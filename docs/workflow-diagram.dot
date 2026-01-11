@@ -1,0 +1,258 @@
+digraph Workflow {
+  // Graph settings
+  rankdir=TB;
+  compound=true;
+  newrank=true;
+  splines=polyline;
+  nodesep=0.6;
+  ranksep=0.8;
+
+  // Default node/edge styles
+  node [shape=box, style="rounded,filled", fillcolor=lightblue, fontname="Arial", fontsize=11];
+  edge [fontname="Arial", fontsize=9];
+
+  // Legend
+  subgraph cluster_legend {
+    label="Legend";
+    style=dashed;
+    fontsize=10;
+
+    leg_wrapper [label="Agent Wrapper", shape=house, fillcolor=lavender];
+    leg_cmd [label="Command / Skill", fillcolor=lightblue];
+    leg_agent [label="(AI Agent Session)", shape=ellipse, fillcolor=lightyellow];
+    leg_human [label="Decision (HITL or AI)", shape=diamond, fillcolor=lightcoral];
+    leg_loop [label="Feedback Loop", shape=cds, fillcolor=lightgreen];
+    leg_parallel [label="Parallel Execution", shape=parallelogram, fillcolor=wheat];
+    leg_session [label="--- New Session ---", shape=plaintext, fontcolor=gray40];
+    leg_note [label="Also: code-align, shared-extract,\n*-simplify (run as needed)", shape=note, fillcolor=white, fontsize=9];
+
+    leg_wrapper -> leg_cmd -> leg_agent -> leg_human -> leg_loop -> leg_parallel -> leg_session [style=invis];
+  }
+
+  // Start - Agent Wrapper
+  subgraph cluster_setup {
+    label="Setup";
+    style=filled;
+    fillcolor=lavender;
+
+    start [label="Run Agent Wrapper", shape=house, fillcolor=lavender];
+    start_agent [label="(Harness selection:\nClaude Code, OpenCode, etc.\nProfiles: GLM+docker, bwrap,\ngemini via CLI Proxy, Copilot...)", shape=ellipse, fillcolor="#ffffcc"];
+  }
+
+  // Research Phase
+  subgraph cluster_research {
+    label="Research Phase (AI Agent Session)";
+    style=filled;
+    fillcolor="#f0f8ff";
+
+    plan_research [label="plan-research", fillcolor=lightblue];
+    plan_research_agent [label="(Agent:\n- Explore codebase\n- Research viability\n- Find alternatives\n- Assess complexity)", shape=ellipse, fillcolor="#ffffcc"];
+    research_review [label="Good idea?\n(HITL or AI)", shape=diamond, fillcolor=lightcoral];
+  }
+
+  // Planning Phase
+  subgraph cluster_planning {
+    label="Planning Phase (AI Agent Sessions)";
+    style=filled;
+    fillcolor=lightyellow;
+
+    session_planning [label="--- New Session (optional) ---", shape=plaintext, fontcolor=gray40];
+    plan_create [label="plan-create\n(or plan-tdd-create)", fillcolor=lightblue];
+    plan_create_agent [label="(Agent:\n- Explore agents align\n- Create plans/<plan>.md\n- Frontmatter: status, skills,\n  versions, parallelization)", shape=ellipse, fillcolor="#ffffcc"];
+    plan_review [label="Review Plan\n(HITL or AI)", shape=diamond, fillcolor=lightcoral];
+    plan_subplans [label="plan-subplans-create\n(optional)", fillcolor=lightblue];
+    plan_subplans_agent [label="(Agent:\n- Create plans/<plan>/<subplans>.md\n- Detect parallel groups\n- Subplans of subplans possible)", shape=ellipse, fillcolor="#ffffcc"];
+    git_commit_plans [label="git-commit\n(commit pending plans)", fillcolor=lightblue];
+  }
+
+  // Worktree Setup
+  subgraph cluster_worktree_setup {
+    label="Worktree Setup";
+    style=filled;
+    fillcolor="#e6ffe6";
+
+    session_worktree [label="--- New Session (optional) ---", shape=plaintext, fontcolor=gray40];
+    plan_worktree_create [label="plan-worktree-create", fillcolor=lightblue];
+    worktree_agent [label="(Agent:\n- Create ../<repo>-<feature>\n- Set git config\n  branch.<branch>.plan)", shape=ellipse, fillcolor="#ffffcc"];
+    cd_worktree [label="cd <worktree-dir>", shape=box, fillcolor=white];
+  }
+
+  // Development Cycle
+  subgraph cluster_dev_cycle {
+    label="Development Cycle (Iterative, Per Session)";
+    style=filled;
+    fillcolor="#e6f3ff";
+
+    session_dev [label="--- New Session ---", shape=plaintext, fontcolor=gray40];
+
+    plan_continue [label="plan-continue", fillcolor=lightblue];
+    plan_continue_agent [label="(Agent:\n- Auto-detect plan from\n  worktree git config\n- Find where left off\n- Load context, create todos)", shape=ellipse, fillcolor="#ffffcc"];
+
+    work [label="Implementation Work", shape=parallelogram, fillcolor=wheat];
+
+    plan_validate [label="plan-validate", fillcolor=lightblue];
+    validate_agent [label="(Agent:\n- Validate vs guidelines\n- Validate vs plan/subplan\n- Run test suite\n- Report evidence)", shape=ellipse, fillcolor="#ffffcc"];
+
+    insights_extract [label="insights-extract\n(optional)", fillcolor=lightblue];
+    insights_agent [label="(Agent:\n- Analyze session\n- Extract self-corrections\n- Save to insights/\n  with frontmatter)", shape=ellipse, fillcolor="#ffffcc"];
+
+    plan_update [label="plan-update", fillcolor=lightblue];
+    update_agent [label="(Agent:\n- Update subplan status\n- Auto-update parent plan(s))", shape=ellipse, fillcolor="#ffffcc"];
+
+    more_subplans [label="More Subplans?\n(HITL or AI)", shape=diamond, fillcolor=lightcoral];
+  }
+
+  // Code Quality Phase
+  subgraph cluster_quality {
+    label="Code Quality Phase (Optional, Separate Session)";
+    style=filled;
+    fillcolor="#fff5e6";
+
+    session_quality [label="--- New Session ---", shape=plaintext, fontcolor=gray40];
+    code_simplify [label="code-simplify\n(find code smells)", fillcolor=lightblue];
+    code_harden [label="code-harden\n(type safety, validation,\nerror handling)", fillcolor=lightblue];
+    quality_loop [label="Another\ncoding loop?", shape=diamond, fillcolor=lightcoral];
+  }
+
+  // Parallel Execution
+  subgraph cluster_parallel {
+    label="Parallel Subplan Execution (Multiple Worktrees)";
+    style=dashed;
+    fillcolor=wheat;
+
+    parallel_note [label="Each parallel agent needs\nits own worktree for subplans\nin same parallel group", shape=note, fillcolor=lightyellow];
+    worktree_1 [label="Worktree A\nSubplan 1\n(parallel_group: 1)", shape=parallelogram];
+    worktree_2 [label="Worktree B\nSubplan 2\n(parallel_group: 1)", shape=parallelogram];
+    worktree_3 [label="Worktree C\nSubplan 3\n(parallel_group: 2)", shape=parallelogram];
+  }
+
+  // Merge Phase
+  subgraph cluster_merge {
+    label="Merge / Abandon Phase";
+    style=filled;
+    fillcolor="#ffe6e6";
+
+    session_merge [label="--- New Session ---", shape=plaintext, fontcolor=gray40];
+
+    merge_or_abandon [label="Merge or Abandon?\n(HITL or AI)", shape=diamond, fillcolor=lightcoral];
+
+    plan_worktree_merge [label="plan-worktree-merge", fillcolor=lightblue];
+    merge_agent [label="(Agent:\n- Intelligent conflict resolution\n  (knows the plan)\n- Merge to parent branch\n- Parallel groups merge to\n  parent before next group)", shape=ellipse, fillcolor="#ffffcc"];
+
+    plan_worktree_abandon [label="plan-worktree-abandon", fillcolor=pink, style="rounded,filled,dashed"];
+    abandon_agent [label="(Agent:\n- Document reason\n- Extract learnings\n- Cleanup worktree)", shape=ellipse, fillcolor="#ffffcc"];
+
+    cd_parent [label="cd <parent-dir>", shape=box, fillcolor=white];
+
+    plan_validate_parent [label="plan-validate\n(on parent plan, optional)", fillcolor=lightblue];
+    validate_parent_agent [label="(Agent:\n- Validate parallel group\n  together on parent)", shape=ellipse, fillcolor="#ffffcc"];
+  }
+
+  // Learning Integration Loop
+  subgraph cluster_insights_loop {
+    label="Continuous Learning Loop (Out-of-band)";
+    style=filled;
+    fillcolor="#e8f5e9";
+
+    insights_integrate [label="insights-integrate\n(optional)", fillcolor=lightblue];
+    integrate_agent [label="(Agent:\n- Merge insights to\n  guidelines/AGENTS.md\n- Mark insights applied)", shape=ellipse, fillcolor="#ffffcc"];
+
+    skills_active [label="Improved Guidelines\nActive in Next Sessions", shape=cds, fillcolor="#ccffcc"];
+
+    simplify_note [label="*-simplify commands run\n\"eventual completion\"\nfor instructions, skills,\nslash commands", shape=note, fillcolor=lightyellow, fontsize=9];
+  }
+
+  // Completion
+  subgraph cluster_complete {
+    label="Completion";
+    style=filled;
+    fillcolor="#e6ffe6";
+
+    session_complete [label="--- New Session ---", shape=plaintext, fontcolor=gray40];
+    git_commit_push [label="git-commit --push\n(when fully complete)", fillcolor=lightblue];
+    end [label="Feature Complete", shape=oval, fillcolor=green];
+  }
+
+  // Main Flow
+  start -> start_agent;
+  start_agent -> plan_research;
+
+  // Research flow
+  plan_research -> plan_research_agent;
+  plan_research_agent -> research_review;
+  research_review -> plan_create [label="Proceed"];
+  research_review -> plan_research [label="Iterate\nresearch", style=dashed];
+
+  // Planning flow
+  plan_create -> plan_create_agent;
+  plan_create_agent -> plan_review;
+  plan_review -> plan_subplans [label="Approved"];
+  plan_review -> plan_create [label="Revise", style=dashed];
+  plan_subplans -> plan_subplans_agent;
+  plan_subplans_agent -> git_commit_plans;
+  git_commit_plans -> plan_worktree_create;
+
+  // Worktree setup flow
+  plan_worktree_create -> worktree_agent;
+  worktree_agent -> cd_worktree;
+  cd_worktree -> plan_continue;
+
+  // Development cycle flow
+  plan_continue -> plan_continue_agent;
+  plan_continue_agent -> work;
+  work -> plan_validate [label="after\nimplementation"];
+  plan_validate -> validate_agent;
+  validate_agent -> insights_extract [label="optional"];
+  validate_agent -> plan_update [style=dashed, label="skip"];
+  insights_extract -> insights_agent;
+  insights_agent -> plan_update;
+  plan_update -> update_agent;
+  update_agent -> more_subplans;
+
+  more_subplans -> plan_continue [label="Yes\n(next pending,\nnew session)"];
+  more_subplans -> code_simplify [label="No\n(all complete)"];
+
+  // Code quality flow
+  code_simplify -> code_harden;
+  code_harden -> quality_loop;
+  quality_loop -> work [label="Yes\n(fix issues)", style=dashed];
+  quality_loop -> merge_or_abandon [label="No\n(proceed)"];
+
+  // Parallel execution (shown separately)
+  plan_continue_agent -> parallel_note [style=dotted, label="parallel\nsubplans"];
+  parallel_note -> worktree_1 [style=invis];
+  worktree_1 -> worktree_2 [style=invis];
+  worktree_2 -> worktree_3 [label="sequential\ndependency\n(group 1 → 2)"];
+
+  // Merge flow
+  merge_or_abandon -> plan_worktree_merge [label="Merge"];
+  merge_or_abandon -> plan_worktree_abandon [label="Abandon", style=dashed];
+
+  plan_worktree_merge -> merge_agent;
+  merge_agent -> cd_parent;
+  cd_parent -> plan_validate_parent;
+  plan_validate_parent -> validate_parent_agent;
+  validate_parent_agent -> git_commit_push;
+
+  // Abandon flow
+  plan_worktree_abandon -> abandon_agent;
+  abandon_agent -> insights_integrate [label="extract\nlearnings"];
+  abandon_agent -> end [label="cleanup\ncomplete", style=dotted];
+
+  // Learning integration loop
+  insights_agent -> insights_integrate [label="later\n(out-of-band)"];
+  insights_integrate -> integrate_agent;
+  integrate_agent -> skills_active;
+  integrate_agent -> simplify_note [style=dotted];
+
+  // Completion
+  git_commit_push -> end;
+
+  // Session boundary visual hints (invisible edges for layout)
+  session_planning -> plan_create [style=invis];
+  session_worktree -> plan_worktree_create [style=invis];
+  session_dev -> plan_continue [style=invis];
+  session_quality -> code_simplify [style=invis];
+  session_merge -> plan_worktree_merge [style=invis];
+  session_complete -> git_commit_push [style=invis];
+}
