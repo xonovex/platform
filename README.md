@@ -22,34 +22,7 @@
 
 **Vision:** Self-organizing agents operating across sandboxes, containers and orchestration platforms (Kubernetes, etc.) spawning their own environments, coordinating across boundaries and managing lifecycles autonomously.
 
-## Index
-
-- [Philosophy](#philosophy)
-- [Quick Start](#quick-start)
-- [Requirements](#requirements)
-- [Installation](#installation)
-- [Agent Wrapper](#agent-wrapper)
-- [Workflow](#workflow)
-- [Docker Sandbox](#docker-sandbox)
-- [Claude Commands](#claude-commands)
-- [Claude Skills](#claude-skills)
-- [License](#license)
-
-## Quick Start
-
-```bash
-# Clone and build
-git clone https://github.com/xonovex/platform.git
-cd platform && npm install && npm run build
-
-# Run Claude Code in a sandbox
-npx agent-cli run --agent claude --sandbox bwrap
-
-# Or use Docker
-docker compose -f packages/docker/docker-agent/compose.yaml run --rm ai-agent
-```
-
-## Requirements
+## Getting Started
 
 | Requirement | Purpose |
 |-------------|---------|
@@ -60,46 +33,26 @@ docker compose -f packages/docker/docker-agent/compose.yaml run --rm ai-agent
 | Nix | Nix sandbox (optional) |
 | tmux | Terminal wrapper (optional) |
 
-## Installation
+```bash
+git clone https://github.com/xonovex/platform.git
+cd platform && npm install && npm run build
+```
+
+<details>
+<summary><strong>Build Go CLI (optional)</strong></summary>
 
 ```bash
-# Clone and install dependencies
-git clone https://github.com/xonovex/platform.git
-cd platform
-npm install
-
-# Build all packages (TypeScript)
-npm run build
-
-# Build Go CLI (optional, requires Go 1.21+)
 npm run build -w @xonovex/agent-cli-go
 ```
 
-## Agent Wrapper
+</details>
 
-CLI tool for running AI coding agents in sandboxed environments with provider and wrapper support.
+## Running Agents
 
-```
-+-------------+     +-------------+     +-------------+
-|  agent-cli  |---->|   sandbox   |---->| claude/open |
-|             |     | bwrap/docker|     |    code     |
-+-------------+     +-------------+     +-------------+
-       |                                       |
-       v                                       v
-+-------------+                         +-------------+
-|  provider   |                         |    your     |
-| gemini/glm  |                         |    code     |
-+-------------+                         +-------------+
-```
-
-### Usage
+### CLI
 
 ```bash
-# TypeScript version
-npx agent-cli run [options]
-
-# Go version
-npx agent-cli-go run [options]
+npx agent-cli run --agent claude --sandbox bwrap
 ```
 
 <details>
@@ -117,7 +70,8 @@ npx agent-cli-go run [options]
 
 </details>
 
-### Examples
+<details>
+<summary><strong>Examples</strong></summary>
 
 ```bash
 # Run Claude Code with bubblewrap sandbox
@@ -133,79 +87,65 @@ npx agent-cli run --agent claude --sandbox bwrap --terminal tmux
 npx agent-cli run --agent opencode --sandbox docker
 ```
 
+</details>
+
+### Docker
+
+Docker compose with custom provider support via [CLIProxyAPI](https://github.com/router-for-me/CLIProxyAPI).
+
+```bash
+docker compose -f packages/docker/docker-agent/compose.yaml run --rm ai-agent
+```
+
+<details>
+<summary><strong>Services</strong></summary>
+
+| Service | Provider | Description |
+|---------|----------|-------------|
+| `ai-agent` | Default | Pass-through Anthropic API |
+| `ai-agent-glm` | GLM | Zhipu AI GLM-4 models |
+| `ai-agent-gemini` | Gemini | Google Gemini 3.x models |
+| `ai-agent-gemini-claude` | Gemini-Claude | Hybrid thinking models |
+| `ai-agent-gpt5-codex` | GPT-5 Codex | OpenAI models |
+
+</details>
+
+<details>
+<summary><strong>Environment Variables</strong></summary>
+
+| Variable | Description |
+|----------|-------------|
+| `ANTHROPIC_AUTH_TOKEN` | Anthropic API token (for default provider) |
+| `ZAI_AUTH_TOKEN` | Z.AI API token (for GLM provider) |
+| `CLI_PROXY_API_KEY` | CLI Proxy API key (for Gemini/GPT providers) |
+| `AGENT_WORK_DIR` | Working directory to mount (defaults to `$PWD`) |
+
+</details>
+
 ## Workflow
 
-```
-+---------------------+     +---------------------+     +---------------------+
-|      Research       |     |      Planning       |     |   Worktree Setup    |
-+---------------------+     +---------------------+     +---------------------+
-| 1. plan-research    |---->| 1. plan-create      |---->| 1. plan-worktree-   |
-|    - viability      |     | 2. plan-subplans    |     |      create         |
-|    - alternatives   |     | 3. git-commit       |     | 2. cd <worktree>    |
-+---------------------+     +---------------------+     +---------------------+
-                                                                  |
-            +-----------------------------------------------------+
-            |
-            v
-+---------------------+     +---------------------+     +---------------------+
-|  Development Loop   |     |    Code Quality     |     |        Merge        |
-+---------------------+     +---------------------+     +---------------------+
-| 1. plan-continue    |---->| 1. code-simplify    |---->| 1. plan-worktree-   |
-| 2. (implement)      |     | 2. code-harden      |     |      merge          |
-| 3. plan-validate    |     |                     |     | 2. git-commit       |
-| 4. insights-extract |     +---------------------+     |      --push         |
-| 5. plan-update      |            |                    +---------------------+
-+---------------------+            |                              |
-            ^                      |                              |
-            |                      |                              v
-            +--- more subplans? ---+                    +---------------------+
-                                                        |        Done         |
-                                                        +---------------------+
+[View workflow diagram](https://raw.githubusercontent.com/xonovex/platform/refs/heads/main/docs/workflow-diagram.png)
 
-Parallel: Multiple agents work on parallel subplan groups in separate worktrees
-Learning: insights-integrate merges learnings into guidelines for future sessions
-```
-
-[View full workflow diagram](https://raw.githubusercontent.com/xonovex/platform/refs/heads/main/docs/workflow-diagram.png)
-
-### Research & Planning
+<details>
+<summary><strong>Commands</strong></summary>
 
 | Command | Description |
 |---------|-------------|
 | `plan-research` | Research viability, suggest alternatives |
 | `plan-create` | Create plan with frontmatter and parallelization info |
 | `plan-subplans-create` | Create subplans for parallel execution |
-| `git-commit` | Commit pending plans |
-
-### Worktree Setup
-
-| Command | Description |
-|---------|-------------|
 | `plan-worktree-create` | Create worktree at `../<repo>-<feature>` |
-
-### Development Cycle
-
-| Command | Description |
-|---------|-------------|
 | `plan-continue` | Auto-detect plan and resume work |
 | `plan-validate` | Validate against guidelines and tests |
-| `insights-extract` | Save self-corrections to `insights/` |
 | `plan-update` | Update plan status |
-
-### Code Quality
-
-| Command | Description |
-|---------|-------------|
+| `plan-worktree-merge` | Merge with intelligent conflict resolution |
 | `code-simplify` | Find code smells |
 | `code-harden` | Improve type safety and error handling |
-
-### Merge
-
-| Command | Description |
-|---------|-------------|
-| `plan-worktree-merge` | Merge with intelligent conflict resolution |
+| `insights-extract` | Save self-corrections to `insights/` |
 | `insights-integrate` | Merge insights into guidelines |
-| `git-commit --push` | Push changes |
+| `git-commit` | Commit changes (use `--push` to push) |
+
+</details>
 
 <details>
 <summary><strong>Parallel Execution</strong></summary>
@@ -231,58 +171,22 @@ An orchestrating agent can run the entire workflow autonomously by spawning agen
 
 </details>
 
-## Docker Sandbox
+## Claude Integration
 
-Docker compose setup for running agents in isolated containers with custom provider support via [CLIProxyAPI](https://github.com/router-for-me/CLIProxyAPI).
-
-| Service | Provider | Description |
-|---------|----------|-------------|
-| `ai-agent` | Default | Pass-through Anthropic API |
-| `ai-agent-glm` | GLM | Zhipu AI GLM-4 models |
-| `ai-agent-gemini` | Gemini | Google Gemini 3.x models |
-| `ai-agent-gemini-claude` | Gemini-Claude | Hybrid thinking models |
-| `ai-agent-gpt5-codex` | GPT-5 Codex | OpenAI models |
-
-### Usage
-
-```bash
-# Build the Docker image
-docker build -t ai-agent -f packages/docker/docker-agent/Dockerfile .
-
-# Run with default provider
-docker compose -f packages/docker/docker-agent/compose.yaml run --rm ai-agent
-
-# Run with Gemini provider
-docker compose -f packages/docker/docker-agent/compose.yaml run --rm ai-agent-gemini
-```
+Slash commands in `.claude/commands/` and technology-specific guidelines in `.claude/skills/`.
 
 <details>
-<summary><strong>Environment Variables</strong></summary>
-
-| Variable | Description |
-|----------|-------------|
-| `ANTHROPIC_AUTH_TOKEN` | Anthropic API token (for default provider) |
-| `ZAI_AUTH_TOKEN` | Z.AI API token (for GLM provider) |
-| `CLI_PROXY_API_KEY` | CLI Proxy API key (for Gemini/GPT providers) |
-| `AGENT_WORK_DIR` | Working directory to mount (defaults to `$PWD`) |
-
-</details>
-
-## Claude Commands
-
-Slash commands for Claude Code located in `.claude/commands/`:
+<summary><strong>Commands</strong></summary>
 
 - **Planning**: `plan-research`, `plan-create`, `plan-continue`, `plan-validate`
 - **Code quality**: `code-simplify`, `code-harden`, `code-align`
 - **Git workflows**: `git-commit`, `plan-worktree-create`, `plan-worktree-merge`
 - **Insights**: `insights-extract`, `insights-integrate`
 
-## Claude Skills
-
-Technology-specific guidelines in `.claude/skills/` covering TypeScript, React, Hono, Docker, Kubernetes, and more.
+</details>
 
 <details>
-<summary><strong>Standard vs Opinionated Skills</strong></summary>
+<summary><strong>Skills</strong></summary>
 
 Standard skills cover common best practices, while `-opinionated` variants contain specialized patterns:
 
