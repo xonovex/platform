@@ -10,6 +10,20 @@ CLI tool for running AI coding agents in sandboxed environments with provider an
 npx agent run --agent claude --sandbox bwrap --wrapper tmux
 ```
 
+## Docker Sandbox
+
+Docker compose setup for running agents in isolated containers with custom provider support via [CLIProxyAPI](https://github.com/router-for-me/CLIProxyAPI). Includes pre-configured services for:
+
+* **Default**: Pass-through Anthropic API
+* **GLM**: Zhipu AI GLM-4 models via Z.AI API
+* **Gemini**: Google Gemini 3.x models via CLI Proxy
+* **Gemini-Claude**: Hybrid thinking models
+* **GPT-5 Codex**: OpenAI models via CLI Proxy
+
+```bash
+AGENT_WORK_DIR=$(pwd) docker compose -f packages/tools/tool-agent-docker/compose.yaml run --rm ai-agent-gemini
+```
+
 ## Claude Commands
 
 Slash commands for Claude Code located in `.claude/commands/`. Includes commands for planning, code quality, git workflows, and insights extraction.
@@ -130,6 +144,7 @@ packages/
     tool-lib-go/       # Shared Go utilities
     tool-agent-cli/    # Agent CLI (TypeScript)
     tool-agent-cli-go/ # Agent CLI (Go)
+    tool-agent-docker/ # Docker sandbox with provider support
 docs/                  # Documentation and workflow diagrams
 .claude/commands/      # Claude Code slash commands
 .claude/skills/        # Claude Code skills (guidelines)

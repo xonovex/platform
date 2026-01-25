@@ -1,0 +1,390 @@
+name: ai-agent
+
+services:
+  # Default AI Agent (pass-through environment variables)
+  # Usage: AGENT_WORK_DIR=$(pwd) docker compose -f stacks/ai-agent.yaml run --rm ai-agent
+  ai-agent:
+    build:
+      context: ../../..
+      dockerfile: packages/tools/tool-agent-docker/Dockerfile
+    image: ai-agent
+    pull_policy: never
+    container_name: ai-agent
+    user: ${AGENT_UID:-1000}:${AGENT_GID:-1000}
+    group_add:
+      - ${DOCKER_GID:-48}
+    environment:
+      - TZ=Europe/Amsterdam
+      - HOME=${HOME}
+      - PATH=/usr/local/bin:/usr/bin:/bin:${HOME}/.local/bin
+      - TERM=xterm-256color
+      # Anthropic API configuration (pass-through from environment)
+      - ANTHROPIC_AUTH_TOKEN=${ANTHROPIC_AUTH_TOKEN:-}
+      - ANTHROPIC_BASE_URL=${ANTHROPIC_BASE_URL:-}
+      - API_TIMEOUT_MS=${API_TIMEOUT_MS:-}
+      - CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=${CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC:-}
+      - ANTHROPIC_DEFAULT_OPUS_MODEL=${ANTHROPIC_DEFAULT_OPUS_MODEL:-}
+      - ANTHROPIC_DEFAULT_SONNET_MODEL=${ANTHROPIC_DEFAULT_SONNET_MODEL:-}
+      - ANTHROPIC_DEFAULT_HAIKU_MODEL=${ANTHROPIC_DEFAULT_HAIKU_MODEL:-}
+      - CLAUDE_CODE_SUBAGENT_MODEL=${CLAUDE_CODE_SUBAGENT_MODEL:-}
+      # OpenTelemetry monitoring
+      - CLAUDE_CODE_ENABLE_TELEMETRY=1
+      - OTEL_METRICS_EXPORTER=otlp
+      - OTEL_LOGS_EXPORTER=otlp
+      - OTEL_EXPORTER_OTLP_PROTOCOL=grpc
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://ai-agent-otel-lgtm:4317
+      - OTEL_METRIC_EXPORT_INTERVAL=10000
+      - OTEL_RESOURCE_ATTRIBUTES=${OTEL_RESOURCE_ATTRIBUTES:-}
+    volumes:
+      # Sandbox home directory (persisted)
+      - ${AGENT_SANDBOX_HOME:-~/.sandboxed-agent-home}:${HOME}:rw
+      # Working directory
+      - ${AGENT_WORK_DIR:?AGENT_WORK_DIR is required}:${AGENT_WORK_DIR}:rw
+      # Temp directory
+      - /tmp:/tmp:rw
+      # Tool directories (bind from host)
+      - ~/.ssh:${HOME}/.ssh:ro
+      - ~/.gitconfig:${HOME}/.gitconfig:ro
+      - ~/.claude:${HOME}/.claude:rw
+      - ~/.claude.json:${HOME}/.claude.json:rw
+      - ~/.config:${HOME}/.config:rw
+      - ~/.local:${HOME}/.local:rw
+      - ~/.cache:${HOME}/.cache:rw
+      - ~/.npm:${HOME}/.npm:rw
+      - ~/.cargo:${HOME}/.cargo:ro
+      # Docker socket for container management
+      - /var/run/docker.sock:/var/run/docker.sock:rw
+    working_dir: ${AGENT_WORK_DIR}
+    networks:
+      - ai-agent-network
+    stdin_open: true
+    tty: true
+    depends_on:
+      ai-agent-otel-lgtm:
+        condition: service_healthy
+
+  # Zhipu AI GLM provider (via Z.AI API)
+  # Usage: AGENT_WORK_DIR=$(pwd) docker compose -f stacks/ai-agent.yaml run --rm ai-agent-glm
+  ai-agent-glm:
+    build:
+      context: ../../..
+      dockerfile: packages/tools/tool-agent-docker/Dockerfile
+    image: ai-agent
+    pull_policy: never
+    container_name: ai-agent-glm
+    user: ${AGENT_UID:-1000}:${AGENT_GID:-1000}
+    group_add:
+      - ${DOCKER_GID:-48}
+    environment:
+      - TZ=Europe/Amsterdam
+      - HOME=${HOME}
+      - PATH=/usr/local/bin:/usr/bin:/bin:${HOME}/.local/bin
+      - TERM=xterm-256color
+      # GLM provider configuration
+      - ANTHROPIC_AUTH_TOKEN=${ZAI_AUTH_TOKEN:-}
+      - ANTHROPIC_BASE_URL=https://api.z.ai/api/anthropic
+      - API_TIMEOUT_MS=3000000
+      - CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1
+      - ANTHROPIC_DEFAULT_OPUS_MODEL=GLM-4.7
+      - ANTHROPIC_DEFAULT_SONNET_MODEL=GLM-4.7
+      - ANTHROPIC_DEFAULT_HAIKU_MODEL=GLM-4.5-Air
+      # OpenTelemetry monitoring
+      - CLAUDE_CODE_ENABLE_TELEMETRY=1
+      - OTEL_METRICS_EXPORTER=otlp
+      - OTEL_LOGS_EXPORTER=otlp
+      - OTEL_EXPORTER_OTLP_PROTOCOL=grpc
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://ai-agent-otel-lgtm:4317
+      - OTEL_METRIC_EXPORT_INTERVAL=10000
+      - OTEL_RESOURCE_ATTRIBUTES=${OTEL_RESOURCE_ATTRIBUTES:-provider.name=glm}
+    volumes:
+      # Sandbox home directory (persisted)
+      - ${AGENT_SANDBOX_HOME:-~/.sandboxed-agent-home}:${HOME}:rw
+      # Working directory
+      - ${AGENT_WORK_DIR:?AGENT_WORK_DIR is required}:${AGENT_WORK_DIR}:rw
+      # Temp directory
+      - /tmp:/tmp:rw
+      # Tool directories (bind from host)
+      - ~/.ssh:${HOME}/.ssh:ro
+      - ~/.gitconfig:${HOME}/.gitconfig:ro
+      - ~/.claude:${HOME}/.claude:rw
+      - ~/.claude.json:${HOME}/.claude.json:rw
+      - ~/.config:${HOME}/.config:rw
+      - ~/.local:${HOME}/.local:rw
+      - ~/.cache:${HOME}/.cache:rw
+      - ~/.npm:${HOME}/.npm:rw
+      - ~/.cargo:${HOME}/.cargo:ro
+      # Docker socket for container management
+      - /var/run/docker.sock:/var/run/docker.sock:rw
+    working_dir: ${AGENT_WORK_DIR}
+    networks:
+      - ai-agent-network
+    stdin_open: true
+    tty: true
+    depends_on:
+      ai-agent-otel-lgtm:
+        condition: service_healthy
+
+  # Google Gemini 3.x provider (via CLI Proxy)
+  # Usage: AGENT_WORK_DIR=$(pwd) docker compose -f stacks/ai-agent.yaml run --rm ai-agent-gemini
+  ai-agent-gemini:
+    build:
+      context: ../../..
+      dockerfile: packages/tools/tool-agent-docker/Dockerfile
+    image: ai-agent
+    pull_policy: never
+    container_name: ai-agent-gemini
+    user: ${AGENT_UID:-1000}:${AGENT_GID:-1000}
+    group_add:
+      - ${DOCKER_GID:-48}
+    environment:
+      - TZ=Europe/Amsterdam
+      - HOME=${HOME}
+      - PATH=/usr/local/bin:/usr/bin:/bin:${HOME}/.local/bin
+      - TERM=xterm-256color
+      # Gemini provider configuration
+      - ANTHROPIC_AUTH_TOKEN=${CLI_PROXY_API_KEY:-}
+      - ANTHROPIC_BASE_URL=http://ai-agent-cli-proxy-api:8317
+      - API_TIMEOUT_MS=3000000
+      - CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1
+      - ANTHROPIC_DEFAULT_OPUS_MODEL=gemini-3-pro-preview
+      - ANTHROPIC_DEFAULT_SONNET_MODEL=gemini-3-flash-preview
+      - ANTHROPIC_DEFAULT_HAIKU_MODEL=gemini-2.5-flash-lite
+      - CLAUDE_CODE_SUBAGENT_MODEL=gemini-3-flash-preview
+      # OpenTelemetry monitoring
+      - CLAUDE_CODE_ENABLE_TELEMETRY=1
+      - OTEL_METRICS_EXPORTER=otlp
+      - OTEL_LOGS_EXPORTER=otlp
+      - OTEL_EXPORTER_OTLP_PROTOCOL=grpc
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://ai-agent-otel-lgtm:4317
+      - OTEL_METRIC_EXPORT_INTERVAL=10000
+      - OTEL_RESOURCE_ATTRIBUTES=${OTEL_RESOURCE_ATTRIBUTES:-provider.name=gemini}
+    volumes:
+      # Sandbox home directory (persisted)
+      - ${AGENT_SANDBOX_HOME:-~/.sandboxed-agent-home}:${HOME}:rw
+      # Working directory
+      - ${AGENT_WORK_DIR:?AGENT_WORK_DIR is required}:${AGENT_WORK_DIR}:rw
+      # Temp directory
+      - /tmp:/tmp:rw
+      # Tool directories (bind from host)
+      - ~/.ssh:${HOME}/.ssh:ro
+      - ~/.gitconfig:${HOME}/.gitconfig:ro
+      - ~/.claude:${HOME}/.claude:rw
+      - ~/.claude.json:${HOME}/.claude.json:rw
+      - ~/.config:${HOME}/.config:rw
+      - ~/.local:${HOME}/.local:rw
+      - ~/.cache:${HOME}/.cache:rw
+      - ~/.npm:${HOME}/.npm:rw
+      - ~/.cargo:${HOME}/.cargo:ro
+      # Docker socket for container management
+      - /var/run/docker.sock:/var/run/docker.sock:rw
+    working_dir: ${AGENT_WORK_DIR}
+    networks:
+      - ai-agent-network
+    stdin_open: true
+    tty: true
+    depends_on:
+      ai-agent-otel-lgtm:
+        condition: service_healthy
+      ai-agent-cli-proxy-api:
+        condition: service_started
+
+  # Gemini-Claude Thinking hybrid provider (via CLI Proxy)
+  # Usage: AGENT_WORK_DIR=$(pwd) docker compose -f stacks/ai-agent.yaml run --rm ai-agent-gemini-claude
+  ai-agent-gemini-claude:
+    build:
+      context: ../../..
+      dockerfile: packages/tools/tool-agent-docker/Dockerfile
+    image: ai-agent
+    pull_policy: never
+    container_name: ai-agent-gemini-claude
+    user: ${AGENT_UID:-1000}:${AGENT_GID:-1000}
+    group_add:
+      - ${DOCKER_GID:-48}
+    environment:
+      - TZ=Europe/Amsterdam
+      - HOME=${HOME}
+      - PATH=/usr/local/bin:/usr/bin:/bin:${HOME}/.local/bin
+      - TERM=xterm-256color
+      # Gemini-Claude provider configuration
+      - ANTHROPIC_AUTH_TOKEN=${CLI_PROXY_API_KEY:-}
+      - ANTHROPIC_BASE_URL=http://ai-agent-cli-proxy-api:8317
+      - API_TIMEOUT_MS=3000000
+      - CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1
+      - ANTHROPIC_DEFAULT_OPUS_MODEL=gemini-claude-opus-4-5-thinking
+      - ANTHROPIC_DEFAULT_SONNET_MODEL=gemini-claude-sonnet-4-5-thinking
+      - ANTHROPIC_DEFAULT_HAIKU_MODEL=gemini-2.5-flash-lite
+      - CLAUDE_CODE_SUBAGENT_MODEL=gemini-claude-sonnet-4-5
+      # OpenTelemetry monitoring
+      - CLAUDE_CODE_ENABLE_TELEMETRY=1
+      - OTEL_METRICS_EXPORTER=otlp
+      - OTEL_LOGS_EXPORTER=otlp
+      - OTEL_EXPORTER_OTLP_PROTOCOL=grpc
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://ai-agent-otel-lgtm:4317
+      - OTEL_METRIC_EXPORT_INTERVAL=10000
+      - OTEL_RESOURCE_ATTRIBUTES=${OTEL_RESOURCE_ATTRIBUTES:-provider.name=gemini-claude}
+    volumes:
+      # Sandbox home directory (persisted)
+      - ${AGENT_SANDBOX_HOME:-~/.sandboxed-agent-home}:${HOME}:rw
+      # Working directory
+      - ${AGENT_WORK_DIR:?AGENT_WORK_DIR is required}:${AGENT_WORK_DIR}:rw
+      # Temp directory
+      - /tmp:/tmp:rw
+      # Tool directories (bind from host)
+      - ~/.ssh:${HOME}/.ssh:ro
+      - ~/.gitconfig:${HOME}/.gitconfig:ro
+      - ~/.claude:${HOME}/.claude:rw
+      - ~/.claude.json:${HOME}/.claude.json:rw
+      - ~/.config:${HOME}/.config:rw
+      - ~/.local:${HOME}/.local:rw
+      - ~/.cache:${HOME}/.cache:rw
+      - ~/.npm:${HOME}/.npm:rw
+      - ~/.cargo:${HOME}/.cargo:ro
+      # Docker socket for container management
+      - /var/run/docker.sock:/var/run/docker.sock:rw
+    working_dir: ${AGENT_WORK_DIR}
+    networks:
+      - ai-agent-network
+    stdin_open: true
+    tty: true
+    depends_on:
+      ai-agent-otel-lgtm:
+        condition: service_healthy
+      ai-agent-cli-proxy-api:
+        condition: service_started
+
+  # OpenAI GPT-5.2 Codex provider (via CLI Proxy)
+  # Usage: AGENT_WORK_DIR=$(pwd) docker compose -f stacks/ai-agent.yaml run --rm ai-agent-gpt5-codex
+  ai-agent-gpt5-codex:
+    build:
+      context: ../../..
+      dockerfile: packages/tools/tool-agent-docker/Dockerfile
+    image: ai-agent
+    pull_policy: never
+    container_name: ai-agent-gpt5-codex
+    user: ${AGENT_UID:-1000}:${AGENT_GID:-1000}
+    group_add:
+      - ${DOCKER_GID:-48}
+    environment:
+      - TZ=Europe/Amsterdam
+      - HOME=${HOME}
+      - PATH=/usr/local/bin:/usr/bin:/bin:${HOME}/.local/bin
+      - TERM=xterm-256color
+      # GPT-5.2 Codex provider configuration
+      - ANTHROPIC_AUTH_TOKEN=${CLI_PROXY_API_KEY:-}
+      - ANTHROPIC_BASE_URL=http://ai-agent-cli-proxy-api:8317
+      - API_TIMEOUT_MS=3000000
+      - CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1
+      - ANTHROPIC_DEFAULT_OPUS_MODEL=gpt-5.2-codex(high)
+      - ANTHROPIC_DEFAULT_SONNET_MODEL=gpt-5.2-codex(medium)
+      - ANTHROPIC_DEFAULT_HAIKU_MODEL=gpt-5.2-codex(low)
+      - CLAUDE_CODE_SUBAGENT_MODEL=gpt-5.2-codex(medium)
+      # OpenTelemetry monitoring
+      - CLAUDE_CODE_ENABLE_TELEMETRY=1
+      - OTEL_METRICS_EXPORTER=otlp
+      - OTEL_LOGS_EXPORTER=otlp
+      - OTEL_EXPORTER_OTLP_PROTOCOL=grpc
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://ai-agent-otel-lgtm:4317
+      - OTEL_METRIC_EXPORT_INTERVAL=10000
+      - OTEL_RESOURCE_ATTRIBUTES=${OTEL_RESOURCE_ATTRIBUTES:-provider.name=gpt5-codex}
+    volumes:
+      # Sandbox home directory (persisted)
+      - ${AGENT_SANDBOX_HOME:-~/.sandboxed-agent-home}:${HOME}:rw
+      # Working directory
+      - ${AGENT_WORK_DIR:?AGENT_WORK_DIR is required}:${AGENT_WORK_DIR}:rw
+      # Temp directory
+      - /tmp:/tmp:rw
+      # Tool directories (bind from host)
+      - ~/.ssh:${HOME}/.ssh:ro
+      - ~/.gitconfig:${HOME}/.gitconfig:ro
+      - ~/.claude:${HOME}/.claude:rw
+      - ~/.claude.json:${HOME}/.claude.json:rw
+      - ~/.config:${HOME}/.config:rw
+      - ~/.local:${HOME}/.local:rw
+      - ~/.cache:${HOME}/.cache:rw
+      - ~/.npm:${HOME}/.npm:rw
+      - ~/.cargo:${HOME}/.cargo:ro
+      # Docker socket for container management
+      - /var/run/docker.sock:/var/run/docker.sock:rw
+    working_dir: ${AGENT_WORK_DIR}
+    networks:
+      - ai-agent-network
+    stdin_open: true
+    tty: true
+    depends_on:
+      ai-agent-otel-lgtm:
+        condition: service_healthy
+      ai-agent-cli-proxy-api:
+        condition: service_started
+
+  ai-agent-cli-proxy-api:
+    image: eceasy/cli-proxy-api:latest
+    container_name: ai-agent-cli-proxy-api
+    # Runs as root (required by CLI Proxy API for auth directory)
+    environment:
+      - TZ=Europe/Amsterdam
+    ports:
+      - 8317:8317
+      - 8085:8085
+      - 1455:1455
+      - 54545:54545
+      - 51121:51121
+      - 11451:11451
+    volumes:
+      - ${AGENT_REPO_DIR:-../../..}/data/ai-agent-cli-proxy-api/config.yaml:/CLIProxyAPI/config.yaml:ro
+      - ${AGENT_REPO_DIR:-../../..}/data/ai-agent-cli-proxy-api/auth:/root/.cli-proxy-api
+      - ${AGENT_REPO_DIR:-../../..}/data/ai-agent-cli-proxy-api/logs:/CLIProxyAPI/logs
+    networks:
+      - ai-agent-network
+    restart: unless-stopped
+
+  ai-agent-otel-lgtm:
+    image: grafana/otel-lgtm:latest
+    container_name: ai-agent-otel-lgtm
+    user: ${AGENT_UID:-1000}:${AGENT_GID:-1000}
+    environment:
+      - TZ=Europe/Amsterdam
+    ports:
+      - 127.0.0.1:3001:3000
+      - 127.0.0.1:4040:4040
+      - 127.0.0.1:4317:4317
+      - 127.0.0.1:4318:4318
+      - 127.0.0.1:9090:9090
+    volumes:
+      - ${AGENT_REPO_DIR:-../../..}/data/ai-agent-otel-lgtm:/data
+      - ${AGENT_REPO_DIR:-../../..}/packages/ai/ai-agent-otel-lgtm/dashboards:/dashboards:ro
+      - ${AGENT_REPO_DIR:-../../..}/packages/ai/ai-agent-otel-lgtm/otelcol-config.yaml:/otel-lgtm/otelcol-config.yaml:ro
+      - ${AGENT_REPO_DIR:-../../..}/packages/ai/ai-agent-otel-lgtm/prometheus.yaml:/otel-lgtm/prometheus.yaml:ro
+    networks:
+      - ai-agent-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "cat", "/tmp/ready"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
+
+  ai-agent-otel-lgtm-init:
+    image: curlimages/curl:latest
+    container_name: ai-agent-otel-lgtm-init
+    user: ${AGENT_UID:-1000}:${AGENT_GID:-1000}
+    environment:
+      - GRAFANA_URL=http://ai-agent-otel-lgtm:3000
+      - GRAFANA_USER=admin
+      - GRAFANA_PASSWORD=admin
+      - DASHBOARDS_DIR=/dashboards
+    volumes:
+      - ${AGENT_REPO_DIR:-../../..}/packages/ai/ai-agent-otel-lgtm/dashboards:/dashboards:ro
+      - ${AGENT_REPO_DIR:-../../..}/packages/ai/ai-agent-otel-lgtm/init-dashboards.sh:/init-dashboards.sh:ro
+    networks:
+      - ai-agent-network
+    depends_on:
+      ai-agent-otel-lgtm:
+        condition: service_healthy
+    entrypoint: ["/bin/sh", "/init-dashboards.sh"]
+    restart: on-failure
+
+networks:
+  ai-agent-network:
+    name: ai-agent-network
+    driver: bridge

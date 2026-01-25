@@ -1,0 +1,5 @@
+type: application
+language: bash
+tags:
+  - docker
+  - agent
