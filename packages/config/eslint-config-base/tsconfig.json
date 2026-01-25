@@ -1,0 +1,10 @@
+{
+  "extends": "@xonovex/ts-config-node",
+  "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": ".",
+    "baseUrl": "."
+  },
+  "include": ["src", "eslint.config.ts"],
+  "exclude": ["dist"]
+}

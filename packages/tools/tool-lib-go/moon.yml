@@ -1,0 +1,7 @@
+$schema: https://moonrepo.dev/schemas/project.json
+type: library
+language: go
+tags:
+  - scripts
+  - go
+  - shared

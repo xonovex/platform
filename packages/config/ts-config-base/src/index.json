@@ -1,0 +1,42 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+
+    "baseUrl": ".",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "customConditions": ["source"],
+
+    "allowJs": true,
+    "resolveJsonModule": true,
+
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "verbatimModuleSyntax": true,
+    "forceConsistentCasingInFileNames": true,
+
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+
+    "composite": true,
+    "incremental": true,
+
+    "declaration": true,
+
+    "sourceMap": true,
+    "declarationMap": true,
+
+    "noEmitOnError": true,
+
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedSideEffectImports": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "strict": true,
+
+    "types": ["vitest/importMeta", "vitest/globals"]
+  }
+}

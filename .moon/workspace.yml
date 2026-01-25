@@ -1,0 +1,50 @@
+# moonrepo workspace configuration
+# https://moonrepo.dev/docs/config/workspace
+# yaml-language-server: $schema=https://moonrepo.dev/schemas/workspace.json
+
+$schema: https://moonrepo.dev/schemas/workspace.json
+
+# Projects configuration - using globs for automatic discovery
+projects:
+  # Top-level directories
+  - "docs"
+
+  # Config packages
+  - "packages/config/*"
+
+  # Tool packages
+  - "packages/tools/*"
+
+# Version control system configuration
+vcs:
+  manager: "git"
+  provider: "github"
+  defaultBranch: "main"
+
+  # VCS hooks for commit validation
+  syncHooks: true
+  hooks:
+    # Commit message validation using commitlint
+    commit-msg:
+      - "npx commitlint --edit $ARG1"
+# Runner configuration for task execution
+runner:
+  # Auto-install dependencies before running tasks
+  autoCleanCache: true
+  cacheLifetime: "7 days"
+
+  # Concurrency settings
+  inheritColorsForPipedTasks: true
+  logRunningCommand: true
+
+# Hasher configuration for intelligent caching
+hasher:
+  # Optimization for monorepos
+  optimization: "performance"
+
+  # Files that affect all projects
+  walkStrategy: "vcs"
+
+# Constraints for better dependency management
+constraints:
+  enforceProjectTypeRelationships: true

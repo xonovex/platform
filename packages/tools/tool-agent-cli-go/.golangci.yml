@@ -1,0 +1,35 @@
+linters:
+  enable:
+    - gofmt
+    - govet
+    - errcheck
+    - staticcheck
+    - unused
+    - gosimple
+    - ineffassign
+    - typecheck
+    - goimports
+    - misspell
+
+linters-settings:
+  gofmt:
+    simplify: true
+  goimports:
+    local-prefixes: github.com/xonovex/platform
+  misspell:
+    locale: US
+
+issues:
+  exclude-use-default: false
+  max-issues-per-linter: 0
+  max-same-issues: 0
+  exclude-rules:
+    # Exclude some linters from running on test files
+    - path: _test\.go
+      linters:
+        - errcheck
+
+run:
+  timeout: 5m
+  tests: true
+  modules-download-mode: readonly

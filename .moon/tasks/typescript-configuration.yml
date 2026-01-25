@@ -1,0 +1,112 @@
+# Shared tasks for configuration packages (ESLint, Vite, Vitest, Astro configs)
+# https://moonrepo.dev/docs/config/tasks
+# yaml-language-server: $schema=https://moonrepo.dev/schemas/tasks.json
+
+$schema: https://moonrepo.dev/schemas/tasks.json
+
+implicitInputs:
+  - "package.json"
+  - "tsconfig*.json"
+
+fileGroups:
+  sources:
+    - "src/**/*"
+  configs:
+    - "*.config.*"
+    - "tsconfig*.json"
+    - ".eslintrc*"
+    - ".prettierrc*"
+    - "package.json"
+
+tasks:
+  # TypeScript compilation task
+  # Compiles config TypeScript to JavaScript in dist/
+  build:
+    deps:
+      - "^:build"
+    command:
+      - "npm"
+      - "run"
+      - "build"
+    inputs:
+      - "@globs(sources)"
+      - "@globs(configs)"
+    outputs:
+      - "dist"
+    options:
+      cache: true
+      runDepsInParallel: true
+
+  # Clean build artifacts
+  clean:
+    command: "bash -lc 'rm -rf dist'"
+    local: true
+    options:
+      cache: false
+
+  # Typecheck without emitting
+  typecheck:
+    command:
+      - "npm"
+      - "run"
+      - "typecheck"
+    deps:
+      - '^:build'
+    inputs:
+      - "@globs(sources)"
+      - "tsconfig*.json"
+    outputs: []
+    options:
+      cache: true
+
+  # Linting
+  lint:
+    command:
+      - "npm"
+      - "run"
+      - "lint"
+    inputs:
+      - "@globs(sources)"
+      - "@globs(configs)"
+    outputs: []
+
+  # Linting with auto-fix
+  lint-fix:
+    command:
+      - "npm"
+      - "run"
+      - "lint:fix"
+    inputs:
+      - "@globs(sources)"
+      - "@globs(configs)"
+    outputs: []
+    options:
+      cache: false
+
+  # Code formatting
+  fmt:
+    command:
+      - "npm"
+      - "run"
+      - "fmt"
+    inputs:
+      - "@globs(sources)"
+      - "@globs(configs)"
+      - "*.json"
+      - "*.md"
+    outputs: []
+    options:
+      cache: false
+
+  # Format checking
+  fmt-check:
+    command:
+      - "npm"
+      - "run"
+      - "fmt:check"
+    inputs:
+      - "@globs(sources)"
+      - "@globs(configs)"
+      - "*.json"
+      - "*.md"
+    outputs: []

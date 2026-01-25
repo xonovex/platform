@@ -1,0 +1,51 @@
+{
+  "compilerOptions": {
+    /* Language and Target Configuration */
+    "target": "ESNext",
+
+    /* Module and Path Resolution */
+    "baseUrl": ".",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "customConditions": ["source"],
+
+    "allowJs": true,
+    "resolveJsonModule": true,
+
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "verbatimModuleSyntax": true,
+    "forceConsistentCasingInFileNames": true,
+
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+
+    /* Build and Output Settings */
+    "composite": true,
+    "incremental": true,
+
+    "declaration": true,
+
+    "sourceMap": true,
+    "declarationMap": true,
+
+    "noEmitOnError": true,
+
+    /* Code Quality and Linting */
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedSideEffectImports": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "strict": true,
+
+    /* Vitest */
+    "types": [
+      "@testing-library/jest-dom",
+      "vitest/importMeta",
+      "vitest/globals"
+    ]
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "name": "@xonovex/eslint-config-cli",
+  "version": "0.1.0",
+  "description": "ESLint configuration for CLI tools and scripts",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "types": "./dist/src/index.d.ts",
+      "node": "./dist/src/index.js",
+      "import": {
+        "source": "./src/index.ts",
+        "default": "./src/index.ts"
+      }
+    },
+    "./*": {
+      "types": "./dist/src/*.d.ts",
+      "node": "./dist/src/*.js",
+      "import": {
+        "source": "./src/*.ts",
+        "default": "./src/*.ts"
+      }
+    }
+  },
+  "dependencies": {
+    "@xonovex/eslint-config-base": "0.1.0",
+    "globals": "17.1.0"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "fmt": "prettier --write .",
+    "fmt:check": "prettier --check .",
+    "typecheck": "tsc --noemit",
+    "test": "echo 'No tests for config package'"
+  },
+  "devDependencies": {
+    "@xonovex/eslint-config-base": "0.1.0",
+    "@xonovex/ts-config-build": "0.1.0",
+    "@types/node": "25.0.10"
+  }
+}

@@ -1,0 +1,30 @@
+$schema: https://moonrepo.dev/schemas/project.json
+type: configuration
+language: typescript
+tags:
+  - tenant-shared
+fileGroups:
+  sources:
+    - src/**/*
+  tests:
+    - src/**/*.test.*
+    - src/**/*.spec.*
+    - test/**/*
+  configs:
+    - "*.config.*"
+    - tsconfig*.json
+    - .eslintrc*
+    - .prettierrc*
+    - package.json
+tasks:
+  build:
+    command:
+      - "npm"
+      - "run"
+      - "build"
+    inputs:
+      - "@globs(sources)"
+      - "@globs(configs)"
+    outputs: []
+    options:
+      cache: true

@@ -1,0 +1,53 @@
+# Shared tasks for Go application packages
+# https://moonrepo.dev/docs/config/tasks
+# yaml-language-server: $schema=https://moonrepo.dev/schemas/tasks.json
+
+$schema: https://moonrepo.dev/schemas/tasks.json
+
+extends: "./go-library.yml"
+
+tasks:
+  # Override go-build to create named binary in dist/
+  go-build:
+    deps:
+      - "^:go-build"
+    command:
+      - "bash"
+      - "-c"
+      - "go build -o dist/$(basename $(pwd)) ./cmd/..."
+    inputs:
+      - "@globs(sources)"
+      - "go.mod"
+      - "go.sum"
+    outputs:
+      - "dist"
+    options:
+      cache: true
+
+  # Run the compiled binary
+  go-run:
+    command:
+      - "bash"
+      - "-c"
+      - "./dist/$(basename $(pwd))"
+    deps:
+      - "go-build"
+    local: true
+    options:
+      cache: false
+      runInCI: false
+      persistent: true
+
+  # Install binary to GOPATH/bin
+  go-install:
+    command:
+      - "go"
+      - "install"
+      - "./cmd/..."
+    deps:
+      - "go-build"
+    inputs:
+      - "@globs(sources)"
+    outputs: []
+    options:
+      cache: false

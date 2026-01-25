@@ -1,0 +1,9 @@
+$schema: https://moonrepo.dev/schemas/project.json
+type: application
+language: go
+dependsOn:
+  - tool-lib-go
+tags:
+  - scripts
+  - go
+  - cli

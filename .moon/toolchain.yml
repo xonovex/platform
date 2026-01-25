@@ -1,0 +1,25 @@
+# Moonrepo toolchain configuration
+# https://moonrepo.dev/docs/config/toolchain
+# yaml-language-server: $schema=https://moonrepo.dev/schemas/toolchain.json
+
+$schema: "https://moonrepo.dev/schemas/toolchain.json"
+
+unstable_node:
+  #version: "24.9.0"
+
+unstable_npm:
+  installArgs: ["--no-save"]
+  #version: "11.6.0"
+
+typescript:
+  createMissingConfig: false
+  syncProjectReferences: true
+  syncProjectReferencesToPaths: true
+
+unstable_javascript:
+  packageManager: "npm"
+  syncPackageManagerField: true
+  syncProjectWorkspaceDependencies: true
+  dependencyVersionFormat: "version-caret"
+
+unstable_go: {}

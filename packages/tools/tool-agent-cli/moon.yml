@@ -1,0 +1,15 @@
+$schema: https://moonrepo.dev/schemas/project.json
+type: library
+language: typescript
+dependsOn:
+  - tool-lib
+tags:
+  - scripts
+  - typescript
+tasks:
+  build:
+    deps:
+      - ^:build
+      - vitest-config-node:build
+      - eslint-config-cli:build
+      - ts-config-cli:build

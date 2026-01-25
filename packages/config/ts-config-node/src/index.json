@@ -1,0 +1,7 @@
+{
+  "extends": "@xonovex/ts-config-base",
+  "compilerOptions": {
+    "noEmit": false,
+    "types": ["node", "vitest/importMeta", "vitest/globals"]
+  }
+}
