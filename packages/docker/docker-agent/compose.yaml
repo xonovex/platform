@@ -6,7 +6,7 @@ services:
   ai-agent:
     build:
       context: ../../..
-      dockerfile: packages/tools/tool-agent-docker/Dockerfile
+      dockerfile: packages/docker/docker-agent/Dockerfile
     image: ai-agent
     pull_policy: never
     container_name: ai-agent
@@ -68,7 +68,7 @@ services:
   ai-agent-glm:
     build:
       context: ../../..
-      dockerfile: packages/tools/tool-agent-docker/Dockerfile
+      dockerfile: packages/docker/docker-agent/Dockerfile
     image: ai-agent
     pull_policy: never
     container_name: ai-agent-glm
@@ -129,7 +129,7 @@ services:
   ai-agent-gemini:
     build:
       context: ../../..
-      dockerfile: packages/tools/tool-agent-docker/Dockerfile
+      dockerfile: packages/docker/docker-agent/Dockerfile
     image: ai-agent
     pull_policy: never
     container_name: ai-agent-gemini
@@ -193,7 +193,7 @@ services:
   ai-agent-gemini-claude:
     build:
       context: ../../..
-      dockerfile: packages/tools/tool-agent-docker/Dockerfile
+      dockerfile: packages/docker/docker-agent/Dockerfile
     image: ai-agent
     pull_policy: never
     container_name: ai-agent-gemini-claude
@@ -257,7 +257,7 @@ services:
   ai-agent-gpt5-codex:
     build:
       context: ../../..
-      dockerfile: packages/tools/tool-agent-docker/Dockerfile
+      dockerfile: packages/docker/docker-agent/Dockerfile
     image: ai-agent
     pull_policy: never
     container_name: ai-agent-gpt5-codex
@@ -351,9 +351,9 @@ services:
       - 127.0.0.1:9090:9090
     volumes:
       - ${AGENT_REPO_DIR:-../../..}/data/ai-agent-otel-lgtm:/data
-      - ${AGENT_REPO_DIR:-../../..}/packages/ai/ai-agent-otel-lgtm/dashboards:/dashboards:ro
-      - ${AGENT_REPO_DIR:-../../..}/packages/ai/ai-agent-otel-lgtm/otelcol-config.yaml:/otel-lgtm/otelcol-config.yaml:ro
-      - ${AGENT_REPO_DIR:-../../..}/packages/ai/ai-agent-otel-lgtm/prometheus.yaml:/otel-lgtm/prometheus.yaml:ro
+      - ${AGENT_REPO_DIR:-../../..}/packages/docker/docker-agent/otel-lgtm/dashboards:/dashboards:ro
+      - ${AGENT_REPO_DIR:-../../..}/packages/docker/docker-agent/otel-lgtm/otelcol-config.yaml:/otel-lgtm/otelcol-config.yaml:ro
+      - ${AGENT_REPO_DIR:-../../..}/packages/docker/docker-agent/otel-lgtm/prometheus.yaml:/otel-lgtm/prometheus.yaml:ro
     networks:
       - ai-agent-network
     restart: unless-stopped
@@ -374,8 +374,8 @@ services:
       - GRAFANA_PASSWORD=admin
       - DASHBOARDS_DIR=/dashboards
     volumes:
-      - ${AGENT_REPO_DIR:-../../..}/packages/ai/ai-agent-otel-lgtm/dashboards:/dashboards:ro
-      - ${AGENT_REPO_DIR:-../../..}/packages/ai/ai-agent-otel-lgtm/init-dashboards.sh:/init-dashboards.sh:ro
+      - ${AGENT_REPO_DIR:-../../..}/packages/docker/docker-agent/otel-lgtm/dashboards:/dashboards:ro
+      - ${AGENT_REPO_DIR:-../../..}/packages/docker/docker-agent/otel-lgtm/init-dashboards.sh:/init-dashboards.sh:ro
     networks:
       - ai-agent-network
     depends_on:

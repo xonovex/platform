@@ -162,9 +162,9 @@ func (e *Executor) ensureAgentDirs(agentID string) *AgentDirs {
 		Home: filepath.Join(root, "home"),
 	}
 
-	os.MkdirAll(dirs.Work, 0755)
-	os.MkdirAll(dirs.Tmp, 0755)
-	os.MkdirAll(dirs.Home, 0755)
+	_ = os.MkdirAll(dirs.Work, 0755)
+	_ = os.MkdirAll(dirs.Tmp, 0755)
+	_ = os.MkdirAll(dirs.Home, 0755)
 
 	return dirs
 }
@@ -386,5 +386,5 @@ func (e *Executor) ensureSandboxMountPoint(sandboxHome string, targetPath string
 	}
 
 	mountPointInSandbox := filepath.Join(sandboxHome, relativePath)
-	os.MkdirAll(mountPointInSandbox, 0755)
+	_ = os.MkdirAll(mountPointInSandbox, 0755)
 }

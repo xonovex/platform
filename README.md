@@ -2,27 +2,113 @@
 
 Monorepo containing AI agent tooling and a structured workflow for AI-assisted development. Includes an agent wrapper CLI for Claude Code and OpenCode with sandbox support (bubblewrap, Docker, Nix) and custom providers. Also includes slash commands and skills for Claude Code that enable plan-driven development with parallel execution, worktree management, and continuous validation.
 
-## Agent CLI
+## Requirements
 
-CLI tool for running AI coding agents in sandboxed environments with provider and wrapper support.
+- **Node.js** 20+ (for TypeScript CLI and development)
+- **Go** 1.21+ (for Go CLI, optional)
+- **Docker** (for Docker sandbox)
+- **bubblewrap** (for bwrap sandbox, Linux only)
+- **Nix** (for Nix sandbox, optional)
+- **tmux** (for terminal wrapper, optional)
+
+## Installation
 
 ```bash
-npx agent run --agent claude --sandbox bwrap --wrapper tmux
+# Clone and install dependencies
+git clone https://github.com/xonovex/platform.git
+cd platform
+npm install
+
+# Build all packages
+npm run build
+
+# Build Go CLI (optional)
+npx moon run tool-agent-cli-go:go-build
+```
+
+## Agent CLI
+
+CLI tool for running AI coding agents in sandboxed environments with provider and wrapper support. Available in TypeScript and Go implementations.
+
+### Usage
+
+```bash
+# TypeScript version
+npx agent-cli run [options]
+
+# Go version (after building)
+./packages/tools/tool-agent-cli-go/dist/agent-cli run [options]
+```
+
+### Options
+
+| Option | Description |
+|--------|-------------|
+| `-a, --agent <type>` | Agent to run: `claude`, `opencode` (default: `claude`) |
+| `-p, --provider <name>` | Model provider: `gemini`, `gemini-claude`, `glm`, `gpt5-codex` |
+| `-s, --sandbox <method>` | Sandbox: `none`, `bwrap`, `docker`, `compose`, `nix` (default: `none`) |
+| `-t, --terminal <wrapper>` | Terminal wrapper: `tmux` |
+| `-w, --work-dir <dir>` | Working directory |
+| `-n, --dry-run` | Show command without executing |
+| `-v, --verbose` | Enable verbose output |
+
+### Examples
+
+```bash
+# Run Claude Code with bubblewrap sandbox
+agent-cli run --agent claude --sandbox bwrap
+
+# Run with Gemini provider (requires CLI Proxy running)
+agent-cli run --agent claude --provider gemini
+
+# Run in tmux session
+agent-cli run --agent claude --sandbox bwrap --terminal tmux
+
+# Run OpenCode with Docker sandbox
+agent-cli run --agent opencode --sandbox docker
+
+# Dry run to see the command
+agent-cli run --agent claude --sandbox bwrap --dry-run
 ```
 
 ## Docker Sandbox
 
-Docker compose setup for running agents in isolated containers with custom provider support via [CLIProxyAPI](https://github.com/router-for-me/CLIProxyAPI). Includes pre-configured services for:
+Docker compose setup for running agents in isolated containers with custom provider support via [CLIProxyAPI](https://github.com/router-for-me/CLIProxyAPI).
 
-* **Default**: Pass-through Anthropic API
-* **GLM**: Zhipu AI GLM-4 models via Z.AI API
-* **Gemini**: Google Gemini 3.x models via CLI Proxy
-* **Gemini-Claude**: Hybrid thinking models
-* **GPT-5 Codex**: OpenAI models via CLI Proxy
+### Services
+
+| Service | Provider | Description |
+|---------|----------|-------------|
+| `ai-agent` | Default | Pass-through Anthropic API |
+| `ai-agent-glm` | GLM | Zhipu AI GLM-4 models via Z.AI API |
+| `ai-agent-gemini` | Gemini | Google Gemini 3.x models via CLI Proxy |
+| `ai-agent-gemini-claude` | Gemini-Claude | Hybrid thinking models |
+| `ai-agent-gpt5-codex` | GPT-5 Codex | OpenAI models via CLI Proxy |
+
+### Usage
 
 ```bash
-AGENT_WORK_DIR=$(pwd) docker compose -f packages/tools/tool-agent-docker/compose.yaml run --rm ai-agent-gemini
+# Build the Docker image
+docker build -t ai-agent -f packages/docker/docker-agent/Dockerfile .
+
+# Run with default provider (requires ANTHROPIC_AUTH_TOKEN)
+AGENT_WORK_DIR=$(pwd) docker compose -f packages/docker/docker-agent/compose.yaml run --rm ai-agent
+
+# Run with Gemini provider (requires CLI Proxy running)
+AGENT_WORK_DIR=$(pwd) docker compose -f packages/docker/docker-agent/compose.yaml run --rm ai-agent-gemini
+
+# Run with GLM provider (requires ZAI_AUTH_TOKEN)
+AGENT_WORK_DIR=$(pwd) docker compose -f packages/docker/docker-agent/compose.yaml run --rm ai-agent-glm
 ```
+
+### Environment Variables
+
+| Variable | Description |
+|----------|-------------|
+| `AGENT_WORK_DIR` | Working directory to mount (required) |
+| `ANTHROPIC_AUTH_TOKEN` | Anthropic API token (for default provider) |
+| `ZAI_AUTH_TOKEN` | Z.AI API token (for GLM provider) |
+| `CLI_PROXY_API_KEY` | CLI Proxy API key (for Gemini/GPT providers) |
 
 ## Claude Commands
 
@@ -35,17 +121,6 @@ Technology-specific guidelines in `.claude/skills/` covering TypeScript, React, 
 ## Workflow
 
 ![Workflow Diagram](https://raw.githubusercontent.com/xonovex/platform/refs/heads/main/docs/workflow-diagram.png)
-
-### Setup
-
-Run the agent wrapper CLI with your preferred configuration:
-
-| Agent | Provider | Sandbox | Example |
-|-------|----------|---------|---------|
-| Claude Code | Default | bubblewrap | `agent run --agent claude --sandbox bwrap` |
-| Claude Code | GLM | Docker | `agent run --agent claude --provider glm --sandbox docker` |
-| Claude Code | Gemini | None | `agent run --agent claude --provider gemini` |
-| OpenCode | GitHub Copilot | bubblewrap | `agent run --agent opencode --provider copilot --sandbox bwrap` |
 
 ### Research & Planning
 
@@ -144,7 +219,8 @@ packages/
     tool-lib-go/       # Shared Go utilities
     tool-agent-cli/    # Agent CLI (TypeScript)
     tool-agent-cli-go/ # Agent CLI (Go)
-    tool-agent-docker/ # Docker sandbox with provider support
+  docker/                  # Docker configurations
+    docker-agent/          # Agent Docker image, compose, and OTEL config
 docs/                  # Documentation and workflow diagrams
 .claude/commands/      # Claude Code slash commands
 .claude/skills/        # Claude Code skills (guidelines)

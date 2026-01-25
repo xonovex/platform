@@ -102,7 +102,7 @@ func runNixBuild(specPath string, outLink string, timeout time.Duration, verbose
 		}
 
 	case <-time.After(timeout):
-		cmd.Process.Kill()
+		_ = cmd.Process.Kill()
 		return &BuildResult{
 			Success:  false,
 			Error:    "Build timed out",

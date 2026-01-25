@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/spf13/cobra"
 
@@ -45,6 +46,7 @@ var (
 	flagTerminalSession      string
 	flagTerminalWindow       string
 	flagTerminalDetach       bool
+	flagDryRun               bool
 )
 
 func init() {
@@ -69,6 +71,7 @@ func init() {
 	runCmd.Flags().StringVar(&flagTerminalSession, "terminal-session", "", "Custom tmux session name")
 	runCmd.Flags().StringVar(&flagTerminalWindow, "terminal-window", "", "Custom tmux window name")
 	runCmd.Flags().BoolVar(&flagTerminalDetach, "terminal-detach", false, "Run in background (detach from terminal)")
+	runCmd.Flags().BoolVarP(&flagDryRun, "dry-run", "n", false, "Show configuration without executing")
 }
 
 func runAgent(cmd *cobra.Command, args []string) error {
@@ -171,6 +174,11 @@ func runAgent(cmd *cobra.Command, args []string) error {
 		Image:       flagImage,
 		ComposeFile: flagComposeFile,
 		Service:     flagService,
+	}
+
+	// Handle dry-run mode
+	if flagDryRun {
+		return printDryRun(sandboxMethod, sandboxExecutor, sandboxConfig, agent, provider, args, workDir, verbose)
 	}
 
 	// Check if terminal wrapper is requested
@@ -322,4 +330,31 @@ func buildDirectEnv(agent *types.AgentConfig, provider *types.ModelProvider, cus
 	env = append(env, customEnv...)
 
 	return env
+}
+
+// printDryRun displays what would be executed without actually running it
+func printDryRun(sandboxMethod types.SandboxMethod, sandboxExecutor types.SandboxExecutor, sandboxConfig *types.SandboxConfig, agent *types.AgentConfig, provider *types.ModelProvider, args []string, workDir string, verbose bool) error {
+	scriptlib.LogInfo("Dry run - would execute:")
+
+	if sandboxMethod == types.SandboxNone {
+		scriptlib.LogInfo("  Agent: " + agent.DisplayName)
+		if provider != nil {
+			scriptlib.LogInfo("  Provider: " + provider.DisplayName)
+		}
+		scriptlib.LogInfo("  Work directory: " + workDir)
+		if len(args) > 0 {
+			scriptlib.LogInfo("  Arguments: " + fmt.Sprintf("%v", args))
+		} else {
+			scriptlib.LogInfo("  Arguments: (none)")
+		}
+		return nil
+	}
+
+	// Get the full command from the sandbox executor
+	command := sandboxExecutor.GetCommand(sandboxConfig)
+	if len(command) > 0 {
+		fmt.Println(strings.Join(command, " "))
+	}
+
+	return nil
 }
