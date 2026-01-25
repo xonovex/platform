@@ -9,7 +9,7 @@
 - **Agent wrapper CLI** for Claude Code and OpenCode
 - **Sandbox support**: bubblewrap, Docker, Nix
 - **Custom providers**: GLM (direct), Gemini, GPT-5 Codex (via CLIProxyAPI)
-- **Claude Code Tasks** for persistent, parallel sub-agent coordination
+- **Claude Code Tasks support** for persistent, parallel sub-agent coordination
 - **Plan-driven workflow** with worktrees and parallel execution
 
 ## Index
