@@ -42,7 +42,14 @@ Technology-specific guidelines in `.claude/skills/` covering TypeScript, React, 
 
 ### Setup
 
-Run my agent wrapper (supports multiple harnesses: Claude Code, OpenCode with different profiles; for ex. Claude Code + GLM + docker, Claude Code + bwrap, Claude Code + Gemini via CLI Proxy, OpenCode + GitHub Copilot etc.)
+Run the agent wrapper CLI with your preferred configuration:
+
+| Agent | Provider | Sandbox | Example |
+|-------|----------|---------|---------|
+| Claude Code | Default | bubblewrap | `agent run --agent claude --sandbox bwrap` |
+| Claude Code | GLM | Docker | `agent run --agent claude --provider glm --sandbox docker` |
+| Claude Code | Gemini | None | `agent run --agent claude --provider gemini` |
+| OpenCode | GitHub Copilot | bubblewrap | `agent run --agent opencode --provider copilot --sandbox bwrap` |
 
 ### Research & Planning
 
