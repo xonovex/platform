@@ -280,12 +280,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build postinstall script
+      - name: Build TypeScript wrapper
         working-directory: packages/cli/agent-cli-go
-        run: npx tsc -p tsconfig.postinstall.json
-
-      - name: Create bin directory
-        run: mkdir -p packages/cli/agent-cli-go/bin
+        run: npx tsc
 
       - name: Publish main Go wrapper package
         if: env.DRY_RUN != 'true'
