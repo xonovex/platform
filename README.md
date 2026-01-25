@@ -16,8 +16,15 @@
 <img src="https://raw.githubusercontent.com/xonovex/platform/refs/heads/main/docs/multiple-agents.png" alt="Multiple Agents">
 </td></tr></table>
 
+## Philosophy
+
+This repository is the result of working with coding agents for nearly 2.5 years (AutoGPT, Aider, Claude Code, and others). Rather than building yet another agent framework, the approach here is to work with existing tools and adapt them through composable skills and guidelines. Pick what you like, fork it and evolve it. The goal is collective evolution using assimilation features; your improvements can flow back and others' improvements can flow to you by using large language models to merge changes intelligently.
+
+This repository provides the foundation: sandboxed execution, multi-agent coordination and skills that can be assimilated and evolved. The natural evolution is agents operating in sandboxes, containers and orchestration platforms like Kubernetes with self-organization; spawning their own environments, coordinating across boundaries and managing their own lifecycles. Autonomous goal pursuit, dynamic capability orchestration, on-demand agent generation and continuous self-regulation.
+
 ## Index
 
+- [Philosophy](#philosophy)
 - [Quick Start](#quick-start)
 - [Requirements](#requirements)
 - [Installation](#installation)
