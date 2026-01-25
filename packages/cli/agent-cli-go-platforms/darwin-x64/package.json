@@ -1,6 +1,6 @@
 {
   "name": "@xonovex/agent-cli-go-darwin-x64",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "macOS x64 binary for @xonovex/agent-cli-go",
   "license": "MIT",
   "author": "Xonovex",

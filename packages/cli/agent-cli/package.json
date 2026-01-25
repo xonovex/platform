@@ -1,6 +1,6 @@
 {
   "name": "@xonovex/agent-cli",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Unified CLI for running AI coding agents with multiple model providers and sandbox options",
   "type": "module",
   "license": "MIT",

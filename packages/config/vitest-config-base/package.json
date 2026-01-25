@@ -1,6 +1,6 @@
 {
   "name": "@xonovex/vitest-config-base",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Base Vitest configuration for Xonovex projects",
   "type": "module",
   "license": "MIT",
