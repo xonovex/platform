@@ -19,6 +19,7 @@ Monorepo for Xonovex tools and configuration packages.
 
 ### Code Style
 
+- **Paradigm**: Follow `general-fp-guidelines` (functional programming)
 - **Imports**: Direct from source, no re-exports or backwards-compatibility wrappers
 - **Design**: Modular functions, explicit context, small focused files
 - **Quality**: Strict types, clear naming, explicit error handling

@@ -16,7 +16,25 @@ packages/
     tool-agent-cli/    # Agent CLI (TypeScript)
     tool-agent-cli-go/ # Agent CLI (Go)
 docs/                  # Documentation
+.claude/commands/      # Claude Code slash commands
+.claude/skills/        # Claude Code skills (guidelines)
 ```
+
+## Agent CLI
+
+CLI tool for running AI coding agents in sandboxed environments with provider and wrapper support.
+
+```bash
+npx agent run --agent claude --sandbox bwrap --wrapper tmux
+```
+
+## Claude Commands
+
+Slash commands for Claude Code located in `.claude/commands/`. Includes commands for planning, code quality, git workflows, and insights extraction.
+
+## Claude Skills
+
+Technology-specific guidelines in `.claude/skills/` covering TypeScript, React, Hono, Docker, Kubernetes, and more.
 
 ## Setup
 
