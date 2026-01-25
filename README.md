@@ -69,16 +69,16 @@ npm run build -w @xonovex/agent-cli-go
 CLI tool for running AI coding agents in sandboxed environments with provider and wrapper support.
 
 ```
-┌─────────────┐     ┌─────────────┐     ┌─────────────┐
-│   agent-cli │────▶│   sandbox   │────▶│ claude/open │
-│             │     │ bwrap/docker│     │    code     │
-└─────────────┘     └─────────────┘     └─────────────┘
-       │                                       │
-       ▼                                       ▼
-┌─────────────┐                         ┌─────────────┐
-│  provider   │                         │   your      │
-│ gemini/glm  │                         │   code      │
-└─────────────┘                         └─────────────┘
++-------------+     +-------------+     +-------------+
+|  agent-cli  |---->|   sandbox   |---->| claude/open |
+|             |     | bwrap/docker|     |    code     |
++-------------+     +-------------+     +-------------+
+       |                                       |
+       v                                       v
++-------------+                         +-------------+
+|  provider   |                         |    your     |
+| gemini/glm  |                         |    code     |
++-------------+                         +-------------+
 ```
 
 ### Usage
