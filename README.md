@@ -125,29 +125,30 @@ npx agent-cli run --agent opencode --sandbox docker
 ## Workflow
 
 ```
-+------------------+     +------------------+     +------------------+
-|     Research     |     |     Planning     |     |  Worktree Setup  |
-+------------------+     +------------------+     +------------------+
-| plan-research    |---->| plan-create      |---->| plan-worktree-   |
-| (viability,      |     | plan-subplans    |     |   create         |
-|  alternatives)   |     | git-commit       |     | cd <worktree>    |
-+------------------+     +------------------+     +------------------+
-                                                          |
-         +------------------------------------------------+
-         |
-         v
-+------------------+     +------------------+     +------------------+
-| Development Loop |     |   Code Quality   |     |      Merge       |
-+------------------+     +------------------+     +------------------+
-| plan-continue    |---->| code-simplify    |---->| plan-worktree-   |
-| (implement)      |     | code-harden      |     |   merge          |
-| plan-validate    |     |                  |     | git-commit --push|
-| insights-extract |     +------------------+     +------------------+
-| plan-update      |            ^                         |
-+------------------+            |                         v
-         |                      |                 +------------------+
-         +--- more subplans? ---+                 |      Done        |
-                                                 +------------------+
++---------------------+     +---------------------+     +---------------------+
+|      Research       |     |      Planning       |     |   Worktree Setup    |
++---------------------+     +---------------------+     +---------------------+
+| 1. plan-research    |---->| 1. plan-create      |---->| 1. plan-worktree-   |
+|    - viability      |     | 2. plan-subplans    |     |      create         |
+|    - alternatives   |     | 3. git-commit       |     | 2. cd <worktree>    |
++---------------------+     +---------------------+     +---------------------+
+                                                                  |
+            +-----------------------------------------------------+
+            |
+            v
++---------------------+     +---------------------+     +---------------------+
+|  Development Loop   |     |    Code Quality     |     |        Merge        |
++---------------------+     +---------------------+     +---------------------+
+| 1. plan-continue    |---->| 1. code-simplify    |---->| 1. plan-worktree-   |
+| 2. (implement)      |     | 2. code-harden      |     |      merge          |
+| 3. plan-validate    |     |                     |     | 2. git-commit       |
+| 4. insights-extract |     +---------------------+     |      --push         |
+| 5. plan-update      |            ^                    +---------------------+
++---------------------+            |                              |
+            |                      |                              v
+            +-- more subplans? ----+                    +---------------------+
+                                                       |        Done         |
+                                                       +---------------------+
 
 Parallel: Multiple agents work on parallel subplan groups in separate worktrees
 Learning: insights-integrate merges learnings into guidelines for future sessions
