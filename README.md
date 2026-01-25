@@ -143,12 +143,13 @@ npx agent-cli run --agent opencode --sandbox docker
 | 2. (implement)      |     | 2. code-harden      |     |      merge          |
 | 3. plan-validate    |     |                     |     | 2. git-commit       |
 | 4. insights-extract |     +---------------------+     |      --push         |
-| 5. plan-update      |            ^                    +---------------------+
+| 5. plan-update      |            |                    +---------------------+
 +---------------------+            |                              |
+            ^                      |                              |
             |                      |                              v
-            +--- more subplans? <--+                    +---------------------+
-                                                       |        Done         |
-                                                       +---------------------+
+            +--- more subplans? ---+                    +---------------------+
+                                                        |        Done         |
+                                                        +---------------------+
 
 Parallel: Multiple agents work on parallel subplan groups in separate worktrees
 Learning: insights-integrate merges learnings into guidelines for future sessions
