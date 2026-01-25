@@ -125,24 +125,32 @@ npx agent-cli run --agent opencode --sandbox docker
 ## Workflow
 
 ```
-Research & Planning          Worktree Setup          Development Cycle
-       |                           |                        |
-       v                           v                        v
-+----------------+         +----------------+        +----------------+
-| plan-research  |         | plan-worktree- |        | plan-continue  |
-| plan-create    |-------->|    create      |------->| plan-validate  |
-| plan-subplans  |         |                |        | plan-update    |
-+----------------+         +----------------+        +----------------+
-                                                            |
-       +----------------------------------------------------+
-       |
-       v
-+----------------+         +----------------+
-| code-simplify  |         | plan-worktree- |
-| code-harden    |-------->|    merge       |-------> Done
-|                |         | git-commit     |
-+----------------+         +----------------+
-  Code Quality                   Merge
++------------------+     +------------------+     +------------------+
+|     Research     |     |     Planning     |     |  Worktree Setup  |
++------------------+     +------------------+     +------------------+
+| plan-research    |---->| plan-create      |---->| plan-worktree-   |
+| (viability,      |     | plan-subplans    |     |   create         |
+|  alternatives)   |     | git-commit       |     | cd <worktree>    |
++------------------+     +------------------+     +------------------+
+                                                          |
+         +------------------------------------------------+
+         |
+         v
++------------------+     +------------------+     +------------------+
+| Development Loop |     |   Code Quality   |     |      Merge       |
++------------------+     +------------------+     +------------------+
+| plan-continue    |---->| code-simplify    |---->| plan-worktree-   |
+| (implement)      |     | code-harden      |     |   merge          |
+| plan-validate    |     |                  |     | git-commit --push|
+| insights-extract |     +------------------+     +------------------+
+| plan-update      |            ^                         |
++------------------+            |                         v
+         |                      |                 +------------------+
+         +--- more subplans? ---+                 |      Done        |
+                                                 +------------------+
+
+Parallel: Multiple agents work on parallel subplan groups in separate worktrees
+Learning: insights-integrate merges learnings into guidelines for future sessions
 ```
 
 [View full workflow diagram](https://raw.githubusercontent.com/xonovex/platform/refs/heads/main/docs/workflow-diagram.png)
