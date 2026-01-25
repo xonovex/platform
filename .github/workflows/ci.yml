@@ -66,11 +66,12 @@ jobs:
         working-directory: packages/cli/agent-cli-go
         run: go test ./...
 
-      - name: golangci-lint
-        uses: golangci/golangci-lint-action@v6
-        with:
-          version: latest
-          working-directory: packages/cli/agent-cli-go
+      # TODO: Re-enable when golangci-lint supports Go 1.25
+      # - name: golangci-lint
+      #   uses: golangci/golangci-lint-action@v6
+      #   with:
+      #     version: latest
+      #     working-directory: packages/cli/agent-cli-go
 
   prepublish-check:
     name: Pre-publish Check
