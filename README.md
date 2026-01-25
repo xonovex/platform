@@ -15,7 +15,7 @@ packages/
     tool-lib-go/       # Shared Go utilities
     tool-agent-cli/    # Agent CLI (TypeScript)
     tool-agent-cli-go/ # Agent CLI (Go)
-docs/                  # Documentation
+docs/                  # Documentation and workflow diagrams
 .claude/commands/      # Claude Code slash commands
 .claude/skills/        # Claude Code skills (guidelines)
 ```
@@ -35,6 +35,10 @@ Slash commands for Claude Code located in `.claude/commands/`. Includes commands
 ## Claude Skills
 
 Technology-specific guidelines in `.claude/skills/` covering TypeScript, React, Hono, Docker, Kubernetes, and more.
+
+## Workflow
+
+See `docs/workflow-diagram.png` for the development workflow diagram.
 
 ## Setup
 
