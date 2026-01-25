@@ -70,31 +70,6 @@ Skills are namespaced as `/xonovex:<skill-name>` (e.g., `/xonovex:typescript-gui
 
 </details>
 
-### Development Setup
-
-| Requirement | Purpose |
-|-------------|---------|
-| Node.js 20+ | TypeScript CLI and development |
-| Go 1.21+ | Go CLI (optional) |
-| Docker | Docker sandbox |
-| bubblewrap | bwrap sandbox (Linux only) |
-| Nix | Nix sandbox (optional) |
-| tmux | Terminal wrapper (optional) |
-
-```bash
-git clone https://github.com/xonovex/platform.git
-cd platform && npm install && npm run build
-```
-
-<details>
-<summary><strong>Build Go CLI (optional)</strong></summary>
-
-```bash
-npm run build -w @xonovex/agent-cli-go
-```
-
-</details>
-
 ## Running Agents
 
 ```
@@ -263,29 +238,28 @@ An orchestrating agent can run the entire workflow autonomously by spawning agen
 
 </details>
 
-## Claude Integration
+## Development Setup
 
-Slash commands in `.claude/commands/` and technology-specific guidelines in `.claude/skills/`.
+| Requirement | Purpose |
+|-------------|---------|
+| Node.js 20+ | TypeScript CLI and development |
+| Go 1.21+ | Go CLI (optional) |
+| Docker | Docker sandbox |
+| bubblewrap | bwrap sandbox (Linux only) |
+| Nix | Nix sandbox (optional) |
+| tmux | Terminal wrapper (optional) |
+
+```bash
+git clone https://github.com/xonovex/platform.git
+cd platform && npm install && npm run build
+```
 
 <details>
-<summary><strong>Commands</strong></summary>
+<summary><strong>Build Go CLI (optional)</strong></summary>
 
-- **Planning**: `plan-research`, `plan-create`, `plan-continue`, `plan-validate`
-- **Code quality**: `code-simplify`, `code-harden`, `code-align`
-- **Git workflows**: `git-commit`, `plan-worktree-create`, `plan-worktree-merge`
-- **Insights**: `insights-extract`, `insights-integrate`
-
-</details>
-
-<details>
-<summary><strong>Skills</strong></summary>
-
-Standard skills cover common best practices, while `-opinionated` variants contain specialized patterns:
-
-* `c99-guidelines` / `c99-opinionated-guidelines`: Standard C99 vs caller-owns-memory, SoA, SIMD
-* `lua-guidelines` / `lua-opinionated-guidelines`: Standard Lua vs LuaJIT optimization
-* `hono-guidelines` / `hono-opinionated-guidelines`: Standard Hono vs inline OpenAPI handlers
-* `general-fp-guidelines` / `general-oop-guidelines`: Functional vs object-oriented paradigms
+```bash
+npm run build -w @xonovex/agent-cli-go
+```
 
 </details>
 
