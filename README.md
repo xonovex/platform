@@ -2,6 +2,20 @@
 
 Monorepo containing AI agent tooling and a structured workflow for AI-assisted development. Includes an agent wrapper CLI for Claude Code and OpenCode with sandbox support (bubblewrap, Docker, Nix) and custom providers. Also includes slash commands and skills for Claude Code that enable plan-driven development with parallel execution, worktree management, and continuous validation.
 
+## Index
+
+- [Requirements](#requirements)
+- [Installation](#installation)
+- [Agent CLI](#agent-cli)
+- [Docker Sandbox](#docker-sandbox)
+- [Claude Commands](#claude-commands)
+- [Claude Skills](#claude-skills)
+- [Workflow](#workflow)
+- [Structure](#structure)
+- [Development](#development)
+- [Commit Convention](#commit-convention)
+- [License](#license)
+
 ## Requirements
 
 - **Node.js** 20+ (for TypeScript CLI and development)
