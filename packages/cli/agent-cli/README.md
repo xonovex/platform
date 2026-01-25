@@ -1,34 +1,33 @@
-# tool-agent-cli
+# @xonovex/agent-cli
 
 Unified CLI for running AI coding agents with multiple model providers and sandbox options.
 
 ## Installation
 
 ```bash
-npm install
-npm run build
+npm install -g @xonovex/agent-cli
 ```
 
 ## Usage
 
 ```bash
 # Run with default agent (Claude)
-node dist/src/agent.js run
+agent-cli run
 
 # Run with specific agent
-node dist/src/agent.js run -a claude
-node dist/src/agent.js run -a opencode
+agent-cli run -a claude
+agent-cli run -a opencode
 
 # Run with sandbox
-node dist/src/agent.js run -s bwrap
-node dist/src/agent.js run -s docker
-node dist/src/agent.js run -s nix
+agent-cli run -s bwrap
+agent-cli run -s docker
+agent-cli run -s nix
 
 # Run with worktree
-node dist/src/agent.js run --worktree-branch feature/my-feature
+agent-cli run --worktree-branch feature/my-feature
 
 # Run with terminal wrapper
-node dist/src/agent.js run -t tmux
+agent-cli run -t tmux
 ```
 
 ## Commands
@@ -55,10 +54,10 @@ Generate shell completion script.
 
 ```bash
 # Bash
-source <(node dist/src/agent.js completion)
+source <(agent-cli completion)
 
 # Add to ~/.bashrc for persistence
-node dist/src/agent.js completion >> ~/.bashrc
+agent-cli completion >> ~/.bashrc
 ```
 
 ## Configuration
@@ -78,7 +77,7 @@ provider: anthropic
 Load with:
 
 ```bash
-node dist/src/agent.js run -c config.yaml
+agent-cli run -c config.yaml
 ```
 
 ## License
