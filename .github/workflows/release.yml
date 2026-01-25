@@ -93,7 +93,7 @@ jobs:
           go build -ldflags="-s -w" -o ../agent-cli-go-platforms/${{ matrix.platform }}/bin/agent-cli-go${{ matrix.ext }} ./cmd/agent-cli
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: binary-${{ matrix.platform }}
           path: packages/cli/agent-cli-go-platforms/${{ matrix.platform }}/bin/
@@ -234,7 +234,7 @@ jobs:
           registry-url: "https://registry.npmjs.org"
 
       - name: Download binary artifact
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v7
         with:
           name: binary-${{ matrix.platform }}
           path: packages/cli/agent-cli-go-platforms/${{ matrix.platform }}/bin/
@@ -311,7 +311,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Download all binary artifacts
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v7
         with:
           path: binaries
           pattern: binary-*
@@ -333,7 +333,7 @@ jobs:
           done
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v3
+        uses: softprops/action-gh-release@v2
         with:
           files: release-assets/*
           generate_release_notes: true
