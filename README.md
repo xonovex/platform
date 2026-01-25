@@ -4,17 +4,41 @@ Monorepo containing AI agent tooling and a structured workflow for AI-assisted d
 
 ## Index
 
+- [Requirements](#requirements)
+- [Installation](#installation)
 - [Agent Wrapper](#agent-wrapper)
 - [Docker Sandbox](#docker-sandbox)
 - [Workflow](#workflow)
 - [Claude Commands](#claude-commands)
 - [Claude Skills](#claude-skills)
-- [Requirements](#requirements)
-- [Installation](#installation)
 - [Structure](#structure)
 - [Development](#development)
 - [Commit Convention](#commit-convention)
 - [License](#license)
+
+## Requirements
+
+- **Node.js** 20+ (for TypeScript CLI and development)
+- **Go** 1.21+ (for Go CLI, optional)
+- **Docker** (for Docker sandbox)
+- **bubblewrap** (for bwrap sandbox, Linux only)
+- **Nix** (for Nix sandbox, optional)
+- **tmux** (for terminal wrapper, optional)
+
+## Installation
+
+```bash
+# Clone and install dependencies
+git clone https://github.com/xonovex/platform.git
+cd platform
+npm install
+
+# Build all packages
+npm run build
+
+# Build Go CLI (optional)
+npx moon run tool-agent-cli-go:go-build
+```
 
 ## Agent Wrapper
 
@@ -193,30 +217,6 @@ Skills in `.claude/skills/` provide technology-specific guidelines. Standard ski
 * `lua-guidelines` / `lua-opinionated-guidelines`: Standard Lua vs LuaJIT performance optimization
 * `hono-guidelines` / `hono-opinionated-guidelines`: Standard Hono vs inline OpenAPI handlers, router selection
 * `general-fp-guidelines` / `general-oop-guidelines`: Functional vs object-oriented paradigms
-
-## Requirements
-
-- **Node.js** 20+ (for TypeScript CLI and development)
-- **Go** 1.21+ (for Go CLI, optional)
-- **Docker** (for Docker sandbox)
-- **bubblewrap** (for bwrap sandbox, Linux only)
-- **Nix** (for Nix sandbox, optional)
-- **tmux** (for terminal wrapper, optional)
-
-## Installation
-
-```bash
-# Clone and install dependencies
-git clone https://github.com/xonovex/platform.git
-cd platform
-npm install
-
-# Build all packages
-npm run build
-
-# Build Go CLI (optional)
-npx moon run tool-agent-cli-go:go-build
-```
 
 ## Structure
 
