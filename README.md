@@ -12,6 +12,8 @@
 - **Claude Code Tasks support** for persistent, parallel sub-agent coordination
 - **Plan-driven workflow** with worktrees and parallel execution
 
+![Multiple Agents](https://raw.githubusercontent.com/xonovex/platform/refs/heads/main/docs/multiple-agents.png)
+
 ## Index
 
 - [Quick Start](#quick-start)
