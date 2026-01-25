@@ -18,9 +18,10 @@
 
 ## Philosophy
 
-This repository is the result of working with coding agents for nearly 2.5 years (AutoGPT, Aider, Claude Code, and others). Rather than building yet another agent framework, the approach here is to work with existing tools and adapt them through composable skills and guidelines. Pick what you like, fork it and evolve it. The goal is collective evolution using assimilation features; your improvements can flow back and others' improvements can flow to you by using large language models to merge changes intelligently.
+Born from 2.5 years of working with coding agents (AutoGPT, Aider, Claude Code), this project is not just another framework. Instead it builds on existing tools by introducing composable skills and shared guidelines. Fork it, adapt it and evolve it. Through collective evolution and LLM-powered assimilation, improvements can flow in both directions.
 
-This repository provides the foundation: sandboxed execution, multi-agent coordination and skills that can be assimilated and evolved. The natural evolution is agents operating in sandboxes, containers and orchestration platforms like Kubernetes with self-organization; spawning their own environments, coordinating across boundaries and managing their own lifecycles. Autonomous goal pursuit, dynamic capability orchestration, on-demand agent generation and continuous self-regulation.
+Foundation: sandboxed execution, multi-agent coordination and assimilable skills.
+Vision: self-organizing agents operating across sandboxes, containers and orchestration platforms like Kubernetes spawning their own environments, coordinating across boundaries and managing lifecycles autonomously. Agents pursuing goals, dynamically orchestrating resources, generating capabilities on demand and continuously self-regulating.
 
 ## Index
 
