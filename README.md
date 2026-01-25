@@ -124,7 +124,28 @@ npx agent-cli run --agent opencode --sandbox docker
 
 ## Workflow
 
-![Workflow Diagram](https://raw.githubusercontent.com/xonovex/platform/refs/heads/main/docs/workflow-diagram.png)
+```
+Research & Planning          Worktree Setup          Development Cycle
+       |                           |                        |
+       v                           v                        v
++----------------+         +----------------+        +----------------+
+| plan-research  |         | plan-worktree- |        | plan-continue  |
+| plan-create    |-------->|    create      |------->| plan-validate  |
+| plan-subplans  |         |                |        | plan-update    |
++----------------+         +----------------+        +----------------+
+                                                            |
+       +----------------------------------------------------+
+       |
+       v
++----------------+         +----------------+
+| code-simplify  |         | plan-worktree- |
+| code-harden    |-------->|    merge       |-------> Done
+|                |         | git-commit     |
++----------------+         +----------------+
+  Code Quality                   Merge
+```
+
+[View full workflow diagram](https://raw.githubusercontent.com/xonovex/platform/refs/heads/main/docs/workflow-diagram.png)
 
 ### Research & Planning
 
