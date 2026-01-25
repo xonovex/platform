@@ -1,0 +1,42 @@
+{
+  "name": "@xonovex/agent-cli-go",
+  "version": "0.1.0",
+  "description": "Agent wrapper CLI (Go implementation)",
+  "type": "module",
+  "license": "MIT",
+  "author": "Xonovex",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xonovex/platform.git",
+    "directory": "packages/cli/agent-cli-go"
+  },
+  "bugs": {
+    "url": "https://github.com/xonovex/platform/issues"
+  },
+  "homepage": "https://github.com/xonovex/platform/tree/main/packages/cli/agent-cli-go#readme",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "files": [
+    "bin",
+    "dist/postinstall.js"
+  ],
+  "bin": {
+    "agent-cli-go": "./bin/agent-cli-go"
+  },
+  "scripts": {
+    "build": "go build -o dist/agent-cli ./cmd/agent-cli && tsc -p tsconfig.postinstall.json",
+    "typecheck": "tsc -p tsconfig.postinstall.json --noEmit",
+    "lint": "go vet ./... && golangci-lint run",
+    "test": "go test ./...",
+    "postinstall": "node -e \"try{require('./dist/postinstall.js')}catch{}\""
+  },
+  "optionalDependencies": {
+    "@xonovex/agent-cli-go-linux-x64": "0.1.0",
+    "@xonovex/agent-cli-go-linux-arm64": "0.1.0",
+    "@xonovex/agent-cli-go-darwin-x64": "0.1.0",
+    "@xonovex/agent-cli-go-darwin-arm64": "0.1.0",
+    "@xonovex/agent-cli-go-win32-x64": "0.1.0"
+  }
+}

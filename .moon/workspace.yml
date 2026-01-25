@@ -12,8 +12,17 @@ projects:
   # Config packages
   - "packages/config/*"
 
-  # Tool packages
-  - "packages/tools/*"
+  # CLI packages
+  - "packages/cli/*"
+
+  # Library packages
+  - "packages/lib/*"
+
+  # Plugin packages
+  - "packages/plugins/*"
+
+  # Docker packages
+  - "packages/docker/*"
 
 # Version control system configuration
 vcs:

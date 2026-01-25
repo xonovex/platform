@@ -1,7 +1,7 @@
-import { existsSync } from "node:fs";
+import {existsSync} from "node:fs";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
-import { includeIgnoreFile } from "@eslint/compat";
+import {fileURLToPath} from "node:url";
+import {includeIgnoreFile} from "@eslint/compat";
 import jseslint from "@eslint/js";
 import eslintViTest from "@vitest/eslint-plugin";
 //import eslintFunctional from "eslint-plugin-functional";
@@ -10,12 +10,12 @@ import eslintViTest from "@vitest/eslint-plugin";
 //import eslintPerfectionist from "eslint-plugin-perfectionist";
 //import eslintPrettierRecommended from "eslint-plugin-prettier/recommended";
 //import eslintPromise from "eslint-plugin-promise";
-import { configs as eslintRegexpConfigs } from "eslint-plugin-regexp";
-import { configs as eslintSecurityConfigs } from "eslint-plugin-security";
+import {configs as eslintRegexpConfigs} from "eslint-plugin-regexp";
+import {configs as eslintSecurityConfigs} from "eslint-plugin-security";
 //import eslintSimpleImportSort from "eslint-plugin-simple-import-sort";
 import eslintSonarjs from "eslint-plugin-sonarjs";
 import eslintUnicorn from "eslint-plugin-unicorn";
-import { defineConfig, globalIgnores } from "eslint/config";
+import {defineConfig, globalIgnores} from "eslint/config";
 import tseslint from "typescript-eslint";
 
 export const GLOB_CONFIG_TS = [
@@ -101,11 +101,11 @@ export const enableTypeCheckedRules = {
   ...tseslint.configs.strictTypeCheckedOnly
     .map((x) => x.rules)
 
-    .reduce((a, b) => ({ ...a, ...b }), {}),
+    .reduce((a, b) => ({...a, ...b}), {}),
   ...tseslint.configs.stylisticTypeCheckedOnly
     .map((x) => x.rules)
 
-    .reduce((a, b) => ({ ...a, ...b }), {}),
+    .reduce((a, b) => ({...a, ...b}), {}),
   "@typescript-eslint/consistent-type-exports": "error" as const,
   "@typescript-eslint/consistent-type-imports": "error" as const,
 };

@@ -7,6 +7,10 @@
 .serena
 *storybook.log
 
+# Local symlinks to plugin package (not committed)
+.claude/skills
+.claude/commands
+
 # Environment and Secrets
 .env.local
 .env.*.local
@@ -92,7 +96,7 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
+#lib/
 lib64/
 parts/
 sdist/

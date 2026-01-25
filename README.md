@@ -22,7 +22,55 @@
 
 **Vision:** Self-organizing agents operating across sandboxes, containers and orchestration platforms (Kubernetes, etc.) spawning their own environments, coordinating across boundaries and managing lifecycles autonomously.
 
-## Getting Started
+## Installation
+
+### npm packages
+
+```bash
+# Agent CLI (TypeScript)
+npm install -g @xonovex/agent-cli
+
+# Agent CLI (Go) - auto-downloads platform binary
+npm install -g @xonovex/agent-cli-go
+
+# Claude Code skills plugin
+npm install @xonovex/skills
+```
+
+### Claude Code Skills
+
+Install the skills plugin to get coding guidelines and workflow commands:
+
+```bash
+# Add the Xonovex marketplace (from within Claude Code)
+/plugin marketplace add xonovex/platform
+
+# Install the skills plugin
+/plugin install xonovex@xonovex-platform
+```
+
+Or test locally during development:
+
+```bash
+claude --plugin-dir ./packages/plugins/skills
+```
+
+Skills are namespaced as `/xonovex:<skill-name>` (e.g., `/xonovex:typescript-guidelines`).
+
+<details>
+<summary><strong>Available Skills</strong></summary>
+
+| Category | Skills |
+|----------|--------|
+| Languages | `typescript-guidelines`, `python-guidelines`, `c99-guidelines`, `lua-guidelines` |
+| Frameworks | `react-guidelines`, `hono-guidelines`, `express.js-guidelines`, `astro-guidelines` |
+| Infrastructure | `docker-guidelines`, `kubernetes-guidelines`, `terraform-guidelines` |
+| Testing | `vitest-guidelines`, `zod-guidelines` |
+| Workflow | `git-guidelines`, `plan-guidelines`, `skill-guidelines` |
+
+</details>
+
+### Development Setup
 
 | Requirement | Purpose |
 |-------------|---------|

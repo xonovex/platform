@@ -1,0 +1,30 @@
+{
+  "name": "xonovex-platform",
+  "owner": {
+    "name": "Xonovex"
+  },
+  "metadata": {
+    "description": "Xonovex coding guidelines, workflow skills, and development tools for Claude Code",
+    "version": "0.1.0"
+  },
+  "plugins": [
+    {
+      "name": "xonovex",
+      "source": "./packages/plugins/skills",
+      "description": "Coding guidelines and workflow skills for TypeScript, React, Docker, Kubernetes, Terraform, and more",
+      "version": "0.1.0",
+      "author": {
+        "name": "Xonovex"
+      },
+      "keywords": [
+        "guidelines",
+        "typescript",
+        "react",
+        "docker",
+        "kubernetes",
+        "terraform",
+        "workflow"
+      ]
+    }
+  ]
+}

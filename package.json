@@ -6,8 +6,14 @@
   "workspaces": [
     "docs",
     "packages/config/*",
-    "packages/tools/*"
+    "packages/cli/*",
+    "packages/lib/*",
+    "packages/plugins/*"
   ],
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
+  },
   "devDependencies": {
     "@commitlint/cli": "20.3.1",
     "@commitlint/config-conventional": "20.3.1",
@@ -38,6 +44,9 @@
     "vitest": "4.0.18"
   },
   "scripts": {
+    "prepublish:check": "npx tsx scripts/prepublish-check.ts",
+    "publish:dry-run": "npm publish --dry-run --workspaces --access public",
+    "release": "npm run build && npm run test && npm run lint",
     "deps:check": "npm-check-updates --workspaces --dep prod,dev,optional",
     "deps:update": "npm-check-updates --workspaces -u --dep prod,dev,optional",
     "moon": "moon",

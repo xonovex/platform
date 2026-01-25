@@ -6,8 +6,10 @@ Monorepo for Xonovex tools and configuration packages.
 
 ### Subdirectories
 
-- **`packages/config/`**: Shared configuration packages (ESLint, TypeScript, Vitest)
-- **`packages/tools/`**: CLI tools and shared libraries
+- **`packages/config/`**: Shared configuration packages (ESLint, TypeScript, Vitest, Prettier, Vite)
+- **`packages/cli/`**: CLI tools (agent-cli, agent-cli-go)
+- **`packages/lib/`**: Shared libraries (core, core-go)
+- **`packages/plugins/`**: Claude Code plugins (skills)
 - **`docs/`**: Technical documentation and workflow diagrams
 
 ### Workflow

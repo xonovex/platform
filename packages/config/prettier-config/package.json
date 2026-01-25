@@ -1,0 +1,46 @@
+{
+  "name": "@xonovex/prettier-config",
+  "version": "0.1.0",
+  "description": "Shared Prettier configuration for Xonovex projects",
+  "type": "module",
+  "license": "MIT",
+  "author": "Xonovex",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xonovex/platform.git",
+    "directory": "packages/config/prettier-config"
+  },
+  "bugs": {
+    "url": "https://github.com/xonovex/platform/issues"
+  },
+  "homepage": "https://github.com/xonovex/platform/tree/main/packages/config/prettier-config#readme",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "files": [
+    "src"
+  ],
+  "exports": {
+    "./package.json": "./package.json",
+    ".": "./src/index.js"
+  },
+  "dependencies": {
+    "@ianvs/prettier-plugin-sort-imports": "4.7.0",
+    "prettier-plugin-astro": "0.14.1",
+    "prettier-plugin-tailwindcss": "0.7.2"
+  },
+  "devDependencies": {
+    "@xonovex/eslint-config-base": "0.1.0",
+    "@xonovex/ts-config-build": "0.1.0"
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "fmt": "prettier --write .",
+    "fmt:check": "prettier --check .",
+    "typecheck": "tsc --noemit",
+    "test": "echo 'No tests for config package'",
+    "build": "mkdir -p dist && echo \"No build needed for config package\" > dist/.gitkeep"
+  }
+}

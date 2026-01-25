@@ -1,0 +1,15 @@
+{
+  "extends": "@xonovex/ts-config-build",
+  "compilerOptions": {
+    "outDir": "dist",
+    "baseUrl": ".",
+    "rootDir": "."
+  },
+  "include": ["src", "eslint.config.ts"],
+  "exclude": ["dist"],
+  "references": [
+    {
+      "path": "../eslint-config-base"
+    }
+  ]
+}

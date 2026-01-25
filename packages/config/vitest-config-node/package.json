@@ -1,8 +1,26 @@
 {
   "name": "@xonovex/vitest-config-node",
   "version": "0.1.0",
-  "private": true,
+  "description": "Vitest configuration for Node.js applications",
   "type": "module",
+  "license": "MIT",
+  "author": "Xonovex",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xonovex/platform.git",
+    "directory": "packages/config/vitest-config-node"
+  },
+  "bugs": {
+    "url": "https://github.com/xonovex/platform/issues"
+  },
+  "homepage": "https://github.com/xonovex/platform/tree/main/packages/config/vitest-config-node#readme",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "files": [
+    "dist"
+  ],
   "exports": {
     "./package.json": "./package.json",
     ".": {

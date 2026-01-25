@@ -1,1 +1,1 @@
-export { default } from "@xonovex/eslint-config-base";
+export {default} from "@xonovex/eslint-config-base";

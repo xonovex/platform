@@ -1,0 +1,52 @@
+{
+  /* Git */
+  "git.ignoreLimitWarning": true,
+  /* Javascript */
+  "debug.javascript.unmapMissingSources": true,
+  /* Typescript */
+  "typescript.suggestionActions.enabled": true,
+  "typescript.autoClosingTags": false,
+  "typescript.tsdk": "node_modules/typescript/lib",
+  /* Javascript / Typescript */
+  "javascript.inlayHints.parameterNames.enabled": "all",
+  "typescript.inlayHints.parameterNames.enabled": "all",
+  "typescript.inlayHints.enumMemberValues.enabled": true,
+  "javascript.preferences.importModuleSpecifier": "project-relative",
+  "typescript.preferences.importModuleSpecifier": "project-relative",
+  /* ESLint */
+  "eslint.enable": true,
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact"
+  ],
+  "eslint.useFlatConfig": true,
+  "python.analysis.typeCheckingMode": "strict",
+  "yaml.customTags": ["!reference sequence"],
+  /* Editor */
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "always"
+  },
+  "editor.quickSuggestions": {
+    "strings": "on"
+  },
+  "diffEditor.renderSideBySide": true,
+  /* Excludes */
+  "files.exclude": {
+    /* NodeJS */
+    "**/node_modules/": false,
+    /* Vscode */
+    //"**/.vscode": false,
+    /* Build */
+    "**/tsconfig.tsbuildinfo": true,
+    "**/dist/": true,
+    /* Misc */
+    "*.tmp": true,
+    "*.old": true,
+    "*.bak": true,
+    "*.log": true
+  }
+}

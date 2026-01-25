@@ -2,8 +2,25 @@
   "name": "@xonovex/ts-config-cli",
   "version": "0.1.0",
   "description": "TypeScript configuration for CLI tools and scripts",
-  "private": true,
   "type": "module",
+  "license": "MIT",
+  "author": "Xonovex",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xonovex/platform.git",
+    "directory": "packages/config/ts-config-cli"
+  },
+  "bugs": {
+    "url": "https://github.com/xonovex/platform/issues"
+  },
+  "homepage": "https://github.com/xonovex/platform/tree/main/packages/config/ts-config-cli#readme",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "files": [
+    "src"
+  ],
   "main": "./src/index.json",
   "exports": {
     "./package.json": "./package.json",

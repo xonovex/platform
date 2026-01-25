@@ -1,0 +1,341 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Perform a dry run (no actual publishing)"
+        type: boolean
+        default: true
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+env:
+  DRY_RUN: ${{ github.event.inputs.dry_run == 'true' || github.event_name == 'workflow_dispatch' && github.event.inputs.dry_run != 'false' }}
+
+jobs:
+  validate:
+    name: Validate
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Test
+        run: npm run test
+
+      - name: Prepublish check
+        run: npm run prepublish:check
+
+  build-go-binaries:
+    name: Build Go Binary (${{ matrix.goos }}-${{ matrix.goarch }})
+    runs-on: ubuntu-latest
+    needs: [validate]
+    strategy:
+      matrix:
+        include:
+          - goos: linux
+            goarch: amd64
+            platform: linux-x64
+          - goos: linux
+            goarch: arm64
+            platform: linux-arm64
+          - goos: darwin
+            goarch: amd64
+            platform: darwin-x64
+          - goos: darwin
+            goarch: arm64
+            platform: darwin-arm64
+          - goos: windows
+            goarch: amd64
+            platform: win32-x64
+            ext: .exe
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.25"
+          cache-dependency-path: packages/cli/agent-cli-go/go.sum
+
+      - name: Build binary
+        working-directory: packages/cli/agent-cli-go
+        env:
+          GOOS: ${{ matrix.goos }}
+          GOARCH: ${{ matrix.goarch }}
+          CGO_ENABLED: 0
+        run: |
+          mkdir -p ../agent-cli-go-platforms/${{ matrix.platform }}/bin
+          go build -ldflags="-s -w" -o ../agent-cli-go-platforms/${{ matrix.platform }}/bin/agent-cli-go${{ matrix.ext }} ./cmd/agent-cli
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: binary-${{ matrix.platform }}
+          path: packages/cli/agent-cli-go-platforms/${{ matrix.platform }}/bin/
+          retention-days: 1
+
+  publish-ts-packages:
+    name: Publish TypeScript Packages
+    runs-on: ubuntu-latest
+    needs: [validate]
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Publish ts-config-base
+        if: env.DRY_RUN != 'true'
+        run: npm publish --workspace @xonovex/ts-config-base --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish ts-config-build
+        if: env.DRY_RUN != 'true'
+        run: npm publish --workspace @xonovex/ts-config-build --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish ts-config-cli
+        if: env.DRY_RUN != 'true'
+        run: npm publish --workspace @xonovex/ts-config-cli --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish ts-config-node
+        if: env.DRY_RUN != 'true'
+        run: npm publish --workspace @xonovex/ts-config-node --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish eslint-config-base
+        if: env.DRY_RUN != 'true'
+        run: npm publish --workspace @xonovex/eslint-config-base --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish eslint-config-cli
+        if: env.DRY_RUN != 'true'
+        run: npm publish --workspace @xonovex/eslint-config-cli --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish vitest-config-base
+        if: env.DRY_RUN != 'true'
+        run: npm publish --workspace @xonovex/vitest-config-base --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish vitest-config-node
+        if: env.DRY_RUN != 'true'
+        run: npm publish --workspace @xonovex/vitest-config-node --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish core
+        if: env.DRY_RUN != 'true'
+        run: npm publish --workspace @xonovex/core --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish agent-cli
+        if: env.DRY_RUN != 'true'
+        run: npm publish --workspace @xonovex/agent-cli --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish claude-skills
+        if: env.DRY_RUN != 'true'
+        run: npm publish --workspace @xonovex/skills --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Dry run - Show what would be published
+        if: env.DRY_RUN == 'true'
+        run: |
+          echo "DRY RUN - Would publish the following packages:"
+          npm pack --workspace @xonovex/ts-config-base --dry-run
+          npm pack --workspace @xonovex/ts-config-build --dry-run
+          npm pack --workspace @xonovex/ts-config-cli --dry-run
+          npm pack --workspace @xonovex/ts-config-node --dry-run
+          npm pack --workspace @xonovex/eslint-config-base --dry-run
+          npm pack --workspace @xonovex/eslint-config-cli --dry-run
+          npm pack --workspace @xonovex/vitest-config-base --dry-run
+          npm pack --workspace @xonovex/vitest-config-node --dry-run
+          npm pack --workspace @xonovex/core --dry-run
+          npm pack --workspace @xonovex/agent-cli --dry-run
+          npm pack --workspace @xonovex/skills --dry-run
+
+  publish-go-platform-packages:
+    name: Publish Go Platform Package (${{ matrix.platform }})
+    runs-on: ubuntu-latest
+    needs: [build-go-binaries]
+    permissions:
+      contents: read
+      id-token: write
+    strategy:
+      matrix:
+        platform:
+          - linux-x64
+          - linux-arm64
+          - darwin-x64
+          - darwin-arm64
+          - win32-x64
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Download binary artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: binary-${{ matrix.platform }}
+          path: packages/cli/agent-cli-go-platforms/${{ matrix.platform }}/bin/
+
+      - name: Make binary executable
+        run: chmod +x packages/cli/agent-cli-go-platforms/${{ matrix.platform }}/bin/*
+
+      - name: Publish platform package
+        if: env.DRY_RUN != 'true'
+        working-directory: packages/cli/agent-cli-go-platforms/${{ matrix.platform }}
+        run: npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Dry run - Show package contents
+        if: env.DRY_RUN == 'true'
+        working-directory: packages/cli/agent-cli-go-platforms/${{ matrix.platform }}
+        run: |
+          echo "DRY RUN - Would publish package:"
+          npm pack --dry-run
+
+  publish-go-main:
+    name: Publish Go Main Package
+    runs-on: ubuntu-latest
+    needs: [publish-go-platform-packages, publish-ts-packages]
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build postinstall script
+        working-directory: packages/cli/agent-cli-go
+        run: npx tsc -p tsconfig.postinstall.json
+
+      - name: Create bin directory
+        run: mkdir -p packages/cli/agent-cli-go/bin
+
+      - name: Publish main Go wrapper package
+        if: env.DRY_RUN != 'true'
+        run: npm publish --workspace @xonovex/agent-cli-go --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Dry run - Show package contents
+        if: env.DRY_RUN == 'true'
+        working-directory: packages/cli/agent-cli-go
+        run: |
+          echo "DRY RUN - Would publish package:"
+          npm pack --dry-run
+
+  github-release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+    needs: [publish-go-main, publish-ts-packages]
+    if: startsWith(github.ref, 'refs/tags/v')
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download all binary artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: binaries
+          pattern: binary-*
+          merge-multiple: false
+
+      - name: Prepare release assets
+        run: |
+          mkdir -p release-assets
+          for platform in linux-x64 linux-arm64 darwin-x64 darwin-arm64 win32-x64; do
+            if [ -d "binaries/binary-$platform" ]; then
+              cd binaries/binary-$platform
+              if [ "$platform" = "win32-x64" ]; then
+                zip ../../release-assets/agent-cli-go-$platform.zip agent-cli-go.exe
+              else
+                tar -czvf ../../release-assets/agent-cli-go-$platform.tar.gz agent-cli-go
+              fi
+              cd ../..
+            fi
+          done
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: release-assets/*
+          generate_release_notes: true
+          draft: false
+          prerelease: ${{ contains(github.ref, '-') }}

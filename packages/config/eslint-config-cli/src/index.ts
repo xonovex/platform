@@ -2,7 +2,7 @@ import baseConfig, {
   GLOB_SRC_JS_WITHOUT_JSX,
   GLOB_SRC_TS_WITHOUT_JSX,
 } from "@xonovex/eslint-config-base";
-import { defineConfig } from "eslint/config";
+import {defineConfig} from "eslint/config";
 import globals from "globals";
 
 export default defineConfig(
