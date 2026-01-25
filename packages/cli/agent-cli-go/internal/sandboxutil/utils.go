@@ -129,8 +129,11 @@ func shellQuote(s string) string {
 	// If the string contains no special characters, return as-is
 	safe := true
 	for _, c := range s {
-		if !((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') ||
-			c == '.' || c == '/' || c == ':' || c == '=' || c == '-' || c == '_') {
+		isLower := c >= 'a' && c <= 'z'
+		isUpper := c >= 'A' && c <= 'Z'
+		isDigit := c >= '0' && c <= '9'
+		isSpecial := c == '.' || c == '/' || c == ':' || c == '=' || c == '-' || c == '_'
+		if !isLower && !isUpper && !isDigit && !isSpecial {
 			safe = false
 			break
 		}
