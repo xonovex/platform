@@ -95,43 +95,43 @@ bwrap --ro-bind / / --dev /dev --proc /proc echo "bwrap works"
 npx moon run script-agent:build
 
 # Run with nix sandbox (uses default Claude Code preset)
-npx agent-cli run -s nix /path/to/project
+agent-cli run -s nix /path/to/project
 
 # With verbose output
-npx agent-cli run -s nix -v
+agent-cli run -s nix -v
 
 # With debug output (shows bwrap command)
-npx agent-cli run -s nix -v -d
+agent-cli run -s nix -v -d
 
 # Dry run (show config without executing)
-npx agent-cli run -s nix -n
+agent-cli run -s nix -n
 ```
 
 ### Nix-Specific Options
 
 ```bash
 # Use the default claude preset (nodejs_24, claude-code, git, ripgrep, fd, fzf, jq, curl, coreutils, bash)
-npx agent-cli run -s nix --nix-preset claude
+agent-cli run -s nix --nix-preset claude
 
 # Custom package sets
-npx agent-cli run -s nix --nix-sets nodejs,python,kubernetes
+agent-cli run -s nix --nix-sets nodejs,python,kubernetes
 
 # Custom packages via image spec
-npx agent-cli run -s nix -I 'nix:{"packages":["nodejs_24","python312","rust"]}'
+agent-cli run -s nix -I 'nix:{"packages":["nodejs_24","python312","rust"]}'
 ```
 
 ### Other Options
 
 ```bash
 # Enable/disable network
-npx agent-cli run -s nix --network      # enabled (default)
-npx agent-cli run -s nix --no-network   # disabled
+agent-cli run -s nix --network      # enabled (default)
+agent-cli run -s nix --no-network   # disabled
 
 # With a different agent
-npx agent-cli run -s nix -a opencode
+agent-cli run -s nix -a opencode
 
 # With a provider
-npx agent-cli run -s nix -p gemini
+agent-cli run -s nix -p gemini
 ```
 
 ## How It Works

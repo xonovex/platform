@@ -113,7 +113,7 @@ npm run build -w @xonovex/agent-cli-go
 ### CLI
 
 ```bash
-npx agent-cli run --agent claude --sandbox bwrap
+agent-cli run --agent claude --sandbox bwrap
 ```
 
 <details>
@@ -136,16 +136,16 @@ npx agent-cli run --agent claude --sandbox bwrap
 
 ```bash
 # Run Claude Code with bubblewrap sandbox
-npx agent-cli run --agent claude --sandbox bwrap
+agent-cli run --agent claude --sandbox bwrap
 
 # Run with Gemini provider
-npx agent-cli run --agent claude --provider gemini
+agent-cli run --agent claude --provider gemini
 
 # Run in tmux session
-npx agent-cli run --agent claude --sandbox bwrap --terminal tmux
+agent-cli run --agent claude --sandbox bwrap --terminal tmux
 
 # Run OpenCode with Docker sandbox
-npx agent-cli run --agent opencode --sandbox docker
+agent-cli run --agent opencode --sandbox docker
 ```
 
 </details>
