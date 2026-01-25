@@ -1,9 +1,20 @@
 # Xonovex Platform
 
-Monorepo containing AI agent tooling and a structured workflow for AI-assisted development. Includes an agent wrapper CLI for Claude Code and OpenCode with sandbox support (bubblewrap, Docker, Nix), custom providers, and Claude Code Tasks. Also includes slash commands and skills for Claude Code that enable plan-driven development with parallel execution, worktree management, and continuous validation.
+![License](https://img.shields.io/badge/license-MIT-blue)
+![Node](https://img.shields.io/badge/node-20%2B-green)
+![Go](https://img.shields.io/badge/go-1.21%2B-00ADD8)
+
+> Run AI coding agents in sandboxed environments with custom providers
+
+- **Agent wrapper CLI** for Claude Code and OpenCode
+- **Sandbox support**: bubblewrap, Docker, Nix
+- **Custom providers** via CLIProxyAPI
+- **Claude Code Tasks** for background execution
+- **Plan-driven workflow** with worktrees and parallel execution
 
 ## Index
 
+- [Quick Start](#quick-start)
 - [Requirements](#requirements)
 - [Installation](#installation)
 - [Agent Wrapper](#agent-wrapper)
@@ -11,19 +22,32 @@ Monorepo containing AI agent tooling and a structured workflow for AI-assisted d
 - [Docker Sandbox](#docker-sandbox)
 - [Claude Commands](#claude-commands)
 - [Claude Skills](#claude-skills)
-- [Structure](#structure)
-- [Development](#development)
-- [Commit Convention](#commit-convention)
 - [License](#license)
+
+## Quick Start
+
+```bash
+# Clone and build
+git clone https://github.com/xonovex/platform.git
+cd platform && npm install && npm run build
+
+# Run Claude Code in a sandbox
+npx agent-cli run --agent claude --sandbox bwrap
+
+# Or use Docker
+docker compose -f packages/docker/docker-agent/compose.yaml run --rm ai-agent
+```
 
 ## Requirements
 
-- **Node.js** 20+ (for TypeScript CLI and development)
-- **Go** 1.21+ (for Go CLI, optional)
-- **Docker** (for Docker sandbox)
-- **bubblewrap** (for bwrap sandbox, Linux only)
-- **Nix** (for Nix sandbox, optional)
-- **tmux** (for terminal wrapper, optional)
+| Requirement | Purpose |
+|-------------|---------|
+| Node.js 20+ | TypeScript CLI and development |
+| Go 1.21+ | Go CLI (optional) |
+| Docker | Docker sandbox |
+| bubblewrap | bwrap sandbox (Linux only) |
+| Nix | Nix sandbox (optional) |
+| tmux | Terminal wrapper (optional) |
 
 ## Installation
 
@@ -42,7 +66,20 @@ npm run build -w @xonovex/agent-cli-go
 
 ## Agent Wrapper
 
-CLI tool for running AI coding agents in sandboxed environments with provider and wrapper support. Available in TypeScript and Go implementations.
+CLI tool for running AI coding agents in sandboxed environments with provider and wrapper support.
+
+```
+┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+│   agent-cli │────▶│   sandbox   │────▶│ claude/open │
+│             │     │ bwrap/docker│     │    code     │
+└─────────────┘     └─────────────┘     └─────────────┘
+       │                                       │
+       ▼                                       ▼
+┌─────────────┐                         ┌─────────────┐
+│  provider   │                         │   your      │
+│ gemini/glm  │                         │   code      │
+└─────────────┘                         └─────────────┘
+```
 
 ### Usage
 
@@ -54,7 +91,8 @@ npx agent-cli run [options]
 npx agent-cli-go run [options]
 ```
 
-### Options
+<details>
+<summary><strong>Options</strong></summary>
 
 | Option | Description |
 |--------|-------------|
@@ -66,23 +104,22 @@ npx agent-cli-go run [options]
 | `-n, --dry-run` | Show command without executing |
 | `-v, --verbose` | Enable verbose output |
 
+</details>
+
 ### Examples
 
 ```bash
 # Run Claude Code with bubblewrap sandbox
-agent-cli run --agent claude --sandbox bwrap
+npx agent-cli run --agent claude --sandbox bwrap
 
-# Run with Gemini provider (requires CLI Proxy running)
-agent-cli run --agent claude --provider gemini
+# Run with Gemini provider
+npx agent-cli run --agent claude --provider gemini
 
 # Run in tmux session
-agent-cli run --agent claude --sandbox bwrap --terminal tmux
+npx agent-cli run --agent claude --sandbox bwrap --terminal tmux
 
 # Run OpenCode with Docker sandbox
-agent-cli run --agent opencode --sandbox docker
-
-# Dry run to see the command
-agent-cli run --agent claude --sandbox bwrap --dry-run
+npx agent-cli run --agent opencode --sandbox docker
 ```
 
 ## Workflow
@@ -93,88 +130,76 @@ agent-cli run --agent claude --sandbox bwrap --dry-run
 
 | Command | Description |
 |---------|-------------|
-| `plan-research` | Explain what I want, it researches viability (using Explore agents with Haiku or equivalent), suggests alternatives, tells me if the idea is good |
-| `plan-create` | Creates `plans/<plan>.md` with frontmatter (status, skills to consult, library versions, parallelization info). Variants like `plan-tdd-create` generate red-green-refactor workflows |
-| `plan-subplans-create` | Creates `plans/<plan>/<subplans>.md`. Even subplans of subplans are possible |
-| `git-commit` | Commit pending plans to the repo |
+| `plan-research` | Research viability, suggest alternatives |
+| `plan-create` | Create plan with frontmatter and parallelization info |
+| `plan-subplans-create` | Create subplans for parallel execution |
+| `git-commit` | Commit pending plans |
 
 ### Worktree Setup
 
 | Command | Description |
 |---------|-------------|
-| `plan-worktree-create` | Creates worktree at `../<repo>-<feature>`, sets `git config branch.<branch>.plan` so other commands know which plan is active |
-
-Then cd into the worktree.
+| `plan-worktree-create` | Create worktree at `../<repo>-<feature>` |
 
 ### Development Cycle
 
-Repeat per session until complete:
-
 | Command | Description |
 |---------|-------------|
-| `plan-continue` | Auto-detects plan from worktree config, finds where it left off |
-| *(agent works)* | Agent implements the next eligible subplan |
-| `plan-validate` | Validates work against guidelines, plan and test suite |
-| `insights-extract` | *(optional)* Saves self-corrections to `insights/` with frontmatter |
-| `plan-update` | Updates subplan and parent plan status |
+| `plan-continue` | Auto-detect plan and resume work |
+| `plan-validate` | Validate against guidelines and tests |
+| `insights-extract` | Save self-corrections to `insights/` |
+| `plan-update` | Update plan status |
 
 ### Code Quality
 
-Optional, separate session:
-
 | Command | Description |
 |---------|-------------|
-| `code-simplify` | Finds code smells |
-| `code-harden` | Improves type safety, validation, error handling |
+| `code-simplify` | Find code smells |
+| `code-harden` | Improve type safety and error handling |
 
 ### Merge
 
 | Command | Description |
 |---------|-------------|
-| `plan-worktree-merge` | Intelligent conflict resolution (knows the plan), merges to parent branch |
-| `plan-validate` | *(optional)* Validates parallel group together on parent |
-| `insights-integrate` | *(optional)* Merges insights into guidelines/AGENTS.md |
+| `plan-worktree-merge` | Merge with intelligent conflict resolution |
+| `insights-integrate` | Merge insights into guidelines |
 | `git-commit --push` | Push changes |
 
-### Maintenance
+<details>
+<summary><strong>Parallel Execution</strong></summary>
 
-Run as needed:
+Multiple agents can work on parallel subplan groups simultaneously, each in its own worktree.
 
-| Command | Description |
-|---------|-------------|
-| `code-align` | Check alignment with current guidelines |
-| `shared-extract` | Extract duplicated code across packages into shared modules |
+</details>
 
----
+<details>
+<summary><strong>Agent Orchestration</strong></summary>
 
-### Parallel Execution
+An orchestrating agent can run the entire workflow autonomously by spawning agent instances that execute commands according to a higher level goal. The orchestrator handles research, planning, subplan creation, worktree management and coordinating parallel agents. This is still a work in progress.
 
-Multiple agents can work on parallel subplan groups simultaneously, each needs its own worktree associated with its specific subplan.
+</details>
 
-### Agent Orchestration
+<details>
+<summary><strong>Design Decisions</strong></summary>
 
-An orchestrating agent can run the entire workflow autonomously by spawning agent instances that execute the commands according to a higher level goal. The human only needs to provide the initial goal, then the orchestrator handles research, planning, subplan creation, worktree management and coordinating parallel agents. Each spawned agent runs in its own session/worktree and the orchestrator monitors progress via plan status updates, decides when to merge and handles the full lifecycle. This is something I am still working on.
+* **Domain-agnostic commands**: the agent figures out what to do based on context
+* **No hooks except git hooks**: agents decide when something cannot be fixed
+* **Plans committed in git**: continue from another machine, branch off for alternatives
+* **`*-simplify` commands**: generalize, compress, remove duplication
 
-### Design Decisions
-
-* **Domain-agnostic commands**: the agent figures out what to do based on context (language, platform etc.)
-* **No hooks except git hooks** (for now): I give agents freedom to decide when something cannot be fixed in the current session
-* **Plans committed in git**: easy to continue from another machine, branch off for alternative implementations, compare approaches
-* **`*-simplify` commands** for everything (instructions, skills, slash commands) which I run occasionally to generalize, compress, remove duplication and ensure consistency
+</details>
 
 ## Docker Sandbox
 
 Docker compose setup for running agents in isolated containers with custom provider support via [CLIProxyAPI](https://github.com/router-for-me/CLIProxyAPI).
 
-### Services
-
 | Service | Provider | Description |
 |---------|----------|-------------|
 | `ai-agent` | Default | Pass-through Anthropic API |
-| `ai-agent-glm` | GLM | Zhipu AI GLM-4 models via Z.AI API |
-| `ai-agent-gemini` | Gemini | Google Gemini 3.x models via CLI Proxy |
+| `ai-agent-glm` | GLM | Zhipu AI GLM-4 models |
+| `ai-agent-gemini` | Gemini | Google Gemini 3.x models |
 | `ai-agent-gemini-claude` | Gemini-Claude | Hybrid thinking models |
-| `ai-agent-gpt5-codex` | GPT-5 Codex | OpenAI models via CLI Proxy |
+| `ai-agent-gpt5-codex` | GPT-5 Codex | OpenAI models |
 
 ### Usage
 
@@ -182,17 +207,15 @@ Docker compose setup for running agents in isolated containers with custom provi
 # Build the Docker image
 docker build -t ai-agent -f packages/docker/docker-agent/Dockerfile .
 
-# Run with default provider (requires ANTHROPIC_AUTH_TOKEN)
+# Run with default provider
 docker compose -f packages/docker/docker-agent/compose.yaml run --rm ai-agent
 
-# Run with Gemini provider (requires CLI Proxy running)
+# Run with Gemini provider
 docker compose -f packages/docker/docker-agent/compose.yaml run --rm ai-agent-gemini
-
-# Run with GLM provider (requires ZAI_AUTH_TOKEN)
-docker compose -f packages/docker/docker-agent/compose.yaml run --rm ai-agent-glm
 ```
 
-### Environment Variables
+<details>
+<summary><strong>Environment Variables</strong></summary>
 
 | Variable | Description |
 |----------|-------------|
@@ -201,68 +224,37 @@ docker compose -f packages/docker/docker-agent/compose.yaml run --rm ai-agent-gl
 | `CLI_PROXY_API_KEY` | CLI Proxy API key (for Gemini/GPT providers) |
 | `AGENT_WORK_DIR` | Working directory to mount (defaults to `$PWD`) |
 
+</details>
+
 ## Claude Commands
 
-Slash commands for Claude Code located in `.claude/commands/`. Includes commands for planning, code quality, git workflows, and insights extraction.
+Slash commands for Claude Code located in `.claude/commands/`:
+
+- **Planning**: `plan-research`, `plan-create`, `plan-continue`, `plan-validate`
+- **Code quality**: `code-simplify`, `code-harden`, `code-align`
+- **Git workflows**: `git-commit`, `plan-worktree-create`, `plan-worktree-merge`
+- **Insights**: `insights-extract`, `insights-integrate`
 
 ## Claude Skills
 
 Technology-specific guidelines in `.claude/skills/` covering TypeScript, React, Hono, Docker, Kubernetes, and more.
 
-### Guidelines
+<details>
+<summary><strong>Standard vs Opinionated Skills</strong></summary>
 
-Skills in `.claude/skills/` provide technology-specific guidelines. Standard skills cover common best practices, while `-opinionated` variants contain specialized patterns:
+Standard skills cover common best practices, while `-opinionated` variants contain specialized patterns:
 
-* `c99-guidelines` / `c99-opinionated-guidelines`: Standard C99 vs caller-owns-memory, SoA, SIMD patterns
-* `lua-guidelines` / `lua-opinionated-guidelines`: Standard Lua vs LuaJIT performance optimization
-* `hono-guidelines` / `hono-opinionated-guidelines`: Standard Hono vs inline OpenAPI handlers, router selection
+* `c99-guidelines` / `c99-opinionated-guidelines`: Standard C99 vs caller-owns-memory, SoA, SIMD
+* `lua-guidelines` / `lua-opinionated-guidelines`: Standard Lua vs LuaJIT optimization
+* `hono-guidelines` / `hono-opinionated-guidelines`: Standard Hono vs inline OpenAPI handlers
 * `general-fp-guidelines` / `general-oop-guidelines`: Functional vs object-oriented paradigms
 
-## Structure
-
-```
-packages/
-  config/              # Shared configuration packages
-    eslint-config-*/   # ESLint configurations
-    ts-config-*/       # TypeScript configurations
-    vitest-config-*/   # Vitest configurations
-  tools/               # CLI tools
-    tool-lib/          # Shared TypeScript utilities
-    tool-lib-go/       # Shared Go utilities
-    tool-agent-cli/    # Agent Wrapper (TypeScript)
-    tool-agent-cli-go/ # Agent Wrapper (Go)
-  docker/                  # Docker configurations
-    docker-agent/          # Agent Docker image, compose, and OTEL config
-docs/                  # Documentation and workflow diagrams
-.claude/commands/      # Claude Code slash commands
-.claude/skills/        # Claude Code skills (guidelines)
-```
-
-## Development
-
-Uses [moonrepo](https://moonrepo.dev/) for task orchestration.
-
-```bash
-npm install                         # Setup
-npm run build                       # Build all packages
-npm run typecheck                   # Type check all packages
-npm run lint                        # Lint all packages
-npm run test                        # Run all tests
-npx moon run <project>:<task>       # Run task for specific project
-npx moon run :<task>                # Run task for all projects
-npx moon query projects             # List all projects
-```
-
-## Commit Convention
-
-Uses [Conventional Commits](https://www.conventionalcommits.org/).
-
-```
-type(scope): description
-
-Types: feat, fix, docs, style, refactor, test, chore, build, ci, perf, revert
-```
+</details>
 
 ## License
 
 MIT
+
+---
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup and guidelines.
