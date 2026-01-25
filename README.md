@@ -105,10 +105,10 @@ docker compose -f packages/docker/docker-agent/compose.yaml run --rm ai-agent-gl
 
 | Variable | Description |
 |----------|-------------|
-| `AGENT_WORK_DIR` | Working directory to mount (defaults to current directory) |
 | `ANTHROPIC_AUTH_TOKEN` | Anthropic API token (for default provider) |
 | `ZAI_AUTH_TOKEN` | Z.AI API token (for GLM provider) |
 | `CLI_PROXY_API_KEY` | CLI Proxy API key (for Gemini/GPT providers) |
+| `AGENT_WORK_DIR` | Working directory to mount (defaults to `$PWD`) |
 
 ## Claude Commands
 
