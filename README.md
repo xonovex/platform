@@ -7,8 +7,8 @@ Monorepo containing AI agent tooling and a structured workflow for AI-assisted d
 - [Requirements](#requirements)
 - [Installation](#installation)
 - [Agent Wrapper](#agent-wrapper)
-- [Docker Sandbox](#docker-sandbox)
 - [Workflow](#workflow)
+- [Docker Sandbox](#docker-sandbox)
 - [Claude Commands](#claude-commands)
 - [Claude Skills](#claude-skills)
 - [Structure](#structure)
@@ -84,45 +84,6 @@ agent-cli run --agent opencode --sandbox docker
 # Dry run to see the command
 agent-cli run --agent claude --sandbox bwrap --dry-run
 ```
-
-## Docker Sandbox
-
-Docker compose setup for running agents in isolated containers with custom provider support via [CLIProxyAPI](https://github.com/router-for-me/CLIProxyAPI).
-
-### Services
-
-| Service | Provider | Description |
-|---------|----------|-------------|
-| `ai-agent` | Default | Pass-through Anthropic API |
-| `ai-agent-glm` | GLM | Zhipu AI GLM-4 models via Z.AI API |
-| `ai-agent-gemini` | Gemini | Google Gemini 3.x models via CLI Proxy |
-| `ai-agent-gemini-claude` | Gemini-Claude | Hybrid thinking models |
-| `ai-agent-gpt5-codex` | GPT-5 Codex | OpenAI models via CLI Proxy |
-
-### Usage
-
-```bash
-# Build the Docker image
-docker build -t ai-agent -f packages/docker/docker-agent/Dockerfile .
-
-# Run with default provider (requires ANTHROPIC_AUTH_TOKEN)
-docker compose -f packages/docker/docker-agent/compose.yaml run --rm ai-agent
-
-# Run with Gemini provider (requires CLI Proxy running)
-docker compose -f packages/docker/docker-agent/compose.yaml run --rm ai-agent-gemini
-
-# Run with GLM provider (requires ZAI_AUTH_TOKEN)
-docker compose -f packages/docker/docker-agent/compose.yaml run --rm ai-agent-glm
-```
-
-### Environment Variables
-
-| Variable | Description |
-|----------|-------------|
-| `ANTHROPIC_AUTH_TOKEN` | Anthropic API token (for default provider) |
-| `ZAI_AUTH_TOKEN` | Z.AI API token (for GLM provider) |
-| `CLI_PROXY_API_KEY` | CLI Proxy API key (for Gemini/GPT providers) |
-| `AGENT_WORK_DIR` | Working directory to mount (defaults to `$PWD`) |
 
 ## Workflow
 
@@ -200,6 +161,45 @@ An orchestrating agent can run the entire workflow autonomously by spawning agen
 * **No hooks except git hooks** (for now): I give agents freedom to decide when something cannot be fixed in the current session
 * **Plans committed in git**: easy to continue from another machine, branch off for alternative implementations, compare approaches
 * **`*-simplify` commands** for everything (instructions, skills, slash commands) which I run occasionally to generalize, compress, remove duplication and ensure consistency
+
+## Docker Sandbox
+
+Docker compose setup for running agents in isolated containers with custom provider support via [CLIProxyAPI](https://github.com/router-for-me/CLIProxyAPI).
+
+### Services
+
+| Service | Provider | Description |
+|---------|----------|-------------|
+| `ai-agent` | Default | Pass-through Anthropic API |
+| `ai-agent-glm` | GLM | Zhipu AI GLM-4 models via Z.AI API |
+| `ai-agent-gemini` | Gemini | Google Gemini 3.x models via CLI Proxy |
+| `ai-agent-gemini-claude` | Gemini-Claude | Hybrid thinking models |
+| `ai-agent-gpt5-codex` | GPT-5 Codex | OpenAI models via CLI Proxy |
+
+### Usage
+
+```bash
+# Build the Docker image
+docker build -t ai-agent -f packages/docker/docker-agent/Dockerfile .
+
+# Run with default provider (requires ANTHROPIC_AUTH_TOKEN)
+docker compose -f packages/docker/docker-agent/compose.yaml run --rm ai-agent
+
+# Run with Gemini provider (requires CLI Proxy running)
+docker compose -f packages/docker/docker-agent/compose.yaml run --rm ai-agent-gemini
+
+# Run with GLM provider (requires ZAI_AUTH_TOKEN)
+docker compose -f packages/docker/docker-agent/compose.yaml run --rm ai-agent-glm
+```
+
+### Environment Variables
+
+| Variable | Description |
+|----------|-------------|
+| `ANTHROPIC_AUTH_TOKEN` | Anthropic API token (for default provider) |
+| `ZAI_AUTH_TOKEN` | Z.AI API token (for GLM provider) |
+| `CLI_PROXY_API_KEY` | CLI Proxy API key (for Gemini/GPT providers) |
+| `AGENT_WORK_DIR` | Working directory to mount (defaults to `$PWD`) |
 
 ## Claude Commands
 
