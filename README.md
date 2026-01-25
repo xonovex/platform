@@ -92,20 +92,20 @@ Docker compose setup for running agents in isolated containers with custom provi
 docker build -t ai-agent -f packages/docker/docker-agent/Dockerfile .
 
 # Run with default provider (requires ANTHROPIC_AUTH_TOKEN)
-AGENT_WORK_DIR=$(pwd) docker compose -f packages/docker/docker-agent/compose.yaml run --rm ai-agent
+docker compose -f packages/docker/docker-agent/compose.yaml run --rm ai-agent
 
 # Run with Gemini provider (requires CLI Proxy running)
-AGENT_WORK_DIR=$(pwd) docker compose -f packages/docker/docker-agent/compose.yaml run --rm ai-agent-gemini
+docker compose -f packages/docker/docker-agent/compose.yaml run --rm ai-agent-gemini
 
 # Run with GLM provider (requires ZAI_AUTH_TOKEN)
-AGENT_WORK_DIR=$(pwd) docker compose -f packages/docker/docker-agent/compose.yaml run --rm ai-agent-glm
+docker compose -f packages/docker/docker-agent/compose.yaml run --rm ai-agent-glm
 ```
 
 ### Environment Variables
 
 | Variable | Description |
 |----------|-------------|
-| `AGENT_WORK_DIR` | Working directory to mount (required) |
+| `AGENT_WORK_DIR` | Working directory to mount (defaults to current directory) |
 | `ANTHROPIC_AUTH_TOKEN` | Anthropic API token (for default provider) |
 | `ZAI_AUTH_TOKEN` | Z.AI API token (for GLM provider) |
 | `CLI_PROXY_API_KEY` | CLI Proxy API key (for Gemini/GPT providers) |

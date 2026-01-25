@@ -39,7 +39,7 @@ services:
       # Sandbox home directory (persisted)
       - ${AGENT_SANDBOX_HOME:-~/.sandboxed-agent-home}:${HOME}:rw
       # Working directory
-      - ${AGENT_WORK_DIR:?AGENT_WORK_DIR is required}:${AGENT_WORK_DIR}:rw
+      - ${AGENT_WORK_DIR:-${PWD}}:${AGENT_WORK_DIR}:rw
       # Temp directory
       - /tmp:/tmp:rw
       # Tool directories (bind from host)
@@ -100,7 +100,7 @@ services:
       # Sandbox home directory (persisted)
       - ${AGENT_SANDBOX_HOME:-~/.sandboxed-agent-home}:${HOME}:rw
       # Working directory
-      - ${AGENT_WORK_DIR:?AGENT_WORK_DIR is required}:${AGENT_WORK_DIR}:rw
+      - ${AGENT_WORK_DIR:-${PWD}}:${AGENT_WORK_DIR}:rw
       # Temp directory
       - /tmp:/tmp:rw
       # Tool directories (bind from host)
@@ -162,7 +162,7 @@ services:
       # Sandbox home directory (persisted)
       - ${AGENT_SANDBOX_HOME:-~/.sandboxed-agent-home}:${HOME}:rw
       # Working directory
-      - ${AGENT_WORK_DIR:?AGENT_WORK_DIR is required}:${AGENT_WORK_DIR}:rw
+      - ${AGENT_WORK_DIR:-${PWD}}:${AGENT_WORK_DIR}:rw
       # Temp directory
       - /tmp:/tmp:rw
       # Tool directories (bind from host)
@@ -226,7 +226,7 @@ services:
       # Sandbox home directory (persisted)
       - ${AGENT_SANDBOX_HOME:-~/.sandboxed-agent-home}:${HOME}:rw
       # Working directory
-      - ${AGENT_WORK_DIR:?AGENT_WORK_DIR is required}:${AGENT_WORK_DIR}:rw
+      - ${AGENT_WORK_DIR:-${PWD}}:${AGENT_WORK_DIR}:rw
       # Temp directory
       - /tmp:/tmp:rw
       # Tool directories (bind from host)
@@ -290,7 +290,7 @@ services:
       # Sandbox home directory (persisted)
       - ${AGENT_SANDBOX_HOME:-~/.sandboxed-agent-home}:${HOME}:rw
       # Working directory
-      - ${AGENT_WORK_DIR:?AGENT_WORK_DIR is required}:${AGENT_WORK_DIR}:rw
+      - ${AGENT_WORK_DIR:-${PWD}}:${AGENT_WORK_DIR}:rw
       # Temp directory
       - /tmp:/tmp:rw
       # Tool directories (bind from host)
