@@ -1,6 +1,6 @@
 # Xonovex Platform
 
-Monorepo containing AI agent tooling and a structured workflow for AI-assisted development. Includes an agent wrapper CLI for Claude Code and OpenCode with sandbox support (bubblewrap, Docker, Nix) and custom providers. Also includes slash commands and skills for Claude Code that enable plan-driven development with parallel execution, worktree management, and continuous validation.
+Monorepo containing AI agent tooling and a structured workflow for AI-assisted development. Includes an agent wrapper CLI for Claude Code and OpenCode with sandbox support (bubblewrap, Docker, Nix), custom providers, and Claude Code Tasks. Also includes slash commands and skills for Claude Code that enable plan-driven development with parallel execution, worktree management, and continuous validation.
 
 ## Index
 
