@@ -33,11 +33,11 @@ git clone https://github.com/xonovex/platform.git
 cd platform
 npm install
 
-# Build all packages
+# Build all packages (TypeScript)
 npm run build
 
-# Build Go CLI (optional)
-npx moon run tool-agent-cli-go:go-build
+# Build Go CLI (optional, requires Go 1.21+)
+npm run build -w @xonovex/agent-cli-go
 ```
 
 ## Agent Wrapper
@@ -47,11 +47,11 @@ CLI tool for running AI coding agents in sandboxed environments with provider an
 ### Usage
 
 ```bash
-# TypeScript version (after npm install && npm run build)
+# TypeScript version
 npx agent-cli run [options]
 
-# Go version (after building)
-./packages/tools/tool-agent-cli-go/dist/agent-cli run [options]
+# Go version
+npx agent-cli-go run [options]
 ```
 
 ### Options

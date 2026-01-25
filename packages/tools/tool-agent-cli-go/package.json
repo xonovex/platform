@@ -1,0 +1,12 @@
+{
+  "name": "@xonovex/agent-cli-go",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Agent wrapper CLI (Go implementation)",
+  "bin": {
+    "agent-cli-go": "./dist/agent-cli"
+  },
+  "scripts": {
+    "build": "go build -o dist/agent-cli ./cmd/agent-cli"
+  }
+}
