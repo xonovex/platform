@@ -20,7 +20,7 @@
 
 **Foundation:** Born from 2.5 years of working with coding agents (AutoGPT, Aider, Claude Code), this project is not just another framework. Instead it builds on existing tools by introducing composable skills and shared guidelines. Fork it, adapt it and evolve it. Through collective evolution and LLM-powered assimilation, improvements can flow in both directions. Sandboxed execution, multi-agent coordination and assimilable skills.
 
-**Vision:** self-organizing agents operating across sandboxes, containers and orchestration platforms (Kubernetes, etc.) spawning their own environments, coordinating across boundaries and managing lifecycles autonomously.
+**Vision:** Self-organizing agents operating across sandboxes, containers and orchestration platforms (Kubernetes, etc.) spawning their own environments, coordinating across boundaries and managing lifecycles autonomously.
 
 ## Index
 
