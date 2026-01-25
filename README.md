@@ -1,6 +1,6 @@
 # Xonovex Platform
 
-Monorepo for Xonovex tools and configuration packages.
+Monorepo containing AI agent tooling, shared configuration packages, and a structured workflow for AI-assisted development. Includes slash commands and skills for Claude Code that enable plan-driven development with parallel execution, worktree management, and continuous validation.
 
 ## Structure
 
@@ -93,6 +93,15 @@ Technology-specific guidelines in `.claude/skills/` covering TypeScript, React, 
 
 * `code-align`: check alignment with current guidelines
 * `shared-extract`: extract duplicated code across packages into shared modules
+
+**Guidelines**
+
+Skills in `.claude/skills/` provide technology-specific guidelines. Standard skills cover common best practices, while `-opinionated` variants contain specialized patterns:
+
+* `c99-guidelines` / `c99-opinionated-guidelines`: Standard C99 vs caller-owns-memory, SoA, SIMD patterns
+* `lua-guidelines` / `lua-opinionated-guidelines`: Standard Lua vs LuaJIT performance optimization
+* `hono-guidelines` / `hono-opinionated-guidelines`: Standard Hono vs inline OpenAPI handlers, router selection
+* `general-fp-guidelines` / `general-oop-guidelines`: Functional vs object-oriented paradigms
 
 ## Setup
 
