@@ -146,7 +146,7 @@ npx agent-cli run --agent opencode --sandbox docker
 | 5. plan-update      |            ^                    +---------------------+
 +---------------------+            |                              |
             |                      |                              v
-            +-- more subplans? ----+                    +---------------------+
+            +--- more subplans? <--+                    +---------------------+
                                                        |        Done         |
                                                        +---------------------+
 
