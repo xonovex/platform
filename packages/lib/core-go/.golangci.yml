@@ -8,11 +8,6 @@ linters:
     - unused
     - ineffassign
     - misspell
-  exclusions:
-    rules:
-      - path: _test\.go
-        linters:
-          - errcheck
 
 formatters:
   enable:

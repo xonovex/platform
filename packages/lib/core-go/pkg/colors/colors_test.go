@@ -5,18 +5,30 @@ import (
 	"testing"
 )
 
-func TestIsColorSupported(t *testing.T) {
+func withEnv(t *testing.T, term, noColor string, fn func()) {
+	t.Helper()
 	origTerm := os.Getenv("TERM")
 	origNoColor := os.Getenv("NO_COLOR")
 	defer func() {
-		os.Setenv("TERM", origTerm)
+		_ = os.Setenv("TERM", origTerm)
 		if origNoColor == "" {
-			os.Unsetenv("NO_COLOR")
+			_ = os.Unsetenv("NO_COLOR")
 		} else {
-			os.Setenv("NO_COLOR", origNoColor)
+			_ = os.Setenv("NO_COLOR", origNoColor)
 		}
 	}()
 
+	_ = os.Setenv("TERM", term)
+	if noColor == "" {
+		_ = os.Unsetenv("NO_COLOR")
+	} else {
+		_ = os.Setenv("NO_COLOR", noColor)
+	}
+
+	fn()
+}
+
+func TestIsColorSupported(t *testing.T) {
 	tests := []struct {
 		name     string
 		term     string
@@ -32,78 +44,35 @@ func TestIsColorSupported(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			os.Setenv("TERM", tt.term)
-			if tt.noColor == "" {
-				os.Unsetenv("NO_COLOR")
-			} else {
-				os.Setenv("NO_COLOR", tt.noColor)
-			}
-
-			if got := IsColorSupported(); got != tt.expected {
-				t.Errorf("IsColorSupported() = %v, want %v", got, tt.expected)
-			}
+			withEnv(t, tt.term, tt.noColor, func() {
+				if got := IsColorSupported(); got != tt.expected {
+					t.Errorf("IsColorSupported() = %v, want %v", got, tt.expected)
+				}
+			})
 		})
 	}
 }
 
 func TestColorize(t *testing.T) {
-	origTerm := os.Getenv("TERM")
-	origNoColor := os.Getenv("NO_COLOR")
-	defer func() {
-		os.Setenv("TERM", origTerm)
-		if origNoColor == "" {
-			os.Unsetenv("NO_COLOR")
-		} else {
-			os.Setenv("NO_COLOR", origNoColor)
+	withEnv(t, "xterm", "", func() {
+		result := Colorize("test", Red)
+		expected := Red + "test" + Reset
+		if result != expected {
+			t.Errorf("Colorize() = %q, want %q", result, expected)
 		}
-	}()
-
-	os.Setenv("TERM", "xterm")
-	os.Unsetenv("NO_COLOR")
-
-	result := Colorize("test", Red)
-	expected := Red + "test" + Reset
-	if result != expected {
-		t.Errorf("Colorize() = %q, want %q", result, expected)
-	}
+	})
 }
 
 func TestColorizeNoColor(t *testing.T) {
-	origTerm := os.Getenv("TERM")
-	origNoColor := os.Getenv("NO_COLOR")
-	defer func() {
-		os.Setenv("TERM", origTerm)
-		if origNoColor == "" {
-			os.Unsetenv("NO_COLOR")
-		} else {
-			os.Setenv("NO_COLOR", origNoColor)
+	withEnv(t, "xterm", "1", func() {
+		result := Colorize("test", Red)
+		if result != "test" {
+			t.Errorf("Colorize() with NO_COLOR = %q, want %q", result, "test")
 		}
-	}()
-
-	os.Setenv("TERM", "xterm")
-	os.Setenv("NO_COLOR", "1")
-
-	result := Colorize("test", Red)
-	if result != "test" {
-		t.Errorf("Colorize() with NO_COLOR = %q, want %q", result, "test")
-	}
+	})
 }
 
 func TestColorFunctions(t *testing.T) {
-	origTerm := os.Getenv("TERM")
-	origNoColor := os.Getenv("NO_COLOR")
-	defer func() {
-		os.Setenv("TERM", origTerm)
-		if origNoColor == "" {
-			os.Unsetenv("NO_COLOR")
-		} else {
-			os.Setenv("NO_COLOR", origNoColor)
-		}
-	}()
-
-	os.Setenv("TERM", "xterm")
-	os.Unsetenv("NO_COLOR")
-
 	tests := []struct {
 		name     string
 		fn       func(string) string
@@ -122,10 +91,12 @@ func TestColorFunctions(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := tt.fn("test")
-			if result != tt.expected {
-				t.Errorf("%s() = %q, want %q", tt.name, result, tt.expected)
-			}
+			withEnv(t, "xterm", "", func() {
+				result := tt.fn("test")
+				if result != tt.expected {
+					t.Errorf("%s() = %q, want %q", tt.name, result, tt.expected)
+				}
+			})
 		})
 	}
 }

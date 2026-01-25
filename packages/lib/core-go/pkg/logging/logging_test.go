@@ -14,7 +14,7 @@ func captureStderr(f func()) string {
 
 	f()
 
-	w.Close()
+	_ = w.Close()
 	os.Stderr = old
 
 	var buf bytes.Buffer
@@ -31,7 +31,7 @@ func captureStdout(f func()) string {
 
 	f()
 
-	w.Close()
+	_ = w.Close()
 	os.Stdout = old
 
 	var buf bytes.Buffer
@@ -85,13 +85,13 @@ func TestLogDebug(t *testing.T) {
 	origDebug := os.Getenv("DEBUG")
 	defer func() {
 		if origDebug == "" {
-			os.Unsetenv("DEBUG")
+			_ = os.Unsetenv("DEBUG")
 		} else {
-			os.Setenv("DEBUG", origDebug)
+			_ = os.Setenv("DEBUG", origDebug)
 		}
 	}()
 
-	os.Unsetenv("DEBUG")
+	_ = os.Unsetenv("DEBUG")
 	output := captureStderr(func() {
 		LogDebug("should not appear")
 	})
@@ -99,7 +99,7 @@ func TestLogDebug(t *testing.T) {
 		t.Errorf("LogDebug() without DEBUG env should not output, got %q", output)
 	}
 
-	os.Setenv("DEBUG", "1")
+	_ = os.Setenv("DEBUG", "1")
 	output = captureStderr(func() {
 		LogDebug("debug message")
 	})
