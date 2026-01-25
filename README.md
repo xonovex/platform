@@ -38,7 +38,61 @@ Technology-specific guidelines in `.claude/skills/` covering TypeScript, React, 
 
 ## Workflow
 
-See `docs/workflow-diagram.png` for the development workflow diagram.
+**Image of my workflow**
+
+![Workflow Diagram](https://raw.githubusercontent.com/xonovex/platform/refs/heads/main/docs/workflow-diagram.png)
+
+**Setup**
+
+* Run my agent wrapper (supports multiple harnesses: Claude Code, OpenCode with different profiles; for ex. Claude Code + GLM + docker, Claude Code + bwrap, Claude Code + Gemini via CLI Proxy, OpenCode + GitHub Copilot etc.)
+
+**Research & Planning**
+
+* `plan-research`: explain what I want, it researches viability (using Explore agents with Haiku or equivalent), suggests alternatives, tells me if the idea is good
+* `plan-create`: creates `plans/<plan>.md` with frontmatter (status, skills to consult, library versions, parallelization info). There are also variants like `plan-tdd-create` generate red-green-refactor workflows
+* `plan-subplans-create`: creates `plans/<plan>/<subplans>.md`. Even subplans of subplans are possible, but never needed that
+* `git-commit`: commit pending plans to the repo
+
+**Worktree Setup**
+
+* `plan-worktree-create`: creates worktree at `../<repo>-<feature>`, sets `git config branch.<branch>.plan` so other commands know which plan is active
+* cd into the worktree
+
+**Development Cycle** (repeat per session until complete)
+
+* `plan-continue`: auto-detects plan from worktree config, finds where it left off
+* Agent implements the next eligible subplan
+* `plan-validate`: validates work against guidelines, plan and test suite
+* `insights-extract` (optional): saves self-corrections to `insights/` with frontmatter
+* `plan-update`: updates subplan and parent plan status
+
+**Code Quality** (optional, separate session)
+
+* `code-simplify`: finds code smells
+* `code-harden`: improves type safety, validation, error handling
+
+**Merge**
+
+* `plan-worktree-merge`: intelligent conflict resolution (knows the plan), merges to parent branch
+* `plan-validate` on parent (optional): validates parallel group together
+* `insights-integrate` (optional): merges insights into guidelines/AGENTS.md
+* `git-commit --push`
+
+**Parallel Execution**: Multiple agents can work on parallel subplan groups simultaneously, each needs its own worktree associated with its specific subplan.
+
+**Agent Orchestration**: An orchestrating agent can run the entire workflow autonomously by spawning agent instances that execute the commands according to a higher level goal. The human only needs to provide the initial goal, then the orchestrator handles research, planning, subplan creation, worktree management and coordinating parallel agents. Each spawned agent runs in its own session/worktree and the orchestrator monitors progress via plan status updates, decides when to merge and handles the full lifecycle. This is something I am still working on.
+
+**Some Design Decisions**:
+
+* All commands are domain-agnostic: the agent figures out what to do based on context (language, platform etc.)
+* No hooks except git hooks (for now): I give agents freedom to decide when something cannot be fixed in the current session
+* Plans committed in git: easy to continue from another machine, branch off for alternative implementations, compare approaches
+* `*-simplify` commands for everything (instructions, skills, slash commands) which I run occasionally to generalize, compress, remove duplication and ensure consistency
+
+**Maintenance Commands** (run as needed):
+
+* `code-align`: check alignment with current guidelines
+* `shared-extract`: extract duplicated code across packages into shared modules
 
 ## Setup
 
