@@ -1,6 +1,6 @@
 {
   "name": "@xonovex/ts-config-build",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "TypeScript configuration for building packages",
   "type": "module",
   "license": "MIT",

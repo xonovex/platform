@@ -1,6 +1,6 @@
 {
   "name": "@xonovex/vitest-config-node",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Vitest configuration for Node.js applications",
   "type": "module",
   "license": "MIT",

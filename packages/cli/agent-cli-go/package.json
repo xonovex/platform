@@ -1,6 +1,6 @@
 {
   "name": "@xonovex/agent-cli-go",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Agent wrapper CLI (Go implementation)",
   "type": "module",
   "license": "MIT",
@@ -32,13 +32,13 @@
     "test": "go test ./..."
   },
   "devDependencies": {
-    "@xonovex/ts-config-cli": "0.1.0"
+    "@xonovex/ts-config-cli": "0.1.1"
   },
   "optionalDependencies": {
-    "@xonovex/agent-cli-go-linux-x64": "0.1.0",
-    "@xonovex/agent-cli-go-linux-arm64": "0.1.0",
-    "@xonovex/agent-cli-go-darwin-x64": "0.1.0",
-    "@xonovex/agent-cli-go-darwin-arm64": "0.1.0",
-    "@xonovex/agent-cli-go-win32-x64": "0.1.0"
+    "@xonovex/agent-cli-go-linux-x64": "0.1.1",
+    "@xonovex/agent-cli-go-linux-arm64": "0.1.1",
+    "@xonovex/agent-cli-go-darwin-x64": "0.1.1",
+    "@xonovex/agent-cli-go-darwin-arm64": "0.1.1",
+    "@xonovex/agent-cli-go-win32-x64": "0.1.1"
   }
 }

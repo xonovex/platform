@@ -1,6 +1,6 @@
 {
   "name": "@xonovex/eslint-config-cli",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "ESLint configuration for CLI tools and scripts",
   "type": "module",
   "license": "MIT",
