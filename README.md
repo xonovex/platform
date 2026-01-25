@@ -2,24 +2,6 @@
 
 Monorepo containing AI agent tooling and a structured workflow for AI-assisted development. Includes an agent wrapper CLI for Claude Code and OpenCode with sandbox support (bubblewrap, Docker, Nix) and custom providers. Also includes slash commands and skills for Claude Code that enable plan-driven development with parallel execution, worktree management, and continuous validation.
 
-## Structure
-
-```
-packages/
-  config/              # Shared configuration packages
-    eslint-config-*/   # ESLint configurations
-    ts-config-*/       # TypeScript configurations
-    vitest-config-*/   # Vitest configurations
-  tools/               # CLI tools
-    tool-lib/          # Shared TypeScript utilities
-    tool-lib-go/       # Shared Go utilities
-    tool-agent-cli/    # Agent CLI (TypeScript)
-    tool-agent-cli-go/ # Agent CLI (Go)
-docs/                  # Documentation and workflow diagrams
-.claude/commands/      # Claude Code slash commands
-.claude/skills/        # Claude Code skills (guidelines)
-```
-
 ## Agent CLI
 
 CLI tool for running AI coding agents in sandboxed environments with provider and wrapper support.
@@ -135,19 +117,22 @@ Skills in `.claude/skills/` provide technology-specific guidelines. Standard ski
 * `hono-guidelines` / `hono-opinionated-guidelines`: Standard Hono vs inline OpenAPI handlers, router selection
 * `general-fp-guidelines` / `general-oop-guidelines`: Functional vs object-oriented paradigms
 
-## Setup
+## Structure
 
-```bash
-npm install
 ```
-
-## Build
-
-```bash
-npm run build       # Build all packages
-npm run typecheck   # Type check all packages
-npm run lint        # Lint all packages
-npm run test        # Run all tests
+packages/
+  config/              # Shared configuration packages
+    eslint-config-*/   # ESLint configurations
+    ts-config-*/       # TypeScript configurations
+    vitest-config-*/   # Vitest configurations
+  tools/               # CLI tools
+    tool-lib/          # Shared TypeScript utilities
+    tool-lib-go/       # Shared Go utilities
+    tool-agent-cli/    # Agent CLI (TypeScript)
+    tool-agent-cli-go/ # Agent CLI (Go)
+docs/                  # Documentation and workflow diagrams
+.claude/commands/      # Claude Code slash commands
+.claude/skills/        # Claude Code skills (guidelines)
 ```
 
 ## Development
@@ -155,9 +140,14 @@ npm run test        # Run all tests
 Uses [moonrepo](https://moonrepo.dev/) for task orchestration.
 
 ```bash
-npx moon run <project>:<task>   # Run task for specific project
-npx moon run :<task>            # Run task for all projects
-npx moon query projects         # List all projects
+npm install                         # Setup
+npm run build                       # Build all packages
+npm run typecheck                   # Type check all packages
+npm run lint                        # Lint all packages
+npm run test                        # Run all tests
+npx moon run <project>:<task>       # Run task for specific project
+npx moon run :<task>                # Run task for all projects
+npx moon query projects             # List all projects
 ```
 
 ## Commit Convention
