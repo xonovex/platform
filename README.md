@@ -33,8 +33,8 @@ CLI tool for running AI coding agents in sandboxed environments with provider an
 ### Usage
 
 ```bash
-# TypeScript version (from repo root)
-node packages/tools/tool-agent-cli/dist/src/agent.js run [options]
+# TypeScript version (after npm install && npm run build)
+npx agent-cli run [options]
 
 # Go version (after building)
 ./packages/tools/tool-agent-cli-go/dist/agent-cli run [options]
