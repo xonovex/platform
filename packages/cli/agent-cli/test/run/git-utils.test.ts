@@ -35,19 +35,16 @@ describe("git utilities", () => {
   });
 
   describe("getCurrentBranchSync", () => {
-    it("should return current branch for current directory", () => {
+    it("should return branch or null for detached HEAD", () => {
       const branch = getCurrentBranchSync();
 
-      // We're in a git repo, so it should return something
-      expect(branch).not.toBeNull();
-      expect(typeof branch).toBe("string");
-    });
-
-    it("should return current branch for specified directory", () => {
-      const branch = getCurrentBranchSync(process.cwd());
-
-      expect(branch).not.toBeNull();
-      expect(typeof branch).toBe("string");
+      // In CI with tag checkout, we may be in detached HEAD (returns null)
+      // On a regular branch, it returns the branch name
+      if (branch !== null) {
+        expect(typeof branch).toBe("string");
+        expect(branch).not.toMatch(/\s/);
+        expect(branch).not.toBe("HEAD");
+      }
     });
 
     it("should return null for non-git directory", () => {
@@ -61,31 +58,22 @@ describe("git utilities", () => {
 
       expect(branch).toBeNull();
     });
-
-    it("should return a valid branch name format", () => {
-      const branch = getCurrentBranchSync();
-
-      // We're in a git repo so branch should exist
-      expect(branch).not.toBeNull();
-      // Branch names shouldn't contain spaces or control characters
-      expect(branch).not.toMatch(/\s/);
-      // Branch name should not be "HEAD" (that would indicate detached)
-      // Our function returns null for detached HEAD
-      expect(branch).not.toBe("HEAD");
-    });
   });
 
   describe("integration", () => {
     it("should work together to identify repo context", () => {
       const root = getGitRootSync();
-      const branch = getCurrentBranchSync();
 
-      // Both should succeed in a git repo
+      // Root should succeed in a git repo
       expect(root).not.toBeNull();
-      expect(branch).not.toBeNull();
-
       // Root should be an absolute path
       expect(root).toMatch(/^\//);
+
+      // Branch may be null in detached HEAD state (e.g., tag checkout in CI)
+      const branch = getCurrentBranchSync();
+      if (branch !== null) {
+        expect(typeof branch).toBe("string");
+      }
     });
   });
 });
