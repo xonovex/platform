@@ -1,6 +1,6 @@
 {
   "name": "@xonovex/core",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Core library for Xonovex TypeScript scripts (Node.js)",
   "type": "module",
   "license": "MIT",
@@ -39,9 +39,9 @@
     "lint:fix": "eslint . --fix"
   },
   "devDependencies": {
-    "@xonovex/eslint-config-cli": "0.1.5",
-    "@xonovex/ts-config-cli": "0.1.5",
-    "@xonovex/vitest-config-node": "0.1.5",
+    "@xonovex/eslint-config-cli": "0.1.6",
+    "@xonovex/ts-config-cli": "0.1.6",
+    "@xonovex/vitest-config-node": "0.1.6",
     "@types/node": "^25.0.10",
     "@vitest/coverage-v8": "^4.0.18",
     "eslint": "^9.39.2",
