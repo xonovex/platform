@@ -1,6 +1,6 @@
 {
   "name": "@xonovex/agent-cli-go-linux-arm64",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Linux arm64 binary for @xonovex/agent-cli-go",
   "license": "MIT",
   "author": "Xonovex",
@@ -17,9 +17,16 @@
     "access": "public",
     "registry": "https://registry.npmjs.org/"
   },
-  "os": ["linux"],
-  "cpu": ["arm64"],
-  "libc": ["glibc", "musl"],
+  "os": [
+    "linux"
+  ],
+  "cpu": [
+    "arm64"
+  ],
+  "libc": [
+    "glibc",
+    "musl"
+  ],
   "files": [
     "bin"
   ]
