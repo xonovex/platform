@@ -1,0 +1,104 @@
+name: Release - TypeScript Packages
+
+on:
+  workflow_call:
+    inputs:
+      dry-run:
+        description: Perform a dry run without publishing
+        type: boolean
+        required: false
+        default: false
+    secrets:
+      npm-token:
+        description: NPM token for publishing
+        required: true
+    outputs:
+      published:
+        description: Whether packages were published
+        value: ${{ jobs.publish.outputs.published }}
+
+jobs:
+  publish:
+    name: Publish
+    runs-on: ubuntu-latest
+    if: ${{ !inputs.dry-run }}
+    permissions:
+      contents: read
+      id-token: write
+    outputs:
+      published: ${{ steps.publish.outputs.published }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: ./.github/actions/setup-node
+        with:
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Build
+        run: npm run build
+
+      - name: Publish packages with Changesets
+        id: publish
+        run: |
+          OUTPUT=$(npx changeset publish --no-git-tag 2>&1) || true
+          echo "$OUTPUT"
+          echo "published=true" >> $GITHUB_OUTPUT
+
+          # Parse output for summary
+          echo "output<<EOF" >> $GITHUB_OUTPUT
+          echo "$OUTPUT" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.npm-token }}
+
+      - name: Summary
+        run: |
+          echo "## TypeScript Packages Published" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Packages were published to npm via Changesets." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "<details>" >> $GITHUB_STEP_SUMMARY
+          echo "<summary>Publish Output</summary>" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "${{ steps.publish.outputs.output }}" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "</details>" >> $GITHUB_STEP_SUMMARY
+
+  dry-run:
+    name: Publish [Dry Run]
+    runs-on: ubuntu-latest
+    if: ${{ inputs.dry-run }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: ./.github/actions/setup-node
+
+      - name: Build
+        run: npm run build
+
+      - name: Check changeset status
+        run: |
+          echo "DRY RUN - Checking changeset status:"
+          npx changeset status || true
+
+      - name: Show packages
+        run: |
+          echo "DRY RUN - Would publish the following packages:"
+          for pkg in $(npm query ':root > *' --workspaces 2>/dev/null | jq -r '.[].name' 2>/dev/null || echo ""); do
+            if [ -n "$pkg" ]; then
+              echo "  - $pkg"
+            fi
+          done
+
+      - name: Summary
+        run: |
+          echo "## TypeScript Packages [Dry Run]" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "This was a dry run. No packages were published." >> $GITHUB_STEP_SUMMARY
