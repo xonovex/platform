@@ -1,5 +1,11 @@
 # @xonovex/agent-cli-go
 
+## 0.1.8
+
+### Patch Changes
+
+- [`220a4cb`](https://github.com/xonovex/platform/commit/220a4cb2324f51cdaa9e1702e2eac219919749e5) Thanks [@deorder](https://github.com/deorder)! - Bump version to resolve npm provenance conflict
+
 ## 0.1.7
 
 ### Patch Changes
