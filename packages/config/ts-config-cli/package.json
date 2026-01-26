@@ -1,6 +1,6 @@
 {
   "name": "@xonovex/ts-config-cli",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "description": "TypeScript configuration for CLI tools and scripts",
   "type": "module",
   "license": "MIT",
@@ -29,7 +29,7 @@
   },
   "dependencies": {},
   "devDependencies": {
-    "@xonovex/ts-config-base": "0.1.7",
+    "@xonovex/ts-config-base": "0.1.8",
     "@types/node": "^25.0.10"
   },
   "scripts": {

@@ -1,5 +1,14 @@
 # @xonovex/vitest-config-node
 
+## 0.1.9
+
+### Patch Changes
+
+- [`afcdbad`](https://github.com/xonovex/platform/commit/afcdbad99e619fe22f85b1c26589e79df62118a5) Thanks [@deorder](https://github.com/deorder)! - Bump versions past provenance conflicts (final)
+
+- Updated dependencies [[`afcdbad`](https://github.com/xonovex/platform/commit/afcdbad99e619fe22f85b1c26589e79df62118a5)]:
+  - @xonovex/vitest-config-base@0.1.9
+
 ## 0.1.8
 
 ### Patch Changes

@@ -1,6 +1,6 @@
 {
   "name": "@xonovex/vitest-config-base",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "description": "Base Vitest configuration for Xonovex projects",
   "type": "module",
   "license": "MIT",
@@ -44,8 +44,8 @@
     "vite-tsconfig-paths": "6.0.4"
   },
   "devDependencies": {
-    "@xonovex/eslint-config-base": "0.1.8",
-    "@xonovex/ts-config-build": "0.1.8"
+    "@xonovex/eslint-config-base": "0.1.9",
+    "@xonovex/ts-config-build": "0.1.9"
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",

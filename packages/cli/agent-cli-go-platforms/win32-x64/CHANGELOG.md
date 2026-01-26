@@ -1,5 +1,7 @@
 # @xonovex/agent-cli-go-win32-x64
 
+## 0.1.10
+
 ## 0.1.9
 
 ## 0.1.8
