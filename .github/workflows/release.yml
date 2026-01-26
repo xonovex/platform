@@ -208,7 +208,6 @@ jobs:
       (needs.build-go-binaries.result == 'success' || needs.build-go-binaries.result == 'skipped')
     permissions:
       contents: read
-      id-token: write
 
     steps:
       - name: Checkout
@@ -220,6 +219,12 @@ jobs:
           node-version: 24
           cache: npm
           registry-url: "https://registry.npmjs.org"
+
+      - name: Disable provenance
+        run: |
+          sed -i 's/provenance=true/provenance=false/' .npmrc
+          echo "Contents of .npmrc:"
+          cat .npmrc
 
       - name: Install dependencies
         run: npm ci
@@ -252,9 +257,6 @@ jobs:
         if: needs.check-release.outputs.has_go_changes == 'true'
         working-directory: packages/cli/agent-cli-go
         run: npx tsc
-
-      - name: Disable provenance in .npmrc
-        run: sed -i 's/provenance=true/provenance=false/' .npmrc
 
       - name: Publish all packages with Changesets
         run: npx changeset publish --no-git-tag
