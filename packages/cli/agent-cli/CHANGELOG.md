@@ -1,5 +1,14 @@
 # @xonovex/agent-cli
 
+## 0.1.12
+
+### Patch Changes
+
+- [`e1c5d24`](https://github.com/xonovex/platform/commit/e1c5d24c2713015f833d1c6d7ac5944056b1b5de) Thanks [@deorder](https://github.com/deorder)! - Simplify GitHub Actions workflows with composite actions
+
+- Updated dependencies [[`e1c5d24`](https://github.com/xonovex/platform/commit/e1c5d24c2713015f833d1c6d7ac5944056b1b5de)]:
+  - @xonovex/core@0.1.12
+
 ## 0.1.11
 
 ### Patch Changes
