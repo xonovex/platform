@@ -1,6 +1,6 @@
 {
   "name": "@xonovex/ts-config-base",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Base TypeScript configuration for Xonovex projects",
   "type": "module",
   "license": "MIT",
