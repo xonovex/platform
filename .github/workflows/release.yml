@@ -154,8 +154,11 @@ jobs:
   publish-ts-packages:
     name: Publish TypeScript Packages
     runs-on: ubuntu-latest
-    needs: [check-release, validate]
-    if: needs.check-release.outputs.should_release == 'true'
+    needs: [check-release, validate, publish-go-main]
+    if: |
+      always() &&
+      needs.check-release.outputs.should_release == 'true' &&
+      (needs.publish-go-main.result == 'success' || needs.publish-go-main.result == 'skipped')
     permissions:
       contents: read
       id-token: write
@@ -263,7 +266,7 @@ jobs:
   publish-go-main:
     name: Publish Go Main Package
     runs-on: ubuntu-latest
-    needs: [check-release, publish-go-platform-packages, publish-ts-packages]
+    needs: [check-release, publish-go-platform-packages]
     if: |
       needs.check-release.outputs.should_release == 'true' &&
       needs.check-release.outputs.has_go_changes == 'true'
