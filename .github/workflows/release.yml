@@ -83,9 +83,7 @@ jobs:
   release-go:
     name: Release Go
     needs: [check, validate]
-    if: |
-      needs.check.outputs.should-release == 'true' &&
-      needs.check.outputs.has-go-changes == 'true'
+    if: needs.check.outputs.should-release == 'true' && needs.check.outputs.has-go-changes == 'true'
     uses: ./.github/workflows/release-go.yml
     with:
       dry-run: ${{ needs.check.outputs.dry-run == 'true' }}
@@ -97,10 +95,7 @@ jobs:
   release-ts:
     name: Release TypeScript
     needs: [check, validate, release-go]
-    if: |
-      always() &&
-      needs.check.outputs.should-release == 'true' &&
-      (needs.release-go.result == 'success' || needs.release-go.result == 'skipped')
+    if: always() && needs.check.outputs.should-release == 'true' && needs.validate.result == 'success' && (needs.release-go.result == 'success' || needs.release-go.result == 'skipped')
     uses: ./.github/workflows/release-ts.yml
     with:
       dry-run: ${{ needs.check.outputs.dry-run == 'true' }}
@@ -111,7 +106,7 @@ jobs:
     name: Summary
     runs-on: ubuntu-latest
     needs: [check, validate, release-go, release-ts]
-    if: always()
+    if: always() && needs.check.result == 'success'
 
     steps:
       - name: Generate Summary
@@ -128,15 +123,14 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "| Job | Status |" >> $GITHUB_STEP_SUMMARY
           echo "|-----|--------|" >> $GITHUB_STEP_SUMMARY
-          echo "| Check | ${{ needs.check.result == 'success' && '✅' || '❌' }} ${{ needs.check.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Validate | ${{ needs.validate.result == 'success' && '✅' || needs.validate.result == 'skipped' && '⏭️' || '❌' }} ${{ needs.validate.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Go Packages | ${{ needs.release-go.result == 'success' && '✅' || needs.release-go.result == 'skipped' && '⏭️' || '❌' }} ${{ needs.release-go.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| TypeScript Packages | ${{ needs.release-ts.result == 'success' && '✅' || needs.release-ts.result == 'skipped' && '⏭️' || '❌' }} ${{ needs.release-ts.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Check | ✅ ${{ needs.check.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Validate | ${{ needs.validate.result == 'success' && '✅' || '⏭️' }} ${{ needs.validate.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Go Packages | ${{ needs.release-go.result == 'success' && '✅' || '⏭️' }} ${{ needs.release-go.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| TypeScript Packages | ${{ needs.release-ts.result == 'success' && '✅' || '⏭️' }} ${{ needs.release-ts.result }} |" >> $GITHUB_STEP_SUMMARY
 
           if [ "${{ needs.check.outputs.has-go-changes }}" = "true" ]; then
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "## Go Release" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "Go packages were included in this release." >> $GITHUB_STEP_SUMMARY
-            echo "GitHub Release: \`agent-cli-go-v${{ needs.release-go.outputs.version || 'N/A' }}\`" >> $GITHUB_STEP_SUMMARY
           fi
