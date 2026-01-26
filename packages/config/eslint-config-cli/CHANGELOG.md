@@ -1,5 +1,14 @@
 # @xonovex/eslint-config-cli
 
+## 0.1.11
+
+### Patch Changes
+
+- [`1baa44d`](https://github.com/xonovex/platform/commit/1baa44d839c9d73f3c85a69e2ffa3c14410f0f6a) Thanks [@deorder](https://github.com/deorder)! - chore: bump all packages
+
+- Updated dependencies [[`1baa44d`](https://github.com/xonovex/platform/commit/1baa44d839c9d73f3c85a69e2ffa3c14410f0f6a)]:
+  - @xonovex/eslint-config-base@0.1.11
+
 ## 0.1.10
 
 ### Patch Changes
