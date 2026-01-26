@@ -387,15 +387,45 @@ jobs:
         run: npm run build
 
       - name: Publish packages with Changesets
-        run: npx changeset publish --no-git-tag || true
+        id: publish
+        run: |
+          set +e
+          OUTPUT=$(npx changeset publish --no-git-tag 2>&1)
+          EXIT_CODE=$?
+          echo "$OUTPUT"
+
+          # Check if all errors are just "already published" errors (which are OK)
+          if [ $EXIT_CODE -ne 0 ]; then
+            # Filter out "already published" errors and check if any real errors remain
+            REAL_ERRORS=$(echo "$OUTPUT" | grep -E "error" | grep -v "previously published versions" || true)
+            if [ -n "$REAL_ERRORS" ]; then
+              echo "Real publish errors detected:"
+              echo "$REAL_ERRORS"
+              exit 1
+            else
+              echo "All errors were 'already published' - this is OK"
+            fi
+          fi
+
+          # Save output for summary
+          echo "output<<EOF" >> $GITHUB_OUTPUT
+          echo "$OUTPUT" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Summary
         run: |
-          echo "## TypeScript Packages Published" >> $GITHUB_STEP_SUMMARY
+          echo "## TypeScript Packages" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "TypeScript packages were published to npm via Changesets." >> $GITHUB_STEP_SUMMARY
+          echo "Changeset publish completed." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "<details><summary>Publish output</summary>" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "${{ steps.publish.outputs.output }}" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "</details>" >> $GITHUB_STEP_SUMMARY
 
   publish-ts-packages-dry-run:
     name: Publish TypeScript Packages [Dry Run]
