@@ -30,6 +30,7 @@ jobs:
       should_release: ${{ steps.check.outputs.should_release }}
       dry_run: ${{ steps.check.outputs.dry_run }}
       has_go_changes: ${{ steps.check-go.outputs.has_go_changes }}
+      go_version: ${{ steps.check-go.outputs.go_version }}
 
     steps:
       - name: Checkout
@@ -57,10 +58,15 @@ jobs:
       - name: Check for Go package changes
         id: check-go
         run: |
+          # Check if Go package CHANGELOG was modified (indicates version bump)
           if git diff HEAD~1 --name-only | grep -q "packages/cli/agent-cli-go/CHANGELOG.md"; then
             echo "has_go_changes=true" >> $GITHUB_OUTPUT
+            # Get the Go package version
+            GO_VERSION=$(node -p "require('./packages/cli/agent-cli-go/package.json').version")
+            echo "go_version=$GO_VERSION" >> $GITHUB_OUTPUT
           else
             echo "has_go_changes=false" >> $GITHUB_OUTPUT
+            echo "go_version=" >> $GITHUB_OUTPUT
           fi
 
       - name: Summary
@@ -72,6 +78,7 @@ jobs:
           echo "| Trigger | \`${{ github.event_name }}\` |" >> $GITHUB_STEP_SUMMARY
           echo "| Dry Run | \`${{ steps.check.outputs.dry_run }}\` |" >> $GITHUB_STEP_SUMMARY
           echo "| Go Changes | \`${{ steps.check-go.outputs.has_go_changes }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Go Version | \`${{ steps.check-go.outputs.go_version }}\` |" >> $GITHUB_STEP_SUMMARY
 
   validate:
     name: Validate
@@ -118,20 +125,16 @@ jobs:
           echo "| Prepublish | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
 
   # ===================
-  # Go Platform Packages - Combined Build & Publish
+  # Build Go Binaries (no publishing here)
   # ===================
 
-  build-publish-go-platform:
-    name: Go Platform (${{ matrix.platform }})
+  build-go-binaries:
+    name: Build Go (${{ matrix.platform }})
     runs-on: ubuntu-latest
     needs: [check-release, validate]
     if: |
       needs.check-release.outputs.should_release == 'true' &&
-      needs.check-release.outputs.has_go_changes == 'true' &&
-      needs.check-release.outputs.dry_run != 'true'
-    permissions:
-      contents: read
-      id-token: write
+      needs.check-release.outputs.has_go_changes == 'true'
     strategy:
       fail-fast: false
       matrix:
@@ -162,12 +165,6 @@ jobs:
         with:
           go-version: "1.25"
           cache-dependency-path: packages/cli/agent-cli-go/go.sum
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: 24
-          registry-url: "https://registry.npmjs.org"
 
       - name: Build binary
         working-directory: packages/cli/agent-cli-go
@@ -182,189 +179,33 @@ jobs:
       - name: Make binary executable
         run: chmod +x packages/cli/agent-cli-go-platforms/${{ matrix.platform }}/bin/*
 
-      - name: Publish platform package
-        working-directory: packages/cli/agent-cli-go-platforms/${{ matrix.platform }}
-        run: npm publish --provenance --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-      - name: Upload artifact for release
+      - name: Upload binary artifact
         uses: actions/upload-artifact@v6
         with:
-          name: binary-${{ matrix.platform }}
+          name: go-binary-${{ matrix.platform }}
           path: packages/cli/agent-cli-go-platforms/${{ matrix.platform }}/bin/
           retention-days: 1
 
-  build-publish-go-platform-dry-run:
-    name: Go Platform (${{ matrix.platform }}) [Dry Run]
-    runs-on: ubuntu-latest
-    needs: [check-release, validate]
-    if: |
-      needs.check-release.outputs.should_release == 'true' &&
-      needs.check-release.outputs.has_go_changes == 'true' &&
-      needs.check-release.outputs.dry_run == 'true'
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - goos: linux
-            goarch: amd64
-            platform: linux-x64
-          - goos: linux
-            goarch: arm64
-            platform: linux-arm64
-          - goos: darwin
-            goarch: amd64
-            platform: darwin-x64
-          - goos: darwin
-            goarch: arm64
-            platform: darwin-arm64
-          - goos: windows
-            goarch: amd64
-            platform: win32-x64
-            ext: .exe
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-
-      - name: Setup Go
-        uses: actions/setup-go@v6
-        with:
-          go-version: "1.25"
-          cache-dependency-path: packages/cli/agent-cli-go/go.sum
-
-      - name: Build binary
-        working-directory: packages/cli/agent-cli-go
-        env:
-          GOOS: ${{ matrix.goos }}
-          GOARCH: ${{ matrix.goarch }}
-          CGO_ENABLED: 0
-        run: |
-          mkdir -p ../agent-cli-go-platforms/${{ matrix.platform }}/bin
-          go build -ldflags="-s -w" -o ../agent-cli-go-platforms/${{ matrix.platform }}/bin/agent-cli-go${{ matrix.ext }} ./cmd/agent-cli
-
-      - name: Dry run - Show package contents
-        working-directory: packages/cli/agent-cli-go-platforms/${{ matrix.platform }}
-        run: |
-          echo "DRY RUN - Would publish package:"
-          npm pack --dry-run
-
       - name: Summary
         run: |
-          echo "## Go Platform Package [Dry Run]" >> $GITHUB_STEP_SUMMARY
+          echo "## Go Binary Built" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Built \`${{ matrix.platform }}\` binary. No publish in dry run mode." >> $GITHUB_STEP_SUMMARY
+          echo "Built \`${{ matrix.platform }}\` binary." >> $GITHUB_STEP_SUMMARY
 
   # ===================
-  # Go Main Package
+  # Publish All Packages (Changesets handles everything)
   # ===================
 
-  publish-go-main:
-    name: Publish Go Main Package
+  publish:
+    name: Publish Packages
     runs-on: ubuntu-latest
-    needs: [check-release, build-publish-go-platform]
-    if: |
-      needs.check-release.outputs.should_release == 'true' &&
-      needs.check-release.outputs.has_go_changes == 'true' &&
-      needs.check-release.outputs.dry_run != 'true'
-    permissions:
-      contents: read
-      id-token: write
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: 24
-          cache: npm
-          registry-url: "https://registry.npmjs.org"
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build TypeScript wrapper
-        working-directory: packages/cli/agent-cli-go
-        run: npx tsc
-
-      - name: Publish main Go wrapper package
-        run: npm publish --workspace @xonovex/agent-cli-go --provenance --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-      - name: Get version
-        id: version
-        run: |
-          VERSION=$(node -p "require('./packages/cli/agent-cli-go/package.json').version")
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-
-      - name: Summary
-        run: |
-          echo "## Go Packages Published" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "| Package | Version |" >> $GITHUB_STEP_SUMMARY
-          echo "|---------|---------|" >> $GITHUB_STEP_SUMMARY
-          echo "| @xonovex/agent-cli-go | ${{ steps.version.outputs.version }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| @xonovex/agent-cli-go-linux-x64 | ${{ steps.version.outputs.version }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| @xonovex/agent-cli-go-linux-arm64 | ${{ steps.version.outputs.version }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| @xonovex/agent-cli-go-darwin-x64 | ${{ steps.version.outputs.version }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| @xonovex/agent-cli-go-darwin-arm64 | ${{ steps.version.outputs.version }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| @xonovex/agent-cli-go-win32-x64 | ${{ steps.version.outputs.version }} |" >> $GITHUB_STEP_SUMMARY
-
-  publish-go-main-dry-run:
-    name: Publish Go Main Package [Dry Run]
-    runs-on: ubuntu-latest
-    needs: [check-release, build-publish-go-platform-dry-run]
-    if: |
-      needs.check-release.outputs.should_release == 'true' &&
-      needs.check-release.outputs.has_go_changes == 'true' &&
-      needs.check-release.outputs.dry_run == 'true'
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: 24
-          cache: npm
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build TypeScript wrapper
-        working-directory: packages/cli/agent-cli-go
-        run: npx tsc
-
-      - name: Dry run - Show package contents
-        working-directory: packages/cli/agent-cli-go
-        run: |
-          echo "DRY RUN - Would publish package:"
-          npm pack --dry-run
-
-      - name: Summary
-        run: |
-          echo "## Go Main Package [Dry Run]" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Built TypeScript wrapper. No publish in dry run mode." >> $GITHUB_STEP_SUMMARY
-
-  # ===================
-  # TypeScript Packages
-  # ===================
-
-  publish-ts-packages:
-    name: Publish TypeScript Packages
-    runs-on: ubuntu-latest
-    needs: [check-release, validate, publish-go-main]
+    needs: [check-release, validate, build-go-binaries]
     if: |
       always() &&
       needs.check-release.outputs.should_release == 'true' &&
       needs.check-release.outputs.dry_run != 'true' &&
-      (needs.publish-go-main.result == 'success' || needs.publish-go-main.result == 'skipped')
+      needs.validate.result == 'success' &&
+      (needs.build-go-binaries.result == 'success' || needs.build-go-binaries.result == 'skipped')
     permissions:
       contents: read
       id-token: write
@@ -383,92 +224,56 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build
+      - name: Build TypeScript packages
         run: npm run build
 
-      - name: Publish TypeScript packages
-        id: publish
+      - name: Download Go binaries
+        if: needs.check-release.outputs.has_go_changes == 'true'
+        uses: actions/download-artifact@v7
+        with:
+          pattern: go-binary-*
+          path: go-binaries
+          merge-multiple: false
+
+      - name: Place Go binaries in platform packages
+        if: needs.check-release.outputs.has_go_changes == 'true'
         run: |
-          # Get list of all workspace packages, excluding Go packages
-          PACKAGES=$(npm query ':root > *' --json | jq -r '.[].name' | grep -v 'agent-cli-go')
-
-          PUBLISHED=""
-          SKIPPED=""
-          FAILED=""
-
-          for pkg in $PACKAGES; do
-            echo "::group::Publishing $pkg"
-
-            # Get local and registry versions
-            LOCAL_VERSION=$(npm pkg get version --workspace "$pkg" | tr -d '"')
-            REGISTRY_VERSION=$(npm view "$pkg" version 2>/dev/null || echo "0.0.0")
-
-            echo "Local: $LOCAL_VERSION, Registry: $REGISTRY_VERSION"
-
-            if [ "$LOCAL_VERSION" = "$REGISTRY_VERSION" ]; then
-              echo "Already published, skipping"
-              SKIPPED="$SKIPPED\n- $pkg@$LOCAL_VERSION (already published)"
-            else
-              if npm publish --workspace "$pkg" --provenance --access public 2>&1; then
-                echo "Published successfully"
-                PUBLISHED="$PUBLISHED\n- $pkg@$LOCAL_VERSION"
-              else
-                echo "Failed to publish"
-                FAILED="$FAILED\n- $pkg@$LOCAL_VERSION"
-              fi
+          for platform in linux-x64 linux-arm64 darwin-x64 darwin-arm64 win32-x64; do
+            if [ -d "go-binaries/go-binary-$platform" ]; then
+              mkdir -p "packages/cli/agent-cli-go-platforms/$platform/bin"
+              cp -r go-binaries/go-binary-$platform/* "packages/cli/agent-cli-go-platforms/$platform/bin/"
+              chmod +x "packages/cli/agent-cli-go-platforms/$platform/bin/"* 2>/dev/null || true
+              echo "Placed binary for $platform"
+              ls -la "packages/cli/agent-cli-go-platforms/$platform/bin/"
             fi
-
-            echo "::endgroup::"
           done
 
-          # Save results for summary
-          echo "published<<EOF" >> $GITHUB_OUTPUT
-          echo -e "$PUBLISHED" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
-          echo "skipped<<EOF" >> $GITHUB_OUTPUT
-          echo -e "$SKIPPED" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
-          echo "failed<<EOF" >> $GITHUB_OUTPUT
-          echo -e "$FAILED" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
+      - name: Build Go TypeScript wrapper
+        if: needs.check-release.outputs.has_go_changes == 'true'
+        working-directory: packages/cli/agent-cli-go
+        run: npx tsc
 
-          # Fail if any packages failed
-          if [ -n "$FAILED" ]; then
-            echo "Some packages failed to publish"
-            exit 1
-          fi
+      - name: Publish all packages with Changesets
+        run: npx changeset publish --no-git-tag
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Summary
-        if: always()
         run: |
-          echo "## TypeScript Packages" >> $GITHUB_STEP_SUMMARY
+          echo "## Packages Published" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          if [ -n "${{ steps.publish.outputs.published }}" ]; then
-            echo "### Published" >> $GITHUB_STEP_SUMMARY
-            echo "${{ steps.publish.outputs.published }}" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-          fi
-          if [ -n "${{ steps.publish.outputs.skipped }}" ]; then
-            echo "### Skipped" >> $GITHUB_STEP_SUMMARY
-            echo "${{ steps.publish.outputs.skipped }}" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-          fi
-          if [ -n "${{ steps.publish.outputs.failed }}" ]; then
-            echo "### Failed" >> $GITHUB_STEP_SUMMARY
-            echo "${{ steps.publish.outputs.failed }}" >> $GITHUB_STEP_SUMMARY
-          fi
+          echo "All packages were published to npm via Changesets." >> $GITHUB_STEP_SUMMARY
 
-  publish-ts-packages-dry-run:
-    name: Publish TypeScript Packages [Dry Run]
+  publish-dry-run:
+    name: Publish Packages [Dry Run]
     runs-on: ubuntu-latest
-    needs: [check-release, validate, publish-go-main-dry-run]
+    needs: [check-release, validate, build-go-binaries]
     if: |
       always() &&
       needs.check-release.outputs.should_release == 'true' &&
       needs.check-release.outputs.dry_run == 'true' &&
-      (needs.publish-go-main-dry-run.result == 'success' || needs.publish-go-main-dry-run.result == 'skipped')
+      needs.validate.result == 'success' &&
+      (needs.build-go-binaries.result == 'success' || needs.build-go-binaries.result == 'skipped')
 
     steps:
       - name: Checkout
@@ -493,22 +298,23 @@ jobs:
 
       - name: Summary
         run: |
-          echo "## TypeScript Packages [Dry Run]" >> $GITHUB_STEP_SUMMARY
+          echo "## Packages [Dry Run]" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "This was a dry run. No packages were published." >> $GITHUB_STEP_SUMMARY
 
   # ===================
-  # GitHub Release
+  # GitHub Release for Go CLI
   # ===================
 
-  github-release-agent-cli-go:
+  github-release:
     name: Create GitHub Release (agent-cli-go)
     runs-on: ubuntu-latest
-    needs: [check-release, publish-go-main]
+    needs: [check-release, publish, build-go-binaries]
     if: |
       needs.check-release.outputs.should_release == 'true' &&
       needs.check-release.outputs.dry_run != 'true' &&
-      needs.check-release.outputs.has_go_changes == 'true'
+      needs.check-release.outputs.has_go_changes == 'true' &&
+      needs.publish.result == 'success'
     permissions:
       contents: write
 
@@ -516,25 +322,24 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
-      - name: Get version from package.json
+      - name: Get version
         id: version
         run: |
-          VERSION=$(node -p "require('./packages/cli/agent-cli-go/package.json').version")
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "version=${{ needs.check-release.outputs.go_version }}" >> $GITHUB_OUTPUT
 
-      - name: Download all binary artifacts
+      - name: Download Go binary artifacts
         uses: actions/download-artifact@v7
         with:
+          pattern: go-binary-*
           path: binaries
-          pattern: binary-*
           merge-multiple: false
 
       - name: Prepare release assets
         run: |
           mkdir -p release-assets
           for platform in linux-x64 linux-arm64 darwin-x64 darwin-arm64 win32-x64; do
-            if [ -d "binaries/binary-$platform" ]; then
-              cd binaries/binary-$platform
+            if [ -d "binaries/go-binary-$platform" ]; then
+              cd binaries/go-binary-$platform
               if [ "$platform" = "win32-x64" ]; then
                 zip ../../release-assets/agent-cli-go-$platform.zip agent-cli-go.exe
               else
