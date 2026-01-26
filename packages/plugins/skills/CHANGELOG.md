@@ -1,5 +1,11 @@
 # @xonovex/skills
 
+## 0.1.6
+
+### Patch Changes
+
+- [`50e70c9`](https://github.com/xonovex/platform/commit/50e70c914227ce406bdcd29d0b9892407c317e19) Thanks [@deorder](https://github.com/deorder)! - Bump versions to resolve npm provenance conflicts
+
 ## 0.1.5
 
 ### Patch Changes

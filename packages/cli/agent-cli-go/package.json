@@ -32,7 +32,7 @@
     "test": "go test ./..."
   },
   "devDependencies": {
-    "@xonovex/ts-config-cli": "0.1.6"
+    "@xonovex/ts-config-cli": "0.1.7"
   },
   "optionalDependencies": {
     "@xonovex/agent-cli-go-linux-x64": "0.1.8",
