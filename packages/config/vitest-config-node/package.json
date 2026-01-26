@@ -1,6 +1,6 @@
 {
   "name": "@xonovex/vitest-config-node",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "description": "Vitest configuration for Node.js applications",
   "type": "module",
   "license": "MIT",
@@ -41,11 +41,11 @@
     }
   },
   "dependencies": {
-    "@xonovex/vitest-config-base": "0.1.9"
+    "@xonovex/vitest-config-base": "0.1.10"
   },
   "devDependencies": {
-    "@xonovex/ts-config-build": "0.1.9",
-    "@xonovex/eslint-config-base": "0.1.9"
+    "@xonovex/ts-config-build": "0.1.10",
+    "@xonovex/eslint-config-base": "0.1.10"
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",

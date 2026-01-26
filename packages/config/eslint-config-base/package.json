@@ -1,6 +1,6 @@
 {
   "name": "@xonovex/eslint-config-base",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "description": "Base ESLint configuration for Xonovex projects",
   "type": "module",
   "license": "MIT",
@@ -63,7 +63,7 @@
     "typescript-eslint": "8.53.1"
   },
   "devDependencies": {
-    "@xonovex/ts-config-node": "0.1.9",
+    "@xonovex/ts-config-node": "0.1.10",
     "@types/eslint": "9.6.1",
     "@types/eslint-plugin-security": "3.0.1",
     "@types/node": "^25.0.10"
