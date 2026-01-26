@@ -2,18 +2,20 @@
   "$schema": "https://unpkg.com/@changesets/config@3.1.1/schema.json",
   "changelog": ["@changesets/changelog-github", {"repo": "xonovex/platform"}],
   "commit": false,
-  "fixed": [],
+  "fixed": [
+    [
+      "@xonovex/agent-cli-go",
+      "@xonovex/agent-cli-go-linux-x64",
+      "@xonovex/agent-cli-go-linux-arm64",
+      "@xonovex/agent-cli-go-darwin-x64",
+      "@xonovex/agent-cli-go-darwin-arm64",
+      "@xonovex/agent-cli-go-win32-x64"
+    ]
+  ],
   "linked": [],
   "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
   "bumpVersionsWithWorkspaceProtocolOnly": false,
-  "ignore": [
-    "@xonovex/agent-cli-go",
-    "@xonovex/agent-cli-go-linux-x64",
-    "@xonovex/agent-cli-go-linux-arm64",
-    "@xonovex/agent-cli-go-darwin-x64",
-    "@xonovex/agent-cli-go-darwin-arm64",
-    "@xonovex/agent-cli-go-win32-x64"
-  ]
+  "ignore": []
 }
