@@ -1,3 +1,5 @@
 # @xonovex/agent-cli-go-linux-arm64
 
+## 0.1.6
+
 ## 0.1.5

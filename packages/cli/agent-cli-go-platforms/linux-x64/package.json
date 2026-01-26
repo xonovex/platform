@@ -1,6 +1,6 @@
 {
   "name": "@xonovex/agent-cli-go-linux-x64",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Linux x64 binary for @xonovex/agent-cli-go",
   "license": "MIT",
   "author": "Xonovex",

@@ -1,5 +1,11 @@
 # @xonovex/agent-cli-go
 
+## 0.1.6
+
+### Patch Changes
+
+- [`217896d`](https://github.com/xonovex/platform/commit/217896d9c1848fa330cdc03540da579ee02f93df) Thanks [@deorder](https://github.com/deorder)! - Test publish order fix
+
 ## 0.1.5
 
 ### Patch Changes
