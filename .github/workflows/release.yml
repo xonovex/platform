@@ -208,6 +208,7 @@ jobs:
       (needs.build-go-binaries.result == 'success' || needs.build-go-binaries.result == 'skipped')
     permissions:
       contents: read
+      id-token: write
 
     steps:
       - name: Checkout
@@ -219,12 +220,6 @@ jobs:
           node-version: 24
           cache: npm
           registry-url: "https://registry.npmjs.org"
-
-      - name: Disable provenance
-        run: |
-          sed -i 's/provenance=true/provenance=false/' .npmrc
-          echo "Contents of .npmrc:"
-          cat .npmrc
 
       - name: Install dependencies
         run: npm ci
