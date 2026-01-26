@@ -16,10 +16,6 @@ on:
         description: Path to Go package
         type: string
         required: true
-    secrets:
-      npm-token:
-        description: NPM token for publishing
-        required: true
     outputs:
       version:
         description: Published version
@@ -121,7 +117,7 @@ jobs:
         working-directory: packages/cli/${{ inputs.package-name }}-platforms/${{ matrix.platform }}
         run: npm publish --provenance --access public
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.npm-token }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   publish-platforms-dry-run:
     name: Publish (${{ matrix.platform }}) [Dry Run]
@@ -196,7 +192,7 @@ jobs:
           npm publish --workspace @xonovex/${{ inputs.package-name }} --provenance --access public
           echo "published=true" >> $GITHUB_OUTPUT
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.npm-token }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Summary
         run: |
