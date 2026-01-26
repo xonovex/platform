@@ -1,0 +1,31 @@
+name: Setup Node.js Workspace
+description: Setup Node.js with caching and optionally install dependencies
+
+inputs:
+  node-version:
+    description: Node.js version to use
+    required: false
+    default: "24"
+  registry-url:
+    description: npm registry URL for publishing (leave empty if not publishing)
+    required: false
+    default: ""
+  install-deps:
+    description: Whether to run npm ci
+    required: false
+    default: "true"
+
+runs:
+  using: composite
+  steps:
+    - name: Setup Node.js ${{ inputs.node-version }}
+      uses: actions/setup-node@v6
+      with:
+        node-version: ${{ inputs.node-version }}
+        cache: npm
+        registry-url: ${{ inputs.registry-url || '' }}
+
+    - name: Install dependencies
+      if: inputs.install-deps == 'true'
+      shell: bash
+      run: npm ci
