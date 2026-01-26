@@ -1,6 +1,6 @@
 {
   "name": "@xonovex/prettier-config",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "Shared Prettier configuration for Xonovex projects",
   "type": "module",
   "license": "MIT",
@@ -31,8 +31,8 @@
     "prettier-plugin-tailwindcss": "0.7.2"
   },
   "devDependencies": {
-    "@xonovex/eslint-config-base": "0.1.7",
-    "@xonovex/ts-config-build": "0.1.7"
+    "@xonovex/eslint-config-base": "0.1.8",
+    "@xonovex/ts-config-build": "0.1.8"
   },
   "scripts": {
     "lint": "eslint .",

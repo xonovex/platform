@@ -1,5 +1,11 @@
 # @xonovex/eslint-config-base
 
+## 0.1.8
+
+### Patch Changes
+
+- [`a1d4f78`](https://github.com/xonovex/platform/commit/a1d4f78f30f1b7cb97e42937badfb5ff40a27797) Thanks [@deorder](https://github.com/deorder)! - Bump versions past provenance conflicts (provenance now disabled)
+
 ## 0.1.7
 
 ### Patch Changes
