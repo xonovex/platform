@@ -58,7 +58,10 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Setup Go
-        uses: ./.github/actions/setup-go
+        uses: actions/setup-go@v6
+        with:
+          go-version: "1.25"
+          cache-dependency-path: ${{ inputs.package-path }}/go.sum
 
       - name: Build binary
         working-directory: ${{ inputs.package-path }}
@@ -168,9 +171,14 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Setup Node.js
-        uses: ./.github/actions/setup-node
+        uses: actions/setup-node@v6
         with:
+          node-version: 24
+          cache: npm
           registry-url: "https://registry.npmjs.org"
+
+      - name: Install dependencies
+        run: npm ci
 
       - name: Get version
         id: version
@@ -214,7 +222,13 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Setup Node.js
-        uses: ./.github/actions/setup-node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
 
       - name: Build TypeScript wrapper
         working-directory: ${{ inputs.package-path }}
