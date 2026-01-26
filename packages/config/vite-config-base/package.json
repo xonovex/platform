@@ -1,6 +1,6 @@
 {
   "name": "@xonovex/vite-config-base",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "description": "Base Vite configuration for Xonovex projects",
   "type": "module",
   "license": "MIT",
@@ -41,8 +41,8 @@
     "vite-tsconfig-paths": "6.0.4"
   },
   "devDependencies": {
-    "@xonovex/eslint-config-base": "0.1.9",
-    "@xonovex/ts-config-build": "0.1.9",
+    "@xonovex/eslint-config-base": "0.1.10",
+    "@xonovex/ts-config-build": "0.1.10",
     "typescript": "5.9.3"
   },
   "scripts": {
