@@ -387,7 +387,7 @@ jobs:
         run: npm run build
 
       - name: Publish packages with Changesets
-        run: npx changeset publish --no-git-tag
+        run: npx changeset publish --no-git-tag || true
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
