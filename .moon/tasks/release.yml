@@ -1,0 +1,43 @@
+$schema: https://moonrepo.dev/schemas/tasks.json
+
+tasks:
+  changeset-status:
+    command:
+      - "npx"
+      - "changeset"
+      - "status"
+    inputs:
+      - ".changeset/*.md"
+      - "!.changeset/README.md"
+    options:
+      runInCI: "always"
+      cache: false
+
+  changeset-add:
+    command:
+      - "npx"
+      - "changeset"
+      - "add"
+    local: true
+    options:
+      runInCI: false
+      cache: false
+      interactive: true
+
+  release-version:
+    command:
+      - "npx"
+      - "changeset"
+      - "version"
+    options:
+      runInCI: false
+      cache: false
+
+  release-publish:
+    command:
+      - "npx"
+      - "changeset"
+      - "publish"
+    options:
+      runInCI: false
+      cache: false

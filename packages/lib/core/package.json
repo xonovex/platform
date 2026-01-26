@@ -39,16 +39,16 @@
     "lint:fix": "eslint . --fix"
   },
   "devDependencies": {
-    "@xonovex/eslint-config-cli": "0.1.0",
-    "@xonovex/ts-config-cli": "0.1.0",
-    "@xonovex/vitest-config-node": "0.1.0",
+    "@xonovex/eslint-config-cli": "0.1.3",
+    "@xonovex/ts-config-cli": "0.1.3",
+    "@xonovex/vitest-config-node": "0.1.3",
     "@types/node": "^25.0.10",
     "@vitest/coverage-v8": "^4.0.18",
     "eslint": "^9.39.2",
     "jiti": "^2.6.1",
     "prettier": "^3.8.1",
     "tsx": "^4.21.0",
-    "typescript": "^5.9.3",
+    "typescript": "5.9.3",
     "vitest": "^4.0.18"
   }
 }
