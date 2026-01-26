@@ -1,6 +1,6 @@
 {
   "name": "@xonovex/agent-cli-go",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Agent wrapper CLI (Go implementation)",
   "type": "module",
   "license": "MIT",
