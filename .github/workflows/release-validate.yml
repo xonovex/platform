@@ -1,0 +1,51 @@
+name: Release - Validate
+
+on:
+  workflow_call:
+    outputs:
+      success:
+        description: Whether validation passed
+        value: ${{ jobs.validate.outputs.success }}
+
+jobs:
+  validate:
+    name: Validate
+    runs-on: ubuntu-latest
+    outputs:
+      success: ${{ steps.result.outputs.success }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: ./.github/actions/setup-node
+
+      - name: Build
+        run: npm run build
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Test
+        run: npm run test
+
+      - name: Prepublish check
+        run: npm run prepublish:check
+
+      - name: Set result
+        id: result
+        run: echo "success=true" >> $GITHUB_OUTPUT
+
+      - name: Summary
+        run: |
+          echo "## Validation Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Check | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Build | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
+          echo "| Lint | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
+          echo "| Test | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
+          echo "| Prepublish | ✅ Passed |" >> $GITHUB_STEP_SUMMARY

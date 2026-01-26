@@ -1,0 +1,26 @@
+name: Setup Node.js
+description: Setup Node.js with npm cache and install dependencies
+
+inputs:
+  registry-url:
+    description: npm registry URL for publishing
+    required: false
+    default: ""
+  node-version:
+    description: Node.js version
+    required: false
+    default: "24"
+
+runs:
+  using: composite
+  steps:
+    - name: Setup Node.js
+      uses: actions/setup-node@v6
+      with:
+        node-version: ${{ inputs.node-version }}
+        cache: npm
+        registry-url: ${{ inputs.registry-url || '' }}
+
+    - name: Install dependencies
+      shell: bash
+      run: npm ci
