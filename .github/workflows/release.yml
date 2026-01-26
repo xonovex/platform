@@ -309,7 +309,7 @@ jobs:
     if: |
       needs.check-release.outputs.should_release == 'true' &&
       needs.check-release.outputs.dry_run != 'true' &&
-      github.event_name == 'pull_request'
+      !startsWith(github.ref, 'refs/tags/v')
     permissions:
       contents: write
     outputs:
