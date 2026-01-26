@@ -1,0 +1,17 @@
+name: Setup Go
+description: Setup Go with cache
+
+inputs:
+  go-version:
+    description: Go version
+    required: false
+    default: "1.25"
+
+runs:
+  using: composite
+  steps:
+    - name: Setup Go
+      uses: actions/setup-go@v6
+      with:
+        go-version: ${{ inputs.go-version }}
+        cache-dependency-path: packages/cli/agent-cli-go/go.sum
