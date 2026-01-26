@@ -386,46 +386,79 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Publish packages with Changesets
+      - name: Publish TypeScript packages
         id: publish
         run: |
-          set +e
-          OUTPUT=$(npx changeset publish --no-git-tag 2>&1)
-          EXIT_CODE=$?
-          echo "$OUTPUT"
+          # Get list of all workspace packages, excluding Go packages
+          PACKAGES=$(npm query ':root > *' --json | jq -r '.[].name' | grep -v 'agent-cli-go')
 
-          # Check if all errors are just "already published" errors (which are OK)
-          if [ $EXIT_CODE -ne 0 ]; then
-            # Filter out "already published" errors and check if any real errors remain
-            REAL_ERRORS=$(echo "$OUTPUT" | grep -E "error" | grep -v "previously published versions" || true)
-            if [ -n "$REAL_ERRORS" ]; then
-              echo "Real publish errors detected:"
-              echo "$REAL_ERRORS"
-              exit 1
+          PUBLISHED=""
+          SKIPPED=""
+          FAILED=""
+
+          for pkg in $PACKAGES; do
+            echo "::group::Publishing $pkg"
+
+            # Get local and registry versions
+            LOCAL_VERSION=$(npm pkg get version --workspace "$pkg" | tr -d '"')
+            REGISTRY_VERSION=$(npm view "$pkg" version 2>/dev/null || echo "0.0.0")
+
+            echo "Local: $LOCAL_VERSION, Registry: $REGISTRY_VERSION"
+
+            if [ "$LOCAL_VERSION" = "$REGISTRY_VERSION" ]; then
+              echo "Already published, skipping"
+              SKIPPED="$SKIPPED\n- $pkg@$LOCAL_VERSION (already published)"
             else
-              echo "All errors were 'already published' - this is OK"
+              if npm publish --workspace "$pkg" --provenance --access public 2>&1; then
+                echo "Published successfully"
+                PUBLISHED="$PUBLISHED\n- $pkg@$LOCAL_VERSION"
+              else
+                echo "Failed to publish"
+                FAILED="$FAILED\n- $pkg@$LOCAL_VERSION"
+              fi
             fi
-          fi
 
-          # Save output for summary
-          echo "output<<EOF" >> $GITHUB_OUTPUT
-          echo "$OUTPUT" >> $GITHUB_OUTPUT
+            echo "::endgroup::"
+          done
+
+          # Save results for summary
+          echo "published<<EOF" >> $GITHUB_OUTPUT
+          echo -e "$PUBLISHED" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
+          echo "skipped<<EOF" >> $GITHUB_OUTPUT
+          echo -e "$SKIPPED" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+          echo "failed<<EOF" >> $GITHUB_OUTPUT
+          echo -e "$FAILED" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+          # Fail if any packages failed
+          if [ -n "$FAILED" ]; then
+            echo "Some packages failed to publish"
+            exit 1
+          fi
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Summary
+        if: always()
         run: |
           echo "## TypeScript Packages" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Changeset publish completed." >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "<details><summary>Publish output</summary>" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo '```' >> $GITHUB_STEP_SUMMARY
-          echo "${{ steps.publish.outputs.output }}" >> $GITHUB_STEP_SUMMARY
-          echo '```' >> $GITHUB_STEP_SUMMARY
-          echo "</details>" >> $GITHUB_STEP_SUMMARY
+          if [ -n "${{ steps.publish.outputs.published }}" ]; then
+            echo "### Published" >> $GITHUB_STEP_SUMMARY
+            echo "${{ steps.publish.outputs.published }}" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+          fi
+          if [ -n "${{ steps.publish.outputs.skipped }}" ]; then
+            echo "### Skipped" >> $GITHUB_STEP_SUMMARY
+            echo "${{ steps.publish.outputs.skipped }}" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+          fi
+          if [ -n "${{ steps.publish.outputs.failed }}" ]; then
+            echo "### Failed" >> $GITHUB_STEP_SUMMARY
+            echo "${{ steps.publish.outputs.failed }}" >> $GITHUB_STEP_SUMMARY
+          fi
 
   publish-ts-packages-dry-run:
     name: Publish TypeScript Packages [Dry Run]
