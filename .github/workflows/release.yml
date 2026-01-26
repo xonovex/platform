@@ -253,11 +253,13 @@ jobs:
         working-directory: packages/cli/agent-cli-go
         run: npx tsc
 
+      - name: Disable provenance in .npmrc
+        run: sed -i 's/provenance=true/provenance=false/' .npmrc
+
       - name: Publish all packages with Changesets
         run: npx changeset publish --no-git-tag
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-          NPM_CONFIG_PROVENANCE: false
 
       - name: Summary
         run: |
