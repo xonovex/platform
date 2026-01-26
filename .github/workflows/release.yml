@@ -32,32 +32,19 @@ jobs:
       has_go_changes: ${{ steps.check-go.outputs.has_go_changes }}
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v6
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
       - name: Determine release type
         id: check
         run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "should_release=true" >> $GITHUB_OUTPUT
-            echo "dry_run=${{ github.event.inputs.dry_run }}" >> $GITHUB_OUTPUT
-          elif [ "${{ github.event_name }}" = "push" ]; then
-            echo "should_release=true" >> $GITHUB_OUTPUT
-            echo "dry_run=false" >> $GITHUB_OUTPUT
-          elif [ "${{ github.event_name }}" = "pull_request" ]; then
-            echo "should_release=true" >> $GITHUB_OUTPUT
-            echo "dry_run=false" >> $GITHUB_OUTPUT
-          else
-            echo "should_release=false" >> $GITHUB_OUTPUT
-            echo "dry_run=true" >> $GITHUB_OUTPUT
-          fi
+          echo "should_release=true" >> $GITHUB_OUTPUT
+          echo "dry_run=${{ github.event_name == 'workflow_dispatch' && github.event.inputs.dry_run || 'false' }}" >> $GITHUB_OUTPUT
 
       - name: Check for Go package changes
         id: check-go
         run: |
-          # Check if agent-cli-go version changed in this commit
           if git diff HEAD~1 --name-only | grep -q "packages/cli/agent-cli-go/CHANGELOG.md"; then
             echo "has_go_changes=true" >> $GITHUB_OUTPUT
           else
@@ -71,31 +58,16 @@ jobs:
     if: needs.check-release.outputs.should_release == 'true'
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v6
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: 24
-          cache: npm
+      - uses: ./.github/actions/setup-node-workspace
 
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build
-        run: npm run build
-
-      - name: Lint
-        run: npm run lint
-
-      - name: Test
-        run: npm run test
-
-      - name: Prepublish check
-        run: npm run prepublish:check
+      - run: npm run build
+      - run: npm run lint
+      - run: npm run test
+      - run: npm run prepublish:check
 
   build-go-binaries:
     name: Build Go Binary (${{ matrix.goos }}-${{ matrix.goarch }})
@@ -125,14 +97,9 @@ jobs:
             ext: .exe
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v6
+      - uses: actions/checkout@v6
 
-      - name: Setup Go
-        uses: actions/setup-go@v6
-        with:
-          go-version: "1.25"
-          cache-dependency-path: packages/cli/agent-cli-go/go.sum
+      - uses: ./.github/actions/setup-go-cli
 
       - name: Build binary
         working-directory: packages/cli/agent-cli-go
@@ -144,12 +111,85 @@ jobs:
           mkdir -p ../agent-cli-go-platforms/${{ matrix.platform }}/bin
           go build -ldflags="-s -w" -o ../agent-cli-go-platforms/${{ matrix.platform }}/bin/agent-cli-go${{ matrix.ext }} ./cmd/agent-cli
 
-      - name: Upload artifact
-        uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v6
         with:
           name: binary-${{ matrix.platform }}
           path: packages/cli/agent-cli-go-platforms/${{ matrix.platform }}/bin/
           retention-days: 1
+
+  publish-go-platform-packages:
+    name: Publish Go Platform Package (${{ matrix.platform }})
+    runs-on: ubuntu-latest
+    needs: [check-release, build-go-binaries]
+    if: |
+      needs.check-release.outputs.should_release == 'true' &&
+      needs.check-release.outputs.has_go_changes == 'true'
+    permissions:
+      contents: read
+      id-token: write
+    strategy:
+      matrix:
+        platform: [linux-x64, linux-arm64, darwin-x64, darwin-arm64, win32-x64]
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: ./.github/actions/setup-node-workspace
+        with:
+          registry-url: "https://registry.npmjs.org"
+          install-deps: "false"
+
+      - uses: actions/download-artifact@v7
+        with:
+          name: binary-${{ matrix.platform }}
+          path: packages/cli/agent-cli-go-platforms/${{ matrix.platform }}/bin/
+
+      - run: chmod +x packages/cli/agent-cli-go-platforms/${{ matrix.platform }}/bin/*
+
+      - name: Publish
+        if: needs.check-release.outputs.dry_run != 'true'
+        working-directory: packages/cli/agent-cli-go-platforms/${{ matrix.platform }}
+        run: npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Dry run
+        if: needs.check-release.outputs.dry_run == 'true'
+        working-directory: packages/cli/agent-cli-go-platforms/${{ matrix.platform }}
+        run: npm pack --dry-run
+
+  publish-go-main:
+    name: Publish Go Main Package
+    runs-on: ubuntu-latest
+    needs: [check-release, publish-go-platform-packages]
+    if: |
+      needs.check-release.outputs.should_release == 'true' &&
+      needs.check-release.outputs.has_go_changes == 'true'
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: ./.github/actions/setup-node-workspace
+        with:
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Build TypeScript wrapper
+        working-directory: packages/cli/agent-cli-go
+        run: npx tsc
+
+      - name: Publish
+        if: needs.check-release.outputs.dry_run != 'true'
+        run: npm publish --workspace @xonovex/agent-cli-go --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Dry run
+        if: needs.check-release.outputs.dry_run == 'true'
+        working-directory: packages/cli/agent-cli-go
+        run: npm pack --dry-run
 
   publish-ts-packages:
     name: Publish TypeScript Packages
@@ -166,23 +206,15 @@ jobs:
       published: ${{ steps.publish.outputs.published }}
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v6
+      - uses: actions/checkout@v6
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
+      - uses: ./.github/actions/setup-node-workspace
         with:
-          node-version: 24
-          cache: npm
           registry-url: "https://registry.npmjs.org"
 
-      - name: Install dependencies
-        run: npm ci
+      - run: npm run build
 
-      - name: Build
-        run: npm run build
-
-      - name: Publish packages with Changesets
+      - name: Publish
         id: publish
         if: needs.check-release.outputs.dry_run != 'true'
         run: |
@@ -191,119 +223,13 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      - name: Dry run - Show what would be published
+      - name: Dry run
         if: needs.check-release.outputs.dry_run == 'true'
         run: |
           echo "DRY RUN - Checking changeset status:"
           npx changeset status
           echo ""
-          echo "DRY RUN - Would publish the following packages:"
-          npm pack --workspace @xonovex/ts-config-base --dry-run
-          npm pack --workspace @xonovex/ts-config-build --dry-run
-          npm pack --workspace @xonovex/ts-config-cli --dry-run
-          npm pack --workspace @xonovex/ts-config-node --dry-run
-          npm pack --workspace @xonovex/eslint-config-base --dry-run
-          npm pack --workspace @xonovex/eslint-config-cli --dry-run
-          npm pack --workspace @xonovex/vitest-config-base --dry-run
-          npm pack --workspace @xonovex/vitest-config-node --dry-run
-          npm pack --workspace @xonovex/core --dry-run
-          npm pack --workspace @xonovex/agent-cli --dry-run
-          npm pack --workspace @xonovex/skills --dry-run
-
-  publish-go-platform-packages:
-    name: Publish Go Platform Package (${{ matrix.platform }})
-    runs-on: ubuntu-latest
-    needs: [check-release, build-go-binaries]
-    if: |
-      needs.check-release.outputs.should_release == 'true' &&
-      needs.check-release.outputs.has_go_changes == 'true'
-    permissions:
-      contents: read
-      id-token: write
-    strategy:
-      matrix:
-        platform:
-          - linux-x64
-          - linux-arm64
-          - darwin-x64
-          - darwin-arm64
-          - win32-x64
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: 24
-          cache: npm
-          registry-url: "https://registry.npmjs.org"
-
-      - name: Download binary artifact
-        uses: actions/download-artifact@v7
-        with:
-          name: binary-${{ matrix.platform }}
-          path: packages/cli/agent-cli-go-platforms/${{ matrix.platform }}/bin/
-
-      - name: Make binary executable
-        run: chmod +x packages/cli/agent-cli-go-platforms/${{ matrix.platform }}/bin/*
-
-      - name: Publish platform package
-        if: needs.check-release.outputs.dry_run != 'true'
-        working-directory: packages/cli/agent-cli-go-platforms/${{ matrix.platform }}
-        run: npm publish --provenance --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-      - name: Dry run - Show package contents
-        if: needs.check-release.outputs.dry_run == 'true'
-        working-directory: packages/cli/agent-cli-go-platforms/${{ matrix.platform }}
-        run: |
-          echo "DRY RUN - Would publish package:"
-          npm pack --dry-run
-
-  publish-go-main:
-    name: Publish Go Main Package
-    runs-on: ubuntu-latest
-    needs: [check-release, publish-go-platform-packages]
-    if: |
-      needs.check-release.outputs.should_release == 'true' &&
-      needs.check-release.outputs.has_go_changes == 'true'
-    permissions:
-      contents: read
-      id-token: write
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: 24
-          cache: npm
-          registry-url: "https://registry.npmjs.org"
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build TypeScript wrapper
-        working-directory: packages/cli/agent-cli-go
-        run: npx tsc
-
-      - name: Publish main Go wrapper package
-        if: needs.check-release.outputs.dry_run != 'true'
-        run: npm publish --workspace @xonovex/agent-cli-go --provenance --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-      - name: Dry run - Show package contents
-        if: needs.check-release.outputs.dry_run == 'true'
-        working-directory: packages/cli/agent-cli-go
-        run: |
-          echo "DRY RUN - Would publish package:"
-          npm pack --dry-run
+          echo "DRY RUN - Would publish packages"
 
   github-release-agent-cli-go:
     name: Create GitHub Release (agent-cli-go)
@@ -317,17 +243,13 @@ jobs:
       contents: write
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v6
+      - uses: actions/checkout@v6
 
-      - name: Get version from package.json
+      - name: Get version
         id: version
-        run: |
-          VERSION=$(node -p "require('./packages/cli/agent-cli-go/package.json').version")
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
+        run: echo "version=$(node -p "require('./packages/cli/agent-cli-go/package.json').version")" >> $GITHUB_OUTPUT
 
-      - name: Download all binary artifacts
-        uses: actions/download-artifact@v7
+      - uses: actions/download-artifact@v7
         with:
           path: binaries
           pattern: binary-*
@@ -351,14 +273,12 @@ jobs:
       - name: Extract changelog
         id: changelog
         run: |
-          # Extract the latest version's changelog entry
           CHANGELOG=$(awk '/^## /{if(p)exit; p=1} p' packages/cli/agent-cli-go/CHANGELOG.md)
           echo "changelog<<EOF" >> $GITHUB_OUTPUT
           echo "$CHANGELOG" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
+      - uses: softprops/action-gh-release@v2
         with:
           tag_name: agent-cli-go-v${{ steps.version.outputs.version }}
           name: agent-cli-go v${{ steps.version.outputs.version }}
