@@ -89,8 +89,7 @@ jobs:
       dry-run: ${{ needs.check.outputs.dry-run == 'true' }}
       package-name: agent-cli-go
       package-path: packages/cli/agent-cli-go
-    secrets:
-      npm-token: ${{ secrets.NPM_TOKEN }}
+    secrets: inherit
 
   release-ts:
     name: Release TypeScript
@@ -99,8 +98,7 @@ jobs:
     uses: ./.github/workflows/release-ts.yml
     with:
       dry-run: ${{ needs.check.outputs.dry-run == 'true' }}
-    secrets:
-      npm-token: ${{ secrets.NPM_TOKEN }}
+    secrets: inherit
 
   summary:
     name: Summary
