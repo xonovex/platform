@@ -1,6 +1,6 @@
 {
   "name": "@xonovex/agent-cli",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "Unified CLI for running AI coding agents with multiple model providers and sandbox options",
   "type": "module",
   "license": "MIT",
@@ -41,16 +41,16 @@
     "lint:fix": "eslint . --fix"
   },
   "dependencies": {
-    "@xonovex/core": "0.1.7",
+    "@xonovex/core": "0.1.8",
     "@iarna/toml": "^2.2.5",
     "commander": "^14.0.2",
     "gray-matter": "^4.0.3",
     "yaml": "^2.8.2"
   },
   "devDependencies": {
-    "@xonovex/eslint-config-cli": "0.1.7",
-    "@xonovex/ts-config-cli": "0.1.7",
-    "@xonovex/vitest-config-node": "0.1.7",
+    "@xonovex/eslint-config-cli": "0.1.8",
+    "@xonovex/ts-config-cli": "0.1.8",
+    "@xonovex/vitest-config-node": "0.1.8",
     "@types/node": "^25.0.10",
     "@vitest/coverage-v8": "^4.0.18",
     "eslint": "^9.39.2",
