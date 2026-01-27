@@ -24,3 +24,5 @@ javascript:
 
 go:
   version: "1.25.5"
+  bins:
+    - "github.com/golangci/golangci-lint/cmd/golangci-lint@latest"
