@@ -1,24 +1,24 @@
 $schema: https://moonrepo.dev/schemas/project.json
-type: configuration
-language: typescript
-tags:
-  - tenant-shared
-dependsOn: []
-fileGroups:
-  sources:
-    - src/**/*
-  tests:
-    - src/**/*.test.*
-    - src/**/*.spec.*
-    - test/**/*
-  configs:
-    - "*.config.*"
-    - tsconfig*.json
-    - .eslintrc*
-    - .prettierrc*
-    - package.json
 tasks:
   build:
     deps:
-      - ts-config-node:build
-      - ^:build
+    - ts-config-node:build
+    - ^:build
+language: typescript
+tags:
+- tenant-shared
+dependsOn: []
+fileGroups:
+  sources:
+  - src/**/*
+  tests:
+  - src/**/*.test.*
+  - src/**/*.spec.*
+  - test/**/*
+  configs:
+  - '*.config.*'
+  - tsconfig*.json
+  - .eslintrc*
+  - .prettierrc*
+  - package.json
+layer: configuration

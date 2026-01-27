@@ -1,53 +1,48 @@
-# Shared tasks for Node.js application packages
-# https://moonrepo.dev/docs/config/tasks
-# yaml-language-server: $schema=https://moonrepo.dev/schemas/tasks.json
-
 $schema: https://moonrepo.dev/schemas/tasks.json
-
-extends: "./typescript-library.yml"
-
+extends: ./typescript-library.yml
 tasks:
   dev:
     deps:
-      - "^:build"
+    - ^:build
     command:
-      - "npm"
-      - "run"
-      - "dev"
-    local: true
+    - npm
+    - run
+    - dev
     options:
       cache: false
       runInCI: false
       persistent: true
-
+    preset: server
   build-docker:
     command:
-      - "npm"
-      - "run"
-      - "build:docker"
+    - npm
+    - run
+    - build:docker
     inputs:
-      - "Dockerfile*"
-      - "docker/**"
-      - ".dockerignore"
-      - "dist/**"
+    - Dockerfile*
+    - docker/**
+    - .dockerignore
+    - dist/**
     outputs: []
     options:
       cache: false
       runInCI: false
-
   test-e2e:
     command:
-      - "npm"
-      - "run"
-      - "test:e2e"
+    - npm
+    - run
+    - test:e2e
     type: test
     deps:
-      - '^:build'
+    - ^:build
     inputs:
-      - "@globs(sources)"
-      - "@globs(tests)"
-      - "*.e2e.config.*"
-      - "vitest.e2e.config.*"
+    - '@globs(sources)'
+    - '@globs(tests)'
+    - '*.e2e.config.*'
+    - vitest.e2e.config.*
     options:
       cache: true
       runInCI: true
+inheritedBy:
+  toolchain: typescript
+  layer: application

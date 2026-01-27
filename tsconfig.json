@@ -1,5 +1,45 @@
 {
   "extends": "./tsconfig.options.json",
   "files": [],
-  "references": []
+  "references": [
+    {
+      "path": "packages/cli/agent-cli"
+    },
+    {
+      "path": "packages/cli/agent-cli-go"
+    },
+    {
+      "path": "packages/config/eslint-config-base"
+    },
+    {
+      "path": "packages/config/eslint-config-cli"
+    },
+    {
+      "path": "packages/config/prettier-config"
+    },
+    {
+      "path": "packages/config/ts-config-base"
+    },
+    {
+      "path": "packages/config/ts-config-build"
+    },
+    {
+      "path": "packages/config/ts-config-cli"
+    },
+    {
+      "path": "packages/config/ts-config-node"
+    },
+    {
+      "path": "packages/config/vite-config-base"
+    },
+    {
+      "path": "packages/config/vitest-config-base"
+    },
+    {
+      "path": "packages/config/vitest-config-node"
+    },
+    {
+      "path": "packages/lib/core"
+    }
+  ]
 }

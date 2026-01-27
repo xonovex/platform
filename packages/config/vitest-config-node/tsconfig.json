@@ -4,7 +4,14 @@
     "outDir": "dist",
     "rootDir": ".",
     "baseUrl": ".",
-    "paths": {}
+    "paths": {
+      "@xonovex/vitest-config-base": [
+        "../vitest-config-base/src/index.ts"
+      ],
+      "@xonovex/vitest-config-base/*": [
+        "../vitest-config-base/src/*"
+      ]
+    }
   },
   "references": [
     {
@@ -14,6 +21,10 @@
       "path": "../vitest-config-base"
     }
   ],
-  "include": ["src"],
-  "exclude": ["dist"]
+  "include": [
+    "src"
+  ],
+  "exclude": [
+    "dist"
+  ]
 }
