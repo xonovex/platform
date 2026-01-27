@@ -33,11 +33,3 @@ tasks:
       runInCI: false
       cache: false
 
-  release-publish:
-    command:
-      - "npx"
-      - "changeset"
-      - "publish"
-    options:
-      runInCI: false
-      cache: false
