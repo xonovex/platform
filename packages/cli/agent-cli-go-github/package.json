@@ -2,5 +2,12 @@
   "name": "@xonovex/agent-cli-go-github",
   "version": "0.0.0",
   "private": true,
-  "description": "GitHub release orchestration for agent-cli-go"
+  "description": "GitHub release orchestration for agent-cli-go",
+  "dependencies": {
+    "@xonovex/agent-cli-go-darwin-arm64": "^0.1.13",
+    "@xonovex/agent-cli-go-darwin-x64": "^0.1.13",
+    "@xonovex/agent-cli-go-linux-arm64": "^0.1.13",
+    "@xonovex/agent-cli-go-linux-x64": "^0.1.13",
+    "@xonovex/agent-cli-go-win32-x64": "^0.1.13"
+  }
 }

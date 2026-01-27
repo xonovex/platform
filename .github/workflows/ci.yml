@@ -23,6 +23,11 @@ jobs:
       - uses: moonrepo/setup-toolchain@v0
         with:
           auto-install: true
+          proto-version: 0.54.2
+          moon-version: "2.0.0-rc.0"
+
+      - name: Ensure proto paths
+        run: echo "$HOME/.proto/bin" >> $GITHUB_PATH
 
       - run: moon ci :build :test :lint :typecheck :go-build :go-test :go-lint :go-typecheck
 
@@ -45,5 +50,7 @@ jobs:
       - uses: moonrepo/setup-toolchain@v0
         with:
           auto-install: true
+          proto-version: 0.54.2
+          moon-version: "2.0.0-rc.0"
 
       - run: npx changeset status --since=origin/main

@@ -1,132 +1,121 @@
-# Shared tasks for Go library packages
-# https://moonrepo.dev/docs/config/tasks
-# yaml-language-server: $schema=https://moonrepo.dev/schemas/tasks.json
-
 $schema: https://moonrepo.dev/schemas/tasks.json
-
 implicitInputs:
-  - "go.mod"
-  - "go.sum"
-
+- go.mod
+- go.sum
 fileGroups:
   sources:
-    - "**/*.go"
+  - '**/*.go'
   tests:
-    - "**/*_test.go"
+  - '**/*_test.go'
   configs:
-    - "go.mod"
-    - "go.sum"
-    - ".golangci.yml"
-
+  - go.mod
+  - go.sum
+  - .golangci.yml
 tasks:
   go-build:
     deps:
-      - "^:go-build"
+    - ^:go-build
     command:
-      - "go"
-      - "build"
-      - "./..."
+    - go
+    - build
+    - ./...
     inputs:
-      - "@globs(sources)"
-      - "go.mod"
-      - "go.sum"
+    - '@globs(sources)'
+    - go.mod
+    - go.sum
     outputs: []
     options:
       cache: true
-
   go-test:
     command:
-      - "go"
-      - "test"
-      - "-v"
-      - "./..."
+    - go
+    - test
+    - -v
+    - ./...
     deps:
-      - "^:go-build"
+    - ^:go-build
     inputs:
-      - "@globs(sources)"
-      - "@globs(tests)"
+    - '@globs(sources)'
+    - '@globs(tests)'
     outputs: []
     options:
       cache: true
-
   go-test-coverage:
     command:
-      - "go"
-      - "test"
-      - "-v"
-      - "-coverprofile=coverage.out"
-      - "./..."
+    - go
+    - test
+    - -v
+    - -coverprofile=coverage.out
+    - ./...
     deps:
-      - "^:go-build"
+    - ^:go-build
     inputs:
-      - "@globs(sources)"
-      - "@globs(tests)"
+    - '@globs(sources)'
+    - '@globs(tests)'
     outputs:
-      - "coverage.out"
+    - coverage.out
     options:
       cache: true
-
   go-lint:
     command:
-      - "golangci-lint"
-      - "run"
-      - "./..."
+    - golangci-lint
+    - run
+    - ./...
     inputs:
-      - "@globs(sources)"
-      - "@globs(tests)"
-      - ".golangci.yml"
+    - '@globs(sources)'
+    - '@globs(tests)'
+    - .golangci.yml
     outputs: []
     options:
       cache: false
-
   go-fmt:
     command:
-      - "go"
-      - "fmt"
-      - "./..."
+    - go
+    - fmt
+    - ./...
     inputs:
-      - "@globs(sources)"
-      - "@globs(tests)"
+    - '@globs(sources)'
+    - '@globs(tests)'
     outputs: []
     options:
       cache: false
-
   go-fmt-check:
     command:
-      - "bash"
-      - "-c"
-      - "test -z \"$(gofmt -l .)\""
+    - bash
+    - -c
+    - test -z "$(gofmt -l .)"
     inputs:
-      - "@globs(sources)"
-      - "@globs(tests)"
+    - '@globs(sources)'
+    - '@globs(tests)'
     outputs: []
     options:
       cache: false
-
   go-typecheck:
     command:
-      - "go"
-      - "vet"
-      - "./..."
+    - go
+    - vet
+    - ./...
     deps:
-      - "^:go-build"
+    - ^:go-build
     inputs:
-      - "@globs(sources)"
-      - "@globs(tests)"
+    - '@globs(sources)'
+    - '@globs(tests)'
     outputs: []
     options:
       cache: true
-
   go-tidy:
     command:
-      - "go"
-      - "mod"
-      - "tidy"
+    - go
+    - mod
+    - tidy
     inputs:
-      - "go.mod"
-      - "go.sum"
+    - go.mod
+    - go.sum
     outputs:
-      - "go.mod"
-      - "go.sum"
+    - go.mod
+    - go.sum
     options:
       cache: false
+inheritedBy:
+  toolchain: go
+  layer: library

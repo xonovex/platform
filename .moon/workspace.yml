@@ -1,65 +1,28 @@
-# moonrepo workspace configuration
-# https://moonrepo.dev/docs/config/workspace
-# yaml-language-server: $schema=https://moonrepo.dev/schemas/workspace.json
-
 $schema: https://moonrepo.dev/schemas/workspace.json
-
-# Projects configuration - using globs for automatic discovery
 projects:
-  # Top-level directories
-  - "docs"
-
-  # Config packages
-  - "packages/config/*"
-
-  # CLI packages
-  - "packages/cli/*"
-
-  # Go platform packages
-  - "packages/cli/agent-cli-go-platforms/*"
-
-  # Go GitHub release
-  - "packages/cli/agent-cli-go-github"
-
-  # Library packages
-  - "packages/lib/*"
-
-  # Plugin packages
-  - "packages/plugins/*"
-
-  # Docker packages
-  - "packages/docker/*"
-
-# Version control system configuration
+  - docs
+  - packages/config/*
+  - packages/cli/*
+  - packages/cli/agent-cli-go-platforms/*
+  - packages/cli/agent-cli-go-github
+  - packages/lib/*
+  - packages/plugins/*
+  - packages/docker/*
 vcs:
-  manager: "git"
-  provider: "github"
-  defaultBranch: "main"
-
-  # VCS hooks for commit validation
-  syncHooks: true
   hooks:
-    # Commit message validation using commitlint
     commit-msg:
-      - "npx commitlint --edit $ARG1"
-# Runner configuration for task execution
-runner:
-  # Auto-install dependencies before running tasks
+      - npx commitlint --edit $ARG1
+  provider: github
+  defaultBranch: main
+  client: git
+  sync: true
+constraints:
+  enforceLayerRelationships: true
+hasher:
+  optimization: performance
+  walkStrategy: vcs
+pipeline:
   autoCleanCache: true
-  cacheLifetime: "7 days"
-
-  # Concurrency settings
+  cacheLifetime: 7 days
   inheritColorsForPipedTasks: true
   logRunningCommand: true
-
-# Hasher configuration for intelligent caching
-hasher:
-  # Optimization for monorepos
-  optimization: "performance"
-
-  # Files that affect all projects
-  walkStrategy: "vcs"
-
-# Constraints for better dependency management
-constraints:
-  enforceProjectTypeRelationships: true

@@ -1,43 +1,39 @@
 $schema: https://moonrepo.dev/schemas/project.json
-type: application
-language: bash
-dependsOn:
-  - agent-cli-go-linux-x64
-  - agent-cli-go-linux-arm64
-  - agent-cli-go-darwin-x64
-  - agent-cli-go-darwin-arm64
-  - agent-cli-go-win32-x64
-
 tasks:
   build:
-    command: "bash scripts/build-archives.sh $workspaceRoot/packages/cli/agent-cli-go-platforms $projectRoot/release-assets"
+    command: bash scripts/build-archives.sh $workspaceRoot/packages/cli/agent-cli-go-platforms $projectRoot/release-assets
     deps:
-      - "^:go-build"
+    - ^:go-build
     inputs: []
     outputs:
-      - "release-assets/"
+    - release-assets/
     options:
       cache: true
-
   github-publish:
-    command: "bash scripts/github-release.sh $workspaceRoot/packages/cli/agent-cli-go $projectRoot/release-assets"
+    command: bash scripts/github-release.sh $workspaceRoot/packages/cli/agent-cli-go $projectRoot/release-assets
     deps:
-      - "build"
-      - "^:npm-publish"
+    - build
+    - ^:npm-publish
     options:
       runInCI: false
       cache: false
-
   ci-publish:
-    command: "echo 'ci-publish complete'"
+    command: echo 'ci-publish complete'
     deps:
-      - "github-publish"
+    - github-publish
     options:
       runInCI: false
       cache: false
-
   ci-publish-dry-run:
-    command: "echo 'ci-publish-dry-run complete'"
+    command: echo 'ci-publish-dry-run complete'
     options:
       runInCI: false
       cache: false
+language: bash
+dependsOn:
+- agent-cli-go-linux-x64
+- agent-cli-go-linux-arm64
+- agent-cli-go-darwin-x64
+- agent-cli-go-darwin-arm64
+- agent-cli-go-win32-x64
+layer: application

@@ -1,216 +1,198 @@
-# Shared tasks for Node.js library packages
-# https://moonrepo.dev/docs/config/tasks
-# yaml-language-server: $schema=https://moonrepo.dev/schemas/tasks.json
-
 $schema: https://moonrepo.dev/schemas/tasks.json
-
 implicitInputs:
-  - "package.json"
-  - "tsconfig*.json"
-
+- package.json
+- tsconfig*.json
 fileGroups:
   sources:
-    - "src/**/*"
+  - src/**/*
   tests:
-    - "src/**/*.test.*"
-    - "src/**/*.spec.*"
-    - "test/**/*"
+  - src/**/*.test.*
+  - src/**/*.spec.*
+  - test/**/*
   configs:
-    - "*.config.*"
-    - ".eslintrc*"
-    - ".prettierrc*"
-
+  - '*.config.*'
+  - .eslintrc*
+  - .prettierrc*
 tasks:
   build:
     deps:
-      - "^:build"
+    - ^:build
     command:
-      - "npm"
-      - "run"
-      - "build"
+    - npm
+    - run
+    - build
     inputs:
-      - "@globs(sources)"
-      - "tsconfig*.json"
+    - '@globs(sources)'
+    - tsconfig*.json
     outputs:
-      - "dist"
+    - dist
     options:
       cache: true
-
   test:
     command:
-      - "npm"
-      - "test"
+    - npm
+    - test
     deps:
-      - '^:build'
+    - ^:build
     inputs:
-      - "@globs(sources)"
-      - "@globs(tests)"
-      - "@globs(configs)"
+    - '@globs(sources)'
+    - '@globs(tests)'
+    - '@globs(configs)'
     outputs: []
     options:
       cache: true
-
   test-watch:
     command:
-      - "npm"
-      - "run"
-      - "test:watch"
+    - npm
+    - run
+    - test:watch
     deps:
-      - '^:build'
-    local: true
+    - ^:build
     options:
       cache: false
       runInCI: false
       persistent: true
-
+    preset: server
   test-browser:
     command:
-      - "npm"
-      - "run"
-      - "test:browser"
+    - npm
+    - run
+    - test:browser
     type: test
     deps:
-      - '^:build'
+    - ^:build
     inputs:
-      - "@globs(sources)"
-      - "@globs(tests)"
-      - "*.browser.config.*"
-      - "vitest.browser.config.*"
+    - '@globs(sources)'
+    - '@globs(tests)'
+    - '*.browser.config.*'
+    - vitest.browser.config.*
     options:
       cache: true
       runInCI: true
-
   test-browser-e2e:
     command:
-      - "npm"
-      - "run"
-      - "test:browser-e2e"
+    - npm
+    - run
+    - test:browser-e2e
     type: test
     deps:
-      - '^:build'
+    - ^:build
     inputs:
-      - "@globs(sources)"
-      - "@globs(tests)"
-      - "playwright.config.*"
+    - '@globs(sources)'
+    - '@globs(tests)'
+    - playwright.config.*
     options:
       cache: false
       runInCI: true
-
   lint:
     command:
-      - "npm"
-      - "run"
-      - "lint"
+    - npm
+    - run
+    - lint
     inputs:
-      - "@globs(sources)"
-      - "@globs(tests)"
-      - "@globs(configs)"
+    - '@globs(sources)'
+    - '@globs(tests)'
+    - '@globs(configs)'
     outputs: []
-
   lint-fix:
     command:
-      - "npm"
-      - "run"
-      - "lint:fix"
+    - npm
+    - run
+    - lint:fix
     inputs:
-      - "@globs(sources)"
-      - "@globs(tests)"
-      - "@globs(configs)"
+    - '@globs(sources)'
+    - '@globs(tests)'
+    - '@globs(configs)'
     outputs: []
     options:
       cache: false
-
   fmt:
     command:
-      - "npm"
-      - "run"
-      - "fmt"
+    - npm
+    - run
+    - fmt
     inputs:
-      - "@globs(sources)"
-      - "@globs(tests)"
-      - "@globs(configs)"
-      - "*.json"
-      - "*.md"
+    - '@globs(sources)'
+    - '@globs(tests)'
+    - '@globs(configs)'
+    - '*.json'
+    - '*.md'
     outputs: []
     options:
       cache: false
-
   fmt-check:
     command:
-      - "npm"
-      - "run"
-      - "fmt:check"
+    - npm
+    - run
+    - fmt:check
     inputs:
-      - "@globs(sources)"
-      - "@globs(tests)"
-      - "@globs(configs)"
-      - "*.json"
-      - "*.md"
+    - '@globs(sources)'
+    - '@globs(tests)'
+    - '@globs(configs)'
+    - '*.json'
+    - '*.md'
     outputs: []
-
   typecheck:
     command:
-      - "npm"
-      - "run"
-      - "typecheck"
+    - npm
+    - run
+    - typecheck
     deps:
-      - '^:build'
+    - ^:build
     inputs:
-      - "@globs(sources)"
-      - "@globs(tests)"
-      - "tsconfig*.json"
+    - '@globs(sources)'
+    - '@globs(tests)'
+    - tsconfig*.json
     outputs: []
-
   npm-publish:
     command:
-      - "npm"
-      - "publish"
-      - "--provenance"
-      - "--access"
-      - "public"
+    - npm
+    - publish
+    - --provenance
+    - --access
+    - public
     deps:
-      - "build"
+    - build
     options:
       runInCI: false
       cache: false
-
   npm-publish-dry-run:
     command:
-      - "npm"
-      - "pack"
-      - "--dry-run"
+    - npm
+    - pack
+    - --dry-run
     options:
       runInCI: false
       cache: false
-
   ci-publish:
-    command: "echo 'ci-publish complete'"
+    command: echo 'ci-publish complete'
     deps:
-      - "npm-publish"
+    - npm-publish
     options:
       runInCI: false
       cache: false
-
   ci-publish-dry-run:
-    command: "echo 'ci-publish-dry-run complete'"
+    command: echo 'ci-publish-dry-run complete'
     deps:
-      - "npm-publish-dry-run"
+    - npm-publish-dry-run
     options:
       runInCI: false
       cache: false
-
   coverage:
     command:
-      - "npm"
-      - "run"
-      - "coverage"
+    - npm
+    - run
+    - coverage
     deps:
-      - '^:build'
+    - ^:build
     inputs:
-      - "@globs(sources)"
-      - "@globs(tests)"
-      - "@globs(configs)"
+    - '@globs(sources)'
+    - '@globs(tests)'
+    - '@globs(configs)'
     outputs:
-      - "coverage"
+    - coverage
     options:
       cache: true
+inheritedBy:
+  toolchain: typescript
+  layer: library

@@ -1,150 +1,128 @@
-# Shared tasks for configuration packages (ESLint, Vite, Vitest, Astro configs)
-# https://moonrepo.dev/docs/config/tasks
-# yaml-language-server: $schema=https://moonrepo.dev/schemas/tasks.json
-
 $schema: https://moonrepo.dev/schemas/tasks.json
-
 implicitInputs:
-  - "package.json"
-  - "tsconfig*.json"
-
+- package.json
+- tsconfig*.json
 fileGroups:
   sources:
-    - "src/**/*"
+  - src/**/*
   configs:
-    - "*.config.*"
-    - "tsconfig*.json"
-    - ".eslintrc*"
-    - ".prettierrc*"
-    - "package.json"
-
+  - '*.config.*'
+  - tsconfig*.json
+  - .eslintrc*
+  - .prettierrc*
+  - package.json
 tasks:
-  # TypeScript compilation task
-  # Compiles config TypeScript to JavaScript in dist/
   build:
     deps:
-      - "^:build"
+    - ^:build
     command:
-      - "npm"
-      - "run"
-      - "build"
+    - npm
+    - run
+    - build
     inputs:
-      - "@globs(sources)"
-      - "@globs(configs)"
+    - '@globs(sources)'
+    - '@globs(configs)'
     outputs:
-      - "dist"
+    - dist
     options:
       cache: true
       runDepsInParallel: true
-
-  # Clean build artifacts
   clean:
-    command: "bash -lc 'rm -rf dist'"
-    local: true
+    command: bash -lc 'rm -rf dist'
     options:
       cache: false
-
-  # Typecheck without emitting
+    preset: server
   typecheck:
     command:
-      - "npm"
-      - "run"
-      - "typecheck"
+    - npm
+    - run
+    - typecheck
     deps:
-      - '^:build'
+    - ^:build
     inputs:
-      - "@globs(sources)"
-      - "tsconfig*.json"
+    - '@globs(sources)'
+    - tsconfig*.json
     outputs: []
     options:
       cache: true
-
-  # Linting
   lint:
     command:
-      - "npm"
-      - "run"
-      - "lint"
+    - npm
+    - run
+    - lint
     inputs:
-      - "@globs(sources)"
-      - "@globs(configs)"
+    - '@globs(sources)'
+    - '@globs(configs)'
     outputs: []
-
-  # Linting with auto-fix
   lint-fix:
     command:
-      - "npm"
-      - "run"
-      - "lint:fix"
+    - npm
+    - run
+    - lint:fix
     inputs:
-      - "@globs(sources)"
-      - "@globs(configs)"
+    - '@globs(sources)'
+    - '@globs(configs)'
     outputs: []
     options:
       cache: false
-
-  # Code formatting
   fmt:
     command:
-      - "npm"
-      - "run"
-      - "fmt"
+    - npm
+    - run
+    - fmt
     inputs:
-      - "@globs(sources)"
-      - "@globs(configs)"
-      - "*.json"
-      - "*.md"
+    - '@globs(sources)'
+    - '@globs(configs)'
+    - '*.json'
+    - '*.md'
     outputs: []
     options:
       cache: false
-
   npm-publish:
     command:
-      - "npm"
-      - "publish"
-      - "--provenance"
-      - "--access"
-      - "public"
+    - npm
+    - publish
+    - --provenance
+    - --access
+    - public
     deps:
-      - "build"
+    - build
     options:
       runInCI: false
       cache: false
-
   npm-publish-dry-run:
     command:
-      - "npm"
-      - "pack"
-      - "--dry-run"
+    - npm
+    - pack
+    - --dry-run
     options:
       runInCI: false
       cache: false
-
   ci-publish:
-    command: "echo 'ci-publish complete'"
+    command: echo 'ci-publish complete'
     deps:
-      - "npm-publish"
+    - npm-publish
     options:
       runInCI: false
       cache: false
-
   ci-publish-dry-run:
-    command: "echo 'ci-publish-dry-run complete'"
+    command: echo 'ci-publish-dry-run complete'
     deps:
-      - "npm-publish-dry-run"
+    - npm-publish-dry-run
     options:
       runInCI: false
       cache: false
-
-  # Format checking
   fmt-check:
     command:
-      - "npm"
-      - "run"
-      - "fmt:check"
+    - npm
+    - run
+    - fmt:check
     inputs:
-      - "@globs(sources)"
-      - "@globs(configs)"
-      - "*.json"
-      - "*.md"
+    - '@globs(sources)'
+    - '@globs(configs)'
+    - '*.json'
+    - '*.md'
     outputs: []
+inheritedBy:
+  toolchain: typescript
+  layer: configuration
