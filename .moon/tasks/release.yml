@@ -1,35 +1,33 @@
 $schema: https://moonrepo.dev/schemas/tasks.json
-
 tasks:
   changeset-status:
     command:
-      - "npx"
-      - "changeset"
-      - "status"
+    - npx
+    - changeset
+    - status
     inputs:
-      - ".changeset/*.md"
-      - "!.changeset/README.md"
+    - .changeset/*.md
+    - '!.changeset/README.md'
     options:
-      runInCI: "always"
+      runInCI: always
       cache: false
-
   changeset-add:
     command:
-      - "npx"
-      - "changeset"
-      - "add"
-    local: true
+    - npx
+    - changeset
+    - add
     options:
       runInCI: false
       cache: false
       interactive: true
-
+    preset: server
   release-version:
     command:
-      - "npx"
-      - "changeset"
-      - "version"
+    - npx
+    - changeset
+    - version
     options:
       runInCI: false
       cache: false
-
+inheritedBy:
+  language: release

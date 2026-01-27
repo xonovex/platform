@@ -1,5 +1,5 @@
-type: application
-language: bash
 tags:
-  - docker
-  - agent
+- docker
+- agent
+language: bash
+layer: application
