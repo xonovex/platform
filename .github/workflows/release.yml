@@ -96,9 +96,6 @@ jobs:
         with:
           auto-install: true
 
-      - name: Install golangci-lint
-        run: go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
-
       - run: moon ci :build :test :lint :typecheck :go-build :go-test :go-lint :go-typecheck
 
       - uses: appthrust/moon-ci-retrospect@v1
