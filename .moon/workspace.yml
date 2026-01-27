@@ -15,6 +15,12 @@ projects:
   # CLI packages
   - "packages/cli/*"
 
+  # Go platform packages
+  - "packages/cli/agent-cli-go-platforms/*"
+
+  # Go GitHub release
+  - "packages/cli/agent-cli-go-github"
+
   # Library packages
   - "packages/lib/*"
 

@@ -4,22 +4,23 @@
 
 $schema: "https://moonrepo.dev/schemas/toolchain.json"
 
-unstable_node:
-  #version: "24.9.0"
+node:
+  version: "24.11.1"
 
-unstable_npm:
+npm:
+  version: "11.6.2"
   installArgs: ["--no-save"]
-  #version: "11.6.0"
 
 typescript:
   createMissingConfig: false
   syncProjectReferences: true
   syncProjectReferencesToPaths: true
 
-unstable_javascript:
+javascript:
   packageManager: "npm"
   syncPackageManagerField: true
   syncProjectWorkspaceDependencies: true
   dependencyVersionFormat: "version-caret"
 
-unstable_go: {}
+go:
+  version: "1.25.5"
