@@ -1,37 +1,29 @@
 $schema: https://moonrepo.dev/schemas/project.json
-type: library
-language: go
+type: application
+language: bash
 dependsOn:
-  - core-go
   - agent-cli-go-linux-x64
   - agent-cli-go-linux-arm64
   - agent-cli-go-darwin-x64
   - agent-cli-go-darwin-arm64
   - agent-cli-go-win32-x64
-tags:
-  - scripts
-  - go
-  - cli
 
 tasks:
-  npm-publish:
-    command:
-      - "npm"
-      - "publish"
-      - "--provenance"
-      - "--access"
-      - "public"
+  build:
+    command: "bash scripts/build-archives.sh $workspaceRoot/packages/cli/agent-cli-go-platforms $projectRoot/release-assets"
     deps:
-      - "^:npm-publish"
+      - "^:go-build"
+    inputs: []
+    outputs:
+      - "release-assets/"
     options:
-      runInCI: false
-      cache: false
+      cache: true
 
-  npm-publish-dry-run:
-    command:
-      - "npm"
-      - "pack"
-      - "--dry-run"
+  github-publish:
+    command: "bash scripts/github-release.sh $workspaceRoot/packages/cli/agent-cli-go $projectRoot/release-assets"
+    deps:
+      - "build"
+      - "^:npm-publish"
     options:
       runInCI: false
       cache: false
@@ -39,16 +31,13 @@ tasks:
   ci-publish:
     command: "echo 'ci-publish complete'"
     deps:
-      - "npm-publish"
-      - "agent-cli-go-github:ci-publish"
+      - "github-publish"
     options:
       runInCI: false
       cache: false
 
   ci-publish-dry-run:
     command: "echo 'ci-publish-dry-run complete'"
-    deps:
-      - "npm-publish-dry-run"
     options:
       runInCI: false
       cache: false

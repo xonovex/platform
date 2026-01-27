@@ -161,6 +161,44 @@ tasks:
       - "tsconfig*.json"
     outputs: []
 
+  npm-publish:
+    command:
+      - "npm"
+      - "publish"
+      - "--provenance"
+      - "--access"
+      - "public"
+    deps:
+      - "build"
+    options:
+      runInCI: false
+      cache: false
+
+  npm-publish-dry-run:
+    command:
+      - "npm"
+      - "pack"
+      - "--dry-run"
+    options:
+      runInCI: false
+      cache: false
+
+  ci-publish:
+    command: "echo 'ci-publish complete'"
+    deps:
+      - "npm-publish"
+    options:
+      runInCI: false
+      cache: false
+
+  ci-publish-dry-run:
+    command: "echo 'ci-publish-dry-run complete'"
+    deps:
+      - "npm-publish-dry-run"
+    options:
+      runInCI: false
+      cache: false
+
   coverage:
     command:
       - "npm"

@@ -19,270 +19,139 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  check-release:
-    name: Check Release
+  detect:
+    name: Detect Changes
     runs-on: ubuntu-latest
     if: |
       (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')) ||
       (github.event_name == 'workflow_dispatch') ||
       (github.event_name == 'pull_request' && github.event.pull_request.merged == true && contains(github.event.pull_request.title, 'version packages'))
     outputs:
-      should_release: ${{ steps.check.outputs.should_release }}
-      dry_run: ${{ steps.check.outputs.dry_run }}
-      has_go_changes: ${{ steps.check-go.outputs.has_go_changes }}
+      should_release: ${{ steps.detect.outputs.should_release }}
+      dry_run: ${{ steps.detect.outputs.dry_run }}
+      changed_projects: ${{ steps.detect.outputs.changed_projects }}
 
     steps:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
-      - name: Determine release type
-        id: check
-        run: |
-          echo "should_release=true" >> $GITHUB_OUTPUT
-          echo "dry_run=${{ github.event_name == 'workflow_dispatch' && github.event.inputs.dry_run || 'false' }}" >> $GITHUB_OUTPUT
+      - uses: moonrepo/setup-toolchain@v0
+        with:
+          auto-install: true
 
-      - name: Check for Go package changes
-        id: check-go
+      - name: Detect changed packages
+        id: detect
         run: |
-          if git diff HEAD~1 --name-only | grep -q "packages/cli/agent-cli-go/CHANGELOG.md"; then
-            echo "has_go_changes=true" >> $GITHUB_OUTPUT
-          else
-            echo "has_go_changes=false" >> $GITHUB_OUTPUT
+          DRY_RUN="${{ github.event_name == 'workflow_dispatch' && github.event.inputs.dry_run || 'false' }}"
+          echo "dry_run=$DRY_RUN" >> $GITHUB_OUTPUT
+
+          npx changeset status --output=changeset-status.json 2>/dev/null || true
+
+          if [ ! -f changeset-status.json ]; then
+            echo "should_release=false" >> $GITHUB_OUTPUT
+            echo "changed_projects=[]" >> $GITHUB_OUTPUT
+            exit 0
           fi
+
+          # Build npm name → moon project ID map dynamically from moon query
+          PROJECTS=$(node -e "
+            const { execSync } = require('child_process');
+            const fs = require('fs');
+            const path = require('path');
+            const status = require('./changeset-status.json');
+            const changedNames = new Set((status.releases || []).map(r => r.name));
+            const moonOutput = JSON.parse(execSync('moon query projects --json', { encoding: 'utf8' }));
+            const projects = [];
+            for (const p of moonOutput.projects) {
+              try {
+                const pkg = JSON.parse(fs.readFileSync(path.join(p.source, 'package.json'), 'utf8'));
+                if (pkg.name && changedNames.has(pkg.name) && !pkg.private) {
+                  projects.push(p.id);
+                }
+              } catch {}
+            }
+            console.log(JSON.stringify(projects));
+          ")
+
+          if [ "$PROJECTS" = "[]" ]; then
+            echo "should_release=false" >> $GITHUB_OUTPUT
+          else
+            echo "should_release=true" >> $GITHUB_OUTPUT
+          fi
+          echo "changed_projects=$PROJECTS" >> $GITHUB_OUTPUT
 
   validate:
     name: Validate
     runs-on: ubuntu-latest
-    needs: [check-release]
-    if: needs.check-release.outputs.should_release == 'true'
+    needs: [detect]
+    if: needs.detect.outputs.should_release == 'true'
 
     steps:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
-      - uses: ./.github/actions/setup-node-workspace
+      - uses: moonrepo/setup-toolchain@v0
+        with:
+          auto-install: true
 
-      - run: npm run build
-      - run: npm run lint
-      - run: npm run test
+      - name: Install golangci-lint
+        run: go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+
+      - run: moon ci :build :test :lint :typecheck :go-build :go-test :go-lint :go-typecheck
+
+      - uses: appthrust/moon-ci-retrospect@v1
+        if: success() || failure()
+
       - run: npm run prepublish:check
 
-  build-go-binaries:
-    name: Build Go Binary (${{ matrix.goos }}-${{ matrix.goarch }})
+  publish:
+    name: Publish
     runs-on: ubuntu-latest
-    needs: [check-release, validate]
-    if: |
-      needs.check-release.outputs.should_release == 'true' &&
-      needs.check-release.outputs.has_go_changes == 'true'
-    strategy:
-      matrix:
-        include:
-          - goos: linux
-            goarch: amd64
-            platform: linux-x64
-          - goos: linux
-            goarch: arm64
-            platform: linux-arm64
-          - goos: darwin
-            goarch: amd64
-            platform: darwin-x64
-          - goos: darwin
-            goarch: arm64
-            platform: darwin-arm64
-          - goos: windows
-            goarch: amd64
-            platform: win32-x64
-            ext: .exe
-
-    steps:
-      - uses: actions/checkout@v6
-
-      - uses: ./.github/actions/setup-go-cli
-
-      - name: Build binary
-        working-directory: packages/cli/agent-cli-go
-        env:
-          GOOS: ${{ matrix.goos }}
-          GOARCH: ${{ matrix.goarch }}
-          CGO_ENABLED: 0
-        run: |
-          mkdir -p ../agent-cli-go-platforms/${{ matrix.platform }}/bin
-          go build -ldflags="-s -w" -o ../agent-cli-go-platforms/${{ matrix.platform }}/bin/agent-cli-go${{ matrix.ext }} ./cmd/agent-cli
-
-      - uses: actions/upload-artifact@v6
-        with:
-          name: binary-${{ matrix.platform }}
-          path: packages/cli/agent-cli-go-platforms/${{ matrix.platform }}/bin/
-          retention-days: 1
-
-  publish-go-platform-packages:
-    name: Publish Go Platform Package (${{ matrix.platform }})
-    runs-on: ubuntu-latest
-    needs: [check-release, build-go-binaries]
-    if: |
-      needs.check-release.outputs.should_release == 'true' &&
-      needs.check-release.outputs.has_go_changes == 'true'
-    permissions:
-      contents: read
-      id-token: write
-    strategy:
-      matrix:
-        platform: [linux-x64, linux-arm64, darwin-x64, darwin-arm64, win32-x64]
-
-    steps:
-      - uses: actions/checkout@v6
-
-      - uses: ./.github/actions/setup-node-workspace
-        with:
-          registry-url: "https://registry.npmjs.org"
-          install-deps: "false"
-
-      - uses: actions/download-artifact@v7
-        with:
-          name: binary-${{ matrix.platform }}
-          path: packages/cli/agent-cli-go-platforms/${{ matrix.platform }}/bin/
-
-      - run: chmod +x packages/cli/agent-cli-go-platforms/${{ matrix.platform }}/bin/*
-
-      - name: Publish
-        if: needs.check-release.outputs.dry_run != 'true'
-        working-directory: packages/cli/agent-cli-go-platforms/${{ matrix.platform }}
-        run: npm publish --provenance --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-      - name: Dry run
-        if: needs.check-release.outputs.dry_run == 'true'
-        working-directory: packages/cli/agent-cli-go-platforms/${{ matrix.platform }}
-        run: npm pack --dry-run
-
-  publish-go-main:
-    name: Publish Go Main Package
-    runs-on: ubuntu-latest
-    needs: [check-release, publish-go-platform-packages]
-    if: |
-      needs.check-release.outputs.should_release == 'true' &&
-      needs.check-release.outputs.has_go_changes == 'true'
-    permissions:
-      contents: read
-      id-token: write
-
-    steps:
-      - uses: actions/checkout@v6
-
-      - uses: ./.github/actions/setup-node-workspace
-        with:
-          registry-url: "https://registry.npmjs.org"
-
-      - name: Build TypeScript wrapper
-        working-directory: packages/cli/agent-cli-go
-        run: npx tsc
-
-      - name: Publish
-        if: needs.check-release.outputs.dry_run != 'true'
-        run: npm publish --workspace @xonovex/agent-cli-go --provenance --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-      - name: Dry run
-        if: needs.check-release.outputs.dry_run == 'true'
-        working-directory: packages/cli/agent-cli-go
-        run: npm pack --dry-run
-
-  publish-ts-packages:
-    name: Publish TypeScript Packages
-    runs-on: ubuntu-latest
-    needs: [check-release, validate, publish-go-main]
-    if: |
-      always() &&
-      needs.check-release.outputs.should_release == 'true' &&
-      (needs.publish-go-main.result == 'success' || needs.publish-go-main.result == 'skipped')
-    permissions:
-      contents: read
-      id-token: write
-    outputs:
-      published: ${{ steps.publish.outputs.published }}
-
-    steps:
-      - uses: actions/checkout@v6
-
-      - uses: ./.github/actions/setup-node-workspace
-        with:
-          registry-url: "https://registry.npmjs.org"
-
-      - run: npm run build
-
-      - name: Publish
-        id: publish
-        if: needs.check-release.outputs.dry_run != 'true'
-        run: |
-          npx changeset publish --no-git-tag
-          echo "published=true" >> $GITHUB_OUTPUT
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-      - name: Dry run
-        if: needs.check-release.outputs.dry_run == 'true'
-        run: |
-          echo "DRY RUN - Checking changeset status:"
-          npx changeset status
-          echo ""
-          echo "DRY RUN - Would publish packages"
-
-  github-release-agent-cli-go:
-    name: Create GitHub Release (agent-cli-go)
-    runs-on: ubuntu-latest
-    needs: [check-release, publish-go-main]
-    if: |
-      needs.check-release.outputs.should_release == 'true' &&
-      needs.check-release.outputs.dry_run != 'true' &&
-      needs.check-release.outputs.has_go_changes == 'true'
+    needs: [detect, validate]
+    if: needs.detect.outputs.should_release == 'true'
     permissions:
       contents: write
+      id-token: write
 
     steps:
       - uses: actions/checkout@v6
-
-      - name: Get version
-        id: version
-        run: echo "version=$(node -p "require('./packages/cli/agent-cli-go/package.json').version")" >> $GITHUB_OUTPUT
-
-      - uses: actions/download-artifact@v7
         with:
-          path: binaries
-          pattern: binary-*
-          merge-multiple: false
+          fetch-depth: 0
 
-      - name: Prepare release assets
+      - uses: moonrepo/setup-toolchain@v0
+        with:
+          auto-install: true
+
+      - uses: ./.github/actions/setup-node
+        with:
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Publish changed packages
+        if: needs.detect.outputs.dry_run != 'true'
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          mkdir -p release-assets
-          for platform in linux-x64 linux-arm64 darwin-x64 darwin-arm64 win32-x64; do
-            if [ -d "binaries/binary-$platform" ]; then
-              cd binaries/binary-$platform
-              if [ "$platform" = "win32-x64" ]; then
-                zip ../../release-assets/agent-cli-go-$platform.zip agent-cli-go.exe
-              else
-                tar -czvf ../../release-assets/agent-cli-go-$platform.tar.gz agent-cli-go
-              fi
-              cd ../..
-            fi
+          PROJECTS='${{ needs.detect.outputs.changed_projects }}'
+
+          for project in $(echo "$PROJECTS" | jq -r '.[]'); do
+            echo "::group::Publishing $project"
+            moon run "$project:ci-publish"
+            echo "::endgroup::"
           done
 
-      - name: Extract changelog
-        id: changelog
+      - name: Dry run
+        if: needs.detect.outputs.dry_run == 'true'
         run: |
-          CHANGELOG=$(awk '/^## /{if(p)exit; p=1} p' packages/cli/agent-cli-go/CHANGELOG.md)
-          echo "changelog<<EOF" >> $GITHUB_OUTPUT
-          echo "$CHANGELOG" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
+          PROJECTS='${{ needs.detect.outputs.changed_projects }}'
 
-      - uses: softprops/action-gh-release@v2
-        with:
-          tag_name: agent-cli-go-v${{ steps.version.outputs.version }}
-          name: agent-cli-go v${{ steps.version.outputs.version }}
-          body: ${{ steps.changelog.outputs.changelog }}
-          files: release-assets/*
-          draft: false
-          prerelease: ${{ contains(steps.version.outputs.version, '-') }}
+          for project in $(echo "$PROJECTS" | jq -r '.[]'); do
+            echo "::group::Dry run $project"
+            moon run "$project:ci-publish-dry-run"
+            echo "::endgroup::"
+          done
+
+      - uses: appthrust/moon-ci-retrospect@v1
+        if: success() || failure()
