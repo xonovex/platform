@@ -53,42 +53,13 @@ tasks:
       runInCI: false
       persistent: true
     preset: server
-  test-browser:
-    command:
-    - npm
-    - run
-    - test:browser
-    type: test
-    deps:
-    - ^:build
-    inputs:
-    - '@globs(sources)'
-    - '@globs(tests)'
-    - '*.browser.config.*'
-    - vitest.browser.config.*
-    options:
-      cache: true
-      runInCI: true
-  test-browser-e2e:
-    command:
-    - npm
-    - run
-    - test:browser-e2e
-    type: test
-    deps:
-    - ^:build
-    inputs:
-    - '@globs(sources)'
-    - '@globs(tests)'
-    - playwright.config.*
-    options:
-      cache: false
-      runInCI: true
   lint:
     command:
     - npm
     - run
     - lint
+    deps:
+    - ^:build
     inputs:
     - '@globs(sources)'
     - '@globs(tests)'

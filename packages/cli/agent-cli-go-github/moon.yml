@@ -1,7 +1,7 @@
 $schema: https://moonrepo.dev/schemas/project.json
 tasks:
   build:
-    command: bash scripts/build-archives.sh $workspaceRoot/packages/cli/agent-cli-go-platforms $projectRoot/release-assets
+    script: bash scripts/build-archives.sh "$workspaceRoot/packages/cli/agent-cli-go-platforms" "$projectRoot/release-assets"
     deps:
     - ^:go-build
     inputs: []
@@ -10,7 +10,7 @@ tasks:
     options:
       cache: true
   github-publish:
-    command: bash scripts/github-release.sh $workspaceRoot/packages/cli/agent-cli-go $projectRoot/release-assets
+    script: bash scripts/github-release.sh "$workspaceRoot/packages/cli/agent-cli-go" "$projectRoot/release-assets"
     deps:
     - build
     - ^:npm-publish
