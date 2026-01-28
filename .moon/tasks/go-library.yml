@@ -116,6 +116,15 @@ tasks:
     - go.sum
     options:
       cache: false
+  ci-prepare:
+    command: echo 'ci-prepare complete'
+    deps:
+    - go-build
+    - go-test
+    - go-lint
+    - go-typecheck
+    options:
+      cache: false
 inheritedBy:
   toolchain: go
   layer: library
