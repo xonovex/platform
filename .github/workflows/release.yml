@@ -36,9 +36,20 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: moonrepo/setup-toolchain@v0
+      - uses: actions/cache@v4
         with:
-          auto-install: true
+          path: /nix
+          key: nix-${{ runner.os }}-${{ hashFiles('flake.lock') }}
+          restore-keys: |
+            nix-${{ runner.os }}-
+
+      - uses: nixbuild/nix-quick-install-action@v34
+        with:
+          nix_conf: |
+            build-users-group =
+
+      - name: Install dependencies
+        run: nix develop --command npm ci
 
       - name: Detect changed packages
         id: detect
@@ -46,7 +57,7 @@ jobs:
           DRY_RUN="${{ github.event_name == 'workflow_dispatch' && github.event.inputs.dry_run || 'false' }}"
           echo "dry_run=$DRY_RUN" >> $GITHUB_OUTPUT
 
-          npx changeset status --output=changeset-status.json 2>/dev/null || true
+          nix develop --command npx changeset status --output=changeset-status.json 2>/dev/null || true
 
           if [ ! -f changeset-status.json ]; then
             echo "should_release=false" >> $GITHUB_OUTPUT
@@ -54,14 +65,13 @@ jobs:
             exit 0
           fi
 
-          # Build npm name → moon project ID map dynamically from moon query
-          PROJECTS=$(node -e "
+          PROJECTS=$(nix develop --command node -e "
             const { execSync } = require('child_process');
             const fs = require('fs');
             const path = require('path');
             const status = require('./changeset-status.json');
             const changedNames = new Set((status.releases || []).map(r => r.name));
-            const moonOutput = JSON.parse(execSync('moon query projects --json', { encoding: 'utf8' }));
+            const moonOutput = JSON.parse(execSync('npx moon query projects', { encoding: 'utf8' }));
             const projects = [];
             for (const p of moonOutput.projects) {
               try {
@@ -92,16 +102,41 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: moonrepo/setup-toolchain@v0
+      - uses: actions/cache@v4
         with:
-          auto-install: true
+          path: /nix
+          key: nix-${{ runner.os }}-${{ hashFiles('flake.lock') }}
+          restore-keys: |
+            nix-${{ runner.os }}-
 
-      - run: moon ci :build :test :lint :typecheck :go-build :go-test :go-lint :go-typecheck
+      - uses: nixbuild/nix-quick-install-action@v34
+        with:
+          nix_conf: |
+            build-users-group =
+
+      - uses: actions/cache@v4
+        with:
+          path: |
+            .moon/cache
+            node_modules
+          key: npm-moon-${{ runner.os }}-${{ hashFiles('package-lock.json', '.moon/**/*.yml') }}
+          restore-keys: |
+            npm-moon-${{ runner.os }}-
+
+      - uses: actions/cache@v4
+        with:
+          path: ~/go/pkg/mod
+          key: go-mod-${{ runner.os }}-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            go-mod-${{ runner.os }}-
+
+      - run: nix develop --command bash -c "npm install && npx moon ci :build :test :lint :typecheck :go-build :go-test :go-lint :go-typecheck"
 
       - uses: appthrust/moon-ci-retrospect@v1
         if: success() || failure()
 
-      - run: npm run prepublish:check
+      - name: Prepublish check
+        run: nix develop --command npm run prepublish:check
 
   publish:
     name: Publish
@@ -117,13 +152,23 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: moonrepo/setup-toolchain@v0
+      - uses: actions/cache@v4
         with:
-          auto-install: true
+          path: /nix
+          key: nix-${{ runner.os }}-${{ hashFiles('flake.lock') }}
+          restore-keys: |
+            nix-${{ runner.os }}-
 
-      - uses: ./.github/actions/setup-node
+      - uses: nixbuild/nix-quick-install-action@v34
+        with:
+          nix_conf: |
+            build-users-group =
+
+      - uses: actions/setup-node@v6
         with:
           registry-url: "https://registry.npmjs.org"
+
+      - run: nix develop --command npm ci
 
       - name: Publish changed packages
         if: needs.detect.outputs.dry_run != 'true'
@@ -135,7 +180,7 @@ jobs:
 
           for project in $(echo "$PROJECTS" | jq -r '.[]'); do
             echo "::group::Publishing $project"
-            moon run "$project:ci-publish"
+            nix develop --command npx moon run "$project:ci-publish"
             echo "::endgroup::"
           done
 
@@ -146,7 +191,7 @@ jobs:
 
           for project in $(echo "$PROJECTS" | jq -r '.[]'); do
             echo "::group::Dry run $project"
-            moon run "$project:ci-publish-dry-run"
+            nix develop --command npx moon run "$project:ci-publish-dry-run"
             echo "::endgroup::"
           done
 
