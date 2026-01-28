@@ -1,27 +1,27 @@
 {
-  "name": "@xonovex/agent-cli-go-win32-x64",
+  "name": "@xonovex/agent-cli-go-darwin-arm64",
   "version": "0.1.13",
-  "description": "Windows x64 binary for @xonovex/agent-cli-go",
+  "description": "macOS arm64 (Apple Silicon) binary for @xonovex/agent-cli-go",
   "license": "MIT",
   "author": "Xonovex",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/xonovex/platform.git",
-    "directory": "packages/cli/agent-cli-go-platforms/win32-x64"
+    "directory": "packages/cli/agent-cli-go-darwin-arm64"
   },
   "bugs": {
     "url": "https://github.com/xonovex/platform/issues"
   },
-  "homepage": "https://github.com/xonovex/platform/tree/main/packages/cli/agent-cli-go-platforms/win32-x64#readme",
+  "homepage": "https://github.com/xonovex/platform/tree/main/packages/cli/agent-cli-go-darwin-arm64#readme",
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org/"
   },
   "os": [
-    "win32"
+    "darwin"
   ],
   "cpu": [
-    "x64"
+    "arm64"
   ],
   "files": [
     "bin"

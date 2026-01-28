@@ -1,5 +1,103 @@
 $schema: https://moonrepo.dev/schemas/project.json
 tasks:
+  go-build:
+    deps:
+    - ^:go-build
+    command:
+    - go
+    - build
+    - ./...
+    inputs:
+    - '**/*.go'
+    - go.mod
+    - go.sum
+    outputs: []
+    options:
+      cache: true
+  go-test:
+    command:
+    - go
+    - test
+    - -v
+    - ./...
+    deps:
+    - ^:go-build
+    inputs:
+    - '**/*.go'
+    - go.mod
+    - go.sum
+    outputs: []
+    options:
+      cache: true
+  go-lint:
+    command:
+    - golangci-lint
+    - run
+    - ./...
+    inputs:
+    - '**/*.go'
+    - .golangci.yml
+    outputs: []
+    options:
+      cache: false
+  go-typecheck:
+    command:
+    - go
+    - vet
+    - ./...
+    deps:
+    - ^:go-build
+    inputs:
+    - '**/*.go'
+    - go.mod
+    - go.sum
+    outputs: []
+    options:
+      cache: true
+  build:
+    script: npx tsc
+    deps:
+    - eslint-config-cli:build
+    - ts-config-cli:build
+    inputs:
+    - src/**/*.ts
+    - tsconfig.json
+    outputs:
+    - dist
+    options:
+      cache: true
+  lint:
+    script: npx eslint src
+    deps:
+    - eslint-config-cli:build
+    inputs:
+    - src/**/*.ts
+    - eslint.config.*
+    outputs: []
+    options:
+      cache: true
+  typecheck:
+    script: npx tsc --noEmit
+    deps:
+    - ts-config-cli:build
+    inputs:
+    - src/**/*.ts
+    - tsconfig.json
+    outputs: []
+    options:
+      cache: true
+  ci-prepare:
+    command: echo 'ci-prepare complete'
+    deps:
+    - go-build
+    - go-test
+    - go-lint
+    - go-typecheck
+    - build
+    - lint
+    - typecheck
+    options:
+      cache: false
   npm-publish:
     command:
     - npm
@@ -8,6 +106,7 @@ tasks:
     - --access
     - public
     deps:
+    - build
     - ^:npm-publish
     options:
       runInCI: false
@@ -17,6 +116,8 @@ tasks:
     - npm
     - pack
     - --dry-run
+    deps:
+    - build
     options:
       runInCI: false
       cache: false
@@ -38,13 +139,14 @@ tasks:
 language: go
 dependsOn:
 - core-go
-- agent-cli-go-linux-x64
-- agent-cli-go-linux-arm64
-- agent-cli-go-darwin-x64
+- eslint-config-cli
+- ts-config-cli
 - agent-cli-go-darwin-arm64
+- agent-cli-go-darwin-x64
+- agent-cli-go-linux-arm64
+- agent-cli-go-linux-x64
 - agent-cli-go-win32-x64
 tags:
-- scripts
 - go
 - cli
 layer: library
