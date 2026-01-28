@@ -4,6 +4,9 @@ tasks:
     deps:
     - ts-config-node:build
     - ^:build
+  lint:
+    deps:
+    - build
 language: typescript
 tags:
 - tenant-shared
