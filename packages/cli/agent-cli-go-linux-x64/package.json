@@ -7,12 +7,12 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/xonovex/platform.git",
-    "directory": "packages/cli/agent-cli-go-platforms/linux-x64"
+    "directory": "packages/cli/agent-cli-go-linux-x64"
   },
   "bugs": {
     "url": "https://github.com/xonovex/platform/issues"
   },
-  "homepage": "https://github.com/xonovex/platform/tree/main/packages/cli/agent-cli-go-platforms/linux-x64#readme",
+  "homepage": "https://github.com/xonovex/platform/tree/main/packages/cli/agent-cli-go-linux-x64#readme",
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org/"

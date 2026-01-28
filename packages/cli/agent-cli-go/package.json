@@ -25,12 +25,6 @@
   "bin": {
     "agent-cli-go": "./dist/bin.js"
   },
-  "scripts": {
-    "build": "tsc && go build -o dist/agent-cli ./cmd/agent-cli",
-    "typecheck": "tsc --noEmit",
-    "lint": "eslint . && go vet ./... && golangci-lint run",
-    "test": "go test ./..."
-  },
   "devDependencies": {
     "@xonovex/ts-config-cli": "0.1.12"
   },

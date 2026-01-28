@@ -3,8 +3,6 @@ projects:
   - docs
   - packages/config/*
   - packages/cli/*
-  - packages/cli/agent-cli-go-platforms/*
-  - packages/cli/agent-cli-go-github
   - packages/lib/*
   - packages/plugins/*
   - packages/docker/*
