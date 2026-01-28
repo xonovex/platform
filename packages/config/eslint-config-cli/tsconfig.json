@@ -13,16 +13,16 @@
       ]
     }
   },
-  "references": [
-    {
-      "path": "../eslint-config-base"
-    }
-  ],
   "include": [
     "src",
     "eslint.config.ts"
   ],
   "exclude": [
     "dist"
+  ],
+  "references": [
+    {
+      "path": "../eslint-config-base"
+    }
   ]
 }

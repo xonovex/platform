@@ -2,22 +2,16 @@ $schema: https://moonrepo.dev/schemas/tasks.json
 extends: ./typescript-library.yml
 tasks:
   dev:
+    script: npx vite dev
     deps:
     - ^:build
-    command:
-    - npm
-    - run
-    - dev
     options:
       cache: false
       runInCI: false
       persistent: true
     preset: server
   build-docker:
-    command:
-    - npm
-    - run
-    - build:docker
+    script: docker build -t $projectName .
     inputs:
     - Dockerfile*
     - docker/**
@@ -28,10 +22,7 @@ tasks:
       cache: false
       runInCI: false
   test-e2e:
-    command:
-    - npm
-    - run
-    - test:e2e
+    script: npx vitest run --config vitest.e2e.config.ts
     type: test
     deps:
     - ^:build

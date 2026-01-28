@@ -10,9 +10,21 @@
       ],
       "@xonovex/vitest-config-base/*": [
         "../vitest-config-base/src/*"
+      ],
+      "@xonovex/eslint-config-base": [
+        "../eslint-config-base/src/index.ts"
+      ],
+      "@xonovex/eslint-config-base/*": [
+        "../eslint-config-base/src/*"
       ]
     }
   },
+  "include": [
+    "src"
+  ],
+  "exclude": [
+    "dist"
+  ],
   "references": [
     {
       "path": "../eslint-config-base"
@@ -20,11 +32,5 @@
     {
       "path": "../vitest-config-base"
     }
-  ],
-  "include": [
-    "src"
-  ],
-  "exclude": [
-    "dist"
   ]
 }
