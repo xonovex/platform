@@ -60,7 +60,8 @@
     "eslint-plugin-sonarjs": "3.0.5",
     "eslint-plugin-unicorn": "62.0.0",
     "globals": "17.1.0",
-    "typescript-eslint": "8.53.1"
+    "typescript-eslint": "8.53.1",
+    "@xonovex/ts-config-node": "^0.1.12"
   },
   "devDependencies": {
     "@xonovex/ts-config-node": "0.1.12",

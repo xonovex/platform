@@ -8,7 +8,8 @@ description: >-
 
 ## Requirements
 
-- Moon ≥ 1.0, Node.js for JavaScript/TypeScript projects.
+- Moon ≥ 2.0, Node.js for JavaScript/TypeScript projects.
+- Migration from v1: Run `moon migrate v2` to automate configuration updates.
 
 ## Essentials
 
@@ -17,8 +18,16 @@ description: >-
 - **Execution** - `project:task`, `#tag:task`, `:task` (all), `--query`, `--affected`
 - **Querying** - Query projects/tasks by tags, language, or query language, see [reference/query-language.md](reference/query-language.md)
 - **Configuration** - Projects use `moon.yml`, workspace uses `.moon/workspace.yml`
-- **Toolchain** - Moon manages language toolchains, configured in workspace
+- **Toolchains** - Moon manages language toolchains, configured in `.moon/toolchains.yml` (plural in v2)
 - **Caching** - Built-in task caching with output definitions, see [reference/task-configuration.md](reference/task-configuration.md)
+
+## Moon 2.0 Key Changes
+
+- **command vs script** - Use `script:` for shell features (pipes, redirects, chaining); `command:` for simple executables only
+- **Shell by default** - Tasks run in shell by default (`bash` on Unix, `pwsh` on Windows)
+- **Deep merging** - Configs merge sequentially (not shallow), fileGroups combine instead of replace
+- **Renamed settings** - `platform` → `toolchains`, `type` → `layer`, `toolchain.yml` → `toolchains.yml`
+- **Env var syntax** - `$VAR` substitutes empty string (not syntax fallback); use `${VAR:-default}` for defaults
 
 ## Progressive disclosure
 
@@ -27,4 +36,9 @@ description: >-
 - Read [reference/query-language.md](reference/query-language.md) - When using advanced query syntax
 - Read [reference/task-inheritance.md](reference/task-inheritance.md) - When setting up task inheritance patterns
 - Read [reference/project-constraints.md](reference/project-constraints.md) - When enforcing project boundaries
+- Read [reference/migration-v2.md](reference/migration-v2.md) - When migrating from moon v1 to v2
 - Read [reference/docker-multistage.md](reference/docker-multistage.md) - When building Docker images with moon scaffold
+
+## External References
+
+- [Moon 2.0 Migration Guide](https://moonrepo.dev/docs/migrate/2.0)

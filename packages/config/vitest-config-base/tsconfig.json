@@ -3,10 +3,22 @@
   "compilerOptions": {
     "outDir": "dist",
     "rootDir": ".",
-    "baseUrl": "."
+    "baseUrl": ".",
+    "paths": {
+      "@xonovex/eslint-config-base": [
+        "../eslint-config-base/src/index.ts"
+      ],
+      "@xonovex/eslint-config-base/*": [
+        "../eslint-config-base/src/*"
+      ]
+    }
   },
-  "include": ["src"],
-  "exclude": ["dist"],
+  "include": [
+    "src"
+  ],
+  "exclude": [
+    "dist"
+  ],
   "references": [
     {
       "path": "../eslint-config-base"

@@ -6,13 +6,5 @@
     "baseUrl": "."
   },
   "include": ["src", "vitest.config.ts"],
-  "exclude": ["node_modules", "dist"],
-  "references": [
-    {
-      "path": "../../config/vitest-config-node"
-    },
-    {
-      "path": "../../config/eslint-config-cli"
-    }
-  ]
+  "exclude": ["node_modules", "dist"]
 }

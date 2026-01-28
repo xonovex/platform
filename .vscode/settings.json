@@ -34,6 +34,8 @@
     "strings": "on"
   },
   "diffEditor.renderSideBySide": true,
+  /* Moonrep */
+  "moon.binPath": "node_modules/.bin/moon",
   /* Excludes */
   "files.exclude": {
     /* NodeJS */

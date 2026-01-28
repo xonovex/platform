@@ -5,19 +5,24 @@
     "rootDir": ".",
     "baseUrl": ".",
     "paths": {
-      "@xonovex/core": ["../../lib/core/src/index.ts"],
-      "@xonovex/core/*": ["../../lib/core/src/*"]
+      "@xonovex/core": [
+        "../../lib/core/src/index.ts"
+      ],
+      "@xonovex/core/*": [
+        "../../lib/core/src/*"
+      ]
     }
   },
-  "include": ["src", "test", "vitest.config.ts"],
-  "exclude": ["node_modules", "dist"],
+  "include": [
+    "src",
+    "test",
+    "vitest.config.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ],
   "references": [
-    {
-      "path": "../../config/vitest-config-node"
-    },
-    {
-      "path": "../../config/eslint-config-cli"
-    },
     {
       "path": "../../lib/core"
     }

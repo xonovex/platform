@@ -1,152 +1,76 @@
 $schema: https://moonrepo.dev/schemas/project.json
+language: go
+layer: library
+tags:
+  - go
+  - typescript
+  - npm
+  - cli
+dependsOn:
+  - core-go
+  - eslint-config-cli
+  - ts-config-cli
+  - agent-cli-go-darwin-arm64
+  - agent-cli-go-darwin-x64
+  - agent-cli-go-linux-arm64
+  - agent-cli-go-linux-x64
+  - agent-cli-go-win32-x64
 tasks:
-  go-build:
-    deps:
-    - ^:go-build
-    command:
-    - go
-    - build
-    - ./...
-    inputs:
-    - '**/*.go'
-    - go.mod
-    - go.sum
-    outputs: []
-    options:
-      cache: true
-  go-test:
-    command:
-    - go
-    - test
-    - -v
-    - ./...
-    deps:
-    - ^:go-build
-    inputs:
-    - '**/*.go'
-    - go.mod
-    - go.sum
-    outputs: []
-    options:
-      cache: true
-  go-lint:
-    command:
-    - golangci-lint
-    - run
-    - ./...
-    inputs:
-    - '**/*.go'
-    - .golangci.yml
-    outputs: []
-    options:
-      cache: false
-  go-typecheck:
-    command:
-    - go
-    - vet
-    - ./...
-    deps:
-    - ^:go-build
-    inputs:
-    - '**/*.go'
-    - go.mod
-    - go.sum
-    outputs: []
-    options:
-      cache: true
+  # Override build to add config deps
   build:
     script: npx tsc
     deps:
-    - eslint-config-cli:build
-    - ts-config-cli:build
+      - eslint-config-cli:build
+      - ts-config-cli:build
     inputs:
-    - src/**/*.ts
-    - tsconfig.json
+      - src/**/*.ts
+      - tsconfig.json
     outputs:
-    - dist
-    options:
-      cache: true
+      - dist
+  # Override lint to add config dep
   lint:
     script: npx eslint src
     deps:
-    - eslint-config-cli:build
+      - eslint-config-cli:build
     inputs:
-    - src/**/*.ts
-    - eslint.config.*
-    outputs: []
-    options:
-      cache: true
-  typecheck:
-    script: npx tsc --noEmit
-    deps:
-    - ts-config-cli:build
-    inputs:
-    - src/**/*.ts
-    - tsconfig.json
-    outputs: []
-    options:
-      cache: true
-  ci-prepare:
-    command: echo 'ci-prepare complete'
-    deps:
-    - go-build
-    - go-test
-    - go-lint
-    - go-typecheck
-    - build
-    - lint
-    - typecheck
+      - src/**/*.ts
+  # No TypeScript tests in this package (Go tests via go-test)
+  test:
+    script: echo 'no TypeScript tests'
     options:
       cache: false
+  # Aggregate ci-prepare for both Go and TS
+  ci-prepare:
+    script: echo 'ci-prepare complete'
+    deps:
+      - go-build
+      - go-test
+      - go-lint
+      - go-typecheck
+      - build
+      - lint
+      - typecheck
+    options:
+      cache: false
+  # Override npm-publish to depend on platform packages
   npm-publish:
     command:
-    - npm
-    - publish
-    - --provenance
-    - --access
-    - public
+      - npm
+      - publish
+      - --provenance
+      - --access
+      - public
     deps:
-    - build
-    - ^:npm-publish
+      - build
+      - ^:npm-publish
     options:
-      runInCI: false
       cache: false
-  npm-publish-dry-run:
-    command:
-    - npm
-    - pack
-    - --dry-run
-    deps:
-    - build
-    options:
       runInCI: false
-      cache: false
   ci-publish:
-    command: echo 'ci-publish complete'
+    script: echo 'ci-publish complete'
     deps:
-    - npm-publish
-    - agent-cli-go-github:ci-publish
+      - npm-publish
+      - agent-cli-go-github:ci-publish
     options:
-      runInCI: false
       cache: false
-  ci-publish-dry-run:
-    command: echo 'ci-publish-dry-run complete'
-    deps:
-    - npm-publish-dry-run
-    options:
       runInCI: false
-      cache: false
-language: go
-dependsOn:
-- core-go
-- eslint-config-cli
-- ts-config-cli
-- agent-cli-go-darwin-arm64
-- agent-cli-go-darwin-x64
-- agent-cli-go-linux-arm64
-- agent-cli-go-linux-x64
-- agent-cli-go-win32-x64
-tags:
-- go
-- cli
-layer: library

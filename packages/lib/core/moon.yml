@@ -2,13 +2,13 @@ $schema: https://moonrepo.dev/schemas/project.json
 tasks:
   build:
     deps:
-    - ^:build
-    - vitest-config-node:build
-    - eslint-config-cli:build
-    - ts-config-cli:build
+      - ^:build
+      - vitest-config-node:build
+      - eslint-config-cli:build
+      - ts-config-cli:build
 language: typescript
 dependsOn: []
 tags:
-- scripts
-- typescript
+  - scripts
+  - typescript
 layer: library
