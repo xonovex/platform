@@ -17,17 +17,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: actions/cache@v4
-        with:
-          path: /nix
-          key: nix-${{ runner.os }}-${{ hashFiles('flake.lock') }}
-          restore-keys: |
-            nix-${{ runner.os }}-
-
-      - uses: nixbuild/nix-quick-install-action@v34
-        with:
-          nix_conf: |
-            build-users-group =
+      - uses: ./.github/actions/setup-nix
 
       - uses: changesets/action@v1
         with:

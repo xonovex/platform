@@ -20,35 +20,11 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: actions/cache@v4
+      - uses: ./.github/actions/setup-nix
         with:
-          path: /nix
-          key: nix-${{ runner.os }}-${{ hashFiles('flake.lock') }}
-          restore-keys: |
-            nix-${{ runner.os }}-
+          cache-workspace: true
 
-      - uses: nixbuild/nix-quick-install-action@v34
-        with:
-          nix_conf: |
-            build-users-group =
-
-      - uses: actions/cache@v4
-        with:
-          path: |
-            .moon/cache
-            node_modules
-          key: npm-moon-${{ runner.os }}-${{ hashFiles('package-lock.json', '.moon/**/*.yml') }}
-          restore-keys: |
-            npm-moon-${{ runner.os }}-
-
-      - uses: actions/cache@v4
-        with:
-          path: ~/go/pkg/mod
-          key: go-mod-${{ runner.os }}-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            go-mod-${{ runner.os }}-
-
-      - run: nix develop --command bash -c "npm install && npx moon ci :build :test :lint :typecheck :go-build :go-test :go-lint :go-typecheck"
+      - run: nix develop --command bash -c "npm ci && npx moon ci :ci-prepare"
 
       - uses: appthrust/moon-ci-retrospect@v1
         if: success() || failure()
@@ -64,16 +40,6 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - uses: actions/cache@v4
-        with:
-          path: /nix
-          key: nix-${{ runner.os }}-${{ hashFiles('flake.lock') }}
-          restore-keys: |
-            nix-${{ runner.os }}-
-
-      - uses: nixbuild/nix-quick-install-action@v34
-        with:
-          nix_conf: |
-            build-users-group =
+      - uses: ./.github/actions/setup-nix
 
       - run: nix develop --command npx changeset status --since=origin/main

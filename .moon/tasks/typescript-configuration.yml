@@ -80,6 +80,14 @@ tasks:
     outputs: []
     options:
       cache: false
+  ci-prepare:
+    command: echo 'ci-prepare complete'
+    deps:
+    - build
+    - lint
+    - typecheck
+    options:
+      cache: false
   npm-publish:
     command:
     - npm
@@ -90,7 +98,6 @@ tasks:
     deps:
     - build
     options:
-      runInCI: false
       cache: false
   npm-publish-dry-run:
     command:
@@ -98,21 +105,18 @@ tasks:
     - pack
     - --dry-run
     options:
-      runInCI: false
       cache: false
   ci-publish:
     command: echo 'ci-publish complete'
     deps:
     - npm-publish
     options:
-      runInCI: false
       cache: false
   ci-publish-dry-run:
     command: echo 'ci-publish-dry-run complete'
     deps:
     - npm-publish-dry-run
     options:
-      runInCI: false
       cache: false
   fmt-check:
     command:
