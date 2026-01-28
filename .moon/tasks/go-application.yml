@@ -4,10 +4,7 @@ tasks:
   go-build:
     deps:
     - ^:go-build
-    command:
-    - bash
-    - -c
-    - go build -o dist/$(basename $(pwd)) ./cmd/...
+    script: go build -o dist/$(basename $(pwd)) ./cmd/...
     inputs:
     - '@globs(sources)'
     - go.mod
@@ -17,10 +14,7 @@ tasks:
     options:
       cache: true
   go-run:
-    command:
-    - bash
-    - -c
-    - ./dist/$(basename $(pwd))
+    script: ./dist/$(basename $(pwd))
     deps:
     - go-build
     options:

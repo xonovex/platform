@@ -28,7 +28,9 @@
   "dependencies": {
     "@ianvs/prettier-plugin-sort-imports": "4.7.0",
     "prettier-plugin-astro": "0.14.1",
-    "prettier-plugin-tailwindcss": "0.7.2"
+    "prettier-plugin-tailwindcss": "0.7.2",
+    "@xonovex/eslint-config-base": "^0.1.12",
+    "@xonovex/ts-config-build": "^0.1.12"
   },
   "devDependencies": {
     "@xonovex/eslint-config-base": "0.1.12",

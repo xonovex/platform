@@ -41,7 +41,9 @@
     }
   },
   "dependencies": {
-    "@xonovex/vitest-config-base": "0.1.12"
+    "@xonovex/vitest-config-base": "0.1.12",
+    "@xonovex/eslint-config-base": "^0.1.12",
+    "@xonovex/ts-config-build": "^0.1.12"
   },
   "devDependencies": {
     "@xonovex/ts-config-build": "0.1.12",

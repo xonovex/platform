@@ -1,8 +1,17 @@
 $schema: https://moonrepo.dev/schemas/project.json
 id: agent-cli-go-darwin-x64
+language: go
+layer: library
+tags:
+- npm
+env:
+  GOOS: darwin
+  GOARCH: amd64
+  CGO_ENABLED: '0'
+  BIN_EXT: ''
 tasks:
   go-build:
-    script: bash -c 'mkdir -p bin && cd $workspaceRoot/packages/cli/agent-cli-go && go build -ldflags="-s -w" -o "$projectRoot/bin/agent-cli-go${BIN_EXT}" ./cmd/agent-cli'
+    script: mkdir -p bin && cd $workspaceRoot/packages/cli/agent-cli-go && go build -ldflags="-s -w" -o "$projectRoot/bin/agent-cli-go${BIN_EXT}" ./cmd/agent-cli
     inputs: []
     outputs:
     - bin/
@@ -25,36 +34,5 @@ tasks:
     deps:
     - go-build
     options:
-      runInCI: false
       cache: false
-  npm-publish-dry-run:
-    command:
-    - npm
-    - pack
-    - --dry-run
-    deps:
-    - go-build
-    options:
       runInCI: false
-      cache: false
-  ci-publish:
-    command: echo 'ci-publish complete'
-    deps:
-    - npm-publish
-    options:
-      runInCI: false
-      cache: false
-  ci-publish-dry-run:
-    command: echo 'ci-publish-dry-run complete'
-    deps:
-    - npm-publish-dry-run
-    options:
-      runInCI: false
-      cache: false
-language: go
-env:
-  GOOS: darwin
-  GOARCH: amd64
-  CGO_ENABLED: '0'
-  BIN_EXT: ''
-layer: library

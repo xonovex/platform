@@ -1,9 +1,9 @@
 #!/usr/bin/env node
-import { spawn } from "node:child_process";
-import { arch, platform } from "node:os";
-import { dirname, join } from "node:path";
-import { existsSync } from "node:fs";
-import { createRequire } from "node:module";
+import {spawn} from "node:child_process";
+import {existsSync} from "node:fs";
+import {createRequire} from "node:module";
+import {arch, platform} from "node:os";
+import {dirname, join} from "node:path";
 
 const require = createRequire(import.meta.url);
 
@@ -32,7 +32,8 @@ const findBinary = (): string => {
     process.exit(1);
   }
 
-  const binaryName = platform() === "win32" ? "agent-cli-go.exe" : "agent-cli-go";
+  const binaryName =
+    platform() === "win32" ? "agent-cli-go.exe" : "agent-cli-go";
 
   try {
     const packageJsonPath = require.resolve(`${packageName}/package.json`);
@@ -45,7 +46,9 @@ const findBinary = (): string => {
     // Package not found
   }
 
-  console.error(`Binary not found. Install with: npm install -g @xonovex/agent-cli-go`);
+  console.error(
+    `Binary not found. Install with: npm install -g @xonovex/agent-cli-go`,
+  );
   process.exit(1);
 };
 
