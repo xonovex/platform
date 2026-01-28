@@ -37,6 +37,11 @@
   },
   "dependencies": {
     "@xonovex/eslint-config-cli": "^0.1.12",
-    "@xonovex/ts-config-cli": "^0.1.12"
+    "@xonovex/ts-config-cli": "^0.1.12",
+    "@xonovex/agent-cli-go-darwin-arm64": "^0.1.13",
+    "@xonovex/agent-cli-go-darwin-x64": "^0.1.13",
+    "@xonovex/agent-cli-go-linux-arm64": "^0.1.13",
+    "@xonovex/agent-cli-go-linux-x64": "^0.1.13",
+    "@xonovex/agent-cli-go-win32-x64": "^0.1.13"
   }
 }
