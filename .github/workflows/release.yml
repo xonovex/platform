@@ -36,17 +36,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: actions/cache@v4
-        with:
-          path: /nix
-          key: nix-${{ runner.os }}-${{ hashFiles('flake.lock') }}
-          restore-keys: |
-            nix-${{ runner.os }}-
-
-      - uses: nixbuild/nix-quick-install-action@v34
-        with:
-          nix_conf: |
-            build-users-group =
+      - uses: ./.github/actions/setup-nix
 
       - name: Install dependencies
         run: nix develop --command npm ci
@@ -102,35 +92,14 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: actions/cache@v4
+      - uses: ./.github/actions/setup-nix
         with:
-          path: /nix
-          key: nix-${{ runner.os }}-${{ hashFiles('flake.lock') }}
-          restore-keys: |
-            nix-${{ runner.os }}-
+          cache-workspace: true
 
-      - uses: nixbuild/nix-quick-install-action@v34
-        with:
-          nix_conf: |
-            build-users-group =
-
-      - uses: actions/cache@v4
-        with:
-          path: |
-            .moon/cache
-            node_modules
-          key: npm-moon-${{ runner.os }}-${{ hashFiles('package-lock.json', '.moon/**/*.yml') }}
-          restore-keys: |
-            npm-moon-${{ runner.os }}-
-
-      - uses: actions/cache@v4
-        with:
-          path: ~/go/pkg/mod
-          key: go-mod-${{ runner.os }}-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            go-mod-${{ runner.os }}-
-
-      - run: nix develop --command bash -c "npm install && npx moon ci :build :test :lint :typecheck :go-build :go-test :go-lint :go-typecheck"
+      - name: Validate changed packages
+        run: |
+          TARGETS=$(echo '${{ needs.detect.outputs.changed_projects }}' | jq -r '.[] | . + ":ci-prepare"' | tr '\n' ' ')
+          nix develop --command bash -c "npm ci && npx moon ci $TARGETS"
 
       - uses: appthrust/moon-ci-retrospect@v1
         if: success() || failure()
@@ -152,23 +121,13 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: actions/cache@v4
+      - uses: ./.github/actions/setup-nix
         with:
-          path: /nix
-          key: nix-${{ runner.os }}-${{ hashFiles('flake.lock') }}
-          restore-keys: |
-            nix-${{ runner.os }}-
-
-      - uses: nixbuild/nix-quick-install-action@v34
-        with:
-          nix_conf: |
-            build-users-group =
+          cache-workspace: true
 
       - uses: actions/setup-node@v6
         with:
           registry-url: "https://registry.npmjs.org"
-
-      - run: nix develop --command npm ci
 
       - name: Publish changed packages
         if: needs.detect.outputs.dry_run != 'true'
@@ -176,24 +135,14 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          PROJECTS='${{ needs.detect.outputs.changed_projects }}'
-
-          for project in $(echo "$PROJECTS" | jq -r '.[]'); do
-            echo "::group::Publishing $project"
-            nix develop --command npx moon run "$project:ci-publish"
-            echo "::endgroup::"
-          done
+          TARGETS=$(echo '${{ needs.detect.outputs.changed_projects }}' | jq -r '.[] | . + ":ci-publish"' | tr '\n' ' ')
+          nix develop --command bash -c "npm ci && npx moon ci $TARGETS"
 
       - name: Dry run
         if: needs.detect.outputs.dry_run == 'true'
         run: |
-          PROJECTS='${{ needs.detect.outputs.changed_projects }}'
-
-          for project in $(echo "$PROJECTS" | jq -r '.[]'); do
-            echo "::group::Dry run $project"
-            nix develop --command npx moon run "$project:ci-publish-dry-run"
-            echo "::endgroup::"
-          done
+          TARGETS=$(echo '${{ needs.detect.outputs.changed_projects }}' | jq -r '.[] | . + ":ci-publish-dry-run"' | tr '\n' ' ')
+          nix develop --command bash -c "npm ci && npx moon ci $TARGETS"
 
       - uses: appthrust/moon-ci-retrospect@v1
         if: success() || failure()
