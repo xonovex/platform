@@ -8,6 +8,10 @@ fileGroups:
   - .prettierrc*
   - package.json
 tasks:
+  test:
+    script: echo 'no tests for config package'
+    options:
+      cache: false
   clean:
     script: rm -rf dist
     options:
