@@ -1,26 +1,26 @@
 $schema: https://moonrepo.dev/schemas/project.json
 language: other
 tags:
-- tenant-shared
-- tsconfig
+  - tenant-shared
+  - tsconfig
 fileGroups:
   sources:
-  - src/**/*
+    - src/**/*
   tests:
-  - src/**/*.test.*
-  - src/**/*.spec.*
-  - test/**/*
+    - src/**/*.test.*
+    - src/**/*.spec.*
+    - test/**/*
   configs:
-  - '*.config.*'
-  - tsconfig*.json
-  - .eslintrc*
-  - .prettierrc*
-  - package.json
+    - "*.config.*"
+    - tsconfig*.json
+    - .eslintrc*
+    - .prettierrc*
+    - package.json
 tasks:
   build:
     inputs:
-    - '@globs(sources)'
-    - '@globs(configs)'
+      - "@globs(sources)"
+      - "@globs(configs)"
     outputs: []
     options:
       cache: true
