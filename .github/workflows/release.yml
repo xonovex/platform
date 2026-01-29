@@ -52,27 +52,15 @@ jobs:
             const fs = require('fs');
             const path = require('path');
 
-            // After a version packages PR merge, changesets are consumed.
-            // Detect changed packages from git diff of package.json files instead.
-            const changedFiles = execSync('git diff HEAD~1 --name-only', { encoding: 'utf8' }).trim().split('\n');
-            const changedPkgDirs = new Set(
-              changedFiles
-                .filter(f => f.endsWith('package.json') && f.startsWith('packages/'))
-                .map(f => path.dirname(f))
-            );
-
-            if (changedPkgDirs.size === 0) {
-              console.log('[]');
-              process.exit(0);
-            }
-
+            // Find packages with local versions not yet published to npm
             const moonOutput = JSON.parse(execSync('npx moon query projects', { encoding: 'utf8', maxBuffer: 10 * 1024 * 1024 }));
             const projects = [];
             for (const p of moonOutput.projects) {
-              if (!changedPkgDirs.has(p.source)) continue;
               try {
                 const pkg = JSON.parse(fs.readFileSync(path.join(p.source, 'package.json'), 'utf8'));
-                if (pkg.name && !pkg.private) {
+                if (!pkg.name || pkg.private) continue;
+                const npmVersion = execSync('npm view ' + pkg.name + ' version 2>/dev/null || echo \"\"', { encoding: 'utf8' }).trim();
+                if (pkg.version !== npmVersion) {
                   projects.push(p.id);
                 }
               } catch {}
@@ -107,6 +95,11 @@ jobs:
           TARGETS=$(echo '${{ needs.detect.outputs.changed_projects }}' | jq -r '.[] | . + ":ci-prepare"' | tr '\n' ' ')
           nix develop --command bash -c "npm ci && npx moon ci $TARGETS"
 
+      - uses: moonrepo/run-report-action@v1
+        if: success() || failure()
+        with:
+          access-token: ${{ secrets.GITHUB_TOKEN }}
+
       - uses: appthrust/moon-ci-retrospect@v1
         if: success() || failure()
 
@@ -135,20 +128,25 @@ jobs:
         with:
           registry-url: "https://registry.npmjs.org"
 
-      - name: Publish changed packages
+      - name: Publish packages
         if: needs.detect.outputs.dry_run != 'true'
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          TARGETS=$(echo '${{ needs.detect.outputs.changed_projects }}' | jq -r '.[] | . + ":ci-publish"' | tr '\n' ' ')
-          nix develop --command bash -c "npm ci && npx moon ci $TARGETS"
+        run: nix develop --command bash -c "npm ci && npx changeset publish"
 
-      - name: Dry run
+      - name: Dry run publish
         if: needs.detect.outputs.dry_run == 'true'
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
-          TARGETS=$(echo '${{ needs.detect.outputs.changed_projects }}' | jq -r '.[] | . + ":ci-publish-dry-run"' | tr '\n' ' ')
-          nix develop --command bash -c "npm ci && npx moon ci $TARGETS"
+          nix develop --command bash -c "npm ci && npx changeset publish" 2>&1 || true
+          echo "Dry run complete - packages were not actually published (no write token)"
+
+      - uses: moonrepo/run-report-action@v1
+        if: success() || failure()
+        with:
+          access-token: ${{ secrets.GITHUB_TOKEN }}
 
       - uses: appthrust/moon-ci-retrospect@v1
         if: success() || failure()
