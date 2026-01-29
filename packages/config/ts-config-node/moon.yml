@@ -3,24 +3,24 @@ tasks:
   build:
     outputs: []
     deps:
-    - ts-config-base:build
-    - ^:build
+      - ts-config-base:build
+      - ^:build
 language: other
 tags:
-- tenant-shared
-- tsconfig
+  - tenant-shared
+  - tsconfig
 dependsOn: []
 fileGroups:
   sources:
-  - src/**/*
+    - src/**/*
   tests:
-  - src/**/*.test.*
-  - src/**/*.spec.*
-  - test/**/*
+    - src/**/*.test.*
+    - src/**/*.spec.*
+    - test/**/*
   configs:
-  - '*.config.*'
-  - tsconfig*.json
-  - .eslintrc*
-  - .prettierrc*
-  - package.json
+    - "*.config.*"
+    - tsconfig*.json
+    - .eslintrc*
+    - .prettierrc*
+    - package.json
 layer: configuration
