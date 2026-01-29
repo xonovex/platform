@@ -43,11 +43,11 @@
   "dependencies": {
     "@xonovex/eslint-config-base": "0.1.12",
     "globals": "17.1.0",
-    "@xonovex/ts-config-build": "^0.1.12"
+    "@xonovex/ts-config-build": "^0.1.13"
   },
   "devDependencies": {
     "@xonovex/eslint-config-base": "0.1.12",
-    "@xonovex/ts-config-build": "0.1.12",
+    "@xonovex/ts-config-build": "0.1.13",
     "@types/node": "^25.0.10"
   },
   "scripts": {
