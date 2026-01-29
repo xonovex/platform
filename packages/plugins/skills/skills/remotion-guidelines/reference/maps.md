@@ -5,11 +5,12 @@
 **Rationale:** Mapbox animations conflict with frame-by-frame rendering; Remotion frame control ensures deterministic animation.
 
 **Example:**
+
 ```tsx
 const _map = new Map({
   container: ref.current!,
-  interactive: false,  // CRITICAL
-  fadeDuration: 0,     // CRITICAL
+  interactive: false, // CRITICAL
+  fadeDuration: 0, // CRITICAL
   zoom: 11.53,
   center: [6.5615, 46.0598],
 });
@@ -17,6 +18,7 @@ const _map = new Map({
 ```
 
 **Techniques:**
+
 - Map config: interactive: false, fadeDuration: 0 disable Mapbox animations
 - delayRender/continueRender: Wait for map.load and camera.idle events
 - turf.js: Route distance, lineSliceAlong for curved animation

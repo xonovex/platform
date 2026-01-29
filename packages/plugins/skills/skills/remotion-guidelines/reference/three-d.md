@@ -5,6 +5,7 @@
 **Rationale:** useFrame() updates real-time, not frame-perfect; Remotion requires frame-based deterministic animation.
 
 **Example:**
+
 ```tsx
 import {ThreeCanvas} from "@remotion/three";
 import {useCurrentFrame, useVideoConfig} from "remotion";
@@ -23,6 +24,7 @@ function RotatingCube() {
 ```
 
 **Techniques:**
+
 - ThreeCanvas: Remotion-specific wrapper (not R3F Canvas)
 - useCurrentFrame() + fps: Calculate frame-based transforms (rotation, position)
 - interpolate(): Linear motion and camera movement

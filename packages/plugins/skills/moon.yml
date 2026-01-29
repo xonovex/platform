@@ -1,0 +1,45 @@
+$schema: https://moonrepo.dev/schemas/project.json
+language: other
+layer: application
+tags:
+  - npm
+  - tenant-shared
+fileGroups:
+  sources:
+    - skills/**/*
+    - commands/**/*
+    - .claude-plugin/**/*
+  configs:
+    - "*.config.*"
+    - package.json
+tasks:
+  fmt:
+    command:
+      - npm
+      - run
+      - fmt
+    inputs:
+      - "@globs(sources)"
+      - "@globs(configs)"
+      - "*.json"
+      - "*.md"
+    outputs: []
+    options:
+      cache: false
+      runInCI: false
+  fmt-check:
+    command:
+      - npm
+      - run
+      - fmt:check
+    inputs:
+      - "@globs(sources)"
+      - "@globs(configs)"
+      - "*.json"
+      - "*.md"
+    outputs: []
+  ci-prepare:
+    command: echo 'ci-prepare complete'
+    deps: [fmt-check]
+    options:
+      cache: false

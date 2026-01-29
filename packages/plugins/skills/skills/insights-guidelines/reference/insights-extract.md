@@ -24,6 +24,7 @@ applied: false
 ```
 
 **Techniques:**
+
 - Review session for development errors and corrections made
 - Extract patterns applicable beyond current task
 - Create insight file with frontmatter: category, topic, applies_to, created, applied

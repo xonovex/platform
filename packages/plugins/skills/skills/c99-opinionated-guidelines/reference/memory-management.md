@@ -28,6 +28,7 @@ void dynamic_array(size_t size) {
 ```
 
 **Techniques:**
+
 - Default stack: Use stack allocation for fixed-size data by default
 - Heap when needed: Use malloc/calloc only for dynamic or longer-lived data
 - Malloc/free pairing: Always pair every malloc with corresponding free call

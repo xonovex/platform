@@ -50,6 +50,7 @@ app.use(
 ```
 
 **Techniques:**
+
 - Import `bodyLimit` from `hono/body-limit` and set appropriate `maxSize` in bytes
 - Apply globally with app.use() or per-route for flexibility
 - Configure different limits for different endpoints (100KB default, 10MB for uploads)

@@ -7,21 +7,21 @@
 **Example:**
 
 ```tsx
-import { useActionState, useOptimistic, use, Suspense } from 'react';
-import { useFormStatus } from 'react-dom';
+import {Suspense, use, useActionState, useOptimistic} from "react";
+import {useFormStatus} from "react-dom";
 
 // useActionState - form state with async actions
 function ContactForm() {
   const [state, formAction, isPending] = useActionState(
     async (prevState, formData) => {
       const result = await submitForm({
-        email: formData.get('email'),
-        message: formData.get('message'),
+        email: formData.get("email"),
+        message: formData.get("message"),
       });
-      if (result.error) return { error: result.error };
-      return { success: true };
+      if (result.error) return {error: result.error};
+      return {success: true};
     },
-    null
+    null,
   );
 
   return (
@@ -36,19 +36,19 @@ function ContactForm() {
 
 // useFormStatus - reads parent form state (must be inside form)
 function SubmitButton() {
-  const { pending } = useFormStatus();
+  const {pending} = useFormStatus();
   return (
     <button type="submit" disabled={pending}>
-      {pending ? 'Sending...' : 'Send'}
+      {pending ? "Sending..." : "Send"}
     </button>
   );
 }
 
 // useOptimistic - instant feedback, reverts on error
-function LikeButton({ postId, likes }: { postId: string; likes: number }) {
+function LikeButton({postId, likes}: {postId: string; likes: number}) {
   const [optimisticLikes, addOptimistic] = useOptimistic(
     likes,
-    (current, delta: number) => current + delta
+    (current, delta: number) => current + delta,
   );
 
   async function handleLike() {
@@ -64,20 +64,20 @@ function LikeButton({ postId, likes }: { postId: string; likes: number }) {
 }
 
 // use() - read promises (suspends until resolved)
-function Comments({ commentsPromise }: { commentsPromise: Promise<Comment[]> }) {
+function Comments({commentsPromise}: {commentsPromise: Promise<Comment[]>}) {
   const comments = use(commentsPromise);
-  return comments.map(c => <p key={c.id}>{c.text}</p>);
+  return comments.map((c) => <p key={c.id}>{c.text}</p>);
 }
 
 // use() - conditional context (not possible with useContext)
-function ThemedContent({ showTheme }: { showTheme: boolean }) {
+function ThemedContent({showTheme}: {showTheme: boolean}) {
   if (!showTheme) return <div>Plain</div>;
   const theme = use(ThemeContext); // can be called conditionally!
   return <div className={theme}>Themed</div>;
 }
 
 // Parent creates promise, child reads it
-function Page({ postId }: { postId: string }) {
+function Page({postId}: {postId: string}) {
   const commentsPromise = fetchComments(postId);
   return (
     <Suspense fallback={<Skeleton />}>
@@ -88,6 +88,7 @@ function Page({ postId }: { postId: string }) {
 ```
 
 **Techniques:**
+
 - Use `useActionState` for form state with async actions (replaces manual loading/error state)
 - Use `useOptimistic` for instant UI feedback that reverts on error
 - Use `use()` to read promises (suspends) or context (can be conditional)

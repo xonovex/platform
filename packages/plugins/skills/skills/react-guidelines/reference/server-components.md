@@ -7,10 +7,13 @@
 **Example:**
 
 ```tsx
+import {useActionState} from "react";
+import {createPost} from "./actions";
+
 // Server Component (default) - no directive needed
-async function ProductPage({ params }: { params: { id: string } }) {
+async function ProductPage({params}: {params: {id: string}}) {
   const product = await db.products.find(params.id);
-  const reviews = await db.reviews.findMany({ productId: params.id });
+  const reviews = await db.reviews.findMany({productId: params.id});
 
   return (
     <main>
@@ -23,44 +26,40 @@ async function ProductPage({ params }: { params: { id: string } }) {
 }
 
 // Client Component - needs directive for interactivity
-'use client';
+("use client");
 
-function AddToCartButton({ productId }: { productId: string }) {
+function AddToCartButton({productId}: {productId: string}) {
   const [isPending, startTransition] = useTransition();
 
   return (
     <button
       onClick={() => startTransition(() => addToCart(productId))}
-      disabled={isPending}
-    >
-      {isPending ? 'Adding...' : 'Add to Cart'}
+      disabled={isPending}>
+      {isPending ? "Adding..." : "Add to Cart"}
     </button>
   );
 }
 
 // Server Action - separate file recommended
 // actions.ts
-'use server';
+("use server");
 
 export async function createPost(prevState: any, formData: FormData) {
-  const title = formData.get('title') as string;
-  if (!title) return { error: 'Title required' };
+  const title = formData.get("title") as string;
+  if (!title) return {error: "Title required"};
 
-  await db.posts.create({ title });
-  revalidatePath('/posts');
-  return { success: true };
+  await db.posts.create({title});
+  revalidatePath("/posts");
+  return {success: true};
 }
 
 export async function deletePost(id: string) {
   await db.posts.delete(id);
-  revalidatePath('/posts');
+  revalidatePath("/posts");
 }
 
 // Using Server Actions in Client Component
-'use client';
-
-import { createPost } from './actions';
-import { useActionState } from 'react';
+("use client");
 
 function NewPostForm() {
   const [state, formAction, isPending] = useActionState(createPost, null);
@@ -77,9 +76,9 @@ function NewPostForm() {
 // Inline Server Action in Server Component
 async function QuickForm() {
   async function handleSubmit(formData: FormData) {
-    'use server';
-    await db.items.create({ name: formData.get('name') });
-    revalidatePath('/items');
+    "use server";
+    await db.items.create({name: formData.get("name")});
+    revalidatePath("/items");
   }
 
   return (
@@ -92,6 +91,7 @@ async function QuickForm() {
 ```
 
 **Techniques:**
+
 - No directive = Server Component (default); can be `async`, access db/fs directly
 - Add `'use client'` only for useState, useEffect, onClick, browser APIs
 - Use `'use server'` for Server Actions (mutations callable from client)

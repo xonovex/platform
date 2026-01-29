@@ -42,6 +42,7 @@ error_t load_file(const char *path, char **out, size_t *len) {
 ```
 
 **Techniques:**
+
 - Error enums: Define descriptive error types with zero for success
 - Output parameters: Use pointers to return multiple results alongside error codes
 - Error checking: Always check return values immediately after function calls

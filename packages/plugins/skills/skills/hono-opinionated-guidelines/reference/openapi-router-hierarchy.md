@@ -55,6 +55,7 @@ itemsRouter.openapi(listItemsRoute, (c) => {
 ```
 
 **Techniques:**
+
 - Import `OpenAPIHono` from `@hono/zod-openapi`
 - Use `OpenAPIHono` for root application router
 - Use `OpenAPIHono` for all intermediate routers (version routers, feature groupings)

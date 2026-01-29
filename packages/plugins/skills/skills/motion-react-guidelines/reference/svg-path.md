@@ -5,6 +5,7 @@
 **Rationale:** Motion's `pathLength` auto-calculates stroke-dash math; simpler than manual `strokeDasharray`/`strokeDashoffset`.
 
 **Example:**
+
 ```tsx
 function DrawingIcon() {
   return (
@@ -24,6 +25,7 @@ function DrawingIcon() {
 ```
 
 **Techniques:**
+
 - Path animation: `initial={{pathLength: 0}}` → `animate={{pathLength: 1}}`; 0-1 range
 - Staggered paths: Use `variants` + `custom` prop for per-path delays
 - Progress circles: `animate={{pathLength: progress}}` (0 to dynamic value)

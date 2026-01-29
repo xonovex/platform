@@ -16,6 +16,7 @@ test/
 ```
 
 **Techniques:**
+
 - Create `test/` directory at package root
 - Mirror API structure in test files (e.g., `test/api/users.test.ts`)
 - Use nested `describe` blocks for endpoint grouping

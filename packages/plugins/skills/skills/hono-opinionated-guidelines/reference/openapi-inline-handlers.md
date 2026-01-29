@@ -48,6 +48,7 @@ itemsRouter.openapi(listItemsRoute, (c) => {
 ```
 
 **Techniques:**
+
 - Define route using `createRoute()` with full request and response schemas
 - Register route with `router.openapi(route, (c) => {...})` with inline handler
 - Access validated data via `c.req.valid()` to get automatically typed request data

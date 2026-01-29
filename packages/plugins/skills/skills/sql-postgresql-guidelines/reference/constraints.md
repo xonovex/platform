@@ -39,6 +39,7 @@ CREATE TABLE bookings (
 ```
 
 **Techniques:**
+
 - Use PRIMARY KEY for unique row identifiers
 - Use FOREIGN KEY with appropriate ON DELETE/UPDATE actions
 - Use UNIQUE for columns requiring uniqueness

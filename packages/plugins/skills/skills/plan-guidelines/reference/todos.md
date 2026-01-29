@@ -5,6 +5,7 @@
 **Rationale:** TODO comments accumulate and become difficult to track. Scanning and grouping by intent helps prioritize work, identify systemic issues, and convert notes into actionable plans.
 
 **Example:**
+
 ```
 Scan Results: 47 TODO comments found
 
@@ -29,6 +30,7 @@ Group 3: Deprecations (17 occurrences, 5 files)
 ```
 
 **Techniques:**
+
 - Scan directory recursively for TODO patterns (`TODO:`, `FIXME:`, `NOTE:`)
 - Extract unique TODO messages, normalized for whitespace consistency
 - Group TODOs by similarity: identical text, conceptual intent, file patterns

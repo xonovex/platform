@@ -5,31 +5,33 @@
 **Rationale:** Animations must load asynchronously. `delayRender()` pauses frame rendering until `continueRender()` is called after JSON loads.
 
 **Example:**
-```tsx
-import { Lottie, useVideoConfig } from '@remotion/lottie'
-import { delayRender, continueRender } from 'remotion'
 
-const handle = delayRender()
+```tsx
+import {Lottie, useVideoConfig} from "@remotion/lottie";
+import {continueRender, delayRender} from "remotion";
+
+const handle = delayRender();
 
 export const MyAnimation = () => {
-  const [animData, setAnimData] = useState<LottieAnimationData | null>(null)
-  const { fps } = useVideoConfig()
+  const [animData, setAnimData] = useState<LottieAnimationData | null>(null);
+  const {fps} = useVideoConfig();
 
   useEffect(() => {
-    fetch('https://lottiefiles.com/animations/123.json')
-      .then(r => r.json())
-      .then(data => {
-        setAnimData(data)
-        continueRender(handle)
+    fetch("https://lottiefiles.com/animations/123.json")
+      .then((r) => r.json())
+      .then((data) => {
+        setAnimData(data);
+        continueRender(handle);
       })
-      .catch(err => cancelRender(err))
-  }, [handle])
+      .catch((err) => cancelRender(err));
+  }, [handle]);
 
-  return animData ? <Lottie animationData={animData} /> : null
-}
+  return animData ? <Lottie animationData={animData} /> : null;
+};
 ```
 
 **Techniques:**
+
 - Install `@remotion/lottie` package before use
 - Call `delayRender()` to pause frame rendering while loading
 - Fetch animation JSON from remote (Lottie Files) or local with `staticFile()`

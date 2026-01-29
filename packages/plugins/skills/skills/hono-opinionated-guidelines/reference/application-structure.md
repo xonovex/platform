@@ -8,9 +8,13 @@
 
 ```typescript
 // src/app.ts - Main application factory
-import {Hono} from "hono";
+import {zValidator} from "@hono/zod-validator";
+// src/routes/v1/users.ts - Domain router
+import {Hono, Hono} from "hono";
 import {cors} from "hono/cors";
 import {logger} from "hono/logger";
+import * as controller from "../../controllers/users.controller.js";
+import {CreateUserSchema} from "../../schemas/users.js";
 import {v1Router} from "./routes/v1/index.js";
 import {v2Router} from "./routes/v2/index.js";
 
@@ -28,12 +32,6 @@ export function createApp() {
   return app;
 }
 
-// src/routes/v1/users.ts - Domain router
-import {Hono} from "hono";
-import {zValidator} from "@hono/zod-validator";
-import * as controller from "../../controllers/users.controller.js";
-import {CreateUserSchema} from "../../schemas/users.js";
-
 export const usersRouter = new Hono();
 
 usersRouter.post(
@@ -44,6 +42,7 @@ usersRouter.post(
 ```
 
 **Techniques:**
+
 - Create `createApp()` factory function instead of exporting instances
 - Configure global middleware inside the factory
 - Mount domain routers using `app.route()`

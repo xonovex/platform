@@ -20,6 +20,7 @@ src/
 ```
 
 **Techniques:**
+
 - routes/: Define route handlers with middleware chaining, avoid business logic
 - controllers/: Implement typed handlers with try-catch, call services
 - middleware/: Auth, validation, CORS, logging, error handling middleware

@@ -5,6 +5,7 @@
 **Rationale:** Understanding available templates before scaffolding ensures correct foundation. Reduces setup time and ensures consistency with established patterns.
 
 **Example:**
+
 ```
 Available templates in .templates/:
 1. api-typescript:
@@ -26,6 +27,7 @@ Recommendation: For new API → use api-typescript
 ```
 
 **Techniques:**
+
 - Discover templates in monorepo (usually in `templates/`, `.templates/`, or `_templates/`)
 - List template types: website, API, library, utility, service
 - Document features and capabilities for each template

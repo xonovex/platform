@@ -62,10 +62,10 @@ module "compute" {
 ```
 
 **Techniques:**
+
 - **Provider blocks:** Configure required providers with version constraints
 - **Default tags:** Use provider default_tags to apply common tags to all resources
 - **Thin root:** Root modules only compose child modules, no resource creation
 - **Module composition:** Wire module outputs as inputs to dependent modules
 - **Environment locals:** Compute availability zones and common tags once
 - **Relative sourcing:** Use ../../modules/ paths for portable module references
-

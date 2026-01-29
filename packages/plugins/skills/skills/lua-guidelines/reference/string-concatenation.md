@@ -25,6 +25,7 @@ local message = string.format("Player %s scored %d points", name, score)
 ```
 
 **Techniques:**
+
 - Build array of string parts
 - Use `table.concat(parts, separator)`
 - Use `string.format()` for simple interpolation

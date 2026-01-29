@@ -7,17 +7,18 @@
 **Example:**
 
 ```typescript
+// ✅ Good: Import directly from source
+import {getUserId, type JwtContext} from "@acme/shared-utils";
+
 // ❌ Bad: Re-export from shared packages
 // src/middlewares/jwt.ts
 export {getUserId, type JwtContext} from "@acme/shared-utils";
-
-// ✅ Good: Import directly from source
-import {getUserId, type JwtContext} from "@acme/shared-utils";
 
 // src/middlewares/jwt.ts - only local exports
 ```
 
 **Techniques:**
+
 - Identify files re-exporting from external/shared packages
 - Remove re-export statements from module exports
 - Update consuming code to import directly from source packages

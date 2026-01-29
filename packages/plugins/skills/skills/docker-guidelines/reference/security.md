@@ -20,6 +20,7 @@ VOLUME /tmp/app-cache
 ```
 
 **Techniques:**
+
 - Version pinning: Pin base image version including OS version for supply chain security
 - Non-root user: Create and use non-root USER to limit breach damage
 - Secret externalization: Never copy secrets into image; use environment or mounts

@@ -16,8 +16,9 @@ interface Props {
   variant?: "default" | "featured";
 }
 
-const { title, description, href, variant = "default" } = Astro.props;
+const {title, description, href, variant = "default"} = Astro.props;
 ---
+
 <div class={`card card--${variant}`}>
   <h3>{title}</h3>
   {description && <p>{description}</p>}
@@ -29,12 +30,20 @@ const { title, description, href, variant = "default" } = Astro.props;
   </div>
 </div>
 <style>
-  .card { border: 1px solid #ddd; padding: 1rem; border-radius: 8px; }
-  .card--featured { border-color: #0066cc; background: #f0f8ff; }
+  .card {
+    border: 1px solid #ddd;
+    padding: 1rem;
+    border-radius: 8px;
+  }
+  .card--featured {
+    border-color: #0066cc;
+    background: #f0f8ff;
+  }
 </style>
 ```
 
 **Techniques:**
+
 - Astro components: Create `.astro` components for static presentational UI
 - Props typing: Use TypeScript interfaces for type-safe component props
 - Slots composition: Leverage slots for flexible component composition

@@ -5,6 +5,7 @@
 **Rationale:** Perspective creates 3D depth; preserve-3d enables layering; motion values drive smooth tilt/flip without re-renders.
 
 **Example:**
+
 ```tsx
 function Card3D({children}: {children: React.ReactNode}) {
   const x = useMotionValue(0);
@@ -18,8 +19,7 @@ function Card3D({children}: {children: React.ReactNode}) {
       onMouseMove={(e) => {
         const rect = e.currentTarget.getBoundingClientRect();
         x.set((e.clientX - rect.left) / rect.width - 0.5);
-      }}
-    >
+      }}>
       {children}
     </motion.div>
   );
@@ -27,6 +27,7 @@ function Card3D({children}: {children: React.ReactNode}) {
 ```
 
 **Techniques:**
+
 - Parent perspective: `style={{perspective: 1000}}`; higher = less depth distortion
 - Flip cards: `animate={{rotateY: isFlipped ? 180 : 0}}`; use `backfaceVisibility: "hidden"`
 - 3D carousel: Position items with `rotateY(angle)` and `translateZ()` in transforms

@@ -43,6 +43,7 @@ void *aligned_alloc_16(size_t size) {
 ```
 
 **Techniques:**
+
 - SIMD alignment: Pad vec3 to 16-byte aligned structures for SIMD instructions
 - Compiler directives: Use `_Alignas(16)` for explicit struct field alignment
 - SoA layout: Align array-of-structures for batch SIMD operations

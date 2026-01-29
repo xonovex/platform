@@ -11,14 +11,18 @@
 import Counter from "../components/Counter.tsx";
 import SearchBar from "../components/SearchBar.tsx";
 ---
+
 <Layout title="Home">
   <h1>Static Content</h1>
-  <Counter client:visible />        <!-- Hydrate on viewport entry -->
-  <SearchBar client:load />         <!-- Hydrate immediately -->
+  <Counter client:visible />
+  <!-- Hydrate on viewport entry -->
+  <SearchBar client:load />
+  <!-- Hydrate immediately -->
 </Layout>
 ```
 
 **Techniques:**
+
 - Static by default: Build pages with Astro components that render zero JavaScript
 - Framework components: Import React, Vue, Svelte only for interactive features
 - client:load: Hydrate immediately for critical interactive components

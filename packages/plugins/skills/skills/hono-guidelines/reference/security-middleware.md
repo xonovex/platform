@@ -53,6 +53,7 @@ app.use(
 ```
 
 **Techniques:**
+
 - Import middleware from `hono/` subpaths (basicAuth, bearerAuth, csrf, secureHeaders, ipRestriction)
 - Apply security headers first in middleware chain to protect all routes
 - Use custom verifiers for dynamic authentication logic

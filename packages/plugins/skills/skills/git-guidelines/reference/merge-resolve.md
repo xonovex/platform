@@ -30,6 +30,7 @@ $ git commit -m "merge: resolve conflicts with feature branch"
 ```
 
 **Techniques:**
+
 - Detect conflicts via `git status --porcelain` (UU, AA, DD markers)
 - Classify as simple (auto-resolvable: imports, dependencies, additions) or complex (manual: functions, types, logic)
 - Auto-resolve imports by merging lists, dependencies by newer version, additions by including both

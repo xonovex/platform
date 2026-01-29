@@ -5,6 +5,7 @@
 **Rationale:** Spring transitions feel instantaneous and natural; duration-based easing delays feedback.
 
 **Example:**
+
 ```tsx
 <motion.button
   whileHover={{scale: 1.05}}
@@ -15,6 +16,7 @@
 ```
 
 **Techniques:**
+
 - whileHover/whileTap/whileFocus: Gesture states; always use spring transitions
 - Spring presets: Snappy (buttons) 400/25, smooth (cards) 300/20, bouncy 200/10
 - Hover effects: y: -8, boxShadow, scale 1.02-1.05

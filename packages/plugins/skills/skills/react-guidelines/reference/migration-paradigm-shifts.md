@@ -5,26 +5,31 @@
 **Rationale:** Server Components eliminate useEffect data fetching; Compiler removes manual memoization burden; Form Actions replace useState form fields.
 
 **Example:**
+
 ```tsx
 // OLD: Client fetch + loading state
-function ProductPage({ productId }) {
+function ProductPage({productId}) {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   useEffect(() => {
-    fetch(`/api/products/${productId}`).then(data => { setProduct(data); setLoading(false); });
+    fetch(`/api/products/${productId}`).then((data) => {
+      setProduct(data);
+      setLoading(false);
+    });
   }, [productId]);
   if (loading) return <Skeleton />;
   return <ProductDetails product={product} />;
 }
 
 // NEW: Server Component - direct DB access
-async function ProductPage({ productId }) {
+async function ProductPage({productId}) {
   const product = await db.products.find(productId);
   return <ProductDetails product={product} />;
 }
 ```
 
 **Techniques:**
+
 - Server-first: Async Server Components (SC) by default, 'use client' for islands only
 - Data fetching: SC replaces useEffect; no loading state needed (Suspense handles it)
 - Form handling: useActionState replaces useState; FormData replaces controlled inputs

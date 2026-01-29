@@ -27,6 +27,7 @@ it("should handle CORS preflight", async () => {
 ```
 
 **Techniques:**
+
 - Always expect 204 status for OPTIONS requests in tests
 - Verify CORS headers are present (Access-Control-Allow-Origin, etc.)
 - Don't expect a response body from OPTIONS

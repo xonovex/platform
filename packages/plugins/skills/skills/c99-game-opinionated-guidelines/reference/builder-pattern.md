@@ -22,6 +22,7 @@ status_t status = sphere_mesh3d_build(&mesh, 1.0f, 32, 16);
 ```
 
 **Techniques:**
+
 - Query phase: Call `*_req()` to get exact vertex/index counts needed
 - Caller allocation: Choose strategy (stack, malloc, arena) for complete control
 - Build phase: Call `*_build()` to fill pre-allocated caller buffer

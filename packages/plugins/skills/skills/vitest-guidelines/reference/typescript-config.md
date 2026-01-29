@@ -35,6 +35,7 @@
 ```
 
 **Techniques:**
+
 - Check actual directory structure with `ls` or file explorer before configuring
 - Calculate relative paths from current package to referenced packages
 - Add project references with correct relative paths

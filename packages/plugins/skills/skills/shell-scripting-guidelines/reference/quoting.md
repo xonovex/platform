@@ -35,6 +35,7 @@ files="$(find . -name '*.txt')"
 ```
 
 **Techniques:**
+
 - Quote all variable expansions: `"$var"`
 - Quote command substitutions: `"$(command)"`
 - Quote `"$@"` in loops to preserve arguments with spaces

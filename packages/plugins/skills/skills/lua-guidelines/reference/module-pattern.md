@@ -31,6 +31,7 @@ return M
 ```
 
 **Techniques:**
+
 - Create local module table `local M = {}`
 - Define functions as `M.function_name`
 - Return module table at end

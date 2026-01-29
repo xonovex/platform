@@ -45,6 +45,7 @@ CREATE INDEX idx_events_data ON events USING GIN (data);
 ```
 
 **Techniques:**
+
 - Use JSONB column type for semi-structured data
 - Use `->` operator to extract JSONB values (returns JSONB)
 - Use `->>` operator to extract text values (returns TEXT)

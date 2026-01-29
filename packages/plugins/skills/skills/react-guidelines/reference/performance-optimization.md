@@ -5,12 +5,13 @@
 **Rationale:** memo() prevents unnecessary re-renders; code splitting reduces initial bundle; SSR improves FCP; React 19 Compiler removes manual memoization burden.
 
 **Example:**
+
 ```tsx
 // Memoize expensive component
-const ExpensiveList = memo(function({ items, onItemClick }) {
+const ExpensiveList = memo(function ({items, onItemClick}) {
   return (
     <ul>
-      {items.map(item => (
+      {items.map((item) => (
         <li key={item.id} onClick={() => onItemClick(item.id)}>
           {item.name}
         </li>
@@ -33,6 +34,7 @@ function App() {
 ```
 
 **Techniques:**
+
 - memo(): Wrap expensive components to skip re-render if props unchanged
 - lazy() + Suspense: Code splitting; reduces initial bundle by ~50-70%
 - useCallback: Stabilize callbacks passed to memoized children (pair with memo)

@@ -22,6 +22,7 @@ const value = process.env["MY-VAR-WITH-DASHES"];
 ```
 
 **Techniques:**
+
 - Replace all `process.env["VAR"]` with `process.env.VAR` for static keys
 - Keep bracket notation only for dynamic keys or special characters
 - Run ESLint to find @typescript-eslint/dot-notation violations

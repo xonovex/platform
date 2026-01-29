@@ -20,6 +20,7 @@ moon run :test --query "(language=javascript || language=typescript) && projectL
 **Techniques:**
 
 ## Operators
+
 - `=` - Equals
 - `!=` - Not equals
 - `~` - Regex match
@@ -29,18 +30,20 @@ moon run :test --query "(language=javascript || language=typescript) && projectL
 - `()` - Grouping
 
 ## Project Fields (Moon 2.0)
-| Field | Description | Example |
-|-------|-------------|---------|
-| `language` | Project language | `language=typescript` |
-| `projectId` | Project ID (was `projectName`) | `projectId=core` |
-| `projectLayer` | Layer type (was `projectType`) | `projectLayer=library` |
-| `projectAlias` | Package name alias | `projectAlias~@xonovex/*` |
-| `projectSource` | Source path | `projectSource~packages/cli/*` |
-| `tags` | Project tags | `tags~frontend` |
+
+| Field           | Description                    | Example                        |
+| --------------- | ------------------------------ | ------------------------------ |
+| `language`      | Project language               | `language=typescript`          |
+| `projectId`     | Project ID (was `projectName`) | `projectId=core`               |
+| `projectLayer`  | Layer type (was `projectType`) | `projectLayer=library`         |
+| `projectAlias`  | Package name alias             | `projectAlias~@xonovex/*`      |
+| `projectSource` | Source path                    | `projectSource~packages/cli/*` |
+| `tags`          | Project tags                   | `tags~frontend`                |
 
 ## Task Fields (Moon 2.0)
-| Field | Description | Example |
-|-------|-------------|---------|
+
+| Field           | Description                         | Example              |
+| --------------- | ----------------------------------- | -------------------- |
 | `taskToolchain` | Task toolchain (was `taskPlatform`) | `taskToolchain=node` |
 
 ## Usage Patterns
@@ -60,6 +63,7 @@ moon run :lint --query "(language=typescript && projectLayer=library) || tags~sh
 ```
 
 ## Performance Tips
+
 - Prefer exact matches (`=`) over regex (`~`) when possible
 - Use `#tag:task` syntax for simple single-tag filtering
 - Use `--query` for complex multi-criterion conditions

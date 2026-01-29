@@ -32,6 +32,7 @@ volumes:
 ```
 
 **Techniques:**
+
 - Build configuration: Specify build context and target stage in compose
 - Secrets management: Use secrets section for sensitive data, never environment vars
 - Volume mounting: Mount volumes for persistent data matching production layout

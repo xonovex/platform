@@ -28,6 +28,7 @@
 ```
 
 **Techniques:**
+
 - Fetch source: WebFetch for URLs, Read for local files
 - Extract guidelines, requirements, rules, patterns, and code examples
 - Parse headings as topic groups, code blocks for language context

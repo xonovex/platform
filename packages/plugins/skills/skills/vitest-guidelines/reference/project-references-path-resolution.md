@@ -27,6 +27,7 @@ templates/ shared/ apps/
 ```
 
 **Techniques:**
+
 - ls verification: Use `ls` to check actual directory structure before configuring
 - Relative paths: Calculate from current package up (..) then down to target
 - tsc --build: Test with TypeScript build to verify paths resolve

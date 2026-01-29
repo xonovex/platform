@@ -37,6 +37,7 @@ end
 ```
 
 **Techniques:**
+
 - Store frequently accessed table fields in locals
 - Cache standard library functions (math.sin, etc.)
 - Especially important in loops and hot paths

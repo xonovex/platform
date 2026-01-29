@@ -26,6 +26,7 @@ void example(void) {
 ```
 
 **Techniques:**
+
 - Inline syntax: Use `(Type){initializer-list}` to create temporaries inline
 - With designators: Combine with designated initializers for clarity
 - Function arguments: Create temporary structs directly in function calls

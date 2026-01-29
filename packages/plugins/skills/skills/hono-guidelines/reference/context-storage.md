@@ -39,6 +39,7 @@ export function list() {
 ```
 
 **Techniques:**
+
 - Import `contextStorage` and `getContext` from `hono/context-storage`
 - Apply `contextStorage()` middleware early in middleware chain
 - Call `getContext()` anywhere during request handling to access context

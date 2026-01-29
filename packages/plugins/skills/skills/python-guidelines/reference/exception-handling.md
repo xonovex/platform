@@ -64,6 +64,7 @@ except (ValueError, TypeError) as e:
 ```
 
 **Techniques:**
+
 - Raise specific built-in exceptions (`ValueError`, `TypeError`, `FileNotFoundError`)
 - Create custom exceptions by subclassing built-in exceptions
 - Catch specific exceptions or tuples of exceptions

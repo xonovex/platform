@@ -25,6 +25,7 @@ int days[12] = {
 ```
 
 **Techniques:**
+
 - Field syntax: Use `.field = value` for struct initialization with clarity
 - Array syntax: Use `[index] = value` for sparse array initialization
 - Partial init: Unspecified fields are automatically zeroed without explicit values

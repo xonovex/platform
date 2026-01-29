@@ -5,6 +5,7 @@
 **Rationale:** Spring animations are interruptible and natural; duration animations are rigid but synchronized; match animation type to use case.
 
 **Example:**
+
 ```tsx
 // Snappy (buttons, quick interactions)
 <motion.div
@@ -27,6 +28,7 @@
 ```
 
 **Techniques:**
+
 - `stiffness: 100-500`: Response speed; higher = faster snap to target
 - `damping: 10-50`: Bounce control; higher = less bouncy/overshoot
 - `mass: 0.5-3`: Perceived weight; higher = heavier, slower response

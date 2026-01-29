@@ -5,6 +5,7 @@
 **Rationale:** staticFile() ensures correct paths; Remotion components wait for full asset load before rendering (native HTML doesn't).
 
 **Example:**
+
 ```tsx
 <Img src={staticFile("logo.png")} />
 <Video src={staticFile("video.mp4")} style={{width: "100%"}} />
@@ -13,6 +14,7 @@ const {fontFamily} = loadFont({family: "Custom", url: staticFile("fonts/font.wof
 ```
 
 **Techniques:**
+
 - staticFile("path"): Reference public/ assets; auto-encodes special characters
 - Local assets: Place in public/; organize as images/, videos/, audio/, fonts/
 - Remote URLs: Use directly without staticFile (CORS enabled)

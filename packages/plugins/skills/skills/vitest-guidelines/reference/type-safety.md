@@ -48,6 +48,7 @@ describe("Users API", () => {
 ```
 
 **Techniques:**
+
 - Define interfaces for expected response shapes at the top of test files
 - Cast all JSON parsing results: `const json = (await res.json()) as ResponseType`
 - Create reusable interfaces for common response types (User, ErrorResponse, etc.)

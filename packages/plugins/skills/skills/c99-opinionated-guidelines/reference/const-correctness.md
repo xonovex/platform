@@ -25,6 +25,7 @@ const char *get_name(void) {
 ```
 
 **Techniques:**
+
 - Read-only parameters: Mark function parameters with const when not modified
 - Pointer variants: Distinguish `const T *p` (pointer to const) vs `T *const p` (const pointer)
 - Return values: Use const for immutable return values to prevent modification

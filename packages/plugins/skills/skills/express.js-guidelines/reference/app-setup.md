@@ -11,7 +11,9 @@ const app = express();
 
 // Security middleware (first)
 app.use(helmet());
-app.use(cors({origin: process.env.ALLOWED_ORIGINS?.split(","), credentials: true}));
+app.use(
+  cors({origin: process.env.ALLOWED_ORIGINS?.split(","), credentials: true}),
+);
 
 // Logging and parsing
 app.use(morgan("combined"));
@@ -30,6 +32,7 @@ app.use(errorHandler);
 ```
 
 **Techniques:**
+
 - Middleware order: Security → logging → parsing → routes → 404 → error handler
 - helmet(): Add security headers (CSP, HSTS, X-Frame-Options, etc)
 - cors(): Configure allowed origins and credentials for cross-origin requests

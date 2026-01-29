@@ -44,6 +44,7 @@ upper="$(printf '%s' "$string" | tr '[:lower:]' '[:upper:]')"
 ```
 
 **Techniques:**
+
 - Use `[ ]` instead of bash-specific `[[ ]]`
 - Use `=` for string comparison, not `==`
 - Use `-gt`, `-lt`, etc. for numeric comparisons

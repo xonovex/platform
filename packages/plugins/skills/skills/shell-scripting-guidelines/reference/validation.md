@@ -22,6 +22,7 @@ variable_with_quotes="$1"
 ```
 
 **Techniques:**
+
 - Run `shellcheck script.sh` before committing
 - Use `find . -name '*.sh' -exec shellcheck {} +` to check multiple scripts
 - Fix shellcheck warnings rather than disabling them

@@ -16,6 +16,7 @@ RUN npm run build
 ```
 
 **Techniques:**
+
 - Copy lockfiles first: package-lock.json, poetry.lock rarely change
 - Install dependencies: Run before copying source to cache dependency layer
 - Copy source last: src/, config files change frequently

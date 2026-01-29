@@ -5,6 +5,7 @@
 **Rationale:** Motion values bypass React rendering; enables 60fps tracking; perfect for animations that don't need state.
 
 **Example:**
+
 ```tsx
 function MouseTracker() {
   const x = useMotionValue(0);
@@ -23,6 +24,7 @@ const scale = useTransform(x, [-100, 100], [0.5, 1.5]);
 ```
 
 **Techniques:**
+
 - `useMotionValue(initial)`: Create raw value; `.set()` updates without renders
 - `useTransform(value, [input], [output])`: Map range; supports colors, strings, numbers
 - `useSpring(value, config)`: Add spring physics (stiffness, damping, mass)

@@ -45,6 +45,7 @@ spec:
 ```
 
 **Techniques:**
+
 - Pod selection: Use podSelector with matchLabels to target specific pods
 - Policy types: Specify policyTypes for ingress, egress, or both rules
 - Namespace selection: Use namespaceSelector to allow traffic from namespaces

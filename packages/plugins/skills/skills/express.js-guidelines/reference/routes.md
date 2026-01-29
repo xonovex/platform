@@ -9,16 +9,39 @@
 ```typescript
 const router = express.Router();
 
-router.get("/", requireAuth, validateQuery(ListUsersQuerySchema), usersController.list);
-router.get("/:id", requireAuth, validateParams(UserParamsSchema), usersController.getById);
+router.get(
+  "/",
+  requireAuth,
+  validateQuery(ListUsersQuerySchema),
+  usersController.list,
+);
+router.get(
+  "/:id",
+  requireAuth,
+  validateParams(UserParamsSchema),
+  usersController.getById,
+);
 router.post("/", validateBody(CreateUserSchema), usersController.create);
-router.patch("/:id", requireAuth, validateParams(UserParamsSchema), validateBody(UpdateUserSchema), usersController.update);
-router.delete("/:id", requireAuth, requireRole("admin"), validateParams(UserParamsSchema), usersController.remove);
+router.patch(
+  "/:id",
+  requireAuth,
+  validateParams(UserParamsSchema),
+  validateBody(UpdateUserSchema),
+  usersController.update,
+);
+router.delete(
+  "/:id",
+  requireAuth,
+  requireRole("admin"),
+  validateParams(UserParamsSchema),
+  usersController.remove,
+);
 
 export {router as userRoutes};
 ```
 
 **Techniques:**
+
 - Middleware order: Auth (requireAuth) before validation before controller
 - requireAuth: Verify JWT token and attach user to request
 - requireRole: Check user role after requireAuth

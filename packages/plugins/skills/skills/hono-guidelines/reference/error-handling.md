@@ -60,6 +60,7 @@ export function notFound(c: Context, detail: string): Response {
 ```
 
 **Techniques:**
+
 - Define `ProblemDetails` TypeScript interface matching RFC 7807 spec
 - Include required fields: type, title, status
 - Include optional fields: detail, instance, custom extensions

@@ -8,7 +8,7 @@ description: >-
 
 ## Core Principles
 
-- **Progressive Disclosure** - SKILL.md contains essentials, reference/* contains examples
+- **Progressive Disclosure** - SKILL.md contains essentials, reference/\* contains examples
 - **Project Independence** - Remove project-specific paths, names, domains
 - **Bullet Format** - `- **Rule** - Brief 5-10 word how-to, see [reference/file.md](reference/file.md)`
 - **Style Consistency** - Match existing skill patterns in structure and voice
@@ -16,7 +16,7 @@ description: >-
 ## Skill Structure
 
 - **SKILL.md** - Frontmatter, essentials (3-7 bullets), one example, progressive disclosure links
-- **reference/*.md** - Guideline, rationale, how to apply, examples, counter-examples
+- **reference/\*.md** - Guideline, rationale, how to apply, examples, counter-examples
 
 ## Operations
 

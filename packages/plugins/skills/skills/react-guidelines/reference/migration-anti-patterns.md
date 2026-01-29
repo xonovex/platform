@@ -5,25 +5,30 @@
 **Rationale:** React 19 provides cleaner solutions; old patterns create unnecessary complexity and performance overhead.
 
 **Example:**
+
 ```tsx
 // OLD: useEffect + loading state
-function UserProfile({ userId }) {
-  const [user, setUser] = useState(null), [loading, setLoading] = useState(true);
+function UserProfile({userId}) {
+  const [user, setUser] = useState(null),
+    [loading, setLoading] = useState(true);
   useEffect(() => {
-    fetchUser(userId).then(setUser).finally(() => setLoading(false));
+    fetchUser(userId)
+      .then(setUser)
+      .finally(() => setLoading(false));
   }, [userId]);
   if (loading) return <Spinner />;
   return <Profile user={user} />;
 }
 
 // NEW: Server Component
-async function UserProfile({ userId }) {
+async function UserProfile({userId}) {
   const user = await fetchUser(userId);
   return <Profile user={user} />;
 }
 ```
 
 **Techniques:**
+
 - Remove useEffect data fetching → Use Server Components (async/await, direct DB)
 - Remove manual loading state → Use useActionState and Suspense
 - Remove useState form fields → Use FormData + Server Actions

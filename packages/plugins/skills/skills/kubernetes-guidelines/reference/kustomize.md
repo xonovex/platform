@@ -33,6 +33,7 @@ configMapGenerator:
 ```
 
 **Techniques:**
+
 - Base resources: Create base/kustomization.yaml with common manifests
 - Environment overlays: Create overlays/<env>/ for environment-specific customization
 - Bases reference: Use bases field to inherit and extend base resources

@@ -23,6 +23,7 @@ set_tests_properties(unit_tests PROPERTIES TIMEOUT 30 LABELS "unit")
 ```
 
 **Techniques:**
+
 - enable_testing(): Enable the testing feature in CMake project
 - add_test(): Register test executable or command with optional working directory
 - set_tests_properties(): Set timeout, labels, or other test attributes

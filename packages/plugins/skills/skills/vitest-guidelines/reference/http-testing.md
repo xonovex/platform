@@ -49,6 +49,7 @@ it("should handle missing resource", async () => {
 ```
 
 **Techniques:**
+
 - Use 204 for OPTIONS preflight requests (CORS)
 - Use 204 for successful DELETE operations without response body
 - Use 201 for resource creation (POST that creates new resource)

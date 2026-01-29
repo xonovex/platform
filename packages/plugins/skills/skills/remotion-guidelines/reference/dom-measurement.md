@@ -9,23 +9,28 @@
 ```tsx
 // Without scale correction (wrong)
 const rect = ref.current.getBoundingClientRect();
-const width = rect.width;  // Scaled value
+const width = rect.width; // Scaled value
 
 // With scale correction (correct)
 const scale = useCurrentScale();
-const width = rect.width / scale;  // Actual unscaled width
+const width = rect.width / scale; // Actual unscaled width
 
 // Full example
 const scale = useCurrentScale();
-const {width: scaled_width, height: scaled_height} = ref.current.getBoundingClientRect();
-return <div>Actual size: {scaled_width / scale} x {scaled_height / scale}</div>;
+const {width: scaled_width, height: scaled_height} =
+  ref.current.getBoundingClientRect();
+return (
+  <div>
+    Actual size: {scaled_width / scale} x {scaled_height / scale}
+  </div>
+);
 ```
 
 **Correct Measurement:**
 
 ```tsx
-import {useCurrentScale} from "remotion";
 import {useEffect, useRef, useState} from "react";
+import {useCurrentScale} from "remotion";
 
 export function MeasuredComponent() {
   const ref = useRef<HTMLDivElement>(null);
@@ -68,11 +73,16 @@ function PositionedElement() {
     });
   }, [scale]);
 
-  return <div ref={ref}>Element at ({position.x}, {position.y})</div>;
+  return (
+    <div ref={ref}>
+      Element at ({position.x}, {position.y})
+    </div>
+  );
 }
 ```
 
 **Techniques:**
+
 - useCurrentScale(): Get scale factor applied by Remotion
 - Divide measurements: width/scale, height/scale for correct values
 - useEffect hook: Measure elements after mount with scale dependency

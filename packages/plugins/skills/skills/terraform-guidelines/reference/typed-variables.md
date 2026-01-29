@@ -80,6 +80,7 @@ variable "optional_config" {
 ```
 
 **Techniques:**
+
 - **Basic types:** Use string, number, bool, list, map for simple variables
 - **Validation blocks:** Add business logic constraints like allowed values
 - **Range validation:** Check numeric ranges with >= and <= operators
@@ -87,4 +88,3 @@ variable "optional_config" {
 - **Optional fields:** Use optional(type, default) for flexible object schemas
 - **Sensible defaults:** Provide practical defaults for common configurations
 - **Early feedback:** Type and validation errors appear before plan phase
-

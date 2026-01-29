@@ -5,13 +5,14 @@
 **Rationale:** Native img tags don't sync with Remotion's timeline. `<AnimatedImage>` provides proper frame synchronization and playback control.
 
 **Example:**
+
 ```tsx
-import { AnimatedImage, staticFile, Composition } from 'remotion'
+import {AnimatedImage, Composition, staticFile} from "remotion";
 
 export const MyComposition = () => (
   <Composition>
     <AnimatedImage
-      src={staticFile('animation.gif')}
+      src={staticFile("animation.gif")}
       width={1920}
       height={1080}
       playbackRate={1}
@@ -19,10 +20,11 @@ export const MyComposition = () => (
       fit="contain"
     />
   </Composition>
-)
+);
 ```
 
 **Techniques:**
+
 - Import `AnimatedImage` and `staticFile` from `remotion` package
 - Set explicit `width` and `height` props for proper sizing and rendering
 - Use `staticFile()` for local assets, remote URLs with CORS headers

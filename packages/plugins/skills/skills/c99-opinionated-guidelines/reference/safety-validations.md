@@ -25,6 +25,7 @@ vec3_t vec3_normalize(const vec3_t *v) {
 ```
 
 **Techniques:**
+
 - Capacity checks: Validate `used + size <= capacity` before writing
 - Bounds checks: Check `idx < count` before array access
 - NULL checks: Test `if (!ptr)` at function entry

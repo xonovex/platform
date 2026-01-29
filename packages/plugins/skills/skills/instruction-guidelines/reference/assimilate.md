@@ -30,6 +30,7 @@
 ```
 
 **Techniques:**
+
 - Load both target and source files and analyze their structure
 - Extract organizational patterns from source (not content or tech names)
 - Preserve target's technology names, paths, and project-specific context

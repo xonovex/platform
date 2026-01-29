@@ -43,9 +43,9 @@ terraform/
 ```
 
 **Techniques:**
+
 - **Modules directory:** Group reusable infrastructure components by capability
 - **Environments directory:** Create separate root modules for dev, staging, prod
 - **Standard files:** Use main.tf, variables.tf, outputs.tf, backend.tf consistently
 - **Module README:** Document each module's purpose, variables, and outputs
 - **Relative sourcing:** Use relative paths in module sources for portability
-

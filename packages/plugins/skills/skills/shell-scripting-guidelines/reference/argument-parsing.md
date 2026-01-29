@@ -59,6 +59,7 @@ parse_flags() {
 ```
 
 **Techniques:**
+
 - Check argument count before accessing positional parameters
 - Provide clear usage messages showing required and optional arguments
 - Use a while loop with case statement for flag parsing

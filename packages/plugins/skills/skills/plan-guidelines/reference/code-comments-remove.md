@@ -5,20 +5,22 @@
 **Rationale:** Self-documenting code preferred over comments. Remove explanatory, obvious, and commented-out code while preserving functional directives (eslint-disable, @ts-expect-error, TODO).
 
 **Example:**
+
 ```typescript
 // REMOVE: Redundant comment
 // Get the user ID
-const userId = user.id
+const userId = user.id;
 
 // KEEP: Functional directive
 // eslint-disable-next-line no-unsafe-optional-chaining
-const role = user?.profile?.role?.name
+const role = user?.profile?.role?.name;
 
 // REMOVE: Commented-out code
 // const oldUserId = user.legacy_id
 ```
 
 **Techniques:**
+
 - Detect comment syntax by language (C-style: `//`, `/* */`; hash-style: `#`)
 - Distinguish functional directives (eslint, prettier, type hints) from explanatory comments
 - Identify and categorize comments: explanatory, obvious, or commented-out code blocks

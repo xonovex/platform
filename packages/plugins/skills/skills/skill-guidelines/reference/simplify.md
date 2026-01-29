@@ -28,14 +28,18 @@ Use Zod for runtime validation of request payloads. Zod provides type-safe schem
 - **Testing** - Use Jest + supertest for HTTP assertions, see [details/testing.md]
 
 # Code examples moved to details/ files
-# details/error-handling.md    - Full AppError implementation
-# details/validation.md        - Zod schema patterns
-# details/testing.md           - Jest + supertest examples
+
+# details/error-handling.md - Full AppError implementation
+
+# details/validation.md - Zod schema patterns
+
+# details/testing.md - Jest + supertest examples
 
 # Reduction: 80% of original size, all content preserved in details
 ```
 
 **Techniques:**
+
 - Read SKILL.md and existing detail files completely
 - Extract code examples to detail files, grouped by topic
 - Remove project-specific paths, names, domains, and URLs

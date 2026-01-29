@@ -32,6 +32,7 @@ void test_vec3_dot_soa_parity(void) {
 ```
 
 **Techniques:**
+
 - Typed assertions: Use `assert_int_eq`, `assert_float_eq`, `assert_ptr_not_null`
 - Epsilon values: Use 1e-4f general, 1e-5f cumulative, 5e-4f for SIMD
 - Scalar tests: Validate against known values for correctness

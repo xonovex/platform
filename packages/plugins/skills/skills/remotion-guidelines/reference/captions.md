@@ -5,6 +5,7 @@
 **Rationale:** SRT parsing is error-prone manually; library handles edge cases; `TikTokStyleCaptions` enables smooth word highlighting matching audio timing.
 
 **Example:**
+
 ```tsx
 function Captions({captions}) {
   const frame = useCurrentFrame();
@@ -12,11 +13,12 @@ function Captions({captions}) {
   const currentTimeMs = (frame / fps) * 1000;
 
   const activeCaption = captions.find(
-    (c) => currentTimeMs >= c.startMs && currentTimeMs < c.endMs
+    (c) => currentTimeMs >= c.startMs && currentTimeMs < c.endMs,
   );
 
   return activeCaption ? (
-    <div style={{position: "absolute", bottom: 100, fontSize: 48, color: "white"}}>
+    <div
+      style={{position: "absolute", bottom: 100, fontSize: 48, color: "white"}}>
       {activeCaption.text}
     </div>
   ) : null;
@@ -24,6 +26,7 @@ function Captions({captions}) {
 ```
 
 **Techniques:**
+
 - Parse SRT: `const {captions} = parseSrt({input: srtContent})`; captions have `startMs`, `endMs`, `text`
 - Frame to time: `currentTimeMs = (frame / fps) * 1000`; match against caption range
 - TikTok style: `createTikTokStyleCaptions({captions})` returns pages with tokens (individual words)

@@ -12,6 +12,7 @@
 ---
 
 ## Overview
+
 - 12 services, 15 shared packages
 - Kubernetes orchestration, GitOps deployment
 - Found in: services/, clusters/
@@ -19,6 +20,7 @@
 ---
 
 ## Core Services
+
 - API Gateway (packages/services/api-gateway)
 - Auth Service (packages/services/auth)
 - User Service (packages/services/users)
@@ -26,11 +28,13 @@
 ---
 
 ## Next Steps
+
 - Scale to 20 services
 - Implement service mesh
 ```
 
 **Techniques:**
+
 - Parse topic and identify relevant codebase areas and packages
 - Clarify scope with questions: packages, depth, audience, style
 - Scan codebase using parallel exploration: architecture, schemas, integration points

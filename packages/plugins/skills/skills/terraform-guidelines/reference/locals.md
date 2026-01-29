@@ -45,9 +45,9 @@ locals {
 ```
 
 **Techniques:**
+
 - **Tag merging:** Combine common tags with resource-specific tags using merge()
 - **Calculated values:** Compute derived values like counts and indices once
 - **Conditional logic:** Use ternary operators for environment-specific resource sizing
 - **CIDR subnetting:** Transform VPC CIDR into subnet ranges using cidrsubnet()
 - **Flattening:** Collapse nested structures for iteration with flatten()
-

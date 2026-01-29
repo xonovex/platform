@@ -36,6 +36,7 @@ const ConfigSchema = z.object({
 ```
 
 **Techniques:**
+
 - Replace `z.string().uuid()` with `z.uuid()`
 - Replace `z.string().email()` with `z.email()`
 - Replace `z.string().url()` with `z.url()`

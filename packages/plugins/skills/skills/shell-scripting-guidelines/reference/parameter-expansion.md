@@ -31,6 +31,7 @@ extension="${filename##*.}"    # txt
 ```
 
 **Techniques:**
+
 - Use `${VAR:-default}` for default if unset or empty
 - Use `: "${VAR:=value}"` to set defaults
 - Use `${VAR:?message}` to require variables

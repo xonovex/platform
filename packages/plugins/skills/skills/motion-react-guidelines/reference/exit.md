@@ -5,6 +5,7 @@
 **Rationale:** AnimatePresence delays DOM removal until exit animation completes; enables smooth transitions and proper cleanup.
 
 **Example:**
+
 ```tsx
 function Modal({isOpen, onClose}) {
   return (
@@ -14,8 +15,7 @@ function Modal({isOpen, onClose}) {
           initial={{opacity: 0, scale: 0.95}}
           animate={{opacity: 1, scale: 1}}
           exit={{opacity: 0, scale: 0.95}}
-          transition={{type: "spring", stiffness: 300}}
-        >
+          transition={{type: "spring", stiffness: 300}}>
           Modal content
         </motion.div>
       )}
@@ -25,6 +25,7 @@ function Modal({isOpen, onClose}) {
 ```
 
 **Techniques:**
+
 - Always wrap conditionals: `<AnimatePresence>{condition && <motion.div exit={{...}} />}</AnimatePresence>`
 - Unique keys: Required for list animations; prevents animation identity loss on reorder
 - Exit modes: `"sync"` (enter/exit simultaneous), `"wait"` (exit first, then enter), `"popLayout"` (exit removed from flow)

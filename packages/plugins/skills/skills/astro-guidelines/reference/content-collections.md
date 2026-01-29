@@ -25,6 +25,7 @@ export const collections = {
 ```
 
 **Techniques:**
+
 - Collection schemas: Define Zod schemas in `src/content/config.ts` for validation
 - Directory structure: Organize content in `src/content/[collection-name]/` directories
 - Query functions: Use `getCollection()` and `getEntry()` for type-safe queries

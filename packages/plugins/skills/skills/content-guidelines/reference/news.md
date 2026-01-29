@@ -20,6 +20,7 @@ lang: "en"
 Write in CEFR B1-B2 level with short sentences (<20 words) and bullet points for skimming.
 
 **Techniques:**
+
 - WebSearch verification: Find 3+ credible sources per story, use date filters
 - Triangulate facts: Cross-check claims, discard unsourced or clickbait content
 - Paraphrase: Never copy verbatim, use original wording while preserving meaning

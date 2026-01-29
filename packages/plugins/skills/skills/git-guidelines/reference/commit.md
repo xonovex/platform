@@ -25,8 +25,9 @@ feat: add OAuth2 provider integration
 ```
 
 **Techniques:**
+
 - Detect changes via `git status --porcelain` and `git diff --stat`
-- Auto-detect type from file patterns: test (*.test.ts), docs (*.md), ci, chore (package.json), feat (new), fix (small), refactor (large)
+- Auto-detect type from file patterns: test (_.test.ts), docs (_.md), ci, chore (package.json), feat (new), fix (small), refactor (large)
 - Generate message from file patterns and diff stats
 - Commit with `git add -A && git commit -m "<type>: <description>"`
 - Optionally push with `git push -o ci.skip origin HEAD:<branch>`

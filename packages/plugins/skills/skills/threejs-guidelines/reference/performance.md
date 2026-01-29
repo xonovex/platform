@@ -5,6 +5,7 @@
 **Rationale:** GPU efficiency depends on draw calls and memory; InstancedMesh renders 1000+ copies in one call vs. 1000 separate meshes.
 
 **Example:**
+
 ```javascript
 const mesh = new THREE.InstancedMesh(geometry, material, 1000);
 for (let i = 0; i < 1000; i++) {
@@ -16,6 +17,7 @@ mesh.instanceMatrix.needsUpdate = true;
 ```
 
 **Techniques:**
+
 - InstancedMesh: Render thousands of copies in one draw call (vs. 1000 draw calls)
 - LOD (Level of Detail): High detail near (0-50), medium mid-range (50-200), low far (200+)
 - Merge geometries: Combine static meshes with BufferGeometryUtils.mergeGeometries()

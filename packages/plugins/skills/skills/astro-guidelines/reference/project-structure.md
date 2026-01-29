@@ -25,6 +25,7 @@ src/
 ```
 
 **Techniques:**
+
 - Pages directory: Place routes in `src/pages/` for automatic file-based routing
 - Components folder: Store reusable components in `src/components/`
 - Layouts directory: Create reusable layouts in `src/layouts/`

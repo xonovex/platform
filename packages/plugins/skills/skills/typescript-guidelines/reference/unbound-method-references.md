@@ -24,6 +24,7 @@ document.addEventListener("click", handler);
 ```
 
 **Techniques:**
+
 - Never destructure methods: avoid `const {method} = object`
 - Keep object reference: `const helpers = object`
 - Call methods on object: `helpers.method()`

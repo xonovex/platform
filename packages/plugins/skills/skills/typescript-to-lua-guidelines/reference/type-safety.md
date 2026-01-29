@@ -5,70 +5,70 @@
 **Rationale:** TypeScript's type system catches errors at compile time and guides TSTL. Patterns like discriminated unions provide type-safe error handling.
 
 **Example:**
+
 ```typescript
 // Discriminated union for type-safe results
-type Result<T, E> =
-  | { kind: 'ok'; value: T }
-  | { kind: 'err'; error: E }
+type Result<T, E> = {kind: "ok"; value: T} | {kind: "err"; error: E};
 
 namespace Result {
   export function ok<T, E>(value: T): Result<T, E> {
-    return { kind: 'ok', value }
+    return {kind: "ok", value};
   }
 
   export function err<T, E>(error: E): Result<T, E> {
-    return { kind: 'err', error }
+    return {kind: "err", error};
   }
 
   export function map<T, U, E>(
     result: Result<T, E>,
-    fn: (t: T) => U
+    fn: (t: T) => U,
   ): Result<U, E> {
-    if (result.kind === 'ok') {
-      return ok(fn(result.value))
+    if (result.kind === "ok") {
+      return ok(fn(result.value));
     }
-    return result
+    return result;
   }
 }
 
 // Readonly properties signal immutability
 interface Position {
-  readonly x: number
-  readonly y: number
+  readonly x: number;
+  readonly y: number;
 }
 
 interface Entity {
-  readonly id: number
-  readonly position: Position
-  readonly velocity: readonly [number, number]  // Readonly tuple
+  readonly id: number;
+  readonly position: Position;
+  readonly velocity: readonly [number, number]; // Readonly tuple
 }
 
 // Complete generic types
-type Option<T> = { kind: 'some'; value: T } | { kind: 'none' }
+type Option<T> = {kind: "some"; value: T} | {kind: "none"};
 
 namespace Option {
   export function some<T>(value: T): Option<T> {
-    return { kind: 'some', value }
+    return {kind: "some", value};
   }
 
   export function none<T>(): Option<T> {
-    return { kind: 'none' }
+    return {kind: "none"};
   }
 
   export function getOrElse<T>(opt: Option<T>, def: T): T {
-    if (opt.kind === 'some') return opt.value
-    return def
+    if (opt.kind === "some") return opt.value;
+    return def;
   }
 }
 
 // Type-safe usage
-const result: Result<number, string> = Result.ok(42)
-if (result.kind === 'ok') {
-  console.log(result.value)  // Type is number
+const result: Result<number, string> = Result.ok(42);
+if (result.kind === "ok") {
+  console.log(result.value); // Type is number
 }
 ```
 
 **Techniques:**
+
 - Use `readonly` modifiers for immutable properties to signal intent
 - Define complete interfaces with all properties typed explicitly
 - Implement discriminated unions for type-safe variant handling

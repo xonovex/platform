@@ -33,6 +33,7 @@ it("should return error", async () => {
 ```
 
 **Techniques:**
+
 - Create test-specific interfaces at the top of test files
 - Use type assertion: `const json = (await res.json()) as ExpectedType`
 - Reuse interfaces across multiple tests

@@ -5,19 +5,25 @@
 **Rationale:** Post-processing applies cinematic effects (bloom, grain, color grading) after rendering without modifying materials.
 
 **Example:**
+
 ```javascript
 const composer = new EffectComposer(renderer);
 composer.addPass(new RenderPass(scene, camera));
-composer.addPass(new UnrealBloomPass(
-  new THREE.Vector2(w, h),
-  1.5,   // Strength
-  0.4,   // Radius
-  0.85   // Threshold
-));
-function animate() { composer.render(); }
+composer.addPass(
+  new UnrealBloomPass(
+    new THREE.Vector2(w, h),
+    1.5, // Strength
+    0.4, // Radius
+    0.85, // Threshold
+  ),
+);
+function animate() {
+  composer.render();
+}
 ```
 
 **Techniques:**
+
 - UnrealBloomPass: Glow on emissive materials; adjust threshold for control
 - FilmPass: Grain/noise effect with intensity and grayscale toggle
 - ShaderPass: Custom fragment shader effects with uniforms for animation

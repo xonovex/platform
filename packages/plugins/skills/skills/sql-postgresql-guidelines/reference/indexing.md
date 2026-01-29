@@ -35,6 +35,7 @@ CREATE INDEX idx_logs_created_at ON logs USING BRIN (created_at);
 ```
 
 **Techniques:**
+
 - Create B-tree indexes (default) for frequently queried columns
 - Use partial indexes to index only relevant subsets
 - Use composite indexes for multi-column queries

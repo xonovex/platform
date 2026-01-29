@@ -5,8 +5,9 @@
 **Rationale:** Proper camera frustum prevents z-fighting; tight near/far prevents clipping; controls must match intended interaction pattern.
 
 **Example:**
+
 ```javascript
-const camera = new THREE.PerspectiveCamera(75, w/h, 0.1, 1000);
+const camera = new THREE.PerspectiveCamera(75, w / h, 0.1, 1000);
 camera.position.set(5, 5, 5);
 
 const controls = new OrbitControls(camera, renderer.domElement);
@@ -17,6 +18,7 @@ controls.update();
 ```
 
 **Techniques:**
+
 - Camera types: PerspectiveCamera (3D standard), OrthographicCamera (CAD/isometric), CubeCamera (reflections)
 - Near/far planes: Large scenes use `near=1, far=100000`; small scenes `near=0.001, far=100` to avoid z-fighting
 - OrbitControls: `enableDamping=true` for smooth motion; set `minDistance`/`maxDistance` and polar angle limits

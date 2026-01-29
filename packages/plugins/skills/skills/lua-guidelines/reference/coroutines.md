@@ -60,6 +60,7 @@ manager:update(dt)
 ```
 
 **Techniques:**
+
 - Create coroutine with `coroutine.create`
 - Use `coroutine.yield()` to pause execution
 - Resume with `coroutine.resume(coro, args)`

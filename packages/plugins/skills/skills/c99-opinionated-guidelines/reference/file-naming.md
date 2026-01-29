@@ -26,6 +26,7 @@ vector.test.c        # Scalar tests
 ```
 
 **Techniques:**
+
 - Type suffix: Use `_type.h` for type definitions only
 - Impl suffix: Use `_impl.h` for inline scalar implementations
 - Batch variants: Use `_aos.h`, `_soa.h` for batch implementations

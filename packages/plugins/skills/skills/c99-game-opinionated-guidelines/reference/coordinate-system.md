@@ -20,6 +20,7 @@ matrix4f_t view_lh = matrix4f_look_at_lh(eye, target, up);
 ```
 
 **Techniques:**
+
 - Right-handed default: Use +X right, +Y up, +Z forward as base convention
 - CCW winding: Define front faces with counter-clockwise vertex order
 - Suffix variants: Provide `_rh` and `_lh` function suffixes for explicit systems

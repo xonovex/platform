@@ -1,6 +1,6 @@
 # compile-options: Compile Options and Definitions
 
-**Guideline:** Set compiler flags, definitions, and features on targets using target_compile_* commands with appropriate visibility.
+**Guideline:** Set compiler flags, definitions, and features on targets using target*compile*\* commands with appropriate visibility.
 
 **Rationale:** Target-scoped settings prevent pollution of the global build environment and allow different targets to have different requirements.
 
@@ -27,6 +27,7 @@ target_compile_features(mylib PUBLIC cxx_std_20)
 ```
 
 **Techniques:**
+
 - target_compile_options(): Set compiler-specific flags with generator expressions
 - target_compile_definitions(): Define preprocessor macros with visibility control
 - target_compile_features(): Require C++ standard using cxx_std_20, cxx_std_17, etc

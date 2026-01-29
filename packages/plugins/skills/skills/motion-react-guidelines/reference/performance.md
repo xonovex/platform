@@ -5,6 +5,7 @@
 **Rationale:** Transform/opacity don't trigger layout recalculation; width/height cause jank. Respecting prefers-reduced-motion is legal requirement (WCAG 2.1).
 
 **Example:**
+
 ```tsx
 import {motion, useReducedMotion} from "motion/react";
 
@@ -14,8 +15,7 @@ function AccessibleDiv({children}) {
     <motion.div
       initial={shouldReduceMotion ? false : {opacity: 0, y: 20}}
       animate={{opacity: 1, y: 0}}
-      transition={shouldReduceMotion ? {duration: 0} : {duration: 0.6}}
-    >
+      transition={shouldReduceMotion ? {duration: 0} : {duration: 0.6}}>
       {children}
     </motion.div>
   );
@@ -23,6 +23,7 @@ function AccessibleDiv({children}) {
 ```
 
 **Techniques:**
+
 - GPU-accelerated: x, y, z, scale, rotate, opacity, skew (no layout recalc)
 - Never animate: width, height, margin, padding, left/top/right/bottom (triggers jank)
 - useReducedMotion(): Check for prefers-reduced-motion; skip animations if true

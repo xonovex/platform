@@ -52,6 +52,7 @@ new_path = Path("users") / "123" / "profile"
 ```
 
 **Techniques:**
+
 - Create Path objects: `path = Path("file.txt")`
 - Use `/` operator for path joining: `Path("dir") / "file.txt"`
 - Check existence with `.exists()`, `.is_file()`, `.is_dir()`

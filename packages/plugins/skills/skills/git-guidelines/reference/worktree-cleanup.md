@@ -33,6 +33,7 @@ git worktree list
 ```
 
 **Techniques:**
+
 - List worktrees: `git worktree list`
 - Identify feature worktrees with `*-feature-*` pattern
 - Check merge status: `git branch --merged <source>`

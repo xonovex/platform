@@ -19,6 +19,7 @@ constraints:
 **Techniques:**
 
 ## tagRelationships
+
 - Define which tags can depend on which tags
 - Key: Source tag, Value: Allowed dependency tags
 - Projects with source tag can only depend on projects with allowed tags
@@ -35,6 +36,7 @@ constraints:
 ```
 
 ## enforceLayerRelationships (Moon 2.0)
+
 - Enforce that libraries cannot depend on applications
 - Prevents circular dependencies between layers
 
@@ -44,11 +46,13 @@ constraints:
 ```
 
 Layer hierarchy (lowest to highest):
+
 1. `configuration` - Can depend on: nothing
 2. `library` - Can depend on: configuration, library
 3. `application` - Can depend on: configuration, library, application
 
 ## Validation
+
 - Constraints checked during project graph creation
 - Violations prevent task execution
 - Run `moon check` to validate without running tasks
@@ -56,6 +60,7 @@ Layer hierarchy (lowest to highest):
 ## Common Patterns
 
 **Tenant isolation:**
+
 ```yaml
 tagRelationships:
   tenant-acme: [tenant-acme, shared]
@@ -63,6 +68,7 @@ tagRelationships:
 ```
 
 **Feature boundaries:**
+
 ```yaml
 tagRelationships:
   auth: [auth, shared, database]
@@ -71,6 +77,7 @@ tagRelationships:
 ```
 
 ## Troubleshooting
+
 - Check project tags in `moon.yml`
 - Verify `dependsOn` doesn't violate constraints
 - Use `moon query projects` to inspect project relationships

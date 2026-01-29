@@ -35,6 +35,7 @@ git branch -d services/feature/auth-flow
 ```
 
 **Techniques:**
+
 - Verify validation passed
 - Read source: `git config branch.<branch>.mergeBackTo`
 - Navigate to source worktree directory

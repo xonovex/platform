@@ -4,7 +4,6 @@ on:
   push:
     branches: [main]
   pull_request:
-    branches: [main]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -36,15 +35,3 @@ jobs:
 
       - name: Prepublish check
         run: nix develop --command npm run prepublish:check
-
-  changeset-check:
-    name: Changeset Check
-    runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
-
-    steps:
-      - uses: actions/checkout@v6
-
-      - uses: ./.github/actions/setup-nix
-
-      - run: nix develop --command npx changeset status --since=origin/main

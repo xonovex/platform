@@ -20,6 +20,7 @@ itemsRouter.openapi(listItemsRoute, (c) => {
 ```
 
 **Techniques:**
+
 - Read error message carefully and understand what it indicates
 - Research framework documentation and TypeScript behavior
 - Refactor code to align with type expectations

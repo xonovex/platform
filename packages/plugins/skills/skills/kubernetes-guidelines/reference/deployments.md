@@ -47,6 +47,7 @@ spec:
 ```
 
 **Techniques:**
+
 - Security context: Set runAsNonRoot and fsGroup for pod-level security
 - Container hardening: Use readOnlyRootFilesystem and drop all capabilities
 - Resource limits: Define requests and limits to prevent resource exhaustion

@@ -5,14 +5,16 @@
 **Rationale:** Color space errors cause washed-out/dark rendering; mipmaps ensure quality at distance; compression saves VRAM.
 
 **Example:**
+
 ```javascript
-const colorTex = loader.load('albedo.jpg');
+const colorTex = loader.load("albedo.jpg");
 colorTex.colorSpace = THREE.SRGBColorSpace;
-const normalTex = loader.load('normal.jpg');
+const normalTex = loader.load("normal.jpg");
 normalTex.colorSpace = THREE.NoColorSpace; // Data, not color
 ```
 
 **Techniques:**
+
 - Color spaces: sRGB for color/albedo/emissive, NoColorSpace for normal/roughness/metalness/displacement/AO
 - Mipmaps: Auto-generate for most textures; disable for canvas/video (dynamic updates)
 - Wrapping: RepeatWrapping or MirroredRepeatWrapping for tiling; ClampToEdgeWrapping default

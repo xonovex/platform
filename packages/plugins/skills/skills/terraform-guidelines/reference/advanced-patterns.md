@@ -81,6 +81,7 @@ resource "aws_instance" "worker" {
 ```
 
 **Techniques:**
+
 - **Data sources:** Query existing AWS resources without importing or creating them
 - **Dynamic blocks:** Generate repeated nested blocks from variables or locals
 - **For_each with maps:** Maintain consistent resource names when order changes

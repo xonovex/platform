@@ -24,6 +24,7 @@
 ```
 
 **Techniques:**
+
 - Semantic elements: Use `<header>`, `<nav>`, `<main>`, `<article>`, `<aside>` for structure
 - Alt text: Provide descriptive alt attributes for all images
 - Heading hierarchy: Maintain h1 → h2 → h3 logical ordering

@@ -5,22 +5,24 @@
 **Rationale:** Hardening improves reliability, debugging, and maintainability. Type safety catches bugs compile-time, validation prevents invalid states, logging aids debugging, and explicit error handling prevents silent failures.
 
 **Example:**
+
 ```typescript
 // Before: Weak type safety, no validation
 function processUser(data: any) {
-  return { id: data.id, email: data.email }
+  return {id: data.id, email: data.email};
 }
 
 // After: Strong types, validation, error handling
 function processUser(data: unknown): Result<User, ValidationError> {
-  const parsed = userSchema.safeParse(data)
-  if (!parsed.success) return Err(parsed.error)
-  logger.info('Processing user', { id: parsed.data.id })
-  return Ok(parsed.data)
+  const parsed = userSchema.safeParse(data);
+  if (!parsed.success) return Err(parsed.error);
+  logger.info("Processing user", {id: parsed.data.id});
+  return Ok(parsed.data);
 }
 ```
 
 **Techniques:**
+
 - Review project standards by reading CLAUDE.md, AGENTS.md, and style guides
 - Scan for type safety issues: any types, implicit types, unchecked assertions
 - Identify missing validation: unvalidated inputs, absent schema checks, missing guards

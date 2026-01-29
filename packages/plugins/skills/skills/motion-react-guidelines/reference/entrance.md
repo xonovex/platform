@@ -5,27 +5,32 @@
 **Rationale:** Opacity + transforms are GPU-optimized; transforms avoid layout thrashing; easing creates polished, professional feel.
 
 **Example:**
+
 ```tsx
 function FadeUp({children}) {
   return (
     <motion.div
       initial={{opacity: 0, y: 20}}
       animate={{opacity: 1, y: 0}}
-      transition={{duration: 0.6, ease: [0.22, 1, 0.36, 1]}}
-    >
+      transition={{duration: 0.6, ease: [0.22, 1, 0.36, 1]}}>
       {children}
     </motion.div>
   );
 }
 
 // Staggered hero
-<motion.section initial="hidden" animate="visible"
+<motion.section
+  initial="hidden"
+  animate="visible"
   variants={{visible: {transition: {staggerChildren: 0.15}}}}>
-  <motion.h1 variants={{hidden: {opacity: 0, y: 30}, visible: {opacity: 1, y: 0}}} />
-</motion.section>
+  <motion.h1
+    variants={{hidden: {opacity: 0, y: 30}, visible: {opacity: 1, y: 0}}}
+  />
+</motion.section>;
 ```
 
 **Techniques:**
+
 - Fade up: `initial={{opacity: 0, y: 20}}` → `animate={{opacity: 1, y: 0}}`
 - Fade in scale: `initial={{opacity: 0, scale: 0.95}}` for zoom-in effect
 - Slide directions: `x: -50` (left), `x: 50` (right), `y: 50` (bottom)

@@ -5,6 +5,7 @@
 **Rationale:** `layout` auto-animates position/size without manually specifying targets; `layoutId` enables seamless transitions across screens (gallery → modal).
 
 **Example:**
+
 ```tsx
 function ExpandingCard({expanded}) {
   return (
@@ -19,16 +20,19 @@ function ExpandingCard({expanded}) {
 // Shared element transition
 <motion.div layoutId={`card-${id}`} onClick={() => setSelected(item)}>
   <motion.img layoutId={`image-${id}`} src={item.image} />
-</motion.div>
+</motion.div>;
 
-{selected && (
-  <motion.div layoutId={`card-${selected.id}`} style={{position: "fixed"}}>
-    <motion.img layoutId={`image-${selected.id}`} src={selected.image} />
-  </motion.div>
-)}
+{
+  selected && (
+    <motion.div layoutId={`card-${selected.id}`} style={{position: "fixed"}}>
+      <motion.img layoutId={`image-${selected.id}`} src={selected.image} />
+    </motion.div>
+  );
+}
 ```
 
 **Techniques:**
+
 - `layout`: Animate position and size changes automatically (FLIP algorithm)
 - `layout="position"`: Only position (for text); `layout="size"`: Only size
 - `layoutId`: Same ID on elements across different DOM states for smooth morphing

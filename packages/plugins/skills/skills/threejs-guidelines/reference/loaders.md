@@ -5,6 +5,7 @@
 **Rationale:** GLTF/GLB is web standard; Draco reduces file size 90%+; async prevents UI blocking; manager centralizes progress.
 
 **Example:**
+
 ```javascript
 async function loadModel(url) {
   return new Promise((resolve, reject) => {
@@ -21,6 +22,7 @@ new GLTFLoader().setDRACOLoader(dracoLoader).load('model.glb', ...);
 ```
 
 **Techniques:**
+
 - GLTFLoader: Primary format; animations in `gltf.animations`; use `traverse()` for shadow/material setup
 - Draco: Reduce geometry size 90%+; requires decoder path setup
 - KTX2 textures: Compressed texture format via `ktx2Loader.setTranscoderPath()`

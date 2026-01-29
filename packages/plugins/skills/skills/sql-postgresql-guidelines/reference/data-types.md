@@ -37,6 +37,7 @@ CREATE TABLE users (
 ```
 
 **Techniques:**
+
 - Use UUID for globally unique identifiers in distributed systems
 - Use TIMESTAMPTZ (not TIMESTAMP) for all timestamps to preserve timezone information
 - Use NUMERIC for monetary values and exact decimals

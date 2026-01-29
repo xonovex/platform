@@ -5,6 +5,7 @@
 **Rationale:** Suspense enables streaming—content loads incrementally, not all-or-nothing; React 19 pre-warms siblings for faster perceived performance.
 
 **Example:**
+
 ```tsx
 function Dashboard() {
   return (
@@ -24,10 +25,11 @@ function Dashboard() {
   <Suspense fallback={<Loading />}>
     <DataDisplay />
   </Suspense>
-</ErrorBoundary>
+</ErrorBoundary>;
 ```
 
 **Techniques:**
+
 - Independent boundaries: Each Suspense boundary loads and shows independently (faster perceived time)
 - Nested boundaries: Hierarchy for critical→secondary→tertiary with fallbacks at each level
 - Error Boundaries: Catch component errors; pair with Suspense for complete error handling

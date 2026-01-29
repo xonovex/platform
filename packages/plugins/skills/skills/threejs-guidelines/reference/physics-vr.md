@@ -5,6 +5,7 @@
 **Rationale:** Three.js has no built-in physics; external engines require frame-based sync. WebXR requires specific animation loop API.
 
 **Example:**
+
 ```javascript
 // Physics setup
 const world = new RAPIER.World(new RAPIER.Vector3(0, -9.81, 0));
@@ -26,6 +27,7 @@ renderer.setAnimationLoop(animate);
 ```
 
 **Techniques:**
+
 - Physics engines: Rapier (recommended), Cannon-es, Oimo; create world with gravity
 - Bodies: RigidBodyDesc dynamic/static/kinematic; add shapes (colliders)
 - Forces: `.applyForce()`, `.applyImpulse()`, `.setLinvel()`, `.setAngvel()`

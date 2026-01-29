@@ -25,6 +25,7 @@ target_link_libraries(app PRIVATE fmt::fmt)
 ```
 
 **Techniques:**
+
 - FetchContent_Declare(): Declare dependency with git repo and version pin
 - GIT_TAG: Pin exact version for reproducible builds
 - GIT_SHALLOW: Use shallow clone for faster fetching
