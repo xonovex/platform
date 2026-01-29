@@ -26,7 +26,7 @@
     "agent-cli-go": "./dist/bin.js"
   },
   "devDependencies": {
-    "@xonovex/ts-config-cli": "0.1.13"
+    "@xonovex/ts-config-cli": "0.1.14"
   },
   "optionalDependencies": {
     "@xonovex/agent-cli-go-linux-x64": "0.1.13",
@@ -37,7 +37,7 @@
   },
   "dependencies": {
     "@xonovex/eslint-config-cli": "^0.1.12",
-    "@xonovex/ts-config-cli": "^0.1.13",
+    "@xonovex/ts-config-cli": "^0.1.14",
     "@xonovex/agent-cli-go-darwin-arm64": "^0.1.13",
     "@xonovex/agent-cli-go-darwin-x64": "^0.1.13",
     "@xonovex/agent-cli-go-linux-arm64": "^0.1.13",

@@ -61,10 +61,10 @@
     "eslint-plugin-unicorn": "62.0.0",
     "globals": "17.1.0",
     "typescript-eslint": "8.53.1",
-    "@xonovex/ts-config-node": "^0.1.13"
+    "@xonovex/ts-config-node": "^0.1.14"
   },
   "devDependencies": {
-    "@xonovex/ts-config-node": "0.1.13",
+    "@xonovex/ts-config-node": "0.1.14",
     "@types/eslint": "9.6.1",
     "@types/eslint-plugin-security": "3.0.1",
     "@types/node": "^25.0.10"
