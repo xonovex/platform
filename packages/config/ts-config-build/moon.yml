@@ -5,9 +5,10 @@ tasks:
     deps:
     - ts-config-base:build
     - ^:build
-language: typescript
+language: other
 tags:
 - tenant-shared
+- tsconfig
 dependsOn: []
 fileGroups:
   sources:
