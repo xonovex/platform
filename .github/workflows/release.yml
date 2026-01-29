@@ -50,17 +50,15 @@ jobs:
           PROJECTS=$(nix develop --command node -e "
             const { execSync } = require('child_process');
             const fs = require('fs');
-            const path = require('path');
 
-            // Find packages with local versions not yet published to npm
             const moonOutput = JSON.parse(execSync('npx moon query projects', { encoding: 'utf8', maxBuffer: 10 * 1024 * 1024 }));
             const projects = [];
             for (const p of moonOutput.projects) {
               try {
-                const pkg = JSON.parse(fs.readFileSync(path.join(p.source, 'package.json'), 'utf8'));
+                const pkg = JSON.parse(fs.readFileSync(p.source + '/package.json', 'utf8'));
                 if (!pkg.name || pkg.private) continue;
-                const npmVersion = execSync('npm view ' + pkg.name + ' version 2>/dev/null || echo \"\"', { encoding: 'utf8' }).trim();
-                if (pkg.version !== npmVersion) {
+                const oldPkg = JSON.parse(execSync('git show HEAD~1:' + p.source + '/package.json', { encoding: 'utf8' }));
+                if (pkg.version !== oldPkg.version) {
                   projects.push(p.id);
                 }
               } catch {}
@@ -133,12 +131,19 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: nix develop --command bash -c "npm ci && npx changeset publish"
+        run: |
+          nix develop --command bash -c "npm ci"
+          PROJECTS='${{ needs.detect.outputs.changed_projects }}'
+          for PROJECT in $(echo "$PROJECTS" | jq -r '.[]'); do
+            echo "Publishing $PROJECT..."
+            nix develop --command npx moon run "$PROJECT:ci-publish"
+          done
 
       - name: Dry run publish
         if: needs.detect.outputs.dry_run == 'true'
         run: |
-          nix develop --command bash -c "npm ci && npx changeset status --verbose"
+          echo "Dry run - would publish:"
+          echo '${{ needs.detect.outputs.changed_projects }}' | jq -r '.[]'
 
       - uses: moonrepo/run-report-action@v1
         if: success() || failure()
