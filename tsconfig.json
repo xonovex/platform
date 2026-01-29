@@ -18,18 +18,6 @@
       "path": "packages/config/prettier-config"
     },
     {
-      "path": "packages/config/ts-config-base"
-    },
-    {
-      "path": "packages/config/ts-config-build"
-    },
-    {
-      "path": "packages/config/ts-config-cli"
-    },
-    {
-      "path": "packages/config/ts-config-node"
-    },
-    {
       "path": "packages/config/vite-config-base"
     },
     {
