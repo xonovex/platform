@@ -19,6 +19,8 @@ jobs:
 
       - uses: ./.github/actions/setup-nix
 
+      - run: nix develop --command npm ci
+
       - uses: changesets/action@v1
         with:
           title: "chore: version packages"
