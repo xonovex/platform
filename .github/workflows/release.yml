@@ -137,11 +137,8 @@ jobs:
 
       - name: Dry run publish
         if: needs.detect.outputs.dry_run == 'true'
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
-          nix develop --command bash -c "npm ci && npx changeset publish" 2>&1 || true
-          echo "Dry run complete - packages were not actually published (no write token)"
+          nix develop --command bash -c "npm ci && npx changeset status --verbose"
 
       - uses: moonrepo/run-report-action@v1
         if: success() || failure()
