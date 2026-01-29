@@ -49,7 +49,7 @@
   },
   "devDependencies": {
     "@xonovex/eslint-config-cli": "0.1.12",
-    "@xonovex/ts-config-cli": "0.1.12",
+    "@xonovex/ts-config-cli": "0.1.13",
     "@xonovex/vitest-config-node": "0.1.12",
     "@types/node": "^25.0.10",
     "@vitest/coverage-v8": "^4.0.18",
