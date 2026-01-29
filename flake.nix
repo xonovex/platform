@@ -16,9 +16,16 @@
         {
           default = pkgs.mkShell {
             packages = [
+              # JavaScript / TypeScript
               pkgs.nodejs_24
+
+              # Go
               pkgs.go_1_25
               pkgs.golangci-lint
+
+              # Shell
+              pkgs.shellcheck
+              pkgs.shfmt
             ];
           };
         }
