@@ -30,11 +30,11 @@
     "prettier-plugin-astro": "0.14.1",
     "prettier-plugin-tailwindcss": "0.7.2",
     "@xonovex/eslint-config-base": "^0.1.12",
-    "@xonovex/ts-config-build": "^0.1.12"
+    "@xonovex/ts-config-build": "^0.1.13"
   },
   "devDependencies": {
     "@xonovex/eslint-config-base": "0.1.12",
-    "@xonovex/ts-config-build": "0.1.12"
+    "@xonovex/ts-config-build": "0.1.13"
   },
   "scripts": {
     "lint": "eslint .",

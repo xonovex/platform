@@ -40,11 +40,11 @@
     "@tailwindcss/vite": "4.1.18",
     "vite-tsconfig-paths": "6.0.4",
     "@xonovex/eslint-config-base": "^0.1.12",
-    "@xonovex/ts-config-build": "^0.1.12"
+    "@xonovex/ts-config-build": "^0.1.13"
   },
   "devDependencies": {
     "@xonovex/eslint-config-base": "0.1.12",
-    "@xonovex/ts-config-build": "0.1.12",
+    "@xonovex/ts-config-build": "0.1.13",
     "typescript": "5.9.3"
   },
   "scripts": {

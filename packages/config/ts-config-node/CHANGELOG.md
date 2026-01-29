@@ -1,5 +1,11 @@
 # @xonovex/ts-config-node
 
+## 0.1.13
+
+### Patch Changes
+
+- [`ee09c16`](https://github.com/xonovex/platform/commit/ee09c16952b32df1c023d2f6bd5d8ff91a36eb7d) Thanks [@deorder](https://github.com/deorder)! - Fix ts-config packages generating invalid root tsconfig references and update skills README with complete guidelines and workflow documentation.
+
 ## 0.1.12
 
 ### Patch Changes
