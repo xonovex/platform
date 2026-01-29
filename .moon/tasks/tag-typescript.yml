@@ -48,6 +48,7 @@ tasks:
   lint:
     script: npx eslint src
     deps:
+    - build
     - ^:build
     inputs:
     - '@globs(sources)'
@@ -58,6 +59,9 @@ tasks:
       cache: true
   lint-fix:
     script: npx eslint src --fix
+    deps:
+    - build
+    - ^:build
     inputs:
     - '@globs(sources)'
     - '@globs(tests)'
@@ -90,6 +94,7 @@ tasks:
   typecheck:
     script: npx tsc --noEmit
     deps:
+    - build
     - ^:build
     inputs:
     - '@globs(sources)'
