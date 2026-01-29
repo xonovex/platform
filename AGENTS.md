@@ -28,6 +28,11 @@ Monorepo for Xonovex tools and configuration packages.
 - **Validation**: typecheck, lint, build, test must pass; fix warnings at root cause
 - **Deprecation**: Remove unused/deprecated code immediately; do not add @deprecated markers or keep backwards-compatibility shims
 
+## Skills
+
+- **Invoke matching skill first** - Use Skill tool when context matches available skills
+- **Read relevant detail only** - Load `details/*.md` file matching the specific context, not all details
+
 ## Commit Convention
 
 Uses [Conventional Commits](https://www.conventionalcommits.org/). Format: `type(scope): description`
