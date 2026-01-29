@@ -37,6 +37,7 @@ tasks:
     - run
     - typecheck
     deps:
+    - build
     - ^:build
     inputs:
     - '@globs(sources)'
@@ -50,6 +51,7 @@ tasks:
     - run
     - lint
     deps:
+    - build
     - ^:build
     inputs:
     - '@globs(sources)'
@@ -61,6 +63,7 @@ tasks:
     - run
     - lint:fix
     deps:
+    - build
     - ^:build
     inputs:
     - '@globs(sources)'
