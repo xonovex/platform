@@ -43,11 +43,11 @@
   "dependencies": {
     "vite-tsconfig-paths": "6.0.4",
     "@xonovex/eslint-config-base": "^0.1.12",
-    "@xonovex/ts-config-build": "^0.1.13"
+    "@xonovex/ts-config-build": "^0.1.14"
   },
   "devDependencies": {
     "@xonovex/eslint-config-base": "0.1.12",
-    "@xonovex/ts-config-build": "0.1.13"
+    "@xonovex/ts-config-build": "0.1.14"
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",
