@@ -46,6 +46,7 @@ it("should transform data", () => {
 ```
 
 **Techniques:**
+
 - Create mocks with `vi.fn()` without complex generics
 - Use type casting when setting return values
 - Let TypeScript infer types from usage

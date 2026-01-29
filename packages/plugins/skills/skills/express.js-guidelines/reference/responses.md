@@ -21,6 +21,7 @@ res.status(204).send();
 ```
 
 **Techniques:**
+
 - Data wrapper: Wrap all responses in {data: ...} or {error: ...} envelope
 - Status 200: GET, PUT, PATCH success - return {data: modified}
 - Status 201: POST success - return {data: created} with Location header

@@ -39,6 +39,7 @@ def find_user(user_id: str) -> User | None:
 ```
 
 **Techniques:**
+
 - Create type aliases with `TypeAlias` for complex types
 - Use `Protocol` for structural typing requirements
 - Use `Sequence` for read-only list-like parameters

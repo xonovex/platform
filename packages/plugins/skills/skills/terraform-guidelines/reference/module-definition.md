@@ -72,10 +72,10 @@ output "vpc_cidr" {
 ```
 
 **Techniques:**
+
 - **Type constraints:** Specify all variable types to enable early validation
 - **Validation blocks:** Add business logic constraints like CIDR format checking
 - **Common locals:** Centralize shared tags and computed values for consistency
 - **CIDR transformations:** Use cidrsubnet() in locals for flexible subnet allocation
 - **Descriptive outputs:** Export all useful values with clear descriptions
 - **Environment isolation:** Use tags and naming patterns for multi-environment support
-

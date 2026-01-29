@@ -50,6 +50,7 @@ async with async_database_transaction(conn) as db:
 ```
 
 **Techniques:**
+
 - Use `with` for synchronous resource operations
 - Use `async with` for asynchronous resource operations
 - Create custom context managers with `@contextmanager` decorator

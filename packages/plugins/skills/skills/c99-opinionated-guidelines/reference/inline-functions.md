@@ -30,6 +30,7 @@ int result = clampi(x++, 0, 10);
 ```
 
 **Techniques:**
+
 - Replace macros: Replace function-like macros with `static inline` functions
 - Type-specific variants: Create `clampi`, `clampf` instead of generic macro
 - Header placement: Use inline functions in headers for no multiple definition issues

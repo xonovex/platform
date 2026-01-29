@@ -22,6 +22,7 @@ mesh3d_pack_3f_4u8(packed, &mesh, color);
 ```
 
 **Techniques:**
+
 - Analytic layer: Define shapes like `sphere3d_t`, `circle2d_t` for physics/logic
 - Discrete layer: Build indexed meshes from analytic shapes with builder pattern
 - Packing layer: Convert mesh to GPU-ready vertex formats (interleaved/streaming)

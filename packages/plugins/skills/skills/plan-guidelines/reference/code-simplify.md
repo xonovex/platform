@@ -5,6 +5,7 @@
 **Rationale:** Complexity accumulates through duplication and feature additions. Simplification reduces cognitive load, improves maintainability, and helps new contributors.
 
 **Example:**
+
 ```typescript
 // Dead code: unused export
 export interface LegacyUserType { name: string }
@@ -24,6 +25,7 @@ interface Config { host, port, ssl, timeout, retries, backoff, circuit, cache, .
 ```
 
 **Techniques:**
+
 - Scan files and build signature index for duplicate detection
 - Find copy-paste duplicates: identical functions, replicated logic (>10 lines)
 - Identify dead code: uncalled functions, unreachable branches, unused exports

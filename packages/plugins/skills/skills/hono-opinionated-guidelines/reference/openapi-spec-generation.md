@@ -48,6 +48,7 @@ app.doc("/openapi.json", {
 ```
 
 **Techniques:**
+
 - Ensure your app uses `OpenAPIHono` (not regular `Hono`)
 - Define routes using `createRoute()` with full request and response schemas
 - Register routes using `router.openapi(route, handler)` method

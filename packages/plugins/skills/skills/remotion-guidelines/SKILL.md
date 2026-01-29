@@ -23,7 +23,13 @@ description: >-
 ## Example
 
 ```tsx
-import {AbsoluteFill, interpolate, spring, useCurrentFrame, useVideoConfig} from "remotion";
+import {
+  AbsoluteFill,
+  interpolate,
+  spring,
+  useCurrentFrame,
+  useVideoConfig,
+} from "remotion";
 
 export function FadeIn() {
   const frame = useCurrentFrame();

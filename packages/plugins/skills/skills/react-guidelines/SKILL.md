@@ -22,39 +22,40 @@ description: >-
 
 ## Quick Reference
 
-| Feature | React 18 | React 19+ |
-|---------|----------|-----------|
-| Memoization | Manual (`useMemo`, `useCallback`) | React Compiler (automatic) |
-| Forward refs | `forwardRef()` wrapper | `ref` as regular prop |
-| Context provider | `<Context.Provider value={}>` | `<Context value={}>` |
-| Form state | Custom `useState` | `useActionState` hook |
-| Optimistic updates | Manual state | `useOptimistic` hook |
-| Read promises | Not possible | `use()` hook |
-| Conditional context | Not possible | `use(Context)` after conditionals |
-| Form pending | Manual tracking | `useFormStatus` hook |
+| Feature             | React 18                          | React 19+                         |
+| ------------------- | --------------------------------- | --------------------------------- |
+| Memoization         | Manual (`useMemo`, `useCallback`) | React Compiler (automatic)        |
+| Forward refs        | `forwardRef()` wrapper            | `ref` as regular prop             |
+| Context provider    | `<Context.Provider value={}>`     | `<Context value={}>`              |
+| Form state          | Custom `useState`                 | `useActionState` hook             |
+| Optimistic updates  | Manual state                      | `useOptimistic` hook              |
+| Read promises       | Not possible                      | `use()` hook                      |
+| Conditional context | Not possible                      | `use(Context)` after conditionals |
+| Form pending        | Manual tracking                   | `useFormStatus` hook              |
 
 ## Example
 
 ```tsx
 // React 19 Form with Actions
-'use client';
-import { useActionState } from 'react';
+"use client";
+
+import {useActionState} from "react";
 
 function ContactForm() {
   const [state, formAction, isPending] = useActionState(
     async (prev, formData) => {
       const result = await submitForm(Object.fromEntries(formData));
-      if (result.error) return { error: result.error };
-      return { success: true };
+      if (result.error) return {error: result.error};
+      return {success: true};
     },
-    null
+    null,
   );
 
   return (
     <form action={formAction}>
       <input name="email" type="email" disabled={isPending} />
       <button disabled={isPending}>
-        {isPending ? 'Submitting...' : 'Submit'}
+        {isPending ? "Submitting..." : "Submit"}
       </button>
       {state?.error && <p className="error">{state.error}</p>}
     </form>
@@ -62,14 +63,14 @@ function ContactForm() {
 }
 
 // ref as prop (no forwardRef needed)
-function Input({ ref, ...props }: { ref?: React.Ref<HTMLInputElement> }) {
+function Input({ref, ...props}: {ref?: React.Ref<HTMLInputElement>}) {
   return <input ref={ref} {...props} />;
 }
 
 // Context as provider
-const ThemeContext = createContext('light');
+const ThemeContext = createContext("light");
 
-function App({ children }) {
+function App({children}) {
   return <ThemeContext value="dark">{children}</ThemeContext>;
 }
 ```

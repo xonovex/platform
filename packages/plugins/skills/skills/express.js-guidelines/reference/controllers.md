@@ -15,7 +15,10 @@ export async function list(
   try {
     const {page, limit} = req.query;
     const result = await userService.list({page, limit});
-    res.json({data: result.users, pagination: {page, limit, total: result.total}});
+    res.json({
+      data: result.users,
+      pagination: {page, limit, total: result.total},
+    });
   } catch (error) {
     next(error);
   }
@@ -40,6 +43,7 @@ export async function getById(
 ```
 
 **Techniques:**
+
 - Type generics: Use Request<Params, ResBody, ReqBody, Query> for type safety
 - Return Promise<void>: Indicates async function that doesn't return a value
 - Try-catch: Wrap all async logic and pass errors to next(error)

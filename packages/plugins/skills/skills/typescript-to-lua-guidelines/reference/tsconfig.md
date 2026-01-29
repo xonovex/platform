@@ -5,6 +5,7 @@
 **Rationale:** Strict options catch errors early and generate predictable Lua. TSTL settings control targeting, libraries, and debugging.
 
 **Example:**
+
 ```json
 {
   "compilerOptions": {
@@ -36,6 +37,7 @@
 ```
 
 **Techniques:**
+
 - Enable `strict: true` for comprehensive type checking
 - Enable individual strict options: `noImplicitAny`, `strictNullChecks`, `strictFunctionTypes`
 - Enable `noUnusedLocals` and `noUnusedParameters` to catch dead code

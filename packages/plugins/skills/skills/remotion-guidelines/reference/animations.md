@@ -19,7 +19,7 @@ const scale = spring({frame, fps: 30, config: {damping: 8}});
 return <div style={{transform: `scale(${scale})`}}>Bounces in</div>;
 
 // Bad: Won't animate in Remotion
-<div className="animate-bounce">Won't work</div>
+<div className="animate-bounce">Won't work</div>;
 ```
 
 **Linear Interpolation:**
@@ -112,6 +112,7 @@ const opacity = interpolate(frame, [0, 30], [0, 1]);
 ```
 
 **Techniques:**
+
 - useCurrentFrame(): Get current frame number from video composition
 - interpolate(): Map frame ranges to value ranges with extrapolation control
 - spring(): Apply physics-based motion with damping, stiffness, mass

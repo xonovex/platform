@@ -8,21 +8,25 @@
 
 ```markdown
 # Target skill: typescript-guidelines (existing)
+
 - Type inference with `as const`
 - Strict mode requirements
 - ESM imports
 
 # Source skill: zod-guidelines (has relevant patterns)
+
 - Runtime validation
 - Type inference from schemas
 - Error handling patterns
 
 # Extract from source: Type inference pattern
+
 Source: "Use z.infer to extract types from schemas"
 Target's context: TypeScript inference
 Adapted: "Derive types from Zod schemas with z.infer for runtime-validated types"
 
 # Insert into target's "Type Inference" section
+
 - Type inference with `as const` for literal types
 - Derive types from Zod schemas with z.infer for runtime-validated types
 - Use `satisfies` operator to narrow complex unions
@@ -31,6 +35,7 @@ Adapted: "Derive types from Zod schemas with z.infer for runtime-validated types
 ```
 
 **Techniques:**
+
 - Load target and source skills completely, including all detail files
 - Analyze target structure: section order, bullet format, voice, tone
 - Extract relevant patterns from source: guidelines, code examples, rationales

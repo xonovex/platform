@@ -49,6 +49,7 @@ update_config() {
 ```
 
 **Techniques:**
+
 - Check if resources exist before creating them
 - Use conditional operations that skip when already done
 - Use atomic operations with temporary files

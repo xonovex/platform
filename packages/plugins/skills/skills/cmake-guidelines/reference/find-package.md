@@ -22,8 +22,9 @@ endif()
 ```
 
 **Techniques:**
+
 - REQUIRED: Fail build if package not found, use for mandatory dependencies
 - COMPONENTS: Specify individual package parts to reduce linking
 - Namespaced targets: Use Boost::system, OpenSSL::SSL for safe target linking
-- \*_FOUND variable: Check if optional dependency is available before using
+- \*\_FOUND variable: Check if optional dependency is available before using
 - Conditional linking: Add target_compile_definitions when dependencies found

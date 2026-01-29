@@ -27,6 +27,7 @@ stringData:
 ```
 
 **Techniques:**
+
 - ConfigMaps: Store non-sensitive configuration data for reusability
 - Secrets: Store sensitive data like passwords and API keys
 - stringData: Use for automatic base64 encoding in YAML

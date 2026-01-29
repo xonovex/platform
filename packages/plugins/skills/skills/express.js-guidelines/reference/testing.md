@@ -30,6 +30,7 @@ describe("POST /api/users", () => {
 ```
 
 **Techniques:**
+
 - supertest: Make HTTP requests to Express app without network
 - request(app).get/post/patch/delete(): Chain HTTP verb with URL path
 - .send(): Pass request body as JSON

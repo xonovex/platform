@@ -28,6 +28,7 @@ spec:
 ```
 
 **Techniques:**
+
 - ClusterIP type: Use ClusterIP for internal service discovery within cluster
 - Selector matching: Match service selector labels exactly with deployment labels
 - Named ports: Use named ports matching container port names for clarity

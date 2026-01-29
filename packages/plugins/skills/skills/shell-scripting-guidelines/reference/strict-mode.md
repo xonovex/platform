@@ -34,6 +34,7 @@ set -e
 ```
 
 **Techniques:**
+
 - Add `set -eu` at the top of POSIX scripts
 - Add `set -euo pipefail` for bash/zsh scripts
 - Handle expected failures explicitly with `if ! command; then`

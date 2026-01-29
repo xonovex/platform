@@ -5,6 +5,7 @@
 **Rationale:** Similar code should follow consistent patterns. Identifies bugs from missing error handling, outdated APIs, or logic differences.
 
 **Example:**
+
 ```
 // Compare two API implementations
 File A: imports v3.5, uses async/await, has try-catch
@@ -14,6 +15,7 @@ Report: Version mismatch (v3.5 vs v2.1), pattern divergence (async vs callback)
 ```
 
 **Techniques:**
+
 - Load both files and detect code type (TypeScript, Python, Go, etc.)
 - Compare imports, dependencies, and version constraints across implementations
 - Analyze interfaces, types, and function signatures for structural differences

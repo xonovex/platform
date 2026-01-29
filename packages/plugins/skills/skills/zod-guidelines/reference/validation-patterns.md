@@ -16,10 +16,18 @@ const user = await createUser(result.data);
 
 // Query transformation with pipe
 const PaginationSchema = z.object({
-  page: z.string().regex(/^\d+$/).transform(Number)
-    .pipe(z.number().int().min(1)).default(1),
-  limit: z.string().regex(/^\d+$/).transform(Number)
-    .pipe(z.number().int().min(1).max(100)).default(10),
+  page: z
+    .string()
+    .regex(/^\d+$/)
+    .transform(Number)
+    .pipe(z.number().int().min(1))
+    .default(1),
+  limit: z
+    .string()
+    .regex(/^\d+$/)
+    .transform(Number)
+    .pipe(z.number().int().min(1).max(100))
+    .default(10),
 });
 
 // Controlled data (safe to use parse)
@@ -27,6 +35,7 @@ const validated = InternalSchema.parse(data);
 ```
 
 **Techniques:**
+
 - `.safeParse()`: Use for external input (API, user, services); never throws
 - `.parse()`: Use only for controlled data; throws on validation failure
 - Check `result.success`: Always verify before accessing `result.data`

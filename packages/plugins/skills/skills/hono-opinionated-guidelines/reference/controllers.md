@@ -31,6 +31,7 @@ export function listUsers(c: Context) {
 ```
 
 **Techniques:**
+
 - Review controller function body for `await` keyword usage
 - Remove `async` keyword if no `await` exists in function
 - Ensure return statements work with or without async (c.json() compatible)

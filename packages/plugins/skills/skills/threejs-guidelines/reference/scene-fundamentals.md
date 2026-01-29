@@ -5,8 +5,9 @@
 **Rationale:** Proper setup ensures memory safety, correct rendering, and frame-rate independence; improper disposal causes memory leaks.
 
 **Example:**
+
 ```javascript
-const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+const renderer = new THREE.WebGLRenderer({antialias: true, alpha: true});
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.shadowMap.enabled = true;
 const clock = new THREE.Clock();
@@ -18,6 +19,7 @@ renderer.setAnimationLoop(() => {
 ```
 
 **Techniques:**
+
 - Renderer config: antialias, alpha (transparency), outputColorSpace (sRGB), toneMaps, shadowMap
 - Scene setup: background (color/texture), environment map (PBR), fog, traverse()
 - Object3D: position/rotation/scale, add/remove, visible (hide without disposal), layers, userData

@@ -36,6 +36,7 @@ SELECT * FROM org_tree ORDER BY level, name;
 ```
 
 **Techniques:**
+
 - Name CTEs descriptively (active_users, not cte1)
 - Use CTEs to decompose multi-step logic
 - Reference CTEs multiple times to avoid repetition

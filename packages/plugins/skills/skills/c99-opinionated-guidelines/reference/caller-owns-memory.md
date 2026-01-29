@@ -31,6 +31,7 @@ status_t entity_add(entity_system_t *sys, float x, float y) {
 ```
 
 **Techniques:**
+
 - Functions receive pointers: Accept caller-provided storage instead of allocating
 - Init functions: Bind library state to caller-owned arrays with capacity tracking
 - Status returns: Return status codes, never allocated pointers

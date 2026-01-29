@@ -5,15 +5,17 @@
 **Rationale:** Built-ins are optimized; proper BufferGeometry avoids redundant data; InstancedMesh enables thousands of copies in one draw call.
 
 **Example:**
+
 ```javascript
 const geometry = new THREE.BufferGeometry();
-geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-geometry.setAttribute('uv', new THREE.BufferAttribute(uvs, 2));
+geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+geometry.setAttribute("uv", new THREE.BufferAttribute(uvs, 2));
 geometry.setIndex(new THREE.BufferAttribute(indices, 1));
 geometry.computeVertexNormals();
 ```
 
 **Techniques:**
+
 - Built-ins: BoxGeometry, SphereGeometry, PlaneGeometry, CylinderGeometry, IcosahedronGeometry, etc.
 - Path-based: LatheGeometry (vases), TubeGeometry (splines), ExtrudeGeometry (2D extrude), TextGeometry (fonts)
 - Custom BufferGeometry: Position (required), UV, indices (reuse vertices), normals, bounds

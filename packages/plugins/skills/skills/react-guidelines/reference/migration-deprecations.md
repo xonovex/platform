@@ -4,21 +4,21 @@
 
 **Rationale:** React 19 removes long-deprecated APIs. Upgrade to React 18.3 first to see deprecation warnings, then migrate.
 
-| Removed | Migration |
-|---------|-----------|
-| `ReactDOM.render()` | `createRoot().render()` |
-| `ReactDOM.hydrate()` | `hydrateRoot()` |
-| `unmountComponentAtNode()` | `root.unmount()` |
-| `ReactDOM.findDOMNode()` | Use refs |
-| `propTypes` | TypeScript |
-| `defaultProps` (functions) | ES6 default parameters |
-| String refs | Callback refs or `useRef` |
-| Legacy Context | `createContext` |
-| `react-dom/test-utils` | `act` from `'react'` |
+| Removed                    | Migration                 |
+| -------------------------- | ------------------------- |
+| `ReactDOM.render()`        | `createRoot().render()`   |
+| `ReactDOM.hydrate()`       | `hydrateRoot()`           |
+| `unmountComponentAtNode()` | `root.unmount()`          |
+| `ReactDOM.findDOMNode()`   | Use refs                  |
+| `propTypes`                | TypeScript                |
+| `defaultProps` (functions) | ES6 default parameters    |
+| String refs                | Callback refs or `useRef` |
+| Legacy Context             | `createContext`           |
+| `react-dom/test-utils`     | `act` from `'react'`      |
 
-| Deprecated | Migration |
-|------------|-----------|
-| `forwardRef` | `ref` as prop |
+| Deprecated         | Migration            |
+| ------------------ | -------------------- |
+| `forwardRef`       | `ref` as prop        |
 | `Context.Provider` | `<Context value={}>` |
 
 **Example:**
@@ -98,6 +98,7 @@ npx codemod@latest react/19/replace-act-import
 ```
 
 **Techniques:**
+
 - Removed APIs: ReactDOM.render, ReactDOM.hydrate, findDOMNode, string refs, propTypes
 - createRoot: Use for client-side rendering instead of deprecated ReactDOM.render
 - useRef/Callback refs: Replace string refs like ref="fieldName"

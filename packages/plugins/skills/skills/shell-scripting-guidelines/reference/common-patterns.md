@@ -38,6 +38,7 @@ fi
 ```
 
 **Techniques:**
+
 - Use `while IFS= read -r line` to read files line by line
 - Create temp files/dirs with `mktemp` and always trap cleanup
 - Use command substitution in conditionals for proper error handling

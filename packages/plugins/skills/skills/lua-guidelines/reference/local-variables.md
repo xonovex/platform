@@ -27,6 +27,7 @@ value = calculate(3, 4)  -- Global!
 ```
 
 **Techniques:**
+
 - Prefix all variable declarations with `local`
 - Prefix all function declarations with `local`
 - Only export through module return table

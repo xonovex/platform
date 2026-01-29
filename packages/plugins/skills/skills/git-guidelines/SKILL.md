@@ -34,10 +34,12 @@ description: >-
 ## Progressive Disclosure
 
 ### Commit Operations
+
 - Read [reference/commit.md](reference/commit.md) - Commit with auto-generated conventional messages
 - Read [reference/merge-resolve.md](reference/merge-resolve.md) - Detect and resolve merge conflicts with AI assistance
 
 ### Worktree Operations
+
 - Read [reference/worktree-create.md](reference/worktree-create.md) - Create feature worktree with branch
 - Read [reference/worktree-commit.md](reference/worktree-commit.md) - Auto-commit with plan context
 - Read [reference/worktree-validate.md](reference/worktree-validate.md) - Pre-merge validation checkpoint

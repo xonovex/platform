@@ -53,6 +53,7 @@ itemsRouter.openapi(createItemRoute, (c) => {
 ```
 
 **Techniques:**
+
 - Review all `c.json()` calls in OpenAPI handlers and add status code parameter
 - Use 200 for success (OK) and 201 for creation (Created)
 - Use 400 (Bad Request), 404 (Not Found), 500 (Server Error) for error cases

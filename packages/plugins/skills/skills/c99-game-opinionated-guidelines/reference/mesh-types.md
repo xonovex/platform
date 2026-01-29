@@ -25,6 +25,7 @@ typedef struct {
 ```
 
 **Techniques:**
+
 - Capacity tracking: Maintain separate count and capacity for dynamic growth
 - Builder pattern: Use `{shape}_mesh{dim}_{req|build}` naming convention
 - Optional data: Include normals/UVs in mesh3d for advanced rendering

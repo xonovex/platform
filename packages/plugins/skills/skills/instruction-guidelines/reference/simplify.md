@@ -14,6 +14,7 @@
 The platform requires initialization through a multi-step process. First, you must install all necessary dependencies using the npm package manager. After installation, you should pull all large files from Git LFS to ensure you have the complete codebase available locally.
 
 The setup process involves:
+
 1. Running npm install to fetch all dependencies
 2. Running git lfs pull to download large binary files
 
@@ -38,6 +39,7 @@ The project uses Moon as a task orchestration system. To run tasks, use the `npx
 ```
 
 **Techniques:**
+
 - Measure baseline line count to track reduction
 - Remove verbose prose and redundant descriptions
 - Condense multi-line bullets to single lines with inline details

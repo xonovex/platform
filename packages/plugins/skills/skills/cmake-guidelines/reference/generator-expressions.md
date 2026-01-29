@@ -27,6 +27,7 @@ target_compile_definitions(mylib PRIVATE
 ```
 
 **Techniques:**
+
 - BUILD_INTERFACE/INSTALL_INTERFACE: Different paths for build vs installed consumption
 - CXX_COMPILER_ID: Detect compiler and apply vendor-specific flags
 - CONFIG: Apply Debug or Release build-specific settings

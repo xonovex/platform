@@ -5,6 +5,7 @@
 **Rationale:** Hierarchical organization enables efficient transforms; cleanup prevents GPU memory exhaustion; delta time ensures consistent movement across devices.
 
 **Example:**
+
 ```javascript
 const scene = new THREE.Scene();
 const clock = new THREE.Clock();
@@ -21,6 +22,7 @@ function animate() {
 ```
 
 **Techniques:**
+
 - Scene hierarchy: Group objects (world → player/enemies/effects) for batch transforms
 - Frame-rate independence: Multiply movement by `clock.getDelta()`; use `getElapsedTime()` for animations
 - Cleanup pattern: Dispose geometry/materials; `mixer.stopAllAction()`, remove listeners, call on `beforeunload`

@@ -28,6 +28,7 @@
 ```
 
 **Techniques:**
+
 - Find AGENTS.md and CLAUDE.md in source path for project guidelines
 - Glob source files by extension to identify language and file patterns
 - Extract patterns from project docs: section headers, tables, code blocks, architecture

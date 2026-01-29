@@ -1,6 +1,7 @@
 $schema: https://moonrepo.dev/schemas/project.json
 language: other
 tags:
+  - npm
   - tenant-shared
   - tsconfig
 fileGroups:

@@ -35,6 +35,7 @@ end
 ```
 
 **Techniques:**
+
 - Return `nil, error_message` on failure
 - Return value on success
 - Check first return value before using

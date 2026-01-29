@@ -37,6 +37,7 @@ git push -o ci.skip origin HEAD:services/feature/auth-flow
 ```
 
 **Techniques:**
+
 - Detect worktree name from directory
 - Check changes: `git status --porcelain`
 - Analyze changed files: test, docs, source, config

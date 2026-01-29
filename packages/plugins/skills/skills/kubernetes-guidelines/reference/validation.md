@@ -24,6 +24,7 @@ kubectl diff -k k8s/overlays/production
 ```
 
 **Techniques:**
+
 - Server dry-run: Use `--dry-run=server` to validate against cluster API
 - Kustomize build: Run `kustomize build` to verify overlay composition
 - Kubectl diff: Use `kubectl diff` to preview exact changes before applying

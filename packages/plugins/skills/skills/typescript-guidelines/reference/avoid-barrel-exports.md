@@ -8,8 +8,8 @@
 
 ```typescript
 // ✅ Good: Direct imports, no index.ts
-import {authMiddleware} from "./middlewares/jwt.js";
 import {csrfProtection} from "./middlewares/csrf.js";
+import {authMiddleware} from "./middlewares/jwt.js";
 
 // ❌ Bad: Subdirectory barrel exports
 // src/middlewares/index.ts
@@ -18,6 +18,7 @@ export {csrfProtection} from "./csrf.js";
 ```
 
 **Techniques:**
+
 - Remove `index.ts` from subdirectories (middlewares, utils, services, controllers)
 - Update imports to specific files directly
 - Use IDE refactoring tools to update all imports automatically

@@ -29,6 +29,7 @@ app.get("/users", (c) => {
 ```
 
 **Techniques:**
+
 - Run ESLint to find @typescript-eslint/require-await violations
 - Remove `async` keyword for each flagged function
 - Verify return types still match (Promises ok without `async`)

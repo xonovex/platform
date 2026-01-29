@@ -5,10 +5,11 @@
 **Rationale:** Raycasting picks objects; state tracking enables hover highlights and drag interactions; coordinate conversion is essential.
 
 **Example:**
+
 ```javascript
 const raycaster = new THREE.Raycaster();
 const pointer = new THREE.Vector2();
-window.addEventListener('pointermove', (e) => {
+window.addEventListener("pointermove", (e) => {
   pointer.x = (e.clientX / innerWidth) * 2 - 1;
   pointer.y = -(e.clientY / innerHeight) * 2 + 1;
   raycaster.setFromCamera(pointer, camera);
@@ -18,6 +19,7 @@ window.addEventListener('pointermove', (e) => {
 ```
 
 **Techniques:**
+
 - NDC conversion: `pointer.x = (clientX / width) * 2 - 1`, `pointer.y = -(clientY / height) * 2 + 1`
 - Intersection properties: object, point (world), distance, uv, face, instanceId
 - Hover effects: Track state, restore original color on exit

@@ -34,6 +34,7 @@ git push origin master
 ```
 
 **Techniques:**
+
 - Detect worktree name from directory basename
 - Get source branch from arg or `git branch --show-current`
 - Sanitize feature name to kebab-case format

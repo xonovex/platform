@@ -36,6 +36,7 @@ end
 ```
 
 **Techniques:**
+
 - Use `assert()` with descriptive messages
 - Check types with `type()` function
 - Validate numeric ranges and constraints

@@ -29,8 +29,10 @@ description: >-
 ## Progressive Disclosure
 
 ### Content Types
+
 - Read [reference/news.md](reference/news.md) - Auto-curate latest news with bilingual summaries
 - Read [reference/travelguide.md](reference/travelguide.md) - Multi-language travel destination guides
 
 ### Writing Quality
+
 - Read [reference/humanize.md](reference/humanize.md) - Remove AI patterns and make text natural

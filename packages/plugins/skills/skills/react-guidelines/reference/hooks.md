@@ -5,6 +5,7 @@
 **Rationale:** Hook rules ensure predictable behavior; custom hooks enable logic reuse without prop drilling; focused hooks maintain single responsibility.
 
 **Example:**
+
 ```tsx
 // useApi - fetch with loading/error states
 function useApi<T>(url: string) {
@@ -14,14 +15,23 @@ function useApi<T>(url: string) {
 
   useEffect(() => {
     let cancelled = false;
-    fetch(url).then(r => r.json()).then(json => {
-      if (!cancelled) {setData(json); setError(null);}
-    }).catch(err => {
-      if (!cancelled) setError(err);
-    }).finally(() => {
-      if (!cancelled) setLoading(false);
-    });
-    return () => {cancelled = true;};
+    fetch(url)
+      .then((r) => r.json())
+      .then((json) => {
+        if (!cancelled) {
+          setData(json);
+          setError(null);
+        }
+      })
+      .catch((err) => {
+        if (!cancelled) setError(err);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [url]);
 
   return {data, loading, error};
@@ -29,6 +39,7 @@ function useApi<T>(url: string) {
 ```
 
 **Techniques:**
+
 - Rules of Hooks: Call only at top-level (not loops/conditions); only from functions/custom hooks
 - Custom hooks: Extract reusable logic; name with `use` prefix; single responsibility
 - useApi: Fetch with cancellation flag; handle loading/error/data states; type-generic

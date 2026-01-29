@@ -33,6 +33,7 @@ add_test(NAME core_test COMMAND core_test)
 ```
 
 **Techniques:**
+
 - cmake_minimum_required(): Set 3.20+ for modern CMake features
 - project(): Declare name, version, description, and required languages
 - add_library/add_executable(): Create targets for libraries and binaries

@@ -51,6 +51,7 @@ function CartTotalBad({items}: {items: CartItem[]}) {
 ```
 
 **Techniques:**
+
 - Break down large components into smaller, focused pieces
 - Keep state in the lowest common ancestor that needs it
 - Calculate derived values using `useMemo` instead of storing them in state

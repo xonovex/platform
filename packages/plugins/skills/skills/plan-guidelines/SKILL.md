@@ -32,6 +32,7 @@ description: >-
 ## Progressive Disclosure
 
 ### Research Analysis
+
 - Read [reference/general-research.md](reference/general-research.md) - Research codebase and web for requirements
 - Read [reference/code-align.md](reference/code-align.md) - Compare two similar implementations
 - Read [reference/code-barrels-remove.md](reference/code-barrels-remove.md) - Analyze barrel exports for removal
@@ -44,6 +45,7 @@ description: >-
 - Read [reference/todos.md](reference/todos.md) - Scan and group TODO comments
 
 ### Plan Creation
+
 - Read [reference/plan-create.md](reference/plan-create.md) - Create plan with task breakdown and dependencies
 - Read [reference/plan-tdd-create.md](reference/plan-tdd-create.md) - Create TDD plan with sequential RED-GREEN-COMMIT tasks
 

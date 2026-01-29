@@ -37,6 +37,7 @@ LIMIT 20;
 ```
 
 **Techniques:**
+
 - Use `EXPLAIN ANALYZE` to inspect query execution plans
 - Look for sequential scans where indexes should be used
 - Replace N+1 query patterns with JOINs or aggregation

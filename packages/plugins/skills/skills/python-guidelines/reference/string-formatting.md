@@ -34,6 +34,7 @@ message_format = "Hello, {}! You are {} years old.".format(name, age)
 ```
 
 **Techniques:**
+
 - Use f-string syntax: `f"text {variable} more text"`
 - Embed expressions directly: `f"result: {2 + 2}"`
 - Apply format specifiers: `f"{value:.2f}"` for decimals

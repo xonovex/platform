@@ -30,6 +30,7 @@ CMD ["dist/server.js"]
 ```
 
 **Techniques:**
+
 - Stage separation: Use distinct dependencies, build, and runtime stages
 - Artifact copying: Copy only necessary outputs between stages
 - Minimal runtime: Use distroless or alpine for production image

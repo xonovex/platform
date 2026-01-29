@@ -40,6 +40,7 @@ git push origin abandoned/auth-redesign-2026-01
 ```
 
 **Techniques:**
+
 - Verify in feature worktree
 - Gather context: feature name, plan, commits, work completed
 - Prompt for abandonment reason

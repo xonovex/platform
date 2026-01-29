@@ -5,6 +5,7 @@
 **Rationale:** Separates research from planning, allowing exploration and decision-making before implementation. Enables saving research independently from multiple sources (codebase + web).
 
 **Example:**
+
 ```
 Research Topic: "Add OAuth2 authentication to API"
 
@@ -25,6 +26,7 @@ Recommendations:
 ```
 
 **Techniques:**
+
 - Parse research topic and clarify scope with specific requirements
 - Explore codebase patterns using parallel search: grep, glob, file reading
 - Document current library versions and identify similar implementations

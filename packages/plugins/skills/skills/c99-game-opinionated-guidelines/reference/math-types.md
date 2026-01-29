@@ -24,7 +24,8 @@ m.columns[3] = (vec4f_t){.x = tx, .y = ty, .z = tz, .w = 1.0f};
 ```
 
 **Techniques:**
-- 16-byte alignment: Pad vec3 with _pad field for SIMD-friendly 16B size
+
+- 16-byte alignment: Pad vec3 with \_pad field for SIMD-friendly 16B size
 - Union design: Combine named fields with array access for flexibility
 - Column-major matrices: Store matrix4f_t as 4 column vectors
 - Quaternion format: Use x, y, z, w order with normalization constraint

@@ -61,6 +61,7 @@ main "$@"
 ```
 
 **Techniques:**
+
 - Begin with `#!/usr/bin/env sh` for portability
 - Add script description and usage in comments
 - Set strict mode with `set -eu`

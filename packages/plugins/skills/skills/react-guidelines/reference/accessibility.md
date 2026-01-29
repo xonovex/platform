@@ -5,10 +5,13 @@
 **Rationale:** Accessible design works for all users (screen readers, keyboards, assistive tech); legal requirement in many jurisdictions.
 
 **Example:**
+
 ```tsx
-function Modal({ isOpen, onClose, title, children }) {
+function Modal({isOpen, onClose, title, children}) {
   const closeButtonRef = useRef<HTMLButtonElement>(null);
-  useEffect(() => { if (isOpen) closeButtonRef.current?.focus(); }, [isOpen]);
+  useEffect(() => {
+    if (isOpen) closeButtonRef.current?.focus();
+  }, [isOpen]);
   if (!isOpen) return null;
   return (
     <div role="dialog" aria-modal="true" aria-labelledby="modal-title">
@@ -23,6 +26,7 @@ function Modal({ isOpen, onClose, title, children }) {
 ```
 
 **Techniques:**
+
 - Semantic HTML: `<button>`, `<nav>`, `<main>`, `<article>` instead of divs
 - ARIA attributes: aria-label, aria-labelledby, aria-describedby, role="dialog", role="list"
 - Focus management: useRef + useEffect to move focus to interactive elements

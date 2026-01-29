@@ -40,6 +40,7 @@ fib_10_again = fibonacci(10)  # Returns cached
 ```
 
 **Techniques:**
+
 - Use `@cache` for unbounded caching of pure functions
 - Use `@lru_cache(maxsize=N)` for size-limited caching
 - Only cache pure functions (no side effects, deterministic output)

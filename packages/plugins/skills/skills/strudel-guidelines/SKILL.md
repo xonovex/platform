@@ -25,15 +25,15 @@ description: >-
 ## Example
 
 ```javascript
-setcpm(138/4)
+setcpm(138 / 4);
 
 stack(
   s("bd*4").gain(0.8),
   s("~ cp ~ cp").gain(0.5).room(0.3),
   s("hh*16").gain(0.3).lpf(sine.range(800, 4000).slow(4)),
   note("a2*8").sound("sawtooth").lpf(700).gain(0.5),
-  note("<a3 f3 c4 g3>").sound("sawtooth").lpf(2000).room(0.8).gain(0.3)
-)
+  note("<a3 f3 c4 g3>").sound("sawtooth").lpf(2000).room(0.8).gain(0.3),
+);
 ```
 
 ## Progressive Disclosure

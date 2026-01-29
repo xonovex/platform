@@ -5,6 +5,7 @@
 **Rationale:** Material complexity directly impacts framerate; fewer unique materials reduce draw calls; transparency requires depth-aware rendering.
 
 **Example:**
+
 ```javascript
 const pbr = new THREE.MeshStandardMaterial({
   color: 0xffffff,
@@ -12,12 +13,13 @@ const pbr = new THREE.MeshStandardMaterial({
   metalness: 0.0,
   map: texture,
   normalMap: normalTex,
-  envMap: envTex
+  envMap: envTex,
 });
 // Reuse: mesh1.material = pbr; mesh2.material = pbr;
 ```
 
 **Techniques:**
+
 - Material types: MeshBasicMaterial (fastest, unlit), Lambert (matte), Phong (shiny), Standard/Physical (PBR realistic)
 - PBR properties: roughness 0=mirror/1=diffuse; metalness 0=dielectric/1=metal; use maps for per-pixel variation
 - Transparency: `.alphaTest` for hard edges (fast); `.transparent=true` + `.depthWrite=false` + `.renderOrder` for smooth (slow)

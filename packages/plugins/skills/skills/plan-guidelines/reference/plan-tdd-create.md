@@ -5,6 +5,7 @@
 **Rationale:** Creates actionable TDD plan from research context. Each RED-GREEN-COMMIT cycle becomes a tracked task, ensuring test-first development with proper sequencing.
 
 **Example:**
+
 ```
 ## TDD Plan: User Authentication
 
@@ -33,6 +34,7 @@
 ```
 
 **Techniques:**
+
 - Read specification and extract research findings from prior analysis
 - Decompose feature into discrete, testable stories
 - Sequence stories: basic → properties → behavior → edge cases → validation

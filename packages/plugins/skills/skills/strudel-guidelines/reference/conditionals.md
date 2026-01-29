@@ -5,15 +5,17 @@
 **Rationale:** Procedural variation creates organic, evolving patterns; manual static edits sound lifeless and repetitive.
 
 **Example:**
+
 ```javascript
 // Evolving drum pattern
 s("bd*4")
-  .every(4, x => x.fast(2))     // Double speed every 4 cycles
-  .every(8, x => x.gain(0.5))   // Quieter every 8 cycles
-  .sometimes(x => x.speed(0.5)) // Occasional pitch drop
+  .every(4, (x) => x.fast(2)) // Double speed every 4 cycles
+  .every(8, (x) => x.gain(0.5)) // Quieter every 8 cycles
+  .sometimes((x) => x.speed(0.5)); // Occasional pitch drop
 ```
 
 **Techniques:**
+
 - `.every(n, fn)`: Apply transformation periodically (repeats every n cycles)
 - `.sometimes()`, `.often()`, `.rarely()`, `.almostAlways()`: Probabilistic 50%, 75%, 10%, 90%
 - `.degradeBy(0.7)`: Keep only 70% of events (sparse/glitchy feel)

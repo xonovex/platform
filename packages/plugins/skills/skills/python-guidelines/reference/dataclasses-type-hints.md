@@ -56,6 +56,7 @@ print(user.email)
 ```
 
 **Techniques:**
+
 - Import `dataclass` decorator and type hints
 - Annotate all fields with types using modern syntax (`list[T]`, `dict[K,V]`)
 - Use `frozen=True` for immutable data structures

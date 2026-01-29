@@ -31,6 +31,7 @@ size_t mesh3d_pack_size(const mesh3d_t *m, vertex_format_t fmt) {
 ```
 
 **Techniques:**
+
 - Vertex format naming: Use `vertex_{components}_{types}_t` (e.g., `vertex_3f_4u8_t`)
 - Interleaved layout: Pack all attributes per-vertex in single buffer
 - Streaming layout: Separate position/normal/UV into different buffers

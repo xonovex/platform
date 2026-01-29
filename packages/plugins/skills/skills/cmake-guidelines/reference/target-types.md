@@ -30,6 +30,7 @@ add_executable(gui WIN32 MACOSX_BUNDLE src/gui.cpp)
 ```
 
 **Techniques:**
+
 - add_library() without type: Let BUILD_SHARED_LIBS control static vs shared
 - STATIC: Always statically link, good for embedded or single-binary scenarios
 - SHARED: Dynamic library for runtime linking and flexible updates

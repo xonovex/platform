@@ -46,6 +46,7 @@ return Vector
 ```
 
 **Techniques:**
+
 - Create table with `__index` pointing to itself
 - Use constructor pattern with `setmetatable`
 - Define methods using colon syntax

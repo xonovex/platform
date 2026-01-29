@@ -35,6 +35,7 @@ for (size_t i = 0; i < system.count; i++) {
 ```
 
 **Techniques:**
+
 - Separate fields: Move frequently accessed fields into their own arrays
 - Cache locality: Sequential memory access maximizes CPU cache utilization
 - Array sync: Keep indices synchronized across all component arrays

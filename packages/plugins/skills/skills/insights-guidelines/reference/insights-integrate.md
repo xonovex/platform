@@ -26,6 +26,7 @@ description: Use when writing tests. Apply for type safety, mocking, async patte
 ```
 
 **Techniques:**
+
 - Search insights/ directory for category-matching insight files
 - Parse content and extract topics with MISTAKE/DISCOVERY/FIX sections
 - Generate or merge SKILL.md: Essentials (3-7 items), Progressive Disclosure links

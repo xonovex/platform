@@ -54,6 +54,7 @@ setCookie(c, "__Host-session", token, {
 ```
 
 **Techniques:**
+
 - Import cookie helpers from `hono/cookie` (setCookie, getCookie, setSignedCookie, getSignedCookie)
 - Always set `secure: true` and `httpOnly: true` for sensitive cookies
 - Use `sameSite: 'Strict'` for maximum CSRF protection or `'Lax'` for better compatibility

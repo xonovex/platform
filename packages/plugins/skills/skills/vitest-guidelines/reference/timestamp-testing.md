@@ -48,6 +48,7 @@ it("should update timestamp", async () => {
 ```
 
 **Techniques:**
+
 - Verify timestamp exists and is correct type (preferred approach)
 - Add explicit delay (10-50ms) before second operation if comparison needed
 - Use timestamp ranges (before/after) instead of exact equality

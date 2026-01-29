@@ -5,16 +5,18 @@
 **Rationale:** Tempo anchors rhythmic relationships; timing modifiers create polyrhythms, syncopation, and groove feels.
 
 **Example:**
+
 ```javascript
-setcpm(138/4)  // 138 BPM (uplifting trance)
+setcpm(138 / 4); // 138 BPM (uplifting trance)
 stack(
-  s("bd*4"),                    // Main beat
-  s("sd*3").slow(4/3),          // 3-per-cycle polyrhythm
-  note("c4").slow(4).room(0.8)  // 4-cycle pad
-)
+  s("bd*4"), // Main beat
+  s("sd*3").slow(4 / 3), // 3-per-cycle polyrhythm
+  note("c4").slow(4).room(0.8), // 4-cycle pad
+);
 ```
 
 **Techniques:**
+
 - `setcpm(BPM/4)`: Set tempo (128=house, 138=trance, 170=drum&bass)
 - `.slow(n)`: Pattern takes n cycles (half speed)
 - `.fast(n)`: Pattern plays n times per cycle (double speed)

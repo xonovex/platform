@@ -2,7 +2,8 @@ $schema: https://moonrepo.dev/schemas/project.json
 language: typescript
 layer: configuration
 tags:
-- tenant-shared
-- typescript
+  - npm
+  - tenant-shared
+  - typescript
 dependsOn:
 - ts-config-node

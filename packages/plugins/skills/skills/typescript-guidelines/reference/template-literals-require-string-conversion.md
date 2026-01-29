@@ -19,6 +19,7 @@ throw new Error(`Timeout after ${String(5000)}ms`);
 ```
 
 **Techniques:**
+
 - Wrap numeric values in `String()` when using template literals
 - Apply to all primitive types in templates (numbers, booleans)
 - Run ESLint to find @typescript-eslint/restrict-template-expressions violations

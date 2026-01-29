@@ -35,6 +35,7 @@ CMD ["dist/src/server.js"]
 ```
 
 **Techniques:**
+
 - moon docker scaffold: Extracts workspace config and package dependencies
 - moon docker prune: Removes dev dependencies and build artifacts
 - Skeleton stage: Separates dependency resolution from source copying

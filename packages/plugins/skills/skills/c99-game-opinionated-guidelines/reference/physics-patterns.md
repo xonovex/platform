@@ -21,6 +21,7 @@ void apply_impulse(rigidbody_t *rb, vec3f_t impulse) {
 ```
 
 **Techniques:**
+
 - Inverse mass: Store `inv_mass` (1/mass); zero for static bodies to disable movement
 - Bit flags: Use `uint32_t` with bitmask enums for state like ACTIVE, SLEEPING
 - Sync maps: Index maps decouple physics arrays from entity system arrays

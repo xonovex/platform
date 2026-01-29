@@ -24,6 +24,7 @@ CMD ["node", "dist/server.js"]
 ```
 
 **Techniques:**
+
 - Health checks: Add HEALTHCHECK for orchestration failure detection
 - Environment config: Use ENV for deployment-specific configuration
 - Persistent volumes: Define VOLUME for data that must survive restarts

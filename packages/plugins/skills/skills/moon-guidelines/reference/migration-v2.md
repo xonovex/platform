@@ -17,11 +17,12 @@ This handles most configuration renames automatically.
 ## Breaking Changes Checklist
 
 ### Task Configuration
-| v1 | v2 |
-|----|-----|
+
+| v1                                     | v2                    |
+| -------------------------------------- | --------------------- |
 | Complex `command:` with shell features | Use `script:` instead |
-| `platform: node` | `toolchains: [node]` |
-| `tasks.*.local: true` | `preset: 'server'` |
+| `platform: node`                       | `toolchains: [node]`  |
+| `tasks.*.local: true`                  | `preset: 'server'`    |
 
 ```yaml
 # v1 - BROKEN in v2
@@ -32,46 +33,52 @@ script: 'echo "foo" && echo "bar"'
 ```
 
 ### Environment Variables
-| v1 Syntax | v1 Behavior | v2 Behavior |
-|-----------|-------------|-------------|
-| `$VAR` | Keep syntax if empty | **Empty string** |
-| `${VAR}` | Keep syntax if empty | **Empty string** |
-| `${VAR?}` | Empty string | Keep syntax if empty |
-| `${VAR:-default}` | Not supported | **Use default** |
+
+| v1 Syntax         | v1 Behavior          | v2 Behavior          |
+| ----------------- | -------------------- | -------------------- |
+| `$VAR`            | Keep syntax if empty | **Empty string**     |
+| `${VAR}`          | Keep syntax if empty | **Empty string**     |
+| `${VAR?}`         | Empty string         | Keep syntax if empty |
+| `${VAR:-default}` | Not supported        | **Use default**      |
 
 ### File Renames
-| v1 | v2 |
-|----|-----|
-| `.moon/toolchain.yml` | `.moon/toolchains.yml` (plural) |
-| `.moon/tasks.yml` | `.moon/tasks/all.yml` (no inheritedBy) |
+
+| v1                    | v2                                     |
+| --------------------- | -------------------------------------- |
+| `.moon/toolchain.yml` | `.moon/toolchains.yml` (plural)        |
+| `.moon/tasks.yml`     | `.moon/tasks/all.yml` (no inheritedBy) |
 
 ### Setting Renames
-| v1 | v2 |
-|----|-----|
+
+| v1              | v2               |
+| --------------- | ---------------- |
 | `type: library` | `layer: library` |
-| `project.name` | `project.title` |
-| `runner:` | `pipeline:` |
-| `vcs.manager` | `vcs.client` |
-| `$projectName` | `$projectTitle` |
-| `$projectType` | `$projectLayer` |
+| `project.name`  | `project.title`  |
+| `runner:`       | `pipeline:`      |
+| `vcs.manager`   | `vcs.client`     |
+| `$projectName`  | `$projectTitle`  |
+| `$projectType`  | `$projectLayer`  |
 | `$taskPlatform` | `$taskToolchain` |
 
 ### Query Language (MQL)
-| v1 | v2 |
-|----|-----|
-| `projectName=foo` | `projectId=foo` |
+
+| v1                    | v2                     |
+| --------------------- | ---------------------- |
+| `projectName=foo`     | `projectId=foo`        |
 | `projectType=library` | `projectLayer=library` |
-| `taskPlatform=node` | `taskToolchain=node` |
+| `taskPlatform=node`   | `taskToolchain=node`   |
 
 ### CLI Changes
-| v1 | v2 |
-|----|-----|
-| `--logLevel` | `--log-level` (kebab-case) |
-| `--update-cache` | `--force` |
-| `--platform` | `--toolchain` |
+
+| v1                      | v2                                            |
+| ----------------------- | --------------------------------------------- |
+| `--logLevel`            | `--log-level` (kebab-case)                    |
+| `--update-cache`        | `--force`                                     |
+| `--platform`            | `--toolchain`                                 |
 | `moon run --dependents` | `moon run --dependents=deep` (value required) |
 
 ### Removed Features
+
 - `moon node` command
 - `moon migrate from-package-json` command
 - `moon query hash` / `moon query hash-diff` commands

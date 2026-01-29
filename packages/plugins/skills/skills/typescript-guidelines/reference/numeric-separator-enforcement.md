@@ -23,6 +23,7 @@ const port = 3000;
 ```
 
 **Techniques:**
+
 - Add underscores for numbers >= 10_000 grouped by thousands
 - Do not add separators for smaller numbers (< 10_000)
 - Run ESLint to find numeric-separators-style violations

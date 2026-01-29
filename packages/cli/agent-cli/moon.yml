@@ -10,6 +10,7 @@ language: typescript
 dependsOn:
   - core
 tags:
+  - npm
   - scripts
   - typescript
 layer: library

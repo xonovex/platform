@@ -5,6 +5,7 @@
 **Rationale:** Templates enable rapid scaffolding while maintaining consistency. Extracting from proven implementations ensures new packages follow established patterns and best practices.
 
 **Example:**
+
 ```
 Analyzing packages/api-auth (successful, reusable):
 ├── src/
@@ -24,6 +25,7 @@ Template parameters:
 ```
 
 **Techniques:**
+
 - Analyze successful package structure: directories, naming, organization patterns
 - Document configuration templates: package.json, tsconfig.json, build settings
 - Extract code patterns: common handlers, middleware, components, hooks

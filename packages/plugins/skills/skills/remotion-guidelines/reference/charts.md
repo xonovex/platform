@@ -5,6 +5,7 @@
 **Rationale:** Remotion controls frame-by-frame timing; library animations bypass frame control; manual rendering ensures sync with audio/video.
 
 **Example:**
+
 ```tsx
 function BarChart({data}) {
   const frame = useCurrentFrame();
@@ -15,9 +16,20 @@ function BarChart({data}) {
       <svg width="100%" height="100%">
         {data.map((item, i) => {
           const delay = i * 5;
-          const progress = spring({frame: frame - delay - 10, fps, config: {damping: 18}});
+          const progress = spring({
+            frame: frame - delay - 10,
+            fps,
+            config: {damping: 18},
+          });
           const barHeight = (item.value / maxValue) * 300 * progress;
-          return <rect key={i} y={350 - barHeight} height={barHeight} fill={item.color} />;
+          return (
+            <rect
+              key={i}
+              y={350 - barHeight}
+              height={barHeight}
+              fill={item.color}
+            />
+          );
         })}
       </svg>
     </AbsoluteFill>
@@ -26,6 +38,7 @@ function BarChart({data}) {
 ```
 
 **Techniques:**
+
 - Bar chart: `spring()` for per-bar stagger; `frame - delay` for sequential animation
 - Pie chart: `interpolate()` for smooth arc fill; use SVG path math for arcs
 - Line chart: SVG path with `strokeDasharray`/`strokeDashoffset` for drawing animation

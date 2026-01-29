@@ -33,6 +33,7 @@ float shape_volume(const shape_t *s) {
 ```
 
 **Techniques:**
+
 - Type enum: Define all variant types in single enum for exhaustiveness
 - Union members: Create named structs within union for each type variant
 - Switch dispatch: Use switch on type field with no default clause

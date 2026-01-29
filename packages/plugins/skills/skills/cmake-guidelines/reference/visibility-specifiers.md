@@ -25,6 +25,7 @@ target_link_libraries(app PRIVATE mylib PUBLIC common INTERFACE interface)
 ```
 
 **Techniques:**
+
 - PUBLIC: Properties visible to both target and all downstream consumers
 - PRIVATE: Properties used only by target, not propagated to consumers
 - INTERFACE: Properties for consumers only, not used by target itself

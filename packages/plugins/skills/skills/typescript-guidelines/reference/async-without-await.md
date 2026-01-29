@@ -25,6 +25,7 @@ const middleware = (c, next) => {
 ```
 
 **Techniques:**
+
 - Review each `async` function for `await` expressions
 - Remove `async` keyword if no `await` found
 - Return `Promise.resolve()` explicitly if signature requires Promise

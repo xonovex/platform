@@ -5,9 +5,10 @@
 **Rationale:** Mixer efficiently plays complex GLTF animations; delta time ensures consistent speed across frame rates.
 
 **Example:**
+
 ```javascript
 const mixer = new THREE.AnimationMixer(gltf.scene);
-const clip = THREE.AnimationClip.findByName(gltf.animations, 'Walk');
+const clip = THREE.AnimationClip.findByName(gltf.animations, "Walk");
 const action = mixer.clipAction(clip);
 action.play();
 const clock = new THREE.Clock();
@@ -18,6 +19,7 @@ renderer.setAnimationLoop(() => {
 ```
 
 **Techniques:**
+
 - AnimationMixer: Create from scene root; plays multiple clips simultaneously
 - AnimationAction: play(), stop(), reset(); loop modes (Repeat, Once, PingPong); timeScale for speed
 - Blending: crossFadeTo(nextAction, duration) for smooth transitions; weight blending for layered animations

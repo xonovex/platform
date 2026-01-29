@@ -7,6 +7,7 @@
 **Example:**
 
 Structure:
+
 1. Introduction (200-300 words): Hook, key logistics, duration
 2. Logistics (400-500 words): Location, hours, transport, tips
 3. Attractions (500-600 words): 3-5 essential with access, duration, cost, hours, tip
@@ -14,6 +15,7 @@ Structure:
 5. Practical Info (400-500 words): Payment, language, weather, safety, customs
 
 Front-matter:
+
 ```yaml
 title: "Destination Name"
 slug: "destination-slug"
@@ -23,6 +25,7 @@ lang: "en"
 ```
 
 **Techniques:**
+
 - WebSearch research: Gather current, comprehensive information before writing
 - Narrative style: Write as knowledgeable friend, pack practical value into prose
 - Language standards: CEFR B1-B2, <20 word sentences, **bold** for critical details

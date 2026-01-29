@@ -30,9 +30,9 @@ terraform {
 ```
 
 **Techniques:**
+
 - **S3 backend:** Store state in versioned, encrypted S3 buckets
 - **DynamoDB locking:** Use DynamoDB tables to prevent concurrent modifications
 - **Encryption:** Enable server-side encryption on S3 backend buckets
 - **Per-environment isolation:** Create separate state buckets for dev, staging, prod
 - **State lifecycle:** Prevent accidental state deletion with versioning and backups
-

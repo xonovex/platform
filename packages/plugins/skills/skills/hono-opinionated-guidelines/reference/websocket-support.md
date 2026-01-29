@@ -51,6 +51,7 @@ wsRouter.get(
 ```
 
 **Techniques:**
+
 - Import `createNodeWebSocket` from `@hono/node-ws` and call with `{app}` parameter
 - Keep entire object reference (e.g., `wsHelpers`) for method-based APIs
 - Call methods on the object: `wsHelpers.injectWebSocket(server)`

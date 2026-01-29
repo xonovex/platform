@@ -54,6 +54,7 @@ temp_file="$(mktemp)"
 ```
 
 **Techniques:**
+
 - Create a `die()` function for fatal errors with exit codes
 - Check command existence with `command -v`
 - Validate file operations before performing them

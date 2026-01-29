@@ -31,8 +31,7 @@ export function FadeUp({children}: {children: React.ReactNode}) {
     <motion.div
       initial={{opacity: 0, y: 20}}
       animate={{opacity: 1, y: 0}}
-      transition={{duration: 0.6, ease: [0.22, 1, 0.36, 1]}}
-    >
+      transition={{duration: 0.6, ease: [0.22, 1, 0.36, 1]}}>
       {children}
     </motion.div>
   );
@@ -42,8 +41,7 @@ export function HoverCard({children}: {children: React.ReactNode}) {
   return (
     <motion.div
       whileHover={{y: -8, boxShadow: "0 20px 40px rgba(0,0,0,0.12)"}}
-      transition={{type: "spring", stiffness: 300, damping: 20}}
-    >
+      transition={{type: "spring", stiffness: 300, damping: 20}}>
       {children}
     </motion.div>
   );

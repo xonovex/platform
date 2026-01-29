@@ -87,6 +87,7 @@ npx types-react-codemod@latest scoped-jsx ./src
 ```
 
 **Techniques:**
+
 - Update `@types/react` and `@types/react-dom` to ^19.0.0
 - Run `npx types-react-codemod@latest preset-19 ./src`
 - Fix ref callback implicit returns: `=> (x = y)` → `=> { x = y; }`

@@ -5,8 +5,9 @@
 **Rationale:** WebGPU provides lower CPU overhead, compute shaders, native Metal/DirectX support; async init required for GPU device setup.
 
 **Example:**
+
 ```javascript
-import * as THREE from 'three/webgpu';
+import * as THREE from "three/webgpu";
 
 const renderer = new THREE.WebGPURenderer({antialias: true});
 renderer.setSize(w, h);
@@ -14,7 +15,7 @@ await renderer.init(); // Required async init
 
 const scene = new THREE.Scene();
 const material = new THREE.MeshStandardNodeMaterial({
-  color: vec3(1.0, 0.0, 0.0)
+  color: vec3(1.0, 0.0, 0.0),
 });
 const mesh = new THREE.Mesh(geometry, material);
 scene.add(mesh);
@@ -22,6 +23,7 @@ renderer.render(scene, camera);
 ```
 
 **Techniques:**
+
 - Setup: `new THREE.WebGPURenderer()` + `await renderer.init()`; async required for device
 - Fallback: Check `navigator.gpu` before creating; fall back to WebGL if unavailable
 - Compute shaders: `Fn([args], returnType)` defines GPU-side computation; `renderer.compute()` executes

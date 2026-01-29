@@ -37,6 +37,7 @@ git config branch.services/feature/auth-flow.plan
 ```
 
 **Techniques:**
+
 - Verify in feature worktree
 - Check commits complete
 - Run validation in sequence: `npm run typecheck`, `npm run lint`, `npm run build`, `npm run test`

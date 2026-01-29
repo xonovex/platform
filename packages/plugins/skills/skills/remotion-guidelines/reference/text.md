@@ -5,9 +5,10 @@
 **Rationale:** Font loading is async; measuring text enables precise layout; frame-based animation ensures consistent timing.
 
 **Example:**
+
 ```tsx
 import {loadFont} from "@remotion/google-fonts/Roboto";
-import {measureText, fitText} from "@remotion/layout-utils";
+import {fitText, measureText} from "@remotion/layout-utils";
 
 const {fontFamily} = loadFont(); // Google Font
 const {width} = measureText({text: "Hello", fontFamily, fontSize: 48});
@@ -15,6 +16,7 @@ const {fontSize} = fitText({text, withinWidth: 500, fontFamily});
 ```
 
 **Techniques:**
+
 - Google Fonts: `loadFont()` from @remotion/google-fonts/FontName
 - Local fonts: `loadFont({family, url: staticFile(), weight})`
 - measureText(): Returns {width, height}; use validateFontIsLoaded: true

@@ -51,6 +51,7 @@ end
 ```
 
 **Techniques:**
+
 - Define all fields in table literal or constructor
 - Pre-allocate arrays with known size
 - Use numeric for loops instead of `pairs` for arrays

@@ -9,6 +9,7 @@ tasks:
 language: typescript
 dependsOn: []
 tags:
+  - npm
   - scripts
   - typescript
 layer: library

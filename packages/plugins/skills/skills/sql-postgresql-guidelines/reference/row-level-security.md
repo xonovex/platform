@@ -58,6 +58,7 @@ SELECT * FROM documents;  -- Only sees tenant's documents
 ```
 
 **Techniques:**
+
 - Enable RLS on multi-tenant tables with `ALTER TABLE ... ENABLE ROW LEVEL SECURITY`
 - Create policies for each operation type (SELECT, INSERT, UPDATE, DELETE)
 - Use `USING` clause to filter which rows are visible/modifiable

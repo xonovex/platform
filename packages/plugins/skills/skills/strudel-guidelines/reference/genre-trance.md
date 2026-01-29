@@ -5,17 +5,21 @@
 **Rationale:** Trance requires precise tempo, layered elements, and evolving filters; proper gain hierarchy and chord progressions maintain energy and emotional impact.
 
 **Example:**
+
 ```javascript
-setcpm(138/4)
+setcpm(138 / 4);
 stack(
   s("bd*4").gain(0.85).lpf(150),
-  note("<a2 a2 f2 g2>*4").sound("sawtooth")
-    .lpf(sine.range(400, 1200).slow(4)).gain(0.52),
-  s("hh*16").gain(0.28).hpf(6000)
-)
+  note("<a2 a2 f2 g2>*4")
+    .sound("sawtooth")
+    .lpf(sine.range(400, 1200).slow(4))
+    .gain(0.52),
+  s("hh*16").gain(0.28).hpf(6000),
+);
 ```
 
 **Techniques:**
+
 - Tempo: `setcpm(138-145/4)` for classic to hard trance pacing
 - Four-on-the-floor: `s("bd*4")` with punchy filtering `.lpf(150)`
 - Rolling bass: `note("*8" or "*16")` with filter automation `.lpf(sine.range())`

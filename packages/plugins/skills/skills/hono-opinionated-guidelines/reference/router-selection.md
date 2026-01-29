@@ -26,6 +26,7 @@ const defaultApp = new Hono();
 ```
 
 **Techniques:**
+
 - Identify deployment environment: serverless/edge (prioritize cold starts) or traditional server
 - Use LinearRouter for serverless/edge environments with repeated initialization
 - Use RegExpRouter for high-throughput APIs with persistent connections

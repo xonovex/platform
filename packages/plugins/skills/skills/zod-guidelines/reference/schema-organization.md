@@ -63,6 +63,7 @@ async function createUser(input: unknown): Promise<User> {
 ```
 
 **Techniques:**
+
 - Name all schemas with PascalCase + "Schema" suffix
 - Define schemas at module level for reuse
 - Always infer types: `type User = z.infer<typeof UserSchema>`

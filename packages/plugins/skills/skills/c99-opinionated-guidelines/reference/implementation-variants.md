@@ -28,6 +28,7 @@ void vec3_dot_soa(float *out, const vec3_soa_t *a, const vec3_soa_t *b) {
 ```
 
 **Techniques:**
+
 - Scalar single: Start with single-object reference implementation for debugging
 - AoS batch: Add batch processing for struct arrays (1.5x speedup)
 - SoA batch: Add cache-friendly variant for large workloads (2-3x speedup)

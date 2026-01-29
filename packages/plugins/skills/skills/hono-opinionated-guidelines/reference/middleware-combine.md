@@ -40,6 +40,7 @@ app.use("*", except(["/health", "/metrics", "/ready"], authMiddleware()));
 ```
 
 **Techniques:**
+
 - Import `some`, `every`, `except` from `hono/combine`
 - Use `some()` for alternative auth methods (OAuth OR API key)
 - Use `every()` for layered requirements (authenticated AND has role)

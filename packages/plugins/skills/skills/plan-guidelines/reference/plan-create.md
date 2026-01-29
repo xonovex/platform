@@ -5,6 +5,7 @@
 **Rationale:** Creates actionable plan from research context. Breaks work into tracked tasks with dependencies, enabling parallel or sequential execution as needed.
 
 **Example:**
+
 ```
 ## Implementation Plan: Add OAuth2 Authentication
 
@@ -27,6 +28,7 @@
 ```
 
 **Techniques:**
+
 - Read specification and clarify requirements with stakeholders
 - Synthesize research findings from conversation history and prior analysis
 - Document key architecture decisions: technology choices, versions, rationale

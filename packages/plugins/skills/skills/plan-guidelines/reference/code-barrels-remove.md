@@ -5,16 +5,18 @@
 **Rationale:** Sub-barrels add indirection without clear benefits. Removing them simplifies navigation, makes imports explicit, and reduces circular dependency risks.
 
 **Example:**
+
 ```typescript
 // Before: Barrel indirection
-import { User, Role } from './auth'  // From src/auth/index.ts
+import {Role, User} from "./auth"; // From src/auth/index.ts
 
+import {Role} from "./auth/role";
 // After: Direct imports
-import { User } from './auth/user'
-import { Role } from './auth/role'
+import {User} from "./auth/user";
 ```
 
 **Techniques:**
+
 - Find all `index.ts`/`index.js` files in subdirectories (exclude root `src/index.ts`)
 - Confirm each is a barrel by verifying it contains only re-exports
 - Search for all imports from sub-barrel paths (pattern: `from "./subdir"`)

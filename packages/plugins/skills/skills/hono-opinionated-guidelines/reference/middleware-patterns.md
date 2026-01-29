@@ -50,6 +50,7 @@ app.use("*", requestId());
 ```
 
 **Techniques:**
+
 - Import CORS from `hono/cors` and configure based on environment
 - For development use `origin: "*"` for permissive access
 - For production specify allowed origins explicitly

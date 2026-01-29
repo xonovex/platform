@@ -35,6 +35,7 @@ usersRouter.post(
 ```
 
 **Techniques:**
+
 - Define Zod schemas for request payloads with TypeScript type exports
 - In controllers using base `Context`, cast `c.req.valid` with target parameter
 - Specify the return type in the cast (e.g., `CreateUser`)

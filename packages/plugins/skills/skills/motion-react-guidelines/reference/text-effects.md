@@ -5,19 +5,25 @@
 **Rationale:** Splitting enables per-element stagger; `overflow: hidden` masks overflow for clean Y-translate reveals; avoid animating entire text blocks.
 
 **Example:**
+
 ```tsx
 function TextReveal({text}) {
   return (
-    <motion.div initial="hidden" animate="visible" variants={{
-      hidden: {},
-      visible: {transition: {staggerChildren: 0.1}}
-    }}>
+    <motion.div
+      initial="hidden"
+      animate="visible"
+      variants={{
+        hidden: {},
+        visible: {transition: {staggerChildren: 0.1}},
+      }}>
       {text.split(" ").map((word, i) => (
         <span key={i} style={{display: "inline-block", overflow: "hidden"}}>
-          <motion.span variants={{
-            hidden: {y: "100%", opacity: 0},
-            visible: {y: 0, opacity: 1}
-          }} style={{display: "inline-block"}}>
+          <motion.span
+            variants={{
+              hidden: {y: "100%", opacity: 0},
+              visible: {y: 0, opacity: 1},
+            }}
+            style={{display: "inline-block"}}>
             {word}
           </motion.span>
           <span>&nbsp;</span>
@@ -29,6 +35,7 @@ function TextReveal({text}) {
 ```
 
 **Techniques:**
+
 - Word reveal: Split by space, `y: ["100%", 0]`, stagger 0.05-0.15
 - Character reveal: Split by `""`, stagger 0.02-0.05, add `y: 20` for bounce effect
 - Typewriter: Use `useState` + `setInterval`, slice() text incrementally, add blinking cursor

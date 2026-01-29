@@ -35,6 +35,7 @@ tasks:
 **Techniques:**
 
 ## inheritedBy Matching
+
 - `toolchain:` - Match project's language toolchain (go, typescript, rust)
 - `layer:` - Match project's layer (library, application, configuration)
 - `tag:` - Match any tag in project's tags array
@@ -47,12 +48,14 @@ inheritedBy:
 ```
 
 ## Deep Merging (Moon 2.0)
+
 - Configs merge sequentially: global → extends → local
 - **fileGroups combine** instead of replace (both sources merge)
 - **deps arrays merge** from inherited + project tasks
 - **command arrays merge** (use `script:` to fully override)
 
 ## Preventing Merge Issues
+
 - Use `script:` instead of `command:` to fully replace inherited commands
 - Project-level `script:` completely overrides template task
 
@@ -68,6 +71,7 @@ script: npx eslint src
 ```
 
 ## extends Syntax
+
 - Single file: `extends: ./tag-go.yml`
 - Extends chain: Child extends parent, inherits all tasks
 - Override in extending file: Redefine task to customize
@@ -75,6 +79,7 @@ script: npx eslint src
 ## Composition Patterns
 
 **Tag-based mixins for mixed packages:**
+
 ```yaml
 # Project with Go + TypeScript
 language: go
@@ -87,6 +92,7 @@ tasks:
 ```
 
 **Layer templates extending tag mixins:**
+
 ```yaml
 # .moon/tasks/typescript-library.yml
 extends: ./tag-typescript.yml

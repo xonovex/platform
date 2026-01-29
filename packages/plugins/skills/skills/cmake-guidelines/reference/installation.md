@@ -31,6 +31,7 @@ install(EXPORT mylib-targets
 ```
 
 **Techniques:**
+
 - install(TARGETS): Install libraries and executables with type-specific destinations
 - EXPORT: Create importable CMake files for downstream find_package() calls
 - DESTINATION: Set lib/bin/include paths for each artifact type

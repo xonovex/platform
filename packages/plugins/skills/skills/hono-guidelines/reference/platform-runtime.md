@@ -34,6 +34,7 @@ app.get("/ip", (c) => {
 ```
 
 **Techniques:**
+
 - Import `env` and `getRuntimeKey` from `hono/adapter`
 - Use `env(c)` instead of `process.env` or `Deno.env`
 - Check runtime with `getRuntimeKey()` for platform-specific logic

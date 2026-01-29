@@ -58,6 +58,7 @@ fi
 ```
 
 **Techniques:**
+
 - Keep functions focused on a single task
 - Declare all function variables as `local`
 - Return 0 for success, non-zero for failure

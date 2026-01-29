@@ -35,7 +35,11 @@ export function errorHandler(
     }
 
     if (process.env.NODE_ENV !== "production") {
-      res.status(500).json({error: "Internal server error", message: err.message, stack: err.stack});
+      res.status(500).json({
+        error: "Internal server error",
+        message: err.message,
+        stack: err.stack,
+      });
       return;
     }
   }
@@ -45,6 +49,7 @@ export function errorHandler(
 ```
 
 **Techniques:**
+
 - Four parameters: (err, req, res, next) required for Express to recognize error handler
 - Zod handling: Check instanceof ZodError, return 400 with details
 - Custom errors: Match error.name against NotFoundError, UnauthorizedError, ForbiddenError

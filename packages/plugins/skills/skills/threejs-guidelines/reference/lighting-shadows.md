@@ -5,6 +5,7 @@
 **Rationale:** Lighting creates atmosphere; tight shadow frustums improve quality; IBL is more efficient than many point lights for PBR.
 
 **Example:**
+
 ```javascript
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -16,13 +17,14 @@ dirLight.shadow.camera.right = 10;
 mesh.castShadow = true;
 mesh.receiveShadow = true;
 
-new RGBELoader().load('env.hdr', (tex) => {
+new RGBELoader().load("env.hdr", (tex) => {
   tex.mapping = THREE.EquirectangularReflectionMapping;
   scene.environment = tex;
 });
 ```
 
 **Techniques:**
+
 - Light types: AmbientLight (fill), HemisphereLight (sky/ground outdoors), DirectionalLight (sun), PointLight (bulb), SpotLight (flashlight)
 - Shadow types: PCFSoftShadowMap (best quality); tight frustum (camera.left/right/top/bottom) and mapSize (512-2048)
 - Shadow bias: `.bias = -0.0001`, `.normalBias = 0.02` to fix acne/peter-panning

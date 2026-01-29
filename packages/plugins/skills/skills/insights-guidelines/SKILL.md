@@ -22,7 +22,9 @@ description: >-
 ## Progressive Disclosure
 
 ### Insight Extraction
+
 - Read [reference/insights-extract.md](reference/insights-extract.md) - Analyze session for development lessons
 
 ### Insight Integration
+
 - Read [reference/insights-integrate.md](reference/insights-integrate.md) - Convert insights to progressive disclosure skills

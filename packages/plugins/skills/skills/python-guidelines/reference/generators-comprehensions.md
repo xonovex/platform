@@ -47,6 +47,7 @@ def read_large_file_bad(path: Path) -> list[str]:
 ```
 
 **Techniques:**
+
 - Use list/dict/set comprehensions for small, in-memory collections
 - Use generator expressions (parentheses) for large or streamed data
 - Create generator functions with `yield` for lazy iteration

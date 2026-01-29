@@ -39,6 +39,7 @@ GRANT app_readonly TO analyst;
 ```
 
 **Techniques:**
+
 - Create roles for different access levels (readonly, readwrite, admin)
 - Grant minimal necessary permissions to each role
 - Use `ALTER DEFAULT PRIVILEGES` to apply permissions to future objects

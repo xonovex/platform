@@ -21,6 +21,7 @@ moon run :build --query "tags~frontend|backend"
 **Techniques:**
 
 ## Tag Syntax
+
 - `#tag:task` - Target all projects with specific tag
 - Quote in shell: `'#tag:task'` (# is comment character)
 - Multiple tags: Use `--query "tags~tag1|tag2"`
@@ -53,9 +54,9 @@ Mixed-language packages can use multiple tags:
 language: go
 layer: library
 tags:
-  - go           # Gets Go tasks from tag-go.yml
-  - typescript   # Gets TypeScript tasks from tag-typescript.yml
-  - npm          # Gets npm-publish from tag-npm.yml
+  - go # Gets Go tasks from tag-go.yml
+  - typescript # Gets TypeScript tasks from tag-typescript.yml
+  - npm # Gets npm-publish from tag-npm.yml
   - cli
 ```
 
@@ -86,6 +87,7 @@ moon run :build --query "tags~shared && projectLayer=library"
 ```
 
 ## Override Behavior
+
 - Project-level tasks override tag-inherited tasks
 - Use `script:` to completely replace inherited commands
 - Task deps merge from inherited + project definitions

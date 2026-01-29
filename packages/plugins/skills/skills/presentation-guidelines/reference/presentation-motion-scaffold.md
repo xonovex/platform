@@ -5,6 +5,7 @@
 **Rationale:** Converts markdown presentations into fully-functional React + Motion slide decks with animations and interactive features.
 
 **Example:**
+
 ```
 Input: presentation.md with:
 - Title: "Microservices Architecture"
@@ -27,6 +28,7 @@ packages/presentations/microservices/
 ```
 
 **Techniques:**
+
 - Parse markdown: extract title, style guide, slides separated by `---`
 - Determine slide types from content: title, bullets, diagrams, chapter headers, closing
 - Create package structure at `packages/presentations/[name]/` with configs

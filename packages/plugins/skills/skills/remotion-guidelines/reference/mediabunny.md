@@ -5,20 +5,23 @@
 **Rationale:** Duration enables accurate durationInFrames; decode checks prevent runtime failures with unsupported codecs.
 
 **Example:**
+
 ```tsx
-import {getVideoDuration, getVideoDimensions} from "mediabunny";
+import {getVideoDimensions, getVideoDuration} from "mediabunny";
 
 calculateMetadata: async ({props}) => {
   const duration = await getVideoDuration(props.videoUrl);
   const {width, height} = await getVideoDimensions(props.videoUrl);
   return {
     durationInFrames: Math.ceil(duration * 30),
-    width, height
+    width,
+    height,
   };
-}
+};
 ```
 
 **Techniques:**
+
 - getVideoDuration(): Returns seconds; multiply by fps for frames
 - getAudioDuration(): For audio files
 - getVideoDimensions(): Returns {width, height} for dynamic sizing

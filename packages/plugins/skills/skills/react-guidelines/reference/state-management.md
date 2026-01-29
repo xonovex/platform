@@ -65,6 +65,7 @@ function ComplexCounter() {
 ```
 
 **Techniques:**
+
 - Start with local `useState` in the component that owns the data
 - If multiple sibling components need the state, lift to their parent
 - For complex state logic, use `useReducer` instead of multiple `useState`
