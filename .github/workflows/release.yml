@@ -47,26 +47,32 @@ jobs:
           DRY_RUN="${{ github.event_name == 'workflow_dispatch' && github.event.inputs.dry_run || 'false' }}"
           echo "dry_run=$DRY_RUN" >> $GITHUB_OUTPUT
 
-          nix develop --command npx changeset status --output=changeset-status.json 2>/dev/null || true
-
-          if [ ! -f changeset-status.json ]; then
-            echo "should_release=false" >> $GITHUB_OUTPUT
-            echo "changed_projects=[]" >> $GITHUB_OUTPUT
-            exit 0
-          fi
-
           PROJECTS=$(nix develop --command node -e "
             const { execSync } = require('child_process');
             const fs = require('fs');
             const path = require('path');
-            const status = require('./changeset-status.json');
-            const changedNames = new Set((status.releases || []).map(r => r.name));
+
+            // After a version packages PR merge, changesets are consumed.
+            // Detect changed packages from git diff of package.json files instead.
+            const changedFiles = execSync('git diff HEAD~1 --name-only', { encoding: 'utf8' }).trim().split('\n');
+            const changedPkgDirs = new Set(
+              changedFiles
+                .filter(f => f.endsWith('package.json') && f.startsWith('packages/'))
+                .map(f => path.dirname(f))
+            );
+
+            if (changedPkgDirs.size === 0) {
+              console.log('[]');
+              process.exit(0);
+            }
+
             const moonOutput = JSON.parse(execSync('npx moon query projects', { encoding: 'utf8', maxBuffer: 10 * 1024 * 1024 }));
             const projects = [];
             for (const p of moonOutput.projects) {
+              if (!changedPkgDirs.has(p.source)) continue;
               try {
                 const pkg = JSON.parse(fs.readFileSync(path.join(p.source, 'package.json'), 'utf8'));
-                if (pkg.name && changedNames.has(pkg.name) && !pkg.private) {
+                if (pkg.name && !pkg.private) {
                   projects.push(p.id);
                 }
               } catch {}
