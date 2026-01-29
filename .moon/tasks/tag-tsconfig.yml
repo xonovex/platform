@@ -1,0 +1,103 @@
+$schema: https://moonrepo.dev/schemas/tasks.json
+implicitInputs:
+- package.json
+- tsconfig*.json
+fileGroups:
+  sources:
+  - src/**/*
+  configs:
+  - '*.config.*'
+  - tsconfig*.json
+  - .eslintrc*
+  - .prettierrc*
+  - package.json
+tasks:
+  build:
+    deps:
+    - ^:build
+    command:
+    - npm
+    - run
+    - build
+    inputs:
+    - '@globs(sources)'
+    - '@globs(configs)'
+    outputs:
+    - dist
+    options:
+      cache: true
+      runDepsInParallel: true
+  clean:
+    script: rm -rf dist
+    options:
+      cache: false
+  typecheck:
+    command:
+    - npm
+    - run
+    - typecheck
+    deps:
+    - ^:build
+    inputs:
+    - '@globs(sources)'
+    - tsconfig*.json
+    outputs: []
+    options:
+      cache: true
+  lint:
+    command:
+    - npm
+    - run
+    - lint
+    deps:
+    - ^:build
+    inputs:
+    - '@globs(sources)'
+    - '@globs(configs)'
+    outputs: []
+  lint-fix:
+    command:
+    - npm
+    - run
+    - lint:fix
+    deps:
+    - ^:build
+    inputs:
+    - '@globs(sources)'
+    - '@globs(configs)'
+    outputs: []
+    options:
+      cache: false
+      runInCI: false
+  fmt:
+    command:
+    - npm
+    - run
+    - fmt
+    inputs:
+    - '@globs(sources)'
+    - '@globs(configs)'
+    - '*.json'
+    - '*.md'
+    outputs: []
+    options:
+      cache: false
+      runInCI: false
+  fmt-check:
+    command:
+    - npm
+    - run
+    - fmt:check
+    inputs:
+    - '@globs(sources)'
+    - '@globs(configs)'
+    - '*.json'
+    - '*.md'
+    outputs: []
+  ci-prepare:
+    command: echo 'ci-prepare complete'
+    deps: [build, lint, fmt-check, typecheck]
+    options:
+      cache: false
+inheritedBy:
+  tag: tsconfig
