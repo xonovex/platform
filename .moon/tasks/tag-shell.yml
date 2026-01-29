@@ -1,0 +1,44 @@
+$schema: https://moonrepo.dev/schemas/tasks.json
+fileGroups:
+  sources:
+  - '**/*.sh'
+  configs:
+  - .shellcheckrc
+  - .editorconfig
+tasks:
+  sh-lint:
+    script: shopt -s globstar nullglob && files=(**/*.sh) && [ ${#files[@]} -gt 0 ] && shellcheck -x "${files[@]}" || echo 'No .sh files found'
+    inputs:
+    - '@globs(sources)'
+    - .shellcheckrc
+    - .editorconfig
+    options:
+      cache: true
+      runInCI: true
+  sh-fmt:
+    command:
+    - shfmt
+    - -w
+    - .
+    inputs:
+    - '@globs(sources)'
+    options:
+      cache: false
+      runInCI: false
+  sh-fmt-check:
+    command:
+    - shfmt
+    - -d
+    - .
+    inputs:
+    - '@globs(sources)'
+    options:
+      cache: true
+      runInCI: true
+  ci-prepare:
+    command: echo 'ci-prepare complete'
+    deps: [sh-lint, sh-fmt-check]
+    options:
+      cache: false
+inheritedBy:
+  tag: shell

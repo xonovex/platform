@@ -26,6 +26,7 @@ tasks:
     outputs: []
     options:
       cache: true
+      runInCI: true
   go-test:
     command:
     - go
@@ -40,6 +41,7 @@ tasks:
     outputs: []
     options:
       cache: true
+      runInCI: true
   go-test-coverage:
     command:
     - go
@@ -56,10 +58,12 @@ tasks:
     - coverage.out
     options:
       cache: true
+      runInCI: true
   go-lint:
     command:
     - golangci-lint
     - run
+    - --allow-parallel-runners
     - ./...
     inputs:
     - '@globs(sources)'
@@ -68,6 +72,7 @@ tasks:
     outputs: []
     options:
       cache: false
+      runInCI: true
   go-fmt:
     command:
     - go
@@ -79,14 +84,19 @@ tasks:
     outputs: []
     options:
       cache: false
+      runInCI: false
   go-fmt-check:
-    script: test -z "$(gofmt -l .)"
+    command:
+    - bash
+    - -c
+    - test -z "$(gofmt -l .)"
     inputs:
     - '@globs(sources)'
     - '@globs(tests)'
     outputs: []
     options:
-      cache: false
+      cache: true
+      runInCI: true
   go-typecheck:
     command:
     - go
@@ -100,6 +110,7 @@ tasks:
     outputs: []
     options:
       cache: true
+      runInCI: true
   go-tidy:
     command:
     - go
@@ -113,5 +124,16 @@ tasks:
     - go.sum
     options:
       cache: false
+      runInCI: false
+  ci-prepare:
+    command: echo 'ci-prepare complete'
+    deps: [go-build, go-test, go-lint, go-fmt-check, go-typecheck]
+    options:
+      cache: false
+  go-clean:
+    script: rm -rf dist coverage.out
+    options:
+      cache: false
+      runInCI: false
 inheritedBy:
   tag: go
