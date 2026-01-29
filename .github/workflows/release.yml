@@ -61,7 +61,7 @@ jobs:
             const path = require('path');
             const status = require('./changeset-status.json');
             const changedNames = new Set((status.releases || []).map(r => r.name));
-            const moonOutput = JSON.parse(execSync('npx moon query projects', { encoding: 'utf8' }));
+            const moonOutput = JSON.parse(execSync('npx moon query projects', { encoding: 'utf8', maxBuffer: 10 * 1024 * 1024 }));
             const projects = [];
             for (const p of moonOutput.projects) {
               try {
