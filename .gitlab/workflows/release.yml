@@ -4,7 +4,7 @@ release:
   stage: release
   extends: .workspace_cache
   script:
-    - rm -f .moon/cache/runReport.json
+    - rm -f .moon/cache/runReport.json .moon/cache/ciReport.json
     - |
       PROJECTS=$(npx tsx scripts/version-detect.ts HEAD~1 2>/dev/null)
       if [ "$PROJECTS" = "[]" ]; then

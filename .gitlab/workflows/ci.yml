@@ -4,7 +4,7 @@ ci:
   stage: ci
   extends: .workspace_cache
   script:
-    - rm -f .moon/cache/runReport.json
+    - rm -f .moon/cache/runReport.json .moon/cache/ciReport.json
     - npx moon ci --color :ci-prepare
   rules:
     - if: '$CI_COMMIT_BRANCH == "main"'
