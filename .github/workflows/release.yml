@@ -6,6 +6,10 @@ on:
       - "v*"
   workflow_dispatch:
     inputs:
+      cache-workspace:
+        description: "Cache .moon/cache and node_modules"
+        type: boolean
+        default: true
       dry_run:
         description: "Perform a dry run (no actual publishing)"
         type: boolean
@@ -19,115 +23,36 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  detect:
-    name: Detect Changes
+  release:
+    name: Release
     runs-on: ubuntu-latest
+
     if: |
       (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')) ||
       (github.event_name == 'workflow_dispatch') ||
       (github.event_name == 'pull_request' && github.event.pull_request.merged == true && contains(github.event.pull_request.title, 'version packages'))
-    outputs:
-      should_release: ${{ steps.detect.outputs.should_release }}
-      dry_run: ${{ steps.detect.outputs.dry_run }}
-      changed_projects: ${{ steps.detect.outputs.changed_projects }}
 
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-
-      - uses: ./.github/actions/setup-nix
-
-      - name: Install dependencies
-        run: nix develop --command npm ci
-
-      - name: Detect changed packages
-        id: detect
-        run: |
-          DRY_RUN="${{ github.event_name == 'workflow_dispatch' && github.event.inputs.dry_run || 'false' }}"
-          echo "dry_run=$DRY_RUN" >> $GITHUB_OUTPUT
-
-          PROJECTS=$(nix develop --command npx tsx scripts/version-detect.ts HEAD~1)
-
-          if [ "$PROJECTS" = "[]" ]; then
-            echo "should_release=false" >> $GITHUB_OUTPUT
-          else
-            echo "should_release=true" >> $GITHUB_OUTPUT
-          fi
-          echo "changed_projects=$PROJECTS" >> $GITHUB_OUTPUT
-
-  validate:
-    name: Validate
-    runs-on: ubuntu-latest
-    needs: [detect]
-    if: needs.detect.outputs.should_release == 'true'
-
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-
-      - uses: ./.github/actions/setup-nix
-        with:
-          cache-workspace: true
-
-      - name: Validate changed packages
-        run: |
-          TARGETS=$(echo '${{ needs.detect.outputs.changed_projects }}' | jq -r '.[] | . + ":ci-prepare"' | tr '\n' ' ')
-          nix develop --command bash -c "npm ci && npx moon ci $TARGETS"
-
-      - uses: moonrepo/run-report-action@v1
-        if: success() || failure()
-        with:
-          access-token: ${{ secrets.GITHUB_TOKEN }}
-
-      - uses: appthrust/moon-ci-retrospect@v1
-        if: success() || failure()
-
-      - name: Prepublish check
-        run: nix develop --command npm run prepublish:check
-
-  publish:
-    name: Publish
-    runs-on: ubuntu-latest
-    needs: [detect, validate]
-    if: needs.detect.outputs.should_release == 'true'
     permissions:
       contents: write
       id-token: write
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: ./.github/actions/setup
         with:
-          fetch-depth: 0
+          cache-workspace: ${{ inputs.cache-workspace }}
 
-      - uses: ./.github/actions/setup-nix
-        with:
-          cache-workspace: true
-
-      - uses: actions/setup-node@v6
-        with:
-          registry-url: "https://registry.npmjs.org"
-
-      - name: Publish packages
-        if: needs.detect.outputs.dry_run != 'true'
+      - name: Publish
+        if: inputs.dry_run != true
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          TARGETS=$(echo '${{ needs.detect.outputs.changed_projects }}' | jq -r '.[] | . + ":ci-publish"' | tr '\n' ' ')
-          nix develop --command bash -c "npm ci && npx moon run --concurrency 1 $TARGETS"
+        run: npx moon ci --concurrency 1 --color :ci-publish
 
       - name: Dry run publish
-        if: needs.detect.outputs.dry_run == 'true'
-        run: |
-          TARGETS=$(echo '${{ needs.detect.outputs.changed_projects }}' | jq -r '.[] | . + ":ci-publish-dry-run"' | tr '\n' ' ')
-          nix develop --command bash -c "npm ci && npx moon run --concurrency 1 $TARGETS"
+        if: inputs.dry_run == true
+        run: npx moon ci --concurrency 1 --color :ci-publish-dry-run
 
       - uses: moonrepo/run-report-action@v1
         if: success() || failure()
         with:
           access-token: ${{ secrets.GITHUB_TOKEN }}
-
-      - uses: appthrust/moon-ci-retrospect@v1
-        if: success() || failure()

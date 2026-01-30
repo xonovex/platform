@@ -4,6 +4,12 @@ on:
   push:
     branches: [main]
   pull_request:
+  workflow_dispatch:
+    inputs:
+      cache-workspace:
+        description: "Cache .moon/cache and node_modules"
+        type: boolean
+        default: true
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -15,23 +21,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: ./.github/actions/setup
         with:
-          fetch-depth: 0
+          cache-workspace: ${{ inputs.cache-workspace }}
 
-      - uses: ./.github/actions/setup-nix
-        with:
-          cache-workspace: true
-
-      - run: nix develop --command bash -c "npm ci && npx moon ci :ci-prepare"
+      - run: "npx moon ci --color :ci-prepare"
 
       - uses: moonrepo/run-report-action@v1
         if: success() || failure()
         with:
           access-token: ${{ secrets.GITHUB_TOKEN }}
-
-      - uses: appthrust/moon-ci-retrospect@v1
-        if: success() || failure()
-
-      - name: Prepublish check
-        run: nix develop --command npm run prepublish:check

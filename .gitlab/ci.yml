@@ -1,29 +1,15 @@
 # Xonovex Platform - GitLab CI/CD Pipeline
 # Mirrors the GitHub Actions workflows
-# Uses Nix via the cachix-flakes Docker image
-#
-# Set CI/CD configuration file to: .gitlab/ci.yml
 
-image: docker.nix-community.org/nixpkgs/cachix-flakes
+image: node:24
 
 variables:
   GIT_DEPTH: 0
 
-# Symlink glibc dynamic linker so npm native binaries (moon, esbuild, etc.)
-# can execute inside the NixOS-based container.
-# See: https://github.com/nix-community/nix-ld
-before_script:
-  - mkdir -p /lib64
-  - ln -sf /nix/store/*-glibc-*/lib64/ld-linux-x86-64.so.2 /lib64/ld-linux-x86-64.so.2 2>/dev/null || true
-  - rm -rf node_modules
-
 stages:
   - ci
-  - release-detect
-  - release-validate
-  - release-publish
+  - release
 
-# Workspace caching for node_modules, .moon/cache
 .workspace_cache:
   cache:
     key:

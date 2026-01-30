@@ -4,7 +4,7 @@ layer: configuration
 tags:
   - npm
   - tenant-shared
-  - typescript
+  - typescript-config
 dependsOn:
 - eslint-config-base
 - ts-config-build
