@@ -5,13 +5,7 @@ ci:
   extends: .workspace_cache
   script:
     - nix develop --command bash -c "npm ci && npx moon ci :ci-prepare"
+    - nix develop --command npm run prepublish:check
   rules:
     - if: '$CI_COMMIT_BRANCH == "main"'
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-
-changeset:check:
-  stage: changeset
-  script:
-    - nix develop --command bash -c "npm ci && npx changeset status --since=origin/main"
-  rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'

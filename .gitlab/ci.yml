@@ -19,7 +19,6 @@ before_script:
 
 stages:
   - ci
-  - changeset
   - release-detect
   - release-validate
   - release-publish
@@ -36,5 +35,4 @@ stages:
 
 include:
   - local: .gitlab/workflows/ci.yml
-  - local: .gitlab/workflows/changesets.yml
   - local: .gitlab/workflows/release.yml
