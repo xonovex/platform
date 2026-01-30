@@ -45,8 +45,7 @@ jobs:
         with:
           cache-workspace: ${{ inputs.cache-workspace }}
 
-      - name: Clear stale run report
-        run: rm -f .moon/cache/runReport.json .moon/cache/ciReport.json
+      - run: rm -f .moon/cache/runReport.json .moon/cache/ciReport.json
 
       - name: Publish
         if: inputs.dry_run != true
@@ -60,7 +59,7 @@ jobs:
             exit 0
           fi
           TARGETS=$(echo "$PROJECTS" | jq -r '.[] | . + ":ci-publish"' | tr '\n' ' ')
-          nix develop --command "npx moon ci --concurrency 1 $TARGETS"
+          nix develop --command bash -c "npm ci && moon ci --color --concurrency 1 $TARGETS"
 
       - name: Publish (dry run)
         if: inputs.dry_run == true
@@ -71,7 +70,7 @@ jobs:
             exit 0
           fi
           TARGETS=$(echo "$PROJECTS" | jq -r '.[] | . + ":ci-publish-dry-run"' | tr '\n' ' ')
-          nix develop --command "npx moon ci --concurrency 1 $TARGETS"
+          nix develop --command bash -c "npm ci && moon ci --color --concurrency 1 $TARGETS"
 
       - uses: moonrepo/run-report-action@v1
         if: success() || failure()
