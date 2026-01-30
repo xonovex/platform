@@ -24,12 +24,6 @@ tasks:
 inheritedBy:
   toolchain: go
   layer: library
-
-# moon.yml - Project override using script to prevent merging
-tasks:
-  ci-prepare:
-    script: echo 'custom ci-prepare'
-    deps: [go-build, build, lint]
 ```
 
 **Techniques:**
@@ -41,40 +35,50 @@ tasks:
 - `tag:` - Match any tag in project's tags array
 - Multiple criteria: All must match (AND logic)
 
-```yaml
-inheritedBy:
-  toolchain: typescript
-  layer: library
-```
-
-## Deep Merging (Moon 2.0)
-
-- Configs merge sequentially: global → extends → local
-- **fileGroups combine** instead of replace (both sources merge)
-- **deps arrays merge** from inherited + project tasks
-- **command arrays merge** (use `script:` to fully override)
-
-## Preventing Merge Issues
-
-- Use `script:` instead of `command:` to fully replace inherited commands
-- Project-level `script:` completely overrides template task
-
-```yaml
-# Template defines:
-command: [npm, run, lint]
-
-# Project override with command: merges → npm run lint eslint src
-command: [eslint, src]
-
-# Project override with script: replaces completely
-script: npx eslint src
-```
-
 ## extends Syntax
 
 - Single file: `extends: ./tag-go.yml`
 - Extends chain: Child extends parent, inherits all tasks
 - Override in extending file: Redefine task to customize
+
+## Merging
+
+Configs merge sequentially: global → extends → local.
+
+- **fileGroups** combine instead of replace
+- **command arrays** merge (use `script:` to fully replace inherited commands)
+- **args, deps, env, inputs, outputs, toolchains** merge via configurable strategies
+
+Merge strategy options: `mergeArgs`, `mergeDeps`, `mergeEnv`, `mergeInputs`, `mergeOutputs`, `mergeToolchains`, plus `merge` as blanket default. Strategies: `append` (default — local after inherited), `prepend` (local before inherited), `replace` (local replaces inherited), `preserve` (inherited wins, ignore local).
+
+```yaml
+# Project override with command: merges → npm run lint eslint src
+command: [eslint, src]
+
+# Project override with script: replaces completely
+script: npx eslint src
+
+# Project override replacing only deps, inheriting command/options
+tasks:
+  npm-publish:
+    deps:
+    - go-build
+    options:
+      mergeDeps: replace
+```
+
+## Optional Dependencies
+
+Use `optional: true` when a tag-level task depends on a task that not all inheriting projects define:
+
+```yaml
+tasks:
+  npm-publish:
+    deps:
+    - target: ~:build
+      optional: true
+    - ^:npm-publish
+```
 
 ## Composition Patterns
 

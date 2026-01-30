@@ -8,6 +8,8 @@ tasks:
     - --access
     - public
     deps:
+    - target: ~:build
+      optional: true
     - ^:npm-publish
     options:
       cache: false
@@ -17,6 +19,9 @@ tasks:
     - npm
     - pack
     - --dry-run
+    deps:
+    - target: ~:build
+      optional: true
     options:
       cache: false
       runInCI: false

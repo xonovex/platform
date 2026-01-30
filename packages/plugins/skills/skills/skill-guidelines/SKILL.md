@@ -24,6 +24,7 @@ description: >-
 - **Extract from codebase** - Analyze code patterns and project instructions, see [reference/extract.md](reference/extract.md)
 - **Assimilate skills** - Merge elements from one skill into another, see [reference/assimilate.md](reference/assimilate.md)
 - **Simplify skills** - Condense verbose SKILL.md to bullet list, see [reference/simplify.md](reference/simplify.md)
+- **Simplify references** - Merge overlapping sections in reference files, see [reference/simplify-reference.md](reference/simplify-reference.md)
 
 ## Progressive Disclosure
 
@@ -31,3 +32,4 @@ description: >-
 - Read [reference/extract.md](reference/extract.md) - When extracting patterns from codebase
 - Read [reference/assimilate.md](reference/assimilate.md) - When augmenting skill with another skill's elements
 - Read [reference/simplify.md](reference/simplify.md) - When condensing verbose skill to bullet format
+- Read [reference/simplify-reference.md](reference/simplify-reference.md) - When condensing verbose reference files
