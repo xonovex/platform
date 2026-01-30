@@ -8,32 +8,7 @@ release:detect:
       DRY_RUN="${DRY_RUN:-false}"
       echo "DRY_RUN=$DRY_RUN" >> release.env
 
-      nix develop --command npx changeset status --output=changeset-status.json 2>/dev/null || true
-
-      if [ ! -f changeset-status.json ]; then
-        echo "SHOULD_RELEASE=false" >> release.env
-        echo "CHANGED_PROJECTS=[]" >> release.env
-        exit 0
-      fi
-
-      PROJECTS=$(nix develop --command node -e "
-        const { execSync } = require('child_process');
-        const fs = require('fs');
-        const path = require('path');
-        const status = require('./changeset-status.json');
-        const changedNames = new Set((status.releases || []).map(r => r.name));
-        const moonOutput = JSON.parse(execSync('npx moon query projects', { encoding: 'utf8' }));
-        const projects = [];
-        for (const p of moonOutput.projects) {
-          try {
-            const pkg = JSON.parse(fs.readFileSync(path.join(p.source, 'package.json'), 'utf8'));
-            if (pkg.name && changedNames.has(pkg.name) && !pkg.private) {
-              projects.push(p.id);
-            }
-          } catch {}
-        }
-        console.log(JSON.stringify(projects));
-      ")
+      PROJECTS=$(nix develop --command npx tsx scripts/version-detect.ts HEAD~1)
 
       if [ "$PROJECTS" = "[]" ]; then
         echo "SHOULD_RELEASE=false" >> release.env
@@ -62,6 +37,7 @@ release:validate:
     - |
       TARGETS=$(echo "$CHANGED_PROJECTS" | jq -r '.[] | . + ":ci-prepare"' | tr '\n' ' ')
       nix develop --command bash -c "npm ci && npx moon ci $TARGETS"
+    - nix develop --command npm run prepublish:check
   rules:
     - if: '$CI_COMMIT_TAG =~ /^v/'
     - if: '$CI_PIPELINE_SOURCE == "web"'
@@ -84,7 +60,7 @@ release:publish:
       else
         TARGETS=$(echo "$CHANGED_PROJECTS" | jq -r '.[] | . + ":ci-publish"' | tr '\n' ' ')
       fi
-      nix develop --command bash -c "npm ci && npx moon ci $TARGETS"
+      nix develop --command bash -c "npm ci && npx moon run --concurrency 1 $TARGETS"
   rules:
     - if: '$CI_COMMIT_TAG =~ /^v/'
     - if: '$CI_PIPELINE_SOURCE == "web"'
