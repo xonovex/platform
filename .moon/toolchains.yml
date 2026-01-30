@@ -1,8 +1,10 @@
 $schema: https://moonrepo.dev/schemas/toolchain.json
-node:
-  version: null
+go:
+  version: 1.25.6
 npm:
-  version: null
+  version: 11.6.2
+node:
+  version: 24.13.0
 typescript:
   createMissingConfig: false
   syncProjectReferences: true

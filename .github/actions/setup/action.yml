@@ -1,0 +1,26 @@
+name: Setup
+description: Checkout, cache workspace, and setup moon toolchain
+
+inputs:
+  cache-workspace:
+    description: "Cache .moon/cache and node_modules"
+    default: "true"
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/checkout@v6
+      with:
+        fetch-depth: 0
+
+    - if: inputs.cache-workspace != 'false'
+      uses: actions/cache@v4
+      with:
+        path: |
+          .moon/cache
+          node_modules
+        key: npm-moon-${{ runner.os }}-${{ hashFiles('package-lock.json', '.moon/**/*.yml') }}
+        restore-keys: |
+          npm-moon-${{ runner.os }}
+
+    - uses: moonrepo/setup-toolchain@v0

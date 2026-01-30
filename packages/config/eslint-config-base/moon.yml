@@ -4,6 +4,6 @@ layer: configuration
 tags:
   - npm
   - tenant-shared
-  - typescript
+  - typescript-config
 dependsOn:
 - ts-config-node

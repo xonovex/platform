@@ -11,8 +11,10 @@ fileGroups:
   - test/**/*
   configs:
   - '*.config.*'
+  - tsconfig*.json
   - .eslintrc*
   - .prettierrc*
+  - package.json
 tasks:
   build:
     deps:
@@ -26,16 +28,9 @@ tasks:
     options:
       cache: true
   test:
-    script: npx vitest run
-    deps:
-    - ^:build
-    inputs:
-    - '@globs(sources)'
-    - '@globs(tests)'
-    - '@globs(configs)'
-    outputs: []
+    script: echo 'no tests for config package'
     options:
-      cache: true
+      cache: false
   test-watch:
     script: npx vitest
     deps:
@@ -115,10 +110,14 @@ tasks:
     - coverage
     options:
       cache: true
+  clean:
+    script: rm -rf dist
+    options:
+      cache: false
   ci-prepare:
     command: echo 'ci-prepare complete'
-    deps: [build, test, lint, typecheck]
+    deps: [build, lint, typecheck]
     options:
       cache: false
 inheritedBy:
-  tag: typescript
+  tag: typescript-config
