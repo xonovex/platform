@@ -46,7 +46,7 @@ jobs:
           cache-workspace: ${{ inputs.cache-workspace }}
 
       - name: Clear stale run report
-        run: rm -f .moon/cache/runReport.json
+        run: rm -f .moon/cache/runReport.json .moon/cache/ciReport.json
 
       - name: Publish
         if: inputs.dry_run != true
