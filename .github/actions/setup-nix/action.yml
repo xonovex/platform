@@ -19,6 +19,7 @@ runs:
         restore-keys: |
           npm-moon-${{ runner.os }}
 
+    - uses: moonrepo/setup-toolchain@v0
     - uses: DeterminateSystems/nix-installer-action@main
     - if: inputs.cache-workspace != 'false'
       uses: DeterminateSystems/magic-nix-cache-action@main
