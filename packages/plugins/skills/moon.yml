@@ -1,6 +1,6 @@
 $schema: https://moonrepo.dev/schemas/project.json
 language: other
-layer: application
+layer: unknown
 tags:
   - npm
   - tenant-shared

@@ -1,5 +1,5 @@
 tags:
-- docker
-- agent
-language: bash
+  - docker
+  - agent
+language: docker
 layer: application

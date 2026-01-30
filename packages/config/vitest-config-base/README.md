@@ -13,8 +13,8 @@ npm install -D @xonovex/vitest-config-base
 In your `vitest.config.ts`:
 
 ```typescript
-import {defineConfig} from "vitest/config";
 import {baseVitestConfig} from "@xonovex/vitest-config-base";
+import {defineConfig} from "vitest/config";
 
 export default defineConfig({
   ...baseVitestConfig,

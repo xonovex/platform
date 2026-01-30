@@ -41,7 +41,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: ./.github/actions/setup
+      - uses: ./.github/actions/setup-nix
         with:
           cache-workspace: ${{ inputs.cache-workspace }}
 
@@ -60,7 +60,7 @@ jobs:
             exit 0
           fi
           TARGETS=$(echo "$PROJECTS" | jq -r '.[] | . + ":ci-publish"' | tr '\n' ' ')
-          npx moon ci --concurrency 1 $TARGETS
+          nix develop --command "npx moon ci --concurrency 1 $TARGETS"
 
       - name: Publish (dry run)
         if: inputs.dry_run == true
@@ -71,7 +71,7 @@ jobs:
             exit 0
           fi
           TARGETS=$(echo "$PROJECTS" | jq -r '.[] | . + ":ci-publish-dry-run"' | tr '\n' ' ')
-          npx moon ci --concurrency 1 $TARGETS
+          nix develop --command "npx moon ci --concurrency 1 $TARGETS"
 
       - uses: moonrepo/run-report-action@v1
         if: success() || failure()

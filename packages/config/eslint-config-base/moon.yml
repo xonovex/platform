@@ -6,4 +6,4 @@ tags:
   - tenant-shared
   - typescript-config
 dependsOn:
-- ts-config-node
+  - ts-config-node

@@ -25,12 +25,12 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: ./.github/actions/setup
+      - uses: ./.github/actions/setup-nix
         with:
           cache-workspace: ${{ inputs.cache-workspace }}
 
       - run: rm -f .moon/cache/runReport.json .moon/cache/ciReport.json
-      - run: "npx moon ci --color :ci-prepare"
+      - run: nix develop --command "npx moon ci --color :ci-prepare"
 
       - uses: moonrepo/run-report-action@v1
         if: success() || failure()

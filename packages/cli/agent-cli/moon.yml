@@ -13,4 +13,4 @@ tags:
   - npm
   - scripts
   - typescript
-layer: library
+layer: application

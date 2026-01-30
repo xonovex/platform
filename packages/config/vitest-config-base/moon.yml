@@ -6,5 +6,5 @@ tags:
   - tenant-shared
   - typescript-config
 dependsOn:
-- eslint-config-base
-- ts-config-build
+  - eslint-config-base
+  - ts-config-build

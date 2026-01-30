@@ -3,23 +3,23 @@ tasks:
   build:
     script: bash scripts/build-archives.sh "$workspaceRoot/packages/cli" "$projectRoot/release-assets"
     deps:
-    - ^:go-build
+      - ^:go-build
     inputs: []
     outputs:
-    - release-assets/
+      - release-assets/
     options:
       cache: true
   github-publish:
     script: bash scripts/github-release.sh "$workspaceRoot/packages/cli/agent-cli-go" "$projectRoot/release-assets"
     deps:
-    - build
+      - build
     options:
       runInCI: false
       cache: false
   ci-publish:
     command: echo 'ci-publish complete'
     deps:
-    - github-publish
+      - github-publish
     options:
       runInCI: false
       cache: false
@@ -30,9 +30,9 @@ tasks:
       cache: false
 language: bash
 dependsOn:
-- agent-cli-go-linux-x64
-- agent-cli-go-linux-arm64
-- agent-cli-go-darwin-x64
-- agent-cli-go-darwin-arm64
-- agent-cli-go-win32-x64
-layer: application
+  - agent-cli-go-linux-x64
+  - agent-cli-go-linux-arm64
+  - agent-cli-go-darwin-x64
+  - agent-cli-go-darwin-arm64
+  - agent-cli-go-win32-x64
+layer: unknown
