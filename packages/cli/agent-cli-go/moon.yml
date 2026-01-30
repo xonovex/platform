@@ -1,6 +1,6 @@
 $schema: https://moonrepo.dev/schemas/project.json
 language: go
-layer: library
+layer: application
 tags:
   - go
   - typescript

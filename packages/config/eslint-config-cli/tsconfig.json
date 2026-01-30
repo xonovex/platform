@@ -5,21 +5,12 @@
     "rootDir": ".",
     "baseUrl": ".",
     "paths": {
-      "@xonovex/eslint-config-base": [
-        "../eslint-config-base/src/index.ts"
-      ],
-      "@xonovex/eslint-config-base/*": [
-        "../eslint-config-base/src/*"
-      ]
+      "@xonovex/eslint-config-base": ["../eslint-config-base/src/index.ts"],
+      "@xonovex/eslint-config-base/*": ["../eslint-config-base/src/*"]
     }
   },
-  "include": [
-    "src",
-    "eslint.config.ts"
-  ],
-  "exclude": [
-    "dist"
-  ],
+  "include": ["src", "eslint.config.ts"],
+  "exclude": ["dist"],
   "references": [
     {
       "path": "../eslint-config-base"

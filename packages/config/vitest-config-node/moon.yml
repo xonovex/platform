@@ -6,6 +6,6 @@ tags:
   - tenant-shared
   - typescript-config
 dependsOn:
-- vitest-config-base
-- eslint-config-base
-- ts-config-build
+  - vitest-config-base
+  - eslint-config-base
+  - ts-config-build

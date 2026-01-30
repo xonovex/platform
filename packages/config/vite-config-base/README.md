@@ -13,8 +13,8 @@ npm install -D @xonovex/vite-config-base
 In your `vite.config.ts`:
 
 ```typescript
-import {defineConfig} from "vite";
 import {baseViteConfig} from "@xonovex/vite-config-base";
+import {defineConfig} from "vite";
 
 export default defineConfig({
   ...baseViteConfig,

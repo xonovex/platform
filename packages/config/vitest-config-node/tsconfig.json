@@ -5,26 +5,14 @@
     "rootDir": ".",
     "baseUrl": ".",
     "paths": {
-      "@xonovex/vitest-config-base": [
-        "../vitest-config-base/src/index.ts"
-      ],
-      "@xonovex/vitest-config-base/*": [
-        "../vitest-config-base/src/*"
-      ],
-      "@xonovex/eslint-config-base": [
-        "../eslint-config-base/src/index.ts"
-      ],
-      "@xonovex/eslint-config-base/*": [
-        "../eslint-config-base/src/*"
-      ]
+      "@xonovex/vitest-config-base": ["../vitest-config-base/src/index.ts"],
+      "@xonovex/vitest-config-base/*": ["../vitest-config-base/src/*"],
+      "@xonovex/eslint-config-base": ["../eslint-config-base/src/index.ts"],
+      "@xonovex/eslint-config-base/*": ["../eslint-config-base/src/*"]
     }
   },
-  "include": [
-    "src"
-  ],
-  "exclude": [
-    "dist"
-  ],
+  "include": ["src"],
+  "exclude": ["dist"],
   "references": [
     {
       "path": "../eslint-config-base"
