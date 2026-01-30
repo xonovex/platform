@@ -25,14 +25,7 @@ tasks:
     options:
       cache: false
   npm-publish:
-    command:
-    - npm
-    - publish
-    - --provenance
-    - --access
-    - public
     deps:
     - go-build
     options:
-      cache: false
-      runInCI: false
+      mergeDeps: replace

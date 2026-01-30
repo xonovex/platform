@@ -46,8 +46,8 @@ script: mkdir -p bin && go build -o bin/app ./cmd/...
 
 - `inputs:` - Files/globs affecting caching and task invalidation
 - `outputs:` - Directories/files produced, cached and restored
-- `deps:` - Task dependencies using `~:task` (same project) or `project:task` syntax
-- `options:` - runInCI, persistent, shell, cache settings
+- `deps:` - Task dependencies using `~:task` (same project), `^:task` (upstream), or `project:task` syntax; use `{target, optional: true}` for deps that may not exist
+- `options:` - runInCI, persistent, shell, cache, merge strategy settings (`merge`, `mergeArgs`, `mergeDeps`, `mergeEnv`, `mergeInputs`, `mergeOutputs`, `mergeToolchains` — each supports `append`/`prepend`/`replace`/`preserve`)
 - `env:` - Environment variables for task execution
 - `toolchains:` - Constraint for execution environment (replaces `platform` in v2)
 
