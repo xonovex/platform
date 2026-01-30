@@ -29,6 +29,7 @@ jobs:
         with:
           cache-workspace: ${{ inputs.cache-workspace }}
 
+      - run: rm -f .moon/cache/runReport.json
       - run: "npx moon ci --color :ci-prepare"
 
       - uses: moonrepo/run-report-action@v1
