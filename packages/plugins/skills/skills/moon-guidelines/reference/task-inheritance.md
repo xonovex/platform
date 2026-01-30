@@ -62,7 +62,7 @@ script: npx eslint src
 tasks:
   npm-publish:
     deps:
-    - go-build
+      - go-build
     options:
       mergeDeps: replace
 ```
@@ -75,9 +75,9 @@ Use `optional: true` when a tag-level task depends on a task that not all inheri
 tasks:
   npm-publish:
     deps:
-    - target: ~:build
-      optional: true
-    - ^:npm-publish
+      - target: ~:build
+        optional: true
+      - ^:npm-publish
 ```
 
 ## Composition Patterns
