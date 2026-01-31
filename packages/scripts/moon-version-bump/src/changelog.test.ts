@@ -82,5 +82,21 @@ describe("generateChangelogEntry", () => {
     expect(entry).toContain("## 1.2.4");
     expect(entry).toContain("### Patch Changes");
     expect(entry).toContain("Updated dependency");
+    expect(entry).not.toContain("Version bump");
+  });
+
+  it("should show version bump when no commits or dep updates", () => {
+    const entry = generateChangelogEntry("1.2.4", [], "patch");
+    expect(entry).toContain("## 1.2.4");
+    expect(entry).toContain("### Patch Changes");
+    expect(entry).toContain("- Version bump");
+  });
+
+  it("should show version bump when all commits are excluded types", () => {
+    const choredCommits: Commit[] = [
+      {hash: "abc1234567890", author: "deorder", message: "chore: update deps"},
+    ];
+    const entry = generateChangelogEntry("1.2.4", choredCommits, "patch");
+    expect(entry).toContain("- Version bump");
   });
 });

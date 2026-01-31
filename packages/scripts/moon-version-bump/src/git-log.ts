@@ -26,14 +26,8 @@ const isIncludedType = (type: string): boolean => INCLUDED_TYPES.has(type);
 const getLastVersionRef = (
   rootDir: string,
   pkgDir: string,
+  currentVersion: string,
 ): string | undefined => {
-  const currentPkgJson = execSync(`git show HEAD:${pkgDir}/package.json`, {
-    cwd: rootDir,
-    encoding: "utf8",
-  });
-  const currentVersion = (JSON.parse(currentPkgJson) as {version?: string})
-    .version;
-
   // Walk back through commits that touched package.json to find where version differs
   const hashes = execSync(
     `git log --diff-filter=M --format=%H -- ${pkgDir}/package.json`,
