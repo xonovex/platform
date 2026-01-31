@@ -14,6 +14,10 @@ on:
         description: "Perform a dry run (no actual publishing)"
         type: boolean
         default: true
+      force_projects:
+        description: "Force publish specific moon projects (comma-separated, e.g. agent-cli-go,core)"
+        type: string
+        default: ""
   pull_request:
     types: [closed]
     branches: [main]
@@ -52,24 +56,35 @@ jobs:
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          FORCE_PROJECTS: ${{ inputs.force_projects }}
         run: |
-          PROJECTS=$(npx tsx scripts/version-detect.ts HEAD~1 2>/dev/null)
-          if [ "$PROJECTS" = "[]" ]; then
-            echo "No packages with version changes"
-            exit 0
+          if [ -n "$FORCE_PROJECTS" ]; then
+            TARGETS=$(echo "$FORCE_PROJECTS" | tr ',' '\n' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' | sed 's/$/:ci-publish/' | tr '\n' ' ')
+          else
+            PROJECTS=$(npx tsx scripts/version-detect.ts HEAD~1 2>/dev/null)
+            if [ "$PROJECTS" = "[]" ]; then
+              echo "No packages with version changes"
+              exit 0
+            fi
+            TARGETS=$(echo "$PROJECTS" | jq -r '.[] | . + ":ci-publish"' | tr '\n' ' ')
           fi
-          TARGETS=$(echo "$PROJECTS" | jq -r '.[] | . + ":ci-publish"' | tr '\n' ' ')
           nix develop --command bash -c "npm ci && npx moon run --color --concurrency 1 $TARGETS"
 
       - name: Publish (dry run)
         if: inputs.dry_run == true
+        env:
+          FORCE_PROJECTS: ${{ inputs.force_projects }}
         run: |
-          PROJECTS=$(npx tsx scripts/version-detect.ts HEAD~1 2>/dev/null)
-          if [ "$PROJECTS" = "[]" ]; then
-            echo "No packages with version changes"
-            exit 0
+          if [ -n "$FORCE_PROJECTS" ]; then
+            TARGETS=$(echo "$FORCE_PROJECTS" | tr ',' '\n' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' | sed 's/$/:ci-publish-dry-run/' | tr '\n' ' ')
+          else
+            PROJECTS=$(npx tsx scripts/version-detect.ts HEAD~1 2>/dev/null)
+            if [ "$PROJECTS" = "[]" ]; then
+              echo "No packages with version changes"
+              exit 0
+            fi
+            TARGETS=$(echo "$PROJECTS" | jq -r '.[] | . + ":ci-publish-dry-run"' | tr '\n' ' ')
           fi
-          TARGETS=$(echo "$PROJECTS" | jq -r '.[] | . + ":ci-publish-dry-run"' | tr '\n' ' ')
           nix develop --command bash -c "npm ci && npx moon run --color --concurrency 1 $TARGETS"
 
       - uses: moonrepo/run-report-action@v1
