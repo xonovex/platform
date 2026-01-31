@@ -3,9 +3,7 @@ import {readFileSync} from "node:fs";
 import type {PackageJson} from "@xonovex/moon-scripts-common";
 import type {DepUpdate} from "./changelog.js";
 
-const getWorkspaceDeps = (
-  pkg: PackageJson,
-): ReadonlyMap<string, string> => {
+const getWorkspaceDeps = (pkg: PackageJson): ReadonlyMap<string, string> => {
   const deps = new Map<string, string>();
   const allDeps = {...pkg.dependencies, ...pkg.devDependencies};
   for (const [name, version] of Object.entries(allDeps)) {
@@ -16,7 +14,10 @@ const getWorkspaceDeps = (
   return deps;
 };
 
-const detectDepUpdates = (rootDir: string, pkgPath: string): readonly DepUpdate[] => {
+const detectDepUpdates = (
+  rootDir: string,
+  pkgPath: string,
+): readonly DepUpdate[] => {
   const currentPkg = JSON.parse(readFileSync(pkgPath, "utf8")) as PackageJson;
   const currentDeps = getWorkspaceDeps(currentPkg);
 

@@ -23,12 +23,16 @@ const parseConventionalCommit = (message: string): ParsedCommit | undefined => {
 
 const isIncludedType = (type: string): boolean => INCLUDED_TYPES.has(type);
 
-const getLastVersionRef = (rootDir: string, pkgDir: string): string | undefined => {
+const getLastVersionRef = (
+  rootDir: string,
+  pkgDir: string,
+): string | undefined => {
   const currentPkgJson = execSync(`git show HEAD:${pkgDir}/package.json`, {
     cwd: rootDir,
     encoding: "utf8",
   });
-  const currentVersion = (JSON.parse(currentPkgJson) as {version?: string}).version;
+  const currentVersion = (JSON.parse(currentPkgJson) as {version?: string})
+    .version;
 
   // Walk back through commits that touched package.json to find where version differs
   const hashes = execSync(

@@ -61,14 +61,5 @@ tasks:
     options:
       cache: false
       runInCI: false
-  changelog-update:
-    command:
-      - npx
-      - moon-changelog-update
-    deps:
-      - moon-changelog-update:install
-    options:
-      cache: false
-      runInCI: false
 inheritedBy:
   tag: npm

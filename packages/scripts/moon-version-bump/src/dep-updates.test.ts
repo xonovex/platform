@@ -4,7 +4,7 @@ import {getWorkspaceDeps} from "./dep-updates.js";
 describe("getWorkspaceDeps", () => {
   it("should extract @xonovex dependencies", () => {
     const deps = getWorkspaceDeps({
-      dependencies: {"@xonovex/core": "1.0.0", "lodash": "4.0.0"},
+      dependencies: {"@xonovex/core": "1.0.0", lodash: "4.0.0"},
       devDependencies: {"@xonovex/eslint-config": "2.0.0"},
     });
     expect(deps.get("@xonovex/core")).toBe("1.0.0");

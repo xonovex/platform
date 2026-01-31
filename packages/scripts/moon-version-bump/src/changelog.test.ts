@@ -28,7 +28,7 @@ describe("formatCommitEntry", () => {
       "add new feature",
     );
     expect(result).toBe(
-      "- [`abc1234`](https://github.com/xonovex/platform/commit/abc1234567890) Thanks [@deorder](https://github.com/deorder)! - add new feature",
+      "- [`abc1234`](https://github.com/xonovex/platform/commit/abc1234567890) [@deorder](https://github.com/deorder)! - add new feature",
     );
   });
 });
@@ -72,9 +72,7 @@ describe("generateChangelogEntry", () => {
     const entry = generateChangelogEntry("1.2.4", [], "patch", [
       {name: "@xonovex/core", version: "0.1.20"},
     ]);
-    expect(entry).toContain(
-      "Updated dependency `@xonovex/core` to `0.1.20`",
-    );
+    expect(entry).toContain("Updated dependency `@xonovex/core` to `0.1.20`");
   });
 
   it("should handle empty commits with dep updates only", () => {
