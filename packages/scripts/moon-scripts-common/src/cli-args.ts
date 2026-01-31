@@ -49,7 +49,11 @@ const parseCliArgs = (spec: CliSpec, argv?: readonly string[]): ParsedArgs => {
   > = {};
   if (spec.options) {
     for (const [name, opt] of Object.entries(spec.options)) {
-      options[name] = {type: opt.type, short: opt.short, default: opt.default};
+      options[name] = {
+        type: opt.type,
+        ...(opt.short ? {short: opt.short} : {}),
+        default: opt.default,
+      };
     }
   }
 
