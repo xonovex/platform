@@ -38,8 +38,8 @@ tasks:
       - "*.json"
       - "*.md"
     outputs: []
-  ci-prepare:
-    command: echo 'ci-prepare complete'
+  ci-check:
+    command: echo 'ci-check complete'
     deps: [fmt-check]
     options:
       cache: false

@@ -5,7 +5,7 @@ ci:
   extends: .workspace_cache
   script:
     - rm -f .moon/cache/runReport.json .moon/cache/ciReport.json
-    - npx moon ci --color --concurrency 4 :ci-prepare
+    - npx moon ci --color --concurrency 4 :ci-check
   rules:
     - if: '$CI_COMMIT_BRANCH == "main"'
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'

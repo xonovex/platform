@@ -125,8 +125,8 @@ tasks:
     options:
       cache: false
       runInCI: false
-  ci-prepare:
-    command: echo 'ci-prepare complete'
+  ci-check:
+    command: echo 'ci-check complete'
     deps: [go-build, go-test, go-lint, go-fmt-check, go-typecheck]
     options:
       cache: false

@@ -18,8 +18,8 @@ inheritedBy:
 # .moon/tasks/go-library.yml - Extends mixin, adds layer-specific tasks
 extends: ./tag-go.yml
 tasks:
-  ci-prepare:
-    script: echo 'ci-prepare complete'
+  ci-check:
+    script: echo 'ci-check complete'
     deps: [go-build, go-test, go-lint]
 inheritedBy:
   toolchain: go
@@ -90,7 +90,7 @@ language: go
 layer: library
 tags: [go, typescript, npm]
 tasks:
-  ci-prepare:
+  ci-check:
     script: echo 'done'
     deps: [go-build, go-test, build, lint, typecheck]
 ```
@@ -101,7 +101,7 @@ tasks:
 # .moon/tasks/typescript-library.yml
 extends: ./tag-typescript.yml
 tasks:
-  ci-prepare:
+  ci-check:
     deps: [build, test, lint, typecheck]
 inheritedBy:
   toolchain: typescript

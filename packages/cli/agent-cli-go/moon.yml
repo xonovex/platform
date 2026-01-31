@@ -39,9 +39,9 @@ tasks:
     script: echo 'no TypeScript tests'
     options:
       cache: false
-  # Aggregate ci-prepare for both Go and TS
-  ci-prepare:
-    script: echo 'ci-prepare complete'
+  # Aggregate ci-check for both Go and TS
+  ci-check:
+    script: echo 'ci-check complete'
     deps:
       - go-build
       - go-test
