@@ -2,43 +2,43 @@ $schema: https://moonrepo.dev/schemas/tasks.json
 tasks:
   npm-publish:
     command:
-    - npx
-    - moon-npm-publish
+      - npx
+      - moon-npm-publish
     deps:
-    - target: ~:build
-      optional: true
-    - ^:npm-publish
-    - ~:npm-check
-    - moon-npm-publish:install
+      - target: ~:build
+        optional: true
+      - ^:npm-publish
+      - ~:npm-check
+      - moon-npm-publish:install
     options:
       cache: false
       runInCI: false
   npm-publish-dry-run:
     command:
-    - npx
-    - moon-npm-publish
-    - --dry-run
+      - npx
+      - moon-npm-publish
+      - --dry-run
     deps:
-    - target: ~:build
-      optional: true
-    - ~:npm-check
-    - moon-npm-publish:install
+      - target: ~:build
+        optional: true
+      - ~:npm-check
+      - moon-npm-publish:install
     options:
       cache: false
       runInCI: false
   ci-publish:
     command: echo 'ci-publish complete'
     deps:
-    - npm-publish
+      - npm-publish
     options:
       cache: false
       runInCI: false
   npm-check:
     command:
-    - npx
-    - moon-npm-check
+      - npx
+      - moon-npm-check
     deps:
-    - moon-npm-check:install
+      - moon-npm-check:install
     options:
       cache: false
   npm-lint-fix:
@@ -48,17 +48,27 @@ tasks:
   ci-publish-dry-run:
     command: echo 'ci-publish-dry-run complete'
     deps:
-    - npm-publish-dry-run
+      - npm-publish-dry-run
     options:
       cache: false
       runInCI: false
   version-bump:
     command:
-    - npx
-    - moon-version-bump
+      - npx
+      - moon-version-bump
     deps:
-    - moon-version-bump:install
+      - moon-version-bump:install
     options:
       cache: false
+      runInCI: false
+  changelog-update:
+    command:
+      - npx
+      - moon-changelog-update
+    deps:
+      - moon-changelog-update:install
+    options:
+      cache: false
+      runInCI: false
 inheritedBy:
   tag: npm

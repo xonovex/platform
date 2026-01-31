@@ -1,0 +1,16 @@
+$schema: https://moonrepo.dev/schemas/project.json
+language: typescript
+tags: [typescript]
+dependsOn:
+  - moon-scripts-common
+tasks:
+  install:
+    command:
+      - npm
+      - install
+      - -w
+      - "@xonovex/moon-changelog-update"
+    deps:
+      - ~:build
+    options:
+      runFromWorkspaceRoot: true

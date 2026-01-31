@@ -1,0 +1,12 @@
+{
+  "name": "@xonovex/moon-changelog-update",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "moon-changelog-update": "./dist/src/index.js"
+  },
+  "dependencies": {
+    "@xonovex/moon-scripts-common": "0.0.0"
+  }
+}
