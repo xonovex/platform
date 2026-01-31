@@ -1,0 +1,10 @@
+{
+  "extends": "@xonovex/ts-config-cli",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": ".",
+    "baseUrl": "."
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "dist"]
+}

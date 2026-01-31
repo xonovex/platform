@@ -50,22 +50,9 @@ tasks:
       - build
       - lint
       - typecheck
+      - npm-prepublish
     options:
       cache: false
-  # Override npm-publish to depend on platform packages
-  npm-publish:
-    command:
-      - npm
-      - publish
-      - --provenance
-      - --access
-      - public
-    deps:
-      - build
-      - ^:npm-publish
-    options:
-      cache: false
-      runInCI: false
   ci-publish:
     script: echo 'ci-publish complete'
     deps:

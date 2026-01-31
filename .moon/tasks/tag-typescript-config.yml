@@ -116,7 +116,12 @@ tasks:
       cache: false
   ci-prepare:
     command: echo 'ci-prepare complete'
-    deps: [build, lint, typecheck]
+    deps:
+    - build
+    - lint
+    - typecheck
+    - target: ~:npm-prepublish
+      optional: true
     options:
       cache: false
 inheritedBy:

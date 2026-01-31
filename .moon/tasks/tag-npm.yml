@@ -2,15 +2,13 @@ $schema: https://moonrepo.dev/schemas/tasks.json
 tasks:
   npm-publish:
     command:
-    - npm
-    - publish
-    - --provenance
-    - --access
-    - public
+    - npx
+    - moon-npm-publish
     deps:
     - target: ~:build
       optional: true
     - ^:npm-publish
+    - moon-npm-publish:install
     options:
       cache: false
       runInCI: false
@@ -32,6 +30,14 @@ tasks:
     options:
       cache: false
       runInCI: false
+  npm-prepublish:
+    command:
+    - npx
+    - moon-npm-prepublish
+    deps:
+    - moon-npm-prepublish:install
+    options:
+      cache: false
   ci-publish-dry-run:
     command: echo 'ci-publish-dry-run complete'
     deps:
@@ -39,5 +45,13 @@ tasks:
     options:
       cache: false
       runInCI: false
+  version-bump:
+    command:
+    - npx
+    - moon-version-bump
+    deps:
+    - moon-version-bump:install
+    options:
+      cache: false
 inheritedBy:
   tag: npm
