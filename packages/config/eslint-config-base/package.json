@@ -1,6 +1,6 @@
 {
   "name": "@xonovex/eslint-config-base",
-  "version": "0.1.16",
+  "version": "0.1.17",
   "description": "Base ESLint configuration for Xonovex projects",
   "type": "module",
   "license": "MIT",
@@ -61,10 +61,10 @@
     "eslint-plugin-unicorn": "62.0.0",
     "globals": "17.1.0",
     "typescript-eslint": "8.53.1",
-    "@xonovex/ts-config-node": "0.1.16"
+    "@xonovex/ts-config-node": "0.1.17"
   },
   "devDependencies": {
-    "@xonovex/ts-config-node": "0.1.16",
+    "@xonovex/ts-config-node": "0.1.17",
     "@types/eslint": "9.6.1",
     "@types/eslint-plugin-security": "3.0.1",
     "@types/node": "^25.0.10"
