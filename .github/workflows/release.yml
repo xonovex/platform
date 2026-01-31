@@ -50,7 +50,7 @@ jobs:
       - name: Publish
         if: inputs.dry_run != true
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           PROJECTS=$(npx tsx scripts/version-detect.ts HEAD~1 2>/dev/null)
