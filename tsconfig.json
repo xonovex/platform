@@ -33,7 +33,7 @@
       "path": "packages/scripts/moon-action-graph"
     },
     {
-      "path": "packages/scripts/moon-npm-prepublish"
+      "path": "packages/scripts/moon-npm-check"
     },
     {
       "path": "packages/scripts/moon-npm-publish"

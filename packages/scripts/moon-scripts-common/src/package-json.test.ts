@@ -1,9 +1,8 @@
 import {mkdtempSync, readFileSync, rmSync, writeFileSync} from "node:fs";
-import {join} from "node:path";
 import {tmpdir} from "node:os";
+import {join} from "node:path";
 import {afterEach, beforeEach, describe, expect, it} from "vitest";
-import {readPkg, writePkg} from "./package-json.js";
-import type {PackageJson} from "./package-json.js";
+import {readPkg, writePkg, type PackageJson} from "./package-json.js";
 
 describe("package-json", () => {
   let tmp: string;
@@ -19,7 +18,10 @@ describe("package-json", () => {
   describe("readPkg", () => {
     it("should read and parse a package.json file", () => {
       const pkgPath = join(tmp, "package.json");
-      writeFileSync(pkgPath, JSON.stringify({name: "@xonovex/test", version: "1.0.0"}));
+      writeFileSync(
+        pkgPath,
+        JSON.stringify({name: "@xonovex/test", version: "1.0.0"}),
+      );
 
       const result = readPkg(pkgPath);
       expect(result.name).toBe("@xonovex/test");

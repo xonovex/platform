@@ -17,9 +17,7 @@ export const queryMoonProjects = (rootDir: string): readonly MoonProject[] => {
   return (JSON.parse(output) as {projects: readonly MoonProject[]}).projects;
 };
 
-export const findAllPackageJsonPaths = (
-  rootDir: string,
-): readonly string[] =>
+export const findAllPackageJsonPaths = (rootDir: string): readonly string[] =>
   queryMoonProjects(rootDir)
     .map((p) => join(rootDir, p.source, "package.json"))
     .filter((p) => existsSync(p));

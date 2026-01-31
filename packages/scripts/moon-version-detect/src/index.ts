@@ -3,6 +3,7 @@ import {execSync} from "node:child_process";
 import {existsSync, readFileSync} from "node:fs";
 import {dirname, join} from "node:path";
 import {fileURLToPath} from "node:url";
+import {parseCliArgs} from "@xonovex/moon-scripts-common";
 
 const findWorkspaceRoot = (start: string): string => {
   let dir = start;
@@ -25,7 +26,18 @@ interface MoonProject {
   source: string;
 }
 
-const ref = process.argv[2] ?? "HEAD~1";
+const {values, positionals} = parseCliArgs({
+  name: "moon-version-detect",
+  description: "Detect moon projects with version changes since a git ref",
+  options: {
+    ref: {
+      type: "string",
+      short: "r",
+      description: "Git ref to compare against (default: HEAD~1)",
+    },
+  },
+});
+const ref = (values.ref as string | undefined) ?? positionals[0] ?? "HEAD~1";
 
 const moonOutput = JSON.parse(
   // eslint-disable-next-line sonarjs/no-os-command-from-path
@@ -47,7 +59,6 @@ for (const p of moonOutput.projects) {
     if (!pkg.name || pkg.private) continue;
 
     const oldPkg = JSON.parse(
-       
       execSync(`git show ${ref}:${p.source}/package.json`, {
         encoding: "utf8",
         cwd: ROOT_DIR,

@@ -50,7 +50,7 @@ tasks:
       - build
       - lint
       - typecheck
-      - npm-prepublish
+      - npm-check
     options:
       cache: false
   ci-publish:

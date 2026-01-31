@@ -7,13 +7,34 @@ import {
   logError,
   logInfo,
   logSuccess,
+  parseCliArgs,
   readPkg,
   writePkg,
 } from "@xonovex/moon-scripts-common";
-import {bumpVersion, updateDependencyVersions} from "./bump.js";
-import type {BumpType} from "./bump.js";
+import {bumpVersion, updateDependencyVersions, type BumpType} from "./bump.js";
 
 const main = (): void => {
+  const {values, positionals} = parseCliArgs({
+    name: "moon-version-bump",
+    description: "Bump package version and update workspace dependents",
+    options: {
+      type: {
+        type: "string",
+        short: "t",
+        description: "Bump type: patch, minor, or major (default: patch)",
+      },
+      "dry-run": {
+        type: "boolean",
+        short: "d",
+        description: "Preview changes without writing files",
+      },
+    },
+  });
+  const bumpType = ((values.type as string | undefined) ??
+    positionals[0] ??
+    "patch") as BumpType;
+  const dryRun = values["dry-run"] === true;
+
   const cwd = process.cwd();
   const pkgPath = join(cwd, "package.json");
 
@@ -28,21 +49,21 @@ const main = (): void => {
     process.exit(1);
   }
 
-  const args = process.argv.slice(2);
-  const bumpType = (args[0] ?? "patch") as BumpType;
-
   if (!["patch", "minor", "major"].includes(bumpType)) {
-    logError(
-      `Invalid bump type: ${bumpType}. Use patch, minor, or major.`,
-    );
+    logError(`Invalid bump type: ${bumpType}. Use patch, minor, or major.`);
     process.exit(1);
   }
 
   const oldVersion = pkg.version;
   const newVersion = bumpVersion(oldVersion, bumpType);
-  pkg.version = newVersion;
-  writePkg(pkgPath, pkg);
-  logInfo(`${pkg.name}: ${oldVersion} -> ${newVersion}`);
+
+  if (dryRun) {
+    logInfo(`[dry-run] ${pkg.name}: ${oldVersion} -> ${newVersion}`);
+  } else {
+    pkg.version = newVersion;
+    writePkg(pkgPath, pkg);
+    logInfo(`${pkg.name}: ${oldVersion} -> ${newVersion}`);
+  }
 
   // Update dependents across workspace
   const rootDir = findWorkspaceRoot(cwd);
@@ -60,7 +81,7 @@ const main = (): void => {
     if (updateDependencyVersions(depPkg.peerDependencies, pkg.name, newVersion))
       changed = true;
     if (changed) {
-      writePkg(depPkgPath, depPkg);
+      if (!dryRun) writePkg(depPkgPath, depPkg);
       depsUpdated++;
     }
   }
@@ -72,17 +93,22 @@ const main = (): void => {
       "packages/plugins/skills/.claude-plugin/plugin.json",
     );
     if (existsSync(pluginJsonPath)) {
-      const pluginJson = JSON.parse(
-        readFileSync(pluginJsonPath, "utf8"),
-      ) as Record<string, unknown>;
-      pluginJson.version = newVersion;
-      writeFileSync(pluginJsonPath, JSON.stringify(pluginJson, null, 2) + "\n");
-      logInfo(`plugin.json -> ${newVersion}`);
+      if (dryRun) {
+        logInfo(`[dry-run] plugin.json -> ${newVersion}`);
+      } else {
+        const pluginJson = JSON.parse(
+          readFileSync(pluginJsonPath, "utf8"),
+        ) as Record<string, unknown>;
+        pluginJson.version = newVersion;
+        writeFileSync(pluginJsonPath, JSON.stringify(pluginJson, null, 2) + "\n");
+        logInfo(`plugin.json -> ${newVersion}`);
+      }
     }
   }
 
+  const prefix = dryRun ? "[dry-run] Would bump" : "Bumped";
   logSuccess(
-    `Bumped ${pkg.name} to ${newVersion}, updated deps in ${String(depsUpdated)} file(s).`,
+    `${prefix} ${pkg.name} to ${newVersion}, updated deps in ${String(depsUpdated)} file(s).`,
   );
 };
 

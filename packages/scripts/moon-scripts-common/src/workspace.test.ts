@@ -1,6 +1,6 @@
-import {mkdtempSync, mkdirSync, rmSync} from "node:fs";
-import {join} from "node:path";
+import {mkdirSync, mkdtempSync, rmSync} from "node:fs";
 import {tmpdir} from "node:os";
+import {join} from "node:path";
 import {afterEach, beforeEach, describe, expect, it} from "vitest";
 import {findWorkspaceRoot} from "./workspace.js";
 
@@ -29,6 +29,8 @@ describe("findWorkspaceRoot", () => {
   });
 
   it("should throw if no .moon directory is found", () => {
-    expect(() => findWorkspaceRoot(tmp)).toThrow("Could not find workspace root");
+    expect(() => findWorkspaceRoot(tmp)).toThrow(
+      "Could not find workspace root",
+    );
   });
 });

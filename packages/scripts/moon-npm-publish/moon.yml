@@ -6,10 +6,10 @@ dependsOn:
 tasks:
   install:
     command:
-    - npm
-    - install
-    - -w
-    - '@xonovex/moon-npm-publish'
+      - npm
+      - install
+      - -w
+      - "@xonovex/moon-npm-publish"
     deps:
       - ~:build
     options:

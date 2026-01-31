@@ -1,5 +1,5 @@
-import {describe, expect, it} from "vitest";
 import type {PackageJson} from "@xonovex/moon-scripts-common";
+import {describe, expect, it} from "vitest";
 import {validatePackage} from "./validate.js";
 
 const validPkg: PackageJson = {

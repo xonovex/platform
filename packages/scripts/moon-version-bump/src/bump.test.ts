@@ -36,6 +36,8 @@ describe("updateDependencyVersions", () => {
   });
 
   it("should return false for undefined deps", () => {
-    expect(updateDependencyVersions(undefined, "@xonovex/core", "1.0.1")).toBe(false);
+    expect(updateDependencyVersions(undefined, "@xonovex/core", "1.0.1")).toBe(
+      false,
+    );
   });
 });

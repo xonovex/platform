@@ -4,10 +4,10 @@ tags: [typescript]
 tasks:
   install:
     command:
-    - npm
-    - install
-    - -w
-    - '@xonovex/moon-version-detect'
+      - npm
+      - install
+      - -w
+      - "@xonovex/moon-version-detect"
     deps:
       - ~:build
     options:

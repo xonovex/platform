@@ -6,10 +6,10 @@ dependsOn:
 tasks:
   install:
     command:
-    - npm
-    - install
-    - -w
-    - '@xonovex/moon-action-graph'
+      - npm
+      - install
+      - -w
+      - "@xonovex/moon-action-graph"
     deps:
       - ~:build
     options:
