@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import {execSync} from "node:child_process";
 import {existsSync, readFileSync, writeFileSync} from "node:fs";
-import {join, relative} from "node:path";
+import {dirname, join, relative} from "node:path";
 import {
   findAllPackageJsonPaths,
   findWorkspaceRoot,
@@ -17,11 +17,55 @@ import {
   determineBumpLevel,
   generateChangelogEntry,
   updateChangelog,
+  type DepUpdate,
 } from "./changelog.js";
 import {detectDepUpdates} from "./dep-updates.js";
 import {updateDependent} from "./dependents.js";
 import {getCommitsSince, getLastVersionRef} from "./git-log.js";
 import {getGitVersion} from "./git.js";
+
+const generateChangelog = (
+  rootDir: string,
+  pkgPath: string,
+  packageName: string,
+  oldVersion: string,
+  newVersion: string,
+  dryRun: boolean,
+  depUpdates?: readonly DepUpdate[],
+): void => {
+  const pkgDir = relative(rootDir, dirname(pkgPath));
+  const sinceRef = getLastVersionRef(rootDir, pkgDir);
+
+  if (!sinceRef) {
+    logInfo(`${packageName}: no previous version found, skipping changelog.`);
+    return;
+  }
+
+  let prevVersion: string;
+  try {
+    const oldPkgJson = execSync(
+      `git show ${sinceRef}:${pkgDir}/package.json`,
+      {cwd: rootDir, encoding: "utf8"},
+    );
+    prevVersion = (JSON.parse(oldPkgJson) as {version: string}).version;
+  } catch {
+    prevVersion = oldVersion;
+  }
+
+  const bumpLevel = determineBumpLevel(prevVersion, newVersion);
+  const commits = getCommitsSince(rootDir, pkgDir, sinceRef);
+  const deps = depUpdates ?? detectDepUpdates(rootDir, pkgPath);
+  const entry = generateChangelogEntry(newVersion, commits, bumpLevel, deps);
+
+  if (dryRun) {
+    logInfo(`[dry-run] Changelog entry for ${packageName}@${newVersion}:`);
+    console.log(entry);
+  } else {
+    const changelogPath = join(dirname(pkgPath), "CHANGELOG.md");
+    updateChangelog(changelogPath, packageName, entry);
+    logInfo(`Updated CHANGELOG.md for ${packageName}@${newVersion}`);
+  }
+};
 
 const main = (): void => {
   const {values, positionals} = parseCliArgs({
@@ -106,6 +150,21 @@ const main = (): void => {
       }
       if (!dryRun) writePkg(depPkgPath, result.pkg);
       depsUpdated++;
+
+      // Generate changelog for dependents that got version-bumped
+      if (result.versionBumped && result.oldVersion && result.newVersion) {
+        const depName = depPkg.name ?? depPkgPath;
+        const depUpdate: DepUpdate = {name: pkg.name, version: newVersion};
+        generateChangelog(
+          rootDir,
+          depPkgPath,
+          depName,
+          result.oldVersion,
+          result.newVersion,
+          dryRun,
+          [depUpdate],
+        );
+      }
     }
   }
 
@@ -132,44 +191,9 @@ const main = (): void => {
     }
   }
 
-  // Generate changelog entry if version was actually bumped
+  // Generate changelog for the primary package
   if (newVersion !== oldVersion) {
-    const pkgDir = relative(rootDir, cwd);
-    const sinceRef = getLastVersionRef(rootDir, pkgDir);
-
-    if (sinceRef) {
-      let prevVersion: string;
-      try {
-        const oldPkgJson = execSync(
-          `git show ${sinceRef}:${pkgDir}/package.json`,
-          {cwd: rootDir, encoding: "utf8"},
-        );
-        prevVersion = (JSON.parse(oldPkgJson) as {version: string}).version;
-      } catch {
-        prevVersion = oldVersion;
-      }
-
-      const bumpLevel = determineBumpLevel(prevVersion, newVersion);
-      const commits = getCommitsSince(rootDir, pkgDir, sinceRef);
-      const depUpdates = detectDepUpdates(rootDir, pkgPath);
-      const entry = generateChangelogEntry(
-        newVersion,
-        commits,
-        bumpLevel,
-        depUpdates,
-      );
-
-      if (dryRun) {
-        logInfo(`[dry-run] Changelog entry for ${pkg.name}@${newVersion}:`);
-        console.log(entry);
-      } else {
-        const changelogPath = join(cwd, "CHANGELOG.md");
-        updateChangelog(changelogPath, pkg.name, entry);
-        logInfo(`Updated CHANGELOG.md for ${pkg.name}@${newVersion}`);
-      }
-    } else {
-      logInfo(`${pkg.name}: no previous version found, skipping changelog.`);
-    }
+    generateChangelog(rootDir, pkgPath, pkg.name, oldVersion, newVersion, dryRun);
   }
 
   const prefix = dryRun ? "[dry-run] Would bump" : "Bumped";
