@@ -14,7 +14,6 @@ release:
       if [ "$DRY_RUN" = "true" ]; then
         TARGETS=$(echo "$PROJECTS" | jq -r '.[] | . + ":ci-publish-dry-run"' | tr '\n' ' ')
       else
-        echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > .npmrc
         TARGETS=$(echo "$PROJECTS" | jq -r '.[] | . + ":ci-publish"' | tr '\n' ' ')
       fi
       npx moon ci --color --concurrency 1 $TARGETS

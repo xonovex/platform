@@ -1,6 +1,6 @@
 {
   "name": "@xonovex/ts-config-build",
-  "version": "0.1.18",
+  "version": "0.1.19",
   "description": "TypeScript configuration for building packages",
   "type": "module",
   "license": "MIT",
@@ -29,7 +29,7 @@
   },
   "dependencies": {},
   "devDependencies": {
-    "@xonovex/ts-config-base": "0.1.18"
+    "@xonovex/ts-config-base": "0.1.19"
   },
   "scripts": {
     "lint": "echo 'No linting needed for JSON-only config package'",

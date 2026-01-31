@@ -1,6 +1,6 @@
 {
   "name": "@xonovex/eslint-config-cli",
-  "version": "0.1.18",
+  "version": "0.1.19",
   "description": "ESLint configuration for CLI tools and scripts",
   "type": "module",
   "license": "MIT",
@@ -41,13 +41,13 @@
     }
   },
   "dependencies": {
-    "@xonovex/eslint-config-base": "0.1.18",
+    "@xonovex/eslint-config-base": "0.1.19",
     "globals": "17.1.0",
-    "@xonovex/ts-config-build": "0.1.18"
+    "@xonovex/ts-config-build": "0.1.19"
   },
   "devDependencies": {
-    "@xonovex/eslint-config-base": "0.1.18",
-    "@xonovex/ts-config-build": "0.1.18",
+    "@xonovex/eslint-config-base": "0.1.19",
+    "@xonovex/ts-config-build": "0.1.19",
     "@types/node": "^25.0.10"
   },
   "scripts": {
