@@ -17,15 +17,27 @@ export const filterDotGraph = (
 
   for (const line of lines) {
     const m = nodeRe.exec(line);
-    if (m?.[3] !== undefined && filters.has(m[3]) && m[1] !== undefined && m[2] !== undefined) {
+    if (
+      m?.[3] !== undefined &&
+      filters.has(m[3]) &&
+      m[1] !== undefined &&
+      m[2] !== undefined
+    ) {
       nodes.set(m[1], m[2]);
     }
   }
 
   for (const line of lines) {
     const m = edgeRe.exec(line);
-    if (m?.[1] !== undefined && m[2] !== undefined && nodes.has(m[1]) && nodes.has(m[2])) {
-      edges.push(`    "${nodes.get(m[1]) ?? ""}" -> "${nodes.get(m[2]) ?? ""}"`);
+    if (
+      m?.[1] !== undefined &&
+      m[2] !== undefined &&
+      nodes.has(m[1]) &&
+      nodes.has(m[2])
+    ) {
+      edges.push(
+        `    "${nodes.get(m[1]) ?? ""}" -> "${nodes.get(m[2]) ?? ""}"`,
+      );
     }
   }
 

@@ -1,10 +1,10 @@
 {
-  "name": "@xonovex/moon-npm-prepublish",
+  "name": "@xonovex/moon-npm-check",
   "version": "0.0.0",
   "private": true,
   "type": "module",
   "bin": {
-    "moon-npm-prepublish": "./dist/src/index.js"
+    "moon-npm-check": "./dist/src/index.js"
   },
   "dependencies": {
     "@xonovex/moon-scripts-common": "0.0.0"

@@ -6,9 +6,15 @@ import {
   logInfo,
   logSuccess,
   logWarning,
+  parseCliArgs,
   readPkg,
 } from "@xonovex/moon-scripts-common";
 import {validatePackage} from "./validate.js";
+
+parseCliArgs({
+  name: "moon-npm-check",
+  description: "Validate a package is ready for npm publishing",
+});
 
 const packageJsonPath = join(process.cwd(), "package.json");
 
@@ -38,13 +44,13 @@ if (pkg.files && Array.isArray(pkg.files)) {
 }
 
 if (errors.length > 0) {
-  logError(
-    `\n${pkg.name ?? packageJsonPath} is not ready for publishing:\n`,
-  );
+  logError(`\n${pkg.name ?? packageJsonPath} is not ready for publishing:\n`);
   for (const error of errors) {
     logError(`  - ${error}`);
   }
   process.exit(1);
 }
 
-logSuccess(`${pkg.name ?? "unknown"}@${pkg.version ?? "unknown"} is ready for publishing`);
+logSuccess(
+  `${pkg.name ?? "unknown"}@${pkg.version ?? "unknown"} is ready for publishing`,
+);

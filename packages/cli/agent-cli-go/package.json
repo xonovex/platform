@@ -23,7 +23,7 @@
     "dist/bin.js.map"
   ],
   "bin": {
-    "agent-cli-go": "./dist/bin.js"
+    "agent-cli-go": "dist/bin.js"
   },
   "devDependencies": {
     "@xonovex/ts-config-cli": "0.1.19"

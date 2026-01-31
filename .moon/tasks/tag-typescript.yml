@@ -122,8 +122,6 @@ tasks:
     - test
     - lint
     - typecheck
-    - target: ~:npm-prepublish
-      optional: true
     options:
       cache: false
 inheritedBy:

@@ -72,13 +72,13 @@
     "docs:build": "moon run docs:build",
     "docs:dev": "moon run docs:dev",
     "docs:fmt": "moon run docs:fmt",
-    "graph:npm-prepublish": "npx moon-action-graph :npm-prepublish npm-prepublish docs/npm-prepublish-graph.png",
+    "graph:npm-check": "npx moon-action-graph :npm-check npm-check docs/npm-check-graph.png",
     "graph:npm-publish": "npx moon-action-graph :npm-publish npm-publish docs/npm-publish-graph.png",
     "graph:ci-check": "npx moon-action-graph :ci-check ci-check docs/ci-check-graph.png",
     "graph:ci-publish": "npx moon-action-graph :ci-publish ci-publish docs/ci-publish-graph.png",
     "graph:ci-publish-dry-run": "npx moon-action-graph :ci-publish-dry-run ci-publish-dry-run docs/ci-publish-dry-run-graph.png",
     "graph:ci-publish-full": "npx moon-action-graph :ci-publish npm-publish,ci-publish docs/ci-publish-full-graph.png",
-    "graph:all": "npm run graph:npm-prepublish && npm run graph:npm-publish && npm run graph:ci-check && npm run graph:ci-publish && npm run graph:ci-publish-dry-run && npm run graph:ci-publish-full",
+    "graph:all": "npm run graph:npm-check && npm run graph:npm-publish && npm run graph:ci-check && npm run graph:ci-publish && npm run graph:ci-publish-dry-run && npm run graph:ci-publish-full",
     "prepare": "npm run sync:hooks"
   },
   "packageManager": "npm@11.6.2"

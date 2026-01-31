@@ -8,18 +8,21 @@ tasks:
     - target: ~:build
       optional: true
     - ^:npm-publish
+    - ~:npm-check
     - moon-npm-publish:install
     options:
       cache: false
       runInCI: false
   npm-publish-dry-run:
     command:
-    - npm
-    - pack
+    - npx
+    - moon-npm-publish
     - --dry-run
     deps:
     - target: ~:build
       optional: true
+    - ~:npm-check
+    - moon-npm-publish:install
     options:
       cache: false
       runInCI: false
@@ -30,12 +33,16 @@ tasks:
     options:
       cache: false
       runInCI: false
-  npm-prepublish:
+  npm-check:
     command:
     - npx
-    - moon-npm-prepublish
+    - moon-npm-check
     deps:
-    - moon-npm-prepublish:install
+    - moon-npm-check:install
+    options:
+      cache: false
+  npm-lint-fix:
+    script: npm pkg fix
     options:
       cache: false
   ci-publish-dry-run:

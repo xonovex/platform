@@ -1,3 +1,5 @@
+export {parseCliArgs} from "./cli-args.js";
+export type {CliSpec, ParsedArgs} from "./cli-args.js";
 export {logError, logInfo, logSuccess, logWarning} from "./logging.js";
 export {readPkg, writePkg} from "./package-json.js";
 export type {PackageJson} from "./package-json.js";

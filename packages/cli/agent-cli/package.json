@@ -22,7 +22,7 @@
     "dist"
   ],
   "bin": {
-    "agent-cli": "./dist/src/agent.js"
+    "agent-cli": "dist/src/agent.js"
   },
   "exports": {
     ".": "./dist/src/index.js",
