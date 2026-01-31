@@ -56,6 +56,7 @@ const generateChangelogEntry = (
   commits: readonly Commit[],
   bumpLevel: BumpLevel,
   depUpdates?: readonly DepUpdate[],
+  includedTypes?: ReadonlySet<string>,
 ): string => {
   const lines: string[] = [
     `## ${version}`,
@@ -67,12 +68,14 @@ const generateChangelogEntry = (
   let hasEntries = false;
 
   for (const commit of commits) {
-    const parsed = parseConventionalCommit(commit.message);
-    if (!parsed || !isIncludedType(parsed.type)) continue;
-    lines.push(
-      formatCommitEntry(commit.hash, commit.author, parsed.description),
-    );
-    hasEntries = true;
+    for (const msg of commit.messages) {
+      const parsed = parseConventionalCommit(msg);
+      if (!parsed || !isIncludedType(parsed.type, includedTypes)) continue;
+      lines.push(
+        formatCommitEntry(commit.hash, commit.author, parsed.description),
+      );
+      hasEntries = true;
+    }
   }
 
   if (depUpdates && depUpdates.length > 0) {

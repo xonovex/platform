@@ -3,7 +3,7 @@ import {execSync} from "node:child_process";
 interface Commit {
   readonly hash: string;
   readonly author: string;
-  readonly message: string;
+  readonly messages: readonly string[];
 }
 
 interface ParsedCommit {
@@ -21,7 +21,10 @@ const parseConventionalCommit = (message: string): ParsedCommit | undefined => {
   return {type: match[1], description: match[2]};
 };
 
-const isIncludedType = (type: string): boolean => INCLUDED_TYPES.has(type);
+const isIncludedType = (
+  type: string,
+  includedTypes?: ReadonlySet<string>,
+): boolean => (includedTypes ?? INCLUDED_TYPES).has(type);
 
 const getLastVersionRef = (
   rootDir: string,
@@ -55,26 +58,31 @@ const getLastVersionRef = (
   return undefined;
 };
 
+const CONVENTIONAL_COMMIT_RE = /^\w+(?:\([^)]*\))?:\s*.+$/;
+
 const getCommitsSince = (
   rootDir: string,
   pkgDir: string,
   sinceRef: string,
 ): readonly Commit[] => {
   const raw = execSync(
-    `git log --format="%H|%aN|%s" ${sinceRef}..HEAD -- ${pkgDir}`,
+    `git log --format="%x00%H|%aN%n%B" ${sinceRef}..HEAD -- ${pkgDir}`,
     {cwd: rootDir, encoding: "utf8"},
   );
   return raw
-    .trim()
-    .split("\n")
+    .split("\0")
     .filter(Boolean)
-    .map((line) => {
-      const parts = line.split("|");
-      return {
-        hash: parts[0] ?? "",
-        author: parts[1] ?? "",
-        message: parts.slice(2).join("|"),
-      };
+    .map((record) => {
+      const lines = record.trim().split("\n");
+      const header = lines[0] ?? "";
+      const separatorIndex = header.indexOf("|");
+      const hash = header.slice(0, separatorIndex);
+      const author = header.slice(separatorIndex + 1);
+      const bodyLines = lines.slice(1);
+      const messages = bodyLines.filter((line) =>
+        CONVENTIONAL_COMMIT_RE.test(line.trim()),
+      );
+      return {hash, author, messages: messages.length > 0 ? messages.map((l) => l.trim()) : bodyLines.slice(0, 1).map((l) => l.trim())};
     });
 };
 
