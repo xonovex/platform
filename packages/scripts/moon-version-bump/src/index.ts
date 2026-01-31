@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-import {execSync} from "node:child_process";
 import {existsSync, readFileSync, writeFileSync} from "node:fs";
 import {dirname, join, relative} from "node:path";
 import {
@@ -32,27 +31,19 @@ const generateChangelog = (
   newVersion: string,
   dryRun: boolean,
   depUpdates?: readonly DepUpdate[],
+  changelogFilename?: string,
+  gitBase?: string,
 ): void => {
   const pkgDir = relative(rootDir, dirname(pkgPath));
-  const sinceRef = getLastVersionRef(rootDir, pkgDir);
+  const filename = changelogFilename ?? "CHANGELOG.md";
+  const sinceRef = gitBase ?? getLastVersionRef(rootDir, pkgDir, oldVersion);
 
   if (!sinceRef) {
     logInfo(`${packageName}: no previous version found, skipping changelog.`);
     return;
   }
 
-  let prevVersion: string;
-  try {
-    const oldPkgJson = execSync(
-      `git show ${sinceRef}:${pkgDir}/package.json`,
-      {cwd: rootDir, encoding: "utf8"},
-    );
-    prevVersion = (JSON.parse(oldPkgJson) as {version: string}).version;
-  } catch {
-    prevVersion = oldVersion;
-  }
-
-  const bumpLevel = determineBumpLevel(prevVersion, newVersion);
+  const bumpLevel = determineBumpLevel(oldVersion, newVersion);
   const commits = getCommitsSince(rootDir, pkgDir, sinceRef);
   const deps = depUpdates ?? detectDepUpdates(rootDir, pkgPath);
   const entry = generateChangelogEntry(newVersion, commits, bumpLevel, deps);
@@ -61,9 +52,9 @@ const generateChangelog = (
     logInfo(`[dry-run] Changelog entry for ${packageName}@${newVersion}:`);
     console.log(entry);
   } else {
-    const changelogPath = join(dirname(pkgPath), "CHANGELOG.md");
+    const changelogPath = join(dirname(pkgPath), filename);
     updateChangelog(changelogPath, packageName, entry);
-    logInfo(`Updated CHANGELOG.md for ${packageName}@${newVersion}`);
+    logInfo(`Updated ${filename} for ${packageName}@${newVersion}`);
   }
 };
 
@@ -82,12 +73,42 @@ const main = (): void => {
         short: "d",
         description: "Preview changes without writing files",
       },
+      "no-changelog": {
+        type: "boolean",
+        description: "Skip changelog generation",
+      },
+      "no-dependents": {
+        type: "boolean",
+        description: "Skip updating dependent packages",
+      },
+      "changelog-path": {
+        type: "string",
+        description: "Custom changelog filename (default: CHANGELOG.md)",
+      },
+      preid: {
+        type: "string",
+        description: "Prerelease identifier (e.g. beta → 1.2.4-beta.0)",
+      },
+      exact: {
+        type: "string",
+        description: "Set exact version instead of bumping",
+      },
+      "git-base": {
+        type: "string",
+        description: "Override git ref for changelog commit range",
+      },
     },
   });
   const bumpType = ((values.type as string | undefined) ??
     positionals[0] ??
     "patch") as BumpType;
   const dryRun = values["dry-run"] === true;
+  const noChangelog = values["no-changelog"] === true;
+  const noDependents = values["no-dependents"] === true;
+  const changelogPath = values["changelog-path"] as string | undefined;
+  const preid = values.preid as string | undefined;
+  const exact = values.exact as string | undefined;
+  const gitBase = values["git-base"] as string | undefined;
 
   const cwd = process.cwd();
   const pkgPath = join(cwd, "package.json");
@@ -103,7 +124,14 @@ const main = (): void => {
     process.exit(1);
   }
 
-  if (!["patch", "minor", "major"].includes(bumpType)) {
+  if (exact) {
+    if (!/^\d+\.\d+\.\d+(?:-\w+\.\d+)?$/.test(exact)) {
+      logError(
+        `Invalid exact version: ${exact}. Expected format: X.Y.Z or X.Y.Z-tag.N`,
+      );
+      process.exit(1);
+    }
+  } else if (!["patch", "minor", "major"].includes(bumpType)) {
     logError(`Invalid bump type: ${bumpType}. Use patch, minor, or major.`);
     process.exit(1);
   }
@@ -117,7 +145,7 @@ const main = (): void => {
     logInfo(`${pkg.name}: already bumped (${oldVersion}), skipping.`);
     newVersion = oldVersion;
   } else {
-    newVersion = bumpVersion(oldVersion, bumpType);
+    newVersion = exact ?? bumpVersion(oldVersion, bumpType, preid);
     if (dryRun) {
       logInfo(`[dry-run] ${pkg.name}: ${oldVersion} -> ${newVersion}`);
     } else {
@@ -131,69 +159,83 @@ const main = (): void => {
   const allPaths = findAllPackageJsonPaths(rootDir);
   let depsUpdated = 0;
 
-  for (const depPkgPath of allPaths) {
-    if (depPkgPath === pkgPath) continue;
-    const depPkg = readPkg(depPkgPath);
-    const result = updateDependent(
-      depPkg,
-      depPkgPath,
-      pkg.name,
-      newVersion,
-      () => getGitVersion(rootDir, depPkgPath),
-    );
-    if (result.depsChanged) {
-      if (result.versionBumped) {
-        const label = dryRun ? "[dry-run] " : "";
-        logInfo(
-          `${label}${depPkg.name ?? depPkgPath}: ${String(result.oldVersion)} -> ${String(result.newVersion)} (dependency updated)`,
-        );
-      }
-      if (!dryRun) writePkg(depPkgPath, result.pkg);
-      depsUpdated++;
+  if (!noDependents) {
+    for (const depPkgPath of allPaths) {
+      if (depPkgPath === pkgPath) continue;
+      const depPkg = readPkg(depPkgPath);
+      const result = updateDependent(
+        depPkg,
+        depPkgPath,
+        pkg.name,
+        newVersion,
+        () => getGitVersion(rootDir, depPkgPath),
+      );
+      if (result.depsChanged) {
+        if (result.versionBumped) {
+          const label = dryRun ? "[dry-run] " : "";
+          logInfo(
+            `${label}${depPkg.name ?? depPkgPath}: ${String(result.oldVersion)} -> ${String(result.newVersion)} (dependency updated)`,
+          );
+        }
+        if (!dryRun) writePkg(depPkgPath, result.pkg);
+        depsUpdated++;
 
-      // Generate changelog for dependents that got version-bumped
-      if (result.versionBumped && result.oldVersion && result.newVersion) {
-        const depName = depPkg.name ?? depPkgPath;
-        const depUpdate: DepUpdate = {name: pkg.name, version: newVersion};
-        generateChangelog(
-          rootDir,
-          depPkgPath,
-          depName,
-          result.oldVersion,
-          result.newVersion,
-          dryRun,
-          [depUpdate],
-        );
+        // Generate changelog for dependents that got version-bumped
+        if (
+          !noChangelog &&
+          result.versionBumped &&
+          result.oldVersion &&
+          result.newVersion
+        ) {
+          const depName = depPkg.name ?? depPkgPath;
+          const depUpdate: DepUpdate = {name: pkg.name, version: newVersion};
+          generateChangelog(
+            rootDir,
+            depPkgPath,
+            depName,
+            result.oldVersion,
+            result.newVersion,
+            dryRun,
+            [depUpdate],
+            changelogPath,
+            gitBase,
+          );
+        }
       }
     }
   }
 
-  // Update plugin.json if this is @xonovex/skills
-  if (pkg.name === "@xonovex/skills") {
-    const pluginJsonPath = join(
-      rootDir,
-      "packages/plugins/skills/.claude-plugin/plugin.json",
-    );
-    if (existsSync(pluginJsonPath)) {
-      if (dryRun) {
-        logInfo(`[dry-run] plugin.json -> ${newVersion}`);
-      } else {
-        const pluginJson = JSON.parse(
-          readFileSync(pluginJsonPath, "utf8"),
-        ) as Record<string, unknown>;
-        pluginJson.version = newVersion;
-        writeFileSync(
-          pluginJsonPath,
-          JSON.stringify(pluginJson, null, 2) + "\n",
-        );
-        logInfo(`plugin.json -> ${newVersion}`);
-      }
+  // Update .claude-plugin/plugin.json if present
+  const pluginJsonPath = join(cwd, ".claude-plugin", "plugin.json");
+  if (existsSync(pluginJsonPath)) {
+    if (dryRun) {
+      logInfo(`[dry-run] plugin.json -> ${newVersion}`);
+    } else {
+      const pluginJson = JSON.parse(
+        readFileSync(pluginJsonPath, "utf8"),
+      ) as Record<string, unknown>;
+      pluginJson.version = newVersion;
+      writeFileSync(
+        pluginJsonPath,
+        JSON.stringify(pluginJson, null, 2) + "\n",
+      );
+      logInfo(`plugin.json -> ${newVersion}`);
     }
   }
 
   // Generate changelog for the primary package
-  if (newVersion !== oldVersion) {
-    generateChangelog(rootDir, pkgPath, pkg.name, oldVersion, newVersion, dryRun);
+  if (!noChangelog && newVersion !== oldVersion) {
+    generateChangelog(
+      rootDir,
+      pkgPath,
+      pkg.name,
+      oldVersion,
+      newVersion,
+      dryRun,
+      undefined,
+      changelogPath,
+      gitBase,
+    );
   }
 
   const prefix = dryRun ? "[dry-run] Would bump" : "Bumped";

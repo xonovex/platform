@@ -64,18 +64,26 @@ const generateChangelogEntry = (
     "",
   ];
 
+  let hasEntries = false;
+
   for (const commit of commits) {
     const parsed = parseConventionalCommit(commit.message);
     if (!parsed || !isIncludedType(parsed.type)) continue;
     lines.push(
       formatCommitEntry(commit.hash, commit.author, parsed.description),
     );
+    hasEntries = true;
   }
 
   if (depUpdates && depUpdates.length > 0) {
     for (const dep of depUpdates) {
       lines.push(`- Updated dependency \`${dep.name}\` to \`${dep.version}\``);
     }
+    hasEntries = true;
+  }
+
+  if (!hasEntries) {
+    lines.push("- Version bump");
   }
 
   lines.push("");

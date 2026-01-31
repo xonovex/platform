@@ -19,6 +19,26 @@ describe("bumpVersion", () => {
     expect(bumpVersion("0.0.0", "minor")).toBe("0.1.0");
     expect(bumpVersion("0.0.0", "major")).toBe("1.0.0");
   });
+
+  it("should create prerelease with preid", () => {
+    expect(bumpVersion("1.2.3", "patch", "beta")).toBe("1.2.4-beta.0");
+  });
+
+  it("should increment prerelease number for matching preid", () => {
+    expect(bumpVersion("1.2.4-beta.0", "patch", "beta")).toBe("1.2.4-beta.1");
+  });
+
+  it("should bump core for higher bump type with preid", () => {
+    expect(bumpVersion("1.2.4-beta.1", "minor", "beta")).toBe("1.3.0-beta.0");
+  });
+
+  it("should strip prerelease when no preid given", () => {
+    expect(bumpVersion("1.2.4-beta.1", "patch")).toBe("1.2.5");
+  });
+
+  it("should create major prerelease", () => {
+    expect(bumpVersion("1.2.3", "major", "alpha")).toBe("2.0.0-alpha.0");
+  });
 });
 
 describe("updateDependencyVersions", () => {
