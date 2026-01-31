@@ -15,6 +15,7 @@ npx moon-version-bump --no-changelog         # skip changelog generation
 npx moon-version-bump --no-dependents        # skip updating dependents
 npx moon-version-bump --changelog-path CHANGES.md  # custom changelog file
 npx moon-version-bump --git-base abc1234     # override git base ref
+npx moon-version-bump --include-types feat,fix,chore  # custom included types
 ```
 
 ## Options
@@ -29,6 +30,7 @@ npx moon-version-bump --git-base abc1234     # override git base ref
 | `--preid <tag>` | string | Prerelease identifier (e.g. `beta` → `1.2.4-beta.0`) |
 | `--exact <version>` | string | Set exact version instead of bumping |
 | `--git-base <ref>` | string | Override git ref for changelog commit range |
+| `--include-types <types>` | string | Comma-separated conventional commit types to include (default: `feat,fix,refactor,perf,docs`) |
 
 ## Behavior
 

@@ -35,13 +35,25 @@ describe("formatCommitEntry", () => {
 
 describe("generateChangelogEntry", () => {
   const commits: Commit[] = [
-    {hash: "abc1234567890", author: "deorder", message: "feat: add widget"},
-    {hash: "def5678901234", author: "deorder", message: "fix: resolve crash"},
-    {hash: "ghi9012345678", author: "deorder", message: "chore: update deps"},
+    {
+      hash: "abc1234567890",
+      author: "deorder",
+      messages: ["feat: add widget"],
+    },
+    {
+      hash: "def5678901234",
+      author: "deorder",
+      messages: ["fix: resolve crash"],
+    },
+    {
+      hash: "ghi9012345678",
+      author: "deorder",
+      messages: ["chore: update deps"],
+    },
     {
       hash: "jkl3456789012",
       author: "deorder",
-      message: "test: add unit tests",
+      messages: ["test: add unit tests"],
     },
   ];
 
@@ -94,9 +106,45 @@ describe("generateChangelogEntry", () => {
 
   it("should show version bump when all commits are excluded types", () => {
     const choredCommits: Commit[] = [
-      {hash: "abc1234567890", author: "deorder", message: "chore: update deps"},
+      {
+        hash: "abc1234567890",
+        author: "deorder",
+        messages: ["chore: update deps"],
+      },
     ];
     const entry = generateChangelogEntry("1.2.4", choredCommits, "patch");
     expect(entry).toContain("- Version bump");
+  });
+
+  it("should handle multiple messages per commit", () => {
+    const multiCommits: Commit[] = [
+      {
+        hash: "abc1234567890",
+        author: "deorder",
+        messages: [
+          "feat: add logging utilities",
+          "feat: add version management",
+          "chore: remove deprecated scripts",
+        ],
+      },
+    ];
+    const entry = generateChangelogEntry("1.3.0", multiCommits, "minor");
+    expect(entry).toContain("add logging utilities");
+    expect(entry).toContain("add version management");
+    expect(entry).not.toContain("remove deprecated scripts");
+  });
+
+  it("should respect custom includedTypes", () => {
+    const entry = generateChangelogEntry(
+      "1.2.4",
+      commits,
+      "patch",
+      undefined,
+      new Set(["chore", "test"]),
+    );
+    expect(entry).toContain("update deps");
+    expect(entry).toContain("add unit tests");
+    expect(entry).not.toContain("add widget");
+    expect(entry).not.toContain("resolve crash");
   });
 });

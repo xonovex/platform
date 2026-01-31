@@ -33,6 +33,7 @@ const generateChangelog = (
   depUpdates?: readonly DepUpdate[],
   changelogFilename?: string,
   gitBase?: string,
+  includedTypes?: ReadonlySet<string>,
 ): void => {
   const pkgDir = relative(rootDir, dirname(pkgPath));
   const filename = changelogFilename ?? "CHANGELOG.md";
@@ -46,7 +47,13 @@ const generateChangelog = (
   const bumpLevel = determineBumpLevel(oldVersion, newVersion);
   const commits = getCommitsSince(rootDir, pkgDir, sinceRef);
   const deps = depUpdates ?? detectDepUpdates(rootDir, pkgPath);
-  const entry = generateChangelogEntry(newVersion, commits, bumpLevel, deps);
+  const entry = generateChangelogEntry(
+    newVersion,
+    commits,
+    bumpLevel,
+    deps,
+    includedTypes,
+  );
 
   if (dryRun) {
     logInfo(`[dry-run] Changelog entry for ${packageName}@${newVersion}:`);
@@ -97,6 +104,11 @@ const main = (): void => {
         type: "string",
         description: "Override git ref for changelog commit range",
       },
+      "include-types": {
+        type: "string",
+        description:
+          "Comma-separated list of conventional commit types to include (default: feat,fix,refactor,perf,docs)",
+      },
     },
   });
   const bumpType = ((values.type as string | undefined) ??
@@ -109,6 +121,10 @@ const main = (): void => {
   const preid = values.preid as string | undefined;
   const exact = values.exact as string | undefined;
   const gitBase = values["git-base"] as string | undefined;
+  const includeTypesRaw = values["include-types"] as string | undefined;
+  const includedTypes = includeTypesRaw
+    ? new Set(includeTypesRaw.split(",").map((s) => s.trim()))
+    : undefined;
 
   const cwd = process.cwd();
   const pkgPath = join(cwd, "package.json");
@@ -199,6 +215,7 @@ const main = (): void => {
             [depUpdate],
             changelogPath,
             gitBase,
+            includedTypes,
           );
         }
       }
@@ -235,6 +252,7 @@ const main = (): void => {
       undefined,
       changelogPath,
       gitBase,
+      includedTypes,
     );
   }
 
