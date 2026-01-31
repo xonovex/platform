@@ -11,7 +11,9 @@ import {
   readPkg,
   writePkg,
 } from "@xonovex/moon-scripts-common";
-import {bumpVersion, updateDependencyVersions, type BumpType} from "./bump.js";
+import {bumpVersion, type BumpType} from "./bump.js";
+import {updateDependent} from "./dependents.js";
+import {getGitVersion} from "./git.js";
 
 const main = (): void => {
   const {values, positionals} = parseCliArgs({
@@ -73,15 +75,17 @@ const main = (): void => {
   for (const depPkgPath of allPaths) {
     if (depPkgPath === pkgPath) continue;
     const depPkg = readPkg(depPkgPath);
-    let changed = false;
-    if (updateDependencyVersions(depPkg.dependencies, pkg.name, newVersion))
-      changed = true;
-    if (updateDependencyVersions(depPkg.devDependencies, pkg.name, newVersion))
-      changed = true;
-    if (updateDependencyVersions(depPkg.peerDependencies, pkg.name, newVersion))
-      changed = true;
-    if (changed) {
-      if (!dryRun) writePkg(depPkgPath, depPkg);
+    const result = updateDependent(depPkg, depPkgPath, pkg.name, newVersion, () =>
+      getGitVersion(rootDir, depPkgPath),
+    );
+    if (result.depsChanged) {
+      if (result.versionBumped) {
+        const label = dryRun ? "[dry-run] " : "";
+        logInfo(
+          `${label}${depPkg.name ?? depPkgPath}: ${String(result.oldVersion)} -> ${String(result.newVersion)} (dependency updated)`,
+        );
+      }
+      if (!dryRun) writePkg(depPkgPath, result.pkg);
       depsUpdated++;
     }
   }
