@@ -41,10 +41,7 @@
     {
       "path": "packages/scripts/moon-scripts-common"
     },
-    {
-      "path": "packages/scripts/moon-changelog-update"
-    },
-    {
+{
       "path": "packages/scripts/moon-version-bump"
     },
     {

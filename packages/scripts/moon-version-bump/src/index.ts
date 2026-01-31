@@ -1,6 +1,7 @@
 #!/usr/bin/env node
+import {execSync} from "node:child_process";
 import {existsSync, readFileSync, writeFileSync} from "node:fs";
-import {join} from "node:path";
+import {join, relative} from "node:path";
 import {
   findAllPackageJsonPaths,
   findWorkspaceRoot,
@@ -12,7 +13,14 @@ import {
   writePkg,
 } from "@xonovex/moon-scripts-common";
 import {bumpVersion, type BumpType} from "./bump.js";
+import {
+  determineBumpLevel,
+  generateChangelogEntry,
+  updateChangelog,
+} from "./changelog.js";
+import {detectDepUpdates} from "./dep-updates.js";
 import {updateDependent} from "./dependents.js";
+import {getCommitsSince, getLastVersionRef} from "./git-log.js";
 import {getGitVersion} from "./git.js";
 
 const main = (): void => {
@@ -57,26 +65,37 @@ const main = (): void => {
   }
 
   const oldVersion = pkg.version;
-  const newVersion = bumpVersion(oldVersion, bumpType);
+  const rootDir = findWorkspaceRoot(cwd);
+  const gitVersion = getGitVersion(rootDir, pkgPath);
+  let newVersion: string;
 
-  if (dryRun) {
-    logInfo(`[dry-run] ${pkg.name}: ${oldVersion} -> ${newVersion}`);
+  if (gitVersion !== undefined && gitVersion !== oldVersion) {
+    logInfo(`${pkg.name}: already bumped (${oldVersion}), skipping.`);
+    newVersion = oldVersion;
   } else {
-    pkg.version = newVersion;
-    writePkg(pkgPath, pkg);
-    logInfo(`${pkg.name}: ${oldVersion} -> ${newVersion}`);
+    newVersion = bumpVersion(oldVersion, bumpType);
+    if (dryRun) {
+      logInfo(`[dry-run] ${pkg.name}: ${oldVersion} -> ${newVersion}`);
+    } else {
+      pkg.version = newVersion;
+      writePkg(pkgPath, pkg);
+      logInfo(`${pkg.name}: ${oldVersion} -> ${newVersion}`);
+    }
   }
 
   // Update dependents across workspace
-  const rootDir = findWorkspaceRoot(cwd);
   const allPaths = findAllPackageJsonPaths(rootDir);
   let depsUpdated = 0;
 
   for (const depPkgPath of allPaths) {
     if (depPkgPath === pkgPath) continue;
     const depPkg = readPkg(depPkgPath);
-    const result = updateDependent(depPkg, depPkgPath, pkg.name, newVersion, () =>
-      getGitVersion(rootDir, depPkgPath),
+    const result = updateDependent(
+      depPkg,
+      depPkgPath,
+      pkg.name,
+      newVersion,
+      () => getGitVersion(rootDir, depPkgPath),
     );
     if (result.depsChanged) {
       if (result.versionBumped) {
@@ -104,9 +123,52 @@ const main = (): void => {
           readFileSync(pluginJsonPath, "utf8"),
         ) as Record<string, unknown>;
         pluginJson.version = newVersion;
-        writeFileSync(pluginJsonPath, JSON.stringify(pluginJson, null, 2) + "\n");
+        writeFileSync(
+          pluginJsonPath,
+          JSON.stringify(pluginJson, null, 2) + "\n",
+        );
         logInfo(`plugin.json -> ${newVersion}`);
       }
+    }
+  }
+
+  // Generate changelog entry if version was actually bumped
+  if (newVersion !== oldVersion) {
+    const pkgDir = relative(rootDir, cwd);
+    const sinceRef = getLastVersionRef(rootDir, pkgDir);
+
+    if (sinceRef) {
+      let prevVersion: string;
+      try {
+        const oldPkgJson = execSync(
+          `git show ${sinceRef}:${pkgDir}/package.json`,
+          {cwd: rootDir, encoding: "utf8"},
+        );
+        prevVersion = (JSON.parse(oldPkgJson) as {version: string}).version;
+      } catch {
+        prevVersion = oldVersion;
+      }
+
+      const bumpLevel = determineBumpLevel(prevVersion, newVersion);
+      const commits = getCommitsSince(rootDir, pkgDir, sinceRef);
+      const depUpdates = detectDepUpdates(rootDir, pkgPath);
+      const entry = generateChangelogEntry(
+        newVersion,
+        commits,
+        bumpLevel,
+        depUpdates,
+      );
+
+      if (dryRun) {
+        logInfo(`[dry-run] Changelog entry for ${pkg.name}@${newVersion}:`);
+        console.log(entry);
+      } else {
+        const changelogPath = join(cwd, "CHANGELOG.md");
+        updateChangelog(changelogPath, pkg.name, entry);
+        logInfo(`Updated CHANGELOG.md for ${pkg.name}@${newVersion}`);
+      }
+    } else {
+      logInfo(`${pkg.name}: no previous version found, skipping changelog.`);
     }
   }
 
