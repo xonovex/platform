@@ -35,8 +35,8 @@ tasks:
     options:
       cache: true
       runInCI: true
-  ci-prepare:
-    command: echo 'ci-prepare complete'
+  ci-check:
+    command: echo 'ci-check complete'
     deps: [sh-lint, sh-fmt-check]
     options:
       cache: false

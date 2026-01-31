@@ -115,8 +115,8 @@ tasks:
     - coverage
     options:
       cache: true
-  ci-prepare:
-    command: echo 'ci-prepare complete'
+  ci-check:
+    command: echo 'ci-check complete'
     deps:
     - build
     - test

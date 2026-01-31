@@ -103,5 +103,5 @@ moon query projects
 moon task project:taskname
 
 # Run CI prepare to verify task graph
-moon run :ci-prepare --dry-run
+moon run :ci-check --dry-run
 ```
