@@ -6,17 +6,12 @@ release:
   script:
     - rm -f .moon/cache/runReport.json .moon/cache/ciReport.json
     - |
-      PROJECTS=$(npx tsx scripts/version-detect.ts HEAD~1 2>/dev/null)
-      if [ "$PROJECTS" = "[]" ]; then
-        echo "No packages with version changes"
-        exit 0
-      fi
       if [ "$DRY_RUN" = "true" ]; then
-        TARGETS=$(echo "$PROJECTS" | jq -r '.[] | . + ":ci-publish-dry-run"' | tr '\n' ' ')
+        TARGETS=":ci-publish-dry-run"
       else
-        TARGETS=$(echo "$PROJECTS" | jq -r '.[] | . + ":ci-publish"' | tr '\n' ' ')
+        TARGETS=":ci-publish"
       fi
-      npx moon ci --color --concurrency 1 $TARGETS
+      npx moon ci --color --concurrency 1 --affected $TARGETS
   rules:
     - if: "$CI_COMMIT_TAG =~ /^v/"
     - if: '$CI_PIPELINE_SOURCE == "web"'

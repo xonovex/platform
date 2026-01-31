@@ -28,6 +28,24 @@
     },
     {
       "path": "packages/lib/core"
+    },
+    {
+      "path": "packages/scripts/moon-action-graph"
+    },
+    {
+      "path": "packages/scripts/moon-npm-prepublish"
+    },
+    {
+      "path": "packages/scripts/moon-npm-publish"
+    },
+    {
+      "path": "packages/scripts/moon-scripts-common"
+    },
+    {
+      "path": "packages/scripts/moon-version-bump"
+    },
+    {
+      "path": "packages/scripts/moon-version-detect"
     }
   ]
 }

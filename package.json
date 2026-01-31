@@ -9,7 +9,8 @@
     "packages/cli/*",
     "packages/cli/agent-cli-go-platforms/*",
     "packages/lib/*",
-    "packages/plugins/*"
+    "packages/plugins/*",
+    "packages/scripts/*"
   ],
   "engines": {
     "node": ">=20.0.0",
@@ -46,10 +47,6 @@
     "vitest": "^4.0.18"
   },
   "scripts": {
-    "version:bump": "npx tsx scripts/version-bump.ts",
-    "prepublish:check": "npx tsx scripts/prepublish-check.ts",
-    "publish:dry-run": "npm publish --dry-run --workspaces --access public",
-    "release": "npm run build && npm run test && npm run lint",
     "deps:check": "npm-check-updates --workspaces --dep prod,dev,optional",
     "deps:update": "npm-check-updates --workspaces -u --dep prod,dev,optional",
     "nix:shell": "nix --extra-experimental-features 'nix-command flakes' develop",
@@ -75,6 +72,13 @@
     "docs:build": "moon run docs:build",
     "docs:dev": "moon run docs:dev",
     "docs:fmt": "moon run docs:fmt",
+    "graph:npm-prepublish": "npx moon-action-graph :npm-prepublish npm-prepublish docs/npm-prepublish-graph.png",
+    "graph:npm-publish": "npx moon-action-graph :npm-publish npm-publish docs/npm-publish-graph.png",
+    "graph:ci-prepare": "npx moon-action-graph :ci-prepare ci-prepare docs/ci-prepare-graph.png",
+    "graph:ci-publish": "npx moon-action-graph :ci-publish ci-publish docs/ci-publish-graph.png",
+    "graph:ci-publish-dry-run": "npx moon-action-graph :ci-publish-dry-run ci-publish-dry-run docs/ci-publish-dry-run-graph.png",
+    "graph:ci-publish-full": "npx moon-action-graph :ci-publish npm-publish,ci-publish docs/ci-publish-full-graph.png",
+    "graph:all": "npm run graph:npm-prepublish && npm run graph:npm-publish && npm run graph:ci-prepare && npm run graph:ci-publish && npm run graph:ci-publish-dry-run && npm run graph:ci-publish-full",
     "prepare": "npm run sync:hooks"
   },
   "packageManager": "npm@11.6.2"

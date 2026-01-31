@@ -6,6 +6,7 @@ projects:
   - packages/lib/*
   - packages/plugins/*
   - packages/docker/*
+  - packages/scripts/*
 vcs:
   hooks:
     commit-msg:

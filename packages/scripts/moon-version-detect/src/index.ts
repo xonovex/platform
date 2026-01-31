@@ -1,10 +1,18 @@
+#!/usr/bin/env node
 import {execSync} from "node:child_process";
 import {existsSync, readFileSync} from "node:fs";
-import {dirname, join, resolve} from "node:path";
+import {dirname, join} from "node:path";
 import {fileURLToPath} from "node:url";
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const ROOT_DIR = resolve(__dirname, "..");
+const findWorkspaceRoot = (start: string): string => {
+  let dir = start;
+  while (dir !== dirname(dir)) {
+    if (existsSync(join(dir, ".moon"))) return dir;
+    dir = dirname(dir);
+  }
+  throw new Error("Could not find workspace root");
+};
+const ROOT_DIR = findWorkspaceRoot(dirname(fileURLToPath(import.meta.url)));
 
 interface PackageJson {
   name?: string;
@@ -39,7 +47,7 @@ for (const p of moonOutput.projects) {
     if (!pkg.name || pkg.private) continue;
 
     const oldPkg = JSON.parse(
-      // eslint-disable-next-line sonarjs/os-command
+       
       execSync(`git show ${ref}:${p.source}/package.json`, {
         encoding: "utf8",
         cwd: ROOT_DIR,
