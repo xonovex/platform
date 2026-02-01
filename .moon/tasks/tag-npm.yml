@@ -34,6 +34,8 @@ tasks:
     command: echo 'ci-publish complete'
     deps:
       - npm-publish
+    inputs:
+      - package.json
     options:
       cache: false
       runInCI: false
@@ -53,6 +55,8 @@ tasks:
     command: echo 'ci-publish-dry-run complete'
     deps:
       - npm-publish-dry-run
+    inputs:
+      - package.json
     options:
       cache: false
       runInCI: false
