@@ -3,10 +3,10 @@
   "files": [],
   "references": [
     {
-      "path": "packages/cli/agent-cli"
+      "path": "packages/agent/agent-cli"
     },
     {
-      "path": "packages/cli/agent-cli-go"
+      "path": "packages/agent/agent-cli-go"
     },
     {
       "path": "packages/config/eslint-config-base"
@@ -27,25 +27,25 @@
       "path": "packages/config/vitest-config-node"
     },
     {
-      "path": "packages/lib/core"
+      "path": "packages/shared/shared-core"
     },
     {
-      "path": "packages/scripts/moon-action-graph"
+      "path": "packages/script/script-moon-action-graph"
     },
     {
-      "path": "packages/scripts/moon-npm-check"
+      "path": "packages/script/script-moon-npm-check"
     },
     {
-      "path": "packages/scripts/moon-npm-publish"
+      "path": "packages/script/script-moon-npm-publish"
     },
     {
-      "path": "packages/scripts/moon-scripts-common"
+      "path": "packages/script/script-moon-common"
     },
 {
-      "path": "packages/scripts/moon-version-bump"
+      "path": "packages/script/script-moon-version-bump"
     },
     {
-      "path": "packages/scripts/moon-version-detect"
+      "path": "packages/script/script-moon-version-detect"
     }
   ]
 }

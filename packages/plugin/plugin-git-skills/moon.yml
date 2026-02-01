@@ -1,0 +1,20 @@
+$schema: https://moonrepo.dev/schemas/project.json
+language: unknown
+dependsOn:
+  - doc-guidelines
+tasks:
+  build:
+    script: |
+      rm -rf "skills/git-guidelines"
+      mkdir -p skills
+      cp -r "../../doc/doc-guidelines/git-guidelines" "skills/git-guidelines"
+      find skills -name 'index.md' -execdir mv {} SKILL.md \;
+    outputs:
+      - skills
+    options:
+      cache: false
+  ci-check:
+    command: echo 'ci-check complete'
+    deps: [build]
+    options:
+      cache: false

@@ -1,0 +1,63 @@
+$schema: https://moonrepo.dev/schemas/project.json
+language: go
+layer: application
+tags:
+  - go
+  - typescript
+  - npm
+  - cli
+dependsOn:
+  - shared-core-go
+  - eslint-config-cli
+  - ts-config-cli
+  - agent-cli-go-darwin-arm64
+  - agent-cli-go-darwin-x64
+  - agent-cli-go-linux-arm64
+  - agent-cli-go-linux-x64
+  - agent-cli-go-win32-x64
+tasks:
+  # Override build to add config deps
+  build:
+    script: npx tsc
+    deps:
+      - eslint-config-cli:build
+      - ts-config-cli:build
+    inputs:
+      - src/**/*.ts
+      - tsconfig.json
+    outputs:
+      - dist
+  # Override lint to add config dep
+  lint:
+    script: npx eslint src
+    deps:
+      - eslint-config-cli:build
+    inputs:
+      - src/**/*.ts
+  # No TypeScript tests in this package (Go tests via go-test)
+  test:
+    script: echo 'no TypeScript tests'
+    options:
+      cache: false
+  # Aggregate ci-check for both Go and TS
+  ci-check:
+    script: echo 'ci-check complete'
+    deps:
+      - go-build
+      - go-test
+      - go-lint
+      - go-typecheck
+      - build
+      - lint
+      - typecheck
+      - npm-check
+    options:
+      cache: false
+  ci-publish:
+    script: echo 'ci-publish complete'
+    deps:
+      - npm-publish
+      - agent-cli-go-github:ci-publish
+    options:
+      cache: false
+      runInCI: false

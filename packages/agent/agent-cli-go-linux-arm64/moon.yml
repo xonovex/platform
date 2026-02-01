@@ -1,0 +1,31 @@
+$schema: https://moonrepo.dev/schemas/project.json
+id: agent-cli-go-linux-arm64
+language: go
+layer: unknown
+tags:
+  - npm
+env:
+  GOOS: linux
+  GOARCH: arm64
+  CGO_ENABLED: "0"
+  BIN_EXT: ""
+tasks:
+  go-build:
+    script: mkdir -p bin && cd $workspaceRoot/packages/agent/agent-cli-go && go build -ldflags="-s -w" -o "$projectRoot/bin/agent-cli-go${BIN_EXT}" ./cmd/agent-cli
+    inputs: []
+    outputs:
+      - bin/
+    options:
+      cache: true
+      runInCI: true
+  ci-check:
+    command: echo 'ci-check complete'
+    deps:
+      - go-build
+    options:
+      cache: false
+  npm-publish:
+    deps:
+      - go-build
+    options:
+      mergeDeps: replace

@@ -1,0 +1,16 @@
+{
+  "name": "xonovex-astro-skills",
+  "description": "Xonovex astro-skills for Claude Code",
+  "version": "0.1.0",
+  "author": {
+    "name": "Xonovex"
+  },
+  "homepage": "https://github.com/xonovex/platform/tree/main/packages/plugin/plugin-astro-skills",
+  "repository": "https://github.com/xonovex/platform",
+  "license": "MIT",
+  "keywords": [
+    "claude-code",
+    "skills",
+    "guidelines"
+  ]
+}

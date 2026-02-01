@@ -1,0 +1,19 @@
+{
+  "extends": "@xonovex/ts-config-cli",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": ".",
+    "baseUrl": ".",
+    "paths": {
+      "@xonovex/script-moon-common": ["../script-moon-common/src/index.ts"],
+      "@xonovex/script-moon-common/*": ["../script-moon-common/src/*"]
+    }
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "dist"],
+  "references": [
+    {
+      "path": "../script-moon-common"
+    }
+  ]
+}

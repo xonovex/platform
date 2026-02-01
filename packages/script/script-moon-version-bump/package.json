@@ -1,0 +1,12 @@
+{
+  "name": "@xonovex/script-moon-version-bump",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "moon-version-bump": "./dist/src/index.js"
+  },
+  "dependencies": {
+    "@xonovex/script-moon-common": "0.0.0"
+  }
+}

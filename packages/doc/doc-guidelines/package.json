@@ -1,0 +1,9 @@
+{
+  "name": "@xonovex/doc-guidelines",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "fmt": "prettier --write .",
+    "fmt:check": "prettier --check ."
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "name": "@xonovex/script-moon-version-detect",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "moon-version-detect": "./dist/src/index.js"
+  },
+  "dependencies": {
+    "@xonovex/script-moon-common": "0.0.0"
+  }
+}

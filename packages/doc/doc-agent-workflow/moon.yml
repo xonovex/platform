@@ -1,0 +1,11 @@
+$schema: https://moonrepo.dev/schemas/project.json
+language: unknown
+tasks:
+  graph-build:
+    command: dot -Tpng -o workflow-diagram.png workflow-diagram.dot
+    inputs:
+      - workflow-diagram.dot
+    outputs:
+      - workflow-diagram.png
+    options:
+      cache: true

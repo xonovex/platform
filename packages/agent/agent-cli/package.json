@@ -1,0 +1,66 @@
+{
+  "name": "@xonovex/agent-cli",
+  "version": "0.1.19",
+  "description": "Unified CLI for running AI coding agents with multiple model providers and sandbox options",
+  "type": "module",
+  "license": "MIT",
+  "author": "Xonovex",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xonovex/platform.git",
+    "directory": "packages/agent/agent-cli"
+  },
+  "bugs": {
+    "url": "https://github.com/xonovex/platform/issues"
+  },
+  "homepage": "https://github.com/xonovex/platform/tree/main/packages/agent/agent-cli#readme",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "files": [
+    "dist"
+  ],
+  "bin": {
+    "agent-cli": "dist/src/agent.js"
+  },
+  "exports": {
+    ".": "./dist/src/index.js",
+    "./*": "./dist/src/*.js"
+  },
+  "scripts": {
+    "build": "tsc --build",
+    "check": "tsc --noEmit",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "coverage": "vitest run --coverage",
+    "fmt": "prettier --write .",
+    "fmt:check": "prettier --check .",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
+  },
+  "dependencies": {
+    "@xonovex/core": "0.1.19",
+    "@iarna/toml": "^2.2.5",
+    "commander": "^14.0.2",
+    "gray-matter": "^4.0.3",
+    "yaml": "^2.8.2"
+  },
+  "devDependencies": {
+    "@xonovex/eslint-config-cli": "0.1.19",
+    "@xonovex/ts-config-cli": "0.1.19",
+    "@xonovex/vitest-config-node": "0.1.19",
+    "@types/node": "^25.0.10",
+    "@vitest/coverage-v8": "^4.0.18",
+    "eslint": "^9.39.2",
+    "jiti": "^2.6.1",
+    "prettier": "^3.8.1",
+    "tsx": "^4.21.0",
+    "typescript": "5.9.3",
+    "vitest": "^4.0.18"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
