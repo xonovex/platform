@@ -40,5 +40,10 @@
     "typecheck": "echo 'No typechecking needed for JSON-only config package'",
     "test": "echo 'No tests for config package'",
     "build": "mkdir -p dist && echo \"No build needed for config package\" > dist/.gitkeep"
-  }
+  },
+  "keywords": [
+    "xonovex",
+    "config",
+    "typescript"
+  ]
 }

@@ -1,6 +1,6 @@
 {
-  "name": "xonovex-remotion-skills",
-  "description": "Xonovex remotion-skills for Claude Code",
+  "name": "remotion-skills",
+  "description": "Remotion programmatic video creation guidelines",
   "version": "0.1.0",
   "author": {
     "name": "Xonovex"
@@ -10,7 +10,8 @@
   "license": "MIT",
   "keywords": [
     "claude-code",
+    "plugin",
     "skills",
-    "guidelines"
+    "remotion"
   ]
 }

@@ -1,6 +1,6 @@
 {
-  "name": "xonovex-strudel-skills",
-  "description": "Xonovex strudel-skills for Claude Code",
+  "name": "strudel-skills",
+  "description": "Strudel live coding music pattern guidelines",
   "version": "0.1.0",
   "author": {
     "name": "Xonovex"
@@ -10,7 +10,8 @@
   "license": "MIT",
   "keywords": [
     "claude-code",
+    "plugin",
     "skills",
-    "guidelines"
+    "strudel"
   ]
 }

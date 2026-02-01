@@ -44,5 +44,10 @@
     "typecheck": "tsc --noemit",
     "test": "echo 'No tests for config package'",
     "build": "mkdir -p dist && echo \"No build needed for config package\" > dist/.gitkeep"
-  }
+  },
+  "keywords": [
+    "xonovex",
+    "config",
+    "prettier"
+  ]
 }

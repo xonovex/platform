@@ -1,6 +1,6 @@
 {
-  "name": "xonovex-zod-skills",
-  "description": "Xonovex zod-skills for Claude Code",
+  "name": "zod-skills",
+  "description": "Zod schema validation guidelines and best practices",
   "version": "0.1.0",
   "author": {
     "name": "Xonovex"
@@ -10,7 +10,8 @@
   "license": "MIT",
   "keywords": [
     "claude-code",
+    "plugin",
     "skills",
-    "guidelines"
+    "zod"
   ]
 }

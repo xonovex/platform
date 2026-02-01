@@ -43,5 +43,11 @@
     "@xonovex/agent-cli-go-linux-arm64": "0.1.19",
     "@xonovex/agent-cli-go-linux-x64": "0.1.19",
     "@xonovex/agent-cli-go-win32-x64": "0.1.19"
-  }
+  },
+  "keywords": [
+    "xonovex",
+    "agent",
+    "cli",
+    "go"
+  ]
 }

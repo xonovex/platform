@@ -1,6 +1,6 @@
 {
-  "name": "xonovex-utility-commands",
-  "description": "Xonovex utility commands for Claude Code (content, instructions, skills, slash commands)",
+  "name": "utility-commands",
+  "description": "Content generation, project instructions, skill management, and slash command utilities",
   "version": "0.1.0",
   "author": {
     "name": "Xonovex"
@@ -10,7 +10,8 @@
   "license": "MIT",
   "keywords": [
     "claude-code",
-    "utility",
-    "commands"
+    "plugin",
+    "commands",
+    "utility"
   ]
 }

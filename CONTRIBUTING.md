@@ -4,20 +4,34 @@
 
 ```
 packages/
-  config/              # Shared configuration packages
-    eslint-config-*/   # ESLint configurations
-    ts-config-*/       # TypeScript configurations
-    vitest-config-*/   # Vitest configurations
-  tools/               # CLI tools
-    tool-lib/          # Shared TypeScript utilities
-    tool-lib-go/       # Shared Go utilities
-    tool-agent-cli/    # Agent Wrapper (TypeScript)
-    tool-agent-cli-go/ # Agent Wrapper (Go)
-  docker/              # Docker configurations
-    docker-agent/      # Agent Docker image, compose, and OTEL config
-docs/                  # Documentation and workflow diagrams
-.claude/commands/      # Claude Code slash commands
-.claude/skills/        # Claude Code skills (guidelines)
+  agent/                # CLI tools
+    agent-cli/          # Agent Wrapper (TypeScript)
+    agent-cli-go/       # Agent Wrapper (Go)
+    agent-cli-go-*/     # Platform-specific Go binaries
+  asset/                # Static assets
+    asset-images/       # Shared images (diagrams, etc.)
+  config/               # Shared configuration packages
+    eslint-config-*/    # ESLint configurations
+    ts-config-*/        # TypeScript configurations
+    vitest-config-*/    # Vitest configurations
+    prettier-config/    # Prettier configuration
+    vite-config-base/   # Vite configuration
+  doc/                  # Documentation packages
+    doc-guidelines/     # Source guidelines (markdown)
+    doc-agent-workflow/ # Agent workflow diagram
+    doc-moon-action-diagrams/ # Moon action graph diagrams
+  plugin/               # Claude Code plugins
+    plugin-*-skills/    # Guideline skill plugins (35 plugins)
+    plugin-workflow-commands/  # Workflow commands (plan, git, insights, code)
+    plugin-utility-commands/  # Utility commands (content, instructions, skills, slash commands)
+  script/               # Internal build scripts
+    script-moon-common/ # Shared moon script utilities
+    script-moon-*/      # Moon task scripts (action-graph, npm-check, npm-publish, version-bump, version-detect)
+  shared/               # Shared libraries
+    shared-core/        # Core TypeScript library (@xonovex/core)
+    shared-core-go/     # Core Go library
+.claude/commands/       # Claude Code slash commands
+.claude-plugin/         # Claude Code plugin marketplace
 ```
 
 ## Development
@@ -26,10 +40,6 @@ Uses [moonrepo](https://moonrepo.dev/) for task orchestration.
 
 ```bash
 npm install                         # Setup
-npm run build                       # Build all packages
-npm run typecheck                   # Type check all packages
-npm run lint                        # Lint all packages
-npm run test                        # Run all tests
 npx moon run <project>:<task>       # Run task for specific project
 npx moon run :<task>                # Run task for all projects
 npx moon query projects             # List all projects
@@ -80,6 +90,20 @@ To detect which projects have changed versions:
 ```bash
 npx moon run moon-version-detect:run
 npx moon run moon-version-detect:run -- --base main
+```
+
+## Claude Code Plugins
+
+The monorepo hosts a Claude Code plugin marketplace at `.claude-plugin/marketplace.json` containing 37 plugins:
+
+- **35 guideline skill plugins** — each copies guidelines from `packages/doc/doc-guidelines/` into a `skills/` directory during build
+- **2 command plugins** — copy slash commands from `.claude/commands/` into a `commands/` directory during build
+
+Install plugins via:
+
+```
+/plugin marketplace add <owner>/<repo>
+/plugin install <plugin-name>
 ```
 
 ## Code Style

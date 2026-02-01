@@ -4,5 +4,11 @@
   "private": true,
   "dependencies": {
     "@xonovex/script-moon-action-graph": "^0.0.0"
-  }
+  },
+  "keywords": [
+    "xonovex",
+    "doc",
+    "diagram",
+    "moon"
+  ]
 }

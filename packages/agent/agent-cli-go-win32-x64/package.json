@@ -25,5 +25,13 @@
   ],
   "files": [
     "bin"
+  ],
+  "keywords": [
+    "xonovex",
+    "agent",
+    "cli",
+    "go",
+    "win32",
+    "x64"
   ]
 }

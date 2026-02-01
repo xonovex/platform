@@ -57,5 +57,10 @@
     "fmt:check": "prettier --check .",
     "typecheck": "tsc --noemit",
     "test": "echo 'No tests for config package'"
-  }
+  },
+  "keywords": [
+    "xonovex",
+    "config",
+    "vitest"
+  ]
 }

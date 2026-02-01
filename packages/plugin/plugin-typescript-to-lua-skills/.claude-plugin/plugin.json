@@ -1,6 +1,6 @@
 {
-  "name": "xonovex-typescript-to-lua-skills",
-  "description": "Xonovex typescript-to-lua-skills for Claude Code",
+  "name": "typescript-to-lua-skills",
+  "description": "TypeScript-to-Lua transpilation guidelines (TSTL)",
   "version": "0.1.0",
   "author": {
     "name": "Xonovex"
@@ -10,7 +10,8 @@
   "license": "MIT",
   "keywords": [
     "claude-code",
+    "plugin",
     "skills",
-    "guidelines"
+    "typescript-to-lua"
   ]
 }

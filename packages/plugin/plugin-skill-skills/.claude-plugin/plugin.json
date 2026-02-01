@@ -1,6 +1,6 @@
 {
-  "name": "xonovex-skill-skills",
-  "description": "Xonovex skill-skills for Claude Code",
+  "name": "skill-skills",
+  "description": "Claude Code skill authoring and structure guidelines",
   "version": "0.1.0",
   "author": {
     "name": "Xonovex"
@@ -10,7 +10,8 @@
   "license": "MIT",
   "keywords": [
     "claude-code",
+    "plugin",
     "skills",
-    "guidelines"
+    "skill"
   ]
 }

@@ -232,10 +232,7 @@ const main = (): void => {
         readFileSync(pluginJsonPath, "utf8"),
       ) as Record<string, unknown>;
       pluginJson.version = newVersion;
-      writeFileSync(
-        pluginJsonPath,
-        JSON.stringify(pluginJson, null, 2) + "\n",
-      );
+      writeFileSync(pluginJsonPath, JSON.stringify(pluginJson, null, 2) + "\n");
       logInfo(`plugin.json -> ${newVersion}`);
     }
   }
