@@ -10,6 +10,8 @@ tasks:
       - ^:npm-publish
       - ~:npm-check
       - script-moon-npm-publish:install
+    inputs:
+      - package.json
     options:
       cache: false
       runInCI: false
@@ -23,6 +25,8 @@ tasks:
         optional: true
       - ~:npm-check
       - script-moon-npm-publish:install
+    inputs:
+      - package.json
     options:
       cache: false
       runInCI: false
