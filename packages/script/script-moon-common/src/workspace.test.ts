@@ -29,7 +29,7 @@ describe("findWorkspaceRoot", () => {
   });
 
   it("should throw if no .moon directory is found", () => {
-    expect(() => findWorkspaceRoot(tmp)).toThrow(
+    expect(() => findWorkspaceRoot(tmp, tmp)).toThrow(
       "Could not find workspace root",
     );
   });
