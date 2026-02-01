@@ -1,5 +1,12 @@
 # @xonovex/ts-config-cli
 
+## 0.1.20
+
+### Patch Changes
+
+- [`d6d5985`](https://github.com/xonovex/platform/commit/d6d59851cb653cdbf6136c93101b63b6efa3c61e) [@Deorder](https://github.com/Deorder)! - update plugin metadata and descriptions across multiple plugins
+- Updated dependency `@xonovex/ts-config-base` to `0.1.20`
+
 ## 0.1.14
 
 ### Patch Changes
