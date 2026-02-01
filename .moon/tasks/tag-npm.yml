@@ -43,6 +43,8 @@ tasks:
       - npx
       - moon-npm-check
     deps:
+      - target: ~:build
+        optional: true
       - script-moon-npm-check:install
     options:
       cache: false
