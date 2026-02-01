@@ -1,0 +1,31 @@
+$schema: https://moonrepo.dev/schemas/tasks.json
+implicitInputs:
+  - package.json
+  - tsconfig*.json
+fileGroups:
+  sources:
+    - src/**/*
+  tests:
+    - src/**/*.test.*
+    - src/**/*.spec.*
+    - test/**/*
+tasks:
+  build:
+    deps:
+      - ^:build
+    script: npx tsc
+    inputs:
+      - '@globs(sources)'
+      - tsconfig*.json
+    outputs:
+      - dist
+    options:
+      cache: true
+  ci-check:
+    command: echo 'ci-check complete'
+    deps:
+      - build
+    options:
+      cache: false
+inheritedBy:
+  tag: typescript-moon
