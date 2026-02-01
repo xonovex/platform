@@ -3,7 +3,11 @@ tasks:
   build:
     script: bash scripts/build-archives.sh "$workspaceRoot/packages/agent" "$projectRoot/release-assets"
     deps:
-      - ^:go-build
+      - agent-cli-go-darwin-arm64:go-build
+      - agent-cli-go-darwin-x64:go-build
+      - agent-cli-go-linux-arm64:go-build
+      - agent-cli-go-linux-x64:go-build
+      - agent-cli-go-win32-x64:go-build
     inputs: []
     outputs:
       - release-assets/
@@ -29,10 +33,5 @@ tasks:
       runInCI: false
       cache: false
 language: bash
-dependsOn:
-  - agent-cli-go-linux-x64
-  - agent-cli-go-linux-arm64
-  - agent-cli-go-darwin-x64
-  - agent-cli-go-darwin-arm64
-  - agent-cli-go-win32-x64
+dependsOn: []
 layer: unknown

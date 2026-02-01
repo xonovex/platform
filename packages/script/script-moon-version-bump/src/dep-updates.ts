@@ -5,7 +5,7 @@ import type {DepUpdate} from "./changelog.js";
 
 const getWorkspaceDeps = (pkg: PackageJson): ReadonlyMap<string, string> => {
   const deps = new Map<string, string>();
-  const allDeps = {...pkg.dependencies, ...pkg.devDependencies};
+  const allDeps = {...pkg.dependencies, ...pkg.devDependencies, ...pkg.optionalDependencies};
   for (const [name, version] of Object.entries(allDeps)) {
     if (version && name.startsWith("@xonovex/")) {
       deps.set(name, version);

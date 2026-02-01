@@ -8,7 +8,6 @@
     "packages/doc/*",
     "packages/config/*",
     "packages/agent/*",
-    "packages/agent/agent-cli-go-platforms/*",
     "packages/shared/*",
     "packages/plugin/*",
     "packages/script/*"
