@@ -10,11 +10,6 @@ dependsOn:
   - shared-core-go
   - eslint-config-cli
   - ts-config-cli
-  - agent-cli-go-darwin-arm64
-  - agent-cli-go-darwin-x64
-  - agent-cli-go-linux-arm64
-  - agent-cli-go-linux-x64
-  - agent-cli-go-win32-x64
 tasks:
   # Override build to add config deps
   build:

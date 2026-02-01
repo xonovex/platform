@@ -26,6 +26,14 @@ export const updateDependent = (
     updateDependencyVersions(depPkg.peerDependencies, packageName, newVersion)
   )
     depsChanged = true;
+  if (
+    updateDependencyVersions(
+      depPkg.optionalDependencies,
+      packageName,
+      newVersion,
+    )
+  )
+    depsChanged = true;
 
   if (!depsChanged) {
     return {
