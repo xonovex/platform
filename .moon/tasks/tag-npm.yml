@@ -29,7 +29,6 @@ tasks:
       - package.json
     options:
       cache: false
-      runInCI: false
   ci-publish:
     command: echo 'ci-publish complete'
     deps:
@@ -59,7 +58,6 @@ tasks:
       - package.json
     options:
       cache: false
-      runInCI: false
   version-bump:
     command:
       - npx
