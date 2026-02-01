@@ -1,5 +1,11 @@
 # @xonovex/eslint-config-base
 
+## 0.1.20
+
+### Patch Changes
+
+- [`d6d5985`](https://github.com/xonovex/platform/commit/d6d59851cb653cdbf6136c93101b63b6efa3c61e) [@Deorder](https://github.com/Deorder)! - update plugin metadata and descriptions across multiple plugins
+
 ## 0.1.12
 
 ### Patch Changes

@@ -1,6 +1,6 @@
 {
   "name": "@xonovex/agent-cli-go",
-  "version": "0.1.19",
+  "version": "0.1.20",
   "description": "Agent wrapper CLI (Go implementation)",
   "type": "module",
   "license": "MIT",
@@ -26,7 +26,7 @@
     "agent-cli-go": "dist/bin.js"
   },
   "devDependencies": {
-    "@xonovex/ts-config-cli": "0.1.19"
+    "@xonovex/ts-config-cli": "0.1.20"
   },
   "optionalDependencies": {
     "@xonovex/agent-cli-go-linux-x64": "0.1.15",
@@ -36,13 +36,13 @@
     "@xonovex/agent-cli-go-win32-x64": "0.1.15"
   },
   "dependencies": {
-    "@xonovex/eslint-config-cli": "0.1.19",
-    "@xonovex/ts-config-cli": "0.1.19",
-    "@xonovex/agent-cli-go-darwin-arm64": "0.1.19",
-    "@xonovex/agent-cli-go-darwin-x64": "0.1.19",
-    "@xonovex/agent-cli-go-linux-arm64": "0.1.19",
-    "@xonovex/agent-cli-go-linux-x64": "0.1.19",
-    "@xonovex/agent-cli-go-win32-x64": "0.1.19"
+    "@xonovex/eslint-config-cli": "0.1.20",
+    "@xonovex/ts-config-cli": "0.1.20",
+    "@xonovex/agent-cli-go-darwin-arm64": "0.1.20",
+    "@xonovex/agent-cli-go-darwin-x64": "0.1.20",
+    "@xonovex/agent-cli-go-linux-arm64": "0.1.20",
+    "@xonovex/agent-cli-go-linux-x64": "0.1.20",
+    "@xonovex/agent-cli-go-win32-x64": "0.1.20"
   },
   "keywords": [
     "xonovex",

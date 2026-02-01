@@ -1,5 +1,15 @@
 # @xonovex/agent-cli-go
 
+## 0.1.20
+
+### Patch Changes
+
+- [`d6d5985`](https://github.com/xonovex/platform/commit/d6d59851cb653cdbf6136c93101b63b6efa3c61e) [@Deorder](https://github.com/Deorder)! - update plugin metadata and descriptions across multiple plugins
+- [`c7f41f4`](https://github.com/xonovex/platform/commit/c7f41f4e03e493bf25556ec592b74150f9e4547e) [@Deorder](https://github.com/Deorder)! - add TypeScript configuration and Vitest setup
+- Updated dependency `@xonovex/agent-cli-go-linux-arm64` to `0.1.20`
+- Updated dependency `@xonovex/agent-cli-go-linux-x64` to `0.1.20`
+- Updated dependency `@xonovex/agent-cli-go-win32-x64` to `0.1.20`
+
 ## 0.1.13
 
 ### Patch Changes
