@@ -1,0 +1,16 @@
+{
+  "name": "xonovex-instruction-skills",
+  "description": "Xonovex instruction-skills for Claude Code",
+  "version": "0.1.0",
+  "author": {
+    "name": "Xonovex"
+  },
+  "homepage": "https://github.com/xonovex/platform/tree/main/packages/plugin/plugin-instruction-skills",
+  "repository": "https://github.com/xonovex/platform",
+  "license": "MIT",
+  "keywords": [
+    "claude-code",
+    "skills",
+    "guidelines"
+  ]
+}

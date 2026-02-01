@@ -1,12 +1,13 @@
 $schema: https://moonrepo.dev/schemas/workspace.json
 projects:
-  - docs
+  - packages/asset/*
+  - packages/doc/*
   - packages/config/*
-  - packages/cli/*
-  - packages/lib/*
-  - packages/plugins/*
+  - packages/agent/*
+  - packages/shared/*
+  - packages/plugin/*
   - packages/docker/*
-  - packages/scripts/*
+  - packages/script/*
 vcs:
   hooks:
     commit-msg:

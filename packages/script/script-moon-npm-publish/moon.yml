@@ -1,0 +1,16 @@
+$schema: https://moonrepo.dev/schemas/project.json
+language: typescript
+tags: [typescript]
+dependsOn:
+  - script-moon-common
+tasks:
+  install:
+    command:
+      - npm
+      - install
+      - -w
+      - "@xonovex/script-moon-npm-publish"
+    deps:
+      - ~:build
+    options:
+      runFromWorkspaceRoot: true

@@ -1,0 +1,12 @@
+{
+  "name": "@xonovex/script-moon-npm-check",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "moon-npm-check": "./dist/src/index.js"
+  },
+  "dependencies": {
+    "@xonovex/script-moon-common": "0.0.0"
+  }
+}

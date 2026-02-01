@@ -1,0 +1,38 @@
+$schema: https://moonrepo.dev/schemas/project.json
+tasks:
+  build:
+    script: bash scripts/build-archives.sh "$workspaceRoot/packages/agent" "$projectRoot/release-assets"
+    deps:
+      - ^:go-build
+    inputs: []
+    outputs:
+      - release-assets/
+    options:
+      cache: true
+  github-publish:
+    script: bash scripts/github-release.sh "$workspaceRoot/packages/agent/agent-cli-go" "$projectRoot/release-assets"
+    deps:
+      - build
+    options:
+      runInCI: false
+      cache: false
+  ci-publish:
+    command: echo 'ci-publish complete'
+    deps:
+      - github-publish
+    options:
+      runInCI: false
+      cache: false
+  ci-publish-dry-run:
+    command: echo 'ci-publish-dry-run complete'
+    options:
+      runInCI: false
+      cache: false
+language: bash
+dependsOn:
+  - agent-cli-go-linux-x64
+  - agent-cli-go-linux-arm64
+  - agent-cli-go-darwin-x64
+  - agent-cli-go-darwin-arm64
+  - agent-cli-go-win32-x64
+layer: unknown

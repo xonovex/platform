@@ -1,0 +1,16 @@
+{
+  "name": "xonovex-vitest-skills",
+  "description": "Xonovex vitest-skills for Claude Code",
+  "version": "0.1.0",
+  "author": {
+    "name": "Xonovex"
+  },
+  "homepage": "https://github.com/xonovex/platform/tree/main/packages/plugin/plugin-vitest-skills",
+  "repository": "https://github.com/xonovex/platform",
+  "license": "MIT",
+  "keywords": [
+    "claude-code",
+    "skills",
+    "guidelines"
+  ]
+}

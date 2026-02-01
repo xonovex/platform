@@ -1,9 +1,0 @@
-{
-  "name": "@xonovex/moon-scripts-common",
-  "version": "0.0.0",
-  "private": true,
-  "type": "module",
-  "exports": {
-    ".": "./dist/src/index.js"
-  }
-}

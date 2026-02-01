@@ -9,7 +9,7 @@ tasks:
         optional: true
       - ^:npm-publish
       - ~:npm-check
-      - moon-npm-publish:install
+      - script-moon-npm-publish:install
     options:
       cache: false
       runInCI: false
@@ -22,7 +22,7 @@ tasks:
       - target: ~:build
         optional: true
       - ~:npm-check
-      - moon-npm-publish:install
+      - script-moon-npm-publish:install
     options:
       cache: false
       runInCI: false
@@ -38,7 +38,7 @@ tasks:
       - npx
       - moon-npm-check
     deps:
-      - moon-npm-check:install
+      - script-moon-npm-check:install
     options:
       cache: false
   npm-lint-fix:
@@ -57,7 +57,7 @@ tasks:
       - npx
       - moon-version-bump
     deps:
-      - moon-version-bump:install
+      - script-moon-version-bump:install
     options:
       cache: false
       runInCI: false

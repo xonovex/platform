@@ -1,0 +1,52 @@
+$schema: https://moonrepo.dev/schemas/project.json
+language: unknown
+dependsOn:
+  - script-moon-action-graph
+tasks:
+  graph-build-npm-check:
+    command: npx moon-action-graph :npm-check npm-check npm-check-graph.png
+    deps:
+      - script-moon-action-graph:build
+    options:
+      cache: false
+  graph-build-npm-publish:
+    command: npx moon-action-graph :npm-publish npm-publish npm-publish-graph.png
+    deps:
+      - script-moon-action-graph:build
+    options:
+      cache: false
+  graph-build-ci-check:
+    command: npx moon-action-graph :ci-check ci-check ci-check-graph.png
+    deps:
+      - script-moon-action-graph:build
+    options:
+      cache: false
+  graph-build-ci-publish:
+    command: npx moon-action-graph :ci-publish ci-publish ci-publish-graph.png
+    deps:
+      - script-moon-action-graph:build
+    options:
+      cache: false
+  graph-build-ci-publish-dry-run:
+    command: npx moon-action-graph :ci-publish-dry-run ci-publish-dry-run ci-publish-dry-run-graph.png
+    deps:
+      - script-moon-action-graph:build
+    options:
+      cache: false
+  graph-build-ci-publish-full:
+    command: npx moon-action-graph :ci-publish npm-publish,ci-publish ci-publish-full-graph.png
+    deps:
+      - script-moon-action-graph:build
+    options:
+      cache: false
+  graph-build:
+    command: noop
+    deps:
+      - ~:graph-build-npm-check
+      - ~:graph-build-npm-publish
+      - ~:graph-build-ci-check
+      - ~:graph-build-ci-publish
+      - ~:graph-build-ci-publish-dry-run
+      - ~:graph-build-ci-publish-full
+    options:
+      cache: false

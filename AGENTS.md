@@ -7,10 +7,11 @@ Monorepo for Xonovex tools and configuration packages.
 ### Subdirectories
 
 - **`packages/config/`**: Shared configuration packages (ESLint, TypeScript, Vitest, Prettier, Vite)
-- **`packages/cli/`**: CLI tools (agent-cli, agent-cli-go)
-- **`packages/lib/`**: Shared libraries (core, core-go)
-- **`packages/plugins/`**: Claude Code plugins (skills)
-- **`docs/`**: Technical documentation and workflow diagrams
+- **`packages/agent/`**: CLI tools (agent-cli, agent-cli-go)
+- **`packages/shared/`**: Shared libraries (shared-core, shared-core-go)
+- **`packages/plugin/`**: Claude Code plugins (skills)
+- **`packages/doc/`**: Documentation packages (action graph diagrams, workflow diagrams)
+- **`packages/asset/`**: Static assets (images)
 
 ### Workflow
 
@@ -21,17 +22,12 @@ Monorepo for Xonovex tools and configuration packages.
 
 ### Code Style
 
-- **Paradigm**: Follow `general-fp-guidelines` (functional programming)
 - **Imports**: Direct from source, no re-exports or backwards-compatibility wrappers
 - **Design**: Modular functions, explicit context, small focused files
 - **Quality**: Strict types, clear naming, explicit error handling
 - **Validation**: typecheck, lint, build, test must pass; fix warnings at root cause
 - **Deprecation**: Remove unused/deprecated code immediately; do not add @deprecated markers or keep backwards-compatibility shims
-
-## Skills
-
-- **Invoke matching skill first** - Use Skill tool when context matches available skills
-- **Read relevant detail only** - Load `details/*.md` file matching the specific context, not all details
+- **Paradigm**: Follow the [Functional Programming](packages/doc/doc-guidelines/general-fp-guidelines/index.md) guidelines
 
 ## Commit Convention
 

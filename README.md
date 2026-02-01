@@ -13,7 +13,7 @@
 - **Plan-driven workflow** with worktrees and parallel execution
 
 <table><tr><td style="border: 2px solid gray; padding: 0;">
-<img src="https://raw.githubusercontent.com/xonovex/platform/refs/heads/main/docs/multiple-agents.png" alt="Multiple Agents">
+<img src="https://raw.githubusercontent.com/xonovex/platform/refs/heads/main/packages/asset/asset-images/multiple-agents.png" alt="Multiple Agents">
 </td></tr></table>
 
 ## Philosophy
@@ -32,30 +32,24 @@ npm install -g @xonovex/agent-cli
 
 # Agent CLI (Go) - auto-downloads platform binary
 npm install -g @xonovex/agent-cli-go
-
-# Claude Code skills plugin
-npm install @xonovex/skills
 ```
 
-### Claude Code Skills
-
-Install the skills plugin to get coding guidelines and workflow commands:
+### Claude Code guideline plugins
 
 ```bash
 # Add the Xonovex marketplace (from within Claude Code)
 /plugin marketplace add xonovex/platform
 
-# Install the skills plugin
-/plugin install xonovex@xonovex-platform
+# Install individual guideline plugins
+/plugin install xonovex-typescript-guidelines@xonovex-platform
+/plugin install xonovex-react-guidelines@xonovex-platform
 ```
 
-Or test locally during development:
+Or use locally during development:
 
 ```bash
-claude --plugin-dir ./packages/plugins/skills
+claude --plugin-dir ./packages/plugin/plugin-typescript-skills
 ```
-
-Skills are namespaced as `/xonovex:<skill-name>` (e.g., `/xonovex:typescript-guidelines`).
 
 <details>
 <summary><strong>Available Skills</strong></summary>

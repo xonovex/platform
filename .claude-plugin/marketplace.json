@@ -1,30 +1,196 @@
 {
   "name": "xonovex-platform",
-  "owner": {
-    "name": "Xonovex"
-  },
+  "owner": { "name": "Xonovex" },
   "metadata": {
     "description": "Xonovex coding guidelines, workflow skills, and development tools for Claude Code",
-    "version": "0.1.0"
+    "version": "0.1.0",
+    "pluginRoot": "./packages/plugin"
   },
   "plugins": [
     {
-      "name": "xonovex",
-      "source": "./packages/plugins/skills",
-      "description": "Coding guidelines and workflow skills for TypeScript, React, Docker, Kubernetes, Terraform, and more",
-      "version": "0.1.0",
-      "author": {
-        "name": "Xonovex"
-      },
-      "keywords": [
-        "guidelines",
-        "typescript",
-        "react",
-        "docker",
-        "kubernetes",
-        "terraform",
-        "workflow"
-      ]
+      "name": "xonovex-workflow-commands",
+      "source": "plugin-workflow-commands",
+      "description": "Xonovex workflow commands for Claude Code (plan, git, insights, code)"
+    },
+    {
+      "name": "xonovex-utility-commands",
+      "source": "plugin-utility-commands",
+      "description": "Xonovex utility commands for Claude Code (content, instructions, skills, slash commands)"
+    },
+    {
+      "name": "xonovex-astro-guidelines",
+      "source": "plugin-astro-skills",
+      "description": "Xonovex astro-guidelines for Claude Code"
+    },
+    {
+      "name": "xonovex-c99-game-opinionated-guidelines",
+      "source": "plugin-c99-game-opinionated-skills",
+      "description": "Xonovex c99-game-opinionated-guidelines for Claude Code"
+    },
+    {
+      "name": "xonovex-c99-guidelines",
+      "source": "plugin-c99-skills",
+      "description": "Xonovex c99-guidelines for Claude Code"
+    },
+    {
+      "name": "xonovex-c99-opinionated-guidelines",
+      "source": "plugin-c99-opinionated-skills",
+      "description": "Xonovex c99-opinionated-guidelines for Claude Code"
+    },
+    {
+      "name": "xonovex-cmake-guidelines",
+      "source": "plugin-cmake-skills",
+      "description": "Xonovex cmake-guidelines for Claude Code"
+    },
+    {
+      "name": "xonovex-content-guidelines",
+      "source": "plugin-content-skills",
+      "description": "Xonovex content-guidelines for Claude Code"
+    },
+    {
+      "name": "xonovex-docker-guidelines",
+      "source": "plugin-docker-skills",
+      "description": "Xonovex docker-guidelines for Claude Code"
+    },
+    {
+      "name": "xonovex-express.js-guidelines",
+      "source": "plugin-express.js-skills",
+      "description": "Xonovex express.js-guidelines for Claude Code"
+    },
+    {
+      "name": "xonovex-general-fp-guidelines",
+      "source": "plugin-general-fp-skills",
+      "description": "Xonovex general-fp-guidelines for Claude Code"
+    },
+    {
+      "name": "xonovex-general-oop-guidelines",
+      "source": "plugin-general-oop-skills",
+      "description": "Xonovex general-oop-guidelines for Claude Code"
+    },
+    {
+      "name": "xonovex-git-guidelines",
+      "source": "plugin-git-skills",
+      "description": "Xonovex git-guidelines for Claude Code"
+    },
+    {
+      "name": "xonovex-hono-guidelines",
+      "source": "plugin-hono-skills",
+      "description": "Xonovex hono-guidelines for Claude Code"
+    },
+    {
+      "name": "xonovex-hono-opinionated-guidelines",
+      "source": "plugin-hono-opinionated-skills",
+      "description": "Xonovex hono-opinionated-guidelines for Claude Code"
+    },
+    {
+      "name": "xonovex-insights-guidelines",
+      "source": "plugin-insights-skills",
+      "description": "Xonovex insights-guidelines for Claude Code"
+    },
+    {
+      "name": "xonovex-instruction-guidelines",
+      "source": "plugin-instruction-skills",
+      "description": "Xonovex instruction-guidelines for Claude Code"
+    },
+    {
+      "name": "xonovex-kubernetes-guidelines",
+      "source": "plugin-kubernetes-skills",
+      "description": "Xonovex kubernetes-guidelines for Claude Code"
+    },
+    {
+      "name": "xonovex-lua-guidelines",
+      "source": "plugin-lua-skills",
+      "description": "Xonovex lua-guidelines for Claude Code"
+    },
+    {
+      "name": "xonovex-lua-opinionated-guidelines",
+      "source": "plugin-lua-opinionated-skills",
+      "description": "Xonovex lua-opinionated-guidelines for Claude Code"
+    },
+    {
+      "name": "xonovex-moon-guidelines",
+      "source": "plugin-moon-skills",
+      "description": "Xonovex moon-guidelines for Claude Code"
+    },
+    {
+      "name": "xonovex-motion-react-guidelines",
+      "source": "plugin-motion-react-skills",
+      "description": "Xonovex motion-react-guidelines for Claude Code"
+    },
+    {
+      "name": "xonovex-plan-guidelines",
+      "source": "plugin-plan-skills",
+      "description": "Xonovex plan-guidelines for Claude Code"
+    },
+    {
+      "name": "xonovex-presentation-guidelines",
+      "source": "plugin-presentation-skills",
+      "description": "Xonovex presentation-guidelines for Claude Code"
+    },
+    {
+      "name": "xonovex-python-guidelines",
+      "source": "plugin-python-skills",
+      "description": "Xonovex python-guidelines for Claude Code"
+    },
+    {
+      "name": "xonovex-react-guidelines",
+      "source": "plugin-react-skills",
+      "description": "Xonovex react-guidelines for Claude Code"
+    },
+    {
+      "name": "xonovex-remotion-guidelines",
+      "source": "plugin-remotion-skills",
+      "description": "Xonovex remotion-guidelines for Claude Code"
+    },
+    {
+      "name": "xonovex-shell-scripting-guidelines",
+      "source": "plugin-shell-scripting-skills",
+      "description": "Xonovex shell-scripting-guidelines for Claude Code"
+    },
+    {
+      "name": "xonovex-skill-guidelines",
+      "source": "plugin-skill-skills",
+      "description": "Xonovex skill-guidelines for Claude Code"
+    },
+    {
+      "name": "xonovex-sql-postgresql-guidelines",
+      "source": "plugin-sql-postgresql-skills",
+      "description": "Xonovex sql-postgresql-guidelines for Claude Code"
+    },
+    {
+      "name": "xonovex-strudel-guidelines",
+      "source": "plugin-strudel-skills",
+      "description": "Xonovex strudel-guidelines for Claude Code"
+    },
+    {
+      "name": "xonovex-terraform-guidelines",
+      "source": "plugin-terraform-skills",
+      "description": "Xonovex terraform-guidelines for Claude Code"
+    },
+    {
+      "name": "xonovex-threejs-guidelines",
+      "source": "plugin-threejs-skills",
+      "description": "Xonovex threejs-guidelines for Claude Code"
+    },
+    {
+      "name": "xonovex-typescript-guidelines",
+      "source": "plugin-typescript-skills",
+      "description": "Xonovex typescript-guidelines for Claude Code"
+    },
+    {
+      "name": "xonovex-typescript-to-lua-guidelines",
+      "source": "plugin-typescript-to-lua-skills",
+      "description": "Xonovex typescript-to-lua-guidelines for Claude Code"
+    },
+    {
+      "name": "xonovex-vitest-guidelines",
+      "source": "plugin-vitest-skills",
+      "description": "Xonovex vitest-guidelines for Claude Code"
+    },
+    {
+      "name": "xonovex-zod-guidelines",
+      "source": "plugin-zod-skills",
+      "description": "Xonovex zod-guidelines for Claude Code"
     }
   ]
 }
