@@ -33,7 +33,7 @@ const getLastVersionRef = (
 ): string | undefined => {
   // Walk back through commits that touched package.json to find where version differs
   const hashes = execSync(
-    `git log --diff-filter=M --format=%H -- ${pkgDir}/package.json`,
+    `git log --format=%H -- ${pkgDir}/package.json`,
     {cwd: rootDir, encoding: "utf8"},
   )
     .trim()
@@ -55,7 +55,9 @@ const getLastVersionRef = (
     }
   }
 
-  return undefined;
+  // Fall back to the earliest commit that introduced this package
+  const earliest = hashes.at(-1);
+  return earliest ?? undefined;
 };
 
 const CONVENTIONAL_COMMIT_RE = /^\w+(?:\([^)]*\))?:\s*.+$/;
