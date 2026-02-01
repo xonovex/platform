@@ -55,9 +55,9 @@ const getLastVersionRef = (
     }
   }
 
-  // Fall back to the earliest commit that introduced this package
+  // Fall back to the parent of the earliest commit that introduced this package
   const earliest = hashes.at(-1);
-  return earliest ?? undefined;
+  return earliest ? `${earliest}~1` : undefined;
 };
 
 const CONVENTIONAL_COMMIT_RE = /^\w+(?:\([^)]*\))?:\s*.+$/;
