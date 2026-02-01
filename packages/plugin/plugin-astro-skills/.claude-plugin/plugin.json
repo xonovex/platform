@@ -1,6 +1,6 @@
 {
-  "name": "xonovex-astro-skills",
-  "description": "Xonovex astro-skills for Claude Code",
+  "name": "astro-skills",
+  "description": "Astro framework coding guidelines and best practices",
   "version": "0.1.0",
   "author": {
     "name": "Xonovex"
@@ -10,7 +10,8 @@
   "license": "MIT",
   "keywords": [
     "claude-code",
+    "plugin",
     "skills",
-    "guidelines"
+    "astro"
   ]
 }

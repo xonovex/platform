@@ -20,17 +20,17 @@ npx moon-version-bump --include-types feat,fix,chore  # custom included types
 
 ## Options
 
-| Flag | Type | Description |
-|------|------|-------------|
-| `--type, -t` | string | Bump type: patch, minor, or major (default: patch) |
-| `--dry-run, -d` | boolean | Preview changes without writing files |
-| `--no-changelog` | boolean | Skip changelog generation |
-| `--no-dependents` | boolean | Skip updating dependent packages |
-| `--changelog-path <path>` | string | Custom changelog filename (default: `CHANGELOG.md`) |
-| `--preid <tag>` | string | Prerelease identifier (e.g. `beta` → `1.2.4-beta.0`) |
-| `--exact <version>` | string | Set exact version instead of bumping |
-| `--git-base <ref>` | string | Override git ref for changelog commit range |
-| `--include-types <types>` | string | Comma-separated conventional commit types to include (default: `feat,fix,refactor,perf,docs`) |
+| Flag                      | Type    | Description                                                                                   |
+| ------------------------- | ------- | --------------------------------------------------------------------------------------------- |
+| `--type, -t`              | string  | Bump type: patch, minor, or major (default: patch)                                            |
+| `--dry-run, -d`           | boolean | Preview changes without writing files                                                         |
+| `--no-changelog`          | boolean | Skip changelog generation                                                                     |
+| `--no-dependents`         | boolean | Skip updating dependent packages                                                              |
+| `--changelog-path <path>` | string  | Custom changelog filename (default: `CHANGELOG.md`)                                           |
+| `--preid <tag>`           | string  | Prerelease identifier (e.g. `beta` → `1.2.4-beta.0`)                                          |
+| `--exact <version>`       | string  | Set exact version instead of bumping                                                          |
+| `--git-base <ref>`        | string  | Override git ref for changelog commit range                                                   |
+| `--include-types <types>` | string  | Comma-separated conventional commit types to include (default: `feat,fix,refactor,perf,docs`) |
 
 ## Behavior
 

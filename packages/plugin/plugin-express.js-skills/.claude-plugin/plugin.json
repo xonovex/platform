@@ -1,6 +1,6 @@
 {
-  "name": "xonovex-express.js-skills",
-  "description": "Xonovex express.js-skills for Claude Code",
+  "name": "express.js-skills",
+  "description": "Express.js API development guidelines and best practices",
   "version": "0.1.0",
   "author": {
     "name": "Xonovex"
@@ -10,7 +10,8 @@
   "license": "MIT",
   "keywords": [
     "claude-code",
+    "plugin",
     "skills",
-    "guidelines"
+    "express.js"
   ]
 }

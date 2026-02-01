@@ -5,5 +5,10 @@
   "type": "module",
   "exports": {
     ".": "./dist/src/index.js"
-  }
+  },
+  "keywords": [
+    "xonovex",
+    "script",
+    "moon"
+  ]
 }

@@ -8,5 +8,10 @@
   },
   "dependencies": {
     "@xonovex/script-moon-common": "0.0.0"
-  }
+  },
+  "keywords": [
+    "xonovex",
+    "script",
+    "moon"
+  ]
 }

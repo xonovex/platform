@@ -1,6 +1,6 @@
 {
-  "name": "xonovex-plan-skills",
-  "description": "Xonovex plan-skills for Claude Code",
+  "name": "plan-skills",
+  "description": "Implementation planning and task breakdown guidelines",
   "version": "0.1.0",
   "author": {
     "name": "Xonovex"
@@ -10,7 +10,8 @@
   "license": "MIT",
   "keywords": [
     "claude-code",
+    "plugin",
     "skills",
-    "guidelines"
+    "plan"
   ]
 }

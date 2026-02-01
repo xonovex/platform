@@ -1,6 +1,6 @@
 {
-  "name": "xonovex-lua-skills",
-  "description": "Xonovex lua-skills for Claude Code",
+  "name": "lua-skills",
+  "description": "Lua coding guidelines and best practices",
   "version": "0.1.0",
   "author": {
     "name": "Xonovex"
@@ -10,7 +10,8 @@
   "license": "MIT",
   "keywords": [
     "claude-code",
+    "plugin",
     "skills",
-    "guidelines"
+    "lua"
   ]
 }

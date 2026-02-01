@@ -1,6 +1,6 @@
 {
-  "name": "xonovex-content-skills",
-  "description": "Xonovex content-skills for Claude Code",
+  "name": "content-skills",
+  "description": "Content writing and documentation guidelines",
   "version": "0.1.0",
   "author": {
     "name": "Xonovex"
@@ -10,7 +10,8 @@
   "license": "MIT",
   "keywords": [
     "claude-code",
+    "plugin",
     "skills",
-    "guidelines"
+    "content"
   ]
 }

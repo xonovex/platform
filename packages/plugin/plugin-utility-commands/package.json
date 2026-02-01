@@ -1,5 +1,11 @@
 {
   "name": "@xonovex/utility-commands",
   "version": "0.1.0",
-  "private": true
+  "private": true,
+  "keywords": [
+    "claude-code",
+    "plugin",
+    "commands",
+    "utility"
+  ]
 }

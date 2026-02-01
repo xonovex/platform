@@ -1,6 +1,6 @@
 {
-  "name": "xonovex-shell-scripting-skills",
-  "description": "Xonovex shell-scripting-skills for Claude Code",
+  "name": "shell-scripting-skills",
+  "description": "Shell scripting guidelines and best practices",
   "version": "0.1.0",
   "author": {
     "name": "Xonovex"
@@ -10,7 +10,8 @@
   "license": "MIT",
   "keywords": [
     "claude-code",
+    "plugin",
     "skills",
-    "guidelines"
+    "shell-scripting"
   ]
 }

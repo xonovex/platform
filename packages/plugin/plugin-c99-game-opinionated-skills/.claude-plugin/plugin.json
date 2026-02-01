@@ -1,6 +1,6 @@
 {
-  "name": "xonovex-c99-game-opinionated-skills",
-  "description": "Xonovex c99-game-opinionated-skills for Claude Code",
+  "name": "c99-game-opinionated-skills",
+  "description": "Opinionated C99 guidelines for game development",
   "version": "0.1.0",
   "author": {
     "name": "Xonovex"
@@ -10,7 +10,8 @@
   "license": "MIT",
   "keywords": [
     "claude-code",
+    "plugin",
     "skills",
-    "guidelines"
+    "c99-game-opinionated"
   ]
 }

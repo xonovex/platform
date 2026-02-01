@@ -82,7 +82,14 @@ const getCommitsSince = (
       const messages = bodyLines.filter((line) =>
         CONVENTIONAL_COMMIT_RE.test(line.trim()),
       );
-      return {hash, author, messages: messages.length > 0 ? messages.map((l) => l.trim()) : bodyLines.slice(0, 1).map((l) => l.trim())};
+      return {
+        hash,
+        author,
+        messages:
+          messages.length > 0
+            ? messages.map((l) => l.trim())
+            : bodyLines.slice(0, 1).map((l) => l.trim()),
+      };
     });
 };
 

@@ -1,6 +1,6 @@
 {
-  "name": "xonovex-c99-skills",
-  "description": "Xonovex c99-skills for Claude Code",
+  "name": "c99-skills",
+  "description": "C99 coding guidelines and best practices",
   "version": "0.1.0",
   "author": {
     "name": "Xonovex"
@@ -10,7 +10,8 @@
   "license": "MIT",
   "keywords": [
     "claude-code",
+    "plugin",
     "skills",
-    "guidelines"
+    "c99"
   ]
 }

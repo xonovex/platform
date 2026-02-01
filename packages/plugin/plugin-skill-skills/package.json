@@ -7,5 +7,11 @@
   },
   "dependencies": {
     "@xonovex/doc-guidelines": "^0.0.0"
-  }
+  },
+  "keywords": [
+    "claude-code",
+    "plugin",
+    "skills",
+    "skill"
+  ]
 }

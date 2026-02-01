@@ -5,5 +5,10 @@
   "scripts": {
     "fmt": "prettier --write .",
     "fmt:check": "prettier --check ."
-  }
+  },
+  "keywords": [
+    "xonovex",
+    "doc",
+    "guidelines"
+  ]
 }

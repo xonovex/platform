@@ -1,6 +1,6 @@
 {
-  "name": "xonovex-workflow-commands",
-  "description": "Xonovex workflow commands for Claude Code (plan, git, insights, code)",
+  "name": "workflow-commands",
+  "description": "Plan creation, git workflows, code analysis, and insight extraction commands",
   "version": "0.1.0",
   "author": {
     "name": "Xonovex"
@@ -10,7 +10,8 @@
   "license": "MIT",
   "keywords": [
     "claude-code",
-    "workflow",
-    "commands"
+    "plugin",
+    "commands",
+    "workflow"
   ]
 }

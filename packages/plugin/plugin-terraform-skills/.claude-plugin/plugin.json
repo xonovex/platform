@@ -1,6 +1,6 @@
 {
-  "name": "xonovex-terraform-skills",
-  "description": "Xonovex terraform-skills for Claude Code",
+  "name": "terraform-skills",
+  "description": "Terraform infrastructure-as-code guidelines and best practices",
   "version": "0.1.0",
   "author": {
     "name": "Xonovex"
@@ -10,7 +10,8 @@
   "license": "MIT",
   "keywords": [
     "claude-code",
+    "plugin",
     "skills",
-    "guidelines"
+    "terraform"
   ]
 }

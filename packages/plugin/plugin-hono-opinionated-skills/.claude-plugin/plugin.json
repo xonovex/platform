@@ -1,6 +1,6 @@
 {
-  "name": "xonovex-hono-opinionated-skills",
-  "description": "Xonovex hono-opinionated-skills for Claude Code",
+  "name": "hono-opinionated-skills",
+  "description": "Opinionated Hono web framework guidelines and conventions",
   "version": "0.1.0",
   "author": {
     "name": "Xonovex"
@@ -10,7 +10,8 @@
   "license": "MIT",
   "keywords": [
     "claude-code",
+    "plugin",
     "skills",
-    "guidelines"
+    "hono-opinionated"
   ]
 }
