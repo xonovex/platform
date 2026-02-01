@@ -1,6 +1,8 @@
 $schema: https://moonrepo.dev/schemas/project.json
 language: typescript
 tags: [typescript-moon]
+dependsOn:
+  - script-moon-common
 tasks:
   install:
     command:
