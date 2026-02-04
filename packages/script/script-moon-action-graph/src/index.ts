@@ -27,6 +27,7 @@ const {values, positionals} = parseCliArgs({
       description: "Task name filter for graph nodes (default: npm-publish)",
     },
     output: {type: "string", short: "o", description: "Output PNG path"},
+    dot: {type: "string", short: "d", description: "Output DOT file path"},
   },
 });
 
@@ -38,6 +39,7 @@ const output =
   (values.output as string | undefined) ??
   positionals[2] ??
   join(root, "npm-publish-graph.png");
+const dotOutput = values.dot as string | undefined;
 
 const dot = execSync(`npx moon action-graph ${target} --dot`, {
   cwd: root,
@@ -55,6 +57,11 @@ const png = execSync("dot -Tpng", {
 });
 
 writeFileSync(output, png);
+
+if (dotOutput) {
+  writeFileSync(dotOutput, filtered);
+}
+
 logSuccess(
-  `Wrote ${output} (${String(graph.nodes.size)} nodes, ${String(graph.edges.length)} edges)`,
+  `Wrote ${output}${dotOutput ? ` and ${dotOutput}` : ""} (${String(graph.nodes.size)} nodes, ${String(graph.edges.length)} edges)`,
 );
