@@ -117,10 +117,24 @@ if command -v git >/dev/null 2>&1 && git -C "$PROJECT_DIR" rev-parse --is-inside
   git -C "$PROJECT_DIR" diff --name-only >"$before_tmp" 2>/dev/null || true
 fi
 
+# Find timeout command (GNU coreutils: timeout on Linux, gtimeout on macOS)
+if command -v timeout >/dev/null 2>&1; then
+  TIMEOUT_CMD=timeout
+elif command -v gtimeout >/dev/null 2>&1; then
+  TIMEOUT_CMD=gtimeout
+else
+  TIMEOUT_CMD=""
+fi
+
 # Run quality checks
 set +e
 FULL_COMMAND="cd \"$PROJECT_DIR\" && ${MOON_CMD[*]@Q}"
-timeout "$TIMEOUT" bash -c "$FULL_COMMAND" >"$LOG_FILE" 2>&1
+if [[ -n "$TIMEOUT_CMD" ]]; then
+  "$TIMEOUT_CMD" "$TIMEOUT" bash -c "$FULL_COMMAND" >"$LOG_FILE" 2>&1
+else
+  # No timeout command available - run without timeout
+  bash -c "$FULL_COMMAND" >"$LOG_FILE" 2>&1
+fi
 cmd_status=$?
 set -e
 
