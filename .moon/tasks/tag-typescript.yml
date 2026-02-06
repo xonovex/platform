@@ -42,7 +42,6 @@ tasks:
     - ^:build
     options:
       cache: false
-      runInCI: false
       persistent: true
     preset: server
   lint:

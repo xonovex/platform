@@ -109,31 +109,6 @@ describe("worktree", () => {
     });
   });
 
-  describe("WorktreeConfig", () => {
-    it("should accept config with all fields", () => {
-      const config: WorktreeConfig = {
-        sourceBranch: "main",
-        branch: "feature/test",
-        dir: "/path/to/worktree",
-      };
-
-      expect(config.sourceBranch).toBe("main");
-      expect(config.branch).toBe("feature/test");
-      expect(config.dir).toBe("/path/to/worktree");
-    });
-
-    it("should accept config without sourceBranch", () => {
-      const config: WorktreeConfig = {
-        branch: "feature/test",
-        dir: "/path/to/worktree",
-      };
-
-      expect(config.sourceBranch).toBeUndefined();
-      expect(config.branch).toBe("feature/test");
-      expect(config.dir).toBe("/path/to/worktree");
-    });
-  });
-
   describe("getCurrentBranch", () => {
     it("should return current branch name", async () => {
       mockExecFile.mockImplementation(

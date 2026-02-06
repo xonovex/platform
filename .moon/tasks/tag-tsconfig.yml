@@ -71,7 +71,6 @@ tasks:
     outputs: []
     options:
       cache: false
-      runInCI: false
   fmt:
     command:
     - npm
@@ -85,7 +84,6 @@ tasks:
     outputs: []
     options:
       cache: false
-      runInCI: false
   fmt-check:
     command:
     - npm

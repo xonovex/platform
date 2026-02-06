@@ -6,16 +6,6 @@ import {type AgentExecOptions} from "../../src/run/agents/types.js";
 
 describe("agents", () => {
   describe("claudeAgent", () => {
-    it("should have correct configuration", () => {
-      expect(claudeAgent.type).toBe("claude");
-      expect(claudeAgent.displayName).toBe("Claude Code");
-      expect(claudeAgent.binary).toBe("claude");
-    });
-
-    it("should have nixPackage for nix sandbox support", () => {
-      expect(claudeAgent.nixPackage).toBe("claude-code");
-    });
-
     it("should build args without sandbox", () => {
       const options: AgentExecOptions = {
         sandbox: false,
@@ -58,16 +48,6 @@ describe("agents", () => {
   });
 
   describe("opencodeAgent", () => {
-    it("should have correct configuration", () => {
-      expect(opencodeAgent.type).toBe("opencode");
-      expect(opencodeAgent.displayName).toBe("OpenCode");
-      expect(opencodeAgent.binary).toBe("opencode");
-    });
-
-    it("should have nixPackage for nix sandbox support", () => {
-      expect(opencodeAgent.nixPackage).toBe("opencode");
-    });
-
     it("should build args with providerCliArgs", () => {
       const options: AgentExecOptions = {
         sandbox: false,

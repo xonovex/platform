@@ -14,7 +14,6 @@ tasks:
     - .editorconfig
     options:
       cache: true
-      runInCI: true
   sh-fmt:
     command:
     - shfmt
@@ -24,7 +23,6 @@ tasks:
     - '@globs(sources)'
     options:
       cache: false
-      runInCI: false
   sh-fmt-check:
     command:
     - shfmt
@@ -34,7 +32,6 @@ tasks:
     - '@globs(sources)'
     options:
       cache: true
-      runInCI: true
   ci-check:
     command: echo 'ci-check complete'
     deps: [sh-lint, sh-fmt-check]

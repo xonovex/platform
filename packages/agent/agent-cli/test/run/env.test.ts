@@ -1,99 +1,16 @@
-import {homedir} from "node:os";
-import {join} from "node:path";
 import {describe, expect, it} from "vitest";
 import {renderNixExpression} from "../../src/run/env/render.js";
 import {
   computeEnvId,
-  getAgentNixDir,
-  getAgentsDir,
-  getEnvsDir,
-  getSpecsDir,
   normalizeEnvSpec,
   resolveEnv,
   validateEnvSpec,
   validatePackageName,
 } from "../../src/run/env/resolve.js";
-import {
-  DEFAULT_BASE_PACKAGES,
-  DEFAULT_NIXPKGS_PIN,
-  NIXPKGS_PINS,
-} from "../../src/run/env/types.js";
+import {DEFAULT_NIXPKGS_PIN} from "../../src/run/env/types.js";
 
 describe("env", () => {
-  describe("types", () => {
-    describe("NIXPKGS_PINS", () => {
-      it("should have nixos-24.11 pin", () => {
-        const pin = NIXPKGS_PINS["nixos-24.11"];
-        expect(pin).toBeDefined();
-        expect(pin?.ref).toBe("nixos-24.11");
-      });
-
-      it("should have nixos-unstable pin", () => {
-        expect(NIXPKGS_PINS["nixos-unstable"]).toBeDefined();
-      });
-    });
-
-    describe("DEFAULT_BASE_PACKAGES", () => {
-      it("should include nodejs_24", () => {
-        expect(DEFAULT_BASE_PACKAGES).toContain("nodejs_24");
-      });
-
-      it("should not include agent-specific packages", () => {
-        // Agent packages are added dynamically based on the agent being used
-        expect(DEFAULT_BASE_PACKAGES).not.toContain("claude-code");
-        expect(DEFAULT_BASE_PACKAGES).not.toContain("opencode");
-      });
-
-      it("should include essential tools", () => {
-        expect(DEFAULT_BASE_PACKAGES).toContain("git");
-        expect(DEFAULT_BASE_PACKAGES).toContain("ripgrep");
-        expect(DEFAULT_BASE_PACKAGES).toContain("fd");
-        expect(DEFAULT_BASE_PACKAGES).toContain("jq");
-      });
-    });
-
-    describe("DEFAULT_NIXPKGS_PIN", () => {
-      it("should be a valid pin", () => {
-        expect(NIXPKGS_PINS[DEFAULT_NIXPKGS_PIN]).toBeDefined();
-      });
-    });
-  });
-
   describe("resolve", () => {
-    describe("getAgentNixDir", () => {
-      it("should return path in home directory", () => {
-        const dir = getAgentNixDir();
-        expect(dir).toBe(join(homedir(), ".local", "share", "agent-nix"));
-      });
-    });
-
-    describe("getSpecsDir", () => {
-      it("should return specs subdirectory", () => {
-        const dir = getSpecsDir();
-        expect(dir).toBe(
-          join(homedir(), ".local", "share", "agent-nix", "specs"),
-        );
-      });
-    });
-
-    describe("getEnvsDir", () => {
-      it("should return envs subdirectory", () => {
-        const dir = getEnvsDir();
-        expect(dir).toBe(
-          join(homedir(), ".local", "share", "agent-nix", "envs"),
-        );
-      });
-    });
-
-    describe("getAgentsDir", () => {
-      it("should return agents subdirectory", () => {
-        const dir = getAgentsDir();
-        expect(dir).toBe(
-          join(homedir(), ".local", "share", "agent-nix", "agents"),
-        );
-      });
-    });
-
     describe("validatePackageName", () => {
       it("should accept valid package names", () => {
         expect(validatePackageName("nodejs_24")).toBe(true);

@@ -62,6 +62,7 @@ if (dotOutput) {
   writeFileSync(dotOutput, filtered);
 }
 
+const dotSuffix = dotOutput ? ` and ${dotOutput}` : "";
 logSuccess(
-  `Wrote ${output}${dotOutput ? ` and ${dotOutput}` : ""} (${String(graph.nodes.size)} nodes, ${String(graph.edges.length)} edges)`,
+  `Wrote ${output}${dotSuffix} (${String(graph.nodes.size)} nodes, ${String(graph.edges.length)} edges)`,
 );
