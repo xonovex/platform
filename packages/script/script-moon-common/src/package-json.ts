@@ -12,6 +12,9 @@ export interface PackageJson {
   devDependencies?: Record<string, string>;
   peerDependencies?: Record<string, string>;
   optionalDependencies?: Record<string, string>;
+  os?: readonly string[];
+  cpu?: readonly string[];
+  libc?: readonly string[];
 }
 
 export const readPkg = (path: string): PackageJson =>

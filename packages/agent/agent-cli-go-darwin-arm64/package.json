@@ -17,12 +17,6 @@
     "access": "public",
     "registry": "https://registry.npmjs.org/"
   },
-  "os": [
-    "darwin"
-  ],
-  "cpu": [
-    "arm64"
-  ],
   "files": [
     "bin"
   ],
