@@ -1,32 +1,22 @@
 {
-  "name": "@xonovex/agent-cli-go-linux-x64",
+  "name": "@xonovex/agent-cli-go-darwin-x64",
   "version": "0.1.20",
-  "description": "Linux x64 binary for @xonovex/agent-cli-go",
+  "description": "macOS x64 binary for @xonovex/agent-cli-go",
   "license": "MIT",
   "author": "Xonovex",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/xonovex/platform.git",
-    "directory": "packages/agent/agent-cli-go-linux-x64"
+    "directory": "packages/agent/agent-cli-go-darwin-x64"
   },
   "bugs": {
     "url": "https://github.com/xonovex/platform/issues"
   },
-  "homepage": "https://github.com/xonovex/platform/tree/main/packages/agent/agent-cli-go-linux-x64#readme",
+  "homepage": "https://github.com/xonovex/platform/tree/main/packages/agent/agent-cli-go-darwin-x64#readme",
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org/"
   },
-  "os": [
-    "linux"
-  ],
-  "cpu": [
-    "x64"
-  ],
-  "libc": [
-    "glibc",
-    "musl"
-  ],
   "files": [
     "bin"
   ],
@@ -35,7 +25,7 @@
     "agent",
     "cli",
     "go",
-    "linux",
+    "darwin",
     "x64"
   ]
 }
