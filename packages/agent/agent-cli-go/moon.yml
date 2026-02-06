@@ -55,4 +55,3 @@ tasks:
       - agent-cli-go-github:ci-publish
     options:
       cache: false
-      runInCI: false
