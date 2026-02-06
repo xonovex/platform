@@ -38,7 +38,6 @@ const parseCliArgs = (spec: CliSpec, argv?: readonly string[]): ParsedArgs => {
 
   if (args.includes("--help") || args.includes("-h")) {
     console.log(formatHelp(spec));
-    // eslint-disable-next-line unicorn/no-process-exit
     process.exit(0);
     return {values: {}, positionals: []} as ParsedArgs;
   }

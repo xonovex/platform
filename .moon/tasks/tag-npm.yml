@@ -14,7 +14,6 @@ tasks:
       - package.json
     options:
       cache: false
-      runInCI: false
   npm-publish-dry-run:
     command:
       - npx
@@ -37,7 +36,6 @@ tasks:
       - package.json
     options:
       cache: false
-      runInCI: false
   npm-check:
     command:
       - npx
@@ -68,6 +66,5 @@ tasks:
       - script-moon-version-bump:install
     options:
       cache: false
-      runInCI: false
 inheritedBy:
   tag: npm

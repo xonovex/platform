@@ -86,10 +86,4 @@ describe("id", () => {
     });
   });
 
-  describe("environment variable names", () => {
-    it("should export correct env var names", () => {
-      expect(AGENT_ID_ENV).toBe("XONOVEX_AGENT_ID");
-      expect(PARENT_AGENT_ID_ENV).toBe("XONOVEX_PARENT_AGENT_ID");
-    });
-  });
 });

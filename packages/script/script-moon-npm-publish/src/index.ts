@@ -35,5 +35,5 @@ try {
 const publishCmd = dryRun
   ? "npm publish --dry-run --access public"
   : "npm publish --provenance --access public";
-// eslint-disable-next-line sonarjs/no-os-command-from-path
+
 execSync(publishCmd, {stdio: "inherit"});

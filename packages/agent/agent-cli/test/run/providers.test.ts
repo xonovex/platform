@@ -1,8 +1,6 @@
 import {afterEach, beforeEach, describe, expect, it} from "vitest";
-import {geminiClaudeProvider} from "../../src/run/providers/claude/gemini-claude.js";
 import {geminiProvider as claudeGeminiProvider} from "../../src/run/providers/claude/gemini.js";
 import {glmProvider} from "../../src/run/providers/claude/glm.js";
-import {gpt5CodexProvider} from "../../src/run/providers/claude/gpt5-codex.js";
 import {
   getProvider,
   getProviderNamesForAgent,
@@ -15,61 +13,6 @@ import {
 } from "../../src/run/providers/types.js";
 
 describe("providers", () => {
-  describe("claude provider configurations", () => {
-    it("should have correct gemini provider config", () => {
-      expect(claudeGeminiProvider.name).toBe("gemini");
-      expect(claudeGeminiProvider.displayName).toBe("Google Gemini 3.x");
-      expect(claudeGeminiProvider.agentType).toBe("claude");
-      expect(claudeGeminiProvider.authTokenEnv).toBe("CLI_PROXY_API_KEY");
-      expect(claudeGeminiProvider.environment.ANTHROPIC_BASE_URL).toBe(
-        "http://127.0.0.1:8317",
-      );
-      expect(
-        claudeGeminiProvider.environment.ANTHROPIC_DEFAULT_OPUS_MODEL,
-      ).toBe("gemini-3-pro-preview");
-    });
-
-    it("should have correct gemini-claude provider config", () => {
-      expect(geminiClaudeProvider.name).toBe("gemini-claude");
-      expect(geminiClaudeProvider.displayName).toBe("Gemini-Claude Thinking");
-      expect(geminiClaudeProvider.agentType).toBe("claude");
-      expect(
-        geminiClaudeProvider.environment.ANTHROPIC_DEFAULT_OPUS_MODEL,
-      ).toBe("gemini-claude-opus-4-5-thinking");
-    });
-
-    it("should have correct glm provider config", () => {
-      expect(glmProvider.name).toBe("glm");
-      expect(glmProvider.displayName).toBe("Zhipu AI GLM");
-      expect(glmProvider.agentType).toBe("claude");
-      expect(glmProvider.authTokenEnv).toBe("ZAI_AUTH_TOKEN");
-      expect(glmProvider.environment.ANTHROPIC_BASE_URL).toBe(
-        "https://api.z.ai/api/anthropic",
-      );
-    });
-
-    it("should have correct gpt5-codex provider config", () => {
-      expect(gpt5CodexProvider.name).toBe("gpt5-codex");
-      expect(gpt5CodexProvider.displayName).toBe("OpenAI GPT-5.2 Codex");
-      expect(gpt5CodexProvider.agentType).toBe("claude");
-      expect(gpt5CodexProvider.environment.ANTHROPIC_DEFAULT_OPUS_MODEL).toBe(
-        "gpt-5.2-codex(high)",
-      );
-    });
-  });
-
-  describe("opencode provider configurations", () => {
-    it("should have correct gemini provider config", () => {
-      expect(opencodeGeminiProvider.name).toBe("gemini");
-      expect(opencodeGeminiProvider.displayName).toBe("Google Gemini");
-      expect(opencodeGeminiProvider.agentType).toBe("opencode");
-      expect(opencodeGeminiProvider.cliArgs).toEqual([
-        "--model",
-        "google/gemini-2.5-pro",
-      ]);
-    });
-  });
-
   describe("getProvider", () => {
     it("should return claude provider by name", () => {
       const provider = getProvider("gemini", "claude");

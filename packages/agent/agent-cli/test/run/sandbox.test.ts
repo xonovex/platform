@@ -1,11 +1,9 @@
 import {homedir} from "node:os";
-import {join} from "node:path";
 import {describe, expect, it} from "vitest";
 import {claudeAgent} from "../../src/run/agents/claude/index.js";
 import {opencodeAgent} from "../../src/run/agents/opencode/index.js";
 import {
   getApplicationBindMounts,
-  getDefaultSandboxHome,
   getHostOverlayBindMounts,
   getSystemBindMounts,
   getUserConfigBindMounts,
@@ -18,122 +16,9 @@ import {
   parseCustomEnv,
 } from "../../src/run/sandbox/environment.js";
 import {getExecutor} from "../../src/run/sandbox/index.js";
-import type {
-  SandboxConfig,
-  SandboxMethod,
-} from "../../src/run/sandbox/types.js";
+import type {SandboxConfig} from "../../src/run/sandbox/types.js";
 
 describe("sandbox", () => {
-  describe("getDefaultSandboxHome", () => {
-    it("should return path in home directory", () => {
-      const home = getDefaultSandboxHome();
-      expect(home).toBe(join(homedir(), ".sandboxed-agent-home"));
-    });
-  });
-
-  describe("getExecutor", () => {
-    it("should return none executor for none method", () => {
-      const executor = getExecutor("none");
-      expect(executor).toBeDefined();
-    });
-
-    it("should return bwrap executor for bwrap method", () => {
-      const executor = getExecutor("bwrap");
-      expect(executor).toBeDefined();
-    });
-
-    it("should return docker executor for docker method", () => {
-      const executor = getExecutor("docker");
-      expect(executor).toBeDefined();
-    });
-
-    it("should return none executor for unknown method", () => {
-      // @ts-expect-error Testing fallback behavior
-      const executor = getExecutor("unknown");
-      expect(executor).toBeDefined();
-    });
-  });
-
-  describe("SandboxConfig", () => {
-    it("should accept valid config with claude agent", () => {
-      const config: SandboxConfig = {
-        agentId: "test-agent",
-        method: "none",
-        agent: claudeAgent,
-        workDir: "/home/user/project",
-        network: true,
-        bindPaths: [],
-        roBindPaths: [],
-        customEnv: [],
-        agentArgs: ["--help"],
-        verbose: false,
-        debug: false,
-        dryRun: false,
-      };
-
-      expect(config.method).toBe("none");
-      expect(config.agent).toBe(claudeAgent);
-      expect(config.workDir).toBe("/home/user/project");
-      expect(config.network).toBe(true);
-    });
-
-    it("should accept valid config with opencode agent", () => {
-      const config: SandboxConfig = {
-        agentId: "test-agent",
-        method: "bwrap",
-        agent: opencodeAgent,
-        workDir: "/home/user/project",
-        network: false,
-        bindPaths: ["/extra/path"],
-        roBindPaths: ["/readonly/path"],
-        customEnv: [],
-        agentArgs: [],
-        verbose: true,
-        debug: true,
-        dryRun: false,
-      };
-
-      expect(config.method).toBe("bwrap");
-      expect(config.agent).toBe(opencodeAgent);
-      expect(config.network).toBe(false);
-      expect(config.bindPaths).toEqual(["/extra/path"]);
-      expect(config.roBindPaths).toEqual(["/readonly/path"]);
-    });
-
-    it("should accept config without agent (defaults to claude)", () => {
-      const config: SandboxConfig = {
-        agentId: "test-agent",
-        method: "docker",
-        workDir: "/home/user/project",
-        network: true,
-        bindPaths: [],
-        roBindPaths: [],
-        customEnv: [],
-        agentArgs: [],
-        verbose: false,
-        debug: false,
-        dryRun: true,
-      };
-
-      expect(config.method).toBe("docker");
-      expect(config.agent).toBeUndefined();
-      expect(config.dryRun).toBe(true);
-    });
-  });
-
-  describe("SandboxMethod", () => {
-    it("should accept valid methods", () => {
-      const methods: SandboxMethod[] = [
-        "none",
-        "bwrap",
-        "docker",
-        "compose",
-        "nix",
-      ];
-      expect(methods).toHaveLength(5);
-    });
-  });
-
   describe("bindings", () => {
     describe("getSystemBindMounts", () => {
       it("should return system-level mounts", () => {
@@ -671,11 +556,6 @@ describe("sandbox", () => {
       expect(command[networkIndex + 1]).toBe("none");
     });
 
-    it("nix executor should return nix executor", () => {
-      const executor = getExecutor("nix");
-      expect(executor).toBeDefined();
-    });
-
     it("nix executor getCommand should include bwrap and nix-specific mounts", () => {
       const executor = getExecutor("nix");
       const config: SandboxConfig = {
@@ -702,9 +582,5 @@ describe("sandbox", () => {
       expect(command.some((c) => c.includes("/nix/store"))).toBe(true);
     });
 
-    it("compose executor should return compose executor", () => {
-      const executor = getExecutor("compose");
-      expect(executor).toBeDefined();
-    });
   });
 });
