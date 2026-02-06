@@ -1,5 +1,11 @@
 # @xonovex/agent-cli
 
+## 0.1.21
+
+### Patch Changes
+
+- Updated dependency `@xonovex/core` to `0.1.21`
+
 ## 0.1.20
 
 ### Patch Changes
