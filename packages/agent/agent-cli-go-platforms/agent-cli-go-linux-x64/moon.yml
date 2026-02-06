@@ -28,4 +28,4 @@ tasks:
     deps:
       - go-build
     options:
-      mergeDeps: replace
+      mergeDeps: prepend
