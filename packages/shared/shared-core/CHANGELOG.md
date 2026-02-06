@@ -1,5 +1,11 @@
 # @xonovex/core
 
+## 0.1.21
+
+### Patch Changes
+
+- Version bump
+
 ## 0.1.20
 
 ### Patch Changes
