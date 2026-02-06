@@ -18,19 +18,16 @@ tasks:
     deps:
       - build
     options:
-      runInCI: false
       cache: false
   ci-publish:
     command: echo 'ci-publish complete'
     deps:
       - github-publish
     options:
-      runInCI: false
       cache: false
   ci-publish-dry-run:
     command: echo 'ci-publish-dry-run complete'
     options:
-      runInCI: false
       cache: false
 language: bash
 dependsOn: []

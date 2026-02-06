@@ -17,7 +17,6 @@ tasks:
       - bin/
     options:
       cache: true
-      runInCI: true
   ci-check:
     command: echo 'ci-check complete'
     deps:
