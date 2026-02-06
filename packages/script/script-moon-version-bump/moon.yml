@@ -1,6 +1,6 @@
 $schema: https://moonrepo.dev/schemas/project.json
 language: typescript
-tags: [typescript-moon]
+tags: [typescript]
 dependsOn:
   - script-moon-common
 tasks:
