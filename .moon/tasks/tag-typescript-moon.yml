@@ -9,6 +9,10 @@ fileGroups:
     - src/**/*.test.*
     - src/**/*.spec.*
     - test/**/*
+  configs:
+    - '*.config.*'
+    - .eslintrc*
+    - .prettierrc*
 tasks:
   build:
     deps:
@@ -21,10 +25,102 @@ tasks:
       - dist
     options:
       cache: true
+  test:
+    script: npx vitest run
+    deps:
+      - ^:build
+    inputs:
+      - '@globs(sources)'
+      - '@globs(tests)'
+      - '@globs(configs)'
+    outputs: []
+    options:
+      cache: true
+  test-watch:
+    script: npx vitest
+    deps:
+      - ^:build
+    options:
+      cache: false
+      persistent: true
+    preset: server
+  lint:
+    script: npx eslint src
+    deps:
+      - build
+      - ^:build
+    inputs:
+      - '@globs(sources)'
+      - '@globs(tests)'
+      - '@globs(configs)'
+    outputs: []
+    options:
+      cache: true
+  lint-fix:
+    script: npx eslint src --fix
+    deps:
+      - build
+      - ^:build
+    inputs:
+      - '@globs(sources)'
+      - '@globs(tests)'
+      - '@globs(configs)'
+    outputs: []
+    options:
+      cache: false
+  fmt:
+    script: npx prettier --write .
+    inputs:
+      - '@globs(sources)'
+      - '@globs(tests)'
+      - '@globs(configs)'
+      - '*.json'
+      - '*.md'
+    outputs: []
+    options:
+      cache: false
+  fmt-check:
+    script: npx prettier --check .
+    inputs:
+      - '@globs(sources)'
+      - '@globs(tests)'
+      - '@globs(configs)'
+      - '*.json'
+      - '*.md'
+    outputs: []
+    options:
+      cache: true
+  typecheck:
+    script: npx tsc --noEmit
+    deps:
+      - build
+      - ^:build
+    inputs:
+      - '@globs(sources)'
+      - '@globs(tests)'
+      - tsconfig*.json
+    outputs: []
+    options:
+      cache: true
+  coverage:
+    script: npx vitest run --coverage
+    deps:
+      - ^:build
+    inputs:
+      - '@globs(sources)'
+      - '@globs(tests)'
+      - '@globs(configs)'
+    outputs:
+      - coverage
+    options:
+      cache: true
   ci-check:
     command: echo 'ci-check complete'
     deps:
       - build
+      - test
+      - lint
+      - typecheck
     options:
       cache: false
 inheritedBy:
