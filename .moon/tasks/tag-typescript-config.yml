@@ -1,30 +1,30 @@
 $schema: https://moonrepo.dev/schemas/tasks.json
 implicitInputs:
-- package.json
-- tsconfig*.json
+  - package.json
+  - tsconfig*.json
 fileGroups:
   sources:
-  - src/**/*
+    - src/**/*
   tests:
-  - src/**/*.test.*
-  - src/**/*.spec.*
-  - test/**/*
+    - src/**/*.test.*
+    - src/**/*.spec.*
+    - test/**/*
   configs:
-  - '*.config.*'
-  - tsconfig*.json
-  - .eslintrc*
-  - .prettierrc*
-  - package.json
+    - '*.config.*'
+    - tsconfig*.json
+    - .eslintrc*
+    - .prettierrc*
+    - package.json
 tasks:
   build:
     deps:
-    - ^:build
+      - ^:build
     script: npx tsc
     inputs:
-    - '@globs(sources)'
-    - tsconfig*.json
+      - '@globs(sources)'
+      - tsconfig*.json
     outputs:
-    - dist
+      - dist
     options:
       cache: true
   test:
@@ -34,7 +34,7 @@ tasks:
   test-watch:
     script: npx vitest
     deps:
-    - ^:build
+      - ^:build
     options:
       cache: false
       persistent: true
@@ -42,71 +42,71 @@ tasks:
   lint:
     script: npx eslint src
     deps:
-    - build
-    - ^:build
+      - build
+      - ^:build
     inputs:
-    - '@globs(sources)'
-    - '@globs(tests)'
-    - '@globs(configs)'
+      - '@globs(sources)'
+      - '@globs(tests)'
+      - '@globs(configs)'
     outputs: []
     options:
       cache: true
   lint-fix:
     script: npx eslint src --fix
     deps:
-    - build
-    - ^:build
+      - build
+      - ^:build
     inputs:
-    - '@globs(sources)'
-    - '@globs(tests)'
-    - '@globs(configs)'
+      - '@globs(sources)'
+      - '@globs(tests)'
+      - '@globs(configs)'
     outputs: []
     options:
       cache: false
   fmt:
     script: npx prettier --write .
     inputs:
-    - '@globs(sources)'
-    - '@globs(tests)'
-    - '@globs(configs)'
-    - '*.json'
-    - '*.md'
+      - '@globs(sources)'
+      - '@globs(tests)'
+      - '@globs(configs)'
+      - '*.json'
+      - '*.md'
     outputs: []
     options:
       cache: false
   fmt-check:
     script: npx prettier --check .
     inputs:
-    - '@globs(sources)'
-    - '@globs(tests)'
-    - '@globs(configs)'
-    - '*.json'
-    - '*.md'
+      - '@globs(sources)'
+      - '@globs(tests)'
+      - '@globs(configs)'
+      - '*.json'
+      - '*.md'
     outputs: []
     options:
       cache: true
   typecheck:
     script: npx tsc --noEmit
     deps:
-    - build
-    - ^:build
+      - build
+      - ^:build
     inputs:
-    - '@globs(sources)'
-    - '@globs(tests)'
-    - tsconfig*.json
+      - '@globs(sources)'
+      - '@globs(tests)'
+      - tsconfig*.json
     outputs: []
     options:
       cache: true
   coverage:
     script: npx vitest run --coverage
     deps:
-    - ^:build
+      - ^:build
     inputs:
-    - '@globs(sources)'
-    - '@globs(tests)'
-    - '@globs(configs)'
+      - '@globs(sources)'
+      - '@globs(tests)'
+      - '@globs(configs)'
     outputs:
-    - coverage
+      - coverage
     options:
       cache: true
   clean:
@@ -116,9 +116,9 @@ tasks:
   ci-check:
     command: echo 'ci-check complete'
     deps:
-    - build
-    - lint
-    - typecheck
+      - build
+      - lint
+      - typecheck
     options:
       cache: false
 inheritedBy:
