@@ -9,11 +9,7 @@
   "dependencies": {
     "@xonovex/script-moon-common": "0.0.0"
   },
-  "devDependencies": {
-    "@xonovex/eslint-config-cli": "0.1.20",
-    "@xonovex/ts-config-cli": "0.1.20",
-    "@xonovex/vitest-config-node": "0.1.20"
-  },
+  "devDependencies": {},
   "keywords": [
     "xonovex",
     "script",
