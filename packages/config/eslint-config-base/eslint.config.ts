@@ -1,4 +1,10 @@
-import baseConfig from "@xonovex/eslint-config-base";
+import baseConfig from "./src/index.ts";
 import {defineConfig} from "eslint/config";
 
-export default defineConfig(baseConfig);
+export default defineConfig(baseConfig, {
+  languageOptions: {
+    parserOptions: {
+      tsconfigRootDir: import.meta.dirname,
+    },
+  },
+});

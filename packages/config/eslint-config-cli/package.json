@@ -19,25 +19,26 @@
     "registry": "https://registry.npmjs.org/"
   },
   "files": [
-    "dist"
+    "dist",
+    "src"
   ],
   "exports": {
     "./package.json": "./package.json",
     ".": {
       "types": "./dist/src/index.d.ts",
-      "node": "./dist/src/index.js",
       "import": {
         "source": "./src/index.ts",
         "default": "./src/index.ts"
-      }
+      },
+      "node": "./dist/src/index.js"
     },
     "./*": {
       "types": "./dist/src/*.d.ts",
-      "node": "./dist/src/*.js",
       "import": {
         "source": "./src/*.ts",
         "default": "./src/*.ts"
-      }
+      },
+      "node": "./dist/src/*.js"
     }
   },
   "dependencies": {
