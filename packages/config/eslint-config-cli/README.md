@@ -26,6 +26,10 @@ Extends `@xonovex/eslint-config-base` with CLI-specific settings:
 - Relaxed rules for CLI scripts
 - Console output allowed
 
+## Export Condition Ordering
+
+The `"import"` condition must appear before `"node"` in the `package.json` exports. This allows script packages (which use the `typescript-script` moon tag without `^:build` dependencies) to lint without this package being built first.
+
 ## License
 
 MIT
