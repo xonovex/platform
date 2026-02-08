@@ -19,12 +19,10 @@ packages/
   diagram/              # Diagram packages
     diagram-agent-workflow/ # Agent workflow diagram
     diagram-moon-action/ # Moon action graph diagrams
-  plugin/               # Claude Code plugins
-    plugin-*-skills/    # Guideline skill plugins (35 plugins)
-    plugin-workflow-commands/  # Workflow commands (plan, git, insights, code)
-    plugin-utility-commands/  # Utility commands (content, instructions, skills, slash commands)
-  guide/                # Guideline packages
-    guide-*/            # Individual guideline packages (35 packages)
+  skill/                # Claude Code skills
+    skill-*/ (35)       # Guideline skill packages (guidelines + build)
+    skill-workflow-commands/  # Workflow commands (plan, git, insights, code)
+    skill-utility-commands/  # Utility commands (content, instructions, skills, slash commands)
   script/               # Internal build scripts
     script-moon-common/ # Shared moon script utilities
     script-moon-*/      # Moon task scripts (action-graph, npm-check, npm-publish, version-bump, version-detect)
@@ -93,12 +91,12 @@ npx moon run moon-version-detect:run
 npx moon run moon-version-detect:run -- --base main
 ```
 
-## Claude Code Plugins
+## Claude Code Skills
 
-The monorepo hosts a Claude Code plugin marketplace at `.claude-plugin/marketplace.json` containing 37 plugins:
+The monorepo hosts a Claude Code plugin marketplace at `.claude-plugin/marketplace.json` containing 37 skill packages:
 
-- **35 guideline skill plugins** — each copies guidelines from `packages/guide/` into a `skills/` directory during build
-- **2 command plugins** — copy slash commands from `.claude/commands/` into a `commands/` directory during build
+- **35 guideline skills** — each contains guidelines in `SKILL.md` and copies them into a `skills/` directory during build
+- **2 command skills** — copy slash commands from `.claude/commands/` into a `commands/` directory during build
 
 Install plugins via:
 

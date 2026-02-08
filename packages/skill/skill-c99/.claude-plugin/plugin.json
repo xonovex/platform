@@ -1,0 +1,12 @@
+{
+  "name": "c99-skills",
+  "description": "C99 coding guidelines and best practices",
+  "version": "0.1.0",
+  "author": {
+    "name": "Xonovex"
+  },
+  "homepage": "https://github.com/xonovex/platform/tree/main/packages/skill/skill-c99",
+  "repository": "https://github.com/xonovex/platform",
+  "license": "MIT",
+  "keywords": ["claude-code", "plugin", "skills", "c99"]
+}

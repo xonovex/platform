@@ -10,4 +10,4 @@ This matters for `packages/script/` packages which use the `typescript-script` m
 
 ## Guidelines
 
-- See [typescript-guidelines](../../guide/guide-typescript/index.md)
+- See [typescript-guidelines](../../skill/skill-typescript/skills/typescript-guidelines/SKILL.md)

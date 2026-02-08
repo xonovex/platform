@@ -14,7 +14,10 @@ describe("getWorkspaceDeps", () => {
 
   it("should extract @xonovex optionalDependencies", () => {
     const deps = getWorkspaceDeps({
-      optionalDependencies: {"@xonovex/agent-cli-go-linux-x64": "1.0.0", "some-pkg": "2.0.0"},
+      optionalDependencies: {
+        "@xonovex/agent-cli-go-linux-x64": "1.0.0",
+        "some-pkg": "2.0.0",
+      },
     });
     expect(deps.get("@xonovex/agent-cli-go-linux-x64")).toBe("1.0.0");
     expect(deps.has("some-pkg")).toBe(false);

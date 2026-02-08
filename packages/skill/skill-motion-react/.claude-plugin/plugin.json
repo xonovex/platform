@@ -1,0 +1,12 @@
+{
+  "name": "motion-react-skills",
+  "description": "Motion (Framer Motion) animation guidelines for React",
+  "version": "0.1.0",
+  "author": {
+    "name": "Xonovex"
+  },
+  "homepage": "https://github.com/xonovex/platform/tree/main/packages/skill/skill-motion-react",
+  "repository": "https://github.com/xonovex/platform",
+  "license": "MIT",
+  "keywords": ["claude-code", "plugin", "skills", "motion-react"]
+}

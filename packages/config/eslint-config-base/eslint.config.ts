@@ -1,5 +1,5 @@
-import baseConfig from "./src/index.ts";
 import {defineConfig} from "eslint/config";
+import baseConfig from "./src/index.ts";
 
 export default defineConfig(baseConfig, {
   languageOptions: {

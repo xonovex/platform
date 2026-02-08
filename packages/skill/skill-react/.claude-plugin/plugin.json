@@ -1,0 +1,12 @@
+{
+  "name": "react-skills",
+  "description": "React component and application development guidelines",
+  "version": "0.1.0",
+  "author": {
+    "name": "Xonovex"
+  },
+  "homepage": "https://github.com/xonovex/platform/tree/main/packages/skill/skill-react",
+  "repository": "https://github.com/xonovex/platform",
+  "license": "MIT",
+  "keywords": ["claude-code", "plugin", "skills", "react"]
+}

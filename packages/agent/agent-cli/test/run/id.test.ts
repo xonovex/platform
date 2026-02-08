@@ -85,5 +85,4 @@ describe("id", () => {
       expect(childEnv[PARENT_AGENT_ID_ENV]).toBe("parent");
     });
   });
-
 });

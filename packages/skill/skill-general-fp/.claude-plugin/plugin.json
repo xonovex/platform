@@ -1,0 +1,12 @@
+{
+  "name": "general-fp-skills",
+  "description": "Functional programming principles and patterns",
+  "version": "0.1.0",
+  "author": {
+    "name": "Xonovex"
+  },
+  "homepage": "https://github.com/xonovex/platform/tree/main/packages/skill/skill-general-fp",
+  "repository": "https://github.com/xonovex/platform",
+  "license": "MIT",
+  "keywords": ["claude-code", "plugin", "skills", "general-fp"]
+}

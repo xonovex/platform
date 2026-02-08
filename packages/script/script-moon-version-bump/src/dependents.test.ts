@@ -124,7 +124,9 @@ describe("updateDependent", () => {
     );
     expect(result.depsChanged).toBe(true);
     expect(result.versionBumped).toBe(true);
-    expect(pkg.optionalDependencies["@xonovex/agent-cli-go-linux-x64"]).toBe("1.1.0");
+    expect(pkg.optionalDependencies["@xonovex/agent-cli-go-linux-x64"]).toBe(
+      "1.1.0",
+    );
   });
 
   it("should skip version bump when git version is undefined (new package)", () => {

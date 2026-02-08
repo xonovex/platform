@@ -581,6 +581,5 @@ describe("sandbox", () => {
       // Should include /nix/store mount
       expect(command.some((c) => c.includes("/nix/store"))).toBe(true);
     });
-
   });
 });

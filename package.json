@@ -6,11 +6,10 @@
   "workspaces": [
     "packages/asset/*",
     "packages/diagram/*",
-    "packages/guide/*",
+    "packages/skill/*",
     "packages/config/*",
     "packages/agent/*",
     "packages/shared/*",
-    "packages/plugin/*",
     "packages/script/*"
   ],
   "engines": {
