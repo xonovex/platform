@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	"github.com/xonovex/platform/packages/cli/agent-cli-go/internal/sandboxutil"
-	"github.com/xonovex/platform/packages/cli/agent-cli-go/internal/types"
+	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/types"
 	"github.com/xonovex/platform/packages/shared/shared-core-go/pkg/scriptlib"
 )
 

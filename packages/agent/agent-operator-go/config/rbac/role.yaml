@@ -1,0 +1,73 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: agent-operator-manager-role
+rules:
+  - apiGroups:
+      - agent.xonovex.com
+    resources:
+      - agentruns
+      - agentproviders
+      - agentconfigs
+    verbs:
+      - get
+      - list
+      - watch
+      - create
+      - update
+      - patch
+      - delete
+  - apiGroups:
+      - agent.xonovex.com
+    resources:
+      - agentruns/status
+      - agentproviders/status
+      - agentconfigs/status
+    verbs:
+      - get
+      - update
+      - patch
+  - apiGroups:
+      - agent.xonovex.com
+    resources:
+      - agentruns/finalizers
+    verbs:
+      - update
+  - apiGroups:
+      - batch
+    resources:
+      - jobs
+    verbs:
+      - get
+      - list
+      - watch
+      - create
+      - update
+      - patch
+      - delete
+  - apiGroups:
+      - ""
+    resources:
+      - pods
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - ""
+    resources:
+      - persistentvolumeclaims
+    verbs:
+      - get
+      - list
+      - watch
+      - create
+      - delete
+  - apiGroups:
+      - ""
+    resources:
+      - secrets
+    verbs:
+      - get
+      - list
+      - watch

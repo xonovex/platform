@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 
 	"github.com/xonovex/platform/packages/cli/agent-cli-go/internal/sandboxutil"
-	"github.com/xonovex/platform/packages/cli/agent-cli-go/internal/types"
+	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/types"
 )
 
 // User config paths that should be bind mounted into sandboxes (relative to home)

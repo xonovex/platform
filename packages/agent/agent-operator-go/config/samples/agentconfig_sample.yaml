@@ -1,0 +1,13 @@
+apiVersion: agent.xonovex.com/v1alpha1
+kind: AgentConfig
+metadata:
+  name: default
+  namespace: default
+spec:
+  defaultAgent: claude
+  defaultProviders:
+    claude: anthropic-provider
+  defaultImage: "node:trixie-slim"
+  defaultTimeout: 1h
+  storageClass: standard
+  storageSize: 10Gi

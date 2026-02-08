@@ -7,6 +7,7 @@ tags:
   - npm
   - cli
 dependsOn:
+  - shared-agent-go
   - shared-core-go
   - eslint-config-cli
   - ts-config-cli

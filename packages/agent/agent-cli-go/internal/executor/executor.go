@@ -5,9 +5,9 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/xonovex/platform/packages/cli/agent-cli-go/internal/agents"
-	"github.com/xonovex/platform/packages/cli/agent-cli-go/internal/providers"
-	"github.com/xonovex/platform/packages/cli/agent-cli-go/internal/types"
+	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/agents"
+	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/providers"
+	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/types"
 	"github.com/xonovex/platform/packages/shared/shared-core-go/pkg/scriptlib"
 )
 

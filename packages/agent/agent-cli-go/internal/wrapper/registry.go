@@ -1,7 +1,7 @@
 package wrapper
 
 import (
-	"github.com/xonovex/platform/packages/cli/agent-cli-go/internal/types"
+	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/types"
 	"github.com/xonovex/platform/packages/cli/agent-cli-go/internal/wrapper/tmux"
 )
 
