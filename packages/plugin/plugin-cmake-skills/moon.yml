@@ -1,13 +1,13 @@
 $schema: https://moonrepo.dev/schemas/project.json
 language: unknown
 dependsOn:
-  - doc-guidelines
+  - guide-cmake
 tasks:
   build:
     script: |
       rm -rf "skills/cmake-guidelines"
       mkdir -p skills
-      cp -r "../../doc/doc-guidelines/cmake-guidelines" "skills/cmake-guidelines"
+      cp -r "../../guide/guide-cmake" "skills/cmake-guidelines"
       find skills -name 'index.md' -execdir mv {} SKILL.md \;
     outputs:
       - skills

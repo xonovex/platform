@@ -1,0 +1,26 @@
+$schema: https://moonrepo.dev/schemas/project.json
+language: unknown
+tasks:
+  fmt:
+    command:
+      - npm
+      - run
+      - fmt
+    inputs:
+      - "**/*.md"
+      - "*.config.*"
+      - package.json
+    outputs: []
+    options:
+      cache: false
+      runInCI: false
+  fmt-check:
+    command:
+      - npm
+      - run
+      - fmt:check
+    inputs:
+      - "**/*.md"
+      - "*.config.*"
+      - package.json
+    outputs: []

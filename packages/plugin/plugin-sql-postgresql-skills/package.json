@@ -3,10 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "build": "rm -rf skills/sql-postgresql-guidelines && mkdir -p skills && cp -r ../../doc/doc-guidelines/sql-postgresql-guidelines skills/sql-postgresql-guidelines && find skills -name 'index.md' -execdir mv {} SKILL.md \\;"
+    "build": "rm -rf skills/sql-postgresql-guidelines && mkdir -p skills && cp -r ../../guide/guide-sql-postgresql skills/sql-postgresql-guidelines && find skills -name 'index.md' -execdir mv {} SKILL.md \\;"
   },
   "dependencies": {
-    "@xonovex/doc-guidelines": "^0.0.0"
+    "@xonovex/guide-sql-postgresql": "^0.0.0"
   },
   "keywords": [
     "claude-code",

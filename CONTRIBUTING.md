@@ -17,13 +17,14 @@ packages/
     prettier-config/    # Prettier configuration
     vite-config-base/   # Vite configuration
   doc/                  # Documentation packages
-    doc-guidelines/     # Source guidelines (markdown)
     doc-agent-workflow/ # Agent workflow diagram
     doc-moon-action-diagrams/ # Moon action graph diagrams
   plugin/               # Claude Code plugins
     plugin-*-skills/    # Guideline skill plugins (35 plugins)
     plugin-workflow-commands/  # Workflow commands (plan, git, insights, code)
     plugin-utility-commands/  # Utility commands (content, instructions, skills, slash commands)
+  guide/                # Guideline packages
+    guide-*/            # Individual guideline packages (35 packages)
   script/               # Internal build scripts
     script-moon-common/ # Shared moon script utilities
     script-moon-*/      # Moon task scripts (action-graph, npm-check, npm-publish, version-bump, version-detect)
@@ -96,7 +97,7 @@ npx moon run moon-version-detect:run -- --base main
 
 The monorepo hosts a Claude Code plugin marketplace at `.claude-plugin/marketplace.json` containing 37 plugins:
 
-- **35 guideline skill plugins** — each copies guidelines from `packages/doc/doc-guidelines/` into a `skills/` directory during build
+- **35 guideline skill plugins** — each copies guidelines from `packages/guide/` into a `skills/` directory during build
 - **2 command plugins** — copy slash commands from `.claude/commands/` into a `commands/` directory during build
 
 Install plugins via:

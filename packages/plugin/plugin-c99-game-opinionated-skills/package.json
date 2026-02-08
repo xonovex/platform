@@ -3,10 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "build": "rm -rf skills/c99-game-opinionated-guidelines && mkdir -p skills && cp -r ../../doc/doc-guidelines/c99-game-opinionated-guidelines skills/c99-game-opinionated-guidelines && find skills -name 'index.md' -execdir mv {} SKILL.md \\;"
+    "build": "rm -rf skills/c99-game-opinionated-guidelines && mkdir -p skills && cp -r ../../guide/guide-c99-game-opinionated skills/c99-game-opinionated-guidelines && find skills -name 'index.md' -execdir mv {} SKILL.md \\;"
   },
   "dependencies": {
-    "@xonovex/doc-guidelines": "^0.0.0"
+    "@xonovex/guide-c99-game-opinionated": "^0.0.0"
   },
   "keywords": [
     "claude-code",

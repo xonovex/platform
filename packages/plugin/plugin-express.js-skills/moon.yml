@@ -1,13 +1,13 @@
 $schema: https://moonrepo.dev/schemas/project.json
 language: unknown
 dependsOn:
-  - doc-guidelines
+  - guide-express.js
 tasks:
   build:
     script: |
       rm -rf "skills/express.js-guidelines"
       mkdir -p skills
-      cp -r "../../doc/doc-guidelines/express.js-guidelines" "skills/express.js-guidelines"
+      cp -r "../../guide/guide-express.js" "skills/express.js-guidelines"
       find skills -name 'index.md' -execdir mv {} SKILL.md \;
     outputs:
       - skills
