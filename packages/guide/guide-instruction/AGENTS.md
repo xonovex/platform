@@ -1,3 +1,0 @@
-# Instruction Guidelines
-
-Instruction guidelines.
