@@ -25,3 +25,8 @@ OpenTelemetry + Grafana LGTM stack for Claude Code monitoring.
 
 - **Upstream**: Claude Code (OTLP metrics and logs)
 - **Downstream**: Grafana (port 3000), Prometheus (port 9090)
+
+## Guidelines
+
+- See [docker-guidelines](../../../guide/guide-docker/index.md)
+- See [shell-scripting-guidelines](../../../guide/guide-shell-scripting/index.md)

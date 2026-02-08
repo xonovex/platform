@@ -2,9 +2,9 @@ $schema: https://moonrepo.dev/schemas/workspace.json
 projects:
   - packages/asset/*
   - packages/doc/*
+  - packages/guide/*
   - packages/config/*
   - packages/agent/*
-  - packages/agent/agent-cli-go-platforms/*
   - packages/shared/*
   - packages/plugin/*
   - packages/docker/*

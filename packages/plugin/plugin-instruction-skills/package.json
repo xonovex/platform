@@ -3,10 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "build": "rm -rf skills/instruction-guidelines && mkdir -p skills && cp -r ../../doc/doc-guidelines/instruction-guidelines skills/instruction-guidelines && find skills -name 'index.md' -execdir mv {} SKILL.md \\;"
+    "build": "rm -rf skills/instruction-guidelines && mkdir -p skills && cp -r ../../guide/guide-instruction skills/instruction-guidelines && find skills -name 'index.md' -execdir mv {} SKILL.md \\;"
   },
   "dependencies": {
-    "@xonovex/doc-guidelines": "^0.0.0"
+    "@xonovex/guide-instruction": "^0.0.0"
   },
   "keywords": [
     "claude-code",

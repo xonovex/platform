@@ -1,0 +1,11 @@
+{
+  "name": "@xonovex/guide-python",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "fmt": "prettier --write .",
+    "fmt:check": "prettier --check ."
+  },
+  "keywords": ["xonovex", "doc", "guidelines"]
+}

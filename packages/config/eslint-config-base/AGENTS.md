@@ -16,3 +16,7 @@ The `"import"` condition **must** appear before `"node"` in `package.json` expor
 This package uses its own config to lint itself. The `eslint.config.ts` uses a relative import (`./src/index.ts`) instead of the package name to avoid a project service conflict: when loaded from source, the shared config sets `tsconfigRootDir: import.meta.dirname` to the `src/` subdirectory, which prevents the TypeScript project service from finding files. The `tsconfigRootDir` override in `eslint.config.ts` corrects this.
 
 The `eslint.config.ts` is excluded from `tsconfig.json` `include` because the `.ts` extension import requires `allowImportingTsExtensions`, and the file should not be emitted to `dist/`.
+
+## Guidelines
+
+- See [typescript-guidelines](../../guide/guide-typescript/index.md)

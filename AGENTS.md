@@ -11,6 +11,7 @@ Monorepo for Xonovex tools and configuration packages.
 - **`packages/shared/`**: Shared libraries (shared-core, shared-core-go)
 - **`packages/plugin/`**: Claude Code plugins (skills)
 - **`packages/doc/`**: Documentation packages (action graph diagrams, workflow diagrams)
+- **`packages/guide/`**: Guidelines packages
 - **`packages/asset/`**: Static assets (images)
 
 ### Workflow
@@ -27,7 +28,7 @@ Monorepo for Xonovex tools and configuration packages.
 - **Quality**: Strict types, clear naming, explicit error handling
 - **Validation**: typecheck, lint, build, test must pass; fix warnings at root cause
 - **Deprecation**: Remove unused/deprecated code immediately; do not add @deprecated markers or keep backwards-compatibility shims
-- **Paradigm**: Follow the [Functional Programming](packages/doc/doc-guidelines/general-fp-guidelines/index.md) guidelines
+- **Paradigm**: Follow the [Functional Programming](packages/guide/guide-general-fp/index.md) guidelines
 
 ## Commit Convention
 

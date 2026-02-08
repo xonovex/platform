@@ -1,13 +1,13 @@
 $schema: https://moonrepo.dev/schemas/project.json
 language: unknown
 dependsOn:
-  - doc-guidelines
+  - guide-terraform
 tasks:
   build:
     script: |
       rm -rf "skills/terraform-guidelines"
       mkdir -p skills
-      cp -r "../../doc/doc-guidelines/terraform-guidelines" "skills/terraform-guidelines"
+      cp -r "../../guide/guide-terraform" "skills/terraform-guidelines"
       find skills -name 'index.md' -execdir mv {} SKILL.md \;
     outputs:
       - skills

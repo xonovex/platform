@@ -6,6 +6,7 @@
   "workspaces": [
     "packages/asset/*",
     "packages/doc/*",
+    "packages/guide/*",
     "packages/config/*",
     "packages/agent/*",
     "packages/shared/*",

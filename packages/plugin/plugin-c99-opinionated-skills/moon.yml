@@ -1,13 +1,13 @@
 $schema: https://moonrepo.dev/schemas/project.json
 language: unknown
 dependsOn:
-  - doc-guidelines
+  - guide-c99-opinionated
 tasks:
   build:
     script: |
       rm -rf "skills/c99-opinionated-guidelines"
       mkdir -p skills
-      cp -r "../../doc/doc-guidelines/c99-opinionated-guidelines" "skills/c99-opinionated-guidelines"
+      cp -r "../../guide/guide-c99-opinionated" "skills/c99-opinionated-guidelines"
       find skills -name 'index.md' -execdir mv {} SKILL.md \;
     outputs:
       - skills
