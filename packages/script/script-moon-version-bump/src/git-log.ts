@@ -32,10 +32,10 @@ const getLastVersionRef = (
   currentVersion: string,
 ): string | undefined => {
   // Walk back through commits that touched package.json to find where version differs
-  const hashes = execSync(
-    `git log --format=%H -- ${pkgDir}/package.json`,
-    {cwd: rootDir, encoding: "utf8"},
-  )
+  const hashes = execSync(`git log --format=%H -- ${pkgDir}/package.json`, {
+    cwd: rootDir,
+    encoding: "utf8",
+  })
     .trim()
     .split("\n")
     .filter(Boolean);

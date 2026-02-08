@@ -1,120 +1,36 @@
 $schema: https://moonrepo.dev/schemas/tasks.json
-implicitInputs:
-- package.json
-- tsconfig*.json
-fileGroups:
-  sources:
-  - src/**/*
-  tests:
-  - src/**/*.test.*
-  - src/**/*.spec.*
-  - test/**/*
-  configs:
-  - '*.config.*'
-  - .eslintrc*
-  - .prettierrc*
+extends: ./tag-typescript.yml
 tasks:
   build:
     deps: []
-    script: npx tsc
-    inputs:
-    - '@globs(sources)'
-    - tsconfig*.json
-    outputs:
-    - dist
     options:
-      cache: true
+      mergeDeps: replace
   test:
-    script: npx vitest run
     deps: []
-    inputs:
-    - '@globs(sources)'
-    - '@globs(tests)'
-    - '@globs(configs)'
-    outputs: []
     options:
-      cache: true
+      mergeDeps: replace
   test-watch:
-    script: npx vitest
     deps: []
     options:
-      cache: false
-      persistent: true
-    preset: server
+      mergeDeps: replace
   lint:
-    script: npx eslint src
     deps:
-    - build
-    inputs:
-    - '@globs(sources)'
-    - '@globs(tests)'
-    - '@globs(configs)'
-    outputs: []
+      - build
     options:
-      cache: true
+      mergeDeps: replace
   lint-fix:
-    script: npx eslint src --fix
     deps:
-    - build
-    inputs:
-    - '@globs(sources)'
-    - '@globs(tests)'
-    - '@globs(configs)'
-    outputs: []
+      - build
     options:
-      cache: false
-  fmt:
-    script: npx prettier --write .
-    inputs:
-    - '@globs(sources)'
-    - '@globs(tests)'
-    - '@globs(configs)'
-    - '*.json'
-    - '*.md'
-    outputs: []
-    options:
-      cache: false
-  fmt-check:
-    script: npx prettier --check .
-    inputs:
-    - '@globs(sources)'
-    - '@globs(tests)'
-    - '@globs(configs)'
-    - '*.json'
-    - '*.md'
-    outputs: []
-    options:
-      cache: true
+      mergeDeps: replace
   typecheck:
-    script: npx tsc --noEmit
     deps:
-    - build
-    inputs:
-    - '@globs(sources)'
-    - '@globs(tests)'
-    - tsconfig*.json
-    outputs: []
+      - build
     options:
-      cache: true
+      mergeDeps: replace
   coverage:
-    script: npx vitest run --coverage
     deps: []
-    inputs:
-    - '@globs(sources)'
-    - '@globs(tests)'
-    - '@globs(configs)'
-    outputs:
-    - coverage
     options:
-      cache: true
-  ci-check:
-    command: echo 'ci-check complete'
-    deps:
-    - build
-    - test
-    - lint
-    - typecheck
-    options:
-      cache: false
+      mergeDeps: replace
 inheritedBy:
   tag: typescript-script

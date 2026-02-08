@@ -48,7 +48,7 @@ npm install -g @xonovex/agent-cli-go
 Or use locally during development:
 
 ```bash
-claude --plugin-dir ./packages/plugin/plugin-typescript-skills
+claude --plugin-dir ./packages/skill/skill-typescript
 ```
 
 <details>
