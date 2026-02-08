@@ -1,3 +1,0 @@
-# Presentation Guidelines
-
-Presentation guidelines.

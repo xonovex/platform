@@ -1,3 +1,0 @@
-# Insights Guidelines
-
-Insights guidelines.
