@@ -10,7 +10,7 @@ Monorepo for Xonovex tools and configuration packages.
 - **`packages/agent/`**: CLI tools (agent-cli, agent-cli-go)
 - **`packages/shared/`**: Shared libraries (shared-core, shared-core-go)
 - **`packages/plugin/`**: Claude Code plugins (skills)
-- **`packages/doc/`**: Documentation packages (action graph diagrams, workflow diagrams)
+- **`packages/diagram/`**: Diagram packages (action graph diagrams, workflow diagrams)
 - **`packages/guide/`**: Guidelines packages
 - **`packages/asset/`**: Static assets (images)
 

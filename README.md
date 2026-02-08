@@ -185,7 +185,7 @@ Parallel: Multiple agents work on parallel subplan groups in separate worktrees
 Learning: insights-integrate merges learnings into guidelines for future sessions
 ```
 
-[View workflow diagram](https://raw.githubusercontent.com/xonovex/platform/refs/heads/main/packages/doc/doc-agent-workflow/workflow-diagram.png)
+[View workflow diagram](https://raw.githubusercontent.com/xonovex/platform/refs/heads/main/packages/diagram/diagram-agent-workflow/workflow-diagram.png)
 
 <details>
 <summary><strong>Commands</strong></summary>
