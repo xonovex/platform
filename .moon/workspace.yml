@@ -1,7 +1,7 @@
 $schema: https://moonrepo.dev/schemas/workspace.json
 projects:
   - packages/asset/*
-  - packages/doc/*
+  - packages/diagram/*
   - packages/guide/*
   - packages/config/*
   - packages/agent/*

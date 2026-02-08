@@ -16,9 +16,9 @@ packages/
     vitest-config-*/    # Vitest configurations
     prettier-config/    # Prettier configuration
     vite-config-base/   # Vite configuration
-  doc/                  # Documentation packages
-    doc-agent-workflow/ # Agent workflow diagram
-    doc-moon-action-diagrams/ # Moon action graph diagrams
+  diagram/              # Diagram packages
+    diagram-agent-workflow/ # Agent workflow diagram
+    diagram-moon-action/ # Moon action graph diagrams
   plugin/               # Claude Code plugins
     plugin-*-skills/    # Guideline skill plugins (35 plugins)
     plugin-workflow-commands/  # Workflow commands (plan, git, insights, code)
