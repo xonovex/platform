@@ -1,0 +1,293 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: agentruns.agent.xonovex.com
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.17.0
+spec:
+  group: agent.xonovex.com
+  names:
+    kind: AgentRun
+    listKind: AgentRunList
+    plural: agentruns
+    singular: agentrun
+  scope: Namespaced
+  versions:
+    - name: v1alpha1
+      served: true
+      storage: true
+      additionalPrinterColumns:
+        - name: Agent
+          type: string
+          jsonPath: .spec.agent
+        - name: Phase
+          type: string
+          jsonPath: .status.phase
+        - name: Age
+          type: date
+          jsonPath: .metadata.creationTimestamp
+      subresources:
+        status: {}
+      schema:
+        openAPIV3Schema:
+          type: object
+          description: AgentRun is the Schema for the agentruns API
+          properties:
+            apiVersion:
+              type: string
+            kind:
+              type: string
+            metadata:
+              type: object
+            spec:
+              type: object
+              description: AgentRunSpec defines the desired state of AgentRun
+              required:
+                - agent
+                - repository
+              properties:
+                agent:
+                  type: string
+                  description: Agent type to run
+                  enum:
+                    - claude
+                    - opencode
+                providerRef:
+                  type: string
+                  description: References an AgentProvider in the namespace
+                provider:
+                  type: object
+                  description: Inline provider configuration
+                  required:
+                    - name
+                  properties:
+                    name:
+                      type: string
+                      description: Name of the provider
+                    authSecretRef:
+                      type: object
+                      description: References a Secret containing the auth token
+                      required:
+                        - name
+                        - key
+                      properties:
+                        name:
+                          type: string
+                        key:
+                          type: string
+                    environment:
+                      type: object
+                      additionalProperties:
+                        type: string
+                      description: Environment variables to set
+                    cliArgs:
+                      type: array
+                      items:
+                        type: string
+                      description: Additional CLI arguments for the provider
+                repository:
+                  type: object
+                  description: Git repository to clone
+                  required:
+                    - url
+                  properties:
+                    url:
+                      type: string
+                      description: Git repository URL
+                    branch:
+                      type: string
+                      description: Branch to checkout
+                    commit:
+                      type: string
+                      description: Commit to checkout (overrides branch)
+                    credentialsSecretRef:
+                      type: object
+                      description: Secret containing git credentials
+                      required:
+                        - name
+                        - key
+                      properties:
+                        name:
+                          type: string
+                        key:
+                          type: string
+                worktree:
+                  type: object
+                  description: Worktree configuration
+                  required:
+                    - branch
+                  properties:
+                    branch:
+                      type: string
+                      description: Branch name for the worktree
+                    sourceBranch:
+                      type: string
+                      description: Source branch to create the worktree from
+                prompt:
+                  type: string
+                  description: Prompt for headless task execution
+                resources:
+                  type: object
+                  description: Resources for the agent container
+                  properties:
+                    limits:
+                      type: object
+                      additionalProperties:
+                        anyOf:
+                          - type: integer
+                          - type: string
+                        pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                        x-kubernetes-int-or-string: true
+                    requests:
+                      type: object
+                      additionalProperties:
+                        anyOf:
+                          - type: integer
+                          - type: string
+                        pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                        x-kubernetes-int-or-string: true
+                timeout:
+                  type: string
+                  description: Timeout for the agent run (default 1h)
+                env:
+                  type: array
+                  description: Additional environment variables
+                  items:
+                    type: object
+                    required:
+                      - name
+                    properties:
+                      name:
+                        type: string
+                      value:
+                        type: string
+                      valueFrom:
+                        type: object
+                        properties:
+                          configMapKeyRef:
+                            type: object
+                            properties:
+                              name:
+                                type: string
+                              key:
+                                type: string
+                              optional:
+                                type: boolean
+                          secretKeyRef:
+                            type: object
+                            properties:
+                              name:
+                                type: string
+                              key:
+                                type: string
+                              optional:
+                                type: boolean
+                          fieldRef:
+                            type: object
+                            properties:
+                              apiVersion:
+                                type: string
+                              fieldPath:
+                                type: string
+                          resourceFieldRef:
+                            type: object
+                            properties:
+                              containerName:
+                                type: string
+                              resource:
+                                type: string
+                              divisor:
+                                anyOf:
+                                  - type: integer
+                                  - type: string
+                                pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                x-kubernetes-int-or-string: true
+                image:
+                  type: string
+                  description: Container image for the agent
+                nodeSelector:
+                  type: object
+                  additionalProperties:
+                    type: string
+                  description: NodeSelector for pod scheduling
+                tolerations:
+                  type: array
+                  description: Tolerations for pod scheduling
+                  items:
+                    type: object
+                    properties:
+                      key:
+                        type: string
+                      operator:
+                        type: string
+                      value:
+                        type: string
+                      effect:
+                        type: string
+                      tolerationSeconds:
+                        type: integer
+                        format: int64
+            status:
+              type: object
+              description: AgentRunStatus defines the observed state of AgentRun
+              properties:
+                phase:
+                  type: string
+                  description: Phase of the AgentRun
+                  enum:
+                    - Pending
+                    - Initializing
+                    - Running
+                    - Succeeded
+                    - Failed
+                    - TimedOut
+                conditions:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                      - type
+                      - status
+                      - lastTransitionTime
+                      - reason
+                      - message
+                    properties:
+                      type:
+                        type: string
+                      status:
+                        type: string
+                        enum:
+                          - "True"
+                          - "False"
+                          - Unknown
+                      lastTransitionTime:
+                        type: string
+                        format: date-time
+                      reason:
+                        type: string
+                      message:
+                        type: string
+                      observedGeneration:
+                        type: integer
+                        format: int64
+                jobName:
+                  type: string
+                  description: Name of the created Job
+                podName:
+                  type: string
+                  description: Name of the running Pod
+                startTime:
+                  type: string
+                  format: date-time
+                  description: When the run started
+                completionTime:
+                  type: string
+                  format: date-time
+                  description: When the run completed
+                exitCode:
+                  type: integer
+                  format: int32
+                  description: Exit code of the agent process
+                workspacePVC:
+                  type: string
+                  description: Name of the workspace PersistentVolumeClaim

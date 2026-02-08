@@ -8,14 +8,15 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/xonovex/platform/packages/cli/agent-cli-go/internal/agents"
-	"github.com/xonovex/platform/packages/cli/agent-cli-go/internal/config"
 	"github.com/xonovex/platform/packages/cli/agent-cli-go/internal/executor"
-	"github.com/xonovex/platform/packages/cli/agent-cli-go/internal/providers"
 	"github.com/xonovex/platform/packages/cli/agent-cli-go/internal/sandbox"
-	"github.com/xonovex/platform/packages/cli/agent-cli-go/internal/types"
 	"github.com/xonovex/platform/packages/cli/agent-cli-go/internal/worktree"
 	"github.com/xonovex/platform/packages/cli/agent-cli-go/internal/wrapper"
+	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/agents"
+	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/config"
+	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/providers"
+	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/types"
+	sharedworktree "github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/worktree"
 	"github.com/xonovex/platform/packages/shared/shared-core-go/pkg/scriptlib"
 )
 
@@ -121,7 +122,7 @@ func runAgent(cmd *cobra.Command, args []string) error {
 		repoName := filepath.Base(workDir)
 		wtDir := flagWorktreeDir
 		if wtDir == "" {
-			wtDir = worktree.GetDefaultDir(flagWorktreeBranch, repoName)
+			wtDir = sharedworktree.GetDefaultDir(flagWorktreeBranch, repoName)
 		}
 
 		wtConfig := worktree.Config{

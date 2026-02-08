@@ -8,7 +8,7 @@ import (
 	"github.com/xonovex/platform/packages/cli/agent-cli-go/internal/sandbox/docker"
 	"github.com/xonovex/platform/packages/cli/agent-cli-go/internal/sandbox/nix"
 	"github.com/xonovex/platform/packages/cli/agent-cli-go/internal/sandbox/none"
-	"github.com/xonovex/platform/packages/cli/agent-cli-go/internal/types"
+	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/types"
 )
 
 // GetExecutor returns a sandbox executor for the specified method

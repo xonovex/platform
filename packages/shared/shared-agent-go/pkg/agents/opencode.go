@@ -1,7 +1,7 @@
 package agents
 
 import (
-	"github.com/xonovex/platform/packages/cli/agent-cli-go/internal/types"
+	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/types"
 )
 
 var opencodeAgent = &types.AgentConfig{

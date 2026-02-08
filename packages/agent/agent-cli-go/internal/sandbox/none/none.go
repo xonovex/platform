@@ -2,7 +2,7 @@ package none
 
 import (
 	"github.com/xonovex/platform/packages/cli/agent-cli-go/internal/executor"
-	"github.com/xonovex/platform/packages/cli/agent-cli-go/internal/types"
+	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/types"
 )
 
 // Executor implements direct execution (no sandbox)

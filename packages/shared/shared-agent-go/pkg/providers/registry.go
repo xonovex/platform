@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/xonovex/platform/packages/cli/agent-cli-go/internal/types"
+	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/types"
 )
 
 // providerRegistry uses composite keys: "agentType:providerName"

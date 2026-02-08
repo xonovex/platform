@@ -8,7 +8,7 @@ import (
 	"github.com/pelletier/go-toml/v2"
 	"gopkg.in/yaml.v3"
 
-	"github.com/xonovex/platform/packages/cli/agent-cli-go/internal/types"
+	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/types"
 )
 
 // FileConfig represents configuration loaded from file

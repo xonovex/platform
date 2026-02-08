@@ -1,0 +1,8 @@
+namespace: agent-operator-system
+
+namePrefix: agent-operator-
+
+resources:
+  - ../crd
+  - ../rbac
+  - ../manager
