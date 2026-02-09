@@ -4,7 +4,8 @@ Kubernetes operator for managing AI coding agent runs.
 
 ## CRDs
 
-- **AgentRun**: Primary workload resource - creates Jobs for agent execution
+- **AgentRun**: Primary workload resource - creates Jobs for agent execution (standalone or workspace-based)
+- **AgentWorkspace**: Shared workspace with RWX PVC for multi-agent coordination via git worktrees and shared config volumes
 - **AgentProvider**: Reusable provider configuration with K8s secret management
 - **AgentConfig**: Namespace-level defaults
 

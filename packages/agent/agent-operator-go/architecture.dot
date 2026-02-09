@@ -28,11 +28,23 @@ digraph AgentOperatorArchitecture {
         <TR><TD><FONT POINT-SIZE="8" COLOR="#555">agent: claude | opencode</FONT></TD></TR>
         <TR><TD><FONT POINT-SIZE="8" COLOR="#555">repository: {url, branch, commit}</FONT></TD></TR>
         <TR><TD><FONT POINT-SIZE="8" COLOR="#555">worktree: {branch, sourceBranch}</FONT></TD></TR>
+        <TR><TD><FONT POINT-SIZE="8" COLOR="#555">workspaceRef: → AgentWorkspace</FONT></TD></TR>
         <TR><TD><FONT POINT-SIZE="8" COLOR="#555">prompt, timeout, image, resources</FONT></TD></TR>
         <TR><TD><FONT POINT-SIZE="8" COLOR="#555">providerRef | provider (inline)</FONT></TD></TR>
         <TR><TD><FONT POINT-SIZE="8" COLOR="#555">nodeSelector, tolerations, env</FONT></TD></TR>
       </TABLE>>,
       fillcolor="#ffcc80"
+    ];
+
+    agentworkspace [
+      label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="1">
+        <TR><TD><B>AgentWorkspace</B></TD></TR>
+        <TR><TD><FONT POINT-SIZE="8" COLOR="#555">repository: {url, branch, commit}</FONT></TD></TR>
+        <TR><TD><FONT POINT-SIZE="8" COLOR="#555">storageClass, storageSize</FONT></TD></TR>
+        <TR><TD><FONT POINT-SIZE="8" COLOR="#555">sharedVolumes: [{name, mountPath, size}]</FONT></TD></TR>
+        <TR><TD><FONT POINT-SIZE="8" COLOR="#555">status: Pending → Initializing → Ready</FONT></TD></TR>
+      </TABLE>>,
+      fillcolor="#fff176"
     ];
 
     agentprovider [
@@ -67,7 +79,15 @@ digraph AgentOperatorArchitecture {
       label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="1">
         <TR><TD><B>AgentRun Webhook</B></TD></TR>
         <TR><TD><FONT POINT-SIZE="8">Default: agent=claude, timeout=1h</FONT></TD></TR>
-        <TR><TD><FONT POINT-SIZE="8">Validate: type, URL, no conflicts</FONT></TD></TR>
+        <TR><TD><FONT POINT-SIZE="8">Validate: type, URL/workspaceRef, no conflicts</FONT></TD></TR>
+      </TABLE>>,
+      fillcolor="#f8bbd0"
+    ];
+    wh_workspace [
+      label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="1">
+        <TR><TD><B>AgentWorkspace Webhook</B></TD></TR>
+        <TR><TD><FONT POINT-SIZE="8">Default: storageSize=10Gi, shared=1Gi</FONT></TD></TR>
+        <TR><TD><FONT POINT-SIZE="8">Validate: URL, shared volume names</FONT></TD></TR>
       </TABLE>>,
       fillcolor="#f8bbd0"
     ];
@@ -80,13 +100,14 @@ digraph AgentOperatorArchitecture {
     style=filled; fillcolor="#e8f5e9"; fontname="Arial"; fontsize=11;
 
     ctrl_run [label=<<B>AgentRun Reconciler</B>>, fillcolor="#a5d6a7"];
+    ctrl_workspace [label=<<B>AgentWorkspace Reconciler</B>>, fillcolor="#a5d6a7"];
     ctrl_provider [label="AgentProvider\nReconciler", fillcolor="#c8e6c9"];
     ctrl_config [label="AgentConfig\nReconciler", fillcolor="#c8e6c9"];
   }
 
-  // ─── Reconciliation Steps (the core flow) ──────────────────────────
+  // ─── Standalone Reconciliation Steps ────────────────────────────────
   subgraph cluster_reconcile {
-    label=<<B>AgentRun Reconciliation Steps</B>>;
+    label=<<B>AgentRun Standalone Reconciliation</B>>;
     style=filled; fillcolor="#f5f5f5"; fontname="Arial"; fontsize=11;
 
     subgraph cluster_resolver {
@@ -121,6 +142,57 @@ digraph AgentOperatorArchitecture {
     watch_status [label="5. Watch Job Status\n→ update AgentRun phase", fillcolor="#fff9c4", fontsize=9];
   }
 
+  // ─── Workspace Reconciliation ───────────────────────────────────────
+  subgraph cluster_ws_reconcile {
+    label=<<B>AgentWorkspace Reconciliation</B>>;
+    style=filled; fillcolor="#fffde7"; fontname="Arial"; fontsize=11;
+
+    ws_create_pvcs [
+      label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="1">
+        <TR><TD><B>1. Create PVCs</B></TD></TR>
+        <TR><TD><FONT POINT-SIZE="8">BuildWorkspacePVC (RWX, ownerRef → Workspace)</FONT></TD></TR>
+        <TR><TD><FONT POINT-SIZE="8">BuildSharedVolumePVC per sharedVolume entry</FONT></TD></TR>
+      </TABLE>>,
+      fillcolor="#fff9c4", fontsize=9
+    ];
+
+    ws_init_job [
+      label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="1">
+        <TR><TD><B>2. BuildWorkspaceInitJob</B></TD></TR>
+        <TR><TD><FONT POINT-SIZE="8">git clone into workspace PVC</FONT></TD></TR>
+      </TABLE>>,
+      fillcolor="#fff9c4", fontsize=9
+    ];
+
+    ws_watch_status [label="3. Watch Init Job\n→ set Ready | Failed", fillcolor="#fff9c4", fontsize=9];
+  }
+
+  // ─── Workspace-Aware AgentRun ─────────────────────────────────────
+  subgraph cluster_ws_run {
+    label=<<B>AgentRun with workspaceRef</B>>;
+    style=filled; fillcolor="#e0f2f1"; fontname="Arial"; fontsize=11;
+
+    ws_resolve [
+      label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="1">
+        <TR><TD><B>1. ResolveWorkspace</B></TD></TR>
+        <TR><TD><FONT POINT-SIZE="8">check phase == Ready (requeue if not)</FONT></TD></TR>
+      </TABLE>>,
+      fillcolor="#b2dfdb", fontsize=9
+    ];
+
+    ws_build_job [
+      label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="1">
+        <TR><TD><B>2. BuildWorkspaceJob</B></TD></TR>
+        <TR><TD><FONT POINT-SIZE="8">BuildWorktreeInitContainers (git worktree add)</FONT></TD></TR>
+        <TR><TD><FONT POINT-SIZE="8">BuildWorkspaceMainContainers (agent + shared mounts)</FONT></TD></TR>
+        <TR><TD><FONT POINT-SIZE="8">Volumes: workspace PVC + shared volume PVCs</FONT></TD></TR>
+      </TABLE>>,
+      fillcolor="#b2dfdb", fontsize=9
+    ];
+
+    ws_watch_run [label="3. Watch Job Status\n→ update AgentRun phase", fillcolor="#b2dfdb", fontsize=9];
+  }
+
   // ─── K8s Resources ─────────────────────────────────────────────────
   subgraph cluster_k8s {
     label=<<B>Created Kubernetes Resources</B>>;
@@ -129,9 +201,18 @@ digraph AgentOperatorArchitecture {
     pvc [
       label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="1">
         <TR><TD><B>PersistentVolumeClaim</B></TD></TR>
-        <TR><TD><FONT POINT-SIZE="8">{name}-workspace, RWO, 10Gi</FONT></TD></TR>
+        <TR><TD><FONT POINT-SIZE="8">Standalone: {name}-workspace, RWO, 10Gi</FONT></TD></TR>
       </TABLE>>,
       fillcolor="#90caf9"
+    ];
+
+    ws_pvc [
+      label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="1">
+        <TR><TD><B>Workspace PVCs (RWX)</B></TD></TR>
+        <TR><TD><FONT POINT-SIZE="8">{ws}-ws: shared git checkout</FONT></TD></TR>
+        <TR><TD><FONT POINT-SIZE="8">{ws}-{vol}: shared config/state dirs</FONT></TD></TR>
+      </TABLE>>,
+      fillcolor="#81d4fa"
     ];
 
     job [
@@ -143,8 +224,8 @@ digraph AgentOperatorArchitecture {
       fillcolor="#90caf9"
     ];
 
-    subgraph cluster_pod {
-      label=<<B>Pod</B>  <FONT POINT-SIZE="8" COLOR="#666">(restartPolicy: Never)</FONT>>;
+    subgraph cluster_pod_standalone {
+      label=<<B>Pod (Standalone)</B>  <FONT POINT-SIZE="8" COLOR="#666">(restartPolicy: Never)</FONT>>;
       style=filled; fillcolor="#bbdefb"; fontname="Arial"; fontsize=10;
 
       init_ctr [
@@ -163,9 +244,33 @@ digraph AgentOperatorArchitecture {
           <TR><TD><FONT POINT-SIZE="8">claude --permission-mode bypassPermissions</FONT></TD></TR>
           <TR><TD><FONT POINT-SIZE="8">  [--print --prompt "task..."]</FONT></TD></TR>
           <TR><TD><FONT POINT-SIZE="8">or: opencode [cliArgs...]</FONT></TD></TR>
-          <TR><TD><FONT POINT-SIZE="8">workingDir: /workspace (PVC)</FONT></TD></TR>
+          <TR><TD><FONT POINT-SIZE="8">workingDir: /workspace</FONT></TD></TR>
         </TABLE>>,
         fillcolor="#64b5f6"
+      ];
+    }
+
+    subgraph cluster_pod_workspace {
+      label=<<B>Pod (Workspace)</B>  <FONT POINT-SIZE="8" COLOR="#666">(restartPolicy: Never)</FONT>>;
+      style=filled; fillcolor="#b2ebf2"; fontname="Arial"; fontsize=10;
+
+      ws_init_ctr [
+        label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="1">
+          <TR><TD><B>Init: git-worktree</B></TD></TR>
+          <TR><TD><FONT POINT-SIZE="8">git worktree add /workspace-wt/{run}</FONT></TD></TR>
+          <TR><TD><FONT POINT-SIZE="8">-b {branch} {sourceBranch}</FONT></TD></TR>
+        </TABLE>>,
+        fillcolor="#4dd0e1"
+      ];
+
+      ws_main_ctr [
+        label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="1">
+          <TR><TD><B>Main: agent</B></TD></TR>
+          <TR><TD><FONT POINT-SIZE="8">workingDir: /workspace-wt/{run}</FONT></TD></TR>
+          <TR><TD><FONT POINT-SIZE="8">mounts: workspace PVC + shared vols</FONT></TD></TR>
+          <TR><TD><FONT POINT-SIZE="8">e.g. /root/.claude, /root/.opencode</FONT></TD></TR>
+        </TABLE>>,
+        fillcolor="#4dd0e1"
       ];
     }
   }
@@ -175,7 +280,7 @@ digraph AgentOperatorArchitecture {
   git_repo [label="Git Repository", shape=cylinder, fillcolor="#d7ccc8"];
   ai_api [label="AI Provider API\n(Anthropic, etc.)", shape=cylinder, fillcolor="#d7ccc8"];
 
-  // ─── Phase Lifecycle ───────────────────────────────────────────────
+  // ─── AgentRun Phase Lifecycle ─────────────────────────────────────
   subgraph cluster_phases {
     label=<<B>AgentRun Phase Lifecycle</B>>;
     style=filled; fillcolor="#f3e5f5"; fontname="Arial"; fontsize=11;
@@ -196,29 +301,58 @@ digraph AgentOperatorArchitecture {
     p_running -> p_timedout [label="elapsed > timeout"];
   }
 
+  // ─── AgentWorkspace Phase Lifecycle ───────────────────────────────
+  subgraph cluster_ws_phases {
+    label=<<B>AgentWorkspace Phase Lifecycle</B>>;
+    style=filled; fillcolor="#e8eaf6"; fontname="Arial"; fontsize=11;
+    rankdir=LR;
+
+    wp_pending [label="Pending", shape=oval, fillcolor="#c5cae9"];
+    wp_init [label="Initializing", shape=oval, fillcolor="#9fa8da"];
+    wp_ready [label="Ready", shape=doubleoctagon, fillcolor="#66bb6a", fontcolor=white];
+    wp_failed [label="Failed", shape=doubleoctagon, fillcolor="#ef5350", fontcolor=white];
+
+    wp_pending -> wp_init [label="PVCs created,\ninit Job running"];
+    wp_init -> wp_ready [label="clone succeeded"];
+    wp_init -> wp_failed [label="clone failed"];
+  }
+
   // ═══ MAIN FLOW EDGES ══════════════════════════════════════════════
 
   // User creates CRDs
   user -> agentrun [label="kubectl apply"];
+  user -> agentworkspace [label="kubectl apply"];
   user -> agentprovider [style=dashed, color="#b0bec5"];
   user -> agentconfig [style=dashed, color="#b0bec5"];
 
   // Webhooks validate/default
   agentrun -> wh_run [label="admit", color="#c62828", fontcolor="#c62828"];
+  agentworkspace -> wh_workspace [label="admit", color="#c62828", fontcolor="#c62828"];
   agentprovider -> wh_provider [color="#c62828", style=dashed];
   agentconfig -> wh_config [color="#c62828", style=dashed];
 
   // Controllers watch CRDs
   agentrun -> ctrl_run [label="watch", color="#2e7d32", fontcolor="#2e7d32"];
+  agentworkspace -> ctrl_workspace [label="watch", color="#2e7d32", fontcolor="#2e7d32"];
   agentprovider -> ctrl_provider [color="#2e7d32", style=dashed];
   agentconfig -> ctrl_config [color="#2e7d32", style=dashed];
 
-  // AgentRun Reconciler orchestrates the steps
-  ctrl_run -> resolve_config [label="resolve", color="#4527a0", fontcolor="#4527a0"];
+  // AgentRun Reconciler — standalone path
+  ctrl_run -> resolve_config [label="standalone\npath", color="#4527a0", fontcolor="#4527a0"];
   ctrl_run -> resolve_provider [color="#4527a0"];
   ctrl_run -> build_pvc [color="#283593"];
   ctrl_run -> build_job [color="#283593"];
   ctrl_run -> watch_status [color="#e65100"];
+
+  // AgentRun Reconciler — workspace path
+  ctrl_run -> ws_resolve [label="workspace\npath", color="#00695c", fontcolor="#00695c"];
+  ws_resolve -> ws_build_job [color="#00695c"];
+  ws_build_job -> ws_watch_run [color="#00695c"];
+
+  // AgentWorkspace Reconciler
+  ctrl_workspace -> ws_create_pvcs [color="#f57f17", fontcolor="#f57f17"];
+  ctrl_workspace -> ws_init_job [color="#f57f17"];
+  ctrl_workspace -> ws_watch_status [color="#f57f17"];
 
   // Resolver → Secrets
   resolve_provider -> k8s_secret [label="read auth token", color="#5d4037", fontcolor="#5d4037"];
@@ -226,30 +360,47 @@ digraph AgentOperatorArchitecture {
   // Provider reconciler → Secrets
   ctrl_provider -> k8s_secret [label="validate exists", style=dashed, color="#5d4037", fontcolor="#5d4037"];
 
-  // Builder → K8s Resources
+  // Standalone builder → K8s Resources
   build_pvc -> pvc [label="create", color="#1565c0", fontcolor="#1565c0"];
   build_job -> job [label="create", color="#1565c0", fontcolor="#1565c0"];
 
-  // Job manages Pod
+  // Workspace builder → K8s Resources
+  ws_create_pvcs -> ws_pvc [label="create RWX", color="#0277bd", fontcolor="#0277bd"];
+  ws_init_job -> job [label="create init job", color="#0277bd", fontcolor="#0277bd"];
+  ws_build_job -> job [label="create run job", color="#00695c", fontcolor="#00695c"];
+
+  // Standalone Job → Pod
   job -> init_ctr [color="#1565c0"];
   init_ctr -> main_ctr [label="then"];
 
-  // PVC mounts
+  // Workspace Job → Pod
+  job -> ws_init_ctr [color="#0277bd"];
+  ws_init_ctr -> ws_main_ctr [label="then"];
+
+  // PVC mounts — standalone
   pvc -> init_ctr [label="/workspace", style=dashed, color="#1565c0", fontcolor="#1565c0"];
   pvc -> main_ctr [style=dashed, color="#1565c0"];
+
+  // PVC mounts — workspace
+  ws_pvc -> ws_init_ctr [label="/workspace\n+ shared vols", style=dashed, color="#0277bd", fontcolor="#0277bd"];
+  ws_pvc -> ws_main_ctr [style=dashed, color="#0277bd"];
 
   // Pod → External systems
   init_ctr -> git_repo [label="git clone", color="#5d4037", fontcolor="#5d4037"];
   main_ctr -> ai_api [label="API calls\n(ANTHROPIC_AUTH_TOKEN)", color="#5d4037", fontcolor="#5d4037"];
+  ws_main_ctr -> ai_api [color="#5d4037"];
 
   // Job status feedback
   job -> watch_status [label="job conditions", color="#e65100", fontcolor="#e65100", style=dashed];
+  job -> ws_watch_status [style=dashed, color="#f57f17"];
+  job -> ws_watch_run [style=dashed, color="#00695c"];
+
+  // AgentRun references AgentWorkspace
+  agentrun -> agentworkspace [label="workspaceRef", style=dashed, color="#ff6f00", fontcolor="#ff6f00"];
 
   // Layout hints
-  {rank=same; agentrun; agentprovider; agentconfig;}
-  {rank=same; wh_run; wh_provider; wh_config; ctrl_run; ctrl_provider; ctrl_config;}
-  {rank=same; resolve_config; resolve_provider; build_pvc; build_job;}
-  {rank=same; pvc; job;}
-  {rank=same; init_ctr; main_ctr;}
+  {rank=same; agentrun; agentworkspace; agentprovider; agentconfig;}
+  {rank=same; wh_run; wh_workspace; wh_provider; wh_config; ctrl_run; ctrl_workspace; ctrl_provider; ctrl_config;}
+  {rank=same; pvc; ws_pvc; job;}
   {rank=same; git_repo; ai_api; k8s_secret;}
 }

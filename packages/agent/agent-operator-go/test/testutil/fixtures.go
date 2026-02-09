@@ -173,6 +173,86 @@ func NewAgentConfig(namespace, name string, opts ...AgentConfigOption) *agentv1a
 	return config
 }
 
+// WithWorkspaceRef sets the workspace reference.
+func WithWorkspaceRef(ref string) AgentRunOption {
+	return func(r *agentv1alpha1.AgentRun) {
+		r.Spec.WorkspaceRef = ref
+		r.Spec.Repository = agentv1alpha1.RepositorySpec{}
+	}
+}
+
+// WithWorktree sets the worktree configuration.
+func WithWorktree(branch, sourceBranch string) AgentRunOption {
+	return func(r *agentv1alpha1.AgentRun) {
+		r.Spec.Worktree = &agentv1alpha1.WorktreeSpec{
+			Branch:       branch,
+			SourceBranch: sourceBranch,
+		}
+	}
+}
+
+// AgentWorkspaceOption configures an AgentWorkspace.
+type AgentWorkspaceOption func(*agentv1alpha1.AgentWorkspace)
+
+// WithWorkspaceRepository sets the workspace repository URL.
+func WithWorkspaceRepository(url string) AgentWorkspaceOption {
+	return func(ws *agentv1alpha1.AgentWorkspace) {
+		ws.Spec.Repository = agentv1alpha1.RepositorySpec{URL: url}
+	}
+}
+
+// WithWorkspaceRepositoryBranch sets the workspace repository branch.
+func WithWorkspaceRepositoryBranch(url, branch string) AgentWorkspaceOption {
+	return func(ws *agentv1alpha1.AgentWorkspace) {
+		ws.Spec.Repository = agentv1alpha1.RepositorySpec{URL: url, Branch: branch}
+	}
+}
+
+// WithWorkspaceStorageClass sets the storage class.
+func WithWorkspaceStorageClass(class string) AgentWorkspaceOption {
+	return func(ws *agentv1alpha1.AgentWorkspace) {
+		ws.Spec.StorageClass = class
+	}
+}
+
+// WithWorkspaceStorageSize sets the storage size.
+func WithWorkspaceStorageSize(size string) AgentWorkspaceOption {
+	return func(ws *agentv1alpha1.AgentWorkspace) {
+		ws.Spec.StorageSize = size
+	}
+}
+
+// WithSharedVolumes sets the shared volumes.
+func WithSharedVolumes(volumes ...agentv1alpha1.SharedVolumeSpec) AgentWorkspaceOption {
+	return func(ws *agentv1alpha1.AgentWorkspace) {
+		ws.Spec.SharedVolumes = volumes
+	}
+}
+
+// WithWorkspacePhase sets an initial status phase.
+func WithWorkspacePhase(phase agentv1alpha1.AgentWorkspacePhase) AgentWorkspaceOption {
+	return func(ws *agentv1alpha1.AgentWorkspace) {
+		ws.Status.Phase = phase
+	}
+}
+
+// NewAgentWorkspace creates an AgentWorkspace with defaults and applies options.
+func NewAgentWorkspace(namespace, name string, opts ...AgentWorkspaceOption) *agentv1alpha1.AgentWorkspace {
+	ws := &agentv1alpha1.AgentWorkspace{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      name,
+			Namespace: namespace,
+		},
+		Spec: agentv1alpha1.AgentWorkspaceSpec{
+			Repository: agentv1alpha1.RepositorySpec{URL: "https://github.com/example/repo"},
+		},
+	}
+	for _, opt := range opts {
+		opt(ws)
+	}
+	return ws
+}
+
 // NewSecret creates a Secret with the given data.
 func NewSecret(namespace, name string, data map[string][]byte) *corev1.Secret {
 	return &corev1.Secret{

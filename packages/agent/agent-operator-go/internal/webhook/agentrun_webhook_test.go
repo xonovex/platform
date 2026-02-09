@@ -187,3 +187,57 @@ func TestAgentRunWebhook_ValidateDelete(t *testing.T) {
 		t.Errorf("ValidateDelete() error = %v", err)
 	}
 }
+
+func TestAgentRunWebhook_Validate_WorkspaceRefWithWorktree(t *testing.T) {
+	w := &AgentRunWebhook{}
+	run := &agentv1alpha1.AgentRun{
+		Spec: agentv1alpha1.AgentRunSpec{
+			Agent:        agentv1alpha1.AgentTypeClaude,
+			WorkspaceRef: "my-workspace",
+			Worktree: &agentv1alpha1.WorktreeSpec{
+				Branch: "agent-1-work",
+			},
+		},
+	}
+
+	_, err := w.ValidateCreate(context.Background(), run)
+	if err != nil {
+		t.Errorf("ValidateCreate() error = %v, want nil", err)
+	}
+}
+
+func TestAgentRunWebhook_Validate_WorkspaceRefWithoutWorktree(t *testing.T) {
+	w := &AgentRunWebhook{}
+	run := &agentv1alpha1.AgentRun{
+		Spec: agentv1alpha1.AgentRunSpec{
+			Agent:        agentv1alpha1.AgentTypeClaude,
+			WorkspaceRef: "my-workspace",
+		},
+	}
+
+	_, err := w.ValidateCreate(context.Background(), run)
+	if err == nil {
+		t.Error("ValidateCreate() expected error for workspaceRef without worktree")
+	}
+}
+
+func TestAgentRunWebhook_Validate_WorkspaceRefWithRepository(t *testing.T) {
+	w := &AgentRunWebhook{}
+	run := &agentv1alpha1.AgentRun{
+		Spec: agentv1alpha1.AgentRunSpec{
+			Agent:        agentv1alpha1.AgentTypeClaude,
+			WorkspaceRef: "my-workspace",
+			Worktree: &agentv1alpha1.WorktreeSpec{
+				Branch: "agent-1-work",
+			},
+			Repository: agentv1alpha1.RepositorySpec{
+				URL: "https://github.com/example/repo.git",
+			},
+		},
+	}
+
+	_, err := w.ValidateCreate(context.Background(), run)
+	if err == nil {
+		t.Error("ValidateCreate() expected error for workspaceRef with repository")
+	}
+}

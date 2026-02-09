@@ -1,0 +1,146 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: agentworkspaces.agent.xonovex.com
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.17.0
+spec:
+  group: agent.xonovex.com
+  names:
+    kind: AgentWorkspace
+    listKind: AgentWorkspaceList
+    plural: agentworkspaces
+    singular: agentworkspace
+  scope: Namespaced
+  versions:
+    - name: v1alpha1
+      served: true
+      storage: true
+      additionalPrinterColumns:
+        - name: Phase
+          type: string
+          jsonPath: .status.phase
+        - name: Age
+          type: date
+          jsonPath: .metadata.creationTimestamp
+      subresources:
+        status: {}
+      schema:
+        openAPIV3Schema:
+          type: object
+          description: AgentWorkspace is the Schema for the agentworkspaces API
+          properties:
+            apiVersion:
+              type: string
+            kind:
+              type: string
+            metadata:
+              type: object
+            spec:
+              type: object
+              description: AgentWorkspaceSpec defines the desired state of AgentWorkspace
+              required:
+                - repository
+              properties:
+                repository:
+                  type: object
+                  description: Git repository to clone into the shared workspace
+                  required:
+                    - url
+                  properties:
+                    url:
+                      type: string
+                      description: Git repository URL
+                    branch:
+                      type: string
+                      description: Branch to checkout
+                    commit:
+                      type: string
+                      description: Commit to checkout (overrides branch)
+                    credentialsSecretRef:
+                      type: object
+                      description: Secret containing git credentials
+                      required:
+                        - name
+                        - key
+                      properties:
+                        name:
+                          type: string
+                        key:
+                          type: string
+                storageClass:
+                  type: string
+                  description: Storage class for the workspace PVC (must support ReadWriteMany)
+                storageSize:
+                  type: string
+                  description: Storage size for the workspace PVC (default 10Gi)
+                sharedVolumes:
+                  type: array
+                  description: Optional shared config/state directories for agents
+                  items:
+                    type: object
+                    required:
+                      - name
+                      - mountPath
+                    properties:
+                      name:
+                        type: string
+                        description: PVC name suffix and volume name
+                      mountPath:
+                        type: string
+                        description: Where to mount in agent containers
+                      storageSize:
+                        type: string
+                        description: Storage size for the shared volume PVC (default 1Gi)
+            status:
+              type: object
+              description: AgentWorkspaceStatus defines the observed state of AgentWorkspace
+              properties:
+                phase:
+                  type: string
+                  description: Phase of the AgentWorkspace
+                  enum:
+                    - Pending
+                    - Initializing
+                    - Ready
+                    - Failed
+                conditions:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                      - type
+                      - status
+                      - lastTransitionTime
+                      - reason
+                      - message
+                    properties:
+                      type:
+                        type: string
+                      status:
+                        type: string
+                        enum:
+                          - "True"
+                          - "False"
+                          - Unknown
+                      lastTransitionTime:
+                        type: string
+                        format: date-time
+                      reason:
+                        type: string
+                      message:
+                        type: string
+                      observedGeneration:
+                        type: integer
+                        format: int64
+                workspacePVC:
+                  type: string
+                  description: Name of the workspace PersistentVolumeClaim
+                sharedVolumePVCs:
+                  type: object
+                  additionalProperties:
+                    type: string
+                  description: Map of volume name to PVC name
+                initJobName:
+                  type: string
+                  description: Name of the init Job that cloned the repository

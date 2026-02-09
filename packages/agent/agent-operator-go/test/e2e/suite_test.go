@@ -120,6 +120,13 @@ func TestMain(m *testing.M) {
 		panic("failed to setup AgentConfig controller: " + err.Error())
 	}
 
+	if err := (&controller.AgentWorkspaceReconciler{
+		Client: mgr.GetClient(),
+		Scheme: mgr.GetScheme(),
+	}).SetupWithManager(mgr); err != nil {
+		panic("failed to setup AgentWorkspace controller: " + err.Error())
+	}
+
 	go func() {
 		if err := mgr.Start(ctx); err != nil {
 			panic("failed to start manager: " + err.Error())

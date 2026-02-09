@@ -44,3 +44,16 @@ func WaitForAgentRunPhase(t *testing.T, ctx context.Context, c client.Client, ke
 		return run.Status.Phase == phase
 	})
 }
+
+// WaitForWorkspacePhase waits for an AgentWorkspace to reach the given phase.
+func WaitForWorkspacePhase(t *testing.T, ctx context.Context, c client.Client, key client.ObjectKey, phase agentv1alpha1.AgentWorkspacePhase, timeout time.Duration) {
+	t.Helper()
+
+	WaitForCondition(t, ctx, timeout, func() bool {
+		var ws agentv1alpha1.AgentWorkspace
+		if err := c.Get(ctx, key, &ws); err != nil {
+			return false
+		}
+		return ws.Status.Phase == phase
+	})
+}

@@ -29,14 +29,13 @@ type AgentRunReconciler struct {
 // +kubebuilder:rbac:groups=agent.xonovex.com,resources=agentruns,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=agent.xonovex.com,resources=agentruns/status,verbs=get;update;patch
 // +kubebuilder:rbac:groups=agent.xonovex.com,resources=agentruns/finalizers,verbs=update
+// +kubebuilder:rbac:groups=agent.xonovex.com,resources=agentworkspaces,verbs=get;list;watch
 // +kubebuilder:rbac:groups=batch,resources=jobs,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups="",resources=pods,verbs=get;list;watch
 // +kubebuilder:rbac:groups="",resources=persistentvolumeclaims,verbs=get;list;watch;create;delete
 // +kubebuilder:rbac:groups="",resources=secrets,verbs=get;list;watch
 
 func (r *AgentRunReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	log := log.FromContext(ctx)
-
 	// 1. Fetch AgentRun
 	var agentRun agentv1alpha1.AgentRun
 	if err := r.Get(ctx, req.NamespacedName, &agentRun); err != nil {
@@ -53,6 +52,17 @@ func (r *AgentRunReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 		return ctrl.Result{}, nil
 	}
 
+	// Branch based on workspace mode
+	if agentRun.Spec.WorkspaceRef != "" {
+		return r.reconcileWithWorkspace(ctx, &agentRun)
+	}
+
+	return r.reconcileStandalone(ctx, &agentRun)
+}
+
+func (r *AgentRunReconciler) reconcileStandalone(ctx context.Context, agentRun *agentv1alpha1.AgentRun) (ctrl.Result, error) {
+	log := log.FromContext(ctx)
+
 	// 2. Resolve AgentConfig defaults
 	agentConfig, err := resolver.ResolveConfig(ctx, r.Client, agentRun.Namespace)
 	if err != nil {
@@ -60,10 +70,10 @@ func (r *AgentRunReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 	}
 
 	// 3. Resolve provider
-	providerEnv, err := resolver.ResolveProvider(ctx, r.Client, &agentRun, agentConfig)
+	providerEnv, err := resolver.ResolveProvider(ctx, r.Client, agentRun, agentConfig)
 	if err != nil {
 		log.Error(err, "failed to resolve provider")
-		return r.updatePhase(ctx, &agentRun, agentv1alpha1.AgentRunPhaseFailed, fmt.Sprintf("ProviderResolutionFailed: %v", err))
+		return r.updatePhase(ctx, agentRun, agentv1alpha1.AgentRunPhaseFailed, fmt.Sprintf("ProviderResolutionFailed: %v", err))
 	}
 
 	// 4. Create workspace PVC if needed
@@ -80,14 +90,14 @@ func (r *AgentRunReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 			}
 		}
 
-		pvc := builder.BuildPVC(pvcName, agentRun.Namespace, storageClass, storageSize, &agentRun)
+		pvc := builder.BuildPVC(pvcName, agentRun.Namespace, storageClass, storageSize, agentRun)
 		if err := r.Create(ctx, pvc); err != nil && !errors.IsAlreadyExists(err) {
 			log.Error(err, "failed to create workspace PVC")
 			return ctrl.Result{}, err
 		}
 
 		agentRun.Status.WorkspacePVC = pvcName
-		if _, err := r.updatePhase(ctx, &agentRun, agentv1alpha1.AgentRunPhaseInitializing, ""); err != nil {
+		if _, err := r.updatePhase(ctx, agentRun, agentv1alpha1.AgentRunPhaseInitializing, ""); err != nil {
 			return ctrl.Result{}, err
 		}
 	}
@@ -106,8 +116,8 @@ func (r *AgentRunReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 			}
 		}
 
-		job := builder.BuildJob(&agentRun, providerEnv, pvcName, defaultImage, defaultTimeout)
-		if err := ctrl.SetControllerReference(&agentRun, job, r.Scheme); err != nil {
+		job := builder.BuildJob(agentRun, providerEnv, pvcName, defaultImage, defaultTimeout)
+		if err := ctrl.SetControllerReference(agentRun, job, r.Scheme); err != nil {
 			return ctrl.Result{}, err
 		}
 
@@ -117,7 +127,7 @@ func (r *AgentRunReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 		}
 
 		agentRun.Status.JobName = jobName
-		if err := r.Status().Update(ctx, &agentRun); err != nil {
+		if err := r.Status().Update(ctx, agentRun); err != nil {
 			return ctrl.Result{}, err
 		}
 	}
@@ -131,8 +141,86 @@ func (r *AgentRunReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 		return ctrl.Result{}, err
 	}
 
-	// Update phase based on Job status
-	return r.reconcileJobStatus(ctx, &agentRun, &job)
+	return r.reconcileJobStatus(ctx, agentRun, &job)
+}
+
+func (r *AgentRunReconciler) reconcileWithWorkspace(ctx context.Context, agentRun *agentv1alpha1.AgentRun) (ctrl.Result, error) {
+	log := log.FromContext(ctx)
+
+	// 1. Resolve AgentWorkspace
+	ws, err := resolver.ResolveWorkspace(ctx, r.Client, agentRun.Namespace, agentRun.Spec.WorkspaceRef)
+	if err != nil {
+		log.Error(err, "failed to resolve workspace")
+		return r.updatePhase(ctx, agentRun, agentv1alpha1.AgentRunPhaseFailed, fmt.Sprintf("WorkspaceResolutionFailed: %v", err))
+	}
+
+	// Check workspace is ready
+	if ws.Status.Phase != agentv1alpha1.AgentWorkspacePhaseReady {
+		log.Info("workspace not ready, requeuing", "workspace", ws.Name, "phase", ws.Status.Phase)
+		return ctrl.Result{RequeueAfter: 5 * time.Second}, nil
+	}
+
+	// Record workspace PVC in status
+	if agentRun.Status.WorkspacePVC == "" {
+		agentRun.Status.WorkspacePVC = ws.Status.WorkspacePVC
+		if _, err := r.updatePhase(ctx, agentRun, agentv1alpha1.AgentRunPhaseInitializing, ""); err != nil {
+			return ctrl.Result{}, err
+		}
+	}
+
+	// 2. Resolve AgentConfig defaults
+	agentConfig, err := resolver.ResolveConfig(ctx, r.Client, agentRun.Namespace)
+	if err != nil {
+		log.Error(err, "failed to resolve agent config")
+	}
+
+	// 3. Resolve provider
+	providerEnv, err := resolver.ResolveProvider(ctx, r.Client, agentRun, agentConfig)
+	if err != nil {
+		log.Error(err, "failed to resolve provider")
+		return r.updatePhase(ctx, agentRun, agentv1alpha1.AgentRunPhaseFailed, fmt.Sprintf("ProviderResolutionFailed: %v", err))
+	}
+
+	// 4. Create Job if needed
+	jobName := agentRun.Name
+	if agentRun.Status.JobName == "" {
+		defaultImage := "node:trixie-slim"
+		defaultTimeout := time.Hour
+		if agentConfig != nil {
+			if agentConfig.Spec.DefaultImage != "" {
+				defaultImage = agentConfig.Spec.DefaultImage
+			}
+			if agentConfig.Spec.DefaultTimeout != nil {
+				defaultTimeout = agentConfig.Spec.DefaultTimeout.Duration
+			}
+		}
+
+		job := builder.BuildWorkspaceJob(agentRun, providerEnv, ws.Status.WorkspacePVC, ws.Spec.SharedVolumes, ws.Status.SharedVolumePVCs, defaultImage, defaultTimeout)
+		if err := ctrl.SetControllerReference(agentRun, job, r.Scheme); err != nil {
+			return ctrl.Result{}, err
+		}
+
+		if err := r.Create(ctx, job); err != nil && !errors.IsAlreadyExists(err) {
+			log.Error(err, "failed to create workspace job")
+			return ctrl.Result{}, err
+		}
+
+		agentRun.Status.JobName = jobName
+		if err := r.Status().Update(ctx, agentRun); err != nil {
+			return ctrl.Result{}, err
+		}
+	}
+
+	// 5. Watch Job status
+	var job batchv1.Job
+	if err := r.Get(ctx, types.NamespacedName{Name: jobName, Namespace: agentRun.Namespace}, &job); err != nil {
+		if errors.IsNotFound(err) {
+			return ctrl.Result{RequeueAfter: 5 * time.Second}, nil
+		}
+		return ctrl.Result{}, err
+	}
+
+	return r.reconcileJobStatus(ctx, agentRun, &job)
 }
 
 func (r *AgentRunReconciler) reconcileJobStatus(ctx context.Context, agentRun *agentv1alpha1.AgentRun, job *batchv1.Job) (ctrl.Result, error) {
