@@ -23,6 +23,10 @@
               pkgs.go_1_25
               pkgs.golangci-lint
 
+              # Kubernetes
+              pkgs.kind
+              pkgs.kubectl
+
               # Shell
               pkgs.shellcheck
               pkgs.shfmt

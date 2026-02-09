@@ -6,3 +6,36 @@ tags:
 dependsOn:
   - shared-core-go
   - shared-agent-go
+tasks:
+  go-test-integration:
+    command:
+      - go
+      - test
+      - -tags=integration
+      - -v
+      - -timeout=300s
+      - ./test/integration/
+    deps:
+      - go-build
+    inputs:
+      - '@globs(sources)'
+      - '@globs(tests)'
+    outputs: []
+    options:
+      cache: false
+  go-test-e2e:
+    command:
+      - go
+      - test
+      - -tags=e2e
+      - -v
+      - -timeout=600s
+      - ./test/e2e/
+    deps:
+      - go-build
+    inputs:
+      - '@globs(sources)'
+      - '@globs(tests)'
+    outputs: []
+    options:
+      cache: false

@@ -1,0 +1,4 @@
+FROM busybox:1.37
+ENV SLEEP_SECONDS=0
+ENV EXIT_CODE=0
+CMD sh -c "sleep ${SLEEP_SECONDS} && exit ${EXIT_CODE}"

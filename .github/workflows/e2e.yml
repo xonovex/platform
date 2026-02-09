@@ -1,0 +1,68 @@
+name: E2E Tests
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - packages/agent/agent-operator-go/**
+  pull_request:
+    paths:
+      - packages/agent/agent-operator-go/**
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  integration:
+    name: Integration Tests (envtest)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/agent/agent-operator-go
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: packages/agent/agent-operator-go/go.mod
+
+      - name: Install setup-envtest
+        run: go install sigs.k8s.io/controller-runtime/tools/setup-envtest@latest
+
+      - name: Setup envtest binaries
+        run: |
+          ENVTEST_ASSETS=$(setup-envtest use --bin-dir /tmp/envtest -p path)
+          echo "KUBEBUILDER_ASSETS=${ENVTEST_ASSETS}" >> "$GITHUB_ENV"
+
+      - name: Run integration tests
+        run: go test -tags=integration -v -timeout=300s ./test/integration/
+
+  e2e:
+    name: E2E Tests (Kind)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/agent/agent-operator-go
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: packages/agent/agent-operator-go/go.mod
+
+      - name: Create Kind cluster
+        uses: helm/kind-action@v1
+        with:
+          cluster_name: agent-operator-e2e
+          config: packages/agent/agent-operator-go/test/testdata/kind-config.yaml
+
+      - name: Install CRDs
+        run: kubectl apply -f config/crd/bases/
+
+      - name: Run e2e tests
+        env:
+          USE_EXISTING_CLUSTER: "true"
+        run: go test -tags=e2e -v -timeout=600s ./test/e2e/
