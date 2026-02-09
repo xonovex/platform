@@ -1,0 +1,255 @@
+digraph AgentOperatorArchitecture {
+  // Graph settings
+  rankdir=TB;
+  compound=true;
+  newrank=true;
+  splines=true;
+  nodesep=0.6;
+  ranksep=0.8;
+  fontname="Arial";
+  label=<<TABLE BORDER="0" CELLBORDER="0"><TR><TD><B><FONT POINT-SIZE="16">Agent Operator Architecture</FONT></B></TD></TR><TR><TD><FONT POINT-SIZE="11" COLOR="#666666">agent.xonovex.com/v1alpha1</FONT></TD></TR></TABLE>>;
+  labelloc=t;
+
+  // Default styles
+  node [shape=box, style="rounded,filled", fontname="Arial", fontsize=10];
+  edge [fontname="Arial", fontsize=8, color="#78909c"];
+
+  // ─── User ──────────────────────────────────────────────────────────
+  user [label="User / CI Pipeline", shape=house, fillcolor="#e8eaf6"];
+
+  // ─── CRDs ──────────────────────────────────────────────────────────
+  subgraph cluster_crds {
+    label=<<B>Custom Resources (CRDs)</B>>;
+    style=filled; fillcolor="#fff8e1"; fontname="Arial"; fontsize=11;
+
+    agentrun [
+      label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="1">
+        <TR><TD><B>AgentRun</B></TD></TR>
+        <TR><TD><FONT POINT-SIZE="8" COLOR="#555">agent: claude | opencode</FONT></TD></TR>
+        <TR><TD><FONT POINT-SIZE="8" COLOR="#555">repository: {url, branch, commit}</FONT></TD></TR>
+        <TR><TD><FONT POINT-SIZE="8" COLOR="#555">worktree: {branch, sourceBranch}</FONT></TD></TR>
+        <TR><TD><FONT POINT-SIZE="8" COLOR="#555">prompt, timeout, image, resources</FONT></TD></TR>
+        <TR><TD><FONT POINT-SIZE="8" COLOR="#555">providerRef | provider (inline)</FONT></TD></TR>
+        <TR><TD><FONT POINT-SIZE="8" COLOR="#555">nodeSelector, tolerations, env</FONT></TD></TR>
+      </TABLE>>,
+      fillcolor="#ffcc80"
+    ];
+
+    agentprovider [
+      label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="1">
+        <TR><TD><B>AgentProvider</B></TD></TR>
+        <TR><TD><FONT POINT-SIZE="8" COLOR="#555">agentTypes, displayName</FONT></TD></TR>
+        <TR><TD><FONT POINT-SIZE="8" COLOR="#555">authTokenSecretRef</FONT></TD></TR>
+        <TR><TD><FONT POINT-SIZE="8" COLOR="#555">environment, cliArgs</FONT></TD></TR>
+        <TR><TD><FONT POINT-SIZE="8" COLOR="#555">status.ready: bool</FONT></TD></TR>
+      </TABLE>>,
+      fillcolor="#ffe0b2"
+    ];
+
+    agentconfig [
+      label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="1">
+        <TR><TD><B>AgentConfig</B>  <FONT POINT-SIZE="7" COLOR="#999">(1 per ns)</FONT></TD></TR>
+        <TR><TD><FONT POINT-SIZE="8" COLOR="#555">defaultAgent, defaultProviders</FONT></TD></TR>
+        <TR><TD><FONT POINT-SIZE="8" COLOR="#555">defaultImage, defaultTimeout</FONT></TD></TR>
+        <TR><TD><FONT POINT-SIZE="8" COLOR="#555">storageClass, storageSize</FONT></TD></TR>
+        <TR><TD><FONT POINT-SIZE="8" COLOR="#555">defaultResources, env</FONT></TD></TR>
+      </TABLE>>,
+      fillcolor="#ffe0b2"
+    ];
+  }
+
+  // ─── Webhooks + Controller Manager side by side ────────────────────
+  subgraph cluster_webhooks {
+    label=<<B>Admission Webhooks</B>>;
+    style=filled; fillcolor="#fce4ec"; fontname="Arial"; fontsize=10;
+
+    wh_run [
+      label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="1">
+        <TR><TD><B>AgentRun Webhook</B></TD></TR>
+        <TR><TD><FONT POINT-SIZE="8">Default: agent=claude, timeout=1h</FONT></TD></TR>
+        <TR><TD><FONT POINT-SIZE="8">Validate: type, URL, no conflicts</FONT></TD></TR>
+      </TABLE>>,
+      fillcolor="#f8bbd0"
+    ];
+    wh_provider [label="AgentProvider\nWebhook", fillcolor="#f8bbd0"];
+    wh_config [label="AgentConfig\nWebhook", fillcolor="#f8bbd0"];
+  }
+
+  subgraph cluster_manager {
+    label=<<B>Controller Manager</B>  <FONT POINT-SIZE="8" COLOR="#666">:8081 health/ready</FONT>>;
+    style=filled; fillcolor="#e8f5e9"; fontname="Arial"; fontsize=11;
+
+    ctrl_run [label=<<B>AgentRun Reconciler</B>>, fillcolor="#a5d6a7"];
+    ctrl_provider [label="AgentProvider\nReconciler", fillcolor="#c8e6c9"];
+    ctrl_config [label="AgentConfig\nReconciler", fillcolor="#c8e6c9"];
+  }
+
+  // ─── Reconciliation Steps (the core flow) ──────────────────────────
+  subgraph cluster_reconcile {
+    label=<<B>AgentRun Reconciliation Steps</B>>;
+    style=filled; fillcolor="#f5f5f5"; fontname="Arial"; fontsize=11;
+
+    subgraph cluster_resolver {
+      label=<<B>resolver</B>>; style=filled; fillcolor="#ede7f6"; fontname="Arial"; fontsize=10;
+
+      resolve_config [label="1. ResolveConfig\n(list AgentConfig in ns)", fillcolor="#d1c4e9", fontsize=9];
+      resolve_provider [
+        label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="1">
+          <TR><TD><B>2. ResolveProvider</B></TD></TR>
+          <TR><TD><FONT POINT-SIZE="8">inline → providerRef → config default → empty</FONT></TD></TR>
+          <TR><TD><FONT POINT-SIZE="8">reads auth token from K8s Secret</FONT></TD></TR>
+        </TABLE>>,
+        fillcolor="#d1c4e9", fontsize=9
+      ];
+    }
+
+    subgraph cluster_builder {
+      label=<<B>builder</B>>; style=filled; fillcolor="#e8eaf6"; fontname="Arial"; fontsize=10;
+
+      build_pvc [label="3. BuildPVC\n(RWO, ownerRef → AgentRun)", fillcolor="#c5cae9", fontsize=9];
+      build_job [
+        label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="1">
+          <TR><TD><B>4. BuildJob</B></TD></TR>
+          <TR><TD><FONT POINT-SIZE="8">BuildInitContainers (git-clone script)</FONT></TD></TR>
+          <TR><TD><FONT POINT-SIZE="8">BuildMainContainers (agent command)</FONT></TD></TR>
+          <TR><TD><FONT POINT-SIZE="8">BuildEnvVars (provider + spec merge)</FONT></TD></TR>
+        </TABLE>>,
+        fillcolor="#c5cae9", fontsize=9
+      ];
+    }
+
+    watch_status [label="5. Watch Job Status\n→ update AgentRun phase", fillcolor="#fff9c4", fontsize=9];
+  }
+
+  // ─── K8s Resources ─────────────────────────────────────────────────
+  subgraph cluster_k8s {
+    label=<<B>Created Kubernetes Resources</B>>;
+    style=filled; fillcolor="#e3f2fd"; fontname="Arial"; fontsize=11;
+
+    pvc [
+      label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="1">
+        <TR><TD><B>PersistentVolumeClaim</B></TD></TR>
+        <TR><TD><FONT POINT-SIZE="8">{name}-workspace, RWO, 10Gi</FONT></TD></TR>
+      </TABLE>>,
+      fillcolor="#90caf9"
+    ];
+
+    job [
+      label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="1">
+        <TR><TD><B>Kubernetes Job</B></TD></TR>
+        <TR><TD><FONT POINT-SIZE="8">controllerRef → AgentRun</FONT></TD></TR>
+        <TR><TD><FONT POINT-SIZE="8">backoffLimit: 0, activeDeadline</FONT></TD></TR>
+      </TABLE>>,
+      fillcolor="#90caf9"
+    ];
+
+    subgraph cluster_pod {
+      label=<<B>Pod</B>  <FONT POINT-SIZE="8" COLOR="#666">(restartPolicy: Never)</FONT>>;
+      style=filled; fillcolor="#bbdefb"; fontname="Arial"; fontsize=10;
+
+      init_ctr [
+        label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="1">
+          <TR><TD><B>Init: git-clone</B></TD></TR>
+          <TR><TD><FONT POINT-SIZE="8">git clone --depth 1 --single-branch</FONT></TD></TR>
+          <TR><TD><FONT POINT-SIZE="8">opt: fetch+checkout commit</FONT></TD></TR>
+          <TR><TD><FONT POINT-SIZE="8">opt: git worktree add -b</FONT></TD></TR>
+        </TABLE>>,
+        fillcolor="#64b5f6"
+      ];
+
+      main_ctr [
+        label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="1">
+          <TR><TD><B>Main: agent</B></TD></TR>
+          <TR><TD><FONT POINT-SIZE="8">claude --permission-mode bypassPermissions</FONT></TD></TR>
+          <TR><TD><FONT POINT-SIZE="8">  [--print --prompt "task..."]</FONT></TD></TR>
+          <TR><TD><FONT POINT-SIZE="8">or: opencode [cliArgs...]</FONT></TD></TR>
+          <TR><TD><FONT POINT-SIZE="8">workingDir: /workspace (PVC)</FONT></TD></TR>
+        </TABLE>>,
+        fillcolor="#64b5f6"
+      ];
+    }
+  }
+
+  // ─── External ──────────────────────────────────────────────────────
+  k8s_secret [label="K8s Secrets\n(auth tokens, git creds)", shape=cylinder, fillcolor="#d7ccc8"];
+  git_repo [label="Git Repository", shape=cylinder, fillcolor="#d7ccc8"];
+  ai_api [label="AI Provider API\n(Anthropic, etc.)", shape=cylinder, fillcolor="#d7ccc8"];
+
+  // ─── Phase Lifecycle ───────────────────────────────────────────────
+  subgraph cluster_phases {
+    label=<<B>AgentRun Phase Lifecycle</B>>;
+    style=filled; fillcolor="#f3e5f5"; fontname="Arial"; fontsize=11;
+    rankdir=LR;
+
+    p_pending [label="Pending", shape=oval, fillcolor="#e1bee7"];
+    p_init [label="Initializing", shape=oval, fillcolor="#ce93d8"];
+    p_running [label="Running", shape=oval, fillcolor="#ab47bc", fontcolor=white];
+    p_succeeded [label="Succeeded", shape=doubleoctagon, fillcolor="#66bb6a", fontcolor=white];
+    p_failed [label="Failed", shape=doubleoctagon, fillcolor="#ef5350", fontcolor=white];
+    p_timedout [label="TimedOut", shape=doubleoctagon, fillcolor="#ffa726", fontcolor=white];
+
+    p_pending -> p_init [label="PVC created"];
+    p_pending -> p_failed [label="provider error", style=dashed];
+    p_init -> p_running [label="pod active"];
+    p_running -> p_succeeded [label="job complete"];
+    p_running -> p_failed [label="job failed"];
+    p_running -> p_timedout [label="elapsed > timeout"];
+  }
+
+  // ═══ MAIN FLOW EDGES ══════════════════════════════════════════════
+
+  // User creates CRDs
+  user -> agentrun [label="kubectl apply"];
+  user -> agentprovider [style=dashed, color="#b0bec5"];
+  user -> agentconfig [style=dashed, color="#b0bec5"];
+
+  // Webhooks validate/default
+  agentrun -> wh_run [label="admit", color="#c62828", fontcolor="#c62828"];
+  agentprovider -> wh_provider [color="#c62828", style=dashed];
+  agentconfig -> wh_config [color="#c62828", style=dashed];
+
+  // Controllers watch CRDs
+  agentrun -> ctrl_run [label="watch", color="#2e7d32", fontcolor="#2e7d32"];
+  agentprovider -> ctrl_provider [color="#2e7d32", style=dashed];
+  agentconfig -> ctrl_config [color="#2e7d32", style=dashed];
+
+  // AgentRun Reconciler orchestrates the steps
+  ctrl_run -> resolve_config [label="resolve", color="#4527a0", fontcolor="#4527a0"];
+  ctrl_run -> resolve_provider [color="#4527a0"];
+  ctrl_run -> build_pvc [color="#283593"];
+  ctrl_run -> build_job [color="#283593"];
+  ctrl_run -> watch_status [color="#e65100"];
+
+  // Resolver → Secrets
+  resolve_provider -> k8s_secret [label="read auth token", color="#5d4037", fontcolor="#5d4037"];
+
+  // Provider reconciler → Secrets
+  ctrl_provider -> k8s_secret [label="validate exists", style=dashed, color="#5d4037", fontcolor="#5d4037"];
+
+  // Builder → K8s Resources
+  build_pvc -> pvc [label="create", color="#1565c0", fontcolor="#1565c0"];
+  build_job -> job [label="create", color="#1565c0", fontcolor="#1565c0"];
+
+  // Job manages Pod
+  job -> init_ctr [color="#1565c0"];
+  init_ctr -> main_ctr [label="then"];
+
+  // PVC mounts
+  pvc -> init_ctr [label="/workspace", style=dashed, color="#1565c0", fontcolor="#1565c0"];
+  pvc -> main_ctr [style=dashed, color="#1565c0"];
+
+  // Pod → External systems
+  init_ctr -> git_repo [label="git clone", color="#5d4037", fontcolor="#5d4037"];
+  main_ctr -> ai_api [label="API calls\n(ANTHROPIC_AUTH_TOKEN)", color="#5d4037", fontcolor="#5d4037"];
+
+  // Job status feedback
+  job -> watch_status [label="job conditions", color="#e65100", fontcolor="#e65100", style=dashed];
+
+  // Layout hints
+  {rank=same; agentrun; agentprovider; agentconfig;}
+  {rank=same; wh_run; wh_provider; wh_config; ctrl_run; ctrl_provider; ctrl_config;}
+  {rank=same; resolve_config; resolve_provider; build_pvc; build_job;}
+  {rank=same; pvc; job;}
+  {rank=same; init_ctr; main_ctr;}
+  {rank=same; git_repo; ai_api; k8s_secret;}
+}
