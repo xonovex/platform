@@ -30,9 +30,9 @@ func BuildJob(run *agentv1alpha1.AgentRun, providerEnv map[string]string, pvcNam
 			Name:      run.Name,
 			Namespace: run.Namespace,
 			Labels: map[string]string{
-				"app.kubernetes.io/name":      "agent-operator",
-				"app.kubernetes.io/instance":  run.Name,
-				"app.kubernetes.io/component": "agent-run",
+				"app.kubernetes.io/name":       "agent-operator",
+				"app.kubernetes.io/instance":   run.Name,
+				"app.kubernetes.io/component":  "agent-run",
 				"agent.xonovex.com/agent-type": string(run.Spec.Agent),
 			},
 		},
@@ -42,9 +42,9 @@ func BuildJob(run *agentv1alpha1.AgentRun, providerEnv map[string]string, pvcNam
 			Template: corev1.PodTemplateSpec{
 				ObjectMeta: metav1.ObjectMeta{
 					Labels: map[string]string{
-						"app.kubernetes.io/name":      "agent-operator",
-						"app.kubernetes.io/instance":  run.Name,
-						"app.kubernetes.io/component": "agent-run",
+						"app.kubernetes.io/name":       "agent-operator",
+						"app.kubernetes.io/instance":   run.Name,
+						"app.kubernetes.io/component":  "agent-run",
 						"agent.xonovex.com/agent-type": string(run.Spec.Agent),
 					},
 				},

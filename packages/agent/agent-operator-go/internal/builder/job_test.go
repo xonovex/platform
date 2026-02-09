@@ -170,9 +170,9 @@ func TestBuildJob_Labels(t *testing.T) {
 	job := BuildJob(run, nil, "pvc", "image", time.Hour)
 
 	expectedLabels := map[string]string{
-		"app.kubernetes.io/name":      "agent-operator",
-		"app.kubernetes.io/instance":  "my-run",
-		"app.kubernetes.io/component": "agent-run",
+		"app.kubernetes.io/name":       "agent-operator",
+		"app.kubernetes.io/instance":   "my-run",
+		"app.kubernetes.io/component":  "agent-run",
 		"agent.xonovex.com/agent-type": "opencode",
 	}
 	for k, want := range expectedLabels {
