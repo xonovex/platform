@@ -13,7 +13,7 @@ vcs:
     commit-msg:
       - npx commitlint --edit $ARG1
     pre-commit:
-      - unset $(git rev-parse --local-env-vars 2>/dev/null || echo '') && .hooks/run-quality-checks.sh --staged --targets :lint,:typecheck --concurrency 4
+      - unset $(git rev-parse --local-env-vars 2>/dev/null || echo '') && .hooks/run-quality-checks.sh --staged --targets :lint,:typecheck,:test,:fmt-check --concurrency 4
   provider: github
   defaultBranch: main
   client: git

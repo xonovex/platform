@@ -6,6 +6,10 @@
   "bin": {
     "moon-version-detect": "./dist/src/index.js"
   },
+  "scripts": {
+    "fmt:check": "prettier --check .",
+    "fmt": "prettier --write ."
+  },
   "dependencies": {
     "@xonovex/script-moon-common": "0.0.0"
   },

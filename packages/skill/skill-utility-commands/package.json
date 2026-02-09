@@ -2,5 +2,14 @@
   "name": "@xonovex/skill-utility-commands",
   "version": "0.1.0",
   "private": true,
-  "keywords": ["xonovex", "skill", "commands", "utility"]
+  "keywords": [
+    "xonovex",
+    "skill",
+    "commands",
+    "utility"
+  ],
+  "scripts": {
+    "fmt:check": "prettier --check .",
+    "fmt": "prettier --write ."
+  }
 }
