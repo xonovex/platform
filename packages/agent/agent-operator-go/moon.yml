@@ -3,10 +3,27 @@ language: go
 layer: application
 tags:
   - go
+  - docker
 dependsOn:
   - shared-core-go
   - shared-agent-go
 tasks:
+  docker-build:
+    command:
+      - docker
+      - build
+      - -f
+      - packages/agent/agent-operator-go/Dockerfile
+      - -t
+      - agent-operator:latest
+      - .
+    inputs:
+      - '@globs(sources)'
+      - '@globs(dockerfiles)'
+    outputs: []
+    options:
+      cache: false
+      runFromWorkspaceRoot: true
   go-test-integration:
     command:
       - go
