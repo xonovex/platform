@@ -2,5 +2,14 @@
   "name": "@xonovex/skill-workflow-commands",
   "version": "0.1.0",
   "private": true,
-  "keywords": ["xonovex", "skill", "commands", "workflow"]
+  "keywords": [
+    "xonovex",
+    "skill",
+    "commands",
+    "workflow"
+  ],
+  "scripts": {
+    "fmt:check": "prettier --check .",
+    "fmt": "prettier --write ."
+  }
 }

@@ -8,10 +8,5 @@
   "homepage": "https://github.com/xonovex/platform/tree/main/packages/skill/skill-utility-commands",
   "repository": "https://github.com/xonovex/platform",
   "license": "MIT",
-  "keywords": [
-    "claude-code",
-    "plugin",
-    "commands",
-    "utility"
-  ]
+  "keywords": ["claude-code", "plugin", "commands", "utility"]
 }
