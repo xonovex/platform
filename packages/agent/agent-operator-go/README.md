@@ -16,8 +16,8 @@ kind: AgentRun
 metadata:
   name: review-codebase
 spec:
-  agent: claude                          # "claude" or "opencode"
-  providerRef: gemini-provider           # references an AgentProvider
+  agent: claude # "claude" or "opencode"
+  providerRef: gemini-provider # references an AgentProvider
   repository:
     url: https://github.com/org/repo.git
     branch: main
@@ -36,24 +36,24 @@ spec:
 
 #### Full spec reference
 
-| Field | Type | Description |
-|---|---|---|
-| `agent` | string | Agent type: `claude` or `opencode` |
-| `providerRef` | string | Name of an AgentProvider in the same namespace |
-| `provider` | object | Inline provider config (mutually exclusive with `providerRef`) |
-| `repository.url` | string | Git repository URL (required) |
-| `repository.branch` | string | Branch to checkout |
-| `repository.commit` | string | Specific commit to checkout (overrides branch) |
-| `repository.credentialsSecretRef` | object | Secret reference for git credentials |
-| `worktree.branch` | string | Create a git worktree with this branch name |
-| `worktree.sourceBranch` | string | Source branch to create the worktree from |
-| `prompt` | string | Task prompt for headless execution |
-| `resources` | object | K8s resource requirements for the agent container |
-| `timeout` | duration | Max run duration (default: `1h`) |
-| `env` | list | Additional environment variables |
-| `image` | string | Container image override |
-| `nodeSelector` | map | Node selector for pod scheduling |
-| `tolerations` | list | Tolerations for pod scheduling |
+| Field                             | Type     | Description                                                    |
+| --------------------------------- | -------- | -------------------------------------------------------------- |
+| `agent`                           | string   | Agent type: `claude` or `opencode`                             |
+| `providerRef`                     | string   | Name of an AgentProvider in the same namespace                 |
+| `provider`                        | object   | Inline provider config (mutually exclusive with `providerRef`) |
+| `repository.url`                  | string   | Git repository URL (required)                                  |
+| `repository.branch`               | string   | Branch to checkout                                             |
+| `repository.commit`               | string   | Specific commit to checkout (overrides branch)                 |
+| `repository.credentialsSecretRef` | object   | Secret reference for git credentials                           |
+| `worktree.branch`                 | string   | Create a git worktree with this branch name                    |
+| `worktree.sourceBranch`           | string   | Source branch to create the worktree from                      |
+| `prompt`                          | string   | Task prompt for headless execution                             |
+| `resources`                       | object   | K8s resource requirements for the agent container              |
+| `timeout`                         | duration | Max run duration (default: `1h`)                               |
+| `env`                             | list     | Additional environment variables                               |
+| `image`                           | string   | Container image override                                       |
+| `nodeSelector`                    | map      | Node selector for pod scheduling                               |
+| `tolerations`                     | list     | Tolerations for pod scheduling                                 |
 
 ### AgentProvider
 
@@ -120,8 +120,8 @@ kubectl apply -k config/crd/
 ### Deploy the operator
 
 ```bash
-# Build the operator image
-go build -o bin/operator ./cmd/operator/
+# Build the Docker image (run from repo root)
+docker build -f packages/agent/agent-operator-go/Dockerfile -t agent-operator:latest .
 
 # Deploy with kustomize (uses the default namespace/RBAC configuration)
 kubectl apply -k config/default/
@@ -270,6 +270,29 @@ spec:
     sourceBranch: main
   prompt: "Implement the user settings page"
 ```
+
+## Testing
+
+```bash
+# Unit tests
+go test ./...
+
+# Integration tests (envtest — real API server, no kubelet)
+# Requires: setup-envtest (go install sigs.k8s.io/controller-runtime/tools/setup-envtest@latest)
+KUBEBUILDER_ASSETS=$(setup-envtest use -p path) go test -tags=integration -v -timeout=300s ./test/integration/
+
+# E2E tests (Kind — full cluster with scheduling and garbage collection)
+# Requires: kind, kubectl, Docker
+go test -tags=e2e -v -timeout=600s ./test/e2e/
+
+# E2E against an existing cluster (skips Kind creation, skips image deployment test)
+USE_EXISTING_CLUSTER=true go test -tags=e2e -v -timeout=600s ./test/e2e/
+```
+
+### What the tests cover
+
+- **Integration (15 tests):** Reconciler logic against a real API server — PVC/Job creation, phase transitions (Running, Succeeded, Failed, TimedOut), provider resolution, AgentConfig defaults, terminal phase skipping.
+- **E2E (6 tests):** Full cluster behavior — Pod scheduling, PVC binding, init container failure propagation, owner reference garbage collection, and Docker image deployment with health probe validation.
 
 ## Architecture
 

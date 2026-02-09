@@ -21,10 +21,11 @@ import (
 )
 
 var (
-	k8sClient   client.Client
-	ctx         context.Context
-	cancel      context.CancelFunc
-	clusterName = "agent-operator-e2e"
+	k8sClient          client.Client
+	ctx                context.Context
+	cancel             context.CancelFunc
+	clusterName        = "agent-operator-e2e"
+	useExistingCluster bool
 )
 
 func TestMain(m *testing.M) {
@@ -32,7 +33,9 @@ func TestMain(m *testing.M) {
 
 	ctx, cancel = context.WithCancel(context.Background())
 
-	useExisting := os.Getenv("USE_EXISTING_CLUSTER") == "true"
+	useExistingCluster = os.Getenv("USE_EXISTING_CLUSTER") == "true"
+
+	useExisting := useExistingCluster
 
 	if !useExisting {
 		kindConfig := filepath.Join("..", "testdata", "kind-config.yaml")
