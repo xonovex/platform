@@ -79,8 +79,19 @@ func (w *AgentRunWebhook) validate(run *agentv1alpha1.AgentRun) (admission.Warni
 		return nil, fmt.Errorf("invalid agent type: %s, must be one of: claude, opencode", run.Spec.Agent)
 	}
 
-	if run.Spec.Repository.URL == "" {
-		return nil, fmt.Errorf("repository URL is required")
+	if run.Spec.WorkspaceRef != "" {
+		// Workspace mode: worktree is required, repository must be empty
+		if run.Spec.Worktree == nil {
+			return nil, fmt.Errorf("worktree is required when workspaceRef is set")
+		}
+		if run.Spec.Repository.URL != "" {
+			return nil, fmt.Errorf("repository must not be set when workspaceRef is set")
+		}
+	} else {
+		// Standalone mode: repository URL is required
+		if run.Spec.Repository.URL == "" {
+			return nil, fmt.Errorf("repository URL is required")
+		}
 	}
 
 	if run.Spec.ProviderRef != "" && run.Spec.Provider != nil {

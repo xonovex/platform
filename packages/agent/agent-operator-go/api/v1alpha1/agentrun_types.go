@@ -73,8 +73,10 @@ type AgentRunSpec struct {
 	ProviderRef string `json:"providerRef,omitempty"`
 	// Provider is an inline provider configuration
 	Provider *ProviderSpec `json:"provider,omitempty"`
+	// WorkspaceRef references an AgentWorkspace for shared workspace support
+	WorkspaceRef string `json:"workspaceRef,omitempty"`
 	// Repository to clone
-	Repository RepositorySpec `json:"repository"`
+	Repository RepositorySpec `json:"repository,omitempty"`
 	// Worktree configuration
 	Worktree *WorktreeSpec `json:"worktree,omitempty"`
 	// Prompt for headless task execution

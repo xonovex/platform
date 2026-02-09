@@ -2,3 +2,4 @@ resources:
   - bases/agent.xonovex.com_agentruns.yaml
   - bases/agent.xonovex.com_agentproviders.yaml
   - bases/agent.xonovex.com_agentconfigs.yaml
+  - bases/agent.xonovex.com_agentworkspaces.yaml

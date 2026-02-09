@@ -44,7 +44,6 @@ spec:
               description: AgentRunSpec defines the desired state of AgentRun
               required:
                 - agent
-                - repository
               properties:
                 agent:
                   type: string
@@ -55,6 +54,9 @@ spec:
                 providerRef:
                   type: string
                   description: References an AgentProvider in the namespace
+                workspaceRef:
+                  type: string
+                  description: References an AgentWorkspace for shared workspace support
                 provider:
                   type: object
                   description: Inline provider configuration
