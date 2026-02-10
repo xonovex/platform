@@ -4,18 +4,16 @@ Base ESLint configuration for all Xonovex TypeScript projects.
 
 ## Export Condition Ordering
 
-The `"import"` condition **must** appear before `"node"` in `package.json` exports. ESLint uses jiti to load config files, and jiti resolves modules via mlly with conditions `['node', 'import']` checked in **object key order**. Placing `"import"` first ensures jiti resolves to `src/index.ts` (source), allowing consumers to use this package without it being built first.
+`"import"` must appear before `"node"` in `package.json` exports — jiti resolves conditions in object key order.
 
-- **`"import"` first**: jiti resolves to `src/index.ts` (source, no build needed)
-- **`"node"` first**: jiti resolves to `dist/src/index.js` (requires build)
-- **CJS consumers**: Fall through to `"node"` regardless of order
-- **Published packages**: `src` is included in `"files"` so the source path resolves on npm too
+- `"import"` first → `src/index.ts` (no build needed)
+- `"node"` first → `dist/src/index.js` (requires build)
+- CJS consumers fall through to `"node"` regardless
+- Published: `src` in `"files"` so source path resolves on npm
 
 ## Self-Lint
 
-This package uses its own config to lint itself. The `eslint.config.ts` uses a relative import (`./src/index.ts`) instead of the package name to avoid a project service conflict: when loaded from source, the shared config sets `tsconfigRootDir: import.meta.dirname` to the `src/` subdirectory, which prevents the TypeScript project service from finding files. The `tsconfigRootDir` override in `eslint.config.ts` corrects this.
-
-The `eslint.config.ts` is excluded from `tsconfig.json` `include` because the `.ts` extension import requires `allowImportingTsExtensions`, and the file should not be emitted to `dist/`.
+Uses own config via relative import (`./src/index.ts`) to avoid project service conflict (`tsconfigRootDir` would point to `src/`). `eslint.config.ts` excluded from `tsconfig.json` (`allowImportingTsExtensions` required, not emitted).
 
 ## Guidelines
 

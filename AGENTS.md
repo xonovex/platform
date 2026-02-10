@@ -4,34 +4,32 @@ Monorepo for Xonovex tools and configuration packages.
 
 ## Structure
 
-### Subdirectories
+- `packages/config/` — shared configs (ESLint, TypeScript, Vitest, Prettier, Vite)
+- `packages/agent/` — CLI tools (agent-cli, agent-cli-go)
+- `packages/shared/` — shared libraries (shared-core, shared-core-go)
+- `packages/guide/` — Claude Code guides
+- `packages/prompt/` — Claude Code prompts
+- `packages/diagram/` — diagrams (action graph, workflow)
+- `packages/asset/` — static assets
 
-- **`packages/config/`**: Shared configuration packages (ESLint, TypeScript, Vitest, Prettier, Vite)
-- **`packages/agent/`**: CLI tools (agent-cli, agent-cli-go)
-- **`packages/shared/`**: Shared libraries (shared-core, shared-core-go)
-- **`packages/guide/`**: Claude Code guides (guidelines)
-- **`packages/prompt/`**: Claude Code prompts (commands)
-- **`packages/diagram/`**: Diagram packages (action graph diagrams, workflow diagrams)
-- **`packages/asset/`**: Static assets (images)
+## Workflow
 
-### Workflow
+- Setup → `npm install`
+- Tasks → `npx moon run <project>:<task>` or `:<task>` for all
+- Templates in `.moon/tasks/*.yml` auto-inherit by type/language/tags
+- Query → `moon query projects`
 
-- **Setup**: `npm install`
-- **Tasks**: `npx moon run <project>:<task>` or `npx moon run :<task>` for all
-- **Moon**: Templates in `.moon/tasks/*.yml` auto-inherit by type/language/tags
-- **Query**: Filter projects with `moon query projects`
+## Code Style
 
-### Code Style
-
-- **Imports**: Direct from source, no re-exports or backwards-compatibility wrappers
-- **Design**: Modular functions, explicit context, small focused files
-- **Quality**: Strict types, clear naming, explicit error handling
-- **Validation**: typecheck, lint, build, test must pass; fix warnings at root cause
-- **Deprecation**: Remove unused/deprecated code immediately; do not add @deprecated markers or keep backwards-compatibility shims
-- **Paradigm**: Follow the [Functional Programming](packages/guide/guide-general-fp/index.md) guidelines
+- Direct imports from source, no re-exports or shims
+- Modular functions, explicit context, small focused files
+- Strict types, clear naming, explicit error handling
+- typecheck, lint, build, test must pass; fix at root cause
+- Remove unused/deprecated code immediately; no @deprecated markers
+- Follow [Functional Programming](packages/guide/guide-general-fp/index.md) guidelines
 
 ## Commit Convention
 
-Uses [Conventional Commits](https://www.conventionalcommits.org/). Format: `type(scope): description`
+[Conventional Commits](https://www.conventionalcommits.org/): `type(scope): description`
 
 Types: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`, `build`, `ci`, `perf`, `revert`

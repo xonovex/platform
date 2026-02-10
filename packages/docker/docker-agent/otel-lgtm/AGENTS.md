@@ -4,27 +4,27 @@ OpenTelemetry + Grafana LGTM stack for Claude Code monitoring.
 
 ## Structure
 
-- `dashboards/` — Grafana dashboard JSON definitions
-- `provisioning/` — Grafana provisioning configuration
+- `dashboards/` — Grafana dashboard JSON
+- `provisioning/` — Grafana provisioning config
 
 ## Workflow
 
-- **Config mounts**: Custom configs mount to `/otel-lgtm/` (not `/etc/`)
-- **Dashboard import**: Init container imports dashboards via Grafana API on startup
-- **Metrics flow**: Claude Code → OTLP (4317) → OTEL Collector → Prometheus exporter (8889) → Prometheus scrape → Grafana query
+- Config mounts → `/otel-lgtm/` (not `/etc/`)
+- Dashboard import → init container via Grafana API on startup
+- Metrics → Claude Code → OTLP (4317) → OTEL Collector → Prometheus (8889) → Grafana
 
 ## Dashboard Style
 
-- **Colors**: Default Grafana palette only (`palette-classic`), no custom overrides
-- **Stat panels**: `colorMode: "none"`, plain text values, no colored backgrounds
-- **Thresholds**: None for cost/tokens (unlimited plan, informational only)
-- **Charts**: Smooth interpolation, gradient fills, donut charts, `thresholdsStyle: "off"`
-- **Philosophy**: Clean, minimal, information-focused—no visual indicators implying cost judgments
+- Default Grafana palette only (`palette-classic`), no custom overrides
+- Stat panels: `colorMode: "none"`, plain text, no colored backgrounds
+- No thresholds for cost/tokens (informational only)
+- Charts: smooth interpolation, gradient fills, donut, `thresholdsStyle: "off"`
+- Clean, minimal, information-focused — no cost judgment indicators
 
 ## Integration
 
-- **Upstream**: Claude Code (OTLP metrics and logs)
-- **Downstream**: Grafana (port 3000), Prometheus (port 9090)
+- Upstream → Claude Code (OTLP metrics and logs)
+- Downstream → Grafana (3000), Prometheus (9090)
 
 ## Guidelines
 
