@@ -4,10 +4,10 @@ Kubernetes operator for managing AI coding agent runs.
 
 ## CRDs
 
-- **AgentRun**: Primary workload resource - creates Jobs for agent execution (standalone or workspace-based)
-- **AgentWorkspace**: Shared workspace with RWX PVC for multi-agent coordination via git worktrees and shared config volumes
-- **AgentProvider**: Reusable provider configuration with K8s secret management
-- **AgentConfig**: Namespace-level defaults
+- **AgentRun** — creates Jobs for agent execution (standalone or workspace-based)
+- **AgentWorkspace** — shared RWX PVC for multi-agent coordination (git worktrees, shared config volumes)
+- **AgentProvider** — reusable provider config with K8s secret management
+- **AgentConfig** — namespace-level defaults
 
 ## Testing
 
@@ -17,6 +17,5 @@ Kubernetes operator for managing AI coding agent runs.
 
 ## Docker
 
-Build from repo root: `docker build -f packages/agent/agent-operator-go/Dockerfile -t agent-operator:latest .`
-
-Moon task: `npx moon run agent-operator-go:docker-build`
+- Build → `docker build -f packages/agent/agent-operator-go/Dockerfile -t agent-operator:latest .`
+- Moon → `npx moon run agent-operator-go:docker-build`
