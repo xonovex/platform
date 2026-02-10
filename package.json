@@ -6,7 +6,8 @@
   "workspaces": [
     "packages/asset/*",
     "packages/diagram/*",
-    "packages/skill/*",
+    "packages/guide/*",
+    "packages/prompt/*",
     "packages/config/*",
     "packages/agent/*",
     "packages/shared/*",

@@ -1,0 +1,15 @@
+{
+  "name": "@xonovex/guide-skill",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "keywords": [
+    "xonovex",
+    "guide",
+    "guide"
+  ],
+  "scripts": {
+    "fmt": "prettier --write .",
+    "fmt:check": "prettier --check ."
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "name": "@xonovex/guide-cmake",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "keywords": [
+    "xonovex",
+    "guide",
+    "cmake"
+  ],
+  "scripts": {
+    "fmt": "prettier --write .",
+    "fmt:check": "prettier --check ."
+  }
+}

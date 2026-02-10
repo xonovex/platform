@@ -1,0 +1,15 @@
+{
+  "name": "@xonovex/guide-docker",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "keywords": [
+    "xonovex",
+    "guide",
+    "docker"
+  ],
+  "scripts": {
+    "fmt": "prettier --write .",
+    "fmt:check": "prettier --check ."
+  }
+}

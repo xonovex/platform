@@ -1,0 +1,15 @@
+{
+  "name": "@xonovex/guide-terraform",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "keywords": [
+    "xonovex",
+    "guide",
+    "terraform"
+  ],
+  "scripts": {
+    "fmt": "prettier --write .",
+    "fmt:check": "prettier --check ."
+  }
+}

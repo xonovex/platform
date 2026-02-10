@@ -4,4 +4,4 @@ Moon action graph diagrams.
 
 ## Guidelines
 
-- See [moon-guidelines](../../skill/skill-moon/skills/moon-guidelines/SKILL.md)
+- See [moon-guidelines](../../guide/guide-moon/index.md)

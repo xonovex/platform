@@ -34,36 +34,6 @@ npm install -g @xonovex/agent-cli
 npm install -g @xonovex/agent-cli-go
 ```
 
-### Claude Code guideline plugins
-
-```bash
-# Add the Xonovex marketplace (from within Claude Code)
-/plugin marketplace add xonovex/platform
-
-# Install individual guideline plugins
-/plugin install xonovex-typescript-guidelines@xonovex-platform
-/plugin install xonovex-react-guidelines@xonovex-platform
-```
-
-Or use locally during development:
-
-```bash
-claude --plugin-dir ./packages/skill/skill-typescript
-```
-
-<details>
-<summary><strong>Available Skills</strong></summary>
-
-| Category | Skills |
-|----------|--------|
-| Languages | `typescript-guidelines`, `python-guidelines`, `c99-guidelines`, `lua-guidelines` |
-| Frameworks | `react-guidelines`, `hono-guidelines`, `express.js-guidelines`, `astro-guidelines` |
-| Infrastructure | `docker-guidelines`, `kubernetes-guidelines`, `terraform-guidelines` |
-| Testing | `vitest-guidelines`, `zod-guidelines` |
-| Workflow | `git-guidelines`, `plan-guidelines`, `skill-guidelines` |
-
-</details>
-
 ## Running Agents
 
 ```
