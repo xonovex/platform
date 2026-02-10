@@ -1,0 +1,8 @@
+$schema: https://moonrepo.dev/schemas/project.json
+language: unknown
+tags: [prompt]
+tasks:
+  build:
+    command: echo 'build complete'
+    options:
+      cache: false

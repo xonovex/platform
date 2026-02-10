@@ -1,0 +1,14 @@
+{
+  "name": "@xonovex/prompt-workflow",
+  "version": "0.1.0",
+  "private": true,
+  "keywords": [
+    "xonovex",
+    "prompt",
+    "workflow"
+  ],
+  "scripts": {
+    "fmt:check": "prettier --check .",
+    "fmt": "prettier --write ."
+  }
+}

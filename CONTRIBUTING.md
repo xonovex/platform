@@ -19,10 +19,11 @@ packages/
   diagram/              # Diagram packages
     diagram-agent-workflow/ # Agent workflow diagram
     diagram-moon-action/ # Moon action graph diagrams
-  skill/                # Claude Code skills
-    skill-*/ (35)       # Guideline skill packages (guidelines + build)
-    skill-workflow-commands/  # Workflow commands (plan, git, insights, code)
-    skill-utility-commands/  # Utility commands (content, instructions, skills, slash commands)
+  guide/                # Claude Code guides
+    guide-*/ (35)       # Guideline packages (guidelines + build)
+  prompt/               # Claude Code prompts
+    prompt-utility/     # Utility commands (content, instructions, slash commands)
+    prompt-workflow/    # Workflow commands (plan, git, insights, code)
   script/               # Internal build scripts
     script-moon-common/ # Shared moon script utilities
     script-moon-*/      # Moon task scripts (action-graph, npm-check, npm-publish, version-bump, version-detect)
@@ -30,7 +31,6 @@ packages/
     shared-core/        # Core TypeScript library (@xonovex/core)
     shared-core-go/     # Core Go library
 .claude/commands/       # Claude Code slash commands
-.claude-plugin/         # Claude Code plugin marketplace
 ```
 
 ## Development
@@ -91,19 +91,9 @@ npx moon run moon-version-detect:run
 npx moon run moon-version-detect:run -- --base main
 ```
 
-## Claude Code Skills
+## Claude Code Guides
 
-The monorepo hosts a Claude Code plugin marketplace at `.claude-plugin/marketplace.json` containing 37 skill packages:
-
-- **35 guideline skills** — each contains guidelines in `SKILL.md` and copies them into a `skills/` directory during build
-- **2 command skills** — copy slash commands from `.claude/commands/` into a `commands/` directory during build
-
-Install plugins via:
-
-```
-/plugin marketplace add <owner>/<repo>
-/plugin install <plugin-name>
-```
+The monorepo contains 35 guideline packages in `packages/guide/`, each with an `index.md` containing the guidelines.
 
 ## Code Style
 

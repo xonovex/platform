@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import {existsSync, readFileSync, writeFileSync} from "node:fs";
+import {existsSync} from "node:fs";
 import {dirname, join, relative} from "node:path";
 import {
   findAllPackageJsonPaths,
@@ -219,21 +219,6 @@ const main = (): void => {
           );
         }
       }
-    }
-  }
-
-  // Update .claude-plugin/plugin.json if present
-  const pluginJsonPath = join(cwd, ".claude-plugin", "plugin.json");
-  if (existsSync(pluginJsonPath)) {
-    if (dryRun) {
-      logInfo(`[dry-run] plugin.json -> ${newVersion}`);
-    } else {
-      const pluginJson = JSON.parse(
-        readFileSync(pluginJsonPath, "utf8"),
-      ) as Record<string, unknown>;
-      pluginJson.version = newVersion;
-      writeFileSync(pluginJsonPath, JSON.stringify(pluginJson, null, 2) + "\n");
-      logInfo(`plugin.json -> ${newVersion}`);
     }
   }
 

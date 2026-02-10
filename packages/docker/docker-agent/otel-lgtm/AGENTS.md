@@ -28,5 +28,5 @@ OpenTelemetry + Grafana LGTM stack for Claude Code monitoring.
 
 ## Guidelines
 
-- See [docker-guidelines](../../../skill/skill-docker/skills/docker-guidelines/SKILL.md)
-- See [shell-scripting-guidelines](../../../skill/skill-shell-scripting/skills/shell-scripting-guidelines/SKILL.md)
+- See [docker-guidelines](../../../guide/guide-docker/index.md)
+- See [shell-scripting-guidelines](../../../guide/guide-shell-scripting/index.md)

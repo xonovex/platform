@@ -1,0 +1,14 @@
+{
+  "name": "@xonovex/prompt-utility",
+  "version": "0.1.0",
+  "private": true,
+  "keywords": [
+    "xonovex",
+    "prompt",
+    "utility"
+  ],
+  "scripts": {
+    "fmt:check": "prettier --check .",
+    "fmt": "prettier --write ."
+  }
+}

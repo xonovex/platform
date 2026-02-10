@@ -4,5 +4,5 @@ Shared utilities for Moon scripts.
 
 ## Guidelines
 
-- See [typescript-guidelines](../../skill/skill-typescript/skills/typescript-guidelines/SKILL.md)
-- See [moon-guidelines](../../skill/skill-moon/skills/moon-guidelines/SKILL.md)
+- See [typescript-guidelines](../../guide/guide-typescript/index.md)
+- See [moon-guidelines](../../guide/guide-moon/index.md)
