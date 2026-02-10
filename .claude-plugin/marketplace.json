@@ -9,187 +9,187 @@
   "plugins": [
     {
       "name": "workflow-commands",
-      "source": "./skill-workflow-commands",
+      "source": "./packages/skill/skill-workflow-commands",
       "description": "Plan creation, git workflows, code analysis, and insight extraction commands"
     },
     {
       "name": "utility-commands",
-      "source": "./skill-utility-commands",
+      "source": "./packages/skill/skill-utility-commands",
       "description": "Content generation, project instructions, skill management, and slash command utilities"
     },
     {
       "name": "astro-skills",
-      "source": "./skill-astro",
+      "source": "./packages/skill/skill-astro",
       "description": "Astro framework coding guidelines and best practices"
     },
     {
       "name": "c99-game-opinionated-skills",
-      "source": "./skill-c99-game-opinionated",
+      "source": "./packages/skill/skill-c99-game-opinionated",
       "description": "Opinionated C99 guidelines for game development"
     },
     {
       "name": "c99-skills",
-      "source": "./skill-c99",
+      "source": "./packages/skill/skill-c99",
       "description": "C99 coding guidelines and best practices"
     },
     {
       "name": "c99-opinionated-skills",
-      "source": "./skill-c99-opinionated",
+      "source": "./packages/skill/skill-c99-opinionated",
       "description": "Opinionated C99 coding guidelines and conventions"
     },
     {
       "name": "cmake-skills",
-      "source": "./skill-cmake",
+      "source": "./packages/skill/skill-cmake",
       "description": "CMake build system guidelines and best practices"
     },
     {
       "name": "content-skills",
-      "source": "./skill-content",
+      "source": "./packages/skill/skill-content",
       "description": "Content writing and documentation guidelines"
     },
     {
       "name": "docker-skills",
-      "source": "./skill-docker",
+      "source": "./packages/skill/skill-docker",
       "description": "Docker containerization guidelines and best practices"
     },
     {
       "name": "express.js-skills",
-      "source": "./skill-express.js",
+      "source": "./packages/skill/skill-express.js",
       "description": "Express.js API development guidelines and best practices"
     },
     {
       "name": "general-fp-skills",
-      "source": "./skill-general-fp",
+      "source": "./packages/skill/skill-general-fp",
       "description": "Functional programming principles and patterns"
     },
     {
       "name": "general-oop-skills",
-      "source": "./skill-general-oop",
+      "source": "./packages/skill/skill-general-oop",
       "description": "Object-oriented programming principles and patterns"
     },
     {
       "name": "git-skills",
-      "source": "./skill-git",
+      "source": "./packages/skill/skill-git",
       "description": "Git version control guidelines and commit conventions"
     },
     {
       "name": "hono-skills",
-      "source": "./skill-hono",
+      "source": "./packages/skill/skill-hono",
       "description": "Hono web framework guidelines and best practices"
     },
     {
       "name": "hono-opinionated-skills",
-      "source": "./skill-hono-opinionated",
+      "source": "./packages/skill/skill-hono-opinionated",
       "description": "Opinionated Hono web framework guidelines and conventions"
     },
     {
       "name": "insights-skills",
-      "source": "./skill-insights",
+      "source": "./packages/skill/skill-insights",
       "description": "Development insights extraction and integration guidelines"
     },
     {
       "name": "instruction-skills",
-      "source": "./skill-instruction",
+      "source": "./packages/skill/skill-instruction",
       "description": "Project instruction authoring and management guidelines"
     },
     {
       "name": "kubernetes-skills",
-      "source": "./skill-kubernetes",
+      "source": "./packages/skill/skill-kubernetes",
       "description": "Kubernetes orchestration guidelines and best practices"
     },
     {
       "name": "lua-skills",
-      "source": "./skill-lua",
+      "source": "./packages/skill/skill-lua",
       "description": "Lua coding guidelines and best practices"
     },
     {
       "name": "lua-opinionated-skills",
-      "source": "./skill-lua-opinionated",
+      "source": "./packages/skill/skill-lua-opinionated",
       "description": "Opinionated Lua coding guidelines and conventions"
     },
     {
       "name": "moon-skills",
-      "source": "./skill-moon",
+      "source": "./packages/skill/skill-moon",
       "description": "Moonrepo task runner guidelines and configuration patterns"
     },
     {
       "name": "motion-react-skills",
-      "source": "./skill-motion-react",
+      "source": "./packages/skill/skill-motion-react",
       "description": "Motion (Framer Motion) animation guidelines for React"
     },
     {
       "name": "plan-skills",
-      "source": "./skill-plan",
+      "source": "./packages/skill/skill-plan",
       "description": "Implementation planning and task breakdown guidelines"
     },
     {
       "name": "presentation-skills",
-      "source": "./skill-presentation",
+      "source": "./packages/skill/skill-presentation",
       "description": "Presentation creation and slide design guidelines"
     },
     {
       "name": "python-skills",
-      "source": "./skill-python",
+      "source": "./packages/skill/skill-python",
       "description": "Python coding guidelines and best practices"
     },
     {
       "name": "react-skills",
-      "source": "./skill-react",
+      "source": "./packages/skill/skill-react",
       "description": "React component and application development guidelines"
     },
     {
       "name": "remotion-skills",
-      "source": "./skill-remotion",
+      "source": "./packages/skill/skill-remotion",
       "description": "Remotion programmatic video creation guidelines"
     },
     {
       "name": "shell-scripting-skills",
-      "source": "./skill-shell-scripting",
+      "source": "./packages/skill/skill-shell-scripting",
       "description": "Shell scripting guidelines and best practices"
     },
     {
       "name": "skill-skills",
-      "source": "./skill-skill",
+      "source": "./packages/skill/skill-skill",
       "description": "Claude Code skill authoring and structure guidelines"
     },
     {
       "name": "sql-postgresql-skills",
-      "source": "./skill-sql-postgresql",
+      "source": "./packages/skill/skill-sql-postgresql",
       "description": "SQL and PostgreSQL database guidelines and best practices"
     },
     {
       "name": "strudel-skills",
-      "source": "./skill-strudel",
+      "source": "./packages/skill/skill-strudel",
       "description": "Strudel live coding music pattern guidelines"
     },
     {
       "name": "terraform-skills",
-      "source": "./skill-terraform",
+      "source": "./packages/skill/skill-terraform",
       "description": "Terraform infrastructure-as-code guidelines and best practices"
     },
     {
       "name": "threejs-skills",
-      "source": "./skill-threejs",
+      "source": "./packages/skill/skill-threejs",
       "description": "Three.js 3D graphics programming guidelines"
     },
     {
       "name": "typescript-skills",
-      "source": "./skill-typescript",
+      "source": "./packages/skill/skill-typescript",
       "description": "TypeScript coding guidelines and best practices"
     },
     {
       "name": "typescript-to-lua-skills",
-      "source": "./skill-typescript-to-lua",
+      "source": "./packages/skill/skill-typescript-to-lua",
       "description": "TypeScript-to-Lua transpilation guidelines (TSTL)"
     },
     {
       "name": "vitest-skills",
-      "source": "./skill-vitest",
+      "source": "./packages/skill/skill-vitest",
       "description": "Vitest testing framework guidelines and best practices"
     },
     {
       "name": "zod-skills",
-      "source": "./skill-zod",
+      "source": "./packages/skill/skill-zod",
       "description": "Zod schema validation guidelines and best practices"
     }
   ]
