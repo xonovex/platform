@@ -41,7 +41,7 @@
     }
   },
   "dependencies": {
-    "vite-tsconfig-paths": "6.0.4",
+    "vite-tsconfig-paths": "6.1.1",
     "@xonovex/eslint-config-base": "0.1.22",
     "@xonovex/ts-config-build": "0.1.22"
   },

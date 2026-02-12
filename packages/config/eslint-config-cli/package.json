@@ -43,13 +43,13 @@
   },
   "dependencies": {
     "@xonovex/eslint-config-base": "0.1.22",
-    "globals": "17.1.0",
+    "globals": "17.3.0",
     "@xonovex/ts-config-build": "0.1.22"
   },
   "devDependencies": {
     "@xonovex/eslint-config-base": "0.1.22",
     "@xonovex/ts-config-build": "0.1.22",
-    "@types/node": "^25.0.10"
+    "@types/node": "^25.2.3"
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",
