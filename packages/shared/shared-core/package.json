@@ -42,7 +42,7 @@
     "@xonovex/eslint-config-cli": "0.1.22",
     "@xonovex/ts-config-cli": "0.1.22",
     "@xonovex/vitest-config-node": "0.1.22",
-    "@types/node": "^25.0.10",
+    "@types/node": "^25.2.3",
     "@vitest/coverage-v8": "^4.0.18",
     "eslint": "^9.39.2",
     "jiti": "^2.6.1",

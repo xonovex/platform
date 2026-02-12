@@ -30,7 +30,7 @@
   "dependencies": {},
   "devDependencies": {
     "@xonovex/ts-config-base": "0.1.22",
-    "@types/node": "^25.0.10"
+    "@types/node": "^25.2.3"
   },
   "scripts": {
     "lint": "echo 'No linting needed for JSON-only config package'",
