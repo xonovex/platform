@@ -13,7 +13,7 @@
 - **Plan-driven workflow** with worktrees and parallel execution
 
 <table><tr><td style="border: 2px solid gray; padding: 0;">
-<img src="https://raw.githubusercontent.com/xonovex/platform/refs/heads/main/packages/asset/asset-images/multiple-agents.png" alt="Multiple Agents">
+<img src="packages/asset/asset-images/multiple-agents.png" alt="Multiple Agents">
 </td></tr></table>
 
 ## Philosophy
@@ -155,7 +155,7 @@ Parallel: Multiple agents work on parallel subplan groups in separate worktrees
 Learning: insights-integrate merges learnings into guidelines for future sessions
 ```
 
-[View workflow diagram](https://raw.githubusercontent.com/xonovex/platform/refs/heads/main/packages/diagram/diagram-agent-workflow/workflow-diagram.png)
+[View workflow diagram](packages/diagram/diagram-agent-workflow/workflow-diagram.png)
 
 <details>
 <summary><strong>Commands</strong></summary>
