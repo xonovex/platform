@@ -32,7 +32,7 @@ Resumes work from an existing plan document by loading its context and outlining
 
 - `document-path` (optional): Path to plan document. Resolution order if omitted:
   1. Check git config for associated plan (feature worktree)
-  2. **Use current conversation context** - if a `/xonovex-workflow:plan-create`, `/plan-research-*`, or similar command was run earlier in this conversation, continue from that research/plan. Do NOT search for other plans.
+  2. **Use current conversation context** - if a `/xonovex-workflow:plan-create`, `/xonovex-workflow:plan-research`, or similar command was run earlier in this conversation, continue from that research/plan. Do NOT search for other plans.
   3. Only if no context exists: Ask user which plan to continue
 
 ## Core Workflow

@@ -80,8 +80,8 @@ Next Steps:
 1. Navigate: cd ../services-feature-auth-fix
 2. Associate plan: /plan-worktree-set-plan <plan-dir>/<plan>.md (if working with a plan)
 3. Start work: /xonovex-workflow:plan-continue (after associating plan)
-4. Make commits: /plan-worktree-commit
-5. Validate: /plan-worktree-validate
+4. Make commits: /xonovex-workflow:plan-worktree-commit
+5. Validate: /xonovex-workflow:plan-worktree-validate
 ```
 
 ## Error Handling
