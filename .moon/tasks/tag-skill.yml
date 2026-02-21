@@ -1,0 +1,26 @@
+$schema: https://moonrepo.dev/schemas/tasks.json
+tasks:
+  fmt:
+    command: [npm, run, fmt]
+    inputs:
+      - "**/*.md"
+      - "*.config.*"
+      - package.json
+    outputs: []
+    options:
+      cache: false
+      runInCI: false
+  fmt-check:
+    command: [npm, run, "fmt:check"]
+    inputs:
+      - "**/*.md"
+      - "*.config.*"
+      - package.json
+    outputs: []
+  ci-check:
+    command: echo 'ci-check complete'
+    deps: [build]
+    options:
+      cache: false
+inheritedBy:
+  tag: skill

@@ -19,11 +19,11 @@ packages/
   diagram/              # Diagram packages
     diagram-agent-workflow/ # Agent workflow diagram
     diagram-moon-action/ # Moon action graph diagrams
-  guide/                # Claude Code guides
-    guide-*/ (35)       # Guideline packages (guidelines + build)
-  prompt/               # Claude Code prompts
-    prompt-utility/     # Utility commands (content, instructions, slash commands)
-    prompt-workflow/    # Workflow commands (plan, git, insights, code)
+  skill/                # Coding guidelines and skills
+    skill-*/ (35)       # Skill packages (guidelines + reference)
+  command/              # Workflow and utility commands
+    command-utility/    # Utility commands (content, instructions, slash commands)
+    command-workflow/   # Workflow commands (plan, git, insights, code)
   script/               # Internal build scripts
     script-moon-common/ # Shared moon script utilities
     script-moon-*/      # Moon task scripts (action-graph, npm-check, npm-publish, version-bump, version-detect)
@@ -93,7 +93,7 @@ npx moon run moon-version-detect:run -- --base main
 
 ## Claude Code Guides
 
-The monorepo contains 35 guideline packages in `packages/guide/`, each with an `index.md` containing the guidelines.
+The monorepo contains 35 skill packages in `packages/skill/`, each with a `guide/SKILL.md` containing the guidelines.
 
 ## Code Style
 
