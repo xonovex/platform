@@ -1,0 +1,7 @@
+{
+  "name": "xonovex-utility",
+  "version": "0.1.0",
+  "description": "Xonovex utility commands — skill management, project instructions",
+  "author": { "name": "Xonovex" },
+  "commands": "./"
+}

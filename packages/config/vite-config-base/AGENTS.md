@@ -4,4 +4,4 @@ Base Vite configuration for Xonovex projects.
 
 ## Guidelines
 
-- See [typescript-guidelines](../../guide/guide-typescript/index.md)
+- See [typescript-guidelines](../../skill/skill-typescript/guide/SKILL.md)

@@ -1,0 +1,14 @@
+{
+  "name": "@xonovex/command-workflow",
+  "version": "0.1.0",
+  "private": true,
+  "keywords": [
+    "xonovex",
+    "command",
+    "workflow"
+  ],
+  "scripts": {
+    "fmt:check": "prettier --check .",
+    "fmt": "prettier --write ."
+  }
+}

@@ -7,8 +7,8 @@ Monorepo for Xonovex tools and configuration packages.
 - `packages/config/` — shared configs (ESLint, TypeScript, Vitest, Prettier, Vite)
 - `packages/agent/` — CLI tools (agent-cli, agent-cli-go)
 - `packages/shared/` — shared libraries (shared-core, shared-core-go)
-- `packages/guide/` — Claude Code guides
-- `packages/prompt/` — Claude Code prompts
+- `packages/skill/` — coding guidelines and skills
+- `packages/command/` — workflow and utility commands
 - `packages/diagram/` — diagrams (action graph, workflow)
 - `packages/asset/` — static assets
 
@@ -26,7 +26,7 @@ Monorepo for Xonovex tools and configuration packages.
 - Strict types, clear naming, explicit error handling
 - typecheck, lint, build, test must pass; fix at root cause
 - Remove unused/deprecated code immediately; no @deprecated markers
-- Follow [Functional Programming](packages/guide/guide-general-fp/index.md) guidelines
+- Follow [Functional Programming](packages/skill/skill-general-fp/guide/SKILL.md) guidelines
 
 ## Commit Convention
 
