@@ -17,4 +17,4 @@ Uses own config via relative import (`./src/index.ts`) to avoid project service 
 
 ## Guidelines
 
-- See [typescript-guidelines](../../guide/guide-typescript/index.md)
+- See [typescript-guidelines](../../skill/skill-typescript/guide/SKILL.md)

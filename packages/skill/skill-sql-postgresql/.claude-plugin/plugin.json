@@ -1,0 +1,7 @@
+{
+  "name": "xonovex-sql-postgresql",
+  "version": "0.1.0",
+  "description": "Sql-postgresql guidelines",
+  "author": { "name": "Xonovex" },
+  "skills": "./"
+}
