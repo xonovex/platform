@@ -2,6 +2,6 @@
   "name": "xonovex-workflow",
   "version": "0.1.0",
   "description": "Xonovex workflow commands — planning, code analysis, git",
-  "author": { "name": "Xonovex" },
+  "author": {"name": "Xonovex"},
   "commands": "./"
 }
