@@ -4,13 +4,28 @@
 ![Node](https://img.shields.io/badge/node-20%2B-green)
 ![Go](https://img.shields.io/badge/go-1.21%2B-00ADD8)
 
-> Run AI coding agents in sandboxed environments with custom providers
+> Execution context manager for AI coding agents
 
-- **Agent wrapper CLI** for Claude Code and OpenCode
+- **Unified agent CLI** for Claude Code and OpenCode
 - **Sandbox support**: bubblewrap, Docker, Nix
 - **Custom providers**: GLM (direct), Gemini, GPT-5 Codex (via CLIProxyAPI)
-- **Claude Code Tasks support** for persistent, parallel sub-agent coordination
 - **Plan-driven workflow** with worktrees and parallel execution
+- **Kubernetes orchestration** for scalable, cloud-native agent execution
+
+## Why agent-cli?
+
+AI coding agents handle prompts, tools, and code changes — they *are* the agent. What they don't control is the environment they run in: where the process executes, which model backs it, how the terminal session is managed, and whether the workspace is reproducible.
+
+agent-cli manages everything *around* the agent. Some agents have overlapping built-in features (Claude Code supports tmux and worktrees natively), but agent-cli operates at a different layer — it configures the execution context *before* the agent launches, rather than being controlled by the agent at runtime:
+
+- **Sandbox isolation** — run agents inside bwrap, Docker, or Nix containers so they can't touch your host system
+- **Model provider routing** — proxy agent API calls to Gemini, GLM, or other models transparently
+- **Terminal session management** — create and attach tmux sessions with git-aware naming before the agent starts, rather than relying on the agent to manage its own terminal
+- **Reproducible environments** — Nix-based package sets for consistent dev tooling across machines
+- **Multi-agent support** — unified interface across Claude Code, OpenCode, and future agents, with the same sandbox and session management regardless of which agent runs inside
+- **Kubernetes orchestration** — run agents as Kubernetes pods for scalable, cloud-native execution
+
+agent-cli is not an agent itself. It doesn't read your code, make decisions, or generate patches. It sets up the sandbox, wires the provider, launches the session and gets out of the way.
 
 <table><tr><td style="border: 2px solid gray; padding: 0;">
 <img src="packages/asset/asset-images/multiple-agents.png" alt="Multiple Agents">
