@@ -12,7 +12,7 @@ allowed-tools:
 argument-hint: "[agents-file | --all] [--dry-run] [--update-workflows]"
 ---
 
-# /xonovex-utility:project-instructions-sync – Sync AGENTS.md with Current State
+# /xonovex-utility:instructions-sync – Sync AGENTS.md with Current State
 
 Update AGENTS.md files to reflect current directory structure, files, and configuration state. Maintain project-specific technology names.
 
@@ -65,9 +65,9 @@ Update AGENTS.md files to reflect current directory structure, files, and config
 ## Examples
 
 ```bash
-/xonovex-utility:project-instructions-sync infrastructure/AGENTS.md
-/xonovex-utility:project-instructions-sync --all --dry-run
-/xonovex-utility:project-instructions-sync cluster/AGENTS.md --update-workflows
+/xonovex-utility:instructions-sync infrastructure/AGENTS.md
+/xonovex-utility:instructions-sync --all --dry-run
+/xonovex-utility:instructions-sync cluster/AGENTS.md --update-workflows
 ```
 
 ## Error Handling
