@@ -10,7 +10,7 @@ allowed-tools:
 argument-hint: "[instruction-file] [--dry-run] [--target-reduction <percent>]"
 ---
 
-# /xonovex-utility:project-instructions-simplify – Simplify project instruction files
+# /xonovex-utility:instructions-simplify – Simplify project instruction files
 
 Reduce AGENTS.md/CLAUDE.md verbosity by 40-50% while preserving structure, workflows, and project-specific technology names.
 
@@ -54,8 +54,8 @@ Reduce AGENTS.md/CLAUDE.md verbosity by 40-50% while preserving structure, workf
 ## Examples
 
 ```bash
-/xonovex-utility:project-instructions-simplify infrastructure/AGENTS.md
-/xonovex-utility:project-instructions-simplify services/AGENTS.md --dry-run
+/xonovex-utility:instructions-simplify infrastructure/AGENTS.md
+/xonovex-utility:instructions-simplify services/AGENTS.md --dry-run
 ```
 
 ## Error Handling

@@ -8,16 +8,16 @@ allowed-tools:
 argument-hint: "[category] [--out-dir <dir>]"
 ---
 
-# /xonovex-workflow:insights-extract – Extract Development Lessons
+# /xonovex-utility:insights-extract – Extract Development Lessons
 
 Analyzes the current session to identify general development mistakes, how they were discovered, and lessons learned. Always saves insights as individual files with frontmatter.
 
 ## Usage
 
 ```
-/xonovex-workflow:insights-extract
-/xonovex-workflow:insights-extract tool-usage
-/xonovex-workflow:insights-extract validation --out-dir docs/insights
+/xonovex-utility:insights-extract
+/xonovex-utility:insights-extract tool-usage
+/xonovex-utility:insights-extract validation --out-dir docs/insights
 ```
 
 ## Arguments
@@ -63,7 +63,7 @@ applied: false
 - `created`: ISO date when insight was created
 - `applied`: Boolean tracking if insight has been integrated into guidelines (always `false` on creation)
 
-The `applies_to` list is used by `/xonovex-workflow:insights-integrate` to determine which guideline files this insight should be added to.
+The `applies_to` list is used by `/xonovex-utility:insights-skills-integrate` and `/xonovex-utility:insights-instructions-integrate` to determine target files.
 
 ## Output
 
@@ -84,22 +84,16 @@ Total: 2 insights extracted
 Next Steps:
 1. Review extracted insight files in insights/ directory
 2. Verify content: Check that mistakes, discoveries, and fixes are accurately captured
-3. Integrate: /xonovex-workflow:insights-integrate --all - Transform insights into guideline structure
-4. Alternative: /xonovex-workflow:insights-integrate insights/<file>.md - Integrate specific insight
-5. Share: Discuss insights with team if applicable before integration
+3. Integrate into skills: /xonovex-utility:insights-skills-integrate [category]
+4. Integrate into AGENTS.md: /xonovex-utility:insights-instructions-integrate [category]
 ```
 
 ## Examples
 
 ```bash
-# Extract all insights from current session
-/xonovex-workflow:insights-extract
-
-# Extract insights for specific category
-/xonovex-workflow:insights-extract tool-usage
-
-# Save to custom directory
-/xonovex-workflow:insights-extract validation --out-dir docs/insights
+/xonovex-utility:insights-extract
+/xonovex-utility:insights-extract tool-usage
+/xonovex-utility:insights-extract validation --out-dir docs/insights
 ```
 
 ## Error Handling

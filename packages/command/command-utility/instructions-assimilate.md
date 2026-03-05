@@ -15,7 +15,7 @@ argument-hint: >-
   [--percentage <percent>] [--interactive] [--dry-run]
 ---
 
-# /xonovex-utility:project-instructions-assimilate – Augment Project Instructions
+# /xonovex-utility:instructions-assimilate – Augment Project Instructions
 
 Extracts organizational patterns from source AGENTS.md/CLAUDE.md and integrates into target while strictly preserving target's structure, style, and project-specific context.
 
@@ -59,9 +59,9 @@ Extracts organizational patterns from source AGENTS.md/CLAUDE.md and integrates 
 ## Examples
 
 ```bash
-/xonovex-utility:project-instructions-assimilate services/api/AGENTS.md ../template/AGENTS.md --aspects "workflow"
-/xonovex-utility:project-instructions-assimilate infrastructure/AGENTS.md examples/AGENTS.md --aspects "structure"
-/xonovex-utility:project-instructions-assimilate AGENTS.md ../reference/AGENTS.md --percentage 30 --dry-run
+/xonovex-utility:instructions-assimilate services/api/AGENTS.md ../template/AGENTS.md --aspects "workflow"
+/xonovex-utility:instructions-assimilate infrastructure/AGENTS.md examples/AGENTS.md --aspects "structure"
+/xonovex-utility:instructions-assimilate AGENTS.md ../reference/AGENTS.md --percentage 30 --dry-run
 ```
 
 ## Implementation

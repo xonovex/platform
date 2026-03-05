@@ -10,7 +10,7 @@ allowed-tools:
 argument-hint: "[category] [--dry-run] [--force] [--output <path>]"
 ---
 
-# /xonovex-workflow:insights-integrate – Convert Insights to Skill
+# /xonovex-utility:insights-skills-integrate – Convert Insights to Skill
 
 Convert insights from a category into a Claude skill with progressive disclosure structure.
 
@@ -95,6 +95,6 @@ description: Use when working with {category} to {purpose}. Apply for {scenarios
 ## Error Handling
 
 - Missing category: ask user
-- No insights found: suggest `/insights-extract [category]`
+- No insights found: suggest `/xonovex-utility:insights-extract [category]`
 - Output not writable: report error
 ```
