@@ -1,9 +1,9 @@
 name: Setup
-description: Cache workspace and setup moon toolchain
+description: Cache npm and moon toolchain
 
 inputs:
   cache-workspace:
-    description: "Cache .moon/cache and node_modules"
+    description: "Cache ~/.npm and .moon/cache"
     default: "true"
 
 runs:
@@ -13,8 +13,8 @@ runs:
       uses: actions/cache@v4
       with:
         path: |
+          ~/.npm
           .moon/cache
-          node_modules
         key: npm-moon-${{ runner.os }}-${{ hashFiles('package-lock.json', '.moon/**/*.yml') }}
         restore-keys: |
           npm-moon-${{ runner.os }}
