@@ -221,6 +221,74 @@ func TestAgentRunWebhook_Validate_WorkspaceRefWithoutWorktree(t *testing.T) {
 	}
 }
 
+func TestAgentRunWebhook_Default_SetsVCS(t *testing.T) {
+	w := &AgentRunWebhook{}
+	run := &agentv1alpha1.AgentRun{
+		Spec: agentv1alpha1.AgentRunSpec{},
+	}
+
+	if err := w.Default(context.Background(), run); err != nil {
+		t.Fatalf("Default() error = %v", err)
+	}
+
+	if run.Spec.VCS != agentv1alpha1.VCSGit {
+		t.Errorf("VCS = %q, want %q", run.Spec.VCS, agentv1alpha1.VCSGit)
+	}
+}
+
+func TestAgentRunWebhook_Default_PreservesJujutsuVCS(t *testing.T) {
+	w := &AgentRunWebhook{}
+	run := &agentv1alpha1.AgentRun{
+		Spec: agentv1alpha1.AgentRunSpec{
+			VCS: agentv1alpha1.VCSJujutsu,
+		},
+	}
+
+	if err := w.Default(context.Background(), run); err != nil {
+		t.Fatalf("Default() error = %v", err)
+	}
+
+	if run.Spec.VCS != agentv1alpha1.VCSJujutsu {
+		t.Errorf("VCS = %q, want %q (should not override)", run.Spec.VCS, agentv1alpha1.VCSJujutsu)
+	}
+}
+
+func TestAgentRunWebhook_Validate_ValidJujutsuVCS(t *testing.T) {
+	w := &AgentRunWebhook{}
+	run := &agentv1alpha1.AgentRun{
+		Spec: agentv1alpha1.AgentRunSpec{
+			Agent: agentv1alpha1.AgentTypeClaude,
+			Repository: agentv1alpha1.RepositorySpec{
+				URL: "https://github.com/example/repo.git",
+			},
+			VCS: agentv1alpha1.VCSJujutsu,
+		},
+	}
+
+	_, err := w.ValidateCreate(context.Background(), run)
+	if err != nil {
+		t.Errorf("ValidateCreate() error = %v", err)
+	}
+}
+
+func TestAgentRunWebhook_Validate_InvalidVCS(t *testing.T) {
+	w := &AgentRunWebhook{}
+	run := &agentv1alpha1.AgentRun{
+		Spec: agentv1alpha1.AgentRunSpec{
+			Agent: agentv1alpha1.AgentTypeClaude,
+			Repository: agentv1alpha1.RepositorySpec{
+				URL: "https://github.com/example/repo.git",
+			},
+			VCS: "svn",
+		},
+	}
+
+	_, err := w.ValidateCreate(context.Background(), run)
+	if err == nil {
+		t.Error("ValidateCreate() expected error for invalid VCS")
+	}
+}
+
 func TestAgentRunWebhook_Validate_WorkspaceRefWithRepository(t *testing.T) {
 	w := &AgentRunWebhook{}
 	run := &agentv1alpha1.AgentRun{

@@ -51,6 +51,9 @@ spec:
                   enum:
                     - claude
                     - opencode
+                configRef:
+                  type: string
+                  description: References an AgentConfig in the namespace for defaults
                 providerRef:
                   type: string
                   description: References an AgentProvider in the namespace
@@ -229,6 +232,28 @@ spec:
                       tolerationSeconds:
                         type: integer
                         format: int64
+                runtimeClassName:
+                  description: RuntimeClassName sets the pod runtimeClassName for
+                    VM-based isolation (e.g. Kata Containers)
+                  type: string
+                vcs:
+                  description: VCS selects the version control system
+                  type: string
+                  enum:
+                    - git
+                    - jj
+                nix:
+                  type: object
+                  description: Nix package provisioning for the agent environment
+                  properties:
+                    packages:
+                      type: array
+                      description: Nixpkgs attribute names to install
+                      items:
+                        type: string
+                    image:
+                      type: string
+                      description: Nix container image for the init container (default nixos/nix:latest)
             status:
               type: object
               description: AgentRunStatus defines the observed state of AgentRun

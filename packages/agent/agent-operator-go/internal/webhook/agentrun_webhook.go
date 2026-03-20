@@ -41,6 +41,10 @@ func (w *AgentRunWebhook) Default(_ context.Context, obj runtime.Object) error {
 		run.Spec.Agent = agentv1alpha1.AgentTypeClaude
 	}
 
+	if run.Spec.VCS == "" {
+		run.Spec.VCS = agentv1alpha1.VCSGit
+	}
+
 	if run.Spec.Timeout == nil {
 		defaultTimeout := metav1.Duration{Duration: time.Hour}
 		run.Spec.Timeout = &defaultTimeout
@@ -96,6 +100,10 @@ func (w *AgentRunWebhook) validate(run *agentv1alpha1.AgentRun) (admission.Warni
 
 	if run.Spec.ProviderRef != "" && run.Spec.Provider != nil {
 		return nil, fmt.Errorf("cannot specify both providerRef and inline provider")
+	}
+
+	if run.Spec.VCS != "" && run.Spec.VCS != agentv1alpha1.VCSGit && run.Spec.VCS != agentv1alpha1.VCSJujutsu {
+		return nil, fmt.Errorf("invalid vcs: %s, must be one of: git, jj", run.Spec.VCS)
 	}
 
 	return nil, nil

@@ -26,6 +26,8 @@
               # Kubernetes
               pkgs.kind
               pkgs.kubectl
+              pkgs.setup-envtest
+              pkgs.kubernetes-controller-tools
 
               # Shell
               pkgs.shellcheck

@@ -158,6 +158,98 @@ func TestBuildJob_NodeSelectorAndTolerations(t *testing.T) {
 	}
 }
 
+func TestBuildJob_WithRuntimeClassName(t *testing.T) {
+	runtimeClass := "kata"
+	run := &agentv1alpha1.AgentRun{
+		ObjectMeta: metav1.ObjectMeta{Name: "test-run", Namespace: "default"},
+		Spec: agentv1alpha1.AgentRunSpec{
+			Agent:            agentv1alpha1.AgentTypeClaude,
+			Repository:       agentv1alpha1.RepositorySpec{URL: "https://example.com/repo.git"},
+			RuntimeClassName: &runtimeClass,
+		},
+	}
+
+	job := BuildJob(run, nil, "pvc", "image", time.Hour)
+
+	if job.Spec.Template.Spec.RuntimeClassName == nil {
+		t.Fatal("expected RuntimeClassName to be set")
+	}
+	if *job.Spec.Template.Spec.RuntimeClassName != "kata" {
+		t.Errorf("RuntimeClassName = %q, want %q", *job.Spec.Template.Spec.RuntimeClassName, "kata")
+	}
+}
+
+func TestBuildJob_WithoutRuntimeClassName(t *testing.T) {
+	run := &agentv1alpha1.AgentRun{
+		ObjectMeta: metav1.ObjectMeta{Name: "test-run", Namespace: "default"},
+		Spec: agentv1alpha1.AgentRunSpec{
+			Agent:      agentv1alpha1.AgentTypeClaude,
+			Repository: agentv1alpha1.RepositorySpec{URL: "https://example.com/repo.git"},
+		},
+	}
+
+	job := BuildJob(run, nil, "pvc", "image", time.Hour)
+
+	if job.Spec.Template.Spec.RuntimeClassName != nil {
+		t.Errorf("expected RuntimeClassName to be nil, got %q", *job.Spec.Template.Spec.RuntimeClassName)
+	}
+}
+
+func TestBuildJob_WithNixPackages(t *testing.T) {
+	run := &agentv1alpha1.AgentRun{
+		ObjectMeta: metav1.ObjectMeta{Name: "test-run", Namespace: "default"},
+		Spec: agentv1alpha1.AgentRunSpec{
+			Agent:      agentv1alpha1.AgentTypeClaude,
+			Repository: agentv1alpha1.RepositorySpec{URL: "https://example.com/repo.git"},
+			Nix: &agentv1alpha1.NixSpec{
+				Packages: []string{"nodejs_22", "python3"},
+			},
+		},
+	}
+
+	job := BuildJob(run, nil, "pvc", "image", time.Hour)
+
+	podSpec := job.Spec.Template.Spec
+
+	// Should have 2 init containers: git-clone + nix-env
+	if len(podSpec.InitContainers) != 2 {
+		t.Fatalf("len(InitContainers) = %d, want 2", len(podSpec.InitContainers))
+	}
+	if podSpec.InitContainers[1].Name != "nix-env" {
+		t.Errorf("init container[1] name = %q, want nix-env", podSpec.InitContainers[1].Name)
+	}
+
+	// Should have 2 volumes: workspace PVC + nix-env emptyDir
+	if len(podSpec.Volumes) != 2 {
+		t.Fatalf("len(Volumes) = %d, want 2", len(podSpec.Volumes))
+	}
+	foundNixVol := false
+	for _, v := range podSpec.Volumes {
+		if v.Name == "nix-env" && v.EmptyDir != nil {
+			foundNixVol = true
+		}
+	}
+	if !foundNixVol {
+		t.Error("expected nix-env emptyDir volume")
+	}
+}
+
+func TestBuildJob_WithoutNix(t *testing.T) {
+	run := &agentv1alpha1.AgentRun{
+		ObjectMeta: metav1.ObjectMeta{Name: "test-run", Namespace: "default"},
+		Spec: agentv1alpha1.AgentRunSpec{
+			Agent:      agentv1alpha1.AgentTypeClaude,
+			Repository: agentv1alpha1.RepositorySpec{URL: "https://example.com/repo.git"},
+		},
+	}
+
+	job := BuildJob(run, nil, "pvc", "image", time.Hour)
+
+	if len(job.Spec.Template.Spec.Volumes) != 1 {
+		t.Errorf("len(Volumes) = %d, want 1 (workspace only)", len(job.Spec.Template.Spec.Volumes))
+	}
+}
+
 func TestBuildJob_Labels(t *testing.T) {
 	run := &agentv1alpha1.AgentRun{
 		ObjectMeta: metav1.ObjectMeta{Name: "my-run", Namespace: "ns"},

@@ -92,6 +92,12 @@ spec:
                       storageSize:
                         type: string
                         description: Storage size for the shared volume PVC (default 1Gi)
+                vcs:
+                  description: VCS selects the version control system
+                  type: string
+                  enum:
+                    - git
+                    - jj
             status:
               type: object
               description: AgentWorkspaceStatus defines the observed state of AgentWorkspace

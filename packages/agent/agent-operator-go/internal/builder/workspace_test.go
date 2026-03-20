@@ -423,6 +423,105 @@ func TestBuildWorkspaceJob_WithSharedVolumes(t *testing.T) {
 	}
 }
 
+func TestBuildWorkspaceJob_WithRuntimeClassName(t *testing.T) {
+	runtimeClass := "kata"
+	run := &agentv1alpha1.AgentRun{
+		ObjectMeta: metav1.ObjectMeta{Name: "agent-1", Namespace: "default"},
+		Spec: agentv1alpha1.AgentRunSpec{
+			Agent:            agentv1alpha1.AgentTypeClaude,
+			WorkspaceRef:     "my-workspace",
+			Worktree:         &agentv1alpha1.WorktreeSpec{Branch: "agent-1-work"},
+			RuntimeClassName: &runtimeClass,
+		},
+	}
+
+	job := BuildWorkspaceJob(run, nil, "my-workspace-ws", nil, nil, "node:trixie-slim", time.Hour)
+
+	if job.Spec.Template.Spec.RuntimeClassName == nil {
+		t.Fatal("expected RuntimeClassName to be set")
+	}
+	if *job.Spec.Template.Spec.RuntimeClassName != "kata" {
+		t.Errorf("RuntimeClassName = %q, want %q", *job.Spec.Template.Spec.RuntimeClassName, "kata")
+	}
+}
+
+func TestBuildWorkspaceInitJob_WithJujutsu(t *testing.T) {
+	ws := &agentv1alpha1.AgentWorkspace{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "jj-workspace",
+			Namespace: "default",
+		},
+		Spec: agentv1alpha1.AgentWorkspaceSpec{
+			Repository: agentv1alpha1.RepositorySpec{
+				URL:    "https://github.com/org/repo.git",
+				Branch: "main",
+			},
+			VCS: agentv1alpha1.VCSJujutsu,
+		},
+	}
+
+	job := BuildWorkspaceInitJob(ws, "jj-workspace-ws", "alpine/git:latest")
+
+	script := job.Spec.Template.Spec.Containers[0].Args[1]
+	if !containsStr(script, "git clone") {
+		t.Error("jj workspace init should still use git clone")
+	}
+	if !containsStr(script, "jj git init --colocate") {
+		t.Errorf("jj workspace init missing 'jj git init --colocate', got:\n%s", script)
+	}
+}
+
+func TestBuildWorktreeInitContainers_WithJujutsu(t *testing.T) {
+	run := &agentv1alpha1.AgentRun{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: "agent-1",
+		},
+		Spec: agentv1alpha1.AgentRunSpec{
+			Worktree: &agentv1alpha1.WorktreeSpec{
+				Branch:       "agent-1-work",
+				SourceBranch: "main",
+			},
+			VCS: agentv1alpha1.VCSJujutsu,
+		},
+	}
+
+	containers := BuildWorktreeInitContainers(run, "node:trixie-slim")
+
+	if len(containers) != 1 {
+		t.Fatalf("expected 1 init container, got %d", len(containers))
+	}
+	container := containers[0]
+	if container.Name != "jj-workspace" {
+		t.Errorf("expected container name jj-workspace, got %s", container.Name)
+	}
+
+	script := container.Args[1]
+	if !containsStr(script, "jj workspace add /workspace-wt/agent-1 --revision main") {
+		t.Errorf("expected jj workspace add command, got: %s", script)
+	}
+	if containsStr(script, "git worktree") {
+		t.Error("jj mode should not use git worktree")
+	}
+}
+
+func TestBuildWorkspaceInitJob_NoRuntimeClassName(t *testing.T) {
+	ws := &agentv1alpha1.AgentWorkspace{
+		ObjectMeta: metav1.ObjectMeta{Name: "my-workspace", Namespace: "default"},
+		Spec: agentv1alpha1.AgentWorkspaceSpec{
+			Repository: agentv1alpha1.RepositorySpec{
+				URL:    "https://github.com/org/repo.git",
+				Branch: "main",
+			},
+		},
+	}
+
+	job := BuildWorkspaceInitJob(ws, "my-workspace-ws", "alpine/git:latest")
+
+	if job.Spec.Template.Spec.RuntimeClassName != nil {
+		t.Errorf("expected init job RuntimeClassName to be nil, got %q", *job.Spec.Template.Spec.RuntimeClassName)
+	}
+}
+
 func containsStr(s, substr string) bool {
 	return len(s) >= len(substr) && (s == substr || len(s) > 0 && containsSubstring(s, substr))
 }
