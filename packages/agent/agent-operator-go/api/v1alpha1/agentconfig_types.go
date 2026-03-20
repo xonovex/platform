@@ -23,6 +23,12 @@ type AgentConfigSpec struct {
 	StorageSize string `json:"storageSize,omitempty"`
 	// Env are additional environment variables applied to all runs
 	Env []corev1.EnvVar `json:"env,omitempty"`
+	// DefaultRuntimeClassName sets the default pod runtimeClassName for agent runs
+	DefaultRuntimeClassName *string `json:"defaultRuntimeClassName,omitempty"`
+	// DefaultVCS sets the default version control system: "git" (default) or "jj" (Jujutsu)
+	DefaultVCS VCSType `json:"defaultVCS,omitempty"`
+	// DefaultNix configures default Nix package provisioning for agent runs
+	DefaultNix *NixSpec `json:"defaultNix,omitempty"`
 }
 
 // AgentConfigStatus defines the observed state of AgentConfig

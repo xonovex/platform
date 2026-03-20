@@ -136,6 +136,28 @@ spec:
                                   - type: string
                                 pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                                 x-kubernetes-int-or-string: true
+                defaultRuntimeClassName:
+                  description: DefaultRuntimeClassName sets the default pod runtimeClassName
+                    for agent runs
+                  type: string
+                defaultVCS:
+                  description: DefaultVCS sets the default version control system
+                  type: string
+                  enum:
+                    - git
+                    - jj
+                defaultNix:
+                  type: object
+                  description: Default Nix package provisioning for agent runs
+                  properties:
+                    packages:
+                      type: array
+                      description: Nixpkgs attribute names to install
+                      items:
+                        type: string
+                    image:
+                      type: string
+                      description: Nix container image for the init container (default nixos/nix:latest)
             status:
               type: object
               description: AgentConfigStatus defines the observed state of AgentConfig

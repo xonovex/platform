@@ -34,6 +34,8 @@ type AgentWorkspaceSpec struct {
 	StorageSize string `json:"storageSize,omitempty"`
 	// SharedVolumes are optional shared config/state directories for agents
 	SharedVolumes []SharedVolumeSpec `json:"sharedVolumes,omitempty"`
+	// VCS selects the version control system: "git" (default) or "jj" (Jujutsu)
+	VCS VCSType `json:"vcs,omitempty"`
 }
 
 // AgentWorkspaceStatus defines the observed state of AgentWorkspace

@@ -56,3 +56,35 @@ tasks:
     outputs: []
     options:
       cache: false
+  go-test-e2e-gvisor:
+    command:
+      - go
+      - test
+      - -tags=e2e_gvisor
+      - -v
+      - -timeout=600s
+      - ./test/e2e-gvisor/
+    deps:
+      - go-build
+    inputs:
+      - '@globs(sources)'
+      - '@globs(tests)'
+    outputs: []
+    options:
+      cache: false
+  go-test-e2e-kata:
+    command:
+      - go
+      - test
+      - -tags=e2e_kata
+      - -v
+      - -timeout=600s
+      - ./test/e2e-kata/
+    deps:
+      - go-build
+    inputs:
+      - '@globs(sources)'
+      - '@globs(tests)'
+    outputs: []
+    options:
+      cache: false
