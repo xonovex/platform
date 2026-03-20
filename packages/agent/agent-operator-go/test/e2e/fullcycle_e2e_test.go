@@ -81,6 +81,7 @@ func TestE2E_FullCycleWithPrompt(t *testing.T) {
 	// Create AgentRun exercising the full pipeline
 	run := testutil.NewAgentRun(ns, "fullcycle-run",
 		testutil.WithAgent(agentv1alpha1.AgentTypeClaude),
+		testutil.WithConfigRef("default"),
 		testutil.WithPrompt("echo test-prompt"),
 		testutil.WithImage(e2eAgentImage),
 		testutil.WithRepository("https://github.com/octocat/Hello-World.git"),

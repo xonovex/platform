@@ -110,7 +110,7 @@ func BuildWorkspaceInitJob(ws *agentv1alpha1.AgentWorkspace, pvcName, image stri
 	activeDeadlineSeconds := int64((10 * time.Minute).Seconds())
 	backoffLimit := int32(0)
 
-	script := buildWorkspaceCloneScript(&ws.Spec.Repository)
+	script := buildWorkspaceCloneScript(&ws.Spec.Repository, ws.Spec.VCS)
 
 	return &batchv1.Job{
 		ObjectMeta: metav1.ObjectMeta{
@@ -165,7 +165,7 @@ func BuildWorkspaceInitJob(ws *agentv1alpha1.AgentWorkspace, pvcName, image stri
 	}
 }
 
-func buildWorkspaceCloneScript(repo *agentv1alpha1.RepositorySpec) string {
+func buildWorkspaceCloneScript(repo *agentv1alpha1.RepositorySpec, vcs agentv1alpha1.VCSType) string {
 	script := "set -e\n"
 	script += "cd " + workspaceMountPath + "\n"
 	script += "git clone"
@@ -180,10 +180,14 @@ func buildWorkspaceCloneScript(repo *agentv1alpha1.RepositorySpec) string {
 		script += "git checkout " + repo.Commit + "\n"
 	}
 
+	if vcs == agentv1alpha1.VCSJujutsu {
+		script += "jj git init --colocate\n"
+	}
+
 	return script
 }
 
-// BuildWorktreeInitContainers builds init containers that create a git worktree for an AgentRun
+// BuildWorktreeInitContainers builds init containers that create a git worktree (or jj workspace) for an AgentRun
 func BuildWorktreeInitContainers(run *agentv1alpha1.AgentRun, image string) []corev1.Container {
 	worktreePath := fmt.Sprintf("%s/%s", worktreeBasePath, run.Name)
 	sourceBranch := run.Spec.Worktree.SourceBranch
@@ -193,11 +197,18 @@ func BuildWorktreeInitContainers(run *agentv1alpha1.AgentRun, image string) []co
 
 	script := "set -e\n"
 	script += "cd " + workspaceMountPath + "\n"
-	script += "git worktree add " + worktreePath + " -b " + run.Spec.Worktree.Branch + " " + sourceBranch + "\n"
+
+	containerName := "git-worktree"
+	if run.Spec.VCS == agentv1alpha1.VCSJujutsu {
+		containerName = "jj-workspace"
+		script += "jj workspace add " + worktreePath + " --revision " + sourceBranch + "\n"
+	} else {
+		script += "git worktree add " + worktreePath + " -b " + run.Spec.Worktree.Branch + " " + sourceBranch + "\n"
+	}
 
 	return []corev1.Container{
 		{
-			Name:    "git-worktree",
+			Name:    containerName,
 			Image:   image,
 			Command: []string{"sh"},
 			Args:    []string{"-c", script},
@@ -231,6 +242,17 @@ func BuildWorkspaceMainContainers(run *agentv1alpha1.AgentRun, providerEnv map[s
 				MountPath: vol.MountPath,
 			})
 		}
+	}
+
+	if run.Spec.Nix != nil && len(run.Spec.Nix.Packages) > 0 {
+		volumeMounts = append(volumeMounts, corev1.VolumeMount{
+			Name:      nixVolumeName,
+			MountPath: nixMountPath,
+		})
+		env = append(env, corev1.EnvVar{
+			Name:  "PATH",
+			Value: nixProfileBinPath + ":/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+		})
 	}
 
 	return []corev1.Container{
@@ -316,10 +338,19 @@ func BuildWorkspaceJob(run *agentv1alpha1.AgentRun, providerEnv map[string]strin
 					Containers:     BuildWorkspaceMainContainers(run, providerEnv, image, sharedVolumes, sharedVolumePVCs),
 					Volumes:        volumes,
 					NodeSelector:   run.Spec.NodeSelector,
-					Tolerations:    run.Spec.Tolerations,
+					Tolerations:      run.Spec.Tolerations,
+					RuntimeClassName: run.Spec.RuntimeClassName,
 				},
 			},
 		},
+	}
+
+	if nix := BuildNixInitContainer(run.Spec.Nix); nix != nil {
+		job.Spec.Template.Spec.InitContainers = append(job.Spec.Template.Spec.InitContainers, *nix)
+		job.Spec.Template.Spec.Volumes = append(job.Spec.Template.Spec.Volumes, corev1.Volume{
+			Name:         nixVolumeName,
+			VolumeSource: corev1.VolumeSource{EmptyDir: &corev1.EmptyDirVolumeSource{}},
+		})
 	}
 
 	if len(run.Spec.Resources.Requests) > 0 || len(run.Spec.Resources.Limits) > 0 {

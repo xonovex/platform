@@ -1,6 +1,6 @@
 # Agent Operator
 
-Kubernetes operator for running AI coding agents (Claude, OpenCode) as Jobs with managed workspaces, provider secrets, and namespace-level defaults. Supports shared multi-agent workspaces where multiple agents coordinate via a common git checkout and shared config/state directories.
+Kubernetes operator for running AI coding agents (Claude, OpenCode) as Jobs with managed workspaces, provider secrets, and namespace-level defaults. Supports shared multi-agent workspaces where multiple agents coordinate via a common git checkout and shared config/state directories. Supports sandboxed execution via gVisor or Kata Containers runtime classes. Supports [Jujutsu (jj)](https://github.com/jj-vcs/jj) as an alternative VCS for automatic snapshotting and operation-log based undo.
 
 **API Group:** `agent.xonovex.com/v1alpha1`
 
@@ -8,7 +8,7 @@ Kubernetes operator for running AI coding agents (Claude, OpenCode) as Jobs with
 
 ### AgentRun
 
-The primary workload resource. Each AgentRun creates a Job with an init container (git clone) and a main container (agent binary). Runs can be standalone (own PVC) or reference a shared AgentWorkspace.
+The primary workload resource. Each AgentRun creates a Job with an init container (git clone) and a main container (agent binary). Runs can be standalone (own PVC) or reference a shared AgentWorkspace. Supports sandboxed runtimes via `runtimeClassName`.
 
 ```yaml
 apiVersion: agent.xonovex.com/v1alpha1
@@ -17,12 +17,14 @@ metadata:
   name: review-codebase
 spec:
   agent: claude # "claude" or "opencode"
+  configRef: default # references an AgentConfig for defaults
   providerRef: gemini-provider # references an AgentProvider
   repository:
     url: https://github.com/org/repo.git
     branch: main
   prompt: "Review the codebase and suggest improvements"
   timeout: 30m
+  runtimeClassName: gvisor # optional — run in a gVisor sandbox
   resources:
     requests:
       cpu: "500m"
@@ -39,6 +41,7 @@ spec:
 | Field                             | Type     | Description                                                    |
 | --------------------------------- | -------- | -------------------------------------------------------------- |
 | `agent`                           | string   | Agent type: `claude` or `opencode`                             |
+| `configRef`                       | string   | Name of an AgentConfig in the same namespace for defaults      |
 | `providerRef`                     | string   | Name of an AgentProvider in the same namespace                 |
 | `provider`                        | object   | Inline provider config (mutually exclusive with `providerRef`) |
 | `workspaceRef`                    | string   | Name of an AgentWorkspace (mutually exclusive with `repository`) |
@@ -53,6 +56,10 @@ spec:
 | `timeout`                         | duration | Max run duration (default: `1h`)                               |
 | `env`                             | list     | Additional environment variables                               |
 | `image`                           | string   | Container image override                                       |
+| `runtimeClassName`                | string   | Pod runtime class for sandboxed execution (e.g. `gvisor`, `kata`) |
+| `vcs`                             | string   | Version control system: `git` (default) or `jj` (Jujutsu)     |
+| `nix.packages`                    | list     | Nixpkgs attribute names to install (e.g. `nodejs_22`, `python3`) |
+| `nix.image`                       | string   | Nix container image for init container (default: `nixos/nix:latest`) |
 | `nodeSelector`                    | map      | Node selector for pod scheduling                               |
 | `tolerations`                     | list     | Tolerations for pod scheduling                                 |
 
@@ -135,7 +142,7 @@ The controller validates that the referenced Secret exists and contains the spec
 
 ### AgentConfig
 
-Namespace-level defaults applied to all AgentRuns in the namespace. Create one per namespace (singleton by convention).
+Reusable configuration with namespace-level defaults. AgentRuns reference an AgentConfig via `configRef` to inherit defaults. Multiple configs can coexist in the same namespace for different workloads.
 
 ```yaml
 apiVersion: agent.xonovex.com/v1alpha1
@@ -148,6 +155,7 @@ spec:
     claude: gemini-provider
     opencode: gemini-opencode-provider
   defaultImage: "node:trixie-slim"
+  defaultRuntimeClassName: gvisor # all runs in this namespace use gVisor by default
   defaultTimeout: 1h
   storageClass: standard
   storageSize: 10Gi
@@ -155,6 +163,22 @@ spec:
     - name: LANG
       value: "en_US.UTF-8"
 ```
+
+#### Full spec reference
+
+| Field                      | Type     | Description                                                  |
+| -------------------------- | -------- | ------------------------------------------------------------ |
+| `defaultAgent`             | string   | Default agent type for new runs                              |
+| `defaultProviders`         | map      | Map of agent type to default provider name                   |
+| `defaultImage`             | string   | Default container image                                      |
+| `defaultRuntimeClassName`  | string   | Default pod runtime class (e.g. `gvisor`, `kata`)            |
+| `defaultVCS`               | string   | Default version control system: `git` (default) or `jj`      |
+| `defaultNix.packages`      | list     | Default Nix packages for all runs referencing this config     |
+| `defaultNix.image`         | string   | Default Nix container image                                   |
+| `defaultTimeout`           | duration | Default timeout for agent runs                               |
+| `storageClass`             | string   | Default storage class for workspace PVCs                     |
+| `storageSize`              | string   | Default storage size for workspace PVCs                      |
+| `env`                      | list     | Default environment variables for all runs                   |
 
 ## Installation
 
@@ -194,16 +218,18 @@ go run ./cmd/operator/ \
 
 ## Usage
 
-### 1. Create a Secret for your provider credentials
+### Standalone agent run (full workflow)
+
+The typical workflow: create a Secret, an AgentProvider, optionally an AgentConfig for namespace defaults, then run an agent.
 
 ```bash
+# 1. Create a Secret for your provider credentials
 kubectl create secret generic gemini-credentials \
   --from-literal=api-key='your-api-key-here'
 ```
 
-### 2. Create an AgentProvider
-
 ```yaml
+# 2. Create an AgentProvider
 apiVersion: agent.xonovex.com/v1alpha1
 kind: AgentProvider
 metadata:
@@ -218,16 +244,8 @@ spec:
     ANTHROPIC_BASE_URL: "http://litellm-proxy:8317"
 ```
 
-```bash
-kubectl apply -f provider.yaml
-kubectl get agentproviders
-# NAME              DISPLAY NAME     READY   AGE
-# gemini-provider   Google Gemini    true    5s
-```
-
-### 3. (Optional) Create namespace defaults
-
 ```yaml
+# 3. (Optional) Create a reusable config with defaults
 apiVersion: agent.xonovex.com/v1alpha1
 kind: AgentConfig
 metadata:
@@ -240,15 +258,15 @@ spec:
   storageSize: 10Gi
 ```
 
-### 4. Run an agent (standalone)
-
 ```yaml
+# 4. Run the agent (referencing config and provider)
 apiVersion: agent.xonovex.com/v1alpha1
 kind: AgentRun
 metadata:
   name: fix-auth-bug
 spec:
   agent: claude
+  configRef: default          # inherit defaults from AgentConfig
   providerRef: gemini-provider
   repository:
     url: https://github.com/org/repo.git
@@ -258,12 +276,250 @@ spec:
 ```
 
 ```bash
-kubectl apply -f run.yaml
+kubectl apply -f provider.yaml -f config.yaml -f run.yaml
+kubectl get agentproviders
+# NAME              DISPLAY NAME     READY   AGE
+# gemini-provider   Google Gemini    true    5s
+
+kubectl get agentruns -w
+# NAME           AGENT    PHASE         AGE
+# fix-auth-bug   claude   Pending       0s
+# fix-auth-bug   claude   Initializing  1s
+# fix-auth-bug   claude   Running       5s
+# fix-auth-bug   claude   Succeeded     45s
 ```
 
-### 5. Run multiple agents on a shared workspace
+### Sandboxed agent run (gVisor)
 
-Create a workspace with shared volumes, then launch concurrent agents:
+Run agents inside a gVisor sandbox for syscall-level isolation. Requires the `gvisor` RuntimeClass to be configured on your cluster.
+
+```yaml
+# RuntimeClass (cluster setup — once per cluster)
+apiVersion: node.k8s.io/v1
+kind: RuntimeClass
+metadata:
+  name: gvisor
+handler: runsc
+---
+# AgentRun with gVisor sandbox
+apiVersion: agent.xonovex.com/v1alpha1
+kind: AgentRun
+metadata:
+  name: sandboxed-review
+spec:
+  agent: claude
+  providerRef: gemini-provider
+  repository:
+    url: https://github.com/org/repo.git
+    branch: main
+  prompt: "Review the codebase for security issues"
+  runtimeClassName: gvisor
+```
+
+The `runtimeClassName` is applied to the Job's PodSpec. Both the init container (git clone) and the main container (agent binary) run inside the gVisor sandbox.
+
+### Sandboxed agent run (Kata Containers)
+
+Run agents inside a Kata Containers VM for hardware-level isolation. Requires the `kata` RuntimeClass and hardware virtualization support (`/dev/kvm`).
+
+```yaml
+# RuntimeClass (cluster setup — once per cluster)
+apiVersion: node.k8s.io/v1
+kind: RuntimeClass
+metadata:
+  name: kata
+handler: kata
+---
+# AgentRun with Kata VM isolation
+apiVersion: agent.xonovex.com/v1alpha1
+kind: AgentRun
+metadata:
+  name: isolated-agent
+spec:
+  agent: claude
+  providerRef: gemini-provider
+  repository:
+    url: https://github.com/org/repo.git
+    branch: main
+  prompt: "Implement the payment processing module"
+  runtimeClassName: kata
+  timeout: 1h
+```
+
+### Sandbox default via config
+
+Use AgentConfig to provide sandboxed runtime defaults that runs inherit via `configRef`:
+
+```yaml
+apiVersion: agent.xonovex.com/v1alpha1
+kind: AgentConfig
+metadata:
+  name: sandboxed
+spec:
+  defaultAgent: claude
+  defaultProviders:
+    claude: gemini-provider
+  defaultRuntimeClassName: gvisor  # runs referencing this config use gVisor
+  storageSize: 10Gi
+---
+# This run inherits runtimeClassName=gvisor from the config
+apiVersion: agent.xonovex.com/v1alpha1
+kind: AgentRun
+metadata:
+  name: auto-sandboxed
+spec:
+  agent: claude
+  configRef: sandboxed
+  repository:
+    url: https://github.com/org/repo.git
+  prompt: "Add input validation to all API endpoints"
+```
+
+### Agent run with Jujutsu (jj)
+
+Run agents with [Jujutsu](https://github.com/jj-vcs/jj) for automatic working copy snapshotting, operation-log based undo, and first-class conflict handling. The operator clones with git, then initializes jj in colocated mode (`jj git init --colocate`) so both tools work side-by-side.
+
+```yaml
+apiVersion: agent.xonovex.com/v1alpha1
+kind: AgentRun
+metadata:
+  name: jj-agent
+spec:
+  agent: claude
+  providerRef: gemini-provider
+  repository:
+    url: https://github.com/org/repo.git
+    branch: main
+  prompt: "Refactor the error handling"
+  vcs: jj  # clone with git, then init jj colocated
+```
+
+The agent container image must include the `jj` binary. When `vcs: jj` is set:
+- **Standalone clone**: `git clone ... && jj git init --colocate`
+- **Standalone worktree**: `jj workspace add` instead of `git worktree add`
+- **Workspace init**: clone + `jj git init --colocate`
+- **Workspace worktree**: `jj workspace add` instead of `git worktree add`
+
+### Jujutsu default via config
+
+Use AgentConfig to provide jj defaults that runs inherit via `configRef`:
+
+```yaml
+apiVersion: agent.xonovex.com/v1alpha1
+kind: AgentConfig
+metadata:
+  name: jj-config
+spec:
+  defaultAgent: claude
+  defaultProviders:
+    claude: gemini-provider
+  defaultVCS: jj  # runs referencing this config use jj
+  storageSize: 10Gi
+---
+# This run inherits vcs=jj from the config
+apiVersion: agent.xonovex.com/v1alpha1
+kind: AgentRun
+metadata:
+  name: auto-jj
+spec:
+  agent: claude
+  configRef: jj-config
+  repository:
+    url: https://github.com/org/repo.git
+  prompt: "Add input validation to all API endpoints"
+```
+
+### Agent run with Nix packages
+
+Provision reproducible tool environments using [Nix](https://nixos.org/). The operator adds a `nix-env` init container that installs packages from nixpkgs into a shared volume, making them available in the agent's PATH.
+
+```yaml
+apiVersion: agent.xonovex.com/v1alpha1
+kind: AgentRun
+metadata:
+  name: nix-agent
+spec:
+  agent: claude
+  providerRef: gemini-provider
+  repository:
+    url: https://github.com/org/repo.git
+    branch: main
+  prompt: "Set up the CI pipeline"
+  nix:
+    packages:
+      - nodejs_22
+      - python3
+      - ripgrep
+      - jujutsu
+```
+
+When `nix.packages` is set, the operator:
+1. Adds an emptyDir volume (`nix-env`)
+2. Adds a `nix-env` init container (using `nixos/nix:latest`) that bootstraps the Nix store to the volume and installs the packages via `nix profile install`
+3. Mounts the volume at `/nix` in the main container
+4. Prepends `/nix/var/nix/profiles/agent/bin` to `PATH`
+
+Package names are [nixpkgs](https://search.nixos.org/packages) attributes — the same names you'd use with `nix profile install nixpkgs#<name>`.
+
+### Nix defaults via config
+
+```yaml
+apiVersion: agent.xonovex.com/v1alpha1
+kind: AgentConfig
+metadata:
+  name: nix-config
+spec:
+  defaultAgent: claude
+  defaultProviders:
+    claude: gemini-provider
+  defaultNix:
+    packages:
+      - nodejs_22
+      - python3
+      - git
+  storageSize: 10Gi
+---
+# Inherits nix packages from config
+apiVersion: agent.xonovex.com/v1alpha1
+kind: AgentRun
+metadata:
+  name: auto-nix
+spec:
+  agent: claude
+  configRef: nix-config
+  repository:
+    url: https://github.com/org/repo.git
+  prompt: "Fix the build"
+```
+
+### Nix + jj + sandbox (combined)
+
+All features compose. An agent can use Nix packages, Jujutsu VCS, and gVisor sandboxing simultaneously:
+
+```yaml
+apiVersion: agent.xonovex.com/v1alpha1
+kind: AgentRun
+metadata:
+  name: full-stack-agent
+spec:
+  agent: claude
+  configRef: default
+  providerRef: gemini-provider
+  repository:
+    url: https://github.com/org/repo.git
+  prompt: "Implement the payment processing module"
+  vcs: jj
+  runtimeClassName: gvisor
+  nix:
+    packages:
+      - nodejs_22
+      - python3
+      - postgresql
+```
+
+### Multi-agent shared workspace
+
+Create a workspace with shared volumes, then launch concurrent agents. Each agent gets an isolated git worktree but shares the same checkout and config directories.
 
 ```yaml
 apiVersion: agent.xonovex.com/v1alpha1
@@ -318,22 +574,65 @@ kubectl get agentruns
 # agent-2   claude   Running   15s
 ```
 
-### 6. Monitor runs
+### Multi-agent shared workspace with jj
 
-```bash
-# Watch AgentRun status
-kubectl get agentruns -w
-# NAME           AGENT    PHASE      AGE
-# fix-auth-bug   claude   Running    30s
+Combine workspace-based runs with Jujutsu. The workspace init job clones with git and initializes jj colocated. Each agent run creates a jj workspace instead of a git worktree.
 
-# Check the underlying Job and Pod
-kubectl get jobs,pods -l agent.xonovex.com/agent-type=claude
+```yaml
+apiVersion: agent.xonovex.com/v1alpha1
+kind: AgentWorkspace
+metadata:
+  name: jj-workspace
+spec:
+  repository:
+    url: https://github.com/org/repo.git
+    branch: main
+  storageClass: nfs-csi
+  storageSize: 10Gi
+  vcs: jj  # init job runs: git clone + jj git init --colocate
+---
+apiVersion: agent.xonovex.com/v1alpha1
+kind: AgentRun
+metadata:
+  name: jj-agent-1
+spec:
+  agent: claude
+  workspaceRef: jj-workspace
+  worktree:
+    branch: agent-1-work
+  providerRef: gemini-provider
+  vcs: jj  # uses: jj workspace add (instead of git worktree add)
+  prompt: "Implement the search feature"
+```
 
-# View agent logs
-kubectl logs job/fix-auth-bug -c agent -f
+### Multi-agent shared workspace with sandbox
 
-# View init container logs (git clone)
-kubectl logs job/fix-auth-bug -c git-clone
+Combine workspace-based runs with runtime sandboxing. The workspace init Job runs with the default runtime, while each agent Job runs in the sandbox.
+
+```yaml
+apiVersion: agent.xonovex.com/v1alpha1
+kind: AgentWorkspace
+metadata:
+  name: sandboxed-ws
+spec:
+  repository:
+    url: https://github.com/org/repo.git
+    branch: main
+  storageClass: nfs-csi
+  storageSize: 10Gi
+---
+apiVersion: agent.xonovex.com/v1alpha1
+kind: AgentRun
+metadata:
+  name: sandboxed-agent-1
+spec:
+  agent: claude
+  workspaceRef: sandboxed-ws
+  worktree:
+    branch: agent-1-work
+  providerRef: gemini-provider
+  runtimeClassName: gvisor  # agent Job runs in gVisor; workspace init Job does not
+  prompt: "Refactor the database layer"
 ```
 
 ### Inline provider (no AgentProvider resource needed)
@@ -381,6 +680,24 @@ spec:
   prompt: "Implement the user settings page"
 ```
 
+### Monitoring runs
+
+```bash
+# Watch AgentRun status
+kubectl get agentruns -w
+# NAME           AGENT    PHASE      AGE
+# fix-auth-bug   claude   Running    30s
+
+# Check the underlying Job and Pod
+kubectl get jobs,pods -l agent.xonovex.com/agent-type=claude
+
+# View agent logs
+kubectl logs job/fix-auth-bug -c agent -f
+
+# View init container logs (git clone)
+kubectl logs job/fix-auth-bug -c git-clone
+```
+
 ## Testing
 
 ```bash
@@ -397,13 +714,24 @@ go test -tags=e2e -v -timeout=600s ./test/e2e/
 
 # E2E against an existing cluster (skips Kind creation, skips image deployment test)
 USE_EXISTING_CLUSTER=true go test -tags=e2e -v -timeout=600s ./test/e2e/
+
+# E2E gVisor tests (creates Kind cluster, installs runsc, runs full workflow in gVisor sandbox)
+# Requires: kind, kubectl, Docker, internet access (downloads runsc binary)
+go test -tags=e2e_gvisor -v -timeout=600s ./test/e2e-gvisor/
+
+# E2E Kata tests (creates Kind cluster, installs Kata, runs full workflow in Kata VM)
+# Requires: kind, kubectl, Docker, /dev/kvm, internet access (downloads Kata release)
+# Note: VM isolation tests skip gracefully in unprivileged kind (vsock/QEMU errors)
+go test -tags=e2e_kata -v -timeout=600s ./test/e2e-kata/
 ```
 
 ### What the tests cover
 
 - **Unit (68 tests):** Builders (PVC, Job, containers, env vars, workspace PVC/Job/worktree), webhooks (defaulting and validation for all 4 CRDs including workspaceRef rules), resolvers (config, provider, workspace).
 - **Integration (20 tests):** Reconciler logic against a real API server — PVC/Job creation, phase transitions (Running, Succeeded, Failed, TimedOut), provider resolution, AgentConfig defaults, terminal phase skipping, AgentWorkspace PVC creation, workspace Ready/Failed transitions, AgentRun with workspaceRef waiting for workspace Ready, backward compatibility.
-- **E2E (7 tests):** Full cluster behavior — Pod scheduling, PVC binding, init container failure propagation, owner reference garbage collection, Docker image deployment with health probe validation, multi-agent workspace with concurrent runs.
+- **E2E (7 tests):** Full cluster behavior — Pod scheduling, PVC binding, init container failure propagation, owner reference garbage collection, Docker image deployment with health probe validation, multi-agent workspace with concurrent runs, full-cycle pipeline (git clone + fake agent binary → Succeeded).
+- **E2E gVisor (5 tests):** Sandbox isolation verification (dmesg gVisor banner), runtimeClassName propagation to Job/Pod, AgentConfig default inheritance, full workflow (Secret + Provider + Config + git clone + agent → Succeeded inside gVisor), workspace-based run (init Job has no runtimeClassName, agent Job does).
+- **E2E Kata (4 tests):** VM isolation verification (guest kernel differs from host, /dev/pmem0), runtimeClassName propagation to Job/Pod, AgentConfig default inheritance, full workflow (Secret + Provider + Config + git clone + agent → Succeeded inside Kata VM, skips in unprivileged kind).
 
 ## Architecture
 
@@ -420,24 +748,27 @@ Each AgentRun triggers one of two paths:
 3. Shared volume PVCs are mounted at configured paths (e.g. `~/.claude/`)
 4. Controller watches Job status and updates AgentRun phase
 
+**RuntimeClassName** is applied to the Job's PodSpec when set on the AgentRun or inherited from the referenced AgentConfig. Both init and main containers run in the sandboxed runtime. Workspace init Jobs do *not* inherit runtimeClassName — only agent Jobs do.
+
 ```
 Standalone:                         Workspace:
 
 AgentRun                            AgentWorkspace
     |                                   |
-    +-> AgentConfig (defaults)          +-> PVCs (RWX): workspace + shared volumes
+    +-> AgentConfig (via configRef)     +-> PVCs (RWX): workspace + shared volumes
     +-> AgentProvider -> Secret         +-> Init Job (git clone) -> Ready
     |                                   |
     +-> PVC (RWO)                   AgentRun (workspaceRef)
     +-> Job                             |
-          +-> Init: git clone           +-> AgentConfig (defaults)
+          +-> Init: git clone           +-> AgentConfig (via configRef)
           +-> Main: agent binary        +-> AgentProvider -> Secret
-                                        |
+          +-> runtimeClassName?         |
                                         +-> Job (uses workspace PVC)
                                               +-> Init: git worktree add
                                               +-> Main: agent binary
                                                     workingDir: /workspace-wt/{run}
                                                     mounts: shared volumes
+                                              +-> runtimeClassName?
 ```
 
 ## Cleanup

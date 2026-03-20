@@ -17,6 +17,14 @@ const (
 	AgentRunPhaseTimedOut     AgentRunPhase = "TimedOut"
 )
 
+// VCSType represents the version control system used for workspace management
+type VCSType string
+
+const (
+	VCSGit     VCSType = "git"
+	VCSJujutsu VCSType = "jj"
+)
+
 // AgentType represents the type of AI agent
 type AgentType string
 
@@ -65,10 +73,22 @@ type ProviderSpec struct {
 	CliArgs []string `json:"cliArgs,omitempty"`
 }
 
+// NixSpec configures Nix package provisioning for agent containers.
+// When set, the operator adds an init container that installs the specified
+// packages from nixpkgs into a shared volume mounted at /nix.
+type NixSpec struct {
+	// Packages are nixpkgs attribute names to install (e.g. "nodejs_22", "python3", "ripgrep")
+	Packages []string `json:"packages,omitempty"`
+	// Image is the Nix container image for the init container (default: "nixos/nix:latest")
+	Image string `json:"image,omitempty"`
+}
+
 // AgentRunSpec defines the desired state of AgentRun
 type AgentRunSpec struct {
 	// Agent type to run
 	Agent AgentType `json:"agent"`
+	// ConfigRef references an AgentConfig in the namespace for defaults
+	ConfigRef string `json:"configRef,omitempty"`
 	// ProviderRef references an AgentProvider in the namespace
 	ProviderRef string `json:"providerRef,omitempty"`
 	// Provider is an inline provider configuration
@@ -93,6 +113,12 @@ type AgentRunSpec struct {
 	NodeSelector map[string]string `json:"nodeSelector,omitempty"`
 	// Tolerations for pod scheduling
 	Tolerations []corev1.Toleration `json:"tolerations,omitempty"`
+	// RuntimeClassName sets the pod runtimeClassName for VM-based isolation (e.g. Kata Containers)
+	RuntimeClassName *string `json:"runtimeClassName,omitempty"`
+	// VCS selects the version control system: "git" (default) or "jj" (Jujutsu)
+	VCS VCSType `json:"vcs,omitempty"`
+	// Nix configures Nix package provisioning for the agent environment
+	Nix *NixSpec `json:"nix,omitempty"`
 }
 
 // AgentRunStatus defines the observed state of AgentRun

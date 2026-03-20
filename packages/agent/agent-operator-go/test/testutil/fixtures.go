@@ -17,6 +17,13 @@ func WithAgent(agent agentv1alpha1.AgentType) AgentRunOption {
 	}
 }
 
+// WithConfigRef sets the config reference.
+func WithConfigRef(ref string) AgentRunOption {
+	return func(r *agentv1alpha1.AgentRun) {
+		r.Spec.ConfigRef = ref
+	}
+}
+
 // WithRepository sets the repository URL.
 func WithRepository(url string) AgentRunOption {
 	return func(r *agentv1alpha1.AgentRun) {
@@ -159,6 +166,20 @@ func WithDefaultProviders(providers map[agentv1alpha1.AgentType]string) AgentCon
 	}
 }
 
+// WithDefaultVCS sets the default VCS.
+func WithDefaultVCS(vcs agentv1alpha1.VCSType) AgentConfigOption {
+	return func(c *agentv1alpha1.AgentConfig) {
+		c.Spec.DefaultVCS = vcs
+	}
+}
+
+// WithDefaultRuntimeClassName sets the default runtime class name.
+func WithDefaultRuntimeClassName(name string) AgentConfigOption {
+	return func(c *agentv1alpha1.AgentConfig) {
+		c.Spec.DefaultRuntimeClassName = &name
+	}
+}
+
 // NewAgentConfig creates an AgentConfig with defaults and applies options.
 func NewAgentConfig(namespace, name string, opts ...AgentConfigOption) *agentv1alpha1.AgentConfig {
 	config := &agentv1alpha1.AgentConfig{
@@ -171,6 +192,30 @@ func NewAgentConfig(namespace, name string, opts ...AgentConfigOption) *agentv1a
 		opt(config)
 	}
 	return config
+}
+
+// WithNixPackages sets the Nix packages.
+func WithNixPackages(packages ...string) AgentRunOption {
+	return func(r *agentv1alpha1.AgentRun) {
+		if r.Spec.Nix == nil {
+			r.Spec.Nix = &agentv1alpha1.NixSpec{}
+		}
+		r.Spec.Nix.Packages = packages
+	}
+}
+
+// WithVCS sets the version control system.
+func WithVCS(vcs agentv1alpha1.VCSType) AgentRunOption {
+	return func(r *agentv1alpha1.AgentRun) {
+		r.Spec.VCS = vcs
+	}
+}
+
+// WithRuntimeClassName sets the runtime class name.
+func WithRuntimeClassName(name string) AgentRunOption {
+	return func(r *agentv1alpha1.AgentRun) {
+		r.Spec.RuntimeClassName = &name
+	}
 }
 
 // WithWorkspaceRef sets the workspace reference.
@@ -226,6 +271,13 @@ func WithWorkspaceStorageSize(size string) AgentWorkspaceOption {
 func WithSharedVolumes(volumes ...agentv1alpha1.SharedVolumeSpec) AgentWorkspaceOption {
 	return func(ws *agentv1alpha1.AgentWorkspace) {
 		ws.Spec.SharedVolumes = volumes
+	}
+}
+
+// WithWorkspaceVCS sets the workspace VCS.
+func WithWorkspaceVCS(vcs agentv1alpha1.VCSType) AgentWorkspaceOption {
+	return func(ws *agentv1alpha1.AgentWorkspace) {
+		ws.Spec.VCS = vcs
 	}
 }
 

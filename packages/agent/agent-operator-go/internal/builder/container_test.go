@@ -143,6 +143,226 @@ func TestBuildCloneScript_WorktreeDefaultSource(t *testing.T) {
 	}
 }
 
+func TestBuildCloneScript_WithJujutsu(t *testing.T) {
+	run := &agentv1alpha1.AgentRun{
+		Spec: agentv1alpha1.AgentRunSpec{
+			Repository: agentv1alpha1.RepositorySpec{
+				URL:    "https://github.com/example/repo.git",
+				Branch: "main",
+			},
+			VCS: agentv1alpha1.VCSJujutsu,
+		},
+	}
+
+	script := buildCloneScript(run)
+
+	if !strings.Contains(script, "git clone") {
+		t.Error("jj script should still use git clone")
+	}
+	if !strings.Contains(script, "jj git init --colocate") {
+		t.Error("jj script missing 'jj git init --colocate'")
+	}
+}
+
+func TestBuildCloneScript_GitNoJJInit(t *testing.T) {
+	run := &agentv1alpha1.AgentRun{
+		Spec: agentv1alpha1.AgentRunSpec{
+			Repository: agentv1alpha1.RepositorySpec{
+				URL: "https://github.com/example/repo.git",
+			},
+			VCS: agentv1alpha1.VCSGit,
+		},
+	}
+
+	script := buildCloneScript(run)
+
+	if strings.Contains(script, "jj") {
+		t.Error("git-only script should not contain 'jj'")
+	}
+}
+
+func TestBuildCloneScript_WithJujutsuWorktree(t *testing.T) {
+	run := &agentv1alpha1.AgentRun{
+		Spec: agentv1alpha1.AgentRunSpec{
+			Repository: agentv1alpha1.RepositorySpec{
+				URL: "https://github.com/example/repo.git",
+			},
+			Worktree: &agentv1alpha1.WorktreeSpec{
+				Branch:       "feature-branch",
+				SourceBranch: "main",
+			},
+			VCS: agentv1alpha1.VCSJujutsu,
+		},
+	}
+
+	script := buildCloneScript(run)
+
+	if !strings.Contains(script, "jj git init --colocate") {
+		t.Error("jj script missing 'jj git init --colocate'")
+	}
+	if !strings.Contains(script, "jj workspace add /workspace-wt --revision main") {
+		t.Errorf("jj script missing workspace add command, got:\n%s", script)
+	}
+	if strings.Contains(script, "git worktree") {
+		t.Error("jj script should not contain 'git worktree'")
+	}
+}
+
+func TestBuildNixInitContainer_Nil(t *testing.T) {
+	c := BuildNixInitContainer(nil)
+	if c != nil {
+		t.Error("expected nil for nil NixSpec")
+	}
+}
+
+func TestBuildNixInitContainer_EmptyPackages(t *testing.T) {
+	c := BuildNixInitContainer(&agentv1alpha1.NixSpec{})
+	if c != nil {
+		t.Error("expected nil for empty packages")
+	}
+}
+
+func TestBuildNixInitContainer_WithPackages(t *testing.T) {
+	nix := &agentv1alpha1.NixSpec{
+		Packages: []string{"nodejs_22", "python3", "ripgrep"},
+	}
+
+	c := BuildNixInitContainer(nix)
+	if c == nil {
+		t.Fatal("expected non-nil container")
+	}
+
+	if c.Name != "nix-env" {
+		t.Errorf("name = %q, want %q", c.Name, "nix-env")
+	}
+	if c.Image != "nixos/nix:latest" {
+		t.Errorf("image = %q, want %q", c.Image, "nixos/nix:latest")
+	}
+
+	script := c.Args[1]
+	if !strings.Contains(script, "cp -a /nix/. /nix-env/") {
+		t.Error("script missing Nix store bootstrap")
+	}
+	if !strings.Contains(script, "nixpkgs#nodejs_22") {
+		t.Error("script missing nodejs_22 package")
+	}
+	if !strings.Contains(script, "nixpkgs#python3") {
+		t.Error("script missing python3 package")
+	}
+	if !strings.Contains(script, "nixpkgs#ripgrep") {
+		t.Error("script missing ripgrep package")
+	}
+	if !strings.Contains(script, "profile install --profile /nix/var/nix/profiles/agent") {
+		t.Error("script missing profile install command")
+	}
+
+	if len(c.VolumeMounts) != 1 || c.VolumeMounts[0].MountPath != "/nix-env" {
+		t.Errorf("volume mount = %v, want /nix-env", c.VolumeMounts)
+	}
+}
+
+func TestBuildNixInitContainer_CustomImage(t *testing.T) {
+	nix := &agentv1alpha1.NixSpec{
+		Packages: []string{"nodejs_22"},
+		Image:    "nixos/nix:2.28.3",
+	}
+
+	c := BuildNixInitContainer(nix)
+	if c.Image != "nixos/nix:2.28.3" {
+		t.Errorf("image = %q, want %q", c.Image, "nixos/nix:2.28.3")
+	}
+}
+
+func TestBuildInitContainers_WithNix(t *testing.T) {
+	run := &agentv1alpha1.AgentRun{
+		Spec: agentv1alpha1.AgentRunSpec{
+			Repository: agentv1alpha1.RepositorySpec{
+				URL: "https://github.com/example/repo.git",
+			},
+			Nix: &agentv1alpha1.NixSpec{
+				Packages: []string{"nodejs_22"},
+			},
+		},
+	}
+
+	containers := BuildInitContainers(run, "node:latest")
+
+	if len(containers) != 2 {
+		t.Fatalf("len(containers) = %d, want 2", len(containers))
+	}
+	if containers[0].Name != "git-clone" {
+		t.Errorf("containers[0].Name = %q, want git-clone", containers[0].Name)
+	}
+	if containers[1].Name != "nix-env" {
+		t.Errorf("containers[1].Name = %q, want nix-env", containers[1].Name)
+	}
+}
+
+func TestBuildMainContainers_WithNix(t *testing.T) {
+	run := &agentv1alpha1.AgentRun{
+		Spec: agentv1alpha1.AgentRunSpec{
+			Agent: agentv1alpha1.AgentTypeClaude,
+			Repository: agentv1alpha1.RepositorySpec{
+				URL: "https://github.com/example/repo.git",
+			},
+			Nix: &agentv1alpha1.NixSpec{
+				Packages: []string{"nodejs_22"},
+			},
+		},
+	}
+
+	containers := BuildMainContainers(run, nil, "image:latest")
+
+	c := containers[0]
+
+	// Should have nix-env volume mount
+	foundNix := false
+	for _, vm := range c.VolumeMounts {
+		if vm.Name == "nix-env" && vm.MountPath == "/nix" {
+			foundNix = true
+		}
+	}
+	if !foundNix {
+		t.Error("expected nix-env volume mount at /nix")
+	}
+
+	// Should have PATH with nix profile bin
+	foundPath := false
+	for _, env := range c.Env {
+		if env.Name == "PATH" && strings.Contains(env.Value, "/nix/var/nix/profiles/agent/bin") {
+			foundPath = true
+		}
+	}
+	if !foundPath {
+		t.Error("expected PATH env var with nix profile bin")
+	}
+}
+
+func TestBuildMainContainers_WithoutNix(t *testing.T) {
+	run := &agentv1alpha1.AgentRun{
+		Spec: agentv1alpha1.AgentRunSpec{
+			Agent: agentv1alpha1.AgentTypeClaude,
+			Repository: agentv1alpha1.RepositorySpec{
+				URL: "https://github.com/example/repo.git",
+			},
+		},
+	}
+
+	containers := BuildMainContainers(run, nil, "image:latest")
+	c := containers[0]
+
+	for _, vm := range c.VolumeMounts {
+		if vm.Name == "nix-env" {
+			t.Error("unexpected nix-env volume mount when Nix is not configured")
+		}
+	}
+	for _, env := range c.Env {
+		if env.Name == "PATH" {
+			t.Error("unexpected PATH env var when Nix is not configured")
+		}
+	}
+}
+
 func TestBuildMainContainers_Claude(t *testing.T) {
 	run := &agentv1alpha1.AgentRun{
 		ObjectMeta: metav1.ObjectMeta{Name: "test"},

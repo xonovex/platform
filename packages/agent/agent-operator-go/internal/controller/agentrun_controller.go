@@ -64,9 +64,9 @@ func (r *AgentRunReconciler) reconcileStandalone(ctx context.Context, agentRun *
 	log := log.FromContext(ctx)
 
 	// 2. Resolve AgentConfig defaults
-	agentConfig, err := resolver.ResolveConfig(ctx, r.Client, agentRun.Namespace)
+	agentConfig, err := resolver.ResolveConfig(ctx, r.Client, agentRun.Namespace, agentRun.Spec.ConfigRef)
 	if err != nil {
-		log.Error(err, "failed to resolve agent config")
+		log.Error(err, "failed to resolve agent config", "configRef", agentRun.Spec.ConfigRef)
 	}
 
 	// 3. Resolve provider
@@ -114,6 +114,16 @@ func (r *AgentRunReconciler) reconcileStandalone(ctx context.Context, agentRun *
 			if agentConfig.Spec.DefaultTimeout != nil {
 				defaultTimeout = agentConfig.Spec.DefaultTimeout.Duration
 			}
+		}
+
+		if agentRun.Spec.RuntimeClassName == nil && agentConfig != nil && agentConfig.Spec.DefaultRuntimeClassName != nil {
+			agentRun.Spec.RuntimeClassName = agentConfig.Spec.DefaultRuntimeClassName
+		}
+		if agentRun.Spec.VCS == "" && agentConfig != nil && agentConfig.Spec.DefaultVCS != "" {
+			agentRun.Spec.VCS = agentConfig.Spec.DefaultVCS
+		}
+		if agentRun.Spec.Nix == nil && agentConfig != nil && agentConfig.Spec.DefaultNix != nil {
+			agentRun.Spec.Nix = agentConfig.Spec.DefaultNix
 		}
 
 		job := builder.BuildJob(agentRun, providerEnv, pvcName, defaultImage, defaultTimeout)
@@ -169,9 +179,9 @@ func (r *AgentRunReconciler) reconcileWithWorkspace(ctx context.Context, agentRu
 	}
 
 	// 2. Resolve AgentConfig defaults
-	agentConfig, err := resolver.ResolveConfig(ctx, r.Client, agentRun.Namespace)
+	agentConfig, err := resolver.ResolveConfig(ctx, r.Client, agentRun.Namespace, agentRun.Spec.ConfigRef)
 	if err != nil {
-		log.Error(err, "failed to resolve agent config")
+		log.Error(err, "failed to resolve agent config", "configRef", agentRun.Spec.ConfigRef)
 	}
 
 	// 3. Resolve provider
@@ -193,6 +203,16 @@ func (r *AgentRunReconciler) reconcileWithWorkspace(ctx context.Context, agentRu
 			if agentConfig.Spec.DefaultTimeout != nil {
 				defaultTimeout = agentConfig.Spec.DefaultTimeout.Duration
 			}
+		}
+
+		if agentRun.Spec.RuntimeClassName == nil && agentConfig != nil && agentConfig.Spec.DefaultRuntimeClassName != nil {
+			agentRun.Spec.RuntimeClassName = agentConfig.Spec.DefaultRuntimeClassName
+		}
+		if agentRun.Spec.VCS == "" && agentConfig != nil && agentConfig.Spec.DefaultVCS != "" {
+			agentRun.Spec.VCS = agentConfig.Spec.DefaultVCS
+		}
+		if agentRun.Spec.Nix == nil && agentConfig != nil && agentConfig.Spec.DefaultNix != nil {
+			agentRun.Spec.Nix = agentConfig.Spec.DefaultNix
 		}
 
 		job := builder.BuildWorkspaceJob(agentRun, providerEnv, ws.Status.WorkspacePVC, ws.Spec.SharedVolumes, ws.Status.SharedVolumePVCs, defaultImage, defaultTimeout)

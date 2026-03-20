@@ -63,10 +63,18 @@ func BuildJob(run *agentv1alpha1.AgentRun, providerEnv map[string]string, pvcNam
 						},
 					},
 					NodeSelector: run.Spec.NodeSelector,
-					Tolerations:  run.Spec.Tolerations,
+					Tolerations:      run.Spec.Tolerations,
+					RuntimeClassName: run.Spec.RuntimeClassName,
 				},
 			},
 		},
+	}
+
+	if run.Spec.Nix != nil && len(run.Spec.Nix.Packages) > 0 {
+		job.Spec.Template.Spec.Volumes = append(job.Spec.Template.Spec.Volumes, corev1.Volume{
+			Name:         nixVolumeName,
+			VolumeSource: corev1.VolumeSource{EmptyDir: &corev1.EmptyDirVolumeSource{}},
+		})
 	}
 
 	if len(run.Spec.Resources.Requests) > 0 || len(run.Spec.Resources.Limits) > 0 {
