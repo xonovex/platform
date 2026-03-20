@@ -64,8 +64,12 @@ func TestE2E_MultiAgentWorkspace(t *testing.T) {
 	if err := k8sClient.Get(ctx, initJobKey, &initJob); err != nil {
 		t.Fatalf("init Job not created: %v", err)
 	}
-	initJob.Status.StartTime = &now
+	initJob.Status.Active = 0
+	if initJob.Status.StartTime == nil {
+		initJob.Status.StartTime = &now
+	}
 	initJob.Status.CompletionTime = &now
+	initJob.Status.Succeeded = 1
 	initJob.Status.Conditions = append(initJob.Status.Conditions,
 		batchv1.JobCondition{
 			Type:   batchv1.JobSuccessCriteriaMet,
@@ -116,8 +120,12 @@ func TestE2E_MultiAgentWorkspace(t *testing.T) {
 		}
 
 		jobNow := metav1.Now()
-		job.Status.StartTime = &jobNow
+		job.Status.Active = 0
+		if job.Status.StartTime == nil {
+			job.Status.StartTime = &jobNow
+		}
 		job.Status.CompletionTime = &jobNow
+		job.Status.Succeeded = 1
 		job.Status.Conditions = append(job.Status.Conditions,
 			batchv1.JobCondition{
 				Type:   batchv1.JobSuccessCriteriaMet,
