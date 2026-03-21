@@ -109,6 +109,7 @@ Utility commands for project instructions, insights, and skill management:
 /xonovex-utility:instructions-init          Create an AGENTS.md by analyzing directory structure
 /xonovex-utility:instructions-simplify      Reduce verbosity in instruction files
 /xonovex-utility:instructions-sync          Sync AGENTS.md with current directory state
+/xonovex-utility:instructions-consolidate   Remove redundant files and standardize format
 /xonovex-utility:insights-extract           Analyze session for mistakes and lessons learned
 /xonovex-utility:insights-instructions-integrate  Convert insights into AGENTS.md bullet points
 /xonovex-utility:insights-skills-integrate  Convert insights into a skill
