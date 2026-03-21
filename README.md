@@ -10,10 +10,10 @@ AI coding agents handle prompts, tools, and code changes. What they don't manage
 
 Xonovex fills that gap:
 
-- **agent-cli** configures sandboxes, providers, and terminal sessions, then launches the agent
-- **agent-operator-go** orchestrates agents as Kubernetes Jobs with managed workspaces and provider secrets
-- **Workflow commands** provide plan-driven development with worktrees and parallel execution
-- **Skills** give agents coding guidelines they follow automatically
+- **[agent-cli-go](packages/agent/agent-cli-go/)** configures sandboxes, providers, and terminal sessions, then launches the agent
+- **[agent-operator-go](packages/agent/agent-operator-go/)** orchestrates agents as Kubernetes Jobs with managed workspaces and provider secrets
+- **[Workflow commands](packages/command/command-workflow/)** provide plan-driven development with worktrees and parallel execution
+- **[Skills](packages/skill/)** give agents coding guidelines they follow automatically
 
 ## Packages
 
