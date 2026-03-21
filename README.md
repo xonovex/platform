@@ -50,16 +50,49 @@ Xonovex manages everything *around* the agent: sandbox isolation, model provider
 
 ## Quick Start
 
-### Agent CLI (TypeScript)
+### Claude Code Plugins
+
+Add the marketplace, then install workflow commands and skills:
 
 ```bash
-npm install -g @xonovex/agent-cli
-agent-cli run --agent claude --sandbox bwrap
+# Add the Xonovex plugin marketplace
+claude plugin marketplace add xonovex/platform
+
+# Install workflow commands (plan, code quality, git)
+claude plugin install xonovex-workflow@platform
+
+# Install utility commands (instructions, insights, skills)
+claude plugin install xonovex-utility@platform
+
+# Install skills (each skill is a separate plugin)
+claude plugin install xonovex-typescript@platform
+claude plugin install xonovex-react@platform
+claude plugin install xonovex-general-fp@platform
 ```
 
-### Agent CLI (Go)
+Once installed, workflow commands are available as slash commands in Claude Code:
+
+```
+/plan-research        Research viability and alternatives
+/plan-create          Create a plan with subplans
+/plan-worktree-create Create a worktree for isolated work
+/plan-continue        Resume work from an existing plan
+/plan-validate        Validate against guidelines and tests
+/code-simplify        Find and fix code smells
+/code-harden          Improve type safety and error handling
+/git-commit           Commit and optionally push changes
+```
+
+Skills are applied automatically when relevant to the task.
+
+### Agent CLI
 
 ```bash
+# TypeScript
+npm install -g @xonovex/agent-cli
+agent-cli run --agent claude --sandbox bwrap
+
+# Go (cross-platform binary)
 npm install -g @xonovex/agent-cli-go
 agent-cli run --agent claude --sandbox bwrap --provider gemini
 ```
@@ -100,25 +133,6 @@ spec:
   prompt: "Review the codebase and suggest improvements"
 EOF
 ```
-
-### Workflow Commands
-
-Slash commands for plan-driven development (used inside an agent session):
-
-```
-/plan-research        Research viability and alternatives
-/plan-create          Create a plan with subplans
-/plan-worktree-create Create a worktree for isolated work
-/plan-continue        Resume work from an existing plan
-/plan-validate        Validate against guidelines and tests
-/code-simplify        Find and fix code smells
-/code-harden          Improve type safety and error handling
-/git-commit           Commit and optionally push changes
-```
-
-### Skills
-
-Add a skill to your project by copying its directory into your repo or referencing it in your agent configuration. Each skill contains a `SKILL.md` with guidelines that agents follow automatically.
 
 ## Development
 
