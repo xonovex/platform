@@ -6,7 +6,7 @@
 
 > Execution context manager for AI coding agents
 
-AI coding agents handle prompts, tools, and code changes — they *are* the agent. What they don't control is the environment they run in: where the process executes, which model backs it, how the terminal session is managed, and whether the workspace is reproducible.
+AI coding agents handle prompts, tools, and code changes. They *are* the agent. What they don't control is the environment they run in: where the process executes, which model backs it, how the terminal session is managed, and whether the workspace is reproducible.
 
 Xonovex manages everything *around* the agent: sandbox isolation, model provider routing, terminal session management, reproducible environments, and Kubernetes orchestration. It sets up the context, launches the agent, and gets out of the way.
 

@@ -214,7 +214,7 @@ When `nix` is configured, the operator:
 3. Mounts the volume at `/nix` in the main container
 4. Prepends `/nix/var/nix/profiles/agent/bin` to `PATH`
 
-Package names are [nixpkgs](https://search.nixos.org/packages) attributes — the same names you'd use with `nix profile install nixpkgs#<name>`.
+Package names are [nixpkgs](https://search.nixos.org/packages) attributes, the same names you'd use with `nix profile install nixpkgs#<name>`.
 
 ## Installation
 
@@ -334,7 +334,7 @@ kubectl get agentruns -w
 Run agents inside a gVisor sandbox for syscall-level isolation. Requires the `gvisor` RuntimeClass to be configured on your cluster.
 
 ```yaml
-# RuntimeClass (cluster setup — once per cluster)
+# RuntimeClass (cluster setup, once per cluster)
 apiVersion: node.k8s.io/v1
 kind: RuntimeClass
 metadata:
@@ -365,7 +365,7 @@ The `runtimeClassName` is applied to the Job's PodSpec. Both the init container 
 Run agents inside a Kata Containers VM for hardware-level isolation. Requires the `kata` RuntimeClass and hardware virtualization support (`/dev/kvm`).
 
 ```yaml
-# RuntimeClass (cluster setup — once per cluster)
+# RuntimeClass (cluster setup, once per cluster)
 apiVersion: node.k8s.io/v1
 kind: RuntimeClass
 metadata:
@@ -694,11 +694,11 @@ kubectl logs job/fix-auth-bug -c git-clone
 # Unit tests
 go test ./...
 
-# Integration tests (envtest — real API server, no kubelet)
+# Integration tests (envtest, real API server, no kubelet)
 # Requires: setup-envtest (go install sigs.k8s.io/controller-runtime/tools/setup-envtest@latest)
 KUBEBUILDER_ASSETS=$(setup-envtest use -p path) go test -tags=integration -v -timeout=300s ./test/integration/
 
-# E2E tests (Kind — full cluster with scheduling and garbage collection)
+# E2E tests (Kind, full cluster with scheduling and garbage collection)
 # Requires: kind, kubectl, Docker
 go test -tags=e2e -v -timeout=600s ./test/e2e/
 
@@ -718,8 +718,8 @@ go test -tags=e2e_kata -v -timeout=600s ./test/e2e-kata/
 ### What the tests cover
 
 - **Unit (68 tests):** Builders (PVC, Job, containers, env vars, workspace PVC/Job/worktree), webhooks (defaulting and validation for all CRDs including workspaceRef rules), resolvers (harness, provider, workspace, toolchain).
-- **Integration (20 tests):** Reconciler logic against a real API server — PVC/Job creation, phase transitions (Running, Succeeded, Failed, TimedOut), provider resolution, AgentHarness defaults, terminal phase skipping, AgentWorkspace PVC creation, workspace Ready/Failed transitions, AgentRun with workspaceRef waiting for workspace Ready.
-- **E2E (7 tests):** Full cluster behavior — Pod scheduling, PVC binding, init container failure propagation, owner reference garbage collection, Docker image deployment with health probe validation, multi-agent workspace with concurrent runs, full-cycle pipeline (git clone + fake agent binary -> Succeeded).
+- **Integration (20 tests):** Reconciler logic against a real API server. PVC/Job creation, phase transitions (Running, Succeeded, Failed, TimedOut), provider resolution, AgentHarness defaults, terminal phase skipping, AgentWorkspace PVC creation, workspace Ready/Failed transitions, AgentRun with workspaceRef waiting for workspace Ready.
+- **E2E (7 tests):** Full cluster behavior. Pod scheduling, PVC binding, init container failure propagation, owner reference garbage collection, Docker image deployment with health probe validation, multi-agent workspace with concurrent runs, full-cycle pipeline (git clone + fake agent binary -> Succeeded).
 - **E2E gVisor (5 tests):** Sandbox isolation verification (dmesg gVisor banner), runtimeClassName propagation to Job/Pod, AgentHarness default inheritance, full workflow (Secret + Provider + Harness + git clone + agent -> Succeeded inside gVisor), workspace-based run (init Job has no runtimeClassName, agent Job does).
 - **E2E Kata (4 tests):** VM isolation verification (guest kernel differs from host, /dev/pmem0), runtimeClassName propagation to Job/Pod, AgentHarness default inheritance, full workflow (Secret + Provider + Harness + git clone + agent -> Succeeded inside Kata VM, skips in unprivileged kind).
 
@@ -738,7 +738,7 @@ Each AgentRun triggers one of two paths:
 3. Shared volume PVCs are mounted at configured paths (e.g. `~/.claude/`)
 4. Controller watches Job status and updates AgentRun phase
 
-**RuntimeClassName** is applied to the Job's PodSpec when set on the AgentRun or inherited from the referenced AgentHarness. Both init and main containers run in the sandboxed runtime. Workspace init Jobs do *not* inherit runtimeClassName — only agent Jobs do.
+**RuntimeClassName** is applied to the Job's PodSpec when set on the AgentRun or inherited from the referenced AgentHarness. Both init and main containers run in the sandboxed runtime. Workspace init Jobs do *not* inherit runtimeClassName; only agent Jobs do.
 
 ```
 Standalone:                         Workspace:
