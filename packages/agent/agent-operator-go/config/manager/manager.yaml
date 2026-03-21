@@ -22,7 +22,7 @@ spec:
       terminationGracePeriodSeconds: 10
       containers:
         - name: manager
-          image: agent-operator:latest
+          image: ghcr.io/xonovex/agent-operator-go:latest
           command:
             - /operator
           args:

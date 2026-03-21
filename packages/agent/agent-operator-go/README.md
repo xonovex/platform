@@ -199,7 +199,7 @@ kubectl apply -k config/crd/
 
 ```bash
 # Build the Docker image (run from repo root)
-docker build -f packages/agent/agent-operator-go/Dockerfile -t agent-operator:latest .
+docker build -f packages/agent/agent-operator-go/Dockerfile -t ghcr.io/xonovex/agent-operator-go:latest .
 
 # Deploy with kustomize (uses the default namespace/RBAC configuration)
 kubectl apply -k config/default/
