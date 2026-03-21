@@ -13,45 +13,8 @@ Xonovex fills that gap:
 - **[agent-cli-go](packages/agent/agent-cli-go/)** configures sandboxes, providers, and terminal sessions, then launches the agent
 - **[agent-operator-go](packages/agent/agent-operator-go/)** orchestrates agents as Kubernetes Jobs with managed workspaces and provider secrets
 - **[Workflow commands](packages/command/command-workflow/)** provide plan-driven development with worktrees and parallel execution
+- **[Utility commands](packages/command/command-utility/)** manage project instructions, extract insights, and create skills
 - **[Skills](packages/skill/)** give agents coding guidelines they follow automatically
-
-## Packages
-
-### Agent
-
-| Package | Description |
-|---------|-------------|
-| [agent-cli](packages/agent/agent-cli/) | Unified CLI for running agents with sandbox, provider, and terminal options |
-| [agent-cli-go](packages/agent/agent-cli-go/) | Go implementation of agent-cli (cross-platform binaries) |
-| [agent-operator-go](packages/agent/agent-operator-go/) | Kubernetes operator for running agents as Jobs with managed workspaces |
-
-### Commands
-
-| Package | Description |
-|---------|-------------|
-| [command-workflow](packages/command/command-workflow/) | Plan-driven development workflow with worktrees and parallel execution |
-| [command-utility](packages/command/command-utility/) | Utility commands for content, instructions, insights, and skills |
-
-### Skills
-
-| Package | Description |
-|---------|-------------|
-| [skill-general-fp](packages/skill/skill-general-fp/) | Functional programming guidelines |
-| [skill-general-oop](packages/skill/skill-general-oop/) | Object-oriented programming guidelines |
-| [skill-typescript](packages/skill/skill-typescript/) | TypeScript guidelines |
-| [skill-python](packages/skill/skill-python/) | Python guidelines |
-| [skill-c99](packages/skill/skill-c99/) | C99 guidelines |
-| [skill-lua](packages/skill/skill-lua/) | Lua guidelines |
-| [skill-react](packages/skill/skill-react/) | React patterns |
-| [skill-docker](packages/skill/skill-docker/) | Docker best practices |
-| [skill-kubernetes](packages/skill/skill-kubernetes/) | Kubernetes patterns |
-| [skill-terraform](packages/skill/skill-terraform/) | Terraform patterns |
-| [skill-git](packages/skill/skill-git/) | Git workflow guidelines |
-| [skill-shell-scripting](packages/skill/skill-shell-scripting/) | Shell scripting guidelines |
-| [skill-vitest](packages/skill/skill-vitest/) | Vitest testing patterns |
-| [skill-zod](packages/skill/skill-zod/) | Zod schema validation patterns |
-| [skill-sql-postgresql](packages/skill/skill-sql-postgresql/) | PostgreSQL and SQL guidelines |
-| [skill-threejs](packages/skill/skill-threejs/) | Three.js 3D graphics patterns |
 
 ## Quick Start
 
