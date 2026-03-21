@@ -8,7 +8,12 @@
 
 AI coding agents handle prompts, tools, and code changes. What they don't manage is the environment around them: sandbox isolation, model provider routing, terminal sessions, reproducible toolchains, and orchestration at scale.
 
-Xonovex fills that gap. It configures the execution context before the agent launches, then gets out of the way.
+Xonovex fills that gap:
+
+- **agent-cli** configures sandboxes, providers, and terminal sessions, then launches the agent
+- **agent-operator-go** orchestrates agents as Kubernetes Jobs with managed workspaces and provider secrets
+- **Workflow commands** provide plan-driven development with worktrees and parallel execution
+- **Skills** give agents coding guidelines they follow automatically
 
 ## Packages
 
