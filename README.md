@@ -1,10 +1,10 @@
-# Xonovex Platform
+# Xonovex Platform Monorepo
 
 ![License](https://img.shields.io/badge/license-MIT-blue)
 ![Node](https://img.shields.io/badge/node-20%2B-green)
 ![Go](https://img.shields.io/badge/go-1.25%2B-00ADD8)
 
-> Execution context manager for AI coding agents
+> Monorepo for Xonovex AI agent tools, workflows, and skills
 
 AI coding agents handle prompts, tools, and code changes. They *are* the agent. What they don't control is the environment they run in: where the process executes, which model backs it, how the terminal session is managed, and whether the workspace is reproducible.
 
