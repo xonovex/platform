@@ -50,13 +50,75 @@ Xonovex manages everything *around* the agent: sandbox isolation, model provider
 
 ## Quick Start
 
-```bash
-# Install
-npm install -g @xonovex/agent-cli
+### Agent CLI (TypeScript)
 
-# Run an agent
+```bash
+npm install -g @xonovex/agent-cli
 agent-cli run --agent claude --sandbox bwrap
 ```
+
+### Agent CLI (Go)
+
+```bash
+npm install -g @xonovex/agent-cli-go
+agent-cli run --agent claude --sandbox bwrap --provider gemini
+```
+
+### Kubernetes Operator
+
+```bash
+# Install CRDs and deploy the operator
+kubectl apply -k packages/agent/agent-operator-go/config/crd/
+kubectl apply -k packages/agent/agent-operator-go/config/default/
+
+# Create a provider and run an agent
+kubectl create secret generic gemini-credentials --from-literal=api-key='your-key'
+kubectl apply -f - <<EOF
+apiVersion: agent.xonovex.com/v1alpha1
+kind: AgentProvider
+metadata:
+  name: gemini-provider
+spec:
+  displayName: Google Gemini
+  authTokenSecretRef:
+    name: gemini-credentials
+    key: api-key
+---
+apiVersion: agent.xonovex.com/v1alpha1
+kind: AgentRun
+metadata:
+  name: review-code
+spec:
+  harness:
+    type: claude
+  providerRef: gemini-provider
+  workspace:
+    type: git
+    repository:
+      url: https://github.com/org/repo.git
+      branch: main
+  prompt: "Review the codebase and suggest improvements"
+EOF
+```
+
+### Workflow Commands
+
+Slash commands for plan-driven development (used inside an agent session):
+
+```
+/plan-research        Research viability and alternatives
+/plan-create          Create a plan with subplans
+/plan-worktree-create Create a worktree for isolated work
+/plan-continue        Resume work from an existing plan
+/plan-validate        Validate against guidelines and tests
+/code-simplify        Find and fix code smells
+/code-harden          Improve type safety and error handling
+/git-commit           Commit and optionally push changes
+```
+
+### Skills
+
+Add a skill to your project by copying its directory into your repo or referencing it in your agent configuration. Each skill contains a `SKILL.md` with guidelines that agents follow automatically.
 
 ## Development
 
