@@ -227,14 +227,14 @@ Package names are [nixpkgs](https://search.nixos.org/packages) attributes, the s
 ### Install CRDs
 
 ```bash
-kubectl apply -k config/crd/
+kubectl apply -k https://github.com/xonovex/platform//packages/agent/agent-operator-go/config/crd
 ```
 
 ### Deploy the operator
 
 ```bash
 # Deploy with kustomize (pulls from GHCR)
-kubectl apply -k config/default/
+kubectl apply -k https://github.com/xonovex/platform//packages/agent/agent-operator-go/config/default
 ```
 
 The manager deployment uses `ghcr.io/xonovex/agent-operator-go:latest`.

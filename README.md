@@ -68,8 +68,8 @@ agent-cli run --agent claude --sandbox bwrap --provider gemini
 
 ```bash
 # Install CRDs and deploy the operator
-kubectl apply -k packages/agent/agent-operator-go/config/crd/
-kubectl apply -k packages/agent/agent-operator-go/config/default/
+kubectl apply -k https://github.com/xonovex/platform//packages/agent/agent-operator-go/config/crd
+kubectl apply -k https://github.com/xonovex/platform//packages/agent/agent-operator-go/config/default
 
 # Create a provider and run an agent
 kubectl create secret generic gemini-credentials --from-literal=api-key='your-key'
