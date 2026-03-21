@@ -103,6 +103,20 @@ Once installed, workflow commands are available as slash commands in Claude Code
 /xonovex-workflow:git-commit             Commit and push changes
 ```
 
+Utility commands for project instructions, insights, and skill management:
+
+```
+/xonovex-utility:instructions-init          Create an AGENTS.md by analyzing directory structure
+/xonovex-utility:instructions-simplify      Reduce verbosity in instruction files
+/xonovex-utility:instructions-sync          Sync AGENTS.md with current directory state
+/xonovex-utility:insights-extract           Analyze session for mistakes and lessons learned
+/xonovex-utility:insights-instructions-integrate  Convert insights into AGENTS.md bullet points
+/xonovex-utility:insights-skills-integrate  Convert insights into a skill
+/xonovex-utility:skill-guidelines-create    Create a skill from a document or URL
+/xonovex-utility:skill-guidelines-extract   Extract patterns from codebase into a skill
+/xonovex-utility:slashcommand-create        Create a slash command from a completed task
+```
+
 Skills are applied automatically when relevant to the task.
 
 ## Development
