@@ -34,11 +34,20 @@ Xonovex manages everything *around* the agent: sandbox isolation, model provider
 |---------|-------------|
 | [skill-general-fp](packages/skill/skill-general-fp/) | Functional programming guidelines |
 | [skill-general-oop](packages/skill/skill-general-oop/) | Object-oriented programming guidelines |
-| [skill-git](packages/skill/skill-git/) | Git workflow guidelines |
+| [skill-typescript](packages/skill/skill-typescript/) | TypeScript guidelines |
+| [skill-python](packages/skill/skill-python/) | Python guidelines |
+| [skill-c99](packages/skill/skill-c99/) | C99 guidelines |
+| [skill-lua](packages/skill/skill-lua/) | Lua guidelines |
+| [skill-react](packages/skill/skill-react/) | React patterns |
 | [skill-docker](packages/skill/skill-docker/) | Docker best practices |
 | [skill-kubernetes](packages/skill/skill-kubernetes/) | Kubernetes patterns |
-| [skill-typescript](packages/skill/skill-typescript/) | TypeScript guidelines |
+| [skill-terraform](packages/skill/skill-terraform/) | Terraform patterns |
+| [skill-git](packages/skill/skill-git/) | Git workflow guidelines |
+| [skill-shell-scripting](packages/skill/skill-shell-scripting/) | Shell scripting guidelines |
 | [skill-vitest](packages/skill/skill-vitest/) | Vitest testing patterns |
+| [skill-zod](packages/skill/skill-zod/) | Zod schema validation patterns |
+| [skill-sql-postgresql](packages/skill/skill-sql-postgresql/) | PostgreSQL and SQL guidelines |
+| [skill-threejs](packages/skill/skill-threejs/) | Three.js 3D graphics patterns |
 
 ## Quick Start
 
