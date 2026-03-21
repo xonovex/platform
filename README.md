@@ -73,14 +73,19 @@ claude plugin install xonovex-general-fp@platform
 Once installed, workflow commands are available as slash commands in Claude Code:
 
 ```
-/plan-research        Research viability and alternatives
-/plan-create          Create a plan with subplans
-/plan-worktree-create Create a worktree for isolated work
-/plan-continue        Resume work from an existing plan
-/plan-validate        Validate against guidelines and tests
-/code-simplify        Find and fix code smells
-/code-harden          Improve type safety and error handling
-/git-commit           Commit and optionally push changes
+/plan-research          Research codebase and web for requirements
+/plan-create            Create a high-level plan for user review
+/plan-subplans-create   Generate detailed subplans with parallel execution detection
+/plan-worktree-create   Create a git worktree for a feature branch
+/plan-continue          Resume work from an existing plan
+/plan-validate          Verify that a plan or current work has been fully achieved
+/plan-update            Update plan status and test results
+/plan-refine            Process user annotations and refine iteratively
+/plan-worktree-merge    Merge feature worktree back to source
+/code-simplify          Consolidate duplicates, remove dead code, flatten abstractions
+/code-harden            Improve type safety, validation, and error handling
+/code-align             Align two similar implementations and suggest improvements
+/git-commit             Commit and push changes
 ```
 
 Skills are applied automatically when relevant to the task.
