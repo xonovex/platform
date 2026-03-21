@@ -1,9 +1,10 @@
 # Agent Operator Go
 
-- **AgentRun** — creates Jobs for agent execution (standalone or workspace-based)
-- **AgentWorkspace** — shared RWX PVC for multi-agent coordination (git worktrees, shared config volumes)
+- **AgentRun** — creates Jobs for agent execution (standalone or workspace-based); 4 concerns via ref/inline: harness, provider, workspace, toolchain
+- **AgentHarness** — agent type defaults (image, timeout, runtimeClassName, env)
 - **AgentProvider** — reusable provider config with K8s secret management
-- **AgentConfig** — namespace-level defaults
+- **AgentWorkspace** — shared RWX PVC for multi-agent coordination (git worktrees, shared config volumes)
+- **AgentToolchain** — toolchain config (e.g. Nix packages)
 
 - Unit: `go test ./...` (builders, resolvers, webhooks)
 - Integration: `go test -tags=integration ./test/integration/` (requires `KUBEBUILDER_ASSETS`)

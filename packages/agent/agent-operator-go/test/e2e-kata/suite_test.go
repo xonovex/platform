@@ -168,10 +168,6 @@ handler: kata
 		cleanup()
 		panic("failed to setup AgentRun controller: " + err.Error())
 	}
-	if err := (&controller.AgentConfigReconciler{Client: mgr.GetClient(), Scheme: mgr.GetScheme()}).SetupWithManager(mgr); err != nil {
-		cleanup()
-		panic("failed to setup AgentConfig controller: " + err.Error())
-	}
 	if err := (&controller.AgentProviderReconciler{Client: mgr.GetClient(), Scheme: mgr.GetScheme()}).SetupWithManager(mgr); err != nil {
 		cleanup()
 		panic("failed to setup AgentProvider controller: " + err.Error())

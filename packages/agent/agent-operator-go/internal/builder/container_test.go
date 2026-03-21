@@ -12,13 +12,15 @@ import (
 func TestBuildInitContainers(t *testing.T) {
 	run := &agentv1alpha1.AgentRun{
 		Spec: agentv1alpha1.AgentRunSpec{
-			Repository: agentv1alpha1.RepositorySpec{
-				URL: "https://github.com/example/repo.git",
+			Workspace: &agentv1alpha1.WorkspaceSpec{
+				Repository: agentv1alpha1.RepositorySpec{
+					URL: "https://github.com/example/repo.git",
+				},
 			},
 		},
 	}
 
-	containers := BuildInitContainers(run, "node:latest")
+	containers := BuildInitContainers(run, "node:latest", agentv1alpha1.WorkspaceTypeGit, nil)
 
 	if len(containers) != 1 {
 		t.Fatalf("len(containers) = %d, want 1", len(containers))
@@ -40,15 +42,11 @@ func TestBuildInitContainers(t *testing.T) {
 }
 
 func TestBuildCloneScript_Basic(t *testing.T) {
-	run := &agentv1alpha1.AgentRun{
-		Spec: agentv1alpha1.AgentRunSpec{
-			Repository: agentv1alpha1.RepositorySpec{
-				URL: "https://github.com/example/repo.git",
-			},
-		},
+	repo := agentv1alpha1.RepositorySpec{
+		URL: "https://github.com/example/repo.git",
 	}
 
-	script := buildCloneScript(run)
+	script := buildCloneScript(repo, agentv1alpha1.WorkspaceTypeGit)
 
 	if !strings.Contains(script, "set -e") {
 		t.Error("script missing 'set -e'")
@@ -68,16 +66,12 @@ func TestBuildCloneScript_Basic(t *testing.T) {
 }
 
 func TestBuildCloneScript_WithBranch(t *testing.T) {
-	run := &agentv1alpha1.AgentRun{
-		Spec: agentv1alpha1.AgentRunSpec{
-			Repository: agentv1alpha1.RepositorySpec{
-				URL:    "https://github.com/example/repo.git",
-				Branch: "develop",
-			},
-		},
+	repo := agentv1alpha1.RepositorySpec{
+		URL:    "https://github.com/example/repo.git",
+		Branch: "develop",
 	}
 
-	script := buildCloneScript(run)
+	script := buildCloneScript(repo, agentv1alpha1.WorkspaceTypeGit)
 
 	if !strings.Contains(script, "--branch develop") {
 		t.Error("script missing '--branch develop'")
@@ -85,16 +79,12 @@ func TestBuildCloneScript_WithBranch(t *testing.T) {
 }
 
 func TestBuildCloneScript_WithCommit(t *testing.T) {
-	run := &agentv1alpha1.AgentRun{
-		Spec: agentv1alpha1.AgentRunSpec{
-			Repository: agentv1alpha1.RepositorySpec{
-				URL:    "https://github.com/example/repo.git",
-				Commit: "abc123",
-			},
-		},
+	repo := agentv1alpha1.RepositorySpec{
+		URL:    "https://github.com/example/repo.git",
+		Commit: "abc123",
 	}
 
-	script := buildCloneScript(run)
+	script := buildCloneScript(repo, agentv1alpha1.WorkspaceTypeGit)
 
 	if !strings.Contains(script, "git fetch origin abc123") {
 		t.Error("script missing 'git fetch origin abc123'")
@@ -104,57 +94,13 @@ func TestBuildCloneScript_WithCommit(t *testing.T) {
 	}
 }
 
-func TestBuildCloneScript_WithWorktree(t *testing.T) {
-	run := &agentv1alpha1.AgentRun{
-		Spec: agentv1alpha1.AgentRunSpec{
-			Repository: agentv1alpha1.RepositorySpec{
-				URL: "https://github.com/example/repo.git",
-			},
-			Worktree: &agentv1alpha1.WorktreeSpec{
-				Branch:       "feature-branch",
-				SourceBranch: "main",
-			},
-		},
-	}
-
-	script := buildCloneScript(run)
-
-	if !strings.Contains(script, "git worktree add /workspace-wt -b feature-branch main") {
-		t.Errorf("script missing worktree command, got:\n%s", script)
-	}
-}
-
-func TestBuildCloneScript_WorktreeDefaultSource(t *testing.T) {
-	run := &agentv1alpha1.AgentRun{
-		Spec: agentv1alpha1.AgentRunSpec{
-			Repository: agentv1alpha1.RepositorySpec{
-				URL: "https://github.com/example/repo.git",
-			},
-			Worktree: &agentv1alpha1.WorktreeSpec{
-				Branch: "my-branch",
-			},
-		},
-	}
-
-	script := buildCloneScript(run)
-
-	if !strings.Contains(script, "git worktree add /workspace-wt -b my-branch HEAD") {
-		t.Errorf("script should default source to HEAD, got:\n%s", script)
-	}
-}
-
 func TestBuildCloneScript_WithJujutsu(t *testing.T) {
-	run := &agentv1alpha1.AgentRun{
-		Spec: agentv1alpha1.AgentRunSpec{
-			Repository: agentv1alpha1.RepositorySpec{
-				URL:    "https://github.com/example/repo.git",
-				Branch: "main",
-			},
-			VCS: agentv1alpha1.VCSJujutsu,
-		},
+	repo := agentv1alpha1.RepositorySpec{
+		URL:    "https://github.com/example/repo.git",
+		Branch: "main",
 	}
 
-	script := buildCloneScript(run)
+	script := buildCloneScript(repo, agentv1alpha1.WorkspaceTypeJujutsu)
 
 	if !strings.Contains(script, "git clone") {
 		t.Error("jj script should still use git clone")
@@ -165,69 +111,24 @@ func TestBuildCloneScript_WithJujutsu(t *testing.T) {
 }
 
 func TestBuildCloneScript_GitNoJJInit(t *testing.T) {
-	run := &agentv1alpha1.AgentRun{
-		Spec: agentv1alpha1.AgentRunSpec{
-			Repository: agentv1alpha1.RepositorySpec{
-				URL: "https://github.com/example/repo.git",
-			},
-			VCS: agentv1alpha1.VCSGit,
-		},
+	repo := agentv1alpha1.RepositorySpec{
+		URL: "https://github.com/example/repo.git",
 	}
 
-	script := buildCloneScript(run)
+	script := buildCloneScript(repo, agentv1alpha1.WorkspaceTypeGit)
 
 	if strings.Contains(script, "jj") {
 		t.Error("git-only script should not contain 'jj'")
 	}
 }
 
-func TestBuildCloneScript_WithJujutsuWorktree(t *testing.T) {
-	run := &agentv1alpha1.AgentRun{
-		Spec: agentv1alpha1.AgentRunSpec{
-			Repository: agentv1alpha1.RepositorySpec{
-				URL: "https://github.com/example/repo.git",
-			},
-			Worktree: &agentv1alpha1.WorktreeSpec{
-				Branch:       "feature-branch",
-				SourceBranch: "main",
-			},
-			VCS: agentv1alpha1.VCSJujutsu,
-		},
-	}
-
-	script := buildCloneScript(run)
-
-	if !strings.Contains(script, "jj git init --colocate") {
-		t.Error("jj script missing 'jj git init --colocate'")
-	}
-	if !strings.Contains(script, "jj workspace add /workspace-wt --revision main") {
-		t.Errorf("jj script missing workspace add command, got:\n%s", script)
-	}
-	if strings.Contains(script, "git worktree") {
-		t.Error("jj script should not contain 'git worktree'")
-	}
-}
-
-func TestBuildNixInitContainer_Nil(t *testing.T) {
-	c := BuildNixInitContainer(nil)
-	if c != nil {
-		t.Error("expected nil for nil NixSpec")
-	}
-}
-
-func TestBuildNixInitContainer_EmptyPackages(t *testing.T) {
-	c := BuildNixInitContainer(&agentv1alpha1.NixSpec{})
-	if c != nil {
-		t.Error("expected nil for empty packages")
-	}
-}
-
-func TestBuildNixInitContainer_WithPackages(t *testing.T) {
+func TestNixToolchain_InitContainer_WithPackages(t *testing.T) {
 	nix := &agentv1alpha1.NixSpec{
 		Packages: []string{"nodejs_22", "python3", "ripgrep"},
 	}
 
-	c := BuildNixInitContainer(nix)
+	tc := NewNixToolchain(nix)
+	c := tc.InitContainer()
 	if c == nil {
 		t.Fatal("expected non-nil container")
 	}
@@ -261,31 +162,56 @@ func TestBuildNixInitContainer_WithPackages(t *testing.T) {
 	}
 }
 
-func TestBuildNixInitContainer_CustomImage(t *testing.T) {
+func TestNixToolchain_InitContainer_CustomImage(t *testing.T) {
 	nix := &agentv1alpha1.NixSpec{
 		Packages: []string{"nodejs_22"},
 		Image:    "nixos/nix:2.28.3",
 	}
 
-	c := BuildNixInitContainer(nix)
+	tc := NewNixToolchain(nix)
+	c := tc.InitContainer()
 	if c.Image != "nixos/nix:2.28.3" {
 		t.Errorf("image = %q, want %q", c.Image, "nixos/nix:2.28.3")
+	}
+}
+
+func TestToolchains_Nil(t *testing.T) {
+	tcs := Toolchains(nil)
+	if len(tcs) != 0 {
+		t.Errorf("len(toolchains) = %d, want 0", len(tcs))
+	}
+}
+
+func TestToolchains_EmptyPackages(t *testing.T) {
+	tc := &agentv1alpha1.ToolchainSpec{
+		Type: agentv1alpha1.ToolchainTypeNix,
+		Nix:  &agentv1alpha1.NixSpec{},
+	}
+	tcs := Toolchains(tc)
+	if len(tcs) != 0 {
+		t.Errorf("len(toolchains) = %d, want 0", len(tcs))
 	}
 }
 
 func TestBuildInitContainers_WithNix(t *testing.T) {
 	run := &agentv1alpha1.AgentRun{
 		Spec: agentv1alpha1.AgentRunSpec{
-			Repository: agentv1alpha1.RepositorySpec{
-				URL: "https://github.com/example/repo.git",
-			},
-			Nix: &agentv1alpha1.NixSpec{
-				Packages: []string{"nodejs_22"},
+			Workspace: &agentv1alpha1.WorkspaceSpec{
+				Repository: agentv1alpha1.RepositorySpec{
+					URL: "https://github.com/example/repo.git",
+				},
 			},
 		},
 	}
 
-	containers := BuildInitContainers(run, "node:latest")
+	tc := &agentv1alpha1.ToolchainSpec{
+		Type: agentv1alpha1.ToolchainTypeNix,
+		Nix: &agentv1alpha1.NixSpec{
+			Packages: []string{"nodejs_22"},
+		},
+	}
+
+	containers := BuildInitContainers(run, "node:latest", agentv1alpha1.WorkspaceTypeGit, tc)
 
 	if len(containers) != 2 {
 		t.Fatalf("len(containers) = %d, want 2", len(containers))
@@ -301,17 +227,22 @@ func TestBuildInitContainers_WithNix(t *testing.T) {
 func TestBuildMainContainers_WithNix(t *testing.T) {
 	run := &agentv1alpha1.AgentRun{
 		Spec: agentv1alpha1.AgentRunSpec{
-			Agent: agentv1alpha1.AgentTypeClaude,
-			Repository: agentv1alpha1.RepositorySpec{
-				URL: "https://github.com/example/repo.git",
-			},
-			Nix: &agentv1alpha1.NixSpec{
-				Packages: []string{"nodejs_22"},
+			Workspace: &agentv1alpha1.WorkspaceSpec{
+				Repository: agentv1alpha1.RepositorySpec{
+					URL: "https://github.com/example/repo.git",
+				},
 			},
 		},
 	}
 
-	containers := BuildMainContainers(run, nil, "image:latest")
+	tc := &agentv1alpha1.ToolchainSpec{
+		Type: agentv1alpha1.ToolchainTypeNix,
+		Nix: &agentv1alpha1.NixSpec{
+			Packages: []string{"nodejs_22"},
+		},
+	}
+
+	containers := BuildMainContainers(run, nil, "image:latest", agentv1alpha1.AgentTypeClaude, tc)
 
 	c := containers[0]
 
@@ -341,14 +272,15 @@ func TestBuildMainContainers_WithNix(t *testing.T) {
 func TestBuildMainContainers_WithoutNix(t *testing.T) {
 	run := &agentv1alpha1.AgentRun{
 		Spec: agentv1alpha1.AgentRunSpec{
-			Agent: agentv1alpha1.AgentTypeClaude,
-			Repository: agentv1alpha1.RepositorySpec{
-				URL: "https://github.com/example/repo.git",
+			Workspace: &agentv1alpha1.WorkspaceSpec{
+				Repository: agentv1alpha1.RepositorySpec{
+					URL: "https://github.com/example/repo.git",
+				},
 			},
 		},
 	}
 
-	containers := BuildMainContainers(run, nil, "image:latest")
+	containers := BuildMainContainers(run, nil, "image:latest", agentv1alpha1.AgentTypeClaude, nil)
 	c := containers[0]
 
 	for _, vm := range c.VolumeMounts {
@@ -367,14 +299,15 @@ func TestBuildMainContainers_Claude(t *testing.T) {
 	run := &agentv1alpha1.AgentRun{
 		ObjectMeta: metav1.ObjectMeta{Name: "test"},
 		Spec: agentv1alpha1.AgentRunSpec{
-			Agent: agentv1alpha1.AgentTypeClaude,
-			Repository: agentv1alpha1.RepositorySpec{
-				URL: "https://github.com/example/repo.git",
+			Workspace: &agentv1alpha1.WorkspaceSpec{
+				Repository: agentv1alpha1.RepositorySpec{
+					URL: "https://github.com/example/repo.git",
+				},
 			},
 		},
 	}
 
-	containers := BuildMainContainers(run, nil, "image:latest")
+	containers := BuildMainContainers(run, nil, "image:latest", agentv1alpha1.AgentTypeClaude, nil)
 
 	if len(containers) != 1 {
 		t.Fatalf("len(containers) = %d, want 1", len(containers))
@@ -407,15 +340,16 @@ func TestBuildMainContainers_Claude(t *testing.T) {
 func TestBuildMainContainers_ClaudeWithPrompt(t *testing.T) {
 	run := &agentv1alpha1.AgentRun{
 		Spec: agentv1alpha1.AgentRunSpec{
-			Agent: agentv1alpha1.AgentTypeClaude,
-			Repository: agentv1alpha1.RepositorySpec{
-				URL: "https://github.com/example/repo.git",
+			Workspace: &agentv1alpha1.WorkspaceSpec{
+				Repository: agentv1alpha1.RepositorySpec{
+					URL: "https://github.com/example/repo.git",
+				},
 			},
 			Prompt: "Fix the tests",
 		},
 	}
 
-	containers := BuildMainContainers(run, nil, "image")
+	containers := BuildMainContainers(run, nil, "image", agentv1alpha1.AgentTypeClaude, nil)
 
 	args := containers[0].Args
 	foundPrint := false
@@ -439,9 +373,10 @@ func TestBuildMainContainers_ClaudeWithPrompt(t *testing.T) {
 func TestBuildMainContainers_Opencode(t *testing.T) {
 	run := &agentv1alpha1.AgentRun{
 		Spec: agentv1alpha1.AgentRunSpec{
-			Agent: agentv1alpha1.AgentTypeOpencode,
-			Repository: agentv1alpha1.RepositorySpec{
-				URL: "https://github.com/example/repo.git",
+			Workspace: &agentv1alpha1.WorkspaceSpec{
+				Repository: agentv1alpha1.RepositorySpec{
+					URL: "https://github.com/example/repo.git",
+				},
 			},
 			Provider: &agentv1alpha1.ProviderSpec{
 				CliArgs: []string{"--model", "google/gemini-2.5-pro"},
@@ -449,7 +384,7 @@ func TestBuildMainContainers_Opencode(t *testing.T) {
 		},
 	}
 
-	containers := BuildMainContainers(run, nil, "image")
+	containers := BuildMainContainers(run, nil, "image", agentv1alpha1.AgentTypeOpencode, nil)
 
 	c := containers[0]
 	if c.Command[0] != "opencode" {
@@ -463,9 +398,10 @@ func TestBuildMainContainers_Opencode(t *testing.T) {
 func TestBuildMainContainers_WithProviderEnv(t *testing.T) {
 	run := &agentv1alpha1.AgentRun{
 		Spec: agentv1alpha1.AgentRunSpec{
-			Agent: agentv1alpha1.AgentTypeClaude,
-			Repository: agentv1alpha1.RepositorySpec{
-				URL: "https://github.com/example/repo.git",
+			Workspace: &agentv1alpha1.WorkspaceSpec{
+				Repository: agentv1alpha1.RepositorySpec{
+					URL: "https://github.com/example/repo.git",
+				},
 			},
 		},
 	}
@@ -475,7 +411,7 @@ func TestBuildMainContainers_WithProviderEnv(t *testing.T) {
 		"API_TIMEOUT_MS":     "60000",
 	}
 
-	containers := BuildMainContainers(run, providerEnv, "image")
+	containers := BuildMainContainers(run, providerEnv, "image", agentv1alpha1.AgentTypeClaude, nil)
 
 	envMap := make(map[string]string)
 	for _, env := range containers[0].Env {

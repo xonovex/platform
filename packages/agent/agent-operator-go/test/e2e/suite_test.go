@@ -113,13 +113,6 @@ func TestMain(m *testing.M) {
 		panic("failed to setup AgentProvider controller: " + err.Error())
 	}
 
-	if err := (&controller.AgentConfigReconciler{
-		Client: mgr.GetClient(),
-		Scheme: mgr.GetScheme(),
-	}).SetupWithManager(mgr); err != nil {
-		panic("failed to setup AgentConfig controller: " + err.Error())
-	}
-
 	if err := (&controller.AgentWorkspaceReconciler{
 		Client: mgr.GetClient(),
 		Scheme: mgr.GetScheme(),

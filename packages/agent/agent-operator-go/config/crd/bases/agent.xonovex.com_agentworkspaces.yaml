@@ -42,6 +42,9 @@ spec:
               required:
                 - repository
               properties:
+                type:
+                  type: string
+                  description: Workspace type
                 repository:
                   type: object
                   description: Git repository to clone into the shared workspace
@@ -92,12 +95,29 @@ spec:
                       storageSize:
                         type: string
                         description: Storage size for the shared volume PVC (default 1Gi)
-                vcs:
-                  description: VCS selects the version control system
-                  type: string
-                  enum:
-                    - git
-                    - jj
+                git:
+                  type: object
+                  description: Git-specific workspace configuration
+                  properties:
+                    worktree:
+                      type: object
+                      description: Worktree configuration
+                      required:
+                        - branch
+                      properties:
+                        branch:
+                          type: string
+                          description: Branch name for the worktree
+                        sourceBranch:
+                          type: string
+                          description: Source branch to create the worktree from
+                jj:
+                  type: object
+                  description: Jujutsu-specific workspace configuration
+                  properties:
+                    revision:
+                      type: string
+                      description: Revision for the Jujutsu workspace
             status:
               type: object
               description: AgentWorkspaceStatus defines the observed state of AgentWorkspace

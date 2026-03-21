@@ -11,19 +11,25 @@ import (
 )
 
 // BuildJob creates a Kubernetes Job for an AgentRun
-func BuildJob(run *agentv1alpha1.AgentRun, providerEnv map[string]string, pvcName string, defaultImage string, defaultTimeout time.Duration) *batchv1.Job {
-	timeout := defaultTimeout
-	if run.Spec.Timeout != nil {
-		timeout = run.Spec.Timeout.Duration
-	}
+func BuildJob(run *agentv1alpha1.AgentRun, providerEnv map[string]string, pvcName string, image string, timeout time.Duration, agentType agentv1alpha1.AgentType, wsType agentv1alpha1.WorkspaceType, tc *agentv1alpha1.ToolchainSpec) *batchv1.Job {
 	activeDeadlineSeconds := int64(timeout.Seconds())
 
-	image := defaultImage
-	if run.Spec.Image != "" {
-		image = run.Spec.Image
+	backoffLimit := int32(0)
+
+	volumes := []corev1.Volume{
+		{
+			Name: "workspace",
+			VolumeSource: corev1.VolumeSource{
+				PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
+					ClaimName: pvcName,
+				},
+			},
+		},
 	}
 
-	backoffLimit := int32(0)
+	for _, t := range Toolchains(tc) {
+		volumes = append(volumes, t.Volumes()...)
+	}
 
 	job := &batchv1.Job{
 		ObjectMeta: metav1.ObjectMeta{
@@ -33,7 +39,7 @@ func BuildJob(run *agentv1alpha1.AgentRun, providerEnv map[string]string, pvcNam
 				"app.kubernetes.io/name":       "agent-operator",
 				"app.kubernetes.io/instance":   run.Name,
 				"app.kubernetes.io/component":  "agent-run",
-				"agent.xonovex.com/agent-type": string(run.Spec.Agent),
+				"agent.xonovex.com/agent-type": string(agentType),
 			},
 		},
 		Spec: batchv1.JobSpec{
@@ -45,36 +51,20 @@ func BuildJob(run *agentv1alpha1.AgentRun, providerEnv map[string]string, pvcNam
 						"app.kubernetes.io/name":       "agent-operator",
 						"app.kubernetes.io/instance":   run.Name,
 						"app.kubernetes.io/component":  "agent-run",
-						"agent.xonovex.com/agent-type": string(run.Spec.Agent),
+						"agent.xonovex.com/agent-type": string(agentType),
 					},
 				},
 				Spec: corev1.PodSpec{
-					RestartPolicy:  corev1.RestartPolicyNever,
-					InitContainers: BuildInitContainers(run, image),
-					Containers:     BuildMainContainers(run, providerEnv, image),
-					Volumes: []corev1.Volume{
-						{
-							Name: "workspace",
-							VolumeSource: corev1.VolumeSource{
-								PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
-									ClaimName: pvcName,
-								},
-							},
-						},
-					},
-					NodeSelector: run.Spec.NodeSelector,
+					RestartPolicy:    corev1.RestartPolicyNever,
+					InitContainers:   BuildInitContainers(run, image, wsType, tc),
+					Containers:       BuildMainContainers(run, providerEnv, image, agentType, tc),
+					Volumes:          volumes,
+					NodeSelector:     run.Spec.NodeSelector,
 					Tolerations:      run.Spec.Tolerations,
 					RuntimeClassName: run.Spec.RuntimeClassName,
 				},
 			},
 		},
-	}
-
-	if run.Spec.Nix != nil && len(run.Spec.Nix.Packages) > 0 {
-		job.Spec.Template.Spec.Volumes = append(job.Spec.Template.Spec.Volumes, corev1.Volume{
-			Name:         nixVolumeName,
-			VolumeSource: corev1.VolumeSource{EmptyDir: &corev1.EmptyDirVolumeSource{}},
-		})
 	}
 
 	if len(run.Spec.Resources.Requests) > 0 || len(run.Spec.Resources.Limits) > 0 {

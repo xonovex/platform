@@ -24,7 +24,6 @@ func TestAgentProvider_BecomesReadyWithValidSecret(t *testing.T) {
 	}
 
 	provider := testutil.NewAgentProvider(ns, "test-provider",
-		testutil.WithAgentTypes(agentv1alpha1.AgentTypeClaude),
 		testutil.WithAuthTokenSecretRef("auth-secret", "token"),
 	)
 	if err := k8sClient.Create(ctx, provider); err != nil {
@@ -57,7 +56,6 @@ func TestAgentProvider_NotReadyWhenSecretMissing(t *testing.T) {
 	ns := createNamespace(t, "provider-not-ready")
 
 	provider := testutil.NewAgentProvider(ns, "test-provider",
-		testutil.WithAgentTypes(agentv1alpha1.AgentTypeClaude),
 		testutil.WithAuthTokenSecretRef("nonexistent-secret", "token"),
 	)
 	if err := k8sClient.Create(ctx, provider); err != nil {
@@ -95,8 +93,7 @@ func TestAgentProvider_ReadyWithoutSecretRef(t *testing.T) {
 	ns := createNamespace(t, "provider-no-secret")
 
 	provider := testutil.NewAgentProvider(ns, "test-provider",
-		testutil.WithAgentTypes(agentv1alpha1.AgentTypeClaude, agentv1alpha1.AgentTypeOpencode),
-	)
+		)
 	if err := k8sClient.Create(ctx, provider); err != nil {
 		t.Fatalf("failed to create AgentProvider: %v", err)
 	}

@@ -26,6 +26,8 @@ type SharedVolumeSpec struct {
 
 // AgentWorkspaceSpec defines the desired state of AgentWorkspace
 type AgentWorkspaceSpec struct {
+	// Type of workspace (git or jj)
+	Type WorkspaceType `json:"type,omitempty"`
 	// Repository to clone into the shared workspace
 	Repository RepositorySpec `json:"repository"`
 	// StorageClass for the workspace PVC (must support ReadWriteMany)
@@ -34,8 +36,10 @@ type AgentWorkspaceSpec struct {
 	StorageSize string `json:"storageSize,omitempty"`
 	// SharedVolumes are optional shared config/state directories for agents
 	SharedVolumes []SharedVolumeSpec `json:"sharedVolumes,omitempty"`
-	// VCS selects the version control system: "git" (default) or "jj" (Jujutsu)
-	VCS VCSType `json:"vcs,omitempty"`
+	// Git holds git-specific configuration
+	Git *GitWorkspaceConfig `json:"git,omitempty"`
+	// Jj holds jj-specific configuration
+	Jj *JujutsuWorkspaceConfig `json:"jj,omitempty"`
 }
 
 // AgentWorkspaceStatus defines the observed state of AgentWorkspace
