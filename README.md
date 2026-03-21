@@ -19,7 +19,6 @@ Xonovex manages everything *around* the agent: sandbox isolation, model provider
 | [agent-cli](packages/agent/agent-cli/) | Unified CLI for running agents with sandbox, provider, and terminal options |
 | [agent-cli-go](packages/agent/agent-cli-go/) | Go implementation of agent-cli (cross-platform binaries) |
 | [agent-operator-go](packages/agent/agent-operator-go/) | Kubernetes operator for running agents as Jobs with managed workspaces |
-| [agent-operator-go-docker](packages/agent/agent-operator-go-docker/) | Multi-arch Docker build and GHCR publish for agent-operator-go |
 
 ### Commands
 
