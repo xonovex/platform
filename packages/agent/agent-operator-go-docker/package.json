@@ -1,0 +1,7 @@
+{
+  "name": "@xonovex/agent-operator-go-docker",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Docker image build and GHCR publish for agent-operator-go",
+  "keywords": ["xonovex", "agent", "operator", "go", "docker"]
+}

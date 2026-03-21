@@ -1,5 +1,6 @@
 # Build stage
-FROM golang:1.25-alpine AS build
+FROM --platform=$BUILDPLATFORM golang:1.25-alpine AS build
+ARG TARGETARCH
 WORKDIR /src
 
 # Copy shared dependencies first (for layer caching)
@@ -19,7 +20,7 @@ COPY packages/agent/agent-operator-go/ packages/agent/agent-operator-go/
 
 # Build static binary
 WORKDIR /src/packages/agent/agent-operator-go
-RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o /operator ./cmd/operator/
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=$TARGETARCH go build -ldflags="-s -w" -o /operator ./cmd/operator/
 
 # Runtime stage
 FROM gcr.io/distroless/static:nonroot AS runtime
