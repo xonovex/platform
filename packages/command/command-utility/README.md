@@ -1,6 +1,6 @@
 # Utility Commands
 
-Slash commands for content generation, project instructions, insights, and skill management.
+Manage project instructions, extract insights, and create skills.
 
 ## Commands
 
