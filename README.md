@@ -28,31 +28,15 @@ Xonovex manages everything *around* the agent: sandbox isolation, model provider
 | [command-workflow](packages/command/command-workflow/) | Plan-driven development workflow with worktrees and parallel execution |
 | [command-utility](packages/command/command-utility/) | Utility commands for content, instructions, insights, and skills |
 
-### Shared
-
-| Package | Description |
-|---------|-------------|
-| [shared-core](packages/shared/shared-core/) | Shared TypeScript library |
-| [shared-core-go](packages/shared/shared-core-go/) | Shared Go library |
-| [shared-agent-go](packages/shared/shared-agent-go/) | Shared Go agent library |
-
 ### Docker
 
 | Package | Description |
 |---------|-------------|
 | [docker-agent](packages/docker/docker-agent/) | Docker Compose setup with custom provider support |
 
-### Config
-
-Shared configurations for ESLint, TypeScript, Vitest, Prettier, and Vite in [`packages/config/`](packages/config/).
-
 ### Skills
 
 Coding guidelines and skill definitions in [`packages/skill/`](packages/skill/).
-
-### Diagrams
-
-Architecture and workflow diagrams in [`packages/diagram/`](packages/diagram/).
 
 ## Quick Start
 
