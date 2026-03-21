@@ -110,7 +110,7 @@ func BuildWorkspaceInitJob(ws *agentv1alpha1.AgentWorkspace, pvcName, image stri
 	activeDeadlineSeconds := int64((10 * time.Minute).Seconds())
 	backoffLimit := int32(0)
 
-	script := buildWorkspaceCloneScript(&ws.Spec.Repository, ws.Spec.VCS)
+	script := buildWorkspaceCloneScript(&ws.Spec.Repository, ws.Spec.Type)
 
 	return &batchv1.Job{
 		ObjectMeta: metav1.ObjectMeta{
@@ -165,7 +165,7 @@ func BuildWorkspaceInitJob(ws *agentv1alpha1.AgentWorkspace, pvcName, image stri
 	}
 }
 
-func buildWorkspaceCloneScript(repo *agentv1alpha1.RepositorySpec, vcs agentv1alpha1.VCSType) string {
+func buildWorkspaceCloneScript(repo *agentv1alpha1.RepositorySpec, wsType agentv1alpha1.WorkspaceType) string {
 	script := "set -e\n"
 	script += "cd " + workspaceMountPath + "\n"
 	script += "git clone"
@@ -180,17 +180,16 @@ func buildWorkspaceCloneScript(repo *agentv1alpha1.RepositorySpec, vcs agentv1al
 		script += "git checkout " + repo.Commit + "\n"
 	}
 
-	if vcs == agentv1alpha1.VCSJujutsu {
-		script += "jj git init --colocate\n"
+	if strategy, err := GetVCSStrategy(wsType); err == nil {
+		script += strategy.PostCloneScript()
 	}
 
 	return script
 }
 
 // BuildWorktreeInitContainers builds init containers that create a git worktree (or jj workspace) for an AgentRun
-func BuildWorktreeInitContainers(run *agentv1alpha1.AgentRun, image string) []corev1.Container {
+func BuildWorktreeInitContainers(run *agentv1alpha1.AgentRun, image string, wsType agentv1alpha1.WorkspaceType, worktreeBranch, sourceBranch string) []corev1.Container {
 	worktreePath := fmt.Sprintf("%s/%s", worktreeBasePath, run.Name)
-	sourceBranch := run.Spec.Worktree.SourceBranch
 	if sourceBranch == "" {
 		sourceBranch = "HEAD"
 	}
@@ -199,11 +198,9 @@ func BuildWorktreeInitContainers(run *agentv1alpha1.AgentRun, image string) []co
 	script += "cd " + workspaceMountPath + "\n"
 
 	containerName := "git-worktree"
-	if run.Spec.VCS == agentv1alpha1.VCSJujutsu {
-		containerName = "jj-workspace"
-		script += "jj workspace add " + worktreePath + " --revision " + sourceBranch + "\n"
-	} else {
-		script += "git worktree add " + worktreePath + " -b " + run.Spec.Worktree.Branch + " " + sourceBranch + "\n"
+	if vcs, err := GetVCSStrategy(wsType); err == nil {
+		containerName = vcs.InitContainerName()
+		script += vcs.WorktreeScript(worktreePath, worktreeBranch, sourceBranch)
 	}
 
 	return []corev1.Container{
@@ -223,9 +220,9 @@ func BuildWorktreeInitContainers(run *agentv1alpha1.AgentRun, image string) []co
 }
 
 // BuildWorkspaceMainContainers builds the main agent container for workspace-based runs
-func BuildWorkspaceMainContainers(run *agentv1alpha1.AgentRun, providerEnv map[string]string, image string, sharedVolumes []agentv1alpha1.SharedVolumeSpec, sharedVolumePVCs map[string]string) []corev1.Container {
+func BuildWorkspaceMainContainers(run *agentv1alpha1.AgentRun, providerEnv map[string]string, image string, agentType agentv1alpha1.AgentType, sharedVolumes []agentv1alpha1.SharedVolumeSpec, sharedVolumePVCs map[string]string, tc *agentv1alpha1.ToolchainSpec) []corev1.Container {
 	env := BuildEnvVars(run, providerEnv)
-	command, args := buildAgentCommand(run)
+	command, args := buildAgentCommand(run, agentType)
 	worktreePath := fmt.Sprintf("%s/%s", worktreeBasePath, run.Name)
 
 	volumeMounts := []corev1.VolumeMount{
@@ -244,15 +241,9 @@ func BuildWorkspaceMainContainers(run *agentv1alpha1.AgentRun, providerEnv map[s
 		}
 	}
 
-	if run.Spec.Nix != nil && len(run.Spec.Nix.Packages) > 0 {
-		volumeMounts = append(volumeMounts, corev1.VolumeMount{
-			Name:      nixVolumeName,
-			MountPath: nixMountPath,
-		})
-		env = append(env, corev1.EnvVar{
-			Name:  "PATH",
-			Value: nixProfileBinPath + ":/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
-		})
+	for _, t := range Toolchains(tc) {
+		volumeMounts = append(volumeMounts, t.VolumeMounts()...)
+		env = append(env, t.EnvVars()...)
 	}
 
 	return []corev1.Container{
@@ -269,17 +260,8 @@ func BuildWorkspaceMainContainers(run *agentv1alpha1.AgentRun, providerEnv map[s
 }
 
 // BuildWorkspaceJob creates a Job for an AgentRun that uses a shared workspace
-func BuildWorkspaceJob(run *agentv1alpha1.AgentRun, providerEnv map[string]string, workspacePVC string, sharedVolumes []agentv1alpha1.SharedVolumeSpec, sharedVolumePVCs map[string]string, defaultImage string, defaultTimeout time.Duration) *batchv1.Job {
-	timeout := defaultTimeout
-	if run.Spec.Timeout != nil {
-		timeout = run.Spec.Timeout.Duration
-	}
+func BuildWorkspaceJob(run *agentv1alpha1.AgentRun, providerEnv map[string]string, workspacePVC string, sharedVolumes []agentv1alpha1.SharedVolumeSpec, sharedVolumePVCs map[string]string, image string, timeout time.Duration, agentType agentv1alpha1.AgentType, wsType agentv1alpha1.WorkspaceType, worktreeBranch, sourceBranch string, tc *agentv1alpha1.ToolchainSpec) *batchv1.Job {
 	activeDeadlineSeconds := int64(timeout.Seconds())
-
-	image := defaultImage
-	if run.Spec.Image != "" {
-		image = run.Spec.Image
-	}
 
 	backoffLimit := int32(0)
 
@@ -307,6 +289,15 @@ func BuildWorkspaceJob(run *agentv1alpha1.AgentRun, providerEnv map[string]strin
 		}
 	}
 
+	initContainers := BuildWorktreeInitContainers(run, image, wsType, worktreeBranch, sourceBranch)
+
+	for _, t := range Toolchains(tc) {
+		if c := t.InitContainer(); c != nil {
+			initContainers = append(initContainers, *c)
+		}
+		volumes = append(volumes, t.Volumes()...)
+	}
+
 	job := &batchv1.Job{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      run.Name,
@@ -315,7 +306,7 @@ func BuildWorkspaceJob(run *agentv1alpha1.AgentRun, providerEnv map[string]strin
 				"app.kubernetes.io/name":       "agent-operator",
 				"app.kubernetes.io/instance":   run.Name,
 				"app.kubernetes.io/component":  "agent-run",
-				"agent.xonovex.com/agent-type": string(run.Spec.Agent),
+				"agent.xonovex.com/agent-type": string(agentType),
 				"agent.xonovex.com/workspace":  run.Spec.WorkspaceRef,
 			},
 		},
@@ -328,29 +319,21 @@ func BuildWorkspaceJob(run *agentv1alpha1.AgentRun, providerEnv map[string]strin
 						"app.kubernetes.io/name":       "agent-operator",
 						"app.kubernetes.io/instance":   run.Name,
 						"app.kubernetes.io/component":  "agent-run",
-						"agent.xonovex.com/agent-type": string(run.Spec.Agent),
+						"agent.xonovex.com/agent-type": string(agentType),
 						"agent.xonovex.com/workspace":  run.Spec.WorkspaceRef,
 					},
 				},
 				Spec: corev1.PodSpec{
-					RestartPolicy:  corev1.RestartPolicyNever,
-					InitContainers: BuildWorktreeInitContainers(run, image),
-					Containers:     BuildWorkspaceMainContainers(run, providerEnv, image, sharedVolumes, sharedVolumePVCs),
-					Volumes:        volumes,
-					NodeSelector:   run.Spec.NodeSelector,
+					RestartPolicy:    corev1.RestartPolicyNever,
+					InitContainers:   initContainers,
+					Containers:       BuildWorkspaceMainContainers(run, providerEnv, image, agentType, sharedVolumes, sharedVolumePVCs, tc),
+					Volumes:          volumes,
+					NodeSelector:     run.Spec.NodeSelector,
 					Tolerations:      run.Spec.Tolerations,
 					RuntimeClassName: run.Spec.RuntimeClassName,
 				},
 			},
 		},
-	}
-
-	if nix := BuildNixInitContainer(run.Spec.Nix); nix != nil {
-		job.Spec.Template.Spec.InitContainers = append(job.Spec.Template.Spec.InitContainers, *nix)
-		job.Spec.Template.Spec.Volumes = append(job.Spec.Template.Spec.Volumes, corev1.Volume{
-			Name:         nixVolumeName,
-			VolumeSource: corev1.VolumeSource{EmptyDir: &corev1.EmptyDirVolumeSource{}},
-		})
 	}
 
 	if len(run.Spec.Resources.Requests) > 0 || len(run.Spec.Resources.Limits) > 0 {

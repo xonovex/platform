@@ -17,12 +17,12 @@ const (
 	AgentRunPhaseTimedOut     AgentRunPhase = "TimedOut"
 )
 
-// VCSType represents the version control system used for workspace management
-type VCSType string
+// WorkspaceType represents the version control system used for workspace management
+type WorkspaceType string
 
 const (
-	VCSGit     VCSType = "git"
-	VCSJujutsu VCSType = "jj"
+	WorkspaceTypeGit     WorkspaceType = "git"
+	WorkspaceTypeJujutsu WorkspaceType = "jj"
 )
 
 // AgentType represents the type of AI agent
@@ -31,6 +31,16 @@ type AgentType string
 const (
 	AgentTypeClaude   AgentType = "claude"
 	AgentTypeOpencode AgentType = "opencode"
+)
+
+// ProviderType represents the type of AI provider
+type ProviderType string
+
+// ToolchainType represents the type of toolchain
+type ToolchainType string
+
+const (
+	ToolchainTypeNix ToolchainType = "nix"
 )
 
 // SecretKeyRef references a key in a Kubernetes Secret
@@ -63,8 +73,8 @@ type WorktreeSpec struct {
 
 // ProviderSpec defines inline provider configuration
 type ProviderSpec struct {
-	// Name of the provider (e.g., "gemini", "glm")
-	Name string `json:"name"`
+	// Type of the provider (e.g., "anthropic", "openai")
+	Type ProviderType `json:"type,omitempty"`
 	// AuthSecretRef references a Secret containing the auth token
 	AuthSecretRef *SecretKeyRef `json:"authSecretRef,omitempty"`
 	// Environment variables to set
@@ -74,8 +84,6 @@ type ProviderSpec struct {
 }
 
 // NixSpec configures Nix package provisioning for agent containers.
-// When set, the operator adds an init container that installs the specified
-// packages from nixpkgs into a shared volume mounted at /nix.
 type NixSpec struct {
 	// Packages are nixpkgs attribute names to install (e.g. "nodejs_22", "python3", "ripgrep")
 	Packages []string `json:"packages,omitempty"`
@@ -83,22 +91,78 @@ type NixSpec struct {
 	Image string `json:"image,omitempty"`
 }
 
+// ToolchainSpec defines toolchain configuration
+type ToolchainSpec struct {
+	// Type of toolchain
+	Type ToolchainType `json:"type"`
+	// Nix configures Nix package provisioning
+	Nix *NixSpec `json:"nix,omitempty"`
+}
+
+// GitWorkspaceConfig holds git-specific workspace configuration
+type GitWorkspaceConfig struct {
+	// Worktree configuration for git worktrees
+	Worktree *WorktreeSpec `json:"worktree,omitempty"`
+}
+
+// JujutsuWorkspaceConfig holds jj-specific workspace configuration
+type JujutsuWorkspaceConfig struct {
+	// Revision for jj workspace
+	Revision string `json:"revision,omitempty"`
+}
+
+// WorkspaceSpec defines inline workspace configuration
+type WorkspaceSpec struct {
+	// Type of workspace (git or jj)
+	Type WorkspaceType `json:"type,omitempty"`
+	// Repository to clone
+	Repository RepositorySpec `json:"repository,omitempty"`
+	// StorageClass for workspace PVCs
+	StorageClass string `json:"storageClass,omitempty"`
+	// StorageSize for workspace PVCs (default: 10Gi)
+	StorageSize string `json:"storageSize,omitempty"`
+	// Git holds git-specific configuration
+	Git *GitWorkspaceConfig `json:"git,omitempty"`
+	// Jj holds jj-specific configuration
+	Jj *JujutsuWorkspaceConfig `json:"jj,omitempty"`
+}
+
+// AgentSpec defines agent/harness configuration
+type AgentSpec struct {
+	// Type of agent
+	Type AgentType `json:"type"`
+	// DefaultProvider is the default provider name
+	DefaultProvider string `json:"defaultProvider,omitempty"`
+	// DefaultImage is the default container image
+	DefaultImage string `json:"defaultImage,omitempty"`
+	// DefaultResources are the default resource requirements
+	DefaultResources corev1.ResourceRequirements `json:"defaultResources,omitempty"`
+	// DefaultTimeout is the default timeout for agent runs
+	DefaultTimeout *metav1.Duration `json:"defaultTimeout,omitempty"`
+	// DefaultRuntimeClassName sets the default pod runtimeClassName
+	DefaultRuntimeClassName *string `json:"defaultRuntimeClassName,omitempty"`
+	// Env are additional environment variables
+	Env []corev1.EnvVar `json:"env,omitempty"`
+}
+
 // AgentRunSpec defines the desired state of AgentRun
 type AgentRunSpec struct {
-	// Agent type to run
-	Agent AgentType `json:"agent"`
-	// ConfigRef references an AgentConfig in the namespace for defaults
-	ConfigRef string `json:"configRef,omitempty"`
+	// HarnessRef references an AgentHarness in the namespace
+	HarnessRef string `json:"harnessRef,omitempty"`
+	// Harness is an inline harness configuration
+	Harness *AgentSpec `json:"harness,omitempty"`
 	// ProviderRef references an AgentProvider in the namespace
 	ProviderRef string `json:"providerRef,omitempty"`
 	// Provider is an inline provider configuration
 	Provider *ProviderSpec `json:"provider,omitempty"`
 	// WorkspaceRef references an AgentWorkspace for shared workspace support
 	WorkspaceRef string `json:"workspaceRef,omitempty"`
-	// Repository to clone
-	Repository RepositorySpec `json:"repository,omitempty"`
-	// Worktree configuration
-	Worktree *WorktreeSpec `json:"worktree,omitempty"`
+	// Workspace is an inline workspace configuration
+	Workspace *WorkspaceSpec `json:"workspace,omitempty"`
+	// ToolchainRef references an AgentToolchain in the namespace
+	ToolchainRef string `json:"toolchainRef,omitempty"`
+	// Toolchain is an inline toolchain configuration
+	Toolchain *ToolchainSpec `json:"toolchain,omitempty"`
 	// Prompt for headless task execution
 	Prompt string `json:"prompt,omitempty"`
 	// Resources for the agent container
@@ -113,12 +177,8 @@ type AgentRunSpec struct {
 	NodeSelector map[string]string `json:"nodeSelector,omitempty"`
 	// Tolerations for pod scheduling
 	Tolerations []corev1.Toleration `json:"tolerations,omitempty"`
-	// RuntimeClassName sets the pod runtimeClassName for VM-based isolation (e.g. Kata Containers)
+	// RuntimeClassName sets the pod runtimeClassName for VM-based isolation
 	RuntimeClassName *string `json:"runtimeClassName,omitempty"`
-	// VCS selects the version control system: "git" (default) or "jj" (Jujutsu)
-	VCS VCSType `json:"vcs,omitempty"`
-	// Nix configures Nix package provisioning for the agent environment
-	Nix *NixSpec `json:"nix,omitempty"`
 }
 
 // AgentRunStatus defines the observed state of AgentRun
@@ -143,7 +203,6 @@ type AgentRunStatus struct {
 
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
-// +kubebuilder:printcolumn:name="Agent",type=string,JSONPath=`.spec.agent`
 // +kubebuilder:printcolumn:name="Phase",type=string,JSONPath=`.status.phase`
 // +kubebuilder:printcolumn:name="Age",type=date,JSONPath=`.metadata.creationTimestamp`
 

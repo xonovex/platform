@@ -70,21 +70,15 @@ func TestE2E_FullCycleWithPrompt(t *testing.T) {
 		t.Fatalf("failed to create AgentProvider: %v", err)
 	}
 
-	// Create AgentConfig with storage defaults
-	agentConfig := testutil.NewAgentConfig(ns, "default",
-		testutil.WithStorageSize("1Gi"),
-	)
-	if err := k8sClient.Create(ctx, agentConfig); err != nil {
-		t.Fatalf("failed to create AgentConfig: %v", err)
-	}
-
 	// Create AgentRun exercising the full pipeline
 	run := testutil.NewAgentRun(ns, "fullcycle-run",
-		testutil.WithAgent(agentv1alpha1.AgentTypeClaude),
-		testutil.WithConfigRef("default"),
+		testutil.WithHarness(&agentv1alpha1.AgentSpec{Type: agentv1alpha1.AgentTypeClaude}),
 		testutil.WithPrompt("echo test-prompt"),
 		testutil.WithImage(e2eAgentImage),
-		testutil.WithRepository("https://github.com/octocat/Hello-World.git"),
+		testutil.WithWorkspace(&agentv1alpha1.WorkspaceSpec{
+			Repository:  agentv1alpha1.RepositorySpec{URL: "https://github.com/octocat/Hello-World.git"},
+			StorageSize: "1Gi",
+		}),
 		testutil.WithProviderRef("test-provider"),
 	)
 	if err := k8sClient.Create(ctx, run); err != nil {

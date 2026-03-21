@@ -200,19 +200,19 @@ func TestE2E_GVisor_AgentRunWithRuntimeClassName(t *testing.T) {
 	t.Logf("Pod %s scheduled on node %s with runtimeClassName=gvisor", pod.Name, pod.Spec.NodeName)
 }
 
-func TestE2E_GVisor_DefaultRuntimeClassNameFromConfig(t *testing.T) {
+func TestE2E_GVisor_DefaultRuntimeClassNameFromHarness(t *testing.T) {
 	ns := createNamespace(t, "e2e-gvisor-default")
 
-	config := testutil.NewAgentConfig(ns, "agent-config",
+	harness := testutil.NewAgentHarness(ns, "agent-harness",
 		testutil.WithDefaultRuntimeClassName("gvisor"),
 	)
-	if err := k8sClient.Create(ctx, config); err != nil {
-		t.Fatalf("failed to create AgentConfig: %v", err)
+	if err := k8sClient.Create(ctx, harness); err != nil {
+		t.Fatalf("failed to create AgentHarness: %v", err)
 	}
 
-	// AgentRun without explicit runtimeClassName — should inherit from config
+	// AgentRun without explicit runtimeClassName — should inherit from harness
 	run := testutil.NewAgentRun(ns, "gvisor-default-run",
-		testutil.WithConfigRef("agent-config"),
+		testutil.WithHarnessRef("agent-harness"),
 		testutil.WithImage("busybox:1.37"),
 	)
 	if err := k8sClient.Create(ctx, run); err != nil {
@@ -237,7 +237,7 @@ func TestE2E_GVisor_DefaultRuntimeClassNameFromConfig(t *testing.T) {
 		if rc != nil {
 			got = *rc
 		}
-		t.Errorf("Job RuntimeClassName = %s, want gvisor (inherited from AgentConfig)", got)
+		t.Errorf("Job RuntimeClassName = %s, want gvisor (inherited from AgentHarness)", got)
 	}
 
 	// Wait for Pod to be scheduled — proves the runtime is actually available
@@ -254,7 +254,7 @@ func TestE2E_GVisor_DefaultRuntimeClassNameFromConfig(t *testing.T) {
 }
 
 // TestE2E_GVisor_FullCycleWithGitClone proves the entire agent pipeline
-// (Secret + AgentProvider + AgentConfig + git clone init container + fake claude)
+// (Secret + AgentProvider + AgentHarness + git clone init container + fake claude)
 // works end-to-end inside a gVisor sandbox.
 func TestE2E_GVisor_FullCycleWithGitClone(t *testing.T) {
 	buildAndLoadE2EAgentImage(t)
@@ -281,21 +281,15 @@ func TestE2E_GVisor_FullCycleWithGitClone(t *testing.T) {
 		t.Fatalf("failed to create AgentProvider: %v", err)
 	}
 
-	// Create AgentConfig with storage defaults
-	agentConfig := testutil.NewAgentConfig(ns, "default",
-		testutil.WithStorageSize("1Gi"),
-	)
-	if err := k8sClient.Create(ctx, agentConfig); err != nil {
-		t.Fatalf("failed to create AgentConfig: %v", err)
-	}
-
 	// Create AgentRun exercising the full pipeline inside gVisor
 	run := testutil.NewAgentRun(ns, "gvisor-fullcycle",
-		testutil.WithAgent(agentv1alpha1.AgentTypeClaude),
-		testutil.WithConfigRef("default"),
+		testutil.WithHarness(&agentv1alpha1.AgentSpec{Type: agentv1alpha1.AgentTypeClaude}),
 		testutil.WithPrompt("echo test-prompt"),
 		testutil.WithImage(e2eAgentImage),
-		testutil.WithRepository("https://github.com/octocat/Hello-World.git"),
+		testutil.WithWorkspace(&agentv1alpha1.WorkspaceSpec{
+			Repository:  agentv1alpha1.RepositorySpec{URL: "https://github.com/octocat/Hello-World.git"},
+			StorageSize: "1Gi",
+		}),
 		testutil.WithProviderRef("test-provider"),
 		testutil.WithRuntimeClassName("gvisor"),
 	)
@@ -497,7 +491,6 @@ func TestE2E_GVisor_WorkspaceJobWithRuntimeClassName(t *testing.T) {
 	// Create AgentRun with workspace ref and runtimeClassName
 	run := testutil.NewAgentRun(ns, "gvisor-ws-run",
 		testutil.WithWorkspaceRef("gvisor-ws"),
-		testutil.WithWorktree("gvisor-work", ""),
 		testutil.WithRuntimeClassName("gvisor"),
 	)
 	if err := k8sClient.Create(ctx, run); err != nil {

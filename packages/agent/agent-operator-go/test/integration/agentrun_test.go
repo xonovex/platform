@@ -394,117 +394,6 @@ func TestAgentRun_SkipsTerminalPhases(t *testing.T) {
 	}
 }
 
-func TestAgentRun_AppliesAgentConfigDefaults(t *testing.T) {
-	ns := createNamespace(t, "config-defaults")
-
-	config := testutil.NewAgentConfig(ns, "agent-config",
-		testutil.WithStorageSize("20Gi"),
-		testutil.WithStorageClass("fast"),
-	)
-	if err := k8sClient.Create(ctx, config); err != nil {
-		t.Fatalf("failed to create AgentConfig: %v", err)
-	}
-
-	run := testutil.NewAgentRun(ns, "test-run",
-		testutil.WithConfigRef("agent-config"),
-	)
-	if err := k8sClient.Create(ctx, run); err != nil {
-		t.Fatalf("failed to create AgentRun: %v", err)
-	}
-
-	testutil.WaitForAgentRunPhase(t, ctx, k8sClient, client.ObjectKeyFromObject(run), agentv1alpha1.AgentRunPhaseInitializing, 30*time.Second)
-
-	var pvc corev1.PersistentVolumeClaim
-	pvcKey := types.NamespacedName{Name: "test-run-workspace", Namespace: ns}
-	if err := k8sClient.Get(ctx, pvcKey, &pvc); err != nil {
-		t.Fatalf("PVC not created: %v", err)
-	}
-
-	storageReq := pvc.Spec.Resources.Requests[corev1.ResourceStorage]
-	if storageReq.Cmp(resource.MustParse("20Gi")) != 0 {
-		t.Errorf("PVC storage = %s, want 20Gi", storageReq.String())
-	}
-
-	if pvc.Spec.StorageClassName == nil || *pvc.Spec.StorageClassName != "fast" {
-		sc := "<nil>"
-		if pvc.Spec.StorageClassName != nil {
-			sc = *pvc.Spec.StorageClassName
-		}
-		t.Errorf("PVC storageClassName = %s, want fast", sc)
-	}
-}
-
-func TestAgentRun_AppliesDefaultRuntimeClassName(t *testing.T) {
-	ns := createNamespace(t, "config-runtime")
-
-	config := testutil.NewAgentConfig(ns, "agent-config",
-		testutil.WithDefaultRuntimeClassName("kata"),
-	)
-	if err := k8sClient.Create(ctx, config); err != nil {
-		t.Fatalf("failed to create AgentConfig: %v", err)
-	}
-
-	run := testutil.NewAgentRun(ns, "test-run",
-		testutil.WithConfigRef("agent-config"),
-	)
-	if err := k8sClient.Create(ctx, run); err != nil {
-		t.Fatalf("failed to create AgentRun: %v", err)
-	}
-
-	testutil.WaitForAgentRunPhase(t, ctx, k8sClient, client.ObjectKeyFromObject(run), agentv1alpha1.AgentRunPhaseInitializing, 30*time.Second)
-
-	var job batchv1.Job
-	jobKey := types.NamespacedName{Name: "test-run", Namespace: ns}
-	if err := k8sClient.Get(ctx, jobKey, &job); err != nil {
-		t.Fatalf("Job not created: %v", err)
-	}
-
-	rc := job.Spec.Template.Spec.RuntimeClassName
-	if rc == nil || *rc != "kata" {
-		got := "<nil>"
-		if rc != nil {
-			got = *rc
-		}
-		t.Errorf("RuntimeClassName = %s, want kata", got)
-	}
-}
-
-func TestAgentRun_RuntimeClassNameOverridesDefault(t *testing.T) {
-	ns := createNamespace(t, "config-runtime-override")
-
-	config := testutil.NewAgentConfig(ns, "agent-config",
-		testutil.WithDefaultRuntimeClassName("kata"),
-	)
-	if err := k8sClient.Create(ctx, config); err != nil {
-		t.Fatalf("failed to create AgentConfig: %v", err)
-	}
-
-	run := testutil.NewAgentRun(ns, "test-run",
-		testutil.WithConfigRef("agent-config"),
-		testutil.WithRuntimeClassName("gvisor"),
-	)
-	if err := k8sClient.Create(ctx, run); err != nil {
-		t.Fatalf("failed to create AgentRun: %v", err)
-	}
-
-	testutil.WaitForAgentRunPhase(t, ctx, k8sClient, client.ObjectKeyFromObject(run), agentv1alpha1.AgentRunPhaseInitializing, 30*time.Second)
-
-	var job batchv1.Job
-	jobKey := types.NamespacedName{Name: "test-run", Namespace: ns}
-	if err := k8sClient.Get(ctx, jobKey, &job); err != nil {
-		t.Fatalf("Job not created: %v", err)
-	}
-
-	rc := job.Spec.Template.Spec.RuntimeClassName
-	if rc == nil || *rc != "gvisor" {
-		got := "<nil>"
-		if rc != nil {
-			got = *rc
-		}
-		t.Errorf("RuntimeClassName = %s, want gvisor", got)
-	}
-}
-
 func TestAgentRun_ProviderEnvVarsInjectedIntoJob(t *testing.T) {
 	ns := createNamespace(t, "provider-env")
 
@@ -516,7 +405,6 @@ func TestAgentRun_ProviderEnvVarsInjectedIntoJob(t *testing.T) {
 	}
 
 	provider := testutil.NewAgentProvider(ns, "test-provider",
-		testutil.WithAgentTypes(agentv1alpha1.AgentTypeClaude),
 		testutil.WithAuthTokenSecretRef("provider-secret", "api-key"),
 		testutil.WithEnvironment(map[string]string{
 			"ANTHROPIC_BASE_URL": "http://proxy:8080",

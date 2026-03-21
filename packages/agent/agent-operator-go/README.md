@@ -16,7 +16,7 @@ kind: AgentRun
 metadata:
   name: review-codebase
 spec:
-  agent: claude # "claude" or "opencode"
+  agent: claude # e.g. "claude", "opencode"
   configRef: default # references an AgentConfig for defaults
   providerRef: gemini-provider # references an AgentProvider
   repository:
@@ -40,8 +40,9 @@ spec:
 
 | Field                             | Type     | Description                                                    |
 | --------------------------------- | -------- | -------------------------------------------------------------- |
-| `agent`                           | string   | Agent type: `claude` or `opencode`                             |
+| `agent`                           | string   | Agent type (e.g. `claude`, `opencode`)                         |
 | `configRef`                       | string   | Name of an AgentConfig in the same namespace for defaults      |
+| `config`                          | object   | Inline config (mutually exclusive with `configRef`)            |
 | `providerRef`                     | string   | Name of an AgentProvider in the same namespace                 |
 | `provider`                        | object   | Inline provider config (mutually exclusive with `providerRef`) |
 | `workspaceRef`                    | string   | Name of an AgentWorkspace (mutually exclusive with `repository`) |
@@ -57,7 +58,7 @@ spec:
 | `env`                             | list     | Additional environment variables                               |
 | `image`                           | string   | Container image override                                       |
 | `runtimeClassName`                | string   | Pod runtime class for sandboxed execution (e.g. `gvisor`, `kata`) |
-| `vcs`                             | string   | Version control system: `git` (default) or `jj` (Jujutsu)     |
+| `vcs`                             | string   | Version control system (e.g. `git`, `jj`; default: `git`)     |
 | `nix.packages`                    | list     | Nixpkgs attribute names to install (e.g. `nodejs_22`, `python3`) |
 | `nix.image`                       | string   | Nix container image for init container (default: `nixos/nix:latest`) |
 | `nodeSelector`                    | map      | Node selector for pod scheduling                               |
@@ -172,7 +173,7 @@ spec:
 | `defaultProviders`         | map      | Map of agent type to default provider name                   |
 | `defaultImage`             | string   | Default container image                                      |
 | `defaultRuntimeClassName`  | string   | Default pod runtime class (e.g. `gvisor`, `kata`)            |
-| `defaultVCS`               | string   | Default version control system: `git` (default) or `jj`      |
+| `defaultVCS`               | string   | Default version control system (e.g. `git`, `jj`)             |
 | `defaultNix.packages`      | list     | Default Nix packages for all runs referencing this config     |
 | `defaultNix.image`         | string   | Default Nix container image                                   |
 | `defaultTimeout`           | duration | Default timeout for agent runs                               |
@@ -633,6 +634,31 @@ spec:
   providerRef: gemini-provider
   runtimeClassName: gvisor  # agent Job runs in gVisor; workspace init Job does not
   prompt: "Refactor the database layer"
+```
+
+### Inline config (no AgentConfig resource needed)
+
+For one-off runs, you can specify the config inline instead of creating a separate AgentConfig resource:
+
+```yaml
+apiVersion: agent.xonovex.com/v1alpha1
+kind: AgentRun
+metadata:
+  name: quick-run
+spec:
+  agent: claude
+  config:
+    defaultImage: "node:22-slim"
+    defaultTimeout: 30m
+    defaultRuntimeClassName: gvisor
+    defaultNix:
+      packages:
+        - nodejs_22
+        - ripgrep
+  providerRef: gemini-provider
+  repository:
+    url: https://github.com/org/repo.git
+  prompt: "Fix the tests"
 ```
 
 ### Inline provider (no AgentProvider resource needed)

@@ -90,7 +90,6 @@ func TestE2E_MultiAgentWorkspace(t *testing.T) {
 	for i := 1; i <= 2; i++ {
 		run := testutil.NewAgentRun(ns, fmt.Sprintf("agent-%d", i),
 			testutil.WithWorkspaceRef("shared-ws"),
-			testutil.WithWorktree(fmt.Sprintf("agent-%d-work", i), ""),
 		)
 		if err := k8sClient.Create(ctx, run); err != nil {
 			t.Fatalf("failed to create AgentRun agent-%d: %v", i, err)

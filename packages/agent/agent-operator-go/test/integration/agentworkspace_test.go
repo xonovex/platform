@@ -167,7 +167,6 @@ func TestAgentRun_WithWorkspaceRef_WaitsForWorkspaceReady(t *testing.T) {
 	// Create AgentRun with workspaceRef
 	run := testutil.NewAgentRun(ns, "agent-1",
 		testutil.WithWorkspaceRef("test-ws"),
-		testutil.WithWorktree("agent-1-work", ""),
 	)
 	if err := k8sClient.Create(ctx, run); err != nil {
 		t.Fatalf("failed to create AgentRun: %v", err)

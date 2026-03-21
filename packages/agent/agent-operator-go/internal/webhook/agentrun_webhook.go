@@ -13,6 +13,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	agentv1alpha1 "github.com/xonovex/platform/packages/agent/agent-operator-go/api/v1alpha1"
+	"github.com/xonovex/platform/packages/agent/agent-operator-go/internal/builder"
 )
 
 // AgentRunWebhook implements defaulting and validation for AgentRun
@@ -35,14 +36,6 @@ func (w *AgentRunWebhook) Default(_ context.Context, obj runtime.Object) error {
 	run, ok := obj.(*agentv1alpha1.AgentRun)
 	if !ok {
 		return fmt.Errorf("expected AgentRun, got %T", obj)
-	}
-
-	if run.Spec.Agent == "" {
-		run.Spec.Agent = agentv1alpha1.AgentTypeClaude
-	}
-
-	if run.Spec.VCS == "" {
-		run.Spec.VCS = agentv1alpha1.VCSGit
 	}
 
 	if run.Spec.Timeout == nil {
@@ -79,31 +72,43 @@ func (w *AgentRunWebhook) ValidateDelete(_ context.Context, _ runtime.Object) (a
 }
 
 func (w *AgentRunWebhook) validate(run *agentv1alpha1.AgentRun) (admission.Warnings, error) {
-	if run.Spec.Agent != agentv1alpha1.AgentTypeClaude && run.Spec.Agent != agentv1alpha1.AgentTypeOpencode {
-		return nil, fmt.Errorf("invalid agent type: %s, must be one of: claude, opencode", run.Spec.Agent)
+	// Mutual exclusivity
+	if run.Spec.HarnessRef != "" && run.Spec.Harness != nil {
+		return nil, fmt.Errorf("cannot specify both harnessRef and inline harness")
 	}
-
-	if run.Spec.WorkspaceRef != "" {
-		// Workspace mode: worktree is required, repository must be empty
-		if run.Spec.Worktree == nil {
-			return nil, fmt.Errorf("worktree is required when workspaceRef is set")
-		}
-		if run.Spec.Repository.URL != "" {
-			return nil, fmt.Errorf("repository must not be set when workspaceRef is set")
-		}
-	} else {
-		// Standalone mode: repository URL is required
-		if run.Spec.Repository.URL == "" {
-			return nil, fmt.Errorf("repository URL is required")
-		}
-	}
-
 	if run.Spec.ProviderRef != "" && run.Spec.Provider != nil {
 		return nil, fmt.Errorf("cannot specify both providerRef and inline provider")
 	}
+	if run.Spec.WorkspaceRef != "" && run.Spec.Workspace != nil {
+		return nil, fmt.Errorf("cannot specify both workspaceRef and inline workspace")
+	}
+	if run.Spec.ToolchainRef != "" && run.Spec.Toolchain != nil {
+		return nil, fmt.Errorf("cannot specify both toolchainRef and inline toolchain")
+	}
 
-	if run.Spec.VCS != "" && run.Spec.VCS != agentv1alpha1.VCSGit && run.Spec.VCS != agentv1alpha1.VCSJujutsu {
-		return nil, fmt.Errorf("invalid vcs: %s, must be one of: git, jj", run.Spec.VCS)
+	// Validate inline types
+	if run.Spec.Harness != nil && run.Spec.Harness.Type != "" {
+		if _, err := builder.GetHarnessCommand(run.Spec.Harness.Type); err != nil {
+			return nil, fmt.Errorf("invalid agent type: %s", run.Spec.Harness.Type)
+		}
+	}
+	if run.Spec.Workspace != nil && run.Spec.Workspace.Type != "" {
+		if _, err := builder.GetVCSStrategy(run.Spec.Workspace.Type); err != nil {
+			return nil, fmt.Errorf("invalid workspace type: %s", run.Spec.Workspace.Type)
+		}
+	}
+	if run.Spec.Toolchain != nil && run.Spec.Toolchain.Type != "" {
+		validTypes := map[agentv1alpha1.ToolchainType]bool{agentv1alpha1.ToolchainTypeNix: true}
+		if !validTypes[run.Spec.Toolchain.Type] {
+			return nil, fmt.Errorf("invalid toolchain type: %s", run.Spec.Toolchain.Type)
+		}
+	}
+
+	// Standalone: require workspace with repository URL
+	if run.Spec.WorkspaceRef == "" {
+		if run.Spec.Workspace == nil || run.Spec.Workspace.Repository.URL == "" {
+			return nil, fmt.Errorf("workspace with repository URL is required (or use workspaceRef)")
+		}
 	}
 
 	return nil, nil

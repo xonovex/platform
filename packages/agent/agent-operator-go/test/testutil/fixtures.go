@@ -10,24 +10,38 @@ import (
 // AgentRunOption configures an AgentRun.
 type AgentRunOption func(*agentv1alpha1.AgentRun)
 
-// WithAgent sets the agent type.
-func WithAgent(agent agentv1alpha1.AgentType) AgentRunOption {
+// WithHarnessRef sets the harness reference.
+func WithHarnessRef(ref string) AgentRunOption {
 	return func(r *agentv1alpha1.AgentRun) {
-		r.Spec.Agent = agent
+		r.Spec.HarnessRef = ref
 	}
 }
 
-// WithConfigRef sets the config reference.
-func WithConfigRef(ref string) AgentRunOption {
+// WithHarness sets the inline harness.
+func WithHarness(spec *agentv1alpha1.AgentSpec) AgentRunOption {
 	return func(r *agentv1alpha1.AgentRun) {
-		r.Spec.ConfigRef = ref
+		r.Spec.Harness = spec
 	}
 }
 
-// WithRepository sets the repository URL.
-func WithRepository(url string) AgentRunOption {
+// WithWorkspace sets the inline workspace.
+func WithWorkspace(spec *agentv1alpha1.WorkspaceSpec) AgentRunOption {
 	return func(r *agentv1alpha1.AgentRun) {
-		r.Spec.Repository = agentv1alpha1.RepositorySpec{URL: url}
+		r.Spec.Workspace = spec
+	}
+}
+
+// WithToolchain sets the inline toolchain.
+func WithToolchain(spec *agentv1alpha1.ToolchainSpec) AgentRunOption {
+	return func(r *agentv1alpha1.AgentRun) {
+		r.Spec.Toolchain = spec
+	}
+}
+
+// WithToolchainRef sets the toolchain reference.
+func WithToolchainRef(ref string) AgentRunOption {
+	return func(r *agentv1alpha1.AgentRun) {
+		r.Spec.ToolchainRef = ref
 	}
 }
 
@@ -66,6 +80,20 @@ func WithPhase(phase agentv1alpha1.AgentRunPhase) AgentRunOption {
 	}
 }
 
+// WithRuntimeClassName sets the runtime class name.
+func WithRuntimeClassName(name string) AgentRunOption {
+	return func(r *agentv1alpha1.AgentRun) {
+		r.Spec.RuntimeClassName = &name
+	}
+}
+
+// WithWorkspaceRef sets the workspace reference.
+func WithWorkspaceRef(ref string) AgentRunOption {
+	return func(r *agentv1alpha1.AgentRun) {
+		r.Spec.WorkspaceRef = ref
+	}
+}
+
 // NewAgentRun creates an AgentRun with defaults and applies options.
 func NewAgentRun(namespace, name string, opts ...AgentRunOption) *agentv1alpha1.AgentRun {
 	run := &agentv1alpha1.AgentRun{
@@ -74,8 +102,9 @@ func NewAgentRun(namespace, name string, opts ...AgentRunOption) *agentv1alpha1.
 			Namespace: namespace,
 		},
 		Spec: agentv1alpha1.AgentRunSpec{
-			Agent:      agentv1alpha1.AgentTypeClaude,
-			Repository: agentv1alpha1.RepositorySpec{URL: "https://github.com/example/repo"},
+			Workspace: &agentv1alpha1.WorkspaceSpec{
+				Repository: agentv1alpha1.RepositorySpec{URL: "https://github.com/example/repo"},
+			},
 		},
 	}
 	for _, opt := range opts {
@@ -87,10 +116,10 @@ func NewAgentRun(namespace, name string, opts ...AgentRunOption) *agentv1alpha1.
 // AgentProviderOption configures an AgentProvider.
 type AgentProviderOption func(*agentv1alpha1.AgentProvider)
 
-// WithAgentTypes sets the supported agent types.
-func WithAgentTypes(types ...agentv1alpha1.AgentType) AgentProviderOption {
+// WithProviderType sets the provider type.
+func WithProviderType(t agentv1alpha1.ProviderType) AgentProviderOption {
 	return func(p *agentv1alpha1.AgentProvider) {
-		p.Spec.AgentTypes = types
+		p.Spec.Type = t
 	}
 }
 
@@ -118,9 +147,7 @@ func NewAgentProvider(namespace, name string, opts ...AgentProviderOption) *agen
 			Name:      name,
 			Namespace: namespace,
 		},
-		Spec: agentv1alpha1.AgentProviderSpec{
-			AgentTypes: []agentv1alpha1.AgentType{agentv1alpha1.AgentTypeClaude},
-		},
+		Spec: agentv1alpha1.AgentProviderSpec{},
 	}
 	for _, opt := range opts {
 		opt(provider)
@@ -128,112 +155,52 @@ func NewAgentProvider(namespace, name string, opts ...AgentProviderOption) *agen
 	return provider
 }
 
-// AgentConfigOption configures an AgentConfig.
-type AgentConfigOption func(*agentv1alpha1.AgentConfig)
+// AgentHarnessOption configures an AgentHarness.
+type AgentHarnessOption func(*agentv1alpha1.AgentHarness)
 
-// WithDefaultAgent sets the default agent type.
-func WithDefaultAgent(agent agentv1alpha1.AgentType) AgentConfigOption {
-	return func(c *agentv1alpha1.AgentConfig) {
-		c.Spec.DefaultAgent = agent
+// WithHarnessType sets the agent type.
+func WithHarnessType(t agentv1alpha1.AgentType) AgentHarnessOption {
+	return func(h *agentv1alpha1.AgentHarness) {
+		h.Spec.Type = t
 	}
 }
 
-// WithStorageSize sets the storage size for workspace PVCs.
-func WithStorageSize(size string) AgentConfigOption {
-	return func(c *agentv1alpha1.AgentConfig) {
-		c.Spec.StorageSize = size
+// WithDefaultImage sets the default image on the harness.
+func WithDefaultImage(image string) AgentHarnessOption {
+	return func(h *agentv1alpha1.AgentHarness) {
+		h.Spec.DefaultImage = image
 	}
 }
 
-// WithStorageClass sets the storage class for workspace PVCs.
-func WithStorageClass(class string) AgentConfigOption {
-	return func(c *agentv1alpha1.AgentConfig) {
-		c.Spec.StorageClass = class
+// WithDefaultRuntimeClassName sets the default runtime class name on the harness.
+func WithDefaultRuntimeClassName(name string) AgentHarnessOption {
+	return func(h *agentv1alpha1.AgentHarness) {
+		h.Spec.DefaultRuntimeClassName = &name
 	}
 }
 
-// WithDefaultImage sets the default container image.
-func WithDefaultImage(image string) AgentConfigOption {
-	return func(c *agentv1alpha1.AgentConfig) {
-		c.Spec.DefaultImage = image
+// WithDefaultProvider sets the default provider on the harness.
+func WithDefaultProvider(provider string) AgentHarnessOption {
+	return func(h *agentv1alpha1.AgentHarness) {
+		h.Spec.DefaultProvider = provider
 	}
 }
 
-// WithDefaultProviders sets the default providers map.
-func WithDefaultProviders(providers map[agentv1alpha1.AgentType]string) AgentConfigOption {
-	return func(c *agentv1alpha1.AgentConfig) {
-		c.Spec.DefaultProviders = providers
-	}
-}
-
-// WithDefaultVCS sets the default VCS.
-func WithDefaultVCS(vcs agentv1alpha1.VCSType) AgentConfigOption {
-	return func(c *agentv1alpha1.AgentConfig) {
-		c.Spec.DefaultVCS = vcs
-	}
-}
-
-// WithDefaultRuntimeClassName sets the default runtime class name.
-func WithDefaultRuntimeClassName(name string) AgentConfigOption {
-	return func(c *agentv1alpha1.AgentConfig) {
-		c.Spec.DefaultRuntimeClassName = &name
-	}
-}
-
-// NewAgentConfig creates an AgentConfig with defaults and applies options.
-func NewAgentConfig(namespace, name string, opts ...AgentConfigOption) *agentv1alpha1.AgentConfig {
-	config := &agentv1alpha1.AgentConfig{
+// NewAgentHarness creates an AgentHarness with defaults and applies options.
+func NewAgentHarness(namespace, name string, opts ...AgentHarnessOption) *agentv1alpha1.AgentHarness {
+	harness := &agentv1alpha1.AgentHarness{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      name,
 			Namespace: namespace,
 		},
+		Spec: agentv1alpha1.AgentSpec{
+			Type: agentv1alpha1.AgentTypeClaude,
+		},
 	}
 	for _, opt := range opts {
-		opt(config)
+		opt(harness)
 	}
-	return config
-}
-
-// WithNixPackages sets the Nix packages.
-func WithNixPackages(packages ...string) AgentRunOption {
-	return func(r *agentv1alpha1.AgentRun) {
-		if r.Spec.Nix == nil {
-			r.Spec.Nix = &agentv1alpha1.NixSpec{}
-		}
-		r.Spec.Nix.Packages = packages
-	}
-}
-
-// WithVCS sets the version control system.
-func WithVCS(vcs agentv1alpha1.VCSType) AgentRunOption {
-	return func(r *agentv1alpha1.AgentRun) {
-		r.Spec.VCS = vcs
-	}
-}
-
-// WithRuntimeClassName sets the runtime class name.
-func WithRuntimeClassName(name string) AgentRunOption {
-	return func(r *agentv1alpha1.AgentRun) {
-		r.Spec.RuntimeClassName = &name
-	}
-}
-
-// WithWorkspaceRef sets the workspace reference.
-func WithWorkspaceRef(ref string) AgentRunOption {
-	return func(r *agentv1alpha1.AgentRun) {
-		r.Spec.WorkspaceRef = ref
-		r.Spec.Repository = agentv1alpha1.RepositorySpec{}
-	}
-}
-
-// WithWorktree sets the worktree configuration.
-func WithWorktree(branch, sourceBranch string) AgentRunOption {
-	return func(r *agentv1alpha1.AgentRun) {
-		r.Spec.Worktree = &agentv1alpha1.WorktreeSpec{
-			Branch:       branch,
-			SourceBranch: sourceBranch,
-		}
-	}
+	return harness
 }
 
 // AgentWorkspaceOption configures an AgentWorkspace.
@@ -274,10 +241,10 @@ func WithSharedVolumes(volumes ...agentv1alpha1.SharedVolumeSpec) AgentWorkspace
 	}
 }
 
-// WithWorkspaceVCS sets the workspace VCS.
-func WithWorkspaceVCS(vcs agentv1alpha1.VCSType) AgentWorkspaceOption {
+// WithWorkspaceType sets the workspace type.
+func WithWorkspaceType(t agentv1alpha1.WorkspaceType) AgentWorkspaceOption {
 	return func(ws *agentv1alpha1.AgentWorkspace) {
-		ws.Spec.VCS = vcs
+		ws.Spec.Type = t
 	}
 }
 
