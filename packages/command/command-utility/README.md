@@ -2,6 +2,13 @@
 
 Manage project instructions, extract insights, and create skills.
 
+## Installation
+
+```bash
+claude plugin marketplace add xonovex/platform
+claude plugin install xonovex-utility@platform
+```
+
 ## Commands
 
 ### Content
