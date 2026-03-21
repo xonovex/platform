@@ -34,9 +34,6 @@ Xonovex manages everything *around* the agent: sandbox isolation, model provider
 |---------|-------------|
 | [skill-general-fp](packages/skill/skill-general-fp/) | Functional programming guidelines |
 | [skill-general-oop](packages/skill/skill-general-oop/) | Object-oriented programming guidelines |
-| [skill-plan](packages/skill/skill-plan/) | Plan-driven development guidelines |
-| [skill-insights](packages/skill/skill-insights/) | Insights extraction and integration |
-| [skill-instruction](packages/skill/skill-instruction/) | Project instruction management |
 | [skill-git](packages/skill/skill-git/) | Git workflow guidelines |
 | [skill-docker](packages/skill/skill-docker/) | Docker best practices |
 | [skill-kubernetes](packages/skill/skill-kubernetes/) | Kubernetes patterns |
