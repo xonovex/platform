@@ -50,46 +50,6 @@ Xonovex manages everything *around* the agent: sandbox isolation, model provider
 
 ## Quick Start
 
-### Claude Code Plugins
-
-Add the marketplace, then install workflow commands and skills:
-
-```bash
-# Add the Xonovex plugin marketplace
-claude plugin marketplace add xonovex/platform
-
-# Install workflow commands (plan, code quality, git)
-claude plugin install xonovex-workflow@platform
-
-# Install utility commands (instructions, insights, skills)
-claude plugin install xonovex-utility@platform
-
-# Install skills (each skill is a separate plugin)
-claude plugin install xonovex-typescript@platform
-claude plugin install xonovex-react@platform
-claude plugin install xonovex-general-fp@platform
-```
-
-Once installed, workflow commands are available as slash commands in Claude Code:
-
-```
-/plan-research          Research codebase and web for requirements
-/plan-create            Create a high-level plan for user review
-/plan-subplans-create   Generate detailed subplans with parallel execution detection
-/plan-worktree-create   Create a git worktree for a feature branch
-/plan-continue          Resume work from an existing plan
-/plan-validate          Verify that a plan or current work has been fully achieved
-/plan-update            Update plan status and test results
-/plan-refine            Process user annotations and refine iteratively
-/plan-worktree-merge    Merge feature worktree back to source
-/code-simplify          Consolidate duplicates, remove dead code, flatten abstractions
-/code-harden            Improve type safety, validation, and error handling
-/code-align             Align two similar implementations and suggest improvements
-/git-commit             Commit and push changes
-```
-
-Skills are applied automatically when relevant to the task.
-
 ### Agent CLI
 
 ```bash
@@ -138,6 +98,46 @@ spec:
   prompt: "Review the codebase and suggest improvements"
 EOF
 ```
+
+### Claude Code Plugins
+
+Add the marketplace, then install workflow commands and skills:
+
+```bash
+# Add the Xonovex plugin marketplace
+claude plugin marketplace add xonovex/platform
+
+# Install workflow commands (plan, code quality, git)
+claude plugin install xonovex-workflow@platform
+
+# Install utility commands (instructions, insights, skills)
+claude plugin install xonovex-utility@platform
+
+# Install skills (each skill is a separate plugin)
+claude plugin install xonovex-typescript@platform
+claude plugin install xonovex-react@platform
+claude plugin install xonovex-general-fp@platform
+```
+
+Once installed, workflow commands are available as slash commands in Claude Code:
+
+```
+/plan-research          Research codebase and web for requirements
+/plan-create            Create a high-level plan for user review
+/plan-subplans-create   Generate detailed subplans with parallel execution detection
+/plan-worktree-create   Create a git worktree for a feature branch
+/plan-continue          Resume work from an existing plan
+/plan-validate          Verify that a plan or current work has been fully achieved
+/plan-update            Update plan status and test results
+/plan-refine            Process user annotations and refine iteratively
+/plan-worktree-merge    Merge feature worktree back to source
+/code-simplify          Consolidate duplicates, remove dead code, flatten abstractions
+/code-harden            Improve type safety, validation, and error handling
+/code-align             Align two similar implementations and suggest improvements
+/git-commit             Commit and push changes
+```
+
+Skills are applied automatically when relevant to the task.
 
 ## Development
 
