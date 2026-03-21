@@ -11,7 +11,7 @@ docker buildx inspect xonovex-builder >/dev/null 2>&1 || \
   docker buildx create --name xonovex-builder --use
 
 # Login to GHCR
-echo "${GITHUB_TOKEN}" | docker login ghcr.io -u deorder --password-stdin
+echo "${GITHUB_TOKEN}" | docker login ghcr.io -u "${GITHUB_ACTOR:-deorder}" --password-stdin
 
 # Build each architecture with registry layer caching
 for ARCH in amd64 arm64; do
