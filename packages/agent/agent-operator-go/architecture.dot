@@ -25,13 +25,12 @@ digraph AgentOperatorArchitecture {
     agentrun [
       label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="1">
         <TR><TD><B>AgentRun</B></TD></TR>
-        <TR><TD><FONT POINT-SIZE="8" COLOR="#555">agent: claude | opencode</FONT></TD></TR>
-        <TR><TD><FONT POINT-SIZE="8" COLOR="#555">repository: {url, branch, commit}</FONT></TD></TR>
-        <TR><TD><FONT POINT-SIZE="8" COLOR="#555">worktree: {branch, sourceBranch}</FONT></TD></TR>
-        <TR><TD><FONT POINT-SIZE="8" COLOR="#555">workspaceRef: → AgentWorkspace</FONT></TD></TR>
-        <TR><TD><FONT POINT-SIZE="8" COLOR="#555">prompt, timeout, image, resources</FONT></TD></TR>
+        <TR><TD><FONT POINT-SIZE="8" COLOR="#555">harnessRef | harness (inline)</FONT></TD></TR>
         <TR><TD><FONT POINT-SIZE="8" COLOR="#555">providerRef | provider (inline)</FONT></TD></TR>
-        <TR><TD><FONT POINT-SIZE="8" COLOR="#555">nodeSelector, tolerations, env</FONT></TD></TR>
+        <TR><TD><FONT POINT-SIZE="8" COLOR="#555">workspaceRef | workspace (inline)</FONT></TD></TR>
+        <TR><TD><FONT POINT-SIZE="8" COLOR="#555">toolchainRef | toolchain (inline)</FONT></TD></TR>
+        <TR><TD><FONT POINT-SIZE="8" COLOR="#555">prompt, timeout, image, resources</FONT></TD></TR>
+        <TR><TD><FONT POINT-SIZE="8" COLOR="#555">runtimeClassName, nodeSelector, tolerations, env</FONT></TD></TR>
       </TABLE>>,
       fillcolor="#ffcc80"
     ];
@@ -39,6 +38,7 @@ digraph AgentOperatorArchitecture {
     agentworkspace [
       label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="1">
         <TR><TD><B>AgentWorkspace</B></TD></TR>
+        <TR><TD><FONT POINT-SIZE="8" COLOR="#555">type: git | jj</FONT></TD></TR>
         <TR><TD><FONT POINT-SIZE="8" COLOR="#555">repository: {url, branch, commit}</FONT></TD></TR>
         <TR><TD><FONT POINT-SIZE="8" COLOR="#555">storageClass, storageSize</FONT></TD></TR>
         <TR><TD><FONT POINT-SIZE="8" COLOR="#555">sharedVolumes: [{name, mountPath, size}]</FONT></TD></TR>
@@ -47,10 +47,21 @@ digraph AgentOperatorArchitecture {
       fillcolor="#fff176"
     ];
 
+    agentharness [
+      label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="1">
+        <TR><TD><B>AgentHarness</B></TD></TR>
+        <TR><TD><FONT POINT-SIZE="8" COLOR="#555">type: claude | opencode</FONT></TD></TR>
+        <TR><TD><FONT POINT-SIZE="8" COLOR="#555">defaultProvider, defaultImage</FONT></TD></TR>
+        <TR><TD><FONT POINT-SIZE="8" COLOR="#555">defaultTimeout, defaultRuntimeClassName</FONT></TD></TR>
+        <TR><TD><FONT POINT-SIZE="8" COLOR="#555">defaultResources, env</FONT></TD></TR>
+      </TABLE>>,
+      fillcolor="#ffe0b2"
+    ];
+
     agentprovider [
       label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="1">
         <TR><TD><B>AgentProvider</B></TD></TR>
-        <TR><TD><FONT POINT-SIZE="8" COLOR="#555">agentTypes, displayName</FONT></TD></TR>
+        <TR><TD><FONT POINT-SIZE="8" COLOR="#555">type, displayName</FONT></TD></TR>
         <TR><TD><FONT POINT-SIZE="8" COLOR="#555">authTokenSecretRef</FONT></TD></TR>
         <TR><TD><FONT POINT-SIZE="8" COLOR="#555">environment, cliArgs</FONT></TD></TR>
         <TR><TD><FONT POINT-SIZE="8" COLOR="#555">status.ready: bool</FONT></TD></TR>
@@ -58,13 +69,11 @@ digraph AgentOperatorArchitecture {
       fillcolor="#ffe0b2"
     ];
 
-    agentconfig [
+    agenttoolchain [
       label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="1">
-        <TR><TD><B>AgentConfig</B>  <FONT POINT-SIZE="7" COLOR="#999">(1 per ns)</FONT></TD></TR>
-        <TR><TD><FONT POINT-SIZE="8" COLOR="#555">defaultAgent, defaultProviders</FONT></TD></TR>
-        <TR><TD><FONT POINT-SIZE="8" COLOR="#555">defaultImage, defaultTimeout</FONT></TD></TR>
-        <TR><TD><FONT POINT-SIZE="8" COLOR="#555">storageClass, storageSize</FONT></TD></TR>
-        <TR><TD><FONT POINT-SIZE="8" COLOR="#555">defaultResources, env</FONT></TD></TR>
+        <TR><TD><B>AgentToolchain</B></TD></TR>
+        <TR><TD><FONT POINT-SIZE="8" COLOR="#555">type: nix</FONT></TD></TR>
+        <TR><TD><FONT POINT-SIZE="8" COLOR="#555">nix: {packages, image}</FONT></TD></TR>
       </TABLE>>,
       fillcolor="#ffe0b2"
     ];
@@ -78,8 +87,8 @@ digraph AgentOperatorArchitecture {
     wh_run [
       label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="1">
         <TR><TD><B>AgentRun Webhook</B></TD></TR>
-        <TR><TD><FONT POINT-SIZE="8">Default: agent=claude, timeout=1h</FONT></TD></TR>
-        <TR><TD><FONT POINT-SIZE="8">Validate: type, URL/workspaceRef, no conflicts</FONT></TD></TR>
+        <TR><TD><FONT POINT-SIZE="8">Default: timeout=1h</FONT></TD></TR>
+        <TR><TD><FONT POINT-SIZE="8">Validate: ref/inline exclusivity, no conflicts</FONT></TD></TR>
       </TABLE>>,
       fillcolor="#f8bbd0"
     ];
@@ -91,8 +100,9 @@ digraph AgentOperatorArchitecture {
       </TABLE>>,
       fillcolor="#f8bbd0"
     ];
+    wh_harness [label="AgentHarness\nWebhook", fillcolor="#f8bbd0"];
     wh_provider [label="AgentProvider\nWebhook", fillcolor="#f8bbd0"];
-    wh_config [label="AgentConfig\nWebhook", fillcolor="#f8bbd0"];
+    wh_toolchain [label="AgentToolchain\nWebhook", fillcolor="#f8bbd0"];
   }
 
   subgraph cluster_manager {
@@ -101,8 +111,9 @@ digraph AgentOperatorArchitecture {
 
     ctrl_run [label=<<B>AgentRun Reconciler</B>>, fillcolor="#a5d6a7"];
     ctrl_workspace [label=<<B>AgentWorkspace Reconciler</B>>, fillcolor="#a5d6a7"];
+    ctrl_harness [label="AgentHarness\nReconciler", fillcolor="#c8e6c9"];
     ctrl_provider [label="AgentProvider\nReconciler", fillcolor="#c8e6c9"];
-    ctrl_config [label="AgentConfig\nReconciler", fillcolor="#c8e6c9"];
+    ctrl_toolchain [label="AgentToolchain\nReconciler", fillcolor="#c8e6c9"];
   }
 
   // ─── Standalone Reconciliation Steps ────────────────────────────────
@@ -113,24 +124,25 @@ digraph AgentOperatorArchitecture {
     subgraph cluster_resolver {
       label=<<B>resolver</B>>; style=filled; fillcolor="#ede7f6"; fontname="Arial"; fontsize=10;
 
-      resolve_config [label="1. ResolveConfig\n(list AgentConfig in ns)", fillcolor="#d1c4e9", fontsize=9];
+      resolve_harness [label="1. ResolveHarness\n(harnessRef or inline)", fillcolor="#d1c4e9", fontsize=9];
       resolve_provider [
         label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="1">
           <TR><TD><B>2. ResolveProvider</B></TD></TR>
-          <TR><TD><FONT POINT-SIZE="8">inline → providerRef → config default → empty</FONT></TD></TR>
+          <TR><TD><FONT POINT-SIZE="8">inline → providerRef → harness default → empty</FONT></TD></TR>
           <TR><TD><FONT POINT-SIZE="8">reads auth token from K8s Secret</FONT></TD></TR>
         </TABLE>>,
         fillcolor="#d1c4e9", fontsize=9
       ];
+      resolve_toolchain [label="3. ResolveToolchain\n(toolchainRef or inline)", fillcolor="#d1c4e9", fontsize=9];
     }
 
     subgraph cluster_builder {
       label=<<B>builder</B>>; style=filled; fillcolor="#e8eaf6"; fontname="Arial"; fontsize=10;
 
-      build_pvc [label="3. BuildPVC\n(RWO, ownerRef → AgentRun)", fillcolor="#c5cae9", fontsize=9];
+      build_pvc [label="4. BuildPVC\n(RWO, ownerRef → AgentRun)", fillcolor="#c5cae9", fontsize=9];
       build_job [
         label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="1">
-          <TR><TD><B>4. BuildJob</B></TD></TR>
+          <TR><TD><B>5. BuildJob</B></TD></TR>
           <TR><TD><FONT POINT-SIZE="8">BuildInitContainers (git-clone script)</FONT></TD></TR>
           <TR><TD><FONT POINT-SIZE="8">BuildMainContainers (agent command)</FONT></TD></TR>
           <TR><TD><FONT POINT-SIZE="8">BuildEnvVars (provider + spec merge)</FONT></TD></TR>
@@ -139,7 +151,7 @@ digraph AgentOperatorArchitecture {
       ];
     }
 
-    watch_status [label="5. Watch Job Status\n→ update AgentRun phase", fillcolor="#fff9c4", fontsize=9];
+    watch_status [label="6. Watch Job Status\n→ update AgentRun phase", fillcolor="#fff9c4", fontsize=9];
   }
 
   // ─── Workspace Reconciliation ───────────────────────────────────────
@@ -322,24 +334,28 @@ digraph AgentOperatorArchitecture {
   // User creates CRDs
   user -> agentrun [label="kubectl apply"];
   user -> agentworkspace [label="kubectl apply"];
+  user -> agentharness [style=dashed, color="#b0bec5"];
   user -> agentprovider [style=dashed, color="#b0bec5"];
-  user -> agentconfig [style=dashed, color="#b0bec5"];
+  user -> agenttoolchain [style=dashed, color="#b0bec5"];
 
   // Webhooks validate/default
   agentrun -> wh_run [label="admit", color="#c62828", fontcolor="#c62828"];
   agentworkspace -> wh_workspace [label="admit", color="#c62828", fontcolor="#c62828"];
+  agentharness -> wh_harness [color="#c62828", style=dashed];
   agentprovider -> wh_provider [color="#c62828", style=dashed];
-  agentconfig -> wh_config [color="#c62828", style=dashed];
+  agenttoolchain -> wh_toolchain [color="#c62828", style=dashed];
 
   // Controllers watch CRDs
   agentrun -> ctrl_run [label="watch", color="#2e7d32", fontcolor="#2e7d32"];
   agentworkspace -> ctrl_workspace [label="watch", color="#2e7d32", fontcolor="#2e7d32"];
+  agentharness -> ctrl_harness [color="#2e7d32", style=dashed];
   agentprovider -> ctrl_provider [color="#2e7d32", style=dashed];
-  agentconfig -> ctrl_config [color="#2e7d32", style=dashed];
+  agenttoolchain -> ctrl_toolchain [color="#2e7d32", style=dashed];
 
   // AgentRun Reconciler — standalone path
-  ctrl_run -> resolve_config [label="standalone\npath", color="#4527a0", fontcolor="#4527a0"];
+  ctrl_run -> resolve_harness [label="standalone\npath", color="#4527a0", fontcolor="#4527a0"];
   ctrl_run -> resolve_provider [color="#4527a0"];
+  ctrl_run -> resolve_toolchain [color="#4527a0"];
   ctrl_run -> build_pvc [color="#283593"];
   ctrl_run -> build_job [color="#283593"];
   ctrl_run -> watch_status [color="#e65100"];
@@ -399,8 +415,8 @@ digraph AgentOperatorArchitecture {
   agentrun -> agentworkspace [label="workspaceRef", style=dashed, color="#ff6f00", fontcolor="#ff6f00"];
 
   // Layout hints
-  {rank=same; agentrun; agentworkspace; agentprovider; agentconfig;}
-  {rank=same; wh_run; wh_workspace; wh_provider; wh_config; ctrl_run; ctrl_workspace; ctrl_provider; ctrl_config;}
+  {rank=same; agentrun; agentworkspace; agentharness; agentprovider; agenttoolchain;}
+  {rank=same; wh_run; wh_workspace; wh_harness; wh_provider; wh_toolchain; ctrl_run; ctrl_workspace; ctrl_harness; ctrl_provider; ctrl_toolchain;}
   {rank=same; pvc; ws_pvc; job;}
   {rank=same; git_repo; ai_api; k8s_secret;}
 }
