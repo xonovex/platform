@@ -33,6 +33,7 @@ Reduce AGENTS.md file count by deleting those with no unique content and standar
 **Redundant (delete):** Title restating dir name, one-line description inferable from dir name, only guideline links predictable from package type, or code summaries that restate what is already in the code
 
 Code summaries include:
+
 - Bin entries, dependencies, exports, engines derivable from package.json
 - Build commands, env vars, task definitions derivable from moon.yml
 - Module listings, function names, config values, CLI options derivable from source files
