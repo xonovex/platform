@@ -1,0 +1,37 @@
+$schema: https://moonrepo.dev/schemas/project.json
+language: bash
+layer: unknown
+dependsOn: []
+tasks:
+  docker-build:
+    script: bash scripts/docker-build.sh "$workspaceRoot"
+    inputs: []
+    outputs: []
+    options:
+      cache: false
+      runFromWorkspaceRoot: true
+  docker-publish:
+    script: bash scripts/docker-publish.sh "$workspaceRoot"
+    inputs: []
+    outputs: []
+    options:
+      cache: false
+      runFromWorkspaceRoot: true
+  ci-check:
+    command: echo 'ci-check complete'
+    deps:
+      - docker-build
+    options:
+      cache: false
+  ci-publish:
+    command: echo 'ci-publish complete'
+    deps:
+      - docker-publish
+    options:
+      cache: false
+  ci-publish-dry-run:
+    command: echo 'ci-publish complete'
+    deps:
+      - docker-build
+    options:
+      cache: false
