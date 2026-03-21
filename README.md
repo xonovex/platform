@@ -88,19 +88,19 @@ claude plugin install xonovex-general-fp@platform
 Once installed, workflow commands are available as slash commands in Claude Code:
 
 ```
-/plan-research          Research codebase and web for requirements
-/plan-create            Create a high-level plan for user review
-/plan-subplans-create   Generate detailed subplans with parallel execution detection
-/plan-worktree-create   Create a git worktree for a feature branch
-/plan-continue          Resume work from an existing plan
-/plan-validate          Verify that a plan or current work has been fully achieved
-/plan-update            Update plan status and test results
-/plan-refine            Process user annotations and refine iteratively
-/plan-worktree-merge    Merge feature worktree back to source
-/code-simplify          Consolidate duplicates, remove dead code, flatten abstractions
-/code-harden            Improve type safety, validation, and error handling
-/code-align             Align two similar implementations and suggest improvements
-/git-commit             Commit and push changes
+/xonovex-workflow:plan-research          Research codebase and web for requirements
+/xonovex-workflow:plan-create            Create a high-level plan for user review
+/xonovex-workflow:plan-subplans-create   Generate detailed subplans with parallel execution detection
+/xonovex-workflow:plan-worktree-create   Create a git worktree for a feature branch
+/xonovex-workflow:plan-continue          Resume work from an existing plan
+/xonovex-workflow:plan-validate          Verify that a plan or current work has been fully achieved
+/xonovex-workflow:plan-update            Update plan status and test results
+/xonovex-workflow:plan-refine            Process user annotations and refine iteratively
+/xonovex-workflow:plan-worktree-merge    Merge feature worktree back to source
+/xonovex-workflow:code-simplify          Consolidate duplicates, remove dead code, flatten abstractions
+/xonovex-workflow:code-harden            Improve type safety, validation, and error handling
+/xonovex-workflow:code-align             Align two similar implementations and suggest improvements
+/xonovex-workflow:git-commit             Commit and push changes
 ```
 
 Skills are applied automatically when relevant to the task.
