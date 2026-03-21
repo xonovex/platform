@@ -2,6 +2,13 @@
 
 Plan-driven development workflow with worktrees and parallel execution.
 
+## Installation
+
+```bash
+claude plugin marketplace add xonovex/platform
+claude plugin install xonovex-workflow@platform
+```
+
 ```
 +---------------------+     +---------------------+     +---------------------+
 |      Research       |     |      Planning       |     |   Worktree Setup    |
