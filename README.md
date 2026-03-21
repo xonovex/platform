@@ -10,10 +10,6 @@ AI coding agents handle prompts, tools, and code changes. They *are* the agent. 
 
 Xonovex manages everything *around* the agent: sandbox isolation, model provider routing, terminal session management, reproducible environments, and Kubernetes orchestration. It sets up the context, launches the agent, and gets out of the way.
 
-<table><tr><td style="border: 2px solid gray; padding: 0;">
-<img src="packages/asset/asset-images/multiple-agents.png" alt="Multiple Agents">
-</td></tr></table>
-
 ## Packages
 
 ### Agent
