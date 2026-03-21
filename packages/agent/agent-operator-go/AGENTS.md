@@ -14,5 +14,6 @@
 
 - **controller-gen broken with Go 1.25+**: generates `_.yaml` (empty group name) and omits sub-type DeepCopyInto methods; CRDs and `zz_generated.deepcopy.go` must be maintained manually until controller-tools supports Go 1.25+
 
-- `docker build -f packages/agent/agent-operator-go/Dockerfile -t agent-operator:latest .`
+- `docker build -f packages/agent/agent-operator-go/Dockerfile -t ghcr.io/xonovex/agent-operator-go:latest .`
 - Moon: `npx moon run agent-operator-go:docker-build`
+- Multi-arch publish: `npx moon run agent-operator-go-docker:docker-publish`

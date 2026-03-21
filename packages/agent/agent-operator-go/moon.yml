@@ -15,7 +15,7 @@ tasks:
       - -f
       - packages/agent/agent-operator-go/Dockerfile
       - -t
-      - agent-operator:latest
+      - ghcr.io/xonovex/agent-operator-go:latest
       - .
     inputs:
       - '@globs(sources)'
