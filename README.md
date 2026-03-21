@@ -6,9 +6,9 @@
 
 > Monorepo for Xonovex AI agent tools, workflows, and skills
 
-AI coding agents handle prompts, tools, and code changes. They *are* the agent. What they don't control is the environment they run in: where the process executes, which model backs it, how the terminal session is managed, and whether the workspace is reproducible.
+AI coding agents handle prompts, tools, and code changes. What they don't manage is the environment around them: sandbox isolation, model provider routing, terminal sessions, reproducible toolchains, and orchestration at scale.
 
-Xonovex manages everything *around* the agent: sandbox isolation, model provider routing, terminal session management, reproducible environments, and Kubernetes orchestration. It sets up the context, launches the agent, and gets out of the way.
+Xonovex fills that gap. It configures the execution context before the agent launches, then gets out of the way.
 
 ## Packages
 
