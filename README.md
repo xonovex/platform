@@ -6,9 +6,9 @@
 
 > Monorepo for Xonovex AI agent tools, workflows, and skills
 
-AI coding agents handle prompts, tools, and code changes. What they don't manage is the environment around them: sandbox isolation, model provider routing, terminal sessions, reproducible toolchains, and orchestration at scale. Xonovex fills this gap. What is in this monorepo:
+AI coding agents handle prompts, tools, and code changes. What they don't manage is the environment around them: sandbox isolation, model provider routing, terminal sessions, reproducible toolchains, and orchestration at scale. Xonovex fills this gap.
 
-- **[agent-cli-go](packages/agent/agent-cli-go/)** configures sandboxes, providers, and terminal sessions, then launches the agent
+- **[agent-cli](packages/agent/agent-cli/)** / **[agent-cli-go](packages/agent/agent-cli-go/)** configure sandboxes, providers, and terminal sessions, then launch the agent
 - **[agent-operator-go](packages/agent/agent-operator-go/)** orchestrates agents as Kubernetes Jobs with managed workspaces and provider secrets
 - **[Workflow commands](packages/command/command-workflow/)** provide plan-driven development with worktrees and parallel execution
 - **[Utility commands](packages/command/command-utility/)** manage project instructions, extract insights, and create skills
@@ -85,6 +85,8 @@ claude plugin install xonovex-react@platform
 claude plugin install xonovex-general-fp@platform
 ```
 
+Skills are applied automatically when relevant to the task.
+
 Once installed, workflow commands are available as slash commands in Claude Code:
 
 ```
@@ -124,8 +126,6 @@ Utility commands for project instructions, insights, and skill management:
 /xonovex-utility:slashcommand-simplify            Reduce verbosity in slash command files
 /xonovex-utility:slashcommand-assimilate          Augment a slash command with elements from another
 ```
-
-Skills are applied automatically when relevant to the task.
 
 ## Development
 
