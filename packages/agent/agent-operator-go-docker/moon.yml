@@ -4,14 +4,14 @@ layer: unknown
 dependsOn: []
 tasks:
   docker-build:
-    script: bash scripts/docker-build.sh "$workspaceRoot"
+    script: bash packages/agent/agent-operator-go-docker/scripts/docker-build.sh "$workspaceRoot"
     inputs: []
     outputs: []
     options:
       cache: false
       runFromWorkspaceRoot: true
   docker-publish:
-    script: bash scripts/docker-publish.sh "$workspaceRoot"
+    script: bash packages/agent/agent-operator-go-docker/scripts/docker-publish.sh "$workspaceRoot"
     inputs: []
     outputs: []
     options:
