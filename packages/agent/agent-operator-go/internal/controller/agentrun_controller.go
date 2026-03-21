@@ -30,6 +30,8 @@ type AgentRunReconciler struct {
 // +kubebuilder:rbac:groups=agent.xonovex.com,resources=agentruns/status,verbs=get;update;patch
 // +kubebuilder:rbac:groups=agent.xonovex.com,resources=agentruns/finalizers,verbs=update
 // +kubebuilder:rbac:groups=agent.xonovex.com,resources=agentworkspaces,verbs=get;list;watch
+// +kubebuilder:rbac:groups=agent.xonovex.com,resources=agentharnesses,verbs=get;list;watch
+// +kubebuilder:rbac:groups=agent.xonovex.com,resources=agenttoolchains,verbs=get;list;watch
 // +kubebuilder:rbac:groups=batch,resources=jobs,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups="",resources=pods,verbs=get;list;watch
 // +kubebuilder:rbac:groups="",resources=persistentvolumeclaims,verbs=get;list;watch;create;delete
@@ -63,33 +65,54 @@ func (r *AgentRunReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 func (r *AgentRunReconciler) reconcileStandalone(ctx context.Context, agentRun *agentv1alpha1.AgentRun) (ctrl.Result, error) {
 	log := log.FromContext(ctx)
 
-	// 2. Resolve AgentConfig defaults
-	agentConfig, err := resolver.ResolveConfig(ctx, r.Client, agentRun.Namespace, agentRun.Spec.ConfigRef)
+	// Resolve harness
+	harness, err := resolver.ResolveHarness(ctx, r.Client, agentRun.Namespace, agentRun.Spec.HarnessRef, agentRun.Spec.Harness)
 	if err != nil {
-		log.Error(err, "failed to resolve agent config", "configRef", agentRun.Spec.ConfigRef)
+		log.Error(err, "failed to resolve harness")
 	}
 
-	// 3. Resolve provider
-	providerEnv, err := resolver.ResolveProvider(ctx, r.Client, agentRun, agentConfig)
+	// Determine agent type from harness
+	agentType := agentv1alpha1.AgentTypeClaude
+	if harness != nil {
+		agentType = harness.Spec.Type
+	}
+
+	// Resolve provider
+	defaultProvider := ""
+	if harness != nil {
+		defaultProvider = harness.Spec.DefaultProvider
+	}
+	providerEnv, err := resolver.ResolveProvider(ctx, r.Client, agentRun, defaultProvider)
 	if err != nil {
 		log.Error(err, "failed to resolve provider")
 		return r.updatePhase(ctx, agentRun, agentv1alpha1.AgentRunPhaseFailed, fmt.Sprintf("ProviderResolutionFailed: %v", err))
 	}
 
-	// 4. Create workspace PVC if needed
+	// Resolve toolchain
+	tc, err := resolver.ResolveToolchain(ctx, r.Client, agentRun.Namespace, agentRun.Spec.ToolchainRef, agentRun.Spec.Toolchain)
+	if err != nil {
+		log.Error(err, "failed to resolve toolchain")
+	}
+
+	// Get workspace config
+	wsType := agentv1alpha1.WorkspaceTypeGit
+	storageClass := ""
+	storageSize := "10Gi"
+	if agentRun.Spec.Workspace != nil {
+		if agentRun.Spec.Workspace.Type != "" {
+			wsType = agentRun.Spec.Workspace.Type
+		}
+		if agentRun.Spec.Workspace.StorageClass != "" {
+			storageClass = agentRun.Spec.Workspace.StorageClass
+		}
+		if agentRun.Spec.Workspace.StorageSize != "" {
+			storageSize = agentRun.Spec.Workspace.StorageSize
+		}
+	}
+
+	// Create workspace PVC if needed
 	pvcName := fmt.Sprintf("%s-workspace", agentRun.Name)
 	if agentRun.Status.WorkspacePVC == "" {
-		storageClass := ""
-		storageSize := "10Gi"
-		if agentConfig != nil {
-			if agentConfig.Spec.StorageClass != "" {
-				storageClass = agentConfig.Spec.StorageClass
-			}
-			if agentConfig.Spec.StorageSize != "" {
-				storageSize = agentConfig.Spec.StorageSize
-			}
-		}
-
 		pvc := builder.BuildPVC(pvcName, agentRun.Namespace, storageClass, storageSize, agentRun)
 		if err := r.Create(ctx, pvc); err != nil && !errors.IsAlreadyExists(err) {
 			log.Error(err, "failed to create workspace PVC")
@@ -102,31 +125,12 @@ func (r *AgentRunReconciler) reconcileStandalone(ctx context.Context, agentRun *
 		}
 	}
 
-	// 5. Create Job if needed
+	// Create Job if needed
 	jobName := agentRun.Name
 	if agentRun.Status.JobName == "" {
-		defaultImage := "node:trixie-slim"
-		defaultTimeout := time.Hour
-		if agentConfig != nil {
-			if agentConfig.Spec.DefaultImage != "" {
-				defaultImage = agentConfig.Spec.DefaultImage
-			}
-			if agentConfig.Spec.DefaultTimeout != nil {
-				defaultTimeout = agentConfig.Spec.DefaultTimeout.Duration
-			}
-		}
+		defaults := resolver.ApplyHarnessDefaults(agentRun, harness)
 
-		if agentRun.Spec.RuntimeClassName == nil && agentConfig != nil && agentConfig.Spec.DefaultRuntimeClassName != nil {
-			agentRun.Spec.RuntimeClassName = agentConfig.Spec.DefaultRuntimeClassName
-		}
-		if agentRun.Spec.VCS == "" && agentConfig != nil && agentConfig.Spec.DefaultVCS != "" {
-			agentRun.Spec.VCS = agentConfig.Spec.DefaultVCS
-		}
-		if agentRun.Spec.Nix == nil && agentConfig != nil && agentConfig.Spec.DefaultNix != nil {
-			agentRun.Spec.Nix = agentConfig.Spec.DefaultNix
-		}
-
-		job := builder.BuildJob(agentRun, providerEnv, pvcName, defaultImage, defaultTimeout)
+		job := builder.BuildJob(agentRun, providerEnv, pvcName, defaults.Image, defaults.Timeout, agentType, wsType, tc)
 		if err := ctrl.SetControllerReference(agentRun, job, r.Scheme); err != nil {
 			return ctrl.Result{}, err
 		}
@@ -142,7 +146,7 @@ func (r *AgentRunReconciler) reconcileStandalone(ctx context.Context, agentRun *
 		}
 	}
 
-	// 6. Watch Job status
+	// Watch Job status
 	var job batchv1.Job
 	if err := r.Get(ctx, types.NamespacedName{Name: jobName, Namespace: agentRun.Namespace}, &job); err != nil {
 		if errors.IsNotFound(err) {
@@ -157,20 +161,16 @@ func (r *AgentRunReconciler) reconcileStandalone(ctx context.Context, agentRun *
 func (r *AgentRunReconciler) reconcileWithWorkspace(ctx context.Context, agentRun *agentv1alpha1.AgentRun) (ctrl.Result, error) {
 	log := log.FromContext(ctx)
 
-	// 1. Resolve AgentWorkspace
+	// Resolve workspace
 	ws, err := resolver.ResolveWorkspace(ctx, r.Client, agentRun.Namespace, agentRun.Spec.WorkspaceRef)
 	if err != nil {
 		log.Error(err, "failed to resolve workspace")
 		return r.updatePhase(ctx, agentRun, agentv1alpha1.AgentRunPhaseFailed, fmt.Sprintf("WorkspaceResolutionFailed: %v", err))
 	}
-
-	// Check workspace is ready
 	if ws.Status.Phase != agentv1alpha1.AgentWorkspacePhaseReady {
 		log.Info("workspace not ready, requeuing", "workspace", ws.Name, "phase", ws.Status.Phase)
 		return ctrl.Result{RequeueAfter: 5 * time.Second}, nil
 	}
-
-	// Record workspace PVC in status
 	if agentRun.Status.WorkspacePVC == "" {
 		agentRun.Status.WorkspacePVC = ws.Status.WorkspacePVC
 		if _, err := r.updatePhase(ctx, agentRun, agentv1alpha1.AgentRunPhaseInitializing, ""); err != nil {
@@ -178,44 +178,60 @@ func (r *AgentRunReconciler) reconcileWithWorkspace(ctx context.Context, agentRu
 		}
 	}
 
-	// 2. Resolve AgentConfig defaults
-	agentConfig, err := resolver.ResolveConfig(ctx, r.Client, agentRun.Namespace, agentRun.Spec.ConfigRef)
+	// Resolve harness
+	harness, err := resolver.ResolveHarness(ctx, r.Client, agentRun.Namespace, agentRun.Spec.HarnessRef, agentRun.Spec.Harness)
 	if err != nil {
-		log.Error(err, "failed to resolve agent config", "configRef", agentRun.Spec.ConfigRef)
+		log.Error(err, "failed to resolve harness")
+	}
+	agentType := agentv1alpha1.AgentTypeClaude
+	if harness != nil {
+		agentType = harness.Spec.Type
 	}
 
-	// 3. Resolve provider
-	providerEnv, err := resolver.ResolveProvider(ctx, r.Client, agentRun, agentConfig)
+	// Resolve provider
+	defaultProvider := ""
+	if harness != nil {
+		defaultProvider = harness.Spec.DefaultProvider
+	}
+	providerEnv, err := resolver.ResolveProvider(ctx, r.Client, agentRun, defaultProvider)
 	if err != nil {
 		log.Error(err, "failed to resolve provider")
 		return r.updatePhase(ctx, agentRun, agentv1alpha1.AgentRunPhaseFailed, fmt.Sprintf("ProviderResolutionFailed: %v", err))
 	}
 
-	// 4. Create Job if needed
+	// Resolve toolchain
+	tc, err := resolver.ResolveToolchain(ctx, r.Client, agentRun.Namespace, agentRun.Spec.ToolchainRef, agentRun.Spec.Toolchain)
+	if err != nil {
+		log.Error(err, "failed to resolve toolchain")
+	}
+
+	// Get workspace type and worktree info from AgentWorkspace CRD
+	wsType := ws.Spec.Type
+	if wsType == "" {
+		wsType = agentv1alpha1.WorkspaceTypeGit
+	}
+
+	// Get worktree branch/source from workspace CRD's type-specific config
+	worktreeBranch := agentRun.Name // default worktree branch to run name
+	sourceBranch := "HEAD"
+	if ws.Spec.Git != nil && ws.Spec.Git.Worktree != nil {
+		if ws.Spec.Git.Worktree.Branch != "" {
+			worktreeBranch = ws.Spec.Git.Worktree.Branch
+		}
+		if ws.Spec.Git.Worktree.SourceBranch != "" {
+			sourceBranch = ws.Spec.Git.Worktree.SourceBranch
+		}
+	}
+	if ws.Spec.Jj != nil && ws.Spec.Jj.Revision != "" {
+		sourceBranch = ws.Spec.Jj.Revision
+	}
+
+	// Create Job if needed
 	jobName := agentRun.Name
 	if agentRun.Status.JobName == "" {
-		defaultImage := "node:trixie-slim"
-		defaultTimeout := time.Hour
-		if agentConfig != nil {
-			if agentConfig.Spec.DefaultImage != "" {
-				defaultImage = agentConfig.Spec.DefaultImage
-			}
-			if agentConfig.Spec.DefaultTimeout != nil {
-				defaultTimeout = agentConfig.Spec.DefaultTimeout.Duration
-			}
-		}
+		defaults := resolver.ApplyHarnessDefaults(agentRun, harness)
 
-		if agentRun.Spec.RuntimeClassName == nil && agentConfig != nil && agentConfig.Spec.DefaultRuntimeClassName != nil {
-			agentRun.Spec.RuntimeClassName = agentConfig.Spec.DefaultRuntimeClassName
-		}
-		if agentRun.Spec.VCS == "" && agentConfig != nil && agentConfig.Spec.DefaultVCS != "" {
-			agentRun.Spec.VCS = agentConfig.Spec.DefaultVCS
-		}
-		if agentRun.Spec.Nix == nil && agentConfig != nil && agentConfig.Spec.DefaultNix != nil {
-			agentRun.Spec.Nix = agentConfig.Spec.DefaultNix
-		}
-
-		job := builder.BuildWorkspaceJob(agentRun, providerEnv, ws.Status.WorkspacePVC, ws.Spec.SharedVolumes, ws.Status.SharedVolumePVCs, defaultImage, defaultTimeout)
+		job := builder.BuildWorkspaceJob(agentRun, providerEnv, ws.Status.WorkspacePVC, ws.Spec.SharedVolumes, ws.Status.SharedVolumePVCs, defaults.Image, defaults.Timeout, agentType, wsType, worktreeBranch, sourceBranch, tc)
 		if err := ctrl.SetControllerReference(agentRun, job, r.Scheme); err != nil {
 			return ctrl.Result{}, err
 		}
@@ -231,7 +247,7 @@ func (r *AgentRunReconciler) reconcileWithWorkspace(ctx context.Context, agentRu
 		}
 	}
 
-	// 5. Watch Job status
+	// Watch Job status
 	var job batchv1.Job
 	if err := r.Get(ctx, types.NamespacedName{Name: jobName, Namespace: agentRun.Namespace}, &job); err != nil {
 		if errors.IsNotFound(err) {

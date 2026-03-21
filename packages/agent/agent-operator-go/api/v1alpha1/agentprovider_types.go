@@ -6,10 +6,10 @@ import (
 
 // AgentProviderSpec defines the desired state of AgentProvider
 type AgentProviderSpec struct {
+	// Type of the provider (e.g., "anthropic", "openai")
+	Type ProviderType `json:"type,omitempty"`
 	// DisplayName is a human-readable name for the provider
 	DisplayName string `json:"displayName,omitempty"`
-	// AgentTypes this provider supports
-	AgentTypes []AgentType `json:"agentTypes"`
 	// AuthTokenSecretRef references a Secret containing the auth token
 	AuthTokenSecretRef *SecretKeyRef `json:"authTokenSecretRef,omitempty"`
 	// Environment variables to set when using this provider

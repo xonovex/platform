@@ -44,16 +44,6 @@ func (w *AgentProviderWebhook) ValidateDelete(_ context.Context, _ runtime.Objec
 	return nil, nil
 }
 
-func (w *AgentProviderWebhook) validate(provider *agentv1alpha1.AgentProvider) (admission.Warnings, error) {
-	if len(provider.Spec.AgentTypes) == 0 {
-		return nil, fmt.Errorf("at least one agent type must be specified")
-	}
-
-	for _, at := range provider.Spec.AgentTypes {
-		if at != agentv1alpha1.AgentTypeClaude && at != agentv1alpha1.AgentTypeOpencode {
-			return nil, fmt.Errorf("invalid agent type: %s", at)
-		}
-	}
-
+func (w *AgentProviderWebhook) validate(_ *agentv1alpha1.AgentProvider) (admission.Warnings, error) {
 	return nil, nil
 }

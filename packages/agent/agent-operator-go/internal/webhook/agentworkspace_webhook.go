@@ -10,6 +10,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 
 	agentv1alpha1 "github.com/xonovex/platform/packages/agent/agent-operator-go/api/v1alpha1"
+	"github.com/xonovex/platform/packages/agent/agent-operator-go/internal/builder"
 )
 
 // AgentWorkspaceWebhook implements defaulting and validation for AgentWorkspace
@@ -73,6 +74,11 @@ func (w *AgentWorkspaceWebhook) ValidateDelete(_ context.Context, _ runtime.Obje
 func (w *AgentWorkspaceWebhook) validate(ws *agentv1alpha1.AgentWorkspace) (admission.Warnings, error) {
 	if ws.Spec.Repository.URL == "" {
 		return nil, fmt.Errorf("repository URL is required")
+	}
+	if ws.Spec.Type != "" {
+		if _, err := builder.GetVCSStrategy(ws.Spec.Type); err != nil {
+			return nil, fmt.Errorf("invalid workspace type: %s", ws.Spec.Type)
+		}
 	}
 
 	names := make(map[string]bool)

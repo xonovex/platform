@@ -224,15 +224,9 @@ func TestBuildWorktreeInitContainers_Basic(t *testing.T) {
 		ObjectMeta: metav1.ObjectMeta{
 			Name: "agent-1",
 		},
-		Spec: agentv1alpha1.AgentRunSpec{
-			Worktree: &agentv1alpha1.WorktreeSpec{
-				Branch:       "agent-1-work",
-				SourceBranch: "main",
-			},
-		},
 	}
 
-	containers := BuildWorktreeInitContainers(run, "node:trixie-slim")
+	containers := BuildWorktreeInitContainers(run, "node:trixie-slim", agentv1alpha1.WorkspaceTypeGit, "agent-1-work", "main")
 
 	if len(containers) != 1 {
 		t.Fatalf("expected 1 init container, got %d", len(containers))
@@ -253,14 +247,9 @@ func TestBuildWorktreeInitContainers_DefaultSourceBranch(t *testing.T) {
 		ObjectMeta: metav1.ObjectMeta{
 			Name: "agent-1",
 		},
-		Spec: agentv1alpha1.AgentRunSpec{
-			Worktree: &agentv1alpha1.WorktreeSpec{
-				Branch: "agent-1-work",
-			},
-		},
 	}
 
-	containers := BuildWorktreeInitContainers(run, "node:trixie-slim")
+	containers := BuildWorktreeInitContainers(run, "node:trixie-slim", agentv1alpha1.WorkspaceTypeGit, "agent-1-work", "")
 	script := containers[0].Args[1]
 	if !containsStr(script, "git worktree add /workspace-wt/agent-1 -b agent-1-work HEAD") {
 		t.Errorf("expected HEAD as default source branch, got: %s", script)
@@ -272,12 +261,9 @@ func TestBuildWorkspaceMainContainers_Basic(t *testing.T) {
 		ObjectMeta: metav1.ObjectMeta{
 			Name: "agent-1",
 		},
-		Spec: agentv1alpha1.AgentRunSpec{
-			Agent: agentv1alpha1.AgentTypeClaude,
-		},
 	}
 
-	containers := BuildWorkspaceMainContainers(run, nil, "node:trixie-slim", nil, nil)
+	containers := BuildWorkspaceMainContainers(run, nil, "node:trixie-slim", agentv1alpha1.AgentTypeClaude, nil, nil, nil)
 
 	if len(containers) != 1 {
 		t.Fatalf("expected 1 container, got %d", len(containers))
@@ -297,9 +283,6 @@ func TestBuildWorkspaceMainContainers_WithSharedVolumes(t *testing.T) {
 		ObjectMeta: metav1.ObjectMeta{
 			Name: "agent-1",
 		},
-		Spec: agentv1alpha1.AgentRunSpec{
-			Agent: agentv1alpha1.AgentTypeClaude,
-		},
 	}
 
 	sharedVolumes := []agentv1alpha1.SharedVolumeSpec{
@@ -311,7 +294,7 @@ func TestBuildWorkspaceMainContainers_WithSharedVolumes(t *testing.T) {
 		"opencode-config": "ws-opencode-config",
 	}
 
-	containers := BuildWorkspaceMainContainers(run, nil, "node:trixie-slim", sharedVolumes, sharedVolumePVCs)
+	containers := BuildWorkspaceMainContainers(run, nil, "node:trixie-slim", agentv1alpha1.AgentTypeClaude, sharedVolumes, sharedVolumePVCs, nil)
 
 	container := containers[0]
 	// workspace + 2 shared volumes = 3 volume mounts
@@ -344,15 +327,11 @@ func TestBuildWorkspaceJob_Basic(t *testing.T) {
 			Namespace: "default",
 		},
 		Spec: agentv1alpha1.AgentRunSpec{
-			Agent:        agentv1alpha1.AgentTypeClaude,
 			WorkspaceRef: "my-workspace",
-			Worktree: &agentv1alpha1.WorktreeSpec{
-				Branch: "agent-1-work",
-			},
 		},
 	}
 
-	job := BuildWorkspaceJob(run, nil, "my-workspace-ws", nil, nil, "node:trixie-slim", time.Hour)
+	job := BuildWorkspaceJob(run, nil, "my-workspace-ws", nil, nil, "node:trixie-slim", time.Hour, agentv1alpha1.AgentTypeClaude, agentv1alpha1.WorkspaceTypeGit, "agent-1-work", "", nil)
 
 	if job.Name != "agent-1" {
 		t.Errorf("expected job name agent-1, got %s", job.Name)
@@ -390,11 +369,7 @@ func TestBuildWorkspaceJob_WithSharedVolumes(t *testing.T) {
 			Namespace: "default",
 		},
 		Spec: agentv1alpha1.AgentRunSpec{
-			Agent:        agentv1alpha1.AgentTypeClaude,
 			WorkspaceRef: "my-workspace",
-			Worktree: &agentv1alpha1.WorktreeSpec{
-				Branch: "agent-1-work",
-			},
 		},
 	}
 
@@ -405,7 +380,7 @@ func TestBuildWorkspaceJob_WithSharedVolumes(t *testing.T) {
 		"claude-config": "my-workspace-claude-config",
 	}
 
-	job := BuildWorkspaceJob(run, nil, "my-workspace-ws", sharedVolumes, sharedVolumePVCs, "node:trixie-slim", time.Hour)
+	job := BuildWorkspaceJob(run, nil, "my-workspace-ws", sharedVolumes, sharedVolumePVCs, "node:trixie-slim", time.Hour, agentv1alpha1.AgentTypeClaude, agentv1alpha1.WorkspaceTypeGit, "agent-1-work", "", nil)
 
 	// workspace + shared volume = 2 volumes
 	if len(job.Spec.Template.Spec.Volumes) != 2 {
@@ -428,14 +403,12 @@ func TestBuildWorkspaceJob_WithRuntimeClassName(t *testing.T) {
 	run := &agentv1alpha1.AgentRun{
 		ObjectMeta: metav1.ObjectMeta{Name: "agent-1", Namespace: "default"},
 		Spec: agentv1alpha1.AgentRunSpec{
-			Agent:            agentv1alpha1.AgentTypeClaude,
 			WorkspaceRef:     "my-workspace",
-			Worktree:         &agentv1alpha1.WorktreeSpec{Branch: "agent-1-work"},
 			RuntimeClassName: &runtimeClass,
 		},
 	}
 
-	job := BuildWorkspaceJob(run, nil, "my-workspace-ws", nil, nil, "node:trixie-slim", time.Hour)
+	job := BuildWorkspaceJob(run, nil, "my-workspace-ws", nil, nil, "node:trixie-slim", time.Hour, agentv1alpha1.AgentTypeClaude, agentv1alpha1.WorkspaceTypeGit, "agent-1-work", "", nil)
 
 	if job.Spec.Template.Spec.RuntimeClassName == nil {
 		t.Fatal("expected RuntimeClassName to be set")
@@ -456,7 +429,7 @@ func TestBuildWorkspaceInitJob_WithJujutsu(t *testing.T) {
 				URL:    "https://github.com/org/repo.git",
 				Branch: "main",
 			},
-			VCS: agentv1alpha1.VCSJujutsu,
+			Type: agentv1alpha1.WorkspaceTypeJujutsu,
 		},
 	}
 
@@ -476,16 +449,9 @@ func TestBuildWorktreeInitContainers_WithJujutsu(t *testing.T) {
 		ObjectMeta: metav1.ObjectMeta{
 			Name: "agent-1",
 		},
-		Spec: agentv1alpha1.AgentRunSpec{
-			Worktree: &agentv1alpha1.WorktreeSpec{
-				Branch:       "agent-1-work",
-				SourceBranch: "main",
-			},
-			VCS: agentv1alpha1.VCSJujutsu,
-		},
 	}
 
-	containers := BuildWorktreeInitContainers(run, "node:trixie-slim")
+	containers := BuildWorktreeInitContainers(run, "node:trixie-slim", agentv1alpha1.WorkspaceTypeJujutsu, "agent-1-work", "main")
 
 	if len(containers) != 1 {
 		t.Fatalf("expected 1 init container, got %d", len(containers))

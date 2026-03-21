@@ -231,19 +231,19 @@ func TestE2E_Kata_AgentRunWithRuntimeClassName(t *testing.T) {
 	t.Logf("Pod %s scheduled on node %s with runtimeClassName=kata", pod.Name, pod.Spec.NodeName)
 }
 
-func TestE2E_Kata_DefaultRuntimeClassNameFromConfig(t *testing.T) {
+func TestE2E_Kata_DefaultRuntimeClassNameFromHarness(t *testing.T) {
 	ns := createNamespace(t, "e2e-kata-default")
 
-	config := testutil.NewAgentConfig(ns, "agent-config",
+	harness := testutil.NewAgentHarness(ns, "agent-harness",
 		testutil.WithDefaultRuntimeClassName("kata"),
 	)
-	if err := k8sClient.Create(ctx, config); err != nil {
-		t.Fatalf("failed to create AgentConfig: %v", err)
+	if err := k8sClient.Create(ctx, harness); err != nil {
+		t.Fatalf("failed to create AgentHarness: %v", err)
 	}
 
-	// AgentRun without explicit runtimeClassName — should inherit from config
+	// AgentRun without explicit runtimeClassName — should inherit from harness
 	run := testutil.NewAgentRun(ns, "kata-default-run",
-		testutil.WithConfigRef("agent-config"),
+		testutil.WithHarnessRef("agent-harness"),
 		testutil.WithImage("busybox:1.37"),
 	)
 	if err := k8sClient.Create(ctx, run); err != nil {
@@ -268,7 +268,7 @@ func TestE2E_Kata_DefaultRuntimeClassNameFromConfig(t *testing.T) {
 		if rc != nil {
 			got = *rc
 		}
-		t.Errorf("Job RuntimeClassName = %s, want kata (inherited from AgentConfig)", got)
+		t.Errorf("Job RuntimeClassName = %s, want kata (inherited from AgentHarness)", got)
 	}
 
 	// Wait for Pod to be scheduled
@@ -285,7 +285,7 @@ func TestE2E_Kata_DefaultRuntimeClassNameFromConfig(t *testing.T) {
 }
 
 // TestE2E_Kata_FullCycleWithGitClone proves the entire agent pipeline
-// (Secret + AgentProvider + AgentConfig + git clone init container + fake claude)
+// (Secret + AgentProvider + AgentHarness + git clone init container + fake claude)
 // works end-to-end inside a Kata VM sandbox.
 // Skips gracefully if Kata VM cannot start in unprivileged kind.
 func TestE2E_Kata_FullCycleWithGitClone(t *testing.T) {
@@ -313,21 +313,15 @@ func TestE2E_Kata_FullCycleWithGitClone(t *testing.T) {
 		t.Fatalf("failed to create AgentProvider: %v", err)
 	}
 
-	// Create AgentConfig with storage defaults
-	agentConfig := testutil.NewAgentConfig(ns, "default",
-		testutil.WithStorageSize("1Gi"),
-	)
-	if err := k8sClient.Create(ctx, agentConfig); err != nil {
-		t.Fatalf("failed to create AgentConfig: %v", err)
-	}
-
 	// Create AgentRun exercising the full pipeline inside Kata
 	run := testutil.NewAgentRun(ns, "kata-fullcycle",
-		testutil.WithAgent(agentv1alpha1.AgentTypeClaude),
-		testutil.WithConfigRef("default"),
+		testutil.WithHarness(&agentv1alpha1.AgentSpec{Type: agentv1alpha1.AgentTypeClaude}),
 		testutil.WithPrompt("echo test-prompt"),
 		testutil.WithImage(e2eAgentImage),
-		testutil.WithRepository("https://github.com/octocat/Hello-World.git"),
+		testutil.WithWorkspace(&agentv1alpha1.WorkspaceSpec{
+			Repository:  agentv1alpha1.RepositorySpec{URL: "https://github.com/octocat/Hello-World.git"},
+			StorageSize: "1Gi",
+		}),
 		testutil.WithProviderRef("test-provider"),
 		testutil.WithRuntimeClassName("kata"),
 	)

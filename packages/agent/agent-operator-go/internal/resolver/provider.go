@@ -12,7 +12,7 @@ import (
 )
 
 // ResolveProvider resolves the provider configuration and returns environment variables
-func ResolveProvider(ctx context.Context, c client.Client, run *agentv1alpha1.AgentRun, config *agentv1alpha1.AgentConfig) (map[string]string, error) {
+func ResolveProvider(ctx context.Context, c client.Client, run *agentv1alpha1.AgentRun, defaultProvider string) (map[string]string, error) {
 	env := make(map[string]string)
 
 	// Use inline provider if specified
@@ -22,11 +22,8 @@ func ResolveProvider(ctx context.Context, c client.Client, run *agentv1alpha1.Ag
 
 	// Use provider ref if specified
 	providerRef := run.Spec.ProviderRef
-	if providerRef == "" && config != nil {
-		// Fall back to default provider from AgentConfig
-		if defaultRef, ok := config.Spec.DefaultProviders[run.Spec.Agent]; ok {
-			providerRef = defaultRef
-		}
+	if providerRef == "" {
+		providerRef = defaultProvider // from harness
 	}
 
 	if providerRef == "" {

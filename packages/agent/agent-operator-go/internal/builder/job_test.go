@@ -18,14 +18,15 @@ func TestBuildJob_Basic(t *testing.T) {
 			Namespace: "default",
 		},
 		Spec: agentv1alpha1.AgentRunSpec{
-			Agent: agentv1alpha1.AgentTypeClaude,
-			Repository: agentv1alpha1.RepositorySpec{
-				URL: "https://github.com/example/repo.git",
+			Workspace: &agentv1alpha1.WorkspaceSpec{
+				Repository: agentv1alpha1.RepositorySpec{
+					URL: "https://github.com/example/repo.git",
+				},
 			},
 		},
 	}
 
-	job := BuildJob(run, nil, "test-pvc", "node:trixie-slim", time.Hour)
+	job := BuildJob(run, nil, "test-pvc", "node:trixie-slim", time.Hour, agentv1alpha1.AgentTypeClaude, agentv1alpha1.WorkspaceTypeGit, nil)
 
 	if job.Name != "test-run" {
 		t.Errorf("job name = %q, want %q", job.Name, "test-run")
@@ -61,17 +62,16 @@ func TestBuildJob_Basic(t *testing.T) {
 }
 
 func TestBuildJob_CustomTimeout(t *testing.T) {
-	customTimeout := metav1.Duration{Duration: 30 * time.Minute}
 	run := &agentv1alpha1.AgentRun{
 		ObjectMeta: metav1.ObjectMeta{Name: "test-run", Namespace: "default"},
 		Spec: agentv1alpha1.AgentRunSpec{
-			Agent:      agentv1alpha1.AgentTypeClaude,
-			Repository: agentv1alpha1.RepositorySpec{URL: "https://example.com/repo.git"},
-			Timeout:    &customTimeout,
+			Workspace: &agentv1alpha1.WorkspaceSpec{
+				Repository: agentv1alpha1.RepositorySpec{URL: "https://example.com/repo.git"},
+			},
 		},
 	}
 
-	job := BuildJob(run, nil, "pvc", "image", time.Hour)
+	job := BuildJob(run, nil, "pvc", "image", 30*time.Minute, agentv1alpha1.AgentTypeClaude, agentv1alpha1.WorkspaceTypeGit, nil)
 
 	expected := int64(1800)
 	if *job.Spec.ActiveDeadlineSeconds != expected {
@@ -83,13 +83,13 @@ func TestBuildJob_CustomImage(t *testing.T) {
 	run := &agentv1alpha1.AgentRun{
 		ObjectMeta: metav1.ObjectMeta{Name: "test-run", Namespace: "default"},
 		Spec: agentv1alpha1.AgentRunSpec{
-			Agent:      agentv1alpha1.AgentTypeClaude,
-			Repository: agentv1alpha1.RepositorySpec{URL: "https://example.com/repo.git"},
-			Image:      "custom-image:latest",
+			Workspace: &agentv1alpha1.WorkspaceSpec{
+				Repository: agentv1alpha1.RepositorySpec{URL: "https://example.com/repo.git"},
+			},
 		},
 	}
 
-	job := BuildJob(run, nil, "pvc", "default-image", time.Hour)
+	job := BuildJob(run, nil, "pvc", "custom-image:latest", time.Hour, agentv1alpha1.AgentTypeClaude, agentv1alpha1.WorkspaceTypeGit, nil)
 
 	initImage := job.Spec.Template.Spec.InitContainers[0].Image
 	if initImage != "custom-image:latest" {
@@ -105,8 +105,9 @@ func TestBuildJob_WithResources(t *testing.T) {
 	run := &agentv1alpha1.AgentRun{
 		ObjectMeta: metav1.ObjectMeta{Name: "test-run", Namespace: "default"},
 		Spec: agentv1alpha1.AgentRunSpec{
-			Agent:      agentv1alpha1.AgentTypeClaude,
-			Repository: agentv1alpha1.RepositorySpec{URL: "https://example.com/repo.git"},
+			Workspace: &agentv1alpha1.WorkspaceSpec{
+				Repository: agentv1alpha1.RepositorySpec{URL: "https://example.com/repo.git"},
+			},
 			Resources: corev1.ResourceRequirements{
 				Requests: corev1.ResourceList{
 					corev1.ResourceCPU:    resource.MustParse("500m"),
@@ -120,7 +121,7 @@ func TestBuildJob_WithResources(t *testing.T) {
 		},
 	}
 
-	job := BuildJob(run, nil, "pvc", "image", time.Hour)
+	job := BuildJob(run, nil, "pvc", "image", time.Hour, agentv1alpha1.AgentTypeClaude, agentv1alpha1.WorkspaceTypeGit, nil)
 
 	resources := job.Spec.Template.Spec.Containers[0].Resources
 	if resources.Requests.Cpu().String() != "500m" {
@@ -135,8 +136,9 @@ func TestBuildJob_NodeSelectorAndTolerations(t *testing.T) {
 	run := &agentv1alpha1.AgentRun{
 		ObjectMeta: metav1.ObjectMeta{Name: "test-run", Namespace: "default"},
 		Spec: agentv1alpha1.AgentRunSpec{
-			Agent:        agentv1alpha1.AgentTypeClaude,
-			Repository:   agentv1alpha1.RepositorySpec{URL: "https://example.com/repo.git"},
+			Workspace: &agentv1alpha1.WorkspaceSpec{
+				Repository: agentv1alpha1.RepositorySpec{URL: "https://example.com/repo.git"},
+			},
 			NodeSelector: map[string]string{"gpu": "true"},
 			Tolerations: []corev1.Toleration{
 				{Key: "gpu", Operator: corev1.TolerationOpExists, Effect: corev1.TaintEffectNoSchedule},
@@ -144,7 +146,7 @@ func TestBuildJob_NodeSelectorAndTolerations(t *testing.T) {
 		},
 	}
 
-	job := BuildJob(run, nil, "pvc", "image", time.Hour)
+	job := BuildJob(run, nil, "pvc", "image", time.Hour, agentv1alpha1.AgentTypeClaude, agentv1alpha1.WorkspaceTypeGit, nil)
 
 	podSpec := job.Spec.Template.Spec
 	if podSpec.NodeSelector["gpu"] != "true" {
@@ -163,13 +165,14 @@ func TestBuildJob_WithRuntimeClassName(t *testing.T) {
 	run := &agentv1alpha1.AgentRun{
 		ObjectMeta: metav1.ObjectMeta{Name: "test-run", Namespace: "default"},
 		Spec: agentv1alpha1.AgentRunSpec{
-			Agent:            agentv1alpha1.AgentTypeClaude,
-			Repository:       agentv1alpha1.RepositorySpec{URL: "https://example.com/repo.git"},
+			Workspace: &agentv1alpha1.WorkspaceSpec{
+				Repository: agentv1alpha1.RepositorySpec{URL: "https://example.com/repo.git"},
+			},
 			RuntimeClassName: &runtimeClass,
 		},
 	}
 
-	job := BuildJob(run, nil, "pvc", "image", time.Hour)
+	job := BuildJob(run, nil, "pvc", "image", time.Hour, agentv1alpha1.AgentTypeClaude, agentv1alpha1.WorkspaceTypeGit, nil)
 
 	if job.Spec.Template.Spec.RuntimeClassName == nil {
 		t.Fatal("expected RuntimeClassName to be set")
@@ -183,12 +186,13 @@ func TestBuildJob_WithoutRuntimeClassName(t *testing.T) {
 	run := &agentv1alpha1.AgentRun{
 		ObjectMeta: metav1.ObjectMeta{Name: "test-run", Namespace: "default"},
 		Spec: agentv1alpha1.AgentRunSpec{
-			Agent:      agentv1alpha1.AgentTypeClaude,
-			Repository: agentv1alpha1.RepositorySpec{URL: "https://example.com/repo.git"},
+			Workspace: &agentv1alpha1.WorkspaceSpec{
+				Repository: agentv1alpha1.RepositorySpec{URL: "https://example.com/repo.git"},
+			},
 		},
 	}
 
-	job := BuildJob(run, nil, "pvc", "image", time.Hour)
+	job := BuildJob(run, nil, "pvc", "image", time.Hour, agentv1alpha1.AgentTypeClaude, agentv1alpha1.WorkspaceTypeGit, nil)
 
 	if job.Spec.Template.Spec.RuntimeClassName != nil {
 		t.Errorf("expected RuntimeClassName to be nil, got %q", *job.Spec.Template.Spec.RuntimeClassName)
@@ -199,15 +203,20 @@ func TestBuildJob_WithNixPackages(t *testing.T) {
 	run := &agentv1alpha1.AgentRun{
 		ObjectMeta: metav1.ObjectMeta{Name: "test-run", Namespace: "default"},
 		Spec: agentv1alpha1.AgentRunSpec{
-			Agent:      agentv1alpha1.AgentTypeClaude,
-			Repository: agentv1alpha1.RepositorySpec{URL: "https://example.com/repo.git"},
-			Nix: &agentv1alpha1.NixSpec{
-				Packages: []string{"nodejs_22", "python3"},
+			Workspace: &agentv1alpha1.WorkspaceSpec{
+				Repository: agentv1alpha1.RepositorySpec{URL: "https://example.com/repo.git"},
 			},
 		},
 	}
 
-	job := BuildJob(run, nil, "pvc", "image", time.Hour)
+	tc := &agentv1alpha1.ToolchainSpec{
+		Type: agentv1alpha1.ToolchainTypeNix,
+		Nix: &agentv1alpha1.NixSpec{
+			Packages: []string{"nodejs_22", "python3"},
+		},
+	}
+
+	job := BuildJob(run, nil, "pvc", "image", time.Hour, agentv1alpha1.AgentTypeClaude, agentv1alpha1.WorkspaceTypeGit, tc)
 
 	podSpec := job.Spec.Template.Spec
 
@@ -238,12 +247,13 @@ func TestBuildJob_WithoutNix(t *testing.T) {
 	run := &agentv1alpha1.AgentRun{
 		ObjectMeta: metav1.ObjectMeta{Name: "test-run", Namespace: "default"},
 		Spec: agentv1alpha1.AgentRunSpec{
-			Agent:      agentv1alpha1.AgentTypeClaude,
-			Repository: agentv1alpha1.RepositorySpec{URL: "https://example.com/repo.git"},
+			Workspace: &agentv1alpha1.WorkspaceSpec{
+				Repository: agentv1alpha1.RepositorySpec{URL: "https://example.com/repo.git"},
+			},
 		},
 	}
 
-	job := BuildJob(run, nil, "pvc", "image", time.Hour)
+	job := BuildJob(run, nil, "pvc", "image", time.Hour, agentv1alpha1.AgentTypeClaude, agentv1alpha1.WorkspaceTypeGit, nil)
 
 	if len(job.Spec.Template.Spec.Volumes) != 1 {
 		t.Errorf("len(Volumes) = %d, want 1 (workspace only)", len(job.Spec.Template.Spec.Volumes))
@@ -254,12 +264,13 @@ func TestBuildJob_Labels(t *testing.T) {
 	run := &agentv1alpha1.AgentRun{
 		ObjectMeta: metav1.ObjectMeta{Name: "my-run", Namespace: "ns"},
 		Spec: agentv1alpha1.AgentRunSpec{
-			Agent:      agentv1alpha1.AgentTypeOpencode,
-			Repository: agentv1alpha1.RepositorySpec{URL: "https://example.com/repo.git"},
+			Workspace: &agentv1alpha1.WorkspaceSpec{
+				Repository: agentv1alpha1.RepositorySpec{URL: "https://example.com/repo.git"},
+			},
 		},
 	}
 
-	job := BuildJob(run, nil, "pvc", "image", time.Hour)
+	job := BuildJob(run, nil, "pvc", "image", time.Hour, agentv1alpha1.AgentTypeOpencode, agentv1alpha1.WorkspaceTypeGit, nil)
 
 	expectedLabels := map[string]string{
 		"app.kubernetes.io/name":       "agent-operator",

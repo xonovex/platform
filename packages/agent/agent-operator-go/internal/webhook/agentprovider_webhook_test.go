@@ -11,7 +11,7 @@ func TestAgentProviderWebhook_Validate_Valid(t *testing.T) {
 	w := &AgentProviderWebhook{}
 	provider := &agentv1alpha1.AgentProvider{
 		Spec: agentv1alpha1.AgentProviderSpec{
-			AgentTypes: []agentv1alpha1.AgentType{agentv1alpha1.AgentTypeClaude},
+			Type: "anthropic",
 		},
 	}
 
@@ -21,48 +21,15 @@ func TestAgentProviderWebhook_Validate_Valid(t *testing.T) {
 	}
 }
 
-func TestAgentProviderWebhook_Validate_MultipleAgentTypes(t *testing.T) {
+func TestAgentProviderWebhook_Validate_Empty(t *testing.T) {
 	w := &AgentProviderWebhook{}
 	provider := &agentv1alpha1.AgentProvider{
-		Spec: agentv1alpha1.AgentProviderSpec{
-			AgentTypes: []agentv1alpha1.AgentType{
-				agentv1alpha1.AgentTypeClaude,
-				agentv1alpha1.AgentTypeOpencode,
-			},
-		},
+		Spec: agentv1alpha1.AgentProviderSpec{},
 	}
 
 	_, err := w.ValidateCreate(context.Background(), provider)
 	if err != nil {
 		t.Errorf("ValidateCreate() error = %v", err)
-	}
-}
-
-func TestAgentProviderWebhook_Validate_EmptyAgentTypes(t *testing.T) {
-	w := &AgentProviderWebhook{}
-	provider := &agentv1alpha1.AgentProvider{
-		Spec: agentv1alpha1.AgentProviderSpec{
-			AgentTypes: []agentv1alpha1.AgentType{},
-		},
-	}
-
-	_, err := w.ValidateCreate(context.Background(), provider)
-	if err == nil {
-		t.Error("ValidateCreate() expected error for empty agent types")
-	}
-}
-
-func TestAgentProviderWebhook_Validate_InvalidAgentType(t *testing.T) {
-	w := &AgentProviderWebhook{}
-	provider := &agentv1alpha1.AgentProvider{
-		Spec: agentv1alpha1.AgentProviderSpec{
-			AgentTypes: []agentv1alpha1.AgentType{"invalid"},
-		},
-	}
-
-	_, err := w.ValidateCreate(context.Background(), provider)
-	if err == nil {
-		t.Error("ValidateCreate() expected error for invalid agent type")
 	}
 }
 
@@ -70,12 +37,12 @@ func TestAgentProviderWebhook_ValidateUpdate(t *testing.T) {
 	w := &AgentProviderWebhook{}
 	old := &agentv1alpha1.AgentProvider{
 		Spec: agentv1alpha1.AgentProviderSpec{
-			AgentTypes: []agentv1alpha1.AgentType{agentv1alpha1.AgentTypeClaude},
+			Type: "anthropic",
 		},
 	}
 	new := &agentv1alpha1.AgentProvider{
 		Spec: agentv1alpha1.AgentProviderSpec{
-			AgentTypes: []agentv1alpha1.AgentType{agentv1alpha1.AgentTypeClaude, agentv1alpha1.AgentTypeOpencode},
+			Type: "openai",
 		},
 	}
 

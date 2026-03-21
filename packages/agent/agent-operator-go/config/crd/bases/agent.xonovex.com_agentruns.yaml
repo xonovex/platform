@@ -17,9 +17,6 @@ spec:
       served: true
       storage: true
       additionalPrinterColumns:
-        - name: Agent
-          type: string
-          jsonPath: .spec.agent
         - name: Phase
           type: string
           jsonPath: .status.phase
@@ -42,33 +39,112 @@ spec:
             spec:
               type: object
               description: AgentRunSpec defines the desired state of AgentRun
-              required:
-                - agent
               properties:
-                agent:
+                harnessRef:
                   type: string
-                  description: Agent type to run
-                  enum:
-                    - claude
-                    - opencode
-                configRef:
-                  type: string
-                  description: References an AgentConfig in the namespace for defaults
+                  description: References an AgentHarness in the namespace
+                harness:
+                  type: object
+                  description: Inline agent harness configuration
+                  properties:
+                    type:
+                      type: string
+                      description: Agent type
+                    defaultProvider:
+                      type: string
+                      description: Default provider name
+                    defaultImage:
+                      type: string
+                      description: Default container image
+                    defaultResources:
+                      type: object
+                      description: Default resource requirements
+                      properties:
+                        limits:
+                          type: object
+                          additionalProperties:
+                            anyOf:
+                              - type: integer
+                              - type: string
+                            pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                            x-kubernetes-int-or-string: true
+                        requests:
+                          type: object
+                          additionalProperties:
+                            anyOf:
+                              - type: integer
+                              - type: string
+                            pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                            x-kubernetes-int-or-string: true
+                    defaultTimeout:
+                      type: string
+                      description: Default timeout for agent runs
+                    defaultRuntimeClassName:
+                      type: string
+                      description: Default pod runtimeClassName for agent runs
+                    env:
+                      type: array
+                      description: Additional environment variables
+                      items:
+                        type: object
+                        required:
+                          - name
+                        properties:
+                          name:
+                            type: string
+                          value:
+                            type: string
+                          valueFrom:
+                            type: object
+                            properties:
+                              configMapKeyRef:
+                                type: object
+                                properties:
+                                  name:
+                                    type: string
+                                  key:
+                                    type: string
+                                  optional:
+                                    type: boolean
+                              secretKeyRef:
+                                type: object
+                                properties:
+                                  name:
+                                    type: string
+                                  key:
+                                    type: string
+                                  optional:
+                                    type: boolean
+                              fieldRef:
+                                type: object
+                                properties:
+                                  apiVersion:
+                                    type: string
+                                  fieldPath:
+                                    type: string
+                              resourceFieldRef:
+                                type: object
+                                properties:
+                                  containerName:
+                                    type: string
+                                  resource:
+                                    type: string
+                                  divisor:
+                                    anyOf:
+                                      - type: integer
+                                      - type: string
+                                    pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                    x-kubernetes-int-or-string: true
                 providerRef:
                   type: string
                   description: References an AgentProvider in the namespace
-                workspaceRef:
-                  type: string
-                  description: References an AgentWorkspace for shared workspace support
                 provider:
                   type: object
                   description: Inline provider configuration
-                  required:
-                    - name
                   properties:
-                    name:
+                    type:
                       type: string
-                      description: Name of the provider
+                      description: Provider type
                     authSecretRef:
                       type: object
                       description: References a Secret containing the auth token
@@ -90,44 +166,93 @@ spec:
                       items:
                         type: string
                       description: Additional CLI arguments for the provider
-                repository:
+                workspaceRef:
+                  type: string
+                  description: References an AgentWorkspace for shared workspace support
+                workspace:
                   type: object
-                  description: Git repository to clone
-                  required:
-                    - url
+                  description: Inline workspace configuration
                   properties:
-                    url:
+                    type:
                       type: string
-                      description: Git repository URL
-                    branch:
-                      type: string
-                      description: Branch to checkout
-                    commit:
-                      type: string
-                      description: Commit to checkout (overrides branch)
-                    credentialsSecretRef:
+                      description: Workspace type
+                    repository:
                       type: object
-                      description: Secret containing git credentials
+                      description: Git repository to clone
                       required:
-                        - name
-                        - key
+                        - url
                       properties:
-                        name:
+                        url:
                           type: string
-                        key:
+                          description: Git repository URL
+                        branch:
                           type: string
-                worktree:
+                          description: Branch to checkout
+                        commit:
+                          type: string
+                          description: Commit to checkout (overrides branch)
+                        credentialsSecretRef:
+                          type: object
+                          description: Secret containing git credentials
+                          required:
+                            - name
+                            - key
+                          properties:
+                            name:
+                              type: string
+                            key:
+                              type: string
+                    storageClass:
+                      type: string
+                      description: StorageClass for workspace PVCs
+                    storageSize:
+                      type: string
+                      description: Storage size for workspace PVCs (default 10Gi)
+                    git:
+                      type: object
+                      description: Git-specific workspace configuration
+                      properties:
+                        worktree:
+                          type: object
+                          description: Worktree configuration
+                          required:
+                            - branch
+                          properties:
+                            branch:
+                              type: string
+                              description: Branch name for the worktree
+                            sourceBranch:
+                              type: string
+                              description: Source branch to create the worktree from
+                    jj:
+                      type: object
+                      description: Jujutsu-specific workspace configuration
+                      properties:
+                        revision:
+                          type: string
+                          description: Revision for the Jujutsu workspace
+                toolchainRef:
+                  type: string
+                  description: References an AgentToolchain in the namespace
+                toolchain:
                   type: object
-                  description: Worktree configuration
-                  required:
-                    - branch
+                  description: Inline toolchain configuration
                   properties:
-                    branch:
+                    type:
                       type: string
-                      description: Branch name for the worktree
-                    sourceBranch:
-                      type: string
-                      description: Source branch to create the worktree from
+                      description: Toolchain type
+                    nix:
+                      type: object
+                      description: Nix package provisioning configuration
+                      properties:
+                        packages:
+                          type: array
+                          description: Nixpkgs attribute names to install
+                          items:
+                            type: string
+                        image:
+                          type: string
+                          description: Nix container image for the init container (default nixos/nix:latest)
                 prompt:
                   type: string
                   description: Prompt for headless task execution
@@ -236,24 +361,6 @@ spec:
                   description: RuntimeClassName sets the pod runtimeClassName for
                     VM-based isolation (e.g. Kata Containers)
                   type: string
-                vcs:
-                  description: VCS selects the version control system
-                  type: string
-                  enum:
-                    - git
-                    - jj
-                nix:
-                  type: object
-                  description: Nix package provisioning for the agent environment
-                  properties:
-                    packages:
-                      type: array
-                      description: Nixpkgs attribute names to install
-                      items:
-                        type: string
-                    image:
-                      type: string
-                      description: Nix container image for the init container (default nixos/nix:latest)
             status:
               type: object
               description: AgentRunStatus defines the observed state of AgentRun
