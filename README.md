@@ -6,7 +6,7 @@
 
 > Monorepo for Xonovex AI agent tools, workflows, and skills
 
-AI coding agents handle prompts, tools, and code changes. What they don't manage is the environment around them: sandbox isolation, model provider routing, terminal sessions, reproducible toolchains, and orchestration at scale. Xonovex fills this gap.
+AI coding agents handle prompts, tools, and code changes. What they don't manage is the environment around them: sandbox isolation, model provider routing, terminal sessions, reproducible toolchains, and orchestration at scale. Xonovex fills this gap. The included commands and skills are token-efficient, unopinionated, and based on current research and best practices.
 
 - **[agent-cli](packages/agent/agent-cli/)** / **[agent-cli-go](packages/agent/agent-cli-go/)** configure sandboxes, providers, and terminal sessions, then launch the agent
 - **[agent-operator-go](packages/agent/agent-operator-go/)** orchestrates agents as Kubernetes Jobs with managed workspaces and provider secrets
