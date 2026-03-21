@@ -62,7 +62,7 @@ npm install -g @xonovex/agent-cli-go
 agent-cli run --agent claude --sandbox bwrap --provider gemini
 ```
 
-### Kubernetes Operator
+### Agent Kubernetes Operator
 
 ```bash
 # Install CRDs and deploy the operator
