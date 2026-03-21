@@ -106,16 +106,23 @@ Once installed, workflow commands are available as slash commands in Claude Code
 Utility commands for project instructions, insights, and skill management:
 
 ```
-/xonovex-utility:instructions-init          Create an AGENTS.md by analyzing directory structure
-/xonovex-utility:instructions-simplify      Reduce verbosity in instruction files
-/xonovex-utility:instructions-sync          Sync AGENTS.md with current directory state
-/xonovex-utility:instructions-consolidate   Remove redundant files and standardize format
-/xonovex-utility:insights-extract           Analyze session for mistakes and lessons learned
+/xonovex-utility:content-news-add                 Curate latest news on a topic and generate bilingual content
+/xonovex-utility:content-travelguide-add          Create a multi-language travel guide for a topic or location
+/xonovex-utility:instructions-init                Create an AGENTS.md by analyzing directory structure
+/xonovex-utility:instructions-simplify            Reduce verbosity in instruction files
+/xonovex-utility:instructions-sync                Sync AGENTS.md with current directory state
+/xonovex-utility:instructions-consolidate         Remove redundant files and standardize format
+/xonovex-utility:instructions-assimilate          Augment instructions with elements from another project
+/xonovex-utility:insights-extract                 Analyze session for mistakes and lessons learned
 /xonovex-utility:insights-instructions-integrate  Convert insights into AGENTS.md bullet points
-/xonovex-utility:insights-skills-integrate  Convert insights into a skill
-/xonovex-utility:skill-guidelines-create    Create a skill from a document or URL
-/xonovex-utility:skill-guidelines-extract   Extract patterns from codebase into a skill
-/xonovex-utility:slashcommand-create        Create a slash command from a completed task
+/xonovex-utility:insights-skills-integrate        Convert insights into a skill
+/xonovex-utility:skill-guidelines-create          Create a skill from a document or URL
+/xonovex-utility:skill-guidelines-extract         Extract patterns from codebase into a skill
+/xonovex-utility:skill-guidelines-simplify        Make skills project-independent and condense
+/xonovex-utility:skill-guidelines-assimilate      Augment a skill with elements from another skill
+/xonovex-utility:slashcommand-create              Create a slash command from a completed task
+/xonovex-utility:slashcommand-simplify            Reduce verbosity in slash command files
+/xonovex-utility:slashcommand-assimilate          Augment a slash command with elements from another
 ```
 
 Skills are applied automatically when relevant to the task.
