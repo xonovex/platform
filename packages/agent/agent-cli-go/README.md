@@ -1,33 +1,33 @@
-# tool-agent-cli-go
+# @xonovex/agent-cli-go
 
-Unified CLI for running AI coding agents with multiple model providers and sandbox options. Go implementation.
+Go implementation of agent-cli. Configures sandboxes, providers, and terminal sessions, then launches the agent.
 
 ## Installation
 
 ```bash
-go build -o agent-cli ./cmd/agent-cli
+npm install -g @xonovex/agent-cli-go
 ```
 
 ## Usage
 
 ```bash
 # Run with default agent (Claude)
-./agent-cli run
+agent-cli run
 
 # Run with specific agent
-./agent-cli run -a claude
-./agent-cli run -a opencode
+agent-cli run -a claude
+agent-cli run -a opencode
 
 # Run with sandbox
-./agent-cli run -s bwrap
-./agent-cli run -s docker
-./agent-cli run -s nix
+agent-cli run -s bwrap
+agent-cli run -s docker
+agent-cli run -s nix
 
 # Run with worktree
-./agent-cli run --worktree-branch feature/my-feature
+agent-cli run --worktree-branch feature/my-feature
 
 # Run with terminal wrapper
-./agent-cli run -t tmux
+agent-cli run -t tmux
 ```
 
 ## Commands
@@ -54,13 +54,13 @@ Generate shell completion script.
 
 ```bash
 # Bash
-source <(./agent-cli completion bash)
+source <(agent-cli completion bash)
 
 # Zsh
-./agent-cli completion zsh > "${fpath[1]}/_agent-cli"
+agent-cli completion zsh > "${fpath[1]}/_agent-cli"
 
 # Fish
-./agent-cli completion fish | source
+agent-cli completion fish | source
 ```
 
 ## Configuration
@@ -80,7 +80,7 @@ provider: anthropic
 Load with:
 
 ```bash
-./agent-cli run -c config.yaml
+agent-cli run -c config.yaml
 ```
 
 ## Testing

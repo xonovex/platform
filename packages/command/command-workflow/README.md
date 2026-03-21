@@ -37,20 +37,23 @@ Learning: insights-integrate merges learnings into guidelines for future session
 
 ## Commands
 
-| Command                | Description                                           |
-| ---------------------- | ----------------------------------------------------- |
-| `plan-research`        | Research viability, suggest alternatives              |
-| `plan-create`          | Create plan with frontmatter and parallelization info |
-| `plan-subplans-create` | Create subplans for parallel execution                |
-| `plan-worktree-create` | Create worktree at `../<repo>-<feature>`              |
-| `plan-continue`        | Auto-detect plan and resume work                      |
-| `plan-validate`        | Validate against guidelines and tests                 |
-| `plan-update`          | Update plan status                                    |
-| `plan-worktree-merge`  | Merge with intelligent conflict resolution            |
-| `code-simplify`        | Find code smells                                      |
-| `code-harden`          | Improve type safety and error handling                |
-| `code-align`           | Align two similar implementations                     |
-| `git-commit`           | Commit changes (use `--push` to push)                 |
+| Command                 | Description                                                    |
+| ----------------------- | -------------------------------------------------------------- |
+| `plan-research`         | Research codebase and web for requirements                     |
+| `plan-create`           | Create a high-level plan for user review                       |
+| `plan-tdd-create`       | Create a TDD plan with research for user review                |
+| `plan-subplans-create`  | Generate detailed subplans with parallel execution detection   |
+| `plan-worktree-create`  | Create a git worktree for a feature branch                     |
+| `plan-continue`         | Resume work from an existing plan                              |
+| `plan-validate`         | Verify that a plan or current work has been fully achieved     |
+| `plan-update`           | Update plan status and test results                            |
+| `plan-refine`           | Process user annotations and refine iteratively                |
+| `plan-worktree-merge`   | Merge feature worktree back to source                          |
+| `plan-worktree-abandon` | Document and abandon a feature with reason and learnings       |
+| `code-simplify`         | Consolidate duplicates, remove dead code, flatten abstractions |
+| `code-harden`           | Improve type safety, validation, and error handling            |
+| `code-align`            | Align two similar implementations and suggest improvements     |
+| `git-commit`            | Commit and push changes                                        |
 
 ## Design Decisions
 

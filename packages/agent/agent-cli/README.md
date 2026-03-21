@@ -1,6 +1,6 @@
 # @xonovex/agent-cli
 
-Unified CLI for running AI coding agents with multiple model providers and sandbox options.
+Configures sandboxes, providers, and terminal sessions, then launches the agent. TypeScript implementation.
 
 ## Installation
 
