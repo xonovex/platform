@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/resource"
 
 	agentv1alpha1 "github.com/xonovex/platform/packages/agent/agent-operator-go/api/v1alpha1"
 )
@@ -47,10 +48,19 @@ func (n *NixToolchain) InitContainer() *corev1.Container {
 }
 
 func (n *NixToolchain) Volumes() []corev1.Volume {
+	sizeLimit := resource.MustParse("10Gi")
+	if n.nix.StoreSizeLimit != "" {
+		sizeLimit = resource.MustParse(n.nix.StoreSizeLimit)
+	}
+
 	return []corev1.Volume{
 		{
-			Name:         nixVolumeName,
-			VolumeSource: corev1.VolumeSource{EmptyDir: &corev1.EmptyDirVolumeSource{}},
+			Name: nixVolumeName,
+			VolumeSource: corev1.VolumeSource{
+				EmptyDir: &corev1.EmptyDirVolumeSource{
+					SizeLimit: &sizeLimit,
+				},
+			},
 		},
 	}
 }

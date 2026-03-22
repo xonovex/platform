@@ -97,7 +97,7 @@ func (r *AgentWorkspaceReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 	if ws.Status.InitJobName == "" {
 		image := "alpine/git:latest"
 
-		job := builder.BuildWorkspaceInitJob(&ws, workspacePVCName, image)
+		job := builder.BuildWorkspaceInitJob(&ws, workspacePVCName, image, ws.Spec.RuntimeClassName)
 		if err := ctrl.SetControllerReference(&ws, job, r.Scheme); err != nil {
 			return ctrl.Result{}, err
 		}

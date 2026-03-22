@@ -100,22 +100,25 @@ func TestMain(m *testing.M) {
 	}
 
 	if err := (&controller.AgentRunReconciler{
-		Client: mgr.GetClient(),
-		Scheme: mgr.GetScheme(),
+		Client:   mgr.GetClient(),
+		Scheme:   mgr.GetScheme(),
+		Recorder: mgr.GetEventRecorderFor("agentrun-controller"),
 	}).SetupWithManager(mgr); err != nil {
 		panic("failed to setup AgentRun controller: " + err.Error())
 	}
 
 	if err := (&controller.AgentProviderReconciler{
-		Client: mgr.GetClient(),
-		Scheme: mgr.GetScheme(),
+		Client:   mgr.GetClient(),
+		Scheme:   mgr.GetScheme(),
+		Recorder: mgr.GetEventRecorderFor("agentprovider-controller"),
 	}).SetupWithManager(mgr); err != nil {
 		panic("failed to setup AgentProvider controller: " + err.Error())
 	}
 
 	if err := (&controller.AgentWorkspaceReconciler{
-		Client: mgr.GetClient(),
-		Scheme: mgr.GetScheme(),
+		Client:   mgr.GetClient(),
+		Scheme:   mgr.GetScheme(),
+		Recorder: mgr.GetEventRecorderFor("agentworkspace-controller"),
 	}).SetupWithManager(mgr); err != nil {
 		panic("failed to setup AgentWorkspace controller: " + err.Error())
 	}

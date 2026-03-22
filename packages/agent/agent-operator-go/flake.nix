@@ -14,7 +14,7 @@
       devShells.${system}.default = pkgs.mkShell {
         packages = [
           # Go
-          pkgs.go_1_25
+          pkgs.go_1_26
           pkgs.golangci-lint
 
           # Kubernetes

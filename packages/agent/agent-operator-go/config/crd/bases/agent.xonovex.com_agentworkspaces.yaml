@@ -118,6 +118,9 @@ spec:
                     revision:
                       type: string
                       description: Revision for the Jujutsu workspace
+                runtimeClassName:
+                  type: string
+                  description: RuntimeClassName for the workspace init Job pod.
             status:
               type: object
               description: AgentWorkspaceStatus defines the observed state of AgentWorkspace

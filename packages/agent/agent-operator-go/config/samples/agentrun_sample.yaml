@@ -23,10 +23,15 @@ spec:
           - port: 443
             protocol: TCP
   timeout: 30m
+  # For AKS Confidential Computing (AMD SEV-SNP):
+  # confidentialComputing:
+  #   tee: amd-sev-snp
   resources:
     requests:
       cpu: "500m"
       memory: "512Mi"
+      ephemeral-storage: "1Gi"
     limits:
       cpu: "2"
       memory: "2Gi"
+      ephemeral-storage: "5Gi"
