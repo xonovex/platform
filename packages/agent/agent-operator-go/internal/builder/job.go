@@ -10,8 +10,17 @@ import (
 	agentv1alpha1 "github.com/xonovex/platform/packages/agent/agent-operator-go/api/v1alpha1"
 )
 
+// resolveTTL returns the TTL pointer to use, defaulting to 3600 if nil.
+func resolveTTL(ttl *int32) *int32 {
+	if ttl != nil {
+		return ttl
+	}
+	defaultTTL := int32(3600)
+	return &defaultTTL
+}
+
 // BuildJob creates a Kubernetes Job for an AgentRun
-func BuildJob(run *agentv1alpha1.AgentRun, providerEnv map[string]string, pvcName string, image string, timeout time.Duration, agentType agentv1alpha1.AgentType, wsType agentv1alpha1.WorkspaceType, tc *agentv1alpha1.ToolchainSpec) *batchv1.Job {
+func BuildJob(run *agentv1alpha1.AgentRun, providerEnv map[string]string, pvcName string, image string, timeout time.Duration, agentType agentv1alpha1.AgentType, wsType agentv1alpha1.WorkspaceType, tc *agentv1alpha1.ToolchainSpec, ttl *int32) *batchv1.Job {
 	activeDeadlineSeconds := int64(timeout.Seconds())
 
 	backoffLimit := int32(0)
@@ -35,6 +44,18 @@ func BuildJob(run *agentv1alpha1.AgentRun, providerEnv map[string]string, pvcNam
 		volumes = append(volumes, t.Volumes()...)
 	}
 
+	// TEE runtimeClassName takes precedence over direct RuntimeClassName
+	runtimeClass := run.Spec.RuntimeClassName
+	if teeRC := TEERuntimeClassName(run.Spec.ConfidentialComputing); teeRC != nil {
+		runtimeClass = teeRC
+	}
+
+	// Build node affinity from TEE config
+	var affinity *corev1.Affinity
+	if nodeAffinity := TEENodeAffinity(run.Spec.ConfidentialComputing); nodeAffinity != nil {
+		affinity = &corev1.Affinity{NodeAffinity: nodeAffinity}
+	}
+
 	job := &batchv1.Job{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      run.Name,
@@ -47,8 +68,9 @@ func BuildJob(run *agentv1alpha1.AgentRun, providerEnv map[string]string, pvcNam
 			},
 		},
 		Spec: batchv1.JobSpec{
-			ActiveDeadlineSeconds: &activeDeadlineSeconds,
-			BackoffLimit:          &backoffLimit,
+			ActiveDeadlineSeconds:   &activeDeadlineSeconds,
+			BackoffLimit:            &backoffLimit,
+			TTLSecondsAfterFinished: resolveTTL(ttl),
 			Template: corev1.PodTemplateSpec{
 				ObjectMeta: metav1.ObjectMeta{
 					Labels: map[string]string{
@@ -66,7 +88,8 @@ func BuildJob(run *agentv1alpha1.AgentRun, providerEnv map[string]string, pvcNam
 					Volumes:          volumes,
 					NodeSelector:     run.Spec.NodeSelector,
 					Tolerations:      run.Spec.Tolerations,
-					RuntimeClassName: run.Spec.RuntimeClassName,
+					RuntimeClassName: runtimeClass,
+					Affinity:         affinity,
 				},
 			},
 		},

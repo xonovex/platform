@@ -158,7 +158,7 @@ func (r *AgentRunReconciler) reconcileStandalone(ctx context.Context, agentRun *
 	if agentRun.Status.JobName == "" {
 		defaults := resolver.ApplyHarnessDefaults(agentRun, harness)
 
-		job := builder.BuildJob(agentRun, providerEnv, pvcName, defaults.Image, defaults.Timeout, agentType, wsType, tc)
+		job := builder.BuildJob(agentRun, providerEnv, pvcName, defaults.Image, defaults.Timeout, agentType, wsType, tc, defaults.TTL)
 		if err := ctrl.SetControllerReference(agentRun, job, r.Scheme); err != nil {
 			return ctrl.Result{}, err
 		}
@@ -288,7 +288,7 @@ func (r *AgentRunReconciler) reconcileWithWorkspace(ctx context.Context, agentRu
 	if agentRun.Status.JobName == "" {
 		defaults := resolver.ApplyHarnessDefaults(agentRun, harness)
 
-		job := builder.BuildWorkspaceJob(agentRun, providerEnv, ws.Status.WorkspacePVC, ws.Spec.SharedVolumes, ws.Status.SharedVolumePVCs, defaults.Image, defaults.Timeout, agentType, wsType, worktreeBranch, sourceBranch, tc)
+		job := builder.BuildWorkspaceJob(agentRun, providerEnv, ws.Status.WorkspacePVC, ws.Spec.SharedVolumes, ws.Status.SharedVolumePVCs, defaults.Image, defaults.Timeout, agentType, wsType, worktreeBranch, sourceBranch, tc, defaults.TTL)
 		if err := ctrl.SetControllerReference(agentRun, job, r.Scheme); err != nil {
 			return ctrl.Result{}, err
 		}

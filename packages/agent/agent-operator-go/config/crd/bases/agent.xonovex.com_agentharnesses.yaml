@@ -96,6 +96,23 @@ spec:
                       items:
                         type: object
                         x-kubernetes-preserve-unknown-fields: true
+                defaultTtlSecondsAfterFinished:
+                  description: Default TTL for completed Jobs. Defaults to 3600.
+                  type: integer
+                  format: int32
+                  minimum: 0
+                defaultConfidentialComputing:
+                  description: Default TEE-based isolation for all runs.
+                  type: object
+                  required: [tee]
+                  properties:
+                    tee:
+                      type: string
+                      enum: [amd-sev-snp, intel-tdx]
+                    overrideRuntimeClassName:
+                      type: string
+                    disableNodeAffinity:
+                      type: boolean
                 env:
                   type: array
                   description: Additional environment variables

@@ -1,6 +1,7 @@
 package webhook
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -10,8 +11,8 @@ import (
 	agentv1alpha1 "github.com/xonovex/platform/packages/agent/agent-operator-go/api/v1alpha1"
 )
 
-func boolPtr(b bool) *bool     { return &b }
-func strPtr(s string) *string  { return &s }
+func boolPtr(b bool) *bool    { return &b }
+func strPtr(s string) *string { return &s }
 
 func baseRun() *agentv1alpha1.AgentRun {
 	return &agentv1alpha1.AgentRun{
@@ -209,7 +210,7 @@ func TestEnforcePolicy_NoPolicy_AllowsAll(t *testing.T) {
 		},
 	}
 
-	_, err := w.validate(nil, run)
+	_, err := w.validate(context.Background(), run)
 	if err != nil {
 		t.Errorf("validate() error = %v, want nil (no policy should allow all)", err)
 	}

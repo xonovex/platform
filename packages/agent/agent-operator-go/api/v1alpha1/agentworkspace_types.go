@@ -40,6 +40,9 @@ type AgentWorkspaceSpec struct {
 	Git *GitWorkspaceConfig `json:"git,omitempty"`
 	// Jj holds jj-specific configuration
 	Jj *JujutsuWorkspaceConfig `json:"jj,omitempty"`
+	// RuntimeClassName sets the pod runtimeClassName for the workspace init Job.
+	// Use to ensure the clone container runs inside the same isolation as agent pods.
+	RuntimeClassName *string `json:"runtimeClassName,omitempty"`
 }
 
 // AgentWorkspaceStatus defines the observed state of AgentWorkspace
