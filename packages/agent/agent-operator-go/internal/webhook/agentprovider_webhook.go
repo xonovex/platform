@@ -3,6 +3,8 @@ package webhook
 import (
 	"context"
 	"fmt"
+	"regexp"
+	"strings"
 
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -10,6 +12,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 
 	agentv1alpha1 "github.com/xonovex/platform/packages/agent/agent-operator-go/api/v1alpha1"
+	"github.com/xonovex/platform/packages/agent/agent-operator-go/internal/validator"
 )
 
 // AgentProviderWebhook implements validation for AgentProvider
@@ -44,6 +47,53 @@ func (w *AgentProviderWebhook) ValidateDelete(_ context.Context, _ runtime.Objec
 	return nil, nil
 }
 
-func (w *AgentProviderWebhook) validate(_ *agentv1alpha1.AgentProvider) (admission.Warnings, error) {
+var envKeyPattern = regexp.MustCompile(`^[a-zA-Z_][a-zA-Z0-9_]*$`)
+
+var k8sNamePattern = regexp.MustCompile(`^[a-z0-9][a-z0-9\-]{0,251}[a-z0-9]$|^[a-z0-9]$`)
+
+var blockedEnvKeyPrefixes = []string{
+	"LD_",
+	"DYLD_",
+	"PYTHONPATH",
+	"RUBYOPT",
+	"NODE_OPTIONS",
+	"JAVA_TOOL_OPTIONS",
+}
+
+func (w *AgentProviderWebhook) validate(provider *agentv1alpha1.AgentProvider) (admission.Warnings, error) {
+	if provider.Spec.AuthTokenSecretRef != nil {
+		ref := provider.Spec.AuthTokenSecretRef
+		if ref.Name == "" {
+			return nil, fmt.Errorf("authTokenSecretRef.name is required")
+		}
+		if ref.Key == "" {
+			return nil, fmt.Errorf("authTokenSecretRef.key is required")
+		}
+		if !k8sNamePattern.MatchString(ref.Name) {
+			return nil, fmt.Errorf("authTokenSecretRef.name %q is not a valid Kubernetes resource name", ref.Name)
+		}
+	}
+
+	for key := range provider.Spec.Environment {
+		if !envKeyPattern.MatchString(key) {
+			return nil, fmt.Errorf("environment key %q is not a valid env var name", key)
+		}
+		upperKey := strings.ToUpper(key)
+		for _, blocked := range blockedEnvKeyPrefixes {
+			if strings.HasPrefix(upperKey, blocked) {
+				return nil, fmt.Errorf("environment key %q is not allowed (blocked prefix %q)", key, blocked)
+			}
+		}
+	}
+
+	for i, arg := range provider.Spec.CliArgs {
+		if arg == "" {
+			return nil, fmt.Errorf("cliArgs[%d] is empty", i)
+		}
+		if validator.ContainsShellMetachars(arg) {
+			return nil, fmt.Errorf("cliArgs[%d] %q contains shell metacharacters", i, arg)
+		}
+	}
+
 	return nil, nil
 }
