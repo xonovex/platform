@@ -226,7 +226,7 @@ func TestBuildWorktreeInitContainers_Basic(t *testing.T) {
 		},
 	}
 
-	containers := BuildWorktreeInitContainers(run, "node:trixie-slim", agentv1alpha1.WorkspaceTypeGit, "agent-1-work", "main")
+	containers := BuildWorktreeInitContainers(run, "node:trixie-slim", agentv1alpha1.WorkspaceTypeGit, "agent-1-work", "main", nil)
 
 	if len(containers) != 1 {
 		t.Fatalf("expected 1 init container, got %d", len(containers))
@@ -249,7 +249,7 @@ func TestBuildWorktreeInitContainers_DefaultSourceBranch(t *testing.T) {
 		},
 	}
 
-	containers := BuildWorktreeInitContainers(run, "node:trixie-slim", agentv1alpha1.WorkspaceTypeGit, "agent-1-work", "")
+	containers := BuildWorktreeInitContainers(run, "node:trixie-slim", agentv1alpha1.WorkspaceTypeGit, "agent-1-work", "", nil)
 	script := containers[0].Args[1]
 	if !containsStr(script, "git worktree add '/workspace-wt/agent-1' -b 'agent-1-work' 'HEAD'") {
 		t.Errorf("expected quoted HEAD as default source branch, got: %s", script)
@@ -263,7 +263,7 @@ func TestBuildWorkspaceMainContainers_Basic(t *testing.T) {
 		},
 	}
 
-	containers := BuildWorkspaceMainContainers(run, nil, "node:trixie-slim", agentv1alpha1.AgentTypeClaude, nil, nil, nil)
+	containers := BuildWorkspaceMainContainers(run, nil, "node:trixie-slim", agentv1alpha1.AgentTypeClaude, nil, nil, nil, nil)
 
 	if len(containers) != 1 {
 		t.Fatalf("expected 1 container, got %d", len(containers))
@@ -272,9 +272,9 @@ func TestBuildWorkspaceMainContainers_Basic(t *testing.T) {
 	if container.WorkingDir != "/workspace-wt/agent-1" {
 		t.Errorf("expected working dir /workspace-wt/agent-1, got %s", container.WorkingDir)
 	}
-	// Should have workspace volume mount
-	if len(container.VolumeMounts) != 1 || container.VolumeMounts[0].Name != "workspace" {
-		t.Errorf("expected workspace volume mount")
+	// Should have workspace + tmp volume mounts
+	if len(container.VolumeMounts) != 2 || container.VolumeMounts[0].Name != "workspace" {
+		t.Errorf("expected workspace + tmp volume mounts, got %d", len(container.VolumeMounts))
 	}
 }
 
@@ -294,12 +294,12 @@ func TestBuildWorkspaceMainContainers_WithSharedVolumes(t *testing.T) {
 		"opencode-config": "ws-opencode-config",
 	}
 
-	containers := BuildWorkspaceMainContainers(run, nil, "node:trixie-slim", agentv1alpha1.AgentTypeClaude, sharedVolumes, sharedVolumePVCs, nil)
+	containers := BuildWorkspaceMainContainers(run, nil, "node:trixie-slim", agentv1alpha1.AgentTypeClaude, sharedVolumes, sharedVolumePVCs, nil, nil)
 
 	container := containers[0]
-	// workspace + 2 shared volumes = 3 volume mounts
-	if len(container.VolumeMounts) != 3 {
-		t.Fatalf("expected 3 volume mounts, got %d", len(container.VolumeMounts))
+	// workspace + tmp + 2 shared volumes = 4 volume mounts
+	if len(container.VolumeMounts) != 4 {
+		t.Fatalf("expected 4 volume mounts, got %d", len(container.VolumeMounts))
 	}
 
 	foundClaude := false
@@ -353,9 +353,9 @@ func TestBuildWorkspaceJob_Basic(t *testing.T) {
 		t.Errorf("expected working dir /workspace-wt/agent-1, got %s", job.Spec.Template.Spec.Containers[0].WorkingDir)
 	}
 
-	// Check workspace volume
-	if len(job.Spec.Template.Spec.Volumes) != 1 {
-		t.Fatalf("expected 1 volume, got %d", len(job.Spec.Template.Spec.Volumes))
+	// Check workspace + tmp volumes
+	if len(job.Spec.Template.Spec.Volumes) != 2 {
+		t.Fatalf("expected 2 volumes (workspace + tmp), got %d", len(job.Spec.Template.Spec.Volumes))
 	}
 	if job.Spec.Template.Spec.Volumes[0].PersistentVolumeClaim.ClaimName != "my-workspace-ws" {
 		t.Errorf("expected workspace PVC claim my-workspace-ws")
@@ -382,9 +382,9 @@ func TestBuildWorkspaceJob_WithSharedVolumes(t *testing.T) {
 
 	job := BuildWorkspaceJob(run, nil, "my-workspace-ws", sharedVolumes, sharedVolumePVCs, "node:trixie-slim", time.Hour, agentv1alpha1.AgentTypeClaude, agentv1alpha1.WorkspaceTypeGit, "agent-1-work", "", nil)
 
-	// workspace + shared volume = 2 volumes
-	if len(job.Spec.Template.Spec.Volumes) != 2 {
-		t.Fatalf("expected 2 volumes, got %d", len(job.Spec.Template.Spec.Volumes))
+	// workspace + tmp + shared volume = 3 volumes
+	if len(job.Spec.Template.Spec.Volumes) != 3 {
+		t.Fatalf("expected 3 volumes, got %d", len(job.Spec.Template.Spec.Volumes))
 	}
 
 	foundSharedVol := false
@@ -451,7 +451,7 @@ func TestBuildWorktreeInitContainers_WithJujutsu(t *testing.T) {
 		},
 	}
 
-	containers := BuildWorktreeInitContainers(run, "node:trixie-slim", agentv1alpha1.WorkspaceTypeJujutsu, "agent-1-work", "main")
+	containers := BuildWorktreeInitContainers(run, "node:trixie-slim", agentv1alpha1.WorkspaceTypeJujutsu, "agent-1-work", "main", nil)
 
 	if len(containers) != 1 {
 		t.Fatalf("expected 1 init container, got %d", len(containers))

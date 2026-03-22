@@ -25,6 +25,10 @@ func BuildJob(run *agentv1alpha1.AgentRun, providerEnv map[string]string, pvcNam
 				},
 			},
 		},
+		{
+			Name:         "tmp",
+			VolumeSource: corev1.VolumeSource{EmptyDir: &corev1.EmptyDirVolumeSource{}},
+		},
 	}
 
 	for _, t := range Toolchains(tc) {
@@ -56,8 +60,9 @@ func BuildJob(run *agentv1alpha1.AgentRun, providerEnv map[string]string, pvcNam
 				},
 				Spec: corev1.PodSpec{
 					RestartPolicy:    corev1.RestartPolicyNever,
-					InitContainers:   BuildInitContainers(run, image, wsType, tc),
-					Containers:       BuildMainContainers(run, providerEnv, image, agentType, tc),
+					SecurityContext:  DefaultPodSecurityContext(run.Spec.PodSecurityContext),
+					InitContainers:   BuildInitContainers(run, image, wsType, tc, run.Spec.SecurityContext),
+					Containers:       BuildMainContainers(run, providerEnv, image, agentType, tc, run.Spec.SecurityContext),
 					Volumes:          volumes,
 					NodeSelector:     run.Spec.NodeSelector,
 					Tolerations:      run.Spec.Tolerations,

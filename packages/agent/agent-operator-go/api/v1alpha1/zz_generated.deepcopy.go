@@ -213,6 +213,16 @@ func (in *AgentSpec) DeepCopyInto(out *AgentSpec) {
 		*out = new(string)
 		**out = **in
 	}
+	if in.DefaultSecurityContext != nil {
+		in, out := &in.DefaultSecurityContext, &out.DefaultSecurityContext
+		*out = new(corev1.SecurityContext)
+		(*in).DeepCopyInto(*out)
+	}
+	if in.DefaultPodSecurityContext != nil {
+		in, out := &in.DefaultPodSecurityContext, &out.DefaultPodSecurityContext
+		*out = new(corev1.PodSecurityContext)
+		(*in).DeepCopyInto(*out)
+	}
 	if in.Env != nil {
 		in, out := &in.Env, &out.Env
 		*out = make([]corev1.EnvVar, len(*in))
@@ -286,6 +296,16 @@ func (in *AgentRunSpec) DeepCopyInto(out *AgentRunSpec) {
 		in, out := &in.RuntimeClassName, &out.RuntimeClassName
 		*out = new(string)
 		**out = **in
+	}
+	if in.SecurityContext != nil {
+		in, out := &in.SecurityContext, &out.SecurityContext
+		*out = new(corev1.SecurityContext)
+		(*in).DeepCopyInto(*out)
+	}
+	if in.PodSecurityContext != nil {
+		in, out := &in.PodSecurityContext, &out.PodSecurityContext
+		*out = new(corev1.PodSecurityContext)
+		(*in).DeepCopyInto(*out)
 	}
 }
 

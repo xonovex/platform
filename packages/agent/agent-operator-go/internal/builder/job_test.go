@@ -228,9 +228,9 @@ func TestBuildJob_WithNixPackages(t *testing.T) {
 		t.Errorf("init container[1] name = %q, want nix-env", podSpec.InitContainers[1].Name)
 	}
 
-	// Should have 2 volumes: workspace PVC + nix-env emptyDir
-	if len(podSpec.Volumes) != 2 {
-		t.Fatalf("len(Volumes) = %d, want 2", len(podSpec.Volumes))
+	// Should have 3 volumes: workspace PVC + tmp emptyDir + nix-env emptyDir
+	if len(podSpec.Volumes) != 3 {
+		t.Fatalf("len(Volumes) = %d, want 3", len(podSpec.Volumes))
 	}
 	foundNixVol := false
 	for _, v := range podSpec.Volumes {
@@ -255,8 +255,8 @@ func TestBuildJob_WithoutNix(t *testing.T) {
 
 	job := BuildJob(run, nil, "pvc", "image", time.Hour, agentv1alpha1.AgentTypeClaude, agentv1alpha1.WorkspaceTypeGit, nil)
 
-	if len(job.Spec.Template.Spec.Volumes) != 1 {
-		t.Errorf("len(Volumes) = %d, want 1 (workspace only)", len(job.Spec.Template.Spec.Volumes))
+	if len(job.Spec.Template.Spec.Volumes) != 2 {
+		t.Errorf("len(Volumes) = %d, want 2 (workspace + tmp)", len(job.Spec.Template.Spec.Volumes))
 	}
 }
 
@@ -285,5 +285,83 @@ func TestBuildJob_Labels(t *testing.T) {
 		if got := job.Spec.Template.Labels[k]; got != want {
 			t.Errorf("pod template label %q = %q, want %q", k, got, want)
 		}
+	}
+}
+
+func TestBuildJob_PodSecurityContext(t *testing.T) {
+	run := &agentv1alpha1.AgentRun{
+		ObjectMeta: metav1.ObjectMeta{Name: "test-run", Namespace: "default"},
+		Spec: agentv1alpha1.AgentRunSpec{
+			Workspace: &agentv1alpha1.WorkspaceSpec{
+				Repository: agentv1alpha1.RepositorySpec{URL: "https://example.com/repo.git"},
+			},
+		},
+	}
+
+	job := BuildJob(run, nil, "pvc", "image", time.Hour, agentv1alpha1.AgentTypeClaude, agentv1alpha1.WorkspaceTypeGit, nil)
+
+	psc := job.Spec.Template.Spec.SecurityContext
+	if psc == nil {
+		t.Fatal("PodSecurityContext should not be nil")
+	}
+	if psc.RunAsNonRoot == nil || *psc.RunAsNonRoot != true {
+		t.Error("RunAsNonRoot should be true")
+	}
+	if psc.SeccompProfile == nil || psc.SeccompProfile.Type != corev1.SeccompProfileTypeRuntimeDefault {
+		t.Error("SeccompProfile should be RuntimeDefault")
+	}
+}
+
+func TestBuildJob_TmpVolume(t *testing.T) {
+	run := &agentv1alpha1.AgentRun{
+		ObjectMeta: metav1.ObjectMeta{Name: "test-run", Namespace: "default"},
+		Spec: agentv1alpha1.AgentRunSpec{
+			Workspace: &agentv1alpha1.WorkspaceSpec{
+				Repository: agentv1alpha1.RepositorySpec{URL: "https://example.com/repo.git"},
+			},
+		},
+	}
+
+	job := BuildJob(run, nil, "pvc", "image", time.Hour, agentv1alpha1.AgentTypeClaude, agentv1alpha1.WorkspaceTypeGit, nil)
+
+	foundTmp := false
+	for _, v := range job.Spec.Template.Spec.Volumes {
+		if v.Name == "tmp" && v.EmptyDir != nil {
+			foundTmp = true
+		}
+	}
+	if !foundTmp {
+		t.Error("expected tmp EmptyDir volume")
+	}
+}
+
+func TestBuildJob_ContainerSecurityContext(t *testing.T) {
+	run := &agentv1alpha1.AgentRun{
+		ObjectMeta: metav1.ObjectMeta{Name: "test-run", Namespace: "default"},
+		Spec: agentv1alpha1.AgentRunSpec{
+			Workspace: &agentv1alpha1.WorkspaceSpec{
+				Repository: agentv1alpha1.RepositorySpec{URL: "https://example.com/repo.git"},
+			},
+		},
+	}
+
+	job := BuildJob(run, nil, "pvc", "image", time.Hour, agentv1alpha1.AgentTypeClaude, agentv1alpha1.WorkspaceTypeGit, nil)
+
+	// Check main container
+	mainSC := job.Spec.Template.Spec.Containers[0].SecurityContext
+	if mainSC == nil {
+		t.Fatal("main container SecurityContext should not be nil")
+	}
+	if *mainSC.AllowPrivilegeEscalation != false {
+		t.Error("main container AllowPrivilegeEscalation should be false")
+	}
+
+	// Check init container
+	initSC := job.Spec.Template.Spec.InitContainers[0].SecurityContext
+	if initSC == nil {
+		t.Fatal("init container SecurityContext should not be nil")
+	}
+	if *initSC.AllowPrivilegeEscalation != false {
+		t.Error("init container AllowPrivilegeEscalation should be false")
 	}
 }

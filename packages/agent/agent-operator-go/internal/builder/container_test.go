@@ -4,6 +4,7 @@ import (
 	"strings"
 	"testing"
 
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	agentv1alpha1 "github.com/xonovex/platform/packages/agent/agent-operator-go/api/v1alpha1"
@@ -20,7 +21,7 @@ func TestBuildInitContainers(t *testing.T) {
 		},
 	}
 
-	containers := BuildInitContainers(run, "node:latest", agentv1alpha1.WorkspaceTypeGit, nil)
+	containers := BuildInitContainers(run, "node:latest", agentv1alpha1.WorkspaceTypeGit, nil, nil)
 
 	if len(containers) != 1 {
 		t.Fatalf("len(containers) = %d, want 1", len(containers))
@@ -234,7 +235,7 @@ func TestBuildInitContainers_WithNix(t *testing.T) {
 		},
 	}
 
-	containers := BuildInitContainers(run, "node:latest", agentv1alpha1.WorkspaceTypeGit, tc)
+	containers := BuildInitContainers(run, "node:latest", agentv1alpha1.WorkspaceTypeGit, tc, nil)
 
 	if len(containers) != 2 {
 		t.Fatalf("len(containers) = %d, want 2", len(containers))
@@ -265,7 +266,7 @@ func TestBuildMainContainers_WithNix(t *testing.T) {
 		},
 	}
 
-	containers := BuildMainContainers(run, nil, "image:latest", agentv1alpha1.AgentTypeClaude, tc)
+	containers := BuildMainContainers(run, nil, "image:latest", agentv1alpha1.AgentTypeClaude, tc, nil)
 
 	c := containers[0]
 
@@ -303,7 +304,7 @@ func TestBuildMainContainers_WithoutNix(t *testing.T) {
 		},
 	}
 
-	containers := BuildMainContainers(run, nil, "image:latest", agentv1alpha1.AgentTypeClaude, nil)
+	containers := BuildMainContainers(run, nil, "image:latest", agentv1alpha1.AgentTypeClaude, nil, nil)
 	c := containers[0]
 
 	for _, vm := range c.VolumeMounts {
@@ -330,7 +331,7 @@ func TestBuildMainContainers_Claude(t *testing.T) {
 		},
 	}
 
-	containers := BuildMainContainers(run, nil, "image:latest", agentv1alpha1.AgentTypeClaude, nil)
+	containers := BuildMainContainers(run, nil, "image:latest", agentv1alpha1.AgentTypeClaude, nil, nil)
 
 	if len(containers) != 1 {
 		t.Fatalf("len(containers) = %d, want 1", len(containers))
@@ -372,7 +373,7 @@ func TestBuildMainContainers_ClaudeWithPrompt(t *testing.T) {
 		},
 	}
 
-	containers := BuildMainContainers(run, nil, "image", agentv1alpha1.AgentTypeClaude, nil)
+	containers := BuildMainContainers(run, nil, "image", agentv1alpha1.AgentTypeClaude, nil, nil)
 
 	args := containers[0].Args
 	foundPrint := false
@@ -407,7 +408,7 @@ func TestBuildMainContainers_Opencode(t *testing.T) {
 		},
 	}
 
-	containers := BuildMainContainers(run, nil, "image", agentv1alpha1.AgentTypeOpencode, nil)
+	containers := BuildMainContainers(run, nil, "image", agentv1alpha1.AgentTypeOpencode, nil, nil)
 
 	c := containers[0]
 	if c.Command[0] != "opencode" {
@@ -434,7 +435,7 @@ func TestBuildMainContainers_WithProviderEnv(t *testing.T) {
 		"API_TIMEOUT_MS":     "60000",
 	}
 
-	containers := BuildMainContainers(run, providerEnv, "image", agentv1alpha1.AgentTypeClaude, nil)
+	containers := BuildMainContainers(run, providerEnv, "image", agentv1alpha1.AgentTypeClaude, nil, nil)
 
 	envMap := make(map[string]string)
 	for _, env := range containers[0].Env {
@@ -446,5 +447,132 @@ func TestBuildMainContainers_WithProviderEnv(t *testing.T) {
 	}
 	if envMap["API_TIMEOUT_MS"] != "60000" {
 		t.Errorf("API_TIMEOUT_MS = %q, want %q", envMap["API_TIMEOUT_MS"], "60000")
+	}
+}
+
+func TestBuildMainContainers_SecurityContextDefaults(t *testing.T) {
+	run := &agentv1alpha1.AgentRun{
+		Spec: agentv1alpha1.AgentRunSpec{
+			Workspace: &agentv1alpha1.WorkspaceSpec{
+				Repository: agentv1alpha1.RepositorySpec{URL: "https://example.com/repo.git"},
+			},
+		},
+	}
+
+	containers := BuildMainContainers(run, nil, "image", agentv1alpha1.AgentTypeClaude, nil, nil)
+	sc := containers[0].SecurityContext
+
+	if sc == nil {
+		t.Fatal("SecurityContext should not be nil")
+	}
+	if *sc.AllowPrivilegeEscalation != false {
+		t.Error("AllowPrivilegeEscalation should be false")
+	}
+	if *sc.RunAsNonRoot != true {
+		t.Error("RunAsNonRoot should be true")
+	}
+	if *sc.ReadOnlyRootFilesystem != true {
+		t.Error("ReadOnlyRootFilesystem should be true")
+	}
+	if sc.Capabilities == nil || len(sc.Capabilities.Drop) != 1 || sc.Capabilities.Drop[0] != "ALL" {
+		t.Error("Capabilities.Drop should be [ALL]")
+	}
+}
+
+func TestBuildMainContainers_SecurityContextOverride(t *testing.T) {
+	allowPrivEsc := true
+	override := &corev1.SecurityContext{
+		AllowPrivilegeEscalation: &allowPrivEsc,
+	}
+
+	run := &agentv1alpha1.AgentRun{
+		Spec: agentv1alpha1.AgentRunSpec{
+			Workspace: &agentv1alpha1.WorkspaceSpec{
+				Repository: agentv1alpha1.RepositorySpec{URL: "https://example.com/repo.git"},
+			},
+		},
+	}
+
+	containers := BuildMainContainers(run, nil, "image", agentv1alpha1.AgentTypeClaude, nil, override)
+	sc := containers[0].SecurityContext
+
+	if *sc.AllowPrivilegeEscalation != true {
+		t.Error("AllowPrivilegeEscalation override should be true")
+	}
+	if *sc.RunAsNonRoot != true {
+		t.Error("RunAsNonRoot default should be preserved")
+	}
+}
+
+func TestBuildMainContainers_TmpVolumeMount(t *testing.T) {
+	run := &agentv1alpha1.AgentRun{
+		Spec: agentv1alpha1.AgentRunSpec{
+			Workspace: &agentv1alpha1.WorkspaceSpec{
+				Repository: agentv1alpha1.RepositorySpec{URL: "https://example.com/repo.git"},
+			},
+		},
+	}
+
+	containers := BuildMainContainers(run, nil, "image", agentv1alpha1.AgentTypeClaude, nil, nil)
+	foundTmp := false
+	for _, vm := range containers[0].VolumeMounts {
+		if vm.Name == "tmp" && vm.MountPath == "/tmp" {
+			foundTmp = true
+		}
+	}
+	if !foundTmp {
+		t.Error("expected /tmp volume mount for ReadOnlyRootFilesystem")
+	}
+}
+
+func TestBuildInitContainers_SecurityContextDefaults(t *testing.T) {
+	run := &agentv1alpha1.AgentRun{
+		Spec: agentv1alpha1.AgentRunSpec{
+			Workspace: &agentv1alpha1.WorkspaceSpec{
+				Repository: agentv1alpha1.RepositorySpec{URL: "https://example.com/repo.git"},
+			},
+		},
+	}
+
+	containers := BuildInitContainers(run, "image", agentv1alpha1.WorkspaceTypeGit, nil, nil)
+	sc := containers[0].SecurityContext
+
+	if sc == nil {
+		t.Fatal("init container SecurityContext should not be nil")
+	}
+	if *sc.AllowPrivilegeEscalation != false {
+		t.Error("AllowPrivilegeEscalation should be false")
+	}
+	if *sc.RunAsNonRoot != true {
+		t.Error("RunAsNonRoot should be true")
+	}
+}
+
+func TestBuildInitContainers_NixSecurityContext(t *testing.T) {
+	run := &agentv1alpha1.AgentRun{
+		Spec: agentv1alpha1.AgentRunSpec{
+			Workspace: &agentv1alpha1.WorkspaceSpec{
+				Repository: agentv1alpha1.RepositorySpec{URL: "https://example.com/repo.git"},
+			},
+		},
+	}
+
+	tc := &agentv1alpha1.ToolchainSpec{
+		Type: agentv1alpha1.ToolchainTypeNix,
+		Nix:  &agentv1alpha1.NixSpec{Packages: []string{"nodejs_22"}},
+	}
+
+	containers := BuildInitContainers(run, "image", agentv1alpha1.WorkspaceTypeGit, tc, nil)
+
+	if len(containers) != 2 {
+		t.Fatalf("len(containers) = %d, want 2", len(containers))
+	}
+
+	nixSC := containers[1].SecurityContext
+	if nixSC == nil {
+		t.Fatal("nix init container SecurityContext should not be nil")
+	}
+	if *nixSC.AllowPrivilegeEscalation != false {
+		t.Error("nix init container AllowPrivilegeEscalation should be false")
 	}
 }

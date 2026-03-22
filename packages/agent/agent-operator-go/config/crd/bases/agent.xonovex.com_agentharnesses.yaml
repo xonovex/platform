@@ -77,6 +77,14 @@ spec:
                 defaultRuntimeClassName:
                   type: string
                   description: Default pod runtimeClassName for agent runs
+                defaultSecurityContext:
+                  description: Default container security context for all runs.
+                  type: object
+                  x-kubernetes-preserve-unknown-fields: true
+                defaultPodSecurityContext:
+                  description: Default pod-level security context for all runs.
+                  type: object
+                  x-kubernetes-preserve-unknown-fields: true
                 env:
                   type: array
                   description: Additional environment variables

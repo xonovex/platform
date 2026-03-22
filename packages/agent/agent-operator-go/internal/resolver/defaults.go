@@ -33,6 +33,12 @@ func ApplyHarnessDefaults(run *agentv1alpha1.AgentRun, harness *agentv1alpha1.Ag
 		if run.Spec.RuntimeClassName == nil && harness.Spec.DefaultRuntimeClassName != nil {
 			run.Spec.RuntimeClassName = harness.Spec.DefaultRuntimeClassName
 		}
+		if run.Spec.SecurityContext == nil && harness.Spec.DefaultSecurityContext != nil {
+			run.Spec.SecurityContext = harness.Spec.DefaultSecurityContext
+		}
+		if run.Spec.PodSecurityContext == nil && harness.Spec.DefaultPodSecurityContext != nil {
+			run.Spec.PodSecurityContext = harness.Spec.DefaultPodSecurityContext
+		}
 	}
 
 	if run.Spec.Image != "" {
