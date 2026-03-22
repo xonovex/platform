@@ -19,9 +19,8 @@ import (
 func TestE2E_JobGCOnAgentRunDelete(t *testing.T) {
 	ns := createNamespace(t, "e2e-job-gc")
 
-	run := testutil.NewAgentRun(ns, "test-run",
-		testutil.WithImage("busybox:1.37"),
-	)
+	opts := append([]testutil.AgentRunOption{testutil.WithImage("busybox:1.37")}, testutil.E2ESecurityOverrides()...)
+	run := testutil.NewAgentRun(ns, "test-run", opts...)
 
 	if err := k8sClient.Create(ctx, run); err != nil {
 		t.Fatalf("failed to create AgentRun: %v", err)
@@ -54,9 +53,8 @@ func TestE2E_JobGCOnAgentRunDelete(t *testing.T) {
 func TestE2E_PVCGCOnAgentRunDelete(t *testing.T) {
 	ns := createNamespace(t, "e2e-pvc-gc")
 
-	run := testutil.NewAgentRun(ns, "test-run",
-		testutil.WithImage("busybox:1.37"),
-	)
+	opts := append([]testutil.AgentRunOption{testutil.WithImage("busybox:1.37")}, testutil.E2ESecurityOverrides()...)
+	run := testutil.NewAgentRun(ns, "test-run", opts...)
 
 	if err := k8sClient.Create(ctx, run); err != nil {
 		t.Fatalf("failed to create AgentRun: %v", err)

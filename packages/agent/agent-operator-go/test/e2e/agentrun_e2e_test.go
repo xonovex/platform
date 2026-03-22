@@ -3,6 +3,7 @@
 package e2e
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
@@ -37,9 +38,8 @@ func TestE2E_JobActuallyScheduled(t *testing.T) {
 
 	// Use busybox as the image — the init container (git clone) will fail
 	// because busybox lacks git, but the Job/Pod will be scheduled.
-	run := testutil.NewAgentRun(ns, "test-run",
-		testutil.WithImage("busybox:1.37"),
-	)
+	opts := append([]testutil.AgentRunOption{testutil.WithImage("busybox:1.37")}, testutil.E2ESecurityOverrides()...)
+	run := testutil.NewAgentRun(ns, "test-run", opts...)
 
 	if err := k8sClient.Create(ctx, run); err != nil {
 		t.Fatalf("failed to create AgentRun: %v", err)
@@ -74,9 +74,8 @@ func TestE2E_JobActuallyScheduled(t *testing.T) {
 func TestE2E_PVCBinds(t *testing.T) {
 	ns := createNamespace(t, "e2e-pvc-bind")
 
-	run := testutil.NewAgentRun(ns, "test-run",
-		testutil.WithImage("busybox:1.37"),
-	)
+	opts := append([]testutil.AgentRunOption{testutil.WithImage("busybox:1.37")}, testutil.E2ESecurityOverrides()...)
+	run := testutil.NewAgentRun(ns, "test-run", opts...)
 
 	if err := k8sClient.Create(ctx, run); err != nil {
 		t.Fatalf("failed to create AgentRun: %v", err)
@@ -109,18 +108,20 @@ func TestE2E_InitContainerFailurePath(t *testing.T) {
 	ns := createNamespace(t, "e2e-init-fail")
 
 	// busybox lacks git, so the init container's git clone will fail
-	run := testutil.NewAgentRun(ns, "test-run",
-		testutil.WithImage("busybox:1.37"),
-	)
+	opts := append([]testutil.AgentRunOption{testutil.WithImage("busybox:1.37")}, testutil.E2ESecurityOverrides()...)
+	run := testutil.NewAgentRun(ns, "test-run", opts...)
 
 	if err := k8sClient.Create(ctx, run); err != nil {
 		t.Fatalf("failed to create AgentRun: %v", err)
 	}
 
-	// Wait for Job to fail (the init container failure causes Job failure)
-	testutil.WaitForCondition(t, ctx, 180*time.Second, func() bool {
+	// Wait for Job to fail (the init container failure causes Job failure).
+	// Increased timeout to account for image pull + PVC provisioning + scheduling.
+	jobKey := types.NamespacedName{Name: "test-run", Namespace: ns}
+	start := time.Now()
+	lastLog := start
+	testutil.WaitForCondition(t, ctx, 300*time.Second, func() bool {
 		var job batchv1.Job
-		jobKey := types.NamespacedName{Name: "test-run", Namespace: ns}
 		if err := k8sClient.Get(ctx, jobKey, &job); err != nil {
 			return false
 		}
@@ -128,6 +129,29 @@ func TestE2E_InitContainerFailurePath(t *testing.T) {
 			if cond.Type == batchv1.JobFailed && cond.Status == corev1.ConditionTrue {
 				return true
 			}
+		}
+		if time.Since(lastLog) >= 30*time.Second {
+			msg := fmt.Sprintf("Job active=%d succeeded=%d failed=%d", job.Status.Active, job.Status.Succeeded, job.Status.Failed)
+			var podList corev1.PodList
+			if err := k8sClient.List(ctx, &podList, client.InNamespace(ns), client.MatchingLabels{
+				"app.kubernetes.io/instance": "test-run",
+			}); err == nil && len(podList.Items) > 0 {
+				pod := podList.Items[0]
+				msg += fmt.Sprintf(", pod=%s", pod.Status.Phase)
+				for _, cs := range pod.Status.InitContainerStatuses {
+					if cs.State.Waiting != nil {
+						msg += fmt.Sprintf(", init=%s(%s)", cs.Name, cs.State.Waiting.Reason)
+					} else if cs.State.Terminated != nil {
+						msg += fmt.Sprintf(", init=%s(exit=%d)", cs.Name, cs.State.Terminated.ExitCode)
+					} else if cs.State.Running != nil {
+						msg += fmt.Sprintf(", init=%s(running)", cs.Name)
+					}
+				}
+			} else {
+				msg += ", no pods found"
+			}
+			t.Log(msg)
+			lastLog = time.Now()
 		}
 		return false
 	})
