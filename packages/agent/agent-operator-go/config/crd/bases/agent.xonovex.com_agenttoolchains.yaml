@@ -57,6 +57,9 @@ spec:
                     image:
                       type: string
                       description: Nix container image for the init container (default nixos/nix:latest)
+                    storeSizeLimit:
+                      type: string
+                      description: Size limit for the Nix store EmptyDir volume (default 10Gi)
             status:
               type: object
               description: AgentToolchainStatus defines the observed state of AgentToolchain

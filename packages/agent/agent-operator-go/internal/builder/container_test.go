@@ -576,3 +576,49 @@ func TestBuildInitContainers_NixSecurityContext(t *testing.T) {
 		t.Error("nix init container AllowPrivilegeEscalation should be false")
 	}
 }
+
+func TestNixToolchain_Volumes_DefaultSizeLimit(t *testing.T) {
+	nix := &agentv1alpha1.NixSpec{
+		Packages: []string{"nodejs_22"},
+	}
+
+	tc := NewNixToolchain(nix)
+	volumes := tc.Volumes()
+
+	if len(volumes) != 1 {
+		t.Fatalf("len(volumes) = %d, want 1", len(volumes))
+	}
+	vol := volumes[0]
+	if vol.EmptyDir == nil {
+		t.Fatal("expected EmptyDir volume source")
+	}
+	if vol.EmptyDir.SizeLimit == nil {
+		t.Fatal("expected SizeLimit to be set")
+	}
+	expected := "10Gi"
+	if vol.EmptyDir.SizeLimit.String() != expected {
+		t.Errorf("SizeLimit = %q, want %q", vol.EmptyDir.SizeLimit.String(), expected)
+	}
+}
+
+func TestNixToolchain_Volumes_CustomSizeLimit(t *testing.T) {
+	nix := &agentv1alpha1.NixSpec{
+		Packages:       []string{"nodejs_22"},
+		StoreSizeLimit: "20Gi",
+	}
+
+	tc := NewNixToolchain(nix)
+	volumes := tc.Volumes()
+
+	if len(volumes) != 1 {
+		t.Fatalf("len(volumes) = %d, want 1", len(volumes))
+	}
+	vol := volumes[0]
+	if vol.EmptyDir == nil || vol.EmptyDir.SizeLimit == nil {
+		t.Fatal("expected EmptyDir with SizeLimit")
+	}
+	expected := "20Gi"
+	if vol.EmptyDir.SizeLimit.String() != expected {
+		t.Errorf("SizeLimit = %q, want %q", vol.EmptyDir.SizeLimit.String(), expected)
+	}
+}

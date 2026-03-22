@@ -14,7 +14,7 @@ type VCSStrategy interface {
 }
 
 var vcsStrategies = map[agentv1alpha1.WorkspaceType]VCSStrategy{
-	"":                                &GitStrategy{},
+	"":                                 &GitStrategy{},
 	agentv1alpha1.WorkspaceTypeGit:     &GitStrategy{},
 	agentv1alpha1.WorkspaceTypeJujutsu: &JujutsuStrategy{},
 }

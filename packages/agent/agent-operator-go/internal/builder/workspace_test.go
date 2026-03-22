@@ -175,7 +175,7 @@ func TestBuildWorkspaceInitJob_Basic(t *testing.T) {
 		},
 	}
 
-	job := BuildWorkspaceInitJob(ws, "my-workspace-ws", "alpine/git:latest")
+	job := BuildWorkspaceInitJob(ws, "my-workspace-ws", "alpine/git:latest", nil)
 
 	if job.Name != "my-workspace-init" {
 		t.Errorf("expected job name my-workspace-init, got %s", job.Name)
@@ -331,7 +331,7 @@ func TestBuildWorkspaceJob_Basic(t *testing.T) {
 		},
 	}
 
-	job := BuildWorkspaceJob(run, nil, "my-workspace-ws", nil, nil, "node:trixie-slim", time.Hour, agentv1alpha1.AgentTypeClaude, agentv1alpha1.WorkspaceTypeGit, "agent-1-work", "", nil)
+	job := BuildWorkspaceJob(run, nil, "my-workspace-ws", nil, nil, "node:trixie-slim", time.Hour, agentv1alpha1.AgentTypeClaude, agentv1alpha1.WorkspaceTypeGit, "agent-1-work", "", nil, nil)
 
 	if job.Name != "agent-1" {
 		t.Errorf("expected job name agent-1, got %s", job.Name)
@@ -380,7 +380,7 @@ func TestBuildWorkspaceJob_WithSharedVolumes(t *testing.T) {
 		"claude-config": "my-workspace-claude-config",
 	}
 
-	job := BuildWorkspaceJob(run, nil, "my-workspace-ws", sharedVolumes, sharedVolumePVCs, "node:trixie-slim", time.Hour, agentv1alpha1.AgentTypeClaude, agentv1alpha1.WorkspaceTypeGit, "agent-1-work", "", nil)
+	job := BuildWorkspaceJob(run, nil, "my-workspace-ws", sharedVolumes, sharedVolumePVCs, "node:trixie-slim", time.Hour, agentv1alpha1.AgentTypeClaude, agentv1alpha1.WorkspaceTypeGit, "agent-1-work", "", nil, nil)
 
 	// workspace + tmp + shared volume = 3 volumes
 	if len(job.Spec.Template.Spec.Volumes) != 3 {
@@ -408,7 +408,7 @@ func TestBuildWorkspaceJob_WithRuntimeClassName(t *testing.T) {
 		},
 	}
 
-	job := BuildWorkspaceJob(run, nil, "my-workspace-ws", nil, nil, "node:trixie-slim", time.Hour, agentv1alpha1.AgentTypeClaude, agentv1alpha1.WorkspaceTypeGit, "agent-1-work", "", nil)
+	job := BuildWorkspaceJob(run, nil, "my-workspace-ws", nil, nil, "node:trixie-slim", time.Hour, agentv1alpha1.AgentTypeClaude, agentv1alpha1.WorkspaceTypeGit, "agent-1-work", "", nil, nil)
 
 	if job.Spec.Template.Spec.RuntimeClassName == nil {
 		t.Fatal("expected RuntimeClassName to be set")
@@ -433,7 +433,7 @@ func TestBuildWorkspaceInitJob_WithJujutsu(t *testing.T) {
 		},
 	}
 
-	job := BuildWorkspaceInitJob(ws, "jj-workspace-ws", "alpine/git:latest")
+	job := BuildWorkspaceInitJob(ws, "jj-workspace-ws", "alpine/git:latest", nil)
 
 	script := job.Spec.Template.Spec.Containers[0].Args[1]
 	if !containsStr(script, "git clone") {
@@ -481,10 +481,51 @@ func TestBuildWorkspaceInitJob_NoRuntimeClassName(t *testing.T) {
 		},
 	}
 
-	job := BuildWorkspaceInitJob(ws, "my-workspace-ws", "alpine/git:latest")
+	job := BuildWorkspaceInitJob(ws, "my-workspace-ws", "alpine/git:latest", nil)
 
 	if job.Spec.Template.Spec.RuntimeClassName != nil {
 		t.Errorf("expected init job RuntimeClassName to be nil, got %q", *job.Spec.Template.Spec.RuntimeClassName)
+	}
+}
+
+func TestBuildWorkspaceInitJob_WithRuntimeClassName(t *testing.T) {
+	runtimeClass := "kata"
+	ws := &agentv1alpha1.AgentWorkspace{
+		ObjectMeta: metav1.ObjectMeta{Name: "my-workspace", Namespace: "default"},
+		Spec: agentv1alpha1.AgentWorkspaceSpec{
+			Repository: agentv1alpha1.RepositorySpec{
+				URL:    "https://github.com/org/repo.git",
+				Branch: "main",
+			},
+			RuntimeClassName: &runtimeClass,
+		},
+	}
+
+	job := BuildWorkspaceInitJob(ws, "my-workspace-ws", "alpine/git:latest", ws.Spec.RuntimeClassName)
+
+	if job.Spec.Template.Spec.RuntimeClassName == nil {
+		t.Fatal("expected RuntimeClassName to be set")
+	}
+	if *job.Spec.Template.Spec.RuntimeClassName != "kata" {
+		t.Errorf("RuntimeClassName = %q, want %q", *job.Spec.Template.Spec.RuntimeClassName, "kata")
+	}
+}
+
+func TestBuildWorkspaceJob_DefaultTTL(t *testing.T) {
+	run := &agentv1alpha1.AgentRun{
+		ObjectMeta: metav1.ObjectMeta{Name: "agent-1", Namespace: "default"},
+		Spec: agentv1alpha1.AgentRunSpec{
+			WorkspaceRef: "my-workspace",
+		},
+	}
+
+	job := BuildWorkspaceJob(run, nil, "my-workspace-ws", nil, nil, "node:trixie-slim", time.Hour, agentv1alpha1.AgentTypeClaude, agentv1alpha1.WorkspaceTypeGit, "agent-1-work", "", nil, nil)
+
+	if job.Spec.TTLSecondsAfterFinished == nil {
+		t.Fatal("TTLSecondsAfterFinished should not be nil")
+	}
+	if *job.Spec.TTLSecondsAfterFinished != 3600 {
+		t.Errorf("TTLSecondsAfterFinished = %d, want 3600", *job.Spec.TTLSecondsAfterFinished)
 	}
 }
 

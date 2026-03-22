@@ -131,8 +131,21 @@ func (w *AgentRunWebhook) validate(ctx context.Context, run *agentv1alpha1.Agent
 		}
 	}
 
-	// Validate NetworkPolicy egress rules
+	// Validate confidentialComputing TEE type
 	var warnings admission.Warnings
+	if run.Spec.ConfidentialComputing != nil {
+		switch run.Spec.ConfidentialComputing.TEE {
+		case agentv1alpha1.TEETypeAMDSEVSNP, agentv1alpha1.TEETypeIntelTDX:
+			// valid
+		default:
+			return nil, fmt.Errorf("unknown TEE type %q", run.Spec.ConfidentialComputing.TEE)
+		}
+		if run.Spec.RuntimeClassName != nil {
+			warnings = append(warnings, "confidentialComputing.tee takes precedence over runtimeClassName")
+		}
+	}
+
+	// Validate NetworkPolicy egress rules
 	if run.Spec.NetworkPolicy != nil && !run.Spec.NetworkPolicy.Disabled {
 		for _, rule := range run.Spec.NetworkPolicy.Egress {
 			if len(rule.To) == 0 {

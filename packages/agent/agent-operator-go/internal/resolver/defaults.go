@@ -13,9 +13,11 @@ const (
 
 // ResolvedDefaults holds the resolved configuration values
 type ResolvedDefaults struct {
-	Image         string
-	Timeout       time.Duration
-	NetworkPolicy *agentv1alpha1.AgentNetworkPolicy
+	Image                 string
+	Timeout               time.Duration
+	NetworkPolicy         *agentv1alpha1.AgentNetworkPolicy
+	TTL                   *int32
+	ConfidentialComputing *agentv1alpha1.ConfidentialComputingSpec
 }
 
 // ApplyHarnessDefaults resolves image, timeout, runtimeClassName from the harness,
@@ -54,9 +56,25 @@ func ApplyHarnessDefaults(run *agentv1alpha1.AgentRun, harness *agentv1alpha1.Ag
 		netpol = harness.Spec.DefaultNetworkPolicy
 	}
 
+	ttl := run.Spec.TTLSecondsAfterFinished
+	if ttl == nil && harness != nil {
+		ttl = harness.Spec.DefaultTTLSecondsAfterFinished
+	}
+
+	cc := run.Spec.ConfidentialComputing
+	if cc == nil && harness != nil {
+		cc = harness.Spec.DefaultConfidentialComputing
+	}
+	// Propagate resolved CC back to run spec so builders can access it
+	if cc != nil && run.Spec.ConfidentialComputing == nil {
+		run.Spec.ConfidentialComputing = cc
+	}
+
 	return ResolvedDefaults{
-		Image:         image,
-		Timeout:       timeout,
-		NetworkPolicy: netpol,
+		Image:                 image,
+		Timeout:               timeout,
+		NetworkPolicy:         netpol,
+		TTL:                   ttl,
+		ConfidentialComputing: cc,
 	}
 }
