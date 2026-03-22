@@ -8,7 +8,7 @@
 
 AI coding agents handle prompts, tools, and code changes. What they don't manage is the environment around them: sandbox isolation, model provider routing, terminal sessions, reproducible toolchains, and orchestration at scale.
 
-Xonovex fills this gap. It currently supports [Claude Code](https://docs.anthropic.com/en/docs/claude-code) and [OpenCode](https://github.com/anomalyco/opencode) as agents, with sandboxing via bubblewrap, Docker, and Nix, VM-level isolation via gVisor and Kata Containers, confidential computing via [Confidential Containers (CoCo)](https://github.com/confidential-containers) with AMD SEV-SNP and Intel TDX, model routing through providers like Gemini, GLM, and GPT, workspace management with Git and [Jujutsu](https://github.com/jj-vcs/jj), reproducible toolchains via Nix, and Kubernetes orchestration for running agents at scale.
+Xonovex fills this gap. It currently supports [Claude Code](https://docs.anthropic.com/en/docs/claude-code) and [OpenCode](https://github.com/anomalyco/opencode) as agents, with sandboxing via bubblewrap and Docker, VM-level isolation via gVisor and Kata Containers, confidential computing via [Confidential Containers (CoCo)](https://github.com/confidential-containers) with AMD SEV-SNP and Intel TDX, model routing through providers like Gemini, GLM, and GPT, workspace management with Git and [Jujutsu](https://github.com/jj-vcs/jj), reproducible toolchains via Nix, and Kubernetes orchestration for running agents at scale.
 
 The included commands and skills are token-efficient, unopinionated, and based on current research and best practices.
 
