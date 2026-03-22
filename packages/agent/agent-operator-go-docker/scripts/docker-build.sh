@@ -10,7 +10,6 @@ docker buildx inspect xonovex-builder >/dev/null 2>&1 || \
 docker buildx build \
   --builder xonovex-builder \
   --platform linux/amd64,linux/arm64 \
-  --build-arg BUILDKIT_INLINE_CACHE=1 \
   -f "$DOCKERFILE" \
   -t "$IMAGE:latest" \
   "$WORKSPACE_ROOT"

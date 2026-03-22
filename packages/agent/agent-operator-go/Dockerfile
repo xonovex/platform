@@ -10,7 +10,8 @@ COPY packages/shared/shared-agent-go/go.mod packages/shared/shared-agent-go/go.s
 # Copy operator module and download dependencies
 COPY packages/agent/agent-operator-go/go.mod packages/agent/agent-operator-go/go.sum packages/agent/agent-operator-go/
 WORKDIR /src/packages/agent/agent-operator-go
-RUN go mod download
+RUN --mount=type=cache,target=/go/pkg/mod \
+    go mod download
 
 # Copy source
 WORKDIR /src
@@ -20,7 +21,9 @@ COPY packages/agent/agent-operator-go/ packages/agent/agent-operator-go/
 
 # Build static binary
 WORKDIR /src/packages/agent/agent-operator-go
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=$TARGETARCH go build -ldflags="-s -w" -o /operator ./cmd/operator/
+RUN --mount=type=cache,target=/go/pkg/mod \
+    --mount=type=cache,target=/root/.cache/go-build \
+    CGO_ENABLED=0 GOOS=linux GOARCH=$TARGETARCH go build -ldflags="-s -w" -o /operator ./cmd/operator/
 
 # Runtime stage
 FROM gcr.io/distroless/static:nonroot AS runtime
