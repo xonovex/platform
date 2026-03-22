@@ -106,18 +106,6 @@ spec:
                       type: integer
                       format: int32
                       minimum: 0
-                    defaultConfidentialComputing:
-                      description: Default TEE-based isolation for all runs.
-                      type: object
-                      required: [tee]
-                      properties:
-                        tee:
-                          type: string
-                          enum: [amd-sev-snp, intel-tdx]
-                        overrideRuntimeClassName:
-                          type: string
-                        disableNodeAffinity:
-                          type: boolean
                     env:
                       type: array
                       description: Additional environment variables
@@ -424,18 +412,6 @@ spec:
                   type: integer
                   format: int32
                   minimum: 0
-                confidentialComputing:
-                  description: Configures TEE-based isolation for agent pods on AKS.
-                  type: object
-                  required: [tee]
-                  properties:
-                    tee:
-                      type: string
-                      enum: [amd-sev-snp, intel-tdx]
-                    overrideRuntimeClassName:
-                      type: string
-                    disableNodeAffinity:
-                      type: boolean
             status:
               type: object
               description: AgentRunStatus defines the observed state of AgentRun
