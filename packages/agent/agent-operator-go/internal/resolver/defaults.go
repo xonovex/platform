@@ -13,8 +13,9 @@ const (
 
 // ResolvedDefaults holds the resolved configuration values
 type ResolvedDefaults struct {
-	Image   string
-	Timeout time.Duration
+	Image         string
+	Timeout       time.Duration
+	NetworkPolicy *agentv1alpha1.AgentNetworkPolicy
 }
 
 // ApplyHarnessDefaults resolves image, timeout, runtimeClassName from the harness,
@@ -48,8 +49,14 @@ func ApplyHarnessDefaults(run *agentv1alpha1.AgentRun, harness *agentv1alpha1.Ag
 		timeout = run.Spec.Timeout.Duration
 	}
 
+	netpol := run.Spec.NetworkPolicy
+	if netpol == nil && harness != nil {
+		netpol = harness.Spec.DefaultNetworkPolicy
+	}
+
 	return ResolvedDefaults{
-		Image:   image,
-		Timeout: timeout,
+		Image:         image,
+		Timeout:       timeout,
+		NetworkPolicy: netpol,
 	}
 }

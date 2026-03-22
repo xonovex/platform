@@ -11,6 +11,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/client-go/tools/record"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
@@ -22,7 +23,8 @@ import (
 // AgentWorkspaceReconciler reconciles an AgentWorkspace object
 type AgentWorkspaceReconciler struct {
 	client.Client
-	Scheme *runtime.Scheme
+	Scheme   *runtime.Scheme
+	Recorder record.EventRecorder
 }
 
 // +kubebuilder:rbac:groups=agent.xonovex.com,resources=agentworkspaces,verbs=get;list;watch;create;update;patch;delete
@@ -32,7 +34,10 @@ type AgentWorkspaceReconciler struct {
 // +kubebuilder:rbac:groups="",resources=persistentvolumeclaims,verbs=get;list;watch;create;delete
 
 func (r *AgentWorkspaceReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	log := log.FromContext(ctx)
+	log := log.FromContext(ctx).WithValues(
+		"workspace", req.Name,
+		"namespace", req.Namespace,
+	)
 
 	var ws agentv1alpha1.AgentWorkspace
 	if err := r.Get(ctx, req.NamespacedName, &ws); err != nil {
@@ -102,6 +107,9 @@ func (r *AgentWorkspaceReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 			return ctrl.Result{}, err
 		}
 
+		r.Recorder.Eventf(&ws, corev1.EventTypeNormal, "WorkspaceInitStarted",
+			"Created init Job %s to clone %s", initJobName, ws.Spec.Repository.URL)
+
 		ws.Status.InitJobName = initJobName
 		if _, err := r.updateWorkspacePhase(ctx, &ws, agentv1alpha1.AgentWorkspacePhaseInitializing, ""); err != nil {
 			return ctrl.Result{}, err
@@ -123,9 +131,13 @@ func (r *AgentWorkspaceReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 func (r *AgentWorkspaceReconciler) reconcileInitJobStatus(ctx context.Context, ws *agentv1alpha1.AgentWorkspace, job *batchv1.Job) (ctrl.Result, error) {
 	for _, condition := range job.Status.Conditions {
 		if condition.Type == batchv1.JobComplete && condition.Status == corev1.ConditionTrue {
+			r.Recorder.Event(ws, corev1.EventTypeNormal, "WorkspaceReady",
+				"Repository cloned successfully, workspace is ready")
 			return r.updateWorkspacePhase(ctx, ws, agentv1alpha1.AgentWorkspacePhaseReady, "")
 		}
 		if condition.Type == batchv1.JobFailed && condition.Status == corev1.ConditionTrue {
+			r.Recorder.Eventf(ws, corev1.EventTypeWarning, "WorkspaceFailed",
+				"Init Job failed: %s", condition.Message)
 			return r.updateWorkspacePhase(ctx, ws, agentv1alpha1.AgentWorkspacePhaseFailed, condition.Message)
 		}
 	}

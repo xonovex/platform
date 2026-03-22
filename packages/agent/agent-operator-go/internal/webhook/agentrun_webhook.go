@@ -3,10 +3,12 @@ package webhook
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
 	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 
@@ -18,13 +20,16 @@ import (
 )
 
 // AgentRunWebhook implements defaulting and validation for AgentRun
-type AgentRunWebhook struct{}
+type AgentRunWebhook struct {
+	Client client.Client
+}
 
 var _ webhook.CustomDefaulter = &AgentRunWebhook{}
 var _ webhook.CustomValidator = &AgentRunWebhook{}
 
 // SetupWebhookWithManager sets up the webhook with the Manager
 func (w *AgentRunWebhook) SetupWebhookWithManager(mgr ctrl.Manager) error {
+	w.Client = mgr.GetClient()
 	return ctrl.NewWebhookManagedBy(mgr).
 		For(&agentv1alpha1.AgentRun{}).
 		WithDefaulter(w).
@@ -48,23 +53,23 @@ func (w *AgentRunWebhook) Default(_ context.Context, obj runtime.Object) error {
 }
 
 // ValidateCreate implements webhook.CustomValidator
-func (w *AgentRunWebhook) ValidateCreate(_ context.Context, obj runtime.Object) (admission.Warnings, error) {
+func (w *AgentRunWebhook) ValidateCreate(ctx context.Context, obj runtime.Object) (admission.Warnings, error) {
 	run, ok := obj.(*agentv1alpha1.AgentRun)
 	if !ok {
 		return nil, fmt.Errorf("expected AgentRun, got %T", obj)
 	}
 
-	return w.validate(run)
+	return w.validate(ctx, run)
 }
 
 // ValidateUpdate implements webhook.CustomValidator
-func (w *AgentRunWebhook) ValidateUpdate(_ context.Context, _ runtime.Object, newObj runtime.Object) (admission.Warnings, error) {
+func (w *AgentRunWebhook) ValidateUpdate(ctx context.Context, _ runtime.Object, newObj runtime.Object) (admission.Warnings, error) {
 	run, ok := newObj.(*agentv1alpha1.AgentRun)
 	if !ok {
 		return nil, fmt.Errorf("expected AgentRun, got %T", newObj)
 	}
 
-	return w.validate(run)
+	return w.validate(ctx, run)
 }
 
 // ValidateDelete implements webhook.CustomValidator
@@ -72,7 +77,7 @@ func (w *AgentRunWebhook) ValidateDelete(_ context.Context, _ runtime.Object) (a
 	return nil, nil
 }
 
-func (w *AgentRunWebhook) validate(run *agentv1alpha1.AgentRun) (admission.Warnings, error) {
+func (w *AgentRunWebhook) validate(ctx context.Context, run *agentv1alpha1.AgentRun) (admission.Warnings, error) {
 	// Mutual exclusivity
 	if run.Spec.HarnessRef != "" && run.Spec.Harness != nil {
 		return nil, fmt.Errorf("cannot specify both harnessRef and inline harness")
@@ -126,5 +131,96 @@ func (w *AgentRunWebhook) validate(run *agentv1alpha1.AgentRun) (admission.Warni
 		}
 	}
 
-	return nil, nil
+	// Validate NetworkPolicy egress rules
+	var warnings admission.Warnings
+	if run.Spec.NetworkPolicy != nil && !run.Spec.NetworkPolicy.Disabled {
+		for _, rule := range run.Spec.NetworkPolicy.Egress {
+			if len(rule.To) == 0 {
+				warnings = append(warnings, "NetworkPolicy egress rule with empty 'to' allows all destinations")
+			}
+		}
+	}
+
+	// Look up AgentPolicy in the namespace
+	if w.Client != nil {
+		var policyList agentv1alpha1.AgentPolicyList
+		if err := w.Client.List(ctx, &policyList, client.InNamespace(run.Namespace)); err != nil {
+			warnings = append(warnings, "AgentPolicy lookup failed: "+err.Error())
+			return warnings, nil
+		}
+		if len(policyList.Items) > 0 {
+			if err := enforcePolicy(run, &policyList.Items[0]); err != nil {
+				return nil, err
+			}
+		}
+	}
+
+	return warnings, nil
+}
+
+func enforcePolicy(run *agentv1alpha1.AgentRun, policy *agentv1alpha1.AgentPolicy) error {
+	e := policy.Spec.Enforced
+
+	// Enforce runtimeClassName
+	if e.RuntimeClassName != nil {
+		rc := run.Spec.RuntimeClassName
+		if rc == nil || *rc != *e.RuntimeClassName {
+			return fmt.Errorf("policy requires runtimeClassName %q", *e.RuntimeClassName)
+		}
+	}
+
+	// Enforce allowed runtime class names
+	if len(e.AllowedRuntimeClassNames) > 0 {
+		allowed := false
+		for _, name := range e.AllowedRuntimeClassNames {
+			if run.Spec.RuntimeClassName != nil && *run.Spec.RuntimeClassName == name {
+				allowed = true
+				break
+			}
+		}
+		if !allowed {
+			return fmt.Errorf("runtimeClassName must be one of %v", e.AllowedRuntimeClassNames)
+		}
+	}
+
+	// Enforce no privilege escalation weakening
+	if e.RequireSecurityContext && run.Spec.SecurityContext != nil {
+		sc := run.Spec.SecurityContext
+		if sc.AllowPrivilegeEscalation != nil && *sc.AllowPrivilegeEscalation {
+			return fmt.Errorf("policy prohibits AllowPrivilegeEscalation=true")
+		}
+		if sc.RunAsNonRoot != nil && !*sc.RunAsNonRoot {
+			return fmt.Errorf("policy requires RunAsNonRoot=true")
+		}
+	}
+
+	// Enforce network policy required
+	if e.RequireNetworkPolicy {
+		if run.Spec.NetworkPolicy != nil && run.Spec.NetworkPolicy.Disabled {
+			return fmt.Errorf("policy requires NetworkPolicy to be enabled")
+		}
+	}
+
+	// Enforce max timeout
+	if e.MaxTimeout != nil && run.Spec.Timeout != nil {
+		if run.Spec.Timeout.Duration > e.MaxTimeout.Duration {
+			return fmt.Errorf("timeout %v exceeds policy maximum %v", run.Spec.Timeout.Duration, e.MaxTimeout.Duration)
+		}
+	}
+
+	// Enforce allowed images
+	if len(e.AllowedImages) > 0 && run.Spec.Image != "" {
+		allowed := false
+		for _, prefix := range e.AllowedImages {
+			if strings.HasPrefix(run.Spec.Image, prefix) {
+				allowed = true
+				break
+			}
+		}
+		if !allowed {
+			return fmt.Errorf("image %q is not in the allowed images list", run.Spec.Image)
+		}
+	}
+
+	return nil
 }

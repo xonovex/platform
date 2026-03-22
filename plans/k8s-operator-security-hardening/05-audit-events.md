@@ -3,7 +3,7 @@ type: plan
 has_subplans: false
 parent_plan: plans/k8s-operator-security-hardening.md
 parallel_group: 3
-status: pending
+status: complete
 dependencies:
   plans:
     - plans/k8s-operator-security-hardening/03-network-policy.md

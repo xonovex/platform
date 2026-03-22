@@ -9,6 +9,7 @@ rules:
       - agentruns
       - agentproviders
       - agentconfigs
+      - agentpolicies
     verbs:
       - get
       - list
@@ -23,6 +24,7 @@ rules:
       - agentruns/status
       - agentproviders/status
       - agentconfigs/status
+      - agentpolicies/status
     verbs:
       - get
       - update
@@ -71,3 +73,22 @@ rules:
       - get
       - list
       - watch
+  - apiGroups:
+      - networking.k8s.io
+    resources:
+      - networkpolicies
+    verbs:
+      - get
+      - list
+      - watch
+      - create
+      - update
+      - patch
+      - delete
+  - apiGroups:
+      - ""
+    resources:
+      - events
+    verbs:
+      - create
+      - patch
