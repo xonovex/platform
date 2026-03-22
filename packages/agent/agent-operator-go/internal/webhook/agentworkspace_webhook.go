@@ -11,6 +11,7 @@ import (
 
 	agentv1alpha1 "github.com/xonovex/platform/packages/agent/agent-operator-go/api/v1alpha1"
 	"github.com/xonovex/platform/packages/agent/agent-operator-go/internal/builder"
+	"github.com/xonovex/platform/packages/agent/agent-operator-go/internal/validator"
 )
 
 // AgentWorkspaceWebhook implements defaulting and validation for AgentWorkspace
@@ -72,8 +73,14 @@ func (w *AgentWorkspaceWebhook) ValidateDelete(_ context.Context, _ runtime.Obje
 }
 
 func (w *AgentWorkspaceWebhook) validate(ws *agentv1alpha1.AgentWorkspace) (admission.Warnings, error) {
-	if ws.Spec.Repository.URL == "" {
-		return nil, fmt.Errorf("repository URL is required")
+	if err := validator.ValidateRepositoryURL(ws.Spec.Repository.URL); err != nil {
+		return nil, err
+	}
+	if err := validator.ValidateBranch(ws.Spec.Repository.Branch); err != nil {
+		return nil, err
+	}
+	if err := validator.ValidateCommit(ws.Spec.Repository.Commit); err != nil {
+		return nil, err
 	}
 	if ws.Spec.Type != "" {
 		if _, err := builder.GetVCSStrategy(ws.Spec.Type); err != nil {

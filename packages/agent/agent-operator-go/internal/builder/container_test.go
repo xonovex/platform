@@ -54,8 +54,8 @@ func TestBuildCloneScript_Basic(t *testing.T) {
 	if !strings.Contains(script, "git clone") {
 		t.Error("script missing 'git clone'")
 	}
-	if !strings.Contains(script, "https://github.com/example/repo.git") {
-		t.Error("script missing repo URL")
+	if !strings.Contains(script, "'https://github.com/example/repo.git'") {
+		t.Error("script missing quoted repo URL")
 	}
 	if !strings.Contains(script, "--single-branch --depth 1") {
 		t.Error("script missing shallow clone flags")
@@ -73,8 +73,31 @@ func TestBuildCloneScript_WithBranch(t *testing.T) {
 
 	script := buildCloneScript(repo, agentv1alpha1.WorkspaceTypeGit)
 
-	if !strings.Contains(script, "--branch develop") {
-		t.Error("script missing '--branch develop'")
+	if !strings.Contains(script, "--branch 'develop'") {
+		t.Errorf("script missing '--branch 'develop'', got:\n%s", script)
+	}
+}
+
+func TestBuildCloneScript_InjectionQuoted(t *testing.T) {
+	repo := agentv1alpha1.RepositorySpec{
+		URL:    "https://github.com/example/repo.git",
+		Branch: "main; rm -rf /",
+		Commit: "abc1234",
+	}
+
+	script := buildCloneScript(repo, agentv1alpha1.WorkspaceTypeGit)
+
+	// The branch should be single-quoted so the semicolon is not interpreted
+	if !strings.Contains(script, "'main; rm -rf /'") {
+		t.Errorf("branch not properly quoted in script:\n%s", script)
+	}
+	// URL should be quoted with -- separator
+	if !strings.Contains(script, "-- 'https://github.com/example/repo.git'") {
+		t.Errorf("URL not properly quoted in script:\n%s", script)
+	}
+	// Commit should be quoted
+	if !strings.Contains(script, "git fetch origin 'abc1234'") {
+		t.Errorf("commit not properly quoted in script:\n%s", script)
 	}
 }
 
@@ -86,11 +109,11 @@ func TestBuildCloneScript_WithCommit(t *testing.T) {
 
 	script := buildCloneScript(repo, agentv1alpha1.WorkspaceTypeGit)
 
-	if !strings.Contains(script, "git fetch origin abc123") {
-		t.Error("script missing 'git fetch origin abc123'")
+	if !strings.Contains(script, "git fetch origin 'abc123'") {
+		t.Errorf("script missing quoted commit in fetch, got:\n%s", script)
 	}
-	if !strings.Contains(script, "git checkout abc123") {
-		t.Error("script missing 'git checkout abc123'")
+	if !strings.Contains(script, "git checkout 'abc123'") {
+		t.Errorf("script missing quoted commit in checkout, got:\n%s", script)
 	}
 }
 

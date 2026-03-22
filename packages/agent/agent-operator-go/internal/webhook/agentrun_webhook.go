@@ -14,6 +14,7 @@ import (
 
 	agentv1alpha1 "github.com/xonovex/platform/packages/agent/agent-operator-go/api/v1alpha1"
 	"github.com/xonovex/platform/packages/agent/agent-operator-go/internal/builder"
+	"github.com/xonovex/platform/packages/agent/agent-operator-go/internal/validator"
 )
 
 // AgentRunWebhook implements defaulting and validation for AgentRun
@@ -101,6 +102,20 @@ func (w *AgentRunWebhook) validate(run *agentv1alpha1.AgentRun) (admission.Warni
 		validTypes := map[agentv1alpha1.ToolchainType]bool{agentv1alpha1.ToolchainTypeNix: true}
 		if !validTypes[run.Spec.Toolchain.Type] {
 			return nil, fmt.Errorf("invalid toolchain type: %s", run.Spec.Toolchain.Type)
+		}
+	}
+
+	// Validate inline workspace repository fields
+	if run.Spec.Workspace != nil {
+		repo := run.Spec.Workspace.Repository
+		if err := validator.ValidateRepositoryURL(repo.URL); err != nil {
+			return nil, err
+		}
+		if err := validator.ValidateBranch(repo.Branch); err != nil {
+			return nil, err
+		}
+		if err := validator.ValidateCommit(repo.Commit); err != nil {
+			return nil, err
 		}
 	}
 
