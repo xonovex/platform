@@ -2,8 +2,20 @@ package v1alpha1
 
 import (
 	corev1 "k8s.io/api/core/v1"
+	networkingv1 "k8s.io/api/networking/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
+
+// AgentNetworkPolicy configures the NetworkPolicy created for an AgentRun's pods.
+type AgentNetworkPolicy struct {
+	// Disabled skips NetworkPolicy creation entirely.
+	// Use only when a cluster-level policy already covers these pods.
+	Disabled bool `json:"disabled,omitempty"`
+
+	// Egress rules. If empty and Disabled is false, all egress is denied.
+	// Specify rules to allow specific destinations (e.g. the provider API endpoint).
+	Egress []networkingv1.NetworkPolicyEgressRule `json:"egress,omitempty"`
+}
 
 // AgentRunPhase represents the phase of an AgentRun
 type AgentRunPhase string
@@ -147,6 +159,8 @@ type AgentSpec struct {
 	DefaultPodSecurityContext *corev1.PodSecurityContext `json:"defaultPodSecurityContext,omitempty"`
 	// Env are additional environment variables
 	Env []corev1.EnvVar `json:"env,omitempty"`
+	// DefaultNetworkPolicy is the default network policy for all runs
+	DefaultNetworkPolicy *AgentNetworkPolicy `json:"defaultNetworkPolicy,omitempty"`
 }
 
 // AgentRunSpec defines the desired state of AgentRun
@@ -187,6 +201,9 @@ type AgentRunSpec struct {
 	SecurityContext *corev1.SecurityContext `json:"securityContext,omitempty"`
 	// PodSecurityContext overrides the default pod-level security context
 	PodSecurityContext *corev1.PodSecurityContext `json:"podSecurityContext,omitempty"`
+	// NetworkPolicy configures the NetworkPolicy applied to agent pods.
+	// Defaults to deny-all egress. Set Disabled:true to skip creation.
+	NetworkPolicy *AgentNetworkPolicy `json:"networkPolicy,omitempty"`
 }
 
 // AgentRunStatus defines the observed state of AgentRun

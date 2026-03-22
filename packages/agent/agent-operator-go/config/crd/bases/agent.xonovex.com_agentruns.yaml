@@ -90,6 +90,17 @@ spec:
                       description: Default pod-level security context for all runs.
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
+                    defaultNetworkPolicy:
+                      description: Default network policy for all runs.
+                      type: object
+                      properties:
+                        disabled:
+                          type: boolean
+                        egress:
+                          type: array
+                          items:
+                            type: object
+                            x-kubernetes-preserve-unknown-fields: true
                     env:
                       type: array
                       description: Additional environment variables
@@ -377,6 +388,17 @@ spec:
                   description: PodSecurityContext overrides the default pod-level security context.
                   type: object
                   x-kubernetes-preserve-unknown-fields: true
+                networkPolicy:
+                  description: NetworkPolicy configures the NetworkPolicy applied to agent pods.
+                  type: object
+                  properties:
+                    disabled:
+                      type: boolean
+                    egress:
+                      type: array
+                      items:
+                        type: object
+                        x-kubernetes-preserve-unknown-fields: true
             status:
               type: object
               description: AgentRunStatus defines the observed state of AgentRun
