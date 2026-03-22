@@ -16,6 +16,7 @@ import (
 	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/config"
 	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/providers"
 	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/types"
+	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/validation"
 	sharedworktree "github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/worktree"
 	"github.com/xonovex/platform/packages/shared/shared-core-go/pkg/scriptlib"
 )
@@ -47,6 +48,7 @@ var (
 	flagTerminalSession      string
 	flagTerminalWindow       string
 	flagTerminalDetach       bool
+	flagVCS                  string
 	flagDryRun               bool
 )
 
@@ -72,6 +74,7 @@ func init() {
 	runCmd.Flags().StringVar(&flagTerminalSession, "terminal-session", "", "Custom tmux session name")
 	runCmd.Flags().StringVar(&flagTerminalWindow, "terminal-window", "", "Custom tmux window name")
 	runCmd.Flags().BoolVar(&flagTerminalDetach, "terminal-detach", false, "Run in background (detach from terminal)")
+	runCmd.Flags().StringVar(&flagVCS, "vcs", "git", "VCS type for worktree (git, jj)")
 	runCmd.Flags().BoolVarP(&flagDryRun, "dry-run", "n", false, "Show configuration without executing")
 }
 
@@ -117,8 +120,21 @@ func runAgent(cmd *cobra.Command, args []string) error {
 
 	var sourceRepoDir string
 
-	// Setup worktree if requested
+	// Validate and setup worktree if requested
 	if flagWorktreeBranch != "" {
+		if err := validation.ValidateBranch(flagWorktreeBranch); err != nil {
+			return fmt.Errorf("invalid --worktree-branch: %w", err)
+		}
+		if flagWorktreeSourceBranch != "" {
+			if err := validation.ValidateBranch(flagWorktreeSourceBranch); err != nil {
+				return fmt.Errorf("invalid --worktree-source-branch: %w", err)
+			}
+		}
+		vcsType := sharedworktree.VCSType(flagVCS)
+		if !vcsType.IsValid() {
+			return fmt.Errorf("unknown --vcs %q; valid values: git, jj", flagVCS)
+		}
+
 		repoName := filepath.Base(workDir)
 		wtDir := flagWorktreeDir
 		if wtDir == "" {
@@ -129,6 +145,7 @@ func runAgent(cmd *cobra.Command, args []string) error {
 			SourceBranch: flagWorktreeSourceBranch,
 			Branch:       flagWorktreeBranch,
 			Dir:          wtDir,
+			VCS:          vcsType,
 		}
 
 		newWorkDir, err := worktree.Setup(wtConfig, workDir, verbose)

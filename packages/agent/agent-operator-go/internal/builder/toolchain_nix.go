@@ -8,6 +8,7 @@ import (
 	"k8s.io/apimachinery/pkg/api/resource"
 
 	agentv1alpha1 "github.com/xonovex/platform/packages/agent/agent-operator-go/api/v1alpha1"
+	nixdefs "github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/nix"
 )
 
 const (
@@ -84,8 +85,9 @@ func (n *NixToolchain) EnvVars() []corev1.EnvVar {
 }
 
 func (n *NixToolchain) installScript() string {
+	expanded := nixdefs.ExpandPackageSets(n.nix.Packages)
 	var pkgRefs []string
-	for _, pkg := range n.nix.Packages {
+	for _, pkg := range expanded {
 		pkgRefs = append(pkgRefs, "nixpkgs#"+pkg)
 	}
 

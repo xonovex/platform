@@ -166,6 +166,12 @@ spec:
                   type: object
                   description: Inline provider configuration
                   properties:
+                    presetRef:
+                      type: string
+                      description: References a named provider preset from shared-agent-go
+                    agentType:
+                      type: string
+                      description: Agent type for preset disambiguation (defaults to "claude")
                     type:
                       type: string
                       description: Provider type

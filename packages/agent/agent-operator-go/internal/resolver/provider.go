@@ -9,6 +9,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	agentv1alpha1 "github.com/xonovex/platform/packages/agent/agent-operator-go/api/v1alpha1"
+	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/providers"
+	sharedtypes "github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/types"
 )
 
 // ResolveProvider resolves the provider configuration and returns environment variables
@@ -36,7 +38,10 @@ func ResolveProvider(ctx context.Context, c client.Client, run *agentv1alpha1.Ag
 		return nil, fmt.Errorf("failed to get provider %s: %w", providerRef, err)
 	}
 
-	// Copy environment from provider spec
+	// Load preset env vars as defaults
+	mergePresetEnv(env, provider.Spec.PresetRef, provider.Spec.AgentType)
+
+	// Copy environment from provider spec (overrides preset)
 	for k, v := range provider.Spec.Environment {
 		env[k] = v
 	}
@@ -59,6 +64,10 @@ func ResolveProvider(ctx context.Context, c client.Client, run *agentv1alpha1.Ag
 func resolveInlineProvider(ctx context.Context, c client.Client, namespace string, spec *agentv1alpha1.ProviderSpec) (map[string]string, error) {
 	env := make(map[string]string)
 
+	// Load preset env vars as defaults
+	mergePresetEnv(env, spec.PresetRef, spec.AgentType)
+
+	// Copy environment from inline spec (overrides preset)
 	for k, v := range spec.Environment {
 		env[k] = v
 	}
@@ -74,6 +83,25 @@ func resolveInlineProvider(ctx context.Context, c client.Client, namespace strin
 	}
 
 	return env, nil
+}
+
+// mergePresetEnv loads preset environment variables as defaults into env.
+// Unknown presets are silently ignored for forward compatibility.
+func mergePresetEnv(env map[string]string, presetRef, agentType string) {
+	if presetRef == "" {
+		return
+	}
+	at := sharedtypes.AgentType(agentType)
+	if at == "" {
+		at = sharedtypes.AgentClaude
+	}
+	preset, err := providers.GetProvider(presetRef, at)
+	if err != nil {
+		return // unknown preset — soft failure
+	}
+	for k, v := range preset.Environment {
+		env[k] = v
+	}
 }
 
 func getSecretValue(ctx context.Context, c client.Client, namespace string, ref *agentv1alpha1.SecretKeyRef) (string, error) {

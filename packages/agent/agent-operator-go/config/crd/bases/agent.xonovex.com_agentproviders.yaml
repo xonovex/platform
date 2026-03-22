@@ -43,6 +43,12 @@ spec:
               type: object
               description: AgentProviderSpec defines the desired state of AgentProvider
               properties:
+                presetRef:
+                  type: string
+                  description: References a named provider preset from shared-agent-go
+                agentType:
+                  type: string
+                  description: Agent type for preset disambiguation (defaults to "claude")
                 type:
                   type: string
                   description: Provider type

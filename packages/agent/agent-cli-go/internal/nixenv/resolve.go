@@ -9,6 +9,8 @@ import (
 	"regexp"
 	"sort"
 	"strings"
+
+	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/nix"
 )
 
 // Package name validation regex
@@ -150,12 +152,9 @@ func ResolveEnv(spec *EnvSpec) (*ResolvedEnv, error) {
 
 // ExpandPackageSets expands set names to package lists
 func ExpandPackageSets(sets []string) []string {
-	packages := make([]string, 0)
-	for _, set := range sets {
-		set = strings.TrimSpace(set)
-		if setPackages, ok := PackageSets[set]; ok {
-			packages = append(packages, setPackages...)
-		}
+	trimmed := make([]string, len(sets))
+	for i, s := range sets {
+		trimmed[i] = strings.TrimSpace(s)
 	}
-	return packages
+	return nix.ExpandPackageSets(trimmed)
 }

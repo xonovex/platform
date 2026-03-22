@@ -12,7 +12,7 @@ Xonovex fills this gap. It currently supports [Claude Code](https://docs.anthrop
 
 The included commands and skills are token-efficient, unopinionated, and based on current research and best practices.
 
-- **[agent-cli](packages/agent/agent-cli/)** / **[agent-cli-go](packages/agent/agent-cli-go/)** configure sandboxes, providers, and terminal sessions, then launch the agent
+- **[agent-cli-go](packages/agent/agent-cli-go/)** configures sandboxes, providers, and terminal sessions, then launches the agent
 - **[agent-operator-go](packages/agent/agent-operator-go/)** orchestrates agents as Kubernetes Jobs with managed workspaces, provider secrets, shared multi-agent workspaces, namespace-level policy enforcement, network isolation, and Nix toolchain provisioning
 - **[Workflow commands](packages/command/command-workflow/)** provide plan-driven development with worktrees and parallel execution
 - **[Utility commands](packages/command/command-utility/)** manage project instructions, extract insights, and create skills
@@ -23,11 +23,6 @@ The included commands and skills are token-efficient, unopinionated, and based o
 ### Agent CLI
 
 ```bash
-# TypeScript
-npm install -g @xonovex/agent-cli
-agent-cli run --agent claude --sandbox bwrap
-
-# Go (cross-platform binary)
 npm install -g @xonovex/agent-cli-go
 agent-cli run --agent claude --sandbox bwrap --provider gemini
 ```

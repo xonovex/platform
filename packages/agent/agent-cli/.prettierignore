@@ -1,9 +1,0 @@
-# Build outputs
-dist/
-
-# Dependencies
-node_modules/
-
-# Cache
-*.tsbuildinfo
-coverage/
