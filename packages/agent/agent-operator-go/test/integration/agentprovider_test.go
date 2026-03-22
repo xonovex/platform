@@ -92,8 +92,7 @@ func TestAgentProvider_NotReadyWhenSecretMissing(t *testing.T) {
 func TestAgentProvider_ReadyWithoutSecretRef(t *testing.T) {
 	ns := createNamespace(t, "provider-no-secret")
 
-	provider := testutil.NewAgentProvider(ns, "test-provider",
-		)
+	provider := testutil.NewAgentProvider(ns, "test-provider")
 	if err := k8sClient.Create(ctx, provider); err != nil {
 		t.Fatalf("failed to create AgentProvider: %v", err)
 	}

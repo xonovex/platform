@@ -306,7 +306,7 @@ func TestE2E_Kata_FullCycleWithGitClone(t *testing.T) {
 		testutil.WithAuthTokenSecretRef("provider-token", "api-key"),
 		testutil.WithEnvironment(map[string]string{
 			"ANTHROPIC_API_KEY": "fake-key",
-			"TEST_ENV_VAR":     "e2e-value",
+			"TEST_ENV_VAR":      "e2e-value",
 		}),
 	)
 	if err := k8sClient.Create(ctx, provider); err != nil {
