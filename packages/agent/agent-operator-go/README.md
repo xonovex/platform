@@ -751,6 +751,11 @@ go test -tags=e2e_gvisor -v -timeout=600s ./test/e2e-gvisor/
 # Requires: kind, kubectl, Docker, /dev/kvm, internet access (downloads Kata release)
 # Note: VM isolation tests skip gracefully in unprivileged kind (vsock/QEMU errors)
 go test -tags=e2e_kata -v -timeout=600s ./test/e2e-kata/
+
+# E2E CoCo tests (creates Kind cluster with simulated kata-cc/kata-tdx RuntimeClasses)
+# Validates runtimeClassName propagation, harness defaults, full pipeline, workspace jobs
+# Requires: kind, kubectl, Docker
+go test -tags=e2e_coco -v -timeout=600s ./test/e2e-coco/
 ```
 
 ### What the tests cover
@@ -760,6 +765,7 @@ go test -tags=e2e_kata -v -timeout=600s ./test/e2e-kata/
 - **E2E (7 tests):** Full cluster behavior. Pod scheduling, PVC binding, init container failure propagation, owner reference garbage collection, Docker image deployment with health probe validation, multi-agent workspace with concurrent runs, full-cycle pipeline (git clone + fake agent binary -> Succeeded).
 - **E2E gVisor (5 tests):** Sandbox isolation verification (dmesg gVisor banner), runtimeClassName propagation to Job/Pod, AgentHarness default inheritance, full workflow (Secret + Provider + Harness + git clone + agent -> Succeeded inside gVisor), workspace-based run (init Job has no runtimeClassName, agent Job does).
 - **E2E Kata (4 tests):** VM isolation verification (guest kernel differs from host, /dev/pmem0), runtimeClassName propagation to Job/Pod, AgentHarness default inheritance, full workflow (Secret + Provider + Harness + git clone + agent -> Succeeded inside Kata VM, skips in unprivileged kind).
+- **E2E CoCo (5 tests):** Confidential Containers runtimeClassName propagation (kata-cc, kata-tdx), AgentHarness default inheritance, full workflow (Secret + Provider + git clone + agent -> Succeeded with kata-cc), workspace-based run (init Job has no runtimeClassName, agent Job does).
 
 ## Architecture
 
