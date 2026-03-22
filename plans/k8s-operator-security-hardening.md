@@ -1,7 +1,8 @@
 ---
 type: plan
 has_subplans: true
-status: approved
+status: complete
+completed_date: "2026-03-22"
 dependencies:
   plans: []
   subplans:
