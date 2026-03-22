@@ -1,0 +1,115 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: agentpolicies.agent.xonovex.com
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.17.0
+spec:
+  group: agent.xonovex.com
+  names:
+    kind: AgentPolicy
+    listKind: AgentPolicyList
+    plural: agentpolicies
+    singular: agentpolicy
+  scope: Namespaced
+  versions:
+    - name: v1alpha1
+      served: true
+      storage: true
+      additionalPrinterColumns:
+        - name: Age
+          type: date
+          jsonPath: .metadata.creationTimestamp
+      subresources:
+        status: {}
+      schema:
+        openAPIV3Schema:
+          type: object
+          description: AgentPolicy defines enforced security constraints and defaults for AgentRuns in a namespace.
+          properties:
+            apiVersion:
+              type: string
+            kind:
+              type: string
+            metadata:
+              type: object
+            spec:
+              type: object
+              description: AgentPolicySpec defines the desired state of AgentPolicy
+              properties:
+                enforced:
+                  type: object
+                  description: Enforced constraints — AgentRuns that violate these are rejected by the webhook.
+                  properties:
+                    runtimeClassName:
+                      type: string
+                      description: If set, requires all AgentRuns to use this runtimeClassName.
+                    requireSecurityContext:
+                      type: boolean
+                      description: If true, prevents AgentRuns from weakening hardened SecurityContext defaults.
+                    requireNetworkPolicy:
+                      type: boolean
+                      description: If true, requires AgentRuns to have a NetworkPolicy enabled.
+                    maxTimeout:
+                      type: string
+                      description: Maximum allowed timeout for AgentRuns (e.g. "2h0m0s").
+                    maxResources:
+                      type: object
+                      description: Upper bound for any single container's resource limits.
+                      x-kubernetes-preserve-unknown-fields: true
+                    allowedImages:
+                      type: array
+                      items:
+                        type: string
+                      description: Allowed container image prefixes.
+                    allowedRuntimeClassNames:
+                      type: array
+                      items:
+                        type: string
+                      description: Permitted runtimeClassNames.
+                defaults:
+                  type: object
+                  description: Defaults applied when AgentRun fields are not set.
+                  properties:
+                    image:
+                      type: string
+                      description: Default container image.
+                    timeout:
+                      type: string
+                      description: Default timeout (e.g. "30m0s").
+                    runtimeClassName:
+                      type: string
+                      description: Default runtimeClassName.
+            status:
+              type: object
+              description: AgentPolicyStatus defines the observed state of AgentPolicy
+              properties:
+                conditions:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                      - type
+                      - status
+                      - lastTransitionTime
+                      - reason
+                      - message
+                    properties:
+                      type:
+                        type: string
+                      status:
+                        type: string
+                        enum:
+                          - "True"
+                          - "False"
+                          - Unknown
+                      lastTransitionTime:
+                        type: string
+                        format: date-time
+                      reason:
+                        type: string
+                      message:
+                        type: string
+                      observedGeneration:
+                        type: integer
+                        format: int64

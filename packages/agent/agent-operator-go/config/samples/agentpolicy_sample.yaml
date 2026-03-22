@@ -1,0 +1,20 @@
+apiVersion: agent.xonovex.com/v1alpha1
+kind: AgentPolicy
+metadata:
+  name: enterprise-policy
+  namespace: ai-agents
+spec:
+  enforced:
+    runtimeClassName: kata
+    requireSecurityContext: true
+    requireNetworkPolicy: true
+    maxTimeout: 2h0m0s
+    allowedImages:
+      - ghcr.io/your-org/
+      - ghcr.io/xonovex/
+    allowedRuntimeClassNames:
+      - kata
+      - gvisor
+  defaults:
+    image: ghcr.io/xonovex/agent-image:latest
+    timeout: 30m0s

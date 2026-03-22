@@ -7,10 +7,12 @@ import (
 
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
+	networkingv1 "k8s.io/api/networking/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/client-go/tools/record"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
@@ -23,7 +25,8 @@ import (
 // AgentRunReconciler reconciles an AgentRun object
 type AgentRunReconciler struct {
 	client.Client
-	Scheme *runtime.Scheme
+	Scheme   *runtime.Scheme
+	Recorder record.EventRecorder
 }
 
 // +kubebuilder:rbac:groups=agent.xonovex.com,resources=agentruns,verbs=get;list;watch;create;update;patch;delete
@@ -36,6 +39,8 @@ type AgentRunReconciler struct {
 // +kubebuilder:rbac:groups="",resources=pods,verbs=get;list;watch
 // +kubebuilder:rbac:groups="",resources=persistentvolumeclaims,verbs=get;list;watch;create;delete
 // +kubebuilder:rbac:groups="",resources=secrets,verbs=get;list;watch
+// +kubebuilder:rbac:groups=networking.k8s.io,resources=networkpolicies,verbs=get;list;watch;create;update;patch;delete
+// +kubebuilder:rbac:groups="",resources=events,verbs=create;patch
 
 func (r *AgentRunReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	// 1. Fetch AgentRun
@@ -63,12 +68,15 @@ func (r *AgentRunReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 }
 
 func (r *AgentRunReconciler) reconcileStandalone(ctx context.Context, agentRun *agentv1alpha1.AgentRun) (ctrl.Result, error) {
-	log := log.FromContext(ctx)
+	log := log.FromContext(ctx).WithValues(
+		"agentRun", agentRun.Name,
+		"namespace", agentRun.Namespace,
+	)
 
 	// Resolve harness
 	harness, err := resolver.ResolveHarness(ctx, r.Client, agentRun.Namespace, agentRun.Spec.HarnessRef, agentRun.Spec.Harness)
 	if err != nil {
-		log.Error(err, "failed to resolve harness")
+		log.Error(err, "failed to resolve harness", "harnessRef", agentRun.Spec.HarnessRef)
 	}
 
 	// Determine agent type from harness
@@ -84,14 +92,14 @@ func (r *AgentRunReconciler) reconcileStandalone(ctx context.Context, agentRun *
 	}
 	providerEnv, err := resolver.ResolveProvider(ctx, r.Client, agentRun, defaultProvider)
 	if err != nil {
-		log.Error(err, "failed to resolve provider")
+		log.Error(err, "failed to resolve provider", "providerRef", agentRun.Spec.ProviderRef)
 		return r.updatePhase(ctx, agentRun, agentv1alpha1.AgentRunPhaseFailed, fmt.Sprintf("ProviderResolutionFailed: %v", err))
 	}
 
 	// Resolve toolchain
 	tc, err := resolver.ResolveToolchain(ctx, r.Client, agentRun.Namespace, agentRun.Spec.ToolchainRef, agentRun.Spec.Toolchain)
 	if err != nil {
-		log.Error(err, "failed to resolve toolchain")
+		log.Error(err, "failed to resolve toolchain", "toolchainRef", agentRun.Spec.ToolchainRef)
 	}
 
 	// Get workspace config
@@ -115,7 +123,7 @@ func (r *AgentRunReconciler) reconcileStandalone(ctx context.Context, agentRun *
 	if agentRun.Status.WorkspacePVC == "" {
 		pvc := builder.BuildPVC(pvcName, agentRun.Namespace, storageClass, storageSize, agentRun)
 		if err := r.Create(ctx, pvc); err != nil && !errors.IsAlreadyExists(err) {
-			log.Error(err, "failed to create workspace PVC")
+			log.Error(err, "failed to create workspace PVC", "pvcName", pvcName)
 			return ctrl.Result{}, err
 		}
 
@@ -123,6 +131,26 @@ func (r *AgentRunReconciler) reconcileStandalone(ctx context.Context, agentRun *
 		if _, err := r.updatePhase(ctx, agentRun, agentv1alpha1.AgentRunPhaseInitializing, ""); err != nil {
 			return ctrl.Result{}, err
 		}
+	}
+
+	// Resolve NetworkPolicy config
+	netpolCfg := agentRun.Spec.NetworkPolicy
+	if netpolCfg == nil && harness != nil {
+		netpolCfg = harness.Spec.DefaultNetworkPolicy
+	}
+
+	// Create NetworkPolicy (unless explicitly disabled)
+	if netpolCfg == nil || !netpolCfg.Disabled {
+		np := builder.BuildNetworkPolicy(agentRun, netpolCfg)
+		if err := ctrl.SetControllerReference(agentRun, np, r.Scheme); err != nil {
+			return ctrl.Result{}, err
+		}
+		if err := r.Create(ctx, np); err != nil && !errors.IsAlreadyExists(err) {
+			log.Error(err, "failed to create network policy")
+			return ctrl.Result{}, err
+		}
+		r.Recorder.Eventf(agentRun, corev1.EventTypeNormal, "NetworkPolicyCreated",
+			"Created NetworkPolicy %s", np.Name)
 	}
 
 	// Create Job if needed
@@ -136,9 +164,15 @@ func (r *AgentRunReconciler) reconcileStandalone(ctx context.Context, agentRun *
 		}
 
 		if err := r.Create(ctx, job); err != nil && !errors.IsAlreadyExists(err) {
-			log.Error(err, "failed to create job")
+			log.Error(err, "failed to create job", "jobName", jobName)
 			return ctrl.Result{}, err
 		}
+
+		log.Info("creating Job", "jobName", jobName, "agentType", agentType,
+			"runtimeClass", ptrOrEmpty(agentRun.Spec.RuntimeClassName))
+		r.Recorder.Eventf(agentRun, corev1.EventTypeNormal, "AgentRunStarted",
+			"Created Job %s (agent=%s, provider=%s, runtimeClass=%s)",
+			jobName, string(agentType), agentRun.Spec.ProviderRef, ptrOrEmpty(agentRun.Spec.RuntimeClassName))
 
 		agentRun.Status.JobName = jobName
 		if err := r.Status().Update(ctx, agentRun); err != nil {
@@ -159,12 +193,15 @@ func (r *AgentRunReconciler) reconcileStandalone(ctx context.Context, agentRun *
 }
 
 func (r *AgentRunReconciler) reconcileWithWorkspace(ctx context.Context, agentRun *agentv1alpha1.AgentRun) (ctrl.Result, error) {
-	log := log.FromContext(ctx)
+	log := log.FromContext(ctx).WithValues(
+		"agentRun", agentRun.Name,
+		"namespace", agentRun.Namespace,
+	)
 
 	// Resolve workspace
 	ws, err := resolver.ResolveWorkspace(ctx, r.Client, agentRun.Namespace, agentRun.Spec.WorkspaceRef)
 	if err != nil {
-		log.Error(err, "failed to resolve workspace")
+		log.Error(err, "failed to resolve workspace", "workspaceRef", agentRun.Spec.WorkspaceRef)
 		return r.updatePhase(ctx, agentRun, agentv1alpha1.AgentRunPhaseFailed, fmt.Sprintf("WorkspaceResolutionFailed: %v", err))
 	}
 	if ws.Status.Phase != agentv1alpha1.AgentWorkspacePhaseReady {
@@ -181,7 +218,7 @@ func (r *AgentRunReconciler) reconcileWithWorkspace(ctx context.Context, agentRu
 	// Resolve harness
 	harness, err := resolver.ResolveHarness(ctx, r.Client, agentRun.Namespace, agentRun.Spec.HarnessRef, agentRun.Spec.Harness)
 	if err != nil {
-		log.Error(err, "failed to resolve harness")
+		log.Error(err, "failed to resolve harness", "harnessRef", agentRun.Spec.HarnessRef)
 	}
 	agentType := agentv1alpha1.AgentTypeClaude
 	if harness != nil {
@@ -195,14 +232,14 @@ func (r *AgentRunReconciler) reconcileWithWorkspace(ctx context.Context, agentRu
 	}
 	providerEnv, err := resolver.ResolveProvider(ctx, r.Client, agentRun, defaultProvider)
 	if err != nil {
-		log.Error(err, "failed to resolve provider")
+		log.Error(err, "failed to resolve provider", "providerRef", agentRun.Spec.ProviderRef)
 		return r.updatePhase(ctx, agentRun, agentv1alpha1.AgentRunPhaseFailed, fmt.Sprintf("ProviderResolutionFailed: %v", err))
 	}
 
 	// Resolve toolchain
 	tc, err := resolver.ResolveToolchain(ctx, r.Client, agentRun.Namespace, agentRun.Spec.ToolchainRef, agentRun.Spec.Toolchain)
 	if err != nil {
-		log.Error(err, "failed to resolve toolchain")
+		log.Error(err, "failed to resolve toolchain", "toolchainRef", agentRun.Spec.ToolchainRef)
 	}
 
 	// Get workspace type and worktree info from AgentWorkspace CRD
@@ -226,6 +263,26 @@ func (r *AgentRunReconciler) reconcileWithWorkspace(ctx context.Context, agentRu
 		sourceBranch = ws.Spec.Jj.Revision
 	}
 
+	// Resolve NetworkPolicy config
+	netpolCfg := agentRun.Spec.NetworkPolicy
+	if netpolCfg == nil && harness != nil {
+		netpolCfg = harness.Spec.DefaultNetworkPolicy
+	}
+
+	// Create NetworkPolicy (unless explicitly disabled)
+	if netpolCfg == nil || !netpolCfg.Disabled {
+		np := builder.BuildNetworkPolicy(agentRun, netpolCfg)
+		if err := ctrl.SetControllerReference(agentRun, np, r.Scheme); err != nil {
+			return ctrl.Result{}, err
+		}
+		if err := r.Create(ctx, np); err != nil && !errors.IsAlreadyExists(err) {
+			log.Error(err, "failed to create network policy")
+			return ctrl.Result{}, err
+		}
+		r.Recorder.Eventf(agentRun, corev1.EventTypeNormal, "NetworkPolicyCreated",
+			"Created NetworkPolicy %s", np.Name)
+	}
+
 	// Create Job if needed
 	jobName := agentRun.Name
 	if agentRun.Status.JobName == "" {
@@ -237,9 +294,15 @@ func (r *AgentRunReconciler) reconcileWithWorkspace(ctx context.Context, agentRu
 		}
 
 		if err := r.Create(ctx, job); err != nil && !errors.IsAlreadyExists(err) {
-			log.Error(err, "failed to create workspace job")
+			log.Error(err, "failed to create workspace job", "jobName", jobName)
 			return ctrl.Result{}, err
 		}
+
+		log.Info("creating Job", "jobName", jobName, "agentType", agentType,
+			"runtimeClass", ptrOrEmpty(agentRun.Spec.RuntimeClassName))
+		r.Recorder.Eventf(agentRun, corev1.EventTypeNormal, "AgentRunStarted",
+			"Created Job %s (agent=%s, provider=%s, runtimeClass=%s)",
+			jobName, string(agentType), agentRun.Spec.ProviderRef, ptrOrEmpty(agentRun.Spec.RuntimeClassName))
 
 		agentRun.Status.JobName = jobName
 		if err := r.Status().Update(ctx, agentRun); err != nil {
@@ -266,10 +329,14 @@ func (r *AgentRunReconciler) reconcileJobStatus(ctx context.Context, agentRun *a
 	for _, condition := range job.Status.Conditions {
 		if condition.Type == batchv1.JobComplete && condition.Status == corev1.ConditionTrue {
 			agentRun.Status.CompletionTime = &now
+			r.Recorder.Event(agentRun, corev1.EventTypeNormal, "AgentRunSucceeded",
+				"Agent Job completed successfully")
 			return r.updatePhase(ctx, agentRun, agentv1alpha1.AgentRunPhaseSucceeded, "")
 		}
 		if condition.Type == batchv1.JobFailed && condition.Status == corev1.ConditionTrue {
 			agentRun.Status.CompletionTime = &now
+			r.Recorder.Eventf(agentRun, corev1.EventTypeWarning, "AgentRunFailed",
+				"Agent Job failed: %s", condition.Message)
 			return r.updatePhase(ctx, agentRun, agentv1alpha1.AgentRunPhaseFailed, condition.Message)
 		}
 	}
@@ -286,6 +353,8 @@ func (r *AgentRunReconciler) reconcileJobStatus(ctx context.Context, agentRun *a
 			elapsed := time.Since(agentRun.Status.StartTime.Time)
 			if elapsed > agentRun.Spec.Timeout.Duration {
 				agentRun.Status.CompletionTime = &now
+				r.Recorder.Eventf(agentRun, corev1.EventTypeWarning, "AgentRunTimedOut",
+					"Agent Job exceeded timeout of %v", agentRun.Spec.Timeout.Duration)
 				return r.updatePhase(ctx, agentRun, agentv1alpha1.AgentRunPhaseTimedOut, "agent run exceeded timeout")
 			}
 		}
@@ -318,5 +387,13 @@ func (r *AgentRunReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&agentv1alpha1.AgentRun{}).
 		Owns(&batchv1.Job{}).
+		Owns(&networkingv1.NetworkPolicy{}).
 		Complete(r)
+}
+
+func ptrOrEmpty(s *string) string {
+	if s == nil {
+		return ""
+	}
+	return *s
 }
