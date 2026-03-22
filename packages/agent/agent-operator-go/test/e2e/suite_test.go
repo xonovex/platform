@@ -42,6 +42,13 @@ func TestMain(m *testing.M) {
 		if err := runCmd("kind", "create", "cluster", "--name", clusterName, "--config", kindConfig, "--wait", "120s"); err != nil {
 			panic("failed to create Kind cluster: " + err.Error())
 		}
+
+		// Pre-pull images used by tests into the Kind node to avoid
+		// Docker Hub rate limits and slow pulls during test timeouts.
+		for _, img := range []string{"busybox:1.37"} {
+			_ = runCmd("docker", "pull", img)
+			_ = runCmd("kind", "load", "docker-image", img, "--name", clusterName)
+		}
 	}
 
 	// Install CRDs

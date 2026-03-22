@@ -4,10 +4,11 @@ import (
 	"time"
 
 	agentv1alpha1 "github.com/xonovex/platform/packages/agent/agent-operator-go/api/v1alpha1"
+	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/sandbox"
 )
 
 const (
-	DefaultImage   = "node:trixie-slim"
+	DefaultImage   = sandbox.DefaultContainerImage
 	DefaultTimeout = time.Hour
 )
 

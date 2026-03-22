@@ -9,26 +9,10 @@ import (
 
 	"github.com/xonovex/platform/packages/cli/agent-cli-go/internal/nixenv"
 	"github.com/xonovex/platform/packages/cli/agent-cli-go/internal/sandboxutil"
+	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/sandbox"
 	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/types"
 	"github.com/xonovex/platform/packages/shared/shared-core-go/pkg/scriptlib"
 )
-
-// User config paths that should be bind mounted into sandboxes (relative to home)
-var userConfigPaths = []string{
-	".claude",
-	".claude.json",
-	".gitconfig",
-	".gitignore_global",
-	".ssh",
-	".config",
-	".npmrc",
-	".npm",
-	".npm-global",
-	".cargo",
-	".rustup",
-	".local",
-	".cache",
-}
 
 // Executor implements Nix sandbox using nix-build + bubblewrap
 type Executor struct{}
@@ -278,7 +262,7 @@ func (e *Executor) buildBwrapArgs(config *types.SandboxConfig, envOutPath string
 	}
 
 	// User config bind mounts
-	for _, configPath := range userConfigPaths {
+	for _, configPath := range sandbox.UserConfigPaths {
 		sourcePath := filepath.Join(homeDir, configPath)
 		if _, err := os.Stat(sourcePath); err == nil {
 			args = append(args, "--bind", sourcePath, sourcePath)

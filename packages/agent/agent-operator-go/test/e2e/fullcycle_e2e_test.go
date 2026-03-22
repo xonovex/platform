@@ -71,7 +71,7 @@ func TestE2E_FullCycleWithPrompt(t *testing.T) {
 	}
 
 	// Create AgentRun exercising the full pipeline
-	run := testutil.NewAgentRun(ns, "fullcycle-run",
+	opts := append([]testutil.AgentRunOption{
 		testutil.WithHarness(&agentv1alpha1.AgentSpec{Type: agentv1alpha1.AgentTypeClaude}),
 		testutil.WithPrompt("echo test-prompt"),
 		testutil.WithImage(e2eAgentImage),
@@ -80,7 +80,8 @@ func TestE2E_FullCycleWithPrompt(t *testing.T) {
 			StorageSize: "1Gi",
 		}),
 		testutil.WithProviderRef("test-provider"),
-	)
+	}, testutil.E2ESecurityOverrides()...)
+	run := testutil.NewAgentRun(ns, "fullcycle-run", opts...)
 	if err := k8sClient.Create(ctx, run); err != nil {
 		t.Fatalf("failed to create AgentRun: %v", err)
 	}
@@ -125,8 +126,9 @@ func TestE2E_FullCycleWithPrompt(t *testing.T) {
 	})
 
 	// Wait for Succeeded terminal phase (the fake claude binary exits 0 quickly,
-	// so the reconciler may transition through Running → Succeeded very fast)
-	testutil.WaitForAgentRunPhase(t, ctx, k8sClient, runKey, agentv1alpha1.AgentRunPhaseSucceeded, 180*time.Second)
+	// so the reconciler may transition through Running → Succeeded very fast).
+	// Increased timeout: init container git-clones from github.com, which may be slow.
+	testutil.WaitForAgentRunPhase(t, ctx, k8sClient, runKey, agentv1alpha1.AgentRunPhaseSucceeded, 300*time.Second)
 
 	if err := k8sClient.Get(ctx, runKey, &runStatus); err != nil {
 		t.Fatalf("failed to get AgentRun: %v", err)
