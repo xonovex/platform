@@ -11,7 +11,7 @@ const (
 )
 
 // BuildInitContainers builds init containers for standalone runs
-func BuildInitContainers(run *agentv1alpha1.AgentRun, image string, wsType agentv1alpha1.WorkspaceType, tc *agentv1alpha1.ToolchainSpec) []corev1.Container {
+func BuildInitContainers(run *agentv1alpha1.AgentRun, image string, wsType agentv1alpha1.WorkspaceType, tc *agentv1alpha1.ToolchainSpec, sc *corev1.SecurityContext) []corev1.Container {
 	containers := []corev1.Container{
 		{
 			Name:    "git-clone",
@@ -24,11 +24,13 @@ func BuildInitContainers(run *agentv1alpha1.AgentRun, image string, wsType agent
 					MountPath: workspaceMountPath,
 				},
 			},
+			SecurityContext: DefaultContainerSecurityContext(sc),
 		},
 	}
 
 	for _, t := range Toolchains(tc) {
 		if c := t.InitContainer(); c != nil {
+			c.SecurityContext = DefaultContainerSecurityContext(sc)
 			containers = append(containers, *c)
 		}
 	}
@@ -37,13 +39,17 @@ func BuildInitContainers(run *agentv1alpha1.AgentRun, image string, wsType agent
 }
 
 // BuildMainContainers builds the main agent container
-func BuildMainContainers(run *agentv1alpha1.AgentRun, providerEnv map[string]string, image string, agentType agentv1alpha1.AgentType, tc *agentv1alpha1.ToolchainSpec) []corev1.Container {
+func BuildMainContainers(run *agentv1alpha1.AgentRun, providerEnv map[string]string, image string, agentType agentv1alpha1.AgentType, tc *agentv1alpha1.ToolchainSpec, sc *corev1.SecurityContext) []corev1.Container {
 	env := BuildEnvVars(run, providerEnv)
 
 	volumeMounts := []corev1.VolumeMount{
 		{
 			Name:      "workspace",
 			MountPath: workspaceMountPath,
+		},
+		{
+			Name:      "tmp",
+			MountPath: "/tmp",
 		},
 	}
 
@@ -56,13 +62,14 @@ func BuildMainContainers(run *agentv1alpha1.AgentRun, providerEnv map[string]str
 
 	return []corev1.Container{
 		{
-			Name:         "agent",
-			Image:        image,
-			Command:      command,
-			Args:         args,
-			Env:          env,
-			WorkingDir:   workspaceMountPath,
-			VolumeMounts: volumeMounts,
+			Name:            "agent",
+			Image:           image,
+			Command:         command,
+			Args:            args,
+			Env:             env,
+			WorkingDir:      workspaceMountPath,
+			VolumeMounts:    volumeMounts,
+			SecurityContext: DefaultContainerSecurityContext(sc),
 		},
 	}
 }

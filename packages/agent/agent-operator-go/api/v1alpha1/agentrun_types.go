@@ -141,6 +141,10 @@ type AgentSpec struct {
 	DefaultTimeout *metav1.Duration `json:"defaultTimeout,omitempty"`
 	// DefaultRuntimeClassName sets the default pod runtimeClassName
 	DefaultRuntimeClassName *string `json:"defaultRuntimeClassName,omitempty"`
+	// DefaultSecurityContext overrides the default container security context for all runs
+	DefaultSecurityContext *corev1.SecurityContext `json:"defaultSecurityContext,omitempty"`
+	// DefaultPodSecurityContext overrides the default pod-level security context for all runs
+	DefaultPodSecurityContext *corev1.PodSecurityContext `json:"defaultPodSecurityContext,omitempty"`
 	// Env are additional environment variables
 	Env []corev1.EnvVar `json:"env,omitempty"`
 }
@@ -179,6 +183,10 @@ type AgentRunSpec struct {
 	Tolerations []corev1.Toleration `json:"tolerations,omitempty"`
 	// RuntimeClassName sets the pod runtimeClassName for VM-based isolation
 	RuntimeClassName *string `json:"runtimeClassName,omitempty"`
+	// SecurityContext overrides the default container security context
+	SecurityContext *corev1.SecurityContext `json:"securityContext,omitempty"`
+	// PodSecurityContext overrides the default pod-level security context
+	PodSecurityContext *corev1.PodSecurityContext `json:"podSecurityContext,omitempty"`
 }
 
 // AgentRunStatus defines the observed state of AgentRun
