@@ -203,11 +203,11 @@ func TestBuildWorkspaceInitJob_Basic(t *testing.T) {
 
 	// Check clone script contains repo URL
 	script := container.Args[1]
-	if !containsStr(script, "https://github.com/org/repo.git") {
-		t.Errorf("expected clone script to contain repo URL")
+	if !containsStr(script, "'https://github.com/org/repo.git'") {
+		t.Errorf("expected clone script to contain quoted repo URL")
 	}
-	if !containsStr(script, "--branch main") {
-		t.Errorf("expected clone script to contain branch")
+	if !containsStr(script, "--branch 'main'") {
+		t.Errorf("expected clone script to contain quoted branch")
 	}
 
 	// Check PVC volume
@@ -237,8 +237,8 @@ func TestBuildWorktreeInitContainers_Basic(t *testing.T) {
 	}
 
 	script := container.Args[1]
-	if !containsStr(script, "git worktree add /workspace-wt/agent-1 -b agent-1-work main") {
-		t.Errorf("expected worktree command in script, got: %s", script)
+	if !containsStr(script, "git worktree add '/workspace-wt/agent-1' -b 'agent-1-work' 'main'") {
+		t.Errorf("expected quoted worktree command in script, got: %s", script)
 	}
 }
 
@@ -251,8 +251,8 @@ func TestBuildWorktreeInitContainers_DefaultSourceBranch(t *testing.T) {
 
 	containers := BuildWorktreeInitContainers(run, "node:trixie-slim", agentv1alpha1.WorkspaceTypeGit, "agent-1-work", "")
 	script := containers[0].Args[1]
-	if !containsStr(script, "git worktree add /workspace-wt/agent-1 -b agent-1-work HEAD") {
-		t.Errorf("expected HEAD as default source branch, got: %s", script)
+	if !containsStr(script, "git worktree add '/workspace-wt/agent-1' -b 'agent-1-work' 'HEAD'") {
+		t.Errorf("expected quoted HEAD as default source branch, got: %s", script)
 	}
 }
 
@@ -462,8 +462,8 @@ func TestBuildWorktreeInitContainers_WithJujutsu(t *testing.T) {
 	}
 
 	script := container.Args[1]
-	if !containsStr(script, "jj workspace add /workspace-wt/agent-1 --revision main") {
-		t.Errorf("expected jj workspace add command, got: %s", script)
+	if !containsStr(script, "jj workspace add '/workspace-wt/agent-1' --revision 'main'") {
+		t.Errorf("expected quoted jj workspace add command, got: %s", script)
 	}
 	if containsStr(script, "git worktree") {
 		t.Error("jj mode should not use git worktree")

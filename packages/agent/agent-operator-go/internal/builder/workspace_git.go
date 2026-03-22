@@ -10,7 +10,7 @@ func (g *GitStrategy) PostCloneScript() string {
 }
 
 func (g *GitStrategy) WorktreeScript(path, branch, sourceBranch string) string {
-	return fmt.Sprintf("git worktree add %s -b %s %s\n", path, branch, sourceBranch)
+	return fmt.Sprintf("git worktree add %s -b %s %s\n", shellQuote(path), shellQuote(branch), shellQuote(sourceBranch))
 }
 
 func (g *GitStrategy) InitContainerName() string {
