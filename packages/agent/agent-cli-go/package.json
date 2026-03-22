@@ -26,7 +26,7 @@
     "agent-cli-go": "dist/bin.js"
   },
   "devDependencies": {
-    "@xonovex/ts-config-cli": "0.1.23"
+    "@xonovex/ts-config-cli": "0.1.22"
   },
   "optionalDependencies": {
     "@xonovex/agent-cli-go-linux-x64": "0.1.23",
@@ -36,8 +36,8 @@
     "@xonovex/agent-cli-go-win32-x64": "0.1.23"
   },
   "dependencies": {
-    "@xonovex/eslint-config-cli": "0.1.23",
-    "@xonovex/ts-config-cli": "0.1.23"
+    "@xonovex/eslint-config-cli": "0.1.22",
+    "@xonovex/ts-config-cli": "0.1.22"
   },
   "keywords": [
     "xonovex",
