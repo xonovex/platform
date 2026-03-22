@@ -8,12 +8,12 @@
 
 AI coding agents handle prompts, tools, and code changes. What they don't manage is the environment around them: sandbox isolation, model provider routing, terminal sessions, reproducible toolchains, and orchestration at scale.
 
-Xonovex fills this gap. It currently supports [Claude Code](https://docs.anthropic.com/en/docs/claude-code) and [OpenCode](https://github.com/anomalyco/opencode) as agents, with sandboxing via bubblewrap, Docker, and Nix, VM-level isolation via gVisor and Kata Containers, model routing through providers like Gemini, GLM, and GPT, workspace management with Git and [Jujutsu](https://github.com/jj-vcs/jj), and Kubernetes orchestration for running agents at scale.
+Xonovex fills this gap. It currently supports [Claude Code](https://docs.anthropic.com/en/docs/claude-code) and [OpenCode](https://github.com/anomalyco/opencode) as agents, with sandboxing via bubblewrap, Docker, and Nix, VM-level isolation via gVisor and Kata Containers, confidential computing via [Confidential Containers (CoCo)](https://github.com/confidential-containers) with AMD SEV-SNP and Intel TDX, model routing through providers like Gemini, GLM, and GPT, workspace management with Git and [Jujutsu](https://github.com/jj-vcs/jj), reproducible toolchains via Nix, and Kubernetes orchestration for running agents at scale.
 
 The included commands and skills are token-efficient, unopinionated, and based on current research and best practices.
 
 - **[agent-cli](packages/agent/agent-cli/)** / **[agent-cli-go](packages/agent/agent-cli-go/)** configure sandboxes, providers, and terminal sessions, then launch the agent
-- **[agent-operator-go](packages/agent/agent-operator-go/)** orchestrates agents as Kubernetes Jobs with managed workspaces and provider secrets
+- **[agent-operator-go](packages/agent/agent-operator-go/)** orchestrates agents as Kubernetes Jobs with managed workspaces, provider secrets, shared multi-agent workspaces, namespace-level policy enforcement, network isolation, and Nix toolchain provisioning
 - **[Workflow commands](packages/command/command-workflow/)** provide plan-driven development with worktrees and parallel execution
 - **[Utility commands](packages/command/command-utility/)** manage project instructions, extract insights, and create skills
 - **[Skills](packages/skill/)** give agents coding guidelines they follow automatically
