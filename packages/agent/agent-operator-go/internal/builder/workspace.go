@@ -134,7 +134,8 @@ func BuildWorkspaceInitJob(ws *agentv1alpha1.AgentWorkspace, pvcName, image stri
 					},
 				},
 				Spec: corev1.PodSpec{
-					RestartPolicy: corev1.RestartPolicyNever,
+					RestartPolicy:   corev1.RestartPolicyNever,
+					SecurityContext: DefaultPodSecurityContext(nil),
 					Containers: []corev1.Container{
 						{
 							Name:    "git-clone",
@@ -147,6 +148,7 @@ func BuildWorkspaceInitJob(ws *agentv1alpha1.AgentWorkspace, pvcName, image stri
 									MountPath: workspaceMountPath,
 								},
 							},
+							SecurityContext: DefaultContainerSecurityContext(nil),
 						},
 					},
 					Volumes: []corev1.Volume{
@@ -188,7 +190,7 @@ func buildWorkspaceCloneScript(repo *agentv1alpha1.RepositorySpec, wsType agentv
 }
 
 // BuildWorktreeInitContainers builds init containers that create a git worktree (or jj workspace) for an AgentRun
-func BuildWorktreeInitContainers(run *agentv1alpha1.AgentRun, image string, wsType agentv1alpha1.WorkspaceType, worktreeBranch, sourceBranch string) []corev1.Container {
+func BuildWorktreeInitContainers(run *agentv1alpha1.AgentRun, image string, wsType agentv1alpha1.WorkspaceType, worktreeBranch, sourceBranch string, sc *corev1.SecurityContext) []corev1.Container {
 	worktreePath := fmt.Sprintf("%s/%s", worktreeBasePath, run.Name)
 	if sourceBranch == "" {
 		sourceBranch = "HEAD"
@@ -215,12 +217,13 @@ func BuildWorktreeInitContainers(run *agentv1alpha1.AgentRun, image string, wsTy
 					MountPath: workspaceMountPath,
 				},
 			},
+			SecurityContext: DefaultContainerSecurityContext(sc),
 		},
 	}
 }
 
 // BuildWorkspaceMainContainers builds the main agent container for workspace-based runs
-func BuildWorkspaceMainContainers(run *agentv1alpha1.AgentRun, providerEnv map[string]string, image string, agentType agentv1alpha1.AgentType, sharedVolumes []agentv1alpha1.SharedVolumeSpec, sharedVolumePVCs map[string]string, tc *agentv1alpha1.ToolchainSpec) []corev1.Container {
+func BuildWorkspaceMainContainers(run *agentv1alpha1.AgentRun, providerEnv map[string]string, image string, agentType agentv1alpha1.AgentType, sharedVolumes []agentv1alpha1.SharedVolumeSpec, sharedVolumePVCs map[string]string, tc *agentv1alpha1.ToolchainSpec, sc *corev1.SecurityContext) []corev1.Container {
 	env := BuildEnvVars(run, providerEnv)
 	command, args := buildAgentCommand(run, agentType)
 	worktreePath := fmt.Sprintf("%s/%s", worktreeBasePath, run.Name)
@@ -246,15 +249,21 @@ func BuildWorkspaceMainContainers(run *agentv1alpha1.AgentRun, providerEnv map[s
 		env = append(env, t.EnvVars()...)
 	}
 
+	volumeMounts = append(volumeMounts, corev1.VolumeMount{
+		Name:      "tmp",
+		MountPath: "/tmp",
+	})
+
 	return []corev1.Container{
 		{
-			Name:         "agent",
-			Image:        image,
-			Command:      command,
-			Args:         args,
-			Env:          env,
-			WorkingDir:   worktreePath,
-			VolumeMounts: volumeMounts,
+			Name:            "agent",
+			Image:           image,
+			Command:         command,
+			Args:            args,
+			Env:             env,
+			WorkingDir:      worktreePath,
+			VolumeMounts:    volumeMounts,
+			SecurityContext: DefaultContainerSecurityContext(sc),
 		},
 	}
 }
@@ -289,10 +298,16 @@ func BuildWorkspaceJob(run *agentv1alpha1.AgentRun, providerEnv map[string]strin
 		}
 	}
 
-	initContainers := BuildWorktreeInitContainers(run, image, wsType, worktreeBranch, sourceBranch)
+	volumes = append(volumes, corev1.Volume{
+		Name:         "tmp",
+		VolumeSource: corev1.VolumeSource{EmptyDir: &corev1.EmptyDirVolumeSource{}},
+	})
+
+	initContainers := BuildWorktreeInitContainers(run, image, wsType, worktreeBranch, sourceBranch, run.Spec.SecurityContext)
 
 	for _, t := range Toolchains(tc) {
 		if c := t.InitContainer(); c != nil {
+			c.SecurityContext = DefaultContainerSecurityContext(run.Spec.SecurityContext)
 			initContainers = append(initContainers, *c)
 		}
 		volumes = append(volumes, t.Volumes()...)
@@ -325,8 +340,9 @@ func BuildWorkspaceJob(run *agentv1alpha1.AgentRun, providerEnv map[string]strin
 				},
 				Spec: corev1.PodSpec{
 					RestartPolicy:    corev1.RestartPolicyNever,
+					SecurityContext:  DefaultPodSecurityContext(run.Spec.PodSecurityContext),
 					InitContainers:   initContainers,
-					Containers:       BuildWorkspaceMainContainers(run, providerEnv, image, agentType, sharedVolumes, sharedVolumePVCs, tc),
+					Containers:       BuildWorkspaceMainContainers(run, providerEnv, image, agentType, sharedVolumes, sharedVolumePVCs, tc, run.Spec.SecurityContext),
 					Volumes:          volumes,
 					NodeSelector:     run.Spec.NodeSelector,
 					Tolerations:      run.Spec.Tolerations,
