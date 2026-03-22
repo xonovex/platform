@@ -94,20 +94,6 @@ func WithWorkspaceRef(ref string) AgentRunOption {
 	}
 }
 
-// WithConfidentialComputing sets the confidential computing spec.
-func WithConfidentialComputing(cc *agentv1alpha1.ConfidentialComputingSpec) AgentRunOption {
-	return func(r *agentv1alpha1.AgentRun) {
-		r.Spec.ConfidentialComputing = cc
-	}
-}
-
-// WithDefaultConfidentialComputing sets the default confidential computing on the harness.
-func WithDefaultConfidentialComputing(cc *agentv1alpha1.ConfidentialComputingSpec) AgentHarnessOption {
-	return func(h *agentv1alpha1.AgentHarness) {
-		h.Spec.DefaultConfidentialComputing = cc
-	}
-}
-
 // NewAgentRun creates an AgentRun with defaults and applies options.
 func NewAgentRun(namespace, name string, opts ...AgentRunOption) *agentv1alpha1.AgentRun {
 	run := &agentv1alpha1.AgentRun{

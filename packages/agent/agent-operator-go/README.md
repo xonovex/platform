@@ -1,6 +1,6 @@
 # Agent Operator
 
-Kubernetes operator for running AI coding agents (Claude, OpenCode) as Jobs with managed workspaces, provider secrets, and namespace-level defaults. Supports shared multi-agent workspaces where multiple agents coordinate via a common git checkout and shared config/state directories. Supports sandboxed execution via gVisor or Kata Containers runtime classes. Supports [Jujutsu (jj)](https://github.com/jj-vcs/jj) as an alternative VCS for automatic snapshotting and operation-log based undo.
+Kubernetes operator for running AI coding agents (Claude, OpenCode) as Jobs with managed workspaces, provider secrets, and namespace-level defaults. Supports shared multi-agent workspaces where multiple agents coordinate via a common git checkout and shared config/state directories. Supports sandboxed execution via gVisor, Kata Containers, or AKS Confidential Computing (AMD SEV-SNP, Intel TDX) runtime classes. Supports [Jujutsu (jj)](https://github.com/jj-vcs/jj) as an alternative VCS for automatic snapshotting and operation-log based undo.
 
 **API Group:** `agent.xonovex.com/v1alpha1`
 
@@ -389,6 +389,43 @@ spec:
   runtimeClassName: kata
   timeout: 1h
 ```
+
+### Confidential Computing (AKS)
+
+Run agents inside a Trusted Execution Environment (TEE) on Azure Kubernetes Service. AKS supports AMD SEV-SNP via `kata-cc` and Intel TDX via `kata-tdx` runtime classes on confidential compute node pools.
+
+Use the existing `runtimeClassName` and `nodeSelector` fields — no special configuration is needed:
+
+```yaml
+# RuntimeClass (cluster setup — AKS creates these automatically on CC node pools)
+apiVersion: node.k8s.io/v1
+kind: RuntimeClass
+metadata:
+  name: kata-cc
+handler: kata-cc
+---
+# AgentRun with AMD SEV-SNP confidential computing
+apiVersion: agent.xonovex.com/v1alpha1
+kind: AgentRun
+metadata:
+  name: confidential-agent
+spec:
+  harnessRef: claude-harness
+  providerRef: gemini-provider
+  workspace:
+    type: git
+    repository:
+      url: https://github.com/org/repo.git
+      branch: main
+  prompt: "Process sensitive data"
+  runtimeClassName: kata-cc
+  nodeSelector:
+    kubernetes.azure.com/confidential-computing: "true"
+```
+
+For Intel TDX, use `runtimeClassName: kata-tdx` instead.
+
+The `nodeSelector` ensures the pod lands on a confidential compute node pool. The `runtimeClassName` selects the TEE-enabled Kata runtime. Both fields can also be set as defaults on an AgentHarness via `defaultRuntimeClassName`.
 
 ### Sandbox default via harness
 
