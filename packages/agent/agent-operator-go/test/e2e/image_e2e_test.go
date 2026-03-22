@@ -3,6 +3,7 @@
 package e2e
 
 import (
+	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -37,9 +38,17 @@ func TestE2E_ImageDeployment(t *testing.T) {
 		t.Fatalf("docker build failed: %v", err)
 	}
 
-	// Load image into Kind
-	if err := runCmd("kind", "load", "docker-image", "agent-operator:latest", "--name", clusterName); err != nil {
-		t.Fatalf("kind load failed: %v", err)
+	// Retry kind load — containerd may not be ready immediately after cluster creation
+	var loadErr error
+	for range 5 {
+		loadErr = runCmd("kind", "load", "docker-image", "agent-operator:latest", "--name", clusterName)
+		if loadErr == nil {
+			break
+		}
+		time.Sleep(3 * time.Second)
+	}
+	if loadErr != nil {
+		t.Fatalf("kind load failed after retries: %v", loadErr)
 	}
 
 	ns := createNamespace(t, "e2e-image")
@@ -139,12 +148,40 @@ func TestE2E_ImageDeployment(t *testing.T) {
 	}
 
 	// Wait for pod to be running and ready (proves binary starts and health probes pass)
-	testutil.WaitForCondition(t, ctx, 120*time.Second, func() bool {
+	lastLog := time.Now()
+	testutil.WaitForCondition(t, ctx, 180*time.Second, func() bool {
 		var d appsv1.Deployment
 		if err := k8sClient.Get(ctx, client.ObjectKeyFromObject(dep), &d); err != nil {
 			return false
 		}
-		return d.Status.ReadyReplicas == 1
+		if d.Status.ReadyReplicas == 1 {
+			return true
+		}
+		if time.Since(lastLog) >= 15*time.Second {
+			var podList corev1.PodList
+			if err := k8sClient.List(ctx, &podList, client.InNamespace(ns), client.MatchingLabels{"app": "agent-operator"}); err == nil {
+				for _, pod := range podList.Items {
+					msg := fmt.Sprintf("pod=%s phase=%s", pod.Name, pod.Status.Phase)
+					for _, cs := range pod.Status.ContainerStatuses {
+						if cs.State.Waiting != nil {
+							msg += fmt.Sprintf(" container=%s(%s: %s)", cs.Name, cs.State.Waiting.Reason, cs.State.Waiting.Message)
+						} else if cs.State.Terminated != nil {
+							msg += fmt.Sprintf(" container=%s(exit=%d: %s)", cs.Name, cs.State.Terminated.ExitCode, cs.State.Terminated.Message)
+						} else if cs.State.Running != nil {
+							msg += fmt.Sprintf(" container=%s(running, ready=%v)", cs.Name, cs.Ready)
+						}
+					}
+					for _, cond := range pod.Status.Conditions {
+						if cond.Status != corev1.ConditionTrue {
+							msg += fmt.Sprintf(" cond=%s(%s)", cond.Type, cond.Message)
+						}
+					}
+					t.Log(msg)
+				}
+			}
+			lastLog = time.Now()
+		}
+		return false
 	})
 
 	// Verify pod details

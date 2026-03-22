@@ -80,6 +80,20 @@ func WithPhase(phase agentv1alpha1.AgentRunPhase) AgentRunOption {
 	}
 }
 
+// WithSecurityContext sets the container security context override.
+func WithSecurityContext(sc *corev1.SecurityContext) AgentRunOption {
+	return func(r *agentv1alpha1.AgentRun) {
+		r.Spec.SecurityContext = sc
+	}
+}
+
+// WithPodSecurityContext sets the pod-level security context override.
+func WithPodSecurityContext(psc *corev1.PodSecurityContext) AgentRunOption {
+	return func(r *agentv1alpha1.AgentRun) {
+		r.Spec.PodSecurityContext = psc
+	}
+}
+
 // WithRuntimeClassName sets the runtime class name.
 func WithRuntimeClassName(name string) AgentRunOption {
 	return func(r *agentv1alpha1.AgentRun) {
@@ -270,6 +284,19 @@ func NewAgentWorkspace(namespace, name string, opts ...AgentWorkspaceOption) *ag
 		opt(ws)
 	}
 	return ws
+}
+
+// E2ESecurityOverrides returns AgentRunOptions that relax security defaults
+// for e2e tests using images that run as root (e.g. busybox:1.37).
+func E2ESecurityOverrides() []AgentRunOption {
+	f := false
+	return []AgentRunOption{
+		WithPodSecurityContext(&corev1.PodSecurityContext{RunAsNonRoot: &f}),
+		WithSecurityContext(&corev1.SecurityContext{
+			RunAsNonRoot:           &f,
+			ReadOnlyRootFilesystem: &f,
+		}),
+	}
 }
 
 // NewSecret creates a Secret with the given data.
