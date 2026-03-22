@@ -44,18 +44,6 @@ func BuildJob(run *agentv1alpha1.AgentRun, providerEnv map[string]string, pvcNam
 		volumes = append(volumes, t.Volumes()...)
 	}
 
-	// TEE runtimeClassName takes precedence over direct RuntimeClassName
-	runtimeClass := run.Spec.RuntimeClassName
-	if teeRC := TEERuntimeClassName(run.Spec.ConfidentialComputing); teeRC != nil {
-		runtimeClass = teeRC
-	}
-
-	// Build node affinity from TEE config
-	var affinity *corev1.Affinity
-	if nodeAffinity := TEENodeAffinity(run.Spec.ConfidentialComputing); nodeAffinity != nil {
-		affinity = &corev1.Affinity{NodeAffinity: nodeAffinity}
-	}
-
 	job := &batchv1.Job{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      run.Name,
@@ -88,8 +76,7 @@ func BuildJob(run *agentv1alpha1.AgentRun, providerEnv map[string]string, pvcNam
 					Volumes:          volumes,
 					NodeSelector:     run.Spec.NodeSelector,
 					Tolerations:      run.Spec.Tolerations,
-					RuntimeClassName: runtimeClass,
-					Affinity:         affinity,
+					RuntimeClassName: run.Spec.RuntimeClassName,
 				},
 			},
 		},

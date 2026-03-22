@@ -6,30 +6,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// TEEType identifies the Trusted Execution Environment type.
-type TEEType string
-
-const (
-	// TEETypeAMDSEVSNP uses AMD SEV-SNP via the kata-cc runtimeClass on AKS.
-	TEETypeAMDSEVSNP TEEType = "amd-sev-snp"
-	// TEETypeIntelTDX uses Intel TDX via the kata-tdx runtimeClass on AKS.
-	TEETypeIntelTDX TEEType = "intel-tdx"
-)
-
-// ConfidentialComputingSpec configures TEE-based isolation for agent pods on AKS.
-type ConfidentialComputingSpec struct {
-	// TEE is the Trusted Execution Environment type.
-	TEE TEEType `json:"tee"`
-
-	// OverrideRuntimeClassName overrides the automatically selected runtimeClassName
-	// for the TEE type. Leave empty to use the default for the TEE.
-	OverrideRuntimeClassName *string `json:"overrideRuntimeClassName,omitempty"`
-
-	// DisableNodeAffinity skips adding the AKS confidential compute node affinity.
-	// Use only if you manage node selection via NodeSelector or Tolerations directly.
-	DisableNodeAffinity bool `json:"disableNodeAffinity,omitempty"`
-}
-
 // AgentNetworkPolicy configures the NetworkPolicy created for an AgentRun's pods.
 type AgentNetworkPolicy struct {
 	// Disabled skips NetworkPolicy creation entirely.
@@ -189,8 +165,6 @@ type AgentSpec struct {
 	DefaultNetworkPolicy *AgentNetworkPolicy `json:"defaultNetworkPolicy,omitempty"`
 	// DefaultTTLSecondsAfterFinished is the default TTL for completed Jobs (default: 3600)
 	DefaultTTLSecondsAfterFinished *int32 `json:"defaultTtlSecondsAfterFinished,omitempty"`
-	// DefaultConfidentialComputing configures TEE-based isolation defaults for all runs.
-	DefaultConfidentialComputing *ConfidentialComputingSpec `json:"defaultConfidentialComputing,omitempty"`
 }
 
 // AgentRunSpec defines the desired state of AgentRun
@@ -238,11 +212,6 @@ type AgentRunSpec struct {
 	// after completion before automatic cleanup. Defaults to 3600 (1 hour). Set to 0 to
 	// clean up immediately.
 	TTLSecondsAfterFinished *int32 `json:"ttlSecondsAfterFinished,omitempty"`
-	// ConfidentialComputing configures TEE-based isolation for agent pods.
-	// When set, the operator adds AKS confidential compute node affinity and
-	// sets the appropriate runtimeClassName for the TEE type.
-	// Takes precedence over RuntimeClassName if both are set.
-	ConfidentialComputing *ConfidentialComputingSpec `json:"confidentialComputing,omitempty"`
 }
 
 // AgentRunStatus defines the observed state of AgentRun
