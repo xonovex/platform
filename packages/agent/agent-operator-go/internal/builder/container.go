@@ -73,14 +73,14 @@ func buildCloneScript(repo agentv1alpha1.RepositorySpec, wsType agentv1alpha1.Wo
 
 	script += "git clone"
 	if repo.Branch != "" {
-		script += " --branch " + repo.Branch
+		script += " --branch " + shellQuote(repo.Branch)
 	}
 	script += " --single-branch --depth 1"
-	script += " " + repo.URL + " .\n"
+	script += " -- " + shellQuote(repo.URL) + " .\n"
 
 	if repo.Commit != "" {
-		script += "git fetch origin " + repo.Commit + "\n"
-		script += "git checkout " + repo.Commit + "\n"
+		script += "git fetch origin " + shellQuote(repo.Commit) + "\n"
+		script += "git checkout " + shellQuote(repo.Commit) + "\n"
 	}
 
 	if vcs, err := GetVCSStrategy(wsType); err == nil {

@@ -10,7 +10,7 @@ func (j *JujutsuStrategy) PostCloneScript() string {
 }
 
 func (j *JujutsuStrategy) WorktreeScript(path, _, sourceBranch string) string {
-	return fmt.Sprintf("jj workspace add %s --revision %s\n", path, sourceBranch)
+	return fmt.Sprintf("jj workspace add %s --revision %s\n", shellQuote(path), shellQuote(sourceBranch))
 }
 
 func (j *JujutsuStrategy) InitContainerName() string {

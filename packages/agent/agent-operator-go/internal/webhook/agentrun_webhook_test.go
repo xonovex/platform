@@ -328,6 +328,62 @@ func TestAgentRunWebhook_ValidateDelete(t *testing.T) {
 	}
 }
 
+func TestAgentRunWebhook_Validate_MaliciousURL(t *testing.T) {
+	w := &AgentRunWebhook{}
+	run := &agentv1alpha1.AgentRun{
+		Spec: agentv1alpha1.AgentRunSpec{
+			Workspace: &agentv1alpha1.WorkspaceSpec{
+				Repository: agentv1alpha1.RepositorySpec{
+					URL: "https://example.com/repo.git; rm -rf /",
+				},
+			},
+		},
+	}
+
+	_, err := w.ValidateCreate(context.Background(), run)
+	if err == nil {
+		t.Error("ValidateCreate() expected error for malicious URL")
+	}
+}
+
+func TestAgentRunWebhook_Validate_MaliciousBranch(t *testing.T) {
+	w := &AgentRunWebhook{}
+	run := &agentv1alpha1.AgentRun{
+		Spec: agentv1alpha1.AgentRunSpec{
+			Workspace: &agentv1alpha1.WorkspaceSpec{
+				Repository: agentv1alpha1.RepositorySpec{
+					URL:    "https://github.com/example/repo.git",
+					Branch: "main$(whoami)",
+				},
+			},
+		},
+	}
+
+	_, err := w.ValidateCreate(context.Background(), run)
+	if err == nil {
+		t.Error("ValidateCreate() expected error for malicious branch")
+	}
+}
+
+func TestAgentRunWebhook_Validate_MaliciousCommit(t *testing.T) {
+	w := &AgentRunWebhook{}
+	run := &agentv1alpha1.AgentRun{
+		Spec: agentv1alpha1.AgentRunSpec{
+			Workspace: &agentv1alpha1.WorkspaceSpec{
+				Repository: agentv1alpha1.RepositorySpec{
+					URL:    "https://github.com/example/repo.git",
+					Commit: "abc1234; cat /etc/passwd",
+				},
+			},
+		},
+	}
+
+	_, err := w.ValidateCreate(context.Background(), run)
+	if err == nil {
+		t.Error("ValidateCreate() expected error for malicious commit")
+	}
+}
+
 func TestAgentRunWebhook_Validate_InlineHarnessOnly(t *testing.T) {
 	w := &AgentRunWebhook{}
 	run := &agentv1alpha1.AgentRun{
