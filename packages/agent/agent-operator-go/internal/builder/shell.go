@@ -1,9 +1,6 @@
 package builder
 
-import "strings"
+import "github.com/xonovex/platform/packages/shared/shared-core-go/pkg/shell"
 
-// shellQuote wraps a string in single quotes, escaping any embedded single quotes.
-// This is safe for POSIX sh arguments even if the value contains spaces or special chars.
-func shellQuote(s string) string {
-	return "'" + strings.ReplaceAll(s, "'", "'\\''") + "'"
-}
+// shellQuote is a package-local alias for shell.Quote.
+var shellQuote = shell.Quote

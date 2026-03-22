@@ -270,6 +270,121 @@ func TestResolveProvider_DefaultFromHarness(t *testing.T) {
 	}
 }
 
+func TestResolveProvider_PresetRef(t *testing.T) {
+	provider := &agentv1alpha1.AgentProvider{
+		ObjectMeta: metav1.ObjectMeta{Name: "preset-provider", Namespace: "default"},
+		Spec: agentv1alpha1.AgentProviderSpec{
+			PresetRef: "gemini",
+		},
+	}
+
+	c := fake.NewClientBuilder().WithScheme(newScheme()).WithObjects(provider).Build()
+
+	run := &agentv1alpha1.AgentRun{
+		ObjectMeta: metav1.ObjectMeta{Name: "test", Namespace: "default"},
+		Spec: agentv1alpha1.AgentRunSpec{
+			ProviderRef: "preset-provider",
+		},
+	}
+
+	env, err := ResolveProvider(context.Background(), c, run, "")
+	if err != nil {
+		t.Fatalf("ResolveProvider() error = %v", err)
+	}
+	if env["ANTHROPIC_BASE_URL"] == "" {
+		t.Error("expected ANTHROPIC_BASE_URL from preset, got empty")
+	}
+}
+
+func TestResolveProvider_PresetRefOverriddenByEnvironment(t *testing.T) {
+	provider := &agentv1alpha1.AgentProvider{
+		ObjectMeta: metav1.ObjectMeta{Name: "preset-override", Namespace: "default"},
+		Spec: agentv1alpha1.AgentProviderSpec{
+			PresetRef: "gemini",
+			Environment: map[string]string{
+				"ANTHROPIC_BASE_URL": "http://custom:9999",
+			},
+		},
+	}
+
+	c := fake.NewClientBuilder().WithScheme(newScheme()).WithObjects(provider).Build()
+
+	run := &agentv1alpha1.AgentRun{
+		ObjectMeta: metav1.ObjectMeta{Name: "test", Namespace: "default"},
+		Spec: agentv1alpha1.AgentRunSpec{
+			ProviderRef: "preset-override",
+		},
+	}
+
+	env, err := ResolveProvider(context.Background(), c, run, "")
+	if err != nil {
+		t.Fatalf("ResolveProvider() error = %v", err)
+	}
+	if env["ANTHROPIC_BASE_URL"] != "http://custom:9999" {
+		t.Errorf("ANTHROPIC_BASE_URL = %q, want %q", env["ANTHROPIC_BASE_URL"], "http://custom:9999")
+	}
+	// Preset's other env vars should still be present
+	if env["API_TIMEOUT_MS"] == "" {
+		t.Error("expected API_TIMEOUT_MS from preset, got empty")
+	}
+}
+
+func TestResolveProvider_UnknownPresetSoftFailure(t *testing.T) {
+	provider := &agentv1alpha1.AgentProvider{
+		ObjectMeta: metav1.ObjectMeta{Name: "unknown-preset", Namespace: "default"},
+		Spec: agentv1alpha1.AgentProviderSpec{
+			PresetRef: "nonexistent-preset",
+			Environment: map[string]string{
+				"CUSTOM_VAR": "value",
+			},
+		},
+	}
+
+	c := fake.NewClientBuilder().WithScheme(newScheme()).WithObjects(provider).Build()
+
+	run := &agentv1alpha1.AgentRun{
+		ObjectMeta: metav1.ObjectMeta{Name: "test", Namespace: "default"},
+		Spec: agentv1alpha1.AgentRunSpec{
+			ProviderRef: "unknown-preset",
+		},
+	}
+
+	env, err := ResolveProvider(context.Background(), c, run, "")
+	if err != nil {
+		t.Fatalf("ResolveProvider() should not error on unknown preset, got %v", err)
+	}
+	if env["CUSTOM_VAR"] != "value" {
+		t.Errorf("CUSTOM_VAR = %q, want %q", env["CUSTOM_VAR"], "value")
+	}
+}
+
+func TestResolveProvider_InlinePresetRef(t *testing.T) {
+	c := fake.NewClientBuilder().WithScheme(newScheme()).Build()
+
+	run := &agentv1alpha1.AgentRun{
+		ObjectMeta: metav1.ObjectMeta{Name: "test", Namespace: "default"},
+		Spec: agentv1alpha1.AgentRunSpec{
+			Provider: &agentv1alpha1.ProviderSpec{
+				PresetRef: "gemini",
+				Environment: map[string]string{
+					"ANTHROPIC_BASE_URL": "http://override:8080",
+				},
+			},
+		},
+	}
+
+	env, err := ResolveProvider(context.Background(), c, run, "")
+	if err != nil {
+		t.Fatalf("ResolveProvider() error = %v", err)
+	}
+	if env["ANTHROPIC_BASE_URL"] != "http://override:8080" {
+		t.Errorf("ANTHROPIC_BASE_URL = %q, want override", env["ANTHROPIC_BASE_URL"])
+	}
+	if env["API_TIMEOUT_MS"] == "" {
+		t.Error("expected API_TIMEOUT_MS from preset")
+	}
+}
+
 func TestResolveProvider_NoAuthTokenInjectionWithoutBaseURL(t *testing.T) {
 	secret := &corev1.Secret{
 		ObjectMeta: metav1.ObjectMeta{Name: "api-key", Namespace: "default"},

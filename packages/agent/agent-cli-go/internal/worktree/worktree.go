@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	sharedworktree "github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/worktree"
 	"github.com/xonovex/platform/packages/shared/shared-core-go/pkg/scriptlib"
 )
 
@@ -15,6 +16,7 @@ type Config struct {
 	SourceBranch string
 	Branch       string
 	Dir          string
+	VCS          sharedworktree.VCSType
 }
 
 // ExistingWorktreeCheck holds the result of checking an existing worktree
@@ -163,10 +165,75 @@ func setMergeBackConfig(branch, sourceBranch, cwd string) error {
 	return err
 }
 
-// Setup creates or reuses a git worktree
+// IsJJAvailable returns true if the jj binary is on PATH
+func IsJJAvailable() bool {
+	_, err := exec.LookPath("jj")
+	return err == nil
+}
+
+// SetupJJ creates or reuses a jj workspace.
+func SetupJJ(config Config, repoDir string, verbose bool) (string, error) {
+	resolvedDir := config.Dir
+	if !filepath.IsAbs(config.Dir) {
+		resolvedDir = filepath.Join(repoDir, config.Dir)
+	}
+
+	// Check if workspace already exists
+	if _, err := os.Stat(resolvedDir); err == nil {
+		if verbose {
+			scriptlib.LogInfo(fmt.Sprintf("Reusing existing jj workspace at %s", config.Dir))
+		}
+		return resolvedDir, nil
+	}
+
+	if !IsJJAvailable() {
+		return "", fmt.Errorf("jj is not installed or not on PATH; install from https://martinvonz.github.io/jj/")
+	}
+
+	sourceBranch := config.SourceBranch
+	if sourceBranch == "" {
+		sourceBranch = GetCurrentBranchSync(repoDir)
+		if sourceBranch == "" {
+			return "", fmt.Errorf("failed to determine source revision")
+		}
+	}
+
+	if verbose {
+		scriptlib.LogInfo(fmt.Sprintf("Creating jj workspace at %s from %s", config.Dir, sourceBranch))
+	}
+
+	cmd := exec.Command("jj", "workspace", "add", resolvedDir, "--revision", sourceBranch)
+	cmd.Dir = repoDir
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	if err := cmd.Run(); err != nil {
+		return "", fmt.Errorf("jj workspace add failed: %w", err)
+	}
+
+	if verbose {
+		scriptlib.LogSuccess("jj workspace created successfully")
+	}
+	return resolvedDir, nil
+}
+
+// Setup creates or reuses a worktree/workspace, dispatching by VCS type.
+func Setup(config Config, repoDir string, verbose bool) (string, error) {
+	vcs := config.VCS
+	if vcs == "" {
+		vcs = sharedworktree.VCSGit
+	}
+	switch vcs {
+	case sharedworktree.VCSJujutsu:
+		return SetupJJ(config, repoDir, verbose)
+	default:
+		return setupGit(config, repoDir, verbose)
+	}
+}
+
+// setupGit creates or reuses a git worktree.
 // If the worktree already exists with the correct branch, it will be reused.
 // Otherwise, creates a new worktree and sets the mergeBackTo config.
-func Setup(config Config, repoDir string, verbose bool) (string, error) {
+func setupGit(config Config, repoDir string, verbose bool) (string, error) {
 	resolvedDir := config.Dir
 	if !filepath.IsAbs(config.Dir) {
 		resolvedDir = filepath.Join(repoDir, config.Dir)

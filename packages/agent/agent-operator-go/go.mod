@@ -3,6 +3,8 @@ module github.com/xonovex/platform/packages/agent/agent-operator-go
 go 1.25.5
 
 require (
+	github.com/xonovex/platform/packages/shared/shared-agent-go v0.0.0-00010101000000-000000000000
+	github.com/xonovex/platform/packages/shared/shared-core-go v0.0.0-20260322125151-861cb167a7d8
 	k8s.io/api v0.32.3
 	k8s.io/apimachinery v0.32.3
 	k8s.io/client-go v0.32.3

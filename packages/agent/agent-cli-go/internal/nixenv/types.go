@@ -1,63 +1,17 @@
 package nixenv
 
-// NixpkgsPin represents a nixpkgs channel pin configuration
-type NixpkgsPin struct {
-	Name string
-	Ref  string
-}
+import "github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/nix"
 
-// Allowed nixpkgs pins - maps friendly names to tarball refs
-var NixpkgsPins = map[string]NixpkgsPin{
-	"nixos-24.11": {
-		Name: "nixos-24.11",
-		Ref:  "nixos-24.11",
-	},
-	"nixos-unstable": {
-		Name: "nixos-unstable",
-		Ref:  "nixos-unstable",
-	},
-	"nixpkgs-unstable": {
-		Name: "nixpkgs-unstable",
-		Ref:  "nixpkgs-unstable",
-	},
-}
+// NixpkgsPin is an alias for the shared Pin type
+type NixpkgsPin = nix.Pin
 
-// DefaultNixpkgsPin is the default nixpkgs pin to use
-const DefaultNixpkgsPin = "nixos-unstable"
+// Shared definitions re-exported for backward compatibility within this package
+var NixpkgsPins = nix.Pins
 
-// DefaultBasePackages are the default packages for agent environments
-var DefaultBasePackages = []string{
-	"nodejs_24",
-	"git",
-	"ripgrep",
-	"fd",
-	"fzf",
-	"jq",
-	"curl",
-	"coreutils",
-	"bash",
-}
+const DefaultNixpkgsPin = nix.DefaultPin
 
-// PackageSets are predefined collections of packages for common use cases
-var PackageSets = map[string][]string{
-	"nodejs": {
-		"nodejs_24",
-		"python312",
-		"gnumake",
-		"gcc",
-		"gnused",
-		"gawk",
-		"binutils",
-	},
-	"python":     {"python312", "python312Packages.pip"},
-	"go":         {"go"},
-	"rust":       {"rustc", "cargo"},
-	"kubernetes": {"kubectl", "kubernetes-helm", "k9s"},
-	"terraform":  {"terraform", "terragrunt"},
-	"docker":     {"docker-client"},
-	"aws":        {"awscli2"},
-	"gcp":        {"google-cloud-sdk"},
-}
+var DefaultBasePackages = nix.DefaultPackages
+var PackageSets = nix.PackageSets
 
 // EnvSpec is the environment specification for building a Nix environment
 type EnvSpec struct {

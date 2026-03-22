@@ -146,51 +146,10 @@ func TestGetGitInfo(t *testing.T) {
 	})
 }
 
-func TestShellQuote(t *testing.T) {
-	tests := []struct {
-		name     string
-		input    string
-		expected string
-	}{
-		{
-			name:     "simple string unchanged",
-			input:    "simple",
-			expected: "simple",
-		},
-		{
-			name:     "path unchanged",
-			input:    "/usr/bin/claude",
-			expected: "/usr/bin/claude",
-		},
-		{
-			name:     "equals sign unchanged",
-			input:    "KEY=value",
-			expected: "KEY=value",
-		},
-		{
-			name:     "spaces quoted",
-			input:    "hello world",
-			expected: "'hello world'",
-		},
-		{
-			name:     "single quotes escaped",
-			input:    "it's",
-			expected: `'it'"'"'s'`,
-		},
-		{
-			name:     "special chars quoted",
-			input:    "echo $VAR",
-			expected: "'echo $VAR'",
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			result := shellQuote(tt.input)
-			if result != tt.expected {
-				t.Errorf("shellQuote(%q) = %q, want %q", tt.input, result, tt.expected)
-			}
-		})
+func TestBuildShellCommand_QuotesAllArgs(t *testing.T) {
+	result := buildShellCommand([]string{"echo", "hello"})
+	if result != "'echo' 'hello'" {
+		t.Errorf("buildShellCommand quoted = %q, want %q", result, "'echo' 'hello'")
 	}
 }
 
@@ -203,17 +162,17 @@ func TestBuildShellCommand(t *testing.T) {
 		{
 			name:     "simple command",
 			args:     []string{"echo", "hello"},
-			expected: "echo hello",
+			expected: "'echo' 'hello'",
 		},
 		{
 			name:     "command with path",
 			args:     []string{"/usr/bin/claude", "--model", "opus"},
-			expected: "/usr/bin/claude --model opus",
+			expected: "'/usr/bin/claude' '--model' 'opus'",
 		},
 		{
 			name:     "command with spaces in arg",
 			args:     []string{"echo", "hello world"},
-			expected: "echo 'hello world'",
+			expected: "'echo' 'hello world'",
 		},
 	}
 
