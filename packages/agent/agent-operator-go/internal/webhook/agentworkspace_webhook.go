@@ -3,7 +3,9 @@ package webhook
 import (
 	"context"
 	"fmt"
+	"strings"
 
+	"k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
@@ -88,7 +90,14 @@ func (w *AgentWorkspaceWebhook) validate(ws *agentv1alpha1.AgentWorkspace) (admi
 		}
 	}
 
+	if ws.Spec.StorageSize != "" {
+		if _, err := resource.ParseQuantity(ws.Spec.StorageSize); err != nil {
+			return nil, fmt.Errorf("storageSize %q is not a valid resource quantity: %v", ws.Spec.StorageSize, err)
+		}
+	}
+
 	names := make(map[string]bool)
+	mountPaths := make(map[string]bool)
 	for _, vol := range ws.Spec.SharedVolumes {
 		if vol.Name == "" {
 			return nil, fmt.Errorf("shared volume name is required")
@@ -96,10 +105,23 @@ func (w *AgentWorkspaceWebhook) validate(ws *agentv1alpha1.AgentWorkspace) (admi
 		if vol.MountPath == "" {
 			return nil, fmt.Errorf("shared volume mountPath is required for volume %q", vol.Name)
 		}
+		if !strings.HasPrefix(vol.MountPath, "/") {
+			return nil, fmt.Errorf("sharedVolumes[%q].mountPath %q must be an absolute path", vol.Name, vol.MountPath)
+		}
 		if names[vol.Name] {
 			return nil, fmt.Errorf("duplicate shared volume name: %q", vol.Name)
 		}
 		names[vol.Name] = true
+		if mountPaths[vol.MountPath] {
+			return nil, fmt.Errorf("duplicate mountPath %q in sharedVolumes", vol.MountPath)
+		}
+		mountPaths[vol.MountPath] = true
+		if vol.StorageSize != "" {
+			if _, err := resource.ParseQuantity(vol.StorageSize); err != nil {
+				return nil, fmt.Errorf("sharedVolumes[%q].storageSize %q is not a valid resource quantity: %v",
+					vol.Name, vol.StorageSize, err)
+			}
+		}
 	}
 
 	return nil, nil

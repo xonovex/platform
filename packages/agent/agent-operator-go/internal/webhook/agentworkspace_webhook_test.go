@@ -194,3 +194,104 @@ func TestAgentWorkspaceWebhook_ValidateDelete(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 }
+
+func TestAgentWorkspaceWebhook_Validate_ValidStorageSize(t *testing.T) {
+	ws := &agentv1alpha1.AgentWorkspace{
+		Spec: agentv1alpha1.AgentWorkspaceSpec{
+			Repository:  agentv1alpha1.RepositorySpec{URL: "https://github.com/org/repo.git"},
+			StorageSize: "10Gi",
+		},
+	}
+
+	webhook := &AgentWorkspaceWebhook{}
+	_, err := webhook.ValidateCreate(context.Background(), ws)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+}
+
+func TestAgentWorkspaceWebhook_Validate_InvalidStorageSize(t *testing.T) {
+	ws := &agentv1alpha1.AgentWorkspace{
+		Spec: agentv1alpha1.AgentWorkspaceSpec{
+			Repository:  agentv1alpha1.RepositorySpec{URL: "https://github.com/org/repo.git"},
+			StorageSize: "10gigabytes",
+		},
+	}
+
+	webhook := &AgentWorkspaceWebhook{}
+	_, err := webhook.ValidateCreate(context.Background(), ws)
+	if err == nil {
+		t.Fatal("expected error for invalid storage size")
+	}
+}
+
+func TestAgentWorkspaceWebhook_Validate_InvalidSharedVolumeStorageSize(t *testing.T) {
+	ws := &agentv1alpha1.AgentWorkspace{
+		Spec: agentv1alpha1.AgentWorkspaceSpec{
+			Repository: agentv1alpha1.RepositorySpec{URL: "https://github.com/org/repo.git"},
+			SharedVolumes: []agentv1alpha1.SharedVolumeSpec{
+				{Name: "data", MountPath: "/data", StorageSize: "notasize"},
+			},
+		},
+	}
+
+	webhook := &AgentWorkspaceWebhook{}
+	_, err := webhook.ValidateCreate(context.Background(), ws)
+	if err == nil {
+		t.Fatal("expected error for invalid shared volume storage size")
+	}
+}
+
+func TestAgentWorkspaceWebhook_Validate_DuplicateMountPath(t *testing.T) {
+	ws := &agentv1alpha1.AgentWorkspace{
+		Spec: agentv1alpha1.AgentWorkspaceSpec{
+			Repository: agentv1alpha1.RepositorySpec{URL: "https://github.com/org/repo.git"},
+			SharedVolumes: []agentv1alpha1.SharedVolumeSpec{
+				{Name: "vol1", MountPath: "/data"},
+				{Name: "vol2", MountPath: "/data"},
+			},
+		},
+	}
+
+	webhook := &AgentWorkspaceWebhook{}
+	_, err := webhook.ValidateCreate(context.Background(), ws)
+	if err == nil {
+		t.Fatal("expected error for duplicate mount path")
+	}
+}
+
+func TestAgentWorkspaceWebhook_Validate_RelativeMountPath(t *testing.T) {
+	ws := &agentv1alpha1.AgentWorkspace{
+		Spec: agentv1alpha1.AgentWorkspaceSpec{
+			Repository: agentv1alpha1.RepositorySpec{URL: "https://github.com/org/repo.git"},
+			SharedVolumes: []agentv1alpha1.SharedVolumeSpec{
+				{Name: "vol1", MountPath: "relative/path"},
+			},
+		},
+	}
+
+	webhook := &AgentWorkspaceWebhook{}
+	_, err := webhook.ValidateCreate(context.Background(), ws)
+	if err == nil {
+		t.Fatal("expected error for relative mount path")
+	}
+}
+
+func TestAgentWorkspaceWebhook_Validate_ValidSharedVolumes(t *testing.T) {
+	ws := &agentv1alpha1.AgentWorkspace{
+		Spec: agentv1alpha1.AgentWorkspaceSpec{
+			Repository:  agentv1alpha1.RepositorySpec{URL: "https://github.com/org/repo.git"},
+			StorageSize: "20Gi",
+			SharedVolumes: []agentv1alpha1.SharedVolumeSpec{
+				{Name: "claude-config", MountPath: "/root/.claude", StorageSize: "1Gi"},
+				{Name: "shared-data", MountPath: "/data", StorageSize: "5Gi"},
+			},
+		},
+	}
+
+	webhook := &AgentWorkspaceWebhook{}
+	_, err := webhook.ValidateCreate(context.Background(), ws)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+}
