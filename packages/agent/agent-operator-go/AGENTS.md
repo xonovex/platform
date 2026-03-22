@@ -11,6 +11,7 @@
 - E2E: `go test -tags=e2e ./test/e2e/` (requires Docker, kind, kubectl)
 - E2E gVisor: `go test -tags=e2e_gvisor ./test/e2e-gvisor/` (downloads runsc, creates kind cluster)
 - E2E Kata: `go test -tags=e2e_kata ./test/e2e-kata/` (downloads Kata, requires `/dev/kvm`; VM isolation test skips in unprivileged kind — use a real cluster or `USE_EXISTING_CLUSTER=true`)
+- E2E CoCo: `go test -tags=e2e_coco ./test/e2e-coco/` (creates kind cluster with simulated kata-cc/kata-tdx RuntimeClasses; validates runtimeClassName propagation, harness defaults, full-cycle pipeline, workspace jobs)
 
 - **controller-gen broken with Go 1.25+**: generates `_.yaml` (empty group name) and omits sub-type DeepCopyInto methods; CRDs and `zz_generated.deepcopy.go` must be maintained manually until controller-tools supports Go 1.25+
 
