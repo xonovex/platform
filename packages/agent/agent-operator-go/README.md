@@ -1,6 +1,6 @@
 # Agent Operator
 
-Kubernetes operator for running AI coding agents (Claude, OpenCode) as Jobs with managed workspaces, provider secrets, and namespace-level defaults. Supports shared multi-agent workspaces where multiple agents coordinate via a common git checkout and shared config/state directories. Supports sandboxed execution via gVisor, Kata Containers, or AKS Confidential Computing (AMD SEV-SNP, Intel TDX) runtime classes. Supports [Jujutsu (jj)](https://github.com/jj-vcs/jj) as an alternative VCS for automatic snapshotting and operation-log based undo.
+Kubernetes operator for running AI coding agents (Claude, OpenCode) as Jobs with managed workspaces, provider secrets, and namespace-level defaults. Supports shared multi-agent workspaces where multiple agents coordinate via a common git checkout and shared config/state directories. Supports sandboxed execution via gVisor, Kata Containers, or Confidential Containers (CoCo) with AMD SEV-SNP / Intel TDX runtime classes. Supports [Jujutsu (jj)](https://github.com/jj-vcs/jj) as an alternative VCS for automatic snapshotting and operation-log based undo.
 
 **API Group:** `agent.xonovex.com/v1alpha1`
 
@@ -390,14 +390,14 @@ spec:
   timeout: 1h
 ```
 
-### Confidential Computing (AKS)
+### Confidential Computing (Kata + CoCo)
 
-Run agents inside a Trusted Execution Environment (TEE) on Azure Kubernetes Service. AKS supports AMD SEV-SNP via `kata-cc` and Intel TDX via `kata-tdx` runtime classes on confidential compute node pools.
+Run agents inside a Trusted Execution Environment (TEE) using [Confidential Containers (CoCo)](https://github.com/confidential-containers) with AMD SEV-SNP or Intel TDX hardware. This works across cloud providers (AKS, EKS, GKE) and on-prem clusters with TEE-capable nodes.
 
 Use the existing `runtimeClassName` and `nodeSelector` fields — no special configuration is needed:
 
 ```yaml
-# RuntimeClass (cluster setup — AKS creates these automatically on CC node pools)
+# RuntimeClass (cluster setup — cloud providers may create these automatically)
 apiVersion: node.k8s.io/v1
 kind: RuntimeClass
 metadata:
@@ -420,12 +420,13 @@ spec:
   prompt: "Process sensitive data"
   runtimeClassName: kata-cc
   nodeSelector:
+    # Use your cluster's label for TEE-capable nodes. Examples:
+    # AKS: kubernetes.azure.com/confidential-computing: "true"
+    # Generic: node.kubernetes.io/tee: "sev-snp"
     kubernetes.azure.com/confidential-computing: "true"
 ```
 
-For Intel TDX, use `runtimeClassName: kata-tdx` instead.
-
-The `nodeSelector` ensures the pod lands on a confidential compute node pool. The `runtimeClassName` selects the TEE-enabled Kata runtime. Both fields can also be set as defaults on an AgentHarness via `defaultRuntimeClassName`.
+Common runtime classes: `kata-cc` (AMD SEV-SNP), `kata-tdx` (Intel TDX). The exact names depend on your cluster's CoCo installation. Use `nodeSelector` to target nodes with TEE hardware. Both fields can also be set as defaults on an AgentHarness via `defaultRuntimeClassName`.
 
 ### Sandbox default via harness
 

@@ -23,14 +23,12 @@ spec:
           - port: 443
             protocol: TCP
   timeout: 30m
-  # For AKS Confidential Computing (AMD SEV-SNP):
+  # For Confidential Computing (AMD SEV-SNP):
   # runtimeClassName: kata-cc
   # nodeSelector:
-  #   kubernetes.azure.com/confidential-computing: "true"
-  # For AKS Confidential Computing (Intel TDX):
+  #   kubernetes.azure.com/confidential-computing: "true"  # AKS example
+  # For Confidential Computing (Intel TDX):
   # runtimeClassName: kata-tdx
-  # nodeSelector:
-  #   kubernetes.azure.com/confidential-computing: "true"
   resources:
     requests:
       cpu: "500m"
