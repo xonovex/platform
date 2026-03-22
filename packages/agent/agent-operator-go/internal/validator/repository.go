@@ -3,6 +3,7 @@ package validator
 import (
 	"fmt"
 	"regexp"
+	"strings"
 )
 
 // repoURLPattern allows http/https and git+ssh URLs.
@@ -45,4 +46,11 @@ func ValidateCommit(commit string) error {
 		return fmt.Errorf("commit %q must be a 7-40 character hex SHA", commit)
 	}
 	return nil
+}
+
+// ContainsShellMetachars returns true if s contains characters that have special
+// meaning in POSIX shell and could enable command injection.
+func ContainsShellMetachars(s string) bool {
+	const metachars = ";|&$`\\\"'<>(){}!#~\n\r"
+	return strings.ContainsAny(s, metachars)
 }

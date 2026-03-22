@@ -103,3 +103,47 @@ func TestValidateCommit_Invalid(t *testing.T) {
 		}
 	}
 }
+
+func TestContainsShellMetachars_Clean(t *testing.T) {
+	clean := []string{
+		"hello",
+		"--model",
+		"claude-sonnet-4-6",
+		"/usr/bin/test",
+		"key=value",
+		"some-flag",
+		"",
+	}
+	for _, s := range clean {
+		if ContainsShellMetachars(s) {
+			t.Errorf("ContainsShellMetachars(%q) = true, want false", s)
+		}
+	}
+}
+
+func TestContainsShellMetachars_Dangerous(t *testing.T) {
+	dangerous := []string{
+		"hello; world",
+		"foo | bar",
+		"foo & bar",
+		"$(whoami)",
+		"`id`",
+		"foo\\bar",
+		"say \"hi\"",
+		"it's",
+		"foo > bar",
+		"foo < bar",
+		"(subshell)",
+		"{braces}",
+		"!event",
+		"#comment",
+		"~home",
+		"line\nbreak",
+		"line\rreturn",
+	}
+	for _, s := range dangerous {
+		if !ContainsShellMetachars(s) {
+			t.Errorf("ContainsShellMetachars(%q) = false, want true", s)
+		}
+	}
+}
