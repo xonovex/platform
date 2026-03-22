@@ -10,6 +10,7 @@ package scriptlib
 import (
 	"github.com/xonovex/platform/packages/shared/shared-core-go/pkg/colors"
 	"github.com/xonovex/platform/packages/shared/shared-core-go/pkg/logging"
+	"github.com/xonovex/platform/packages/shared/shared-core-go/pkg/shell"
 )
 
 // Color functions
@@ -68,3 +69,9 @@ const (
 
 // IsColorSupported returns true if terminal supports color output
 var IsColorSupported = colors.IsColorSupported
+
+// Shell functions
+var (
+	ShellQuote             = shell.Quote
+	ShellContainsMetachars = shell.ContainsMetachars
+)

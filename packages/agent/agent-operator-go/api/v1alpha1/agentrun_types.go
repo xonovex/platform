@@ -85,6 +85,14 @@ type WorktreeSpec struct {
 
 // ProviderSpec defines inline provider configuration
 type ProviderSpec struct {
+	// PresetRef references a named provider preset from shared-agent-go.
+	// Preset env vars are applied as defaults; Environment overrides them.
+	// +optional
+	PresetRef string `json:"presetRef,omitempty"`
+	// AgentType selects which agent's preset to use when PresetRef is set.
+	// Defaults to "claude".
+	// +optional
+	AgentType string `json:"agentType,omitempty"`
 	// Type of the provider (e.g., "anthropic", "openai")
 	Type ProviderType `json:"type,omitempty"`
 	// AuthSecretRef references a Secret containing the auth token

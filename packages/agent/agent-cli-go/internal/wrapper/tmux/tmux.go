@@ -9,6 +9,7 @@ import (
 
 	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/types"
 	"github.com/xonovex/platform/packages/shared/shared-core-go/pkg/scriptlib"
+	"github.com/xonovex/platform/packages/shared/shared-core-go/pkg/shell"
 )
 
 // gitInfo holds git repository information
@@ -269,28 +270,7 @@ func (e *Executor) attachSession(sessionName string, verbose bool) (int, error) 
 func buildShellCommand(args []string) string {
 	quoted := make([]string, len(args))
 	for i, arg := range args {
-		quoted[i] = shellQuote(arg)
+		quoted[i] = shell.Quote(arg)
 	}
 	return strings.Join(quoted, " ")
-}
-
-// shellQuote quotes a string for safe use in a shell command
-func shellQuote(s string) string {
-	// If the string contains no special characters, return as-is
-	safe := true
-	for _, c := range s {
-		isLower := c >= 'a' && c <= 'z'
-		isUpper := c >= 'A' && c <= 'Z'
-		isDigit := c >= '0' && c <= '9'
-		isSpecial := c == '.' || c == '/' || c == ':' || c == '=' || c == '-' || c == '_'
-		if !isLower && !isUpper && !isDigit && !isSpecial {
-			safe = false
-			break
-		}
-	}
-	if safe {
-		return s
-	}
-	// Wrap in single quotes and escape any single quotes
-	return "'" + strings.ReplaceAll(s, "'", "'\"'\"'") + "'"
 }

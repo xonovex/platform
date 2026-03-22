@@ -10,6 +10,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 
 	agentv1alpha1 "github.com/xonovex/platform/packages/agent/agent-operator-go/api/v1alpha1"
+	"github.com/xonovex/platform/packages/shared/shared-core-go/pkg/shell"
 )
 
 // AgentToolchainWebhook implements validation for AgentToolchain
@@ -51,5 +52,14 @@ func (w *AgentToolchainWebhook) validate(tc *agentv1alpha1.AgentToolchain) (admi
 	if tc.Spec.Type != "" && !validTypes[tc.Spec.Type] {
 		return nil, fmt.Errorf("invalid toolchain type: %s", tc.Spec.Type)
 	}
+
+	if tc.Spec.Nix != nil {
+		for i, pkg := range tc.Spec.Nix.Packages {
+			if shell.ContainsMetachars(pkg) {
+				return nil, fmt.Errorf("nix.packages[%d] %q contains shell metacharacters", i, pkg)
+			}
+		}
+	}
+
 	return nil, nil
 }

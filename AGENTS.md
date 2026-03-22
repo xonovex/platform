@@ -3,8 +3,8 @@
 Monorepo for Xonovex tools and configuration packages.
 
 - `packages/config/` — shared configs (ESLint, TypeScript, Vitest, Prettier, Vite)
-- `packages/agent/` — CLI tools (agent-cli, agent-cli-go)
-- `packages/shared/` — shared libraries (shared-core, shared-core-go)
+- `packages/agent/` — CLI tools (agent-cli-go) and K8s operator (agent-operator-go)
+- `packages/shared/` — shared libraries (shared-core, shared-core-go, shared-agent-go)
 - `packages/skill/` — coding guidelines and skills
 - `packages/command/` — workflow and utility commands
 - `packages/diagram/` — diagrams (action graph, workflow)

@@ -12,7 +12,9 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 
 	agentv1alpha1 "github.com/xonovex/platform/packages/agent/agent-operator-go/api/v1alpha1"
-	"github.com/xonovex/platform/packages/agent/agent-operator-go/internal/validator"
+	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/providers"
+	sharedtypes "github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/types"
+	"github.com/xonovex/platform/packages/shared/shared-core-go/pkg/shell"
 )
 
 // AgentProviderWebhook implements validation for AgentProvider
@@ -61,6 +63,19 @@ var blockedEnvKeyPrefixes = []string{
 }
 
 func (w *AgentProviderWebhook) validate(provider *agentv1alpha1.AgentProvider) (admission.Warnings, error) {
+	var warnings admission.Warnings
+
+	// Warn on unknown preset (not an error for forward compatibility)
+	if provider.Spec.PresetRef != "" {
+		at := sharedtypes.AgentType(provider.Spec.AgentType)
+		if at == "" {
+			at = sharedtypes.AgentClaude
+		}
+		if _, err := providers.GetProvider(provider.Spec.PresetRef, at); err != nil {
+			warnings = append(warnings, fmt.Sprintf("presetRef %q is not a known provider preset for agent type %q", provider.Spec.PresetRef, at))
+		}
+	}
+
 	if provider.Spec.AuthTokenSecretRef != nil {
 		ref := provider.Spec.AuthTokenSecretRef
 		if ref.Name == "" {
@@ -90,10 +105,10 @@ func (w *AgentProviderWebhook) validate(provider *agentv1alpha1.AgentProvider) (
 		if arg == "" {
 			return nil, fmt.Errorf("cliArgs[%d] is empty", i)
 		}
-		if validator.ContainsShellMetachars(arg) {
+		if shell.ContainsMetachars(arg) {
 			return nil, fmt.Errorf("cliArgs[%d] %q contains shell metacharacters", i, arg)
 		}
 	}
 
-	return nil, nil
+	return warnings, nil
 }
