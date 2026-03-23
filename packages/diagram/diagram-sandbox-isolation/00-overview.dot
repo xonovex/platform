@@ -1,55 +1,113 @@
-digraph SandboxOverview {
-  rankdir=LR;
-  splines=ortho;
-  nodesep=0.5;
-  ranksep=1.2;
+digraph Overview {
+  rankdir=TB;
+  splines=false;
+  nodesep=0.4;
+  ranksep=0.4;
   bgcolor="white";
+  margin=0.3;
 
-  node [shape=box, style="rounded,filled", fontname="Inter,Helvetica,Arial", fontsize=11];
-  edge [fontname="Inter,Helvetica,Arial", fontsize=9, color="#90a4ae"];
+  node [shape=box, style="filled", fontname="Helvetica", fontsize=11, width=1.4, height=0.4];
+  edge [fontname="Helvetica", fontsize=9];
 
   label="AI Agent Sandbox Isolation Spectrum";
   labelloc=t;
-  fontsize=16;
-  fontname="Inter,Helvetica,Arial";
-  fontcolor="#263238";
+  fontsize=14;
+  fontname="Helvetica-Bold";
 
-  agent [label="AI Agent", shape=ellipse, fillcolor="#e3f2fd", color="#1565c0", penwidth=2, fontsize=12];
+  // Column headers
+  subgraph {
+    rank=same;
+    h1 [label="None", shape=plaintext, fontsize=10, fontname="Helvetica-Bold"];
+    h2 [label="Bubblewrap", shape=plaintext, fontsize=10, fontname="Helvetica-Bold"];
+    h3 [label="Docker", shape=plaintext, fontsize=10, fontname="Helvetica-Bold"];
+    h4 [label="Nix + bwrap", shape=plaintext, fontsize=10, fontname="Helvetica-Bold"];
+    h5 [label="gVisor", shape=plaintext, fontsize=10, fontname="Helvetica-Bold"];
+    h6 [label="Kata / CoCo", shape=plaintext, fontsize=10, fontname="Helvetica-Bold"];
+  }
 
-  none [label="None", fillcolor="#ffcdd2", color="#c62828"];
-  bwrap [label="Bubblewrap", fillcolor="#c8e6c9", color="#2e7d32"];
-  docker [label="Docker", fillcolor="#bbdefb", color="#1565c0"];
-  compose [label="Docker\nCompose", fillcolor="#b3e5fc", color="#0277bd"];
-  nix [label="Nix +\nBubblewrap", fillcolor="#d1c4e9", color="#4527a0"];
-  gvisor [label="gVisor", fillcolor="#fff9c4", color="#f9a825"];
-  kata [label="Kata\nContainers", fillcolor="#ffe0b2", color="#e65100"];
-  coco [label="Confidential\nContainers", fillcolor="#ffccbc", color="#bf360c"];
+  // Application layer
+  subgraph {
+    rank=same;
+    a1 [label="AI Agent", fillcolor="#4FC3F7"];
+    a2 [label="AI Agent", fillcolor="#4FC3F7"];
+    a3 [label="AI Agent", fillcolor="#4FC3F7"];
+    a4 [label="AI Agent", fillcolor="#4FC3F7"];
+    a5 [label="AI Agent", fillcolor="#4FC3F7"];
+    a6 [label="AI Agent", fillcolor="#4FC3F7"];
+  }
 
-  // Scale
-  s1 [label="No\nIsolation", shape=plaintext, fontcolor="#c62828", fontsize=9];
-  s2 [label="Namespace", shape=plaintext, fontcolor="#2e7d32", fontsize=9];
-  s3 [label="Container", shape=plaintext, fontcolor="#1565c0", fontsize=9];
-  s4 [label="Syscall\nFilter", shape=plaintext, fontcolor="#f9a825", fontsize=9];
-  s5 [label="VM", shape=plaintext, fontcolor="#e65100", fontsize=9];
-  s6 [label="Hardware\nTEE", shape=plaintext, fontcolor="#bf360c", fontsize=9];
+  // Sandbox / isolation layer
+  subgraph {
+    rank=same;
+    s1 [label="(no sandbox)", fillcolor="#FFCDD2", style="filled,dashed"];
+    s2 [label="Namespaces\n+ bind mounts", fillcolor="#C8E6C9"];
+    s3 [label="Namespaces\ncgroups, seccomp", fillcolor="#BBDEFB"];
+    s4 [label="Namespaces\n+ /nix/store (ro)", fillcolor="#D1C4E9"];
+    s5 [label="Sentry\n(user-space kernel)", fillcolor="#FFF9C4"];
+    s6 [label="Guest Kernel\n(separate VM)", fillcolor="#FFE0B2"];
+  }
 
-  agent -> none;
-  agent -> bwrap;
-  agent -> docker;
-  agent -> compose;
-  agent -> nix;
-  agent -> gvisor;
-  agent -> kata;
-  agent -> coco;
+  // Kernel layer
+  subgraph {
+    rank=same;
+    k1 [label="Host Kernel", fillcolor="#FF8A65", fontcolor=white];
+    k2 [label="Host Kernel", fillcolor="#FF8A65", fontcolor=white];
+    k3 [label="Host Kernel", fillcolor="#FF8A65", fontcolor=white];
+    k4 [label="Host Kernel", fillcolor="#FF8A65", fontcolor=white];
+    k5 [label="Host Kernel\n(~60 syscalls)", fillcolor="#FF8A65", fontcolor=white];
+    k6 [label="Hypervisor\n+ Host Kernel", fillcolor="#FF8A65", fontcolor=white];
+  }
 
-  s1 -> s2 -> s3 -> s4 -> s5 -> s6 [style=bold, color="#b0bec5", arrowhead=vee];
+  // Hardware
+  subgraph {
+    rank=same;
+    hw1 [label="Hardware", fillcolor="#78909C", fontcolor=white];
+    hw2 [label="Hardware", fillcolor="#78909C", fontcolor=white];
+    hw3 [label="Hardware", fillcolor="#78909C", fontcolor=white];
+    hw4 [label="Hardware", fillcolor="#78909C", fontcolor=white];
+    hw5 [label="Hardware", fillcolor="#78909C", fontcolor=white];
+    hw6 [label="Hardware\n(VT-x / TEE)", fillcolor="#78909C", fontcolor=white];
+  }
 
-  none -> s1 [style=dotted, constraint=false, color="#e0e0e0"];
-  bwrap -> s2 [style=dotted, constraint=false, color="#e0e0e0"];
-  nix -> s2 [style=dotted, constraint=false, color="#e0e0e0"];
-  docker -> s3 [style=dotted, constraint=false, color="#e0e0e0"];
-  compose -> s3 [style=dotted, constraint=false, color="#e0e0e0"];
-  gvisor -> s4 [style=dotted, constraint=false, color="#e0e0e0"];
-  kata -> s5 [style=dotted, constraint=false, color="#e0e0e0"];
-  coco -> s6 [style=dotted, constraint=false, color="#e0e0e0"];
+  // Vertical flows
+  h1 -> a1 [style=invis];
+  a1 -> s1 [style=dashed, color="#C62828", label="  no\n  barrier", fontcolor="#C62828"];
+  s1 -> k1;
+  k1 -> hw1;
+
+  h2 -> a2 [style=invis];
+  a2 -> s2;
+  s2 -> k2 [label="  all\n  syscalls"];
+  k2 -> hw2;
+
+  h3 -> a3 [style=invis];
+  a3 -> s3;
+  s3 -> k3 [label="  filtered\n  syscalls"];
+  k3 -> hw3;
+
+  h4 -> a4 [style=invis];
+  a4 -> s4;
+  s4 -> k4 [label="  all\n  syscalls"];
+  k4 -> hw4;
+
+  h5 -> a5 [style=invis];
+  a5 -> s5;
+  s5 -> k5 [label="  minimal\n  surface", style=dashed];
+  k5 -> hw5;
+
+  h6 -> a6 [style=invis];
+  a6 -> s6;
+  s6 -> k6 [label="  KVM", style=dashed];
+  k6 -> hw6;
+
+  // Invisible horizontal ordering
+  h1 -> h2 -> h3 -> h4 -> h5 -> h6 [style=invis];
+  a1 -> a2 -> a3 -> a4 -> a5 -> a6 [style=invis];
+  s1 -> s2 -> s3 -> s4 -> s5 -> s6 [style=invis];
+  k1 -> k2 -> k3 -> k4 -> k5 -> k6 [style=invis];
+  hw1 -> hw2 -> hw3 -> hw4 -> hw5 -> hw6 [style=invis];
+
+  // Isolation arrow
+  arrow_label [label="Isolation strength →", shape=plaintext, fontsize=10, fontcolor="#546E7A"];
+  hw1 -> arrow_label [style=invis];
 }
