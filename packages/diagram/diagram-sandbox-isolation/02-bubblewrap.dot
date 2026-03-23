@@ -17,22 +17,13 @@ digraph Bubblewrap {
   agent [label="AI Agent", fillcolor="#4FC3F7"];
   ns [label="PID | IPC | UTS | cgroup namespaces", fillcolor="#C8E6C9"];
   mounts [label="Bind mounts: /usr,/lib (ro) | workdir (rw) | /tmp (tmpfs)", fillcolor="#A5D6A7", fontsize=10];
-
-  sandbox [label="", shape=plaintext, width=0, height=0];
-
+  sb [label="sandbox boundary", style="dashed,filled", fillcolor="#F5F5F5", fontcolor="#C62828", fontsize=10, color="#C62828"];
   kernel [label="Host Kernel (shared)", fillcolor="#FF8A65", fontcolor=white];
   hw [label="Hardware", fillcolor="#78909C", fontcolor=white];
 
   agent -> ns;
   ns -> mounts;
-
-  // Sandbox boundary
-  mounts -> sandbox [style=invis];
-  sandbox -> kernel [style=invis];
-
-  {rank=same; sandbox; sb_label}
-  sb_label [label="- - - sandbox boundary - - -", shape=plaintext, fontsize=10, fontcolor="#C62828"];
-
-  mounts -> kernel [label="  all syscalls (shared kernel)"];
+  mounts -> sb [label="  all syscalls (shared kernel)"];
+  sb -> kernel [style=dashed, color="#C62828"];
   kernel -> hw;
 }
