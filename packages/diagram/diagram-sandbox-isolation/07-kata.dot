@@ -1,44 +1,34 @@
-digraph SandboxKata {
+digraph Kata {
   rankdir=TB;
-  splines=polyline;
-  nodesep=0.5;
-  ranksep=0.6;
+  splines=false;
+  nodesep=0.3;
+  ranksep=0.5;
   bgcolor="white";
+  margin=0.3;
 
-  node [shape=box, style="rounded,filled", fontname="Inter,Helvetica,Arial", fontsize=11];
-  edge [fontname="Inter,Helvetica,Arial", fontsize=9, color="#999999"];
+  node [shape=box, style="filled", fontname="Helvetica", fontsize=12, width=3, height=0.5];
+  edge [fontname="Helvetica", fontsize=9, color="#666666"];
 
   label="Kata Containers — Lightweight VM Isolation";
   labelloc=t;
   fontsize=14;
-  fontname="Inter,Helvetica,Arial";
-  fontcolor="#e65100";
+  fontname="Helvetica-Bold";
 
-  subgraph cluster_host {
-    label="Host";
-    style="rounded,filled";
-    fillcolor="#fff3e0";
-    color="#ffcc80";
+  agent [label="AI Agent", fillcolor="#4FC3F7"];
+  guest [label="Guest Kernel (separate)", fillcolor="#FFE0B2"];
 
-    subgraph cluster_vm {
-      label="Lightweight VM";
-      style="rounded,bold,filled";
-      fillcolor="#ffe0b2";
-      color="#e65100";
-      penwidth=3;
+  sb_label [label="- - - - - - sandbox (VM boundary) - - - - - -", shape=plaintext, fontsize=10, fontcolor="#C62828"];
 
-      guest_kernel [label="Guest Kernel\n(separate)", fillcolor="#ff9100", color="#e65100", shape=cylinder, fontcolor=white];
-      agent [label="AI Agent", fillcolor="#ffcc80", color="#e65100", shape=ellipse];
-    }
+  vmm [label="QEMU / Cloud-Hypervisor (VMM)", fillcolor="#FFCC80"];
+  kvm [label="KVM", fillcolor="#FFB74D"];
+  kernel [label="Host Kernel", fillcolor="#FF8A65", fontcolor=white];
+  hw [label="Hardware (VT-x / AMD-V)", fillcolor="#78909C", fontcolor=white];
 
-    hypervisor [label="QEMU /\nCloud-Hypervisor", fillcolor="#ff6d00", color="#e65100", shape=box3d, fontcolor=white];
-    host_kernel [label="Host Kernel", fillcolor="#e65100", color="#bf360c", shape=cylinder, fontcolor=white];
-  }
-
-  hw [label="Hardware\n(VT-x / AMD-V)", fillcolor="#bf360c", fontcolor=white, color="#7f2400", shape=box3d];
-
-  agent -> guest_kernel [label="syscalls\n(guest only)"];
-  hypervisor -> guest_kernel [label="boot VM"];
-  hypervisor -> host_kernel [label="KVM"];
-  host_kernel -> hw;
+  agent -> guest [label="  syscalls (guest only)"];
+  guest -> sb_label [style=invis];
+  sb_label -> vmm [style=invis];
+  guest -> vmm [label="  virtio-blk, virtio-net"];
+  vmm -> kvm;
+  kvm -> kernel;
+  kernel -> hw;
 }

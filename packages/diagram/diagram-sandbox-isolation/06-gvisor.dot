@@ -1,48 +1,39 @@
-digraph SandboxGVisor {
+digraph GVisor {
   rankdir=TB;
-  splines=polyline;
-  nodesep=0.5;
-  ranksep=0.6;
+  splines=false;
+  nodesep=0.3;
+  ranksep=0.5;
   bgcolor="white";
+  margin=0.3;
 
-  node [shape=box, style="rounded,filled", fontname="Inter,Helvetica,Arial", fontsize=11];
-  edge [fontname="Inter,Helvetica,Arial", fontsize=9, color="#999999"];
+  node [shape=box, style="filled", fontname="Helvetica", fontsize=12, width=3, height=0.5];
+  edge [fontname="Helvetica", fontsize=9, color="#666666"];
 
   label="gVisor (runsc) — User-Space Kernel";
   labelloc=t;
   fontsize=14;
-  fontname="Inter,Helvetica,Arial";
-  fontcolor="#f57f17";
+  fontname="Helvetica-Bold";
 
-  subgraph cluster_host {
-    label="Host";
-    style="rounded,filled";
-    fillcolor="#fffde7";
-    color="#fff176";
+  agent [label="AI Agent", fillcolor="#4FC3F7"];
+  sentry [label="Sentry (user-space kernel)", fillcolor="#FFF9C4"];
 
-    subgraph cluster_gvisor {
-      label="gVisor Sandbox";
-      style="rounded,bold,filled";
-      fillcolor="#fff9c4";
-      color="#f9a825";
-      penwidth=2;
-
-      agent [label="AI Agent", fillcolor="#ffd54f", color="#ff8f00", shape=ellipse];
-
-      sentry [label="Sentry\n(user-space kernel)", fillcolor="#ffca28", color="#ff8f00", shape=octagon];
-      gofer [label="Gofer\n(file proxy, 9P)", fillcolor="#ffca28", color="#ff8f00", shape=octagon];
-      netstack [label="Netstack\n(user-space TCP/IP)", fillcolor="#ffe082", fontsize=9];
-    }
-
-    host_kernel [label="Host Kernel", fillcolor="#ffb300", color="#e65100", shape=cylinder, fontcolor=white];
+  subgraph {
+    rank=same;
+    gofer [label="Gofer\n(file proxy, 9P)", fillcolor="#FFE082", width=1.4];
+    netstack [label="Netstack\n(user-space TCP/IP)", fillcolor="#FFE082", width=1.4];
   }
 
-  hw [label="Hardware", fillcolor="#e65100", fontcolor=white, color="#bf360c", shape=box3d];
+  sb_label [label="- - - - - - sandbox - - - - - -", shape=plaintext, fontsize=10, fontcolor="#C62828"];
 
-  agent -> sentry [label="syscalls\n(intercepted)", color="#e65100", penwidth=1.5];
-  sentry -> netstack [style=dotted, arrowhead=none];
-  sentry -> gofer [label="9P"];
-  sentry -> host_kernel [label="~60 syscalls\n(minimal)", style=dashed];
-  gofer -> host_kernel [label="file I/O", style=dashed];
-  host_kernel -> hw;
+  kernel [label="Host Kernel (~60 syscalls)", fillcolor="#FF8A65", fontcolor=white];
+  hw [label="Hardware", fillcolor="#78909C", fontcolor=white];
+
+  agent -> sentry [label="  syscalls (intercepted)"];
+  sentry -> gofer;
+  sentry -> netstack;
+  gofer -> sb_label [style=invis];
+  sb_label -> kernel [style=invis];
+  gofer -> kernel [label="  file I/O"];
+  sentry -> kernel [label="  minimal surface", style=dashed];
+  kernel -> hw;
 }

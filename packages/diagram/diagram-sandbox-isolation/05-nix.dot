@@ -1,49 +1,34 @@
-digraph SandboxNix {
+digraph Nix {
   rankdir=TB;
-  splines=polyline;
-  nodesep=0.5;
-  ranksep=0.6;
+  splines=false;
+  nodesep=0.3;
+  ranksep=0.5;
   bgcolor="white";
+  margin=0.3;
 
-  node [shape=box, style="rounded,filled", fontname="Inter,Helvetica,Arial", fontsize=11];
-  edge [fontname="Inter,Helvetica,Arial", fontsize=9, color="#999999"];
+  node [shape=box, style="filled", fontname="Helvetica", fontsize=12, width=3, height=0.5];
+  edge [fontname="Helvetica", fontsize=9, color="#666666"];
 
   label="Nix + Bubblewrap — Reproducible Sandboxed Isolation";
   labelloc=t;
   fontsize=14;
-  fontname="Inter,Helvetica,Arial";
-  fontcolor="#4527a0";
+  fontname="Helvetica-Bold";
 
-  subgraph cluster_host {
-    label="Host OS";
-    style="rounded,filled";
-    fillcolor="#ede7f6";
-    color="#b39ddb";
+  agent [label="AI Agent", fillcolor="#4FC3F7"];
+  env [label="/env (from nix-build, read-only)", fillcolor="#D1C4E9"];
+  store [label="/nix/store (immutable, content-addressed)", fillcolor="#CE93D8", fontcolor=white, fontsize=10];
+  ns [label="PID | IPC | UTS | cgroup | net namespaces", fillcolor="#B39DDB", fontsize=10];
 
-    nix_build [label="nix-build", fillcolor="#b39ddb", color="#4527a0", shape=hexagon];
-    nix_store [label="/nix/store\n(immutable)", fillcolor="#ce93d8", color="#7b1fa2", shape=cylinder];
+  sb_label [label="- - - - sandbox - - - -", shape=plaintext, fontsize=10, fontcolor="#C62828"];
 
-    subgraph cluster_sandbox {
-      label="bwrap sandbox";
-      style="rounded,bold,filled";
-      fillcolor="#d1c4e9";
-      color="#4527a0";
-      penwidth=2;
+  kernel [label="Host Kernel (shared)", fillcolor="#FF8A65", fontcolor=white];
+  hw [label="Hardware", fillcolor="#78909C", fontcolor=white];
 
-      agent [label="AI Agent", fillcolor="#ab47bc", color="#6a1b9a", shape=ellipse, fontcolor=white];
-      ns [label="PID | IPC | UTS | cgroup\n+ optional net isolation", fillcolor="#ce93d8", fontsize=9];
-      mounts [label="/env (ro, from nix-build)\n/nix/store (ro)\nworkdir (rw)", fillcolor="#ce93d8", fontsize=9, shape=folder];
-    }
-
-    kernel [label="Shared Kernel", fillcolor="#7e57c2", color="#4527a0", shape=cylinder, fontcolor=white];
-  }
-
-  hw [label="Hardware", fillcolor="#4527a0", fontcolor=white, color="#311b92", shape=box3d];
-
-  nix_build -> nix_store [label="build"];
-  nix_store -> mounts [label="mount ro", style=dashed];
-  agent -> ns [style=dotted, arrowhead=none];
-  agent -> mounts [label="reproducible\nbinaries"];
-  agent -> kernel [label="syscalls\n(shared)"];
+  agent -> env [label="  binaries from /env/bin"];
+  env -> store;
+  store -> ns;
+  ns -> sb_label [style=invis];
+  sb_label -> kernel [style=invis];
+  ns -> kernel [label="  all syscalls (shared kernel)"];
   kernel -> hw;
 }
