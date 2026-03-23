@@ -1,86 +1,55 @@
 digraph SandboxOverview {
-  rankdir=TB;
-  compound=true;
-  newrank=true;
+  rankdir=LR;
   splines=ortho;
-  nodesep=0.8;
-  ranksep=1.0;
+  nodesep=0.5;
+  ranksep=1.2;
   bgcolor="white";
 
   node [shape=box, style="rounded,filled", fontname="Inter,Helvetica,Arial", fontsize=11];
-  edge [fontname="Inter,Helvetica,Arial", fontsize=9, color="#666666"];
+  edge [fontname="Inter,Helvetica,Arial", fontsize=9, color="#90a4ae"];
 
-  label="AI Agent Sandbox Isolation — Overview";
+  label="AI Agent Sandbox Isolation Spectrum";
   labelloc=t;
   fontsize=16;
   fontname="Inter,Helvetica,Arial";
-  fontcolor="#1a1a2e";
+  fontcolor="#263238";
 
-  // AI Agent at top
-  agent [label="AI Agent\n(Claude, OpenCode, ...)", shape=ellipse, fillcolor="#e3f2fd", color="#1565c0", penwidth=2, fontsize=13];
+  agent [label="AI Agent", shape=ellipse, fillcolor="#e3f2fd", color="#1565c0", penwidth=2, fontsize=12];
 
-  // CLI-level sandboxes
-  subgraph cluster_cli {
-    label="CLI Sandboxes (agent-cli-go)";
-    style="rounded,filled";
-    fillcolor="#f3e5f5";
-    color="#7b1fa2";
-    fontcolor="#4a148c";
-    fontsize=12;
+  none [label="None", fillcolor="#ffcdd2", color="#c62828"];
+  bwrap [label="Bubblewrap", fillcolor="#c8e6c9", color="#2e7d32"];
+  docker [label="Docker", fillcolor="#bbdefb", color="#1565c0"];
+  compose [label="Docker\nCompose", fillcolor="#b3e5fc", color="#0277bd"];
+  nix [label="Nix +\nBubblewrap", fillcolor="#d1c4e9", color="#4527a0"];
+  gvisor [label="gVisor", fillcolor="#fff9c4", color="#f9a825"];
+  kata [label="Kata\nContainers", fillcolor="#ffe0b2", color="#e65100"];
+  coco [label="Confidential\nContainers", fillcolor="#ffccbc", color="#bf360c"];
 
-    none [label="None\n(Direct Execution)", fillcolor="#ffcdd2", color="#c62828"];
-    bwrap [label="Bubblewrap\n(Linux Namespaces)", fillcolor="#c8e6c9", color="#2e7d32"];
-    docker [label="Docker\n(Container)", fillcolor="#bbdefb", color="#1565c0"];
-    compose [label="Docker Compose\n(Multi-Service Container)", fillcolor="#b3e5fc", color="#0277bd"];
-    nix [label="Nix + Bubblewrap\n(Reproducible + Sandboxed)", fillcolor="#d1c4e9", color="#4527a0"];
-  }
+  // Scale
+  s1 [label="No\nIsolation", shape=plaintext, fontcolor="#c62828", fontsize=9];
+  s2 [label="Namespace", shape=plaintext, fontcolor="#2e7d32", fontsize=9];
+  s3 [label="Container", shape=plaintext, fontcolor="#1565c0", fontsize=9];
+  s4 [label="Syscall\nFilter", shape=plaintext, fontcolor="#f9a825", fontsize=9];
+  s5 [label="VM", shape=plaintext, fontcolor="#e65100", fontsize=9];
+  s6 [label="Hardware\nTEE", shape=plaintext, fontcolor="#bf360c", fontsize=9];
 
-  // K8s-level sandboxes
-  subgraph cluster_k8s {
-    label="Kubernetes Sandboxes (agent-operator-go)";
-    style="rounded,filled";
-    fillcolor="#e8f5e9";
-    color="#2e7d32";
-    fontcolor="#1b5e20";
-    fontsize=12;
+  agent -> none;
+  agent -> bwrap;
+  agent -> docker;
+  agent -> compose;
+  agent -> nix;
+  agent -> gvisor;
+  agent -> kata;
+  agent -> coco;
 
-    runc [label="runc\n(Default OCI Runtime)", fillcolor="#c8e6c9", color="#388e3c"];
-    gvisor [label="gVisor (runsc)\n(User-Space Kernel)", fillcolor="#fff9c4", color="#f9a825"];
-    kata [label="Kata Containers\n(Lightweight VM)", fillcolor="#ffe0b2", color="#e65100"];
-    coco [label="Confidential Containers\n(TEE: kata-cc / kata-tdx)", fillcolor="#ffccbc", color="#bf360c"];
-  }
+  s1 -> s2 -> s3 -> s4 -> s5 -> s6 [style=bold, color="#b0bec5", arrowhead=vee];
 
-  // Isolation strength scale
-  subgraph cluster_scale {
-    label="Isolation Strength";
-    style="rounded,filled";
-    fillcolor="#eceff1";
-    color="#546e7a";
-    fontcolor="#37474f";
-    fontsize=11;
-
-    s1 [label="No Isolation", shape=plaintext, fillcolor="#eceff1", fontcolor="#c62828", fontsize=10];
-    s2 [label="Namespace\nIsolation", shape=plaintext, fillcolor="#eceff1", fontcolor="#2e7d32", fontsize=10];
-    s3 [label="Container\nIsolation", shape=plaintext, fillcolor="#eceff1", fontcolor="#1565c0", fontsize=10];
-    s4 [label="Syscall\nInterception", shape=plaintext, fillcolor="#eceff1", fontcolor="#f9a825", fontsize=10];
-    s5 [label="VM\nIsolation", shape=plaintext, fillcolor="#eceff1", fontcolor="#e65100", fontsize=10];
-    s6 [label="Hardware TEE\nIsolation", shape=plaintext, fillcolor="#eceff1", fontcolor="#bf360c", fontsize=10];
-
-    s1 -> s2 -> s3 -> s4 -> s5 -> s6 [style=bold, color="#90a4ae", arrowhead=vee, label="", dir=forward];
-  }
-
-  // Agent to sandbox connections
-  agent -> none [lhead=cluster_cli];
-  agent -> runc [lhead=cluster_k8s];
-
-  // Mapping sandboxes to scale
-  none -> s1 [style=dotted, color="#c62828", constraint=false];
-  bwrap -> s2 [style=dotted, color="#2e7d32", constraint=false];
-  docker -> s3 [style=dotted, color="#1565c0", constraint=false];
-  compose -> s3 [style=dotted, color="#0277bd", constraint=false];
-  nix -> s2 [style=dotted, color="#4527a0", constraint=false];
-  runc -> s3 [style=dotted, color="#388e3c", constraint=false];
-  gvisor -> s4 [style=dotted, color="#f9a825", constraint=false];
-  kata -> s5 [style=dotted, color="#e65100", constraint=false];
-  coco -> s6 [style=dotted, color="#bf360c", constraint=false];
+  none -> s1 [style=dotted, constraint=false, color="#e0e0e0"];
+  bwrap -> s2 [style=dotted, constraint=false, color="#e0e0e0"];
+  nix -> s2 [style=dotted, constraint=false, color="#e0e0e0"];
+  docker -> s3 [style=dotted, constraint=false, color="#e0e0e0"];
+  compose -> s3 [style=dotted, constraint=false, color="#e0e0e0"];
+  gvisor -> s4 [style=dotted, constraint=false, color="#e0e0e0"];
+  kata -> s5 [style=dotted, constraint=false, color="#e0e0e0"];
+  coco -> s6 [style=dotted, constraint=false, color="#e0e0e0"];
 }

@@ -1,102 +1,48 @@
 digraph SandboxGVisor {
   rankdir=TB;
-  compound=true;
   splines=polyline;
-  nodesep=0.6;
-  ranksep=0.7;
+  nodesep=0.5;
+  ranksep=0.6;
   bgcolor="white";
 
   node [shape=box, style="rounded,filled", fontname="Inter,Helvetica,Arial", fontsize=11];
-  edge [fontname="Inter,Helvetica,Arial", fontsize=9, color="#666666"];
+  edge [fontname="Inter,Helvetica,Arial", fontsize=9, color="#999999"];
 
-  label="Sandbox: gVisor (runsc) — User-Space Kernel / Syscall Interception";
+  label="gVisor (runsc) — User-Space Kernel";
   labelloc=t;
-  fontsize=15;
+  fontsize=14;
   fontname="Inter,Helvetica,Arial";
   fontcolor="#f57f17";
 
-  subgraph cluster_node {
-    label="Kubernetes Node";
+  subgraph cluster_host {
+    label="Host";
     style="rounded,filled";
     fillcolor="#fffde7";
-    color="#f57f17";
-    fontcolor="#e65100";
-    fontsize=12;
-
-    kubelet [label="kubelet", fillcolor="#fff9c4", color="#f57f17", shape=hexagon];
-    containerd [label="containerd", fillcolor="#fff9c4", color="#f57f17", shape=hexagon];
+    color="#fff176";
 
     subgraph cluster_gvisor {
-      label="gVisor Sandbox (runsc)";
+      label="gVisor Sandbox";
       style="rounded,bold,filled";
-      fillcolor="#fff59d";
+      fillcolor="#fff9c4";
       color="#f9a825";
-      fontcolor="#e65100";
-      fontsize=12;
       penwidth=2;
 
-      subgraph cluster_sentry {
-        label="Sentry (User-Space Kernel)";
-        style="rounded,filled";
-        fillcolor="#ffe082";
-        color="#ffa000";
-        fontcolor="#e65100";
-        fontsize=11;
+      agent [label="AI Agent", fillcolor="#ffd54f", color="#ff8f00", shape=ellipse];
 
-        sentry [label="Sentry Process\n(implements Linux kernel ABI\nin user space)", fillcolor="#ffca28", color="#ff8f00", shape=octagon, fontsize=10];
-        vfs [label="Virtual Filesystem\n(in-memory, overlay)", fillcolor="#ffd54f", fontsize=9];
-        netstack [label="Network Stack\n(user-space TCP/IP)", fillcolor="#ffd54f", fontsize=9];
-        sched [label="Scheduler /\nMemory Manager", fillcolor="#ffd54f", fontsize=9];
-      }
-
-      subgraph cluster_gofer {
-        label="Gofer (File Proxy)";
-        style="rounded,filled";
-        fillcolor="#ffe082";
-        color="#ffa000";
-        fontcolor="#e65100";
-        fontsize=10;
-
-        gofer [label="Gofer Process\n(mediates host FS access)", fillcolor="#ffca28", color="#ff8f00", shape=octagon, fontsize=10];
-      }
-
-      subgraph cluster_app {
-        label="Application Container";
-        style="rounded,filled";
-        fillcolor="#fff8e1";
-        color="#ffb300";
-        fontsize=10;
-
-        agent [label="AI Agent Process", fillcolor="#ffd54f", color="#ff8f00", shape=ellipse];
-        workspace [label="Workspace\n(/workspace PVC)", fillcolor="#ffe082", fontsize=9, shape=folder];
-      }
+      sentry [label="Sentry\n(user-space kernel)", fillcolor="#ffca28", color="#ff8f00", shape=octagon];
+      gofer [label="Gofer\n(file proxy, 9P)", fillcolor="#ffca28", color="#ff8f00", shape=octagon];
+      netstack [label="Netstack\n(user-space TCP/IP)", fillcolor="#ffe082", fontsize=9];
     }
 
-    host_kernel [label="Host Linux Kernel", fillcolor="#ffb300", color="#e65100", fontcolor=white, shape=cylinder];
-    hw [label="Hardware", fillcolor="#e65100", fontcolor=white, color="#bf360c", shape=box3d];
+    host_kernel [label="Host Kernel", fillcolor="#ffb300", color="#e65100", shape=cylinder, fontcolor=white];
   }
 
-  // K8s flow
-  kubelet -> containerd [label="CRI"];
-  containerd -> sentry [label="runsc\n(RuntimeClass: gvisor)"];
+  hw [label="Hardware", fillcolor="#e65100", fontcolor=white, color="#bf360c", shape=box3d];
 
-  // Agent syscalls go to Sentry, NOT host kernel
-  agent -> sentry [label="syscalls\n(intercepted by\nSentry, NOT\nhost kernel)", color="#e65100", penwidth=2];
-  sentry -> vfs;
-  sentry -> netstack;
-  sentry -> sched;
-
-  // Sentry makes limited syscalls to host
-  sentry -> host_kernel [label="~60 host syscalls\n(minimal surface)", style=dashed, color="#ff6f00"];
-
-  // Gofer mediates filesystem
-  sentry -> gofer [label="9P protocol\n(file access)", style=dashed];
-  gofer -> host_kernel [label="file I/O\n(restricted)", style=dashed];
-
+  agent -> sentry [label="syscalls\n(intercepted)", color="#e65100", penwidth=1.5];
+  sentry -> netstack [style=dotted, arrowhead=none];
+  sentry -> gofer [label="9P"];
+  sentry -> host_kernel [label="~60 syscalls\n(minimal)", style=dashed];
+  gofer -> host_kernel [label="file I/O", style=dashed];
   host_kernel -> hw;
-
-  // Detection
-  detect [label="Detection: dmesg shows\n\"Starting gVisor...\"", shape=note, fillcolor="#e8f5e9", color="#2e7d32", fontsize=9, fontcolor="#1b5e20"];
-
-  props [label="Properties:\n• Syscall interception — agent never touches host kernel\n• Sentry re-implements Linux ABI in user space\n• ~60 host syscalls vs ~300+ in normal container\n• Gofer mediates all file access via 9P\n• User-space network stack (netstack)\n• No VM overhead — runs as processes\n• RuntimeClass: gvisor on K8s\n• Blocks kernel exploits", shape=note, fillcolor="#fff3e0", color="#e65100", fontsize=9, fontcolor="#bf360c"];
 }
