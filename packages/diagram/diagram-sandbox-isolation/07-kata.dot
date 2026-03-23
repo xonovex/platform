@@ -16,18 +16,15 @@ digraph Kata {
 
   agent [label="AI Agent", fillcolor="#4FC3F7"];
   guest [label="Guest Kernel (separate)", fillcolor="#FFE0B2"];
-
-  sb_label [label="- - - - - - sandbox (VM boundary) - - - - - -", shape=plaintext, fontsize=10, fontcolor="#C62828"];
-
+  sb [label="sandbox (VM boundary)", style="dashed,filled", fillcolor="#F5F5F5", fontcolor="#C62828", fontsize=10, color="#C62828"];
   vmm [label="QEMU / Cloud-Hypervisor (VMM)", fillcolor="#FFCC80"];
   kvm [label="KVM", fillcolor="#FFB74D"];
   kernel [label="Host Kernel", fillcolor="#FF8A65", fontcolor=white];
   hw [label="Hardware (VT-x / AMD-V)", fillcolor="#78909C", fontcolor=white];
 
   agent -> guest [label="  syscalls (guest only)"];
-  guest -> sb_label [style=invis];
-  sb_label -> vmm [style=invis];
-  guest -> vmm [label="  virtio-blk, virtio-net"];
+  guest -> sb [label="  virtio-blk, virtio-net"];
+  sb -> vmm [style=dashed, color="#C62828"];
   vmm -> kvm;
   kvm -> kernel;
   kernel -> hw;

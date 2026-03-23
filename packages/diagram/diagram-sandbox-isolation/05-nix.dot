@@ -18,17 +18,14 @@ digraph Nix {
   env [label="/env (from nix-build, read-only)", fillcolor="#D1C4E9"];
   store [label="/nix/store (immutable, content-addressed)", fillcolor="#CE93D8", fontcolor=white, fontsize=10];
   ns [label="PID | IPC | UTS | cgroup | net namespaces", fillcolor="#B39DDB", fontsize=10];
-
-  sb_label [label="- - - - sandbox - - - -", shape=plaintext, fontsize=10, fontcolor="#C62828"];
-
+  sb [label="sandbox boundary", style="dashed,filled", fillcolor="#F5F5F5", fontcolor="#C62828", fontsize=10, color="#C62828"];
   kernel [label="Host Kernel (shared)", fillcolor="#FF8A65", fontcolor=white];
   hw [label="Hardware", fillcolor="#78909C", fontcolor=white];
 
   agent -> env [label="  binaries from /env/bin"];
   env -> store;
   store -> ns;
-  ns -> sb_label [style=invis];
-  sb_label -> kernel [style=invis];
-  ns -> kernel [label="  all syscalls (shared kernel)"];
+  ns -> sb [label="  all syscalls (shared kernel)"];
+  sb -> kernel [style=dashed, color="#C62828"];
   kernel -> hw;
 }
