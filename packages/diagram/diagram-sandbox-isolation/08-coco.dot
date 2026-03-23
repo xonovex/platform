@@ -16,21 +16,14 @@ digraph CoCo {
 
   agent [label="AI Agent (encrypted memory)", fillcolor="#4FC3F7"];
   guest [label="Attested Guest Kernel (measured)", fillcolor="#FFCCBC"];
-  attestation [label="Remote Attestation", fillcolor="#EF9A9A"];
-
-  sb_label [label="- - - sandbox (TEE boundary) - - -", shape=plaintext, fontsize=10, fontcolor="#C62828"];
-
+  sb [label="sandbox (TEE boundary)", style="dashed,filled", fillcolor="#F5F5F5", fontcolor="#C62828", fontsize=10, color="#C62828"];
   vmm [label="Hypervisor (cannot read TEE memory)", fillcolor="#FFCC80"];
   kernel [label="Host Kernel (cannot read TEE memory)", fillcolor="#FF8A65", fontcolor=white];
   hw [label="CPU + Memory Encryption HW\n(Intel TDX / AMD SEV-SNP)", fillcolor="#78909C", fontcolor=white];
 
   agent -> guest [label="  syscalls"];
-  {rank=same; guest; attestation}
-  guest -> attestation [style=dotted, dir=back, label="  measures"];
-  guest -> sb_label [style=invis];
-  sb_label -> vmm [style=invis];
-  guest -> vmm [label="  encrypted VM"];
+  guest -> sb [label="  encrypted VM"];
+  sb -> vmm [style=dashed, color="#C62828"];
   vmm -> kernel [label="  KVM (limited)"];
-  kernel -> hw;
-  attestation -> hw [style=dashed, label="  root of trust"];
+  kernel -> hw [label="  remote attestation\n  (root of trust)"];
 }

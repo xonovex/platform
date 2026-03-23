@@ -18,18 +18,14 @@ digraph Docker {
   ns [label="All 6 namespaces (PID, Mount, UTS, IPC, Net, User)", fillcolor="#BBDEFB", fontsize=10];
   cgroups [label="cgroups (CPU, memory, I/O limits)", fillcolor="#90CAF9"];
   seccomp [label="seccomp (syscall filter)", fillcolor="#64B5F6", fontcolor=white];
-
-  // Sandbox boundary
-  sb_label [label="- - - - - - - - sandbox - - - - - - - -", shape=plaintext, fontsize=10, fontcolor="#C62828"];
-
+  sb [label="sandbox boundary", style="dashed,filled", fillcolor="#F5F5F5", fontcolor="#C62828", fontsize=10, color="#C62828"];
   kernel [label="Host Kernel (shared)", fillcolor="#FF8A65", fontcolor=white];
   hw [label="Hardware", fillcolor="#78909C", fontcolor=white];
 
   agent -> ns;
   ns -> cgroups;
   cgroups -> seccomp;
-  seccomp -> sb_label [style=invis];
-  sb_label -> kernel [style=invis];
-  seccomp -> kernel [label="  filtered syscalls"];
+  seccomp -> sb [label="  filtered syscalls"];
+  sb -> kernel [style=dashed, color="#C62828"];
   kernel -> hw;
 }

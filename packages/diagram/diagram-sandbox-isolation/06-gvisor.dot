@@ -23,17 +23,15 @@ digraph GVisor {
     netstack [label="Netstack\n(user-space TCP/IP)", fillcolor="#FFE082", width=1.4];
   }
 
-  sb_label [label="- - - - - - sandbox - - - - - -", shape=plaintext, fontsize=10, fontcolor="#C62828"];
-
+  sb [label="sandbox boundary", style="dashed,filled", fillcolor="#F5F5F5", fontcolor="#C62828", fontsize=10, color="#C62828"];
   kernel [label="Host Kernel (~60 syscalls)", fillcolor="#FF8A65", fontcolor=white];
   hw [label="Hardware", fillcolor="#78909C", fontcolor=white];
 
   agent -> sentry [label="  syscalls (intercepted)"];
   sentry -> gofer;
   sentry -> netstack;
-  gofer -> sb_label [style=invis];
-  sb_label -> kernel [style=invis];
-  gofer -> kernel [label="  file I/O"];
-  sentry -> kernel [label="  minimal surface", style=dashed];
+  gofer -> sb [label="  file I/O"];
+  netstack -> sb [style=invis];
+  sb -> kernel [style=dashed, color="#C62828", label="  minimal surface"];
   kernel -> hw;
 }

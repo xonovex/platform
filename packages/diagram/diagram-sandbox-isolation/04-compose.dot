@@ -22,17 +22,14 @@ digraph Compose {
 
   network [label="Isolated Bridge Network", fillcolor="#E0F7FA"];
   container [label="Container isolation\n(namespaces, cgroups, seccomp)", fillcolor="#BBDEFB", fontsize=10];
-
-  sb_label [label="- - - - sandbox - - - -", shape=plaintext, fontsize=10, fontcolor="#C62828"];
-
+  sb [label="sandbox boundary", style="dashed,filled", fillcolor="#F5F5F5", fontcolor="#C62828", fontsize=10, color="#C62828"];
   kernel [label="Host Kernel (shared)", fillcolor="#FF8A65", fontcolor=white];
   hw [label="Hardware", fillcolor="#78909C", fontcolor=white];
 
   agent -> network;
   services -> network;
   network -> container;
-  container -> sb_label [style=invis];
-  sb_label -> kernel [style=invis];
-  container -> kernel [label="  filtered syscalls"];
+  container -> sb [label="  filtered syscalls"];
+  sb -> kernel [style=dashed, color="#C62828"];
   kernel -> hw;
 }
