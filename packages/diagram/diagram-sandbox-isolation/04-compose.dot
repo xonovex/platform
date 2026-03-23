@@ -1,65 +1,38 @@
-digraph SandboxCompose {
+digraph Compose {
   rankdir=TB;
-  splines=polyline;
-  nodesep=0.5;
-  ranksep=0.6;
+  splines=false;
+  nodesep=0.3;
+  ranksep=0.5;
   bgcolor="white";
+  margin=0.3;
 
-  node [shape=box, style="rounded,filled", fontname="Inter,Helvetica,Arial", fontsize=11];
-  edge [fontname="Inter,Helvetica,Arial", fontsize=9, color="#999999"];
+  node [shape=box, style="filled", fontname="Helvetica", fontsize=12, width=2.2, height=0.5];
+  edge [fontname="Helvetica", fontsize=9, color="#666666"];
 
   label="Docker Compose — Multi-Service Container Isolation";
   labelloc=t;
   fontsize=14;
-  fontname="Inter,Helvetica,Arial";
-  fontcolor="#0277bd";
+  fontname="Helvetica-Bold";
 
-  subgraph cluster_host {
-    label="Host OS";
-    style="rounded,filled";
-    fillcolor="#e1f5fe";
-    color="#4fc3f7";
-
-    dockerd [label="Docker Daemon", fillcolor="#81d4fa", color="#0277bd", shape=hexagon];
-
-    subgraph cluster_compose {
-      label="Compose Stack";
-      style="rounded,bold,filled";
-      fillcolor="#b3e5fc";
-      color="#0277bd";
-      penwidth=2;
-
-      subgraph cluster_svc1 {
-        label="AI Agent Service";
-        style="rounded,filled";
-        fillcolor="#e0f7fa";
-        color="#00838f";
-        fontsize=10;
-
-        agent [label="AI Agent", fillcolor="#4dd0e1", color="#00838f", shape=ellipse];
-      }
-
-      subgraph cluster_svc2 {
-        label="Supporting Services";
-        style="rounded,dashed,filled";
-        fillcolor="#e0f7fa";
-        color="#00838f";
-        fontsize=10;
-
-        tools [label="DB / Tools / LSP\n...", fillcolor="#b2ebf2", fontsize=9];
-      }
-
-      net [label="Isolated Bridge Network", fillcolor="#b2ebf2", fontsize=9, shape=tab];
-    }
-
-    kernel [label="Shared Kernel", fillcolor="#039be5", color="#0277bd", shape=cylinder, fontcolor=white];
+  subgraph {
+    rank=same;
+    agent [label="AI Agent", fillcolor="#4FC3F7"];
+    services [label="DB / Tools / LSP", fillcolor="#B2EBF2", style="filled,dashed"];
   }
 
-  hw [label="Hardware", fillcolor="#0277bd", fontcolor=white, color="#01579b", shape=box3d];
+  network [label="Isolated Bridge Network", fillcolor="#E0F7FA"];
+  container [label="Container isolation\n(namespaces, cgroups, seccomp)", fillcolor="#BBDEFB", fontsize=10];
 
-  dockerd -> agent [label="create"];
-  agent -> net;
-  tools -> net [style=dashed];
-  agent -> kernel [label="filtered\nsyscalls"];
+  sb_label [label="- - - - sandbox - - - -", shape=plaintext, fontsize=10, fontcolor="#C62828"];
+
+  kernel [label="Host Kernel (shared)", fillcolor="#FF8A65", fontcolor=white];
+  hw [label="Hardware", fillcolor="#78909C", fontcolor=white];
+
+  agent -> network;
+  services -> network;
+  network -> container;
+  container -> sb_label [style=invis];
+  sb_label -> kernel [style=invis];
+  container -> kernel [label="  filtered syscalls"];
   kernel -> hw;
 }

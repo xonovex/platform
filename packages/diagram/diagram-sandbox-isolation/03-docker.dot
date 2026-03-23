@@ -1,50 +1,35 @@
-digraph SandboxDocker {
+digraph Docker {
   rankdir=TB;
-  splines=polyline;
-  nodesep=0.5;
-  ranksep=0.6;
+  splines=false;
+  nodesep=0.3;
+  ranksep=0.5;
   bgcolor="white";
+  margin=0.3;
 
-  node [shape=box, style="rounded,filled", fontname="Inter,Helvetica,Arial", fontsize=11];
-  edge [fontname="Inter,Helvetica,Arial", fontsize=9, color="#999999"];
+  node [shape=box, style="filled", fontname="Helvetica", fontsize=12, width=3, height=0.5];
+  edge [fontname="Helvetica", fontsize=9, color="#666666"];
 
   label="Docker — Container Isolation";
   labelloc=t;
   fontsize=14;
-  fontname="Inter,Helvetica,Arial";
-  fontcolor="#1565c0";
+  fontname="Helvetica-Bold";
 
-  subgraph cluster_host {
-    label="Host OS";
-    style="rounded,filled";
-    fillcolor="#e3f2fd";
-    color="#64b5f6";
+  agent [label="AI Agent", fillcolor="#4FC3F7"];
+  ns [label="All 6 namespaces (PID, Mount, UTS, IPC, Net, User)", fillcolor="#BBDEFB", fontsize=10];
+  cgroups [label="cgroups (CPU, memory, I/O limits)", fillcolor="#90CAF9"];
+  seccomp [label="seccomp (syscall filter)", fillcolor="#64B5F6", fontcolor=white];
 
-    dockerd [label="Docker Daemon", fillcolor="#90caf9", color="#1565c0", shape=hexagon];
+  // Sandbox boundary
+  sb_label [label="- - - - - - - - sandbox - - - - - - - -", shape=plaintext, fontsize=10, fontcolor="#C62828"];
 
-    subgraph cluster_container {
-      label="Container (runc)";
-      style="rounded,bold,filled";
-      fillcolor="#bbdefb";
-      color="#1565c0";
-      penwidth=2;
+  kernel [label="Host Kernel (shared)", fillcolor="#FF8A65", fontcolor=white];
+  hw [label="Hardware", fillcolor="#78909C", fontcolor=white];
 
-      agent [label="AI Agent", fillcolor="#42a5f5", color="#1565c0", shape=ellipse, fontcolor=white];
-      ns [label="PID | Mount | UTS\nIPC | Net | User", fillcolor="#90caf9", fontsize=9];
-      cgroups [label="cgroups\n(CPU, memory, I/O)", fillcolor="#90caf9", fontsize=9];
-      seccomp [label="seccomp\n(syscall filter)", fillcolor="#90caf9", fontsize=9];
-      fs [label="Image FS (layered)\n+ volume mounts", fillcolor="#90caf9", fontsize=9, shape=folder];
-    }
-
-    kernel [label="Shared Kernel", fillcolor="#1e88e5", color="#1565c0", shape=cylinder, fontcolor=white];
-  }
-
-  hw [label="Hardware", fillcolor="#1565c0", fontcolor=white, color="#0d47a1", shape=box3d];
-
-  dockerd -> agent [label="create"];
-  agent -> ns [style=dotted, arrowhead=none];
-  agent -> seccomp [style=dotted, arrowhead=none];
-  agent -> fs;
-  agent -> kernel [label="filtered\nsyscalls"];
+  agent -> ns;
+  ns -> cgroups;
+  cgroups -> seccomp;
+  seccomp -> sb_label [style=invis];
+  sb_label -> kernel [style=invis];
+  seccomp -> kernel [label="  filtered syscalls"];
   kernel -> hw;
 }

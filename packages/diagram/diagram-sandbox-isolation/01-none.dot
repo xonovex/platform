@@ -1,35 +1,26 @@
-digraph SandboxNone {
+digraph None {
   rankdir=TB;
-  splines=polyline;
-  nodesep=0.5;
-  ranksep=0.6;
+  splines=false;
+  nodesep=0.3;
+  ranksep=0.5;
   bgcolor="white";
+  margin=0.3;
 
-  node [shape=box, style="rounded,filled", fontname="Inter,Helvetica,Arial", fontsize=11];
-  edge [fontname="Inter,Helvetica,Arial", fontsize=9, color="#999999"];
+  node [shape=box, style="filled", fontname="Helvetica", fontsize=12, width=3, height=0.5];
+  edge [fontname="Helvetica", fontsize=9, color="#666666"];
 
   label="None — Direct Execution";
   labelloc=t;
   fontsize=14;
-  fontname="Inter,Helvetica,Arial";
-  fontcolor="#c62828";
+  fontname="Helvetica-Bold";
 
-  subgraph cluster_host {
-    label="Host OS";
-    style="rounded,filled";
-    fillcolor="#ffebee";
-    color="#e57373";
+  agent [label="AI Agent", fillcolor="#4FC3F7"];
+  kernel [label="Host Kernel", fillcolor="#FF8A65", fontcolor=white];
+  hw [label="Hardware", fillcolor="#78909C", fontcolor=white];
 
-    agent [label="AI Agent", fillcolor="#ef9a9a", color="#c62828", shape=ellipse];
-    kernel [label="Linux Kernel", fillcolor="#e57373", color="#c62828", shape=cylinder];
-    fs [label="Filesystem", fillcolor="#e57373", color="#c62828", shape=folder];
-    net [label="Network", fillcolor="#e57373", color="#c62828", shape=tab];
-  }
-
-  hw [label="Hardware", fillcolor="#d32f2f", fontcolor=white, color="#b71c1c", shape=box3d];
-
-  agent -> kernel [label="unrestricted"];
-  agent -> fs [label="full access"];
-  agent -> net [label="full access"];
+  agent -> kernel [label="  all syscalls (unrestricted)"];
   kernel -> hw;
+
+  note [label="No isolation boundary — full host access", shape=plaintext, fontsize=10, fontcolor="#C62828"];
+  hw -> note [style=invis];
 }

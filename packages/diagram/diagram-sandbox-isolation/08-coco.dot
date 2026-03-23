@@ -1,47 +1,36 @@
-digraph SandboxCoCo {
+digraph CoCo {
   rankdir=TB;
-  splines=polyline;
-  nodesep=0.5;
-  ranksep=0.6;
+  splines=false;
+  nodesep=0.3;
+  ranksep=0.5;
   bgcolor="white";
+  margin=0.3;
 
-  node [shape=box, style="rounded,filled", fontname="Inter,Helvetica,Arial", fontsize=11];
-  edge [fontname="Inter,Helvetica,Arial", fontsize=9, color="#999999"];
+  node [shape=box, style="filled", fontname="Helvetica", fontsize=12, width=3, height=0.5];
+  edge [fontname="Helvetica", fontsize=9, color="#666666"];
 
   label="Confidential Containers — TEE Isolation";
   labelloc=t;
   fontsize=14;
-  fontname="Inter,Helvetica,Arial";
-  fontcolor="#bf360c";
+  fontname="Helvetica-Bold";
 
-  subgraph cluster_host {
-    label="Host (untrusted)";
-    style="rounded,filled";
-    fillcolor="#fbe9e7";
-    color="#ffab91";
+  agent [label="AI Agent (encrypted memory)", fillcolor="#4FC3F7"];
+  guest [label="Attested Guest Kernel (measured)", fillcolor="#FFCCBC"];
+  attestation [label="Remote Attestation", fillcolor="#EF9A9A"];
 
-    subgraph cluster_tee {
-      label="Trusted Execution Environment";
-      style="rounded,bold,filled";
-      fillcolor="#ffab91";
-      color="#bf360c";
-      penwidth=3;
-      fontcolor="#7f2400";
+  sb_label [label="- - - sandbox (TEE boundary) - - -", shape=plaintext, fontsize=10, fontcolor="#C62828"];
 
-      guest_kernel [label="Attested Guest Kernel", fillcolor="#ff7043", color="#d84315", shape=cylinder, fontcolor=white];
-      agent [label="AI Agent\n(encrypted memory)", fillcolor="#ffccbc", color="#bf360c", shape=ellipse];
-      attestation [label="Remote Attestation", fillcolor="#e64a19", color="#bf360c", shape=octagon, fontcolor=white, fontsize=10];
-    }
+  vmm [label="Hypervisor (cannot read TEE memory)", fillcolor="#FFCC80"];
+  kernel [label="Host Kernel (cannot read TEE memory)", fillcolor="#FF8A65", fontcolor=white];
+  hw [label="CPU + Memory Encryption HW\n(Intel TDX / AMD SEV-SNP)", fillcolor="#78909C", fontcolor=white];
 
-    hypervisor [label="Hypervisor\n(cannot read\nTEE memory)", fillcolor="#d84315", color="#bf360c", shape=box3d, fontcolor=white];
-    host_kernel [label="Host Kernel\n(cannot read\nTEE memory)", fillcolor="#bf360c", color="#7f2400", shape=cylinder, fontcolor=white];
-  }
-
-  hw [label="CPU + Memory\nEncryption HW\n(TDX / SEV-SNP)", fillcolor="#7f2400", fontcolor=white, color="#4e1500", shape=box3d];
-
-  agent -> guest_kernel [label="syscalls"];
-  attestation -> hw [label="root of trust", style=dashed, color="#bf360c"];
-  hypervisor -> guest_kernel [label="launch"];
-  hypervisor -> host_kernel [label="KVM"];
-  host_kernel -> hw;
+  agent -> guest [label="  syscalls"];
+  {rank=same; guest; attestation}
+  guest -> attestation [style=dotted, dir=back, label="  measures"];
+  guest -> sb_label [style=invis];
+  sb_label -> vmm [style=invis];
+  guest -> vmm [label="  encrypted VM"];
+  vmm -> kernel [label="  KVM (limited)"];
+  kernel -> hw;
+  attestation -> hw [style=dashed, label="  root of trust"];
 }

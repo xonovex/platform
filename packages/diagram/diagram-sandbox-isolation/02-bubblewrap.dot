@@ -1,44 +1,38 @@
-digraph SandboxBwrap {
+digraph Bubblewrap {
   rankdir=TB;
-  splines=polyline;
-  nodesep=0.5;
-  ranksep=0.6;
+  splines=false;
+  nodesep=0.3;
+  ranksep=0.5;
   bgcolor="white";
+  margin=0.3;
 
-  node [shape=box, style="rounded,filled", fontname="Inter,Helvetica,Arial", fontsize=11];
-  edge [fontname="Inter,Helvetica,Arial", fontsize=9, color="#999999"];
+  node [shape=box, style="filled", fontname="Helvetica", fontsize=12, width=3, height=0.5];
+  edge [fontname="Helvetica", fontsize=9, color="#666666"];
 
   label="Bubblewrap — Linux Namespace Isolation";
   labelloc=t;
   fontsize=14;
-  fontname="Inter,Helvetica,Arial";
-  fontcolor="#2e7d32";
+  fontname="Helvetica-Bold";
 
-  subgraph cluster_host {
-    label="Host OS";
-    style="rounded,filled";
-    fillcolor="#e8f5e9";
-    color="#66bb6a";
+  agent [label="AI Agent", fillcolor="#4FC3F7"];
+  ns [label="PID | IPC | UTS | cgroup namespaces", fillcolor="#C8E6C9"];
+  mounts [label="Bind mounts: /usr,/lib (ro) | workdir (rw) | /tmp (tmpfs)", fillcolor="#A5D6A7", fontsize=10];
 
-    subgraph cluster_sandbox {
-      label="bwrap sandbox";
-      style="rounded,bold,filled";
-      fillcolor="#c8e6c9";
-      color="#2e7d32";
-      penwidth=2;
+  sandbox [label="", shape=plaintext, width=0, height=0];
 
-      agent [label="AI Agent", fillcolor="#81c784", color="#2e7d32", shape=ellipse];
-      ns [label="PID | IPC | UTS | cgroup\n(unshared)", fillcolor="#a5d6a7", fontsize=9];
-      mounts [label="/usr,/lib,/bin (ro)\nworkdir (rw) | /tmp (tmpfs)", fillcolor="#a5d6a7", fontsize=9, shape=folder];
-    }
+  kernel [label="Host Kernel (shared)", fillcolor="#FF8A65", fontcolor=white];
+  hw [label="Hardware", fillcolor="#78909C", fontcolor=white];
 
-    kernel [label="Shared Kernel", fillcolor="#66bb6a", color="#2e7d32", shape=cylinder, fontcolor=white];
-  }
+  agent -> ns;
+  ns -> mounts;
 
-  hw [label="Hardware", fillcolor="#43a047", fontcolor=white, color="#2e7d32", shape=box3d];
+  // Sandbox boundary
+  mounts -> sandbox [style=invis];
+  sandbox -> kernel [style=invis];
 
-  agent -> ns [style=dotted, arrowhead=none];
-  agent -> mounts [label="bind mounts"];
-  agent -> kernel [label="syscalls\n(shared)"];
+  {rank=same; sandbox; sb_label}
+  sb_label [label="- - - sandbox boundary - - -", shape=plaintext, fontsize=10, fontcolor="#C62828"];
+
+  mounts -> kernel [label="  all syscalls (shared kernel)"];
   kernel -> hw;
 }
