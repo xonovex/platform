@@ -1,0 +1,11 @@
+$schema: https://moonrepo.dev/schemas/project.json
+language: unknown
+tasks:
+  graph-build:
+    command: bash -c 'for f in *.dot; do dot -Tpng -Gdpi=150 -o "${f%.dot}.png" "$f"; done'
+    inputs:
+      - "*.dot"
+    outputs:
+      - "*.png"
+    options:
+      cache: true

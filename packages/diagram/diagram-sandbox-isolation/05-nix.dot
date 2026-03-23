@@ -1,0 +1,99 @@
+digraph SandboxNix {
+  rankdir=TB;
+  compound=true;
+  splines=polyline;
+  nodesep=0.6;
+  ranksep=0.7;
+  bgcolor="white";
+
+  node [shape=box, style="rounded,filled", fontname="Inter,Helvetica,Arial", fontsize=11];
+  edge [fontname="Inter,Helvetica,Arial", fontsize=9, color="#666666"];
+
+  label="Sandbox: Nix + Bubblewrap — Reproducible + Sandboxed Isolation";
+  labelloc=t;
+  fontsize=15;
+  fontname="Inter,Helvetica,Arial";
+  fontcolor="#4527a0";
+
+  subgraph cluster_host {
+    label="Host OS";
+    style="rounded,filled";
+    fillcolor="#ede7f6";
+    color="#4527a0";
+    fontcolor="#311b92";
+    fontsize=12;
+
+    agent_cli [label="agent-cli-go", fillcolor="#b39ddb", color="#4527a0"];
+
+    subgraph cluster_nix_build {
+      label="1. Nix Build Phase";
+      style="rounded,filled";
+      fillcolor="#d1c4e9";
+      color="#5e35b1";
+      fontcolor="#311b92";
+      fontsize=11;
+
+      nix_build [label="nix-build\n(build environment)", fillcolor="#b39ddb", color="#4527a0", shape=hexagon];
+      nix_store [label="/nix/store\n(immutable, content-addressed)", fillcolor="#ce93d8", color="#7b1fa2", shape=cylinder];
+      env_spec [label="EnvSpec\n• NixpkgsPin (reproducible)\n• Packages list\n• Package sets", fillcolor="#e1bee7", fontsize=9, shape=component];
+      env_out [label="Environment Output\n/env → /nix/store/<hash>-env\n(bin, lib, etc)", fillcolor="#ce93d8", color="#7b1fa2", shape=folder];
+    }
+
+    subgraph cluster_bwrap_sandbox {
+      label="2. Bubblewrap Sandbox";
+      style="rounded,bold,filled";
+      fillcolor="#d1c4e9";
+      color="#311b92";
+      fontcolor="#311b92";
+      fontsize=11;
+      penwidth=2;
+
+      subgraph cluster_ns {
+        label="Unshared Namespaces";
+        style="rounded,dashed,filled";
+        fillcolor="#e1bee7";
+        color="#8e24aa";
+        fontsize=10;
+
+        ns [label="UTS | IPC | PID | cgroup\nNetwork (optional)", fillcolor="#ce93d8", fontsize=9];
+      }
+
+      agent [label="AI Agent Process", fillcolor="#ab47bc", color="#6a1b9a", fontcolor=white, shape=ellipse];
+
+      subgraph cluster_mounts {
+        label="Filesystem Layout";
+        style="rounded,dashed,filled";
+        fillcolor="#e1bee7";
+        color="#8e24aa";
+        fontsize=10;
+
+        m_nix [label="/nix/store\n(read-only bind)", fillcolor="#ce93d8", fontsize=9, shape=folder];
+        m_env [label="/env → env output\n(read-only bind)", fillcolor="#ce93d8", fontsize=9, shape=folder];
+        m_work [label="$WORKDIR\n(read-write bind)", fillcolor="#ce93d8", fontsize=9, shape=folder];
+        m_home [label="Per-agent $HOME\n(agents/<id>/home)", fillcolor="#ce93d8", fontsize=9, shape=folder];
+        m_tmp [label="Per-agent /tmp\n(agents/<id>/tmp)", fillcolor="#ce93d8", fontsize=9, shape=folder];
+        m_ssl [label="/etc/ssl/certs\n/etc/resolv.conf\n(read-only)", fillcolor="#ce93d8", fontsize=9, shape=folder];
+        m_symlink [label="/usr/bin/env → /env/bin/env\n(symlink for shebangs)", fillcolor="#ce93d8", fontsize=9, shape=folder];
+      }
+
+      env_vars [label="Environment\nPATH=/env/bin:/usr/bin:/bin\nSHELL=/env/bin/bash\nNIX_SSL_CERT_FILE=...", fillcolor="#e1bee7", fontsize=9, shape=component];
+    }
+
+    kernel [label="Shared Linux Kernel", fillcolor="#7e57c2", color="#4527a0", fontcolor=white, shape=cylinder];
+    hw [label="Hardware", fillcolor="#4527a0", fontcolor=white, color="#311b92", shape=box3d];
+  }
+
+  agent_cli -> nix_build [label="1. build env"];
+  env_spec -> nix_build [style=dotted];
+  nix_build -> nix_store [label="store"];
+  nix_build -> env_out [label="output"];
+  agent_cli -> agent [label="2. bwrap exec\n--die-with-parent"];
+  env_out -> m_env [label="mount as /env", style=dashed];
+  nix_store -> m_nix [label="mount r/o", style=dashed];
+  agent -> m_env [label="binaries from\n/env/bin"];
+  agent -> m_work [label="read/write"];
+  agent -> kernel [label="syscalls\n(shared kernel)"];
+  kernel -> hw;
+
+  props [label="Properties:\n• Reproducible env via Nix (pinned nixpkgs)\n• All binaries from /nix/store (immutable)\n• No host system dirs mounted (no /usr, /lib)\n• Per-agent home and tmp directories\n• Namespace isolation (UTS, IPC, PID, cgroup)\n• Network optionally isolated\n• Package sets for common toolchains\n• Strongest CLI-level isolation", shape=note, fillcolor="#f3e5f5", color="#7b1fa2", fontsize=9, fontcolor="#4a148c"];
+}
