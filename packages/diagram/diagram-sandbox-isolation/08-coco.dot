@@ -1,0 +1,112 @@
+digraph SandboxCoCo {
+  rankdir=TB;
+  compound=true;
+  splines=polyline;
+  nodesep=0.6;
+  ranksep=0.7;
+  bgcolor="white";
+
+  node [shape=box, style="rounded,filled", fontname="Inter,Helvetica,Arial", fontsize=11];
+  edge [fontname="Inter,Helvetica,Arial", fontsize=9, color="#666666"];
+
+  label="Sandbox: Confidential Containers (CoCo) — TEE / Hardware-Attested Isolation";
+  labelloc=t;
+  fontsize=15;
+  fontname="Inter,Helvetica,Arial";
+  fontcolor="#bf360c";
+
+  subgraph cluster_node {
+    label="Kubernetes Node";
+    style="rounded,filled";
+    fillcolor="#fbe9e7";
+    color="#bf360c";
+    fontcolor="#7f2400";
+    fontsize=12;
+
+    kubelet [label="kubelet", fillcolor="#ffccbc", color="#bf360c", shape=hexagon];
+    containerd [label="containerd\n+ kata-cc-runtime", fillcolor="#ffccbc", color="#bf360c", shape=hexagon];
+
+    subgraph cluster_tee {
+      label="Trusted Execution Environment (TEE)";
+      style="rounded,bold,filled";
+      fillcolor="#ffab91";
+      color="#d84315";
+      fontcolor=white;
+      fontsize=13;
+      penwidth=3;
+
+      subgraph cluster_cc_vm {
+        label="Confidential VM (encrypted memory)";
+        style="rounded,bold,filled";
+        fillcolor="#ff8a65";
+        color="#bf360c";
+        fontcolor=white;
+        fontsize=11;
+        penwidth=2;
+
+        guest_kernel [label="Guest Kernel\n(measured, attested)", fillcolor="#ff7043", color="#d84315", fontcolor=white, shape=cylinder];
+
+        subgraph cluster_guest {
+          label="Attested Guest Environment";
+          style="rounded,filled";
+          fillcolor="#ffccbc";
+          color="#e64a19";
+          fontsize=10;
+
+          kata_agent [label="kata-agent\n(attested)", fillcolor="#ff8a65", color="#bf360c", shape=hexagon, fontsize=10];
+          agent [label="AI Agent Process\n(code + data encrypted\nin memory)", fillcolor="#ffab91", color="#bf360c", shape=ellipse];
+          workspace [label="Encrypted Workspace\n(sealed to TEE)", fillcolor="#ffccbc", fontsize=9, shape=folder];
+          secrets [label="Sealed Secrets\n(API keys, tokens\nonly inside TEE)", fillcolor="#ffccbc", fontsize=9, shape=folder];
+        }
+      }
+
+      attestation [label="Remote Attestation\n(hardware proof of\nintegrity + identity)", fillcolor="#e64a19", color="#bf360c", fontcolor=white, shape=octagon];
+    }
+
+    subgraph cluster_hw_tee {
+      label="Hardware TEE Support";
+      style="rounded,filled";
+      fillcolor="#ffccbc";
+      color="#d84315";
+      fontsize=10;
+
+      tdx [label="Intel TDX\n(Trust Domain Extensions)", fillcolor="#ff8a65", fontsize=9];
+      sev [label="AMD SEV-SNP\n(Secure Encrypted Virt)", fillcolor="#ff8a65", fontsize=9];
+      cc_hw [label="Memory Encryption\nEngine (hardware)", fillcolor="#ff8a65", fontsize=9];
+    }
+
+    hypervisor [label="Hypervisor\n(untrusted — cannot\nread VM memory)", fillcolor="#d84315", color="#bf360c", fontcolor=white, shape=box3d];
+    host_kernel [label="Host Linux Kernel\n(untrusted — cannot\nread TEE memory)", fillcolor="#bf360c", color="#7f2400", fontcolor=white, shape=cylinder];
+    hw [label="CPU + Memory Encryption HW\n(root of trust)", fillcolor="#7f2400", fontcolor=white, color="#4e1500", shape=box3d];
+  }
+
+  // K8s flow
+  kubelet -> containerd [label="CRI"];
+  containerd -> hypervisor [label="kata-cc / kata-tdx\nRuntimeClass"];
+  hypervisor -> guest_kernel [label="launch\nconfidential VM"];
+
+  // Inside TEE
+  guest_kernel -> kata_agent;
+  kata_agent -> agent [label="start container"];
+  agent -> workspace;
+  agent -> secrets [label="sealed access"];
+  agent -> guest_kernel [label="syscalls"];
+
+  // Attestation
+  attestation -> guest_kernel [label="measure", style=dashed, color="#bf360c"];
+  attestation -> hw [label="hardware\nroot of trust", style=dashed, color="#bf360c"];
+
+  // TEE hardware
+  guest_kernel -> cc_hw [label="encrypted\nmemory ops", style=dotted];
+  tdx -> cc_hw [style=invis];
+  sev -> cc_hw [style=invis];
+
+  // Host cannot access
+  hypervisor -> host_kernel [label="KVM (limited)"];
+  host_kernel -> hw;
+
+  // Trust boundary annotation
+  untrusted [label="UNTRUSTED ZONE\nHost kernel, hypervisor, and\ncloud operator CANNOT read\nTEE memory or tamper with\nattested code", shape=note, fillcolor="#ffebee", color="#c62828", fontcolor="#c62828", fontsize=9];
+
+  props [label="Properties:\n• Hardware-enforced memory encryption\n• Remote attestation (cryptographic proof)\n• Host/hypervisor CANNOT read VM memory\n• Protects against compromised infrastructure\n• Secrets sealed to TEE identity\n• RuntimeClass: kata-cc (AMD SEV) or kata-tdx (Intel TDX)\n• Strongest isolation — protects from cloud operator\n• Higher overhead (encrypted memory ops)", shape=note, fillcolor="#fce4ec", color="#c62828", fontsize=9, fontcolor="#880e4f"];
+}
