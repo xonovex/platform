@@ -1,0 +1,84 @@
+digraph SandboxBwrap {
+  rankdir=TB;
+  compound=true;
+  splines=polyline;
+  nodesep=0.6;
+  ranksep=0.7;
+  bgcolor="white";
+
+  node [shape=box, style="rounded,filled", fontname="Inter,Helvetica,Arial", fontsize=11];
+  edge [fontname="Inter,Helvetica,Arial", fontsize=9, color="#666666"];
+
+  label="Sandbox: Bubblewrap (bwrap) — Linux Namespace Isolation";
+  labelloc=t;
+  fontsize=15;
+  fontname="Inter,Helvetica,Arial";
+  fontcolor="#2e7d32";
+
+  subgraph cluster_host {
+    label="Host OS";
+    style="rounded,filled";
+    fillcolor="#e8f5e9";
+    color="#2e7d32";
+    fontcolor="#1b5e20";
+    fontsize=12;
+
+    agent_cli [label="agent-cli-go\n(parent process)", fillcolor="#a5d6a7", color="#2e7d32"];
+
+    subgraph cluster_sandbox {
+      label="Bubblewrap Sandbox";
+      style="rounded,bold,filled";
+      fillcolor="#c8e6c9";
+      color="#1b5e20";
+      fontcolor="#1b5e20";
+      fontsize=12;
+      penwidth=2;
+
+      subgraph cluster_namespaces {
+        label="Unshared Namespaces";
+        style="rounded,dashed,filled";
+        fillcolor="#dcedc8";
+        color="#558b2f";
+        fontsize=10;
+
+        ns_uts [label="UTS\n(hostname)", fillcolor="#aed581", fontsize=9];
+        ns_ipc [label="IPC\n(inter-process)", fillcolor="#aed581", fontsize=9];
+        ns_pid [label="PID\n(process tree)", fillcolor="#aed581", fontsize=9];
+        ns_cgroup [label="cgroup\n(resources)", fillcolor="#aed581", fontsize=9];
+        ns_net [label="Network\n(optional: --share-net)", fillcolor="#aed581", fontsize=9, style="rounded,filled,dashed"];
+      }
+
+      agent [label="AI Agent Process", fillcolor="#81c784", color="#2e7d32", shape=ellipse];
+
+      subgraph cluster_mounts {
+        label="Filesystem Mounts";
+        style="rounded,dashed,filled";
+        fillcolor="#dcedc8";
+        color="#558b2f";
+        fontsize=10;
+
+        ro_sys [label="/usr, /lib, /bin, /etc\n(read-only bind)", fillcolor="#c5e1a5", fontsize=9, shape=folder];
+        rw_home [label="$HOME\n(read-write bind)", fillcolor="#c5e1a5", fontsize=9, shape=folder];
+        rw_work [label="$WORKDIR\n(read-write bind)", fillcolor="#c5e1a5", fontsize=9, shape=folder];
+        ro_repo [label="$REPODIR\n(read-only bind,\nworktree source)", fillcolor="#c5e1a5", fontsize=9, shape=folder, style="rounded,filled,dashed"];
+        tmpfs [label="/tmp\n(tmpfs)", fillcolor="#c5e1a5", fontsize=9, shape=folder];
+        dev [label="/dev (dev-bind)\n/proc (proc)", fillcolor="#c5e1a5", fontsize=9, shape=folder];
+      }
+
+      env [label="Environment\nHOME, PATH, TMPDIR, SHELL\n(--setenv)", fillcolor="#e8f5e9", fontsize=9, shape=component];
+    }
+
+    kernel [label="Shared Linux Kernel", fillcolor="#66bb6a", color="#2e7d32", shape=cylinder];
+    hw [label="Hardware", fillcolor="#43a047", fontcolor=white, color="#2e7d32", shape=box3d];
+  }
+
+  agent_cli -> agent [label="bwrap exec\n--die-with-parent"];
+  agent -> ns_uts [style=dotted, arrowhead=none];
+  agent -> ro_sys [label="read"];
+  agent -> rw_work [label="read/write"];
+  agent -> kernel [label="syscalls\n(shared kernel)"];
+  kernel -> hw;
+
+  // Properties
+  props [label="Properties:\n• Lightweight — no VM or container daemon\n• Shared kernel (same syscall surface)\n• Filesystem restricted via bind mounts\n• PID/IPC/UTS/cgroup isolation\n• Network optionally shared\n• Dies with parent process", shape=note, fillcolor="#f1f8e9", color="#558b2f", fontsize=9, fontcolor="#33691e"];
+}

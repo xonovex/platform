@@ -1,0 +1,95 @@
+digraph SandboxDocker {
+  rankdir=TB;
+  compound=true;
+  splines=polyline;
+  nodesep=0.6;
+  ranksep=0.7;
+  bgcolor="white";
+
+  node [shape=box, style="rounded,filled", fontname="Inter,Helvetica,Arial", fontsize=11];
+  edge [fontname="Inter,Helvetica,Arial", fontsize=9, color="#666666"];
+
+  label="Sandbox: Docker — Container Isolation";
+  labelloc=t;
+  fontsize=15;
+  fontname="Inter,Helvetica,Arial";
+  fontcolor="#1565c0";
+
+  subgraph cluster_host {
+    label="Host OS";
+    style="rounded,filled";
+    fillcolor="#e3f2fd";
+    color="#1565c0";
+    fontcolor="#0d47a1";
+    fontsize=12;
+
+    agent_cli [label="agent-cli-go\n(invokes docker run)", fillcolor="#90caf9", color="#1565c0"];
+    dockerd [label="Docker Daemon\n(dockerd)", fillcolor="#64b5f6", color="#1565c0", shape=hexagon];
+
+    subgraph cluster_container {
+      label="Docker Container (--rm -it)";
+      style="rounded,bold,filled";
+      fillcolor="#bbdefb";
+      color="#0d47a1";
+      fontcolor="#0d47a1";
+      fontsize=12;
+      penwidth=2;
+
+      subgraph cluster_ns {
+        label="Container Namespaces";
+        style="rounded,dashed,filled";
+        fillcolor="#e1f5fe";
+        color="#0288d1";
+        fontsize=10;
+
+        ns_all [label="PID | Mount | UTS\nIPC | Network | User", fillcolor="#81d4fa", fontsize=9];
+      }
+
+      subgraph cluster_cgroups {
+        label="Control Groups";
+        style="rounded,dashed,filled";
+        fillcolor="#e1f5fe";
+        color="#0288d1";
+        fontsize=10;
+
+        cg [label="CPU | Memory | I/O\n(resource limits)", fillcolor="#81d4fa", fontsize=9];
+      }
+
+      agent [label="AI Agent Process\n(runs as host UID:GID)", fillcolor="#42a5f5", color="#1565c0", shape=ellipse, fontcolor=white];
+
+      subgraph cluster_fs {
+        label="Filesystem";
+        style="rounded,dashed,filled";
+        fillcolor="#e1f5fe";
+        color="#0288d1";
+        fontsize=10;
+
+        image_fs [label="Container Image FS\n(layered, read-only base)", fillcolor="#b3e5fc", fontsize=9, shape=folder];
+        vol_home [label="-v $HOME:$HOME", fillcolor="#b3e5fc", fontsize=9, shape=folder];
+        vol_work [label="-v $WORKDIR:$WORKDIR", fillcolor="#b3e5fc", fontsize=9, shape=folder];
+        vol_repo [label="-v $REPODIR:$REPODIR:ro\n(worktree, optional)", fillcolor="#b3e5fc", fontsize=9, shape=folder, style="rounded,filled,dashed"];
+        vol_config [label="-v ~/.claude, ~/.config\n(user config paths)", fillcolor="#b3e5fc", fontsize=9, shape=folder];
+      }
+
+      net [label="Network: none\n(or host, bridge)", fillcolor="#e1f5fe", fontsize=9, shape=tab];
+      env [label="Environment\n-e HOME, TMPDIR, SHELL\n+ provider keys", fillcolor="#e1f5fe", fontsize=9, shape=component];
+    }
+
+    runc_runtime [label="runc\n(OCI Runtime)", fillcolor="#42a5f5", color="#1565c0", shape=diamond, fontcolor=white];
+    kernel [label="Shared Linux Kernel", fillcolor="#1e88e5", color="#1565c0", fontcolor=white, shape=cylinder];
+    hw [label="Hardware", fillcolor="#1565c0", fontcolor=white, color="#0d47a1", shape=box3d];
+  }
+
+  agent_cli -> dockerd [label="docker run"];
+  dockerd -> runc_runtime [label="create container"];
+  runc_runtime -> agent [label="start process"];
+  agent -> ns_all [style=dotted, arrowhead=none];
+  agent -> cg [style=dotted, arrowhead=none];
+  agent -> image_fs [label="root fs"];
+  agent -> vol_work [label="bind mount"];
+  agent -> net;
+  agent -> kernel [label="syscalls\n(filtered by seccomp)"];
+  kernel -> hw;
+
+  props [label="Properties:\n• Full namespace isolation (all 6)\n• Seccomp syscall filtering\n• Layered filesystem with CoW\n• Network isolation (default: none)\n• Resource limits via cgroups\n• Requires Docker daemon\n• OCI image as base environment", shape=note, fillcolor="#e8eaf6", color="#3f51b5", fontsize=9, fontcolor="#1a237e"];
+}

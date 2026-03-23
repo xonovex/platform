@@ -1,0 +1,10 @@
+{
+  "name": "@xonovex/diagram-sandbox-isolation",
+  "version": "0.0.0",
+  "private": true,
+  "keywords": [
+    "xonovex",
+    "doc",
+    "diagram"
+  ]
+}

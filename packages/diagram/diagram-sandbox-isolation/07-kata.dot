@@ -1,0 +1,113 @@
+digraph SandboxKata {
+  rankdir=TB;
+  compound=true;
+  splines=polyline;
+  nodesep=0.6;
+  ranksep=0.7;
+  bgcolor="white";
+
+  node [shape=box, style="rounded,filled", fontname="Inter,Helvetica,Arial", fontsize=11];
+  edge [fontname="Inter,Helvetica,Arial", fontsize=9, color="#666666"];
+
+  label="Sandbox: Kata Containers — Lightweight VM Isolation";
+  labelloc=t;
+  fontsize=15;
+  fontname="Inter,Helvetica,Arial";
+  fontcolor="#e65100";
+
+  subgraph cluster_node {
+    label="Kubernetes Node";
+    style="rounded,filled";
+    fillcolor="#fff3e0";
+    color="#e65100";
+    fontcolor="#bf360c";
+    fontsize=12;
+
+    kubelet [label="kubelet", fillcolor="#ffe0b2", color="#e65100", shape=hexagon];
+    containerd [label="containerd\n+ kata-runtime", fillcolor="#ffe0b2", color="#e65100", shape=hexagon];
+
+    subgraph cluster_vm {
+      label="Lightweight Virtual Machine (QEMU/Cloud-Hypervisor)";
+      style="rounded,bold,filled";
+      fillcolor="#ffcc80";
+      color="#e65100";
+      fontcolor="#bf360c";
+      fontsize=12;
+      penwidth=3;
+
+      subgraph cluster_guest_kernel {
+        label="Guest Kernel";
+        style="rounded,filled";
+        fillcolor="#ffab40";
+        color="#e65100";
+        fontcolor=white;
+        fontsize=11;
+
+        guest_kernel [label="Lightweight Linux Kernel\n(separate from host)", fillcolor="#ff9100", color="#e65100", fontcolor=white, shape=cylinder];
+      }
+
+      subgraph cluster_guest_os {
+        label="Guest OS (Minimal rootfs)";
+        style="rounded,filled";
+        fillcolor="#ffe0b2";
+        color="#f57c00";
+        fontsize=10;
+
+        kata_agent [label="kata-agent\n(manages container\nlifecycle inside VM)", fillcolor="#ffb74d", color="#e65100", shape=hexagon, fontsize=10];
+
+        subgraph cluster_container {
+          label="OCI Container";
+          style="rounded,filled";
+          fillcolor="#fff3e0";
+          color="#ff9800";
+          fontsize=10;
+
+          agent [label="AI Agent Process\n(init container: git clone\nmain: claude/opencode)", fillcolor="#ffcc80", color="#e65100", shape=ellipse];
+          workspace [label="Workspace PVC\n(mounted via\nvirtio/9pfs)", fillcolor="#ffe0b2", fontsize=9, shape=folder];
+        }
+
+        pmem [label="/dev/pmem0\n(rootfs via PMEM)", fillcolor="#ffe0b2", fontsize=9, shape=folder, style="rounded,filled,dashed"];
+      }
+
+      subgraph cluster_hw_virt {
+        label="Hardware Virtualization";
+        style="rounded,dashed,filled";
+        fillcolor="#ffe0b2";
+        color="#e65100";
+        fontsize=10;
+
+        vcpu [label="vCPU(s)", fillcolor="#ffcc80", fontsize=9];
+        vmem [label="Virtual Memory", fillcolor="#ffcc80", fontsize=9];
+        vnet [label="Virtual NIC\n(vsock / virtio-net)", fillcolor="#ffcc80", fontsize=9];
+        vblk [label="Virtual Block\n(virtio-blk)", fillcolor="#ffcc80", fontsize=9];
+      }
+    }
+
+    hypervisor [label="Hypervisor\n(QEMU / Cloud-Hypervisor)\nRequires /dev/kvm", fillcolor="#ff6d00", color="#e65100", fontcolor=white, shape=box3d];
+    host_kernel [label="Host Linux Kernel", fillcolor="#e65100", color="#bf360c", fontcolor=white, shape=cylinder];
+    hw [label="Hardware\n(VT-x/AMD-V, /dev/kvm)", fillcolor="#bf360c", fontcolor=white, color="#7f2400", shape=box3d];
+  }
+
+  // K8s flow
+  kubelet -> containerd [label="CRI"];
+  containerd -> hypervisor [label="kata-runtime\n(RuntimeClass: kata)"];
+  hypervisor -> guest_kernel [label="boot VM"];
+
+  // Inside VM
+  guest_kernel -> kata_agent [label="manages"];
+  kata_agent -> agent [label="start container"];
+  agent -> workspace;
+  agent -> guest_kernel [label="syscalls\n(guest kernel only)"];
+
+  // VM to host
+  hypervisor -> host_kernel [label="KVM ioctls\n(/dev/kvm)"];
+  host_kernel -> hw;
+
+  // vsock communication
+  containerd -> kata_agent [label="vsock\n(control channel)", style=dashed, color="#e65100"];
+
+  // Detection
+  detect [label="Detection:\n• Guest kernel differs from host\n• /dev/pmem0 present\n• vsock communication", shape=note, fillcolor="#e8f5e9", color="#2e7d32", fontsize=9, fontcolor="#1b5e20"];
+
+  props [label="Properties:\n• Full VM boundary — separate kernel\n• Agent syscalls never reach host kernel\n• Hardware-enforced isolation (VT-x/AMD-V)\n• Requires /dev/kvm on host\n• Higher overhead than containers/gVisor\n• Lightweight VM (fast boot, small memory)\n• RuntimeClass: kata on K8s\n• Init container for git clone + main agent", shape=note, fillcolor="#fbe9e7", color="#bf360c", fontsize=9, fontcolor="#7f2400"];
+}

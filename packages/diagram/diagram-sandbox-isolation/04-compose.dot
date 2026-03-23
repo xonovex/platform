@@ -1,0 +1,92 @@
+digraph SandboxCompose {
+  rankdir=TB;
+  compound=true;
+  splines=polyline;
+  nodesep=0.6;
+  ranksep=0.7;
+  bgcolor="white";
+
+  node [shape=box, style="rounded,filled", fontname="Inter,Helvetica,Arial", fontsize=11];
+  edge [fontname="Inter,Helvetica,Arial", fontsize=9, color="#666666"];
+
+  label="Sandbox: Docker Compose — Multi-Service Container Isolation";
+  labelloc=t;
+  fontsize=15;
+  fontname="Inter,Helvetica,Arial";
+  fontcolor="#0277bd";
+
+  subgraph cluster_host {
+    label="Host OS";
+    style="rounded,filled";
+    fillcolor="#e1f5fe";
+    color="#0277bd";
+    fontcolor="#01579b";
+    fontsize=12;
+
+    agent_cli [label="agent-cli-go\n(invokes docker compose run)", fillcolor="#81d4fa", color="#0277bd"];
+    dockerd [label="Docker Daemon", fillcolor="#4fc3f7", color="#0277bd", shape=hexagon];
+
+    subgraph cluster_compose {
+      label="Docker Compose Stack\n(stacks/ai-agent.yaml)";
+      style="rounded,bold,filled";
+      fillcolor="#b3e5fc";
+      color="#01579b";
+      fontcolor="#01579b";
+      fontsize=12;
+      penwidth=2;
+
+      subgraph cluster_service_agent {
+        label="Service: ai-agent (or custom)";
+        style="rounded,filled";
+        fillcolor="#e0f7fa";
+        color="#00838f";
+        fontsize=10;
+
+        agent [label="AI Agent Process", fillcolor="#4dd0e1", color="#00838f", shape=ellipse];
+        vol_compose [label="Compose Volumes\n(from YAML config)", fillcolor="#b2ebf2", fontsize=9, shape=folder];
+        vol_runtime [label="Runtime Volumes\n-v $WORKDIR, configs", fillcolor="#b2ebf2", fontsize=9, shape=folder];
+      }
+
+      subgraph cluster_service_extra {
+        label="Additional Services\n(defined in compose file)";
+        style="rounded,dashed,filled";
+        fillcolor="#e0f7fa";
+        color="#00838f";
+        fontsize=10;
+
+        svc_db [label="Database /\nCache / ...", fillcolor="#b2ebf2", fontsize=9, style="rounded,filled,dashed"];
+        svc_tools [label="Dev Tools /\nLSP / ...", fillcolor="#b2ebf2", fontsize=9, style="rounded,filled,dashed"];
+      }
+
+      compose_net [label="Compose Network\n(isolated bridge)", fillcolor="#e0f7fa", fontsize=9, shape=tab];
+    }
+
+    subgraph cluster_env {
+      label="Compose Environment";
+      style="rounded,dashed,filled";
+      fillcolor="#e1f5fe";
+      color="#0288d1";
+      fontsize=10;
+
+      env_agent [label="AGENT_WORK_DIR\nAGENT_REPO_DIR\nAGENT_UID / AGENT_GID\nAGENT_ID", fillcolor="#b3e5fc", fontsize=9, shape=component];
+      env_provider [label="Provider Env\n(API keys)", fillcolor="#b3e5fc", fontsize=9, shape=component];
+    }
+
+    kernel [label="Shared Linux Kernel", fillcolor="#039be5", color="#0277bd", fontcolor=white, shape=cylinder];
+    hw [label="Hardware", fillcolor="#0277bd", fontcolor=white, color="#01579b", shape=box3d];
+  }
+
+  agent_cli -> dockerd [label="docker compose\n-f <file> run --rm"];
+  dockerd -> agent [label="start service"];
+  agent -> vol_compose;
+  agent -> vol_runtime;
+  agent -> compose_net;
+  svc_db -> compose_net [style=dashed];
+  svc_tools -> compose_net [style=dashed];
+  agent -> kernel [label="syscalls"];
+  kernel -> hw;
+  env_agent -> agent [style=dotted, label="injected"];
+  env_provider -> agent [style=dotted, label="injected"];
+
+  props [label="Properties:\n• Same container isolation as Docker\n• Multi-service orchestration\n• Pre-configured environments via YAML\n• Compose-level networking between services\n• Agent can use DB, tools, LSP servers\n• AGENT_WORK_DIR/REPO_DIR passed as env\n• Bash reserved vars filtered (UID, EUID, ...)", shape=note, fillcolor="#e8eaf6", color="#3f51b5", fontsize=9, fontcolor="#1a237e"];
+}
