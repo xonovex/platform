@@ -16,7 +16,10 @@
 # binaries.
 # =============================================================================
 
-FROM alpine:latest
+# SECURITY: Pinned to specific digest to prevent supply chain attacks.
+# Floating tags silently change — a compromised tag could inject malware.
+# Update digest periodically after verifying the new image.
+FROM alpine@sha256:25109184c71bdad752c8312a8623239686a9a2071e8825f20acb8f2198c3f659
 
 # dnsmasq-dnssec (not plain dnsmasq) includes DNSSEC validation support.
 # Alpine's base dnsmasq package is compiled without it.

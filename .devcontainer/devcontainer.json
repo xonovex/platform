@@ -76,15 +76,23 @@
 
   "customizations": {
     "vscode": {
-      "extensions": [
-        "esbenp.prettier-vscode",
-        "dbaeumer.vscode-eslint"
-      ],
+      "extensions": ["esbenp.prettier-vscode", "dbaeumer.vscode-eslint"],
       "settings": {
         // SECURITY: Prevent copying host git config into container.
         // Host git config may contain credential helpers, signing keys,
         // or other settings that shouldn't be exposed.
         "dev.containers.copyGitConfig": false,
+        // SECURITY: Prompt before trusting workspace content. Prevents
+        // auto-execution of malicious tasks.json, launch.json, or
+        // extension settings from untrusted repositories.
+        "security.workspace.trust.enabled": true,
+        "security.workspace.trust.untrustedFiles": "prompt",
+        // SECURITY: Keep extensions updated to get security patches.
+        // Critical VS Code extension vulnerabilities (CVE-2025-65717,
+        // CVE-2025-65716) affected 128M+ installs in Feb 2026.
+        "extensions.autoCheckUpdates": true,
+        "extensions.autoUpdate": true,
+        // Editor settings
         "editor.formatOnSave": true
       }
     }

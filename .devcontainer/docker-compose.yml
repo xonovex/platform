@@ -29,8 +29,14 @@ services:
     # Even if a setuid binary exists, the kernel won't honor the bit.
     # Combined with sudo removal and setuid stripping in Dockerfile, this
     # creates three layers of privilege escalation prevention.
+    # SECURITY: Custom seccomp profile restricts syscalls beyond Docker's
+    # default. Removes name_to_handle_at (escape vector), time adjustment,
+    # and all capability-gated syscalls the container doesn't have. Blocks
+    # AF_VSOCK (VM-host escape), namespace creation in clone, and returns
+    # ENOSYS for clone3 (glibc compatibility).
     security_opt:
       - no-new-privileges:true
+      - seccomp=app/seccomp.json
 
     # SECURITY: Writable scratch areas with restrictive mount options.
     # - noexec: prevents execution of binaries written to tmp (blocks
@@ -79,7 +85,20 @@ services:
       proxy-net:
         ipv4_address: 10.200.0.3
 
-    command: sleep infinity
+    # SECURITY: Background IPC socket cleanup loop. VS Code creates IPC
+    # sockets at multiple lifecycle stages — a single cleanup pass in
+    # harden-ipc.sh misses sockets created after shell init. This loop
+    # runs as a child of PID 1 (not a VS Code lifecycle command), so it
+    # survives VS Code's cgroup-based process termination. 10 passes
+    # over 5 minutes catches late-created sockets.
+    command: >
+      bash -c '
+        (for i in $(seq 1 10); do
+          find /tmp -maxdepth 2 \( -name "vscode-ipc-*" -o -name "vscode-git-*" -o -name "vscode-ssh-auth-*" -o -name "vscode-remote-containers-*" \) -type s -delete 2>/dev/null
+          sleep 30
+        done) &
+        exec sleep infinity
+      '
 
   proxy:
     build:
