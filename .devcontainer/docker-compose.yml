@@ -1,42 +1,152 @@
+# =============================================================================
+# Devcontainer Docker Compose — Hardened Network Isolation
+#
+# Architecture:
+#   app (internal only) → proxy (squid + dnsmasq) → internet
+#
+# The app container has NO direct internet access. All HTTP/HTTPS traffic
+# routes through the squid proxy which enforces a domain allowlist.
+# DNS queries go through dnsmasq which also enforces the same allowlist,
+# providing defense-in-depth (even if proxy env vars are bypassed, DNS
+# won't resolve unauthorized domains).
+# =============================================================================
+
 services:
   app:
     build:
-      context: .
+      context: ./app
       dockerfile: Dockerfile
       args:
         NODE_VERSION: "20"
+
+    # SECURITY: Drop ALL Linux capabilities. The app container needs zero
+    # capabilities — it doesn't bind privileged ports, manage networks, or
+    # access raw sockets. The proxy handles all external communication.
+    cap_drop:
+      - ALL
+
+    # SECURITY: Prevent privilege escalation via setuid/setgid binaries.
+    # Even if a setuid binary exists, the kernel won't honor the bit.
+    # Combined with sudo removal and setuid stripping in Dockerfile, this
+    # creates three layers of privilege escalation prevention.
+    security_opt:
+      - no-new-privileges:true
+
+    # SECURITY: Writable scratch areas with restrictive mount options.
+    # - noexec: prevents execution of binaries written to tmp (blocks
+    #   malware that downloads and runs from /tmp)
+    # - nosuid: blocks setuid privilege escalation from tmp
+    # - nodev: prevents creation of device nodes
+    # Note: /run omits noexec because some runtime tools place executable
+    # helpers there (e.g., VS Code Server).
+    # Note: read_only is NOT used on the app container because VS Code
+    # Server, Claude Code, npm, and git all write extensively to home
+    # directories and system paths. Managing all writable paths via
+    # tmpfs/volumes is fragile and breaks easily. The other hardening
+    # layers (cap_drop, no-new-privileges, no sudo) provide strong
+    # security without the operational risk.
+    tmpfs:
+      - /tmp:noexec,nosuid,nodev,size=256m
+      - /var/tmp:noexec,nosuid,nodev,size=64m
+      - /run:nosuid,nodev,size=64m
+
     volumes:
       - ..:/workspaces/xonovex-platform:cached
+
     depends_on:
       - proxy
+
+    # SECURITY: Override Docker's default DNS (127.0.0.11) with the proxy's
+    # dnsmasq. This is critical because on the internal network, Docker's
+    # DNS can resolve container names but cannot forward external queries.
+    # Dnsmasq provides filtered DNS — only allowed domains resolve,
+    # everything else returns NXDOMAIN. This prevents DNS-based data
+    # exfiltration and ensures unauthorized domains fail at DNS level
+    # even if the proxy env vars are bypassed.
     dns:
       - 10.200.0.2
+
+    # Route all HTTP/HTTPS through the squid proxy.
+    # Claude Code (Bun), npm, curl, wget all respect these env vars.
     environment:
       - HTTP_PROXY=http://proxy:3128
       - HTTPS_PROXY=http://proxy:3128
       - NO_PROXY=localhost,127.0.0.1
+
+    # SECURITY: App is ONLY on the internal network. It cannot reach any
+    # external IP directly — all traffic must go through the proxy.
     networks:
       proxy-net:
         ipv4_address: 10.200.0.3
+
     command: sleep infinity
 
   proxy:
     build:
-      context: .
-      dockerfile: Dockerfile.squid
+      context: ./proxy
+      dockerfile: Dockerfile
+
+    # SECURITY: Drop ALL Linux capabilities. dnsmasq needs to bind port 53
+    # but gets this via setcap file capability (set in Dockerfile), not via
+    # Docker's cap_add. This keeps the bounding set completely empty.
+    cap_drop:
+      - ALL
+
+    # NOTE: no-new-privileges is NOT set on the proxy container.
+    # Squid 7.x refuses to run as root and requires user switching via
+    # setgid/initgroups, which no-new-privileges blocks. The proxy runs
+    # as the squid user instead. Without no-new-privileges, setcap file
+    # capabilities work — dnsmasq uses cap_net_bind_service to bind
+    # port 53 as non-root. This is acceptable because: cap_drop ALL
+    # removes all capabilities from the bounding set, read_only prevents
+    # binary modification, and Alpine ships no setuid binaries.
+
+    # SECURITY: Immutable root filesystem. Nothing can be written to the
+    # image filesystem — no malware installation, no binary modification,
+    # no persistent backdoors. Writable areas are explicitly enumerated
+    # as tmpfs below and disappear on container restart.
+    read_only: true
+
+    # Writable tmpfs areas for squid/dnsmasq runtime state.
+    # uid=31,gid=31 = squid user, so the non-root process can write.
+    # /etc/squid and /etc/dnsmasq.d: configs are generated at startup
+    # from allowed-domains.conf (the image's /etc/squid is wiped by
+    # read_only + tmpfs overlay, so mime.conf is preserved in /etc/proxy
+    # and restored by the entrypoint).
+    tmpfs:
+      - /tmp:noexec,nosuid,nodev,uid=31,gid=31,size=32m
+      - /var/log/squid:uid=31,gid=31,size=64m
+      - /var/cache/squid:uid=31,gid=31,size=128m
+      - /run:uid=31,gid=31,size=16m
+      - /etc/squid:uid=31,gid=31,size=1m
+      - /etc/dnsmasq.d:uid=31,gid=31,size=1m
+
+    # SECURITY: Domain allowlist mounted read-only. This is the single
+    # source of truth — the entrypoint generates both squid ACLs and
+    # dnsmasq forwarding rules from this file. Even if the container is
+    # compromised, the allowlist cannot be modified.
     volumes:
-      - ./squid.conf:/etc/squid/squid.conf:ro
+      - ./proxy/allowed-domains.conf:/etc/proxy/allowed-domains.conf:ro
+
+    # Proxy sits on both networks: internal (to receive app traffic) and
+    # external (to reach the internet). It is the only bridge between them.
     networks:
       proxy-net:
         ipv4_address: 10.200.0.2
       external:
 
 networks:
+  # SECURITY: Internal-only network. Docker blocks all external routing
+  # for containers on this network. The app can only communicate with
+  # the proxy — it cannot reach any external IP, even if it tries to
+  # bypass the proxy env vars. This is the primary enforcement mechanism.
   proxy-net:
     driver: bridge
     internal: true
     ipam:
       config:
         - subnet: 10.200.0.0/24
+
+  # External network for the proxy to reach the internet.
   external:
     driver: bridge
