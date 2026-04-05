@@ -14,11 +14,40 @@ FROM mcr.microsoft.com/devcontainers/base:ubuntu@sha256:4bcb1b466771b1ba1ea110e2
 ARG NODE_VERSION=20
 ARG DEBIAN_FRONTEND=noninteractive
 
-# System packages. sudo is deliberately excluded — it is purged below.
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    git curl wget unzip jq vim nano \
-    procps build-essential python3 bash \
-    && rm -rf /var/lib/apt/lists/*
+# Optional package groups, activated via .env (gitignored):
+#   PACKAGE_GROUPS=android,python
+# Only packages listed in allowed-packages.conf can be installed.
+# The "base" group is always included. See allowed-packages.conf for
+# available groups and their contents.
+ARG PACKAGE_GROUPS=""
+
+# Copy the package allowlist into the image for the install script to read.
+COPY allowed-packages.conf /tmp/allowed-packages.conf
+
+# Install packages from allowed-packages.conf. The script parses the config
+# file, always installs the [base] group, and adds any groups listed in
+# PACKAGE_GROUPS. Developers cannot install arbitrary packages — only
+# centrally approved ones listed in allowed-packages.conf.
+# sudo is deliberately excluded — it is purged below.
+RUN set -e; \
+    PACKAGES=""; \
+    ACTIVE_GROUPS=",base,${PACKAGE_GROUPS},"; \
+    CURRENT_GROUP=""; \
+    while IFS= read -r line || [ -n "$line" ]; do \
+      line=$(echo "$line" | sed 's/#.*//'); \
+      line=$(echo "$line" | tr -d '[:space:]'); \
+      [ -z "$line" ] && continue; \
+      if echo "$line" | grep -q '^\[.*\]$'; then \
+        CURRENT_GROUP=$(echo "$line" | tr -d '[]'); \
+        continue; \
+      fi; \
+      if echo "$ACTIVE_GROUPS" | grep -q ",${CURRENT_GROUP},"; then \
+        PACKAGES="$PACKAGES $line"; \
+      fi; \
+    done < /tmp/allowed-packages.conf; \
+    echo "Installing packages: $PACKAGES"; \
+    apt-get update && apt-get install -y --no-install-recommends $PACKAGES; \
+    rm -rf /var/lib/apt/lists/* /tmp/allowed-packages.conf
 
 # Node.js
 RUN curl -fsSL https://deb.nodesource.com/setup_${NODE_VERSION}.x | bash - \
