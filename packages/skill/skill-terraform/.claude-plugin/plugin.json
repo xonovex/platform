@@ -2,6 +2,6 @@
   "name": "xonovex-terraform",
   "version": "0.1.0",
   "description": "Terraform guidelines",
-  "author": { "name": "Xonovex" },
+  "author": {"name": "Xonovex"},
   "skills": "./"
 }

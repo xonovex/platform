@@ -2,6 +2,6 @@
   "name": "xonovex-astro",
   "version": "0.1.0",
   "description": "Astro guidelines",
-  "author": { "name": "Xonovex" },
+  "author": {"name": "Xonovex"},
   "skills": "./"
 }

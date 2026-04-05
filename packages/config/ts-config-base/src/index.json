@@ -2,7 +2,6 @@
   "compilerOptions": {
     "target": "ESNext",
 
-    "baseUrl": ".",
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "customConditions": ["source"],

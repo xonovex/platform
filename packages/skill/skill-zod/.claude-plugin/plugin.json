@@ -2,6 +2,6 @@
   "name": "xonovex-zod",
   "version": "0.1.0",
   "description": "Zod guidelines",
-  "author": { "name": "Xonovex" },
+  "author": {"name": "Xonovex"},
   "skills": "./"
 }
