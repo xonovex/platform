@@ -6,7 +6,10 @@
 # container where user code, Claude Code, and development tools run.
 # =============================================================================
 
-FROM mcr.microsoft.com/devcontainers/base:ubuntu
+# SECURITY: Pinned to specific digest to prevent supply chain attacks.
+# Floating tags silently change — a compromised tag could inject malware.
+# Update digest periodically after verifying the new image.
+FROM mcr.microsoft.com/devcontainers/base:ubuntu@sha256:4bcb1b466771b1ba1ea110e2a27daea2f6093f9527fb75ee59703ec89b5561cb
 
 ARG NODE_VERSION=20
 ARG DEBIAN_FRONTEND=noninteractive
