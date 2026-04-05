@@ -2,6 +2,6 @@
   "name": "xonovex-kubernetes",
   "version": "0.1.0",
   "description": "Kubernetes guidelines",
-  "author": { "name": "Xonovex" },
+  "author": {"name": "Xonovex"},
   "skills": "./"
 }

@@ -2,8 +2,7 @@
   "extends": "@xonovex/ts-config-cli",
   "compilerOptions": {
     "outDir": "./dist",
-    "rootDir": ".",
-    "baseUrl": "."
+    "rootDir": "."
   },
   "include": ["src", "vitest.config.ts"],
   "exclude": ["node_modules", "dist"]

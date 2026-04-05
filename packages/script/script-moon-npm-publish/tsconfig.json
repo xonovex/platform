@@ -3,7 +3,6 @@
   "compilerOptions": {
     "outDir": "./dist",
     "rootDir": ".",
-    "baseUrl": ".",
     "paths": {
       "@xonovex/script-moon-common": ["../script-moon-common/src/index.ts"],
       "@xonovex/script-moon-common/*": ["../script-moon-common/src/*"]

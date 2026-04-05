@@ -2,6 +2,6 @@
   "name": "xonovex-shell-scripting",
   "version": "0.1.0",
   "description": "Shell-scripting guidelines",
-  "author": { "name": "Xonovex" },
+  "author": {"name": "Xonovex"},
   "skills": "./"
 }
