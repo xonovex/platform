@@ -1,14 +1,27 @@
+// =============================================================================
+// Devcontainer Configuration — Hardened for Secure Coding Agents
+//
+// Security layers:
+//   1. Network: internal-only network + squid proxy + dnsmasq filtering
+//   2. Runtime: cap_drop ALL, no-new-privileges, no sudo, no setuid
+//   3. IPC: VS Code escape vector mitigation (remoteEnv + harden-ipc.sh)
+//   4. Filesystem: proxy has read-only root; app has noexec tmpfs on /tmp
+// =============================================================================
 {
   "name": "Xonovex Secure Coding Agent",
   "dockerComposeFile": "docker-compose.yml",
   "service": "app",
   "workspaceFolder": "/workspaces/xonovex-platform",
 
+  // Run as non-root vscode user (UID 1000). Matches host file ownership
+  // for bind-mounted .claude config and workspace files.
   "remoteUser": "vscode",
   "containerUser": "vscode",
 
   "mounts": [
+    // Named volume for npm cache (persists across container rebuilds)
     "source=xonovex-npm-cache,target=/home/vscode/.npm,type=volume",
+    // Bind-mount Claude config from host (credentials, settings, history)
     "source=${localEnv:HOME}/.claude,target=/home/vscode/.claude,type=bind",
     "source=${localEnv:HOME}/.claude.json,target=/home/vscode/.claude.json,type=bind"
   ],
@@ -16,19 +29,44 @@
   "containerEnv": {
     "EDITOR": "code --wait",
     "DOCKER_CLI_HINTS": "false",
+    // Proxy env vars — route all HTTP/HTTPS through squid.
+    // Duplicated from docker-compose.yml because devcontainer.json env
+    // vars are applied after compose env, ensuring they're visible in
+    // all shells (including VS Code's integrated terminal).
     "HTTP_PROXY": "http://proxy:3128",
     "HTTPS_PROXY": "http://proxy:3128",
     "NO_PROXY": "localhost,127.0.0.1"
   },
 
+  // SECURITY: Clear VS Code IPC variables that enable container-to-host
+  // communication. VS Code reinjects some of these despite this config,
+  // so harden-ipc.sh (sourced in .bashrc) acts as a fallback.
+  // Setting to empty string ("") tells VS Code to unset them.
   "remoteEnv": {
+    // SSH agent forwarding — allows host SSH key access from container
     "SSH_AUTH_SOCK": "",
+    // GPG agent — allows host signing key access from container
     "GPG_AGENT_INFO": "",
     "GNUPGHOME": "",
+    // VS Code IPC sockets — primary container escape vector
+    // (The Red Guild: "Leveraging VS Code Internals to Escape Containers")
     "VSCODE_IPC_HOOK_CLI": "",
-    "VSCODE_GIT_IPC_HANDLE": ""
+    "VSCODE_GIT_IPC_HANDLE": "",
+    // Git credential helpers — VS Code injects a helper that proxies
+    // to the host, enabling credential exfiltration
+    "VSCODE_GIT_ASKPASS_NODE": "",
+    "VSCODE_GIT_ASKPASS_MAIN": "",
+    "VSCODE_GIT_ASKPASS_EXTRA_ARGS": "",
+    "GIT_ASKPASS": "",
+    // Prevent opening host browser from container (minor escape vector)
+    "BROWSER": "",
+    // Prevent Node.js execution via VS Code's bundled Electron binary
+    // (known escape technique: ELECTRON_RUN_AS_NODE=1 /path/to/code)
+    "ELECTRON_RUN_AS_NODE": ""
   },
 
+  // Run IPC hardening on every terminal attach as a fallback layer.
+  // VS Code re-injects IPC variables after remoteEnv clearing.
   "postAttachCommand": "bash -c '. /usr/local/bin/harden-ipc.sh'",
 
   "features": {
@@ -43,6 +81,9 @@
         "dbaeumer.vscode-eslint"
       ],
       "settings": {
+        // SECURITY: Prevent copying host git config into container.
+        // Host git config may contain credential helpers, signing keys,
+        // or other settings that shouldn't be exposed.
         "dev.containers.copyGitConfig": false,
         "editor.formatOnSave": true
       }
