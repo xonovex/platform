@@ -11,6 +11,7 @@ set -e
 # =============================================================================
 
 ALLOWED_DOMAINS="/etc/proxy/allowed-domains.conf"
+ALLOWED_PORTS="/etc/proxy/allowed-ports.conf"
 SQUID_CONF="/etc/squid/squid.conf"
 DNSMASQ_CONF="/etc/dnsmasq.d/allowed-domains.conf"
 
@@ -234,6 +235,35 @@ echo "Squid: generated ACL with ${DOMAIN_COUNT} domains"
 
 generate_dnsmasq_conf > "$DNSMASQ_CONF"
 echo "Dnsmasq: generated ${DOMAIN_COUNT} forwarding rules (all others -> NXDOMAIN)"
+
+# ---------------------------------------------------------------------------
+# Start TCP relays from allowed-ports.conf
+# ---------------------------------------------------------------------------
+# Each line in allowed-ports.conf defines a socat relay:
+#   profile:listen_port:target_host:target_port
+#
+# Only relays matching ACTIVE_PROFILES are started. ACTIVE_PROFILES is set
+# via the COMPOSE_PROFILES env var (passed through docker-compose.yml).
+# This ensures developers can only forward ports that are centrally approved
+# AND activated for their profile.
+ACTIVE_PROFILES=",${COMPOSE_PROFILES:-},"
+RELAY_COUNT=0
+if [ -f "$ALLOWED_PORTS" ]; then
+  while IFS= read -r line || [ -n "$line" ]; do
+    line=$(echo "$line" | sed 's/#.*//' | tr -d '[:space:]')
+    [ -z "$line" ] && continue
+    PROFILE=$(echo "$line" | cut -d: -f1)
+    LISTEN_PORT=$(echo "$line" | cut -d: -f2)
+    TARGET_HOST=$(echo "$line" | cut -d: -f3)
+    TARGET_PORT=$(echo "$line" | cut -d: -f4)
+    if echo "$ACTIVE_PROFILES" | grep -q ",${PROFILE},"; then
+      echo "TCP relay: proxy:${LISTEN_PORT} -> ${TARGET_HOST}:${TARGET_PORT} [${PROFILE}]"
+      socat TCP-LISTEN:"${LISTEN_PORT}",fork,reuseaddr TCP:"${TARGET_HOST}":"${TARGET_PORT}" &
+      RELAY_COUNT=$((RELAY_COUNT + 1))
+    fi
+  done < "$ALLOWED_PORTS"
+fi
+echo "TCP relays: started ${RELAY_COUNT} (profiles: ${COMPOSE_PROFILES:-none})"
 
 # ---------------------------------------------------------------------------
 # Start dnsmasq (binds port 53 via setcap cap_net_bind_service)

@@ -18,6 +18,10 @@ services:
       dockerfile: Dockerfile
       args:
         NODE_VERSION: "20"
+        # Optional package groups from allowed-packages.conf.
+        # Set in .env (gitignored): PACKAGE_GROUPS=android,python
+        # Only centrally approved packages can be installed.
+        PACKAGE_GROUPS: "${PACKAGE_GROUPS:-}"
 
     # SECURITY: Drop ALL Linux capabilities. The app container needs zero
     # capabilities — it doesn't bind privileged ports, manage networks, or
@@ -120,6 +124,11 @@ services:
     # removes all capabilities from the bounding set, read_only prevents
     # binary modification, and Alpine ships no setuid binaries.
 
+    # Pass active profiles to the entrypoint so it knows which port
+    # relays to start from allowed-ports.conf.
+    environment:
+      - COMPOSE_PROFILES=${COMPOSE_PROFILES:-}
+
     # SECURITY: Immutable root filesystem. Nothing can be written to the
     # image filesystem — no malware installation, no binary modification,
     # no persistent backdoors. Writable areas are explicitly enumerated
@@ -140,12 +149,19 @@ services:
       - /etc/squid:uid=31,gid=31,size=1m
       - /etc/dnsmasq.d:uid=31,gid=31,size=1m
 
-    # SECURITY: Domain allowlist mounted read-only. This is the single
-    # source of truth — the entrypoint generates both squid ACLs and
-    # dnsmasq forwarding rules from this file. Even if the container is
-    # compromised, the allowlist cannot be modified.
+    # Map host.docker.internal to the host's gateway IP. Used by socat
+    # to relay TCP connections (defined in allowed-ports.conf) from the
+    # internal network to host services. Only explicitly listed ports
+    # are forwarded — the app cannot reach arbitrary host services.
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+    # SECURITY: Allowlists mounted read-only. These are the single sources
+    # of truth — the entrypoint generates all configs from these files.
+    # Even if the container is compromised, the allowlists cannot be modified.
     volumes:
       - ./proxy/allowed-domains.conf:/etc/proxy/allowed-domains.conf:ro
+      - ./proxy/allowed-ports.conf:/etc/proxy/allowed-ports.conf:ro
 
     # Proxy sits on both networks: internal (to receive app traffic) and
     # external (to reach the internet). It is the only bridge between them.

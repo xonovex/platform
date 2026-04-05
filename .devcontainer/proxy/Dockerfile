@@ -25,7 +25,7 @@ FROM alpine@sha256:25109184c71bdad752c8312a8623239686a9a2071e8825f20acb8f2198c3f
 # Alpine's base dnsmasq package is compiled without it.
 # libcap-utils provides setcap for granting file capabilities.
 RUN apk update && \
-    apk add --no-cache ca-certificates squid tzdata dnsmasq-dnssec libcap-utils && \
+    apk add --no-cache ca-certificates squid tzdata dnsmasq-dnssec libcap-utils socat && \
     rm -rf /var/cache/apk/*
 
 # SECURITY: Grant dnsmasq the ability to bind port 53 as non-root.
