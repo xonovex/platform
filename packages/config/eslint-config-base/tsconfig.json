@@ -2,8 +2,7 @@
   "extends": "@xonovex/ts-config-node",
   "compilerOptions": {
     "outDir": "dist",
-    "rootDir": ".",
-    "baseUrl": "."
+    "rootDir": "."
   },
   "include": ["src"],
   "exclude": ["dist"]

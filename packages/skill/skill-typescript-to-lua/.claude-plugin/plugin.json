@@ -2,6 +2,6 @@
   "name": "xonovex-typescript-to-lua",
   "version": "0.1.0",
   "description": "Typescript-to-lua guidelines",
-  "author": { "name": "Xonovex" },
+  "author": {"name": "Xonovex"},
   "skills": "./"
 }

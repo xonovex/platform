@@ -2,6 +2,6 @@
   "name": "xonovex-git",
   "version": "0.1.0",
   "description": "Git guidelines",
-  "author": { "name": "Xonovex" },
+  "author": {"name": "Xonovex"},
   "skills": "./"
 }

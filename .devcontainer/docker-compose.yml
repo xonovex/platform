@@ -1,0 +1,42 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        NODE_VERSION: "20"
+    volumes:
+      - ..:/workspaces/xonovex-platform:cached
+    depends_on:
+      - proxy
+    dns:
+      - 10.200.0.2
+    environment:
+      - HTTP_PROXY=http://proxy:3128
+      - HTTPS_PROXY=http://proxy:3128
+      - NO_PROXY=localhost,127.0.0.1
+    networks:
+      proxy-net:
+        ipv4_address: 10.200.0.3
+    command: sleep infinity
+
+  proxy:
+    build:
+      context: .
+      dockerfile: Dockerfile.squid
+    volumes:
+      - ./squid.conf:/etc/squid/squid.conf:ro
+    networks:
+      proxy-net:
+        ipv4_address: 10.200.0.2
+      external:
+
+networks:
+  proxy-net:
+    driver: bridge
+    internal: true
+    ipam:
+      config:
+        - subnet: 10.200.0.0/24
+  external:
+    driver: bridge

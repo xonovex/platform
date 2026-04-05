@@ -3,7 +3,6 @@
   "compilerOptions": {
     "outDir": "dist",
     "rootDir": ".",
-    "baseUrl": ".",
     "paths": {
       "@xonovex/vitest-config-base": ["../vitest-config-base/src/index.ts"],
       "@xonovex/vitest-config-base/*": ["../vitest-config-base/src/*"],

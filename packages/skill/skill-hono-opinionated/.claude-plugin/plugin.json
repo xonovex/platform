@@ -2,6 +2,6 @@
   "name": "xonovex-hono-opinionated",
   "version": "0.1.0",
   "description": "Hono-opinionated guidelines",
-  "author": { "name": "Xonovex" },
+  "author": {"name": "Xonovex"},
   "skills": "./"
 }

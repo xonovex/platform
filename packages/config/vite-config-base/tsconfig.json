@@ -2,7 +2,6 @@
   "extends": "@xonovex/ts-config-build",
   "compilerOptions": {
     "outDir": "dist",
-    "baseUrl": ".",
     "rootDir": ".",
     "paths": {
       "@xonovex/eslint-config-base": ["../eslint-config-base/src/index.ts"],

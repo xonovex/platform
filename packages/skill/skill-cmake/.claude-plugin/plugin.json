@@ -2,6 +2,6 @@
   "name": "xonovex-cmake",
   "version": "0.1.0",
   "description": "CMake guidelines",
-  "author": { "name": "Xonovex" },
+  "author": {"name": "Xonovex"},
   "skills": "./"
 }
