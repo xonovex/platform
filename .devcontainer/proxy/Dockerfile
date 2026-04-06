@@ -46,6 +46,11 @@ RUN mkdir -p /var/log/squid /var/cache/squid /run/squid /etc/dnsmasq.d /etc/prox
 # The entrypoint restores it at startup.
 RUN cp /etc/squid/mime.conf /etc/proxy/mime.conf
 
+# Allowlists baked into image. Docker-compose bind mounts override these
+# at runtime for quick iteration without rebuilding.
+COPY allowed-domains.conf /etc/proxy/allowed-domains.conf
+COPY allowed-ports.conf /etc/proxy/allowed-ports.conf
+
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod 755 /entrypoint.sh
 
