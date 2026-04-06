@@ -16,16 +16,6 @@ services:
     build:
       context: ./app
       dockerfile: Dockerfile
-      # Additional build context: makes flake.nix and flake.lock available
-      # to the Dockerfile via COPY --from=flake, without changing the
-      # primary build context from ./app.
-      additional_contexts:
-        flake: .
-      args:
-        # Optional Nix package groups from flake.nix.
-        # Set in .env (gitignored): PACKAGE_GROUPS=android,python,go
-        # Only centrally approved groups can be installed.
-        PACKAGE_GROUPS: "${PACKAGE_GROUPS:-}"
 
     # SECURITY: Drop ALL Linux capabilities. The app container needs zero
     # capabilities — it doesn't bind privileged ports, manage networks, or
@@ -44,7 +34,7 @@ services:
     # ENOSYS for clone3 (glibc compatibility).
     security_opt:
       - no-new-privileges:true
-      - seccomp=app/seccomp.json
+      - seccomp=seccomp.json
 
     # SECURITY: Writable scratch areas with restrictive mount options.
     # - noexec: prevents execution of binaries written to tmp (blocks
@@ -80,8 +70,9 @@ services:
     dns:
       - 10.200.0.2
 
-    # Route all HTTP/HTTPS through the squid proxy.
-    # Claude Code (Bun), npm, curl, wget all respect these env vars.
+    # Route all HTTP/HTTPS through the squid proxy. Set at runtime (not
+    # in the Dockerfile) because the proxy service doesn't exist at build
+    # time. Claude Code (Bun), npm, curl, wget all respect these env vars.
     environment:
       - HTTP_PROXY=http://proxy:3128
       - HTTPS_PROXY=http://proxy:3128
@@ -92,21 +83,6 @@ services:
     networks:
       proxy-net:
         ipv4_address: 10.200.0.3
-
-    # SECURITY: Background IPC socket cleanup loop. VS Code creates IPC
-    # sockets at multiple lifecycle stages — a single cleanup pass in
-    # harden-ipc.sh misses sockets created after shell init. This loop
-    # runs as a child of PID 1 (not a VS Code lifecycle command), so it
-    # survives VS Code's cgroup-based process termination. 10 passes
-    # over 5 minutes catches late-created sockets.
-    command: >
-      bash -c '
-        (for i in $(seq 1 10); do
-          find /tmp -maxdepth 2 \( -name "vscode-ipc-*" -o -name "vscode-git-*" -o -name "vscode-ssh-auth-*" -o -name "vscode-remote-containers-*" \) -type s -delete 2>/dev/null
-          sleep 30
-        done) &
-        exec sleep infinity
-      '
 
   proxy:
     build:
@@ -160,9 +136,10 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
-    # SECURITY: Allowlists mounted read-only. These are the single sources
-    # of truth — the entrypoint generates all configs from these files.
-    # Even if the container is compromised, the allowlists cannot be modified.
+    # SECURITY: Allowlists mounted read-only as overrides. The image
+    # already contains these files (COPY in Dockerfile); the bind mounts
+    # allow quick iteration without rebuilding. Even if the container is
+    # compromised, the allowlists cannot be modified.
     volumes:
       - ./proxy/allowed-domains.conf:/etc/proxy/allowed-domains.conf:ro
       - ./proxy/allowed-ports.conf:/etc/proxy/allowed-ports.conf:ro
