@@ -16,11 +16,15 @@ services:
     build:
       context: ./app
       dockerfile: Dockerfile
+      # Additional build context: makes flake.nix and flake.lock available
+      # to the Dockerfile via COPY --from=flake, without changing the
+      # primary build context from ./app.
+      additional_contexts:
+        flake: .
       args:
-        NODE_VERSION: "20"
-        # Optional package groups from allowed-packages.conf.
-        # Set in .env (gitignored): PACKAGE_GROUPS=android,python
-        # Only centrally approved packages can be installed.
+        # Optional Nix package groups from flake.nix.
+        # Set in .env (gitignored): PACKAGE_GROUPS=android,python,go
+        # Only centrally approved groups can be installed.
         PACKAGE_GROUPS: "${PACKAGE_GROUPS:-}"
 
     # SECURITY: Drop ALL Linux capabilities. The app container needs zero
