@@ -4,8 +4,30 @@
 // Security layers:
 //   1. Network: internal-only network + squid proxy + dnsmasq filtering
 //   2. Runtime: cap_drop ALL, no-new-privileges, no sudo, no setuid
-//   3. IPC: VS Code escape vector mitigation (remoteEnv + harden-ipc.sh)
+//   3. IPC: VS Code escape vector mitigation (remoteEnv + harden.d/)
 //   4. Filesystem: proxy has read-only root; app has noexec tmpfs on /tmp
+//   5. Config: agent config files read-only, runtime data ephemeral
+//
+// Claude Code config protection:
+//   ~/.claude.json — contains MCP servers, trust decisions, OAuth tokens.
+//     Mounted read-only as .claude.json.ro; entrypoint copies to writable
+//     .claude.json. Agent can write session state but changes never persist
+//     to host. Claude Code crashes if this file is directly read-only.
+//   ~/.claude/settings.json — permissions, hooks, model choice.
+//     Read-only overlay. Agent cannot modify its own permission rules.
+//   ~/.claude/settings.local.json — user overrides.
+//     Read-only overlay. Pre-configure on host before starting container.
+//   ~/.claude/CLAUDE.md — user-level instructions.
+//     Read-only overlay. Agent cannot modify its own instructions.
+//   ~/.claude/* (everything else) — writable bind mount to host.
+//     Runtime data: history, todos, tasks, sessions, cache, plans,
+//     shell-snapshots, debug, backups, projects/memory, etc.
+//   .claude/ (project) — read-only overlay (docker-compose).
+//     Agent cannot modify project settings, skills, rules, or commands.
+//     Subagent memory (agent-memory/) writes fail silently — not persisted.
+//   .claude/settings.local.json — read-only (inherits from .claude/).
+//     In-session permission approvals cannot persist. Pre-configure
+//     on host or define team permissions in .claude/settings.json.
 // =============================================================================
 {
   "name": "Xonovex Secure Coding Agent",
@@ -21,9 +43,27 @@
   "mounts": [
     // Named volume for npm cache (persists across container rebuilds)
     "source=xonovex-npm-cache,target=/home/vscode/.npm,type=volume",
-    // Bind-mount Claude config from host (credentials, settings, history)
+    // Claude home directory — writable for runtime data that Claude Code
+    // writes extensively: history.jsonl, sessions/, todos/, tasks/, teams/,
+    // plans/, cache/, debug/, backups/, shell-snapshots/, session-env/,
+    // paste-cache/, file-history/, statsig/, usage-data/, projects/memory/,
+    // stats-cache.json, mcp-needs-auth-cache.json, .credentials.json.
     "source=${localEnv:HOME}/.claude,target=/home/vscode/.claude,type=bind",
-    "source=${localEnv:HOME}/.claude.json,target=/home/vscode/.claude.json,type=bind"
+    // SECURITY: ~/.claude.json contains MCP server configs, per-project
+    // trust decisions, and OAuth tokens. Mounted read-only to .claude.json.ro;
+    // the entrypoint copies it to a writable .claude.json so Claude Code can
+    // update session state (it crashes if directly read-only). Changes are
+    // ephemeral — never persist to host.
+    "source=${localEnv:HOME}/.claude.json,target=/home/vscode/.claude.json.ro,type=bind,readonly",
+    // SECURITY: Read-only overlays for behavior-controlling config files.
+    // More specific mounts take precedence over the parent bind mount.
+    // These prevent the agent from modifying its own:
+    //   - permissions and hooks (settings.json, settings.local.json)
+    //   - model choice and environment variables (settings.json)
+    //   - user-level instructions (CLAUDE.md)
+    "source=${localEnv:HOME}/.claude/settings.json,target=/home/vscode/.claude/settings.json,type=bind,readonly",
+    "source=${localEnv:HOME}/.claude/settings.local.json,target=/home/vscode/.claude/settings.local.json,type=bind,readonly",
+    "source=${localEnv:HOME}/.claude/CLAUDE.md,target=/home/vscode/.claude/CLAUDE.md,type=bind,readonly"
   ],
 
   "containerEnv": {

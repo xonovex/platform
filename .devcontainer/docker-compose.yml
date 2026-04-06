@@ -56,6 +56,20 @@ services:
 
     volumes:
       - ..:/workspaces/xonovex-platform:cached
+      # SECURITY: Read-only overlays prevent the coding agent from modifying
+      # its own container config and project-level Claude settings.
+      #
+      # .devcontainer/ — Dockerfiles, allowlists, seccomp, entrypoints,
+      #   hardening scripts. Malicious edits take effect on next rebuild.
+      #
+      # .claude/ — project settings.json (permissions, hooks, env vars),
+      #   settings.local.json (permission approvals), CLAUDE.md (instructions),
+      #   rules/, skills/, commands/, agents/. The agent could escalate
+      #   privileges by modifying permissions or add malicious hooks.
+      #   Note: agent-memory/ writes will fail silently on the read-only
+      #   mount. Subagent memory is not persisted in the hardened container.
+      - ../.devcontainer:/workspaces/xonovex-platform/.devcontainer:ro
+      - ../.claude:/workspaces/xonovex-platform/.claude:ro
 
     depends_on:
       - proxy
@@ -166,3 +180,4 @@ networks:
   # External network for the proxy to reach the internet.
   external:
     driver: bridge
+
