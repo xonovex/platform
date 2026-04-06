@@ -28,14 +28,7 @@
 
   "containerEnv": {
     "EDITOR": "code --wait",
-    "DOCKER_CLI_HINTS": "false",
-    // Proxy env vars — route all HTTP/HTTPS through squid.
-    // Duplicated from docker-compose.yml because devcontainer.json env
-    // vars are applied after compose env, ensuring they're visible in
-    // all shells (including VS Code's integrated terminal).
-    "HTTP_PROXY": "http://proxy:3128",
-    "HTTPS_PROXY": "http://proxy:3128",
-    "NO_PROXY": "localhost,127.0.0.1"
+    "DOCKER_CLI_HINTS": "false"
   },
 
   // SECURITY: Clear VS Code IPC variables that enable container-to-host
@@ -65,9 +58,9 @@
     "ELECTRON_RUN_AS_NODE": ""
   },
 
-  // Run IPC hardening on every terminal attach as a fallback layer.
+  // Run hardening on every terminal attach as a fallback layer.
   // VS Code re-injects IPC variables after remoteEnv clearing.
-  "postAttachCommand": "bash -c '. /usr/local/bin/harden-ipc.sh'",
+  "postAttachCommand": "bash -c '. /usr/local/bin/harden.sh'",
 
   "features": {
     "ghcr.io/devcontainers/features/git:1": {},
