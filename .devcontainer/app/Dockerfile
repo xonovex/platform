@@ -69,7 +69,7 @@ ARG PACKAGE_GROUPS=""
 # Each group is a separate nix profile install so they can be independently
 # managed. The flake is evaluated from the local copy, not fetched from
 # the network (the lock file ensures reproducibility).
-ENV NIX_BIN=/root/.nix-profile/bin
+ARG NIX_BIN=/root/.nix-profile/bin
 RUN echo "Installing Nix package groups: base ${PACKAGE_GROUPS}" \
     && $NIX_BIN/nix profile install "/tmp/devcontainer-flake#base" \
     && for group in $(echo "${PACKAGE_GROUPS}" | tr ',' ' '); do \

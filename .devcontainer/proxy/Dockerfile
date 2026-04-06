@@ -46,11 +46,6 @@ RUN mkdir -p /var/log/squid /var/cache/squid /run/squid /etc/dnsmasq.d /etc/prox
 # The entrypoint restores it at startup.
 RUN cp /etc/squid/mime.conf /etc/proxy/mime.conf
 
-# Domain allowlist — single source of truth for both squid ACLs and
-# dnsmasq forwarding rules. The entrypoint generates both configs from
-# this file. Mounted read-only at runtime via docker-compose.
-COPY allowed-domains.conf /etc/proxy/allowed-domains.conf
-
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod 755 /entrypoint.sh
 
