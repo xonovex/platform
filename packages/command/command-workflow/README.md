@@ -6,7 +6,7 @@ Plan-driven development workflow with worktrees and parallel execution.
 
 ```bash
 claude plugin marketplace add xonovex/platform
-claude plugin install xonovex-workflow@platform
+claude plugin install xonovex-workflow@xonovex-marketplace
 ```
 
 ```

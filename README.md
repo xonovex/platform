@@ -73,15 +73,15 @@ Add the marketplace, then install workflow commands and skills:
 claude plugin marketplace add xonovex/platform
 
 # Install workflow commands (plan, code quality, git)
-claude plugin install xonovex-workflow@platform
+claude plugin install xonovex-workflow@xonovex-marketplace
 
 # Install utility commands (instructions, insights, skills)
-claude plugin install xonovex-utility@platform
+claude plugin install xonovex-utility@xonovex-marketplace
 
 # Install skills (each skill is a separate plugin)
-claude plugin install xonovex-typescript@platform
-claude plugin install xonovex-react@platform
-claude plugin install xonovex-general-fp@platform
+claude plugin install xonovex-typescript@xonovex-marketplace
+claude plugin install xonovex-react@xonovex-marketplace
+claude plugin install xonovex-general-fp@xonovex-marketplace
 ```
 
 Skills are applied automatically when relevant to the task.
