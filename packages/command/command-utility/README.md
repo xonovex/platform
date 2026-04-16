@@ -6,7 +6,7 @@ Manage project instructions, extract insights, and create skills.
 
 ```bash
 claude plugin marketplace add xonovex/platform
-claude plugin install xonovex-utility@platform
+claude plugin install xonovex-utility@xonovex-marketplace
 ```
 
 ## Commands
