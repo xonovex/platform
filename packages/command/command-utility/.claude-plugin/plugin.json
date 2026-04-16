@@ -3,5 +3,5 @@
   "version": "0.1.2",
   "description": "Xonovex utility commands — skills, instructions, insights, content",
   "author": {"name": "Xonovex"},
-  "commands": "./"
+  "commands": ["./"]
 }

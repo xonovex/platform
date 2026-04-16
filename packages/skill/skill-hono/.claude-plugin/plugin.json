@@ -3,5 +3,5 @@
   "version": "0.1.0",
   "description": "Hono guidelines",
   "author": {"name": "Xonovex"},
-  "skills": "./"
+  "skills": ["./"]
 }

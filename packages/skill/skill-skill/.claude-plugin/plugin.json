@@ -3,5 +3,5 @@
   "version": "0.1.0",
   "description": "Skill guidelines",
   "author": {"name": "Xonovex"},
-  "skills": "./"
+  "skills": ["./"]
 }

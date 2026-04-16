@@ -3,5 +3,5 @@
   "version": "0.1.2",
   "description": "Xonovex workflow commands — planning, code analysis, git",
   "author": {"name": "Xonovex"},
-  "commands": "./"
+  "commands": ["./"]
 }
