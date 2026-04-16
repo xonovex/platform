@@ -42,11 +42,11 @@
     }
   },
   "dependencies": {
-    "@eslint/compat": "2.0.4",
+    "@eslint/compat": "2.0.5",
     "@eslint/js": "10.0.1",
-    "@typescript-eslint/eslint-plugin": "8.58.0",
-    "@typescript-eslint/parser": "8.58.0",
-    "@vitest/eslint-plugin": "1.6.14",
+    "@typescript-eslint/eslint-plugin": "8.58.2",
+    "@typescript-eslint/parser": "8.58.2",
+    "@vitest/eslint-plugin": "1.6.16",
     "eslint-config-flat-gitignore": "2.3.0",
     "eslint-plugin-functional": "9.0.4",
     "eslint-plugin-jsdoc": "62.9.0",
@@ -54,18 +54,18 @@
     "eslint-plugin-prettier": "5.5.5",
     "eslint-plugin-regexp": "3.1.0",
     "eslint-plugin-security": "4.0.0",
-    "eslint-plugin-simple-import-sort": "12.1.1",
-    "eslint-plugin-sonarjs": "4.0.2",
+    "eslint-plugin-simple-import-sort": "13.0.0",
+    "eslint-plugin-sonarjs": "4.0.3",
     "eslint-plugin-unicorn": "64.0.0",
-    "globals": "17.4.0",
-    "typescript-eslint": "8.58.0",
+    "globals": "17.5.0",
+    "typescript-eslint": "8.58.2",
     "@xonovex/ts-config-node": "0.1.22"
   },
   "devDependencies": {
     "@xonovex/ts-config-node": "0.1.22",
     "@types/eslint": "9.6.1",
     "@types/eslint-plugin-security": "3.0.1",
-    "@types/node": "^25.5.2"
+    "@types/node": "^25.6.0"
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",
