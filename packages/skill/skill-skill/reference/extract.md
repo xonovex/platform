@@ -19,10 +19,10 @@
 
 # Create SKILL.md with 4 essentials + Express example
 # Details:
-# - details/routing.md (routes, versioning, organization)
-# - details/error-handling.md (AppError, error middleware)
-# - details/validation.md (Zod schemas, SafeParseResult patterns)
-# - details/testing.md (Jest, supertest, mocking)
+# - reference/routing.md (routes, versioning, organization)
+# - reference/error-handling.md (AppError, error middleware)
+# - reference/validation.md (Zod schemas, SafeParseResult patterns)
+# - reference/testing.md (Jest, supertest, mocking)
 
 # Result: express-api-patterns skill extracted from codebase
 ```
@@ -35,8 +35,8 @@
 - Sample source files for common patterns: naming, types, function signatures
 - Detect language: .ts/.tsx → TypeScript, .py → Python, .c/.h → C99, .lua → Lua
 - Categorize patterns: architecture, types, testing, safety, naming conventions
-- Create SKILL.md with 3-5 key essentials, one code example, detail references
-- Create details/{pattern}.md for each category with guideline, rationale, examples
+- Create SKILL.md with 3-5 key essentials, one code example, reference file links
+- Create reference/{pattern}.md for each category with guideline, rationale, examples
 - Skip patterns already in base skill to avoid duplication
-- Use kebab-case for skill and detail file names
+- Use kebab-case for skill and reference file names
 - Remove project-specific paths and names for reusability

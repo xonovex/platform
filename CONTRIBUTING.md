@@ -54,19 +54,19 @@ type(scope): description
 
 ### Types
 
-| Type | Description |
-|------|-------------|
-| `feat` | New feature |
-| `fix` | Bug fix |
-| `docs` | Documentation |
-| `style` | Formatting |
+| Type       | Description        |
+| ---------- | ------------------ |
+| `feat`     | New feature        |
+| `fix`      | Bug fix            |
+| `docs`     | Documentation      |
+| `style`    | Formatting         |
 | `refactor` | Code restructuring |
-| `test` | Tests |
-| `chore` | Maintenance |
-| `build` | Build system |
-| `ci` | CI configuration |
-| `perf` | Performance |
-| `revert` | Revert commit |
+| `test`     | Tests              |
+| `chore`    | Maintenance        |
+| `build`    | Build system       |
+| `ci`       | CI configuration   |
+| `perf`     | Performance        |
+| `revert`   | Revert commit      |
 
 ## Version Bump
 
@@ -93,7 +93,7 @@ npx moon run moon-version-detect:run -- --base main
 
 ## Claude Code Guides
 
-The monorepo contains 35 skill packages in `packages/skill/`, each with a `guide/SKILL.md` containing the guidelines.
+The monorepo contains 35 skill packages in `packages/skill/`, each with a `SKILL.md` containing the guidelines.
 
 ## Code Style
 

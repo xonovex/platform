@@ -36,7 +36,7 @@ Adapted: "Derive types from Zod schemas with z.infer for runtime-validated types
 
 **Techniques:**
 
-- Load target and source skills completely, including all detail files
+- Load target and source skills completely, including all reference files
 - Analyze target structure: section order, bullet format, voice, tone
 - Extract relevant patterns from source: guidelines, code examples, rationales
 - Filter elements by aspect (validation, error-handling, testing, etc.)

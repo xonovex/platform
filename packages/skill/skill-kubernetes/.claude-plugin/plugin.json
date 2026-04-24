@@ -1,6 +1,6 @@
 {
   "name": "xonovex-kubernetes",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Kubernetes guidelines",
   "author": {"name": "Xonovex"},
   "skills": ["./"]
