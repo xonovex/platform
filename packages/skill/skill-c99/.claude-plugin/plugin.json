@@ -1,6 +1,6 @@
 {
   "name": "xonovex-c99",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "C99 guidelines",
   "author": {"name": "Xonovex"},
   "skills": ["./"]

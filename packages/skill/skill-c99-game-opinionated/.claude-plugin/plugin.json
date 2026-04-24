@@ -1,6 +1,6 @@
 {
   "name": "xonovex-c99-game-opinionated",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "C99-game-opinionated guidelines",
   "author": {"name": "Xonovex"},
   "skills": ["./"]
