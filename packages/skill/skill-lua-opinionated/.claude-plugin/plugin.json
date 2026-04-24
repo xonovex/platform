@@ -1,6 +1,6 @@
 {
   "name": "xonovex-lua-opinionated",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Lua-opinionated guidelines",
   "author": {"name": "Xonovex"},
   "skills": ["./"]

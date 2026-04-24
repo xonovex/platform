@@ -20,9 +20,9 @@
 # Code example showing validation + error handling pattern
 
 # Details extracted:
-# details/validation.md    - Marshmallow schemas, custom fields
-# details/error-handling.md - Custom exceptions, error responses
-# details/testing.md       - Pytest fixtures, mocking patterns
+# reference/validation.md    - Marshmallow schemas, custom fields
+# reference/error-handling.md - Custom exceptions, error responses
+# reference/testing.md       - Pytest fixtures, mocking patterns
 
 # Result: Skill accessible in .claude/skills/flask-patterns/
 ```
@@ -35,8 +35,8 @@
 - Identify patterns: do/don't, good/bad, prefer/avoid statements
 - Categorize by topic: performance, architecture, testing, security, etc.
 - Create SKILL.md with 3-7 essential bullets and one representative example
-- Extract detailed explanations and code to details/{topic}.md files
-- Use bullet format: `- **Rule** - Brief how-to, see [details/file.md](details/file.md)`
-- Validate all references point to existing detail files
+- Extract detailed explanations and code to reference/{topic}.md files
+- Use bullet format: `- **Rule** - Brief how-to, see [reference/file.md](reference/file.md)`
+- Validate all references point to existing reference files
 - Remove source-specific paths, project names, and domain references
 - Save to .claude/skills/{name}/ with kebab-case naming

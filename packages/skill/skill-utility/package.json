@@ -1,0 +1,15 @@
+{
+  "name": "@xonovex/skill-utility",
+  "version": "0.1.1",
+  "private": true,
+  "type": "module",
+  "keywords": [
+    "xonovex",
+    "skill",
+    "utility"
+  ],
+  "scripts": {
+    "fmt": "prettier --write .",
+    "fmt:check": "prettier --check ."
+  }
+}

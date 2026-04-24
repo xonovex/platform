@@ -1,6 +1,6 @@
 # simplify: Condense Verbose Skill to Bullet Format
 
-**Guideline:** Reduce SKILL.md by 60-80% to bullet format; move code to details; remove project-specific references.
+**Guideline:** Reduce SKILL.md by 60-80% to bullet format; move code to reference files; remove project-specific references.
 
 **Rationale:** Verbose skills become hard to scan. Progressive disclosure loads only what's needed during development.
 
@@ -23,31 +23,31 @@ Use Zod for runtime validation of request payloads. Zod provides type-safe schem
 
 # AFTER (SKILL.md simplified to 8 lines)
 
-- **Error handling** - Define custom AppError class, see [details/error-handling.md]
-- **Validation** - Use Zod schemas for request payload validation, see [details/validation.md]
-- **Testing** - Use Jest + supertest for HTTP assertions, see [details/testing.md]
+- **Error handling** - Define custom AppError class, see [reference/error-handling.md]
+- **Validation** - Use Zod schemas for request payload validation, see [reference/validation.md]
+- **Testing** - Use Jest + supertest for HTTP assertions, see [reference/testing.md]
 
-# Code examples moved to details/ files
+# Code examples moved to reference/ files
 
-# details/error-handling.md - Full AppError implementation
+# reference/error-handling.md - Full AppError implementation
 
-# details/validation.md - Zod schema patterns
+# reference/validation.md - Zod schema patterns
 
-# details/testing.md - Jest + supertest examples
+# reference/testing.md - Jest + supertest examples
 
-# Reduction: 80% of original size, all content preserved in details
+# Reduction: 80% of original size, all content preserved in reference files
 ```
 
 **Techniques:**
 
-- Read SKILL.md and existing detail files completely
-- Extract code examples to detail files, grouped by topic
+- Read SKILL.md and existing reference files completely
+- Extract code examples to reference files, grouped by topic
 - Remove project-specific paths, names, domains, and URLs
-- Condense prose explanations to bullet format: `- **Rule** - How-to, see [details/file.md]`
+- Condense prose explanations to bullet format: `- **Rule** - How-to, see [reference/file.md]`
 - Remove long paragraphs, code blocks, example sections from main file
 - Keep frontmatter, description, section headings, and short inline snippets
-- Create or update detail files for code examples and detailed explanations
-- Validate all detail file references are correct
+- Create or update reference files for code examples and detailed explanations
+- Validate all reference file links are correct
 - Target 60-70% reduction for standard simplification
-- Preserve all content by moving to details, don't delete
-- Check for detail file overwrites before writing
+- Preserve all content by moving to reference files, don't delete
+- Check for reference file overwrites before writing

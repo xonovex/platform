@@ -3,7 +3,7 @@
   "owner": { "name": "Xonovex" },
   "metadata": {
     "description": "Official Xonovex development tools",
-    "version": "0.1.0"
+    "version": "0.1.1"
   },
   "plugins": [
     { "name": "xonovex-workflow", "source": "./packages/command/command-workflow", "description": "Xonovex workflow commands — planning, code analysis, git" },
@@ -41,7 +41,9 @@
     { "name": "xonovex-threejs", "source": "./packages/skill/skill-threejs", "description": "Three.js guidelines" },
     { "name": "xonovex-typescript", "source": "./packages/skill/skill-typescript", "description": "TypeScript guidelines" },
     { "name": "xonovex-typescript-to-lua", "source": "./packages/skill/skill-typescript-to-lua", "description": "TypeScript to Lua guidelines" },
+    { "name": "xonovex-utility-skills", "source": "./packages/skill/skill-utility", "description": "Xonovex utility skills — skills, instructions, insights, content" },
     { "name": "xonovex-vitest", "source": "./packages/skill/skill-vitest", "description": "Vitest testing guidelines" },
+    { "name": "xonovex-workflow-skills", "source": "./packages/skill/skill-workflow", "description": "Xonovex workflow skills — planning, code analysis, git" },
     { "name": "xonovex-zod", "source": "./packages/skill/skill-zod", "description": "Zod validation guidelines" }
   ]
 }

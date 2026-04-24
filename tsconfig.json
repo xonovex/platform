@@ -27,10 +27,13 @@
       "path": "packages/config/vitest-config-node"
     },
     {
-      "path": "packages/shared/shared-core"
+      "path": "packages/script/script-hello-world"
     },
     {
       "path": "packages/script/script-moon-action-graph"
+    },
+    {
+      "path": "packages/script/script-moon-common"
     },
     {
       "path": "packages/script/script-moon-npm-check"
@@ -39,13 +42,13 @@
       "path": "packages/script/script-moon-npm-publish"
     },
     {
-      "path": "packages/script/script-moon-common"
-    },
-{
       "path": "packages/script/script-moon-version-bump"
     },
     {
       "path": "packages/script/script-moon-version-detect"
+    },
+    {
+      "path": "packages/shared/shared-core"
     }
   ]
 }
