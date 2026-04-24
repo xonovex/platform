@@ -27,9 +27,6 @@
       "path": "packages/config/vitest-config-node"
     },
     {
-      "path": "packages/script/script-hello-world"
-    },
-    {
       "path": "packages/script/script-moon-action-graph"
     },
     {
