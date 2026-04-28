@@ -38,12 +38,12 @@ claude plugin install xonovex-utility@xonovex-marketplace
 
 ### Skills
 
-| Command                       | Description                                      |
-| ----------------------------- | ------------------------------------------------ |
-| `skill-guidelines-create`     | Create a guideline skill from a document or URL  |
-| `skill-guidelines-extract`    | Extract patterns from codebase into a skill      |
-| `skill-guidelines-simplify`   | Make skills project-independent and condense     |
-| `skill-guidelines-assimilate` | Augment a skill with elements from another skill |
+| Command                  | Description                                      |
+| ------------------------ | ------------------------------------------------ |
+| `skill-guide-create`     | Create a guideline skill from a document or URL  |
+| `skill-guide-extract`    | Extract patterns from codebase into a skill      |
+| `skill-guide-simplify`   | Make skills project-independent and condense     |
+| `skill-guide-assimilate` | Augment a skill with elements from another skill |
 
 ### Slash Commands
 

@@ -1,7 +1,7 @@
 {
-  "name": "xonovex-shell-scripting",
-  "version": "0.1.1",
-  "description": "Shell-scripting guidelines",
+  "name": "xonovex-skill-shell-scripting",
+  "version": "0.2.0",
+  "description": "Xonovex Shell scripting skills",
   "author": {"name": "Xonovex"},
-  "skills": ["./"]
+  "skills": ["./shell-scripting-guide"]
 }

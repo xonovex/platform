@@ -1,7 +1,7 @@
 {
-  "name": "xonovex-motion-react",
-  "version": "0.1.1",
-  "description": "Motion-react guidelines",
+  "name": "xonovex-skill-motion-react",
+  "version": "0.2.0",
+  "description": "Xonovex Motion for React skills",
   "author": {"name": "Xonovex"},
-  "skills": ["./"]
+  "skills": ["./motion-guide"]
 }

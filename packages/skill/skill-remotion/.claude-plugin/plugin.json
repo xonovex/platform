@@ -1,7 +1,7 @@
 {
-  "name": "xonovex-remotion",
-  "version": "0.1.1",
-  "description": "Remotion guidelines",
+  "name": "xonovex-skill-remotion",
+  "version": "0.2.0",
+  "description": "Xonovex Remotion skills",
   "author": {"name": "Xonovex"},
-  "skills": ["./"]
+  "skills": ["./remotion-guide"]
 }

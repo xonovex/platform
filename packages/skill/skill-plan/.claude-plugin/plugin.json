@@ -1,7 +1,7 @@
 {
-  "name": "xonovex-plan",
-  "version": "0.1.1",
-  "description": "Plan guidelines",
+  "name": "xonovex-skill-plan",
+  "version": "0.2.0",
+  "description": "Xonovex Plan skills",
   "author": {"name": "Xonovex"},
-  "skills": ["./"]
+  "skills": ["./plan-guide"]
 }

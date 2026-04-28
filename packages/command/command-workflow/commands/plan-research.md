@@ -77,7 +77,7 @@ Integration Points:
 - Add to Hono middleware chain
 - Use existing Redis connection
 
-Skills: typescript-guidelines, hono-guidelines
+Skills: typescript-guide, hono-guide
 
 Considerations: Rate limit keys per user/IP, env config, metrics
 ```

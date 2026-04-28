@@ -1,7 +1,7 @@
 {
-  "name": "xonovex-strudel",
-  "version": "0.1.1",
-  "description": "Strudel guidelines",
+  "name": "xonovex-skill-strudel",
+  "version": "0.2.0",
+  "description": "Xonovex Strudel skills",
   "author": {"name": "Xonovex"},
-  "skills": ["./"]
+  "skills": ["./strudel-guide"]
 }

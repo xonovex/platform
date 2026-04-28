@@ -1,7 +1,7 @@
 {
-  "name": "xonovex-typescript",
-  "version": "0.1.1",
-  "description": "Typescript guidelines",
+  "name": "xonovex-skill-typescript",
+  "version": "0.2.0",
+  "description": "Xonovex TypeScript skills",
   "author": {"name": "Xonovex"},
-  "skills": ["./"]
+  "skills": ["./typescript-guide"]
 }

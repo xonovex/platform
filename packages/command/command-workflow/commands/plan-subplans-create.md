@@ -62,7 +62,7 @@ This command requires an approved parent plan. It does NOT perform codebase expl
 
 **Child Plan Frontmatter**: `type: plan`, `has_subplans: false`, `parent_plan`, `parallel_group`, `status: pending`, `dependencies: {plans: [], files: []}`, `skills_to_consult: [skill-names]`, `validation: {type_check: pending, lint: pending, build: pending, tests: pending, integration: pending}`
 
-**Skills to Consult**: Every child plan MUST include `skills_to_consult` array listing applicable coding guidelines (e.g., `typescript-guidelines`, `testing-guidelines`, `hono-guidelines`). This ensures implementers consult project conventions before coding.
+**Skills to Consult**: Every child plan MUST include `skills_to_consult` array listing applicable coding guidelines (e.g., `typescript-guide`, `testing-guide`, `hono-guide`). This ensures implementers consult project conventions before coding.
 
 **Child Plan Sections**: Objective, Tasks (numbered with file paths, code snippets, actions), Validation Steps (typecheck, lint, build, test - all must pass), Success Criteria (checklist), Files Modified/Created (list), Dependencies (required plans), Estimated Duration
 

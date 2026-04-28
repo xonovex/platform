@@ -1,6 +1,26 @@
 {
-  "name": "xonovex-utility-skills",
-  "version": "0.1.1",
+  "name": "xonovex-skill-utility",
+  "version": "0.2.0",
   "description": "Xonovex utility skills — skills, instructions, insights, content",
-  "author": {"name": "Xonovex"}
+  "author": {"name": "Xonovex"},
+  "skills": [
+    "./content-humanize",
+    "./content-news-add",
+    "./content-travelguide-add",
+    "./insights-extract",
+    "./insights-instructions-integrate",
+    "./insights-skills-integrate",
+    "./instructions-assimilate",
+    "./instructions-consolidate",
+    "./instructions-init",
+    "./instructions-simplify",
+    "./instructions-sync",
+    "./skill-guide-assimilate",
+    "./skill-guide-create",
+    "./skill-guide-extract",
+    "./skill-guide-simplify",
+    "./slashcommand-assimilate",
+    "./slashcommand-create",
+    "./slashcommand-simplify"
+  ]
 }

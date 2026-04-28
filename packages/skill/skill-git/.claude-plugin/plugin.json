@@ -1,7 +1,7 @@
 {
-  "name": "xonovex-git",
-  "version": "0.1.1",
-  "description": "Git guidelines",
+  "name": "xonovex-skill-git",
+  "version": "0.2.0",
+  "description": "Xonovex Git skills",
   "author": {"name": "Xonovex"},
-  "skills": ["./"]
+  "skills": ["./git-guide"]
 }

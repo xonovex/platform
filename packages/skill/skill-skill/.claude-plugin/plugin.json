@@ -1,7 +1,7 @@
 {
-  "name": "xonovex-skill",
-  "version": "0.1.1",
-  "description": "Skill guidelines",
+  "name": "xonovex-skill-skill",
+  "version": "0.2.0",
+  "description": "Xonovex Skill skills",
   "author": {"name": "Xonovex"},
-  "skills": ["./"]
+  "skills": ["./skill-guide"]
 }
