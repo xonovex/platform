@@ -1,6 +1,6 @@
 ---
 name: plan-guidelines
-description: Trigger on planning sessions, research tasks, architecture decisions. Use when planning research and analysis tasks. Apply for code alignment, simplification, hardening, template extraction. Keywords: research, planning, task breakdown, code analysis, refactoring, template extraction, shared libraries, TODO scanning.
+description: "Planning workflow guidelines: research, task breakdown, plan documents. Apply when planning a feature, analyzing code, or scoping refactors. Use for code alignment, simplification, hardening, template extraction. Keywords: research, planning, task breakdown, plan document, code analysis, refactoring, template extraction, shared libraries, TODO scanning."
 ---
 
 # Planning Research Guidelines

@@ -1,6 +1,6 @@
 ---
 name: cmake-guidelines
-description: Trigger on `CMakeLists.txt` files. Use when writing CMake 3.20+ build systems for C/C++ projects. Apply for target-based builds, dependency management, testing setup, visibility specifiers. Keywords: CMake, add_library, add_executable, target_link_libraries, PUBLIC/PRIVATE/INTERFACE, find_package, FetchContent, CTest.
+description: "CMake 3.20+ build-system guidelines for C/C++ projects. Apply when editing `CMakeLists.txt` files. Use for target-based builds, dependency management, testing setup, visibility specifiers. Keywords: CMake, add_library, add_executable, target_link_libraries, PUBLIC/PRIVATE/INTERFACE, find_package, FetchContent, CTest."
 ---
 
 # CMake Coding Guidelines

@@ -1,6 +1,6 @@
 ---
 name: sql-postgresql-guidelines
-description: Trigger on `.sql` files, PostgreSQL migrations, schema files. Use when writing PostgreSQL 15+ queries and schemas. Apply for CTEs, indexing, constraints, JSONB, RLS, performance optimization. Keywords: PostgreSQL, SQL, CTEs, GIN index, JSONB, RLS, role-based access, migrations, EXPLAIN ANALYZE, constraints.
+description: "PostgreSQL 15+ query and schema guidelines. Apply when editing `.sql` files, migrations, or schema files. Use for CTEs, indexing, constraints, JSONB, RLS, performance optimization. Keywords: PostgreSQL, SQL, CTEs, GIN index, JSONB, RLS, role-based access, migrations, EXPLAIN ANALYZE, constraints."
 ---
 
 # PostgreSQL Coding Guidelines

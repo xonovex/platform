@@ -1,16 +1,5 @@
 ---
-description: >-
-  Create a high-level plan with research for user review before detailed
-  subplans
-allowed-tools:
-  - Write
-  - Read
-  - Glob
-  - Grep
-  - TaskCreate
-  - TaskUpdate
-  - AskUserQuestion
-argument-hint: "[spec-file-or-requirements] [--interactive] [--depends-on <plan>] [--dry-run]"
+description: "Create a high-level plan with research for user review before generating detailed subplans. Use when the user asks to plan, design, scope, or break down a feature or task. Keywords: plan, planning, design, scope, research, plan document, high-level plan."
 ---
 
 # /xonovex-workflow:plan-create – Create Plan with Research

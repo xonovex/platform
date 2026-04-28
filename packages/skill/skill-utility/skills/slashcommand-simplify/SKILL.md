@@ -1,15 +1,5 @@
 ---
-description: >-
-  Automatically simplify slash command files by reducing verbosity while
-  maintaining functionality
-model: sonnet
-allowed-tools:
-  - Read
-  - Edit
-  - Write
-  - Glob
-  - TodoWrite
-argument-hint: "[command-file] [--dry-run] [--target-reduction <percent>]"
+description: "Simplify slash command .md files by reducing verbosity while keeping functionality intact. Use when the user asks to simplify, condense, or shorten slash commands. Keywords: slash command, /command, simplify, condense, reduce verbosity."
 ---
 
 # /xonovex-utility:slashcommand-simplify – Simplify Slash Command Documentation

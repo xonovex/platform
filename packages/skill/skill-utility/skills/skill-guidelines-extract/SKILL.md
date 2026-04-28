@@ -1,19 +1,5 @@
 ---
-description: >-
-  Create or update a skill by extracting patterns from codebase and project
-  instructions
-model: sonnet
-allowed-tools:
-  - Read
-  - Write
-  - Edit
-  - Glob
-  - Grep
-  - Bash
-  - TodoWrite
-  - AskUserQuestion
-  - Task
-argument-hint: "[skill-name] [source-path] [--update] [--interactive] [--dry-run]"
+description: "Create or update a guideline skill by extracting patterns from the codebase and AGENTS.md/CLAUDE.md. Use when the user asks to extract a skill from existing code, distill patterns into a SKILL.md, or capture project conventions. Keywords: skill extraction, SKILL.md, codebase patterns, AGENTS.md, distill conventions, guideline skill."
 ---
 
 # /xonovex-utility:skill-guidelines-extract – Extract Skill from Codebase

@@ -1,6 +1,6 @@
 ---
 name: general-oop-guidelines
-description: Trigger on object-oriented patterns, class hierarchies, encapsulation. Use for OOP-style coding principles. Apply when using inheritance, polymorphism, encapsulated state. Keywords: object-oriented, classes, inheritance, polymorphism, encapsulation, SOLID, design patterns, interfaces.
+description: "Object-oriented programming guidelines: classes, inheritance, encapsulation, SOLID. Apply when designing class hierarchies, encapsulating state, or using polymorphism. Use for OOP-style code organization. Keywords: object-oriented, OOP, classes, inheritance, polymorphism, encapsulation, SOLID, design patterns, interfaces."
 ---
 
 # General Object-Oriented Programming Guidelines

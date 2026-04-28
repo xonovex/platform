@@ -1,6 +1,6 @@
 ---
 name: express.js-guidelines
-description: Trigger on `*.ts` files with Express imports or `@types/express`. Use when building Express 5+ API servers. Apply for route organization, error handling, authentication, testing. Keywords: Express, routes, controllers, middleware, Zod validation, JWT, error handling, CORS, Morgan.
+description: "Express 5+ API server guidelines for TypeScript. Apply when editing `*.ts` files with Express imports or `@types/express`. Use for route organization, error handling, authentication, testing. Keywords: Express, routes, controllers, middleware, Zod validation, JWT, error handling, CORS, Morgan."
 ---
 
 # Express.js Coding Guidelines

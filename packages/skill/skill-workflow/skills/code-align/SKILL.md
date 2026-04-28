@@ -1,16 +1,5 @@
 ---
-description: Create alignment between two similar implementations and suggest improvements
-model: sonnet
-allowed-tools:
-  - Read
-  - Glob
-  - Grep
-  - Bash
-  - Task
-  - TaskCreate
-  - TaskUpdate
-  - AskUserQuestion
-argument-hint: "[file1] [file2] [--interactive] [--fix]"
+description: "Compare two similar implementations, surface differences, and suggest a unified design. Use when the user asks to align, reconcile, harmonize, or compare two pieces of similar code. Keywords: code alignment, reconcile, harmonize, similar implementations, dedupe, unify design."
 ---
 
 # /xonovex-workflow:code-align – Research Code Alignment Between Similar Implementations

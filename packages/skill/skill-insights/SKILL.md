@@ -1,6 +1,6 @@
 ---
 name: insights-guidelines
-description: Trigger on post-session reflection and skill improvement tasks. Use when analyzing development sessions for lessons learned. Apply for extracting insights, integrating into skills. Keywords: mistakes, discoveries, patterns, insights extraction, skill integration, lessons learned, development session analysis.
+description: "Insights workflow guidelines: extracting lessons from sessions and integrating into skills or AGENTS.md. Apply when running post-session reflection or improving skills. Use for capturing mistakes, discoveries, recurring patterns. Keywords: insights, mistakes, discoveries, patterns, lessons learned, retrospective, post-session reflection, skill integration."
 ---
 
 # Insights Guidelines

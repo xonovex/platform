@@ -1,6 +1,6 @@
 ---
 name: moon-guidelines
-description: Trigger on `.moon/`, `moon.yml` files in project config. Use when working with moonrepo for monorepo task management. Apply for task configuration, project tagging, task inheritance. Keywords: moon, monorepo, .moon/tasks, tags, task inheritance, project queries, task caching, language toolchains.
+description: "moonrepo monorepo task-management guidelines. Apply when editing `.moon/` configs or `moon.yml` files. Use for task configuration, project tagging, task inheritance, language toolchains. Keywords: moon, moonrepo, monorepo, .moon/tasks, tags, task inheritance, project queries, task caching, language toolchains."
 ---
 
 # Moon Build System Guidelines

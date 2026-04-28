@@ -1,14 +1,5 @@
 ---
-description: Create a guideline skill from a provided document or URL
-allowed-tools:
-  - Read
-  - Write
-  - Glob
-  - Grep
-  - WebFetch
-  - AskUserQuestion
-  - TodoWrite
-argument-hint: "[source] [--name <name>] [--dry-run]"
+description: "Create a new guideline skill (SKILL.md plus reference files) from a provided document, URL, or text. Use when the user asks to make a skill from a guide, blog post, spec, or documentation. Keywords: SKILL.md, skill creation, guideline skill, from URL, from document, progressive disclosure."
 ---
 
 # /xonovex-utility:skill-guidelines-create – Create Guideline Skill from Document

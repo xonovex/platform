@@ -1,15 +1,5 @@
 ---
-description: Create an AGENTS.md file for a directory by analyzing its structure and contents
-model: sonnet
-allowed-tools:
-  - Read
-  - Write
-  - Glob
-  - Grep
-  - Bash
-  - TodoWrite
-  - AskUserQuestion
-argument-hint: "[directory] [--dry-run] [--recursive]"
+description: "Generate a fresh AGENTS.md for a directory by analyzing its structure and code. Use when the user asks to initialize AGENTS.md, bootstrap project instructions, or document a directory for agents. Keywords: AGENTS.md, init, bootstrap, project instructions, directory analysis, document codebase."
 ---
 
 # /xonovex-utility:instructions-init – Create AGENTS.md

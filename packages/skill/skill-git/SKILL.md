@@ -1,6 +1,6 @@
 ---
 name: git-guidelines
-description: Trigger on git operations and merge conflict situations. Use when working with git operations. Apply for conventional commits, merge conflict resolution, worktree management. Keywords: git, conventional commits, feat/fix/chore/docs, merge conflicts, worktrees, commit messages, history rewrite.
+description: "Git workflow guidelines: conventional commits, merge conflict resolution, worktrees. Apply when running git operations, resolving merge conflicts, or managing branches. Use for commit messages, conflict cleanup, worktree workflows. Keywords: git, conventional commits, feat/fix/chore/docs, merge conflicts, worktrees, commit messages, history rewrite."
 ---
 
 # Git Guidelines

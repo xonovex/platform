@@ -1,6 +1,6 @@
 ---
 name: lua-opinionated-guidelines
-description: Trigger on `.lua` files for LuaJIT performance-critical code. Opinionated patterns: JIT-friendly tables, table pre-allocation, cache lookups. Keywords: LuaJIT, JIT optimization, table pre-allocation, cache lookups, stable table shapes.
+description: "Opinionated LuaJIT guidelines for performance-critical code: JIT-friendly tables, pre-allocation, cache lookups. Apply when editing `.lua` files for LuaJIT targets. Use for stable table shapes, hot-path tuning. Keywords: LuaJIT, JIT optimization, table pre-allocation, cache lookups, stable table shapes, hot path."
 ---
 
 # Lua Opinionated Guidelines (LuaJIT Performance)

@@ -1,16 +1,5 @@
 ---
-description: >-
-  Make skills project-independent, remove redundancy, condense SKILL.md to
-  bullet list with examples in reference files
-model: sonnet
-allowed-tools:
-  - Read
-  - Edit
-  - Write
-  - Glob
-  - Grep
-  - TodoWrite
-argument-hint: "[skill-file] [--dry-run] [--target-reduction <percent>]"
+description: "Condense verbose SKILL.md files into bullet-list quick references and move examples to reference files. Use when the user asks to simplify, slim down, or de-project-ify a skill. Keywords: SKILL.md, skill simplify, condense, project-independent, progressive disclosure, reference files."
 ---
 
 # /xonovex-utility:skill-guidelines-simplify – Condense verbose skill files

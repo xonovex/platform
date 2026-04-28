@@ -1,15 +1,5 @@
 ---
-description: Verify that a plan or current work has been fully achieved
-allowed-tools:
-  - Bash
-  - Read
-  - Grep
-  - Glob
-  - Task
-  - TaskCreate
-  - TaskUpdate
-  - TaskList
-argument-hint: "[plan-file] [--detailed]"
+description: "Verify a plan or in-progress work has been fully achieved against its acceptance criteria. Use when the user asks to validate, verify, check completion, or confirm a plan is done. Keywords: plan, validate, verify, completion check, acceptance, done."
 ---
 
 # /xonovex-workflow:plan-validate – Validate Plan Achievement

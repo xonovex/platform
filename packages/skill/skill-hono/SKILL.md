@@ -1,6 +1,6 @@
 ---
 name: hono-guidelines
-description: Trigger on `*.ts` files with Hono imports or `@hono/` packages. Use when building Hono 4.0+ API servers. Apply for validation, middleware, error handling, WebSockets. Keywords: Hono, middleware, Zod validator, error handling, WebSocket.
+description: "Hono 4.0+ API server guidelines for TypeScript. Apply when editing `*.ts` files with Hono imports or `@hono/` packages. Use for validation, middleware, error handling, WebSockets. Keywords: Hono, middleware, Zod validator, error handling, WebSocket, route handlers."
 ---
 
 # Hono Coding Guidelines

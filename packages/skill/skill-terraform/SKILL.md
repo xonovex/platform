@@ -1,6 +1,6 @@
 ---
 name: terraform-guidelines
-description: Trigger on `.tf` files, Terraform modules, `*.tfvars`. Use when writing Terraform 1.12+ for infrastructure as code. Apply for module design, environment isolation, state management. Keywords: Terraform, modules, variables, outputs, remote state, for_each, dynamic blocks, locals, environment isolation.
+description: "Terraform 1.12+ infrastructure-as-code guidelines. Apply when editing `.tf` files, modules, or `*.tfvars`. Use for module design, environment isolation, state management. Keywords: Terraform, modules, variables, outputs, remote state, for_each, dynamic blocks, locals, environment isolation, IaC."
 ---
 
 # Terraform Coding Guidelines

@@ -1,6 +1,6 @@
 ---
 name: astro-guidelines
-description: Trigger on `.astro` files. Use when building Astro static sites with islands architecture. Apply for content collections, component hydration, or accessibility implementation. Keywords: Astro, islands, static HTML, content collections, `astro:content`, schema validation.
+description: "Astro static-site guidelines with islands architecture. Apply when editing `.astro` files. Use for content collections, component hydration, accessibility. Keywords: Astro, islands, static HTML, content collections, `astro:content`, schema validation, hydration directives."
 ---
 
 # Astro Coding Guidelines

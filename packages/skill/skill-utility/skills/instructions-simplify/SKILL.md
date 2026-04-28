@@ -1,13 +1,5 @@
 ---
-description: Simplify project instruction files (AGENTS.md/CLAUDE.md) by reducing verbosity
-model: sonnet
-allowed-tools:
-  - Read
-  - Edit
-  - Write
-  - Glob
-  - TodoWrite
-argument-hint: "[instruction-file] [--dry-run] [--target-reduction <percent>]"
+description: "Reduce AGENTS.md/CLAUDE.md verbosity while preserving structure and technology names. Use when the user asks to simplify, condense, or shorten project instructions. Keywords: AGENTS.md, CLAUDE.md, simplify, condense, reduce verbosity, instructions cleanup."
 ---
 
 # /xonovex-utility:instructions-simplify – Simplify project instruction files

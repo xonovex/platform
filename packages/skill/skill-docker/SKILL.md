@@ -1,6 +1,6 @@
 ---
 name: docker-guidelines
-description: Trigger on `Dockerfile`, `docker-compose.yml`, `.dockerignore` files. Use when writing Docker configurations for containerized applications. Apply for multi-stage builds, security hardening, production deployments. Keywords: Dockerfile, multi-stage, alpine/distroless, layer caching, non-root, secrets, health checks, BuildKit.
+description: "Docker container guidelines for production deployments. Apply when editing `Dockerfile`, `docker-compose.yml`, or `.dockerignore` files. Use for multi-stage builds, security hardening, image slimming. Keywords: Dockerfile, multi-stage, alpine/distroless, layer caching, non-root, secrets, health checks, BuildKit."
 ---
 
 # Docker Coding Guidelines

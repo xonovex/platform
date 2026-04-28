@@ -1,6 +1,6 @@
 ---
 name: hono-opinionated-guidelines
-description: Trigger on `*.ts` files with Hono imports or `@hono/` packages. Opinionated patterns: inline OpenAPI handlers, router selection, remove unnecessary async, bodyLimit. Keywords: Hono, OpenAPIHono, LinearRouter/RegExpRouter, inline handlers, bodyLimit.
+description: "Opinionated Hono guidelines: inline OpenAPI handlers, router selection, sync handlers, bodyLimit. Apply when editing `*.ts` files with Hono imports or `@hono/` packages. Use for OpenAPI routes, router choice, perf tuning. Keywords: Hono, OpenAPIHono, LinearRouter, RegExpRouter, inline handlers, bodyLimit, sync handlers."
 ---
 
 # Hono Opinionated Guidelines

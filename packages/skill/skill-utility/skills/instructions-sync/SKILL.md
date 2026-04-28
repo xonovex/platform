@@ -1,15 +1,5 @@
 ---
-description: Sync AGENTS.md files with current directory structure and state
-model: sonnet
-allowed-tools:
-  - Read
-  - Edit
-  - Write
-  - Glob
-  - Grep
-  - Bash
-  - TodoWrite
-argument-hint: "[agents-file | --all] [--dry-run] [--update-workflows]"
+description: "Sync AGENTS.md files with the actual current directory structure and codebase state. Use when the user asks to refresh AGENTS.md, update instructions to match the codebase, or fix stale documentation. Keywords: AGENTS.md, sync, refresh, stale instructions, directory structure update, instructions sync."
 ---
 
 # /xonovex-utility:instructions-sync – Sync AGENTS.md with Current State

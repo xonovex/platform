@@ -1,21 +1,5 @@
 ---
-description: >-
-  Simplify code by consolidating duplicates, removing dead code, and flattening
-  abstractions
-model: sonnet
-allowed-tools:
-  - Read
-  - Glob
-  - Grep
-  - Bash
-  - Task
-  - TaskCreate
-  - TaskUpdate
-  - AskUserQuestion
-argument-hint: >-
-  [path] [--aspects
-  <duplicates,dead-code,dependencies,abstractions,interfaces,config>]
-  [--dry-run] [--fix]
+description: "Simplify code by consolidating duplicates, removing dead code, and flattening unnecessary abstractions. Use when the user asks to simplify, refactor, dedupe, or clean up code. Keywords: simplify, refactor, dedupe, dead code, flatten abstractions, cleanup."
 ---
 
 # /xonovex-workflow:code-simplify – Research Code Simplification Opportunities
