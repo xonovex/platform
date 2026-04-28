@@ -6,19 +6,6 @@ description: "Analyze the current session for development mistakes, surprises, a
 
 Analyzes the current session to identify general development mistakes, how they were discovered, and lessons learned. Always saves insights as individual files with frontmatter.
 
-## Usage
-
-```
-/xonovex-utility:insights-extract
-/xonovex-utility:insights-extract tool-usage
-/xonovex-utility:insights-extract validation --out-dir docs/insights
-```
-
-## Arguments
-
-- `category` (optional): Focus on a specific mistake category (e.g., `tool-usage`, `dependencies`, `validation`).
-- `--out-dir` (optional): The directory to save insight files in. Defaults to `insights/`.
-
 ## Goal
 
 1.  **Analyzes** the conversation for development errors and corrections.
@@ -78,16 +65,8 @@ Total: 2 insights extracted
 Next Steps:
 1. Review extracted insight files in insights/ directory
 2. Verify content: Check that mistakes, discoveries, and fixes are accurately captured
-3. Integrate into skills: /xonovex-utility:insights-skills-integrate [category]
-4. Integrate into AGENTS.md: /xonovex-utility:insights-instructions-integrate [category]
-```
-
-## Examples
-
-```bash
-/xonovex-utility:insights-extract
-/xonovex-utility:insights-extract tool-usage
-/xonovex-utility:insights-extract validation --out-dir docs/insights
+3. Integrate into skills: invoke insights-skills-integrate for the category
+4. Integrate into AGENTS.md: invoke insights-instructions-integrate for the category
 ```
 
 ## Error Handling

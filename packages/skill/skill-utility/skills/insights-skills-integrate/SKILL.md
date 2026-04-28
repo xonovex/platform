@@ -6,13 +6,6 @@ description: "Convert extracted insights into a new or updated guideline skill w
 
 Convert insights from a category into a Claude skill with progressive disclosure structure.
 
-## Arguments
-
-- `category` (required) - Category to convert (e.g., `hono`, `typescript`, `workflow`)
-- `--dry-run` - Preview without writing
-- `--force` - Overwrite existing skill instead of merging
-- `--output <path>` - Custom output path (default: `.claude/skills/{category}/SKILL.md`)
-
 ## Workflow
 
 1. **Discover:** Search `insights/` for category files, extract Problem/Solution/Example, group by topic
@@ -20,8 +13,8 @@ Convert insights from a category into a Claude skill with progressive disclosure
    - Metadata: `{category}-best-practices`, description under 150 chars starting with "Use when..."
    - SKILL.md: Requirements (optional), Essentials (3-7 items), Examples (code), Progressive disclosure (reference links)
    - Reference files: Guideline, Rationale, How to Apply, Example (bad vs good), Related
-3. **Merge:** If skill exists and not `--force`: combine metadata, deduplicate Essentials (keep 3-7), append examples, add reference file links
-4. **Output:** `--dry-run` shows structure without writing, otherwise creates directory and files
+3. **Merge:** If skill exists (unless user asked to overwrite): combine metadata, deduplicate Essentials (keep 3-7), append examples, add reference file links
+4. **Output:** Preview shows structure without writing, otherwise creates directory and files
 
 ## Structure Template
 
@@ -87,6 +80,6 @@ description: Use when working with {category} to {purpose}. Apply for {scenarios
 ## Error Handling
 
 - Missing category: ask user
-- No insights found: suggest `/xonovex-utility:insights-extract [category]`
+- No insights found: suggest running insights-extract for the category
 - Output not writable: report error
 ```

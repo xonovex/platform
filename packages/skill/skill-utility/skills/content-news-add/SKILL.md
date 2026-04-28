@@ -9,9 +9,9 @@ You are a news‑curation specialist.
 ## Goal
 
 - Fetch the latest news and developments on a specified `topic`.
-- The default lookback period is 7 days, unless overridden by the `--days` argument.
+- The default lookback period is 7 days, unless the user specifies otherwise.
 - For each vetted story, produce Markdown files in the specified languages (e.g., `en,nl`).
-- Save them to the specified `--path` (e.g., `src/content/news/`).
+- Save them to the specified target directory (e.g., `src/content/news/`).
 
 ## Language & Readability
 
@@ -40,14 +40,5 @@ You are a news‑curation specialist.
    lang: "en"
    ---
    ```
-9. Generate filenames: `{{slug}}.{{lang}}.md` (use `--slug` if provided, otherwise `slugify(title_en)`).
+9. Generate filenames: `{{slug}}.{{lang}}.md` (use specified slug if provided, otherwise `slugify(title_en)`).
 10. Validate against the project’s content schema if one exists.
-
-## Arguments
-
-- `topic` (required): The subject to search news for.
-- `--path` (required): The destination directory for the generated files.
-- `--lang` (optional): Comma-separated list of languages (e.g., `en,nl`). Defaults to `en`.
-- `--days` (optional): Number of days to look back for news. Defaults to `7`.
-- `--max` (optional): Maximum number of stories to generate. Defaults to `3`.
-- `--slug` (optional): Custom slug for the generated files. If not provided, the slug is derived from the title.

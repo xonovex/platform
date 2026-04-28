@@ -22,12 +22,6 @@ This command requires an approved parent plan. It does NOT perform codebase expl
 - Auto-associate with feature worktree via git config
 - Save child plans and STOP (user runs /xonovex-workflow:plan-continue when ready)
 
-## Arguments
-
-- `parent-plan-file` (required): Path to approved parent plan (e.g., `plans/auth.md`)
-- `--by-phase` (optional): Split by phase markers instead of logical grouping
-- `--dry-run` (optional): Preview without writing files
-
 ## Core Workflow
 
 **IMPORTANT: Do NOT use EnterPlanMode. Do NOT use Task/Explore agents - rely on parent plan context.**
@@ -45,7 +39,7 @@ This command requires an approved parent plan. It does NOT perform codebase expl
 
 ## Implementation Details
 
-**Splitting**: Logical grouping (default) or by phase markers (`--by-phase`)
+**Splitting**: Logical grouping (default) or by phase markers (if the user requests phase-based splitting)
 
 **Dependency Detection**: File overlap -> Sequential; No overlap -> Parallel; Explicit deps -> Sequential with tracking
 
@@ -76,22 +70,9 @@ Updated parent plan with parallel execution groups
 Next Steps:
 1. Review all child plans
 2. Verify parallel execution groups and dependencies
-3. Create workspace: /xonovex-workflow:plan-worktree-create feature-name --plan plans/feature-name.md
-4. Start implementation: /xonovex-workflow:plan-continue plans/feature-name.md
-5. Track progress: /plan-status plans/feature-name.md
-```
-
-## Examples
-
-```bash
-# Generate child plans from approved parent plan
-/xonovex-workflow:plan-subplans-create plans/feature.md
-
-# Phase-based splitting
-/xonovex-workflow:plan-subplans-create plans/migration.md --by-phase
-
-# Preview without writing
-/xonovex-workflow:plan-subplans-create plans/feature.md --dry-run
+3. Create workspace: invoke plan-worktree-create for feature-name
+4. Start implementation: invoke plan-continue
+5. Track progress: check overall plan completion status
 ```
 
 ## Error Handling

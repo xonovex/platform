@@ -6,15 +6,6 @@ description: "Merge useful patterns from one project's AGENTS.md/CLAUDE.md into 
 
 Extracts organizational patterns from source AGENTS.md/CLAUDE.md and integrates into target while strictly preserving target's structure, style, and project-specific context.
 
-## Arguments
-
-- `target-instructions` (required): Target AGENTS.md/CLAUDE.md (augmented)
-- `source-instructions` (required): Source AGENTS.md/CLAUDE.md (provides patterns)
-- `--aspects <aspects>` (optional): Focus aspects (e.g., "workflow,structure,integration")
-- `--percentage <percent>` (optional): Intensity 10-100 (default: 45)
-- `--interactive` (optional): Ask clarifying questions
-- `--dry-run` (optional): Preview without modifying
-
 ## Core Workflow
 
 1. Use TodoWrite to track steps
@@ -22,7 +13,7 @@ Extracts organizational patterns from source AGENTS.md/CLAUDE.md and integrates 
 3. Analyze target's DNA (structure, style, voice, formatting, conventions, project context)
 4. Extract source patterns (organizational, workflow, integration, structure, dependencies)
 5. Filter by aspects/percentage
-6. Ask questions if --interactive
+6. Ask clarifying questions if interactive mode was requested
 7. Rewrite patterns in target's voice with target's technology names
 8. Preview or apply
 9. Report summary
@@ -43,14 +34,6 @@ Extracts organizational patterns from source AGENTS.md/CLAUDE.md and integrates 
 
 **Aspect filtering:** `workflow` (sequences/delegation), `structure` (directory/hierarchy), `integration` (doc styles), `dependencies` (doc approaches), `commands` (notation styles)
 
-## Examples
-
-```bash
-/xonovex-utility:instructions-assimilate services/api/AGENTS.md ../template/AGENTS.md --aspects "workflow"
-/xonovex-utility:instructions-assimilate infrastructure/AGENTS.md examples/AGENTS.md --aspects "structure"
-/xonovex-utility:instructions-assimilate AGENTS.md ../reference/AGENTS.md --percentage 30 --dry-run
-```
-
 ## Implementation
 
 **Discovery:** Accept AGENTS.md/CLAUDE.md paths or directories (e.g., `services/api` → `services/api/AGENTS.md`)
@@ -67,4 +50,4 @@ File not found, invalid percentage (10-100), no new patterns, aspect not found, 
 
 ## Safety
 
-Recommend git commit, never modify project tech names/paths/commands, preserve all target content, use `--dry-run`, warn if >30% added, abort if style confidence <85% or project context at risk, only modify CLAUDE.md when explicitly specified
+Recommend git commit, never modify project tech names/paths/commands, preserve all target content, preview before writing, warn if >30% added, abort if style confidence <85% or project context at risk, only modify CLAUDE.md when explicitly specified

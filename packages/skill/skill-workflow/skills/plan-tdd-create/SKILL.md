@@ -23,13 +23,6 @@ This command assumes research context is already in the conversation. It does NO
 - Present test strategy for review
 - Save plan and STOP (user approves, then runs /plan-tdd-subplans-create)
 
-## Arguments
-
-- `spec-file-or-requirements` (optional): Path to spec or inline requirements (defaults to context)
-- `--interactive` (optional): Ask about test approach and step granularity
-- `--depends-on <plan>` (optional): Mark dependency on another plan
-- `--dry-run` (optional): Preview without writing
-
 ## Core Workflow
 
 **IMPORTANT: Do NOT use EnterPlanMode. Do NOT use Task/Explore agents - assume research is already done.**
@@ -106,12 +99,3 @@ After approval: `/plan-tdd-subplans-create plans/[feature]-tdd.md`
 **Extending components:** New property/behavior test -> Integration -> Edge cases
 
 **Granularity check:** Independent commit? Tests ONE thing? Clear description?
-
-## Examples
-
-```bash
-/xonovex-workflow:plan-tdd-create specs/feature.md
-/xonovex-workflow:plan-tdd-create --interactive
-/xonovex-workflow:plan-tdd-create specs/logic.md --depends-on plans/setup-tdd.md
-/xonovex-workflow:plan-tdd-create "Add auth" --dry-run
-```

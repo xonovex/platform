@@ -17,15 +17,6 @@ Resumes work from an existing plan document by loading its context and outlining
 - Execute that single plan to completion
 - Mark complete, report success, STOP
 
-## Arguments
-
-`/plan-continue [document-path]`
-
-- `document-path` (optional): Path to plan document. Resolution order if omitted:
-  1. Check git config for associated plan (feature worktree)
-  2. **Use current conversation context** - if a `/xonovex-workflow:plan-create`, `/xonovex-workflow:plan-research`, or similar command was run earlier in this conversation, continue from that research/plan. Do NOT search for other plans.
-  3. Only if no context exists: Ask user which plan to continue
-
 ## Core Workflow
 
 1. **Resolve Plan**: Check git config, then conversation context (do NOT search for plans)
@@ -143,16 +134,3 @@ Next Steps:
 - **Info if all child plans complete** (recommend `/xonovex-workflow:plan-update` to mark parent complete)
 - Error if plan file is malformed (invalid front matter)
 - Warning if no plan associated with feature worktree
-
-## Examples
-
-```bash
-# Auto-detect from git config (in feature worktree)
-/xonovex-workflow:plan-continue
-
-# Explicit path
-/xonovex-workflow:plan-continue plans/authentication.md
-
-# Continue specific subplan
-/xonovex-workflow:plan-continue plans/authentication/subplan-02.md
-```

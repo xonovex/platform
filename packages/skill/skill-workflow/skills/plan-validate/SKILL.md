@@ -13,13 +13,6 @@ Verify that a plan document's objectives have been fully achieved, or validate t
 - Report clear pass/fail with evidence
 - Never modify files (read-only)
 
-## Arguments
-
-`/plan-validate [plan-file] [--detailed]`
-
-- `plan-file` (optional): Path to plan document (if omitted, validates current conversation goal)
-- `--detailed` (optional): Comprehensive analysis with full evidence trail
-
 ## Core Workflow
 
 ### With Plan Document
@@ -77,14 +70,3 @@ Next Steps:
 - Error if plan file not found or invalid format
 - Warning if plan already marked complete
 - Info if all tests pass (recommend `/xonovex-workflow:plan-update`)
-
-## Examples
-
-```bash
-# Validate current conversation goal
-/xonovex-workflow:plan-validate
-
-# Validate specific plan
-/xonovex-workflow:plan-validate plans/auth.md
-/xonovex-workflow:plan-validate plans/auth.md --detailed
-```

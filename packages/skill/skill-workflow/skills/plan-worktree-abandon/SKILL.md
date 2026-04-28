@@ -12,30 +12,22 @@ Abandon feature by updating plan status, documenting reason, and optionally clea
 - Optionally commit current state and remove worktree
 - Keep worktree by default for later insights extraction
 
-## Arguments
-
-- `reason` (optional): Concise reason for abandonment (prompted if not provided)
-- `--remove-worktree` (optional): Remove feature worktree after documenting
-- `--no-plan` (optional): Skip plan update (for features without plans)
-- `--commit` (optional): Commit current state before abandoning
-- `--dry-run` (optional): Preview changes without modifying files
-
 ## Core Workflow
 
 1. Verify in feature worktree (basename matches `*-feature-*`)
-2. Get reason from argument or prompt user
+2. Get reason from user message or prompt user
 3. Detect plan via `git config branch.<branch>.plan`
-4. Optionally commit: `git add . && git commit -m "wip: abandoned work on <feature>"` (skipped if --dry-run)
-5. Update plan frontmatter and add "Abandonment Notes" section (or preview if --dry-run)
-6. Keep worktree by default (or remove if `--remove-worktree`, skipped if --dry-run)
+4. Optionally commit: `git add . && git commit -m "wip: abandoned work on <feature>"` (skipped if preview was requested)
+5. Update plan frontmatter and add "Abandonment Notes" section (or preview if requested)
+6. Keep worktree by default (or remove if user requested removal, skipped if preview was requested)
 
 ## Implementation Steps
 
 1. Verify feature worktree and get current branch
 2. Read plan path from git config
-3. Get abandonment reason (arg or prompt)
-4. Optionally commit (if `--commit` and uncommitted changes)
-5. Update plan (unless `--no-plan`):
+3. Get abandonment reason from user message or prompt
+4. Optionally commit (if user requested commit and there are uncommitted changes)
+5. Update plan (unless user asked to skip plan update):
    - Frontmatter: `status: "abandoned"`, `abandoned_reason`, `abandoned_date`
    - Content: Add "Abandonment Notes" with detailed explanation and learnings
 6. Optionally remove worktree: `git worktree remove <path>`
@@ -82,16 +74,4 @@ Next Steps:
 ## Error Handling
 
 - Error: not in feature worktree, no reason, plan doesn't exist, worktree removal fails
-- Warning: no plan associated (unless `--no-plan`), uncommitted changes (suggest `--commit`)
-
-## Examples
-
-```bash
-/xonovex-workflow:plan-worktree-abandon "Superseded by better approach"
-/xonovex-workflow:plan-worktree-abandon "Requirements changed" --commit --remove-worktree
-/xonovex-workflow:plan-worktree-abandon "Quick experiment" --no-plan
-/xonovex-workflow:plan-worktree-abandon "Blocked by dependency" --commit
-
-# Preview changes without modifying files
-/xonovex-workflow:plan-worktree-abandon "Superseded by OAuth 2.0" --dry-run
-```
+- Warning: no plan associated (unless user asked to skip plan update), uncommitted changes (suggest committing first)

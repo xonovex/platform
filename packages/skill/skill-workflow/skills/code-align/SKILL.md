@@ -6,20 +6,6 @@ description: "Compare two similar implementations, surface differences, and sugg
 
 Analyzes two similar implementations to identify structural differences, inconsistencies, and opportunities for alignment. Generates a detailed research report. Does NOT create plans or make changes - run `/xonovex-workflow:plan-create` afterward to create an implementation plan.
 
-## Usage
-
-```bash
-/xonovex-workflow:code-align src/file-a.ts src/file-b.ts
-/xonovex-workflow:code-align src/file-a.ts src/file-b.ts --interactive
-/xonovex-workflow:code-align "src/process-*.ts"
-```
-
-## Arguments
-
-- `file1` (required): Path to first file, or glob pattern
-- `file2` (optional): Path to second file. If omitted and file1 is a glob, compares first two matches
-- `--interactive` (optional): Ask clarifying questions about reference implementation
-
 ## Core Workflow
 
 **Use Task agents with subagent_type=Explore and model=haiku for codebase analysis. Do NOT use EnterPlanMode.**
@@ -70,17 +56,7 @@ Recommendations:
   4. Sync configuration values
 ```
 
-4. **Interactive Mode** (`--interactive`): Asks questions about reference implementation, control flow preference, default values, missing features
-
-## Examples
-
-```bash
-# Compare two implementations
-/xonovex-workflow:code-align src/process-a.ts src/process-b.ts
-
-# Interactive with glob pattern
-/xonovex-workflow:code-align "src/handler-*.ts" --interactive
-```
+4. **Interactive Mode** (if requested): Asks questions about reference implementation, control flow preference, default values, missing features
 
 ## Next Steps
 
