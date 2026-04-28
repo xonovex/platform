@@ -1,6 +1,6 @@
 ---
 name: python-guidelines
-description: Trigger on `.py` files. Use when writing Python 3.12+ code. Apply for API development, data processing, file operations, resource management. Keywords: Python, async/await, dataclasses, type hints, generators, pathlib, pytest, context managers, @cache, f-strings.
+description: "Python 3.12+ coding guidelines for APIs, data processing, scripting. Apply when editing `.py` files. Use for async code, type hints, dataclasses, file operations, resource management. Keywords: Python, async/await, dataclasses, type hints, generators, pathlib, pytest, context managers, @cache, f-strings."
 ---
 
 # Python Coding Guidelines

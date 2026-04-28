@@ -1,16 +1,5 @@
 ---
-description: Consolidate project instructions by removing redundant files and standardizing format
-model: sonnet
-allowed-tools:
-  - Read
-  - Edit
-  - Write
-  - Glob
-  - Grep
-  - Bash
-  - TodoWrite
-  - AskUserQuestion
-argument-hint: "[--dry-run] [--path <directory>]"
+description: "Consolidate scattered AGENTS.md/CLAUDE.md files, remove redundancy, standardize format. Use when the user asks to clean up instructions, deduplicate AGENTS files, or unify project instruction style. Keywords: AGENTS.md, CLAUDE.md, consolidate, dedupe, cleanup, standardize, instructions."
 ---
 
 # /xonovex-utility:instructions-consolidate – Consolidate project instruction files

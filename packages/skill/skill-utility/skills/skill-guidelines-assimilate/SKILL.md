@@ -1,19 +1,5 @@
 ---
-description: >-
-  Augment an existing skill with elements from another skill while preserving
-  structure and style
-model: sonnet
-allowed-tools:
-  - Read
-  - Edit
-  - Write
-  - Glob
-  - Grep
-  - TodoWrite
-  - AskUserQuestion
-argument-hint: >-
-  [target-skill] [source-skill] [--aspects <aspects>] [--percentage <percent>]
-  [--interactive] [--dry-run]
+description: "Merge useful patterns from one skill into another while preserving the target's structure. Use when the user asks to assimilate, port, or borrow patterns between SKILL.md files. Keywords: SKILL.md, skill assimilate, merge skills, skill porting, guideline reuse."
 ---
 
 # /xonovex-utility:skill-guidelines-assimilate – Augment Skill with Another Skill

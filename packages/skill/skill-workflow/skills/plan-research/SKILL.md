@@ -1,17 +1,5 @@
 ---
-description: Research codebase and web for requirements without creating a plan
-allowed-tools:
-  - Read
-  - Bash
-  - Glob
-  - Grep
-  - Task
-  - TaskCreate
-  - TaskUpdate
-  - WebSearch
-  - WebFetch
-  - AskUserQuestion
-argument-hint: "<requirements> [--interactive] [--save-to <file>]"
+description: "Research the codebase and web for requirements without producing a plan document. Use when the user asks to research, investigate, scope, or gather context on a topic. Keywords: research, investigate, scope, codebase research, web research, requirements gathering."
 ---
 
 # /xonovex-workflow:plan-research – Research Codebase and Web

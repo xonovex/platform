@@ -1,16 +1,5 @@
 ---
-description: >-
-  Create a high-level TDD plan with research for user review before detailed
-  step generation
-allowed-tools:
-  - Write
-  - Read
-  - Glob
-  - Grep
-  - TaskCreate
-  - TaskUpdate
-  - AskUserQuestion
-argument-hint: "[spec-file-or-requirements] [--interactive] [--depends-on <plan>] [--dry-run]"
+description: "Create a high-level test-driven plan with research for user review before detailed step generation. Use when the user asks to plan with TDD, design test-first, or scope a feature test-first. Keywords: TDD, test-driven, plan, test-first, planning, plan document."
 ---
 
 # /xonovex-workflow:plan-tdd-create – Create TDD Plan with Research

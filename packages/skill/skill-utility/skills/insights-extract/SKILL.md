@@ -1,11 +1,5 @@
 ---
-description: Analyze the session for development mistakes and lessons learned
-allowed-tools:
-  - Read
-  - Write
-  - Glob
-  - Grep
-argument-hint: "[category] [--out-dir <dir>]"
+description: "Analyze the current session for development mistakes, surprises, and lessons learned. Use when the user asks to extract insights, capture lessons, review what went wrong, or run a post-session reflection. Keywords: insights, retrospective, lessons learned, mistakes, post-mortem, reflection, session review."
 ---
 
 # /xonovex-utility:insights-extract – Extract Development Lessons

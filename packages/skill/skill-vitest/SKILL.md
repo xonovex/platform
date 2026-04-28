@@ -1,6 +1,6 @@
 ---
 name: vitest-guidelines
-description: Trigger on `.test.ts`, `.spec.ts` files, test blocks. Use when writing Vitest 3+ tests with TypeScript. Apply for type safety in tests, HTTP testing, mocking patterns, test organization. Keywords: Vitest, test, spec, HTTP assertions, mock patterns, type safety, CORS preflight, timestamps, response casting.
+description: "Vitest 3+ testing guidelines for TypeScript. Apply when editing `.test.ts` or `.spec.ts` files. Use for type safety in tests, HTTP testing, mocking patterns, test organization. Keywords: Vitest, test, spec, HTTP assertions, mock patterns, type safety, CORS preflight, timestamps, response casting."
 ---
 
 # Vitest Testing Guidelines

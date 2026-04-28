@@ -1,6 +1,6 @@
 ---
 name: presentation-guidelines
-description: Trigger on presentation/slides creation tasks. Use when creating presentations from codebase analysis. Apply for scaffolding motion presentation packages. Keywords: presentation, slides, codebase analysis, GraphViz diagrams, Motion, React components, visual flow, narrative structure.
+description: "Presentation and slide-deck guidelines built from codebase analysis. Apply when creating presentations, slide decks, or visual walkthroughs of code. Use for scaffolding Motion-based slide packages, GraphViz diagrams, narrative structure. Keywords: presentation, slides, deck, codebase walkthrough, GraphViz diagrams, Motion, React components, visual flow, narrative structure."
 ---
 
 # Presentation Guidelines

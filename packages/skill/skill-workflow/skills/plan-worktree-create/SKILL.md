@@ -1,11 +1,5 @@
 ---
-description: Create a new git worktree for a feature branch
-model: haiku
-allowed-tools:
-  - Bash
-  - Glob
-  - Read
-argument-hint: "[feature-name] [--from <branch>]"
+description: "Create a new git worktree for a feature branch. Use when the user asks to create a worktree, start a feature in a worktree, or branch into an isolated workspace. Keywords: git worktree, worktree create, feature branch, isolated workspace."
 ---
 
 # /xonovex-workflow:plan-worktree-create – Create Feature Worktree

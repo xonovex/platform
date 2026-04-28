@@ -1,6 +1,6 @@
 ---
 name: general-fp-guidelines
-description: Trigger on functional programming patterns, immutability, pure functions. Use for FP-style coding principles. Apply when preferring composition over inheritance, module-level functions, explicit context passing. Keywords: functional programming, pure functions, immutability, composition, module functions, explicit context, stateless.
+description: "Functional programming guidelines: pure functions, immutability, composition over inheritance. Apply when writing FP-style code, module-level functions, or explicit context passing. Use for stateless designs, composition, function chaining. Keywords: functional programming, pure functions, immutability, composition, module functions, explicit context, stateless, FP."
 ---
 
 # General Functional Programming Guidelines

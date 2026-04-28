@@ -1,20 +1,5 @@
 ---
-description: >-
-  Create a comprehensive, multi-language travel guide for a specified topic or
-  location
-model: haiku
-allowed-tools:
-  - WebSearch
-  - WebFetch
-  - Write
-  - Read
-  - Bash
-  - Glob
-  - Grep
-  - TodoWrite
-argument-hint: >-
-  [topic] [subject] [--path <path>] [--lang <en,nl>] [--research-only] [--slug
-  <slug>]
+description: "Generate a multi-language travel guide for a city, region, or topic. Use when the user asks to create a travel guide, destination article, or multilingual destination content. Keywords: travel guide, destination, multilingual, port guide, ship guide, location article, tourism content."
 ---
 
 # /xonovex-utility:content-travelguide-add – Comprehensive Travel Guide Generator

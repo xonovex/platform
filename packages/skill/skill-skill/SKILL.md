@@ -1,6 +1,6 @@
 ---
 name: skill-guidelines
-description: Trigger on `.claude/skills/` directory work, skill documentation creation. Use when creating or managing guideline skills. Apply for extracting patterns, assimilating skills, simplifying verbose skills. Keywords: skill creation, progressive disclosure, SKILL.md, details, pattern extraction, skill assimilation, bullet format.
+description: "Guidelines for authoring SKILL.md files with progressive disclosure. Apply when editing files under `.claude/skills/` or creating new skills. Use for pattern extraction, skill assimilation, simplification, bullet format. Keywords: skill creation, SKILL.md, progressive disclosure, reference files, pattern extraction, skill assimilation, bullet format, guideline skill."
 ---
 
 # Skill Guidelines Management

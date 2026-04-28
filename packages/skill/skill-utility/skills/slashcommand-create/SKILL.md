@@ -1,12 +1,5 @@
 ---
-description: Create a new slash command from a completed task or goal
-allowed-tools:
-  - Read
-  - Write
-  - Glob
-  - TodoWrite
-  - AskUserQuestion
-argument-hint: "[description] [--name <name>] [--interactive]"
+description: "Create a reusable slash command from a completed task, goal, or workflow described in chat. Use when the user asks to make a slash command, save a workflow as a command, or capture this task as reusable. Keywords: slash command, /command, command creation, save workflow, reusable task."
 ---
 
 # /xonovex-utility:slashcommand-create – Create Slash Command from Task

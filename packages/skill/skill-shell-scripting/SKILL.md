@@ -1,6 +1,6 @@
 ---
 name: shell-scripting-guidelines
-description: Trigger on `.sh` files and shell scripts. Use when writing POSIX shell scripts for automation. Apply for strict mode, quoting, error handling, idempotent operations. Keywords: shell, bash, POSIX, shellcheck, shfmt, strict mode, quoting, parameter expansion, exit codes, idempotency.
+description: "POSIX shell scripting guidelines for automation. Apply when editing `.sh` files or shell scripts. Use for strict mode, quoting, error handling, idempotent operations. Keywords: shell, bash, POSIX, shellcheck, shfmt, strict mode, quoting, parameter expansion, exit codes, idempotency."
 ---
 
 # Shell Scripting Coding Guidelines
