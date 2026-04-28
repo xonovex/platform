@@ -20,5 +20,5 @@ Monorepo for Xonovex tools and configuration packages.
 - Strict types, clear naming, explicit error handling
 - typecheck, lint, build, test must pass; fix at root cause
 - Remove unused/deprecated code immediately; no @deprecated markers
-- Follow [Functional Programming](packages/skill/skill-general-fp/SKILL.md) guidelines
+- Follow [Functional Programming](packages/skill/skill-general-fp/general-fp-guide/SKILL.md) guidelines
 - Conventional commits

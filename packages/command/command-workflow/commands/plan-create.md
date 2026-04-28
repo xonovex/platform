@@ -59,7 +59,7 @@ This command assumes research context is already in the conversation. It does NO
 
 **Plan Frontmatter**: `type: plan`, `has_subplans: true`, `status: pending-approval`, `dependencies.plans: []`, `proposed_subplans: []`, `skills_to_consult: [skill-names]`, `research_sources: {documentation: [], versions: {}}`
 
-**Skills to Consult**: Plan MUST include `skills_to_consult` array listing applicable coding guidelines based on languages/frameworks (e.g., `typescript-guidelines`, `react-guidelines`, `testing-guidelines`). This ensures implementers know which project conventions to follow.
+**Skills to Consult**: Plan MUST include `skills_to_consult` array listing applicable coding guidelines based on languages/frameworks (e.g., `typescript-guide`, `react-guide`, `testing-guide`). This ensures implementers know which project conventions to follow.
 
 **Plan Sections**: Overview (2-3 sentences), Goals (bullet list), Current State (stack/integration), Research Findings (recommended library with version/rationale/pros-cons/docs, alternatives), Proposed Approach (numbered list of components/files), Risk Assessment, Proposed Child Plans (with execution groups), Success Criteria, Estimated Effort
 

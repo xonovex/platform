@@ -79,9 +79,9 @@ claude plugin install xonovex-workflow@xonovex-marketplace
 claude plugin install xonovex-utility@xonovex-marketplace
 
 # Install skills (each skill is a separate plugin)
-claude plugin install xonovex-typescript@xonovex-marketplace
-claude plugin install xonovex-react@xonovex-marketplace
-claude plugin install xonovex-general-fp@xonovex-marketplace
+claude plugin install xonovex-skill-typescript@xonovex-marketplace
+claude plugin install xonovex-skill-react@xonovex-marketplace
+claude plugin install xonovex-skill-general-fp@xonovex-marketplace
 ```
 
 Skills are applied automatically when relevant to the task.
@@ -117,10 +117,10 @@ Utility commands for project instructions, insights, and skill management:
 /xonovex-utility:insights-extract                 Analyze session for mistakes and lessons learned
 /xonovex-utility:insights-instructions-integrate  Convert insights into AGENTS.md bullet points
 /xonovex-utility:insights-skills-integrate        Convert insights into a skill
-/xonovex-utility:skill-guidelines-create          Create a skill from a document or URL
-/xonovex-utility:skill-guidelines-extract         Extract patterns from codebase into a skill
-/xonovex-utility:skill-guidelines-simplify        Make skills project-independent and condense
-/xonovex-utility:skill-guidelines-assimilate      Augment a skill with elements from another skill
+/xonovex-utility:skill-guide-create          Create a skill from a document or URL
+/xonovex-utility:skill-guide-extract         Extract patterns from codebase into a skill
+/xonovex-utility:skill-guide-simplify        Make skills project-independent and condense
+/xonovex-utility:skill-guide-assimilate      Augment a skill with elements from another skill
 /xonovex-utility:slashcommand-create              Create a slash command from a completed task
 /xonovex-utility:slashcommand-simplify            Reduce verbosity in slash command files
 /xonovex-utility:slashcommand-assimilate          Augment a slash command with elements from another

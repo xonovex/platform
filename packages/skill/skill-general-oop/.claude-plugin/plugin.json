@@ -1,7 +1,7 @@
 {
-  "name": "xonovex-general-oop",
-  "version": "0.1.1",
-  "description": "General-oop guidelines",
+  "name": "xonovex-skill-general-oop",
+  "version": "0.2.0",
+  "description": "Xonovex Object-oriented programming skills",
   "author": {"name": "Xonovex"},
-  "skills": ["./"]
+  "skills": ["./general-oop-guide"]
 }
