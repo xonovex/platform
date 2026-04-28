@@ -1,18 +1,5 @@
 ---
-description: >-
-  Augment project instructions with elements from another project's instructions
-  while preserving structure and style
-model: sonnet
-allowed-tools:
-  - Read
-  - Edit
-  - Write
-  - Glob
-  - TodoWrite
-  - AskUserQuestion
-argument-hint: >-
-  [target-instructions] [source-instructions] [--aspects <aspects>]
-  [--percentage <percent>] [--interactive] [--dry-run]
+description: "Merge useful patterns from one project's AGENTS.md/CLAUDE.md into another's while preserving the target's structure. Use when the user asks to assimilate, port, or borrow instructions across projects. Keywords: AGENTS.md, CLAUDE.md, assimilate, merge instructions, project porting, instruction reuse."
 ---
 
 # /xonovex-utility:instructions-assimilate – Augment Project Instructions

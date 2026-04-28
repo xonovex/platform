@@ -1,6 +1,6 @@
 ---
 name: c99-game-opinionated-guidelines
-description: Trigger on `.c/.h` files in game/engine directories. Opinionated game engine patterns: caller-owns-memory, inverse mass, SoA optimization, builder pattern. Keywords: vectors, matrices, quaternions, physics, meshes, spatial structures, tagged unions, inverse mass.
+description: "Opinionated C99 game-engine guidelines: caller-owns-memory, inverse mass, SoA layouts, builder patterns. Apply when editing `.c`/`.h` files in game or engine directories. Use for vectors, matrices, quaternions, physics, meshes, spatial structures. Keywords: game engine, vectors, matrices, quaternions, physics, meshes, spatial structures, tagged unions, inverse mass, SoA."
 ---
 
 # C99 Game Engine Opinionated Guidelines

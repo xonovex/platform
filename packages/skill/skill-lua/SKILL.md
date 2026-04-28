@@ -1,6 +1,6 @@
 ---
 name: lua-guidelines
-description: Trigger on `.lua` files. Use when writing Lua 5.4+ code. Apply for modules, scripting, table patterns. Keywords: Lua, module pattern, local variables, metatables, coroutines, error handling.
+description: "Lua 5.4+ coding guidelines for modules and scripting. Apply when editing `.lua` files. Use for module patterns, local scoping, metatables, coroutines. Keywords: Lua, module pattern, local variables, metatables, coroutines, error handling."
 ---
 
 # Lua Coding Guidelines

@@ -1,6 +1,6 @@
 ---
 name: c99-guidelines
-description: Trigger on `.c/.h` files. Use when writing C99 code. Apply for memory management, data structures, low-level operations. Keywords: C99, malloc/free, const-correctness, designated initializers, inline functions, error handling.
+description: "C99 coding guidelines for general systems and library code. Apply when editing `.c`/`.h` files. Use for memory management, data structures, low-level operations. Keywords: C99, malloc/free, const-correctness, designated initializers, inline functions, error handling."
 ---
 
 # C99 Coding Guidelines

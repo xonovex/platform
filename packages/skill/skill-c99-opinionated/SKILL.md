@@ -1,6 +1,6 @@
 ---
 name: c99-opinionated-guidelines
-description: Trigger on `.c/.h` files for systems/game/embedded development. Opinionated patterns: caller-owns-memory, data-oriented design (SoA), SIMD variants, strict file naming. Keywords: C99, alignment, SIMD, AoS/SoA, caller-owns-memory, data-oriented design.
+description: "Opinionated C99 systems/embedded guidelines: caller-owns-memory, data-oriented design, SIMD variants, strict file naming. Apply when editing `.c`/`.h` files for systems, game, or embedded code. Use for memory ownership, SoA layouts, SIMD. Keywords: C99, alignment, SIMD, AoS/SoA, caller-owns-memory, data-oriented design, embedded."
 ---
 
 # C99 Opinionated Guidelines (Systems/Game/Embedded)

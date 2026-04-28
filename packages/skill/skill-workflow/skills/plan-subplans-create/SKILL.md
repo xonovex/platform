@@ -1,16 +1,5 @@
 ---
-description: >-
-  Generate detailed subplans from an approved parent plan with parallel
-  execution detection
-model: sonnet
-allowed-tools:
-  - Write
-  - Read
-  - Glob
-  - Grep
-  - TaskCreate
-  - TaskUpdate
-argument-hint: "[parent-plan-file] [--by-phase] [--dry-run]"
+description: "Generate detailed subplans from an approved parent plan, flagging steps that can run in parallel. Use when the user asks to break down, expand, or generate subplans from a plan. Keywords: plan, subplans, breakdown, parallel execution, expand plan, detailed steps."
 ---
 
 # /xonovex-workflow:plan-subplans-create – Generate Detailed Subplans from Parent Plan

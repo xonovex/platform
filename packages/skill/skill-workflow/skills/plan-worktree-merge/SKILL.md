@@ -1,9 +1,5 @@
 ---
-description: Merge feature worktree back to source worktree
-model: haiku
-allowed-tools:
-  - Bash
-argument-hint: "[--squash] [--remove-worktree] [--delete-remote] [--dry-run]"
+description: "Merge a feature worktree back into the source worktree or branch. Use when the user asks to merge a worktree, integrate worktree changes, or land a feature back home. Keywords: git worktree, worktree merge, feature integration, land changes."
 ---
 
 # /xonovex-workflow:plan-worktree-merge – Merge Feature Worktree Back to Source

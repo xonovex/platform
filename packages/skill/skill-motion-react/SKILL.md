@@ -1,6 +1,6 @@
 ---
 name: motion-guidelines
-description: Trigger on Motion animations, `whileHover`, `whileInView`, scroll effects, spring physics, gesture animations. Use when creating React animations with Motion. Apply for entrance animations, hover effects, scroll reveals, layout transitions, drag interactions. Keywords: Motion, motion/react, animation, React, spring physics, whileHover, whileTap, useScroll, layoutId, AnimatePresence.
+description: "Motion (formerly Framer Motion) animation guidelines for React. Apply when editing files with `motion/react` imports, `whileHover`, `whileInView`, scroll, or spring effects. Use for entrance animations, hover effects, scroll reveals, layout transitions, drag interactions. Keywords: Motion, motion/react, Framer Motion, animation, React, spring physics, whileHover, whileTap, useScroll, layoutId, AnimatePresence."
 ---
 
 # Motion Animation Guidelines

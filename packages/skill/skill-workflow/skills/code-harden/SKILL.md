@@ -1,16 +1,5 @@
 ---
-description: "Harden code by improving type safety, validation, logging, and error handling"
-model: sonnet
-allowed-tools:
-  - Read
-  - Grep
-  - Glob
-  - Bash
-  - Task
-  - TaskCreate
-  - TaskUpdate
-  - AskUserQuestion
-argument-hint: "[path] [--aspects <type-safety,logging,validation>] [--auto-fix] [--dry-run]"
+description: "Harden code by improving type safety, runtime validation, logging, and error handling. Use when the user asks to harden, productionize, add validation, tighten types, or improve error handling. Keywords: harden, productionize, type safety, Zod validation, error handling, logging, defensive coding."
 ---
 
 # /xonovex-workflow:code-harden – Research Code Hardening Opportunities

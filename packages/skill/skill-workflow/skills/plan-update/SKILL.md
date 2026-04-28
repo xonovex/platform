@@ -1,13 +1,5 @@
 ---
-description: Update a plan document with the latest implementation status and test results
-allowed-tools:
-  - Read
-  - Edit
-  - Bash
-  - Glob
-  - TaskUpdate
-  - TaskList
-argument-hint: "[document-path] [--dry-run]"
+description: "Update a plan document with the latest implementation status, test results, and completed steps. Use when the user asks to update, sync, mark progress on, or refresh a plan. Keywords: plan, update, sync, progress, status, plan document, mark complete."
 ---
 
 # /xonovex-workflow:plan-update – Update Plan Progress

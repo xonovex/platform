@@ -1,18 +1,5 @@
 ---
-description: >-
-  Augment an existing slash command with elements from another slash command
-  while preserving structure and style
-model: sonnet
-allowed-tools:
-  - Read
-  - Edit
-  - Write
-  - Glob
-  - TodoWrite
-  - AskUserQuestion
-argument-hint: >-
-  [target-command] [source-command] [--aspects <aspects>] [--percentage
-  <percent>] [--interactive] [--dry-run]
+description: "Merge useful patterns from one slash command file into another while preserving the target's structure. Use when the user asks to assimilate, port, or borrow patterns between slash command files. Keywords: slash command, .md command, assimilate, merge commands, command porting."
 ---
 
 # /xonovex-utility:slashcommand-assimilate – Augment Slash Command

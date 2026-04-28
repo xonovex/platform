@@ -1,12 +1,5 @@
 ---
-description: Document and abandon a feature with reason and learnings
-model: haiku
-allowed-tools:
-  - Bash
-  - Read
-  - Edit
-  - Write
-argument-hint: "[reason] [--remove-worktree] [--no-plan] [--commit] [--dry-run]"
+description: "Document and abandon a feature worktree with reason and lessons learned. Use when the user asks to abandon, drop, give up on, or shelve a feature/branch/worktree. Keywords: worktree, abandon, drop, shelve, feature abandonment, lessons learned."
 ---
 
 # /xonovex-workflow:plan-worktree-abandon – Abandon Feature with Documentation

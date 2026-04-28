@@ -1,6 +1,6 @@
 ---
 name: kubernetes-guidelines
-description: Trigger on `.yaml/.yml` files in clusters/ or k8s directories. Use when writing Kubernetes manifests for GitOps deployments. Apply for Deployments, Services, security, multi-environment config. Keywords: Kubernetes, Deployment, Service, ConfigMap, Secret, Kustomize, Flux, RLS, SOPS, labels, namespaces.
+description: "Kubernetes manifest guidelines for GitOps deployments. Apply when editing `.yaml`/`.yml` files in `clusters/` or k8s directories. Use for Deployments, Services, security, multi-environment configs. Keywords: Kubernetes, Deployment, Service, ConfigMap, Secret, Kustomize, Flux, SOPS, labels, namespaces, GitOps."
 ---
 
 # Kubernetes Coding Guidelines

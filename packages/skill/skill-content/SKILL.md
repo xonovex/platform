@@ -1,6 +1,6 @@
 ---
 name: content-guidelines
-description: Trigger on content creation tasks with bilingual requirements. Use when creating bilingual content with structured formatting. Apply for news curation, port/ship guides, travel guides. Keywords: bilingual, CEFR, B1-B2 proficiency, content frontmatter, news articles, travel guides, humanize, web research.
+description: "Bilingual content creation guidelines with structured frontmatter and CEFR readability targets. Apply when creating multilingual articles, news, port/ship guides, or travel guides. Use for frontmatter shape, language register, web research. Keywords: bilingual, multilingual, CEFR, B1-B2, content frontmatter, news articles, travel guides, port guides, humanize, web research."
 ---
 
 # Content Creation Guidelines

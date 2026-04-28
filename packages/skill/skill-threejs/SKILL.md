@@ -1,6 +1,6 @@
 ---
 name: threejs-guidelines
-description: Trigger on `.js/.ts` files with Three.js imports, `three` package usage, or 3D scene code. Use when building vanilla Three.js applications. Apply for scene setup, meshes, materials, lighting, loaders, animation, interaction, shaders, post-processing, performance optimization. Keywords: Three.js, WebGL, WebGPU, Scene, Renderer, Mesh, BufferGeometry, MeshStandardMaterial, GLTFLoader, Raycaster, ShaderMaterial, EffectComposer, InstancedMesh.
+description: "Three.js vanilla 3D guidelines for WebGL/WebGPU. Apply when editing `.js`/`.ts` files with Three.js imports or `three` package usage. Use for scene setup, meshes, materials, lighting, loaders, animation, interaction, shaders, post-processing, performance optimization. Keywords: Three.js, WebGL, WebGPU, Scene, Renderer, Mesh, BufferGeometry, MeshStandardMaterial, GLTFLoader, Raycaster, ShaderMaterial, EffectComposer, InstancedMesh."
 ---
 
 # Three.js Coding Guidelines

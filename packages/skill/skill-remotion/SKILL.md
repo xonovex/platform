@@ -1,6 +1,6 @@
 ---
 name: remotion-guidelines
-description: Trigger on Remotion video projects, `remotion.config.ts`, video composition files. Use when creating programmatic videos with React. Apply for animations, sequencing, media handling, transitions, captions. Keywords: Remotion, video, React, animation, composition, useCurrentFrame, interpolate, spring, Sequence.
+description: "Remotion programmatic-video guidelines for React. Apply when editing Remotion projects, `remotion.config.ts`, or video composition files. Use for animations, sequencing, media handling, transitions, captions. Keywords: Remotion, video, React, animation, composition, useCurrentFrame, interpolate, spring, Sequence."
 ---
 
 # Remotion Coding Guidelines

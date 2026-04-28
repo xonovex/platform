@@ -1,6 +1,6 @@
 ---
 name: typescript-guidelines
-description: Trigger on `.ts` files with Node.js/ESM patterns. Use when writing TypeScript code for Node.js ESM projects. Apply for async functions, module imports, type safety, linting. Keywords: TypeScript, ESM, strict mode, async/await, Zod, type inference, avoid barrel exports, process.env, template literals, numeric separators.
+description: "TypeScript coding guidelines for Node.js ESM projects. Apply when editing `.ts` files with Node.js or ESM patterns. Use for async functions, module imports, type safety, linting. Keywords: TypeScript, ESM, strict mode, async/await, Zod, type inference, avoid barrel exports, process.env, template literals, numeric separators."
 ---
 
 # TypeScript Coding Guidelines

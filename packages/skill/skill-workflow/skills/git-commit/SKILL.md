@@ -1,12 +1,5 @@
 ---
-description: Commit and push changes in the current or a specified directory
-model: haiku
-allowed-tools:
-  - Bash
-  - Read
-argument-hint: >-
-  [message] [--type <feat|fix|docs|chore|refactor|test|ci>] [--path <path>]
-  [--remote <remote>] [--branch <branch>] [--push] [--dry-run] [--interactive]
+description: "Commit and push changes with conventional-commit messages in the current or a specified directory. Use when the user asks to commit, push, save changes, or wrap up a piece of work. Keywords: commit, push, conventional commits, git commit, save changes, ship work."
 ---
 
 # /xonovex-workflow:git-commit – Auto-Commit with Smart Messages
