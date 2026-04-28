@@ -15,23 +15,14 @@ Merges a feature branch from a feature worktree back to its source worktree.
 - Support both regular merge and squash merge
 - Optionally remove feature worktree after merge
 
-## Arguments
-
-`/plan-worktree-merge [--squash] [--remove-worktree] [--delete-remote] [--dry-run]`
-
-- `--squash`: Squash all feature commits into a single commit
-- `--remove-worktree`: Remove feature worktree directory after merge (default: keep)
-- `--delete-remote`: Also delete remote feature branch (requires remote exists)
-- `--dry-run` (optional): Preview changes without modifying files
-
 ## Core Workflow
 
 1. **Validate Feature Worktree**: Verify we're in a `<worktree>-feature-*` directory
 2. **Detect Worktree Names**: Extract base worktree name and feature name from directory
 3. **Retrieve Source Branch**: Get from `git config branch.<feature-branch>.mergeBackTo`
 4. **Navigate to Source**: Find and cd to source worktree directory
-5. **Merge Feature**: Regular (`git merge`) or squash (`git merge --squash` + commit), or preview if --dry-run
-6. **Clean Up**: Optionally remove feature worktree if `--remove-worktree` (skipped if --dry-run)
+5. **Merge Feature**: Regular (`git merge`) or squash (`git merge --squash` + commit), or preview if requested
+6. **Clean Up**: Optionally remove feature worktree if user requested removal (skipped if preview was requested)
 
 ## Worktree Detection
 
@@ -61,12 +52,12 @@ The command automatically detects:
 12. **Merge feature**:
     - Regular: `git merge <feature-branch>`
     - Squash: `git merge --squash <feature-branch>` then `git commit -m "<message>"`
-13. **Remove worktree**: `git worktree remove <feature-worktree-path>` (only if `--remove-worktree`)
-14. **Delete remote branch**: `git push origin --delete <feature-branch>` (if `--delete-remote`)
+13. **Remove worktree**: `git worktree remove <feature-worktree-path>` (only if user requested removal)
+14. **Delete remote branch**: `git push origin --delete <feature-branch>` (if user requested remote deletion)
 
 ## Squash Commit Message
 
-When using `--squash`, generate commit message in format:
+When squashing, generate commit message in format:
 
 ```
 <type>: <feature-name-as-description>
@@ -89,30 +80,14 @@ Source branch: master (from git config)
 
 Merge type: Regular merge
 Merge status: Success (no conflicts)
-Worktree cleanup: Kept (use --remove-worktree to clean up)
+Worktree cleanup: Kept (ask for removal to clean up)
 
 Next Steps:
 1. Verify merge: Check that changes are properly merged in source worktree
 2. Clean up worktree: /plan-worktree-cleanup - Remove merged feature worktree (if not already removed)
 3. Push changes: Commit and push from source worktree if needed
-4. Delete remote: Use --delete-remote flag if you want to clean up remote branch
+4. Delete remote: Ask for remote deletion if you want to clean up the remote branch
 5. If conflicts: Resolve conflicts manually, complete merge, then re-run validation
-```
-
-## Examples
-
-```bash
-# Merge feature branch back to source
-/xonovex-workflow:plan-worktree-merge
-
-# Squash and merge
-/xonovex-workflow:plan-worktree-merge --squash
-
-# Merge and clean up worktree
-/xonovex-workflow:plan-worktree-merge --remove-worktree --delete-remote
-
-# Preview merge without making changes
-/xonovex-workflow:plan-worktree-merge --dry-run
 ```
 
 ## Error Handling

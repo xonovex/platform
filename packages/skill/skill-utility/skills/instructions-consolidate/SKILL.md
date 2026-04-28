@@ -6,11 +6,6 @@ description: "Consolidate scattered AGENTS.md/CLAUDE.md files, remove redundancy
 
 Reduce AGENTS.md file count by deleting those with no unique content and standardizing the rest to a consistent bullet-list format.
 
-## Arguments
-
-- `--dry-run` (optional): Preview without modifying
-- `--path <directory>` (optional): Root directory to scan (defaults to workspace root)
-
 ## Core Workflow
 
 1. Use TodoWrite to track steps
@@ -45,14 +40,6 @@ Code summaries include:
 - Redundant = removing title, description, guideline links, and code summaries leaves nothing
 - When unsure, keep the file
 
-## Examples
-
-```bash
-/xonovex-utility:instructions-consolidate
-/xonovex-utility:instructions-consolidate --dry-run
-/xonovex-utility:instructions-consolidate --path packages/
-```
-
 ## Error Handling
 
 - No AGENTS.md found: report and exit
@@ -61,4 +48,4 @@ Code summaries include:
 
 ## Safety
 
-Use `--dry-run` to preview, never delete root AGENTS.md, never modify CLAUDE.md, report deleted and standardized files separately.
+Preview before writing, never delete root AGENTS.md, never modify CLAUDE.md, report deleted and standardized files separately.

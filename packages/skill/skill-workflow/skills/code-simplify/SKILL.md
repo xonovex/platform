@@ -14,31 +14,6 @@ Analyzes code complexity to identify consolidation, dead code removal, and simpl
 - Simplify complex interfaces
 - Centralize scattered configuration
 
-## Usage
-
-```bash
-/xonovex-workflow:code-simplify packages/my-package/
-/xonovex-workflow:code-simplify src/ --aspects duplicates,dead-code
-/xonovex-workflow:code-simplify . --dry-run
-```
-
-## Arguments
-
-- `path` (required): Directory to analyze
-- `--aspects` (optional): Aspects to check (comma-separated):
-  - `duplicates` - Identical/near-identical functions
-  - `utilities` - Logic for shared utilities
-  - `types` - Redundant type definitions
-  - `constants` - Scattered magic values
-  - `patterns` - Repeated code patterns
-  - `dead-code` - Unused functions, unreachable branches
-  - `dependencies` - Unused imports, redundant packages
-  - `abstractions` - Over-engineered patterns
-  - `interfaces` - Complex APIs (>5 params, nested config)
-  - `config` - Scattered configuration
-  - `all` (default) - All aspects
-- `--dry-run` (optional): Report without changes
-
 ## Core Workflow
 
 **Use Task agents with subagent_type=Explore and model=haiku for codebase analysis. Do NOT use EnterPlanMode.**
@@ -113,13 +88,6 @@ Impact: ~450 lines removed, 3 dependencies pruned, 25% complexity reduction
 - **False positives**: Check dynamic imports, reflection, external entry points
 - **Breaking changes**: Ensure no external consumers
 - **Circular deps**: Restructure or create intermediate module
-
-## Examples
-
-```bash
-/xonovex-workflow:code-simplify packages/api/ --aspects dead-code --dry-run
-/xonovex-workflow:code-simplify services/ --aspects abstractions,interfaces
-```
 
 ## Next Steps
 

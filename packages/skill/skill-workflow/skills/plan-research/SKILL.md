@@ -11,19 +11,13 @@ Research codebase and web for requirements, presenting findings for review. Does
 - Use Task/Explore agents to understand codebase (do NOT use EnterPlanMode)
 - Use WebSearch/WebFetch for latest library versions and documentation
 - Present research findings for review
-- NO plan file created (unless `--save-to` specified)
-
-## Arguments
-
-- `requirements` (required): Description of what to research
-- `--interactive` (optional): Ask clarifying questions
-- `--save-to <file>` (optional): Save research to file
+- NO plan file created (unless the user asks to save to a file)
 
 ## Core Workflow
 
 **Use Task agents with subagent_type=Explore and model=haiku for codebase analysis. Do NOT use EnterPlanMode.**
 
-1. **Gather requirements**: Parse input; ask clarifications if `--interactive`
+1. **Gather requirements**: Parse input; ask clarifications if interactive mode was requested
 
 2. **Codebase exploration**: Use Task with subagent_type=Explore and model=haiku (up to 3 parallel):
    - Architecture, patterns, integration points
@@ -69,30 +63,6 @@ Skills: typescript-guidelines, hono-guidelines
 
 Considerations: Rate limit keys per user/IP, env config, metrics
 ```
-
-## Examples
-
-```bash
-/xonovex-workflow:plan-research "Add rate limiting to API"
-/xonovex-workflow:plan-research "Implement WebSocket support" --interactive
-/xonovex-workflow:plan-research "Add analytics tracking" --save-to research/analytics.md
-```
-
-## Integration
-
-```bash
-/xonovex-workflow:plan-research "Add rate limiting"       # Explore options
-/xonovex-workflow:plan-create "Add rate limiting"         # Create plan
-/xonovex-workflow:plan-subplans-create plans/rate-limit.md  # Generate subplans
-```
-
-**When to use**: Exploring options, researching unfamiliar tech, saving research without plan
-
-**vs. other commands**:
-
-- `/xonovex-workflow:plan-create`: Research + create plan file
-- `/xonovex-workflow:plan-research`: Research only (or save separately)
-- `/xonovex-workflow:plan-followup`: Create follow-up sibling plan
 
 ## Error Handling
 

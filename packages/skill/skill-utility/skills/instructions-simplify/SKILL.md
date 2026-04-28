@@ -6,12 +6,6 @@ description: "Reduce AGENTS.md/CLAUDE.md verbosity while preserving structure an
 
 Reduce AGENTS.md/CLAUDE.md verbosity by 40-50% while preserving structure, workflows, and project-specific technology names.
 
-## Arguments
-
-- `instruction-file` (required): Path to AGENTS.md or CLAUDE.md file
-- `--dry-run` (optional): Preview without modifying
-- `--target-reduction <percent>` (optional): Override default 45% (range: 30-60)
-
 ## Core Workflow
 
 1. Use TodoWrite to track steps
@@ -43,13 +37,6 @@ Reduce AGENTS.md/CLAUDE.md verbosity by 40-50% while preserving structure, workf
 - Use → for workflow chains
 - Keep actual technology names
 
-## Examples
-
-```bash
-/xonovex-utility:instructions-simplify infrastructure/AGENTS.md
-/xonovex-utility:instructions-simplify services/AGENTS.md --dry-run
-```
-
 ## Error Handling
 
 - File not found: verify path
@@ -59,4 +46,4 @@ Reduce AGENTS.md/CLAUDE.md verbosity by 40-50% while preserving structure, workf
 
 ## Safety
 
-Preserve headings/patterns/commands, use --dry-run, never remove integration points or technology references. Only modify CLAUDE.md when explicitly specified.
+Preserve headings/patterns/commands, preview before writing, never remove integration points or technology references. Only modify CLAUDE.md when explicitly specified.

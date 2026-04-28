@@ -12,26 +12,6 @@ Analyzes code for hardening opportunities (type safety, validation, logging, err
 - Apply fixes aligned with project standards
 - Validate changes with typecheck, lint, and tests
 
-## Usage
-
-```bash
-# Analyze all aspects
-/xonovex-workflow:code-harden packages/myapp/
-
-# Focus on specific aspects
-/xonovex-workflow:code-harden src/ --aspects type-safety,logging
-
-# Preview analysis
-/xonovex-workflow:code-harden . --dry-run
-```
-
-## Arguments
-
-- `path` (required): Directory to analyze
-- `--aspects` (optional): Comma-separated aspects (type-safety, logging, validation, error-handling, testing, or custom)
-- `--auto-fix` (optional): Automatically apply safe fixes
-- `--dry-run` (optional): Report issues without making changes
-
 ## Core Workflow
 
 **Use Task agents with subagent_type=Explore and model=haiku for codebase analysis. Do NOT use EnterPlanMode.**
