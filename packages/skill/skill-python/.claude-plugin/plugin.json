@@ -1,7 +1,7 @@
 {
-  "name": "xonovex-python",
-  "version": "0.1.1",
-  "description": "Python guidelines",
+  "name": "xonovex-skill-python",
+  "version": "0.2.0",
+  "description": "Xonovex Python skills",
   "author": {"name": "Xonovex"},
-  "skills": ["./"]
+  "skills": ["./python-guide"]
 }

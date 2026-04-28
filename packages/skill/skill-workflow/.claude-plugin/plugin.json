@@ -1,6 +1,23 @@
 {
-  "name": "xonovex-workflow-skills",
-  "version": "0.1.1",
+  "name": "xonovex-skill-workflow",
+  "version": "0.2.0",
   "description": "Xonovex workflow skills — planning, code analysis, git",
-  "author": {"name": "Xonovex"}
+  "author": {"name": "Xonovex"},
+  "skills": [
+    "./code-align",
+    "./code-harden",
+    "./code-simplify",
+    "./git-commit",
+    "./plan-continue",
+    "./plan-create",
+    "./plan-refine",
+    "./plan-research",
+    "./plan-subplans-create",
+    "./plan-tdd-create",
+    "./plan-update",
+    "./plan-validate",
+    "./plan-worktree-abandon",
+    "./plan-worktree-create",
+    "./plan-worktree-merge"
+  ]
 }

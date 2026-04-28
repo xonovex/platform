@@ -1,7 +1,7 @@
 {
-  "name": "xonovex-instruction",
-  "version": "0.1.1",
-  "description": "Instruction guidelines",
+  "name": "xonovex-skill-instruction",
+  "version": "0.2.0",
+  "description": "Xonovex Instruction skills",
   "author": {"name": "Xonovex"},
-  "skills": ["./"]
+  "skills": ["./instruction-guide"]
 }

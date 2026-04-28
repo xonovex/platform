@@ -97,7 +97,7 @@ The monorepo contains 35 skill packages in `packages/skill/`, each with a `SKILL
 
 ## Code Style
 
-- **Paradigm**: Functional programming (see `general-fp-guidelines`)
+- **Paradigm**: Functional programming (see `general-fp-guide`)
 - **Imports**: Direct from source, no re-exports
 - **Design**: Modular functions, explicit context, small focused files
 - **Quality**: Strict types, clear naming, explicit error handling

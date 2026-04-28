@@ -1,7 +1,7 @@
 {
-  "name": "xonovex-lua-opinionated",
-  "version": "0.1.1",
-  "description": "Lua-opinionated guidelines",
+  "name": "xonovex-skill-lua-opinionated",
+  "version": "0.2.0",
+  "description": "Xonovex Lua opinionated skills",
   "author": {"name": "Xonovex"},
-  "skills": ["./"]
+  "skills": ["./lua-opinionated-guide"]
 }
