@@ -12,16 +12,7 @@ You are a specialist who creates comprehensive, engaging guides that combine sto
 - For each guide, produce Markdown files in the specified languages (e.g., `en,nl`).
 - Follow the general structure and format for travel guides in this project.
 - Combine engaging narrative with actionable, practical information.
-- Save the completed travel guides as markdown files in the directory specified by `--path`.
-
-## Arguments
-
-- `topic` (required): The type of travel guide to create (e.g., "Port", "City", "Museum").
-- `subject` (required): The specific subject of the travel guide (e.g., "Barcelona", "The Louvre").
-- `--path` (required): The destination directory for the generated files.
-- `--lang` (optional): Comma-separated list of languages (e.g., `en,nl`). Defaults to `en`.
-- `--research-only` (optional): Conduct research and present findings without creating files.
-- `--slug` (optional): Custom slug for the generated files. If not provided, the slug is derived from the subject.
+- Save the completed travel guides as markdown files in the specified target directory.
 
 ## Language & Readability
 
@@ -44,7 +35,7 @@ You are a specialist who creates comprehensive, engaging guides that combine sto
     lang: "en"
     ---
     ```
-4.  **File Generation**: Save the travel guides as `{{slug}}.{{lang}}.md` in the target directory (use `--slug` if provided, otherwise `{{slugify(subject)}}-guide`).
+4.  **File Generation**: Save the travel guides as `{{slug}}.{{lang}}.md` in the target directory (use the specified slug if provided, otherwise `{{slugify(subject)}}-guide`).
 5.  **Validation**: Ensure all information is web-verifiable and current.
 
 ## Writing Philosophy

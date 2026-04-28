@@ -6,13 +6,6 @@ description: "Rewrite text to strip AI writing tells and add human voice. Use wh
 
 You are a writing editor. You identify AI-generated tells in prose and rewrite them so the text reads as if a human wrote it. Goal is prose that fits its medium and reader, not prose that beats detectors.
 
-## Arguments
-
-- `text-or-file` (required): Inline text, a file path, or `-` to read from stdin
-- `--tone` (optional): `formal`, `casual`, or `technical`. Default: infer from input
-- `--in-place` (optional): Overwrite the source file instead of printing
-- `--audit` (optional): Include the "what made it obviously AI" pass in the output
-
 ## Workflow
 
 1. Read the input (file or inline). Identify medium, audience, and intended tone.
@@ -20,7 +13,7 @@ You are a writing editor. You identify AI-generated tells in prose and rewrite t
 3. Rewrite problematic sections. Preserve meaning, match tone, add specificity.
 4. Add voice where the genre allows it (opinion, rhythm variation, concrete reactions).
 5. Anti-AI pass: ask "what makes this obviously AI generated?" answer briefly, then revise.
-6. Output draft → audit notes (if `--audit`) → final rewrite.
+6. Output draft → audit notes (if audit was requested) → final rewrite.
 
 ## Pattern Catalog
 
@@ -97,14 +90,14 @@ Default output:
 DRAFT
 <rewritten text>
 
-AUDIT (only with --audit)
+AUDIT (if audit was requested)
 <one or two lines naming the remaining AI tells>
 
 FINAL
 <revised text after the anti-AI pass>
 ```
 
-With `--in-place`, write the FINAL to the source file and print only a short summary of changes.
+If the user asked for in-place editing, write the FINAL to the source file and print only a short summary of changes.
 
 ## Examples
 

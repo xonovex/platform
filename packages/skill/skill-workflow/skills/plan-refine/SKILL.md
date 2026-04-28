@@ -18,11 +18,6 @@ Process inline annotations the user has added to a plan document. Resolves every
 - Present a summary of changes for the next review round
 - STOP after each pass (user reviews, annotates again, or approves)
 
-## Arguments
-
-- `plan-file` (optional): Path to plan document (auto-detects from git config or most recent plan in `plans/`)
-- `--final` (optional): Treat this as the final pass — after resolving annotations, mark plan as `approved` in frontmatter
-
 ## Annotation Format
 
 Annotations are inline markers the user adds directly in the plan markdown. Recognize all of these forms:
@@ -39,7 +34,7 @@ Annotations are inline markers the user adds directly in the plan markdown. Reco
 
 **IMPORTANT: Do NOT use EnterPlanMode. Do NOT implement anything. This command only refines the plan document.**
 
-1. **Locate plan**: Read the plan file from argument, git config, or most recent `plans/*.md`
+1. **Locate plan**: Read the plan file from user message, git config, or most recent `plans/*.md`
 2. **Scan for annotations**: Read the full document and collect every annotation with its line location and content
 3. **Report findings**: List all annotations found with line numbers before making changes — if zero found, inform the user and STOP
 4. **Resolve each annotation**: Process annotations top-to-bottom:
@@ -51,7 +46,7 @@ Annotations are inline markers the user adds directly in the plan markdown. Reco
    - **Scope change** (e.g., "move notifications to a follow-up"): Remove the scoped-out items and adjust dependent sections
 5. **Remove annotation markers**: Strip all annotation syntax after resolving (the plan should read cleanly)
 6. **Reconcile dependencies**: If annotations changed subplan structure, update the proposed subplans list and execution groups
-7. **Update frontmatter**: Set `updated` date; if `--final`, set `status: approved`
+7. **Update frontmatter**: Set `updated` date; if this is the final pass, set `status: approved`
 8. **Write updated plan**: Edit the plan file in place
 9. **Present change summary**: Show what was changed, then STOP
 
@@ -81,22 +76,9 @@ Subplan structure: Changed (was 4 subplans, now 3)
 Review the updated plan:
   - Open plans/feature-name.md in your editor
   - Add annotations for any remaining issues
-  - Run /xonovex-workflow:plan-refine again, or
-  - Run /xonovex-workflow:plan-refine --final to approve
-  - Then: /xonovex-workflow:plan-subplans-create plans/feature-name.md
-```
-
-## Examples
-
-```bash
-# Process annotations on auto-detected plan
-/xonovex-workflow:plan-refine
-
-# Process annotations on specific plan
-/xonovex-workflow:plan-refine plans/auth.md
-
-# Final pass — approve after resolving
-/xonovex-workflow:plan-refine plans/auth.md --final
+  - Add annotations for any remaining issues and run plan-refine again, or
+  - Run plan-refine as a final pass to approve
+  - Then run plan-subplans-create to generate subplans
 ```
 
 ## Error Handling

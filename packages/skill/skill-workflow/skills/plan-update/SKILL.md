@@ -8,19 +8,12 @@ Updates a plan document with the latest implementation status, test results, and
 
 ## Goal
 
-1. **Identifies** the target plan document (auto-detect from git config or argument)
+1. **Identifies** the target plan document (auto-detect from git config or user message)
 2. **Updates the plan** with validation results and current progress
 3. **Checks child plan status** (if target has child plans)
 4. **Auto-updates parent** (if target has a parent plan)
 5. **Updates frontmatter** (`status`, `phase`, `updated` date)
 6. **Timestamps** the update for progress tracking
-
-## Arguments
-
-`/plan-update [document-path] [--dry-run]`
-
-- `document-path` (optional): Path to plan document (auto-detects from git config if omitted)
-- `--dry-run` (optional): Preview changes without modifying files
 
 ## Core Workflow
 
@@ -73,19 +66,3 @@ Next Steps:
 - Error if plan format invalid (missing frontmatter)
 - Warning if no changes detected
 - Error if parent plan not found (for child plans)
-
-## Examples
-
-```bash
-# Auto-detect from git config (in feature worktree)
-/xonovex-workflow:plan-update
-
-# Explicit path
-/xonovex-workflow:plan-update plans/auth.md
-
-# Update child plan (auto-updates parent)
-/xonovex-workflow:plan-update plans/auth/02-implementation.md
-
-# Preview changes
-/xonovex-workflow:plan-update plans/auth.md --dry-run
-```

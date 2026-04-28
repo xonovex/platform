@@ -6,22 +6,14 @@ description: "Create or update a guideline skill by extracting patterns from the
 
 Creates or updates a skill by analyzing codebase patterns, AGENTS.md/CLAUDE.md instructions, and source files.
 
-## Arguments
-
-- `skill-name` (required): Name for skill (e.g., `example-guidelines`)
-- `source-path` (required): Path to analyze (e.g., `packages/example`)
-- `--update` (optional): Update existing skill instead of creating new
-- `--interactive` (optional): Ask which patterns to include before writing
-- `--dry-run` (optional): Preview without writing files
-
 ## Core Workflow
 
 1. **Discover Sources**: Find AGENTS.md/CLAUDE.md in source-path; glob for source files by extension
 2. **Analyze Instructions**: Extract patterns, conventions, file naming, architecture from project docs
 3. **Analyze Code**: Sample source files for common patterns, types, naming conventions
 4. **Categorize Patterns**: Group into categories (architecture, types, testing, safety, etc.)
-5. **Present Patterns**: If `--interactive`, ask user which categories to include
-6. **Check Existing**: If skill exists and no `--update`, error; if `--update`, read existing skill
+5. **Present Patterns**: If interactive, ask user which categories to include
+6. **Check Existing**: If skill exists and user didn't ask to update, error; if updating, read existing skill
 7. **Generate Skill**: Create SKILL.md with essentials, examples, progressive disclosure
 8. **Generate Reference Files**: Create reference files for each included category
 9. **Write Files**: Create `.claude/skills/{skill-name}/` structure
@@ -108,19 +100,6 @@ Which pattern categories should I include?
 
 - Source path not found → error with suggestion
 - No AGENTS.md/CLAUDE.md found → warn, continue with source analysis only
-- Skill exists without `--update` → error, suggest `--update`
+- Skill exists without update requested → error, ask user to confirm update
 - No patterns extracted → error, path may not contain relevant code
 - Language not detected → ask user or default to generic
-
-## Examples
-
-```bash
-# Create new skill from source code
-/xonovex-utility:skill-guidelines-extract example-guidelines packages/example --interactive
-
-# Update existing skill with new patterns
-/xonovex-utility:skill-guidelines-extract typescript-guidelines packages/api --update
-
-# Preview without writing
-/xonovex-utility:skill-guidelines-extract python-guidelines services/ml --dry-run
-```

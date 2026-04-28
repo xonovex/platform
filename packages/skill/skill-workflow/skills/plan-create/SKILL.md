@@ -23,18 +23,11 @@ This command assumes research context is already in the conversation. It does NO
 - Present plan for user review/discussion
 - Save plan and STOP (user reviews, then runs /plan-subplans-create)
 
-## Arguments
-
-- `spec-file-or-requirements` (optional): Path to spec or inline requirements (defaults to conversation context)
-- `--interactive` (optional): Ask context-dependent technical questions during research
-- `--depends-on <plan>` (optional): Mark dependency on another plan
-- `--dry-run` (optional): Preview without writing files
-
 ## Core Workflow
 
 **IMPORTANT: Do NOT use EnterPlanMode. Do NOT use Task/Explore agents - assume research is already done.**
 
-1. **Gather requirements**: Read spec file or analyze conversation context; ask clarifications if `--interactive`
+1. **Gather requirements**: Read spec file or analyze conversation context; ask clarifications if interactive mode was requested
 2. **Synthesize context**: Use research findings from conversation context
 3. **Document key decisions**: Technology choices with versions, rationale, alternatives
 4. **Assess risks**: Trade-offs, alternatives considered, open questions
@@ -75,19 +68,6 @@ Next Steps:
 3. Verify proposed child plan structure and execution groups
 4. Generate child plans: /xonovex-workflow:plan-subplans-create plans/feature-name.md
 5. Alternative: Modify plan if different approach needed, then re-run child plan creation
-```
-
-## Examples
-
-```bash
-# Create plan with research
-/xonovex-workflow:plan-create specs/feature.md
-
-# Interactive with questions
-/xonovex-workflow:plan-create --interactive
-
-# With dependency
-/xonovex-workflow:plan-create specs/profile.md --depends-on plans/auth.md
 ```
 
 ## Error Handling

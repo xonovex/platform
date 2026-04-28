@@ -8,12 +8,6 @@ description: "Condense verbose SKILL.md files into bullet-list quick references 
 
 Reduce SKILL.md by 60-80% (default 70%) while preserving quick reference. Extract examples to reference files. Make content project-independent.
 
-## Arguments
-
-- `[skill-file]` (required) - Path to SKILL.md file or skill directory
-- `[--dry-run]` (optional) - Preview without modifying
-- `[--target-reduction <percent>]` (optional) - Override default 70% (range: 50-90)
-
 ## Core Workflow
 
 1. Use TodoWrite to track steps

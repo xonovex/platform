@@ -6,20 +6,13 @@ description: "Sync AGENTS.md files with the actual current directory structure a
 
 Update AGENTS.md files to reflect current directory structure, files, and configuration state. Maintain project-specific technology names.
 
-## Arguments
-
-- `agents-file` (optional): Path to specific AGENTS.md file to update
-- `--all` (optional): Update all AGENTS.md files in repository
-- `--dry-run` (optional): Preview without modifying
-- `--update-workflows` (optional): Refresh commands from package.json/config files
-
 ## Core Workflow
 
 1. Use TodoWrite to track each file
 2. Discover: scan subdirectories, read package.json/config files, identify patterns
 3. Analyze: parse Subdirectories section, extract workflows, preserve Integration Points
 4. Sync: add new directories, remove deleted ones, update patterns
-5. Update workflows (if --update-workflows): sync operations, update delegation chains, keep technology names
+5. Update workflows (if requested): sync operations, update delegation chains, keep technology names
 6. Validate and report: check broken references, show diff
 
 ## Discovery
@@ -52,14 +45,6 @@ Update AGENTS.md files to reflect current directory structure, files, and config
 - Technology preservation: keep actual names (moon, npm, Terraform, Flux)
 - Diff output: show added (+), removed (-), updated (~)
 
-## Examples
-
-```bash
-/xonovex-utility:instructions-sync infrastructure/AGENTS.md
-/xonovex-utility:instructions-sync --all --dry-run
-/xonovex-utility:instructions-sync cluster/AGENTS.md --update-workflows
-```
-
 ## Error Handling
 
 - File not found: verify path
@@ -69,4 +54,4 @@ Update AGENTS.md files to reflect current directory structure, files, and config
 
 ## Safety
 
-Use --dry-run, preserve manual descriptions/Integration Points/section structure, keep technology references. Only sync AGENTS.md files; never modify CLAUDE.md unless explicitly specified.
+Preview before writing, preserve manual descriptions/Integration Points/section structure, keep technology references. Only sync AGENTS.md files; never modify CLAUDE.md unless explicitly specified.

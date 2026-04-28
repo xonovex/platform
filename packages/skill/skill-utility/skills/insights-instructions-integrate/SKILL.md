@@ -6,16 +6,10 @@ description: "Convert extracted insights from a category into AGENTS.md/CLAUDE.m
 
 Convert insights from a category into concise bullet points and integrate them into the appropriate AGENTS.md file.
 
-## Arguments
-
-- `category` (required): Category to convert (e.g., `testing`, `typescript`, `workflow`)
-- `--dry-run` (optional): Preview without modifying
-- `--agents-file <path>` (optional): Target AGENTS.md (default: auto-detect from `applies_to`)
-
 ## Core Workflow
 
 1. Search `insights/` for category files, extract Problem/Solution pairs, group by topic
-2. Locate target AGENTS.md — use `--agents-file` or auto-detect from `applies_to` field
+2. Locate target AGENTS.md — use specified file or auto-detect from `applies_to` field
 3. Convert each insight to a concise bullet point matching AGENTS.md style
 4. Merge into existing file — append to relevant bullet group or create new group
 5. Mark processed insights as `applied: true`
@@ -33,27 +27,19 @@ Convert insights from a category into concise bullet points and integrate them i
 
 ## Auto-Detection
 
-When `--agents-file` is not provided:
+When no target file is provided:
 
 - Use `applies_to` field to match directory names or package names
 - Search for nearest AGENTS.md in the matching directory
 - If ambiguous, ask user via AskUserQuestion
 
-## Examples
-
-```bash
-/xonovex-utility:insights-instructions-integrate testing
-/xonovex-utility:insights-instructions-integrate typescript --dry-run
-/xonovex-utility:insights-instructions-integrate api --agents-file packages/api/AGENTS.md
-```
-
 ## Error Handling
 
 - Missing category: ask user
-- No insights found: suggest `/xonovex-utility:insights-extract [category]`
+- No insights found: suggest running insights-extract for the category
 - No matching AGENTS.md: ask user for target path
 - AGENTS.md not found at path: verify and abort
 
 ## Safety
 
-Use `--dry-run` to preview, preserve existing AGENTS.md content and structure, never remove existing bullets, only append or merge.
+Preview before writing, preserve existing AGENTS.md content and structure, never remove existing bullets, only append or merge.

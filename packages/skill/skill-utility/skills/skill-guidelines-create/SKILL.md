@@ -13,25 +13,6 @@ Generate a guideline skill with progressive disclosure structure from a document
 - Create reference files for complex topics with examples
 - Make content project-independent and reusable
 
-## Usage
-
-```bash
-# From URL
-/xonovex-utility:skill-guidelines-create "https://example.com/react-best-practices" --name react-guidelines
-
-# From local file
-/xonovex-utility:skill-guidelines-create "./docs/coding-standards.md" --name typescript-guidelines
-
-# Preview without writing
-/xonovex-utility:skill-guidelines-create "https://example.com/go-style-guide" --name go-guidelines --dry-run
-```
-
-## Arguments
-
-- `source` (required): URL or file path to the source document
-- `--name` (required): Skill name in kebab-case (e.g., `react-guidelines`, `go-guidelines`)
-- `--dry-run` (optional): Preview generated structure without writing files
-
 ## Core Workflow
 
 1. **Fetch Source**: Use WebFetch for URLs, Read for local files
@@ -40,7 +21,7 @@ Generate a guideline skill with progressive disclosure structure from a document
 4. **Generate SKILL.md**: Create condensed quick reference with essentials (3-7 items)
 5. **Create Reference Files**: Extract code examples and explanations to `reference/*.md`
 6. **Validate Structure**: Ensure all @references point to existing files
-7. **Write Files**: Save to `.claude/skills/{name}/` or preview with `--dry-run`
+7. **Write Files**: Save to `.claude/skills/{name}/` or preview without writing
 
 ## Output Structure
 
@@ -121,7 +102,7 @@ description: "Use when working with {technology}. Apply for {scenarios}."
 
 ## Safety
 
-- Preview with `--dry-run` before writing
+- Preview before writing
 - Check for existing skill directory
 - Preserve existing reference files when merging
 - Remove source-specific paths and project names

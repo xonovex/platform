@@ -6,12 +6,6 @@ description: "Generate a fresh AGENTS.md for a directory by analyzing its struct
 
 Generate a concise AGENTS.md for a directory by scanning its structure, config files, and code.
 
-## Arguments
-
-- `directory` (required): Target directory
-- `--dry-run` (optional): Preview without writing
-- `--recursive` (optional): Also create AGENTS.md for subdirectories with unique content
-
 ## Core Workflow
 
 1. Use TodoWrite to track steps
@@ -36,14 +30,6 @@ Generate a concise AGENTS.md for a directory by scanning its structure, config f
 - **Exclude:** Descriptions restating dir name, predictable guideline links, boilerplate
 - **Brevity:** 5-15 lines; nothing non-obvious → skip, report "No unique content found"
 
-## Examples
-
-```bash
-/xonovex-utility:instructions-init packages/agent/agent-cli
-/xonovex-utility:instructions-init infrastructure/ --recursive
-/xonovex-utility:instructions-init services/api --dry-run
-```
-
 ## Error Handling
 
 - AGENTS.md exists: abort, suggest sync or simplify
@@ -52,4 +38,4 @@ Generate a concise AGENTS.md for a directory by scanning its structure, config f
 
 ## Safety
 
-Never overwrite existing AGENTS.md, only create files with genuinely useful content, use `--dry-run`, recommend git commit after `--recursive` runs.
+Never overwrite existing AGENTS.md, only create files with genuinely useful content, preview before writing, recommend git commit after recursive runs.
