@@ -1,4 +1,5 @@
 ---
+name: plan-subplans-create
 description: "Generate detailed subplans from an approved parent plan, flagging steps that can run in parallel. Use when the user asks to break down, expand, or generate subplans from a plan. Keywords: plan, subplans, breakdown, parallel execution, expand plan, detailed steps."
 ---
 

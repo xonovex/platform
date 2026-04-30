@@ -1,4 +1,5 @@
 ---
+name: plan-research
 description: "Research the codebase and web for requirements without producing a plan document. Use when the user asks to research, investigate, scope, or gather context on a topic. Keywords: research, investigate, scope, codebase research, web research, requirements gathering."
 ---
 

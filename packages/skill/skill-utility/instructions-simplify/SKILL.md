@@ -1,4 +1,5 @@
 ---
+name: instructions-simplify
 description: "Reduce AGENTS.md/CLAUDE.md verbosity while preserving structure and technology names. Use when the user asks to simplify, condense, or shorten project instructions. Keywords: AGENTS.md, CLAUDE.md, simplify, condense, reduce verbosity, instructions cleanup."
 ---
 

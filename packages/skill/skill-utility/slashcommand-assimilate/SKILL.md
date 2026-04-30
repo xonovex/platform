@@ -1,4 +1,5 @@
 ---
+name: slashcommand-assimilate
 description: "Merge useful patterns from one slash command file into another while preserving the target's structure. Use when the user asks to assimilate, port, or borrow patterns between slash command files. Keywords: slash command, .md command, assimilate, merge commands, command porting."
 ---
 

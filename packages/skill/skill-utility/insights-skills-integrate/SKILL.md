@@ -1,4 +1,5 @@
 ---
+name: insights-skills-integrate
 description: "Convert extracted insights into a new or updated guideline skill with progressive disclosure. Use when the user asks to turn insights into a skill, generate a SKILL.md from lessons, or build a reusable guideline from session findings. Keywords: insights, skill creation, SKILL.md, progressive disclosure, guideline, lessons to skill."
 ---
 

@@ -1,4 +1,5 @@
 ---
+name: instructions-sync
 description: "Sync AGENTS.md files with the actual current directory structure and codebase state. Use when the user asks to refresh AGENTS.md, update instructions to match the codebase, or fix stale documentation. Keywords: AGENTS.md, sync, refresh, stale instructions, directory structure update, instructions sync."
 ---
 

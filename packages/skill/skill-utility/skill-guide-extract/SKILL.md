@@ -1,4 +1,5 @@
 ---
+name: skill-guide-extract
 description: "Create or update a guideline skill by extracting patterns from the codebase and AGENTS.md/CLAUDE.md. Use when the user asks to extract a skill from existing code, distill patterns into a SKILL.md, or capture project conventions. Keywords: skill extraction, SKILL.md, codebase patterns, AGENTS.md, distill conventions, guideline skill."
 ---
 

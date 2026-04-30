@@ -1,4 +1,5 @@
 ---
+name: plan-create
 description: "Create a high-level plan with research for user review before generating detailed subplans. Use when the user asks to plan, design, scope, or break down a feature or task. Keywords: plan, planning, design, scope, research, plan document, high-level plan."
 ---
 

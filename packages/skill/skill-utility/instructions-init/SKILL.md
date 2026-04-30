@@ -1,4 +1,5 @@
 ---
+name: instructions-init
 description: "Generate a fresh AGENTS.md for a directory by analyzing its structure and code. Use when the user asks to initialize AGENTS.md, bootstrap project instructions, or document a directory for agents. Keywords: AGENTS.md, init, bootstrap, project instructions, directory analysis, document codebase."
 ---
 

@@ -1,4 +1,5 @@
 ---
+name: content-humanize
 description: "Rewrite text to strip AI writing tells and add human voice. Use when the user asks to humanize, de-AI, edit for naturalness, or rewrite blog posts, marketing copy, docs, or any AI-generated draft. Keywords: humanize, de-AI, AI tells, voice, rewrite, naturalness, edit prose, marketing copy."
 ---
 
