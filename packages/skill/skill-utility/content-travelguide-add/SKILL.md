@@ -1,4 +1,5 @@
 ---
+name: content-travelguide-add
 description: "Generate a multi-language travel guide for a city, region, or topic. Use when the user asks to create a travel guide, destination article, or multilingual destination content. Keywords: travel guide, destination, multilingual, port guide, ship guide, location article, tourism content."
 ---
 

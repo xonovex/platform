@@ -1,4 +1,5 @@
 ---
+name: git-commit
 description: "Commit and push changes with conventional-commit messages in the current or a specified directory. Use when the user asks to commit, push, save changes, or wrap up a piece of work. Keywords: commit, push, conventional commits, git commit, save changes, ship work."
 ---
 

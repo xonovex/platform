@@ -1,4 +1,5 @@
 ---
+name: slashcommand-simplify
 description: "Simplify slash command .md files by reducing verbosity while keeping functionality intact. Use when the user asks to simplify, condense, or shorten slash commands. Keywords: slash command, /command, simplify, condense, reduce verbosity."
 ---
 

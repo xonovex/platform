@@ -1,4 +1,5 @@
 ---
+name: insights-instructions-integrate
 description: "Convert extracted insights from a category into AGENTS.md/CLAUDE.md bullet points. Use when the user asks to integrate insights into project instructions, update AGENTS.md from lessons learned, or fold session insights into docs. Keywords: insights, AGENTS.md, CLAUDE.md, integrate, project instructions, lessons learned, update docs."
 ---
 

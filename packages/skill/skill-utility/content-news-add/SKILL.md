@@ -1,4 +1,5 @@
 ---
+name: content-news-add
 description: "Curate the latest news on a topic and generate bilingual Markdown articles. Use when the user asks to add news, fetch recent stories, generate news content for a site, or produce CEFR B1-B2 articles. Keywords: news, curation, bilingual, articles, recent stories, web research, CEFR, multilingual content."
 ---
 

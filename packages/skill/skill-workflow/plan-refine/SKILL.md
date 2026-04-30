@@ -1,4 +1,5 @@
 ---
+name: plan-refine
 description: "Process user annotations in a plan document and refine iteratively until approved. Use when the user asks to refine, revise, iterate on, or address comments in a plan. Keywords: plan, refine, revise, iterate, annotations, plan feedback."
 ---
 

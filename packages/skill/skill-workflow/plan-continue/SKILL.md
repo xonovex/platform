@@ -1,4 +1,5 @@
 ---
+name: plan-continue
 description: "Resume work from an existing plan document with full context reload. Use when the user asks to continue, resume, pick up, or keep going on a plan. Keywords: plan, continue, resume, pick up, plan document, context reload."
 ---
 

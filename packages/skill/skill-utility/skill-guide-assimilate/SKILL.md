@@ -1,4 +1,5 @@
 ---
+name: skill-guide-assimilate
 description: "Merge useful patterns from one skill into another while preserving the target's structure. Use when the user asks to assimilate, port, or borrow patterns between SKILL.md files. Keywords: SKILL.md, skill assimilate, merge skills, skill porting, guideline reuse."
 ---
 

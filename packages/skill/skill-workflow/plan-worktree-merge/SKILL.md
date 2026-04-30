@@ -1,4 +1,5 @@
 ---
+name: plan-worktree-merge
 description: "Merge a feature worktree back into the source worktree or branch. Use when the user asks to merge a worktree, integrate worktree changes, or land a feature back home. Keywords: git worktree, worktree merge, feature integration, land changes."
 ---
 

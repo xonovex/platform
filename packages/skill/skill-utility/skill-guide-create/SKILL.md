@@ -1,4 +1,5 @@
 ---
+name: skill-guide-create
 description: "Create a new guideline skill (SKILL.md plus reference files) from a provided document, URL, or text. Use when the user asks to make a skill from a guide, blog post, spec, or documentation. Keywords: SKILL.md, skill creation, guideline skill, from URL, from document, progressive disclosure."
 ---
 

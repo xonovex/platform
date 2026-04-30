@@ -1,4 +1,5 @@
 ---
+name: code-align
 description: "Compare two similar implementations, surface differences, and suggest a unified design. Use when the user asks to align, reconcile, harmonize, or compare two pieces of similar code. Keywords: code alignment, reconcile, harmonize, similar implementations, dedupe, unify design."
 ---
 

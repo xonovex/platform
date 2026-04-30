@@ -1,4 +1,5 @@
 ---
+name: code-simplify
 description: "Simplify code by consolidating duplicates, removing dead code, and flattening unnecessary abstractions. Use when the user asks to simplify, refactor, dedupe, or clean up code. Keywords: simplify, refactor, dedupe, dead code, flatten abstractions, cleanup."
 ---
 

@@ -1,4 +1,5 @@
 ---
+name: plan-validate
 description: "Verify a plan or in-progress work has been fully achieved against its acceptance criteria. Use when the user asks to validate, verify, check completion, or confirm a plan is done. Keywords: plan, validate, verify, completion check, acceptance, done."
 ---
 

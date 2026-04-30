@@ -1,4 +1,5 @@
 ---
+name: skill-guide-simplify
 description: "Condense verbose SKILL.md files into bullet-list quick references and move examples to reference files. Use when the user asks to simplify, slim down, or de-project-ify a skill. Keywords: SKILL.md, skill simplify, condense, project-independent, progressive disclosure, reference files."
 ---
 

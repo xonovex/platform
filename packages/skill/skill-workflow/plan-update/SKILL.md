@@ -1,4 +1,5 @@
 ---
+name: plan-update
 description: "Update a plan document with the latest implementation status, test results, and completed steps. Use when the user asks to update, sync, mark progress on, or refresh a plan. Keywords: plan, update, sync, progress, status, plan document, mark complete."
 ---
 

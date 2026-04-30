@@ -1,4 +1,5 @@
 ---
+name: instructions-consolidate
 description: "Consolidate scattered AGENTS.md/CLAUDE.md files, remove redundancy, standardize format. Use when the user asks to clean up instructions, deduplicate AGENTS files, or unify project instruction style. Keywords: AGENTS.md, CLAUDE.md, consolidate, dedupe, cleanup, standardize, instructions."
 ---
 
