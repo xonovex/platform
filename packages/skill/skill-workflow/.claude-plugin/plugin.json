@@ -1,6 +1,6 @@
 {
   "name": "xonovex-skill-workflow",
-  "version": "0.2.0",
+  "version": "0.2.2",
   "description": "Xonovex workflow skills — planning, code analysis, git",
   "author": {"name": "Xonovex"},
   "skills": [
