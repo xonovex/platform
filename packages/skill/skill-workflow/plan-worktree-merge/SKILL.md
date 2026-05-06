@@ -1,6 +1,6 @@
 ---
 name: plan-worktree-merge
-description: "Merge a feature worktree back into the source worktree or branch. Use when the user asks to merge a worktree, integrate worktree changes, or land a feature back home. Keywords: git worktree, worktree merge, feature integration, land changes."
+description: "Use when integrating a finished feature worktree back into the source branch or worktree. Triggers on prompts to merge a worktree, land changes, integrate, or ship a feature back to main, even when the user doesn't say 'merge worktree'. Skip creating one (use plan-worktree-create) and abandoning one (use plan-worktree-abandon)."
 ---
 
 # /xonovex-workflow:plan-worktree-merge – Merge Feature Worktree Back to Source

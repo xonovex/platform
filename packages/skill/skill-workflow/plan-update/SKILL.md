@@ -1,6 +1,6 @@
 ---
 name: plan-update
-description: "Update a plan document with the latest implementation status, test results, and completed steps. Use when the user asks to update, sync, mark progress on, or refresh a plan. Keywords: plan, update, sync, progress, status, plan document, mark complete."
+description: "Use when refreshing a plan document with current implementation status, test results, or completed steps. Triggers on prompts to update, sync, mark progress on, or refresh a plan, even when the user doesn't name the plan. Skip authoring a new plan (use plan-create) and validating final completion (use plan-validate)."
 ---
 
 # /xonovex-workflow:plan-update – Update Plan Progress

@@ -1,6 +1,6 @@
 ---
 name: skill-guide-simplify
-description: "Condense verbose SKILL.md files into bullet-list quick references and move examples to reference files. Use when the user asks to simplify, slim down, or de-project-ify a skill. Keywords: SKILL.md, skill simplify, condense, project-independent, progressive disclosure, reference files."
+description: "Use when condensing a verbose SKILL.md into a bullet-list quick reference and pushing examples into reference files. Triggers on prompts to simplify a skill, slim it down, de-project-ify, or move examples to references, even when the user doesn't say 'simplify'. Skip authoring (use skill-guide-create), extracting (use skill-guide-extract), and merging (use skill-guide-assimilate)."
 ---
 
 # /xonovex-utility:skill-guide-simplify – Condense verbose skill files

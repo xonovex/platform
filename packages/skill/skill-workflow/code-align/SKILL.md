@@ -1,6 +1,6 @@
 ---
 name: code-align
-description: "Compare two similar implementations, surface differences, and suggest a unified design. Use when the user asks to align, reconcile, harmonize, or compare two pieces of similar code. Keywords: code alignment, reconcile, harmonize, similar implementations, dedupe, unify design."
+description: "Use when comparing two similar implementations or modules to align them. Triggers on prompts to align, reconcile, harmonize, dedupe, or unify two pieces of similar code (e.g., 'these two services do almost the same thing — make them consistent'), even when the user doesn't say 'align'. Skip simplifying a single piece of code (use code-simplify) and productionizing for reliability (use code-harden)."
 ---
 
 # /xonovex-workflow:code-align – Research Code Alignment Between Similar Implementations

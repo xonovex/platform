@@ -1,6 +1,6 @@
 ---
 name: slashcommand-assimilate
-description: "Merge useful patterns from one slash command file into another while preserving the target's structure. Use when the user asks to assimilate, port, or borrow patterns between slash command files. Keywords: slash command, .md command, assimilate, merge commands, command porting."
+description: "Use when porting useful patterns from one slash-command file into another while preserving the target's structure. Triggers on prompts to assimilate, port, borrow, or merge between `/command.md` files, even when the user doesn't say 'assimilate'. Skip authoring a new command (use slashcommand-create) and simplifying (use slashcommand-simplify)."
 ---
 
 # /xonovex-utility:slashcommand-assimilate – Augment Slash Command

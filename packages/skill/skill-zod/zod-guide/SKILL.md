@@ -1,6 +1,6 @@
 ---
 name: zod-guide
-description: "Zod 4.0+ runtime-validation guidelines for TypeScript. Apply when editing `.ts` files with Zod imports or validation patterns. Use for API validation, schema composition, type inference, default values. Keywords: Zod, z.uuid(), z.email(), z.iso.datetime(), schema composition, safeParse, z.infer, defaults, validation patterns."
+description: "Use when defining or editing Zod 4.0+ schemas for runtime validation in TypeScript. Triggers on `.ts` files with `zod` imports and prompts about API input validation, schema composition, type inference (`z.infer`), `z.uuid()`, `z.email()`, `z.iso.datetime()`, defaults, or refinements — even when the user doesn't say 'Zod'. Skip Yup, Joi, io-ts, and JSON Schema-only work."
 ---
 
 # Zod Coding Guidelines

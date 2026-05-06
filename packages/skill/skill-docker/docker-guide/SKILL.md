@@ -1,6 +1,6 @@
 ---
 name: docker-guide
-description: "Docker container guidelines for production deployments. Apply when editing `Dockerfile`, `docker-compose.yml`, or `.dockerignore` files. Use for multi-stage builds, security hardening, image slimming. Keywords: Dockerfile, multi-stage, alpine/distroless, layer caching, non-root, secrets, health checks, BuildKit."
+description: "Use when writing or editing Docker images and Compose files for production. Triggers on `Dockerfile`, `docker-compose.yml`, `.dockerignore`, and prompts about multi-stage builds, alpine/distroless base images, layer caching, non-root users, BuildKit, secrets, health checks, or image slimming, even when the user doesn't say 'Docker'. Skip Kubernetes manifests (use kubernetes-guide) and Podman/containerd-only runtime config."
 ---
 
 # Docker Coding Guidelines

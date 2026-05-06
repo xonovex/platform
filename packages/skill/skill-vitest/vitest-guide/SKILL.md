@@ -1,6 +1,6 @@
 ---
 name: vitest-guide
-description: "Vitest 3+ testing guidelines for TypeScript. Apply when editing `.test.ts` or `.spec.ts` files. Use for type safety in tests, HTTP testing, mocking patterns, test organization. Keywords: Vitest, test, spec, HTTP assertions, mock patterns, type safety, CORS preflight, timestamps, response casting."
+description: "Use when writing or editing Vitest 3+ tests in TypeScript. Triggers on `.test.ts`, `.spec.ts`, `vitest.config.*` files, and prompts about test setup, mocking, HTTP assertions, CORS preflight tests, type safety in tests, or snapshots, even when the user doesn't say 'Vitest'. Skip Jest-only APIs, Playwright/Cypress E2E, and runtime-side production code."
 ---
 
 # Vitest Testing Guidelines

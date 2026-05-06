@@ -1,6 +1,6 @@
 ---
 name: skill-guide-create
-description: "Create a new guideline skill (SKILL.md plus reference files) from a provided document, URL, or text. Use when the user asks to make a skill from a guide, blog post, spec, or documentation. Keywords: SKILL.md, skill creation, guideline skill, from URL, from document, progressive disclosure."
+description: "Use when authoring a new guideline skill (SKILL.md plus reference files) from a provided document, URL, or text. Triggers on prompts to make a skill from a guide / blog post / spec / doc, scaffold a new SKILL.md, or build a guideline from external source, even when the user doesn't say 'skill'. Skip extracting from this codebase (use skill-guide-extract) and merging between skills (use skill-guide-assimilate)."
 ---
 
 # /xonovex-utility:skill-guide-create – Create Guideline Skill from Document

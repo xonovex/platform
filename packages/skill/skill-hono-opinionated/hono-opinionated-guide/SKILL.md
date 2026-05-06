@@ -1,6 +1,6 @@
 ---
 name: hono-opinionated-guide
-description: "Opinionated Hono guidelines: inline OpenAPI handlers, router selection, sync handlers, bodyLimit. Apply when editing `*.ts` files with Hono imports or `@hono/` packages. Use for OpenAPI routes, router choice, perf tuning. Keywords: Hono, OpenAPIHono, LinearRouter, RegExpRouter, inline handlers, bodyLimit, sync handlers."
+description: "Use when editing Hono APIs that follow the opinionated style — inline OpenAPI handlers, explicit router selection (LinearRouter / RegExpRouter), sync handlers where possible, bodyLimit middleware. Triggers on `.ts` files with `OpenAPIHono`, inline route schemas, and prompts about router perf, payload limits, or sync-vs-async handlers, even when the user doesn't say 'opinionated'. Skip generic Hono usage (use hono-guide) and Express work."
 ---
 
 # Hono Opinionated Guidelines

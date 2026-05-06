@@ -1,6 +1,6 @@
 ---
 name: plan-research
-description: "Research the codebase and web for requirements without producing a plan document. Use when the user asks to research, investigate, scope, or gather context on a topic. Keywords: research, investigate, scope, codebase research, web research, requirements gathering."
+description: "Use when investigating a topic or codebase without producing a plan document. Triggers on prompts to research, investigate, scope, gather context, survey the codebase, or check the web for requirements, even when the user doesn't say 'research'. Skip producing a plan document (use plan-create / plan-tdd-create) and validating completed work (use plan-validate)."
 ---
 
 # /xonovex-workflow:plan-research – Research Codebase and Web

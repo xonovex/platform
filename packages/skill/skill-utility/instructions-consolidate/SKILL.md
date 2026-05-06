@@ -1,6 +1,6 @@
 ---
 name: instructions-consolidate
-description: "Consolidate scattered AGENTS.md/CLAUDE.md files, remove redundancy, standardize format. Use when the user asks to clean up instructions, deduplicate AGENTS files, or unify project instruction style. Keywords: AGENTS.md, CLAUDE.md, consolidate, dedupe, cleanup, standardize, instructions."
+description: "Use when cleaning up scattered AGENTS.md / CLAUDE.md files — dedupes content and standardizes format across the repo. Triggers on prompts to consolidate, dedupe, unify, or standardize project instructions, even when the user doesn't say 'consolidate'. Skip per-file simplification (use instructions-simplify) and porting from another project (use instructions-assimilate)."
 ---
 
 # /xonovex-utility:instructions-consolidate – Consolidate project instruction files

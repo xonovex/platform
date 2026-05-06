@@ -1,6 +1,6 @@
 ---
 name: lua-opinionated-guide
-description: "Opinionated LuaJIT guidelines for performance-critical code: JIT-friendly tables, pre-allocation, cache lookups. Apply when editing `.lua` files for LuaJIT targets. Use for stable table shapes, hot-path tuning. Keywords: LuaJIT, JIT optimization, table pre-allocation, cache lookups, stable table shapes, hot path."
+description: "Use when tuning LuaJIT-targeted Lua for performance-critical paths. Triggers on `.lua` files in LuaJIT projects and on prompts about JIT-friendly tables, table pre-allocation, cache lookups, stable table shapes, or hot-path tuning, even when the user doesn't say 'LuaJIT'. Skip generic Lua scripting (use lua-guide) and TSTL output (use typescript-to-lua-guide)."
 ---
 
 # Lua Opinionated Guidelines (LuaJIT Performance)

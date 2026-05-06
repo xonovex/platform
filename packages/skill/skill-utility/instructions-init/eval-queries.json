@@ -1,0 +1,125 @@
+[
+  {
+    "query": "this packages/auth dir doesn't have an AGENTS.md yet — set one up",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "direct init"
+  },
+  {
+    "query": "bootstrap a CLAUDE.md for the new services/notifications package i just scaffolded",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "direct bootstrap"
+  },
+  {
+    "query": "i want claude to know what's in apps/admin — write the agent docs from scratch",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "from-scratch intent"
+  },
+  {
+    "query": "no AGENTS.md anywhere in this repo, can you create one for the root",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "init at repo root"
+  },
+  {
+    "query": "document this directory for an AI agent — first time",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "first-time doc"
+  },
+  {
+    "query": "scaffold an AGENTS.md for libs/shared/ that covers the conventions",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "scaffold = init"
+  },
+  {
+    "query": "we just split out the analytics package — can you create instructions for it",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "new package needs init"
+  },
+
+  {
+    "query": "the existing AGENTS.md in packages/core is out of date — refresh it",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: should match instructions-sync"
+  },
+  {
+    "query": "the AGENTS.md in apps/web is way too verbose — trim it",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: should match instructions-simplify"
+  },
+  {
+    "query": "merge the patterns from project-a/AGENTS.md into project-b/AGENTS.md",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: should match instructions-assimilate"
+  },
+  {
+    "query": "we have AGENTS.md scattered all over the monorepo — clean them up and dedupe",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: should match instructions-consolidate"
+  },
+  {
+    "query": "write a README.md for the new service",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "different doc type"
+  },
+
+  {
+    "query": "add a CLAUDE.md to the new monorepo workspace at packages/billing",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "direct init"
+  },
+  {
+    "query": "the new microservice doesn't have project instructions yet — generate one based on what's in src/",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "init intent without saying 'AGENTS'"
+  },
+  {
+    "query": "write up a fresh AGENTS file for tools/cli-runner — just analyze what's there",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "fresh + analyze = init"
+  },
+  {
+    "query": "kick off project instructions for this new repo",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "kick off = init"
+  },
+  {
+    "query": "no claude.md in services/payments — analyze the code and write one",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "init from analysis"
+  },
+
+  {
+    "query": "generate API docs for our public endpoints",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "different doc type"
+  },
+  {
+    "query": "add a comment to the user model explaining the soft-delete column",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "code comment, not AGENTS.md"
+  },
+  {
+    "query": "create a release notes document for v2.0",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "different doc type"
+  }
+]

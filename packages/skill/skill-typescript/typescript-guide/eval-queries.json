@@ -1,0 +1,125 @@
+[
+  {
+    "query": "add proper types to the response shape in src/api/users.ts so the consumer doesn't have to cast",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "direct: TS file + typing intent"
+  },
+  {
+    "query": "this is throwing 'Cannot find module' on `import { foo } from './bar'` — what's the ESM dance for relative imports",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "ESM import question"
+  },
+  {
+    "query": "convert this Promise.all-with-side-effects mess to a clean async function in src/jobs/sync.ts",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "async/await refactor in TS"
+  },
+  {
+    "query": "drop the barrel export in shared/index.ts and import directly from each module",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "anti-barrel guidance"
+  },
+  {
+    "query": "tighten this `any` in src/utils/parseDate.ts to something usable",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "strict typing intent"
+  },
+  {
+    "query": "make PORT a typed env var with a default of 3000 instead of the loose process.env.PORT we have now",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "env handling"
+  },
+  {
+    "query": "fix the inferred return type on this generic helper — it widens to `unknown` and the callers all have to assert",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "type inference"
+  },
+
+  {
+    "query": "build a Hono route that returns a typed JSON response and validates the body",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: should match hono-guide"
+  },
+  {
+    "query": "spec out the validation schema with z.object for the contact form payload",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: should match zod-guide"
+  },
+  {
+    "query": "write a Vitest test for parseDate covering DST edges",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: should match vitest-guide"
+  },
+  {
+    "query": "translate the Dutch and German strings in the app's i18n bundle",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "i18n, not TS work"
+  },
+  {
+    "query": "we're stuck on Node 14 and can't move to ESM right now — leave this CommonJS",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "CommonJS-only context, skill skips this"
+  },
+
+  {
+    "query": "the strict-mode flag is off in this package's tsconfig — turn it on and fix what falls out",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "strict mode"
+  },
+  {
+    "query": "rewrite this string concat with template literals and pull out the magic numbers as named consts",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "TS idioms"
+  },
+  {
+    "query": "the discriminated union in src/events/Event.ts isn't narrowing in the switch — what's wrong",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "type narrowing"
+  },
+  {
+    "query": "convert these callback-style filesystem helpers to async/await",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "async refactor"
+  },
+  {
+    "query": "the readonly modifier isn't propagating through the array-of-record return type, can you fix the types in src/cache/Store.ts",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "readonly typing"
+  },
+
+  {
+    "query": "add bodyLimit middleware to all routes in our Hono app",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near-miss: should match hono-guide"
+  },
+  {
+    "query": "set up the Dockerfile for production deploys with multi-stage builds",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near-miss: should match docker-guide"
+  },
+  {
+    "query": "fix the failing assertion in user.spec.ts — it expects 200 but we return 204",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near-miss: test work, should match vitest-guide"
+  }
+]

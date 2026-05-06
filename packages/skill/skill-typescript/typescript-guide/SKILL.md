@@ -1,6 +1,6 @@
 ---
 name: typescript-guide
-description: "TypeScript coding guidelines for Node.js ESM projects. Apply when editing `.ts` files with Node.js or ESM patterns. Use for async functions, module imports, type safety, linting. Keywords: TypeScript, ESM, strict mode, async/await, Zod, type inference, avoid barrel exports, process.env, template literals, numeric separators."
+description: "Use when editing or reviewing TypeScript in Node.js ESM projects. Triggers on `.ts` files, ESM `package.json`, and prompts about async functions, type inference, strict mode, ESM imports, env handling, template literals, even when the user doesn't say 'TypeScript'. Skip framework-specific work (Hono → hono-guide, React → react-guide, tests → vitest-guide), TSTL transpiled code (use typescript-to-lua-guide), and CommonJS-only projects."
 ---
 
 # TypeScript Coding Guidelines

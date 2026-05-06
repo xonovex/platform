@@ -1,6 +1,6 @@
 ---
 name: general-fp-guide
-description: "Functional programming guidelines: pure functions, immutability, composition over inheritance. Apply when writing FP-style code, module-level functions, or explicit context passing. Use for stateless designs, composition, function chaining. Keywords: functional programming, pure functions, immutability, composition, module functions, explicit context, stateless, FP."
+description: "Use when writing functional-style code or reviewing for FP cleanliness. Triggers on prompts about pure functions, immutability, function composition, module-level functions, explicit context passing, avoiding inheritance, or stateless designs, even when the user doesn't say 'FP' or 'functional'. Skip OOP/class-heavy designs (use general-oop-guide) and language-specific guidance covered by typescript-guide / python-guide / lua-guide."
 ---
 
 # General Functional Programming Guidelines

@@ -1,6 +1,6 @@
 ---
 name: content-news-add
-description: "Curate the latest news on a topic and generate bilingual Markdown articles. Use when the user asks to add news, fetch recent stories, generate news content for a site, or produce CEFR B1-B2 articles. Keywords: news, curation, bilingual, articles, recent stories, web research, CEFR, multilingual content."
+description: "Use when adding curated news articles to a content site. Triggers on prompts to add news, fetch recent stories, generate news content for a site, or produce CEFR B1-B2 bilingual articles, even when the user doesn't say 'news'. Skip travel-guide creation (use content-travelguide-add), humanizing existing prose (use content-humanize), and code-related news monitoring."
 ---
 
 # /xonovex-utility:content-news-add – Auto‑curate Latest News Stories

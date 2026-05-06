@@ -1,6 +1,6 @@
 ---
 name: plan-worktree-abandon
-description: "Document and abandon a feature worktree with reason and lessons learned. Use when the user asks to abandon, drop, give up on, or shelve a feature/branch/worktree. Keywords: worktree, abandon, drop, shelve, feature abandonment, lessons learned."
+description: "Use when shelving or dropping a feature worktree with documented reasons and lessons learned. Triggers on prompts to abandon, drop, give up on, shelve, or kill a feature / branch / worktree, even when the user doesn't say 'abandon'. Skip merging back (use plan-worktree-merge) and starting one (use plan-worktree-create)."
 ---
 
 # /xonovex-workflow:plan-worktree-abandon – Abandon Feature with Documentation

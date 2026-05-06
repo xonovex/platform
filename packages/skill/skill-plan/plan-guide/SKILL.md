@@ -1,6 +1,6 @@
 ---
 name: plan-guide
-description: "Planning workflow guidelines: research, task breakdown, plan documents. Apply when planning a feature, analyzing code, or scoping refactors. Use for code alignment, simplification, hardening, template extraction. Keywords: research, planning, task breakdown, plan document, code analysis, refactoring, template extraction, shared libraries, TODO scanning."
+description: "Use when scoping a feature, refactor, or analysis task — research, task breakdown, plan documents. Triggers on prompts to plan, design, scope, break down, or analyze a feature or refactor (template extraction, TODO scanning, shared-library design), even when the user doesn't say 'plan'. Skip the focused workflow automations — use plan-create / plan-tdd-create / plan-subplans-create / plan-refine / plan-update / plan-validate / plan-research / plan-continue when the user names a specific step."
 ---
 
 # Planning Research Guidelines

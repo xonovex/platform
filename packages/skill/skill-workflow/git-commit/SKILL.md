@@ -1,6 +1,6 @@
 ---
 name: git-commit
-description: "Commit and push changes with conventional-commit messages in the current or a specified directory. Use when the user asks to commit, push, save changes, or wrap up a piece of work. Keywords: commit, push, conventional commits, git commit, save changes, ship work."
+description: "Use when the user wants to commit and push the current work with a conventional-commit message. Triggers on prompts to commit, push, save changes, ship, wrap up, or finalize, even when the user doesn't say 'commit'. Apply for the current directory or a specified one. Skip broader git operations like rebases, conflict resolution, or worktree management (use git-guide / plan-worktree-* skills)."
 ---
 
 # /xonovex-workflow:git-commit – Auto-Commit with Smart Messages

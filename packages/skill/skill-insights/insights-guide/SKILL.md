@@ -1,6 +1,6 @@
 ---
 name: insights-guide
-description: "Insights workflow guidelines: extracting lessons from sessions and integrating into skills or AGENTS.md. Apply when running post-session reflection or improving skills. Use for capturing mistakes, discoveries, recurring patterns. Keywords: insights, mistakes, discoveries, patterns, lessons learned, retrospective, post-session reflection, skill integration."
+description: "Use when reflecting on a session or distilling lessons into reusable form. Triggers on prompts about extracting insights, capturing mistakes / discoveries / patterns, post-session retrospectives, or folding lessons into skills or AGENTS.md, even when the user doesn't say 'insights'. Skip the focused automations — use insights-extract / insights-instructions-integrate / insights-skills-integrate when the user names a specific step."
 ---
 
 # Insights Guidelines

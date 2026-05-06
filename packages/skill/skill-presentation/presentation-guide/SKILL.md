@@ -1,6 +1,6 @@
 ---
 name: presentation-guide
-description: "Presentation and slide-deck guidelines built from codebase analysis. Apply when creating presentations, slide decks, or visual walkthroughs of code. Use for scaffolding Motion-based slide packages, GraphViz diagrams, narrative structure. Keywords: presentation, slides, deck, codebase walkthrough, GraphViz diagrams, Motion, React components, visual flow, narrative structure."
+description: "Use when creating slide decks, presentations, or visual codebase walkthroughs. Triggers on prompts about scaffolding Motion-based slide packages, GraphViz diagrams, narrative flow, or codebase walkthroughs, even when the user doesn't say 'presentation'. Skip ad-hoc Markdown handouts, PowerPoint/Keynote-specific exports, and live-coded demos without slide structure."
 ---
 
 # Presentation Guidelines

@@ -1,6 +1,6 @@
 ---
 name: plan-worktree-create
-description: "Create a new git worktree for a feature branch. Use when the user asks to create a worktree, start a feature in a worktree, or branch into an isolated workspace. Keywords: git worktree, worktree create, feature branch, isolated workspace."
+description: "Use when starting a feature in an isolated git worktree. Triggers on prompts to create a worktree, branch into an isolated workspace, spin up a feature directory, or start parallel work, even when the user doesn't say 'worktree'. Skip merging it back (use plan-worktree-merge) and abandoning it (use plan-worktree-abandon)."
 ---
 
 # /xonovex-workflow:plan-worktree-create – Create Feature Worktree

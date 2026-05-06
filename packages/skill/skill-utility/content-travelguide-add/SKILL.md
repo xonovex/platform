@@ -1,6 +1,6 @@
 ---
 name: content-travelguide-add
-description: "Generate a multi-language travel guide for a city, region, or topic. Use when the user asks to create a travel guide, destination article, or multilingual destination content. Keywords: travel guide, destination, multilingual, port guide, ship guide, location article, tourism content."
+description: "Use when creating multilingual destination, port, ship, or travel-guide content. Triggers on prompts to add a travel guide, generate destination content, draft a port / ship guide, or produce city / region articles in multiple languages, even when the user doesn't say 'travel guide'. Skip news curation (use content-news-add) and humanizing existing prose (use content-humanize)."
 ---
 
 # /xonovex-utility:content-travelguide-add – Comprehensive Travel Guide Generator

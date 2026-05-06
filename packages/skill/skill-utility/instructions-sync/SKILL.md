@@ -1,6 +1,6 @@
 ---
 name: instructions-sync
-description: "Sync AGENTS.md files with the actual current directory structure and codebase state. Use when the user asks to refresh AGENTS.md, update instructions to match the codebase, or fix stale documentation. Keywords: AGENTS.md, sync, refresh, stale instructions, directory structure update, instructions sync."
+description: "Use when refreshing AGENTS.md to match the current directory structure and codebase state. Triggers on prompts to sync AGENTS.md, refresh stale instructions, update docs to match the codebase, or fix drifted documentation, even when the user doesn't say 'sync'. Skip initializing from scratch (use instructions-init), simplifying (use instructions-simplify), and assimilating from another project (use instructions-assimilate)."
 ---
 
 # /xonovex-utility:instructions-sync – Sync AGENTS.md with Current State

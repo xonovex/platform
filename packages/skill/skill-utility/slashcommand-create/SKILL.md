@@ -1,6 +1,6 @@
 ---
 name: slashcommand-create
-description: "Create a reusable slash command from a completed task, goal, or workflow described in chat. Use when the user asks to make a slash command, save a workflow as a command, or capture this task as reusable. Keywords: slash command, /command, command creation, save workflow, reusable task."
+description: "Use when capturing a completed task or workflow as a reusable slash command. Triggers on prompts to make a slash command, save this workflow, capture this task as reusable, or 'add a /command for this', even when the user doesn't say 'slash command'. Skip merging across commands (use slashcommand-assimilate) and simplifying an existing one (use slashcommand-simplify)."
 ---
 
 # /xonovex-utility:slashcommand-create – Create Slash Command from Task

@@ -1,6 +1,6 @@
 ---
 name: insights-extract
-description: "Analyze the current session for development mistakes, surprises, and lessons learned. Use when the user asks to extract insights, capture lessons, review what went wrong, or run a post-session reflection. Keywords: insights, retrospective, lessons learned, mistakes, post-mortem, reflection, session review."
+description: "Use when running a post-session retrospective on this conversation — captures development mistakes, surprises, and lessons learned. Triggers on prompts to extract insights, capture lessons, review what went wrong, run a post-mortem, or reflect on the session, even when the user doesn't say 'insights'. Skip writing the insights into AGENTS.md (use insights-instructions-integrate) or into a skill (use insights-skills-integrate)."
 ---
 
 # /xonovex-utility:insights-extract – Extract Development Lessons

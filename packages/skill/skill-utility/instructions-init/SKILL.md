@@ -1,6 +1,6 @@
 ---
 name: instructions-init
-description: "Generate a fresh AGENTS.md for a directory by analyzing its structure and code. Use when the user asks to initialize AGENTS.md, bootstrap project instructions, or document a directory for agents. Keywords: AGENTS.md, init, bootstrap, project instructions, directory analysis, document codebase."
+description: "Use when bootstrapping a fresh AGENTS.md for a directory by analyzing its structure and code. Triggers on prompts to init AGENTS.md, bootstrap project instructions, document a directory for agents, or create a CLAUDE.md from scratch, even when the user doesn't say 'init'. Skip refreshing an existing one (use instructions-sync) and simplifying (use instructions-simplify)."
 ---
 
 # /xonovex-utility:instructions-init – Create AGENTS.md

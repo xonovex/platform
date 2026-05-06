@@ -1,0 +1,125 @@
+[
+  {
+    "query": "make this client component server-rendered if possible — it's just fetching the user's recent orders",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "RSC migration, doesn't say 'React'"
+  },
+  {
+    "query": "add a useActionState hook for the contact form so we can show pending state",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "direct React 19 hook"
+  },
+  {
+    "query": "the streaming Suspense boundary on /dashboard isn't cutting at the right spot, can you adjust where the fallback shows",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "Suspense streaming"
+  },
+  {
+    "query": "convert the old forwardRef pattern in Button.tsx to ref-as-prop",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "React 19 idiom, no name"
+  },
+  {
+    "query": "Form submission in checkout/page.tsx is double-firing — can you wire up useFormStatus properly",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "Form Actions"
+  },
+  {
+    "query": "fetch the user's posts inside a use() call instead of useEffect — we want it to suspend",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "use() hook intent"
+  },
+  {
+    "query": "the search filter in components/Filters.tsx re-renders on every keystroke even though the parent doesn't change — fix it",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "perf / memoization, doesn't say 'React'"
+  },
+
+  {
+    "query": "add a fade-in when the testimonial card scrolls into view",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: should match motion-guide"
+  },
+  {
+    "query": "render this 30-second product showcase video with captions",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: should match remotion-guide"
+  },
+  {
+    "query": "build a React Native screen for the mobile checkout",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: RN, not web React"
+  },
+  {
+    "query": "configure Vite's rollup output for a non-React Express SSR build",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: Vite config but no React work"
+  },
+  {
+    "query": "in this Next.js API route, validate the body with Zod",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: backend handler, should match zod-guide"
+  },
+
+  {
+    "query": "i think the React Compiler is over-memoizing this list, can you check src/feed/Feed.tsx",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "direct React 19 Compiler"
+  },
+  {
+    "query": "this 'use client' boundary in profile/edit shouldn't extend to the avatar picker — split it",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "RSC client/server boundary"
+  },
+  {
+    "query": "wire up an optimistic update on the like button so the count flips immediately",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "useOptimistic intent"
+  },
+  {
+    "query": "page transition feels janky — i think the Suspense fallback is showing too much",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "Suspense, casual phrasing"
+  },
+  {
+    "query": "we just upgraded to 19 — what does our memo wrapper look like with the compiler enabled",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "React 19 + Compiler"
+  },
+
+  {
+    "query": "explain the difference between Vue 3 Composition API and Options API",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "wrong framework"
+  },
+  {
+    "query": "the legacy class components in old/ don't have lifecycle types — just leave them, I'm deleting them next sprint",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near-miss: legacy with no modernization intent"
+  },
+  {
+    "query": "render this MDX content into HTML for the static-site build",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near-miss: Astro/MDX, not React component work"
+  }
+]
