@@ -1,6 +1,6 @@
 {
   "name": "xonovex-skill-moon",
-  "version": "0.2.0",
+  "version": "0.2.2",
   "description": "Xonovex Moon skills",
   "author": {"name": "Xonovex"},
   "skills": ["./moon-guide"]
