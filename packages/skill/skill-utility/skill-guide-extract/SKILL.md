@@ -1,6 +1,6 @@
 ---
 name: skill-guide-extract
-description: "Create or update a guideline skill by extracting patterns from the codebase and AGENTS.md/CLAUDE.md. Use when the user asks to extract a skill from existing code, distill patterns into a SKILL.md, or capture project conventions. Keywords: skill extraction, SKILL.md, codebase patterns, AGENTS.md, distill conventions, guideline skill."
+description: "Use when distilling a new or updated guideline skill from this codebase plus AGENTS.md / CLAUDE.md. Triggers on prompts to extract a skill, distill patterns into a SKILL.md, capture project conventions, or generate a guideline from existing code, even when the user doesn't say 'extract'. Skip authoring from an external doc (use skill-guide-create) and merging between skills (use skill-guide-assimilate)."
 ---
 
 # /xonovex-utility:skill-guide-extract – Extract Skill from Codebase

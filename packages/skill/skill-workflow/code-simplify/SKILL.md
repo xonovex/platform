@@ -1,6 +1,6 @@
 ---
 name: code-simplify
-description: "Simplify code by consolidating duplicates, removing dead code, and flattening unnecessary abstractions. Use when the user asks to simplify, refactor, dedupe, or clean up code. Keywords: simplify, refactor, dedupe, dead code, flatten abstractions, cleanup."
+description: "Use when cleaning up code — consolidating duplicates, removing dead code, flattening unnecessary abstractions. Triggers on prompts to simplify, refactor, dedupe, or clean up code, even when the user doesn't say 'simplify'. Skip productionizing / hardening (use code-harden) and aligning two similar implementations (use code-align)."
 ---
 
 # /xonovex-workflow:code-simplify – Research Code Simplification Opportunities

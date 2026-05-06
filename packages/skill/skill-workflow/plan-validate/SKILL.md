@@ -1,6 +1,6 @@
 ---
 name: plan-validate
-description: "Verify a plan or in-progress work has been fully achieved against its acceptance criteria. Use when the user asks to validate, verify, check completion, or confirm a plan is done. Keywords: plan, validate, verify, completion check, acceptance, done."
+description: "Use when verifying a plan or in-progress work meets its acceptance criteria. Triggers on prompts to validate, verify, confirm done, sanity-check completion, or check off a plan, even when the user doesn't say 'validate'. Skip mid-flight status updates (use plan-update) and code-hardening review (use code-harden)."
 ---
 
 # /xonovex-workflow:plan-validate – Validate Plan Achievement

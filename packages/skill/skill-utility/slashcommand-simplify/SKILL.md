@@ -1,6 +1,6 @@
 ---
 name: slashcommand-simplify
-description: "Simplify slash command .md files by reducing verbosity while keeping functionality intact. Use when the user asks to simplify, condense, or shorten slash commands. Keywords: slash command, /command, simplify, condense, reduce verbosity."
+description: "Use when condensing a verbose slash-command `.md` file while keeping its functionality intact. Triggers on prompts to simplify, condense, or shorten a slash command, even when the user doesn't say 'simplify'. Skip authoring a new command (use slashcommand-create) and merging across commands (use slashcommand-assimilate)."
 ---
 
 # /xonovex-utility:slashcommand-simplify – Simplify Slash Command Documentation

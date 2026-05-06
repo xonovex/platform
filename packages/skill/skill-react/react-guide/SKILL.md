@@ -1,6 +1,6 @@
 ---
 name: react-guide
-description: "React 19+ component guidelines. Apply when editing `.tsx`/`.jsx` files with React imports or Vite configs. Use for Server Components, Form Actions, new hooks, Suspense streaming, React Compiler. Keywords: React 19, RSC, Server Components, useActionState, useOptimistic, use(), Suspense, Form Actions, 'use client', 'use server', ref as prop, React Compiler."
+description: "Use when building or editing React 19+ components, hooks, or app routing. Triggers on `.tsx`/`.jsx` files with React imports, Vite/Next configs, Server Components, `'use client'` / `'use server'` directives, and on prompts about Form Actions, useActionState, useOptimistic, use(), Suspense streaming, ref-as-prop, or the React Compiler — even when the user doesn't say 'React'. Skip React Native, UI animations (use motion-guide), Remotion videos (use remotion-guide), and class-component legacy code without modernization intent."
 ---
 
 # React Coding Guidelines

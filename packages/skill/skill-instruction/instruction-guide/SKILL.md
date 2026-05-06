@@ -1,6 +1,6 @@
 ---
 name: instruction-guide
-description: "AGENTS.md/CLAUDE.md instruction-file guidelines: structure, brevity, sync with directory. Apply when editing `AGENTS.md` or `CLAUDE.md` files. Use for assimilating patterns, simplifying verbosity, syncing structure. Keywords: AGENTS.md, CLAUDE.md, project instructions, directory structure, patterns, dry-run, preserve context."
+description: "Use when authoring or reviewing AGENTS.md / CLAUDE.md project-instruction files. Triggers on edits to `AGENTS.md` or `CLAUDE.md` and on prompts about structure, brevity, dry-run review, syncing with directory state, or assimilating instruction patterns across projects, even when the user doesn't say 'instructions'. Skip the focused automations — use instructions-init / instructions-sync / instructions-simplify / instructions-consolidate / instructions-assimilate when the user names a specific step."
 ---
 
 # Project Instruction Guidelines

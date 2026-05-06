@@ -1,6 +1,6 @@
 ---
 name: insights-skills-integrate
-description: "Convert extracted insights into a new or updated guideline skill with progressive disclosure. Use when the user asks to turn insights into a skill, generate a SKILL.md from lessons, or build a reusable guideline from session findings. Keywords: insights, skill creation, SKILL.md, progressive disclosure, guideline, lessons to skill."
+description: "Use when turning extracted insights from a category into a new or updated guideline skill. Triggers on prompts to make a skill from insights, generate a SKILL.md from lessons, or build a reusable guideline from session findings, even when the user doesn't say 'skill'. Skip extracting fresh insights (use insights-extract) and folding into project instructions (use insights-instructions-integrate)."
 ---
 
 # /xonovex-utility:insights-skills-integrate – Convert Insights to Skill

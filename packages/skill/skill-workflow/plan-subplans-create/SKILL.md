@@ -1,6 +1,6 @@
 ---
 name: plan-subplans-create
-description: "Generate detailed subplans from an approved parent plan, flagging steps that can run in parallel. Use when the user asks to break down, expand, or generate subplans from a plan. Keywords: plan, subplans, breakdown, parallel execution, expand plan, detailed steps."
+description: "Use when expanding an approved high-level plan into detailed, parallelizable subplans. Triggers on prompts to break down a plan, generate subplans, expand into steps, or flag parallel execution opportunities, even when the user doesn't say 'subplans'. Skip authoring the parent plan (use plan-create / plan-tdd-create) and refining annotations (use plan-refine)."
 ---
 
 # /xonovex-workflow:plan-subplans-create – Generate Detailed Subplans from Parent Plan

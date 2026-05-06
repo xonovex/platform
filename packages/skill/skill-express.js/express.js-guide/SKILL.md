@@ -1,6 +1,6 @@
 ---
 name: express.js-guide
-description: "Express 5+ API server guidelines for TypeScript. Apply when editing `*.ts` files with Express imports or `@types/express`. Use for route organization, error handling, authentication, testing. Keywords: Express, routes, controllers, middleware, Zod validation, JWT, error handling, CORS, Morgan."
+description: "Use when editing or scaffolding Express 5+ API servers in TypeScript. Triggers on `.ts` files with `express` or `@types/express` imports, route definitions, middleware, controllers, and prompts about routes, error handling, JWT, CORS, Morgan, or Zod validation in Express, even when the user doesn't say 'Express'. Skip Hono (use hono-guide / hono-opinionated-guide), Fastify, and non-HTTP work."
 ---
 
 # Express.js Coding Guidelines

@@ -1,6 +1,6 @@
 ---
 name: skill-guide
-description: "Guidelines for authoring SKILL.md files with progressive disclosure. Apply when editing files under `.claude/skills/` or creating new skills. Use for pattern extraction, skill assimilation, simplification, bullet format. Keywords: skill creation, SKILL.md, progressive disclosure, reference files, pattern extraction, skill assimilation, bullet format, guideline skill."
+description: "Use when authoring or reviewing SKILL.md files and reference assets. Triggers on edits under `.claude/skills/` or `packages/skill/`, and on prompts about creating a new skill, progressive disclosure, reference files, pattern extraction, skill assimilation, or simplification to bullet format, even when the user doesn't say 'skill'. Skip the focused automations — use skill-guide-create / skill-guide-extract / skill-guide-assimilate / skill-guide-simplify when the user names a specific step."
 ---
 
 # Skill Guidelines Management

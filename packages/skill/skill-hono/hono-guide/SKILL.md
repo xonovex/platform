@@ -1,6 +1,6 @@
 ---
 name: hono-guide
-description: "Hono 4.0+ API server guidelines for TypeScript. Apply when editing `*.ts` files with Hono imports or `@hono/` packages. Use for validation, middleware, error handling, WebSockets. Keywords: Hono, middleware, Zod validator, error handling, WebSocket, route handlers."
+description: "Use when editing or scaffolding Hono 4.0+ API servers in TypeScript. Triggers on `.ts` files with `hono` or `@hono/*` imports, route handlers, middleware, and prompts about validation, error handling, WebSockets, CORS, or building an HTTP API in Hono — even when the user doesn't say 'Hono'. Skip Express (use express.js-guide), the opinionated inline-OpenAPI style (use hono-opinionated-guide), and non-HTTP TypeScript work."
 ---
 
 # Hono Coding Guidelines

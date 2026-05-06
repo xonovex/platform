@@ -1,6 +1,6 @@
 ---
 name: moon-guide
-description: "moonrepo monorepo task-management guidelines. Apply when editing `.moon/` configs or `moon.yml` files. Use for task configuration, project tagging, task inheritance, language toolchains. Keywords: moon, moonrepo, monorepo, .moon/tasks, tags, task inheritance, project queries, task caching, language toolchains."
+description: "Use when configuring moonrepo monorepo tasks. Triggers on `.moon/` config files, `moon.yml`, and prompts about task definitions, project tags, task inheritance, language toolchains, project queries, or task caching, even when the user doesn't say 'moonrepo'. Skip Nx, Turborepo, Bazel, and ad-hoc npm-script orchestration."
 ---
 
 # Moon Build System Guidelines

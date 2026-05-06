@@ -1,0 +1,125 @@
+[
+  {
+    "query": "ship this",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "shortest possible ship intent"
+  },
+  {
+    "query": "commit and push",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "direct"
+  },
+  {
+    "query": "ok we're done — save the changes",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "colloquial save-the-work"
+  },
+  {
+    "query": "wrap up this work in a commit",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "wrap up"
+  },
+  {
+    "query": "looks good — push it up",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "casual push"
+  },
+  {
+    "query": "make a commit with a proper message and push",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "explicit commit + push"
+  },
+  {
+    "query": "lets get this on main",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "colloquial ship; relies on commit-and-push"
+  },
+
+  {
+    "query": "i've got a merge conflict in package-lock.json — help me resolve it",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: should match git-guide"
+  },
+  {
+    "query": "rebase my feature branch onto main and squash",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: should match git-guide"
+  },
+  {
+    "query": "create a worktree for the new auth feature",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: should match plan-worktree-create"
+  },
+  {
+    "query": "merge the worktree back into main",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: should match plan-worktree-merge"
+  },
+  {
+    "query": "show me the diff between my branch and main",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "read-only git, not commit-and-push"
+  },
+
+  {
+    "query": "commit what i have so far with a wip message",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "wip commit"
+  },
+  {
+    "query": "save and push these changes — feat for the new endpoint",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "explicit with type"
+  },
+  {
+    "query": "alright, finalize this branch with a commit",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "finalize"
+  },
+  {
+    "query": "good to go, commit it",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "short approval-then-commit"
+  },
+  {
+    "query": "package this up and ship to origin",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "colloquial commit + push"
+  },
+
+  {
+    "query": "what's the convention for naming feature branches here",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near-miss: workflow question, should match git-guide"
+  },
+  {
+    "query": "revert the last 3 commits",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near-miss: history rewrite, should match git-guide"
+  },
+  {
+    "query": "stash my changes so i can switch branches",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near-miss: stash, not commit"
+  }
+]

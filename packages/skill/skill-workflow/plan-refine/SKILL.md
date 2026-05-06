@@ -1,6 +1,6 @@
 ---
 name: plan-refine
-description: "Process user annotations in a plan document and refine iteratively until approved. Use when the user asks to refine, revise, iterate on, or address comments in a plan. Keywords: plan, refine, revise, iterate, annotations, plan feedback."
+description: "Use when iterating on a plan document with user annotations or comments. Triggers on prompts to refine, revise, iterate, address comments, or process feedback on a plan, even when the user doesn't name the plan. Skip authoring a new plan (use plan-create / plan-tdd-create) and updating status (use plan-update)."
 ---
 
 # /xonovex-workflow:plan-refine – Refine Plan from Annotations

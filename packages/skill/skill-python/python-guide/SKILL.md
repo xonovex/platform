@@ -1,6 +1,6 @@
 ---
 name: python-guide
-description: "Python 3.12+ coding guidelines for APIs, data processing, scripting. Apply when editing `.py` files. Use for async code, type hints, dataclasses, file operations, resource management. Keywords: Python, async/await, dataclasses, type hints, generators, pathlib, pytest, context managers, @cache, f-strings."
+description: "Use when writing or editing Python 3.12+ for APIs, data processing, scripting, or tooling. Triggers on `.py` files and prompts about async functions, type hints, dataclasses, pathlib, pytest, generators, context managers, f-strings, even when the user doesn't say 'Python'. Skip Python 2 code, notebook-only data exploration, and ML model code that needs framework-specific guidance."
 ---
 
 # Python Coding Guidelines

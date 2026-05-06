@@ -1,6 +1,6 @@
 ---
 name: plan-continue
-description: "Resume work from an existing plan document with full context reload. Use when the user asks to continue, resume, pick up, or keep going on a plan. Keywords: plan, continue, resume, pick up, plan document, context reload."
+description: "Use when resuming work from an existing plan document with full context reload. Triggers on prompts to continue, resume, pick up, or keep going on a plan / feature / task, even when the user doesn't name the plan. Skip starting a new plan (use plan-create / plan-tdd-create) and updating status (use plan-update)."
 ---
 
 # /xonovex-workflow:plan-continue – Continue Progress from Plan

@@ -1,6 +1,6 @@
 ---
 name: astro-guide
-description: "Astro static-site guidelines with islands architecture. Apply when editing `.astro` files. Use for content collections, component hydration, accessibility. Keywords: Astro, islands, static HTML, content collections, `astro:content`, schema validation, hydration directives."
+description: "Use when editing or scaffolding Astro sites with islands architecture. Triggers on `.astro` files, `astro:content` imports, `Astro.props`, `client:` hydration directives, content-collection schemas, and on prompts about pages, layouts, MDX, content collections, image optimization, view transitions, or accessibility in an Astro project — even when the user doesn't say 'Astro'. Skip Next.js / Remix work and unrelated static-site generators."
 ---
 
 # Astro Coding Guidelines

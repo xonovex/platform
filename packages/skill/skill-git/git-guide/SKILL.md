@@ -1,6 +1,6 @@
 ---
 name: git-guide
-description: "Git workflow guidelines: conventional commits, merge conflict resolution, worktrees. Apply when running git operations, resolving merge conflicts, or managing branches. Use for commit messages, conflict cleanup, worktree workflows. Keywords: git, conventional commits, feat/fix/chore/docs, merge conflicts, worktrees, commit messages, history rewrite."
+description: "Use when running git operations or resolving repo-state issues. Triggers on prompts about commit messages, conventional commits (feat/fix/chore/docs), merge conflicts, rebases, worktrees, branch cleanup, or history rewrites, even when the user doesn't say 'git'. Skip the focused commit-and-push workflow (use git-commit) and worktree create/abandon/merge automations (use plan-worktree-create / -merge / -abandon)."
 ---
 
 # Git Guidelines

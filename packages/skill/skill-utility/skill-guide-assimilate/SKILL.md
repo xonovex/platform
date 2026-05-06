@@ -1,6 +1,6 @@
 ---
 name: skill-guide-assimilate
-description: "Merge useful patterns from one skill into another while preserving the target's structure. Use when the user asks to assimilate, port, or borrow patterns between SKILL.md files. Keywords: SKILL.md, skill assimilate, merge skills, skill porting, guideline reuse."
+description: "Use when porting useful patterns from one SKILL.md into another while preserving the target's structure. Triggers on prompts to assimilate, port, borrow, or merge between skills, even when the user doesn't say 'assimilate'. Skip authoring a new skill (use skill-guide-create), extracting from codebase (use skill-guide-extract), and simplifying (use skill-guide-simplify)."
 ---
 
 # /xonovex-utility:skill-guide-assimilate – Augment Skill with Another Skill

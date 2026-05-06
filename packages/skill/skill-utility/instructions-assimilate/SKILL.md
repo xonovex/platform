@@ -1,6 +1,6 @@
 ---
 name: instructions-assimilate
-description: "Merge useful patterns from one project's AGENTS.md/CLAUDE.md into another's while preserving the target's structure. Use when the user asks to assimilate, port, or borrow instructions across projects. Keywords: AGENTS.md, CLAUDE.md, assimilate, merge instructions, project porting, instruction reuse."
+description: "Use when porting useful patterns from one project's AGENTS.md / CLAUDE.md into another's, while preserving the target's structure and tone. Triggers on prompts to assimilate, port, borrow, or merge instructions across projects, even when the user doesn't say 'assimilate'. Skip initializing fresh instructions (use instructions-init), syncing to directory state (use instructions-sync), and simplifying (use instructions-simplify)."
 ---
 
 # /xonovex-utility:instructions-assimilate – Augment Project Instructions

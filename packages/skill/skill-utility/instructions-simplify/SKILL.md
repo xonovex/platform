@@ -1,6 +1,6 @@
 ---
 name: instructions-simplify
-description: "Reduce AGENTS.md/CLAUDE.md verbosity while preserving structure and technology names. Use when the user asks to simplify, condense, or shorten project instructions. Keywords: AGENTS.md, CLAUDE.md, simplify, condense, reduce verbosity, instructions cleanup."
+description: "Use when condensing AGENTS.md / CLAUDE.md verbosity while preserving structure and technology names. Triggers on prompts to simplify, condense, shorten, or trim project instructions, even when the user doesn't say 'simplify'. Skip syncing to directory state (use instructions-sync) and consolidating across multiple files (use instructions-consolidate)."
 ---
 
 # /xonovex-utility:instructions-simplify – Simplify project instruction files

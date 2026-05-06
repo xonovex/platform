@@ -1,6 +1,6 @@
 ---
 name: code-harden
-description: "Harden code by improving type safety, runtime validation, logging, and error handling. Use when the user asks to harden, productionize, add validation, tighten types, or improve error handling. Keywords: harden, productionize, type safety, Zod validation, error handling, logging, defensive coding."
+description: "Use when productionizing code — tightening types, adding runtime validation, structured logging, and explicit error handling. Triggers on prompts to harden, productionize, add validation, tighten types, or improve error handling, even when the user doesn't say 'harden'. Skip pure deduplication / cleanup (use code-simplify) and aligning two similar implementations (use code-align)."
 ---
 
 # /xonovex-workflow:code-harden – Research Code Hardening Opportunities

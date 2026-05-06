@@ -1,6 +1,6 @@
 ---
 name: plan-create
-description: "Create a high-level plan with research for user review before generating detailed subplans. Use when the user asks to plan, design, scope, or break down a feature or task. Keywords: plan, planning, design, scope, research, plan document, high-level plan."
+description: "Use when scoping a new feature or task — produces a high-level plan with research before any subplans. Triggers on prompts to plan, design, scope, break down, or architect a feature, even when the user doesn't say 'plan'. Skip TDD-style plans (use plan-tdd-create), expanding an approved plan into subplans (use plan-subplans-create), and continuing existing work (use plan-continue)."
 ---
 
 # /xonovex-workflow:plan-create – Create Plan with Research

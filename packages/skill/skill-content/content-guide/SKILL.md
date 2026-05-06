@@ -1,6 +1,6 @@
 ---
 name: content-guide
-description: "Bilingual content creation guidelines with structured frontmatter and CEFR readability targets. Apply when creating multilingual articles, news, port/ship guides, or travel guides. Use for frontmatter shape, language register, web research. Keywords: bilingual, multilingual, CEFR, B1-B2, content frontmatter, news articles, travel guides, port guides, humanize, web research."
+description: "Use when creating multilingual articles, news, port/ship guides, or travel guides with structured frontmatter. Triggers on prompts about bilingual / multilingual content, CEFR B1-B2 readability targets, content frontmatter shape, language register, or editorial web research, even when the user doesn't say 'content'. Skip code documentation, API references, and marketing landing-page copy."
 ---
 
 # Content Creation Guidelines

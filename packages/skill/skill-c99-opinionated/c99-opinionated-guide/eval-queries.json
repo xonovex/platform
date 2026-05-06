@@ -1,0 +1,125 @@
+[
+  {
+    "query": "I need to add a SIMD variant of my vec3_dot in lib/math/vec3.c — the rest of the project uses _sse4 and _avx2 suffixes",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "direct: SIMD variant + naming convention in systems lib"
+  },
+  {
+    "query": "convert this AoS particle list to SoA for cache locality",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "data-oriented design intent without naming opinionated style"
+  },
+  {
+    "query": "in firmware/sensor/sensor_read.c can you change the read function so the caller passes the buffer instead of malloc'ing one",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "caller-owns-memory in embedded"
+  },
+  {
+    "query": "stub out the alignment-aware allocator for our DSP target",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "embedded alignment work"
+  },
+  {
+    "query": "rename modules to follow our snake_case_subsystem.c convention — there's a few stragglers in src/net/",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "strict file naming"
+  },
+  {
+    "query": "in lib/io/ ring_buffer should expose iter functions that don't allocate",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "non-allocating API in systems lib"
+  },
+  {
+    "query": "we're seeing alignment faults on the M4 build, can you audit the struct layouts in firmware/",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "embedded layout audit, doesn't say 'C'"
+  },
+
+  {
+    "query": "I'm writing a Defold game in C — physics/collision needs vectors and quaternions",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: should match c99-game-opinionated-guide"
+  },
+  {
+    "query": "throwing together a quick C99 hello-world for a workshop, what's a clean main() pattern",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: generic C99, should match c99-guide"
+  },
+  {
+    "query": "fix the std::vector copy constructor in src/render/material.cpp",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: C++, all C99 skills should skip"
+  },
+  {
+    "query": "open this CMakeLists.txt — the C standard isn't being set right",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: CMake config, should match cmake-guide"
+  },
+  {
+    "query": "i need a SIMD-friendly matrix multiply for my game's skinning pipeline",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: game engine, should match c99-game-opinionated-guide"
+  },
+
+  {
+    "query": "add bounds-checked variants to the matrix ops in src/dsp/",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "systems DSP"
+  },
+  {
+    "query": "make our pixel buffer struct hot-friendly — split the metadata fields out",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "DOD intent without naming it"
+  },
+  {
+    "query": "the embedded build complains about VLAs — can you switch the parser to fixed-size?",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "embedded constraint"
+  },
+  {
+    "query": "I'm porting our DSP routines to a STM32 — what's our convention for buffer ownership?",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "caller-owns-memory in embedded port"
+  },
+  {
+    "query": "review the file naming under src/comms/ — looks inconsistent with the rest",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "strict file naming, generic phrasing"
+  },
+
+  {
+    "query": "show me how to write a basic linked list in C99 for my CS homework",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near-miss: generic C99, should match c99-guide"
+  },
+  {
+    "query": "convert my Python sensor-read script to TypeScript for the new dashboard",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "wrong language pair"
+  },
+  {
+    "query": "review my Cargo.toml — is this idiomatic Rust 2024?",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "wrong language"
+  }
+]

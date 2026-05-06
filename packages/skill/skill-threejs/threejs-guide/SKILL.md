@@ -1,6 +1,6 @@
 ---
 name: threejs-guide
-description: "Three.js vanilla 3D guidelines for WebGL/WebGPU. Apply when editing `.js`/`.ts` files with Three.js imports or `three` package usage. Use for scene setup, meshes, materials, lighting, loaders, animation, interaction, shaders, post-processing, performance optimization. Keywords: Three.js, WebGL, WebGPU, Scene, Renderer, Mesh, BufferGeometry, MeshStandardMaterial, GLTFLoader, Raycaster, ShaderMaterial, EffectComposer, InstancedMesh."
+description: "Use when building or editing 3D scenes in vanilla Three.js for WebGL/WebGPU. Triggers on `.js`/`.ts` files with `three` or `three/*` imports, and on prompts about Scene, Renderer, Mesh, BufferGeometry, materials, lighting, GLTF loaders, raycasting, shaders, post-processing, instancing, or perf tuning — even when the user doesn't say 'Three.js'. Skip React Three Fiber, Babylon.js, and other 3D engines."
 ---
 
 # Three.js Coding Guidelines

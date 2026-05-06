@@ -1,6 +1,6 @@
 ---
 name: insights-instructions-integrate
-description: "Convert extracted insights from a category into AGENTS.md/CLAUDE.md bullet points. Use when the user asks to integrate insights into project instructions, update AGENTS.md from lessons learned, or fold session insights into docs. Keywords: insights, AGENTS.md, CLAUDE.md, integrate, project instructions, lessons learned, update docs."
+description: "Use when folding extracted insights from a category into AGENTS.md / CLAUDE.md as bullet points. Triggers on prompts to integrate insights into project instructions, update AGENTS.md from lessons learned, or roll session insights into docs, even when the user doesn't say 'integrate'. Skip extracting fresh insights (use insights-extract) and turning insights into a standalone skill (use insights-skills-integrate)."
 ---
 
 # /xonovex-utility:insights-instructions-integrate – Convert Insights to AGENTS.md

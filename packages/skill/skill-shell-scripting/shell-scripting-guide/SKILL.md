@@ -1,6 +1,6 @@
 ---
 name: shell-scripting-guide
-description: "POSIX shell scripting guidelines for automation. Apply when editing `.sh` files or shell scripts. Use for strict mode, quoting, error handling, idempotent operations. Keywords: shell, bash, POSIX, shellcheck, shfmt, strict mode, quoting, parameter expansion, exit codes, idempotency."
+description: "Use when writing or editing POSIX shell or Bash automation. Triggers on `.sh` files, `#!/usr/bin/env bash` shebangs, and prompts about scripting CI tasks, build helpers, devops automation, or one-off pipelines, even when the user doesn't say 'shell'. Apply for strict mode, quoting, parameter expansion, exit codes, idempotency, shellcheck/shfmt. Skip fish/zsh-only features and PowerShell."
 ---
 
 # Shell Scripting Coding Guidelines

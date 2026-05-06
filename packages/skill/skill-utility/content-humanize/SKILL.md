@@ -1,6 +1,6 @@
 ---
 name: content-humanize
-description: "Rewrite text to strip AI writing tells and add human voice. Use when the user asks to humanize, de-AI, edit for naturalness, or rewrite blog posts, marketing copy, docs, or any AI-generated draft. Keywords: humanize, de-AI, AI tells, voice, rewrite, naturalness, edit prose, marketing copy."
+description: "Use when rewriting AI-generated or stiff prose so it reads as a human wrote it. Triggers on prompts to humanize, de-AI, edit for naturalness, strip AI tells, or rewrite blog posts, marketing copy, docs, or emails, even when the user doesn't say 'humanize'. Skip code generation, technical reference docs that need formal tone, and AI-detector-evasion requests."
 ---
 
 # /xonovex-utility:content-humanize – Remove AI writing patterns

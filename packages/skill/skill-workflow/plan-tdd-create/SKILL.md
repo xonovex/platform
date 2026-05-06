@@ -1,6 +1,6 @@
 ---
 name: plan-tdd-create
-description: "Create a high-level test-driven plan with research for user review before detailed step generation. Use when the user asks to plan with TDD, design test-first, or scope a feature test-first. Keywords: TDD, test-driven, plan, test-first, planning, plan document."
+description: "Use when scoping a feature test-first — produces a high-level TDD plan with research before detailed steps. Triggers on prompts to plan with TDD, design test-first, scope tests-first, or sketch failing tests before implementation, even when the user doesn't say 'TDD'. Skip non-TDD planning (use plan-create) and subplan expansion (use plan-subplans-create)."
 ---
 
 # /xonovex-workflow:plan-tdd-create – Create TDD Plan with Research

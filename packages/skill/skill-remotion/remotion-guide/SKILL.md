@@ -1,6 +1,6 @@
 ---
 name: remotion-guide
-description: "Remotion programmatic-video guidelines for React. Apply when editing Remotion projects, `remotion.config.ts`, or video composition files. Use for animations, sequencing, media handling, transitions, captions. Keywords: Remotion, video, React, animation, composition, useCurrentFrame, interpolate, spring, Sequence."
+description: "Use when building or editing programmatic video in Remotion. Triggers on Remotion projects, `remotion.config.ts`, composition files, and prompts about useCurrentFrame, interpolate, spring, Sequence, transitions, captions, audio, or rendering MP4/GIF from React, even when the user doesn't say 'Remotion'. Skip ordinary React UI (use react-guide), motion-react UI animations (use motion-guide), and non-video media tools."
 ---
 
 # Remotion Coding Guidelines

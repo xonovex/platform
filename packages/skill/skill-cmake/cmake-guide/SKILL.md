@@ -1,6 +1,6 @@
 ---
 name: cmake-guide
-description: "CMake 3.20+ build-system guidelines for C/C++ projects. Apply when editing `CMakeLists.txt` files. Use for target-based builds, dependency management, testing setup, visibility specifiers. Keywords: CMake, add_library, add_executable, target_link_libraries, PUBLIC/PRIVATE/INTERFACE, find_package, FetchContent, CTest."
+description: "Use when editing CMake build files for C/C++ projects on CMake 3.20+. Triggers on `CMakeLists.txt`, `*.cmake` files and on prompts about adding targets, linking libraries, dependency fetching, test setup, install rules, or PUBLIC/PRIVATE/INTERFACE visibility, even when the user doesn't say 'CMake'. Apply for FetchContent, find_package, target_link_libraries, CTest. Skip Make, Bazel, Meson, and other build systems."
 ---
 
 # CMake Coding Guidelines
