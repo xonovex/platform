@@ -1,0 +1,16 @@
+{
+  "name": "@xonovex/skill-llmstxt",
+  "version": "0.2.3",
+  "private": true,
+  "type": "module",
+  "keywords": [
+    "xonovex",
+    "skill",
+    "llmstxt",
+    "llms.txt"
+  ],
+  "scripts": {
+    "fmt": "prettier --write .",
+    "fmt:check": "prettier --check ."
+  }
+}

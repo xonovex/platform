@@ -11,21 +11,29 @@ description: "Use when writing or editing Python 3.12+ for APIs, data processing
 
 ## Essentials
 
-- **Data models** - Use dataclasses and type hints, see [reference/dataclasses-type-hints.md](reference/dataclasses-type-hints.md), [reference/type-checking.md](reference/type-checking.md)
-- **Iteration** - Prefer generators/comprehensions for data processing, see [reference/generators-comprehensions.md](reference/generators-comprehensions.md)
-- **Async I/O** - Use async/await for I/O operations, see [reference/async-await-patterns.md](reference/async-await-patterns.md)
-- **Performance** - Cache pure functions with `@cache`, see [reference/caching-functions.md](reference/caching-functions.md)
-- **Resource management** - Use context managers for cleanup, see [reference/resource-management.md](reference/resource-management.md)
-- **Modern syntax** - Use pathlib, f-strings, specific exceptions, see [reference/pathlib-file-ops.md](reference/pathlib-file-ops.md), [reference/string-formatting.md](reference/string-formatting.md), [reference/exception-handling.md](reference/exception-handling.md)
+- **Data models** - Use dataclasses and type hints, see [references/dataclasses-type-hints.md](references/dataclasses-type-hints.md), [references/type-checking.md](references/type-checking.md)
+- **Iteration** - Prefer generators/comprehensions for data processing, see [references/generators-comprehensions.md](references/generators-comprehensions.md)
+- **Async I/O** - Use async/await for I/O operations, see [references/async-await-patterns.md](references/async-await-patterns.md)
+- **Performance** - Cache pure functions with `@cache`, see [references/caching-functions.md](references/caching-functions.md)
+- **Resource management** - Use context managers for cleanup, see [references/resource-management.md](references/resource-management.md)
+- **Modern syntax** - Use pathlib, f-strings, specific exceptions, see [references/pathlib-file-ops.md](references/pathlib-file-ops.md), [references/string-formatting.md](references/string-formatting.md), [references/exception-handling.md](references/exception-handling.md)
+
+## Gotchas
+
+- Mutable default arguments (`def f(x=[]):`) share state across calls — use `None` and assign inside
+- The GIL serializes pure-Python execution — threads only help on I/O; CPU-bound work needs `multiprocessing` or compiled extensions
+- `is` checks identity, not equality — small-int caching means `a is b` works for `1` but fails for `300`
+- `__init__.py` is no longer required for packages (PEP 420), but mixing namespace and regular packages causes silent import-shadowing bugs
+- `async`/sync mixing without `asyncio.to_thread` blocks the event loop — a single `requests.get()` in an async handler kills concurrency
 
 ## Progressive disclosure
 
-- Read [reference/dataclasses-type-hints.md](reference/dataclasses-type-hints.md) - When defining structured data models or adding type annotations
-- Read [reference/type-checking.md](reference/type-checking.md) - When using Protocols, type aliases, or complex Union types
-- Read [reference/async-await-patterns.md](reference/async-await-patterns.md) - When building async APIs or handling concurrent I/O operations
-- Read [reference/resource-management.md](reference/resource-management.md) - When working with files, connections, or resources needing cleanup
-- Read [reference/caching-functions.md](reference/caching-functions.md) - When optimizing expensive computations or repeated function calls
-- Read [reference/generators-comprehensions.md](reference/generators-comprehensions.md) - When processing large datasets or streaming data
-- Read [reference/string-formatting.md](reference/string-formatting.md) - When formatting output, building messages, or templating
-- Read [reference/pathlib-file-ops.md](reference/pathlib-file-ops.md) - When reading/writing files or traversing directories
-- Read [reference/exception-handling.md](reference/exception-handling.md) - When defining error handling or creating custom exceptions
+- Read [references/dataclasses-type-hints.md](references/dataclasses-type-hints.md) - When defining structured data models or adding type annotations
+- Read [references/type-checking.md](references/type-checking.md) - When using Protocols, type aliases, or complex Union types
+- Read [references/async-await-patterns.md](references/async-await-patterns.md) - When building async APIs or handling concurrent I/O operations
+- Read [references/resource-management.md](references/resource-management.md) - When working with files, connections, or resources needing cleanup
+- Read [references/caching-functions.md](references/caching-functions.md) - When optimizing expensive computations or repeated function calls
+- Read [references/generators-comprehensions.md](references/generators-comprehensions.md) - When processing large datasets or streaming data
+- Read [references/string-formatting.md](references/string-formatting.md) - When formatting output, building messages, or templating
+- Read [references/pathlib-file-ops.md](references/pathlib-file-ops.md) - When reading/writing files or traversing directories
+- Read [references/exception-handling.md](references/exception-handling.md) - When defining error handling or creating custom exceptions

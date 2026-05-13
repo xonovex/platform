@@ -11,18 +11,26 @@ description: "Use when editing general-purpose Lua 5.4+ — modules, scripts, co
 
 ## Essentials
 
-- **Module pattern** - Always `local`, one module per file returning table, see [reference/module-pattern.md](reference/module-pattern.md), [reference/local-variables.md](reference/local-variables.md)
-- **Code organization** - Prefer table-based modules and simple functions, see [reference/module-pattern.md](reference/module-pattern.md), [reference/metatables.md](reference/metatables.md)
-- **Cooperative tasks** - Use coroutines for async patterns, see [reference/coroutines.md](reference/coroutines.md)
-- **Validation** - Validate inputs and handle errors, see [reference/input-validation.md](reference/input-validation.md), [reference/error-handling.md](reference/error-handling.md)
+- **Module pattern** - Always `local`, one module per file returning table, see [references/module-pattern.md](references/module-pattern.md), [references/local-variables.md](references/local-variables.md)
+- **Code organization** - Prefer table-based modules and simple functions, see [references/module-pattern.md](references/module-pattern.md), [references/metatables.md](references/metatables.md)
+- **Cooperative tasks** - Use coroutines for async patterns, see [references/coroutines.md](references/coroutines.md)
+- **Validation** - Validate inputs and handle errors, see [references/input-validation.md](references/input-validation.md), [references/error-handling.md](references/error-handling.md)
+
+## Gotchas
+
+- Arrays are 1-indexed; a `nil` hole breaks the `#` length operator (it stops at the first nil)
+- Tables are both array and hash; mixing them is fine but iteration order isn't guaranteed for the hash part
+- 5.3+ distinguishes integers from floats; division `/` always returns float, `//` does integer division — silent bugs in pre-5.3 code
+- Variables are global by default unless declared `local` — forgetting `local` in a loop counter leaks into the surrounding scope
+- `require` caches modules; reloading needs `package.loaded[name] = nil` before re-requiring
 
 ## Progressive disclosure
 
-- Read [reference/module-pattern.md](reference/module-pattern.md) - When creating reusable modules or organizing code structure
-- Read [reference/local-variables.md](reference/local-variables.md) - When encountering global variable issues or scoping problems
-- Read [reference/metatables.md](reference/metatables.md) - When implementing object-oriented patterns or operator overloading
-- Read [reference/coroutines.md](reference/coroutines.md) - When implementing cooperative multitasking or async patterns
-- Read [reference/input-validation.md](reference/input-validation.md) - When adding type checks or parameter validation
-- Read [reference/error-handling.md](reference/error-handling.md) - When handling errors or implementing fallback logic
-- Read [reference/string-concatenation.md](reference/string-concatenation.md) - When building strings in loops or formatting output
-- Read [reference/idiomatic-patterns.md](reference/idiomatic-patterns.md) - When learning common Lua idioms or patterns
+- Read [references/module-pattern.md](references/module-pattern.md) - When creating reusable modules or organizing code structure
+- Read [references/local-variables.md](references/local-variables.md) - When encountering global variable issues or scoping problems
+- Read [references/metatables.md](references/metatables.md) - When implementing object-oriented patterns or operator overloading
+- Read [references/coroutines.md](references/coroutines.md) - When implementing cooperative multitasking or async patterns
+- Read [references/input-validation.md](references/input-validation.md) - When adding type checks or parameter validation
+- Read [references/error-handling.md](references/error-handling.md) - When handling errors or implementing fallback logic
+- Read [references/string-concatenation.md](references/string-concatenation.md) - When building strings in loops or formatting output
+- Read [references/idiomatic-patterns.md](references/idiomatic-patterns.md) - When learning common Lua idioms or patterns

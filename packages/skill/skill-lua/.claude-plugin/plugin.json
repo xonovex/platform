@@ -1,6 +1,6 @@
 {
   "name": "xonovex-skill-lua",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Xonovex Lua skills",
   "author": {"name": "Xonovex"},
   "skills": ["./lua-guide"]

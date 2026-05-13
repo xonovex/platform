@@ -3,11 +3,9 @@
   "owner": { "name": "Xonovex" },
   "metadata": {
     "description": "Official Xonovex development tools",
-    "version": "0.2.0"
+    "version": "0.2.3"
   },
   "plugins": [
-    { "name": "xonovex-workflow", "source": "./packages/command/command-workflow", "description": "Xonovex workflow commands — planning, code analysis, git" },
-    { "name": "xonovex-utility", "source": "./packages/command/command-utility", "description": "Xonovex utility commands — skills, instructions, insights, content" },
     { "name": "xonovex-skill-astro", "source": "./packages/skill/skill-astro", "description": "Xonovex Astro skills" },
     { "name": "xonovex-skill-c99", "source": "./packages/skill/skill-c99", "description": "Xonovex C99 skills" },
     { "name": "xonovex-skill-c99-game-opinionated", "source": "./packages/skill/skill-c99-game-opinionated", "description": "Xonovex C99 game opinionated skills" },
@@ -15,7 +13,7 @@
     { "name": "xonovex-skill-cmake", "source": "./packages/skill/skill-cmake", "description": "Xonovex CMake skills" },
     { "name": "xonovex-skill-content", "source": "./packages/skill/skill-content", "description": "Xonovex Content skills" },
     { "name": "xonovex-skill-docker", "source": "./packages/skill/skill-docker", "description": "Xonovex Docker skills" },
-    { "name": "xonovex-skill-express.js", "source": "./packages/skill/skill-express.js", "description": "Xonovex Express.js skills" },
+    { "name": "xonovex-skill-expressjs", "source": "./packages/skill/skill-expressjs", "description": "Xonovex Express.js skills" },
     { "name": "xonovex-skill-general-fp", "source": "./packages/skill/skill-general-fp", "description": "Xonovex Functional programming skills" },
     { "name": "xonovex-skill-general-oop", "source": "./packages/skill/skill-general-oop", "description": "Xonovex Object-oriented programming skills" },
     { "name": "xonovex-skill-git", "source": "./packages/skill/skill-git", "description": "Xonovex Git skills" },
@@ -24,12 +22,14 @@
     { "name": "xonovex-skill-insights", "source": "./packages/skill/skill-insights", "description": "Xonovex Insights skills" },
     { "name": "xonovex-skill-instruction", "source": "./packages/skill/skill-instruction", "description": "Xonovex Instruction skills" },
     { "name": "xonovex-skill-kubernetes", "source": "./packages/skill/skill-kubernetes", "description": "Xonovex Kubernetes skills" },
+    { "name": "xonovex-skill-llmstxt", "source": "./packages/skill/skill-llmstxt", "description": "Xonovex llms.txt skill — author and maintain /llms.txt files and per-page markdown mirrors per the llmstxt.org spec" },
     { "name": "xonovex-skill-lua", "source": "./packages/skill/skill-lua", "description": "Xonovex Lua skills" },
     { "name": "xonovex-skill-lua-opinionated", "source": "./packages/skill/skill-lua-opinionated", "description": "Xonovex Lua opinionated skills" },
     { "name": "xonovex-skill-moon", "source": "./packages/skill/skill-moon", "description": "Xonovex Moon skills" },
     { "name": "xonovex-skill-motion-react", "source": "./packages/skill/skill-motion-react", "description": "Xonovex Motion for React skills" },
     { "name": "xonovex-skill-plan", "source": "./packages/skill/skill-plan", "description": "Xonovex Plan skills" },
     { "name": "xonovex-skill-presentation", "source": "./packages/skill/skill-presentation", "description": "Xonovex Presentation skills" },
+    { "name": "xonovex-skill-prompt", "source": "./packages/skill/skill-prompt", "description": "Xonovex Prompt skill — author, merge, simplify reusable user-invocable prompt files" },
     { "name": "xonovex-skill-python", "source": "./packages/skill/skill-python", "description": "Xonovex Python skills" },
     { "name": "xonovex-skill-react", "source": "./packages/skill/skill-react", "description": "Xonovex React skills" },
     { "name": "xonovex-skill-remotion", "source": "./packages/skill/skill-remotion", "description": "Xonovex Remotion skills" },
@@ -41,9 +41,7 @@
     { "name": "xonovex-skill-threejs", "source": "./packages/skill/skill-threejs", "description": "Xonovex Three.js skills" },
     { "name": "xonovex-skill-typescript", "source": "./packages/skill/skill-typescript", "description": "Xonovex TypeScript skills" },
     { "name": "xonovex-skill-typescript-to-lua", "source": "./packages/skill/skill-typescript-to-lua", "description": "Xonovex TypeScript to Lua skills" },
-    { "name": "xonovex-skill-utility", "source": "./packages/skill/skill-utility", "description": "Xonovex utility skills — skills, instructions, insights, content" },
     { "name": "xonovex-skill-vitest", "source": "./packages/skill/skill-vitest", "description": "Xonovex Vitest skills" },
-    { "name": "xonovex-skill-workflow", "source": "./packages/skill/skill-workflow", "description": "Xonovex workflow skills — planning, code analysis, git" },
     { "name": "xonovex-skill-zod", "source": "./packages/skill/skill-zod", "description": "Xonovex Zod skills" }
   ]
 }

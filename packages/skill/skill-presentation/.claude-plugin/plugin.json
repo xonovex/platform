@@ -1,6 +1,6 @@
 {
   "name": "xonovex-skill-presentation",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Xonovex Presentation skills",
   "author": {"name": "Xonovex"},
   "skills": ["./presentation-guide"]

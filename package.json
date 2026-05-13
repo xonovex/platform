@@ -7,7 +7,6 @@
     "packages/asset/*",
     "packages/diagram/*",
     "packages/skill/*",
-    "packages/command/*",
     "packages/config/*",
     "packages/agent/*",
     "packages/shared/*",

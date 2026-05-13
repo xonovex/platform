@@ -11,17 +11,25 @@ description: "Use when editing Kubernetes manifests in GitOps repos. Triggers on
 
 ## Essentials
 
-- **Organization** - Use namespaces, labels, annotations consistently, see [reference/deployments.md](reference/deployments.md)
-- **Container images** - No `latest` tags, set requests/limits and probes, see [reference/deployments.md](reference/deployments.md)
-- **Security** - Run as non-root, read-only FS, drop capabilities, see [reference/deployments.md](reference/deployments.md)
-- **Configuration** - Use ConfigMaps/Secrets, SOPS/External Secrets for secrets, see [reference/configmaps-secrets.md](reference/configmaps-secrets.md)
-- **Multi-environment** - Manage with Kustomize bases/overlays, validate with `--dry-run`, see [reference/kustomize.md](reference/kustomize.md), [reference/validation.md](reference/validation.md)
+- **Organization** - Use namespaces, labels, annotations consistently, see [references/deployments.md](references/deployments.md)
+- **Container images** - No `latest` tags, set requests/limits and probes, see [references/deployments.md](references/deployments.md)
+- **Security** - Run as non-root, read-only FS, drop capabilities, see [references/deployments.md](references/deployments.md)
+- **Configuration** - Use ConfigMaps/Secrets, SOPS/External Secrets for secrets, see [references/configmaps-secrets.md](references/configmaps-secrets.md)
+- **Multi-environment** - Manage with Kustomize bases/overlays, validate with `--dry-run`, see [references/kustomize.md](references/kustomize.md), [references/validation.md](references/validation.md)
+
+## Gotchas
+
+- `Secrets` are base64-encoded, not encrypted — encryption-at-rest requires enabling KMS provider on the cluster
+- `resources.requests` is what the scheduler considers; `.limits` is what the kubelet enforces — without requests, pods compete unbounded
+- Label selectors are immutable once a Service/Deployment is created — changing them requires recreate, not patch
+- Namespace scope: `kubectl` defaults to `default` namespace; cross-namespace traffic needs `<svc>.<ns>.svc.cluster.local` or `NetworkPolicy`
+- `Deployment` rolling updates require `readinessProbe` to be honest — a probe that returns 200 too early routes traffic to a not-ready pod
 
 ## Progressive disclosure
 
-- Read [reference/deployments.md](reference/deployments.md) - When creating or updating Deployment resources
-- Read [reference/services.md](reference/services.md) - When exposing applications or configuring load balancing
-- Read [reference/configmaps-secrets.md](reference/configmaps-secrets.md) - When externalizing configuration or managing secrets
-- Read [reference/kustomize.md](reference/kustomize.md) - When managing multiple environments with overlays
-- Read [reference/network-policies.md](reference/network-policies.md) - When implementing network isolation between pods
-- Read [reference/validation.md](reference/validation.md) - When validating manifests before applying to cluster
+- Read [references/deployments.md](references/deployments.md) - When creating or updating Deployment resources
+- Read [references/services.md](references/services.md) - When exposing applications or configuring load balancing
+- Read [references/configmaps-secrets.md](references/configmaps-secrets.md) - When externalizing configuration or managing secrets
+- Read [references/kustomize.md](references/kustomize.md) - When managing multiple environments with overlays
+- Read [references/network-policies.md](references/network-policies.md) - When implementing network isolation between pods
+- Read [references/validation.md](references/validation.md) - When validating manifests before applying to cluster

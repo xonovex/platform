@@ -11,11 +11,11 @@ description: "Use when editing Hono APIs that follow the opinionated style — i
 
 ## Opinionated patterns
 
-- **Async controllers** - Remove unnecessary `async` from synchronous handlers, see [reference/controllers.md](reference/controllers.md)
-- **OpenAPI type inference** - Use inline handlers for type safety, explicit status codes, OpenAPIHono hierarchy, see [reference/openapi-inline-handlers.md](reference/openapi-inline-handlers.md), [reference/openapi-explicit-status-codes.md](reference/openapi-explicit-status-codes.md), [reference/openapi-router-hierarchy.md](reference/openapi-router-hierarchy.md)
-- **OpenAPI documentation** - Use `app.doc()` for automatic spec generation, see [reference/openapi-spec-generation.md](reference/openapi-spec-generation.md)
-- **Router selection** - LinearRouter for serverless, RegExpRouter for high-throughput, see [reference/router-selection.md](reference/router-selection.md)
-- **Request limits** - Use `bodyLimit` middleware to prevent DoS, see [reference/body-limit.md](reference/body-limit.md)
+- **Async controllers** - Remove unnecessary `async` from synchronous handlers, see [references/controllers.md](references/controllers.md)
+- **OpenAPI type inference** - Use inline handlers for type safety, explicit status codes, OpenAPIHono hierarchy, see [references/openapi-inline-handlers.md](references/openapi-inline-handlers.md), [references/openapi-explicit-status-codes.md](references/openapi-explicit-status-codes.md), [references/openapi-router-hierarchy.md](references/openapi-router-hierarchy.md)
+- **OpenAPI documentation** - Use `app.doc()` for automatic spec generation, see [references/openapi-spec-generation.md](references/openapi-spec-generation.md)
+- **Router selection** - LinearRouter for serverless, RegExpRouter for high-throughput, see [references/router-selection.md](references/router-selection.md)
+- **Request limits** - Use `bodyLimit` middleware to prevent DoS, see [references/body-limit.md](references/body-limit.md)
 
 ## Example
 
@@ -37,12 +37,19 @@ export function createApp() {
 }
 ```
 
+## Gotchas
+
+- Inline OpenAPI handlers tie validation, status codes, and types together — splitting them later is painful, write them inline from day one
+- Explicit status codes (`c.json(body, 201)`) are required by the OpenAPI generator — implicit 200 produces wrong specs
+- Router hierarchy: parent routes inherit middleware; mounting a sub-router with `.route()` runs the parent middleware first
+- Picking the router (RegExpRouter / SmartRouter / TrieRouter / PatternRouter) is a startup decision — switching requires testing all routes
+
 ## Progressive disclosure
 
-- Read [reference/controllers.md](reference/controllers.md) - When seeing unnecessary async functions
-- Read [reference/openapi-inline-handlers.md](reference/openapi-inline-handlers.md) - When OpenAPI loses type inference
-- Read [reference/openapi-explicit-status-codes.md](reference/openapi-explicit-status-codes.md) - When defining OpenAPI response schemas
-- Read [reference/openapi-router-hierarchy.md](reference/openapi-router-hierarchy.md) - When composing multiple routers
-- Read [reference/openapi-spec-generation.md](reference/openapi-spec-generation.md) - When generating OpenAPI documentation
-- Read [reference/router-selection.md](reference/router-selection.md) - When optimizing for serverless/edge or high-throughput
-- Read [reference/body-limit.md](reference/body-limit.md) - When preventing oversized request payloads
+- Read [references/controllers.md](references/controllers.md) - When seeing unnecessary async functions
+- Read [references/openapi-inline-handlers.md](references/openapi-inline-handlers.md) - When OpenAPI loses type inference
+- Read [references/openapi-explicit-status-codes.md](references/openapi-explicit-status-codes.md) - When defining OpenAPI response schemas
+- Read [references/openapi-router-hierarchy.md](references/openapi-router-hierarchy.md) - When composing multiple routers
+- Read [references/openapi-spec-generation.md](references/openapi-spec-generation.md) - When generating OpenAPI documentation
+- Read [references/router-selection.md](references/router-selection.md) - When optimizing for serverless/edge or high-throughput
+- Read [references/body-limit.md](references/body-limit.md) - When preventing oversized request payloads

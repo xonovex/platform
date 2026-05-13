@@ -1,6 +1,6 @@
 {
   "name": "xonovex-skill-astro",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Xonovex Astro skills",
   "author": {"name": "Xonovex"},
   "skills": ["./astro-guide"]

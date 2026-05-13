@@ -11,32 +11,39 @@ description: "Use when editing C99 game-engine or runtime code in projects that 
 
 ## Math
 
-- **Types** - 16-byte aligned vectors/matrices/quaternions, see [reference/math-types.md](reference/math-types.md)
-- **Access** - Use accessor functions for matrices, direct fields for vectors, see [reference/math-types.md](reference/math-types.md)
-- **Coordinates** - Right-handed Y-up, CCW winding, configurable clip depth, see [reference/coordinate-system.md](reference/coordinate-system.md)
+- **Types** - 16-byte aligned vectors/matrices/quaternions, see [references/math-types.md](references/math-types.md)
+- **Access** - Use accessor functions for matrices, direct fields for vectors, see [references/math-types.md](references/math-types.md)
+- **Coordinates** - Right-handed Y-up, CCW winding, configurable clip depth, see [references/coordinate-system.md](references/coordinate-system.md)
 - **Suffixes** - `_aos/_soa` layouts, `_simde` SIMD, `2d/3d` dimensions
 
 ## Geometry Pipeline
 
-- **Analytic → Discrete → Packing** - Separate logic/rendering/GPU layers, see [reference/geometry-pipeline.md](reference/geometry-pipeline.md)
-- **Builder pattern** - `*_req()` query size, `*_build()` write to caller buffer, see [reference/builder-pattern.md](reference/builder-pattern.md)
+- **Analytic → Discrete → Packing** - Separate logic/rendering/GPU layers, see [references/geometry-pipeline.md](references/geometry-pipeline.md)
+- **Builder pattern** - `*_req()` query size, `*_build()` write to caller buffer, see [references/builder-pattern.md](references/builder-pattern.md)
 
 ## Patterns
 
 - **Caller-owns-memory** - Libraries never allocate, app provides arrays
-- **Tagged unions** - Type enum + union for polymorphism, see [reference/tagged-unions.md](reference/tagged-unions.md)
-- **Inverse mass** - Store `1/mass`, static objects use `0.0`, see [reference/physics-patterns.md](reference/physics-patterns.md)
-- **SoA optimization** - AoS for single objects, SoA for batches, see [reference/mesh-types.md](reference/mesh-types.md)
+- **Tagged unions** - Type enum + union for polymorphism, see [references/tagged-unions.md](references/tagged-unions.md)
+- **Inverse mass** - Store `1/mass`, static objects use `0.0`, see [references/physics-patterns.md](references/physics-patterns.md)
+- **SoA optimization** - AoS for single objects, SoA for batches, see [references/mesh-types.md](references/mesh-types.md)
 - **Validation** - Check capacity, bounds, NULL, overflow before operations
+
+## Gotchas
+
+- Vertex packing order matters for GPU upload — pack tightly and match the shader's attribute layout, not the C struct's natural padding
+- Quaternion math is sensitive to normalization drift — re-normalize after long chains of multiplications
+- Tagged unions with a sentinel `TYPE_INVALID = 0` save initialization bugs; designated initializers default fields to zero
+- Builder patterns in C99 work via opaque structs + functions; never expose mutable struct fields across the public boundary
 
 ## Progressive disclosure
 
-- Read [reference/math-types.md](reference/math-types.md) - When working with vectors, matrices, or quaternions
-- Read [reference/coordinate-system.md](reference/coordinate-system.md) - When setting up camera, projection, or mesh normals
-- Read [reference/tagged-unions.md](reference/tagged-unions.md) - When implementing shape or entity polymorphism
-- Read [reference/physics-patterns.md](reference/physics-patterns.md) - When implementing rigid bodies, collision, or constraints
-- Read [reference/geometry-pipeline.md](reference/geometry-pipeline.md) - When converting analytic shapes to renderable meshes
-- Read [reference/builder-pattern.md](reference/builder-pattern.md) - When generating meshes or other variable-size data
-- Read [reference/vertex-packing.md](reference/vertex-packing.md) - When preparing vertex data for GPU upload
-- Read [reference/mesh-types.md](reference/mesh-types.md) - When working with 2D or 3D mesh structures
-- Read [reference/spatial-structures.md](reference/spatial-structures.md) - When implementing broad-phase collision or spatial queries
+- Read [references/math-types.md](references/math-types.md) - When working with vectors, matrices, or quaternions
+- Read [references/coordinate-system.md](references/coordinate-system.md) - When setting up camera, projection, or mesh normals
+- Read [references/tagged-unions.md](references/tagged-unions.md) - When implementing shape or entity polymorphism
+- Read [references/physics-patterns.md](references/physics-patterns.md) - When implementing rigid bodies, collision, or constraints
+- Read [references/geometry-pipeline.md](references/geometry-pipeline.md) - When converting analytic shapes to renderable meshes
+- Read [references/builder-pattern.md](references/builder-pattern.md) - When generating meshes or other variable-size data
+- Read [references/vertex-packing.md](references/vertex-packing.md) - When preparing vertex data for GPU upload
+- Read [references/mesh-types.md](references/mesh-types.md) - When working with 2D or 3D mesh structures
+- Read [references/spatial-structures.md](references/spatial-structures.md) - When implementing broad-phase collision or spatial queries
