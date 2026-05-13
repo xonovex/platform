@@ -37,13 +37,13 @@ description: "Use when configuring moonrepo monorepo tasks. Triggers on `.moon/`
 
 ## Progressive disclosure
 
-- Read [references/task-configuration.md](references/task-configuration.md) - When defining or modifying task configurations
-- Read [references/tag-based-filtering.md](references/tag-based-filtering.md) - When filtering projects or tasks by tags
-- Read [references/query-language.md](references/query-language.md) - When using advanced query syntax
-- Read [references/task-inheritance.md](references/task-inheritance.md) - When setting up task inheritance patterns
-- Read [references/project-constraints.md](references/project-constraints.md) - When enforcing project boundaries
-- Read [references/migration-v2.md](references/migration-v2.md) - When migrating from moon v1 to v2
-- Read [references/docker-multistage.md](references/docker-multistage.md) - When building Docker images with moon scaffold
+- Read [references/task-configuration.md](references/task-configuration.md) - Load when defining or modifying task configurations
+- Read [references/tag-based-filtering.md](references/tag-based-filtering.md) - Load when filtering projects or tasks by tags
+- Read [references/query-language.md](references/query-language.md) - Load when using advanced query syntax
+- Read [references/task-inheritance.md](references/task-inheritance.md) - Load when setting up task inheritance patterns
+- Read [references/project-constraints.md](references/project-constraints.md) - Load when enforcing project boundaries
+- Read [references/migration-v2.md](references/migration-v2.md) - Load when migrating from moon v1 to v2
+- Read [references/docker-multistage.md](references/docker-multistage.md) - Load when building Docker images with moon scaffold
 
 ## External References
 

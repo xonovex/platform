@@ -22,8 +22,8 @@ description: "Use when editing or scaffolding Astro sites with islands architect
 
 ## Progressive disclosure
 
-- Read [references/islands-architecture.md](references/islands-architecture.md) - When deciding which components need client-side JavaScript
-- Read [references/project-structure.md](references/project-structure.md) - When organizing files and directories
-- Read [references/content-collections.md](references/content-collections.md) - When managing blog posts, docs, or structured content
-- Read [references/components.md](references/components.md) - When integrating React, Vue, or other framework components
-- Read [references/accessibility.md](references/accessibility.md) - When adding keyboard navigation or screen reader support
+- Read [references/islands-architecture.md](references/islands-architecture.md) - Load when deciding which components need client-side JavaScript
+- Read [references/project-structure.md](references/project-structure.md) - Load when organizing files and directories
+- Read [references/content-collections.md](references/content-collections.md) - Load when managing blog posts, docs, or structured content
+- Read [references/components.md](references/components.md) - Load when integrating React, Vue, or other framework components
+- Read [references/accessibility.md](references/accessibility.md) - Load when adding keyboard navigation or screen reader support

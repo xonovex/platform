@@ -43,13 +43,13 @@ export function createApp() {
 
 ## Progressive disclosure
 
-- Read [references/application-structure.md](references/application-structure.md) - When organizing a new Hono application
-- Read [references/validation-type-safety.md](references/validation-type-safety.md) - When losing type safety after validation
-- Read [references/middleware-patterns.md](references/middleware-patterns.md) - When creating reusable middleware or configuring CORS
-- Read [references/websocket-support.md](references/websocket-support.md) - When implementing WebSocket endpoints
-- Read [references/error-handling.md](references/error-handling.md) - When standardizing error responses across routes
-- Read [references/security-middleware.md](references/security-middleware.md) - When configuring auth, CSRF, or security headers
-- Read [references/cookie-handling.md](references/cookie-handling.md) - When managing sessions or sensitive cookies
-- Read [references/context-storage.md](references/context-storage.md) - When accessing Context outside handlers
-- Read [references/middleware-combine.md](references/middleware-combine.md) - When composing complex middleware logic
-- Read [references/platform-runtime.md](references/platform-runtime.md) - When deploying across multiple runtimes
+- Read [references/application-structure.md](references/application-structure.md) - Load when organizing a new Hono application
+- Read [references/validation-type-safety.md](references/validation-type-safety.md) - Load when losing type safety after validation
+- Read [references/middleware-patterns.md](references/middleware-patterns.md) - Load when creating reusable middleware or configuring CORS
+- Read [references/websocket-support.md](references/websocket-support.md) - Load when implementing WebSocket endpoints
+- Read [references/error-handling.md](references/error-handling.md) - Load when standardizing error responses across routes
+- Read [references/security-middleware.md](references/security-middleware.md) - Load when configuring auth, CSRF, or security headers
+- Read [references/cookie-handling.md](references/cookie-handling.md) - Load when managing sessions or sensitive cookies
+- Read [references/context-storage.md](references/context-storage.md) - Load when accessing Context outside handlers
+- Read [references/middleware-combine.md](references/middleware-combine.md) - Load when composing complex middleware logic
+- Read [references/platform-runtime.md](references/platform-runtime.md) - Load when deploying across multiple runtimes

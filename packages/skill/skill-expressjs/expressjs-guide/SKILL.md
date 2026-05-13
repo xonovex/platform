@@ -27,12 +27,12 @@ description: "Use when editing or scaffolding Express 5+ API servers in TypeScri
 
 ## Progressive disclosure
 
-- Read [references/project-structure.md](references/project-structure.md) - When organizing a new Express project
-- Read [references/routes.md](references/routes.md) - When defining REST endpoints or route patterns
-- Read [references/controllers.md](references/controllers.md) - When implementing request handlers
-- Read [references/validation.md](references/validation.md) - When adding input validation to routes
-- Read [references/authentication.md](references/authentication.md) - When implementing JWT auth or session management
-- Read [references/error-handling.md](references/error-handling.md) - When centralizing error responses
-- Read [references/responses.md](references/responses.md) - When standardizing API response formats
-- Read [references/app-setup.md](references/app-setup.md) - When configuring Express app initialization
-- Read [references/testing.md](references/testing.md) - When writing unit or integration tests
+- Read [references/project-structure.md](references/project-structure.md) - Load when organizing a new Express project
+- Read [references/routes.md](references/routes.md) - Load when defining REST endpoints or route patterns
+- Read [references/controllers.md](references/controllers.md) - Load when implementing request handlers
+- Read [references/validation.md](references/validation.md) - Load when adding input validation to routes
+- Read [references/authentication.md](references/authentication.md) - Load when implementing JWT auth or session management
+- Read [references/error-handling.md](references/error-handling.md) - Load when centralizing error responses
+- Read [references/responses.md](references/responses.md) - Load when standardizing API response formats
+- Read [references/app-setup.md](references/app-setup.md) - Load when configuring Express app initialization
+- Read [references/testing.md](references/testing.md) - Load when writing unit or integration tests

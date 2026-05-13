@@ -32,7 +32,8 @@ NAME_RE = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
 FRONTMATTER_RE = re.compile(r"^---\n(.*?)\n---\n(.*)$", re.DOTALL)
 REF_LINK_RE = re.compile(r"references/([a-zA-Z0-9_./<>{}-]+\.md)")
 PROGRESSIVE_DISCLOSURE_RE = re.compile(
-    r"^## *Progressive Disclosure\s*\n(.*?)(?=^## |\Z)", re.MULTILINE | re.DOTALL
+    r"^## *Progressive Disclosure\s*\n(.*?)(?=^## |\Z)",
+    re.MULTILINE | re.DOTALL | re.IGNORECASE,
 )
 HEADING_RE = re.compile(r"^#{1,6} ", re.MULTILINE)
 CODE_FENCE_OPEN_RE = re.compile(r"^```([a-zA-Z0-9_+-]+)?\s*$", re.MULTILINE)

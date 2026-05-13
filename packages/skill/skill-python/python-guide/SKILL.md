@@ -28,12 +28,12 @@ description: "Use when writing or editing Python 3.12+ for APIs, data processing
 
 ## Progressive disclosure
 
-- Read [references/dataclasses-type-hints.md](references/dataclasses-type-hints.md) - When defining structured data models or adding type annotations
-- Read [references/type-checking.md](references/type-checking.md) - When using Protocols, type aliases, or complex Union types
-- Read [references/async-await-patterns.md](references/async-await-patterns.md) - When building async APIs or handling concurrent I/O operations
-- Read [references/resource-management.md](references/resource-management.md) - When working with files, connections, or resources needing cleanup
-- Read [references/caching-functions.md](references/caching-functions.md) - When optimizing expensive computations or repeated function calls
-- Read [references/generators-comprehensions.md](references/generators-comprehensions.md) - When processing large datasets or streaming data
-- Read [references/string-formatting.md](references/string-formatting.md) - When formatting output, building messages, or templating
-- Read [references/pathlib-file-ops.md](references/pathlib-file-ops.md) - When reading/writing files or traversing directories
-- Read [references/exception-handling.md](references/exception-handling.md) - When defining error handling or creating custom exceptions
+- Read [references/dataclasses-type-hints.md](references/dataclasses-type-hints.md) - Load when defining structured data models or adding type annotations
+- Read [references/type-checking.md](references/type-checking.md) - Load when using Protocols, type aliases, or complex Union types
+- Read [references/async-await-patterns.md](references/async-await-patterns.md) - Load when building async APIs or handling concurrent I/O operations
+- Read [references/resource-management.md](references/resource-management.md) - Load when working with files, connections, or resources needing cleanup
+- Read [references/caching-functions.md](references/caching-functions.md) - Load when optimizing expensive computations or repeated function calls
+- Read [references/generators-comprehensions.md](references/generators-comprehensions.md) - Load when processing large datasets or streaming data
+- Read [references/string-formatting.md](references/string-formatting.md) - Load when formatting output, building messages, or templating
+- Read [references/pathlib-file-ops.md](references/pathlib-file-ops.md) - Load when reading/writing files or traversing directories
+- Read [references/exception-handling.md](references/exception-handling.md) - Load when defining error handling or creating custom exceptions

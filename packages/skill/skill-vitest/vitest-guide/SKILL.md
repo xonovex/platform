@@ -28,12 +28,12 @@ description: "Use when writing or editing Vitest 3+ tests in TypeScript. Trigger
 
 ## Progressive disclosure
 
-- Read [references/type-safety.md](references/type-safety.md) - When test variables lose type information
-- Read [references/json-response-type-safety.md](references/json-response-type-safety.md) - When calling res.json() without type assertions
-- Read [references/http-testing.md](references/http-testing.md) - When asserting HTTP status codes in API tests
-- Read [references/cors-preflight-status-code.md](references/cors-preflight-status-code.md) - When testing CORS OPTIONS requests
-- Read [references/timestamp-testing.md](references/timestamp-testing.md) - When tests fail intermittently due to timing
-- Read [references/mock-patterns.md](references/mock-patterns.md) - When creating mocks or stubs for tests
-- Read [references/typescript-config.md](references/typescript-config.md) - When test files aren't recognized by TypeScript
-- Read [references/project-references-path-resolution.md](references/project-references-path-resolution.md) - When imports fail in test files
-- Read [references/test-organization.md](references/test-organization.md) - When structuring test suites for large APIs
+- Read [references/type-safety.md](references/type-safety.md) - Load when test variables lose type information
+- Read [references/json-response-type-safety.md](references/json-response-type-safety.md) - Load when calling res.json() without type assertions
+- Read [references/http-testing.md](references/http-testing.md) - Load when asserting HTTP status codes in API tests
+- Read [references/cors-preflight-status-code.md](references/cors-preflight-status-code.md) - Load when testing CORS OPTIONS requests
+- Read [references/timestamp-testing.md](references/timestamp-testing.md) - Load when tests fail intermittently due to timing
+- Read [references/mock-patterns.md](references/mock-patterns.md) - Load when creating mocks or stubs for tests
+- Read [references/typescript-config.md](references/typescript-config.md) - Load when test files aren't recognized by TypeScript
+- Read [references/project-references-path-resolution.md](references/project-references-path-resolution.md) - Load when imports fail in test files
+- Read [references/test-organization.md](references/test-organization.md) - Load when structuring test suites for large APIs

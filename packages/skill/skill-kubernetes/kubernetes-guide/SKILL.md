@@ -27,9 +27,9 @@ description: "Use when editing Kubernetes manifests in GitOps repos. Triggers on
 
 ## Progressive disclosure
 
-- Read [references/deployments.md](references/deployments.md) - When creating or updating Deployment resources
-- Read [references/services.md](references/services.md) - When exposing applications or configuring load balancing
-- Read [references/configmaps-secrets.md](references/configmaps-secrets.md) - When externalizing configuration or managing secrets
-- Read [references/kustomize.md](references/kustomize.md) - When managing multiple environments with overlays
-- Read [references/network-policies.md](references/network-policies.md) - When implementing network isolation between pods
-- Read [references/validation.md](references/validation.md) - When validating manifests before applying to cluster
+- Read [references/deployments.md](references/deployments.md) - Load when creating or updating Deployment resources
+- Read [references/services.md](references/services.md) - Load when exposing applications or configuring load balancing
+- Read [references/configmaps-secrets.md](references/configmaps-secrets.md) - Load when externalizing configuration or managing secrets
+- Read [references/kustomize.md](references/kustomize.md) - Load when managing multiple environments with overlays
+- Read [references/network-policies.md](references/network-policies.md) - Load when implementing network isolation between pods
+- Read [references/validation.md](references/validation.md) - Load when validating manifests before applying to cluster

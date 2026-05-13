@@ -35,16 +35,16 @@ description: "Use when editing systems or embedded C99 code in projects that fol
 
 ## Progressive disclosure
 
-- Read [references/memory-management.md](references/memory-management.md) - When allocating memory or managing resource lifetimes
-- Read [references/designated-initializers.md](references/designated-initializers.md) - When initializing structs or arrays with specific values
-- Read [references/inline-functions.md](references/inline-functions.md) - When replacing macros or writing small utility functions
-- Read [references/compound-literals.md](references/compound-literals.md) - When creating temporary values without named variables
-- Read [references/const-correctness.md](references/const-correctness.md) - When marking immutable data or understanding pointer const
-- Read [references/data-oriented-design.md](references/data-oriented-design.md) - When optimizing cache performance or data layouts
-- Read [references/error-handling.md](references/error-handling.md) - When implementing error codes or handling failures
-- Read [references/implementation-variants.md](references/implementation-variants.md) - When choosing between scalar, AoS, SoA, or SIMD implementations
-- Read [references/caller-owns-memory.md](references/caller-owns-memory.md) - When designing APIs where caller provides memory
-- Read [references/alignment.md](references/alignment.md) - When aligning data for SIMD or cache performance
-- Read [references/file-naming.md](references/file-naming.md) - When organizing headers by type, implementation, and variant
-- Read [references/testing-patterns.md](references/testing-patterns.md) - When writing tests with assertions, epsilon comparisons, or parity checks
-- Read [references/safety-validations.md](references/safety-validations.md) - When validating inputs for capacity, bounds, NULL, or overflow
+- Read [references/memory-management.md](references/memory-management.md) - Load when allocating memory or managing resource lifetimes
+- Read [references/designated-initializers.md](references/designated-initializers.md) - Load when initializing structs or arrays with specific values
+- Read [references/inline-functions.md](references/inline-functions.md) - Load when replacing macros or writing small utility functions
+- Read [references/compound-literals.md](references/compound-literals.md) - Load when creating temporary values without named variables
+- Read [references/const-correctness.md](references/const-correctness.md) - Load when marking immutable data or understanding pointer const
+- Read [references/data-oriented-design.md](references/data-oriented-design.md) - Load when optimizing cache performance or data layouts
+- Read [references/error-handling.md](references/error-handling.md) - Load when implementing error codes or handling failures
+- Read [references/implementation-variants.md](references/implementation-variants.md) - Load when choosing between scalar, AoS, SoA, or SIMD implementations
+- Read [references/caller-owns-memory.md](references/caller-owns-memory.md) - Load when designing APIs where caller provides memory
+- Read [references/alignment.md](references/alignment.md) - Load when aligning data for SIMD or cache performance
+- Read [references/file-naming.md](references/file-naming.md) - Load when organizing headers by type, implementation, and variant
+- Read [references/testing-patterns.md](references/testing-patterns.md) - Load when writing tests with assertions, epsilon comparisons, or parity checks
+- Read [references/safety-validations.md](references/safety-validations.md) - Load when validating inputs for capacity, bounds, NULL, or overflow

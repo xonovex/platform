@@ -23,8 +23,8 @@ description: "Use when writing or editing Docker images and Compose files for pr
 
 ## Progressive disclosure
 
-- Read [references/multi-stage-builds.md](references/multi-stage-builds.md) - When creating production images or optimizing build process
-- Read [references/layer-caching.md](references/layer-caching.md) - When builds are slow or cache invalidates frequently
-- Read [references/security.md](references/security.md) - When hardening images or handling secrets
-- Read [references/production-config.md](references/production-config.md) - When adding health checks or configuring for orchestration
-- Read [references/docker-compose.md](references/docker-compose.md) - When defining multi-service local development environments
+- Read [references/multi-stage-builds.md](references/multi-stage-builds.md) - Load when creating production images or optimizing build process
+- Read [references/layer-caching.md](references/layer-caching.md) - Load when builds are slow or cache invalidates frequently
+- Read [references/security.md](references/security.md) - Load when hardening images or handling secrets
+- Read [references/production-config.md](references/production-config.md) - Load when adding health checks or configuring for orchestration
+- Read [references/docker-compose.md](references/docker-compose.md) - Load when defining multi-service local development environments

@@ -38,12 +38,12 @@ description: "Use when editing C99 game-engine or runtime code in projects that 
 
 ## Progressive disclosure
 
-- Read [references/math-types.md](references/math-types.md) - When working with vectors, matrices, or quaternions
-- Read [references/coordinate-system.md](references/coordinate-system.md) - When setting up camera, projection, or mesh normals
-- Read [references/tagged-unions.md](references/tagged-unions.md) - When implementing shape or entity polymorphism
-- Read [references/physics-patterns.md](references/physics-patterns.md) - When implementing rigid bodies, collision, or constraints
-- Read [references/geometry-pipeline.md](references/geometry-pipeline.md) - When converting analytic shapes to renderable meshes
-- Read [references/builder-pattern.md](references/builder-pattern.md) - When generating meshes or other variable-size data
-- Read [references/vertex-packing.md](references/vertex-packing.md) - When preparing vertex data for GPU upload
-- Read [references/mesh-types.md](references/mesh-types.md) - When working with 2D or 3D mesh structures
-- Read [references/spatial-structures.md](references/spatial-structures.md) - When implementing broad-phase collision or spatial queries
+- Read [references/math-types.md](references/math-types.md) - Load when working with vectors, matrices, or quaternions
+- Read [references/coordinate-system.md](references/coordinate-system.md) - Load when setting up camera, projection, or mesh normals
+- Read [references/tagged-unions.md](references/tagged-unions.md) - Load when implementing shape or entity polymorphism
+- Read [references/physics-patterns.md](references/physics-patterns.md) - Load when implementing rigid bodies, collision, or constraints
+- Read [references/geometry-pipeline.md](references/geometry-pipeline.md) - Load when converting analytic shapes to renderable meshes
+- Read [references/builder-pattern.md](references/builder-pattern.md) - Load when generating meshes or other variable-size data
+- Read [references/vertex-packing.md](references/vertex-packing.md) - Load when preparing vertex data for GPU upload
+- Read [references/mesh-types.md](references/mesh-types.md) - Load when working with 2D or 3D mesh structures
+- Read [references/spatial-structures.md](references/spatial-structures.md) - Load when implementing broad-phase collision or spatial queries

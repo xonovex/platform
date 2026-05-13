@@ -26,13 +26,13 @@ description: "Use when tuning LuaJIT-targeted Lua for performance-critical paths
 
 ## Progressive disclosure
 
-- Read [references/module-pattern.md](references/module-pattern.md) - When creating reusable modules or organizing code structure
-- Read [references/local-variables.md](references/local-variables.md) - When encountering global variable issues or scoping problems
-- Read [references/metatables.md](references/metatables.md) - When implementing object-oriented patterns or operator overloading
-- Read [references/jit-friendly-tables.md](references/jit-friendly-tables.md) - When optimizing hot paths or improving JIT performance
-- Read [references/cache-lookups.md](references/cache-lookups.md) - When reducing table access overhead in performance-critical code
-- Read [references/coroutines.md](references/coroutines.md) - When implementing cooperative multitasking or async patterns
-- Read [references/input-validation.md](references/input-validation.md) - When adding type checks or parameter validation
-- Read [references/error-handling.md](references/error-handling.md) - When handling errors or implementing fallback logic
-- Read [references/string-concatenation.md](references/string-concatenation.md) - When building strings in loops or formatting output
-- Read [references/idiomatic-patterns.md](references/idiomatic-patterns.md) - When learning common Lua idioms or patterns
+- Read [references/module-pattern.md](references/module-pattern.md) - Load when creating reusable modules or organizing code structure
+- Read [references/local-variables.md](references/local-variables.md) - Load when encountering global variable issues or scoping problems
+- Read [references/metatables.md](references/metatables.md) - Load when implementing object-oriented patterns or operator overloading
+- Read [references/jit-friendly-tables.md](references/jit-friendly-tables.md) - Load when optimizing hot paths or improving JIT performance
+- Read [references/cache-lookups.md](references/cache-lookups.md) - Load when reducing table access overhead in performance-critical code
+- Read [references/coroutines.md](references/coroutines.md) - Load when implementing cooperative multitasking or async patterns
+- Read [references/input-validation.md](references/input-validation.md) - Load when adding type checks or parameter validation
+- Read [references/error-handling.md](references/error-handling.md) - Load when handling errors or implementing fallback logic
+- Read [references/string-concatenation.md](references/string-concatenation.md) - Load when building strings in loops or formatting output
+- Read [references/idiomatic-patterns.md](references/idiomatic-patterns.md) - Load when learning common Lua idioms or patterns
