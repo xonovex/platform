@@ -1,0 +1,108 @@
+---
+description: "Harden code by improving type safety, validation, logging, and error handling"
+model: sonnet
+allowed-tools:
+  - Read
+  - Grep
+  - Glob
+  - Bash
+  - Task
+  - TaskCreate
+  - TaskUpdate
+  - AskUserQuestion
+argument-hint: "[path] [--aspects <type-safety,logging,validation>] [--auto-fix] [--dry-run]"
+---
+
+# /xonovex-workflow:code-harden – Research Code Hardening Opportunities
+
+Analyzes code for hardening opportunities (type safety, validation, logging, error handling). Generates a detailed research report. Does NOT create plans or make changes - run `/xonovex-workflow:plan-create` afterward to create an implementation plan.
+
+## Goal
+
+- Identify code quality issues (type safety, logging, validation, best practices, code smells)
+- Apply fixes aligned with project standards
+- Validate changes with typecheck, lint, and tests
+
+## Usage
+
+```bash
+# Analyze all aspects
+/xonovex-workflow:code-harden packages/myapp/
+
+# Focus on specific aspects
+/xonovex-workflow:code-harden src/ --aspects type-safety,logging
+
+# Preview analysis
+/xonovex-workflow:code-harden . --dry-run
+```
+
+## Arguments
+
+- `path` (required): Directory to analyze
+- `--aspects` (optional): Comma-separated aspects (type-safety, logging, validation, error-handling, testing, or custom)
+- `--auto-fix` (optional): Automatically apply safe fixes
+- `--dry-run` (optional): Report issues without making changes
+
+## Core Workflow
+
+**Delegate codebase analysis to read-only search agents where available; otherwise use grep/find/file-read directly.**
+
+1. **Read Guidelines**: Check AGENTS.md, POLICY.md and referenced guidelines for project standards
+2. **Analyze**: Run focused, read-only searches to find anti-patterns and violations; categorize by priority
+3. **Report**: Generate detailed report of issues found, grouped by package and priority
+
+## Implementation Details
+
+**Find guidelines**: Look for AGENTS.md and POLICY.md in project root and subdirectories; check @-referenced documents
+
+**Apply standards**: Follow project-specific patterns from guidelines for type safety, logging, validation, error handling
+
+**Validation**: Fix one package at a time; validate immediately after each
+
+## Example Transformation
+
+```typescript
+// Before: weak types, no validation
+function processUser(data: any) {
+  return {id: data.id, email: data.email};
+}
+
+// After: strong types, validation, error handling
+function processUser(data: unknown): Result<User, ValidationError> {
+  const parsed = userSchema.safeParse(data);
+  if (!parsed.success) return Err(parsed.error);
+  logger.info("Processing user", {id: parsed.data.id});
+  return Ok(parsed.data);
+}
+```
+
+## What to Look For
+
+- **Type safety:** `any` types, implicit types, unchecked assertions
+- **Missing validation:** unvalidated inputs, absent schema checks, missing guards
+- **Error handling:** unhandled errors, swallowed exceptions, silent failures
+- **Logging:** missing context, inconsistent levels, inadequate debugging info
+- **Code smells:** long functions (>30 lines), deep nesting, complex branches
+
+Group by severity + category; prioritize by impact and fix effort.
+
+## Error Handling
+
+- **Lint failures**: Review fix against project linting rules; adjust to match standards
+- **Test failures**: Review logic errors, validation strictness, mock compatibility
+- **Type errors**: Check imports, type definitions, schema alignment
+- **Guidelines not found**: Fall back to language / framework best practices
+
+## Gotchas
+
+- Hardening without reading project guidelines first applies generic best-practices that may conflict with project conventions — read AGENTS.md / POLICY.md first
+- A pile of `any` types is often a symptom of a missing schema, not a typing problem — fix the boundary, not every site
+- Adding logging everywhere creates noise — log at boundaries and on error paths, not every function entry
+- Validation at every layer is wasteful — validate at trust boundaries (user input, external APIs); trust internal callers
+
+## Next Steps
+
+After running this research command:
+
+1. Review the hardening report for accuracy
+2. Run `/xonovex-workflow:plan-create` to create an implementation plan from this research
