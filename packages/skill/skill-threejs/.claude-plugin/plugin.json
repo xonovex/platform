@@ -1,6 +1,6 @@
 {
   "name": "xonovex-skill-threejs",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "Xonovex Three.js skills",
   "author": {"name": "Xonovex"},
   "skills": ["./threejs-guide"]
