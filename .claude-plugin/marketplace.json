@@ -3,7 +3,7 @@
   "owner": { "name": "Xonovex" },
   "metadata": {
     "description": "Official Xonovex development tools",
-    "version": "0.2.3"
+    "version": "0.2.4"
   },
   "plugins": [
     { "name": "xonovex-skill-astro", "source": "./packages/skill/skill-astro", "description": "Xonovex Astro skills" },

@@ -1,6 +1,6 @@
 {
   "name": "xonovex-skill-zod",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "Xonovex Zod skills",
   "author": {"name": "Xonovex"},
   "skills": ["./zod-guide"]
