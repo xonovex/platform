@@ -25,14 +25,14 @@ description: "Use when writing or editing POSIX shell or Bash automation. Trigge
 
 ## Progressive disclosure
 
-- Read [references/posix-compatibility.md](references/posix-compatibility.md) - When ensuring portability across shells
-- Read [references/strict-mode.md](references/strict-mode.md) - When setting up error handling and safety flags
-- Read [references/quoting.md](references/quoting.md) - When variables expand incorrectly or word splitting occurs
-- Read [references/functions.md](references/functions.md) - When organizing script logic or creating reusable code
-- Read [references/parameter-expansion.md](references/parameter-expansion.md) - When setting default values or manipulating variables
-- Read [references/error-handling.md](references/error-handling.md) - When implementing exit codes or error messages
-- Read [references/argument-parsing.md](references/argument-parsing.md) - When parsing command-line flags or arguments
-- Read [references/validation.md](references/validation.md) - When checking preconditions or input validity
-- Read [references/idempotency.md](references/idempotency.md) - When scripts should be safely re-runnable
-- Read [references/common-patterns.md](references/common-patterns.md) - When learning common shell idioms
-- Read [references/script-template.md](references/script-template.md) - When starting a new shell script
+- Read [references/posix-compatibility.md](references/posix-compatibility.md) - Load when ensuring portability across shells
+- Read [references/strict-mode.md](references/strict-mode.md) - Load when setting up error handling and safety flags
+- Read [references/quoting.md](references/quoting.md) - Load when variables expand incorrectly or word splitting occurs
+- Read [references/functions.md](references/functions.md) - Load when organizing script logic or creating reusable code
+- Read [references/parameter-expansion.md](references/parameter-expansion.md) - Load when setting default values or manipulating variables
+- Read [references/error-handling.md](references/error-handling.md) - Load when implementing exit codes or error messages
+- Read [references/argument-parsing.md](references/argument-parsing.md) - Load when parsing command-line flags or arguments
+- Read [references/validation.md](references/validation.md) - Load when checking preconditions or input validity
+- Read [references/idempotency.md](references/idempotency.md) - Load when scripts should be safely re-runnable
+- Read [references/common-patterns.md](references/common-patterns.md) - Load when learning common shell idioms
+- Read [references/script-template.md](references/script-template.md) - Load when starting a new shell script

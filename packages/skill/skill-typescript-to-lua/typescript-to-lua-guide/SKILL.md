@@ -26,15 +26,15 @@ description: "Use when editing TypeScript that compiles to Lua via TSTL 1.24+ (g
 
 ## Progressive disclosure
 
-- Read [references/namespaces-vs-classes.md](references/namespaces-vs-classes.md) - When choosing code organization for clean Lua output
-- Read [references/multi-return-functions.md](references/multi-return-functions.md) - When implementing Lua-style multiple return values
-- Read [references/function-patterns.md](references/function-patterns.md) - When defining functions that transpile cleanly
-- Read [references/module-organization.md](references/module-organization.md) - When structuring TSTL projects or exports
-- Read [references/stable-tables.md](references/stable-tables.md) - When optimizing for Lua GC or JIT performance
-- Read [references/coroutine-patterns.md](references/coroutine-patterns.md) - When implementing cooperative multitasking
-- Read [references/lua-interop.md](references/lua-interop.md) - When calling Lua code from TypeScript
-- Read [references/tstl-decorators.md](references/tstl-decorators.md) - When using TSTL-specific decorators
-- Read [references/performance-tips.md](references/performance-tips.md) - When generated Lua code is slow or bloated
-- Read [references/type-safety.md](references/type-safety.md) - When maintaining types across TS/Lua boundary
-- Read [references/avoiding-heavy-features.md](references/avoiding-heavy-features.md) - When transpiled output is unexpectedly large
-- Read [references/tsconfig.md](references/tsconfig.md) - When configuring TSTL compiler options
+- Read [references/namespaces-vs-classes.md](references/namespaces-vs-classes.md) - Load when choosing code organization for clean Lua output
+- Read [references/multi-return-functions.md](references/multi-return-functions.md) - Load when implementing Lua-style multiple return values
+- Read [references/function-patterns.md](references/function-patterns.md) - Load when defining functions that transpile cleanly
+- Read [references/module-organization.md](references/module-organization.md) - Load when structuring TSTL projects or exports
+- Read [references/stable-tables.md](references/stable-tables.md) - Load when optimizing for Lua GC or JIT performance
+- Read [references/coroutine-patterns.md](references/coroutine-patterns.md) - Load when implementing cooperative multitasking
+- Read [references/lua-interop.md](references/lua-interop.md) - Load when calling Lua code from TypeScript
+- Read [references/tstl-decorators.md](references/tstl-decorators.md) - Load when using TSTL-specific decorators
+- Read [references/performance-tips.md](references/performance-tips.md) - Load when generated Lua code is slow or bloated
+- Read [references/type-safety.md](references/type-safety.md) - Load when maintaining types across TS/Lua boundary
+- Read [references/avoiding-heavy-features.md](references/avoiding-heavy-features.md) - Load when transpiled output is unexpectedly large
+- Read [references/tsconfig.md](references/tsconfig.md) - Load when configuring TSTL compiler options

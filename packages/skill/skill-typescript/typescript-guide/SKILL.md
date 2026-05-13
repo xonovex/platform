@@ -33,12 +33,12 @@ description: "Use when editing or reviewing TypeScript in Node.js ESM projects. 
 
 ## Progressive disclosure
 
-- Read [references/async-without-await.md](references/async-without-await.md) - When seeing async functions that don't use await
-- Read [references/unnecessary-async-keywords.md](references/unnecessary-async-keywords.md) - When simplifying synchronous controller functions
-- Read [references/avoid-eslint-disable.md](references/avoid-eslint-disable.md) - When tempted to suppress linting warnings
-- Read [references/template-literals-require-string-conversion.md](references/template-literals-require-string-conversion.md) - When inserting numbers in template literals
-- Read [references/numeric-separator-enforcement.md](references/numeric-separator-enforcement.md) - When writing large numeric literals
-- Read [references/unbound-method-references.md](references/unbound-method-references.md) - When passing methods as callbacks or references
-- Read [references/avoid-barrel-exports.md](references/avoid-barrel-exports.md) - When creating or importing from index.ts files
-- Read [references/avoid-reexports.md](references/avoid-reexports.md) - When organizing module exports
-- Read [references/env-access-bracket-notation.md](references/env-access-bracket-notation.md) - When accessing process.env variables
+- Read [references/async-without-await.md](references/async-without-await.md) - Load when seeing async functions that don't use await
+- Read [references/unnecessary-async-keywords.md](references/unnecessary-async-keywords.md) - Load when simplifying synchronous controller functions
+- Read [references/avoid-eslint-disable.md](references/avoid-eslint-disable.md) - Load when tempted to suppress linting warnings
+- Read [references/template-literals-require-string-conversion.md](references/template-literals-require-string-conversion.md) - Load when inserting numbers in template literals
+- Read [references/numeric-separator-enforcement.md](references/numeric-separator-enforcement.md) - Load when writing large numeric literals
+- Read [references/unbound-method-references.md](references/unbound-method-references.md) - Load when passing methods as callbacks or references
+- Read [references/avoid-barrel-exports.md](references/avoid-barrel-exports.md) - Load when creating or importing from index.ts files
+- Read [references/avoid-reexports.md](references/avoid-reexports.md) - Load when organizing module exports
+- Read [references/env-access-bracket-notation.md](references/env-access-bracket-notation.md) - Load when accessing process.env variables

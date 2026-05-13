@@ -26,10 +26,10 @@ description: "Use when editing Terraform 1.12+ infrastructure code. Triggers on 
 
 ## Progressive disclosure
 
-- Read [references/module-structure.md](references/module-structure.md) - When designing reusable Terraform modules
-- Read [references/module-definition.md](references/module-definition.md) - When defining module inputs, outputs, or resources
-- Read [references/typed-variables.md](references/typed-variables.md) - When adding variable validation or complex types
-- Read [references/locals.md](references/locals.md) - When computing intermediate values or reducing duplication
-- Read [references/root-module.md](references/root-module.md) - When organizing environment-specific configurations
-- Read [references/remote-state.md](references/remote-state.md) - When configuring state backend or state isolation
-- Read [references/advanced-patterns.md](references/advanced-patterns.md) - When using dynamic blocks, for_each, or count
+- Read [references/module-structure.md](references/module-structure.md) - Load when designing reusable Terraform modules
+- Read [references/module-definition.md](references/module-definition.md) - Load when defining module inputs, outputs, or resources
+- Read [references/typed-variables.md](references/typed-variables.md) - Load when adding variable validation or complex types
+- Read [references/locals.md](references/locals.md) - Load when computing intermediate values or reducing duplication
+- Read [references/root-module.md](references/root-module.md) - Load when organizing environment-specific configurations
+- Read [references/remote-state.md](references/remote-state.md) - Load when configuring state backend or state isolation
+- Read [references/advanced-patterns.md](references/advanced-patterns.md) - Load when using dynamic blocks, for_each, or count

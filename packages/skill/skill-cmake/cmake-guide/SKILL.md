@@ -26,12 +26,12 @@ description: "Use when editing CMake build files for C/C++ projects on CMake 3.2
 
 ## Progressive disclosure
 
-- Read [references/target-types.md](references/target-types.md) - When choosing between library types or executables
-- Read [references/visibility-specifiers.md](references/visibility-specifiers.md) - When deciding PUBLIC vs PRIVATE vs INTERFACE
-- Read [references/compile-options.md](references/compile-options.md) - When adding compiler flags to targets
-- Read [references/find-package.md](references/find-package.md) - When integrating external dependencies
-- Read [references/fetchcontent.md](references/fetchcontent.md) - When vendoring dependencies from git/archives
-- Read [references/testing.md](references/testing.md) - When setting up CTest or test targets
-- Read [references/project-structure.md](references/project-structure.md) - When organizing multi-directory CMake projects
-- Read [references/generator-expressions.md](references/generator-expressions.md) - When using conditional build configuration
-- Read [references/installation.md](references/installation.md) - When creating install targets or package exports
+- Read [references/target-types.md](references/target-types.md) - Load when choosing between library types or executables
+- Read [references/visibility-specifiers.md](references/visibility-specifiers.md) - Load when deciding PUBLIC vs PRIVATE vs INTERFACE
+- Read [references/compile-options.md](references/compile-options.md) - Load when adding compiler flags to targets
+- Read [references/find-package.md](references/find-package.md) - Load when integrating external dependencies
+- Read [references/fetchcontent.md](references/fetchcontent.md) - Load when vendoring dependencies from git/archives
+- Read [references/testing.md](references/testing.md) - Load when setting up CTest or test targets
+- Read [references/project-structure.md](references/project-structure.md) - Load when organizing multi-directory CMake projects
+- Read [references/generator-expressions.md](references/generator-expressions.md) - Load when using conditional build configuration
+- Read [references/installation.md](references/installation.md) - Load when creating install targets or package exports

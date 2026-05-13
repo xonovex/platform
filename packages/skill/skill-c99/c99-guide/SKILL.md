@@ -27,9 +27,9 @@ description: "Use when editing or reviewing general-purpose C99 — libraries, C
 
 ## Progressive disclosure
 
-- Read [references/memory-management.md](references/memory-management.md) - When allocating memory or managing resource lifetimes
-- Read [references/designated-initializers.md](references/designated-initializers.md) - When initializing structs or arrays with specific values
-- Read [references/inline-functions.md](references/inline-functions.md) - When replacing macros or writing small utility functions
-- Read [references/compound-literals.md](references/compound-literals.md) - When creating temporary values without named variables
-- Read [references/const-correctness.md](references/const-correctness.md) - When marking immutable data or understanding pointer const
-- Read [references/error-handling.md](references/error-handling.md) - When implementing error codes or handling failures
+- Read [references/memory-management.md](references/memory-management.md) - Load when allocating memory or managing resource lifetimes
+- Read [references/designated-initializers.md](references/designated-initializers.md) - Load when initializing structs or arrays with specific values
+- Read [references/inline-functions.md](references/inline-functions.md) - Load when replacing macros or writing small utility functions
+- Read [references/compound-literals.md](references/compound-literals.md) - Load when creating temporary values without named variables
+- Read [references/const-correctness.md](references/const-correctness.md) - Load when marking immutable data or understanding pointer const
+- Read [references/error-handling.md](references/error-handling.md) - Load when implementing error codes or handling failures

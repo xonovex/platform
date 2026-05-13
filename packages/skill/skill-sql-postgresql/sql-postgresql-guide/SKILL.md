@@ -28,11 +28,11 @@ description: "Use when editing PostgreSQL 15+ queries, schemas, or migrations. T
 
 ## Progressive disclosure
 
-- Read [references/cte-patterns.md](references/cte-patterns.md) - When breaking down complex queries or improving readability
-- Read [references/data-types.md](references/data-types.md) - When choosing column types or avoiding type mismatches
-- Read [references/indexing.md](references/indexing.md) - When optimizing slow queries or query planning
-- Read [references/constraints.md](references/constraints.md) - When enforcing data integrity rules
-- Read [references/jsonb.md](references/jsonb.md) - When storing semi-structured or dynamic data
-- Read [references/row-level-security.md](references/row-level-security.md) - When implementing multi-tenant data isolation
-- Read [references/role-based-access.md](references/role-based-access.md) - When configuring database user permissions
-- Read [references/performance.md](references/performance.md) - When analyzing query plans or tuning performance
+- Read [references/cte-patterns.md](references/cte-patterns.md) - Load when breaking down complex queries or improving readability
+- Read [references/data-types.md](references/data-types.md) - Load when choosing column types or avoiding type mismatches
+- Read [references/indexing.md](references/indexing.md) - Load when optimizing slow queries or query planning
+- Read [references/constraints.md](references/constraints.md) - Load when enforcing data integrity rules
+- Read [references/jsonb.md](references/jsonb.md) - Load when storing semi-structured or dynamic data
+- Read [references/row-level-security.md](references/row-level-security.md) - Load when implementing multi-tenant data isolation
+- Read [references/role-based-access.md](references/role-based-access.md) - Load when configuring database user permissions
+- Read [references/performance.md](references/performance.md) - Load when analyzing query plans or tuning performance

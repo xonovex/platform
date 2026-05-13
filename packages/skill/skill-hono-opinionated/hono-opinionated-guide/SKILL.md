@@ -46,10 +46,10 @@ export function createApp() {
 
 ## Progressive disclosure
 
-- Read [references/controllers.md](references/controllers.md) - When seeing unnecessary async functions
-- Read [references/openapi-inline-handlers.md](references/openapi-inline-handlers.md) - When OpenAPI loses type inference
-- Read [references/openapi-explicit-status-codes.md](references/openapi-explicit-status-codes.md) - When defining OpenAPI response schemas
-- Read [references/openapi-router-hierarchy.md](references/openapi-router-hierarchy.md) - When composing multiple routers
-- Read [references/openapi-spec-generation.md](references/openapi-spec-generation.md) - When generating OpenAPI documentation
-- Read [references/router-selection.md](references/router-selection.md) - When optimizing for serverless/edge or high-throughput
-- Read [references/body-limit.md](references/body-limit.md) - When preventing oversized request payloads
+- Read [references/controllers.md](references/controllers.md) - Load when seeing unnecessary async functions
+- Read [references/openapi-inline-handlers.md](references/openapi-inline-handlers.md) - Load when OpenAPI loses type inference
+- Read [references/openapi-explicit-status-codes.md](references/openapi-explicit-status-codes.md) - Load when defining OpenAPI response schemas
+- Read [references/openapi-router-hierarchy.md](references/openapi-router-hierarchy.md) - Load when composing multiple routers
+- Read [references/openapi-spec-generation.md](references/openapi-spec-generation.md) - Load when generating OpenAPI documentation
+- Read [references/router-selection.md](references/router-selection.md) - Load when optimizing for serverless/edge or high-throughput
+- Read [references/body-limit.md](references/body-limit.md) - Load when preventing oversized request payloads
