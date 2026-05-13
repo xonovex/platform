@@ -25,3 +25,10 @@ description: "Use when designing class hierarchies or applying OOP principles. T
 - Linting: Fix root causes of warnings; never suppress with disable comments.
 - Validation: Run typecheck, lint, build, test after each major change (all must pass).
 - Design patterns: Apply appropriate patterns (Factory, Strategy, Observer) when they simplify code.
+
+## Gotchas
+
+- Liskov substitution is about behavior, not just signatures — `Square extends Rectangle` is the classic violation despite matching types
+- Equality (`equals` / `==`) and hashing must agree — overriding one and not the other breaks `HashSet`/`HashMap` silently
+- Premature class hierarchies are harder to refactor than premature composition — start flat, extract a base only when ≥3 implementations exist
+- Mutable shared state plus method calls = order-dependent behavior; making fields `final`/`readonly` is the cheapest correctness lever

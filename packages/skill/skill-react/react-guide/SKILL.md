@@ -76,30 +76,38 @@ function App({children}) {
 
 ## Essentials
 
-- **Component design** - Small, composable; lift/minimize state; derive when possible, see [reference/component-design.md](reference/component-design.md)
-- **Performance** - Let React Compiler handle memoization; manual `useMemo`/`useCallback` for effect deps only, see [reference/performance-optimization.md](reference/performance-optimization.md)
-- **Rendering** - Prefer Server Components; use Suspense for streaming, see [reference/suspense-streaming.md](reference/suspense-streaming.md)
-- **Accessibility** - Semantic HTML, ARIA, keyboard/focus management, see [reference/accessibility.md](reference/accessibility.md)
-- **Custom hooks** - Extract reusable logic, see [reference/hooks.md](reference/hooks.md)
+- **Component design** - Small, composable; lift/minimize state; derive when possible, see [references/component-design.md](references/component-design.md)
+- **Performance** - Let React Compiler handle memoization; manual `useMemo`/`useCallback` for effect deps only, see [references/performance-optimization.md](references/performance-optimization.md)
+- **Rendering** - Prefer Server Components; use Suspense for streaming, see [references/suspense-streaming.md](references/suspense-streaming.md)
+- **Accessibility** - Semantic HTML, ARIA, keyboard/focus management, see [references/accessibility.md](references/accessibility.md)
+- **Custom hooks** - Extract reusable logic, see [references/hooks.md](references/hooks.md)
+
+## Gotchas
+
+- Stale closures in `useEffect` — captured state from the render that scheduled the effect, not the current state; use refs or include in deps
+- List keys must be stable AND unique — index keys cause re-mounts on reorder, generated keys cause re-mounts every render
+- `useMemo`/`useCallback` aren't free — the comparison + bookkeeping costs more than re-running cheap computations
+- Controlled vs uncontrolled inputs: passing `value` without `onChange` warns; switching mid-lifetime is silently buggy
+- Server Components can't use state/effects/event handlers — the boundary is `'use client'`; mis-marking causes runtime errors only
 
 ## Progressive Disclosure
 
 ### Guidelines
 
-- Read [reference/component-design.md](reference/component-design.md) - When breaking down large components or managing state lifting
-- Read [reference/state-management.md](reference/state-management.md) - When choosing between useState, useReducer, or Context
-- Read [reference/performance-optimization.md](reference/performance-optimization.md) - When components re-render unnecessarily or performance lags
-- Read [reference/hooks.md](reference/hooks.md) - When extracting reusable logic or creating custom hooks
-- Read [reference/accessibility.md](reference/accessibility.md) - When adding keyboard navigation or screen reader support
-- Read [reference/new-hooks.md](reference/new-hooks.md) - When using useActionState, useOptimistic, use(), or useFormStatus
-- Read [reference/server-components.md](reference/server-components.md) - When building with RSC, Server Actions, or 'use server'/'use client' directives
-- Read [reference/suspense-streaming.md](reference/suspense-streaming.md) - When using Suspense boundaries, streaming, or error handling
-- Read [reference/react-compiler.md](reference/react-compiler.md) - When setting up React Compiler or understanding automatic memoization
-- Read [reference/activity-effect-event.md](reference/activity-effect-event.md) - When using Activity component or useEffectEvent
+- Read [references/component-design.md](references/component-design.md) - Load when breaking down large components or managing state lifting
+- Read [references/state-management.md](references/state-management.md) - Load when choosing between useState, useReducer, or Context
+- Read [references/performance-optimization.md](references/performance-optimization.md) - Load when components re-render unnecessarily or performance lags
+- Read [references/hooks.md](references/hooks.md) - Load when extracting reusable logic or creating custom hooks
+- Read [references/accessibility.md](references/accessibility.md) - Load when adding keyboard navigation or screen reader support
+- Read [references/new-hooks.md](references/new-hooks.md) - Load when using useActionState, useOptimistic, use(), or useFormStatus
+- Read [references/server-components.md](references/server-components.md) - Load when building with RSC, Server Actions, or 'use server'/'use client' directives
+- Read [references/suspense-streaming.md](references/suspense-streaming.md) - Load when using Suspense boundaries, streaming, or error handling
+- Read [references/react-compiler.md](references/react-compiler.md) - Load when setting up React Compiler or understanding automatic memoization
+- Read [references/activity-effect-event.md](references/activity-effect-event.md) - Load when using Activity component or useEffectEvent
 
 ### Migration from React 18
 
-- Read [reference/migration-paradigm-shifts.md](reference/migration-paradigm-shifts.md) - When adapting mental model from React 18 to React 19
-- Read [reference/migration-anti-patterns.md](reference/migration-anti-patterns.md) - When avoiding outdated patterns (useEffect for data, manual loading states)
-- Read [reference/migration-deprecations.md](reference/migration-deprecations.md) - When migrating from React 18 or handling removed APIs
-- Read [reference/migration-typescript.md](reference/migration-typescript.md) - When fixing TypeScript errors after React 19 upgrade
+- Read [references/migration-paradigm-shifts.md](references/migration-paradigm-shifts.md) - Load when adapting mental model from React 18 to React 19
+- Read [references/migration-anti-patterns.md](references/migration-anti-patterns.md) - Load when avoiding outdated patterns (useEffect for data, manual loading states)
+- Read [references/migration-deprecations.md](references/migration-deprecations.md) - Load when migrating from React 18 or handling removed APIs
+- Read [references/migration-typescript.md](references/migration-typescript.md) - Load when fixing TypeScript errors after React 19 upgrade

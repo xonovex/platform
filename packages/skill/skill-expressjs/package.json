@@ -1,0 +1,15 @@
+{
+  "name": "@xonovex/skill-expressjs",
+  "version": "0.2.3",
+  "private": true,
+  "type": "module",
+  "keywords": [
+    "xonovex",
+    "skill",
+    "expressjs"
+  ],
+  "scripts": {
+    "fmt": "prettier --write .",
+    "fmt:check": "prettier --check ."
+  }
+}

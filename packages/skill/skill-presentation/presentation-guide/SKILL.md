@@ -15,10 +15,17 @@ description: "Use when creating slide decks, presentations, or visual codebase w
 
 ## Workflow
 
-- **Create Presentation** - Explore codebase and generate markdown presentation, see [reference/presentation-create.md](reference/presentation-create.md)
-- **Scaffold Package** - Convert markdown to Motion presentation package, see [reference/presentation-motion-scaffold.md](reference/presentation-motion-scaffold.md)
+- **Create Presentation** - Explore codebase and generate markdown presentation, see [references/presentation-create.md](references/presentation-create.md)
+- **Scaffold Package** - Convert markdown to Motion presentation package, see [references/presentation-motion-scaffold.md](references/presentation-motion-scaffold.md)
+
+## Gotchas
+
+- Slide cadence beats slide density — 3-5 bullets per slide forces the speaker to elaborate, not read
+- Narrative arc (problem → tension → resolution) outperforms feature checklists — restructure if a deck reads like a manual
+- GraphViz diagrams render differently across engines (`dot` vs `neato` vs `fdp`) — pick one and stick with it for visual consistency
+- Motion-based slide packages need deterministic timing — avoid randomness in animations to keep slide reproducibility
 
 ## Progressive Disclosure
 
-- **Create presentation document** - Explore codebase and structure into slides, see [reference/presentation-create.md](reference/presentation-create.md)
-- **Scaffold motion package** - Generate React+Motion package from markdown, see [reference/presentation-motion-scaffold.md](reference/presentation-motion-scaffold.md)
+- Read [references/presentation-create.md](references/presentation-create.md) - Load when creating a presentation document by exploring a codebase and structuring it into slides
+- Read [references/presentation-motion-scaffold.md](references/presentation-motion-scaffold.md) - Load when scaffolding a React+Motion package from a presentation markdown

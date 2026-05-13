@@ -12,14 +12,14 @@ description: "Use when writing or editing browser-based live-coding music in Str
 
 ## Essentials
 
-- **Tempo** - Set BPM first with `setcpm(BPM/4)`, see [reference/tempo-timing.md](reference/tempo-timing.md)
-- **Mini-notation** - Space-separated sequences, `*` multiply, `/` divide, `<>` alternate, `[]` subdivide, `~` rest, see [reference/mini-notation.md](reference/mini-notation.md)
-- **Layering** - Use `stack()` to combine patterns, each layer independent, see [reference/layering.md](reference/layering.md)
-- **Sounds** - Drums: `bd`, `sd`, `hh`, `oh`, `cp`; Synths: `sine`, `sawtooth`, `square`, `triangle`, see [reference/sounds.md](reference/sounds.md)
-- **Effects** - `.gain()`, `.lpf()`, `.room()`, `.delay()`, `.shape()`, `.crush()`, see [reference/effects.md](reference/effects.md)
-- **Modulation** - `sine.range(a,b).slow(n)` for sweeps, `perlin` for organic variation, see [reference/modulation.md](reference/modulation.md)
-- **Conditional** - `.every(n, fn)`, `.sometimes(fn)`, `.degradeBy(p)` for variation, see [reference/conditionals.md](reference/conditionals.md)
-- **Structure** - Use `.mask()` for sections, `arrange()` for song form, see [reference/arrangement.md](reference/arrangement.md)
+- **Tempo** - Set BPM first with `setcpm(BPM/4)`, see [references/tempo-timing.md](references/tempo-timing.md)
+- **Mini-notation** - Space-separated sequences, `*` multiply, `/` divide, `<>` alternate, `[]` subdivide, `~` rest, see [references/mini-notation.md](references/mini-notation.md)
+- **Layering** - Use `stack()` to combine patterns, each layer independent, see [references/layering.md](references/layering.md)
+- **Sounds** - Drums: `bd`, `sd`, `hh`, `oh`, `cp`; Synths: `sine`, `sawtooth`, `square`, `triangle`, see [references/sounds.md](references/sounds.md)
+- **Effects** - `.gain()`, `.lpf()`, `.room()`, `.delay()`, `.shape()`, `.crush()`, see [references/effects.md](references/effects.md)
+- **Modulation** - `sine.range(a,b).slow(n)` for sweeps, `perlin` for organic variation, see [references/modulation.md](references/modulation.md)
+- **Conditional** - `.every(n, fn)`, `.sometimes(fn)`, `.degradeBy(p)` for variation, see [references/conditionals.md](references/conditionals.md)
+- **Structure** - Use `.mask()` for sections, `arrange()` for song form, see [references/arrangement.md](references/arrangement.md)
 
 ## Example
 
@@ -35,17 +35,24 @@ stack(
 );
 ```
 
+## Gotchas
+
+- Pattern transformations are right-associative — `s("bd").fast(2).rev()` is read right-to-left; the order changes the result
+- Time signatures bind to the cycle, not bars — switching cycle length mid-piece shifts everything downstream
+- Sample rate of loaded samples affects pitch — uploading 48 kHz samples to a 44.1 kHz session shifts notes by a semitone
+- `stack` adds voices in parallel; `cat` concatenates in series — confusing them silently doubles or halves the pattern duration
+
 ## Progressive Disclosure
 
-- Read [reference/mini-notation.md](reference/mini-notation.md) - When learning pattern syntax or fixing notation errors
-- Read [reference/sounds.md](reference/sounds.md) - When selecting instruments or troubleshooting missing sounds
-- Read [reference/effects.md](reference/effects.md) - When applying audio processing or creating textures
-- Read [reference/modulation.md](reference/modulation.md) - When adding movement and dynamic variation
-- Read [reference/conditionals.md](reference/conditionals.md) - When creating algorithmic variation
-- Read [reference/layering.md](reference/layering.md) - When combining multiple patterns
-- Read [reference/tempo-timing.md](reference/tempo-timing.md) - When setting tempo or working with time
-- Read [reference/arrangement.md](reference/arrangement.md) - When structuring full compositions
-- Read [reference/genre-trance.md](reference/genre-trance.md) - When producing uplifting/hard trance
-- Read [reference/genre-ambient.md](reference/genre-ambient.md) - When creating atmospheric soundscapes
-- Read [reference/genre-harsh.md](reference/genre-harsh.md) - When making experimental/industrial music
-- Read [reference/scales-harmony.md](reference/scales-harmony.md) - When working with melodies and chords
+- Read [references/mini-notation.md](references/mini-notation.md) - Load when learning pattern syntax or fixing notation errors
+- Read [references/sounds.md](references/sounds.md) - Load when selecting instruments or troubleshooting missing sounds
+- Read [references/effects.md](references/effects.md) - Load when applying audio processing or creating textures
+- Read [references/modulation.md](references/modulation.md) - Load when adding movement and dynamic variation
+- Read [references/conditionals.md](references/conditionals.md) - Load when creating algorithmic variation
+- Read [references/layering.md](references/layering.md) - Load when combining multiple patterns
+- Read [references/tempo-timing.md](references/tempo-timing.md) - Load when setting tempo or working with time
+- Read [references/arrangement.md](references/arrangement.md) - Load when structuring full compositions
+- Read [references/genre-trance.md](references/genre-trance.md) - Load when producing uplifting/hard trance
+- Read [references/genre-ambient.md](references/genre-ambient.md) - Load when creating atmospheric soundscapes
+- Read [references/genre-harsh.md](references/genre-harsh.md) - Load when making experimental/industrial music
+- Read [references/scales-harmony.md](references/scales-harmony.md) - Load when working with melodies and chords

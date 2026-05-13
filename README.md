@@ -10,13 +10,11 @@ AI coding agents handle prompts, tools, and code changes. What they don't manage
 
 Xonovex fills this gap. It currently supports [Claude Code](https://docs.anthropic.com/en/docs/claude-code) and [OpenCode](https://github.com/anomalyco/opencode) as agents, with sandboxing via bubblewrap and Docker, VM-level isolation via gVisor and Kata Containers, confidential computing via [Confidential Containers (CoCo)](https://github.com/confidential-containers) with AMD SEV-SNP and Intel TDX, model routing through providers like Gemini, GLM, and GPT, workspace management with Git and [Jujutsu](https://github.com/jj-vcs/jj), reproducible toolchains via Nix, and Kubernetes orchestration for running agents at scale.
 
-The included commands and skills are token-efficient, unopinionated, and based on current research and best practices.
+The included skills are token-efficient, harness-neutral, and based on current research and best practices (Agent Skills spec, agentskills.io, agents.md).
 
 - **[agent-cli-go](packages/agent/agent-cli-go/)** configures sandboxes, providers, and terminal sessions, then launches the agent
 - **[agent-operator-go](packages/agent/agent-operator-go/)** orchestrates agents as Kubernetes Jobs with managed workspaces, provider secrets, shared multi-agent workspaces, namespace-level policy enforcement, network isolation, and Nix toolchain provisioning
-- **[Workflow commands](packages/command/command-workflow/)** provide plan-driven development with worktrees and parallel execution
-- **[Utility commands](packages/command/command-utility/)** manage project instructions, extract insights, and create skills
-- **[Skills](packages/skill/)** give agents coding guidelines they follow automatically
+- **[Skills](packages/skill/)** give agents coding guidelines they follow automatically; plan-driven development with worktrees, project-instruction management, insight extraction, and skill authoring all live here as consolidated skill packages
 
 ## Quick Start
 
@@ -64,66 +62,31 @@ spec:
 EOF
 ```
 
-### Claude Code Plugins
+### Agent Plugins
 
-Add the marketplace, then install workflow commands and skills:
+Each skill is a separate plugin. Skills are applied **automatically** when the agent detects a relevant task — no explicit slash-command invocation needed. Skills also work cross-harness (Claude Code, OpenCode, etc.) since they follow the [Agent Skills spec](https://agentskills.io/specification).
 
 ```bash
-# Add the Xonovex plugin marketplace
+# Add the Xonovex plugin marketplace (Claude Code example)
 claude plugin marketplace add xonovex/platform
 
-# Install workflow commands (plan, code quality, git)
-claude plugin install xonovex-workflow@xonovex-marketplace
+# Install workflow skills — each covers a full operation lifecycle via consolidated references
+claude plugin install xonovex-skill-plan@xonovex-marketplace          # research, plan, refine, subplans, continue, update, validate, code-align/harden/simplify
+claude plugin install xonovex-skill-git@xonovex-marketplace           # commit, merge-resolve, feature-worktree create/merge/abandon/cleanup
+claude plugin install xonovex-skill-instruction@xonovex-marketplace   # AGENTS.md init / sync / simplify / consolidate / merge
+claude plugin install xonovex-skill-insights@xonovex-marketplace      # session retrospective: extract, integrate-instructions, integrate-skills
+claude plugin install xonovex-skill-prompt@xonovex-marketplace        # author / merge / simplify reusable prompt files (cross-harness format reference)
+claude plugin install xonovex-skill-skill@xonovex-marketplace         # author / extract / merge / simplify / validate Agent Skills
+claude plugin install xonovex-skill-content@xonovex-marketplace       # multilingual articles, news, travel guides, prose humanization
+claude plugin install xonovex-skill-llmstxt@xonovex-marketplace       # /llms.txt files and per-page markdown mirrors
 
-# Install utility commands (instructions, insights, skills)
-claude plugin install xonovex-utility@xonovex-marketplace
-
-# Install skills (each skill is a separate plugin)
+# Install language / framework guides (apply automatically when editing those files)
 claude plugin install xonovex-skill-typescript@xonovex-marketplace
 claude plugin install xonovex-skill-react@xonovex-marketplace
-claude plugin install xonovex-skill-general-fp@xonovex-marketplace
-```
-
-Skills are applied automatically when relevant to the task.
-
-Once installed, workflow commands are available as slash commands in Claude Code:
-
-```
-/xonovex-workflow:plan-research          Research codebase and web for requirements
-/xonovex-workflow:plan-create            Create a high-level plan for user review
-/xonovex-workflow:plan-subplans-create   Generate detailed subplans with parallel execution detection
-/xonovex-workflow:plan-worktree-create   Create a git worktree for a feature branch
-/xonovex-workflow:plan-continue          Resume work from an existing plan
-/xonovex-workflow:plan-validate          Verify that a plan or current work has been fully achieved
-/xonovex-workflow:plan-update            Update plan status and test results
-/xonovex-workflow:plan-refine            Process user annotations and refine iteratively
-/xonovex-workflow:plan-worktree-merge    Merge feature worktree back to source
-/xonovex-workflow:code-simplify          Consolidate duplicates, remove dead code, flatten abstractions
-/xonovex-workflow:code-harden            Improve type safety, validation, and error handling
-/xonovex-workflow:code-align             Align two similar implementations and suggest improvements
-/xonovex-workflow:git-commit             Commit and push changes
-```
-
-Utility commands for project instructions, insights, and skill management:
-
-```
-/xonovex-utility:content-news-add                 Curate latest news on a topic and generate bilingual content
-/xonovex-utility:content-travelguide-add          Create a multi-language travel guide for a topic or location
-/xonovex-utility:instructions-init                Create an AGENTS.md by analyzing directory structure
-/xonovex-utility:instructions-simplify            Reduce verbosity in instruction files
-/xonovex-utility:instructions-sync                Sync AGENTS.md with current directory state
-/xonovex-utility:instructions-consolidate         Remove redundant files and standardize format
-/xonovex-utility:instructions-assimilate          Augment instructions with elements from another project
-/xonovex-utility:insights-extract                 Analyze session for mistakes and lessons learned
-/xonovex-utility:insights-instructions-integrate  Convert insights into AGENTS.md bullet points
-/xonovex-utility:insights-skills-integrate        Convert insights into a skill
-/xonovex-utility:skill-guide-create          Create a skill from a document or URL
-/xonovex-utility:skill-guide-extract         Extract patterns from codebase into a skill
-/xonovex-utility:skill-guide-simplify        Make skills project-independent and condense
-/xonovex-utility:skill-guide-assimilate      Augment a skill with elements from another skill
-/xonovex-utility:slashcommand-create              Create a slash command from a completed task
-/xonovex-utility:slashcommand-simplify            Reduce verbosity in slash command files
-/xonovex-utility:slashcommand-assimilate          Augment a slash command with elements from another
+claude plugin install xonovex-skill-hono@xonovex-marketplace
+claude plugin install xonovex-skill-zod@xonovex-marketplace
+claude plugin install xonovex-skill-vitest@xonovex-marketplace
+# … see .claude-plugin/marketplace.json for the full list
 ```
 
 ## Development

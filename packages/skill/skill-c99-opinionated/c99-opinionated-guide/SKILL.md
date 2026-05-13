@@ -7,37 +7,44 @@ description: "Use when editing systems or embedded C99 code in projects that fol
 
 ## Essentials
 
-- **Memory management** - Prefer stack, free all heap allocations, see [reference/memory-management.md](reference/memory-management.md)
-- **Modern C99** - Use `const`, designated initializers, small functions, see [reference/designated-initializers.md](reference/designated-initializers.md), [reference/const-correctness.md](reference/const-correctness.md)
-- **Type safety** - Favor `inline` functions over macros, see [reference/inline-functions.md](reference/inline-functions.md)
-- **Data-oriented design** - Structure for cache locality, see [reference/data-oriented-design.md](reference/data-oriented-design.md)
+- **Memory management** - Prefer stack, free all heap allocations, see [references/memory-management.md](references/memory-management.md)
+- **Modern C99** - Use `const`, designated initializers, small functions, see [references/designated-initializers.md](references/designated-initializers.md), [references/const-correctness.md](references/const-correctness.md)
+- **Type safety** - Favor `inline` functions over macros, see [references/inline-functions.md](references/inline-functions.md)
+- **Data-oriented design** - Structure for cache locality, see [references/data-oriented-design.md](references/data-oriented-design.md)
 - **Quality** - Treat warnings as errors, run static analysis
 
 ## Architecture
 
-- **Implementation variants** - Scalar → AoS → SoA → SIMD, see [reference/implementation-variants.md](reference/implementation-variants.md)
-- **Caller-owns-memory** - Libraries never allocate, caller provides arrays, see [reference/caller-owns-memory.md](reference/caller-owns-memory.md)
-- **Alignment** - 16-byte for SIMD, cache line for hot data, see [reference/alignment.md](reference/alignment.md)
-- **File naming** - `*_type.h`, `*_impl.h`, `*_aos.h`, `*_soa.h`, `*_simde.h`, see [reference/file-naming.md](reference/file-naming.md)
+- **Implementation variants** - Scalar → AoS → SoA → SIMD, see [references/implementation-variants.md](references/implementation-variants.md)
+- **Caller-owns-memory** - Libraries never allocate, caller provides arrays, see [references/caller-owns-memory.md](references/caller-owns-memory.md)
+- **Alignment** - 16-byte for SIMD, cache line for hot data, see [references/alignment.md](references/alignment.md)
+- **File naming** - `*_type.h`, `*_impl.h`, `*_aos.h`, `*_soa.h`, `*_simde.h`, see [references/file-naming.md](references/file-naming.md)
 
 ## Safety
 
-- **Input validation** - Check capacity, bounds, NULL, division, overflow, see [reference/safety-validations.md](reference/safety-validations.md)
-- **Work buffers** - Complex functions use caller-provided buffers, see [reference/caller-owns-memory.md](reference/caller-owns-memory.md)
-- **SIMD parity** - Test variants against scalar reference, see [reference/testing-patterns.md](reference/testing-patterns.md)
+- **Input validation** - Check capacity, bounds, NULL, division, overflow, see [references/safety-validations.md](references/safety-validations.md)
+- **Work buffers** - Complex functions use caller-provided buffers, see [references/caller-owns-memory.md](references/caller-owns-memory.md)
+- **SIMD parity** - Test variants against scalar reference, see [references/testing-patterns.md](references/testing-patterns.md)
+
+## Gotchas
+
+- `static inline` in a header has different linkage than `inline` alone — exactly one TU must emit the definition; mixing causes silent code bloat
+- Designated initializers leave unmentioned fields zero-initialized — relying on that for safety means a missing field is silent
+- `unsigned` overflow is defined; signed overflow is undefined behavior — never rely on signed wrap
+- `alignof`/`alignas` interact subtly with `malloc` (always returns max-align) vs custom allocators
 
 ## Progressive disclosure
 
-- Read [reference/memory-management.md](reference/memory-management.md) - When allocating memory or managing resource lifetimes
-- Read [reference/designated-initializers.md](reference/designated-initializers.md) - When initializing structs or arrays with specific values
-- Read [reference/inline-functions.md](reference/inline-functions.md) - When replacing macros or writing small utility functions
-- Read [reference/compound-literals.md](reference/compound-literals.md) - When creating temporary values without named variables
-- Read [reference/const-correctness.md](reference/const-correctness.md) - When marking immutable data or understanding pointer const
-- Read [reference/data-oriented-design.md](reference/data-oriented-design.md) - When optimizing cache performance or data layouts
-- Read [reference/error-handling.md](reference/error-handling.md) - When implementing error codes or handling failures
-- Read [reference/implementation-variants.md](reference/implementation-variants.md) - When choosing between scalar, AoS, SoA, or SIMD implementations
-- Read [reference/caller-owns-memory.md](reference/caller-owns-memory.md) - When designing APIs where caller provides memory
-- Read [reference/alignment.md](reference/alignment.md) - When aligning data for SIMD or cache performance
-- Read [reference/file-naming.md](reference/file-naming.md) - When organizing headers by type, implementation, and variant
-- Read [reference/testing-patterns.md](reference/testing-patterns.md) - When writing tests with assertions, epsilon comparisons, or parity checks
-- Read [reference/safety-validations.md](reference/safety-validations.md) - When validating inputs for capacity, bounds, NULL, or overflow
+- Read [references/memory-management.md](references/memory-management.md) - When allocating memory or managing resource lifetimes
+- Read [references/designated-initializers.md](references/designated-initializers.md) - When initializing structs or arrays with specific values
+- Read [references/inline-functions.md](references/inline-functions.md) - When replacing macros or writing small utility functions
+- Read [references/compound-literals.md](references/compound-literals.md) - When creating temporary values without named variables
+- Read [references/const-correctness.md](references/const-correctness.md) - When marking immutable data or understanding pointer const
+- Read [references/data-oriented-design.md](references/data-oriented-design.md) - When optimizing cache performance or data layouts
+- Read [references/error-handling.md](references/error-handling.md) - When implementing error codes or handling failures
+- Read [references/implementation-variants.md](references/implementation-variants.md) - When choosing between scalar, AoS, SoA, or SIMD implementations
+- Read [references/caller-owns-memory.md](references/caller-owns-memory.md) - When designing APIs where caller provides memory
+- Read [references/alignment.md](references/alignment.md) - When aligning data for SIMD or cache performance
+- Read [references/file-naming.md](references/file-naming.md) - When organizing headers by type, implementation, and variant
+- Read [references/testing-patterns.md](references/testing-patterns.md) - When writing tests with assertions, epsilon comparisons, or parity checks
+- Read [references/safety-validations.md](references/safety-validations.md) - When validating inputs for capacity, bounds, NULL, or overflow

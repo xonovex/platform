@@ -12,13 +12,13 @@ description: "Use when adding or editing UI animations in React with the Motion 
 
 ## Essentials
 
-- **Entrance animations** - Use `initial`/`animate` with opacity+transform; 0.6-0.8s duration, ease `[0.22, 1, 0.36, 1]`, see [reference/entrance.md](reference/entrance.md)
-- **Gesture interactions** - Use `whileHover`/`whileTap` with spring physics (stiffness: 300, damping: 20), see [reference/gestures.md](reference/gestures.md)
-- **Scroll effects** - Use `whileInView` with `viewport={{once: true, amount: 0.3}}`; use `useScroll`/`useTransform` for parallax, see [reference/scroll.md](reference/scroll.md)
-- **Layout animations** - Use `layout` prop for automatic FLIP; use `layoutId` for shared element morphing, see [reference/layout.md](reference/layout.md)
-- **Stagger sequences** - Use variants with `staggerChildren: 0.1` and `delayChildren`, see [reference/stagger.md](reference/stagger.md)
-- **Exit animations** - Wrap in `<AnimatePresence>` with `exit` prop, see [reference/exit.md](reference/exit.md)
-- **Performance** - Only animate transform/opacity; use `useReducedMotion()` for accessibility, see [reference/performance.md](reference/performance.md)
+- **Entrance animations** - Use `initial`/`animate` with opacity+transform; 0.6-0.8s duration, ease `[0.22, 1, 0.36, 1]`, see [references/entrance.md](references/entrance.md)
+- **Gesture interactions** - Use `whileHover`/`whileTap` with spring physics (stiffness: 300, damping: 20), see [references/gestures.md](references/gestures.md)
+- **Scroll effects** - Use `whileInView` with `viewport={{once: true, amount: 0.3}}`; use `useScroll`/`useTransform` for parallax, see [references/scroll.md](references/scroll.md)
+- **Layout animations** - Use `layout` prop for automatic FLIP; use `layoutId` for shared element morphing, see [references/layout.md](references/layout.md)
+- **Stagger sequences** - Use variants with `staggerChildren: 0.1` and `delayChildren`, see [references/stagger.md](references/stagger.md)
+- **Exit animations** - Wrap in `<AnimatePresence>` with `exit` prop, see [references/exit.md](references/exit.md)
+- **Performance** - Only animate transform/opacity; use `useReducedMotion()` for accessibility, see [references/performance.md](references/performance.md)
 
 ## Example
 
@@ -47,17 +47,24 @@ export function HoverCard({children}: {children: React.ReactNode}) {
 }
 ```
 
+## Gotchas
+
+- `AnimatePresence` requires stable, unique `key` props on direct children — generated keys (`Math.random()`) recreate every render and break exit animations
+- `initial={false}` on a first-render mounted component skips the initial animation — needed when restoring state from SSR or cache
+- Layout animations (`layout` prop) trigger on every reflow — expensive components should also set `layoutDependency` to scope updates
+- `useAnimate` and `useMotionValue` aren't React state — changing them doesn't re-render; reading them in JSX without a `MotionValue` consumer shows stale values
+
 ## Progressive Disclosure
 
-- Read [reference/entrance.md](reference/entrance.md) - When creating fade-in, slide-up, or hero animations
-- Read [reference/gestures.md](reference/gestures.md) - When adding hover, tap, or focus interactions
-- Read [reference/scroll.md](reference/scroll.md) - When building scroll reveals or parallax effects
-- Read [reference/layout.md](reference/layout.md) - When animating layout changes or shared elements
-- Read [reference/stagger.md](reference/stagger.md) - When orchestrating sequential child animations
-- Read [reference/exit.md](reference/exit.md) - When animating component unmounting
-- Read [reference/spring-physics.md](reference/spring-physics.md) - When tuning spring stiffness, damping, mass
-- Read [reference/motion-values.md](reference/motion-values.md) - When using useMotionValue, useSpring, useTransform, useAnimate, or MotionConfig
-- Read [reference/performance.md](reference/performance.md) - When optimizing animations or supporting reduced motion
-- Read [reference/svg-path.md](reference/svg-path.md) - When animating SVG paths or strokes
-- Read [reference/3d-effects.md](reference/3d-effects.md) - When creating 3D cards, perspective, or rotations
-- Read [reference/text-effects.md](reference/text-effects.md) - When animating text reveals, scramble, or typewriter effects
+- Read [references/entrance.md](references/entrance.md) - Load when creating fade-in, slide-up, or hero animations
+- Read [references/gestures.md](references/gestures.md) - Load when adding hover, tap, or focus interactions
+- Read [references/scroll.md](references/scroll.md) - Load when building scroll reveals or parallax effects
+- Read [references/layout.md](references/layout.md) - Load when animating layout changes or shared elements
+- Read [references/stagger.md](references/stagger.md) - Load when orchestrating sequential child animations
+- Read [references/exit.md](references/exit.md) - Load when animating component unmounting
+- Read [references/spring-physics.md](references/spring-physics.md) - Load when tuning spring stiffness, damping, mass
+- Read [references/motion-values.md](references/motion-values.md) - Load when using useMotionValue, useSpring, useTransform, useAnimate, or MotionConfig
+- Read [references/performance.md](references/performance.md) - Load when optimizing animations or supporting reduced motion
+- Read [references/svg-path.md](references/svg-path.md) - Load when animating SVG paths or strokes
+- Read [references/3d-effects.md](references/3d-effects.md) - Load when creating 3D cards, perspective, or rotations
+- Read [references/text-effects.md](references/text-effects.md) - Load when animating text reveals, scramble, or typewriter effects

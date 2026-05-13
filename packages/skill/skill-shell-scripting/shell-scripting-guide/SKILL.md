@@ -7,24 +7,32 @@ description: "Use when writing or editing POSIX shell or Bash automation. Trigge
 
 ## Essentials
 
-- **POSIX compatibility** - Use POSIX sh, lint with shellcheck, format with shfmt, see [reference/posix-compatibility.md](reference/posix-compatibility.md)
-- **Strict mode** - Use strict mode and safe defaults, see [reference/strict-mode.md](reference/strict-mode.md)
-- **Quoting** - Quote all expansions to avoid word splitting, see [reference/quoting.md](reference/quoting.md)
-- **Functions** - Write small, focused functions, see [reference/functions.md](reference/functions.md)
-- **Parameter expansion** - Set default values and manipulate variables, see [reference/parameter-expansion.md](reference/parameter-expansion.md)
-- **Error handling** - Implement exit codes and error messages, see [reference/error-handling.md](reference/error-handling.md)
-- **Idempotency** - Make scripts safely re-runnable, see [reference/idempotency.md](reference/idempotency.md)
+- **POSIX compatibility** - Use POSIX sh, lint with shellcheck, format with shfmt, see [references/posix-compatibility.md](references/posix-compatibility.md)
+- **Strict mode** - Use strict mode and safe defaults, see [references/strict-mode.md](references/strict-mode.md)
+- **Quoting** - Quote all expansions to avoid word splitting, see [references/quoting.md](references/quoting.md)
+- **Functions** - Write small, focused functions, see [references/functions.md](references/functions.md)
+- **Parameter expansion** - Set default values and manipulate variables, see [references/parameter-expansion.md](references/parameter-expansion.md)
+- **Error handling** - Implement exit codes and error messages, see [references/error-handling.md](references/error-handling.md)
+- **Idempotency** - Make scripts safely re-runnable, see [references/idempotency.md](references/idempotency.md)
+
+## Gotchas
+
+- Unquoted variables word-split and glob-expand — `cp $file dest/` silently breaks on filenames with spaces; quote everything
+- `set -e` doesn't catch errors inside `if`, `&&`, `||`, or pipelines without `-o pipefail` — combine `set -euo pipefail` at the top
+- `[[ ]]` is bash/ksh-specific; POSIX `sh` needs `[ ]` with different quoting rules — `#!/usr/bin/env bash` makes the dep explicit
+- `command -v` is portable for checking command existence; `which` varies across platforms and exits non-zero on missing
+- `trap ... EXIT` runs on normal exit AND on errors with `set -e` — use it for cleanup; place it BEFORE the code that needs cleanup
 
 ## Progressive disclosure
 
-- Read [reference/posix-compatibility.md](reference/posix-compatibility.md) - When ensuring portability across shells
-- Read [reference/strict-mode.md](reference/strict-mode.md) - When setting up error handling and safety flags
-- Read [reference/quoting.md](reference/quoting.md) - When variables expand incorrectly or word splitting occurs
-- Read [reference/functions.md](reference/functions.md) - When organizing script logic or creating reusable code
-- Read [reference/parameter-expansion.md](reference/parameter-expansion.md) - When setting default values or manipulating variables
-- Read [reference/error-handling.md](reference/error-handling.md) - When implementing exit codes or error messages
-- Read [reference/argument-parsing.md](reference/argument-parsing.md) - When parsing command-line flags or arguments
-- Read [reference/validation.md](reference/validation.md) - When checking preconditions or input validity
-- Read [reference/idempotency.md](reference/idempotency.md) - When scripts should be safely re-runnable
-- Read [reference/common-patterns.md](reference/common-patterns.md) - When learning common shell idioms
-- Read [reference/script-template.md](reference/script-template.md) - When starting a new shell script
+- Read [references/posix-compatibility.md](references/posix-compatibility.md) - When ensuring portability across shells
+- Read [references/strict-mode.md](references/strict-mode.md) - When setting up error handling and safety flags
+- Read [references/quoting.md](references/quoting.md) - When variables expand incorrectly or word splitting occurs
+- Read [references/functions.md](references/functions.md) - When organizing script logic or creating reusable code
+- Read [references/parameter-expansion.md](references/parameter-expansion.md) - When setting default values or manipulating variables
+- Read [references/error-handling.md](references/error-handling.md) - When implementing exit codes or error messages
+- Read [references/argument-parsing.md](references/argument-parsing.md) - When parsing command-line flags or arguments
+- Read [references/validation.md](references/validation.md) - When checking preconditions or input validity
+- Read [references/idempotency.md](references/idempotency.md) - When scripts should be safely re-runnable
+- Read [references/common-patterns.md](references/common-patterns.md) - When learning common shell idioms
+- Read [references/script-template.md](references/script-template.md) - When starting a new shell script
