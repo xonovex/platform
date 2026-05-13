@@ -6,6 +6,8 @@
     "version": "0.2.4"
   },
   "plugins": [
+    { "name": "xonovex-utility", "source": "./packages/command/command-utility", "description": "Xonovex utility commands — skills, instructions, insights, content" },
+    { "name": "xonovex-workflow", "source": "./packages/command/command-workflow", "description": "Xonovex workflow commands — planning, code analysis, git" },
     { "name": "xonovex-skill-astro", "source": "./packages/skill/skill-astro", "description": "Xonovex Astro skills" },
     { "name": "xonovex-skill-c99", "source": "./packages/skill/skill-c99", "description": "Xonovex C99 skills" },
     { "name": "xonovex-skill-c99-game-opinionated", "source": "./packages/skill/skill-c99-game-opinionated", "description": "Xonovex C99 game opinionated skills" },
