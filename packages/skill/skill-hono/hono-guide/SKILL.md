@@ -12,7 +12,7 @@ description: "Use when editing or scaffolding Hono 4.0+ API servers in TypeScrip
 ## Essentials
 
 - **Factory functions** - Use for testability and domain organization, see [references/application-structure.md](references/application-structure.md)
-- **Type-safe validation** - Cast `c.req.valid` properly, handle errors with Zod, see [references/validation-type-safety.md](references/validation-type-safety.md)
+- **Type-safe validation** - Recover types at the `c.req.valid` boundary; schema design in **zod-guide**, see [references/validation-type-safety.md](references/validation-type-safety.md)
 - **Middleware configuration** - Use factories for CORS, composition with `some()`/`every()`/`except()`, see [references/middleware-patterns.md](references/middleware-patterns.md), [references/middleware-combine.md](references/middleware-combine.md)
 - **WebSocket helpers** - Keep object references to maintain `this` binding, see [references/websocket-support.md](references/websocket-support.md)
 - **Error responses** - Use RFC 7807 Problem Details format, see [references/error-handling.md](references/error-handling.md)

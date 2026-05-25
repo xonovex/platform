@@ -1,8 +1,10 @@
-# validation: Zod Validation Pattern
+# validation: Zod Validation Middleware (Express glue)
 
 **Guideline:** Validate request params, body, and query at route edges using reusable Zod middleware.
 
 **Rationale:** Early validation prevents invalid data from reaching business logic, provides consistent error responses.
+
+Schema design — defining schemas, `z.infer` types, `safeParse` vs `parse`, transforms, refinements, and defaults — belongs to **zod-guide**. This file covers only the Express glue that wires a schema into the request pipeline.
 
 **Example:**
 
@@ -33,12 +35,9 @@ export function validateBody<T extends z.ZodType>(schema: T) {
 }
 ```
 
-**Techniques:**
+**Techniques (Express glue — schema design lives in zod-guide):**
 
-- Define schemas: Create Zod objects for body, params, query with strict types
-- Type inference: Use z.infer<typeof Schema> to export TypeScript types
-- safeParse: Use safeParse() instead of parse() to avoid exceptions
 - Middleware pattern: Create validateBody/validateParams/validateQuery factories
 - Type generics: Accept T extends z.ZodType for reusable middleware
+- Assign back: Set `req.body = result.data` so handlers receive parsed, coerced input
 - Error response: Return 400 with result.error.flatten() containing field errors
-- Transform: Use .transform(Number) and .pipe() to coerce and validate strings

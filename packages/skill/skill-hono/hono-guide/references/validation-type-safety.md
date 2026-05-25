@@ -4,6 +4,8 @@
 
 **Rationale:** Hono's Context type without generic validation types returns `any` from `c.req.valid()`, losing type safety. Type assertions restore compile-time type checking without complex nested generics, enabling autocomplete and error detection while keeping signatures simple.
 
+Schema design — defining schemas, `z.infer` types, `safeParse`, transforms, refinements — belongs to **zod-guide**. This file covers only the Hono glue: wiring a schema through `zValidator` and recovering types at the `c.req.valid` boundary.
+
 **Example:**
 
 ```typescript

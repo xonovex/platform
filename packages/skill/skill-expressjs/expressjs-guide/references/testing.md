@@ -1,8 +1,10 @@
-# testing: API Testing Pattern
+# testing: Supertest API Testing (Express glue)
 
 **Guideline:** Test API endpoints using supertest with realistic request/response scenarios.
 
 **Rationale:** Integration tests validate the full middleware chain and response format.
+
+Test runner setup, `describe`/`it` organization, assertions, mocking, and HTTP status conventions belong to **vitest-guide**. This file covers only the Express glue: driving the app with supertest.
 
 **Example:**
 
@@ -29,12 +31,10 @@ describe("POST /api/users", () => {
 });
 ```
 
-**Techniques:**
+**Techniques (Express glue — runner/assertions live in vitest-guide):**
 
-- supertest: Make HTTP requests to Express app without network
+- supertest: Make HTTP requests to the Express app without opening a network port
 - request(app).get/post/patch/delete(): Chain HTTP verb with URL path
 - .send(): Pass request body as JSON
-- expect(res.status).toBe(201): Assert HTTP status code
-- expect(res.body.data): Assert response structure
-- Integration testing: Validate full middleware chain, validation, handlers
-- Realistic scenarios: Test valid/invalid inputs, edge cases, error responses
+- Integration testing: Drive the full middleware chain, validation, and handlers end to end
+- Realistic scenarios: Exercise valid/invalid inputs, edge cases, and error responses
