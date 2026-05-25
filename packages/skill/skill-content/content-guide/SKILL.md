@@ -1,11 +1,13 @@
 ---
 name: content-guide
-description: "Use when authoring or rewriting multilingual articles, news, travel guides, port/ship guides, or other structured-frontmatter content. Triggers on prompts about bilingual / multilingual content, CEFR B1-B2 readability targets, content frontmatter shape, language register, editorial web research, humanizing AI-generated prose, or stripping AI writing tells — even when the user doesn't say 'content'. Skip code documentation, API references, and marketing landing-page copy."
+description: "Use when authoring or rewriting multilingual articles, news, travel and destination/venue guides, or other structured-frontmatter content. Triggers on prompts about bilingual / multilingual content, CEFR B1-B2 readability targets, content frontmatter shape, language register, editorial web research, humanizing AI-generated prose, or stripping AI writing tells — even when the user doesn't say 'content'. Skip code documentation, API references, and marketing landing-page copy."
 ---
 
 # Content Creation Guidelines
 
 Author multilingual articles (news, travel guides, etc.) with structured frontmatter and CEFR B1-B2 readability; rewrite AI-generated prose so it reads as a human wrote it.
+
+Tenant-agnostic: these patterns apply to any structured multilingual content. Domain-specific guide types (e.g. cruise port/ship guides) live in their tenant's own skills and reuse this skill's patterns.
 
 ## Core Principles
 
@@ -33,4 +35,4 @@ Author multilingual articles (news, travel guides, etc.) with structured frontma
 
 - Read [references/humanize.md](references/humanize.md) - Load when rewriting AI-generated or stiff prose; covers the pattern catalog, anti-AI checks, and adding human voice
 - Read [references/news-add.md](references/news-add.md) - Load when curating latest news into bilingual articles with structured frontmatter
-- Read [references/travelguide-add.md](references/travelguide-add.md) - Load when generating multilingual travel / destination / port / ship guides
+- Read [references/travelguide-add.md](references/travelguide-add.md) - Load when generating multilingual travel / destination / venue guides
