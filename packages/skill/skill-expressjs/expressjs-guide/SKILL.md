@@ -12,11 +12,11 @@ description: "Use when editing or scaffolding Express 5+ API servers in TypeScri
 ## Essentials
 
 - **Project structure** - Routes, controllers, middleware as separate modules, see [references/project-structure.md](references/project-structure.md)
-- **Input validation** - Validate params/body/query with Zod at route edges, see [references/validation.md](references/validation.md)
+- **Input validation** - Wire Zod schemas as edge middleware; schema design in **zod-guide**, see [references/validation.md](references/validation.md)
 - **Error handling** - Central error handler, never leak stack traces in prod, see [references/error-handling.md](references/error-handling.md)
 - **Authentication** - JWT auth with role/permission middleware, see [references/authentication.md](references/authentication.md)
 - **Response format** - Consistent JSON shape and status codes, see [references/responses.md](references/responses.md)
-- **Testing** - Unit-test controllers/middleware, integration-test routes, see [references/testing.md](references/testing.md)
+- **Testing** - Integration-test routes with supertest; runner/assertions in **vitest-guide**, see [references/testing.md](references/testing.md)
 
 ## Gotchas
 
