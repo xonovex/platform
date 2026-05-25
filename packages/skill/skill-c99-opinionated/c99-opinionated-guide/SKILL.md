@@ -18,6 +18,8 @@ description: "Use when editing systems or embedded C99 code in projects that fol
 - **Implementation variants** - Scalar → AoS → SoA → SIMD, see [references/implementation-variants.md](references/implementation-variants.md)
 - **Caller-owns-memory** - Libraries never allocate, caller provides arrays, see [references/caller-owns-memory.md](references/caller-owns-memory.md)
 - **Alignment** - 16-byte for SIMD, cache line for hot data, see [references/alignment.md](references/alignment.md)
+- **Composability** - Composable stages/primitives over a uniform currency, explicit caller-wired composition, see [references/composability.md](references/composability.md)
+- **Hot reload** - Reloadable native modules via API/function-pointer tables + host-owned state, see [references/hot-reload.md](references/hot-reload.md)
 - **File naming** - `*_type.h`, `*_impl.h`, `*_aos.h`, `*_soa.h`, `*_simde.h`, see [references/file-naming.md](references/file-naming.md)
 
 ## Safety
@@ -45,6 +47,8 @@ description: "Use when editing systems or embedded C99 code in projects that fol
 - Read [references/implementation-variants.md](references/implementation-variants.md) - Load when choosing between scalar, AoS, SoA, or SIMD implementations
 - Read [references/caller-owns-memory.md](references/caller-owns-memory.md) - Load when designing APIs where caller provides memory
 - Read [references/alignment.md](references/alignment.md) - Load when aligning data for SIMD or cache performance
+- Read [references/composability.md](references/composability.md) - Load when designing pipelines, multi-stage transforms, or reusable primitive APIs
+- Read [references/hot-reload.md](references/hot-reload.md) - Load when making native code reloadable at runtime or designing a plugin/module boundary
 - Read [references/file-naming.md](references/file-naming.md) - Load when organizing headers by type, implementation, and variant
 - Read [references/testing-patterns.md](references/testing-patterns.md) - Load when writing tests with assertions, epsilon comparisons, or parity checks
 - Read [references/safety-validations.md](references/safety-validations.md) - Load when validating inputs for capacity, bounds, NULL, or overflow

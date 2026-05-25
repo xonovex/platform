@@ -1,0 +1,86 @@
+[
+  {
+    "query": "our particle simulator stalls when we have 50k particles — the update loop reads position and velocity out of a fat 96-byte struct, can you restructure it for cache efficiency",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "direct: AoS->SoA / hot-field layout for cache efficiency"
+  },
+  {
+    "query": "the enemy update loop spends all its time chasing next pointers through a linked list of agents — make iteration fast",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "implicit: pointer-chasing -> sequential array access, no DOD named"
+  },
+  {
+    "query": "I want entities to reference each other without raw pointers so the storage can grow and relocate safely",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "handles/indices vs pointers, relocatable storage"
+  },
+  {
+    "query": "redesign our component storage so we can iterate all alive entities of one type without branching on a flag each iteration",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "existence-based processing / ECS bucketing, branches to loops"
+  },
+  {
+    "query": "we malloc every projectile individually and the heap is fragmented and slow — switch to a frame arena",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "arena/pool allocation over per-object malloc"
+  },
+  {
+    "query": "the AI pass touches name and debug strings on every entity even though it only needs the transform; can you split the struct so the hot loop stays small",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "hot/cold splitting, buried in larger task"
+  },
+  {
+    "query": "I added a mutex around the shared counter but threads still contend badly — fix the false sharing between cores",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: concurrency/false-sharing for threads -> lock-free-guide"
+  },
+  {
+    "query": "is my const-correctness right in this systems C file, and should the header use static inline",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: C language style -> c99-opinionated-guide"
+  },
+  {
+    "query": "what's the big-O of this nested loop and can I get it down to n log n",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: pure algorithmic complexity, not data layout"
+  },
+  {
+    "query": "lay the float arrays out so the inner loop auto-vectorizes with aligned AVX loads instead of falling back to scalar gathers",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "validation positive: SIMD-friendly SoA layout + alignment"
+  },
+  {
+    "query": "profile why the broad-phase is slow — I suspect we're missing cache constantly but want to confirm before changing the layout",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "validation positive: measure cache misses before layout change"
+  },
+  {
+    "query": "tile the bodies into blocks of 8 so each block fits a cache line and the lanes stay contiguous for SIMD",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "validation positive: AoSoA for cache + SIMD, implicit"
+  },
+  {
+    "query": "write a lock-free single-producer single-consumer ring buffer for our audio thread",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "validation negative: lock-free/threading -> lock-free-guide"
+  },
+  {
+    "query": "review my vec3 and quaternion math API in the engine for the builder pattern and inverse-mass convention",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "validation negative: game-engine C style -> c99-game-opinionated-guide"
+  }
+]

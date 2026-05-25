@@ -1,0 +1,15 @@
+{
+  "name": "@xonovex/skill-lock-free",
+  "version": "0.2.4",
+  "private": true,
+  "type": "module",
+  "keywords": [
+    "xonovex",
+    "skill",
+    "lock-free"
+  ],
+  "scripts": {
+    "fmt": "prettier --write .",
+    "fmt:check": "prettier --check ."
+  }
+}
