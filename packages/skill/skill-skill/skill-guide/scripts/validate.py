@@ -21,6 +21,7 @@ Read-only — never modifies files.
 
 from __future__ import annotations
 
+import argparse
 import re
 import sys
 from dataclasses import dataclass, field
@@ -75,9 +76,13 @@ class Report:
         self.errors.append(msg)
 
 
-def usage() -> None:
-    sys.stderr.write("Usage: validate.py <skill-dir or SKILL.md>\n")
-    sys.exit(2)
+def build_parser() -> argparse.ArgumentParser:
+    p = argparse.ArgumentParser(
+        description="Validate a SKILL.md against the Agent Skills spec and authoring best practices.",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    p.add_argument("target", help="skill directory or path to a SKILL.md")
+    return p
 
 
 def resolve_target(arg: str) -> tuple[Path, Path]:
@@ -418,11 +423,8 @@ def render_report(report: Report, skill_path: Path, skill_dir: Path) -> int:
 
 
 def main(argv: list[str]) -> int:
-    if len(argv) != 2:
-        usage()
-        return 2  # unreachable; usage() exits
-
-    skill_path, skill_dir = resolve_target(argv[1])
+    args = build_parser().parse_args(argv)
+    skill_path, skill_dir = resolve_target(args.target)
     parent_name = skill_dir.name
     content = skill_path.read_text(encoding="utf-8")
 
@@ -443,4 +445,4 @@ def main(argv: list[str]) -> int:
 
 
 if __name__ == "__main__":
-    sys.exit(main(sys.argv))
+    sys.exit(main(sys.argv[1:]))

@@ -6,17 +6,16 @@
 """Run skill-triggering evals against an eval-queries.json file.
 
 Usage:
-    eval-triggers.py <queries.json> <skill_name> [split]
+    eval-triggers.py <queries.json> <skill_name> [split] [options]
         skill_name = bare ("git-commit") or plugin-namespaced ("xonovex-git:git-commit")
         split      = train | validation | all   (default: all)
 
-Env:
-    RUNS=<n>               runs per query (default: 3)
-    THRESHOLD=<f>          trigger-rate cutoff for a passing query (default: 0.5)
-    CLAUDE_MODEL=<m>       model alias or full id passed to `claude --model`
-                           (e.g. haiku, sonnet, opus). Unset = claude default.
-    DISALLOWED_TOOLS=<l>   comma-separated tools blocked during the eval
-                           (default: Bash,Edit,Write,NotebookEdit,WebFetch).
+Options (flag overrides env; env keeps the loop/CI ergonomics):
+    --runs N            / RUNS=N             runs per query (default: 3)
+    --threshold F       / THRESHOLD=F        trigger-rate cutoff for a pass (default: 0.5)
+    --model M           / CLAUDE_MODEL=M     model alias/id for `claude --model` (haiku/sonnet/opus)
+    --disallowed-tools L / DISALLOWED_TOOLS=L  comma-separated tools blocked during the eval
+                                            (default: Bash,Edit,Write,NotebookEdit,WebFetch)
 
 Safety model:
     1. Each query launches `claude -p --output-format stream-json --verbose`
@@ -35,6 +34,7 @@ Cross-platform: works on macOS, Linux, and Windows (where `claude` CLI is instal
 
 from __future__ import annotations
 
+import argparse
 import json
 import os
 import shutil
@@ -44,11 +44,46 @@ import sys
 from pathlib import Path
 
 
-def usage() -> None:
-    sys.stderr.write(
-        "Usage: eval-triggers.py <queries.json> <skill_name> [split]\n"
+def build_parser() -> argparse.ArgumentParser:
+    p = argparse.ArgumentParser(
+        description="Run skill-triggering evals against an eval-queries.json file.",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
     )
-    sys.exit(2)
+    p.add_argument("queries", help="path to eval-queries.json")
+    p.add_argument(
+        "skill_name",
+        help="bare ('git-commit') or plugin-namespaced ('plugin:git-commit')",
+    )
+    p.add_argument(
+        "split",
+        nargs="?",
+        choices=("train", "validation", "all"),
+        default="all",
+        help="which split to run (default: all)",
+    )
+    p.add_argument(
+        "--runs",
+        type=int,
+        default=int(os.environ.get("RUNS", "3")),
+        help="runs per query — model is nondeterministic (env RUNS, default 3)",
+    )
+    p.add_argument(
+        "--threshold",
+        type=float,
+        default=float(os.environ.get("THRESHOLD", "0.5")),
+        help="trigger-rate cutoff for a passing query (env THRESHOLD, default 0.5)",
+    )
+    p.add_argument(
+        "--model",
+        default=os.environ.get("CLAUDE_MODEL", ""),
+        help="model alias/id passed to `claude --model` (env CLAUDE_MODEL)",
+    )
+    p.add_argument(
+        "--disallowed-tools",
+        default=os.environ.get("DISALLOWED_TOOLS", "Bash,Edit,Write,NotebookEdit,WebFetch"),
+        help="comma-separated tools blocked during the eval (env DISALLOWED_TOOLS)",
+    )
+    return p
 
 
 def match_skill(skill_field: object, target: str, short: str) -> bool:
@@ -138,13 +173,10 @@ def check_triggered(
 
 
 def main(argv: list[str]) -> int:
-    if len(argv) < 3 or len(argv) > 4:
-        usage()
-        return 2
-
-    queries_file = Path(argv[1])
-    skill_name = argv[2]
-    split = argv[3] if len(argv) == 4 else "all"
+    args = build_parser().parse_args(argv)
+    queries_file = Path(args.queries)
+    skill_name = args.skill_name
+    split = args.split
 
     if not queries_file.is_file():
         sys.stderr.write(f"Error: queries file not found: {queries_file}\n")
@@ -153,12 +185,10 @@ def main(argv: list[str]) -> int:
         sys.stderr.write("Error: 'claude' CLI not found in PATH\n")
         return 2
 
-    runs = int(os.environ.get("RUNS", "3"))
-    threshold = float(os.environ.get("THRESHOLD", "0.5"))
-    claude_model = os.environ.get("CLAUDE_MODEL", "")
-    disallowed = os.environ.get(
-        "DISALLOWED_TOOLS", "Bash,Edit,Write,NotebookEdit,WebFetch"
-    )
+    runs = args.runs
+    threshold = args.threshold
+    claude_model = args.model
+    disallowed = args.disallowed_tools
 
     short = skill_name.rsplit(":", 1)[-1]
 
@@ -230,4 +260,4 @@ def main(argv: list[str]) -> int:
 
 
 if __name__ == "__main__":
-    sys.exit(main(sys.argv))
+    sys.exit(main(sys.argv[1:]))
