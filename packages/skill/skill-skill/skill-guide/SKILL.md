@@ -35,6 +35,7 @@ Author, extract, merge, simplify, and validate Agent Skills following the Agent 
 
 - **SKILL.md** — frontmatter, essentials (3-7 bullets), Gotchas, one example, progressive disclosure links with load-when triggers
 - **references/\*.md** — statement, rationale, how to apply, examples, counter-examples — one topic per file
+- **Long references** — a reference file >100 lines starts with a `## Contents` list so the agent sees its full scope on a partial read
 - **scripts/** (optional) — bundled executables for repeated work
 - **assets/** (optional) — templates and data files
 
