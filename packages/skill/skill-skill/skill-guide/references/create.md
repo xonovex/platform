@@ -9,10 +9,7 @@
 
 ## Spec Constraints
 
-- `name`: 1-64 chars, lowercase kebab-case, no consecutive/leading/trailing hyphens; must match parent dir
-- `description`: 1-1024 chars, imperative "Use when..." phrasing, covers what + when (incl. non-obvious triggers)
-- Body: target <500 lines / ~5000 tokens; push detail to `references/`
-- Optional: `license`, `compatibility` (≤500 chars), `metadata`, `allowed-tools`
+Spec limits (name / description / body / optional-field rules) live in the parent SKILL.md — re-check after edits.
 
 ## Skill Types
 
@@ -68,9 +65,7 @@ description: "Use when {task}. Triggers on {patterns}. Skip {adjacent-skill}."
 
 - SKILL.md: 3-7 essentials, one representative example, a Gotchas section
 - Reference files: full explanations, multiple examples, rationale; one topic each
-- Add only what the agent lacks; omit general knowledge it already has
-- Provide a default; mention alternatives briefly (no menus)
-- Procedures over declarations (teach the approach, not the one-off answer)
+- Apply the parent SKILL.md Core Principles (add what the agent lacks, defaults over menus, procedures over declarations)
 - Match specificity to fragility — prescriptive only when consistency is required
 - Mine non-obvious facts/corrections into a **Gotchas** section
 

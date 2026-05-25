@@ -46,6 +46,4 @@ When extracting from external docs:
 
 - Remove source-specific paths and project names — keep content reusable across projects
 - Mine corrections / PR comments / fix commits for **Gotchas** entries
-- Procedures over declarations: teach the approach, not the one-off answer
-- Defaults over menus: pick one recommended approach in Essentials; alternatives go in the reference file
-- Add only what the agent lacks — omit anything inferable from official docs alone
+- Apply the parent SKILL.md Core Principles (add what the agent lacks, defaults over menus, procedures over declarations)

@@ -86,8 +86,6 @@
 - **Last reviewed:** 2026-05-13
 - **Used for:**
   - `SKILL.md` → Spec Constraints, Skill Structure
-  - `references/create.md` → Spec Constraints
-  - `references/extract-from-codebase.md` → Spec Constraints
   - `references/simplify-skill.md` → Spec Constraints
   - `references/validate.md` → Spec Constraints, Frontmatter Checks, Body Checks, Reference Checks
 - **Aspects extracted:**
