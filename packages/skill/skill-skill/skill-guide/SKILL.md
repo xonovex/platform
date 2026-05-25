@@ -18,6 +18,8 @@ Author, extract, merge, simplify, and validate Agent Skills following the Agent 
 
 - **Progressive Disclosure** — SKILL.md contains essentials; `references/*` contains depth, loaded on demand
 - **Project Independence** — remove project-specific paths, names, domains
+- **Composable split** — one concept has one owner skill; prefer small mix-and-match skills, cross-reference others by name instead of duplicating, and generalize anything not inherently language/API-specific into a general skill that specific skills link to for the "why"
+- **Sources in SOURCES.md** — cite provenance only in `SOURCES.md`; never name authors, companies, talks, books, or blogs inside `SKILL.md` or `references/*` (tool/API/standard names are fine)
 - **Bullet Format** — `- **Rule** - Brief 5-10 word how-to, see [references/<topic>.md](references/<topic>.md)`
 - **Style Consistency** — match existing skill patterns in structure and voice
 - **Add what the agent lacks; omit what it knows** — no general-knowledge filler
