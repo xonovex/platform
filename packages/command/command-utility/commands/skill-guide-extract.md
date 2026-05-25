@@ -22,9 +22,10 @@ Creates or updates a skill by analyzing codebase patterns, AGENTS.md instruction
 
 ## Spec Constraints
 
-- `name`: ≤64 chars, lowercase kebab-case, must match parent dir
-- `description`: ≤1024 chars, imperative "Use when..." phrasing, covers what + when (incl. non-obvious triggers)
+- `name`: 1-64 chars, lowercase kebab-case, no consecutive/leading/trailing hyphens, not the reserved words `anthropic`/`claude`, no XML tags, must match parent dir
+- `description`: 1-1024 chars, imperative "Use when..." + triggers, third person, covers what + when (incl. non-obvious triggers)
 - Body: target <500 lines / ~5000 tokens; push detail to `references/`
+- Optional: `license` (string), `compatibility` (≤500 chars), `metadata` (string→string map), `allowed-tools` (experimental, space-separated)
 
 ## Arguments
 

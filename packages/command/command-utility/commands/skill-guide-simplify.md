@@ -17,12 +17,12 @@ argument-hint: "[skill-file] [--dry-run] [--target-reduction <percent>]"
 
 ## Goal
 
-Reduce SKILL.md by 60-80% (default 70%) while preserving quick reference. Extract examples to reference files. Make content project-independent. Land under spec ceiling (<500 lines / ~5000 tokens body).
+Reduce SKILL.md by 60-80% (default 70%) while preserving quick reference. Extract examples to reference files. Make content project-independent. Land under spec ceiling (<500 lines / ~5000 tokens body). The same operation also trims bloated reference files — merge overlapping sections (20-40% reduction).
 
 ## Spec Constraints
 
-- `name`: ≤64 chars, lowercase kebab-case, must match parent dir
-- `description`: ≤1024 chars, imperative "Use when..." with explicit trigger contexts; preserve triggering quality when simplifying
+- `name`: 1-64 chars, lowercase kebab-case, no consecutive/leading/trailing hyphens, not the reserved words `anthropic`/`claude`, no XML tags, must match parent dir
+- `description`: 1-1024 chars, imperative "Use when..." + triggers, third person; preserve triggering quality when simplifying
 - Body: target <500 lines / ~5000 tokens
 
 ## Arguments

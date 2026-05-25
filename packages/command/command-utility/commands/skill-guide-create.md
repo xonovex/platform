@@ -24,10 +24,10 @@ Generate a guideline skill with progressive disclosure structure from a document
 
 ## Spec Constraints
 
-- `name`: 1-64 chars, lowercase kebab-case, no consecutive/leading/trailing hyphens; must match parent dir
-- `description`: 1-1024 chars, imperative "Use when..." phrasing, covers what + when (incl. non-obvious triggers)
+- `name`: 1-64 chars, lowercase kebab-case, no consecutive/leading/trailing hyphens, not the reserved words `anthropic`/`claude`, no XML tags; must match parent dir
+- `description`: 1-1024 chars, imperative "Use when..." + triggers, third person (no "I can…"/"You can…")
 - Body: target <500 lines / ~5000 tokens; push detail to `references/`
-- Optional: `license`, `compatibility` (≤500 chars), `metadata`, `allowed-tools`
+- Optional: `license` (string), `compatibility` (≤500 chars), `metadata` (string→string map), `allowed-tools` (experimental, space-separated)
 
 ## Skill Types
 
