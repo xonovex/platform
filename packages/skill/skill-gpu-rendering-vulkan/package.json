@@ -1,0 +1,15 @@
+{
+  "name": "@xonovex/skill-gpu-rendering-vulkan",
+  "version": "0.2.4",
+  "private": true,
+  "type": "module",
+  "keywords": [
+    "xonovex",
+    "skill",
+    "gpu-rendering-vulkan"
+  ],
+  "scripts": {
+    "fmt": "prettier --write .",
+    "fmt:check": "prettier --check ."
+  }
+}

@@ -1,51 +1,37 @@
-# alignment: Memory Alignment
+# alignment: Memory Alignment (C)
 
-**Guideline:** 16 bytes for SIMD, cache line (64/128B) for hot data.
+**Guideline:** Use C's alignment mechanics — `_Alignas`, over-aligned types, and an aligned allocator — to satisfy the SIMD and cache-line alignment that other concerns require.
 
-**Rationale:** SIMD loads require alignment. Misalignment causes penalties/crashes. Cache alignment prevents false sharing in concurrent code.
+**Rationale:** This doc is only the C _how_. The _why/when_ lives elsewhere: aligning/padding for vectorization is a layout decision (see **data-oriented-design-guide**, SIMD-friendly layout), and cache-line-aligning/padding hot or atomic fields to avoid false sharing is a concurrency decision (see **lock-free-guide**). Here: how to express those in C.
+
+**How to Apply (C specifics):**
+
+1. `_Alignas(16)` (or `alignas`, C11) on a field/type for SIMD; pad a `vec3` to 16 bytes when it must load as a `vec4`.
+2. Allocate over-aligned memory with `aligned_alloc` (C11) or `posix_memalign`; `malloc` only guarantees max-align.
+3. Pad a struct to a whole multiple of the alignment so an _array_ of it stays aligned per element.
+4. Source the cache-line size per target with conditional compilation (64 B x86-64, 128 B some ARM).
 
 **Example:**
 
 ```c
-// SIMD-friendly vec3 (16 bytes)
-typedef struct { float x, y, z, _pad; } vec3_t;
+typedef struct { float x, y, z, _pad; } vec3_t;              // 16B, SIMD-loadable
+typedef struct { _Alignas(16) float data[4]; } vec4a_t;     // explicit field alignment
 
-// Compiler alignment
-typedef struct { _Alignas(16) float data[4]; } aligned_vec4_t;
-
-// Cache-line aligned hot data
-#define CACHE_LINE_SIZE 64
-typedef struct {
-    _Alignas(CACHE_LINE_SIZE) uint32_t counter;
-    char pad[CACHE_LINE_SIZE - sizeof(uint32_t)];
-} atomic_counter_t;
-
-// SoA arrays
-typedef struct {
-    _Alignas(16) float *x, *y, *z;
-    size_t count;
-} vec3_soa_t;
-
-// Aligned allocation
-void *aligned_alloc_16(size_t size) {
-    void *ptr;
-    return posix_memalign(&ptr, 16, size) == 0 ? ptr : NULL;
-}
-
-// Platform detection
-#if defined(__x86_64__) || defined(_M_X64)
-    #define CACHE_LINE_SIZE 64
-#elif defined(__aarch64__)
-    #define CACHE_LINE_SIZE 128
+#if defined(__aarch64__)
+#define CACHE_LINE_SIZE 128
 #else
-    #define CACHE_LINE_SIZE 64
+#define CACHE_LINE_SIZE 64
 #endif
+typedef struct { _Alignas(CACHE_LINE_SIZE) uint32_t v; char pad[CACHE_LINE_SIZE - 4]; } padded_t;
+
+static void *aligned_alloc_16(size_t n) {                   // over-aligned allocation
+  void *p; return posix_memalign(&p, 16, n) == 0 ? p : NULL;
+}
 ```
 
-**Techniques:**
+**Gotchas:**
 
-- SIMD alignment: Pad vec3 to 16-byte aligned structures for SIMD instructions
-- Compiler directives: Use `_Alignas(16)` for explicit struct field alignment
-- SoA layout: Align array-of-structures for batch SIMD operations
-- Cache alignment: Align hot data to 64B (x86) or 128B (ARM) cache line size
-- Platform detection: Use conditional compilation for architecture-specific alignment
+- `_Alignas` on a struct field aligns the field, but an array of that struct only stays aligned if the struct size is a whole multiple of the alignment — add explicit padding.
+- `malloc` returns max-align (fine for scalars), not arbitrary over-alignment; use `aligned_alloc`/`posix_memalign` for SIMD/cache-line needs.
+
+**Related:** **data-oriented-design-guide** (SIMD-friendly layout), **lock-free-guide** (false sharing)

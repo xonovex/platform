@@ -53,4 +53,4 @@ draw_world_and_move_objects(m); // reader writing shared state -> data race
 - Reader threads reconciling changes by mutating a snapshot bypass undo/notification and corrupt state — route them through the writer's transactional path.
 - The atomic publish needs release/acquire ordering; a plain non-atomic pointer swap lets a reader see a torn or stale version on weakly-ordered hardware.
 
-**Related:** [references/change-notification.md](./change-notification.md), [references/undo-redo.md](./undo-redo.md), [references/serialization.md](./serialization.md)
+**Related:** [references/change-notification.md](./change-notification.md), [references/undo-redo.md](./undo-redo.md), [references/serialization.md](./serialization.md); **lock-free-guide** for the snapshot-publish / atomic-version-swap and safe-reclamation mechanics

@@ -49,7 +49,6 @@
 - **Aspects extracted:**
   - Cache hierarchy latencies, prefetching, miss taxonomy → `references/cache-behavior.md`, `references/access-patterns.md`
   - Alignment, SIMD loads, AoSoA → `references/simd-friendly-layout.md`
-  - Arena/pool allocation, fragmentation → `references/memory-arenas.md`
   - Profiling, hardware counters, microbenchmarking → `references/measurement-and-profiling.md`
   - Indices/handles, swap-remove, free lists → `references/handles-and-indices.md`
 
@@ -61,7 +60,6 @@
   - `SKILL.md` → Layout, Memory
   - Practical engine DOD storage and allocator techniques
 - **Aspects extracted:**
-  - "Virtual Memory Tricks" — reserve/commit growable arrays with stable addresses → `references/memory-arenas.md`
   - "Data Structures Part 1–2: Bulk Data / Indices" — bulk-data store + handle↔index indirection (stable handles AND dense data) → `references/handles-and-indices.md`
   - "It's All About The Data" — data-first framing → `references/data-as-transforms.md`
   - "Minimalist container library in C" — contiguous growable containers (noted in c99-opinionated)

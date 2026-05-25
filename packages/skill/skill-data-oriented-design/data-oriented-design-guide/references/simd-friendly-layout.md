@@ -48,4 +48,4 @@ typedef struct { float x, y, out; char tag; } rec_t; // stride 16B, gathered
 - Alignment is necessary but not sufficient: divergent per-lane branches, dependent loads, or aliasing can still block vectorization.
 - Aligned allocation is separate from struct alignment — `malloc` only guarantees max-align; use an aligned allocator for over-aligned columns.
 
-**Related:** [references/soa-aos-aosoa.md](./soa-aos-aosoa.md), [references/memory-arenas.md](./memory-arenas.md), [references/cache-behavior.md](./cache-behavior.md), [references/measurement-and-profiling.md](./measurement-and-profiling.md)
+**Related:** [references/soa-aos-aosoa.md](./soa-aos-aosoa.md), memory-management-guide, [references/cache-behavior.md](./cache-behavior.md), [references/measurement-and-profiling.md](./measurement-and-profiling.md)

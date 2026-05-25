@@ -1,0 +1,80 @@
+[
+  {
+    "query": "make our particle system stop calling malloc per particle — hand it a buffer it just fills",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "caller-owns-memory / non-allocating API"
+  },
+  {
+    "query": "I want a per-frame scratch allocator I can reset every frame instead of freeing temporaries individually",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "arena / scratch / lifetime reset"
+  },
+  {
+    "query": "add an object pool with a free list for our connection structs so allocation is O(1) and stable",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "pool + free list"
+  },
+  {
+    "query": "reserve a big virtual range and commit pages as the array grows so the pointers never move",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "virtual-memory reserve/commit growable storage"
+  },
+  {
+    "query": "who's supposed to free the node returned by get_node? we have a double-free somewhere",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "ownership / lifetimes"
+  },
+  {
+    "query": "design the buffer-ownership convention for our parser so there are no leaks on error paths",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "ownership convention, caller-owns"
+  },
+  {
+    "query": "convert this AoS particle array to SoA so the update loop is cache-friendly",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: data layout / cache -> data-oriented-design-guide"
+  },
+  {
+    "query": "free nodes safely in our lock-free stack while other threads might still read them",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: lock-free reclamation -> lock-free-guide"
+  },
+  {
+    "query": "sub-allocate VkDeviceMemory by memory type and use a staging buffer for uploads",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: GPU device memory -> gpu-rendering-vulkan-guide"
+  },
+  {
+    "query": "should I use a weakref or just let the GC collect this in our Python service?",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: GC-managed runtime owns lifetimes"
+  },
+  {
+    "query": "we keep fragmenting the heap — can you route the level's allocations through one arena that frees on level unload",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "arena, lifetime-by-phase"
+  },
+  {
+    "query": "the engine should pass scratch space into the mesh builder instead of the builder allocating it",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "caller-provided work buffer"
+  },
+  {
+    "query": "split the hot and cold fields of this struct to shrink the cache working set",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near-miss: hot/cold layout -> data-oriented-design-guide"
+  }
+]
