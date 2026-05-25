@@ -1,6 +1,6 @@
 ---
 name: lua-guide
-description: "Use when editing general-purpose Lua 5.4+ — modules, scripts, configuration. Triggers on `.lua` files and prompts about module patterns, local scoping, metatables, coroutines, error handling, even when the user doesn't say 'Lua'. Skip LuaJIT performance-critical code (use lua-opinionated-guide) and TypeScript-to-Lua transpiled output (use typescript-to-lua-guide)."
+description: "Use when editing general-purpose Lua 5.4+ — modules, scripts, configuration. Triggers on `.lua` files and prompts about module patterns, local scoping, metatables, coroutines, error handling, even when the user doesn't say 'Lua'. Skip performance-critical hot-path tuning (use lua-opinionated-guide) and TypeScript-to-Lua transpiled output (use typescript-to-lua-guide)."
 ---
 
 # Lua Coding Guidelines
