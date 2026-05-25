@@ -3,7 +3,7 @@
 ## Agent Skills: Best Practices for Skill Creators
 
 - **URL:** https://agentskills.io/skill-creation/best-practices.md
-- **Last reviewed:** 2026-05-13
+- **Last reviewed:** 2026-05-27
 - **Used for:**
   - `SKILL.md` → Core Principles, Gotchas
   - `references/create.md` → Content Rules
@@ -26,7 +26,7 @@
 ## Agent Skills: Optimizing Skill Descriptions
 
 - **URL:** https://agentskills.io/skill-creation/optimizing-descriptions.md
-- **Last reviewed:** 2026-05-13
+- **Last reviewed:** 2026-05-27
 - **Used for:**
   - `references/writing-descriptions.md` → Writing Principles, Anatomy, Before/After, Gotchas
   - `references/evaluating-triggers.md` → entire file
@@ -46,7 +46,7 @@
 ## Agent Skills: Using Scripts in Skills
 
 - **URL:** https://agentskills.io/skill-creation/using-scripts.md
-- **Last reviewed:** 2026-05-13
+- **Last reviewed:** 2026-05-27
 - **Used for:**
   - `references/using-scripts.md` → entire file
 - **Aspects extracted:**
@@ -60,7 +60,7 @@
 ## Agent Skills: Evaluating Skill Output Quality
 
 - **URL:** https://agentskills.io/skill-creation/evaluating-skills.md
-- **Last reviewed:** 2026-05-13
+- **Last reviewed:** 2026-05-27
 - **Used for:**
   - `references/evaluating-outputs.md` → entire file (incl. Automated Runner section)
   - `scripts/eval-outputs.py` → with-skill/without-skill arms, LLM-as-judge grading, `benchmark.json`
@@ -83,7 +83,7 @@
 ## Agent Skills: Specification
 
 - **URL:** https://agentskills.io/specification.md
-- **Last reviewed:** 2026-05-13
+- **Last reviewed:** 2026-05-27
 - **Used for:**
   - `SKILL.md` → Spec Constraints, Skill Structure
   - `references/validate.md` → Spec Constraints, Frontmatter Checks, Body Checks, Reference Checks
