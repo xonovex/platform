@@ -1,6 +1,6 @@
 ---
 name: skill-guide
-description: "Use when authoring, reviewing, extracting, merging, simplifying, or validating Agent Skills (SKILL.md plus references / scripts / assets). Triggers on edits under a skills directory, on prompts about creating a new skill, progressive disclosure, reference files, pattern extraction, merging or assimilating skills, simplification to bullet format, validation against the Agent Skills spec, description tuning, or evaluating trigger rate / output quality — even when the user doesn't say 'skill'."
+description: "Use when authoring, reviewing, extracting, merging, simplifying, or validating Agent Skills (SKILL.md plus references / scripts / assets), or when auditing, splitting, de-duplicating, or tiering a whole set of skills. Triggers on edits under a skills directory, on prompts about creating a new skill, progressive disclosure, reference files, pattern extraction, merging or assimilating skills, simplification to bullet format, validation against the Agent Skills spec, description tuning, evaluating trigger rate / output quality, or making a catalog composable (one owner per concept, cross-references, general→language→framework tiers) — even when the user doesn't say 'skill'."
 ---
 
 # Skill Guidelines Management
@@ -13,12 +13,15 @@ Author, extract, merge, simplify, and validate Agent Skills following the Agent 
 - `description`: 1-1024 chars; imperative "Use when…" with explicit trigger contexts
 - Body: <500 lines / ~5000 tokens; push detail to `references/`
 - Reference files: one level deep under `references/`, kebab-case filenames
+- **Progressive-disclosure budget** — discovery sees only name+description (~100 tokens), so the description alone decides routing; `SKILL.md` loads on activation (keep ≤ ~500 lines / 5k tokens); anything needed <~20% of the time belongs in `references/`, loaded on demand
 
 ## Core Principles
 
 - **Progressive Disclosure** — SKILL.md contains essentials; `references/*` contains depth, loaded on demand
 - **Project Independence** — remove project-specific paths, names, domains
-- **Composable split** — one concept has one owner skill; prefer small mix-and-match skills, cross-reference others by name instead of duplicating, and generalize anything not inherently language/API-specific into a general skill that specific skills link to for the "why"
+- **Composable split** — one concept has one owner skill; prefer small mix-and-match skills, cross-reference others by name instead of duplicating, and generalize anything not inherently language/API-specific into a general skill that specific skills link to for the "why", see [references/composability.md](references/composability.md)
+- **Design to coexist** — a skill is one capability among many loaded together; it must work alongside others, never assume it is the only one, and link up the general→language→framework tiers without the general tier depending on a specific one
+- **Routing-first descriptions** — the description is the router (discovery sees only name+description); tune trigger words and Skip clauses, and debug mis-routes by asking "which skill did you use?", see [references/writing-descriptions.md](references/writing-descriptions.md)
 - **Sources in SOURCES.md** — cite provenance only in `SOURCES.md`; never name authors, companies, talks, books, or blogs inside `SKILL.md` or `references/*` (tool/API/standard names are fine)
 - **Bullet Format** — `- **Rule** - Brief 5-10 word how-to, see [references/<topic>.md](references/<topic>.md)`
 - **Style Consistency** — match existing skill patterns in structure and voice
@@ -56,6 +59,7 @@ Cross-platform (macOS / Linux / Windows wherever `uv` is installed). Install `uv
 - **Simplify** a verbose SKILL.md to bullet format — see [references/simplify-skill.md](references/simplify-skill.md)
 - **Simplify reference files** by merging overlapping sections — see [references/simplify-reference.md](references/simplify-reference.md)
 - **Validate** a SKILL.md against the spec and best practices — see [references/validate.md](references/validate.md)
+- **Audit** a set of skills and refactor it onto the composable split — see [references/catalog-audit.md](references/catalog-audit.md)
 
 ## Progressive Disclosure
 
@@ -65,6 +69,8 @@ Cross-platform (macOS / Linux / Windows wherever `uv` is installed). Install `uv
 - Read [references/simplify-skill.md](references/simplify-skill.md) - Load when condensing a verbose SKILL.md to bullet format
 - Read [references/simplify-reference.md](references/simplify-reference.md) - Load when condensing or merging verbose reference files
 - Read [references/validate.md](references/validate.md) - Load when auditing a SKILL.md against the spec
+- Read [references/composability.md](references/composability.md) - Load when deciding skill boundaries, owners, tiers, or whether to generalize vs link a concept
+- Read [references/catalog-audit.md](references/catalog-audit.md) - Load when auditing, splitting, or de-duplicating a set of skills onto the composable split
 - Read [references/guideline-skills.md](references/guideline-skills.md) - Load when creating a coding-guideline / style-rule skill (topic categories, do/don't patterns, reference shape)
 - Read [references/writing-descriptions.md](references/writing-descriptions.md) - Load when authoring or rewriting a `description` field (writing principles, before/after)
 - Read [references/evaluating-triggers.md](references/evaluating-triggers.md) - Load when verifying or iterating on trigger rate (eval queries, train/validation split, optimization loop)
