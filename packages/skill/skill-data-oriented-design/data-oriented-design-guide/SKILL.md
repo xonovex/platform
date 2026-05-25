@@ -1,6 +1,6 @@
 ---
 name: data-oriented-design-guide
-description: "Use when designing or refactoring performance-critical data layouts for cache efficiency, in any language. Triggers on prompts about SoA/AoS/AoSoA, cache misses, hot/cold field splitting, data-oriented design, ECS/component storage, batch/bulk processing, handles vs pointers, avoiding pointer chasing, arena/pool allocation. Skip language-specific style (use c99-opinionated-guide / c99-game-opinionated-guide), thread-synchronization & false-sharing-for-concurrency (use lock-free-guide), and pure algorithmic-complexity questions."
+description: "Use when designing or refactoring performance-critical data layouts for cache efficiency, in any language. Triggers on prompts about SoA/AoS/AoSoA, cache misses, hot/cold field splitting, data-oriented design, ECS/component storage, batch/bulk processing, handles vs pointers, avoiding pointer chasing. Skip allocation/ownership mechanics (use memory-management-guide), language-specific style (use c99-opinionated-guide / c99-game-opinionated-guide), thread-synchronization & false-sharing-for-concurrency (use lock-free-guide), and pure algorithmic-complexity questions."
 ---
 
 # Data-Oriented Design Guidelines
@@ -26,13 +26,12 @@ description: "Use when designing or refactoring performance-critical data layout
 ## Memory
 
 - **Handles, not pointers** - Reference by index/generational handle for relocatable, stable arrays, see [references/handles-and-indices.md](references/handles-and-indices.md)
-- **Arenas and pools** - Bump/pool allocators over per-object malloc, see [references/memory-arenas.md](references/memory-arenas.md)
+- **Allocation** - Contiguous storage matters for cache, but the allocators themselves (arenas/pools/lifetimes) are general — see **memory-management-guide**
 
 ## Gotchas
 
 - SoA only wins when loops touch a subset of fields; full-record access can favor AoS — measure both.
 - A generational handle prevents use-after-free dangling on swap-remove, but only if you actually compare the generation.
-- Bump allocators cannot free individual objects; lifetimes must be batched and reset together or you leak.
 - The hardware prefetcher tracks linear strides; randomizing your index order silently disables it.
 - Padding for alignment trades memory for throughput — on cache-bound loads, the smaller packed layout can still win.
 
@@ -45,6 +44,5 @@ description: "Use when designing or refactoring performance-critical data layout
 - Read [references/access-patterns.md](references/access-patterns.md) - Load when iterating collections or replacing pointer-chasing structures
 - Read [references/handles-and-indices.md](references/handles-and-indices.md) - Load when designing entity references, stable arrays, or free lists
 - Read [references/existence-based-processing.md](references/existence-based-processing.md) - Load when removing per-item branches by sorting or bucketing
-- Read [references/memory-arenas.md](references/memory-arenas.md) - Load when replacing per-object allocation with arenas or pools
 - Read [references/simd-friendly-layout.md](references/simd-friendly-layout.md) - Load when laying out data for vectorization or alignment
 - Read [references/measurement-and-profiling.md](references/measurement-and-profiling.md) - Load when measuring before/after or reading hardware counters

@@ -37,4 +37,4 @@ solve_aabb(&manifold, boxes, &pairs);
 
 **Counter-Example:** A genuinely single-step operation with no reuse or variation does not need a stage split — forcing a funnel there adds ceremony without payoff. Composability biases the design; it is not a mandate to fragment every function.
 
-**Related:** [references/caller-owns-memory.md](./caller-owns-memory.md), [references/data-oriented-design.md](./data-oriented-design.md), [references/implementation-variants.md](./implementation-variants.md)
+**Related:** [references/caller-owns-memory.md](./caller-owns-memory.md), [references/implementation-variants.md](./implementation-variants.md), **data-oriented-design-guide**

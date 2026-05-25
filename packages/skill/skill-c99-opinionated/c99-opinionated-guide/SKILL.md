@@ -10,14 +10,14 @@ description: "Use when editing systems or embedded C99 code in projects that fol
 - **Memory management** - Prefer stack, free all heap allocations, see [references/memory-management.md](references/memory-management.md)
 - **Modern C99** - Use `const`, designated initializers, small functions, see [references/designated-initializers.md](references/designated-initializers.md), [references/const-correctness.md](references/const-correctness.md)
 - **Type safety** - Favor `inline` functions over macros, see [references/inline-functions.md](references/inline-functions.md)
-- **Data-oriented design** - Structure for cache locality, see [references/data-oriented-design.md](references/data-oriented-design.md)
+- **Data-oriented design** - Layout/cache is a core choice of this style — apply **data-oriented-design-guide**
 - **Quality** - Treat warnings as errors, run static analysis
 
 ## Architecture
 
-- **Implementation variants** - Scalar → AoS → SoA → SIMD, see [references/implementation-variants.md](references/implementation-variants.md)
-- **Caller-owns-memory** - Libraries never allocate, caller provides arrays, see [references/caller-owns-memory.md](references/caller-owns-memory.md)
-- **Alignment** - 16-byte for SIMD, cache line for hot data, see [references/alignment.md](references/alignment.md)
+- **Implementation variants** - Ship scalar → AoS → SoA → SIMD with `_*` suffixes + parity tests; layout rationale in **data-oriented-design-guide**, see [references/implementation-variants.md](references/implementation-variants.md)
+- **Caller-owns-memory** - This style's default; the general principle (arenas/ownership) lives in **memory-management-guide**, see [references/caller-owns-memory.md](references/caller-owns-memory.md)
+- **Alignment** - C `_Alignas`/aligned allocation; the _why_ is in **data-oriented-design-guide** (SIMD) and **lock-free-guide** (false sharing), see [references/alignment.md](references/alignment.md)
 - **Composability** - Composable stages/primitives over a uniform currency, explicit caller-wired composition, see [references/composability.md](references/composability.md)
 - **Hot reload** - Reloadable native modules via API/function-pointer tables + host-owned state, see [references/hot-reload.md](references/hot-reload.md)
 - **File naming** - `*_type.h`, `*_impl.h`, `*_aos.h`, `*_soa.h`, `*_simde.h`, see [references/file-naming.md](references/file-naming.md)
@@ -42,7 +42,6 @@ description: "Use when editing systems or embedded C99 code in projects that fol
 - Read [references/inline-functions.md](references/inline-functions.md) - Load when replacing macros or writing small utility functions
 - Read [references/compound-literals.md](references/compound-literals.md) - Load when creating temporary values without named variables
 - Read [references/const-correctness.md](references/const-correctness.md) - Load when marking immutable data or understanding pointer const
-- Read [references/data-oriented-design.md](references/data-oriented-design.md) - Load when optimizing cache performance or data layouts
 - Read [references/error-handling.md](references/error-handling.md) - Load when implementing error codes or handling failures
 - Read [references/implementation-variants.md](references/implementation-variants.md) - Load when choosing between scalar, AoS, SoA, or SIMD implementations
 - Read [references/caller-owns-memory.md](references/caller-owns-memory.md) - Load when designing APIs where caller provides memory

@@ -43,4 +43,4 @@ long sum_array(const int *v, size_t n) {
 - Linked structures can still be fine if nodes are pool-allocated in traversal order and rarely re-linked — it is the random heap addresses, not the "list" concept, that hurts.
 - Indexing by a generational handle is sequential-friendly only if the underlying array is itself traversed in order; random handle lookups are still random.
 
-**Related:** [references/handles-and-indices.md](./handles-and-indices.md), [references/cache-behavior.md](./cache-behavior.md), [references/data-as-transforms.md](./data-as-transforms.md), [references/memory-arenas.md](./memory-arenas.md)
+**Related:** [references/handles-and-indices.md](./handles-and-indices.md), [references/cache-behavior.md](./cache-behavior.md), [references/data-as-transforms.md](./data-as-transforms.md), memory-management-guide

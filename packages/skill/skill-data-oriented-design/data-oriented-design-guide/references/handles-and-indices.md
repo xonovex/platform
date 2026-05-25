@@ -73,4 +73,4 @@ static void store_remove(store_t *s, handle_t h) {
 - Swap-remove invalidates the moved element's index; either use handles (which the move updates) or notify holders.
 - Cache the dereferenced pointer only within a scope where no allocation/removal can occur.
 
-**Related:** [references/access-patterns.md](./access-patterns.md), [references/existence-based-processing.md](./existence-based-processing.md), [references/memory-arenas.md](./memory-arenas.md), [references/hot-cold-splitting.md](./hot-cold-splitting.md)
+**Related:** [references/access-patterns.md](./access-patterns.md), [references/existence-based-processing.md](./existence-based-processing.md), memory-management-guide, [references/hot-cold-splitting.md](./hot-cold-splitting.md)

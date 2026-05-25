@@ -53,4 +53,4 @@ object_t *cached_target = resolve(m, ref_id); // valid only within this scope
 - Cross-file links need GUIDs: local ids are only unique within the file that minted them, so a merge or import will collide them.
 - Resolving an id every access has a cost; batch-resolve once per operation, but never cache a pointer across an edit that can delete or relocate.
 
-**Related:** [references/object-model.md](./object-model.md), [references/serialization.md](./serialization.md), [references/undo-redo.md](./undo-redo.md)
+**Related:** [references/object-model.md](./object-model.md), [references/serialization.md](./serialization.md), [references/undo-redo.md](./undo-redo.md); **data-oriented-design-guide** for the cache-friendly handle/indirection storage mechanics

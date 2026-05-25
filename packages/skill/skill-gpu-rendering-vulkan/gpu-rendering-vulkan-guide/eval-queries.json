@@ -1,0 +1,92 @@
+[
+  {
+    "query": "give me the exact VkImageMemoryBarrier2 with srcStageMask/srcAccessMask and dstStageMask/dstAccessMask plus the oldLayout/newLayout for reading a color attachment as a sampled texture, and the vkCmdPipelineBarrier2 call",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "direct: concrete VkImageMemoryBarrier2 masks + layout transition + vkCmdPipelineBarrier2"
+  },
+  {
+    "query": "we're calling vkAllocateMemory once per VkImage and hit maxMemoryAllocationCount on big levels — how do I pick memory types from VkPhysicalDeviceMemoryProperties and sub-allocate from a few large VkDeviceMemory blocks honoring VkMemoryRequirements alignment",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "direct: Vulkan device-memory types/heaps, allocation cap, sub-allocation, alignment"
+  },
+  {
+    "query": "I want one giant sampler2D array the shader indexes by an integer — how do I set up VkDescriptorSetLayout with update-after-bind and descriptor indexing and use nonuniformEXT",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "direct: Vulkan bindless via descriptor indexing / UPDATE_AFTER_BIND + nonuniformEXT"
+  },
+  {
+    "query": "replace our binary VkSemaphores between the graphics and async-compute queues with a single timeline VkSemaphore we can also wait on from the CPU with vkWaitSemaphores",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "direct: Vulkan timeline VkSemaphore for queue handoff + host wait"
+  },
+  {
+    "query": "upload a static vertex buffer to DEVICE_LOCAL memory through a HOST_VISIBLE staging buffer with vkCmdCopyBuffer, then barrier transfer-write to vertex-read before the draw",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "direct: Vulkan staging upload + vkCmdCopyBuffer + transfer->read barrier"
+  },
+  {
+    "query": "switch our renderer from VkRenderPass/VkFramebuffer objects to VK_KHR_dynamic_rendering with vkCmdBeginRendering, and persist a VkPipelineCache to disk to kill first-draw stalls",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "direct: Vulkan dynamic rendering + VkPipelineCache persistence"
+  },
+  {
+    "query": "how should I lay out VkCommandPool per worker thread per frame and reset with vkResetCommandPool, and wire vkAcquireNextImageKHR / vkQueueSubmit2 / vkQueuePresentKHR with a VkFence per frame",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "direct: Vulkan command pools, swapchain acquire/present, fence per frame"
+  },
+  {
+    "query": "our renderer hand-writes a barrier before and after every pass and it breaks when we reorder — I want passes to just declare what they read and write and have ordering and transitions derived, conceptually",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: API-agnostic render-graph architecture -> gpu-rendering-guide, no Vk* how-to"
+  },
+  {
+    "query": "what's the general model for grouping bindings by update frequency and why does bindless help — no specific API, just the architecture",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: agnostic binding-model concept -> gpu-rendering-guide"
+  },
+  {
+    "query": "set up the D3D12 resource barriers and root signature for my deferred renderer",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: another explicit API (D3D12), not Vulkan"
+  },
+  {
+    "query": "set up a three.js scene with orbit controls and a glTF model and postprocessing",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: high-level web 3D -> threejs-guide"
+  },
+  {
+    "query": "what oldLayout/newLayout and queue-family ownership transfer do I need to move a VkImage written on the dedicated transfer queue to be sampled on the graphics queue",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "validation positive: Vulkan layout transition + queue-family ownership transfer barrier"
+  },
+  {
+    "query": "build a graphics VkPipeline with VkPipelineRenderingCreateInfo and dynamic viewport/scissor state, sharing one VkPipelineCache across vkCreateGraphicsPipelines calls",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "validation positive: Vulkan pipeline + dynamic state + pipeline cache + dynamic rendering formats"
+  },
+  {
+    "query": "explain the conceptual difference between device-local and host-visible GPU memory tiers and when to stage uploads — keep it API-neutral",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "validation negative: agnostic gpu-memory-strategy -> gpu-rendering-guide, no Vk* specifics"
+  },
+  {
+    "query": "tune my WebGL draw-call batching and instancing in the browser to keep the framerate up",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "validation negative: high-level web 3D, not Vulkan"
+  }
+]

@@ -3,25 +3,25 @@
     "query": "our renderer hand-writes a barrier before and after every pass and it breaks every time we reorder passes — I want passes to just declare what they read and write and have ordering and transitions figured out for us",
     "should_trigger": true,
     "split": "train",
-    "rationale": "direct: render/frame graph deriving order + barriers from declared reads/writes"
+    "rationale": "direct: render/frame graph deriving order + barriers from declared reads/writes, API-neutral"
   },
   {
     "query": "we have a g-buffer, an SSAO target, and a bloom mip chain all alive at once and VRAM is tight — can we reuse the same memory for targets that aren't used at the same time",
     "should_trigger": true,
     "split": "train",
-    "rationale": "implicit: transient render-target aliasing by disjoint lifetime, no Vulkan named"
+    "rationale": "implicit: transient render-target aliasing by disjoint lifetime, no API named"
   },
   {
     "query": "every time we use a new material the frame hitches for a few ms; I think it's compiling the graphics state on first draw — how do we get rid of the stall",
     "should_trigger": true,
     "split": "train",
-    "rationale": "implicit: precompiled + cached pipeline state objects, warm the PSO cache"
+    "rationale": "architecture: precompiled + cached pipeline-state objects, warm the cache, API-neutral"
   },
   {
     "query": "we're calling the allocator once per texture and once per mesh and it falls over on big levels — restructure how we hand out GPU memory",
     "should_trigger": true,
     "split": "train",
-    "rationale": "device-memory: sub-allocate from few large blocks, allocation-count cap"
+    "rationale": "gpu-memory-strategy: sub-allocate from few large blocks, allocation-count cap, strategy not API calls"
   },
   {
     "query": "the CPU and GPU keep stalling on each other each frame; we have one set of uniform buffers and one command pool shared across frames — fix the frame pacing",
@@ -30,34 +30,34 @@
     "rationale": "frames-in-flight: per-frame resource sets + fence so CPU doesn't outrun GPU"
   },
   {
-    "query": "we want one big array of all our textures that the shader indexes by an integer instead of binding a descriptor set per draw",
+    "query": "we want one big array of all our textures that the shader indexes by an integer instead of binding a group per draw",
     "should_trigger": true,
     "split": "train",
-    "rationale": "bindless / update-after-bind descriptor arrays indexed by handle"
+    "rationale": "bindless binding model indexed by handle, frequency grouping; concept not one API"
   },
   {
-    "query": "how do I get a sampled read of a render target right after I wrote to it as a color attachment — what stage and access masks and layout transition do I need",
+    "query": "how should I think about the stage and access scopes plus a layout transition needed to read a render target right after writing it as a color attachment — what's the general model",
     "should_trigger": true,
     "split": "train",
-    "rationale": "synchronization: pipeline barrier masks + image-layout transition, read-after-write"
+    "rationale": "synchronization model: producer/consumer barrier scopes + image-layout transition, conceptual"
   },
   {
     "query": "we have 40 feature combinations for our lit shader and build times exploded; should we compile a variant per combo or branch in one ubershader, and how do we recompile on save without restarting",
     "should_trigger": true,
     "split": "train",
-    "rationale": "shader-system: permutations vs ubershader + spec constants, hot-reload"
+    "rationale": "shader-system: permutations vs ubershader + specialization constants, hot-reload"
+  },
+  {
+    "query": "give me the exact VkImageMemoryBarrier2 with srcStageMask/srcAccessMask and the VkImageLayout transition and the vkCmdPipelineBarrier2 call for a color-attachment-to-sampled read",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: concrete Vulkan Vk*/vkCmd* how-to -> gpu-rendering-vulkan-guide, not the agnostic model"
   },
   {
     "query": "set up a three.js scene with orbit controls and a glTF model and some postprocessing passes",
     "should_trigger": false,
     "split": "train",
-    "rationale": "near-miss: high-level web 3D -> threejs-guide, no explicit-API resource/sync concerns"
-  },
-  {
-    "query": "help me get the BRDF math right in my fragment shader — the specular highlight looks wrong, it's all GLSL, no pipeline or resource changes",
-    "should_trigger": false,
-    "split": "train",
-    "rationale": "near-miss: pure shading-language math, no pipeline/resource/sync concern"
+    "rationale": "near-miss: high-level web 3D -> threejs-guide, no explicit-API architecture concerns"
   },
   {
     "query": "restructure this CPU particle array from AoS to SoA so the update loop stops missing cache",
@@ -66,27 +66,27 @@
     "rationale": "near-miss: CPU-only data layout -> data-oriented-design-guide"
   },
   {
-    "query": "upload a static vertex buffer to fast GPU-only memory — I think I need a staging buffer and a copy, then a barrier before the draw reads it",
+    "query": "how do I architect uploads of static GPU-resident data versus dynamic per-frame data — staging into a device-local tier for one, a persistent-mapped ring for the other",
     "should_trigger": true,
     "split": "validation",
-    "rationale": "validation positive: staging upload to device-local + transfer->read barrier"
+    "rationale": "validation positive: gpu-memory-strategy tiers + staging + ring buffer, API-neutral"
   },
   {
-    "query": "I want to record draw calls from several worker threads at once and then submit them in order — how should I lay out command pools and buffers",
+    "query": "I want to record draw calls from several worker threads at once and then submit them in order — how should I structure per-thread per-frame recording contexts",
     "should_trigger": true,
     "split": "validation",
-    "rationale": "validation positive: per-thread pools, primary/secondary, multi-threaded recording"
+    "rationale": "validation positive: per-thread contexts, primary/secondary, multi-threaded recording, conceptual"
   },
   {
-    "query": "replace our pile of binary semaphores between the graphics and async-compute queues with a single monotonic counter we can also wait on from the CPU",
+    "query": "explain the model for replacing a pile of binary cross-queue waits between graphics and async-compute with a single monotonic timeline value we can also wait on from the CPU",
     "should_trigger": true,
     "split": "validation",
-    "rationale": "validation positive: timeline semaphores for queue->queue + CPU waits"
+    "rationale": "validation positive: timeline value generalizing cross-queue waits + CPU waits, concept"
   },
   {
-    "query": "tune my WebGL draw-call batching and instancing in the browser to keep the framerate up",
+    "query": "walk me through the concrete vkCreateSwapchainKHR + vkAcquireNextImageKHR + vkQueuePresentKHR calls and the VkFence per frame for my Vulkan loop",
     "should_trigger": false,
     "split": "validation",
-    "rationale": "validation negative: high-level web 3D, no explicit-API device/memory/sync ownership"
+    "rationale": "validation negative: concrete Vulkan swapchain how-to -> gpu-rendering-vulkan-guide"
   }
 ]
