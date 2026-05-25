@@ -95,3 +95,16 @@
   - Progressive disclosure: metadata at startup, body on activation, resources on demand
   - File references one level deep, relative paths from skill root
   - Reference filename kebab-case convention
+
+## Agent Skills: Equipping Agents for the Real World
+
+- **URL:** https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills
+- **Last reviewed:** 2026-05-27
+- **Used for:**
+  - `SKILL.md` → Core Principles (`Design to coexist`, `Routing-first descriptions`), Spec Constraints (progressive-disclosure budget)
+  - `references/composability.md` → entire file
+  - `references/catalog-audit.md` → entire file
+- **Aspects extracted:**
+  - "Composable by design" — a skill should work well alongside others, not assume it is the only capability → Design-to-coexist principle and one-owner-per-concept rule
+  - Progressive disclosure as token budget (metadata ~100 tokens → SKILL.md → references on demand) → progressive-disclosure budget note and routing-first descriptions
+  - General → language → framework tiering as the composition model → `composability.md` tiered model and `catalog-audit.md` owner-selection
