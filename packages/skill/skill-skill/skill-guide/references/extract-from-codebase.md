@@ -2,9 +2,7 @@
 
 ## Spec Constraints
 
-- `name`: ≤64 chars, lowercase kebab-case, must match parent dir
-- `description`: ≤1024 chars, imperative "Use when..." phrasing, covers what + when (incl. non-obvious triggers)
-- Body: target <500 lines / ~5000 tokens; push detail to `references/`
+Spec limits (name / description / body / optional-field rules) live in the parent SKILL.md — re-check after edits.
 
 ## Core Workflow
 

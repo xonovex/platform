@@ -6,10 +6,10 @@ A reference implementation lives at [scripts/validate.py](../scripts/validate.py
 
 ## Spec Constraints
 
-- `name`: 1-64 chars, lowercase kebab-case, no consecutive/leading/trailing hyphens, matches parent dir
-- `description`: 1-1024 chars, non-empty, imperative "Use when..." phrasing, covers what + when
-- `compatibility` (optional): ≤500 chars
+- `name`: 1-64 chars, lowercase kebab-case, no consecutive/leading/trailing hyphens, not the reserved words `anthropic`/`claude`, no XML tags, matches parent dir
+- `description`: 1-1024 chars, non-empty, imperative "Use when..." phrasing, covers what + when, third person
 - Body: target <500 lines / ~5000 tokens; push detail to `references/`
+- Optional: `license` (string), `compatibility` (≤500 chars), `metadata` (string→string map), `allowed-tools` (experimental, space-separated)
 
 ## Core Workflow
 

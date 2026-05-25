@@ -9,10 +9,11 @@ Author, extract, merge, simplify, and validate Agent Skills following the Agent 
 
 ## Spec Constraints
 
-- `name`: 1-64 chars, lowercase kebab-case; must match parent dir
-- `description`: 1-1024 chars; imperative "Use when…" with explicit trigger contexts
+- `name`: 1-64 chars, lowercase kebab-case; no consecutive/leading/trailing hyphens; not the reserved words `anthropic`/`claude`; no XML tags; must match parent dir
+- `description`: 1-1024 chars; imperative "Use when…" + explicit triggers; third person (no "I can…"/"You can…")
 - Body: <500 lines / ~5000 tokens; push detail to `references/`
 - Reference files: one level deep under `references/`, kebab-case filenames
+- **Optional frontmatter:** `license` (string), `compatibility` (≤500 chars; declare network/runtime needs), `metadata` (string→string map), `allowed-tools` (experimental, space-separated allowlist, e.g. `Bash(git:*) Read`)
 - **Progressive-disclosure budget** — discovery sees only name+description (~100 tokens), so the description alone decides routing; `SKILL.md` loads on activation (keep ≤ ~500 lines / 5k tokens); anything needed <~20% of the time belongs in `references/`, loaded on demand
 
 ## Core Principles
@@ -27,6 +28,7 @@ Author, extract, merge, simplify, and validate Agent Skills following the Agent 
 - **Style Consistency** — match existing skill patterns in structure and voice
 - **Add what the agent lacks; omit what it knows** — no general-knowledge filler
 - **Defaults over menus** — one default, alternatives mentioned briefly
+- **Procedures over declarations** — teach the approach/steps, not a one-off answer
 
 ## Skill Structure
 
