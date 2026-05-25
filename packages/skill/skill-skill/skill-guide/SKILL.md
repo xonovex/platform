@@ -62,8 +62,7 @@ Single index of every reference; each entry names the operation/concept and when
 - Read [references/create.md](references/create.md) - Load when creating a new skill from a document, URL, or task description
 - Read [references/extract-from-codebase.md](references/extract-from-codebase.md) - Load when extracting patterns from this codebase into a skill
 - Read [references/merge.md](references/merge.md) - Load when porting elements from one skill into another
-- Read [references/simplify-skill.md](references/simplify-skill.md) - Load when condensing a verbose SKILL.md to bullet format
-- Read [references/simplify-reference.md](references/simplify-reference.md) - Load when condensing or merging verbose reference files
+- Read [references/simplify.md](references/simplify.md) - Load when condensing a verbose SKILL.md to bullet format or trimming bloated reference files
 - Read [references/validate.md](references/validate.md) - Load when auditing a SKILL.md against the spec
 - Read [references/composability.md](references/composability.md) - Load when deciding skill boundaries, owners, tiers, or whether to generalize vs link a concept
 - Read [references/catalog-audit.md](references/catalog-audit.md) - Load when auditing, splitting, or de-duplicating a set of skills onto the composable split
