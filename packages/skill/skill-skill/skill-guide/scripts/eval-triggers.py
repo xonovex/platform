@@ -11,11 +11,16 @@ Usage:
         split      = train | validation | all   (default: all)
 
 Options (flag overrides env; env keeps the loop/CI ergonomics):
-    --runs N            / RUNS=N             runs per query (default: 3)
-    --threshold F       / THRESHOLD=F        trigger-rate cutoff for a pass (default: 0.5)
-    --model M           / CLAUDE_MODEL=M     model alias/id for `claude --model` (haiku/sonnet/opus)
-    --disallowed-tools L / DISALLOWED_TOOLS=L  comma-separated tools blocked during the eval
-                                            (default: Bash,Edit,Write,NotebookEdit,WebFetch)
+    --runs N             / RUNS=N            runs per query (default: 3)
+    --threshold F        / THRESHOLD=F       trigger-rate cutoff for a pass (default: 0.5)
+    --model M            / CLAUDE_MODEL=M    model for `claude --model` — use `haiku` to keep cost low
+    --disallowed-tools L / DISALLOWED_TOOLS=L  tools blocked during the eval (default blocks
+                                             everything but Skill, so non-triggering runs stay cheap)
+    --max-budget-usd N   / MAX_BUDGET_USD=N  hard per-run spend cap (default: 0.10; 0 disables)
+
+Cost: a run where the skill does NOT fire would otherwise execute the whole task.
+The default tool-blocking keeps those short, `--model haiku` makes them cheap, and
+`--max-budget-usd` caps each run. While iterating, prefer `--runs 1` on the train split.
 
 Safety model:
     1. Each query launches `claude -p --output-format stream-json --verbose`
@@ -80,8 +85,19 @@ def build_parser() -> argparse.ArgumentParser:
     )
     p.add_argument(
         "--disallowed-tools",
-        default=os.environ.get("DISALLOWED_TOOLS", "Bash,Edit,Write,NotebookEdit,WebFetch"),
-        help="comma-separated tools blocked during the eval (env DISALLOWED_TOOLS)",
+        default=os.environ.get(
+            "DISALLOWED_TOOLS",
+            "Bash,Edit,Write,NotebookEdit,WebFetch,WebSearch,Read,Glob,Grep,Task,TodoWrite",
+        ),
+        help="comma-separated tools blocked during the eval (env DISALLOWED_TOOLS); the "
+        "default blocks everything but Skill so non-triggering runs stay short and cheap",
+    )
+    p.add_argument(
+        "--max-budget-usd",
+        type=float,
+        default=float(os.environ.get("MAX_BUDGET_USD", "0.10")),
+        help="hard per-run spend cap passed to `claude --max-budget-usd` "
+        "(env MAX_BUDGET_USD, default 0.10; 0 disables)",
     )
     return p
 
@@ -189,6 +205,7 @@ def main(argv: list[str]) -> int:
     threshold = args.threshold
     claude_model = args.model
     disallowed = args.disallowed_tools
+    budget = args.max_budget_usd
 
     short = skill_name.rsplit(":", 1)[-1]
 
@@ -198,6 +215,9 @@ def main(argv: list[str]) -> int:
     if disallowed:
         # Use --opt=val to avoid the variadic parser swallowing the prompt
         claude_args.append(f"--disallowedTools={disallowed}")
+    if budget and budget > 0:
+        # Hard per-run ceiling so a non-triggering run can't execute the whole task
+        claude_args.extend(["--max-budget-usd", str(budget)])
 
     try:
         queries = json.loads(queries_file.read_text(encoding="utf-8"))
@@ -252,6 +272,7 @@ def main(argv: list[str]) -> int:
     print(
         f"skill: {skill_name}  split: {split}  runs: {runs}  "
         f"threshold: {threshold}  model: {claude_model or '<default>'}  "
+        f"budget/run: {('$' + str(budget)) if budget and budget > 0 else 'none'}  "
         f"disallowed: {disallowed}",
         file=sys.stderr,
     )

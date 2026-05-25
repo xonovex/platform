@@ -36,6 +36,7 @@ These belong **in the test queries**, not in the description itself. Generic que
 - Should-trigger passes if rate ≥0.5; should-not-trigger passes if rate <0.5
 - Detect triggering via the harness's tool-call log (varies by harness)
 - Reference implementation: [scripts/eval-triggers.py](../scripts/eval-triggers.py) — PEP 723 self-contained Python. Streams the tool-call log and terminates the run on first match. Targets Claude Code's `claude` CLI; adapt the `check_triggered` function for other harnesses. Run with `uv run scripts/eval-triggers.py <queries.json> <skill-name>`.
+- **Cost control** — a run where the skill _doesn't_ fire would otherwise execute the whole task, which dominates token spend. Keep it cheap: `--model haiku`, the default tool-blocking (everything but `Skill`, so non-triggering runs stay short), a `--max-budget-usd` per-run ceiling, and `--runs 1` on the `train` split while iterating.
 
 ## Train / Validation Split
 

@@ -34,6 +34,7 @@ Options (flag overrides env; env keeps the loop/CI ergonomics):
     --workspace DIR / WORKSPACE=DIR    workspace base dir (default: "<skill>-workspace")
     --eval-cwd DIR / EVAL_CWD=DIR      working dir for generation runs (default: current dir;
                                        must be where the skill resolves — installed plugin / project)
+    --max-budget-usd N / MAX_BUDGET_USD=N  optional hard per-generation spend cap (unset = no cap)
 
 Method (mirrors SkillsBench / skill-creator 2.0):
     - Each eval runs in two arms, vanilla (Skill disallowed) and skill-augmented,
@@ -110,6 +111,10 @@ def build_parser() -> argparse.ArgumentParser:
                    help="workspace base dir (env WORKSPACE, default '<skill>-workspace')")
     p.add_argument("--eval-cwd", default=os.environ.get("EVAL_CWD"),
                    help="working dir for generation runs (env EVAL_CWD, default current dir)")
+    p.add_argument("--max-budget-usd", type=float,
+                   default=(float(os.environ["MAX_BUDGET_USD"]) if os.environ.get("MAX_BUDGET_USD") else None),
+                   help="optional hard per-generation spend cap passed to `claude --max-budget-usd` "
+                        "(env MAX_BUDGET_USD; unset = no cap — output eval needs the task to finish)")
     return p
 
 
@@ -405,6 +410,7 @@ def main(argv: list[str]) -> int:
     disallowed = args.disallowed_tools
     timeout = args.gen_timeout
     cwd = args.eval_cwd or None
+    budget = args.max_budget_usd
     short = skill_name.rsplit(":", 1)[-1]
 
     base = Path(args.workspace) if args.workspace else Path(f"{short}-workspace")
@@ -418,6 +424,8 @@ def main(argv: list[str]) -> int:
     gen_base = ["-p", "--output-format", "stream-json", "--verbose"]
     if claude_model:
         gen_base.extend(["--model", claude_model])
+    if budget and budget > 0:
+        gen_base.extend(["--max-budget-usd", str(budget)])
     with_args = [*gen_base, f"--disallowedTools={disallowed}"] if disallowed else list(gen_base)
     without_disallowed = ",".join(filter(None, [disallowed, "Skill"]))
     without_args = [*gen_base, f"--disallowedTools={without_disallowed}"]
