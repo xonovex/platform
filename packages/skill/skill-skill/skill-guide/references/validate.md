@@ -26,13 +26,13 @@ A reference implementation lives at [scripts/validate.py](../scripts/validate.py
 
 ## Frontmatter Checks
 
-- `name` present, 1-64 chars, matches `^[a-z0-9]+(-[a-z0-9]+)*$`, equals parent directory name
-- `description` present, 1-1024 chars
+- `name` present, 1-64 chars, matches `^[a-z0-9]+(-[a-z0-9]+)*$`, not a reserved word (`anthropic`/`claude`), no XML tags, equals parent directory name
+- `description` present, 1-1024 chars (warns on `<…>` angle-bracket markup — fine for component/generic references)
 - `description` starts with imperative cue ("Use when...", "Use this skill when...")
 - `description` includes trigger contexts ("Triggers on...", "even when the user doesn't say...")
 - `description` includes skip/scope boundary clauses where adjacent skills exist
-- Optional fields obey their limits (`compatibility` ≤500 chars)
-- No unknown top-level fields
+- Optional fields obey their limits/types: `compatibility` ≤500 chars, `license` string, `metadata` string→string map, `allowed-tools` space-separated token string
+- No unknown top-level fields (outside `name`/`description`/`license`/`compatibility`/`metadata`/`allowed-tools`)
 
 ## Body Checks
 

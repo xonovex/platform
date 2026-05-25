@@ -129,6 +129,13 @@ def check_frontmatter(fm: dict, parent_name: str, report: Report) -> None:
     else:
         report.add_pass(f"name: '{name}' ({len(name)} chars, kebab-case, matches parent dir)")
 
+    # name: reserved words / XML tags (platform spec)
+    if isinstance(name, str):
+        if re.search(r"anthropic|claude", name, re.IGNORECASE):
+            report.add_fail(f"frontmatter: name '{name}' uses a reserved word (anthropic/claude)")
+        if re.search(r"<[^>]+>", name):
+            report.add_fail(f"frontmatter: name '{name}' contains an XML tag")
+
     # description
     desc = fm.get("description")
     if not desc:
@@ -173,6 +180,15 @@ def check_frontmatter(fm: dict, parent_name: str, report: Report) -> None:
                 "may miss implicit triggers"
             )
 
+    # description: XML tags (platform spec) — warn, since descriptions legitimately
+    # reference component/generic syntax (e.g. `<motion.*>`, `<T>`) that regex can't
+    # distinguish from a real XML tag.
+    if isinstance(desc, str) and re.search(r"<[^>]+>", desc):
+        report.add_warn(
+            "description: contains angle-bracket markup (`<…>`) — fine if it's a "
+            "component/generic reference, otherwise remove the XML tag"
+        )
+
     # compatibility (optional)
     compat = fm.get("compatibility")
     if compat is not None:
@@ -184,6 +200,39 @@ def check_frontmatter(fm: dict, parent_name: str, report: Report) -> None:
             report.add_fail(f"frontmatter: compatibility is {len(compat)} chars (>500)")
         else:
             report.add_pass(f"compatibility: {len(compat)} chars (under 500)")
+
+    # license (optional)
+    lic = fm.get("license")
+    if lic is not None and not isinstance(lic, str):
+        report.add_warn(f"frontmatter: license is {type(lic).__name__}, expected string")
+
+    # metadata (optional): string -> string map
+    meta = fm.get("metadata")
+    if meta is not None and not (
+        isinstance(meta, dict)
+        and all(isinstance(k, str) and isinstance(v, str) for k, v in meta.items())
+    ):
+        report.add_warn("frontmatter: metadata should be a string→string map")
+
+    # allowed-tools (optional, experimental): space-separated token string
+    allowed = fm.get("allowed-tools")
+    if allowed is not None:
+        if not isinstance(allowed, str):
+            report.add_warn(
+                f"frontmatter: allowed-tools is {type(allowed).__name__}, "
+                "expected a space-separated string"
+            )
+        elif not re.fullmatch(r"[\w():*,.\- ]+", allowed):
+            report.add_warn(
+                "frontmatter: allowed-tools has unexpected characters "
+                "(expected space-separated tokens like 'Bash(git:*) Read')"
+            )
+
+    # unknown top-level fields
+    known = {"name", "description", "license", "compatibility", "metadata", "allowed-tools"}
+    unknown = sorted(k for k in fm if k not in known)
+    if unknown:
+        report.add_warn("frontmatter: unknown top-level field(s): " + ", ".join(unknown))
 
 
 def check_body(body: str, report: Report) -> None:
