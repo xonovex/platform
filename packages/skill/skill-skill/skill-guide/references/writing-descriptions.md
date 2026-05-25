@@ -3,6 +3,7 @@
 ## Writing Principles
 
 - **Imperative phrasing** — start with "Use when…" / "Use this skill when…", not "This skill does…"
+- **Third person** — describe the skill, not the user/agent; avoid "I can…" / "You can…" (imperative "Use when…" is fine — neither first nor second person)
 - **User intent over implementation** — match what the user asks for, not internal mechanics
 - **Be pushy on triggers** — include "even when the user doesn't say '{keyword}'" for non-obvious matches
 - **Concise** — a short paragraph; ≤1024 chars (spec limit)

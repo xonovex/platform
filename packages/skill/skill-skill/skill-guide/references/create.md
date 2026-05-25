@@ -20,14 +20,15 @@ Spec limits (name / description / body / optional-field rules) live in the paren
 
 ## Core Workflow
 
-1. **Identify Source & Type**: URL, file, conversation, or task description; classify the skill type
+1. **Identify Source & Type**: URL, file, conversation, or task description; classify the skill type (guideline skills: see [guideline-skills.md](guideline-skills.md))
 2. **Fetch Source**: Fetch URLs from the web; read local files; mine conversation/task context
 3. **Extract Content**: Requirements, procedures, rules, gotchas, examples, edge cases — whatever the type calls for
-4. **Categorize**: Group by topic (or by step, for workflows); decide what lives in SKILL.md vs `references/`
-5. **Generate SKILL.md**: Condensed quick reference with essentials (3-7 items); include a Gotchas section for non-obvious env-specific facts
-6. **Create Supporting Files**: `references/*.md` for detail (pair each with a load-when trigger), `scripts/` for executables, `assets/` for templates
-7. **Validate Structure**: Frontmatter limits met, all reference paths resolve, body under spec ceiling
-8. **Write Files**: Save to `<skills-dir>/{name}/` (path depends on the agent harness) or preview without writing
+4. **Draft evals first**: Write 2-3 trigger/output eval cases for the gap _before_ authoring extensive body content — see [evaluating-triggers.md](evaluating-triggers.md), [evaluating-outputs.md](evaluating-outputs.md)
+5. **Categorize**: Group by topic (or by step, for workflows); decide what lives in SKILL.md vs `references/`
+6. **Generate SKILL.md**: Condensed quick reference with essentials (3-7 items) and a routing-first description (see [writing-descriptions.md](writing-descriptions.md)); include a Gotchas section for non-obvious env-specific facts
+7. **Create Supporting Files**: `references/*.md` for detail (pair each with a load-when trigger), `scripts/` for executables (see [using-scripts.md](using-scripts.md)), `assets/` for templates
+8. **Validate Structure**: Frontmatter limits met, all reference paths resolve, body under spec ceiling
+9. **Write Files**: Save to `<skills-dir>/{name}/` (path depends on the agent harness) or preview without writing
 
 ## Output Structure
 
@@ -68,14 +69,6 @@ description: "Use when {task}. Triggers on {patterns}. Skip {adjacent-skill}."
 - Apply the parent SKILL.md Core Principles (add what the agent lacks, defaults over menus, procedures over declarations)
 - Match specificity to fragility — prescriptive only when consistency is required
 - Mine non-obvious facts/corrections into a **Gotchas** section
-
-## Related
-
-- [guideline-skills.md](guideline-skills.md) - Patterns specific to coding-guideline skills
-- [writing-descriptions.md](writing-descriptions.md) - Writing the description well
-- [evaluating-triggers.md](evaluating-triggers.md) - Trigger-rate eval loop
-- [evaluating-outputs.md](evaluating-outputs.md) - Output-quality eval loop
-- [using-scripts.md](using-scripts.md) - Bundling executable scripts
 
 ## Error Handling
 

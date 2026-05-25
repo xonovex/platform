@@ -30,6 +30,7 @@ Author, extract, merge, simplify, and validate Agent Skills following the Agent 
 - **Add what the agent lacks; omit what it knows** — no general-knowledge filler
 - **Defaults over menus** — one default, alternatives mentioned briefly
 - **Procedures over declarations** — teach the approach/steps, not a one-off answer
+- **Evals before docs** — build trigger/output evals for the gap first, then write the minimum to pass them; iterate observe→revise, see [references/evaluating-triggers.md](references/evaluating-triggers.md), [references/evaluating-outputs.md](references/evaluating-outputs.md)
 
 ## Skill Structure
 
