@@ -55,7 +55,7 @@ PEP 723 self-contained Python scripts (run with `uv run <script>` — `uv` creat
 - `scripts/validate.py <skill-dir>` — spec / quality / harness-neutrality audit (read-only; exits non-zero on errors)
 - `scripts/eval-triggers.py <queries.json> <skill-name>` — run trigger-eval queries against a skill (Claude Code reference implementation; requires `claude` CLI in PATH)
 - `scripts/eval-outputs.py <evals.json> <skill-name>` — run output-quality evals with-skill vs without-skill; writes per-arm pass rate / tokens / duration + `benchmark.json` (requires `claude` CLI in PATH)
-- `scripts/update-skill-from-source.py <skill-dir>` — audit a skill's `SOURCES.md` for drift: staleness vs `Last reviewed`, dangling provenance, source→reference mapping; `--fetch` to check URLs, `--mark-reviewed` to stamp the date after review (read-only by default)
+- `scripts/audit-sources.py <skill-dir>` — audit a skill's `SOURCES.md` for drift: staleness vs `Last reviewed`, dangling provenance, source→reference mapping; `--fetch` to check URLs, `--mark-reviewed` to stamp the date after review (read-only by default)
 
 Cross-platform (macOS / Linux / Windows wherever `uv` is installed). Install `uv` with `brew install uv` or `curl -LsSf https://astral.sh/uv/install.sh | sh`.
 

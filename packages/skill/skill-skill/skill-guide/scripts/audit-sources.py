@@ -29,8 +29,8 @@ human (or follow-up agent) decision — the report tells you exactly which
 reference files to review.
 
 Usage:
-    update-skill-from-source.py <skill-dir> [options]
-    update-skill-from-source.py --all [root] [options]
+    audit-sources.py <skill-dir> [options]
+    audit-sources.py --all [root] [options]
 
       skill-dir            path to a skill dir (containing SOURCES.md) or to a
                            SOURCES.md file directly
