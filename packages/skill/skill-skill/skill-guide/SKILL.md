@@ -55,17 +55,9 @@ PEP 723 self-contained Python scripts (run with `uv run <script>` — `uv` creat
 
 Cross-platform (macOS / Linux / Windows wherever `uv` is installed). Install `uv` with `brew install uv` or `curl -LsSf https://astral.sh/uv/install.sh | sh`.
 
-## Operations
-
-- **Create** a new skill from a document, URL, or task description — see [references/create.md](references/create.md)
-- **Extract** patterns from a codebase + AGENTS.md into a skill — see [references/extract-from-codebase.md](references/extract-from-codebase.md)
-- **Merge** elements from one skill into another — see [references/merge.md](references/merge.md)
-- **Simplify** a verbose SKILL.md to bullet format — see [references/simplify-skill.md](references/simplify-skill.md)
-- **Simplify reference files** by merging overlapping sections — see [references/simplify-reference.md](references/simplify-reference.md)
-- **Validate** a SKILL.md against the spec and best practices — see [references/validate.md](references/validate.md)
-- **Audit** a set of skills and refactor it onto the composable split — see [references/catalog-audit.md](references/catalog-audit.md)
-
 ## Progressive Disclosure
+
+Single index of every reference; each entry names the operation/concept and when to load it.
 
 - Read [references/create.md](references/create.md) - Load when creating a new skill from a document, URL, or task description
 - Read [references/extract-from-codebase.md](references/extract-from-codebase.md) - Load when extracting patterns from this codebase into a skill
