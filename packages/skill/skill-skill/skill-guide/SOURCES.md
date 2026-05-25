@@ -107,3 +107,15 @@
   - "Composable by design" — a skill should work well alongside others, not assume it is the only capability → Design-to-coexist principle and one-owner-per-concept rule
   - Progressive disclosure as token budget (metadata ~100 tokens → SKILL.md → references on demand) → progressive-disclosure budget note and routing-first descriptions
   - General → language → framework tiering as the composition model → `composability.md` tiered model and `catalog-audit.md` owner-selection
+
+## Agent Skills: Security & Least Privilege (synthesized)
+
+- **URL:** https://agentskills.io/specification.md
+- **Last reviewed:** 2026-05-27
+- **Used for:**
+  - `references/security.md` → all sections
+  - `SKILL.md` → Core Principle (Treat skills as software), Gotchas
+- **Aspects extracted:**
+  - `allowed-tools` frontmatter (experimental, space-separated allowlist) → least-privilege section; the "reduces blast radius, not injection likelihood" framing also informed by the security-considerations section of https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview
+  - `compatibility` field for declaring network/runtime needs → network/runtime section
+  - Treat-skills-as-software, audit untrusted scripts/URLs, fetched-content-as-untrusted-data, no hardcoded secrets → repo-original synthesis (not a transcription of an upstream "Security" page)

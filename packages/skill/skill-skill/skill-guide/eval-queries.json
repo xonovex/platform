@@ -29,6 +29,12 @@
     "split": "train",
     "rationale": "merge/assimilate one skill into another"
   },
+  {
+    "query": "before we install this third-party skill, audit its scripts and the URLs it fetches and lock down what tools it's allowed to use",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "security audit of an untrusted skill + allowed-tools least privilege"
+  },
 
   {
     "query": "simplify our AGENTS.md — it's gotten verbose and repeats itself across sections",
@@ -47,6 +53,12 @@
     "should_trigger": false,
     "split": "train",
     "rationale": "near-miss: slash command authoring, should match slashcommand-guide"
+  },
+  {
+    "query": "audit our app's npm dependencies for known CVEs and bump the vulnerable ones",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: software supply-chain/dependency audit, not an Agent Skill"
   },
 
   {
