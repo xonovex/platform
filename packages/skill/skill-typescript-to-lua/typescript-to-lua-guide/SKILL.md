@@ -5,14 +5,16 @@ description: "Use when editing TypeScript that compiles to Lua via TSTL 1.24+ (g
 
 # TypeScript-to-Lua Coding Guidelines
 
+The output is Lua. For Lua runtime semantics and idioms — module pattern, coroutines, metatables, error handling, string building — apply **lua-guide**; for hot-path tuning of the generated code apply **lua-opinionated-guide**. This skill covers only the TS→Lua transpiler boundary: what translates, how to shape TS source for clean Lua, and TSTL-specific features.
+
 ## Requirements
 
 - TSTL ≥ 1.24; TS strict mode; Lua ≥ 5.3 / LuaJIT 2.1.
 
 ## Essentials
 
-- **Code organization** - Favor namespaces/functions over classes for clean Lua output, see [references/namespaces-vs-classes.md](references/namespaces-vs-classes.md), [references/function-patterns.md](references/function-patterns.md)
-- **Performance** - Keep tables stable, design for Lua GC and coroutines, see [references/stable-tables.md](references/stable-tables.md), [references/coroutine-patterns.md](references/coroutine-patterns.md)
+- **Code organization** - Favor namespaces/functions over classes for clean Lua output; Lua module idioms in **lua-guide**, see [references/namespaces-vs-classes.md](references/namespaces-vs-classes.md), [references/function-patterns.md](references/function-patterns.md)
+- **Performance** - Keep tables stable, design for Lua GC and coroutines; the JIT "why" is in **lua-opinionated-guide**, see [references/stable-tables.md](references/stable-tables.md), [references/coroutine-patterns.md](references/coroutine-patterns.md)
 - **TSTL features** - Use LuaMultiReturn, decorators when beneficial, see [references/multi-return-functions.md](references/multi-return-functions.md), [references/tstl-decorators.md](references/tstl-decorators.md)
 - **Optimization** - Avoid heavy TypeScript features, see [references/avoiding-heavy-features.md](references/avoiding-heavy-features.md), [references/performance-tips.md](references/performance-tips.md)
 
