@@ -1,38 +1,30 @@
 ---
 name: lua-opinionated-guide
-description: "Use when tuning LuaJIT-targeted Lua for performance-critical paths. Triggers on `.lua` files in LuaJIT projects and on prompts about JIT-friendly tables, table pre-allocation, cache lookups, stable table shapes, or hot-path tuning, even when the user doesn't say 'LuaJIT'. Skip generic Lua scripting (use lua-guide) and TSTL output (use typescript-to-lua-guide)."
+description: "Use when tuning performance-critical Lua hot paths — the tunings especially benefit LuaJIT, and the principles apply to vanilla Lua 5.4 too. An overlay on lua-guide: covers only hot-path performance, not Lua fundamentals. Triggers on `.lua` files in performance-sensitive or LuaJIT projects and on prompts about JIT-friendly tables, table pre-allocation, cache lookups, stable table shapes, or hot-path tuning, even when the user doesn't say 'LuaJIT'. Skip generic Lua scripting — modules, scoping, metatables, coroutines, validation, errors, string building, idioms (use lua-guide) — and TSTL output (use typescript-to-lua-guide)."
 ---
 
-# Lua Opinionated Guidelines (LuaJIT Performance)
+# Lua Opinionated Guidelines (Performance Tuning)
+
+A performance overlay on **lua-guide**. Apply **lua-guide** for all Lua fundamentals — module pattern, local variables, metatables, coroutines, input validation, error handling, string building, idioms. This skill adds only hot-path tuning: the tunings especially benefit LuaJIT, and the same principles still help vanilla Lua 5.4.
 
 ## Requirements
 
-- Lua ≥ 5.4 or LuaJIT 2.1.
+- LuaJIT 2.1 (these tunings especially target JIT compilation) or Lua ≥ 5.4 (principles still apply).
 
 ## Essentials
 
-- **Module pattern** - Always `local`, one module per file returning table, see [references/module-pattern.md](references/module-pattern.md), [references/local-variables.md](references/local-variables.md)
-- **Code organization** - Prefer table-based modules and simple functions over deep OO, see [references/module-pattern.md](references/module-pattern.md), [references/metatables.md](references/metatables.md)
-- **Performance** - Keep tables stable (JIT-friendly), pre-alloc when size known, see [references/jit-friendly-tables.md](references/jit-friendly-tables.md), [references/cache-lookups.md](references/cache-lookups.md)
-- **Cooperative tasks** - Use coroutines for async patterns, see [references/coroutines.md](references/coroutines.md)
-- **Validation** - Validate inputs and handle errors, see [references/input-validation.md](references/input-validation.md), [references/error-handling.md](references/error-handling.md)
+- **Foundation** - All Lua fundamentals live in **lua-guide**; this skill adds hot-path performance tuning on top
+- **Stable table shapes** - Pre-allocate all fields, never add fields after creation, so the JIT can specialize, see [references/jit-friendly-tables.md](references/jit-friendly-tables.md)
+- **Cache lookups** - Hoist repeated table/global/stdlib lookups into locals on hot paths, see [references/cache-lookups.md](references/cache-lookups.md)
 
 ## Gotchas
 
-- Module pattern (`local M = {}; return M`) is idiomatic — exposing globals breaks isolation and shadows in unexpected places
-- `pcall` is the only way to catch errors — wrapping every entry point makes errors compose; ad-hoc `pcall` leaks failures
-- Metatables for OOP work but inheritance is by-hand — prefer composition unless you actually need polymorphic dispatch
-- String concatenation with `..` allocates each time — building a string in a loop should use `table.concat` instead
+- Adding a field after table creation changes the table's shape — it deoptimizes the JIT trace even though the code is correct
+- `pairs()` in a hot loop can't be JIT-compiled as tightly as a numeric `for i = 1, #t` loop over a dense array
+- Sparse arrays (`nil` holes) break both `#` and fast array traces — keep arrays dense
+- Caching `math.sin`/`math.cos` into locals matters in hot loops but is noise elsewhere — apply tuning where profiling shows it, not everywhere
 
 ## Progressive disclosure
 
-- Read [references/module-pattern.md](references/module-pattern.md) - Load when creating reusable modules or organizing code structure
-- Read [references/local-variables.md](references/local-variables.md) - Load when encountering global variable issues or scoping problems
-- Read [references/metatables.md](references/metatables.md) - Load when implementing object-oriented patterns or operator overloading
 - Read [references/jit-friendly-tables.md](references/jit-friendly-tables.md) - Load when optimizing hot paths or improving JIT performance
 - Read [references/cache-lookups.md](references/cache-lookups.md) - Load when reducing table access overhead in performance-critical code
-- Read [references/coroutines.md](references/coroutines.md) - Load when implementing cooperative multitasking or async patterns
-- Read [references/input-validation.md](references/input-validation.md) - Load when adding type checks or parameter validation
-- Read [references/error-handling.md](references/error-handling.md) - Load when handling errors or implementing fallback logic
-- Read [references/string-concatenation.md](references/string-concatenation.md) - Load when building strings in loops or formatting output
-- Read [references/idiomatic-patterns.md](references/idiomatic-patterns.md) - Load when learning common Lua idioms or patterns
