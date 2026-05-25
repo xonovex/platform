@@ -14,6 +14,10 @@ Coding-guideline Agent Skills for the Xonovex marketplace. For authoring mechani
 
 - Cite sources only in `SOURCES.md`. Never name authors/companies/talks/books/blogs inside `SKILL.md` or `references/*.md` (tool/API/standard names — Vulkan, SPIR-V, TSan, GUID — are fine).
 
+## Security
+
+- Treat skills as software: review bundled scripts and any fetched URLs before installing, and never hardcode secrets. Least-privilege a script-bundling skill with the experimental `allowed-tools` frontmatter (e.g. `Bash(git:*) Read`). See [security](skill-skill/skill-guide/references/security.md).
+
 ## Package layout (per skill)
 
 - `skill-<topic>/`: `package.json` (`@xonovex/skill-<topic>`), `moon.yml`, `prettier.config.ts`, `.claude-plugin/plugin.json` (`xonovex-skill-<topic>`), and `<topic>-guide/`.
