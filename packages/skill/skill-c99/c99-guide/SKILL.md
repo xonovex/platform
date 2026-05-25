@@ -17,6 +17,7 @@ description: "Use when editing or reviewing general-purpose C99 — libraries, C
 - **Error handling** - Use return codes, check all fallible operations, see [references/error-handling.md](references/error-handling.md)
 - **Input validation** - Check bounds, NULL pointers, division by zero
 - **Readability** - Small functions, clear naming, comments for non-obvious logic
+- **Paradigm** - Functional style (pure functions, explicit context) → **general-fp-guide**; object/data modeling → **general-oop-guide**
 
 ## Gotchas
 

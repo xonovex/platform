@@ -22,6 +22,7 @@ description: "Use when editing or reviewing TypeScript in Node.js ESM projects. 
 - **Numeric literals** - Use underscores in large numbers (`30_000`), see [references/numeric-separator-enforcement.md](references/numeric-separator-enforcement.md)
 - **Method references** - Keep object references to maintain `this` binding, see [references/unbound-method-references.md](references/unbound-method-references.md)
 - **Environment** - Use dot notation for `process.env` access, see [references/env-access-bracket-notation.md](references/env-access-bracket-notation.md)
+- **Paradigm** - Functional style → **general-fp-guide**; class/OO design → **general-oop-guide**
 
 ## Gotchas
 
