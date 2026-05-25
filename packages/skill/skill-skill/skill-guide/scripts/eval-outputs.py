@@ -6,7 +6,7 @@
 """Run output-quality evals against a skill: with-skill vs without-skill.
 
 Usage:
-    eval-outputs.py <evals.json> <skill_name> [iteration]
+    eval-outputs.py <evals.json> <skill_name> [iteration] [options]
         skill_name = bare ("git-commit") or plugin-namespaced ("int-poc-git:git-commit")
         iteration  = name for this run's workspace dir (default: auto "iteration-N")
 
@@ -21,18 +21,19 @@ evals.json shape (either a bare array of evals, or {"skill_name", "evals": [...]
       }
     ]
 
-Env:
-    RUNS=<n>               runs per arm per eval (default: 1; >1 measures variance)
-    CONCURRENCY=<n>        parallel claude invocations (default: 4)
-    CLAUDE_MODEL=<m>       model for the generation runs (e.g. haiku, sonnet, opus)
-    JUDGE_MODEL=<m>        model for grading (default: claude default)
-    DISALLOWED_TOOLS=<l>   tools blocked in BOTH arms during generation
-                           (default: Bash,Edit,Write,NotebookEdit,WebFetch).
-                           The without-skill arm additionally blocks Skill.
-    GEN_TIMEOUT=<s>        per-generation timeout in seconds (default: 600)
-    WORKSPACE=<dir>        workspace base dir (default: "<skill>-workspace")
-    EVAL_CWD=<dir>         working dir for generation runs (default: current dir;
-                           must be where the skill resolves — installed plugin / project)
+Options (flag overrides env; env keeps the loop/CI ergonomics):
+    --runs N / RUNS=N                  runs per arm per eval (default: 1; >1 measures variance)
+    --concurrency N / CONCURRENCY=N    parallel claude invocations (default: 4)
+    --model M / CLAUDE_MODEL=M         model for the generation runs (haiku/sonnet/opus)
+    --judge-model M / JUDGE_MODEL=M    model for grading (default: claude default)
+    --disallowed-tools L / DISALLOWED_TOOLS=L
+                                       tools blocked in BOTH arms during generation
+                                       (default: Bash,Edit,Write,NotebookEdit,WebFetch);
+                                       the without-skill arm additionally blocks Skill
+    --gen-timeout S / GEN_TIMEOUT=S    per-generation timeout in seconds (default: 600)
+    --workspace DIR / WORKSPACE=DIR    workspace base dir (default: "<skill>-workspace")
+    --eval-cwd DIR / EVAL_CWD=DIR      working dir for generation runs (default: current dir;
+                                       must be where the skill resolves — installed plugin / project)
 
 Method (mirrors SkillsBench / skill-creator 2.0):
     - Each eval runs in two arms, vanilla (Skill disallowed) and skill-augmented,
@@ -57,6 +58,7 @@ Cross-platform: works wherever the `claude` CLI is installed (macOS / Linux / Wi
 
 from __future__ import annotations
 
+import argparse
 import json
 import os
 import re
@@ -75,9 +77,40 @@ TOKEN_KEYS = (
 )
 
 
-def usage() -> None:
-    sys.stderr.write("Usage: eval-outputs.py <evals.json> <skill_name> [iteration]\n")
-    sys.exit(2)
+def build_parser() -> argparse.ArgumentParser:
+    p = argparse.ArgumentParser(
+        description="Run output-quality evals against a skill: with-skill vs without-skill.",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    p.add_argument("evals", help="path to evals.json (array, or {\"evals\": [...]})")
+    p.add_argument(
+        "skill_name",
+        help="bare ('git-commit') or plugin-namespaced ('plugin:git-commit')",
+    )
+    p.add_argument(
+        "iteration",
+        nargs="?",
+        default="",
+        help="workspace dir name for this run (default: auto 'iteration-N')",
+    )
+    p.add_argument("--runs", type=int, default=int(os.environ.get("RUNS", "1")),
+                   help="runs per arm per eval (env RUNS, default 1; >1 measures variance)")
+    p.add_argument("--concurrency", type=int, default=int(os.environ.get("CONCURRENCY", "4")),
+                   help="parallel claude invocations (env CONCURRENCY, default 4)")
+    p.add_argument("--model", default=os.environ.get("CLAUDE_MODEL", ""),
+                   help="model for the generation runs (env CLAUDE_MODEL)")
+    p.add_argument("--judge-model", default=os.environ.get("JUDGE_MODEL", ""),
+                   help="model for grading (env JUDGE_MODEL)")
+    p.add_argument("--disallowed-tools",
+                   default=os.environ.get("DISALLOWED_TOOLS", "Bash,Edit,Write,NotebookEdit,WebFetch"),
+                   help="tools blocked in both arms (env DISALLOWED_TOOLS); without-skill also blocks Skill")
+    p.add_argument("--gen-timeout", type=int, default=int(os.environ.get("GEN_TIMEOUT", "600")),
+                   help="per-generation timeout in seconds (env GEN_TIMEOUT, default 600)")
+    p.add_argument("--workspace", default=os.environ.get("WORKSPACE"),
+                   help="workspace base dir (env WORKSPACE, default '<skill>-workspace')")
+    p.add_argument("--eval-cwd", default=os.environ.get("EVAL_CWD"),
+                   help="working dir for generation runs (env EVAL_CWD, default current dir)")
+    return p
 
 
 def match_skill(skill_field: object, target: str, short: str) -> bool:
@@ -326,13 +359,10 @@ def aggregate_arm(records: list[dict], arm: str, runs: int) -> dict:
 
 
 def main(argv: list[str]) -> int:
-    if len(argv) < 3 or len(argv) > 4 or argv[1] in ("-h", "--help"):
-        usage()
-        return 2
-
-    evals_file = Path(argv[1])
-    skill_name = argv[2]
-    iteration = argv[3] if len(argv) == 4 else ""
+    args = build_parser().parse_args(argv)
+    evals_file = Path(args.evals)
+    skill_name = args.skill_name
+    iteration = args.iteration
 
     if not evals_file.is_file():
         sys.stderr.write(f"Error: evals file not found: {evals_file}\n")
@@ -368,16 +398,16 @@ def main(argv: list[str]) -> int:
         sys.stderr.write("Error: no gradable evals\n")
         return 2
 
-    runs = int(os.environ.get("RUNS", "1"))
-    concurrency = max(1, int(os.environ.get("CONCURRENCY", "4")))
-    claude_model = os.environ.get("CLAUDE_MODEL", "")
-    judge_model = os.environ.get("JUDGE_MODEL", "")
-    disallowed = os.environ.get("DISALLOWED_TOOLS", "Bash,Edit,Write,NotebookEdit,WebFetch")
-    timeout = int(os.environ.get("GEN_TIMEOUT", "600"))
-    cwd = os.environ.get("EVAL_CWD") or None
+    runs = args.runs
+    concurrency = max(1, args.concurrency)
+    claude_model = args.model
+    judge_model = args.judge_model
+    disallowed = args.disallowed_tools
+    timeout = args.gen_timeout
+    cwd = args.eval_cwd or None
     short = skill_name.rsplit(":", 1)[-1]
 
-    base = Path(os.environ.get("WORKSPACE", f"{short}-workspace"))
+    base = Path(args.workspace) if args.workspace else Path(f"{short}-workspace")
     if not iteration:
         existing = [int(m.group(1)) for p in base.glob("iteration-*")
                     if (m := re.match(r"iteration-(\d+)$", p.name))]
@@ -475,4 +505,4 @@ def main(argv: list[str]) -> int:
 
 
 if __name__ == "__main__":
-    sys.exit(main(sys.argv))
+    sys.exit(main(sys.argv[1:]))
