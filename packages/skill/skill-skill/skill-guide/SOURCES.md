@@ -86,7 +86,6 @@
 - **Last reviewed:** 2026-05-13
 - **Used for:**
   - `SKILL.md` → Spec Constraints, Skill Structure
-  - `references/simplify-skill.md` → Spec Constraints
   - `references/validate.md` → Spec Constraints, Frontmatter Checks, Body Checks, Reference Checks
 - **Aspects extracted:**
   - Frontmatter fields: required `name` (≤64 chars, kebab-case regex, matches parent dir), required `description` (≤1024 chars), optional `license` / `compatibility` (≤500 chars) / `metadata` / `allowed-tools`
