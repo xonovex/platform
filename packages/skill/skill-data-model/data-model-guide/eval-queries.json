@@ -1,0 +1,80 @@
+[
+  {
+    "query": "I'm building the core document store for our level editor — objects of different kinds each with a set of named properties, and I want to add new object types at runtime without recompiling. How should the type/property schema work?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "direct: runtime typed-object/property schema, data-driven types"
+  },
+  {
+    "query": "entities in our scene need to point at each other, but pointers break when I save and reload — what should I store instead so links survive serialization?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "implicit: reference objects by stable id/GUID instead of pointers"
+  },
+  {
+    "query": "when I delete a material that meshes still reference, the app crashes — how should deletes behave so the references don't dangle?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "ownership vs weak reference, delete -> resolve to null"
+  },
+  {
+    "query": "the property panel and the viewport both need to refresh when the model changes, but I don't want to rescan everything every frame — what's the right way to observe edits?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "change notification: events / dirty flags / version polling"
+  },
+  {
+    "query": "I need proper undo/redo where dragging a handle that changes five fields is a single Ctrl+Z, and redo works after it",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "transactional edits grouped into one undo step + redo stack"
+  },
+  {
+    "query": "old project files stop opening every time we add a field to the format — how do we version the save format and load old files into the new schema?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "serialization versioning + migration of old files"
+  },
+  {
+    "query": "the render thread reads the scene while the editor thread edits it and we get tearing — I want readers to see a consistent version without locking on every read",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "immutable / copy-on-write snapshots published atomically for readers"
+  },
+  {
+    "query": "our particle update loop reads position and velocity from a 96-byte struct and stalls on cache misses — restructure the layout for the hot loop",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: cache/layout optimization -> data-oriented-design-guide"
+  },
+  {
+    "query": "design the Postgres schema and foreign keys for our users and orders tables with the right indexes",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: relational/SQL schema design -> sql-postgresql-guide"
+  },
+  {
+    "query": "I want to iterate all alive entities of one component type each frame for the physics simulation without branching on a flag",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: runtime ECS component iteration for simulation -> data-oriented-design-guide"
+  },
+  {
+    "query": "give me a single typed object database where every node has properties, children it owns, and links to other nodes by id, and the whole thing notifies on edit, supports undo, and saves to a versioned file",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "validation positive: the full central data-model pattern, unnamed"
+  },
+  {
+    "query": "I want copy-on-write versions of the document so I can snapshot the state for a background autosave while the user keeps editing",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "validation positive: COW snapshots for consistent concurrent reads"
+  },
+  {
+    "query": "write fwrite/fread routines to dump and reload this fixed C struct of camera settings to a binary file",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "validation negative: plain serialization of a fixed struct, no model/schema/versioning"
+  }
+]

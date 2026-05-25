@@ -41,3 +41,4 @@ for (size_t i = 0; i < system.count; i++) {
 - Array sync: Keep indices synchronized across all component arrays
 - Hot loops: Identify performance-critical loops for SoA conversion
 - Measurement: Profile before and after refactoring to verify improvements
+- Minimalist containers: prefer one contiguous growable array (length+capacity, stb-style header) — or an arena/fixed-capacity caller-provided buffer in caller-owns code — over a node-per-element container; it is one allocation and iterates linearly

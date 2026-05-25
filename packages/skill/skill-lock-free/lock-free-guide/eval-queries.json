@@ -1,0 +1,104 @@
+[
+  {
+    "query": "what memory_order should I use on the store and load when one thread fills a buffer and flips a ready flag the other thread waits on?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "direct: acquire/release publish-consume ordering"
+  },
+  {
+    "query": "my pop() in this CAS stack occasionally reads garbage from a node — is this the ABA thing?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "Treiber stack + ABA / use-after-free without naming lock-free"
+  },
+  {
+    "query": "I have 8 worker threads each bumping its slot in a counters[] array and it's somehow slower than a single global atomic — why?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "false sharing, described by symptom"
+  },
+  {
+    "query": "need a bounded queue where several producers and several consumers hand off jobs without a mutex",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "MPMC bounded queue, doesn't say lock-free"
+  },
+  {
+    "query": "the audio thread can't take a lock — build me a single-producer single-consumer ring for samples",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "SPSC ring buffer"
+  },
+  {
+    "query": "when is it safe to free a node after I unlink it from a list that other threads are still traversing?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "safe memory reclamation, hazard pointers/epoch"
+  },
+  {
+    "query": "this spinlock pegs all cores under contention — how do I make threads back off or use a scalable queue lock?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "backoff + MCS/CLH locks"
+  },
+  {
+    "query": "convert this array-of-structs particle system to struct-of-arrays for cache locality",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: single-threaded data layout, use data-oriented-design-guide"
+  },
+  {
+    "query": "wire up a thread pool with an async job API so I can await results from a higher-level worker",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: high-level async/pool usage, no shared-memory synchronization"
+  },
+  {
+    "query": "review my .c file for const-correctness and designated-initializer style in this systems lib",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: C99 style, use c99-opinionated-guide"
+  },
+  {
+    "query": "I think I need a compare-exchange loop to atomically clamp a shared max value — show the weak vs strong choice",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "CAS loop, weak vs strong"
+  },
+  {
+    "query": "is plain volatile enough to share this flag between two threads, or do I actually need something else?",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "memory model: volatile is not atomic"
+  },
+  {
+    "query": "many threads log into one collector thread — what queue avoids producer-side CAS contention?",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "MPSC Vyukov queue, implicit"
+  },
+  {
+    "query": "give me a wait-free counter and explain how that differs from just lock-free here",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "progress guarantees"
+  },
+  {
+    "query": "pad these hot fields so two cores writing them don't keep invalidating each other's cache line",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "false sharing, alignment to cache line"
+  },
+  {
+    "query": "tune this LuaJIT hot loop with stable table shapes and preallocated arrays",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near-miss: language-specific perf, use lua-opinionated-guide"
+  },
+  {
+    "query": "align my vec4 struct to 16 bytes so the SIMD loads don't fault",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near-miss: single-threaded SIMD alignment, not concurrency"
+  }
+]
