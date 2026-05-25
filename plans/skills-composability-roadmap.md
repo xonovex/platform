@@ -1,6 +1,14 @@
+---
+status: complete
+has_subplans: false
+completed: 2026-05-27
+---
+
 # Skills Composability Roadmap
 
 Plan to bring the rest of the Xonovex skill catalog onto the composable-split pattern, and to improve the meta `skill` guide so the pattern is self-sustaining.
+
+> **Status: complete (2026-05-27).** All of Part A and Part B (items 1–9) landed, one cluster per commit; the "Explicitly NOT changing" set was left intact. See [Completion summary](#completion-summary).
 
 ## Context
 
@@ -100,3 +108,18 @@ For each move (mirrors the c99/DOD/memory work already done):
 - [Progressive Discovery: A Better Mental Model for Agent Skills (DEV)](https://dev.to/phil-whittaker/progressive-discovery-a-better-mental-model-for-agent-skills-51bd)
 - [Claude Agent Skills: A First Principles Deep Dive](https://leehanchung.github.io/blogs/2025/10/26/claude-skills-deep-dive/)
 - [Introduction to agent skills (Anthropic Courses)](https://anthropic.skilljar.com/introduction-to-agent-skills)
+
+## Completion summary
+
+Landed one cluster per commit; each validated (spec/links/harness-neutrality), prettier-clean, with `marketplace.json` left valid and compact.
+
+- **Part A** — `docs(skill): add composability + catalog-audit references`. New `references/composability.md` and `references/catalog-audit.md` (the latter also documents intentional parallel-by-domain overlaps, item B9); broadened description to catalog-level work; added progressive-disclosure budget + `Design to coexist` and `Routing-first descriptions` Core Principles; SOURCES provenance.
+- **B1** — `refactor(skill-hono): tier split`. Removed 10 byte-identical generic references from `hono-opinionated`; it is now an overlay on `hono-guide` (controllers, `openapi-*`, router-selection, body-limit only).
+- **B2 + B8** — `refactor(skill-lua): tier split`. `lua-guide` owns the 8 fundamentals; `lua-opinionated` keeps only `jit-friendly-tables` + `cache-lookups`, with scope clarified (LuaJIT-focused, applies to vanilla 5.4).
+- **B3** — `refactor(skill-http): cross-link zod-guide + vitest-guide`. `expressjs`/`hono` cross-reference the owners for schema design and test runner; keep only framework glue.
+- **B4** — `refactor(skill-tstl): link up to lua-guide`. `typescript-to-lua` points at `lua-guide`/`lua-opinionated-guide` for Lua idioms; keeps transpiler-specific topics.
+- **B5** — `docs(skill): add paradigm bridges`. `typescript`/`python`/`lua`/`c99` point up to `general-fp-guide` / `general-oop-guide`.
+- **B6** — `fix(skill): complete language<->framework Skip reciprocity`. `typescript` routes Express/Astro out; fixed `hono`'s `express.js-guide` → `expressjs-guide` typo (broken cross-skip).
+- **B7** — `docs(skill-content): make content-guide tenant-agnostic`. Removed cruise-specific port/ship name-drops, stated reusability (per intent confirmation); tenant guides stay in `drodan-utility`.
+
+Left intact per plan: React/visual cluster, meta/tooling parallel ops, infra single-tool skills, the already-restructured systems cluster.
