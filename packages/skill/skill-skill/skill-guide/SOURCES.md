@@ -62,9 +62,11 @@
 - **URL:** https://agentskills.io/skill-creation/evaluating-skills.md
 - **Last reviewed:** 2026-05-13
 - **Used for:**
-  - `references/evaluating-outputs.md` → entire file
+  - `references/evaluating-outputs.md` → entire file (incl. Automated Runner section)
+  - `scripts/eval-outputs.py` → with-skill/without-skill arms, LLM-as-judge grading, `benchmark.json`
 - **Aspects extracted:**
   - Test case shape (prompt, expected output, optional input files) → Test Case Shape
+  - Reference-guided binary LLM-as-judge with evidence; with-skill vs without-skill arms in isolated runs → `scripts/eval-outputs.py` (method also informed by public SkillsBench / skill-creator output-eval practice)
   - `evals/evals.json` storage convention
   - Workspace layout (`iteration-N/`, `with_skill/`, `without_skill/`) → Workspace Layout
   - Run pair (with skill + baseline) → Running Eval Pairs

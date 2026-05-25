@@ -7,7 +7,8 @@ This is about **whether the outputs are good once the skill activates** — not 
 ## Test Case Shape
 
 - **Prompt** — realistic user message (not "process this data")
-- **Expected output** — human-readable description of success
+- **Expected output** — human-readable reference for what success looks like
+- **Assertions** — specific, binary PASS/FAIL checks the judge grades against
 - **Files** (optional) — input artifacts the skill needs
 
 Store in `evals/evals.json` inside the skill directory:
@@ -20,11 +21,16 @@ Store in `evals/evals.json` inside the skill directory:
       "id": 1,
       "prompt": "{realistic prompt}",
       "expected_output": "{success criterion}",
+      "assertions": ["{verifiable check}", "{another check}"],
       "files": ["evals/files/{input}"]
     }
   ]
 }
 ```
+
+## Automated Runner
+
+`scripts/eval-outputs.py <evals.json> <skill-name>` runs the whole loop below: each eval runs in an isolated `claude -p` context **with the skill** and **without it** (Skill tool blocked), in parallel; outputs are graded by a reference-guided LLM-as-judge (binary per assertion, evidence required); results land in the workspace layout and `benchmark.json`. Env: `RUNS`, `CONCURRENCY`, `CLAUDE_MODEL`, `JUDGE_MODEL`. Do the manual loop when you need human grading or file-producing skills the runner doesn't capture.
 
 ## Designing Prompts
 
