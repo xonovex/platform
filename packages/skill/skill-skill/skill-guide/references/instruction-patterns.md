@@ -1,5 +1,9 @@
 # instruction-patterns: Structural Patterns for Skill Bodies
 
+## Contents
+
+[Templates for Output Format](#templates-for-output-format) · [Checklists for Multi-Step Workflows](#checklists-for-multi-step-workflows) · [Validation Loops](#validation-loops) · [Plan-Validate-Execute](#plan-validate-execute) · [When to Use Which](#when-to-use-which) · [Gotchas](#gotchas)
+
 Reusable structural patterns for instruction sections inside a SKILL.md body. Use the ones that fit the task — most skills won't need all of them.
 
 ## Templates for Output Format

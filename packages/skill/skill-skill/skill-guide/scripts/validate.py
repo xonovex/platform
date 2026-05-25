@@ -298,6 +298,39 @@ def check_references(body: str, skill_dir: Path, report: Report) -> None:
                 )
 
 
+def check_reference_tocs(skill_dir: Path, report: Report) -> None:
+    """Soft check: reference files >100 lines should open with a '## Contents' TOC.
+
+    Long reference files that lack a table of contents get previewed with a
+    partial read, so the agent never sees their full scope. Warn, don't fail.
+    """
+    refs_dir = skill_dir / "references"
+    if not refs_dir.is_dir():
+        return
+    toc_re = re.compile(r"^## *(Contents|Table of Contents)\b", re.MULTILINE | re.IGNORECASE)
+    missing: list[str] = []
+    checked = 0
+    for ref in sorted(refs_dir.glob("*.md")):
+        lines = ref.read_text(encoding="utf-8").splitlines()
+        if len(lines) <= 100:
+            continue
+        checked += 1
+        if not toc_re.search("\n".join(lines[:15])):
+            missing.append(f"{ref.name} ({len(lines)} lines)")
+    if checked == 0:
+        return
+    if missing:
+        report.add_warn(
+            "references: file(s) >100 lines lack a '## Contents' table of contents — "
+            + ", ".join(missing)
+        )
+    else:
+        report.add_pass(
+            f"references: all {checked} reference file(s) >100 lines open with a "
+            "'## Contents' table of contents"
+        )
+
+
 def check_harness_neutrality(body: str, report: Report) -> None:
     hits = 0
     for pattern, label in HARNESS_PATTERNS:
@@ -354,6 +387,7 @@ def main(argv: list[str]) -> int:
     check_frontmatter(fm, parent_name, report)
     check_body(body, report)
     check_references(body, skill_dir, report)
+    check_reference_tocs(skill_dir, report)
     check_harness_neutrality(body, report)
 
     return render_report(report, skill_path, skill_dir)

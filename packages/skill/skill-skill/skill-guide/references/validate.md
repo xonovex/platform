@@ -1,5 +1,9 @@
 # validate: Validate Skill Against Spec and Best Practices
 
+## Contents
+
+[Spec Constraints](#spec-constraints) · [Core Workflow](#core-workflow) · [Frontmatter Checks](#frontmatter-checks) · [Body Checks](#body-checks) · [Reference Checks](#reference-checks) · [Content Quality Checks](#content-quality-checks) · [Structural-Pattern Hints](#structural-pattern-hints-soft-signals) · [Harness Neutrality Checks](#harness-neutrality-checks) · [Output](#output) · [Error Handling](#error-handling) · [Safety](#safety)
+
 Read-only audit of a SKILL.md against the Agent Skills spec, project conventions, and authoring best practices. Reports pass/fail per check with line numbers.
 
 A reference implementation lives at [scripts/validate.py](../scripts/validate.py) (PEP 723 self-contained Python): `uv run scripts/validate.py <skill-dir>` runs all checks below and exits non-zero on errors.

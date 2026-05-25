@@ -1,5 +1,9 @@
 # evaluating-outputs: Eval-Driven Iteration on Output Quality
 
+## Contents
+
+[Scope](#scope) · [Test Case Shape](#test-case-shape) · [Automated Runner](#automated-runner) · [Designing Prompts](#designing-prompts) · [Workspace Layout](#workspace-layout) · [Running Eval Pairs](#running-eval-pairs) · [Writing Assertions](#writing-assertions) · [Grading](#grading) · [Aggregating](#aggregating-benchmarkjson) · [Pattern Analysis](#pattern-analysis) · [Human Review](#human-review) · [Iteration Signals](#iteration-signals) · [Iteration Principles](#iteration-principles) · [Gotchas](#gotchas)
+
 ## Scope
 
 This is about **whether the outputs are good once the skill activates** — not about whether the skill triggers on the right prompts.
