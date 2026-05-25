@@ -1,0 +1,77 @@
+[
+  {
+    "query": "create a new skill for our GraphQL resolver conventions — SKILL.md plus a few reference files",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "direct: authoring a new skill"
+  },
+  {
+    "query": "the SKILL.md body is ~700 lines — push the detail into references with load-when triggers and keep the body an index",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "implicit: progressive disclosure / simplify without naming the skill guide"
+  },
+  {
+    "query": "editing packages/skill/skill-zod/zod-guide/SKILL.md and it never seems to fire — can you tighten the description so it routes better?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "context cue: editing under a skills dir + description tuning"
+  },
+  {
+    "query": "audit our skill catalog for duplicated reference files and split them into general/language/framework tiers, cross-linking the owner",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "catalog-level work — the broadened composability/audit scope"
+  },
+  {
+    "query": "two of our skills overlap a lot — pull the useful rules from one into the other but keep the target's voice and structure",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "merge/assimilate one skill into another"
+  },
+
+  {
+    "query": "simplify our AGENTS.md — it's gotten verbose and repeats itself across sections",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: project instructions, should match instruction-guide"
+  },
+  {
+    "query": "tune this system prompt so the model stops apologizing and follows the output format",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: prompt engineering, should match prompt-guide"
+  },
+  {
+    "query": "create a /deploy slash command that wraps our release steps and asks for a target env",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: slash command authoring, should match slashcommand-guide"
+  },
+
+  {
+    "query": "write trigger-eval queries for our new docker-guide and check the description routes them correctly",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "validation positive: evaluating trigger rate"
+  },
+  {
+    "query": "this guide re-explains the immutability rules that general-fp-guide already owns — factor them out and cross-reference it",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "validation positive — implicit de-duplication / composability"
+  },
+
+  {
+    "query": "consolidate the duplicated AGENTS.md files across our packages into one canonical set",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "validation negative: project instructions, should match instruction-guide"
+  },
+  {
+    "query": "simplify this verbose prompt template we reuse for support replies",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "validation negative — near-miss, should match prompt-guide"
+  }
+]
