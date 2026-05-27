@@ -19,6 +19,7 @@ General principles for allocating, owning, and freeing memory in manual-memory o
 - **Object pool** - Fixed-size slots + free list; O(1) alloc/free, stable, see [references/arenas-and-pools.md](references/arenas-and-pools.md)
 - **Scratch / temp** - Per-frame/per-request arena reset each cycle, see [references/arenas-and-pools.md](references/arenas-and-pools.md)
 - **Virtual-memory reserve/commit** - Reserve a large range, commit pages on demand; stable addresses, no realloc copy, see [references/arenas-and-pools.md](references/arenas-and-pools.md)
+- **Virtual-memory tricks** - Cap-free arrays, page-aligned growth, gapless ring buffers, end-of-page bounds checks, see [references/virtual-memory.md](references/virtual-memory.md)
 
 ## Ownership
 
@@ -36,4 +37,5 @@ General principles for allocating, owning, and freeing memory in manual-memory o
 
 - Read [references/caller-owns-memory.md](references/caller-owns-memory.md) - Load when designing an API's allocation boundary or a non-allocating library
 - Read [references/arenas-and-pools.md](references/arenas-and-pools.md) - Load when choosing an allocator: arena, pool, scratch, or virtual-memory backed
+- Read [references/virtual-memory.md](references/virtual-memory.md) - Load when using address-space reservation for cap-free arrays, ring buffers, page-aligned growth, or end-of-page bounds checking
 - Read [references/ownership-and-lifetimes.md](references/ownership-and-lifetimes.md) - Load when deciding who owns/frees memory and how long it lives

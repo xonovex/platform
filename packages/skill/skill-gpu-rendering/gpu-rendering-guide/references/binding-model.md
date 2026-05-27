@@ -12,6 +12,7 @@
 - **Bindless** - One large resource array of all textures/buffers; the shader indexes by handle; add resources without rebinding. Requires the API's bindless/descriptor-indexing capability.
 - **Inline constants** - A small block (tens to ~128 bytes, API-dependent) for per-draw scalars/indices; updated inline in the command stream, no binding write.
 - **Dynamic offsets** - One binding for a ring buffer; supply a per-draw byte offset to address the right sub-range without a new binding.
+- **Resource binders carry only handles** - Bundle a draw's resources into a binder object (≈ one binding group) and serialize only its small integer handle onto the command stream, not the resource contents. Commands stay self-contained, so streams recorded on worker threads can be translated to the backend in parallel without backtracking to reconstruct binding state.
 
 **Example:**
 

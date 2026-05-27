@@ -14,6 +14,7 @@
 - **Ring buffer** - One mapped buffer holding N per-frame sub-ranges; frame i writes range i; a fence guards reuse, see [references/command-recording-and-frames.md](./command-recording-and-frames.md).
 - **Defragmentation** - Periodically relocate live allocations to compact blocks, then fix up the handles/views that referenced them.
 - **General-purpose allocator** - A reusable allocator over these techniques (block management, tier selection, defrag) so call sites request `(size, usage)` and never touch raw device memory.
+- **Visual allocator debugging** - Give every allocation a debug tag and build a simple visualization of block occupancy early; GPU memory waste (e.g. power-of-two rounding in a buddy allocator, or blocks hoarded and never released) is otherwise invisible and easy to ship.
 
 **Example:**
 
@@ -45,5 +46,6 @@ memcpy(slot, &per_frame_ubo, sizeof per_frame_ubo);
 - Buffer and image alignment requirements differ and some implementations require buffer/image granularity separation within a block — query and respect both.
 - Writing a ring-buffer sub-range still in use by an in-flight frame races the GPU; size the ring to frames-in-flight and gate on the per-frame fence.
 - Defragmentation invalidates offsets/views that referenced the moved resource; update every binding and view, or you sample stale memory.
+- A buddy/power-of-two block allocator rounds each request up to the next power of two; a 9 MB texture can quietly consume a 16 MB slot. Measure occupancy before assuming the allocator is tight.
 
 **Related:** [references/command-recording-and-frames.md](./command-recording-and-frames.md), [references/synchronization.md](./synchronization.md), [references/render-graph.md](./render-graph.md), [references/binding-model.md](./binding-model.md)

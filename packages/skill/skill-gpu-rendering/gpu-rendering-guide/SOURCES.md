@@ -70,6 +70,21 @@
   - Source → binary intermediate offline, reflection for binding/layout info → `references/shader-system.md`
   - Permutations vs ubershader + specialization constants, pipeline keying, hot-reload, disk cache → `references/shader-system.md`, `references/binding-model.md`
 
+## Game-engine development blog (archive)
+
+- **URL:** https://archive-host.github.io/blog_archive/
+- **Last reviewed:** 2026-05-27
+- **Used for:**
+  - `SKILL.md` → Architecture, Resources, Synchronization, Gotchas
+  - A worked, shipped instance of the cross-API architecture: declarative passes, frequency-grouped binding, sort-key scheduling, sub-allocated device memory, and multi-GPU
+- **Aspects extracted:**
+  - "A modern rendering architecture", "Simple Parallel Rendering" — 64-bit sort key per command decoupling GPU order from CPU record order, merge-and-sort worker streams before submit → `references/command-recording-and-frames.md` (the per-viewer visibility-bitmask / visit-once model is owned by **ecs-guide** rendering-integration)
+  - "High-Level Rendering Using Render Graphs" — setup/execute pass split, root-pass culling, transient lifetimes, nested modules with extension points → `references/render-graph.md`
+  - "Efficient binding of shader resources" — resource binders grouped by update frequency (UPDATABLE vs DYNAMIC); commands carry only handles so streams translate in parallel → `references/binding-model.md`
+  - "the engine Shader System (parts 1–3)" — declarative composable shader declarations (imports/code/state, last-write-wins), generated accessors, system-bitmask variant selection, materials as a superset binder → `references/shader-system.md`
+  - "Device Memory Management" — few large blocks + sub-allocation, buddy ≤256 MB vs dedicated above, build visual allocator debugging early → `references/gpu-memory-strategy.md`
+  - "Explicit Multi-GPU Programming", "Moving the engine to Bindless" — device-affinity masks; single global descriptor array with indices embedded in handles (the bindless principle behind the binding model) → `references/binding-model.md`, `references/synchronization.md`
+
 ## Refresh Workflow
 
 1. Re-read the upstream source(s) above (spec sections, talk, allocator/tooling docs)

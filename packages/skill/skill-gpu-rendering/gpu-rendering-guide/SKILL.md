@@ -25,6 +25,7 @@ API-agnostic architecture for a low-level GPU renderer. The concepts hold across
 - **Shader system** - Permutations vs ubershaders, pipeline keyed by shader+state, hot-reload, caching, see [references/shader-system.md](references/shader-system.md)
 - **Command recording** - One recording context per thread per frame, multi-threaded record, see [references/command-recording-and-frames.md](references/command-recording-and-frames.md)
 - **Frames in flight** - Double/triple-buffer per-frame resource sets behind a fence so the CPU can't outrun the GPU, see [references/command-recording-and-frames.md](references/command-recording-and-frames.md)
+- **Sort keys** - A 64-bit key per command decouples GPU submission order from CPU record order; merge worker streams and sort before submit, see [references/command-recording-and-frames.md](references/command-recording-and-frames.md)
 
 ## Resources
 

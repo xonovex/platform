@@ -11,6 +11,8 @@
 - **Bindless** - A binding with a large `descriptorCount` and `VK_DESCRIPTOR_BINDING_UPDATE_AFTER_BIND_BIT | PARTIALLY_BOUND_BIT | VARIABLE_DESCRIPTOR_COUNT_BIT`; enable `descriptorIndexing`; index in GLSL with `nonuniformEXT(handle)`.
 - **Push constants** - `VkPushConstantRange{ stageFlags, offset, size }` in the pipeline layout; `vkCmdPushConstants` per draw. Keep to indices/scalars within the guaranteed minimum.
 - **Dynamic offsets** - A `*_DYNAMIC` descriptor for a ring buffer; pass a per-draw byte offset to `vkCmdBindDescriptorSets` to address the right sub-range.
+- **One global bindless set** - Instead of many per-pipeline sets, keep a single renderer-wide `VkDescriptorSet` with one large array binding per resource class (storage buffer, sampled image, storage image, sampler, acceleration structure). Allocate an array index per resource at creation from a per-type free list (scan for a free range, else bump a `next` counter) and embed it in the resource handle; shaders index by that integer. Defer freeing a slot until a `VkFence` proves no in-flight command buffer still references it. Removing the per-set bind/lookup is what makes command-buffer building dramatically cheaper (the engine project reported ~6×).
+- **Per-job blueprint copy** - When sets must be mutated mid-frame, keep shared sets as read-only blueprints and give each worker/job its own `VkDescriptorPool` plus a parallel set array; lazily copy a blueprint into the job-local set (via `VkCopyDescriptorSet` / `vkUpdateDescriptorSets`) only on first use, then reset and recycle the whole pool after the fence. Whole-pool recycling avoids the fragmentation that per-set versioning + GC causes.
 
 **Example:**
 
@@ -40,5 +42,7 @@ for (material *m = materials; m < end; m++) {
 - Bindless requires the descriptor-indexing feature enabled at device creation _and_ `nonuniformEXT` for divergent indices — a divergent index without it is undefined.
 - Push-constant space is small and shared across stages; exceeding `maxPushConstantsSize` (or overlapping stage ranges) is invalid — keep it tiny.
 - The pipeline layout's set layouts and push-constant ranges must match the shader's declared bindings exactly, or binding silently targets the wrong resource.
+- A bindless array index freed and immediately reused while a prior frame's command buffer still references the slot samples the wrong resource — release bind points through fence-gated deferred deletion, and reserve a slot of fallback resources so a "null" handle reads something valid.
+- The bindless descriptor-array sizes you request may exceed the device's `maxDescriptorSet*` / `maxPerStageDescriptor*` limits; query and clamp (or log) rather than assuming a fixed 512K.
 
 **Related:** [references/pipelines.md](./pipelines.md), [references/resources-and-barriers.md](./resources-and-barriers.md), [references/commands-and-swapchain.md](./commands-and-swapchain.md), [references/device-memory.md](./device-memory.md)

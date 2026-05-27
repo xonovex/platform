@@ -12,6 +12,7 @@
 - **Swapchain creation** - `vkCreateSwapchainKHR` from surface caps/formats/present modes; retrieve images with `vkGetSwapchainImagesKHR`; create a `VkImageView` per image.
 - **Acquire/submit/present** - `vkAcquireNextImageKHR` (signal image-available) → record → `vkQueueSubmit2` (wait image-available, signal render-finished, signal fence) → `vkQueuePresentKHR` (wait render-finished), see [references/synchronization.md](./synchronization.md).
 - **Recreation** - On `VK_ERROR_OUT_OF_DATE_KHR`/`VK_SUBOPTIMAL_KHR` or resize, `vkDeviceWaitIdle`, destroy, and recreate the swapchain and its views/targets.
+- **Fence-gated deletion + pool recycling** - Attach a queue of pending resource destroys to each submission; process them (and reset/recycle the slot's command pools and descriptor pools into a free "pool of pools") only when the slot's `VkFence` signals. Recycling whole pools, rather than freeing individual buffers, keeps reuse O(1) and avoids fragmentation.
 
 **Example:**
 

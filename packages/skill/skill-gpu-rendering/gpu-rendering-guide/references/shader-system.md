@@ -13,6 +13,8 @@
 - **Pipeline key** - Key the pipeline cache on (shader modules + render state: blend, depth, raster, formats); identical keys share one compiled pipeline.
 - **Hot-reload** - Watch shader source mtimes; on change recompile, validate, then rebuild every pipeline whose key references the changed module and swap them in at a frame boundary.
 - **Caching** - Persist compiled bytecode and the driver's pipeline cache blob to disk so cold start skips recompilation.
+- **Declarative composition** - Author shaders as composable declarations (named resource/constant `imports`, code blocks, state blocks) that merge by rule — code concatenated in order, state last-write-wins — and generate `load_<const>()` / `get_<resource>()` accessors and the interpolator structs automatically, so authoring is decoupled from the binding API. Build a library of stackable declarations rather than monolithic shaders.
+- **System-bitmask variant selection** - Give each optional feature/"system" a unique bit; the set of active systems forms a bitmask that selects the precompiled variant in O(1), instead of a string/hash lookup recomputed on every state change.
 
 **Example:**
 

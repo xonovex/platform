@@ -9,6 +9,7 @@
 - **Context per thread per frame** - One recording context per (recording thread × frame slot); reset the whole context when the slot's fence signals; never free individual streams.
 - **Primary vs secondary** - Primary streams are submitted to a queue; secondary streams are recorded by worker threads and invoked from a primary.
 - **Multi-threaded recording** - Partition draws/passes across threads, each recording its own secondary stream into its own context; join, then a primary executes them. Recording scales; submission stays single-threaded.
+- **Sort keys** - Tag each recorded command with a 64-bit sort key; merge all threads' streams and sort by key before submission. GPU execution order is then decoupled from the order (and thread) commands were recorded in, so workers record independently and ordering is resolved once, afterward.
 - **Frames in flight** - N frame slots (2 = double, 3 = triple buffer), each with its own recording contexts, per-frame bindings, ring-buffer ranges, and one fence.
 - **Per-frame resource sets** - Anything the GPU reads that the CPU also rewrites (uniforms, instance buffers, dynamic bindings) is duplicated per slot so writing slot i can't race the GPU reading slot i-1.
 - **Acquire/submit/present loop** - acquire image (signal image-available) → record → submit (wait image-available, signal render-done, signal fence) → present (wait render-done), see [references/synchronization.md](./synchronization.md).
@@ -54,5 +55,6 @@ void draw_frame(uint64_t frame) {
 - Per-frame resources must be genuinely duplicated; a single shared dynamic buffer written each frame races the GPU reading last frame's value.
 - The swapchain can return out-of-date/suboptimal on resize; recreate the swapchain and dependent targets, do not present into a stale image.
 - More frames in flight adds input latency and multiplies per-frame memory; 2–3 is the usual sweet spot, not "as many as possible".
+- Without a sort key, GPU order _is_ the order commands were recorded, so multi-threaded recording forces threads to coordinate their relative ordering; a per-command key lets each thread record obliviously and the order is sorted out after the join.
 
 **Related:** [references/synchronization.md](./synchronization.md), [references/gpu-memory-strategy.md](./gpu-memory-strategy.md), [references/render-graph.md](./render-graph.md), [references/binding-model.md](./binding-model.md)

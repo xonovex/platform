@@ -11,6 +11,8 @@
 - **Dynamic rendering** - Set `VkPipelineRenderingCreateInfo{ colorAttachmentCount, pColorAttachmentFormats, depthAttachmentFormat }` in `pNext`; render with `vkCmdBeginRendering`/`vkCmdEndRendering` and `VkRenderingAttachmentInfo` — no `VkRenderPass`.
 - **Dynamic state** - List `VK_DYNAMIC_STATE_VIEWPORT`/`SCISSOR` (and extended dynamic state where enabled) so the pipeline omits those from its key; set them per command buffer with `vkCmdSetViewport`/`vkCmdSetScissor`.
 - **Compute pipeline** - `vkCreateComputePipelines` from a single compute `VkShaderModule` + layout; dispatch with `vkCmdDispatch`.
+- **Deferred creation + thread-local staging** - When the target attachment formats / render pass aren't known until draw time, defer creation and look up by a hash of `(formats or render pass, shader, state-override blocks)`. A worker thread that misses puts the newly-created `VkPipeline` in a small thread-local array (linear search, cardinality is low) rather than the shared map; merge those into the global immutable lookup after the frame, so no lock is taken on the hot path. Skip the lookup entirely if the key equals the most-recently-bound pipeline.
+- **Render-state override blocks** - Represent per-draw state as a stack of small "override" blocks that hold only non-default values; later blocks win on conflict. Split overrides into a dynamic subset (viewport, scissor, depth bias → `vkCmdSet*`) and a static subset (folded into the pipeline key), so common tweaks need no new pipeline.
 
 **Example:**
 
@@ -47,5 +49,6 @@ vkCmdEndRendering(cmd);
 - A pipeline's attachment formats (render pass or `VkPipelineRenderingCreateInfo`) must match the actual attachments at draw time, or rendering is invalid.
 - Forgetting to `vkCmdSetViewport`/`vkCmdSetScissor` for a dynamic-state pipeline leaves them undefined — set every dynamic state you declared.
 - The serialized pipeline-cache blob is driver/device-specific; validate its header (`VkPipelineCacheHeaderVersionOne`) before trusting it, and rebuild on mismatch.
+- Worker threads must never mutate the shared pipeline lookup concurrently; stage new pipelines thread-locally and merge after the frame, or the map corrupts.
 
 **Related:** [references/descriptors.md](./descriptors.md), [references/resources-and-barriers.md](./resources-and-barriers.md), [references/commands-and-swapchain.md](./commands-and-swapchain.md)

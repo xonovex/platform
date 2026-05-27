@@ -42,6 +42,12 @@
     "rationale": "near-miss: concurrency/false-sharing for threads -> lock-free-guide"
   },
   {
+    "query": "design my ECS so physics only mirrors the entities that changed this frame, and systems still run in parallel",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: ECS architecture / change-tracking & external sync -> ecs-guide, not raw data layout"
+  },
+  {
     "query": "is my const-correctness right in this systems C file, and should the header use static inline",
     "should_trigger": false,
     "split": "train",

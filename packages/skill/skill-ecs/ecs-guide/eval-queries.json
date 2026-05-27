@@ -1,0 +1,74 @@
+[
+  {
+    "query": "I'm building an ECS and can't decide how to store components — should each entity own its components or should I group entities by which components they have?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "direct: archetype/bitmask storage vs per-entity ownership"
+  },
+  {
+    "query": "our physics actors lag a frame behind the game — a fast car gets missed by raycasts. how should I push transform changes into PhysX from my component data?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "direct: mirroring ECS state to a stateful external system, out-of-sync window"
+  },
+  {
+    "query": "can an entity have two of the same component, like two colliders, or should I model that some other way?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "direct: single-vs-multiple components verdict and alternatives"
+  },
+  {
+    "query": "I have a system that updates a few hundred thousand objects and I want it to run across all my worker threads without locking — how do I structure the loop?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "implicit: filter-and-batch system loop + parallel jobs, no 'ECS' said"
+  },
+  {
+    "query": "we register on-change callbacks so the renderer updates whenever a component is edited, but now our job scheduler hits races — what's the right pattern?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "implicit: callbacks break parallelism; use brute-force/change-lists"
+  },
+  {
+    "query": "how should rendering components hook into the engine so I can cull lots of meshes per camera and feed several shadow views in one pass?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "implicit: ECS->renderer interfaces, per-viewer visibility bitmasks"
+  },
+  {
+    "query": "restructure this CPU particle array from array-of-structs to struct-of-arrays so the update loop stops missing cache",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: raw CPU data layout -> data-oriented-design-guide, not ECS architecture"
+  },
+  {
+    "query": "design the render graph passes and barrier/transition derivation for my Vulkan deferred renderer",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: GPU renderer architecture -> gpu-rendering-guide"
+  },
+  {
+    "query": "I'm modeling thousands of units in an RTS and want systems that iterate only the units that have both health and movement components — how do I match and walk them?",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "validation positive: component-mask filtering + co-located iteration"
+  },
+  {
+    "query": "what's the cheapest way to know which entities changed this frame so my audio engine only re-syncs those, without slowing down the parallel systems?",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "validation positive: change-tracking strategies, dirty flags vs change lists vs tags"
+  },
+  {
+    "query": "refactor my GameObject base class and its Update() override hierarchy so subclasses share behavior through inheritance",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "validation negative: class/inheritance game-object design -> general-oop-guide"
+  },
+  {
+    "query": "tune this LuaJIT table layout so the hot path stays JIT-friendly and avoids rehashing",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "validation negative: LuaJIT table tuning -> lua-opinionated-guide"
+  }
+]
