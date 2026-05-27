@@ -2,7 +2,6 @@
 
 ## Game-engine development blog (archive)
 
-- **URL:** https://archive-host.github.io/blog_archive/post/writing-a-low-level-sound-system/index.html
 - **Last reviewed:** 2026-05-27
 - **Used for:**
   - `SKILL.md` → Essentials, The render path, Mixing and signal, Voices and control, Gotchas

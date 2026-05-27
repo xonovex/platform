@@ -2,7 +2,6 @@
 
 ## Game-engine development blog (archive)
 
-- **URL:** https://archive-host.github.io/blog_archive/
 - **Last reviewed:** 2026-05-27
 - **Used for:**
   - `SKILL.md` → Essentials, Node model, Typing and connections, Evaluation and reuse, Gotchas
