@@ -23,6 +23,7 @@ description: "Use when designing a central in-memory data model / object databas
 - **Strong = owning sub-object** - A parent owns its sub-objects; deleting the parent deletes them, see [references/references-and-ownership.md](references/references-and-ownership.md)
 - **Weak = reference** - A reference does not own; on delete it resolves to null, never dangles, see [references/references-and-ownership.md](references/references-and-ownership.md)
 - **Local vs global ids** - Local ids inside a file, GUIDs for cross-file/cross-session links, see [references/references-and-ownership.md](references/references-and-ownership.md)
+- **Identity vs role** - A GUID names a fixed identity; a name/path names a role that late-binds — default to GUIDs, see [references/references-and-ownership.md](references/references-and-ownership.md)
 
 ## Mutation
 
@@ -36,6 +37,8 @@ description: "Use when designing a central in-memory data model / object databas
 - **Stable on-disk schema** - Version the format; migrate old files into the new schema on load, see [references/serialization.md](references/serialization.md)
 - **References serialize by id** - Persist ids/GUIDs, re-resolve on load, see [references/serialization.md](references/serialization.md)
 - **Deterministic output** - Stable ordering for diff/version control; choose text vs binary, see [references/serialization.md](references/serialization.md)
+- **Save changes or re-spawn from assets** - Persist member-level deltas for runtime state, asset references for content; POD serializes by default, see [references/serialization.md](references/serialization.md)
+- **ABI-stable struct evolution** - Append fields at the end, add a leading `size`, never reorder/retype; semantic-version the API, see [references/serialization.md](references/serialization.md)
 - **Snapshots & threading** - Publish immutable/copy-on-write versions for readers, see [references/snapshots-and-threading.md](references/snapshots-and-threading.md)
 
 ## Gotchas

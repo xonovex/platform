@@ -1,0 +1,15 @@
+{
+  "name": "@xonovex/skill-imgui",
+  "version": "0.2.5",
+  "private": true,
+  "type": "module",
+  "keywords": [
+    "xonovex",
+    "skill",
+    "imgui"
+  ],
+  "scripts": {
+    "fmt": "prettier --write .",
+    "fmt:check": "prettier --check ."
+  }
+}

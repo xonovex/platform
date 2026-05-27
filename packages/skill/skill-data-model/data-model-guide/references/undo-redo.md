@@ -12,6 +12,7 @@
 - **Undo / redo stacks** - Commit pushes the transaction onto the undo stack. Undo pops it, applies inverses, pushes it onto the redo stack. Any new edit clears the redo stack (you cannot redo into a branch you've diverged from).
 - **Bounding history** - Cap the undo stack by count or by memory; drop the oldest transactions. For large-buffer edits, store deltas or only the changed region rather than whole copies.
 - **Undoable vs not** - Pure model mutations are undoable. External side effects — file writes, network calls, spawning a process — are not; keep them out of the journal or make them idempotent and re-issue on redo deliberately.
+- **Save & undo scope (document model)** - Decide the save model and pair the undo model to it, and be opinionated rather than offering several behind flags: (1) per-asset save/revert pairs with **per-asset undo stacks**; (2) project-wide save/revert pairs with a **single project-wide undo stack**; (3) automatic persistence (no explicit save). Per-asset stacks make cross-document operations (find/replace across many files) painful to undo; a single project stack can surprise users by undoing edits in an unrelated document. Collaboration reintroduces the need for per-user stacks. Prefer resolving inter-document relationships at runtime over persisting them.
 
 **How to Apply:**
 
@@ -53,5 +54,6 @@ edit_t broken = { .target_ptr = obj_ptr }; // dangles on undo of a delete
 - Side effects (writing a file, sending a request) cannot be undone by replaying inverses; either exclude them or model them explicitly so redo re-issues them on purpose.
 - Whole-buffer snapshots for large `buffer`/`array` properties blow up history memory; store region deltas and bound the stack.
 - Transaction boundaries should match user intent: too fine and one click takes many undos; too coarse and unrelated edits undo together.
+- A single project-wide undo stack will undo across documents the user wasn't looking at, with no visual cue; per-document stacks make a cross-document edit impossible to undo atomically. Neither is free — choose deliberately per the save model, don't expose both.
 
 **Related:** [references/change-notification.md](./change-notification.md), [references/references-and-ownership.md](./references-and-ownership.md), [references/snapshots-and-threading.md](./snapshots-and-threading.md)

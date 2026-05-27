@@ -38,6 +38,16 @@
 - **Aspects extracted:**
   - Single-owner/borrow, lifetime-by-scope, leak/double-free/use-after-free avoidance, refcount as exception → `references/ownership-and-lifetimes.md`
 
+## Game-engine development blog (archive)
+
+- **URL:** https://archive-host.github.io/blog_archive/
+- **Last reviewed:** 2026-05-27
+- **Used for:**
+  - `SKILL.md` → Allocation strategy
+  - Practical virtual-memory techniques built on address-space reservation
+- **Aspects extracted:**
+  - "Virtual Memory Tricks" — reserve cheap address space vs commit physical, cap-free never-moving arrays, page-aligned growth to cut fragmentation, gapless ring buffer via double-mapping, end-of-page bounds-checking allocator → `references/virtual-memory.md`
+
 ## Refresh Workflow
 
 1. Re-read the upstream source(s) above

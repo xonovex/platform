@@ -1,0 +1,74 @@
+[
+  {
+    "query": "I'm writing an immediate-mode GUI and my hover highlight flickers between two overlapping panels — how should I decide which control the mouse is over?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "direct: immediate-mode occlusion/hover resolved via frame delay (last-drawn wins)"
+  },
+  {
+    "query": "our editor UI pushes tens of thousands of rectangles to the GPU every frame and it's bandwidth-bound — how do I get the whole UI down to one draw call?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "direct: primitive buffers + index encoding + single draw call"
+  },
+  {
+    "query": "how do I add Tab/Shift-Tab keyboard navigation and 'first responder' style focus to an IMGUI that has no widget tree?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "direct: responder chain, scope stack, event trickling, tab order"
+  },
+  {
+    "query": "I want to drag an item from one panel and drop it onto another panel in my tool — what's the cleanest way to track the drag across windows?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "implicit: data-model-first drag-and-drop, global drag id, cross-window"
+  },
+  {
+    "query": "text in my tool looks blurry on a 4K laptop and crisp on the external monitor when I drag the window across — how should I handle per-monitor scaling?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "implicit: per-monitor DPI, virtual coords, DPI-keyed font atlas"
+  },
+  {
+    "query": "two of my list rows share the same hover state and interaction jumps between them — how should controls be identified each frame?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "implicit: stable unique ids, id-stack scoping, no position-derived ids"
+  },
+  {
+    "query": "build me a React data table with sortable columns and a sticky header using hooks",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: retained-mode web component framework -> react-guide"
+  },
+  {
+    "query": "design the Vulkan command buffer submission and frames-in-flight fencing for my renderer",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: GPU command submission internals -> gpu-rendering-vulkan-guide"
+  },
+  {
+    "query": "in my retained-vs-immediate UI experiment, how do I keep widget state across frames when I re-issue every control from scratch?",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "validation positive: immediate-mode state model, what persists vs recomputed"
+  },
+  {
+    "query": "a keyboard shortcut creates a popup that then immediately reacts to the same keypress that opened it — how do I stop that?",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "validation positive: event ordering / one-frame delay for event-created controls"
+  },
+  {
+    "query": "style this landing page hero section with a bold gradient and tasteful typography",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "validation negative: visual web design -> frontend-design"
+  },
+  {
+    "query": "lay out my CPU entity components as struct-of-arrays so the simulation loop is cache-friendly",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "validation negative: ECS/data layout -> ecs-guide / data-oriented-design-guide"
+  }
+]

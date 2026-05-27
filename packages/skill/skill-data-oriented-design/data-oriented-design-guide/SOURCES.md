@@ -61,6 +61,8 @@
   - Practical engine DOD storage and allocator techniques
 - **Aspects extracted:**
   - "Data Structures Part 1–2: Bulk Data / Indices" — bulk-data store + handle↔index indirection (stable handles AND dense data) → `references/handles-and-indices.md`
+  - "Data Structures Part 3: Arrays of arrays" — variable-length child lists in bulk arrays + cache-line-sized chunks, capped fixed arrays, linked siblings, string interning → `references/nested-arrays.md`
+  - "Defaulting to Zero" — all-zero as a valid default, 0 as none/not-found/neutral, nil enum entry and reserved index-0 → `references/zero-as-default.md`
   - "It's All About The Data" — data-first framing → `references/data-as-transforms.md`
   - "Minimalist container library in C" — contiguous growable containers (noted in c99-opinionated)
 

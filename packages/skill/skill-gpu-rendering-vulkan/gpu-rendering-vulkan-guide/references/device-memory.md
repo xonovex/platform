@@ -12,6 +12,8 @@
 - **Staging upload** - Map a `HOST_VISIBLE` staging buffer, `memcpy`, `vkCmdCopyBufferToImage` / `vkCmdCopyBuffer` into the `DEVICE_LOCAL` target, then a barrier to the read state, see [references/resources-and-barriers.md](./resources-and-barriers.md).
 - **Persistent mapping** - `vkMapMemory` a host-visible block once and keep the pointer; without `HOST_COHERENT`, `vkFlushMappedMemoryRanges` after writes and `vkInvalidateMappedMemoryRanges` before reads.
 - **General-purpose allocator** - A reusable Vulkan allocator over these techniques (block management, type selection, defrag) so call sites never touch raw `VkDeviceMemory`.
+- **Block strategy by size** - A workable split: device-local requests ≤ a block size (e.g. 256 MB) sub-allocate from buddy-managed 256 MB blocks; larger requests get a dedicated `vkAllocateMemory`; staging uses a linear allocator over `max(size, 256 MB)` blocks recycled once the transfer fence signals.
+- **Tagged visual debugging** - Pass a debug tag with every allocation and build a simple occupancy visualization early; buddy power-of-two rounding waste and never-released empty blocks are invisible otherwise (the engine project's tool was ~400 lines / one day and immediately exposed waste).
 
 **Example:**
 

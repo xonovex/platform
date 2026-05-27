@@ -8,9 +8,12 @@
   - `SKILL.md` → Essentials, Object model, References & ownership, Mutation, Persistence
   - The central typed object/property "object database" framing for tools and editors
 - **Aspects extracted:**
-  - "The Story behind The Truth: Designing a Data Model" — typed objects, property kinds, data-driven types, ids → `references/object-model.md`
-  - "References, Ownership, and the Object Model" — id/GUID references, strong sub-object ownership vs weak references, delete-to-null → `references/references-and-ownership.md`
+  - "The Story behind The Truth: Designing a Data Model" — typed objects, property kinds, data-driven types, ids, and the strong sub-object ownership vs weak reference (delete-to-null) model → `references/object-model.md`, `references/references-and-ownership.md`
+  - "Referencing Objects: Names vs GUIDs" — id/GUID references, GUID-as-identity vs name/path-as-role, default-to-GUID hybrid, resolve-once-at-spawn, rename/auto-patch pitfalls → `references/references-and-ownership.md`
   - "Multi-Threading the Truth" — immutable snapshots, copy-on-write versions, atomic publish, per-frame read snapshot → `references/snapshots-and-threading.md`
+  - "One-Click Save Game System (Parts 1–3)" — member-level change tracking (deltas vs snapshots), POD default serializer, asset-reference re-spawn for smaller saves and forward compatibility, declarative persistence opt-in → `references/serialization.md`
+  - "API Versioning" — semantic-versioned API structs, ABI-safe evolution (append at end, leading `size` field, reserved-byte reuse), exact-major / higher-minor matching → `references/serialization.md`
+  - "The Document Model and the engine" — per-asset vs project-wide save/revert and undo-stack scope trade-offs, runtime-resolved inter-document relationships → `references/undo-redo.md`
   - Change tracking, dirty flags, transaction-batched notification → `references/change-notification.md`
   - Versioned serialization, migration of old files, references serialized by id → `references/serialization.md`
 
