@@ -1,0 +1,98 @@
+[
+  {
+    "query": "I want artists to build effects by dragging boxes onto a canvas and connecting their inputs and outputs with wires instead of writing code — how should I structure the thing they're editing",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "core: visual node-based authoring, graph as data with nodes/pins/wires -> node-model.md"
+  },
+  {
+    "query": "each box has little sockets on the left and right and I need to stop people from plugging a color output into a number input — what's the right way to validate a connection as they draw it",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "typed pins, connection validity checked at author time -> typing-and-connections.md"
+  },
+  {
+    "query": "my editor graph is getting walked from scratch every frame and it's slow; I'd rather turn the authored graph into some flat ordered thing once and just run that",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "compile/lower to flattened executable form vs interpret editor graph -> evaluation-and-compilation.md"
+  },
+  {
+    "query": "some nodes do expensive image filtering and I don't want to recompute them when nothing upstream changed — how do I know a node's result is still valid",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "validity-hash caching from node settings + input hashes -> evaluation-and-compilation.md"
+  },
+  {
+    "query": "I want to select a cluster of nodes and collapse them into a single reusable box that I can drop into other graphs, with named inputs and outputs",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "subgraph encapsulation behind a typed interface, create-from-selection -> subgraphs-and-functions.md"
+  },
+  {
+    "query": "how do I run a graph that contains other graphs nested inside it without my evaluator having to understand the nesting — can I just inline them before running",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "flatten/inline subgraphs at compile, evaluator sees flat DAG -> subgraphs-and-functions.md"
+  },
+  {
+    "query": "one input on a node should just use a typed-in default value when there's no wire plugged into it, so I don't need a separate constant node for every literal",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "unwired input falls back to stored constant default -> authoring-and-introspection.md"
+  },
+  {
+    "query": "we want plugins to be able to register brand new box types and new kinds of data that can travel on the wires without touching the core editor",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "data-driven node-type + wire-type registry extensible by plugins -> authoring-and-introspection.md / node-model.md"
+  },
+  {
+    "query": "one node should adapt its input and output types depending on what's wired into it — a CPU image vs a GPU image — instead of me making two near-identical nodes",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "polymorphic/variant node resolving pin types from connections -> typing-and-connections.md"
+  },
+  {
+    "query": "the last node in my graph produces a draw call but nothing actually runs it; where is the work supposed to get scheduled from",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "terminal/output node hands result to owning system which schedules -> node-model.md (scheduling itself -> gpu-rendering-guide)"
+  },
+  {
+    "query": "should one graph output just a single texture, or should I bundle the mesh, material, and textures of a whole object into one big graph — what does that decide for my project",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "asset granularity fine vs uber-graph, sets project data layout -> authoring-and-introspection.md"
+  },
+  {
+    "query": "artists can't tell why the final output looks wrong because they can't see the data coming out of any of the intermediate boxes — how do I let them inspect a wire",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "per-pin introspection / preview of intermediate values -> authoring-and-introspection.md"
+  },
+  {
+    "query": "when I disconnect and reconnect a wire the types of a flexible node go stale and validation lies; when should I re-resolve and re-check",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "re-resolve polymorphic pins + re-validate on every connect/disconnect -> typing-and-connections.md"
+  },
+  {
+    "query": "I need to schedule a frame of render passes with the right barriers and layout transitions across an explicit GPU API",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: GPU render/frame graph scheduling and barriers -> gpu-rendering-guide, not authoring node graphs"
+  },
+  {
+    "query": "how should I lay out a big array of components in struct-of-arrays so iterating them is cache-friendly",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: CPU data-oriented memory layout -> data-oriented-design-guide, not node-graph design"
+  },
+  {
+    "query": "I'm designing the reflectable typed object store with properties and references that everything serializes into",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near-miss: the underlying typed data model / object store -> data-model-guide, not the graph layer on top"
+  }
+]

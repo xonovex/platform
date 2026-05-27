@@ -1,0 +1,104 @@
+[
+  {
+    "query": "our codebase has #ifdef _WIN32 / #ifdef __linux__ branches in basically every source file and adding macOS means touching all of them — how do we restructure so the platform stuff lives in one place",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "direct: concentrate OS access behind one abstraction interface, no scattered #ifdef -> platform-abstraction-layer.md"
+  },
+  {
+    "query": "I want all our OS calls to go through a struct of function pointers so the engine never calls the OS directly and each platform just fills in the struct",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "direct: function-pointer OS interface with per-platform backends -> platform-abstraction-layer.md"
+  },
+  {
+    "query": "we're bringing our game engine up on Linux for the first time — what order should I implement things and how do I keep it building while half the platform layer is missing",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "porting-strategy: interactivity order (window->input->os->audio), stub-first so it keeps linking"
+  },
+  {
+    "query": "the new compiler is throwing a ton of unused-variable warnings and complaining about void foo() declarations that the old build never cared about — is the new toolchain just stricter or are these real",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "porting-strategy: toolchain/compiler-strictness differences are real latent bugs, void f(void)"
+  },
+  {
+    "query": "after switching one of our build targets to 32-bit pointers our hash tables and memcmp comparisons started failing — why would pointer width break struct comparisons",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "porting-strategy / web-wasm: 32-bit pointers change struct padding, breaking hash/memcmp; widen keys, re-pad"
+  },
+  {
+    "query": "I compiled our C app to wasm with emscripten but the tab just freezes — our main loop is a while(running){tick();} and it never gives control back to the browser",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "web-wasm: blocking native loop hangs the tab; use emscripten_set_main_loop cooperative callback"
+  },
+  {
+    "query": "in our emscripten build fopen returns null for assets that load fine natively — how am I supposed to read data files in the browser",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "web-wasm: async I/O, preload into virtual FS (--preload-file) or fetch at runtime"
+  },
+  {
+    "query": "our renderer is Vulkan but browsers only give me WebGL — I don't want to rewrite the whole backend, can I just get the 2D UI drawing on screen in the browser",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "web-wasm: map the UI/2D draw stream down to GL ES, expand compact verts on CPU, defer 3D"
+  },
+  {
+    "query": "I need to find connected gamepads on Linux and read their button presses — how do I enumerate /dev/input and tell a controller apart from a keyboard",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "input-devices: evdev enumeration, by-id symlinks, BTN_GAMEPAD capability probe"
+  },
+  {
+    "query": "my controller's analog sticks drift at rest and the dpad shows up as a single axis — how do I read the deadzone and split the hat into directions",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "input-devices: per-axis flat deadzone via EVIOCGABS, 1:2 hat->dpad mapping table"
+  },
+  {
+    "query": "controllers plugged in after my game launches never get picked up — I only scan devices once at startup, how do I detect hotplug",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "input-devices: hotplug via watching the device directory for changes, not a one-time enumerate"
+  },
+  {
+    "query": "design the render graph so passes declare their reads and writes and the system derives barriers and transient-target aliasing for us",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: GPU renderer architecture (render graph/barriers) -> gpu-rendering-guide, not portability"
+  },
+  {
+    "query": "give me the exact vkCreateSwapchainKHR and VkImageMemoryBarrier2 calls plus the per-frame VkFence for my Vulkan loop",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: concrete Vulkan API how-to -> gpu-rendering-vulkan-guide"
+  },
+  {
+    "query": "set up a CMake target that fetches a dependency with FetchContent and links it PRIVATE with proper include visibility",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "validation negative: build-system mechanics -> cmake-guide, not the porting concept"
+  },
+  {
+    "query": "what naming convention should I use for the SIMD and scalar implementation variants of this C module and how do I lay out the .c files",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "validation negative: C dialect file-naming/implementation variants -> c99-opinionated-guide"
+  },
+  {
+    "query": "I'm porting a native C app to the browser with emscripten: how should I structure the frame loop, load assets, and deal with the renderer only having WebGL",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "validation positive: web-wasm cooperative loop + async assets + GL ES mapping -> web-wasm-builds.md"
+  },
+  {
+    "query": "we want one input interface that mouse, keyboard, and gamepads all feed into, with the platform-specific device reading hidden behind it on each OS",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "validation positive: input as a backend behind the input-source interface -> input-devices.md + platform-abstraction-layer.md"
+  }
+]

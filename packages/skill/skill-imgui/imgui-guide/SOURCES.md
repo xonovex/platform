@@ -14,6 +14,8 @@
   - "Implementing drag-and-drop in an IMGUI" — data-representation-first, global drag id, prepare-drag latch, drop type-check, end-of-frame cancel ordering → `references/drag-and-drop.md`
   - "DPI-aware IMGUI" — per-monitor awareness, virtual vs pixel coordinates, DPI-keyed font atlas (stb_truetype), scale in vertex shader, viewport virtual-resolution default → `references/dpi-scaling.md`
   - Last-drawn-wins hover via `next_hover` promoted at frame end → `references/frame-delay.md`, `references/ids-and-state.md`
+  - "Localization in the engine's UI" — `LOCALIZE()` marker macro, hashing the source string itself as the key (no ID table), context argument for homonyms, swappable localizer interface with source-string fallback, extraction tool for coverage, pseudo-localization ("gibberish") mode padded ~40% longer to catch unmarked strings and layout expansion → `references/localization.md`
+  - "Accessibility in the engine" — per-frame side list of semantic controls (`register_control` with role/label/rect/state) built during drawing, query + virtual-input automation surface, bridging to platform accessibility APIs, zoom via existing DPI scale, high-contrast themes, the "immediate mode does not preclude a retained accessibility tree" framing → `references/accessibility.md`
 
 ## Immediate-mode GUI prior art
 

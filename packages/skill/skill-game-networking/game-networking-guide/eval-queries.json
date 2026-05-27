@@ -1,0 +1,110 @@
+[
+  {
+    "query": "I'm starting a multiplayer game and need to decide whether the server owns all the gameplay objects or if peers can each own their own — and how to keep that flexible if I switch to peer-to-peer later",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "direct: topology + per-object authority, topology-as-config -> topology-and-authority.md"
+  },
+  {
+    "query": "Each participant runs its own copy of the world bound to an address and they talk to each other. How should I structure who accepts connections and who simulates what?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "implicit: node-graph model, node behavior (accept/simulate/replicate) -> topology-and-authority.md"
+  },
+  {
+    "query": "When a player's position changes on the host, how do I get only the changed objects out to the other machines instead of broadcasting the whole world every frame?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "direct: per-frame deltas, relevancy, owner-watches-changes -> state-replication.md / delta-and-snapshots.md"
+  },
+  {
+    "query": "How do I mark which entities and which of their components actually get sent over the wire? Right now I think I'm syncing everything by accident.",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "direct: two-level opt-in (component capability + per-object flag) -> state-replication.md"
+  },
+  {
+    "query": "My replicated structs send the whole blob even when one float changed. How do I get it to only transmit the members that actually changed?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "direct: whole-blob default vs per-field layout description -> state-replication.md"
+  },
+  {
+    "query": "A new client just connected mid-match and its world is garbage — I'm only sending the per-frame changes. What am I missing?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "direct: delta needs a baseline; new connection needs a full snapshot first -> delta-and-snapshots.md"
+  },
+  {
+    "query": "Can I reuse my save-game serialization to send and apply state updates over the connection, or do I need a separate path?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "implicit: replication reuses the save/load dump+apply path -> delta-and-snapshots.md"
+  },
+  {
+    "query": "I built everything on UDP and now some critical messages get dropped while others I don't care about clog the line. How should I decide reliability per message?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "direct: per-packet-type delivery guarantee, head-of-line tradeoff -> transport-and-channels.md"
+  },
+  {
+    "query": "My connection setup opens a second channel every time the response gets lost and the client retries. How should the handshake behave?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "direct: idempotent request/accept handshake, pipe ids -> transport-and-channels.md"
+  },
+  {
+    "query": "I want to run a server and a client in the same process to debug, then deploy them to separate machines without changing code. How do I make local talk behave like remote?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "direct: virtual networking / in-process short-circuit -> dev-iteration-and-observability.md"
+  },
+  {
+    "query": "How can I fake 150ms of lag and a bandwidth cap in the editor so I can reproduce a desync bug without a real bad network?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "direct: injected latency/bandwidth + packet inspection -> dev-iteration-and-observability.md"
+  },
+  {
+    "query": "I need to fire a remote event at a specific entity on the other side and sometimes the order of these events matters and sometimes it doesn't. How should I send them?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "implicit: replicate event by id, ordered vs unordered delivery -> state-replication.md / transport-and-channels.md"
+  },
+  {
+    "query": "Both my host and a client think they own the same crate and they keep snapping it back and forth. How do I resolve this?",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "direct: singular authority per object -> topology-and-authority.md"
+  },
+  {
+    "query": "I want one project that ships as single-player but can also run multiplayer by having one process play all the roles. How do I branch on that?",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "implicit: topology-switch catch-all path runs all branches -> dev-iteration-and-observability.md"
+  },
+  {
+    "query": "Restructure this CPU particle array from array-of-structs to struct-of-arrays so the update loop stops missing cache",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: in-engine memory layout -> data-oriented-design-guide, not networking"
+  },
+  {
+    "query": "Should an entity be able to hold two of the same component, like two colliders, or model it differently in my ECS?",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: component model design -> ecs-guide, not networking"
+  },
+  {
+    "query": "How do I give every asset and object a stable GUID so references survive save/load and renaming?",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near-miss: typed object/id model -> data-model-guide, not networking (networking only reuses those ids)"
+  },
+  {
+    "query": "I need to insert the right resource barriers between my render passes and alias transient targets on the GPU",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near-miss: GPU frame graph -> gpu-rendering-guide, not networking"
+  }
+]

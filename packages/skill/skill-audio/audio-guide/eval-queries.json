@@ -1,0 +1,98 @@
+[
+  {
+    "query": "my sound randomly cuts out with a little pop when the frame rate dips — the mixing happens in a callback that sometimes grabs a mutex",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "audio underrun from a lock on the callback path -> audio-callback-thread.md"
+  },
+  {
+    "query": "how big should I make the playback buffer? smaller feels more responsive but I keep getting dropouts on a usb headset",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "latency vs buffer size, queue-ahead vs starvation -> audio-callback-thread.md"
+  },
+  {
+    "query": "when I change a sound's volume there's an audible click — I just set the new value each frame",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "gain must be ramped, not snapped -> mixing-and-buffers.md"
+  },
+  {
+    "query": "I'm summing a bunch of 16-bit sounds into one output and it crackles and distorts when several are loud at once",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "integer overflow on mix; accumulate in float and scale to fit -> mixing-and-buffers.md"
+  },
+  {
+    "query": "I have a 22 kHz wav and my mixer runs at 44.1 kHz — how do I play it back at the right speed, and can I also pitch it up an octave?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "sample-rate conversion + pitch via step -> resampling-and-dsp.md"
+  },
+  {
+    "query": "what's a good way to limit how many sounds play at once and pick which one to drop when I run out?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "fixed voice pool and voice stealing -> voice-management.md"
+  },
+  {
+    "query": "my game thread sets a playing sound's position directly while the mixer reads it and I get garbage — how should the two threads communicate?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "command handoff, value messages, audio thread owns state -> command-handoff.md"
+  },
+  {
+    "query": "I pitch a looping clip up and it glitches at the loop point now",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "read cursor advances faster under pitch; couple to loop/length -> resampling-and-dsp.md"
+  },
+  {
+    "query": "give me a generic single-producer single-consumer ring buffer with the right acquire/release ordering",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: the queue internals are owned by lock-free-guide"
+  },
+  {
+    "query": "design a preallocated fixed-size pool allocator so I never call malloc at runtime",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: generic no-realtime-allocation pool -> memory-management-guide"
+  },
+  {
+    "query": "convert my array-of-structs particle data to struct-of-arrays for cache locality",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: data layout -> data-oriented-design-guide"
+  },
+  {
+    "query": "the render thread needs to feed the device exactly one fixed block each time without ever allocating — what work is safe to do in there?",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "real-time callback contract, bounded work -> audio-callback-thread.md"
+  },
+  {
+    "query": "panning and 3d positioning a voice — is there one structure that covers volume and channel routing together?",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "per-voice gain matrix m[ic][oc] -> mixing-and-buffers.md"
+  },
+  {
+    "query": "I want each sound effect to have its own playback speed without affecting the others",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "per-voice fractional step / pitch -> resampling-and-dsp.md"
+  },
+  {
+    "query": "stopping a sound instantly clicks; how do I retire a voice cleanly and reuse its slot?",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "ramp-to-zero before freeing the slot -> voice-management.md / mixing-and-buffers.md"
+  },
+  {
+    "query": "wire up a thread pool with an async job API so I can await results from worker threads",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near-miss: high-level async/pool usage, not real-time audio"
+  }
+]

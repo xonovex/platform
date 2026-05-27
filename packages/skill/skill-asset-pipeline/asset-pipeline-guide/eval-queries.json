@@ -1,0 +1,98 @@
+[
+  {
+    "query": "our editor lets artists drop in an FBX or PNG and we want them edited in-tool but shipped as packed GPU-ready data — how should we structure the two forms so editing and loading don't fight each other",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "raw-vs-runtime-formats: editable intermediate vs derived packed runtime form"
+  },
+  {
+    "query": "we want one plugin per file format that just parses into a common scene representation, and then separate per-type steps that turn meshes and textures into runtime data",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "import-and-compile: importers keyed by format, per-type compilers"
+  },
+  {
+    "query": "changing the texture compression preset doesn't seem to rebuild anything, artists keep seeing the old result until they delete the cache by hand",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "import-and-compile + content-hash: settings must be inputs folded into the cache key"
+  },
+  {
+    "query": "why does editing one shader include header force a rebuild of our entire content set instead of just the materials that use it",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "dependency-tracking: record real inputs, recook only the dependency closure"
+  },
+  {
+    "query": "I want a build cache that two developers and CI can all share so if one person already baked an asset nobody else has to bake it again",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "content-hash-and-cache: content-addressed, reproducible, shareable cache"
+  },
+  {
+    "query": "when an artist saves a texture I want it to update in the running game without a restart, but doing it now occasionally crashes mid-frame",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "hot-reloading-content: background recompile + atomic swap + retire behind in-flight fence"
+  },
+  {
+    "query": "each bake step should be able to skip its work if nothing it depends on changed — what's the general way to decide that cheaply",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "content-hash-and-cache + dependency-tracking: validity hash folding in input hashes"
+  },
+  {
+    "query": "our cook produces slightly different output bytes on CI than on my machine so the cache never hits — how do I make the compile reproducible",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "import-and-compile: determinism, no clock/abs-path/host/env, canonical content"
+  },
+  {
+    "query": "we need to emit different compressed texture formats and byte order per target platform but share one source asset — how should the pipeline handle platforms",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "import-and-compile: target platform as an input folded into output and cache key"
+  },
+  {
+    "query": "references between our baked assets break whenever someone renames or moves a source file — how should asset dependencies be keyed so they survive reorg",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "dependency-tracking: edges by stable identity (GUID) not path"
+  },
+  {
+    "query": "should we do all the mip generation and vertex optimization while importing the FBX, or keep import dumb and do that later",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "raw-vs-runtime-formats: minimal massaging on import, heavy work deferred to compile"
+  },
+  {
+    "query": "a file watcher fires several times for one save and we end up recompiling the asset three times in a row",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "hot-reloading-content: debounce/coalesce watcher events"
+  },
+  {
+    "query": "how should I lay out the cooked vertex and index data in memory so the runtime iterates it cache-efficiently",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: runtime memory layout of cooked data -> data-oriented-design-guide"
+  },
+  {
+    "query": "I'm modeling assets as typed objects that reference each other by id — how should I design the schema and the reference fields themselves",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near-miss: how assets are modeled as typed objects/references -> data-model-guide"
+  },
+  {
+    "query": "what discipline keeps my C structs and function pointers safe to swap when I reload a shared library at runtime",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near-miss: reload-safety discipline of the C code itself -> c99-opinionated-guide"
+  },
+  {
+    "query": "how do I declare render passes so the frame graph derives barriers and transitions for my Vulkan renderer",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near-miss: GPU render-graph architecture -> gpu-rendering-guide, not the asset pipeline"
+  }
+]

@@ -75,8 +75,8 @@
 - **URL:** https://archive-host.github.io/blog_archive/
 - **Last reviewed:** 2026-05-27
 - **Used for:**
-  - `SKILL.md` → Architecture, Resources, Synchronization, Gotchas
-  - A worked, shipped instance of the cross-API architecture: declarative passes, frequency-grouped binding, sort-key scheduling, sub-allocated device memory, and multi-GPU
+  - `SKILL.md` → Architecture, Resources, Output, Synchronization, Gotchas
+  - A worked, shipped instance of the cross-API architecture: declarative passes, frequency-grouped binding, sort-key scheduling, sub-allocated device memory, multi-GPU, programmable vertex fetch, GPU compute simulation, and HDR output
 - **Aspects extracted:**
   - "A modern rendering architecture", "Simple Parallel Rendering" — 64-bit sort key per command decoupling GPU order from CPU record order, merge-and-sort worker streams before submit → `references/command-recording-and-frames.md` (the per-viewer visibility-bitmask / visit-once model is owned by **ecs-guide** rendering-integration)
   - "High-Level Rendering Using Render Graphs" — setup/execute pass split, root-pass culling, transient lifetimes, nested modules with extension points → `references/render-graph.md`
@@ -84,6 +84,9 @@
   - "the engine Shader System (parts 1–3)" — declarative composable shader declarations (imports/code/state, last-write-wins), generated accessors, system-bitmask variant selection, materials as a superset binder → `references/shader-system.md`
   - "Device Memory Management" — few large blocks + sub-allocation, buddy ≤256 MB vs dedicated above, build visual allocator debugging early → `references/gpu-memory-strategy.md`
   - "Explicit Multi-GPU Programming", "Moving the engine to Bindless" — device-affinity masks; single global descriptor array with indices embedded in handles (the bindless principle behind the binding model) → `references/binding-model.md`, `references/synchronization.md`
+  - "Vertex Assembly and Skinning" — programmable vertex pull from byte-address buffers behind a loader interface, active-channel bitflags + offset/stride, packed skin-influence word (count + offset into a shared influence buffer), in-shader linear blend skinning, ping-pong bone matrices for motion vectors → `references/vertex-assembly-skinning.md`
+  - "GPU Simulation" — GPU-resident element state in ring buffers, event-triggered init/spawn/update compute stages, GPU-tracked live count feeding indirect dispatch/draw, double-buffered state, atomics/append for spawn and compaction → `references/gpu-compute-simulation.md`
+  - "Supporting Native HDR Monitors" — wide-gamut PQ (Rec.2020/ST2084) vs extended-linear scRGB swapchains, ≥10-bit/FP16 to avoid banding, linear pipeline with an explicit final color-space (3×3 to output primaries) + transfer encode, paper-white scaling to the display's real peak nits, encode-once / row-vs-column matrix pitfalls → `references/hdr-output.md`
 
 ## Refresh Workflow
 

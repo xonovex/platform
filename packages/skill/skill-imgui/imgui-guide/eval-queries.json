@@ -70,5 +70,35 @@
     "should_trigger": false,
     "split": "validation",
     "rationale": "validation negative: ECS/data layout -> ecs-guide / data-oriented-design-guide"
+  },
+  {
+    "query": "I need to translate all the text in my immediate-mode tool UI into other languages without maintaining a giant table of string IDs — what's a good approach?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "localization: hash source string as key, swappable localizer, extraction tool, pseudo-loc"
+  },
+  {
+    "query": "how do I tell which UI strings I forgot to wrap for translation, and make sure the layout doesn't break when translations are longer?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "localization: pseudo-localization (gibberish) mode padded longer to catch unmarked strings + expansion"
+  },
+  {
+    "query": "people keep telling me an immediate-mode GUI can't support a screen reader — how do I expose my widgets to assistive tech and keyboard-only users?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "accessibility: per-frame side semantic list registered while drawing, bridged to platform a11y APIs"
+  },
+  {
+    "query": "I want my editor's controls to be drivable by an automation/UI-test harness that can find a button by label and inject clicks — how do I structure that in my IMGUI?",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "validation positive: accessibility automation surface (find_control + virtual input) from the side list"
+  },
+  {
+    "query": "translate the copy on my marketing landing page into French and German with a CMS",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near-miss: web content localization, not an immediate-mode UI string system -> not this skill"
   }
 ]

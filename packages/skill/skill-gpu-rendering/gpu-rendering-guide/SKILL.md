@@ -26,6 +26,8 @@ API-agnostic architecture for a low-level GPU renderer. The concepts hold across
 - **Command recording** - One recording context per thread per frame, multi-threaded record, see [references/command-recording-and-frames.md](references/command-recording-and-frames.md)
 - **Frames in flight** - Double/triple-buffer per-frame resource sets behind a fence so the CPU can't outrun the GPU, see [references/command-recording-and-frames.md](references/command-recording-and-frames.md)
 - **Sort keys** - A 64-bit key per command decouples GPU submission order from CPU record order; merge worker streams and sort before submit, see [references/command-recording-and-frames.md](references/command-recording-and-frames.md)
+- **Programmable vertex fetch** - Pull vertices from storage buffers behind a loader interface instead of fixed-function input; skin in-shader from an indirected influence list, see [references/vertex-assembly-skinning.md](references/vertex-assembly-skinning.md)
+- **GPU-resident simulation** - Keep large element state in GPU buffers, advance with compute, and drive draws from a GPU-tracked count via indirect args — no CPU enumeration or readback, see [references/gpu-compute-simulation.md](references/gpu-compute-simulation.md)
 
 ## Resources
 
@@ -33,6 +35,10 @@ API-agnostic architecture for a low-level GPU renderer. The concepts hold across
 - **Uploads** - Staging buffer → device-local copy; persistent-mapped ring buffers for per-frame data, see [references/gpu-memory-strategy.md](references/gpu-memory-strategy.md)
 - **Pipeline state** - Precompile and cache pipeline objects; avoid first-use compile stalls, see [references/binding-model.md](references/binding-model.md)
 - **Binding model** - Group bindings by update frequency, bindless arrays + handles, inline constants for tiny data, see [references/binding-model.md](references/binding-model.md)
+
+## Output
+
+- **HDR output** - Wide-gamut PQ/scRGB swapchain at ≥10-bit/FP16, linear pipeline, own the final color-space + transfer encode scaled to the display's real peak nits, see [references/hdr-output.md](references/hdr-output.md)
 
 ## Synchronization
 
@@ -48,6 +54,8 @@ API-agnostic architecture for a low-level GPU renderer. The concepts hold across
 - Host-coherent memory skips explicit flush/invalidate but is not free; large dynamic data still wants a device-local copy via staging.
 - Recording into a per-frame context whose previous submission's fence has not signaled corrupts in-flight GPU work — gate reuse on the fence.
 - Re-using a transient target the graph aliased to another lifetime, then reading it later, returns garbage; lifetimes must not overlap.
+- Applying a display transfer function twice (an automatic sRGB backbuffer plus your own HDR encode) double-darkens and loses precision in the shadows — encode exactly once.
+- Reading GPU-simulation results back to the CPU each frame reintroduces the full pipeline stall you went to the GPU to avoid; consume them on the GPU via indirect draw.
 
 ## Progressive Disclosure
 
@@ -57,3 +65,6 @@ API-agnostic architecture for a low-level GPU renderer. The concepts hold across
 - Read [references/synchronization.md](references/synchronization.md) - Load when placing barriers, queue waits, fences, or reasoning about queue timelines
 - Read [references/command-recording-and-frames.md](references/command-recording-and-frames.md) - Load when recording commands, threading recording, or sizing frames-in-flight
 - Read [references/gpu-memory-strategy.md](references/gpu-memory-strategy.md) - Load when planning GPU memory tiers, sub-allocation, or uploads
+- Read [references/vertex-assembly-skinning.md](references/vertex-assembly-skinning.md) - Load when designing vertex fetch, vertex packing, morph targets, or GPU skinning
+- Read [references/gpu-compute-simulation.md](references/gpu-compute-simulation.md) - Load when simulating many elements (particles/agents) on the GPU with compute and indirect dispatch
+- Read [references/hdr-output.md](references/hdr-output.md) - Load when adding HDR output, picking a swapchain color space/format, or encoding for the display

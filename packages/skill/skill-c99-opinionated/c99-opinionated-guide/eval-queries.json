@@ -121,5 +121,23 @@
     "should_trigger": false,
     "split": "validation",
     "rationale": "wrong language"
+  },
+  {
+    "query": "editing one header in our C engine triggers a near-full rebuild and compiles are crawling — how should I restructure headers and includes to fix incremental build times?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "physical-design: no header-includes-header rule, one header per system, opaque handles, acyclic deps"
+  },
+  {
+    "query": "I want my C engine to be a set of DLLs that register capabilities and discover each other at runtime by name instead of linking against each other — how do I structure the interfaces?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "plugin-architecture: string-keyed registry of plain-C function-pointer interfaces, runtime discovery"
+  },
+  {
+    "query": "we need to call our C library from Lua and C# — how should I shape the C API so it's easy to bind and generate wrappers for, and what should I avoid?",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "cross-language-api: portable C subset, flat data, call-scoped pointers, spec-generated bindings"
   }
 ]

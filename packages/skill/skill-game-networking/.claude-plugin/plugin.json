@@ -1,0 +1,7 @@
+{
+  "name": "xonovex-skill-game-networking",
+  "version": "0.2.5",
+  "description": "Xonovex Game networking skills",
+  "author": {"name": "Xonovex"},
+  "skills": ["./game-networking-guide"]
+}

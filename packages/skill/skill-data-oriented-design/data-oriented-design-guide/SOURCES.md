@@ -57,14 +57,15 @@
 - **URL:** https://archive-host.github.io/blog_archive/
 - **Last reviewed:** 2026-05-27
 - **Used for:**
-  - `SKILL.md` → Layout, Memory
-  - Practical engine DOD storage and allocator techniques
+  - `SKILL.md` → Essentials, Layout, Memory
+  - Practical engine DOD storage, allocator, and low-overhead telemetry techniques
 - **Aspects extracted:**
   - "Data Structures Part 1–2: Bulk Data / Indices" — bulk-data store + handle↔index indirection (stable handles AND dense data) → `references/handles-and-indices.md`
   - "Data Structures Part 3: Arrays of arrays" — variable-length child lists in bulk arrays + cache-line-sized chunks, capped fixed arrays, linked siblings, string interning → `references/nested-arrays.md`
   - "Defaulting to Zero" — all-zero as a valid default, 0 as none/not-found/neutral, nil enum entry and reserved index-0 → `references/zero-as-default.md`
   - "It's All About The Data" — data-first framing → `references/data-as-transforms.md`
   - "Minimalist container library in C" — contiguous growable containers (noted in c99-opinionated)
+  - "Recording Statistics — An Exercise in Minimalism" — per-frame accumulating counters, API evolution from string-hash lookup → cached index → returned accumulator pointer (one store, no lookup/branch/lock), `{name, history ring, frame_value}` layout, lazy history allocation for viewed counters only, graph-vs-table readout → `references/statistics-recording.md`
 
 ## Refresh Workflow
 
