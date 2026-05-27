@@ -1,0 +1,98 @@
+[
+  {
+    "query": "our exporter crashes opening the second project but the first one is fine — where do I even start",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "systematic debugging: establish a repro, step before the crash -> scientific-debugging.md / reproduction-and-bisection.md"
+  },
+  {
+    "query": "I'm getting a read access violation and the pointer's memory is all 0xdddddddd, what does that mean",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "freed-memory fill pattern at a mapped address = use-after-free -> scientific-debugging.md"
+  },
+  {
+    "query": "the packaging command crashes but it's slow — can you help me find a smaller way to trigger it",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "shrink to a minimal deterministic repro -> reproduction-and-bisection.md"
+  },
+  {
+    "query": "this regression appeared sometime in the last 200 commits, how do I find which change broke it",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "git bisect on a deterministic repro -> reproduction-and-bisection.md"
+  },
+  {
+    "query": "stop the team from chasing the same buffer-overwrite class of bug — what design would make it crash instantly at the bad write instead",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "end-of-page allocator prevents the overwrite class -> bug-taxonomy.md / instrumentation-and-checks.md"
+  },
+  {
+    "query": "I keep editing things at random trying to make the crash go away and it's not working",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "flailing vs hypothesis-driven debugging -> scientific-debugging.md"
+  },
+  {
+    "query": "this bug only shows up once an hour and I can't catch it in the debugger — how do I make it reproducible",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "intermittent: stress to raise rate, circular log, record/replay -> determinism-and-replay.md"
+  },
+  {
+    "query": "add assertions so a bad precondition fails loudly at the call site instead of corrupting state later",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "assertions/invariants as tripwires -> instrumentation-and-checks.md"
+  },
+  {
+    "query": "I want to tag every allocation with file and line and check the counter is zero on shutdown to catch leaks",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "allocation instrumentation for leak detection -> instrumentation-and-checks.md"
+  },
+  {
+    "query": "should I just never destroy the document and clean up at exit so we stop hitting these dangling-pointer crashes",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "prevention reflection: never-free hides bugs; proper teardown exposes them -> bug-taxonomy.md"
+  },
+  {
+    "query": "design the ownership convention for our parser buffers so there are no leaks or double-frees on error paths",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: lifetime/ownership design -> memory-management-guide, not finding a bug"
+  },
+  {
+    "query": "free nodes safely in our lock-free stack while other threads might still be reading them",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: concurrent reclamation / race correctness -> lock-free-guide"
+  },
+  {
+    "query": "the update loop is too slow, profile it and tell me which cache misses to fix",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: profiling for speed / cache layout -> data-oriented-design-guide"
+  },
+  {
+    "query": "I have a 100% repro of a use-after-free; walk me through forming a hypothesis and confirming it before I touch the code",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "hypothesis, one change, confirm before fixing -> scientific-debugging.md"
+  },
+  {
+    "query": "make our engine tick a deterministic function of its inputs so the same input replays the same crash every time",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "designing for determinism + replay -> determinism-and-replay.md"
+  },
+  {
+    "query": "convert this AoS particle array to SoA so the hot loop is cache friendly",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near-miss: data layout for performance -> data-oriented-design-guide"
+  }
+]

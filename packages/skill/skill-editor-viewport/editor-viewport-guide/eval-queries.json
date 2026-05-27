@@ -1,0 +1,110 @@
+[
+  {
+    "query": "in our level editor clicking on a character that's GPU-skinned never selects it because we ray-cast against physics shapes and skinned meshes have none — how should we figure out what's under the cursor",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "object-picking: render ids and read back the pixel under the cursor instead of CPU ray-casting proxies"
+  },
+  {
+    "query": "we render an object id into a buffer to know what the mouse is over, but reading that pixel back every frame tanks our framerate",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "object-picking: queue an async read-back consumed a frame or two later instead of a synchronous stall"
+  },
+  {
+    "query": "two surfaces at the same pixel sometimes report the wrong object because both threads pass the depth test and the last one wins — the stored id doesn't match the stored depth",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "object-picking: atomic-min on depth plus a spinlock so the id stays consistent with the winning depth"
+  },
+  {
+    "query": "I want a clean one-pixel outline around the selected mesh that still shows up faintly when it's hidden behind a wall",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "selection-highlighting: id edge-detect outline, dim occluded outline via depth compare instead of dropping it"
+  },
+  {
+    "query": "our selection outline shimmers and crawls every frame and we think it's because of the temporal AA jitter on the depth buffer",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "selection-highlighting: take the closest selection depth over a neighborhood before comparing to scene depth to survive TAA jitter"
+  },
+  {
+    "query": "what's an efficient way to find silhouette edges of selected objects in a fullscreen pass without nine separate texture samples per pixel",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "selection-highlighting: GatherRed a 2x2 block per instruction and compare neighbor ids to the center"
+  },
+  {
+    "query": "right now every component type implements its own translate handle and they all behave slightly differently — I want one move/rotate/scale tool that works on splines and regular transforms alike",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "manipulation-gizmos: central gizmo, components expose a queried get/set-transform interface"
+  },
+  {
+    "query": "how do I let a custom component expose a draggable handle to the editor's transform tool without the editor hard-coding knowledge of that component",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "manipulation-gizmos: register a queried function-pointer transform interface, looked up by name, not inheritance"
+  },
+  {
+    "query": "when I start dragging the move handle along the X axis and then swing the camera so the axis is nearly edge-on, the object shoots backwards instead of following my cursor",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "gizmo-math: the fake 3D mouse ray is skew-line distance; project the axis into screen space instead"
+  },
+  {
+    "query": "my translate gizmo jumps to the cursor on the first frame of the drag and our math divides by something that's basically zero when the handle points toward the camera",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "gizmo-math: apply the delta from a stored start parameter and guard near-parallel/degenerate denominators with an epsilon"
+  },
+  {
+    "query": "our transform handles become tiny and unclickable when the camera pulls back — how do I keep them a constant size on screen",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "gizmo-math: scale handle geometry by camera distance for constant on-screen pixel size"
+  },
+  {
+    "query": "where should the boundary sit between editor code and the renderer for things like the grid and selection overlays so editor code never touches command buffers",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "render-editor-integration: thin POD data seam, viewport layer owns pipeline details, composite after post in sRGB"
+  },
+  {
+    "query": "design the render graph passes and the resource-barrier transitions for our deferred lighting and bloom chain on Vulkan",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: renderer's own pass/target/barrier plumbing -> gpu-rendering-guide, not the editor viewport seam"
+  },
+  {
+    "query": "I need a fast quaternion slerp and a 4x4 matrix inverse for our math library's vec/mat types",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: the math-type library itself -> c99-game-opinionated-guide, not gizmo viewport interaction"
+  },
+  {
+    "query": "model the component/entity data so each renderable stores its transform and the system iterates them cache-friendly",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near-miss: generic component/data model layout -> ecs-guide / data-model-guide, not the viewport gizmo interface"
+  },
+  {
+    "query": "clicking in the 3D view should pick whatever the user actually sees, including alpha-cut foliage and voxel terrain, and then draw a crisp highlight around it",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "validation positive: GPU id-buffer pixel-perfect picking + id edge-detect selection outline"
+  },
+  {
+    "query": "make the editor's drag tool manipulate the right transform when an object has several positionable parts, and apply moves in either world or local space on a modifier key",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "validation positive: gizmo priority to disambiguate components, get_transform returns both world and local"
+  },
+  {
+    "query": "show me the exact VkImageMemoryBarrier2 and vkCmdPipelineBarrier2 for transitioning my id render target from color-attachment to a sampled read",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "validation negative: concrete Vulkan barrier how-to -> gpu-rendering-vulkan-guide, not the viewport seam"
+  }
+]

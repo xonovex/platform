@@ -10,6 +10,7 @@ description: "Use when designing or refactoring performance-critical data layout
 - **The problem is data movement** - Optimize cache traffic, not instruction count, see [references/cache-behavior.md](references/cache-behavior.md)
 - **Design from the data** - Model bulk input→output transforms, not idealized objects, see [references/data-as-transforms.md](references/data-as-transforms.md)
 - **Measure first** - Profile cache misses before changing layout, see [references/measurement-and-profiling.md](references/measurement-and-profiling.md)
+- **Record cheaply, always on** - Per-frame accumulating counters recorded via a cached accumulator pointer (one store, no lookup/branch/lock), history allocated only for viewed counters, see [references/statistics-recording.md](references/statistics-recording.md)
 
 ## Layout
 
@@ -36,6 +37,7 @@ description: "Use when designing or refactoring performance-critical data layout
 - A generational handle prevents use-after-free dangling on swap-remove, but only if you actually compare the generation.
 - The hardware prefetcher tracks linear strides; randomizing your index order silently disables it.
 - Padding for alignment trades memory for throughput — on cache-bound loads, the smaller packed layout can still win.
+- A counter you cache as a raw pointer dangles if its backing array reallocates — hand out indices into a stable block, or pointers into a non-relocating pool.
 
 ## Progressive Disclosure
 
@@ -50,3 +52,4 @@ description: "Use when designing or refactoring performance-critical data layout
 - Read [references/nested-arrays.md](references/nested-arrays.md) - Load when objects own variable-length child lists, or you're reaching for a per-object growable container
 - Read [references/zero-as-default.md](references/zero-as-default.md) - Load when choosing sentinels, nil values, or default-initialized state
 - Read [references/measurement-and-profiling.md](references/measurement-and-profiling.md) - Load when measuring before/after or reading hardware counters
+- Read [references/statistics-recording.md](references/statistics-recording.md) - Load when building always-on counters/telemetry that must add near-zero overhead on hot paths

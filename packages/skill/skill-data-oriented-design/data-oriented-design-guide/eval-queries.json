@@ -88,5 +88,17 @@
     "should_trigger": false,
     "split": "validation",
     "rationale": "validation negative: game-engine C style -> c99-game-opinionated-guide"
+  },
+  {
+    "query": "I want always-on counters for draw calls and allocations that I can leave in the hot path without slowing it down, and plot over the last few hundred frames to catch hitches",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "statistics-recording: per-frame accumulator, cached pointer (one store), ring history, graph readout"
+  },
+  {
+    "query": "my profiling counters do a string hash and hashtable lookup on every record call and it's showing up in the profile — how do I make recording basically free?",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "validation positive: statistics-recording returned-accumulator-pointer pattern, lazy history"
   }
 ]

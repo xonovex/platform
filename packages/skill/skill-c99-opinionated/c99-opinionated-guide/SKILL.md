@@ -20,6 +20,9 @@ description: "Use when editing systems or embedded C99 code in projects that fol
 - **Alignment** - C `_Alignas`/aligned allocation; the _why_ is in **data-oriented-design-guide** (SIMD) and **lock-free-guide** (false sharing), see [references/alignment.md](references/alignment.md)
 - **Composability** - Composable stages/primitives over a uniform currency, explicit caller-wired composition, see [references/composability.md](references/composability.md)
 - **Hot reload** - Reloadable native modules via API/function-pointer tables + host-owned state, see [references/hot-reload.md](references/hot-reload.md)
+- **Physical design** - Headers don't include headers; one header = one system's interface; opaque handles + forward declarations; acyclic deps and fast incremental builds, see [references/physical-design.md](references/physical-design.md)
+- **Plugin architecture** - Small plugins talking through a string-keyed registry of plain-C function-pointer interfaces; runtime discovery, lean core, see [references/plugin-architecture.md](references/plugin-architecture.md)
+- **Cross-language APIs** - Plain-C portable-subset surface, flat data over pointers, call-scoped pointers, spec-generated bindings, see [references/cross-language-api.md](references/cross-language-api.md)
 - **File naming** - `*_type.h`, `*_impl.h`, `*_aos.h`, `*_soa.h`, `*_simde.h`, see [references/file-naming.md](references/file-naming.md)
 
 ## Safety
@@ -34,6 +37,9 @@ description: "Use when editing systems or embedded C99 code in projects that fol
 - Designated initializers leave unmentioned fields zero-initialized — relying on that for safety means a missing field is silent
 - `unsigned` overflow is defined; signed overflow is undefined behavior — never rely on signed wrap
 - `alignof`/`alignas` interact subtly with `malloc` (always returns max-align) vs custom allocators
+- One header including another silently reintroduces the include cascade and recompilation storms — keep the no-header-includes rule machine-checked in CI
+- A cached plugin-interface or cross-module function pointer dangles after reload/unload — re-fetch from the registry, never stash it across that boundary
+- A C API that lets a caller keep a borrowed pointer past the call is a lifetime contract a GC language can't honor; default to call-scoped pointers and document the rare exceptions
 
 ## Progressive disclosure
 
@@ -48,6 +54,9 @@ description: "Use when editing systems or embedded C99 code in projects that fol
 - Read [references/alignment.md](references/alignment.md) - Load when aligning data for SIMD or cache performance
 - Read [references/composability.md](references/composability.md) - Load when designing pipelines, multi-stage transforms, or reusable primitive APIs
 - Read [references/hot-reload.md](references/hot-reload.md) - Load when making native code reloadable at runtime or designing a plugin/module boundary
+- Read [references/physical-design.md](references/physical-design.md) - Load when organizing headers/translation units, cutting build times, or breaking include/dependency cycles
+- Read [references/plugin-architecture.md](references/plugin-architecture.md) - Load when designing a plugin system, an interface/API registry, or runtime discovery between decoupled components
+- Read [references/cross-language-api.md](references/cross-language-api.md) - Load when designing a C API to be bound from other languages (Lua/C#/Rust/Python) or generating bindings
 - Read [references/file-naming.md](references/file-naming.md) - Load when organizing headers by type, implementation, and variant
 - Read [references/testing-patterns.md](references/testing-patterns.md) - Load when writing tests with assertions, epsilon comparisons, or parity checks
 - Read [references/safety-validations.md](references/safety-validations.md) - Load when validating inputs for capacity, bounds, NULL, or overflow

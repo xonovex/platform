@@ -88,5 +88,47 @@
     "should_trigger": false,
     "split": "validation",
     "rationale": "validation negative: concrete Vulkan swapchain how-to -> gpu-rendering-vulkan-guide"
+  },
+  {
+    "query": "I want my vertex shader to read positions straight out of a big storage buffer instead of binding a vertex layout, so I can support quantized formats and morph targets from one shader",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "vertex-assembly-skinning: programmable vertex pull behind a loader, custom packing, morph targets"
+  },
+  {
+    "query": "our characters animate but the bone count per vertex varies a lot and a fixed 4-bone vertex format wastes memory — how should I store skin influences and do the blend on the GPU",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "vertex-assembly-skinning: indirected influence list (count+offset), in-shader linear blend skinning"
+  },
+  {
+    "query": "we have a million particles and uploading them every frame and reading results back is killing us — I want the whole simulation to live on the GPU and drive its own draw count",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "gpu-compute-simulation: GPU-resident state, compute update, indirect draw from GPU-tracked count"
+  },
+  {
+    "query": "how do I structure a compute-based particle system so spawning and updating are separate dispatches over GPU-resident ring buffers without CPU readback stalls",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "validation positive: gpu-compute-simulation event-triggered stages, ring buffer, no readback"
+  },
+  {
+    "query": "I'm adding HDR10 output — which swapchain color space and format do I pick, and where do I apply the Rec.2020 conversion and PQ curve relative to tone mapping and UI?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "hdr-output: PQ/Rec.2020 swapchain, linear pipeline, own final color-space + transfer encode"
+  },
+  {
+    "query": "my HDR image looks washed out and dim and the UI text blends wrong — I think I'm double-applying a transfer function with an sRGB backbuffer",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "validation positive: hdr-output encode-once, paper-white scaling, no auto-sRGB backbuffer for HDR"
+  },
+  {
+    "query": "tune my CPU SoA particle update loop to stop missing cache — no GPU involved",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: CPU-only data layout -> data-oriented-design-guide, not GPU simulation"
   }
 ]

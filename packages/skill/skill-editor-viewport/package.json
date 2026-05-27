@@ -1,0 +1,15 @@
+{
+  "name": "@xonovex/skill-editor-viewport",
+  "version": "0.2.5",
+  "private": true,
+  "type": "module",
+  "keywords": [
+    "xonovex",
+    "skill",
+    "editor-viewport"
+  ],
+  "scripts": {
+    "fmt": "prettier --write .",
+    "fmt:check": "prettier --check ."
+  }
+}
