@@ -76,5 +76,17 @@
     "should_trigger": false,
     "split": "validation",
     "rationale": "validation negative: plain serialization of a fixed struct, no model/schema/versioning"
+  },
+  {
+    "query": "I want prefabs in my editor: edit a template object and have all placed copies update, but each copy can tweak individual properties and keep those tweaks — how do I store and resolve that?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "prototypes: prototype/instance inheritance, per-property override, read-through resolution, edit propagation"
+  },
+  {
+    "query": "how should I track which fields of an instance diverge from its prototype, and only save those overrides, including added/removed child objects?",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "validation positive: prototypes override bitmask + inherited/instantiated/removed sub-objects, delta serialization"
   }
 ]

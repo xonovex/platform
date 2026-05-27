@@ -25,6 +25,12 @@ description: "Use when designing a central in-memory data model / object databas
 - **Local vs global ids** - Local ids inside a file, GUIDs for cross-file/cross-session links, see [references/references-and-ownership.md](references/references-and-ownership.md)
 - **Identity vs role** - A GUID names a fixed identity; a name/path names a role that late-binds — default to GUIDs, see [references/references-and-ownership.md](references/references-and-ownership.md)
 
+## Prototypes & overrides
+
+- **Any object can be a prototype** - Instances inherit all properties and store only overrides; resolve a property by walking the prototype chain, see [references/prototypes.md](references/prototypes.md)
+- **Per-property override bitmask** - One bit per property marks local-vs-inherited; sub-object sets track inherited / instantiated / removed children, see [references/prototypes.md](references/prototypes.md)
+- **Serialize only deltas** - Persist the prototype reference plus overrides; reconstruct inherited values on load, see [references/prototypes.md](references/prototypes.md)
+
 ## Mutation
 
 - **Change notification** - Events, dirty flags, dependency recompute, batched per transaction, see [references/change-notification.md](references/change-notification.md)
@@ -49,11 +55,14 @@ description: "Use when designing a central in-memory data model / object databas
 - An undo entry that captured a pointer/index breaks once storage moves — capture ids and values, not addresses.
 - External side effects (file writes, network) are not undoable; keep them out of the transactional journal.
 - A loader that rejects unknown fields cannot open older OR newer files — migrate forward and ignore-or-preserve unknowns.
+- Overriding a sub-object in an instance gives it a new id, so references to the prototype's original silently miss — resolve references through the override, don't store the new id everywhere.
+- Allowing computed overrides (a property defined as an expression over the prototype's value) drags evaluation order and cycles into the data model — keep overrides concrete values.
 
 ## Progressive Disclosure
 
 - Read [references/object-model.md](references/object-model.md) - Load when defining typed objects, property kinds, or data-driven schemas
 - Read [references/references-and-ownership.md](references/references-and-ownership.md) - Load when linking objects by id, modeling ownership, or handling deletes
+- Read [references/prototypes.md](references/prototypes.md) - Load when adding prefabs/templates/presets: prototype-instance inheritance, per-property overrides, override propagation
 - Read [references/change-notification.md](references/change-notification.md) - Load when making edits observable, batching, or recomputing derived data
 - Read [references/undo-redo.md](references/undo-redo.md) - Load when adding transactional edits, undo journals, or redo stacks
 - Read [references/serialization.md](references/serialization.md) - Load when saving/loading, versioning the format, or migrating old files
