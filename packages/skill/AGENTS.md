@@ -29,3 +29,4 @@ Coding-guideline Agent Skills for the Xonovex marketplace. For authoring mechani
 - Add every new skill to `.claude-plugin/marketplace.json` (compact one-line entry, alphabetical by name) — skills are not auto-discovered.
 - `npx prettier --write` the new/changed package; leave `marketplace.json` in its existing compact one-line-per-entry style (do not reflow it).
 - Confirm JSON is valid and every `SKILL.md` → `references/` link resolves.
+- Run `npm install` after adding or removing a skill package so `package-lock.json` records the workspace — CI runs `npm ci`, which fails on an out-of-sync lockfile. The `pre-commit` hook (`.hooks/sync-lockfile.sh`) auto-syncs and stages it.
