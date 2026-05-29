@@ -1,0 +1,74 @@
+[
+  {
+    "query": "write an ADR for the new caching layer",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "explicit ADR request"
+  },
+  {
+    "query": "document this decision so we remember why we chose it",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "record-a-decision without saying ADR"
+  },
+  {
+    "query": "create an architecture decision record for the auth change",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "full name spelled out"
+  },
+  {
+    "query": "we standardized on UTC timestamps, capture the reasoning behind the design",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "why-this-design framing"
+  },
+  {
+    "query": "there's no ADR for the existing event bus yet, add one",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "retroactive ADR for shipped functionality"
+  },
+  {
+    "query": "write a README for this package",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: README, not a decision record"
+  },
+  {
+    "query": "document the REST API endpoints for this service",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: API reference, not a decision"
+  },
+  {
+    "query": "write a deployment runbook for the release",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: runbook, not a decision"
+  },
+  {
+    "query": "draft a decision record for moving the store to Postgres",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "decision record, synonym for ADR"
+  },
+  {
+    "query": "capture why we chose this module boundary",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "rationale capture for a design choice"
+  },
+  {
+    "query": "add a tutorial showing how to call the SDK",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near-miss: tutorial, not a decision"
+  },
+  {
+    "query": "explain this algorithm in inline code comments",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near-miss: code comments, not a decision record"
+  }
+]
