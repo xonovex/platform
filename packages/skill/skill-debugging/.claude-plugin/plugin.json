@@ -1,6 +1,6 @@
 {
   "name": "xonovex-skill-debugging",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "description": "Xonovex Debugging skills",
   "author": {"name": "Xonovex"},
   "skills": ["./debugging-guide"]
