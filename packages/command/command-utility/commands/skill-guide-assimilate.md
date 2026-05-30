@@ -2,7 +2,6 @@
 description: >-
   Augment an existing skill with elements from another skill while preserving
   structure and style
-model: sonnet
 allowed-tools:
   - Read
   - Edit

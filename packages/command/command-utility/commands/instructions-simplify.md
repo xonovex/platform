@@ -1,6 +1,5 @@
 ---
 description: Simplify project instruction files (AGENTS.md) by reducing verbosity
-model: sonnet
 allowed-tools:
   - Read
   - Edit

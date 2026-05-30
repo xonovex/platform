@@ -52,7 +52,7 @@ Automatically generates a new slash command file based on a recently completed t
 
 **Required Sections**:
 
-- Metadata block: at minimum a 1-sentence `description`; format is harness-specific (YAML frontmatter in Claude Code, with optional fields like `argument-hint`, `allowed-tools`, `model`; other harnesses use their own conventions)
+- Metadata block: at minimum a 1-sentence `description`; format is harness-specific (YAML frontmatter in Claude Code, with optional fields like `argument-hint`, `allowed-tools`; other harnesses use their own conventions)
 - Goal: 3-5 bullet points
 - Usage: 2-3 bash examples
 - Arguments: List with required/optional, defaults, descriptions

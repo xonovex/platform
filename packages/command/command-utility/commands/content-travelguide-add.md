@@ -2,7 +2,6 @@
 description: >-
   Create a comprehensive, multi-language travel guide for a specified topic or
   location
-model: haiku
 allowed-tools:
   - WebSearch
   - WebFetch

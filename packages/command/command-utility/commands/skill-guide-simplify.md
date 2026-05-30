@@ -2,7 +2,6 @@
 description: >-
   Make skills project-independent, remove redundancy, condense SKILL.md to
   bullet list with examples in reference files
-model: sonnet
 allowed-tools:
   - Read
   - Edit

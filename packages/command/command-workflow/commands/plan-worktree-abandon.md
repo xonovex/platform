@@ -1,6 +1,5 @@
 ---
 description: Document and abandon a feature with reason and learnings
-model: haiku
 allowed-tools:
   - Bash
   - Read

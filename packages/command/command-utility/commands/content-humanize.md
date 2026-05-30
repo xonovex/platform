@@ -1,6 +1,5 @@
 ---
 description: Write or rewrite content to remove AI writing patterns and add human voice
-model: sonnet
 allowed-tools:
   - Read
   - Edit

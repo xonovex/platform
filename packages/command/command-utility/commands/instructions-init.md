@@ -1,6 +1,5 @@
 ---
 description: Create an AGENTS.md file for a directory by analyzing its structure and contents
-model: sonnet
 allowed-tools:
   - Read
   - Write

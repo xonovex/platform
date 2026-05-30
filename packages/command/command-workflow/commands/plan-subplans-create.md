@@ -2,7 +2,6 @@
 description: >-
   Generate detailed subplans from an approved parent plan with parallel
   execution detection
-model: sonnet
 allowed-tools:
   - Write
   - Read

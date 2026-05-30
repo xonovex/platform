@@ -1,6 +1,5 @@
 ---
 description: Create a new git worktree for a feature branch
-model: haiku
 allowed-tools:
   - Bash
   - Glob

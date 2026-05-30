@@ -1,6 +1,5 @@
 ---
 description: Convert insights from a category into a progressive disclosure skill
-model: sonnet
 allowed-tools:
   - Read
   - Write

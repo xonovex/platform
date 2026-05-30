@@ -2,7 +2,6 @@
 description: >-
   Automatically simplify slash command files by reducing verbosity while
   maintaining functionality
-model: sonnet
 allowed-tools:
   - Read
   - Edit

@@ -1,6 +1,5 @@
 ---
 description: Auto-curate latest news stories on a topic and generate bilingual content
-model: haiku
 allowed-tools:
   - WebSearch
   - WebFetch
