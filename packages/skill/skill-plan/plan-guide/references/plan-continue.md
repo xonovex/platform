@@ -42,7 +42,7 @@ Resume work from an existing plan document. Auto-detect the associated plan from
 5. **Load work target plan** (full)
 6. **Analyze current status** — phase, completed tasks, pending tasks, blockers
 7. **Validate state** — verify files exist, run typecheck / lint / build / tests, report baseline
-8. **Consult skills** — check plan frontmatter `skills_to_consult` and invoke them
+8. **Consult skills** — before writing any code, read the plan frontmatter `skills_to_consult` and invoke EACH listed skill. For each, also read the relevant progressive-disclosure documents it points to (its `references/*.md`), not just the `SKILL.md` summary. Hard gate: implementation must not begin until they're loaded.
 9. **Generate next steps** — highest priority pending tasks for THIS plan only
 10. **Create tasks** — set up an actionable task list with status tracking
 11. **Execute** — implement all tasks
@@ -88,4 +88,4 @@ Parent: plans/authentication.md (3/4 complete)
 - Reading all child plans upfront wastes context — metadata-only scan first, then load only the target
 - Skipping the validation step at start hides regressions introduced by previous plans — always baseline before working
 - Auto-continuing to the next plan after completion silently chains work — STOP after one plan and let the user decide
-- `skills_to_consult` listed in the plan must actually be invoked — they encode the project conventions the implementation must follow
+- `skills_to_consult` listed in the plan must actually be invoked, and each skill's relevant reference docs read — they encode the project conventions the implementation must follow, and the `SKILL.md` summary alone often omits the detail

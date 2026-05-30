@@ -1,13 +1,5 @@
 ---
 description: Resume work from an existing plan document with full context loading
-allowed-tools:
-  - Read
-  - Bash
-  - Glob
-  - TaskCreate
-  - TaskUpdate
-  - TaskList
-  - Task
 argument-hint: "[document-path]"
 ---
 
@@ -78,7 +70,7 @@ Resumes work from an existing plan document by loading its context and outlining
    - Run linting to check code style
    - Run tests if test commands specified
    - Report baseline status (typecheck, lint, build, tests)
-8. **Consult Skills**: Check plan frontmatter for `skills_to_consult` array and invoke relevant skills before implementation
+8. **Consult Skills**: Before writing ANY code, read the plan frontmatter `skills_to_consult` array and invoke EACH listed skill. For each invoked skill, also read the relevant progressive-disclosure documents it points to (its `references/*.md`), not just the top-level `SKILL.md` summary. This is a hard gate — implementation must not begin until the applicable skills and their reference docs have been loaded.
 9. **Generate Next Steps**:
    - Identify highest priority pending tasks for current plan only
    - Extract file locations and required changes
@@ -157,4 +149,4 @@ Parent: plans/authentication.md (3/4 complete)
 - Reading all child plans upfront wastes context — metadata-only scan first, then load only the target
 - Skipping the validation step at start hides regressions introduced by previous plans — always baseline before working
 - Auto-continuing to the next plan after completion silently chains work — STOP after one plan and let the user decide
-- `skills_to_consult` listed in the plan must actually be invoked — they encode the project conventions the implementation must follow
+- `skills_to_consult` listed in the plan must actually be invoked, and each skill's relevant reference docs read — they encode the project conventions the implementation must follow, and the `SKILL.md` summary alone often omits the detail
