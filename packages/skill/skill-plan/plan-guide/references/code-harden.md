@@ -5,8 +5,8 @@ Analyze code for hardening opportunities (type safety, validation, logging, erro
 ## Goal
 
 - Identify code quality issues (type safety, logging, validation, best practices, code smells)
-- Apply fixes aligned with project standards
-- Validate changes with typecheck / lint / tests
+- Assess each finding against project standards and conventions
+- Produce a prioritized research report to feed into `plan-create`
 
 ## Core Workflow
 
@@ -20,9 +20,9 @@ Analyze code for hardening opportunities (type safety, validation, logging, erro
 
 **Find guidelines:** AGENTS.md and POLICY.md in project root and subdirectories; check @-referenced documents
 
-**Apply standards:** follow project-specific patterns for type safety, logging, validation, error handling
+**Assess against standards:** compare findings to project-specific patterns for type safety, logging, validation, error handling
 
-**Validation:** fix one package at a time; validate immediately after each
+**Scope:** report findings one package at a time so the downstream plan can be sequenced cleanly
 
 ## Example Transformation
 
@@ -53,10 +53,9 @@ Group by severity + category; prioritize by impact and fix effort.
 
 ## Error Handling
 
-- **Lint failures:** review against project rules
-- **Test failures:** review logic, validation strictness, mock compatibility
-- **Type errors:** check imports, type definitions, schema alignment
-- **Guidelines not found:** fall back to language / framework best practices
+- **No matching files:** report that the path / aspect produced no candidates rather than failing silently
+- **Conflicting standards:** when guidelines disagree, surface both in the report instead of picking one
+- **Guidelines not found:** fall back to language / framework best practices and note the assumption in the report
 
 ## Gotchas
 

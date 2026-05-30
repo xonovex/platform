@@ -1,6 +1,5 @@
 ---
 description: "Harden code by improving type safety, validation, logging, and error handling"
-model: sonnet
 allowed-tools:
   - Read
   - Grep
@@ -10,7 +9,7 @@ allowed-tools:
   - TaskCreate
   - TaskUpdate
   - AskUserQuestion
-argument-hint: "[path] [--aspects <type-safety,logging,validation>] [--auto-fix] [--dry-run]"
+argument-hint: "[path] [--aspects <type-safety,logging,validation>]"
 ---
 
 # /xonovex-workflow:code-harden – Research Code Hardening Opportunities
@@ -20,8 +19,8 @@ Analyzes code for hardening opportunities (type safety, validation, logging, err
 ## Goal
 
 - Identify code quality issues (type safety, logging, validation, best practices, code smells)
-- Apply fixes aligned with project standards
-- Validate changes with typecheck, lint, and tests
+- Assess each finding against project standards and conventions
+- Produce a prioritized research report to feed into `/xonovex-workflow:plan-create`
 
 ## Usage
 
@@ -31,17 +30,12 @@ Analyzes code for hardening opportunities (type safety, validation, logging, err
 
 # Focus on specific aspects
 /xonovex-workflow:code-harden src/ --aspects type-safety,logging
-
-# Preview analysis
-/xonovex-workflow:code-harden . --dry-run
 ```
 
 ## Arguments
 
 - `path` (required): Directory to analyze
 - `--aspects` (optional): Comma-separated aspects (type-safety, logging, validation, error-handling, testing, or custom)
-- `--auto-fix` (optional): Automatically apply safe fixes
-- `--dry-run` (optional): Report issues without making changes
 
 ## Core Workflow
 
@@ -55,9 +49,9 @@ Analyzes code for hardening opportunities (type safety, validation, logging, err
 
 **Find guidelines**: Look for AGENTS.md and POLICY.md in project root and subdirectories; check @-referenced documents
 
-**Apply standards**: Follow project-specific patterns from guidelines for type safety, logging, validation, error handling
+**Assess against standards**: Compare findings to project-specific patterns from guidelines for type safety, logging, validation, error handling
 
-**Validation**: Fix one package at a time; validate immediately after each
+**Scope**: Report findings one package at a time so the downstream plan can be sequenced cleanly
 
 ## Example Transformation
 
@@ -88,10 +82,9 @@ Group by severity + category; prioritize by impact and fix effort.
 
 ## Error Handling
 
-- **Lint failures**: Review fix against project linting rules; adjust to match standards
-- **Test failures**: Review logic errors, validation strictness, mock compatibility
-- **Type errors**: Check imports, type definitions, schema alignment
-- **Guidelines not found**: Fall back to language / framework best practices
+- **No matching files**: Report that the path / aspect produced no candidates rather than failing silently
+- **Conflicting standards**: When guidelines disagree, surface both in the report instead of picking one
+- **Guidelines not found**: Fall back to language / framework best practices and note the assumption in the report
 
 ## Gotchas
 
