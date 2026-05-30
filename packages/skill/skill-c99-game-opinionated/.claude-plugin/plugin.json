@@ -1,6 +1,6 @@
 {
   "name": "xonovex-skill-c99-game-opinionated",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "description": "Xonovex C99 game opinionated skills",
   "author": {"name": "Xonovex"},
   "skills": ["./c99-game-opinionated-guide"]
