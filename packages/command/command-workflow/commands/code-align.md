@@ -1,6 +1,5 @@
 ---
 description: Create alignment between two similar implementations and suggest improvements
-model: sonnet
 allowed-tools:
   - Read
   - Glob
@@ -10,7 +9,7 @@ allowed-tools:
   - TaskCreate
   - TaskUpdate
   - AskUserQuestion
-argument-hint: "[file1] [file2] [--interactive] [--fix]"
+argument-hint: "[file1] [file2] [--interactive]"
 ---
 
 # /xonovex-workflow:code-align – Research Code Alignment Between Similar Implementations
@@ -105,7 +104,7 @@ After running this research command:
 - File not found: Verify paths exist
 - Invalid glob: Check pattern syntax
 - Parse errors: ensure valid source language
-- Validation failures: Review changes, fix test/lint errors
+- No reference implementation: ask which file is canonical (or pick the more complete one) before reporting
 
 ## Gotchas
 

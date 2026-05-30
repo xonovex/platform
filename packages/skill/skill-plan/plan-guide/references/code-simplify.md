@@ -68,9 +68,9 @@ Impact: ~450 lines removed, 3 dependencies pruned, 25% complexity reduction
 - Cross-package: existing `shared-*` or propose new
 - Follow project conventions
 
-**Safe changes:** identical implementations, unused imports, single-impl interfaces, constant consolidation
+**Safe to recommend:** identical implementations, unused imports, single-impl interfaces, constant consolidation
 
-**Validation:** fix incrementally, validate after each (typecheck / lint / test)
+**Sequencing:** group findings so the downstream plan can apply them incrementally, validating after each (typecheck / lint / test)
 
 ## Error Handling
 

@@ -2,7 +2,6 @@
 description: >-
   Simplify code by consolidating duplicates, removing dead code, and flattening
   abstractions
-model: sonnet
 allowed-tools:
   - Read
   - Glob
@@ -15,7 +14,6 @@ allowed-tools:
 argument-hint: >-
   [path] [--aspects
   <duplicates,dead-code,dependencies,abstractions,interfaces,config>]
-  [--dry-run] [--fix]
 ---
 
 # /xonovex-workflow:code-simplify – Research Code Simplification Opportunities
@@ -35,7 +33,6 @@ Analyzes code complexity to identify consolidation, dead code removal, and simpl
 ```bash
 /xonovex-workflow:code-simplify packages/my-package/
 /xonovex-workflow:code-simplify src/ --aspects duplicates,dead-code
-/xonovex-workflow:code-simplify . --dry-run
 ```
 
 ## Arguments
@@ -53,7 +50,6 @@ Analyzes code complexity to identify consolidation, dead code removal, and simpl
   - `interfaces` - Complex APIs (>5 params, nested config)
   - `config` - Scattered configuration
   - `all` (default) - All aspects
-- `--dry-run` (optional): Report without changes
 
 ## Core Workflow
 
@@ -113,9 +109,9 @@ Impact: ~450 lines removed, 3 dependencies pruned, 25% complexity reduction
 - Cross-package: Existing `shared-*` or propose new
 - Follow project conventions
 
-**Safe changes**: Identical implementations, unused imports, single-impl interfaces, constant consolidation
+**Safe to recommend**: Identical implementations, unused imports, single-impl interfaces, constant consolidation
 
-**Validation**: Fix incrementally, validate after each (typecheck/lint/test)
+**Sequencing**: Group findings so the downstream plan can apply them incrementally, validating after each (typecheck/lint/test)
 
 ## Error Handling
 
@@ -133,7 +129,7 @@ Impact: ~450 lines removed, 3 dependencies pruned, 25% complexity reduction
 ## Examples
 
 ```bash
-/xonovex-workflow:code-simplify packages/api/ --aspects dead-code --dry-run
+/xonovex-workflow:code-simplify packages/api/ --aspects dead-code
 /xonovex-workflow:code-simplify services/ --aspects abstractions,interfaces
 ```
 
