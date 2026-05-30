@@ -1,6 +1,5 @@
 ---
 description: Consolidate project instructions by removing redundant files and standardizing format
-model: sonnet
 allowed-tools:
   - Read
   - Edit

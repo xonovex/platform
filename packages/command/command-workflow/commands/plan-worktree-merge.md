@@ -1,6 +1,5 @@
 ---
 description: Merge feature worktree back to source worktree
-model: haiku
 allowed-tools:
   - Bash
 argument-hint: "[--squash] [--remove-worktree] [--delete-remote] [--dry-run]"

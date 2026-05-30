@@ -2,7 +2,6 @@
 description: >-
   Augment project instructions with elements from another project's instructions
   while preserving structure and style
-model: sonnet
 allowed-tools:
   - Read
   - Edit

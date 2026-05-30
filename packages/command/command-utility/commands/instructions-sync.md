@@ -1,6 +1,5 @@
 ---
 description: Sync AGENTS.md files with current directory structure and state
-model: sonnet
 allowed-tools:
   - Read
   - Edit

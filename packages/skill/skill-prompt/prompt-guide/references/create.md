@@ -31,7 +31,7 @@ Generate a new reusable prompt file (a.k.a. slash command, user-invocable comman
 
 **Required Sections:**
 
-- Metadata block: at minimum a 1-sentence `description`; add other fields (tools, permissions, model override, argument hint, activation scope) appropriate for the target harness — see [harness-formats.md](harness-formats.md)
+- Metadata block: at minimum a 1-sentence `description`; add other fields (tools, permissions, argument hint, activation scope) appropriate for the target harness — see [harness-formats.md](harness-formats.md)
 - Goal: 3-5 bullet points
 - Usage: 2-3 invocation examples
 - Arguments: list with required/optional, defaults, descriptions

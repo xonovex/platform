@@ -2,7 +2,6 @@
 description: >-
   Augment an existing slash command with elements from another slash command
   while preserving structure and style
-model: sonnet
 allowed-tools:
   - Read
   - Edit

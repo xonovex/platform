@@ -1,6 +1,5 @@
 ---
 description: Convert insights from a category into AGENTS.md bullet points
-model: sonnet
 allowed-tools:
   - Read
   - Edit

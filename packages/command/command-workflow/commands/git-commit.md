@@ -1,6 +1,5 @@
 ---
 description: Commit and push changes in the current or a specified directory
-model: haiku
 allowed-tools:
   - Bash
   - Read

@@ -2,7 +2,6 @@
 description: >-
   Create or update a skill by extracting patterns from codebase and project
   instructions
-model: sonnet
 allowed-tools:
   - Read
   - Write
