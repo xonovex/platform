@@ -1,0 +1,9 @@
+{
+  "name": "xonovex-skill-shell-scripting",
+  "version": "0.2.7",
+  "description": "Xonovex Shell scripting skills",
+  "author": {
+    "name": "Xonovex"
+  },
+  "skills": "./"
+}

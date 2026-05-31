@@ -1,0 +1,9 @@
+{
+  "name": "xonovex-skill-typescript-to-lua",
+  "version": "0.2.7",
+  "description": "Xonovex TypeScript to Lua skills",
+  "author": {
+    "name": "Xonovex"
+  },
+  "skills": "./"
+}

@@ -1,0 +1,9 @@
+{
+  "name": "xonovex-skill-data-oriented-design",
+  "version": "0.2.7",
+  "description": "Xonovex Data-oriented design skills",
+  "author": {
+    "name": "Xonovex"
+  },
+  "skills": "./"
+}

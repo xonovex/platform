@@ -1,0 +1,9 @@
+{
+  "name": "xonovex-skill-general-fp",
+  "version": "0.2.7",
+  "description": "Xonovex Functional programming skills",
+  "author": {
+    "name": "Xonovex"
+  },
+  "skills": "./"
+}

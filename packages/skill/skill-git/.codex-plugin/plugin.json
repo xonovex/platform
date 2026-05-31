@@ -1,0 +1,9 @@
+{
+  "name": "xonovex-skill-git",
+  "version": "0.2.7",
+  "description": "Xonovex Git skills",
+  "author": {
+    "name": "Xonovex"
+  },
+  "skills": "./"
+}

@@ -1,0 +1,9 @@
+{
+  "name": "xonovex-skill-skill",
+  "version": "0.2.7",
+  "description": "Xonovex Skill skill — author, extract, assimilate, simplify, validate Agent Skills via progressive disclosure",
+  "author": {
+    "name": "Xonovex"
+  },
+  "skills": "./"
+}

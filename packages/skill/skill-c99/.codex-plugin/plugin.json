@@ -1,0 +1,9 @@
+{
+  "name": "xonovex-skill-c99",
+  "version": "0.2.7",
+  "description": "Xonovex C99 skills",
+  "author": {
+    "name": "Xonovex"
+  },
+  "skills": "./"
+}

@@ -1,0 +1,9 @@
+{
+  "name": "xonovex-skill-cmake",
+  "version": "0.2.7",
+  "description": "Xonovex CMake skills",
+  "author": {
+    "name": "Xonovex"
+  },
+  "skills": "./"
+}

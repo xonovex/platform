@@ -1,0 +1,9 @@
+{
+  "name": "xonovex-skill-python",
+  "version": "0.2.7",
+  "description": "Xonovex Python skills",
+  "author": {
+    "name": "Xonovex"
+  },
+  "skills": "./"
+}
