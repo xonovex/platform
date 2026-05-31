@@ -1,31 +1,35 @@
 # plan-validate: Validate Plan Achievement
 
-Verify a plan document's objectives have been fully achieved, or validate the most recently stated goal in the current conversation. Read-only — never modifies plan files.
+Verify a plan document's objectives have been fully achieved: success criteria pass
+AND the code structurally matches what the plan describes. Read-only — never modifies files.
 
 ## Goal
 
-- Validate plan completion with objective tests
-- Check subplan status (if applicable)
-- Report clear pass / fail with evidence
+- Run success criteria checks (build, test, grep commands)
+- Audit code vs plan structure (types, functions, naming, data flow)
+- Check cross-subplan consistency (shared concepts described the same way)
+- Report clear pass/fail with evidence
 - Never modify files
 
 ## Core Workflow
 
 ### With Plan Document
 
-1. **Load plan** — read document, extract success criteria from phases
-2. **Parse metadata** — extract status, phase, dependencies from frontmatter
+1. **Load plan** — read document, extract tasks, success criteria, file lists
+2. **Parse metadata** — extract status, dependencies from frontmatter
 3. **Check subplans** — if subplans exist, read and report their status
-4. **Design tests** — create validation tests for each phase criterion
-5. **Execute validation checks** — run the project's standard checks in order (skip any that don't apply):
-   - **Type check** (e.g. `tsc --noEmit`, `mypy`, `go vet`) — 0 errors
-   - **Lint** (e.g. `eslint`, `ruff`, `golangci-lint`) — 0 errors, 0 warnings
-   - **Build** (e.g. `npm run build`, `cargo build`, `go build`) — succeeds
-   - **Tests** (e.g. `vitest`, `pytest`, `go test`) — all pass
-
-   Detect the toolchain from the project (`package.json` scripts, Moon tasks, Makefile, language config) instead of hardcoding commands.
-
-6. **Report** — clear pass / fail per phase with evidence and recommendations
+4. **Criteria checks** — run each success criterion command and report pass/fail:
+   - Type check, lint, build, tests — detect toolchain from project, don't hardcode
+   - Grep checks from the plan (e.g. "zero direct calls outside X")
+5. **Structural audit** — for each plan task, search the codebase to verify:
+   - Types/functions mentioned in the plan exist in the code
+   - Files created/removed as stated
+   - Naming matches (plan says `foo_t`, code doesn't still use the old name `bar_t`)
+   - Data flow matches (plan says "A reads from B", code doesn't have A reading from C)
+   - Report deviations as: "plan says X, code has Y"
+6. **Cross-subplan consistency** — shared concepts named the same way across subplans,
+   no contradictions, dependencies reference things that exist
+7. **Report** — per-criterion PASS/FAIL, per-task match/deviation, consistency issues
 
 **IMPORTANT:** Read-only; use `plan-update` to update status.
 
@@ -34,38 +38,11 @@ Verify a plan document's objectives have been fully achieved, or validate the mo
 1. **Identify goal** — review conversation to extract objective and success criteria
 2. **Design tests** — create validation tests for each criterion
 3. **Execute** — run tests, collect evidence
-4. **Report** — clear pass / fail with evidence and recommendations
-
-## Success Criteria
-
-- All phase requirements validated
-- All subplans complete (if subplans exist)
-- All toolchain checks pass (typecheck / lint / build / tests)
-- Implementation matches specification
-
-## Output
-
-```
-Validation Report
-
-Phase 1: Setup PASS
-Phase 2: Implementation IN PROGRESS
-  FAIL Error handling incomplete (src/core.ts:45)
-
-Files: PASS typecheck | FAIL lint (2 errors) | PASS test
-
-Result: NOT COMPLETE
-```
-
-## Error Handling
-
-- Plan file not found / invalid format → error
-- Plan already marked complete → warning
-- All tests pass → info (recommend `plan-update`)
+4. **Report** — clear pass/fail with evidence and recommendations
 
 ## Gotchas
 
-- Detecting toolchain via `package.json` only misses Moon/Makefile-driven projects — check both
-- "Tests pass" without checking coverage misses gaps in _what_ is tested — read success criteria, not just exit codes
-- A subplan still `in_progress` blocks parent validation — surface the offending subplan explicitly
-- Treating warnings as passes hides slow regressions — lint warnings count toward FAIL unless the project explicitly tolerates them
+- Criteria checks alone miss structural drift — code can pass all greps but implement something different from what the plan describes
+- Cross-subplan consistency issues compound silently — one wrong name in an early subplan propagates through all later ones
+- "Tests pass" without checking coverage misses gaps — read success criteria, not just exit codes
+- A subplan still `in_progress` blocks parent validation — surface it explicitly

@@ -1,4 +1,4 @@
-# code-harden: Research Code Hardening Opportunities
+# plan-research-harden: Research Code Hardening Opportunities
 
 Analyze code for hardening opportunities (type safety, validation, logging, error handling). Generates a research report. Does **not** create plans or make changes — run `plan-create` afterward.
 

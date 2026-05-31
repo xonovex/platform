@@ -75,13 +75,16 @@ Resumes work from an existing plan document by loading its context and outlining
    - Identify highest priority pending tasks for current plan only
    - Extract file locations and required changes
    - Create implementation order based on dependencies
-10. **Create Tasks**: Use TaskCreate to set up actionable tasks with status tracking; update with TaskUpdate as work progresses
-11. **Execute Plan**: Implement all tasks in the plan
+10. **Track Tasks**: Use the environment's task/todo tracking tool to create one entry per plan task. Update their status as work progresses — this prevents tasks from being silently skipped.
+11. **Execute Plan**: Implement all tasks in the plan.
 12. **On Completion**:
 
-- Update plan status to `complete` in front matter
+- Re-read the plan file (not from memory — read the file)
+- Verify each task was done; do any that were missed
+- Run each success criterion command; fix failures
 - Run validation (typecheck, lint, build, tests)
-- Report completion summary
+- Report per-task DONE/SKIPPED and per-criterion PASS/FAIL
+- Update plan status to `complete` in front matter
 - **STOP** - do not continue to next plan automatically
 
 ## Output
@@ -150,3 +153,5 @@ Parent: plans/authentication.md (3/4 complete)
 - Skipping the validation step at start hides regressions introduced by previous plans — always baseline before working
 - Auto-continuing to the next plan after completion silently chains work — STOP after one plan and let the user decide
 - `skills_to_consult` listed in the plan must actually be invoked, and each skill's relevant reference docs read — they encode the project conventions the implementation must follow, and the `SKILL.md` summary alone often omits the detail
+- Skipping the completion verification (re-reading the plan, checking each task and criterion) is the #1 cause of incomplete subplans — later tasks get compressed out of context and silently forgotten
+- Use the environment's task/todo tracking tool — a pending task is visible, an untracked one is invisible
