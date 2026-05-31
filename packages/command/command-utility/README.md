@@ -4,9 +4,18 @@ Manage project instructions, extract insights, and create skills.
 
 ## Installation
 
+### Claude Code
+
 ```bash
 claude plugin marketplace add xonovex/platform
 claude plugin install xonovex-utility@xonovex-marketplace
+```
+
+### Codex
+
+```bash
+codex plugin marketplace add xonovex/platform
+codex plugin add xonovex-utility@xonovex-marketplace
 ```
 
 ## Commands

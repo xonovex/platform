@@ -1,0 +1,9 @@
+{
+  "name": "xonovex-skill-remotion",
+  "version": "0.2.7",
+  "description": "Xonovex Remotion skills",
+  "author": {
+    "name": "Xonovex"
+  },
+  "skills": "./"
+}

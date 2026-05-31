@@ -1,0 +1,9 @@
+{
+  "name": "xonovex-skill-general-oop",
+  "version": "0.2.7",
+  "description": "Xonovex Object-oriented programming skills",
+  "author": {
+    "name": "Xonovex"
+  },
+  "skills": "./"
+}

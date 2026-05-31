@@ -66,8 +66,10 @@ EOF
 
 Each skill is a separate plugin. Skills are applied **automatically** when the agent detects a relevant task — no explicit slash-command invocation needed. Skills also work cross-harness (Claude Code, OpenCode, etc.) since they follow the [Agent Skills spec](https://agentskills.io/specification).
 
+#### Claude Code
+
 ```bash
-# Add the Xonovex plugin marketplace (Claude Code example)
+# Add the Xonovex plugin marketplace
 claude plugin marketplace add xonovex/platform
 
 # Install workflow skills — each covers a full operation lifecycle via consolidated references
@@ -87,6 +89,31 @@ claude plugin install xonovex-skill-hono@xonovex-marketplace
 claude plugin install xonovex-skill-zod@xonovex-marketplace
 claude plugin install xonovex-skill-vitest@xonovex-marketplace
 # … see .claude-plugin/marketplace.json for the full list
+```
+
+#### Codex
+
+```bash
+# Add the Xonovex plugin marketplace
+codex plugin marketplace add xonovex/platform
+
+# Install workflow skills — each covers a full operation lifecycle via consolidated references
+codex plugin add xonovex-skill-plan@xonovex-marketplace          # research, plan, refine, subplans, continue, update, validate, code-align/harden/simplify
+codex plugin add xonovex-skill-git@xonovex-marketplace           # commit, merge-resolve, feature-worktree create/merge/abandon/cleanup
+codex plugin add xonovex-skill-instruction@xonovex-marketplace   # AGENTS.md init / sync / simplify / consolidate / merge
+codex plugin add xonovex-skill-insights@xonovex-marketplace      # session retrospective: extract, integrate-instructions, integrate-skills
+codex plugin add xonovex-skill-prompt@xonovex-marketplace        # author / merge / simplify reusable prompt files (cross-harness format reference)
+codex plugin add xonovex-skill-skill@xonovex-marketplace         # author / extract / merge / simplify / validate Agent Skills
+codex plugin add xonovex-skill-content@xonovex-marketplace       # multilingual articles, news, travel guides, prose humanization
+codex plugin add xonovex-skill-llmstxt@xonovex-marketplace       # /llms.txt files and per-page markdown mirrors
+
+# Install language / framework guides (apply automatically when editing those files)
+codex plugin add xonovex-skill-typescript@xonovex-marketplace
+codex plugin add xonovex-skill-react@xonovex-marketplace
+codex plugin add xonovex-skill-hono@xonovex-marketplace
+codex plugin add xonovex-skill-zod@xonovex-marketplace
+codex plugin add xonovex-skill-vitest@xonovex-marketplace
+# … see .agents/plugins/marketplace.json for the full list
 ```
 
 ## Development

@@ -1,0 +1,9 @@
+{
+  "name": "xonovex-skill-memory-management",
+  "version": "0.2.7",
+  "description": "Xonovex Memory management skills",
+  "author": {
+    "name": "Xonovex"
+  },
+  "skills": "./"
+}

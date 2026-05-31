@@ -1,0 +1,668 @@
+{
+  "name": "xonovex-marketplace",
+  "interface": {
+    "displayName": "Xonovex"
+  },
+  "plugins": [
+    {
+      "name": "xonovex-utility",
+      "source": {
+        "source": "local",
+        "path": "./packages/command/command-utility"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-workflow",
+      "source": {
+        "source": "local",
+        "path": "./packages/command/command-workflow"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-adr",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-adr"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-asset-pipeline",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-asset-pipeline"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-astro",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-astro"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-audio",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-audio"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-c99",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-c99"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-c99-game-opinionated",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-c99-game-opinionated"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-c99-opinionated",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-c99-opinionated"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-cmake",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-cmake"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-content",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-content"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-cross-platform",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-cross-platform"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-data-model",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-data-model"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-data-oriented-design",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-data-oriented-design"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-debugging",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-debugging"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-docker",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-docker"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-ecs",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-ecs"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-editor-viewport",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-editor-viewport"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-expressjs",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-expressjs"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-game-networking",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-game-networking"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-general-fp",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-general-fp"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-general-oop",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-general-oop"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-git",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-git"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-gpu-rendering",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-gpu-rendering"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-gpu-rendering-vulkan",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-gpu-rendering-vulkan"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-hono",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-hono"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-hono-opinionated",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-hono-opinionated"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-imgui",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-imgui"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-insights",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-insights"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-instruction",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-instruction"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-kubernetes",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-kubernetes"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-llmstxt",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-llmstxt"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-lock-free",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-lock-free"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-lua",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-lua"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-lua-opinionated",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-lua-opinionated"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-memory-management",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-memory-management"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-moon",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-moon"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-motion-react",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-motion-react"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-node-graph",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-node-graph"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-plan",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-plan"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-presentation",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-presentation"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-prompt",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-prompt"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-python",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-python"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-react",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-react"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-remotion",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-remotion"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-shell-scripting",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-shell-scripting"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-skill",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-skill"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-sql-postgresql",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-sql-postgresql"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-strudel",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-strudel"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-terraform",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-terraform"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-threejs",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-threejs"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-typescript",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-typescript"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-typescript-to-lua",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-typescript-to-lua"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-vitest",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-vitest"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-zod",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-zod"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

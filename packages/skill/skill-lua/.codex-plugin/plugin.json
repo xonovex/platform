@@ -1,0 +1,9 @@
+{
+  "name": "xonovex-skill-lua",
+  "version": "0.2.7",
+  "description": "Xonovex Lua skills",
+  "author": {
+    "name": "Xonovex"
+  },
+  "skills": "./"
+}
