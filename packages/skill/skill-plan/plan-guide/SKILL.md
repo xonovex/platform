@@ -14,6 +14,7 @@ Author and maintain plan documents across their full lifecycle (research → cre
 - **Validation required** — every plan's success criteria back-checks with typecheck / lint / build / tests
 - **Skills to consult** — every plan lists which guideline skills implementers must read first
 - **Read-only research** — exploration / analysis operations never modify files; they generate reports for `plan-create` to consume
+- **Use available tools** — if the environment provides task tracking, file search, code analysis, or other tools, use them rather than working from memory or assumptions
 
 ## Gotchas
 
@@ -23,10 +24,12 @@ Author and maintain plan documents across their full lifecycle (research → cre
 - Approving a parent plan is mandatory before generating subplans (`plan-subplans-create`)
 - "Tests pass" doesn't mean "success criteria met" — `plan-validate` reads the criteria, not just exit codes
 - Auto-continuing to the next plan after completion silently chains work — `plan-continue` STOPS after one
+- Subplans with >7 tasks risk silent drops — target 5–7 tasks each
+- Skipping the verification re-read before marking complete is the #1 cause of incomplete work
 
 ## Plan Lifecycle
 
-1. **Research** — `plan-research` for general; `code-align` / `code-harden` / `code-simplify` for specific aspects
+1. **Research** — `plan-research` for general; `plan-research-align` / `plan-research-harden` / `plan-research-simplify` for specific aspects
 2. **Create** — `plan-create` (or `plan-tdd-create`) authors the parent plan
 3. **Refine** — `plan-refine` processes user feedback (annotations + prompt instructions)
 4. **Expand** — `plan-subplans-create` generates detailed child plans
@@ -36,9 +39,9 @@ Author and maintain plan documents across their full lifecycle (research → cre
 
 ## Code-Research Operations
 
-- **Align two implementations** — see [references/code-align.md](references/code-align.md)
-- **Harden for production** — see [references/code-harden.md](references/code-harden.md)
-- **Simplify / deduplicate** — see [references/code-simplify.md](references/code-simplify.md)
+- **Align two implementations** — see [references/plan-research-align.md](references/plan-research-align.md)
+- **Harden for production** — see [references/plan-research-harden.md](references/plan-research-harden.md)
+- **Simplify / deduplicate** — see [references/plan-research-simplify.md](references/plan-research-simplify.md)
 - **Remove barrel exports** — see [references/code-barrels-remove.md](references/code-barrels-remove.md)
 - **Remove non-essential comments** — see [references/code-comments-remove.md](references/code-comments-remove.md)
 - **Extract shared utilities** — see [references/code-shared-extract.md](references/code-shared-extract.md)
@@ -62,9 +65,9 @@ Author and maintain plan documents across their full lifecycle (research → cre
 ### Research
 
 - Read [references/plan-research.md](references/plan-research.md) - Load when researching codebase + web for a future plan
-- Read [references/code-align.md](references/code-align.md) - Load when comparing two similar implementations for alignment
-- Read [references/code-harden.md](references/code-harden.md) - Load when researching type-safety / validation / logging / error-handling improvements
-- Read [references/code-simplify.md](references/code-simplify.md) - Load when researching deduplication, dead code, and over-engineering
+- Read [references/plan-research-align.md](references/plan-research-align.md) - Load when comparing two similar implementations for alignment
+- Read [references/plan-research-harden.md](references/plan-research-harden.md) - Load when researching type-safety / validation / logging / error-handling improvements
+- Read [references/plan-research-simplify.md](references/plan-research-simplify.md) - Load when researching deduplication, dead code, and over-engineering
 - Read [references/code-barrels-remove.md](references/code-barrels-remove.md) - Load when analyzing barrel exports for removal
 - Read [references/code-comments-remove.md](references/code-comments-remove.md) - Load when identifying non-essential comments
 - Read [references/code-shared-extract.md](references/code-shared-extract.md) - Load when finding duplicated patterns to extract

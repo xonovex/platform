@@ -1,63 +1,22 @@
----
-description: >-
-  Simplify code by consolidating duplicates, removing dead code, and flattening
-  abstractions
-allowed-tools:
-  - Read
-  - Glob
-  - Grep
-  - Bash
-  - Task
-  - TaskCreate
-  - TaskUpdate
-  - AskUserQuestion
-argument-hint: >-
-  [path] [--aspects
-  <duplicates,dead-code,dependencies,abstractions,interfaces,config>]
----
+# plan-research-simplify: Research Code Simplification Opportunities
 
-# /xonovex-workflow:code-simplify – Research Code Simplification Opportunities
-
-Analyzes code complexity to identify consolidation, dead code removal, and simplification opportunities. Generates a detailed research report. Does NOT create plans or make changes - run `/xonovex-workflow:plan-create` afterward to create an implementation plan.
+Analyze code complexity to identify consolidation, dead code removal, and simplification opportunities. Generates a research report. Does **not** create plans or make changes — run `plan-create` afterward.
 
 ## Goal
 
 - Consolidate duplicated logic into shared utilities
-- Remove unused code, imports, and dependencies
+- Remove unused code, imports, dependencies
 - Flatten over-engineered abstractions
 - Simplify complex interfaces
 - Centralize scattered configuration
 
-## Usage
-
-```bash
-/xonovex-workflow:code-simplify packages/my-package/
-/xonovex-workflow:code-simplify src/ --aspects duplicates,dead-code
-```
-
-## Arguments
-
-- `path` (required): Directory to analyze
-- `--aspects` (optional): Aspects to check (comma-separated):
-  - `duplicates` - Identical/near-identical functions
-  - `utilities` - Logic for shared utilities
-  - `types` - Redundant type definitions
-  - `constants` - Scattered magic values
-  - `patterns` - Repeated code patterns
-  - `dead-code` - Unused functions, unreachable branches
-  - `dependencies` - Unused imports, redundant packages
-  - `abstractions` - Over-engineered patterns
-  - `interfaces` - Complex APIs (>5 params, nested config)
-  - `config` - Scattered configuration
-  - `all` (default) - All aspects
-
 ## Core Workflow
 
-**Delegate codebase analysis to read-only search agents where available; otherwise use grep/find/file-read directly.**
+**Delegate codebase analysis to read-only search agents where available; otherwise use grep/find/file-read directly. Stay in research mode.**
 
-1. **Discovery** - Scan files, build signature index, analyze dependency trees
-2. **Analysis** - Check each aspect for issues via focused read-only searches
-3. **Report** - Group by priority, estimate impact, generate detailed report
+1. **Discovery** — scan files, build a signature index, analyze dependency trees
+2. **Analysis** — check each aspect for issues via focused read-only searches
+3. **Report** — group by priority, estimate impact, generate a detailed report
 
 ## Analysis Aspects
 
@@ -101,23 +60,23 @@ Impact: ~450 lines removed, 3 dependencies pruned, 25% complexity reduction
 
 ## Implementation Details
 
-**Finding issues**: Grep for signatures, delegate semantic analysis to read-only search agents where available; otherwise use grep/find/file-read directly, trace exports, check call graphs
+**Finding issues:** grep for signatures, delegate semantic analysis to read-only search agents where available, trace exports, check call graphs
 
-**Location strategy**:
+**Location strategy:**
 
 - Same package: `utils/` subdirectory
-- Cross-package: Existing `shared-*` or propose new
+- Cross-package: existing `shared-*` or propose new
 - Follow project conventions
 
-**Safe to recommend**: Identical implementations, unused imports, single-impl interfaces, constant consolidation
+**Safe to recommend:** identical implementations, unused imports, single-impl interfaces, constant consolidation
 
-**Sequencing**: Group findings so the downstream plan can apply them incrementally, validating after each (typecheck/lint/test)
+**Sequencing:** group findings so the downstream plan can apply them incrementally, validating after each (typecheck / lint / test)
 
 ## Error Handling
 
-- **False positives**: Check dynamic imports, reflection, external entry points
-- **Breaking changes**: Ensure no external consumers
-- **Circular deps**: Restructure or create intermediate module
+- **False positives:** check dynamic imports, reflection, external entry points
+- **Breaking changes:** ensure no external consumers
+- **Circular deps:** restructure or create an intermediate module
 
 ## Gotchas
 
@@ -125,17 +84,3 @@ Impact: ~450 lines removed, 3 dependencies pruned, 25% complexity reduction
 - Single-implementation interfaces aren't always over-engineering — they may exist for testability or planned variants
 - Consolidating into a "shared utility" without a clear owner produces a junk drawer — propose a clear home in the report
 - Removing a dependency that's used transitively for typing only is harmless but looks alarming in diffs — call this out explicitly
-
-## Examples
-
-```bash
-/xonovex-workflow:code-simplify packages/api/ --aspects dead-code
-/xonovex-workflow:code-simplify services/ --aspects abstractions,interfaces
-```
-
-## Next Steps
-
-After running this research command:
-
-1. Review the simplification report for accuracy
-2. Run `/xonovex-workflow:plan-create` to create an implementation plan from this research

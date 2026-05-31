@@ -1,6 +1,6 @@
 {
   "name": "xonovex-skill-hono",
-  "version": "0.2.6",
+  "version": "0.2.7",
   "description": "Xonovex Hono skills",
   "author": {"name": "Xonovex"},
   "skills": ["./hono-guide"]

@@ -101,10 +101,12 @@ Updated parent plan with parallel execution groups
 
 - Error: parent plan doesn't exist, parent plan not approved, child plans already exist, output dir fails
 - Warning: >10 child plans (consider consolidation), circular dependencies, excessive file overlap
+- Warning: any child plan with >7 tasks (split into smaller subplans)
 
 ## Gotchas
 
 - Approving the parent plan is mandatory — generating subplans against `draft` parent skips review
 - File-overlap analysis runs against the parent plan's listed files only — if the parent doesn't enumerate files clearly, parallel detection produces false-parallels
 - A child plan without `skills_to_consult` will skip project conventions during implementation — never empty
-- > 10 child plans usually signals the parent plan is too broad — split into multiple parent plans
+- \> 10 child plans usually signals the parent plan is too broad — split into multiple parent plans
+- A subplan with >7 tasks risks tasks being dropped during implementation — context limits cause later tasks to be forgotten. Target 5–7 tasks per subplan.

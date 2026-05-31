@@ -1,6 +1,6 @@
 {
   "name": "xonovex-skill-react",
-  "version": "0.2.6",
+  "version": "0.2.7",
   "description": "Xonovex React skills",
   "author": {"name": "Xonovex"},
   "skills": ["./react-guide"]

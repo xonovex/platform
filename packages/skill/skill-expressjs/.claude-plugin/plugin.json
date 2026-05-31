@@ -1,6 +1,6 @@
 {
   "name": "xonovex-skill-expressjs",
-  "version": "0.2.6",
+  "version": "0.2.7",
   "description": "Xonovex Express.js skills",
   "author": {"name": "Xonovex"},
   "skills": ["./expressjs-guide"]

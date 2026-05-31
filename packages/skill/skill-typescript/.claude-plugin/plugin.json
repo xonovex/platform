@@ -1,6 +1,6 @@
 {
   "name": "xonovex-skill-typescript",
-  "version": "0.2.6",
+  "version": "0.2.7",
   "description": "Xonovex TypeScript skills",
   "author": {"name": "Xonovex"},
   "skills": ["./typescript-guide"]

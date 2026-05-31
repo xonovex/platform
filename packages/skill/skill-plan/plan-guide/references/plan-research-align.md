@@ -1,4 +1,4 @@
-# code-align: Research Code Alignment Between Similar Implementations
+# plan-research-align: Research Code Alignment Between Similar Implementations
 
 Analyze two similar implementations to identify structural differences, inconsistencies, and opportunities for alignment. Generates a research report. Does **not** create plans or make changes — run `plan-create` afterward.
 

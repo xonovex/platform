@@ -12,7 +12,7 @@ allowed-tools:
 argument-hint: "[path] [--aspects <type-safety,logging,validation>]"
 ---
 
-# /xonovex-workflow:code-harden – Research Code Hardening Opportunities
+# /xonovex-workflow:plan-research-harden – Research Code Hardening Opportunities
 
 Analyzes code for hardening opportunities (type safety, validation, logging, error handling). Generates a detailed research report. Does NOT create plans or make changes - run `/xonovex-workflow:plan-create` afterward to create an implementation plan.
 
@@ -26,10 +26,10 @@ Analyzes code for hardening opportunities (type safety, validation, logging, err
 
 ```bash
 # Analyze all aspects
-/xonovex-workflow:code-harden packages/myapp/
+/xonovex-workflow:plan-research-harden packages/myapp/
 
 # Focus on specific aspects
-/xonovex-workflow:code-harden src/ --aspects type-safety,logging
+/xonovex-workflow:plan-research-harden src/ --aspects type-safety,logging
 ```
 
 ## Arguments

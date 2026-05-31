@@ -22,8 +22,8 @@ Generate high-level plan from spec/requirements using deep codebase and web rese
 Run research before using this command:
 
 - `/xonovex-workflow:plan-research` - General codebase and web research
-- `/xonovex-workflow:code-simplify` - Code simplification analysis
-- `/xonovex-workflow:code-harden` - Code hardening analysis
+- `/xonovex-workflow:plan-research-simplify` - Code simplification analysis
+- `/xonovex-workflow:plan-research-harden` - Code hardening analysis
 - Or other `/plan-research-*` commands as appropriate
 
 This command assumes research context is already in the conversation. It does NOT perform codebase exploration.

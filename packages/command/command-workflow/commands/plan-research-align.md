@@ -12,16 +12,16 @@ allowed-tools:
 argument-hint: "[file1] [file2] [--interactive]"
 ---
 
-# /xonovex-workflow:code-align – Research Code Alignment Between Similar Implementations
+# /xonovex-workflow:plan-research-align – Research Code Alignment Between Similar Implementations
 
 Analyzes two similar implementations to identify structural differences, inconsistencies, and opportunities for alignment. Generates a detailed research report. Does NOT create plans or make changes - run `/xonovex-workflow:plan-create` afterward to create an implementation plan.
 
 ## Usage
 
 ```bash
-/xonovex-workflow:code-align src/file-a.ts src/file-b.ts
-/xonovex-workflow:code-align src/file-a.ts src/file-b.ts --interactive
-/xonovex-workflow:code-align "src/process-*.ts"
+/xonovex-workflow:plan-research-align src/file-a.ts src/file-b.ts
+/xonovex-workflow:plan-research-align src/file-a.ts src/file-b.ts --interactive
+/xonovex-workflow:plan-research-align "src/process-*.ts"
 ```
 
 ## Arguments
@@ -86,10 +86,10 @@ Recommendations:
 
 ```bash
 # Compare two implementations
-/xonovex-workflow:code-align src/process-a.ts src/process-b.ts
+/xonovex-workflow:plan-research-align src/process-a.ts src/process-b.ts
 
 # Interactive with glob pattern
-/xonovex-workflow:code-align "src/handler-*.ts" --interactive
+/xonovex-workflow:plan-research-align "src/handler-*.ts" --interactive
 ```
 
 ## Next Steps
