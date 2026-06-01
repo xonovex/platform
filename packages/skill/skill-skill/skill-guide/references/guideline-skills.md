@@ -4,7 +4,7 @@
 
 A ready-to-scaffold template lives under `assets/guideline-skill-template/`:
 
-- [`assets/guideline-skill-template/SKILL.md`](../assets/guideline-skill-template/SKILL.md) — umbrella with frontmatter, Essentials, Gotchas, Example, Progressive Disclosure
+- [`assets/guideline-skill-template/SKILL.md.template`](../assets/guideline-skill-template/SKILL.md.template) — umbrella with frontmatter, Essentials, Gotchas, Example, Progressive Disclosure
 - [`assets/guideline-skill-template/SOURCES.md`](../assets/guideline-skill-template/SOURCES.md) — upstream source tracking
 - [`assets/guideline-skill-template/eval-queries.json`](../assets/guideline-skill-template/eval-queries.json) — 12 sample trigger-eval queries (8 train + 4 validation, mix of should-trigger and near-miss)
 - [`assets/guideline-skill-template/references/{topic}.md`](../assets/guideline-skill-template/references/{topic}.md) — reference file template (Guideline / Rationale / How to Apply / Example / Counter-Example / Related)
