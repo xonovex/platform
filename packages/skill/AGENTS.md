@@ -20,8 +20,9 @@ Coding-guideline Agent Skills for the Xonovex marketplace. For authoring mechani
 
 ## Package layout (per skill)
 
-- `skill-<topic>/`: `package.json` (`@xonovex/skill-<topic>`), `moon.yml`, `prettier.config.ts`, `.claude-plugin/plugin.json` (`xonovex-skill-<topic>`), and `<topic>-guide/`.
+- `skill-<topic>/`: `package.json` (`@xonovex/skill-<topic>`), `moon.yml`, `prettier.config.ts`, `.claude-plugin/plugin.json`, `.codex-plugin/plugin.json` (`xonovex-skill-<topic>`), and `<topic>-guide/`.
 - `<topic>-guide/`: `SKILL.md`, `references/*.md`, `SOURCES.md`, `eval-queries.json`.
+- Codex plugin manifests use a string `skills` path pointing directly at the guide directory, e.g. `"./<topic>-guide"`. Do not point Codex skills at `"./"`; the loader will not expose nested guide skills reliably.
 - Versions are lockstep across all skill packages (match the others).
 
 ## Register & validate
