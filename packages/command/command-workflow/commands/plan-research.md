@@ -16,7 +16,7 @@ argument-hint: "<requirements> [--interactive] [--save-to <file>]"
 
 # /xonovex-workflow:plan-research – Research Codebase and Web
 
-Research codebase and web for requirements, presenting findings for review. Does NOT create plans - run `/xonovex-workflow:plan-create` afterward to create an implementation plan.
+Research codebase and web for requirements, presenting findings for review. Does NOT create plans - run `/xonovex-workflow:plan-clarify` afterward to settle open decisions one by one, then `/xonovex-workflow:plan-create` to create an implementation plan.
 
 ## Goal
 
@@ -46,7 +46,7 @@ Research codebase and web for requirements, presenting findings for review. Does
 
 4. **Synthesize findings**: Combine codebase + web research
 
-5. **Present or save**: Display findings OR save to file
+5. **Present or save**: Display findings OR save to file; when findings contain open decisions (ambiguities, contradictions, unsettled trade-offs), say so and recommend `/xonovex-workflow:plan-clarify`
 
 ## Implementation Details
 
@@ -83,6 +83,14 @@ Skills: typescript-guide, hono-guide
 /xonovex-workflow:plan-research "Implement WebSocket support" --interactive
 /xonovex-workflow:plan-research "Add analytics tracking" --save-to research/analytics.md
 ```
+
+## Next Steps
+
+After running this research command:
+
+1. Review the research findings for accuracy
+2. Run `/xonovex-workflow:plan-clarify` when the findings left open decisions to settle one by one
+3. Run `/xonovex-workflow:plan-create` to create an implementation plan from this research
 
 ## Error Handling
 

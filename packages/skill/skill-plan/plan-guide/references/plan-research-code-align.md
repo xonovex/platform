@@ -1,6 +1,6 @@
-# plan-research-align: Research Code Alignment Between Similar Implementations
+# plan-research-code-align: Research Code Alignment Between Similar Implementations
 
-Analyze two similar implementations to identify structural differences, inconsistencies, and opportunities for alignment. Generates a research report. Does **not** create plans or make changes — run `plan-create` afterward.
+Analyze two similar implementations to identify structural differences, inconsistencies, and opportunities for alignment. Generates a research report and stops there. Does **not** edit code and does **not** create plans — continue with the plan operations afterward (optionally `plan-clarify` to settle open decisions, then `plan-create`).
 
 ## Core Workflow
 

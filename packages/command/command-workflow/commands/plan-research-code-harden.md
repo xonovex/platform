@@ -1,5 +1,8 @@
 ---
-description: "Harden code by improving type safety, validation, logging, and error handling"
+description: >-
+  Research code-hardening opportunities (type safety, validation, logging,
+  error handling) — read-only report that feeds a follow-up plan; makes no
+  changes
 allowed-tools:
   - Read
   - Grep
@@ -12,7 +15,7 @@ allowed-tools:
 argument-hint: "[path] [--aspects <type-safety,logging,validation>]"
 ---
 
-# /xonovex-workflow:plan-research-harden – Research Code Hardening Opportunities
+# /xonovex-workflow:plan-research-code-harden – Research Code Hardening Opportunities
 
 Analyzes code for hardening opportunities (type safety, validation, logging, error handling). Generates a detailed research report. Does NOT create plans or make changes - run `/xonovex-workflow:plan-create` afterward to create an implementation plan.
 
@@ -26,10 +29,10 @@ Analyzes code for hardening opportunities (type safety, validation, logging, err
 
 ```bash
 # Analyze all aspects
-/xonovex-workflow:plan-research-harden packages/myapp/
+/xonovex-workflow:plan-research-code-harden packages/myapp/
 
 # Focus on specific aspects
-/xonovex-workflow:plan-research-harden src/ --aspects type-safety,logging
+/xonovex-workflow:plan-research-code-harden src/ --aspects type-safety,logging
 ```
 
 ## Arguments
@@ -39,7 +42,7 @@ Analyzes code for hardening opportunities (type safety, validation, logging, err
 
 ## Core Workflow
 
-**Delegate codebase analysis to read-only search agents where available; otherwise use grep/find/file-read directly.**
+**IMPORTANT: This command is read-only research, do NOT edit code and do NOT author a plan. The output is a report; planning happens afterward via the plan commands. Delegate codebase analysis to read-only search agents where available; otherwise use grep/find/file-read directly.**
 
 1. **Read Guidelines**: Check AGENTS.md, POLICY.md and referenced guidelines for project standards
 2. **Analyze**: Run focused, read-only searches to find anti-patterns and violations; categorize by priority
@@ -98,4 +101,5 @@ Group by severity + category; prioritize by impact and fix effort.
 After running this research command:
 
 1. Review the hardening report for accuracy
-2. Run `/xonovex-workflow:plan-create` to create an implementation plan from this research
+2. Optionally run `/xonovex-workflow:plan-clarify` to settle open decisions one by one
+3. Run `/xonovex-workflow:plan-create` to create an implementation plan from this research

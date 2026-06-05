@@ -1,6 +1,6 @@
 {
   "name": "xonovex-skill-sql-postgresql",
-  "version": "0.2.7",
+  "version": "0.2.8",
   "description": "Xonovex PostgreSQL skills",
   "author": {
     "name": "Xonovex"

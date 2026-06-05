@@ -20,7 +20,7 @@ Group 2: Performance optimizations (18 occurrences, 7 files)
 - "TODO: Optimize database queries"
 - Files: across services
 - Priority: MEDIUM
-- Action: Create plan-research-simplify analysis
+- Action: Create plan-research-code-simplify analysis
 
 Group 3: Deprecations (17 occurrences, 5 files)
 - "TODO: Remove legacy API"

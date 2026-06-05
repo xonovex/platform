@@ -1,6 +1,6 @@
-# plan-research-simplify: Research Code Simplification Opportunities
+# plan-research-code-simplify: Research Code Simplification Opportunities
 
-Analyze code complexity to identify consolidation, dead code removal, and simplification opportunities. Generates a research report. Does **not** create plans or make changes — run `plan-create` afterward.
+Analyze code complexity to identify consolidation, dead code removal, and simplification opportunities. Generates a research report and stops there. Does **not** edit code and does **not** create plans — continue with the plan operations afterward (optionally `plan-clarify` to settle open decisions, then `plan-create`).
 
 ## Goal
 
