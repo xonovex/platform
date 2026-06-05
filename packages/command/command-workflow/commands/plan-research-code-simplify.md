@@ -1,7 +1,8 @@
 ---
 description: >-
-  Simplify code by consolidating duplicates, removing dead code, and flattening
-  abstractions
+  Research code-simplification opportunities (duplicates, dead code,
+  over-abstraction) — read-only report that feeds a follow-up plan; makes no
+  changes
 allowed-tools:
   - Read
   - Glob
@@ -16,7 +17,7 @@ argument-hint: >-
   <duplicates,dead-code,dependencies,abstractions,interfaces,config>]
 ---
 
-# /xonovex-workflow:plan-research-simplify – Research Code Simplification Opportunities
+# /xonovex-workflow:plan-research-code-simplify – Research Code Simplification Opportunities
 
 Analyzes code complexity to identify consolidation, dead code removal, and simplification opportunities. Generates a detailed research report. Does NOT create plans or make changes - run `/xonovex-workflow:plan-create` afterward to create an implementation plan.
 
@@ -31,8 +32,8 @@ Analyzes code complexity to identify consolidation, dead code removal, and simpl
 ## Usage
 
 ```bash
-/xonovex-workflow:plan-research-simplify packages/my-package/
-/xonovex-workflow:plan-research-simplify src/ --aspects duplicates,dead-code
+/xonovex-workflow:plan-research-code-simplify packages/my-package/
+/xonovex-workflow:plan-research-code-simplify src/ --aspects duplicates,dead-code
 ```
 
 ## Arguments
@@ -53,7 +54,7 @@ Analyzes code complexity to identify consolidation, dead code removal, and simpl
 
 ## Core Workflow
 
-**Delegate codebase analysis to read-only search agents where available; otherwise use grep/find/file-read directly.**
+**IMPORTANT: This command is read-only research, do NOT edit code and do NOT author a plan. The output is a report; planning happens afterward via the plan commands. Delegate codebase analysis to read-only search agents where available; otherwise use grep/find/file-read directly.**
 
 1. **Discovery** - Scan files, build signature index, analyze dependency trees
 2. **Analysis** - Check each aspect for issues via focused read-only searches
@@ -129,8 +130,8 @@ Impact: ~450 lines removed, 3 dependencies pruned, 25% complexity reduction
 ## Examples
 
 ```bash
-/xonovex-workflow:plan-research-simplify packages/api/ --aspects dead-code
-/xonovex-workflow:plan-research-simplify services/ --aspects abstractions,interfaces
+/xonovex-workflow:plan-research-code-simplify packages/api/ --aspects dead-code
+/xonovex-workflow:plan-research-code-simplify services/ --aspects abstractions,interfaces
 ```
 
 ## Next Steps
@@ -138,4 +139,5 @@ Impact: ~450 lines removed, 3 dependencies pruned, 25% complexity reduction
 After running this research command:
 
 1. Review the simplification report for accuracy
-2. Run `/xonovex-workflow:plan-create` to create an implementation plan from this research
+2. Optionally run `/xonovex-workflow:plan-clarify` to settle open decisions one by one
+3. Run `/xonovex-workflow:plan-create` to create an implementation plan from this research

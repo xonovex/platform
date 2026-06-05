@@ -24,7 +24,7 @@ digraph Workflow {
     leg_loop [label="Feedback Loop", shape=cds, fillcolor=lightgreen];
     leg_parallel [label="Parallel Execution", shape=parallelogram, fillcolor=wheat];
     leg_session [label="--- New Session ---", shape=plaintext, fontcolor=gray40];
-    leg_note [label="Also: code-align, shared-extract,\n*-simplify (run as needed)", shape=note, fillcolor=white, fontsize=9];
+    leg_note [label="Also: plan-research-code-align,\nshared-extract, *-simplify\n(run as needed)", shape=note, fillcolor=white, fontsize=9];
 
     leg_wrapper -> leg_cmd -> leg_agent -> leg_human -> leg_loop -> leg_parallel -> leg_session [style=invis];
   }
@@ -109,8 +109,8 @@ digraph Workflow {
     fillcolor="#fff5e6";
 
     session_quality [label="--- New Session ---", shape=plaintext, fontcolor=gray40];
-    code_simplify [label="code-simplify\n(find code smells)", fillcolor=lightblue];
-    code_harden [label="code-harden\n(type safety, validation,\nerror handling)", fillcolor=lightblue];
+    code_simplify [label="plan-research-code-simplify\n(research code smells,\nplan changes after)", fillcolor=lightblue];
+    code_harden [label="plan-research-code-harden\n(research type safety, validation,\nerror handling; plan after)", fillcolor=lightblue];
     quality_loop [label="Another\ncoding loop?", shape=diamond, fillcolor=lightcoral];
   }
 

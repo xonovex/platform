@@ -4,7 +4,7 @@ Generate a high-level TDD plan for user review BEFORE detailed RED-GREEN-COMMIT 
 
 ## Prerequisites
 
-Run research first (see `plan-research.md` / `plan-research-simplify.md` / `plan-research-harden.md`); this command assumes research context is already in the conversation and does NOT perform codebase exploration.
+Run research first (see `plan-research.md` / `plan-research-code-simplify.md` / `plan-research-code-harden.md`); this command assumes research context is already in the conversation and does NOT perform codebase exploration.
 
 ## Goal
 

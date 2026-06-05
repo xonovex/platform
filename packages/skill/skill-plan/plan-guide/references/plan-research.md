@@ -1,6 +1,6 @@
 # plan-research: Research Codebase and Web for Requirements
 
-Research codebase and web for requirements; present findings for review. Does **not** create plans — run `plan-create` afterward to author one.
+Research codebase and web for requirements; present findings for review. Does **not** create plans — run `plan-clarify` afterward to settle open decisions one by one, then `plan-create` to author one.
 
 ## Goal
 
@@ -20,7 +20,7 @@ Research codebase and web for requirements; present findings for review. Does **
    - Testing / build patterns, applicable coding guidelines
 3. **Web research** — search for latest versions; fetch official docs
 4. **Synthesize** — combine codebase + web research
-5. **Present or save** — display findings or save to a file
+5. **Present or save** — display findings or save to a file; when findings contain open decisions (ambiguities, contradictions, unsettled trade-offs), say so and recommend `plan-clarify`
 
 ## Implementation Details
 

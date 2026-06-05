@@ -1,6 +1,6 @@
 {
   "name": "xonovex-skill-cross-platform",
-  "version": "0.2.7",
+  "version": "0.2.8",
   "description": "Xonovex Cross-platform / portability skills",
   "author": {"name": "Xonovex"},
   "skills": ["./cross-platform-guide"]

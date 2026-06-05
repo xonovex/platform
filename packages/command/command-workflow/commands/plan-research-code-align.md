@@ -1,5 +1,7 @@
 ---
-description: Create alignment between two similar implementations and suggest improvements
+description: >-
+  Research alignment between two similar code implementations — read-only
+  report that feeds a follow-up plan; makes no changes
 allowed-tools:
   - Read
   - Glob
@@ -12,16 +14,16 @@ allowed-tools:
 argument-hint: "[file1] [file2] [--interactive]"
 ---
 
-# /xonovex-workflow:plan-research-align – Research Code Alignment Between Similar Implementations
+# /xonovex-workflow:plan-research-code-align – Research Code Alignment Between Similar Implementations
 
 Analyzes two similar implementations to identify structural differences, inconsistencies, and opportunities for alignment. Generates a detailed research report. Does NOT create plans or make changes - run `/xonovex-workflow:plan-create` afterward to create an implementation plan.
 
 ## Usage
 
 ```bash
-/xonovex-workflow:plan-research-align src/file-a.ts src/file-b.ts
-/xonovex-workflow:plan-research-align src/file-a.ts src/file-b.ts --interactive
-/xonovex-workflow:plan-research-align "src/process-*.ts"
+/xonovex-workflow:plan-research-code-align src/file-a.ts src/file-b.ts
+/xonovex-workflow:plan-research-code-align src/file-a.ts src/file-b.ts --interactive
+/xonovex-workflow:plan-research-code-align "src/process-*.ts"
 ```
 
 ## Arguments
@@ -32,7 +34,7 @@ Analyzes two similar implementations to identify structural differences, inconsi
 
 ## Core Workflow
 
-**Delegate codebase analysis to read-only search agents where available; otherwise use grep/find/file-read directly.**
+**IMPORTANT: This command is read-only research, do NOT edit code and do NOT author a plan. The output is a report; planning happens afterward via the plan commands. Delegate codebase analysis to read-only search agents where available; otherwise use grep/find/file-read directly.**
 
 1. **Discovery & Loading**
    - Resolve files from paths or glob patterns
@@ -86,10 +88,10 @@ Recommendations:
 
 ```bash
 # Compare two implementations
-/xonovex-workflow:plan-research-align src/process-a.ts src/process-b.ts
+/xonovex-workflow:plan-research-code-align src/process-a.ts src/process-b.ts
 
 # Interactive with glob pattern
-/xonovex-workflow:plan-research-align "src/handler-*.ts" --interactive
+/xonovex-workflow:plan-research-code-align "src/handler-*.ts" --interactive
 ```
 
 ## Next Steps
@@ -97,7 +99,8 @@ Recommendations:
 After running this research command:
 
 1. Review the alignment report for accuracy
-2. Run `/xonovex-workflow:plan-create` to create an implementation plan from this research
+2. Optionally run `/xonovex-workflow:plan-clarify` to settle open decisions one by one
+3. Run `/xonovex-workflow:plan-create` to create an implementation plan from this research
 
 ## Error Handling
 

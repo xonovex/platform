@@ -25,6 +25,7 @@ codex plugin add xonovex-workflow@xonovex-marketplace
 | 1. plan-research    |---->| 1. plan-create      |---->| 1. plan-worktree-   |
 |    - viability      |     | 2. plan-subplans    |     |      create         |
 |    - alternatives   |     | 3. git-commit       |     | 2. cd <worktree>    |
+| 2. plan-clarify     |     |                     |     |                     |
 +---------------------+     +---------------------+     +---------------------+
                                                                   |
             +-----------------------------------------------------+
@@ -34,8 +35,8 @@ codex plugin add xonovex-workflow@xonovex-marketplace
 |  Development Loop   |     |    Code Quality     |     |        Merge        |
 +---------------------+     +---------------------+     +---------------------+
 | 1. plan-continue    |---->| 1. plan-research-   |---->| 1. plan-worktree-   |
-| 2. (implement)      |     |      simplify/harden|     |      merge          |
-| 3. plan-validate    |     |                     |     | 2. git-commit       |
+| 2. (implement)      |     |      code-simplify/ |     |      merge          |
+| 3. plan-validate    |     |      code-harden    |     | 2. git-commit       |
 | 4. insights-extract |     +---------------------+     |      --push         |
 | 5. plan-update      |            |                    +---------------------+
 +---------------------+            |                              |
@@ -53,23 +54,24 @@ Learning: insights-integrate merges learnings into guidelines for future session
 
 ## Commands
 
-| Command                  | Description                                                    |
-| ------------------------ | -------------------------------------------------------------- |
-| `plan-research`          | Research codebase and web for requirements                     |
-| `plan-create`            | Create a high-level plan for user review                       |
-| `plan-tdd-create`        | Create a TDD plan with research for user review                |
-| `plan-subplans-create`   | Generate detailed subplans with parallel execution detection   |
-| `plan-worktree-create`   | Create a git worktree for a feature branch                     |
-| `plan-continue`          | Resume work from an existing plan                              |
-| `plan-validate`          | Verify that a plan or current work has been fully achieved     |
-| `plan-update`            | Update plan status and test results                            |
-| `plan-refine`            | Process user annotations and refine iteratively                |
-| `plan-worktree-merge`    | Merge feature worktree back to source                          |
-| `plan-worktree-abandon`  | Document and abandon a feature with reason and learnings       |
-| `plan-research-simplify` | Consolidate duplicates, remove dead code, flatten abstractions |
-| `plan-research-harden`   | Improve type safety, validation, and error handling            |
-| `plan-research-align`    | Align two similar implementations and suggest improvements     |
-| `git-commit`             | Commit and push changes                                        |
+| Command                       | Description                                                     |
+| ----------------------------- | --------------------------------------------------------------- |
+| `plan-research`               | Research codebase and web for requirements                      |
+| `plan-clarify`                | Walk open decisions one by one in plain prose                   |
+| `plan-create`                 | Create a high-level plan for user review                        |
+| `plan-tdd-create`             | Create a TDD plan with research for user review                 |
+| `plan-subplans-create`        | Generate detailed subplans with parallel execution detection    |
+| `plan-worktree-create`        | Create a git worktree for a feature branch                      |
+| `plan-continue`               | Resume work from an existing plan                               |
+| `plan-validate`               | Verify that a plan or current work has been fully achieved      |
+| `plan-update`                 | Update plan status and test results                             |
+| `plan-refine`                 | Process user annotations and refine iteratively                 |
+| `plan-worktree-merge`         | Merge feature worktree back to source                           |
+| `plan-worktree-abandon`       | Document and abandon a feature with reason and learnings        |
+| `plan-research-code-simplify` | Research code-simplification opportunities for a follow-up plan |
+| `plan-research-code-harden`   | Research code-hardening opportunities for a follow-up plan      |
+| `plan-research-code-align`    | Research alignment of two similar implementations for a plan    |
+| `git-commit`                  | Commit and push changes                                         |
 
 ## Design Decisions
 

@@ -1,6 +1,6 @@
 {
   "name": "xonovex-skill-audio",
-  "version": "0.2.7",
+  "version": "0.2.8",
   "description": "Xonovex Low-level audio skills",
   "author": {"name": "Xonovex"},
   "skills": ["./audio-guide"]
