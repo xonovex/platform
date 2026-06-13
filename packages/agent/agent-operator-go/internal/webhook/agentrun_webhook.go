@@ -6,10 +6,8 @@ import (
 	"strings"
 	"time"
 
-	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/controller-runtime/pkg/webhook"
 	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -24,25 +22,20 @@ type AgentRunWebhook struct {
 	Client client.Client
 }
 
-var _ webhook.CustomDefaulter = &AgentRunWebhook{}
-var _ webhook.CustomValidator = &AgentRunWebhook{}
+var _ admission.Defaulter[*agentv1alpha1.AgentRun] = &AgentRunWebhook{}
+var _ admission.Validator[*agentv1alpha1.AgentRun] = &AgentRunWebhook{}
 
 // SetupWebhookWithManager sets up the webhook with the Manager
 func (w *AgentRunWebhook) SetupWebhookWithManager(mgr ctrl.Manager) error {
 	w.Client = mgr.GetClient()
 	return ctrl.NewWebhookManagedBy(mgr, &agentv1alpha1.AgentRun{}).
-		WithCustomDefaulter(w).
-		WithCustomValidator(w).
+		WithDefaulter(w).
+		WithValidator(w).
 		Complete()
 }
 
-// Default implements webhook.CustomDefaulter
-func (w *AgentRunWebhook) Default(_ context.Context, obj runtime.Object) error {
-	run, ok := obj.(*agentv1alpha1.AgentRun)
-	if !ok {
-		return fmt.Errorf("expected AgentRun, got %T", obj)
-	}
-
+// Default implements admission.Defaulter
+func (w *AgentRunWebhook) Default(_ context.Context, run *agentv1alpha1.AgentRun) error {
 	if run.Spec.Timeout == nil {
 		defaultTimeout := metav1.Duration{Duration: time.Hour}
 		run.Spec.Timeout = &defaultTimeout
@@ -51,28 +44,18 @@ func (w *AgentRunWebhook) Default(_ context.Context, obj runtime.Object) error {
 	return nil
 }
 
-// ValidateCreate implements webhook.CustomValidator
-func (w *AgentRunWebhook) ValidateCreate(ctx context.Context, obj runtime.Object) (admission.Warnings, error) {
-	run, ok := obj.(*agentv1alpha1.AgentRun)
-	if !ok {
-		return nil, fmt.Errorf("expected AgentRun, got %T", obj)
-	}
-
+// ValidateCreate implements admission.Validator
+func (w *AgentRunWebhook) ValidateCreate(ctx context.Context, run *agentv1alpha1.AgentRun) (admission.Warnings, error) {
 	return w.validate(ctx, run)
 }
 
-// ValidateUpdate implements webhook.CustomValidator
-func (w *AgentRunWebhook) ValidateUpdate(ctx context.Context, _ runtime.Object, newObj runtime.Object) (admission.Warnings, error) {
-	run, ok := newObj.(*agentv1alpha1.AgentRun)
-	if !ok {
-		return nil, fmt.Errorf("expected AgentRun, got %T", newObj)
-	}
-
-	return w.validate(ctx, run)
+// ValidateUpdate implements admission.Validator
+func (w *AgentRunWebhook) ValidateUpdate(ctx context.Context, _ *agentv1alpha1.AgentRun, newObj *agentv1alpha1.AgentRun) (admission.Warnings, error) {
+	return w.validate(ctx, newObj)
 }
 
-// ValidateDelete implements webhook.CustomValidator
-func (w *AgentRunWebhook) ValidateDelete(_ context.Context, _ runtime.Object) (admission.Warnings, error) {
+// ValidateDelete implements admission.Validator
+func (w *AgentRunWebhook) ValidateDelete(_ context.Context, _ *agentv1alpha1.AgentRun) (admission.Warnings, error) {
 	return nil, nil
 }
 

@@ -83,5 +83,5 @@ type AgentWorkspaceList struct {
 }
 
 func init() {
-	SchemeBuilder.Register(&AgentWorkspace{}, &AgentWorkspaceList{})
+	registerTypes(&AgentWorkspace{}, &AgentWorkspaceList{})
 }

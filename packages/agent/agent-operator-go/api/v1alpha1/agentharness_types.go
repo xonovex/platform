@@ -34,5 +34,5 @@ type AgentHarnessList struct {
 }
 
 func init() {
-	SchemeBuilder.Register(&AgentHarness{}, &AgentHarnessList{})
+	registerTypes(&AgentHarness{}, &AgentHarnessList{})
 }
