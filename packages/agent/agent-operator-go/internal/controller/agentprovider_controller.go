@@ -8,7 +8,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
-	"k8s.io/client-go/tools/record"
+	"k8s.io/client-go/tools/events"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
@@ -20,7 +20,7 @@ import (
 type AgentProviderReconciler struct {
 	client.Client
 	Scheme   *runtime.Scheme
-	Recorder record.EventRecorder
+	Recorder events.EventRecorder
 }
 
 func (r *AgentProviderReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
@@ -49,7 +49,7 @@ func (r *AgentProviderReconciler) Reconcile(ctx context.Context, req ctrl.Reques
 			if errors.IsNotFound(err) {
 				ready = false
 				log.Info("referenced secret not found", "secret", secretName)
-				r.Recorder.Eventf(&provider, corev1.EventTypeWarning, "ProviderSecretMissing",
+				r.Recorder.Eventf(&provider, nil, corev1.EventTypeWarning, "ProviderSecretMissing", "ProviderSecretMissing",
 					"Secret %s not found or key %s missing",
 					provider.Spec.AuthTokenSecretRef.Name, provider.Spec.AuthTokenSecretRef.Key)
 			} else {
@@ -60,11 +60,11 @@ func (r *AgentProviderReconciler) Reconcile(ctx context.Context, req ctrl.Reques
 			if _, ok := secret.Data[provider.Spec.AuthTokenSecretRef.Key]; !ok {
 				ready = false
 				log.Info("key not found in secret", "secret", secretName, "key", provider.Spec.AuthTokenSecretRef.Key)
-				r.Recorder.Eventf(&provider, corev1.EventTypeWarning, "ProviderSecretMissing",
+				r.Recorder.Eventf(&provider, nil, corev1.EventTypeWarning, "ProviderSecretMissing", "ProviderSecretMissing",
 					"Secret %s not found or key %s missing",
 					provider.Spec.AuthTokenSecretRef.Name, provider.Spec.AuthTokenSecretRef.Key)
 			} else {
-				r.Recorder.Eventf(&provider, corev1.EventTypeNormal, "ProviderSecretResolved",
+				r.Recorder.Eventf(&provider, nil, corev1.EventTypeNormal, "ProviderSecretResolved", "ProviderSecretResolved",
 					"Secret %s key %s resolved successfully",
 					provider.Spec.AuthTokenSecretRef.Name, provider.Spec.AuthTokenSecretRef.Key)
 			}
