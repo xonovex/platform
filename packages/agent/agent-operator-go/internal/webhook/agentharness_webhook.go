@@ -19,9 +19,8 @@ type AgentHarnessWebhook struct{}
 var _ webhook.CustomValidator = &AgentHarnessWebhook{}
 
 func (w *AgentHarnessWebhook) SetupWebhookWithManager(mgr ctrl.Manager) error {
-	return ctrl.NewWebhookManagedBy(mgr).
-		For(&agentv1alpha1.AgentHarness{}).
-		WithValidator(w).
+	return ctrl.NewWebhookManagedBy(mgr, &agentv1alpha1.AgentHarness{}).
+		WithCustomValidator(w).
 		Complete()
 }
 

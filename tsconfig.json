@@ -3,61 +3,61 @@
   "files": [],
   "references": [
     {
+      "path": "./packages/agent/agent-cli-go"
+    },
+    {
+      "path": "./packages/config/eslint-config-base"
+    },
+    {
+      "path": "./packages/config/eslint-config-cli"
+    },
+    {
+      "path": "./packages/config/prettier-config"
+    },
+    {
+      "path": "./packages/config/vite-config-base"
+    },
+    {
+      "path": "./packages/config/vitest-config-base"
+    },
+    {
+      "path": "./packages/config/vitest-config-node"
+    },
+    {
+      "path": "./packages/script/script-moon-action-graph"
+    },
+    {
+      "path": "./packages/script/script-moon-common"
+    },
+    {
+      "path": "./packages/script/script-moon-npm-check"
+    },
+    {
+      "path": "./packages/script/script-moon-npm-publish"
+    },
+    {
+      "path": "./packages/script/script-moon-skill-audit-sources"
+    },
+    {
+      "path": "./packages/script/script-moon-skill-eval-outputs"
+    },
+    {
+      "path": "./packages/script/script-moon-skill-eval-triggers"
+    },
+    {
+      "path": "./packages/script/script-moon-skill-validate"
+    },
+    {
+      "path": "./packages/script/script-moon-version-bump"
+    },
+    {
+      "path": "./packages/script/script-moon-version-detect"
+    },
+    {
+      "path": "./packages/shared/shared-core"
+    },
+    {
       "path": "packages/agent/agent-cli"
-    },
-    {
-      "path": "packages/agent/agent-cli-go"
-    },
-    {
-      "path": "packages/config/eslint-config-base"
-    },
-    {
-      "path": "packages/config/eslint-config-cli"
-    },
-    {
-      "path": "packages/config/prettier-config"
-    },
-    {
-      "path": "packages/config/vite-config-base"
-    },
-    {
-      "path": "packages/config/vitest-config-base"
-    },
-    {
-      "path": "packages/config/vitest-config-node"
-    },
-    {
-      "path": "packages/script/script-moon-action-graph"
-    },
-    {
-      "path": "packages/script/script-moon-common"
-    },
-    {
-      "path": "packages/script/script-moon-npm-check"
-    },
-    {
-      "path": "packages/script/script-moon-npm-publish"
-    },
-    {
-      "path": "packages/script/script-moon-skill-audit-sources"
-    },
-    {
-      "path": "packages/script/script-moon-skill-eval-outputs"
-    },
-    {
-      "path": "packages/script/script-moon-skill-eval-triggers"
-    },
-    {
-      "path": "packages/script/script-moon-skill-validate"
-    },
-    {
-      "path": "packages/script/script-moon-version-bump"
-    },
-    {
-      "path": "packages/script/script-moon-version-detect"
-    },
-    {
-      "path": "packages/shared/shared-core"
     }
   ]
 }

@@ -1,4 +1,3 @@
-import tsconfigPaths from "vite-tsconfig-paths";
 import {defineConfig} from "vitest/config";
 
 export default defineConfig({
@@ -36,8 +35,8 @@ export default defineConfig({
     // Ensure cleanup runs even on test failure
     teardownTimeout: 10_000,
   },
-  plugins: [tsconfigPaths({projects: ["./tsconfig.json"]})],
   resolve: {
     conditions: ["source"],
+    tsconfigPaths: true,
   },
 });

@@ -30,10 +30,9 @@ var _ webhook.CustomValidator = &AgentRunWebhook{}
 // SetupWebhookWithManager sets up the webhook with the Manager
 func (w *AgentRunWebhook) SetupWebhookWithManager(mgr ctrl.Manager) error {
 	w.Client = mgr.GetClient()
-	return ctrl.NewWebhookManagedBy(mgr).
-		For(&agentv1alpha1.AgentRun{}).
-		WithDefaulter(w).
-		WithValidator(w).
+	return ctrl.NewWebhookManagedBy(mgr, &agentv1alpha1.AgentRun{}).
+		WithCustomDefaulter(w).
+		WithCustomValidator(w).
 		Complete()
 }
 

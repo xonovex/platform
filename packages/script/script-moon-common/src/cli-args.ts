@@ -25,7 +25,7 @@ const formatHelp = (spec: CliSpec): string => {
     "\nOptions:",
     "  -h, --help  Show this help message",
     ...Object.entries(spec.options ?? {}).map(([name, opt]) => {
-      const shortFlag = opt.short ? `-${opt.short}, ` : "    ";
+      const shortFlag = opt.short ? `-${opt.short}, ` : " ".repeat(4);
       const desc = opt.description ?? "";
       return `  ${shortFlag}--${name}  ${desc}`;
     }),
@@ -39,7 +39,7 @@ const parseCliArgs = (spec: CliSpec, argv?: readonly string[]): ParsedArgs => {
   if (args.includes("--help") || args.includes("-h")) {
     console.log(formatHelp(spec));
     process.exit(0);
-    return {values: {}, positionals: []} as ParsedArgs;
+    return {values: {}, positionals: []};
   }
 
   const options: Record<
@@ -64,7 +64,7 @@ const parseCliArgs = (spec: CliSpec, argv?: readonly string[]): ParsedArgs => {
   });
 
   return {
-    values: result.values as Record<string, string | boolean | undefined>,
+    values: result.values,
     positionals: result.positionals,
   };
 };
