@@ -4,9 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
-	"sigs.k8s.io/controller-runtime/pkg/webhook"
 	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 
 	agentv1alpha1 "github.com/xonovex/platform/packages/agent/agent-operator-go/api/v1alpha1"
@@ -16,31 +14,23 @@ import (
 // AgentHarnessWebhook implements validation for AgentHarness
 type AgentHarnessWebhook struct{}
 
-var _ webhook.CustomValidator = &AgentHarnessWebhook{}
+var _ admission.Validator[*agentv1alpha1.AgentHarness] = &AgentHarnessWebhook{}
 
 func (w *AgentHarnessWebhook) SetupWebhookWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewWebhookManagedBy(mgr, &agentv1alpha1.AgentHarness{}).
-		WithCustomValidator(w).
+		WithValidator(w).
 		Complete()
 }
 
-func (w *AgentHarnessWebhook) ValidateCreate(_ context.Context, obj runtime.Object) (admission.Warnings, error) {
-	h, ok := obj.(*agentv1alpha1.AgentHarness)
-	if !ok {
-		return nil, fmt.Errorf("expected AgentHarness, got %T", obj)
-	}
+func (w *AgentHarnessWebhook) ValidateCreate(_ context.Context, h *agentv1alpha1.AgentHarness) (admission.Warnings, error) {
 	return w.validate(h)
 }
 
-func (w *AgentHarnessWebhook) ValidateUpdate(_ context.Context, _ runtime.Object, newObj runtime.Object) (admission.Warnings, error) {
-	h, ok := newObj.(*agentv1alpha1.AgentHarness)
-	if !ok {
-		return nil, fmt.Errorf("expected AgentHarness, got %T", newObj)
-	}
-	return w.validate(h)
+func (w *AgentHarnessWebhook) ValidateUpdate(_ context.Context, _ *agentv1alpha1.AgentHarness, newObj *agentv1alpha1.AgentHarness) (admission.Warnings, error) {
+	return w.validate(newObj)
 }
 
-func (w *AgentHarnessWebhook) ValidateDelete(_ context.Context, _ runtime.Object) (admission.Warnings, error) {
+func (w *AgentHarnessWebhook) ValidateDelete(_ context.Context, _ *agentv1alpha1.AgentHarness) (admission.Warnings, error) {
 	return nil, nil
 }
 

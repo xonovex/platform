@@ -34,5 +34,5 @@ type AgentToolchainList struct {
 }
 
 func init() {
-	SchemeBuilder.Register(&AgentToolchain{}, &AgentToolchainList{})
+	registerTypes(&AgentToolchain{}, &AgentToolchainList{})
 }

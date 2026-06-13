@@ -89,5 +89,5 @@ type AgentPolicyList struct {
 }
 
 func init() {
-	SchemeBuilder.Register(&AgentPolicy{}, &AgentPolicyList{})
+	registerTypes(&AgentPolicy{}, &AgentPolicyList{})
 }

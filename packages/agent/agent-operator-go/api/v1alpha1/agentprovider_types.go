@@ -60,5 +60,5 @@ type AgentProviderList struct {
 }
 
 func init() {
-	SchemeBuilder.Register(&AgentProvider{}, &AgentProviderList{})
+	registerTypes(&AgentProvider{}, &AgentProviderList{})
 }

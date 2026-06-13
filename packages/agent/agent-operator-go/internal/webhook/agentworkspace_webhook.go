@@ -6,9 +6,7 @@ import (
 	"strings"
 
 	"k8s.io/apimachinery/pkg/api/resource"
-	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
-	"sigs.k8s.io/controller-runtime/pkg/webhook"
 	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 
 	agentv1alpha1 "github.com/xonovex/platform/packages/agent/agent-operator-go/api/v1alpha1"
@@ -19,24 +17,19 @@ import (
 // AgentWorkspaceWebhook implements defaulting and validation for AgentWorkspace
 type AgentWorkspaceWebhook struct{}
 
-var _ webhook.CustomDefaulter = &AgentWorkspaceWebhook{}
-var _ webhook.CustomValidator = &AgentWorkspaceWebhook{}
+var _ admission.Defaulter[*agentv1alpha1.AgentWorkspace] = &AgentWorkspaceWebhook{}
+var _ admission.Validator[*agentv1alpha1.AgentWorkspace] = &AgentWorkspaceWebhook{}
 
 // SetupWebhookWithManager sets up the webhook with the Manager
 func (w *AgentWorkspaceWebhook) SetupWebhookWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewWebhookManagedBy(mgr, &agentv1alpha1.AgentWorkspace{}).
-		WithCustomDefaulter(w).
-		WithCustomValidator(w).
+		WithDefaulter(w).
+		WithValidator(w).
 		Complete()
 }
 
-// Default implements webhook.CustomDefaulter
-func (w *AgentWorkspaceWebhook) Default(_ context.Context, obj runtime.Object) error {
-	ws, ok := obj.(*agentv1alpha1.AgentWorkspace)
-	if !ok {
-		return fmt.Errorf("expected AgentWorkspace, got %T", obj)
-	}
-
+// Default implements admission.Defaulter
+func (w *AgentWorkspaceWebhook) Default(_ context.Context, ws *agentv1alpha1.AgentWorkspace) error {
 	if ws.Spec.StorageSize == "" {
 		ws.Spec.StorageSize = "10Gi"
 	}
@@ -50,26 +43,18 @@ func (w *AgentWorkspaceWebhook) Default(_ context.Context, obj runtime.Object) e
 	return nil
 }
 
-// ValidateCreate implements webhook.CustomValidator
-func (w *AgentWorkspaceWebhook) ValidateCreate(_ context.Context, obj runtime.Object) (admission.Warnings, error) {
-	ws, ok := obj.(*agentv1alpha1.AgentWorkspace)
-	if !ok {
-		return nil, fmt.Errorf("expected AgentWorkspace, got %T", obj)
-	}
+// ValidateCreate implements admission.Validator
+func (w *AgentWorkspaceWebhook) ValidateCreate(_ context.Context, ws *agentv1alpha1.AgentWorkspace) (admission.Warnings, error) {
 	return w.validate(ws)
 }
 
-// ValidateUpdate implements webhook.CustomValidator
-func (w *AgentWorkspaceWebhook) ValidateUpdate(_ context.Context, _ runtime.Object, newObj runtime.Object) (admission.Warnings, error) {
-	ws, ok := newObj.(*agentv1alpha1.AgentWorkspace)
-	if !ok {
-		return nil, fmt.Errorf("expected AgentWorkspace, got %T", newObj)
-	}
-	return w.validate(ws)
+// ValidateUpdate implements admission.Validator
+func (w *AgentWorkspaceWebhook) ValidateUpdate(_ context.Context, _ *agentv1alpha1.AgentWorkspace, newObj *agentv1alpha1.AgentWorkspace) (admission.Warnings, error) {
+	return w.validate(newObj)
 }
 
-// ValidateDelete implements webhook.CustomValidator
-func (w *AgentWorkspaceWebhook) ValidateDelete(_ context.Context, _ runtime.Object) (admission.Warnings, error) {
+// ValidateDelete implements admission.Validator
+func (w *AgentWorkspaceWebhook) ValidateDelete(_ context.Context, _ *agentv1alpha1.AgentWorkspace) (admission.Warnings, error) {
 	return nil, nil
 }
 

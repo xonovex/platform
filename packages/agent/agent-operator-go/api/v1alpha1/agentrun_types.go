@@ -266,5 +266,5 @@ type AgentRunList struct {
 }
 
 func init() {
-	SchemeBuilder.Register(&AgentRun{}, &AgentRunList{})
+	registerTypes(&AgentRun{}, &AgentRunList{})
 }
