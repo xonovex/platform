@@ -1,11 +1,13 @@
 # Sources
 
-The core C99 style here (memory management, designated initializers, const-correctness,
-inline-over-macros, compound literals, error handling, implementation variants,
-caller-owns-memory, alignment, file naming, safety validations, testing patterns) is
+The C99 style here (implementation variants, caller-owns-memory, alignment,
+handles/indices, string handling, file naming, safety validations, testing patterns) is
 repo-original/general C knowledge — those reference files have no single upstream and
-are expected to show as "uncovered" in the source audit. The architecture references
-below are distilled from the engine blog archive.
+are expected to show as "uncovered" in the source audit. This guide is an **overlay on
+c99-guide**: the generic C99 idioms it shares — const-correctness, designated
+initializers, inline-over-macros, compound literals, and baseline error/memory patterns —
+are not duplicated here; c99-guide owns them. The architecture references below are
+distilled from the engine blog archive.
 
 ## Game-engine development blog (archive)
 
@@ -31,6 +33,21 @@ below are distilled from the engine blog archive.
   - Corroborating the C-ABI-as-lingua-franca and spec-generated-bindings approach
 - **Aspects extracted:**
   - Stable C calling convention vs unstable C++ ABI; spec → C header + per-language bindings → `references/cross-language-api.md`
+
+## Modern C / data-oriented C conference talks
+
+- **Last reviewed:** 2026-06-13
+- **Used for:**
+  - `SKILL.md` → Architecture (Handles & indices), Safety (Strings), Gotchas
+  - The data-oriented decisions that distinguish this style from generic C99
+- **Aspects extracted:**
+  - "Reference objects via array indexes, not raw pointers" — indices/generational handles into caller-owned arrays survive relocation, serialize position-independently, pack tighter, and stay deterministic; generation counters guard slot reuse → `references/handles-and-indices.md`, sharpened bounded-container/handle-resolution rules in `references/safety-validations.md`
+  - "Replace the legacy libc string trap" — `strlen`/`strtok` terminator rescans go O(n²) in a loop (the GTA Online JSON-load case); the owning-vs-non-owning split (length-carrying view for reads, bounded caller-owned builder for writes) → `references/string-handling.md`
+  - Address/UndefinedBehavior sanitizers as the runtime net for hand-carved arena/caller-owned memory → `references/build-warnings-policy.md`
+  - Memory arenas / aggregate "free the whole lifetime at once" allocation reinforce the existing caller-owns-memory direction; the general allocator theory stays in **memory-management-guide**
+
+The C11 `_Generic` overloading and macro-heavy metaprogramming (defer macros, stb_ds-style
+meta-header dynamic arrays) from the same talks are intentionally **excluded** from this guide.
 
 ## Refresh Workflow
 

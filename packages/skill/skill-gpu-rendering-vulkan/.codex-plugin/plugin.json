@@ -1,6 +1,6 @@
 {
   "name": "xonovex-skill-gpu-rendering-vulkan",
-  "version": "0.2.8",
+  "version": "0.2.9",
   "description": "Xonovex GPU rendering (Vulkan) skills",
   "author": {
     "name": "Xonovex"

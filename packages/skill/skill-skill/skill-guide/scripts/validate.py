@@ -89,7 +89,18 @@ def resolve_target(arg: str) -> tuple[Path, Path]:
     """Return (skill_md_path, skill_dir)."""
     target = Path(arg).resolve()
     if target.is_dir():
-        skill = target / "SKILL.md"
+        if (target / "SKILL.md").is_file():
+            skill = target / "SKILL.md"
+        else:
+            # Skill-package layout: the SKILL.md lives in a single guide subdir
+            # (e.g. skill-c99/c99-guide/SKILL.md), so descend one level.
+            nested = sorted(p for p in target.glob("*/SKILL.md") if p.is_file())
+            if len(nested) > 1:
+                sys.stderr.write(
+                    f"Error: multiple SKILL.md found under {target}; pass one explicitly\n"
+                )
+                sys.exit(2)
+            skill = nested[0] if nested else target / "SKILL.md"
     elif target.is_file():
         skill = target
     else:

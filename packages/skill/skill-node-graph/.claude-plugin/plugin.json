@@ -1,6 +1,6 @@
 {
   "name": "xonovex-skill-node-graph",
-  "version": "0.2.8",
+  "version": "0.2.9",
   "description": "Xonovex Node graph skills",
   "author": {"name": "Xonovex"},
   "skills": ["./node-graph-guide"]

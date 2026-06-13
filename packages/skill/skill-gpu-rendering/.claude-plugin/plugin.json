@@ -1,6 +1,6 @@
 {
   "name": "xonovex-skill-gpu-rendering",
-  "version": "0.2.8",
+  "version": "0.2.9",
   "description": "Xonovex GPU rendering skills",
   "author": {"name": "Xonovex"},
   "skills": ["./gpu-rendering-guide"]

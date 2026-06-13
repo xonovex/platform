@@ -31,3 +31,14 @@ int days[12] = {
 - Partial init: Unspecified fields are automatically zeroed without explicit values
 - Order-independent: Fields can be specified in any order within initializer
 - Large structs: Especially useful for structs with many fields or optional fields
+- ZII (Zero Is Initialization): A partial initializer or `= {0}` zero-fills the rest, so a zeroed struct is a valid default — C99's analogue of leaning on C++ RAII; give the all-zero state meaning instead of writing an init function
+- Declarative config: Pair a config struct with a `_DEFAULT` const and pass it by value so callers override only what differs — configuration as data, not imperative setter chains (the broader value-oriented API shape lives in [references/value-types.md](./value-types.md))
+
+**Example (ZII default + declarative override):**
+
+```c
+typedef struct { int width, height; bool vsync; const char *title; } window_cfg_t;
+#define WINDOW_CFG_DEFAULT (window_cfg_t){ .width = 1280, .height = 720, .title = "app" }
+
+window_t w = window_create((window_cfg_t){ .width = 800, .height = 600 });  // vsync=false, title="" via ZII
+```

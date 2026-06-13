@@ -80,8 +80,8 @@ def build_parser() -> argparse.ArgumentParser:
     )
     p.add_argument(
         "--model",
-        default=os.environ.get("CLAUDE_MODEL", ""),
-        help="model alias/id passed to `claude --model` (env CLAUDE_MODEL)",
+        default=os.environ.get("CLAUDE_MODEL", "haiku"),
+        help="model alias/id passed to `claude --model` (env CLAUDE_MODEL, default haiku)",
     )
     p.add_argument(
         "--disallowed-tools",

@@ -139,5 +139,17 @@
     "should_trigger": true,
     "split": "validation",
     "rationale": "cross-language-api: portable C subset, flat data, call-scoped pointers, spec-generated bindings"
+  },
+  {
+    "query": "our entity structs in sim/ store node_t* pointers to each other and it breaks when the pool array grows — and we can't serialize the graph. how should we reference between them?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "handles-and-indices: index/generational-handle references over raw pointers for relocatable, serializable structures"
+  },
+  {
+    "query": "the parser in src/cfg/ calls strlen and strtok all over a big buffer and load time is terrible — how should I restructure string handling?",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "string-handling: length-carrying views + bounded caller-owned builders, avoid terminator-rescan O(n^2)"
   }
 ]

@@ -4,6 +4,13 @@
 
 **Rationale:** React 19 removes long-deprecated APIs. Upgrade to React 18.3 first to see deprecation warnings, then migrate.
 
+## Contents
+
+- [Removed and deprecated APIs](#removed--deprecated-apis)
+- [Example](#example)
+- [Migration codemods](#migration-codemods)
+- [Techniques](#techniques)
+
 | Removed                    | Migration                 |
 | -------------------------- | ------------------------- |
 | `ReactDOM.render()`        | `createRoot().render()`   |

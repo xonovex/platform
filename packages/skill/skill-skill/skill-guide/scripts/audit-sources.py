@@ -101,11 +101,34 @@ def parse_sources(text: str) -> list[Source]:
     return [s for s in sources if s.url]
 
 
+def resolve_guide_dir(base: Path) -> Path:
+    """The skill/guide dir for a base dir.
+
+    base itself if base/SKILL.md exists, else the single immediate subdir
+    containing SKILL.md (skill-package layout, e.g. skill-c99/c99-guide/SKILL.md).
+    >1 match is ambiguous; 0 falls back to base so the existing not-found error
+    still fires.
+    """
+    if (base / "SKILL.md").is_file():
+        return base
+    nested = sorted(p.parent for p in base.glob("*/SKILL.md") if p.is_file())
+    if len(nested) > 1:
+        sys.stderr.write(f"error: multiple SKILL.md found under {base}; pass one explicitly\n")
+        raise SystemExit(2)
+    return nested[0] if nested else base
+
+
 def resolve_sources_file(target: Path) -> Path | None:
     if target.is_file() and target.name == "SOURCES.md":
         return target
-    if target.is_dir() and (target / "SOURCES.md").is_file():
-        return target / "SOURCES.md"
+    if target.is_dir():
+        if (target / "SOURCES.md").is_file():
+            return target / "SOURCES.md"
+        # No SOURCES.md directly: descend into the single guide subdir (identified
+        # by SKILL.md, per the skill-package layout) and use its SOURCES.md.
+        guide_dir = resolve_guide_dir(target)
+        if (guide_dir / "SOURCES.md").is_file():
+            return guide_dir / "SOURCES.md"
     return None
 
 

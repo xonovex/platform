@@ -1,6 +1,6 @@
 {
   "name": "xonovex-skill-prompt",
-  "version": "0.2.8",
+  "version": "0.2.9",
   "description": "Xonovex Prompt skill — author, merge, simplify reusable user-invocable prompt files (slash commands)",
   "author": {"name": "Xonovex"},
   "skills": ["./prompt-guide"]

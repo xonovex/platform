@@ -2,6 +2,17 @@
 
 Rewrite AI-generated or stiff prose so it reads as a human wrote it. Goal: prose that fits its medium and reader, not prose that beats detectors.
 
+## Contents
+
+- [Workflow](#workflow)
+- [Pattern Catalog](#pattern-catalog)
+- [Adding Voice](#adding-voice)
+- [Safety Rails](#safety-rails)
+- [Required Checks Before Output](#required-checks-before-output)
+- [Output Format](#output-format)
+- [Examples](#examples)
+- [Gotchas](#gotchas)
+
 ## Workflow
 
 1. Read the input (file or inline). Identify medium, audience, intended tone.

@@ -1,6 +1,6 @@
 ---
 name: data-oriented-design-guide
-description: "Use when designing or refactoring performance-critical data layouts for cache efficiency, in any language. Triggers on prompts about SoA/AoS/AoSoA, cache misses, hot/cold field splitting, data-oriented design, component-storage layout, batch/bulk processing, handles vs pointers, avoiding pointer chasing. Skip allocation/ownership mechanics (use memory-management-guide), ECS architecture / systems / change-tracking (use ecs-guide), language-specific style (use c99-opinionated-guide / c99-game-opinionated-guide), thread-synchronization & false-sharing-for-concurrency (use lock-free-guide), and pure algorithmic-complexity questions."
+description: "Use when designing or refactoring performance-critical data layouts for cache efficiency, in any language. Triggers on prompts about SoA/AoS/AoSoA, cache misses, hot/cold field splitting, data-oriented design, component-storage layout, batch/bulk processing, handles vs pointers, avoiding pointer chasing, even when the user doesn't say 'data-oriented' or 'cache'. Skip allocation/ownership mechanics (use memory-management-guide), ECS architecture / systems / change-tracking (use ecs-guide), language-specific style (use c99-opinionated-guide / c99-game-opinionated-guide), thread-synchronization & false-sharing-for-concurrency (use lock-free-guide), and pure algorithmic-complexity questions."
 ---
 
 # Data-Oriented Design Guidelines

@@ -1,6 +1,6 @@
 {
   "name": "xonovex-skill-hono-opinionated",
-  "version": "0.2.8",
+  "version": "0.2.9",
   "description": "Xonovex Hono opinionated skills",
   "author": {"name": "Xonovex"},
   "skills": ["./hono-opinionated-guide"]

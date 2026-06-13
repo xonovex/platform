@@ -2,6 +2,18 @@
 
 Commit changes with auto-generated conventional-commit messages based on changed files and (optionally) plan context. Default behaviour: commit immediately without prompting.
 
+## Contents
+
+- [Goal](#goal)
+- [Core Workflow](#core-workflow)
+- [Type Detection](#type-detection)
+- [Message Generation](#message-generation)
+- [Implementation Steps](#implementation-steps)
+- [Commit Format](#commit-format)
+- [Output](#output)
+- [Error Handling](#error-handling)
+- [Gotchas](#gotchas)
+
 ## Goal
 
 - Auto-commit changes with conventional format `<type>: <description>`

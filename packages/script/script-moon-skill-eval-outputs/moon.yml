@@ -1,0 +1,20 @@
+$schema: https://moonrepo.dev/schemas/project.json
+language: typescript
+tags: [typescript-script]
+dependsOn:
+  - script-moon-common
+tasks:
+  build:
+    deps:
+      - script-moon-common:build
+  install:
+    command:
+      - npm
+      - install
+      - -w
+      - "@xonovex/script-moon-skill-eval-outputs"
+    deps:
+      - ~:build
+    options:
+      cache: false
+      runFromWorkspaceRoot: true

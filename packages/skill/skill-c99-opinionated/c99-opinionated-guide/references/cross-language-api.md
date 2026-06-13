@@ -38,4 +38,4 @@ int image_write(image_o *img, const uint8_t *pixels, uint64_t size);  // returns
 - Direct 1:1 C bindings are almost never pleasant to use in another language — budget for an idiomatic wrapper layer (the generator should produce it) over the raw FFI.
 - Returning a pointer into internal state leaks your layout and ties the caller to your allocator; return a value/struct or fill a caller-provided buffer instead (pairs with [references/caller-owns-memory.md](./caller-owns-memory.md)).
 
-**Related:** [references/plugin-architecture.md](./plugin-architecture.md), [references/caller-owns-memory.md](./caller-owns-memory.md), [references/error-handling.md](./error-handling.md), [references/physical-design.md](./physical-design.md)
+**Related:** [references/plugin-architecture.md](./plugin-architecture.md), [references/caller-owns-memory.md](./caller-owns-memory.md), [references/physical-design.md](./physical-design.md)

@@ -4,6 +4,16 @@
 
 **Rationale:** Remotion captures each frame as an image; CSS transitions and Tailwind animations won't render in the video output.
 
+## Contents
+
+- [Example](#example)
+- [Linear Interpolation](#linear-interpolation)
+- [Spring Animation](#spring-animation)
+- [Spring Presets](#spring-presets)
+- [Easing Functions](#easing-functions)
+- [Bad vs. Good](#bad-vs-good)
+- [Techniques](#techniques)
+
 **Example:**
 
 ```tsx

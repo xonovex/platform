@@ -31,3 +31,5 @@ vec3_t vec3_normalize(const vec3_t *v) {
 - NULL checks: Test `if (!ptr)` at function entry
 - Epsilon division: Use `len < 1e-6f` for zero checks in float operations
 - Overflow checks: Test `count > SIZE_MAX / size` before multiplication
+- Bounded containers: Keep `data + count + capacity` together and gate every access through a checked accessor — a raw `T*` paired with a separate, unenforced length is the bug surface this removes
+- Handle/index resolution: Resolve a stored index/handle against the live `count` (and generation, if slots recycle) before dereferencing — see [references/handles-and-indices.md](./handles-and-indices.md)

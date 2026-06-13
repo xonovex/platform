@@ -6,6 +6,13 @@
 
 **Reference:** [Moon 2.0 Migration Guide](https://moonrepo.dev/docs/migrate/2.0)
 
+## Contents
+
+- [Automated Migration](#automated-migration)
+- [Breaking Changes Checklist](#breaking-changes-checklist)
+- [New Features in v2](#new-features-in-v2)
+- [Post-Migration Verification](#post-migration-verification)
+
 ## Automated Migration
 
 ```bash

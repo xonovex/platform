@@ -98,8 +98,8 @@ def build_parser() -> argparse.ArgumentParser:
                    help="runs per arm per eval (env RUNS, default 1; >1 measures variance)")
     p.add_argument("--concurrency", type=int, default=int(os.environ.get("CONCURRENCY", "4")),
                    help="parallel claude invocations (env CONCURRENCY, default 4)")
-    p.add_argument("--model", default=os.environ.get("CLAUDE_MODEL", ""),
-                   help="model for the generation runs (env CLAUDE_MODEL)")
+    p.add_argument("--model", default=os.environ.get("CLAUDE_MODEL", "haiku"),
+                   help="model for the generation runs (env CLAUDE_MODEL, default haiku)")
     p.add_argument("--judge-model", default=os.environ.get("JUDGE_MODEL", ""),
                    help="model for grading (env JUDGE_MODEL)")
     p.add_argument("--disallowed-tools",

@@ -39,6 +39,18 @@
       "path": "packages/script/script-moon-npm-publish"
     },
     {
+      "path": "packages/script/script-moon-skill-audit-sources"
+    },
+    {
+      "path": "packages/script/script-moon-skill-eval-outputs"
+    },
+    {
+      "path": "packages/script/script-moon-skill-eval-triggers"
+    },
+    {
+      "path": "packages/script/script-moon-skill-validate"
+    },
+    {
       "path": "packages/script/script-moon-version-bump"
     },
     {

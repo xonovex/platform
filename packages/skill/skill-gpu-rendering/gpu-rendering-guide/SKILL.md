@@ -1,6 +1,6 @@
 ---
 name: gpu-rendering-guide
-description: "Use when designing the architecture of a low-level GPU renderer on any explicit API (Vulkan/D3D12/Metal/WebGPU): render/frame graphs, shader/permutation systems, the descriptor/binding model, explicit GPU↔CPU synchronization, command recording and frames-in-flight, and GPU memory strategy. Triggers on render passes, resource barriers/transitions, transient/aliased targets, shader variants, bind groups/descriptor frequency, command buffers, double/triple buffering, even when no specific API is named. Skip API-specific how-to (use gpu-rendering-vulkan-guide), high-level web 3D (use threejs-guide), and CPU-only data layout (use data-oriented-design-guide)."
+description: "Use when designing the architecture of a low-level GPU renderer on any explicit API (Vulkan/D3D12/Metal/WebGPU): render/frame graphs, shader/permutation systems, the descriptor/binding model, explicit GPU↔CPU synchronization, command recording and frames-in-flight, and GPU memory strategy. Triggers on render passes, resource barriers/transitions, transient/aliased targets, shader variants, bind groups/descriptor frequency, command buffers, double/triple buffering, even when the user doesn't say 'renderer' or name a specific API. Skip API-specific how-to (use gpu-rendering-vulkan-guide), high-level web 3D (use threejs-guide), and CPU-only data layout (use data-oriented-design-guide)."
 ---
 
 # GPU Rendering Guidelines (Explicit-API Architecture)
