@@ -12,7 +12,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
-	"k8s.io/client-go/tools/record"
+	"k8s.io/client-go/tools/events"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
@@ -26,7 +26,7 @@ import (
 type AgentRunReconciler struct {
 	client.Client
 	Scheme   *runtime.Scheme
-	Recorder record.EventRecorder
+	Recorder events.EventRecorder
 }
 
 // +kubebuilder:rbac:groups=agent.xonovex.com,resources=agentruns,verbs=get;list;watch;create;update;patch;delete
@@ -149,7 +149,7 @@ func (r *AgentRunReconciler) reconcileStandalone(ctx context.Context, agentRun *
 			log.Error(err, "failed to create network policy")
 			return ctrl.Result{}, err
 		}
-		r.Recorder.Eventf(agentRun, corev1.EventTypeNormal, "NetworkPolicyCreated",
+		r.Recorder.Eventf(agentRun, nil, corev1.EventTypeNormal, "NetworkPolicyCreated", "NetworkPolicyCreated",
 			"Created NetworkPolicy %s", np.Name)
 	}
 
@@ -170,7 +170,7 @@ func (r *AgentRunReconciler) reconcileStandalone(ctx context.Context, agentRun *
 
 		log.Info("creating Job", "jobName", jobName, "agentType", agentType,
 			"runtimeClass", ptrOrEmpty(agentRun.Spec.RuntimeClassName))
-		r.Recorder.Eventf(agentRun, corev1.EventTypeNormal, "AgentRunStarted",
+		r.Recorder.Eventf(agentRun, nil, corev1.EventTypeNormal, "AgentRunStarted", "AgentRunStarted",
 			"Created Job %s (agent=%s, provider=%s, runtimeClass=%s)",
 			jobName, string(agentType), agentRun.Spec.ProviderRef, ptrOrEmpty(agentRun.Spec.RuntimeClassName))
 
@@ -279,7 +279,7 @@ func (r *AgentRunReconciler) reconcileWithWorkspace(ctx context.Context, agentRu
 			log.Error(err, "failed to create network policy")
 			return ctrl.Result{}, err
 		}
-		r.Recorder.Eventf(agentRun, corev1.EventTypeNormal, "NetworkPolicyCreated",
+		r.Recorder.Eventf(agentRun, nil, corev1.EventTypeNormal, "NetworkPolicyCreated", "NetworkPolicyCreated",
 			"Created NetworkPolicy %s", np.Name)
 	}
 
@@ -300,7 +300,7 @@ func (r *AgentRunReconciler) reconcileWithWorkspace(ctx context.Context, agentRu
 
 		log.Info("creating Job", "jobName", jobName, "agentType", agentType,
 			"runtimeClass", ptrOrEmpty(agentRun.Spec.RuntimeClassName))
-		r.Recorder.Eventf(agentRun, corev1.EventTypeNormal, "AgentRunStarted",
+		r.Recorder.Eventf(agentRun, nil, corev1.EventTypeNormal, "AgentRunStarted", "AgentRunStarted",
 			"Created Job %s (agent=%s, provider=%s, runtimeClass=%s)",
 			jobName, string(agentType), agentRun.Spec.ProviderRef, ptrOrEmpty(agentRun.Spec.RuntimeClassName))
 
@@ -329,13 +329,13 @@ func (r *AgentRunReconciler) reconcileJobStatus(ctx context.Context, agentRun *a
 	for _, condition := range job.Status.Conditions {
 		if condition.Type == batchv1.JobComplete && condition.Status == corev1.ConditionTrue {
 			agentRun.Status.CompletionTime = &now
-			r.Recorder.Event(agentRun, corev1.EventTypeNormal, "AgentRunSucceeded",
+			r.Recorder.Eventf(agentRun, nil, corev1.EventTypeNormal, "AgentRunSucceeded", "AgentRunSucceeded",
 				"Agent Job completed successfully")
 			return r.updatePhase(ctx, agentRun, agentv1alpha1.AgentRunPhaseSucceeded, "")
 		}
 		if condition.Type == batchv1.JobFailed && condition.Status == corev1.ConditionTrue {
 			agentRun.Status.CompletionTime = &now
-			r.Recorder.Eventf(agentRun, corev1.EventTypeWarning, "AgentRunFailed",
+			r.Recorder.Eventf(agentRun, nil, corev1.EventTypeWarning, "AgentRunFailed", "AgentRunFailed",
 				"Agent Job failed: %s", condition.Message)
 			return r.updatePhase(ctx, agentRun, agentv1alpha1.AgentRunPhaseFailed, condition.Message)
 		}
@@ -353,7 +353,7 @@ func (r *AgentRunReconciler) reconcileJobStatus(ctx context.Context, agentRun *a
 			elapsed := time.Since(agentRun.Status.StartTime.Time)
 			if elapsed > agentRun.Spec.Timeout.Duration {
 				agentRun.Status.CompletionTime = &now
-				r.Recorder.Eventf(agentRun, corev1.EventTypeWarning, "AgentRunTimedOut",
+				r.Recorder.Eventf(agentRun, nil, corev1.EventTypeWarning, "AgentRunTimedOut", "AgentRunTimedOut",
 					"Agent Job exceeded timeout of %v", agentRun.Spec.Timeout.Duration)
 				return r.updatePhase(ctx, agentRun, agentv1alpha1.AgentRunPhaseTimedOut, "agent run exceeded timeout")
 			}

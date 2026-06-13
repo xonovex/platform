@@ -52,7 +52,7 @@ func main() {
 	if err = (&controller.AgentRunReconciler{
 		Client:   mgr.GetClient(),
 		Scheme:   mgr.GetScheme(),
-		Recorder: mgr.GetEventRecorderFor("agent-operator"),
+		Recorder: mgr.GetEventRecorder("agent-operator"),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "AgentRun")
 		os.Exit(1)
@@ -61,7 +61,7 @@ func main() {
 	if err = (&controller.AgentProviderReconciler{
 		Client:   mgr.GetClient(),
 		Scheme:   mgr.GetScheme(),
-		Recorder: mgr.GetEventRecorderFor("agent-operator"),
+		Recorder: mgr.GetEventRecorder("agent-operator"),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "AgentProvider")
 		os.Exit(1)
@@ -70,7 +70,7 @@ func main() {
 	if err = (&controller.AgentWorkspaceReconciler{
 		Client:   mgr.GetClient(),
 		Scheme:   mgr.GetScheme(),
-		Recorder: mgr.GetEventRecorderFor("agent-operator"),
+		Recorder: mgr.GetEventRecorder("agent-operator"),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "AgentWorkspace")
 		os.Exit(1)
