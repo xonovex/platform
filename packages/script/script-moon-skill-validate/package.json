@@ -1,0 +1,20 @@
+{
+  "name": "@xonovex/script-moon-skill-validate",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "moon-skill-validate": "./dist/src/index.js"
+  },
+  "dependencies": {
+    "@xonovex/script-moon-common": "0.0.0",
+    "yaml": "^2.9.0"
+  },
+  "devDependencies": {},
+  "keywords": [
+    "xonovex",
+    "script",
+    "moon",
+    "skill"
+  ]
+}

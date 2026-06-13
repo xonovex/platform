@@ -1,0 +1,19 @@
+{
+  "name": "@xonovex/script-moon-skill-eval-outputs",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "moon-skill-eval-outputs": "./dist/src/index.js"
+  },
+  "dependencies": {
+    "@xonovex/script-moon-common": "0.0.0"
+  },
+  "devDependencies": {},
+  "keywords": [
+    "xonovex",
+    "script",
+    "moon",
+    "skill"
+  ]
+}

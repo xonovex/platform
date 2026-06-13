@@ -1,6 +1,6 @@
 ---
 name: motion-guide
-description: "Use when adding or editing UI animations in React with the Motion library (formerly Framer Motion). Triggers on `motion/react` imports, `<motion.*>` components, `whileHover`, `whileTap`, `whileInView`, `useScroll`, `useSpring`, `layoutId`, `AnimatePresence`, and on prompts about entrance animations, hover effects, scroll reveals, layout transitions, or drag interactions, even when the user doesn't say 'Motion'. Skip CSS-only animations, GSAP, React Spring, and React Native Reanimated."
+description: "Use when adding or editing UI animations in React with the Motion library (formerly Framer Motion). Triggers on `motion/react` imports, `motion.*` components (motion.div, etc.), `whileHover`, `whileTap`, `whileInView`, `useScroll`, `useSpring`, `layoutId`, `AnimatePresence`, and on prompts about entrance animations, hover effects, scroll reveals, layout transitions, or drag interactions, even when the user doesn't say 'Motion'. Skip CSS-only animations, GSAP, React Spring, and React Native Reanimated."
 ---
 
 # Motion Animation Guidelines

@@ -4,6 +4,14 @@
 
 **Rationale:** Hierarchical task inheritance allows global defaults with project-specific customizations, reducing configuration duplication while maintaining flexibility.
 
+## Contents
+
+- [inheritedBy Matching](#inheritedby-matching)
+- [extends Syntax](#extends-syntax)
+- [Merging](#merging)
+- [Optional Dependencies](#optional-dependencies)
+- [Composition Patterns](#composition-patterns)
+
 **Example:**
 
 ```yaml

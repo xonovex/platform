@@ -22,5 +22,54 @@ tasks:
     deps: [build]
     options:
       cache: false
+  # Skill tooling. Tasks stay simple — just invoke the bin from the project root.
+  # Each bundled script resolves the skill's guide subdir itself (the moon project
+  # root holds one guide dir containing SKILL.md). The `script-moon-skill-*:install`
+  # dep builds + installs the bin first (its deps chain through ~:build), mirroring
+  # npm-publish in tag-npm.yml.
+  validate:
+    command:
+      - npx
+      - moon-skill-validate
+    deps:
+      - target: ~:build
+        optional: true
+      - script-moon-skill-validate:install
+    options:
+      cache: false
+      runInCI: false
+  audit-sources:
+    command:
+      - npx
+      - moon-skill-audit-sources
+    deps:
+      - target: ~:build
+        optional: true
+      - script-moon-skill-audit-sources:install
+    options:
+      cache: false
+      runInCI: false
+  eval-triggers:
+    command:
+      - npx
+      - moon-skill-eval-triggers
+    deps:
+      - target: ~:build
+        optional: true
+      - script-moon-skill-eval-triggers:install
+    options:
+      cache: false
+      runInCI: false
+  eval-outputs:
+    command:
+      - npx
+      - moon-skill-eval-outputs
+    deps:
+      - target: ~:build
+        optional: true
+      - script-moon-skill-eval-outputs:install
+    options:
+      cache: false
+      runInCI: false
 inheritedBy:
   tag: skill

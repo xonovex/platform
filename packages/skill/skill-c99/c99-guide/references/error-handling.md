@@ -48,3 +48,4 @@ error_t load_file(const char *path, char **out, size_t *len) {
 - Error checking: Always check return values immediately after function calls
 - Cleanup: Properly free resources in all error paths before returning
 - Context: Provide specific error codes to indicate failure reason, not generic errors
+- Single results: when a function produces one small value, return it (or a `{bool ok; T value;}` result struct) by value rather than threading it through an out-param — reserve out-params for multiple or large results, see [references/value-types.md](./value-types.md)
