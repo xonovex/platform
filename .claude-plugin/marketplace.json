@@ -25,6 +25,7 @@
     { "name": "xonovex-skill-ecs", "source": "./packages/skill/skill-ecs", "description": "Xonovex Entity-Component-System skills" },
     { "name": "xonovex-skill-editor-viewport", "source": "./packages/skill/skill-editor-viewport", "description": "Xonovex Editor viewport skills" },
     { "name": "xonovex-skill-expressjs", "source": "./packages/skill/skill-expressjs", "description": "Xonovex Express.js skills" },
+    { "name": "xonovex-skill-fable", "source": "./packages/skill/skill-fable", "description": "Xonovex Fable mode skill" },
     { "name": "xonovex-skill-game-networking", "source": "./packages/skill/skill-game-networking", "description": "Xonovex Game networking skills" },
     { "name": "xonovex-skill-general-fp", "source": "./packages/skill/skill-general-fp", "description": "Xonovex Functional programming skills" },
     { "name": "xonovex-skill-general-oop", "source": "./packages/skill/skill-general-oop", "description": "Xonovex Object-oriented programming skills" },

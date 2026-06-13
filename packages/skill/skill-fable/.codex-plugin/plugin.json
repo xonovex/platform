@@ -1,0 +1,9 @@
+{
+  "name": "xonovex-skill-fable",
+  "version": "0.2.8",
+  "description": "Xonovex Fable mode skill",
+  "author": {
+    "name": "Xonovex"
+  },
+  "skills": "./fable"
+}
