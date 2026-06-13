@@ -23,9 +23,8 @@ type AgentProviderWebhook struct{}
 var _ webhook.CustomValidator = &AgentProviderWebhook{}
 
 func (w *AgentProviderWebhook) SetupWebhookWithManager(mgr ctrl.Manager) error {
-	return ctrl.NewWebhookManagedBy(mgr).
-		For(&agentv1alpha1.AgentProvider{}).
-		WithValidator(w).
+	return ctrl.NewWebhookManagedBy(mgr, &agentv1alpha1.AgentProvider{}).
+		WithCustomValidator(w).
 		Complete()
 }
 

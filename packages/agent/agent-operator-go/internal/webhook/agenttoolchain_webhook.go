@@ -19,9 +19,8 @@ type AgentToolchainWebhook struct{}
 var _ webhook.CustomValidator = &AgentToolchainWebhook{}
 
 func (w *AgentToolchainWebhook) SetupWebhookWithManager(mgr ctrl.Manager) error {
-	return ctrl.NewWebhookManagedBy(mgr).
-		For(&agentv1alpha1.AgentToolchain{}).
-		WithValidator(w).
+	return ctrl.NewWebhookManagedBy(mgr, &agentv1alpha1.AgentToolchain{}).
+		WithCustomValidator(w).
 		Complete()
 }
 

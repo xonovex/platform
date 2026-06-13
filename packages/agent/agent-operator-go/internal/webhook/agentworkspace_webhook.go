@@ -24,10 +24,9 @@ var _ webhook.CustomValidator = &AgentWorkspaceWebhook{}
 
 // SetupWebhookWithManager sets up the webhook with the Manager
 func (w *AgentWorkspaceWebhook) SetupWebhookWithManager(mgr ctrl.Manager) error {
-	return ctrl.NewWebhookManagedBy(mgr).
-		For(&agentv1alpha1.AgentWorkspace{}).
-		WithDefaulter(w).
-		WithValidator(w).
+	return ctrl.NewWebhookManagedBy(mgr, &agentv1alpha1.AgentWorkspace{}).
+		WithCustomDefaulter(w).
+		WithCustomValidator(w).
 		Complete()
 }
 

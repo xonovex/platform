@@ -1,7 +1,6 @@
 import {existsSync} from "node:fs";
 import path from "node:path";
 import {fileURLToPath} from "node:url";
-import {includeIgnoreFile} from "@eslint/compat";
 import jseslint from "@eslint/js";
 import eslintViTest from "@vitest/eslint-plugin";
 //import eslintFunctional from "eslint-plugin-functional";
@@ -15,7 +14,7 @@ import {configs as eslintSecurityConfigs} from "eslint-plugin-security";
 //import eslintSimpleImportSort from "eslint-plugin-simple-import-sort";
 import eslintSonarjs from "eslint-plugin-sonarjs";
 import eslintUnicorn from "eslint-plugin-unicorn";
-import {defineConfig, globalIgnores} from "eslint/config";
+import {defineConfig, globalIgnores, includeIgnoreFile} from "eslint/config";
 import tseslint from "typescript-eslint";
 
 export const GLOB_CONFIG_TS = [

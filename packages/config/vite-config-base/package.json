@@ -37,15 +37,14 @@
     }
   },
   "dependencies": {
-    "@tailwindcss/vite": "4.2.2",
-    "vite-tsconfig-paths": "6.1.1",
+    "@tailwindcss/vite": "4.3.1",
     "@xonovex/eslint-config-base": "0.1.22",
     "@xonovex/ts-config-build": "0.1.22"
   },
   "devDependencies": {
     "@xonovex/eslint-config-base": "0.1.22",
     "@xonovex/ts-config-build": "0.1.22",
-    "typescript": "6.0.2"
+    "typescript": "6.0.3"
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",
