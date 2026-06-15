@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import {execFileSync} from "node:child_process";
 import {readdirSync, readFileSync, statSync, writeFileSync} from "node:fs";
 import {basename, join, resolve, sep} from "node:path";
 
@@ -6,6 +7,18 @@ const URL_RE = /\*\*URL:\*\*\s*(\S+)/;
 const REVIEWED_RE = /\*\*Last reviewed:\*\*\s*(\d{4}-\d{2}-\d{2})/;
 const REF_RE = /references\/([a-z0-9][a-z0-9-]*\.md)/g;
 const HEADER_RE = /^##\s+(.*\S)\s*$/;
+// Optional upstream-drift fields. A source carrying **Checkout:** is also
+// diffed against its local source repo (latest tag vs pinned, commits since).
+const CHECKOUT_RE = /\*\*Checkout:\*\*\s*(\S+)/;
+const VERSION_RE = /\*\*Version:\*\*\s*v?(\d+\.\d+\.\d+)/;
+const COMMIT_RE = /\*\*Commit:\*\*\s*([0-9a-f]{7,40})/;
+// **Watch:** <source-subpath> -> ref-a.md, ref-b.md  (path may contain spaces)
+const WATCH_RE = /\*\*Watch:\*\*\s*(.+?)\s*(?:->|→)\s*(.+\S)\s*$/;
+
+interface Watch {
+  path: string;
+  refs: readonly string[];
+}
 
 interface Source {
   title: string;
@@ -14,11 +27,27 @@ interface Source {
   reviewedRaw: string | undefined;
   refs: Set<string>;
   lineNo: number;
+  checkout: string | undefined;
+  version: string | undefined;
+  commit: string | undefined;
+  watches: Watch[];
 }
 
 interface FetchReport {
   status: string;
   detail: string;
+}
+
+interface DriftReport {
+  checkout: string;
+  resolved: boolean;
+  pinned_version: string | null;
+  latest_version: string | null;
+  behind: boolean;
+  commit_count: number;
+  commits: readonly string[];
+  review_refs: readonly string[];
+  note?: string;
 }
 
 interface SourceReport {
@@ -30,6 +59,7 @@ interface SourceReport {
   refs: readonly string[];
   dangling_refs: readonly string[];
   fetch?: FetchReport;
+  drift?: DriftReport;
 }
 
 interface SkillReport {
@@ -48,6 +78,7 @@ interface ParsedArgs {
   fetch: boolean;
   markReviewed: string | undefined;
   json: boolean;
+  pull: boolean;
 }
 
 const HELP = `Audit a skill's upstream sources (SOURCES.md) for drift.
@@ -61,10 +92,19 @@ Usage:
       --all [root]         audit every */SOURCES.md under root (default: cwd)
       --max-age DAYS       staleness threshold in days (default: 180)
       --fetch              HTTP-check each URL still resolves
+      --pull               fetch tags in each source's **Checkout:** repo first
       --mark-reviewed [T]  stamp 'Last reviewed' to today for sources whose title
                            contains T (case-insensitive); omit T to stamp all
       --json               emit a JSON report instead of text
-      -h, --help           show this help`;
+      -h, --help           show this help
+
+A source block may add upstream-drift fields:
+      **Checkout:** <path>            local source repo (relative to workspace root)
+      **Version:** <semver>           version the skill is pinned to
+      **Commit:** <hash>              commit the skill was distilled from
+      **Watch:** <subpath> -> a.md    map a source subpath to the references it feeds
+When present, the audit also reports the latest released tag vs the pinned
+version and the commits since the pinned commit on watched paths.`;
 
 // Match Python json.dumps(ensure_ascii=True): escape every non-ASCII UTF-16
 // code unit as \uXXXX (surrogate pairs become two escapes, as in CPython).
@@ -139,6 +179,10 @@ const parseSources = (text: string): Source[] => {
         reviewedRaw: undefined,
         refs: new Set<string>(),
         lineNo: i,
+        checkout: undefined,
+        version: undefined,
+        commit: undefined,
+        watches: [],
       };
       sources.push(current);
       continue;
@@ -152,6 +196,28 @@ const parseSources = (text: string): Source[] => {
     if (reviewedMatch?.[1] !== undefined) {
       current.reviewedRaw = reviewedMatch[1];
       current.reviewed = parseIsoDate(reviewedMatch[1]);
+    }
+    const checkoutMatch = CHECKOUT_RE.exec(line);
+    if (checkoutMatch?.[1] !== undefined) {
+      current.checkout = checkoutMatch[1];
+    }
+    const versionMatch = VERSION_RE.exec(line);
+    if (versionMatch?.[1] !== undefined) {
+      current.version = versionMatch[1];
+    }
+    const commitMatch = COMMIT_RE.exec(line);
+    if (commitMatch?.[1] !== undefined) {
+      current.commit = commitMatch[1];
+    }
+    const watchMatch = WATCH_RE.exec(line);
+    if (watchMatch?.[1] !== undefined && watchMatch[2] !== undefined) {
+      const refs = watchMatch[2]
+        .split(",")
+        .map((r) => basename(r.trim()))
+        .filter((r) => r.endsWith(".md"));
+      current.watches.push({path: watchMatch[1], refs});
+      // Watched refs are fed by this source too — count them toward coverage.
+      for (const ref of refs) current.refs.add(ref);
     }
     for (const ref of findRefs(line)) {
       current.refs.add(ref);
@@ -255,13 +321,147 @@ const listExistingRefs = (skillDir: string): Set<string> => {
   return refs;
 };
 
+// Walk up from a dir to the moon workspace root (the dir holding `.moon`), so a
+// source's **Checkout:** path resolves the same way the Python tool's
+// REPO_ROOT-relative default did. Falls back to the start dir.
+const findWorkspaceRoot = (start: string): string => {
+  let dir = resolve(start);
+  for (;;) {
+    if (isDir(join(dir, ".moon"))) return dir;
+    const parent = resolve(dir, "..");
+    if (parent === dir) return resolve(start);
+    dir = parent;
+  }
+};
+
+const git = (cwd: string, args: readonly string[]): string | undefined => {
+  try {
+    // eslint-disable-next-line sonarjs/no-os-command-from-path
+    return execFileSync("git", [...args], {
+      cwd,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "ignore"],
+      maxBuffer: 10 * 1024 * 1024,
+    });
+  } catch {
+    return undefined;
+  }
+};
+
+type Semver = readonly [number, number, number];
+
+const parseSemver = (text: string): Semver | undefined => {
+  const m = /(\d+)\.(\d+)\.(\d+)/.exec(text);
+  return m?.[1] !== undefined && m[2] !== undefined && m[3] !== undefined
+    ? [Number(m[1]), Number(m[2]), Number(m[3])]
+    : undefined;
+};
+
+const cmpSemver = (a: Semver, b: Semver): number =>
+  a[0] - b[0] || a[1] - b[1] || a[2] - b[2];
+
+const latestSemverTag = (
+  checkout: string,
+): {version: Semver; raw: string} | undefined => {
+  const out = git(checkout, ["tag", "--list"]);
+  if (out === undefined) return undefined;
+  let best: {version: Semver; raw: string} | undefined;
+  for (const line of out.split("\n")) {
+    const raw = line.trim();
+    if (!/^v?\d+\.\d+\.\d+$/.test(raw)) continue;
+    const version = parseSemver(raw);
+    if (version && (!best || cmpSemver(version, best.version) > 0)) {
+      best = {version, raw};
+    }
+  }
+  return best;
+};
+
+const computeDrift = (
+  workspaceRoot: string,
+  source: Source,
+  pull: boolean,
+): DriftReport => {
+  const checkout = resolve(workspaceRoot, source.checkout ?? "");
+  const report: DriftReport = {
+    checkout,
+    resolved: false,
+    pinned_version: source.version ?? null,
+    latest_version: null,
+    behind: false,
+    commit_count: 0,
+    commits: [],
+    review_refs: [],
+  };
+  if (!isDir(checkout) || !isDir(join(checkout, ".git"))) {
+    return {...report, note: "checkout not found or not a git repo"};
+  }
+  report.resolved = true;
+  if (pull) git(checkout, ["fetch", "--tags", "--quiet"]);
+
+  const latest = latestSemverTag(checkout);
+  const pinnedV = source.version ? parseSemver(source.version) : undefined;
+  if (latest) {
+    report.latest_version = latest.raw;
+    if (pinnedV) report.behind = cmpSemver(latest.version, pinnedV) > 0;
+  }
+
+  // Diff base: the pinned commit (exact) else the pinned version tag.
+  const ref = source.commit ?? source.version;
+  if (ref === undefined) {
+    return {...report, note: "no **Commit:** or **Version:** to diff from"};
+  }
+  if (
+    git(checkout, ["rev-parse", "--verify", "--quiet", `${ref}^{commit}`]) ===
+    undefined
+  ) {
+    return {...report, note: `pinned ref '${ref}' not found in checkout`};
+  }
+
+  // Upper bound: the latest released tag (deterministic after --pull) else HEAD.
+  const upper = latest ? latest.raw : "HEAD";
+  const paths = source.watches.map((w) => w.path);
+  const range = `${ref}..${upper}`;
+
+  const logOut =
+    git(checkout, [
+      "log",
+      "--oneline",
+      range,
+      ...(paths.length > 0 ? ["--", ...paths] : []),
+    ]) ?? "";
+  const commits = logOut.split("\n").filter((l) => l.trim());
+  report.commit_count = commits.length;
+  report.commits = commits.slice(0, 20);
+
+  const diffOut =
+    git(checkout, [
+      "diff",
+      "--name-only",
+      range,
+      ...(paths.length > 0 ? ["--", ...paths] : []),
+    ]) ?? "";
+  const reviewRefs = new Set<string>();
+  for (const file of diffOut.split("\n")) {
+    const f = file.trim();
+    if (!f) continue;
+    for (const w of source.watches) {
+      if (f.startsWith(w.path)) for (const r of w.refs) reviewRefs.add(r);
+    }
+  }
+  report.review_refs = [...reviewRefs].toSorted();
+  return report;
+};
+
 const auditSkill = async (
   sourcesFile: string,
   maxAge: number,
   doFetch: boolean,
+  pull: boolean,
   today: Date,
 ): Promise<SkillReport> => {
   const skillDir = resolve(sourcesFile, "..");
+  const workspaceRoot = findWorkspaceRoot(skillDir);
   const text = readFileSync(sourcesFile, "utf8");
   const sources = parseSources(text);
 
@@ -291,6 +491,13 @@ const auditSkill = async (
       const fetchReport = await fetchStatus(s.url);
       report.fetch = fetchReport;
       if (fetchReport.status !== "ok") {
+        problems += 1;
+      }
+    }
+    if (s.checkout !== undefined) {
+      const drift = computeDrift(workspaceRoot, s, pull);
+      report.drift = drift;
+      if (drift.behind || drift.commit_count > 0) {
         problems += 1;
       }
     }
@@ -360,6 +567,14 @@ const printTextReport = (rep: SkillReport, maxAge: number): void => {
     if (fetch && fetch.status !== "ok") {
       flags.push(`URL ${fetch.status}`);
     }
+    const drift = s.drift;
+    if (drift?.behind) {
+      flags.push(
+        `BEHIND ${drift.pinned_version ?? "?"} -> ${drift.latest_version ?? "?"}`,
+      );
+    } else if (drift && drift.commit_count > 0) {
+      flags.push(`DRIFT (${String(drift.commit_count)} commit(s))`);
+    }
     const marker = flags.length > 0 ? flags.join("  ") : "ok";
     console.log(`\n  [${marker}] ${s.title}`);
     console.log(`    url           : ${String(s.url)}`);
@@ -374,6 +589,36 @@ const printTextReport = (rep: SkillReport, maxAge: number): void => {
       console.log(
         `    feeds         : ${s.refs.map((r) => "references/" + r).join(", ")}`,
       );
+    }
+    if (drift) {
+      if (drift.resolved) {
+        const pinned = drift.pinned_version ?? "?";
+        const latest = drift.latest_version ?? "(no tags)";
+        const state = drift.behind
+          ? `behind — latest released ${latest}`
+          : `up to date with latest released ${latest}`;
+        console.log(`    upstream      : pinned ${pinned}, ${state}`);
+        if (drift.note) {
+          console.log(`                    note: ${drift.note}`);
+        }
+        if (drift.commit_count > 0) {
+          console.log(
+            `    commits since : ${String(drift.commit_count)} on watched paths`,
+          );
+          for (const c of drift.commits) {
+            console.log(`                    ${c}`);
+          }
+          const review =
+            drift.review_refs.length > 0 ? drift.review_refs : s.refs;
+          if (review.length > 0) {
+            console.log(
+              `    review        : ${review.map((r) => "references/" + r).join(", ")}`,
+            );
+          }
+        }
+      } else {
+        console.log(`    upstream      : ${drift.note ?? "unresolved"}`);
+      }
     }
   }
   if (rep.uncovered_refs.length > 0) {
@@ -401,6 +646,7 @@ const parseArgv = (argv: readonly string[]): ParsedArgs => {
     fetch: false,
     markReviewed: undefined,
     json: false,
+    pull: false,
   };
   const positionals: string[] = [];
 
@@ -417,6 +663,10 @@ const parseArgv = (argv: readonly string[]): ParsedArgs => {
       }
       case "--fetch": {
         parsed.fetch = true;
+        break;
+      }
+      case "--pull": {
+        parsed.pull = true;
         break;
       }
       case "--json": {
@@ -586,7 +836,9 @@ const main = async (argv: readonly string[]): Promise<number> => {
 
   const reports: SkillReport[] = [];
   for (const sf of targets) {
-    reports.push(await auditSkill(sf, args.maxAge, args.fetch, today));
+    reports.push(
+      await auditSkill(sf, args.maxAge, args.fetch, args.pull, today),
+    );
   }
   const totalProblems = reports.reduce((sum, r) => sum + r.problems, 0);
 
