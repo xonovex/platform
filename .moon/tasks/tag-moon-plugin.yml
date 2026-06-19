@@ -44,23 +44,46 @@ tasks:
       - fmt-check
     options:
       cache: false
+  github-check:
+    script: |
+      set -euo pipefail
+      name=$(awk -F'"' '/^name *= /{print $2; exit}' Cargo.toml)
+      version=$(awk -F'"' '/^version *= /{print $2; exit}' Cargo.toml)
+      [ -n "$name" ] && [ -n "$version" ] || { echo "Cargo.toml: name/version not found" >&2; exit 1; }
+      grep -qE "^## ${version}( |$)" CHANGELOG.md || { echo "CHANGELOG.md has no '## ${version}' section" >&2; exit 1; }
+      shopt -s nullglob
+      wasms=(target/wasm32-wasip1/release/*.wasm)
+      [ "${#wasms[@]}" -gt 0 ] || { echo "no .wasm artifact found (run build first)" >&2; exit 1; }
+      for wasm in "${wasms[@]}"; do
+        [ -s "$wasm" ] || { echo "$wasm is empty" >&2; exit 1; }
+        wasm-validate --enable-all "$wasm"
+      done
+      echo "${name}-v${version}: ${#wasms[@]} valid wasm artifact(s) + changelog entry, ready to publish"
+    toolchain: [system]
+    deps:
+      - build
+    options:
+      cache: false
   github-publish:
     script: |
       set -euo pipefail
       name=$(awk -F'"' '/^name *= /{print $2; exit}' Cargo.toml)
       version=$(awk -F'"' '/^version *= /{print $2; exit}' Cargo.toml)
       tag="${name}-v${version}"
+      if gh release view "$tag" >/dev/null 2>&1; then
+        echo "release ${tag} already exists; bump the version to publish (skipping)"
+        exit 0
+      fi
+      notes=$(awk '/^## /{if(p)exit; p=1} p' CHANGELOG.md)
+      [ -n "$notes" ] || notes="$tag"
       ( cd target/wasm32-wasip1/release && shopt -s nullglob
         for wasm in *.wasm; do sha256sum "$wasm" > "$wasm.sha256"; done )
       assets=(target/wasm32-wasip1/release/*.wasm target/wasm32-wasip1/release/*.sha256)
-      if gh release view "$tag" >/dev/null 2>&1; then
-        gh release upload "$tag" "${assets[@]}" --clobber
-      else
-        gh release create "$tag" "${assets[@]}" --title "$tag" --notes "$tag"
-      fi
+      gh release create "$tag" "${assets[@]}" --target "$(git rev-parse HEAD)" --title "$tag" --notes "$notes"
     toolchain: [system]
     deps:
       - build
+      - github-check
     options:
       cache: false
   github-publish-dry-run:
@@ -71,11 +94,17 @@ tasks:
       tag="${name}-v${version}"
       ( cd target/wasm32-wasip1/release && shopt -s nullglob
         for wasm in *.wasm; do sha256sum "$wasm" > "$wasm.sha256"; done )
-      echo "[dry-run] would create/update release ${tag} with:"
+      if gh release view "$tag" >/dev/null 2>&1; then
+        echo "[dry-run] release ${tag} already exists; would SKIP (bump version to publish)"
+      else
+        echo "[dry-run] would create release ${tag} (target $(git rev-parse --short HEAD)) with notes:"
+        awk '/^## /{if(p)exit; p=1} p' CHANGELOG.md
+      fi
       ls -l target/wasm32-wasip1/release/*.wasm target/wasm32-wasip1/release/*.sha256
     toolchain: [system]
     deps:
       - build
+      - github-check
     options:
       cache: false
   ci-publish:
