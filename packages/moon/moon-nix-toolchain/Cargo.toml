@@ -1,0 +1,27 @@
+[package]
+name = "moon_nix_toolchain"
+version = "0.1.0"
+edition = "2021"
+description = "moon toolchain plugin that wraps every task in the repository's nix flake dev shell."
+license = "MIT"
+publish = false
+
+[lib]
+crate-type = ["cdylib", "lib"]
+
+[dependencies]
+extism-pdk = "1.4.1"
+moon_pdk = "2.0.4"
+moon_pdk_api = "2.0.4"
+
+[dev-dependencies]
+moon_pdk_test_utils = "2.0.4"
+tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
+serial_test = "3"
+
+[profile.release]
+opt-level = "s"
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true
