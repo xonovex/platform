@@ -1,9 +1,13 @@
 {
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    rust-overlay = {
+      url = "github:oxalica/rust-overlay";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { nixpkgs, ... }:
+  outputs = { nixpkgs, rust-overlay, ... }:
     let
       supportedSystems = [ "x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin" ];
       forAllSystems = nixpkgs.lib.genAttrs supportedSystems;
@@ -11,7 +15,13 @@
     {
       devShells = forAllSystems (system:
         let
-          pkgs = nixpkgs.legacyPackages.${system};
+          pkgs = import nixpkgs {
+            inherit system;
+            overlays = [ rust-overlay.overlays.default ];
+          };
+          rustToolchain = pkgs.rust-bin.stable.latest.default.override {
+            targets = [ "wasm32-wasip1" ];
+          };
         in
         {
           default = pkgs.mkShell {
@@ -32,6 +42,14 @@
               # Shell
               pkgs.shellcheck
               pkgs.shfmt
+
+              # Rust → WASM (moon plugins)
+              rustToolchain
+              pkgs.binaryen
+              pkgs.wabt
+
+              # Release tooling
+              pkgs.gh
             ];
           };
         }

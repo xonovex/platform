@@ -1,0 +1,94 @@
+# WASM moon-plugin tasks (Rust -> wasm32-wasip1 build, test, and GitHub-release publish).
+# Projects tagged `moon-plugin` must also carry the `rust` tag, which supplies the
+# `sources`/`tests` fileGroups and the `lint`/`fmt-check` tasks referenced here.
+$schema: https://moonrepo.dev/schemas/tasks.json
+tasks:
+  build:
+    script: |
+      set -euo pipefail
+      cargo build --release --target wasm32-wasip1
+      shopt -s nullglob
+      for wasm in target/wasm32-wasip1/release/*.wasm; do
+        wasm-opt -Os --all-features "$wasm" -o "$wasm"
+        wasm-strip "$wasm"
+      done
+    toolchain: [system]
+    inputs:
+      - '@globs(sources)'
+      - Cargo.toml
+      - Cargo.lock
+    outputs:
+      - 'target/wasm32-wasip1/release/*.wasm'
+    options:
+      cache: true
+  test:
+    command:
+      - cargo
+      - test
+    toolchain: [system]
+    deps:
+      - build
+    inputs:
+      - '@globs(sources)'
+      - '@globs(tests)'
+      - Cargo.toml
+      - Cargo.lock
+    options:
+      cache: true
+  ci-check:
+    command: echo 'ci-check complete'
+    deps:
+      - build
+      - test
+      - lint
+      - fmt-check
+    options:
+      cache: false
+  github-publish:
+    script: |
+      set -euo pipefail
+      name=$(awk -F'"' '/^name *= /{print $2; exit}' Cargo.toml)
+      version=$(awk -F'"' '/^version *= /{print $2; exit}' Cargo.toml)
+      tag="${name}-v${version}"
+      ( cd target/wasm32-wasip1/release && shopt -s nullglob
+        for wasm in *.wasm; do sha256sum "$wasm" > "$wasm.sha256"; done )
+      assets=(target/wasm32-wasip1/release/*.wasm target/wasm32-wasip1/release/*.sha256)
+      if gh release view "$tag" >/dev/null 2>&1; then
+        gh release upload "$tag" "${assets[@]}" --clobber
+      else
+        gh release create "$tag" "${assets[@]}" --title "$tag" --notes "$tag"
+      fi
+    toolchain: [system]
+    deps:
+      - build
+    options:
+      cache: false
+  github-publish-dry-run:
+    script: |
+      set -euo pipefail
+      name=$(awk -F'"' '/^name *= /{print $2; exit}' Cargo.toml)
+      version=$(awk -F'"' '/^version *= /{print $2; exit}' Cargo.toml)
+      tag="${name}-v${version}"
+      ( cd target/wasm32-wasip1/release && shopt -s nullglob
+        for wasm in *.wasm; do sha256sum "$wasm" > "$wasm.sha256"; done )
+      echo "[dry-run] would create/update release ${tag} with:"
+      ls -l target/wasm32-wasip1/release/*.wasm target/wasm32-wasip1/release/*.sha256
+    toolchain: [system]
+    deps:
+      - build
+    options:
+      cache: false
+  ci-publish:
+    command: echo 'ci-publish complete'
+    deps:
+      - github-publish
+    options:
+      cache: false
+  ci-publish-dry-run:
+    command: echo 'ci-publish-dry-run complete'
+    deps:
+      - github-publish-dry-run
+    options:
+      cache: false
+inheritedBy:
+  tag: moon-plugin
