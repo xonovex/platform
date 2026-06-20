@@ -7,8 +7,9 @@
 .serena
 *storybook.log
 
+# direnv / nix-direnv cache
 .envrc
-.direnv
+.direnv/
 
 # Environment and Secrets
 .env.local
