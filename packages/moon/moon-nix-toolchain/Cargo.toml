@@ -1,6 +1,6 @@
 [package]
 name = "moon_nix_toolchain"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 description = "moon toolchain plugin that wraps every task in the repository's nix flake dev shell."
 license = "MIT"
@@ -13,6 +13,7 @@ crate-type = ["cdylib", "lib"]
 extism-pdk = "1.4.1"
 moon_pdk = "2.0.4"
 moon_pdk_api = "2.0.4"
+serde_json = "1"
 
 [dev-dependencies]
 moon_pdk_test_utils = "2.0.4"

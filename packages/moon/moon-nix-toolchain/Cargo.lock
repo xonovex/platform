@@ -2722,12 +2722,13 @@ dependencies = [
 
 [[package]]
 name = "moon_nix_toolchain"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "extism-pdk",
  "moon_pdk",
  "moon_pdk_api",
  "moon_pdk_test_utils",
+ "serde_json",
  "serial_test",
  "tokio",
 ]
