@@ -42,6 +42,9 @@ jobs:
           workspaces: packages/moon/moon-nix-toolchain
           cmd-format: nix develop -c {0}
           key: ${{ hashFiles('flake.lock') }}
+          # Save only on main; PRs restore from main's cache (avoids every PR branch
+          # saving a ~260MB cache and thrashing the repo's Actions cache budget).
+          save-if: ${{ github.ref == 'refs/heads/main' }}
 
       - run: nix develop --command zizmor --offline .github/
 
