@@ -31,3 +31,14 @@ pipeline:
   cacheLifetime: 7 days
   inheritColorsForPipedTasks: true
   logRunningCommand: true
+# Self-hosted moon remote cache (Bazel RE API — e.g. bazel-remote, or Depot).
+# DISABLED (commented out). To enable: run a bazel-remote server (or use Depot),
+# uncomment the block below, set MOON_REMOTE_TOKEN, and point `host` at the server
+# (or export MOON_REMOTE_HOST=grpc://cache.host:9092). The auth token gate means moon
+# stays disabled until MOON_REMOTE_TOKEN exists; zstd needs a matching server mode.
+# remote:
+#   host: 'grpc://cache.host:9092'
+#   cache:
+#     compression: 'zstd'
+#   auth:
+#     token: 'MOON_REMOTE_TOKEN'
