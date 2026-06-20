@@ -19,6 +19,16 @@ fn command_input(command: &str, args: &[&str]) -> ExtendTaskCommandInput {
     }
 }
 
+/// Extract the flake reference (the `nix develop <flakeref>` argument) from a
+/// wrapped command task.
+fn flake_ref(output: &ExtendTaskCommandOutput) -> String {
+    let Some(Extend::Replace(args)) = &output.args else {
+        panic!("expected args to be replaced, got {:?}", output.args);
+    };
+    assert_eq!(args[0], "develop");
+    args[1].clone()
+}
+
 #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
 #[serial]
 async fn wraps_command_task_in_nix_develop() {
@@ -152,7 +162,7 @@ async fn wraps_script_task_via_bash() {
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
 #[serial]
-async fn wraps_in_named_dev_shell_from_toolchain_config() {
+async fn wraps_in_named_dev_shell_from_project_shell() {
     reset_wrap_env();
 
     let sandbox = create_empty_moon_sandbox();
@@ -163,22 +173,16 @@ async fn wraps_in_named_dev_shell_from_toolchain_config() {
 
     let output = plugin.extend_task_command(input).await;
 
-    let Some(Extend::Replace(args)) = output.args else {
-        panic!("expected args to be replaced, got {:?}", output.args);
-    };
-    assert_eq!(args[0], "develop");
     assert!(
-        args[1].ends_with("#go"),
+        flake_ref(&output).ends_with("#go"),
         "flakeref should select the go devShell, got: {}",
-        args[1]
+        flake_ref(&output)
     );
-    assert_eq!(args[2], "--command");
-    assert_eq!(args[3], "golangci-lint");
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
 #[serial]
-async fn selects_dev_shell_per_task_from_shells_map() {
+async fn selects_dev_shell_per_task_from_shell_by_task() {
     reset_wrap_env();
 
     let sandbox = create_empty_moon_sandbox();
@@ -186,20 +190,165 @@ async fn selects_dev_shell_per_task_from_shells_map() {
 
     let mut input = command_input("golangci-lint", &["run"]);
     input.task.target = serde_json::from_value(serde_json::json!("script-lib-go:go-lint")).unwrap();
-    // A per-task `shells` entry wins over the project-wide `shell`.
+    // A per-task `shellByTask` entry wins over the project-wide `shell`.
     input.toolchain_config = serde_json::json!({
-        "shells": { "go-lint": "go" },
+        "shellByTask": { "go-lint": "go" },
         "shell": "default"
     });
 
     let output = plugin.extend_task_command(input).await;
 
-    let Some(Extend::Replace(args)) = output.args else {
-        panic!("expected args to be replaced, got {:?}", output.args);
-    };
     assert!(
-        args[1].ends_with("#go"),
-        "per-task shells map should select the go devShell, got: {}",
-        args[1]
+        flake_ref(&output).ends_with("#go"),
+        "shellByTask should select the go devShell, got: {}",
+        flake_ref(&output)
+    );
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 1)]
+#[serial]
+async fn selects_dev_shell_from_shell_by_toolchain() {
+    reset_wrap_env();
+
+    let sandbox = create_empty_moon_sandbox();
+    let plugin = sandbox.create_toolchain("nix").await;
+
+    let mut input = command_input("golangci-lint", &["run"]);
+    input.task.toolchains = serde_json::from_value(serde_json::json!(["nix", "go"])).unwrap();
+    input.toolchain_config = serde_json::json!({ "shellByToolchain": { "go": "go" } });
+
+    let output = plugin.extend_task_command(input).await;
+
+    assert!(
+        flake_ref(&output).ends_with("#go"),
+        "shellByToolchain should select the go devShell from task.toolchains, got: {}",
+        flake_ref(&output)
+    );
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 1)]
+#[serial]
+async fn selects_dev_shell_from_shell_by_language() {
+    reset_wrap_env();
+
+    let mut sandbox = create_empty_moon_sandbox();
+    sandbox
+        .host_funcs
+        .mock_load_project(|_id| serde_json::json!({ "language": "bash" }));
+    let plugin = sandbox.create_toolchain("nix").await;
+
+    let mut input = command_input("shellcheck", &["-x"]);
+    input.toolchain_config = serde_json::json!({ "shellByLanguage": { "bash": "shell" } });
+
+    let output = plugin.extend_task_command(input).await;
+
+    assert!(
+        flake_ref(&output).ends_with("#shell"),
+        "shellByLanguage should select the shell devShell from project.language, got: {}",
+        flake_ref(&output)
+    );
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 1)]
+#[serial]
+async fn selects_dev_shell_from_shell_by_tag() {
+    reset_wrap_env();
+
+    let mut sandbox = create_empty_moon_sandbox();
+    sandbox.host_funcs.mock_load_project(
+        |_id| serde_json::json!({ "config": { "tags": ["tenant-shared", "kubernetes"] } }),
+    );
+    let plugin = sandbox.create_toolchain("nix").await;
+
+    let mut input = command_input("kustomize", &["build"]);
+    input.toolchain_config = serde_json::json!({ "shellByTag": { "kubernetes": "k8s" } });
+
+    let output = plugin.extend_task_command(input).await;
+
+    assert!(
+        flake_ref(&output).ends_with("#k8s"),
+        "shellByTag should select the k8s devShell from a project tag, got: {}",
+        flake_ref(&output)
+    );
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 1)]
+#[serial]
+async fn shell_by_task_outranks_shell_by_toolchain() {
+    reset_wrap_env();
+
+    let sandbox = create_empty_moon_sandbox();
+    let plugin = sandbox.create_toolchain("nix").await;
+
+    let mut input = command_input("golangci-lint", &["run"]);
+    input.task.target = serde_json::from_value(serde_json::json!("p:go-lint")).unwrap();
+    input.task.toolchains = serde_json::from_value(serde_json::json!(["nix", "go"])).unwrap();
+    input.toolchain_config = serde_json::json!({
+        "shellByTask": { "go-lint": "go" },
+        "shellByToolchain": { "go": "wrong" }
+    });
+
+    let output = plugin.extend_task_command(input).await;
+
+    assert!(
+        flake_ref(&output).ends_with("#go"),
+        "shellByTask must outrank shellByToolchain, got: {}",
+        flake_ref(&output)
+    );
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 1)]
+#[serial]
+async fn shell_by_toolchain_outranks_tag_and_language() {
+    reset_wrap_env();
+
+    let mut sandbox = create_empty_moon_sandbox();
+    // The project would resolve a different shell by tag/language; the task
+    // toolchain must win, and the project must not even need loading.
+    sandbox.host_funcs.mock_load_project(
+        |_id| serde_json::json!({ "language": "wrong", "config": { "tags": ["wrong"] } }),
+    );
+    let plugin = sandbox.create_toolchain("nix").await;
+
+    let mut input = command_input("golangci-lint", &["run"]);
+    input.task.toolchains = serde_json::from_value(serde_json::json!(["nix", "go"])).unwrap();
+    input.toolchain_config = serde_json::json!({
+        "shellByToolchain": { "go": "go" },
+        "shellByTag": { "wrong": "wrong" },
+        "shellByLanguage": { "wrong": "wrong" }
+    });
+
+    let output = plugin.extend_task_command(input).await;
+
+    assert!(
+        flake_ref(&output).ends_with("#go"),
+        "shellByToolchain must outrank shellByTag/shellByLanguage, got: {}",
+        flake_ref(&output)
+    );
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 1)]
+#[serial]
+async fn shell_by_tag_outranks_shell_by_language() {
+    reset_wrap_env();
+
+    let mut sandbox = create_empty_moon_sandbox();
+    sandbox.host_funcs.mock_load_project(
+        |_id| serde_json::json!({ "language": "go", "config": { "tags": ["shell"] } }),
+    );
+    let plugin = sandbox.create_toolchain("nix").await;
+
+    let mut input = command_input("task", &[]);
+    input.toolchain_config = serde_json::json!({
+        "shellByTag": { "shell": "shell" },
+        "shellByLanguage": { "go": "go" }
+    });
+
+    let output = plugin.extend_task_command(input).await;
+
+    assert!(
+        flake_ref(&output).ends_with("#shell"),
+        "shellByTag must outrank shellByLanguage, got: {}",
+        flake_ref(&output)
     );
 }

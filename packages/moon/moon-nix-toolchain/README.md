@@ -18,12 +18,7 @@ Register the plugin in `.moon/toolchains.yml`, pinned to a release tag:
 
 ```yaml
 nix:
-  plugin: 'github://xonovex/platform/moon_nix_toolchain@moon_nix_toolchain-v0.3.0'
-  # Optional: pick a flake devShell per task id (applies across all projects).
-  shells:
-    go-lint: go
-    sh-lint: shell
-    k8s-validate: k8s
+  plugin: 'github://xonovex/platform/moon_nix_toolchain@moon_nix_toolchain-v0.4.0'
 ```
 
 Opt a project in via its `moon.yml` (moon has no global toolchain default, so this is per project):
@@ -33,15 +28,42 @@ toolchains:
   default: [system, nix]
 ```
 
-Selecting a devShell gives a task a lean, exact toolchain (default: the flake's `default` devShell). Use the per-task `shells` map above, or set a project-wide default in its `moon.yml`:
+## Selecting a devShell
+
+Selecting a named devShell gives a task a lean, exact toolchain (default: the flake's `default` devShell). The plugin resolves the shell from the merged toolchain config using ordered selectors, **most specific first** — the first selector with a matching key wins:
+
+1. `shellByTask` — keyed by task id
+2. `shellByToolchain` — keyed by a toolchain id present in the task's `toolchains`
+3. `shellByTag` — keyed by a project tag
+4. `shellByLanguage` — keyed by the project language
+5. `shell` — a project-wide default (set in a project's `moon.yml`)
+
+An unset, empty, or `default` value selects the flake's default devShell. `shellByTag` and `shellByLanguage` read the project's tags/language over the host; the project is loaded only when one of them is configured.
+
+```yaml
+nix:
+  plugin: 'github://xonovex/platform/moon_nix_toolchain@moon_nix_toolchain-v0.4.0'
+  # Tag-based: every project tagged `go` runs its tasks in `nix develop <root>#go`,
+  # without enumerating task ids or relying on a real toolchain id.
+  shellByTag:
+    go: go
+    shell: shell
+    kubernetes: k8s
+  # Language-based alternative (keyed on the project's language):
+  # shellByLanguage: { go: go, bash: shell, yaml: k8s }
+  # Toolchain-based (keyed on a task toolchain id):
+  # shellByToolchain: { go: go }
+  # Per-task override (keyed on task id):
+  # shellByTask: { go-lint: go }
+```
+
+A project-wide default lives in the project's `moon.yml`:
 
 ```yaml
 toolchains:
   nix:
     shell: go # this project's tasks use `nix develop <root>#go`
 ```
-
-A task's `shells` entry wins over the project `shell`.
 
 Set `GITHUB_TOKEN` in CI so moon's `github://` resolver isn't rate-limited; moon downloads and caches the `.wasm` on first use.
 

@@ -2722,7 +2722,7 @@ dependencies = [
 
 [[package]]
 name = "moon_nix_toolchain"
-version = "0.3.0"
+version = "0.4.0"
 dependencies = [
  "extism-pdk",
  "moon_pdk",
