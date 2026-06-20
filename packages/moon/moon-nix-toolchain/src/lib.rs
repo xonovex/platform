@@ -18,15 +18,29 @@ pub fn register_toolchain(
     Ok(Json(RegisterToolchainOutput {
         name: "Nix".into(),
         plugin_version: env!("CARGO_PKG_VERSION").into(),
-        description: Some("Runs every task inside the workspace nix flake dev shell.".into()),
+        description: Some(
+            "Runs every task inside the project's or workspace's nix flake dev shell.".into(),
+        ),
         ..Default::default()
     }))
 }
 
-/// Return the real workspace root to wrap with, or `None` when the task must run
+/// The nix flake a task is wrapped with: the real path passed to `nix develop`, and
+/// whether it is a project-local flake. A project flake uses its own default devShell
+/// (the shell selectors target the workspace flake's named shells, so they are skipped).
+struct WrapTarget {
+    root: String,
+    project_flake: bool,
+}
+
+/// Return the flake to wrap the task with, or `None` when the task must run
 /// unchanged: already inside a dev shell (CI's outer `nix develop`), already
-/// wrapped, `nix` is unavailable, or the workspace root cannot be resolved.
-fn resolve_wrap_root(context: &MoonContext) -> AnyResult<Option<String>> {
+/// wrapped, `nix` is unavailable, or no real path resolves. When the task's project
+/// has its own `flake.nix`, that project flake wins over the workspace flake.
+fn resolve_wrap_target(
+    context: &MoonContext,
+    project_source: &str,
+) -> AnyResult<Option<WrapTarget>> {
     if !get_host_env_var("IN_NIX_SHELL")?
         .unwrap_or_default()
         .is_empty()
@@ -42,10 +56,29 @@ fn resolve_wrap_root(context: &MoonContext) -> AnyResult<Option<String>> {
         return Ok(None);
     }
 
-    Ok(context
-        .workspace_root
-        .real_path()
-        .map(|path| path.to_string_lossy().into_owned()))
+    if !project_source.is_empty() {
+        if let Some(project_root) = context.workspace_root.join(project_source).real_path() {
+            // Detect the project flake over the host: the plugin's sandbox has no
+            // direct read access to the workspace, so `VirtualPath::is_file` cannot
+            // see it. `test -f` runs on the host against the real project path.
+            let flake = project_root.join("flake.nix");
+            let flake_path = flake.to_string_lossy();
+
+            if exec_captured("test", ["-f", flake_path.as_ref()])
+                .is_ok_and(|result| result.exit_code == 0)
+            {
+                return Ok(Some(WrapTarget {
+                    root: project_root.to_string_lossy().into_owned(),
+                    project_flake: true,
+                }));
+            }
+        }
+    }
+
+    Ok(context.workspace_root.real_path().map(|path| WrapTarget {
+        root: path.to_string_lossy().into_owned(),
+        project_flake: false,
+    }))
 }
 
 /// Trim a configured devShell name, treating empty or `default` as no selection
@@ -123,12 +156,12 @@ fn resolve_shell(
         .and_then(normalize_shell))
 }
 
-/// Build the `nix develop` flake reference: the workspace root, plus a `#<shell>`
+/// Build the `nix develop` flake reference: the flake root, plus a `#<shell>`
 /// attribute when a named devShell is selected, else the root's default devShell.
-fn flake_ref(workspace_root: &str, shell: Option<&str>) -> String {
+fn flake_ref(root: &str, shell: Option<&str>) -> String {
     match shell {
-        Some(shell) => format!("{workspace_root}#{shell}"),
-        None => workspace_root.to_string(),
+        Some(shell) => format!("{root}#{shell}"),
+        None => root.to_string(),
     }
 }
 
@@ -143,23 +176,29 @@ pub fn extend_task_command(
 ) -> FnResult<Json<ExtendTaskCommandOutput>> {
     let mut output = ExtendTaskCommandOutput::default();
 
-    let Some(workspace_root) = resolve_wrap_root(&input.context)? else {
+    let Some(target) = resolve_wrap_target(&input.context, input.project.source.as_str())? else {
         return Ok(Json(output));
     };
 
-    let shell = resolve_shell(
-        input.task.target.get_task_id().ok(),
-        &input.task.toolchains,
-        input.project.id.as_str(),
-        &input.toolchain_config,
-    )?;
+    // A project-local flake uses its own default devShell; the shell selectors
+    // name shells in the workspace flake, so they do not apply to it.
+    let shell = if target.project_flake {
+        None
+    } else {
+        resolve_shell(
+            input.task.target.get_task_id().ok(),
+            &input.task.toolchains,
+            input.project.id.as_str(),
+            &input.toolchain_config,
+        )?
+    };
 
     // Rebuild the entire argv: nix develop <flakeref> --command <cmd> <args...>.
     // `--command` must be the last `nix` flag; everything after it is the child
     // argv, passed through verbatim with no shell layer.
     let mut args = vec![
         "develop".to_string(),
-        flake_ref(&workspace_root, shell.as_deref()),
+        flake_ref(&target.root, shell.as_deref()),
         "--command".to_string(),
         input.command.clone(),
     ];
@@ -178,22 +217,26 @@ pub fn extend_task_script(
 ) -> FnResult<Json<ExtendTaskScriptOutput>> {
     let mut output = ExtendTaskScriptOutput::default();
 
-    let Some(workspace_root) = resolve_wrap_root(&input.context)? else {
+    let Some(target) = resolve_wrap_target(&input.context, input.project.source.as_str())? else {
         return Ok(Json(output));
     };
 
-    let shell = resolve_shell(
-        input.task.target.get_task_id().ok(),
-        &input.task.toolchains,
-        input.project.id.as_str(),
-        &input.toolchain_config,
-    )?;
+    let shell = if target.project_flake {
+        None
+    } else {
+        resolve_shell(
+            input.task.target.get_task_id().ok(),
+            &input.task.toolchains,
+            input.project.id.as_str(),
+            &input.toolchain_config,
+        )?
+    };
 
     // A script is one opaque string, so it needs a shell layer inside the dev
     // shell: nix develop <flakeref> --command bash -c "<original script>".
     output.script = Some(format!(
         "nix develop {} --command bash -c {}",
-        shell_quote(&flake_ref(&workspace_root, shell.as_deref())),
+        shell_quote(&flake_ref(&target.root, shell.as_deref())),
         shell_quote(&input.script)
     ));
     output.env.insert(SENTINEL.into(), "1".into());

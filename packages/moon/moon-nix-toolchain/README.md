@@ -4,7 +4,7 @@ A moon toolchain plugin that runs selected tasks inside the workspace's Nix flak
 
 ## What it does
 
-Registers a `Nix` toolchain. Tasks that select it are rewritten to run inside `nix develop <workspaceRoot> --command …`, so binaries resolve from the flake's dev shell instead of the developer's `$PATH`. It is generic — the workspace root is resolved at runtime and it carries no consumer-specific config.
+Registers a `Nix` toolchain. Tasks that select it are rewritten to run inside `nix develop <root> --command …`, so binaries resolve from the flake's dev shell instead of the developer's `$PATH`. It is generic — the root is resolved at runtime and it carries no consumer-specific config. A project that ships its own `flake.nix` is wrapped with that flake (see [Per-project flakes](#per-project-flakes)); otherwise the workspace flake is used.
 
 It leaves the task **unchanged** when any guard trips:
 
@@ -18,7 +18,7 @@ Register the plugin in `.moon/toolchains.yml`, pinned to a release tag:
 
 ```yaml
 nix:
-  plugin: 'github://xonovex/platform/moon_nix_toolchain@moon_nix_toolchain-v0.4.0'
+  plugin: 'github://xonovex/platform/moon_nix_toolchain@moon_nix_toolchain-v0.5.0'
 ```
 
 Opt a project in via its `moon.yml` (moon has no global toolchain default, so this is per project):
@@ -42,7 +42,7 @@ An unset, empty, or `default` value selects the flake's default devShell. `shell
 
 ```yaml
 nix:
-  plugin: 'github://xonovex/platform/moon_nix_toolchain@moon_nix_toolchain-v0.4.0'
+  plugin: 'github://xonovex/platform/moon_nix_toolchain@moon_nix_toolchain-v0.5.0'
   # Tag-based: every project tagged `go` runs its tasks in `nix develop <root>#go`,
   # without enumerating task ids or relying on a real toolchain id.
   shellByTag:
@@ -66,6 +66,12 @@ toolchains:
 ```
 
 Set `GITHUB_TOKEN` in CI so moon's `github://` resolver isn't rate-limited; moon downloads and caches the `.wasm` on first use.
+
+## Per-project flakes
+
+When a project ships its own `flake.nix` (i.e. `<projectRoot>/flake.nix` exists), the plugin wraps that project's tasks with the project flake — `nix develop <projectRoot> --command …` — using the project flake's **default** devShell. This takes precedence over the workspace flake and over the shell selectors above, which name devShells in the workspace flake and therefore do not apply to a project flake.
+
+The project flake is detected from the project source over the host, so it auto-applies to every project that ships one — no per-project config. Projects without their own `flake.nix` are unchanged: the workspace flake plus the resolved devShell. This lets a package pin its own toolchain independently of the workspace flake.
 
 ## Notes
 
