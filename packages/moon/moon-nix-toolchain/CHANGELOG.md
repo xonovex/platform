@@ -1,5 +1,11 @@
 # @xonovex/moon-nix-toolchain
 
+## 0.4.0
+
+### Minor Changes
+
+- Select the flake devShell from the project, not only the task. The toolchain config gains four ordered selectors, most specific first: `shellByTask` (task id) > `shellByToolchain` (a task toolchain id) > `shellByTag` (a project tag) > `shellByLanguage` (the project language) — each falling back to the project-wide `shell`, then the default devShell. `shellByTag`/`shellByLanguage` read the project's tags/language over the host, loaded only when one of them is configured. Renames the previous per-task `shells` map to `shellByTask` (no `shells` fallback). `shellByTag` keys a devShell on a project tag (`go`, `shell`, `kubernetes`), so it auto-applies to every tagged project's tasks without enumerating task ids or relying on a real toolchain id.
+
 ## 0.3.0
 
 ### Minor Changes
