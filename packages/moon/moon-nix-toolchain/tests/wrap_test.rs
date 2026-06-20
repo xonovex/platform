@@ -352,3 +352,61 @@ async fn shell_by_tag_outranks_shell_by_language() {
         flake_ref(&output)
     );
 }
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 1)]
+#[serial]
+async fn wraps_in_project_flake_when_project_has_one() {
+    reset_wrap_env();
+
+    let sandbox = create_empty_moon_sandbox();
+    // A project that ships its own flake.nix.
+    std::fs::create_dir_all(sandbox.root.join("packages/proj")).unwrap();
+    std::fs::write(sandbox.root.join("packages/proj/flake.nix"), "{}").unwrap();
+
+    let plugin = sandbox.create_toolchain("nix").await;
+
+    let mut input = command_input("golangci-lint", &["run"]);
+    input.project =
+        serde_json::from_value(serde_json::json!({ "id": "proj", "source": "packages/proj" }))
+            .unwrap();
+    // A shell selector is configured but must be ignored: a project flake uses its
+    // own default devShell, not a named shell from the workspace flake.
+    input.toolchain_config = serde_json::json!({ "shell": "go" });
+
+    let output = plugin.extend_task_command(input).await;
+
+    let flake_ref = flake_ref(&output);
+    assert!(
+        flake_ref.ends_with("/packages/proj"),
+        "should wrap with the project flake root, got: {flake_ref}"
+    );
+    assert!(
+        !flake_ref.contains('#'),
+        "a project flake must use its default devShell (no #shell), got: {flake_ref}"
+    );
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 1)]
+#[serial]
+async fn uses_workspace_flake_when_project_has_no_flake() {
+    reset_wrap_env();
+
+    let sandbox = create_empty_moon_sandbox();
+    let plugin = sandbox.create_toolchain("nix").await;
+
+    // A project source without a flake.nix falls back to the workspace flake, and
+    // the shell selector still applies.
+    let mut input = command_input("golangci-lint", &["run"]);
+    input.project =
+        serde_json::from_value(serde_json::json!({ "id": "proj", "source": "packages/proj" }))
+            .unwrap();
+    input.toolchain_config = serde_json::json!({ "shell": "go" });
+
+    let output = plugin.extend_task_command(input).await;
+
+    assert!(
+        flake_ref(&output).ends_with("#go"),
+        "no project flake should fall back to the workspace flake + shell, got: {}",
+        flake_ref(&output)
+    );
+}

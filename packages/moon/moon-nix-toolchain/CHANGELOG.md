@@ -1,5 +1,11 @@
 # @xonovex/moon-nix-toolchain
 
+## 0.5.0
+
+### Minor Changes
+
+- Wrap a task in its project's own `flake.nix` when present. If `<project>/flake.nix` exists, the task runs in `nix develop <projectRoot> --command …` (the project flake's default devShell), taking precedence over the workspace flake and the shell selectors (which name shells in the workspace flake, so they do not apply to a project flake). Projects without their own flake are unchanged: the workspace flake plus the resolved devShell. Lets a package pin its own toolchain independently of the workspace flake — detected from the project source over the host, so it auto-applies to every project that ships a flake.
+
 ## 0.4.0
 
 ### Minor Changes
