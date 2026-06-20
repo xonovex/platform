@@ -15,24 +15,34 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
   ci:
     name: CI
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: read
+      pull-requests: write
+
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
         with:
           fetch-depth: 0
+          persist-credentials: false
 
       - uses: ./.github/actions/setup-nix
         with:
           cache-workspace: ${{ inputs.cache-workspace }}
 
-      - run: rm -f .moon/cache/runReport.json .moon/cache/ciReport.json
+      - run: nix develop --command zizmor --offline .github/
+
+      - run: rm -f .moon/cache/runReport.json
       - run: nix develop --command bash -c "npm ci && npx moon ci --color --concurrency 4 :ci-check"
 
-      - uses: moonrepo/run-report-action@v1
+      - uses: moonrepo/run-report-action@bbe7e99bf2aca819ec660ec01fc59d84bdd492d6 # v1
         if: success() || failure()
         with:
           access-token: ${{ secrets.GITHUB_TOKEN }}
