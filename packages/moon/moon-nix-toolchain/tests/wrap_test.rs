@@ -175,3 +175,31 @@ async fn wraps_in_named_dev_shell_from_toolchain_config() {
     assert_eq!(args[2], "--command");
     assert_eq!(args[3], "golangci-lint");
 }
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 1)]
+#[serial]
+async fn selects_dev_shell_per_task_from_shells_map() {
+    reset_wrap_env();
+
+    let sandbox = create_empty_moon_sandbox();
+    let plugin = sandbox.create_toolchain("nix").await;
+
+    let mut input = command_input("golangci-lint", &["run"]);
+    input.task.target = serde_json::from_value(serde_json::json!("script-lib-go:go-lint")).unwrap();
+    // A per-task `shells` entry wins over the project-wide `shell`.
+    input.toolchain_config = serde_json::json!({
+        "shells": { "go-lint": "go" },
+        "shell": "default"
+    });
+
+    let output = plugin.extend_task_command(input).await;
+
+    let Some(Extend::Replace(args)) = output.args else {
+        panic!("expected args to be replaced, got {:?}", output.args);
+    };
+    assert!(
+        args[1].ends_with("#go"),
+        "per-task shells map should select the go devShell, got: {}",
+        args[1]
+    );
+}
