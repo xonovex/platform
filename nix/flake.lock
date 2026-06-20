@@ -1,22 +1,5 @@
 {
   "nodes": {
-    "nixShells": {
-      "inputs": {
-        "nixpkgs": [
-          "nixpkgs"
-        ],
-        "rust-overlay": "rust-overlay"
-      },
-      "locked": {
-        "path": "../../../nix",
-        "type": "path"
-      },
-      "original": {
-        "path": "../../../nix",
-        "type": "path"
-      },
-      "parent": []
-    },
     "nixpkgs": {
       "locked": {
         "lastModified": 1781268102,
@@ -35,14 +18,13 @@
     },
     "root": {
       "inputs": {
-        "nixShells": "nixShells",
-        "nixpkgs": "nixpkgs"
+        "nixpkgs": "nixpkgs",
+        "rust-overlay": "rust-overlay"
       }
     },
     "rust-overlay": {
       "inputs": {
         "nixpkgs": [
-          "nixShells",
           "nixpkgs"
         ]
       },
