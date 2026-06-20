@@ -19,18 +19,13 @@
           g = nixShells.devShells.${system};
         in
         {
-          # Full shell — composed from the shared per-tool devShells in nix/. The Go
-          # compiler is added here (golangci-lint comes from the shared `go` shell).
+          # Full shell — composed from the shared per-tool devShells in nix/.
           default = pkgs.mkShell {
             inputsFrom = [ g.node g.go g.k8s g.shell g.rust g.release g.ci g.general ];
-            packages = [ pkgs.go_1_26 ];
           };
 
           # Lean per-purpose shells, selected via the nix toolchain `shellByTag` setting.
-          go = pkgs.mkShell {
-            inputsFrom = [ g.go g.general ];
-            packages = [ pkgs.go_1_26 ];
-          };
+          go = pkgs.mkShell { inputsFrom = [ g.go g.general ]; };
           shell = pkgs.mkShell { inputsFrom = [ g.shell g.general ]; };
           rust = pkgs.mkShell { inputsFrom = [ g.rust g.release g.general ]; };
         }

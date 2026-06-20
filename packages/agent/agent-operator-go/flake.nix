@@ -9,8 +9,7 @@
     };
   };
 
-  # Shared Go + shell + Kubernetes tooling from nix/, plus this project's
-  # go.mod-matched Go toolchain.
+  # Shared Go + shell + Kubernetes tooling from nix/.
   outputs = { nixpkgs, nixShells, ... }:
     let
       system = "x86_64-linux";
@@ -20,7 +19,6 @@
     {
       devShells.${system}.default = pkgs.mkShell {
         inputsFrom = [ g.go g.shell g.k8s ];
-        packages = [ pkgs.go_1_26 ];
       };
     };
 }

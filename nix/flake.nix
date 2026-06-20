@@ -35,6 +35,7 @@
           rust = group ./rust.nix;
           release = group ./release.nix;
           ci = group ./ci.nix;
+          docker = group ./docker.nix;
         }
       );
     };
