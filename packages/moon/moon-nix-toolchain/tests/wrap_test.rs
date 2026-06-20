@@ -149,3 +149,29 @@ async fn wraps_script_task_via_bash() {
     assert!(script.contains("echo hi && ls"), "got: {script}");
     assert_eq!(output.env.get(SENTINEL).map(String::as_str), Some("1"));
 }
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 1)]
+#[serial]
+async fn wraps_in_named_dev_shell_from_toolchain_config() {
+    reset_wrap_env();
+
+    let sandbox = create_empty_moon_sandbox();
+    let plugin = sandbox.create_toolchain("nix").await;
+
+    let mut input = command_input("golangci-lint", &["run"]);
+    input.toolchain_config = serde_json::json!({ "shell": "go" });
+
+    let output = plugin.extend_task_command(input).await;
+
+    let Some(Extend::Replace(args)) = output.args else {
+        panic!("expected args to be replaced, got {:?}", output.args);
+    };
+    assert_eq!(args[0], "develop");
+    assert!(
+        args[1].ends_with("#go"),
+        "flakeref should select the go devShell, got: {}",
+        args[1]
+    );
+    assert_eq!(args[2], "--command");
+    assert_eq!(args[3], "golangci-lint");
+}

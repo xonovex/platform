@@ -43,6 +43,22 @@ fn resolve_wrap_root(context: &MoonContext) -> AnyResult<Option<String>> {
         .map(|path| path.to_string_lossy().into_owned()))
 }
 
+/// Build the `nix develop` flake reference for a wrapped task: the workspace
+/// root, plus a `#<shell>` attribute when the merged toolchain config selects a
+/// named devShell via the `shell` setting (e.g. `shell: go`). An unset, empty,
+/// or `default` shell uses the flake's default devShell (the root, no attribute).
+fn flake_ref(workspace_root: &str, toolchain_config: &serde_json::Value) -> String {
+    match toolchain_config
+        .get("shell")
+        .and_then(|value| value.as_str())
+        .map(str::trim)
+        .filter(|shell| !shell.is_empty() && *shell != "default")
+    {
+        Some(shell) => format!("{workspace_root}#{shell}"),
+        None => workspace_root.to_string(),
+    }
+}
+
 /// Quote a string for safe inclusion as a single POSIX shell argument.
 fn shell_quote(value: &str) -> String {
     format!("'{}'", value.replace('\'', "'\\''"))
@@ -58,12 +74,12 @@ pub fn extend_task_command(
         return Ok(Json(output));
     };
 
-    // Rebuild the entire argv: nix develop <root> --command <cmd> <args...>.
+    // Rebuild the entire argv: nix develop <flakeref> --command <cmd> <args...>.
     // `--command` must be the last `nix` flag; everything after it is the child
     // argv, passed through verbatim with no shell layer.
     let mut args = vec![
         "develop".to_string(),
-        workspace_root,
+        flake_ref(&workspace_root, &input.toolchain_config),
         "--command".to_string(),
         input.command.clone(),
     ];
@@ -87,10 +103,10 @@ pub fn extend_task_script(
     };
 
     // A script is one opaque string, so it needs a shell layer inside the dev
-    // shell: nix develop <root> --command bash -c "<original script>".
+    // shell: nix develop <flakeref> --command bash -c "<original script>".
     output.script = Some(format!(
         "nix develop {} --command bash -c {}",
-        shell_quote(&workspace_root),
+        shell_quote(&flake_ref(&workspace_root, &input.toolchain_config)),
         shell_quote(&input.script)
     ));
     output.env.insert(SENTINEL.into(), "1".into());
