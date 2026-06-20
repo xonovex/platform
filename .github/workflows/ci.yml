@@ -37,6 +37,12 @@ jobs:
         with:
           cache-workspace: ${{ inputs.cache-workspace }}
 
+      - uses: Swatinem/rust-cache@c19371144df3bb44fab255c43d04cbc2ab54d1c4 # v2.9.1
+        with:
+          workspaces: packages/moon/moon-nix-toolchain
+          cmd-format: nix develop -c {0}
+          key: ${{ hashFiles('flake.lock') }}
+
       - run: nix develop --command zizmor --offline .github/
 
       - run: rm -f .moon/cache/runReport.json
