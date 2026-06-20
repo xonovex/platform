@@ -145,6 +145,14 @@ if [[ $cmd_status -eq 124 ]]; then
   exit 2
 fi
 
+# Moon exits non-zero when no task is affected (e.g. a root-config or docs-only
+# change with no matching task). Nothing ran, so this is a no-op, not a failure.
+if [[ $cmd_status -ne 0 ]] && grep -qiE 'No tasks affected by changed files' "$LOG_FILE"; then
+  cleanup_temp_log
+  echo "OK"
+  exit 0
+fi
+
 # Check for modified files
 changed_files=""
 if (( git_ok )); then
