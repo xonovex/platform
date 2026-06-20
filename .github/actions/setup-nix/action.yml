@@ -29,21 +29,6 @@ runs:
         restore-keys: |
           go-${{ runner.os }}-
 
-    # Cargo registry + the wasm32-wasip1 dependency rlibs for the moon-nix-toolchain
-    # plugin. Salted on flake.lock (which pins rustc via rust-overlay) so a toolchain
-    # bump invalidates stale artifacts; excludes the final *.wasm (moon's own output).
-    - uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5
-      with:
-        path: |
-          ~/.cargo/registry/index
-          ~/.cargo/registry/cache
-          ~/.cargo/git/db
-          packages/moon/moon-nix-toolchain/target/wasm32-wasip1/release/deps
-          packages/moon/moon-nix-toolchain/target/wasm32-wasip1/release/.fingerprint
-        key: cargo-wasm-${{ runner.os }}-${{ hashFiles('flake.lock', 'packages/moon/moon-nix-toolchain/Cargo.lock') }}
-        restore-keys: |
-          cargo-wasm-${{ runner.os }}-
-
     - uses: nixbuild/nix-quick-install-action@9f63be77f412a248c9d9a65a4c82cf066cdf8f0c # v35
       with:
         github_access_token: ${{ github.token }}
