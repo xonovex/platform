@@ -3,6 +3,9 @@
 ci:
   stage: ci
   extends: .workspace_cache
+  # Requires a GITHUB_TOKEN CI/CD variable set in GitLab settings (GitLab provides
+  # CI_JOB_TOKEN, not a GitHub token); once set it is injected into the job env so moon
+  # can resolve the github:// nix toolchain plugin without hitting GitHub API rate limits.
   script:
     - rm -f .moon/cache/runReport.json
     - npx moon ci --color --concurrency 4 :ci-check

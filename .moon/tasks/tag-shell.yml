@@ -8,6 +8,7 @@ fileGroups:
 tasks:
   sh-lint:
     script: shopt -s globstar nullglob && files=(**/*.sh) && [ ${#files[@]} -gt 0 ] && shellcheck -x "${files[@]}" || echo 'No .sh files found'
+    toolchain: [system, nix]
     inputs:
     - '@globs(sources)'
     - .shellcheckrc
@@ -19,6 +20,7 @@ tasks:
     - shfmt
     - -w
     - .
+    toolchain: [system, nix]
     inputs:
     - '@globs(sources)'
     options:
@@ -28,6 +30,7 @@ tasks:
     - shfmt
     - -d
     - .
+    toolchain: [system, nix]
     inputs:
     - '@globs(sources)'
     options:

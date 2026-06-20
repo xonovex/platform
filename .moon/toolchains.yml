@@ -14,3 +14,10 @@ javascript:
   syncPackageManagerField: true
   syncProjectWorkspaceDependencies: true
   dependencyVersionFormat: version-caret
+nix:
+  plugin: 'github://xonovex/platform/moon_nix_toolchain@moon_nix_toolchain-v0.4.0'
+  shellByTag:
+    go: go
+    shell: shell
+    rust: rust
+    moon-plugin: rust
