@@ -1,13 +1,13 @@
 {
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-    rust-overlay = {
-      url = "github:oxalica/rust-overlay";
+    nixShells = {
+      url = "path:./nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 
-  outputs = { nixpkgs, rust-overlay, ... }:
+  outputs = { nixpkgs, nixShells, ... }:
     let
       supportedSystems = [ "x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin" ];
       forAllSystems = nixpkgs.lib.genAttrs supportedSystems;
@@ -15,36 +15,24 @@
     {
       devShells = forAllSystems (system:
         let
-          pkgs = import nixpkgs {
-            inherit system;
-            overlays = [ rust-overlay.overlays.default ];
-          };
-          rustToolchain = pkgs.rust-bin.stable.latest.default.override {
-            targets = [ "wasm32-wasip1" ];
-          };
-
-          # Tool groups, composed into the full `default` shell and lean
-          # per-purpose shells selected per project via the nix toolchain's
-          # `shellByTag` setting (see .moon/toolchains.yml).
-          general = [ pkgs.git ]; # git for the moon-plugin release tasks
-          node = [ pkgs.nodejs_24 ];
-          go = [ pkgs.go_1_26 pkgs.golangci-lint ];
-          k8s = [ pkgs.kind pkgs.kubectl pkgs.setup-envtest pkgs.kubernetes-controller-tools ];
-          shell = [ pkgs.shellcheck pkgs.shfmt ];
-          rust = [ rustToolchain pkgs.binaryen pkgs.wabt ]; # cargo/clippy/rustfmt + wasm-opt + wasm tools
-          release = [ pkgs.gh ]; # gh for the moon-plugin GitHub releases
-          ci = [ pkgs.zizmor ]; # GitHub Actions workflow linter
+          pkgs = nixpkgs.legacyPackages.${system};
+          g = nixShells.devShells.${system};
         in
         {
-          # Full shell — every task that does not select a named shell uses this.
+          # Full shell — composed from the shared per-tool devShells in nix/. The Go
+          # compiler is added here (golangci-lint comes from the shared `go` shell).
           default = pkgs.mkShell {
-            packages = node ++ go ++ k8s ++ shell ++ rust ++ release ++ ci ++ general;
+            inputsFrom = [ g.node g.go g.k8s g.shell g.rust g.release g.ci g.general ];
+            packages = [ pkgs.go_1_26 ];
           };
 
           # Lean per-purpose shells, selected via the nix toolchain `shellByTag` setting.
-          go = pkgs.mkShell { packages = go ++ general; };
-          shell = pkgs.mkShell { packages = shell ++ general; };
-          rust = pkgs.mkShell { packages = rust ++ release ++ general; };
+          go = pkgs.mkShell {
+            inputsFrom = [ g.go g.general ];
+            packages = [ pkgs.go_1_26 ];
+          };
+          shell = pkgs.mkShell { inputsFrom = [ g.shell g.general ]; };
+          rust = pkgs.mkShell { inputsFrom = [ g.rust g.release g.general ]; };
         }
       );
     };
