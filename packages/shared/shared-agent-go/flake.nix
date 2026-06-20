@@ -9,17 +9,8 @@
     };
   };
 
-  # Shared Go tooling (golangci-lint) from nix/, plus this project's go.mod-matched
-  # Go toolchain.
-  outputs = { nixpkgs, nixShells, ... }:
-    let
-      system = "x86_64-linux";
-      pkgs = nixpkgs.legacyPackages.${system};
-    in
-    {
-      devShells.${system}.default = pkgs.mkShell {
-        inputsFrom = [ nixShells.devShells.${system}.go ];
-        packages = [ pkgs.go_1_25 ];
-      };
-    };
+  # The Go toolchain (go + golangci-lint) comes from the shared nix/ `go` devShell.
+  outputs = { nixShells, ... }: {
+    devShells.x86_64-linux.default = nixShells.devShells.x86_64-linux.go;
+  };
 }
