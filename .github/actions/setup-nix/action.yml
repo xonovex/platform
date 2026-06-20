@@ -1,5 +1,5 @@
 name: Setup
-description: Cache npm and moon toolchain with Nix
+description: Cache npm, Go, and the Nix store, then install Nix
 
 inputs:
   cache-workspace:
@@ -10,7 +10,7 @@ runs:
   using: composite
   steps:
     - if: inputs.cache-workspace != 'false'
-      uses: actions/cache@v5
+      uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5
       with:
         path: |
           ~/.npm
@@ -19,7 +19,7 @@ runs:
         restore-keys: |
           npm-moon-${{ runner.os }}
 
-    - uses: actions/cache@v5
+    - uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5
       with:
         path: |
           ~/go/pkg/mod
@@ -29,8 +29,20 @@ runs:
         restore-keys: |
           go-${{ runner.os }}-
 
-    - uses: cachix/install-nix-action@v31
+    - uses: nixbuild/nix-quick-install-action@9f63be77f412a248c9d9a65a4c82cf066cdf8f0c # v35
       with:
-        install_options: --no-daemon
+        github_access_token: ${{ github.token }}
+        nix_conf: |
+          keep-env-derivations = true
+          keep-outputs = true
+          experimental-features = nix-command flakes
 
-    - uses: moonrepo/setup-toolchain@v0
+    - uses: nix-community/cache-nix-action@7df957e333c1e5da7721f60227dbba6d06080569 # v7
+      with:
+        primary-key: nix-${{ runner.os }}-${{ hashFiles('flake.nix', 'flake.lock') }}
+        restore-prefixes-first-match: nix-${{ runner.os }}-
+        gc-max-store-size-linux: 5368709120
+        purge: true
+        purge-prefixes: nix-${{ runner.os }}-
+        purge-primary-key: never
+        purge-last-accessed: P1DT12H

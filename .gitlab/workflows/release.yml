@@ -4,7 +4,7 @@ release:
   stage: release
   extends: .workspace_cache
   script:
-    - rm -f .moon/cache/runReport.json .moon/cache/ciReport.json
+    - rm -f .moon/cache/runReport.json
     - |
       if [ "$DRY_RUN" = "true" ]; then
         TARGETS=":ci-publish-dry-run"

@@ -15,24 +15,43 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
   ci:
     name: CI
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: read
+      pull-requests: write
+
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
         with:
           fetch-depth: 0
+          persist-credentials: false
 
       - uses: ./.github/actions/setup-nix
         with:
           cache-workspace: ${{ inputs.cache-workspace }}
 
-      - run: rm -f .moon/cache/runReport.json .moon/cache/ciReport.json
+      - uses: Swatinem/rust-cache@c19371144df3bb44fab255c43d04cbc2ab54d1c4 # v2.9.1
+        with:
+          workspaces: packages/moon/moon-nix-toolchain
+          cmd-format: nix develop -c {0}
+          key: ${{ hashFiles('flake.lock') }}
+          # Save only on main; PRs restore from main's cache (avoids every PR branch
+          # saving a ~260MB cache and thrashing the repo's Actions cache budget).
+          save-if: ${{ github.ref == 'refs/heads/main' }}
+
+      - run: nix develop --command zizmor --offline .github/
+
+      - run: rm -f .moon/cache/runReport.json
       - run: nix develop --command bash -c "npm ci && npx moon ci --color --concurrency 4 :ci-check"
 
-      - uses: moonrepo/run-report-action@v1
+      - uses: moonrepo/run-report-action@bbe7e99bf2aca819ec660ec01fc59d84bdd492d6 # v1
         if: success() || failure()
         with:
           access-token: ${{ secrets.GITHUB_TOKEN }}

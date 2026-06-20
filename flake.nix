@@ -50,6 +50,9 @@
 
               # Release tooling
               pkgs.gh
+
+              # CI / workflow linting
+              pkgs.zizmor
             ];
           };
         }
