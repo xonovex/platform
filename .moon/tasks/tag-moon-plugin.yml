@@ -12,7 +12,7 @@ tasks:
         wasm-opt -Os --all-features "$wasm" -o "$wasm"
         wasm-strip "$wasm"
       done
-    toolchain: [system]
+    toolchain: [system, nix]
     inputs:
       - '@globs(sources)'
       - Cargo.toml
@@ -25,7 +25,7 @@ tasks:
     command:
       - cargo
       - test
-    toolchain: [system]
+    toolchain: [system, nix]
     deps:
       - build
     inputs:
@@ -59,7 +59,7 @@ tasks:
         wasm-validate --enable-all "$wasm"
       done
       echo "${name}-v${version}: ${#wasms[@]} valid wasm artifact(s) + changelog entry, ready to publish"
-    toolchain: [system]
+    toolchain: [system, nix]
     deps:
       - build
     options:
@@ -80,7 +80,7 @@ tasks:
         for wasm in *.wasm; do sha256sum "$wasm" > "$wasm.sha256"; done )
       assets=(target/wasm32-wasip1/release/*.wasm target/wasm32-wasip1/release/*.sha256)
       gh release create "$tag" "${assets[@]}" --target "$(git rev-parse HEAD)" --title "$tag" --notes "$notes"
-    toolchain: [system]
+    toolchain: [system, nix]
     deps:
       - build
       - github-check
@@ -101,7 +101,7 @@ tasks:
         awk '/^## /{if(p)exit; p=1} p' CHANGELOG.md
       fi
       ls -l target/wasm32-wasip1/release/*.wasm target/wasm32-wasip1/release/*.sha256
-    toolchain: [system]
+    toolchain: [system, nix]
     deps:
       - build
       - github-check

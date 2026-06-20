@@ -15,7 +15,7 @@ tasks:
       - --
       - -D
       - warnings
-    toolchain: [system]
+    toolchain: [system, nix]
     inputs:
       - '@globs(sources)'
       - '@globs(tests)'
@@ -28,7 +28,7 @@ tasks:
       - cargo
       - fmt
       - --check
-    toolchain: [system]
+    toolchain: [system, nix]
     inputs:
       - '@globs(sources)'
       - '@globs(tests)'
