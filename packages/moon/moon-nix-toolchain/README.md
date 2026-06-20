@@ -18,7 +18,12 @@ Register the plugin in `.moon/toolchains.yml`, pinned to a release tag:
 
 ```yaml
 nix:
-  plugin: 'github://xonovex/platform/moon_nix_toolchain@moon_nix_toolchain-v0.2.0'
+  plugin: 'github://xonovex/platform/moon_nix_toolchain@moon_nix_toolchain-v0.3.0'
+  # Optional: pick a flake devShell per task id (applies across all projects).
+  shells:
+    go-lint: go
+    sh-lint: shell
+    k8s-validate: k8s
 ```
 
 Opt a project in via its `moon.yml` (moon has no global toolchain default, so this is per project):
@@ -28,13 +33,15 @@ toolchains:
   default: [system, nix]
 ```
 
-Optionally select a named flake devShell for a project (default: the flake's `default` devShell):
+Selecting a devShell gives a task a lean, exact toolchain (default: the flake's `default` devShell). Use the per-task `shells` map above, or set a project-wide default in its `moon.yml`:
 
 ```yaml
 toolchains:
   nix:
-    shell: go # wraps tasks in `nix develop <root>#go`
+    shell: go # this project's tasks use `nix develop <root>#go`
 ```
+
+A task's `shells` entry wins over the project `shell`.
 
 Set `GITHUB_TOKEN` in CI so moon's `github://` resolver isn't rate-limited; moon downloads and caches the `.wasm` on first use.
 

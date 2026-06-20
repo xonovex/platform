@@ -43,17 +43,32 @@ fn resolve_wrap_root(context: &MoonContext) -> AnyResult<Option<String>> {
         .map(|path| path.to_string_lossy().into_owned()))
 }
 
-/// Build the `nix develop` flake reference for a wrapped task: the workspace
-/// root, plus a `#<shell>` attribute when the merged toolchain config selects a
-/// named devShell via the `shell` setting (e.g. `shell: go`). An unset, empty,
-/// or `default` shell uses the flake's default devShell (the root, no attribute).
-fn flake_ref(workspace_root: &str, toolchain_config: &serde_json::Value) -> String {
-    match toolchain_config
-        .get("shell")
-        .and_then(|value| value.as_str())
+/// Build the `nix develop` flake reference for a wrapped task: the workspace root,
+/// plus a `#<shell>` attribute selecting a named devShell. The shell is chosen from
+/// the merged toolchain config — a per-task entry in the `shells` map (keyed by task
+/// id) wins, else the project-wide `shell`. An unset, empty, or `default` shell uses
+/// the flake's default devShell (the root, no attribute).
+fn flake_ref(
+    workspace_root: &str,
+    task_id: Option<&str>,
+    toolchain_config: &serde_json::Value,
+) -> String {
+    let shell = task_id
+        .and_then(|id| {
+            toolchain_config
+                .get("shells")
+                .and_then(|shells| shells.get(id))
+                .and_then(|value| value.as_str())
+        })
+        .or_else(|| {
+            toolchain_config
+                .get("shell")
+                .and_then(|value| value.as_str())
+        })
         .map(str::trim)
-        .filter(|shell| !shell.is_empty() && *shell != "default")
-    {
+        .filter(|shell| !shell.is_empty() && *shell != "default");
+
+    match shell {
         Some(shell) => format!("{workspace_root}#{shell}"),
         None => workspace_root.to_string(),
     }
@@ -74,12 +89,14 @@ pub fn extend_task_command(
         return Ok(Json(output));
     };
 
+    let task_id = input.task.target.get_task_id().ok();
+
     // Rebuild the entire argv: nix develop <flakeref> --command <cmd> <args...>.
     // `--command` must be the last `nix` flag; everything after it is the child
     // argv, passed through verbatim with no shell layer.
     let mut args = vec![
         "develop".to_string(),
-        flake_ref(&workspace_root, &input.toolchain_config),
+        flake_ref(&workspace_root, task_id, &input.toolchain_config),
         "--command".to_string(),
         input.command.clone(),
     ];
@@ -102,11 +119,17 @@ pub fn extend_task_script(
         return Ok(Json(output));
     };
 
+    let task_id = input.task.target.get_task_id().ok();
+
     // A script is one opaque string, so it needs a shell layer inside the dev
     // shell: nix develop <flakeref> --command bash -c "<original script>".
     output.script = Some(format!(
         "nix develop {} --command bash -c {}",
-        shell_quote(&flake_ref(&workspace_root, &input.toolchain_config)),
+        shell_quote(&flake_ref(
+            &workspace_root,
+            task_id,
+            &input.toolchain_config
+        )),
         shell_quote(&input.script)
     ));
     output.env.insert(SENTINEL.into(), "1".into());

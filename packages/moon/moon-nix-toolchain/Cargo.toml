@@ -1,6 +1,6 @@
 [package]
 name = "moon_nix_toolchain"
-version = "0.2.0"
+version = "0.3.0"
 edition = "2021"
 description = "moon toolchain plugin that wraps every task in the repository's nix flake dev shell."
 license = "MIT"

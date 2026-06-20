@@ -1,5 +1,11 @@
 # @xonovex/moon-nix-toolchain
 
+## 0.3.0
+
+### Minor Changes
+
+- Add a per-task `shells` map (keyed by task id) to the toolchain config: `shells: { go-lint: go, sh-lint: shell }` selects a flake devShell per task. A task's `shells` entry wins over the project-wide `shell`, and both fall back to the default devShell. Lets one project run different tasks in different shells and auto-applies by task id across all projects.
+
 ## 0.2.0
 
 ### Minor Changes
