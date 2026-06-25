@@ -35,7 +35,6 @@
   - User-intent-over-implementation rule → Writing Principles
   - "Be pushy on triggers" + "even when the user doesn't say X" pattern → Writing Principles
   - 1024-char limit → Spec Constraints (multiple files)
-  - Skip / handoff clauses → Anatomy section
   - Trigger eval set design (~20 queries, 8-10 positive + 8-10 negative) → `evaluating-triggers.md` Trigger Eval Set
   - Near-miss negative queries → Strongest should-not-trigger queries
   - Realistic query content (file paths, personal context, casual language) → Making Eval Queries Realistic

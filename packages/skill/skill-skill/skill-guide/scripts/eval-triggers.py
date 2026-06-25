@@ -7,7 +7,7 @@
 
 Usage:
     eval-triggers.py <queries.json> <skill_name> [split] [options]
-        skill_name = bare ("git-commit") or plugin-namespaced ("xonovex-git:git-commit")
+        skill_name = bare ("git-commit") or plugin-namespaced ("myplugin:git-commit")
         split      = train | validation | all   (default: all)
 
 Options (flag overrides env; env keeps the loop/CI ergonomics):

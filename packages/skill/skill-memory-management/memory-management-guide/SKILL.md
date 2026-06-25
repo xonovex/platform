@@ -1,6 +1,6 @@
 ---
 name: memory-management-guide
-description: "Use when deciding how memory is allocated, owned, and freed in manual-memory or buffer-passing code, in any language. Triggers on prompts about caller-owns-memory / caller-provided buffers, arena/bump/linear allocators, object pools and free lists, virtual-memory reserve/commit, scratch/temp allocators, object lifetimes, ownership (single-owner/borrow), leaks/use-after-free/double-free, even when the user doesn't say 'memory' or 'allocator'. Skip cache/layout optimization (use data-oriented-design-guide), lock-free reclamation of shared nodes (use lock-free-guide), GPU device-memory specifics (use gpu-rendering-vulkan-guide), and garbage-collected languages where the runtime owns lifetimes."
+description: "Use when deciding how memory is allocated, owned, and freed in manual-memory or buffer-passing code, in any language. Triggers on prompts about caller-owns-memory / caller-provided buffers, arena/bump/linear allocators, object pools and free lists, virtual-memory reserve/commit, scratch/temp allocators, object lifetimes, ownership (single-owner/borrow), leaks/use-after-free/double-free, even when the user doesn't say 'memory' or 'allocator'."
 ---
 
 # Memory Management Guidelines

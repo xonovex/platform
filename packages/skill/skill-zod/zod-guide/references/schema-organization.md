@@ -1,6 +1,6 @@
 # schema-organization: Schema Organization Patterns
 
-**Guideline:** Name schemas with PascalCase suffix, compose with `.merge()`, `.pick()`, `.partial()`, and always infer types using `z.infer<typeof Schema>`.
+**Guideline:** Name schemas with PascalCase suffix, compose with `.extend(OtherSchema.shape)`, `.pick()`, `.partial()`, and always infer types using `z.infer<typeof Schema>`.
 
 **Rationale:** Schema-first design provides single source of truth for types and validation, enabling reusable composition and reducing duplication.
 
@@ -14,13 +14,13 @@ const BaseEntitySchema = z.object({
   updatedAt: z.iso.datetime(),
 });
 
-// ✅ Extend with .merge()
-export const UserSchema = BaseEntitySchema.merge(
+// ✅ Extend with .extend(OtherSchema.shape)
+export const UserSchema = BaseEntitySchema.extend(
   z.object({
     email: z.email(),
     name: z.string().min(1).max(100),
     role: z.enum(["admin", "user", "guest"]),
-  }),
+  }).shape,
 );
 
 // ✅ Infer type from schema
@@ -67,7 +67,7 @@ async function createUser(input: unknown): Promise<User> {
 - Name all schemas with PascalCase + "Schema" suffix
 - Define schemas at module level for reuse
 - Always infer types: `type User = z.infer<typeof UserSchema>`
-- Use `.merge()` to combine schemas
+- Use `.extend(OtherSchema.shape)` to combine schemas
 - Use `.pick()` to select specific fields
 - Use `.partial()` to make fields optional
 - Create base schemas for common patterns

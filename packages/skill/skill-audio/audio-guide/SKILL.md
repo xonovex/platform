@@ -1,6 +1,6 @@
 ---
 name: audio-guide
-description: "Use when building a low-level, real-time audio/sound system that does its own mixing: the OS audio callback / render thread, summing voices into the output buffer, sample-rate conversion and per-voice pitch, voice pools and stealing, and handing play/stop/parameter changes from the game thread to the audio thread. Triggers on audio underrun/dropout, clicks/pops, the audio callback can't lock or allocate, buffer size vs latency, resampling/interpolation, mixing gain/pan/clipping, fixed voice pools, even when the user doesn't say 'audio'. Skip the lock-free queue internals themselves (use lock-free-guide), generic no-realtime-allocation pools (use memory-management-guide), and high-level middleware/DAW usage."
+description: "Use when building a low-level, real-time audio/sound system that does its own mixing: the OS audio callback / render thread, summing voices into the output buffer, sample-rate conversion and per-voice pitch, voice pools and stealing, and handing play/stop/parameter changes from the game thread to the audio thread. Triggers on audio underrun/dropout, clicks/pops, the audio callback can't lock or allocate, buffer size vs latency, resampling/interpolation, mixing gain/pan/clipping, fixed voice pools, even when the user doesn't say 'audio'."
 ---
 
 # Low-level Audio Guidelines (Real-Time Software Mixing)

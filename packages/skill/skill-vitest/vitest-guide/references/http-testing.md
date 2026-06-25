@@ -17,7 +17,7 @@ it("should handle CORS preflight", async () => {
     },
   });
 
-  expect(res.status).toBe(204); // ✅ Correct for OPTIONS
+  expect(res.status).toBe(204); // Hono cors() returns 204 for preflight; the CORS spec allows any 2xx, so assert what the configured middleware sends
   expect(res.headers.get("Access-Control-Allow-Origin")).toBeDefined();
 });
 
@@ -50,7 +50,7 @@ it("should handle missing resource", async () => {
 
 **Techniques:**
 
-- Use 204 for OPTIONS preflight requests (CORS)
+- Assert the preflight (OPTIONS) status your CORS middleware actually returns (Hono `cors()` returns 204 with no body); the CORS spec permits any 2xx, so don't treat 204 as an absolute requirement
 - Use 204 for successful DELETE operations without response body
 - Use 201 for resource creation (POST that creates new resource)
 - Use 200 for successful operations with response body

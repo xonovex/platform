@@ -1,12 +1,14 @@
 {
-  "name": "@xonovex/skill-prompt",
+  "name": "@xonovex/skill-android-analytics",
   "version": "0.2.9",
   "private": true,
   "type": "module",
   "keywords": [
     "xonovex",
     "skill",
-    "prompt"
+    "analytics",
+    "tracking",
+    "android"
   ],
   "scripts": {
     "fmt": "prettier --write .",

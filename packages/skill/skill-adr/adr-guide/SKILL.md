@@ -1,6 +1,6 @@
 ---
 name: adr-guide
-description: "Use when creating or writing an Architecture Decision Record (ADR), recording an architectural decision, or documenting why a design was chosen. Triggers on 'write/create an ADR', 'document this decision', adding files to an `adr/` folder, or capturing a design choice, even when the user doesn't say 'ADR' (e.g. 'record why we chose X'). Works for not-yet-implemented proposals and for existing functionality with no ADR yet (written retroactively, still in proposal voice). Produces a house-style ADR: numbered title, a Status / Date / Decision-makers table, and Context / Proposal / Example uses / Decision sections, in present-tense proposal voice with no em dashes. Domain-agnostic. Skip non-decision docs (runbooks, API references, READMEs)."
+description: "Use when creating or writing an Architecture Decision Record (ADR), recording an architectural decision, or documenting why a design was chosen. Triggers on 'write/create an ADR', 'document this decision', adding files to an `adr/` folder, or capturing a design choice, even when the user doesn't say 'ADR' (e.g. 'record why we chose X'). Works for not-yet-implemented proposals and for existing functionality with no ADR yet (written retroactively, still in proposal voice). Produces a house-style ADR: numbered title, a Status / Date / Decision-makers table, and Context / Proposal / Example uses / Decision sections, in present-tense proposal voice with no em dashes. Domain-agnostic."
 ---
 
 # ADR authoring

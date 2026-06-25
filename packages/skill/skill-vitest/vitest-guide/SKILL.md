@@ -1,6 +1,6 @@
 ---
 name: vitest-guide
-description: "Use when writing or editing Vitest 3+ tests in TypeScript. Triggers on `.test.ts`, `.spec.ts`, `vitest.config.*` files, and prompts about test setup, mocking, HTTP assertions, CORS preflight tests, type safety in tests, or snapshots, even when the user doesn't say 'Vitest'. Skip Jest-only APIs, Playwright/Cypress E2E, and runtime-side production code."
+description: "Use when writing or editing Vitest 3+ tests in TypeScript. Triggers on `.test.ts`, `.spec.ts`, `vitest.config.*` files, and prompts about test setup, mocking, HTTP assertions, CORS preflight tests, type safety in tests, or snapshots, even when the user doesn't say 'Vitest'."
 ---
 
 # Vitest Testing Guidelines

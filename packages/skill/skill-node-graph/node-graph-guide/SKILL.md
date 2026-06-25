@@ -1,6 +1,6 @@
 ---
 name: node-graph-guide
-description: "Use when designing a visual node-based / data-flow graph for content authoring: typed input/output pins, wires between nodes, the graph stored as plain data, compiling/lowering to executable form vs interpreting it, topological evaluation with caching, reusable subgraphs, function graphs with declared inputs/outputs, and parametric/procedural content. Triggers on node editors, pins/connectors/sockets, wiring nodes, type-checking connections, variant/polymorphic nodes, validity hashing, flattening subgraphs, output nodes that emit work, data-driven node definitions, hot-reloading a graph, even when the user doesn't say 'node graph'. Skip the typed object/data store (use data-model-guide), CPU layout of node arrays (use data-oriented-design-guide), and emitting GPU draw/compute (use gpu-rendering-guide)."
+description: "Use when designing a visual node-based / data-flow graph for content authoring: typed input/output pins, wires between nodes, the graph stored as plain data, compiling/lowering to executable form vs interpreting it, topological evaluation with caching, reusable subgraphs, function graphs with declared inputs/outputs, and parametric/procedural content. Triggers on node editors, pins/connectors/sockets, wiring nodes, type-checking connections, variant/polymorphic nodes, validity hashing, flattening subgraphs, output nodes that emit work, data-driven node definitions, hot-reloading a graph, even when the user doesn't say 'node graph'."
 ---
 
 # Node graph Guidelines (Visual Data-Flow Authoring)

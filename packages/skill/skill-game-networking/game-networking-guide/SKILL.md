@@ -1,6 +1,6 @@
 ---
 name: game-networking-guide
-description: "Use when architecting real-time multiplayer networking for a game or simulation engine: client/server vs peer topology and per-object authority, replicating a typed world/component state across nodes, snapshot-vs-delta updates with baselines and acks, and reliable/unreliable/ordered channels layered over UDP. Triggers on netcode, network nodes, pipes/connections, packet types, state replication, snapshots and deltas, server authority, ack/out-of-order packets, lag/bandwidth simulation, and single-player-to-multiplayer transitions, even when the user doesn't say 'networking'. Skip in-engine data layout (use data-oriented-design-guide), the component model itself (use ecs-guide), the typed object/asset model (use data-model-guide), and GPU/rendering work (use gpu-rendering-guide)."
+description: "Use when architecting real-time multiplayer networking for a game or simulation engine: client/server vs peer topology and per-object authority, replicating a typed world/component state across nodes, snapshot-vs-delta updates with baselines and acks, and reliable/unreliable/ordered channels layered over UDP. Triggers on netcode, network nodes, pipes/connections, packet types, state replication, snapshots and deltas, server authority, ack/out-of-order packets, lag/bandwidth simulation, and single-player-to-multiplayer transitions, even when the user doesn't say 'networking'."
 ---
 
 # Game networking Guidelines

@@ -1,6 +1,6 @@
 ---
 name: gpu-rendering-vulkan-guide
-description: "Use when implementing a Vulkan renderer: the concrete Vulkan API for device/queues, device memory + memory types + staging, images/buffers + pipeline barriers and layout transitions, descriptor sets/layouts + bindless, pipelines + pipeline cache + dynamic rendering, timeline semaphores + fences, command pools/buffers, and the swapchain. Triggers on Vk* types and vkCmd*/vkCreate* calls, VkImageMemoryBarrier2, VkDescriptorSet, VkPipeline, VkSemaphore, VkCommandPool, swapchain acquire/present, even when the user doesn't say 'Vulkan'. Skip API-agnostic rendering architecture (use gpu-rendering-guide), other GPU APIs (D3D12/Metal), and high-level web 3D (use threejs-guide)."
+description: "Use when implementing a Vulkan renderer: the concrete Vulkan API for device/queues, device memory + memory types + staging, images/buffers + pipeline barriers and layout transitions, descriptor sets/layouts + bindless, pipelines + pipeline cache + dynamic rendering, timeline semaphores + fences, command pools/buffers, and the swapchain. Triggers on Vk* types and vkCmd*/vkCreate* calls, VkImageMemoryBarrier2, VkDescriptorSet, VkPipeline, VkSemaphore, VkCommandPool, swapchain acquire/present, even when the user doesn't say 'Vulkan'."
 ---
 
 # Vulkan Rendering Guidelines

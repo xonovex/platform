@@ -1,6 +1,6 @@
 ---
 name: strudel-guide
-description: "Use when writing or editing browser-based live-coding music in Strudel.cc. Triggers on `.strudel` files and prompts about mini-notation, pattern composition, FX chains, or generating algorithmic / genre-specific music (techno, ambient, trance, etc.), even when the user doesn't say 'Strudel'. Skip TidalCycles-only features, SuperCollider, and DAW-style production."
+description: "Use when writing or editing browser-based live-coding music in Strudel.cc. Triggers on `.strudel` files and prompts about mini-notation, pattern composition, FX chains, or generating algorithmic / genre-specific music (techno, ambient, trance, etc.), even when the user doesn't say 'Strudel'."
 ---
 
 # Strudel Music Coding Guidelines

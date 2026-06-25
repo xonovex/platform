@@ -1,6 +1,6 @@
 ---
 name: ecs-guide
-description: "Use when designing or implementing a data-oriented Entity-Component-System: archetype/bitmask storage, contiguous per-type component arrays, filter-and-batch systems, change tracking, and syncing ECS state into stateful external systems (renderer, physics). Triggers on entities, components, archetypes, systems, world iteration, component bitmasks, mirroring transforms to physics, even when the user doesn't say 'ECS'. Skip CPU cache-layout fundamentals (use data-oriented-design-guide), GPU renderer architecture (use gpu-rendering-guide), and class-based scene-graph / game-object designs (use general-oop-guide)."
+description: "Use when designing or implementing a data-oriented Entity-Component-System: archetype/bitmask storage, contiguous per-type component arrays, filter-and-batch systems, change tracking, and syncing ECS state into stateful external systems (renderer, physics). Triggers on entities, components, archetypes, systems, world iteration, component bitmasks, mirroring transforms to physics, even when the user doesn't say 'ECS'."
 ---
 
 # Entity-Component-System Guidelines (Data-Oriented)

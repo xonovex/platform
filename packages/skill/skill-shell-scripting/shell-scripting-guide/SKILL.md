@@ -1,6 +1,6 @@
 ---
 name: shell-scripting-guide
-description: "Use when writing or editing POSIX shell or Bash automation. Triggers on `.sh` files, `#!/usr/bin/env bash` shebangs, and prompts about scripting CI tasks, build helpers, devops automation, or one-off pipelines, even when the user doesn't say 'shell'. Apply for strict mode, quoting, parameter expansion, exit codes, idempotency, shellcheck/shfmt. Skip fish/zsh-only features and PowerShell."
+description: "Use when writing or editing POSIX shell or Bash automation. Triggers on `.sh` files, `#!/usr/bin/env bash` shebangs, and prompts about scripting CI tasks, build helpers, devops automation, or one-off pipelines, even when the user doesn't say 'shell'. Apply for strict mode, quoting, parameter expansion, exit codes, idempotency, shellcheck/shfmt."
 ---
 
 # Shell Scripting Coding Guidelines

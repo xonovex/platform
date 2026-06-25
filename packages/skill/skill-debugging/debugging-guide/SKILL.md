@@ -1,6 +1,6 @@
 ---
 name: debugging-guide
-description: "Use when chasing a bug in native or low-level software: a crash, access violation, use-after-free, leak, intermittent/heisenbug, or 'works on my machine' failure, and when deciding how to prevent a whole class of bugs by design. Triggers on segfaults, callstacks/.dmp files, freed-memory fill patterns (0xdddddddd), git bisect, minimal repro, assertions, sanitizers (ASan/UBSan/TSan), determinism, and record/replay, even when the user doesn't say 'debugging'. Skip lifetime/ownership design (use memory-management-guide), concurrency correctness and TSan-for-races (use lock-free-guide), and profiling for speed (use data-oriented-design-guide)."
+description: "Use when chasing a bug in native or low-level software: a crash, access violation, use-after-free, leak, intermittent/heisenbug, or 'works on my machine' failure, and when deciding how to prevent a whole class of bugs by design. Triggers on segfaults, callstacks/.dmp files, freed-memory fill patterns (0xdddddddd), git bisect, minimal repro, assertions, sanitizers (ASan/UBSan/TSan), determinism, and record/replay, even when the user doesn't say 'debugging'."
 ---
 
 # Debugging Guidelines

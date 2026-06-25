@@ -1,0 +1,17 @@
+{
+  "name": "@xonovex/skill-code-review",
+  "version": "0.2.9",
+  "private": true,
+  "type": "module",
+  "keywords": [
+    "xonovex",
+    "skill",
+    "code-review",
+    "pull-request",
+    "conventional-comments"
+  ],
+  "scripts": {
+    "fmt": "prettier --write .",
+    "fmt:check": "prettier --check ."
+  }
+}

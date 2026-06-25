@@ -1,6 +1,6 @@
 ---
 name: c99-game-opinionated-guide
-description: "Use when editing C99 game-engine or runtime code in projects that follow the opinionated caller-owns-memory, SoA, builder-pattern style. Triggers on `.c`/`.h` files in game/engine directories and on prompts about vectors, matrices, quaternions, physics, meshes, spatial structures, tagged unions, inverse mass, builder patterns, even when the user doesn't say 'opinionated'. Skip non-game systems/embedded code (use c99-opinionated-guide) and generic C99 (use c99-guide)."
+description: "Use when editing C99 game-engine or runtime code in projects that follow the opinionated caller-owns-memory, SoA, builder-pattern style. Triggers on `.c`/`.h` files in game/engine directories and on prompts about vectors, matrices, quaternions, physics, meshes, spatial structures, tagged unions, inverse mass, builder patterns, even when the user doesn't say 'opinionated'."
 ---
 
 # C99 Game Engine Opinionated Guidelines

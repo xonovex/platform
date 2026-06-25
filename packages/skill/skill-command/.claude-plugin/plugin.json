@@ -1,0 +1,7 @@
+{
+  "name": "xonovex-skill-command",
+  "version": "0.2.9",
+  "description": "Xonovex Command skill — author, merge, simplify reusable user-invocable prompt files (slash commands)",
+  "author": {"name": "Xonovex"},
+  "skills": ["./command-guide"]
+}

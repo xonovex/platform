@@ -6,61 +6,20 @@ Convert insights from a category into a new or updated guideline skill with prog
 
 1. **Discover** — search `insights/` for category files, extract Problem/Solution/Example, group by topic
 2. **Generate Structure**
-   - Metadata: `{category}-best-practices`, description starting with "Use when..."
+   - Metadata: `{category}-guide` name and description in skill-guide's format (it owns the metadata shape)
    - SKILL.md: Requirements (optional), Essentials (3-7 items), Examples (code), Progressive disclosure (reference links with load-when triggers)
    - Reference files: Guideline, Rationale, How to Apply, Example (bad vs good), Related
 3. **Merge** — if skill exists (unless user asked to overwrite): combine metadata, deduplicate Essentials (keep 3-7), append examples, add reference-file links
 4. **Output** — preview shows structure without writing; otherwise creates directory and files
 
-## Structure Template
+## Structure
 
-**SKILL.md:**
+Follow skill-guide for the SKILL.md frontmatter/Essentials/Progressive-disclosure structure and the `references/{topic}.md` template — it owns guideline-skill authoring. Map insights onto that structure as follows:
 
-````markdown
----
-name: {category}-best-practices
-description: "Use when working with {category} to {purpose}. Apply for {scenarios}."
----
-
-## Essentials
-
-- {Core guideline 1}
-- {Core guideline 2-6}
-
-## Examples
-
-```typescript
-{Code showing best practice}
-```
-
-## Progressive disclosure
-
-- **references/{topic}.md** - Load when {scenario}
-````
-
-**Reference file (`references/{topic}.md`):**
-
-````markdown
-# {topic}: {Title}
-
-**Guideline:** {Rule statement}
-**Rationale:** {Why this matters}
-
-**How to Apply:**
-
-1. {Step-by-step}
-
-**Example:**
-
-```typescript
-// Bad
-{Anti-pattern}
-// Good
-{Correct usage}
-```
-
-**Related:** references/{other-topic}.md
-````
+- **Category → skill** — one insights `category` becomes one `{category}-guide` skill
+- **Topics → references** — group a category's insights by `topic`; each topic with enough mass becomes a `references/{topic}.md`
+- **Problem/Solution/Example → reference body** — the extracted fields fill the Guideline / Rationale / How to Apply / Example slots
+- **Essentials** — promote the 3-7 strongest per-category guidelines to the SKILL.md Essentials list
 
 ## Example Output
 

@@ -1,6 +1,6 @@
 ---
 name: typescript-guide
-description: "Use when editing or reviewing TypeScript in Node.js ESM projects. Triggers on `.ts` files, ESM `package.json`, and prompts about async functions, type inference, strict mode, ESM imports, env handling, template literals, even when the user doesn't say 'TypeScript'. Skip framework-specific work (Express → expressjs-guide, Hono → hono-guide, React → react-guide, Astro → astro-guide, tests → vitest-guide), TSTL transpiled code (use typescript-to-lua-guide), and CommonJS-only projects."
+description: "Use when editing or reviewing TypeScript in Node.js ESM projects. Triggers on `.ts` files, ESM `package.json`, and prompts about async functions, type inference, strict mode, ESM imports, env handling, template literals, even when the user doesn't say 'TypeScript'."
 ---
 
 # TypeScript Coding Guidelines

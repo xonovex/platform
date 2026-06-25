@@ -1,6 +1,6 @@
 ---
 name: expressjs-guide
-description: "Use when editing or scaffolding Express 5+ API servers in TypeScript. Triggers on `.ts` files with `express` or `@types/express` imports, route definitions, middleware, controllers, and prompts about routes, error handling, JWT, CORS, Morgan, or Zod validation in Express, even when the user doesn't say 'Express'. Skip Hono (use hono-guide / hono-opinionated-guide), Fastify, and non-HTTP work."
+description: "Use when editing or scaffolding Express 5+ API servers in TypeScript. Triggers on `.ts` files with `express` or `@types/express` imports, route definitions, middleware, controllers, and prompts about routes, error handling, JWT, CORS, Morgan, or Zod validation in Express, even when the user doesn't say 'Express'."
 ---
 
 # Express.js Coding Guidelines
