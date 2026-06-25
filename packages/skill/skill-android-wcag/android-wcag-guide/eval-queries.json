@@ -1,0 +1,86 @@
+[
+  {
+    "query": "make this Compose screen accessible for TalkBack",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "direct mention of Compose accessibility"
+  },
+  {
+    "query": "TalkBack reads the icons in the wrong order on this composable — fix the focus order",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "reading/focus order, doesn't say WCAG"
+  },
+  {
+    "query": "add contentDescription to these images and mark the decorative ones as ignored",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "non-text content labelling"
+  },
+  {
+    "query": "this custom toggle doesn't announce its on/off state to the screen reader",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "state description / role"
+  },
+  {
+    "query": "the tap targets on these icon buttons are too small — make them meet the accessibility minimum",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "touch target size (2.5.8)"
+  },
+  {
+    "query": "the text doesn't grow when I increase the system font size, fix it",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "resize text / font scaling (1.4.4)"
+  },
+  {
+    "query": "write a UI test that verifies the book button is reachable and labelled for accessibility",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "accessibility testing"
+  },
+  {
+    "query": "the brand contrast on a badge component is wrong — fix it with the design-system tokens",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: design-system-specific contrast tokens, out of scope for WCAG guidance"
+  },
+  {
+    "query": "build a SwiftUI screen that works well with VoiceOver",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: wrong platform (iOS)"
+  },
+  {
+    "query": "fix the Retrofit interceptor that strips auth headers on retry",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "backend/networking, unrelated"
+  },
+  {
+    "query": "announce the error message to the screen reader when form validation fails",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "live region / status messages (4.1.3)"
+  },
+  {
+    "query": "mark the section titles on this screen as semantic headings",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "headings (2.4.6) via Compose semantics"
+  },
+  {
+    "query": "translate the Dutch strings in res/values/strings.xml",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "i18n only, not accessibility work"
+  },
+  {
+    "query": "which design-system component renders an already-accessible heading for me?",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near-miss: component-choice question, out of scope for WCAG guidance"
+  }
+]

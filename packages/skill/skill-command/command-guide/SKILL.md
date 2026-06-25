@@ -1,9 +1,9 @@
 ---
-name: prompt-guide
+name: command-guide
 description: "Use when authoring, reviewing, merging, or simplifying reusable user-invocable prompt files (a.k.a. slash commands — files an agent harness exposes as `/command` invocations). Triggers on edits to prompt / command files, on prompts to make a slash command, save a workflow as a reusable command, merge across commands, or condense a verbose command — even when the user doesn't say 'prompt' or 'slash command'."
 ---
 
-# Prompt Guidelines
+# Command Guidelines
 
 Author, merge, and simplify reusable user-invocable prompt files (sometimes called slash commands, custom commands, or user prompts depending on the agent harness).
 

@@ -19,13 +19,13 @@ The repeatable method for auditing an existing catalog and refactoring it onto t
 
 - **Duplicated reference filenames across two skills = a tiered-split smell.** Two skills shipping `error-handling.md` (or `validation.md`, `middleware.md`…) almost always means one should own it and the other should cross-link.
 - A concept that recurs across **3+ unrelated languages/frameworks** is a general-skill candidate — extract it once.
-- A description with no "Skip" clause routing siblings is a routing gap — neighbors will mis-fire.
+- Sibling skills with overlapping trigger words are a routing gap — tighten each description's triggers so the distinguishing keywords route to the right owner.
 
 ## Per-overlap execution
 
 1. Pick the **owner** skill for the concept.
 2. **Keep** the canonical reference in the owner; **delete** the duplicate from the other skill.
-3. In the de-duplicated skill, **replace** the removed bullet/reference with a by-name cross-reference in the `SKILL.md` bullet and any `references/` "Related" lines; update the description's Skip clause to route the concept to the owner.
+3. In the de-duplicated skill, **replace** the removed bullet/reference with a by-name cross-reference in the `SKILL.md` bullet and any `references/` "Related" lines; tighten the description's trigger words so the concept routes to the owner.
 4. **Fix links** — repoint anything that pointed at the removed file; confirm no dangling links.
 5. **Move provenance** to the owner's `SOURCES.md`; re-scan prose for leaked attributions.
 6. **Validate** — JSON valid, links resolve, formatter clean; spot-check trigger evals (positives for the skill, a negative pointing at the now-cross-linked sibling).

@@ -3,12 +3,14 @@
   "owner": { "name": "Xonovex" },
   "metadata": {
     "description": "Official Xonovex development tools",
-    "version": "0.2.9"
+    "version": "3.0.0"
   },
   "plugins": [
     { "name": "xonovex-utility", "source": "./packages/command/command-utility", "description": "Xonovex utility commands — skills, instructions, insights, content" },
     { "name": "xonovex-workflow", "source": "./packages/command/command-workflow", "description": "Xonovex workflow commands — planning, code analysis, git" },
     { "name": "xonovex-skill-adr", "source": "./packages/skill/skill-adr", "description": "Xonovex ADR skills" },
+    { "name": "xonovex-skill-android-analytics", "source": "./packages/skill/skill-android-analytics", "description": "Xonovex Android analytics skills" },
+    { "name": "xonovex-skill-android-wcag", "source": "./packages/skill/skill-android-wcag", "description": "Xonovex Android WCAG accessibility skills" },
     { "name": "xonovex-skill-asset-pipeline", "source": "./packages/skill/skill-asset-pipeline", "description": "Xonovex Asset pipeline skills" },
     { "name": "xonovex-skill-astro", "source": "./packages/skill/skill-astro", "description": "Xonovex Astro skills" },
     { "name": "xonovex-skill-audio", "source": "./packages/skill/skill-audio", "description": "Xonovex Low-level audio skills" },
@@ -16,6 +18,7 @@
     { "name": "xonovex-skill-c99-game-opinionated", "source": "./packages/skill/skill-c99-game-opinionated", "description": "Xonovex C99 game opinionated skills" },
     { "name": "xonovex-skill-c99-opinionated", "source": "./packages/skill/skill-c99-opinionated", "description": "Xonovex C99 opinionated skills" },
     { "name": "xonovex-skill-cmake", "source": "./packages/skill/skill-cmake", "description": "Xonovex CMake skills" },
+    { "name": "xonovex-skill-code-review", "source": "./packages/skill/skill-code-review", "description": "Xonovex Code review skills" },
     { "name": "xonovex-skill-content", "source": "./packages/skill/skill-content", "description": "Xonovex Content skills" },
     { "name": "xonovex-skill-cross-platform", "source": "./packages/skill/skill-cross-platform", "description": "Xonovex Cross-platform / portability skills" },
     { "name": "xonovex-skill-data-model", "source": "./packages/skill/skill-data-model", "description": "Xonovex Data-model skills" },
@@ -48,7 +51,8 @@
     { "name": "xonovex-skill-node-graph", "source": "./packages/skill/skill-node-graph", "description": "Xonovex Node graph skills" },
     { "name": "xonovex-skill-plan", "source": "./packages/skill/skill-plan", "description": "Xonovex Plan skills" },
     { "name": "xonovex-skill-presentation", "source": "./packages/skill/skill-presentation", "description": "Xonovex Presentation skills" },
-    { "name": "xonovex-skill-prompt", "source": "./packages/skill/skill-prompt", "description": "Xonovex Prompt skill — author, merge, simplify reusable user-invocable prompt files" },
+    { "name": "xonovex-skill-command", "source": "./packages/skill/skill-command", "description": "Xonovex Command skill — author, merge, simplify reusable user-invocable prompt files" },
+    { "name": "xonovex-skill-pull-request", "source": "./packages/skill/skill-pull-request", "description": "Xonovex Pull request skills" },
     { "name": "xonovex-skill-python", "source": "./packages/skill/skill-python", "description": "Xonovex Python skills" },
     { "name": "xonovex-skill-react", "source": "./packages/skill/skill-react", "description": "Xonovex React skills" },
     { "name": "xonovex-skill-remotion", "source": "./packages/skill/skill-remotion", "description": "Xonovex Remotion skills" },

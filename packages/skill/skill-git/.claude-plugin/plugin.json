@@ -1,6 +1,6 @@
 {
   "name": "xonovex-skill-git",
-  "version": "0.2.9",
+  "version": "3.0.0",
   "description": "Xonovex Git skills",
   "author": {"name": "Xonovex"},
   "skills": ["./git-guide"]

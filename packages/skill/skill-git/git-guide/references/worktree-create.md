@@ -71,6 +71,7 @@ Next Steps:
 ## Gotchas
 
 - The directory naming pattern `<worktree>-feature-<name>` is what downstream operations (merge, abandon) detect — non-conforming names break the workflow
+- `branch.<branch>.mergeBackTo` and `branch.<branch>.plan` are custom config keys this workflow sets and reads; git itself ignores them, so don't expect any built-in behavior from them
 - `mergeBackTo` git config is the only record of the source branch — without it, `worktree-merge` can't find where to merge back
 - Creating a worktree from a dirty source branch carries those uncommitted changes into the feature worktree only if they're staged — verify clean state first
 - A second worktree can't check out the same branch as another worktree — try a different source branch or move the existing worktree

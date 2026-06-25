@@ -27,7 +27,7 @@ import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 
-import yaml
+import yaml  # pyright: ignore[reportMissingModuleSource]  # PEP723 dep, installed by uv at runtime
 
 NAME_RE = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
 FRONTMATTER_RE = re.compile(r"^---\n(.*?)\n---\n(.*)$", re.DOTALL)
@@ -364,7 +364,7 @@ def check_references(body: str, skill_dir: Path, report: Report) -> None:
 
 
 def check_reference_tocs(skill_dir: Path, report: Report) -> None:
-    """Soft check: reference files >100 lines should open with a '## Contents' TOC.
+    """Soft check: reference files >200 lines should open with a '## Contents' TOC.
 
     Long reference files that lack a table of contents get previewed with a
     partial read, so the agent never sees their full scope. Warn, don't fail.
@@ -377,7 +377,7 @@ def check_reference_tocs(skill_dir: Path, report: Report) -> None:
     checked = 0
     for ref in sorted(refs_dir.glob("*.md")):
         lines = ref.read_text(encoding="utf-8").splitlines()
-        if len(lines) <= 100:
+        if len(lines) <= 200:
             continue
         checked += 1
         if not toc_re.search("\n".join(lines[:15])):
@@ -386,12 +386,12 @@ def check_reference_tocs(skill_dir: Path, report: Report) -> None:
         return
     if missing:
         report.add_warn(
-            "references: file(s) >100 lines lack a '## Contents' table of contents — "
+            "references: file(s) >200 lines lack a '## Contents' table of contents — "
             + ", ".join(missing)
         )
     else:
         report.add_pass(
-            f"references: all {checked} reference file(s) >100 lines open with a "
+            f"references: all {checked} reference file(s) >200 lines open with a "
             "'## Contents' table of contents"
         )
 

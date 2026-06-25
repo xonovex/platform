@@ -46,7 +46,7 @@
     "query": "tune this system prompt so the model stops apologizing and follows the output format",
     "should_trigger": false,
     "split": "train",
-    "rationale": "near-miss: prompt engineering, should match prompt-guide"
+    "rationale": "near-miss: prompt engineering, should match command-guide"
   },
   {
     "query": "create a /deploy slash command that wraps our release steps and asks for a target env",
@@ -84,6 +84,6 @@
     "query": "simplify this verbose prompt template we reuse for support replies",
     "should_trigger": false,
     "split": "validation",
-    "rationale": "validation negative — near-miss, should match prompt-guide"
+    "rationale": "validation negative — near-miss, should match command-guide"
   }
 ]

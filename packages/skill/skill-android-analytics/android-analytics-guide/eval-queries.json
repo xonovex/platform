@@ -1,0 +1,86 @@
+[
+  {
+    "query": "track a screen view when this ViewModel loads",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "screen tracking placement"
+  },
+  {
+    "query": "where should the analytics call go — in the composable or the view model?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "where-to-track"
+  },
+  {
+    "query": "fire a button-click event when the user taps Book",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "event tracking"
+  },
+  {
+    "query": "set a user property for whether the user is logged in",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "user properties"
+  },
+  {
+    "query": "our tracking fires even when the user declined cookie consent — gate it",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "consent-gated tracking"
+  },
+  {
+    "query": "inject an analytics tracker into this feature instead of calling the SDK directly",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "tracker abstraction / DI"
+  },
+  {
+    "query": "write a test that asserts the screen-view event is tracked",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "analytics testing"
+  },
+  {
+    "query": "I added an event in the analytics tracking plan — regenerate the generated Kotlin code",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: SDK/codegen-tool specifics, out of scope for platform-level analytics guidance"
+  },
+  {
+    "query": "configure the Snowplow collector endpoint and batching",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: destination/SDK config, out of scope for platform-level analytics guidance"
+  },
+  {
+    "query": "make this screen reachable by TalkBack",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "accessibility, should match android-wcag-guide"
+  },
+  {
+    "query": "report the A/B experiment running on this screen to analytics",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "experiments on screens"
+  },
+  {
+    "query": "stop putting the raw email address in this event — hash it",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "PII in event params"
+  },
+  {
+    "query": "translate the Dutch strings in res/values",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "i18n, unrelated"
+  },
+  {
+    "query": "which design-system component should I use for this card?",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "design system, out of scope for analytics guidance"
+  }
+]

@@ -1,6 +1,6 @@
 ---
 name: asset-pipeline-guide
-description: "Use when designing the asset pipeline of a tool or game engine — turning authored sources (FBX, glTF, PNG, WAV, shaders) into runtime-ready data: importers/compilers per asset type, a deterministic compile/cook step, content-addressed caching keyed by a hash of inputs and settings, dependency tracking so an edit reimports only what changed, platform-specific output, and live hot-reloading. Triggers on import, cook/bake, asset/build cache, reimport, dependency invalidation, file watcher, hot-reload of textures/meshes/materials, and 'why does changing one file rebuild everything', even when the user doesn't say 'asset pipeline'. Skip modeling assets as typed objects/references (use data-model-guide), layout of cooked data (use data-oriented-design-guide), and reload-safe C (use c99-opinionated-guide)."
+description: "Use when designing the asset pipeline of a tool or game engine — turning authored sources (FBX, glTF, PNG, WAV, shaders) into runtime-ready data: importers/compilers per asset type, a deterministic compile/cook step, content-addressed caching keyed by a hash of inputs and settings, dependency tracking so an edit reimports only what changed, platform-specific output, and live hot-reloading. Triggers on import, cook/bake, asset/build cache, reimport, dependency invalidation, file watcher, hot-reload of textures/meshes/materials, and 'why does changing one file rebuild everything', even when the user doesn't say 'asset pipeline'."
 ---
 
 # Asset pipeline Guidelines

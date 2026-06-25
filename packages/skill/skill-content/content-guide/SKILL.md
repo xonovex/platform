@@ -1,6 +1,6 @@
 ---
 name: content-guide
-description: "Use when authoring or rewriting multilingual articles, news, travel and destination/venue guides, or other structured-frontmatter content. Triggers on prompts about bilingual / multilingual content, CEFR B1-B2 readability targets, content frontmatter shape, language register, editorial web research, humanizing AI-generated prose, or stripping AI writing tells — even when the user doesn't say 'content'. Skip code documentation, API references, and marketing landing-page copy."
+description: "Use when authoring or rewriting multilingual articles, news, travel and destination/venue guides, or other structured-frontmatter content. Triggers on prompts about bilingual / multilingual content, CEFR B1-B2 readability targets, content frontmatter shape, language register, editorial web research, humanizing AI-generated prose, or stripping AI writing tells — even when the user doesn't say 'content'."
 ---
 
 # Content Creation Guidelines

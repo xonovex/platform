@@ -1,6 +1,6 @@
 ---
 name: lock-free-guide
-description: "Use when writing or reviewing shared-memory concurrent code: atomics, lock-free/wait-free data structures, or scalable synchronization. Triggers on prompts about memory ordering (relaxed/acquire/release/seq_cst), CAS/compare-exchange, the ABA problem, SPSC/MPSC/MPMC queues, lock-free stack, hazard pointers / epoch / RCU reclamation, false sharing, spinlocks/backoff, work-stealing, even when the user doesn't say 'lock-free'. Skip single-threaded data layout (use data-oriented-design-guide), high-level thread-pool/async-API usage without shared-memory synchronization, and language-specific style guides."
+description: "Use when writing or reviewing shared-memory concurrent code: atomics, lock-free/wait-free data structures, or scalable synchronization. Triggers on prompts about memory ordering (relaxed/acquire/release/seq_cst), CAS/compare-exchange, the ABA problem, SPSC/MPSC/MPMC queues, lock-free stack, hazard pointers / epoch / RCU reclamation, false sharing, spinlocks/backoff, work-stealing, even when the user doesn't say 'lock-free'."
 ---
 
 # Lock-Free / Wait-Free Concurrency Guidelines

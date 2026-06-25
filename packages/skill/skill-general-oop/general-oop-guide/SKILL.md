@@ -1,6 +1,6 @@
 ---
 name: general-oop-guide
-description: "Use when designing class hierarchies or applying OOP principles. Triggers on prompts about classes, inheritance, polymorphism, encapsulation, SOLID, design patterns, or interfaces, even when the user doesn't say 'OOP'. Skip functional-style designs (use general-fp-guide) and language-specific guidance covered by typescript-guide / python-guide."
+description: "Use when designing class hierarchies or applying OOP principles. Triggers on prompts about classes, inheritance, polymorphism, encapsulation, SOLID, design patterns, or interfaces, even when the user doesn't say 'OOP'."
 ---
 
 # General Object-Oriented Programming Guidelines

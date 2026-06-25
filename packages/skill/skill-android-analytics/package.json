@@ -1,0 +1,17 @@
+{
+  "name": "@xonovex/skill-android-analytics",
+  "version": "3.0.0",
+  "private": true,
+  "type": "module",
+  "keywords": [
+    "xonovex",
+    "skill",
+    "analytics",
+    "tracking",
+    "android"
+  ],
+  "scripts": {
+    "fmt": "prettier --write .",
+    "fmt:check": "prettier --check ."
+  }
+}

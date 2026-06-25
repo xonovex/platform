@@ -25,12 +25,10 @@ it("should call user service", async () => {
   expect(getUserFn).toHaveBeenCalledWith("123");
 });
 
-// ✅ Good - type cast when needed
+// ✅ Good - reject without a redundant cast (vi.fn() already returns a Mock)
 it("should handle error", async () => {
   const getUserFn = vi.fn();
-  (getUserFn as ReturnType<typeof vi.fn>).mockRejectedValue(
-    new Error("Not found"),
-  );
+  getUserFn.mockRejectedValue(new Error("Not found"));
 
   await expect(getUserFn("999")).rejects.toThrow("Not found");
 });
@@ -48,7 +46,7 @@ it("should transform data", () => {
 **Techniques:**
 
 - Create mocks with `vi.fn()` without complex generics
-- Use type casting when setting return values
+- `vi.fn()` already returns a `Mock`, so call `.mockResolvedValue` / `.mockRejectedValue` directly without casting; only type the variable at declaration (`vi.fn<...>()`) when a type is genuinely needed
 - Let TypeScript infer types from usage
 - Only add types when necessary for test assertions
 - Prefer simple casting over advanced mock type patterns

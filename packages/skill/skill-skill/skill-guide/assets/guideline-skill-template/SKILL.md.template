@@ -1,6 +1,6 @@
 ---
 name: "{tech}-guide"
-description: "Use when {writing | reviewing | editing | scaffolding} {Tech} {scope, e.g. 'API servers in TypeScript' / 'React components' / 'Postgres schemas'}. Triggers on {file patterns}, imports, and prompts about {capabilities}, even when the user doesn't say '{Tech}'. Skip {adjacent skill description} (use {adjacent-skill}), and {out-of-scope work description}."
+description: "Use when {writing | reviewing | editing | scaffolding} {Tech} {scope, e.g. 'API servers in TypeScript' / 'React components' / 'Postgres schemas'}. Triggers on {file patterns}, imports, and prompts about {capabilities}, even when the user doesn't say '{Tech}'."
 ---
 
 # {Tech} Coding Guidelines

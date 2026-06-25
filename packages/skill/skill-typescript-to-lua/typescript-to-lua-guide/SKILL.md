@@ -1,6 +1,6 @@
 ---
 name: typescript-to-lua-guide
-description: "Use when editing TypeScript that compiles to Lua via TSTL 1.24+ (game scripting, Defold, embedded engines). Triggers on `.ts` files in game/scripting directories with TSTL config, and on prompts about LuaMultiReturn, namespaces, decorators, stable table layouts, or Lua interop boundaries, even when the user doesn't say 'TSTL'. Skip ordinary Node/browser TypeScript (use typescript-guide) and pure Lua (use lua-guide / lua-opinionated-guide)."
+description: "Use when editing TypeScript that compiles to Lua via TSTL 1.24+ (game scripting, Defold, embedded engines). Triggers on `.ts` files in game/scripting directories with TSTL config, and on prompts about LuaMultiReturn, namespaces, decorators, stable table layouts, or Lua interop boundaries, even when the user doesn't say 'TSTL'."
 ---
 
 # TypeScript-to-Lua Coding Guidelines

@@ -1,6 +1,6 @@
 ---
 name: lua-opinionated-guide
-description: "Use when tuning performance-critical Lua hot paths — the tunings especially benefit LuaJIT, and the principles apply to vanilla Lua 5.4 too. An overlay on lua-guide: covers only hot-path performance, not Lua fundamentals. Triggers on `.lua` files in performance-sensitive or LuaJIT projects and on prompts about JIT-friendly tables, table pre-allocation, cache lookups, stable table shapes, or hot-path tuning, even when the user doesn't say 'LuaJIT'. Skip generic Lua scripting — modules, scoping, metatables, coroutines, validation, errors, string building, idioms (use lua-guide) — and TSTL output (use typescript-to-lua-guide)."
+description: "Use when tuning performance-critical Lua hot paths — the tunings especially benefit LuaJIT, and the principles apply to vanilla Lua 5.4 too. An overlay on lua-guide: covers only hot-path performance, not Lua fundamentals. Triggers on `.lua` files in performance-sensitive or LuaJIT projects and on prompts about JIT-friendly tables, table pre-allocation, cache lookups, stable table shapes, or hot-path tuning, even when the user doesn't say 'LuaJIT'."
 ---
 
 # Lua Opinionated Guidelines (Performance Tuning)

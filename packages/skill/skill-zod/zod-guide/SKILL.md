@@ -1,6 +1,6 @@
 ---
 name: zod-guide
-description: "Use when defining or editing Zod 4.0+ schemas for runtime validation in TypeScript. Triggers on `.ts` files with `zod` imports and prompts about API input validation, schema composition, type inference (`z.infer`), `z.uuid()`, `z.email()`, `z.iso.datetime()`, defaults, or refinements — even when the user doesn't say 'Zod'. Skip Yup, Joi, io-ts, and JSON Schema-only work."
+description: "Use when defining or editing Zod 4.0+ schemas for runtime validation in TypeScript. Triggers on `.ts` files with `zod` imports and prompts about API input validation, schema composition, type inference (`z.infer`), `z.uuid()`, `z.email()`, `z.iso.datetime()`, defaults, or refinements — even when the user doesn't say 'Zod'."
 ---
 
 # Zod Coding Guidelines
@@ -12,7 +12,7 @@ description: "Use when defining or editing Zod 4.0+ schemas for runtime validati
 ## Essentials
 
 - **Use v4 validators** - `z.uuid()`, `z.email()`, `z.iso.datetime()` (not `z.string().uuid()`)
-- **Name schemas PascalCase** - Derive with `.omit()`, `.extend()`, `.pick()`, `.merge()`, see [references/schema-organization.md](references/schema-organization.md)
+- **Name schemas PascalCase** - Derive with `.omit()`, `.extend()`, `.pick()`, see [references/schema-organization.md](references/schema-organization.md)
 - **Validate at boundaries** - Use `.safeParse()` for I/O, `.pipe()` for transforms, see [references/validation-patterns.md](references/validation-patterns.md)
 - **Infer types from schemas** - `z.infer<typeof Schema>` for TypeScript types, see [references/validation-patterns.md](references/validation-patterns.md)
 - **Module-level schemas** - Define for reuse, keep close to usage, see [references/schema-organization.md](references/schema-organization.md)

@@ -1,6 +1,6 @@
 ---
 name: terraform-guide
-description: "Use when editing Terraform 1.12+ infrastructure code. Triggers on `.tf` files, `*.tfvars`, modules, and prompts about module design, environment isolation, remote state, for_each, dynamic blocks, locals, or providers, even when the user doesn't say 'Terraform'. Skip Pulumi, OpenTofu-only features, CloudFormation, and ad-hoc cloud CLI work."
+description: "Use when editing Terraform 1.12+ infrastructure code. Triggers on `.tf` files, `*.tfvars`, modules, and prompts about module design, environment isolation, remote state, for_each, dynamic blocks, locals, or providers, even when the user doesn't say 'Terraform'."
 ---
 
 # Terraform Coding Guidelines

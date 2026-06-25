@@ -21,6 +21,7 @@ Extract development lessons from a session and integrate them either as AGENTS.m
 - `applies_to: ["general"]` makes integration impossible — be specific with routing keys
 - One-off corrections don't deserve a whole skill — fold them into AGENTS.md instead
 - A skill with only 1-2 essentials is filler — wait until the category has 3-7 worth-keeping bullets
+- A generated skill must follow skill-guide's naming and metadata conventions (`{category}-guide`, its description shape), not an ad-hoc inline format, to avoid drift from sibling skills
 
 ## Operations
 

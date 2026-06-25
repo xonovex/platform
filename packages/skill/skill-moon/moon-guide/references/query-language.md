@@ -36,7 +36,7 @@ moon run :test --query "(language=javascript || language=typescript) && projectL
 | `language`      | Project language               | `language=typescript`            |
 | `projectId`     | Project ID (was `projectName`) | `projectId=core`                 |
 | `projectLayer`  | Layer type (was `projectType`) | `projectLayer=library`           |
-| `projectAlias`  | Package name alias             | `projectAlias~@xonovex/*`        |
+| `projectAlias`  | Package name alias             | `projectAlias~@scope/*`          |
 | `projectSource` | Source path                    | `projectSource~packages/agent/*` |
 | `tags`          | Project tags                   | `tags~frontend`                  |
 

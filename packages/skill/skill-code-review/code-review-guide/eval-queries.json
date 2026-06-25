@@ -1,0 +1,74 @@
+[
+  {
+    "query": "how should I mark a review comment so the author knows it must be fixed before merge?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "blocking decoration / Conventional Comments"
+  },
+  {
+    "query": "what label do I use for a trivial preference-level nitpick in a code review?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "label taxonomy"
+  },
+  {
+    "query": "structure my PR review with a summary and inline comments",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "review structure"
+  },
+  {
+    "query": "my summary comment says 'see comment 3' but that is unclear, what is better?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "cross-link instead of ordinal reference"
+  },
+  {
+    "query": "is this a blocking issue or just a suggestion, and how do I make that explicit?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "blocking vs non-blocking decorations"
+  },
+  {
+    "query": "write clear actionable review feedback that leads with what is good",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "tone and structure"
+  },
+  {
+    "query": "should I order my review comments by file or by priority?",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "priority ordering in the summary"
+  },
+  {
+    "query": "label this comment that proposes renaming a variable for clarity",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "suggestion label"
+  },
+  {
+    "query": "post an inline comment anchored to a line on a Bitbucket pull request",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: host-specific posting mechanics, out of scope"
+  },
+  {
+    "query": "authenticate to the Bitbucket REST API with an HTTP access token",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: git-host auth, out of scope"
+  },
+  {
+    "query": "find bugs and race conditions in this concurrency code",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: bug-hunting heuristics, not review-comment craft"
+  },
+  {
+    "query": "configure required reviewers and branch protection on the repository",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near-miss: repo settings, not review-comment craft"
+  }
+]
