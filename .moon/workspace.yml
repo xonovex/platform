@@ -10,6 +10,10 @@ projects:
   - packages/docker/*
   - packages/script/*
   - packages/moon/*
+  # Tenant roots may hold AGENTS.md/CLAUDE.md instruction files; the globs above
+  # match them as project roots, so exclude markdown to keep project location to
+  # directories only.
+  - "!**/*.md"
 vcs:
   hooks:
     commit-msg:
