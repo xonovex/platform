@@ -36,21 +36,21 @@ When this skill fires:
 ## Example — one focusable, labelled, actionable node for a composite tile
 
 ```kotlin
-val recap = stringResource(R.string.booking_recap, route, date)   // localized, prebuilt
+val recap = stringResource(R.string.event_recap, eventTitle, date)   // localized, prebuilt
 val newLabel = stringResource(R.string.badge_new)
 
 Row(
     modifier = Modifier
-        .clickable(onClickLabel = stringResource(R.string.action_open_booking)) { onOpen() }
+        .clickable(onClickLabel = stringResource(R.string.action_open_event)) { onOpen() }
         .clearAndSetSemantics {                       // replace children: announce as ONE node
             role = Role.Button
             contentDescription = recap
             if (isNew) stateDescription = newLabel
         },
 ) {
-    Icon(painterResource(R.drawable.ic_train), contentDescription = null)  // decorative
+    Icon(painterResource(R.drawable.ic_calendar), contentDescription = null)  // decorative
     Column {
-        Text(text = route)
+        Text(text = eventTitle)
         Text(text = date, style = MaterialTheme.typography.bodySmall)
     }
 }

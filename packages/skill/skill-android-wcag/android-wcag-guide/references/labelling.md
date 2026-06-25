@@ -17,9 +17,9 @@
 // Bad — hardcoded literal description breaks localization;
 //        decorative chevron read aloud as noise; no role.
 Row(modifier = Modifier.clickable(onClick = onClick)) {
-    Icon(Icons.Default.Train, contentDescription = "Trein") // literal, untranslated
-    Text(departure)
-    Text(arrival)
+    Icon(Icons.Default.MusicNote, contentDescription = "Nummer") // literal, untranslated
+    Text(title)
+    Text(artist)
     Icon(Icons.Default.ChevronRight, contentDescription = "Chevron") // decorative noise
 }
 
@@ -33,9 +33,9 @@ Row(
             role = Role.Button
         },
 ) {
-    Icon(Icons.Default.Train, contentDescription = null)        // informational meaning is in `label`
-    Text(departure)
-    Text(arrival)
+    Icon(Icons.Default.MusicNote, contentDescription = null)    // informational meaning is in `label`
+    Text(title)
+    Text(artist)
     Icon(Icons.Default.ChevronRight, contentDescription = null) // purely decorative
 }
 ```
@@ -43,9 +43,9 @@ Row(
 Build the composite label from a resource with positional args so word order survives translation:
 
 ```kotlin
-val label = stringResource(R.string.journey_from_to, departure, arrival)
-// strings.xml:    <string name="journey_from_to">Trip from %1$s to %2$s</string>
-// strings-nl.xml: <string name="journey_from_to">Reis van %1$s naar %2$s</string>
+val label = stringResource(R.string.track_by_artist, title, artist)
+// strings.xml:    <string name="track_by_artist">%1$s by %2$s</string>
+// strings-nl.xml: <string name="track_by_artist">%1$s van %2$s</string>
 ```
 
 Stateful composite (assign a role and a separately-announced state):
@@ -54,7 +54,7 @@ Stateful composite (assign a role and a separately-announced state):
 Modifier
     .toggleable(value = checked, role = Role.Switch, onValueChange = onToggle)
     .semantics(mergeDescendants = true) {
-        contentDescription = stringResource(R.string.notify_delays)
+        contentDescription = stringResource(R.string.notify_new_releases)
         stateDescription = if (checked) onLabel else offLabel // localized strings
     }
 ```
@@ -64,7 +64,7 @@ Modifier
 ```kotlin
 // Replaces the whole descendant tree's semantics with a single label + role.
 Modifier.clearAndSetSemantics {
-    contentDescription = stringResource(R.string.price_eur, amount)
+    contentDescription = stringResource(R.string.price, amount)
     role = Role.Button
 }
 ```
@@ -88,7 +88,7 @@ Column(
 ) { /* expanded title */ }
 ```
 
-**Counter-Example (spell codes out for text-to-speech):** A booking/reference code rendered as visible text ("QPBMWPK") is read by TTS as a garbled run-on word. Keep the compact visible glyphs but expose a spelled-out `contentDescription` ("Q P B M W P K") so the code is intelligible spoken. In server-driven UI this is a backend concern — the BFF sends a dedicated spelled-out field; the client only applies it.
+**Counter-Example (spell codes out for text-to-speech):** A confirmation/reference code rendered as visible text ("QPBMWPK") is read by TTS as a garbled run-on word. Keep the compact visible glyphs but expose a spelled-out `contentDescription` ("Q P B M W P K") so the code is intelligible spoken. In server-driven UI this is a backend concern — the BFF sends a dedicated spelled-out field; the client only applies it.
 
 **Counter-Example (when `null` is wrong):** `contentDescription = null` is correct only for graphics whose meaning is fully carried by adjacent text or a parent merge label. A standalone icon-only button (no visible text) must carry a real localized description, or it has no accessible name (4.1.2).
 
@@ -108,14 +108,14 @@ Column(
 // Domain/data layer — pure, unit-testable, no Compose
 data class A11yText<T>(val value: T, val description: String)
 
-class DescribeJourney(private val res: StringResolver) {        // injected resolver, not Context
-    operator fun invoke(legs: List<Leg>): A11yText<List<Leg>> =
-        A11yText(legs, legs.joinToString(res.get(R.string.then)) { it.name } + ".")
+class DescribePlaylist(private val res: StringResolver) {        // injected resolver, not Context
+    operator fun invoke(tracks: List<Track>): A11yText<List<Track>> =
+        A11yText(tracks, tracks.joinToString(res.get(R.string.then)) { it.name } + ".")
 }
 
 // UI — only applies the prebuilt string to one consolidated node
-Box(Modifier.clearAndSetSemantics { contentDescription = journey.description }) {
-    JourneyRow(journey.value)
+Box(Modifier.clearAndSetSemantics { contentDescription = playlist.description }) {
+    PlaylistRow(playlist.value)
 }
 ```
 

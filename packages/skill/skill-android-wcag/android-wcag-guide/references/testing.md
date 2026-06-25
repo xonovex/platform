@@ -39,7 +39,7 @@ composeTestRule
 // Good — locate by stable testTag, then assert the accessibility contract.
 composeTestRule
     .onNodeWithTag("deleteButton")
-    .assertContentDescriptionEquals("Delete trip to Berlin")
+    .assertContentDescriptionEquals("Delete message from Maria Jansen")
     .assert(SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Button))
     .assertTouchHeightIsEqualTo(48.dp)
     .assertTouchWidthIsEqualTo(48.dp)
@@ -73,8 +73,8 @@ Asserting a description on a _rendered_ node (above) and unit-testing the _logic
 
 ```kotlin
 @Config(qualifiers = "nl") // pin locale; assert the exact translated sentence
-@Test fun cancelledLeg() =
-    assertEquals("Geannuleerd", describeLeg(context, leg.copy(cancelled = true)))
+@Test fun cancelledStatus() =
+    assertEquals("Geannuleerd", describeStatus(context, order.copy(cancelled = true)))
 ```
 
 Keep a thin Compose test that the value actually lands on the node; this test covers the wording across locales without rendering.
@@ -83,7 +83,7 @@ Keep a thin Compose test that the value actually lands on the node; this test co
 
 ### Locate by the accessibility semantic (Robot pattern)
 
-Fold the accessibility property into the **locator**, not just the assertion: find a heading via `isHeading() and hasText(localizedTitle)`, an icon control via `hasClickAction() and hasContentDescription(localizedLabel)`, resolving strings from resources. A regression — a lost `heading()`, a missing `contentDescription` — then makes the test fail to even _locate_ the element, turning silent a11y loss into a hard failure. Related notes: locate a toggle by its localized `contentDescription` then `assertIsOn()` / `assertIsOff()` (this also guards the spoken label); assert terse glyph and full phrase independently (`assertTextEquals("+2")` vs `assertContentDescriptionEquals("2 minutes delay")`); pass `useUnmergedTree = true` to finders to reach children hidden by a merged composite — merging affects screen readers _and_ the test tree.
+Fold the accessibility property into the **locator**, not just the assertion: find a heading via `isHeading() and hasText(localizedTitle)`, an icon control via `hasClickAction() and hasContentDescription(localizedLabel)`, resolving strings from resources. A regression — a lost `heading()`, a missing `contentDescription` — then makes the test fail to even _locate_ the element, turning silent a11y loss into a hard failure. Related notes: locate a toggle by its localized `contentDescription` then `assertIsOn()` / `assertIsOff()` (this also guards the spoken label); assert terse glyph and full phrase independently (`assertTextEquals("+2")` vs `assertContentDescriptionEquals("2 unread messages")`); pass `useUnmergedTree = true` to finders to reach children hidden by a merged composite — merging affects screen readers _and_ the test tree.
 
 ---
 
@@ -132,7 +132,7 @@ Most reflow and contrast regressions only surface under conditions a default-con
 ```kotlin
 // Bad — single golden image at default scale, light theme only.
 @Test
-fun ticketCard() = snapshot { TicketCard(sampleTrip) }
+fun messageCard() = snapshot { MessageCard(sampleMessage) }
 
 // Good — drive the same composable across the conditions that break it.
 private val configs = listOf(
@@ -143,13 +143,13 @@ private val configs = listOf(
 )
 
 @Test
-fun ticketCard_acrossConfigs() {
+fun messageCard_acrossConfigs() {
     configs.forEach { cfg ->
-        snapshot(name = "ticketCard_${cfg.fontScale}_${if (cfg.dark) "dark" else "light"}") {
+        snapshot(name = "messageCard_${cfg.fontScale}_${if (cfg.dark) "dark" else "light"}") {
             CompositionLocalProvider(
                 LocalDensity provides Density(density = 2.625f, fontScale = cfg.fontScale)
             ) {
-                AppTheme(darkTheme = cfg.dark) { TicketCard(sampleTrip) }
+                AppTheme(darkTheme = cfg.dark) { MessageCard(sampleMessage) }
             }
         }
     }

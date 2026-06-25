@@ -138,7 +138,7 @@ Prefer a live region whenever a persistent node exists; imperative announcements
 **How to Apply:**
 
 1. Keep `contentDescription` a stable **noun** (the control's name) and put the state-dependent **verb** in `onClickLabel` (the word TalkBack appends after "double tap to"). For a toggle, hold the noun fixed and switch the verb by state — never bake the verb into `contentDescription` ("add to saved, button, double tap to add to saved").
-2. Name the **primary** action with `onClickLabel` on `clickable` / `toggleable` (e.g. "show train details"). TalkBack then says "double tap to show train details".
+2. Name the **primary** action with `onClickLabel` on `clickable` / `toggleable` (e.g. "show item details"). TalkBack then says "double tap to show item details".
 3. Expose **secondary** and **gesture-only** actions — swipe/drag/long-press-revealed Edit or Delete are otherwise unreachable by TalkBack — as `CustomAccessibilityAction(label, action)` in `customActions`; build them per item so a row only advertises the actions that apply. The `action` lambda must return `true` when handled.
 4. Label every action with a localized verb phrase.
 
@@ -153,7 +153,7 @@ Modifier
     .clickable(
         role = Role.Button,
         onClick = onOpen,
-        onClickLabel = stringResource(R.string.show_trip_details),
+        onClickLabel = stringResource(R.string.show_item_details),
     )
     .semantics {
         customActions = listOf(
