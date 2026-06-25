@@ -17,12 +17,12 @@ const UserSchema = z.object({
   checkInTime: z.iso.time(), // Not z.string().time()
 });
 
-// Enum usage (unchanged)
+// Native enums now go through z.enum() (z.nativeEnum() is deprecated in v4)
 enum Status {
   Active = "active",
   Inactive = "inactive",
 }
-const StatusSchema = z.enum(Status);
+const StatusSchema = z.enum(Status); // v3 required z.nativeEnum(Status)
 
 // String literal unions (unchanged)
 const RoleSchema = z.enum(["admin", "user", "guest"]);

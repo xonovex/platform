@@ -36,7 +36,7 @@ Author, refresh, simplify, consolidate, and port AGENTS.md project-instruction f
 - **Sync** — refresh AGENTS.md to match current directory state — see [references/sync.md](references/sync.md)
 - **Simplify** — reduce verbosity while preserving structure and workflows — see [references/simplify.md](references/simplify.md)
 - **Consolidate** — dedupe across the repo and standardize bullet-list format — see [references/consolidate.md](references/consolidate.md)
-- **Merge** — port organizational patterns from another project — see [references/merge.md](references/merge.md)
+- **Merge / assimilate** — port organizational patterns from another project — see [references/merge.md](references/merge.md)
 
 ## Progressive Disclosure
 

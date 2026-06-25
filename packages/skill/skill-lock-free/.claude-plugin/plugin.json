@@ -1,6 +1,6 @@
 {
   "name": "xonovex-skill-lock-free",
-  "version": "0.2.9",
+  "version": "3.0.0",
   "description": "Xonovex Lock-free / wait-free concurrency skills",
   "author": {"name": "Xonovex"},
   "skills": ["./lock-free-guide"]

@@ -1,6 +1,6 @@
 ---
 name: react-guide
-description: "Use when building or editing React 19+ components, hooks, or app routing. Triggers on `.tsx`/`.jsx` files with React imports, Vite/Next configs, Server Components, `'use client'` / `'use server'` directives, and on prompts about Form Actions, useActionState, useOptimistic, use(), Suspense streaming, ref-as-prop, or the React Compiler — even when the user doesn't say 'React'. Skip React Native, UI animations (use motion-guide), Remotion videos (use remotion-guide), and class-component legacy code without modernization intent."
+description: "Use when building or editing React 19+ components, hooks, or app routing. Triggers on `.tsx`/`.jsx` files with React imports, Vite/Next configs, Server Components, `'use client'` / `'use server'` directives, and on prompts about Form Actions, useActionState, useOptimistic, use(), Suspense streaming, ref-as-prop, or the React Compiler — even when the user doesn't say 'React'."
 ---
 
 # React Coding Guidelines

@@ -9,8 +9,7 @@
 ```typescript
 // src/app.ts - Main application factory
 import {zValidator} from "@hono/zod-validator";
-// src/routes/v1/users.ts - Domain router
-import {Hono, Hono} from "hono";
+import {Hono} from "hono";
 import {cors} from "hono/cors";
 import {logger} from "hono/logger";
 import * as controller from "../../controllers/users.controller.js";

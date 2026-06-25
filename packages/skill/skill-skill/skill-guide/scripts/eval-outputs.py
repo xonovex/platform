@@ -7,7 +7,7 @@
 
 Usage:
     eval-outputs.py <evals.json> <skill_name> [iteration] [options]
-        skill_name = bare ("git-commit") or plugin-namespaced ("int-poc-git:git-commit")
+        skill_name = bare ("git-commit") or plugin-namespaced ("myplugin:git-commit")
         iteration  = name for this run's workspace dir (default: auto "iteration-N")
 
 evals.json shape (either a bare array of evals, or {"skill_name", "evals": [...]}):

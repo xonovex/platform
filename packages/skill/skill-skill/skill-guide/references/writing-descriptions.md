@@ -7,7 +7,7 @@
 - **User intent over implementation** — match what the user asks for, not internal mechanics
 - **Be pushy on triggers** — include "even when the user doesn't say '{keyword}'" for non-obvious matches
 - **Concise** — a short paragraph; ≤1024 chars (spec limit)
-- **Skip clauses** — explicitly list adjacent skills to take instead (disambiguation)
+- **Positive routing only** — describe what the skill is for and let triggers route; do not add "Skip …" clauses, enumerate out-of-scope work, or point to other skills by name in the description
 
 ## Anatomy
 
@@ -15,7 +15,6 @@ A strong description usually contains:
 
 1. **What** — a verb-led sentence describing what the skill does
 2. **When to trigger** — situations or prompt shapes that should activate it
-3. **Skip / handoff clauses** — pointers to adjacent skills for nearby tasks
 
 ## Before / After
 

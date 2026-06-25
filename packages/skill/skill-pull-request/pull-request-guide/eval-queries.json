@@ -1,0 +1,74 @@
+[
+  {
+    "query": "help me write a good pull request description for this change",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "direct mention"
+  },
+  {
+    "query": "this PR is getting huge, what should I do about it",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "implicit trigger, size"
+  },
+  {
+    "query": "what should I put in the description before I open this MR",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "implicit trigger, content"
+  },
+  {
+    "query": "draft a pr description, what why how",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "casual phrasing"
+  },
+  {
+    "query": "I finished the feature, get it ready for review",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "buried in larger task, self-review"
+  },
+  {
+    "query": "review this pull request and tell me if the logic is correct",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "reviewer side, use code-review-guide"
+  },
+  {
+    "query": "rebase my branch onto main and resolve the conflicts",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "git mechanics, use git-guide"
+  },
+  {
+    "query": "post an inline review comment on this PR",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "keyword overlap, reviewer side"
+  },
+  {
+    "query": "how big should a pull request be",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "size guidance"
+  },
+  {
+    "query": "split this large change into smaller reviewable pieces",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "atomicity, splitting"
+  },
+  {
+    "query": "run az repos pr create to open the PR on Azure DevOps",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "host mechanics, out of scope"
+  },
+  {
+    "query": "write unit tests for this function",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "unrelated"
+  }
+]

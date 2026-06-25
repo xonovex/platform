@@ -35,7 +35,7 @@ Spec limits (name / description / body / optional-field rules) live in the paren
 ```markdown
 ---
 name: {name}
-description: "Use when {task}. Triggers on {patterns}. Skip {adjacent-skill}."
+description: "Use when {task}. Triggers on {patterns}."
 ---
 
 # {Title}
@@ -65,7 +65,7 @@ description: "Use when {task}. Triggers on {patterns}. Skip {adjacent-skill}."
 ## Content Rules
 
 - SKILL.md: 3-7 essentials, one representative example, a Gotchas section
-- Reference files: full explanations, multiple examples, rationale; one topic each
+- Reference files: full explanations, multiple examples, rationale; one topic each — don't restate when/why to read the file itself (its load-when trigger lives in the SKILL.md progressive-disclosure list); pointing to other references with a "read when" trigger is fine
 - Apply the parent SKILL.md Core Principles (add what the agent lacks, defaults over menus, procedures over declarations)
 - Match specificity to fragility — prescriptive only when consistency is required
 - Mine non-obvious facts/corrections into a **Gotchas** section

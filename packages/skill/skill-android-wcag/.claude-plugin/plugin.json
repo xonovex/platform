@@ -1,0 +1,7 @@
+{
+  "name": "xonovex-skill-android-wcag",
+  "version": "3.0.0",
+  "description": "Xonovex Android WCAG accessibility skills",
+  "author": {"name": "Xonovex"},
+  "skills": ["./android-wcag-guide"]
+}

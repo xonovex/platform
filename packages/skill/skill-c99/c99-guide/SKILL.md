@@ -1,6 +1,6 @@
 ---
 name: c99-guide
-description: "Use when editing or reviewing general-purpose C99 — libraries, CLI tools, system code without strong opinions on memory ownership or layout. Triggers on `.c`/`.h` files and prompts about C99 idioms, designated initializers, fixed-width types, const-correctness, malloc/free patterns, inline functions, value-oriented APIs, sanitizers, or error returns, even when the user doesn't say 'C'. Skip projects that follow the caller-owns-memory style (use c99-opinionated-guide), game-engine code (use c99-game-opinionated-guide), and C++ work."
+description: "Use when editing or reviewing general-purpose C99 — libraries, CLI tools, system code without strong opinions on memory ownership or layout. Triggers on `.c`/`.h` files and prompts about C99 idioms, designated initializers, fixed-width types, const-correctness, malloc/free patterns, inline functions, value-oriented APIs, sanitizers, or error returns, even when the user doesn't say 'C'."
 ---
 
 # C99 Coding Guidelines

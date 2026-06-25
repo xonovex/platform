@@ -1,6 +1,6 @@
 ---
 name: editor-viewport-guide
-description: "Use when building the interactive 3D viewport that bridges a real-time renderer and an editor: GPU id-buffer object picking, selection outline/highlight rendering, and move/rotate/scale gizmos that work on any object plus the linear algebra behind them. Triggers on click-to-select in a 3D scene, reading back the picked object under the cursor, drawing a crisp selection outline, transform handles/gizmos, dragging an axis at a steep camera angle, constant screen-size handles, ray/plane projection, even when the user doesn't say 'viewport' or 'gizmo'. Skip the renderer's own pass/target plumbing (use gpu-rendering-guide), the generic component data model (use ecs-guide / data-model-guide), and the math-type library itself (use c99-game-opinionated-guide)."
+description: "Use when building the interactive 3D viewport that bridges a real-time renderer and an editor: GPU id-buffer object picking, selection outline/highlight rendering, and move/rotate/scale gizmos that work on any object plus the linear algebra behind them. Triggers on click-to-select in a 3D scene, reading back the picked object under the cursor, drawing a crisp selection outline, transform handles/gizmos, dragging an axis at a steep camera angle, constant screen-size handles, ray/plane projection, even when the user doesn't say 'viewport' or 'gizmo'."
 ---
 
 # Editor viewport Guidelines

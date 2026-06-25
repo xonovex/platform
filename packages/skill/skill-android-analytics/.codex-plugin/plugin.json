@@ -1,0 +1,9 @@
+{
+  "name": "xonovex-skill-android-analytics",
+  "version": "3.0.0",
+  "description": "Xonovex Android analytics skills",
+  "author": {
+    "name": "Xonovex"
+  },
+  "skills": "./android-analytics-guide"
+}

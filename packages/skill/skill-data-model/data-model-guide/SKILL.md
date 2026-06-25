@@ -1,6 +1,6 @@
 ---
 name: data-model-guide
-description: "Use when designing a central in-memory data model / object database for a tool, editor, or engine: typed objects with properties, stable cross-references and sub-object ownership, change notification, undo/redo, and serialization. Triggers on prompts about a runtime object/property schema, referencing objects by stable id/GUID, observing/notifying changes, transactional edits and undo history, save/load with versioning/migration, or copy-on-write snapshots — even when the user doesn't name a specific model. Skip cache/layout optimization (use data-oriented-design-guide), relational/SQL schema design (use sql-postgresql-guide), and runtime ECS component iteration for simulation/rendering."
+description: "Use when designing a central in-memory data model / object database for a tool, editor, or engine: typed objects with properties, stable cross-references and sub-object ownership, change notification, undo/redo, and serialization. Triggers on prompts about a runtime object/property schema, referencing objects by stable id/GUID, observing/notifying changes, transactional edits and undo history, save/load with versioning/migration, or copy-on-write snapshots — even when the user doesn't name a specific model."
 ---
 
 # Data-Model Guidelines

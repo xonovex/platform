@@ -1,6 +1,6 @@
 ---
 name: imgui-guide
-description: "Use when designing or implementing an immediate-mode GUI (IMGUI): batching the whole UI into one draw call with compact primitive buffers, keying controls by stable IDs, resolving ordering with frame-delayed state, keyboard focus / responder chains / event trickling, drag-and-drop, per-monitor DPI scaling, string localization, and screen-reader accessibility. Triggers on immediate-mode widgets, retained-vs-immediate UI, hover/active/focus IDs, UI draw batching, ImGui-style code, localizing UI strings, accessibility/screen-reader support for an IMGUI, even when the user doesn't say 'IMGUI'. Skip retained-mode / DOM / web component frameworks (use react-guide or frontend-design), GPU command-submission internals (use gpu-rendering-guide), and game-entity design (use ecs-guide)."
+description: "Use when designing or implementing an immediate-mode GUI (IMGUI): batching the whole UI into one draw call with compact primitive buffers, keying controls by stable IDs, resolving ordering with frame-delayed state, keyboard focus / responder chains / event trickling, drag-and-drop, per-monitor DPI scaling, string localization, and screen-reader accessibility. Triggers on immediate-mode widgets, retained-vs-immediate UI, hover/active/focus IDs, UI draw batching, ImGui-style code, localizing UI strings, accessibility/screen-reader support for an IMGUI, even when the user doesn't say 'IMGUI'."
 ---
 
 # Immediate-Mode GUI Guidelines

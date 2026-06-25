@@ -1,6 +1,6 @@
 {
   "name": "xonovex-skill-ecs",
-  "version": "0.2.9",
+  "version": "3.0.0",
   "description": "Xonovex Entity-Component-System skills",
   "author": {"name": "Xonovex"},
   "skills": ["./ecs-guide"]

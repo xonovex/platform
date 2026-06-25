@@ -32,4 +32,4 @@ For any concept appearing in a language/framework skill, ask: **is this concept 
 - Prefer many small single-concern skills over one large bundle — they mix and match per task.
 - The general tier must stay self-contained: it explains the principle without referencing any language or framework skill.
 - Cross-reference by **skill name**, bolded in prose (`**hono-guide**`) — readers route by name, and names survive repackaging that file paths do not.
-- A "Skip" clause in the description routes a concept to its owner ("Skip framework work — use hono-guide"); the body cross-links the same owner for depth.
+- A description routes by its own trigger words, not by naming other skills; keep cross-references in the body, which links the owning skill by name for depth.

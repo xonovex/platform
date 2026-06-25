@@ -1,6 +1,6 @@
 ---
 name: sql-postgresql-guide
-description: "Use when editing PostgreSQL 15+ queries, schemas, or migrations. Triggers on `.sql` files, migration files, schema files, and prompts about CTEs, indexing, JSONB, RLS, EXPLAIN ANALYZE, constraints, or partitioning, even when the user doesn't say 'Postgres'. Skip MySQL, SQLite, MSSQL-specific features, and ORM-only work that doesn't reach raw SQL."
+description: "Use when editing PostgreSQL 15+ queries, schemas, or migrations. Triggers on `.sql` files, migration files, schema files, and prompts about CTEs, indexing, JSONB, RLS, EXPLAIN ANALYZE, constraints, or partitioning, even when the user doesn't say 'Postgres'."
 ---
 
 # PostgreSQL Coding Guidelines

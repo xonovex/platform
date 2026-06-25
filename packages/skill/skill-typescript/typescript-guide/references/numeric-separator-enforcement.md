@@ -26,6 +26,6 @@ const port = 3000;
 
 - Add underscores for numbers >= 10_000 grouped by thousands
 - Do not add separators for smaller numbers (< 10_000)
-- Run ESLint to find numeric-separators-style violations
+- Run ESLint to find `unicorn/numeric-separators-style` violations
 - Use consistent grouping by thousands (e.g., 1_000_000 not 100_0000)
 - Verify numeric values are correct after adding separators

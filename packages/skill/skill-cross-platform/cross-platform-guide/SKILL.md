@@ -1,6 +1,6 @@
 ---
 name: cross-platform-guide
-description: "Use when making native C/C++ software portable across operating systems and targets: isolating all OS/windowing/input/audio calls behind one platform-abstraction interface, ordering a port to a new OS, building to the web via Emscripten/WebAssembly (cooperative main loop, async file/network, GL ES/WebGPU mapping, 32-bit pointers, memory growth), and reading input devices like gamepads. Triggers on scattered platform #ifdefs, function-pointer OS interfaces, porting to Linux/web, emscripten_set_main_loop, ALLOW_MEMORY_GROWTH, WebGL from a Vulkan engine, /dev/input, evdev, gamepad hotplug, even when the user doesn't say 'portable'. Skip renderer architecture (use gpu-rendering-guide / gpu-rendering-vulkan-guide), build mechanics (use cmake-guide), and per-platform C file naming (use c99-opinionated-guide)."
+description: "Use when making native C/C++ software portable across operating systems and targets: isolating all OS/windowing/input/audio calls behind one platform-abstraction interface, ordering a port to a new OS, building to the web via Emscripten/WebAssembly (cooperative main loop, async file/network, GL ES/WebGPU mapping, 32-bit pointers, memory growth), and reading input devices like gamepads. Triggers on scattered platform #ifdefs, function-pointer OS interfaces, porting to Linux/web, emscripten_set_main_loop, ALLOW_MEMORY_GROWTH, WebGL from a Vulkan engine, /dev/input, evdev, gamepad hotplug, even when the user doesn't say 'portable'."
 ---
 
 # Cross-platform / portability Guidelines

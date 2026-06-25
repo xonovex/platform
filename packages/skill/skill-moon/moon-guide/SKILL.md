@@ -1,6 +1,6 @@
 ---
 name: moon-guide
-description: "Use when configuring moonrepo monorepo tasks. Triggers on `.moon/` config files, `moon.yml`, and prompts about task definitions, project tags, task inheritance, language toolchains, project queries, or task caching, even when the user doesn't say 'moonrepo'. Skip Nx, Turborepo, Bazel, and ad-hoc npm-script orchestration."
+description: "Use when configuring moonrepo monorepo tasks. Triggers on `.moon/` config files, `moon.yml`, and prompts about task definitions, project tags, task inheritance, language toolchains, project queries, or task caching, even when the user doesn't say 'moonrepo'."
 ---
 
 # Moon Build System Guidelines
@@ -32,7 +32,7 @@ description: "Use when configuring moonrepo monorepo tasks. Triggers on `.moon/`
 
 - Task inheritance flows from `.moon/tasks/*.yml` (by tag/language) → project `moon.yml` — overriding requires the same task key in the project file
 - Implicit task dependencies via `deps:` are project-scoped — cross-project deps need `<project>:<task>` syntax
-- `moon ci` skips tasks marked `local: true` — never gate CI-only checks behind a local-only task
+- `moon ci` skips persistent server tasks (`preset: 'server'`) and any task with `options.runInCI: false` — never gate CI-only checks behind a non-CI task
 - Project tags drive task inheritance; misspelling a tag silently disables the inherited tasks for that project
 
 ## Progressive disclosure

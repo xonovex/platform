@@ -45,8 +45,9 @@ An H2 section literally titled `## Optional` designates secondary resources that
 For every HTML page worth giving to LLMs, serve a clean markdown version at the **same URL with `.md` appended**:
 
 - `https://example.com/docs/intro.html` → `https://example.com/docs/intro.html.md`
+- `https://example.com/docs/intro` → `https://example.com/docs/intro.md`
 - `https://example.com/docs/intro/` → `https://example.com/docs/intro/index.html.md`
-- `https://example.com/docs/page` → `https://example.com/docs/page.md`
+- `https://example.com/` → `https://example.com/index.html.md`
 
 The `llms.txt` file links to these `.md` mirrors, not the HTML originals.
 

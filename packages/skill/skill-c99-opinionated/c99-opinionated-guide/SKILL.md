@@ -1,6 +1,6 @@
 ---
 name: c99-opinionated-guide
-description: "Use when editing systems or embedded C99 code in projects that follow the opinionated caller-owns-memory, data-oriented style. An overlay on c99-guide: covers only the opinionated decisions, not the generic C99 idioms it shares with c99-guide. Triggers on `.c`/`.h` files in systems/embedded/DOD projects and on prompts about caller-owns-memory, SoA/SIMD variants, alignment, index/handle references, caller-owned string views/builders, physical design, plugin architecture, strict file naming, even when the user doesn't say 'opinionated'. Skip generic C99 idioms — const-correctness, designated initializers, inline-vs-macro, compound literals, fixed-width types, value-oriented APIs, baseline error/memory patterns (use c99-guide) — game-engine code (use c99-game-opinionated-guide), and C++ work."
+description: "Use when editing systems or embedded C99 code in projects that follow the opinionated caller-owns-memory, data-oriented style. An overlay on c99-guide: covers only the opinionated decisions, not the generic C99 idioms it shares with c99-guide. Triggers on `.c`/`.h` files in systems/embedded/DOD projects and on prompts about caller-owns-memory, SoA/SIMD variants, alignment, index/handle references, caller-owned string views/builders, physical design, plugin architecture, strict file naming, even when the user doesn't say 'opinionated'."
 ---
 
 # C99 Opinionated Guidelines (Systems/Game/Embedded)

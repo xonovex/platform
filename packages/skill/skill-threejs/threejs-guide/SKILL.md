@@ -1,6 +1,6 @@
 ---
 name: threejs-guide
-description: "Use when building or editing 3D scenes in vanilla Three.js for WebGL/WebGPU. Triggers on `.js`/`.ts` files with `three` or `three/*` imports, and on prompts about Scene, Renderer, Mesh, BufferGeometry, materials, lighting, GLTF loaders, raycasting, shaders, post-processing, instancing, or perf tuning — even when the user doesn't say 'Three.js'. Skip React Three Fiber, Babylon.js, and other 3D engines."
+description: "Use when building or editing 3D scenes in vanilla Three.js for WebGL/WebGPU. Triggers on `.js`/`.ts` files with `three` or `three/*` imports, and on prompts about Scene, Renderer, Mesh, BufferGeometry, materials, lighting, GLTF loaders, raycasting, shaders, post-processing, instancing, or perf tuning — even when the user doesn't say 'Three.js'."
 ---
 
 # Three.js Coding Guidelines

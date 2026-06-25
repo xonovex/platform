@@ -41,6 +41,30 @@
       "category": "Productivity"
     },
     {
+      "name": "xonovex-skill-android-analytics",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-android-analytics"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-android-wcag",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-android-wcag"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
       "name": "xonovex-skill-asset-pipeline",
       "source": {
         "source": "local",
@@ -117,6 +141,18 @@
       "source": {
         "source": "local",
         "path": "./packages/skill/skill-cmake"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-code-review",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-code-review"
       },
       "policy": {
         "installation": "AVAILABLE",
@@ -497,10 +533,22 @@
       "category": "Productivity"
     },
     {
-      "name": "xonovex-skill-prompt",
+      "name": "xonovex-skill-command",
       "source": {
         "source": "local",
-        "path": "./packages/skill/skill-prompt"
+        "path": "./packages/skill/skill-command"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-pull-request",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-pull-request"
       },
       "policy": {
         "installation": "AVAILABLE",

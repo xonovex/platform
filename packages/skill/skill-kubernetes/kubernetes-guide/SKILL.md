@@ -1,6 +1,6 @@
 ---
 name: kubernetes-guide
-description: "Use when editing Kubernetes manifests in GitOps repos. Triggers on `.yaml`/`.yml` files in `clusters/`, `apps/`, or k8s manifest directories, and on prompts about Deployments, Services, ConfigMaps, Secrets (SOPS), Kustomize overlays, Flux/ArgoCD, labels, namespaces, or multi-environment configs, even when the user doesn't say 'Kubernetes'. Skip Helm chart authoring, Dockerfile work (use docker-guide), and cloud-provider-managed services."
+description: "Use when editing Kubernetes manifests in GitOps repos. Triggers on `.yaml`/`.yml` files in `clusters/`, `apps/`, or k8s manifest directories, and on prompts about Deployments, Services, ConfigMaps, Secrets (SOPS), Kustomize overlays, Flux/ArgoCD, labels, namespaces, or multi-environment configs, even when the user doesn't say 'Kubernetes'."
 ---
 
 # Kubernetes Coding Guidelines
