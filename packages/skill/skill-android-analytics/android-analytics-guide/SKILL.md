@@ -26,22 +26,22 @@ SDK-agnostic patterns for event tracking in an Android app: depend on a typed tr
 ## Example — VM-owned tracking + a fake-tracker test
 
 ```kotlin
-class TicketsViewModel(
+class CartViewModel(
     private val analytics: AnalyticsTracker,
 ) : ViewModel() {
-    init { analytics.trackScreen(ScreenName.TICKETS_OVERVIEW) } // once, on entry
+    init { analytics.trackScreen(ScreenName.CART) } // once, on entry
 
-    fun onBookClicked() {
-        analytics.trackEvent(ButtonClickEvent(uniqueName = "tickets_book"))
+    fun onCheckoutClicked() {
+        analytics.trackEvent(ButtonClickEvent(uniqueName = "cart_checkout"))
     }
 }
 
 // Test — inject the fake, assert the event; no real SDK
 @Test
-fun book_click_is_tracked() = runTest {
+fun checkout_click_is_tracked() = runTest {
     val analytics = FakeAnalyticsTracker()
-    TicketsViewModel(analytics).onBookClicked()
-    analytics.assertEvent(ButtonClickEvent(uniqueName = "tickets_book"))
+    CartViewModel(analytics).onCheckoutClicked()
+    analytics.assertEvent(ButtonClickEvent(uniqueName = "cart_checkout"))
 }
 ```
 

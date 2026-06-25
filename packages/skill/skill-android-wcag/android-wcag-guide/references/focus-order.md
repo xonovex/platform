@@ -34,19 +34,19 @@ Android has **three distinct orderings**, controlled by different APIs; no singl
 3. Keep the spread small and intentional: e.g. body content `-10f`, top-bar title `-1f`. Do not assign a unique index to every node, only the ones whose order you must correct.
 
 ```kotlin
-// Bad - title composed first, so TalkBack reads "Departures" before the route the user just tapped
+// Bad - title composed first, so TalkBack reads "Inbox" before the message the user just tapped
 Box {
-    TopAppBar(title = { Text("Departures") })
-    DeparturesList(modifier = Modifier.padding(top = 64.dp))
+    TopAppBar(title = { Text("Inbox") })
+    MessageList(modifier = Modifier.padding(top = 64.dp))
 }
 
 // Good - body reads first, then the bar
 Box {
     TopAppBar(
-        title = { Text("Departures") },
+        title = { Text("Inbox") },
         modifier = Modifier.semantics { traversalIndex = TraversalOrder.TopBar.index }, // -1f
     )
-    DeparturesList(
+    MessageList(
         modifier = Modifier.semantics { traversalIndex = TraversalOrder.Body.index }, // -10f
     )
 }
@@ -63,21 +63,21 @@ Box {
 ```kotlin
 // Bad - each line is a separate swipe stop; user hears three fragments
 Column {
-    Text("Intercity 800")
-    Text("Platform 4b")
-    Text("On time")
+    Text("Maria Jansen")
+    Text("Project update")
+    Text("2 minutes ago")
 }
 
 // Good - one stop, read as a sentence
 Column(
     modifier = Modifier
         .semantics(mergeDescendants = true) {
-            contentDescription = "Intercity 800, platform 4b, on time"
+            contentDescription = "Maria Jansen, Project update, 2 minutes ago"
         },
 ) {
-    Text("Intercity 800")
-    Text("Platform 4b")
-    Text("On time")
+    Text("Maria Jansen")
+    Text("Project update")
+    Text("2 minutes ago")
 }
 ```
 
@@ -98,12 +98,12 @@ TabRow(/* ... */, modifier = Modifier.semantics { heading() })
 
 // Good — tabs keep their tab role; each list card is the heading-nav target
 TabRow(/* ... */)                                   // a control, not a heading
-items(bookings) { booking ->
+items(messages) { message ->
     Card(
         modifier = Modifier.semantics(mergeDescendants = true) {
             heading()                               // skimmable with the heading gesture
             isTraversalGroup = true
-            contentDescription = booking.label
+            contentDescription = message.label
         },
     ) { /* card content; interactive children stay separately focusable */ }
 }
@@ -111,11 +111,11 @@ items(bookings) { booking ->
 
 ```kotlin
 // Bad - title is announced as plain text; no heading-nav target on the screen
-Text("Your journeys", style = MaterialTheme.typography.titleLarge)
+Text("Your messages", style = MaterialTheme.typography.titleLarge)
 
 // Good
 Text(
-    text = "Your journeys",
+    text = "Your messages",
     style = MaterialTheme.typography.titleLarge,
     modifier = Modifier.semantics { heading() },
 )
@@ -132,18 +132,18 @@ Text(
 ```kotlin
 // Bad - hand-rolled list in a Column; TalkBack gives no "X of Y" position
 Column {
-    stops.forEach { Text(it.name) }
+    people.forEach { Text(it.name) }
 }
 
 // Good
 Column(
     modifier = Modifier.semantics {
-        collectionInfo = CollectionInfo(rowCount = stops.size, columnCount = 1)
+        collectionInfo = CollectionInfo(rowCount = people.size, columnCount = 1)
     },
 ) {
-    stops.forEachIndexed { index, stop ->
+    people.forEachIndexed { index, person ->
         Text(
-            text = stop.name,
+            text = person.name,
             modifier = Modifier.semantics {
                 collectionItemInfo = CollectionItemInfo(
                     rowIndex = index, rowSpan = 1, columnIndex = 0, columnSpan = 1,

@@ -7,7 +7,7 @@
 **How to Apply:**
 
 1. Track the screen view in the ViewModel's `init` (or the function that first loads the screen), so it fires once per ViewModel instance — i.e. once per genuine screen entry.
-2. For events, have the composable expose an intent callback (`onBookClicked`) and let the ViewModel call the tracker inside the handler. The composable never touches the tracker.
+2. For events, have the composable expose an intent callback (`onCheckoutClicked`) and let the ViewModel call the tracker inside the handler. The composable never touches the tracker.
 3. Re-track a screen only on a real re-entry (new ViewModel, new navigation destination), not on every state emission. Map state changes to UI; map user intents to events.
 4. For Activity/Fragment screens, track the screen view once — in `init`/`onCreate`, or in `onResume` guarded by a flag so back-stack returns don't re-count.
 
@@ -16,32 +16,32 @@
 ```kotlin
 // Bad — composable owns tracking; re-fires on every recomposition / config change
 @Composable
-fun BookingScreen(state: BookingState, analytics: AnalyticsTracker) {
+fun CartScreen(state: CartState, analytics: AnalyticsTracker) {
     LaunchedEffect(Unit) {                       // re-fires on rotation -> inflated screen views
-        analytics.trackScreen(ScreenName.Booking)
+        analytics.trackScreen(ScreenName.Cart)
     }
     Button(onClick = {
-        analytics.trackEvent(ButtonClickEvent("book")) // event firing from the UI layer
+        analytics.trackEvent(ButtonClickEvent("cart_checkout")) // event firing from the UI layer
     }) { /* ... */ }
 }
 
 // Good — ViewModel owns tracking; UI only raises intent
-class BookingViewModel(
+class CartViewModel(
     private val analytics: AnalyticsTracker,
 ) : ViewModel() {
     init {
-        analytics.trackScreen(ScreenName.Booking) // once per ViewModel == once per entry
+        analytics.trackScreen(ScreenName.Cart) // once per ViewModel == once per entry
     }
 
-    fun onBookClicked() {
-        analytics.trackEvent(ButtonClickEvent("book"))
-        // ...proceed with booking
+    fun onCheckoutClicked() {
+        analytics.trackEvent(ButtonClickEvent("cart_checkout"))
+        // ...proceed to checkout
     }
 }
 
 @Composable
-fun BookingScreen(state: BookingState, onBookClicked: () -> Unit) {
-    Button(onClick = onBookClicked) { /* ... */ }
+fun CartScreen(state: CartState, onCheckoutClicked: () -> Unit) {
+    Button(onClick = onCheckoutClicked) { /* ... */ }
 }
 ```
 

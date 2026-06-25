@@ -29,20 +29,20 @@ class FakeAnalyticsTracker : AnalyticsTracker {
     fun clear() { recorded.clear(); screens.clear() }
 }
 
-// Bad — no assertion that booking tracked anything, or asserts a loose string
-@Test fun book() {
-    vm.onBookClicked()
-    verify(tracker).trackEvent(argThat { it.toString().contains("book") }) // brittle, untyped
+// Bad — no assertion that checkout tracked anything, or asserts a loose string
+@Test fun checkout() {
+    vm.onCheckoutClicked()
+    verify(tracker).trackEvent(argThat { it.toString().contains("checkout") }) // brittle, untyped
 }
 
 // Good — exact typed event on a fake
-@Test fun `book click tracks button event`() {
+@Test fun `checkout click tracks button event`() {
     val analytics = FakeAnalyticsTracker()
-    val vm = BookingViewModel(analytics)
+    val vm = CartViewModel(analytics)
 
     analytics.assertNoEvent()        // nothing before intent
-    vm.onBookClicked()
-    analytics.assertEvent(ButtonClickEvent("tickets_book"))
+    vm.onCheckoutClicked()
+    analytics.assertEvent(ButtonClickEvent("cart_checkout"))
 }
 ```
 

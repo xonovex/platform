@@ -12,7 +12,7 @@
     "rationale": "where-to-track"
   },
   {
-    "query": "fire a button-click event when the user taps Book",
+    "query": "fire a button-click event when the user taps Checkout",
     "should_trigger": true,
     "split": "train",
     "rationale": "event tracking"
