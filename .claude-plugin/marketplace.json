@@ -3,7 +3,7 @@
   "owner": { "name": "Xonovex" },
   "metadata": {
     "description": "Official Xonovex development tools",
-    "version": "0.2.9"
+    "version": "3.0.0"
   },
   "plugins": [
     { "name": "xonovex-utility", "source": "./packages/command/command-utility", "description": "Xonovex utility commands — skills, instructions, insights, content" },
