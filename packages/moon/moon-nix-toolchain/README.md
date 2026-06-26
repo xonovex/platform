@@ -69,7 +69,7 @@ Set `GITHUB_TOKEN` in CI so moon's `github://` resolver isn't rate-limited; moon
 
 ## Per-project flakes
 
-When a project ships its own `flake.nix` (i.e. `<projectRoot>/flake.nix` exists), the plugin wraps that project's tasks with the project flake — `nix develop <projectRoot> --command …` — using the project flake's **default** devShell. This takes precedence over the workspace flake and over the shell selectors above, which name devShells in the workspace flake and therefore do not apply to a project flake.
+When a project ships its own `flake.nix` (i.e. `<projectRoot>/flake.nix` exists), the plugin wraps that project's tasks with the project flake — `nix develop <projectRoot> --command …` — taking precedence over the workspace flake. The shell selectors above still apply: a matching selector routes the task to `nix develop <projectRoot>#<shell>`, so the **named devShell must be exposed by the project flake**. With no match (or a `default` value) the task uses the project flake's default devShell.
 
 The project flake is detected from the project source over the host, so it auto-applies to every project that ships one — no per-project config. Projects without their own `flake.nix` are unchanged: the workspace flake plus the resolved devShell. This lets a package pin its own toolchain independently of the workspace flake.
 

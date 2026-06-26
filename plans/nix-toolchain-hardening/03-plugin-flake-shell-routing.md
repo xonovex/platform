@@ -3,7 +3,7 @@ type: plan
 has_subplans: false
 parent_plan: plans/nix-toolchain-hardening.md
 parallel_group: 2
-status: pending
+status: complete
 dependencies:
   plans: [plugin-typed-config]
   files:
@@ -13,11 +13,11 @@ dependencies:
     - packages/moon/moon-nix-toolchain/CHANGELOG.md
 skills_to_consult: [moon-guide, general-fp-guide, code-review-guide]
 validation:
-  type_check: pending
-  lint: pending
-  build: pending
-  tests: pending
-  integration: pending
+  type_check: pass
+  lint: pass
+  build: pass
+  tests: pass
+  integration: "passed (hook-level: extend_task_command drives the real plugin and asserts project-flake named-shell routing; manual moon run --log trace smoke not run)"
 ---
 
 # 03 — Plugin: Route Project-Flake Tasks to Named devShells

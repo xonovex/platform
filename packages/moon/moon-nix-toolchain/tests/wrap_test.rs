@@ -363,7 +363,7 @@ async fn shell_by_tag_outranks_shell_by_language() {
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
 #[serial]
-async fn wraps_in_project_flake_when_project_has_one() {
+async fn routes_project_flake_to_named_shell() {
     reset_wrap_env();
 
     let sandbox = create_empty_moon_sandbox();
@@ -377,20 +377,75 @@ async fn wraps_in_project_flake_when_project_has_one() {
     input.project =
         serde_json::from_value(serde_json::json!({ "id": "proj", "source": "packages/proj" }))
             .unwrap();
-    // A shell selector is configured but must be ignored: a project flake uses its
-    // own default devShell, not a named shell from the workspace flake.
+    // A selector now routes a project flake to one of ITS OWN named devShells.
     input.toolchain_config = serde_json::json!({ "shell": "go" });
+
+    let output = plugin.extend_task_command(input).await;
+
+    assert!(
+        flake_ref(&output).ends_with("/packages/proj#go"),
+        "a project flake with a selector should route to its named devShell, got: {}",
+        flake_ref(&output)
+    );
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 1)]
+#[serial]
+async fn project_flake_without_selector_uses_default_shell() {
+    reset_wrap_env();
+
+    let sandbox = create_empty_moon_sandbox();
+    std::fs::create_dir_all(sandbox.root.join("packages/proj")).unwrap();
+    std::fs::write(sandbox.root.join("packages/proj/flake.nix"), "{}").unwrap();
+
+    let plugin = sandbox.create_toolchain("nix").await;
+
+    let mut input = command_input("golangci-lint", &["run"]);
+    input.project =
+        serde_json::from_value(serde_json::json!({ "id": "proj", "source": "packages/proj" }))
+            .unwrap();
 
     let output = plugin.extend_task_command(input).await;
 
     let flake_ref = flake_ref(&output);
     assert!(
         flake_ref.ends_with("/packages/proj"),
-        "should wrap with the project flake root, got: {flake_ref}"
+        "project flake root should be used, got: {flake_ref}"
     );
     assert!(
         !flake_ref.contains('#'),
-        "a project flake must use its default devShell (no #shell), got: {flake_ref}"
+        "no selector should keep the project flake's default devShell, got: {flake_ref}"
+    );
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 1)]
+#[serial]
+async fn routes_project_flake_per_task_from_shell_by_task() {
+    reset_wrap_env();
+
+    let sandbox = create_empty_moon_sandbox();
+    std::fs::create_dir_all(sandbox.root.join("packages/proj")).unwrap();
+    std::fs::write(sandbox.root.join("packages/proj/flake.nix"), "{}").unwrap();
+
+    let plugin = sandbox.create_toolchain("nix").await;
+
+    let mut input = command_input("golangci-lint", &["run"]);
+    input.project =
+        serde_json::from_value(serde_json::json!({ "id": "proj", "source": "packages/proj" }))
+            .unwrap();
+    input.task.target = serde_json::from_value(serde_json::json!("proj:go-lint")).unwrap();
+    // shellByTask outranks the project-wide `shell`, even for a project flake.
+    input.toolchain_config = serde_json::json!({
+        "shellByTask": { "go-lint": "go" },
+        "shell": "default"
+    });
+
+    let output = plugin.extend_task_command(input).await;
+
+    assert!(
+        flake_ref(&output).ends_with("/packages/proj#go"),
+        "shellByTask should route a project flake to its named devShell, got: {}",
+        flake_ref(&output)
     );
 }
 

@@ -116,12 +116,13 @@ pub fn define_toolchain_config() -> FnResult<Json<DefineToolchainConfigOutput>> 
     }))
 }
 
-/// The nix flake a task is wrapped with: the real path passed to `nix develop`, and
-/// whether it is a project-local flake. A project flake uses its own default devShell
-/// (the shell selectors target the workspace flake's named shells, so they are skipped).
+/// The nix flake a task is wrapped with: the real path passed to `nix develop`. A
+/// project-local `flake.nix` wins over the workspace flake; either way the resolved
+/// devShell selector (`resolve_shell`) is applied, so a project flake routes a task to
+/// `{root}#<shell>` when a selector matches — that named devShell must exist in the
+/// project flake.
 struct WrapTarget {
     root: String,
-    project_flake: bool,
 }
 
 /// Return the flake to wrap the task with, or `None` when the task must run
@@ -174,7 +175,6 @@ fn resolve_wrap_target(
             {
                 return Ok(Some(WrapTarget {
                     root: project_root.to_string_lossy().into_owned(),
-                    project_flake: true,
                 }));
             }
         }
@@ -182,7 +182,6 @@ fn resolve_wrap_target(
 
     Ok(context.workspace_root.real_path().map(|path| WrapTarget {
         root: path.to_string_lossy().into_owned(),
-        project_flake: false,
     }))
 }
 
@@ -271,18 +270,15 @@ pub fn extend_task_command(
         return Ok(Json(output));
     };
 
-    // A project-local flake uses its own default devShell; the shell selectors
-    // name shells in the workspace flake, so they do not apply to it.
-    let shell = if target.project_flake {
-        None
-    } else {
-        resolve_shell(
-            input.task.target.get_task_id().ok(),
-            &input.task.toolchains,
-            input.project.id.as_str(),
-            &config,
-        )?
-    };
+    // Resolve the devShell selector for every flake, project-local or workspace.
+    // For a project flake the selected name must be a devShell in THAT flake;
+    // no match (or `default`) keeps the flake's bare default devShell.
+    let shell = resolve_shell(
+        input.task.target.get_task_id().ok(),
+        &input.task.toolchains,
+        input.project.id.as_str(),
+        &config,
+    )?;
 
     // Rebuild the entire argv: nix develop <flakeref> --command <cmd> <args...>.
     // `--command` must be the last `nix` flag; everything after it is the child
@@ -320,16 +316,12 @@ pub fn extend_task_script(
         return Ok(Json(output));
     };
 
-    let shell = if target.project_flake {
-        None
-    } else {
-        resolve_shell(
-            input.task.target.get_task_id().ok(),
-            &input.task.toolchains,
-            input.project.id.as_str(),
-            &config,
-        )?
-    };
+    let shell = resolve_shell(
+        input.task.target.get_task_id().ok(),
+        &input.task.toolchains,
+        input.project.id.as_str(),
+        &config,
+    )?;
 
     // A script is one opaque string, so it needs a shell layer inside the dev
     // shell: nix develop <flakeref> --command bash -c "<original script>".
