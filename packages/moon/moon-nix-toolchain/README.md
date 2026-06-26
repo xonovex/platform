@@ -88,6 +88,10 @@ nix:
 
 When `nix` is absent for a task in an opted-in project, the plugin errors with `nix is required for <project>:<task> …` and the task fails, instead of falling back to host tools. Tasks in projects outside both allowlists keep the silent no-op. The `IN_NIX_SHELL` and `MOON_NIX_WRAPPED` guards still take precedence — a task already inside a dev shell (or already wrapped) never fails closed. Both allowlists are validated against the published schema and default to empty, so existing consumers are unaffected until they opt in.
 
+## Cache coherence
+
+Editing the flake a task runs in — `flake.lock`, or switching its resolved devShell — busts that task's moon cache via the `hash_task_contents` hook; an unrelated edit does not. The hook resolves the same flake root (the project `flake.nix` when present, else the workspace flake) and the same devShell selector the wrap hooks use, then folds the resolved flake root, the selected shell, and the `flake.lock` contents into the task's cache key. The key is independent of `IN_NIX_SHELL` / `MOON_NIX_WRAPPED` and of whether `nix` is installed on the hashing host, so it is stable across CI and local runs. The `setup_environment` hook pre-builds the resolved devShell (non-blocking) so the first wrapped task is not a cold `nix develop`.
+
 ## Notes
 
 - The flake must provide every binary a wrapped task runs.

@@ -161,7 +161,18 @@ fn resolve_wrap_target(
         return Ok(None);
     }
 
-    let project_source = project.source.as_str();
+    resolve_flake_target(context, project.source.as_str())
+}
+
+/// Resolve the flake that wraps a task purely from paths, with no runtime guards:
+/// the project flake when `<project>/flake.nix` exists, else the workspace flake.
+/// Shared by `resolve_wrap_target` (after its guards) and `hash_task_contents`,
+/// whose cache key must not depend on transient env (`IN_NIX_SHELL`/`MOON_NIX_WRAPPED`)
+/// or on whether `nix` is installed on the hashing host.
+fn resolve_flake_target(
+    context: &MoonContext,
+    project_source: &str,
+) -> AnyResult<Option<WrapTarget>> {
     if !project_source.is_empty() {
         if let Some(project_root) = context.workspace_root.join(project_source).real_path() {
             // Detect the project flake over the host: the plugin's sandbox has no
@@ -245,6 +256,19 @@ fn flake_ref(root: &str, shell: Option<&str>) -> String {
         Some(shell) => format!("{root}#{shell}"),
         None => root.to_string(),
     }
+}
+
+/// Read a flake's `flake.lock` over the host so its pinned inputs fold into the
+/// task hash. Returns an empty string when the lock is absent (a flake with no
+/// lock, or a non-flake workspace root) — an absent lock is a stable value, so it
+/// never thrashes the cache.
+fn flake_lock_contents(root: &str) -> String {
+    let lock_path = format!("{root}/flake.lock");
+    exec_captured("cat", [lock_path.as_str()])
+        .ok()
+        .filter(|result| result.exit_code == 0)
+        .map(|result| result.stdout)
+        .unwrap_or_default()
 }
 
 /// Quote a string for safe inclusion as a single POSIX shell argument.
@@ -331,6 +355,71 @@ pub fn extend_task_script(
         shell_quote(&input.script)
     ));
     output.env.insert(SENTINEL.into(), "1".into());
+
+    Ok(Json(output))
+}
+
+#[plugin_fn]
+pub fn hash_task_contents(
+    Json(input): Json<HashTaskContentsInput>,
+) -> FnResult<Json<HashTaskContentsOutput>> {
+    let mut contents = Vec::new();
+
+    let config: NixToolchainConfig = parse_toolchain_config_schema(input.toolchain_config.clone())?;
+
+    if let Some(target) = resolve_flake_target(&input.context, input.project.source.as_str())? {
+        // Mirror the wrap hooks' shell resolution exactly — they apply the selectors
+        // to project and workspace flakes alike — so the cache key tracks the same
+        // `{root}#<shell>` the task actually executes in.
+        let shell = resolve_shell(
+            input.task.target.get_task_id().ok(),
+            &input.task.toolchains,
+            input.project.id.as_str(),
+            &config,
+        )?;
+
+        // Fold the resolved flake root, the selected shell, and the lock's pinned
+        // inputs into the cache key: editing flake.lock or switching the shell
+        // changes `contents`; an unrelated edit leaves it byte-identical.
+        contents.push(serde_json::json!({
+            "flakeRoot": target.root,
+            "shell": shell,
+            "flakeLock": flake_lock_contents(&target.root),
+        }));
+    }
+
+    Ok(Json(HashTaskContentsOutput { contents }))
+}
+
+#[plugin_fn]
+pub fn setup_environment(
+    Json(input): Json<SetupEnvironmentInput>,
+) -> FnResult<Json<SetupEnvironmentOutput>> {
+    let mut output = SetupEnvironmentOutput::default();
+
+    if !command_exists(&get_host_environment()?, "nix") {
+        return Ok(Json(output));
+    }
+
+    let project_source = input
+        .project
+        .as_ref()
+        .map_or("", |project| project.source.as_str());
+    if let Some(target) = resolve_flake_target(&input.context, project_source)? {
+        // Realise (and cache) the devShell closure before the first task runs, so the
+        // first wrapped task is not a cold `nix develop`. `allow_failure` keeps setup
+        // non-blocking; the closure lands in the nix store without a GC root, so a
+        // `nix store gc` before the task can still evict it.
+        let reference = flake_ref(&target.root, None);
+        output.commands.push(
+            ExecCommand::new(ExecCommandInput::new(
+                "nix",
+                ["develop", reference.as_str(), "--command", "true"],
+            ))
+            .allow_failure()
+            .label(format!("Pre-building nix devShell {reference}")),
+        );
+    }
 
     Ok(Json(output))
 }
