@@ -15,10 +15,16 @@
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
       g = nixShells.devShells.${system};
+      # `default` and the named `go` devShell are the same composite shell, so the
+      # nix toolchain plugin's shellByTag `go` routing resolves to it.
+      devShell = pkgs.mkShell {
+        inputsFrom = [ g.go g.shell ];
+      };
     in
     {
-      devShells.${system}.default = pkgs.mkShell {
-        inputsFrom = [ g.go g.shell ];
+      devShells.${system} = {
+        default = devShell;
+        go = devShell;
       };
     };
 }
