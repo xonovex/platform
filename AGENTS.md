@@ -24,7 +24,7 @@ Monorepo for Xonovex tools and configuration packages, all code under `packages/
 - **Moon**: `.moon/tasks/*.yml` templates auto-inherit by type/language/tags
 - **Query**: `moon query projects --tags "<pattern>"`
 - **Git**: Do not create feature branches unless explicitly asked. Never push unless explicitly asked.
-- **Release**: cut releases through a pull request, never a direct push to `main`. A PR whose title contains `version packages`, merged to protected `main`, triggers `.github/workflows/release.yml` (`:ci-publish` -> the GitHub release/tag); do not bypass branch protection to publish.
+- **Release**: via PR only, never direct push; a `version packages` PR merged to `main` triggers `.github/workflows/release.yml` (`:ci-publish` -> release/tag). Don't bypass branch protection.
 
 ### Code Style
 
@@ -40,4 +40,3 @@ Monorepo for Xonovex tools and configuration packages, all code under `packages/
 ## Integration Points
 
 - config -> shared -> agent
-- command plugins depend on guideline skills via `plugin.json` `dependencies` (auto-installed on Claude Code): `command-utility` -> `skill-{content,insights,instruction,skill,command}`; `command-workflow` -> `skill-{plan,git,pull-request,code-review}`; the `pr-*` commands additionally load an optional host-delivery skill detected from the remote (`skill-github`, `skill-gitlab`, or another `skill-<host>`), installed separately rather than as a hard dependency
