@@ -11,6 +11,28 @@ fn reset_wrap_env() {
     std::env::remove_var(SENTINEL);
 }
 
+/// Simulate a host without `nix`: point PATH at a dir whose only `which` reports
+/// every command missing (exit 1), mirroring a real `which nix` miss without
+/// trapping on a missing `which` itself. Returns a closure that restores the prior
+/// PATH; call it before asserting so PATH never leaks across `#[serial]` tests.
+fn stub_missing_nix() -> impl FnOnce() {
+    use std::os::unix::fs::PermissionsExt;
+
+    let bin_dir = std::env::temp_dir().join("moon-nix-toolchain-no-nix");
+    std::fs::create_dir_all(&bin_dir).unwrap();
+    let which = bin_dir.join("which");
+    std::fs::write(&which, "#!/bin/sh\nexit 1\n").unwrap();
+    std::fs::set_permissions(&which, std::fs::Permissions::from_mode(0o755)).unwrap();
+
+    let original_path = std::env::var_os("PATH");
+    std::env::set_var("PATH", &bin_dir);
+
+    move || match original_path {
+        Some(path) => std::env::set_var("PATH", path),
+        None => std::env::remove_var("PATH"),
+    }
+}
+
 fn command_input(command: &str, args: &[&str]) -> ExtendTaskCommandInput {
     ExtendTaskCommandInput {
         command: command.into(),
@@ -103,21 +125,10 @@ async fn no_op_when_sentinel_set() {
 #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
 #[serial]
 async fn passthrough_when_nix_absent() {
-    use std::os::unix::fs::PermissionsExt;
-
     reset_wrap_env();
-
-    // Simulate a host without nix: a PATH whose only `which` reports every
-    // command as missing (exit 1), mirroring a real `which nix` miss without
-    // trapping on a missing `which` itself.
-    let bin_dir = std::env::temp_dir().join("moon-nix-toolchain-no-nix");
-    std::fs::create_dir_all(&bin_dir).unwrap();
-    let which = bin_dir.join("which");
-    std::fs::write(&which, "#!/bin/sh\nexit 1\n").unwrap();
-    std::fs::set_permissions(&which, std::fs::Permissions::from_mode(0o755)).unwrap();
-
-    let original_path = std::env::var_os("PATH");
-    std::env::set_var("PATH", &bin_dir);
+    // Canonical not-opted case: no `failClosed*` config, so a nix-absent host stays
+    // a silent no-op rather than failing closed.
+    let restore = stub_missing_nix();
 
     let sandbox = create_empty_moon_sandbox();
     let plugin = sandbox.create_toolchain("nix").await;
@@ -126,10 +137,7 @@ async fn passthrough_when_nix_absent() {
         .extend_task_command(command_input("echo", &["hi"]))
         .await;
 
-    match original_path {
-        Some(path) => std::env::set_var("PATH", path),
-        None => std::env::remove_var("PATH"),
-    }
+    restore();
 
     assert_eq!(
         output.command, None,
@@ -456,4 +464,191 @@ async fn uses_workspace_flake_when_project_has_no_flake() {
         "no project flake should fall back to the workspace flake + shell, got: {}",
         flake_ref(&output)
     );
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 1)]
+#[serial]
+async fn fails_closed_when_opted_in_and_nix_absent() {
+    reset_wrap_env();
+    let restore = stub_missing_nix();
+
+    let mut sandbox = create_empty_moon_sandbox();
+    // A `cmake`-tagged project opted into fail-closed nix via `failClosedByTag`.
+    sandbox
+        .host_funcs
+        .mock_load_project(|_id| serde_json::json!({ "config": { "tags": ["cmake"] } }));
+    let plugin = sandbox.create_toolchain("nix").await;
+
+    let mut input = command_input("cmake", &["--build", "."]);
+    input.context = plugin.create_context();
+    input.project = serde_json::from_value(
+        serde_json::json!({ "id": "game-worldgen", "source": "packages/game/game-worldgen" }),
+    )
+    .unwrap();
+    input.task.target = serde_json::from_value(serde_json::json!("game-worldgen:build")).unwrap();
+    input.toolchain_config = serde_json::json!({ "failClosedByTag": ["cmake"] });
+
+    // Call the plugin container directly: the wrapper `.unwrap()`s the plugin `Err`,
+    // so this returns a `Result` and PATH is restored before asserting.
+    let result: Result<ExtendTaskCommandOutput, _> = plugin
+        .plugin
+        .call_func_with("extend_task_command", input)
+        .await;
+
+    restore();
+    let err = result.expect_err("opted-in task must fail when nix is absent");
+    let message = format!("{err:?}");
+    assert!(message.contains("nix is required"), "got: {message}");
+    assert!(
+        message.contains("game-worldgen:build"),
+        "error must name <project>:<task>, got: {message}"
+    );
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 1)]
+#[serial]
+async fn no_op_when_not_opted_in_and_nix_absent() {
+    reset_wrap_env();
+    let restore = stub_missing_nix();
+
+    let mut sandbox = create_empty_moon_sandbox();
+    // Project is tagged `go`, but only `cmake` is fail-closed -> stay a no-op.
+    sandbox
+        .host_funcs
+        .mock_load_project(|_id| serde_json::json!({ "config": { "tags": ["go"] } }));
+    let plugin = sandbox.create_toolchain("nix").await;
+
+    let mut input = command_input("go", &["build"]);
+    input.toolchain_config = serde_json::json!({ "failClosedByTag": ["cmake"] });
+    let output = plugin.extend_task_command(input).await;
+
+    restore();
+    assert_eq!(
+        output.command, None,
+        "non-opted task must keep the host-tool no-op"
+    );
+    assert!(output.args.is_none());
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 1)]
+#[serial]
+async fn in_nix_shell_outranks_fail_closed() {
+    reset_wrap_env();
+    // Already inside a dev shell: the `IN_NIX_SHELL` guard wins above the nix probe,
+    // so an opted-in, nix-absent task is a no-op rather than a fail-closed error.
+    std::env::set_var("IN_NIX_SHELL", "impure");
+    let restore = stub_missing_nix();
+
+    let mut sandbox = create_empty_moon_sandbox();
+    sandbox
+        .host_funcs
+        .mock_load_project(|_id| serde_json::json!({ "config": { "tags": ["cmake"] } }));
+    let plugin = sandbox.create_toolchain("nix").await;
+
+    let mut input = command_input("cmake", &["--build", "."]);
+    input.toolchain_config = serde_json::json!({ "failClosedByTag": ["cmake"] });
+    let output = plugin.extend_task_command(input).await;
+
+    restore();
+    std::env::remove_var("IN_NIX_SHELL");
+
+    assert_eq!(
+        output.command, None,
+        "IN_NIX_SHELL must win over fail-closed: no wrap and no error"
+    );
+    assert!(output.args.is_none());
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 1)]
+#[serial]
+async fn fails_closed_when_opted_in_by_language_and_nix_absent() {
+    reset_wrap_env();
+    let restore = stub_missing_nix();
+
+    let mut sandbox = create_empty_moon_sandbox();
+    // A C project opted into fail-closed nix via `failClosedByLanguage` (the other
+    // opt-in half from `failClosedByTag`).
+    sandbox
+        .host_funcs
+        .mock_load_project(|_id| serde_json::json!({ "language": "c" }));
+    let plugin = sandbox.create_toolchain("nix").await;
+
+    let mut input = command_input("cmake", &["--build", "."]);
+    input.context = plugin.create_context();
+    input.project = serde_json::from_value(
+        serde_json::json!({ "id": "game-worldgen", "source": "packages/game/game-worldgen" }),
+    )
+    .unwrap();
+    input.task.target = serde_json::from_value(serde_json::json!("game-worldgen:build")).unwrap();
+    input.toolchain_config = serde_json::json!({ "failClosedByLanguage": ["c"] });
+
+    let result: Result<ExtendTaskCommandOutput, _> = plugin
+        .plugin
+        .call_func_with("extend_task_command", input)
+        .await;
+
+    restore();
+    let err = result.expect_err("language-opted-in task must fail when nix is absent");
+    let message = format!("{err:?}");
+    assert!(message.contains("nix is required"), "got: {message}");
+    assert!(
+        message.contains("game-worldgen:build"),
+        "error must name <project>:<task>, got: {message}"
+    );
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 1)]
+#[serial]
+async fn sentinel_outranks_fail_closed() {
+    reset_wrap_env();
+    // Already wrapped: the MOON_NIX_WRAPPED guard wins above the nix probe, so an
+    // opted-in, nix-absent task is a no-op rather than a fail-closed error.
+    std::env::set_var(SENTINEL, "1");
+    let restore = stub_missing_nix();
+
+    let mut sandbox = create_empty_moon_sandbox();
+    sandbox
+        .host_funcs
+        .mock_load_project(|_id| serde_json::json!({ "config": { "tags": ["cmake"] } }));
+    let plugin = sandbox.create_toolchain("nix").await;
+
+    let mut input = command_input("cmake", &["--build", "."]);
+    input.toolchain_config = serde_json::json!({ "failClosedByTag": ["cmake"] });
+    let output = plugin.extend_task_command(input).await;
+
+    restore();
+    std::env::remove_var(SENTINEL);
+
+    assert_eq!(
+        output.command, None,
+        "MOON_NIX_WRAPPED must win over fail-closed: no wrap and no error"
+    );
+    assert!(output.args.is_none());
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 1)]
+#[serial]
+async fn no_host_load_when_allowlists_empty() {
+    reset_wrap_env();
+    let restore = stub_missing_nix();
+
+    let mut sandbox = create_empty_moon_sandbox();
+    // With no `failClosed*` configured (the common case for every current consumer),
+    // the fail-closed check must short-circuit before any host project load — a load
+    // here panics the host mock, failing the test.
+    sandbox
+        .host_funcs
+        .mock_load_project(|_id| panic!("must not load project when both allowlists are empty"));
+    let plugin = sandbox.create_toolchain("nix").await;
+
+    let output = plugin
+        .extend_task_command(command_input("echo", &["hi"]))
+        .await;
+
+    restore();
+    assert_eq!(
+        output.command, None,
+        "non-opted nix-absent task must stay a no-op without loading the project"
+    );
+    assert!(output.args.is_none());
 }

@@ -5,6 +5,7 @@
 ### Minor Changes
 
 - Define a typed, schema-validated toolchain config. Implements the moon_pdk_api `define_toolchain_config` hook, which registers a JSON schema for `shell`, `shellByTask`, `shellByToolchain`, `shellByTag`, and `shellByLanguage`, so moon validates these keys (unknown key, wrong type) at config-load time instead of silently ignoring them. The plugin now reads a typed `NixToolchainConfig` struct internally rather than probing an untyped `serde_json::Value`; devShell precedence and the lazy project load are unchanged.
+- Fail closed for opted-in tasks when `nix` is unavailable. New `failClosedByTag` and `failClosedByLanguage` allowlists name the project tags/languages whose tasks MUST run inside nix; when `nix` is absent for such a task the plugin errors (`nix is required for <project>:<task> …`) instead of silently using host tools. Tasks outside the allowlists keep the no-op fallback, and the `IN_NIX_SHELL` / `MOON_NIX_WRAPPED` double-entry guards still no-op unconditionally. Both allowlists default to empty, so existing consumers are unaffected until they opt in (e.g. drodan's game/C via `failClosedByTag: [cmake]`).
 
 ## 0.5.0
 
