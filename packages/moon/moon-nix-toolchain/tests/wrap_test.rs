@@ -388,6 +388,53 @@ async fn wraps_in_project_flake_when_project_has_one() {
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
 #[serial]
+async fn define_toolchain_config_exposes_camel_case_schema() {
+    let sandbox = create_empty_moon_sandbox();
+    let plugin = sandbox.create_toolchain("nix").await;
+
+    let output: DefineToolchainConfigOutput = plugin
+        .plugin
+        .call_func("define_toolchain_config")
+        .await
+        .unwrap();
+
+    let rendered = serde_json::to_value(&output.schema).unwrap().to_string();
+    for key in [
+        "shell",
+        "shellByTask",
+        "shellByToolchain",
+        "shellByTag",
+        "shellByLanguage",
+    ] {
+        assert!(
+            rendered.contains(key),
+            "schema should expose `{key}`: {rendered}"
+        );
+    }
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 1)]
+#[serial]
+async fn typed_config_defaults_to_flake_default_shell() {
+    reset_wrap_env();
+
+    let sandbox = create_empty_moon_sandbox();
+    let plugin = sandbox.create_toolchain("nix").await;
+
+    // No toolchain config: parse yields struct defaults, so no `#shell` suffix.
+    let output = plugin
+        .extend_task_command(command_input("cargo", &["build"]))
+        .await;
+
+    assert!(
+        !flake_ref(&output).contains('#'),
+        "an unset config must select the default devShell, got: {}",
+        flake_ref(&output)
+    );
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 1)]
+#[serial]
 async fn uses_workspace_flake_when_project_has_no_flake() {
     reset_wrap_env();
 

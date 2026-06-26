@@ -1,5 +1,11 @@
 # @xonovex/moon-nix-toolchain
 
+## 0.6.0
+
+### Minor Changes
+
+- Define a typed, schema-validated toolchain config. Implements the moon_pdk_api `define_toolchain_config` hook, which registers a JSON schema for `shell`, `shellByTask`, `shellByToolchain`, `shellByTag`, and `shellByLanguage`, so moon validates these keys (unknown key, wrong type) at config-load time instead of silently ignoring them. The plugin now reads a typed `NixToolchainConfig` struct internally rather than probing an untyped `serde_json::Value`; devShell precedence and the lazy project load are unchanged.
+
 ## 0.5.0
 
 ### Minor Changes
