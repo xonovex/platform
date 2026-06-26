@@ -10,7 +10,11 @@ Monorepo for Xonovex tools and configuration packages, all code under `packages/
 - **`agent`**: CLI tools (agent-cli-go) and K8s operator (agent-operator-go)
 - **`shared`**: shared libraries (shared-core, shared-core-go, shared-agent-go)
 - **`skill`**: coding guidelines and skills
-- **`diagram`**: diagrams (action graph, workflow)
+- **`command`**: command plugins (command-utility, command-workflow)
+- **`diagram`**: diagrams (agent workflow, moon action, sandbox isolation)
+- **`docker`**: Docker images (docker-agent)
+- **`moon`**: moon toolchain plugins (moon-nix-toolchain)
+- **`script`**: moon action scripts (version bump, npm publish, skill audit)
 - **`asset`**: static assets
 
 ### Workflow
