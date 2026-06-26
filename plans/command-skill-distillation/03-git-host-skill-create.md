@@ -3,7 +3,7 @@ type: plan
 has_subplans: false
 parent_plan: plans/command-skill-distillation.md
 parallel_group: 2
-status: pending
+status: complete
 feature: command-skill-distillation
 dependencies:
   plans:
@@ -25,11 +25,11 @@ dependencies:
     - .claude-plugin/marketplace.json
 skills_to_consult: [skill-guide, command-guide, moon-guide, git-guide, code-review-guide]
 validation:
-  type_check: pending
-  lint: pending
-  build: pending
-  tests: pending
-  integration: pending
+  type_check: n/a
+  lint: pass
+  build: pass
+  tests: n/a
+  integration: pass
 ---
 
 # 03 — git-host-skill-create
@@ -228,18 +228,18 @@ methodology), **not** in `git-host-guide`. `git-host-guide` owns only host I/O.
 
 ## Success Criteria
 
-- [ ] `packages/skill/skill-git-host/` exists with `moon.yml` (`tags:[skill]`, echo build),
+- [x] `packages/skill/skill-git-host/` exists with `moon.yml` (`tags:[skill]`, echo build),
       `package.json` (`@xonovex/skill-git-host`), `prettier.config.ts`, and both
       `.claude-plugin/plugin.json` (`skills` array) + `.codex-plugin/plugin.json` (`skills` string).
-- [ ] `git-host-guide/SKILL.md` has `name: git-host-guide`, the host-delivery description,
+- [x] `git-host-guide/SKILL.md` has `name: git-host-guide`, the host-delivery description,
       and Essentials + Operations + Progressive Disclosure sections.
-- [ ] `git-host-guide/references/{create,review-post,review-resolve}.md` carry the host-driving
+- [x] `git-host-guide/references/{create,review-post,review-resolve}.md` carry the host-driving
       procedures lifted from the three `pr-*` command bodies, craft excluded.
-- [ ] `code-review-guide` has `references/{findings-schema,review-analyze,review-refine}.md`,
+- [x] `code-review-guide` has `references/{findings-schema,review-analyze,review-refine}.md`,
       the findings schema has exactly one owner, and matching disclosure bullets are in SKILL.md.
-- [ ] `code-review-guide/SKILL.md`'s "matching host skill" reference resolves to `git-host-guide`.
-- [ ] `xonovex-skill-git-host` is registered in `.claude-plugin/marketplace.json`.
-- [ ] fmt:check, `moon build`, and JSON validity are green on all touched packages; the skill
+- [x] `code-review-guide/SKILL.md`'s "matching host skill" reference resolves to `git-host-guide`.
+- [x] `xonovex-skill-git-host` is registered in `.claude-plugin/marketplace.json`.
+- [x] fmt:check, `moon build`, and JSON validity are green on all touched packages; the skill
       loads and every progressive-disclosure pointer resolves.
 
 ## Files Modified / Created

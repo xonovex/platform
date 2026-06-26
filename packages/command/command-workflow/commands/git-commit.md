@@ -3,20 +3,13 @@ description: Commit and push changes in the current or a specified directory
 allowed-tools:
   - Bash
   - Read
+  - Skill
 argument-hint: >-
   [message] [--type <feat|fix|docs|chore|refactor|test|ci>] [--path <path>]
   [--remote <remote>] [--branch <branch>] [--push] [--dry-run] [--interactive]
 ---
 
-# /xonovex-workflow:git-commit – Auto-Commit with Smart Messages
-
-Commits changes in a directory with conventional commit format. Automatically generates commit messages based on changed files and plan context.
-
-## Goal
-
-- Auto-commit changes with conventional format
-- Auto-generate messages from changed files and plan context
-- Support interactive mode and optional push
+# /xonovex-workflow:git-commit — Auto-Commit with Smart Messages
 
 ## Arguments
 
@@ -31,126 +24,8 @@ Commits changes in a directory with conventional commit format. Automatically ge
 - `--dry-run` (optional): Preview without committing
 - `--interactive` (optional): Show suggestions and prompt for selection instead of auto-committing
 
-## Core Workflow
+## Delegation
 
-**IMPORTANT: Always auto-commit immediately without prompting. Never ask the user to select a suggestion unless `--interactive` flag is explicitly provided.**
-
-1. **Navigate**: Change to specified `--path` (if provided)
-2. **Check Status**: Detect uncommitted changes and unpushed commits
-3. **Analyze Changes**: Examine changed files to determine type and message
-4. **Generate Message**: Pick the best commit message automatically
-5. **Commit Immediately**: Stage and commit without asking - do NOT show suggestions or ask for confirmation
-6. **Push**: Optionally push to specified remote and branch
-
-Exception: Only show suggestions and prompt for selection when `--interactive` flag is explicitly provided.
-
-## Smart Suggestion Logic
-
-**Type Detection** – Analyze changed files:
-
-| Pattern                                   | Type       |
-| ----------------------------------------- | ---------- |
-| `*.test.ts`, `*.spec.ts`                  | `test`     |
-| `*.md` under `docs/`                      | `docs`     |
-| CI config files                           | `ci`       |
-| `package.json`, lockfiles, project config | `chore`    |
-| New files in `src/`                       | `feat`     |
-| Small modifications in `src/`             | `fix`      |
-| Large changesets across many files        | `refactor` |
-
-Default: `chore` if nothing else matches.
-
-**Message Generation** – Based on:
-
-1. File patterns (extract package/feature names)
-2. Diff stats (gauge scope)
-3. Plan context (from git config)
-4. Common operations (add/update/fix/remove)
-
-## Implementation Steps
-
-1. **Change Directory**: `cd <path>` (if `--path` specified)
-2. **Check Git Status**: `git status --porcelain` for changes
-3. **Analyze Changes** (if no message provided):
-   - Run: `git diff --stat HEAD`, `git status --porcelain`
-   - Detect type from file patterns
-   - Generate the best commit message
-4. **If Message Provided**: Use directly (skip generation)
-5. **Determine Type**:
-   - Use `--type` if provided
-   - Use detected type from file analysis
-   - Default to "chore"
-6. **Commit Immediately**: `git add -A && git commit -m "<type>: <message>"`
-   - Do NOT prompt or show suggestions (unless `--interactive`)
-   - Just commit with the best generated message
-7. **Push** (if --push):
-   - Get remote: `git config branch.<branch>.remote` or use `--remote` or default to "origin"
-   - Get branch: Use `--branch` or `git branch --show-current`
-   - Push: `git push -o ci.skip <remote> HEAD:<branch>`
-
-## Commit Format
-
-**Format**: `<type>: <description>` (lowercase, no footers)
-
-**Types**: `chore`, `feat`, `fix`, `docs`, `refactor`, `test`, `ci`
-
-## Output
-
-**Default mode (auto-commit, no prompts):**
-
-```
-Commit: /path/to/repo
-Changed: 14 files (+588, -210)
-Type: chore
-
-Committed: chore: game-common consistency fixes (a3b2c1d)
-```
-
-**Interactive mode (`--interactive` flag):**
-
-```
-Suggestions:
-  1. docs: add implementation guide
-  2. feat: implement core logic
-Select [1-2]: 1
-
-Committed: docs: add implementation guide (a3b2c1d)
-```
-
-## Error Handling
-
-- Error if not in a git repository
-- Warning if no changes to commit (working tree clean)
-- Error if commit fails (show git error)
-- Warning if push fails (show git error, commit still succeeded)
-- Error if `--path` directory doesn't exist
-- Warning if large number of files changed (suggest splitting commit)
-
-## Gotchas
-
-- Auto-detecting `refactor` when the changeset spans many files often misses a more specific intent (`feat` / `fix`) — interactive mode is safer for very large diffs
-- Pushing with `-o ci.skip` skips CI on the push; remove the option when you actually want CI to run
-- Default mode commits without asking — risky on dirty working trees with mixed-intent changes; either pre-stage or use interactive mode
-- A stale `branch.<branch>.plan` git config can inject irrelevant plan context into the message — clear it when starting unrelated work
-
-## Examples
-
-```bash
-# Auto-commit with generated message
-/xonovex-workflow:git-commit
-
-# Interactive selection
-/xonovex-workflow:git-commit --interactive
-
-# Explicit message and push
-/xonovex-workflow:git-commit "fix validation bug" --type fix --push
-
-# Auto-commit in specific directory
-/xonovex-workflow:git-commit --path ./services
-
-# Preview what would be committed
-/xonovex-workflow:git-commit --dry-run
-
-# Commit and push to specific branch
-/xonovex-workflow:git-commit --branch develop --remote origin --push
-```
+Load the `git-guide` skill (plugin `xonovex-skill-git`) and perform its **commit**
+operation with these arguments. The skill is the source of truth for the procedure,
+output format, and gotchas — do not restate them.

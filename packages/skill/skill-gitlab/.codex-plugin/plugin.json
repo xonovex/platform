@@ -1,0 +1,9 @@
+{
+  "name": "xonovex-skill-gitlab",
+  "version": "3.1.0",
+  "description": "Xonovex GitLab host delivery skills",
+  "author": {
+    "name": "Xonovex"
+  },
+  "skills": "./gitlab-guide"
+}

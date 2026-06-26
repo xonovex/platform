@@ -16,6 +16,7 @@
 
 - **Last reviewed:** 2026-06-24
 - **Used for:** the summary-plus-inline structure, cross-linking instead of ordinal references, verify-before-assert (read the branch, confirm component / API signatures via the relevant design-system or library skill before suggesting a fix), and the house writing style (no em-dash / semicolon / ellipsis in review prose) mined from a real Bitbucket PR review
+- **Also used for:** the platform-independent findings pipeline — `references/findings-schema.md` (canonical findings shape, new-file hunk anchoring), `references/review-analyze.md` (diff → findings, effort dial, prior-findings comparison), `references/review-refine.md` (per-finding operations, label discipline) — distilled from the in-repo `pr-review-analyze` / `pr-review-refine` / `pr-review-post` command bodies; host delivery of these findings lives in the host skills (`github-guide` / `gitlab-guide`)
 
 ## Refresh Workflow
 

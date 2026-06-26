@@ -18,12 +18,21 @@ codex plugin marketplace add xonovex/platform
 codex plugin add xonovex-utility@xonovex-marketplace
 ```
 
+### Dependencies
+
+Each command delegates its procedure to a guideline skill, declared in `plugin.json`
+`dependencies`. On Claude Code, installing this plugin auto-installs those skills; if a
+depended-on skill is missing the command is disabled with `dependency-unsatisfied`. On
+Codex, `dependencies` is not auto-installed — install the delegated skill plugins
+alongside this one.
+
 ## Commands
 
 ### Content
 
 | Command                   | Description                                                                 |
 | ------------------------- | --------------------------------------------------------------------------- |
+| `content-humanize`        | Remove AI writing patterns and add human voice                              |
 | `content-news-add`        | Auto-curate latest news stories on a topic and generate bilingual content   |
 | `content-travelguide-add` | Create a comprehensive, multi-language travel guide for a topic or location |
 

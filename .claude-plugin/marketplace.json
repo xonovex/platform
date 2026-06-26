@@ -3,7 +3,7 @@
   "owner": { "name": "Xonovex" },
   "metadata": {
     "description": "Official Xonovex development tools",
-    "version": "3.0.0"
+    "version": "3.1.0"
   },
   "plugins": [
     { "name": "xonovex-utility", "source": "./packages/command/command-utility", "description": "Xonovex utility commands — skills, instructions, insights, content" },
@@ -33,6 +33,8 @@
     { "name": "xonovex-skill-general-fp", "source": "./packages/skill/skill-general-fp", "description": "Xonovex Functional programming skills" },
     { "name": "xonovex-skill-general-oop", "source": "./packages/skill/skill-general-oop", "description": "Xonovex Object-oriented programming skills" },
     { "name": "xonovex-skill-git", "source": "./packages/skill/skill-git", "description": "Xonovex Git skills" },
+    { "name": "xonovex-skill-github", "source": "./packages/skill/skill-github", "description": "Xonovex GitHub host delivery skills" },
+    { "name": "xonovex-skill-gitlab", "source": "./packages/skill/skill-gitlab", "description": "Xonovex GitLab host delivery skills" },
     { "name": "xonovex-skill-gpu-rendering", "source": "./packages/skill/skill-gpu-rendering", "description": "Xonovex GPU rendering skills" },
     { "name": "xonovex-skill-gpu-rendering-vulkan", "source": "./packages/skill/skill-gpu-rendering-vulkan", "description": "Xonovex GPU rendering (Vulkan) skills" },
     { "name": "xonovex-skill-hono", "source": "./packages/skill/skill-hono", "description": "Xonovex Hono skills" },

@@ -3,7 +3,7 @@ type: plan
 has_subplans: false
 parent_plan: plans/command-skill-distillation.md
 parallel_group: 2
-status: pending
+status: complete
 feature: command-skill-distillation
 dependencies:
   plans:
@@ -29,11 +29,11 @@ dependencies:
     - packages/command/command-workflow/.codex-plugin/plugin.json
 skills_to_consult: [command-guide, git-guide, pull-request-guide, code-review-guide]
 validation:
-  type_check: pending
-  lint: pending
-  build: pending
-  tests: pending
-  integration: pending
+  type_check: n/a
+  lint: pass
+  build: pass
+  tests: n/a
+  integration: documented
 ---
 
 # 02 — Workflow plan-* and git Distillation

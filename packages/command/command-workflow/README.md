@@ -18,6 +18,20 @@ codex plugin marketplace add xonovex/platform
 codex plugin add xonovex-workflow@xonovex-marketplace
 ```
 
+### Dependencies
+
+Each command delegates its procedure to a guideline skill, declared in `plugin.json`
+`dependencies`. On Claude Code, installing this plugin auto-installs those skills; if a
+depended-on skill is missing the command is disabled with `dependency-unsatisfied`. On
+Codex, `dependencies` is not auto-installed — install the delegated skill plugins
+alongside this one.
+
+The `pr-*` commands additionally load a **host-delivery skill** chosen from the git remote
+to open PRs/MRs and post reviews — `xonovex-skill-github` (GitHub), `xonovex-skill-gitlab`
+(GitLab), or another `xonovex-skill-<host>`. These are pluggable, not hard dependencies:
+install the one matching your host. With none installed, the `pr-*` commands still load and
+tell you which host skill to add.
+
 ```
 +---------------------+     +---------------------+     +---------------------+
 |      Research       |     |      Planning       |     |   Worktree Setup    |

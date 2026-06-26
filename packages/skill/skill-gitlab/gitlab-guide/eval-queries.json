@@ -1,0 +1,86 @@
+[
+  {
+    "query": "open a merge request against main with glab on this GitLab repo",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "create MR via glab — core op"
+  },
+  {
+    "query": "I pushed my branch, now create an MR on gitlab.com and add reviewers",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "create MR with reviewers/labels"
+  },
+  {
+    "query": "post an inline review comment anchored to line 42 of a file on a GitLab merge request",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "position-anchored discussion via POST /discussions"
+  },
+  {
+    "query": "my inline MR comment came back as a plain note instead of attaching to the diff — what's wrong with the position SHAs?",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "DiffNote downgrade / three-SHA position model"
+  },
+  {
+    "query": "resolve the discussion thread on my GitLab merge request and reply in it",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "resolve thread via PUT discussions?resolved=true"
+  },
+  {
+    "query": "block this MR from merging until my feedback is addressed without the Premium request-changes feature",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "withhold approval / unresolved threads gating"
+  },
+  {
+    "query": "what token scope does glab need to create a merge request and post comments — is read_api enough?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "api vs read_api scope question"
+  },
+  {
+    "query": "set up glab against our self-managed GitLab instance and verify access",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "auth login --hostname / onboarding / read verify"
+  },
+  {
+    "query": "approve a merge request from the command line on GitLab",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "glab mr approve verdict"
+  },
+  {
+    "query": "why does a second glab mr create on the same branch fail with 409?",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "one-open-MR-per-branch idempotency"
+  },
+  {
+    "query": "open a pull request and request reviewers on a GitHub-hosted repo with gh",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: GitHub host, not GitLab"
+  },
+  {
+    "query": "rebase my feature branch onto origin/main and force-push before opening the MR",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: local git rebase/push, use git-guide"
+  },
+  {
+    "query": "how should I label my review feedback blocking vs non-blocking and structure the summary?",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near-miss: review comment craft, use code-review-guide"
+  },
+  {
+    "query": "what should I write in the pull request description and how do I split a large change?",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: PR description craft, use pull-request-guide"
+  }
+]

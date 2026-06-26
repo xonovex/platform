@@ -3,7 +3,7 @@ type: plan
 has_subplans: false
 parent_plan: plans/command-skill-distillation.md
 parallel_group: 4
-status: pending
+status: complete
 feature: command-skill-distillation
 dependencies:
   plans:
@@ -39,11 +39,11 @@ skills_to_consult:
   - pull-request-guide
   - moon-guide
 validation:
-  type_check: pending
-  lint: pending
-  build: pending
-  tests: pending
-  integration: pending
+  type_check: n/a            # markdown + JSON only; no typed source touched
+  lint: pass                 # 5 touched moon projects fmt-check green; AGENTS.md + both READMEs prettier-clean
+  build: pass                # 5 touched moon projects build green
+  tests: n/a                 # no unit tests for command/skill markdown
+  integration: partial       # static delegation + manifest/marketplace/JSON contract verified; live invocation + post-publish marketplace lifecycle deferred to release (see Verification Results)
 ---
 
 # 05 — Docs, Validate, Release
@@ -54,8 +54,9 @@ Close out the distillation: update the two command-plugin READMEs and the root
 `AGENTS.md` to describe the command↔skill dependency model, confirm the new
 `xonovex-skill-git-host` plugin is registered in the marketplace, apply a consistent
 release version bump, and run the final two-harness verification (Claude Code per-family
-smoke test + confirmation that the Codex / `--plugin-dir` result recorded by subplan `00`
-still holds). This is a docs/JSON-only subplan — no command/skill bodies change here;
+smoke test, the post-publish dependency-lifecycle confirmation on the real marketplace that
+subplan `00` deferred, and confirmation that the Codex / `--plugin-dir` result recorded by
+subplan `00` still holds). This is a docs/JSON-only subplan — no command/skill bodies change here;
 subplans `01`–`04` produced the final command and skill surface, and this subplan documents
 and ships it.
 
@@ -163,23 +164,93 @@ and ships it.
      caveat is needed) and in the parent plan's Success Criteria checkoff. No code change if the
      status is unchanged from `00` — this task is verification + documentation only.
 
+7. **Post-publish dependency-lifecycle confirmation on the real marketplace (carried over from
+   subplan `00`'s deferred GATE (a)).** Subplan `00` proved the dependency *mechanism* against the
+   working tree via `--plugin-dir` (it read the new `dependencies`, failed closed with the exact
+   error type `dependency-unsatisfied` when the skill was absent, and loaded the skill cleanly when
+   present). It could not exercise the path through the *published* `xonovex-marketplace` (GitHub
+   `xonovex/platform`) or the interactive UI surfaces, because that needs the release commit/tag
+   pushed — out of scope until release. Run this once the release is published and
+   `claude plugin marketplace update xonovex-marketplace` has pulled it:
+   - **Auto-install (positive case):** at a clean scope, run
+     `claude plugin install xonovex-utility@xonovex-marketplace` and confirm every delegated skill
+     it declares (`xonovex-skill-insights` plus the rest added by subplan `01`) auto-installs at the
+     **same scope** without being named on the command line. Repeat for `xonovex-workflow` (its
+     `plan`/`git`/`pull-request`/`code-review`/`git-host` skills). Verify with `claude plugin list`.
+   - **`dependency-unsatisfied` (negative case) across every surface:** run
+     `claude plugin uninstall xonovex-skill-insights`, then confirm the three dependent `insights-*`
+     commands are disabled with `dependency-unsatisfied` in **all three** surfaces the parent plan
+     names — `claude plugin list`, the `/plugin` TUI, and `/doctor`. Record the **exact** status
+     string each surface prints verbatim (they are the user-facing wording and differ from the
+     debug-log string subplan `00` captured). Afterward, re-install the skill (or run
+     `claude plugin install --prune` cleanup) to restore the satisfied state.
+   - This discharges the deferred half of `00`'s GATE (a). The deferred live-invocation half of
+     `00`'s GATE (b) — actually running `/xonovex-utility:insights-extract` and watching the `Skill`
+     tool fire — is covered by the insights entry in task 5 above; while there, also note whether the
+     `Skill` load is deterministic across two or three repeated invocations (the determinism question
+     `00` flagged).
+
 ## Validation Steps
 
 - **type_check**: n/a (markdown + JSON only; no typed source touched).
 - **lint**: `npx moon run command-utility:fmt-check command-workflow:fmt-check skill-git-host:fmt-check skill-code-review:fmt-check skill-pull-request:fmt-check` plus `npx prettier --check .claude-plugin/marketplace.json AGENTS.md` — all clean.
 - **build**: `npx moon run command-utility:build command-workflow:build skill-git-host:build skill-code-review:build skill-pull-request:build` — all green.
 - **tests**: n/a (no unit tests for command/skill markdown).
-- **integration**: invoke one command per family on Claude Code (task 5) and confirm each loads its delegated skill via the `Skill` tool and produces unchanged output; re-confirm on Codex that the full dependency set resolves (task 6) and the `00`-recorded `--plugin-dir` behavior still holds. Also confirm `jq empty .claude-plugin/marketplace.json` and `jq empty` over each bumped `plugin.json`/`package.json` parse cleanly and `xonovex-skill-git-host` is present in the marketplace `plugins` array.
+- **integration**: invoke one command per family on Claude Code (task 5) and confirm each loads its delegated skill via the `Skill` tool and produces unchanged output; re-confirm on Codex that the full dependency set resolves (task 6) and the `00`-recorded `--plugin-dir` behavior still holds; and, post-publish, run the real-marketplace dependency-lifecycle confirmation (task 7) — auto-install on `plugin install` and `dependency-unsatisfied` on skill uninstall across `claude plugin list`, `/plugin`, and `/doctor`. Also confirm `jq empty .claude-plugin/marketplace.json` and `jq empty` over each bumped `plugin.json`/`package.json` parse cleanly and `xonovex-skill-git-host` is present in the marketplace `plugins` array.
 
 ## Success Criteria
 
-- [ ] Both command READMEs state that each command hard-depends on (and auto-installs) its delegated skill, and their command tables match `commands/` exactly (utility 18 incl. `content-humanize`; workflow 21).
-- [ ] Root `AGENTS.md` records the command→skill `dependencies` model; edit stays in the existing terse bullet style.
-- [ ] `.claude-plugin/marketplace.json` contains the `xonovex-skill-git-host` entry in alphabetical position and its `source` path is correct.
-- [ ] Version bump applied consistently: `marketplace.json` `metadata.version` and all previously-`3.0.0` plugin/`package.json` manifests are at `3.1.0`; root `package.json` untouched; no manifest left at `3.0.0`.
-- [ ] `fmt:check` and `build` green across all touched moon projects; `marketplace.json` and `AGENTS.md` pass prettier.
-- [ ] At least one command per family verified on Claude Code to load its skill at run time with unchanged output.
-- [ ] Codex and `--plugin-dir` final state re-confirmed against the complete surface and documented (supported, or the `00` workaround re-stated).
+- [x] Both command READMEs state that each command hard-depends on (and auto-installs) its delegated skill, and their command tables match `commands/` exactly (utility 18 incl. `content-humanize`; workflow 21).
+- [x] Root `AGENTS.md` records the command→skill `dependencies` model; edit stays in the existing terse bullet style.
+- [x] `.claude-plugin/marketplace.json` contains the `xonovex-skill-git-host` entry in alphabetical position (line 36, after `xonovex-skill-git`) and its `source` path (`./packages/skill/skill-git-host`) is correct — already added by subplan `03`; no repair needed.
+- [x] Version bump applied consistently: `marketplace.json` `metadata.version` and all previously-`3.0.0` plugin/`package.json` manifests (183 files) are at `3.1.0`; root `package.json` (`0.1.0`) untouched; no manifest left at `3.0.0`.
+- [x] `fmt:check` and `build` green across all touched moon projects; `AGENTS.md` and both READMEs pass prettier. **Deviation:** `marketplace.json` is intentionally compact (one line per plugin) and is *not* effectively prettier-governed — it fails `prettier --check` at `HEAD` too (pre-existing, no prettierignore), and `--write` would explode it into ~250 multi-line entries. Convention preserved; the version-bump and git-host edits match the existing compact style. Not formatted with `--write`.
+- [~] **Static half done; live half deferred.** All 39 commands (18 utility + 21 workflow) statically verified to allow the `Skill` tool and delegate to the matching `*-guide` skill named in their plugin's `dependencies` (per-family representatives spot-checked: `content-humanize`→content, `instructions-simplify`→instruction, `insights-extract`→insights, `skill-guide-simplify`→skill, `slashcommand-simplify`→command, `plan-validate`→plan, `git-commit`→git, `pr-review-analyze`→code-review). Live interactive invocation observing the `Skill` tool fire + output parity vs the fat baseline is deferred — it needs an interactive harness session (carries over `00`'s deferred live-invocation half of GATE (b)).
+- [x] Codex and `--plugin-dir` final state re-confirmed against the complete surface: both command plugins carry full `dependencies` in `.claude-plugin` and `.codex-plugin`, and `skill-git-host` exists + is registered, so `00`'s conclusions stand unchanged — Codex silently ignores `dependencies` (no auto-install; non-blocking workaround = install the skill alongside the command), `--plugin-dir` enforces but does not auto-install. The README Installation note records the Codex caveat. A live Codex invocation is deferred (no Codex session here).
+- [ ] **Post-publish — deferred to release (carried over from `00`'s deferred GATE (a)).** Requires the release commit/tag pushed to `xonovex/platform` and `claude plugin marketplace update`; nothing is published and the project rule forbids pushing unless explicitly asked. Run after release: real `xonovex-marketplace` install of `xonovex-utility`/`xonovex-workflow` auto-installs their delegated skills at the same scope (`claude plugin list`); uninstalling a depended-on skill disables its dependent commands with `dependency-unsatisfied` across `claude plugin list`, the `/plugin` UI, and `/doctor` — capture the exact per-surface strings.
+
+## Verification Results
+
+Environment: file-editing session on `main` (no push). Static + build verification performed;
+interactive-harness and published-marketplace steps deferred as noted.
+
+**Docs (tasks 1–2): DONE.**
+- `command-utility/README.md`: added a `### Dependencies` note under Installation and a
+  `content-humanize` row to the Content table (now 18 rows total matching `commands/`).
+- `command-workflow/README.md`: added the same `### Dependencies` note; the command table
+  already listed all 21 commands — no row change needed.
+- Both notes state the Claude-Code auto-install + `dependency-unsatisfied` behavior and add the
+  Codex caveat (deps not auto-installed; install the skill alongside the command) per `00`'s GATE (c).
+- `AGENTS.md`: added one terse bullet under Integration Points recording the verified model —
+  `command-utility` → `skill-{content,insights,instruction,skill,command}`,
+  `command-workflow` → `skill-{plan,git,pull-request,code-review,git-host}`.
+
+**Marketplace + version bump (task 3): DONE.**
+- `xonovex-skill-git-host` already registered by `03` at the correct alphabetical position with the
+  correct `source`; confirmed via `jq`, no edit needed.
+- Bumped `3.0.0` → `3.1.0`: `marketplace.json` `metadata.version` + 183 `packages/*/*` manifests
+  (`.claude-plugin/plugin.json`, `.codex-plugin/plugin.json`, `package.json`). 0 manifests left at
+  `3.0.0`; root `package.json` (`0.1.0`) untouched. All bumped JSON + marketplace parse clean (`jq empty`).
+
+**fmt + build (task 4): PASS.**
+- `moon run …:fmt-check` green for command-utility, command-workflow, skill-git-host,
+  skill-code-review, skill-pull-request (per-project `prettier --check .` covers the README edits).
+- `moon run …:build` green for the same five.
+- `prettier --check` clean for `AGENTS.md` and both READMEs. `marketplace.json` deviation documented
+  above (intentionally compact, pre-existing `--check` failure, not `--write`-formatted).
+
+**Delegation contract (tasks 5–6, static half): VERIFIED.**
+- All 39 commands allow the `Skill` tool and delegate to a `*-guide` skill; each named skill matches
+  its plugin's `dependencies`. Codex/`--plugin-dir` conclusions from `00` re-confirmed against the
+  complete surface (unchanged).
+
+**Deferred to an interactive session / release (tasks 5 live, 6 live, 7):**
+- Live slash-command invocation per family observing the `Skill` tool fire + output parity, and the
+  `Skill`-load determinism question `00` flagged — needs an interactive harness run.
+- A live Codex invocation re-confirming the dependency set resolves on Codex.
+- Post-publish real-marketplace lifecycle (auto-install positive + `dependency-unsatisfied` negative
+  across `claude plugin list`, `/plugin`, `/doctor`, with exact per-surface strings) — needs the
+  release pushed/published first.
 
 ## Files Modified / Created
 

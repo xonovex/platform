@@ -35,3 +35,4 @@ Monorepo for Xonovex tools and configuration packages, all code under `packages/
 ## Integration Points
 
 - config -> shared -> agent
+- command plugins depend on guideline skills via `plugin.json` `dependencies` (auto-installed on Claude Code): `command-utility` -> `skill-{content,insights,instruction,skill,command}`; `command-workflow` -> `skill-{plan,git,pull-request,code-review}`; the `pr-*` commands additionally load an optional host-delivery skill detected from the remote (`skill-github`, `skill-gitlab`, or another `skill-<host>`), installed separately rather than as a hard dependency
