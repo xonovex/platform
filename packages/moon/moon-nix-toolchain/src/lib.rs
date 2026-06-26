@@ -30,11 +30,66 @@ pub struct NixToolchainConfig {
 
     /// devShell name keyed by the project language.
     pub shell_by_language: HashMap<String, String>,
+
+    /// Project tags whose tasks MUST run inside nix. When `nix` is unavailable for a
+    /// task in a project carrying one of these tags, the plugin errors instead of
+    /// silently falling back to host tools. Empty (the default) = no enforcement.
+    pub fail_closed_by_tag: Vec<String>,
+
+    /// Project languages whose tasks MUST run inside nix — same fail-closed contract
+    /// as `fail_closed_by_tag`, keyed on the project's moon `language`.
+    pub fail_closed_by_language: Vec<String>,
 }
 
 #[host_fn]
 extern "ExtismHost" {
     fn load_project_by_id(id: String) -> Json<serde_json::Value>;
+}
+
+/// Load a project's fragment over the host. The plugin sandbox cannot read the
+/// workspace directly, so tags/language come from moon via `load_project_by_id`.
+fn load_project(project_id: &str) -> AnyResult<serde_json::Value> {
+    Ok(unsafe { load_project_by_id(project_id.to_owned())? }.0)
+}
+
+/// The project's moon tags (`config.tags`), empty when unset.
+fn project_tags(project: &serde_json::Value) -> impl Iterator<Item = &str> {
+    project
+        .get("config")
+        .and_then(|config| config.get("tags"))
+        .and_then(|tags| tags.as_array())
+        .into_iter()
+        .flatten()
+        .filter_map(|tag| tag.as_str())
+}
+
+/// The project's moon `language`, when present.
+fn project_language(project: &serde_json::Value) -> Option<&str> {
+    project
+        .get("language")
+        .and_then(|language| language.as_str())
+}
+
+/// Whether the task's project opted into fail-closed nix: one of its tags is in
+/// `failClosedByTag`, or its language is in `failClosedByLanguage`. Returns
+/// `false` without a host round-trip when both allowlists are empty.
+fn fail_closed_opted_in(project_id: &str, config: &NixToolchainConfig) -> AnyResult<bool> {
+    if config.fail_closed_by_tag.is_empty() && config.fail_closed_by_language.is_empty() {
+        return Ok(false);
+    }
+
+    let project = load_project(project_id)?;
+
+    let tag_opt_in = project_tags(&project)
+        .any(|tag| config.fail_closed_by_tag.iter().any(|allow| allow == tag));
+    let language_opt_in = project_language(&project).is_some_and(|language| {
+        config
+            .fail_closed_by_language
+            .iter()
+            .any(|allow| allow == language)
+    });
+
+    Ok(tag_opt_in || language_opt_in)
 }
 
 #[plugin_fn]
@@ -71,11 +126,15 @@ struct WrapTarget {
 
 /// Return the flake to wrap the task with, or `None` when the task must run
 /// unchanged: already inside a dev shell (CI's outer `nix develop`), already
-/// wrapped, `nix` is unavailable, or no real path resolves. When the task's project
-/// has its own `flake.nix`, that project flake wins over the workspace flake.
+/// wrapped, `nix` is unavailable for a non-opted project, or no real path resolves.
+/// Returns `Err` when `nix` is unavailable but the project opted into fail-closed
+/// nix (see `fail_closed_opted_in`). When the task's project has its own `flake.nix`,
+/// that project flake wins over the workspace flake.
 fn resolve_wrap_target(
     context: &MoonContext,
-    project_source: &str,
+    project: &ProjectFragment,
+    target_id: &str,
+    config: &NixToolchainConfig,
 ) -> AnyResult<Option<WrapTarget>> {
     if !get_host_env_var("IN_NIX_SHELL")?
         .unwrap_or_default()
@@ -89,9 +148,19 @@ fn resolve_wrap_target(
     }
 
     if !command_exists(&get_host_environment()?, "nix") {
+        // Fail closed for opted-in projects: a task that must run inside nix must
+        // not silently fall back to host tools when `nix` is absent.
+        if fail_closed_opted_in(project.id.as_str(), config)? {
+            return Err(anyhow!(
+                "nix is required for `{target_id}` but `nix` was not found on PATH; \
+                 this project opted into fail-closed nix \
+                 (failClosedByTag / failClosedByLanguage)"
+            ));
+        }
         return Ok(None);
     }
 
+    let project_source = project.source.as_str();
     if !project_source.is_empty() {
         if let Some(project_root) = context.workspace_root.join(project_source).real_path() {
             // Detect the project flake over the host: the plugin's sandbox has no
@@ -150,27 +219,18 @@ fn resolve_shell(
     }
 
     if !config.shell_by_tag.is_empty() || !config.shell_by_language.is_empty() {
-        let project = unsafe { load_project_by_id(project_id.to_owned())? }.0;
+        let project = load_project(project_id)?;
 
         if !config.shell_by_tag.is_empty() {
-            let tags = project
-                .get("config")
-                .and_then(|config| config.get("tags"))
-                .and_then(|tags| tags.as_array());
-
-            if let Some(tags) = tags {
-                for tag in tags.iter().filter_map(|tag| tag.as_str()) {
-                    if let Some(value) = config.shell_by_tag.get(tag) {
-                        return Ok(normalize_shell(value));
-                    }
+            for tag in project_tags(&project) {
+                if let Some(value) = config.shell_by_tag.get(tag) {
+                    return Ok(normalize_shell(value));
                 }
             }
         }
 
-        if let Some(value) = project
-            .get("language")
-            .and_then(|language| language.as_str())
-            .and_then(|language| config.shell_by_language.get(language))
+        if let Some(value) =
+            project_language(&project).and_then(|language| config.shell_by_language.get(language))
         {
             return Ok(normalize_shell(value));
         }
@@ -199,7 +259,15 @@ pub fn extend_task_command(
 ) -> FnResult<Json<ExtendTaskCommandOutput>> {
     let mut output = ExtendTaskCommandOutput::default();
 
-    let Some(target) = resolve_wrap_target(&input.context, input.project.source.as_str())? else {
+    let config: NixToolchainConfig = parse_toolchain_config_schema(input.toolchain_config.clone())?;
+
+    let Some(target) = resolve_wrap_target(
+        &input.context,
+        &input.project,
+        input.task.target.id.as_str(),
+        &config,
+    )?
+    else {
         return Ok(Json(output));
     };
 
@@ -208,8 +276,6 @@ pub fn extend_task_command(
     let shell = if target.project_flake {
         None
     } else {
-        let config: NixToolchainConfig =
-            parse_toolchain_config_schema(input.toolchain_config.clone())?;
         resolve_shell(
             input.task.target.get_task_id().ok(),
             &input.task.toolchains,
@@ -242,15 +308,21 @@ pub fn extend_task_script(
 ) -> FnResult<Json<ExtendTaskScriptOutput>> {
     let mut output = ExtendTaskScriptOutput::default();
 
-    let Some(target) = resolve_wrap_target(&input.context, input.project.source.as_str())? else {
+    let config: NixToolchainConfig = parse_toolchain_config_schema(input.toolchain_config.clone())?;
+
+    let Some(target) = resolve_wrap_target(
+        &input.context,
+        &input.project,
+        input.task.target.id.as_str(),
+        &config,
+    )?
+    else {
         return Ok(Json(output));
     };
 
     let shell = if target.project_flake {
         None
     } else {
-        let config: NixToolchainConfig =
-            parse_toolchain_config_schema(input.toolchain_config.clone())?;
         resolve_shell(
             input.task.target.get_task_id().ok(),
             &input.task.toolchains,

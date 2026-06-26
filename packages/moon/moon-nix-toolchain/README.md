@@ -10,7 +10,7 @@ It leaves the task **unchanged** when any guard trips:
 
 - `IN_NIX_SHELL` is set — already in a dev shell (e.g. CI's outer `nix develop`); avoids double-entry.
 - `MOON_NIX_WRAPPED=1` — already wrapped (the sentinel it sets on every wrapped task).
-- `nix` is not on `PATH` — never hard-fails on a host without nix.
+- `nix` is not on `PATH` — never hard-fails on a host without nix, **unless** the project opted into [fail-closed enforcement](#fail-closed-enforcement).
 
 ## Usage
 
@@ -72,6 +72,21 @@ Set `GITHUB_TOKEN` in CI so moon's `github://` resolver isn't rate-limited; moon
 When a project ships its own `flake.nix` (i.e. `<projectRoot>/flake.nix` exists), the plugin wraps that project's tasks with the project flake — `nix develop <projectRoot> --command …` — using the project flake's **default** devShell. This takes precedence over the workspace flake and over the shell selectors above, which name devShells in the workspace flake and therefore do not apply to a project flake.
 
 The project flake is detected from the project source over the host, so it auto-applies to every project that ships one — no per-project config. Projects without their own `flake.nix` are unchanged: the workspace flake plus the resolved devShell. This lets a package pin its own toolchain independently of the workspace flake.
+
+## Fail-closed enforcement
+
+By default a task on a host without `nix` runs unchanged on host tools — convenient, but it silently drops the flake-pinned toolchain. A project can opt out of that silent fallback so its tasks **must** run inside nix:
+
+```yaml
+nix:
+  plugin: 'github://xonovex/platform/moon_nix_toolchain@moon_nix_toolchain-v0.6.0'
+  # Tasks in any project carrying one of these tags MUST run inside nix.
+  failClosedByTag: [cmake]
+  # Or key the same contract on the project language:
+  # failClosedByLanguage: [c, cpp]
+```
+
+When `nix` is absent for a task in an opted-in project, the plugin errors with `nix is required for <project>:<task> …` and the task fails, instead of falling back to host tools. Tasks in projects outside both allowlists keep the silent no-op. The `IN_NIX_SHELL` and `MOON_NIX_WRAPPED` guards still take precedence — a task already inside a dev shell (or already wrapped) never fails closed. Both allowlists are validated against the published schema and default to empty, so existing consumers are unaffected until they opt in.
 
 ## Notes
 

@@ -3,7 +3,7 @@ type: plan
 has_subplans: false
 parent_plan: plans/nix-toolchain-hardening.md
 parallel_group: 2
-status: pending
+status: complete
 dependencies:
   plans: [plugin-typed-config]
   files:
@@ -13,11 +13,11 @@ dependencies:
     - packages/moon/moon-nix-toolchain/README.md
 skills_to_consult: [moon-guide, general-fp-guide, debugging-guide, code-review-guide]
 validation:
-  type_check: pending
-  lint: pending
-  build: pending
-  tests: pending
-  integration: pending
+  type_check: passed
+  lint: passed
+  build: passed
+  tests: passed
+  integration: "passed (hook-level: extend_task_command drives the real plugin and asserts the fail-closed Err; manual cross-repo PATH-strip repro not run)"
 ---
 
 # Plugin: Fail-Closed for Opted-In Tasks When `nix` Is Absent
