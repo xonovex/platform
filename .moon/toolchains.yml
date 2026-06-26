@@ -15,7 +15,7 @@ javascript:
   syncProjectWorkspaceDependencies: true
   dependencyVersionFormat: version-caret
 nix:
-  plugin: 'github://xonovex/platform/moon_nix_toolchain@moon_nix_toolchain-v0.5.0'
+  plugin: 'github://xonovex/platform/moon_nix_toolchain@moon_nix_toolchain-v0.6.0'
   shellByTag:
     go: go
     shell: shell
