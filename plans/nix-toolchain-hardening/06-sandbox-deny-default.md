@@ -3,7 +3,7 @@ type: plan
 has_subplans: false
 parent_plan: plans/nix-toolchain-hardening.md
 parallel_group: 3
-status: pending
+status: complete
 dependencies:
   plans: [sandbox-flake-devshell]
   files:
@@ -16,11 +16,11 @@ dependencies:
     - packages/agent/agent-cli-go/internal/sandbox/registry_test.go
 skills_to_consult: [general-fp-guide, code-review-guide, debugging-guide]
 validation:
-  type_check: pending
-  lint: pending
-  build: pending
-  tests: pending
-  integration: pending
+  type_check: pass
+  lint: pass
+  build: pass
+  tests: pass
+  integration: skipped (live nix flake fixture required; skips cleanly via env gate)
 ---
 
 # Sandbox Deny-Default: Mandate the Pinned Nix(flake) Tier

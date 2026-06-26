@@ -50,6 +50,7 @@ var (
 	flagTerminalDetach       bool
 	flagVCS                  string
 	flagDryRun               bool
+	flagRequirePinned        bool
 )
 
 func init() {
@@ -76,6 +77,8 @@ func init() {
 	runCmd.Flags().BoolVar(&flagTerminalDetach, "terminal-detach", false, "Run in background (detach from terminal)")
 	runCmd.Flags().StringVar(&flagVCS, "vcs", "git", "VCS type for worktree (git, jj)")
 	runCmd.Flags().BoolVarP(&flagDryRun, "dry-run", "n", false, "Show configuration without executing")
+	runCmd.Flags().BoolVar(&flagRequirePinned, "require-pinned-toolchain", false,
+		"Mandate the nix(flake) tier; reject leaky bwrap/none and image-less docker/compose")
 }
 
 func runAgent(cmd *cobra.Command, args []string) error {
@@ -162,7 +165,12 @@ func runAgent(cmd *cobra.Command, args []string) error {
 
 	// Get sandbox executor
 	sandboxMethod := types.SandboxMethod(flagSandbox)
-	sandboxExecutor, err := sandbox.GetExecutor(sandboxMethod)
+	if flagRequirePinned && !cmd.Flags().Changed("sandbox") {
+		// Mandate the pinned tier when the caller did not pick one explicitly.
+		sandboxMethod = types.SandboxNixFlake
+	}
+	policy := types.SandboxPolicy{RequirePinnedToolchain: flagRequirePinned}
+	sandboxExecutor, sandboxMethod, err := sandbox.SelectExecutor(sandboxMethod, flagImage, policy)
 	if err != nil {
 		return err
 	}
@@ -179,6 +187,7 @@ func runAgent(cmd *cobra.Command, args []string) error {
 	// Build sandbox config (used by both sandbox and terminal wrapper)
 	sandboxConfig := &types.SandboxConfig{
 		Method:      sandboxMethod,
+		Policy:      policy,
 		Agent:       agent,
 		Provider:    provider,
 		WorkDir:     workDir,

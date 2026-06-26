@@ -41,3 +41,12 @@ type NixSandboxConfig struct {
 	NixpkgsPin string
 	NoDefaults bool
 }
+
+// FlakeSandboxConfig configures the nixflake sandbox: which flake devShell to enter.
+type FlakeSandboxConfig struct {
+	FlakeRef string // e.g. "/repo" or "git+https://...#rev"; defaults to the bound flake dir
+	Shell    string // attribute under devShells.<system>; defaults to "default"
+}
+
+// DefaultFlakeShell is the devShell attribute used when none is requested.
+const DefaultFlakeShell = "default"

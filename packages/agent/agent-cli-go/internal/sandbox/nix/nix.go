@@ -14,7 +14,12 @@ import (
 	"github.com/xonovex/platform/packages/shared/shared-core-go/pkg/scriptlib"
 )
 
-// Executor implements Nix sandbox using nix-build + bubblewrap
+// Executor implements the Nix sandbox using nix-build + bubblewrap.
+//
+// Isolation: host tools unreachable. buildBwrapArgs ro-binds only /nix/store and
+// the nix-built closure at /env (no host /usr,/lib,/bin), and getSandboxEnvironment
+// points PATH at that closure, so host binaries do not resolve. It satisfies
+// RequirePinnedToolchain.
 type Executor struct{}
 
 // NewExecutor creates a new nix executor
