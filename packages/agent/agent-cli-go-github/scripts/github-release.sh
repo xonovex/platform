@@ -14,7 +14,17 @@ if gh release view "$TAG" >/dev/null 2>&1; then
   exit 0
 fi
 
-CHANGELOG=$(awk '/^## /{if(p)exit; p=1} p' "$CLI_DIR/CHANGELOG.md")
+# Extract the section for THIS version (not just the top entry), so a missing changelog
+# entry publishes no notes rather than the previous version's. Fail loudly if absent.
+CHANGELOG=$(awk -v ver="$VERSION" '
+  $1 == "##" && $2 == ver {p = 1}
+  p && $1 == "##" && $2 != ver {exit}
+  p
+' "$CLI_DIR/CHANGELOG.md")
+[ -n "$CHANGELOG" ] || {
+  echo "CHANGELOG.md has no '## ${VERSION}' section" >&2
+  exit 1
+}
 
 gh release create "$TAG" "$ASSETS_DIR"/* \
   --title "agent-cli-go v${VERSION}" \

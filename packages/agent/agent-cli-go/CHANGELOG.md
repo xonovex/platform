@@ -1,5 +1,19 @@
 # @xonovex/agent-cli-go
 
+## 0.1.24
+
+### Patch Changes
+
+- [`ffa01e5`](https://github.com/xonovex/platform/commit/ffa01e5da8a6d5eb551945247629161840d0c415) [@Deorder](https://github.com/Deorder)! - expose named go devShell in Go project flakes
+- [`cdb0fd2`](https://github.com/xonovex/platform/commit/cdb0fd21ebcee694fbaf6b88ebe5b56a4f7d7938) [@Deorder](https://github.com/Deorder)! - nixflake sandbox tier + pinned-toolchain deny-default policy (#25)
+- [`52a05be`](https://github.com/xonovex/platform/commit/52a05be3f4378a729ddf9fab5fb6d38f9e6d08f1) [@Deorder](https://github.com/Deorder)! - go.nix carries go_1_26; all Go projects on 1.26; docker-agent composes from nix/
+- [`e7f1cb6`](https://github.com/xonovex/platform/commit/e7f1cb61dba7072025c710c242cc6540e43af58e) [@Deorder](https://github.com/Deorder)! - compose flakes from per-tool nix/\*.nix modules
+- Updated dependency `@xonovex/agent-cli-go-linux-arm64` to `0.1.24`
+- Updated dependency `@xonovex/agent-cli-go-linux-x64` to `0.1.24`
+- Updated dependency `@xonovex/agent-cli-go-darwin-arm64` to `0.1.24`
+- Updated dependency `@xonovex/agent-cli-go-darwin-x64` to `0.1.24`
+- Updated dependency `@xonovex/agent-cli-go-win32-x64` to `0.1.24`
+
 ## 0.1.23
 
 ### Patch Changes
