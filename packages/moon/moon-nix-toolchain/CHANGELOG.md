@@ -1,5 +1,11 @@
 # @xonovex/moon-nix-toolchain
 
+## 0.6.1
+
+### Patch Changes
+
+- Fall back to a project flake's `default` devShell when a resolved selector names a devShell the flake does not expose. 0.6.0 routed a project-owned `flake.nix` to `nix develop <projectRoot>#<shell>` whenever a `shellBy*` selector matched, even if that named devShell was absent, so a task wrapped outside a nix shell failed with `does not provide attribute 'devShells.<system>.<shell>'`. The wrap hooks now probe the project flake (`nix eval <root>#devShells`, names only — never building or writing a lock file) and drop the `#<shell>` suffix when the name is absent, so the task runs in the flake's `default` devShell exactly as it did under 0.5.0. Workspace-flake selectors and `hash_task_contents` are unchanged (the cache key still tracks the configured shell and stays independent of `nix`).
+
 ## 0.6.0
 
 ### Minor Changes

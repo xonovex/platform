@@ -119,10 +119,14 @@ pub fn define_toolchain_config() -> FnResult<Json<DefineToolchainConfigOutput>> 
 /// The nix flake a task is wrapped with: the real path passed to `nix develop`. A
 /// project-local `flake.nix` wins over the workspace flake; either way the resolved
 /// devShell selector (`resolve_shell`) is applied, so a project flake routes a task to
-/// `{root}#<shell>` when a selector matches — that named devShell must exist in the
-/// project flake.
+/// `{root}#<shell>` when a selector matches. For a project flake a selected name the
+/// flake does not expose is dropped (`effective_shell`), falling back to its `default`.
 struct WrapTarget {
     root: String,
+    /// True when `root` is a project-local flake (`<project>/flake.nix`), false for the
+    /// workspace flake. Only project-flake selectors are existence-checked before
+    /// routing; the workspace flake is curated to expose its configured devShells.
+    is_project_flake: bool,
 }
 
 /// Return the flake to wrap the task with, or `None` when the task must run
@@ -186,6 +190,7 @@ fn resolve_flake_target(
             {
                 return Ok(Some(WrapTarget {
                     root: project_root.to_string_lossy().into_owned(),
+                    is_project_flake: true,
                 }));
             }
         }
@@ -193,6 +198,7 @@ fn resolve_flake_target(
 
     Ok(context.workspace_root.real_path().map(|path| WrapTarget {
         root: path.to_string_lossy().into_owned(),
+        is_project_flake: false,
     }))
 }
 
@@ -258,6 +264,49 @@ fn flake_ref(root: &str, shell: Option<&str>) -> String {
     }
 }
 
+/// Whether the flake at `root` exposes a devShell named `shell` for the current
+/// system. Evaluates `<root>#devShells` only (attribute names, never building the
+/// shell) and never writes a lock file, so it does not mutate the project. `nix` is
+/// guaranteed present past the wrap guards; a probe failure (eval error, no
+/// `devShells` output, missing system) reports `false` so the wrap degrades to the
+/// flake's `default` rather than emitting a `#<shell>` that `nix develop` rejects.
+fn flake_exposes_shell(root: &str, shell: &str) -> bool {
+    // Escape the name for a `"..."` Nix string literal: backslash, double-quote, and
+    // the `${` interpolation opener (`\${` is a literal `${`).
+    let escaped = shell
+        .replace('\\', "\\\\")
+        .replace('"', "\\\"")
+        .replace("${", "\\${");
+    let reference = format!("{root}#devShells");
+    let apply =
+        format!("sets: builtins.hasAttr \"{escaped}\" (sets.${{builtins.currentSystem}} or {{}})");
+    exec_captured(
+        "nix",
+        [
+            "eval",
+            "--impure",
+            "--no-write-lock-file",
+            "--json",
+            reference.as_str(),
+            "--apply",
+            apply.as_str(),
+        ],
+    )
+    .is_ok_and(|result| result.exit_code == 0 && result.stdout.trim() == "true")
+}
+
+/// The devShell selector actually used to wrap a task. A project-flake selector the
+/// flake does not expose is dropped (falling back to the flake's `default`), so a
+/// configured `#<shell>` can never hard-fail `nix develop`. Workspace-flake selectors
+/// and the no-selector case are returned unchanged — the existence probe runs only
+/// for a project flake with a resolved name.
+fn effective_shell(target: &WrapTarget, shell: Option<String>) -> Option<String> {
+    match shell {
+        Some(name) if target.is_project_flake && !flake_exposes_shell(&target.root, &name) => None,
+        other => other,
+    }
+}
+
 /// Read a flake's `flake.lock` over the host so its pinned inputs fold into the
 /// task hash. Returns an empty string when the lock is absent (a flake with no
 /// lock, or a non-flake workspace root) — an absent lock is a stable value, so it
@@ -294,15 +343,18 @@ pub fn extend_task_command(
         return Ok(Json(output));
     };
 
-    // Resolve the devShell selector for every flake, project-local or workspace.
-    // For a project flake the selected name must be a devShell in THAT flake;
-    // no match (or `default`) keeps the flake's bare default devShell.
-    let shell = resolve_shell(
-        input.task.target.get_task_id().ok(),
-        &input.task.toolchains,
-        input.project.id.as_str(),
-        &config,
-    )?;
+    // Resolve the devShell selector for every flake, project-local or workspace, then
+    // drop a project-flake name the flake does not expose so the wrap falls back to its
+    // default devShell instead of a `#<shell>` that `nix develop` would reject.
+    let shell = effective_shell(
+        &target,
+        resolve_shell(
+            input.task.target.get_task_id().ok(),
+            &input.task.toolchains,
+            input.project.id.as_str(),
+            &config,
+        )?,
+    );
 
     // Rebuild the entire argv: nix develop <flakeref> --command <cmd> <args...>.
     // `--command` must be the last `nix` flag; everything after it is the child
@@ -340,12 +392,15 @@ pub fn extend_task_script(
         return Ok(Json(output));
     };
 
-    let shell = resolve_shell(
-        input.task.target.get_task_id().ok(),
-        &input.task.toolchains,
-        input.project.id.as_str(),
-        &config,
-    )?;
+    let shell = effective_shell(
+        &target,
+        resolve_shell(
+            input.task.target.get_task_id().ok(),
+            &input.task.toolchains,
+            input.project.id.as_str(),
+            &config,
+        )?,
+    );
 
     // A script is one opaque string, so it needs a shell layer inside the dev
     // shell: nix develop <flakeref> --command bash -c "<original script>".
@@ -368,9 +423,10 @@ pub fn hash_task_contents(
     let config: NixToolchainConfig = parse_toolchain_config_schema(input.toolchain_config.clone())?;
 
     if let Some(target) = resolve_flake_target(&input.context, input.project.source.as_str())? {
-        // Mirror the wrap hooks' shell resolution exactly — they apply the selectors
-        // to project and workspace flakes alike — so the cache key tracks the same
-        // `{root}#<shell>` the task actually executes in.
+        // Mirror the wrap hooks' selector resolution, but track the *configured* shell
+        // rather than `effective_shell`'s fallback: the cache key must stay independent
+        // of `nix` (no devShell-existence probe on the hashing host), and the configured
+        // selector is a stable proxy — it changes exactly when the config changes.
         let shell = resolve_shell(
             input.task.target.get_task_id().ok(),
             &input.task.toolchains,

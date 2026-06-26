@@ -367,9 +367,13 @@ async fn routes_project_flake_to_named_shell() {
     reset_wrap_env();
 
     let sandbox = create_empty_moon_sandbox();
-    // A project that ships its own flake.nix.
+    // A project that ships its own flake.nix exposing a named `go` devShell.
     std::fs::create_dir_all(sandbox.root.join("packages/proj")).unwrap();
-    std::fs::write(sandbox.root.join("packages/proj/flake.nix"), "{}").unwrap();
+    std::fs::write(
+        sandbox.root.join("packages/proj/flake.nix"),
+        "{ outputs = _: { devShells.x86_64-linux = { default = {}; go = {}; }; }; }",
+    )
+    .unwrap();
 
     let plugin = sandbox.create_toolchain("nix").await;
 
@@ -420,12 +424,53 @@ async fn project_flake_without_selector_uses_default_shell() {
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
 #[serial]
+async fn project_flake_falls_back_to_default_when_named_shell_absent() {
+    reset_wrap_env();
+
+    let sandbox = create_empty_moon_sandbox();
+    std::fs::create_dir_all(sandbox.root.join("packages/proj")).unwrap();
+    // A project flake that exposes only `default`, not the selected `go`.
+    std::fs::write(
+        sandbox.root.join("packages/proj/flake.nix"),
+        "{ outputs = _: { devShells.x86_64-linux.default = {}; }; }",
+    )
+    .unwrap();
+
+    let plugin = sandbox.create_toolchain("nix").await;
+
+    let mut input = command_input("golangci-lint", &["run"]);
+    input.project =
+        serde_json::from_value(serde_json::json!({ "id": "proj", "source": "packages/proj" }))
+            .unwrap();
+    // The selector resolves `go`, but the project flake does not expose it, so the wrap
+    // must fall back to the flake's default devShell instead of a `#go` nix would reject.
+    input.toolchain_config = serde_json::json!({ "shell": "go" });
+
+    let output = plugin.extend_task_command(input).await;
+
+    let flake_ref = flake_ref(&output);
+    assert!(
+        flake_ref.ends_with("/packages/proj"),
+        "an unexposed named shell must fall back to the project flake root, got: {flake_ref}"
+    );
+    assert!(
+        !flake_ref.contains('#'),
+        "fallback must drop the `#<shell>` suffix, got: {flake_ref}"
+    );
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 1)]
+#[serial]
 async fn routes_project_flake_per_task_from_shell_by_task() {
     reset_wrap_env();
 
     let sandbox = create_empty_moon_sandbox();
     std::fs::create_dir_all(sandbox.root.join("packages/proj")).unwrap();
-    std::fs::write(sandbox.root.join("packages/proj/flake.nix"), "{}").unwrap();
+    std::fs::write(
+        sandbox.root.join("packages/proj/flake.nix"),
+        "{ outputs = _: { devShells.x86_64-linux = { default = {}; go = {}; }; }; }",
+    )
+    .unwrap();
 
     let plugin = sandbox.create_toolchain("nix").await;
 
