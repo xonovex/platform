@@ -3,7 +3,7 @@ type: plan
 has_subplans: false
 parent_plan: plans/nix-toolchain-hardening.md
 parallel_group: 4
-status: pending
+status: in_progress
 dependencies:
   plans: [plugin-typed-config, plugin-fail-closed, plugin-flake-shell-routing, plugin-cache-coherence]
   files:
@@ -14,11 +14,11 @@ dependencies:
     - ../../drodan/drodan-platform/.moon/toolchains.yml
 skills_to_consult: [moon-guide, git-guide, pull-request-guide, code-review-guide]
 validation:
-  type_check: pending
-  lint: pending
-  build: pending
-  tests: pending
-  integration: pending
+  type_check: pass
+  lint: pass
+  build: pass
+  tests: pass
+  integration: pending  # local github-check + publish-dry-run pass; release/tag + consumer rollout await authorization
 ---
 
 # 07 — Rollout and Release (moon_nix_toolchain-v0.6.0)
