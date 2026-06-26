@@ -69,7 +69,7 @@ Set `GITHUB_TOKEN` in CI so moon's `github://` resolver isn't rate-limited; moon
 
 ## Per-project flakes
 
-When a project ships its own `flake.nix` (i.e. `<projectRoot>/flake.nix` exists), the plugin wraps that project's tasks with the project flake — `nix develop <projectRoot> --command …` — using the project flake's **default** devShell. This takes precedence over the workspace flake and over the shell selectors above, which name devShells in the workspace flake and therefore do not apply to a project flake.
+When a project ships its own `flake.nix` (i.e. `<projectRoot>/flake.nix` exists), the plugin wraps that project's tasks with the project flake — `nix develop <projectRoot> --command …` — taking precedence over the workspace flake. The shell selectors above still apply: a matching selector routes the task to `nix develop <projectRoot>#<shell>`, so the **named devShell must be exposed by the project flake**. With no match (or a `default` value) the task uses the project flake's default devShell.
 
 The project flake is detected from the project source over the host, so it auto-applies to every project that ships one — no per-project config. Projects without their own `flake.nix` are unchanged: the workspace flake plus the resolved devShell. This lets a package pin its own toolchain independently of the workspace flake.
 
@@ -87,6 +87,10 @@ nix:
 ```
 
 When `nix` is absent for a task in an opted-in project, the plugin errors with `nix is required for <project>:<task> …` and the task fails, instead of falling back to host tools. Tasks in projects outside both allowlists keep the silent no-op. The `IN_NIX_SHELL` and `MOON_NIX_WRAPPED` guards still take precedence — a task already inside a dev shell (or already wrapped) never fails closed. Both allowlists are validated against the published schema and default to empty, so existing consumers are unaffected until they opt in.
+
+## Cache coherence
+
+Editing the flake a task runs in — `flake.lock`, or switching its resolved devShell — busts that task's moon cache via the `hash_task_contents` hook; an unrelated edit does not. The hook resolves the same flake root (the project `flake.nix` when present, else the workspace flake) and the same devShell selector the wrap hooks use, then folds the resolved flake root, the selected shell, and the `flake.lock` contents into the task's cache key. The key is independent of `IN_NIX_SHELL` / `MOON_NIX_WRAPPED` and of whether `nix` is installed on the hashing host, so it is stable across CI and local runs. The `setup_environment` hook pre-builds the resolved devShell (non-blocking) so the first wrapped task is not a cold `nix develop`.
 
 ## Notes
 
