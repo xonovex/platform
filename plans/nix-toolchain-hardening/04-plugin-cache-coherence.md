@@ -3,7 +3,7 @@ type: plan
 has_subplans: false
 parent_plan: plans/nix-toolchain-hardening.md
 parallel_group: 2
-status: pending
+status: complete
 dependencies:
   plans: [plugin-typed-config]
   files:
@@ -13,11 +13,11 @@ dependencies:
     - packages/moon/moon-nix-toolchain/README.md
 skills_to_consult: [moon-guide, general-fp-guide, debugging-guide]
 validation:
-  type_check: pending
-  lint: pending
-  build: pending
-  tests: pending
-  integration: pending
+  type_check: passed
+  lint: passed
+  build: passed
+  tests: passed
+  integration: passed
 ---
 
 # Plugin Cache Coherence — `hash_task_contents` (+ optional `setup_environment`)

@@ -116,12 +116,13 @@ pub fn define_toolchain_config() -> FnResult<Json<DefineToolchainConfigOutput>> 
     }))
 }
 
-/// The nix flake a task is wrapped with: the real path passed to `nix develop`, and
-/// whether it is a project-local flake. A project flake uses its own default devShell
-/// (the shell selectors target the workspace flake's named shells, so they are skipped).
+/// The nix flake a task is wrapped with: the real path passed to `nix develop`. A
+/// project-local `flake.nix` wins over the workspace flake; either way the resolved
+/// devShell selector (`resolve_shell`) is applied, so a project flake routes a task to
+/// `{root}#<shell>` when a selector matches — that named devShell must exist in the
+/// project flake.
 struct WrapTarget {
     root: String,
-    project_flake: bool,
 }
 
 /// Return the flake to wrap the task with, or `None` when the task must run
@@ -160,7 +161,18 @@ fn resolve_wrap_target(
         return Ok(None);
     }
 
-    let project_source = project.source.as_str();
+    resolve_flake_target(context, project.source.as_str())
+}
+
+/// Resolve the flake that wraps a task purely from paths, with no runtime guards:
+/// the project flake when `<project>/flake.nix` exists, else the workspace flake.
+/// Shared by `resolve_wrap_target` (after its guards) and `hash_task_contents`,
+/// whose cache key must not depend on transient env (`IN_NIX_SHELL`/`MOON_NIX_WRAPPED`)
+/// or on whether `nix` is installed on the hashing host.
+fn resolve_flake_target(
+    context: &MoonContext,
+    project_source: &str,
+) -> AnyResult<Option<WrapTarget>> {
     if !project_source.is_empty() {
         if let Some(project_root) = context.workspace_root.join(project_source).real_path() {
             // Detect the project flake over the host: the plugin's sandbox has no
@@ -174,7 +186,6 @@ fn resolve_wrap_target(
             {
                 return Ok(Some(WrapTarget {
                     root: project_root.to_string_lossy().into_owned(),
-                    project_flake: true,
                 }));
             }
         }
@@ -182,7 +193,6 @@ fn resolve_wrap_target(
 
     Ok(context.workspace_root.real_path().map(|path| WrapTarget {
         root: path.to_string_lossy().into_owned(),
-        project_flake: false,
     }))
 }
 
@@ -248,6 +258,19 @@ fn flake_ref(root: &str, shell: Option<&str>) -> String {
     }
 }
 
+/// Read a flake's `flake.lock` over the host so its pinned inputs fold into the
+/// task hash. Returns an empty string when the lock is absent (a flake with no
+/// lock, or a non-flake workspace root) — an absent lock is a stable value, so it
+/// never thrashes the cache.
+fn flake_lock_contents(root: &str) -> String {
+    let lock_path = format!("{root}/flake.lock");
+    exec_captured("cat", [lock_path.as_str()])
+        .ok()
+        .filter(|result| result.exit_code == 0)
+        .map(|result| result.stdout)
+        .unwrap_or_default()
+}
+
 /// Quote a string for safe inclusion as a single POSIX shell argument.
 fn shell_quote(value: &str) -> String {
     format!("'{}'", value.replace('\'', "'\\''"))
@@ -271,18 +294,15 @@ pub fn extend_task_command(
         return Ok(Json(output));
     };
 
-    // A project-local flake uses its own default devShell; the shell selectors
-    // name shells in the workspace flake, so they do not apply to it.
-    let shell = if target.project_flake {
-        None
-    } else {
-        resolve_shell(
-            input.task.target.get_task_id().ok(),
-            &input.task.toolchains,
-            input.project.id.as_str(),
-            &config,
-        )?
-    };
+    // Resolve the devShell selector for every flake, project-local or workspace.
+    // For a project flake the selected name must be a devShell in THAT flake;
+    // no match (or `default`) keeps the flake's bare default devShell.
+    let shell = resolve_shell(
+        input.task.target.get_task_id().ok(),
+        &input.task.toolchains,
+        input.project.id.as_str(),
+        &config,
+    )?;
 
     // Rebuild the entire argv: nix develop <flakeref> --command <cmd> <args...>.
     // `--command` must be the last `nix` flag; everything after it is the child
@@ -320,16 +340,12 @@ pub fn extend_task_script(
         return Ok(Json(output));
     };
 
-    let shell = if target.project_flake {
-        None
-    } else {
-        resolve_shell(
-            input.task.target.get_task_id().ok(),
-            &input.task.toolchains,
-            input.project.id.as_str(),
-            &config,
-        )?
-    };
+    let shell = resolve_shell(
+        input.task.target.get_task_id().ok(),
+        &input.task.toolchains,
+        input.project.id.as_str(),
+        &config,
+    )?;
 
     // A script is one opaque string, so it needs a shell layer inside the dev
     // shell: nix develop <flakeref> --command bash -c "<original script>".
@@ -339,6 +355,71 @@ pub fn extend_task_script(
         shell_quote(&input.script)
     ));
     output.env.insert(SENTINEL.into(), "1".into());
+
+    Ok(Json(output))
+}
+
+#[plugin_fn]
+pub fn hash_task_contents(
+    Json(input): Json<HashTaskContentsInput>,
+) -> FnResult<Json<HashTaskContentsOutput>> {
+    let mut contents = Vec::new();
+
+    let config: NixToolchainConfig = parse_toolchain_config_schema(input.toolchain_config.clone())?;
+
+    if let Some(target) = resolve_flake_target(&input.context, input.project.source.as_str())? {
+        // Mirror the wrap hooks' shell resolution exactly — they apply the selectors
+        // to project and workspace flakes alike — so the cache key tracks the same
+        // `{root}#<shell>` the task actually executes in.
+        let shell = resolve_shell(
+            input.task.target.get_task_id().ok(),
+            &input.task.toolchains,
+            input.project.id.as_str(),
+            &config,
+        )?;
+
+        // Fold the resolved flake root, the selected shell, and the lock's pinned
+        // inputs into the cache key: editing flake.lock or switching the shell
+        // changes `contents`; an unrelated edit leaves it byte-identical.
+        contents.push(serde_json::json!({
+            "flakeRoot": target.root,
+            "shell": shell,
+            "flakeLock": flake_lock_contents(&target.root),
+        }));
+    }
+
+    Ok(Json(HashTaskContentsOutput { contents }))
+}
+
+#[plugin_fn]
+pub fn setup_environment(
+    Json(input): Json<SetupEnvironmentInput>,
+) -> FnResult<Json<SetupEnvironmentOutput>> {
+    let mut output = SetupEnvironmentOutput::default();
+
+    if !command_exists(&get_host_environment()?, "nix") {
+        return Ok(Json(output));
+    }
+
+    let project_source = input
+        .project
+        .as_ref()
+        .map_or("", |project| project.source.as_str());
+    if let Some(target) = resolve_flake_target(&input.context, project_source)? {
+        // Realise (and cache) the devShell closure before the first task runs, so the
+        // first wrapped task is not a cold `nix develop`. `allow_failure` keeps setup
+        // non-blocking; the closure lands in the nix store without a GC root, so a
+        // `nix store gc` before the task can still evict it.
+        let reference = flake_ref(&target.root, None);
+        output.commands.push(
+            ExecCommand::new(ExecCommandInput::new(
+                "nix",
+                ["develop", reference.as_str(), "--command", "true"],
+            ))
+            .allow_failure()
+            .label(format!("Pre-building nix devShell {reference}")),
+        );
+    }
 
     Ok(Json(output))
 }
