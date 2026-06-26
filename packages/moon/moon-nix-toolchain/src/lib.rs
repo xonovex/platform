@@ -1,10 +1,36 @@
 use extism_pdk::*;
 use moon_pdk::*;
 use moon_pdk_api::*;
+use schematic::{Config, SchemaBuilder};
+use std::collections::HashMap;
 
 /// Env var set on a wrapped task so a task is wrapped at most once, even outside
 /// a dev shell (belt-and-suspenders alongside the `IN_NIX_SHELL` guard).
 const SENTINEL: &str = "MOON_NIX_WRAPPED";
+
+/// Typed `nix` toolchain configuration, validated against the schema returned by
+/// `define_toolchain_config`. The devShell selectors are resolved most-specific
+/// first: `shell_by_task` > `shell_by_toolchain` > `shell_by_tag` >
+/// `shell_by_language` > `shell` (a project-wide default).
+#[derive(Clone, Config, Debug)]
+#[config(rename_all = "camelCase")]
+pub struct NixToolchainConfig {
+    /// Project-wide default devShell name. Empty or `default` selects the flake's
+    /// default devShell.
+    pub shell: Option<String>,
+
+    /// devShell name keyed by task id.
+    pub shell_by_task: HashMap<String, String>,
+
+    /// devShell name keyed by a task toolchain id.
+    pub shell_by_toolchain: HashMap<String, String>,
+
+    /// devShell name keyed by a project tag.
+    pub shell_by_tag: HashMap<String, String>,
+
+    /// devShell name keyed by the project language.
+    pub shell_by_language: HashMap<String, String>,
+}
 
 #[host_fn]
 extern "ExtismHost" {
@@ -22,6 +48,16 @@ pub fn register_toolchain(
             "Runs every task inside the project's or workspace's nix flake dev shell.".into(),
         ),
         ..Default::default()
+    }))
+}
+
+/// Register the JSON schema for the typed toolchain config, so moon validates the
+/// `shell`/`shellBy*` keys (unknown key, wrong type) at config-load time instead of
+/// silently ignoring them.
+#[plugin_fn]
+pub fn define_toolchain_config() -> FnResult<Json<DefineToolchainConfigOutput>> {
+    Ok(Json(DefineToolchainConfigOutput {
+        schema: SchemaBuilder::build_root::<NixToolchainConfig>(),
     }))
 }
 
@@ -101,27 +137,22 @@ fn resolve_shell(
     task_id: Option<&str>,
     task_toolchains: &[Id],
     project_id: &str,
-    config: &serde_json::Value,
+    config: &NixToolchainConfig,
 ) -> AnyResult<Option<String>> {
-    if let Some(value) = task_id
-        .and_then(|id| config.get("shellByTask").and_then(|map| map.get(id)))
-        .and_then(|value| value.as_str())
-    {
+    if let Some(value) = task_id.and_then(|id| config.shell_by_task.get(id)) {
         return Ok(normalize_shell(value));
     }
 
-    if let Some(map) = config.get("shellByToolchain") {
-        for toolchain in task_toolchains {
-            if let Some(value) = map.get(toolchain.as_str()).and_then(|value| value.as_str()) {
-                return Ok(normalize_shell(value));
-            }
+    for toolchain in task_toolchains {
+        if let Some(value) = config.shell_by_toolchain.get(toolchain.as_str()) {
+            return Ok(normalize_shell(value));
         }
     }
 
-    if config.get("shellByTag").is_some() || config.get("shellByLanguage").is_some() {
+    if !config.shell_by_tag.is_empty() || !config.shell_by_language.is_empty() {
         let project = unsafe { load_project_by_id(project_id.to_owned())? }.0;
 
-        if let Some(map) = config.get("shellByTag") {
+        if !config.shell_by_tag.is_empty() {
             let tags = project
                 .get("config")
                 .and_then(|config| config.get("tags"))
@@ -129,31 +160,23 @@ fn resolve_shell(
 
             if let Some(tags) = tags {
                 for tag in tags.iter().filter_map(|tag| tag.as_str()) {
-                    if let Some(value) = map.get(tag).and_then(|value| value.as_str()) {
+                    if let Some(value) = config.shell_by_tag.get(tag) {
                         return Ok(normalize_shell(value));
                     }
                 }
             }
         }
 
-        if let Some(value) = config
-            .get("shellByLanguage")
-            .zip(
-                project
-                    .get("language")
-                    .and_then(|language| language.as_str()),
-            )
-            .and_then(|(map, language)| map.get(language))
-            .and_then(|value| value.as_str())
+        if let Some(value) = project
+            .get("language")
+            .and_then(|language| language.as_str())
+            .and_then(|language| config.shell_by_language.get(language))
         {
             return Ok(normalize_shell(value));
         }
     }
 
-    Ok(config
-        .get("shell")
-        .and_then(|value| value.as_str())
-        .and_then(normalize_shell))
+    Ok(config.shell.as_deref().and_then(normalize_shell))
 }
 
 /// Build the `nix develop` flake reference: the flake root, plus a `#<shell>`
@@ -185,11 +208,13 @@ pub fn extend_task_command(
     let shell = if target.project_flake {
         None
     } else {
+        let config: NixToolchainConfig =
+            parse_toolchain_config_schema(input.toolchain_config.clone())?;
         resolve_shell(
             input.task.target.get_task_id().ok(),
             &input.task.toolchains,
             input.project.id.as_str(),
-            &input.toolchain_config,
+            &config,
         )?
     };
 
@@ -224,11 +249,13 @@ pub fn extend_task_script(
     let shell = if target.project_flake {
         None
     } else {
+        let config: NixToolchainConfig =
+            parse_toolchain_config_schema(input.toolchain_config.clone())?;
         resolve_shell(
             input.task.target.get_task_id().ok(),
             &input.task.toolchains,
             input.project.id.as_str(),
-            &input.toolchain_config,
+            &config,
         )?
     };
 

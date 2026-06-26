@@ -2722,12 +2722,14 @@ dependencies = [
 
 [[package]]
 name = "moon_nix_toolchain"
-version = "0.5.0"
+version = "0.6.0"
 dependencies = [
  "extism-pdk",
  "moon_pdk",
  "moon_pdk_api",
  "moon_pdk_test_utils",
+ "schematic",
+ "serde",
  "serde_json",
  "serial_test",
  "tokio",
@@ -2746,6 +2748,7 @@ dependencies = [
  "moon_project",
  "moon_task",
  "rustc-hash",
+ "schematic",
  "serde",
  "warpgate_pdk",
 ]

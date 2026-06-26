@@ -18,7 +18,7 @@ Register the plugin in `.moon/toolchains.yml`, pinned to a release tag:
 
 ```yaml
 nix:
-  plugin: 'github://xonovex/platform/moon_nix_toolchain@moon_nix_toolchain-v0.5.0'
+  plugin: 'github://xonovex/platform/moon_nix_toolchain@moon_nix_toolchain-v0.6.0'
 ```
 
 Opt a project in via its `moon.yml` (moon has no global toolchain default, so this is per project):
@@ -38,11 +38,11 @@ Selecting a named devShell gives a task a lean, exact toolchain (default: the fl
 4. `shellByLanguage` — keyed by the project language
 5. `shell` — a project-wide default (set in a project's `moon.yml`)
 
-An unset, empty, or `default` value selects the flake's default devShell. `shellByTag` and `shellByLanguage` read the project's tags/language over the host; the project is loaded only when one of them is configured.
+An unset, empty, or `default` value selects the flake's default devShell. `shellByTag` and `shellByLanguage` read the project's tags/language over the host; the project is loaded only when one of them is configured. Every key above is validated against the toolchain's published schema, so an unknown key or wrong type is rejected when moon loads the config.
 
 ```yaml
 nix:
-  plugin: 'github://xonovex/platform/moon_nix_toolchain@moon_nix_toolchain-v0.5.0'
+  plugin: 'github://xonovex/platform/moon_nix_toolchain@moon_nix_toolchain-v0.6.0'
   # Tag-based: every project tagged `go` runs its tasks in `nix develop <root>#go`,
   # without enumerating task ids or relying on a real toolchain id.
   shellByTag:
