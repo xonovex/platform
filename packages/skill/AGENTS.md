@@ -23,7 +23,7 @@ Coding-guideline Agent Skills for the Xonovex marketplace. For authoring mechani
 - `skill-<topic>/`: `package.json` (`@xonovex/skill-<topic>`), `moon.yml`, `prettier.config.ts`, `.claude-plugin/plugin.json`, `.codex-plugin/plugin.json` (`xonovex-skill-<topic>`), and `<topic>-guide/`.
 - `<topic>-guide/`: `SKILL.md`, `references/*.md`, `SOURCES.md`, `eval-queries.json`.
 - Codex plugin manifests use a string `skills` path pointing directly at the guide directory, e.g. `"./<topic>-guide"`. Do not point Codex skills at `"./"`; the loader will not expose nested guide skills reliably.
-- Versions are lockstep across all skill **and command** plugins and `marketplace.json` — see Version bump below.
+- Versions are lockstep across all skill plugins, command plugins, and `marketplace.json` — bump them together.
 
 ## Register & validate
 
@@ -31,9 +31,3 @@ Coding-guideline Agent Skills for the Xonovex marketplace. For authoring mechani
 - `npx prettier --write` the new/changed package; leave `marketplace.json` in its existing compact one-line-per-entry style (do not reflow it).
 - Confirm JSON is valid and every `SKILL.md` → `references/` link resolves.
 - Run `npm install` after adding or removing a skill package so `package-lock.json` records the workspace — CI runs `npm ci`, which fails on an out-of-sync lockfile. The `pre-commit` hook (`.hooks/validate-lockfile.sh`) blocks the commit if you forget; it does not edit the lockfile for you.
-
-## Version bump
-
-- Skill plugins, command plugins (`packages/command/*`), and `.claude-plugin/marketplace.json` share **one lockstep version** (currently `3.x`); bump them all to the same number in a single change. Per package: `package.json` `version`, `.claude-plugin/plugin.json` `version`, `.codex-plugin/plugin.json` `version`. Plus `marketplace.json` `metadata.version`.
-- These packages are `private` and git-sourced by the marketplace — there is no npm/CI publish, so the version on `main` *is* the published marketplace state.
-- After bumping, run `npm install` to refresh `package-lock.json`.
