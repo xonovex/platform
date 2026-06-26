@@ -54,7 +54,19 @@
     "rationale": "near-miss: host-specific posting mechanics, out of scope"
   },
   {
+    "query": "post an inline review comment anchored to a line on a GitHub pull request",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: host-specific posting mechanics, out of scope"
+  },
+  {
     "query": "authenticate to the Bitbucket REST API with an HTTP access token",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: git-host auth, out of scope"
+  },
+  {
+    "query": "authenticate to the GitHub REST API with a personal access token",
     "should_trigger": false,
     "split": "train",
     "rationale": "near-miss: git-host auth, out of scope"

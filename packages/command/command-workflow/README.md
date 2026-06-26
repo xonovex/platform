@@ -72,6 +72,11 @@ Learning: insights-integrate merges learnings into guidelines for future session
 | `plan-research-code-harden`   | Research code-hardening opportunities for a follow-up plan      |
 | `plan-research-code-align`    | Research alignment of two similar implementations for a plan    |
 | `git-commit`                  | Commit and push changes                                         |
+| `pr-create`                   | Open a pull request with a drafted description (any host)       |
+| `pr-review-analyze`           | Review a branch diff into a structured findings file            |
+| `pr-review-refine`            | Refine review findings one by one before publishing             |
+| `pr-review-post`              | Publish a structured, labelled code review to a PR (any host)   |
+| `pr-review-resolve`           | Verify fixes and resolve the review's blocking threads          |
 
 ## Design Decisions
 
