@@ -10,7 +10,12 @@ import (
 	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/types"
 )
 
-// Executor implements bubblewrap sandbox
+// Executor implements the bubblewrap sandbox.
+//
+// Isolation: host tools leaked. buildBwrapArgs ro-binds host /usr,/lib,/lib64,
+// /bin,/etc and getSandboxEnvironment appends the host PATH, so host binaries
+// stay reachable. It cannot satisfy RequirePinnedToolchain and is rejected at
+// selection.
 type Executor struct{}
 
 // NewExecutor creates a new bwrap executor

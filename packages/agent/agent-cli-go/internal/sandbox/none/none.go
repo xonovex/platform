@@ -5,7 +5,10 @@ import (
 	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/types"
 )
 
-// Executor implements direct execution (no sandbox)
+// Executor implements direct host execution (no sandbox).
+//
+// Isolation: host tools leaked. Execute runs the agent on the host with the host
+// PATH, so every host tool is reachable. Rejected under RequirePinnedToolchain.
 type Executor struct{}
 
 // NewExecutor creates a new none executor

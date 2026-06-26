@@ -3,7 +3,7 @@ type: plan
 has_subplans: false
 parent_plan: plans/nix-toolchain-hardening.md
 parallel_group: 3
-status: pending
+status: complete
 dependencies:
   plans: []
   files:
@@ -14,11 +14,11 @@ dependencies:
     - packages/agent/agent-cli-go/internal/nixenv/types.go
 skills_to_consult: [general-fp-guide, code-review-guide, debugging-guide]
 validation:
-  type_check: pending
-  lint: pending
-  build: pending
-  tests: pending
-  integration: pending
+  type_check: pass
+  lint: pass
+  build: pass
+  tests: pass
+  integration: pass   # env-gated TestIntegrationRealNixDevShell drives the real resolveNixMount/buildBwrapArgs/buildDevelopArgs under bwrap; verified live (USRBIN_ABSENT + working go devShell) on a system /usr/bin/nix host. resolveNixMount handles both store-resolved nix (closure under the bound /nix/store) and system/distro nix (relocated to /.nixflake-bin; runtime closure enumerated via the PT_INTERP loader and bound as individual read-only files; fail-closed on unresolved libs).
 ---
 
 # Sandbox Flake devShell Mode (`nixflake`)
@@ -343,12 +343,12 @@ go run ./packages/agent/agent-cli-go --sandbox nixflake \
 
 ## Success Criteria
 
-- [ ] `types.SandboxNixFlake` exists and `GetExecutor`/`GetAvailableMethods` handle it.
-- [ ] `internal/sandbox/nixflake/nixflake.go` enters `nix develop <ref>#<shell> --command <agent>` under bwrap, with `/nix/store` and the flake dir ro-bound and `--no-write-lock-file` set.
-- [ ] Sandbox `PATH` contains only the nix bin dir — no host `/usr/bin` or `/bin` (deny-default verified by test).
-- [ ] Flake ref defaults to `config.RepoDir` then `config.WorkDir`; shell defaults to `default`.
-- [ ] GPU/display agents are explicitly refused with a clear error; CPU/tooling scope documented in a comment.
-- [ ] `go-typecheck`, `go-lint`, `go-build`, `go-test`, and `ci-check` all pass.
+- [x] `types.SandboxNixFlake` exists and `GetExecutor`/`GetAvailableMethods` handle it.
+- [x] `internal/sandbox/nixflake/nixflake.go` enters `nix develop <ref>#<shell> --command <agent>` under bwrap, with `/nix/store` and the flake dir ro-bound and `--no-write-lock-file` set.
+- [x] Sandbox `PATH` contains only the nix bin dir — no host `/usr/bin` or `/bin` (deny-default verified by test).
+- [x] Flake ref defaults to `config.RepoDir` then `config.WorkDir`; shell defaults to `default`.
+- [x] GPU/display agents are explicitly refused with a clear error; CPU/tooling scope documented in a comment.
+- [x] `go-typecheck`, `go-lint`, `go-build`, `go-test`, and `ci-check` all pass.
 
 ## Files Modified/Created
 
