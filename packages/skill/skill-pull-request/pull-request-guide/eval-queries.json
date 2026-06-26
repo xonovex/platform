@@ -66,6 +66,12 @@
     "rationale": "host mechanics, out of scope"
   },
   {
+    "query": "run gh pr create to open the PR on GitHub",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "host mechanics, out of scope"
+  },
+  {
     "query": "write unit tests for this function",
     "should_trigger": false,
     "split": "validation",
