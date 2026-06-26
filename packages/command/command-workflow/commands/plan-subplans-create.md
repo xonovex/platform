@@ -9,28 +9,11 @@ allowed-tools:
   - Grep
   - TaskCreate
   - TaskUpdate
+  - Skill
 argument-hint: "[parent-plan-file] [--by-phase] [--dry-run]"
 ---
 
-# /xonovex-workflow:plan-subplans-create – Generate Detailed Subplans from Parent Plan
-
-Generate detailed implementation subplans from an approved parent plan with parallel execution detection based on file/package dependencies.
-
-## Prerequisites
-
-Run before using this command:
-
-- `/xonovex-workflow:plan-create` - Create and get approval for the parent plan
-
-This command requires an approved parent plan. It does NOT perform codebase exploration - it relies on the parent plan context.
-
-## Goal
-
-- Read approved parent plan and extract proposed subplan structure
-- Generate detailed child plans with implementation steps, code snippets, validation
-- Detect parallel execution groups based on file/package overlap analysis
-- Auto-associate with feature worktree via git config
-- Save child plans and STOP (user runs /xonovex-workflow:plan-continue when ready)
+# /xonovex-workflow:plan-subplans-create — Generate Detailed Subplans from Parent Plan
 
 ## Arguments
 
@@ -38,75 +21,8 @@ This command requires an approved parent plan. It does NOT perform codebase expl
 - `--by-phase` (optional): Split by phase markers instead of logical grouping
 - `--dry-run` (optional): Preview without writing files
 
-## Core Workflow
+## Delegation
 
-**IMPORTANT: Do NOT switch into a plan-authoring mode. Do NOT delegate to codebase-exploration agents — rely on parent plan context.**
-
-1. **Read parent plan**: Load and parse approved parent plan
-2. **Validate status**: Ensure parent plan is approved (status: `pending-approval` or `approved`)
-3. **Extract context**: Goals, technology choices, proposed subplans, dependencies
-4. **Identify child plans**: Use proposed subplan structure from parent plan
-5. **Generate detailed content**: Objective, tasks with code snippets, file paths/line numbers, validation steps (typecheck/lint/build/test/integration), success criteria
-6. **Analyze dependencies**: File overlap analysis -> parallel groups (independent), sequential (overlapping/dependent)
-7. **Write child plan files**: Save to `<plan-dir>/<feature-name>/subplan-*.md`
-8. **Update parent plan**: Add parallel_groups and dependencies.subplans
-9. **Auto-associate worktree**: Set `git config branch.<branch>.plan` if in feature worktree
-10. **Show summary**: Display created child plans and execution strategy; STOP (no implementation)
-
-## Implementation Details
-
-**Splitting**: Logical grouping (default), or by phase markers if user requests phase-based splitting
-
-**Dependency Detection**: File overlap -> Sequential; No overlap -> Parallel; Explicit deps -> Sequential with tracking
-
-**Child Plan Frontmatter**: `type: plan`, `has_subplans: false`, `parent_plan`, `parallel_group`, `status: pending`, `dependencies: {plans: [], files: []}`, `skills_to_consult: [skill-names]`, `validation: {type_check: pending, lint: pending, build: pending, tests: pending, integration: pending}`
-
-**Skills to Consult**: Every child plan MUST include `skills_to_consult` array listing applicable coding guidelines (e.g., `typescript-guide`, `testing-guide`, `hono-guide`). This ensures implementers consult project conventions before coding.
-
-**Child Plan Sections**: Objective, Tasks (numbered with file paths, code snippets, actions), Validation Steps (typecheck, lint, build, test - all must pass), Success Criteria (checklist), Files Modified/Created (list), Dependencies (required plans), Estimated Duration
-
-## Output
-
-```
-Created child plans for: plans/feature-name.md
-
-Child Plans Created:
-- plans/feature-name/01-add-library.md (pending)
-- plans/feature-name/02-create-component.md (pending)
-- plans/feature-name/03-integrate.md (pending)
-- plans/feature-name/04-add-tests.md (pending)
-
-Execution Strategy:
-- Parallel Group 1: 01-add-library, 02-create-component
-- Sequential Group 2: 03-integrate (depends on Group 1)
-- Sequential Group 3: 04-add-tests (depends on Group 2)
-
-Updated parent plan with parallel execution groups
-```
-
-## Examples
-
-```bash
-# Generate child plans from approved parent plan
-/xonovex-workflow:plan-subplans-create plans/feature.md
-
-# Phase-based splitting
-/xonovex-workflow:plan-subplans-create plans/migration.md --by-phase
-
-# Preview without writing
-/xonovex-workflow:plan-subplans-create plans/feature.md --dry-run
-```
-
-## Error Handling
-
-- Error: parent plan doesn't exist, parent plan not approved, child plans already exist, output dir fails
-- Warning: >10 child plans (consider consolidation), circular dependencies, excessive file overlap
-- Warning: any child plan with >7 tasks (split into smaller subplans)
-
-## Gotchas
-
-- Approving the parent plan is mandatory — generating subplans against `draft` parent skips review
-- File-overlap analysis runs against the parent plan's listed files only — if the parent doesn't enumerate files clearly, parallel detection produces false-parallels
-- A child plan without `skills_to_consult` will skip project conventions during implementation — never empty
-- \> 10 child plans usually signals the parent plan is too broad — split into multiple parent plans
-- A subplan with >7 tasks risks tasks being dropped during implementation — context limits cause later tasks to be forgotten. Target 5–7 tasks per subplan.
+Load the `plan-guide` skill (plugin `xonovex-skill-plan`) and perform its
+**plan-subplans-create** operation with these arguments. The skill is the source of
+truth for the procedure, output format, and gotchas — do not restate them.

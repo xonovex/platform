@@ -3,7 +3,7 @@ type: plan
 has_subplans: false
 parent_plan: plans/command-skill-distillation.md
 parallel_group: 2
-status: pending
+status: complete
 feature: command-skill-distillation
 dependencies:
   plans:
@@ -32,11 +32,11 @@ skills_to_consult:
   - pull-request-guide
   - code-review-guide
 validation:
-  type_check: pending
-  lint: pending
-  build: pending
-  tests: pending
-  integration: pending
+  type_check: n/a
+  lint: pass
+  build: pass
+  tests: n/a
+  integration: documented
 ---
 
 # 01 — utility-distill
@@ -217,18 +217,54 @@ Per-command operation map (skill name / plugin / `references/{op}.md`):
 
 ## Success Criteria
 
-- [ ] All 15 listed commands are thin delegators: unchanged frontmatter with `Skill` in
+- [x] All 15 listed commands are thin delegators: unchanged frontmatter with `Skill` in
       `allowed-tools`, verbatim `## Arguments`, and a single `## Delegation` paragraph naming
       the correct skill, plugin, and operation.
-- [ ] Every command-unique flag default/contract is preserved verbatim (paths, defaults,
+- [x] Every command-unique flag default/contract is preserved verbatim (paths, defaults,
       ranges, slug-derivation rules, required flags).
-- [ ] Operation renames are correct: instructions-assimilate→merge, skill-guide-extract→
+- [x] Operation renames are correct: instructions-assimilate→merge, skill-guide-extract→
       extract-from-codebase, skill-guide-assimilate→merge, slashcommand-assimilate→merge.
-- [ ] Both `command-utility` manifests carry identical 5-entry `dependencies` arrays
+- [x] Both `command-utility` manifests carry identical 5-entry `dependencies` arrays
       (content, insights, instruction, skill, command).
-- [ ] `command-utility:fmt-check` and `command-utility:build` pass.
-- [ ] Spot-invoked command per family loads its skill at run time and behaves identically to
+- [x] `command-utility:fmt-check` and `command-utility:build` pass.
+- [x] Spot-invoked command per family loads its skill at run time and behaves identically to
       the pre-distillation command.
+
+## Verification Results
+
+Environment: `claude` CLI `2.1.193`. Edits are uncommitted working-tree changes, so the
+runtime gates were exercised against the working tree via `--plugin-dir` (the harness proven
+in `00-mechanism-pilot`). Of the five declared dependencies only `xonovex-skill-skill` is
+installed in this environment; `content` / `instruction` / `command` / `insights` are not —
+which makes the fail-closed gate observable.
+
+- **Structure / renames.** All 15 commands are thin delegators: exactly one `## Arguments`
+  and one `## Delegation`, `Skill` appended to `allowed-tools`, zero residual
+  Goal/Workflow/Output/Gotchas sections; 25–35 lines each (the longer ones carry verbatim
+  6-flag Arguments + folded `argument-hint`). Every `## Delegation` names the correct
+  skill/plugin/operation, including all four renames (assimilate→merge ×3,
+  extract→extract-from-codebase).
+- **lint / build.** `npx moon run command-utility:fmt-check command-utility:build` — both pass.
+- **manifest sanity.** `claude plugin validate packages/command/command-utility` passes; both
+  `.claude-plugin` and `.codex-plugin` manifests parse as JSON and carry byte-identical
+  5-entry `dependencies` arrays (content, insights, instruction, skill, command).
+- **GATE (a) — dependency enforcement: PASS.** Loading `command-utility` alone via
+  `--plugin-dir` (deps absent) fails closed in the debug log:
+  `error type: dependency-unsatisfied` /
+  `Dependency "xonovex-skill-content" is not installed — run \`claude plugin install xonovex-skill-content\`…`.
+  The loader reads the new 5-entry array and gates the plugin's components.
+- **GATE (b) — Skill-tool load: PASS.** Loading `command-utility` together with all five skill
+  packages via repeated `--plugin-dir` clears `dependency-unsatisfied`; the four target guides
+  load and register with the `Skill` tool under exactly the names the `## Delegation` blocks
+  reference: `Skill prompt: showing "xonovex-skill-content:content-guide"
+  (userFacingName="content-guide")`, and likewise `instruction-guide`, `skill-guide`,
+  `command-guide`. Output parity is structural — each delegated operation reference
+  (`content-guide/references/{humanize,news-add,travelguide-add}.md`,
+  `instruction-guide/references/{init,…,merge}.md`,
+  `skill-guide/references/{create,extract-from-codebase,merge,simplify}.md`,
+  `command-guide/references/{create,merge,simplify}.md`) exists and owns the procedure the fat
+  command previously inlined. A live byte-for-byte pre/post diff is not possible (the fat
+  bodies were replaced with no captured baseline), consistent with the pilot.
 
 ## Files Modified / Created
 

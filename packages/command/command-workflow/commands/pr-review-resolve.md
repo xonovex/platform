@@ -11,19 +11,7 @@ argument-hint: >-
 
 # /xonovex-workflow:pr-review-resolve – Close Out a Posted Review
 
-Closes the loop after the author fixes a review. For each finding posted by `/xonovex-workflow:pr-review-post`, it verifies the issue is actually addressed on the current branch, and if so resolves the finding's blocking thread (optionally replying with the fixing commit). Still-broken findings are left open. It is the symmetric end of the pipeline: `post` opens the threads, `resolve` closes them.
-
-It is host-agnostic by **detecting the host from the remote and driving it through that host's native CLI / API**:
-
-- **the code review skill** (always) — judge whether a finding is genuinely addressed, not just moved.
-- **the host's CLI / API for the detected host** — reading PR comments, resolving a thread, and replying on a thread (see the Host Mapping below). GitHub via `gh` is the realized host today.
-
-## Goal
-
-- Confirm each posted finding is fixed on the branch before touching its thread
-- Resolve only the blocking threads whose findings are genuinely addressed
-- Leave still-present findings open, and report fixed vs still-open
-- Never blanket-resolve — verification gates every state change
+Symmetric end of the review pipeline: `pr-review-post` opens the blocking threads, this closes them. For each posted finding it verifies the issue is genuinely fixed on the branch, then resolves only those findings' threads (optionally replying with the fixing commit), leaving still-broken findings open.
 
 ## Arguments
 
@@ -36,47 +24,14 @@ It is host-agnostic by **detecting the host from the remote and driving it throu
 - `--yes` (optional): Skip the confirmation and resolve immediately
 - `--dry-run` (optional): Print the verdicts and stop, change nothing
 
-## Host Mapping
+## Delegation
 
-| Neutral concept   | GitHub (`gh`, realized)                  | Other hosts                   |
-| ----------------- | ---------------------------------------- | ----------------------------- |
-| blocking thread   | review thread from a `--request-changes` | host's blocking-task / thread |
-| resolve a thread  | `resolveReviewThread` (GraphQL)          | host's resolve mechanism      |
-| reply on a thread | comment with `in_reply_to` id            | comment appended to thread    |
+Load these skills via the `Skill` tool; they are the source of truth for the procedure, verdict craft, matching, and gotchas — do not restate them:
 
-GitHub via `gh` is the realized host today; another host needs its own CLI / API conventions wired in. Derive the host from `git remote get-url origin`, never hardcode one.
+- your **host skill** — detect the host from the git remote and load the matching one: `github-guide` (plugin `xonovex-skill-github`) on GitHub, `gitlab-guide` (plugin `xonovex-skill-gitlab`) on GitLab, or another installed `skill-<host>` — and perform its **review-resolve** op: auth, reading threads, matching findings to threads by `commentId`, resolving, replying.
+- `code-review-guide` (plugin `xonovex-skill-code-review`) — the **verify-addressed judgment**: decide whether a finding is genuinely fixed, not just moved.
 
-## Core Workflow
-
-1. **Detect host + load skills**: read the git remote, load that host's CLI / API plus the code review skill. If the host has no supported resolve path, stop and say so. Resolve the PR from `--pr` or `branch`, verify auth.
-2. **Gather posted findings**: take the in-session findings (with `commentId`s) or read `--findings`. If neither has ids, read the PR's open blocking threads via the host's CLI and match them to findings by anchor.
-3. **Re-check each finding**: against the current branch, decide `fixed` or `still-open`. Re-read the code at the anchor and judge whether the issue is genuinely addressed, do not assume a changed line means it is fixed.
-4. **Preview**: print a table of finding -> verdict (fixed / still-open) and which threads will be resolved. Stop if `--dry-run`. Require confirmation unless `--yes`.
-5. **Resolve fixed threads**: for each `fixed` finding, resolve its blocking thread via the host's CLI. Leave `still-open` ones untouched.
-6. **Reply (if `--reply`)**: via the host's CLI, post a short reply on each resolved thread naming the fixing commit.
-7. **Verify and report**: report resolved-this-run, still-open, and the remaining open blocking-thread total.
-
-## Implementation Details
-
-- **The host's CLI owns the REST calls** — reading threads, the resolve mechanism, threaded replies. This command orchestrates only.
-- **Match findings to threads** by `commentId` first. Only fall back to `path` + body similarity when an id is missing — line numbers shift after fixes, so do not match on `line`.
-- **Verdict needs evidence**: tie each `fixed` call to what changed at the anchor, surface it in the preview so the user can sanity-check before resolving.
-- **Build JSON with a serializer** (`python3` + `json`).
-
-## Error Handling
-
-- Host has no supported resolve path → stop, name the host, point to wiring its CLI / API
-- No `commentId`s anywhere and anchors do not match open threads → ask for `--findings`, or resolve manually in the UI
-- Thread already resolved → skip and note it
-- Finding still present → leave the thread open, list it as still-open (a normal outcome, not an error)
-- Resolve lacks write permission → the token needs the host's PR-write scope
-
-## Gotchas
-
-- Resolving threads is normally the PR author's action — this command suits a reviewer verification re-pass or a self-review flow. Make the verdicts visible so the author can object.
-- Verify, do not trust. A finding whose line merely moved is not fixed, judge the code, not the diff.
-- This changes real PR state — keep the verify-and-confirm default, only bypass with `--yes`.
-- A resolved thread only unblocks the merge where the host enforces it, do not imply the merge is now unblocked.
+Command-level glue: route `--pr` / `branch` to PR lookup; detect the host and stop, naming the host skill to install, if none is loaded; source findings from `--findings` else the in-session set carried forward by `pr-review-post`.
 
 ## Examples
 
@@ -84,13 +39,6 @@ GitHub via `gh` is the realized host today; another host needs its own CLI / API
 # Verify fixes and preview what would resolve, change nothing
 /xonovex-workflow:pr-review-resolve --dry-run
 
-# Resolve the fixed findings' threads on the current branch's PR
-/xonovex-workflow:pr-review-resolve
-
-# Resolve and reply with the fixing commit on each thread
+# Resolve the fixed findings' threads, replying with the fixing commit
 /xonovex-workflow:pr-review-resolve --pr 42 --findings review.json --reply
-
-# Re-review then close the loop (cross-session)
-/xonovex-workflow:pr-review-analyze feat/x --since review.json --out review.json
-/xonovex-workflow:pr-review-resolve feat/x --findings review.json
 ```

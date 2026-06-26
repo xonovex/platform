@@ -1,0 +1,9 @@
+{
+  "name": "xonovex-skill-github",
+  "version": "3.1.0",
+  "description": "Xonovex GitHub host delivery skills",
+  "author": {
+    "name": "Xonovex"
+  },
+  "skills": "./github-guide"
+}

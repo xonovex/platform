@@ -63,13 +63,13 @@
     "query": "authenticate to the Bitbucket REST API with an HTTP access token",
     "should_trigger": false,
     "split": "train",
-    "rationale": "near-miss: git-host auth, out of scope"
+    "rationale": "near-miss: host-skill auth, out of scope"
   },
   {
     "query": "authenticate to the GitHub REST API with a personal access token",
     "should_trigger": false,
     "split": "train",
-    "rationale": "near-miss: git-host auth, out of scope"
+    "rationale": "near-miss: host-skill auth, out of scope"
   },
   {
     "query": "find bugs and race conditions in this concurrency code",

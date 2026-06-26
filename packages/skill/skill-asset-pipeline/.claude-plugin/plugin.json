@@ -1,6 +1,6 @@
 {
   "name": "xonovex-skill-asset-pipeline",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "description": "Xonovex Asset pipeline skills",
   "author": {"name": "Xonovex"},
   "skills": ["./asset-pipeline-guide"]

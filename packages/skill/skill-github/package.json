@@ -1,0 +1,15 @@
+{
+  "name": "@xonovex/skill-github",
+  "version": "3.1.0",
+  "private": true,
+  "type": "module",
+  "keywords": [
+    "xonovex",
+    "skill",
+    "github"
+  ],
+  "scripts": {
+    "fmt": "prettier --write .",
+    "fmt:check": "prettier --check ."
+  }
+}

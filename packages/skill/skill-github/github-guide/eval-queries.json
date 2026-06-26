@@ -1,0 +1,86 @@
+[
+  {
+    "query": "open a pull request against main with reviewers and a label using the gh CLI",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "gh pr create with reviewers/labels"
+  },
+  {
+    "query": "post an inline review comment anchored to a specific line on a GitHub pull request",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "inline anchor inside the reviews API object"
+  },
+  {
+    "query": "submit a REQUEST_CHANGES review with a summary and inline comments in one gh api call",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "atomic reviews object via gh api"
+  },
+  {
+    "query": "resolve a review thread on a GitHub PR from the terminal",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "GraphQL-only resolveReviewThread"
+  },
+  {
+    "query": "what token scope do I need so gh can push commits and open a PR",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "Contents: write to push, Pull requests: write to open PR"
+  },
+  {
+    "query": "gh pr review won't let me add inline comments, how do I post them",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "gh pr review has no inline support; drop to gh api reviews"
+  },
+  {
+    "query": "set GH_ENTERPRISE_TOKEN to authenticate gh against our GitHub Enterprise Server",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "GHES env var split vs GH_TOKEN"
+  },
+  {
+    "query": "my Closes #123 didn't close the issue when the PR merged, why",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "closing keyword auto-closes only on merge into default branch"
+  },
+  {
+    "query": "reply in a review thread and mark it resolved so the PR can merge",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "addPullRequestReviewThreadReply + resolveReviewThread + conversation-resolution gate"
+  },
+  {
+    "query": "the github remote is private and the API returns 404, what permission is missing",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "404-hides-existence; read X-Accepted-GitHub-Permissions"
+  },
+  {
+    "query": "open a merge request on a GitLab-hosted repo with glab and request reviewers",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: GitLab host (glab), not GitHub"
+  },
+  {
+    "query": "rebase my feature branch onto origin/main and force-push before opening the PR",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: local git push/rebase, use git-guide"
+  },
+  {
+    "query": "how should I label review feedback as blocking vs nit and structure the summary",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near-miss: review content/labels craft, use code-review-guide"
+  },
+  {
+    "query": "what should I write in the PR description and how do I split a large change",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near-miss: PR description craft, use pull-request-guide"
+  }
+]

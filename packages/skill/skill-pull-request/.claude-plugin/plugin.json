@@ -1,6 +1,6 @@
 {
   "name": "xonovex-skill-pull-request",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "description": "Xonovex Pull request skills",
   "author": {"name": "Xonovex"},
   "skills": ["./pull-request-guide"]

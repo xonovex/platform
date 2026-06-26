@@ -11,10 +11,15 @@ description: "Use when running git operations or resolving repo-state issues. Tr
 - **Auto-Generate Messages** - Analyze changed files and context, see [references/commit.md](references/commit.md)
 - **Isolated Development** - Use worktrees for feature branches, see [references/worktree-create.md](references/worktree-create.md)
 - **Validate Before Merge** - Run typecheck/lint/build/test, see [references/worktree-validate.md](references/worktree-validate.md)
+- **Publish and Rebase** - Push a branch upstream and rebase onto the base before opening a PR / MR, see [references/push.md](references/push.md)
 
 ## Commit Operations
 
 - **Auto-commit** - Analyze changes, infer type, generate message, optional push, see [references/commit.md](references/commit.md)
+
+## Branch Operations
+
+- **Push + rebase-onto-base** - Publish a branch upstream and keep its PR / MR diff just this change; the host skill (`github-guide` / `gitlab-guide`) drives the PR itself, see [references/push.md](references/push.md)
 
 ## Conflict Resolution
 
@@ -43,6 +48,7 @@ description: "Use when running git operations or resolving repo-state issues. Tr
 ### Commit Operations
 
 - Read [references/commit.md](references/commit.md) - Load when committing changes with auto-generated conventional messages
+- Read [references/push.md](references/push.md) - Load when publishing a branch upstream and rebasing it onto the base before opening a PR / MR
 - Read [references/merge-resolve.md](references/merge-resolve.md) - Load when detecting and resolving merge conflicts
 
 ### Worktree Operations
