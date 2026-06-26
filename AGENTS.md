@@ -20,6 +20,7 @@ Monorepo for Xonovex tools and configuration packages, all code under `packages/
 - **Moon**: `.moon/tasks/*.yml` templates auto-inherit by type/language/tags
 - **Query**: `moon query projects --tags "<pattern>"`
 - **Git**: Do not create feature branches unless explicitly asked. Never push unless explicitly asked.
+- **Release**: cut releases through a pull request, never a direct push to `main`. A PR whose title contains `version packages`, merged to protected `main`, triggers `.github/workflows/release.yml` (`:ci-publish` -> the GitHub release/tag); do not bypass branch protection to publish.
 
 ### Code Style
 
