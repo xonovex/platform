@@ -6,15 +6,17 @@ import (
 	"path/filepath"
 
 	"github.com/xonovex/platform/packages/cli/agent-cli-go/internal/sandboxutil"
+	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/agentcmd"
 	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/sandbox"
 	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/types"
+	"github.com/xonovex/platform/packages/shared/shared-core-go/pkg/envutil"
 )
 
 // Executor implements the bubblewrap sandbox.
 //
 // Isolation: host tools leaked. buildBwrapArgs ro-binds host /usr,/lib,/lib64,
 // /bin,/etc and getSandboxEnvironment appends the host PATH, so host binaries
-// stay reachable. It cannot satisfy RequirePinnedToolchain and is rejected at
+// stay reachable. It cannot satisfy RequireHostToolsUnreachable and is rejected at
 // selection.
 type Executor struct{}
 
@@ -35,18 +37,18 @@ func (e *Executor) Execute(config *types.SandboxConfig) (int, error) {
 
 	// Build environment - passed via --setenv in args, not via process env
 	// But we still need to pass provider env to the parent process for token access
-	agentEnv, err := sandboxutil.BuildProviderEnv(config)
+	agentEnv, err := agentcmd.BuildProviderEnv(config)
 	if err != nil {
 		return 1, err
 	}
 
 	// Merge with custom env for the parent process
-	customEnv := sandboxutil.ParseCustomEnv(config.CustomEnv)
-	mergedEnv := sandboxutil.MergeEnvMaps(agentEnv, customEnv)
+	customEnv := envutil.ParseCustomEnv(config.CustomEnv)
+	mergedEnv := envutil.MergeEnvMaps(agentEnv, customEnv)
 
 	// Convert to environ format for parent process
 	env := os.Environ()
-	env = append(env, sandboxutil.EnvMapToSlice(mergedEnv)...)
+	env = append(env, envutil.EnvMapToSlice(mergedEnv)...)
 
 	return sandboxutil.SpawnSandbox("bwrap", args, env, "Bubblewrap sandbox", config.Verbose)
 }
@@ -72,7 +74,7 @@ func (e *Executor) buildBwrapArgs(config *types.SandboxConfig) []string {
 	}
 
 	// Network
-	if config.Network {
+	if config.Network == types.NetworkHost {
 		args = append(args, "--share-net")
 	}
 
@@ -141,7 +143,7 @@ func (e *Executor) buildBwrapArgs(config *types.SandboxConfig) []string {
 
 	// Separator and agent command (wrapped with init commands if present)
 	args = append(args, "--")
-	agentCmd := sandboxutil.BuildAgentCommand(config, "")
+	agentCmd := agentcmd.BuildAgentCommand(config, "")
 	fullCmd := sandboxutil.WrapWithInitCommands(agentCmd, config.SandboxInitCommands)
 	args = append(args, fullCmd...)
 

@@ -34,8 +34,10 @@ import (
 
 	"github.com/xonovex/platform/packages/cli/agent-cli-go/internal/nixenv"
 	"github.com/xonovex/platform/packages/cli/agent-cli-go/internal/sandboxutil"
+	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/agentcmd"
 	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/sandbox"
 	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/types"
+	"github.com/xonovex/platform/packages/shared/shared-core-go/pkg/envutil"
 	"github.com/xonovex/platform/packages/shared/shared-core-go/pkg/scriptlib"
 )
 
@@ -50,7 +52,7 @@ const sandboxNixDir = "/.nixflake-bin"
 // Isolation: host tools unreachable. buildBwrapArgs binds /nix/store and the
 // ro-bound flake dir but no host /usr,/lib,/bin, and sets PATH to the nix bin dir
 // only; the flake.lock devShell then supplies the toolchain. It satisfies
-// RequirePinnedToolchain.
+// RequirePinnedProvisioning and RequireHostToolsUnreachable.
 type Executor struct{}
 
 // NewExecutor creates a new nixflake executor.
@@ -101,7 +103,7 @@ func (e *Executor) Execute(config *types.SandboxConfig) (int, error) {
 	bwrapArgs := e.buildBwrapArgs(config, fc, dirs, nm)
 
 	// Deny-default: the agent binary is resolved by the devShell PATH (no /env prefix).
-	agentCmd := sandboxutil.BuildAgentCommand(config, "")
+	agentCmd := agentcmd.BuildAgentCommand(config, "")
 	fullCmd := sandboxutil.WrapWithInitCommands(agentCmd, config.SandboxInitCommands)
 
 	bwrapArgs = append(bwrapArgs, "--")
@@ -114,9 +116,9 @@ func (e *Executor) Execute(config *types.SandboxConfig) (int, error) {
 		scriptlib.LogInfo("Entering flake devShell " + fc.FlakeRef + "#" + fc.Shell)
 	}
 
-	agentEnv, _ := sandboxutil.BuildProviderEnv(config)
-	merged := sandboxutil.MergeEnvMaps(agentEnv, sandboxutil.ParseCustomEnv(config.CustomEnv))
-	env := append(os.Environ(), sandboxutil.EnvMapToSlice(merged)...)
+	agentEnv, _ := agentcmd.BuildProviderEnv(config)
+	merged := envutil.MergeEnvMaps(agentEnv, envutil.ParseCustomEnv(config.CustomEnv))
+	env := append(os.Environ(), envutil.EnvMapToSlice(merged)...)
 
 	return sandboxutil.SpawnSandbox("bwrap", bwrapArgs, env, "Nix flake sandbox", config.Verbose)
 }
@@ -403,7 +405,7 @@ func (e *Executor) buildBwrapArgs(config *types.SandboxConfig, fc nixenv.FlakeSa
 
 	args = append(args, "--proc", "/proc", "--dev", "/dev")
 	args = append(args, "--unshare-uts", "--unshare-ipc", "--unshare-pid", "--unshare-cgroup")
-	if config.Network {
+	if config.Network == types.NetworkHost {
 		args = append(args, "--share-net")
 	} else {
 		args = append(args, "--unshare-net")
@@ -420,7 +422,7 @@ func (e *Executor) buildBwrapArgs(config *types.SandboxConfig, fc nixenv.FlakeSa
 		"NIX_SSL_CERT_FILE": "/etc/ssl/certs/ca-certificates.crt",
 		"NIX_CONFIG":        "experimental-features = nix-command flakes",
 	}
-	for k, v := range sandboxutil.ParseCustomEnv(config.CustomEnv) {
+	for k, v := range envutil.ParseCustomEnv(config.CustomEnv) {
 		env[k] = v
 	}
 	for k, v := range env {

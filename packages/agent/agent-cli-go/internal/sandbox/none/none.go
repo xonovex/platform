@@ -8,7 +8,7 @@ import (
 // Executor implements direct host execution (no sandbox).
 //
 // Isolation: host tools leaked. Execute runs the agent on the host with the host
-// PATH, so every host tool is reachable. Rejected under RequirePinnedToolchain.
+// PATH, so every host tool is reachable. Rejected under RequireHostToolsUnreachable.
 type Executor struct{}
 
 // NewExecutor creates a new none executor

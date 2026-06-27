@@ -7,8 +7,10 @@ import (
 	"path/filepath"
 
 	"github.com/xonovex/platform/packages/cli/agent-cli-go/internal/sandboxutil"
+	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/agentcmd"
 	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/sandbox"
 	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/types"
+	"github.com/xonovex/platform/packages/shared/shared-core-go/pkg/envutil"
 )
 
 // Executor implements Docker sandbox
@@ -51,7 +53,7 @@ func (e *Executor) buildDockerArgs(config *types.SandboxConfig) []string {
 	homeDir, _ := os.UserHomeDir()
 
 	// Network
-	if !config.Network {
+	if config.Network != types.NetworkHost {
 		args = append(args, "--network", "none")
 	}
 
@@ -64,9 +66,9 @@ func (e *Executor) buildDockerArgs(config *types.SandboxConfig) []string {
 	args = append(args, "-u", fmt.Sprintf("%d:%d", uid, gid))
 
 	// Environment variables from provider
-	agentEnv, _ := sandboxutil.BuildProviderEnv(config)
-	customEnv := sandboxutil.ParseCustomEnv(config.CustomEnv)
-	mergedEnv := sandboxutil.MergeEnvMaps(agentEnv, customEnv)
+	agentEnv, _ := agentcmd.BuildProviderEnv(config)
+	customEnv := envutil.ParseCustomEnv(config.CustomEnv)
+	mergedEnv := envutil.MergeEnvMaps(agentEnv, customEnv)
 
 	// Add sandbox environment
 	sandboxEnv := map[string]string{
@@ -74,7 +76,7 @@ func (e *Executor) buildDockerArgs(config *types.SandboxConfig) []string {
 		"TMPDIR": "/tmp",
 		"SHELL":  "/bin/bash",
 	}
-	mergedEnv = sandboxutil.MergeEnvMaps(sandboxEnv, mergedEnv)
+	mergedEnv = envutil.MergeEnvMaps(sandboxEnv, mergedEnv)
 
 	for k, v := range mergedEnv {
 		args = append(args, "-e", fmt.Sprintf("%s=%s", k, v))
@@ -122,7 +124,7 @@ func (e *Executor) buildDockerArgs(config *types.SandboxConfig) []string {
 	args = append(args, image)
 
 	// Agent command (wrapped with init commands if present)
-	agentCmd := sandboxutil.BuildAgentCommand(config, "")
+	agentCmd := agentcmd.BuildAgentCommand(config, "")
 	fullCmd := sandboxutil.WrapWithInitCommands(agentCmd, config.SandboxInitCommands)
 	args = append(args, fullCmd...)
 
