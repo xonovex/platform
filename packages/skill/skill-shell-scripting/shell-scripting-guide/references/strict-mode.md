@@ -1,10 +1,14 @@
 # strict-mode: Strict Mode and Safety
 
-**Guideline:** Enable strict mode with `set -eu` (POSIX) or `set -euo pipefail` (bash/zsh) to catch errors early.
+## Guideline
 
-**Rationale:** Strict mode prevents scripts from continuing after errors, catches undefined variable usage, and makes pipeline failures visible, preventing silent failures that can cause data loss or security issues.
+Enable strict mode with `set -eu` (POSIX) or `set -euo pipefail` (bash/zsh) to catch errors early.
 
-**Example:**
+## Rationale
+
+Strict mode prevents scripts from continuing after errors, catches undefined variable usage, and makes pipeline failures visible, preventing silent failures that can cause data loss or security issues.
+
+## Example
 
 ```sh
 # ✅ Basic strict mode (POSIX)
@@ -33,7 +37,7 @@ optional_command || true
 set -e
 ```
 
-**Techniques:**
+## Techniques
 
 - Add `set -eu` at the top of POSIX scripts
 - Add `set -euo pipefail` for bash/zsh scripts

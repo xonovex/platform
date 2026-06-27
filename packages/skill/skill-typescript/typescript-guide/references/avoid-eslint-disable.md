@@ -1,10 +1,14 @@
 # avoid-eslint-disable: Never Suppress Warnings - Fix Root Causes
 
-**Guideline:** Never use `eslint-disable`, `@ts-ignore`, or `any` types; fix root causes instead.
+## Guideline
 
-**Rationale:** Suppressing warnings hides architectural issues and creates technical debt.
+Never use `eslint-disable`, `@ts-ignore`, or `any` types; fix root causes instead.
 
-**Example:**
+## Rationale
+
+Suppressing warnings hides architectural issues and creates technical debt.
+
+## Example
 
 ```typescript
 // ❌ WRONG: Suppress error
@@ -19,7 +23,7 @@ itemsRouter.openapi(listItemsRoute, (c) => {
 });
 ```
 
-**Techniques:**
+## Techniques
 
 - Read error message carefully and understand what it indicates
 - Research framework documentation and TypeScript behavior

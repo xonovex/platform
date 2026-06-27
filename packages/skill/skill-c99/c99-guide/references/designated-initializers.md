@@ -1,10 +1,14 @@
 # designated-initializers: Designated Initializers
 
-**Guideline:** Use designated initializers for struct and array initialization to make code self-documenting and reduce errors.
+## Guideline
 
-**Rationale:** Designated initializers explicitly name fields being initialized, making code more readable and maintainable.
+Use designated initializers for struct and array initialization to make code self-documenting and reduce errors.
 
-**Example:**
+## Rationale
+
+Designated initializers explicitly name fields being initialized, making code more readable and maintainable.
+
+## Example
 
 ```c
 struct Point {
@@ -24,7 +28,7 @@ int days[12] = {
 };
 ```
 
-**Techniques:**
+## Techniques
 
 - Field syntax: Use `.field = value` for struct initialization with clarity
 - Array syntax: Use `[index] = value` for sparse array initialization
@@ -34,7 +38,7 @@ int days[12] = {
 - ZII (Zero Is Initialization): A partial initializer or `= {0}` zero-fills the rest, so a zeroed struct is a valid default — C99's analogue of leaning on C++ RAII; give the all-zero state meaning instead of writing an init function
 - Declarative config: Pair a config struct with a `_DEFAULT` const and pass it by value so callers override only what differs — configuration as data, not imperative setter chains (the broader value-oriented API shape lives in [references/value-types.md](./value-types.md))
 
-**Example (ZII default + declarative override):**
+## Example (ZII default + declarative override)
 
 ```c
 typedef struct { int width, height; bool vsync; const char *title; } window_cfg_t;

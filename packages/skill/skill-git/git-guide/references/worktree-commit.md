@@ -1,10 +1,14 @@
 # worktree-commit: Auto-Commit in Worktree with Plan Context
 
-**Guideline:** Commit worktree changes with auto-generated messages enhanced by plan context to align with implementation objectives.
+## Guideline
 
-**Rationale:** Extending auto-commit with plan awareness generates contextual messages that document not just what changed, but how it aligns with the overall feature plan.
+Commit worktree changes with auto-generated messages enhanced by plan context to align with implementation objectives.
 
-**Example:**
+## Rationale
+
+Extending auto-commit with plan awareness generates contextual messages that document not just what changed, but how it aligns with the overall feature plan.
+
+## Example
 
 ```bash
 # In feature worktree: services-feature-auth-flow
@@ -36,7 +40,7 @@ Test coverage: happy path, invalid email, expired TOTP."
 git push -o ci.skip origin HEAD:services/feature/auth-flow
 ```
 
-**Techniques:**
+## Techniques
 
 - Detect worktree name from directory
 - Check changes: `git status --porcelain`

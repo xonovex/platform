@@ -1,10 +1,14 @@
 # task-configuration: Define Inherited Tasks
 
-**Guideline:** Define tasks in `.moon/tasks/*.yml` files with inputs, outputs, and dependencies for automatic inheritance by projects.
+## Guideline
 
-**Rationale:** Centralized task configuration prevents duplication and ensures consistent task execution across projects of the same type or language.
+Define tasks in `.moon/tasks/*.yml` files with inputs, outputs, and dependencies for automatic inheritance by projects.
 
-**Example:**
+## Rationale
+
+Centralized task configuration prevents duplication and ensures consistent task execution across projects of the same type or language.
+
+## Example
 
 ```yaml
 # .moon/tasks/node.yml - Inherited by all Node.js projects
@@ -26,7 +30,7 @@ tasks:
       runInCI: true
 ```
 
-**Techniques:**
+## Techniques
 
 ## command vs script (Moon 2.0)
 

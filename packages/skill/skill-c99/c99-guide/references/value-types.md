@@ -47,4 +47,6 @@ Value returns do not replace every out-param:
 
 The bias: a single small result → return it (or a result struct) by value; a fallible op with one cheap value → result struct; anything heavier → status code + out-param.
 
-**Related:** [references/error-handling.md](./error-handling.md), [references/designated-initializers.md](./designated-initializers.md)
+### Related
+
+[references/error-handling.md](./error-handling.md), [references/designated-initializers.md](./designated-initializers.md)

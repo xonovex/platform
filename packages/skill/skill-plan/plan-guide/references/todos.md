@@ -1,10 +1,14 @@
 # todos: Scan and Group TODO Comments
 
-**Guideline:** Scan for TODO comments, group by intent, and generate research report.
+## Guideline
 
-**Rationale:** TODO comments accumulate and become difficult to track. Scanning and grouping by intent helps prioritize work, identify systemic issues, and convert notes into actionable plans.
+Scan for TODO comments, group by intent, and generate research report.
 
-**Example:**
+## Rationale
+
+TODO comments accumulate and become difficult to track. Scanning and grouping by intent helps prioritize work, identify systemic issues, and convert notes into actionable plans.
+
+## Example
 
 ```
 Scan Results: 47 TODO comments found
@@ -29,7 +33,7 @@ Group 3: Deprecations (17 occurrences, 5 files)
 - Action: Schedule for v2.0 release
 ```
 
-**Techniques:**
+## Techniques
 
 - Scan directory recursively for TODO patterns (`TODO:`, `FIXME:`, `NOTE:`)
 - Extract unique TODO messages, normalized for whitespace consistency

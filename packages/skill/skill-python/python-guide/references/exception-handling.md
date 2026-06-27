@@ -1,10 +1,14 @@
 # exception-handling: Specific Exception Handling
 
-**Guideline:** Raise and catch specific exception types, never use bare `except`.
+## Guideline
 
-**Rationale:** Specific exceptions enable precise error handling and better debugging. Bare `except` catches system exceptions like `KeyboardInterrupt` and `SystemExit`, making programs unresponsive. Custom exceptions document error conditions and enable targeted error handling. Specific exception handling improves code reliability and maintainability.
+Raise and catch specific exception types, never use bare `except`.
 
-**Example:**
+## Rationale
+
+Specific exceptions enable precise error handling and better debugging. Bare `except` catches system exceptions like `KeyboardInterrupt` and `SystemExit`, making programs unresponsive. Custom exceptions document error conditions and enable targeted error handling. Specific exception handling improves code reliability and maintainability.
+
+## Example
 
 ```python
 from pathlib import Path
@@ -63,7 +67,7 @@ except (ValueError, TypeError) as e:
     handle_error(e)
 ```
 
-**Techniques:**
+## Techniques
 
 - Raise specific built-in exceptions (`ValueError`, `TypeError`, `FileNotFoundError`)
 - Create custom exceptions by subclassing built-in exceptions

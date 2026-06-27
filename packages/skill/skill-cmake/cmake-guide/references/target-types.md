@@ -1,10 +1,14 @@
 # target-types: Target Types
 
-**Guideline:** Choose appropriate target types based on how the code will be consumed.
+## Guideline
 
-**Rationale:** Different target types optimize for different use cases: shared libraries for runtime linking, static for embedding, header-only for templates, object for reusing compiled code.
+Choose appropriate target types based on how the code will be consumed.
 
-**Example:**
+## Rationale
+
+Different target types optimize for different use cases: shared libraries for runtime linking, static for embedding, header-only for templates, object for reusing compiled code.
+
+## Example
 
 ```cmake
 # Normal library (static or shared based on BUILD_SHARED_LIBS)
@@ -29,7 +33,7 @@ add_executable(app src/main.cpp)
 add_executable(gui WIN32 MACOSX_BUNDLE src/gui.cpp)
 ```
 
-**Techniques:**
+## Techniques
 
 - add_library() without type: Let BUILD_SHARED_LIBS control static vs shared
 - STATIC: Always statically link, good for embedded or single-binary scenarios

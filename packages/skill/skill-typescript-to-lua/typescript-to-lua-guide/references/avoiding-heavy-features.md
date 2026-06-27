@@ -1,10 +1,14 @@
 # avoiding-heavy-features: Avoiding Heavy TypeScript Features
 
-**Guideline:** Avoid complex inheritance, async/await, and heavy OOP patterns that bloat Lua output.
+## Guideline
 
-**Rationale:** Complex features require substantial runtime support and generate verbose Lua. Simpler patterns align with Lua's lightweight nature.
+Avoid complex inheritance, async/await, and heavy OOP patterns that bloat Lua output.
 
-**Example:**
+## Rationale
+
+Complex features require substantial runtime support and generate verbose Lua. Simpler patterns align with Lua's lightweight nature.
+
+## Example
 
 ```typescript
 // AVOID: Heavy inheritance
@@ -47,7 +51,7 @@ function* loadData() {
 }
 ```
 
-**Techniques:**
+## Techniques
 
 - Use composition patterns instead of inheritance to keep Lua output lightweight
 - Replace async/await with callback functions or coroutines (not supported in Lua)

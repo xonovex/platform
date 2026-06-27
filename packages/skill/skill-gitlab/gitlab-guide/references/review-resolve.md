@@ -1,6 +1,8 @@
 # review-resolve: List, match, and resolve threads
 
-**Guideline:** Resolution is a plain REST PUT on the discussion — no GraphQL needed on GitLab. List the threads, match a finding to a thread by its `id` (never by line number), resolve, and reply in-thread. Resolution gates merge only when the project opts in.
+## Guideline
+
+Resolution is a plain REST PUT on the discussion — no GraphQL needed on GitLab. List the threads, match a finding to a thread by its `id` (never by line number), resolve, and reply in-thread. Resolution gates merge only when the project opts in.
 
 ## List and match
 
@@ -51,4 +53,6 @@ Resolving needs `api` scope + Developer role (or the MR author); a read-only / R
 
 Beware the project "automatically resolve threads when they become outdated" setting: a push that moves the anchored lines silently flips those threads to resolved — re-check `detailed_merge_status` after a push rather than assuming an unresolved thread stayed blocking.
 
-**Related:** [review-post.md](review-post.md)
+### Related
+
+[review-post.md](review-post.md)

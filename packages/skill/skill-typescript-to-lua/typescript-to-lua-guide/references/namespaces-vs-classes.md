@@ -1,10 +1,14 @@
 # namespaces-vs-classes: Namespace vs Class Design
 
-**Guideline:** Prefer namespaces over classes for cleaner, more efficient Lua output.
+## Guideline
 
-**Rationale:** Classes generate metatables and inheritance chains. Namespaces compile to simple Lua tables with functions, resulting in efficient output.
+Prefer namespaces over classes for cleaner, more efficient Lua output.
 
-**Example:**
+## Rationale
+
+Classes generate metatables and inheritance chains. Namespaces compile to simple Lua tables with functions, resulting in efficient output.
+
+## Example
 
 ```typescript
 // AVOID: Class generates complex Lua with metatables
@@ -49,7 +53,7 @@ const mag = Vector.magnitude(v); // 5
 const norm = Vector.normalize(v); // { x: 0.6, y: 0.8 }
 ```
 
-**Techniques:**
+## Techniques
 
 - Use `export namespace` for grouping related functions instead of classes
 - Export functions directly within namespaces (not static methods)

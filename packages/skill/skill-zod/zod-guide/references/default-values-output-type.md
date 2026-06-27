@@ -1,10 +1,14 @@
 # default-values-output-type: Default Values Must Match Output Type
 
-**Guideline:** When using `.transform()` or `.pipe()`, ensure `.default()` matches the final output type, not the input type.
+## Guideline
 
-**Rationale:** Zod v4 requires defaults to match the transformed output type; mismatched types cause TypeScript errors and prevent proper type narrowing.
+When using `.transform()` or `.pipe()`, ensure `.default()` matches the final output type, not the input type.
 
-**Example:**
+## Rationale
+
+Zod v4 requires defaults to match the transformed output type; mismatched types cause TypeScript errors and prevent proper type narrowing.
+
+## Example
 
 ```typescript
 // ✅ Correct - default matches output type (number)
@@ -53,7 +57,7 @@ type Port = z.infer<typeof PortSchema>;
 // Result: number
 ```
 
-**Techniques:**
+## Techniques
 
 - Match defaults to final output type, not input type
 - With `.transform(Number)`, use `.default(1)` not `.default("1")`

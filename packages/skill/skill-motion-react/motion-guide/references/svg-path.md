@@ -1,10 +1,14 @@
 # filename: svg-path
 
-**Guideline:** Animate SVG paths with `pathLength` from 0 to 1 for drawing effects; pair with `opacity` for simultaneous fade-in.
+## Guideline
 
-**Rationale:** Motion's `pathLength` auto-calculates stroke-dash math; simpler than manual `strokeDasharray`/`strokeDashoffset`.
+Animate SVG paths with `pathLength` from 0 to 1 for drawing effects; pair with `opacity` for simultaneous fade-in.
 
-**Example:**
+## Rationale
+
+Motion's `pathLength` auto-calculates stroke-dash math; simpler than manual `strokeDasharray`/`strokeDashoffset`.
+
+## Example
 
 ```tsx
 function DrawingIcon() {
@@ -24,7 +28,7 @@ function DrawingIcon() {
 }
 ```
 
-**Techniques:**
+## Techniques
 
 - Path animation: `initial={{pathLength: 0}}` → `animate={{pathLength: 1}}`; 0-1 range
 - Staggered paths: Use `variants` + `custom` prop for per-path delays

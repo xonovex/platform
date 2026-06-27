@@ -1,10 +1,14 @@
 # indexing: Index Strategy and Optimization
 
-**Guideline:** Create indexes based on actual query patterns and access paths. Use appropriate index types (B-tree, GIN, GiST, BRIN) for different data types and query patterns. Avoid over-indexing as each index has write overhead.
+## Guideline
 
-**Rationale:** Proper indexing dramatically improves query performance by reducing full table scans. Different index types are optimized for different use cases: B-tree for equality and range queries, GIN for JSONB and arrays, GiST for full-text search, BRIN for large time-series data.
+Create indexes based on actual query patterns and access paths. Use appropriate index types (B-tree, GIN, GiST, BRIN) for different data types and query patterns. Avoid over-indexing as each index has write overhead.
 
-**Example:**
+## Rationale
+
+Proper indexing dramatically improves query performance by reducing full table scans. Different index types are optimized for different use cases: B-tree for equality and range queries, GIN for JSONB and arrays, GiST for full-text search, BRIN for large time-series data.
+
+## Example
 
 ```sql
 -- B-tree index for common queries
@@ -34,7 +38,7 @@ CREATE INDEX idx_products_search ON products USING GiST (
 CREATE INDEX idx_logs_created_at ON logs USING BRIN (created_at);
 ```
 
-**Techniques:**
+## Techniques
 
 - Create B-tree indexes (default) for frequently queried columns
 - Use partial indexes to index only relevant subsets

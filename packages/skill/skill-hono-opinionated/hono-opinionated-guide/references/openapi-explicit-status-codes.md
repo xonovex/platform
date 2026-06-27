@@ -1,10 +1,14 @@
 # openapi-explicit-status-codes: Always Provide Explicit Status Codes in Responses
 
-**Guideline:** Always provide explicit status codes in all `c.json()` calls within OpenAPI routes, as discriminated unions require them for proper TypeScript type narrowing.
+## Guideline
 
-**Rationale:** OpenAPI routes define multiple possible response types, each with a specific status code. TypeScript uses discriminated unions to represent these possibilities. Without explicit status codes, TypeScript cannot narrow the response type at compile time, causing type inference to break and losing type safety guarantees.
+Always provide explicit status codes in all `c.json()` calls within OpenAPI routes, as discriminated unions require them for proper TypeScript type narrowing.
 
-**Example:**
+## Rationale
+
+OpenAPI routes define multiple possible response types, each with a specific status code. TypeScript uses discriminated unions to represent these possibilities. Without explicit status codes, TypeScript cannot narrow the response type at compile time, causing type inference to break and losing type safety guarantees.
+
+## Example
 
 ```typescript
 import {createRoute, z} from "@hono/zod-openapi";
@@ -52,7 +56,7 @@ itemsRouter.openapi(createItemRoute, (c) => {
 });
 ```
 
-**Techniques:**
+## Techniques
 
 - Review all `c.json()` calls in OpenAPI handlers and add status code parameter
 - Use 200 for success (OK) and 201 for creation (Created)

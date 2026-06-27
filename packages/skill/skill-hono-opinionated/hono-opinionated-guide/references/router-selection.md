@@ -1,10 +1,14 @@
 # router-selection: Choosing the Right Router for Your Environment
 
-**Guideline:** Select the appropriate Hono router based on deployment environment, optimizing for cold start times in serverless/edge or throughput in traditional servers.
+## Guideline
 
-**Rationale:** Hono provides multiple router implementations: RegExpRouter (fastest throughput via single regex), LinearRouter (optimized for serverless cold starts), SmartRouter (default, supports all patterns), and PatternRouter (smallest footprint). Choosing correctly impacts cold starts, request throughput, and memory usage.
+Select the appropriate Hono router based on deployment environment, optimizing for cold start times in serverless/edge or throughput in traditional servers.
 
-**Example:**
+## Rationale
+
+Hono provides multiple router implementations: RegExpRouter (fastest throughput via single regex), LinearRouter (optimized for serverless cold starts), SmartRouter (default, supports all patterns), and PatternRouter (smallest footprint). Choosing correctly impacts cold starts, request throughput, and memory usage.
+
+## Example
 
 ```typescript
 import {Hono} from "hono";
@@ -25,7 +29,7 @@ const serverlessApp = new Hono({
 const defaultApp = new Hono();
 ```
 
-**Techniques:**
+## Techniques
 
 - Identify deployment environment: serverless/edge (prioritize cold starts) or traditional server
 - Use LinearRouter for serverless/edge environments with repeated initialization

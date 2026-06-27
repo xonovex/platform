@@ -1,10 +1,14 @@
 # vertex-packing: Vertex Packing for GPU
 
-**Guideline:** Pack mesh data to GPU-ready formats. Support interleaved (single buffer) and non-interleaved (streaming).
+## Guideline
 
-**Rationale:** GPU-ready vertex formats maximize performance; flexible layouts support different rendering pipelines and optimization strategies.
+Pack mesh data to GPU-ready formats. Support interleaved (single buffer) and non-interleaved (streaming).
 
-**Example:**
+## Rationale
+
+GPU-ready vertex formats maximize performance; flexible layouts support different rendering pipelines and optimization strategies.
+
+## Example
 
 ```c
 typedef struct {
@@ -30,7 +34,7 @@ size_t mesh3d_pack_size(const mesh3d_t *m, vertex_format_t fmt) {
 }
 ```
 
-**Techniques:**
+## Techniques
 
 - Vertex format naming: Use `vertex_{components}_{types}_t` (e.g., `vertex_3f_4u8_t`)
 - Interleaved layout: Pack all attributes per-vertex in single buffer

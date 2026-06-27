@@ -1,10 +1,14 @@
 # type-checking: Type Checking Best Practices
 
-**Guideline:** Use type aliases, protocols, and modern type syntax for clear, maintainable type hints.
+## Guideline
 
-**Rationale:** Type aliases make complex types readable and reusable. Protocols enable structural typing (duck typing with type safety). Using `Sequence` and `Mapping` instead of `list` and `dict` in function parameters enables broader compatibility. Modern union syntax (`|`) is more concise than `Union`. Proper typing enables static analysis and better IDE support.
+Use type aliases, protocols, and modern type syntax for clear, maintainable type hints.
 
-**Example:**
+## Rationale
+
+Type aliases make complex types readable and reusable. Protocols enable structural typing (duck typing with type safety). Using `Sequence` and `Mapping` instead of `list` and `dict` in function parameters enables broader compatibility. Modern union syntax (`|`) is more concise than `Union`. Proper typing enables static analysis and better IDE support.
+
+## Example
 
 ```python
 from typing import TypeAlias, Protocol, Sequence, Mapping
@@ -38,7 +42,7 @@ def find_user(user_id: str) -> User | None:
     pass
 ```
 
-**Techniques:**
+## Techniques
 
 - Create type aliases with `TypeAlias` for complex types
 - Use `Protocol` for structural typing requirements

@@ -1,10 +1,14 @@
 # string-concatenation: String Concatenation
 
-**Guideline:** Use `table.concat()` for building strings in loops instead of repeated concatenation.
+## Guideline
 
-**Rationale:** Repeated `..` in loops creates many intermediate strings. Using `table.concat` is cleaner and more efficient for building strings from many parts.
+Use `table.concat()` for building strings in loops instead of repeated concatenation.
 
-**Example:**
+## Rationale
+
+Repeated `..` in loops creates many intermediate strings. Using `table.concat` is cleaner and more efficient for building strings from many parts.
+
+## Example
 
 ```lua
 -- ❌ Bad - repeated concatenation creates many strings
@@ -24,7 +28,7 @@ local str = table.concat(parts, ",")
 local message = string.format("Player %s scored %d points", name, score)
 ```
 
-**Techniques:**
+## Techniques
 
 - Build array of string parts
 - Use `table.concat(parts, separator)`

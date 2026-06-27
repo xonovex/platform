@@ -58,4 +58,6 @@ target_link_options(target_asan    PRIVATE -fsanitize=address,undefined)
 
 The `_req()`/`_init()` sizing pattern (see caller-owns-memory) covers string building too: a builder takes `_req(max_len)` bytes the caller allocates, then every append is bounded against that capacity and latches a `truncated` flag — no hidden allocation, no `strcat` overrun. Reads borrow length-carrying views; only the boundary does the one `strlen`. Full treatment in [references/string-handling.md](./string-handling.md).
 
-**Related:** [references/caller-owns-memory.md](./caller-owns-memory.md), [references/string-handling.md](./string-handling.md), [references/safety-validations.md](./safety-validations.md)
+### Related
+
+[references/caller-owns-memory.md](./caller-owns-memory.md), [references/string-handling.md](./string-handling.md), [references/safety-validations.md](./safety-validations.md)

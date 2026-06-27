@@ -1,10 +1,14 @@
 # coordinate-system: Coordinate System Conventions
 
-**Guideline:** Right-handed Y-up coordinates, CCW winding. Use suffixes `_rh`/`_lh` for explicit handedness. Override with defines.
+## Guideline
 
-**Rationale:** Consistent handedness and winding across geometry reduces bugs and ensures interoperability with standard graphics APIs.
+Right-handed Y-up coordinates, CCW winding. Use suffixes `_rh`/`_lh` for explicit handedness. Override with defines.
 
-**Example:**
+## Rationale
+
+Consistent handedness and winding across geometry reduces bugs and ensures interoperability with standard graphics APIs.
+
+## Example
 
 ```c
 // Default (right-handed)
@@ -19,7 +23,7 @@ matrix4f_t view_lh = matrix4f_look_at_lh(eye, target, up);
 #define MATH_CLIP_SPACE_DEPTH_ZERO_TO_ONE 1
 ```
 
-**Techniques:**
+## Techniques
 
 - Right-handed default: Use +X right, +Y up, +Z forward as base convention
 - CCW winding: Define front faces with counter-clockwise vertex order

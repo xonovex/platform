@@ -1,10 +1,14 @@
 # async-await-patterns: Async/Await Patterns
 
-**Guideline:** Use async/await for I/O-bound operations with proper concurrent execution patterns.
+## Guideline
 
-**Rationale:** Async programming enables efficient I/O operations without blocking threads. Using `asyncio.gather()` allows multiple operations to run concurrently, improving performance. Async generators enable memory-efficient streaming of data. Proper async context management ensures resources are cleaned up correctly.
+Use async/await for I/O-bound operations with proper concurrent execution patterns.
 
-**Example:**
+## Rationale
+
+Async programming enables efficient I/O operations without blocking threads. Using `asyncio.gather()` allows multiple operations to run concurrently, improving performance. Async generators enable memory-efficient streaming of data. Proper async context management ensures resources are cleaned up correctly.
+
+## Example
 
 ```python
 import asyncio
@@ -53,7 +57,7 @@ async def main():
 asyncio.run(main())
 ```
 
-**Techniques:**
+## Techniques
 
 - Define async functions with `async def`
 - Use `await` for async operations

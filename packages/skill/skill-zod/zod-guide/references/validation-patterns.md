@@ -1,10 +1,14 @@
 # validation-patterns: Validation Patterns
 
-**Guideline:** Use `.safeParse()` for external input; `.parse()` for controlled data; `.pipe()` for type-safe transformations.
+## Guideline
 
-**Rationale:** Runtime type safety ensures external input never crashes your application.
+Use `.safeParse()` for external input; `.parse()` for controlled data; `.pipe()` for type-safe transformations.
 
-**Example:**
+## Rationale
+
+Runtime type safety ensures external input never crashes your application.
+
+## Example
 
 ```typescript
 // API input with safeParse
@@ -34,7 +38,7 @@ const PaginationSchema = z.object({
 const validated = InternalSchema.parse(data);
 ```
 
-**Techniques:**
+## Techniques
 
 - `.safeParse()`: Use for external input (API, user, services); never throws
 - `.parse()`: Use only for controlled data; throws on validation failure

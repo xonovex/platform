@@ -1,10 +1,14 @@
 # text: Text and Typography
 
-**Guideline:** Load fonts first; use measureText() for dimensions; fitText() to auto-scale; animate with frame-based calculations.
+## Guideline
 
-**Rationale:** Font loading is async; measuring text enables precise layout; frame-based animation ensures consistent timing.
+Load fonts first; use measureText() for dimensions; fitText() to auto-scale; animate with frame-based calculations.
 
-**Example:**
+## Rationale
+
+Font loading is async; measuring text enables precise layout; frame-based animation ensures consistent timing.
+
+## Example
 
 ```tsx
 import {loadFont} from "@remotion/google-fonts/Roboto";
@@ -15,7 +19,7 @@ const {width} = measureText({text: "Hello", fontFamily, fontSize: 48});
 const {fontSize} = fitText({text, withinWidth: 500, fontFamily});
 ```
 
-**Techniques:**
+## Techniques
 
 - Google Fonts: `loadFont()` from @remotion/google-fonts/FontName
 - Local fonts: `loadFont({family, url: staticFile(), weight})`

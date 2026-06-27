@@ -11,9 +11,13 @@
 - Section box: jump to a heading, then descend into it
 - Programmatic focus & bringing content into view
 
-**Guideline:** Make the accessibility traversal order match the visual reading order, expose headings and collection structure to the semantics tree, and group composites into single swipe stops.
+### Guideline
 
-**Rationale:** Screen-reader users navigate sequentially (swipe) and by structure (heading rotor, "item X of Y"). If the semantics tree does not encode order, grouping, headings, and collection counts, those navigation modes break: focus jumps around, related elements scatter into separate swipes, heading jump-navigation finds nothing, and lists give no position feedback. Serves 1.3.1 Info and Relationships, 1.3.2 Meaningful Sequence, 2.4.3 Focus Order, and 2.4.6 Headings and Labels.
+Make the accessibility traversal order match the visual reading order, expose headings and collection structure to the semantics tree, and group composites into single swipe stops.
+
+### Rationale
+
+Screen-reader users navigate sequentially (swipe) and by structure (heading rotor, "item X of Y"). If the semantics tree does not encode order, grouping, headings, and collection counts, those navigation modes break: focus jumps around, related elements scatter into separate swipes, heading jump-navigation finds nothing, and lists give no position feedback. Serves 1.3.1 Info and Relationships, 1.3.2 Meaningful Sequence, 2.4.3 Focus Order, and 2.4.6 Headings and Labels.
 
 ## Three independent orders (accessibility vs keyboard vs composition)
 
@@ -27,7 +31,7 @@ Android has **three distinct orderings**, controlled by different APIs; no singl
 
 ## Accessibility traversal order (`traversalIndex`)
 
-**How to Apply:**
+### How to Apply
 
 1. Default order is the visual reading order (top-to-bottom, left-to-right) — note this differs from the keyboard default (composable-call order). Only override when the visual order differs from composition order (common with a top bar drawn after body content, overlays, or `Box` z-stacks).
 2. Set `Modifier.semantics { traversalIndex = <Float> }`. Lower reads earlier; the implicit default is `0f`; negatives read before everything at `0f`.
@@ -54,7 +58,7 @@ Box {
 
 ## Grouping (`isTraversalGroup`, `mergeDescendants`)
 
-**How to Apply:**
+### How to Apply
 
 1. `Modifier.semantics { isTraversalGroup = true }` scopes ordering: children sort by `traversalIndex` _within_ the group before the group is placed among its siblings. Use it so a reordered region stays self-contained.
 2. `isTraversalGroup` does NOT merge children into one focus stop. To collapse a card (icon + title + subtitle) into a single swipe stop, use `Modifier.semantics(mergeDescendants = true) { }`. They are orthogonal and apply at **different levels** — group a section with `isTraversalGroup` at the container, merge an atomic card with `mergeDescendants` at its own node — but combining both on the **same** node is pointless: a merged node has no individually focusable children left to order.
@@ -83,7 +87,7 @@ Column(
 
 ## Headings (`heading()`)
 
-**How to Apply:**
+### How to Apply
 
 1. Mark the screen title AND every section header with `Modifier.semantics { heading() }`. TalkBack's heading-navigation control jumps between these; without it the user must swipe through every element.
 2. Apply it to the text/label node, not its container, so the announced "heading" text is the visible title.
@@ -123,7 +127,7 @@ Text(
 
 ## Collections (`collectionInfo` / `collectionItemInfo`)
 
-**How to Apply:**
+### How to Apply
 
 1. On the list/grid container, set `Modifier.semantics { collectionInfo = CollectionInfo(rowCount = n, columnCount = c) }`. For an unknown/streaming count, use `-1`.
 2. On each item, set `collectionItemInfo = CollectionItemInfo(rowIndex, rowSpan, columnIndex, columnSpan)`. This is what makes TalkBack announce "item X of Y".
@@ -156,9 +160,11 @@ Column(
 
 ## Named traversal-index enum (maintainability)
 
-**Guideline:** Replace scattered magic `Float` traversal indices with one named enum per screen so the ordering is self-documenting and edits stay consistent.
+### Guideline
 
-**How to Apply:**
+Replace scattered magic `Float` traversal indices with one named enum per screen so the ordering is self-documenting and edits stay consistent.
+
+### How to Apply
 
 1. Define an enum (or sealed value list) whose entries name the regions in reading order and expose their index.
 2. Reference the enum everywhere instead of literals, so adding a region in the middle is a single, reviewable change.
@@ -205,7 +211,9 @@ Stack several down a screen and you have its heading outline. Compose has no hea
 
 **Visual headings are not semantic headings.** Text merely styled with a heading typography token, or markdown rendered into one `AnnotatedString` (where `#`/`##`/`###` map only to a `TextStyle`), is invisible to heading navigation — it looks like an outline but exposes none. Each outline entry needs its own `heading()` node; `AnnotatedString` spans cannot carry it, so render such headings as real composables (or add the semantic per node).
 
-**Counter-Example:** On a simple linear screen where composition order already equals visual order, do not add `traversalIndex` at all, an unnecessary index is one more thing to keep in sync and can introduce the very mismatch it is meant to prevent. Likewise, never set `collectionInfo` on a `LazyColumn`/`LazyRow`, it is already provided and a manual count will fight the framework's.
+### Counter-Example
+
+On a simple linear screen where composition order already equals visual order, do not add `traversalIndex` at all, an unnecessary index is one more thing to keep in sync and can introduce the very mismatch it is meant to prevent. Likewise, never set `collectionInfo` on a `LazyColumn`/`LazyRow`, it is already provided and a manual count will fight the framework's.
 
 ## Programmatic focus & bringing content into view
 
@@ -228,4 +236,6 @@ fun Modifier.moveIntoViewOnFocus(req: BringIntoViewRequester, scope: CoroutineSc
 - **Focus into transient surfaces.** When a sheet or dialog appears, `requestFocus()` a `FocusRequester` attached to its root content and wrap children in `Modifier.focusGroup()`. Note: `focusGroup()` is keyboard/D-pad focus traversal; `isTraversalGroup` is the accessibility reading order — different APIs.
 - **Reorder keyboard / D-pad focus.** Default Tab order follows composable-call order, not the layout — fix it first by grouping/sequencing composables correctly (e.g. a `Row` of two `Column`s so each column is exhausted before the next), then override with `Modifier.focusProperties { next = reqB; previous = reqA }` (1D Tab) or `{ up/down/left/right = ... }` (2D arrows/D-pad), each target carrying a `FocusRequester`. Caveats: only the **topmost** `focusProperties` modifier applies, parents override children, and `FocusRequester.Default` resets to default. This is independent of `traversalIndex` — set both if both audiences need the order.
 
-**Related:** ./labelling.md for `contentDescription` and merge labelling; ./state-and-announcements.md for announcing changes (and validate-on-blur) without moving focus; ./text-and-targets.md for per-item sizing within collections.
+### Related
+
+./labelling.md for `contentDescription` and merge labelling; ./state-and-announcements.md for announcing changes (and validate-on-blur) without moving focus; ./text-and-targets.md for per-item sizing within collections.

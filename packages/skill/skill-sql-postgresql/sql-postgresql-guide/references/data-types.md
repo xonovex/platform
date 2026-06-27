@@ -1,10 +1,14 @@
 # data-types: PostgreSQL Data Type Best Practices
 
-**Guideline:** Choose precise, semantically appropriate data types for each column. Use UUID for distributed identifiers, TIMESTAMPTZ for timestamps, NUMERIC for exact decimals, JSONB for semi-structured data, and custom types (ENUMs, DOMAINs) for business logic.
+## Guideline
 
-**Rationale:** Proper data types ensure data integrity, optimize storage, enable better indexing, and prevent common errors. TIMESTAMPTZ handles timezones correctly, NUMERIC avoids floating-point precision issues, and custom types enforce domain constraints at the database level.
+Choose precise, semantically appropriate data types for each column. Use UUID for distributed identifiers, TIMESTAMPTZ for timestamps, NUMERIC for exact decimals, JSONB for semi-structured data, and custom types (ENUMs, DOMAINs) for business logic.
 
-**Example:**
+## Rationale
+
+Proper data types ensure data integrity, optimize storage, enable better indexing, and prevent common errors. TIMESTAMPTZ handles timezones correctly, NUMERIC avoids floating-point precision issues, and custom types enforce domain constraints at the database level.
+
+## Example
 
 ```sql
 -- Precise data types
@@ -36,7 +40,7 @@ CREATE TABLE users (
 );
 ```
 
-**Techniques:**
+## Techniques
 
 - Use UUID for globally unique identifiers in distributed systems
 - Use TIMESTAMPTZ (not TIMESTAMP) for all timestamps to preserve timezone information

@@ -1,10 +1,14 @@
 # jit-friendly-tables: JIT-Friendly Table Operations
 
-**Guideline:** Keep table shapes stable by pre-allocating all fields and avoid adding fields after creation.
+## Guideline
 
-**Rationale:** LuaJIT optimizes based on table shape. Adding fields later causes shape changes that prevent JIT compilation and reduce performance.
+Keep table shapes stable by pre-allocating all fields and avoid adding fields after creation.
 
-**Example:**
+## Rationale
+
+LuaJIT optimizes based on table shape. Adding fields later causes shape changes that prevent JIT compilation and reduce performance.
+
+## Example
 
 ```lua
 -- ✅ Good - stable tables
@@ -50,7 +54,7 @@ for i = 1, #entities do  -- Fast
 end
 ```
 
-**Techniques:**
+## Techniques
 
 - Define all fields in table literal or constructor
 - Pre-allocate arrays with known size

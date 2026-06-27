@@ -9,11 +9,15 @@
 - 2D point-on-line and 3D line-line intersection helpers
 - Numerical robustness: epsilons and degenerate cases
 
-**Guideline:** Do gizmo drag geometry in screen space: project the gizmo's axis to 2D, project the 2D cursor onto that 2D line, then lift the result back to world space and intersect with the world axis — never build a 3D "mouse ray" from an arbitrary cursor z and intersect it with the axis. Drive the object by the _delta_ of the projected parameter from drag-start, and guard every division with an epsilon so near-parallel axes and zero-length directions cannot explode.
+### Guideline
 
-**Rationale:** The cursor is a 2D screen position; the natural question "where along this axis is the cursor pointing?" is a 2D point-to-line projection, and it is exact. The tempting alternative — invent a 3D ray by setting the cursor's z to 0 and 1, then find where it meets the gizmo axis — is not a projection at all: two arbitrary 3D lines generally do not intersect, so the routine actually minimizes the distance between two skew lines. At shallow viewing angles that distance-minimization wanders far from the axis and the object lurches backward instead of tracking the cursor. Pulling the axis into screen space removes the made-up depth entirely: the projection happens in the same 2D space the mouse lives in, then a single screen-to-world step plus an axis intersection recovers the world parameter. Working from a stored start parameter and applying only the difference keeps the object from snapping to the cursor on the first frame and makes the drag frame-rate independent. Constant screen-size handles matter because a gizmo that shrinks with distance becomes unclickable; scaling geometry by view distance fixes the on-screen size. Finally, the robust forms of these tiny linear-algebra helpers all share one failure mode — a denominator that goes to zero when directions become parallel or degenerate — so each needs an explicit epsilon guard and a sane fallback.
+Do gizmo drag geometry in screen space: project the gizmo's axis to 2D, project the 2D cursor onto that 2D line, then lift the result back to world space and intersect with the world axis — never build a 3D "mouse ray" from an arbitrary cursor z and intersect it with the axis. Drive the object by the _delta_ of the projected parameter from drag-start, and guard every division with an epsilon so near-parallel axes and zero-length directions cannot explode.
 
-**How to Apply:**
+### Rationale
+
+The cursor is a 2D screen position; the natural question "where along this axis is the cursor pointing?" is a 2D point-to-line projection, and it is exact. The tempting alternative — invent a 3D ray by setting the cursor's z to 0 and 1, then find where it meets the gizmo axis — is not a projection at all: two arbitrary 3D lines generally do not intersect, so the routine actually minimizes the distance between two skew lines. At shallow viewing angles that distance-minimization wanders far from the axis and the object lurches backward instead of tracking the cursor. Pulling the axis into screen space removes the made-up depth entirely: the projection happens in the same 2D space the mouse lives in, then a single screen-to-world step plus an axis intersection recovers the world parameter. Working from a stored start parameter and applying only the difference keeps the object from snapping to the cursor on the first frame and makes the drag frame-rate independent. Constant screen-size handles matter because a gizmo that shrinks with distance becomes unclickable; scaling geometry by view distance fixes the on-screen size. Finally, the robust forms of these tiny linear-algebra helpers all share one failure mode — a denominator that goes to zero when directions become parallel or degenerate — so each needs an explicit epsilon guard and a sane fallback.
+
+### How to Apply
 
 1. On drag start, compute the projected parameter once and store it as `axis_start`.
 2. Each frame, recompute the projected parameter `s` for the current cursor and apply the _delta_ `ds = s - axis_start` along the axis.
@@ -23,7 +27,7 @@
 6. Scale handle geometry by distance from the camera so it keeps a fixed pixel size on screen.
 7. Guard every helper: bail to a no-op (return the base point, or `{0,0}`) when a denominator is below epsilon.
 
-**Example:**
+### Example
 
 ```c
 // Per-frame axis drag: apply the DELTA from the stored start, not the absolute s.
@@ -70,7 +74,7 @@ vec2_t gizmo_axis_intersection(vec3_t world_pos, vec3_t axis, vec2_t cursor_px,
 }
 ```
 
-**Gotchas:**
+### Gotchas
 
 - The 3D-mouse-ray approach (set cursor z to 0/1, intersect with the axis) is a skew-line distance minimization, not a projection; it drifts and sends the object backward at steep angles — project in 2D screen space instead.
 - Applying the absolute projected parameter as the position snaps the object to the cursor on frame one; always subtract the drag-start parameter and apply only the delta.
@@ -80,4 +84,6 @@ vec2_t gizmo_axis_intersection(vec3_t world_pos, vec3_t axis, vec2_t cursor_px,
 - A handle that is not distance-scaled shrinks to sub-pixel at distance and becomes unclickable; scale geometry by camera distance for constant on-screen size.
 - Skipping the inverse-parent-rotation step in local mode applies a world delta to a local position and the object slides along the wrong axes under a rotated parent.
 
-**Related:** [references/manipulation-gizmos.md](./manipulation-gizmos.md), **c99-game-opinionated-guide**
+### Related
+
+[references/manipulation-gizmos.md](./manipulation-gizmos.md), **c99-game-opinionated-guide**

@@ -1,16 +1,20 @@
 # consent-and-privacy: Consent-gated, PII-safe tracking
 
-**Guideline:** Apply consent centrally in the tracker layer and never put raw PII in event params or user properties.
+## Guideline
 
-**Rationale:** If features individually decide whether to track, one missed call ships identified data without consent — a legal/privacy breach. Raw PII (email, name, customer id, phone) in analytics payloads leaks into third-party pipelines, logs, and warehouses you do not control, and is irreversible once sent.
+Apply consent centrally in the tracker layer and never put raw PII in event params or user properties.
 
-**How to Apply:**
+## Rationale
+
+If features individually decide whether to track, one missed call ships identified data without consent — a legal/privacy breach. Raw PII (email, name, customer id, phone) in analytics payloads leaks into third-party pipelines, logs, and warehouses you do not control, and is irreversible once sent.
+
+## How to Apply
 
 1. Expose consent as a `Flow` of the user's current choices (categories: analytics, personalization, ad storage). Read it once inside the tracker implementation; do not pass consent down into feature code.
 2. In the central tracker, branch on consent before dispatch. When analytics consent is withheld, set an anonymize/nullify flag so identifiers are stripped — only fully drop events if the product explicitly does not want anonymized collection.
 3. Never accept a raw identifier in an event or property. Hash it with a stable one-way hash (e.g. SHA-256) at the call site or omit it. Treat any raw PII param as a defect to reject in review.
 
-**Example:**
+## Example
 
 ```kotlin
 // Bad — raw PII in params, no central consent gate
@@ -52,6 +56,10 @@ class DefaultAnalyticsTracker(
 }
 ```
 
-**Counter-Example:** Strictly necessary, non-identified product telemetry (crash-free signals, anonymous feature counters) that your privacy/legal classification places outside analytics consent may bypass the gate — but it must still carry zero PII and should be documented as such, not assumed.
+## Counter-Example
 
-**Related:** ./user-properties-and-identity.md, ./testing.md
+Strictly necessary, non-identified product telemetry (crash-free signals, anonymous feature counters) that your privacy/legal classification places outside analytics consent may bypass the gate — but it must still carry zero PII and should be documented as such, not assumed.
+
+## Related
+
+./user-properties-and-identity.md, ./testing.md

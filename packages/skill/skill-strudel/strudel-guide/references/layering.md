@@ -1,10 +1,14 @@
 # filename: layering
 
-**Guideline:** Use `stack()` to combine independent patterns organized by role (rhythm, bass, harmony, melody) with balanced gain levels.
+## Guideline
 
-**Rationale:** Clear layer hierarchy prevents overlap and mud; role-based organization enables independent editing and coherent mixes.
+Use `stack()` to combine independent patterns organized by role (rhythm, bass, harmony, melody) with balanced gain levels.
 
-**Example:**
+## Rationale
+
+Clear layer hierarchy prevents overlap and mud; role-based organization enables independent editing and coherent mixes.
+
+## Example
 
 ```javascript
 stack(
@@ -15,7 +19,7 @@ stack(
 );
 ```
 
-**Techniques:**
+## Techniques
 
 - Layer hierarchy: Kick 0.8-0.9, Bass 0.5-0.6, Lead 0.4-0.5, Pads 0.2-0.4, Hats 0.2-0.4
 - Multi-layer drums: `.late(0.01)` and `.late(0.02)` offsets for depth

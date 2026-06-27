@@ -1,10 +1,14 @@
 # safe-memory-reclamation: Safe Memory Reclamation
 
-**Guideline:** In a lock-free structure, removing a node from the logical structure is not the same as freeing it; defer the actual `free` until you can prove no other thread holds a reference. Pick a reclamation scheme deliberately.
+## Guideline
 
-**Rationale:** This is the central hard problem of lock-free programming. Without a lock, a thread can be reading node X at the exact moment another thread unlinks and frees it — a use-after-free, and the source of ABA when the address is recycled. A garbage collector solves this for you; in C you must build the equivalent. Every scheme trades reader cost, memory overhead, and reclamation latency differently.
+In a lock-free structure, removing a node from the logical structure is not the same as freeing it; defer the actual `free` until you can prove no other thread holds a reference. Pick a reclamation scheme deliberately.
 
-**Schemes:**
+## Rationale
+
+This is the central hard problem of lock-free programming. Without a lock, a thread can be reading node X at the exact moment another thread unlinks and frees it — a use-after-free, and the source of ABA when the address is recycled. A garbage collector solves this for you; in C you must build the equivalent. Every scheme trades reader cost, memory overhead, and reclamation latency differently.
+
+## Schemes
 
 - **Reference counting:** each node carries an atomic refcount; readers increment before access, decrement after, and the last to reach zero frees it. _Limit:_ the increment is itself a race — between loading the pointer and bumping its count, the node can be freed (the "load-then-inc" gap). Fixing it needs split reference counts or a DWCAS, and the per-access atomic RMW does not scale (cache-line bouncing on the count). Fine for low-contention or coarse-grained nodes.
 
@@ -16,17 +20,19 @@
 
 - **Immutable snapshots (atomic version swap):** keep the shared state in an immutable object; a reader does one acquire-load of the current version pointer and then reads freely with no further synchronization (the version never mutates). A writer builds a whole new version off to the side and publishes it with one release-store/CAS on the pointer. Old versions are reclaimed (refcount or epoch) once no reader still holds them. _Trade-off:_ trivially correct lock-free reads and a simple mental model, at the cost of copying the state per update — ideal for coarse, read-mostly, infrequently-written data (config, a world/scene snapshot per frame).
 
-**How to choose:**
+## How to choose
 
 1. Read-mostly, readers must be cheapest, can define quiescent points (frame boundaries) → QSBR / RCU.
 2. Must bound worst-case memory, mixed read/write → hazard pointers.
 3. Low contention, simplest to reason about, coarse objects → reference counting.
 4. Fixed pool that never returns memory to the allocator → no reclamation needed; tag pointers for ABA instead.
 
-**Gotchas:**
+## Gotchas
 
 - All four protect _one logical structure_; a node shared across structures needs the strictest scheme covering it.
 - QSBR/RCU correctness hinges on _every_ participating thread reaching a quiescent state; a thread that spins forever without quiescing leaks all retired memory.
 - Hazard-pointer reads need a `seq_cst` fence (or store + acquire fence) between publishing the hazard and re-reading the pointer, or the publish can be reordered after the dereference.
 
-**Related:** [references/lock-free-stack.md](./lock-free-stack.md), [references/aba-problem.md](./aba-problem.md), [references/progress-guarantees.md](./progress-guarantees.md)
+## Related
+
+[references/lock-free-stack.md](./lock-free-stack.md), [references/aba-problem.md](./aba-problem.md), [references/progress-guarantees.md](./progress-guarantees.md)

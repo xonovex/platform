@@ -1,10 +1,14 @@
 # mock-patterns: Simple Type Casting for Vitest Mocks
 
-**Guideline:** Use simple type casting for Vitest mocks instead of complex generic typing.
+## Guideline
 
-**Rationale:** Simple casting is more maintainable and readable than complex generic typing.
+Use simple type casting for Vitest mocks instead of complex generic typing.
 
-**Example:**
+## Rationale
+
+Simple casting is more maintainable and readable than complex generic typing.
+
+## Example
 
 ```typescript
 import {expect, it, vi} from "vitest";
@@ -43,7 +47,7 @@ it("should transform data", () => {
 });
 ```
 
-**Techniques:**
+## Techniques
 
 - Create mocks with `vi.fn()` without complex generics
 - `vi.fn()` already returns a `Mock`, so call `.mockResolvedValue` / `.mockRejectedValue` directly without casting; only type the variable at declaration (`vi.fn<...>()`) when a type is genuinely needed

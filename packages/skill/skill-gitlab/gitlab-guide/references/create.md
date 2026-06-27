@@ -1,6 +1,8 @@
 # create: Push and open the merge request
 
-**Guideline:** Push the branch yourself, then open the MR with `glab mr create`, capturing the `iid`. glab does NOT push by default, MR creation is NOT idempotent, and the description / labels are replace-only on update. The MR description content is `pull-request-guide`'s craft; the pure-git push and rebase are `git-guide`'s push reference — name them, don't restate them here.
+## Guideline
+
+Push the branch yourself, then open the MR with `glab mr create`, capturing the `iid`. glab does NOT push by default, MR creation is NOT idempotent, and the description / labels are replace-only on update. The MR description content is `pull-request-guide`'s craft; the pure-git push and rebase are `git-guide`'s push reference — name them, don't restate them here.
 
 ## Push first
 
@@ -66,4 +68,6 @@ glab api --method POST "projects/group%2Fproject/merge_requests" \
 - Update: `PUT /projects/:id/merge_requests/:iid` — `description` and `labels` are **replace-only**; only `add_labels` / `remove_labels` are additive.
 - Needs `api` scope + Developer role (see [auth.md](auth.md)); prefer a project access token scoped to one project with a short expiry.
 
-**Related:** [review-post.md](review-post.md), [review-resolve.md](review-resolve.md)
+### Related
+
+[review-post.md](review-post.md), [review-resolve.md](review-resolve.md)

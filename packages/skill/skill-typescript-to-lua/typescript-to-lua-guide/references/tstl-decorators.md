@@ -1,10 +1,14 @@
 # tstl-decorators: TSTL Decorators and Annotations
 
-**Guideline:** Use TSTL-specific decorators and JSDoc annotations to control Lua code generation.
+## Guideline
 
-**Rationale:** TSTL decorators like `@luaTable` and `@luaIterator` fine-tune generated Lua. Custom decorators bridge TypeScript and Lua idioms.
+Use TSTL-specific decorators and JSDoc annotations to control Lua code generation.
 
-**Example:**
+## Rationale
+
+TSTL decorators like `@luaTable` and `@luaIterator` fine-tune generated Lua. Custom decorators bridge TypeScript and Lua idioms.
+
+## Example
 
 ```typescript
 /** @luaTable */
@@ -54,7 +58,7 @@ function memoize(fn: Function) {
 }
 ```
 
-**Techniques:**
+## Techniques
 
 - Use `/** @luaTable */` JSDoc annotation for raw Lua table interfaces
 - Use `/** @luaIterator */` for generator-based iterators

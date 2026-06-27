@@ -1,10 +1,14 @@
 # worktree-validate: Pre-Merge Validation Checkpoint
 
-**Guideline:** Validate feature worktree before merge by running typecheck, lint, build, and tests to ensure stability.
+## Guideline
 
-**Rationale:** Running validation before merge catches issues early, ensures quality standards are met, and verifies the feature aligns with plan criteria when configured.
+Validate feature worktree before merge by running typecheck, lint, build, and tests to ensure stability.
 
-**Example:**
+## Rationale
+
+Running validation before merge catches issues early, ensures quality standards are met, and verifies the feature aligns with plan criteria when configured.
+
+## Example
 
 ```bash
 # In feature worktree
@@ -36,7 +40,7 @@ git config branch.services/feature/auth-flow.plan
 # All validation passed, all plan criteria met
 ```
 
-**Techniques:**
+## Techniques
 
 - Verify in feature worktree
 - Check commits complete

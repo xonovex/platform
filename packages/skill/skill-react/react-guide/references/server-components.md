@@ -1,10 +1,14 @@
 # server-components: React Server Components & Actions
 
-**Guideline:** Use Server Components by default for data fetching and static UI; add `'use client'` only for interactivity.
+## Guideline
 
-**Rationale:** Server Components send zero JS to the client, access databases/APIs directly, and eliminate loading state boilerplate. Client boundaries should be minimal.
+Use Server Components by default for data fetching and static UI; add `'use client'` only for interactivity.
 
-**Example:**
+## Rationale
+
+Server Components send zero JS to the client, access databases/APIs directly, and eliminate loading state boilerplate. Client boundaries should be minimal.
+
+## Example
 
 ```tsx
 import {useActionState} from "react";
@@ -90,7 +94,7 @@ async function QuickForm() {
 }
 ```
 
-**Techniques:**
+## Techniques
 
 - No directive = Server Component (default); can be `async`, access db/fs directly
 - Add `'use client'` only for useState, useEffect, onClick, browser APIs

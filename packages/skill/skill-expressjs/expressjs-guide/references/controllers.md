@@ -1,10 +1,14 @@
 # controllers: Controller Pattern
 
-**Guideline:** Implement async controllers with typed request/response, wrap in try-catch, pass errors to next().
+## Guideline
 
-**Rationale:** Type-safe handlers with proper error handling ensure predictable API behavior.
+Implement async controllers with typed request/response, wrap in try-catch, pass errors to next().
 
-**Example:**
+## Rationale
+
+Type-safe handlers with proper error handling ensure predictable API behavior.
+
+## Example
 
 ```typescript
 export async function list(
@@ -42,7 +46,7 @@ export async function getById(
 }
 ```
 
-**Techniques:**
+## Techniques
 
 - Type generics: Use Request<Params, ResBody, ReqBody, Query> for type safety
 - Return Promise<void>: Indicates async function that doesn't return a value

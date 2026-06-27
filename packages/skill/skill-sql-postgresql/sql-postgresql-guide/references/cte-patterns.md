@@ -1,10 +1,14 @@
 # cte-patterns: Common Table Expression Patterns
 
-**Guideline:** Use CTEs (WITH clauses) to decompose complex queries into readable, named components. Prefer CTEs over subqueries for better organization.
+## Guideline
 
-**Rationale:** CTEs improve readability by naming intermediate result sets, making complex queries easier to understand and maintain.
+Use CTEs (WITH clauses) to decompose complex queries into readable, named components. Prefer CTEs over subqueries for better organization.
 
-**Example:**
+## Rationale
+
+CTEs improve readability by naming intermediate result sets, making complex queries easier to understand and maintain.
+
+## Example
 
 ```sql
 -- Simple CTE
@@ -35,7 +39,7 @@ WITH RECURSIVE org_tree AS (
 SELECT * FROM org_tree ORDER BY level, name;
 ```
 
-**Techniques:**
+## Techniques
 
 - Name CTEs descriptively (active_users, not cte1)
 - Use CTEs to decompose multi-step logic

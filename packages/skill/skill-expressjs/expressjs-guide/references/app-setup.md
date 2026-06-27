@@ -1,10 +1,14 @@
 # app-setup: Basic Application Setup
 
-**Guideline:** Configure Express app with security, logging, body parsing, routes, and error handling in correct order.
+## Guideline
 
-**Rationale:** Middleware order matters - security first, error handler last ensures proper request processing.
+Configure Express app with security, logging, body parsing, routes, and error handling in correct order.
 
-**Example:**
+## Rationale
+
+Middleware order matters - security first, error handler last ensures proper request processing.
+
+## Example
 
 ```typescript
 const app = express();
@@ -31,7 +35,7 @@ app.use((req, res) => res.status(404).json({error: "Not found"}));
 app.use(errorHandler);
 ```
 
-**Techniques:**
+## Techniques
 
 - Middleware order: Security → logging → parsing → routes → 404 → error handler
 - helmet(): Add security headers (CSP, HSTS, X-Frame-Options, etc)

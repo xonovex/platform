@@ -1,6 +1,8 @@
 # review-post: Publish a structured review
 
-**Guideline:** A GitLab review has NO single object — assemble three parts and publish each immediately: a summary note, one position-anchored discussion per inline finding, and a separate approve/withhold verdict. This realizes `code-review-guide`'s findings on GitLab — what each comment says (Conventional Comments labels, blocking vs non-blocking, summary-plus-inline structure) is that skill's craft; this file is only how to deliver it.
+## Guideline
+
+A GitLab review has NO single object — assemble three parts and publish each immediately: a summary note, one position-anchored discussion per inline finding, and a separate approve/withhold verdict. This realizes `code-review-guide`'s findings on GitLab — what each comment says (Conventional Comments labels, blocking vs non-blocking, summary-plus-inline structure) is that skill's craft; this file is only how to deliver it.
 
 ## (1) Summary — a plain note
 
@@ -82,4 +84,6 @@ MR notes carry **no `web_url`** — build it yourself from the returned note `id
 
 All writes here need `api` scope + Developer role (or MR author); see [auth.md](auth.md). The atomic "Submit review with summary" exists only in the UI / GraphQL — over REST every piece publishes immediately.
 
-**Related:** [review-resolve.md](review-resolve.md), [create.md](create.md)
+### Related
+
+[review-resolve.md](review-resolve.md), [create.md](create.md)

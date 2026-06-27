@@ -1,8 +1,12 @@
 # deprecations: React 19 Removed & Deprecated APIs
 
-**Guideline:** Migrate away from removed APIs; avoid deprecated patterns that will be removed in future versions.
+## Guideline
 
-**Rationale:** React 19 removes long-deprecated APIs. Upgrade to React 18.3 first to see deprecation warnings, then migrate.
+Migrate away from removed APIs; avoid deprecated patterns that will be removed in future versions.
+
+## Rationale
+
+React 19 removes long-deprecated APIs. Upgrade to React 18.3 first to see deprecation warnings, then migrate.
 
 ## Contents
 
@@ -28,7 +32,7 @@
 | `forwardRef`       | `ref` as prop        |
 | `Context.Provider` | `<Context value={}>` |
 
-**Example:**
+### Example
 
 ```tsx
 // Removed: ReactDOM.render
@@ -91,7 +95,7 @@ import { act } from 'react-dom/test-utils'; // ❌ Removed
 import { act } from 'react';
 ```
 
-**Migration codemods:**
+### Migration codemods
 
 ```bash
 # Run all React 19 codemods
@@ -104,7 +108,7 @@ npx codemod@latest react/19/replace-forward-ref
 npx codemod@latest react/19/replace-act-import
 ```
 
-**Techniques:**
+### Techniques
 
 - Removed APIs: ReactDOM.render, ReactDOM.hydrate, findDOMNode, string refs, propTypes
 - createRoot: Use for client-side rendering instead of deprecated ReactDOM.render

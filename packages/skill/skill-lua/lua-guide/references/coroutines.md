@@ -1,10 +1,14 @@
 # coroutines: Coroutines for Cooperative Tasks
 
-**Guideline:** Use coroutines for cooperative multitasking, timed actions, and state machines.
+## Guideline
 
-**Rationale:** Coroutines enable writing sequential code for asynchronous operations without callbacks. Ideal for game timers, animations, and task scheduling.
+Use coroutines for cooperative multitasking, timed actions, and state machines.
 
-**Example:**
+## Rationale
+
+Coroutines enable writing sequential code for asynchronous operations without callbacks. Ideal for game timers, animations, and task scheduling.
+
+## Example
 
 ```lua
 -- Coroutine for timed actions
@@ -59,7 +63,7 @@ end)
 manager:update(dt)
 ```
 
-**Techniques:**
+## Techniques
 
 - Create coroutine with `coroutine.create`
 - Use `coroutine.yield()` to pause execution

@@ -1,10 +1,14 @@
 # activity-effect-event: Activity Component & useEffectEvent
 
-**Guideline:** Use `<Activity mode="hidden">` to preserve state; use `useEffectEvent` for Effect logic that reads latest values without re-triggering.
+## Guideline
 
-**Rationale:** Activity preserves DOM state during hide (tabs, accordions); useEffectEvent eliminates false re-runs caused by dependency changes.
+Use `<Activity mode="hidden">` to preserve state; use `useEffectEvent` for Effect logic that reads latest values without re-triggering.
 
-**Example:**
+## Rationale
+
+Activity preserves DOM state during hide (tabs, accordions); useEffectEvent eliminates false re-runs caused by dependency changes.
+
+## Example
 
 ```tsx
 // Activity - preserve state when hidden
@@ -30,7 +34,7 @@ function ChatRoom({roomId, theme}) {
 }
 ```
 
-**Techniques:**
+## Techniques
 
 - Activity visible/hidden: Preserves state of hidden components (vs conditional render which destroys state)
 - Activity pre-rendering: Load content in background for faster transition when shown

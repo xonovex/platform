@@ -1,10 +1,14 @@
 # idiomatic-patterns: Idiomatic Patterns
 
-**Guideline:** Use Lua's idiomatic patterns for common operations like ternary expressions, default values, and safe navigation.
+## Guideline
 
-**Rationale:** These patterns are widely recognized in Lua community, concise, and leverage Lua's truthiness semantics effectively.
+Use Lua's idiomatic patterns for common operations like ternary expressions, default values, and safe navigation.
 
-**Example:**
+## Rationale
+
+These patterns are widely recognized in Lua community, concise, and leverage Lua's truthiness semantics effectively.
+
+## Example
 
 ```lua
 -- ✅ Ternary operator pattern
@@ -32,7 +36,7 @@ a, b = b, a
 local x, y, z = unpack(position)
 ```
 
-**Techniques:**
+## Techniques
 
 - Use `and`/`or` for conditional expressions
 - Use `or` for default values

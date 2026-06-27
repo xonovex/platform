@@ -1,10 +1,14 @@
 # jsonb: JSONB Storage and Querying
 
-**Guideline:** Use JSONB (not JSON) for semi-structured data that needs to be queried or indexed. Leverage JSONB operators and functions for efficient querying. Index JSONB columns with GIN indexes.
+## Guideline
 
-**Rationale:** JSONB provides flexible schema storage while maintaining queryability. It stores data in binary format for faster processing, supports indexing, and provides rich operators for querying nested structures. Prefer JSONB over JSON for all use cases except when preserving exact text formatting is critical.
+Use JSONB (not JSON) for semi-structured data that needs to be queried or indexed. Leverage JSONB operators and functions for efficient querying. Index JSONB columns with GIN indexes.
 
-**Example:**
+## Rationale
+
+JSONB provides flexible schema storage while maintaining queryability. It stores data in binary format for faster processing, supports indexing, and provides rich operators for querying nested structures. Prefer JSONB over JSON for all use cases except when preserving exact text formatting is critical.
+
+## Example
 
 ```sql
 -- Define JSONB table
@@ -44,7 +48,7 @@ SELECT jsonb_agg(data) FROM events WHERE type = 'user_action';
 CREATE INDEX idx_events_data ON events USING GIN (data);
 ```
 
-**Techniques:**
+## Techniques
 
 - Use JSONB column type for semi-structured data
 - Use `->` operator to extract JSONB values (returns JSONB)

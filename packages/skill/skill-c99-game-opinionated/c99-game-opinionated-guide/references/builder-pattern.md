@@ -1,10 +1,14 @@
 # builder-pattern: Builder Pattern for Meshes
 
-**Guideline:** Two-phase construction: `*_req()` queries memory, `*_build()` fills caller-provided buffer.
+## Guideline
 
-**Rationale:** Caller controls allocation (stack, pool, arena). Builder never allocates. Exact sizes prevent over-allocation.
+Two-phase construction: `*_req()` queries memory, `*_build()` fills caller-provided buffer.
 
-**Example:**
+## Rationale
+
+Caller controls allocation (stack, pool, arena). Builder never allocates. Exact sizes prevent over-allocation.
+
+## Example
 
 ```c
 // Query
@@ -21,7 +25,7 @@ mesh3d_t mesh = {.vertices = vertices, .indices = indices,
 status_t status = sphere_mesh3d_build(&mesh, 1.0f, 32, 16);
 ```
 
-**Techniques:**
+## Techniques
 
 - Query phase: Call `*_req()` to get exact vertex/index counts needed
 - Caller allocation: Choose strategy (stack, malloc, arena) for complete control

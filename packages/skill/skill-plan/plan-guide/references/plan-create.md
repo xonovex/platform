@@ -30,13 +30,21 @@ When the request is test-first, apply **tdd-guide**'s red-green-refactor (or **b
 
 ## Implementation Details
 
-**Interactive mode:** ask about architectural preferences, library choices, error handling, testing depth, accessibility
+### Interactive mode
 
-**Plan frontmatter:** `type: plan`, `has_subplans: true`, `status: pending-approval`, `dependencies.plans: []`, `proposed_subplans: []`, `skills_to_consult: [skill-names]`, `research_sources: {documentation: [], versions: {}}`
+ask about architectural preferences, library choices, error handling, testing depth, accessibility
 
-**Skills to consult:** plan MUST include `skills_to_consult` listing applicable coding guidelines (e.g. `typescript-guide`, `react-guide`, `testing-guide`) so implementers know project conventions
+### Plan frontmatter
 
-**Plan sections:** Overview (2-3 sentences), Goals (bullets), Current State (stack / integration), Research Findings (recommended library with version / rationale / pros-cons / docs, alternatives), Proposed Approach (numbered components / files), Risk Assessment, Proposed Child Plans (with execution groups), Success Criteria, Estimated Effort
+`type: plan`, `has_subplans: true`, `status: pending-approval`, `dependencies.plans: []`, `proposed_subplans: []`, `skills_to_consult: [skill-names]`, `research_sources: {documentation: [], versions: {}}`
+
+### Skills to consult
+
+plan MUST include `skills_to_consult` listing applicable coding guidelines (e.g. `typescript-guide`, `react-guide`, `testing-guide`) so implementers know project conventions
+
+### Plan sections
+
+Overview (2-3 sentences), Goals (bullets), Current State (stack / integration), Research Findings (recommended library with version / rationale / pros-cons / docs, alternatives), Proposed Approach (numbered components / files), Risk Assessment, Proposed Child Plans (with execution groups), Success Criteria, Estimated Effort
 
 ## Output
 

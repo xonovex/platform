@@ -1,10 +1,14 @@
 # filename: webgpu
 
-**Guideline:** Use WebGPU for compute shaders and modern GPU features; call `await renderer.init()` before rendering; use TSL for cross-renderer materials.
+## Guideline
 
-**Rationale:** WebGPU provides lower CPU overhead, compute shaders, native Metal/DirectX support; async init required for GPU device setup.
+Use WebGPU for compute shaders and modern GPU features; call `await renderer.init()` before rendering; use TSL for cross-renderer materials.
 
-**Example:**
+## Rationale
+
+WebGPU provides lower CPU overhead, compute shaders, native Metal/DirectX support; async init required for GPU device setup.
+
+## Example
 
 ```javascript
 import * as THREE from "three/webgpu";
@@ -22,7 +26,7 @@ scene.add(mesh);
 renderer.render(scene, camera);
 ```
 
-**Techniques:**
+## Techniques
 
 - Setup: `new THREE.WebGPURenderer()` + `await renderer.init()`; async required for device
 - Fallback: Check `navigator.gpu` before creating; fall back to WebGL if unavailable

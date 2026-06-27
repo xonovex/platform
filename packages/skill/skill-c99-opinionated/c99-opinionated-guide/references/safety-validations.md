@@ -1,10 +1,14 @@
 # safety-validations: Safety Validations
 
-**Guideline:** Validate capacity, bounds, NULL pointers, division-by-zero, overflow before use.
+## Guideline
 
-**Rationale:** Prevents undefined behavior, crashes, security vulnerabilities. Return status codes for graceful error handling.
+Validate capacity, bounds, NULL pointers, division-by-zero, overflow before use.
 
-**Example:**
+## Rationale
+
+Prevents undefined behavior, crashes, security vulnerabilities. Return status codes for graceful error handling.
+
+## Example
 
 ```c
 status_t buffer_write(buffer_t *buf, const void *data, size_t size) {
@@ -24,7 +28,7 @@ vec3_t vec3_normalize(const vec3_t *v) {
 }
 ```
 
-**Techniques:**
+## Techniques
 
 - Capacity checks: Validate `used + size <= capacity` before writing
 - Bounds checks: Check `idx < count` before array access

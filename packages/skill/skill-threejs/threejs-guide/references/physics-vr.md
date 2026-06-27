@@ -1,10 +1,14 @@
 # filename: physics-vr
 
-**Guideline:** Use Rapier (or Cannon-es) for physics; sync physics bodies to meshes each frame; use `renderer.setAnimationLoop()` for WebXR.
+## Guideline
 
-**Rationale:** Three.js has no built-in physics; external engines require frame-based sync. WebXR requires specific animation loop API.
+Use Rapier (or Cannon-es) for physics; sync physics bodies to meshes each frame; use `renderer.setAnimationLoop()` for WebXR.
 
-**Example:**
+## Rationale
+
+Three.js has no built-in physics; external engines require frame-based sync. WebXR requires specific animation loop API.
+
+## Example
 
 ```javascript
 // Physics setup
@@ -26,7 +30,7 @@ function animate() {
 renderer.setAnimationLoop(animate);
 ```
 
-**Techniques:**
+## Techniques
 
 - Physics engines: Rapier (recommended), Cannon-es, Oimo; create world with gravity
 - Bodies: RigidBodyDesc dynamic/static/kinematic; add shapes (colliders)

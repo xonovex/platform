@@ -1,10 +1,14 @@
 # spatial-structures: Spatial Data Structures
 
-**Guideline:** Use dimension-suffixed structures (grid, tree, bvh) for broad-phase queries. Choose by density/pattern.
+## Guideline
 
-**Rationale:** Different structures suit different spatial distributions; dimension suffixes (\_2d, \_3d) enable consistent APIs across dimensions.
+Use dimension-suffixed structures (grid, tree, bvh) for broad-phase queries. Choose by density/pattern.
 
-**Example:**
+## Rationale
+
+Different structures suit different spatial distributions; dimension suffixes (\_2d, \_3d) enable consistent APIs across dimensions.
+
+## Example
 
 ```c
 typedef struct {
@@ -18,7 +22,7 @@ uint32_t cell_y = (uint32_t)((pos.y - g->bounds.min.y) / cell_height);
 uint32_t cell_idx = cell_y * g->cells_x + cell_x;
 ```
 
-**Techniques:**
+## Techniques
 
 - Uniform grids: Use for dense/uniform object distributions with O(1) insertion
 - Quadtrees/Octrees: Use for sparse/varying density with O(log n) operations

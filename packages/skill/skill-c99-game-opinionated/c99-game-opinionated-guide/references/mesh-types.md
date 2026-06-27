@@ -1,10 +1,14 @@
 # mesh-types: Mesh Data Structures
 
-**Guideline:** Use `mesh2d_t`/`mesh3d_t` with capacity tracking. Builders generate from analytic shapes.
+## Guideline
 
-**Rationale:** Separate count/capacity enables efficient reuse; builder pattern decouples construction from memory strategy.
+Use `mesh2d_t`/`mesh3d_t` with capacity tracking. Builders generate from analytic shapes.
 
-**Example:**
+## Rationale
+
+Separate count/capacity enables efficient reuse; builder pattern decouples construction from memory strategy.
+
+## Example
 
 ```c
 typedef struct {
@@ -24,7 +28,7 @@ typedef struct {
 } mesh3d_t;
 ```
 
-**Techniques:**
+## Techniques
 
 - Capacity tracking: Maintain separate count and capacity for dynamic growth
 - Builder pattern: Use `{shape}_mesh{dim}_{req|build}` naming convention

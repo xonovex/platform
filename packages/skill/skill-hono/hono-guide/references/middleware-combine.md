@@ -1,10 +1,14 @@
 # middleware-combine: Composing Middleware with some, every, except
 
-**Guideline:** Use the `combine` module (`some`, `every`, `except`) to compose complex middleware logic for conditional execution and access control.
+## Guideline
 
-**Rationale:** The combine module provides declarative composition of complex requirements: `some()` implements OR logic for alternative auth methods, `every()` implements AND logic for layered checks, and `except()` skips middleware for specific paths, enabling cleaner code than nested conditionals.
+Use the `combine` module (`some`, `every`, `except`) to compose complex middleware logic for conditional execution and access control.
 
-**Example:**
+## Rationale
+
+The combine module provides declarative composition of complex requirements: `some()` implements OR logic for alternative auth methods, `every()` implements AND logic for layered checks, and `except()` skips middleware for specific paths, enabling cleaner code than nested conditionals.
+
+## Example
 
 ```typescript
 import {basicAuth} from "hono/basic-auth";
@@ -39,7 +43,7 @@ app.use("*", except("/health", rateLimiter({max: 100, window: 60})));
 app.use("*", except(["/health", "/metrics", "/ready"], authMiddleware()));
 ```
 
-**Techniques:**
+## Techniques
 
 - Import `some`, `every`, `except` from `hono/combine`
 - Use `some()` for alternative auth methods (OAuth OR API key)

@@ -1,10 +1,14 @@
 # tag-based-filtering: Filter Tasks by Project Tags
 
-**Guideline:** Use `#tag:task` syntax to run tasks for all projects matching a specific tag.
+## Guideline
 
-**Rationale:** Tag-based filtering enables efficient execution of tasks across related projects without listing each individually, supporting tenant isolation and feature organization.
+Use `#tag:task` syntax to run tasks for all projects matching a specific tag.
 
-**Example:**
+## Rationale
+
+Tag-based filtering enables efficient execution of tasks across related projects without listing each individually, supporting tenant isolation and feature organization.
+
+## Example
 
 ```bash
 # Run build for all frontend projects
@@ -18,7 +22,7 @@ moon run '#tenant-other:lint'
 moon run :build --query "tags~frontend|backend"
 ```
 
-**Techniques:**
+## Techniques
 
 ## Tag Syntax
 

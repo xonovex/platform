@@ -1,10 +1,14 @@
 # tradeoffs: Surface Limitations and Decisions Early
 
-**Guideline:** State known limitations, risks, and non-obvious decisions in the description, before a reviewer has to find them.
+## Guideline
 
-**Rationale:** Naming a tradeoff up front signals technical honesty and saves a back-and-forth in review comments. Hidden limitations get discovered late or in production. A "why I chose A over B" lets reviewers engage with your reasoning instead of guessing at it.
+State known limitations, risks, and non-obvious decisions in the description, before a reviewer has to find them.
 
-**How to Apply:**
+## Rationale
+
+Naming a tradeoff up front signals technical honesty and saves a back-and-forth in review comments. Hidden limitations get discovered late or in production. A "why I chose A over B" lets reviewers engage with your reasoning instead of guessing at it.
+
+## How to Apply
 
 1. Add a short "Tradeoffs / risks" section when the change has any.
 2. State each known limitation and why it is acceptable for now.
@@ -12,7 +16,7 @@
 4. Flag anything that affects backwards compatibility, data, config, or other consumers.
 5. If the change diverges from a related convention or another branch, explain why.
 
-**Example:**
+## Example
 
 ```text
 // Bad
@@ -24,6 +28,10 @@
 - Local-dev tooling only, production images are unaffected.
 ```
 
-**Counter-Example:** A change with no limitations or risky decisions does not need the section - do not invent risks.
+## Counter-Example
 
-**Related:** [description.md](./description.md)
+A change with no limitations or risky decisions does not need the section - do not invent risks.
+
+## Related
+
+[description.md](./description.md)

@@ -11,9 +11,13 @@ Generate a concise AGENTS.md for a directory by scanning its structure, config f
 
 ## Discovery
 
-**Configs:** `package.json`, `moon.yml`, `CMakeLists.txt`, `Dockerfile`, `go.mod`, `tsconfig.json`, `Cargo.toml`, `pyproject.toml` — detect project type (TypeScript, Go, C, Python, Rust), extract build/test commands, entry points, exports
+### Configs
 
-**Structure:** 1 level deep; exclude `node_modules`, `.git`, `build`, `dist`, `coverage`, `.artifacts`, `__pycache__`; scan `README.md` for architectural context
+`package.json`, `moon.yml`, `CMakeLists.txt`, `Dockerfile`, `go.mod`, `tsconfig.json`, `Cargo.toml`, `pyproject.toml` — detect project type (TypeScript, Go, C, Python, Rust), extract build/test commands, entry points, exports
+
+### Structure
+
+1 level deep; exclude `node_modules`, `.git`, `build`, `dist`, `coverage`, `.artifacts`, `__pycache__`; scan `README.md` for architectural context
 
 ## Output Format
 

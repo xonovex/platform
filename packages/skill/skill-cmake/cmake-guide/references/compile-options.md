@@ -1,10 +1,14 @@
 # compile-options: Compile Options and Definitions
 
-**Guideline:** Set compiler flags, definitions, and features on targets using target*compile*\* commands with appropriate visibility.
+## Guideline
 
-**Rationale:** Target-scoped settings prevent pollution of the global build environment and allow different targets to have different requirements.
+Set compiler flags, definitions, and features on targets using target*compile*\* commands with appropriate visibility.
 
-**Example:**
+## Rationale
+
+Target-scoped settings prevent pollution of the global build environment and allow different targets to have different requirements.
+
+## Example
 
 ```cmake
 # Set compile options
@@ -26,7 +30,7 @@ target_compile_definitions(mylib
 target_compile_features(mylib PUBLIC cxx_std_20)
 ```
 
-**Techniques:**
+## Techniques
 
 - target_compile_options(): Set compiler-specific flags with generator expressions
 - target_compile_definitions(): Define preprocessor macros with visibility control

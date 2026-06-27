@@ -1,10 +1,14 @@
 # module-structure: Module Organization
 
-**Guideline:** Organize modules with separate directories for reusable modules and environment-specific configurations
+## Guideline
 
-**Rationale:** Clear separation between modules and environments enables reusability and environment isolation
+Organize modules with separate directories for reusable modules and environment-specific configurations
 
-**Example:**
+## Rationale
+
+Clear separation between modules and environments enables reusability and environment isolation
+
+## Example
 
 ```
 terraform/
@@ -42,7 +46,7 @@ terraform/
         └── backend.tf
 ```
 
-**Techniques:**
+## Techniques
 
 - **Modules directory:** Group reusable infrastructure components by capability
 - **Environments directory:** Create separate root modules for dev, staging, prod

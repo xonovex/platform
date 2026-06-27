@@ -1,10 +1,14 @@
 # compound-literals: Compound Literals
 
-**Guideline:** Use compound literals to create temporary values inline without declaring separate variables.
+## Guideline
 
-**Rationale:** Compound literals reduce boilerplate code and improve readability by creating temporary structs or arrays directly in expressions.
+Use compound literals to create temporary values inline without declaring separate variables.
 
-**Example:**
+## Rationale
+
+Compound literals reduce boilerplate code and improve readability by creating temporary structs or arrays directly in expressions.
+
+## Example
 
 ```c
 struct Point {
@@ -25,7 +29,7 @@ void example(void) {
 }
 ```
 
-**Techniques:**
+## Techniques
 
 - Inline syntax: Use `(Type){initializer-list}` to create temporaries inline
 - With designators: Combine with designated initializers for clarity

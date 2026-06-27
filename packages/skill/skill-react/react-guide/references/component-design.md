@@ -1,10 +1,14 @@
 # component-design: Component Design Patterns
 
-**Guideline:** Build small, composable components with minimal state lifting and derived values.
+## Guideline
 
-**Rationale:** Small components are easier to test, reuse, and maintain. Keeping state local reduces complexity and re-renders. Deriving values prevents synchronization bugs.
+Build small, composable components with minimal state lifting and derived values.
 
-**Example:**
+## Rationale
+
+Small components are easier to test, reuse, and maintain. Keeping state local reduces complexity and re-renders. Deriving values prevents synchronization bugs.
+
+## Example
 
 ```tsx
 import {memo, useMemo, useState} from "react";
@@ -50,7 +54,7 @@ function CartTotalBad({items}: {items: CartItem[]}) {
 }
 ```
 
-**Techniques:**
+## Techniques
 
 - Break down large components into smaller, focused pieces
 - Keep state in the lowest common ancestor that needs it

@@ -1,10 +1,14 @@
 # network-policies: Network Segmentation with NetworkPolicy
 
-**Guideline:** Implement NetworkPolicies to control ingress and egress traffic between pods and namespaces.
+## Guideline
 
-**Rationale:** Provides network segmentation and least-privilege access control, preventing unauthorized communication between workloads.
+Implement NetworkPolicies to control ingress and egress traffic between pods and namespaces.
 
-**Example:**
+## Rationale
+
+Provides network segmentation and least-privilege access control, preventing unauthorized communication between workloads.
+
+## Example
 
 ```yaml
 apiVersion: networking.k8s.io/v1
@@ -44,7 +48,7 @@ spec:
           port: 53
 ```
 
-**Techniques:**
+## Techniques
 
 - Pod selection: Use podSelector with matchLabels to target specific pods
 - Policy types: Specify policyTypes for ingress, egress, or both rules

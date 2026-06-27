@@ -1,10 +1,14 @@
 # async-without-await: Only Use Async When Function Contains Await
 
-**Guideline:** Only use `async` when function contains `await` or must return Promise.
+## Guideline
 
-**Rationale:** Unnecessary `async` adds overhead and misleads readers about async behavior.
+Only use `async` when function contains `await` or must return Promise.
 
-**Example:**
+## Rationale
+
+Unnecessary `async` adds overhead and misleads readers about async behavior.
+
+## Example
 
 ```typescript
 // ❌ Bad: async without await
@@ -24,7 +28,7 @@ const middleware = (c, next) => {
 };
 ```
 
-**Techniques:**
+## Techniques
 
 - Review each `async` function for `await` expressions
 - Remove `async` keyword if no `await` found

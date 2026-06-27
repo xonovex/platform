@@ -1,10 +1,14 @@
 # installation: Installation
 
-**Guideline:** Configure installation rules to enable package distribution and consumption via find_package.
+## Guideline
 
-**Rationale:** Proper installation allows your library to be installed system-wide or in custom locations and discovered by other CMake projects.
+Configure installation rules to enable package distribution and consumption via find_package.
 
-**Example:**
+## Rationale
+
+Proper installation allows your library to be installed system-wide or in custom locations and discovered by other CMake projects.
+
+## Example
 
 ```cmake
 # Install targets with export
@@ -30,7 +34,7 @@ install(EXPORT mylib-targets
 )
 ```
 
-**Techniques:**
+## Techniques
 
 - install(TARGETS): Install libraries and executables with type-specific destinations
 - EXPORT: Create importable CMake files for downstream find_package() calls

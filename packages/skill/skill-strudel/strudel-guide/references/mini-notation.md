@@ -1,10 +1,14 @@
 # mini-notation: Pattern Mini-Notation Syntax
 
-**Guideline:** Use Strudel mini-notation operators to express rhythmic and melodic patterns concisely.
+## Guideline
 
-**Rationale:** Mini-notation provides compact syntax for complex structures without verbose function calls.
+Use Strudel mini-notation operators to express rhythmic and melodic patterns concisely.
 
-**Example:**
+## Rationale
+
+Mini-notation provides compact syntax for complex structures without verbose function calls.
+
+## Example
 
 ```javascript
 // Simple drum pattern
@@ -61,7 +65,7 @@ note("[c3 e3] [g3 b3]"); // Melodic subdivisions
 s("[bd sd]*2, hh*16"); // Layered rhythm
 ```
 
-**Techniques:**
+### Techniques
 
 - Space separator: Sequential patterns (a b c)
 - Tilde (~): Rest/silence in pattern

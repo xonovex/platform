@@ -1,10 +1,14 @@
 # mediabunny: Media Metadata and Frame Extraction
 
-**Guideline:** Use Mediabunny for video/audio duration, dimensions, and frame extraction; check decode compatibility before playback.
+## Guideline
 
-**Rationale:** Duration enables accurate durationInFrames; decode checks prevent runtime failures with unsupported codecs.
+Use Mediabunny for video/audio duration, dimensions, and frame extraction; check decode compatibility before playback.
 
-**Example:**
+## Rationale
+
+Duration enables accurate durationInFrames; decode checks prevent runtime failures with unsupported codecs.
+
+## Example
 
 ```tsx
 import {getVideoDimensions, getVideoDuration} from "mediabunny";
@@ -20,7 +24,7 @@ calculateMetadata: async ({props}) => {
 };
 ```
 
-**Techniques:**
+## Techniques
 
 - getVideoDuration(): Returns seconds; multiply by fps for frames
 - getAudioDuration(): For audio files

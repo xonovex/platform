@@ -1,10 +1,14 @@
 # assets: Static Files and Asset Loading
 
-**Guideline:** Use `staticFile()` for local assets in `public/` folder; use Remotion media components `<Img>`, `<Video>`, `<Audio>` that await loading.
+## Guideline
 
-**Rationale:** staticFile() ensures correct paths; Remotion components wait for full asset load before rendering (native HTML doesn't).
+Use `staticFile()` for local assets in `public/` folder; use Remotion media components `<Img>`, `<Video>`, `<Audio>` that await loading.
 
-**Example:**
+## Rationale
+
+staticFile() ensures correct paths; Remotion components wait for full asset load before rendering (native HTML doesn't).
+
+## Example
 
 ```tsx
 <Img src={staticFile("logo.png")} />
@@ -13,7 +17,7 @@
 const {fontFamily} = loadFont({family: "Custom", url: staticFile("fonts/font.woff2")});
 ```
 
-**Techniques:**
+## Techniques
 
 - staticFile("path"): Reference public/ assets; auto-encodes special characters
 - Local assets: Place in public/; organize as images/, videos/, audio/, fonts/

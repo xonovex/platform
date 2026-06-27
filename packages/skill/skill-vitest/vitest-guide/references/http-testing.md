@@ -1,10 +1,14 @@
 # http-testing: HTTP Testing Patterns
 
-**Guideline:** Use correct HTTP status codes in test assertions (204 for OPTIONS/DELETE, 201 for creation, 200 for GET).
+## Guideline
 
-**Rationale:** Correct status codes ensure tests align with HTTP standards and detect real failures.
+Use correct HTTP status codes in test assertions (204 for OPTIONS/DELETE, 201 for creation, 200 for GET).
 
-**Example:**
+## Rationale
+
+Correct status codes ensure tests align with HTTP standards and detect real failures.
+
+## Example
 
 ```typescript
 // CORS Preflight
@@ -48,7 +52,7 @@ it("should handle missing resource", async () => {
 });
 ```
 
-**Techniques:**
+## Techniques
 
 - Assert the preflight (OPTIONS) status your CORS middleware actually returns (Hono `cors()` returns 204 with no body); the CORS spec permits any 2xx, so don't treat 204 as an absolute requirement
 - Use 204 for successful DELETE operations without response body

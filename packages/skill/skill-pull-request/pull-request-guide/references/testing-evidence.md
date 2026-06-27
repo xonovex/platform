@@ -1,10 +1,14 @@
 # testing-evidence: Show How You Verified the Change
 
-**Guideline:** Document the evidence that the change works - environment, scenarios, edge cases, and how a reviewer can reproduce it - not just "tested locally".
+## Guideline
 
-**Rationale:** "Tested locally" is unverifiable and tells the reviewer nothing. Concrete evidence lets them trust the change without pulling the branch, and reproduction steps catch the bugs unit tests miss by exercising the code the way a user or caller would.
+Document the evidence that the change works - environment, scenarios, edge cases, and how a reviewer can reproduce it - not just "tested locally".
 
-**How to Apply:**
+## Rationale
+
+"Tested locally" is unverifiable and tells the reviewer nothing. Concrete evidence lets them trust the change without pulling the branch, and reproduction steps catch the bugs unit tests miss by exercising the code the way a user or caller would.
+
+## How to Apply
 
 1. List the automated tests added or updated, and what they cover.
 2. Describe manual verification: the environment, the exact scenario, and the observed result.
@@ -12,7 +16,7 @@
 4. Give the reviewer a way to reproduce it end to end (a command, a request, a deep link).
 5. For a fix, state how you confirmed the bug before and the fix after.
 
-**Example:**
+## Example
 
 ```text
 // Bad
@@ -24,6 +28,10 @@ Tested locally, works.
 - Edge: a device with zero bookings renders the empty state.
 ```
 
-**Counter-Example:** None - even a docs-only change states "no behaviour change, docs only".
+## Counter-Example
 
-**Related:** [self-review.md](./self-review.md)
+None - even a docs-only change states "no behaviour change, docs only".
+
+## Related
+
+[self-review.md](./self-review.md)

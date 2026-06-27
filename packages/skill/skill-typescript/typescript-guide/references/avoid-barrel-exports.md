@@ -1,10 +1,14 @@
 # avoid-barrel-exports: Import Directly from Specific Files
 
-**Guideline:** Avoid `index.ts` barrel exports in subdirectories; import directly from specific files.
+## Guideline
 
-**Rationale:** Subdirectory barrels add indirection, obscure source, and cause circular dependency issues.
+Avoid `index.ts` barrel exports in subdirectories; import directly from specific files.
 
-**Example:**
+## Rationale
+
+Subdirectory barrels add indirection, obscure source, and cause circular dependency issues.
+
+## Example
 
 ```typescript
 // ✅ Good: Direct imports, no index.ts
@@ -17,7 +21,7 @@ export {authMiddleware} from "./jwt.js";
 export {csrfProtection} from "./csrf.js";
 ```
 
-**Techniques:**
+## Techniques
 
 - Remove `index.ts` from subdirectories (middlewares, utils, services, controllers)
 - Update imports to specific files directly

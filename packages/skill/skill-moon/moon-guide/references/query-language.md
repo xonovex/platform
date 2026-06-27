@@ -1,10 +1,14 @@
 # query-language: Advanced Project and Task Filtering
 
-**Guideline:** Use Moon Query Language (MQL) for advanced filtering of projects and tasks.
+## Guideline
 
-**Rationale:** MQL allows precise selection of projects using language, layer, tags, and other criteria for targeted task execution and querying.
+Use Moon Query Language (MQL) for advanced filtering of projects and tasks.
 
-**Example:**
+## Rationale
+
+MQL allows precise selection of projects using language, layer, tags, and other criteria for targeted task execution and querying.
+
+## Example
 
 ```bash
 # Query projects by language and layer (v2 syntax)
@@ -17,7 +21,7 @@ moon run :build --query "language=typescript"
 moon run :test --query "(language=javascript || language=typescript) && projectLayer=application"
 ```
 
-**Techniques:**
+## Techniques
 
 ## Operators
 

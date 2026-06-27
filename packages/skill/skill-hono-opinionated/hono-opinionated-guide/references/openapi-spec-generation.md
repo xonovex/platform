@@ -1,10 +1,14 @@
 # openapi-spec-generation: Use app.doc() for Automatic OpenAPI Spec Generation
 
-**Guideline:** Use the `app.doc()` method to automatically generate OpenAPI specifications from registered routes instead of maintaining static documents.
+## Guideline
 
-**Rationale:** Manual OpenAPI documents drift out of sync with implementation, require constant maintenance, and create a duplicate source of truth. The `app.doc()` method automatically extracts route metadata from route definitions, building complete documentation that stays synchronized with the actual implementation.
+Use the `app.doc()` method to automatically generate OpenAPI specifications from registered routes instead of maintaining static documents.
 
-**Example:**
+## Rationale
+
+Manual OpenAPI documents drift out of sync with implementation, require constant maintenance, and create a duplicate source of truth. The `app.doc()` method automatically extracts route metadata from route definitions, building complete documentation that stays synchronized with the actual implementation.
+
+## Example
 
 ```typescript
 import {createRoute, OpenAPIHono, z} from "@hono/zod-openapi";
@@ -47,7 +51,7 @@ app.doc("/openapi.json", {
 // Spec automatically includes all registered OpenAPI routes
 ```
 
-**Techniques:**
+## Techniques
 
 - Ensure your app uses `OpenAPIHono` (not regular `Hono`)
 - Define routes using `createRoute()` with full request and response schemas

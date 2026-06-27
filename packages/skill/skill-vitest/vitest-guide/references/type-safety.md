@@ -1,10 +1,14 @@
 # type-safety: Type Safety in Tests
 
-**Guideline:** Always define interfaces for response shapes and cast JSON parsing results to maintain type safety.
+## Guideline
 
-**Rationale:** Type assertions enable IDE autocomplete and prevent unsafe assignment errors.
+Always define interfaces for response shapes and cast JSON parsing results to maintain type safety.
 
-**Example:**
+## Rationale
+
+Type assertions enable IDE autocomplete and prevent unsafe assignment errors.
+
+## Example
 
 ```typescript
 import {describe, expect, it} from "vitest";
@@ -47,7 +51,7 @@ describe("Users API", () => {
 });
 ```
 
-**Techniques:**
+## Techniques
 
 - Define interfaces for expected response shapes at the top of test files
 - Cast all JSON parsing results: `const json = (await res.json()) as ResponseType`

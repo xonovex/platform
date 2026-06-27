@@ -1,10 +1,14 @@
 # role-based-access: Role-Based Access Control (RBAC)
 
-**Guideline:** Create database roles with appropriate permissions and grant them to users. Use roles to enforce least-privilege access at the database level. Define read-only, read-write, and admin roles.
+## Guideline
 
-**Rationale:** Database-level RBAC provides defense-in-depth security by limiting what each database user can do. It prevents accidental or malicious modifications, supports compliance requirements, and allows different applications or users to have different access levels.
+Create database roles with appropriate permissions and grant them to users. Use roles to enforce least-privilege access at the database level. Define read-only, read-write, and admin roles.
 
-**Example:**
+## Rationale
+
+Database-level RBAC provides defense-in-depth security by limiting what each database user can do. It prevents accidental or malicious modifications, supports compliance requirements, and allows different applications or users to have different access levels.
+
+## Example
 
 ```sql
 -- Create roles
@@ -38,7 +42,7 @@ CREATE USER analyst WITH PASSWORD 'secure_password';
 GRANT app_readonly TO analyst;
 ```
 
-**Techniques:**
+## Techniques
 
 - Create roles for different access levels (readonly, readwrite, admin)
 - Grant minimal necessary permissions to each role

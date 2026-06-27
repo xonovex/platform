@@ -1,10 +1,14 @@
 # error-handling: Centralized Error Handler
 
-**Guideline:** Implement single error handler middleware that handles Zod errors, custom errors, and hides stack traces in production.
+## Guideline
 
-**Rationale:** Centralized error handling ensures consistent error responses and prevents information leakage.
+Implement single error handler middleware that handles Zod errors, custom errors, and hides stack traces in production.
 
-**Example:**
+## Rationale
+
+Centralized error handling ensures consistent error responses and prevents information leakage.
+
+## Example
 
 ```typescript
 export function errorHandler(
@@ -48,7 +52,7 @@ export function errorHandler(
 }
 ```
 
-**Techniques:**
+## Techniques
 
 - Four parameters: (err, req, res, next) required for Express to recognize error handler
 - Zod handling: Check instanceof ZodError, return 400 with details

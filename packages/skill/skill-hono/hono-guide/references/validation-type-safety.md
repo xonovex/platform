@@ -1,12 +1,16 @@
 # validation-type-safety: Request Validation and Type Safety with Zod
 
-**Guideline:** Chain `zValidator` inline on the route so `c.req.valid('json')` is typed by inference through the route generics — no cast. Only when a controller is imported from a separate file and receives the base `Context` (where inference cannot flow) fall back to casting `c.req.valid`, and treat that cast as an unchecked assertion that can hide schema/type drift.
+## Guideline
 
-**Rationale:** When the validator is chained on the route, Hono threads the schema's inferred type into the handler's `Context` generics, so `c.req.valid('json')` is fully typed with autocomplete and no assertion. A controller imported separately sees only the base `Context`, whose `c.req.valid()` returns `any`; there a cast restores compile-time types but is unchecked, so it must be reserved for that case and called out as a risk.
+Chain `zValidator` inline on the route so `c.req.valid('json')` is typed by inference through the route generics — no cast. Only when a controller is imported from a separate file and receives the base `Context` (where inference cannot flow) fall back to casting `c.req.valid`, and treat that cast as an unchecked assertion that can hide schema/type drift.
+
+## Rationale
+
+When the validator is chained on the route, Hono threads the schema's inferred type into the handler's `Context` generics, so `c.req.valid('json')` is fully typed with autocomplete and no assertion. A controller imported separately sees only the base `Context`, whose `c.req.valid()` returns `any`; there a cast restores compile-time types but is unchecked, so it must be reserved for that case and called out as a risk.
 
 Schema design — defining schemas, `z.infer` types, `safeParse`, transforms, refinements — belongs to **zod-guide**. This file covers only the Hono glue: wiring a schema through `zValidator` and recovering types at the `c.req.valid` boundary.
 
-**Example (preferred — inline method-chaining, inferred types):**
+## Example (preferred — inline method-chaining, inferred types)
 
 ```typescript
 import {zValidator} from "@hono/zod-validator";
@@ -24,7 +28,7 @@ usersRouter.post("/", zValidator("json", CreateUserSchema), (c) => {
 });
 ```
 
-**Example (fallback — base `Context` controller in a separate file):**
+## Example (fallback — base `Context` controller in a separate file)
 
 ```typescript
 import {zValidator} from "@hono/zod-validator";
@@ -53,7 +57,7 @@ usersRouter.post(
 );
 ```
 
-**Techniques:**
+## Techniques
 
 - Define Zod schemas for request payloads with TypeScript type exports
 - Prefer chaining `zValidator` inline on the route so `c.req.valid('json')` is typed by inference — no cast

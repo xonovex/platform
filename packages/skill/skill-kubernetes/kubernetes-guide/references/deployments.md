@@ -1,10 +1,14 @@
 # deployments: Secure Deployments
 
-**Guideline:** Configure secure, production-ready deployments with security contexts, resource management, and health probes.
+## Guideline
 
-**Rationale:** Deployments need security hardening, resource limits, and health checks to prevent privilege escalation, resource exhaustion, and availability issues.
+Configure secure, production-ready deployments with security contexts, resource management, and health probes.
 
-**Example:**
+## Rationale
+
+Deployments need security hardening, resource limits, and health checks to prevent privilege escalation, resource exhaustion, and availability issues.
+
+## Example
 
 ```yaml
 apiVersion: apps/v1
@@ -46,7 +50,7 @@ spec:
           emptyDir: {}
 ```
 
-**Techniques:**
+## Techniques
 
 - Security context: Set runAsNonRoot and fsGroup for pod-level security
 - Container hardening: Use readOnlyRootFilesystem and drop all capabilities

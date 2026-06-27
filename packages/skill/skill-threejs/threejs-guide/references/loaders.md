@@ -1,10 +1,14 @@
 # filename: loaders
 
-**Guideline:** Use GLTFLoader with Draco compression for 3D models; wrap loaders in async/await; use LoadingManager for progress tracking.
+## Guideline
 
-**Rationale:** GLTF/GLB is web standard; Draco reduces file size 90%+; async prevents UI blocking; manager centralizes progress.
+Use GLTFLoader with Draco compression for 3D models; wrap loaders in async/await; use LoadingManager for progress tracking.
 
-**Example:**
+## Rationale
+
+GLTF/GLB is web standard; Draco reduces file size 90%+; async prevents UI blocking; manager centralizes progress.
+
+## Example
 
 ```javascript
 async function loadModel(url) {
@@ -21,7 +25,7 @@ dracoLoader.setDecoderPath('https://www.gstatic.com/draco/v1.5.6/');
 new GLTFLoader().setDRACOLoader(dracoLoader).load('model.glb', ...);
 ```
 
-**Techniques:**
+## Techniques
 
 - GLTFLoader: Primary format; animations in `gltf.animations`; use `traverse()` for shadow/material setup
 - Draco: Reduce geometry size 90%+; requires decoder path setup

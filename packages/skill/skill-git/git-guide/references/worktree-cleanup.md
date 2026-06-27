@@ -1,10 +1,14 @@
 # worktree-cleanup: Clean Up Stale and Merged Worktrees
 
-**Guideline:** Remove stale and merged feature worktrees to keep workspace clean and organized.
+## Guideline
 
-**Rationale:** Prevents workspace clutter from old feature worktrees by identifying merged worktrees (fully integrated) and stale worktrees (30+ days without changes).
+Remove stale and merged feature worktrees to keep workspace clean and organized.
 
-**Example:**
+## Rationale
+
+Prevents workspace clutter from old feature worktrees by identifying merged worktrees (fully integrated) and stale worktrees (30+ days without changes).
+
+## Example
 
 ```bash
 # List all worktrees and their status
@@ -32,7 +36,7 @@ git worktree list
 # Only main worktree remains
 ```
 
-**Techniques:**
+## Techniques
 
 - List worktrees: `git worktree list`
 - Identify feature worktrees with `*-feature-*` pattern

@@ -1,10 +1,14 @@
 # scene-fundamentals: Scene, Renderer, and Core Concepts
 
-**Guideline:** Configure Scene/Renderer; use Object3D hierarchy with proper dispose patterns; animate with setAnimationLoop and delta time.
+## Guideline
 
-**Rationale:** Proper setup ensures memory safety, correct rendering, and frame-rate independence; improper disposal causes memory leaks.
+Configure Scene/Renderer; use Object3D hierarchy with proper dispose patterns; animate with setAnimationLoop and delta time.
 
-**Example:**
+## Rationale
+
+Proper setup ensures memory safety, correct rendering, and frame-rate independence; improper disposal causes memory leaks.
+
+## Example
 
 ```javascript
 const renderer = new THREE.WebGLRenderer({antialias: true, alpha: true});
@@ -18,7 +22,7 @@ renderer.setAnimationLoop(() => {
 });
 ```
 
-**Techniques:**
+## Techniques
 
 - Renderer config: antialias, alpha (transparency), outputColorSpace (sRGB), toneMaps, shadowMap
 - Scene setup: background (color/texture), environment map (PBR), fog, traverse()

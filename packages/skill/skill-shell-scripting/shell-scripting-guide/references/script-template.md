@@ -1,10 +1,14 @@
 # script-template: Basic Script Template
 
-**Guideline:** Start all shell scripts with a standard template including shebang, strict mode, logging functions, and argument validation.
+## Guideline
 
-**Rationale:** A consistent template ensures scripts follow safety best practices from the start, reducing common errors and improving maintainability.
+Start all shell scripts with a standard template including shebang, strict mode, logging functions, and argument validation.
 
-**Example:**
+## Rationale
+
+A consistent template ensures scripts follow safety best practices from the start, reducing common errors and improving maintainability.
+
+## Example
 
 ```sh
 #!/usr/bin/env sh
@@ -60,7 +64,7 @@ main() {
 main "$@"
 ```
 
-**Techniques:**
+## Techniques
 
 - Begin with `#!/usr/bin/env sh` for portability
 - Add script description and usage in comments

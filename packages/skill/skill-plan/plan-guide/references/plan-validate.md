@@ -31,7 +31,9 @@ AND the code structurally matches what the plan describes. Read-only — never m
    no contradictions, dependencies reference things that exist
 7. **Report** — per-criterion PASS/FAIL, per-task match/deviation, consistency issues
 
-**IMPORTANT:** Read-only; use `plan-update` to update status.
+#### IMPORTANT
+
+Read-only; use `plan-update` to update status.
 
 ### Without Plan Document (Current Work)
 

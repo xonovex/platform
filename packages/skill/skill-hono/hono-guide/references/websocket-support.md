@@ -1,10 +1,14 @@
 # websocket-support: WebSocket Server Setup and Route Patterns
 
-**Guideline:** Keep the object reference returned from `createNodeWebSocket()` and call methods on that object rather than destructuring, to maintain proper `this` binding.
+## Guideline
 
-**Rationale:** JavaScript methods that rely on `this` context lose their binding when destructured. The `@hono/node-ws` package's `createNodeWebSocket()` returns methods that depend on `this` to access internal state. Keeping the object reference preserves the binding while factory functions like `upgradeWebSocket` can safely be destructured.
+Keep the object reference returned from `createNodeWebSocket()` and call methods on that object rather than destructuring, to maintain proper `this` binding.
 
-**Example:**
+## Rationale
+
+JavaScript methods that rely on `this` context lose their binding when destructured. The `@hono/node-ws` package's `createNodeWebSocket()` returns methods that depend on `this` to access internal state. Keeping the object reference preserves the binding while factory functions like `upgradeWebSocket` can safely be destructured.
+
+## Example
 
 ```typescript
 import {serve} from "@hono/node-server";
@@ -50,7 +54,7 @@ wsRouter.get(
 );
 ```
 
-**Techniques:**
+## Techniques
 
 - Import `createNodeWebSocket` from `@hono/node-ws` and call with `{app}` parameter
 - Keep entire object reference (e.g., `wsHelpers`) for method-based APIs

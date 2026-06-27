@@ -1,10 +1,14 @@
 # filename: 3d-effects
 
-**Guideline:** Set `perspective` on parent; use `transformStyle: "preserve-3d"` on children; drive 3D via `useMotionValue` + `useSpring`.
+## Guideline
 
-**Rationale:** Perspective creates 3D depth; preserve-3d enables layering; motion values drive smooth tilt/flip without re-renders.
+Set `perspective` on parent; use `transformStyle: "preserve-3d"` on children; drive 3D via `useMotionValue` + `useSpring`.
 
-**Example:**
+## Rationale
+
+Perspective creates 3D depth; preserve-3d enables layering; motion values drive smooth tilt/flip without re-renders.
+
+## Example
 
 ```tsx
 function Card3D({children}: {children: React.ReactNode}) {
@@ -26,7 +30,7 @@ function Card3D({children}: {children: React.ReactNode}) {
 }
 ```
 
-**Techniques:**
+## Techniques
 
 - Parent perspective: `style={{perspective: 1000}}`; higher = less depth distortion
 - Flip cards: `animate={{rotateY: isFlipped ? 180 : 0}}`; use `backfaceVisibility: "hidden"`

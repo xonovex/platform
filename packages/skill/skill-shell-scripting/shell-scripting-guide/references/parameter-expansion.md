@@ -1,10 +1,14 @@
 # parameter-expansion: Default Values and Parameter Expansion
 
-**Guideline:** Use parameter expansion to set default values, require variables, and perform string operations.
+## Guideline
 
-**Rationale:** Parameter expansion provides safe, portable ways to handle optional and required variables without external commands, improving script robustness and performance.
+Use parameter expansion to set default values, require variables, and perform string operations.
 
-**Example:**
+## Rationale
+
+Parameter expansion provides safe, portable ways to handle optional and required variables without external commands, improving script robustness and performance.
+
+## Example
 
 ```sh
 # ✅ Default value if unset or empty
@@ -30,7 +34,7 @@ basename="${filename%.*}"      # document
 extension="${filename##*.}"    # txt
 ```
 
-**Techniques:**
+## Techniques
 
 - Use `${VAR:-default}` for default if unset or empty
 - Use `: "${VAR:=value}"` to set defaults

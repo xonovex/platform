@@ -1,10 +1,14 @@
 # dataclasses-type-hints: Dataclasses and Type Hints
 
-**Guideline:** Use dataclasses with type hints for structured data definitions.
+## Guideline
 
-**Rationale:** Dataclasses reduce boilerplate code while providing automatic `__init__`, `__repr__`, and comparison methods. Type hints enable static analysis, IDE support, and self-documenting code. Frozen dataclasses create immutable objects that are safer in concurrent contexts.
+Use dataclasses with type hints for structured data definitions.
 
-**Example:**
+## Rationale
+
+Dataclasses reduce boilerplate code while providing automatic `__init__`, `__repr__`, and comparison methods. Type hints enable static analysis, IDE support, and self-documenting code. Frozen dataclasses create immutable objects that are safer in concurrent contexts.
+
+## Example
 
 ```python
 from dataclasses import dataclass, field
@@ -55,7 +59,7 @@ user = User(
 print(user.email)
 ```
 
-**Techniques:**
+## Techniques
 
 - Import `dataclass` decorator and type hints
 - Annotate all fields with types using modern syntax (`list[T]`, `dict[K,V]`)

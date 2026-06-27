@@ -1,10 +1,14 @@
 # type-safety: Type Safety Patterns
 
-**Guideline:** Use strict typing with readonly properties, discriminated unions, and complete annotations.
+## Guideline
 
-**Rationale:** TypeScript's type system catches errors at compile time and guides TSTL. Patterns like discriminated unions provide type-safe error handling.
+Use strict typing with readonly properties, discriminated unions, and complete annotations.
 
-**Example:**
+## Rationale
+
+TypeScript's type system catches errors at compile time and guides TSTL. Patterns like discriminated unions provide type-safe error handling.
+
+## Example
 
 ```typescript
 // Discriminated union for type-safe results
@@ -67,7 +71,7 @@ if (result.kind === "ok") {
 }
 ```
 
-**Techniques:**
+## Techniques
 
 - Use `readonly` modifiers for immutable properties to signal intent
 - Define complete interfaces with all properties typed explicitly

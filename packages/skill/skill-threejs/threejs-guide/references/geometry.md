@@ -1,10 +1,14 @@
 # geometry: Geometry and BufferGeometry
 
-**Guideline:** Use built-in geometries for standard shapes; create efficient custom BufferGeometry with position/UV/indices/normals; use InstancedMesh.
+## Guideline
 
-**Rationale:** Built-ins are optimized; proper BufferGeometry avoids redundant data; InstancedMesh enables thousands of copies in one draw call.
+Use built-in geometries for standard shapes; create efficient custom BufferGeometry with position/UV/indices/normals; use InstancedMesh.
 
-**Example:**
+## Rationale
+
+Built-ins are optimized; proper BufferGeometry avoids redundant data; InstancedMesh enables thousands of copies in one draw call.
+
+## Example
 
 ```javascript
 const geometry = new THREE.BufferGeometry();
@@ -14,7 +18,7 @@ geometry.setIndex(new THREE.BufferAttribute(indices, 1));
 geometry.computeVertexNormals();
 ```
 
-**Techniques:**
+## Techniques
 
 - Built-ins: BoxGeometry, SphereGeometry, PlaneGeometry, CylinderGeometry, IcosahedronGeometry, etc.
 - Path-based: LatheGeometry (vases), TubeGeometry (splines), ExtrudeGeometry (2D extrude), TextGeometry (fonts)

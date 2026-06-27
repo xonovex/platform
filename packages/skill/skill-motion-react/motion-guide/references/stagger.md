@@ -1,10 +1,14 @@
 # filename: stagger
 
-**Guideline:** Use `staggerChildren` in parent variant transitions to orchestrate sequential child animations; never use manual delays.
+## Guideline
 
-**Rationale:** Variants + stagger maintains maintainability; auto-sequencing prevents timing bugs; reversible with `staggerDirection: -1`.
+Use `staggerChildren` in parent variant transitions to orchestrate sequential child animations; never use manual delays.
 
-**Example:**
+## Rationale
+
+Variants + stagger maintains maintainability; auto-sequencing prevents timing bugs; reversible with `staggerDirection: -1`.
+
+## Example
 
 ```tsx
 const container = {
@@ -27,7 +31,7 @@ const item = {
 </motion.ul>;
 ```
 
-**Techniques:**
+## Techniques
 
 - Parent variant: `staggerChildren` (per-child delay), `delayChildren` (initial delay before first)
 - Child variant: individual `initial`/`visible`/`exit` states

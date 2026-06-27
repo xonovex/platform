@@ -17,29 +17,51 @@ Extracts elements from a source skill and integrates them into a target skill wh
 
 ## Integration Rules
 
-**Preserve (CRITICAL):** Frontmatter, section order, bullet format, voice/tone, code style, reference file structure, spacing, terminology
+### Preserve (CRITICAL)
 
-**Spec ceilings (CRITICAL):** Target `description` ≤1024 chars after merge; target body <500 lines / ~5000 tokens — push overflow to `references/` with explicit load-when triggers
+Frontmatter, section order, bullet format, voice/tone, code style, reference file structure, spacing, terminology
 
-**Extract from source:** New rules, gotchas, enhanced explanations, code examples, reference topics, complementary patterns
+### Spec ceilings (CRITICAL)
 
-**Style matching:** Match bullet patterns, bold/italic/code usage, sentence structure, vocabulary, whitespace, heading caps
+Target `description` ≤1024 chars after merge; target body <500 lines / ~5000 tokens — push overflow to `references/` with explicit load-when triggers
 
-**Approach:** Rewrite in target's voice → insert in existing sections → match format exactly → adapt code style → avoid duplicates → omit material the agent already knows
+### Extract from source
 
-**Percentage scale:** 10-30% critical only, 30-50% important (default), 50-70% comprehensive, 70-100% extensive
+New rules, gotchas, enhanced explanations, code examples, reference topics, complementary patterns
 
-**Aspect filtering:** Extract only specified aspects (e.g., "validation" = validation content only)
+### Style matching
+
+Match bullet patterns, bold/italic/code usage, sentence structure, vocabulary, whitespace, heading caps
+
+### Approach
+
+Rewrite in target's voice → insert in existing sections → match format exactly → adapt code style → avoid duplicates → omit material the agent already knows
+
+### Percentage scale
+
+10-30% critical only, 30-50% important (default), 50-70% comprehensive, 70-100% extensive
+
+### Aspect filtering
+
+Extract only specified aspects (e.g., "validation" = validation content only)
 
 ## Implementation
 
-**Discovery:** Accept SKILL.md paths or names (e.g., `typescript-guide` → `<skills-dir>/typescript-guide/SKILL.md`)
+### Discovery
 
-**Analysis:** Parse target structure → analyze bullet/formatting patterns → detect voice → extract style rules → build template
+Accept SKILL.md paths or names (e.g., `typescript-guide` → `<skills-dir>/typescript-guide/SKILL.md`)
 
-**Extraction:** Parse source → extract examples/patterns → read reference files → filter by aspects
+### Analysis
 
-**Integration:** Rewrite in target's voice → insert in existing sections → merge reference files → validate consistency
+Parse target structure → analyze bullet/formatting patterns → detect voice → extract style rules → build template
+
+### Extraction
+
+Parse source → extract examples/patterns → read reference files → filter by aspects
+
+### Integration
+
+Rewrite in target's voice → insert in existing sections → merge reference files → validate consistency
 
 ## Error Handling
 

@@ -1,10 +1,14 @@
 # resampling-and-dsp: Sample-Rate Conversion, Pitch, and Per-Voice DSP
 
-**Guideline:** Resample every source to the mixer's internal rate by reading it with a fractional, per-voice playback step and interpolating between source samples; one knob — the step size — gives both rate conversion and pitch/speed control.
+## Guideline
 
-**Rationale:** A source recorded at one rate cannot be summed against a mixer running at another rate without re-deriving its values at the mixer's sample instants. The clean abstraction is a sampler that, given a fractional time offset, returns the source's value there; advancing that offset by `src_rate / mix_rate` per output sample converts the rate, and scaling the step changes pitch and duration together (step 2.0 plays twice as fast, one octave up). Because real positions land between stored samples, you must interpolate; linear interpolation is cheap and usually adequate, with higher-order kernels (e.g. Hermite/cubic) available when fidelity matters. Doing this per voice lets each sound have its own pitch without touching the others.
+Resample every source to the mixer's internal rate by reading it with a fractional, per-voice playback step and interpolating between source samples; one knob — the step size — gives both rate conversion and pitch/speed control.
 
-**How to Apply:**
+## Rationale
+
+A source recorded at one rate cannot be summed against a mixer running at another rate without re-deriving its values at the mixer's sample instants. The clean abstraction is a sampler that, given a fractional time offset, returns the source's value there; advancing that offset by `src_rate / mix_rate` per output sample converts the rate, and scaling the step changes pitch and duration together (step 2.0 plays twice as fast, one octave up). Because real positions land between stored samples, you must interpolate; linear interpolation is cheap and usually adequate, with higher-order kernels (e.g. Hermite/cubic) available when fidelity matters. Doing this per voice lets each sound have its own pitch without touching the others.
+
+## How to Apply
 
 1. Define a sampler callback per source type: given a fractional offset and a count, it fills a mixer-rate buffer — `(user_data, offset, out, n, mix_rate)`. WAV, synth, and stream sources all hide behind this one signature.
 2. Maintain a fractional read cursor per voice. Advance it by `step = (src_rate / mix_rate) * pitch` each output sample; `pitch` is the per-voice speed/pitch control.
@@ -12,7 +16,7 @@
 4. Keep DSP per-voice and bounded: pitch via step, gain/pan via the mix matrix; defer reverb and shared effect buses to a separate, fixed-cost post-mix stage.
 5. Resample on load if the source is small and the rate fixed (one-time cost), or resample on the fly inside the sampler if the rate varies or the asset is streamed.
 
-**Example:**
+## Example
 
 ```c
 // Sampler contract: produce `n` mixer-rate samples starting at `offset` seconds.
@@ -35,7 +39,7 @@ uint32_t wav_sample(const void *ud, double offset, float *out,
 }
 ```
 
-**Gotchas:**
+## Gotchas
 
 - Linear interpolation is a cheap default but rolls off highs and adds aliasing on big pitch-ups; reach for a cubic/Hermite or band-limited kernel only where the artifact is audible, not everywhere.
 - Pitching a voice up makes it consume source samples faster, so it ends sooner — couple the read cursor to the loop/length logic or a sped-up loop will glitch at its seam.
@@ -43,4 +47,6 @@ uint32_t wav_sample(const void *ud, double offset, float *out,
 - Pitch-up reads past the source faster than pitch-1; always range-check the bracketing index, especially the `i0 + 1` neighbor at the very end of the buffer.
 - Resampling on the audio thread is fine as long as it stays bounded and allocation-free; do not lazily allocate a scratch buffer there (see the callback contract).
 
-**Related:** [references/mixing-and-buffers.md](./mixing-and-buffers.md), [references/voice-management.md](./voice-management.md)
+## Related
+
+[references/mixing-and-buffers.md](./mixing-and-buffers.md), [references/voice-management.md](./voice-management.md)

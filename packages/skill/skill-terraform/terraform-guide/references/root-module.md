@@ -1,10 +1,14 @@
 # root-module: Root Module Pattern
 
-**Guideline:** Keep root modules thin by composing child modules with provider config and environment-specific values
+## Guideline
 
-**Rationale:** Root modules orchestrate infrastructure without duplicating logic, modules remain reusable
+Keep root modules thin by composing child modules with provider config and environment-specific values
 
-**Example:**
+## Rationale
+
+Root modules orchestrate infrastructure without duplicating logic, modules remain reusable
+
+## Example
 
 ```hcl
 # environments/prod/main.tf
@@ -61,7 +65,7 @@ module "compute" {
 }
 ```
 
-**Techniques:**
+## Techniques
 
 - **Provider blocks:** Configure required providers with version constraints
 - **Default tags:** Use provider default_tags to apply common tags to all resources

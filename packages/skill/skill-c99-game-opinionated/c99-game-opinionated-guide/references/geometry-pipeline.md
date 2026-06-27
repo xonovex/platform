@@ -1,10 +1,14 @@
 # geometry-pipeline: Geometry Pipeline
 
-**Guideline:** Three-layer pipeline: Analytic (logic) → Discrete (mesh) → Packing (GPU).
+## Guideline
 
-**Rationale:** Each layer handles specific concerns: math/physics, rendering data, GPU format optimization.
+Three-layer pipeline: Analytic (logic) → Discrete (mesh) → Packing (GPU).
 
-**Example:**
+## Rationale
+
+Each layer handles specific concerns: math/physics, rendering data, GPU format optimization.
+
+## Example
 
 ```c
 // 1. Analytic
@@ -21,7 +25,7 @@ size_t size = mesh3d_pack_size(&mesh, VERTEX_FORMAT_3F_4U8);
 mesh3d_pack_3f_4u8(packed, &mesh, color);
 ```
 
-**Techniques:**
+## Techniques
 
 - Analytic layer: Define shapes like `sphere3d_t`, `circle2d_t` for physics/logic
 - Discrete layer: Build indexed meshes from analytic shapes with builder pattern

@@ -1,10 +1,14 @@
 # responses: Response Patterns and Status Codes
 
-**Guideline:** Use consistent JSON response shapes with appropriate HTTP status codes.
+## Guideline
 
-**Rationale:** Standardized responses simplify client-side handling and follow HTTP semantics.
+Use consistent JSON response shapes with appropriate HTTP status codes.
 
-**Example:**
+## Rationale
+
+Standardized responses simplify client-side handling and follow HTTP semantics.
+
+## Example
 
 ```typescript
 // Success
@@ -20,7 +24,7 @@ res.status(400).json({error: "Validation failed", details: {...}});
 res.status(204).send();
 ```
 
-**Techniques:**
+## Techniques
 
 - Data wrapper: Wrap all responses in {data: ...} or {error: ...} envelope
 - Status 200: GET, PUT, PATCH success - return {data: modified}

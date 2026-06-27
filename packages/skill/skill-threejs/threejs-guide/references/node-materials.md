@@ -1,10 +1,14 @@
 # filename: node-materials
 
-**Guideline:** Use TSL (Three Shading Language) for materials that work across WebGL and WebGPU; compose shader nodes instead of writing GLSL.
+## Guideline
 
-**Rationale:** TSL provides type-safe, composable nodes compiling to GLSL (WebGL) and WGSL (WebGPU); supports future renderers without code changes.
+Use TSL (Three Shading Language) for materials that work across WebGL and WebGPU; compose shader nodes instead of writing GLSL.
 
-**Example:**
+## Rationale
+
+TSL provides type-safe, composable nodes compiling to GLSL (WebGL) and WGSL (WebGPU); supports future renderers without code changes.
+
+## Example
 
 ```javascript
 import {float, mix, sin, uniform, vec3} from "three/tsl";
@@ -20,7 +24,7 @@ const material = new THREE.MeshStandardNodeMaterial({
 timeUniform.value = clock.getElapsedTime();
 ```
 
-**Techniques:**
+## Techniques
 
 - TSL nodes: `float()`, `vec2/3/4()`, `sin()`, `cos()`, `mix()`, `step()`, `normalize()`
 - Uniforms: `uniform(type, name)` for runtime control; update `.value` each frame

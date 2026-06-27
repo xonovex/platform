@@ -1,10 +1,14 @@
 # effects: Audio Effects and Processing
 
-**Guideline:** Chain effects with dot notation; balance gain staging, use filters for EQ, and add space with reverb/delay.
+## Guideline
 
-**Rationale:** Tasteful effects shape tone and add movement; poor gain staging causes clipping or loss of clarity.
+Chain effects with dot notation; balance gain staging, use filters for EQ, and add space with reverb/delay.
 
-**Example:**
+## Rationale
+
+Tasteful effects shape tone and add movement; poor gain staging causes clipping or loss of clarity.
+
+## Example
 
 ```javascript
 // Acid bass
@@ -15,7 +19,7 @@ note("c2*8")
   .gain(0.5);
 ```
 
-**Techniques:**
+## Techniques
 
 - Gain staging: kick 0.7-0.85, bass 0.5-0.6, leads 0.4-0.6, hats 0.2-0.35
 - `.lpf(cutoff)`, `.hpf(cutoff)`: Shape frequency space (sub-bass 40-100Hz, muddy 300-600Hz)

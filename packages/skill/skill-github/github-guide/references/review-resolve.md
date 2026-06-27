@@ -1,8 +1,12 @@
 # review-resolve: list, match, resolve, and reply on review threads
 
-**Guideline:** Resolution is **GraphQL-only** — list `pullRequest.reviewThreads`, match a finding to a thread by its node id (`PRRT_…`), never by line, then `resolveReviewThread`. Reply in-thread with `addPullRequestReviewThreadReply`.
+## Guideline
 
-**Rationale:** REST has no resolve field and does not model review threads at all; only GraphQL exposes thread resolution and the full reply chains.
+Resolution is **GraphQL-only** — list `pullRequest.reviewThreads`, match a finding to a thread by its node id (`PRRT_…`), never by line, then `resolveReviewThread`. Reply in-thread with `addPullRequestReviewThreadReply`.
+
+## Rationale
+
+REST has no resolve field and does not model review threads at all; only GraphQL exposes thread resolution and the full reply chains.
 
 ## List threads (the only source of full reply chains)
 
@@ -43,7 +47,9 @@ gh api graphql -f query='mutation($t:ID!){resolveReviewThread(input:{threadId:$t
 # reverse with unresolveReviewThread(input:{threadId:$t})
 ```
 
-**Permission gotcha:** on a fine-grained PAT / App token, `resolveReviewThread` needs **Pull requests: write AND Contents: read & write**, or it fails "Resource not accessible by integration" (community #44650). A classic `repo` token suffices.
+### Permission gotcha
+
+on a fine-grained PAT / App token, `resolveReviewThread` needs **Pull requests: write AND Contents: read & write**, or it fails "Resource not accessible by integration" (community #44650). A classic `repo` token suffices.
 
 ## Reply in-thread (preferred, unambiguous)
 
@@ -62,6 +68,10 @@ Resolving a thread blocks merge **only** when "Require conversation resolution b
 gh pr view 123 --json reviewDecision,mergeStateStatus,mergeable   # mergeStateStatus=BLOCKED means a gate is unmet
 ```
 
-**Orphaned/outdated threads:** after a force-push / rebase / squash, threads stay unresolved (`isOutdated:true`) and can block merge with nothing visibly open — use `isOutdated` to detect them. An outdated thread can often be resolved only by the original comment author, so a different automation identity may be unable to clear it.
+### Orphaned/outdated threads
 
-**Related:** [review-post.md](./review-post.md), [auth.md](./auth.md)
+after a force-push / rebase / squash, threads stay unresolved (`isOutdated:true`) and can block merge with nothing visibly open — use `isOutdated` to detect them. An outdated thread can often be resolved only by the original comment author, so a different automation identity may be unable to clear it.
+
+### Related
+
+[review-post.md](./review-post.md), [auth.md](./auth.md)

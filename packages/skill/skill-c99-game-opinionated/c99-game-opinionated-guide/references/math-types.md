@@ -1,10 +1,14 @@
 # math-types: Game Math Types
 
-**Guideline:** Use 16-byte aligned vectors/matrices/quaternions. Union-based for named and indexed access.
+## Guideline
 
-**Rationale:** 16-byte alignment enables SIMD operations and efficient cache access; unions allow both semantic and array-based access.
+Use 16-byte aligned vectors/matrices/quaternions. Union-based for named and indexed access.
 
-**Example:**
+## Rationale
+
+16-byte alignment enables SIMD operations and efficient cache access; unions allow both semantic and array-based access.
+
+## Example
 
 ```c
 typedef union {
@@ -23,7 +27,7 @@ matrix4f_t m;
 m.columns[3] = (vec4f_t){.x = tx, .y = ty, .z = tz, .w = 1.0f};
 ```
 
-**Techniques:**
+## Techniques
 
 - 16-byte alignment: Pad vec3 with \_pad field for SIMD-friendly 16B size
 - Union design: Combine named fields with array access for flexibility

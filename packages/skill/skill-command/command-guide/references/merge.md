@@ -25,27 +25,47 @@ Extracts elements from a source prompt and integrates them into a target prompt 
 
 ## Integration Rules
 
-**Preserve (CRITICAL):** metadata block, section order, formatting (bullets/numbers), voice/tone, code style, argument format, example structure, spacing
+### Preserve (CRITICAL)
 
-**Extract from source:** workflow steps, arguments/flags, validation, error handling, safety guidelines, examples
+metadata block, section order, formatting (bullets/numbers), voice/tone, code style, argument format, example structure, spacing
 
-**Style matching:** match workflow format, argument style, example format, heading caps, whitespace, vocabulary
+### Extract from source
 
-**Approach:** rewrite in target's voice → insert in existing sections → match format exactly → adapt examples → avoid duplicates
+workflow steps, arguments/flags, validation, error handling, safety guidelines, examples
 
-**Percentage scale:** 10-30% critical only, 30-50% important (default), 50-70% comprehensive, 70-100% extensive
+### Style matching
 
-**Aspect filtering:** `workflow` (steps/sequence), `arguments` (patterns/validation), `error-handling` (cases/messages), `examples` (use cases), `validation` (rules/checks), `safety` (guidelines/warnings)
+match workflow format, argument style, example format, heading caps, whitespace, vocabulary
+
+### Approach
+
+rewrite in target's voice → insert in existing sections → match format exactly → adapt examples → avoid duplicates
+
+### Percentage scale
+
+10-30% critical only, 30-50% important (default), 50-70% comprehensive, 70-100% extensive
+
+### Aspect filtering
+
+`workflow` (steps/sequence), `arguments` (patterns/validation), `error-handling` (cases/messages), `examples` (use cases), `validation` (rules/checks), `safety` (guidelines/warnings)
 
 ## Implementation
 
-**Discovery:** Accept prompt-file paths or bare names; resolve to the harness-specific location and extension (see [harness-formats.md](harness-formats.md))
+### Discovery
 
-**Analysis:** Parse target structure → analyze formatting → detect voice → extract conventions → build template
+Accept prompt-file paths or bare names; resolve to the harness-specific location and extension (see [harness-formats.md](harness-formats.md))
 
-**Extraction:** Parse source → extract workflow/arguments/validation → collect examples → filter by aspects
+### Analysis
 
-**Integration:** Rewrite in target's voice → insert in existing sections → merge workflows → validate consistency
+Parse target structure → analyze formatting → detect voice → extract conventions → build template
+
+### Extraction
+
+Parse source → extract workflow/arguments/validation → collect examples → filter by aspects
+
+### Integration
+
+Rewrite in target's voice → insert in existing sections → merge workflows → validate consistency
 
 ## Error Handling
 

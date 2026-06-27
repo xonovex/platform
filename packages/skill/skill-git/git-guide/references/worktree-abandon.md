@@ -30,7 +30,7 @@ Abandon a feature: update the plan status, document the reason and learnings, an
 
 ## Plan Updates
 
-**Frontmatter:**
+### Frontmatter
 
 ```yaml
 status: "abandoned"
@@ -38,7 +38,7 @@ abandoned_reason: "Superseded by OAuth 2.0"
 abandoned_date: "2026-05-13"
 ```
 
-**Content:**
+### Content
 
 ```markdown
 ## Abandonment Notes

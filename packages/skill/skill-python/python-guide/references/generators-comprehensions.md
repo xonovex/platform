@@ -1,10 +1,14 @@
 # generators-comprehensions: Generators and Comprehensions
 
-**Guideline:** Use generators and comprehensions for memory-efficient, lazy data processing.
+## Guideline
 
-**Rationale:** Generators process items on-demand without loading entire datasets into memory, enabling efficient handling of large files and streams. Comprehensions provide concise, readable syntax for transformations. Generator expressions and functions enable pipeline-style processing with minimal memory overhead.
+Use generators and comprehensions for memory-efficient, lazy data processing.
 
-**Example:**
+## Rationale
+
+Generators process items on-demand without loading entire datasets into memory, enabling efficient handling of large files and streams. Comprehensions provide concise, readable syntax for transformations. Generator expressions and functions enable pipeline-style processing with minimal memory overhead.
+
+## Example
 
 ```python
 from typing import Iterator, Iterable
@@ -46,7 +50,7 @@ def read_large_file_bad(path: Path) -> list[str]:
         return [line.strip() for line in f]  # All in memory!
 ```
 
-**Techniques:**
+## Techniques
 
 - Use list/dict/set comprehensions for small, in-memory collections
 - Use generator expressions (parentheses) for large or streamed data

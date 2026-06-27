@@ -1,10 +1,14 @@
 # input-validation: Input Validation
 
-**Guideline:** Validate function arguments for type, range, and correctness using assertions.
+## Guideline
 
-**Rationale:** Lua is dynamically typed. Explicit validation catches errors early, provides clear error messages, and documents expectations.
+Validate function arguments for type, range, and correctness using assertions.
 
-**Example:**
+## Rationale
+
+Lua is dynamically typed. Explicit validation catches errors early, provides clear error messages, and documents expectations.
+
+## Example
 
 ```lua
 -- ✅ Good - validate inputs
@@ -35,7 +39,7 @@ function M.set_volume(volume)
 end
 ```
 
-**Techniques:**
+## Techniques
 
 - Use `assert()` with descriptive messages
 - Check types with `type()` function

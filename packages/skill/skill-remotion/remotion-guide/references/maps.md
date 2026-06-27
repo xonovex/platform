@@ -1,10 +1,14 @@
 # maps: Map Animations with Mapbox
 
-**Guideline:** Disable Mapbox animations (fadeDuration: 0, interactive: false); control camera/lines via Remotion frames; use turf.js for route.
+## Guideline
 
-**Rationale:** Mapbox animations conflict with frame-by-frame rendering; Remotion frame control ensures deterministic animation.
+Disable Mapbox animations (fadeDuration: 0, interactive: false); control camera/lines via Remotion frames; use turf.js for route.
 
-**Example:**
+## Rationale
+
+Mapbox animations conflict with frame-by-frame rendering; Remotion frame control ensures deterministic animation.
+
+## Example
 
 ```tsx
 const _map = new Map({
@@ -17,7 +21,7 @@ const _map = new Map({
 // Animate with: turf.along(lineString, distance * progress)
 ```
 
-**Techniques:**
+## Techniques
 
 - Map config: interactive: false, fadeDuration: 0 disable Mapbox animations
 - delayRender/continueRender: Wait for map.load and camera.idle events

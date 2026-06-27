@@ -1,10 +1,14 @@
 # render-graph: Render Graphs and Transient Resource Aliasing
 
-**Guideline:** Express a frame as a graph of passes that each declare which resources they read and write, and let the graph derive execution order, insert barriers and image-layout transitions, prune unused passes, and alias transient render targets whose lifetimes do not overlap — instead of hand-sequencing barriers and managing target memory by hand.
+## Guideline
 
-**Rationale:** Hand-managed barriers are the single largest source of correctness bugs and silent over-synchronization in an explicit renderer: every pass must know the prior and next usage of every resource it touches, which couples passes together and breaks the moment one is reordered. A render graph (or frame graph) inverts this. Passes are declarative and order-independent; the graph topologically sorts them from the read/write dependencies, computes the minimal barrier (correct stage/access scopes and layout) at each producer→consumer edge automatically, and drops any pass whose outputs nothing consumes. Because the graph knows every resource's first and last use, it can place two transient targets in the same physical memory when their lifetimes are disjoint, cutting VRAM for the framebuffer-heavy passes (G-buffer, bloom chains, SSAO) that dominate a modern frame. Rebuilding the graph per frame is cheap relative to the GPU work it schedules.
+Express a frame as a graph of passes that each declare which resources they read and write, and let the graph derive execution order, insert barriers and image-layout transitions, prune unused passes, and alias transient render targets whose lifetimes do not overlap — instead of hand-sequencing barriers and managing target memory by hand.
 
-**How to Apply:**
+## Rationale
+
+Hand-managed barriers are the single largest source of correctness bugs and silent over-synchronization in an explicit renderer: every pass must know the prior and next usage of every resource it touches, which couples passes together and breaks the moment one is reordered. A render graph (or frame graph) inverts this. Passes are declarative and order-independent; the graph topologically sorts them from the read/write dependencies, computes the minimal barrier (correct stage/access scopes and layout) at each producer→consumer edge automatically, and drops any pass whose outputs nothing consumes. Because the graph knows every resource's first and last use, it can place two transient targets in the same physical memory when their lifetimes are disjoint, cutting VRAM for the framebuffer-heavy passes (G-buffer, bloom chains, SSAO) that dominate a modern frame. Rebuilding the graph per frame is cheap relative to the GPU work it schedules.
+
+## How to Apply
 
 1. Each frame, register passes; each pass declares its inputs (reads) and outputs (writes) as virtual resource handles, not physical allocations.
 2. Build a DAG from the declared dependencies; topologically sort to get execution order.
@@ -13,7 +17,7 @@
 5. Walk each producer→consumer edge and emit the barrier: source/destination stage+access scopes and the image-layout transition implied by the usages.
 6. Execute passes in sorted order, invoking each pass's record callback with its resolved physical resources.
 
-**Example:**
+## Example
 
 ```c
 // Declarative pass setup — the pass states intent, not barriers or ordering.
@@ -38,7 +42,7 @@ rg_compile(g);   // sort, cull, assign+alias memory, plan barriers/transitions
 rg_execute(g, cmd);
 ```
 
-**Gotchas:**
+## Gotchas
 
 - The graph can only insert a correct barrier for usage it was told about; a pass that touches a resource it did not declare gets no barrier and corrupts silently — declare every read and write.
 - Aliasing requires non-overlapping lifetimes; if a "transient" target is read after the graph reused its memory, you get garbage — mark anything that must persist as non-transient.
@@ -46,4 +50,6 @@ rg_execute(g, cmd);
 - Per-frame graph rebuild must be cheap (arena-allocated, no global heap churn) or it eats the frame it is meant to schedule.
 - Async-compute and multi-queue edges need queue-ownership transfers and cross-queue waits, not just intra-queue barriers — the graph must model the queue, see [references/synchronization.md](./synchronization.md).
 
-**Related:** [references/synchronization.md](./synchronization.md), [references/gpu-memory-strategy.md](./gpu-memory-strategy.md), [references/command-recording-and-frames.md](./command-recording-and-frames.md), [references/binding-model.md](./binding-model.md)
+## Related
+
+[references/synchronization.md](./synchronization.md), [references/gpu-memory-strategy.md](./gpu-memory-strategy.md), [references/command-recording-and-frames.md](./command-recording-and-frames.md), [references/binding-model.md](./binding-model.md)

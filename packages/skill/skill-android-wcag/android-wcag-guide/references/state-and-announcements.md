@@ -11,13 +11,17 @@
 - Validate on blur, not on first render
 - Counter-Examples (double-announcing, generic prompts, non-localized state)
 
-**Guideline:** Expose every dynamic state change to accessibility services with a localized `stateDescription`, the correct interaction `Role`, a live region only for content that persists on screen, an imperative announcement only for transient events, and named verbs for every actionable element.
+### Guideline
 
-**Rationale:** TalkBack reads a node from its role + state + name. Toggling, selecting, expanding, loading, or erroring without surfacing the new state leaves a blind user with no feedback that anything happened. This serves 4.1.2 Name, Role, Value (state must be programmatically determinable and announced when it changes) and 4.1.3 Status Messages (AA-only — content changes that are not focus changes must be announced without moving focus). Named verbs serve 2.1.1 Keyboard / general operability — a switch-access or screen-reader user must know what activating an element does before doing it.
+Expose every dynamic state change to accessibility services with a localized `stateDescription`, the correct interaction `Role`, a live region only for content that persists on screen, an imperative announcement only for transient events, and named verbs for every actionable element.
+
+### Rationale
+
+TalkBack reads a node from its role + state + name. Toggling, selecting, expanding, loading, or erroring without surfacing the new state leaves a blind user with no feedback that anything happened. This serves 4.1.2 Name, Role, Value (state must be programmatically determinable and announced when it changes) and 4.1.3 Status Messages (AA-only — content changes that are not focus changes must be announced without moving focus). Named verbs serve 2.1.1 Keyboard / general operability — a switch-access or screen-reader user must know what activating an element does before doing it.
 
 ## Toggle / selection state
 
-**How to Apply:**
+### How to Apply
 
 1. Prefer the foundation modifiers — `Modifier.toggleable`, `Modifier.selectable`, `Modifier.triStateToggleable` — they set role, click handling, and `toggleableState`/`selected` semantics in one place. Reach for raw `semantics { }` only when you cannot use them.
 2. Pass the matching `Role`: `Role.Switch` for on/off, `Role.Checkbox` for independent multi-select (or tri-state), `Role.RadioButton` for single-select. The role drives the spoken state phrasing ("on" vs "ticked" vs "selected").
@@ -64,7 +68,7 @@ Modifier.semantics { stateDescription = stateText }
 
 Use a live region when there is a **persistent node on screen** whose text changes — a loading row, an inline validation message, a value that updates in place.
 
-**How to Apply:**
+### How to Apply
 
 1. `liveRegion = LiveRegionMode.Polite` for non-urgent updates (loading started/finished, a count changed). Polite waits for TalkBack to finish the current utterance.
 2. `liveRegion = LiveRegionMode.Assertive` for errors and limits the user must hear now — it interrupts. Use sparingly; reserve for failures and hard boundaries.
@@ -83,7 +87,9 @@ Text(
 )
 ```
 
-**Counter-Example:** A value that the _user_ is actively driving with a stepper or slider is often better announced via `stateDescription` on the value node (with `liveRegion` `Assertive` only at limits) than a chatty Polite region on every keypress.
+### Counter-Example
+
+A value that the _user_ is actively driving with a stepper or slider is often better announced via `stateDescription` on the value node (with `liveRegion` `Assertive` only at limits) than a chatty Polite region on every keypress.
 
 ## Announce a transient in-flight state on the control
 
@@ -109,7 +115,7 @@ Modifier.semantics(mergeDescendants = true) {
 
 When there is **no persistent node** to mark — a page changed in a pager, a bottom sheet opened, a snackbar-like transient event — announce it imperatively from an effect keyed on the event.
 
-**How to Apply:**
+### How to Apply
 
 1. Capture the view once: `val view = LocalView.current`.
 2. Fire inside a `LaunchedEffect` keyed on the changing value so it runs exactly once per change, not on every recomposition.
@@ -135,7 +141,7 @@ Prefer a live region whenever a persistent node exists; imperative announcements
 
 `Role.Button` + `contentDescription` alone makes TalkBack say only "double tap to activate" — generic and useless on a row that does something specific. Name the verb.
 
-**How to Apply:**
+### How to Apply
 
 1. Keep `contentDescription` a stable **noun** (the control's name) and put the state-dependent **verb** in `onClickLabel` (the word TalkBack appends after "double tap to"). For a toggle, hold the noun fixed and switch the verb by state — never bake the verb into `contentDescription` ("add to saved, button, double tap to add to saved").
 2. Name the **primary** action with `onClickLabel` on `clickable` / `toggleable` (e.g. "show item details"). TalkBack then says "double tap to show item details".
@@ -197,4 +203,6 @@ Modifier.onFocusChanged { if (touched && !it.isFocused) validate() else touched 
 3. **Non-localized state.** `stateDescription = "On"` / `announceForAccessibility("Saved")`. State and announcement strings must come from string resources.
 4. **Inconsistent separators.** Hand-concatenated spoken text with different joiners per screen. Standardize one join helper.
 
-**Related:** ./labelling.md (naming nodes; `contentDescription` vs `stateDescription`); ./focus-order.md (when to move focus instead of announce). A design system may already wire correct roles and live regions into its controls — prefer those over hand-rolled semantics.
+### Related
+
+./labelling.md (naming nodes; `contentDescription` vs `stateDescription`); ./focus-order.md (when to move focus instead of announce). A design system may already wire correct roles and live regions into its controls — prefer those over hand-rolled semantics.

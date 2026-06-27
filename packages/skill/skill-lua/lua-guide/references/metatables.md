@@ -1,10 +1,14 @@
 # metatables: Metatable Pattern for Simple OO
 
-**Guideline:** Use metatables with `__index` for simple object-oriented programming when needed.
+## Guideline
 
-**Rationale:** Provides class-like behavior with inheritance and methods. Simpler than complex OO frameworks while staying idiomatic to Lua.
+Use metatables with `__index` for simple object-oriented programming when needed.
 
-**Example:**
+## Rationale
+
+Provides class-like behavior with inheritance and methods. Simpler than complex OO frameworks while staying idiomatic to Lua.
+
+## Example
 
 ```lua
 -- vector.lua
@@ -45,7 +49,7 @@ local v2 = v1:add(Vector:new(1, 1))
 return Vector
 ```
 
-**Techniques:**
+## Techniques
 
 - Create table with `__index` pointing to itself
 - Use constructor pattern with `setmetatable`

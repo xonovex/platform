@@ -32,32 +32,48 @@ Reduce verbosity in a prompt file while preserving all functional content. Remov
 
 ## Simplification Rules
 
-**Remove entirely:** advanced features, best practices, version-control integration, technical notes, troubleshooting (if redundant)
+### Remove entirely
 
-**Merge:** "What this does" + "Workflow" → "Core Workflow"; Usage + Examples; multiple example subsections → 2-3 cases
+advanced features, best practices, version-control integration, technical notes, troubleshooting (if redundant)
 
-**Simplify:** reduce examples (4+ → 2-3), condense output samples (60-70%), convert paragraphs to bullets
+### Merge
 
-**Make generic:** replace specific paths, domain terms, project names with generic equivalents (`packages/myapp/` → `packages/example/`, `users` → `items`, `MyProjectAPI` → `API`)
+"What this does" + "Workflow" → "Core Workflow"; Usage + Examples; multiple example subsections → 2-3 cases
 
-**Keep (essential):** metadata block, goal, arguments, core workflow, implementation details, error handling, safety guidelines
+### Simplify
+
+reduce examples (4+ → 2-3), condense output samples (60-70%), convert paragraphs to bullets
+
+### Make generic
+
+replace specific paths, domain terms, project names with generic equivalents (`packages/myapp/` → `packages/example/`, `users` → `items`, `MyProjectAPI` → `API`)
+
+### Keep (essential)
+
+metadata block, goal, arguments, core workflow, implementation details, error handling, safety guidelines
 
 ## Implementation Details
 
-**Analysis:** count lines, calculate target (current × reduction%), parse sections, categorize as Essential/Simplifiable/Removable
+### Analysis
 
-**Simplification:** remove categorized sections, merge duplicates, condense examples (2-3 kept, 10-15 lines), convert paragraphs to bullets
+count lines, calculate target (current × reduction%), parse sections, categorize as Essential/Simplifiable/Removable
 
-**Generalization:**
+### Simplification
+
+remove categorized sections, merge duplicates, condense examples (2-3 kept, 10-15 lines), convert paragraphs to bullets
+
+### Generalization
 
 1. **Paths:** replace `/packages\/[\w-]+\//g` → `packages/example/`
 2. **Domain terms:** find 3+ related specialized terms (e.g. `users+orders+payments`) and replace with generic equivalents
 3. **Project names:** replace `(\w+)(API|Service|Database|Client)` → `MyProject$2`
 4. **Business context:** remove industry-specific workflows, use generic CRUD examples
 
-**Validation:** verify metadata block / arguments / workflow preserved; measure reduction
+### Validation
 
-**Dry-run output:**
+verify metadata block / arguments / workflow preserved; measure reduction
+
+### Dry-run output
 
 ```
 === Preview ===

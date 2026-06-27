@@ -1,10 +1,14 @@
 # performance: Performance and Accessibility
 
-**Guideline:** Animate only GPU-accelerated transforms (x/y/scale/rotate) and opacity; use scaleX/Y or layout for size changes; support prefers-reduced-motion.
+## Guideline
 
-**Rationale:** Transform/opacity don't trigger layout recalculation; width/height cause jank. Respecting prefers-reduced-motion is legal requirement (WCAG 2.1).
+Animate only GPU-accelerated transforms (x/y/scale/rotate) and opacity; use scaleX/Y or layout for size changes; support prefers-reduced-motion.
 
-**Example:**
+## Rationale
+
+Transform/opacity don't trigger layout recalculation; width/height cause jank. Respecting prefers-reduced-motion is legal requirement (WCAG 2.1).
+
+## Example
 
 ```tsx
 import {motion, useReducedMotion} from "motion/react";
@@ -22,7 +26,7 @@ function AccessibleDiv({children}) {
 }
 ```
 
-**Techniques:**
+## Techniques
 
 - GPU-accelerated: x, y, z, scale, rotate, opacity, skew (no layout recalc)
 - Never animate: width, height, margin, padding, left/top/right/bottom (triggers jank)

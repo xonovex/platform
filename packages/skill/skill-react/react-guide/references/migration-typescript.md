@@ -1,10 +1,14 @@
 # typescript-changes: React 19 TypeScript Changes
 
-**Guideline:** Update TypeScript types for React 19's breaking changes to refs, JSX namespace, and removed types.
+## Guideline
 
-**Rationale:** React 19 changes ref semantics, removes deprecated types, and scopes JSX namespace. Run codemods to automate most migrations.
+Update TypeScript types for React 19's breaking changes to refs, JSX namespace, and removed types.
 
-**Example:**
+## Rationale
+
+React 19 changes ref semantics, removes deprecated types, and scopes JSX namespace. Run codemods to automate most migrations.
+
+## Example
 
 ```tsx
 // Ref callbacks must not return values (except cleanup)
@@ -74,7 +78,7 @@ const [optimistic, addOptimistic] = useOptimistic<Message[], Omit<Message, 'pend
 );
 ```
 
-**Migration codemods:**
+## Migration codemods
 
 ```bash
 # Run all TypeScript codemods
@@ -86,7 +90,7 @@ npx types-react-codemod@latest refobject-defaults ./src
 npx types-react-codemod@latest scoped-jsx ./src
 ```
 
-**Techniques:**
+## Techniques
 
 - Update `@types/react` and `@types/react-dom` to ^19.0.0
 - Run `npx types-react-codemod@latest preset-19 ./src`

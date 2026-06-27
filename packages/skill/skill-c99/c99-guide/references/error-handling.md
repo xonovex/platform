@@ -1,10 +1,14 @@
 # error-handling: Error Handling Patterns
 
-**Guideline:** Return error codes from functions and use output parameters for results to enable proper error checking and recovery.
+## Guideline
 
-**Rationale:** Error codes force callers to handle errors explicitly, unlike exceptions. Using return values for errors and output parameters for results creates a consistent pattern throughout the codebase.
+Return error codes from functions and use output parameters for results to enable proper error checking and recovery.
 
-**Example:**
+## Rationale
+
+Error codes force callers to handle errors explicitly, unlike exceptions. Using return values for errors and output parameters for results creates a consistent pattern throughout the codebase.
+
+## Example
 
 ```c
 typedef enum {
@@ -41,7 +45,7 @@ error_t load_file(const char *path, char **out, size_t *len) {
 }
 ```
 
-**Techniques:**
+## Techniques
 
 - Error enums: Define descriptive error types with zero for success
 - Output parameters: Use pointers to return multiple results alongside error codes

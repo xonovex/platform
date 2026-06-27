@@ -1,10 +1,14 @@
 # undo-redo: Transactional Edits and the Undo Journal
 
-**Guideline:** Make edits transactional — record either the inverse of each operation or a before/after snapshot of what changed into an undo journal, group the operations of one user action into a single transaction, and maintain a redo stack so undone transactions can be re-applied.
+## Guideline
 
-**Rationale:** Undo is the defining feature of an editor's data model, and it only works if every state-changing edit is captured. Recording inverse operations (or before/after values) makes undo a pure data operation: pop the last transaction, apply its inverses, push it onto the redo stack. Grouping into transactions matters because one user action ("move three nodes") is many property writes; the user expects one Ctrl+Z to undo all of them, not three. Tying the transaction boundary to the change-notification commit keeps undo, notification, and persistence consistent.
+Make edits transactional — record either the inverse of each operation or a before/after snapshot of what changed into an undo journal, group the operations of one user action into a single transaction, and maintain a redo stack so undone transactions can be re-applied.
 
-**Techniques:**
+## Rationale
+
+Undo is the defining feature of an editor's data model, and it only works if every state-changing edit is captured. Recording inverse operations (or before/after values) makes undo a pure data operation: pop the last transaction, apply its inverses, push it onto the redo stack. Grouping into transactions matters because one user action ("move three nodes") is many property writes; the user expects one Ctrl+Z to undo all of them, not three. Tying the transaction boundary to the change-notification commit keeps undo, notification, and persistence consistent.
+
+## Techniques
 
 - **Inverse operations** - For each mutation, record an operation that exactly reverses it: `set(id, prop, old)` inverts `set(id, prop, new)`; `delete` inverts `create`. Undo applies inverses in reverse order.
 - **Before/after snapshots** - Alternatively store the property's old value (for undo) and new value (for redo). Simpler than authoring inverses, at the cost of storing both values; cheap for scalar properties, expensive for large buffers.
@@ -14,14 +18,14 @@
 - **Undoable vs not** - Pure model mutations are undoable. External side effects — file writes, network calls, spawning a process — are not; keep them out of the journal or make them idempotent and re-issue on redo deliberately.
 - **Save & undo scope (document model)** - Decide the save model and pair the undo model to it, and be opinionated rather than offering several behind flags: (1) per-asset save/revert pairs with **per-asset undo stacks**; (2) project-wide save/revert pairs with a **single project-wide undo stack**; (3) automatic persistence (no explicit save). Per-asset stacks make cross-document operations (find/replace across many files) painful to undo; a single project stack can surprise users by undoing edits in an unrelated document. Collaboration reintroduces the need for per-user stacks. Prefer resolving inter-document relationships at runtime over persisting them.
 
-**How to Apply:**
+## How to Apply
 
 1. Wrap each user action in `txn_begin` / `txn_commit`; route all mutations through the model so they land in the open transaction.
 2. For every mutation, append an entry capturing object id, property, and old (and new) value — ids and values, never pointers or indices.
 3. Undo: pop the undo stack, apply inverses in reverse order, push onto redo. Redo: the mirror.
 4. On any fresh edit, clear the redo stack; enforce the history bound after commit.
 
-**Example:**
+## Example
 
 ```c
 typedef struct { object_id_t id; uint32_t prop; value_t old, new; } edit_t;
@@ -47,7 +51,7 @@ static void undo(model_t *m) {
 edit_t broken = { .target_ptr = obj_ptr }; // dangles on undo of a delete
 ```
 
-**Gotchas:**
+## Gotchas
 
 - An edit entry that stored a pointer or array index breaks the moment storage moves or an object is recreated — capture the stable id and the value.
 - Forgetting to clear the redo stack on a new edit lets a redo re-apply a stale operation onto diverged state, corrupting the model.
@@ -56,4 +60,6 @@ edit_t broken = { .target_ptr = obj_ptr }; // dangles on undo of a delete
 - Transaction boundaries should match user intent: too fine and one click takes many undos; too coarse and unrelated edits undo together.
 - A single project-wide undo stack will undo across documents the user wasn't looking at, with no visual cue; per-document stacks make a cross-document edit impossible to undo atomically. Neither is free — choose deliberately per the save model, don't expose both.
 
-**Related:** [references/change-notification.md](./change-notification.md), [references/references-and-ownership.md](./references-and-ownership.md), [references/snapshots-and-threading.md](./snapshots-and-threading.md)
+## Related
+
+[references/change-notification.md](./change-notification.md), [references/references-and-ownership.md](./references-and-ownership.md), [references/snapshots-and-threading.md](./snapshots-and-threading.md)

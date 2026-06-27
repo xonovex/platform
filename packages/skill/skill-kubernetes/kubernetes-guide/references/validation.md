@@ -1,10 +1,14 @@
 # validation: Manifest Validation Commands
 
-**Guideline:** Always validate Kubernetes manifests before applying to clusters using dry-run and diff commands.
+## Guideline
 
-**Rationale:** Validation catches configuration errors, API version mismatches, and unintended changes before they impact running workloads.
+Always validate Kubernetes manifests before applying to clusters using dry-run and diff commands.
 
-**Example:**
+## Rationale
+
+Validation catches configuration errors, API version mismatches, and unintended changes before they impact running workloads.
+
+## Example
 
 ```bash
 # Dry-run validation
@@ -23,7 +27,7 @@ kubectl apply -k k8s/overlays/production --dry-run=server
 kubectl diff -k k8s/overlays/production
 ```
 
-**Techniques:**
+## Techniques
 
 - Server dry-run: Use `--dry-run=server` to validate against cluster API
 - Kustomize build: Run `kustomize build` to verify overlay composition

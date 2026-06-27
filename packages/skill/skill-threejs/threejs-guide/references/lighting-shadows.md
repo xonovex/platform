@@ -1,10 +1,14 @@
 # filename: lighting-shadows
 
-**Guideline:** Use light types appropriate to scene; keep shadow frustums tight; leverage IBL (Environment maps) for realistic ambient lighting.
+## Guideline
 
-**Rationale:** Lighting creates atmosphere; tight shadow frustums improve quality; IBL is more efficient than many point lights for PBR.
+Use light types appropriate to scene; keep shadow frustums tight; leverage IBL (Environment maps) for realistic ambient lighting.
 
-**Example:**
+## Rationale
+
+Lighting creates atmosphere; tight shadow frustums improve quality; IBL is more efficient than many point lights for PBR.
+
+## Example
 
 ```javascript
 renderer.shadowMap.enabled = true;
@@ -23,7 +27,7 @@ new RGBELoader().load("env.hdr", (tex) => {
 });
 ```
 
-**Techniques:**
+## Techniques
 
 - Light types: AmbientLight (fill), HemisphereLight (sky/ground outdoors), DirectionalLight (sun), PointLight (bulb), SpotLight (flashlight)
 - Shadow types: PCFSoftShadowMap (best quality); tight frustum (camera.left/right/top/bottom) and mapSize (512-2048)

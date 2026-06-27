@@ -1,10 +1,14 @@
 # constraints: Database Constraint Patterns
 
-**Guideline:** Enforce data integrity at the database level using constraints (PRIMARY KEY, FOREIGN KEY, UNIQUE, CHECK, NOT NULL, EXCLUSION). Define referential actions (ON DELETE/UPDATE) for foreign keys.
+## Guideline
 
-**Rationale:** Database constraints ensure data validity regardless of which application or process modifies the data.
+Enforce data integrity at the database level using constraints (PRIMARY KEY, FOREIGN KEY, UNIQUE, CHECK, NOT NULL, EXCLUSION). Define referential actions (ON DELETE/UPDATE) for foreign keys.
 
-**Example:**
+## Rationale
+
+Database constraints ensure data validity regardless of which application or process modifies the data.
+
+## Example
 
 ```sql
 -- Primary key
@@ -38,7 +42,7 @@ CREATE TABLE bookings (
 );
 ```
 
-**Techniques:**
+## Techniques
 
 - Use PRIMARY KEY for unique row identifiers
 - Use FOREIGN KEY with appropriate ON DELETE/UPDATE actions

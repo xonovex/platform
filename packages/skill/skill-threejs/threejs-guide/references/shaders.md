@@ -1,10 +1,14 @@
 # filename: shaders
 
-**Guideline:** Use ShaderMaterial with uniforms for parameter control; modify built-in shaders via `onBeforeCompile`; move expensive calculations to vertex shader.
+## Guideline
 
-**Rationale:** Custom shaders enable advanced effects; uniform updates avoid recompilation; vertex-side calculations reduce fragment shader load.
+Use ShaderMaterial with uniforms for parameter control; modify built-in shaders via `onBeforeCompile`; move expensive calculations to vertex shader.
 
-**Example:**
+## Rationale
+
+Custom shaders enable advanced effects; uniform updates avoid recompilation; vertex-side calculations reduce fragment shader load.
+
+## Example
 
 ```javascript
 const material = new THREE.ShaderMaterial({
@@ -20,7 +24,7 @@ const material = new THREE.ShaderMaterial({
 material.uniforms.time.value = clock.getElapsedTime();
 ```
 
-**Techniques:**
+## Techniques
 
 - Uniform types: float, vec2/vec3, Color, sampler2D (texture), Matrix4, arrays
 - Varyings: Pass data vertex→fragment (vUv, vNormal, vWorldPos)

@@ -1,10 +1,14 @@
 # services: Kubernetes Service Configuration
 
-**Guideline:** Create Services with consistent labels and named ports for service discovery.
+## Guideline
 
-**Rationale:** Services provide stable endpoints for pod communication. Named ports improve readability and allow port changes without updating all references.
+Create Services with consistent labels and named ports for service discovery.
 
-**Example:**
+## Rationale
+
+Services provide stable endpoints for pod communication. Named ports improve readability and allow port changes without updating all references.
+
+## Example
 
 ```yaml
 apiVersion: v1
@@ -27,7 +31,7 @@ spec:
   sessionAffinity: None
 ```
 
-**Techniques:**
+## Techniques
 
 - ClusterIP type: Use ClusterIP for internal service discovery within cluster
 - Selector matching: Match service selector labels exactly with deployment labels

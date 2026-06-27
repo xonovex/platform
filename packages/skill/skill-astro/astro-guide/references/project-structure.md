@@ -1,10 +1,14 @@
 # project-structure: Project Structure and Organization
 
-**Guideline:** Organize using conventional directories: pages, components, layouts, content, public.
+## Guideline
 
-**Rationale:** Opinionated defaults enable file-based routing, clear separation of concerns, better maintainability, easier navigation.
+Organize using conventional directories: pages, components, layouts, content, public.
 
-**Example:**
+## Rationale
+
+Opinionated defaults enable file-based routing, clear separation of concerns, better maintainability, easier navigation.
+
+## Example
 
 ```
 src/
@@ -24,7 +28,7 @@ src/
 └── styles/global.css
 ```
 
-**Techniques:**
+## Techniques
 
 - Pages directory: Place routes in `src/pages/` for automatic file-based routing
 - Components folder: Store reusable components in `src/components/`

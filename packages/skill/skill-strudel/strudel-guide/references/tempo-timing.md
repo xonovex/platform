@@ -1,10 +1,14 @@
 # tempo-timing: Tempo and Timing Control
 
-**Guideline:** Set tempo with `setcpm(BPM/4)` first, then use `.slow()`, `.fast()`, `.early()`, `.late()` for timing control.
+## Guideline
 
-**Rationale:** Tempo anchors rhythmic relationships; timing modifiers create polyrhythms, syncopation, and groove feels.
+Set tempo with `setcpm(BPM/4)` first, then use `.slow()`, `.fast()`, `.early()`, `.late()` for timing control.
 
-**Example:**
+## Rationale
+
+Tempo anchors rhythmic relationships; timing modifiers create polyrhythms, syncopation, and groove feels.
+
+## Example
 
 ```javascript
 setcpm(138 / 4); // 138 BPM (uplifting trance)
@@ -15,7 +19,7 @@ stack(
 );
 ```
 
-**Techniques:**
+## Techniques
 
 - `setcpm(BPM/4)`: Set tempo (128=house, 138=trance, 170=drum&bass)
 - `.slow(n)`: Pattern takes n cycles (half speed)

@@ -1,10 +1,14 @@
 # project-structure: Application Structure
 
-**Guideline:** Organize Express apps with separated concerns - routes, controllers, middleware, schemas in dedicated directories.
+## Guideline
 
-**Rationale:** Clear separation prevents tight coupling and improves maintainability in larger codebases.
+Organize Express apps with separated concerns - routes, controllers, middleware, schemas in dedicated directories.
 
-**Example:**
+## Rationale
+
+Clear separation prevents tight coupling and improves maintainability in larger codebases.
+
+## Example
 
 ```
 src/
@@ -19,7 +23,7 @@ src/
 └── utils/           # Helper functions
 ```
 
-**Techniques:**
+## Techniques
 
 - routes/: Define route handlers with middleware chaining, avoid business logic
 - controllers/: Implement typed handlers with try-catch, call services

@@ -1,10 +1,14 @@
 # remote-state: Remote State Configuration
 
-**Guideline:** Store state remotely with encryption and locking, isolate per environment
+## Guideline
 
-**Rationale:** Remote state enables team collaboration and prevents concurrent modification conflicts
+Store state remotely with encryption and locking, isolate per environment
 
-**Example:**
+## Rationale
+
+Remote state enables team collaboration and prevents concurrent modification conflicts
+
+## Example
 
 ```hcl
 # environments/prod/backend.tf
@@ -29,7 +33,7 @@ terraform {
 # prod: s3://myapp-tf-state-prod/prod/terraform.tfstate
 ```
 
-**Techniques:**
+## Techniques
 
 - **S3 backend:** Store state in versioned, encrypted S3 buckets
 - **DynamoDB locking:** Use DynamoDB tables to prevent concurrent modifications

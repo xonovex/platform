@@ -1,10 +1,14 @@
 # modulation: Dynamic Parameter Modulation
 
-**Guideline:** Replace static values with signal generators (sine, perlin, rand) to create organic evolution and movement.
+## Guideline
 
-**Rationale:** Dynamic modulation adds life and interest; static values sound robotic and unmotivated.
+Replace static values with signal generators (sine, perlin, rand) to create organic evolution and movement.
 
-**Example:**
+## Rationale
+
+Dynamic modulation adds life and interest; static values sound robotic and unmotivated.
+
+## Example
 
 ```javascript
 // Classic filter sweep
@@ -15,7 +19,7 @@ note("c2*8")
   .gain(0.5);
 ```
 
-**Techniques:**
+## Techniques
 
 - `sine.range(min, max).slow(n)`: Smooth, predictable LFO oscillation
 - `saw.range(min, max).slow(n)`: Linear ramps for gradual builds

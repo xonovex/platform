@@ -1,10 +1,14 @@
 # lock-free-stack: Lock-Free Stack
 
-**Guideline:** Build a lock-free LIFO by CAS-ing a new node onto `head`; but recognize that the _pop_ path has both an ABA hazard and a use-after-free hazard, so a lock-free stack that frees nodes REQUIRES a memory-reclamation scheme.
+## Guideline
 
-**Rationale:** This is the canonical lock-free structure: push and pop are each a short CAS loop on a single `head` pointer. Push is safe in isolation. Pop, however, dereferences `head->next` to compute the new head — and between that read and the CAS another thread can pop and free the very node you're holding, giving (a) a torn/incorrect `next` (ABA) and (b) a dereference of freed memory. This is the textbook example of why "lock-free" and "safe to free" are different problems.
+Build a lock-free LIFO by CAS-ing a new node onto `head`; but recognize that the _pop_ path has both an ABA hazard and a use-after-free hazard, so a lock-free stack that frees nodes REQUIRES a memory-reclamation scheme.
 
-**Example:**
+## Rationale
+
+This is the canonical lock-free structure: push and pop are each a short CAS loop on a single `head` pointer. Push is safe in isolation. Pop, however, dereferences `head->next` to compute the new head — and between that read and the CAS another thread can pop and free the very node you're holding, giving (a) a torn/incorrect `next` (ABA) and (b) a dereference of freed memory. This is the textbook example of why "lock-free" and "safe to free" are different problems.
+
+## Example
 
 ```c
 #include <stdatomic.h>
@@ -39,16 +43,18 @@ node_t *pop_UNSAFE(void) {
 }
 ```
 
-**How to Apply (making pop safe):**
+## How to Apply (making pop safe)
 
 1. Protect `old` before dereferencing it — publish it as a _hazard pointer_ so no thread frees it while you hold it, then re-validate `head` still equals it.
 2. Or wrap pop in an _epoch / RCU read-side section_ and defer frees until all readers have left the epoch.
 3. Or, if the stack is a fixed pool that never frees (a freelist of preallocated nodes), tag `head` with a version counter (DWCAS) to kill ABA — nodes are reused but never returned to the allocator, so there is no use-after-free.
 
-**Gotchas:**
+## Gotchas
 
 - Tagging alone (versioned head) fixes ABA but _not_ use-after-free; it is only sufficient when nodes are never actually freed.
 - Don't `free(old)` right after a successful pop in a shared stack — another thread may still be inside its own pop holding `old`. Hand it to the reclamation scheme.
 - Push being safe is specific to LIFO: the node is fully initialized before the CAS and no concurrent reader walks past `head` during push.
 
-**Related:** [references/safe-memory-reclamation.md](./safe-memory-reclamation.md), [references/aba-problem.md](./aba-problem.md), [references/atomics-and-cas.md](./atomics-and-cas.md)
+## Related
+
+[references/safe-memory-reclamation.md](./safe-memory-reclamation.md), [references/aba-problem.md](./aba-problem.md), [references/atomics-and-cas.md](./atomics-and-cas.md)

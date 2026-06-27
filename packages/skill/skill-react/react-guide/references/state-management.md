@@ -1,10 +1,14 @@
 # state-management: State Management Best Practices
 
-**Guideline:** Use local state with `useState`, lift state only when multiple components need it, and derive computed values.
+## Guideline
 
-**Rationale:** Local state keeps components independent and easier to reason about. Lifting state only when necessary prevents prop drilling and over-sharing. Derived state eliminates synchronization bugs.
+Use local state with `useState`, lift state only when multiple components need it, and derive computed values.
 
-**Example:**
+## Rationale
+
+Local state keeps components independent and easier to reason about. Lifting state only when necessary prevents prop drilling and over-sharing. Derived state eliminates synchronization bugs.
+
+## Example
 
 ```tsx
 // ✅ Local state
@@ -64,7 +68,7 @@ function ComplexCounter() {
 }
 ```
 
-**Techniques:**
+## Techniques
 
 - Start with local `useState` in the component that owns the data
 - If multiple sibling components need the state, lift to their parent

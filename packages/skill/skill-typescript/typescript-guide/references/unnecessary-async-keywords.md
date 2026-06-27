@@ -1,10 +1,14 @@
 # unnecessary-async-keywords: Remove Async Keyword Without Await Usage
 
-**Guideline:** Remove `async` from functions that don't use `await`; frameworks allow returning Promises directly.
+## Guideline
 
-**Rationale:** Unnecessary `async` adds overhead and creates false async expectations.
+Remove `async` from functions that don't use `await`; frameworks allow returning Promises directly.
 
-**Example:**
+## Rationale
+
+Unnecessary `async` adds overhead and creates false async expectations.
+
+## Example
 
 ```typescript
 // ❌ Bad: async without await
@@ -28,7 +32,7 @@ app.get("/users", (c) => {
 });
 ```
 
-**Techniques:**
+## Techniques
 
 - Run ESLint to find @typescript-eslint/require-await violations
 - Remove `async` keyword for each flagged function

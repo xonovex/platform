@@ -1,10 +1,14 @@
 # stable-tables: Stable Table Patterns
 
-**Guideline:** Define all table fields upfront to enable LuaJIT optimizations.
+## Guideline
 
-**Rationale:** LuaJIT performs best with constant table shapes. Adding fields dynamically causes deoptimization. Pre-allocating fields enables optimal JIT compilation.
+Define all table fields upfront to enable LuaJIT optimizations.
 
-**Example:**
+## Rationale
+
+LuaJIT performs best with constant table shapes. Adding fields dynamically causes deoptimization. Pre-allocating fields enables optimal JIT compilation.
+
+## Example
 
 ```typescript
 // SLOW: Dynamic property addition (deoptimizes JIT)
@@ -51,7 +55,7 @@ for (let i = 0; i < maxEntities; i++) {
 }
 ```
 
-**Techniques:**
+## Techniques
 
 - Define complete interfaces with all properties and types upfront
 - Initialize all fields in factory functions to establish table shape

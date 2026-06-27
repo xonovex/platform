@@ -1,10 +1,14 @@
 # coroutine-patterns: Coroutine-Friendly Patterns
 
-**Guideline:** Design generators for seamless Lua coroutine integration without runtime overhead.
+## Guideline
 
-**Rationale:** Lua coroutines provide cooperative multitasking naturally. TypeScript generators compile to coroutines, enabling timers, sequences, and state machines.
+Design generators for seamless Lua coroutine integration without runtime overhead.
 
-**Example:**
+## Rationale
+
+Lua coroutines provide cooperative multitasking naturally. TypeScript generators compile to coroutines, enabling timers, sequences, and state machines.
+
+## Example
 
 ```typescript
 // Timer using generator/coroutine
@@ -40,7 +44,7 @@ function* sequence(): Generator<void, void> {
 }
 ```
 
-**Techniques:**
+## Techniques
 
 - Use `function*` syntax to define generators that compile to Lua coroutines
 - Yield control points with `yield` to pause execution and allow other tasks

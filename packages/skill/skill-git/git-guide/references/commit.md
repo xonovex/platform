@@ -79,7 +79,7 @@ Derive the description from:
 
 ## Output
 
-**Default mode (no prompts):**
+### Default mode (no prompts)
 
 ```
 Commit: /path/to/repo
@@ -89,7 +89,7 @@ Type: chore
 Committed: chore: game-common consistency fixes (a3b2c1d)
 ```
 
-**Interactive mode:**
+### Interactive mode
 
 ```
 Suggestions:

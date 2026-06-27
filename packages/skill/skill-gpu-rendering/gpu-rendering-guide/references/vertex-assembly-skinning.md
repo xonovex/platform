@@ -1,10 +1,14 @@
 # vertex-assembly-skinning: Programmable Vertex Fetch and GPU Skinning
 
-**Guideline:** Fetch vertex data yourself from storage buffers in the shader (programmable vertex pull) behind a small loader interface, instead of binding fixed-function vertex input; this lets one shader read any packing, any channel set, and any vertex — which is what makes flexible GPU skinning and morph targets fall out cleanly.
+## Guideline
 
-**Rationale:** The fixed-function input assembler ties a pipeline to one rigid vertex layout and only ever hands the shader _its own_ vertex. Pulling vertices manually from byte-addressable storage buffers removes both limits: a single shader supports many packings/quantizations by going through an abstract loader (`load_position()`, `load_normal()`, …) that hides offsets and strides; it can read _any_ vertex or the index buffer from any stage; and it can gracefully skip channels a mesh doesn't have. Skinning then needs no special vertex format — the shader just also reads bone influences and matrices from buffers and blends, and variable bone-per-vertex counts cost no wasted space because the influence list is indirected, not padded to a fixed maximum.
+Fetch vertex data yourself from storage buffers in the shader (programmable vertex pull) behind a small loader interface, instead of binding fixed-function vertex input; this lets one shader read any packing, any channel set, and any vertex — which is what makes flexible GPU skinning and morph targets fall out cleanly.
 
-**How to Apply:**
+## Rationale
+
+The fixed-function input assembler ties a pipeline to one rigid vertex layout and only ever hands the shader _its own_ vertex. Pulling vertices manually from byte-addressable storage buffers removes both limits: a single shader supports many packings/quantizations by going through an abstract loader (`load_position()`, `load_normal()`, …) that hides offsets and strides; it can read _any_ vertex or the index buffer from any stage; and it can gracefully skip channels a mesh doesn't have. Skinning then needs no special vertex format — the shader just also reads bone influences and matrices from buffers and blends, and variable bone-per-vertex counts cost no wasted space because the influence list is indirected, not padded to a fixed maximum.
+
+## How to Apply
 
 1. Store vertex streams in storage/byte-address buffers; describe each mesh with active-channel bitflags plus per-channel offset and stride, and a vertex count.
 2. Expose a loader context the shader calls (`load_position(i)`, `load_texcoord0(i)`, …) so material shaders are independent of packing; return sensible defaults for absent channels.
@@ -13,7 +17,7 @@
 5. Ping-pong the bone-matrix buffer between frames (current + previous) so you can output motion vectors from skinned previous positions.
 6. Let skinning register as a named shader system that rendering discovers after culling, so it composes with materials without hard coupling.
 
-**Example:**
+## Example
 
 ```glsl
 // Programmable pull + linear blend skinning in the vertex shader.
@@ -33,7 +37,7 @@ vec3 skin_position(uint vtx) {
 }
 ```
 
-**Gotchas:**
+## Gotchas
 
 - Manual fetch bypasses any format conversion the input assembler would do — you must decode/normalize packed/quantized data yourself in the loader.
 - Forgetting to skin the normal/tangent (only the position) breaks lighting on animated meshes; skin the basis with the matrix's rotation part.
@@ -41,4 +45,6 @@ vec3 skin_position(uint vtx) {
 - Motion vectors need _previous-frame_ skinned positions — keep last frame's bone matrices, don't recompute from current.
 - Compute-skinning once into a buffer (vs re-skinning in every pass) pays off when a mesh is drawn many times per frame (shadow + depth + color); skinning in the vertex shader re-does the work per pass.
 
-**Related:** [references/shader-system.md](./shader-system.md), [references/binding-model.md](./binding-model.md), [references/gpu-compute-simulation.md](./gpu-compute-simulation.md), **c99-game-opinionated-guide**
+## Related
+
+[references/shader-system.md](./shader-system.md), [references/binding-model.md](./binding-model.md), [references/gpu-compute-simulation.md](./gpu-compute-simulation.md), **c99-game-opinionated-guide**

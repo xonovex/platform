@@ -1,10 +1,14 @@
 # sequencing: Sequencing and Scene Orchestration
 
-**Guideline:** Use `<Sequence>` for timed playback with local frame context and `premountFor` to prevent pop-in.
+## Guideline
 
-**Rationale:** Sequences provide local frame context reset and timing control. `premountFor` preloads components early to avoid rendering artifacts.
+Use `<Sequence>` for timed playback with local frame context and `premountFor` to prevent pop-in.
 
-**Example:**
+## Rationale
+
+Sequences provide local frame context reset and timing control. `premountFor` preloads components early to avoid rendering artifacts.
+
+## Example
 
 ```tsx
 import {Sequence, Series, useCurrentFrame, useVideoConfig} from "remotion";
@@ -33,7 +37,7 @@ const Scene1 = () => {
 };
 ```
 
-**Techniques:**
+## Techniques
 
 - Use `<Sequence>` to show/hide components at specific frame ranges
 - Set `from` prop for start frame (calculate with `fps`: `1.5 * fps` for 1.5 seconds)

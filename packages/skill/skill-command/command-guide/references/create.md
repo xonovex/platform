@@ -27,9 +27,11 @@ Generate a new reusable prompt file (a.k.a. slash command, user-invocable comman
 
 ## Implementation Details
 
-**Name Generation:** lowercase, replace spaces with hyphens, remove special characters, prefix with a category (e.g. `git-`, `code-`, `test-`)
+### Name Generation
 
-**Required Sections:**
+lowercase, replace spaces with hyphens, remove special characters, prefix with a category (e.g. `git-`, `code-`, `test-`)
+
+### Required Sections
 
 - Metadata block: at minimum a 1-sentence `description`; add other fields (tools, permissions, argument hint, activation scope) appropriate for the target harness — see [harness-formats.md](harness-formats.md)
 - Goal: 3-5 bullet points

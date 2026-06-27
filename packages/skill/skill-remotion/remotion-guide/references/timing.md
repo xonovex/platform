@@ -1,10 +1,14 @@
 # timing: Timing and Frame Calculations
 
-**Guideline:** Always write durations as seconds multiplied by fps for consistency; use interpolate with frame ranges, not time.
+## Guideline
 
-**Rationale:** Seconds \* fps pattern is clear and frame-accurate; consistent approach prevents calculation errors.
+Always write durations as seconds multiplied by fps for consistency; use interpolate with frame ranges, not time.
 
-**Example:**
+## Rationale
+
+Seconds \* fps pattern is clear and frame-accurate; consistent approach prevents calculation errors.
+
+## Example
 
 ```tsx
 const frame = useCurrentFrame();
@@ -15,7 +19,7 @@ const fadeIn = interpolate(frame, [0, 0.5 * fps], [0, 1], {
 });
 ```
 
-**Techniques:**
+## Techniques
 
 - Pattern: `seconds * fps` for all durations (0.1 _ fps = 100ms, 1 _ fps = 1s)
 - interpolate() ranges in frames: [startFrame, endFrame] not seconds

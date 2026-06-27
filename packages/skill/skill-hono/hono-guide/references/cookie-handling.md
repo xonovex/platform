@@ -1,10 +1,14 @@
 # cookie-handling: Secure Cookie Configuration and Signed Cookies
 
-**Guideline:** Set secure cookie options explicitly, use signed cookies for sensitive data, and follow browser-enforced prefix requirements for additional security.
+## Guideline
 
-**Rationale:** Cookies require careful configuration to ensure HTTPS-only transmission, prevent JavaScript access, defend against CSRF, and verify integrity. Cookie prefixes enforce additional security guarantees, while signed cookies prevent tampering and provide strong integrity verification for sensitive client-side state.
+Set secure cookie options explicitly, use signed cookies for sensitive data, and follow browser-enforced prefix requirements for additional security.
 
-**Example:**
+## Rationale
+
+Cookies require careful configuration to ensure HTTPS-only transmission, prevent JavaScript access, defend against CSRF, and verify integrity. Cookie prefixes enforce additional security guarantees, while signed cookies prevent tampering and provide strong integrity verification for sensitive client-side state.
+
+## Example
 
 ```typescript
 import {
@@ -53,7 +57,7 @@ setCookie(c, "__Host-session", token, {
 });
 ```
 
-**Techniques:**
+## Techniques
 
 - Import cookie helpers from `hono/cookie` (setCookie, getCookie, setSignedCookie, getSignedCookie)
 - Always set `secure: true` and `httpOnly: true` for sensitive cookies

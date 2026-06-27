@@ -1,10 +1,14 @@
 # numeric-separator-enforcement: Use Underscores in Large Numbers
 
-**Guideline:** Use underscores in large numeric literals (e.g., `30_000`) for improved readability.
+## Guideline
 
-**Rationale:** Numeric separators improve readability and prevent misreading similar values.
+Use underscores in large numeric literals (e.g., `30_000`) for improved readability.
 
-**Example:**
+## Rationale
+
+Numeric separators improve readability and prevent misreading similar values.
+
+## Example
 
 ```typescript
 // ❌ Bad: Hard to read
@@ -22,7 +26,7 @@ const smallTimeout = 5000;
 const port = 3000;
 ```
 
-**Techniques:**
+## Techniques
 
 - Add underscores for numbers >= 10_000 grouped by thousands
 - Do not add separators for smaller numbers (< 10_000)

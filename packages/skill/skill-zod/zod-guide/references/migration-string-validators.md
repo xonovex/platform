@@ -1,10 +1,14 @@
 # string-validation-method-changes: String Validation Method Changes
 
-**Guideline:** Use standalone validators `z.uuid()` and `z.iso.datetime()` instead of deprecated string refinements `z.string().uuid()` and `z.string().datetime()`.
+## Guideline
 
-**Rationale:** Zod v4 deprecated string refinements; standalone methods are more efficient and prevent ESLint deprecation warnings.
+Use standalone validators `z.uuid()` and `z.iso.datetime()` instead of deprecated string refinements `z.string().uuid()` and `z.string().datetime()`.
 
-**Example:**
+## Rationale
+
+Zod v4 deprecated string refinements; standalone methods are more efficient and prevent ESLint deprecation warnings.
+
+## Example
 
 ```typescript
 // ✅ Correct - Zod v4 standalone validators
@@ -27,7 +31,7 @@ if (result.success) {
 }
 ```
 
-**Techniques:**
+## Techniques
 
 - Replace `z.string().uuid()` with `z.uuid()`
 - Replace `z.string().email()` with `z.email()`

@@ -1,10 +1,14 @@
 # filename: motion-values
 
-**Guideline:** Use `useMotionValue` for high-frequency updates (mouse, scroll) without re-renders; derive with `useTransform`; smooth with `useSpring`.
+## Guideline
 
-**Rationale:** Motion values bypass React rendering; enables 60fps tracking; perfect for animations that don't need state.
+Use `useMotionValue` for high-frequency updates (mouse, scroll) without re-renders; derive with `useTransform`; smooth with `useSpring`.
 
-**Example:**
+## Rationale
+
+Motion values bypass React rendering; enables 60fps tracking; perfect for animations that don't need state.
+
+## Example
 
 ```tsx
 function MouseTracker() {
@@ -23,7 +27,7 @@ const background = useTransform(x, [-100, 0, 100], ["red", "white", "green"]);
 const scale = useTransform(x, [-100, 100], [0.5, 1.5]);
 ```
 
-**Techniques:**
+## Techniques
 
 - `useMotionValue(initial)`: Create raw value; `.set()` updates without renders
 - `useTransform(value, [input], [output])`: Map range; supports colors, strings, numbers

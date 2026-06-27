@@ -1,10 +1,14 @@
 # migration-paradigm-shifts: React 19 Mental Model Changes
 
-**Guideline:** Think server-first, compiler-optimized, declarative; React 19 shifts from client-side to Server Components and from manual to automatic optimization.
+## Guideline
 
-**Rationale:** Server Components eliminate useEffect data fetching; Compiler removes manual memoization burden; Form Actions replace useState form fields.
+Think server-first, compiler-optimized, declarative; React 19 shifts from client-side to Server Components and from manual to automatic optimization.
 
-**Example:**
+## Rationale
+
+Server Components eliminate useEffect data fetching; Compiler removes manual memoization burden; Form Actions replace useState form fields.
+
+## Example
 
 ```tsx
 // OLD: Client fetch + loading state
@@ -28,7 +32,7 @@ async function ProductPage({productId}) {
 }
 ```
 
-**Techniques:**
+## Techniques
 
 - Server-first: Async Server Components (SC) by default, 'use client' for islands only
 - Data fetching: SC replaces useEffect; no loading state needed (Suspense handles it)

@@ -1,10 +1,14 @@
 # binding-model: Pipeline State and the Descriptor/Binding Model
 
-**Guideline:** Bake render state into immutable pipeline-state objects that are precompiled and cached so no compile happens on the hot path; describe shader resource access with binding groups organized by update frequency; prefer large bindless arrays indexed by handle for material/texture access; and route small, frequently-changing per-draw data through inline constants instead of binding updates.
+## Guideline
 
-**Rationale:** On an explicit API the full graphics state — shaders, blend, depth/stencil, rasterizer, vertex input, attachment formats — is frozen into one pipeline object at creation. This lets the driver compile a fully specialized GPU program ahead of time, but it means the first use of an uncompiled pipeline stalls the frame, so pipelines must be built and cached during load, not on demand. Bindings are how shaders reach buffers and images; grouping them by how often they change (per-frame, per-material, per-draw) means a frame rebinds only the groups that actually changed, minimizing churn. (Each API names this differently — descriptor sets, root parameters/descriptor tables, argument buffers, bind groups — but the frequency model is the same.) The traditional bind-a-group-per-draw model becomes a bottleneck with many materials; a bindless model declares one huge resource array, uploads texture/buffer handles once, and lets the shader index it by an integer passed per draw — collapsing thousands of binds into one. Inline constants carry a tiny amount of data (a transform index, a few floats) directly in the command stream with no binding update at all, which is the cheapest path for data that changes every single draw.
+Bake render state into immutable pipeline-state objects that are precompiled and cached so no compile happens on the hot path; describe shader resource access with binding groups organized by update frequency; prefer large bindless arrays indexed by handle for material/texture access; and route small, frequently-changing per-draw data through inline constants instead of binding updates.
 
-**Techniques:**
+## Rationale
+
+On an explicit API the full graphics state — shaders, blend, depth/stencil, rasterizer, vertex input, attachment formats — is frozen into one pipeline object at creation. This lets the driver compile a fully specialized GPU program ahead of time, but it means the first use of an uncompiled pipeline stalls the frame, so pipelines must be built and cached during load, not on demand. Bindings are how shaders reach buffers and images; grouping them by how often they change (per-frame, per-material, per-draw) means a frame rebinds only the groups that actually changed, minimizing churn. (Each API names this differently — descriptor sets, root parameters/descriptor tables, argument buffers, bind groups — but the frequency model is the same.) The traditional bind-a-group-per-draw model becomes a bottleneck with many materials; a bindless model declares one huge resource array, uploads texture/buffer handles once, and lets the shader index it by an integer passed per draw — collapsing thousands of binds into one. Inline constants carry a tiny amount of data (a transform index, a few floats) directly in the command stream with no binding update at all, which is the cheapest path for data that changes every single draw.
+
+## Techniques
 
 - **Precompiled pipeline** - Build pipelines at load from the (shader + state) key; persist the driver's pipeline-cache blob to disk so cold start is fast, see [references/shader-system.md](./shader-system.md).
 - **Pipeline cache** - Hash the full state into a key; dedupe identical pipelines; warm likely combinations before they are first drawn.
@@ -14,7 +18,7 @@
 - **Dynamic offsets** - One binding for a ring buffer; supply a per-draw byte offset to address the right sub-range without a new binding.
 - **Resource binders carry only handles** - Bundle a draw's resources into a binder object (≈ one binding group) and serialize only its small integer handle onto the command stream, not the resource contents. Commands stay self-contained, so streams recorded on worker threads can be translated to the backend in parallel without backtracking to reconstruct binding state.
 
-**Example:**
+## Example
 
 ```c
 // Precompile and cache the pipeline at load; never compile on the draw path.
@@ -38,7 +42,7 @@ for (material m : materials) {
 // e.g. sampler2D textures[];   sample(textures[pc.tex_id], uv)
 ```
 
-**Gotchas:**
+## Gotchas
 
 - First use of an uncompiled pipeline compiles synchronously and hitches; build and warm the cache at load, and persist the driver cache blob across runs.
 - Changing any baked state (a blend mode, an attachment format) needs a different pipeline — there is no partial state change; plan the permutation set, see [references/shader-system.md](./shader-system.md).
@@ -47,4 +51,6 @@ for (material m : materials) {
 - Binding-group pool sizing is fixed at pool creation in some APIs; underestimating exhausts the pool mid-frame — size for the worst case or use a growable strategy.
 - A binding written while the GPU may still read it (without update-after-bind) is a data race — gate updates on the frame fence, see [references/synchronization.md](./synchronization.md).
 
-**Related:** [references/shader-system.md](./shader-system.md), [references/synchronization.md](./synchronization.md), [references/command-recording-and-frames.md](./command-recording-and-frames.md), [references/gpu-memory-strategy.md](./gpu-memory-strategy.md)
+## Related
+
+[references/shader-system.md](./shader-system.md), [references/synchronization.md](./synchronization.md), [references/command-recording-and-frames.md](./command-recording-and-frames.md), [references/gpu-memory-strategy.md](./gpu-memory-strategy.md)

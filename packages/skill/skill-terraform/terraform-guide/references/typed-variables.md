@@ -1,10 +1,14 @@
 # typed-variables: Variable Types and Validation
 
-**Guideline:** Use type constraints and validation blocks for all variables to catch configuration errors early
+## Guideline
 
-**Rationale:** Typed variables with validation provide immediate feedback and prevent invalid deployments
+Use type constraints and validation blocks for all variables to catch configuration errors early
 
-**Example:**
+## Rationale
+
+Typed variables with validation provide immediate feedback and prevent invalid deployments
+
+## Example
 
 ```hcl
 # String with validation
@@ -79,7 +83,7 @@ variable "optional_config" {
 }
 ```
 
-**Techniques:**
+## Techniques
 
 - **Basic types:** Use string, number, bool, list, map for simple variables
 - **Validation blocks:** Add business logic constraints like allowed values

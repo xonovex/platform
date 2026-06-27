@@ -1,10 +1,14 @@
 # physics-patterns: Physics Engine Patterns
 
-**Guideline:** Use inverse mass (0 = static), bit flags for state, sync maps for decoupled systems.
+## Guideline
 
-**Rationale:** Inverse mass simplifies static bodies and impulse application; flags enable efficient state management; sync maps decouple physics from entity systems.
+Use inverse mass (0 = static), bit flags for state, sync maps for decoupled systems.
 
-**Example:**
+## Rationale
+
+Inverse mass simplifies static bodies and impulse application; flags enable efficient state management; sync maps decouple physics from entity systems.
+
+## Example
 
 ```c
 typedef struct {
@@ -20,7 +24,7 @@ void apply_impulse(rigidbody_t *rb, vec3f_t impulse) {
 }
 ```
 
-**Techniques:**
+## Techniques
 
 - Inverse mass: Store `inv_mass` (1/mass); zero for static bodies to disable movement
 - Bit flags: Use `uint32_t` with bitmask enums for state like ACTIVE, SLEEPING

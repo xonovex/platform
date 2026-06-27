@@ -1,10 +1,14 @@
 # routes: Routes with Validation and Auth
 
-**Guideline:** Chain validation and auth middleware before controller handlers in route definitions.
+## Guideline
 
-**Rationale:** Declarative middleware chaining ensures validation/auth happens before business logic.
+Chain validation and auth middleware before controller handlers in route definitions.
 
-**Example:**
+## Rationale
+
+Declarative middleware chaining ensures validation/auth happens before business logic.
+
+## Example
 
 ```typescript
 const router = express.Router();
@@ -40,7 +44,7 @@ router.delete(
 export {router as userRoutes};
 ```
 
-**Techniques:**
+## Techniques
 
 - Middleware order: Auth (requireAuth) before validation before controller
 - requireAuth: Verify JWT token and attach user to request

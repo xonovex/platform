@@ -1,10 +1,14 @@
 # filename: charts
 
-**Guideline:** Build charts with React/SVG; animate with `useCurrentFrame()` + `interpolate()` or `spring()`; disable third-party library animations.
+## Guideline
 
-**Rationale:** Remotion controls frame-by-frame timing; library animations bypass frame control; manual rendering ensures sync with audio/video.
+Build charts with React/SVG; animate with `useCurrentFrame()` + `interpolate()` or `spring()`; disable third-party library animations.
 
-**Example:**
+## Rationale
+
+Remotion controls frame-by-frame timing; library animations bypass frame control; manual rendering ensures sync with audio/video.
+
+## Example
 
 ```tsx
 function BarChart({data}) {
@@ -37,7 +41,7 @@ function BarChart({data}) {
 }
 ```
 
-**Techniques:**
+## Techniques
 
 - Bar chart: `spring()` for per-bar stagger; `frame - delay` for sequential animation
 - Pie chart: `interpolate()` for smooth arc fill; use SVG path math for arcs

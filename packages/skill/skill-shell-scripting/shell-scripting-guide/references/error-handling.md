@@ -1,10 +1,14 @@
 # error-handling: Error Handling
 
-**Guideline:** Provide clear error messages with context, validate operations, and implement cleanup handlers.
+## Guideline
 
-**Rationale:** Good error handling makes scripts easier to debug and prevents resource leaks. Clear error messages help users understand and fix problems quickly.
+Provide clear error messages with context, validate operations, and implement cleanup handlers.
 
-**Example:**
+## Rationale
+
+Good error handling makes scripts easier to debug and prevents resource leaks. Clear error messages help users understand and fix problems quickly.
+
+## Example
 
 ```sh
 # ✅ Clear error messages with context
@@ -53,7 +57,7 @@ temp_file="$(mktemp)"
 # Cleanup happens automatically
 ```
 
-**Techniques:**
+## Techniques
 
 - Create a `die()` function for fatal errors with exit codes
 - Check command existence with `command -v`

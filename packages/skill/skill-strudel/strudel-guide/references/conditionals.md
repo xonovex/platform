@@ -1,10 +1,14 @@
 # conditionals: Conditional and Probabilistic Transformations
 
-**Guideline:** Use `.every(n, fn)`, probability functions, and `.degradeBy()` to add algorithmic variation without manual editing.
+## Guideline
 
-**Rationale:** Procedural variation creates organic, evolving patterns; manual static edits sound lifeless and repetitive.
+Use `.every(n, fn)`, probability functions, and `.degradeBy()` to add algorithmic variation without manual editing.
 
-**Example:**
+## Rationale
+
+Procedural variation creates organic, evolving patterns; manual static edits sound lifeless and repetitive.
+
+## Example
 
 ```javascript
 // Evolving drum pattern
@@ -14,7 +18,7 @@ s("bd*4")
   .sometimes((x) => x.speed(0.5)); // Occasional pitch drop
 ```
 
-**Techniques:**
+## Techniques
 
 - `.every(n, fn)`: Apply transformation periodically (repeats every n cycles)
 - `.sometimes()`, `.often()`, `.rarely()`, `.almostAlways()`: Probabilistic 50%, 75%, 10%, 90%

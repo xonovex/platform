@@ -1,10 +1,14 @@
 # performance-tips: Performance Optimization Tips
 
-**Guideline:** Cache lookups, use numeric for-loops, and pre-allocate data structures for optimal performance.
+## Guideline
 
-**Rationale:** Lua has different performance characteristics than JavaScript. Lookups, iterators, and dynamic allocation have costs. Pre-allocation aligns with LuaJIT optimization.
+Cache lookups, use numeric for-loops, and pre-allocate data structures for optimal performance.
 
-**Example:**
+## Rationale
+
+Lua has different performance characteristics than JavaScript. Lookups, iterators, and dynamic allocation have costs. Pre-allocation aligns with LuaJIT optimization.
+
+## Example
 
 ```typescript
 // SLOW: Repeated lookups, for-of loop
@@ -58,7 +62,7 @@ function updatePositions(bodies: Body[]) {
 }
 ```
 
-**Techniques:**
+## Techniques
 
 - Cache frequently-used global functions in local variables for fast lookup
 - Use numeric for-loops (`for (let i = 0; i < arr.length; i++)`) instead of for-of

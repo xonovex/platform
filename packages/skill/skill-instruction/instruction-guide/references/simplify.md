@@ -13,17 +13,27 @@ Reduce AGENTS.md verbosity by 40-50% while preserving structure, workflows, and 
 
 ## Simplification Rules
 
-**Remove:** verbose descriptions, explanatory prose, redundant introductions, @docs references, duplicates, code blocks (convert to inline arrow notation)
+### Remove
 
-**Condense:** multi-line bullets → single line with inline details; workflows → essential steps; task delegation → arrow notation; directory structures → inline patterns with parentheses
+verbose descriptions, explanatory prose, redundant introductions, @docs references, duplicates, code blocks (convert to inline arrow notation)
 
-**Keep:** section headings, dependencies, command examples with actual tool names, file/directory patterns, integration points, technology names (`moon`, `Terraform`, `Flux`, `npm`, etc.)
+### Condense
+
+multi-line bullets → single line with inline details; workflows → essential steps; task delegation → arrow notation; directory structures → inline patterns with parentheses
+
+### Keep
+
+section headings, dependencies, command examples with actual tool names, file/directory patterns, integration points, technology names (`moon`, `Terraform`, `Flux`, `npm`, etc.)
 
 ## Example
 
-**Before:** "This directory contains environment-specific configurations for different deployment targets. Each environment has its own main.tf and tfvars files."
+### Before
 
-**After:** Environment configs (`main.tf`, vars, `backend.sh`) - local, staging
+"This directory contains environment-specific configurations for different deployment targets. Each environment has its own main.tf and tfvars files."
+
+### After
+
+Environment configs (`main.tf`, vars, `backend.sh`) - local, staging
 
 ## Implementation
 

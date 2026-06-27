@@ -1,10 +1,14 @@
 # posix-compatibility: POSIX Compatibility
 
-**Guideline:** Use POSIX-compliant syntax for maximum portability across different shells and systems.
+## Guideline
 
-**Rationale:** POSIX-compliant scripts run on any POSIX shell (sh, dash, bash, zsh, etc.), ensuring scripts work reliably across different systems without modification.
+Use POSIX-compliant syntax for maximum portability across different shells and systems.
 
-**Example:**
+## Rationale
+
+POSIX-compliant scripts run on any POSIX shell (sh, dash, bash, zsh, etc.), ensuring scripts work reliably across different systems without modification.
+
+## Example
 
 ```sh
 # ✅ Use POSIX test constructs
@@ -43,7 +47,7 @@ string="hello world"
 upper="$(printf '%s' "$string" | tr '[:lower:]' '[:upper:]')"
 ```
 
-**Techniques:**
+## Techniques
 
 - Use `[ ]` instead of bash-specific `[[ ]]`
 - Use `=` for string comparison, not `==`

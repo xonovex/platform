@@ -1,10 +1,14 @@
 # presentation-create: Create Presentation Document from Codebase
 
-**Guideline:** Generate markdown presentation by exploring codebase and structuring findings into slides.
+## Guideline
 
-**Rationale:** Transforms technical findings from codebase analysis into structured narrative flow with clear narrative arcs, enabling effective communication of architecture and decisions to various audiences.
+Generate markdown presentation by exploring codebase and structuring findings into slides.
 
-**Example:**
+## Rationale
+
+Transforms technical findings from codebase analysis into structured narrative flow with clear narrative arcs, enabling effective communication of architecture and decisions to various audiences.
+
+## Example
 
 ```markdown
 # Microservices Architecture
@@ -33,7 +37,7 @@
 - Implement service mesh
 ```
 
-**Techniques:**
+## Techniques
 
 - Parse topic and identify relevant codebase areas and packages
 - Clarify scope with questions: packages, depth, audience, style

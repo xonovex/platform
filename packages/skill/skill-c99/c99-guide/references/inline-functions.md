@@ -1,10 +1,14 @@
 # inline-functions: Inline Functions vs Macros
 
-**Guideline:** Prefer static inline functions over macros for type safety and predictable behavior.
+## Guideline
 
-**Rationale:** Inline functions provide type checking, proper scoping, and avoid macro side effects like multiple evaluation of arguments.
+Prefer static inline functions over macros for type safety and predictable behavior.
 
-**Example:**
+## Rationale
+
+Inline functions provide type checking, proper scoping, and avoid macro side effects like multiple evaluation of arguments.
+
+## Example
 
 ```c
 // Macro - unsafe, no type checking
@@ -29,7 +33,7 @@ int x = 5;
 int result = clampi(x++, 0, 10);
 ```
 
-**Techniques:**
+## Techniques
 
 - Replace macros: Replace function-like macros with `static inline` functions
 - Type-specific variants: Create `clampi`, `clampf` instead of generic macro

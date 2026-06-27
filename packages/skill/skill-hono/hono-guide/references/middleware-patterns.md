@@ -1,10 +1,14 @@
 # middleware-patterns: CORS Configuration and Custom Middleware
 
-**Guideline:** Configure CORS differently for development and production, and use middleware factory functions to ensure proper `this` binding and parameterization.
+## Guideline
 
-**Rationale:** Environment-specific CORS balances development convenience with production security. Middleware factories ensure correct context binding in async operations, enable parameterization, and provide consistent patterns across applications through proper closure over configuration values.
+Configure CORS differently for development and production, and use middleware factory functions to ensure proper `this` binding and parameterization.
 
-**Example:**
+## Rationale
+
+Environment-specific CORS balances development convenience with production security. Middleware factories ensure correct context binding in async operations, enable parameterization, and provide consistent patterns across applications through proper closure over configuration values.
+
+## Example
 
 ```typescript
 import type {Context, Next} from "hono";
@@ -49,7 +53,7 @@ function requestId() {
 app.use("*", requestId());
 ```
 
-**Techniques:**
+## Techniques
 
 - Import CORS from `hono/cors` and configure based on environment
 - For development use `origin: "*"` for permissive access

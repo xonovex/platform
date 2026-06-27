@@ -1,10 +1,14 @@
 # v4-migration: Zod v4 Migration Guide
 
-**Guideline:** Use Zod v4 standalone validators like `z.uuid()`, `z.email()`, and `z.iso.datetime()` instead of deprecated v3 string refinement methods.
+## Guideline
 
-**Rationale:** Zod v4 changed from string refinements to standalone validators that are more efficient, type-safe, and avoid ESLint deprecation warnings.
+Use Zod v4 standalone validators like `z.uuid()`, `z.email()`, and `z.iso.datetime()` instead of deprecated v3 string refinement methods.
 
-**Example:**
+## Rationale
+
+Zod v4 changed from string refinements to standalone validators that are more efficient, type-safe, and avoid ESLint deprecation warnings.
+
+## Example
 
 ```typescript
 // ✅ Correct (v4) - standalone validators
@@ -35,7 +39,7 @@ const ConfigSchema = z.object({
 });
 ```
 
-**Techniques:**
+## Techniques
 
 - Replace `z.string().uuid()` with `z.uuid()`
 - Replace `z.string().email()` with `z.email()`

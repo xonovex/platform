@@ -1,10 +1,14 @@
 # code-template-extract: Analyze Package for Template Extraction
 
-**Guideline:** Analyze packages to identify core patterns for template extraction.
+## Guideline
 
-**Rationale:** Templates enable rapid scaffolding while maintaining consistency. Extracting from proven implementations ensures new packages follow established patterns and best practices.
+Analyze packages to identify core patterns for template extraction.
 
-**Example:**
+## Rationale
+
+Templates enable rapid scaffolding while maintaining consistency. Extracting from proven implementations ensures new packages follow established patterns and best practices.
+
+## Example
 
 ```
 Analyzing packages/api-auth (successful, reusable):
@@ -24,7 +28,7 @@ Template parameters:
 - {{DATABASE_URL}}: postgres://...
 ```
 
-**Techniques:**
+## Techniques
 
 - Analyze successful package structure: directories, naming, organization patterns
 - Document configuration templates: package.json, tsconfig.json, build settings

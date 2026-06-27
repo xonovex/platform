@@ -1,10 +1,14 @@
 # arrangement: Song Structure and Arrangement
 
-**Guideline:** Organize compositions into distinct sections using `.mask()` and `arrange()` to build tension, peaks, and release.
+## Guideline
 
-**Rationale:** Structured arrangements create emotional arcs; static loops lack engagement and dynamics.
+Organize compositions into distinct sections using `.mask()` and `arrange()` to build tension, peaks, and release.
 
-**Example:**
+## Rationale
+
+Structured arrangements create emotional arcs; static loops lack engagement and dynamics.
+
+## Example
 
 ```javascript
 arrange(
@@ -16,7 +20,7 @@ arrange(
 );
 ```
 
-**Techniques:**
+## Techniques
 
 - `.mask("1 1 0 0 0 0 0 0")`: Play first half of 8-subdivision cycle
 - `arrange([cycles, pattern], ...)`: Sequence sections with precise lengths
