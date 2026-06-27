@@ -57,7 +57,7 @@ digraph Workflow {
     fillcolor=lightyellow;
 
     session_planning [label="--- New Session (optional) ---", shape=plaintext, fontcolor=gray40];
-    plan_create [label="plan-create\n(or plan-tdd-create)", fillcolor=lightblue];
+    plan_create [label="plan-create\n(TDD via tdd-guide)", fillcolor=lightblue];
     plan_create_agent [label="(Agent:\n- Explore agents align\n- Create plans/<plan>.md\n- Frontmatter: status, skills,\n  versions, parallelization)", shape=ellipse, fillcolor="#ffffcc"];
     plan_review [label="Review Plan\n(HITL or AI)", shape=diamond, fillcolor=lightcoral];
     plan_subplans [label="plan-subplans-create\n(optional)", fillcolor=lightblue];

@@ -4,7 +4,7 @@ Process user feedback on a plan document — from inline annotations in the plan
 
 ## Prerequisites
 
-- A plan document exists (from `plan-create` or `plan-tdd-create`)
+- A plan document exists (from `plan-create`)
 - The user has provided feedback as inline annotations, prompt instructions, or both
 
 ## Goal

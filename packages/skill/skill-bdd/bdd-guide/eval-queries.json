@@ -1,0 +1,74 @@
+[
+  {
+    "query": "help me run a three amigos session and write Given-When-Then scenarios for the checkout story before we code",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "discovery + Gherkin formulation before coding — core bdd"
+  },
+  {
+    "query": "how do I structure a feature file with Background and a Scenario Outline for the coupon rules?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "Gherkin keyword structure owned by bdd"
+  },
+  {
+    "query": "we want to do example mapping on this story — what do the yellow, blue, green and red cards mean?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "example mapping card colours owned by bdd discovery"
+  },
+  {
+    "query": "set up acceptance-test-driven development so the specs become living documentation the business can read",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "ATDD = specification by example = living documentation, all bdd"
+  },
+  {
+    "query": "is Cucumber a testing tool, and should I drive these scenarios through the browser?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "framing/gotcha owned by bdd: collaboration tool, stub externals not UI-drive"
+  },
+  {
+    "query": "how many scenarios per business rule should we keep, versus pushing cases into unit tests?",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "2-5 scenarios per rule, push exhaustive cases down — bdd boundary guidance"
+  },
+  {
+    "query": "what's the red-green-refactor cycle and how do I write a failing test first for this pricing function?",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: inner test-first rhythm -> tdd-guide, not the acceptance layer"
+  },
+  {
+    "query": "what's the difference between a mock and a stub, and how do I stub the payment gateway in my step definitions?",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: test-double taxonomy and stubbing mechanics -> testing-guide"
+  },
+  {
+    "query": "help me write a good user story with INVEST and acceptance criteria for the wishlist feature",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near-miss: the story container and INVEST -> user-stories-guide"
+  },
+  {
+    "query": "define the bounded context and ubiquitous language for our billing domain",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: the vocabulary scenarios are written in -> ddd-guide"
+  },
+  {
+    "query": "configure vi.mock and the vitest matchers for these HTTP assertions",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near-miss: framework API -> vitest-guide"
+  },
+  {
+    "query": "audit this module for dead code and duplication without changing anything",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: read-only smell audit -> code-quality-guide"
+  }
+]

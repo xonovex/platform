@@ -1,0 +1,74 @@
+[
+  {
+    "query": "walk me through red-green-refactor on this shopping-cart total function",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "core owned concept: the TDD cycle"
+  },
+  {
+    "query": "write the test first, then the code — drive this feature test-first",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "test-first discipline is the owned rhythm"
+  },
+  {
+    "query": "should I fake it with a constant or triangulate here to get the test green?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "green-bar strategy choice: fake it / obvious / triangulation"
+  },
+  {
+    "query": "help me build a test list and work it one item at a time without writing them all up front",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "test list / to-do list, owned by tdd"
+  },
+  {
+    "query": "is mockist (London) or classical (Detroit) TDD better for growing this design?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "classical vs mockist as a TDD design-style choice, owned by tdd"
+  },
+  {
+    "query": "I want clean code that works — let the tests grow the API instead of designing it up front",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "letting tests drive design + the clean-code-that-works goal"
+  },
+  {
+    "query": "my green bar never refactors — is that still TDD?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "refactor-step discipline, an owned gotcha"
+  },
+  {
+    "query": "what's the difference between a mock and a stub, and which should I use?",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: test-double taxonomy and state-vs-behaviour verification -> testing-guide"
+  },
+  {
+    "query": "structure this test with Arrange-Act-Assert and make it follow FIRST",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near-miss: anatomy of a single test (AAA / FIRST / naming) -> testing-guide"
+  },
+  {
+    "query": "write Given-When-Then acceptance scenarios with the three amigos before we code",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: acceptance-first / example-led specification -> bdd-guide"
+  },
+  {
+    "query": "this class has low cohesion and too many responsibilities — how should I redesign it?",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near-miss: the design bar the refactor aims at -> oop-guide / connascence-guide"
+  },
+  {
+    "query": "set up Vitest config and mock this module with vi.mock for my test suite",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: framework API mechanics -> vitest-guide"
+  }
+]

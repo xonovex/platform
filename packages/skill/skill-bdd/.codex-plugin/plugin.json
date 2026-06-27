@@ -1,0 +1,14 @@
+{
+  "name": "xonovex-skill-bdd",
+  "version": "3.2.0",
+  "description": "Xonovex Behaviour/acceptance-driven development skills",
+  "author": {
+    "name": "Xonovex"
+  },
+  "skills": "./bdd-guide",
+  "dependencies": [
+    "xonovex-skill-user-stories",
+    "xonovex-skill-testing",
+    "xonovex-skill-ddd"
+  ]
+}

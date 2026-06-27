@@ -5,6 +5,7 @@ import {parse as parseYaml} from "yaml";
 
 const NAME_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const FRONTMATTER_RE = /^---\n([\s\S]*?)\n---\n([\s\S]*)$/;
+const QUOTED_SCALAR_RE = /^[ \t]*[a-z_][\w-]*:[ \t]*(.+?)[ \t]*$/i;
 const REF_LINK_RE = /references\/([\w./<>{}-]+\.md)/g;
 const PROGRESSIVE_DISCLOSURE_RE =
   /^## *Progressive Disclosure\s*\n([\s\S]*?)(?=^## |(?![\s\S]))/im;
@@ -123,10 +124,12 @@ const resolveTarget = (arg: string): {skill: string; skillDir: string} => {
   return {skill, skillDir: dirname(skill)};
 };
 
-const splitFrontmatter = (content: string): {fm: Frontmatter; body: string} => {
+const splitFrontmatter = (
+  content: string,
+): {fm: Frontmatter; body: string; fmRaw: string} => {
   const match = FRONTMATTER_RE.exec(content);
   if (!match) {
-    return {fm: {}, body: content};
+    return {fm: {}, body: content, fmRaw: ""};
   }
   const fmRaw = match[1] ?? "";
   const body = match[2] ?? "";
@@ -139,7 +142,43 @@ const splitFrontmatter = (content: string): {fm: Frontmatter; body: string} => {
   if (fm === null || typeof fm !== "object" || Array.isArray(fm)) {
     throw new Error("Frontmatter is not a mapping");
   }
-  return {fm: fm as Frontmatter, body};
+  return {fm: fm as Frontmatter, body, fmRaw};
+};
+
+const checkLoaderQuoting = (fmRaw: string, report: Report): void => {
+  let flagged = false;
+  for (const rawLine of splitLines(fmRaw)) {
+    const m = QUOTED_SCALAR_RE.exec(rawLine);
+    if (!m) continue;
+    const rest = m[1] ?? "";
+    if (rest.length < 2 || (!rest.startsWith("'") && !rest.startsWith('"')))
+      continue;
+    const quote = rest.startsWith("'") ? "'" : '"';
+    if (!rest.endsWith(quote)) continue; // multiline / unterminated — cannot judge naively
+    const key = (rawLine.split(":", 1)[0] ?? "").trim();
+    const count = rest.split(quote).length - 1;
+    if (quote === "'" && rest.includes("''")) {
+      report.addFail(
+        `frontmatter: '${key}' uses single-quote '' escaping, which the skill ` +
+          "loader's parser does not support (it reads the tail as an unknown " +
+          "attribute). Use a double-quoted scalar with literal apostrophes, e.g. " +
+          "\"… doesn't say 'TDD'.\"",
+      );
+      flagged = true;
+    } else if (count !== 2) {
+      report.addFail(
+        `frontmatter: '${key}' has an inner ${quote} inside a ${quote}-quoted value; ` +
+          "the skill loader stops at the first inner quote. Use a double-quoted scalar " +
+          "with single quotes for inner phrases (apostrophes stay literal).",
+      );
+      flagged = true;
+    }
+  }
+  if (!flagged) {
+    report.addPass(
+      "frontmatter: quoting is loader-safe (no '' escapes or inner delimiter quotes)",
+    );
+  }
 };
 
 const checkFrontmatter = (
@@ -592,8 +631,9 @@ const main = (argv: readonly string[]): number => {
 
   let fm: Frontmatter;
   let body: string;
+  let fmRaw: string;
   try {
-    ({fm, body} = splitFrontmatter(content));
+    ({fm, body, fmRaw} = splitFrontmatter(content));
   } catch (error) {
     process.stderr.write(
       `Error: ${error instanceof Error ? error.message : String(error)}\n`,
@@ -603,6 +643,7 @@ const main = (argv: readonly string[]): number => {
 
   const report = new Report();
   checkFrontmatter(fm, parentName, report);
+  checkLoaderQuoting(fmRaw, report);
   checkBody(body, report);
   checkReferences(body, skillDir, report);
   checkReferenceTocs(skillDir, report);

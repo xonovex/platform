@@ -4,5 +4,9 @@
   "description": "Xonovex Plan skills",
   "author": {"name": "Xonovex"},
   "skills": ["./plan-guide"],
-  "dependencies": ["xonovex-skill-code-quality"]
+  "dependencies": [
+    "xonovex-skill-code-quality",
+    "xonovex-skill-tdd",
+    "xonovex-skill-bdd"
+  ]
 }

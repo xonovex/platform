@@ -1,0 +1,8 @@
+{
+  "name": "xonovex-skill-tdd",
+  "version": "3.2.0",
+  "description": "Xonovex Test-driven development skills",
+  "author": {"name": "Xonovex"},
+  "skills": ["./tdd-guide"],
+  "dependencies": ["xonovex-skill-testing"]
+}

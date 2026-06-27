@@ -32,7 +32,7 @@ Author and maintain plan documents across their full lifecycle (research → int
 1. **Research** — `plan-research` for general; for a code-quality audit (hardening / simplification / alignment) it applies the **code-quality-guide** dimensions and reports findings
 2. **Interrogate** — `plan-interrogate` surfaces unknown decisions by walking the design tree one question at a time (codebase-aware), upstream of clarify
 3. **Clarify** — `plan-clarify` walks known open decisions one by one in plain prose (after research, or after create to settle direction)
-4. **Create** — `plan-create` (or `plan-tdd-create`) authors the parent plan
+4. **Create** — `plan-create` authors the parent plan; test-first plans apply **tdd-guide** (or **bdd-guide** for acceptance-first)
 5. **Refine** — `plan-refine` processes user feedback (annotations + prompt instructions)
 6. **Critique** — `plan-critique` adversarially stress-tests the plan (red-team / pre-mortem), feeding findings back into refine
 7. **Expand** — `plan-subplans-create` generates detailed child plans
@@ -56,7 +56,6 @@ Author and maintain plan documents across their full lifecycle (research → int
 - **Interrogate** to surface unknown decisions — see [references/plan-interrogate.md](references/plan-interrogate.md)
 - **Clarify** known open decisions one by one — see [references/plan-clarify.md](references/plan-clarify.md)
 - **Create** a plan with research — see [references/plan-create.md](references/plan-create.md)
-- **Create a TDD plan** — see [references/plan-tdd-create.md](references/plan-tdd-create.md)
 - **Refine** from feedback (annotations / prompt) — see [references/plan-refine.md](references/plan-refine.md)
 - **Critique** the plan adversarially — see [references/plan-critique.md](references/plan-critique.md)
 - **Generate subplans** from an approved parent — see [references/plan-subplans-create.md](references/plan-subplans-create.md)
@@ -80,8 +79,7 @@ Author and maintain plan documents across their full lifecycle (research → int
 
 - Read [references/plan-interrogate.md](references/plan-interrogate.md) - Load when interrogating the user to surface unknown decisions before a plan exists, one question at a time, exploring the codebase to self-answer
 - Read [references/plan-clarify.md](references/plan-clarify.md) - Load when walking the user through known open decisions one at a time, in plain prose, after research or plan creation
-- Read [references/plan-create.md](references/plan-create.md) - Load when authoring a high-level plan from research
-- Read [references/plan-tdd-create.md](references/plan-tdd-create.md) - Load when authoring a TDD plan with story-based test steps
+- Read [references/plan-create.md](references/plan-create.md) - Load when authoring a high-level plan from research (test-first plans route to **tdd-guide** / **bdd-guide**)
 - Read [references/plan-refine.md](references/plan-refine.md) - Load when iterating on a plan from inline annotations and/or prompt feedback
 - Read [references/plan-critique.md](references/plan-critique.md) - Load when adversarially stress-testing a plan to expose weaknesses (red-team / pre-mortem / falsify / steelman), read-only
 - Read [references/plan-subplans-create.md](references/plan-subplans-create.md) - Load when expanding an approved plan into detailed parallelizable subplans

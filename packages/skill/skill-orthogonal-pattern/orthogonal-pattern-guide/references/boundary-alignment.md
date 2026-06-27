@@ -9,7 +9,7 @@ A variation point — the design decision likely to change — must be cut on th
 
 ## Align to a domain seam, not a layer
 
-A variation point should coincide with a bounded context — a region with its own consistent vocabulary (its ubiquitous language) and one reason to change. Cut on a technical layer or a storage table instead and you split a single concept across two owners.
+A variation point should coincide with a bounded context — a region with its own consistent vocabulary (its ubiquitous language) and one reason to change. Bounded context and ubiquitous language are owned by **ddd-guide**; this file uses them without redefining them. Cut on a technical layer or a storage table instead and you split a single concept across two owners.
 
 - **One bounded context, one variation point** — `format` is a seam because "how is a record encoded?" has its own vocabulary (`Columnar`, `RowDelimited`) that means nothing to `compression`. The seam follows the concept, not the call stack.
 - **A seam through a concept leaks** — if encoding rules live half in `format` and half in a `compression` table keyed by format, a single encoding change fans out across both. That fan-out is connascence crossing the boundary — the concept was split, not separated.

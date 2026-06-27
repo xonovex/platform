@@ -24,6 +24,10 @@ Run research first (see `plan-research.md`, including its code-quality audits �
 6. **Write plan** — save to `plans/<feature-name>.md` (standalone file, not inside an existing plan dir unless requested)
 7. **Show summary** — display plan for user review; STOP
 
+## Test-first plans
+
+When the request is test-first, apply **tdd-guide**'s red-green-refactor (or **bdd-guide** for acceptance-first): structure each step as failing-test → implement → refactor, keep one assertion failing at a time, and list the test doubles per **testing-guide**. The plan document is the same shape — the steps just lead with the test.
+
 ## Implementation Details
 
 **Interactive mode:** ask about architectural preferences, library choices, error handling, testing depth, accessibility

@@ -1,0 +1,15 @@
+{
+  "name": "@xonovex/skill-ddd",
+  "version": "3.2.0",
+  "private": true,
+  "type": "module",
+  "keywords": [
+    "xonovex",
+    "skill",
+    "ddd"
+  ],
+  "scripts": {
+    "fmt": "prettier --write .",
+    "fmt:check": "prettier --check ."
+  }
+}

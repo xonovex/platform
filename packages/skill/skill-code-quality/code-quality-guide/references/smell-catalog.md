@@ -2,7 +2,7 @@
 
 The audit checklist: every code smell, the signal that detects it, and the **one** skill that owns its definition and fix. This file routes; it does not redefine. Organized by design-problem **family** (the peer-reviewed grouping) — _not_ by an application/class/method scope tier, which is an informal, weakly-sourced label, not a citable taxonomy.
 
-Owner key: `robustness.md` = this skill's robustness dimension · **oop-guide** = OO-design smells · **connascence-guide** = coupling/cohesion smells · _here_ = this skill owns the detector (duplication / dead code / over-abstraction cleanup).
+Owner key: `robustness.md` = this skill's robustness dimension · **oop-guide** = OO-design smells · **connascence-guide** = coupling/cohesion smells · _here_ = this skill owns the detector (duplication / dead code / over-abstraction / redundant-comment cleanup).
 
 ## Bloaters — grown too large
 
@@ -34,13 +34,14 @@ Owner key: `robustness.md` = this skill's robustness dimension · **oop-guide** 
 
 ## Dispensables — remove for free (this skill owns the detector)
 
-| Smell                    | Detector signal                                    | Owner                                               |
-| ------------------------ | -------------------------------------------------- | --------------------------------------------------- |
-| Duplicated Code          | identical / near-identical logic in 2+ places      | _here_ (DUPLICATES)                                 |
-| Dead Code                | unreachable or never-called code, exports, params  | _here_ (DEAD CODE)                                  |
-| Speculative Generality   | abstraction / hook with no current user            | _here_ (OVER-ENGINEERING)                           |
-| Lazy Class / Data Class  | a class too thin to justify itself, or only fields | **oop-guide**                                       |
-| Magic Numbers / Literals | unnamed constants begging for a name               | `robustness.md` — _supplementary; cited in SOURCES_ |
+| Smell                    | Detector signal                                                                                                  | Owner                                                           |
+| ------------------------ | ---------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
+| Duplicated Code          | identical / near-identical logic in 2+ places                                                                    | _here_ (DUPLICATES)                                             |
+| Dead Code                | unreachable or never-called code, exports, params                                                                | _here_ (DEAD CODE)                                              |
+| Speculative Generality   | abstraction / hook with no current user                                                                          | _here_ (OVER-ENGINEERING)                                       |
+| Comments (noise)         | a comment restating a well-named declaration, narrating a plan / provenance, or denser than the surrounding code | _here_ (REDUNDANT COMMENT) — rename to self-document, or delete |
+| Lazy Class / Data Class  | a class too thin to justify itself, or only fields                                                               | **oop-guide**                                                   |
+| Magic Numbers / Literals | unnamed constants begging for a name                                                                             | `robustness.md` — _supplementary; cited in SOURCES_             |
 
 ## Couplers
 

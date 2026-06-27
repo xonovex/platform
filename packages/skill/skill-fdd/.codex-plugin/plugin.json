@@ -1,0 +1,10 @@
+{
+  "name": "xonovex-skill-fdd",
+  "version": "3.2.0",
+  "description": "Xonovex Feature-driven development skills",
+  "author": {
+    "name": "Xonovex"
+  },
+  "skills": "./fdd-guide",
+  "dependencies": ["xonovex-skill-ddd", "xonovex-skill-user-stories"]
+}
