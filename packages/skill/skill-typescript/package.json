@@ -3,6 +3,10 @@
   "version": "3.2.0",
   "private": true,
   "type": "module",
+  "dependencies": {
+    "@xonovex/skill-fp": "3.2.0",
+    "@xonovex/skill-oop": "3.2.0"
+  },
   "keywords": [
     "xonovex",
     "skill",

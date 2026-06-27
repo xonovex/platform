@@ -18,6 +18,7 @@
     { "name": "xonovex-skill-c99", "source": "./packages/skill/skill-c99", "description": "Xonovex C99 skills" },
     { "name": "xonovex-skill-c99-game-opinionated", "source": "./packages/skill/skill-c99-game-opinionated", "description": "Xonovex C99 game opinionated skills" },
     { "name": "xonovex-skill-c99-opinionated", "source": "./packages/skill/skill-c99-opinionated", "description": "Xonovex C99 opinionated skills" },
+    { "name": "xonovex-skill-caveman", "source": "./packages/skill/skill-caveman", "description": "Xonovex Caveman writing-style skill" },
     { "name": "xonovex-skill-cmake", "source": "./packages/skill/skill-cmake", "description": "Xonovex CMake skills" },
     { "name": "xonovex-skill-code-quality", "source": "./packages/skill/skill-code-quality", "description": "Xonovex Code quality skills" },
     { "name": "xonovex-skill-code-review", "source": "./packages/skill/skill-code-review", "description": "Xonovex Code review skills" },

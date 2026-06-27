@@ -3,7 +3,9 @@ name: "{tech}-guide"
 description: "Use when {writing | reviewing | editing | scaffolding} {Tech} {scope, e.g. 'API servers in TypeScript' / 'React components' / 'Postgres schemas'}. Triggers on {file patterns}, imports, and prompts about {capabilities}, even when the user doesn't say '{Tech}'."
 ---
 
-# {Tech} Coding Guidelines
+# {Topic} Guidelines
+
+<!-- ## Requirements is language/framework-only — delete it for general / pattern / process skills. -->
 
 ## Requirements
 

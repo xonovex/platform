@@ -1,0 +1,50 @@
+[
+  {
+    "query": "respond like a caveman from now on",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "direct caveman-style request"
+  },
+  {
+    "query": "cut the filler, give me terse blunt answers",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "terse / cut-filler intent without naming caveman"
+  },
+  {
+    "query": "rewrite this paragraph in caveman speak",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "transform prose into caveman style"
+  },
+  {
+    "query": "stop hedging and drop the pleasantries in your replies",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "no-hedging / no-pleasantries are caveman rules"
+  },
+  {
+    "query": "make these replies as short and direct as possible, no padding",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "terse-response intent, validation positive"
+  },
+  {
+    "query": "translate this sentence into French",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: a different natural language, not a terseness style"
+  },
+  {
+    "query": "remove the AI writing patterns and make this sound human",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: humanizing voice is content-guide, not caveman terseness"
+  },
+  {
+    "query": "summarize this article in three bullet points",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near-miss: content summarization, not a caveman writing style"
+  }
+]

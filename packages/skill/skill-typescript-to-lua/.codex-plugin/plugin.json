@@ -5,5 +5,6 @@
   "author": {
     "name": "Xonovex"
   },
-  "skills": "./typescript-to-lua-guide"
+  "skills": "./typescript-to-lua-guide",
+  "dependencies": ["xonovex-skill-lua"]
 }

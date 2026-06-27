@@ -1,0 +1,74 @@
+[
+  {
+    "query": "{realistic should-trigger prompt — names the operation/workflow directly}",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "direct mention"
+  },
+  {
+    "query": "{realistic should-trigger prompt — describes the task without naming the workflow}",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "implicit trigger"
+  },
+  {
+    "query": "{realistic should-trigger prompt — names a specific operation}",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "operation-level trigger"
+  },
+  {
+    "query": "{realistic should-trigger prompt — casual phrasing or typo}",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "casual phrasing"
+  },
+  {
+    "query": "{realistic should-trigger prompt — operation buried in a larger task}",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "buried in larger task"
+  },
+  {
+    "query": "{near-miss prompt — shares keywords but is a different skill's operation}",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "keyword overlap, different owner"
+  },
+  {
+    "query": "{near-miss prompt — adjacent workflow, not this one}",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "adjacent workflow"
+  },
+  {
+    "query": "{near-miss prompt — related terminology in a different context}",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "terminology overlap"
+  },
+  {
+    "query": "{realistic should-trigger prompt — different phrasing for validation set}",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "validation positive"
+  },
+  {
+    "query": "{realistic should-trigger prompt — validation set, implicit trigger}",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "validation positive — implicit"
+  },
+  {
+    "query": "{near-miss prompt — validation set negative}",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "validation negative"
+  },
+  {
+    "query": "{near-miss prompt — validation set near-miss pointing at the right owner}",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "validation negative — near-miss"
+  }
+]

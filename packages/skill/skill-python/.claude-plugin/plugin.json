@@ -3,5 +3,6 @@
   "version": "3.2.0",
   "description": "Xonovex Python skills",
   "author": {"name": "Xonovex"},
-  "skills": ["./python-guide"]
+  "skills": ["./python-guide"],
+  "dependencies": ["xonovex-skill-fp", "xonovex-skill-oop"]
 }

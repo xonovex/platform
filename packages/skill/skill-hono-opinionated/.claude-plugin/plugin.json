@@ -3,5 +3,6 @@
   "version": "3.2.0",
   "description": "Xonovex Hono opinionated skills",
   "author": {"name": "Xonovex"},
-  "skills": ["./hono-opinionated-guide"]
+  "skills": ["./hono-opinionated-guide"],
+  "dependencies": ["xonovex-skill-hono"]
 }

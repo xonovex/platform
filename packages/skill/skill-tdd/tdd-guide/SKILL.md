@@ -1,6 +1,6 @@
 ---
 name: tdd-guide
-description: "Use when driving code test-first or coaching the red-green-refactor rhythm — writing a failing test before the production code, going green with fake-it / obvious-implementation / triangulation, then refactoring to remove duplication, working a test list one item at a time, and letting the tests grow the design. Triggers on red-green-refactor, test-first, 'write the test first', failing test before code, triangulation, fake it till you make it, test list / to-do list, classical (Detroit) vs mockist (London) TDD, and 'clean code that works' — even when the user doesn't say 'TDD'. Skip the anatomy of a single test (AAA, FIRST, naming, test doubles, mocking, smells -> see **testing-guide**), acceptance-first / example-led Given-When-Then specification (see **bdd-guide**), and the design bar the refactor step aims at (see **oop-guide**, **connascence-guide**)."
+description: "Use when driving code test-first or coaching the red-green-refactor rhythm — writing a failing test before the production code, going green with fake-it / obvious-implementation / triangulation, then refactoring to remove duplication, working a test list one item at a time, and letting the tests grow the design. Triggers on red-green-refactor, test-first, 'write the test first', failing test before code, triangulation, fake it till you make it, test list / to-do list, classical (Detroit) vs mockist (London) TDD, and 'clean code that works' — even when the user doesn't say 'TDD'."
 ---
 
 # Test-Driven Development

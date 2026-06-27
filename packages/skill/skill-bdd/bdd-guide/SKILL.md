@@ -1,6 +1,6 @@
 ---
 name: bdd-guide
-description: "Use when driving software from concrete agreed examples of behaviour — running three-amigos discovery and example mapping before coding, formulating Given-When-Then scenarios in feature files, and treating them as living documentation that tests the team their shared understanding. ATDD and BDD are one practice here. Triggers on BDD, ATDD, Gherkin, Given-When-Then, Cucumber, feature file, scenario / scenario outline, three amigos, example mapping, specification by example, living documentation, acceptance-test-driven — even when the user doesn not say 'BDD'. Skip the inner red-green-refactor loop that drives the domain logic (see **tdd-guide**), step-implementation / stubbing mechanics and test doubles (see **testing-guide**), the story container and INVEST (see **user-stories-guide**), and the ubiquitous language the scenarios are written in (see **ddd-guide**)."
+description: "Use when driving software from concrete agreed examples of behaviour — running three-amigos discovery and example mapping before coding, formulating Given-When-Then scenarios in feature files, and treating them as living documentation that tests the team their shared understanding. ATDD and BDD are one practice here. Triggers on BDD, ATDD, Gherkin, Given-When-Then, Cucumber, feature file, scenario / scenario outline, three amigos, example mapping, specification by example, living documentation, acceptance-test-driven — even when the user doesn not say 'BDD'."
 ---
 
 # Behaviour- and Acceptance-Driven Development

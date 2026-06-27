@@ -75,6 +75,7 @@ Single index of every reference; each entry names the operation/concept and when
 - Read [references/catalog-audit.md](references/catalog-audit.md) - Load when auditing, splitting, or de-duplicating a set of skills onto the composable split
 - Read [references/decompose.md](references/decompose.md) - Load when splitting one multi-concern skill into several single-owner composable skills
 - Read [references/guideline-skills.md](references/guideline-skills.md) - Load when creating a coding-guideline / style-rule skill (topic categories, do/don't patterns, reference shape)
+- Read [references/workflow-skills.md](references/workflow-skills.md) - Load when creating a workflow / operation skill — a procedure the agent or a command delegates to (Core Principles → Operations skeleton, command delegation)
 - Read [references/writing-descriptions.md](references/writing-descriptions.md) - Load when authoring or rewriting a `description` field (writing principles, before/after)
 - Read [references/evaluating-triggers.md](references/evaluating-triggers.md) - Load when verifying or iterating on trigger rate (eval queries, train/validation split, optimization loop)
 - Read [references/evaluating-outputs.md](references/evaluating-outputs.md) - Load when verifying or iterating on output quality (test cases, assertions, grading)

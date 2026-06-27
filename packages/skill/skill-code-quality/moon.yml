@@ -1,6 +1,9 @@
 $schema: https://moonrepo.dev/schemas/project.json
 language: unknown
 tags: [skill]
+dependsOn:
+  - skill-connascence
+  - skill-oop
 tasks:
   build:
     command: echo 'build complete'

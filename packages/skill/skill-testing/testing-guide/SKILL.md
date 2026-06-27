@@ -1,6 +1,6 @@
 ---
 name: testing-guide
-description: "Use when writing or reviewing a single good test independent of any framework — structuring it as Arrange-Act-Assert / Four-Phase, meeting FIRST, naming it, choosing and naming the right test double (Dummy / Stub / Spy / Mock / Fake), deciding what to mock and what not to, telling state from behaviour verification, and spotting test smells. Triggers on test double, mock vs stub vs fake vs spy, what should I mock, over-mocking, AAA, FIRST, fragile/flaky/obscure test, Object Mother, Test Data Builder, fixture setup — even when the user doesn't say 'testing'. Skip the test-first rhythm and red-green-refactor (see **tdd-guide**), acceptance/example specification and Gherkin (see **bdd-guide**), the coupling theory behind over-mocking (see **connascence-guide**), and any framework-specific API (see **vitest-guide**)."
+description: "Use when writing or reviewing a single good test independent of any framework — structuring it as Arrange-Act-Assert / Four-Phase, meeting FIRST, naming it, choosing and naming the right test double (Dummy / Stub / Spy / Mock / Fake), deciding what to mock and what not to, telling state from behaviour verification, and spotting test smells. Triggers on test double, mock vs stub vs fake vs spy, what should I mock, over-mocking, AAA, FIRST, fragile/flaky/obscure test, Object Mother, Test Data Builder, fixture setup — even when the user doesn't say 'testing'."
 ---
 
 # Writing a Single Good Test

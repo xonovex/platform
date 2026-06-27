@@ -149,6 +149,18 @@
       "category": "Productivity"
     },
     {
+      "name": "xonovex-skill-caveman",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-caveman"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
       "name": "xonovex-skill-cmake",
       "source": {
         "source": "local",

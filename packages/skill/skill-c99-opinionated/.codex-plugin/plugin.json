@@ -5,5 +5,10 @@
   "author": {
     "name": "Xonovex"
   },
-  "skills": "./c99-opinionated-guide"
+  "skills": "./c99-opinionated-guide",
+  "dependencies": [
+    "xonovex-skill-c99",
+    "xonovex-skill-data-oriented-design",
+    "xonovex-skill-memory-management"
+  ]
 }
