@@ -1,6 +1,6 @@
 {
   "name": "xonovex-skill-cmake",
-  "version": "3.2.0",
+  "version": "4.0.0",
   "description": "Xonovex CMake skills",
   "author": {"name": "Xonovex"},
   "skills": ["./cmake-guide"]

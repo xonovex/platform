@@ -1,12 +1,12 @@
 {
   "name": "@xonovex/skill-bdd",
-  "version": "3.2.0",
+  "version": "4.0.0",
   "private": true,
   "type": "module",
   "dependencies": {
-    "@xonovex/skill-ddd": "3.2.0",
-    "@xonovex/skill-testing": "3.2.0",
-    "@xonovex/skill-user-stories": "3.2.0"
+    "@xonovex/skill-ddd": "4.0.0",
+    "@xonovex/skill-testing": "4.0.0",
+    "@xonovex/skill-user-stories": "4.0.0"
   },
   "keywords": [
     "xonovex",

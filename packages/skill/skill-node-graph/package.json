@@ -1,10 +1,10 @@
 {
   "name": "@xonovex/skill-node-graph",
-  "version": "3.2.0",
+  "version": "4.0.0",
   "private": true,
   "type": "module",
   "dependencies": {
-    "@xonovex/skill-data-model": "3.2.0"
+    "@xonovex/skill-data-model": "4.0.0"
   },
   "keywords": [
     "xonovex",
