@@ -199,7 +199,7 @@ func TestBuildJob_WithoutRuntimeClassName(t *testing.T) {
 	}
 }
 
-func TestBuildJob_WithNixPackages(t *testing.T) {
+func TestBuildJob_WithNixImage(t *testing.T) {
 	run := &agentv1alpha1.AgentRun{
 		ObjectMeta: metav1.ObjectMeta{Name: "test-run", Namespace: "default"},
 		Spec: agentv1alpha1.AgentRunSpec{
@@ -212,34 +212,47 @@ func TestBuildJob_WithNixPackages(t *testing.T) {
 	tc := &agentv1alpha1.ToolchainSpec{
 		Type: agentv1alpha1.ToolchainTypeNix,
 		Nix: &agentv1alpha1.NixSpec{
-			Packages: []string{"nodejs_22", "python3"},
+			NixpkgsRev: "abc123",
+			Packages:   []string{"nodejs_22", "python3"},
+			Image:      "ghcr.io/xonovex/agent@sha256:abc",
 		},
 	}
 
-	job := BuildJob(run, nil, "pvc", "image", time.Hour, agentv1alpha1.AgentTypeClaude, agentv1alpha1.WorkspaceTypeGit, tc, nil)
-
+	job := BuildJob(run, nil, "pvc", "ghcr.io/xonovex/agent@sha256:abc", time.Hour, agentv1alpha1.AgentTypeClaude, agentv1alpha1.WorkspaceTypeGit, tc, nil)
 	podSpec := job.Spec.Template.Spec
 
-	// Should have 2 init containers: git-clone + nix-env
-	if len(podSpec.InitContainers) != 2 {
-		t.Fatalf("len(InitContainers) = %d, want 2", len(podSpec.InitContainers))
-	}
-	if podSpec.InitContainers[1].Name != "nix-env" {
-		t.Errorf("init container[1] name = %q, want nix-env", podSpec.InitContainers[1].Name)
-	}
-
-	// Should have 3 volumes: workspace PVC + tmp emptyDir + nix-env emptyDir
-	if len(podSpec.Volumes) != 3 {
-		t.Fatalf("len(Volumes) = %d, want 3", len(podSpec.Volumes))
-	}
-	foundNixVol := false
-	for _, v := range podSpec.Volumes {
-		if v.Name == "nix-env" && v.EmptyDir != nil {
-			foundNixVol = true
+	// Image-based nix: NO nix-env init container or volume (per-pod install gone).
+	for _, c := range podSpec.InitContainers {
+		if c.Name == "nix-env" {
+			t.Error("image-based nix must not add a nix-env init container")
 		}
 	}
-	if !foundNixVol {
-		t.Error("expected nix-env emptyDir volume")
+	foundHome := false
+	for _, v := range podSpec.Volumes {
+		if v.Name == "nix-env" {
+			t.Error("image-based nix must not add a nix-env volume")
+		}
+		if v.Name == homeVolumeName && v.EmptyDir != nil {
+			foundHome = true
+		}
+	}
+	// Writable HOME emptyDir reconciles readOnlyRootFilesystem with the uid-1000 image.
+	if !foundHome {
+		t.Error("expected a writable home emptyDir")
+	}
+	if podSpec.SecurityContext == nil || podSpec.SecurityContext.FSGroup == nil || *podSpec.SecurityContext.FSGroup != 1000 {
+		t.Error("expected fsGroup=1000 so uid 1000 owns the HOME emptyDir")
+	}
+	// Zero-RBAC ServiceAccount, no mounted token.
+	if podSpec.ServiceAccountName != AgentServiceAccountName {
+		t.Errorf("ServiceAccountName = %q, want %q", podSpec.ServiceAccountName, AgentServiceAccountName)
+	}
+	if podSpec.AutomountServiceAccountToken == nil || *podSpec.AutomountServiceAccountToken {
+		t.Error("AutomountServiceAccountToken must be false (agent never calls the K8s API)")
+	}
+	// Default resource bounds applied when the run requested none.
+	if len(podSpec.Containers[0].Resources.Limits) == 0 {
+		t.Error("expected default resource limits (node-DoS bound)")
 	}
 }
 

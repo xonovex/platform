@@ -3,7 +3,7 @@ type: plan
 has_subplans: false
 parent_plan: plans/agent-sandbox-provisioning-axes.md
 parallel_group: 1
-status: pending
+status: complete
 dependencies:
   plans: [shared-types-policy-dedups]
   files:
@@ -16,11 +16,11 @@ dependencies:
     - packages/agent/agent-cli-go/internal/nixenv/
 skills_to_consult: [general-fp-guide, docker-guide, shell-scripting-guide, debugging-guide]
 validation:
-  type_check: pending
-  lint: pending
-  build: pending
-  tests: pending
-  integration: pending
+  type_check: pass        # shared-agent-go go-build
+  lint: pass              # shared-agent-go go-lint (0 issues)
+  build: pass             # shared-agent-go go-build + nix flake check + agentImageTest/agentEnvTest realize
+  tests: pass             # shared-agent-go go-test (incl. pkg/nix source_test.go)
+  integration: pass       # nix flake check, rebuild-digest-equality identical, devShell/image closure parity
 ---
 
 # 02 — The pinned flake (with llm-agents.nix) + the shared closure/source model
@@ -103,11 +103,17 @@ nix build .#agentImageTest --rebuild && cmp <(./result | sha256sum) <(./result |
 
 ## Success Criteria
 
-- [ ] `llm-agents.nix` is a `flake.lock`-pinned input (consumers pin via `flake.lock` alone); no `follows` against it; if `cache.numtide.com` is added, the `niks3.numtide.com-1:…` key is configured and the trust expansion is recorded in Risk Assessment.
-- [ ] `nix/mkAgentImage.nix` is vendored (adapted from `nothingnesses/agent-images`): numeric uid-1000 via hand-written `/etc/passwd`+`/etc/group`, XDG/`workspace` dirs, `streamLayeredImage`, `maxLayers = 100`, no `created = now`.
-- [ ] `nix/agent-env.nix` produces a devShell **and** a single `streamLayeredImage` from one parameterized closure (uid-1000/`/workspace`/XDG); both surfaces yield the same `nix path-info -r` closure.
-- [ ] `shared-agent-go/pkg/nix` exposes `NixSource`/`ClosureDescriptor` (with `Requisites`)/`ValidateSource` (pure); the channel-pinned `buildEnv` renderer is deleted.
-- [ ] `nix flake check` passes; the test image + devShell build from a pinned rev; the rebuild-digest-equality smoke is identical.
+- [x] `llm-agents.nix` is a `flake.lock`-pinned input (rev `05f2ea60…`; consumers pin via `flake.lock` alone); no `follows` against it; `cache.numtide.com` is NOT added (agents build from source) — the `niks3.numtide.com-1:…` key + trust-expansion note are recorded in the `flake.nix` input comment.
+- [x] `nix/mkAgentImage.nix` is vendored (adapted from `nothingnesses/agent-images`): numeric uid-1000 via hand-written `/etc/passwd`+`/etc/group`, XDG/`workspace` dirs owned 1000:1000, `streamLayeredImage`, `maxLayers = 100`, no `created = now` (verified: config `User=1000:1000`/`WorkingDir=/workspace`, dirs `1000/1000`, fixed `1980-01-01` epoch).
+- [x] `nix/agent-env.nix` produces a devShell **and** a single `streamLayeredImage` from one parameterized closure (uid-1000/`/workspace`/XDG); both surfaces resolve the **same** store paths (verified: `print-dev-env` of `agentEnvTest` and the image both reference `…-hello-2.12.3` / `…-coreutils-9.11`).
+- [x] `shared-agent-go/pkg/nix` exposes `NixSource`/`ClosureDescriptor` (with `Requisites`)/`ValidateSource` (pure) + the moved `ComputeEnvID`; the channel-pinned `buildEnv` renderer (`render.go`/`build.go`) is deleted.
+- [x] `nix flake check` passes; the test image + devShell build from a pinned rev; the rebuild-digest-equality smoke is identical (`5b59835f…` across `--rebuild`).
+
+## Completion Notes
+
+- Scope per the wave design: 02 is the shared foundation (flake + pure Go types) and retires the channel renderer. Its validation is deliberately scoped to `shared-agent-go` + the flake, **not** `agent-cli-go:go-build`.
+- Deleting `render.go`/`build.go` (the channel `buildEnv` path) leaves exactly one intended, contained dangling reference — `internal/sandbox/nix/nix.go:70` (`nixenv.BuildEnv`/`BuildOptions`), the old fused `nix` tier executor. **Subplan 03** removes that executor when it collapses the tiers into `Select` + isolators (and `04` lands the `nixprov` provisioner). The `nixenv` package itself and `internal/sandbox/nixflake` still compile (they use the surviving `GetAgentNixDir`/`GetAgentsDir`/`ExpandPackageSets` + `FlakeSandboxConfig`/`DefaultFlakeShell`). `ComputeEnvID` now lives in shared for 04's GC-root key.
+- Consequence: `agent-cli-go` does not fully build until 03 lands; 02 should land together with the group-2 CLI wave (per the parent's "shared foundation must merge before the CLI/operator waves resolve their imports"), not released standalone.
 
 ## Files Modified/Created
 

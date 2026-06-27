@@ -343,6 +343,11 @@ func (in *AgentRunSpec) DeepCopyInto(out *AgentRunSpec) {
 		*out = new(corev1.PodSecurityContext)
 		(*in).DeepCopyInto(*out)
 	}
+	if in.EgressAllowlist != nil {
+		in, out := &in.EgressAllowlist, &out.EgressAllowlist
+		*out = make([]string, len(*in))
+		copy(*out, *in)
+	}
 	if in.NetworkPolicy != nil {
 		in, out := &in.NetworkPolicy, &out.NetworkPolicy
 		*out = new(AgentNetworkPolicy)

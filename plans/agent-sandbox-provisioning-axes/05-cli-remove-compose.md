@@ -3,7 +3,7 @@ type: plan
 has_subplans: false
 parent_plan: plans/agent-sandbox-provisioning-axes.md
 parallel_group: 2
-status: pending
+status: complete
 dependencies:
   plans: [cli-isolator-provisioner-core]
   files:
@@ -14,11 +14,11 @@ dependencies:
     - packages/shared/shared-agent-go/pkg/sandbox/defaults.go
 skills_to_consult: [general-fp-guide, git-guide]
 validation:
-  type_check: pending
-  lint: pending
-  build: pending
-  tests: pending
-  integration: pending
+  type_check: pass        # agent-cli-go + shared-agent-go go-build
+  lint: pass              # agent-cli-go go-lint (0 issues)
+  build: pass             # agent-cli-go + shared-agent-go go-build
+  tests: pass             # go-test green; alias test asserts --sandbox compose is rejected
+  integration: n/a        # deletion only
 ---
 
 # 05 — Remove the compose isolator
@@ -47,9 +47,15 @@ npx moon run agent-cli-go:go-build agent-cli-go:go-test agent-cli-go:go-lint sha
 
 ## Success Criteria
 
-- [ ] `internal/sandbox/compose/` deleted; `SandboxConfig.{ComposeFile,Service}` + `SandboxCompose` gone.
-- [ ] No `compose` branches remain in registry/flags/defaults; isolation axis = `{none, bwrap, docker}`.
-- [ ] `grep` confirms no residual compose references; build/lint/test green.
+- [x] `internal/sandbox/compose/` deleted; `SandboxConfig.{ComposeFile,Service}` + the `SandboxCompose` const gone.
+- [x] No `compose` branches remain in registry/flags/defaults; isolation axis = `{none, bwrap, docker}`. (`registry.go` + the `--compose-file`/`--service` flags were already gone after 03; `defaults.go` had no compose defaults.)
+- [x] `grep` confirms no residual compose implementation; build/lint/test green (`agent-cli-go` + `shared-agent-go`).
+
+## Completion Notes
+
+- **Mostly already excised by 03.** The 03 registry/run.go rewrite already deleted `registry.go` (and its `GetExecutor`/`tierIsolation` compose branches) and dropped the `--compose-file`/`--service` flags, so 05 only had to delete the `compose` package, the two config fields, and the `SandboxCompose` const.
+- **Clean rejection, no shim.** The `--sandbox compose` alias case was removed entirely; the legacy alias now falls to the generic `default` error (`unknown --sandbox "compose"; use --isolation/--provision/--network`). The one remaining `compose` mention is the alias unit test asserting that rejection — regression protection against compose silently reappearing, not a residual implementation.
+- **Isolation axis is now `{none, bwrap, docker}`** end to end. The legacy `SandboxMethod` enum (none/bwrap/docker/nix/nixflake) and `SandboxConfig.Method` remain only as the deprecated-`--sandbox` alias surface.
 
 ## Files Modified/Created
 

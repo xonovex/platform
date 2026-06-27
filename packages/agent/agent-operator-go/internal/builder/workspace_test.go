@@ -263,7 +263,7 @@ func TestBuildWorkspaceMainContainers_Basic(t *testing.T) {
 		},
 	}
 
-	containers := BuildWorkspaceMainContainers(run, nil, "node:trixie-slim", agentv1alpha1.AgentTypeClaude, nil, nil, nil, nil)
+	containers := BuildWorkspaceMainContainers(run, nil, "node:trixie-slim", agentv1alpha1.AgentTypeClaude, nil, nil, nil)
 
 	if len(containers) != 1 {
 		t.Fatalf("expected 1 container, got %d", len(containers))
@@ -294,7 +294,7 @@ func TestBuildWorkspaceMainContainers_WithSharedVolumes(t *testing.T) {
 		"opencode-config": "ws-opencode-config",
 	}
 
-	containers := BuildWorkspaceMainContainers(run, nil, "node:trixie-slim", agentv1alpha1.AgentTypeClaude, sharedVolumes, sharedVolumePVCs, nil, nil)
+	containers := BuildWorkspaceMainContainers(run, nil, "node:trixie-slim", agentv1alpha1.AgentTypeClaude, sharedVolumes, sharedVolumePVCs, nil)
 
 	container := containers[0]
 	// workspace + tmp + 2 shared volumes = 4 volume mounts

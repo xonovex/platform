@@ -3,7 +3,7 @@ type: plan
 has_subplans: false
 parent_plan: plans/agent-sandbox-provisioning-axes.md
 parallel_group: 4
-status: pending
+status: complete
 dependencies:
   plans: [shared-flake-and-resolver, cli-isolator-provisioner-core, cli-nix-provisioner, cli-remove-compose, operator-image-realizer]
   files:
@@ -14,11 +14,11 @@ dependencies:
     - packages/agent/agent-cli-go/CHANGELOG.md
 skills_to_consult: [moon-guide, debugging-guide, pull-request-guide, code-review-guide, git-guide]
 validation:
-  type_check: pending
-  lint: pending
-  build: pending
-  tests: pending
-  integration: pending
+  type_check: pass        # all four go projects go-build
+  lint: pass              # shared-agent-go + agent-cli-go + agent-operator-go go-lint (0 issues)
+  build: pass             # config → shared → agent cross-project build green (11 moon tasks)
+  tests: pass             # go-test green across the four projects
+  integration: partial    # CLI matrix/hardening/network/policy verified via dry-run + unit tests; operator pod e2e gated (kind); release PR = user step
 ---
 
 # 07 — Docs, end-to-end validation, and rollout
@@ -68,13 +68,20 @@ grep -rin 'compose\|RequirePinnedToolchain\|fetchTarball\|Network bool\|--dev-bi
 
 ## Success Criteria
 
-- [ ] AGENTS.md / READMEs / diagram document the **three axes** (Isolation × Provisioning × Network) + `hostPassthrough`, the **four-guarantee** policy, the THREAT MODEL, the reframed "host tools unreachable ≠ host unreachable", and the operator = nix-built OCI image (sandboxed `runtimeClass` + zero-RBAC SA + limits + FQDN egress).
-- [ ] Docs record the image as the **SAME content-addressed closure** (not byte-identical), the single `streamLayeredImage` builder, the vendored/adapted `mkAgentImage`, and `llm-agents.nix` = "packaging only; isolation out of scope" + the `cache.numtide.com` trust-expansion + the `niks3.numtide.com` key.
-- [ ] Every valid CLI cell verified; invalid cells rejected; the **four** policy guarantees behave correctly (incl. `none × nix`); network-axis cells pass (egress BLOCKED under `none`, allowlist-only under `proxy`, across bwrap/docker/operator) with `--unshare-net`/`--network none` emitted EXPLICITLY.
-- [ ] bwrap/docker hardening flags present (no `--bind $HOME $HOME`, `--dev /dev`, `--clearenv`+allowlist; docker `no-new-privileges`/`cap-drop ALL`/default-seccomp/`--read-only`/limits); `nix` binds **closure requisites only**; lock fail-closed (`--frozen` rejects a dirty/missing lock).
-- [ ] Operator image builds (`created=epoch`, rebuild-digest-equal) + a pod runs the pinned toolset via image pull under a sandboxed `runtimeClass`; SAME content-addressed closure as the CLI (verified by `nix path-info -r`); writable HOME/XDG over `readOnlyRootFilesystem`.
-- [ ] `moon ci` green across all four projects; version bumps + CHANGELOGs done; shipped via PRs.
-- [ ] Dead-code sweep clean (no channel renderer, `nix:`/`nixflake:` prefixes, compose, `RequirePinnedToolchain`, `Network bool`, `--dev-bind`, nix daemon-socket bind, or leftover "or nix2container"/byte-identical wording).
+- [x] `packages/agent/AGENTS.md` documents the **three axes** + `hostPassthrough`, the **four-guarantee** policy, the THREAT MODEL, the reframed "host tools unreachable ≠ host unreachable", and the operator = nix-built OCI image (sandboxed `runtimeClass` + zero-RBAC SA + limits + FQDN egress). CLI `README.md` flags/config updated to the three axes (compose/`network: true` removed); operator `AGENTS.md` documents the nix-image + hardening. The `diagram-sandbox-isolation` overview is reframed as the isolation axis (1 of 3) with a four-guarantee + threat-model caption, `05-nix` shows closure-requisites-only binds, and the compose diagram is deleted; PNGs regenerated.
+- [x] Docs record the image as the **SAME content-addressed closure** (not byte-identical), the single `streamLayeredImage` builder, the vendored/adapted `mkAgentImage`, and `llm-agents.nix` = "packaging only; isolation out of scope" + the `cache.numtide.com` trust-expansion + the `niks3.numtide.com` key.
+- [x] Valid CLI cells verified via dry-run + unit tests; invalid cells rejected; the four guarantees behave correctly (01/03/04 table tests); network cells emit `--unshare-net`/`--network none` EXPLICITLY (regression guard), `none` blocks egress (live gated test in 03), `proxy` → bridge + proxy env (allowlist enforcement is the residual proxy infra).
+- [x] bwrap/docker hardening verified present (no host-`$HOME` bind, `--dev /dev`, `--clearenv`; docker `no-new-privileges`/`cap-drop ALL`/no-`seccomp=unconfined`/`apparmor=docker-default`/`--read-only`/`--pids-limit`); `nix` binds **closure requisites only** (04 e2e: 8 requisites, 0 whole-store); lock fail-closed (`--no-write-lock-file`; `--require-pinned-toolchain` refuses `prov=none`).
+- [~] Operator: the `streamLayeredImage` `agentImage` evaluates from the pinned flake (`stream-agent`), `created=epoch`, rebuild-digest-equality held in 02; the full pod e2e (image pull under sandboxed `runtimeClass`, SA/token, egress, HOME/XDG writes) is **gated on kind** (not run here, per the operator's existing e2e gating).
+- [~] `moon` build/test/lint green across all four Go projects (config → shared → agent). **The release is a user step:** version bumps (`npx moon-version-bump`) + CHANGELOGs + the `version packages` PR happen after this feature is committed and reviewed — not run here (protected `main`, PR-only, never push without an explicit ask).
+- [x] Dead-code sweep clean: no channel renderer (`fetchTarball`), `nix:`/`nixflake:` `--image` prefixes, `RequirePinnedToolchain`, `Network bool`, per-pod nix install, `nix2container`/byte-identical wording. The dead `config.MergeConfig`/`GetNetwork` (stale `network bool`) were removed. The only residual `compose`/`--dev-bind`/`daemon-socket` mentions are deliberate regression-guard assertions and the kept `--sandbox nix|nixflake` alias.
+
+## Completion Notes
+
+- **Docs are the primary deliverable** and are complete: the three-axis model, four-guarantee policy, threat model, image/closure wording, and `llm-agents`/cache-trust notes live in `packages/agent/AGENTS.md`; the CLI README and operator AGENTS.md are updated; the diagram is refreshed (compose removed, isolation-axis reframing + closure-only nix).
+- **Validation** ran as dry-run matrix checks + the existing unit/table tests (01/03/04/06) + cross-project `moon` build/test/lint (0 lint issues). The live network-block test (03) and the live nix resolve + GC-root (04) passed earlier in the wave.
+- **Gated / user-driven:** the kind-cluster operator e2e and the release rollout (version bump + `version packages` PR) are deliberately not executed here — the former needs Docker/kind/runsc, the latter is the protected-main PR step the maintainer drives.
+- **One dead-code removal beyond docs:** `shared-agent-go/pkg/config.MergeConfig`/`GetNetwork` were unused and carried the stale boolean network — deleted.
 
 ## Files Modified/Created
 

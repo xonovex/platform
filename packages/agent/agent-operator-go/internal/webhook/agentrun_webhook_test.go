@@ -67,6 +67,41 @@ func TestAgentRunWebhook_Validate_ValidStandalone(t *testing.T) {
 	}
 }
 
+func runWithNix(nix *agentv1alpha1.NixSpec) *agentv1alpha1.AgentRun {
+	return &agentv1alpha1.AgentRun{
+		Spec: agentv1alpha1.AgentRunSpec{
+			Workspace: &agentv1alpha1.WorkspaceSpec{
+				Repository: agentv1alpha1.RepositorySpec{URL: "https://github.com/example/repo.git"},
+			},
+			Toolchain: &agentv1alpha1.ToolchainSpec{Type: agentv1alpha1.ToolchainTypeNix, Nix: nix},
+		},
+	}
+}
+
+func TestAgentRunWebhook_Validate_NixSpec(t *testing.T) {
+	w := &AgentRunWebhook{}
+	cases := []struct {
+		name    string
+		nix     *agentv1alpha1.NixSpec
+		wantErr bool
+	}{
+		{"valid packages", &agentv1alpha1.NixSpec{NixpkgsRev: "abc", Packages: []string{"ripgrep"}, Image: "ghcr.io/x/agent@sha256:1"}, false},
+		{"valid flake", &agentv1alpha1.NixSpec{NixpkgsRev: "abc", FlakeRef: "/repo", Image: "ghcr.io/x/agent@sha256:1"}, false},
+		{"missing rev", &agentv1alpha1.NixSpec{Packages: []string{"ripgrep"}, Image: "ghcr.io/x/agent@sha256:1"}, true},
+		{"packages and flake", &agentv1alpha1.NixSpec{NixpkgsRev: "abc", Packages: []string{"ripgrep"}, FlakeRef: "/repo", Image: "ghcr.io/x/agent@sha256:1"}, true},
+		{"no source", &agentv1alpha1.NixSpec{NixpkgsRev: "abc", Image: "ghcr.io/x/agent@sha256:1"}, true},
+		{"missing image", &agentv1alpha1.NixSpec{NixpkgsRev: "abc", Packages: []string{"ripgrep"}}, true},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			_, err := w.ValidateCreate(context.Background(), runWithNix(tc.nix))
+			if (err != nil) != tc.wantErr {
+				t.Errorf("ValidateCreate(nix=%+v) err = %v, wantErr %v", tc.nix, err, tc.wantErr)
+			}
+		})
+	}
+}
+
 func TestAgentRunWebhook_Validate_ValidWorkspaceRef(t *testing.T) {
 	w := &AgentRunWebhook{}
 	run := &agentv1alpha1.AgentRun{

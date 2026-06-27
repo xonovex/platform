@@ -224,7 +224,7 @@ func BuildWorktreeInitContainers(run *agentv1alpha1.AgentRun, image string, wsTy
 }
 
 // BuildWorkspaceMainContainers builds the main agent container for workspace-based runs
-func BuildWorkspaceMainContainers(run *agentv1alpha1.AgentRun, providerEnv map[string]string, image string, agentType agentv1alpha1.AgentType, sharedVolumes []agentv1alpha1.SharedVolumeSpec, sharedVolumePVCs map[string]string, tc *agentv1alpha1.ToolchainSpec, sc *corev1.SecurityContext) []corev1.Container {
+func BuildWorkspaceMainContainers(run *agentv1alpha1.AgentRun, providerEnv map[string]string, image string, agentType agentv1alpha1.AgentType, sharedVolumes []agentv1alpha1.SharedVolumeSpec, sharedVolumePVCs map[string]string, sc *corev1.SecurityContext) []corev1.Container {
 	env := BuildEnvVars(run, providerEnv)
 	command, args := buildAgentCommand(run, agentType)
 	worktreePath := fmt.Sprintf("%s/%s", worktreeBasePath, run.Name)
@@ -243,11 +243,6 @@ func BuildWorkspaceMainContainers(run *agentv1alpha1.AgentRun, providerEnv map[s
 				MountPath: vol.MountPath,
 			})
 		}
-	}
-
-	for _, t := range Toolchains(tc) {
-		volumeMounts = append(volumeMounts, t.VolumeMounts()...)
-		env = append(env, t.EnvVars()...)
 	}
 
 	volumeMounts = append(volumeMounts, corev1.VolumeMount{
@@ -306,14 +301,6 @@ func BuildWorkspaceJob(run *agentv1alpha1.AgentRun, providerEnv map[string]strin
 
 	initContainers := BuildWorktreeInitContainers(run, image, wsType, worktreeBranch, sourceBranch, run.Spec.SecurityContext)
 
-	for _, t := range Toolchains(tc) {
-		if c := t.InitContainer(); c != nil {
-			c.SecurityContext = DefaultContainerSecurityContext(run.Spec.SecurityContext)
-			initContainers = append(initContainers, *c)
-		}
-		volumes = append(volumes, t.Volumes()...)
-	}
-
 	job := &batchv1.Job{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      run.Name,
@@ -344,7 +331,7 @@ func BuildWorkspaceJob(run *agentv1alpha1.AgentRun, providerEnv map[string]strin
 					RestartPolicy:    corev1.RestartPolicyNever,
 					SecurityContext:  DefaultPodSecurityContext(run.Spec.PodSecurityContext),
 					InitContainers:   initContainers,
-					Containers:       BuildWorkspaceMainContainers(run, providerEnv, image, agentType, sharedVolumes, sharedVolumePVCs, tc, run.Spec.SecurityContext),
+					Containers:       BuildWorkspaceMainContainers(run, providerEnv, image, agentType, sharedVolumes, sharedVolumePVCs, run.Spec.SecurityContext),
 					Volumes:          volumes,
 					NodeSelector:     run.Spec.NodeSelector,
 					Tolerations:      run.Spec.Tolerations,
@@ -354,9 +341,7 @@ func BuildWorkspaceJob(run *agentv1alpha1.AgentRun, providerEnv map[string]strin
 		},
 	}
 
-	if len(run.Spec.Resources.Requests) > 0 || len(run.Spec.Resources.Limits) > 0 {
-		job.Spec.Template.Spec.Containers[0].Resources = run.Spec.Resources
-	}
+	applyPodHardening(&job.Spec.Template.Spec, run, tc)
 
 	return job
 }

@@ -103,14 +103,27 @@ type ProviderSpec struct {
 	CliArgs []string `json:"cliArgs,omitempty"`
 }
 
-// NixSpec configures Nix package provisioning for agent containers.
+// NixSpec configures Nix provisioning for agent containers. Provisioning is a
+// build-time concern: a nix-built OCI image (the same content-addressed closure
+// the CLI resolves) is referenced as the pod image — there is no per-pod nix
+// install. Packages/FlakeRef+Shell + NixpkgsRev record the source the image was
+// built from (provenance + validation); Image is the resolved, digest-pinned ref
+// the pod runs.
 type NixSpec struct {
-	// Packages are nixpkgs attribute names to install (e.g. "nodejs_22", "python3", "ripgrep")
+	// NixpkgsRev pins the nixpkgs revision the image was built from. Required:
+	// the pin is what makes the provisioning reproducible.
+	NixpkgsRev string `json:"nixpkgsRev,omitempty"`
+	// Packages are nixpkgs attribute names baked into the image (packages source).
+	// Mutually exclusive with FlakeRef.
 	Packages []string `json:"packages,omitempty"`
-	// Image is the Nix container image for the init container (default: "nixos/nix:latest")
+	// FlakeRef is the project flake the devShell was built from (project-flake
+	// source). Mutually exclusive with Packages.
+	FlakeRef string `json:"flakeRef,omitempty"`
+	// Shell is the devShell attribute for the project-flake source (default "default").
+	Shell string `json:"shell,omitempty"`
+	// Image is the pre-built, digest-pinned nix agent image the pod runs. Required
+	// for the nix toolchain — it satisfies RequirePinnedProvision.
 	Image string `json:"image,omitempty"`
-	// StoreSizeLimit is the size limit for the Nix store EmptyDir volume (default: "10Gi")
-	StoreSizeLimit string `json:"storeSizeLimit,omitempty"`
 }
 
 // ToolchainSpec defines toolchain configuration
@@ -213,8 +226,18 @@ type AgentRunSpec struct {
 	SecurityContext *corev1.SecurityContext `json:"securityContext,omitempty"`
 	// PodSecurityContext overrides the default pod-level security context
 	PodSecurityContext *corev1.PodSecurityContext `json:"podSecurityContext,omitempty"`
-	// NetworkPolicy configures the NetworkPolicy applied to agent pods.
-	// Defaults to deny-all egress. Set Disabled:true to skip creation.
+	// Network is the egress axis (host, none, proxy) mapped onto the per-AgentRun
+	// egress NetworkPolicy. host = unrestricted (does not satisfy egress-restricted);
+	// none = DNS only; proxy = public egress except metadata/RFC1918/loopback (an
+	// FQDN-aware allowlist is the documented upgrade). Defaults to none.
+	// +kubebuilder:validation:Enum=host;none;proxy
+	Network string `json:"network,omitempty"`
+	// EgressAllowlist extends the default allowlist for Network=proxy (FQDN-aware
+	// upgrade path; carried for the policy engine, not enforced by L3/L4 rules).
+	EgressAllowlist []string `json:"egressAllowlist,omitempty"`
+	// NetworkPolicy configures the NetworkPolicy applied to agent pods. When set it
+	// takes precedence over Network. Defaults to deny-all egress. Set Disabled:true
+	// to skip creation.
 	NetworkPolicy *AgentNetworkPolicy `json:"networkPolicy,omitempty"`
 	// TTLSecondsAfterFinished is the number of seconds the Job and its pods are retained
 	// after completion before automatic cleanup. Defaults to 3600 (1 hour). Set to 0 to

@@ -40,10 +40,6 @@ func BuildJob(run *agentv1alpha1.AgentRun, providerEnv map[string]string, pvcNam
 		},
 	}
 
-	for _, t := range Toolchains(tc) {
-		volumes = append(volumes, t.Volumes()...)
-	}
-
 	job := &batchv1.Job{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      run.Name,
@@ -71,8 +67,8 @@ func BuildJob(run *agentv1alpha1.AgentRun, providerEnv map[string]string, pvcNam
 				Spec: corev1.PodSpec{
 					RestartPolicy:    corev1.RestartPolicyNever,
 					SecurityContext:  DefaultPodSecurityContext(run.Spec.PodSecurityContext),
-					InitContainers:   BuildInitContainers(run, image, wsType, tc, run.Spec.SecurityContext),
-					Containers:       BuildMainContainers(run, providerEnv, image, agentType, tc, run.Spec.SecurityContext),
+					InitContainers:   BuildInitContainers(run, image, wsType, run.Spec.SecurityContext),
+					Containers:       BuildMainContainers(run, providerEnv, image, agentType, run.Spec.SecurityContext),
 					Volumes:          volumes,
 					NodeSelector:     run.Spec.NodeSelector,
 					Tolerations:      run.Spec.Tolerations,
@@ -82,9 +78,7 @@ func BuildJob(run *agentv1alpha1.AgentRun, providerEnv map[string]string, pvcNam
 		},
 	}
 
-	if len(run.Spec.Resources.Requests) > 0 || len(run.Spec.Resources.Limits) > 0 {
-		job.Spec.Template.Spec.Containers[0].Resources = run.Spec.Resources
-	}
+	applyPodHardening(&job.Spec.Template.Spec, run, tc)
 
 	return job
 }

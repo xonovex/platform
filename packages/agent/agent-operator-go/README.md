@@ -183,7 +183,7 @@ shared volume PVCs (RWX, one per sharedVolumes entry):
 
 ### AgentToolchain
 
-Reusable toolchain configuration (e.g. Nix packages). The operator adds init containers to provision tools.
+Reusable toolchain configuration. The `nix` toolchain provisions via a **pre-built, digest-pinned OCI image** (no per-pod install).
 
 ```yaml
 apiVersion: agent.xonovex.com/v1alpha1
@@ -193,11 +193,11 @@ metadata:
 spec:
   type: nix
   nix:
+    nixpkgsRev: 49a4bd0573c376468dd7996ddb6f9fa31d8c4d97
     packages:
-      - nodejs_22
-      - python3
+      - nodejs_24
       - ripgrep
-      - jujutsu
+    image: ghcr.io/xonovex/agent@sha256:<digest>
 ```
 
 #### Full spec reference
@@ -205,16 +205,12 @@ spec:
 | Field | Type | Description |
 | --- | --- | --- |
 | `type` | string | Toolchain type (`nix`) |
-| `nix.packages` | list | Nixpkgs attribute names to install |
-| `nix.image` | string | Nix container image (default: `nixos/nix:latest`) |
+| `nix.nixpkgsRev` | string | Pinned nixpkgs rev the image was built from (required reproducibility pin) |
+| `nix.packages` | list | Nixpkgs attribute names baked into the image (packages source; mutually exclusive with `flakeRef`) |
+| `nix.flakeRef` / `nix.shell` | string | Project flake + devShell (project-flake source; mutually exclusive with `packages`) |
+| `nix.image` | string | Pre-built, digest-pinned agent OCI image the pod runs (required; satisfies `RequirePinnedProvision`) |
 
-When `nix` is configured, the operator:
-1. Adds an emptyDir volume (`nix-env`)
-2. Adds a `nix-env` init container that bootstraps the Nix store and installs packages via `nix profile install`
-3. Mounts the volume at `/nix` in the main container
-4. Prepends `/nix/var/nix/profiles/agent/bin` to `PATH`
-
-Package names are [nixpkgs](https://search.nixos.org/packages) attributes, the same names you'd use with `nix profile install nixpkgs#<name>`.
+The `nix` toolchain selects the pre-built image as the pod image — the **same content-addressed store-path closure** the CLI resolves (built from the same `flake.lock` + `nix/agent-env.nix`, verified with `nix path-info -r`). The pod starts by image pull: **no `nix-env` emptyDir, no `nixos/nix` init container, no per-pod `nix profile install`**. The webhook rejects a `NixSpec` missing `nixpkgsRev` or `image`. Build/push the image with `npx moon run agent-operator-go:agent-image-build` (→ `nix build .#legacyPackages.<sys>.agentImage` + skopeo push).
 
 ## Installation
 

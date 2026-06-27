@@ -1,121 +1,131 @@
 package sandbox
 
 import (
+	"errors"
 	"fmt"
+	"sort"
 
-	"github.com/xonovex/platform/packages/cli/agent-cli-go/internal/sandbox/bwrap"
-	"github.com/xonovex/platform/packages/cli/agent-cli-go/internal/sandbox/compose"
-	"github.com/xonovex/platform/packages/cli/agent-cli-go/internal/sandbox/docker"
-	"github.com/xonovex/platform/packages/cli/agent-cli-go/internal/sandbox/nix"
-	"github.com/xonovex/platform/packages/cli/agent-cli-go/internal/sandbox/nixflake"
-	"github.com/xonovex/platform/packages/cli/agent-cli-go/internal/sandbox/none"
+	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/sandbox"
 	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/types"
 )
 
-// GetExecutor returns a sandbox executor for the specified method
-func GetExecutor(method types.SandboxMethod) (types.SandboxExecutor, error) {
-	switch method {
-	case types.SandboxNone:
-		return none.NewExecutor(), nil
-	case types.SandboxBwrap:
-		return bwrap.NewExecutor(), nil
-	case types.SandboxDocker:
-		return docker.NewExecutor(), nil
-	case types.SandboxCompose:
-		return compose.NewExecutor(), nil
-	case types.SandboxNix:
-		return nix.NewExecutor(), nil
-	case types.SandboxNixFlake:
-		return nixflake.NewExecutor(), nil
-	default:
-		return nil, fmt.Errorf("unknown sandbox method: %s", method)
-	}
-}
-
-// Isolation classifies a tier's host-tool reachability guarantee.
-type Isolation int
-
-const (
-	// IsolationHostToolsLeaked: the tier ro-binds host /usr,/lib,/bin and/or
-	// appends the host PATH, so host binaries stay reachable (none, bwrap).
-	IsolationHostToolsLeaked Isolation = iota
-	// IsolationContainerPinned: host tools are unreachable only when a concrete
-	// --image/pin is supplied; an empty image resolves host-equivalent tools.
-	IsolationContainerPinned
-	// IsolationHostToolsUnreachable: the tier exposes only a nix-built closure or
-	// a flake.lock devShell and binds no host /usr,/lib,/bin (nix, nixflake).
-	IsolationHostToolsUnreachable
+var (
+	// ErrNoIsolator reports an isolation method with no registered isolator.
+	ErrNoIsolator = errors.New("no isolator registered")
+	// ErrNoProvisioner reports a provisioning method with no registered provisioner.
+	ErrNoProvisioner = errors.New("no provisioner registered")
 )
 
-// tierIsolation maps a method to its guarantee. Pure: depends only on method.
-// It is the single source of truth for the per-tier guarantee, so adding a tier
-// forces a classification decision here.
-func tierIsolation(method types.SandboxMethod) Isolation {
-	switch method {
-	case types.SandboxNix, types.SandboxNixFlake:
-		return IsolationHostToolsUnreachable
-	case types.SandboxDocker, types.SandboxCompose:
-		return IsolationContainerPinned
-	default: // SandboxNone, SandboxBwrap
-		return IsolationHostToolsLeaked
+// IsolatorFactory and ProvisionerFactory construct a fresh plugin instance.
+type (
+	IsolatorFactory    func() Isolator
+	ProvisionerFactory func() Provisioner
+)
+
+// Registry maps method names to plugin factories. It is built once at the
+// composition root and passed explicitly to Select — there is no global mutable
+// state, and tests build their own minimal Registry. Adding a plugin is one
+// Register call at the root; the core selection/policy code never changes.
+type Registry struct {
+	isolators    map[types.IsolationMethod]IsolatorFactory
+	provisioners map[types.ProvisionMethod]ProvisionerFactory
+}
+
+// NewRegistry returns an empty registry.
+func NewRegistry() *Registry {
+	return &Registry{
+		isolators:    map[types.IsolationMethod]IsolatorFactory{},
+		provisioners: map[types.ProvisionMethod]ProvisionerFactory{},
 	}
 }
 
-// SelectExecutor resolves an executor for method under policy. When the policy
-// requires a pinned toolchain, leaky tiers and image-less container tiers are
-// rejected before construction; otherwise it behaves like GetExecutor. The
-// returned method echoes the requested one so callers can record what was used.
-func SelectExecutor(method types.SandboxMethod, image string, policy types.SandboxPolicy) (types.SandboxExecutor, types.SandboxMethod, error) {
-	if policy.RequirePinnedProvisioning || policy.RequireHostToolsUnreachable {
-		if err := enforcePinnedToolchain(method, image); err != nil {
-			return nil, "", err
-		}
+// RegisterIsolator registers (or replaces) an isolator factory; chainable.
+func (r *Registry) RegisterIsolator(m types.IsolationMethod, f IsolatorFactory) *Registry {
+	r.isolators[m] = f
+	return r
+}
+
+// RegisterProvisioner registers (or replaces) a provisioner factory; chainable.
+func (r *Registry) RegisterProvisioner(m types.ProvisionMethod, f ProvisionerFactory) *Registry {
+	r.provisioners[m] = f
+	return r
+}
+
+// Isolator constructs the isolator for m, or ErrNoIsolator if unregistered.
+func (r *Registry) Isolator(m types.IsolationMethod) (Isolator, error) {
+	f, ok := r.isolators[m]
+	if !ok {
+		return nil, fmt.Errorf("%w for isolation %q", ErrNoIsolator, m)
 	}
-	exec, err := GetExecutor(method)
+	return f(), nil
+}
+
+// Provisioner constructs the provisioner for m, or ErrNoProvisioner if unregistered.
+func (r *Registry) Provisioner(m types.ProvisionMethod) (Provisioner, error) {
+	f, ok := r.provisioners[m]
+	if !ok {
+		return nil, fmt.Errorf("%w for provisioning %q", ErrNoProvisioner, m)
+	}
+	return f(), nil
+}
+
+// IsolationMethods returns the registered isolation methods, sorted for stable output.
+func (r *Registry) IsolationMethods() []types.IsolationMethod {
+	out := make([]types.IsolationMethod, 0, len(r.isolators))
+	for m := range r.isolators {
+		out = append(out, m)
+	}
+	sort.Slice(out, func(i, j int) bool { return out[i] < out[j] })
+	return out
+}
+
+// Request bundles the per-run axis selection handed to Select.
+type Request struct {
+	Isolation   types.IsolationMethod
+	Provision   types.ProvisionMethod
+	Network     types.NetworkMethod
+	Passthrough bool
+	Runtime     string
+	Image       string
+}
+
+// Select resolves the isolator and provisioner for a request and enforces the
+// policy fail-closed. Registry membership is the validity check; the resolved
+// plugins declare their own capabilities, so the policy engine never names a
+// concrete isolator or provisioner.
+func Select(reg *Registry, req Request, pol types.SandboxPolicy) (Isolator, Provisioner, error) {
+	iso, err := reg.Isolator(req.Isolation)
 	if err != nil {
-		return nil, "", err
+		return nil, nil, err
 	}
-	return exec, method, nil
+	prov, err := reg.Provisioner(req.Provision)
+	if err != nil {
+		return nil, nil, err
+	}
+	caps := sandbox.Capabilities{
+		Pinned:               prov.Pinned(),
+		HostToolsUnreachable: iso.HidesHost(req.Passthrough, req.Image),
+		EgressRestricted:     sandbox.EgressIsRestricted(req.Network),
+		KernelIsolated:       iso.KernelIsolated(req.Runtime),
+	}
+	if err := sandbox.EnforcePolicy(caps, pol); err != nil {
+		return nil, nil, err
+	}
+	return iso, prov, nil
 }
 
-// enforcePinnedToolchain rejects any method that cannot guarantee unreachable
-// host tools under a pinned-toolchain policy.
-func enforcePinnedToolchain(method types.SandboxMethod, image string) error {
-	switch tierIsolation(method) {
-	case IsolationHostToolsUnreachable:
-		return nil
-	case IsolationContainerPinned:
-		if image == "" {
-			return fmt.Errorf("sandbox %q needs a pinned --image under require-pinned-toolchain: an image-less container resolves host-equivalent tools", method)
-		}
-		return nil
-	default:
-		return fmt.Errorf("sandbox %q is rejected by require-pinned-toolchain: it ro-binds host /usr,/lib,/bin and appends the host PATH, so host tools stay reachable — use the nix or nixflake tier", method)
-	}
-}
-
-// GetAvailableMethods returns all sandbox methods that are currently available
-func GetAvailableMethods() []types.SandboxMethod {
-	allMethods := []types.SandboxMethod{
-		types.SandboxNone,
-		types.SandboxBwrap,
-		types.SandboxDocker,
-		types.SandboxCompose,
-		types.SandboxNix,
-		types.SandboxNixFlake,
-	}
-
-	available := make([]types.SandboxMethod, 0, len(allMethods))
-	for _, method := range allMethods {
-		executor, err := GetExecutor(method)
+// AvailableIsolations returns the registered isolation methods whose isolator is
+// currently available on this host.
+func AvailableIsolations(reg *Registry) []types.IsolationMethod {
+	var available []types.IsolationMethod
+	for _, m := range reg.IsolationMethods() {
+		iso, err := reg.Isolator(m)
 		if err != nil {
 			continue
 		}
-		isAvailable, err := executor.IsAvailable()
-		if err == nil && isAvailable {
-			available = append(available, method)
+		if ok, err := iso.Available(); err == nil && ok {
+			available = append(available, m)
 		}
 	}
-
 	return available
 }

@@ -90,6 +90,9 @@ func (w *AgentRunWebhook) validate(ctx context.Context, run *agentv1alpha1.Agent
 		if !validTypes[run.Spec.Toolchain.Type] {
 			return nil, fmt.Errorf("invalid toolchain type: %s", run.Spec.Toolchain.Type)
 		}
+		if err := validateNixSpec(run.Spec.Toolchain.Nix); err != nil {
+			return nil, err
+		}
 	}
 
 	// Validate inline workspace repository fields
@@ -138,6 +141,30 @@ func (w *AgentRunWebhook) validate(ctx context.Context, run *agentv1alpha1.Agent
 	}
 
 	return warnings, nil
+}
+
+// validateNixSpec validates the nix toolchain: a pinned rev, exactly one source
+// (packages XOR project flake), and a pre-built pinned image. The provisioning is
+// build-time, so the image must be supplied — fail closed otherwise.
+func validateNixSpec(nix *agentv1alpha1.NixSpec) error {
+	if nix == nil {
+		return nil
+	}
+	if nix.NixpkgsRev == "" {
+		return fmt.Errorf("nix toolchain requires nixpkgsRev (the reproducibility pin)")
+	}
+	hasPackages := len(nix.Packages) > 0
+	hasFlake := nix.FlakeRef != ""
+	if hasPackages && hasFlake {
+		return fmt.Errorf("nix toolchain: packages and flakeRef are mutually exclusive")
+	}
+	if !hasPackages && !hasFlake {
+		return fmt.Errorf("nix toolchain requires a source: packages or flakeRef")
+	}
+	if nix.Image == "" {
+		return fmt.Errorf("nix toolchain requires a pre-built pinned image (build-time provisioning)")
+	}
+	return nil
 }
 
 func enforcePolicy(run *agentv1alpha1.AgentRun, policy *agentv1alpha1.AgentPolicy) error {

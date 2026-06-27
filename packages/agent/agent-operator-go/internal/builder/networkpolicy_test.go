@@ -20,7 +20,7 @@ func newTestAgentRun(name, namespace string) *agentv1alpha1.AgentRun {
 	}
 }
 
-func TestBuildNetworkPolicy_DenyAll(t *testing.T) {
+func TestBuildNetworkPolicy_DefaultNoneDNSOnly(t *testing.T) {
 	run := newTestAgentRun("my-run", "default")
 	np := BuildNetworkPolicy(run, nil)
 
@@ -30,8 +30,59 @@ func TestBuildNetworkPolicy_DenyAll(t *testing.T) {
 	if np.Namespace != "default" {
 		t.Errorf("namespace = %q, want %q", np.Namespace, "default")
 	}
-	if np.Spec.Egress != nil {
-		t.Errorf("egress = %v, want nil (deny all)", np.Spec.Egress)
+	// Default (Network unset → none): DNS-only egress, nothing else. Never an
+	// implicit open egress.
+	if len(np.Spec.Egress) != 1 {
+		t.Fatalf("egress rules = %d, want 1 (DNS only)", len(np.Spec.Egress))
+	}
+	rule := np.Spec.Egress[0]
+	if len(rule.To) == 0 || rule.To[0].NamespaceSelector == nil {
+		t.Error("expected the single egress rule to target kube-system DNS")
+	}
+	if len(rule.Ports) == 0 {
+		t.Error("expected DNS ports on the egress rule")
+	}
+	if len(np.Spec.Ingress) != 0 {
+		t.Error("ingress must always be denied")
+	}
+}
+
+func TestBuildNetworkPolicy_NetworkMapping(t *testing.T) {
+	// host → a single allow-all rule (explicit opt-in).
+	host := newTestAgentRun("h", "default")
+	host.Spec.Network = "host"
+	if eg := BuildNetworkPolicy(host, nil).Spec.Egress; len(eg) != 1 || len(eg[0].To) != 0 {
+		t.Errorf("host egress = %v, want one allow-all rule", eg)
+	}
+
+	// proxy → DNS + public-except-private (metadata/RFC1918/loopback blocked).
+	proxy := newTestAgentRun("p", "default")
+	proxy.Spec.Network = "proxy"
+	eg := BuildNetworkPolicy(proxy, nil).Spec.Egress
+	if len(eg) != 2 {
+		t.Fatalf("proxy egress rules = %d, want 2 (DNS + public)", len(eg))
+	}
+	var block *networkingv1.IPBlock
+	for _, r := range eg {
+		for _, peer := range r.To {
+			if peer.IPBlock != nil {
+				block = peer.IPBlock
+			}
+		}
+	}
+	if block == nil || block.CIDR != "0.0.0.0/0" {
+		t.Fatal("proxy must allow public egress via 0.0.0.0/0")
+	}
+	for _, want := range []string{"169.254.0.0/16", "10.0.0.0/8", "127.0.0.0/8"} {
+		found := false
+		for _, ex := range block.Except {
+			if ex == want {
+				found = true
+			}
+		}
+		if !found {
+			t.Errorf("proxy must block %s (metadata/RFC1918/loopback)", want)
+		}
 	}
 }
 

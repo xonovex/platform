@@ -4,6 +4,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 
 	"github.com/xonovex/platform/packages/cli/agent-cli-go/internal/sandboxutil"
 	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/agentcmd"
@@ -12,194 +13,175 @@ import (
 	"github.com/xonovex/platform/packages/shared/shared-core-go/pkg/envutil"
 )
 
-// Executor implements the bubblewrap sandbox.
+// Isolator confines the agent with bubblewrap namespaces and applies a
+// Contribution via read-only binds plus an explicit setenv allowlist.
 //
-// Isolation: host tools leaked. buildBwrapArgs ro-binds host /usr,/lib,/lib64,
-// /bin,/etc and getSandboxEnvironment appends the host PATH, so host binaries
-// stay reachable. It cannot satisfy RequireHostToolsUnreachable and is rejected at
-// selection.
-type Executor struct{}
+// Deny-default (HostPassthrough off): a sandbox-local HOME (tmpfs, no host-$HOME
+// bind) with only the curated config paths bound back read-only; only the
+// workspace (rw) and RepoDir (ro) are bound; /dev is a minimal devtmpfs (not a
+// full --dev-bind, which would expose /dev/sda, /dev/mem and input devices); the
+// environment is cleared (--clearenv) and rebuilt from an explicit allowlist.
+// HostPassthrough on restores the leaky behavior: host /usr,/lib,/bin,/etc are
+// ro-bound and the host PATH is appended.
+//
+// bwrap and default runc are attack-surface reduction, not a kernel trust
+// boundary (see KernelIsolated); no-new-privs and cap-drop are bwrap defaults.
+type Isolator struct{}
 
-// NewExecutor creates a new bwrap executor
-func NewExecutor() *Executor {
-	return &Executor{}
-}
+// NewIsolator creates a bwrap isolator.
+func NewIsolator() *Isolator { return &Isolator{} }
 
-// IsAvailable checks if bwrap is installed
-func (e *Executor) IsAvailable() (bool, error) {
+// Available reports whether bwrap is installed.
+func (i *Isolator) Available() (bool, error) {
 	_, err := exec.LookPath("bwrap")
 	return err == nil, nil
 }
 
-// Execute runs the agent in bubblewrap sandbox
-func (e *Executor) Execute(config *types.SandboxConfig) (int, error) {
-	args := e.buildBwrapArgs(config)
+// HidesHost reports that host tools are off PATH and not bind-reachable in
+// deny-default mode; HostPassthrough forfeits the guarantee.
+func (i *Isolator) HidesHost(passthrough bool, _ string) bool { return !passthrough }
 
-	// Build environment - passed via --setenv in args, not via process env
-	// But we still need to pass provider env to the parent process for token access
-	agentEnv, err := agentcmd.BuildProviderEnv(config)
-	if err != nil {
-		return 1, err
+// KernelIsolated reports false: bwrap is attack-surface reduction, not a kernel
+// trust boundary.
+func (i *Isolator) KernelIsolated(_ string) bool { return false }
+
+// Run executes the agent in the bubblewrap sandbox. The sandbox environment is
+// built entirely from --setenv (the parent env is cleared by --clearenv), so the
+// parent process only needs its own environment to launch bwrap.
+func (i *Isolator) Run(cfg *types.SandboxConfig, c types.Contribution) (int, error) {
+	args := i.buildArgs(cfg, c)
+	return sandboxutil.SpawnSandbox("bwrap", args, os.Environ(), "Bubblewrap sandbox", cfg.Verbose)
+}
+
+// Command returns the full bwrap command (for display / terminal wrappers).
+func (i *Isolator) Command(cfg *types.SandboxConfig, c types.Contribution) []string {
+	return append([]string{"bwrap"}, i.buildArgs(cfg, c)...)
+}
+
+func (i *Isolator) buildArgs(cfg *types.SandboxConfig, c types.Contribution) []string {
+	homeDir, _ := os.UserHomeDir()
+	if cfg.HomeDir != "" {
+		homeDir = cfg.HomeDir
 	}
 
-	// Merge with custom env for the parent process
-	customEnv := envutil.ParseCustomEnv(config.CustomEnv)
-	mergedEnv := envutil.MergeEnvMaps(agentEnv, customEnv)
-
-	// Convert to environ format for parent process
-	env := os.Environ()
-	env = append(env, envutil.EnvMapToSlice(mergedEnv)...)
-
-	return sandboxutil.SpawnSandbox("bwrap", args, env, "Bubblewrap sandbox", config.Verbose)
-}
-
-// GetCommand returns the bwrap command
-func (e *Executor) GetCommand(config *types.SandboxConfig) []string {
-	args := e.buildBwrapArgs(config)
-	result := make([]string, 0, len(args)+1)
-	result = append(result, "bwrap")
-	result = append(result, args...)
-	return result
-}
-
-func (e *Executor) buildBwrapArgs(config *types.SandboxConfig) []string {
-	// Unshare namespaces individually instead of --unshare-all
-	// to avoid user namespace issues that can cause segfaults
 	args := []string{
 		"--unshare-uts",
 		"--unshare-ipc",
 		"--unshare-pid",
 		"--unshare-cgroup",
 		"--die-with-parent",
+		// Minimal devtmpfs — NOT --dev-bind /dev /dev, which exposes /dev/sda,
+		// /dev/mem and input devices.
+		"--dev", "/dev",
+		"--proc", "/proc",
+		"--tmpfs", "/tmp",
+		// Deny-default environment: start empty, add back an explicit allowlist.
+		"--clearenv",
 	}
 
-	// Network
-	if config.Network == types.NetworkHost {
-		args = append(args, "--share-net")
+	// Network — applied EXPLICITLY (regression guard: --unshare-net for none/proxy).
+	args = append(args, sandboxutil.BwrapNetworkArgs(cfg.Network)...)
+
+	// Sandbox-local HOME: a tmpfs at the home path (no host-$HOME bind), with only
+	// the curated config paths bound back read-only.
+	args = append(args, "--tmpfs", homeDir)
+	for _, configPath := range sandbox.UserConfigPaths {
+		src := filepath.Join(homeDir, configPath)
+		if _, err := os.Stat(src); err == nil {
+			args = append(args, "--ro-bind", src, src)
+		}
 	}
 
-	homeDir, _ := os.UserHomeDir()
-	if config.HomeDir != "" {
-		homeDir = config.HomeDir
+	// Workspace (rw) + source repo (ro for worktrees).
+	args = append(args, "--bind", cfg.WorkDir, cfg.WorkDir)
+	if cfg.RepoDir != "" && cfg.RepoDir != cfg.WorkDir {
+		args = append(args, "--ro-bind", cfg.RepoDir, cfg.RepoDir)
 	}
 
-	// Build sandbox environment and add as --setenv args
-	sandboxEnv := e.getSandboxEnvironment(homeDir, config.CustomEnv)
-	for k, v := range sandboxEnv {
+	// HostPassthrough: restore host tool reachability (leaky mode).
+	if cfg.HostPassthrough {
+		for _, dir := range []string{"/usr", "/lib", "/lib64", "/bin", "/etc"} {
+			if _, err := os.Stat(dir); err == nil {
+				args = append(args, "--ro-bind", dir, dir)
+			}
+		}
+	}
+
+	// Contribution: read-only binds of the provisioned closure's requisites.
+	for _, p := range c.RoBindPaths {
+		if _, err := os.Stat(p); err == nil {
+			args = append(args, "--ro-bind", p, p)
+		}
+	}
+
+	// Caller-supplied extra binds.
+	for _, path := range cfg.BindPaths {
+		if abs, err := filepath.Abs(path); err == nil {
+			if _, err := os.Stat(abs); err == nil {
+				args = append(args, "--bind", abs, abs)
+			}
+		}
+	}
+	for _, path := range cfg.RoBindPaths {
+		if abs, err := filepath.Abs(path); err == nil {
+			if _, err := os.Stat(abs); err == nil {
+				args = append(args, "--ro-bind", abs, abs)
+			}
+		}
+	}
+
+	args = append(args, "--chdir", cfg.WorkDir)
+
+	// Explicit setenv allowlist (since --clearenv wiped everything).
+	for k, v := range i.sandboxEnv(cfg, c, homeDir) {
 		args = append(args, "--setenv", k, v)
 	}
 
-	// System directories (read-only)
-	systemDirs := []string{"/usr", "/lib", "/lib64", "/bin", "/etc"}
-	for _, dir := range systemDirs {
-		if _, err := os.Stat(dir); err == nil {
-			args = append(args, "--ro-bind", dir, dir)
-		}
-	}
-
-	// Special mounts
-	args = append(args,
-		"--dev-bind", "/dev", "/dev",
-		"--proc", "/proc",
-		"--tmpfs", "/tmp",
-	)
-
-	// Home directory
-	args = append(args, "--bind", homeDir, homeDir)
-
-	// User config bind mounts
-	for _, configPath := range sandbox.UserConfigPaths {
-		sourcePath := filepath.Join(homeDir, configPath)
-		if _, err := os.Stat(sourcePath); err == nil {
-			args = append(args, "--bind", sourcePath, sourcePath)
-		}
-	}
-
-	// Bind work directory
-	args = append(args, "--bind", config.WorkDir, config.WorkDir)
-
-	// Bind source repo if worktree
-	if config.RepoDir != "" && config.RepoDir != config.WorkDir {
-		args = append(args, "--ro-bind", config.RepoDir, config.RepoDir)
-	}
-
-	// Additional bind mounts
-	for _, path := range config.BindPaths {
-		absPath, _ := filepath.Abs(path)
-		if _, err := os.Stat(absPath); err == nil {
-			args = append(args, "--bind", absPath, absPath)
-		}
-	}
-
-	for _, path := range config.RoBindPaths {
-		absPath, _ := filepath.Abs(path)
-		if _, err := os.Stat(absPath); err == nil {
-			args = append(args, "--ro-bind", absPath, absPath)
-		}
-	}
-
-	// Set working directory
-	args = append(args, "--chdir", config.WorkDir)
-
-	// Separator and agent command (wrapped with init commands if present)
+	// Agent command, wrapped with the provisioner's init commands.
 	args = append(args, "--")
-	agentCmd := agentcmd.BuildAgentCommand(config, "")
-	fullCmd := sandboxutil.WrapWithInitCommands(agentCmd, config.SandboxInitCommands)
-	args = append(args, fullCmd...)
+	agentCmd := agentcmd.BuildAgentCommand(cfg, "")
+	args = append(args, sandboxutil.WrapWithInitCommands(agentCmd, c.InitCommands)...)
 
 	return args
 }
 
-// getSandboxEnvironment returns environment variables for inside the sandbox
-func (e *Executor) getSandboxEnvironment(home string, customEnv []string) map[string]string {
-	// Build PATH with common locations
-	pathParts := []string{
-		filepath.Join(home, ".local", "bin"),
-		"/usr/local/bin",
-		"/usr/bin",
-		"/bin",
-	}
-
-	// Include host PATH for binaries in non-standard locations
-	if hostPath := os.Getenv("PATH"); hostPath != "" {
-		pathParts = append(pathParts, hostPath)
-	}
-
+// sandboxEnv builds the explicit environment allowlist for inside the sandbox:
+// HOME/PATH/TMPDIR/SHELL, the contribution's env, the provider tokens, the
+// caller's custom env, and the proxy egress env. API keys reach the sandbox ONLY
+// through this allowlist.
+func (i *Isolator) sandboxEnv(cfg *types.SandboxConfig, c types.Contribution, homeDir string) map[string]string {
 	env := map[string]string{
-		"HOME":   home,
+		"HOME":   homeDir,
 		"TMPDIR": "/tmp",
-		"PATH":   joinPath(pathParts),
 		"SHELL":  "/bin/bash",
 	}
 
-	// Merge custom env
-	for _, e := range customEnv {
-		if idx := indexOf(e, "="); idx > 0 {
-			key := e[:idx]
-			value := e[idx+1:]
-			env[key] = value
+	// PATH: the contribution's tool dirs first, then standard dirs (resolvable
+	// only under HostPassthrough), then the host PATH when passing through.
+	pathEntries := append([]string{}, c.PathEntries...)
+	pathEntries = append(pathEntries, "/usr/local/bin", "/usr/bin", "/bin")
+	if cfg.HostPassthrough {
+		if hostPath := os.Getenv("PATH"); hostPath != "" {
+			pathEntries = append(pathEntries, hostPath)
 		}
+	}
+	env["PATH"] = strings.Join(pathEntries, ":")
+
+	// Provider tokens + contribution env + custom env + proxy env.
+	if providerEnv, err := agentcmd.BuildProviderEnv(cfg); err == nil {
+		for k, v := range providerEnv {
+			env[k] = v
+		}
+	}
+	for k, v := range c.Env {
+		env[k] = v
+	}
+	for k, v := range envutil.ParseCustomEnv(cfg.CustomEnv) {
+		env[k] = v
+	}
+	for k, v := range sandboxutil.ProxyEnv(cfg.Network, sandboxutil.ProxyURL()) {
+		env[k] = v
 	}
 
 	return env
-}
-
-func joinPath(parts []string) string {
-	result := ""
-	for i, p := range parts {
-		if i > 0 {
-			result += ":"
-		}
-		result += p
-	}
-	return result
-}
-
-func indexOf(s string, substr string) int {
-	for i := 0; i < len(s); i++ {
-		if s[i:i+len(substr)] == substr {
-			return i
-		}
-	}
-	return -1
 }

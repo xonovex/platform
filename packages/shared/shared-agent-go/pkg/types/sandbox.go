@@ -1,23 +1,9 @@
 package types
 
-// SandboxMethod represents the sandbox execution method. It fuses isolation,
-// provisioning, and network into one enum; the three-axis model below
-// (IsolationMethod × ProvisioningMethod × NetworkMethod) supersedes it. Kept
-// during the transition while callers migrate.
-type SandboxMethod string
-
-const (
-	SandboxNone     SandboxMethod = "none"
-	SandboxBwrap    SandboxMethod = "bwrap"
-	SandboxDocker   SandboxMethod = "docker"
-	SandboxCompose  SandboxMethod = "compose"
-	SandboxNix      SandboxMethod = "nix"
-	SandboxNixFlake SandboxMethod = "nixflake"
-)
-
 // IsolationMethod is the process-isolation axis: how the agent process is
 // confined from the host. It does not determine where tools come from
-// (ProvisioningMethod) or whether egress is constrained (NetworkMethod).
+// (ProvisionMethod) or whether egress is constrained (NetworkMethod). Isolators
+// are resolved by an injected registry, so this set is open for extension.
 type IsolationMethod string
 
 const (
@@ -28,24 +14,25 @@ const (
 	IsolationBwrap IsolationMethod = "bwrap"
 	// IsolationDocker confines the agent in a container. Default runc is
 	// attack-surface reduction; a sandboxed runtime (runsc/gVisor) is a kernel
-	// boundary (see KernelIsolated).
+	// boundary (each isolator declares its own KernelIsolated capability).
 	IsolationDocker IsolationMethod = "docker"
 )
 
-// ProvisioningMethod is the tool-provisioning axis: how the agent's tools reach
-// its PATH, independent of how the process is isolated.
-type ProvisioningMethod string
+// ProvisionMethod is the tool-provisioning axis: how the agent's tools reach its
+// PATH, independent of how the process is isolated. Provisioners are resolved by
+// an injected registry and each declares its own guarantees (e.g. Pinned), so
+// this set is open for extension.
+type ProvisionMethod string
 
 const (
 	// ProvisionNone provides no tools; the agent relies on host/base-image PATH
 	// (subject to HostPassthrough).
-	ProvisionNone ProvisioningMethod = "none"
+	ProvisionNone ProvisionMethod = "none"
 	// ProvisionNix resolves a flake.lock/rev-pinned closure on the host and mounts
-	// it read-only into the sandbox. The only pinned provisioning (see
-	// ProvisioningIsPinned).
-	ProvisionNix ProvisioningMethod = "nix"
+	// it read-only into the sandbox. Pinned provisioning (declares Pinned()=true).
+	ProvisionNix ProvisionMethod = "nix"
 	// ProvisionCommand runs a single init-command list before the agent.
-	ProvisionCommand ProvisioningMethod = "command"
+	ProvisionCommand ProvisionMethod = "command"
 )
 
 // NetworkMethod is the network-egress axis, replacing the old boolean Network.
@@ -109,10 +96,10 @@ var DefaultEgressAllowlist = []string{
 // the engine refuses to run when a requested guarantee cannot be established,
 // never silently degrades.
 type SandboxPolicy struct {
-	// RequirePinnedProvisioning mandates provisioning from a pinned source
+	// RequirePinnedProvision mandates provisioning from a pinned source
 	// (nix closure or a pinned image), enforced at resolve via
 	// --frozen / --no-write-lock-file against a committed lock (fail closed).
-	RequirePinnedProvisioning bool
+	RequirePinnedProvision bool
 	// RequireHostToolsUnreachable mandates that host tools are off PATH AND not
 	// bind-reachable. Conditioned on closure-only store binds, no host-$HOME bind,
 	// and (docker) a pinned image.
@@ -128,35 +115,33 @@ type SandboxPolicy struct {
 
 // SandboxConfig holds sandbox configuration
 type SandboxConfig struct {
-	AgentID             string
-	Method              SandboxMethod
-	Isolation           IsolationMethod
-	Provisioning        ProvisioningMethod
-	HostPassthrough     bool
-	Policy              SandboxPolicy
-	Agent               *AgentConfig
-	HomeDir             string
-	Image               string
-	ComposeFile         string
-	Service             string
-	WorkDir             string
-	RepoDir             string
-	Network             NetworkMethod
-	EgressAllowlist     []string
-	BindPaths           []string
-	RoBindPaths         []string
-	CustomEnv           []string
+	AgentID         string
+	Isolation       IsolationMethod
+	Provision       ProvisionMethod
+	HostPassthrough bool
+	Policy          SandboxPolicy
+	Agent           *AgentConfig
+	HomeDir         string
+	Image           string
+	WorkDir         string
+	RepoDir         string
+	Network         NetworkMethod
+	EgressAllowlist []string
+	BindPaths       []string
+	RoBindPaths     []string
+	CustomEnv       []string
+	// Nix provisioning inputs (Provision=nix). NixSourceKind selects the source:
+	// "packages" (rev-pinned package set) uses NixRev + NixPackages; "flake" (the
+	// project's own flake) uses NixFlakeRef + NixShell.
+	NixSourceKind       string
+	NixRev              string
+	NixPackages         []string
+	NixShell            string
+	NixFlakeRef         string
 	Provider            *ModelProvider
 	AgentArgs           []string
 	SandboxInitCommands []string
 	Verbose             bool
 	Debug               bool
 	DryRun              bool
-}
-
-// SandboxExecutor defines the interface for sandbox implementations
-type SandboxExecutor interface {
-	IsAvailable() (bool, error)
-	Execute(config *SandboxConfig) (int, error)
-	GetCommand(config *SandboxConfig) []string
 }

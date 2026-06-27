@@ -24,6 +24,24 @@ tasks:
     options:
       cache: false
       runFromWorkspaceRoot: true
+  agent-image-build:
+    # Build the nix agent image (streamLayeredImage) from the pinned flake.lock —
+    # the same content-addressed closure the CLI provisions. The result is an
+    # executable that streams the image; CI pushes it digest-pinned, e.g.
+    #   ./result | skopeo copy docker-archive:/dev/stdin docker://ghcr.io/xonovex/agent:<rev>
+    command:
+      - nix
+      - build
+      - .#legacyPackages.x86_64-linux.agentImage
+    inputs:
+      - /flake.nix
+      - /flake.lock
+      - /nix/agent-env.nix
+      - /nix/mkAgentImage.nix
+    outputs: []
+    options:
+      cache: false
+      runFromWorkspaceRoot: true
   go-test-integration:
     command:
       - go

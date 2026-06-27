@@ -6,6 +6,15 @@ import (
 	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/validation"
 )
 
+func TestParseNetwork(t *testing.T) {
+	if _, err := parseNetwork("proxy"); err != nil {
+		t.Errorf("parseNetwork(proxy) = %v", err)
+	}
+	if _, err := parseNetwork("bogus"); err == nil {
+		t.Error("parseNetwork(bogus) = nil, want error")
+	}
+}
+
 func TestWorktreeBranchValidation(t *testing.T) {
 	tests := []struct {
 		name    string

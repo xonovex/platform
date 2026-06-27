@@ -18,10 +18,11 @@ agent-cli run
 agent-cli run -a claude
 agent-cli run -a opencode
 
-# Run with sandbox
-agent-cli run -s bwrap
-agent-cli run -s docker
-agent-cli run -s nix
+# Run with the three sandbox axes (isolation × provision × network)
+agent-cli run --isolation bwrap --provision command --init-command 'echo setup'
+agent-cli run --isolation docker --network proxy --egress-allow github.com
+agent-cli run --isolation bwrap --provision nix --nix-source packages --nix-rev <rev> --nix-packages ripgrep
+agent-cli run --isolation bwrap --provision nix --nix-source flake --nix-shell default
 
 # Run with worktree
 agent-cli run --worktree-branch feature/my-feature
@@ -34,13 +35,24 @@ agent-cli run -t tmux
 
 ### run
 
-Run an AI coding agent.
+Run an AI coding agent. The sandbox is selected by three orthogonal axes — see
+`packages/agent/AGENTS.md` for the model and the four-guarantee policy.
 
 ```
 Options:
   -a, --agent <type>           Agent: claude, opencode (default: claude)
   -p, --provider <name>        Model provider for the agent
-  -s, --sandbox <method>       Sandbox: none, bwrap, docker, compose, nix (default: none)
+  --isolation <method>         Isolation: none, bwrap, docker (default: none)
+  --provision <method>         Provision: none, nix, command (default: none)
+  --network <method>           Network egress: host, none, proxy (default: host)
+  --egress-allow <host>        Extra allowlist host for --network proxy (repeatable)
+  --host-passthrough           Expose host/base-image tools (forfeits host-tools-unreachable)
+  --init-command <cmd>         Init command for --provision command (repeatable)
+  --nix-source <kind>          Nix source: packages, flake (default: packages)
+  --nix-rev <rev>              Pinned nixpkgs rev for --nix-source packages
+  --nix-packages <pkg>         Package for --nix-source packages (repeatable)
+  --nix-shell <name>           devShell for --nix-source flake (default: default)
+  --require-pinned-toolchain   Mandate pinned provisioning + host-tools-unreachable
   -w, --work-dir <dir>         Working directory
   --worktree-branch <branch>   Create worktree with branch
   -t, --terminal <wrapper>     Terminal wrapper: tmux
@@ -68,13 +80,10 @@ agent-cli completion fish | source
 Create a config file (YAML or JSON):
 
 ```yaml
-sandbox:
-  method: bwrap
-  network: true
-  bindPaths:
-    - /home/user/projects
 agent: claude
 provider: anthropic
+bindPaths:
+  - /home/user/projects
 ```
 
 Load with:
