@@ -25,7 +25,7 @@ func TestGetExecutorUnknown(t *testing.T) {
 }
 
 func TestSelectExecutor_RequirePinnedToolchain(t *testing.T) {
-	deny := types.SandboxPolicy{RequirePinnedToolchain: true}
+	deny := types.SandboxPolicy{RequirePinnedProvisioning: true, RequireHostToolsUnreachable: true}
 	cases := []struct {
 		name    string
 		method  types.SandboxMethod
@@ -103,7 +103,7 @@ func TestRequirePinnedToolchain_NixflakeHostToolsUnreachable(t *testing.T) {
 	}
 
 	// The policy seam under test: an unspecified method must resolve to nixflake.
-	executor, method, err := SelectExecutor("", "", types.SandboxPolicy{RequirePinnedToolchain: true})
+	executor, method, err := SelectExecutor("", "", types.SandboxPolicy{RequirePinnedProvisioning: true, RequireHostToolsUnreachable: true})
 	if err != nil {
 		t.Fatalf("select under policy: %v", err)
 	}
@@ -118,10 +118,10 @@ func TestRequirePinnedToolchain_NixflakeHostToolsUnreachable(t *testing.T) {
 	probe := `test -z "$(ls -A /usr/bin 2>/dev/null)" || exit 1; ! command -v fdisk >/dev/null 2>&1 || exit 1`
 	cfg := &types.SandboxConfig{
 		Method:    method,
-		Policy:    types.SandboxPolicy{RequirePinnedToolchain: true},
+		Policy:    types.SandboxPolicy{RequirePinnedProvisioning: true, RequireHostToolsUnreachable: true},
 		WorkDir:   flakeDir,
 		RepoDir:   flakeDir,
-		Network:   true,
+		Network:   types.NetworkHost,
 		Agent:     &types.AgentConfig{Type: types.AgentOpencode, Binary: "sh"},
 		AgentArgs: []string{"-c", probe},
 	}

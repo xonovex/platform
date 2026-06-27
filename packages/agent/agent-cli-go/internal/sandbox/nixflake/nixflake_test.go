@@ -361,7 +361,7 @@ func TestIntegrationRealNixDevShell(t *testing.T) {
 
 	e := NewExecutor()
 	fc := nixenv.FlakeSandboxConfig{FlakeRef: flakeDir, Shell: shell}
-	config := &types.SandboxConfig{WorkDir: flakeDir, Network: true}
+	config := &types.SandboxConfig{WorkDir: flakeDir, Network: types.NetworkHost}
 	dirs := e.ensureAgentDirs("integration")
 
 	args := e.buildBwrapArgs(config, fc, dirs, nm)

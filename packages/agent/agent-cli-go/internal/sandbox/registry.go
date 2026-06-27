@@ -66,7 +66,7 @@ func tierIsolation(method types.SandboxMethod) Isolation {
 // rejected before construction; otherwise it behaves like GetExecutor. The
 // returned method echoes the requested one so callers can record what was used.
 func SelectExecutor(method types.SandboxMethod, image string, policy types.SandboxPolicy) (types.SandboxExecutor, types.SandboxMethod, error) {
-	if policy.RequirePinnedToolchain {
+	if policy.RequirePinnedProvisioning || policy.RequireHostToolsUnreachable {
 		if err := enforcePinnedToolchain(method, image); err != nil {
 			return nil, "", err
 		}

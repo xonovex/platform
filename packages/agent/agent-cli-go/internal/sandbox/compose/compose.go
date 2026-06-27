@@ -8,8 +8,10 @@ import (
 	"strings"
 
 	"github.com/xonovex/platform/packages/cli/agent-cli-go/internal/sandboxutil"
+	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/agentcmd"
 	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/sandbox"
 	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/types"
+	"github.com/xonovex/platform/packages/shared/shared-core-go/pkg/envutil"
 	"github.com/xonovex/platform/packages/shared/shared-core-go/pkg/scriptlib"
 )
 
@@ -68,7 +70,7 @@ func (e *Executor) Execute(config *types.SandboxConfig) (int, error) {
 	env := e.buildComposeEnv(config)
 
 	// Add provider environment
-	agentEnv, _ := sandboxutil.BuildProviderEnv(config)
+	agentEnv, _ := agentcmd.BuildProviderEnv(config)
 	for k, v := range agentEnv {
 		env = append(env, k+"="+v)
 	}
@@ -175,7 +177,7 @@ func (e *Executor) buildComposeArgs(config *types.SandboxConfig, composeFile str
 		"TMPDIR": "/tmp",
 		"SHELL":  "/bin/bash",
 	}
-	customEnv := sandboxutil.ParseCustomEnv(config.CustomEnv)
+	customEnv := envutil.ParseCustomEnv(config.CustomEnv)
 	for k, v := range customEnv {
 		sandboxEnv[k] = v
 	}
@@ -214,7 +216,7 @@ func (e *Executor) buildComposeArgs(config *types.SandboxConfig, composeFile str
 	args = append(args, service)
 
 	// Agent command (wrapped with init commands if present)
-	agentCmd := sandboxutil.BuildAgentCommand(config, "")
+	agentCmd := agentcmd.BuildAgentCommand(config, "")
 	fullCmd := sandboxutil.WrapWithInitCommands(agentCmd, config.SandboxInitCommands)
 	args = append(args, fullCmd...)
 

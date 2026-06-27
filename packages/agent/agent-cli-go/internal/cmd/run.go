@@ -169,10 +169,21 @@ func runAgent(cmd *cobra.Command, args []string) error {
 		// Mandate the pinned tier when the caller did not pick one explicitly.
 		sandboxMethod = types.SandboxNixFlake
 	}
-	policy := types.SandboxPolicy{RequirePinnedToolchain: flagRequirePinned}
+	// The legacy --require-pinned-toolchain flag bundled pinned provisioning with
+	// host-tools-unreachable; map it onto both decoupled guarantees.
+	policy := types.SandboxPolicy{
+		RequirePinnedProvisioning:   flagRequirePinned,
+		RequireHostToolsUnreachable: flagRequirePinned,
+	}
 	sandboxExecutor, sandboxMethod, err := sandbox.SelectExecutor(sandboxMethod, flagImage, policy)
 	if err != nil {
 		return err
+	}
+
+	// Map the legacy boolean --network flag onto the network-egress axis.
+	network := types.NetworkNone
+	if flagNetwork {
+		network = types.NetworkHost
 	}
 
 	// Check availability
@@ -192,7 +203,7 @@ func runAgent(cmd *cobra.Command, args []string) error {
 		Provider:    provider,
 		WorkDir:     workDir,
 		RepoDir:     sourceRepoDir,
-		Network:     flagNetwork,
+		Network:     network,
 		BindPaths:   bindPaths,
 		RoBindPaths: flagRoBind,
 		CustomEnv:   flagEnv,

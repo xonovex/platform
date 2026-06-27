@@ -9,8 +9,10 @@ import (
 
 	"github.com/xonovex/platform/packages/cli/agent-cli-go/internal/nixenv"
 	"github.com/xonovex/platform/packages/cli/agent-cli-go/internal/sandboxutil"
+	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/agentcmd"
 	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/sandbox"
 	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/types"
+	"github.com/xonovex/platform/packages/shared/shared-core-go/pkg/envutil"
 	"github.com/xonovex/platform/packages/shared/shared-core-go/pkg/scriptlib"
 )
 
@@ -19,7 +21,7 @@ import (
 // Isolation: host tools unreachable. buildBwrapArgs ro-binds only /nix/store and
 // the nix-built closure at /env (no host /usr,/lib,/bin), and getSandboxEnvironment
 // points PATH at that closure, so host binaries do not resolve. It satisfies
-// RequirePinnedToolchain.
+// RequirePinnedProvisioning and RequireHostToolsUnreachable.
 type Executor struct{}
 
 // NewExecutor creates a new nix executor
@@ -89,7 +91,7 @@ func (e *Executor) Execute(config *types.SandboxConfig) (int, error) {
 	bwrapArgs := e.buildBwrapArgs(config, result.StorePath, agentDirs)
 
 	// Build agent command with /env/bin prefix (wrapped with init commands if present)
-	agentCmd := sandboxutil.BuildAgentCommand(config, "/env/bin")
+	agentCmd := agentcmd.BuildAgentCommand(config, "/env/bin")
 	fullCmd := sandboxutil.WrapWithInitCommands(agentCmd, config.SandboxInitCommands)
 
 	// Add command separator and agent command
@@ -105,12 +107,12 @@ func (e *Executor) Execute(config *types.SandboxConfig) (int, error) {
 	}
 
 	// Build environment
-	agentEnv, _ := sandboxutil.BuildProviderEnv(config)
-	customEnv := sandboxutil.ParseCustomEnv(config.CustomEnv)
-	mergedEnv := sandboxutil.MergeEnvMaps(agentEnv, customEnv)
+	agentEnv, _ := agentcmd.BuildProviderEnv(config)
+	customEnv := envutil.ParseCustomEnv(config.CustomEnv)
+	mergedEnv := envutil.MergeEnvMaps(agentEnv, customEnv)
 
 	env := os.Environ()
-	env = append(env, sandboxutil.EnvMapToSlice(mergedEnv)...)
+	env = append(env, envutil.EnvMapToSlice(mergedEnv)...)
 
 	return sandboxutil.SpawnSandbox("bwrap", bwrapArgs, env, "Nix sandbox", config.Verbose)
 }
@@ -305,7 +307,7 @@ func (e *Executor) buildBwrapArgs(config *types.SandboxConfig, envOutPath string
 	args = append(args, "--unshare-uts", "--unshare-ipc", "--unshare-pid", "--unshare-cgroup")
 
 	// Network
-	if config.Network {
+	if config.Network == types.NetworkHost {
 		args = append(args, "--share-net")
 	} else {
 		args = append(args, "--unshare-net")
