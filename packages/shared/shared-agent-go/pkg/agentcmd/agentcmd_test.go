@@ -7,12 +7,9 @@ import (
 )
 
 func TestBuildAgentCommandBinaryPrefix(t *testing.T) {
-	config := &types.SandboxConfig{
-		Agent:     &types.AgentConfig{Type: types.AgentClaude, Binary: "claude"},
-		AgentArgs: []string{"--foo"},
-	}
+	agent := &types.AgentConfig{Type: types.AgentClaude, Binary: "claude"}
 
-	cmd := BuildAgentCommand(config, "/env/bin")
+	cmd := BuildAgentCommand(agent, nil, []string{"--foo"}, "/env/bin")
 	if len(cmd) == 0 {
 		t.Fatal("BuildAgentCommand returned empty command")
 	}
@@ -22,22 +19,18 @@ func TestBuildAgentCommandBinaryPrefix(t *testing.T) {
 }
 
 func TestBuildAgentCommandNoPrefix(t *testing.T) {
-	config := &types.SandboxConfig{
-		Agent: &types.AgentConfig{Type: types.AgentOpencode, Binary: "opencode"},
-	}
+	agent := &types.AgentConfig{Type: types.AgentOpencode, Binary: "opencode"}
 
-	cmd := BuildAgentCommand(config, "")
+	cmd := BuildAgentCommand(agent, nil, nil, "")
 	if len(cmd) == 0 || cmd[0] != "opencode" {
 		t.Errorf("binary = %v, want opencode first", cmd)
 	}
 }
 
 func TestBuildProviderEnvNilProvider(t *testing.T) {
-	config := &types.SandboxConfig{
-		Agent: &types.AgentConfig{Type: types.AgentClaude, Binary: "claude"},
-	}
+	agent := &types.AgentConfig{Type: types.AgentClaude, Binary: "claude"}
 
-	env, err := BuildProviderEnv(config)
+	env, err := BuildProviderEnv(agent, nil)
 	if err != nil {
 		t.Fatalf("BuildProviderEnv err = %v, want nil", err)
 	}
