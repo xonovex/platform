@@ -37,6 +37,7 @@ type AgentRunReconciler struct {
 // +kubebuilder:rbac:groups=agent.xonovex.com,resources=agenttoolchains,verbs=get;list;watch
 // +kubebuilder:rbac:groups=batch,resources=jobs,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups="",resources=pods,verbs=get;list;watch
+// +kubebuilder:rbac:groups="",resources=serviceaccounts,verbs=get;list;watch;create
 // +kubebuilder:rbac:groups="",resources=persistentvolumeclaims,verbs=get;list;watch;create;delete
 // +kubebuilder:rbac:groups="",resources=secrets,verbs=get;list;watch
 // +kubebuilder:rbac:groups=networking.k8s.io,resources=networkpolicies,verbs=get;list;watch;create;update;patch;delete
@@ -158,7 +159,18 @@ func (r *AgentRunReconciler) reconcileStandalone(ctx context.Context, agentRun *
 	if agentRun.Status.JobName == "" {
 		defaults := resolver.ApplyHarnessDefaults(agentRun, harness)
 
-		job := builder.BuildJob(agentRun, providerEnv, pvcName, defaults.Image, defaults.Timeout, agentType, wsType, tc, defaults.TTL)
+		// An image-based toolchain (e.g. nix) provisions via its pre-built,
+		// digest-pinned image.
+		image := defaults.Image
+		if tcl := builder.ResolveToolchain(tc); tcl != nil && tcl.Image() != "" {
+			image = tcl.Image()
+		}
+
+		if err := r.ensureAgentServiceAccount(ctx, agentRun.Namespace); err != nil {
+			return ctrl.Result{}, err
+		}
+
+		job := builder.BuildJob(agentRun, providerEnv, pvcName, image, defaults.Timeout, agentType, wsType, tc, defaults.TTL)
 		if err := ctrl.SetControllerReference(agentRun, job, r.Scheme); err != nil {
 			return ctrl.Result{}, err
 		}
@@ -190,6 +202,17 @@ func (r *AgentRunReconciler) reconcileStandalone(ctx context.Context, agentRun *
 	}
 
 	return r.reconcileJobStatus(ctx, agentRun, &job)
+}
+
+// ensureAgentServiceAccount creates the dedicated zero-RBAC ServiceAccount agent
+// pods bind to, idempotently. It is a shared namespace resource, so it carries no
+// owner reference (it outlives any single AgentRun).
+func (r *AgentRunReconciler) ensureAgentServiceAccount(ctx context.Context, namespace string) error {
+	sa := builder.BuildAgentServiceAccount(namespace)
+	if err := r.Create(ctx, sa); err != nil && !errors.IsAlreadyExists(err) {
+		return err
+	}
+	return nil
 }
 
 func (r *AgentRunReconciler) reconcileWithWorkspace(ctx context.Context, agentRun *agentv1alpha1.AgentRun) (ctrl.Result, error) {
@@ -288,7 +311,18 @@ func (r *AgentRunReconciler) reconcileWithWorkspace(ctx context.Context, agentRu
 	if agentRun.Status.JobName == "" {
 		defaults := resolver.ApplyHarnessDefaults(agentRun, harness)
 
-		job := builder.BuildWorkspaceJob(agentRun, providerEnv, ws.Status.WorkspacePVC, ws.Spec.SharedVolumes, ws.Status.SharedVolumePVCs, defaults.Image, defaults.Timeout, agentType, wsType, worktreeBranch, sourceBranch, tc, defaults.TTL)
+		// An image-based toolchain (e.g. nix) provisions via its pre-built,
+		// digest-pinned image.
+		image := defaults.Image
+		if tcl := builder.ResolveToolchain(tc); tcl != nil && tcl.Image() != "" {
+			image = tcl.Image()
+		}
+
+		if err := r.ensureAgentServiceAccount(ctx, agentRun.Namespace); err != nil {
+			return ctrl.Result{}, err
+		}
+
+		job := builder.BuildWorkspaceJob(agentRun, providerEnv, ws.Status.WorkspacePVC, ws.Spec.SharedVolumes, ws.Status.SharedVolumePVCs, image, defaults.Timeout, agentType, wsType, worktreeBranch, sourceBranch, tc, defaults.TTL)
 		if err := ctrl.SetControllerReference(agentRun, job, r.Scheme); err != nil {
 			return ctrl.Result{}, err
 		}

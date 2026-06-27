@@ -8,17 +8,18 @@ This document tracks feature parity between the TypeScript `script-agent` and Go
 
 - [x] Agent selection (`-a`/`--agent`)
 - [x] Provider selection (`-p`/`--provider`)
-- [x] Sandbox methods (`-s`/`--sandbox`): none, bwrap, docker, compose, nix
+- [x] Isolation axis (`--isolation`): none, bwrap, docker
+- [x] Provision axis (`--provision`): none, nix, command
+- [x] Network axis (`--network`): host, none, proxy
+- [x] Host passthrough (`--host-passthrough`); egress allowlist (`--egress-allow`); init command (`--init-command`)
+- [x] Nix source flags (`--nix-source`, `--nix-rev`, `--nix-packages`, `--nix-shell`)
 - [x] Work directory (`-w`/`--work-dir`)
 - [x] Worktree support (`--worktree-branch`, `--worktree-source-branch`, `--worktree-dir`)
 - [x] Config file (`-c`/`--config`)
-- [x] Network control (`-N`/`--network`)
 - [x] Bind mounts (`--bind`, `--ro-bind`)
 - [x] Environment variables (`--env`)
 - [x] Verbose/debug flags (`-v`, `-d`)
 - [x] Container image (`--image`)
-- [x] Compose file (`--compose-file`)
-- [x] Service selection (`--service`)
 
 ### `sync` command
 
@@ -81,12 +82,6 @@ This document tracks feature parity between the TypeScript `script-agent` and Go
 - [x] Network control
 - [x] Environment passing
 - [x] Interactive mode
-
-### Docker Compose
-
-- [x] Compose file support
-- [x] Service selection
-- [x] Environment passing
 
 ### Nix
 

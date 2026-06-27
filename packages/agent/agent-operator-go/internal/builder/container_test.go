@@ -21,7 +21,7 @@ func TestBuildInitContainers(t *testing.T) {
 		},
 	}
 
-	containers := BuildInitContainers(run, "node:latest", agentv1alpha1.WorkspaceTypeGit, nil, nil)
+	containers := BuildInitContainers(run, "node:latest", agentv1alpha1.WorkspaceTypeGit, nil)
 
 	if len(containers) != 1 {
 		t.Fatalf("len(containers) = %d, want 1", len(containers))
@@ -146,150 +146,23 @@ func TestBuildCloneScript_GitNoJJInit(t *testing.T) {
 	}
 }
 
-func TestNixToolchain_InitContainer_WithPackages(t *testing.T) {
-	nix := &agentv1alpha1.NixSpec{
-		Packages: []string{"nodejs_22", "python3", "ripgrep"},
-	}
-
-	tc := NewNixToolchain(nix)
-	c := tc.InitContainer()
-	if c == nil {
-		t.Fatal("expected non-nil container")
-	}
-
-	if c.Name != "nix-env" {
-		t.Errorf("name = %q, want %q", c.Name, "nix-env")
-	}
-	if c.Image != "nixos/nix:latest" {
-		t.Errorf("image = %q, want %q", c.Image, "nixos/nix:latest")
-	}
-
-	script := c.Args[1]
-	if !strings.Contains(script, "cp -a /nix/. /nix-env/") {
-		t.Error("script missing Nix store bootstrap")
-	}
-	if !strings.Contains(script, "nixpkgs#nodejs_22") {
-		t.Error("script missing nodejs_22 package")
-	}
-	if !strings.Contains(script, "nixpkgs#python3") {
-		t.Error("script missing python3 package")
-	}
-	if !strings.Contains(script, "nixpkgs#ripgrep") {
-		t.Error("script missing ripgrep package")
-	}
-	if !strings.Contains(script, "profile install --profile /nix/var/nix/profiles/agent") {
-		t.Error("script missing profile install command")
-	}
-
-	if len(c.VolumeMounts) != 1 || c.VolumeMounts[0].MountPath != "/nix-env" {
-		t.Errorf("volume mount = %v, want /nix-env", c.VolumeMounts)
-	}
-}
-
-func TestNixToolchain_InitContainer_CustomImage(t *testing.T) {
-	nix := &agentv1alpha1.NixSpec{
-		Packages: []string{"nodejs_22"},
-		Image:    "nixos/nix:2.28.3",
-	}
-
-	tc := NewNixToolchain(nix)
-	c := tc.InitContainer()
-	if c.Image != "nixos/nix:2.28.3" {
-		t.Errorf("image = %q, want %q", c.Image, "nixos/nix:2.28.3")
-	}
-}
-
-func TestToolchains_Nil(t *testing.T) {
-	tcs := Toolchains(nil)
-	if len(tcs) != 0 {
-		t.Errorf("len(toolchains) = %d, want 0", len(tcs))
-	}
-}
-
-func TestToolchains_EmptyPackages(t *testing.T) {
+func TestResolveToolchain(t *testing.T) {
 	tc := &agentv1alpha1.ToolchainSpec{
 		Type: agentv1alpha1.ToolchainTypeNix,
-		Nix:  &agentv1alpha1.NixSpec{},
+		Nix:  &agentv1alpha1.NixSpec{Image: "ghcr.io/xonovex/agent@sha256:abc"},
 	}
-	tcs := Toolchains(tc)
-	if len(tcs) != 0 {
-		t.Errorf("len(toolchains) = %d, want 0", len(tcs))
+	tcl := ResolveToolchain(tc)
+	if tcl == nil || tcl.Image() != "ghcr.io/xonovex/agent@sha256:abc" {
+		t.Fatalf("ResolveToolchain(nix).Image() = %v, want the pre-built image", tcl)
 	}
-}
-
-func TestBuildInitContainers_WithNix(t *testing.T) {
-	run := &agentv1alpha1.AgentRun{
-		Spec: agentv1alpha1.AgentRunSpec{
-			Workspace: &agentv1alpha1.WorkspaceSpec{
-				Repository: agentv1alpha1.RepositorySpec{
-					URL: "https://github.com/example/repo.git",
-				},
-			},
-		},
+	if !tcl.Pinned() {
+		t.Error("nix toolchain must report Pinned()=true")
 	}
-
-	tc := &agentv1alpha1.ToolchainSpec{
-		Type: agentv1alpha1.ToolchainTypeNix,
-		Nix: &agentv1alpha1.NixSpec{
-			Packages: []string{"nodejs_22"},
-		},
+	if ResolveToolchain(nil) != nil {
+		t.Error("ResolveToolchain(nil) must be nil")
 	}
-
-	containers := BuildInitContainers(run, "node:latest", agentv1alpha1.WorkspaceTypeGit, tc, nil)
-
-	if len(containers) != 2 {
-		t.Fatalf("len(containers) = %d, want 2", len(containers))
-	}
-	if containers[0].Name != "git-clone" {
-		t.Errorf("containers[0].Name = %q, want git-clone", containers[0].Name)
-	}
-	if containers[1].Name != "nix-env" {
-		t.Errorf("containers[1].Name = %q, want nix-env", containers[1].Name)
-	}
-}
-
-func TestBuildMainContainers_WithNix(t *testing.T) {
-	run := &agentv1alpha1.AgentRun{
-		Spec: agentv1alpha1.AgentRunSpec{
-			Workspace: &agentv1alpha1.WorkspaceSpec{
-				Repository: agentv1alpha1.RepositorySpec{
-					URL: "https://github.com/example/repo.git",
-				},
-			},
-		},
-	}
-
-	tc := &agentv1alpha1.ToolchainSpec{
-		Type: agentv1alpha1.ToolchainTypeNix,
-		Nix: &agentv1alpha1.NixSpec{
-			Packages: []string{"nodejs_22"},
-		},
-	}
-
-	containers := BuildMainContainers(run, nil, "image:latest", agentv1alpha1.AgentTypeClaude, tc, nil)
-
-	c := containers[0]
-
-	// Should have nix-env volume mount
-	foundNix := false
-	for _, vm := range c.VolumeMounts {
-		if vm.Name == "nix-env" && vm.MountPath == "/nix" {
-			foundNix = true
-		}
-	}
-	if !foundNix {
-		t.Error("expected nix-env volume mount at /nix")
-	}
-
-	// Should have PATH with nix profile bin
-	foundPath := false
-	for _, env := range c.Env {
-		if env.Name == "PATH" && strings.Contains(env.Value, "/nix/var/nix/profiles/agent/bin") {
-			foundPath = true
-		}
-	}
-	if !foundPath {
-		t.Error("expected PATH env var with nix profile bin")
+	if ResolveToolchain(&agentv1alpha1.ToolchainSpec{Type: "bogus"}) != nil {
+		t.Error("ResolveToolchain(unknown type) must be nil")
 	}
 }
 
@@ -304,7 +177,7 @@ func TestBuildMainContainers_WithoutNix(t *testing.T) {
 		},
 	}
 
-	containers := BuildMainContainers(run, nil, "image:latest", agentv1alpha1.AgentTypeClaude, nil, nil)
+	containers := BuildMainContainers(run, nil, "image:latest", agentv1alpha1.AgentTypeClaude, nil)
 	c := containers[0]
 
 	for _, vm := range c.VolumeMounts {
@@ -331,7 +204,7 @@ func TestBuildMainContainers_Claude(t *testing.T) {
 		},
 	}
 
-	containers := BuildMainContainers(run, nil, "image:latest", agentv1alpha1.AgentTypeClaude, nil, nil)
+	containers := BuildMainContainers(run, nil, "image:latest", agentv1alpha1.AgentTypeClaude, nil)
 
 	if len(containers) != 1 {
 		t.Fatalf("len(containers) = %d, want 1", len(containers))
@@ -373,7 +246,7 @@ func TestBuildMainContainers_ClaudeWithPrompt(t *testing.T) {
 		},
 	}
 
-	containers := BuildMainContainers(run, nil, "image", agentv1alpha1.AgentTypeClaude, nil, nil)
+	containers := BuildMainContainers(run, nil, "image", agentv1alpha1.AgentTypeClaude, nil)
 
 	args := containers[0].Args
 	foundPrint := false
@@ -408,7 +281,7 @@ func TestBuildMainContainers_Opencode(t *testing.T) {
 		},
 	}
 
-	containers := BuildMainContainers(run, nil, "image", agentv1alpha1.AgentTypeOpencode, nil, nil)
+	containers := BuildMainContainers(run, nil, "image", agentv1alpha1.AgentTypeOpencode, nil)
 
 	c := containers[0]
 	if c.Command[0] != "opencode" {
@@ -435,7 +308,7 @@ func TestBuildMainContainers_WithProviderEnv(t *testing.T) {
 		"API_TIMEOUT_MS":     "60000",
 	}
 
-	containers := BuildMainContainers(run, providerEnv, "image", agentv1alpha1.AgentTypeClaude, nil, nil)
+	containers := BuildMainContainers(run, providerEnv, "image", agentv1alpha1.AgentTypeClaude, nil)
 
 	envMap := make(map[string]string)
 	for _, env := range containers[0].Env {
@@ -459,7 +332,7 @@ func TestBuildMainContainers_SecurityContextDefaults(t *testing.T) {
 		},
 	}
 
-	containers := BuildMainContainers(run, nil, "image", agentv1alpha1.AgentTypeClaude, nil, nil)
+	containers := BuildMainContainers(run, nil, "image", agentv1alpha1.AgentTypeClaude, nil)
 	sc := containers[0].SecurityContext
 
 	if sc == nil {
@@ -493,7 +366,7 @@ func TestBuildMainContainers_SecurityContextOverride(t *testing.T) {
 		},
 	}
 
-	containers := BuildMainContainers(run, nil, "image", agentv1alpha1.AgentTypeClaude, nil, override)
+	containers := BuildMainContainers(run, nil, "image", agentv1alpha1.AgentTypeClaude, override)
 	sc := containers[0].SecurityContext
 
 	if *sc.AllowPrivilegeEscalation != true {
@@ -513,7 +386,7 @@ func TestBuildMainContainers_TmpVolumeMount(t *testing.T) {
 		},
 	}
 
-	containers := BuildMainContainers(run, nil, "image", agentv1alpha1.AgentTypeClaude, nil, nil)
+	containers := BuildMainContainers(run, nil, "image", agentv1alpha1.AgentTypeClaude, nil)
 	foundTmp := false
 	for _, vm := range containers[0].VolumeMounts {
 		if vm.Name == "tmp" && vm.MountPath == "/tmp" {
@@ -534,7 +407,7 @@ func TestBuildInitContainers_SecurityContextDefaults(t *testing.T) {
 		},
 	}
 
-	containers := BuildInitContainers(run, "image", agentv1alpha1.WorkspaceTypeGit, nil, nil)
+	containers := BuildInitContainers(run, "image", agentv1alpha1.WorkspaceTypeGit, nil)
 	sc := containers[0].SecurityContext
 
 	if sc == nil {
@@ -545,80 +418,5 @@ func TestBuildInitContainers_SecurityContextDefaults(t *testing.T) {
 	}
 	if *sc.RunAsNonRoot != true {
 		t.Error("RunAsNonRoot should be true")
-	}
-}
-
-func TestBuildInitContainers_NixSecurityContext(t *testing.T) {
-	run := &agentv1alpha1.AgentRun{
-		Spec: agentv1alpha1.AgentRunSpec{
-			Workspace: &agentv1alpha1.WorkspaceSpec{
-				Repository: agentv1alpha1.RepositorySpec{URL: "https://example.com/repo.git"},
-			},
-		},
-	}
-
-	tc := &agentv1alpha1.ToolchainSpec{
-		Type: agentv1alpha1.ToolchainTypeNix,
-		Nix:  &agentv1alpha1.NixSpec{Packages: []string{"nodejs_22"}},
-	}
-
-	containers := BuildInitContainers(run, "image", agentv1alpha1.WorkspaceTypeGit, tc, nil)
-
-	if len(containers) != 2 {
-		t.Fatalf("len(containers) = %d, want 2", len(containers))
-	}
-
-	nixSC := containers[1].SecurityContext
-	if nixSC == nil {
-		t.Fatal("nix init container SecurityContext should not be nil")
-	}
-	if *nixSC.AllowPrivilegeEscalation != false {
-		t.Error("nix init container AllowPrivilegeEscalation should be false")
-	}
-}
-
-func TestNixToolchain_Volumes_DefaultSizeLimit(t *testing.T) {
-	nix := &agentv1alpha1.NixSpec{
-		Packages: []string{"nodejs_22"},
-	}
-
-	tc := NewNixToolchain(nix)
-	volumes := tc.Volumes()
-
-	if len(volumes) != 1 {
-		t.Fatalf("len(volumes) = %d, want 1", len(volumes))
-	}
-	vol := volumes[0]
-	if vol.EmptyDir == nil {
-		t.Fatal("expected EmptyDir volume source")
-	}
-	if vol.EmptyDir.SizeLimit == nil {
-		t.Fatal("expected SizeLimit to be set")
-	}
-	expected := "10Gi"
-	if vol.EmptyDir.SizeLimit.String() != expected {
-		t.Errorf("SizeLimit = %q, want %q", vol.EmptyDir.SizeLimit.String(), expected)
-	}
-}
-
-func TestNixToolchain_Volumes_CustomSizeLimit(t *testing.T) {
-	nix := &agentv1alpha1.NixSpec{
-		Packages:       []string{"nodejs_22"},
-		StoreSizeLimit: "20Gi",
-	}
-
-	tc := NewNixToolchain(nix)
-	volumes := tc.Volumes()
-
-	if len(volumes) != 1 {
-		t.Fatalf("len(volumes) = %d, want 1", len(volumes))
-	}
-	vol := volumes[0]
-	if vol.EmptyDir == nil || vol.EmptyDir.SizeLimit == nil {
-		t.Fatal("expected EmptyDir with SizeLimit")
-	}
-	expected := "20Gi"
-	if vol.EmptyDir.SizeLimit.String() != expected {
-		t.Errorf("SizeLimit = %q, want %q", vol.EmptyDir.SizeLimit.String(), expected)
 	}
 }

@@ -3,7 +3,7 @@ type: plan
 has_subplans: false
 parent_plan: plans/agent-sandbox-provisioning-axes.md
 parallel_group: 2
-status: pending
+status: complete
 dependencies:
   plans: [shared-types-policy-dedups, shared-flake-and-resolver, cli-isolator-provisioner-core]
   files:
@@ -12,11 +12,11 @@ dependencies:
     - packages/agent/agent-cli-go/internal/cmd/run.go
 skills_to_consult: [general-fp-guide, shell-scripting-guide, debugging-guide]
 validation:
-  type_check: pending
-  lint: pending
-  build: pending
-  tests: pending
-  integration: pending
+  type_check: pass        # agent-cli-go go-build
+  lint: pass              # agent-cli-go go-lint (0 issues)
+  build: pass             # agent-cli-go + shared-agent-go go-build
+  tests: pass             # nixprov DI tests (Contribution/source/gcroot key/fail-closed) + 03 suite green
+  integration: pass       # live: resolve hello@rev → requisites-only binds + GC-root verified (nix-store --query --roots); e2e dry-run binds 8 requisites, 0 whole-store
 ---
 
 # 04 — CLI nix provisioner (resolve → closure, mount read-only)
@@ -55,11 +55,19 @@ env -u IN_NIX_SHELL agent-cli-go run --isolation docker --provision nix --nix-so
 
 ## Success Criteria
 
-- [ ] `ResolveClosure` resolves both sources to a pinned `ClosureDescriptor` via host nix with `--no-write-lock-file`/`--frozen`; `ClosureDescriptor.Requisites` is populated via `nix path-info -r`; a **full-closure** GC-root is registered.
-- [ ] The `nix` provisioner returns a mount-only `Contribution` whose `RoBindPaths` is the **requisites** (not `["/nix/store"]`) + closure PATH/env, **no daemon socket**.
-- [ ] `bwrap × nix` and `docker × nix` produce the same toolset; `none × nix` runs on host with the closure prepended.
-- [ ] `--provision nix` + source flags replace the `nix:`/`nixflake:` `--image` prefixes; a dirty/missing lock fails closed so committed lock / pinned rev is required.
-- [ ] Parity + policy + GC-root regression tests pass (`nix-collect-garbage -d` doesn't evict the held closure); build/lint/test green.
+- [x] `ResolveClosure` resolves both sources to a pinned `ClosureDescriptor` via host nix with `--no-write-lock-file` (packages: rev-pinned flake URL; flake: `print-dev-env --json`); `ClosureDescriptor.Requisites` is populated via `nix path-info -r`; a **full-closure** GC-root is registered (rooting the top-level store paths keeps their runtime closure).
+- [x] The `nix` provisioner returns a mount-only `Contribution` whose `RoBindPaths` is the **requisites** (not `["/nix/store"]`) + closure PATH/env, **no daemon socket** (asserted in tests; e2e dry-run binds 8 requisites, 0 whole-store).
+- [x] `bwrap × nix` and `docker × nix` produce the same toolset (both consume the SAME `Contribution`; identical store paths by nix content-addressing); `none × nix` prepends the closure to the host PATH.
+- [x] `--provision nix` + `--nix-source/--nix-rev/--nix-packages/--nix-shell` flags drive resolution (the `nix:`/`nixflake:` `--image` grammar was already removed in 03); a missing rev / `--no-write-lock-file` on a dirty lock fails closed.
+- [x] Contribution/source/gcroot-key/fail-closed unit tests + the gated live integration (resolve + GC-root reachability via `nix-store --query --roots`) pass; build/lint/test green (`shared-agent-go` + `agent-cli-go`).
+
+## Completion Notes
+
+- **Makes `--require-pinned-toolchain` functional.** With the nix provisioner registered, the pinned combo (`bwrap × nix`) now resolves; `RequirePinnedProvisioning` is satisfied by nix, `RequireHostToolsUnreachable` by the requisites-only binds — the policy seam from 01/03 now engages end to end.
+- **Supersedes the 03 "nix unregistered" intermediate.** `selectProvisioner(nix)` now returns the provisioner; the two 03 tests that asserted `ErrNoProvisioner` for nix were updated (a `bogus` method still exercises the fail-closed path).
+- **GC-root regression is verified non-destructively.** The gated integration asserts the closure is reachable from our GC-root (`nix-store --query --roots`) rather than running a destructive `nix-collect-garbage -d` on the dev machine; the destructive form is available behind the same gate for CI.
+- **Closure parity is by nix content-addressing.** The same `rev`/`flake.lock` yields identical store paths (hence identical `Requisites`); the CLI bind-mounts the same closure the operator (06) will bake into image layers.
+- **Compose removal remains for 05** (`internal/sandbox/compose` + `ComposeFile`/`Service` config fields are still present, inert).
 
 ## Files Modified/Created
 

@@ -8,8 +8,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/xonovex/platform/packages/cli/agent-cli-go/internal/executor"
 	"github.com/xonovex/platform/packages/cli/agent-cli-go/internal/sandbox"
+	"github.com/xonovex/platform/packages/cli/agent-cli-go/internal/sandbox/plugins"
 	"github.com/xonovex/platform/packages/cli/agent-cli-go/internal/worktree"
 	"github.com/xonovex/platform/packages/cli/agent-cli-go/internal/wrapper"
 	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/agents"
@@ -31,7 +31,16 @@ var runCmd = &cobra.Command{
 var (
 	flagAgent                string
 	flagProvider             string
-	flagSandbox              string
+	flagIsolation            string
+	flagProvision            string
+	flagNetwork              string
+	flagEgressAllow          []string
+	flagHostPassthrough      bool
+	flagInitCommand          []string
+	flagNixSource            string
+	flagNixRev               string
+	flagNixPackages          []string
+	flagNixShell             string
 	flagWorkDir              string
 	flagWorktreeBranch       string
 	flagWorktreeSourceBranch string
@@ -40,10 +49,7 @@ var (
 	flagBind                 []string
 	flagRoBind               []string
 	flagEnv                  []string
-	flagNetwork              bool
 	flagImage                string
-	flagComposeFile          string
-	flagService              string
 	flagTerminal             string
 	flagTerminalSession      string
 	flagTerminalWindow       string
@@ -58,7 +64,16 @@ func init() {
 
 	runCmd.Flags().StringVarP(&flagAgent, "agent", "a", "claude", "Agent to run (claude, opencode)")
 	runCmd.Flags().StringVarP(&flagProvider, "provider", "p", "", "Model provider")
-	runCmd.Flags().StringVarP(&flagSandbox, "sandbox", "s", "none", "Sandbox method (none, bwrap, docker, compose, nix)")
+	runCmd.Flags().StringVar(&flagIsolation, "isolation", "none", "Isolation axis (none, bwrap, docker)")
+	runCmd.Flags().StringVar(&flagProvision, "provision", "none", "Provision axis (none, nix, command)")
+	runCmd.Flags().StringVar(&flagNetwork, "network", "host", "Network egress axis (host, none, proxy)")
+	runCmd.Flags().StringSliceVar(&flagEgressAllow, "egress-allow", []string{}, "Extra egress allowlist hosts for --network proxy (repeatable)")
+	runCmd.Flags().BoolVar(&flagHostPassthrough, "host-passthrough", false, "Expose host/base-image tools as a fallback (forfeits host-tools-unreachable)")
+	runCmd.Flags().StringSliceVar(&flagInitCommand, "init-command", []string{}, "Init command to run before the agent for --provision command (repeatable)")
+	runCmd.Flags().StringVar(&flagNixSource, "nix-source", "packages", "Nix source for --provision nix (packages, flake)")
+	runCmd.Flags().StringVar(&flagNixRev, "nix-rev", "", "Pinned nixpkgs rev for --nix-source packages")
+	runCmd.Flags().StringSliceVar(&flagNixPackages, "nix-packages", []string{}, "Packages for --nix-source packages (repeatable)")
+	runCmd.Flags().StringVar(&flagNixShell, "nix-shell", "default", "devShell name for --nix-source flake")
 	runCmd.Flags().StringVarP(&flagWorkDir, "work-dir", "w", "", "Working directory")
 	runCmd.Flags().StringVar(&flagWorktreeBranch, "worktree-branch", "", "Create worktree with branch name")
 	runCmd.Flags().StringVar(&flagWorktreeSourceBranch, "worktree-source-branch", "", "Source branch for worktree")
@@ -67,10 +82,7 @@ func init() {
 	runCmd.Flags().StringSliceVar(&flagBind, "bind", []string{}, "Read-write bind mount")
 	runCmd.Flags().StringSliceVar(&flagRoBind, "ro-bind", []string{}, "Read-only bind mount")
 	runCmd.Flags().StringSliceVar(&flagEnv, "env", []string{}, "Environment variables (KEY=VALUE)")
-	runCmd.Flags().BoolVarP(&flagNetwork, "network", "N", true, "Enable network access")
-	runCmd.Flags().StringVar(&flagImage, "image", "", "Container image (for docker/nix sandboxes)")
-	runCmd.Flags().StringVar(&flagComposeFile, "compose-file", "", "Docker Compose file (for compose sandbox)")
-	runCmd.Flags().StringVar(&flagService, "service", "", "Docker Compose service (for compose sandbox)")
+	runCmd.Flags().StringVar(&flagImage, "image", "", "Container image (for docker isolation)")
 	runCmd.Flags().StringVarP(&flagTerminal, "terminal", "t", "", "Terminal wrapper (tmux)")
 	runCmd.Flags().StringVar(&flagTerminalSession, "terminal-session", "", "Custom tmux session name")
 	runCmd.Flags().StringVar(&flagTerminalWindow, "terminal-window", "", "Custom tmux window name")
@@ -78,13 +90,12 @@ func init() {
 	runCmd.Flags().StringVar(&flagVCS, "vcs", "git", "VCS type for worktree (git, jj)")
 	runCmd.Flags().BoolVarP(&flagDryRun, "dry-run", "n", false, "Show configuration without executing")
 	runCmd.Flags().BoolVar(&flagRequirePinned, "require-pinned-toolchain", false,
-		"Mandate the nix(flake) tier; reject leaky bwrap/none and image-less docker/compose")
+		"Mandate pinned provisioning + host-tools-unreachable; reject leaky/host-exposed cells")
 }
 
 func runAgent(cmd *cobra.Command, args []string) error {
 	verbose, _ := cmd.Flags().GetBool("verbose")
 
-	// Get agent
 	agent, err := agents.GetAgent(types.AgentType(flagAgent))
 	if err != nil {
 		scriptlib.LogError(err.Error())
@@ -92,19 +103,16 @@ func runAgent(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	// Load config file
 	fileConfig, err := config.LoadConfigFile(flagConfig)
 	if err != nil {
 		return fmt.Errorf("failed to load config: %w", err)
 	}
 
-	// Get provider if specified
 	var provider *types.ModelProvider
 	providerName := flagProvider
 	if providerName == "" && fileConfig.Provider != "" {
 		providerName = fileConfig.Provider
 	}
-
 	if providerName != "" {
 		provider, err = providers.GetProvider(providerName, agent.Type)
 		if err != nil {
@@ -114,7 +122,6 @@ func runAgent(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	// Resolve work directory
 	workDir := flagWorkDir
 	if workDir == "" {
 		workDir, _ = os.Getwd()
@@ -122,8 +129,6 @@ func runAgent(cmd *cobra.Command, args []string) error {
 	workDir, _ = filepath.Abs(workDir)
 
 	var sourceRepoDir string
-
-	// Validate and setup worktree if requested
 	if flagWorktreeBranch != "" {
 		if err := validation.ValidateBranch(flagWorktreeBranch); err != nil {
 			return fmt.Errorf("invalid --worktree-branch: %w", err)
@@ -144,141 +149,147 @@ func runAgent(cmd *cobra.Command, args []string) error {
 			wtDir = sharedworktree.GetDefaultDir(flagWorktreeBranch, repoName)
 		}
 
-		wtConfig := worktree.Config{
+		newWorkDir, err := worktree.Setup(worktree.Config{
 			SourceBranch: flagWorktreeSourceBranch,
 			Branch:       flagWorktreeBranch,
 			Dir:          wtDir,
 			VCS:          vcsType,
-		}
-
-		newWorkDir, err := worktree.Setup(wtConfig, workDir, verbose)
+		}, workDir, verbose)
 		if err != nil {
 			return err
 		}
-
 		sourceRepoDir = workDir
 		workDir = newWorkDir
 	}
 
-	// Build bind paths with worktree
 	bindPaths := worktree.BuildBindPaths(flagBind, sourceRepoDir)
 
-	// Get sandbox executor
-	sandboxMethod := types.SandboxMethod(flagSandbox)
-	if flagRequirePinned && !cmd.Flags().Changed("sandbox") {
-		// Mandate the pinned tier when the caller did not pick one explicitly.
-		sandboxMethod = types.SandboxNixFlake
-	}
-	// The legacy --require-pinned-toolchain flag bundled pinned provisioning with
-	// host-tools-unreachable; map it onto both decoupled guarantees.
+	// --require-pinned-toolchain mandates pinned provisioning + host-tools-unreachable.
 	policy := types.SandboxPolicy{
-		RequirePinnedProvisioning:   flagRequirePinned,
+		RequirePinnedProvision:      flagRequirePinned,
 		RequireHostToolsUnreachable: flagRequirePinned,
 	}
-	sandboxExecutor, sandboxMethod, err := sandbox.SelectExecutor(sandboxMethod, flagImage, policy)
+
+	iso, prov, net, passthrough, err := resolveAxes(cmd, policy)
 	if err != nil {
 		return err
 	}
 
-	// Map the legacy boolean --network flag onto the network-egress axis.
-	network := types.NetworkNone
-	if flagNetwork {
-		network = types.NetworkHost
-	}
+	// runtime is the container runtime (e.g. runsc for gVisor); default runc gives
+	// no kernel boundary. No flag wires a sandboxed runtime in this build.
+	const runtime = ""
 
-	// Check availability
-	available, err := sandboxExecutor.IsAvailable()
-	if err != nil || !available {
-		availableMethods := sandbox.GetAvailableMethods()
-		scriptlib.LogError(fmt.Sprintf("Sandbox method %s is not available", flagSandbox))
-		scriptlib.LogInfo(fmt.Sprintf("Available methods: %v", availableMethods))
-		return fmt.Errorf("sandbox method %s is not available", flagSandbox)
-	}
-
-	// Build sandbox config (used by both sandbox and terminal wrapper)
-	sandboxConfig := &types.SandboxConfig{
-		Method:      sandboxMethod,
-		Policy:      policy,
-		Agent:       agent,
-		Provider:    provider,
-		WorkDir:     workDir,
-		RepoDir:     sourceRepoDir,
-		Network:     network,
-		BindPaths:   bindPaths,
-		RoBindPaths: flagRoBind,
-		CustomEnv:   flagEnv,
-		AgentArgs:   args,
-		Verbose:     verbose,
+	reg := plugins.DefaultRegistry()
+	req := sandbox.Request{
+		Isolation:   iso,
+		Provision:   prov,
+		Network:     net,
+		Passthrough: passthrough,
+		Runtime:     runtime,
 		Image:       flagImage,
-		ComposeFile: flagComposeFile,
-		Service:     flagService,
 	}
-
-	// Handle dry-run mode
-	if flagDryRun {
-		return printDryRun(sandboxMethod, sandboxExecutor, sandboxConfig, agent, provider, args, workDir, verbose)
-	}
-
-	// Check if terminal wrapper is requested
-	if flagTerminal != "" {
-		return executeWithTerminal(sandboxMethod, sandboxExecutor, sandboxConfig, agent, provider, args, workDir, verbose)
-	}
-
-	// For "none" sandbox, use direct execution for simplicity
-	if sandboxMethod == types.SandboxNone {
-		execOpts := executor.Options{
-			Agent:     agent,
-			Provider:  provider,
-			Args:      args,
-			Cwd:       workDir,
-			Verbose:   verbose,
-			Sandbox:   false,
-			CustomEnv: flagEnv,
-		}
-
-		exitCode, err := executor.Execute(execOpts)
-		if err != nil {
-			return err
-		}
-
-		if exitCode != 0 {
-			os.Exit(exitCode)
-		}
-
-		return nil
-	}
-
-	// Execute via sandbox
-	exitCode, err := sandboxExecutor.Execute(sandboxConfig)
+	isolator, provisioner, err := sandbox.Select(reg, req, policy)
 	if err != nil {
 		return err
 	}
 
+	available, err := isolator.Available()
+	if err != nil || !available {
+		scriptlib.LogError(fmt.Sprintf("Isolation method %s is not available", iso))
+		scriptlib.LogInfo(fmt.Sprintf("Available isolations: %v", sandbox.AvailableIsolations(reg)))
+		return fmt.Errorf("isolation method %s is not available", iso)
+	}
+
+	sandboxConfig := &types.SandboxConfig{
+		Isolation:           iso,
+		Provision:           prov,
+		Network:             net,
+		HostPassthrough:     passthrough,
+		EgressAllowlist:     append(append([]string{}, types.DefaultEgressAllowlist...), flagEgressAllow...),
+		Policy:              policy,
+		Agent:               agent,
+		Provider:            provider,
+		WorkDir:             workDir,
+		RepoDir:             sourceRepoDir,
+		BindPaths:           bindPaths,
+		RoBindPaths:         flagRoBind,
+		CustomEnv:           flagEnv,
+		AgentArgs:           args,
+		SandboxInitCommands: flagInitCommand,
+		Verbose:             verbose,
+		Image:               flagImage,
+		NixSourceKind:       flagNixSource,
+		NixRev:              flagNixRev,
+		NixPackages:         flagNixPackages,
+		NixShell:            flagNixShell,
+	}
+
+	contribution, err := provisioner.Contribute(sandboxConfig)
+	if err != nil {
+		return err
+	}
+
+	if flagDryRun {
+		return printDryRun(iso, isolator, sandboxConfig, contribution, agent, provider, args, workDir)
+	}
+
+	if flagTerminal != "" {
+		return executeWithTerminal(iso, isolator, sandboxConfig, contribution, agent, provider, args, workDir, verbose)
+	}
+
+	exitCode, err := isolator.Run(sandboxConfig, contribution)
+	if err != nil {
+		return err
+	}
 	if exitCode != 0 {
 		os.Exit(exitCode)
 	}
-
 	return nil
 }
 
-// executeWithTerminal handles execution when a terminal wrapper is requested
-func executeWithTerminal(sandboxMethod types.SandboxMethod, sandboxExecutor types.SandboxExecutor, sandboxConfig *types.SandboxConfig, agent *types.AgentConfig, provider *types.ModelProvider, args []string, workDir string, verbose bool) error {
+// resolveAxes determines the three axes from the flags. Isolation and provision
+// are passed through verbatim — the registry is the source of truth for valid
+// methods (Select rejects unregistered ones), keeping the method set pluggable.
+// Network is a closed enum, validated here.
+func resolveAxes(cmd *cobra.Command, policy types.SandboxPolicy) (types.IsolationMethod, types.ProvisionMethod, types.NetworkMethod, bool, error) {
+	net, err := parseNetwork(flagNetwork)
+	if err != nil {
+		return "", "", "", false, err
+	}
+
+	// Mandate the pinned combo when a pinned toolchain is required but no cell was
+	// chosen explicitly.
+	if policy.RequirePinnedProvision && !cmd.Flags().Changed("isolation") && !cmd.Flags().Changed("provision") {
+		return types.IsolationBwrap, types.ProvisionNix, net, flagHostPassthrough, nil
+	}
+
+	return types.IsolationMethod(flagIsolation), types.ProvisionMethod(flagProvision), net, flagHostPassthrough, nil
+}
+
+func parseNetwork(s string) (types.NetworkMethod, error) {
+	switch types.NetworkMethod(s) {
+	case types.NetworkHost, types.NetworkNone, types.NetworkProxy:
+		return types.NetworkMethod(s), nil
+	default:
+		return "", fmt.Errorf("unknown --network %q; valid: host, none, proxy", s)
+	}
+}
+
+// executeWithTerminal handles execution when a terminal wrapper is requested.
+func executeWithTerminal(iso types.IsolationMethod, isolator sandbox.Isolator, sandboxConfig *types.SandboxConfig, contribution types.Contribution, agent *types.AgentConfig, provider *types.ModelProvider, args []string, workDir string, verbose bool) error {
 	terminalType := types.TerminalType(flagTerminal)
 	terminalExecutor := wrapper.GetExecutor(terminalType)
-
 	if terminalExecutor == nil {
 		availableTypes := wrapper.GetAvailableTypes()
 		scriptlib.LogError(fmt.Sprintf("Unknown terminal type: %s", flagTerminal))
 		scriptlib.LogInfo(fmt.Sprintf("Available types: %v", availableTypes))
 		return fmt.Errorf("unknown terminal type: %s", flagTerminal)
 	}
-
 	if !terminalExecutor.IsAvailable() {
 		scriptlib.LogError(fmt.Sprintf("Terminal type %s is not available (not installed)", flagTerminal))
 		return fmt.Errorf("terminal type %s is not available", flagTerminal)
 	}
 
-	// Build terminal config
 	terminalConfig := &types.TerminalConfig{
 		Type:        terminalType,
 		SessionName: flagTerminalSession,
@@ -286,18 +297,13 @@ func executeWithTerminal(sandboxMethod types.SandboxMethod, sandboxExecutor type
 		Detach:      flagTerminalDetach,
 	}
 
-	// Build the full command and environment
 	var fullCommand []string
 	var env []string
-
-	if sandboxMethod == types.SandboxNone {
-		// Build direct agent command
-		fullCommand = buildDirectCommand(agent, provider, args, sandboxConfig.CustomEnv)
+	if iso == types.IsolationNone {
+		fullCommand = buildDirectCommand(agent, provider, args)
 		env = buildDirectEnv(agent, provider, sandboxConfig.CustomEnv)
 	} else {
-		// Use sandbox's GetCommand to get the full wrapped command
-		fullCommand = sandboxExecutor.GetCommand(sandboxConfig)
-		// For sandbox execution, environment is handled by the sandbox
+		fullCommand = isolator.Command(sandboxConfig, contribution)
 		env = os.Environ()
 		env = append(env, sandboxConfig.CustomEnv...)
 	}
@@ -306,30 +312,23 @@ func executeWithTerminal(sandboxMethod types.SandboxMethod, sandboxExecutor type
 		scriptlib.LogInfo("Using terminal wrapper: " + flagTerminal)
 	}
 
-	// Execute via terminal wrapper
 	exitCode, err := terminalExecutor.Execute(terminalConfig, fullCommand, env, workDir, verbose)
 	if err != nil {
 		return err
 	}
-
 	if exitCode != 0 {
 		os.Exit(exitCode)
 	}
-
 	return nil
 }
 
-// buildDirectCommand builds the command for direct (non-sandbox) execution
-func buildDirectCommand(agent *types.AgentConfig, provider *types.ModelProvider, args []string, customEnv []string) []string {
+// buildDirectCommand builds the command for direct (no-isolation) execution.
+func buildDirectCommand(agent *types.AgentConfig, provider *types.ModelProvider, args []string) []string {
 	var providerCliArgs []string
 	if provider != nil {
 		providerCliArgs = providers.GetProviderCliArgs(provider)
 	}
-
-	execOpts := types.AgentExecOptions{
-		Sandbox:         false,
-		ProviderCliArgs: providerCliArgs,
-	}
+	execOpts := types.AgentExecOptions{Sandbox: false, ProviderCliArgs: providerCliArgs}
 
 	var agentArgs []string
 	switch agent.Type {
@@ -342,11 +341,10 @@ func buildDirectCommand(agent *types.AgentConfig, provider *types.ModelProvider,
 	cmd := make([]string, 0, 1+len(agentArgs))
 	cmd = append(cmd, agent.Binary)
 	cmd = append(cmd, agentArgs...)
-
 	return cmd
 }
 
-// buildDirectEnv builds the environment for direct (non-sandbox) execution
+// buildDirectEnv builds the environment for direct (no-isolation) execution.
 func buildDirectEnv(agent *types.AgentConfig, provider *types.ModelProvider, customEnv []string) []string {
 	var providerEnv map[string]string
 	if provider != nil {
@@ -366,15 +364,14 @@ func buildDirectEnv(agent *types.AgentConfig, provider *types.ModelProvider, cus
 		env = append(env, k+"="+v)
 	}
 	env = append(env, customEnv...)
-
 	return env
 }
 
-// printDryRun displays what would be executed without actually running it
-func printDryRun(sandboxMethod types.SandboxMethod, sandboxExecutor types.SandboxExecutor, sandboxConfig *types.SandboxConfig, agent *types.AgentConfig, provider *types.ModelProvider, args []string, workDir string, verbose bool) error {
+// printDryRun displays what would be executed without running it.
+func printDryRun(iso types.IsolationMethod, isolator sandbox.Isolator, sandboxConfig *types.SandboxConfig, contribution types.Contribution, agent *types.AgentConfig, provider *types.ModelProvider, args []string, workDir string) error {
 	scriptlib.LogInfo("Dry run - would execute:")
 
-	if sandboxMethod == types.SandboxNone {
+	if iso == types.IsolationNone {
 		scriptlib.LogInfo("  Agent: " + agent.DisplayName)
 		if provider != nil {
 			scriptlib.LogInfo("  Provider: " + provider.DisplayName)
@@ -385,14 +382,11 @@ func printDryRun(sandboxMethod types.SandboxMethod, sandboxExecutor types.Sandbo
 		} else {
 			scriptlib.LogInfo("  Arguments: (none)")
 		}
-		return nil
 	}
 
-	// Get the full command from the sandbox executor
-	command := sandboxExecutor.GetCommand(sandboxConfig)
+	command := isolator.Command(sandboxConfig, contribution)
 	if len(command) > 0 {
 		fmt.Println(strings.Join(command, " "))
 	}
-
 	return nil
 }

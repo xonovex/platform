@@ -1,0 +1,48 @@
+# Namespace-scoped guardrails for agent pods. Apply to the namespace where
+# AgentRuns execute. They bound node-DoS for untrusted, model-generated code:
+# the LimitRange supplies per-container defaults/ceilings, the ResourceQuota caps
+# aggregate namespace usage. The operator also creates a zero-RBAC ServiceAccount
+# (agent-runner) at reconcile; this manifest declares it for GitOps parity.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: agent-runner
+  labels:
+    app.kubernetes.io/name: agent-operator
+    app.kubernetes.io/component: agent-serviceaccount
+automountServiceAccountToken: false
+---
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: agent-limits
+  labels:
+    app.kubernetes.io/name: agent-operator
+    app.kubernetes.io/component: agent-limits
+spec:
+  limits:
+    - type: Container
+      default:
+        cpu: "2"
+        memory: 4Gi
+      defaultRequest:
+        cpu: 250m
+        memory: 512Mi
+      max:
+        cpu: "4"
+        memory: 8Gi
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: agent-quota
+  labels:
+    app.kubernetes.io/name: agent-operator
+    app.kubernetes.io/component: agent-quota
+spec:
+  hard:
+    pods: "20"
+    requests.cpu: "8"
+    requests.memory: 16Gi
+    limits.cpu: "32"
+    limits.memory: 64Gi

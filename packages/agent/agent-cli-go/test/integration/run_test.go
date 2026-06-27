@@ -31,7 +31,9 @@ func TestRunCommand_Help(t *testing.T) {
 		"Run an AI coding agent",
 		"--agent",
 		"--provider",
-		"--sandbox",
+		"--isolation",
+		"--provision",
+		"--network",
 		"--work-dir",
 		"--worktree-branch",
 		"--config",
@@ -72,19 +74,18 @@ func TestRunCommand_InvalidAgent(t *testing.T) {
 	}
 }
 
-func TestRunCommand_InvalidSandbox(t *testing.T) {
-	cmd := exec.Command(binaryPath, "run", "-s", "invalid-sandbox-xyz")
+func TestRunCommand_InvalidIsolation(t *testing.T) {
+	cmd := exec.Command(binaryPath, "run", "--isolation", "invalid-isolation-xyz")
 	output, err := cmd.CombinedOutput()
 
-	// Should fail with error
+	// Should fail closed: the registry has no isolator for the unknown method.
 	if err == nil {
-		t.Errorf("Expected error for invalid sandbox, got nil")
+		t.Errorf("Expected error for invalid isolation, got nil")
 	}
 
-	// Should mention the invalid method (either "unknown sandbox method" or "not available")
 	outputStr := string(output)
-	if !strings.Contains(outputStr, "invalid-sandbox-xyz") {
-		t.Errorf("Expected error mentioning invalid sandbox, got: %s", output)
+	if !strings.Contains(outputStr, "invalid-isolation-xyz") {
+		t.Errorf("Expected error mentioning the invalid isolation, got: %s", output)
 	}
 }
 
@@ -103,18 +104,18 @@ func TestRunCommand_Agents(t *testing.T) {
 	}
 }
 
-func TestRunCommand_SandboxMethods(t *testing.T) {
-	methods := []string{"none", "bwrap", "docker", "compose", "nix"}
+func TestRunCommand_IsolationMethods(t *testing.T) {
+	methods := []string{"none", "bwrap", "docker"}
 
 	for _, method := range methods {
 		t.Run(method, func(t *testing.T) {
-			// Test that the sandbox is recognized (even if not available)
-			cmd := exec.Command(binaryPath, "run", "-s", method, "--help")
+			// Test that the isolation axis is recognized (even if not available).
+			cmd := exec.Command(binaryPath, "run", "--isolation", method, "--help")
 			_, err := cmd.CombinedOutput()
 
 			// Help should always work
 			if err != nil {
-				t.Errorf("Sandbox %s help failed: %v", method, err)
+				t.Errorf("Isolation %s help failed: %v", method, err)
 			}
 		})
 	}

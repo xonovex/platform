@@ -9,18 +9,19 @@ digraph Overview {
   node [shape=box, style="filled", fontname="Helvetica", fontsize=11, width=1.4, height=0.4];
   edge [fontname="Helvetica", fontsize=9];
 
-  label="AI Agent Sandbox Isolation Spectrum";
+  label="AI Agent Sandbox: Isolation Axis (1 of 3 orthogonal axes)";
   labelloc=t;
   fontsize=14;
   fontname="Helvetica-Bold";
 
-  // Column headers
+  // Column headers — the ISOLATION axis. Provision {none,nix,command} and
+  // Network {host,none,proxy} are ORTHOGONAL axes, not points on this spectrum.
   subgraph {
     rank=same;
     h1 [label="None", shape=plaintext, fontsize=10, fontname="Helvetica-Bold"];
     h2 [label="Bubblewrap", shape=plaintext, fontsize=10, fontname="Helvetica-Bold"];
-    h3 [label="Docker", shape=plaintext, fontsize=10, fontname="Helvetica-Bold"];
-    h4 [label="Nix + bwrap", shape=plaintext, fontsize=10, fontname="Helvetica-Bold"];
+    h3 [label="Docker\n(runc)", shape=plaintext, fontsize=10, fontname="Helvetica-Bold"];
+    h4 [label="bwrap\n+ nix (provisioned)", shape=plaintext, fontsize=10, fontname="Helvetica-Bold"];
     h5 [label="gVisor", shape=plaintext, fontsize=10, fontname="Helvetica-Bold"];
     h6 [label="Kata / CoCo", shape=plaintext, fontsize=10, fontname="Helvetica-Bold"];
   }
@@ -110,4 +111,16 @@ digraph Overview {
   // Isolation arrow
   arrow_label [label="Isolation strength →", shape=plaintext, fontsize=10, fontcolor="#546E7A"];
   hw1 -> arrow_label [style=invis];
+
+  // Three-axis model + policy footnote.
+  caption [shape=note, fillcolor="#ECEFF1", fontsize=9, fontname="Helvetica", label=<
+    <b>Three orthogonal axes:</b> Isolation {none, bwrap, docker} (above) ×<br/>
+    Provision {none, nix, command} × Network {host, none, proxy}, + hostPassthrough.<br/>
+    <b>Four guarantees (fail closed):</b> RequirePinnedProvision, RequireHostToolsUnreachable,<br/>
+    RequireEgressRestricted (Network ∈ none/proxy), RequireKernelIsolation (gVisor/Kata, NOT bwrap/runc).<br/>
+    <b>Threat model:</b> untrusted model-generated code. bwrap/runc = attack-surface reduction, not a<br/>
+    kernel boundary; "host tools unreachable" ≠ "host unreachable". CLI binds the resolved closure;<br/>
+    operator bakes the SAME content-addressed closure into a streamLayeredImage OCI image.
+  >];
+  arrow_label -> caption [style=invis];
 }

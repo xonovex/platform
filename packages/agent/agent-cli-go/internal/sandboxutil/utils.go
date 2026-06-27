@@ -10,13 +10,22 @@ import (
 	"github.com/xonovex/platform/packages/shared/shared-core-go/pkg/shell"
 )
 
-// SpawnSandbox spawns a sandbox process and waits for completion
+// SpawnSandbox spawns a sandbox process and waits for completion. The process
+// inherits the caller's working directory; isolators that need a specific cwd
+// (e.g. host execution) use SpawnSandboxInDir.
 func SpawnSandbox(command string, args []string, env []string, errorPrefix string, verbose bool) (int, error) {
+	return SpawnSandboxInDir(command, args, env, "", errorPrefix, verbose)
+}
+
+// SpawnSandboxInDir spawns a process in dir (empty = inherit the caller's cwd)
+// and waits for completion, returning the child exit code.
+func SpawnSandboxInDir(command string, args []string, env []string, dir string, errorPrefix string, verbose bool) (int, error) {
 	if verbose {
 		scriptlib.LogDebug(verbose, fmt.Sprintf("Executing: %s %s", command, strings.Join(args, " ")))
 	}
 
 	cmd := exec.Command(command, args...)
+	cmd.Dir = dir
 	cmd.Env = env
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout

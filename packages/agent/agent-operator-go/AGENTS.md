@@ -6,6 +6,9 @@
 - **AgentWorkspace** — shared RWX PVC for multi-agent coordination (git worktrees, shared config volumes)
 - **AgentToolchain** — toolchain config (e.g. Nix packages)
 
+- **Nix toolchain = nix-built OCI image** (not a per-pod install): `NixSpec` carries a pin (`nixpkgsRev`), a source (`packages` XOR `flakeRef`/`shell`), and a pre-built digest-pinned `image`. The pod runs that image (built from the same `flake.lock` + `nix/agent-env.nix` as the CLI — the SAME content-addressed store-path closure, verified via `nix path-info -r`, not byte-identical layers). Build/push the image with `npx moon run agent-operator-go:agent-image-build` (→ `nix build .#legacyPackages.<sys>.agentImage` + skopeo push). The webhook requires a pinned image (`RequirePinnedProvision`); there is no `nixos/nix` init container or `nix-env` emptyDir.
+- **Untrusted-pod hardening** (fail closed): a sandboxed `runtimeClassName` via the existing `DefaultRuntimeClassName`/`AllowedRuntimeClassNames` machinery (set it on the harness — `RequireKernelIsolation`, never default runc); a dedicated zero-RBAC ServiceAccount (`agent-runner`, created by the controller) with `automountServiceAccountToken=false`; default resource requests/limits + the namespace `LimitRange`/`ResourceQuota` in `config/agent/`; a default-deny egress `NetworkPolicy` per `AgentRun` mapped from `Network` (`none`=DNS-only, `proxy`=public-except-metadata/RFC1918/loopback + DNS, `host`=allow-all), FQDN-aware via Cilium `toFQDNs`/Squid as the upgrade; `readOnlyRootFilesystem=true` reconciled with a writable HOME `emptyDir` + `fsGroup=1000`.
+
 - Unit: `go test ./...` (builders, resolvers, webhooks)
 - Integration: `go test -tags=integration ./test/integration/` (requires `KUBEBUILDER_ASSETS`)
 - E2E: `go test -tags=e2e ./test/e2e/` (requires Docker, kind, kubectl)

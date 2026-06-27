@@ -23,8 +23,12 @@ The included skills are token-efficient, harness-neutral, and based on current r
 
 ```bash
 npm install -g @xonovex/agent-cli-go
-agent-cli run --agent claude --sandbox bwrap --provider gemini
+agent-cli run --agent claude --isolation bwrap --provider gemini
 ```
+
+The sandbox is selected by three orthogonal axes — `--isolation {none,bwrap,docker}` ×
+`--provision {none,nix,command}` × `--network {host,none,proxy}` — see
+`packages/agent/AGENTS.md`.
 
 ### Agent Kubernetes Operator
 

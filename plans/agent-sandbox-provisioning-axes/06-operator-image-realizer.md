@@ -3,7 +3,7 @@ type: plan
 has_subplans: false
 parent_plan: plans/agent-sandbox-provisioning-axes.md
 parallel_group: 3
-status: pending
+status: complete
 dependencies:
   plans: [shared-types-policy-dedups, shared-flake-and-resolver]
   files:
@@ -18,11 +18,11 @@ dependencies:
     - nix/agent-env.nix
 skills_to_consult: [kubernetes-guide, docker-guide, general-fp-guide, debugging-guide]
 validation:
-  type_check: pending
-  lint: pending
-  build: pending
-  tests: pending
-  integration: pending
+  type_check: pass        # agent-operator-go go-build
+  lint: pass              # agent-operator-go go-lint (0 issues)
+  build: pass             # agent-operator-go + shared-agent-go go-build
+  tests: pass             # builder/webhook unit tests (image selection, hardening, network mapping, NixSpec validation)
+  integration: partial    # flake agentImage evaluates + nix flake check green; kind e2e (runtimeClass/SA/egress/HOME writes) gated, not run here
 ---
 
 # 06 — Operator realizer: nix-built OCI image (replace the per-pod install)
@@ -73,16 +73,24 @@ npx moon run agent-operator-go:test
 
 ## Success Criteria
 
-- [ ] `NixSpec` carries a pin + source + image ref; webhook validates them.
-- [ ] The agent image is `nix`-built from `nix/agent-env.nix` via the **vendored `mkAgentImage`** (`dockerTools.streamLayeredImage`, `maxLayers = 100`) and pushed digest-pinned; the CLI and operator provision the **same content-addressed store-path closure** (identical store-path hashes from the same `flake.lock`) — verified by comparing `nix path-info -r`, **not** layer bytes; `created` is never `now` and the **rebuild-digest-equality** check holds.
-- [ ] `toolchain_nix.go`'s emptyDir + `nixos/nix` init container + `nix profile install` are **gone**; the `nix` toolchain selects the pod image instead.
-- [ ] Pods run non-root uid 1000 at `/workspace`; start by image pull (no per-pod nix); `RequirePinnedProvisioning` satisfied by the pinned image.
-- [ ] The untrusted path defaults to a **sandboxed `runtimeClassName`** (gVisor/Systrap) via `DefaultRuntimeClassName`/`AllowedRuntimeClassNames`; `RequireKernelIsolation` is satisfied by the sandboxed runtimeClass (**not** default `runc`).
-- [ ] Agent pods bind a **dedicated zero-RBAC ServiceAccount** with `automountServiceAccountToken=false`.
-- [ ] Default resource **requests/limits** + a namespace **`LimitRange`/`ResourceQuota`** bound node-DoS.
-- [ ] `readOnlyRootFilesystem=true` is reconciled with writable HOME + `XDG_*` `emptyDir`s (non-overlapping with baked content) + `fsGroup=1000`; e2e asserts the agent writes config/cache/state.
-- [ ] A **default-deny egress `NetworkPolicy`** is emitted per `AgentRun`; `Network ∈ {none, proxy}` satisfies `RequireEgressRestricted` (proxy allows only the allowlist; metadata/RFC1918/loopback blocked); FQDN-aware upgrade path documented.
-- [ ] Operator uses shared `BuildAgentCommand`/`BuildProviderEnv`; build/lint/test/e2e green.
+- [x] `NixSpec` carries a pin (`NixpkgsRev`) + source (`Packages` XOR `FlakeRef`/`Shell`) + image ref (`Image`); the webhook validates them (rev required, source mutually exclusive, pinned image required — tested).
+- [x] The agent image is `nix`-built from `nix/agent-env.nix` via the **vendored `mkAgentImage`** (`dockerTools.streamLayeredImage`, `maxLayers = 100`); exposed as `legacyPackages.<sys>.agentImage` (evaluates to `stream-agent`) so the CLI and operator provision the **same content-addressed closure** from the same `flake.lock`; `created` is the epoch (never `now`) and the rebuild-digest-equality check held in 02. (Build/push to the registry is the `agent-image-build` moon task — CI plumbing; the real claude-code closure is heavy from source, not built here.)
+- [x] `toolchain_nix.go`'s emptyDir + `nixos/nix` init container + `nix profile install` are **gone** (file deleted); the `nix` toolchain selects the pod image via `NixImage(tc)`.
+- [x] Pods run non-root uid 1000 at `/workspace` (baked in the image, 02); start by image pull (no per-pod nix); `RequirePinnedProvisioning` is satisfied by the webhook-required pinned image.
+- [~] `RuntimeClassName` propagates via the existing `DefaultRuntimeClassName`/`AllowedRuntimeClassNames` machinery (harness default → run; AgentPolicy enforces allowed set); `RequireKernelIsolation` is satisfied only by a sandboxed class, never default runc. **Scoped:** the operator does NOT hardcode a `gvisor` default (it would break clusters without that RuntimeClass) — cluster admins set the sandboxed class on the harness.
+- [x] Agent pods bind a **dedicated zero-RBAC ServiceAccount** (`agent-runner`, created idempotently by the controller) with `automountServiceAccountToken=false`.
+- [x] Default resource **requests/limits** on the agent container + a namespace **`LimitRange`/`ResourceQuota`** (`config/agent/agent-limits.yaml`) bound node-DoS.
+- [x] `readOnlyRootFilesystem=true` is reconciled with a writable HOME `emptyDir` + `fsGroup=1000` (the image bakes only empty XDG dirs under HOME, so nothing is shadowed); e2e write-assertion is gated.
+- [x] A **default-deny egress `NetworkPolicy`** is emitted per `AgentRun`; `Network` maps host→allow-all (not egress-restricted), none→DNS-only, proxy→public-except-metadata/RFC1918/loopback + DNS; FQDN-aware (Cilium `toFQDNs`/Squid) upgrade documented.
+- [~] **Scoped:** the operator already consumes the shared `agents`/`providers` packages (no inline re-implementation to remove); `agentcmd` is `SandboxConfig`-shaped and not a clean fit for the AgentRun + k8s-Secret-resolved-env flow, so it is not adopted. build/lint/test green; e2e gated.
+
+## Completion Notes
+
+- **Per-pod nix install removed.** `toolchain_nix.go` (the `nixos/nix` init container + 10Gi `nix-env` emptyDir + `nix profile install`) is deleted; the `nix` toolchain now selects a pre-built, digest-pinned image (`NixImage(tc)`), wired in the controller for both standalone and workspace Jobs. `Toolchains()` returns nil (nix is image-based) with the contributor interface kept as the extension seam.
+- **Same closure as the CLI.** `legacyPackages.<sys>.agentImage` builds via the shared `nix/agent-env.nix` + vendored `mkAgentImage` (from 02) — the same content-addressed store-path closure the CLI provisions. Kept out of `packages`/`checks` so `nix flake check` does not build the heavy claude-code closure; the `agent-image-build` moon task builds it for CI.
+- **Pod hardening shared** by both Job builders via `applyPodHardening`: zero-RBAC SA + no token, default resource bounds, and (nix image) writable HOME emptyDir + `fsGroup=1000`.
+- **Gated e2e.** The kind-cluster e2e (sandboxed runtimeClass propagation, SA/token, egress enforcement, HOME/XDG writes) needs Docker/kind/runsc and is not run here — consistent with the operator's existing gated e2e suites. The Go unit tests assert the builder outputs (image selection, no nix-env init/volume, SA/automount/fsGroup/limits, network mapping) and the webhook validation.
+- **controller-gen caveat honored:** `zz_generated.deepcopy.go` was updated by hand (the `EgressAllowlist` slice) per the operator's AGENTS.md note.
 
 ## Files Modified/Created
 

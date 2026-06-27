@@ -3,7 +3,7 @@ type: plan
 has_subplans: false
 parent_plan: plans/agent-sandbox-provisioning-axes.md
 parallel_group: 2
-status: pending
+status: complete
 dependencies:
   plans: [shared-types-policy-dedups]
   files:
@@ -17,11 +17,11 @@ dependencies:
     - packages/agent/agent-cli-go/internal/sandboxutil/utils.go
 skills_to_consult: [general-fp-guide, debugging-guide]
 validation:
-  type_check: pending
-  lint: pending
-  build: pending
-  tests: pending
-  integration: pending
+  type_check: pass        # agent-cli-go go-build
+  lint: pass              # agent-cli-go go-lint (0 issues)
+  build: pass             # agent-cli-go go-build (02 break resolved: nix/nixflake collapsed)
+  tests: pass             # agent-cli-go go-test (Select/policy/alias, isolator hardening, network, provisioners)
+  integration: pass       # gated bwrap --unshare-net egress block verified live
 ---
 
 # 03 — CLI `Isolator × Provisioner` composition core
@@ -81,15 +81,22 @@ agent-cli-go run --isolation docker --network proxy --egress-allow github.com --
 
 ## Success Criteria
 
-- [ ] `Isolator`/`Provisioner` interfaces + `Select` exist; the curated matrix + policy are enforced at selection.
-- [ ] `bwrap`/`docker`/`none` isolators consume a `Contribution`; `hostPassthrough` toggles host/base-image bleed-through; the leaky/deny-default bwrap split is one isolator + the knob.
-- [ ] Every isolator applies `cfg.Network` EXPLICITLY (`--unshare-net` / `--network none` / proxy injection); the regression guard holds — collapsing nix/nixflake into `bwrap` does NOT silently drop today's `--unshare-net`.
-- [ ] bwrap deny-default hardening: sandbox-local HOME (no host-`$HOME` bind), `--dev /dev` (not `--dev-bind /dev`), `--clearenv` + `--setenv` allowlist, `no-new-privs` + `cap-drop ALL` asserted.
-- [ ] docker security DEFAULTS: `no-new-privileges`, `--cap-drop ALL`, default seccomp (never `unconfined`), `apparmor=docker-default`, `--read-only` + `--tmpfs /tmp` + workdir-only writable, `--pids-limit`/`--memory`/`--cpus`; no whole-`$HOME` rw mount.
-- [ ] `IsolationHidesHost` is conditioned (closure-only binds + no host-`$HOME` + pinned image), not a naive `docker→true`.
-- [ ] `none` + `command` provisioners work; the dormant `WrapWithInitCommands` is wired.
-- [ ] `--isolation`/`--provision`/`--network`/`--egress-allow`/`--host-passthrough`/`--init-command` flags work; `--sandbox` still works as a mapped alias (legacy → `Network=host`).
-- [ ] build/lint/test green.
+- [x] `Isolator`/`Provisioner` interfaces + `Select` exist (`internal/sandbox/{isolator,provisioner}.go`); the curated matrix + policy are enforced at selection (`Select` calls shared `EnforcePolicy` and fails closed).
+- [x] `bwrap`/`docker`/`none` isolators consume a `Contribution`; `hostPassthrough` toggles host/base-image bleed-through; the leaky/deny-default bwrap split is one isolator + the knob.
+- [x] Every isolator applies `cfg.Network` EXPLICITLY (`--unshare-net` for none/proxy / `--network none` / proxy env injection); the regression guard holds — unit-asserted for every non-host cell, and a gated live test confirms `--unshare-net` actually blocks egress. `none` fails CLOSED when egress restriction is requested.
+- [x] bwrap deny-default hardening: sandbox-local HOME tmpfs (no host-`$HOME` bind), `--dev /dev` (not `--dev-bind`), `--clearenv` + explicit `--setenv` allowlist (asserted). `no-new-privs` + `cap-drop ALL` are bwrap defaults (no flag to emit; documented).
+- [x] docker security DEFAULTS: `no-new-privileges`, `--cap-drop ALL`, default seccomp (never `unconfined`), `apparmor=docker-default`, `--read-only` + `--tmpfs /tmp:rw,noexec,nosuid` + workdir-only writable, `--pids-limit`/`--memory`/`--cpus` (cpus clamped to host cores); no whole-`$HOME` rw mount (asserted).
+- [x] `HostToolsUnreachable` conditions the shared classifier (closure-only binds + no host-`$HOME` + pinned image), not a naive `docker→true`; tested across the matrix.
+- [x] `none` + `command` provisioners work; the dormant `WrapWithInitCommands` is wired (tested).
+- [x] `--isolation`/`--provision`/`--network`/`--egress-allow`/`--host-passthrough`/`--init-command` flags work; `--sandbox` still works as a mapped alias (legacy → `Network=host`; tested).
+- [x] build/lint/test green (`agent-cli-go` builds again — the 02 channel-renderer break is resolved).
+
+## Completion Notes
+
+- **Resolves the 02 intermediate break.** The old fused `internal/sandbox/{nix,nixflake}` executors are deleted (collapsed into the bwrap isolator + the nix provisioner), so `agent-cli-go` builds again. `internal/sandbox/compose` and `internal/nixenv` are now unreferenced but still compile — left for **05** (compose removal) and **04** (the nix provisioner reuses `nixenv` dirs + the shared `ComputeEnvID`).
+- **Nix provisioning is deferred to 04.** `selectProvisioner(nix)` returns `ErrNoProvisioner` (fail closed); `--provision nix` / `--sandbox nix|nixflake` / `--require-pinned-toolchain` therefore error cleanly until 04 registers the `nixprov` provisioner. This matches the wave: 04 implements resolve→closure→mount.
+- **Network proxy is a documented residual for bwrap.** The isolators emit the network method explicitly (the tested regression guard) and inject `HTTP(S)_PROXY` env for `proxy`; the egress allowlist is plumbed onto `SandboxConfig.EgressAllowlist`. The actual allowlist-enforcing proxy and the bwrap namespace→proxy wiring (slirp/pasta) are infrastructure, out of scope here — egress fails closed (`--unshare-net`) rather than open.
+- **Provider tokens reach bwrap via `--setenv`** (a consequence of `--clearenv`, per the plan's explicit-allowlist requirement).
 
 ## Files Modified/Created
 
