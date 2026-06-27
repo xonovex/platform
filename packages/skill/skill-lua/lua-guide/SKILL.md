@@ -15,7 +15,7 @@ description: "Use when editing general-purpose Lua 5.4+ — modules, scripts, co
 - **Code organization** - Prefer table-based modules and simple functions, see [references/module-pattern.md](references/module-pattern.md), [references/metatables.md](references/metatables.md)
 - **Cooperative tasks** - Use coroutines for async patterns, see [references/coroutines.md](references/coroutines.md)
 - **Validation** - Validate inputs and handle errors, see [references/input-validation.md](references/input-validation.md), [references/error-handling.md](references/error-handling.md)
-- **Paradigm** - Functional style → **general-fp-guide**; class/OO design (metatable-based) → **general-oop-guide**
+- **Paradigm** - Functional style → **fp-guide**; class/OO design (metatable-based) → **oop-guide**
 
 ## Gotchas
 

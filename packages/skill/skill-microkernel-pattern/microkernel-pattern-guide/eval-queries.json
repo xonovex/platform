@@ -1,0 +1,50 @@
+[
+  {
+    "query": "design a plugin registry so new storage backends register themselves and the core never imports them",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "core + plug-ins + registry; open/closed"
+  },
+  {
+    "query": "adding a backend means editing a giant switch in three files — make it so a new one plugs in without touching the core",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "open/closed via registry, not a central switch"
+  },
+  {
+    "query": "should plug-ins be selected at build time, at startup from config, or at runtime per request?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "binding time spectrum picks the mechanism"
+  },
+  {
+    "query": "I want a fail-closed capability check so a plugin that lacks a guarantee is rejected without me editing the core",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "capabilities + secure-by-default gating"
+  },
+  {
+    "query": "is passing my plugin registry into the services to look things up a bad idea?",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "service-locator anti-pattern; inject at the root instead"
+  },
+  {
+    "query": "isolate my domain from the database behind a repository interface so I can swap it",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: ports-and-adapters isolation -> hexagonal-pattern-guide"
+  },
+  {
+    "query": "grade how tightly these two modules are coupled and how to weaken the worst seam",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near-miss: coupling vocabulary -> connascence-guide"
+  },
+  {
+    "query": "which axis owns this concern and where should its directory go in the tree?",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: decomposition/boundaries -> orthogonal-pattern-guide"
+  }
+]

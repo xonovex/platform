@@ -81,7 +81,7 @@ claude plugin marketplace add xonovex/platform
 claude plugin install xonovex-skill-plan@xonovex-marketplace          # research, plan, refine, subplans, continue, update, validate, code-align/harden/simplify
 claude plugin install xonovex-skill-git@xonovex-marketplace           # commit, merge-resolve, feature-worktree create/merge/abandon/cleanup
 claude plugin install xonovex-skill-instruction@xonovex-marketplace   # AGENTS.md init / sync / simplify / consolidate / merge
-claude plugin install xonovex-skill-insights@xonovex-marketplace      # session retrospective: extract, integrate-instructions, integrate-skills
+claude plugin install xonovex-skill-reflect@xonovex-marketplace       # session reflection: extract lessons, fold into AGENTS.md or a skill
 claude plugin install xonovex-skill-code-review@xonovex-marketplace   # Conventional Comments feedback: blocking vs non-blocking, summary + inline
 claude plugin install xonovex-skill-pull-request@xonovex-marketplace  # PR authoring: description, size/atomicity, testing evidence, tradeoffs, self-review
 claude plugin install xonovex-skill-command@xonovex-marketplace        # author / merge / simplify reusable prompt files (cross-harness format reference)
@@ -108,7 +108,7 @@ codex plugin marketplace add xonovex/platform
 codex plugin add xonovex-skill-plan@xonovex-marketplace          # research, plan, refine, subplans, continue, update, validate, code-align/harden/simplify
 codex plugin add xonovex-skill-git@xonovex-marketplace           # commit, merge-resolve, feature-worktree create/merge/abandon/cleanup
 codex plugin add xonovex-skill-instruction@xonovex-marketplace   # AGENTS.md init / sync / simplify / consolidate / merge
-codex plugin add xonovex-skill-insights@xonovex-marketplace      # session retrospective: extract, integrate-instructions, integrate-skills
+codex plugin add xonovex-skill-reflect@xonovex-marketplace       # session reflection: extract lessons, fold into AGENTS.md or a skill
 codex plugin add xonovex-skill-code-review@xonovex-marketplace   # Conventional Comments feedback: blocking vs non-blocking, summary + inline
 codex plugin add xonovex-skill-pull-request@xonovex-marketplace  # PR authoring: description, size/atomicity, testing evidence, tradeoffs, self-review
 codex plugin add xonovex-skill-command@xonovex-marketplace        # author / merge / simplify reusable prompt files (cross-harness format reference)

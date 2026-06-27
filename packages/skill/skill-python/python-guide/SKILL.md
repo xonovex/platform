@@ -17,7 +17,7 @@ description: "Use when writing or editing Python 3.12+ for APIs, data processing
 - **Performance** - Cache pure functions with `@cache`, see [references/caching-functions.md](references/caching-functions.md)
 - **Resource management** - Use context managers for cleanup, see [references/resource-management.md](references/resource-management.md)
 - **Modern syntax** - Use pathlib, f-strings, specific exceptions, see [references/pathlib-file-ops.md](references/pathlib-file-ops.md), [references/string-formatting.md](references/string-formatting.md), [references/exception-handling.md](references/exception-handling.md)
-- **Paradigm** - Functional style → **general-fp-guide**; class/OO design → **general-oop-guide**
+- **Paradigm** - Functional style → **fp-guide**; class/OO design → **oop-guide**
 
 ## Gotchas
 

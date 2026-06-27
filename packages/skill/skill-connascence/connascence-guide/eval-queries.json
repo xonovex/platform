@@ -1,0 +1,50 @@
+[
+  {
+    "query": "these two modules feel way too tightly coupled — tell me concretely what kind of coupling it is and how to loosen the worst part",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "direct: grade the seam (connascence + coupling ladder) and weaken it"
+  },
+  {
+    "query": "is a chained call like order.getCustomer().getAddress().getCity() a problem, and what do I do about it?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "Law of Demeter / train wreck = content coupling"
+  },
+  {
+    "query": "should this function take positional arguments or a named options object — which couples callers less?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "connascence of position vs name; rule of degree"
+  },
+  {
+    "query": "this helper module is just a grab-bag of unrelated init steps that run at startup — is that bad cohesion?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "temporal/coincidental cohesion vs functional"
+  },
+  {
+    "query": "I pass a boolean flag into this shared method that switches its behavior — code smell?",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "control coupling on the ladder"
+  },
+  {
+    "query": "design a plugin registry so new backends register themselves without editing the core",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: extensibility/registry -> microkernel-pattern-guide"
+  },
+  {
+    "query": "isolate my domain logic from Postgres behind an interface so I can swap the database",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: ports-and-adapters isolation -> hexagonal-pattern-guide"
+  },
+  {
+    "query": "which module should own the nix provisioning code — it feels misfiled",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near-miss: where a boundary goes -> orthogonal-pattern-guide"
+  }
+]

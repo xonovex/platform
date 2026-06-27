@@ -1,0 +1,164 @@
+[
+  {
+    "query": "our internal/ dir has grown into a mess — there's a sandbox folder, a sandboxutil folder next to it, and nix code buried three levels deep; reorganize it so it stops feeling like spaghetti",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "direct: reorganize a tangled tree into clean axes, misplaced util/nix packages"
+  },
+  {
+    "query": "I have isolation, network and provision as separate flags but the folders don't reflect that — where should the nix provisioning code actually live?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "direct: structure should mirror the orthogonal axes; nixprov belongs under a provision axis"
+  },
+  {
+    "query": "we have bwrap and docker backends and want to add a third without editing the existing ones — how should the packages be laid out?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "implicit: shared-core + per-variant leaves, Strategy per axis, open-for-extension layout"
+  },
+  {
+    "query": "name these sibling modules consistently — right now it's sandbox, net, and nixprov and it reads inconsistently",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "naming symmetry: sibling concepts need sibling grammar; tool-named leaves are a smell"
+  },
+  {
+    "query": "the CLI and the kubernetes operator have drifted — they implement the same concepts but with totally different folder structures; make them symmetric",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "consumer symmetry: two realizers of the same axes should rhyme, share down to a common lib"
+  },
+  {
+    "query": "bwrap needs some nix-specific glue to mount the closure — should that be a new top-level package?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "variation-point bridge: localize cross-axis coupling inside the type, don't hoist a sibling"
+  },
+  {
+    "query": "should this be packaged by feature or by layer? right now everything is split into controllers/, services/, utils/, types/",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "package-by-axis/feature vs by-layer; layer packaging hides the axes"
+  },
+  {
+    "query": "split the shared code from the type-specific code in this module tree so each backend only owns its own specifics",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "commonality/variability: shared kernel vs per-variant leaf"
+  },
+  {
+    "query": "restructure this 96-byte particle struct into SoA so the update loop stops missing cache",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: runtime data layout for cache -> data-oriented-design-guide, not module structure"
+  },
+  {
+    "query": "should this be a class with inheritance or composition of functions — design the object model",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: class-vs-function design -> oop-guide / fp-guide"
+  },
+  {
+    "query": "set up moon task inheritance so projects tagged skill auto-pick-up the build task",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: monorepo task config -> moon-guide, not source-tree decomposition"
+  },
+  {
+    "query": "I'm designing a new tool with three independent config dimensions — input format, transport, and output sink — how do I lay out the packages so adding one input doesn't touch the others?",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "validation positive: orthogonal axes + cross-product, fan-out layout, open-for-extension"
+  },
+  {
+    "query": "a single utils package at the repo root has become a dumping ground — every axis throws its helpers in there; how should I distribute them?",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "validation positive: per-axis shared/, axis owns its own utils, no homeless util sibling"
+  },
+  {
+    "query": "rename the provisioner type from nixprov to just nix and move it next to its sibling provisioners",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "validation positive: bare type names under axis context, sibling co-location"
+  },
+  {
+    "query": "write the kubernetes Deployment and NetworkPolicy manifests for this service",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "validation negative: authoring k8s manifests -> kubernetes-guide, not package decomposition"
+  },
+  {
+    "query": "profile whether the broad-phase is cache-bound before I change any layout",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "validation negative: measurement of runtime cache behavior -> data-oriented-design-guide"
+  },
+  {
+    "query": "adding a new storage backend means editing a giant switch in three files — make it so a new backend plugs in without touching the core",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: open/closed plugin extension -> microkernel-pattern-guide"
+  },
+  {
+    "query": "design a plugin registry so each provider registers itself and the core never imports the concrete implementations",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: plugin registry / open-closed -> microkernel-pattern-guide"
+  },
+  {
+    "query": "this Isolator interface has nine methods and half the implementations just return nil — split it so each type only implements what it needs",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: narrow ports / interface segregation -> hexagonal-pattern-guide"
+  },
+  {
+    "query": "the core package imports the concrete docker and nix packages directly; invert it so the core depends only on interfaces",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near-miss: dependency inversion / ports-and-adapters -> hexagonal-pattern-guide"
+  },
+  {
+    "query": "should I model this as an abstract base class with virtual methods or a plain interface — which OO construct fits?",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: class/paradigm construct choice -> oop-guide, not axis decomposition"
+  },
+  {
+    "query": "logging, metrics, and the auth check are copied into every backend and I keep forgetting one — where should concerns that touch every backend live?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "cross-cutting concerns: scattering/tangling, weave once at the composition root, not a sibling axis"
+  },
+  {
+    "query": "should the storage backend be picked at compile time with build flags, or at runtime from config — and how does that change the wiring?",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: binding time -> microkernel-pattern-guide"
+  },
+  {
+    "query": "we split the monolith into packages but everything still imports everything — how do I actually enforce the module boundaries?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "false modularity / distributed monolith: enforce with import/architecture tests + data ownership, not folders"
+  },
+  {
+    "query": "grade how tightly these two modules are coupled and tell me concretely how to loosen the worst part",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near-miss: coupling vocabulary -> connascence-guide"
+  },
+  {
+    "query": "two teams keep colliding on the same module — how should we draw the boundary so each owns its piece?",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "boundary alignment: Conway's law, single owner per axis, domain seams"
+  },
+  {
+    "query": "write the actual bubblewrap unshare/bind syscall sequence for the sandbox runner",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: implementing one variant's internals, not deciding the decomposition"
+  }
+]

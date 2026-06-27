@@ -1,0 +1,15 @@
+{
+  "name": "@xonovex/skill-connascence",
+  "version": "3.2.0",
+  "private": true,
+  "type": "module",
+  "keywords": [
+    "xonovex",
+    "skill",
+    "connascence"
+  ],
+  "scripts": {
+    "fmt": "prettier --write .",
+    "fmt:check": "prettier --check ."
+  }
+}

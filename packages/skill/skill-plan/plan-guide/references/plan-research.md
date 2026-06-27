@@ -22,6 +22,10 @@ Research codebase and web for requirements; present findings for review. Does **
 4. **Synthesize** — combine codebase + web research
 5. **Present or save** — display findings or save to a file; when findings contain open decisions (ambiguities, contradictions, unsettled trade-offs), say so and recommend `plan-clarify`
 
+## Code-quality audits
+
+When the request is an inward code-quality audit rather than forward / web research — hardening (type safety, validation, error handling, logging), simplification (duplicates, dead code, unused dependencies, over-abstraction), or alignment / consistency between two implementations — load the **code-quality-guide** skill and apply its matching dimension, producing the same read-only report grouped by category and graded by severity (no edits, no plan). Then continue with `plan-clarify` / `plan-create` as usual.
+
 ## Implementation Details
 
 **Version detection:** read project manifests (`package.json`, `pyproject.toml`, `go.mod`, `Cargo.toml`) → web search for latest → fetch official docs

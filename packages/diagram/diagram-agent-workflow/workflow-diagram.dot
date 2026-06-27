@@ -24,7 +24,7 @@ digraph Workflow {
     leg_loop [label="Feedback Loop", shape=cds, fillcolor=lightgreen];
     leg_parallel [label="Parallel Execution", shape=parallelogram, fillcolor=wheat];
     leg_session [label="--- New Session ---", shape=plaintext, fontcolor=gray40];
-    leg_note [label="Also: plan-research-code-align,\nshared-extract, *-simplify\n(run as needed)", shape=note, fillcolor=white, fontsize=9];
+    leg_note [label="Also: code-quality audit\n(harden/simplify/align),\nshared-extract (run as needed)", shape=note, fillcolor=white, fontsize=9];
 
     leg_wrapper -> leg_cmd -> leg_agent -> leg_human -> leg_loop -> leg_parallel -> leg_session [style=invis];
   }
@@ -93,8 +93,8 @@ digraph Workflow {
     plan_validate [label="plan-validate", fillcolor=lightblue];
     validate_agent [label="(Agent:\n- Validate vs guidelines\n- Validate vs plan/subplan\n- Run test suite\n- Report evidence)", shape=ellipse, fillcolor="#ffffcc"];
 
-    insights_extract [label="insights-extract\n(optional)", fillcolor=lightblue];
-    insights_agent [label="(Agent:\n- Analyze session\n- Extract self-corrections\n- Save to insights/\n  with frontmatter)", shape=ellipse, fillcolor="#ffffcc"];
+    insights_extract [label="reflect-extract\n(optional)", fillcolor=lightblue];
+    insights_agent [label="(Agent:\n- Analyze session\n- Extract self-corrections\n- Save to reflections/\n  with frontmatter)", shape=ellipse, fillcolor="#ffffcc"];
 
     plan_update [label="plan-update", fillcolor=lightblue];
     update_agent [label="(Agent:\n- Update subplan status\n- Auto-update parent plan(s))", shape=ellipse, fillcolor="#ffffcc"];
@@ -109,8 +109,7 @@ digraph Workflow {
     fillcolor="#fff5e6";
 
     session_quality [label="--- New Session ---", shape=plaintext, fontcolor=gray40];
-    code_simplify [label="plan-research-code-simplify\n(research code smells,\nplan changes after)", fillcolor=lightblue];
-    code_harden [label="plan-research-code-harden\n(research type safety, validation,\nerror handling; plan after)", fillcolor=lightblue];
+    code_quality [label="plan-research\n(code-quality audit:\nharden / simplify / align,\nvia code-quality-guide)", fillcolor=lightblue];
     quality_loop [label="Another\ncoding loop?", shape=diamond, fillcolor=lightcoral];
   }
 
@@ -154,7 +153,7 @@ digraph Workflow {
     style=filled;
     fillcolor="#e8f5e9";
 
-    insights_integrate [label="insights-integrate\n(optional)", fillcolor=lightblue];
+    insights_integrate [label="reflect-to-instructions\n(optional)", fillcolor=lightblue];
     integrate_agent [label="(Agent:\n- Merge insights to\n  guidelines/AGENTS.md\n- Mark insights applied)", shape=ellipse, fillcolor="#ffffcc"];
 
     skills_active [label="Improved Guidelines\nActive in Next Sessions", shape=cds, fillcolor="#ccffcc"];
@@ -210,11 +209,10 @@ digraph Workflow {
   update_agent -> more_subplans;
 
   more_subplans -> plan_continue [label="Yes\n(next pending,\nnew session)"];
-  more_subplans -> code_simplify [label="No\n(all complete)"];
+  more_subplans -> code_quality [label="No\n(all complete)"];
 
   // Code quality flow
-  code_simplify -> code_harden;
-  code_harden -> quality_loop;
+  code_quality -> quality_loop;
   quality_loop -> work [label="Yes\n(fix issues)", style=dashed];
   quality_loop -> merge_or_abandon [label="No\n(proceed)"];
 
@@ -252,7 +250,7 @@ digraph Workflow {
   session_planning -> plan_create [style=invis];
   session_worktree -> plan_worktree_create [style=invis];
   session_dev -> plan_continue [style=invis];
-  session_quality -> code_simplify [style=invis];
+  session_quality -> code_quality [style=invis];
   session_merge -> plan_worktree_merge [style=invis];
   session_complete -> git_commit_push [style=invis];
 }

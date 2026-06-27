@@ -3,5 +3,6 @@
   "version": "3.2.0",
   "description": "Xonovex Code review skills",
   "author": {"name": "Xonovex"},
-  "skills": ["./code-review-guide"]
+  "skills": ["./code-review-guide"],
+  "dependencies": ["xonovex-skill-code-quality"]
 }

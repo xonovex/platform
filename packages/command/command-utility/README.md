@@ -1,6 +1,6 @@
 # Utility Commands
 
-Manage project instructions, extract insights, and create skills.
+Manage project instructions, reflect on sessions, and create skills.
 
 ## Installation
 
@@ -46,27 +46,29 @@ alongside this one.
 | `instructions-consolidate` | Remove redundant files and standardize format             |
 | `instructions-assimilate`  | Augment instructions with elements from another project   |
 
-### Insights
+### Reflect
 
-| Command                           | Description                                                  |
-| --------------------------------- | ------------------------------------------------------------ |
-| `insights-extract`                | Analyze session for development mistakes and lessons learned |
-| `insights-instructions-integrate` | Convert insights into AGENTS.md bullet points                |
-| `insights-skills-integrate`       | Convert insights into a progressive disclosure skill         |
+| Command                   | Description                                                  |
+| ------------------------- | ------------------------------------------------------------ |
+| `reflect-extract`         | Analyze session for development mistakes and lessons learned |
+| `reflect-to-instructions` | Convert insights into AGENTS.md bullet points                |
+| `reflect-to-skill`        | Convert insights into a progressive disclosure skill         |
 
 ### Skills
 
-| Command                  | Description                                      |
-| ------------------------ | ------------------------------------------------ |
-| `skill-guide-create`     | Create a guideline skill from a document or URL  |
-| `skill-guide-extract`    | Extract patterns from codebase into a skill      |
-| `skill-guide-simplify`   | Make skills project-independent and condense     |
-| `skill-guide-assimilate` | Augment a skill with elements from another skill |
+| Command                  | Description                                          |
+| ------------------------ | ---------------------------------------------------- |
+| `skill-guide-create`     | Create a guideline skill from a document or URL      |
+| `skill-guide-extract`    | Extract patterns from codebase into a skill          |
+| `skill-guide-simplify`   | Make skills project-independent and condense         |
+| `skill-guide-decompose`  | Split a multi-concern skill into single-owner skills |
+| `skill-guide-assimilate` | Augment a skill with elements from another skill     |
 
 ### Slash Commands
 
-| Command                   | Description                                        |
-| ------------------------- | -------------------------------------------------- |
-| `slashcommand-create`     | Create a new slash command from a completed task   |
-| `slashcommand-simplify`   | Reduce verbosity in slash command files            |
-| `slashcommand-assimilate` | Augment a slash command with elements from another |
+| Command                   | Description                                                |
+| ------------------------- | ---------------------------------------------------------- |
+| `slashcommand-create`     | Create a new slash command from a completed task           |
+| `slashcommand-simplify`   | Reduce verbosity in slash command files                    |
+| `slashcommand-assimilate` | Augment a slash command with elements from another         |
+| `slashcommand-distill`    | Distill a fat command into a thin skill-delegating command |

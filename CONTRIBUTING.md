@@ -23,7 +23,7 @@ packages/
     skill-*/ (35)       # Skill packages (guidelines + reference)
   command/              # Workflow and utility commands
     command-utility/    # Utility commands (content, instructions, slash commands)
-    command-workflow/   # Workflow commands (plan, git, insights, code)
+    command-workflow/   # Workflow commands (plan, git, reflect, code)
   script/               # Internal build scripts
     script-moon-common/ # Shared moon script utilities
     script-moon-*/      # Moon task scripts (action-graph, npm-check, npm-publish, version-bump, version-detect)

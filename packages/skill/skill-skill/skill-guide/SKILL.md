@@ -1,6 +1,6 @@
 ---
 name: skill-guide
-description: "Use when authoring, reviewing, extracting, merging, simplifying, or validating Agent Skills (SKILL.md plus references / scripts / assets), or when auditing, splitting, de-duplicating, or tiering a whole set of skills. Triggers on edits under a skills directory, on prompts about creating a new skill, progressive disclosure, reference files, pattern extraction, merging or assimilating skills, simplification to bullet format, validation against the Agent Skills spec, description tuning, evaluating trigger rate / output quality, or making a catalog composable (one owner per concept, cross-references, general→language→framework tiers) — even when the user doesn't say 'skill'."
+description: "Use when authoring, reviewing, extracting, merging, simplifying, decomposing, or validating Agent Skills (SKILL.md plus references / scripts / assets), or when auditing, splitting, de-duplicating, or tiering a whole set of skills. Triggers on edits under a skills directory, on prompts about creating a new skill, progressive disclosure, reference files, pattern extraction, merging or assimilating skills, simplification to bullet format, validation against the Agent Skills spec, description tuning, evaluating trigger rate / output quality, or making a catalog composable (one owner per concept, cross-references, general→language→framework tiers) — even when the user doesn't say 'skill'."
 ---
 
 # Skill Guidelines Management
@@ -19,9 +19,9 @@ Author, extract, merge, simplify, and validate Agent Skills following the Agent 
 ## Core Principles
 
 - **Progressive Disclosure** — SKILL.md contains essentials; `references/*` contains depth, loaded on demand
-- **Project Independence** — remove project-specific paths, names, domains; when concrete instance coordinates (hosts, orgs, repos, ids) are genuinely needed, isolate them in one on-demand reference (e.g. a dedicated `coordinates.md`) so the rest stays reusable and swappable
+- **Project Independence** — remove project-specific paths, names, domains; when concrete instance coordinates (hosts, orgs, repos, ids) are genuinely needed, isolate them in one on-demand reference (e.g. a dedicated `coordinates.md`) so the rest stays reusable and swappable; a general / architectural-pattern skill must also illustrate with a neutral domain (orders, storage, notifications), never the codebase that motivated it — map real concepts onto the neutral example, see [references/guideline-skills.md](references/guideline-skills.md)
 - **Composable split** — one concept has one owner skill; prefer small mix-and-match skills, cross-reference others by name instead of duplicating, and generalize anything not inherently language/API-specific into a general skill that specific skills link to for the "why", see [references/composability.md](references/composability.md)
-- **Design to coexist** — a skill is one capability among many loaded together; it must work alongside others, never assume it is the only one, and link up the general→language→framework tiers without the general tier depending on a specific one
+- **Design to coexist** — a skill is one capability among many loaded together; it must work alongside others, never assume it is the only one, and depend on others by described capability (soft) or exact declared name in the plugin's `dependencies` (hard) — always pointing upward through the general→language→framework tiers so the general tier never depends on a specific one, see [references/composability.md](references/composability.md)
 - **Routing-first descriptions** — the description is the router (discovery sees only name+description); tune the trigger words, and debug mis-routes by asking "which skill did you use?", see [references/writing-descriptions.md](references/writing-descriptions.md)
 - **Sources in SOURCES.md** — cite provenance only in `SOURCES.md`; never name authors, companies, talks, books, or blogs inside `SKILL.md` or `references/*` (tool/API/standard names are fine); for content distilled from a versioned upstream, pin its version + commit + watched source paths so currency is checkable by diffing the pinned commit to latest, and refresh against the released tag
 - **Verify against source** — check every command, flag, signature, version, and count against the authoritative tool/API/docs before stating it; distilled facts drift and even a confident review "fix" can be wrong, so confirm against source before applying it
@@ -71,8 +71,9 @@ Single index of every reference; each entry names the operation/concept and when
 - Read [references/merge.md](references/merge.md) - Load when porting elements from one skill into another
 - Read [references/simplify.md](references/simplify.md) - Load when condensing a verbose SKILL.md to bullet format or trimming bloated reference files
 - Read [references/validate.md](references/validate.md) - Load when auditing a SKILL.md against the spec
-- Read [references/composability.md](references/composability.md) - Load when deciding skill boundaries, owners, tiers, or whether to generalize vs link a concept
+- Read [references/composability.md](references/composability.md) - Load when deciding skill boundaries, owners, tiers, how one skill depends on another, or whether to generalize vs link a concept
 - Read [references/catalog-audit.md](references/catalog-audit.md) - Load when auditing, splitting, or de-duplicating a set of skills onto the composable split
+- Read [references/decompose.md](references/decompose.md) - Load when splitting one multi-concern skill into several single-owner composable skills
 - Read [references/guideline-skills.md](references/guideline-skills.md) - Load when creating a coding-guideline / style-rule skill (topic categories, do/don't patterns, reference shape)
 - Read [references/writing-descriptions.md](references/writing-descriptions.md) - Load when authoring or rewriting a `description` field (writing principles, before/after)
 - Read [references/evaluating-triggers.md](references/evaluating-triggers.md) - Load when verifying or iterating on trigger rate (eval queries, train/validation split, optimization loop)

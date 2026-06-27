@@ -60,7 +60,7 @@ State: Committed as "wip: abandoned work on auth-custom-jwt" (commit b4c5d6e)
 Worktree: Kept (run worktree-cleanup to remove)
 
 Next Steps:
-1. Extract insights from the abandoned work (see skill-insights)
+1. Extract insights from the abandoned work (see skill-reflect)
 2. Review plan's "Abandonment Notes" section
 3. Clean up worktree later if desired
 ```

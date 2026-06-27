@@ -19,6 +19,15 @@ Group guidelines into one reference file per topic. Common buckets:
 - naming, state-management, accessibility
 - validation, routing, observability, deployment
 
+## Neutral Examples for General / Pattern Skills
+
+A general or architectural-**pattern** skill (anything not tied to one language or API) must illustrate with a **neutral, widely-recognized domain**, never the codebase or project that motivated it.
+
+- **Pick one neutral running example and reuse it across the skill** — e.g. an order service + a repository, notifications with email/sms/push channels, a storage backend, shapes, documents. A reader who has never seen your repo must be able to follow every snippet.
+- **Map the motivating project onto the neutral domain; never name its types or dirs** — if a real refactor inspired the skill, translate it. `Isolator` / `nixprov` / `internal/sandbox` becomes `Repository` / `s3` / `internal/store`; "our agent sandbox" becomes "a data-export tool". The principle is the subject, not the project.
+- **No in-repo provenance in the body** — drop phrases like "in this repo", "our service", and any `## Motivating in-repo example` SOURCES entry; they bind the skill to one project. (Language/framework skills are the exception — their specifics _are_ the subject.)
+- **Test:** hand the skill to someone who has never seen your codebase. If an example only parses with your project's vocabulary, it is not yet project-agnostic.
+
 ## Source Parsing Patterns
 
 When extracting from external docs:

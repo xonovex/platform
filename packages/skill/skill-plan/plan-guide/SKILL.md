@@ -1,11 +1,11 @@
 ---
 name: plan-guide
-description: "Use when scoping, researching, planning, refining, continuing, updating, or validating a feature, refactor, or analysis task — covers the whole plan-document lifecycle plus codebase research (alignment, hardening, simplification, template extraction, TODO scanning, shared-library design). Triggers on prompts about planning, designing, scoping, breaking down, architecting, code analysis / cleanup / hardening / alignment, even when the user doesn't say 'plan'."
+description: "Use when scoping, researching, interrogating, planning, clarifying, refining, critiquing, continuing, updating, or validating a feature, refactor, or analysis task — covers the whole plan-document lifecycle plus codebase research (alignment, hardening, simplification, template extraction, TODO scanning, shared-library design). Triggers on prompts about planning, designing, scoping, breaking down, architecting, interrogating requirements, stress-testing / critiquing a plan, code analysis / cleanup / hardening / alignment, even when the user doesn't say 'plan'."
 ---
 
 # Planning & Code-Research Guidelines
 
-Author and maintain plan documents across their full lifecycle (research → clarify → create → refine → subplans → continue → update → validate) and run code-research operations (align, harden, simplify, template extraction, etc.) that feed into those plans.
+Author and maintain plan documents across their full lifecycle (research → interrogate → clarify → create → refine → critique → subplans → continue → update → validate) and run code-research operations (align, harden, simplify, template extraction, etc.) that feed into those plans.
 
 ## Core Principles
 
@@ -29,20 +29,20 @@ Author and maintain plan documents across their full lifecycle (research → cla
 
 ## Plan Lifecycle
 
-1. **Research** — `plan-research` for general; `plan-research-code-align` / `plan-research-code-harden` / `plan-research-code-simplify` for specific aspects
-2. **Clarify** — `plan-clarify` walks open decisions one by one in plain prose (after research, or after create to settle direction)
-3. **Create** — `plan-create` (or `plan-tdd-create`) authors the parent plan
-4. **Refine** — `plan-refine` processes user feedback (annotations + prompt instructions)
-5. **Expand** — `plan-subplans-create` generates detailed child plans
-6. **Execute** — `plan-continue` works through subplans one at a time
-7. **Update** — `plan-update` refreshes status / phase / validation results
-8. **Validate** — `plan-validate` confirms success criteria are met (read-only)
+1. **Research** — `plan-research` for general; for a code-quality audit (hardening / simplification / alignment) it applies the **code-quality-guide** dimensions and reports findings
+2. **Interrogate** — `plan-interrogate` surfaces unknown decisions by walking the design tree one question at a time (codebase-aware), upstream of clarify
+3. **Clarify** — `plan-clarify` walks known open decisions one by one in plain prose (after research, or after create to settle direction)
+4. **Create** — `plan-create` (or `plan-tdd-create`) authors the parent plan
+5. **Refine** — `plan-refine` processes user feedback (annotations + prompt instructions)
+6. **Critique** — `plan-critique` adversarially stress-tests the plan (red-team / pre-mortem), feeding findings back into refine
+7. **Expand** — `plan-subplans-create` generates detailed child plans
+8. **Execute** — `plan-continue` works through subplans one at a time
+9. **Update** — `plan-update` refreshes status / phase / validation results
+10. **Validate** — `plan-validate` confirms success criteria are met (read-only)
 
 ## Code-Research Operations
 
-- **Align two implementations** — see [references/plan-research-code-align.md](references/plan-research-code-align.md)
-- **Harden for production** — see [references/plan-research-code-harden.md](references/plan-research-code-harden.md)
-- **Simplify / deduplicate** — see [references/plan-research-code-simplify.md](references/plan-research-code-simplify.md)
+- **Audit code quality (harden / simplify / align)** — `plan-research` applies the **code-quality-guide** dimensions and reports findings for `plan-create`
 - **Remove barrel exports** — see [references/code-barrels-remove.md](references/code-barrels-remove.md)
 - **Remove non-essential comments** — see [references/code-comments-remove.md](references/code-comments-remove.md)
 - **Extract shared utilities** — see [references/code-shared-extract.md](references/code-shared-extract.md)
@@ -53,10 +53,12 @@ Author and maintain plan documents across their full lifecycle (research → cla
 ## Plan Operations
 
 - **Research** the codebase + web — see [references/plan-research.md](references/plan-research.md)
-- **Clarify** open decisions one by one — see [references/plan-clarify.md](references/plan-clarify.md)
+- **Interrogate** to surface unknown decisions — see [references/plan-interrogate.md](references/plan-interrogate.md)
+- **Clarify** known open decisions one by one — see [references/plan-clarify.md](references/plan-clarify.md)
 - **Create** a plan with research — see [references/plan-create.md](references/plan-create.md)
 - **Create a TDD plan** — see [references/plan-tdd-create.md](references/plan-tdd-create.md)
 - **Refine** from feedback (annotations / prompt) — see [references/plan-refine.md](references/plan-refine.md)
+- **Critique** the plan adversarially — see [references/plan-critique.md](references/plan-critique.md)
 - **Generate subplans** from an approved parent — see [references/plan-subplans-create.md](references/plan-subplans-create.md)
 - **Continue** work from an existing plan — see [references/plan-continue.md](references/plan-continue.md)
 - **Update** plan status / progress — see [references/plan-update.md](references/plan-update.md)
@@ -66,10 +68,7 @@ Author and maintain plan documents across their full lifecycle (research → cla
 
 ### Research
 
-- Read [references/plan-research.md](references/plan-research.md) - Load when researching codebase + web for a future plan
-- Read [references/plan-research-code-align.md](references/plan-research-code-align.md) - Load when comparing two similar implementations for alignment
-- Read [references/plan-research-code-harden.md](references/plan-research-code-harden.md) - Load when researching type-safety / validation / logging / error-handling improvements
-- Read [references/plan-research-code-simplify.md](references/plan-research-code-simplify.md) - Load when researching deduplication, dead code, and over-engineering
+- Read [references/plan-research.md](references/plan-research.md) - Load when researching codebase + web for a future plan, or running a read-only code-quality audit (harden / simplify / align — applies code-quality-guide)
 - Read [references/code-barrels-remove.md](references/code-barrels-remove.md) - Load when analyzing barrel exports for removal
 - Read [references/code-comments-remove.md](references/code-comments-remove.md) - Load when identifying non-essential comments
 - Read [references/code-shared-extract.md](references/code-shared-extract.md) - Load when finding duplicated patterns to extract
@@ -79,10 +78,12 @@ Author and maintain plan documents across their full lifecycle (research → cla
 
 ### Plan lifecycle
 
-- Read [references/plan-clarify.md](references/plan-clarify.md) - Load when walking the user through open decisions one at a time, in plain prose, after research or plan creation
+- Read [references/plan-interrogate.md](references/plan-interrogate.md) - Load when interrogating the user to surface unknown decisions before a plan exists, one question at a time, exploring the codebase to self-answer
+- Read [references/plan-clarify.md](references/plan-clarify.md) - Load when walking the user through known open decisions one at a time, in plain prose, after research or plan creation
 - Read [references/plan-create.md](references/plan-create.md) - Load when authoring a high-level plan from research
 - Read [references/plan-tdd-create.md](references/plan-tdd-create.md) - Load when authoring a TDD plan with story-based test steps
 - Read [references/plan-refine.md](references/plan-refine.md) - Load when iterating on a plan from inline annotations and/or prompt feedback
+- Read [references/plan-critique.md](references/plan-critique.md) - Load when adversarially stress-testing a plan to expose weaknesses (red-team / pre-mortem / falsify / steelman), read-only
 - Read [references/plan-subplans-create.md](references/plan-subplans-create.md) - Load when expanding an approved plan into detailed parallelizable subplans
 - Read [references/plan-continue.md](references/plan-continue.md) - Load when resuming implementation work from an existing plan
 - Read [references/plan-update.md](references/plan-update.md) - Load when refreshing a plan with current status / validation / progress
