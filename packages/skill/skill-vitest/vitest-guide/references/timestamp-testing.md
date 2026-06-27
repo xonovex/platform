@@ -1,10 +1,14 @@
 # timestamp-testing: Avoiding Flaky Timestamp Comparisons
 
-**Guideline:** Don't compare timestamps from rapid operations; they may complete in the same millisecond.
+## Guideline
 
-**Rationale:** Fast operations can complete within milliseconds, making timestamp comparisons flaky and unreliable.
+Don't compare timestamps from rapid operations; they may complete in the same millisecond.
 
-**Example:**
+## Rationale
+
+Fast operations can complete within milliseconds, making timestamp comparisons flaky and unreliable.
+
+## Example
 
 ```typescript
 // ✅ Preferred - verify existence and type
@@ -47,7 +51,7 @@ it("should update timestamp", async () => {
 });
 ```
 
-**Techniques:**
+## Techniques
 
 - Verify timestamp exists and is correct type (preferred approach)
 - Add explicit delay (10-50ms) before second operation if comparison needed

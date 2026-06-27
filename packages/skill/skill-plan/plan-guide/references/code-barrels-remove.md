@@ -1,10 +1,14 @@
 # code-barrels-remove: Analyze Sub-Directory Barrel Exports for Removal
 
-**Guideline:** Identify sub-directory barrel files for removal and convert imports to direct file paths.
+## Guideline
 
-**Rationale:** Sub-barrels add indirection without clear benefits. Removing them simplifies navigation, makes imports explicit, and reduces circular dependency risks.
+Identify sub-directory barrel files for removal and convert imports to direct file paths.
 
-**Example:**
+## Rationale
+
+Sub-barrels add indirection without clear benefits. Removing them simplifies navigation, makes imports explicit, and reduces circular dependency risks.
+
+## Example
 
 ```typescript
 // Before: Barrel indirection
@@ -15,7 +19,7 @@ import {Role} from "./auth/role";
 import {User} from "./auth/user";
 ```
 
-**Techniques:**
+## Techniques
 
 - Find all `index.ts`/`index.js` files in subdirectories (exclude root `src/index.ts`)
 - Confirm each is a barrel by verifying it contains only re-exports

@@ -1,10 +1,14 @@
 # idempotency: Idempotent Scripts
 
-**Guideline:** Design scripts to be safely run multiple times without unintended side effects.
+## Guideline
 
-**Rationale:** Idempotent scripts are essential for automation, deployment, and configuration management. They allow safe retries after failures and prevent duplicate operations.
+Design scripts to be safely run multiple times without unintended side effects.
 
-**Example:**
+## Rationale
+
+Idempotent scripts are essential for automation, deployment, and configuration management. They allow safe retries after failures and prevent duplicate operations.
+
+## Example
 
 ```sh
 # ✅ Check before creating
@@ -48,7 +52,7 @@ update_config() {
 }
 ```
 
-**Techniques:**
+## Techniques
 
 - Check if resources exist before creating them
 - Use conditional operations that skip when already done

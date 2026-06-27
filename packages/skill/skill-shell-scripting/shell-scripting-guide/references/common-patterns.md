@@ -1,10 +1,14 @@
 # common-patterns: Common Patterns
 
-**Guideline:** Use well-tested patterns for common operations like reading files, processing output, and managing temporary resources.
+## Guideline
 
-**Rationale:** Standard patterns are proven to handle edge cases correctly and avoid common pitfalls like word splitting, missing the last line, or resource leaks.
+Use well-tested patterns for common operations like reading files, processing output, and managing temporary resources.
 
-**Example:**
+## Rationale
+
+Standard patterns are proven to handle edge cases correctly and avoid common pitfalls like word splitting, missing the last line, or resource leaks.
+
+## Example
 
 ```sh
 # ✅ Read file line by line
@@ -37,7 +41,7 @@ else
 fi
 ```
 
-**Techniques:**
+## Techniques
 
 - Use `while IFS= read -r line` to read files line by line
 - Create temp files/dirs with `mktemp` and always trap cleanup

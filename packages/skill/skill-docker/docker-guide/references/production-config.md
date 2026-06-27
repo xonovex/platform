@@ -1,10 +1,14 @@
 # production-config: Production Configuration
 
-**Guideline:** Configure with health checks, externalized config, proper lifecycle management.
+## Guideline
 
-**Rationale:** Health checks enable failure detection, env vars allow deployment-specific config, volumes preserve data.
+Configure with health checks, externalized config, proper lifecycle management.
 
-**Example:**
+## Rationale
+
+Health checks enable failure detection, env vars allow deployment-specific config, volumes preserve data.
+
+## Example
 
 ```dockerfile
 # syntax=docker/dockerfile:1.7
@@ -23,7 +27,7 @@ USER node:node
 CMD ["node", "dist/server.js"]
 ```
 
-**Techniques:**
+## Techniques
 
 - Health checks: Add HEALTHCHECK for orchestration failure detection
 - Environment config: Use ENV for deployment-specific configuration

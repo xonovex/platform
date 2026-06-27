@@ -20,9 +20,13 @@ Update a plan document with the latest implementation status, test results, and 
 
 ## Updates
 
-**Frontmatter:** `updated`, `status` (in_progress / complete / blocked), `phase`, `completed_date` (if complete)
+### Frontmatter
 
-**Status Section:** timestamped update with phase, summary, files modified, validation, next steps
+`updated`, `status` (in_progress / complete / blocked), `phase`, `completed_date` (if complete)
+
+### Status Section
+
+timestamped update with phase, summary, files modified, validation, next steps
 
 ## Status Logic
 

@@ -1,10 +1,14 @@
 # json-response-type-safety: JSON Response Type Safety in Tests
 
-**Guideline:** Define response interfaces and cast JSON results to maintain type safety in tests.
+## Guideline
 
-**Rationale:** Type casting prevents unsafe assignment errors and enables IDE autocomplete and refactoring.
+Define response interfaces and cast JSON results to maintain type safety in tests.
 
-**Example:**
+## Rationale
+
+Type casting prevents unsafe assignment errors and enables IDE autocomplete and refactoring.
+
+## Example
 
 ```typescript
 // Define interfaces at file top
@@ -32,7 +36,7 @@ it("should return error", async () => {
 });
 ```
 
-**Techniques:**
+## Techniques
 
 - Create test-specific interfaces at the top of test files
 - Use type assertion: `const json = (await res.json()) as ExpectedType`

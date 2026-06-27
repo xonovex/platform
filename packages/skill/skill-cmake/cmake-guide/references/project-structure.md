@@ -1,10 +1,14 @@
 # project-structure: Basic Project Structure
 
-**Guideline:** Set up CMake projects with modern target-based configuration using CMake 3.20 or higher.
+## Guideline
 
-**Rationale:** A well-structured CMakeLists.txt establishes build requirements, project metadata, and target definitions that form the foundation for maintainable builds.
+Set up CMake projects with modern target-based configuration using CMake 3.20 or higher.
 
-**Example:**
+## Rationale
+
+A well-structured CMakeLists.txt establishes build requirements, project metadata, and target definitions that form the foundation for maintainable builds.
+
+## Example
 
 ```cmake
 cmake_minimum_required(VERSION 3.20)
@@ -32,7 +36,7 @@ target_link_libraries(core_test PRIVATE core)
 add_test(NAME core_test COMMAND core_test)
 ```
 
-**Techniques:**
+## Techniques
 
 - cmake_minimum_required(): Set 3.20+ for modern CMake features
 - project(): Declare name, version, description, and required languages

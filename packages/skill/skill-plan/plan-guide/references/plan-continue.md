@@ -50,7 +50,7 @@ Resume work from an existing plan document. Auto-detect the associated plan from
 
 ## Output
 
-**Initial briefing:**
+### Initial briefing
 
 ```
 Continuing plan: plans/authentication.md
@@ -66,7 +66,7 @@ Validation:
   [WARN] Tests: 2 failing (expected — not yet implemented)
 ```
 
-**Completion report:**
+### Completion report
 
 ```
 Completed plan: plans/authentication/03-api-routes.md

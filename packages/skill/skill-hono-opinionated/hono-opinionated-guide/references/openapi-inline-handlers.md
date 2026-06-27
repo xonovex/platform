@@ -1,10 +1,14 @@
 # openapi-inline-handlers: Use Inline Handlers for OpenAPI Routes
 
-**Guideline:** Implement handler logic inline within OpenAPI route definitions instead of separate controller functions to enable proper TypeScript type inference from route schemas.
+## Guideline
 
-**Rationale:** Hono's OpenAPI integration uses TypeScript type inference to match route schemas with handlers. This only works with inline handlers because TypeScript cannot infer types across function boundaries, and separate controllers return generic `Response` types instead of being automatically typed by route definitions.
+Implement handler logic inline within OpenAPI route definitions instead of separate controller functions to enable proper TypeScript type inference from route schemas.
 
-**Example:**
+## Rationale
+
+Hono's OpenAPI integration uses TypeScript type inference to match route schemas with handlers. This only works with inline handlers because TypeScript cannot infer types across function boundaries, and separate controllers return generic `Response` types instead of being automatically typed by route definitions.
+
+## Example
 
 ```typescript
 import {createRoute, OpenAPIHono, z} from "@hono/zod-openapi";
@@ -47,7 +51,7 @@ itemsRouter.openapi(listItemsRoute, (c) => {
 });
 ```
 
-**Techniques:**
+## Techniques
 
 - Define route using `createRoute()` with full request and response schemas
 - Register route with `router.openapi(route, (c) => {...})` with inline handler

@@ -1,10 +1,14 @@
 # filename: entrance
 
-**Guideline:** Use `initial`/`animate` with opacity and transforms (y, x, scale); apply Apple easing `[0.22, 1, 0.36, 1]` for smooth deceleration.
+## Guideline
 
-**Rationale:** Opacity + transforms are GPU-optimized; transforms avoid layout thrashing; easing creates polished, professional feel.
+Use `initial`/`animate` with opacity and transforms (y, x, scale); apply Apple easing `[0.22, 1, 0.36, 1]` for smooth deceleration.
 
-**Example:**
+## Rationale
+
+Opacity + transforms are GPU-optimized; transforms avoid layout thrashing; easing creates polished, professional feel.
+
+## Example
 
 ```tsx
 function FadeUp({children}) {
@@ -29,7 +33,7 @@ function FadeUp({children}) {
 </motion.section>;
 ```
 
-**Techniques:**
+## Techniques
 
 - Fade up: `initial={{opacity: 0, y: 20}}` → `animate={{opacity: 1, y: 0}}`
 - Fade in scale: `initial={{opacity: 0, scale: 0.95}}` for zoom-in effect

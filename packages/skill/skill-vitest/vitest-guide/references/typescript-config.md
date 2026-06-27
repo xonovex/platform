@@ -1,10 +1,14 @@
 # typescript-config: TypeScript Project Configuration for Tests
 
-**Guideline:** Verify directory structure before configuring TypeScript project references and test inclusion in tsconfig.json.
+## Guideline
 
-**Rationale:** Incorrect configuration causes compilation failures and broken builds in CI/CD.
+Verify directory structure before configuring TypeScript project references and test inclusion in tsconfig.json.
 
-**Example:**
+## Rationale
+
+Incorrect configuration causes compilation failures and broken builds in CI/CD.
+
+## Example
 
 ```json
 // For packages/templates/X referencing packages/shared/Y
@@ -34,7 +38,7 @@
 }
 ```
 
-**Techniques:**
+## Techniques
 
 - Check actual directory structure with `ls` or file explorer before configuring
 - Calculate relative paths from current package to referenced packages

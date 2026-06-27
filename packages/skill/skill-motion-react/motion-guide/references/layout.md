@@ -1,10 +1,14 @@
 # filename: layout
 
-**Guideline:** Use `layout` prop for automatic FLIP animations on size/position changes; use `layoutId` for shared element transitions between DOM nodes.
+## Guideline
 
-**Rationale:** `layout` auto-animates position/size without manually specifying targets; `layoutId` enables seamless transitions across screens (gallery → modal).
+Use `layout` prop for automatic FLIP animations on size/position changes; use `layoutId` for shared element transitions between DOM nodes.
 
-**Example:**
+## Rationale
+
+`layout` auto-animates position/size without manually specifying targets; `layoutId` enables seamless transitions across screens (gallery → modal).
+
+## Example
 
 ```tsx
 function ExpandingCard({expanded}) {
@@ -31,7 +35,7 @@ function ExpandingCard({expanded}) {
 }
 ```
 
-**Techniques:**
+## Techniques
 
 - `layout`: Animate position and size changes automatically (FLIP algorithm)
 - `layout="position"`: Only position (for text); `layout="size"`: Only size

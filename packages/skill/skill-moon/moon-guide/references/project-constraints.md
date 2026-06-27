@@ -1,10 +1,14 @@
 # project-constraints: Enforce Architectural Boundaries
 
-**Guideline:** Define tag-based constraints in workspace to enforce dependency rules between projects.
+## Guideline
 
-**Rationale:** Tag-based constraints prevent architectural violations by restricting which project tags can depend on others, enforcing clear module boundaries in monorepos.
+Define tag-based constraints in workspace to enforce dependency rules between projects.
 
-**Example:**
+## Rationale
+
+Tag-based constraints prevent architectural violations by restricting which project tags can depend on others, enforcing clear module boundaries in monorepos.
+
+## Example
 
 ```yaml
 # .moon/workspace.yml
@@ -16,7 +20,7 @@ constraints:
   enforceLayerRelationships: true
 ```
 
-**Techniques:**
+## Techniques
 
 ## tagRelationships
 
@@ -59,7 +63,7 @@ Layer hierarchy (lowest to highest):
 
 ## Common Patterns
 
-**Tenant isolation:**
+### Tenant isolation
 
 ```yaml
 tagRelationships:
@@ -67,7 +71,7 @@ tagRelationships:
   tenant-beta: [tenant-beta, shared]
 ```
 
-**Feature boundaries:**
+### Feature boundaries
 
 ```yaml
 tagRelationships:

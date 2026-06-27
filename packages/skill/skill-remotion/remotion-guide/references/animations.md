@@ -1,8 +1,12 @@
 # animations: Frame-Driven Animation
 
-**Guideline:** Drive all animations with `useCurrentFrame()` and `interpolate()` or `spring()` functions, never CSS transitions.
+## Guideline
 
-**Rationale:** Remotion captures each frame as an image; CSS transitions and Tailwind animations won't render in the video output.
+Drive all animations with `useCurrentFrame()` and `interpolate()` or `spring()` functions, never CSS transitions.
+
+## Rationale
+
+Remotion captures each frame as an image; CSS transitions and Tailwind animations won't render in the video output.
 
 ## Contents
 
@@ -14,7 +18,7 @@
 - [Bad vs. Good](#bad-vs-good)
 - [Techniques](#techniques)
 
-**Example:**
+### Example
 
 ```tsx
 // Simple fade-in over 1 second (30fps = 30 frames)
@@ -32,7 +36,7 @@ return <div style={{transform: `scale(${scale})`}}>Bounces in</div>;
 <div className="animate-bounce">Won't work</div>;
 ```
 
-**Linear Interpolation:**
+### Linear Interpolation
 
 ```tsx
 import {interpolate, useCurrentFrame, useVideoConfig} from "remotion";
@@ -50,7 +54,7 @@ function FadeIn() {
 }
 ```
 
-**Spring Animation:**
+### Spring Animation
 
 ```tsx
 import {spring, useCurrentFrame, useVideoConfig} from "remotion";
@@ -69,7 +73,7 @@ function BounceIn() {
 }
 ```
 
-**Spring Presets:**
+### Spring Presets
 
 ```tsx
 // Smooth, no bounce (subtle reveals)
@@ -85,7 +89,7 @@ const bouncy = {damping: 8};
 const heavy = {damping: 15, stiffness: 80, mass: 2};
 ```
 
-**Easing Functions:**
+### Easing Functions
 
 ```tsx
 import {Easing, interpolate, useCurrentFrame} from "remotion";
@@ -106,7 +110,7 @@ function EasedMove() {
 }
 ```
 
-**Bad vs. Good:**
+### Bad vs. Good
 
 ```tsx
 // Bad: CSS transitions won't render
@@ -121,7 +125,7 @@ const opacity = interpolate(frame, [0, 30], [0, 1]);
 <div style={{opacity}}>Renders correctly</div>
 ```
 
-**Techniques:**
+### Techniques
 
 - useCurrentFrame(): Get current frame number from video composition
 - interpolate(): Map frame ranges to value ranges with extrapolation control

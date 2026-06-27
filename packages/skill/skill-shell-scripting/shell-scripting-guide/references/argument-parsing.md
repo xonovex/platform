@@ -1,10 +1,14 @@
 # argument-parsing: Argument Parsing
 
-**Guideline:** Validate script arguments and parse flags with clear usage messages.
+## Guideline
 
-**Rationale:** Proper argument parsing prevents script misuse, provides helpful feedback to users, and makes scripts more robust and user-friendly.
+Validate script arguments and parse flags with clear usage messages.
 
-**Example:**
+## Rationale
+
+Proper argument parsing prevents script misuse, provides helpful feedback to users, and makes scripts more robust and user-friendly.
+
+## Example
 
 ```sh
 # ✅ Simple argument parsing
@@ -58,7 +62,7 @@ parse_flags() {
 }
 ```
 
-**Techniques:**
+## Techniques
 
 - Check argument count before accessing positional parameters
 - Provide clear usage messages showing required and optional arguments

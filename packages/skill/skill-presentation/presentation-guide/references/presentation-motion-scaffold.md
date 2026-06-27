@@ -1,10 +1,14 @@
 # presentation-motion-scaffold: Create Motion Presentation Package
 
-**Guideline:** Scaffold Motion React presentation package from markdown presentation document.
+## Guideline
 
-**Rationale:** Converts markdown presentations into fully-functional React + Motion slide decks with animations and interactive features.
+Scaffold Motion React presentation package from markdown presentation document.
 
-**Example:**
+## Rationale
+
+Converts markdown presentations into fully-functional React + Motion slide decks with animations and interactive features.
+
+## Example
 
 ```
 Input: presentation.md with:
@@ -27,7 +31,7 @@ packages/presentations/microservices/
 └── vite.config.ts (generated)
 ```
 
-**Techniques:**
+## Techniques
 
 - Parse markdown: extract title, style guide, slides separated by `---`
 - Determine slide types from content: title, bullets, diagrams, chapter headers, closing

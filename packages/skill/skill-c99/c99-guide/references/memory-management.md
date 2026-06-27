@@ -1,10 +1,14 @@
 # memory-management: Memory Management Patterns
 
-**Guideline:** Prefer stack allocation and ensure proper cleanup of heap allocations with clear ownership tracking.
+## Guideline
 
-**Rationale:** Proper memory management prevents leaks and use-after-free bugs. Stack allocation is simpler as it's automatically cleaned up when the function returns.
+Prefer stack allocation and ensure proper cleanup of heap allocations with clear ownership tracking.
 
-**Example:**
+## Rationale
+
+Proper memory management prevents leaks and use-after-free bugs. Stack allocation is simpler as it's automatically cleaned up when the function returns.
+
+## Example
 
 ```c
 // Stack allocation (preferred)
@@ -27,7 +31,7 @@ void dynamic_array(size_t size) {
 }
 ```
 
-**Techniques:**
+## Techniques
 
 - Default stack: Use stack allocation for fixed-size data by default
 - Heap when needed: Use malloc/calloc only for dynamic or longer-lived data

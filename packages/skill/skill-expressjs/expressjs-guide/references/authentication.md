@@ -1,10 +1,14 @@
 # authentication: JWT Authentication
 
-**Guideline:** Implement JWT-based auth with middleware for authentication and role verification.
+## Guideline
 
-**Rationale:** Stateless JWT tokens enable scalable authentication; role-based middleware enforces authorization at route level.
+Implement JWT-based auth with middleware for authentication and role verification.
 
-**Example:**
+## Rationale
+
+Stateless JWT tokens enable scalable authentication; role-based middleware enforces authorization at route level.
+
+## Example
 
 ```typescript
 declare global {
@@ -40,7 +44,7 @@ export function requireRole(...roles: string[]) {
 }
 ```
 
-**Techniques:**
+## Techniques
 
 - Extend Express Request: Add optional user property with JwtPayload interface
 - requireAuth middleware: Verify Bearer token from Authorization header, attach user to request

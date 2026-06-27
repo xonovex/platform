@@ -1,10 +1,14 @@
 # quoting: Quoting Variables and Expansions
 
-**Guideline:** Always quote variable expansions with double quotes to prevent word splitting and glob expansion.
+## Guideline
 
-**Rationale:** Unquoted variables are subject to word splitting on whitespace and pathname expansion, leading to subtle bugs when filenames contain spaces or special characters.
+Always quote variable expansions with double quotes to prevent word splitting and glob expansion.
 
-**Example:**
+## Rationale
+
+Unquoted variables are subject to word splitting on whitespace and pathname expansion, leading to subtle bugs when filenames contain spaces or special characters.
+
+## Example
 
 ```sh
 # ✅ Always quote variable expansions
@@ -34,7 +38,7 @@ current_date="$(date +%Y-%m-%d)"
 files="$(find . -name '*.txt')"
 ```
 
-**Techniques:**
+## Techniques
 
 - Quote all variable expansions: `"$var"`
 - Quote command substitutions: `"$(command)"`

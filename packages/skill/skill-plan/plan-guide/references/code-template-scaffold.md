@@ -1,10 +1,14 @@
 # code-template-scaffold: Analyze Package Scaffolding Options
 
-**Guideline:** Analyze available templates and generate research report on scaffolding options.
+## Guideline
 
-**Rationale:** Understanding available templates before scaffolding ensures correct foundation. Reduces setup time and ensures consistency with established patterns.
+Analyze available templates and generate research report on scaffolding options.
 
-**Example:**
+## Rationale
+
+Understanding available templates before scaffolding ensures correct foundation. Reduces setup time and ensures consistency with established patterns.
+
+## Example
 
 ```
 Available templates in .templates/:
@@ -26,7 +30,7 @@ Available templates in .templates/:
 Recommendation: For new API → use api-typescript
 ```
 
-**Techniques:**
+## Techniques
 
 - Discover templates in monorepo (usually in `templates/`, `.templates/`, or `_templates/`)
 - List template types: website, API, library, utility, service

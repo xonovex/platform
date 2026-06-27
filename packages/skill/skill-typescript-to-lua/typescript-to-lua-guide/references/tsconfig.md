@@ -1,10 +1,14 @@
 # tsconfig: TypeScript Configuration for TSTL
 
-**Guideline:** Configure TypeScript with strict mode and TSTL settings for optimal Lua generation.
+## Guideline
 
-**Rationale:** Strict options catch errors early and generate predictable Lua. TSTL settings control targeting, libraries, and debugging.
+Configure TypeScript with strict mode and TSTL settings for optimal Lua generation.
 
-**Example:**
+## Rationale
+
+Strict options catch errors early and generate predictable Lua. TSTL settings control targeting, libraries, and debugging.
+
+## Example
 
 ```json
 {
@@ -36,7 +40,7 @@
 }
 ```
 
-**Techniques:**
+## Techniques
 
 - Enable `strict: true` for comprehensive type checking
 - Enable individual strict options: `noImplicitAny`, `strictNullChecks`, `strictFunctionTypes`

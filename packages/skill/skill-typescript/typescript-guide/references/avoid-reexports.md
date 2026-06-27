@@ -1,10 +1,14 @@
 # avoid-reexports: Import from Source Packages Directly
 
-**Guideline:** Import directly from source packages, don't re-export external utilities through your modules.
+## Guideline
 
-**Rationale:** Re-exports obscure code origin and complicate dependency understanding.
+Import directly from source packages, don't re-export external utilities through your modules.
 
-**Example:**
+## Rationale
+
+Re-exports obscure code origin and complicate dependency understanding.
+
+## Example
 
 ```typescript
 // ✅ Good: Import directly from source
@@ -17,7 +21,7 @@ export {getUserId, type JwtContext} from "@acme/shared-utils";
 // src/middlewares/jwt.ts - only local exports
 ```
 
-**Techniques:**
+## Techniques
 
 - Identify files re-exporting from external/shared packages
 - Remove re-export statements from module exports

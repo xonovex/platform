@@ -1,10 +1,14 @@
 # merge-resolve: Detect and Resolve Merge Conflicts
 
-**Guideline:** Detect, classify, and resolve merge conflicts with auto-resolution for simple cases and strategies for complex conflicts.
+## Guideline
 
-**Rationale:** Simple conflicts like import statements and dependencies can be auto-resolved, while complex conflicts require manual decision-making based on strategies like keeping ours/theirs/merging intelligently.
+Detect, classify, and resolve merge conflicts with auto-resolution for simple cases and strategies for complex conflicts.
 
-**Example:**
+## Rationale
+
+Simple conflicts like import statements and dependencies can be auto-resolved, while complex conflicts require manual decision-making based on strategies like keeping ours/theirs/merging intelligently.
+
+## Example
 
 ```bash
 # Detecting conflicts
@@ -29,7 +33,7 @@ $ git add .
 $ git commit -m "merge: resolve conflicts with feature branch"
 ```
 
-**Techniques:**
+## Techniques
 
 - Detect conflicts via `git status --porcelain` (UU, AA, DD markers)
 - Classify as simple (auto-resolvable: imports, dependencies, additions) or complex (manual: functions, types, logic)

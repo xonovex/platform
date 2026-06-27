@@ -1,10 +1,14 @@
 # error-handling: RFC 7807 Problem Details for Consistent Error Responses
 
-**Guideline:** Use RFC 7807 Problem Details format for all error responses to provide consistent, structured, machine-readable error information across your API.
+## Guideline
 
-**Rationale:** RFC 7807 provides a standard structure recognized across HTTP APIs, enabling clients to parse errors consistently with machine-readable field-level validation details and request context. Built-in extensibility and separation between human and machine-readable fields improves debugging and error handling.
+Use RFC 7807 Problem Details format for all error responses to provide consistent, structured, machine-readable error information across your API.
 
-**Example:**
+## Rationale
+
+RFC 7807 provides a standard structure recognized across HTTP APIs, enabling clients to parse errors consistently with machine-readable field-level validation details and request context. Built-in extensibility and separation between human and machine-readable fields improves debugging and error handling.
+
+## Example
 
 ```typescript
 import type {Context} from "hono";
@@ -59,7 +63,7 @@ export function notFound(c: Context, detail: string): Response {
 }
 ```
 
-**Techniques:**
+## Techniques
 
 - Define `ProblemDetails` TypeScript interface matching RFC 7807 spec
 - Include required fields: type, title, status

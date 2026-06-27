@@ -1,10 +1,14 @@
 # caching-functions: Caching Pure Functions
 
-**Guideline:** Cache expensive pure function results with `@cache` or `@lru_cache` decorators.
+## Guideline
 
-**Rationale:** Caching eliminates redundant computations for pure functions (functions that always return the same output for the same input). `@cache` provides unbounded caching for small datasets, while `@lru_cache` offers size-limited caching with LRU eviction for larger datasets. This dramatically improves performance for recursive algorithms and expensive operations.
+Cache expensive pure function results with `@cache` or `@lru_cache` decorators.
 
-**Example:**
+## Rationale
+
+Caching eliminates redundant computations for pure functions (functions that always return the same output for the same input). `@cache` provides unbounded caching for small datasets, while `@lru_cache` offers size-limited caching with LRU eviction for larger datasets. This dramatically improves performance for recursive algorithms and expensive operations.
+
+## Example
 
 ```python
 from functools import cache, lru_cache
@@ -39,7 +43,7 @@ fib_10 = fibonacci(10)  # Calculates
 fib_10_again = fibonacci(10)  # Returns cached
 ```
 
-**Techniques:**
+## Techniques
 
 - Use `@cache` for unbounded caching of pure functions
 - Use `@lru_cache(maxsize=N)` for size-limited caching

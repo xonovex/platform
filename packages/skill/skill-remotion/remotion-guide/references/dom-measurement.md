@@ -1,10 +1,14 @@
 # dom-measurement: Measuring DOM Elements
 
-**Guideline:** Divide `getBoundingClientRect()` values by `useCurrentScale()` to account for Remotion's scale transforms.
+## Guideline
 
-**Rationale:** Remotion applies scale transforms to elements; measurements need correction to reflect actual dimensions at scale 1.
+Divide `getBoundingClientRect()` values by `useCurrentScale()` to account for Remotion's scale transforms.
 
-**Example:**
+## Rationale
+
+Remotion applies scale transforms to elements; measurements need correction to reflect actual dimensions at scale 1.
+
+## Example
 
 ```tsx
 // Without scale correction (wrong)
@@ -26,7 +30,7 @@ return (
 );
 ```
 
-**Correct Measurement:**
+## Correct Measurement
 
 ```tsx
 import {useEffect, useRef, useState} from "react";
@@ -55,7 +59,9 @@ export function MeasuredComponent() {
 }
 ```
 
-**Outline vs Border:** Outline doesn't affect layout; border does at different scales.
+## Outline vs Border
+
+Outline doesn't affect layout; border does at different scales.
 
 ```tsx
 function PositionedElement() {
@@ -81,7 +87,7 @@ function PositionedElement() {
 }
 ```
 
-**Techniques:**
+## Techniques
 
 - useCurrentScale(): Get scale factor applied by Remotion
 - Divide measurements: width/scale, height/scale for correct values

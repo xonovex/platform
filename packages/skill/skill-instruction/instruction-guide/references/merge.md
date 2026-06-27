@@ -16,29 +16,51 @@ Extracts organizational patterns from a source AGENTS.md and integrates them int
 
 ## Integration Rules
 
-**Preserve (CRITICAL):** section order, project tech names (`moon`, `npm`, `Terraform`, etc.), paths/directories, command syntax, notation style (arrows/parens), spacing, terminology, all project context
+### Preserve (CRITICAL)
 
-**Extract from source:** organizational patterns only — section grouping, hierarchy, workflow presentation, integration docs, structure styles
+section order, project tech names (`moon`, `npm`, `Terraform`, etc.), paths/directories, command syntax, notation style (arrows/parens), spacing, terminology, all project context
 
-**Style matching:** match section presentation, command notation, arrow style, inline details format, heading caps, whitespace, tech vocabulary
+### Extract from source
 
-**Approach:** extract patterns NOT content → rewrite with target's tech names → insert in existing sections → match formatting exactly → preserve all project-specific elements
+organizational patterns only — section grouping, hierarchy, workflow presentation, integration docs, structure styles
 
-**Project preservation:** never replace tech names, keep paths/directories, preserve commands, maintain integration docs, keep dependencies unchanged
+### Style matching
 
-**Percentage scale:** 10-30% critical only, 30-50% important (default 45), 50-70% comprehensive, 70-100% extensive
+match section presentation, command notation, arrow style, inline details format, heading caps, whitespace, tech vocabulary
 
-**Aspect filtering:** `workflow` (sequences/delegation), `structure` (directory/hierarchy), `integration` (doc styles), `dependencies` (doc approaches), `commands` (notation styles)
+### Approach
+
+extract patterns NOT content → rewrite with target's tech names → insert in existing sections → match formatting exactly → preserve all project-specific elements
+
+### Project preservation
+
+never replace tech names, keep paths/directories, preserve commands, maintain integration docs, keep dependencies unchanged
+
+### Percentage scale
+
+10-30% critical only, 30-50% important (default 45), 50-70% comprehensive, 70-100% extensive
+
+### Aspect filtering
+
+`workflow` (sequences/delegation), `structure` (directory/hierarchy), `integration` (doc styles), `dependencies` (doc approaches), `commands` (notation styles)
 
 ## Implementation
 
-**Discovery:** Accept AGENTS.md paths or directories (e.g. `services/api` → `services/api/AGENTS.md`)
+### Discovery
 
-**Analysis:** Parse target structure → analyze formatting → detect voice → extract conventions → identify project context → build template
+Accept AGENTS.md paths or directories (e.g. `services/api` → `services/api/AGENTS.md`)
 
-**Extraction:** Identify organizational patterns → extract workflow presentation → find integration approaches → filter by aspects
+### Analysis
 
-**Integration:** Extract patterns only (not content) → rewrite with target's tech names → insert in existing sections → match formatting → validate project-specificity
+Parse target structure → analyze formatting → detect voice → extract conventions → identify project context → build template
+
+### Extraction
+
+Identify organizational patterns → extract workflow presentation → find integration approaches → filter by aspects
+
+### Integration
+
+Extract patterns only (not content) → rewrite with target's tech names → insert in existing sections → match formatting → validate project-specificity
 
 ## Error Handling
 

@@ -1,10 +1,14 @@
 # row-level-security: Row-Level Security (RLS) Implementation
 
-**Guideline:** Use Row-Level Security (RLS) policies to enforce tenant isolation and access control at the database level. Set session variables to identify the current tenant/user, and create policies that filter data based on these variables.
+## Guideline
 
-**Rationale:** RLS provides transparent, centralized access control that applies regardless of how data is accessed. It prevents accidental data leaks between tenants and reduces application-level security logic. Policies are enforced by PostgreSQL itself, making them immune to application bugs.
+Use Row-Level Security (RLS) policies to enforce tenant isolation and access control at the database level. Set session variables to identify the current tenant/user, and create policies that filter data based on these variables.
 
-**Example:**
+## Rationale
+
+RLS provides transparent, centralized access control that applies regardless of how data is accessed. It prevents accidental data leaks between tenants and reduces application-level security logic. Policies are enforced by PostgreSQL itself, making them immune to application bugs.
+
+## Example
 
 ```sql
 -- Define multi-tenant table
@@ -57,7 +61,7 @@ SET app.user_id = '660e8400-e29b-41d4-a716-446655440000';
 SELECT * FROM documents;  -- Only sees tenant's documents
 ```
 
-**Techniques:**
+## Techniques
 
 - Enable RLS on multi-tenant tables with `ALTER TABLE ... ENABLE ROW LEVEL SECURITY`
 - Create policies for each operation type (SELECT, INSERT, UPDATE, DELETE)

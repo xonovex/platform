@@ -1,10 +1,14 @@
 # testing-patterns: Testing Patterns
 
-**Guideline:** Typed assertions, epsilon for floats, parity tests for variants.
+## Guideline
 
-**Rationale:** Catches type mismatches. Epsilon handles float imprecision. Parity ensures variants produce identical results.
+Typed assertions, epsilon for floats, parity tests for variants.
 
-**Example:**
+## Rationale
+
+Catches type mismatches. Epsilon handles float imprecision. Parity ensures variants produce identical results.
+
+## Example
 
 ```c
 void test_vec3_dot(void) {
@@ -31,7 +35,7 @@ void test_vec3_dot_soa_parity(void) {
 }
 ```
 
-**Techniques:**
+## Techniques
 
 - Typed assertions: Use `assert_int_eq`, `assert_float_eq`, `assert_ptr_not_null`
 - Epsilon values: Use 1e-4f general, 1e-5f cumulative, 5e-4f for SIMD

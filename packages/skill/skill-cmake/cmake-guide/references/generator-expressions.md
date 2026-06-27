@@ -1,10 +1,14 @@
 # generator-expressions: Generator Expressions
 
-**Guideline:** Use generator expressions for conditional and context-dependent CMake settings.
+## Guideline
 
-**Rationale:** Generator expressions evaluate at build time, allowing different settings based on compiler, platform, configuration, or build/install context.
+Use generator expressions for conditional and context-dependent CMake settings.
 
-**Example:**
+## Rationale
+
+Generator expressions evaluate at build time, allowing different settings based on compiler, platform, configuration, or build/install context.
+
+## Example
 
 ```cmake
 # Build/Install interface paths
@@ -26,7 +30,7 @@ target_compile_definitions(mylib PRIVATE
 )
 ```
 
-**Techniques:**
+## Techniques
 
 - BUILD_INTERFACE/INSTALL_INTERFACE: Different paths for build vs installed consumption
 - CXX_COMPILER_ID: Detect compiler and apply vendor-specific flags

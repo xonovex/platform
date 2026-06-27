@@ -1,10 +1,14 @@
 # env-access-bracket-notation: Use Dot Notation for process.env
 
-**Guideline:** Use dot notation for `process.env` (not bracket notation) unless dynamic or special chars.
+## Guideline
 
-**Rationale:** Dot notation is more idiomatic and improves readability.
+Use dot notation for `process.env` (not bracket notation) unless dynamic or special chars.
 
-**Example:**
+## Rationale
+
+Dot notation is more idiomatic and improves readability.
+
+## Example
 
 ```typescript
 // ❌ Bad: Bracket notation for static
@@ -21,7 +25,7 @@ const value = process.env[configKey];
 const value = process.env["MY-VAR-WITH-DASHES"];
 ```
 
-**Techniques:**
+## Techniques
 
 - Replace all `process.env["VAR"]` with `process.env.VAR` for static keys
 - Keep bracket notation only for dynamic keys or special characters

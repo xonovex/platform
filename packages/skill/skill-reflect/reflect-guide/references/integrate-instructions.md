@@ -13,13 +13,21 @@ Convert insights from a category into concise bullet points and integrate them i
 
 ## Conversion Rules
 
-**Format:** each insight becomes 1-2 bullet points in AGENTS.md style — backtick-wrapped names, `—` descriptions, `→` chains
+### Format
 
-**Deduplication:** skip insights already covered by existing bullets; merge related insights into single bullets
+each insight becomes 1-2 bullet points in AGENTS.md style — backtick-wrapped names, `—` descriptions, `→` chains
 
-**Placement:** insert near related existing bullets; if no related section exists, append a new bullet group with a blank-line separator
+### Deduplication
 
-**Brevity:** only non-obvious details — skip anything inferable from directory name or project structure
+skip insights already covered by existing bullets; merge related insights into single bullets
+
+### Placement
+
+insert near related existing bullets; if no related section exists, append a new bullet group with a blank-line separator
+
+### Brevity
+
+only non-obvious details — skip anything inferable from directory name or project structure
 
 ## Auto-Detection
 

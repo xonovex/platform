@@ -1,10 +1,14 @@
 # architecture: Track behind an injected tracker abstraction
 
-**Guideline:** Feature code depends on a hand-written `AnalyticsTracker` interface injected via DI; the analytics SDK is referenced only by one implementation module, never by ViewModels, composables, or other feature code.
+## Guideline
 
-**Rationale:** A directly-imported SDK couples every feature to a vendor: swapping or adding a destination becomes a project-wide edit, tests cannot assert what was tracked without a real network/SDK, and SDK initialization order leaks into UI code. An interface boundary localizes the SDK to one place and makes tracking a substitutable collaborator.
+Feature code depends on a hand-written `AnalyticsTracker` interface injected via DI; the analytics SDK is referenced only by one implementation module, never by ViewModels, composables, or other feature code.
 
-**How to Apply:**
+## Rationale
+
+A directly-imported SDK couples every feature to a vendor: swapping or adding a destination becomes a project-wide edit, tests cannot assert what was tracked without a real network/SDK, and SDK initialization order leaks into UI code. An interface boundary localizes the SDK to one place and makes tracking a substitutable collaborator.
+
+## How to Apply
 
 1. Define `AnalyticsTracker` in an `api` module with no SDK dependency. Keep the surface small and typed: `trackScreen`, `trackEvent`, `setUserProperties`, plus optional helpers like `trackScreenWithExperiments` and a convenience `trackButtonClickEvent`.
 2. Put the SDK-backed implementation in a separate `impl` module that depends on `api` and the SDK. Feature modules depend only on `api`.
@@ -12,7 +16,7 @@
 4. The implementation may fan out to several destinations behind the one interface; callers stay unaware.
 5. In tests, substitute a fake implementation of the interface (see ./testing.md).
 
-**Example:**
+## Example
 
 ```kotlin
 // Bad — SDK imported directly in a ViewModel; vendor leaks into the feature,
@@ -56,6 +60,10 @@ internal class SdkAnalyticsTracker(
 }
 ```
 
-**Counter-Example:** A thin, throwaway prototype with no tests and one destination may call the SDK inline. As soon as a second destination, a unit test, or a shared feature module appears, introduce the interface.
+## Counter-Example
 
-**Related:** ./where-to-track.md, ./testing.md. The concrete SDK-backed implementation conventions (a specific analytics SDK or codegen tool) are outside this platform-level skill.
+A thin, throwaway prototype with no tests and one destination may call the SDK inline. As soon as a second destination, a unit test, or a shared feature module appears, introduce the interface.
+
+## Related
+
+./where-to-track.md, ./testing.md. The concrete SDK-backed implementation conventions (a specific analytics SDK or codegen tool) are outside this platform-level skill.

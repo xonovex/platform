@@ -1,10 +1,14 @@
 # accessibility: Accessibility Best Practices
 
-**Guideline:** Use semantic HTML, descriptive alt text, and ARIA attributes for accessibility.
+## Guideline
 
-**Rationale:** Static-first approach enables accessible sites by default; semantic HTML ensures assistive tech compatibility and improves SEO.
+Use semantic HTML, descriptive alt text, and ARIA attributes for accessibility.
 
-**Example:**
+## Rationale
+
+Static-first approach enables accessible sites by default; semantic HTML ensures assistive tech compatibility and improves SEO.
+
+## Example
 
 ```astro
 <header>
@@ -23,7 +27,7 @@
 </main>
 ```
 
-**Techniques:**
+## Techniques
 
 - Semantic elements: Use `<header>`, `<nav>`, `<main>`, `<article>`, `<aside>` for structure
 - Alt text: Provide descriptive alt attributes for all images

@@ -1,10 +1,14 @@
 # selection-highlighting: Outline Rendering by Id Edge Detection
 
-**Guideline:** Highlight the selection with a crisp constant-width outline by rendering selected objects' ids into a separate single-channel target, then edge-detecting that id target in one fullscreen pass after post-processing — comparing each pixel's id to its neighbors' to find silhouette edges, and comparing selection depth to scene depth so an occluded outline is dimmed rather than dropped.
+## Guideline
 
-**Rationale:** A good selection outline must be readable, crisp, anti-aliased, a constant one pixel wide, composited after post-processing, still visible (dimmed) when the selected object is hidden behind unselected geometry, and cheap for any shader to opt into. Writing a selection id into a dedicated render target and doing edge detection on it satisfies all of these at once: edges fall exactly on silhouette boundaries (where the id changes), width is controlled by the sampling kernel rather than the geometry, and the pass runs late so it overlays the final image. The hard part is occlusion. Comparing the selection depth directly against the scene depth would be correct only if the depth buffers were stable — but with temporal anti-aliasing every frame applies a different sub-pixel jitter, so a direct compare makes the outline shimmer. Taking the closest selection depth over a small neighborhood before comparing both smooths jitter and lets the outline bleed slightly over occluders, which reads as a deliberate, soft hidden-outline rather than noise.
+Highlight the selection with a crisp constant-width outline by rendering selected objects' ids into a separate single-channel target, then edge-detecting that id target in one fullscreen pass after post-processing — comparing each pixel's id to its neighbors' to find silhouette edges, and comparing selection depth to scene depth so an occluded outline is dimmed rather than dropped.
 
-**How to Apply:**
+## Rationale
+
+A good selection outline must be readable, crisp, anti-aliased, a constant one pixel wide, composited after post-processing, still visible (dimmed) when the selected object is hidden behind unselected geometry, and cheap for any shader to opt into. Writing a selection id into a dedicated render target and doing edge detection on it satisfies all of these at once: edges fall exactly on silhouette boundaries (where the id changes), width is controlled by the sampling kernel rather than the geometry, and the pass runs late so it overlays the final image. The hard part is occlusion. Comparing the selection depth directly against the scene depth would be correct only if the depth buffers were stable — but with temporal anti-aliasing every frame applies a different sub-pixel jitter, so a direct compare makes the outline shimmer. Taking the closest selection depth over a small neighborhood before comparing both smooths jitter and lets the outline bleed slightly over occluders, which reads as a deliberate, soft hidden-outline rather than noise.
+
+## How to Apply
 
 1. Maintain a selection set of ids and pass it to renderable objects; in the inner loop, if the owning object's id is in the set, enable a shared `selection` shader feature.
 2. That feature renders the object again into a single-channel selection target, writing a unique id (e.g. the low 8 bits of the entity id).
@@ -14,7 +18,7 @@
 6. If the outline pixel is behind scene geometry, multiply its alpha down (e.g. to 0.3) rather than discarding it; early-out when alpha is zero.
 7. Composite the outline color after post-processing in sRGB.
 
-**Example:**
+## Example
 
 ```hlsl
 // Edge detect on the id target: alpha rises where neighbor ids differ from center.
@@ -38,7 +42,7 @@ a *= visible ? 1.0 : 0.3;                                // hidden outline dimme
 if (a == 0.0) discard;
 ```
 
-**Gotchas:**
+## Gotchas
 
 - Direct selection-depth-vs-scene-depth comparison shimmers under TAA because the depth buffers carry a per-frame sub-pixel jitter; take the closest depth over a small neighborhood first.
 - Reverse-Z means the closest surface is the maximum depth value, so use `max` over the depth taps, not `min`.
@@ -48,4 +52,6 @@ if (a == 0.0) discard;
 - Skipping the zero-alpha early-out wastes the whole composite where there is no edge.
 - A single-channel id target only distinguishes silhouettes, not colors; per-selection-state colors require writing a color id and doing a weighted neighborhood sum.
 
-**Related:** [references/object-picking.md](./object-picking.md), [references/render-editor-integration.md](./render-editor-integration.md), **gpu-rendering-guide**
+## Related
+
+[references/object-picking.md](./object-picking.md), [references/render-editor-integration.md](./render-editor-integration.md), **gpu-rendering-guide**

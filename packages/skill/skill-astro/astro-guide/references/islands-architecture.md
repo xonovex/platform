@@ -1,10 +1,14 @@
 # islands-architecture: Islands Architecture and Hydration
 
-**Guideline:** Ship minimal JavaScript by hydrating only interactive components; static HTML by default.
+## Guideline
 
-**Rationale:** Astro renders to static HTML by default (zero JS). Framework components only hydrate when marked with directives, resulting in faster loads and better performance.
+Ship minimal JavaScript by hydrating only interactive components; static HTML by default.
 
-**Example:**
+## Rationale
+
+Astro renders to static HTML by default (zero JS). Framework components only hydrate when marked with directives, resulting in faster loads and better performance.
+
+## Example
 
 ```astro
 ---
@@ -21,7 +25,7 @@ import SearchBar from "../components/SearchBar.tsx";
 </Layout>
 ```
 
-**Techniques:**
+## Techniques
 
 - Static by default: Build pages with Astro components that render zero JavaScript
 - Framework components: Import React, Vue, Svelte only for interactive features

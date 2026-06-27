@@ -1,10 +1,14 @@
 # resource-management: Resource Management with Context Managers
 
-**Guideline:** Use context managers (`with` and `async with`) for automatic resource cleanup.
+## Guideline
 
-**Rationale:** Context managers ensure resources are properly released even when exceptions occur. This prevents resource leaks and simplifies error handling. Custom context managers enable reusable resource management patterns like database transactions.
+Use context managers (`with` and `async with`) for automatic resource cleanup.
 
-**Example:**
+## Rationale
+
+Context managers ensure resources are properly released even when exceptions occur. This prevents resource leaks and simplifies error handling. Custom context managers enable reusable resource management patterns like database transactions.
+
+## Example
 
 ```python
 from pathlib import Path
@@ -49,7 +53,7 @@ async with async_database_transaction(conn) as db:
     await db.execute("INSERT INTO users ...")
 ```
 
-**Techniques:**
+## Techniques
 
 - Use `with` for synchronous resource operations
 - Use `async with` for asynchronous resource operations

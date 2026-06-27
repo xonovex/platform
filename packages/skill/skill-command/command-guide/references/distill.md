@@ -18,13 +18,13 @@ Refactor a self-contained ("fat") command — one that inlines its whole Goal / 
 
 ## What Stays vs What Moves
 
-**Stays in the command (its public contract):**
+### Stays in the command (its public contract)
 
 - Frontmatter — `description`, `allowed-tools` (with `Skill` added), `argument-hint`
 - Arguments — the flag/default contract (command-unique; absent from the skill)
 - A `## Delegation` block naming the exact skill + operation
 
-**Moves to the skill reference (the single source of truth):**
+### Moves to the skill reference (the single source of truth)
 
 - Goal, Core Workflow, Output Format, Examples, Error Handling, Gotchas — deleted from the command, authored once in `references/{operation}.md`
 

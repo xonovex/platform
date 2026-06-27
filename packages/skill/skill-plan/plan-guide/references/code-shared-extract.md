@@ -1,10 +1,14 @@
 # code-shared-extract: Identify Common Patterns for Shared Library Extraction
 
-**Guideline:** Identify common code patterns across packages for extraction to shared libraries.
+## Guideline
 
-**Rationale:** Duplicated code increases maintenance burden and inconsistency risks. Extracting to shared libraries promotes DRY, ensures consistent behavior, simplifies updates.
+Identify common code patterns across packages for extraction to shared libraries.
 
-**Example:**
+## Rationale
+
+Duplicated code increases maintenance burden and inconsistency risks. Extracting to shared libraries promotes DRY, ensures consistent behavior, simplifies updates.
+
+## Example
 
 ```typescript
 // Found in 3 packages: auth validation logic
@@ -16,7 +20,7 @@
 export function validateToken(token: string): Result<Payload, Error>;
 ```
 
-**Techniques:**
+## Techniques
 
 - Scan packages for repeated patterns: functions, components, hooks, middleware, types, constants
 - Use semantic analysis to find similar logic even with different names

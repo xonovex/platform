@@ -1,10 +1,14 @@
 # composability: Composable Stages Over a Uniform Currency
 
-**Guideline:** Build small, unopinionated primitives/stages that compose over one uniform data currency; let the caller wire the sequence explicitly. A stage's "phase"/role is how it is used, not a category the library bakes in — the consumer picks the 1..N stages it needs.
+## Guideline
 
-**Rationale:** A monolithic `do_everything()` forces every caller into one fixed pipeline and one set of trade-offs. Decomposing the work into stages that read and write the _same_ data type lets each consumer assemble exactly the funnel it needs (1 stage for the trivial case, more for the complex one), swap one stage's implementation without touching the others, and test each stage in isolation. Keeping composition explicit (plain function calls in the caller, not a registered callback/vtable pipeline) preserves readability, debuggability, and the no-hidden-dispatch property of systems C — the "pipeline" is just the code the caller writes.
+Build small, unopinionated primitives/stages that compose over one uniform data currency; let the caller wire the sequence explicitly. A stage's "phase"/role is how it is used, not a category the library bakes in — the consumer picks the 1..N stages it needs.
 
-**How to Apply:**
+## Rationale
+
+A monolithic `do_everything()` forces every caller into one fixed pipeline and one set of trade-offs. Decomposing the work into stages that read and write the _same_ data type lets each consumer assemble exactly the funnel it needs (1 stage for the trivial case, more for the complex one), swap one stage's implementation without touching the others, and test each stage in isolation. Keeping composition explicit (plain function calls in the caller, not a registered callback/vtable pipeline) preserves readability, debuggability, and the no-hidden-dispatch property of systems C — the "pipeline" is just the code the caller writes.
+
+## How to Apply
 
 1. Define the **currency**: one caller-owned data type that flows between stages (e.g. an index-pair set, a manifold/contact buffer, a mesh-vertex stream). Index-based, not pointer-based, so stages stay relocatable and cache-friendly.
 2. Split the work into **role-shaped stages** over that currency: a _source_ (produces the currency), zero or more _filters_ (currency → narrower currency), and a _sink/solver_ (currency → result). Name stages by what they _do_, never by a fixed "phase".
@@ -12,7 +16,7 @@
 4. **Compose explicitly** in the consumer — sequential calls, no function-pointer dispatch table or registration framework. Fuse adjacent stages only as a measured optimization.
 5. Let trivial cases **skip stages**: a one-stage path (e.g. all-pairs solve) must not pay for machinery the N-stage path needs.
 
-**Example:**
+## Example
 
 ```c
 // Bad: one monolithic call bakes in the whole pipeline and its policy.
@@ -35,6 +39,10 @@ pairs_filter_layer(layer, mask, &pairs, &pairs);   // in/out may alias (compacti
 solve_aabb(&manifold, boxes, &pairs);
 ```
 
-**Counter-Example:** A genuinely single-step operation with no reuse or variation does not need a stage split — forcing a funnel there adds ceremony without payoff. Composability biases the design; it is not a mandate to fragment every function.
+## Counter-Example
 
-**Related:** [references/caller-owns-memory.md](./caller-owns-memory.md), [references/implementation-variants.md](./implementation-variants.md), **data-oriented-design-guide**
+A genuinely single-step operation with no reuse or variation does not need a stage split — forcing a funnel there adds ceremony without payoff. Composability biases the design; it is not a mandate to fragment every function.
+
+## Related
+
+[references/caller-owns-memory.md](./caller-owns-memory.md), [references/implementation-variants.md](./implementation-variants.md), **data-oriented-design-guide**

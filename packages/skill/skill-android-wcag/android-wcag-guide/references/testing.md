@@ -10,11 +10,15 @@
 - Lint accessibility rules: abortOnError + burn down the baseline
 - Wire lint and instrumented tests into CI
 
-**Guideline:** Treat accessibility as a verified output, not a hope — assert semantics in Compose tests, unit-test the strings that build descriptions, add automated ATF checks where you can (real apps often ship without them — see below), exercise large font scale / dark mode in screenshot tests, keep accessibility lint rules error-level, and run all of it in CI.
+### Guideline
 
-**Rationale:** Accessibility regressions are invisible in normal QA because the screen still looks fine to a sighted tester at default font scale. Without enforcement, content descriptions get dropped, touch targets shrink, contrast drifts, and headings vanish — silently. Automated checks defend most criteria at once: 1.1.1 Non-text Content (labels), 1.4.3 Contrast (Minimum), 1.4.4 Resize Text and 1.4.10 Reflow (font scale / reflow), 1.4.11 Non-text Contrast, 2.5.8 Target Size (Minimum), and 4.1.2 Name, Role, Value (role + state). A test that merely finds a node by its label proves nothing about whether that label is correct or whether a screen reader can act on it.
+Treat accessibility as a verified output, not a hope — assert semantics in Compose tests, unit-test the strings that build descriptions, add automated ATF checks where you can (real apps often ship without them — see below), exercise large font scale / dark mode in screenshot tests, keep accessibility lint rules error-level, and run all of it in CI.
 
-**How to Apply:**
+### Rationale
+
+Accessibility regressions are invisible in normal QA because the screen still looks fine to a sighted tester at default font scale. Without enforcement, content descriptions get dropped, touch targets shrink, contrast drifts, and headings vanish — silently. Automated checks defend most criteria at once: 1.1.1 Non-text Content (labels), 1.4.3 Contrast (Minimum), 1.4.4 Resize Text and 1.4.10 Reflow (font scale / reflow), 1.4.11 Non-text Contrast, 2.5.8 Target Size (Minimum), and 4.1.2 Name, Role, Value (role + state). A test that merely finds a node by its label proves nothing about whether that label is correct or whether a screen reader can act on it.
+
+### How to Apply
 
 1. In Compose UI tests, assert the semantics — `assertContentDescriptionEquals`, role via a `SemanticsMatcher`, `stateDescription`, heading presence, and touch size — not just that a node exists.
 2. Add the Accessibility Test Framework — `enableAccessibilityChecks()` (Compose) / `AccessibilityChecks.enable()` (Espresso) — to fail tests on low contrast, small targets, and missing labels. It is a cheap automatic net for whole classes of issues; large apps commonly omit it, which means those classes go uncaught unless asserted by hand.
@@ -28,7 +32,7 @@
 
 The locator and the assertion must be different things. Finding a node _by_ its content description and then doing nothing else only proves a string exists somewhere — it never checks that the string is the right one, that the element has a role, or that it meets target size.
 
-**Example:**
+#### Example
 
 ```kotlin
 // Bad — content description used purely as a locator; nothing about it is verified.
@@ -91,7 +95,7 @@ Fold the accessibility property into the **locator**, not just the assertion: fi
 
 The ATF runs the same engine behind Accessibility Scanner over the live view tree during a test and fails on a catalogue of issues (contrast, target size, missing labels, duplicate descriptions). It is the cheapest broad net you have. Enable it once per test class. Reality check: many large apps ship with no ATF wiring at all, relying on Robot semantics assertions plus accessibility-stress screenshots — which catch labels/headings/state but leave contrast and target-size regressions uncaught. That gap is the reason to add ATF, not a reason to skip it.
 
-**Example:**
+#### Example
 
 ```kotlin
 // Compose: opt every interaction in this rule into ATF validation.
@@ -119,7 +123,9 @@ AccessibilityChecks.enable()
     )
 ```
 
-**Counter-Example:** ATF cannot judge whether a label is _meaningful_ — `"Button"` or `"image1"` passes the missing-label check. Semantic correctness still needs the explicit `assertContentDescriptionEquals` from the section above.
+#### Counter-Example
+
+ATF cannot judge whether a label is _meaningful_ — `"Button"` or `"image1"` passes the missing-label check. Semantic correctness still needs the explicit `assertContentDescriptionEquals` from the section above.
 
 ---
 
@@ -127,7 +133,7 @@ AccessibilityChecks.enable()
 
 Most reflow and contrast regressions only surface under conditions a default-config test never reaches. Parameterize visual tests over font scale and theme so a 200% user and a dark-mode user are covered before release (1.4.4 Resize Text, 1.4.10 Reflow, 1.4.3 Contrast (Minimum)).
 
-**Example:**
+#### Example
 
 ```kotlin
 // Bad — single golden image at default scale, light theme only.
@@ -164,7 +170,7 @@ Review the 2.0 and dark diffs deliberately: clipped text, ellipsized labels, and
 
 Android lint statically catches a meaningful slice — `ContentDescription` (missing description on `ImageView`/icon), `KeyboardInaccessibleWidget` (clickable with no focusability), and `LabelFor` (input with no associated label). These map to 1.1.1, 2.1.1 Keyboard, and 3.3.2 Labels or Instructions. They only protect you if they fail the build.
 
-**Example:**
+#### Example
 
 ```kotlin
 // Bad — every finding is swallowed and a baseline hides the existing debt forever.
@@ -189,7 +195,9 @@ android {
 
 If a baseline already exists, treat it as a debt ledger to shrink, not a permanent mute: fix entries and delete them, and never let a re-run regenerate the baseline to absorb new violations. A baseline that keeps growing is indistinguishable from `abortOnError = false`. Keep genuine non-issue suppressions in a separate `lintConfig` XML — never list accessibility rules (`ContentDescription`, `SpUsage`) there — and make "the baseline must shrink" an explicit written policy.
 
-**Counter-Example:** A short-lived baseline pinned to a known count, tracked in a follow-up issue and reduced every sprint, is acceptable. The anti-pattern is an unbounded baseline plus `abortOnError = false`, where new findings re-baseline silently.
+#### Counter-Example
+
+A short-lived baseline pinned to a known count, tracked in a follow-up issue and reduced every sprint, is acceptable. The anti-pattern is an unbounded baseline plus `abortOnError = false`, where new findings re-baseline silently.
 
 ---
 
@@ -197,13 +205,17 @@ If a baseline already exists, treat it as a debt ledger to shrink, not a permane
 
 Local discipline does not survive a busy team. The semantics assertions, ATF checks, screenshot tests, and lint rules above only prevent regressions if a merge cannot happen while any of them is red.
 
-**How to Apply:**
+#### How to Apply
 
 1. Run `./gradlew lint` (error-level a11y rules) on every PR.
 2. Run instrumented UI tests via `connectedAndroidTest` or a Gradle-managed-device task so ATF and semantics assertions execute on a real/virtual device in CI.
 3. Run the screenshot suite and publish the diff report as a build artifact for review.
 4. Make all three required status checks; do not allow override-on-red as routine.
 
-**Counter-Example:** A pipeline that compiles and runs only JVM unit tests exercises none of the accessibility surface — semantics, contrast, target size, and reflow all live in the instrumented and screenshot layers. "Green CI" without those layers is a false signal.
+#### Counter-Example
 
-**Related:** the behaviors asserted here are defined in ./labelling.md, ./focus-order.md, ./state-and-announcements.md, ./contrast-and-color.md, and ./text-and-targets.md. Follow your design system's component test conventions (screenshot goldens, test-tag injection) where it provides them.
+A pipeline that compiles and runs only JVM unit tests exercises none of the accessibility surface — semantics, contrast, target size, and reflow all live in the instrumented and screenshot layers. "Green CI" without those layers is a false signal.
+
+#### Related
+
+the behaviors asserted here are defined in ./labelling.md, ./focus-order.md, ./state-and-announcements.md, ./contrast-and-color.md, and ./text-and-targets.md. Follow your design system's component test conventions (screenshot goldens, test-tag injection) where it provides them.

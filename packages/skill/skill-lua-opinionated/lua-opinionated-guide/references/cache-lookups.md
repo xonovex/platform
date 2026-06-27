@@ -1,10 +1,14 @@
 # cache-lookups: Cache Table Lookups
 
-**Guideline:** Cache repeated table field accesses in local variables to improve performance.
+## Guideline
 
-**Rationale:** Table lookups are slower than local variable access. Caching reduces redundant table accesses, especially in hot paths and loops.
+Cache repeated table field accesses in local variables to improve performance.
 
-**Example:**
+## Rationale
+
+Table lookups are slower than local variable access. Caching reduces redundant table accesses, especially in hot paths and loops.
+
+## Example
 
 ```lua
 -- ❌ Bad - repeated table lookups
@@ -36,7 +40,7 @@ function rotate_point(x, y, angle)
 end
 ```
 
-**Techniques:**
+## Techniques
 
 - Store frequently accessed table fields in locals
 - Cache standard library functions (math.sin, etc.)

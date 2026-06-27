@@ -1,10 +1,14 @@
 # error-handling: Error Handling
 
-**Guideline:** Use explicit error return values (value, error) pattern instead of exceptions for expected failures.
+## Guideline
 
-**Rationale:** Follows Lua conventions. Makes error handling explicit and visible. More appropriate for recoverable errors than `assert()`.
+Use explicit error return values (value, error) pattern instead of exceptions for expected failures.
 
-**Example:**
+## Rationale
+
+Follows Lua conventions. Makes error handling explicit and visible. More appropriate for recoverable errors than `assert()`.
+
+## Example
 
 ```lua
 -- ✅ Protected call with error handling
@@ -34,7 +38,7 @@ if not config then
 end
 ```
 
-**Techniques:**
+## Techniques
 
 - Return `nil, error_message` on failure
 - Return value on success

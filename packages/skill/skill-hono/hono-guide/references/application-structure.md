@@ -1,10 +1,14 @@
 # application-structure: Application Factory and Router Organization
 
-**Guideline:** Use factory functions to create Hono applications instead of exporting instances, and organize routes into separate router files by domain.
+## Guideline
 
-**Rationale:** Factory functions enable testability by creating fresh instances per test, support dependency injection, and improve isolation. Domain-based router organization provides clear separation of concerns and reduces merge conflicts in team environments.
+Use factory functions to create Hono applications instead of exporting instances, and organize routes into separate router files by domain.
 
-**Example:**
+## Rationale
+
+Factory functions enable testability by creating fresh instances per test, support dependency injection, and improve isolation. Domain-based router organization provides clear separation of concerns and reduces merge conflicts in team environments.
+
+## Example
 
 ```typescript
 // src/app.ts - Main application factory
@@ -40,7 +44,7 @@ usersRouter.post(
 );
 ```
 
-**Techniques:**
+## Techniques
 
 - Create `createApp()` factory function instead of exporting instances
 - Configure global middleware inside the factory

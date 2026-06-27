@@ -1,10 +1,14 @@
 # tagged-unions: Tagged Union Pattern
 
-**Guideline:** Type enum + union for polymorphism without virtual functions. Cache-friendly, compiler optimizable.
+## Guideline
 
-**Rationale:** Avoids virtual function overhead and pointer chasing; enables compiler exhaustiveness checks and efficient batch processing.
+Type enum + union for polymorphism without virtual functions. Cache-friendly, compiler optimizable.
 
-**Example:**
+## Rationale
+
+Avoids virtual function overhead and pointer chasing; enables compiler exhaustiveness checks and efficient batch processing.
+
+## Example
 
 ```c
 typedef enum {
@@ -32,7 +36,7 @@ float shape_volume(const shape_t *s) {
 }
 ```
 
-**Techniques:**
+## Techniques
 
 - Type enum: Define all variant types in single enum for exhaustiveness
 - Union members: Create named structs within union for each type variant

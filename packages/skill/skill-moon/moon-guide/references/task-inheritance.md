@@ -1,8 +1,12 @@
 # task-inheritance: Task Inheritance Hierarchy
 
-**Guideline:** Define tasks at appropriate levels using `inheritedBy` and `extends` with deep merging in Moon 2.0.
+## Guideline
 
-**Rationale:** Hierarchical task inheritance allows global defaults with project-specific customizations, reducing configuration duplication while maintaining flexibility.
+Define tasks at appropriate levels using `inheritedBy` and `extends` with deep merging in Moon 2.0.
+
+## Rationale
+
+Hierarchical task inheritance allows global defaults with project-specific customizations, reducing configuration duplication while maintaining flexibility.
 
 ## Contents
 
@@ -12,7 +16,7 @@
 - [Optional Dependencies](#optional-dependencies)
 - [Composition Patterns](#composition-patterns)
 
-**Example:**
+### Example
 
 ```yaml
 # .moon/tasks/tag-go.yml - Tag-based mixin
@@ -34,7 +38,7 @@ inheritedBy:
   layer: library
 ```
 
-**Techniques:**
+### Techniques
 
 ## inheritedBy Matching
 
@@ -90,7 +94,7 @@ tasks:
 
 ## Composition Patterns
 
-**Tag-based mixins for mixed packages:**
+### Tag-based mixins for mixed packages
 
 ```yaml
 # Project with Go + TypeScript
@@ -103,7 +107,7 @@ tasks:
     deps: [go-build, go-test, build, lint, typecheck]
 ```
 
-**Layer templates extending tag mixins:**
+### Layer templates extending tag mixins
 
 ```yaml
 # .moon/tasks/typescript-library.yml

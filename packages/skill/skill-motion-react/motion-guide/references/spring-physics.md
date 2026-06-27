@@ -1,10 +1,14 @@
 # filename: spring-physics
 
-**Guideline:** Use `type: "spring"` for interactive gestures; adjust `stiffness` (speed), `damping` (bounce), `mass` (weight) for feel.
+## Guideline
 
-**Rationale:** Spring animations are interruptible and natural; duration animations are rigid but synchronized; match animation type to use case.
+Use `type: "spring"` for interactive gestures; adjust `stiffness` (speed), `damping` (bounce), `mass` (weight) for feel.
 
-**Example:**
+## Rationale
+
+Spring animations are interruptible and natural; duration animations are rigid but synchronized; match animation type to use case.
+
+## Example
 
 ```tsx
 // Snappy (buttons, quick interactions)
@@ -27,7 +31,7 @@
 />
 ```
 
-**Techniques:**
+## Techniques
 
 - `stiffness: 100-500`: Response speed; higher = faster snap to target
 - `damping: 10-50`: Bounce control; higher = less bouncy/overshoot

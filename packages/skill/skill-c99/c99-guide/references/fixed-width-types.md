@@ -46,4 +46,6 @@ printf("id=%" PRIu32 " off=%" PRId16 "\n", r.id, r.offset);
 
 Determinism and portability. A struct of exact-width fields has the same size and layout on every target, so it serializes, hashes, and compares bit-identically. A struct of `int`/`long` does not: `long` is 32-bit on Windows and 64-bit on most 64-bit Unix targets, and that single difference silently breaks save files, network packets, and cross-compiler reproducibility.
 
-**Related:** [references/designated-initializers.md](./designated-initializers.md) (ZII fills the rest), [references/build-and-warnings.md](./build-and-warnings.md) (sign-conversion warnings)
+### Related
+
+[references/designated-initializers.md](./designated-initializers.md) (ZII fills the rest), [references/build-and-warnings.md](./build-and-warnings.md) (sign-conversion warnings)

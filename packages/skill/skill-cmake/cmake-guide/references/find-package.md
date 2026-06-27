@@ -1,10 +1,14 @@
 # find-package: Dependency Management with find_package
 
-**Guideline:** Use find_package to locate and link system-installed dependencies.
+## Guideline
 
-**Rationale:** System-installed packages are pre-built and optimized for the platform, reducing build times and disk usage when available.
+Use find_package to locate and link system-installed dependencies.
 
-**Example:**
+## Rationale
+
+System-installed packages are pre-built and optimized for the platform, reducing build times and disk usage when available.
+
+## Example
 
 ```cmake
 # Find system-installed package
@@ -21,7 +25,7 @@ if(OpenSSL_FOUND)
 endif()
 ```
 
-**Techniques:**
+## Techniques
 
 - REQUIRED: Fail build if package not found, use for mandatory dependencies
 - COMPONENTS: Specify individual package parts to reduce linking

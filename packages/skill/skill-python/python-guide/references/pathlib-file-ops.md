@@ -1,10 +1,14 @@
 # pathlib-file-ops: Pathlib for File Operations
 
-**Guideline:** Use `pathlib.Path` for all file and directory operations instead of `os.path`.
+## Guideline
 
-**Rationale:** Pathlib provides object-oriented path manipulation with intuitive methods and operators. The `/` operator for path joining is more readable than `os.path.join()`. Built-in methods like `.read_text()`, `.write_text()`, and `.glob()` simplify common operations. Pathlib is cross-platform and type-safe.
+Use `pathlib.Path` for all file and directory operations instead of `os.path`.
 
-**Example:**
+## Rationale
+
+Pathlib provides object-oriented path manipulation with intuitive methods and operators. The `/` operator for path joining is more readable than `os.path.join()`. Built-in methods like `.read_text()`, `.write_text()`, and `.glob()` simplify common operations. Pathlib is cross-platform and type-safe.
+
+## Example
 
 ```python
 from pathlib import Path
@@ -51,7 +55,7 @@ old_path = os.path.join("users", "123", "profile")  # Don't do this
 new_path = Path("users") / "123" / "profile"
 ```
 
-**Techniques:**
+## Techniques
 
 - Create Path objects: `path = Path("file.txt")`
 - Use `/` operator for path joining: `Path("dir") / "file.txt"`

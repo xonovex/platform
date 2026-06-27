@@ -1,10 +1,14 @@
 # filename: captions
 
-**Guideline:** Use `@remotion/captions` with `parseSrt()` for accurate timing; use `createTikTokStyleCaptions()` for word-by-word display.
+## Guideline
 
-**Rationale:** SRT parsing is error-prone manually; library handles edge cases; `TikTokStyleCaptions` enables smooth word highlighting matching audio timing.
+Use `@remotion/captions` with `parseSrt()` for accurate timing; use `createTikTokStyleCaptions()` for word-by-word display.
 
-**Example:**
+## Rationale
+
+SRT parsing is error-prone manually; library handles edge cases; `TikTokStyleCaptions` enables smooth word highlighting matching audio timing.
+
+## Example
 
 ```tsx
 function Captions({captions}) {
@@ -25,7 +29,7 @@ function Captions({captions}) {
 }
 ```
 
-**Techniques:**
+## Techniques
 
 - Parse SRT: `const {captions} = parseSrt({input: srtContent})`; captions have `startMs`, `endMs`, `text`
 - Frame to time: `currentTimeMs = (frame / fps) * 1000`; match against caption range

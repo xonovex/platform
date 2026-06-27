@@ -1,8 +1,12 @@
 # Strings: length-carrying views, caller-owned builders
 
-**Guideline:** Strings follow the same caller-owns rule as everything else in this style — a non-owning **view** for reads, a bounded **builder** over caller memory for writes — and the libc terminator-scan cluster (`strlen`/`strcmp`/`strcat`/`strtok`) is avoided.
+## Guideline
 
-**Rationale:** A C string carries no length, so every `strlen`/`strcmp`/`strcat`/`strtok` rescans to the terminator — an O(n) hidden cost that becomes O(n²) inside a loop. The infamous case: GTA Online spent minutes at load because a JSON parser re-`strlen`'d the whole buffer once per token. Carry the length explicitly and the rescans, and the hidden allocations, both disappear.
+Strings follow the same caller-owns rule as everything else in this style — a non-owning **view** for reads, a bounded **builder** over caller memory for writes — and the libc terminator-scan cluster (`strlen`/`strcmp`/`strcat`/`strtok`) is avoided.
+
+## Rationale
+
+A C string carries no length, so every `strlen`/`strcmp`/`strcat`/`strtok` rescans to the terminator — an O(n) hidden cost that becomes O(n²) inside a loop. The infamous case: GTA Online spent minutes at load because a JSON parser re-`strlen`'d the whole buffer once per token. Carry the length explicitly and the rescans, and the hidden allocations, both disappear.
 
 ## View — non-owning slice (pointer + length)
 
@@ -27,4 +31,6 @@ typedef struct { char *data; size_t len, capacity; bool truncated; } strbuilder_
 
 This pair replaces the `strcpy`/`strcat`/`sprintf`/`strtok`/`strlen` cluster: reads borrow length-carrying views, writes go through a bounded builder over memory the caller owns. Where a bounded libc call is unavoidable at a boundary, use the `n` variants (`strnlen`, `strncmp`) with an explicit cap and carry the length onward rather than rescanning.
 
-**Related:** [references/caller-owns-memory.md](./caller-owns-memory.md), [references/build-warnings-policy.md](./build-warnings-policy.md) (snprintf truncation)
+### Related
+
+[references/caller-owns-memory.md](./caller-owns-memory.md), [references/build-warnings-policy.md](./build-warnings-policy.md) (snprintf truncation)

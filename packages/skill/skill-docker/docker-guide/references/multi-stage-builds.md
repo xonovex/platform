@@ -1,10 +1,14 @@
 # multi-stage-builds: Multi-Stage Build Pattern
 
-**Guideline:** Separate build and runtime stages to minimize production image size and attack surface.
+## Guideline
 
-**Rationale:** Multi-stage builds use full-featured build envs while keeping runtime images minimal; reduces size, attack surface, deployment time.
+Separate build and runtime stages to minimize production image size and attack surface.
 
-**Example:**
+## Rationale
+
+Multi-stage builds use full-featured build envs while keeping runtime images minimal; reduces size, attack surface, deployment time.
+
+## Example
 
 ```dockerfile
 # syntax=docker/dockerfile:1.7
@@ -29,7 +33,7 @@ EXPOSE 3000
 CMD ["dist/server.js"]
 ```
 
-**Techniques:**
+## Techniques
 
 - Stage separation: Use distinct dependencies, build, and runtime stages
 - Artifact copying: Copy only necessary outputs between stages

@@ -1,10 +1,14 @@
 # components: Component Development and Composition
 
-**Guideline:** Build reusable Astro components with props and slots; use framework components only for interactivity.
+## Guideline
 
-**Rationale:** Astro components for static content, framework components (React, Vue, Svelte) for interactive features; minimizes JavaScript.
+Build reusable Astro components with props and slots; use framework components only for interactivity.
 
-**Example:**
+## Rationale
+
+Astro components for static content, framework components (React, Vue, Svelte) for interactive features; minimizes JavaScript.
+
+## Example
 
 ```astro
 ---
@@ -42,7 +46,7 @@ const {title, description, href, variant = "default"} = Astro.props;
 </style>
 ```
 
-**Techniques:**
+## Techniques
 
 - Astro components: Create `.astro` components for static presentational UI
 - Props typing: Use TypeScript interfaces for type-safe component props

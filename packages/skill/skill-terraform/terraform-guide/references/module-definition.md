@@ -1,10 +1,14 @@
 # module-definition: Module Definition Pattern
 
-**Guideline:** Define reusable modules with typed variables, validation rules, computed locals, and explicit outputs
+## Guideline
 
-**Rationale:** Well-defined interfaces make modules composable and prevent configuration errors
+Define reusable modules with typed variables, validation rules, computed locals, and explicit outputs
 
-**Example:**
+## Rationale
+
+Well-defined interfaces make modules composable and prevent configuration errors
+
+## Example
 
 ```hcl
 # modules/network/variables.tf
@@ -71,7 +75,7 @@ output "vpc_cidr" {
 }
 ```
 
-**Techniques:**
+## Techniques
 
 - **Type constraints:** Specify all variable types to enable early validation
 - **Validation blocks:** Add business logic constraints like CIDR format checking

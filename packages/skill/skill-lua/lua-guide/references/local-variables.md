@@ -1,10 +1,14 @@
 # local-variables: Always Use Local Variables
 
-**Guideline:** Declare all variables as `local` to avoid implicit globals.
+## Guideline
 
-**Rationale:** Global variables pollute the namespace and create hard-to-find bugs. Locals have clearer scope and are easier to reason about.
+Declare all variables as `local` to avoid implicit globals.
 
-**Example:**
+## Rationale
+
+Global variables pollute the namespace and create hard-to-find bugs. Locals have clearer scope and are easier to reason about.
+
+## Example
 
 ```lua
 -- ✅ Good - all local
@@ -26,7 +30,7 @@ end
 value = calculate(3, 4)  -- Global!
 ```
 
-**Techniques:**
+## Techniques
 
 - Prefix all variable declarations with `local`
 - Prefix all function declarations with `local`

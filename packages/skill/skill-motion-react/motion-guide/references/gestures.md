@@ -1,10 +1,14 @@
 # gestures: Gesture Interactions
 
-**Guideline:** Use whileHover/whileTap/whileFocus with spring physics; never use duration for gestures (springs feel responsive).
+## Guideline
 
-**Rationale:** Spring transitions feel instantaneous and natural; duration-based easing delays feedback.
+Use whileHover/whileTap/whileFocus with spring physics; never use duration for gestures (springs feel responsive).
 
-**Example:**
+## Rationale
+
+Spring transitions feel instantaneous and natural; duration-based easing delays feedback.
+
+## Example
 
 ```tsx
 <motion.button
@@ -15,7 +19,7 @@
 />
 ```
 
-**Techniques:**
+## Techniques
 
 - whileHover/whileTap/whileFocus: Gesture states; always use spring transitions
 - Spring presets: Snappy (buttons) 400/25, smooth (cards) 300/20, bouncy 200/10

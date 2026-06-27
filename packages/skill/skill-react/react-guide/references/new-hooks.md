@@ -1,10 +1,14 @@
 # new-hooks: React 19 Hooks
 
-**Guideline:** Use React 19's new hooks for forms, optimistic updates, and promise/context reading.
+## Guideline
 
-**Rationale:** These hooks replace manual state management patterns, reducing boilerplate and providing built-in pending states, error handling, and progressive enhancement.
+Use React 19's new hooks for forms, optimistic updates, and promise/context reading.
 
-**Example:**
+## Rationale
+
+These hooks replace manual state management patterns, reducing boilerplate and providing built-in pending states, error handling, and progressive enhancement.
+
+## Example
 
 ```tsx
 import {Suspense, use, useActionState, useOptimistic} from "react";
@@ -87,7 +91,7 @@ function Page({postId}: {postId: string}) {
 }
 ```
 
-**Techniques:**
+## Techniques
 
 - Use `useActionState` for form state with async actions (replaces manual loading/error state)
 - Use `useOptimistic` for instant UI feedback that reverts on error

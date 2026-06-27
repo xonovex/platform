@@ -24,11 +24,17 @@ Spec limits (name / description / body / optional-field rules) live in the paren
 
 ## Pattern Extraction
 
-**From AGENTS.md:** Section headers → categories, tables → structured patterns, code blocks → examples
+### From AGENTS.md
 
-**From Source Files:** File naming conventions, type definitions, function signatures, comment conventions
+Section headers → categories, tables → structured patterns, code blocks → examples
 
-**From git history:** Fix commits → gotchas; PR review comments → recurring corrections; patches → real-world failure modes
+### From Source Files
+
+File naming conventions, type definitions, function signatures, comment conventions
+
+### From git history
+
+Fix commits → gotchas; PR review comments → recurring corrections; patches → real-world failure modes
 
 ## Skill Structure
 
@@ -39,7 +45,7 @@ Spec limits (name / description / body / optional-field rules) live in the paren
     └── pattern-*.md
 ```
 
-**SKILL.md Format:**
+### SKILL.md Format
 
 ```markdown
 ---
@@ -70,14 +76,14 @@ description: "{one-line description}"
 - **references/{file}.md** - Load when {specific trigger condition}
 ```
 
-**Reference File Format:**
+### Reference File Format
 
 ```markdown
 # {pattern-name}: {Title}
 
-**Statement:** {one sentence}
-**Rationale:** {why this pattern}
-**Example:** {code block}
+## {Facet}
+
+{statement and rationale, then a bad -> good example}
 ```
 
 ## Implementation Details

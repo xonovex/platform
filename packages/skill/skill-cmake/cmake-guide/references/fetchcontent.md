@@ -1,10 +1,14 @@
 # fetchcontent: Dependency Management with FetchContent
 
-**Guideline:** Use FetchContent to fetch and build external dependencies from source at configure time.
+## Guideline
 
-**Rationale:** FetchContent ensures dependencies are built with the same compiler and settings as your project, providing reproducible builds without system installation.
+Use FetchContent to fetch and build external dependencies from source at configure time.
 
-**Example:**
+## Rationale
+
+FetchContent ensures dependencies are built with the same compiler and settings as your project, providing reproducible builds without system installation.
+
+## Example
 
 ```cmake
 include(FetchContent)
@@ -24,7 +28,7 @@ add_executable(app src/main.cpp)
 target_link_libraries(app PRIVATE fmt::fmt)
 ```
 
-**Techniques:**
+## Techniques
 
 - FetchContent_Declare(): Declare dependency with git repo and version pin
 - GIT_TAG: Pin exact version for reproducible builds

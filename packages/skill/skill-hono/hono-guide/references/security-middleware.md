@@ -1,10 +1,14 @@
 # security-middleware: Built-in Security Middleware Configuration
 
-**Guideline:** Use Hono's built-in security middleware for authentication, CSRF protection, and security headers, applying `secureHeaders()` first in the middleware chain.
+## Guideline
 
-**Rationale:** Hono provides battle-tested security middleware implementations for basic auth, bearer tokens, JWT verification, CSRF protection, and IP restriction with consistent configuration patterns and type safety, eliminating the need for external dependencies.
+Use Hono's built-in security middleware for authentication, CSRF protection, and security headers, applying `secureHeaders()` first in the middleware chain.
 
-**Example:**
+## Rationale
+
+Hono provides battle-tested security middleware implementations for basic auth, bearer tokens, JWT verification, CSRF protection, and IP restriction with consistent configuration patterns and type safety, eliminating the need for external dependencies.
+
+## Example
 
 ```typescript
 import {Hono} from "hono";
@@ -52,7 +56,7 @@ app.use(
 );
 ```
 
-**Techniques:**
+## Techniques
 
 - Import middleware from `hono/` subpaths (basicAuth, bearerAuth, csrf, secureHeaders, ipRestriction)
 - Apply security headers first in middleware chain to protect all routes

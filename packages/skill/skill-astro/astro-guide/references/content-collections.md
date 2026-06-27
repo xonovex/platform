@@ -1,10 +1,14 @@
 # content-collections: Content Collections with Type Safety
 
-**Guideline:** Use Astro content collections API with Zod schemas for type-safe content management.
+## Guideline
 
-**Rationale:** Content collections provide type safety, schema validation, IntelliSense, standardized organization, and build-time frontmatter validation.
+Use Astro content collections API with Zod schemas for type-safe content management.
 
-**Example:**
+## Rationale
+
+Content collections provide type safety, schema validation, IntelliSense, standardized organization, and build-time frontmatter validation.
+
+## Example
 
 ```typescript
 // src/content/config.ts
@@ -24,7 +28,7 @@ export const collections = {
 };
 ```
 
-**Techniques:**
+## Techniques
 
 - Collection schemas: Define Zod schemas in `src/content/config.ts` for validation
 - Directory structure: Organize content in `src/content/[collection-name]/` directories

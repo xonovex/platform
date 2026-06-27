@@ -28,11 +28,17 @@ When the request is an inward code-quality audit rather than forward / web resea
 
 ## Implementation Details
 
-**Version detection:** read project manifests (`package.json`, `pyproject.toml`, `go.mod`, `Cargo.toml`) → web search for latest → fetch official docs
+### Version detection
 
-**Interactive mode:** ask about preferences, libraries, error handling, testing depth
+read project manifests (`package.json`, `pyproject.toml`, `go.mod`, `Cargo.toml`) → web search for latest → fetch official docs
 
-**Output:** current stack, recommended libraries (with versions/rationale), code locations, integration points, skills to consult, considerations
+### Interactive mode
+
+ask about preferences, libraries, error handling, testing depth
+
+### Output
+
+current stack, recommended libraries (with versions/rationale), code locations, integration points, skills to consult, considerations
 
 ## Output
 

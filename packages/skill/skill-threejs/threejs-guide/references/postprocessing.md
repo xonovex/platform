@@ -1,10 +1,14 @@
 # postprocessing: Post-Processing Effects
 
-**Guideline:** Use EffectComposer to chain passes (RenderPass→effects→screen); render to intermediate targets for complex pipelines.
+## Guideline
 
-**Rationale:** Post-processing applies cinematic effects (bloom, grain, color grading) after rendering without modifying materials.
+Use EffectComposer to chain passes (RenderPass→effects→screen); render to intermediate targets for complex pipelines.
 
-**Example:**
+## Rationale
+
+Post-processing applies cinematic effects (bloom, grain, color grading) after rendering without modifying materials.
+
+## Example
 
 ```javascript
 const composer = new EffectComposer(renderer);
@@ -22,7 +26,7 @@ function animate() {
 }
 ```
 
-**Techniques:**
+## Techniques
 
 - UnrealBloomPass: Glow on emissive materials; adjust threshold for control
 - FilmPass: Grain/noise effect with intensity and grayscale toggle

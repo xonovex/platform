@@ -1,10 +1,14 @@
 # platform-abstraction-layer: A Single Interface for All OS Calls
 
-**Guideline:** Route every operating-system and windowing call through one narrow abstraction interface — a struct of function pointers (or a header whose implementation is selected at build time) — and forbid application, renderer, and engine code from ever calling an OS API directly or guarding logic with platform `#ifdef`s.
+## Guideline
 
-**Rationale:** Conditional compilation scattered through application code is the central failure of ad-hoc ports: every feature ends up knowing every platform, so each new target multiplies the surface that must be re-read and re-tested, and platform bugs hide inside otherwise-portable logic. Concentrating OS access behind one interface inverts this — application code depends only on the abstract contract, and a port becomes "write one new backend that fills the interface," with zero edits to callers. Because the interface is the unit of completeness, you can stub it, compile against the stub on day one, and replace stubs one function at a time while the rest of the system keeps building. Grouping by concern (windowing, clipboard, threading/fibers, file watching, time, input, audio) also keeps each backend small enough that a missing or fragile platform feature is isolated to its own struct, not smeared across the codebase.
+Route every operating-system and windowing call through one narrow abstraction interface — a struct of function pointers (or a header whose implementation is selected at build time) — and forbid application, renderer, and engine code from ever calling an OS API directly or guarding logic with platform `#ifdef`s.
 
-**How to Apply:**
+## Rationale
+
+Conditional compilation scattered through application code is the central failure of ad-hoc ports: every feature ends up knowing every platform, so each new target multiplies the surface that must be re-read and re-tested, and platform bugs hide inside otherwise-portable logic. Concentrating OS access behind one interface inverts this — application code depends only on the abstract contract, and a port becomes "write one new backend that fills the interface," with zero edits to callers. Because the interface is the unit of completeness, you can stub it, compile against the stub on day one, and replace stubs one function at a time while the rest of the system keeps building. Grouping by concern (windowing, clipboard, threading/fibers, file watching, time, input, audio) also keeps each backend small enough that a missing or fragile platform feature is isolated to its own struct, not smeared across the codebase.
+
+## How to Apply
 
 1. Carve the OS surface into cohesive interfaces by concern: one for general OS services (threading, fibers, time, filesystem, file-system change monitoring), one for windowing, one for clipboard/selection, one for input sources, one for the audio backend.
 2. Express each as a struct of function pointers (so the same header compiles on every target) or as a header with a build-time-selected `.c`; expose only the abstract types callers need, never raw OS handles.
@@ -13,7 +17,7 @@
 5. Implement one backend per platform in its own translation unit (e.g. `os.linux.c`, `os.win32.c`, `os.web.c`); the build picks exactly one.
 6. When the OS lacks a concept the interface assumes (e.g. relative mouse motion, a single system clipboard), emulate it inside the backend so the contract still holds for callers.
 
-**Example:**
+## Example
 
 ```c
 // os.h — one abstract interface, identical on every platform.
@@ -39,7 +43,7 @@ uint64_t t = os_api->now();          // resolves to os.linux.c / os.win32.c / os
 // code above is byte-for-byte identical on every target.
 ```
 
-**Gotchas:**
+## Gotchas
 
 - A backend that leaks a raw OS handle (HWND, file descriptor, X connection) through the interface re-couples callers to one platform — keep the type opaque and convert at the boundary.
 - The interface must be designed before the first backend, not reverse-engineered from one platform, or its shape silently bakes in that platform's assumptions (e.g. assuming one global clipboard, or that the OS reports relative mouse motion).
@@ -47,4 +51,6 @@ uint64_t t = os_api->now();          // resolves to os.linux.c / os.win32.c / os
 - Splitting the surface too finely produces dozens of one-function interfaces and ceremony; too coarsely produces a god-interface no backend can fill incrementally — group by the subsystem that ships together.
 - Some platforms have no native concept the interface names (relative mouse delta, multiple selections vs one clipboard); the backend must emulate it (e.g. track last mouse position to synthesize deltas) rather than push the gap up to callers.
 
-**Related:** [references/porting-strategy.md](./porting-strategy.md), [references/input-devices.md](./input-devices.md), [references/web-wasm-builds.md](./web-wasm-builds.md), **c99-opinionated-guide**, **gpu-rendering-guide**
+## Related
+
+[references/porting-strategy.md](./porting-strategy.md), [references/input-devices.md](./input-devices.md), [references/web-wasm-builds.md](./web-wasm-builds.md), **c99-opinionated-guide**, **gpu-rendering-guide**

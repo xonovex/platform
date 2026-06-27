@@ -1,10 +1,14 @@
 # docker-multistage: Moon Docker Scaffold Pattern
 
-**Guideline:** Use moon's docker scaffold command in multistage Dockerfiles for efficient monorepo builds.
+## Guideline
 
-**Rationale:** Moon's scaffold command extracts only the necessary workspace files and dependencies, reducing build context and enabling efficient layer caching.
+Use moon's docker scaffold command in multistage Dockerfiles for efficient monorepo builds.
 
-**Example:**
+## Rationale
+
+Moon's scaffold command extracts only the necessary workspace files and dependencies, reducing build context and enabling efficient layer caching.
+
+## Example
 
 ```dockerfile
 # Base stage
@@ -34,7 +38,7 @@ WORKDIR /app/packages/my-service
 CMD ["dist/src/server.js"]
 ```
 
-**Techniques:**
+## Techniques
 
 - moon docker scaffold: Extracts workspace config and package dependencies
 - moon docker prune: Removes dev dependencies and build artifacts

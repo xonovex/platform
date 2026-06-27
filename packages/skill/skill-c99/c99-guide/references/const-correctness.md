@@ -1,10 +1,14 @@
 # const-correctness: Const Correctness
 
-**Guideline:** Use const qualifier to mark immutable data, function parameters, and return values to prevent unintended modifications.
+## Guideline
 
-**Rationale:** Const correctness catches bugs at compile time, documents intent, and helps maintain API contracts.
+Use const qualifier to mark immutable data, function parameters, and return values to prevent unintended modifications.
 
-**Example:**
+## Rationale
+
+Const correctness catches bugs at compile time, documents intent, and helps maintain API contracts.
+
+## Example
 
 ```c
 // Use const for immutable data
@@ -24,7 +28,7 @@ const char *get_name(void) {
 }
 ```
 
-**Techniques:**
+## Techniques
 
 - Read-only parameters: Mark function parameters with const when not modified
 - Pointer variants: Distinguish `const T *p` (pointer to const) vs `T *const p` (const pointer)

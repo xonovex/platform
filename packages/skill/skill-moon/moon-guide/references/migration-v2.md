@@ -1,10 +1,16 @@
 # migration-v2: Migrating from Moon v1 to v2
 
-**Guideline:** Run `moon migrate v2` to automate most changes, then manually address breaking changes.
+## Guideline
 
-**Rationale:** Moon 2.0 introduces breaking changes to task configuration, environment variables, and file structure that require migration.
+Run `moon migrate v2` to automate most changes, then manually address breaking changes.
 
-**Reference:** [Moon 2.0 Migration Guide](https://moonrepo.dev/docs/migrate/2.0)
+## Rationale
+
+Moon 2.0 introduces breaking changes to task configuration, environment variables, and file structure that require migration.
+
+## Reference
+
+[Moon 2.0 Migration Guide](https://moonrepo.dev/docs/migrate/2.0)
 
 ## Contents
 

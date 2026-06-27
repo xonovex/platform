@@ -10,7 +10,9 @@ Reduce AGENTS.md file count by deleting those with no unique content and standar
 
 ## Classification
 
-**Redundant (delete):** title restating dir name, one-line description inferable from dir name, only guideline links predictable from package type, or code summaries that restate what is already in the code
+### Redundant (delete)
+
+title restating dir name, one-line description inferable from dir name, only guideline links predictable from package type, or code summaries that restate what is already in the code
 
 Code summaries include:
 
@@ -19,11 +21,15 @@ Code summaries include:
 - Module listings, function names, config values, CLI options derivable from source files
 - Directory structure derivable from a file listing
 
-**Unique (keep):** caveats, gotchas, non-obvious constraints, style rules, or architectural decisions not inferable from reading the code — things an agent would miss even after reading `package.json`, `moon.yml`, and source files
+### Unique (keep)
+
+caveats, gotchas, non-obvious constraints, style rules, or architectural decisions not inferable from reading the code — things an agent would miss even after reading `package.json`, `moon.yml`, and source files
 
 ## Standardization
 
-**Format:** `# Title` (humanized dir name) + flat bullet list — no `##` headings, no prose paragraphs
+### Format
+
+`# Title` (humanized dir name) + flat bullet list — no `##` headings, no prose paragraphs
 
 - Convert prose → bullet points; remove redundant descriptions and predictable guideline links
 - Remove bullets that summarize code (an agent can read the code itself)

@@ -106,19 +106,19 @@ If the user asked for in-place editing, write the FINAL to the source file and p
 
 ## Examples
 
-**Before (AI-tell heavy):**
+### Before (AI-tell heavy)
 
 > The new feature increased user engagement by 32%. Users interacted more frequently with the dashboard, reflecting broader shifts in how teams approach analytics. Feedback has been generally positive, although some concerns remain.
 
-**After (human voice, casual review):**
+### After (human voice, casual review)
 
 > Engagement jumped 32% after the new feature shipped. Talking to a few users though, it sounds like they click more because they have to, not because they want to. The number looks great on a slide; the experience underneath is messier.
 
-**Before (marketing puffery):**
+### Before (marketing puffery)
 
 > This powerful platform offers a seamless and intuitive experience, helping teams unlock their full potential.
 
-**After (observable consequence):**
+### After (observable consequence)
 
 > The platform handles task tracking and reporting in one place, which cuts down on tool switching.
 

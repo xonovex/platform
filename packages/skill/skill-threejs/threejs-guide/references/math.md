@@ -1,10 +1,14 @@
 # filename: math
 
-**Guideline:** Use Three.js math classes (Vector3, Matrix4, Quaternion) and reuse instances to avoid garbage collection in animation loops.
+## Guideline
 
-**Rationale:** Three.js math classes are GPU-optimized; allocating new instances every frame causes GC stalls and framerate drops.
+Use Three.js math classes (Vector3, Matrix4, Quaternion) and reuse instances to avoid garbage collection in animation loops.
 
-**Example:**
+## Rationale
+
+Three.js math classes are GPU-optimized; allocating new instances every frame causes GC stalls and framerate drops.
+
+## Example
 
 ```javascript
 // Reuse pattern: Define once, mutate in loop
@@ -21,7 +25,7 @@ v.lerp(target, 0.5);
 // Quaternion: q.slerp(target, t); Matrix4: m.compose(pos, quat, scale);
 ```
 
-**Techniques:**
+## Techniques
 
 - Vector3: `.set()`, `.copy()`, `.add()`, `.multiplyScalar()`, `.normalize()`, `.dot()`, `.cross()`, `.lerp()`
 - Quaternion: `.setFromAxisAngle()`, `.slerp()` for smooth rotation interpolation avoiding gimbal lock

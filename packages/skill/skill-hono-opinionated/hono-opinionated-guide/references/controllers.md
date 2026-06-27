@@ -1,10 +1,14 @@
 # controllers: Remove Unnecessary Async from Synchronous Controllers
 
-**Guideline:** Remove the `async` keyword from controller functions that don't use `await`, as unnecessary async adds overhead without providing benefits.
+## Guideline
 
-**Rationale:** Marking a function `async` without awaiting anything creates unnecessary Promise wrapping overhead, adds microtask queue delays, and misleads developers about async operations. Synchronous controllers are faster, clearer in intent, and produce simpler stack traces.
+Remove the `async` keyword from controller functions that don't use `await`, as unnecessary async adds overhead without providing benefits.
 
-**Example:**
+## Rationale
+
+Marking a function `async` without awaiting anything creates unnecessary Promise wrapping overhead, adds microtask queue delays, and misleads developers about async operations. Synchronous controllers are faster, clearer in intent, and produce simpler stack traces.
+
+## Example
 
 ```typescript
 import type {Context} from "hono";
@@ -30,7 +34,7 @@ export function listUsers(c: Context) {
 }
 ```
 
-**Techniques:**
+## Techniques
 
 - Review controller function body for `await` keyword usage
 - Remove `async` keyword if no `await` exists in function

@@ -1,8 +1,12 @@
 # review-post: publish a structured review on GitHub
 
-**Guideline:** Batch the summary body, every line-anchored inline comment, and the verdict into ONE `POST .../pulls/{n}/reviews` object — anchored to the PR HEAD sha. This realizes the findings authored per **`code-review-guide`** on GitHub; that skill owns the labels, severity, and blocking decoration — this file only anchors and submits them.
+## Guideline
 
-**Rationale:** A GitHub review is a first-class atomic object: one call carries summary + inline comments + the APPROVE / REQUEST_CHANGES / COMMENT verdict. `gh pr review` posts only the review-level body (no inline support, cli/cli#12396), and the standalone `.../pulls/{n}/comments` endpoint frequently 422s on `line`/`side` (cli/cli#13358) — so build the inline comments inside the review object.
+Batch the summary body, every line-anchored inline comment, and the verdict into ONE `POST .../pulls/{n}/reviews` object — anchored to the PR HEAD sha. This realizes the findings authored per **`code-review-guide`** on GitHub; that skill owns the labels, severity, and blocking decoration — this file only anchors and submits them.
+
+## Rationale
+
+A GitHub review is a first-class atomic object: one call carries summary + inline comments + the APPROVE / REQUEST_CHANGES / COMMENT verdict. `gh pr review` posts only the review-level body (no inline support, cli/cli#12396), and the standalone `.../pulls/{n}/comments` endpoint frequently 422s on `line`/`side` (cli/cli#13358) — so build the inline comments inside the review object.
 
 ## The one review call
 
@@ -62,4 +66,6 @@ Take them from the response `html_url`; never reconstruct anchors by hand:
 - review → `#pullrequestreview-<id>`
 - top-level PR comment (`gh pr comment`, an issue comment) → `#issuecomment-<id>` — and it never carries a verdict.
 
-**Related:** [review-resolve.md](./review-resolve.md), [auth.md](./auth.md)
+### Related
+
+[review-resolve.md](./review-resolve.md), [auth.md](./auth.md)

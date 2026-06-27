@@ -1,10 +1,14 @@
 # migration-anti-patterns: React 19 Anti-Patterns
 
-**Guideline:** Replace useEffect data fetching with Server Components; use Form Actions instead of useState for forms; let Compiler handle memoization.
+## Guideline
 
-**Rationale:** React 19 provides cleaner solutions; old patterns create unnecessary complexity and performance overhead.
+Replace useEffect data fetching with Server Components; use Form Actions instead of useState for forms; let Compiler handle memoization.
 
-**Example:**
+## Rationale
+
+React 19 provides cleaner solutions; old patterns create unnecessary complexity and performance overhead.
+
+## Example
 
 ```tsx
 // OLD: useEffect + loading state
@@ -27,7 +31,7 @@ async function UserProfile({userId}) {
 }
 ```
 
-**Techniques:**
+## Techniques
 
 - Remove useEffect data fetching → Use Server Components (async/await, direct DB)
 - Remove manual loading state → Use useActionState and Suspense

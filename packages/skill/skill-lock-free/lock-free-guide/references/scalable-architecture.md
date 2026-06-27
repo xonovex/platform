@@ -1,10 +1,14 @@
 # scalable-architecture: Scalable Architecture
 
-**Guideline:** Scale by _removing sharing_, not by making shared access faster — the fastest synchronization is none. Partition state per-thread/per-core, and only synchronize on the rare path.
+## Guideline
 
-**Rationale:** Any memory written by multiple cores costs a coherence round-trip, and that cost is fixed no matter how clever the lock-free trick. Past a few cores, the only thing that scales is data that isn't shared. Algorithmic structure beats micro-optimized atomics: an architecture that avoids contention with a plain mutex outperforms a lock-free one that contends.
+Scale by _removing sharing_, not by making shared access faster — the fastest synchronization is none. Partition state per-thread/per-core, and only synchronize on the rare path.
 
-**Techniques:**
+## Rationale
+
+Any memory written by multiple cores costs a coherence round-trip, and that cost is fixed no matter how clever the lock-free trick. Past a few cores, the only thing that scales is data that isn't shared. Algorithmic structure beats micro-optimized atomics: an architecture that avoids contention with a plain mutex outperforms a lock-free one that contends.
+
+## Techniques
 
 - **Per-thread / per-core shards:** give each thread its own counter, allocator arena, or queue; aggregate lazily when a total is actually needed (sum the per-thread counters at frame end). Turns a contended atomic into a contention-free local increment.
 - **Partitioning / sharding:** split a shared map or array into N independent partitions keyed by hash; a thread touches only its partition, so writers to different keys never contend.
@@ -15,7 +19,7 @@
 - **Amortization:** batch many operations behind one synchronization (drain a whole local buffer into a shared queue under one lock acquire instead of one lock per item).
 - **NUMA-aware placement:** pin threads and allocate their hot data on the local NUMA node; cross-socket coherence is dramatically slower, so keep a worker's shard on its own socket.
 
-**Example:**
+## Example
 
 ```c
 #define CACHE_LINE_SIZE 64 // platform cache line: 64 B x86-64, 128 B Apple silicon
@@ -41,10 +45,12 @@ uint64_t total(void) {                 // cold path: pay the cross-core reads on
 }
 ```
 
-**Gotchas:**
+## Gotchas
 
 - Sharding trades exact-at-all-times reads for cheap writes; the aggregated total is only a snapshot, not a consistent instant. Fine for stats, wrong for invariants.
 - Padding shards to a cache line is mandatory — an unpadded shard array recreates the very false sharing you sharded to avoid.
 - Work-stealing's correctness lives entirely in the _steal_ path's atomics (the owner's pop and a thief's steal can race on the last element); use a verified deque, don't hand-roll it.
 
-**Related:** [references/false-sharing.md](./false-sharing.md), [references/progress-guarantees.md](./progress-guarantees.md), [references/locks-and-backoff.md](./locks-and-backoff.md)
+## Related
+
+[references/false-sharing.md](./false-sharing.md), [references/progress-guarantees.md](./progress-guarantees.md), [references/locks-and-backoff.md](./locks-and-backoff.md)

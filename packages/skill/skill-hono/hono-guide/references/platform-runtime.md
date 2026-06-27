@@ -1,10 +1,14 @@
 # platform-runtime: Platform-Specific Runtime Detection
 
-**Guideline:** Use `env()` for unified environment variables and `getRuntimeKey()` for platform-specific code paths.
+## Guideline
 
-**Rationale:** Hono runs on different runtimes with different APIs and behaviors. Unified helpers enable portable code across all platforms.
+Use `env()` for unified environment variables and `getRuntimeKey()` for platform-specific code paths.
 
-**Example:**
+## Rationale
+
+Hono runs on different runtimes with different APIs and behaviors. Unified helpers enable portable code across all platforms.
+
+## Example
 
 ```typescript
 import {Hono} from "hono";
@@ -33,7 +37,7 @@ app.get("/ip", (c) => {
 });
 ```
 
-**Techniques:**
+## Techniques
 
 - Import `env` and `getRuntimeKey` from `hono/adapter`
 - Use `env(c)` instead of `process.env` or `Deno.env`

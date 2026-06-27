@@ -13,13 +13,21 @@ Update AGENTS.md files to reflect current directory structure, files, and config
 
 ## Discovery
 
-**Subdirectories:** scan 1 level deep, exclude `node_modules`, `.git`, `build`, `dist`, `coverage`, `.artifacts`; detect `<name>/` patterns
+### Subdirectories
 
-**Files:** identify common files (`package.json`, `moon.yml`, `CMakeLists.txt`, `Dockerfile`), list configs in parentheses
+scan 1 level deep, exclude `node_modules`, `.git`, `build`, `dist`, `coverage`, `.artifacts`; detect `<name>/` patterns
 
-**Commands:** extract from `package.json` / config files, format with backticks, preserve tool names
+### Files
 
-**Git history:** check recent commits for directory/file additions not reflected in AGENTS.md
+identify common files (`package.json`, `moon.yml`, `CMakeLists.txt`, `Dockerfile`), list configs in parentheses
+
+### Commands
+
+extract from `package.json` / config files, format with backticks, preserve tool names
+
+### Git history
+
+check recent commits for directory/file additions not reflected in AGENTS.md
 
 ## Sync Strategy
 
@@ -32,9 +40,13 @@ Update AGENTS.md files to reflect current directory structure, files, and config
 
 ## Example
 
-**Before:** `` `environments/` ``: Environment configs
+### Before
 
-**After:** `` `environments/<name>/` ``: Environment configs (`main.tf`, vars, `backend.sh`) - local, staging, production
+`` `environments/` ``: Environment configs
+
+### After
+
+`` `environments/<name>/` ``: Environment configs (`main.tf`, vars, `backend.sh`) - local, staging, production
 
 ## Implementation
 

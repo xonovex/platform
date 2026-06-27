@@ -1,10 +1,14 @@
 # code-comments-remove: Identify Non-Essential Comments for Removal
 
-**Guideline:** Analyze and remove non-essential comments while preserving functional directives.
+## Guideline
 
-**Rationale:** Self-documenting code preferred over comments. Remove explanatory, obvious, and commented-out code while preserving functional directives (eslint-disable, @ts-expect-error, TODO).
+Analyze and remove non-essential comments while preserving functional directives.
 
-**Example:**
+## Rationale
+
+Self-documenting code preferred over comments. Remove explanatory, obvious, and commented-out code while preserving functional directives (eslint-disable, @ts-expect-error, TODO).
+
+## Example
 
 ```typescript
 // REMOVE: Redundant comment
@@ -19,7 +23,7 @@ const role = user?.profile?.role?.name;
 // const oldUserId = user.legacy_id
 ```
 
-**Techniques:**
+## Techniques
 
 - Detect comment syntax by language (C-style: `//`, `/* */`; hash-style: `#`)
 - Distinguish functional directives (eslint, prettier, type hints) from explanatory comments

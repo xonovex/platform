@@ -1,10 +1,14 @@
 # unbound-method-references: Keep Object References for Method Calls
 
-**Guideline:** Keep object reference when calling methods, don't destructure them.
+## Guideline
 
-**Rationale:** Destructuring methods breaks `this` binding and causes runtime errors.
+Keep object reference when calling methods, don't destructure them.
 
-**Example:**
+## Rationale
+
+Destructuring methods breaks `this` binding and causes runtime errors.
+
+## Example
 
 ```typescript
 // ❌ Bad: Destructuring breaks this
@@ -23,7 +27,7 @@ addEventListener("click", handler); // Fails
 document.addEventListener("click", handler);
 ```
 
-**Techniques:**
+## Techniques
 
 - Never destructure methods: avoid `const {method} = object`
 - Keep object reference: `const helpers = object`

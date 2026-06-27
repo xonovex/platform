@@ -1,10 +1,14 @@
 # filename: compositions
 
-**Guideline:** Define compositions in `Root.tsx` with `type` declarations (not `interface`) and Zod `schema` for visual parameter UI; use `calculateMetadata()` for dynamic values.
+## Guideline
 
-**Rationale:** `type` works better with `defaultProps` and Zod inference; schema enables GUI parameter editing; `calculateMetadata` enables dynamic duration/dimensions from props.
+Define compositions in `Root.tsx` with `type` declarations (not `interface`) and Zod `schema` for visual parameter UI; use `calculateMetadata()` for dynamic values.
 
-**Example:**
+## Rationale
+
+`type` works better with `defaultProps` and Zod inference; schema enables GUI parameter editing; `calculateMetadata` enables dynamic duration/dimensions from props.
+
+## Example
 
 ```tsx
 const schema = z.object({
@@ -30,7 +34,7 @@ export function RemotionRoot() {
 }
 ```
 
-**Techniques:**
+## Techniques
 
 - Composition setup: `id`, `component`, `durationInFrames`, `fps`, `width`, `height` required
 - Type vs interface: Always use `type`, not `interface`; works better with Zod inference

@@ -1,10 +1,14 @@
 # filename: materials
 
-**Guideline:** Choose material type based on performance needs; reuse material instances; handle transparency with proper depth writes and render order.
+## Guideline
 
-**Rationale:** Material complexity directly impacts framerate; fewer unique materials reduce draw calls; transparency requires depth-aware rendering.
+Choose material type based on performance needs; reuse material instances; handle transparency with proper depth writes and render order.
 
-**Example:**
+## Rationale
+
+Material complexity directly impacts framerate; fewer unique materials reduce draw calls; transparency requires depth-aware rendering.
+
+## Example
 
 ```javascript
 const pbr = new THREE.MeshStandardMaterial({
@@ -18,7 +22,7 @@ const pbr = new THREE.MeshStandardMaterial({
 // Reuse: mesh1.material = pbr; mesh2.material = pbr;
 ```
 
-**Techniques:**
+## Techniques
 
 - Material types: MeshBasicMaterial (fastest, unlit), Lambert (matte), Phong (shiny), Standard/Physical (PBR realistic)
 - PBR properties: roughness 0=mirror/1=diffuse; metalness 0=dielectric/1=metal; use maps for per-pixel variation

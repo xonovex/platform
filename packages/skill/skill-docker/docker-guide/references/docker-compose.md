@@ -1,10 +1,14 @@
 # docker-compose: Docker Compose Configuration
 
-**Guideline:** Use Docker Compose for development with proper secrets, volumes, and health checks.
+## Guideline
 
-**Rationale:** Simplifies multi-container orchestration during development; secrets, volumes, and health checks mirror production while maintaining security.
+Use Docker Compose for development with proper secrets, volumes, and health checks.
 
-**Example:**
+## Rationale
+
+Simplifies multi-container orchestration during development; secrets, volumes, and health checks mirror production while maintaining security.
+
+## Example
 
 ```yaml
 services:
@@ -31,7 +35,7 @@ volumes:
   app-data:
 ```
 
-**Techniques:**
+## Techniques
 
 - Build configuration: Specify build context and target stage in compose
 - Secrets management: Use secrets section for sensitive data, never environment vars

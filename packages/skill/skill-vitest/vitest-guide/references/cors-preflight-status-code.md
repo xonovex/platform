@@ -1,10 +1,14 @@
 # cors-preflight-status-code: CORS Preflight Status Code Expectations
 
-**Guideline:** OPTIONS preflight requests should return HTTP 204 (No Content), not 200 (OK).
+## Guideline
 
-**Rationale:** HTTP 204 is the correct status code for OPTIONS requests with no response body.
+OPTIONS preflight requests should return HTTP 204 (No Content), not 200 (OK).
 
-**Example:**
+## Rationale
+
+HTTP 204 is the correct status code for OPTIONS requests with no response body.
+
+## Example
 
 ```typescript
 it("should handle CORS preflight", async () => {
@@ -26,7 +30,7 @@ it("should handle CORS preflight", async () => {
 });
 ```
 
-**Techniques:**
+## Techniques
 
 - Always expect 204 status for OPTIONS requests in tests
 - Verify CORS headers are present (Access-Control-Allow-Origin, etc.)

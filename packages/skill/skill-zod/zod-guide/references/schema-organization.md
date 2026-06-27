@@ -1,10 +1,14 @@
 # schema-organization: Schema Organization Patterns
 
-**Guideline:** Name schemas with PascalCase suffix, compose with `.extend(OtherSchema.shape)`, `.pick()`, `.partial()`, and always infer types using `z.infer<typeof Schema>`.
+## Guideline
 
-**Rationale:** Schema-first design provides single source of truth for types and validation, enabling reusable composition and reducing duplication.
+Name schemas with PascalCase suffix, compose with `.extend(OtherSchema.shape)`, `.pick()`, `.partial()`, and always infer types using `z.infer<typeof Schema>`.
 
-**Example:**
+## Rationale
+
+Schema-first design provides single source of truth for types and validation, enabling reusable composition and reducing duplication.
+
+## Example
 
 ```typescript
 // ✅ Base schema with common fields
@@ -62,7 +66,7 @@ async function createUser(input: unknown): Promise<User> {
 }
 ```
 
-**Techniques:**
+## Techniques
 
 - Name all schemas with PascalCase + "Schema" suffix
 - Define schemas at module level for reuse

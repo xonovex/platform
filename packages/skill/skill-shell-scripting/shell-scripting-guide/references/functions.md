@@ -1,10 +1,14 @@
 # functions: Function Best Practices
 
-**Guideline:** Write small, focused functions with local variables and meaningful return codes.
+## Guideline
 
-**Rationale:** Small functions improve readability, testability, and reusability. Local variables prevent variable pollution, and return codes enable proper error handling.
+Write small, focused functions with local variables and meaningful return codes.
 
-**Example:**
+## Rationale
+
+Small functions improve readability, testability, and reusability. Local variables prevent variable pollution, and return codes enable proper error handling.
+
+## Example
 
 ```sh
 # ✅ Small focused functions
@@ -57,7 +61,7 @@ else
 fi
 ```
 
-**Techniques:**
+## Techniques
 
 - Keep functions focused on a single task
 - Declare all function variables as `local`

@@ -1,12 +1,16 @@
 # advanced-patterns: Advanced Terraform Patterns
 
-**Guideline:** Use data sources, dynamic blocks, and for_each/count appropriately
+## Guideline
 
-**Rationale:** Advanced patterns enable flexible, maintainable infrastructure code
+Use data sources, dynamic blocks, and for_each/count appropriately
 
-**Example:**
+## Rationale
 
-**Data Sources:**
+Advanced patterns enable flexible, maintainable infrastructure code
+
+## Example
+
+## Data Sources
 
 ```hcl
 data "aws_ami" "amazon_linux_2" {
@@ -29,7 +33,7 @@ resource "aws_instance" "app" {
 }
 ```
 
-**Dynamic Blocks:**
+## Dynamic Blocks
 
 ```hcl
 resource "aws_security_group" "this" {
@@ -49,7 +53,7 @@ resource "aws_security_group" "this" {
 }
 ```
 
-**For_Each vs Count:**
+## For_Each vs Count
 
 ```hcl
 # ✅ Use for_each for map-based resources
@@ -80,7 +84,7 @@ resource "aws_instance" "worker" {
 # ❌ Avoid count with lists (order matters, causes unnecessary recreation)
 ```
 
-**Techniques:**
+## Techniques
 
 - **Data sources:** Query existing AWS resources without importing or creating them
 - **Dynamic blocks:** Generate repeated nested blocks from variables or locals

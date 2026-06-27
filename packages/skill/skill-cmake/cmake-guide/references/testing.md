@@ -1,10 +1,14 @@
 # testing: Testing with CTest
 
-**Guideline:** Use CTest to integrate automated testing into the build system.
+## Guideline
 
-**Rationale:** CTest provides a standardized way to run tests across platforms with features like timeouts, labels, and parallel execution.
+Use CTest to integrate automated testing into the build system.
 
-**Example:**
+## Rationale
+
+CTest provides a standardized way to run tests across platforms with features like timeouts, labels, and parallel execution.
+
+## Example
 
 ```cmake
 # Enable testing
@@ -22,7 +26,7 @@ add_test(NAME integration_test COMMAND app --test-mode WORKING_DIRECTORY ${CMAKE
 set_tests_properties(unit_tests PROPERTIES TIMEOUT 30 LABELS "unit")
 ```
 
-**Techniques:**
+## Techniques
 
 - enable_testing(): Enable the testing feature in CMake project
 - add_test(): Register test executable or command with optional working directory

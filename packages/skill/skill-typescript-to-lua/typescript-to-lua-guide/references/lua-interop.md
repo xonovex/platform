@@ -1,10 +1,14 @@
 # lua-interop: Integration with Lua APIs
 
-**Guideline:** Declare Lua globals with TypeScript types for type-safe integration.
+## Guideline
 
-**Rationale:** Lua environments provide global APIs (LÖVE, Corona, custom engines). TypeScript declarations enable autocomplete, type checking, and full interop.
+Declare Lua globals with TypeScript types for type-safe integration.
 
-**Example:**
+## Rationale
+
+Lua environments provide global APIs (LÖVE, Corona, custom engines). TypeScript declarations enable autocomplete, type checking, and full interop.
+
+## Example
 
 ```typescript
 // LÖVE 2D game engine declarations
@@ -40,7 +44,7 @@ love.graphics.print("Hello", 100, 50);
 const width = love.window.getWidth();
 ```
 
-**Techniques:**
+## Techniques
 
 - Use `declare const` to declare Lua global variables and libraries
 - Define complete type signatures for all global APIs and functions

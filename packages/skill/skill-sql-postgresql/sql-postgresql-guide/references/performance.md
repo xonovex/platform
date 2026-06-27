@@ -1,10 +1,14 @@
 # performance: Query Performance Optimization
 
-**Guideline:** Use EXPLAIN ANALYZE to understand query execution plans. Avoid N+1 queries by using JOINs. Choose appropriate join types. Limit result sets and use efficient pagination strategies.
+## Guideline
 
-**Rationale:** Query performance directly impacts application responsiveness and database load. Understanding query plans helps identify bottlenecks. Proper JOIN usage eliminates multiple round-trips. Keyset pagination outperforms OFFSET for large datasets. Limiting result sets reduces memory usage and network transfer.
+Use EXPLAIN ANALYZE to understand query execution plans. Avoid N+1 queries by using JOINs. Choose appropriate join types. Limit result sets and use efficient pagination strategies.
 
-**Example:**
+## Rationale
+
+Query performance directly impacts application responsiveness and database load. Understanding query plans helps identify bottlenecks. Proper JOIN usage eliminates multiple round-trips. Keyset pagination outperforms OFFSET for large datasets. Limiting result sets reduces memory usage and network transfer.
+
+## Example
 
 ```sql
 -- EXPLAIN ANALYZE to understand query performance
@@ -36,7 +40,7 @@ ORDER BY created_at DESC
 LIMIT 20;
 ```
 
-**Techniques:**
+## Techniques
 
 - Use `EXPLAIN ANALYZE` to inspect query execution plans
 - Look for sequential scans where indexes should be used

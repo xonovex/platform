@@ -1,10 +1,14 @@
 # filename: scroll
 
-**Guideline:** Use `whileInView` for scroll-triggered reveals; use `useScroll()` + `useTransform()` for precise parallax and scroll-linked effects.
+## Guideline
 
-**Rationale:** `whileInView` leverages Intersection Observer; `useScroll()` enables smooth parallax without scroll listeners; `useTransform` maps scroll range to outputs.
+Use `whileInView` for scroll-triggered reveals; use `useScroll()` + `useTransform()` for precise parallax and scroll-linked effects.
 
-**Example:**
+## Rationale
+
+`whileInView` leverages Intersection Observer; `useScroll()` enables smooth parallax without scroll listeners; `useTransform` maps scroll range to outputs.
+
+## Example
 
 ```tsx
 function ScrollReveal({children}) {
@@ -31,7 +35,7 @@ function Parallax() {
 }
 ```
 
-**Techniques:**
+## Techniques
 
 - `whileInView`: Animates when element enters viewport; `viewport={{once: true, amount: 0.3}}` triggers at 30% visible
 - `useScroll()`: Returns `scrollX/Y` and `scrollXProgress/scrollYProgress` (0-1 normalized)

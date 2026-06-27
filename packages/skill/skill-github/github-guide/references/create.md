@@ -1,8 +1,12 @@
 # create: open a pull request on GitHub
 
-**Guideline:** Push the branch (that's `git-guide`'s job), then open the PR with `gh pr create`, which pushes the branch for you if it isn't on the remote and sets reviewers/labels/assignees in one call. The PR description content is `pull-request-guide`'s.
+## Guideline
 
-**Rationale:** `gh pr create` is the one-shot path: it auto-pushes the source branch (prompting where to push / offering to fork), opens the PR, and attaches metadata in a single step. The raw `POST /repos/{owner}/{repo}/pulls` does none of that.
+Push the branch (that's `git-guide`'s job), then open the PR with `gh pr create`, which pushes the branch for you if it isn't on the remote and sets reviewers/labels/assignees in one call. The PR description content is `pull-request-guide`'s.
+
+## Rationale
+
+`gh pr create` is the one-shot path: it auto-pushes the source branch (prompting where to push / offering to fork), opens the PR, and attaches metadata in a single step. The raw `POST /repos/{owner}/{repo}/pulls` does none of that.
 
 ## Push / rebase first
 
@@ -71,6 +75,10 @@ gh api --method POST repos/{owner}/{repo}/pulls \
 - REST does **not** push your branch — the ref must already exist or you get `422 "Head sha can't be blank"`.
 - REST cannot set reviewers/assignees/labels in this call (separate endpoints).
 
-**Counter-example:** Calling `POST /pulls` before the branch is pushed fails with 422 — `gh pr create` would have pushed it for you.
+### Counter-example
 
-**Related:** [review-post.md](./review-post.md), [auth.md](./auth.md)
+Calling `POST /pulls` before the branch is pushed fails with 422 — `gh pr create` would have pushed it for you.
+
+### Related
+
+[review-post.md](./review-post.md), [auth.md](./auth.md)

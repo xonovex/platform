@@ -1,10 +1,14 @@
 # locals: Computed Values with Locals
 
-**Guideline:** Use locals block for computed values, transformations, and conditional logic
+## Guideline
 
-**Rationale:** Locals reduce duplication, improve readability, and centralize computation logic
+Use locals block for computed values, transformations, and conditional logic
 
-**Example:**
+## Rationale
+
+Locals reduce duplication, improve readability, and centralize computation logic
+
+## Example
 
 ```hcl
 locals {
@@ -44,7 +48,7 @@ locals {
 }
 ```
 
-**Techniques:**
+## Techniques
 
 - **Tag merging:** Combine common tags with resource-specific tags using merge()
 - **Calculated values:** Compute derived values like counts and indices once

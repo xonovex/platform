@@ -1,10 +1,14 @@
 # openapi-router-hierarchy: Use OpenAPIHono Throughout Router Hierarchy
 
-**Guideline:** Use `OpenAPIHono` for all routers in the hierarchy (root, intermediate, and leaf) to ensure OpenAPI routes appear in the generated specification.
+## Guideline
 
-**Rationale:** OpenAPI metadata propagation works through the router chain only when all routers use `OpenAPIHono`. Mixing regular `Hono` with `OpenAPIHono` breaks metadata propagation, causing child OpenAPI routes to be "lost" and resulting in incomplete API documentation.
+Use `OpenAPIHono` for all routers in the hierarchy (root, intermediate, and leaf) to ensure OpenAPI routes appear in the generated specification.
 
-**Example:**
+## Rationale
+
+OpenAPI metadata propagation works through the router chain only when all routers use `OpenAPIHono`. Mixing regular `Hono` with `OpenAPIHono` breaks metadata propagation, causing child OpenAPI routes to be "lost" and resulting in incomplete API documentation.
+
+## Example
 
 ```typescript
 // src/app.ts - Root router
@@ -54,7 +58,7 @@ itemsRouter.openapi(listItemsRoute, (c) => {
 });
 ```
 
-**Techniques:**
+## Techniques
 
 - Import `OpenAPIHono` from `@hono/zod-openapi`
 - Use `OpenAPIHono` for root application router

@@ -1,10 +1,14 @@
 # validation: Shellcheck and Shfmt Integration
 
-**Guideline:** Validate scripts with shellcheck and format with shfmt for consistent, error-free code.
+## Guideline
 
-**Rationale:** Shellcheck catches common bugs, portability issues, and anti-patterns automatically. Shfmt ensures consistent formatting across scripts, improving readability and maintainability.
+Validate scripts with shellcheck and format with shfmt for consistent, error-free code.
 
-**Example:**
+## Rationale
+
+Shellcheck catches common bugs, portability issues, and anti-patterns automatically. Shfmt ensures consistent formatting across scripts, improving readability and maintainability.
+
+## Example
 
 ```sh
 # Run shellcheck on script
@@ -21,7 +25,7 @@ variable_without_quotes=$1
 variable_with_quotes="$1"
 ```
 
-**Techniques:**
+## Techniques
 
 - Run `shellcheck script.sh` before committing
 - Use `find . -name '*.sh' -exec shellcheck {} +` to check multiple scripts

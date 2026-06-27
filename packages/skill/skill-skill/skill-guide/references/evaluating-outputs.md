@@ -68,13 +68,13 @@ Each pass through the loop gets its own `iteration-N/` directory.
 
 ## Writing Assertions
 
-**Good:**
+### Good
 
 - "Output is valid JSON"
 - "Bar chart has labeled axes"
 - "Report includes at least 3 recommendations"
 
-**Weak:**
+### Weak
 
 - "Output is good" (vague)
 - "Output uses exactly the phrase X" (brittle)

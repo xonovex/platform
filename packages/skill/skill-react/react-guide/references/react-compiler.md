@@ -1,10 +1,14 @@
 # react-compiler: React Compiler & Automatic Memoization
 
-**Guideline:** Write clean code without manual memoization; let Compiler handle it automatically; use useMemo/useCallback only for effect dependencies.
+## Guideline
 
-**Rationale:** Compiler analyzes data flow and applies memoization where beneficial; manual optimization adds overhead and is often incorrect.
+Write clean code without manual memoization; let Compiler handle it automatically; use useMemo/useCallback only for effect dependencies.
 
-**Example:**
+## Rationale
+
+Compiler analyzes data flow and applies memoization where beneficial; manual optimization adds overhead and is often incorrect.
+
+## Example
 
 ```tsx
 // Compiler handles this automatically
@@ -27,7 +31,7 @@ function SearchResults({query}) {
 }
 ```
 
-**Techniques:**
+## Techniques
 
 - Compiler enabled: Vite react({ babel: { plugins: ['babel-plugin-react-compiler'] } }) or Next.js experimental.reactCompiler
 - Rules of React: Pure functions, immutable state, unconditional hooks (compiler enforces)

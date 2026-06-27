@@ -1,10 +1,14 @@
 # three-d: 3D Content with Three.js
 
-**Guideline:** Use ThreeCanvas (not react-three-fiber Canvas); animate with useCurrentFrame, not useFrame(); use layout="none" in Sequences.
+## Guideline
 
-**Rationale:** useFrame() updates real-time, not frame-perfect; Remotion requires frame-based deterministic animation.
+Use ThreeCanvas (not react-three-fiber Canvas); animate with useCurrentFrame, not useFrame(); use layout="none" in Sequences.
 
-**Example:**
+## Rationale
+
+useFrame() updates real-time, not frame-perfect; Remotion requires frame-based deterministic animation.
+
+## Example
 
 ```tsx
 import {ThreeCanvas} from "@remotion/three";
@@ -23,7 +27,7 @@ function RotatingCube() {
 }
 ```
 
-**Techniques:**
+## Techniques
 
 - ThreeCanvas: Remotion-specific wrapper (not R3F Canvas)
 - useCurrentFrame() + fps: Calculate frame-based transforms (rotation, position)

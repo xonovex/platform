@@ -1,10 +1,14 @@
 # visibility-specifiers: Visibility Specifiers
 
-**Guideline:** Use PUBLIC, PRIVATE, and INTERFACE to control how target properties propagate to consumers.
+## Guideline
 
-**Rationale:** Proper visibility prevents leaking implementation details and ensures consumers get only the dependencies they need, reducing coupling and build times.
+Use PUBLIC, PRIVATE, and INTERFACE to control how target properties propagate to consumers.
 
-**Example:**
+## Rationale
+
+Proper visibility prevents leaking implementation details and ensures consumers get only the dependencies they need, reducing coupling and build times.
+
+## Example
 
 ```cmake
 # PUBLIC: Library AND consumers need this
@@ -24,7 +28,7 @@ add_executable(app src/main.cpp)
 target_link_libraries(app PRIVATE mylib PUBLIC common INTERFACE interface)
 ```
 
-**Techniques:**
+## Techniques
 
 - PUBLIC: Properties visible to both target and all downstream consumers
 - PRIVATE: Properties used only by target, not propagated to consumers

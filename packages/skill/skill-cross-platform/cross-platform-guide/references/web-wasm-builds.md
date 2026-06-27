@@ -1,8 +1,12 @@
 # web-wasm-builds: Building Native C/C++ to WebAssembly
 
-**Guideline:** Treat the browser as just another platform backend, but restructure the parts the web cannot host: hand the frame loop to the browser via a cooperative main-loop callback, make all file and network access asynchronous, map your explicit-API renderer down to GL ES / WebGL (or WebGPU) — typically by routing only the 2D/UI path — and account for a 32-bit, single-address-space, single-threaded sandbox with growable but fully-committed memory.
+## Guideline
 
-**Rationale:** A Wasm/Emscripten toolchain compiles your portable C/C++ unchanged, but the browser owns the event loop, the network is non-blocking, the filesystem is virtual, threads are restricted, and pointers are 32-bit — so the platform-specific delta is concentrated and large rather than diffuse. A native `while (running) { tick(); }` loop blocks the browser's event loop and hangs the tab; the browser must drive the frame. Synchronous `fopen`/`read` and blocking sockets do not exist over the network, so assets must be preloaded into the virtual filesystem or fetched asynchronously. The renderer is the deepest cut: browsers expose WebGL (OpenGL ES), not a low-level explicit API, so a Vulkan/D3D12/Metal engine cannot run its native backend — the pragmatic path is to map only the UI/2D draw stream to a tiny GL ES pipeline and defer or stream 3D. Getting these structural constraints right is what makes the same source that runs natively also run in a tab.
+Treat the browser as just another platform backend, but restructure the parts the web cannot host: hand the frame loop to the browser via a cooperative main-loop callback, make all file and network access asynchronous, map your explicit-API renderer down to GL ES / WebGL (or WebGPU) — typically by routing only the 2D/UI path — and account for a 32-bit, single-address-space, single-threaded sandbox with growable but fully-committed memory.
+
+## Rationale
+
+A Wasm/Emscripten toolchain compiles your portable C/C++ unchanged, but the browser owns the event loop, the network is non-blocking, the filesystem is virtual, threads are restricted, and pointers are 32-bit — so the platform-specific delta is concentrated and large rather than diffuse. A native `while (running) { tick(); }` loop blocks the browser's event loop and hangs the tab; the browser must drive the frame. Synchronous `fopen`/`read` and blocking sockets do not exist over the network, so assets must be preloaded into the virtual filesystem or fetched asynchronously. The renderer is the deepest cut: browsers expose WebGL (OpenGL ES), not a low-level explicit API, so a Vulkan/D3D12/Metal engine cannot run its native backend — the pragmatic path is to map only the UI/2D draw stream to a tiny GL ES pipeline and defer or stream 3D. Getting these structural constraints right is what makes the same source that runs natively also run in a tab.
 
 ## Contents
 
@@ -94,7 +98,7 @@ EM_BOOL on_mouse(int type, const EmscriptenMouseEvent *e, void *ud) {
 
 Web builds are statically linked — there is no native dynamic-plugin loader by default. Code that normally loads subsystems as plugins now links them all into one binary, which surfaces duplicate symbols: every plugin defining `load_plugin()` or a global API pointer collides. The pragmatic fix is `#if defined(PLATFORM_WEB)` guards to drop the duplicates; the principled fix is to support the toolchain's `dlopen` so plugins load as on native. Some browser APIs are partial: callbacks that link on one browser may fail to link on another (e.g. touch callbacks), so test on each target browser, not just one.
 
-**Gotchas:**
+### Gotchas
 
 - A blocking `while (running)` loop hangs the tab; the browser owns the frame clock — you must yield via the main-loop callback every frame.
 - 32-bit pointers change struct padding silently, breaking any hash/`memcmp` that assumed a 64-bit layout; widen keys and re-pad for the web build.
@@ -104,4 +108,6 @@ Web builds are statically linked — there is no native dynamic-plugin loader by
 - Static-linking everything that was a plugin creates duplicate-symbol collisions (`load_plugin`, global API pointers); guard or properly `dlopen`, don't ignore the linker.
 - Browser API coverage differs per browser; a callback that links in one may produce link errors in another — CI must build/run on each target browser.
 
-**Related:** [references/platform-abstraction-layer.md](./platform-abstraction-layer.md), [references/porting-strategy.md](./porting-strategy.md), **gpu-rendering-guide**, **gpu-rendering-vulkan-guide**
+### Related
+
+[references/platform-abstraction-layer.md](./platform-abstraction-layer.md), [references/porting-strategy.md](./porting-strategy.md), **gpu-rendering-guide**, **gpu-rendering-vulkan-guide**

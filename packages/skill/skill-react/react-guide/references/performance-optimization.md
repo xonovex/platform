@@ -1,10 +1,14 @@
 # performance-optimization: Performance Optimization Techniques
 
-**Guideline:** Use memo() for expensive components; lazy-load routes with React.lazy + Suspense; prefer SSR/SSG; let Compiler handle calculations.
+## Guideline
 
-**Rationale:** memo() prevents unnecessary re-renders; code splitting reduces initial bundle; SSR improves FCP; React 19 Compiler removes manual memoization burden.
+Use memo() for expensive components; lazy-load routes with React.lazy + Suspense; prefer SSR/SSG; let Compiler handle calculations.
 
-**Example:**
+## Rationale
+
+memo() prevents unnecessary re-renders; code splitting reduces initial bundle; SSR improves FCP; React 19 Compiler removes manual memoization burden.
+
+## Example
 
 ```tsx
 // Memoize expensive component
@@ -33,7 +37,7 @@ function App() {
 }
 ```
 
-**Techniques:**
+## Techniques
 
 - memo(): Wrap expensive components to skip re-render if props unchanged
 - lazy() + Suspense: Code splitting; reduces initial bundle by ~50-70%

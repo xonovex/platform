@@ -1,10 +1,14 @@
 # lottie: Lottie Animations
 
-**Guideline:** Use `delayRender()` pattern to load Lottie JSON before rendering compositions.
+## Guideline
 
-**Rationale:** Animations must load asynchronously. `delayRender()` pauses frame rendering until `continueRender()` is called after JSON loads.
+Use `delayRender()` pattern to load Lottie JSON before rendering compositions.
 
-**Example:**
+## Rationale
+
+Animations must load asynchronously. `delayRender()` pauses frame rendering until `continueRender()` is called after JSON loads.
+
+## Example
 
 ```tsx
 import {Lottie, useVideoConfig} from "@remotion/lottie";
@@ -30,7 +34,7 @@ export const MyAnimation = () => {
 };
 ```
 
-**Techniques:**
+## Techniques
 
 - Install `@remotion/lottie` package before use
 - Call `delayRender()` to pause frame rendering while loading

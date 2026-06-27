@@ -1,10 +1,14 @@
 # file-naming: File Naming Conventions
 
-**Guideline:** Suffixes for purpose: `_type.h` (types), `_impl.h` (scalar), `_aos/_soa/_simd` (variants).
+## Guideline
 
-**Rationale:** Enables quick file identification, prevents include order issues, supports multiple variant implementations.
+Suffixes for purpose: `_type.h` (types), `_impl.h` (scalar), `_aos/_soa/_simd` (variants).
 
-**Example:**
+## Rationale
+
+Enables quick file identification, prevents include order issues, supports multiple variant implementations.
+
+## Example
 
 ```
 vector_type.h        # Types only
@@ -25,7 +29,7 @@ vector.test.c        # Scalar tests
 #include "vector_soa.h"
 ```
 
-**Techniques:**
+## Techniques
 
 - Type suffix: Use `_type.h` for type definitions only
 - Impl suffix: Use `_impl.h` for inline scalar implementations

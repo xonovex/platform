@@ -13,7 +13,9 @@ Spec limits (name / description / body / optional-field rules) live in the paren
 
 ## Condensing SKILL.md
 
-**Goal:** Reduce SKILL.md by 60-80% (default 70%) while preserving quick reference. Extract examples to reference files. Land under the spec ceiling (<500 lines / ~5000 tokens body).
+### Goal
+
+Reduce SKILL.md by 60-80% (default 70%) while preserving quick reference. Extract examples to reference files. Land under the spec ceiling (<500 lines / ~5000 tokens body).
 
 ### Core Workflow
 
@@ -27,19 +29,33 @@ Spec limits (name / description / body / optional-field rules) live in the paren
 
 ### Simplification Rules
 
-**Remove from SKILL.md:** code blocks, prose paragraphs, long explanations, project paths/names, example sections, duplicate content, anything the agent already knows by general training
+#### Remove from SKILL.md
 
-**Keep in SKILL.md:** frontmatter, one-line description, section headings, bullet points with rule + brief how-to + link, small inline code, a **Gotchas** section for non-obvious env-specific facts
+code blocks, prose paragraphs, long explanations, project paths/names, example sections, duplicate content, anything the agent already knows by general training
 
-**Bullet format:** `- **Rule** - Brief 5-10 word how-to (references/{topic}.md)`
+#### Keep in SKILL.md
 
-**Reference triggers:** each reference link states a load-when condition (e.g., "Load when API returns non-200"), not a generic "see X"
+frontmatter, one-line description, section headings, bullet points with rule + brief how-to + link, small inline code, a **Gotchas** section for non-obvious env-specific facts
 
-**Create reference files when:** code examples exist, detailed explanation needed, multiple examples, or counter-examples to show
+#### Bullet format
 
-**Defaults over menus:** never leave 3+ equal options when condensing — pick one default, mention alternatives briefly
+`- **Rule** - Brief 5-10 word how-to (references/{topic}.md)`
 
-**Project-independence:** replace specific project names/paths/domains with generic equivalents ("your app", "project root")
+#### Reference triggers
+
+each reference link states a load-when condition (e.g., "Load when API returns non-200"), not a generic "see X"
+
+#### Create reference files when
+
+code examples exist, detailed explanation needed, multiple examples, or counter-examples to show
+
+#### Defaults over menus
+
+never leave 3+ equal options when condensing — pick one default, mention alternatives briefly
+
+#### Project-independence
+
+replace specific project names/paths/domains with generic equivalents ("your app", "project root")
 
 ### Success Metrics
 
@@ -47,11 +63,15 @@ Report: lines removed ([X]% reduction), reference files created/updated, project
 
 ## Condensing reference files
 
-**Guideline:** Reduce `references/*.md` files by merging overlapping sections, trimming redundant examples, and removing prose that restates headings.
+### Guideline
 
-**Rationale:** Reference files are the detail layer of progressive disclosure. When they grow verbose with overlapping sections or redundant examples, they defeat their purpose as scannable technical references.
+Reduce `references/*.md` files by merging overlapping sections, trimming redundant examples, and removing prose that restates headings.
 
-**Techniques:**
+### Rationale
+
+Reference files are the detail layer of progressive disclosure. When they grow verbose with overlapping sections or redundant examples, they defeat their purpose as scannable technical references.
+
+### Techniques
 
 - Read the full reference file and identify overlapping sections
 - Merge sections that cover the same concept from different angles
@@ -62,7 +82,7 @@ Report: lines removed ([X]% reduction), reference files created/updated, project
 - Target 20-40% reduction (reference files are already the detail layer)
 - Do not move content to sub-files — reference is the bottom of the disclosure hierarchy
 
-**Example:**
+### Example
 
 ```markdown
 # BEFORE (task-inheritance.md, 139 lines, 3 overlapping merge sections)

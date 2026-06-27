@@ -1,10 +1,14 @@
 # sounds: Available Sounds and Instruments
 
-**Guideline:** Use verified drum samples and synthesis waveforms; fall back to synthesis for unreliable samples.
+## Guideline
 
-**Rationale:** Not all sample names work in the web version. Verified sounds prevent silent patterns.
+Use verified drum samples and synthesis waveforms; fall back to synthesis for unreliable samples.
 
-**Example:**
+## Rationale
+
+Not all sample names work in the web version. Verified sounds prevent silent patterns.
+
+## Example
 
 ```javascript
 // Use verified drum sounds
@@ -76,7 +80,7 @@ note("c3").sound("sine").attack(0.5).sustain(2).release(1).room(0.8).gain(0.4);
 note("c2").sound("sawtooth").lpf(400).gain(0.6);
 ```
 
-**Techniques:**
+### Techniques
 
 - Verified drums: bd, sd, hh, oh, cp, rim, lt, mt, ht always work
 - Drum banks: RolandTR909, RolandTR808, RolandTR707, AkaiLinn, ViscoSpaceDrum

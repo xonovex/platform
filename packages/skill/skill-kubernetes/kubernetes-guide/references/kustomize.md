@@ -1,10 +1,14 @@
 # kustomize: Multi-Environment Management
 
-**Guideline:** Organize manifests with base resources and environment-specific overlays using strategic merge patches.
+## Guideline
 
-**Rationale:** Kustomize enables DRY configuration management across environments. Base resources define common configuration while overlays customize for each environment.
+Organize manifests with base resources and environment-specific overlays using strategic merge patches.
 
-**Example:**
+## Rationale
+
+Kustomize enables DRY configuration management across environments. Base resources define common configuration while overlays customize for each environment.
+
+## Example
 
 ```yaml
 # base/kustomization.yaml
@@ -32,7 +36,7 @@ configMapGenerator:
     literals: [LOG_LEVEL=info, RATE_LIMIT=1000]
 ```
 
-**Techniques:**
+## Techniques
 
 - Base resources: Create base/kustomization.yaml with common manifests
 - Environment overlays: Create overlays/<env>/ for environment-specific customization

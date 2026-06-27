@@ -1,10 +1,14 @@
 # security: Security Best Practices
 
-**Guideline:** Pin versions, run non-root, externalize secrets to limit attack surface.
+## Guideline
 
-**Rationale:** Multiple defense layers: pinned versions prevent supply chain attacks, non-root limits breach damage, externalized secrets prevent leaks.
+Pin versions, run non-root, externalize secrets to limit attack surface.
 
-**Example:**
+## Rationale
+
+Multiple defense layers: pinned versions prevent supply chain attacks, non-root limits breach damage, externalized secrets prevent leaks.
+
+## Example
 
 ```dockerfile
 FROM node:22.1.0-alpine3.19
@@ -19,7 +23,7 @@ RUN mkdir /tmp/app-cache && chown nodejs:nodejs /tmp/app-cache
 VOLUME /tmp/app-cache
 ```
 
-**Techniques:**
+## Techniques
 
 - Version pinning: Pin base image version including OS version for supply chain security
 - Non-root user: Create and use non-root USER to limit breach damage

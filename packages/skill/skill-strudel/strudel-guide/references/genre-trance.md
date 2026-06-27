@@ -1,10 +1,14 @@
 # filename: genre-trance
 
-**Guideline:** Build uplifting trance with four-on-the-floor kicks, rolling basslines, euphoric melodies, and filter sweeps at 138-145 BPM.
+## Guideline
 
-**Rationale:** Trance requires precise tempo, layered elements, and evolving filters; proper gain hierarchy and chord progressions maintain energy and emotional impact.
+Build uplifting trance with four-on-the-floor kicks, rolling basslines, euphoric melodies, and filter sweeps at 138-145 BPM.
 
-**Example:**
+## Rationale
+
+Trance requires precise tempo, layered elements, and evolving filters; proper gain hierarchy and chord progressions maintain energy and emotional impact.
+
+## Example
 
 ```javascript
 setcpm(138 / 4);
@@ -18,7 +22,7 @@ stack(
 );
 ```
 
-**Techniques:**
+## Techniques
 
 - Tempo: `setcpm(138-145/4)` for classic to hard trance pacing
 - Four-on-the-floor: `s("bd*4")` with punchy filtering `.lpf(150)`

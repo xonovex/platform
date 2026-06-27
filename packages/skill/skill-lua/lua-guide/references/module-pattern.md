@@ -1,10 +1,14 @@
 # module-pattern: Module Pattern
 
-**Guideline:** Use table-based module pattern with local module table and single return statement.
+## Guideline
 
-**Rationale:** Provides clean encapsulation, avoids global namespace pollution, and creates predictable module structure that's easy to reason about.
+Use table-based module pattern with local module table and single return statement.
 
-**Example:**
+## Rationale
+
+Provides clean encapsulation, avoids global namespace pollution, and creates predictable module structure that's easy to reason about.
+
+## Example
 
 ```lua
 -- math2d.lua
@@ -30,7 +34,7 @@ end
 return M
 ```
 
-**Techniques:**
+## Techniques
 
 - Create local module table `local M = {}`
 - Define functions as `M.function_name`

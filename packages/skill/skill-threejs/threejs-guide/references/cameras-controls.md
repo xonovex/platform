@@ -1,10 +1,14 @@
 # filename: cameras-controls
 
-**Guideline:** Choose camera type (Perspective, Orthographic, Cube); select controls matching interaction (OrbitControls, FlyControls, PointerLockControls).
+## Guideline
 
-**Rationale:** Proper camera frustum prevents z-fighting; tight near/far prevents clipping; controls must match intended interaction pattern.
+Choose camera type (Perspective, Orthographic, Cube); select controls matching interaction (OrbitControls, FlyControls, PointerLockControls).
 
-**Example:**
+## Rationale
+
+Proper camera frustum prevents z-fighting; tight near/far prevents clipping; controls must match intended interaction pattern.
+
+## Example
 
 ```javascript
 const camera = new THREE.PerspectiveCamera(75, w / h, 0.1, 1000);
@@ -17,7 +21,7 @@ controls.target.set(0, 0, 0);
 controls.update();
 ```
 
-**Techniques:**
+## Techniques
 
 - Camera types: PerspectiveCamera (3D standard), OrthographicCamera (CAD/isometric), CubeCamera (reflections)
 - Near/far planes: Large scenes use `near=1, far=100000`; small scenes `near=0.001, far=100` to avoid z-fighting

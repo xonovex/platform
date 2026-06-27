@@ -1,8 +1,12 @@
 # dev-iteration-and-observability: Virtual Networking, Latency Simulation, and Packet Inspection
 
-**Guideline:** Make multiplayer debuggable and iterable by abstracting the wire behind the network API so many nodes can run in one process and behave like remote machines, by simulating adverse conditions (added latency, bandwidth caps) on demand, by exposing a packet inspector for acks/order/counts, and by letting one project run single-player or multiplayer through a topology branch with no code changes.
+## Guideline
 
-**Rationale:** Multiplayer is hard to debug because the number of possible states is multiplied across several running processes that you can't pause together or step in one debugger. The fix is to make "remote" an abstraction, not a deployment fact: route all node-to-node traffic through one API, and when both nodes live in the same process, short-circuit the wire entirely — deliver to the receiver callback immediately without copying — so you can launch a server node and a client node side by side in one tool and step them together, yet the same code runs unchanged across real machines later. On top of that, real network pain (latency, jitter, limited bandwidth) is something you must be able to _inject_ to hit corner cases without standing up a lossy network, and you need a profiler that can pause every simulation at once and show what packets flew, how many were acked, and how many arrived out of order. Finally, the gap between single-player and multiplayer should be a data branch on node type — a "what node am I" switch whose unnamed/catch-all path runs every branch in sequence — so the single-player build is the multiplayer build with one node running all roles.
+Make multiplayer debuggable and iterable by abstracting the wire behind the network API so many nodes can run in one process and behave like remote machines, by simulating adverse conditions (added latency, bandwidth caps) on demand, by exposing a packet inspector for acks/order/counts, and by letting one project run single-player or multiplayer through a topology branch with no code changes.
+
+## Rationale
+
+Multiplayer is hard to debug because the number of possible states is multiplied across several running processes that you can't pause together or step in one debugger. The fix is to make "remote" an abstraction, not a deployment fact: route all node-to-node traffic through one API, and when both nodes live in the same process, short-circuit the wire entirely — deliver to the receiver callback immediately without copying — so you can launch a server node and a client node side by side in one tool and step them together, yet the same code runs unchanged across real machines later. On top of that, real network pain (latency, jitter, limited bandwidth) is something you must be able to _inject_ to hit corner cases without standing up a lossy network, and you need a profiler that can pause every simulation at once and show what packets flew, how many were acked, and how many arrived out of order. Finally, the gap between single-player and multiplayer should be a data branch on node type — a "what node am I" switch whose unnamed/catch-all path runs every branch in sequence — so the single-player build is the multiplayer build with one node running all roles.
 
 ## Contents
 
@@ -12,7 +16,7 @@
 - Packet inspection: acks, order, per-type counts
 - Single-player ↔ multiplayer via a topology branch
 
-**How to Apply:**
+### How to Apply
 
 1. Route every node-to-node message through the network API; never let nodes touch each other's state directly, so the API can choose wire vs. in-process delivery.
 2. Short-circuit local delivery: if the destination node is in the same process, call its receiver callback immediately and skip serialization/copies — identical behavior, zero wire cost.
@@ -21,7 +25,7 @@
 5. Build a packet inspector that can pause all simulations together and answer "what packets of type X were sent N frames ago," "how many were acked last frame," "how many arrived out of order."
 6. Branch single-player vs. multiplayer on node type via a topology switch; give it a catch-all (no node name) path that runs every branch in sequence, so a single node can play all roles for the offline build.
 
-**Example:**
+### Example
 
 ```c
 // One process, two nodes: local sends skip the wire entirely.
@@ -41,7 +45,7 @@ switch (node_role(self)) {
 }
 ```
 
-**Gotchas:**
+### Gotchas
 
 - In-process short-circuit must not copy or re-serialize, or you measure the wrong thing and hide serialization bugs that only bite over a real socket; but skipping serialization can also hide format errors — test against a real socket before shipping.
 - Latency/bandwidth injection belongs in a debug layer, never in shipping code paths; leaving it on tanks live performance.
@@ -50,4 +54,6 @@ switch (node_role(self)) {
 - Local-only testing can pass while the shipped build fails: in-process delivery never drops or reorders, so bugs that only appear under loss/reorder stay hidden until you inject conditions or use a real socket.
 - Per-type packet counts and ack/out-of-order stats are only as good as the packet typing (see transport-and-channels.md); untyped or mistyped packets distort the profiler.
 
-**Related:** [references/transport-and-channels.md](./transport-and-channels.md), [references/topology-and-authority.md](./topology-and-authority.md), **ecs-guide**
+### Related
+
+[references/transport-and-channels.md](./transport-and-channels.md), [references/topology-and-authority.md](./topology-and-authority.md), **ecs-guide**

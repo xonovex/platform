@@ -1,10 +1,14 @@
 # context-storage: Access Context Globally with AsyncLocalStorage
 
-**Guideline:** Use `contextStorage()` middleware with `getContext()` to access Hono Context outside route handlers, enabling cleaner service layer code without parameter drilling.
+## Guideline
 
-**Rationale:** AsyncLocalStorage provides global access to the current request context without parameter drilling through the call stack, enabling clean separation between routing and business logic while automatically cleaning up context after requests.
+Use `contextStorage()` middleware with `getContext()` to access Hono Context outside route handlers, enabling cleaner service layer code without parameter drilling.
 
-**Example:**
+## Rationale
+
+AsyncLocalStorage provides global access to the current request context without parameter drilling through the call stack, enabling clean separation between routing and business logic while automatically cleaning up context after requests.
+
+## Example
 
 ```typescript
 import {Hono} from "hono";
@@ -38,7 +42,7 @@ export function list() {
 }
 ```
 
-**Techniques:**
+## Techniques
 
 - Import `contextStorage` and `getContext` from `hono/context-storage`
 - Apply `contextStorage()` middleware early in middleware chain

@@ -1,10 +1,14 @@
 # project-references-path-resolution: Path Resolution in TypeScript Project References
 
-**Guideline:** Verify directory structure before configuring project references; calculate relative paths carefully from current package to target.
+## Guideline
 
-**Rationale:** Incorrect paths cause "File not found" errors and build failures in CI/CD pipelines.
+Verify directory structure before configuring project references; calculate relative paths carefully from current package to target.
 
-**Example:**
+## Rationale
+
+Incorrect paths cause "File not found" errors and build failures in CI/CD pipelines.
+
+## Example
 
 ```bash
 # Verify structure
@@ -26,7 +30,7 @@ templates/ shared/ apps/
 // {"path": "../../shared-core"}  ❌
 ```
 
-**Techniques:**
+## Techniques
 
 - ls verification: Use `ls` to check actual directory structure before configuring
 - Relative paths: Calculate from current package up (..) then down to target

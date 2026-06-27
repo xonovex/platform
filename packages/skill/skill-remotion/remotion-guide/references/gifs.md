@@ -1,10 +1,14 @@
 # gifs: Animated Images (GIF, APNG, WebP, AVIF)
 
-**Guideline:** Use `<AnimatedImage>` for frame-synchronized playback of animated images.
+## Guideline
 
-**Rationale:** Native img tags don't sync with Remotion's timeline. `<AnimatedImage>` provides proper frame synchronization and playback control.
+Use `<AnimatedImage>` for frame-synchronized playback of animated images.
 
-**Example:**
+## Rationale
+
+Native img tags don't sync with Remotion's timeline. `<AnimatedImage>` provides proper frame synchronization and playback control.
+
+## Example
 
 ```tsx
 import {AnimatedImage, Composition, staticFile} from "remotion";
@@ -23,7 +27,7 @@ export const MyComposition = () => (
 );
 ```
 
-**Techniques:**
+## Techniques
 
 - Import `AnimatedImage` and `staticFile` from `remotion` package
 - Set explicit `width` and `height` props for proper sizing and rendering

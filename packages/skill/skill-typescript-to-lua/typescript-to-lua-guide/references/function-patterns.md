@@ -1,10 +1,14 @@
 # function-patterns: Function and Module Patterns
 
-**Guideline:** Use pure functions, module-level constants, and type-safe enums for efficient Lua.
+## Guideline
 
-**Rationale:** Pure functions compile to simple Lua without closures. Constants generate efficient tables. Patterns align with Lua's procedural nature.
+Use pure functions, module-level constants, and type-safe enums for efficient Lua.
 
-**Example:**
+## Rationale
+
+Pure functions compile to simple Lua without closures. Constants generate efficient tables. Patterns align with Lua's procedural nature.
+
+## Example
 
 ```typescript
 // Pure functions in namespace
@@ -54,7 +58,7 @@ namespace Array {
 }
 ```
 
-**Techniques:**
+## Techniques
 
 - Export pure functions in namespaces to organize code without closures
 - Define module-level constants in dedicated namespaces for reusability

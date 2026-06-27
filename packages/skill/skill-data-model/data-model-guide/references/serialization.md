@@ -1,10 +1,14 @@
 # serialization: Save, Load, Versioning, and Migration
 
-**Guideline:** Persist the model through a stable, versioned on-disk schema; serialize references by id, migrate older files forward into the current schema on load, and emit deterministic output so saved files diff cleanly under version control.
+## Guideline
 
-**Rationale:** Saved files outlive the code that wrote them. The schema in memory will change — properties get added, renamed, removed — but old files must still open. A versioned format plus per-version migration lets the loader transform an old layout into the current one instead of refusing it. Because the in-memory model already references objects by id (not pointer), serialization is mostly mechanical: write ids, re-resolve on load. Deterministic output (stable ordering, stable formatting) is what makes the file usable with diff/merge tools and code review.
+Persist the model through a stable, versioned on-disk schema; serialize references by id, migrate older files forward into the current schema on load, and emit deterministic output so saved files diff cleanly under version control.
 
-**Techniques:**
+## Rationale
+
+Saved files outlive the code that wrote them. The schema in memory will change — properties get added, renamed, removed — but old files must still open. A versioned format plus per-version migration lets the loader transform an old layout into the current one instead of refusing it. Because the in-memory model already references objects by id (not pointer), serialization is mostly mechanical: write ids, re-resolve on load. Deterministic output (stable ordering, stable formatting) is what makes the file usable with diff/merge tools and code review.
+
+## Techniques
 
 - **Stable on-disk schema** - Define the file layout explicitly and independently of the in-memory layout. Tag the file with a format version. Treat the on-disk property names/ids as a contract.
 - **Versioning + migration** - On load, read the version; if older, run the chain of migration steps (`v1→v2→v3…`) that each transform the prior layout into the next. New code reads only the current schema; migrations bridge the gap.
@@ -17,14 +21,14 @@
 - **Re-spawn from asset references** - When content originates from an asset, save only a reference to the asset plus the local overrides, and re-spawn the hierarchy from the _current_ asset on load. Saves shrink, and content patches apply automatically — but you must keep every asset version that older saves still reference, and structural changes to an asset hierarchy can break the UUID matching that re-maps overridden children.
 - **ABI-stable struct evolution** - For versioned API/data structs that must stay binary-compatible: append new fields only at the _end_, never reorder or retype existing ones, and reuse explicitly zero-initialized reserved bytes. A leading `uint32_t size` field lets a callee version-detect a struct passed by pointer. Request an exact major version, accept higher minor/patch; for a breaking change introduce a new struct and support both for a while rather than mutating the old one.
 
-**How to Apply:**
+## How to Apply
 
 1. Write a header with a magic tag and a format `version`.
 2. Serialize each owned object: its type, id, and each set property; sub-objects inline, references as ids.
 3. On load, read `version`; if `< current`, apply migration steps in sequence to reach the current schema.
 4. Re-resolve all reference ids after all objects exist; emit objects/properties in a stable order for deterministic files.
 
-**Example:**
+## Example
 
 ```c
 #define FORMAT_VERSION 3
@@ -50,7 +54,7 @@ static void migrate_step(model_t *m, uint32_t from) {
 if (prop_unknown) return false; // brittle: loses cross-version compatibility
 ```
 
-**Gotchas:**
+## Gotchas
 
 - A loader that hard-fails on an unrecognized property cannot open newer files; skip-and-preserve unknowns instead of rejecting.
 - Migrations must be ordered and idempotent per step; a missing or out-of-order step silently mis-reads old data as if it were current.
@@ -61,4 +65,6 @@ if (prop_unknown) return false; // brittle: loses cross-version compatibility
 - "Reserved, must be zero" struct bytes are unenforceable (Hyrum's Law): callers will pass garbage and break future reuse. A leading `size` field is the more reliable way to evolve a by-pointer struct.
 - You cannot freely replace an asset that older saves point to — re-spawning from a structurally-changed asset can leave saved overrides orphaned or mis-mapped.
 
-**Related:** [references/references-and-ownership.md](./references-and-ownership.md), [references/object-model.md](./object-model.md), [references/snapshots-and-threading.md](./snapshots-and-threading.md)
+## Related
+
+[references/references-and-ownership.md](./references-and-ownership.md), [references/object-model.md](./object-model.md), [references/snapshots-and-threading.md](./snapshots-and-threading.md)

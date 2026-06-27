@@ -1,10 +1,14 @@
 # filename: genre-harsh
 
-**Guideline:** Create harsh, experimental textures using extreme distortion, bit crushing, noise, and chaotic polyrhythms for intentional sonic destruction.
+## Guideline
 
-**Rationale:** Harsh music demands intentional degradation and dissonance; extreme effect values and dark scales create cohesive experimental aesthetics.
+Create harsh, experimental textures using extreme distortion, bit crushing, noise, and chaotic polyrhythms for intentional sonic destruction.
 
-**Example:**
+## Rationale
+
+Harsh music demands intentional degradation and dissonance; extreme effect values and dark scales create cohesive experimental aesthetics.
+
+## Example
 
 ```javascript
 stack(
@@ -19,7 +23,7 @@ stack(
 );
 ```
 
-**Techniques:**
+## Techniques
 
 - Extreme effects: `.crush(2-4)`, `.coarse(32-64)`, `.shape(0.8-2)` for maximum harshness
 - Noise layers: `s("white")` with `.hpf()`, `.bpf()`, `.degradeBy()` for texture

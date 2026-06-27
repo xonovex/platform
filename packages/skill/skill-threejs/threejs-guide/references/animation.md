@@ -1,10 +1,14 @@
 # animation: Animation System
 
-**Guideline:** Use AnimationMixer for GLTF keyframe animations; use clock.getDelta() for frame-rate independent procedural animation.
+## Guideline
 
-**Rationale:** Mixer efficiently plays complex GLTF animations; delta time ensures consistent speed across frame rates.
+Use AnimationMixer for GLTF keyframe animations; use clock.getDelta() for frame-rate independent procedural animation.
 
-**Example:**
+## Rationale
+
+Mixer efficiently plays complex GLTF animations; delta time ensures consistent speed across frame rates.
+
+## Example
 
 ```javascript
 const mixer = new THREE.AnimationMixer(gltf.scene);
@@ -18,7 +22,7 @@ renderer.setAnimationLoop(() => {
 });
 ```
 
-**Techniques:**
+## Techniques
 
 - AnimationMixer: Create from scene root; plays multiple clips simultaneously
 - AnimationAction: play(), stop(), reset(); loop modes (Repeat, Once, PingPong); timeScale for speed

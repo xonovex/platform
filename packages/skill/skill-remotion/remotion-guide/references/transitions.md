@@ -1,10 +1,14 @@
 # transitions: Scene Transitions
 
-**Guideline:** Use `<TransitionSeries>` from `@remotion/transitions` for fullscreen scene transitions.
+## Guideline
 
-**Rationale:** Transitions overlap scenes, reducing total composition duration. `<TransitionSeries>` handles complex timing automatically.
+Use `<TransitionSeries>` from `@remotion/transitions` for fullscreen scene transitions.
 
-**Example:**
+## Rationale
+
+Transitions overlap scenes, reducing total composition duration. `<TransitionSeries>` handles complex timing automatically.
+
+## Example
 
 ```tsx
 import {
@@ -44,7 +48,7 @@ export const MyComposition = () => {
 };
 ```
 
-**Techniques:**
+## Techniques
 
 - Install `@remotion/transitions` package before use
 - Wrap all scenes with `<TransitionSeries>` container

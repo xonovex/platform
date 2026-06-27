@@ -1,10 +1,14 @@
 # filename: hooks
 
-**Guideline:** Follow Rules of Hooks (top-level only, from functions/custom hooks); extract reusable logic into custom hooks with `use` prefix.
+## Guideline
 
-**Rationale:** Hook rules ensure predictable behavior; custom hooks enable logic reuse without prop drilling; focused hooks maintain single responsibility.
+Follow Rules of Hooks (top-level only, from functions/custom hooks); extract reusable logic into custom hooks with `use` prefix.
 
-**Example:**
+## Rationale
+
+Hook rules ensure predictable behavior; custom hooks enable logic reuse without prop drilling; focused hooks maintain single responsibility.
+
+## Example
 
 ```tsx
 // useApi - fetch with loading/error states
@@ -38,7 +42,7 @@ function useApi<T>(url: string) {
 }
 ```
 
-**Techniques:**
+## Techniques
 
 - Rules of Hooks: Call only at top-level (not loops/conditions); only from functions/custom hooks
 - Custom hooks: Extract reusable logic; name with `use` prefix; single responsibility

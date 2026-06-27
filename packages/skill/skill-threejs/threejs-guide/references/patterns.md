@@ -1,10 +1,14 @@
 # filename: patterns
 
-**Guideline:** Organize scenes in Groups; implement proper cleanup to prevent memory leaks; use delta time for frame-rate independent updates.
+## Guideline
 
-**Rationale:** Hierarchical organization enables efficient transforms; cleanup prevents GPU memory exhaustion; delta time ensures consistent movement across devices.
+Organize scenes in Groups; implement proper cleanup to prevent memory leaks; use delta time for frame-rate independent updates.
 
-**Example:**
+## Rationale
+
+Hierarchical organization enables efficient transforms; cleanup prevents GPU memory exhaustion; delta time ensures consistent movement across devices.
+
+## Example
 
 ```javascript
 const scene = new THREE.Scene();
@@ -21,7 +25,7 @@ function animate() {
 }
 ```
 
-**Techniques:**
+## Techniques
 
 - Scene hierarchy: Group objects (world → player/enemies/effects) for batch transforms
 - Frame-rate independence: Multiply movement by `clock.getDelta()`; use `getElapsedTime()` for animations

@@ -2,7 +2,9 @@
 
 Reference for the file formats, locations, and conventions used by different agent harnesses to define reusable **user-invocable** prompts (a.k.a. slash commands, custom commands, prompt files, rules).
 
-**Out of scope:** project-wide always-applied context files (e.g. `AGENTS.md`, `CLAUDE.md`, `.cursorrules`). Those are not invoked by name — for those, see the `skill-instruction` skill.
+## Out of scope
+
+project-wide always-applied context files (e.g. `AGENTS.md`, `CLAUDE.md`, `.cursorrules`). Those are not invoked by name — for those, see the `skill-instruction` skill.
 
 ## Harness Matrix
 

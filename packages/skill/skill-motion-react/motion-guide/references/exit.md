@@ -1,10 +1,14 @@
 # filename: exit
 
-**Guideline:** Wrap conditionally rendered elements in `<AnimatePresence>` to enable exit animations; React removes elements instantly without it.
+## Guideline
 
-**Rationale:** AnimatePresence delays DOM removal until exit animation completes; enables smooth transitions and proper cleanup.
+Wrap conditionally rendered elements in `<AnimatePresence>` to enable exit animations; React removes elements instantly without it.
 
-**Example:**
+## Rationale
+
+AnimatePresence delays DOM removal until exit animation completes; enables smooth transitions and proper cleanup.
+
+## Example
 
 ```tsx
 function Modal({isOpen, onClose}) {
@@ -24,7 +28,7 @@ function Modal({isOpen, onClose}) {
 }
 ```
 
-**Techniques:**
+## Techniques
 
 - Always wrap conditionals: `<AnimatePresence>{condition && <motion.div exit={{...}} />}</AnimatePresence>`
 - Unique keys: Required for list animations; prevents animation identity loss on reorder

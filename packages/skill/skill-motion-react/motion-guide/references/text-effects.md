@@ -1,10 +1,14 @@
 # filename: text-effects
 
-**Guideline:** Split text into words/characters in spans; use `overflow: hidden` with `y: ["100%", 0]` for elegant reveal animations.
+## Guideline
 
-**Rationale:** Splitting enables per-element stagger; `overflow: hidden` masks overflow for clean Y-translate reveals; avoid animating entire text blocks.
+Split text into words/characters in spans; use `overflow: hidden` with `y: ["100%", 0]` for elegant reveal animations.
 
-**Example:**
+## Rationale
+
+Splitting enables per-element stagger; `overflow: hidden` masks overflow for clean Y-translate reveals; avoid animating entire text blocks.
+
+## Example
 
 ```tsx
 function TextReveal({text}) {
@@ -34,7 +38,7 @@ function TextReveal({text}) {
 }
 ```
 
-**Techniques:**
+## Techniques
 
 - Word reveal: Split by space, `y: ["100%", 0]`, stagger 0.05-0.15
 - Character reveal: Split by `""`, stagger 0.02-0.05, add `y: 20` for bounce effect

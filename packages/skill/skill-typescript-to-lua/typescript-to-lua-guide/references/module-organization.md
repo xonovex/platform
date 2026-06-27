@@ -1,10 +1,14 @@
 # module-organization: Module Organization
 
-**Guideline:** Organize code in flat namespace hierarchies that map cleanly to Lua tables.
+## Guideline
 
-**Rationale:** Nested namespaces compile to nested Lua tables, creating efficient module systems aligned with Lua patterns.
+Organize code in flat namespace hierarchies that map cleanly to Lua tables.
 
-**Example:**
+## Rationale
+
+Nested namespaces compile to nested Lua tables, creating efficient module systems aligned with Lua patterns.
+
+## Example
 
 ```typescript
 // Good: 2-level hierarchy, organized by feature
@@ -41,7 +45,7 @@ namespace Rendering {
 namespace Game.Entities.Physics.Collision.Detection {}
 ```
 
-**Techniques:**
+## Techniques
 
 - Use nested namespaces for logical grouping that maps to Lua table structure
 - Export functions directly within namespaces (not as properties)

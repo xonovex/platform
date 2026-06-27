@@ -1,10 +1,14 @@
 # test-organization: Test Directory Structure and Suite Organization
 
-**Guideline:** Organize tests by endpoint/feature with nested describe blocks and clear directory structure.
+## Guideline
 
-**Rationale:** Well-organized tests are easy to navigate, maintain, and update.
+Organize tests by endpoint/feature with nested describe blocks and clear directory structure.
 
-**Example:**
+## Rationale
+
+Well-organized tests are easy to navigate, maintain, and update.
+
+## Example
 
 ```
 test/
@@ -15,7 +19,7 @@ test/
     └── auth.test.ts      # Authentication flows
 ```
 
-**Techniques:**
+## Techniques
 
 - Create `test/` directory at package root
 - Mirror API structure in test files (e.g., `test/api/users.test.ts`)

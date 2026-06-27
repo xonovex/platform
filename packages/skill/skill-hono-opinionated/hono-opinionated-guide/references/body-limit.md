@@ -1,10 +1,14 @@
 # body-limit: Preventing Large Payload Attacks
 
-**Guideline:** Use Body Limit middleware to prevent DoS attacks from oversized request payloads, configuring appropriate limits per endpoint based on expected data.
+## Guideline
 
-**Rationale:** Large request bodies can exhaust server memory, cause denial of service, and overwhelm downstream services. Body Limit middleware rejects requests before fully reading them, uses stream reading without Content-Length requirements, and returns 413 Payload Too Large status while remaining configurable per route.
+Use Body Limit middleware to prevent DoS attacks from oversized request payloads, configuring appropriate limits per endpoint based on expected data.
 
-**Example:**
+## Rationale
+
+Large request bodies can exhaust server memory, cause denial of service, and overwhelm downstream services. Body Limit middleware rejects requests before fully reading them, uses stream reading without Content-Length requirements, and returns 413 Payload Too Large status while remaining configurable per route.
+
+## Example
 
 ```typescript
 import {bodyLimit} from "hono/body-limit";
@@ -49,7 +53,7 @@ app.use(
 );
 ```
 
-**Techniques:**
+## Techniques
 
 - Import `bodyLimit` from `hono/body-limit` and set appropriate `maxSize` in bytes
 - Apply globally with app.use() or per-route for flexibility

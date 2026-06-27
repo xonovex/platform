@@ -1,10 +1,14 @@
 # performance: Performance Optimization
 
-**Guideline:** Minimize draw calls with InstancedMesh; use LOD for distance; dispose unused; reuse geometry/materials; profile before optimizing.
+## Guideline
 
-**Rationale:** GPU efficiency depends on draw calls and memory; InstancedMesh renders 1000+ copies in one call vs. 1000 separate meshes.
+Minimize draw calls with InstancedMesh; use LOD for distance; dispose unused; reuse geometry/materials; profile before optimizing.
 
-**Example:**
+## Rationale
+
+GPU efficiency depends on draw calls and memory; InstancedMesh renders 1000+ copies in one call vs. 1000 separate meshes.
+
+## Example
 
 ```javascript
 const mesh = new THREE.InstancedMesh(geometry, material, 1000);
@@ -16,7 +20,7 @@ for (let i = 0; i < 1000; i++) {
 mesh.instanceMatrix.needsUpdate = true;
 ```
 
-**Techniques:**
+## Techniques
 
 - InstancedMesh: Render thousands of copies in one draw call (vs. 1000 draw calls)
 - LOD (Level of Detail): High detail near (0-50), medium mid-range (50-200), low far (200+)

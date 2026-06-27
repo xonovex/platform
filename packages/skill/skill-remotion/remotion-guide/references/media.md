@@ -1,10 +1,14 @@
 # media: Audio and Video Manipulation
 
-**Guideline:** Use `<Audio>` and `<Video>` from Remotion for frame-synchronized playback.
+## Guideline
 
-**Rationale:** Native HTML elements don't sync properly with Remotion's timeline. Remotion components provide frame-synchronized playback control.
+Use `<Audio>` and `<Video>` from Remotion for frame-synchronized playback.
 
-**Example:**
+## Rationale
+
+Native HTML elements don't sync properly with Remotion's timeline. Remotion components provide frame-synchronized playback control.
+
+## Example
 
 ```tsx
 import {Audio, useVideoConfig, Video} from "remotion";
@@ -28,7 +32,7 @@ export const MediaComposition = () => {
 };
 ```
 
-**Techniques:**
+## Techniques
 
 - Import `Audio` and `Video` from `remotion` for frame-synced playback
 - Use `staticFile()` for local media files, remote URLs for external sources

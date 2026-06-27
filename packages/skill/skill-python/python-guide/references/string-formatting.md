@@ -1,10 +1,14 @@
 # string-formatting: Modern String Formatting
 
-**Guideline:** Use f-strings for all string formatting and interpolation.
+## Guideline
 
-**Rationale:** F-strings are more readable, faster, and less error-prone than old `%` formatting or `.format()` methods. They support inline expressions, formatting specifiers, and multiline strings. The syntax is concise and makes variable substitution obvious.
+Use f-strings for all string formatting and interpolation.
 
-**Example:**
+## Rationale
+
+F-strings are more readable, faster, and less error-prone than old `%` formatting or `.format()` methods. They support inline expressions, formatting specifiers, and multiline strings. The syntax is concise and makes variable substitution obvious.
+
+## Example
 
 ```python
 # f-strings (preferred)
@@ -33,7 +37,7 @@ message_old = "Hello, %s! You are %d years old." % (name, age)
 message_format = "Hello, {}! You are {} years old.".format(name, age)
 ```
 
-**Techniques:**
+## Techniques
 
 - Use f-string syntax: `f"text {variable} more text"`
 - Embed expressions directly: `f"result: {2 + 2}"`

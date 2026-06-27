@@ -1,10 +1,14 @@
 # template-literals-require-string-conversion: Explicitly Convert Numbers in Template Literals
 
-**Guideline:** Explicitly convert numbers to strings in templates using `String(value)`, not implicit coercion.
+## Guideline
 
-**Rationale:** Explicit conversion is clearer and avoids relying on implicit type coercion.
+Explicitly convert numbers to strings in templates using `String(value)`, not implicit coercion.
 
-**Example:**
+## Rationale
+
+Explicit conversion is clearer and avoids relying on implicit type coercion.
+
+## Example
 
 ```typescript
 // ❌ Bad: Implicit number coercion
@@ -18,7 +22,7 @@ console.log(`Server running on port: ${String(port)}`);
 throw new Error(`Timeout after ${String(5000)}ms`);
 ```
 
-**Techniques:**
+## Techniques
 
 - Wrap numeric values in `String()` when using template literals
 - Apply to all primitive types in templates (numbers, booleans)

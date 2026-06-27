@@ -31,15 +31,25 @@ An approved parent plan (run `plan-create` first). This command does NOT perform
 
 ## Implementation Details
 
-**Splitting:** logical grouping (default), or by phase markers if user requests phase-based splitting
+### Splitting
 
-**Dependency detection:** file overlap → sequential; no overlap → parallel; explicit deps → sequential with tracking
+logical grouping (default), or by phase markers if user requests phase-based splitting
 
-**Child plan frontmatter:** `type: plan`, `has_subplans: false`, `parent_plan`, `parallel_group`, `status: pending`, `dependencies: {plans: [], files: []}`, `skills_to_consult: [skill-names]`, `validation: {type_check: pending, lint: pending, build: pending, tests: pending, integration: pending}`
+### Dependency detection
 
-**Skills to consult:** every child plan MUST include `skills_to_consult` so implementers know project conventions
+file overlap → sequential; no overlap → parallel; explicit deps → sequential with tracking
 
-**Child plan sections:** Objective, Tasks (numbered with file paths, code snippets, actions), Validation Steps, Success Criteria (checklist), Files Modified/Created, Dependencies, Estimated Duration
+### Child plan frontmatter
+
+`type: plan`, `has_subplans: false`, `parent_plan`, `parallel_group`, `status: pending`, `dependencies: {plans: [], files: []}`, `skills_to_consult: [skill-names]`, `validation: {type_check: pending, lint: pending, build: pending, tests: pending, integration: pending}`
+
+### Skills to consult
+
+every child plan MUST include `skills_to_consult` so implementers know project conventions
+
+### Child plan sections
+
+Objective, Tasks (numbered with file paths, code snippets, actions), Validation Steps, Success Criteria (checklist), Files Modified/Created, Dependencies, Estimated Duration
 
 ## Output
 
