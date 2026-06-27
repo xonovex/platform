@@ -1,6 +1,6 @@
 ---
 type: plan
-status: pending-approval
+status: complete
 has_subplans: true
 dependencies:
   plans: []

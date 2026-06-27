@@ -8,7 +8,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 
 	agentv1alpha1 "github.com/xonovex/platform/packages/agent/agent-operator-go/api/v1alpha1"
-	"github.com/xonovex/platform/packages/agent/agent-operator-go/internal/builder"
+	harnessshared "github.com/xonovex/platform/packages/agent/agent-operator-go/internal/harness/shared"
 )
 
 // AgentHarnessWebhook implements validation for AgentHarness
@@ -36,7 +36,7 @@ func (w *AgentHarnessWebhook) ValidateDelete(_ context.Context, _ *agentv1alpha1
 
 func (w *AgentHarnessWebhook) validate(h *agentv1alpha1.AgentHarness) (admission.Warnings, error) {
 	if h.Spec.Type != "" {
-		if _, err := builder.GetHarnessCommand(h.Spec.Type); err != nil {
+		if _, err := harnessshared.GetHarnessCommand(h.Spec.Type); err != nil {
 			return nil, fmt.Errorf("invalid agent type: %s", h.Spec.Type)
 		}
 	}

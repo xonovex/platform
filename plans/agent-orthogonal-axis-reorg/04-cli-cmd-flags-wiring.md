@@ -3,7 +3,7 @@ type: plan
 has_subplans: false
 parent_plan: plans/agent-orthogonal-axis-reorg.md
 parallel_group: 3
-status: pending
+status: complete
 dependencies:
   plans: [02-cli-isolation-provision-network.md, 03-cli-workspace-terminal.md]
   files:

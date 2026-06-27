@@ -13,8 +13,9 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	agentv1alpha1 "github.com/xonovex/platform/packages/agent/agent-operator-go/api/v1alpha1"
-	"github.com/xonovex/platform/packages/agent/agent-operator-go/internal/builder"
+	harnessshared "github.com/xonovex/platform/packages/agent/agent-operator-go/internal/harness/shared"
 	"github.com/xonovex/platform/packages/agent/agent-operator-go/internal/validator"
+	wsshared "github.com/xonovex/platform/packages/agent/agent-operator-go/internal/workspace/shared"
 )
 
 // AgentRunWebhook implements defaulting and validation for AgentRun
@@ -76,12 +77,12 @@ func (w *AgentRunWebhook) validate(ctx context.Context, run *agentv1alpha1.Agent
 
 	// Validate inline types
 	if run.Spec.Harness != nil && run.Spec.Harness.Type != "" {
-		if _, err := builder.GetHarnessCommand(run.Spec.Harness.Type); err != nil {
+		if _, err := harnessshared.GetHarnessCommand(run.Spec.Harness.Type); err != nil {
 			return nil, fmt.Errorf("invalid agent type: %s", run.Spec.Harness.Type)
 		}
 	}
 	if run.Spec.Workspace != nil && run.Spec.Workspace.Type != "" {
-		if _, err := builder.GetVCSStrategy(run.Spec.Workspace.Type); err != nil {
+		if _, err := wsshared.GetVCSStrategy(run.Spec.Workspace.Type); err != nil {
 			return nil, fmt.Errorf("invalid workspace type: %s", run.Spec.Workspace.Type)
 		}
 	}
