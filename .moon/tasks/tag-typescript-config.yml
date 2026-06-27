@@ -8,7 +8,7 @@ fileGroups:
     - .prettierrc*
     - package.json
 tasks:
-  test:
+  ts-test:
     script: echo 'no tests for config package'
     deps: []
     inputs: []
@@ -16,18 +16,9 @@ tasks:
     options:
       cache: false
       mergeDeps: replace
-  clean:
+  ts-clean:
     script: rm -rf dist
     options:
       cache: false
-  ci-check:
-    command: echo 'ci-check complete'
-    deps:
-      - build
-      - lint
-      - typecheck
-    options:
-      cache: false
-      mergeDeps: replace
 inheritedBy:
   tag: typescript-config

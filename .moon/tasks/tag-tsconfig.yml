@@ -12,7 +12,7 @@ fileGroups:
   - .prettierrc*
   - package.json
 tasks:
-  build:
+  tsconfig-build:
     deps:
     - ^:build
     command:
@@ -27,17 +27,17 @@ tasks:
     options:
       cache: true
       runDepsInParallel: true
-  clean:
+  tsconfig-clean:
     script: rm -rf dist
     options:
       cache: false
-  typecheck:
+  tsconfig-typecheck:
     command:
     - npm
     - run
     - typecheck
     deps:
-    - build
+    - tsconfig-build
     - ^:build
     inputs:
     - '@globs(sources)'
@@ -45,13 +45,13 @@ tasks:
     outputs: []
     options:
       cache: true
-  lint:
+  tsconfig-lint:
     command:
     - npm
     - run
     - lint
     deps:
-    - build
+    - tsconfig-build
     - ^:build
     inputs:
     - '@globs(sources)'
@@ -59,13 +59,13 @@ tasks:
     outputs: []
     options:
       cache: true
-  lint-fix:
+  tsconfig-lint-fix:
     command:
     - npm
     - run
     - lint:fix
     deps:
-    - build
+    - tsconfig-build
     - ^:build
     inputs:
     - '@globs(sources)'
@@ -73,7 +73,7 @@ tasks:
     outputs: []
     options:
       cache: false
-  fmt:
+  tsconfig-format:
     command:
     - npm
     - run
@@ -86,7 +86,7 @@ tasks:
     outputs: []
     options:
       cache: false
-  fmt-check:
+  tsconfig-format-check:
     command:
     - npm
     - run
@@ -99,9 +99,33 @@ tasks:
     outputs: []
     options:
       cache: true
+  build:
+    command: noop
+    deps: [tsconfig-build]
+    options:
+      cache: false
+      mergeDeps: append
+  lint:
+    command: noop
+    deps: [tsconfig-lint]
+    options:
+      cache: false
+      mergeDeps: append
+  typecheck:
+    command: noop
+    deps: [tsconfig-typecheck]
+    options:
+      cache: false
+      mergeDeps: append
+  format-check:
+    command: noop
+    deps: [tsconfig-format-check]
+    options:
+      cache: false
+      mergeDeps: append
   ci-check:
     command: echo 'ci-check complete'
-    deps: [build, lint, fmt-check, typecheck]
+    deps: [build, lint, typecheck, format-check]
     options:
       cache: false
 inheritedBy:

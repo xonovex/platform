@@ -18,7 +18,7 @@ fileGroups:
     - .prettierrc*
     - package.json
 tasks:
-  build:
+  tsconfig-build:
     inputs:
       - "@globs(sources)"
       - "@globs(configs)"

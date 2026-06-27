@@ -1,6 +1,6 @@
 $schema: https://moonrepo.dev/schemas/tasks.json
 tasks:
-  fmt:
+  skill-format:
     command: [npm, run, fmt]
     inputs:
       - "**/*.md"
@@ -10,19 +10,32 @@ tasks:
     options:
       cache: false
       runInCI: false
-  fmt-check:
+  skill-format-check:
     command: [npm, run, "fmt:check"]
     inputs:
       - "**/*.md"
       - "*.config.*"
       - package.json
     outputs: []
-  ci-check:
-    command: echo 'ci-check complete'
-    deps: [build]
+  format:
+    command: noop
+    deps: [skill-format]
     options:
       cache: false
-  validate:
+      runInCI: false
+      mergeDeps: append
+  format-check:
+    command: noop
+    deps: [skill-format-check]
+    options:
+      cache: false
+      mergeDeps: append
+  ci-check:
+    command: echo 'ci-check complete'
+    deps: [build, format-check, skill-validate]
+    options:
+      cache: false
+  skill-validate:
     command:
       - npx
       - moon-skill-validate
@@ -32,8 +45,7 @@ tasks:
       - script-moon-skill-validate:install
     options:
       cache: false
-      runInCI: false
-  audit-sources:
+  skill-audit-sources:
     command:
       - npx
       - moon-skill-audit-sources
@@ -44,7 +56,7 @@ tasks:
     options:
       cache: false
       runInCI: false
-  eval-triggers:
+  skill-eval-triggers:
     command:
       - npx
       - moon-skill-eval-triggers
@@ -55,7 +67,7 @@ tasks:
     options:
       cache: false
       runInCI: false
-  eval-outputs:
+  skill-eval-outputs:
     command:
       - npx
       - moon-skill-eval-outputs

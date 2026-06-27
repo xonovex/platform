@@ -43,8 +43,10 @@
         in
         {
           # Full shell — composed from the shared per-tool devShells in nix/.
+          # g.docker supplies hadolint, which `docker-lint` (folded into ci-check
+          # via the docker tag's `lint` alias) needs on PATH.
           default = pkgs.mkShell {
-            inputsFrom = [ g.node g.go g.k8s g.shell g.rust g.release g.ci g.general ];
+            inputsFrom = [ g.node g.go g.k8s g.shell g.rust g.release g.ci g.docker g.general ];
           };
 
           # Lean per-purpose shells, selected via the nix toolchain `shellByTag` setting.
