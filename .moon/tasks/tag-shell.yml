@@ -15,7 +15,7 @@ tasks:
     - .editorconfig
     options:
       cache: true
-  sh-fmt:
+  sh-format:
     command:
     - shfmt
     - -w
@@ -25,7 +25,7 @@ tasks:
     - '@globs(sources)'
     options:
       cache: false
-  sh-fmt-check:
+  sh-format-check:
     command:
     - shfmt
     - -d
@@ -35,9 +35,21 @@ tasks:
     - '@globs(sources)'
     options:
       cache: true
+  lint:
+    command: noop
+    deps: [sh-lint]
+    options:
+      cache: false
+      mergeDeps: append
+  format-check:
+    command: noop
+    deps: [sh-format-check]
+    options:
+      cache: false
+      mergeDeps: append
   ci-check:
     command: echo 'ci-check complete'
-    deps: [sh-lint, sh-fmt-check]
+    deps: [lint, format-check]
     options:
       cache: false
 inheritedBy:

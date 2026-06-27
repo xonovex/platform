@@ -1,34 +1,34 @@
 $schema: https://moonrepo.dev/schemas/tasks.json
 extends: ./tag-typescript.yml
 tasks:
-  build:
+  ts-build:
     deps: []
     options:
       mergeDeps: replace
-  test:
+  ts-test:
     deps: []
     options:
       mergeDeps: replace
-  test-watch:
+  ts-test-watch:
     deps: []
     options:
       mergeDeps: replace
-  lint:
+  ts-lint:
     deps:
-      - build
+      - ts-build
     options:
       mergeDeps: replace
-  lint-fix:
+  ts-lint-fix:
     deps:
-      - build
+      - ts-build
     options:
       mergeDeps: replace
-  typecheck:
+  ts-typecheck:
     deps:
-      - build
+      - ts-build
     options:
       mergeDeps: replace
-  coverage:
+  ts-coverage:
     deps: []
     options:
       mergeDeps: replace

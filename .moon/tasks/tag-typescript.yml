@@ -14,7 +14,7 @@ fileGroups:
   - .eslintrc*
   - .prettierrc*
 tasks:
-  build:
+  ts-build:
     deps:
     - ^:build
     script: npx tsc
@@ -25,7 +25,7 @@ tasks:
     - dist
     options:
       cache: true
-  test:
+  ts-test:
     script: npx vitest run
     deps:
     - ^:build
@@ -36,7 +36,7 @@ tasks:
     outputs: []
     options:
       cache: true
-  test-watch:
+  ts-test-watch:
     script: npx vitest
     deps:
     - ^:build
@@ -44,10 +44,10 @@ tasks:
       cache: false
       persistent: true
     preset: server
-  lint:
+  ts-lint:
     script: npx eslint src
     deps:
-    - build
+    - ts-build
     - ^:build
     inputs:
     - '@globs(sources)'
@@ -56,10 +56,10 @@ tasks:
     outputs: []
     options:
       cache: true
-  lint-fix:
+  ts-lint-fix:
     script: npx eslint src --fix
     deps:
-    - build
+    - ts-build
     - ^:build
     inputs:
     - '@globs(sources)'
@@ -68,7 +68,7 @@ tasks:
     outputs: []
     options:
       cache: false
-  fmt:
+  ts-format:
     script: npx prettier --write .
     inputs:
     - '@globs(sources)'
@@ -79,7 +79,7 @@ tasks:
     outputs: []
     options:
       cache: false
-  fmt-check:
+  ts-format-check:
     script: npx prettier --check .
     inputs:
     - '@globs(sources)'
@@ -90,10 +90,10 @@ tasks:
     outputs: []
     options:
       cache: true
-  typecheck:
+  ts-typecheck:
     script: npx tsc --noEmit
     deps:
-    - build
+    - ts-build
     - ^:build
     inputs:
     - '@globs(sources)'
@@ -102,7 +102,7 @@ tasks:
     outputs: []
     options:
       cache: true
-  coverage:
+  ts-coverage:
     script: npx vitest run --coverage
     deps:
     - ^:build
@@ -114,13 +114,44 @@ tasks:
     - coverage
     options:
       cache: true
+  build:
+    command: noop
+    deps: [ts-build]
+    options:
+      cache: false
+      mergeDeps: append
+  lint:
+    command: noop
+    deps: [ts-lint]
+    options:
+      cache: false
+      mergeDeps: append
+  typecheck:
+    command: noop
+    deps: [ts-typecheck]
+    options:
+      cache: false
+      mergeDeps: append
+  test:
+    command: noop
+    deps: [ts-test]
+    options:
+      cache: false
+      mergeDeps: append
+  format-check:
+    command: noop
+    deps: [ts-format-check]
+    options:
+      cache: false
+      mergeDeps: append
   ci-check:
     command: echo 'ci-check complete'
     deps:
     - build
-    - test
     - lint
     - typecheck
+    - test
+    - format-check
     options:
       cache: false
 inheritedBy:

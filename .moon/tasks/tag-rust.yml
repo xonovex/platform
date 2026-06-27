@@ -1,5 +1,3 @@
-# Generic Rust tasks for any crate (library, CLI, or plugin): linting and formatting.
-# Target/output-specific tasks (e.g. a wasm build or release publish) live in their own tag.
 $schema: https://moonrepo.dev/schemas/tasks.json
 fileGroups:
   sources:
@@ -7,7 +5,7 @@ fileGroups:
   tests:
     - 'tests/**/*'
 tasks:
-  lint:
+  rust-lint:
     command:
       - cargo
       - clippy
@@ -23,7 +21,7 @@ tasks:
       - Cargo.lock
     options:
       cache: true
-  fmt-check:
+  rust-format-check:
     command:
       - cargo
       - fmt
@@ -34,5 +32,17 @@ tasks:
       - '@globs(tests)'
     options:
       cache: true
+  lint:
+    command: noop
+    deps: [rust-lint]
+    options:
+      cache: false
+      mergeDeps: append
+  format-check:
+    command: noop
+    deps: [rust-format-check]
+    options:
+      cache: false
+      mergeDeps: append
 inheritedBy:
   tag: rust

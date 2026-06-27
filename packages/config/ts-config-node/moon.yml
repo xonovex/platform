@@ -1,6 +1,6 @@
 $schema: https://moonrepo.dev/schemas/project.json
 tasks:
-  build:
+  tsconfig-build:
     outputs: []
     deps:
       - ts-config-base:build

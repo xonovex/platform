@@ -1,6 +1,6 @@
 $schema: https://moonrepo.dev/schemas/tasks.json
 tasks:
-  fmt:
+  command-format:
     command: [npm, run, fmt]
     inputs:
       - "**/*.md"
@@ -10,16 +10,29 @@ tasks:
     options:
       cache: false
       runInCI: false
-  fmt-check:
+  command-format-check:
     command: [npm, run, "fmt:check"]
     inputs:
       - "**/*.md"
       - "*.config.*"
       - package.json
     outputs: []
+  format:
+    command: noop
+    deps: [command-format]
+    options:
+      cache: false
+      runInCI: false
+      mergeDeps: append
+  format-check:
+    command: noop
+    deps: [command-format-check]
+    options:
+      cache: false
+      mergeDeps: append
   ci-check:
     command: echo 'ci-check complete'
-    deps: [build]
+    deps: [build, format-check]
     options:
       cache: false
 inheritedBy:

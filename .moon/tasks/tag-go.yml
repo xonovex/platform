@@ -14,7 +14,7 @@ fileGroups:
 tasks:
   go-build:
     deps:
-    - ^:go-build
+    - ^:build
     command:
     - go
     - build
@@ -73,7 +73,7 @@ tasks:
     outputs: []
     options:
       cache: false
-  go-fmt:
+  go-format:
     command:
     - go
     - fmt
@@ -85,7 +85,7 @@ tasks:
     outputs: []
     options:
       cache: false
-  go-fmt-check:
+  go-format-check:
     command:
     - bash
     - -c
@@ -125,9 +125,39 @@ tasks:
     - go.sum
     options:
       cache: false
+  build:
+    command: noop
+    deps: [go-build]
+    options:
+      cache: false
+      mergeDeps: append
+  lint:
+    command: noop
+    deps: [go-lint]
+    options:
+      cache: false
+      mergeDeps: append
+  typecheck:
+    command: noop
+    deps: [go-typecheck]
+    options:
+      cache: false
+      mergeDeps: append
+  test:
+    command: noop
+    deps: [go-test]
+    options:
+      cache: false
+      mergeDeps: append
+  format-check:
+    command: noop
+    deps: [go-format-check]
+    options:
+      cache: false
+      mergeDeps: append
   ci-check:
     command: echo 'ci-check complete'
-    deps: [go-build, go-test, go-lint, go-fmt-check, go-typecheck]
+    deps: [build, lint, typecheck, test, format-check]
     options:
       cache: false
   go-clean:

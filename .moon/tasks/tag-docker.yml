@@ -16,3 +16,14 @@ tasks:
     outputs: []
     options:
       cache: true
+  lint:
+    command: noop
+    deps: [docker-lint]
+    options:
+      cache: false
+      mergeDeps: append
+  ci-check:
+    command: echo 'ci-check complete'
+    deps: [lint]
+    options:
+      cache: false
