@@ -1,16 +1,10 @@
 # {topic}: {Title}
 
-**Guideline:** {One-sentence rule statement.}
+{One-line summary of the topic. Once this file passes ~200 lines, add a `## Contents` list here so a partial read still shows its full scope.}
 
-**Rationale:** {Why this matters — what breaks or degrades without it, what improves with it.}
+## {Facet}
 
-**How to Apply:**
-
-1. {Step — concrete action}
-2. {Step}
-3. {Step}
-
-**Example:**
+{Statement and rationale — what this facet of the topic requires and why it matters.}
 
 ```{language}
 // Bad
@@ -20,6 +14,10 @@
 {Correct usage}
 ```
 
-**Counter-Example:** {Optional — a case where this guideline doesn't apply or has a known exception}
+## {Facet}
 
-**Related:** [references/{other-topic}.md](./{other-topic}.md)
+{Statement and rationale. Add a bad → good example, or a counter-example noting where the rule does not apply.}
+
+## Related
+
+- {Another guide or topic, cross-referenced by name}

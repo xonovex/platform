@@ -3,5 +3,6 @@
   "version": "3.2.0",
   "description": "Xonovex Hono skills",
   "author": {"name": "Xonovex"},
-  "skills": ["./hono-guide"]
+  "skills": ["./hono-guide"],
+  "dependencies": ["xonovex-skill-zod"]
 }

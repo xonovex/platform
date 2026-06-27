@@ -3,6 +3,10 @@
   "version": "3.2.0",
   "private": true,
   "type": "module",
+  "dependencies": {
+    "@xonovex/skill-ddd": "3.2.0",
+    "@xonovex/skill-user-stories": "3.2.0"
+  },
   "keywords": [
     "xonovex",
     "skill",

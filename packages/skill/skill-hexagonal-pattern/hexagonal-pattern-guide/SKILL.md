@@ -1,6 +1,6 @@
 ---
 name: hexagonal-pattern-guide
-description: 'Use when isolating an application or domain core from its I/O and delivery mechanisms behind interfaces — hexagonal / ports-and-adapters / clean / onion architecture. Triggers on decoupling the domain from the database/UI/framework, driving (primary) vs driven (secondary) adapters, dependency inversion / the dependency rule ("depend on an interface, not the implementation"), a composition root wiring adapters to ports, swapping a real adapter for a fake in tests, or keeping business logic free of infrastructure — even when the user says ''ports and adapters'' or ''clean architecture''. Skip open, extensible plug-in registries (see microkernel-pattern-guide), grading coupling strength (see connascence-guide), and choosing where module boundaries go (see orthogonal-pattern-guide).'
+description: "Use when isolating an application or domain core from its I/O and delivery mechanisms behind interfaces — hexagonal / ports-and-adapters / clean / onion architecture. Triggers on decoupling the domain from the database/UI/framework, driving (primary) vs driven (secondary) adapters, dependency inversion / the dependency rule ('depend on an interface, not the implementation'), a composition root wiring adapters to ports, swapping a real adapter for a fake in tests, or keeping business logic free of infrastructure — even when the user says 'ports and adapters' or 'clean architecture'."
 ---
 
 # Hexagonal Architecture (Ports and Adapters)

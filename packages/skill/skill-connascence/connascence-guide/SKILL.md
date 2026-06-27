@@ -1,6 +1,6 @@
 ---
 name: connascence-guide
-description: 'Use when grading or loosening the coupling between two pieces of code, or judging how cohesive a module is. Triggers on connascence, coupling vs cohesion, "too tightly coupled", decouple/loosen, the coupling ladder (content/common/control/stamp/data), the cohesion ladder, Law of Demeter / train wrecks like a.b().c(), positional vs named parameters, or reviewing a module boundary for coupling strength — even when the user only says ''tightly coupled''. Skip where a module/axis boundary should go (see orthogonal-pattern-guide), isolating a domain behind ports-and-adapters (see hexagonal-pattern-guide), and plugin registries (see microkernel-pattern-guide).'
+description: "Use when grading or loosening the coupling between two pieces of code, or judging how cohesive a module is. Triggers on connascence, coupling vs cohesion, 'too tightly coupled', decouple/loosen, the coupling ladder (content/common/control/stamp/data), the cohesion ladder, Law of Demeter / train wrecks like a.b().c(), positional vs named parameters, or reviewing a module boundary for coupling strength — even when the user only says 'tightly coupled'."
 ---
 
 # Connascence: a Precise Coupling Vocabulary

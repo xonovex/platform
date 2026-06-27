@@ -1,6 +1,6 @@
 ---
 name: code-quality-guide
-description: "Use when auditing existing code for quality WITHOUT changing it — a read-only pass that finds smells, grades them by severity, and routes each to its owner. Triggers on robustness / hardening (any-types, missing validation, swallowed errors, logging), duplication / dead code / over-abstraction / complexity, magic numbers, or a code-smell audit ('find issues in', 'is this robust', 'remove dead code', 'audit this module'). A smell catalog maps each smell to its owner. Skip applying the fixes or authoring a plan (see plan-guide) and delivering PR-review feedback (see code-review-guide); OO-design smells live in oop-guide and coupling smells in connascence-guide."
+description: "Use when auditing existing code for quality WITHOUT changing it — a read-only pass that finds smells, grades them by severity, and routes each to its owner. Triggers on robustness / hardening (any-types, missing validation, swallowed errors, logging), duplication / dead code / over-abstraction / complexity, magic numbers, or a code-smell audit ('find issues in', 'is this robust', 'remove dead code', 'audit this module'). A smell catalog maps each smell to its owner."
 ---
 
 # Code-Quality Audit

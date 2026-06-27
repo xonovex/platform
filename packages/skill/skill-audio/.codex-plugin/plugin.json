@@ -5,5 +5,10 @@
   "author": {
     "name": "Xonovex"
   },
-  "skills": "./audio-guide"
+  "skills": "./audio-guide",
+  "dependencies": [
+    "xonovex-skill-data-oriented-design",
+    "xonovex-skill-lock-free",
+    "xonovex-skill-memory-management"
+  ]
 }

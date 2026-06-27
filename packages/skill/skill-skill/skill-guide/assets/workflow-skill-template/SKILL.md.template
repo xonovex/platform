@@ -1,0 +1,31 @@
+---
+name: "{topic}-guide"
+description: "Use when {running | authoring | maintaining} {the workflow, e.g. 'plan documents' / 'git operations' / 'reusable slash commands'}. Triggers on {operations / prompt shapes}, even when the user doesn't say '{topic}'."
+---
+
+# {Topic} Guidelines
+
+## Core Principles
+
+- **{Principle}** — {the rule that governs every operation, one line}
+- **{Principle}** — {…}
+- **{Principle}** — {…}
+
+## Operations
+
+Each operation is a procedure the agent (or a command) delegates to — one row per `references/` file, mirrored below in Progressive Disclosure. Split into domain groups (e.g. `## Plan Operations` / `## Commit Operations`) once there are more than ~7.
+
+- **{Operation}** — {what it produces} — see [references/{operation}.md](references/{operation}.md)
+- **{Operation}** — {…} — see [references/{operation}.md](references/{operation}.md)
+- **{Operation}** — {…} — see [references/{operation}.md](references/{operation}.md)
+
+## Gotchas
+
+- {Non-obvious failure mode a fresh reader could not infer}
+- {Common mistake, with the one-line reason}
+
+## Progressive Disclosure
+
+- Read [references/{operation}.md](references/{operation}.md) - Load when {the operation is requested}
+- Read [references/{operation}.md](references/{operation}.md) - Load when {specific scenario}
+- Read [references/{operation}.md](references/{operation}.md) - Load when {specific scenario}

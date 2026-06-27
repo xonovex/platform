@@ -3,6 +3,11 @@
   "version": "3.2.0",
   "private": true,
   "type": "module",
+  "dependencies": {
+    "@xonovex/skill-bdd": "3.2.0",
+    "@xonovex/skill-code-quality": "3.2.0",
+    "@xonovex/skill-tdd": "3.2.0"
+  },
   "keywords": [
     "xonovex",
     "skill",

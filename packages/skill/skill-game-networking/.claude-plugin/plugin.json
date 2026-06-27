@@ -3,5 +3,6 @@
   "version": "3.2.0",
   "description": "Xonovex Game networking skills",
   "author": {"name": "Xonovex"},
-  "skills": ["./game-networking-guide"]
+  "skills": ["./game-networking-guide"],
+  "dependencies": ["xonovex-skill-data-model"]
 }

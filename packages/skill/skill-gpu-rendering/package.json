@@ -3,6 +3,9 @@
   "version": "3.2.0",
   "private": true,
   "type": "module",
+  "dependencies": {
+    "@xonovex/skill-memory-management": "3.2.0"
+  },
   "keywords": [
     "xonovex",
     "skill",

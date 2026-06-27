@@ -1,6 +1,10 @@
 $schema: https://moonrepo.dev/schemas/project.json
 language: unknown
 tags: [skill]
+dependsOn:
+  - skill-data-oriented-design
+  - skill-lock-free
+  - skill-memory-management
 tasks:
   build:
     command: echo 'build complete'

@@ -1,6 +1,6 @@
 ---
 name: microkernel-pattern-guide
-description: "Use when building an extensible system: a minimal core plus interchangeable plug-ins selected through a registry — the microkernel / plug-in architecture. Triggers on plugin/extension-point/registry design, adding a backend or driver without editing the core, open/closed extension, capability negotiation and fail-closed / secure-by-default gating, binding time (compile vs load vs run-time), dependency-injection vs service-locator wiring, lazy activation, or versioning a plug-in contract — even when the user only says 'plugin architecture'. Skip isolating a domain core from I/O behind ports (see hexagonal-pattern-guide), grading coupling strength (see connascence-guide), and deciding the axes/boundaries themselves (see orthogonal-pattern-guide)."
+description: "Use when building an extensible system: a minimal core plus interchangeable plug-ins selected through a registry — the microkernel / plug-in architecture. Triggers on plugin/extension-point/registry design, adding a backend or driver without editing the core, open/closed extension, capability negotiation and fail-closed / secure-by-default gating, binding time (compile vs load vs run-time), dependency-injection vs service-locator wiring, lazy activation, or versioning a plug-in contract — even when the user only says 'plugin architecture'."
 ---
 
 # Microkernel (Plug-in) Architecture

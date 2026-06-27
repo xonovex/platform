@@ -38,3 +38,4 @@ The improved version is more specific about _what_ and broader about _when_ it a
 - Descriptions tend to **grow** during iteration; re-check the 1024-char limit each pass.
 - Avoid leaking implementation details ("calls the X API, uses Y library") — those don't help the agent decide _when_ to invoke the skill.
 - Don't promise behavior the body doesn't deliver — over-promising descriptions cause false-positive triggers.
+- Quote the `description` as a double-quoted YAML scalar with single-quoted inner phrases and literal apostrophes (e.g. `"… even when the user doesn't say 'TDD'."`) — the skill loader's parser rejects single-quote `''` escaping and stops at an inner double-quote, then reads the tail as an unknown attribute.

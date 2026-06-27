@@ -1,13 +1,17 @@
 # guideline-skills: Creating Coding-Guideline Skills
 
+A guideline skill teaches **coding style / rules** for a language, framework, or paradigm (e.g. typescript, ddd, code-quality). For a **procedure / workflow** skill the agent or a command delegates to (plan, git, …), see [workflow-skills.md](workflow-skills.md) instead. A skill may **combine both** — one that teaches a format _and_ its authoring procedure (as llmstxt does) keeps these guideline sections and adds an `## Operations` section from the workflow template.
+
+An **output-artifact hybrid** — a guideline skill that also prescribes a structured deliverable (e.g. pull-request, adr) — uses this skeleton and adds the artifact's sections after `Example` (e.g. `What / Why / Changes / Testing`), per [instruction-patterns.md](instruction-patterns.md) "Templates for Output Format".
+
 ## Template
 
 A ready-to-scaffold template lives under `assets/guideline-skill-template/`:
 
-- [`assets/guideline-skill-template/SKILL.md.template`](../assets/guideline-skill-template/SKILL.md.template) — umbrella with frontmatter, Essentials, Gotchas, Example, Progressive Disclosure
-- [`assets/guideline-skill-template/SOURCES.md`](../assets/guideline-skill-template/SOURCES.md) — upstream source tracking
-- [`assets/guideline-skill-template/eval-queries.json`](../assets/guideline-skill-template/eval-queries.json) — 12 sample trigger-eval queries (8 train + 4 validation, mix of should-trigger and near-miss)
-- [`assets/guideline-skill-template/references/{topic}.md`](../assets/guideline-skill-template/references/{topic}.md) — reference file template (Guideline / Rationale / How to Apply / Example / Counter-Example / Related)
+- [`SKILL.md.template`](../assets/guideline-skill-template/SKILL.md.template) — frontmatter, Essentials, Gotchas, Example, Progressive Disclosure (`## Requirements` is language/framework-only — delete it for general / pattern / process skills)
+- [`SOURCES.md`](../assets/guideline-skill-template/SOURCES.md) — source tracking with a **docs-URL** form and an authored **`Title:`** form for cited books/papers/articles
+- [`eval-queries.json`](../assets/guideline-skill-template/eval-queries.json) — 12 trigger-eval queries (8 train + 4 validation, mix of should-trigger and near-miss)
+- [`references/{topic}.md`](../assets/guideline-skill-template/references/{topic}.md) — reference template (`## sub-headers`, one per facet: statement / rationale / bad→good example; `## Contents` once >200 lines)
 
 To scaffold a new guideline skill: copy the directory, rename `{topic}.md` files, and fill in `{placeholders}`.
 
@@ -47,7 +51,8 @@ When extracting from external docs:
 ## Reference File Conventions (matches the template)
 
 - Title: `# {topic}: {Title}`
-- Body fields: **Guideline**, **Rationale**, **How to Apply**, **Example** (bad / good pair), optional **Counter-Example**, optional **Related**
+- `## sub-headers`, one per facet of the topic, each with its own statement, rationale, and bad→good example
+- Add a `## Contents` list once the file passes ~200 lines so a partial read shows its full scope
 - One topic per file; one level deep under `references/`
 - Filename is kebab-case matching the topic
 
