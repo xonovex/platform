@@ -1,12 +1,12 @@
 {
   "name": "@xonovex/skill-audio",
-  "version": "3.2.0",
+  "version": "4.0.0",
   "private": true,
   "type": "module",
   "dependencies": {
-    "@xonovex/skill-data-oriented-design": "3.2.0",
-    "@xonovex/skill-lock-free": "3.2.0",
-    "@xonovex/skill-memory-management": "3.2.0"
+    "@xonovex/skill-data-oriented-design": "4.0.0",
+    "@xonovex/skill-lock-free": "4.0.0",
+    "@xonovex/skill-memory-management": "4.0.0"
   },
   "keywords": [
     "xonovex",
