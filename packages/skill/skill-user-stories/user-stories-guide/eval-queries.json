@@ -1,0 +1,86 @@
+[
+  {
+    "query": "is this user story good? \"As a rider I want to pay for my trip\" — does it pass INVEST?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "core INVEST evaluation of a user story"
+  },
+  {
+    "query": "this story is too big for a sprint, how do I split it into smaller stories?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "story splitting — SPIDR / flowchart territory"
+  },
+  {
+    "query": "what does SPIDR stand for and when do I use a spike to split a story?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "SPIDR splitting techniques owned here"
+  },
+  {
+    "query": "help me write acceptance criteria for the checkout story covering edge cases and errors",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "acceptance criteria coverage is owned by user-stories"
+  },
+  {
+    "query": "explain the 3 Cs — card, conversation, confirmation — for our stories",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "the 3 Cs model is owned here"
+  },
+  {
+    "query": "what's a walking skeleton and how do I slice this feature vertically instead of by layer?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "vertical slicing / walking skeleton owned by user-stories"
+  },
+  {
+    "query": "our backlog refinement is a mess — when is a story actually ready and who sizes it?",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "backlog refinement and readiness owned here"
+  },
+  {
+    "query": "rewrite this story using the As a / I want / so that template",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "the story template is owned by user-stories"
+  },
+  {
+    "query": "break these tasks down so each one is SMART",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "SMART tasks are the task-level companion owned here"
+  },
+  {
+    "query": "write the Given-When-Then scenarios in a Cucumber feature file for this behaviour",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: Gherkin notation and feature files are owned by bdd-guide"
+  },
+  {
+    "query": "should I use a mock or a stub for the payment gateway in this test?",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: test-double choice is owned by testing-guide"
+  },
+  {
+    "query": "define the bounded contexts and ubiquitous language for our payments domain",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near-miss: domain modelling and ubiquitous language are owned by ddd-guide"
+  },
+  {
+    "query": "name our features using the FDD action-result-object template and build the feature list",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: FDD feature list and naming template are owned by fdd-guide"
+  },
+  {
+    "query": "these two stories keep breaking each other — analyse the coupling between the modules",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near-miss: coupling theory behind Independent is owned by connascence-guide"
+  }
+]

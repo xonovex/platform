@@ -6,6 +6,7 @@
   "skills": ["./orthogonal-pattern-guide"],
   "dependencies": [
     "xonovex-skill-connascence",
+    "xonovex-skill-ddd",
     "xonovex-skill-hexagonal-pattern",
     "xonovex-skill-microkernel-pattern"
   ]

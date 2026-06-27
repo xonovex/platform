@@ -21,6 +21,7 @@ A read-only pass over existing code: find smells, grade them by severity, report
 - A pile of `any` is usually a missing schema at one boundary, not a per-site typing problem — fix the boundary, not every call site.
 - "Dead code" detection misses code reached via dynamic dispatch, reflection, or external entry points — verify before flagging for deletion.
 - A single-implementation interface is not automatically over-engineering — it may exist for testability or a planned variant.
+- A comment that captures a non-obvious _why_ (a workaround, an invariant, a caveat) is not noise — flag a comment only when a rename would say it better, it restates the code, or it narrates a plan/provenance.
 - The "application / class / method-level" smell grouping is an informal label, not a citable taxonomy — the smell catalog groups by design-problem family instead.
 - Log at boundaries and on error paths, validate at trust boundaries — "everywhere" is noise and wasted work, not robustness.
 

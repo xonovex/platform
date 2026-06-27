@@ -1,0 +1,86 @@
+[
+  {
+    "query": "what's the difference between a mock, a stub, a fake, and a spy?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "core owned concept: the test-double taxonomy and how the kinds differ"
+  },
+  {
+    "query": "should I mock the value object here or just construct the real thing?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "what-to-mock decision: value objects are a do-not-mock case owned here"
+  },
+  {
+    "query": "this test asserts on every internal call and breaks on every refactor — is that over-mocking?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "over-mocking / behaviour-vs-state verification and the Fragile-Test symptom"
+  },
+  {
+    "query": "help me structure this test as arrange-act-assert and check it meets FIRST",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "AAA structure and FIRST qualities are owned concepts"
+  },
+  {
+    "query": "my fixture setup is a mess of canned objects — should I use a Test Data Builder or an Object Mother?",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "fixture-creation patterns owned here"
+  },
+  {
+    "query": "name this test and split it — it verifies five things at once",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "test naming plus the Eager Test smell, both owned here"
+  },
+  {
+    "query": "is this a Responder stub or a Saboteur, and should it verify state or behaviour?",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "stub sub-kinds and state-vs-behaviour verification owned here"
+  },
+  {
+    "query": "this test is flaky and obscure — what smell is it and how do I fix it?",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "Erratic and Obscure test smells owned here"
+  },
+  {
+    "query": "when in the cycle should I write the failing test — before or after the production code?",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: test-first rhythm / red-green-refactor is owned by tdd-guide, not the shape of a single test"
+  },
+  {
+    "query": "write a Given-When-Then scenario for the checkout in a feature file",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: Gherkin acceptance scenarios are owned by bdd-guide"
+  },
+  {
+    "query": "what kind of coupling does this over-mocked test reveal and how do I reduce it?",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near-miss: the coupling diagnosis/vocabulary is owned by connascence-guide; testing only flags the symptom"
+  },
+  {
+    "query": "how do I use vi.fn() and vi.mock() to stub a module in Vitest?",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: framework-specific double API is owned by vitest-guide"
+  },
+  {
+    "query": "audit this module for dead code and missing input validation, read-only",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near-miss: read-only smell audit is owned by code-quality-guide"
+  },
+  {
+    "query": "should I grow this design with classical or mockist TDD as my development style?",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: classical-vs-mockist as a development/design style is owned by tdd-guide"
+  }
+]

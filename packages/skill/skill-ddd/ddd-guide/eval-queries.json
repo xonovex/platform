@@ -1,0 +1,86 @@
+[
+  {
+    "query": "how do I get the business and developers speaking the same vocabulary that also shows up in the code?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "ubiquitous language grounded in model and code — owned by ddd-guide"
+  },
+  {
+    "query": "where should I draw the bounded contexts for an online shop where 'customer' means different things in ordering, shipping and billing?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "bounded context + polysemy + context map — core ddd-guide strategic design"
+  },
+  {
+    "query": "we call an upstream payment API directly and its concepts are leaking into our model — how do I isolate it?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "anti-corruption layer protecting a model — owned by ddd-guide"
+  },
+  {
+    "query": "is an Order with its line items one aggregate, and should other things reference it by id or by object?",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "aggregate + root, reference-by-identity rules — ddd-guide tactical blocks"
+  },
+  {
+    "query": "should money be an entity or a value object, and what makes the difference?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "entity vs value object distinction — owned by ddd-guide"
+  },
+  {
+    "query": "my entities are just getters and setters with all the logic in services — is that proper domain modelling?",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "anemic-domain-model anti-pattern — owned by ddd-guide"
+  },
+  {
+    "query": "what's the difference between strategic and tactical design, and is a repository just an ORM wrapper?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "strategic vs tactical split + repository definition — ddd-guide"
+  },
+  {
+    "query": "should I emit a domain event when an order is placed so shipping can react?",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "domain event as a building block — owned by ddd-guide"
+  },
+  {
+    "query": "measure the connascence between these two modules and tell me which coupling form is strongest",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: code-level coupling metrics -> connascence-guide, not domain boundaries"
+  },
+  {
+    "query": "should this class use inheritance or composition, and is it violating the Liskov substitution principle?",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: general OO class/inheritance mechanics -> oop-guide"
+  },
+  {
+    "query": "design an in-memory object database with stable GUIDs, change notification and undo/redo for my editor",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near-miss: in-memory object/property model with undo/serialization -> data-model-guide, not a DDD repository"
+  },
+  {
+    "query": "write the Given-When-Then acceptance scenarios for placing an order with a discount",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: eliciting behaviour as agreed examples -> bdd-guide"
+  },
+  {
+    "query": "split this big user story into thin vertical slices and write INVEST acceptance criteria",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near-miss: story container and slicing -> user-stories-guide"
+  },
+  {
+    "query": "audit this module for code smells like dead code and swallowed errors",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: read-only quality smell audit -> code-quality-guide, not domain modelling"
+  }
+]

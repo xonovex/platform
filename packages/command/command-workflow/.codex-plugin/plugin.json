@@ -10,6 +10,8 @@
     "xonovex-skill-git",
     "xonovex-skill-pull-request",
     "xonovex-skill-code-review",
-    "xonovex-skill-code-quality"
+    "xonovex-skill-code-quality",
+    "xonovex-skill-tdd",
+    "xonovex-skill-bdd"
   ]
 }

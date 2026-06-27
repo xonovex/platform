@@ -1,0 +1,74 @@
+[
+  {
+    "query": "we're adopting FDD — what are the five processes and which run once vs per feature set?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "core FDD: the five processes and the once-vs-iterative split"
+  },
+  {
+    "query": "how should I name features? something like 'calculate the total of an order'?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "FDD feature-naming template <action> the <result> by/for/of/to a(n) <object>"
+  },
+  {
+    "query": "how do I report percent-complete per feature with the design and code milestones?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "the six weighted build milestones (1/40/3/45/10/1)"
+  },
+  {
+    "query": "what's the difference between a feature, a feature set, and a major feature set?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "FDD feature-list decomposition hierarchy"
+  },
+  {
+    "query": "who's the chief programmer vs the class owner, and how do feature teams form?",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "FDD role structure and dynamically formed feature teams"
+  },
+  {
+    "query": "should a feature in our feature list be capped at two weeks, and what if a step is bigger?",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "FDD feature sizing rule and decomposition of oversized steps"
+  },
+  {
+    "query": "set up Design by Feature and Build by Feature as the iterative inner loop for our team",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "FDD processes 4 and 5 as the per-feature-set loop"
+  },
+  {
+    "query": "help me establish a ubiquitous language and draw the bounded contexts for our domain model",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: domain modelling and bounded contexts -> ddd-guide owns Develop-an-Overall-Model substance"
+  },
+  {
+    "query": "split this user story into thin vertical slices and check it against INVEST",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near-miss: client-value slicing and INVEST -> user-stories-guide"
+  },
+  {
+    "query": "write Given-When-Then scenarios for this feature and run an example-mapping session",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: Gherkin and example mapping -> bdd-guide"
+  },
+  {
+    "query": "what's the right red-green-refactor rhythm for building this feature test-first?",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near-miss: test-first development rhythm -> tdd-guide"
+  },
+  {
+    "query": "are these classes too coupled — what design quality bar should the code inspection enforce?",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: design/coupling quality bar -> oop-guide and connascence-guide; FDD only schedules the inspection"
+  }
+]

@@ -101,6 +101,18 @@
       "category": "Productivity"
     },
     {
+      "name": "xonovex-skill-bdd",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-bdd"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
       "name": "xonovex-skill-c99",
       "source": {
         "source": "local",
@@ -233,6 +245,18 @@
       "category": "Productivity"
     },
     {
+      "name": "xonovex-skill-ddd",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-ddd"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
       "name": "xonovex-skill-debugging",
       "source": {
         "source": "local",
@@ -285,6 +309,18 @@
       "source": {
         "source": "local",
         "path": "./packages/skill/skill-expressjs"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-fdd",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-fdd"
       },
       "policy": {
         "installation": "AVAILABLE",
@@ -701,10 +737,34 @@
       "category": "Productivity"
     },
     {
+      "name": "xonovex-skill-tdd",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-tdd"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
       "name": "xonovex-skill-terraform",
       "source": {
         "source": "local",
         "path": "./packages/skill/skill-terraform"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-testing",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-testing"
       },
       "policy": {
         "installation": "AVAILABLE",
@@ -741,6 +801,18 @@
       "source": {
         "source": "local",
         "path": "./packages/skill/skill-typescript-to-lua"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-user-stories",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-user-stories"
       },
       "policy": {
         "installation": "AVAILABLE",

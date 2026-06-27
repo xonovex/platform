@@ -73,8 +73,7 @@ Learning: reflect-to-instructions / reflect-to-skill fold learnings into guideli
 | `plan-research`         | Research codebase + web, or run a read-only code-quality audit (harden / simplify / align) |
 | `plan-interrogate`      | Interrogate to surface unknown decisions before a plan exists                              |
 | `plan-clarify`          | Walk known open decisions one by one in plain prose                                        |
-| `plan-create`           | Create a high-level plan for user review                                                   |
-| `plan-tdd-create`       | Create a TDD plan with research for user review                                            |
+| `plan-create`           | Create a high-level plan for user review (test-first plans route to tdd / bdd guides)      |
 | `plan-refine`           | Process user annotations and refine iteratively                                            |
 | `plan-critique`         | Adversarially stress-test a plan to expose weaknesses                                      |
 | `plan-subplans-create`  | Generate detailed subplans with parallel execution detection                               |

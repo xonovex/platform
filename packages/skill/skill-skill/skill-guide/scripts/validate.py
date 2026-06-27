@@ -31,6 +31,7 @@ import yaml  # pyright: ignore[reportMissingModuleSource]  # PEP723 dep, install
 
 NAME_RE = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
 FRONTMATTER_RE = re.compile(r"^---\n(.*?)\n---\n(.*)$", re.DOTALL)
+QUOTED_SCALAR_RE = re.compile(r"^[ \t]*[A-Za-z_][\w-]*:[ \t]*(?P<rest>.+?)[ \t]*$")
 REF_LINK_RE = re.compile(r"references/([a-zA-Z0-9_./<>{}-]+\.md)")
 PROGRESSIVE_DISCLOSURE_RE = re.compile(
     r"^## *Progressive Disclosure\s*\n(.*?)(?=^## |\Z)",
@@ -112,10 +113,10 @@ def resolve_target(arg: str) -> tuple[Path, Path]:
     return skill, skill.parent
 
 
-def split_frontmatter(content: str) -> tuple[dict, str]:
+def split_frontmatter(content: str) -> tuple[dict, str, str]:
     match = FRONTMATTER_RE.match(content)
     if not match:
-        return {}, content
+        return {}, content, ""
     fm_raw, body = match.groups()
     try:
         fm = yaml.safe_load(fm_raw) or {}
@@ -123,7 +124,47 @@ def split_frontmatter(content: str) -> tuple[dict, str]:
         raise ValueError(f"Invalid YAML frontmatter: {e}") from e
     if not isinstance(fm, dict):
         raise ValueError("Frontmatter is not a mapping")
-    return fm, body
+    return fm, body, fm_raw
+
+
+def check_loader_quoting(fm_raw: str, report: Report) -> None:
+    """Flag frontmatter quoting the skill loader's naive parser cannot read.
+
+    The loader does not understand single-quote `''` escaping or inner double
+    quotes; it stops at the first inner delimiter and reads the tail as an
+    unknown attribute. `yaml.safe_load` accepts these, so scan the raw text.
+    """
+    flagged = False
+    for raw_line in fm_raw.splitlines():
+        m = QUOTED_SCALAR_RE.match(raw_line)
+        if not m:
+            continue
+        rest = m.group("rest")
+        if len(rest) < 2 or rest[0] not in ("'", '"'):
+            continue  # unquoted or block scalar — the loader handles it
+        quote = rest[0]
+        if not rest.endswith(quote):
+            continue  # multiline / unterminated on this line — cannot judge naively
+        key = raw_line.split(":", 1)[0].strip()
+        if quote == "'" and "''" in rest:
+            report.add_fail(
+                f"frontmatter: '{key}' uses single-quote '' escaping, which the skill "
+                "loader's parser does not support (it reads the tail as an unknown "
+                "attribute). Use a double-quoted scalar with literal apostrophes, e.g. "
+                "\"… doesn't say 'TDD'.\""
+            )
+            flagged = True
+        elif rest.count(quote) != 2:
+            report.add_fail(
+                f"frontmatter: '{key}' has an inner {quote} inside a {quote}-quoted value; "
+                "the skill loader stops at the first inner quote. Use a double-quoted scalar "
+                "with single quotes for inner phrases (apostrophes stay literal)."
+            )
+            flagged = True
+    if not flagged:
+        report.add_pass(
+            "frontmatter: quoting is loader-safe (no '' escapes or inner delimiter quotes)"
+        )
 
 
 def check_frontmatter(fm: dict, parent_name: str, report: Report) -> None:
@@ -440,13 +481,14 @@ def main(argv: list[str]) -> int:
     content = skill_path.read_text(encoding="utf-8")
 
     try:
-        fm, body = split_frontmatter(content)
+        fm, body, fm_raw = split_frontmatter(content)
     except ValueError as e:
         sys.stderr.write(f"Error: {e}\n")
         return 2
 
     report = Report()
     check_frontmatter(fm, parent_name, report)
+    check_loader_quoting(fm_raw, report)
     check_body(body, report)
     check_references(body, skill_dir, report)
     check_reference_tocs(skill_dir, report)
