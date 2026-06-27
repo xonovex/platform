@@ -3,7 +3,7 @@ type: plan
 has_subplans: false
 parent_plan: plans/agent-sandbox-provisioning-axes.md
 parallel_group: 1
-status: pending
+status: complete
 dependencies:
   plans: []
   files:
@@ -15,11 +15,11 @@ dependencies:
     - packages/agent/agent-cli-go/internal/sandboxutil/utils.go
 skills_to_consult: [general-fp-guide, debugging-guide]
 validation:
-  type_check: pending
-  lint: pending
-  build: pending
-  tests: pending
-  integration: pending
+  type_check: pass
+  lint: pass
+  build: pass
+  tests: pass
+  integration: n/a
 ---
 
 # 01 — Shared three-axis types, decoupled policy, and pure-helper dedups
@@ -107,10 +107,10 @@ npx moon run agent-cli-go:go-build   # CLI still compiles against the moved help
 
 ## Success Criteria
 
-- [ ] Three-axis types (`IsolationMethod`/`ProvisioningMethod`/`NetworkMethod`) + `Contribution` + `DefaultEgressAllowlist` + the four-guarantee `SandboxPolicy` exist in `shared-agent-go/pkg/types`; `SandboxConfig.Network NetworkMethod` (replacing `Network bool`) + `EgressAllowlist []string` added.
-- [ ] `pkg/sandbox/policy.go` classifies pinned-provisioning, host-tools-unreachable, egress-restricted (`EgressIsRestricted`), and kernel-isolation (`KernelIsolated`) as independent, table-tested guarantees; `EnforcePolicy(iso, prov, net, passthrough, runtime, pol)` returns a distinct named error per unmet guarantee and the curated matrix validity check lives here.
-- [ ] `shellQuote` removed (uses `shell.Quote`); env helpers in `shared-core-go/pkg/envutil`; `BuildAgentCommand`/`BuildProviderEnv` in `shared-agent-go/pkg/agentcmd`.
-- [ ] `shared-*-go` + `agent-cli-go` build/lint/test green; nothing imports the deleted symbols.
+- [x] Three-axis types (`IsolationMethod`/`ProvisioningMethod`/`NetworkMethod`) + `Contribution` + `DefaultEgressAllowlist` + the four-guarantee `SandboxPolicy` exist in `shared-agent-go/pkg/types`; `SandboxConfig.Network NetworkMethod` (replacing `Network bool`) + `EgressAllowlist []string` added.
+- [x] `pkg/sandbox/policy.go` classifies pinned-provisioning, host-tools-unreachable, egress-restricted (`EgressIsRestricted`), and kernel-isolation (`KernelIsolated`) as independent, table-tested guarantees; `EnforcePolicy(iso, prov, net, passthrough, runtime, pol)` returns a distinct named error per unmet guarantee and the curated matrix validity check lives here.
+- [x] `shellQuote` removed (uses `shell.Quote`); env helpers in `shared-core-go/pkg/envutil`; `BuildAgentCommand`/`BuildProviderEnv` in `shared-agent-go/pkg/agentcmd`.
+- [x] `shared-*-go` + `agent-cli-go` build/lint/test green; nothing imports the deleted symbols.
 
 ## Files Modified/Created
 
