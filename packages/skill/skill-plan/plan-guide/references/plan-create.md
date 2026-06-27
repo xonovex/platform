@@ -4,7 +4,7 @@ Generate a high-level plan from spec / requirements using research already in co
 
 ## Prerequisites
 
-Run research first (see `plan-research.md` or `plan-research-code-simplify.md` / `plan-research-code-harden.md`); this command assumes research context is already in the conversation and does NOT perform codebase exploration.
+Run research first (see `plan-research.md`, including its code-quality audits — harden / simplify / align); this command assumes research context is already in the conversation and does NOT perform codebase exploration.
 
 ## Goal
 

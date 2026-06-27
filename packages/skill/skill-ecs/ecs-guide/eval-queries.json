@@ -63,7 +63,7 @@
     "query": "refactor my GameObject base class and its Update() override hierarchy so subclasses share behavior through inheritance",
     "should_trigger": false,
     "split": "validation",
-    "rationale": "validation negative: class/inheritance game-object design -> general-oop-guide"
+    "rationale": "validation negative: class/inheritance game-object design -> oop-guide"
   },
   {
     "query": "tune this LuaJIT table layout so the hot path stays JIT-friendly and avoids rehashing",

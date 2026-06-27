@@ -21,5 +21,5 @@
 ## Refresh Workflow
 
 1. Re-check conventionalcomments.org for any change to the label set or decorations
-2. Fold recurring review-craft lessons (from `insights-guide` retrospectives) into the references
+2. Fold recurring review-craft lessons (from `reflect-guide` retrospectives) into the references
 3. Bump **Last reviewed** above

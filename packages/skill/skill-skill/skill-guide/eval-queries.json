@@ -68,7 +68,7 @@
     "rationale": "validation positive: evaluating trigger rate"
   },
   {
-    "query": "this guide re-explains the immutability rules that general-fp-guide already owns — factor them out and cross-reference it",
+    "query": "this guide re-explains the immutability rules that fp-guide already owns — factor them out and cross-reference it",
     "should_trigger": true,
     "split": "validation",
     "rationale": "validation positive — implicit de-duplication / composability"

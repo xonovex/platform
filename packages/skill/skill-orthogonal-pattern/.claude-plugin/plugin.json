@@ -1,0 +1,12 @@
+{
+  "name": "xonovex-skill-orthogonal-pattern",
+  "version": "3.2.0",
+  "description": "Xonovex Orthogonal pattern skills",
+  "author": {"name": "Xonovex"},
+  "skills": ["./orthogonal-pattern-guide"],
+  "dependencies": [
+    "xonovex-skill-connascence",
+    "xonovex-skill-hexagonal-pattern",
+    "xonovex-skill-microkernel-pattern"
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "name": "xonovex-skill-connascence",
+  "version": "3.2.0",
+  "description": "Xonovex Connascence skills",
+  "author": {"name": "Xonovex"},
+  "skills": ["./connascence-guide"]
+}

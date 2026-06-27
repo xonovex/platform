@@ -1,0 +1,13 @@
+{
+  "name": "xonovex-skill-microkernel-pattern",
+  "version": "3.2.0",
+  "description": "Xonovex Microkernel architecture skills",
+  "author": {
+    "name": "Xonovex"
+  },
+  "skills": "./microkernel-pattern-guide",
+  "dependencies": [
+    "xonovex-skill-connascence",
+    "xonovex-skill-hexagonal-pattern"
+  ]
+}

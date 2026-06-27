@@ -9,6 +9,7 @@
     "xonovex-skill-plan",
     "xonovex-skill-git",
     "xonovex-skill-pull-request",
-    "xonovex-skill-code-review"
+    "xonovex-skill-code-review",
+    "xonovex-skill-code-quality"
   ]
 }

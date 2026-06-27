@@ -48,10 +48,10 @@ tell you which host skill to add.
 +---------------------+     +---------------------+     +---------------------+
 |  Development Loop   |     |    Code Quality     |     |        Merge        |
 +---------------------+     +---------------------+     +---------------------+
-| 1. plan-continue    |---->| 1. plan-research-   |---->| 1. plan-worktree-   |
-| 2. (implement)      |     |      code-simplify/ |     |      merge          |
-| 3. plan-validate    |     |      code-harden    |     | 2. git-commit       |
-| 4. insights-extract |     +---------------------+     |      --push         |
+| 1. plan-continue    |---->| 1. plan-research    |---->| 1. plan-worktree-   |
+| 2. (implement)      |     |    (code-quality    |     |      merge          |
+| 3. plan-validate    |     |     audit)          |     | 2. git-commit       |
+| 4. reflect-extract  |     +---------------------+     |      --push         |
 | 5. plan-update      |            |                    +---------------------+
 +---------------------+            |                              |
             ^                      |                              |
@@ -61,36 +61,35 @@ tell you which host skill to add.
                                                         +---------------------+
 
 Parallel: Multiple agents work on parallel subplan groups in separate worktrees
-Learning: insights-integrate merges learnings into guidelines for future sessions
+Learning: reflect-to-instructions / reflect-to-skill fold learnings into guidelines for future sessions
 ```
 
 [View workflow diagram](../../diagram/diagram-agent-workflow/workflow-diagram.png)
 
 ## Commands
 
-| Command                       | Description                                                     |
-| ----------------------------- | --------------------------------------------------------------- |
-| `plan-research`               | Research codebase and web for requirements                      |
-| `plan-clarify`                | Walk open decisions one by one in plain prose                   |
-| `plan-create`                 | Create a high-level plan for user review                        |
-| `plan-tdd-create`             | Create a TDD plan with research for user review                 |
-| `plan-subplans-create`        | Generate detailed subplans with parallel execution detection    |
-| `plan-worktree-create`        | Create a git worktree for a feature branch                      |
-| `plan-continue`               | Resume work from an existing plan                               |
-| `plan-validate`               | Verify that a plan or current work has been fully achieved      |
-| `plan-update`                 | Update plan status and test results                             |
-| `plan-refine`                 | Process user annotations and refine iteratively                 |
-| `plan-worktree-merge`         | Merge feature worktree back to source                           |
-| `plan-worktree-abandon`       | Document and abandon a feature with reason and learnings        |
-| `plan-research-code-simplify` | Research code-simplification opportunities for a follow-up plan |
-| `plan-research-code-harden`   | Research code-hardening opportunities for a follow-up plan      |
-| `plan-research-code-align`    | Research alignment of two similar implementations for a plan    |
-| `git-commit`                  | Commit and push changes                                         |
-| `pr-create`                   | Open a pull request with a drafted description (any host)       |
-| `pr-review-analyze`           | Review a branch diff into a structured findings file            |
-| `pr-review-refine`            | Refine review findings one by one before publishing             |
-| `pr-review-post`              | Publish a structured, labelled code review to a PR (any host)   |
-| `pr-review-resolve`           | Verify fixes and resolve the review's blocking threads          |
+| Command                 | Description                                                                                |
+| ----------------------- | ------------------------------------------------------------------------------------------ |
+| `plan-research`         | Research codebase + web, or run a read-only code-quality audit (harden / simplify / align) |
+| `plan-interrogate`      | Interrogate to surface unknown decisions before a plan exists                              |
+| `plan-clarify`          | Walk known open decisions one by one in plain prose                                        |
+| `plan-create`           | Create a high-level plan for user review                                                   |
+| `plan-tdd-create`       | Create a TDD plan with research for user review                                            |
+| `plan-refine`           | Process user annotations and refine iteratively                                            |
+| `plan-critique`         | Adversarially stress-test a plan to expose weaknesses                                      |
+| `plan-subplans-create`  | Generate detailed subplans with parallel execution detection                               |
+| `plan-worktree-create`  | Create a git worktree for a feature branch                                                 |
+| `plan-continue`         | Resume work from an existing plan                                                          |
+| `plan-validate`         | Verify that a plan or current work has been fully achieved                                 |
+| `plan-update`           | Update plan status and test results                                                        |
+| `git-commit`            | Commit and push changes                                                                    |
+| `pr-create`             | Open a pull request with a drafted description (any host)                                  |
+| `pr-review-analyze`     | Review a branch diff into a structured findings file                                       |
+| `pr-review-refine`      | Refine review findings one by one before publishing                                        |
+| `pr-review-post`        | Publish a structured, labelled code review to a PR (any host)                              |
+| `pr-review-resolve`     | Verify fixes and resolve the review's blocking threads                                     |
+| `plan-worktree-merge`   | Merge feature worktree back to source                                                      |
+| `plan-worktree-abandon` | Document and abandon a feature with reason and learnings                                   |
 
 ## Design Decisions
 

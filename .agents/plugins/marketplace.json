@@ -149,10 +149,34 @@
       "category": "Productivity"
     },
     {
+      "name": "xonovex-skill-code-quality",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-code-quality"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
       "name": "xonovex-skill-code-review",
       "source": {
         "source": "local",
         "path": "./packages/skill/skill-code-review"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-connascence",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-connascence"
       },
       "policy": {
         "installation": "AVAILABLE",
@@ -269,34 +293,22 @@
       "category": "Productivity"
     },
     {
+      "name": "xonovex-skill-fp",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-fp"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
       "name": "xonovex-skill-game-networking",
       "source": {
         "source": "local",
         "path": "./packages/skill/skill-game-networking"
-      },
-      "policy": {
-        "installation": "AVAILABLE",
-        "authentication": "ON_INSTALL"
-      },
-      "category": "Productivity"
-    },
-    {
-      "name": "xonovex-skill-general-fp",
-      "source": {
-        "source": "local",
-        "path": "./packages/skill/skill-general-fp"
-      },
-      "policy": {
-        "installation": "AVAILABLE",
-        "authentication": "ON_INSTALL"
-      },
-      "category": "Productivity"
-    },
-    {
-      "name": "xonovex-skill-general-oop",
-      "source": {
-        "source": "local",
-        "path": "./packages/skill/skill-general-oop"
       },
       "policy": {
         "installation": "AVAILABLE",
@@ -341,6 +353,18 @@
       "category": "Productivity"
     },
     {
+      "name": "xonovex-skill-hexagonal-pattern",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-hexagonal-pattern"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
       "name": "xonovex-skill-hono",
       "source": {
         "source": "local",
@@ -369,18 +393,6 @@
       "source": {
         "source": "local",
         "path": "./packages/skill/skill-imgui"
-      },
-      "policy": {
-        "installation": "AVAILABLE",
-        "authentication": "ON_INSTALL"
-      },
-      "category": "Productivity"
-    },
-    {
-      "name": "xonovex-skill-insights",
-      "source": {
-        "source": "local",
-        "path": "./packages/skill/skill-insights"
       },
       "policy": {
         "installation": "AVAILABLE",
@@ -473,6 +485,18 @@
       "category": "Productivity"
     },
     {
+      "name": "xonovex-skill-microkernel-pattern",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-microkernel-pattern"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
       "name": "xonovex-skill-moon",
       "source": {
         "source": "local",
@@ -501,6 +525,30 @@
       "source": {
         "source": "local",
         "path": "./packages/skill/skill-node-graph"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-oop",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-oop"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-orthogonal-pattern",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-orthogonal-pattern"
       },
       "policy": {
         "installation": "AVAILABLE",
@@ -573,6 +621,18 @@
       "source": {
         "source": "local",
         "path": "./packages/skill/skill-react"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-reflect",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-reflect"
       },
       "policy": {
         "installation": "AVAILABLE",

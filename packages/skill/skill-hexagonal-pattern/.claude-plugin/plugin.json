@@ -1,0 +1,8 @@
+{
+  "name": "xonovex-skill-hexagonal-pattern",
+  "version": "3.2.0",
+  "description": "Xonovex Hexagonal architecture skills",
+  "author": {"name": "Xonovex"},
+  "skills": ["./hexagonal-pattern-guide"],
+  "dependencies": ["xonovex-skill-connascence"]
+}

@@ -1,0 +1,50 @@
+[
+  {
+    "query": "decouple my domain logic from Postgres so I can swap the database without rewriting business rules",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "ports-and-adapters: driven adapter behind a core-owned port"
+  },
+  {
+    "query": "where should the repository interface live — in the core or in the database layer?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "the port belongs to the core (dependency rule)"
+  },
+  {
+    "query": "my service class imports the ORM and the HTTP framework directly — how do I keep the domain clean?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "dependencies must point inward; adapters on the outside"
+  },
+  {
+    "query": "I want to unit-test the domain without spinning up a real database",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "testability via fakes for driven adapters"
+  },
+  {
+    "query": "set up ports and adapters / clean architecture for this checkout service",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "explicit hexagonal/clean architecture request"
+  },
+  {
+    "query": "design a plugin system so third parties can add new payment backends without editing our core",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: open registered plug-in set -> microkernel-pattern-guide"
+  },
+  {
+    "query": "grade how tightly these two modules are coupled and how to loosen it",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near-miss: coupling vocabulary -> connascence-guide"
+  },
+  {
+    "query": "which axis should own the nix provisioning code in this tree?",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: where a boundary goes -> orthogonal-pattern-guide"
+  }
+]

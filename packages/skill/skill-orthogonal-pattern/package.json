@@ -1,0 +1,15 @@
+{
+  "name": "@xonovex/skill-orthogonal-pattern",
+  "version": "3.2.0",
+  "private": true,
+  "type": "module",
+  "keywords": [
+    "xonovex",
+    "skill",
+    "orthogonal-pattern"
+  ],
+  "scripts": {
+    "fmt": "prettier --write .",
+    "fmt:check": "prettier --check ."
+  }
+}

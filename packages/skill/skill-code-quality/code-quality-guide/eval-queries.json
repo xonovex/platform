@@ -1,0 +1,50 @@
+[
+  {
+    "query": "harden the user-service module — it's full of `any` and swallowed errors, just tell me what to fix",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "robustness audit: type safety + error handling, read-only findings"
+  },
+  {
+    "query": "find simplification opportunities in src/ — duplicates and dead code, don't change anything yet",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "simplicity audit: duplicates + dead code, read-only"
+  },
+  {
+    "query": "these two API handlers do the same thing slightly differently — which should be the reference and where do they drift?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "alignment/consistency audit between two implementations"
+  },
+  {
+    "query": "audit this package for code smells and missing input validation",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "harden: code smells + validation gaps"
+  },
+  {
+    "query": "which of our dependencies are unused or redundant — report only, no removals",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "simplify: unused dependencies, read-only"
+  },
+  {
+    "query": "write a plan to refactor the auth module over the next sprint",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: authoring a plan -> plan-guide, not a read-only quality audit"
+  },
+  {
+    "query": "review this pull request and leave inline comments on the diff",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: PR review craft / delivering feedback -> code-review-guide"
+  },
+  {
+    "query": "go ahead and apply all the simplifications you found and run the tests",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near-miss: implementing the changes, not a read-only audit"
+  }
+]

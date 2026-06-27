@@ -1,11 +1,11 @@
 {
   "name": "xonovex-utility",
   "version": "3.2.0",
-  "description": "Xonovex utility commands — skills, instructions, insights, content",
+  "description": "Xonovex utility commands — skills, instructions, reflect, content",
   "author": {"name": "Xonovex"},
   "dependencies": [
     "xonovex-skill-content",
-    "xonovex-skill-insights",
+    "xonovex-skill-reflect",
     "xonovex-skill-instruction",
     "xonovex-skill-skill",
     "xonovex-skill-command"

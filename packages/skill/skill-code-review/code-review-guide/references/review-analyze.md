@@ -6,7 +6,7 @@ Read a branch diff and produce findings in the shared contract — a top-level s
 
 1. **Compute the diff** — `git diff <base>...<branch>` (or read a pre-saved unified diff). Track new-file line numbers from each hunk header so findings can anchor to `ADDED` / `CONTEXT` lines (see [findings-schema.md](findings-schema.md)).
 2. **Read for correctness first** — bugs, regressions, broken edge cases, accessibility and contract violations. Re-read the surrounding code to confirm each claim; do not assert from the diff alone.
-3. **Then quality** — reuse, simplification, efficiency, naming, consistency. Right-size to the change — a small diff does not need a long list.
+3. **Then quality** — reuse, simplification, efficiency, naming, consistency; for the dimension vocabulary (robustness, duplication, dead code, over-abstraction) see **code-quality-guide**. Right-size to the change — a small diff does not need a long list.
 4. **Label each finding** — pick a label and a decoration; set `blocking: true` only for must-fix-before-merge items. If unsure a thing is real, use `question`, not `issue`.
 5. **Anchor each finding** — a specific new-file `path` + `line` + `lineType` that exists in the diff.
 6. **Draft the summary** — lead with what works, then number the priority (blocking) points so cross-links can attach later.

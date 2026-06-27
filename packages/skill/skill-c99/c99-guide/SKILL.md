@@ -20,7 +20,7 @@ description: "Use when editing or reviewing general-purpose C99 — libraries, C
 - **Strings** - Borrow length-carrying views, write through bounded builders over caller memory — not `strlen`/`strcat`/`strtok` rescans, see [references/string-views.md](references/string-views.md)
 - **Input validation** - Check bounds, NULL pointers, division by zero
 - **Readability** - Small functions, clear naming, comments for non-obvious logic
-- **Paradigm** - Functional style (pure functions, explicit context) → **general-fp-guide**; object/data modeling → **general-oop-guide**
+- **Paradigm** - Functional style (pure functions, explicit context) → **fp-guide**; object/data modeling → **oop-guide**
 
 ## Gotchas
 
