@@ -3,7 +3,7 @@ type: plan
 has_subplans: false
 parent_plan: plans/agent-orthogonal-axis-reorg.md
 parallel_group: 5
-status: pending
+status: complete
 dependencies:
   plans: [01-shared-per-axis-split.md]
   files:
@@ -23,11 +23,51 @@ skills_to_consult:
   - general-fp-guide
   - moon-guide
 validation:
-  type_check: pending
-  lint: pending
-  build: pending
-  tests: pending
-  integration: pending
+  type_check: pass
+  lint: pass
+  build: pass
+  tests: pass
+  integration: n/a
+---
+
+## Status (complete — golden-safe)
+
+`internal/builder/` fanned out into `internal/{isolation,network,provision,workspace,harness,provider}`
+with axis-name symmetry to the CLI. All operator moon tasks green (lint 0 issues); the relocated unit
+tests (the pod/admission goldens) pass, including both `BuildJob` paths — confirming the Job merge is
+golden-equivalent.
+
+### Acyclic design (resolves the plan's implicit cross-cutting cycle)
+
+The operator has ONE pod realizer, so `isolation/shared` is the pod composition root: it builds all
+Jobs/containers and weaves the security/hardening cross-cutting concern, importing the other axes as pure
+data providers (`workspace/shared` scripts+strategies+PVCs, `provision/shared` toolchain image,
+`harness/shared` command, `provider` env, `network/shared` policy). The data axes never import isolation —
+no cycle. This is why container/Job builders live in `isolation/shared` even though the plan's literal file
+list put some under `workspace`; placing them there would have created an `isolation ↔ workspace` cycle.
+
+### Key results
+- One pod isolator (`isolation/shared`); no fabricated `bwrap`/`docker`/`none` leaves; `runtimeClassName`
+  the kernel knob.
+- `BuildJob` + `BuildWorkspaceJob` merged into one `BuildJob(..., ws *WorkspaceBinding)` (nil → standalone,
+  non-nil → workspace), preserving exact pod-spec output for both.
+- `DefaultContainerSecurityContext`/`DefaultPodSecurityContext` are the single hardening source in
+  `isolation/shared/security.go`; `applyPodHardening` consumes them.
+- Real leaves only where the operator varies: `provision/nix`, `workspace/{git,jj}`,
+  `harness/{claude,opencode}`. The three package-level registries (`toolchainFactories`, `harnessCommands`,
+  `vcsStrategies`) live in their axis `shared/` dirs.
+- `NetworkMode` typed enum replaces the untyped `Network string` field.
+
+### Deviations
+- **CRD enum typing**: only `Network` was an untyped string — typed to `NetworkMode`. `WorkspaceType`,
+  `AgentType`, `ToolchainType` were already typed enums. No `+kubebuilder:validation:Enum` markers were
+  added to those three (and no CRD-manifest enum constraints added for them) — controller-gen is broken on
+  Go 1.25+ (operator AGENTS.md) and adding Go-only markers without the matching hand-edited CRD YAML would
+  introduce Go↔CRD drift. The `NetworkMode` change is type-only (identical serialization + existing CRD
+  enum), so deepcopy/CRD/RBAC need no regeneration — drift-free.
+- **`resolver/` partially kept**: only `resolver/provider.go` moved (to `internal/provider`); the CRD-fetch
+  resolvers (`ResolveHarness`/`ResolveToolchain`/`ResolveWorkspace`) and `ApplyHarnessDefaults` stay in
+  `resolver/` per the plan's Removed list.
 ---
 
 # Operator Builder -> Per-Axis Dirs (Symmetric)

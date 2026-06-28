@@ -3,7 +3,7 @@ type: plan
 has_subplans: false
 parent_plan: plans/agent-orthogonal-axis-reorg.md
 parallel_group: 4
-status: pending
+status: complete
 dependencies:
   plans: [02-cli-isolation-provision-network.md, 03-cli-workspace-terminal.md, 04-cli-cmd-flags-wiring.md]
   files:
@@ -11,11 +11,33 @@ dependencies:
     - packages/agent/agent-cli-go/moon.yml
 skills_to_consult: [orthogonal-pattern-guide, hexagonal-pattern-guide, microkernel-pattern-guide, moon-guide]
 validation:
-  type_check: pending
-  lint: pending
-  build: pending
-  tests: pending
-  integration: pending
+  type_check: pass
+  lint: pass
+  build: pass
+  tests: pass
+  integration: pass
+---
+
+## Status (complete)
+
+`internal/sandbox/architecture_test.go` (package `sandbox`) added with six guards, all green and run by
+`agent-cli-go:go-test`: import-direction (leaves never import the composition root), no-sibling-reach,
+shared-cores-import-no-leaf (one-way bridges), selection-layer-names-no-variant (the policy gate names no
+concrete method constant), concretes-only-in-plugins (leaf constructors referenced only from `plugins.go`,
+detected via AST import-alias + selector resolution so `run.go`'s `provnix.SourceFromFlags` is not a false
+positive), and registry-factory-lazy.
+
+### Deviations
+
+- **No new dependency**: implemented with the stdlib `go/parser`/`go/ast` instead of
+  `golang.org/x/tools/go/packages` (honors the parent plan's "zero new dependencies"). Uses per-file
+  `parser.ParseFile` (not the Go 1.25-deprecated `ParseDir`).
+- **Location**: `internal/sandbox/architecture_test.go` (package `sandbox`) rather than
+  `internal/architecture_test.go`, so the registry-factory test references `IsolatorFactory`/
+  `ProvisionerFactory` directly and the package compiles cleanly (an `internal/`-root test-only package is
+  awkward in Go).
+- **Policy-gate purity** asserted against the CLI selection layer (`registry.go` names no variant constant)
+  rather than parsing the cross-module shared `pkg/policy` source — the locally-checkable, robust invariant.
 ---
 
 # CLI Architecture / Import Fitness Tests

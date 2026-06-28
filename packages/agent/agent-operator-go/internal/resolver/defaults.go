@@ -4,11 +4,11 @@ import (
 	"time"
 
 	agentv1alpha1 "github.com/xonovex/platform/packages/agent/agent-operator-go/api/v1alpha1"
-	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/sandbox"
+	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/isolation"
 )
 
 const (
-	DefaultImage   = sandbox.DefaultContainerImage
+	DefaultImage   = isolation.DefaultContainerImage
 	DefaultTimeout = time.Hour
 )
 

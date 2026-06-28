@@ -10,7 +10,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 
 	agentv1alpha1 "github.com/xonovex/platform/packages/agent/agent-operator-go/api/v1alpha1"
-	"github.com/xonovex/platform/packages/agent/agent-operator-go/internal/builder"
+	"github.com/xonovex/platform/packages/agent/agent-operator-go/internal/plugins"
 	"github.com/xonovex/platform/packages/agent/agent-operator-go/internal/validator"
 )
 
@@ -69,7 +69,7 @@ func (w *AgentWorkspaceWebhook) validate(ws *agentv1alpha1.AgentWorkspace) (admi
 		return nil, err
 	}
 	if ws.Spec.Type != "" {
-		if _, err := builder.GetVCSStrategy(ws.Spec.Type); err != nil {
+		if _, err := plugins.GetVCSStrategy(ws.Spec.Type); err != nil {
 			return nil, fmt.Errorf("invalid workspace type: %s", ws.Spec.Type)
 		}
 	}

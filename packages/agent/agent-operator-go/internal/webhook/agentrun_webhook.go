@@ -13,7 +13,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	agentv1alpha1 "github.com/xonovex/platform/packages/agent/agent-operator-go/api/v1alpha1"
-	"github.com/xonovex/platform/packages/agent/agent-operator-go/internal/builder"
+	"github.com/xonovex/platform/packages/agent/agent-operator-go/internal/plugins"
 	"github.com/xonovex/platform/packages/agent/agent-operator-go/internal/validator"
 )
 
@@ -76,12 +76,12 @@ func (w *AgentRunWebhook) validate(ctx context.Context, run *agentv1alpha1.Agent
 
 	// Validate inline types
 	if run.Spec.Harness != nil && run.Spec.Harness.Type != "" {
-		if _, err := builder.GetHarnessCommand(run.Spec.Harness.Type); err != nil {
+		if _, err := plugins.GetHarnessCommand(run.Spec.Harness.Type); err != nil {
 			return nil, fmt.Errorf("invalid agent type: %s", run.Spec.Harness.Type)
 		}
 	}
 	if run.Spec.Workspace != nil && run.Spec.Workspace.Type != "" {
-		if _, err := builder.GetVCSStrategy(run.Spec.Workspace.Type); err != nil {
+		if _, err := plugins.GetVCSStrategy(run.Spec.Workspace.Type); err != nil {
 			return nil, fmt.Errorf("invalid workspace type: %s", run.Spec.Workspace.Type)
 		}
 	}

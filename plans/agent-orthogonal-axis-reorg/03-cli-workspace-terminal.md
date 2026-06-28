@@ -3,7 +3,7 @@ type: plan
 has_subplans: false
 parent_plan: plans/agent-orthogonal-axis-reorg.md
 parallel_group: 2
-status: pending
+status: complete
 dependencies:
   plans: [01-shared-per-axis-split.md]
   files:
@@ -13,11 +13,30 @@ dependencies:
     - packages/agent/agent-cli-go/internal/terminal/
 skills_to_consult: [orthogonal-pattern-guide, hexagonal-pattern-guide, general-fp-guide, moon-guide]
 validation:
-  type_check: pending
-  lint: pending
-  build: pending
-  tests: pending
-  integration: pending
+  type_check: pass
+  lint: pass
+  build: pass
+  tests: pass
+  integration: pass
+---
+
+## Status (complete)
+
+`internal/worktree` → `internal/workspace/{shared,git,jj}` behind a `VCS` port (`shared/` holds the
+port + git-repo plumbing + naming helpers; the composition root selects a leaf by `VCSType` in `cmd`).
+`internal/wrapper` → `internal/terminal/{shared,tmux}` with the `TerminalExecutor` port + config types
+re-homed into `terminal/shared`. `VCSType` consumed from shared `pkg/workspace` (no local redefinition).
+
+### Deviations from the written sketch (premise corrections)
+
+- **`jj` preserved, not dropped**: the plan assumed "no jj implementation yet", but `SetupJJ`/`--vcs jj`
+  already existed and are wired. Kept as a real `workspace/jj` leaf rather than deleting working support.
+- **VCS port** kept the existing `Setup(config, repoDir, verbose)` signature (not the sketch's
+  `Checkout(ctx, opts)`) — relocation, not a rewrite.
+- **`TerminalExecutor`** kept its existing `IsAvailable/IsInside/Execute` signature; the terminal axis is
+  `shared` (port+types) + `tmux` leaf + a `terminal` selection root. No `none` terminal leaf / lazy-factory
+  conversion (that would change behavior; the existing switch-selector is preserved). Terminal is not a
+  fitness-checked axis, so this is invisible to 05.
 ---
 
 # CLI Workspace + Terminal Axes

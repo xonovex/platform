@@ -3,7 +3,7 @@ type: plan
 has_subplans: false
 parent_plan: plans/agent-orthogonal-axis-reorg.md
 parallel_group: 1
-status: pending
+status: complete
 dependencies:
   plans: []
   files:
@@ -22,11 +22,40 @@ skills_to_consult:
   - general-fp-guide
   - moon-guide
 validation:
-  type_check: pending
-  lint: pending
-  build: pending
-  tests: pending
-  integration: pending
+  type_check: pass
+  lint: pass
+  build: pass
+  tests: pass
+  integration: n/a
+---
+
+## Status (complete)
+
+Executed via plan-continue. Shared module restructured into per-axis packages and
+verified green standalone; operator retargeted and compiling.
+
+- `npx moon run shared-agent-go:{go-typecheck,go-lint,go-build,go-test,go-format-check}` — all green (lint 0 issues).
+- `go mod tidy` idempotent; `go-toml/v2` + `yaml.v3` absent from go.mod/go.sum (no external deps remain).
+- `cd packages/agent/agent-operator-go && go build ./...` — green (only `internal/resolver/defaults.go` touched: `pkg/sandbox` → `pkg/isolation`).
+
+### Discovery beyond the written tasks
+
+`pkg/agentcmd` (`BuildAgentCommand`/`BuildProviderEnv`) depended on `*types.SandboxConfig`,
+so the god-struct deletion would have broken the shared module itself. Resolved by weakening
+that stamp coupling to data coupling (connascence rule of degree): both functions now take
+`(*types.AgentConfig, *types.ModelProvider, ...)` — the fields they actually use. `pkg/types`
+survives (agent.go + provider.go).
+
+### CLI shared-import retargeting — folded into subplan 02
+
+Task 6's CLI-side import retargeting is deferred to subplan 02 rather than done here. The CLI
+files importing shared (`internal/sandbox/{bwrap,docker,none,nixprov}`, `isolator.go`,
+`provisioner.go`, `run.go`, `sandboxutil`) are the exact files 02 rewrites for the
+`SandboxConfig` → per-type `Options` switch, the `agentcmd` call-site update, and the per-axis
+move; retargeting their imports now would be throwaway churn 02 redoes. This matches the plan's
+co-landing design — **CLI build-green is the combined 01+02 landing**. The CLI does not compile
+until 02 lands; that is the documented intermediate state.
+
 ---
 
 # Shared-agent-go Per-Axis Split + Delete SandboxConfig

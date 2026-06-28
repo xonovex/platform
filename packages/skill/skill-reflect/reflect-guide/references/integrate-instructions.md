@@ -4,11 +4,11 @@ Convert insights from a category into concise bullet points and integrate them i
 
 ## Core Workflow
 
-1. Search `reflections/` for category files, extract Problem/Solution pairs, group by topic
+1. **Gather insights** — by DEFAULT, extract lessons from the current session (see [extract.md](extract.md)) and hold them in memory; with `--from-reflections`, read `reflections/*.md` instead; with `--persist`, also write them to `reflections/`. No `category` → take all session insights. Group by topic.
 2. Locate target AGENTS.md — use specified file or auto-detect from `applies_to` field
 3. Convert each insight to a concise bullet point matching AGENTS.md style
 4. Merge into existing file — append to relevant bullet group or create new group
-5. Mark processed insights as `applied: true`
+5. If insights were persisted (`--persist` or `--from-reflections`), mark those files `applied: true`; in-memory insights have nothing to flag
 6. Preview or write → report
 
 ## Conversion Rules
@@ -39,8 +39,8 @@ When no target file is provided:
 
 ## Error Handling
 
-- Missing category → ask user
-- No insights found → suggest running `extract` for the category
+- Missing category → take all session insights (don't block)
+- No insights found in the session → report that no lessons were detected; with `--from-reflections`, suggest running `extract` first
 - No matching AGENTS.md → ask user for target path
 - AGENTS.md not found at path → verify and abort
 
@@ -53,3 +53,4 @@ Preview before writing; preserve existing AGENTS.md content and structure; never
 - Insights that restate code (e.g. "use `useMemo`") are filler in AGENTS.md — only keep ones a fresh reader couldn't infer from the code
 - Auto-detection on `applies_to: ["general"]` will pick the root AGENTS.md, which is rarely what you want — require a more specific routing key
 - `applied: true` is the trail of what's already been integrated — bumping it prematurely (before the actual write) leaves orphaned insights
+- Apply directly by default — extract straight into AGENTS.md; only write `reflections/*.md` when `--persist` is set or the user explicitly ran `extract` first. Don't store-then-integrate as a forced two-step.

@@ -3,7 +3,7 @@ type: plan
 has_subplans: false
 parent_plan: plans/agent-orthogonal-axis-reorg.md
 parallel_group: 6
-status: pending
+status: complete
 dependencies:
   plans: [06-operator-axis-relocation.md]
   files:
@@ -19,11 +19,51 @@ skills_to_consult:
   - connascence-guide
   - moon-guide
 validation:
-  type_check: pending
-  lint: pending
-  build: pending
-  tests: pending
-  integration: pending
+  type_check: pass
+  lint: pass
+  build: pass
+  tests: pass
+  integration: n/a
+---
+
+## Status (complete — webhook rewire intentionally NOT done)
+
+Closed Phase 2 on the **safe path** (user-confirmed): locked the relocation/merge with goldens and the
+cross-module symmetry test, verified codegen, and **kept the operator's admission policy intact**. All
+three modules green; operator lint 0 issues.
+
+### Delivered
+- **Pod-spec goldens** — `internal/isolation/shared/golden_test.go` + `testdata/*.golden.yaml` (standalone,
+  workspace, nix-image); full YAML snapshot locks BuildJob output across the relocation + merge. Regen via
+  `-update-golden`.
+- **Admission-verdict goldens** — `internal/webhook/agentpolicy_verdict_test.go`: freezes the accept/deny +
+  exact denial-reason substring for 8 representative `AgentPolicy` violations.
+- **Cross-module symmetry test** — `internal/arch/symmetry_test.go`: asserts the shared axes
+  `{isolation, network, provision, workspace}` exist in BOTH consumers' `internal/`; documents the agreed
+  asymmetries (`harness`/`provider` operator-only; `terminal` CLI-only).
+- **deepcopy** — `NetworkMode` is string-kind, value-copied by `AgentRunSpec.DeepCopyInto`'s `*out = *in`;
+  no `zz_generated.deepcopy.go` change needed (compiles + round-trips).
+
+### Tasks NOT done, with reasons (both rest on false premises in the plan)
+
+1. **Webhook rewire onto shared `policy.EnforcePolicy` (task 3) — deliberately skipped.** The premise (the
+   operator "duplicates" the shared engine) is factually wrong. The operator's `webhook.enforcePolicy`
+   enforces a Kubernetes admission policy (`AgentPolicy.Enforced`: `runtimeClassName` exact/allowlist,
+   `RequireSecurityContext`, `RequireNetworkPolicy`, `MaxTimeout`, `MaxResources`, `AllowedImages` prefixes),
+   which has NO representation in the shared `Capabilities`/`SandboxPolicy` (4 sandbox-capability booleans:
+   Pinned/HostToolsUnreachable/EgressRestricted/KernelIsolated). Deleting it and routing through shared
+   `EnforcePolicy` would silently drop every admission check on the untrusted-workload path — a security
+   regression. The two policies are legitimately different and should stay separate.
+
+2. **RBAC reconcile role.yaml ↔ markers (task 5) — deliberately not modified.** The reorg changed no
+   `+kubebuilder:rbac` markers, so it introduced no new drift. The pre-existing markers↔role.yaml mismatch
+   (flagged in the parent risk list) goes BOTH ways: role.yaml grants `agentproviders`/`agentpolicies` the
+   markers lack but the code needs (resolver reads AgentProvider, the webhook lists AgentPolicy), while the
+   markers grant `agentharnesses`/`agenttoolchains`/`agentworkspaces` role.yaml lacks. "Reconciling role.yaml
+   to the markers" would delete permissions the operator uses at runtime. controller-gen is broken on Go
+   1.25+ (operator AGENTS.md), so this is hand-maintained — fixing the marker↔role.yaml mismatch correctly
+   (verifying every Get/List's RBAC need) is a separate codegen-hygiene task, out of scope for locking the
+   reorg, and left untouched to avoid breaking the operator.
 ---
 
 # Operator Policy Symmetry + Goldens + Codegen

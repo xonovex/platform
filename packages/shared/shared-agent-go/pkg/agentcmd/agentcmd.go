@@ -10,11 +10,12 @@ import (
 
 // BuildAgentCommand builds the command array for executing an agent. When
 // binaryPrefix is non-empty, the agent binary is resolved under that directory
-// (e.g. a provisioned closure's bin).
-func BuildAgentCommand(config *types.SandboxConfig, binaryPrefix string) []string {
+// (e.g. a provisioned closure's bin). It takes only the fields it needs (data
+// coupling), not a whole config struct.
+func BuildAgentCommand(agent *types.AgentConfig, provider *types.ModelProvider, agentArgs []string, binaryPrefix string) []string {
 	var providerCliArgs []string
-	if config.Provider != nil {
-		providerCliArgs = providers.GetProviderCliArgs(config.Provider)
+	if provider != nil {
+		providerCliArgs = providers.GetProviderCliArgs(provider)
 	}
 
 	execOpts := types.AgentExecOptions{
@@ -22,40 +23,41 @@ func BuildAgentCommand(config *types.SandboxConfig, binaryPrefix string) []strin
 		ProviderCliArgs: providerCliArgs,
 	}
 
-	var agentArgs []string
-	switch config.Agent.Type {
+	var builtArgs []string
+	switch agent.Type {
 	case types.AgentClaude:
-		agentArgs = agents.BuildClaudeArgs(config.AgentArgs, execOpts)
+		builtArgs = agents.BuildClaudeArgs(agentArgs, execOpts)
 	case types.AgentOpencode:
-		agentArgs = agents.BuildOpencodeArgs(config.AgentArgs, execOpts)
+		builtArgs = agents.BuildOpencodeArgs(agentArgs, execOpts)
 	}
 
-	binary := config.Agent.Binary
+	binary := agent.Binary
 	if binaryPrefix != "" {
 		binary = binaryPrefix + "/" + binary
 	}
 
-	cmd := make([]string, 0, 1+len(agentArgs))
+	cmd := make([]string, 0, 1+len(builtArgs))
 	cmd = append(cmd, binary)
-	cmd = append(cmd, agentArgs...)
+	cmd = append(cmd, builtArgs...)
 
 	return cmd
 }
 
 // BuildProviderEnv builds the agent environment from the configured provider,
-// merging provider environment with agent-specific environment.
-func BuildProviderEnv(config *types.SandboxConfig) (map[string]string, error) {
-	if config.Provider == nil {
+// merging provider environment with agent-specific environment. It takes only
+// the fields it needs (data coupling), not a whole config struct.
+func BuildProviderEnv(agent *types.AgentConfig, provider *types.ModelProvider) (map[string]string, error) {
+	if provider == nil {
 		return map[string]string{}, nil
 	}
 
-	providerEnv, err := providers.BuildProviderEnv(config.Provider)
+	providerEnv, err := providers.BuildProviderEnv(provider)
 	if err != nil {
 		return nil, fmt.Errorf("failed to build provider environment: %w", err)
 	}
 
 	var agentEnv map[string]string
-	switch config.Agent.Type {
+	switch agent.Type {
 	case types.AgentClaude:
 		agentEnv = agents.BuildClaudeEnv(providerEnv)
 	case types.AgentOpencode:

@@ -24,3 +24,7 @@ docker buildx build \
   -t "${IMAGE}:latest" \
   --push \
   "$WORKSPACE_ROOT"
+
+# Cap the persistent BuildKit cache: the docker-container builder keeps its own
+# cache volume that is never auto-pruned and balloons unbounded otherwise.
+docker buildx prune --builder xonovex-builder --keep-storage "${BUILDX_CACHE_KEEP:-20GB}" --force >/dev/null 2>&1 || true
