@@ -51,11 +51,12 @@ func (e *InvalidModeError) Error() string {
 	return "unknown network mode " + e.Value + "; valid: host, none, proxy"
 }
 
-// ProxyEnv returns the proxy environment for Mode=proxy: all egress is routed
-// through proxyURL and NO_PROXY is empty so nothing bypasses it. It returns nil
-// for any other mode or when proxyURL is empty.
-func ProxyEnv(m Mode, proxyURL string) map[string]string {
-	if m != ModeProxy || proxyURL == "" {
+// ProxyEnv returns the proxy environment: all egress is routed through proxyURL
+// and NO_PROXY is empty so nothing bypasses it. It returns nil when proxyURL is
+// empty. The caller is responsible for only invoking it for the proxy mode (the
+// proxy leaf owns it).
+func ProxyEnv(proxyURL string) map[string]string {
+	if proxyURL == "" {
 		return nil
 	}
 	return map[string]string{

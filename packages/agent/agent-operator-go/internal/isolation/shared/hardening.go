@@ -6,7 +6,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	agentv1alpha1 "github.com/xonovex/platform/packages/agent/agent-operator-go/api/v1alpha1"
-	provshared "github.com/xonovex/platform/packages/agent/agent-operator-go/internal/provision/shared"
+	"github.com/xonovex/platform/packages/agent/agent-operator-go/internal/plugins"
 )
 
 const (
@@ -82,7 +82,7 @@ func applyPodHardening(spec *corev1.PodSpec, run *agentv1alpha1.AgentRun, tc *ag
 
 	// An image-based toolchain runs non-root at a read-only rootfs; reconcile with
 	// a writable HOME emptyDir + fsGroup.
-	if tcl := provshared.ResolveToolchain(tc); tcl != nil && tcl.Image() != "" {
+	if tcl := plugins.ResolveToolchain(tc); tcl != nil && tcl.Image() != "" {
 		if spec.SecurityContext == nil {
 			spec.SecurityContext = &corev1.PodSecurityContext{}
 		}

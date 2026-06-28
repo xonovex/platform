@@ -5,11 +5,13 @@ import (
 	"testing"
 
 	agentv1alpha1 "github.com/xonovex/platform/packages/agent/agent-operator-go/api/v1alpha1"
+	"github.com/xonovex/platform/packages/agent/agent-operator-go/internal/workspace/git"
+	"github.com/xonovex/platform/packages/agent/agent-operator-go/internal/workspace/jj"
 )
 
 func TestCloneScript_Basic(t *testing.T) {
 	repo := agentv1alpha1.RepositorySpec{URL: "https://github.com/example/repo.git"}
-	script := CloneScript(repo, agentv1alpha1.WorkspaceTypeGit)
+	script := CloneScript(repo, &git.Strategy{})
 
 	if !strings.Contains(script, "set -e") {
 		t.Error("script missing 'set -e'")
@@ -30,7 +32,7 @@ func TestCloneScript_Basic(t *testing.T) {
 
 func TestCloneScript_WithBranch(t *testing.T) {
 	repo := agentv1alpha1.RepositorySpec{URL: "https://github.com/example/repo.git", Branch: "develop"}
-	script := CloneScript(repo, agentv1alpha1.WorkspaceTypeGit)
+	script := CloneScript(repo, &git.Strategy{})
 	if !strings.Contains(script, "--branch 'develop'") {
 		t.Errorf("script missing '--branch 'develop'', got:\n%s", script)
 	}
@@ -42,7 +44,7 @@ func TestCloneScript_InjectionQuoted(t *testing.T) {
 		Branch: "main; rm -rf /",
 		Commit: "abc1234",
 	}
-	script := CloneScript(repo, agentv1alpha1.WorkspaceTypeGit)
+	script := CloneScript(repo, &git.Strategy{})
 
 	if !strings.Contains(script, "'main; rm -rf /'") {
 		t.Errorf("branch not properly quoted in script:\n%s", script)
@@ -57,7 +59,7 @@ func TestCloneScript_InjectionQuoted(t *testing.T) {
 
 func TestCloneScript_WithCommit(t *testing.T) {
 	repo := agentv1alpha1.RepositorySpec{URL: "https://github.com/example/repo.git", Commit: "abc123"}
-	script := CloneScript(repo, agentv1alpha1.WorkspaceTypeGit)
+	script := CloneScript(repo, &git.Strategy{})
 	if !strings.Contains(script, "git fetch origin 'abc123'") {
 		t.Errorf("script missing quoted commit in fetch, got:\n%s", script)
 	}
@@ -68,7 +70,7 @@ func TestCloneScript_WithCommit(t *testing.T) {
 
 func TestCloneScript_WithJujutsu(t *testing.T) {
 	repo := agentv1alpha1.RepositorySpec{URL: "https://github.com/example/repo.git", Branch: "main"}
-	script := CloneScript(repo, agentv1alpha1.WorkspaceTypeJujutsu)
+	script := CloneScript(repo, &jj.Strategy{})
 	if !strings.Contains(script, "git clone") {
 		t.Error("jj script should still use git clone")
 	}
@@ -79,7 +81,7 @@ func TestCloneScript_WithJujutsu(t *testing.T) {
 
 func TestCloneScript_GitNoJJInit(t *testing.T) {
 	repo := agentv1alpha1.RepositorySpec{URL: "https://github.com/example/repo.git"}
-	script := CloneScript(repo, agentv1alpha1.WorkspaceTypeGit)
+	script := CloneScript(repo, &git.Strategy{})
 	if strings.Contains(script, "jj") {
 		t.Error("git-only script should not contain 'jj'")
 	}

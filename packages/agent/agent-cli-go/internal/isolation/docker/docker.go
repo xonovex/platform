@@ -73,6 +73,13 @@ func (i *Isolator) Command(cfg isoshared.RunConfig, c provision.Contribution) []
 	return append([]string{"docker"}, i.buildArgs(cfg, c)...)
 }
 
+// TerminalCommand returns the docker command plus the host env to launch it; the
+// container environment is baked into the command via -e, so the wrapper needs
+// only the host env.
+func (i *Isolator) TerminalCommand(cfg isoshared.RunConfig, c provision.Contribution) ([]string, []string) {
+	return i.Command(cfg, c), os.Environ()
+}
+
 func (i *Isolator) buildArgs(cfg isoshared.RunConfig, c provision.Contribution) []string {
 	homeDir, _ := os.UserHomeDir()
 	if cfg.HomeDir != "" {

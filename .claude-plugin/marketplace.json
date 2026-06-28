@@ -9,7 +9,7 @@
     {
       "name": "xonovex-utility",
       "source": "./packages/command/command-utility",
-      "description": "Xonovex utility commands — skills, instructions, reflect, content"
+      "description": "Xonovex utility commands — skills, instructions, reflect, content, versioning"
     },
     {
       "name": "xonovex-workflow",
@@ -267,6 +267,11 @@
       "description": "Xonovex Node graph skills"
     },
     {
+      "name": "xonovex-skill-npm",
+      "source": "./packages/skill/skill-npm",
+      "description": "Xonovex npm publishing skills"
+    },
+    {
       "name": "xonovex-skill-oop",
       "source": "./packages/skill/skill-oop",
       "description": "Xonovex Object-oriented programming skills"
@@ -365,6 +370,11 @@
       "name": "xonovex-skill-user-stories",
       "source": "./packages/skill/skill-user-stories",
       "description": "Xonovex User story skills"
+    },
+    {
+      "name": "xonovex-skill-versioning",
+      "source": "./packages/skill/skill-versioning",
+      "description": "Xonovex versioning skills"
     },
     {
       "name": "xonovex-skill-vitest",

@@ -34,15 +34,6 @@ func ExecGit(args []string, cwd string) (string, error) {
 	return strings.TrimSpace(string(output)), nil
 }
 
-// GetGitRootSync returns the git repository root directory, or "" on error.
-func GetGitRootSync(cwd string) string {
-	result, err := ExecGit([]string{"rev-parse", "--show-toplevel"}, cwd)
-	if err != nil {
-		return ""
-	}
-	return result
-}
-
 // GetCurrentBranchSync returns the current git branch name, or "" if detached or
 // on error. Both the git and jj variants use it to resolve a source revision.
 func GetCurrentBranchSync(cwd string) string {

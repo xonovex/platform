@@ -10,7 +10,7 @@ import (
 
 func TestBuildEnvVars_Empty(t *testing.T) {
 	run := &agentv1alpha1.AgentRun{}
-	envVars := BuildEnvVars(run, nil)
+	envVars := buildEnvVars(run, nil)
 
 	if len(envVars) != 0 {
 		t.Errorf("len(envVars) = %d, want 0", len(envVars))
@@ -24,7 +24,7 @@ func TestBuildEnvVars_ProviderOnly(t *testing.T) {
 		"KEY2": "val2",
 	}
 
-	envVars := BuildEnvVars(run, providerEnv)
+	envVars := buildEnvVars(run, providerEnv)
 
 	envMap := make(map[string]string)
 	for _, e := range envVars {
@@ -48,7 +48,7 @@ func TestBuildEnvVars_SpecEnv(t *testing.T) {
 		},
 	}
 
-	envVars := BuildEnvVars(run, nil)
+	envVars := buildEnvVars(run, nil)
 
 	if len(envVars) != 1 {
 		t.Fatalf("len(envVars) = %d, want 1", len(envVars))
@@ -70,7 +70,7 @@ func TestBuildEnvVars_CombinesProviderAndSpec(t *testing.T) {
 		"PROVIDER_VAR": "from-provider",
 	}
 
-	envVars := BuildEnvVars(run, providerEnv)
+	envVars := buildEnvVars(run, providerEnv)
 
 	envMap := make(map[string]string)
 	for _, e := range envVars {

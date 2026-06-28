@@ -16,8 +16,10 @@ const (
 	WorkspaceVolumeName = "workspace"
 )
 
-// CloneScript builds the repository clone script for the workspace mount.
-func CloneScript(repo agentv1alpha1.RepositorySpec, wsType agentv1alpha1.WorkspaceType) string {
+// CloneScript builds the repository clone script for the workspace mount. The
+// strategy (resolved by the composition root) supplies the post-clone step; a nil
+// strategy adds none.
+func CloneScript(repo agentv1alpha1.RepositorySpec, strategy VCSStrategy) string {
 	script := "set -e\n"
 	script += "cd " + WorkspaceMountPath + "\n"
 	script += "git clone"
@@ -32,8 +34,8 @@ func CloneScript(repo agentv1alpha1.RepositorySpec, wsType agentv1alpha1.Workspa
 		script += "git checkout " + shell.Quote(repo.Commit) + "\n"
 	}
 
-	if vcs, err := GetVCSStrategy(wsType); err == nil {
-		script += vcs.PostCloneScript()
+	if strategy != nil {
+		script += strategy.PostCloneScript()
 	}
 
 	return script
@@ -45,18 +47,19 @@ func WorktreePath(runName string) string {
 }
 
 // WorktreeScriptAndName builds the worktree-creation script for worktreePath and
-// returns the init-container name for the VCS type. An empty sourceBranch defaults
-// to HEAD.
-func WorktreeScriptAndName(wsType agentv1alpha1.WorkspaceType, worktreePath, branch, sourceBranch string) (script, name string) {
+// returns the init-container name for the strategy (resolved by the composition
+// root). A nil strategy yields the default git-worktree name and no worktree step.
+// An empty sourceBranch defaults to HEAD.
+func WorktreeScriptAndName(strategy VCSStrategy, worktreePath, branch, sourceBranch string) (script, name string) {
 	if sourceBranch == "" {
 		sourceBranch = "HEAD"
 	}
 	script = "set -e\n"
 	script += "cd " + WorkspaceMountPath + "\n"
 	name = "git-worktree"
-	if vcs, err := GetVCSStrategy(wsType); err == nil {
-		name = vcs.InitContainerName()
-		script += vcs.WorktreeScript(worktreePath, branch, sourceBranch)
+	if strategy != nil {
+		name = strategy.InitContainerName()
+		script += strategy.WorktreeScript(worktreePath, branch, sourceBranch)
 	}
 	return script, name
 }

@@ -1,5 +1,5 @@
 ---
-description: Convert insights from a category into AGENTS.md bullet points
+description: Distil this session's lessons straight into the relevant AGENTS.md files (extract + apply in one pass)
 allowed-tools:
   - Read
   - Edit
@@ -8,16 +8,21 @@ allowed-tools:
   - Grep
   - AskUserQuestion
   - Skill
-argument-hint: "[category] [--dry-run] [--agents-file <path>]"
+argument-hint: "[category] [--from-reflections] [--persist] [--dry-run] [--agents-file <path>]"
 ---
 
 # /xonovex-utility:reflect-to-instructions — Convert Insights to AGENTS.md
 
 ## Arguments
 
-- `category` (required): Category to convert (e.g., `testing`, `typescript`, `workflow`)
-- `--dry-run` (optional): Preview without modifying
-- `--agents-file <path>` (optional): Target AGENTS.md (default: auto-detect from `applies_to`)
+- `category` (optional): Focus on one category (e.g., `testing`, `typescript`). Default: all
+  session insights, each routed to the nearest AGENTS.md via its `applies_to`.
+- `--from-reflections`: Source insights from existing `reflections/*.md` files instead of
+  extracting from the session (the explicit two-step flow after `reflect-extract`).
+- `--persist [<dir>]`: Also write the insights as `reflections/*.md` for an audit trail
+  (default: off — apply directly without storing).
+- `--dry-run`: Preview without modifying.
+- `--agents-file <path>`: Target AGENTS.md (default: auto-detect from `applies_to`).
 
 ## Delegation
 

@@ -20,8 +20,8 @@ import (
 	agentv1alpha1 "github.com/xonovex/platform/packages/agent/agent-operator-go/api/v1alpha1"
 	isoshared "github.com/xonovex/platform/packages/agent/agent-operator-go/internal/isolation/shared"
 	netshared "github.com/xonovex/platform/packages/agent/agent-operator-go/internal/network/shared"
+	"github.com/xonovex/platform/packages/agent/agent-operator-go/internal/plugins"
 	"github.com/xonovex/platform/packages/agent/agent-operator-go/internal/provider"
-	provshared "github.com/xonovex/platform/packages/agent/agent-operator-go/internal/provision/shared"
 	"github.com/xonovex/platform/packages/agent/agent-operator-go/internal/resolver"
 	wsshared "github.com/xonovex/platform/packages/agent/agent-operator-go/internal/workspace/shared"
 )
@@ -166,7 +166,7 @@ func (r *AgentRunReconciler) reconcileStandalone(ctx context.Context, agentRun *
 		// An image-based toolchain (e.g. nix) provisions via its pre-built,
 		// digest-pinned image.
 		image := defaults.Image
-		if tcl := provshared.ResolveToolchain(tc); tcl != nil && tcl.Image() != "" {
+		if tcl := plugins.ResolveToolchain(tc); tcl != nil && tcl.Image() != "" {
 			image = tcl.Image()
 		}
 
@@ -318,7 +318,7 @@ func (r *AgentRunReconciler) reconcileWithWorkspace(ctx context.Context, agentRu
 		// An image-based toolchain (e.g. nix) provisions via its pre-built,
 		// digest-pinned image.
 		image := defaults.Image
-		if tcl := provshared.ResolveToolchain(tc); tcl != nil && tcl.Image() != "" {
+		if tcl := plugins.ResolveToolchain(tc); tcl != nil && tcl.Image() != "" {
 			image = tcl.Image()
 		}
 

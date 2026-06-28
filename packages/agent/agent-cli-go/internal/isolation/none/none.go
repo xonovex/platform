@@ -50,6 +50,14 @@ func (i *Isolator) Command(cfg isoshared.RunConfig, c provision.Contribution) []
 	return cmd
 }
 
+// TerminalCommand returns the host command AND its full resolved environment
+// (provider tokens, custom env, and the provisioner's PATH/env). Unlike
+// bwrap/docker, host execution bakes nothing into the command, so the wrapper
+// must carry this environment for the agent to see its toolchain.
+func (i *Isolator) TerminalCommand(cfg isoshared.RunConfig, c provision.Contribution) ([]string, []string) {
+	return i.hostCommand(cfg, c)
+}
+
 // hostCommand builds the host command and environment, applying the Contribution.
 func (i *Isolator) hostCommand(cfg isoshared.RunConfig, c provision.Contribution) ([]string, []string) {
 	var providerCliArgs []string

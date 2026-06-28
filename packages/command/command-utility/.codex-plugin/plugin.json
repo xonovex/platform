@@ -1,7 +1,7 @@
 {
   "name": "xonovex-utility",
   "version": "4.0.0",
-  "description": "Xonovex utility commands — skills, instructions, reflect, content",
+  "description": "Xonovex utility commands — skills, instructions, reflect, content, versioning",
   "author": {
     "name": "Xonovex"
   },
@@ -10,6 +10,7 @@
     "xonovex-skill-reflect",
     "xonovex-skill-instruction",
     "xonovex-skill-skill",
-    "xonovex-skill-command"
+    "xonovex-skill-command",
+    "xonovex-skill-versioning"
   ]
 }

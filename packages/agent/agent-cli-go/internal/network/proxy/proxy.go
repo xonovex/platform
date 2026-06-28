@@ -26,7 +26,7 @@ type Options struct {
 // proxy URL is configured. The allowlist is exported via EgressAllowEnvVar so it
 // is honored rather than written-and-ignored.
 func (o Options) Env() map[string]string {
-	env := netshared.ProxyEnv(netshared.ModeProxy, o.URL)
+	env := netshared.ProxyEnv(o.URL)
 	if env == nil {
 		return nil
 	}

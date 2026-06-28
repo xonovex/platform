@@ -17,8 +17,9 @@ import (
 var updateGolden = flag.Bool("update-golden", false, "regenerate pod-spec golden files")
 
 // goldenJobs returns representative Jobs whose full serialized pod spec is frozen
-// in testdata/*.golden.yaml — the lock that the relocation + BuildJob merge did
-// not change pod output.
+// in testdata/*.golden.yaml. The goldens were generated from the post-merge
+// builder, so they lock the pod spec against FUTURE drift; the merge itself is
+// verified by the field-assertion tests in this package (job_test, workspace_job_test).
 func goldenJobs() map[string]*batchv1.Job {
 	stdRun := func() *agentv1alpha1.AgentRun {
 		return &agentv1alpha1.AgentRun{

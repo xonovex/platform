@@ -2,6 +2,7 @@ package shared
 
 import (
 	"fmt"
+	"maps"
 	"time"
 
 	batchv1 "k8s.io/api/batch/v1"
@@ -9,6 +10,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	agentv1alpha1 "github.com/xonovex/platform/packages/agent/agent-operator-go/api/v1alpha1"
+	"github.com/xonovex/platform/packages/agent/agent-operator-go/internal/plugins"
 	wsshared "github.com/xonovex/platform/packages/agent/agent-operator-go/internal/workspace/shared"
 )
 
@@ -92,7 +94,9 @@ func BuildJob(run *agentv1alpha1.AgentRun, providerEnv map[string]string, pvcNam
 			BackoffLimit:            &backoffLimit,
 			TTLSecondsAfterFinished: resolveTTL(ttl),
 			Template: corev1.PodTemplateSpec{
-				ObjectMeta: metav1.ObjectMeta{Labels: labels},
+				// Clone so the pod-template labels are independent of the Job's; a
+				// later mutation of one must not corrupt the other's identity/selector.
+				ObjectMeta: metav1.ObjectMeta{Labels: maps.Clone(labels)},
 				Spec: corev1.PodSpec{
 					RestartPolicy:    corev1.RestartPolicyNever,
 					SecurityContext:  DefaultPodSecurityContext(run.Spec.PodSecurityContext),
@@ -118,7 +122,8 @@ func BuildWorkspaceInitJob(ws *agentv1alpha1.AgentWorkspace, pvcName, image stri
 	activeDeadlineSeconds := int64((10 * time.Minute).Seconds())
 	backoffLimit := int32(0)
 
-	script := wsshared.CloneScript(ws.Spec.Repository, ws.Spec.Type)
+	strategy, _ := plugins.GetVCSStrategy(ws.Spec.Type)
+	script := wsshared.CloneScript(ws.Spec.Repository, strategy)
 
 	return &batchv1.Job{
 		ObjectMeta: metav1.ObjectMeta{

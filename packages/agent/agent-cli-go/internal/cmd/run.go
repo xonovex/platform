@@ -21,7 +21,6 @@ import (
 	"github.com/xonovex/platform/packages/cli/agent-cli-go/internal/workspace/git"
 	"github.com/xonovex/platform/packages/cli/agent-cli-go/internal/workspace/jj"
 	wsshared "github.com/xonovex/platform/packages/cli/agent-cli-go/internal/workspace/shared"
-	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/agentcmd"
 	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/agents"
 	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/isolation"
 	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/network"
@@ -261,7 +260,18 @@ func runAgent(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("isolation method %s is not available", axes.IsolationName)
 	}
 
-	contribution, err := axes.Provision.Contribute(provisionInput(axes.ProvisionName, sourceRepoDir, workDir))
+	// isolation=none has no namespace, so it cannot restrict egress; reject a
+	// restricted network up front so every dispatch path (run, terminal, dry-run)
+	// fails closed, not just isolator.Run.
+	if axes.IsolationName == isolation.IsolationNone && axes.Network != netshared.ModeHost {
+		return fmt.Errorf("isolation=none cannot restrict network egress (network=%q); use bwrap or docker", axes.Network)
+	}
+
+	input, err := provisionInput(axes.ProvisionName, sourceRepoDir, workDir)
+	if err != nil {
+		return err
+	}
+	contribution, err := axes.Provision.Contribute(input)
 	if err != nil {
 		return err
 	}
@@ -270,7 +280,7 @@ func runAgent(cmd *cobra.Command, args []string) error {
 		WorkDir:         workDir,
 		RepoDir:         sourceRepoDir,
 		Network:         axes.Network,
-		ProxyEnv:        proxyEnv(),
+		ProxyEnv:        proxyEnv(axes.Network),
 		HostPassthrough: axes.Passthrough,
 		Image:           axes.Image,
 		Runtime:         axes.Runtime,
@@ -288,7 +298,7 @@ func runAgent(cmd *cobra.Command, args []string) error {
 	}
 
 	if flagTerminal != "" {
-		return executeWithTerminal(axes, runCfg, contribution, agent, provider, workDir, verbose)
+		return executeWithTerminal(axes, runCfg, contribution, workDir, verbose)
 	}
 
 	exitCode, err := axes.Isolation.Run(runCfg, contribution)
@@ -363,20 +373,29 @@ func setupWorktree(workDir string, verbose bool) (sourceRepoDir, newWorkDir stri
 }
 
 // provisionInput assembles the neutral provisioner Input. The nix source is built
-// only for the nix provisioner; the others ignore it.
-func provisionInput(provName provision.ProvisionMethod, repoDir, workDir string) provshared.Input {
+// only for the nix provisioner; the others ignore it. An invalid --nix-source is
+// returned as an error here (naming the bad value) rather than degrading to a
+// zero source that fails later with a misleading diagnostic.
+func provisionInput(provName provision.ProvisionMethod, repoDir, workDir string) (provshared.Input, error) {
 	in := provshared.Input{InitCommands: flagInitCommand}
 	if provName == provision.ProvisionNix {
-		// Errors here surface at Contribute via ValidateSource (fail closed).
-		src, _ := provnix.SourceFromFlags(flagNixSource, flagNixRev, flagNixPackages, flagNixShell, "", repoDir, workDir)
+		src, err := provnix.SourceFromFlags(flagNixSource, flagNixRev, flagNixPackages, flagNixShell, "", repoDir, workDir)
+		if err != nil {
+			return provshared.Input{}, err
+		}
 		in.NixSource = src
 	}
-	return in
+	return in, nil
 }
 
-// proxyEnv builds the resolved proxy egress environment (allowlist folded in), or
-// nil when the network mode is not proxy or no proxy URL is configured.
-func proxyEnv() map[string]string {
+// proxyEnv builds the resolved proxy egress environment (allowlist folded in) for
+// the proxy network mode, or nil for any other mode or when no proxy URL is set.
+// The mode gate is essential: without it, a host-side AGENT_SANDBOX_PROXY would be
+// injected into the sandbox regardless of the requested --network.
+func proxyEnv(mode netshared.Mode) map[string]string {
+	if mode != netshared.ModeProxy {
+		return nil
+	}
 	return proxy.Options{
 		EgressAllowlist: append(append([]string{}, network.DefaultEgressAllowlist...), flagNetworkProxyEgressAllow...),
 		URL:             netshared.ProxyURL(),
@@ -384,7 +403,7 @@ func proxyEnv() map[string]string {
 }
 
 // executeWithTerminal runs the resolved cell inside a terminal wrapper.
-func executeWithTerminal(axes resolvedAxes, runCfg isoshared.RunConfig, contribution provision.Contribution, agent *types.AgentConfig, provider *types.ModelProvider, workDir string, verbose bool) error {
+func executeWithTerminal(axes resolvedAxes, runCfg isoshared.RunConfig, contribution provision.Contribution, workDir string, verbose bool) error {
 	terminalType := termshared.TerminalType(flagTerminal)
 	executor := terminal.GetExecutor(terminalType)
 	if executor == nil {
@@ -404,18 +423,10 @@ func executeWithTerminal(axes resolvedAxes, runCfg isoshared.RunConfig, contribu
 		Detach:      flagTerminalDetach,
 	}
 
-	// The isolator's Command is self-contained; bwrap/docker bake their env into
-	// the command, so the wrapper only needs the host env. Host (no-isolation)
-	// execution has no wrapper baking, so its provider env is added here.
-	fullCommand := axes.Isolation.Command(runCfg, contribution)
-	env := append(os.Environ(), runCfg.CustomEnv...)
-	if axes.IsolationName == isolation.IsolationNone {
-		if providerEnv, err := agentcmd.BuildProviderEnv(agent, provider); err == nil {
-			for k, v := range providerEnv {
-				env = append(env, k+"="+v)
-			}
-		}
-	}
+	// Each isolator owns its terminal launch: bwrap/docker bake their env into the
+	// command and return the host env; none returns the agent command with its full
+	// resolved environment (provider + custom + the provisioner's PATH/env).
+	fullCommand, env := axes.Isolation.TerminalCommand(runCfg, contribution)
 
 	if verbose {
 		scriptlib.LogInfo("Using terminal wrapper: " + flagTerminal)

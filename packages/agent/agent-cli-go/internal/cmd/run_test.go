@@ -16,6 +16,21 @@ func TestParseNetwork(t *testing.T) {
 	}
 }
 
+// TestProxyEnv_GatedByMode locks the fix that a host-side AGENT_SANDBOX_PROXY is
+// only injected for --network proxy, never for host/none.
+func TestProxyEnv_GatedByMode(t *testing.T) {
+	t.Setenv("AGENT_SANDBOX_PROXY", "http://127.0.0.1:3128")
+	if env := proxyEnv(netshared.ModeHost); env != nil {
+		t.Errorf("proxyEnv(host) = %v, want nil even with AGENT_SANDBOX_PROXY set", env)
+	}
+	if env := proxyEnv(netshared.ModeNone); env != nil {
+		t.Errorf("proxyEnv(none) = %v, want nil", env)
+	}
+	if env := proxyEnv(netshared.ModeProxy); env == nil || env["HTTPS_PROXY"] != "http://127.0.0.1:3128" {
+		t.Errorf("proxyEnv(proxy) = %v, want the proxy env", env)
+	}
+}
+
 // TestResolveAxes_DockerRuntimeWiresKernelIsolation confirms the new
 // --isolation-docker-runtime flag makes the kernel-isolation capability reachable
 // (previously the hardcoded empty runtime left it dead).

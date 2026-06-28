@@ -17,12 +17,6 @@ tasks:
     options:
       cache: false
       runFromWorkspaceRoot: true
-  ci-check:
-    command: echo 'ci-check complete'
-    deps:
-      - docker-build
-    options:
-      cache: false
   ci-publish:
     command: echo 'ci-publish complete'
     deps:
