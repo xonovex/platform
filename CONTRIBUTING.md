@@ -70,26 +70,13 @@ type(scope): description
 
 ## Version Bump
 
-Packages tagged with `npm` in Moon use `moon-version-bump` to bump versions, update workspace dependents, and generate changelog entries.
+Packages tagged with `npm` in Moon are versioned in lockstep. A version bump:
 
-```bash
-npx moon run <project>:version-bump              # patch bump (default)
-npx moon run <project>:version-bump -- minor      # minor bump
-npx moon run <project>:version-bump -- --dry-run  # preview without writing
-```
+1. Bumps the version in the target package's `package.json`
+2. Updates all workspace packages that depend on it
+3. Generates a `CHANGELOG.md` entry from the conventional commits since the last version change
 
-This will:
-
-1. Bump the version in the target package's `package.json`
-2. Update all workspace packages that depend on it
-3. Generate a `CHANGELOG.md` entry from conventional commits since the last version change
-
-To detect which projects have changed versions:
-
-```bash
-npx moon run moon-version-detect:run
-npx moon run moon-version-detect:run -- --base main
-```
+Changed-version packages are detected by comparing each `package.json` `version` against a base git ref (default the previous commit).
 
 ## Claude Code Guides
 
