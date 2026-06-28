@@ -12,7 +12,14 @@ env:
 tasks:
   go-build:
     script: mkdir -p bin && cd $workspaceRoot/packages/agent/agent-cli-go && go build -ldflags="-s -w" -o "$projectRoot/bin/agent-cli-go${BIN_EXT}" ./cmd/agent-cli
-    inputs: []
+    inputs:
+      - /packages/agent/agent-cli-go/**/*.go
+      - /packages/agent/agent-cli-go/go.mod
+      - /packages/agent/agent-cli-go/go.sum
+      - /packages/shared/shared-agent-go/**/*.go
+      - /packages/shared/shared-agent-go/go.mod
+      - /packages/shared/shared-core-go/**/*.go
+      - /packages/shared/shared-core-go/go.mod
     outputs:
       - bin/
     options:
