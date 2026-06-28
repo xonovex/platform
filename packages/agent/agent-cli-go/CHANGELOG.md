@@ -1,5 +1,24 @@
 # @xonovex/agent-cli-go
 
+## 0.1.30
+
+### Patch Changes
+
+- [`11dea8c`](https://github.com/xonovex/platform/commit/11dea8ccde78ba31bfa330d73c97b49d2d7cd84f) [@Deorder](https://github.com/Deorder)! - reorganize CLI/shared into orthogonal confinement axes
+- [`01a38ee`](https://github.com/xonovex/platform/commit/01a38eec436112efb0d80836ecc187569b188581) [@Deorder](https://github.com/Deorder)! - prefix tag tasks per language and aggregate via ci-check
+- [`12e5a13`](https://github.com/xonovex/platform/commit/12e5a1382afb4f4139c12e29ff05f9ea6724cac5) [@Deorder](https://github.com/Deorder)! - add nix provisioner and operator image realizer, drop compose and docker-agent
+- [`2d30102`](https://github.com/xonovex/platform/commit/2d3010210913b74edca492c6ea356e7f885ddd48) [@Deorder](https://github.com/Deorder)! - split isolation/provisioning/network axes and hoist shared helpers
+- [`fa6e337`](https://github.com/xonovex/platform/commit/fa6e3376197ec32f11e849decad1d12f05172783) [@Deorder](https://github.com/Deorder)! - add missing 0.1.24 CHANGELOG entry; publish version-specific notes
+- [`ffa01e5`](https://github.com/xonovex/platform/commit/ffa01e5da8a6d5eb551945247629161840d0c415) [@Deorder](https://github.com/Deorder)! - expose named go devShell in Go project flakes
+- [`cdb0fd2`](https://github.com/xonovex/platform/commit/cdb0fd21ebcee694fbaf6b88ebe5b56a4f7d7938) [@Deorder](https://github.com/Deorder)! - nixflake sandbox tier + pinned-toolchain deny-default policy (#25)
+- [`52a05be`](https://github.com/xonovex/platform/commit/52a05be3f4378a729ddf9fab5fb6d38f9e6d08f1) [@Deorder](https://github.com/Deorder)! - go.nix carries go_1_26; all Go projects on 1.26; docker-agent composes from nix/
+- [`e7f1cb6`](https://github.com/xonovex/platform/commit/e7f1cb61dba7072025c710c242cc6540e43af58e) [@Deorder](https://github.com/Deorder)! - compose flakes from per-tool nix/\*.nix modules
+- Updated dependency `@xonovex/agent-cli-go-linux-arm64` to `0.1.30`
+- Updated dependency `@xonovex/agent-cli-go-linux-x64` to `0.1.30`
+- Updated dependency `@xonovex/agent-cli-go-darwin-arm64` to `0.1.30`
+- Updated dependency `@xonovex/agent-cli-go-darwin-x64` to `0.1.30`
+- Updated dependency `@xonovex/agent-cli-go-win32-x64` to `0.1.30`
+
 ## 0.1.24
 
 ### Patch Changes

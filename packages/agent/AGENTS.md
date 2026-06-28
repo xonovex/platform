@@ -1,6 +1,6 @@
 # Agent
 
-- Version bump: run `npx moon-version-bump <patch|minor|major>` from `packages/agent/agent-cli-go` — it bumps the version, lockstep-updates the five `agent-cli-go-<platform>` binary packages and the `agent-cli-go-github` refs, and generates the `CHANGELOG.md` entry. Don't hand-edit versions: that skips the changelog, and `github-publish` fails (or ships stale notes) without a matching `## <version>` section.
+- Version bump: the agent release line moves in lockstep — `agent-cli-go`'s `version` and its five `optionalDependencies`, the five `agent-cli-go-<platform>` binary packages, and `agent-cli-go-github`'s platform refs all move to the same version, plus a matching `## <version>` `CHANGELOG.md` entry from the conventional commits since the last release. A release without its `## <version>` CHANGELOG section makes `github-publish` fail or ship stale notes.
 
 ## Sandbox model
 
