@@ -1,0 +1,90 @@
+metadata:
+  labels:
+    agent.xonovex.com/agent-type: claude
+    agent.xonovex.com/workspace: my-workspace
+    app.kubernetes.io/component: agent-run
+    app.kubernetes.io/instance: golden-ws-run
+    app.kubernetes.io/name: agent-operator
+  name: golden-ws-run
+  namespace: default
+spec:
+  activeDeadlineSeconds: 3600
+  backoffLimit: 0
+  template:
+    metadata:
+      labels:
+        agent.xonovex.com/agent-type: claude
+        agent.xonovex.com/workspace: my-workspace
+        app.kubernetes.io/component: agent-run
+        app.kubernetes.io/instance: golden-ws-run
+        app.kubernetes.io/name: agent-operator
+    spec:
+      automountServiceAccountToken: false
+      containers:
+      - args:
+        - --permission-mode
+        - bypassPermissions
+        command:
+        - claude
+        image: node:trixie-slim
+        name: agent
+        resources:
+          limits:
+            cpu: "2"
+            memory: 4Gi
+          requests:
+            cpu: 250m
+            memory: 512Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          seccompProfile:
+            type: RuntimeDefault
+        volumeMounts:
+        - mountPath: /workspace
+          name: workspace
+        - mountPath: /tmp
+          name: tmp
+        workingDir: /workspace-wt/golden-ws-run
+      initContainers:
+      - args:
+        - -c
+        - |
+          set -e
+          cd /workspace
+          git worktree add '/workspace-wt/golden-ws-run' -b 'feature' 'HEAD'
+        command:
+        - sh
+        image: node:trixie-slim
+        name: git-worktree
+        resources: {}
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          seccompProfile:
+            type: RuntimeDefault
+        volumeMounts:
+        - mountPath: /workspace
+          name: workspace
+      restartPolicy: Never
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      serviceAccountName: agent-runner
+      volumes:
+      - name: workspace
+        persistentVolumeClaim:
+          claimName: my-workspace-ws
+      - emptyDir: {}
+        name: tmp
+  ttlSecondsAfterFinished: 3600
+status: {}

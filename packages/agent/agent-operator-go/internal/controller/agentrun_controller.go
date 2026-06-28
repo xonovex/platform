@@ -18,8 +18,12 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
 	agentv1alpha1 "github.com/xonovex/platform/packages/agent/agent-operator-go/api/v1alpha1"
-	"github.com/xonovex/platform/packages/agent/agent-operator-go/internal/builder"
+	isoshared "github.com/xonovex/platform/packages/agent/agent-operator-go/internal/isolation/shared"
+	netshared "github.com/xonovex/platform/packages/agent/agent-operator-go/internal/network/shared"
+	"github.com/xonovex/platform/packages/agent/agent-operator-go/internal/plugins"
+	"github.com/xonovex/platform/packages/agent/agent-operator-go/internal/provider"
 	"github.com/xonovex/platform/packages/agent/agent-operator-go/internal/resolver"
+	wsshared "github.com/xonovex/platform/packages/agent/agent-operator-go/internal/workspace/shared"
 )
 
 // AgentRunReconciler reconciles an AgentRun object
@@ -91,7 +95,7 @@ func (r *AgentRunReconciler) reconcileStandalone(ctx context.Context, agentRun *
 	if harness != nil {
 		defaultProvider = harness.Spec.DefaultProvider
 	}
-	providerEnv, err := resolver.ResolveProvider(ctx, r.Client, agentRun, defaultProvider)
+	providerEnv, err := provider.ResolveProvider(ctx, r.Client, agentRun, defaultProvider)
 	if err != nil {
 		log.Error(err, "failed to resolve provider", "providerRef", agentRun.Spec.ProviderRef)
 		return r.updatePhase(ctx, agentRun, agentv1alpha1.AgentRunPhaseFailed, fmt.Sprintf("ProviderResolutionFailed: %v", err))
@@ -122,7 +126,7 @@ func (r *AgentRunReconciler) reconcileStandalone(ctx context.Context, agentRun *
 	// Create workspace PVC if needed
 	pvcName := fmt.Sprintf("%s-workspace", agentRun.Name)
 	if agentRun.Status.WorkspacePVC == "" {
-		pvc := builder.BuildPVC(pvcName, agentRun.Namespace, storageClass, storageSize, agentRun)
+		pvc := wsshared.BuildPVC(pvcName, agentRun.Namespace, storageClass, storageSize, agentRun)
 		if err := r.Create(ctx, pvc); err != nil && !errors.IsAlreadyExists(err) {
 			log.Error(err, "failed to create workspace PVC", "pvcName", pvcName)
 			return ctrl.Result{}, err
@@ -142,7 +146,7 @@ func (r *AgentRunReconciler) reconcileStandalone(ctx context.Context, agentRun *
 
 	// Create NetworkPolicy (unless explicitly disabled)
 	if netpolCfg == nil || !netpolCfg.Disabled {
-		np := builder.BuildNetworkPolicy(agentRun, netpolCfg)
+		np := netshared.BuildNetworkPolicy(agentRun, netpolCfg)
 		if err := ctrl.SetControllerReference(agentRun, np, r.Scheme); err != nil {
 			return ctrl.Result{}, err
 		}
@@ -162,7 +166,7 @@ func (r *AgentRunReconciler) reconcileStandalone(ctx context.Context, agentRun *
 		// An image-based toolchain (e.g. nix) provisions via its pre-built,
 		// digest-pinned image.
 		image := defaults.Image
-		if tcl := builder.ResolveToolchain(tc); tcl != nil && tcl.Image() != "" {
+		if tcl := plugins.ResolveToolchain(tc); tcl != nil && tcl.Image() != "" {
 			image = tcl.Image()
 		}
 
@@ -170,7 +174,7 @@ func (r *AgentRunReconciler) reconcileStandalone(ctx context.Context, agentRun *
 			return ctrl.Result{}, err
 		}
 
-		job := builder.BuildJob(agentRun, providerEnv, pvcName, image, defaults.Timeout, agentType, wsType, tc, defaults.TTL)
+		job := isoshared.BuildJob(agentRun, providerEnv, pvcName, image, defaults.Timeout, agentType, wsType, tc, defaults.TTL, nil)
 		if err := ctrl.SetControllerReference(agentRun, job, r.Scheme); err != nil {
 			return ctrl.Result{}, err
 		}
@@ -208,7 +212,7 @@ func (r *AgentRunReconciler) reconcileStandalone(ctx context.Context, agentRun *
 // pods bind to, idempotently. It is a shared namespace resource, so it carries no
 // owner reference (it outlives any single AgentRun).
 func (r *AgentRunReconciler) ensureAgentServiceAccount(ctx context.Context, namespace string) error {
-	sa := builder.BuildAgentServiceAccount(namespace)
+	sa := isoshared.BuildAgentServiceAccount(namespace)
 	if err := r.Create(ctx, sa); err != nil && !errors.IsAlreadyExists(err) {
 		return err
 	}
@@ -253,7 +257,7 @@ func (r *AgentRunReconciler) reconcileWithWorkspace(ctx context.Context, agentRu
 	if harness != nil {
 		defaultProvider = harness.Spec.DefaultProvider
 	}
-	providerEnv, err := resolver.ResolveProvider(ctx, r.Client, agentRun, defaultProvider)
+	providerEnv, err := provider.ResolveProvider(ctx, r.Client, agentRun, defaultProvider)
 	if err != nil {
 		log.Error(err, "failed to resolve provider", "providerRef", agentRun.Spec.ProviderRef)
 		return r.updatePhase(ctx, agentRun, agentv1alpha1.AgentRunPhaseFailed, fmt.Sprintf("ProviderResolutionFailed: %v", err))
@@ -294,7 +298,7 @@ func (r *AgentRunReconciler) reconcileWithWorkspace(ctx context.Context, agentRu
 
 	// Create NetworkPolicy (unless explicitly disabled)
 	if netpolCfg == nil || !netpolCfg.Disabled {
-		np := builder.BuildNetworkPolicy(agentRun, netpolCfg)
+		np := netshared.BuildNetworkPolicy(agentRun, netpolCfg)
 		if err := ctrl.SetControllerReference(agentRun, np, r.Scheme); err != nil {
 			return ctrl.Result{}, err
 		}
@@ -314,7 +318,7 @@ func (r *AgentRunReconciler) reconcileWithWorkspace(ctx context.Context, agentRu
 		// An image-based toolchain (e.g. nix) provisions via its pre-built,
 		// digest-pinned image.
 		image := defaults.Image
-		if tcl := builder.ResolveToolchain(tc); tcl != nil && tcl.Image() != "" {
+		if tcl := plugins.ResolveToolchain(tc); tcl != nil && tcl.Image() != "" {
 			image = tcl.Image()
 		}
 
@@ -322,7 +326,13 @@ func (r *AgentRunReconciler) reconcileWithWorkspace(ctx context.Context, agentRu
 			return ctrl.Result{}, err
 		}
 
-		job := builder.BuildWorkspaceJob(agentRun, providerEnv, ws.Status.WorkspacePVC, ws.Spec.SharedVolumes, ws.Status.SharedVolumePVCs, image, defaults.Timeout, agentType, wsType, worktreeBranch, sourceBranch, tc, defaults.TTL)
+		job := isoshared.BuildJob(agentRun, providerEnv, ws.Status.WorkspacePVC, image, defaults.Timeout, agentType, wsType, tc, defaults.TTL, &isoshared.WorkspaceBinding{
+			SharedVolumes:    ws.Spec.SharedVolumes,
+			SharedVolumePVCs: ws.Status.SharedVolumePVCs,
+			WorktreeBranch:   worktreeBranch,
+			SourceBranch:     sourceBranch,
+			WorkspaceRef:     agentRun.Spec.WorkspaceRef,
+		})
 		if err := ctrl.SetControllerReference(agentRun, job, r.Scheme); err != nil {
 			return ctrl.Result{}, err
 		}

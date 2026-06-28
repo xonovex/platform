@@ -17,7 +17,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
 	agentv1alpha1 "github.com/xonovex/platform/packages/agent/agent-operator-go/api/v1alpha1"
-	"github.com/xonovex/platform/packages/agent/agent-operator-go/internal/builder"
+	isoshared "github.com/xonovex/platform/packages/agent/agent-operator-go/internal/isolation/shared"
+	wsshared "github.com/xonovex/platform/packages/agent/agent-operator-go/internal/workspace/shared"
 )
 
 // AgentWorkspaceReconciler reconciles an AgentWorkspace object
@@ -56,7 +57,7 @@ func (r *AgentWorkspaceReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 	// 1. Create workspace PVC if needed
 	workspacePVCName := fmt.Sprintf("%s-ws", ws.Name)
 	if ws.Status.WorkspacePVC == "" {
-		pvc := builder.BuildWorkspacePVC(workspacePVCName, &ws)
+		pvc := wsshared.BuildWorkspacePVC(workspacePVCName, &ws)
 		if err := r.Create(ctx, pvc); err != nil && !errors.IsAlreadyExists(err) {
 			log.Error(err, "failed to create workspace PVC")
 			return ctrl.Result{}, err
@@ -76,7 +77,7 @@ func (r *AgentWorkspaceReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 		}
 
 		sharedPVCName := fmt.Sprintf("%s-%s", ws.Name, vol.Name)
-		pvc := builder.BuildSharedVolumePVC(sharedPVCName, &ws, vol)
+		pvc := wsshared.BuildSharedVolumePVC(sharedPVCName, &ws, vol)
 		if err := r.Create(ctx, pvc); err != nil && !errors.IsAlreadyExists(err) {
 			log.Error(err, "failed to create shared volume PVC", "volume", vol.Name)
 			return ctrl.Result{}, err
@@ -97,7 +98,7 @@ func (r *AgentWorkspaceReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 	if ws.Status.InitJobName == "" {
 		image := "alpine/git:latest"
 
-		job := builder.BuildWorkspaceInitJob(&ws, workspacePVCName, image, ws.Spec.RuntimeClassName)
+		job := isoshared.BuildWorkspaceInitJob(&ws, workspacePVCName, image, ws.Spec.RuntimeClassName)
 		if err := ctrl.SetControllerReference(&ws, job, r.Scheme); err != nil {
 			return ctrl.Result{}, err
 		}

@@ -1,3 +1,8 @@
+// Package sandbox is the confinement composition/selection layer: it holds only
+// the Registry (lazy plugin factories), Select (fail-closed policy gate), and the
+// plugins composition root. The axis ports and concrete leaves live under
+// internal/{isolation,provision,network}; this package names no concrete leaf
+// (only internal/sandbox/plugins does).
 package sandbox
 
 import (
@@ -5,8 +10,12 @@ import (
 	"fmt"
 	"sort"
 
-	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/sandbox"
-	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/types"
+	isoshared "github.com/xonovex/platform/packages/cli/agent-cli-go/internal/isolation/shared"
+	netshared "github.com/xonovex/platform/packages/cli/agent-cli-go/internal/network/shared"
+	provshared "github.com/xonovex/platform/packages/cli/agent-cli-go/internal/provision/shared"
+	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/isolation"
+	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/policy"
+	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/provision"
 )
 
 var (
@@ -18,8 +27,8 @@ var (
 
 // IsolatorFactory and ProvisionerFactory construct a fresh plugin instance.
 type (
-	IsolatorFactory    func() Isolator
-	ProvisionerFactory func() Provisioner
+	IsolatorFactory    func() isoshared.Isolator
+	ProvisionerFactory func() provshared.Provisioner
 )
 
 // Registry maps method names to plugin factories. It is built once at the
@@ -27,32 +36,32 @@ type (
 // state, and tests build their own minimal Registry. Adding a plugin is one
 // Register call at the root; the core selection/policy code never changes.
 type Registry struct {
-	isolators    map[types.IsolationMethod]IsolatorFactory
-	provisioners map[types.ProvisionMethod]ProvisionerFactory
+	isolators    map[isolation.IsolationMethod]IsolatorFactory
+	provisioners map[provision.ProvisionMethod]ProvisionerFactory
 }
 
 // NewRegistry returns an empty registry.
 func NewRegistry() *Registry {
 	return &Registry{
-		isolators:    map[types.IsolationMethod]IsolatorFactory{},
-		provisioners: map[types.ProvisionMethod]ProvisionerFactory{},
+		isolators:    map[isolation.IsolationMethod]IsolatorFactory{},
+		provisioners: map[provision.ProvisionMethod]ProvisionerFactory{},
 	}
 }
 
 // RegisterIsolator registers (or replaces) an isolator factory; chainable.
-func (r *Registry) RegisterIsolator(m types.IsolationMethod, f IsolatorFactory) *Registry {
+func (r *Registry) RegisterIsolator(m isolation.IsolationMethod, f IsolatorFactory) *Registry {
 	r.isolators[m] = f
 	return r
 }
 
 // RegisterProvisioner registers (or replaces) a provisioner factory; chainable.
-func (r *Registry) RegisterProvisioner(m types.ProvisionMethod, f ProvisionerFactory) *Registry {
+func (r *Registry) RegisterProvisioner(m provision.ProvisionMethod, f ProvisionerFactory) *Registry {
 	r.provisioners[m] = f
 	return r
 }
 
 // Isolator constructs the isolator for m, or ErrNoIsolator if unregistered.
-func (r *Registry) Isolator(m types.IsolationMethod) (Isolator, error) {
+func (r *Registry) Isolator(m isolation.IsolationMethod) (isoshared.Isolator, error) {
 	f, ok := r.isolators[m]
 	if !ok {
 		return nil, fmt.Errorf("%w for isolation %q", ErrNoIsolator, m)
@@ -61,7 +70,7 @@ func (r *Registry) Isolator(m types.IsolationMethod) (Isolator, error) {
 }
 
 // Provisioner constructs the provisioner for m, or ErrNoProvisioner if unregistered.
-func (r *Registry) Provisioner(m types.ProvisionMethod) (Provisioner, error) {
+func (r *Registry) Provisioner(m provision.ProvisionMethod) (provshared.Provisioner, error) {
 	f, ok := r.provisioners[m]
 	if !ok {
 		return nil, fmt.Errorf("%w for provisioning %q", ErrNoProvisioner, m)
@@ -70,8 +79,8 @@ func (r *Registry) Provisioner(m types.ProvisionMethod) (Provisioner, error) {
 }
 
 // IsolationMethods returns the registered isolation methods, sorted for stable output.
-func (r *Registry) IsolationMethods() []types.IsolationMethod {
-	out := make([]types.IsolationMethod, 0, len(r.isolators))
+func (r *Registry) IsolationMethods() []isolation.IsolationMethod {
+	out := make([]isolation.IsolationMethod, 0, len(r.isolators))
 	for m := range r.isolators {
 		out = append(out, m)
 	}
@@ -81,9 +90,9 @@ func (r *Registry) IsolationMethods() []types.IsolationMethod {
 
 // Request bundles the per-run axis selection handed to Select.
 type Request struct {
-	Isolation   types.IsolationMethod
-	Provision   types.ProvisionMethod
-	Network     types.NetworkMethod
+	Isolation   isolation.IsolationMethod
+	Provision   provision.ProvisionMethod
+	Network     netshared.Mode
 	Passthrough bool
 	Runtime     string
 	Image       string
@@ -93,7 +102,7 @@ type Request struct {
 // policy fail-closed. Registry membership is the validity check; the resolved
 // plugins declare their own capabilities, so the policy engine never names a
 // concrete isolator or provisioner.
-func Select(reg *Registry, req Request, pol types.SandboxPolicy) (Isolator, Provisioner, error) {
+func Select(reg *Registry, req Request, pol policy.SandboxPolicy) (isoshared.Isolator, provshared.Provisioner, error) {
 	iso, err := reg.Isolator(req.Isolation)
 	if err != nil {
 		return nil, nil, err
@@ -102,13 +111,13 @@ func Select(reg *Registry, req Request, pol types.SandboxPolicy) (Isolator, Prov
 	if err != nil {
 		return nil, nil, err
 	}
-	caps := sandbox.Capabilities{
+	caps := policy.Capabilities{
 		Pinned:               prov.Pinned(),
 		HostToolsUnreachable: iso.HidesHost(req.Passthrough, req.Image),
-		EgressRestricted:     sandbox.EgressIsRestricted(req.Network),
+		EgressRestricted:     netshared.EgressIsRestricted(req.Network),
 		KernelIsolated:       iso.KernelIsolated(req.Runtime),
 	}
-	if err := sandbox.EnforcePolicy(caps, pol); err != nil {
+	if err := policy.EnforcePolicy(caps, pol); err != nil {
 		return nil, nil, err
 	}
 	return iso, prov, nil
@@ -116,8 +125,8 @@ func Select(reg *Registry, req Request, pol types.SandboxPolicy) (Isolator, Prov
 
 // AvailableIsolations returns the registered isolation methods whose isolator is
 // currently available on this host.
-func AvailableIsolations(reg *Registry) []types.IsolationMethod {
-	var available []types.IsolationMethod
+func AvailableIsolations(reg *Registry) []isolation.IsolationMethod {
+	var available []isolation.IsolationMethod
 	for _, m := range reg.IsolationMethods() {
 		iso, err := reg.Isolator(m)
 		if err != nil {

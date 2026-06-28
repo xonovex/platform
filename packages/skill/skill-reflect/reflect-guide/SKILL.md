@@ -11,9 +11,10 @@ Reflect on a session to capture development lessons (insights) and integrate the
 
 - **Extract from experience** — analyze the session for mistakes, discoveries, and corrections, not hypotheticals
 - **Identify general patterns** — capture only insights that apply beyond the current task
-- **Structured storage** — save each insight as a file with `category` / `topic` / `applies_to` frontmatter
+- **Apply directly by default** — `integrate-instructions` and `integrate-skills` extract from the session and write STRAIGHT to AGENTS.md / the owning skill; persisting insights as `reflections/*.md` first is an optional audit step (`--persist`), not a prerequisite. Use `extract` only when you explicitly want the stored files, or `--from-reflections` to integrate ones already stored.
+- **Route by `applies_to`** — each insight carries `category` / `topic` / `applies_to`; `applies_to` picks the nearest AGENTS.md or the owning skill, whether the insight is held in memory or stored
 - **Two integration paths** — small one-off lessons → AGENTS.md (project instructions); recurring patterns with enough mass → guideline skill
-- **`applied: false` is the pending flag** — flip it only after the insight is actually integrated
+- **`applied: false` is the pending flag** — only for persisted insights; flip it after the insight is integrated
 
 ## Gotchas
 
@@ -25,9 +26,9 @@ Reflect on a session to capture development lessons (insights) and integrate the
 
 ## Operations
 
-- **Extract** — capture development lessons from the current session — see [references/extract.md](references/extract.md)
-- **Integrate-instructions** — fold insights into AGENTS.md as bullet points — see [references/integrate-instructions.md](references/integrate-instructions.md)
-- **Integrate-skills** — convert insights into a new or updated guideline skill — see [references/integrate-skills.md](references/integrate-skills.md)
+- **Extract** — capture development lessons from the current session and STORE them as `reflections/*.md` (the explicit persist step) — see [references/extract.md](references/extract.md)
+- **Integrate-instructions** — fold insights into AGENTS.md as bullet points; extracts from the session by default (`--from-reflections` to read stored files) — see [references/integrate-instructions.md](references/integrate-instructions.md)
+- **Integrate-skills** — apply insights into the owning skill (or a new `{category}-guide`); extracts from the session by default (`--from-reflections` to read stored files) — see [references/integrate-skills.md](references/integrate-skills.md)
 
 ## Progressive Disclosure
 

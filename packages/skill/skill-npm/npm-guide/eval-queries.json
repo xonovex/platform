@@ -1,0 +1,74 @@
+[
+  {
+    "query": "publish this package to npm",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "direct publish intent"
+  },
+  {
+    "query": "is this package ready to publish?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "publish-readiness check"
+  },
+  {
+    "query": "check the package.json has everything needed before release",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "publish-check without naming npm"
+  },
+  {
+    "query": "publish with provenance from the CI pipeline",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "provenance flag trigger"
+  },
+  {
+    "query": "only push this to the registry if the version isn't already up there",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "idempotent publish, buried in casual phrasing"
+  },
+  {
+    "query": "bump this package to 2.0.0 and update dependents",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "adjacent release step, owned by versioning-guide"
+  },
+  {
+    "query": "write the CHANGELOG for this release",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "changelog generation, owned by versioning-guide"
+  },
+  {
+    "query": "install the project dependencies with npm install",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "npm keyword overlap but install, not publish"
+  },
+  {
+    "query": "ship this package to the registry and skip it if already published",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "validation positive — idempotent publish"
+  },
+  {
+    "query": "validate publish-readiness of these packages before the release job",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "validation positive — publish-check"
+  },
+  {
+    "query": "bump every dependent package and tag the release version",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "validation negative — owned by versioning-guide"
+  },
+  {
+    "query": "add a new dependency to package.json",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "validation negative — package.json edit, not publishing"
+  }
+]

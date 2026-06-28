@@ -45,6 +45,19 @@ const (
 	AgentTypeOpencode AgentType = "opencode"
 )
 
+// NetworkMode is the egress axis mapped onto the per-AgentRun NetworkPolicy.
+// +kubebuilder:validation:Enum=host;none;proxy
+type NetworkMode string
+
+const (
+	// NetworkModeHost allows unrestricted egress (does not satisfy egress-restricted).
+	NetworkModeHost NetworkMode = "host"
+	// NetworkModeNone allows DNS only.
+	NetworkModeNone NetworkMode = "none"
+	// NetworkModeProxy allows public egress except metadata/RFC1918/loopback.
+	NetworkModeProxy NetworkMode = "proxy"
+)
+
 // ProviderType represents the type of AI provider
 type ProviderType string
 
@@ -230,8 +243,7 @@ type AgentRunSpec struct {
 	// egress NetworkPolicy. host = unrestricted (does not satisfy egress-restricted);
 	// none = DNS only; proxy = public egress except metadata/RFC1918/loopback (an
 	// FQDN-aware allowlist is the documented upgrade). Defaults to none.
-	// +kubebuilder:validation:Enum=host;none;proxy
-	Network string `json:"network,omitempty"`
+	Network NetworkMode `json:"network,omitempty"`
 	// EgressAllowlist extends the default allowlist for Network=proxy (FQDN-aware
 	// upgrade path; carried for the policy engine, not enforced by L3/L4 rules).
 	EgressAllowlist []string `json:"egressAllowlist,omitempty"`

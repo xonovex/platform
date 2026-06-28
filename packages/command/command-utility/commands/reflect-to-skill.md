@@ -1,23 +1,29 @@
 ---
-description: Convert insights from a category into a progressive disclosure skill
+description: Distil this session's lessons straight into the relevant guideline skills (extract + apply in one pass)
 allowed-tools:
   - Read
+  - Edit
   - Write
   - Glob
   - Grep
   - AskUserQuestion
   - Skill
-argument-hint: "[category] [--dry-run] [--force] [--output <path>]"
+argument-hint: "[category] [--from-reflections] [--persist] [--dry-run] [--force] [--output <path>]"
 ---
 
 # /xonovex-utility:reflect-to-skill — Convert Insights to Skill
 
 ## Arguments
 
-- `category` (required) - Category to convert (e.g., `hono`, `typescript`, `workflow`)
-- `--dry-run` - Preview without writing
-- `--force` - Overwrite existing skill instead of merging
-- `--output <path>` - Custom output path (default: `.claude/skills/{category}/SKILL.md`)
+- `category` (optional) - Focus on one category (e.g., `testing`, `typescript`). Default: all
+  session insights, each routed to the existing skill that owns its domain.
+- `--from-reflections` - Source insights from existing `reflections/*.md` files instead of
+  extracting from the session (the explicit two-step flow after `reflect-extract`).
+- `--persist [<dir>]` - Also write the insights as `reflections/*.md` for an audit trail
+  (default: off — apply directly without storing).
+- `--dry-run` - Preview without writing.
+- `--force` - Overwrite an existing skill instead of merging.
+- `--output <path>` - Custom output path for a newly created skill.
 
 ## Delegation
 

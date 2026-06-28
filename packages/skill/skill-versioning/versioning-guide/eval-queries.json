@@ -1,0 +1,74 @@
+[
+  {
+    "query": "bump this package to a minor release",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "direct mention of a level bump"
+  },
+  {
+    "query": "cut a new patch release and update the changelog",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "release + changelog without naming semver"
+  },
+  {
+    "query": "set this package to 2.0.0 and update everything that depends on it",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "exact version + dependent propagation"
+  },
+  {
+    "query": "make a beta prerelease of the api package",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "prerelease / preid trigger"
+  },
+  {
+    "query": "which packages changed version since main",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "version-detect, phrased as a question"
+  },
+  {
+    "query": "write a conventional commit message for these staged changes",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "keyword overlap, owned by git-guide (commit authoring)"
+  },
+  {
+    "query": "publish these packages to the npm registry",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "adjacent release step, owned by npm-guide"
+  },
+  {
+    "query": "show me which files changed in the last commit",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "'changed' overlap but read-only git, not version detection"
+  },
+  {
+    "query": "release 1.4.0 and add the changelog entries",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "validation positive — exact release + changelog"
+  },
+  {
+    "query": "tag the next version after these feat and fix commits",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "validation positive — bump inferred from commits"
+  },
+  {
+    "query": "open a pull request for the release branch",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "validation negative — owned by pull-request-guide"
+  },
+  {
+    "query": "fix the merge conflict in two package.json files",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "validation negative — conflict resolution, owned by git-guide"
+  }
+]

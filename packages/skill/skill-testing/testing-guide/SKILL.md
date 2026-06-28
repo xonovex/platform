@@ -50,4 +50,4 @@ gateway.verify();                                  // behaviour verification of 
 - Read [references/test-double-taxonomy.md](references/test-double-taxonomy.md) - Load when choosing or naming a double, or settling mock vs stub vs fake vs spy
 - Read [references/state-vs-behaviour-and-what-to-mock.md](references/state-vs-behaviour-and-what-to-mock.md) - Load when deciding what to mock, whether to assert on state or calls, or diagnosing over-mocking
 - Read [references/test-structure-and-first.md](references/test-structure-and-first.md) - Load when structuring a test (AAA / Four-Phase), naming it, or checking it against FIRST
-- Read [references/test-smells-and-fixtures.md](references/test-smells-and-fixtures.md) - Load when a test is fragile/obscure/eager/erratic, or when building fixtures with a Builder or Object Mother
+- Read [references/test-smells-and-fixtures.md](references/test-smells-and-fixtures.md) - Load when a test is fragile/obscure/eager/erratic/tautological, or when building fixtures with a Builder or Object Mother

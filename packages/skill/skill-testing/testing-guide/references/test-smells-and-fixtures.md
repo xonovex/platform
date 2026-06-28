@@ -23,6 +23,7 @@ Test smells span what a test _does_ (behaviour smells), how its _code_ reads (co
 - **Eager Test** — it verifies too much at once.
 - **Fragile Test** — it breaks on changes unrelated to what it checks.
 - **Erratic Test** — it passes or fails non-deterministically.
+- **Tautological Test** — it passes no matter what the code does; nothing in it can fail.
 
 ## Obscure Test and Mystery Guest
 
@@ -46,6 +47,17 @@ A Fragile Test that breaks on every honest refactor is often reporting coupling 
 ## Erratic Test
 
 An **Erratic Test** gives different results across runs with no code change — a flaky test. Causes are non-determinism the test failed to control: the wall clock, random seeds, time zones, uncontrolled concurrency, network, or order-dependence on another test's leftover state. It violates FIRST's Repeatable and Independent. Fix it by injecting a fixed clock and seed, doubling external seams, and ensuring no shared mutable fixture leaks between tests.
+
+## Tautological Test
+
+## Tautological Test
+
+A **Tautological Test** is green for the wrong reason: nothing it asserts can fail, so it certifies nothing. The tell: you cannot name an input or code change that would make it red. It usually appears in two forms:
+
+- **Scope mismatch**: the assertion is narrower than the rule. For example, an architecture test checks only direct imports while the forbidden dependency is reached transitively.
+- **After-the-fact baseline**: a golden or characterization test is generated from already-changed code. It may prevent future drift, but it did not prove the change preserved behavior.
+
+Fix it by first naming the concrete input or change that must fail the test, then aligning the assertion with the rule: check transitive reachability when the rule is transitive; capture golden baselines before the change, or verify the change with pre-existing assertions.
 
 ## How smells cause other smells
 

@@ -3,7 +3,7 @@ type: plan
 has_subplans: false
 parent_plan: plans/agent-orthogonal-axis-reorg.md
 parallel_group: 3
-status: pending
+status: complete
 dependencies:
   plans: [02-cli-isolation-provision-network.md, 03-cli-workspace-terminal.md]
   files:
@@ -13,11 +13,32 @@ dependencies:
     - packages/agent/agent-cli-go/test/integration/run_test.go
 skills_to_consult: [microkernel-pattern-guide, connascence-guide, general-fp-guide, moon-guide]
 validation:
-  type_check: pending
-  lint: pending
-  build: pending
-  tests: pending
-  integration: pending
+  type_check: pass
+  lint: pass
+  build: pass
+  tests: pass
+  integration: pass
+---
+
+## Status (complete — Phase-1 CLI build-green gate)
+
+`run.go` slimmed into per-axis helpers (`resolveProvider`/`setupWorktree`/`provisionInput`/`proxyEnv`)
+with a testable `flags` struct → `resolveAxes(flags) (resolvedAxes, error)` (named struct replaces the
+positional tuple). Flags renamed/added under the `--<axis>-<type>-<option>` grammar:
+`--host-passthrough` → `--isolation-bwrap-passthrough`, `--egress-allow` → `--network-proxy-egress-allow`,
+new `--isolation-docker-runtime` (emits docker `--runtime`, wiring kernel isolation live, verified by a
+`resolveAxes` capability test). `executor.go` + `buildDirect*` deleted — the no-isolation path routes
+through the `isolation/none` leaf via the port; the terminal+none provider env is built via the shared
+`agentcmd.BuildProviderEnv` (no concrete-leaf import, so the 05 concretes-only guard holds). Config loader
+re-homed to `internal/config`; `go-toml`/`yaml` now CLI-module-only (`go mod tidy` clean). Integration
+help-text test extended with the three new flags and passes against the built binary.
+
+### Deviation
+
+- Kept the single `--require-pinned-toolchain` policy flag (→ `RequirePinnedProvision` +
+  `RequireHostToolsUnreachable`); did not add `--require-kernel-isolation`/`--require-egress-restricted`
+  flags (gold-plating beyond the three per-type wirings; the capabilities are reachable and the engine
+  already enforces them when demanded).
 ---
 
 # CLI cmd slim + per-type flag grammar

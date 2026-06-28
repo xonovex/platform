@@ -3,7 +3,7 @@ type: plan
 has_subplans: false
 parent_plan: plans/agent-orthogonal-axis-reorg.md
 parallel_group: 2
-status: pending
+status: complete
 dependencies:
   plans: [01-shared-per-axis-split.md]
   files:
@@ -20,11 +20,35 @@ skills_to_consult:
   - general-fp-guide
   - moon-guide
 validation:
-  type_check: pending
-  lint: pending
-  build: pending
-  tests: pending
-  integration: pending
+  type_check: pass
+  lint: pass
+  build: pass
+  tests: pass
+  integration: pass
+---
+
+## Status (complete — landed with 03/04/05 as Phase-1 CLI)
+
+`internal/{isolation,provision,network}` fanned out with `shared/` cores + bare leaves;
+`SandboxConfig` replaced CLI-side by `isolation/shared.RunConfig` + per-leaf knobs; `sandboxutil`
+dissolved (`SpawnSandbox`/`WrapWithInitCommands` → `isolation/shared`; per-isolator network
+emitters → `isolation/{bwrap,docker}/network.go` bridges depending on `network/shared` one-way);
+`nixprov` → `provision/nix` (shared engine aliased `sharednix`); registry/select retargeted to
+`pkg/policy`; `plugins.go` the sole concrete importer with lazy `func()` factories. `--isolation-docker-runtime`
+now emits docker `--runtime` (kernel isolation live). All `agent-cli-go` moon tasks green.
+
+### Deviations from the written sketch (behavior-preserving)
+
+- **Network leaves**: created `network/{shared,proxy}` only — `host`/`none` carry no per-type data,
+  so per the orthogonal-guide's over-factoring caution there is no empty `host`/`none` leaf; the
+  closed-enum asymmetry is documented in `network/shared`. The `Mode` enum aliases shared `pkg/network`
+  (one owner), not a CLI redefinition.
+- **Isolator port** kept its `(int, error)` return and per-leaf `New…` constructors (not the sketch's
+  `int`-only signature) to avoid a behavior change.
+- **`agentcmd` call sites**: threaded `Agent`/`Provider`/`AgentArgs` from `RunConfig` (the 01 data-coupled
+  signature), as flagged in Task 5.
+- **Egress allowlist** is now plumbed (`network/proxy.Options` → `SANDBOX_EGRESS_ALLOW` env) rather than
+  dead, but full enforcement still requires the out-of-scope host proxy integration.
 ---
 
 # CLI Isolation/Provision/Network Axis Fan-Out
@@ -86,6 +110,12 @@ Fan the overloaded `internal/sandbox` tree out into three orthogonal axes — `i
    package docker
    type Options struct { Image, Runtime string; Pids int64; Memory string } // value type, no methods that mutate
    ```
+
+   **`agentcmd` call-site update (from 01).** Subplan 01 weakened
+   `agentcmd.BuildAgentCommand`/`BuildProviderEnv` from `*types.SandboxConfig` to explicit
+   `(*types.AgentConfig, *types.ModelProvider, agentArgs, …)` (data coupling, since the god-struct
+   is gone). The bwrap/docker leaves are the only callers; thread `Agent`/`Provider`/`AgentArgs`
+   from the resolved `Request`/exec context — they are NOT part of any per-type `Options` struct.
 
 6. **Slim `internal/sandbox/registry.go`.** Strip the docker-shaped `Image`/`Runtime` out of `Request` into `isolation/docker.Options`; keep `Select` building `Capabilities` and calling shared `pkg/policy.EnforcePolicy` unchanged (it still names no concrete variant):
 
