@@ -1,5 +1,16 @@
 # @xonovex/agent-cli-go
 
+## 0.1.31
+
+### Patch Changes
+
+- [`ec791d7`](https://github.com/xonovex/platform/commit/ec791d7511bb05ab27eba0ad3c2140d3a1fe81bb) [@Deorder](https://github.com/Deorder)! - track CLI and shared-lib Go sources in each platform binary's build-cache inputs so a release recompiles the binary instead of republishing a stale cached one (#31)
+- Updated dependency `@xonovex/agent-cli-go-linux-arm64` to `0.1.31`
+- Updated dependency `@xonovex/agent-cli-go-linux-x64` to `0.1.31`
+- Updated dependency `@xonovex/agent-cli-go-darwin-arm64` to `0.1.31`
+- Updated dependency `@xonovex/agent-cli-go-darwin-x64` to `0.1.31`
+- Updated dependency `@xonovex/agent-cli-go-win32-x64` to `0.1.31`
+
 ## 0.1.30
 
 ### Patch Changes
