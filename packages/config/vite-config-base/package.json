@@ -37,7 +37,7 @@
     }
   },
   "dependencies": {
-    "@tailwindcss/vite": "4.3.1",
+    "@tailwindcss/vite": "4.3.2",
     "@xonovex/eslint-config-base": "0.1.22",
     "@xonovex/ts-config-build": "0.1.22"
   },
