@@ -42,14 +42,14 @@
     "@xonovex/eslint-config-cli": "0.1.22",
     "@xonovex/ts-config-cli": "0.1.22",
     "@xonovex/vitest-config-node": "0.1.22",
-    "@types/node": "^25.9.3",
-    "@vitest/coverage-v8": "^4.1.8",
-    "eslint": "^10.5.0",
+    "@types/node": "^26.0.1",
+    "@vitest/coverage-v8": "^4.1.9",
+    "eslint": "^10.6.0",
     "jiti": "^2.7.0",
-    "prettier": "^3.8.4",
+    "prettier": "^3.9.4",
     "tsx": "^4.22.4",
     "typescript": "6.0.3",
-    "vitest": "^4.1.8"
+    "vitest": "^4.1.9"
   },
   "keywords": [
     "xonovex",
