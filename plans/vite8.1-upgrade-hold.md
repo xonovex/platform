@@ -40,13 +40,24 @@ same test passes (verified: `shared-core` `logging.test.ts`, 14/14).
 
 ## How to tell the fix has shipped
 
-1. A Vite release **newer than 8.1.1** exists containing PR #21932
-   (`npm view vite version`; confirm via changelog / the PR's merged tag).
-2. Smoke test before committing the bump:
-   ```bash
-   cd packages/shared/shared-core
-   npx vitest run src/logging.test.ts   # must pass, no "Tsconfig not found"
-   ```
+The smoke test is the **only** reliable signal. Version-number heuristics
+don't work: 8.1.3 shipped with a rolldown bump (1.1.2) and still fails, so
+"a release newer than 8.1.1 containing PR #21932" is not sufficient.
+
+Install the candidate without touching package.json/lockfile, test, restore:
+
+```bash
+npm install --no-save vite@latest
+cd packages/shared/shared-core
+npx vitest run src/logging.test.ts   # must pass, no "Tsconfig not found"
+cd ../../.. && npm install           # restore 8.0.16 from the lockfile
+```
+
+## Verification log
+
+- 2026-07-02: `vite@8.1.3` — still broken; same
+  `Tsconfig not found .../packages/agent/agent-cli` failure. Restored to
+  `8.0.16`, `logging.test.ts` 14/14 green.
 
 ## When fixed — steps to complete the upgrade
 
