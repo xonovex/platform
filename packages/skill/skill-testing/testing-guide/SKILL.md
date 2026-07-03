@@ -28,21 +28,21 @@ How to structure, name, populate, and verify one test — and how to pick the ri
 
 ## Example
 
-```
+```ts
 // Arrange — one Dummy, one Stub, one Spy, one Mock, one Fake
-const auditId   = "ignored";                       // Dummy: fills the signature, never read
-const fares     = stubFare({ cityCenter: 1250 });  // Stub: canned answer (Responder)
-const receipts  = spyReceipts();                   // Spy: records each send(...)
-const gateway   = mockGateway().expect("charge", 1250, "EUR"); // Mock: command expectation
-const cards     = inMemoryCardStore();             // Fake: real but shortcut storage
+const auditId = "ignored"; // Dummy: fills the signature, never read
+const fares = stubFare({cityCenter: 1250}); // Stub: canned answer (Responder)
+const receipts = spyReceipts(); // Spy: records each send(...)
+const gateway = mockGateway().expect("charge", 1250, "EUR"); // Mock: command expectation
+const cards = inMemoryCardStore(); // Fake: real but shortcut storage
 
 // Act — exactly one action
 const confirmation = chargeRide(trip, gateway, receipts, fares, cards, auditId);
 
 // Assert — state first, then the one behaviour expectation
-expect(confirmation.status).toBe("paid");          // state verification
-expect(receipts.sent).toHaveLength(1);             // spy: outcome, not call order
-gateway.verify();                                  // behaviour verification of the command
+expect(confirmation.status).toBe("paid"); // state verification
+expect(receipts.sent).toHaveLength(1); // spy: outcome, not call order
+gateway.verify(); // behaviour verification of the command
 ```
 
 ## Progressive Disclosure

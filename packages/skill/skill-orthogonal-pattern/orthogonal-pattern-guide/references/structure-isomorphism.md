@@ -2,6 +2,17 @@
 
 The directory tree is the diagram. Make it isomorphic to the conceptual model so that reading the tree reveals the variation points and their variants with no external map. This is the screaming-architecture test: the structure should scream the domain, not the framework or the layer it sits in.
 
+## Contents
+
+- [Package by variation point, not by layer](#package-by-variation-point-not-by-layer)
+- [Ports and adapters](#ports-and-adapters)
+- [One composition root](#one-composition-root)
+- [Stable abstract core, unstable concrete leaves](#stable-abstract-core-unstable-concrete-leaves)
+- [The cross-product is a feature model](#the-cross-product-is-a-feature-model)
+- [Some concerns live at no node](#some-concerns-live-at-no-node)
+- [One owner per variation point](#one-owner-per-variation-point)
+- [The tree as documentation](#the-tree-as-documentation)
+
 ## Package by variation point, not by layer
 
 - **Top dir per variation point** — name each directory for a variation point (= axis): one design decision likely to change, with one reason to change. A newcomer reads the dirs and recovers the model. See [finding-axes.md](finding-axes.md) for picking them.

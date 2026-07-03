@@ -37,7 +37,7 @@ Decompose a system into **variation points** — orthogonal **axes**, each a des
 
 ## Example
 
-```
+```text
 BAD  internal/export/s3uploader/          # s3 sink misfiled under export, tool-named leaf
      internal/exportutil/                 # axis utils homeless, sibling to the axis instead of inside it
      internal/export/{json,s3,gzip}       # 'export' names a mechanism, not the axis; mixes format + sink + compression

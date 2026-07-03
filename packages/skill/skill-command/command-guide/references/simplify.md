@@ -2,6 +2,17 @@
 
 Reduce verbosity in a prompt file while preserving all functional content. Removes duplication, simplifies examples, makes content generic for cross-project use.
 
+## Contents
+
+- [Goal](#goal)
+- [Arguments](#arguments)
+- [Core Workflow](#core-workflow)
+- [Simplification Rules](#simplification-rules)
+- [Implementation Details](#implementation-details)
+- [Error Handling](#error-handling)
+- [Safety](#safety)
+- [Gotchas](#gotchas)
+
 ## Goal
 
 - Reduce file length by 40-60% while maintaining full functionality

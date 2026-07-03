@@ -1,5 +1,12 @@
 # server-components: React Server Components & Actions
 
+## Contents
+
+- [Guideline](#guideline)
+- [Rationale](#rationale)
+- [Example](#example)
+- [Techniques](#techniques)
+
 ## Guideline
 
 Use Server Components by default for data fetching and static UI; add `'use client'` only for interactivity.

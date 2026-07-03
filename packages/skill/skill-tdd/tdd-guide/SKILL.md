@@ -27,7 +27,7 @@ Drive production code from a failing test, one small step at a time: red (write 
 
 ## Example
 
-```
+```text
 Test list (shopping-cart total):
 [ ] empty cart totals 0
 [ ] one line item totals its price

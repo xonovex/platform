@@ -1,6 +1,6 @@
 ---
 name: connascence-guide
-description: "Use when grading or loosening the coupling between two pieces of code, or judging how cohesive a module is. Triggers on connascence, coupling vs cohesion, 'too tightly coupled', decouple/loosen, the coupling ladder (content/common/control/stamp/data), the cohesion ladder, Law of Demeter / train wrecks like a.b().c(), positional vs named parameters, or reviewing a module boundary for coupling strength — even when the user only says 'tightly coupled'."
+description: "Use when grading or loosening the coupling between two pieces of code, or judging how cohesive a module is. Triggers on connascence, coupling vs cohesion, 'too tightly coupled', decouple/loosen, the coupling ladder (content/common/control/stamp/data), the cohesion ladder, Law of Demeter / train wrecks like a.b().c(), positional vs named parameters, or reviewing a module boundary for coupling strength — even when the user doesn't say 'connascence' and only says 'tightly coupled'."
 ---
 
 # Connascence: a Precise Coupling Vocabulary
@@ -25,7 +25,7 @@ Grade a seam by naming its worst coupling and its strongest connascence, then we
 
 ## Example
 
-```
+```text
 SEAM   a billing function reaches into an Order's private `total` field
 GRADE  content coupling (reaches internals) + connascence of meaning across a boundary
 FIX    Order exposes a neutral `amountDue()` value (rule of degree → data coupling);

@@ -4,6 +4,18 @@ At every variation point, separate what all variants share from what each one va
 
 A variation point (axis) is a design decision likely to change; a variant (leaf) is one value of it. The component-cohesion principles below name _why_ the split lands where it does.
 
+## Contents
+
+- [Split each variation point into core and variants](#split-each-variation-point-into-core-and-variants)
+- [Name the principles: CCP, CRP, REP](#name-the-principles-ccp-crp-rep)
+- [Where shared code lives](#where-shared-code-lives)
+- [Keep `shared/` lean](#keep-shared-lean)
+- [Deep, not shallow: the quality bar](#deep-not-shallow-the-quality-bar)
+- [Give every variation point explicit rationale](#give-every-variation-point-explicit-rationale)
+- [Treat all variants symmetrically](#treat-all-variants-symmetrically)
+- [Share at every level of the fan-out](#share-at-every-level-of-the-fan-out)
+- [Don't multiply variants across variation points](#dont-multiply-variants-across-variation-points)
+
 ## Split each variation point into core and variants
 
 - **Shared = interface + types + policy** — the commonality is everything all variants need to stay interchangeable: the port they implement, the data types they exchange, and the policy/validation that holds for every one. Put it once at the node.

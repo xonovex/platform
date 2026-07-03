@@ -1,6 +1,6 @@
 ---
 name: bdd-guide
-description: "Use when driving software from concrete agreed examples of behaviour — running three-amigos discovery and example mapping before coding, formulating Given-When-Then scenarios in feature files, and treating them as living documentation that tests the team their shared understanding. ATDD and BDD are one practice here. Triggers on BDD, ATDD, Gherkin, Given-When-Then, Cucumber, feature file, scenario / scenario outline, three amigos, example mapping, specification by example, living documentation, acceptance-test-driven — even when the user doesn not say 'BDD'."
+description: "Use when driving software from concrete agreed examples of behaviour — running three-amigos discovery and example mapping before coding, formulating Given-When-Then scenarios in feature files, and treating them as living documentation that tests the team their shared understanding. ATDD and BDD are one practice here. Triggers on BDD, ATDD, Gherkin, Given-When-Then, Cucumber, feature file, scenario / scenario outline, three amigos, example mapping, specification by example, living documentation, acceptance-test-driven — even when the user doesn't say 'BDD'."
 ---
 
 # Behaviour- and Acceptance-Driven Development
@@ -43,4 +43,4 @@ Feature: Assign the best nearby taxi
 - Read [references/gherkin-reference.md](references/gherkin-reference.md) - Load when writing or reviewing feature files: keyword meanings, file structure, declarative vs imperative steps.
 - Read [references/discovery-three-amigos.md](references/discovery-three-amigos.md) - Load when running discovery: the three perspectives, the workshop, and example-mapping card colours.
 - Read [references/specification-by-example.md](references/specification-by-example.md) - Load when establishing the process: the seven patterns, specs-as-tests, and trustworthy living documentation.
-- Read [references/appendix-discovery.md](references/appendix-discovery.md) - Load for the underlying framing: testing understanding, scenarios-per-rule, stubbing externals, right-code vs code-right.
+- Read [references/appendix-discovery.md](references/appendix-discovery.md) - Load when you need the underlying framing: testing understanding, scenarios-per-rule, stubbing externals, right-code vs code-right.

@@ -2,6 +2,20 @@
 
 Modularity is a property of the code's dependency edges, not of the directory tree. A folder only labels a boundary the interfaces already enforce; move folders without narrowing interfaces and you have changed nothing.
 
+## Contents
+
+- [Code first, directories second](#code-first-directories-second)
+- [Map the rules onto the coupling ladder](#map-the-rules-onto-the-coupling-ladder)
+- [Depend on the abstraction, not the implementation](#depend-on-the-abstraction-not-the-implementation)
+- [The Dependency Rule and the leak test](#the-dependency-rule-and-the-leak-test)
+- [Narrow, single-purpose ports](#narrow-single-purpose-ports)
+- [Pass data across seams, don't call into internals](#pass-data-across-seams-dont-call-into-internals)
+- [Explicit state, no globals](#explicit-state-no-globals)
+- [Direct dependencies, no re-export shims](#direct-dependencies-no-re-export-shims)
+- [Small, focused files](#small-focused-files)
+- [False modularity is a distributed monolith](#false-modularity-is-a-distributed-monolith)
+- [Testability is the proof of modularity](#testability-is-the-proof-of-modularity)
+
 ## Code first, directories second
 
 - **A variant is a narrow public surface over hidden internals** — the boundary is real only when the exported surface is small and the rest is unreachable. The directory reflects that boundary; it does not create it.

@@ -1,5 +1,17 @@
 # labelling: Screen-reader labelling & non-text content
 
+## Contents
+
+- [Guideline](#guideline)
+- [Rationale](#rationale)
+- [How to Apply](#how-to-apply)
+- [Example](#example)
+- [Counter-Example (deliberate hide idiom)](#counter-example-deliberate-hide-idiom)
+- [Counter-Example (spell codes out for text-to-speech)](#counter-example-spell-codes-out-for-text-to-speech)
+- [Counter-Example (when `null` is wrong)](#counter-example-when-null-is-wrong)
+- [Carry the spoken label as data, build it where it is testable](#carry-the-spoken-label-as-data-build-it-where-it-is-testable)
+- [Counter-examples to avoid](#counter-examples-to-avoid)
+
 ## Guideline
 
 Every meaningful graphic carries a localized text alternative, every decorative graphic is silenced, and every composite control exposes exactly one focusable node with one label and one role to TalkBack.

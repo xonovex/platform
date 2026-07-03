@@ -28,7 +28,7 @@ Find the boundaries in a domain, name everything inside them rigorously, and mod
 
 ## Example
 
-```
+```text
 Bounded context: Ordering
   Ubiquitous language: Customer, Order, OrderLine, place, fulfil
   Aggregate Order (root)

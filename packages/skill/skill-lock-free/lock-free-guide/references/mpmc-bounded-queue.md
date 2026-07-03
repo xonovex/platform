@@ -1,5 +1,15 @@
 # mpmc-bounded-queue: Bounded MPMC Queue
 
+## Contents
+
+- [Guideline](#guideline)
+- [Rationale](#rationale)
+- [How it works](#how-it-works)
+- [Example](#example)
+- [Why it's fast and ABA-free](#why-its-fast-and-aba-free)
+- [Gotchas](#gotchas)
+- [Related](#related)
+
 ## Guideline
 
 For the general multi-producer/multi-consumer case, use a bounded queue: a power-of-two array of cells, each carrying its own sequence number, with a CAS on the position counter to claim a slot. It is fast, ABA-free, and needs no node allocation or reclamation.

@@ -1,6 +1,6 @@
 ---
 name: fdd-guide
-description: "Use when running Feature-Driven Development its process scaffolding — the five processes (Develop an Overall Model, Build a Features List, Plan by Feature, Design by Feature, Build by Feature), naming features as '<action> the <result> by/for/of/to a(n) <object>', decomposing into feature sets and major feature sets, tracking the six weighted build milestones, and organising Chief Architect / Chief Programmer / Class Owner roles and per-feature-set teams. Triggers on FDD, feature-driven development, feature list, design by feature, build by feature, feature-naming template, milestone percent-complete, class owner, chief programmer — even when the user doesn not say 'FDD'."
+description: "Use when running Feature-Driven Development's process scaffolding — the five processes (Develop an Overall Model, Build a Features List, Plan by Feature, Design by Feature, Build by Feature), naming features with the action-result-object template, decomposing into feature sets and major feature sets, tracking the six weighted build milestones, and organising Chief Architect / Chief Programmer / Class Owner roles and per-feature-set teams. Triggers on FDD, feature-driven development, feature list, design by feature, build by feature, feature-naming template, milestone percent-complete, class owner, chief programmer — even when the user doesn't say 'FDD'."
 ---
 
 # Feature-Driven Development
@@ -27,7 +27,7 @@ FDD is a model-driven, short-iteration delivery rhythm built from five processes
 
 ## Example
 
-```
+```text
 Major feature set: Order Management
   Feature set: Processing an order
     Feature: Calculate the total of an order
