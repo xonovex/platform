@@ -1,5 +1,5 @@
 ---
-description: Update a plan document with the latest implementation status and test results
+description: "Execution: update a plan document with the latest implementation status and test results"
 allowed-tools:
   - Read
   - Edit
@@ -12,6 +12,8 @@ argument-hint: "[document-path] [--dry-run]"
 ---
 
 # /xonovex-workflow:plan-update — Update Plan Progress
+
+> Lifecycle: research → decide → create → revise ⇄ critique → subplans-create → continue → **update** → validate
 
 ## Arguments
 

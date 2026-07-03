@@ -1,5 +1,5 @@
 ---
-description: Research codebase and web for requirements without creating a plan
+description: "Pre-plan: research codebase and web for requirements without creating a plan"
 allowed-tools:
   - Read
   - Bash
@@ -16,6 +16,8 @@ argument-hint: "<requirements> [--interactive] [--save-to <file>]"
 ---
 
 # /xonovex-workflow:plan-research — Research Codebase and Web
+
+> Lifecycle: **research** → decide → create → revise ⇄ critique → subplans-create → continue → update → validate
 
 ## Arguments
 

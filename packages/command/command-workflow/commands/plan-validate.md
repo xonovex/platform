@@ -1,5 +1,5 @@
 ---
-description: Verify that a plan or current work has been fully achieved
+description: "Execution: verify that a plan or current work has been fully achieved"
 allowed-tools:
   - Bash
   - Read
@@ -14,6 +14,8 @@ argument-hint: "[plan-file] [--detailed]"
 ---
 
 # /xonovex-workflow:plan-validate — Validate Plan Achievement
+
+> Lifecycle: research → decide → create → revise ⇄ critique → subplans-create → continue → update → **validate**
 
 ## Arguments
 

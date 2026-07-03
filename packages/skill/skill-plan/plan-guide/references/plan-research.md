@@ -1,6 +1,6 @@
 # plan-research: Research Codebase and Web for Requirements
 
-Research codebase and web for requirements; present findings for review. Does **not** create plans — run `plan-clarify` afterward to settle open decisions one by one, then `plan-create` to author one.
+Research codebase and web for requirements; present findings for review. Does **not** create plans — run `plan-decide` afterward to settle open decisions one by one, then `plan-create` to author one.
 
 ## Goal
 
@@ -20,11 +20,11 @@ Research codebase and web for requirements; present findings for review. Does **
    - Testing / build patterns, applicable coding guidelines
 3. **Web research** — search for latest versions; fetch official docs
 4. **Synthesize** — combine codebase + web research
-5. **Present or save** — display findings or save to a file; when findings contain open decisions (ambiguities, contradictions, unsettled trade-offs), say so and recommend `plan-clarify`
+5. **Present or save** — display findings or save to a file; when findings contain open decisions (ambiguities, contradictions, unsettled trade-offs), say so and recommend `plan-decide`
 
 ## Code-quality audits
 
-When the request is an inward code-quality audit rather than forward / web research — hardening (type safety, validation, error handling, logging), simplification (duplicates, dead code, unused dependencies, over-abstraction), or alignment / consistency between two implementations — load the **code-quality-guide** skill and apply its matching dimension, producing the same read-only report grouped by category and graded by severity (no edits, no plan). Then continue with `plan-clarify` / `plan-create` as usual.
+When the request is an inward code-quality audit rather than forward / web research — hardening (type safety, validation, error handling, logging), simplification (duplicates, dead code, unused dependencies, over-abstraction), or alignment / consistency between two implementations — load the **code-quality-guide** skill and apply its matching dimension, producing the same read-only report grouped by category and graded by severity (no edits, no plan). Then continue with `plan-decide` / `plan-create` as usual.
 
 ## Implementation Details
 

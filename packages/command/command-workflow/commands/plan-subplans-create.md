@@ -1,7 +1,5 @@
 ---
-description: >-
-  Generate detailed subplans from an approved parent plan with parallel
-  execution detection
+description: "Execution: expand an approved parent plan into detailed subplans with parallel-group detection"
 allowed-tools:
   - Write
   - Read
@@ -14,6 +12,8 @@ argument-hint: "[parent-plan-file] [--by-phase] [--dry-run]"
 ---
 
 # /xonovex-workflow:plan-subplans-create — Generate Detailed Subplans from Parent Plan
+
+> Lifecycle: research → decide → create → revise ⇄ critique → **subplans-create** → continue → update → validate
 
 ## Arguments
 

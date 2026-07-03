@@ -1,5 +1,5 @@
 ---
-description: Resume work from an existing plan document with full context loading
+description: "Execution: resume work from an existing plan document with full context loading"
 allowed-tools:
   - Read
   - Write
@@ -16,6 +16,8 @@ argument-hint: "[document-path]"
 ---
 
 # /xonovex-workflow:plan-continue — Continue Progress from Plan
+
+> Lifecycle: research → decide → create → revise ⇄ critique → subplans-create → **continue** → update → validate
 
 ## Arguments
 

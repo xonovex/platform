@@ -1,7 +1,5 @@
 ---
-description: >-
-  Create a high-level plan with research for user review before detailed
-  subplans
+description: "Draft: create a high-level plan from research for user review before detailed subplans"
 allowed-tools:
   - Write
   - Read
@@ -15,6 +13,8 @@ argument-hint: "[spec-file-or-requirements] [--interactive] [--depends-on <plan>
 ---
 
 # /xonovex-workflow:plan-create — Create Plan with Research
+
+> Lifecycle: research → decide → **create** → revise ⇄ critique → subplans-create → continue → update → validate
 
 ## Arguments
 

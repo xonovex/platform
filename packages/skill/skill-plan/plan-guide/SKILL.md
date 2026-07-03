@@ -1,11 +1,11 @@
 ---
 name: plan-guide
-description: "Use when scoping, researching, interrogating, planning, clarifying, refining, critiquing, continuing, updating, or validating a feature, refactor, or analysis task — covers the whole plan-document lifecycle plus codebase research (alignment, hardening, simplification, template extraction, TODO scanning, shared-library design). Triggers on prompts about planning, designing, scoping, breaking down, architecting, interrogating requirements, stress-testing / critiquing a plan, code analysis / cleanup / hardening / alignment, even when the user doesn't say 'plan'."
+description: "Use when scoping, researching, deciding, planning, revising, critiquing, continuing, updating, or validating a feature, refactor, or analysis task — covers the whole plan-document lifecycle plus codebase research (alignment, hardening, simplification, template extraction, TODO scanning, shared-library design). Triggers on prompts about planning, designing, scoping, breaking down, architecting, settling or interrogating requirements and decisions, stress-testing / critiquing a plan, code analysis / cleanup / hardening / alignment, even when the user doesn't say 'plan'."
 ---
 
 # Planning & Code-Research Guidelines
 
-Author and maintain plan documents across their full lifecycle (research → interrogate → clarify → create → refine → critique → subplans → continue → update → validate) and run code-research operations (align, harden, simplify, template extraction, etc.) that feed into those plans.
+Author and maintain plan documents across their full lifecycle (research → decide → create → revise ⇄ critique → subplans → continue → update → validate) and run code-research operations (align, harden, simplify, template extraction, etc.) that feed into those plans.
 
 ## Core Principles
 
@@ -30,15 +30,14 @@ Author and maintain plan documents across their full lifecycle (research → int
 ## Plan Lifecycle
 
 1. **Research** — `plan-research` for general; for a code-quality audit (hardening / simplification / alignment) it applies the **code-quality-guide** dimensions and reports findings
-2. **Interrogate** — `plan-interrogate` surfaces unknown decisions by walking the design tree one question at a time (codebase-aware), upstream of clarify
-3. **Clarify** — `plan-clarify` walks known open decisions one by one in plain prose (after research, or after create to settle direction)
-4. **Create** — `plan-create` authors the parent plan; test-first plans apply **tdd-guide** (or **bdd-guide** for acceptance-first)
-5. **Refine** — `plan-refine` processes user feedback (annotations + prompt instructions)
-6. **Critique** — `plan-critique` adversarially stress-tests the plan (red-team / pre-mortem), feeding findings back into refine
-7. **Expand** — `plan-subplans-create` generates detailed child plans
-8. **Execute** — `plan-continue` works through subplans one at a time
-9. **Update** — `plan-update` refreshes status / phase / validation results
-10. **Validate** — `plan-validate` confirms success criteria are met (read-only)
+2. **Decide** — `plan-decide` settles decisions one at a time: walks known open decisions as prose briefs, or discovers unknown ones by questioning the user down the design tree (codebase-aware) when nothing is queued
+3. **Create** — `plan-create` authors the parent plan; test-first plans apply **tdd-guide** (or **bdd-guide** for acceptance-first)
+4. **Revise** — `plan-revise` applies user feedback to the plan document (annotations + prompt instructions); `--final` marks it approved
+5. **Critique** — `plan-critique` adversarially stress-tests the plan (red-team / pre-mortem), feeding findings back into revise
+6. **Expand** — `plan-subplans-create` generates detailed child plans
+7. **Execute** — `plan-continue` works through subplans one at a time
+8. **Update** — `plan-update` refreshes status / phase / validation results
+9. **Validate** — `plan-validate` confirms success criteria are met (read-only)
 
 ## Code-Research Operations
 
@@ -53,10 +52,9 @@ Author and maintain plan documents across their full lifecycle (research → int
 ## Plan Operations
 
 - **Research** the codebase + web — see [references/plan-research.md](references/plan-research.md)
-- **Interrogate** to surface unknown decisions — see [references/plan-interrogate.md](references/plan-interrogate.md)
-- **Clarify** known open decisions one by one — see [references/plan-clarify.md](references/plan-clarify.md)
+- **Decide** — settle decisions one at a time (walk known / discover unknown) — see [references/plan-decide.md](references/plan-decide.md)
 - **Create** a plan with research — see [references/plan-create.md](references/plan-create.md)
-- **Refine** from feedback (annotations / prompt) — see [references/plan-refine.md](references/plan-refine.md)
+- **Revise** from feedback (annotations / prompt) — see [references/plan-revise.md](references/plan-revise.md)
 - **Critique** the plan adversarially — see [references/plan-critique.md](references/plan-critique.md)
 - **Generate subplans** from an approved parent — see [references/plan-subplans-create.md](references/plan-subplans-create.md)
 - **Continue** work from an existing plan — see [references/plan-continue.md](references/plan-continue.md)
@@ -77,10 +75,9 @@ Author and maintain plan documents across their full lifecycle (research → int
 
 ### Plan lifecycle
 
-- Read [references/plan-interrogate.md](references/plan-interrogate.md) - Load when interrogating the user to surface unknown decisions before a plan exists, one question at a time, exploring the codebase to self-answer
-- Read [references/plan-clarify.md](references/plan-clarify.md) - Load when walking the user through known open decisions one at a time, in plain prose, after research or plan creation
+- Read [references/plan-decide.md](references/plan-decide.md) - Load when settling decisions one at a time — walking known open decisions as prose briefs, or discovering unknown ones by questioning the user, before or after a plan exists
 - Read [references/plan-create.md](references/plan-create.md) - Load when authoring a high-level plan from research (test-first plans route to **tdd-guide** / **bdd-guide**)
-- Read [references/plan-refine.md](references/plan-refine.md) - Load when iterating on a plan from inline annotations and/or prompt feedback
+- Read [references/plan-revise.md](references/plan-revise.md) - Load when applying inline annotations and/or prompt feedback to a plan document
 - Read [references/plan-critique.md](references/plan-critique.md) - Load when adversarially stress-testing a plan to expose weaknesses (red-team / pre-mortem / falsify / steelman), read-only
 - Read [references/plan-subplans-create.md](references/plan-subplans-create.md) - Load when expanding an approved plan into detailed parallelizable subplans
 - Read [references/plan-continue.md](references/plan-continue.md) - Load when resuming implementation work from an existing plan

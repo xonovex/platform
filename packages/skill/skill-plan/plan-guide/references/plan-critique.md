@@ -1,6 +1,6 @@
 # plan-critique: Adversarially Stress-Test a Plan
 
-Attack an existing plan to expose its weaknesses before any code is written — flawed assumptions, failure modes, missing cases, unmanaged risks. Read-only: produces a findings report for `plan-refine` to act on; never edits the plan or the codebase.
+Attack an existing plan to expose its weaknesses before any code is written — flawed assumptions, failure modes, missing cases, unmanaged risks. Read-only: produces a findings report for `plan-revise` to act on; never edits the plan or the codebase.
 
 ## Critique vs Validate
 
@@ -26,7 +26,7 @@ Run one or more adversarial lenses (default: red-team + pre-mortem):
 3. **Run each selected mode** — produce concrete findings, not vague worries
 4. **Rate each finding** — severity (blocking / major / minor) and confidence; a finding without a severity can't be triaged
 5. **Tie findings to the plan** — name the section / decision / subplan each one attacks
-6. **Report** — grouped by mode, severity-ordered, each with the weakness, why it bites, and a suggested direction; STOP (feeds `plan-refine`)
+6. **Report** — grouped by mode, severity-ordered, each with the weakness, why it bites, and a suggested direction; STOP (feeds `plan-revise`)
 
 ## Finding Format
 
@@ -47,7 +47,7 @@ Critique: 6 findings (2 blocking, 3 major, 1 minor)
 [pre-mortem] major    — no migration path for existing rows
   Where: Schema change · Why: deploy breaks reads mid-rollout · Direction: expand/contract migration
 ...
-Next: plan-refine (resolve blocking + major), then re-run plan-critique
+Next: plan-revise (resolve blocking + major), then re-run plan-critique
 ```
 
 ## Gotchas
@@ -55,5 +55,5 @@ Next: plan-refine (resolve blocking + major), then re-run plan-critique
 - Vague worries ("this might not scale") are noise — every finding names a concrete input, scale, or sequence that breaks it
 - Critiquing a misread of the plan wastes the round — verify each claim against the code before attacking it
 - Findings without severity can't be triaged — always rate and order
-- A critique that edits the plan oversteps — it reports; `plan-refine` applies the fixes
+- A critique that edits the plan oversteps — it reports; `plan-revise` applies the fixes
 - Running every mode on a tiny plan is busywork — default to red-team + pre-mortem, escalate to falsify / steelman when the stakes warrant

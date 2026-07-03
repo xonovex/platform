@@ -1,8 +1,5 @@
 ---
-description: >-
-  Adversarially critique an existing plan to expose weaknesses before build —
-  attack assumptions, run a pre-mortem, hunt the disconfirming case, and
-  steelman the weakest part; reports findings for plan-refine to fix
+description: "Draft: adversarially stress-test the written plan before approval; reports findings for plan-revise to fix"
 allowed-tools:
   - Read
   - Glob
@@ -15,6 +12,8 @@ argument-hint: "[plan-file] [--mode red-team|pre-mortem|falsify|steelman|all]"
 ---
 
 # /xonovex-workflow:plan-critique — Adversarially Critique a Plan
+
+> Lifecycle: research → decide → create → revise ⇄ **critique** → subplans-create → continue → update → validate
 
 ## Arguments
 

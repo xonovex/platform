@@ -14,7 +14,7 @@ argument-hint: "[findings-file] [--walk] [--final]"
 
 # /xonovex-workflow:pr-review-refine – Refine Review Findings Before Posting
 
-Resolves feedback on the findings from `/xonovex-workflow:pr-review-analyze` before `/xonovex-workflow:pr-review-post` publishes them — the middle stage of the review pipeline, the analogue of `plan-refine`. It refines whatever findings are in play: the in-session findings from a same-session analyze run (no file needed), or a `findings.json` passed as the argument for a cross-session or hand-edited review.
+Resolves feedback on the findings from `/xonovex-workflow:pr-review-analyze` before `/xonovex-workflow:pr-review-post` publishes them — the middle stage of the review pipeline, the analogue of `plan-revise`. It refines whatever findings are in play: the in-session findings from a same-session analyze run (no file needed), or a `findings.json` passed as the argument for a cross-session or hand-edited review.
 
 ## Arguments
 

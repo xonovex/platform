@@ -1,6 +1,10 @@
-# plan-refine: Refine Plan from User Feedback
+# plan-revise: Revise Plan from User Feedback
 
-Process user feedback on a plan document — from inline annotations in the plan, from instructions in the prompt, or both. Resolve every item, update the plan in place, present the result for review. Repeat until approved.
+Apply user feedback to a plan document — from inline annotations in the plan, from instructions in the prompt, or both. Resolve every item, update the plan in place, present the result for review. Repeat until approved.
+
+## Stage
+
+Draft — a plan document must exist (from `plan-create`). For settling open decisions instead of applying feedback, use `plan-decide`.
 
 ## Prerequisites
 
@@ -30,11 +34,11 @@ Markers the user adds directly in the plan markdown:
 
 ### Prompt instructions
 
-Refinement requests stated in the user's prompt (e.g., "swap manual validation for zod schemas and drop the caching layer"). Each distinct instruction is a feedback item. When the user names a section, scope the change there; otherwise infer affected sections from the plan.
+Revision requests stated in the user's prompt (e.g., "swap manual validation for zod schemas and drop the caching layer"). Each distinct instruction is a feedback item. When the user names a section, scope the change there; otherwise infer affected sections from the plan.
 
 ## Core Workflow
 
-**IMPORTANT: Do NOT switch into a plan-authoring mode. Do NOT implement anything. This command only refines the plan document.**
+**IMPORTANT: Do NOT switch into a plan-authoring mode. Do NOT implement anything. This command only revises the plan document.**
 
 1. **Locate plan** — read from user message, git config, or most recent `plans/*.md`
 2. **Collect feedback** — gather annotations (with line numbers) + parse prompt instructions
@@ -46,7 +50,7 @@ Refinement requests stated in the user's prompt (e.g., "swap manual validation f
    - **Question** ("SSE or WebSockets?") → ask user, then update
    - **Rejection** ("this won't scale — rethink batch processing") → rework with revised approach
    - **Scope change** ("move notifications to follow-up") → move to Future Work, adjust dependents
-5. **Strip annotation markers** — the plan should read cleanly after refining
+5. **Strip annotation markers** — the plan should read cleanly after revising
 6. **Reconcile dependencies** — if changes affected subplan structure, update proposed subplans + execution groups
 7. **Update frontmatter** — `updated` date; final pass: `status: approved`
 8. **Write the updated plan** in place
@@ -85,7 +89,7 @@ Subplan structure: Changed (was 4 subplans, now 3)
 
 ## Gotchas
 
-- Implementing instead of refining is the #1 mistake — this command only edits the plan
+- Implementing instead of revising is the #1 mistake — this command only edits the plan
 - The prompt doesn't automatically beat annotations — conflict resolution requires the user
 - Stripping annotation markers without resolving the underlying intent loses information silently
 - A change that touches a technology choice but isn't propagated through risks / subplans / success criteria leaves the plan internally inconsistent

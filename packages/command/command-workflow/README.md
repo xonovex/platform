@@ -39,7 +39,7 @@ tell you which host skill to add.
 | 1. plan-research    |---->| 1. plan-create      |---->| 1. plan-worktree-   |
 |    - viability      |     | 2. plan-subplans    |     |      create         |
 |    - alternatives   |     | 3. git-commit       |     | 2. cd <worktree>    |
-| 2. plan-clarify     |     |                     |     |                     |
+| 2. plan-decide      |     |                     |     |                     |
 +---------------------+     +---------------------+     +---------------------+
                                                                   |
             +-----------------------------------------------------+
@@ -71,10 +71,9 @@ Learning: reflect-to-instructions / reflect-to-skill fold learnings into guideli
 | Command                 | Description                                                                                |
 | ----------------------- | ------------------------------------------------------------------------------------------ |
 | `plan-research`         | Research codebase + web, or run a read-only code-quality audit (harden / simplify / align) |
-| `plan-interrogate`      | Interrogate to surface unknown decisions before a plan exists                              |
-| `plan-clarify`          | Walk known open decisions one by one in plain prose                                        |
+| `plan-decide`           | Settle decisions one at a time — walk known open ones, or discover them by questioning     |
 | `plan-create`           | Create a high-level plan for user review (test-first plans route to tdd / bdd guides)      |
-| `plan-refine`           | Process user annotations and refine iteratively                                            |
+| `plan-revise`           | Apply annotations and prompt feedback to the plan; `--final` approves                      |
 | `plan-critique`         | Adversarially stress-test a plan to expose weaknesses                                      |
 | `plan-subplans-create`  | Generate detailed subplans with parallel execution detection                               |
 | `plan-worktree-create`  | Create a git worktree for a feature branch                                                 |
