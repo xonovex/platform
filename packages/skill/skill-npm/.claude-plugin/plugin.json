@@ -1,6 +1,6 @@
 {
   "name": "xonovex-skill-npm",
-  "version": "4.0.0",
+  "version": "4.1.0",
   "description": "Xonovex npm publishing skills",
   "author": {"name": "Xonovex"},
   "skills": ["./npm-guide"]

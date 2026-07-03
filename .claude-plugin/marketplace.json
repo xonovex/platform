@@ -3,7 +3,7 @@
   "owner": {"name": "Xonovex"},
   "metadata": {
     "description": "Official Xonovex development tools",
-    "version": "4.0.0"
+    "version": "4.1.0"
   },
   "plugins": [
     {
