@@ -1,0 +1,19 @@
+digraph AgenticMaturityLadder {
+  // Progressive automation: what changes per level, and what never does.
+  rankdir=LR;
+  splines=polyline;
+  node [shape=box, style="rounded,filled", fillcolor=white, fontname="Arial", fontsize=11];
+  edge [fontname="Arial", fontsize=9];
+
+  l0 [label="L0 - Manual (today)\nadvances: human types each command\ngates: human decides inline\nrunner: interactive session", fillcolor="#e6f3ff"];
+  l1 [label="L1 - Assisted\nadvances: workflow-next reads state,\nsuggests or runs the next step in-session\ngates: manual / assisted\nrunner: interactive session", fillcolor="#d9ecff"];
+  l2 [label="L2 - Supervised autonomous\nadvances: headless loop (agent-cli workflow run)\nruns until the next manual gate\ngates: assisted / auto, async approvals\nrunner: sandboxed headless sessions", fillcolor="#cce5ff"];
+  l3 [label="L3 - Cluster autonomous\nadvances: WorkflowRun controller (operator)\ntriggered by humans, schedules, or sensors\ngates: auto + PR approvals + AgentPolicy\nrunner: AgentRun Jobs (ci cluster)", fillcolor="#bfdeff"];
+
+  l0 -> l1 [label="add workflow defs\n+ step result contract"];
+  l1 -> l2 [label="add runner loop\n+ run journal"];
+  l2 -> l3 [label="add WorkflowRun CRD\n+ sensors"];
+
+  invariant [label="Invariant at every level:\nsame commands (steps), same skills, same plan-document state,\nsame gate definitions - only gate policy, runner,\nand who advances the workflow change.", shape=note, fillcolor=lightyellow];
+  invariant -> l0 [style=invis];
+}

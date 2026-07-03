@@ -2,10 +2,32 @@ $schema: https://moonrepo.dev/schemas/project.json
 language: unknown
 tasks:
   graph-build:
+    command: noop
+    deps:
+      - graph-build-workflow
+      - graph-build-target
+      - graph-build-maturity
+  graph-build-workflow:
     command: dot -Tpng -o workflow-diagram.png workflow-diagram.dot
     inputs:
       - workflow-diagram.dot
     outputs:
       - workflow-diagram.png
+    options:
+      cache: true
+  graph-build-target:
+    command: dot -Tpng -o target-architecture.png target-architecture.dot
+    inputs:
+      - target-architecture.dot
+    outputs:
+      - target-architecture.png
+    options:
+      cache: true
+  graph-build-maturity:
+    command: dot -Tpng -o maturity-ladder.png maturity-ladder.dot
+    inputs:
+      - maturity-ladder.dot
+    outputs:
+      - maturity-ladder.png
     options:
       cache: true

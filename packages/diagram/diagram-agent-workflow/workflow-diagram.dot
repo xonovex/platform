@@ -48,6 +48,7 @@ digraph Workflow {
     plan_research [label="plan-research", fillcolor=lightblue];
     plan_research_agent [label="(Agent:\n- Explore codebase\n- Research viability\n- Find alternatives\n- Assess complexity)", shape=ellipse, fillcolor="#ffffcc"];
     research_review [label="Good idea?\n(HITL or AI)", shape=diamond, fillcolor=lightcoral];
+    plan_decide [label="plan-decide\n(settle open decisions\none at a time, optional)", fillcolor=lightblue];
   }
 
   // Planning Phase
@@ -60,6 +61,8 @@ digraph Workflow {
     plan_create [label="plan-create\n(TDD via tdd-guide)", fillcolor=lightblue];
     plan_create_agent [label="(Agent:\n- Explore agents align\n- Create plans/<plan>.md\n- Frontmatter: status, skills,\n  versions, parallelization)", shape=ellipse, fillcolor="#ffffcc"];
     plan_review [label="Review Plan\n(HITL or AI)", shape=diamond, fillcolor=lightcoral];
+    plan_critique [label="plan-critique\n(adversarial stress-test,\noptional)", fillcolor=lightblue];
+    plan_revise [label="plan-revise\n(apply feedback;\n--final approves)", fillcolor=lightblue];
     plan_subplans [label="plan-subplans-create\n(optional)", fillcolor=lightblue];
     plan_subplans_agent [label="(Agent:\n- Create plans/<plan>/<subplans>.md\n- Detect parallel groups\n- Subplans of subplans possible)", shape=ellipse, fillcolor="#ffffcc"];
     git_commit_plans [label="git-commit\n(commit pending plans)", fillcolor=lightblue];
@@ -179,14 +182,18 @@ digraph Workflow {
   // Research flow
   plan_research -> plan_research_agent;
   plan_research_agent -> research_review;
-  research_review -> plan_create [label="Proceed"];
+  research_review -> plan_decide [label="Proceed"];
   research_review -> plan_research [label="Iterate\nresearch", style=dashed];
+  plan_decide -> plan_create;
 
   // Planning flow
   plan_create -> plan_create_agent;
   plan_create_agent -> plan_review;
   plan_review -> plan_subplans [label="Approved"];
-  plan_review -> plan_create [label="Revise", style=dashed];
+  plan_review -> plan_critique [label="Stress-test", style=dashed];
+  plan_critique -> plan_revise [label="findings"];
+  plan_review -> plan_revise [label="Feedback", style=dashed];
+  plan_revise -> plan_review [label="re-review", style=dashed];
   plan_subplans -> plan_subplans_agent;
   plan_subplans_agent -> git_commit_plans;
   git_commit_plans -> plan_worktree_create;
