@@ -23,7 +23,7 @@ Hierarchical task inheritance allows global defaults with project-specific custo
 tasks:
   go-build:
     command: [go, build, ./...]
-    inputs: ['**/*.go', go.mod]
+    inputs: ["**/*.go", go.mod]
 inheritedBy:
   tag: go
 

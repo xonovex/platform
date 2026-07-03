@@ -31,9 +31,7 @@ function Parent() {
 // ✅ useReducer for complex state
 type State = {count: number; step: number};
 type Action =
-  | {type: "increment"}
-  | {type: "decrement"}
-  | {type: "setStep"; step: number};
+  {type: "increment"} | {type: "decrement"} | {type: "setStep"; step: number};
 
 function reducer(state: State, action: Action): State {
   switch (action.type) {
