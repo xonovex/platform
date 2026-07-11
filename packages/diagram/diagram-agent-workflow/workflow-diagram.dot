@@ -62,7 +62,9 @@ digraph Workflow {
     plan_create_agent [label="(Agent:\n- Explore agents align\n- Create plans/<plan>.md\n- Frontmatter: status, skills,\n  versions, parallelization)", shape=ellipse, fillcolor="#ffffcc"];
     plan_review [label="Review Plan\n(HITL or AI)", shape=diamond, fillcolor=lightcoral];
     plan_critique [label="plan-critique\n(adversarial stress-test,\noptional)", fillcolor=lightblue];
-    plan_revise [label="plan-revise\n(apply feedback;\n--final approves)", fillcolor=lightblue];
+    plan_revise [label="plan-revise\n(apply feedback)", fillcolor=lightblue];
+    plan_accept [label="plan-accept\n(set status: approved)", fillcolor=lightblue];
+    plan_reject [label="plan-reject\n(set status: rejected,\nwith reason)", fillcolor=lightblue];
     plan_subplans [label="plan-subplans-create\n(optional)", fillcolor=lightblue];
     plan_subplans_agent [label="(Agent:\n- Create plans/<plan>/<subplans>.md\n- Detect parallel groups\n- Subplans of subplans possible)", shape=ellipse, fillcolor="#ffffcc"];
     git_commit_plans [label="git-commit\n(commit pending plans)", fillcolor=lightblue];
@@ -189,7 +191,10 @@ digraph Workflow {
   // Planning flow
   plan_create -> plan_create_agent;
   plan_create_agent -> plan_review;
-  plan_review -> plan_subplans [label="Approved"];
+  plan_review -> plan_accept [label="Approve"];
+  plan_accept -> plan_subplans;
+  plan_review -> plan_reject [label="Reject", style=dashed];
+  plan_reject -> plan_revise [label="address", style=dashed];
   plan_review -> plan_critique [label="Stress-test", style=dashed];
   plan_critique -> plan_revise [label="findings"];
   plan_review -> plan_revise [label="Feedback", style=dashed];

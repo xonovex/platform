@@ -78,7 +78,7 @@ Each skill is a separate plugin. Skills are applied **automatically** when the a
 claude plugin marketplace add xonovex/platform
 
 # Install workflow skills — each covers a full operation lifecycle via consolidated references
-claude plugin install xonovex-skill-plan@xonovex-marketplace          # research, decide, plan, revise, critique, subplans, continue, update, validate, code-align/harden/simplify
+claude plugin install xonovex-skill-plan@xonovex-marketplace          # research, decide, plan, revise, critique, accept/reject, subplans, continue, update, validate, code-align/harden/simplify
 claude plugin install xonovex-skill-git@xonovex-marketplace           # commit, merge-resolve, feature-worktree create/merge/abandon/cleanup
 claude plugin install xonovex-skill-instruction@xonovex-marketplace   # AGENTS.md init / sync / simplify / consolidate / merge
 claude plugin install xonovex-skill-reflect@xonovex-marketplace       # session reflection: extract lessons, fold into AGENTS.md or a skill
@@ -105,7 +105,7 @@ claude plugin install xonovex-skill-vitest@xonovex-marketplace
 codex plugin marketplace add xonovex/platform
 
 # Install workflow skills — each covers a full operation lifecycle via consolidated references
-codex plugin add xonovex-skill-plan@xonovex-marketplace          # research, decide, plan, revise, critique, subplans, continue, update, validate, code-align/harden/simplify
+codex plugin add xonovex-skill-plan@xonovex-marketplace          # research, decide, plan, revise, critique, accept/reject, subplans, continue, update, validate, code-align/harden/simplify
 codex plugin add xonovex-skill-git@xonovex-marketplace           # commit, merge-resolve, feature-worktree create/merge/abandon/cleanup
 codex plugin add xonovex-skill-instruction@xonovex-marketplace   # AGENTS.md init / sync / simplify / consolidate / merge
 codex plugin add xonovex-skill-reflect@xonovex-marketplace       # session reflection: extract lessons, fold into AGENTS.md or a skill
