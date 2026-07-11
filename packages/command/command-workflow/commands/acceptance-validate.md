@@ -25,8 +25,10 @@ them to check the implementation against each acceptance scenario: for every
 Given-When-Then, find the covering test and verify the code path, boundary, and error
 handling; mark each PASS / PARTIAL / FAIL with evidence; flag uncovered scenarios,
 criteria changed without sign-off, and regressions; then give a verdict (accept /
-accept-with-notes / reject). The skills are the source of truth for the method — do not
-restate them.
+accept-with-notes / reject). The agent's pass/fail-per-scenario report informs the
+decision, but final acceptance is a human product-owner sign-off, distinct from
+code-owner (code-review) approval. The skills are the source of truth for the method — do
+not restate them.
 
 Write the report to `acceptance/<feature>/validation-report.md`. If a work-item-tracker
 host skill is installed, additionally post the results and transition the item; otherwise

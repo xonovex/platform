@@ -39,6 +39,7 @@ digraph Workflow {
 
     start [label="Run Agent Wrapper", shape=house, fillcolor=lavender];
     start_agent [label="(Harness selection:\nClaude Code, OpenCode, etc.\nProfiles: GLM+docker, bwrap,\ngemini via CLI Proxy, Copilot...)", shape=ellipse, fillcolor="#ffffcc"];
+    right_size [label="Trivial change?\n(one-sentence diff)", shape=diamond, fillcolor=lightcoral];
   }
 
   // Discovery Phase (Three Amigos)
@@ -216,7 +217,7 @@ digraph Workflow {
 
     acceptance_validate [label="acceptance-validate\n(validate acceptance\ncriteria against PR)", fillcolor="#e8d5f5"];
     acceptance_validate_agent [label="(Agent:\n- Load original scenarios\n- Verify each Given-When-Then\n  is covered by tests\n- Report pass/fail per scenario\n- Flag gaps or regressions)", shape=ellipse, fillcolor="#ffffcc"];
-    qa_verdict [label="Acceptance Met?\n(sign-off)", shape=diamond, fillcolor=lightcoral];
+    qa_verdict [label="Product owner accepts?\n(human sign-off, distinct\nfrom code-review approval)", shape=diamond, fillcolor=lightcoral];
   }
 
   // Learning Integration Loop
@@ -239,6 +240,7 @@ digraph Workflow {
     style=filled;
     fillcolor="#e6ffe6";
 
+    dod_gate [label="Definition of Done met?\n(review, docs, no regressions,\nNFRs — team release gate)", shape=diamond, fillcolor=lightcoral];
     git_commit_push [label="git-commit --push\n(when fully complete)", fillcolor=lightblue];
     end [label="Feature Complete\n(acceptance met)", shape=oval, fillcolor=green];
   }
@@ -247,7 +249,9 @@ digraph Workflow {
 
   // Setup
   start -> start_agent;
-  start_agent -> story_input;
+  start_agent -> right_size;
+  right_size -> story_input [label="No: full flow"];
+  right_size -> work [label="Yes: implement\ndirectly", style=dashed];
 
   // Discovery flow (Three Amigos loop)
   story_input -> story_refine;
@@ -349,7 +353,9 @@ digraph Workflow {
   // QA acceptance
   acceptance_validate -> acceptance_validate_agent;
   acceptance_validate_agent -> qa_verdict;
-  qa_verdict -> git_commit_push [label="Accepted"];
+  qa_verdict -> dod_gate [label="Accepted"];
+  dod_gate -> git_commit_push [label="Yes"];
+  dod_gate -> work [label="No: DoD gaps\n(fix)", style=dashed];
   qa_verdict -> work [label="Gaps found:\nfix and\nre-validate", style=dashed];
 
   // Abandon flow

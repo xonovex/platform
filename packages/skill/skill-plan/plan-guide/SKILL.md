@@ -22,6 +22,9 @@ Author and maintain plan documents across their full lifecycle (research → dec
 - Auto-detecting toolchain via `package.json` only misses Moon/Makefile-driven projects — check both
 - Approve the parent with `plan-accept` before `plan-subplans-create` — it requires `status: approved`
 - `plan-critique` must run as an independent agent (fresh session), not the plan's author — self-critique defends instead of attacks
+- A change describable in one sentence (a one-line diff) skips discovery and planning — implement it directly; heavy up-front spec on a trivial edit is waste
+- High-impact gates — `plan-accept`, worktree merge, and acceptance sign-off — stay mandatory-human at every automation level; gate policy may auto-advance only low-impact gates
+- A plan is done when the team's Definition of Done is met (review, docs, no regressions, NFRs), not when tests merely pass — `plan-validate` checks the DoD, not just success criteria
 - "Tests pass" doesn't mean "success criteria met" — `plan-validate` reads the criteria, not just exit codes
 - Auto-continuing to the next plan after completion silently chains work — `plan-continue` STOPS after one
 - Subplans with >7 tasks risk silent drops — target 5–7 tasks each

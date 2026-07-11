@@ -14,6 +14,6 @@ digraph AgenticMaturityLadder {
   l1 -> l2 [label="add runner loop\n+ run journal\n+ async gates"];
   l2 -> l3 [label="add WorkflowRun CRD\n+ sensors\n+ HITL escalation"];
 
-  invariant [label="Invariant at every level:\nsame commands (steps), same skills, same plan-document state,\nsame gate definitions - only gate policy, runner,\nand who advances the workflow change.", shape=note, fillcolor=lightyellow];
+  invariant [label="Invariant at every level:\nsame commands (steps), same skills, same plan-document state,\nsame gate definitions - only gate policy, runner,\nand who advances the workflow change.\nHigh-impact gates (plan-accept, merge, acceptance sign-off)\nstay mandatory-human at every level; only low-impact\ngates may auto-advance.", shape=note, fillcolor=lightyellow];
   invariant -> l0 [style=invis];
 }

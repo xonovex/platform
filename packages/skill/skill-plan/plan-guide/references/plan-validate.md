@@ -1,6 +1,6 @@
 # plan-validate: Validate Plan Achievement
 
-Verify a plan's objectives are fully achieved: success criteria pass AND the code structurally matches what the plan describes. Read-only — never modifies files (use `plan-update` to change status).
+Verify a plan's objectives are fully achieved: success criteria pass, the code structurally matches what the plan describes, AND the team's Definition of Done is met. Read-only — never modifies files (use `plan-update` to change status).
 
 ## Core Workflow
 
@@ -21,6 +21,7 @@ Verify a plan's objectives are fully achieved: success criteria pass AND the cod
 6. **Cross-subplan consistency** — shared concepts named the same way across subplans,
    no contradictions, dependencies reference things that exist
 7. **Report** — per-criterion PASS/FAIL, per-task match/deviation, consistency issues
+8. **Definition of Done** — beyond the plan's own success criteria, confirm the team's Definition of Done (review complete, docs updated, no known regressions, NFRs met); the DoD is the release gate
 
 ### Without Plan Document (Current Work)
 
@@ -35,3 +36,4 @@ Verify a plan's objectives are fully achieved: success criteria pass AND the cod
 - Cross-subplan consistency issues compound silently — one wrong name in an early subplan propagates through all later ones
 - "Tests pass" without checking coverage misses gaps — read success criteria, not just exit codes
 - A subplan still `in_progress` blocks parent validation — surface it explicitly
+- A plan is not done on green tests alone — success criteria are plan-specific; the Definition of Done is the team-wide release gate (review, docs, no regressions, NFRs); check both

@@ -24,8 +24,10 @@ acceptance-criteria completeness — and follow them to turn the stories (and an
 designs) into Given-When-Then scenarios: run three-amigos discovery (business /
 development / testing perspectives), example-map each rule (yellow/green/red/blue cards),
 and write 2-5 declarative scenarios per rule covering happy path, boundaries, errors, UI
-states, and accessibility. The skills are the source of truth for the method — do not
-restate them.
+states, and accessibility. Include non-functional acceptance criteria (performance,
+security, load) alongside the functional ones where they matter — they feed the
+acceptance sign-off. The skills are the source of truth for the method — do not restate
+them.
 
 Write `.feature` files to the output directory. If a work-item-tracker host skill is
 installed (any `xonovex-skill-<host>` exposing issue/test-case sync), additionally attach
