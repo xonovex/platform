@@ -32,6 +32,19 @@
 - **Aspects extracted:**
   - The three practices (discovery / formulation / automation); examples as guide-rails; living documentation; "the code reflects the documentation, and the documentation reflects the team's shared understanding"
 
+## The three-practices model and formulation techniques
+
+- **Title:** Seb Rose & Gaspar Nagy — "The BDD Books: Discovery" and "The BDD Books: Formulation"
+- **URLs:**
+  - https://leanpub.com/bddbooks-discovery
+  - https://leanpub.com/bddbooks-formulation
+- **Last reviewed:** 2026-07-12
+- **Used for:**
+  - `references/specification-by-example.md`
+  - `references/appendix-discovery.md`
+- **Aspects extracted:**
+  - The three-practices model (Discovery / Formulation / Automation) as the primary treatment; the formulation techniques for turning discovered examples into readable, declarative Gherkin scenarios
+
 ## Example Mapping
 
 - **Title:** Matt Wynne — "Introducing Example Mapping" (Cucumber blog)

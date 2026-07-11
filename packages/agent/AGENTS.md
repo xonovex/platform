@@ -35,6 +35,12 @@ Isolators and provisioners are **plugins resolved by an explicit registry**, not
 - `mkAgentImage` is **vendored/adapted** from `nothingnesses/agent-images` (bus-factor 1): numeric uid-1000 hand-written passwd/group, `/workspace`, pre-created XDG dirs.
 - `numtide/llm-agents.nix` is a `flake.lock`-pinned input — **packaging only; isolation out of scope**. Consumers pin via `flake.lock` alone. The binary-cache trusted key NAME is `niks3.numtide.com` (`niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g=`); adding `cache.numtide.com` is a TRUST EXPANSION (numtide's CI/signing key builds the agent binaries) — not enabled by default.
 
+## Governance & oversight
+
+- **Accountability:** every `AgentRun` carries a named accountable owner; human overseers must hold the competence and authority to understand the system's limits and intervene.
+- **Anomaly + stop:** behavior-level anomaly detection (beyond timeout/budget) plus a tested kill-switch / emergency stop, building on Falco + `TaskStop` / Fleet-pause.
+- **AI bill-of-materials:** each run records model/provider, prompt, tools, and granted permissions in its run journal for audit.
+
 ## Operator path
 
 - Provisions via a **nix-built OCI image** (no per-pod `nix profile install`); pods start by image pull. Untrusted pods default to a sandboxed `runtimeClassName` via the existing `DefaultRuntimeClassName`/`AllowedRuntimeClassNames` machinery (wires `RequireKernelIsolation`), bind a dedicated **zero-RBAC ServiceAccount** with `automountServiceAccountToken=false`, get default resource requests/limits + a namespace `LimitRange`/`ResourceQuota`, and always get a **default-deny egress `NetworkPolicy`** per `AgentRun` (mapped from `Network`; metadata/RFC1918/loopback blocked, FQDN-aware via Cilium `toFQDNs`/Squid as the upgrade). `readOnlyRootFilesystem=true` is reconciled with writable HOME/XDG `emptyDir`s + `fsGroup=1000`.

@@ -41,3 +41,7 @@ Imperative steps (`When I click "#submit"`, `type "SAVE10" into "#code"`) couple
 ## Ownership
 
 Keep one rule per scenario, 2-5 scenarios per `Rule`; drive exhaustive value/edge coverage into **tdd-guide** unit tests, not more outlines. The vocabulary ("order", "coupon", "taxi") is the ubiquitous language owned by **ddd-guide**; step-definition glue and external stubbing is owned by **testing-guide**. Scenarios are first the OUTPUT of a discovery conversation (see discovery-three-amigos), second a regression suite.
+
+- Feed each step only the data the rule needs; incidental or hardcoded values obscure the behaviour under examination.
+- Keep steps to single digits per scenario — more signals a scenario doing too much.
+- The `.feature` suite runs every build in CI as living regression, so any drift between spec and system fails immediately.

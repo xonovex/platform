@@ -6,6 +6,7 @@ Create a sibling worktree with a feature branch for isolated development, derivi
 
 - Worktree directory: `<worktree>-feature-<feature-name>` (kebab-case name)
 - Branch: `<worktree>/feature/<feature-name>`
+- Use a type-descriptive prefix conveying the kind of change (`feature/`, `fix/`, `docs/`, `hotfix/`), not a single generic `feature` segment
 
 | In worktree | Feature        | Directory                   | Branch                      |
 | ----------- | -------------- | --------------------------- | --------------------------- |

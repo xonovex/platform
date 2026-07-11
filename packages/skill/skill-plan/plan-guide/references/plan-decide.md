@@ -13,7 +13,7 @@ Pre-plan (Discover) through draft (Walk). Mode selection: if open decisions are 
 1. **Extract decisions** from research findings or a plan: ambiguities, contradictions between sources, leading assumptions worth challenging, unsettled trade-offs
 2. **Order by dependency** — upstream decisions first; a scoping answer reshapes placement decisions downstream
 3. **Present one brief**, then STOP and wait for the answer
-4. **Record the answer with its nuances** ("yes, but don't use that word in the app layer") and push back honestly if it conflicts with a discovered constraint
+4. **Record the answer with its nuances** ("yes, but don't use that word in the app layer") as a single testable claim (EARS: "When \<trigger\>, the system shall \<response\>") so it is unambiguous and checkable, and push back honestly if it conflicts with a discovered constraint
 5. **Propagate** the answer into the remaining queue — merge, split, resolve, reframe — before presenting the next
 6. **Consolidate** at the end: numbered decisions, governing principles the answers revealed, sequencing, next command
 

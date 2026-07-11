@@ -19,6 +19,8 @@ The Confirmation from the 3 Cs (see [three-cs.md](three-cs.md)) written down. Go
 - **Errors / invalid cases** — rejected input, failed dependency, unmet precondition.
 - **UI changes** — visible state changes: what the user now sees, what becomes enabled or hidden.
 
+**Sufficiency:** criteria are enough only when every rule has at least one confirmable (testable) criterion across the four categories; a rule with no confirmable criterion is not ready.
+
 Criteria CAN be expressed as Given-When-Then (owned by **bdd-guide**); designing the tests themselves — levels, doubles, structure — is owned by **testing-guide**. This skill stops at "criteria exist and cover the four categories".
 
 ## Example

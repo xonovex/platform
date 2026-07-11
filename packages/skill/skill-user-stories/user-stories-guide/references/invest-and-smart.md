@@ -4,11 +4,11 @@ INVEST checks one story; SMART checks the tasks a ready story is broken into. A 
 
 ## INVEST (the story)
 
-- **I — Independent** — schedulable and buildable in any order. This is scheduling independence, not coupling theory (owned by **connascence-guide**).
+- **I — Independent** — minimize and manage dependencies, or schedule around them. This is scheduling independence, not coupling theory (owned by **connascence-guide**).
 - **N — Negotiable** — not a fixed contract; details co-created in conversation.
 - **V — Valuable** — value the customer can see (not "add a payments table").
 - **E — Estimable** — understood well enough to size and rank.
-- **S — Small** — a few person-weeks at most, finishable within one sprint. The canonical expansion is **Small**, not "Sized appropriately".
+- **S — Small** — a few days up to ~two weeks, finishable within a sprint. The canonical expansion is **Small**, not "Sized appropriately".
 - **T — Testable** — a test can confirm it is done.
 
 Fails **Small** or **Estimable** → split (see [splitting-spidr.md](splitting-spidr.md), [splitting-flowchart.md](splitting-flowchart.md)).

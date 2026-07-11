@@ -20,11 +20,10 @@ argument-hint: "[stories-or-feature] [--out <dir>]"
 ## Delegation
 
 Load the `bdd-guide` skill (plugin `xonovex-skill-bdd`) — and `user-stories-guide` for
-acceptance-criteria completeness — and follow them to turn the stories (and any provided
-designs) into Given-When-Then scenarios: run three-amigos discovery (business /
-development / testing perspectives), example-map each rule (yellow/green/red/blue cards),
-and write the declarative scenarios each rule needs (often a couple, sometimes none) covering happy path, boundaries, errors, UI
-states, and accessibility. Include non-functional acceptance criteria (performance,
+acceptance-criteria completeness — and follow them to formalize the example map produced
+in three-amigos discovery: take each rule's green cards (the agreed examples) and write the
+declarative Given-When-Then scenarios each rule needs (often a couple, sometimes none) covering happy path, boundaries, errors, UI
+states, and accessibility. Do not re-run the amigos session — that discovery already happened. Include non-functional acceptance criteria (performance,
 security, load) alongside the functional ones where they matter — they feed the
 acceptance sign-off. The skills are the source of truth for the method — do not restate
 them.

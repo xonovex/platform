@@ -17,6 +17,6 @@ digraph AgenticMaturityLadder {
   invariant [label="Invariant at every level:\nsame commands (steps), same skills, same plan-document state,\nsame gate definitions - only gate policy, runner,\nand who advances the workflow change.\nHigh-impact gates (plan-accept, merge, acceptance sign-off)\nstay mandatory-human at every level; only low-impact\ngates may auto-advance.", shape=note, fillcolor=lightyellow];
   invariant -> l0 [style=invis];
 
-  governance [label="Governance is a separate axis from autonomy:\nnever raise autonomy without matching oversight (do-not-deploy coupling).\nUnanswered L2/L3 escalations fall back to a safe default (pause / abandon)\nafter a bounded window. Per-run provenance - model, prompt, tools,\npermissions - is recorded by the agent runtime / operator.", shape=note, fillcolor="#fff0f0"];
+  governance [label="Governance is a separate axis from autonomy:\nnever raise autonomy without matching oversight (do-not-deploy coupling).\nEach run has a named accountable owner; overseers hold the competence\nand authority to understand the system's limits.\nBehaviour-level anomaly detection + a tested kill-switch (emergency stop)\nback every level, beyond timeout / budget.\nUnanswered L2/L3 escalations fall back to a safe default (pause / abandon)\nafter a bounded window.\nEach run records an AI bill-of-materials - model/provider, prompt, tools,\npermissions - in its journal for audit.", shape=note, fillcolor="#fff0f0"];
   governance -> l3 [style=invis];
 }

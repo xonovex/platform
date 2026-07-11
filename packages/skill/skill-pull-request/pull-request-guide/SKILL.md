@@ -23,6 +23,7 @@ How to write a pull request that gets reviewed fast and correctly. This skill ow
 - Large diffs get rubber-stamped, not reviewed - one 600-line PR gets a worse review than three 200-line PRs
 - Line count measures volume, not risk - a 20-line auth change needs more scrutiny than a 400-line generated-code or scaffolding diff, so call those out
 - A refactor bundled into a feature PR hides the real change - split it into its own PR
+- A PR merges only on the required approving review(s) plus green required status checks (branch protection) - never bypass the gate
 
 ## Example
 
