@@ -342,7 +342,8 @@ digraph Workflow {
   review_addressed -> pr_review_resolve;
   pr_review_resolve -> pr_review_resolve_agent;
   pr_review_resolve_agent -> review_clear;
-  review_clear -> pr_review_analyze [label="No: re-review\nupdated branch", style=dashed];
+  review_clear -> review_addressed [label="No: findings still open,\nfix and re-resolve", style=dashed];
+  review_addressed -> pr_review_analyze [label="pushed new code:\nre-review round", style=dotted];
   review_clear -> acceptance_validate [label="Yes: clean\n& approved"];
 
   // QA acceptance
