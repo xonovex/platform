@@ -12,7 +12,7 @@ allowed-tools:
 argument-hint: "[skill-file] [--tier auto|aggressive|moderate|conservative] [--dry-run]"
 ---
 
-# /xonovex-utility:skill-guide-optimize — Trim a skill to its knowledge delta
+# /xonovex-utility:skill-optimize — Trim a skill to its knowledge delta
 
 ## Arguments
 

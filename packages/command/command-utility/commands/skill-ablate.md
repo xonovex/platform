@@ -12,7 +12,7 @@ allowed-tools:
 argument-hint: "[skill-file] [--model <weakest>] [--base <git-ref>] [--report-only]"
 ---
 
-# /xonovex-utility:skill-guide-ablate — Verify no load-bearing knowledge was trimmed
+# /xonovex-utility:skill-ablate — Verify no load-bearing knowledge was trimmed
 
 ## Arguments
 

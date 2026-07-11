@@ -16,7 +16,7 @@ allowed-tools:
 argument-hint: "[skill-name] [source-path] [--update] [--interactive] [--dry-run]"
 ---
 
-# /xonovex-utility:skill-guide-extract — Extract Skill from Codebase
+# /xonovex-utility:skill-extract — Extract Skill from Codebase
 
 ## Arguments
 

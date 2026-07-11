@@ -13,7 +13,7 @@ allowed-tools:
 argument-hint: "[skill-file] [--dry-run] [--target-reduction <percent>]"
 ---
 
-# /xonovex-utility:skill-guide-simplify — Condense verbose skill files
+# /xonovex-utility:skill-simplify — Condense verbose skill files
 
 ## Arguments
 

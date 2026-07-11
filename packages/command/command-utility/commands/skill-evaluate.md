@@ -11,7 +11,7 @@ allowed-tools:
 argument-hint: "[skill-file] [--count <n>]"
 ---
 
-# /xonovex-utility:skill-guide-evals — Seed a skill's output-eval file
+# /xonovex-utility:skill-evaluate — Seed a skill's output-eval file
 
 ## Arguments
 

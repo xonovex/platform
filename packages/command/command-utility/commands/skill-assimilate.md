@@ -16,7 +16,7 @@ argument-hint: >-
   [--interactive] [--dry-run]
 ---
 
-# /xonovex-utility:skill-guide-assimilate — Augment Skill with Another Skill
+# /xonovex-utility:skill-assimilate — Augment Skill with Another Skill
 
 ## Arguments
 

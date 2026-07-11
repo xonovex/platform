@@ -15,7 +15,7 @@ allowed-tools:
 argument-hint: "[skill-file] [--into <names>] [--dry-run]"
 ---
 
-# /xonovex-utility:skill-guide-decompose — Decompose a Skill into Composable Skills
+# /xonovex-utility:skill-decompose — Decompose a Skill into Composable Skills
 
 ## Arguments
 

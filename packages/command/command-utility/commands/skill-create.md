@@ -12,7 +12,7 @@ allowed-tools:
 argument-hint: "[source] [--name <name>] [--dry-run]"
 ---
 
-# /xonovex-utility:skill-guide-create — Create Guideline Skill from Document
+# /xonovex-utility:skill-create — Create Guideline Skill from Document
 
 ## Arguments
 
