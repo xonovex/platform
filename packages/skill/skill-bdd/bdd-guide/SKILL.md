@@ -12,7 +12,7 @@ Drive software from concrete, agreed examples of behaviour. Discover them in con
 - **Discover before you formulate** - run a three-amigos conversation over real examples first, see [references/discovery-three-amigos.md](references/discovery-three-amigos.md)
 - **Map examples to size and split the story** - yellow/blue/green/red cards expose scope and gaps, see [references/discovery-three-amigos.md](references/discovery-three-amigos.md)
 - **Write scenarios in Gherkin Given-When-Then** - Feature, Scenario, Background, Outline; declarative steps, see [references/gherkin-reference.md](references/gherkin-reference.md)
-- **Keep 2-5 scenarios per rule, push the rest down** - illustrate the rule, then drive exhaustive cases with **tdd-guide** unit tests
+- **A few scenarios per rule, push the rest down** - illustrate each rule with the examples it needs (often ~2-5, sometimes none), then drive exhaustive cases with **tdd-guide** unit tests
 - **Treat scenarios as living documentation** - specs and tests become one trustworthy artefact, see [references/specification-by-example.md](references/specification-by-example.md)
 
 ## Gotchas
@@ -23,6 +23,7 @@ Drive software from concrete, agreed examples of behaviour. Discover them in con
 - Driving scenarios end-to-end through the UI/browser is slow, volatile, and fails to localise the bug — stub external services/queues/DBs and drive the core domain directly.
 - Given-When-Then is the recommended template, not the goal; the essential thing is concrete agreed examples, so do not over-engineer the grammar with deep nesting or imperative "click button X" steps.
 - ATDD and BDD are not rival methodologies — same example-driven, acceptance-level idea; do not split the practice in two.
+- A rule that needs many examples to pin down is a signal to split the rule, not to write ten scenarios — and a rule simple enough to need none needs none; the count is emergent, not a quota.
 
 ## Example
 

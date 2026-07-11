@@ -25,6 +25,7 @@ Host-independent review-comment craft. **Every comment states its type and its u
 - A "before merge" verdict belongs once in the summary, not repeated in every inline comment.
 - Keep each comment self-contained, especially if you may edit it later. If comment A says "see comment B" and B is reworded or removed, A is left dangling.
 - Suggested-code blocks must compile against the real APIs. A confidently wrong snippet is worse than prose; verify component / function signatures first (this is where a framework skill, e.g. a design-system guide, composes in).
+- AI-generated findings and AI-written code are not self-verifying — the human reviewer must actively evaluate each, not rubber-stamp; adversarial AI review complements, never replaces, human judgement on the merge decision.
 
 ## Example — a labelled inline comment, and a summary that links to it
 

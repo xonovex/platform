@@ -27,7 +27,9 @@ handling; mark each PASS / PARTIAL / FAIL with evidence; flag uncovered scenario
 criteria changed without sign-off, and regressions; then give a verdict (accept /
 accept-with-notes / reject). The agent's pass/fail-per-scenario report informs the
 decision, but final acceptance is a human product-owner sign-off, distinct from
-code-owner (code-review) approval. The skills are the source of truth for the method — do
+code-owner (code-review) approval. This verifies scenario coverage against the code
+statically; where an acceptance criterion requires it, also run the scenarios in a
+staging / operational environment. The skills are the source of truth for the method — do
 not restate them.
 
 Write the report to `acceptance/<feature>/validation-report.md`. If a work-item-tracker

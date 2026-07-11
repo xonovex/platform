@@ -58,3 +58,4 @@ Next: plan-revise (resolve blocking + major), then re-run plan-critique
 - A critique that edits the plan oversteps — it reports; `plan-revise` applies the fixes
 - Running every mode on a tiny plan is busywork — default to red-team + pre-mortem, escalate to falsify / steelman when the stakes warrant
 - The plan's author critiquing their own plan defends it — run plan-critique in a fresh session (or a separate agent) that did not write the plan
+- A finding that demands speculative robustness or gold-plating is itself over-engineering — every finding must reduce a concrete, likely risk, not defend against the improbable
