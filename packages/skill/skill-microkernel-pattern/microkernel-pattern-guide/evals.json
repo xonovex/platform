@@ -1,0 +1,44 @@
+{
+  "skill_name": "microkernel-pattern-guide",
+  "tier": "aggressive",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "We have a notification service in Go that currently sends messages over email, SMS, and push. We keep having to touch the sending code every time a new channel is added. Sketch a design that lets us add new channels later without rewriting the sender, and show the sending function's signature.",
+      "assertions": [
+        "The channel is selected via a map/dictionary keyed by a string (key -> factory/constructor), NOT via a switch/if-else chain on the channel kind",
+        "The map stores factories/constructors that are called only for the selected channel (lazy construction), not pre-built instances of every channel",
+        "The core sending function receives the already-resolved channel/port as a parameter (dependency injection), and the registry/map is NOT passed into the sending function"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 2,
+      "prompt": "Our notification core must guarantee that certain sensitive messages only go out over channels that provide end-to-end encryption. We keep adding new channels over time. How should the core enforce this check so it stays correct as channels are added? Show the gating code in Go.",
+      "assertions": [
+        "The gate decides based on a capability/guarantee that the plug-in self-declares as data the core reads, NOT on the plug-in's identity/name (no `if kind == \"email\"`-style allowlist)",
+        "The check is fail-closed / default-deny: a channel is rejected unless the required capability is positively present (a missing or unreadable declaration is treated as a denial)",
+        "The rejection error/message names the required capability, never a specific concrete plug-in"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 3,
+      "prompt": "We have a payment-gateway integration that today has a single provider, but we know a second provider is coming and which one to use will be chosen from a config/environment value at deploy time. A colleague proposes selecting the provider with compile-time build tags. Advise us on the selection mechanism and justify it.",
+      "assertions": [
+        "Advises AGAINST compile-time build tags for this case and recommends resolving the provider at load/deploy time via config/DI/registry population (or run-time registry lookup), because the choice comes from a deploy-time config value",
+        "Explicitly reasons about binding time — that the moment the variant is chosen determines the technique, and binding compile-time here would force shipping/rebuilding separate binaries to switch a config-selectable provider"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 4,
+      "prompt": "We're building a plug-in registry for export formats in a Go tool. Following the common Go driver idiom (blank import plus an init() that registers the format), a teammate wants each format plug-in to self-register in its own init() at import time. Is that the right approach for our registry? Advise.",
+      "assertions": [
+        "Recommends central/explicit registration at the composition root over init()-based self-registration",
+        "Justifies it on the grounds that central wiring is visible/ordered/testable whereas init() self-registration hides the wiring behind import order"
+      ],
+      "load_bearing": true
+    }
+  ]
+}

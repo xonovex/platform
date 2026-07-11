@@ -1,0 +1,46 @@
+{
+  "skill_name": "debugging-guide",
+  "tier": "aggressive",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Our C++ game crashes with a read access violation while reading tt->object_types. The crash is on the very first line of the changed_objects() function, before any of its own logic runs. In the debugger the watch window shows that tt itself is a valid, mapped address, but the memory it points at is all 0xdddddddd. One teammate thinks we're missing a critical section; another thinks the process lost admin access to that memory. What is actually happening and how should we proceed?",
+      "assertions": [
+        "Concludes the bug is a use-after-free (a dangling pointer to already-freed memory being dereferenced), not a random memory overwrite/corruption",
+        "States the access violation means an unmapped/invalid address was accessed (a bad pointer), and explicitly rejects both the missing-critical-section/threading explanation and the memory-permissions/admin-access explanation",
+        "Recommends confirming the hypothesis before fixing (e.g. breakpoint where the object is destroyed to verify it is the same object later dereferenced) and tracing the data flow back to whoever still holds the stale pointer"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 2,
+      "prompt": "We have a nasty crash that happens maybe once an hour in our multithreaded native app. We can't reproduce it on demand, so we can't step through it in a debugger. What is the best strategy to actually pin this bug down?",
+      "assertions": [
+        "Advises converting the bug into a deterministic/reliable reproduction before attempting a fix",
+        "Recommends at least one of: stressing the suspect code path to raise the crash frequency, logging key events to a fixed-size circular buffer that is dumped when the bug trips, or a record/replay tool",
+        "Recommends adding a run-single-threaded toggle (or otherwise disabling threads) to test whether the bug is a data race"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 3,
+      "prompt": "Across our codebase we keep hitting use-after-free crashes on Entity references: some subsystem holds a pointer to an Entity that another subsystem has already destroyed. Someone proposed switching Entity references to reference-counted smart pointers (or adding a garbage collector) so the Entity stays alive as long as anyone references it. Is that the right way to eliminate this whole class of bug? What would you do instead?",
+      "assertions": [
+        "Warns that making the references owning (refcount-for-liveness or GC) does NOT fix the stale-reference bug: it converts a loud crash into a silent leak and/or a state-divergence bug (two systems disagreeing on state)",
+        "Recommends tracking liveness as detection rather than ownership: non-owning references with tagged retain/release counts, asserting the reference count is zero at the Entity's destruction so a leaked reference is reported at destroy time",
+        "Frames the fix as eliminating the bug class by design (e.g. asserting invariants, end-of-page/page-guard allocator for the suspect allocations, or a type-safe/handle-based API) rather than patching individual crash sites"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 4,
+      "prompt": "A rendering feature worked fine in our v2021.2 release but crashes reliably on our current main branch. There are hundreds of commits between them. How do I efficiently find the commit that introduced the regression?",
+      "assertions": [
+        "Recommends git bisect, marking a known-good revision (v2021.2) and a known-bad revision and building/running the repro at each midpoint to label GOOD/BAD",
+        "States that bisection requires a deterministic (non-flaky) repro because one mislabeled GOOD/BAD points bisect at the wrong commit",
+        "Warns that incremental builds can pick up stale objects and to force a clean rebuild per step when results look inconsistent"
+      ],
+      "load_bearing": true
+    }
+  ]
+}

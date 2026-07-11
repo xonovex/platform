@@ -1,0 +1,43 @@
+{
+  "skill_name": "skill-guide",
+  "tier": "conservative",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I'm creating a new Agent Skill that validates GraphQL schemas. Write the YAML frontmatter `description` field for its SKILL.md so it routes reliably.",
+      "assertions": [
+        "The description starts with an imperative 'Use when' (or 'Use this skill when') phrasing rather than 'This skill…' / 'I can…' / 'You can…'.",
+        "The description contains an explicit trigger clause of the form 'even when the user doesn't say ...' (or equivalent 'even if not mentioned') to catch non-obvious matches.",
+        "The description contains NO negative/out-of-scope 'Skip …' exclusion clause and does not point to any other skill by name."
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 2,
+      "prompt": "I'm authoring an Agent Skill about Docker. Create the reference file references/multi-stage-builds.md that goes deeper on multi-stage build patterns, with correct frontmatter and structure for a skill reference file.",
+      "assertions": [
+        "The reference file contains NO YAML frontmatter block (no `name:`/`description:` header fenced by `---`).",
+        "The reference file body does NOT include any sentence telling the reader when or why to read this file itself (e.g. 'Read this when working with multi-stage builds')."
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 3,
+      "prompt": "I'm writing references/error-handling.md for a Go coding-guideline skill. The content is distilled from Dave Cheney's blog posts and a GopherCon talk. Add the guidance to the reference file along with proper source attribution.",
+      "assertions": [
+        "The reference file body does NOT name the author, blog, company, or talk inside references/error-handling.md.",
+        "Provenance/attribution is directed to a separate SOURCES.md file rather than embedded in the reference body."
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 4,
+      "prompt": "Draft the Essentials section of a SKILL.md for a new Rust coding-guideline skill covering ownership, error handling, and async. Each topic has its own reference file.",
+      "assertions": [
+        "Each essentials bullet leads with a bolded short rule name followed by a brief (roughly 5-10 word) how-to.",
+        "Each essentials bullet cross-references its topic's references/*.md file via a markdown link (e.g. 'see [references/ownership.md](references/ownership.md)')."
+      ],
+      "load_bearing": true
+    }
+  ]
+}

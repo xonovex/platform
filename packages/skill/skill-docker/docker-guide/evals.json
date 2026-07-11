@@ -1,0 +1,42 @@
+{
+  "skill_name": "docker-guide",
+  "tier": "moderate",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Write a production Dockerfile for a Node.js 22 web service that builds TypeScript with `npm run build` and serves on port 3000. Keep the final image as small and secure as reasonably possible.",
+      "assertions": [
+        "Uses a multi-stage build with at least one named build stage (`AS <name>`) and a separate final runtime stage that only pulls in built artifacts via `COPY --from=<stage>`",
+        "The final runtime stage uses a minimal base image (distroless such as `gcr.io/distroless/nodejs22`, or a slim/alpine variant) rather than a full node image, and does NOT reinstall build/dev dependencies",
+        "The container runs as a non-root user (a `USER` line such as `USER nonroot` / `USER node` or an explicitly created non-root user)"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 2,
+      "prompt": "Our Docker builds re-run `npm ci` on almost every commit even when only application source changed, and installing system packages with apt-get bloats the image. Show the Dockerfile layer ordering and the apt-get command you would use to fix both problems.",
+      "assertions": [
+        "Copies the lockfile/manifest (e.g. `package-lock.json` / `package.json`) and runs the dependency install BEFORE copying the rest of the source (`COPY . .` comes after the install step)",
+        "Combines `apt-get update`, `apt-get install`, and `rm -rf /var/lib/apt/lists/*` into a single `RUN` instruction (chained with `&&`) so the apt cache is not left in an earlier layer"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 3,
+      "prompt": "Add a database password to a containerized Node app without baking the secret into the image, and make sure the build context does not leak local files. Provide the relevant Dockerfile/compose lines and any supporting file.",
+      "assertions": [
+        "The secret is passed at runtime via a file-based mechanism (e.g. a `*_FILE` env var pointing at `/run/secrets/...`, a Compose `secrets:` section, or a BuildKit `--mount=type=secret`) and is NOT `COPY`/`ADD`ed into the image or hardcoded in a plain `ENV`/`environment` value",
+        "Includes a `.dockerignore` that excludes at least `node_modules/` and `.git/` (or `.git`)"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 4,
+      "prompt": "Add a container health check to a Node.js image so a Kubernetes/Compose orchestrator can detect when the app stops responding. Show the Dockerfile instruction.",
+      "assertions": [
+        "Uses the `HEALTHCHECK` instruction with tuning flags such as `--interval`, `--timeout`, and/or `--start-period`, and a `CMD` that exits non-zero on failure (e.g. `|| exit 1`)"
+      ],
+      "load_bearing": false
+    }
+  ]
+}

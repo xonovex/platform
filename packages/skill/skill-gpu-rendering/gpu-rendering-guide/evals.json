@@ -1,0 +1,45 @@
+{
+  "skill_name": "gpu-rendering-guide",
+  "tier": "conservative",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I'm writing the main per-frame render loop for a low-level explicit-API renderer (Vulkan-style). Each frame I record command buffers and update a uniform buffer with camera and per-object data, then submit and present. How should I structure the loop and its resources so the CPU can prepare the next frame while the GPU works on the current one, without corrupting data the GPU is still reading?",
+      "assertions": [
+        "At the start of a frame, waits on the fence for the frame slot it is about to reuse (e.g. frame index modulo N), NOT the fence of the frame just submitted",
+        "Keeps only about 2 or 3 frames in flight (double/triple buffering) rather than maximizing the number of in-flight frames",
+        "Duplicates per-frame CPU-written GPU resources (uniform/command/instance buffers) per frame slot so writing one slot cannot race the GPU reading another"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 2,
+      "prompt": "I'm building a renderer with a deferred pipeline: a G-buffer pass, an SSAO pass, a lighting pass, and a bloom mip chain, all writing intermediate render targets. I want to keep VRAM usage for these intermediate targets low and stop hand-tracking image barriers and layout transitions between passes. What architecture should I use and what are the correctness pitfalls?",
+      "assertions": [
+        "Recommends a render graph / frame graph where each pass declares its resource reads and writes and the graph derives execution order plus the barriers and image-layout transitions",
+        "States that transient targets may share (alias) the same physical memory only when their lifetimes do not overlap",
+        "Warns that an aliased target's contents are undefined on first use in its new lifetime, so it must be fully cleared or overwritten before being read"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 3,
+      "prompt": "I want my game to output real HDR to an HDR10 display. Today I render the scene and present to an 8-bit sRGB swapchain. What do I need to change in the swapchain configuration and the final output pass to get correct HDR on the panel?",
+      "assertions": [
+        "Specifies a wide-gamut swapchain: PQ/ST2084 Rec.2020 at 10-bit-or-more per channel (e.g. an A2B10G10R10 packed format) for HDR10, or extended-linear scRGB at FP16 (RGBA16F) — not an 8-bit sRGB backbuffer for the HDR path",
+        "Applies the display transfer function exactly once in an explicit final pass and does not rely on an automatic sRGB backbuffer to encode",
+        "Scales luminance to the display's actual measured peak nits rather than PQ's full 10,000-nit range"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 4,
+      "prompt": "My explicit-API renderer creates a separate device memory allocation for every texture and buffer. It works in small test scenes but fails once I load a real level with thousands of assets. How should I manage GPU memory instead, and how should I get static texture data onto GPU memory the shaders can sample fast?",
+      "assertions": [
+        "Recommends sub-allocating resources out of a small number of large memory blocks instead of one device allocation per resource, and notes the device allocation count is hard-capped",
+        "Uploads static assets by writing to a host-visible staging buffer and copying into a device-local resource, because device-local memory is generally not CPU-mappable"
+      ],
+      "load_bearing": true
+    }
+  ]
+}

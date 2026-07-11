@@ -1,0 +1,46 @@
+{
+  "skill_name": "cross-platform-guide",
+  "tier": "conservative",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I have a native C game that runs a `while (running) { pump_input(); update(dt); render(); }` loop and allocates its main arena by reserving a 16 GiB virtual address range and committing pages on demand. I'm compiling it to run in the browser with Emscripten. What concrete code changes do I need to make so it actually runs in a tab?",
+      "assertions": [
+        "Replaces the blocking while loop with a per-frame callback registered via emscripten_set_main_loop, passing fps=0 (requestAnimationFrame) and simulate_infinite_loop=1",
+        "Replaces the reserve-then-commit virtual-memory arena with a fixed/bounded allocation for the web build, because Emscripten commits all requested memory (no lazy commit)",
+        "Enables heap expansion with ALLOW_MEMORY_GROWTH=1"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 2,
+      "prompt": "On Linux I need to read a USB gamepad's buttons and analog sticks in a game engine. Walk me through how to find the device, confirm it's really a gamepad, and read its stick values correctly.",
+      "assertions": [
+        "Enumerates devices under /dev/input and binds using the stable by-id or by-path symlinks rather than the unstable eventN node numbers",
+        "Probes device capability bits (e.g. requires BTN_GAMEPAD) before treating a node as a gamepad, since keyboards/mice also appear under /dev/input",
+        "Reads each axis's min/max and flat (deadzone) via EVIOCGABS to normalize, instead of hard-coding a range like [-32768, 32767] or a fixed deadzone"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 3,
+      "prompt": "Our C++ engine has `#ifdef _WIN32 / #else` blocks scattered through the renderer, gameplay, and asset code for window creation, clipboard, threading, and file watching. It's becoming unmaintainable and we want to add a Linux build. How should we restructure the OS-dependent code?",
+      "assertions": [
+        "Routes all OS calls through one abstraction expressed as struct(s) of function pointers (or build-time-selected translation units), grouped by concern, with a single backend .c selected per platform and no #ifdef in portable engine/app code",
+        "Keeps OS handles opaque at the interface boundary (never leaks raw HWND / file descriptor / X connection to callers)",
+        "Designs the interface first and provides a default stub backend so the program links and runs before any real backend exists, rather than reverse-engineering the interface from one platform"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 4,
+      "prompt": "We're bringing our Windows/MSVC C game up on Linux for the first time. Behind our platform interface we still need to implement windowing, input, threading/time/filesystem, and audio. What order should we tackle these in, and what toolchain issues should we expect?",
+      "assertions": [
+        "Recommends working in interactivity order — window/graphics first, then input, then general OS services, then audio — stubbing each interface first, rather than alphabetical/arbitrary order",
+        "Warns that the stricter/different compiler's new warnings are usually real latent bugs to fix at the root (e.g. changing K&R `void f()` to `void f(void)`, unused vars, declaration mismatches) rather than suppressing them",
+        "Adds the new target as its own CI matrix entry so it doesn't regress silently on later portable-code edits"
+      ],
+      "load_bearing": true
+    }
+  ]
+}

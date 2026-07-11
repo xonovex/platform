@@ -1,0 +1,45 @@
+{
+  "skill_name": "orthogonal-pattern-guide",
+  "tier": "aggressive",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Our Go data-export CLI has grown messy. The current layout is:\n\n  internal/export/s3uploader/\n  internal/exportutil/\n  internal/export/json/\n  internal/export/s3/\n  internal/export/gzip/\n\nIt supports encoding records as JSON/CSV/Parquet, sending them to a local file, S3, or stdout, and optionally compressing with none/gzip/zstd. Propose a cleaner package/directory structure and explain how new variants get added.",
+      "assertions": [
+        "The proposed top-level directories are named for the varying concerns (e.g. format, sink, compression) rather than for tools or layers (not s3uploader, exportutil, utils, helpers, services)",
+        "Variant leaf directories are bare variant names (e.g. sink/s3, format/json) rather than repeating the axis or naming a tool (not sink/s3uploader or format/jsonformat)",
+        "A single composition root / registry file is described as the only place that imports and wires the concrete variants, and adding a variant is one new leaf plus one registry entry"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 2,
+      "prompt": "In that same export tool I now need to add: (1) structured audit logging around every send, and (2) a fail-closed policy check that rejects any export of sensitive records to an unencrypted destination. These must apply no matter which encoder, destination, or compression is chosen. Where should this code live in the module structure?",
+      "assertions": [
+        "The answer explicitly states that logging and the policy check are NOT a new axis / sibling variant directory (e.g. no logging/ or policy/ directory placed alongside format/sink/compression)",
+        "It recommends applying these concerns once at the composition root over the whole selection, rather than duplicating the check inside each variant leaf",
+        "It frames them as cross-cutting concerns and warns that forcing them into a variant causes scattering (duplication across leaves) or tangling"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 3,
+      "prompt": "We have 3 encoders (json, csv, parquet) and want to support several compression algorithms (none, gzip, zstd). Right now every time we add a compressor we have to touch code in each encoder. How should the encoder and compression code be structured so adding a new compressor does not mean editing every encoder (and vice versa)?",
+      "assertions": [
+        "Recommends the producing axis emit a neutral data value (e.g. an encoded Record with bytes/content-type/metadata) that the compression axis consumes, so neither axis names the other",
+        "Explicitly states the result is N+M implementations rather than N*M per-combination code, with the cross-product living in configuration/selection rather than in code",
+        "If it addresses a case where one specific encoder genuinely requires a specific compressor, it places that glue as a bridge file inside the dependent leaf (e.g. format/parquet/zstd.go) rather than a new top-level combined package (not export/parquetzstd/)"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 4,
+      "prompt": "Design the command-line flag naming for per-variant options in this export tool: the S3 destination needs a bucket, and the zstd compressor needs a compression level. Show the flags and explain the naming rule so it scales as we add more variants.",
+      "assertions": [
+        "The proposed flags are prefixed by axis and variant, e.g. --sink-s3-bucket and --compression-zstd-level, rather than bare positional or unprefixed names like --bucket and --level",
+        "The rationale notes that the axis+variant prefix keeps option names unique (avoiding collisions such as two variants both wanting --level) and that each variant registers its own options at its leaf rather than editing a central parser"
+      ],
+      "load_bearing": true
+    }
+  ]
+}

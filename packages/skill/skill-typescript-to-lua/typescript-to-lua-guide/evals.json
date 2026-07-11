@@ -1,0 +1,45 @@
+{
+  "skill_name": "typescript-to-lua-guide",
+  "tier": "moderate",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I'm writing TypeScript that compiles to Lua with the typescript-to-lua transpiler. Write a `divmod` function that takes two numbers and returns both the quotient (floored) and the remainder so the generated Lua uses native Lua multiple return values rather than an array or object wrapper. Include a call site that consumes both values.",
+      "assertions": [
+        "The function body returns via a `$multi(...)` call",
+        "The function's return type is annotated `LuaMultiReturn<[number, number]>` (or equivalent LuaMultiReturn tuple) imported from \"typescript-to-lua\"",
+        "The call site destructures the result with array destructuring, e.g. `const [q, r] = divmod(...)`"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 2,
+      "prompt": "In a typescript-to-lua project I need an interface that compiles directly to a plain raw Lua table with no runtime wrapper, and a standalone helper function that must NOT receive an implicit `self` parameter in the generated Lua. Write the TypeScript.",
+      "assertions": [
+        "The interface is annotated with a `/** @luaTable */` JSDoc comment",
+        "The helper function is annotated with a `/** @noSelf */` JSDoc comment"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 3,
+      "prompt": "I'm building a small 2D vector math module (add, magnitude) in TypeScript that compiles to Lua via typescript-to-lua. Write it in the way that produces the cleanest, most efficient Lua output for this transpiler.",
+      "assertions": [
+        "The module is organized with a `namespace` (and/or exported free functions) rather than a `class` with instance methods",
+        "Vector operations take the vector value(s) as explicit parameters instead of relying on `this`",
+        "The output does not define a class with a constructor for the vector type"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 4,
+      "prompt": "Set up the tsconfig.json for a typescript-to-lua project that targets LuaJIT and should remap Lua stack traces back to the original TypeScript line numbers. Show the config.",
+      "assertions": [
+        "The config contains a top-level `tstl` block (sibling to `compilerOptions`)",
+        "Inside `tstl`, `luaTarget` is set to `\"JIT\"`",
+        "Inside `tstl`, `sourceMapTraceback` is set to `true`"
+      ],
+      "load_bearing": true
+    }
+  ]
+}

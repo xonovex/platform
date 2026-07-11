@@ -1,0 +1,43 @@
+{
+  "skill_name": "c99-guide",
+  "tier": "aggressive",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Set up the compiler configuration (CMake) for a C99 library target named `netcodec` that calls `readlink` and `strnlen`. Configure it for strict ISO C99, treat warnings as errors with `-Wall -Wextra`, and make sure it still compiles cleanly even though the code uses partial designated initializers like `(cfg_t){ .port = 8080 }` throughout.",
+      "assertions": [
+        "Sets C_STANDARD 99 with C_EXTENSIONS OFF (true ISO C99, not the GNU/-std=gnu99 dialect)",
+        "Defines a feature-test macro (_XOPEN_SOURCE 700 or _POSIX_C_SOURCE 200809L) so readlink/strnlen are not implicit-declaration errors under strict C99",
+        "Adds -Wno-missing-field-initializers and -Wno-missing-braces while keeping -Werror"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 2,
+      "prompt": "Write a C function that builds a filesystem path by joining a directory and a filename into a fixed 256-byte stack buffer, and returns an error if the joined path would be too long to fit.",
+      "assertions": [
+        "Uses snprintf into the fixed buffer rather than strcpy/strcat/sprintf",
+        "Checks the snprintf return value to detect truncation, treating a return >= the buffer size (e.g. (size_t)n >= sizeof(buf)) as the too-long error"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 3,
+      "prompt": "I have this C struct that is written to disk and sent over the network:\n\n```c\ntypedef struct { uint32_t id; int16_t offset; uint8_t flags; } record_t;\n```\n\nWrite a portable printf statement that logs all three fields on one line.",
+      "assertions": [
+        "Uses the <inttypes.h> format-macro constants (e.g. PRIu32 and PRId16/PRIi16) rather than plain %u/%d/%hd conversions",
+        "Includes <inttypes.h>"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 4,
+      "prompt": "Write an idiomatic modern-C99 function `parse_u32` that parses a string slice (a pointer plus an explicit length, which is NOT guaranteed to be null-terminated) into an unsigned 32-bit integer and signals to the caller whether parsing succeeded.",
+      "assertions": [
+        "Returns a by-value result struct that bundles a bool validity flag together with the uint32_t value, instead of writing the value through an out-parameter",
+        "Takes the input as a length-carrying view (pointer plus size_t length) rather than a null-terminated const char* it would strlen or scan"
+      ],
+      "load_bearing": true
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "skill_name": "lua-guide",
+  "tier": "aggressive",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Write a Lua 5.4 function `load_config(path)` that opens the file at `path`, reads all of it, and returns the parsed contents. Show how a caller would use it when the file might not exist, falling back to a default config instead of crashing.",
+      "assertions": [
+        "On failure the function returns `nil` plus an error message (e.g. `return nil, err`) rather than calling `error()` or raising/throwing",
+        "The caller checks the first return value (e.g. `if not config then ...`) before using it, and substitutes a default on failure"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 2,
+      "prompt": "In Lua, write a function that takes an array of a few thousand numbers and returns them as a single comma-separated string. Make it efficient for large inputs.",
+      "assertions": [
+        "The string is built by collecting parts in a table and calling `table.concat(parts, \",\")`",
+        "It does NOT accumulate the result with repeated `..` string concatenation inside the loop"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 3,
+      "prompt": "I'm iterating in a running Lua process. I edited `myapp.settings` on disk, but calling `require(\"myapp.settings\")` again keeps returning the stale version from before my edit. How do I force it to pick up the new file? Show the code.",
+      "assertions": [
+        "The answer sets `package.loaded[\"myapp.settings\"] = nil` (clears the entry in `package.loaded`) before re-requiring",
+        "It then calls `require(\"myapp.settings\")` again to get the fresh module"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 4,
+      "prompt": "Write a Lua 5.4 function `paginate(total, per_page)` that returns two values: the number of full pages needed to hold all items (rounded up is not required — use floor of total divided by per_page), and the exact average items-per-page as a decimal number.",
+      "assertions": [
+        "The whole-pages value is computed with the integer floor-division operator `//` (not `math.floor` on a `/` result)",
+        "The decimal average is computed with the float division operator `/`"
+      ],
+      "load_bearing": true
+    }
+  ]
+}

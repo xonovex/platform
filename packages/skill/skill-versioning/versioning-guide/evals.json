@@ -1,0 +1,42 @@
+{
+  "skill_name": "versioning-guide",
+  "tier": "conservative",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "A package's package.json currently reads \"version\": \"1.2.3-beta.4\". The beta cycle is over and we're ready to ship the stable release. Tell me the exact version string it should become and explain briefly why.",
+      "assertions": [
+        "The resulting version is 1.2.3, not 1.2.4",
+        "The explanation states that finalizing a pre-release lands on the same core version (the pre-release sorts below its release), rather than incrementing the patch"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 2,
+      "prompt": "In an npm workspace, package @acme/core is being bumped from 1.2.0 to 2.0.0 (a major release). Another package @acme/app has this in its package.json: \"dependencies\": { \"@acme/core\": \"^1.2.0\" }. @acme/app is not private and hasn't been bumped yet. Show me exactly how @acme/app's package.json should change and what its own version should do.",
+      "assertions": [
+        "The @acme/core dependency range in @acme/app becomes ^2.0.0 (the ^ caret operator is preserved, not stripped to a bare 2.0.0)",
+        "@acme/app receives a patch bump (e.g. its own version incremented by one patch) because 2.0.0 falls outside the previous ^1.2.0 range"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 3,
+      "prompt": "Generate a changelog entry summarizing this release. The commits since the last release are:\n\n- chore!: remove the deprecated /v1 auth endpoint\n\n  BREAKING CHANGE: the /v1 auth endpoint is gone; migrate to /v2.\n- feat(api): add pagination to the search results\n- fix(cache): stop double-invalidating on write\n\nWhat overall version bump level does this release require, and how should each commit be categorized?",
+      "assertions": [
+        "The release is classified as a MAJOR bump (driven by the breaking change), not minor or patch",
+        "The breaking chore!: commit with the BREAKING CHANGE: footer is included/detected as a breaking change and is not dropped or filtered out despite being a chore"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 4,
+      "prompt": "I have a bump script that decides a package is 'already bumped' (and should be skipped) by checking whether `git show HEAD:package.json` differs from the working-tree version. It worked while my bump was uncommitted, but after I committed the version bump and ran the script again, it bumped the version a second time. Explain why and how to fix the idempotency check.",
+      "assertions": [
+        "The answer explains that after committing, the working tree equals HEAD so the diff-based signal disappears (returns no difference), causing a re-bump",
+        "The recommended fix compares the working-tree version against the published registry version or a release tag instead of against HEAD"
+      ],
+      "load_bearing": true
+    }
+  ]
+}

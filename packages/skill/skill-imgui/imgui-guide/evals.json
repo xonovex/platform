@@ -1,0 +1,42 @@
+{
+  "skill_name": "imgui-guide",
+  "tier": "conservative",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I'm building an immediate-mode GUI in C. When two panels overlap, the hover highlight flickers between the control underneath and the one on top, because when I test the lower control I don't yet know the overlapping one will be drawn later this frame. How should I structure the hover resolution so the topmost / last-drawn control reliably wins?",
+      "assertions": [
+        "Writes each control under the cursor into a candidate field (e.g. next_hover) during the frame rather than committing hover immediately, so the last-drawn/topmost control's write wins",
+        "Promotes the candidate to the active hover value at frame end so controls read the previous frame's resolved hover this frame (a one-frame delay), rather than resolving hover within the same frame"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 2,
+      "prompt": "My editor UI pushes tens of thousands of rectangles and glyphs to the GPU every frame and it's bandwidth-bound. I want to get the whole UI into a single draw call by packing compact primitive definitions into a buffer and synthesizing vertices in the vertex shader from the index buffer. How should I lay out the primitive buffer and encode each 32-bit index so one shader can render everything?",
+      "assertions": [
+        "Encodes each 32-bit index as a byte offset into the primitive buffer in the low 24 bits plus the primitive type and corner id packed into the top 8 bits (6 bits type + 2 bits corner)",
+        "Packs primitives tightly with no common/fixed stride (a rect and a glyph differ in size) rather than using a uniform vertex layout, and encodes the clip rectangle into each primitive (GPU clips) instead of issuing per-scissor draw calls"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 3,
+      "prompt": "I need to localize all the visible text in my immediate-mode tool UI into multiple languages, and I do not want to maintain a big table of numeric string IDs that collide during merges and orphan entries. What lookup-key scheme should each visible string use, what should happen on a missing translation, and how do I catch strings I forgot to mark?",
+      "assertions": [
+        "Uses the hash of the source string itself as the lookup key (wrapping visible text in a LOCALIZE-style marker) instead of numeric/string IDs, and returns the original source string as the fallback on a lookup miss",
+        "Recommends a pseudo-localization mode that both transforms strings into recognizable nonsense and pads them noticeably longer (~40%) to surface unmarked strings and layout that breaks under text expansion"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 4,
+      "prompt": "In my immediate-mode tool I want to drag an item from one panel and drop it onto another panel (possibly a different window). Where should the drag state live, how do I initiate the drag so a simple click doesn't accidentally start one, and what ordering do I need at end of frame so valid drops aren't lost?",
+      "assertions": [
+        "Holds the drag state as a single global id naming the dragged object(s) (outside any per-control or per-window UI context) so it survives across windows, and treats the drop as a data-model mutation",
+        "Initiates via a prepare/latch on mouse-press that only starts the actual drag once the cursor leaves the item while still held (aborting if released first), and runs the end-of-frame drag-cancel only AFTER all drop targets have processed the mouse-release"
+      ],
+      "load_bearing": true
+    }
+  ]
+}

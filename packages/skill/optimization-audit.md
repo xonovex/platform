@@ -143,3 +143,38 @@ Before/after are total lines across `SKILL.md` + `references/`, measured from gi
 
 - The trim decision was made by a strong model's judgment of "filler vs delta"; the ablation re-checked the **removed** content against the **weakest** model (Haiku), so the final catalog is trimmed to what Haiku provably does not already produce — the three exceptions restored.
 - Conservative-tier skills show near-zero reduction by design: their value is exact facts, so only obvious duplication was removed.
+
+## Re-running the evals (and adding a new model)
+
+Every skill carries an `evals.json` next to its `SKILL.md` — the output-eval seed consumed by `eval-outputs.py`. It holds the knowledge probes (`prompt` + binary `assertions`, with a `load_bearing` flag) that seed any A/B or ablation run. **291 evals across the catalog, 274 `load_bearing`.** This is the durable "something to start from": no probe needs re-authoring to test a new model.
+
+### Test one skill on any model
+
+```bash
+uv run packages/skill/skill-skill/skill-guide/scripts/eval-outputs.py \
+  packages/skill/<skill>/<guide>/evals.json <plugin>:<guide> --model <model>
+# e.g. …/eval-outputs.py packages/skill/skill-typescript/typescript-guide/evals.json \
+#        xonovex-skill-typescript:typescript-guide --model haiku
+```
+
+Each eval runs twice — **with** the skill and **without** it (no-skill baseline) — graded on its assertions by an LLM judge. The script exits `0` iff with-skill beats no-skill. Needs the `claude` CLI, and `--eval-cwd` set to where the skill resolves (installed plugin or this repo).
+
+### When a new model is added
+
+The **weakest model you deploy is the gate** — "what the model already knows" is model-specific, so re-verify against the new model. Re-run the seed across the catalog:
+
+```bash
+for d in packages/skill/skill-*/*/evals.json; do
+  guide=$(basename "$(dirname "$d")")
+  uv run packages/skill/skill-skill/skill-guide/scripts/eval-outputs.py \
+    "$d" "xonovex-skill-${guide%-guide}:$guide" --model <new-model>
+done
+```
+
+Read each eval's `with_skill` vs `without_skill` pass rate:
+
+- `without_skill` **high** → the new model already knows it → that content is now redundant → **trim-further** candidate (only act if this model is the weakest you run).
+- `with_skill` high, `without_skill` low → still **load-bearing** → keep (restore if a trim removed it).
+- `with_skill` low → the skill or the eval needs attention.
+
+The `load_bearing` evals are the ones a trim must never break. After any future trimming pass, re-run them (or the two-stage ablation: diff removed content → ablate on the weakest model) to confirm nothing load-bearing was lost, exactly as this session did.

@@ -1,0 +1,43 @@
+{
+  "skill_name": "code-review-guide",
+  "tier": "aggressive",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "During a PR review I found that a function dereferences `user` with no null check and crashes when the session has expired. This has to be fixed before the PR merges. Write the exact review comment I should leave on that line.",
+      "assertions": [
+        "The comment is categorized with the Conventional Comments label `issue`",
+        "The comment carries an explicit urgency decoration written as `(blocking)`",
+        "The comment states the label and decoration up front (e.g. `issue (blocking)`) rather than only describing the bug in prose"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 2,
+      "prompt": "I reviewed a PR and found three things. Near the top of the file there is a variable that could be renamed for clarity (trivial, author's call). Lower down, a query runs inside a loop instead of being batched (worth doing but not required). Much further down, an auth check is skipped so unauthenticated users reach the handler (this must be fixed before merge). Draft the top-level review summary I should post, and tell me how the summary should point the author to the individual line comments.",
+      "assertions": [
+        "The auth-check problem is listed first in the summary, ahead of the rename and the batching item (priority order, not file order)",
+        "The summary refers the author to the detailed line comments via links/cross-links, and does NOT reference them by ordinal (no `see comment 1/2/3` style numbering)"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 3,
+      "prompt": "In a concurrency PR I'm genuinely unsure whether the order of two operations still matters once the lock is acquired, and I want the author to confirm it before this merges. What Conventional Comments label should I use for this remark, and should I mark it as blocking?",
+      "assertions": [
+        "Recommends the label `question`",
+        "States that the remark should NOT be marked `(blocking)` (question/thought are inherently non-blocking; blocking a question is contradictory)"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 4,
+      "prompt": "I'm converting a diff into a structured inline review finding. Here is the hunk:\n\n```\n@@ -10,4 +10,5 @@ function total() {\n   const a = 1;\n   const b = 2;\n-  return a + b;\n+  const c = 3;\n+  return a + b + c;\n }\n```\n\nI want to leave an inline comment on the `return a + b + c;` statement. What line number should the inline comment be anchored to, and on which side of the diff?",
+      "assertions": [
+        "States the anchor line number is 13",
+        "Specifies the anchor is on the new-file (added/right) side of the diff, not the old-file side"
+      ],
+      "load_bearing": true
+    }
+  ]
+}

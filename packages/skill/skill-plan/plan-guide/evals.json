@@ -1,0 +1,42 @@
+{
+  "skill_name": "plan-guide",
+  "tier": "moderate",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I have an approved parent plan for adding OAuth login to our web app. Break it down into detailed implementation subplans I can hand off for execution.",
+      "assertions": [
+        "No single subplan is given more than 7 tasks (work is split into subplans of roughly 5-7 tasks each)",
+        "Execution ordering (parallel vs sequential) is decided by whether subplans touch overlapping files/packages: non-overlapping ones may run in parallel, overlapping ones are sequenced"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 2,
+      "prompt": "Before we plan this data-layer refactor, help me settle the open design decisions. There are several unresolved trade-offs (naming, where the migration logic lives, and how much of the old contract to keep).",
+      "assertions": [
+        "Presents only ONE decision at a time and stops for the answer, rather than listing or batching all the decisions in one response",
+        "The decision is presented as prose with an explicit recommended option (not a neutral multiple-choice list and not a forced-option question widget)"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 3,
+      "prompt": "Resume the implementation work on my authentication plan, which has several subplans.",
+      "assertions": [
+        "Establishes a baseline by running validation (typecheck / lint / build / tests) before making code changes",
+        "Works on a single plan/subplan and stops when it is complete instead of automatically continuing to the next subplan"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 4,
+      "prompt": "Create a high-level plan for adding rate limiting to our API, based on the research we just did.",
+      "assertions": [
+        "The plan includes a non-empty skills_to_consult list naming applicable coding-guideline skills for implementers",
+        "It stops at the high-level/parent plan and does NOT write out detailed implementation subplans in the same pass"
+      ],
+      "load_bearing": true
+    }
+  ]
+}

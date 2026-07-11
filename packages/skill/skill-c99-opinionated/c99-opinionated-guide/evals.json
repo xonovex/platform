@@ -1,0 +1,43 @@
+{
+  "skill_name": "c99-opinionated-guide",
+  "tier": "moderate",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I'm writing a C99 entity-storage module for a resource-constrained runtime. It needs to hold 2D positions (x and y) for many entities and support adding a new entity. Show the struct plus the init and add functions.",
+      "assertions": [
+        "The init function binds the system to a caller-provided array/pointer plus a capacity, and does NOT call malloc/calloc internally to allocate the storage.",
+        "The add function returns a status/error code (e.g. a full/overflow status) when at capacity instead of calling realloc or otherwise growing the storage."
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 2,
+      "prompt": "Design a C99 struct for a scene-graph node that references its parent and children. The nodes live in a pooled array, and the whole graph must be serializable to disk and reloaded identically in a later run. Show the node struct and how code recovers the parent node to read it.",
+      "assertions": [
+        "Parent/child cross-references are stored as integer indices or handles into the pool, not as raw node pointers (e.g. node_t *).",
+        "The 'no parent'/'no link' state is an explicit integer sentinel such as -1 or UINT32_MAX rather than a NULL pointer.",
+        "The parent pointer is recovered transiently at the point of use (e.g. &pool->nodes[idx]) rather than stored back into the node struct."
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 3,
+      "prompt": "Configure the GCC/Clang compiler warning flags for a reusable C99 systems library. The library defines enum-name/backend-mapping tables inside headers and has interface-mandated callback parameters that individual translation units don't all use. Recommend the flag set and briefly justify it.",
+      "assertions": [
+        "Enables -Werror (or treats correctness warnings as hard errors) while explicitly disabling the unused-symbol family for the library (e.g. -Wno-unused-parameter, -Wno-unused-function, -Wno-unused-variable).",
+        "Keeps -Wunused-value as an error (does NOT disable it) rather than blanket-suppressing all unused warnings."
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 4,
+      "prompt": "In a C99 parser I keep calling strlen and strtok inside the tokenizing loop, and profiling shows it dominates runtime on large inputs. Redesign the string handling to fix the performance problem.",
+      "assertions": [
+        "Introduces a length-carrying view type (pointer plus explicit length field) so comparisons/reads use the stored length instead of repeated strlen/strcmp terminator scans.",
+        "Replaces strtok with a stateless/re-entrant split that returns a field and advances a cursor over the remaining input, avoiding repeated rescans to the terminator (the O(n^2) cause)."
+      ],
+      "load_bearing": true
+    }
+  ]
+}

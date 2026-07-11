@@ -1,0 +1,44 @@
+{
+  "skill_name": "c99-game-opinionated-guide",
+  "tier": "moderate",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I'm writing a small C99 physics engine. Define a rigid body struct and a function that applies a linear impulse to it. It must correctly handle both dynamic bodies and immovable/static bodies.",
+      "assertions": [
+        "The rigid body stores the reciprocal of mass (an inverse-mass / 1-over-mass field), not the mass itself",
+        "Static/immovable bodies are represented by an inverse mass of 0.0 (0)",
+        "The apply-impulse function scales the impulse by the inverse mass, with no separate branch/if-check special-casing static bodies"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 2,
+      "prompt": "Write a C99 API to generate a UV-sphere triangle mesh for a game engine, in a style where the library itself never allocates memory. Also show how a caller would use it.",
+      "assertions": [
+        "Provides two separate functions: one that returns the required vertex/index counts, and one that fills a caller-provided buffer",
+        "No malloc/calloc/realloc or other internal allocation appears inside the mesh-generation code; the caller supplies the buffers",
+        "The build/fill function returns a status or otherwise checks the provided buffer capacity before writing"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 3,
+      "prompt": "In C99, I have collision shapes that can be a sphere, a box, or a capsule. Write the shape type and a function that computes each shape's volume.",
+      "assertions": [
+        "Uses a single struct with a type enum tag plus a union of the per-shape data (not separate unrelated structs, function pointers, or a vtable)",
+        "The volume function switches on the type tag and has NO default clause in the switch"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 4,
+      "prompt": "Set up C99 types for a 4x4 transform matrix and a quaternion for a 3D game engine, and show constructing a translation matrix from a translation vector.",
+      "assertions": [
+        "The 4x4 matrix is stored column-major (as four column vectors / 16 floats in column order), with the translation placed in the last column (column index 3)",
+        "The quaternion component order is x, y, z, w (w last)"
+      ],
+      "load_bearing": true
+    }
+  ]
+}

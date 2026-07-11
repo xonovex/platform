@@ -1,0 +1,43 @@
+{
+  "skill_name": "memory-management-guide",
+  "tier": "conservative",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I'm writing a small C tokenizer library that other teams will embed. It must be leak-free even on error paths and must not force a specific allocator on its users. Sketch the C function signatures for initializing the tokenizer and for adding/producing tokens, and briefly explain the allocation approach.",
+      "assertions": [
+        "The init and operation functions accept caller-provided storage (buffer pointer(s) plus a capacity) rather than calling malloc/calloc/realloc internally to allocate the token storage.",
+        "Operations return a status/error code (e.g. a 'full'/overflow status) when capacity is exceeded instead of growing or reallocating.",
+        "The design exposes or describes a way for the caller to determine the required buffer size (e.g. a size-query / *_req() function) rather than the library owning a returned allocation the caller must free."
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 2,
+      "prompt": "In my 64-bit C program I have a growable array, and many other structures store raw pointers directly to elements inside it. When the array exceeds capacity it reallocs and every one of those pointers dangles. I do not want to rewrite all those references. How should I change the array's storage so the pointers stay valid as it grows?",
+      "assertions": [
+        "Recommends reserving a large virtual address range up front and committing pages on demand (reserve/commit) so the array's base never moves and never reallocs, keeping existing pointers valid.",
+        "States that reserving address space costs only address space / page-table entries, not physical RAM (physical cost is only the committed/touched pages)."
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 3,
+      "prompt": "My engine has a per-frame arena that I reset at the end of every frame. I just added a feature that parses some asset data, allocates it from that same per-frame arena, and caches it to reuse across many later frames. Is this design sound?",
+      "assertions": [
+        "Identifies that data allocated from the per-frame arena becomes a use-after-free once the arena is reset, because an arena reclaims everything at reset and cannot free/retain individual objects.",
+        "Advises allocating the longer-lived cached data from storage whose lifetime matches its use (a different/longer-lived allocator or arena), i.e. grouping/matching allocations by lifetime."
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 4,
+      "prompt": "Code review question: is there anything to improve about this C accessor used to fetch a node out of a graph? `node_t *get_node(graph_t *g, int i);` We've been hitting occasional double-frees around graph nodes.",
+      "assertions": [
+        "Points out that returning a raw pointer leaves ownership ambiguous (whether the caller must free it), which is a likely cause of the double-free/leak.",
+        "Recommends making ownership explicit: return a handle/index, or use an explicit borrow/take naming convention, or document that the accessor returns a borrowed (non-owning) pointer that the caller must not free."
+      ],
+      "load_bearing": true
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "skill_name": "sql-postgresql-guide",
+  "tier": "aggressive",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Design a PostgreSQL table for meeting-room reservations. Each reservation has a room, a start time, and an end time. The database itself must guarantee that two reservations for the same room can never overlap in time. Write the CREATE TABLE statement.",
+      "assertions": [
+        "Uses an EXCLUDE USING GIST exclusion constraint to prevent overlaps (not a trigger, application check, or plain UNIQUE constraint)",
+        "The exclusion constraint compares the room identifier WITH = and a range type (e.g. tstzrange over start/end) WITH the && overlap operator"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 2,
+      "prompt": "We have a products table with tens of millions of rows and an API endpoint that lets users page through them ordered by created_at descending. The current implementation uses LIMIT with a page offset and gets slower on deeper pages. Rewrite the pagination query so it stays fast on any page.",
+      "assertions": [
+        "Uses keyset/cursor pagination with a WHERE clause comparing the ordering column to the last-seen value (e.g. WHERE created_at < $last_seen) plus ORDER BY and LIMIT",
+        "Does not rely on OFFSET for skipping rows"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 3,
+      "prompt": "This query is doing a sequential scan and is slow on a large users table: SELECT * FROM users WHERE lower(email) = 'user@example.com'. There is already a B-tree index on the email column but the planner ignores it. Add an index that makes this query use an index scan.",
+      "assertions": [
+        "Creates an expression/functional index on LOWER(email) (e.g. CREATE INDEX ... ON users (LOWER(email)))",
+        "Explains or implies that the existing plain index on email is unusable because the predicate wraps the column in lower()"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 4,
+      "prompt": "Set up a PostgreSQL readwrite role for an application in the public schema. The application user must be able to SELECT/INSERT/UPDATE/DELETE on all existing tables, on any tables created later without re-granting, and it must be able to insert into tables that use identity/serial columns. Provide the SQL.",
+      "assertions": [
+        "Uses ALTER DEFAULT PRIVILEGES IN SCHEMA public so future tables inherit the grants automatically",
+        "Grants USAGE (or ALL) on sequences to the role so nextval works for identity/serial columns",
+        "Grants privileges to a role and then assigns that role to the user rather than granting directly to the user"
+      ],
+      "load_bearing": true
+    }
+  ]
+}

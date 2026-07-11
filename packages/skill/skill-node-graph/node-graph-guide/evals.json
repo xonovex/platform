@@ -1,0 +1,43 @@
+{
+  "skill_name": "node-graph-guide",
+  "tier": "conservative",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I'm building an evaluator for a visual node-based image-authoring graph. Some nodes (blur, compress, bake) are expensive, and the same subtree gets evaluated repeatedly across edits. Design the caching scheme that decides when a node can reuse a previously computed output instead of recomputing it. Explain exactly what the cache key is computed from and the one mistake that would make it return stale results.",
+      "assertions": [
+        "States the cache key (validity hash) is computed from the node's own settings combined with the validity hashes of all of its inputs",
+        "Warns that omitting any consumed input from the hash produces silent stale reuse with no error, so every input that affects the output must be folded in"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 2,
+      "prompt": "In my node-graph tool, authors can select a group of nodes and collapse them into a single reusable subgraph node that can be dropped into other graphs. How should the runtime evaluator handle these subgraph nodes, and what must I guard against so a user can't crash the tool by nesting subgraphs?",
+      "assertions": [
+        "Says subgraphs are flattened/inlined into the parent at compile time so the evaluator sees one flat DAG and never recurses into subgraphs at runtime",
+        "Warns that a subgraph transitively containing itself would inline forever / overflow the stack, so cycles must be detected and rejected before inlining"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 3,
+      "prompt": "I'm implementing the wiring logic for a node editor. A node has typed input and output pins. Walk me through the rules for what makes a connection legal, how many wires each pin may accept, when type checking happens, and what to do when a user tries to wire a CPU-memory image output into a node that expects a GPU image.",
+      "assertions": [
+        "States each input pin accepts at most one source wire while an output pin may fan out to many consumers",
+        "Says connection type validity is checked at author/connect time (not deferred to evaluation)",
+        "Requires an explicit conversion node (e.g. upload/readback) for CPU-vs-GPU image mismatch rather than silently coercing"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 4,
+      "prompt": "Design the in-memory and on-disk representation for a procedural content node graph so the editor, evaluator, and diff/merge tools all read the same thing, and plugins can add new node kinds. How should the graph be stored, and how do terminal nodes that produce a rendered image or a draw call actually get that work executed?",
+      "assertions": [
+        "Represents the graph as plain serialized data (explicit node list plus connection list plus per-node settings), not topology buried in imperative code",
+        "States that terminal/output nodes only surface a result and the owning system schedules the emitted work; if no system consumes the output node the work never runs"
+      ],
+      "load_bearing": true
+    }
+  ]
+}

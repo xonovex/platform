@@ -1,0 +1,45 @@
+{
+  "skill_name": "audio-guide",
+  "tier": "conservative",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I'm writing my own software audio mixer in C that sums many playing sounds into one output buffer for the sound card. Right now I add each sound's 16-bit samples directly into the 16-bit output buffer and when several loud sounds play at once I get a horrible loud burst of noise. Also, when a sound starts or its volume changes, I hear a sharp click. How should I structure the mixing and volume handling to fix both?",
+      "assertions": [
+        "Recommends accumulating the mix in floating-point (deinterleaved/planar 32-bit float) rather than summing directly in the integer output format, then scaling to fit and converting to the device integer format only at the end",
+        "Explains that the burst comes from integer overflow/wraparound and that float accumulation tolerates sums outside [-1,1]",
+        "States that gain/volume changes must be ramped gradually over many samples (on the order of tens of milliseconds) rather than snapped, and the ramp advances per sample (not once per block)"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 2,
+      "prompt": "My game's audio render callback occasionally produces audible clicks and dropouts, especially the first time a new sound type plays or when the game is busy. Inside the callback I currently take a mutex to read the list of active sounds, malloc a temporary scratch buffer for mixing, and sometimes printf when a sound finishes. What is wrong with this and how should the callback and the game-thread-to-audio-thread communication be structured?",
+      "assertions": [
+        "States the audio callback must never lock/take a mutex, allocate or free (malloc/free), do I/O (printf/file/network), or otherwise do unbounded/blocking work on the audio path",
+        "Says all buffers and voice state must be preallocated and pre-touched/pinned at startup so the first callback does not page-fault, and that the 'first time' glitch is a first-touch page fault",
+        "Says the game thread should hand work to the audio thread via a lock-free (single-producer/single-consumer) command queue drained at the top of the render block instead of sharing/mutating state under a lock"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 3,
+      "prompt": "In my C audio engine each sound asset can be at a different sample rate than my 44100 Hz mixer, and I also want per-sound pitch/playback-speed control. My current approach uses a float variable that I increment to track my read position in the source, and long ambient loops slowly drift out of tune over a minute or two. How should I do the sample-rate conversion and pitch, and why is my long sound going out of tune?",
+      "assertions": [
+        "Describes reading the source with a single fractional per-voice playback step where step = (src_rate / mix_rate) * pitch, so one step handles both rate conversion and pitch/speed together, and interpolating (linear by default) between bracketing source samples",
+        "States the read cursor/position must be kept in double (or fixed-point), not float, because accumulating the fractional position in float drifts/loses precision over long sounds"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 4,
+      "prompt": "My audio system dynamically allocates a new voice struct with malloc every time a sound plays and frees it when the sound ends, and it hands the caller a raw pointer to that voice so they can change its volume later. Under heavy action the audio thread stutters, and sometimes changing a sound's volume affects a completely different sound. How should I manage the voices instead?",
+      "assertions": [
+        "Recommends a fixed-size preallocated voice pool (cap concurrency at MAX_VOICES, no per-play malloc/free on the audio thread) so the mix loop's worst case is bounded",
+        "Says to hand out an opaque handle containing a slot index plus a generation counter (validated before use) instead of a raw pointer, so stale references to a recycled voice are detected",
+        "Says that when the pool is full you steal the least important voice (ranked by priority first, then loudness/age) and must ramp the stolen/stopped voice's gain to zero before reusing its slot rather than cutting it instantly"
+      ],
+      "load_bearing": true
+    }
+  ]
+}

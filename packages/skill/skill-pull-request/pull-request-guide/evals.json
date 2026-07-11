@@ -1,0 +1,45 @@
+{
+  "skill_name": "pull-request-guide",
+  "tier": "aggressive",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I have a branch that adds a new /reports API endpoint. While I was in there I also upgraded the web framework to its next major version and reformatted about 30 files that the linter flagged. Help me get this ready to open as a pull request.",
+      "assertions": [
+        "Advises splitting the work into separate PRs rather than opening it as one (e.g. reformat, framework upgrade, and new endpoint as distinct PRs)",
+        "Recommends a target size around 50-200 changed lines (treating roughly 400 as a soft cap), or frames the goal as keeping review time under about an hour"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 2,
+      "prompt": "Write the 'how I tested this' section for my PR. The change fixes a bug where an import step double-charged on retry. All I really did to check it was run it locally and it worked.",
+      "assertions": [
+        "Rejects or replaces the bare 'tested locally' phrasing with concrete evidence: names the specific environment, the exact scenario, and the observed result",
+        "For the fix, states how the bug was confirmed before the change and how the fix was confirmed after",
+        "Includes an explicit way to reproduce end to end (a command, request, or link) and/or edge cases checked"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 3,
+      "prompt": "Draft a reusable pull request description template for our repo so people stop opening PRs with an empty body.",
+      "assertions": [
+        "Produces a lean template of roughly 4-6 prompts/sections rather than a long mandatory checkbox form",
+        "Includes distinct sections covering what changed, why (work item/issue link), how tested, and tradeoffs/risks",
+        "Includes a section for linking related/sibling PRs or the shared work item"
+      ],
+      "load_bearing": false
+    },
+    {
+      "id": 4,
+      "prompt": "My PR is a single large diff: a database schema migration plus all the application code that depends on the new columns. It's about 500 lines and can't really be broken apart. What should I do before requesting review?",
+      "assertions": [
+        "Confirms an atomic, unsplittable change (migration plus dependent code) is acceptable even when large, rather than forcing a split",
+        "Says to explicitly flag in the PR that it is one atomic unit and explain why it cannot be split",
+        "Advises self-review of the full diff and keeping it a draft until CI is green before flipping to ready and assigning reviewers"
+      ],
+      "load_bearing": true
+    }
+  ]
+}

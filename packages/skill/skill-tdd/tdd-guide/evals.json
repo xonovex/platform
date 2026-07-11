@@ -1,0 +1,43 @@
+{
+  "skill_name": "tdd-guide",
+  "tier": "aggressive",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Implement a `discountedTotal(items, rate)` function test-first, where each item has a `price`. Show the ordered sequence of failing tests and the exact code change you make to pass each one, step by step.",
+      "assertions": [
+        "The walkthrough includes an explicit refactor step that changes structure (e.g. extracting a subtotal helper or removing duplication) while keeping the tests green and adding no new behaviour.",
+        "At least one early step goes green by returning a hard-coded constant or a single-element value (fake it / obvious implementation) rather than jumping straight to the fully general implementation.",
+        "The refactor step explicitly removes the duplication (such as a constant shared between test and code) that was introduced to go green."
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 2,
+      "prompt": "When I'm doing TDD, when should I reach for triangulation versus just writing the implementation directly?",
+      "assertions": [
+        "States that triangulation is a fallback / last resort, used only when you cannot yet see the general solution — not the default or canonical TDD move.",
+        "States that obvious implementation and/or fake it are used far more often, and that if you can already see how to remove the duplication you should write the general solution directly instead of adding a second example just to justify it."
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 3,
+      "prompt": "I brainstormed 8 test cases for the CSV parser I'm about to build with TDD. My plan is to write all 8 as failing tests first, then make them all pass. Is that the right approach?",
+      "assertions": [
+        "Advises against writing all the tests as failing up front, and recommends driving exactly one test through red-green-refactor at a time before moving to the next.",
+        "Frames the remaining cases as a test list of ideas (a parking lot / to-do list) that you keep unwritten and pull from one at a time."
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 4,
+      "prompt": "A colleague says London-style (mockist) TDD is the modern, correct way to do TDD and that classical/Detroit-style is outdated. Should I default all my tests to mockist?",
+      "assertions": [
+        "States that neither classical nor mockist is more modern or a universal default — it is a per-situation design choice, not a correctness upgrade.",
+        "Describes the tradeoff: mockist tests assert expected calls and couple to the implementation/collaboration (breaking on internal refactors), while classical tests assert the result/state and survive internal refactoring with better integration coverage."
+      ],
+      "load_bearing": true
+    }
+  ]
+}

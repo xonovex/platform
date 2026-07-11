@@ -1,0 +1,36 @@
+{
+  "skill_name": "command-guide",
+  "tier": "conservative",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I have a Claude Code slash command at `.claude/commands/changelog.md`. Its body uses `$ARGUMENTS` for the user input and embeds git output inline with `` !`git log --oneline -20` ``. I want to port this same command to the Gemini CLI. Tell me exactly what to change and where the file goes.",
+      "assertions": [
+        "States the ported file must use the `.toml` extension and live in `.gemini/commands/` (project) or `~/.gemini/commands/` (user)",
+        "Converts the argument placeholder from `$ARGUMENTS` to `{{args}}`",
+        "Puts the body into a triple-quoted multiline `prompt = \"\"\"...\"\"\"` TOML key and converts inline shell from `` !`cmd` `` to `!{cmd}`"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 2,
+      "prompt": "We have a ~140-line Claude Code slash command that inlines its entire Goal, Workflow, Output format, and Gotchas. I want to refactor it into a thin command that keeps only its argument contract and delegates the actual procedure to a reusable guideline skill. It's packaged as a plugin. Walk me through every step so nothing breaks at run time.",
+      "assertions": [
+        "Says to add the `Skill` tool to the command's `allowed-tools` so the delegation can load the skill",
+        "Says to declare the guideline skill as a dependency in BOTH the `.claude-plugin/plugin.json` and `.codex-plugin/plugin.json` manifests",
+        "Keeps the argument contract (flags/defaults) in the command while the Goal/Workflow/Output/Gotchas move into the skill's `references/{operation}.md`, and notes install does not equal in-context (must load via the Skill tool)"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 3,
+      "prompt": "I just finished a task where I stripped every `console.log` call out of `packages/billing-service/src/` for our invoicing app. Save this as a reusable slash command I can run on other projects.",
+      "assertions": [
+        "Replaces the project-specific path `packages/billing-service/src/` and domain/app terms (billing, invoicing) with generic equivalents rather than hardcoding them",
+        "Gives the command a kebab-case name",
+        "Resulting command body is kept short (under ~150 lines) with the load-bearing sections (description/metadata, Goal, Arguments, Core Workflow, Error Handling)"
+      ],
+      "load_bearing": true
+    }
+  ]
+}

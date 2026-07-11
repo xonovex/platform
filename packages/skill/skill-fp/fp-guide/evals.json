@@ -1,0 +1,42 @@
+{
+  "skill_name": "fp-guide",
+  "tier": "aggressive",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I have a log file with about 20 million lines already loaded as an array of strings in JavaScript. Write a function that keeps only the ERROR lines, extracts the timestamp from each, and returns the first 10. Explain any performance concerns.",
+      "assertions": [
+        "The solution avoids chaining eager array .filter/.map over the full 20M-element array and instead uses a generator/iterator or lazy stream (or a single pass) so no large intermediate arrays are allocated",
+        "The explanation states that chained array map/filter are eager and allocate intermediate arrays"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 2,
+      "prompt": "Write a pure function `describeShape` that takes a discriminated-union shape value (a circle, a square, or any other shape) and returns a human-readable string. Handle the circle and square cases specifically and provide a fallback for everything else.",
+      "assertions": [
+        "The pattern matching / branch order places the specific cases (circle, square) before the general fallback case",
+        "The function is pure: it returns a value based only on its input with no mutation or side effects"
+      ],
+      "load_bearing": false
+    },
+    {
+      "id": 3,
+      "prompt": "Design a small rate-limiter module in TypeScript that tracks how many requests each client has made in the current window and decides whether to allow the next request. Show the module's public functions and how a caller uses them.",
+      "assertions": [
+        "The rate-limiter state is passed explicitly to the functions (module-level functions taking the state/context as a parameter) rather than held in a class instance or in module-level/global mutable variables",
+        "State transitions return new state (or an updated state value) rather than mutating shared module-level mutable state in place"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 4,
+      "prompt": "I have an array of user IDs and an async function `fetchUser(id)` that returns a Promise. I want a composed pipeline that fetches every user and then uppercases each user's name. Someone told me to just `ids.map(fetchUser).map(u => u.name.toUpperCase())`. Is that correct? Show the right way.",
+      "assertions": [
+        "The answer states that mapping a transform directly over an array of Promises operates on the Promise objects, not the resolved values, so `u.name` would be undefined / fail",
+        "The corrected solution awaits/resolves the Promises (e.g. Promise.all) before applying the name-uppercasing transform"
+      ],
+      "load_bearing": true
+    }
+  ]
+}

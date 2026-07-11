@@ -1,0 +1,42 @@
+{
+  "skill_name": "code-quality-guide",
+  "tier": "aggressive",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Here is part of a Node/Express service. Of the quality problems in it, which should I address first, and why?\n\n```ts\nfunction buildInvoiceLines(rows: Row[]): string {\n  let out = '';\n  for (const r of rows) {\n    for (const item of r.items) {\n      if (item.qty > 0) {\n        if (item.discount) {\n          out += `${item.name}: ${item.qty} @ ${item.price} (-${item.discount})\\n`;\n        } else {\n          out += `${item.name}: ${item.qty} @ ${item.price}\\n`;\n        }\n      }\n    }\n  }\n  // ...roughly 45 lines total, pure string assembly, no I/O\n  return out;\n}\n\napp.post('/orders', (req, res) => {\n  const qty = req.body.quantity;\n  const total = qty * req.body.price;\n  db.insertOrder({ customerId: req.body.customerId, total });\n  res.json({ total });\n});\n```",
+      "assertions": [
+        "Ranks the unvalidated `/orders` request body (req.body.quantity / price / customerId used without validation) as higher severity than the long buildInvoiceLines function",
+        "Justifies the ranking by impact/blast radius (a trust-boundary input reaching logic) rather than by the function's line count or length"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 2,
+      "prompt": "This config loader is riddled with `any` and my linter flags it in about 20 spots. How should I characterize the type-safety problem and what is the right fix?\n\n```ts\nconst data: any = JSON.parse(await readFile(configPath, 'utf8'));\nconst host = data.server.host;\nconst port: any = data.server.port;\nconst retries = data.server.retries;\nconst endpoints: any[] = data.endpoints;\nconst timeout = data.limits.timeout;\n// ...~15 more reads of fields off `data`, each typed any\n```",
+      "assertions": [
+        "Recommends adding a single schema / parse / validation step at the boundary where the file is parsed (the JSON.parse of the config), rather than annotating or asserting a type at each field access / call site",
+        "Frames the ~20 `any` uses as one missing-schema finding at the boundary, not as many separate per-site type findings"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 3,
+      "prompt": "Do a read-only audit of the error handling in this file and tell me which catches are genuinely a problem worth fixing.\n\n```ts\ntry {\n  await refreshCache(key);\n} catch (err) {\n  // cache refresh is best-effort; a miss is fine and we recompute later\n}\n\nasync function loadUser(id: string) {\n  try {\n    return await db.getUser(id);\n  } catch (err) {\n    return null;\n  }\n}\n```",
+      "assertions": [
+        "Flags the loadUser catch as a problem: a real error is swallowed and mapped to a sentinel (null) so a failure looks like a legitimate 'not found', losing the cause",
+        "Does NOT treat the commented best-effort refreshCache catch as a high-severity swallowed error; accepts it (or grades it low) because the comment documents an intentional best-effort/no-data-loss case"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 4,
+      "prompt": "Run a code-smell audit over this module and summarize what you find. Don't change anything yet — I just want to know what's there.\n\n```ts\nexport function parseA(s: string) { /* ~10 lines */ }\nexport function parseB(s: string) { /* near-identical to parseA */ }\nfunction legacyNormalize(s: string) { /* defined, never referenced */ }\nclass ReportManager {\n  // 26 methods spanning formatting, persistence, email, and metrics\n}\n```",
+      "assertions": [
+        "Reports findings without producing a rewritten/fixed version of the module (stays read-only)",
+        "Groups or labels each finding by a severity level (e.g. high/medium/low) and/or a category, rather than a flat unranked list"
+      ],
+      "load_bearing": false
+    }
+  ]
+}

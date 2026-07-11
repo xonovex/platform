@@ -1,0 +1,44 @@
+{
+  "skill_name": "shell-scripting-guide",
+  "tier": "aggressive",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Write a portable shell script that must run under dash and busybox sh, not just bash. It should verify that jq is installed, take a filename as its first argument, and abort early on any error or unset variable.",
+      "assertions": [
+        "The strict-mode line is `set -eu` (or `set -e` and `set -u`) and does NOT include `-o pipefail`, or pipefail is explicitly noted as bash-only and omitted under the sh shebang",
+        "Command existence is checked with `command -v` (not `which` or `type`)",
+        "Conditionals use single-bracket `[ ]` tests with `=`, not `[[ ]]` or `==`"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 2,
+      "prompt": "Write a shell script that ensures the line `export PATH=\"$PATH:/opt/tool/bin\"` is present in the user's ~/.profile, and regenerates a config file at /etc/app/config from a template. A provisioning system runs it repeatedly, so re-running must not duplicate the line and must not corrupt the config if the script is interrupted mid-write.",
+      "assertions": [
+        "Before appending the line it guards with a grep check (e.g. `grep -qF`) so the line is not duplicated on re-run",
+        "The config is written to a temporary file and then moved into place with `mv` for an atomic replacement (not written directly to the final path)"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 3,
+      "prompt": "Write a shell script that reads a list of file paths from an input file, one path per line where paths may contain spaces, tabs, or backslashes, and processes each path. It also needs a temporary working directory that is always removed, even if the script exits early or is interrupted.",
+      "assertions": [
+        "The read loop uses `IFS= read -r` to preserve leading/trailing whitespace and backslashes",
+        "A `trap` on EXIT (and typically INT/TERM) removes the temp directory created via `mktemp -d`"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 4,
+      "prompt": "Write a bash script with a helper for fatal errors and meaningful exit statuses. It requires the docker command to be present and takes exactly one argument, an image name. A caller should be able to distinguish a usage error from a missing-command error purely by the script's exit code.",
+      "assertions": [
+        "The fatal-error helper writes its message to stderr (redirected with `>&2`)",
+        "The missing-command failure exits with status 127",
+        "The usage/argument-count error exits with status 2"
+      ],
+      "load_bearing": true
+    }
+  ]
+}

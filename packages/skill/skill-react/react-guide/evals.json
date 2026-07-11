@@ -1,0 +1,42 @@
+{
+  "skill_name": "react-guide",
+  "tier": "moderate",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "We're on React 19. Write a reusable `TextInput` component in TypeScript that lets a parent component get a reference to the underlying native `<input>` DOM node (for example, to call `.focus()` on it).",
+      "assertions": [
+        "The component accepts `ref` as an ordinary prop and does NOT use `forwardRef()` to wrap the component",
+        "The ref prop is typed as a React ref to an input element (e.g. `React.Ref<HTMLInputElement>`) and is forwarded to the `<input>` element"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 2,
+      "prompt": "In a React 19 client component, build a contact form that submits asynchronously to a `submitContact(data)` function, disables the submit button while the request is in flight, and shows a returned error message on failure. Write the component.",
+      "assertions": [
+        "Uses the `useActionState` hook and destructures its return as `[state, formAction, isPending]` (three values, including the pending flag)",
+        "Passes the action to the form via `<form action={formAction}>` and reads field values from `FormData` (e.g. `formData.get(...)`) rather than tracking each input with a controlled `useState`/`value`+`onChange`"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 3,
+      "prompt": "Our React 19 codebase just turned on the React Compiler in the build. A teammate asks whether we should keep wrapping our expensive derived values and event-handler callbacks in `useMemo` and `useCallback`, and whether there are any cases where manual memoization is still warranted. Answer with guidance.",
+      "assertions": [
+        "States that manual `useMemo`/`useCallback` are generally no longer needed because the React Compiler applies memoization automatically",
+        "Identifies that manual memoization is still warranted to produce a stable dependency for a `useEffect` (effect dependency arrays)"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 4,
+      "prompt": "In a React 19 component I need to read a Context value, but only inside a conditional branch (I return early before I'd read it in some cases). `useContext` at the top isn't acceptable and calling it inside the `if` throws a hooks-order error. How should I read the context?",
+      "assertions": [
+        "Recommends the `use()` hook (e.g. `use(Context)`) to read the context",
+        "States that `use()` may be called conditionally / after early returns or inside branches, unlike `useContext`"
+      ],
+      "load_bearing": true
+    }
+  ]
+}

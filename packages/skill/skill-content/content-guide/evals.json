@@ -1,0 +1,46 @@
+{
+  "skill_name": "content-guide",
+  "tier": "conservative",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Rewrite this so it reads like a person wrote it, not an AI: 'Our platform offers a seamless, intuitive experience that empowers teams to unlock their full potential. Experts agree it's a game-changer, and studies show productivity has never been better.'",
+      "assertions": [
+        "The rewrite drops marketing-puffery words (at least 'seamless', 'unlock ... potential', and 'game-changer') and instead states something concrete the product does.",
+        "The vague attributions 'experts agree' and 'studies show' are either cut or replaced by a specific named source; no unsourced 'experts'/'studies show' claim remains.",
+        "No fabricated statistic, source name, publication, or quote is invented to replace the vague claims."
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 2,
+      "prompt": "Add two short news posts about recent electric-vehicle developments to our content site. We publish in both English and Dutch, and each post is a Markdown file with frontmatter.",
+      "assertions": [
+        "Each news post is emitted as a separate Markdown file per language (distinct English and Dutch files), not a single combined bilingual file.",
+        "Filenames follow the slug.lang.md convention (e.g. some-slug.en.md and some-slug.nl.md).",
+        "Each file's frontmatter includes lang, slug, title, summary, and created_at fields."
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 3,
+      "prompt": "Write a travel guide for visitors to the city of Porto that we can publish on our multilingual content site.",
+      "assertions": [
+        "The guide is organized into sections covering, at minimum: an introduction/welcome, logistics and planning, main attractions and activities, itineraries or strategies, and essential practical information.",
+        "Critical practical details such as costs, opening hours, and names are marked in bold.",
+        "The output records the date the information was researched or verified (e.g. in the summary or a footer) so it can be re-checked later."
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 4,
+      "prompt": "This blog paragraph feels robotic. Make it sound human without changing the facts: 'The release was pivotal. It was not just faster, but also cleaner and more reliable. This delivers a robust, seamless experience — creating value — while ensuring users remain engaged. Overall, the future looks promising.'",
+      "assertions": [
+        "Negative parallelism ('not just X, but also Y') and the reflexive rule-of-three list are broken up rather than preserved.",
+        "The trailing participle clauses ('creating value', 'ensuring users remain engaged') and the generic 'Overall, the future looks promising' conclusion are removed or replaced with a concrete claim.",
+        "The rewrite does not introduce invented facts, fake typos, or forced sentence fragments as a way to appear human."
+      ],
+      "load_bearing": true
+    }
+  ]
+}

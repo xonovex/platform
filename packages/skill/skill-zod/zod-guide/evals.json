@@ -1,0 +1,46 @@
+{
+  "skill_name": "zod-guide",
+  "tier": "moderate",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Using Zod 4, write a TypeScript schema named UserSchema for a user object with these fields: an id that is a UUID, an email address, a createdAt that is an ISO datetime string, and a name string between 1 and 100 characters. Also export the inferred TypeScript type.",
+      "assertions": [
+        "The id field uses the standalone validator z.uuid() and NOT z.string().uuid()",
+        "The email field uses z.email() and NOT z.string().email()",
+        "The createdAt field uses z.iso.datetime() and NOT z.string().datetime()",
+        "The type is derived with z.infer<typeof UserSchema>"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 2,
+      "prompt": "In Zod 4, write a schema for an environment variable PORT that arrives as a string, is converted to a number, must be an integer between 1024 and 65535, and falls back to port 3000 when the variable is absent. Show the inferred output type.",
+      "assertions": [
+        "The default is provided as the numeric value .default(3000) and NOT the string .default(\"3000\")",
+        "A .transform (converting to Number) is piped into a numeric schema before the default is applied",
+        "The inferred output type resolves to number"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 3,
+      "prompt": "Write an Express-style POST handler in TypeScript that validates an incoming request body against a Zod schema called CreateUserSchema and returns HTTP 400 with the validation errors if the body is invalid, otherwise creates the user. The handler must not throw on invalid input.",
+      "assertions": [
+        "The handler uses .safeParse() rather than .parse()",
+        "It branches on the result.success boolean and returns a 400 response containing result.error (e.g. result.error.issues) when success is false"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 4,
+      "prompt": "In Zod 4, define a StatusSchema from an existing native TypeScript enum named Status. Then, given a UserSchema object schema, derive a CreateUserSchema that drops the id field and an UpdateUserSchema that makes all of CreateUserSchema's fields optional.",
+      "assertions": [
+        "The enum schema uses z.enum(Status) and NOT the deprecated z.nativeEnum(Status)",
+        "CreateUserSchema is derived from UserSchema using .omit (or .pick) rather than redefining the fields",
+        "UpdateUserSchema is derived using .partial()"
+      ],
+      "load_bearing": true
+    }
+  ]
+}

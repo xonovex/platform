@@ -1,0 +1,33 @@
+{
+  "skill_name": "astro-guide",
+  "tier": "moderate",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "In an Astro page I already have static content. Add two React components: a `<NewsletterSignup />` in the page footer that should only become interactive once the user scrolls it into view, and a `<ThemeToggle />` that reads `window.localStorage` on mount and therefore must not be server-rendered at all. Show the page frontmatter and markup with the correct hydration for each.",
+      "assertions": [
+        "`<NewsletterSignup />` is hydrated with the `client:visible` directive",
+        "`<ThemeToggle />` uses `client:only` with the framework name as its value (e.g. `client:only=\"react\"`), not `client:load` or a bare `client:only`"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 2,
+      "prompt": "Set up an Astro content collection for blog posts. Each post has a title, a publish date, an array of tags, and a boolean draft flag that defaults to false. Then write the query that returns only the non-draft posts. Provide the collection config file and the query snippet.",
+      "assertions": [
+        "The config is defined in `src/content/config.ts` using `defineCollection` and a `z.object({...})` schema imported from `astro:content`",
+        "Non-draft posts are retrieved with `getCollection` passing a filter callback on the entry data (e.g. `getCollection(\"posts\", ({ data }) => !data.draft)`)"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 3,
+      "prompt": "Create a reusable Astro `Card` component with a required `title` string, an optional `href` string, and an optional `variant` that is either \"default\" or \"featured\" (defaulting to \"default\"). It should render child content and have component-scoped styles.",
+      "assertions": [
+        "Props are typed with an `interface Props` and destructured from `Astro.props` with `variant = \"default\"` as the default",
+        "Child content is rendered via a `<slot />` and styles are placed in a component `<style>` block"
+      ],
+      "load_bearing": false
+    }
+  ]
+}

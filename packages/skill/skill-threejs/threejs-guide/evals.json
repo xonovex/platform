@@ -1,0 +1,44 @@
+{
+  "skill_name": "threejs-guide",
+  "tier": "moderate",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Using vanilla Three.js, set up a WebGLRenderer and a render loop that spins a cube smoothly. It must keep a consistent rotation speed regardless of frame rate and stay crisp on high-DPI / retina displays. Give me the renderer setup and the loop.",
+      "assertions": [
+        "The render loop is driven by renderer.setAnimationLoop(...) rather than requestAnimationFrame",
+        "The per-frame rotation is scaled by a delta time obtained from a THREE.Clock (e.g. clock.getDelta()) rather than a fixed increment",
+        "The device pixel ratio is capped at 2, e.g. renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 2,
+      "prompt": "Write a Three.js setup that renders with WebGPU and gives a mesh a material whose color animates over time. It should target modern browsers and use Three's cross-renderer shader approach rather than raw GLSL.",
+      "assertions": [
+        "Imports the renderer from the 'three/webgpu' entry point (e.g. import * as THREE from 'three/webgpu') and instantiates WebGPURenderer",
+        "Awaits renderer.init() before the first render",
+        "Uses TSL / node materials (imports from 'three/tsl' and/or a *NodeMaterial such as MeshStandardNodeMaterial) instead of hand-written GLSL ShaderMaterial"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 3,
+      "prompt": "I'm applying an albedo/base-color texture and a normal map to a MeshStandardMaterial. Colors look washed out and the lighting is off. Show me how to load and configure both textures correctly for color-accurate PBR.",
+      "assertions": [
+        "The albedo/base-color texture has its colorSpace set to THREE.SRGBColorSpace",
+        "The normal map is treated as data (NoColorSpace) and is NOT assigned SRGBColorSpace"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 4,
+      "prompt": "I have a THREE.Points cloud of about 50,000 particles built from a BufferGeometry with positions I set manually. When I orbit the camera, the entire point cloud sometimes vanishes even though points are clearly within view. What's causing this and how do I fix it?",
+      "assertions": [
+        "Identifies that frustum culling relies on the geometry's bounding sphere, which is not automatically computed for Points/LineSegments when positions are set manually",
+        "Recommends calling geometry.computeBoundingSphere() (or disabling culling via frustumCulled = false) as the fix"
+      ],
+      "load_bearing": true
+    }
+  ]
+}

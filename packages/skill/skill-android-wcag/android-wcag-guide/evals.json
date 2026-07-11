@@ -1,0 +1,44 @@
+{
+  "skill_name": "android-wcag-guide",
+  "tier": "conservative",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I have a Jetpack Compose Row that I made tappable with Modifier.clickable to open an event detail screen. It contains a calendar Icon and two Text lines (title and date). With TalkBack it reads the two texts as separate stops and then only says \"double tap to activate\". Rewrite it so the whole tile is announced as a single actionable element with a proper name and a named action.",
+      "assertions": [
+        "The clickable/semantics sets an explicit Role.Button (e.g. role = Role.Button on clickable or role = Role.Button inside semantics)",
+        "The action verb is provided via onClickLabel (not baked into contentDescription), so TalkBack says \"double tap to <verb>\" instead of the generic \"activate\"",
+        "The tile is consolidated into one node using mergeDescendants = true or clearAndSetSemantics, and the decorative Icon is given contentDescription = null"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 2,
+      "prompt": "This Compose icon button is a 24dp close (X) Icon wrapped in a Box with Modifier.size(24.dp).clickable(onClick = onClose). Testers say it is too hard to tap. Make the tap target meet accessibility guidelines, but the X must stay the same visual size on screen.",
+      "assertions": [
+        "Uses Modifier.minimumInteractiveComponentSize() (or Modifier.sizeIn / defaultMinSize) to expand the hit area rather than enlarging the drawn icon",
+        "The minimum touch target is 48dp (not 24dp and not 44dp)",
+        "The Icon itself stays drawn at 24dp (the visual size is not increased)"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 3,
+      "prompt": "In my Compose screen a TopAppBar is placed inside a Box after the body content (a MessageList). Because of the composition order, TalkBack reads the app bar title \"Inbox\" before the message list body that the user actually cares about. Fix the screen-reader reading order.",
+      "assertions": [
+        "Uses Modifier.semantics { traversalIndex = ... } to control the TalkBack traversal order",
+        "Gives the body content a lower (or more negative) traversalIndex than the top bar so the body is read first (lower reads earlier)"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 4,
+      "prompt": "On my Compose settings screen I want TalkBack users to be able to jump between the screen title and each section header using the headings gesture. The screen also has a TabRow of category tabs at the top. Show how to mark up the headings.",
+      "assertions": [
+        "Applies Modifier.semantics { heading() } to the title and section-header text nodes, with no level argument (heading() is a flat boolean; there is no heading(level = ...))",
+        "Does NOT apply heading() to the TabRow or its tabs (interactive controls with a Role are kept out of the heading rotor)"
+      ],
+      "load_bearing": true
+    }
+  ]
+}

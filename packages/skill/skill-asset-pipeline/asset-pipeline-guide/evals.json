@@ -1,0 +1,44 @@
+{
+  "skill_name": "asset-pipeline-guide",
+  "tier": "conservative",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I'm building the build cache for our game engine's cooked textures. Write the function that computes the cache key for a compiled texture output, and explain what goes into it, so that identical inputs always reuse the same entry and the cache can be shared across our CI and developer machines.",
+      "assertions": [
+        "The key is derived from a hash that folds in the import/compile settings (e.g. compression format, mip count) and the target platform, not just the raw source bytes",
+        "The hash also folds in the content hashes of the texture's dependencies/input resources (transitively), not only its own source",
+        "The answer explicitly excludes absolute file paths, timestamps/wall-clock time, and host/machine names from the hash so two machines produce the same key"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 2,
+      "prompt": "Our material reimport is unreliable: when someone edits a shared shader header that several materials #include, the materials that use it are not rebuilt and the game ships stale shaders. Also, moving an asset to a new folder sometimes breaks its rebuild edges. How should the pipeline track dependencies to fix both problems?",
+      "assertions": [
+        "Recommends routing every input a compiler reads (including included headers/sub-resources) through a tracked interface so no dependency is invisible, rather than reading files directly",
+        "States that under-reporting/missing a dependency ships stale data and that over-reporting is preferable to under-reporting",
+        "Recommends recording dependency edges by stable identity (GUID/object id) instead of by file path so rename/move does not break the edge"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 3,
+      "prompt": "Add hot-reloading of textures to our engine: watch the source file, recompile on change, and swap the new texture into the running renderer. Right now our prototype occasionally crashes in the frame right after a reload. Show the swap logic and explain how to make it safe.",
+      "assertions": [
+        "Builds the new resource fully off to the side and publishes it by atomically swapping the reference/handle, never mutating the live resource in place",
+        "Defers freeing the old resource until in-flight work referencing it has completed (past the frames-in-flight fence), not at the moment of the swap"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 4,
+      "prompt": "We switched the texture compression preset in our import settings from BC7 to ASTC, but the game keeps loading the old BC7 textures until we manually delete the entire asset cache. What is wrong with how our pipeline is designed, and how should it work?",
+      "assertions": [
+        "Identifies that compile/import settings must be treated as part of the cache-key/hash inputs, so changing the preset yields a different key and automatically invalidates the stale entry",
+        "Does not recommend manually wiping the cache or comparing timestamps as the fix"
+      ],
+      "load_bearing": true
+    }
+  ]
+}

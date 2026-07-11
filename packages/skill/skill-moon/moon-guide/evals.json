@@ -1,0 +1,43 @@
+{
+  "skill_name": "moon-guide",
+  "tier": "moderate",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "We're on moonrepo 2.0. I want to enable and configure one of Moon's built-in extensions in our workspace. Which config file does the extension configuration go in, and show me a minimal example of the config block.",
+      "assertions": [
+        "States the extension configuration belongs in the file `.moon/extensions.yml`",
+        "Does NOT place the extension config in `.moon/workspace.yml` or `.moon/toolchains.yml`"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 2,
+      "prompt": "Write a multi-stage Dockerfile that uses `moon docker scaffold` and `moon docker prune` to build our Node service `my-service`, with a final runtime stage based on `gcr.io/distroless/nodejs22-debian12:nonroot`. Make sure the app can actually read its files at runtime.",
+      "assertions": [
+        "Every COPY into the distroless nonroot runtime stage uses `--chown=65532:65532`",
+        "Copies the scaffolded `.moon/docker/workspace` before `npm ci` and `.moon/docker/sources` after, and calls `moon docker prune` after the build"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 3,
+      "prompt": "In a Moon 2.0 `.moon/tasks/*.yml` task, I need a build step that runs `mkdir -p bin && go build -o bin/app ./cmd/...` and also sets an OUTPUT_DIR env var that should default to `bin` when it is not already set in the environment. Write the task definition.",
+      "assertions": [
+        "Uses `script:` (not `command:`) for the shell-chained `mkdir ... && go build ...` command",
+        "Uses the `${OUTPUT_DIR:-bin}` default-value syntax rather than a bare `$OUTPUT_DIR`"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 4,
+      "prompt": "Migrate this moon v1 project config to moon 2.0:\n\n```yaml\ntype: library\nplatform: node\ntasks:\n  dev:\n    command: 'npm run dev'\n    local: true\n```\n\nAlso tell me what MQL field replaces `projectType` when I later query these projects.",
+      "assertions": [
+        "Renames `type: library` to `layer: library` and `platform: node` to `toolchains: [node]`",
+        "Replaces `local: true` with `preset: 'server'`",
+        "States that `projectType` is replaced by `projectLayer` in MQL queries"
+      ],
+      "load_bearing": true
+    }
+  ]
+}

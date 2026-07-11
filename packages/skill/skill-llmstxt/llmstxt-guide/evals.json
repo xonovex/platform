@@ -1,0 +1,43 @@
+{
+  "skill_name": "llmstxt-guide",
+  "tier": "conservative",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Our TypeScript HTTP framework docs site at https://acme.dev has getting-started, API reference, routing, and middleware pages, plus a changelog and a migration guide that are only occasionally relevant. Write the llms.txt file we should serve.",
+      "assertions": [
+        "The file starts with a single H1 line and (if present) a blockquote before any H2 section, with no H2 heading appearing before the H1/blockquote.",
+        "Every link URL in the file ends in `.md` (points to markdown mirrors), not an `.html` or extensionless HTML page.",
+        "The secondary/occasional pages (changelog, migration guide) are placed under a section whose heading is exactly `## Optional`."
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 2,
+      "prompt": "We're generating the `.md` mirror URLs that our llms.txt will link to. Give the correct mirror URL for each of these pages: (a) https://site.com/docs/intro.html  (b) https://site.com/docs/guide  (c) https://site.com/docs/guide/  (d) https://site.com/ (the root).",
+      "assertions": [
+        "For the trailing-slash URL (c) and the root URL (d), the answer appends `index.html.md` rather than just `.md` (e.g. `https://site.com/docs/guide/index.html.md` and `https://site.com/index.html.md`).",
+        "For (a) the answer is `https://site.com/docs/intro.html.md` and for (b) it is `https://site.com/docs/guide.md`."
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 3,
+      "prompt": "We already host an llms.txt with linked .md mirrors. How do we produce the single-file expanded context bundles the spec describes, and what should each output file be named?",
+      "assertions": [
+        "Names the two spec outputs as `llms-ctx.txt` (expansion WITHOUT the `## Optional` links) and `llms-ctx-full.txt` (expansion WITH the `## Optional` links).",
+        "Does not present `llms-full.txt` as the spec's expanded output; if mentioned, it is identified as a non-spec / community single-file-dump convention distinct from `llms-ctx-full.txt`."
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 4,
+      "prompt": "Review this llms.txt draft and tell me what's wrong with it:\n\n# DataPipe\n\n> Streaming ETL library for Python.\n\nDataPipe moves data between sources and sinks.\n\n### Key concepts\n\nPipelines are composed of stages.\n\n## Docs\n\n- [Quickstart](https://datapipe.io/docs/quickstart.html)\n- [API](https://datapipe.io/docs/api.md)",
+      "assertions": [
+        "Flags that the descriptive prose contains a heading (`### Key concepts`) which is not allowed — prose between the blockquote and the first H2 must contain no headings.",
+        "Flags that the Quickstart link points to the `.html` page instead of its `.md` mirror (should be `https://datapipe.io/docs/quickstart.html.md`)."
+      ],
+      "load_bearing": true
+    }
+  ]
+}

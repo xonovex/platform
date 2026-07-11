@@ -1,0 +1,43 @@
+{
+  "skill_name": "fdd-guide",
+  "tier": "aggressive",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "We're adopting Feature-Driven Development. Set up the per-feature build tracking: list every milestone we mark off as a feature moves from design through to being promoted into the build, and give the percent weight each one contributes so a feature's percent-complete is the running total. Then show what percent-complete a feature reads once it has passed design inspection and is midway through coding.",
+      "assertions": [
+        "Lists exactly six milestones (Domain Walkthrough, Design, Design Inspection, Code, Code Inspection, Promote to Build) with weights 1%, 40%, 3%, 45%, 10%, 1% summing to 100%",
+        "States the feature reads 44% complete when past Design Inspection but mid-Code (sum of Domain Walkthrough + Design + Design Inspection = 44%), not an even ~16.6% per-milestone split"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 2,
+      "prompt": "For our FDD features list, write four feature names for an order-processing domain (totalling, discounting, address validation, payment authorization). Tell me the exact naming template we should follow for every feature and what the allowed connector words are.",
+      "assertions": [
+        "States the template as <action> the <result> by/for/of/to a(n) <object> with the connector being one of by, for, of, or to (not fixed to 'of')",
+        "Each of the four feature names follows the action-result-object template and names a client-valued function, not a component/class/task (e.g. not 'Build the OrderService')"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 3,
+      "prompt": "A teammate says FDD's 'two-week' rule means we run two-week sprints like Scrum. Is that right? Explain what the two-week figure actually governs and how long a typical feature takes.",
+      "assertions": [
+        "Clarifies the two weeks is the MAX SIZE of a single feature, not a sprint/iteration timebox, and that FDD does not use fixed sprints",
+        "States most features take about 1-3 days"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 4,
+      "prompt": "Explain how FDD structures the five processes and how it assigns responsibility for code. In particular, describe FDD's ownership model for classes and what a 'feature team' is.",
+      "assertions": [
+        "Lists the five processes in order: Develop an Overall Model, Build a Features List, Plan by Feature, Design by Feature, Build by Feature",
+        "States FDD uses single-owner-per-class (Class Owner), in deliberate contrast to collective code ownership",
+        "Describes a feature team as a transient/dynamic team formed per feature set under a Chief Programmer, not a fixed role and not a 'feature'"
+      ],
+      "load_bearing": true
+    }
+  ]
+}

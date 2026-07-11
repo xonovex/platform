@@ -1,0 +1,45 @@
+{
+  "skill_name": "npm-guide",
+  "tier": "moderate",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Write a shell/Node routine that publishes the npm package described by the current package.json, but only if that exact name@version is not already on the registry (so re-running it in CI is safe). Show the command(s) and the skip logic.",
+      "assertions": [
+        "Probes the registry for the exact name@version before publishing (e.g. `npm view <name>@<version> version`) and skips publishing when it already exists",
+        "Probes the explicit name@version rather than a bare name or @latest tag",
+        "Treats an already-published version as a skip (success), not as an error"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 2,
+      "prompt": "Write a publish-readiness validator for a package.json. It should report hard failures that would actually block `npm publish` separately from softer house-policy recommendations. Given a package.json with a valid name and version, a `repository` set to the string \"github:acme/widget\", and no `license` field, what does it report?",
+      "assertions": [
+        "Classifies only name + version (and valid semver) as npm-blocking requirements; treats missing license/repository/files as policy/warnings, not npm rules",
+        "Accepts the `repository` shorthand string \"github:acme/widget\" as valid (does not require the {type,url} object form)",
+        "Does not block publishing on the missing license field (npm only warns)"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 3,
+      "prompt": "I'm publishing a scoped package `@acme/cli` for the first time, and the version is `2.0.0-rc.1`. I want npm build provenance too. What flags should the publish command use and why?",
+      "assertions": [
+        "Uses `--access public` because scoped packages default to restricted on first publish",
+        "Uses a dist-tag such as `--tag next`/`--tag rc` so the pre-release does not land on `latest`",
+        "States that `--provenance` only works from a supported CI runner with OIDC (id-token) and fails/does not no-op outside that environment"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 4,
+      "prompt": "I build native binaries as separate npm packages, one per platform, and inject `os`, `cpu`, and `libc` into each package.json at publish time from a sibling platform.json. Write the inject-then-publish-then-restore logic and note any field-specific caveats.",
+      "assertions": [
+        "Restores the original package.json even when publish fails (try/finally or equivalent)",
+        "Notes that `libc` only takes effect when `os` includes `linux` (otherwise it is a no-op)"
+      ],
+      "load_bearing": true
+    }
+  ]
+}

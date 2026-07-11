@@ -1,0 +1,42 @@
+{
+  "skill_name": "user-stories-guide",
+  "tier": "aggressive",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Our team has this user story that is too large for one sprint: 'As a shopper, I want to check out my cart and pay so that I receive my order.' Break it into smaller stories the team can deliver, and briefly justify each break.",
+      "assertions": [
+        "Each resulting smaller story is a thin vertical slice that delivers usable end-to-end value; none is a horizontal layer/component story such as 'build the database', 'build the API', or 'build the UI'.",
+        "At least one split is justified by a named technique from SPIDR or the splitting patterns (Spike, Path, Interface, Data, Rules, or Workflow Steps / Operations / Business Rule Variations / Simple-Complex / Deferred NFR)."
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 2,
+      "prompt": "A teammate asked me to explain what the INVEST acronym for user stories stands for, and separately what the SMART acronym for the tasks a story is broken into stands for. Write the explanation.",
+      "assertions": [
+        "The 'S' in INVEST is expanded as 'Small' (not 'Sized' / 'Sized appropriately').",
+        "SMART is expanded with 'A' = Achievable and 'R' = Relevant (not Assignable/Agreed and not Realistic)."
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 3,
+      "prompt": "Write the acceptance criteria for this user story: 'As a user, I want to reset my password so that I can regain access to my account.'",
+      "assertions": [
+        "The acceptance criteria include at least one boundary/limit case, at least one error/invalid-input case, AND at least one visible UI/state-change check — not only the happy-path success scenario."
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 4,
+      "prompt": "Explain how backlog refinement should work on our Scrum team: who is responsible for sizing items, how often refinement happens, and whether every item must carry a numeric estimate before it is ready.",
+      "assertions": [
+        "States that sizing is the Developers' responsibility (the people who build the item).",
+        "States that refinement is ongoing/continuous work rather than a fixed required weekly grooming meeting.",
+        "States that items are 'sized' and do not strictly require a numeric estimate."
+      ],
+      "load_bearing": true
+    }
+  ]
+}

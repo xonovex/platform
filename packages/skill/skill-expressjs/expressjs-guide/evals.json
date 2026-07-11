@@ -1,0 +1,43 @@
+{
+  "skill_name": "expressjs-guide",
+  "tier": "moderate",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Write an Express 5 + TypeScript login route handler. It should look up the user by email, verify the submitted password against the stored hash, and on success return a signed JWT the client will send on future API requests.",
+      "assertions": [
+        "The jwt.sign call sets an expiration option (e.g. expiresIn: \"7d\") so the token is not a non-expiring token",
+        "The password is verified with bcrypt (e.g. bcrypt.compare) rather than a plaintext string comparison"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 2,
+      "prompt": "Write a centralized error-handling middleware for an Express 5 + TypeScript API that turns thrown errors into JSON responses, and show how it is registered on the app.",
+      "assertions": [
+        "The error handler function is declared with exactly four parameters in the order (err, req, res, next)",
+        "The error message and/or stack trace is only included in the response when NODE_ENV is not \"production\"; production returns a generic 500 without the stack",
+        "The error handler is registered last, after all routes"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 3,
+      "prompt": "Write a reusable Express + TypeScript middleware factory that validates an incoming request body against a given Zod schema before the route handler runs.",
+      "assertions": [
+        "Validation uses safeParse and responds with HTTP 400 when parsing fails",
+        "On success the parsed/coerced result is assigned back onto the request (e.g. req.body = result.data) before calling next()"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 4,
+      "prompt": "Set up the main app entrypoint (app.ts) for an Express 5 + TypeScript API: wire helmet, cors, morgan, JSON body parsing, mount the route modules, and handle unmatched routes.",
+      "assertions": [
+        "Security middleware (helmet/cors) is registered before the route modules are mounted",
+        "A 404 catch-all handler is registered after the routes and before the error handler"
+      ],
+      "load_bearing": false
+    }
+  ]
+}

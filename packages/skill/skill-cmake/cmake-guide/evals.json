@@ -1,0 +1,44 @@
+{
+  "skill_name": "cmake-guide",
+  "tier": "moderate",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "In a CMakeLists.txt for an executable target named `app`, add the fmt formatting library as a source dependency fetched from https://github.com/fmtlib/fmt.git at version 10.1.1, and link it to `app`. Show the CMake code.",
+      "assertions": [
+        "Uses FetchContent_MakeAvailable(fmt) rather than the FetchContent_GetProperties / FetchContent_Populate pattern",
+        "Pins GIT_TAG to an exact tag or commit (e.g. 10.1.1), not a branch name",
+        "Links the namespaced imported target fmt::fmt (not a bare `fmt`) via target_link_libraries"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 2,
+      "prompt": "I have a CMake library target `core`. Make it require C++20, and add `-Wall -Wextra -pedantic` warnings on GCC/Clang and `/W4` on MSVC, without affecting other targets in the build. Write the CMake commands.",
+      "assertions": [
+        "Requires the standard via target_compile_features(core PUBLIC cxx_std_20) rather than setting the CMAKE_CXX_STANDARD variable",
+        "Applies warning flags with per-target target_compile_options (with a visibility keyword), not the global add_compile_options",
+        "Guards compiler-specific flags with a generator expression keyed on CXX_COMPILER_ID (e.g. $<$<CXX_COMPILER_ID:GNU,Clang>:...>)"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 3,
+      "prompt": "I have a library target `mylib` with public headers in `include/`. Write the CMake install rules so that a downstream project can consume it with find_package and get a properly namespaced imported target.",
+      "assertions": [
+        "install(TARGETS mylib ...) associates the target with an EXPORT set, and install(EXPORT ...) is called with a NAMESPACE ending in :: (e.g. mylib::)",
+        "Public include directories use the $<BUILD_INTERFACE:...> / $<INSTALL_INTERFACE:...> generator-expression split rather than a single unconditional path"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 4,
+      "prompt": "Set up CTest for a project. Register a test executable `unit_tests` as a test, tag it so it can be run selectively as a group, and give it a 30-second timeout. Show the CMake code.",
+      "assertions": [
+        "Calls enable_testing() and registers the test with add_test(NAME ... COMMAND ...)",
+        "Assigns a LABELS property (and TIMEOUT) via set_tests_properties so the test can be filtered with `ctest -L`"
+      ],
+      "load_bearing": false
+    }
+  ]
+}

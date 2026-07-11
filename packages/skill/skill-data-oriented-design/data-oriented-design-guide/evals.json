@@ -1,0 +1,44 @@
+{
+  "skill_name": "data-oriented-design-guide",
+  "tier": "conservative",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I'm building an entity system in C. Entities are created and destroyed at runtime, freed slots get reused, and other entities need to hold long-lived references to each other. I want a reference that does not silently point at the wrong entity after a slot is recycled, and I want the backing storage free to grow or be compacted. How should I represent a reference to an entity, and how does a lookup detect that a reference is stale?",
+      "assertions": [
+        "Recommends referencing entities by a generational handle that packs an integer index together with a generation counter, rather than by raw pointer or a bare index alone",
+        "States that a dereference validates the handle by comparing the handle's generation against the slot's stored generation and returns null/error on mismatch",
+        "States that freeing/recycling a slot increments (bumps) that slot's generation so outstanding handles to it become invalid"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 2,
+      "prompt": "Our C engine stores 100,000 particles, each with a position (x, y, z), a velocity (vx, vy, vz), and a 40-byte debug name plus some rarely-used metadata, all in one struct in a flat array. The per-frame update only reads and writes positions and velocities and is memory-bound. How should I lay out this particle data so the update loop runs fast, and why?",
+      "assertions": [
+        "Recommends splitting the fields into separate per-field arrays (Struct-of-Arrays / SoA) so the update loop streams only the position and velocity columns, and/or separating the hot position/velocity fields from the cold name/metadata into parallel arrays kept in lockstep by index",
+        "Justifies the layout in terms of cache-line utilization / memory traffic (the fat struct drags cold or unused bytes through the cache on every iteration), not merely instruction count"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 3,
+      "prompt": "In our C codebase we mark 'no value' with `#define INVALID_ID 0xffffffff` and have to remember to initialize every id field to it; we keep hitting bugs where someone leaves an id zero-initialized and it's mistaken for a real id, or forgets the sentinel entirely. How should we redesign the id/handle convention to make this class of bug go away?",
+      "assertions": [
+        "Recommends reserving the value 0 to mean none/not-found/invalid (so zero-initialization yields a valid 'no value' default) instead of a magic non-zero sentinel like 0xffffffff or -1",
+        "Recommends reserving array index 0 as a zero-initialized dummy/nil slot and/or having lookups return 0 for not-found so call sites can test with `if (handle)`"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 4,
+      "prompt": "I want always-on instrumentation counters in our engine (draw calls, allocations, subsystem timings) that stay enabled in every build, including release, with negligible overhead where events are recorded. There may be thousands of registered counters but only a handful are displayed at any time. How should I design the recording API and the storage?",
+      "assertions": [
+        "Recommends that the hot-path record be a single accumulate (e.g. `*ptr += n`) through a pointer/handle to the counter that is looked up by name only once and then cached, so the per-call cost avoids a hash/name lookup, function call, branch, or lock",
+        "Recommends accumulating one value per counter per frame and resetting at the frame boundary, rather than recording a per-event/timestamped entry on every occurrence",
+        "Recommends allocating the per-counter history/ring buffer lazily, only for counters actually being viewed, so registered-but-unviewed counters cost near-zero memory"
+      ],
+      "load_bearing": true
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "skill_name": "bdd-guide",
+  "tier": "aggressive",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Write a Gherkin feature file for an order checkout where applying a valid percentage-off coupon reduces the order total. The cart totals 50.00 EUR; cover a 10 percent coupon (new total 45.00) and a 25 percent coupon (new total 37.50).",
+      "assertions": [
+        "Uses a single Scenario Outline with an Examples table parameterising the coupon percent and resulting total, rather than two duplicated near-identical scenarios.",
+        "Steps are declarative and contain no UI-mechanic steps (no 'click', 'type', button labels, or CSS/element selectors).",
+        "Groups the scenario(s) under a Gherkin `Rule` keyword."
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 2,
+      "prompt": "Our team is about to run an example mapping session for a user story. Explain what each of the four card colours used in example mapping represents.",
+      "assertions": [
+        "States yellow = the user story and blue = a business rule / acceptance criterion.",
+        "States green = a concrete example (which becomes a scenario) and red = an open/unanswered question or blocking assumption."
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 3,
+      "prompt": "We are adopting BDD with Cucumber. For a single business rule, how many acceptance scenarios should we write, and how should our acceptance scenarios relate to our unit tests?",
+      "assertions": [
+        "Recommends roughly 2-5 scenarios per business rule, illustrating the rule rather than one scenario per code path or edge case.",
+        "States BDD/acceptance scenarios do not replace unit tests, that there should be far more unit tests than scenarios, and that exhaustive/edge cases belong in unit tests (TDD)."
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 4,
+      "prompt": "Our BDD scenarios are automated by driving the whole application end-to-end through a real browser, hitting the real database and downstream services. The suite takes tens of minutes, is flaky, and when it fails we can't tell where the bug is. How should we change how we automate these scenarios?",
+      "assertions": [
+        "Advises stubbing external services/queues/databases and driving the core domain directly instead of automating through the UI/browser.",
+        "Identifies that end-to-end-through-the-UI automation is slow, brittle/volatile, and fails to localise the failure."
+      ],
+      "load_bearing": true
+    }
+  ]
+}

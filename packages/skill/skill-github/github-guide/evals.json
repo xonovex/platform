@@ -1,0 +1,42 @@
+{
+  "skill_name": "github-guide",
+  "tier": "moderate",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I'm reviewing PR #123 in the repo acme/widgets. There's a null-pointer bug on line 42 of src/app.ts that must block the merge. Give me the exact command(s) to post my review so it includes that inline comment anchored to line 42 and requests changes.",
+      "assertions": [
+        "The inline comment is carried inside a single `gh api` POST to the `repos/acme/widgets/pulls/123/reviews` endpoint (a comments[] entry in the review object), NOT via `gh pr review` and NOT via a standalone `.../pulls/123/comments` call",
+        "The review sets `event=REQUEST_CHANGES`",
+        "The inline anchor uses `line` (a file line number) plus `side` (e.g. RIGHT), and does NOT compute or use the deprecated diff `position` field"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 2,
+      "prompt": "The author pushed a fix for a comment I left on PR #123 in acme/widgets. I want to mark that review conversation thread as resolved from the command line. What's the command?",
+      "assertions": [
+        "Uses `gh api graphql` with the `resolveReviewThread` mutation (not any REST endpoint, which cannot resolve threads)",
+        "Targets the thread by its node id (a `PRRT_...` threadId) rather than matching by line number"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 3,
+      "prompt": "We're provisioning a bot account with a fine-grained personal access token. The bot needs to push commits to branches and to resolve review threads on our pull requests. What is the minimal set of repository permissions to grant?",
+      "assertions": [
+        "Pushing commits/refs requires Contents: write, and it explicitly notes Contents: read is NOT sufficient to push",
+        "Resolving a review thread requires Pull requests: write AND Contents: read & write together"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 4,
+      "prompt": "Our CI job runs the gh CLI and authenticates fine against github.com, but the identical job returns 401 Unauthorized when we point it at our self-hosted GitHub Enterprise Server. What's the likely cause and fix?",
+      "assertions": [
+        "Identifies that the GitHub Enterprise Server host reads GH_ENTERPRISE_TOKEN (or GITHUB_ENTERPRISE_TOKEN), not GH_TOKEN/GITHUB_TOKEN, and that the token must be supplied via that enterprise variable"
+      ],
+      "load_bearing": true
+    }
+  ]
+}

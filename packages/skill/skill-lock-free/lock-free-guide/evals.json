@@ -1,0 +1,45 @@
+{
+  "skill_name": "lock-free-guide",
+  "tier": "conservative",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "In C11, I need a bounded FIFO queue passing pointers between exactly one dedicated producer thread and one dedicated consumer thread (an audio ring). Implement push and pop using C11 atomics. Show the struct and both functions.",
+      "assertions": [
+        "The producer and consumer paths use only plain atomic loads and stores on the head/tail indices, with no compare-exchange/CAS and no mutex in either function.",
+        "The producing store to the index (tail) uses memory_order_release and is paired with a memory_order_acquire load of that index on the consumer side (and vice versa).",
+        "Capacity is a power of two and wrap is done with a bit mask, with free-running indices compared via unsigned subtraction (not reset to zero / not modulo)."
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 2,
+      "prompt": "Here is a lock-free stack in C. push() and pop() each CAS on a single `head` pointer, and pop() does `free(node)` on the node it returns. Review it for concurrency correctness and tell me what is wrong and how to fix it.",
+      "assertions": [
+        "Identifies the ABA problem: a successful CAS proves only that the bit pattern of head matched, not that the list was untouched, which fails when a freed node's address is reallocated.",
+        "States that the CAS-only stack also has a use-after-free hazard on pop and that freeing the popped node immediately is unsafe while other threads may still hold it.",
+        "Recommends either a memory-reclamation scheme (hazard pointers / epoch-QSBR / RCU) or a versioned/tagged pointer via DWCAS, and notes tagging alone fixes ABA but not use-after-free."
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 3,
+      "prompt": "In a C11 program I have two atomics. (a) A statistics counter that every worker increments and that guards no other data. (b) A producer fills a data buffer and then sets a `ready` flag; a consumer spins reading `ready` and, once it is set, reads the buffer. Which memory_order should each atomic operation use, and why?",
+      "assertions": [
+        "The statistics counter increment is specified as memory_order_relaxed.",
+        "The producer's store to `ready` uses memory_order_release and the consumer's load of `ready` uses memory_order_acquire, forming a synchronizes-with pair on the same variable.",
+        "Does not recommend memory_order_seq_cst for these cases and does not recommend memory_order_consume."
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 4,
+      "prompt": "I gave each of my 16 worker threads its own atomic counter in an array (`atomic_uint64_t counters[16]`), expecting perfect scaling since no two threads touch the same counter. But throughput is worse than when all threads incremented a single shared atomic. Explain why and show how to fix it in C.",
+      "assertions": [
+        "Diagnoses false sharing: distinct counters share a cache line, so writes on one core invalidate the line on others even though there is no logical sharing.",
+        "Fixes it by padding/aligning each counter to its own cache line (e.g. _Alignas(CACHE_LINE_SIZE) plus explicit padding so the struct size is a whole multiple of the line)."
+      ],
+      "load_bearing": false
+    }
+  ]
+}

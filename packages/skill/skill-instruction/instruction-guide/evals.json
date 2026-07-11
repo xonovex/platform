@@ -1,0 +1,41 @@
+{
+  "skill_name": "instruction-guide",
+  "tier": "conservative",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I have a directory `terraform-modules/` containing `main.tf`, `variables.tf`, and environment subdirectories `dev/`, `staging/`, and `prod/`. It targets Terraform 1.12, the team runs `terraform fmt` and `terraform validate` before every commit, and changes are applied through Atlantis. Write an AGENTS.md file for this directory.",
+      "assertions": [
+        "The AGENTS.md body is a flat bullet list under a single top-level `#` title, with no `##`/`###` section headings and no prose paragraphs",
+        "The literal names `Terraform`, `terraform fmt`, `terraform validate`, and `Atlantis` all appear unchanged (not replaced with generic terms)"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 2,
+      "prompt": "Create an AGENTS.md for this directory: it's a package `@acme/hello` whose `index.ts` exports a single function `greet(name)`, a `tsconfig.json` that just extends the shared config, and a `package.json` whose `build` and `test` scripts only call `tsc` and `vitest`. There are no special conventions, caveats, or gotchas here.",
+      "assertions": [
+        "The response declines to create an AGENTS.md file (does not emit AGENTS.md content) and explicitly states there is no non-obvious/unique content to document because everything is inferable from package.json plus the source"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 3,
+      "prompt": "Condense this AGENTS.md while keeping it functional:\n\n# API Service\n\nThis directory contains the source code for our main API service. It is a very important part of our system.\n\n## Overview\n\nThe API service is responsible for handling all incoming HTTP requests from clients.\n\n## Building\n\nTo build the project, you should run the following command in your terminal:\n\n    npm run build\n\nThis will compile all of the TypeScript files into JavaScript.\n\n## Testing\n\nWe use Vitest for testing. Run the tests like so:\n\n    npm run test",
+      "assertions": [
+        "The condensed output still contains the literal command names `npm run build` and `npm run test` and the tool name `Vitest`",
+        "No fenced or indented command code blocks remain; commands appear inline (backtick-wrapped) rather than in a code block"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 4,
+      "prompt": "I'm deduping AGENTS.md files across my monorepo. The root AGENTS.md is only 4 lines and looks thin, and one subpackage's AGENTS.md seems to just repeat rules that are already in the root. Which of these should I delete, and how should I decide?",
+      "assertions": [
+        "Advises against deleting the root AGENTS.md (keep it as the project entry-point doc even though it looks thin)",
+        "States that nested/subpackage AGENTS.md follow closest-wins precedence and are scope-specific overrides that should not be merged up into the root"
+      ],
+      "load_bearing": true
+    }
+  ]
+}

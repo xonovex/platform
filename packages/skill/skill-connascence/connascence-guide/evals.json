@@ -1,0 +1,43 @@
+{
+  "skill_name": "connascence-guide",
+  "tier": "aggressive",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Review this Go function for coupling problems and tell me how to fix the worst one:\n\n```go\nfunc (r *Repo) Save(order Order, dryRun bool) error {\n    if dryRun {\n        return validate(order)\n    }\n    return r.persist(order)\n}\n```\n\nCallers do `repo.Save(order, true)` in some places and `repo.Save(order, false)` in others.",
+      "assertions": [
+        "Identifies the boolean flag as control coupling (a caller-passed flag driving the callee's branching)",
+        "Recommends splitting Save into two separate named operations/functions (one for validate, one for persist) rather than keeping a single flag-driven function"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 2,
+      "prompt": "Is a chained expression like `order.Customer().Address().City()` a problem in our codebase? Explain concretely what it costs and what to do instead. Also: we have a builder used as `NewQuery().Where(x).OrderBy(y).Build()` — is that the same problem?",
+      "assertions": [
+        "Labels the order.Customer().Address().City() chain as content coupling (reaching through returned objects into their internals) and violating the Law of Demeter",
+        "Recommends replacing it with a single method on the direct neighbor (e.g. order.ShippingCity()) that hides the intermediate objects",
+        "States the fluent builder chain is a legitimate exception (it returns the same builder, not fresh strangers) and is NOT a Law of Demeter violation"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 3,
+      "prompt": "A billing function reads an Order's total by passing a magic number: `cache.Get(key, 0)` where `0` means \"no expiry\", and a far-away handler does `if ttl == 0 { /* unlimited */ }`. Grade this coupling precisely and give me the fix.",
+      "assertions": [
+        "Names the specific connascence form as connascence of meaning/convention (both distant sites silently agree that 0 means unlimited) rather than only calling it 'tight coupling'",
+        "Applies the rule of degree to convert it to connascence of name — e.g. a named/typed value like an explicit Unlimited field or constant so the pact is visible at both call sites"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 4,
+      "prompt": "We have a `setup(app)` function that parses config, then builds the cache from the config size, then builds the logger from the config level. It's described as 'everything that runs at startup'. Is grouping these together good module design? If not, how should it be split?",
+      "assertions": [
+        "Identifies this as temporal cohesion (parts grouped because they run in the same phase/startup) and calls it a weak/trap form of cohesion, aiming for functional cohesion instead",
+        "Recommends splitting into separate functions so each concern (config, cache, logger) owns the part that changes with it, rather than grouping by when it runs"
+      ],
+      "load_bearing": true
+    }
+  ]
+}

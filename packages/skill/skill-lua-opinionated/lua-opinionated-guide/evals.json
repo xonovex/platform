@@ -1,0 +1,42 @@
+{
+  "skill_name": "lua-opinionated-guide",
+  "tier": "moderate",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "In our LuaJIT game engine, write a factory function `create_entity(x, y, kind)` that returns a new entity table. Entities need position (x, y), a kind, a velocity (velocity_x, velocity_y starting at 0), health (starts at 100), and an active flag (starts true). Not all of these are known at the call site, so make it clean and efficient for a hot update loop.",
+      "assertions": [
+        "The returned entity table is built as a single table literal/constructor with all fields (x, y, kind, velocity_x, velocity_y, health, active) present at creation",
+        "No entity field is assigned via `entity.field = ...` after the table is constructed"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 2,
+      "prompt": "This LuaJIT function runs every frame over thousands of entities and shows up hot in the profiler. Rewrite it to be faster without changing behavior:\n\n```lua\nfunction update_positions(entities, dt)\n    for i = 1, #entities do\n        local e = entities[i]\n        e.x = e.x + e.velocity_x * dt\n        e.y = e.y + e.velocity_y * dt\n    end\nend\n```",
+      "assertions": [
+        "Repeated table-field reads are hoisted into locals (e.g. `local x, y = e.x, e.y` or equivalent) rather than re-indexing the same field multiple times",
+        "The loop still iterates with a numeric `for i = 1, #entities` and does not switch to `pairs()`"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 3,
+      "prompt": "Write a LuaJIT hot-loop function that computes and stores sin and cos of each angle in a large numeric array `angles` into two output arrays. Optimize it for repeated per-frame execution.",
+      "assertions": [
+        "`math.sin` and `math.cos` are cached into upvalue/module locals (e.g. `local sin, cos = math.sin, math.cos`) rather than called as `math.sin(...)` inside the loop",
+        "Iteration uses a numeric `for i = 1, #angles` loop rather than `pairs()`/`ipairs()`"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 4,
+      "prompt": "I need to build a large lookup buffer in LuaJIT: an array `buf` of `size` numbers, each initialized to 0, that I'll later index into during a hot loop. Show the idiomatic performant way to create and fill it.",
+      "assertions": [
+        "The array is filled with a numeric `for i = 1, size do buf[i] = 0 end` producing a dense array with no nil holes",
+        "The output does not create a sparse array or rely on `#` over a table with gaps"
+      ],
+      "load_bearing": false
+    }
+  ]
+}

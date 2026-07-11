@@ -1,0 +1,43 @@
+{
+  "skill_name": "reflect-guide",
+  "tier": "aggressive",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "We just wrapped a debugging session where I made a couple of mistakes and had to correct course. Capture the development lessons from this session and save each one as its own file so a future agent can reuse it. Show me exactly what one of those files should contain.",
+      "assertions": [
+        "Each file has YAML frontmatter that includes category, topic, and applies_to fields",
+        "The frontmatter sets applied to false on creation",
+        "The body is structured around MISTAKE, DISCOVERY, and FIX (how to avoid it)"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 2,
+      "prompt": "Fold the lessons from this session into our project's AGENTS.md instructions. Explain how the reflect tooling does this by default before you run it.",
+      "assertions": [
+        "States that insights are extracted and written straight into AGENTS.md by default, without a required prior store-then-integrate step",
+        "Notes that persisting the lessons to reflections/*.md files first is optional and only happens with a --persist flag (or an explicit extract), not a prerequisite"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 3,
+      "prompt": "This session surfaced one useful lesson about how we type JSON responses in our tests. Should I spin up a new guideline skill to capture it? Tell me where this lesson should actually live.",
+      "assertions": [
+        "Advises against creating a new guideline skill for a single one-off lesson and recommends folding it into AGENTS.md instead",
+        "States that a new skill is only warranted once a category has roughly 3-7 worth-keeping bullets (and no existing owner skill covers it)"
+      ],
+      "load_bearing": true
+    },
+    {
+      "id": 4,
+      "prompt": "When I extract insights from a session, I usually just tag every one with applies_to: [\"general\"] to keep it simple. Is that a good idea for how these get integrated later?",
+      "assertions": [
+        "Warns that applies_to: [\"general\"] breaks or defeats routing/auto-detection (it cannot pick the correct AGENTS.md or owner skill)",
+        "Recommends using a specific routing key (e.g. a directory/package/domain name) instead of general"
+      ],
+      "load_bearing": true
+    }
+  ]
+}
