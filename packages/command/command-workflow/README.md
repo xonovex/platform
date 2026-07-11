@@ -93,6 +93,7 @@ Learning: reflect-to-instructions / reflect-to-skill fold learnings into guideli
 | `pr-review-resolve`     | Verify fixes and resolve the review's blocking threads                                     |
 | `plan-worktree-merge`   | Merge feature worktree back to source                                                      |
 | `plan-worktree-abandon` | Document and abandon a feature with reason and learnings                                   |
+| `plan-worktree-cleanup` | Remove stale and merged worktrees, and prune leftover admin metadata                       |
 
 ## Design Decisions
 
