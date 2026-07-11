@@ -17,7 +17,6 @@ digraph Workflow {
     style=dashed;
     fontsize=10;
 
-    leg_wrapper [label="Agent Wrapper", shape=house, fillcolor=lavender];
     leg_cmd [label="Command / Skill", fillcolor=lightblue];
     leg_agent [label="(AI Agent Session)", shape=ellipse, fillcolor=lightyellow];
     leg_human [label="Decision (HITL or AI)", shape=diamond, fillcolor=lightcoral];
@@ -28,19 +27,11 @@ digraph Workflow {
     leg_owners [label="Code Owner (CODEOWNERS)", fillcolor=lightcoral];
     leg_note [label="Also: code-quality audit\n(harden/simplify/align),\nshared-extract (run as needed)", shape=note, fillcolor=white, fontsize=9];
 
-    leg_wrapper -> leg_cmd -> leg_agent -> leg_human -> leg_loop -> leg_parallel -> leg_session -> leg_3amigos -> leg_owners [style=invis];
+    leg_cmd -> leg_agent -> leg_human -> leg_loop -> leg_parallel -> leg_session -> leg_3amigos -> leg_owners [style=invis];
   }
 
-  // Start - Agent Wrapper
-  subgraph cluster_setup {
-    label="Setup";
-    style=filled;
-    fillcolor=lavender;
-
-    start [label="Run Agent Wrapper", shape=house, fillcolor=lavender];
-    start_agent [label="(Harness selection:\nClaude Code, OpenCode, etc.\nProfiles: GLM+docker, bwrap,\ngemini via CLI Proxy, Copilot...)", shape=ellipse, fillcolor="#ffffcc"];
-    right_size [label="Trivial change?\n(one-sentence diff)", shape=diamond, fillcolor=lightcoral];
-  }
+  // Entry triage (any session / any agent)
+  right_size [label="Trivial change?\n(one-sentence diff)", shape=diamond, fillcolor=lightcoral];
 
   // Discovery Phase (Three Amigos)
   subgraph cluster_discovery {
@@ -247,9 +238,7 @@ digraph Workflow {
 
   // === EDGES ===
 
-  // Setup
-  start -> start_agent;
-  start_agent -> right_size;
+  // Entry triage
   right_size -> story_input [label="No: full flow"];
   right_size -> work [label="Yes: implement\ndirectly", style=dashed];
 
