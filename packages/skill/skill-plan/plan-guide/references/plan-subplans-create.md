@@ -10,7 +10,7 @@ An approved parent plan (run `plan-create` first). Does **NOT** explore the code
 
 **Do NOT switch into plan-authoring. Do NOT delegate to codebase-exploration agents.**
 
-1. **Read parent plan** and validate status is `pending-approval` or `approved`
+1. **Read parent plan** and validate `status: approved` (run `plan-accept` first)
 2. **Extract context** — goals, technology choices, proposed subplans, dependencies
 3. **Generate detailed child plans** — objective, tasks with code snippets and file paths/line numbers, validation steps (typecheck/lint/build/test/integration), success criteria
 4. **Detect execution groups** — file overlap → sequential · no overlap → parallel · explicit deps → sequential with tracking
@@ -29,7 +29,7 @@ Splitting defaults to logical grouping, or by phase markers if the user requests
 
 ## Gotchas
 
-- Approving the parent plan is mandatory — generating subplans against a `draft` parent skips review
+- Approving the parent plan (`plan-accept`) is mandatory — generating subplans against an unapproved parent skips review
 - File-overlap analysis runs against the parent plan's listed files only — if the parent doesn't enumerate files clearly, parallel detection produces false-parallels
 - A child plan without `skills_to_consult` skips project conventions during implementation — never empty
 - > 10 child plans usually signals the parent is too broad — split into multiple parent plans

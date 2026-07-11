@@ -5,7 +5,7 @@ description: "Use when scoping, researching, deciding, planning, revising, criti
 
 # Planning & Code-Research Guidelines
 
-Author and maintain plan documents across their full lifecycle (research → decide → create → revise ⇄ critique → subplans → continue → update → validate) and run code-research operations (align, harden, simplify, template extraction, etc.) that feed into those plans.
+Author and maintain plan documents across their full lifecycle (research → decide → create → revise ⇄ critique → accept → subplans → continue → update → validate) and run code-research operations (align, harden, simplify, template extraction, etc.) that feed into those plans.
 
 ## Core Principles
 
@@ -20,7 +20,7 @@ Author and maintain plan documents across their full lifecycle (research → dec
 - Skipping `plan-research` and going straight to `plan-create` produces vague plans built on assumed context
 - A plan without `skills_to_consult` leaves implementers ignoring project conventions
 - Auto-detecting toolchain via `package.json` only misses Moon/Makefile-driven projects — check both
-- Approving a parent plan is mandatory before generating subplans (`plan-subplans-create`)
+- Approve the parent with `plan-accept` before `plan-subplans-create` — it requires `status: approved`
 - "Tests pass" doesn't mean "success criteria met" — `plan-validate` reads the criteria, not just exit codes
 - Auto-continuing to the next plan after completion silently chains work — `plan-continue` STOPS after one
 - Subplans with >7 tasks risk silent drops — target 5–7 tasks each
@@ -31,12 +31,13 @@ Author and maintain plan documents across their full lifecycle (research → dec
 1. **Research** — `plan-research` for general; for a code-quality audit (hardening / simplification / alignment) it applies the **code-quality-guide** dimensions and reports findings
 2. **Decide** — `plan-decide` settles decisions one at a time: walks known open decisions as prose briefs, or discovers unknown ones by questioning the user down the design tree (codebase-aware) when nothing is queued
 3. **Create** — `plan-create` authors the parent plan; test-first plans apply **tdd-guide** (or **bdd-guide** for acceptance-first)
-4. **Revise** — `plan-revise` applies user feedback to the plan document (annotations + prompt instructions); `--final` marks it approved
+4. **Revise** — `plan-revise` applies user feedback to the plan document (annotations + prompt instructions)
 5. **Critique** — `plan-critique` adversarially stress-tests the plan (red-team / pre-mortem), feeding findings back into revise
-6. **Expand** — `plan-subplans-create` generates detailed child plans
-7. **Execute** — `plan-continue` works through subplans one at a time
-8. **Update** — `plan-update` refreshes status / phase / validation results
-9. **Validate** — `plan-validate` confirms success criteria are met (read-only)
+6. **Accept / Reject** — `plan-accept` sets `status: approved` (the gate to subplans); `plan-reject` sets `status: rejected` with a reason
+7. **Expand** — `plan-subplans-create` generates detailed child plans
+8. **Execute** — `plan-continue` works through subplans one at a time
+9. **Update** — `plan-update` refreshes status / phase / validation results
+10. **Validate** — `plan-validate` confirms success criteria are met (read-only)
 
 ## Progressive Disclosure
 
@@ -56,6 +57,8 @@ Author and maintain plan documents across their full lifecycle (research → dec
 - Read [references/plan-create.md](references/plan-create.md) - Load when authoring a high-level plan from research (test-first plans route to **tdd-guide** / **bdd-guide**)
 - Read [references/plan-revise.md](references/plan-revise.md) - Load when applying inline annotations and/or prompt feedback to a plan document
 - Read [references/plan-critique.md](references/plan-critique.md) - Load when adversarially stress-testing a plan to expose weaknesses (red-team / pre-mortem / falsify / steelman), read-only
+- Read [references/plan-accept.md](references/plan-accept.md) - Load when approving a plan for execution (sanity-check, then set status: approved)
+- Read [references/plan-reject.md](references/plan-reject.md) - Load when rejecting a plan with a reason (set status: rejected, record why, keep the plan)
 - Read [references/plan-subplans-create.md](references/plan-subplans-create.md) - Load when expanding an approved plan into detailed parallelizable subplans
 - Read [references/plan-continue.md](references/plan-continue.md) - Load when resuming implementation work from an existing plan
 - Read [references/plan-update.md](references/plan-update.md) - Load when refreshing a plan with current status / validation / progress

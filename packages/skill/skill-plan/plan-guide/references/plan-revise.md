@@ -1,6 +1,6 @@
 # plan-revise: Revise Plan from User Feedback
 
-Apply user feedback to an existing plan document — from inline annotations, prompt instructions, or both. Resolve every item, update the plan in place, present the result, STOP. Repeat until approved. For settling open decisions instead of applying feedback, use `plan-decide`.
+Apply user feedback to an existing plan document — from inline annotations, prompt instructions, or both. Resolve every item, update the plan in place, present the result, STOP. Repeat until the user accepts (`plan-accept`) or rejects (`plan-reject`) it. For settling open decisions instead of applying feedback, use `plan-decide`.
 
 ## Feedback Sources
 
@@ -28,7 +28,7 @@ Revision requests in the prompt (e.g. "swap manual validation for zod and drop t
 4. **Resolve each item** top-to-bottom by type — Correction → update section · Deletion → remove · Addition → add in place · Question → ask user then update · Rejection → rework approach · Scope change → move to Future Work, adjust dependents
 5. **Strip annotation markers** so the plan reads cleanly
 6. **Reconcile dependencies** — if subplan structure changed, update proposed subplans + execution groups
-7. **Update frontmatter** — `updated` date; final pass sets `status: approved`
+7. **Update frontmatter** — set the `updated` date (approval is a separate step — `plan-accept`)
 8. **Write in place**, present change summary, STOP
 
 ## Resolution Rules

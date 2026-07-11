@@ -73,8 +73,10 @@ Learning: reflect-to-instructions / reflect-to-skill fold learnings into guideli
 | `plan-research`         | Research codebase + web, or run a read-only code-quality audit (harden / simplify / align) |
 | `plan-decide`           | Settle decisions one at a time — walk known open ones, or discover them by questioning     |
 | `plan-create`           | Create a high-level plan for user review (test-first plans route to tdd / bdd guides)      |
-| `plan-revise`           | Apply annotations and prompt feedback to the plan; `--final` approves                      |
+| `plan-revise`           | Apply annotations and prompt feedback to the plan                                          |
 | `plan-critique`         | Adversarially stress-test a plan to expose weaknesses                                      |
+| `plan-accept`           | Approve a plan for execution (sanity-check, set status: approved)                          |
+| `plan-reject`           | Reject a plan with a reason (set status: rejected, keep the plan)                          |
 | `plan-subplans-create`  | Generate detailed subplans with parallel execution detection                               |
 | `plan-worktree-create`  | Create a git worktree for a feature branch                                                 |
 | `plan-continue`         | Resume work from an existing plan                                                          |
