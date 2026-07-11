@@ -33,6 +33,8 @@ script: 'echo "foo" && echo "bar"'
 | `.moon/toolchain.yml` | `.moon/toolchains.yml` (plural)        |
 | `.moon/tasks.yml`     | `.moon/tasks/all.yml` (no inheritedBy) |
 
+New in v2: built-in extensions are configured in `.moon/extensions.yml`.
+
 ## Setting renames
 
 | v1              | v2               |

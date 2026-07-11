@@ -1,6 +1,6 @@
 # authentication: JWT Authentication
 
-Verify the `Bearer` token in `requireAuth`, attach the payload to `req.user` (declaration-merged onto `Express.Request`), and gate roles with a `requireRole(...roles)` factory that runs after `requireAuth`. Return 401 for missing/invalid auth, 403 for insufficient role. Sign tokens over `{userId, email, role}`; compare passwords with bcrypt, never plaintext.
+Verify the `Bearer` token in `requireAuth`, attach the payload to `req.user` (declaration-merged onto `Express.Request`), and gate roles with a `requireRole(...roles)` factory that runs after `requireAuth`. Return 401 for missing/invalid auth, 403 for insufficient role. Sign tokens over `{userId, email, role}` with an expiration (`expiresIn: "7d"`); compare passwords with bcrypt, never plaintext.
 
 ```typescript
 declare global {
