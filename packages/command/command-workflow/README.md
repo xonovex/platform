@@ -82,6 +82,9 @@ Learning: reflect-to-instructions / reflect-to-skill fold learnings into guideli
 | `plan-continue`         | Resume work from an existing plan                                                          |
 | `plan-validate`         | Verify that a plan or current work has been fully achieved                                 |
 | `plan-update`           | Update plan status and test results                                                        |
+| `story-refine`          | Refine user stories against INVEST and split them vertically (SPIDR)                       |
+| `acceptance-formalize`  | Formalize acceptance criteria as Given-When-Then scenarios (three-amigos)                  |
+| `acceptance-validate`   | Validate a PR against its acceptance scenarios, pass/fail per scenario                     |
 | `git-commit`            | Commit and push changes                                                                    |
 | `pr-create`             | Open a pull request with a drafted description (any host)                                  |
 | `pr-review-analyze`     | Review a branch diff into a structured findings file                                       |
