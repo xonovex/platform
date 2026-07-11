@@ -25,9 +25,10 @@ digraph Workflow {
     leg_parallel [label="Parallel Execution", shape=parallelogram, fillcolor=wheat];
     leg_session [label="--- New Session ---", shape=plaintext, fontcolor=gray40];
     leg_3amigos [label="Three Amigos", shape=tab, fillcolor="#e8d5f5"];
+    leg_owners [label="Code Owner (CODEOWNERS)", fillcolor=lightcoral];
     leg_note [label="Also: code-quality audit\n(harden/simplify/align),\nshared-extract (run as needed)", shape=note, fillcolor=white, fontsize=9];
 
-    leg_wrapper -> leg_cmd -> leg_agent -> leg_human -> leg_loop -> leg_parallel -> leg_session -> leg_3amigos [style=invis];
+    leg_wrapper -> leg_cmd -> leg_agent -> leg_human -> leg_loop -> leg_parallel -> leg_session -> leg_3amigos -> leg_owners [style=invis];
   }
 
   // Start - Agent Wrapper
@@ -158,9 +159,9 @@ digraph Workflow {
     worktree_3 [label="Worktree C\nSubplan 3\n(parallel_group: 2)", shape=parallelogram];
   }
 
-  // Merge / Delivery + QA Validation Phase
+  // Merge / Delivery Phase
   subgraph cluster_merge {
-    label="Merge / Delivery + QA Validation";
+    label="Merge / Delivery";
     style=filled;
     fillcolor="#ffe6e6";
 
@@ -180,10 +181,41 @@ digraph Workflow {
     validate_parent_agent [label="(Agent:\n- Validate parallel group\n  together on parent)", shape=ellipse, fillcolor="#ffffcc"];
 
     pr_create [label="pr-create\n(open PR, any host)", fillcolor=lightblue];
+  }
+
+  // PR / Code Review Loop
+  subgraph cluster_review {
+    label="PR / Code Review Loop";
+    style=filled;
+    fillcolor="#f5f0ff";
+
+    // Automated reviewer track
+    pr_review_analyze [label="pr-review-analyze\n(diff -> structured findings:\nConventional Comments\nlabels + blocking flags)", fillcolor=lightblue];
+    pr_review_analyze_agent [label="(Agent:\n- Review branch diff\n- Ground in code + domain skills\n- Label + blocking-flag each\n- Summary + line anchors)", shape=ellipse, fillcolor="#ffffcc"];
+    pr_review_refine [label="pr-review-refine\n(reword / relabel / re-anchor /\nmerge / split / drop;\n--final = ready)", fillcolor=lightblue];
+    pr_review_refine_agent [label="(Agent:\n- Per-finding: keep / reword /\n  relabel / re-anchor /\n  merge / split / drop\n- Re-validate anchors,\n  re-derive summary)", shape=ellipse, fillcolor="#ffffcc"];
+    pr_review_post [label="pr-review-post\n(publish to PR: summary +\nlabelled inline comments\n+ blocking tasks, any host)", fillcolor=lightblue];
+    pr_review_post_agent [label="(Agent:\n- Detect host from remote\n- Post summary + inline\n- Promote blocking tasks\n- Write back comment ids)", shape=ellipse, fillcolor="#ffffcc"];
+
+    // Human reviewer track
+    code_owners [label="Code owners review\n(CODEOWNERS required\nreviewers, HITL)", fillcolor=lightcoral];
+
+    review_addressed [label="Author addresses findings\n(AI review + code owners)", shape=parallelogram, fillcolor=wheat];
+
+    pr_review_resolve [label="pr-review-resolve\n(verify each fix, resolve\nits thread; leave\nstill-broken open)", fillcolor=lightblue];
+    pr_review_resolve_agent [label="(Agent:\n- Match findings to threads\n- Verify each genuinely fixed\n- Resolve fixed threads,\n  optionally reply)", shape=ellipse, fillcolor="#ffffcc"];
+
+    review_clear [label="Findings resolved\n& code owners approved?", shape=diamond, fillcolor=lightcoral];
+  }
+
+  // QA Acceptance Phase
+  subgraph cluster_qa {
+    label="QA Acceptance";
+    style=filled;
+    fillcolor="#ffe6e6";
 
     acceptance_validate [label="acceptance-validate\n(validate acceptance\ncriteria against PR)", fillcolor="#e8d5f5"];
     acceptance_validate_agent [label="(Agent:\n- Load original scenarios\n- Verify each Given-When-Then\n  is covered by tests\n- Report pass/fail per scenario\n- Flag gaps or regressions)", shape=ellipse, fillcolor="#ffffcc"];
-
     qa_verdict [label="Acceptance Met?\n(sign-off)", shape=diamond, fillcolor=lightcoral];
   }
 
@@ -296,7 +328,24 @@ digraph Workflow {
   cd_parent -> plan_validate_parent;
   plan_validate_parent -> validate_parent_agent;
   validate_parent_agent -> pr_create;
-  pr_create -> acceptance_validate;
+
+  // PR / code review loop (automated track + code owners)
+  pr_create -> pr_review_analyze;
+  pr_create -> code_owners [label="request\nreviewers", style=dashed];
+  pr_review_analyze -> pr_review_analyze_agent;
+  pr_review_analyze_agent -> pr_review_refine;
+  pr_review_refine -> pr_review_refine_agent;
+  pr_review_refine_agent -> pr_review_post;
+  pr_review_post -> pr_review_post_agent;
+  pr_review_post_agent -> review_addressed;
+  code_owners -> review_addressed [label="owner\ncomments"];
+  review_addressed -> pr_review_resolve;
+  pr_review_resolve -> pr_review_resolve_agent;
+  pr_review_resolve_agent -> review_clear;
+  review_clear -> pr_review_analyze [label="No: re-review\nupdated branch", style=dashed];
+  review_clear -> acceptance_validate [label="Yes: clean\n& approved"];
+
+  // QA acceptance
   acceptance_validate -> acceptance_validate_agent;
   acceptance_validate_agent -> qa_verdict;
   qa_verdict -> git_commit_push [label="Accepted"];
