@@ -1,12 +1,6 @@
 # cross-language-api: Designing a C API for Cross-Language Binding
 
-## Guideline
-
-When an API must be callable from other languages, expose a plain-C interface restricted to a portable subset (no untagged unions, variadics, or globals), prefer passing flat data over pointers, scope every borrowed pointer to the call itself, and describe the API in a machine-readable spec so idiomatic bindings can be generated rather than hand-written.
-
-## Rationale
-
-The C ABI is the one calling convention every platform and nearly every language's FFI understands; C++ has no stable ABI, so a C surface is the lingua franca for inter-language calls. But raw FFI is awkward — it needs unsafe blocks, has no string marshaling, no memory-management integration, and no native idioms — so "just expose C" is necessary but not sufficient for a _nice_ binding. Two moves fix that. First, keep the API shape inside what FFIs can express: untagged unions don't exist in most languages, variadics aren't universally supported, and global structures are discouraged everywhere outside C/C++. Second, drive bindings from a spec (IDL/XML/JSON) instead of by hand, so a generator can emit idiomatic, always-in-sync wrappers for each target language and enforce the constraints automatically — the same approach large C APIs use to generate headers plus Rust/C# bindings.
+When an API must be callable from other languages, expose a plain-C interface restricted to a portable subset (no untagged unions, variadics, or globals), prefer passing flat data over pointers, scope every borrowed pointer to the call itself, and describe the API in a machine-readable spec so idiomatic bindings can be generated rather than hand-written. C is the only stable de-facto ABI (C++ has none).
 
 ## How to Apply
 

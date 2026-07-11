@@ -1,14 +1,6 @@
 # error-handling: Centralized Error Handler
 
-## Guideline
-
-Implement single error handler middleware that handles Zod errors, custom errors, and hides stack traces in production.
-
-## Rationale
-
-Centralized error handling ensures consistent error responses and prevents information leakage.
-
-## Example
+A single error handler with the four-parameter signature `(err, req, res, next)` — Express only treats a four-arg function as an error handler. Branch `ZodError` → 400 with `err.flatten()`, match custom `err.name` (`NotFoundError`/`UnauthorizedError`/`ForbiddenError`) to 404/401/403, and expose `err.message`/`err.stack` only when `NODE_ENV !== "production"`; otherwise return a generic 500. Register it last.
 
 ```typescript
 export function errorHandler(
@@ -37,7 +29,6 @@ export function errorHandler(
       res.status(403).json({error: err.message});
       return;
     }
-
     if (process.env.NODE_ENV !== "production") {
       res.status(500).json({
         error: "Internal server error",
@@ -51,13 +42,3 @@ export function errorHandler(
   res.status(500).json({error: "Internal server error"});
 }
 ```
-
-## Techniques
-
-- Four parameters: (err, req, res, next) required for Express to recognize error handler
-- Zod handling: Check instanceof ZodError, return 400 with details
-- Custom errors: Match error.name against NotFoundError, UnauthorizedError, ForbiddenError
-- Development mode: Show error.message and error.stack when NODE_ENV !== "production"
-- Production mode: Hide details, return generic "Internal server error" message
-- Register last: Error handler must be last middleware in app.use() chain
-- Logging: Log errors to console for debugging and monitoring

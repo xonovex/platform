@@ -1,62 +1,16 @@
-# avoiding-heavy-features: Avoiding Heavy TypeScript Features
+# avoiding-heavy-features: Skip Runtime-Heavy TS
 
-## Guideline
-
-Avoid complex inheritance, async/await, and heavy OOP patterns that bloat Lua output.
-
-## Rationale
-
-Complex features require substantial runtime support and generate verbose Lua. Simpler patterns align with Lua's lightweight nature.
-
-## Example
+Deep inheritance, `async`/`await`, and heavy OOP pull in verbose TSTL runtime support. Prefer composition and namespaces over class hierarchies (see namespaces-vs-classes.md); replace `async`/`await` with `function*` generators, which compile to Lua coroutines (see coroutine-patterns.md). Model data as plain objects, not methods on classes.
 
 ```typescript
-// AVOID: Heavy inheritance
-class Entity {
-  move() {}
-}
-class GameObject extends Entity {
-  render() {}
-}
-class Enemy extends GameObject {
-  attack() {}
-}
-
-// PREFER: Composition with namespaces
-namespace Physics {
-  export interface Body {
-    x: number;
-    y: number;
-  }
-  export function move(b: Body, dx: number) {
-    b.x += dx;
-  }
-}
-
-namespace Rendering {
-  export function render(b: Body) {
-    /* draw */
-  }
-}
-
-// AVOID: async/await
+// AVOID
 async function loadData() {
   return await fetch();
 }
 
-// PREFER: Generators (become coroutines in Lua)
+// PREFER: generator → coroutine
 function* loadData() {
   const data = yield fetchAsync();
   return data;
 }
 ```
-
-## Techniques
-
-- Use composition patterns instead of inheritance to keep Lua output lightweight
-- Replace async/await with callback functions or coroutines (not supported in Lua)
-- Prefer interfaces and namespaces for code organization over class-based designs
-- Design data structures as plain objects without methods or properties
-- Use function\* generators for cooperative multitasking instead of async APIs
-- Keep class hierarchies shallow, prefer interfaces for type contracts
-- Avoid decorators and complex OOP patterns that require runtime support

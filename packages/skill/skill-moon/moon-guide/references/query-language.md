@@ -1,74 +1,28 @@
 # query-language: Advanced Project and Task Filtering
 
-## Guideline
-
-Use Moon Query Language (MQL) for advanced filtering of projects and tasks.
-
-## Rationale
-
-MQL allows precise selection of projects using language, layer, tags, and other criteria for targeted task execution and querying.
-
-## Example
+Use Moon Query Language (MQL) to select projects/tasks by language, layer, tags, and more. Prefer `#tag:task` for a single tag; use `--query` for multi-criterion conditions.
 
 ```bash
-# Query projects by language and layer (v2 syntax)
 moon query projects "language=javascript && projectLayer=library"
-
-# Run build for typescript projects
 moon run :build --query "language=typescript"
-
-# Complex filtering
 moon run :test --query "(language=javascript || language=typescript) && projectLayer=application"
+moon run :lint --query "tags~shared && projectLayer=library"
 ```
-
-## Techniques
 
 ## Operators
 
-- `=` - Equals
-- `!=` - Not equals
-- `~` - Regex match
-- `!~` - Not regex match
-- `&&` - AND
-- `||` - OR
-- `()` - Grouping
+`=` equals · `!=` not equals · `~` regex match · `!~` not regex · `&&` AND · `||` OR · `()` grouping.
 
-## Project Fields (Moon 2.0)
+## Fields (Moon 2.0)
 
-| Field           | Description                    | Example                          |
-| --------------- | ------------------------------ | -------------------------------- |
-| `language`      | Project language               | `language=typescript`            |
-| `projectId`     | Project ID (was `projectName`) | `projectId=core`                 |
-| `projectLayer`  | Layer type (was `projectType`) | `projectLayer=library`           |
-| `projectAlias`  | Package name alias             | `projectAlias~@scope/*`          |
-| `projectSource` | Source path                    | `projectSource~packages/agent/*` |
-| `tags`          | Project tags                   | `tags~frontend`                  |
+| Field           | Notes                               | Example                          |
+| --------------- | ----------------------------------- | -------------------------------- |
+| `language`      | project language                    | `language=typescript`            |
+| `projectId`     | project id (was `projectName`)      | `projectId=core`                 |
+| `projectLayer`  | layer (was `projectType`)           | `projectLayer=library`           |
+| `projectAlias`  | package name alias                  | `projectAlias~@scope/*`          |
+| `projectSource` | source path                         | `projectSource~packages/agent/*` |
+| `tags`          | project tags                        | `tags~frontend`                  |
+| `taskToolchain` | task toolchain (was `taskPlatform`) | `taskToolchain=node`             |
 
-## Task Fields (Moon 2.0)
-
-| Field           | Description                         | Example              |
-| --------------- | ----------------------------------- | -------------------- |
-| `taskToolchain` | Task toolchain (was `taskPlatform`) | `taskToolchain=node` |
-
-## Usage Patterns
-
-```bash
-# Simple tag filtering
-moon run '#frontend:build'
-
-# Query with regex for multiple tags
-moon run :build --query "tags~frontend|backend"
-
-# Filter by layer
-moon run :test --query "projectLayer=application"
-
-# Complex multi-criterion
-moon run :lint --query "(language=typescript && projectLayer=library) || tags~shared"
-```
-
-## Performance Tips
-
-- Prefer exact matches (`=`) over regex (`~`) when possible
-- Use `#tag:task` syntax for simple single-tag filtering
-- Use `--query` for complex multi-criterion conditions
-- Parentheses group conditions for boolean logic
+Prefer exact `=` over regex `~` when possible.

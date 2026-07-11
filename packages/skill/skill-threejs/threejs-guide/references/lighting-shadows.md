@@ -1,14 +1,6 @@
-# filename: lighting-shadows
+# lighting-shadows: Lighting and Shadows
 
-## Guideline
-
-Use light types appropriate to scene; keep shadow frustums tight; leverage IBL (Environment maps) for realistic ambient lighting.
-
-## Rationale
-
-Lighting creates atmosphere; tight shadow frustums improve quality; IBL is more efficient than many point lights for PBR.
-
-## Example
+Use light types appropriate to the scene; keep shadow frustums tight; leverage IBL (environment maps) for realistic ambient lighting.
 
 ```javascript
 renderer.shadowMap.enabled = true;

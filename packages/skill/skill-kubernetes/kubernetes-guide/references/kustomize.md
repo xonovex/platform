@@ -1,22 +1,16 @@
 # kustomize: Multi-Environment Management
 
-## Guideline
-
-Organize manifests with base resources and environment-specific overlays using strategic merge patches.
-
-## Rationale
-
-Kustomize enables DRY configuration management across environments. Base resources define common configuration while overlays customize for each environment.
-
-## Example
+Structure manifests as a `base/` plus per-environment `overlays/<env>/`; overlays inherit the base via `resources` and customize with `patches` (auto-detects strategic-merge vs JSON6902). Manage image tags with `images` and env config with `configMapGenerator`. On Kustomize ≥ 5 prefer `resources`/`patches`/`labels` over the deprecated `bases`/`patchesStrategicMerge`/`commonLabels`.
 
 ```yaml
 # base/kustomization.yaml
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: default
-commonLabels:
-  app.kubernetes.io/name: api
+labels:
+  - pairs:
+      app.kubernetes.io/name: api
+    includeSelectors: true
 resources:
   - deployment.yaml
   - service.yaml
@@ -25,22 +19,13 @@ images:
     newTag: 1.2.3
 
 # overlays/production/kustomization.yaml
-bases:
+resources:
   - ../../base
 namespace: production
-patchesStrategicMerge:
-  - replica-count.yaml
-  - resources-patch.yaml
+patches:
+  - path: replica-count.yaml
+  - path: resources-patch.yaml
 configMapGenerator:
   - name: api-config
     literals: [LOG_LEVEL=info, RATE_LIMIT=1000]
 ```
-
-## Techniques
-
-- Base resources: Create base/kustomization.yaml with common manifests
-- Environment overlays: Create overlays/<env>/ for environment-specific customization
-- Bases reference: Use bases field to inherit and extend base resources
-- Strategic patches: Apply patchesStrategicMerge for targeted environment differences
-- Config generation: Use configMapGenerator for environment-specific configuration
-- Image management: Manage image tags in kustomization.yaml for consistency

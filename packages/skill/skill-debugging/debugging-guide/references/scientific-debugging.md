@@ -1,12 +1,6 @@
 # scientific-debugging: Hypothesis-Driven Debugging
 
-## Guideline
-
-Debug like a scientist — form one falsifiable hypothesis about the cause, change exactly one thing, predict the outcome before you run, observe, and let the result narrow the search; never edit at random hoping the symptom goes away.
-
-## Rationale
-
-The default move on a reproducible bug is to break into the debugger _before_ the failure and step through, comparing what the code actually does against what you believe it should do — the bug lives in that gap. Random edits ("flailing") can make a symptom vanish without removing the cause, leaving a latent bug and no understanding. A single-variable experiment with a prediction is decisive: a confirmed prediction advances you, a violated prediction is information (your model was wrong, which narrows things further). Crucially, confirm the hypothesis cheaply _before_ committing to a fix direction, so you don't spend hours down a rabbit hole built on a wrong assumption.
+Form one falsifiable hypothesis about the cause, change exactly one thing, predict the outcome before you run, observe, and let the result narrow the search; never edit at random hoping the symptom goes away. On a reproducible bug the default move is to break in _before_ the failure and step through, comparing what the code does against what you believe it should — the bug lives in that gap.
 
 ## How to Apply
 

@@ -1,21 +1,8 @@
 # contrast-and-color: Contrast & use of color
 
-## Contents
-
-- [Guideline](#guideline)
-- [Rationale](#rationale)
-- [Contrast ratios (1.4.3, 1.4.11)](#contrast-ratios-143-1411)
-- [Never rely on color alone (1.4.1)](#never-rely-on-color-alone-141)
-- [Source colors from semantic theme tokens](#source-colors-from-semantic-theme-tokens)
-- [Verify both light and dark themes](#verify-both-light-and-dark-themes)
-
 ## Guideline
 
-Meet the WCAG AA contrast thresholds, and never let color be the only carrier of meaning — pair it with an icon, a text label, and a status-naming `contentDescription`.
-
-## Rationale
-
-Low contrast makes text and controls unreadable for low-vision users and in bright sunlight. Conveying state by hue alone is invisible to the ~8% of users with color-vision deficiency and to screen-reader users. Serves 1.4.3 Contrast (Minimum), 1.4.11 Non-text Contrast, and 1.4.1 Use of Color.
+Meet the WCAG AA contrast thresholds, and never let color be the only carrier of meaning — pair it with an icon, a text label, and a status-naming `contentDescription`. Serves 1.4.3 Contrast (Minimum), 1.4.11 Non-text Contrast, and 1.4.1 Use of Color.
 
 ## Contrast ratios (1.4.3, 1.4.11)
 

@@ -1,19 +1,6 @@
 # server-components: React Server Components & Actions
 
-## Contents
-
-- [Guideline](#guideline)
-- [Rationale](#rationale)
-- [Example](#example)
-- [Techniques](#techniques)
-
-## Guideline
-
-Use Server Components by default for data fetching and static UI; add `'use client'` only for interactivity.
-
-## Rationale
-
-Server Components send zero JS to the client, access databases/APIs directly, and eliminate loading state boilerplate. Client boundaries should be minimal.
+Use Server Components by default (zero client JS, direct db/API access, no loading-state boilerplate); add `'use client'` only for interactivity; use `'use server'` for mutations callable from the client.
 
 ## Example
 

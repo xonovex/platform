@@ -2,15 +2,7 @@
 
 ## Guideline
 
-Push the branch (that's `git-guide`'s job), then open the PR with `gh pr create`, which pushes the branch for you if it isn't on the remote and sets reviewers/labels/assignees in one call. The PR description content is `pull-request-guide`'s.
-
-## Rationale
-
-`gh pr create` is the one-shot path: it auto-pushes the source branch (prompting where to push / offering to fork), opens the PR, and attaches metadata in a single step. The raw `POST /repos/{owner}/{repo}/pulls` does none of that.
-
-## Push / rebase first
-
-Getting a clean branch built on the latest target — `git fetch`, rebase onto `origin/<target>`, push — is **`git-guide`**'s push reference. This file assumes the branch is ready; `gh pr create` will push it if the remote ref is missing.
+Push the branch (that's `git-guide`'s job, prerequisite: clean branch rebased onto the latest target), then open the PR with `gh pr create`, which auto-pushes the source branch if the remote ref is missing (prompting where to push / offering to fork) and sets reviewers/labels/assignees in one call. The raw `POST /repos/{owner}/{repo}/pulls` does none of that. The PR description content is `pull-request-guide`'s.
 
 ## `gh pr create` flags
 
@@ -74,10 +66,6 @@ gh api --method POST repos/{owner}/{repo}/pulls \
 - Requires `head` + `base` and (`title` OR an issue); optional `body`, `draft`, `head_repo`, `maintainer_can_modify`; cross-fork head is `username:branch`.
 - REST does **not** push your branch — the ref must already exist or you get `422 "Head sha can't be blank"`.
 - REST cannot set reviewers/assignees/labels in this call (separate endpoints).
-
-### Counter-example
-
-Calling `POST /pulls` before the branch is pushed fails with 422 — `gh pr create` would have pushed it for you.
 
 ### Related
 

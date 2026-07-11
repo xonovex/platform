@@ -1,23 +1,8 @@
 # state-and-announcements: State, live regions, announcements & custom actions
 
-## Contents
-
-- Toggle / selection state via `stateDescription` + the right `Role`
-- Live regions for non-transient updates (4.1.3)
-- Announce a transient in-flight state on the control
-- Imperative `announceForAccessibility` for transient events
-- Custom actions and named primary verbs (`onClickLabel`)
-- Disabled controls
-- Validate on blur, not on first render
-- Counter-Examples (double-announcing, generic prompts, non-localized state)
-
 ### Guideline
 
-Expose every dynamic state change to accessibility services with a localized `stateDescription`, the correct interaction `Role`, a live region only for content that persists on screen, an imperative announcement only for transient events, and named verbs for every actionable element.
-
-### Rationale
-
-TalkBack reads a node from its role + state + name. Toggling, selecting, expanding, loading, or erroring without surfacing the new state leaves a blind user with no feedback that anything happened. This serves 4.1.2 Name, Role, Value (state must be programmatically determinable and announced when it changes) and 4.1.3 Status Messages (AA-only — content changes that are not focus changes must be announced without moving focus). Named verbs serve 2.1.1 Keyboard / general operability — a switch-access or screen-reader user must know what activating an element does before doing it.
+Expose every dynamic state change to accessibility services with a localized `stateDescription`, the correct interaction `Role`, a live region only for content that persists on screen, an imperative announcement only for transient events, and named verbs for every actionable element. This serves 4.1.2 Name, Role, Value (state must be programmatically determinable and announced when it changes) and 4.1.3 Status Messages (AA-only — content changes that are not focus changes must be announced without moving focus). Named verbs serve 2.1.1 Keyboard / general operability.
 
 ## Toggle / selection state
 

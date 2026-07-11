@@ -6,7 +6,7 @@ Allocate from arena/bump and pool allocators over contiguous blocks and reclaim 
 
 ## Rationale
 
-Per-object general-purpose allocation is slow (lock + free-list search), fragments the heap, scatters objects across random addresses, and adds a per-allocation header. An arena allocates by bumping a pointer (a few instructions, no search) and places objects contiguously; reclaiming a whole lifetime is one O(1) reset and leak-proof by construction. Pools give O(1) allocate/free of same-size objects with stable addresses and no fragmentation. (Contiguity also helps cache behavior — see data-oriented-design-guide — but the allocation strategy is the concern here.)
+An arena reclaims a whole lifetime in one O(1) reset, leak-proof by construction, and places objects contiguously. Pools give O(1) allocate/free of same-size objects with stable addresses and no fragmentation. (Contiguity also helps cache behavior — see data-oriented-design-guide — but the allocation strategy is the concern here.)
 
 ## Techniques
 
@@ -15,13 +15,6 @@ Per-object general-purpose allocation is slow (lock + free-list search), fragmen
 - **Lifetime by reset** - Group allocations by lifetime (per-frame, per-level, per-request); reset the arena at the boundary so everything dies at once.
 - **Scratch / temp arena** - A per-cycle arena for transient buffers, reset every cycle, so temporaries never hit the global allocator.
 - **Virtual-memory reserve/commit** - Reserve a huge virtual range once (cheap — no physical pages), commit pages lazily as the arena grows. The block never moves and never reallocs, so pointers/back-pointers into it stay valid as it grows — a growable array with stable addresses. Reset/decommit returns the pages.
-
-## How to Apply
-
-1. Identify allocations that share a lifetime; route them through one arena.
-2. Implement `arena_alloc(a, size, align)` as an aligned pointer-bump; assert/return on overflow.
-3. Reset at the lifetime boundary (`used = 0`) — no per-object free.
-4. For long-lived same-type objects with individual lifetimes, use a pool with a free list.
 
 ## Example
 

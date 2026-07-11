@@ -6,7 +6,7 @@ A library never allocates; the caller provides all storage and the library opera
 
 ## Rationale
 
-Hidden allocations are the root of leaks, ownership confusion, and surprise allocator cost on a hot path. When the caller owns the memory, it picks the strategy (stack, pool, arena, virtual-memory block), there is nothing to leak, and batch processing needs no per-item allocation. It also makes the library trivially testable and embeddable (no allocator dependency), and serialization/relocation become the caller's clear responsibility.
+When the caller owns the memory it picks the strategy (stack, pool, arena, virtual-memory block), there is nothing to leak, batch processing needs no per-item allocation, and the library is embeddable with no allocator dependency. Serialization/relocation become the caller's responsibility.
 
 ## How to Apply
 

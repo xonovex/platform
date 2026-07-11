@@ -1,12 +1,6 @@
 # composability: Composable Stages Over a Uniform Currency
 
-## Guideline
-
-Build small, unopinionated primitives/stages that compose over one uniform data currency; let the caller wire the sequence explicitly. A stage's "phase"/role is how it is used, not a category the library bakes in — the consumer picks the 1..N stages it needs.
-
-## Rationale
-
-A monolithic `do_everything()` forces every caller into one fixed pipeline and one set of trade-offs. Decomposing the work into stages that read and write the _same_ data type lets each consumer assemble exactly the funnel it needs (1 stage for the trivial case, more for the complex one), swap one stage's implementation without touching the others, and test each stage in isolation. Keeping composition explicit (plain function calls in the caller, not a registered callback/vtable pipeline) preserves readability, debuggability, and the no-hidden-dispatch property of systems C — the "pipeline" is just the code the caller writes.
+Build small, unopinionated primitives/stages that compose over one uniform data currency; let the caller wire the sequence explicitly with plain function calls (no registered callback/vtable pipeline). A stage's "phase"/role is how it is used, not a category the library bakes in — the consumer picks the 1..N stages it needs.
 
 ## How to Apply
 

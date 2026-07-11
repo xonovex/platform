@@ -1,14 +1,6 @@
 # scene-fundamentals: Scene, Renderer, and Core Concepts
 
-## Guideline
-
-Configure Scene/Renderer; use Object3D hierarchy with proper dispose patterns; animate with setAnimationLoop and delta time.
-
-## Rationale
-
-Proper setup ensures memory safety, correct rendering, and frame-rate independence; improper disposal causes memory leaks.
-
-## Example
+Configure Scene/Renderer; use Object3D hierarchy with proper dispose patterns; animate with `setAnimationLoop` and delta time.
 
 ```javascript
 const renderer = new THREE.WebGLRenderer({antialias: true, alpha: true});

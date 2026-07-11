@@ -6,7 +6,7 @@ Represent an entity's type as the bitmask of components it has, and store all en
 
 ## Rationale
 
-Systems process components in bulk. If the components a system needs are co-located in memory, iteration is a tight pointer walk with predictable prefetch and no indirection. If they are scattered (one allocation per entity, or a map keyed by id), every step is a cache miss and the transform is dominated by data movement, not arithmetic. Bitmask typing also makes "which entities does this system touch?" a cheap mask test instead of a per-entity branch.
+Bitmask typing makes "which entities does this system touch?" a cheap superset mask test instead of a per-entity branch; contiguous per-type arrays make the system loop a tight pointer walk. (Cache/layout reasoning: **data-oriented-design-guide**.)
 
 ## How to Apply
 

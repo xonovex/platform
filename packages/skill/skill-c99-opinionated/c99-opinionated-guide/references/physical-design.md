@@ -1,12 +1,6 @@
 # physical-design: Physical Design and Header Discipline
 
-## Guideline
-
-Enforce one machine-checkable rule — a header may not `#include` another header (bar a tiny allowlist like `<stdint.h>`/`<stdbool.h>`) — so each header is the self-contained public interface of exactly one system, dependencies stay acyclic and explicit, and editing a header doesn't cascade a project-wide rebuild.
-
-## Rationale
-
-The dominant cost in a large C/C++ codebase is the include graph: a few innocent `#include`s recursively expand to megabytes of unrelated declarations, every translation unit recompiles the world, and one header edit triggers a project-wide rebuild — so iteration slows to a crawl and circular dependencies creep in unnoticed. Forbidding header-to-header includes removes all of it at once: cycles become impossible (a header can't name another header), the dependency graph is directional and obvious, and a `.c` file pulls in only the handful of system headers it actually uses. The win is build velocity approaching a scripting language's while keeping native performance, and the rule is simple enough to verify automatically in CI.
+Enforce one machine-checkable rule — a header may not `#include` another header (bar a tiny allowlist like `<stdint.h>`/`<stdbool.h>`) — so each header is the self-contained public interface of exactly one system, dependencies stay acyclic and explicit, and editing a header doesn't cascade a project-wide rebuild. Cycles become impossible: a header can't name another header.
 
 ## How to Apply
 

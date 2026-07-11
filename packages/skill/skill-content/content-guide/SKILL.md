@@ -25,12 +25,6 @@ Tenant-agnostic: these patterns apply to any structured multilingual content. Do
 - Removing every em dash or every "however" is over-correction — regularity is the AI tell, not the punctuation
 - Inventing facts (made-up sources, fabricated numbers) to "add specificity" is worse than the AI prose you started with
 
-## Operations
-
-- **Humanize** — rewrite AI-generated or stiff prose so it reads as a human wrote it — see [references/humanize.md](references/humanize.md)
-- **News-add** — auto-curate latest news on a topic into bilingual articles — see [references/news-add.md](references/news-add.md)
-- **Travelguide-add** — generate comprehensive multilingual travel / destination guides — see [references/travelguide-add.md](references/travelguide-add.md)
-
 ## Progressive Disclosure
 
 - Read [references/humanize.md](references/humanize.md) - Load when rewriting AI-generated or stiff prose; covers the pattern catalog, anti-AI checks, and adding human voice

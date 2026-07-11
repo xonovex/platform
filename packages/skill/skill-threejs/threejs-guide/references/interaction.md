@@ -1,14 +1,6 @@
 # interaction: Raycasting and User Interaction
 
-## Guideline
-
-Convert screen to normalized device coordinates, then raycast; cache raycaster instance and track state for hover/drag.
-
-## Rationale
-
-Raycasting picks objects; state tracking enables hover highlights and drag interactions; coordinate conversion is essential.
-
-## Example
+Convert screen coords to NDC, then raycast; cache the raycaster instance and track state for hover/drag.
 
 ```javascript
 const raycaster = new THREE.Raycaster();

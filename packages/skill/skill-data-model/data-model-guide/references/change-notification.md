@@ -6,7 +6,7 @@ Route every mutation through the model so it can record what changed and tell in
 
 ## Rationale
 
-A central model has many readers: a UI showing the data, derived caches, a renderer, a save indicator. They must stay consistent without each one polling everything. If mutations are observable, readers update exactly what changed and recompute only what depends on it. Batching per transaction prevents a single user action that touches fifty properties from emitting fifty separate notifications (a "notification storm") and prevents observers from seeing the model in a half-edited intermediate state.
+A central model has many readers (UI, derived caches, renderer, save indicator) that must stay consistent without each polling everything. Observable mutations let readers update exactly what changed and recompute only its dependents. Batching per transaction stops one action touching fifty properties from emitting fifty notifications (a "notification storm") and stops observers seeing a half-edited intermediate state.
 
 ## Techniques
 

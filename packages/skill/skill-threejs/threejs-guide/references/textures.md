@@ -1,14 +1,6 @@
 # textures: Texture Loading and Configuration
 
-## Guideline
-
-Set correct color space per texture type (sRGB for colors, no color space for data), use power-of-2 dimensions, enable mipmaps.
-
-## Rationale
-
-Color space errors cause washed-out/dark rendering; mipmaps ensure quality at distance; compression saves VRAM.
-
-## Example
+Set the correct color space per texture type (sRGB for color, NoColorSpace for data), use power-of-2 dimensions, and enable mipmaps.
 
 ```javascript
 const colorTex = loader.load("albedo.jpg");

@@ -60,16 +60,6 @@ When a site provides `llms.txt` + linked `.md` mirrors, a processing tool (e.g. 
 
 Some projects also publish `llms-full.txt` as a single-file dump of everything (e.g. `https://hono.dev/llms-full.txt`) — this is a common convention even though the spec primarily defines `llms.txt`.
 
-## Authoring Workflow
-
-1. **Inventory** the site's content; identify pages worth ingesting (API docs, reference, tutorials, recipes)
-2. **Mirror to `.md`** each selected page (clean markdown, no nav chrome)
-3. **Group** related links into H2 sections (e.g. `## Docs`, `## API`, `## Examples`)
-4. **Mark secondary content** under `## Optional`
-5. **Draft `/llms.txt`** following the strict ordering: H1 → blockquote → optional prose → H2 lists
-6. **Test** by expanding to a context file and running it through ≥2 LLMs; refine link descriptions if responses are vague
-7. **Serve** at `/llms.txt` (root preferred); commit alongside docs so it stays current
-
 ## Core Principles
 
 - **Concise, clear language** — every link description earns its tokens
@@ -87,13 +77,6 @@ Some projects also publish `llms-full.txt` as a single-file dump of everything (
 - A page without filename needs `index.html.md`, not just `.md`
 - `llms-full.txt` (single dump) is a popular sibling convention but **not part of the spec** — don't confuse it with the spec's `llms-ctx-full.txt` (which is a processing output)
 - `## Optional` is a literal section title with semantic meaning to processors — don't rename it ("Extra", "Bonus", "Additional") if you want the short-context variant to work
-
-## Operations
-
-- **Create** — author a new `/llms.txt` from scratch — see [references/create.md](references/create.md)
-- **Markdown mirrors** — produce per-page `.md` versions linked from `/llms.txt` — see [references/markdown-mirrors.md](references/markdown-mirrors.md)
-- **Examples** — reference implementations to model — see [references/examples.md](references/examples.md)
-- **Processing tools** — generate `llms-ctx.txt` / `llms-ctx-full.txt` from `llms.txt` + mirrors — see [references/processing-tools.md](references/processing-tools.md)
 
 ## Progressive Disclosure
 

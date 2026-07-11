@@ -4,9 +4,7 @@ Reduce AGENTS.md file count by deleting those with no unique content and standar
 
 ## Core Workflow
 
-1. Track steps in a task list
-2. Discover all AGENTS.md files (glob)
-3. Classify each as unique or redundant → delete redundant → standardize unique → report
+Discover all AGENTS.md files (glob) → classify each as unique or redundant → delete redundant → standardize unique → report.
 
 ## Classification
 
@@ -42,16 +40,6 @@ caveats, gotchas, non-obvious constraints, style rules, or architectural decisio
 - Redundant = removing title, description, guideline links, and code summaries leaves nothing
 - When unsure, keep the file
 - **Respect nested precedence:** the AGENTS.md closest to the edited file wins. Don't merge a subproject's AGENTS.md up into the root — its scope is intentionally narrower.
-
-## Error Handling
-
-- No AGENTS.md found: report and exit
-- All already consolidated: report and exit
-- File permissions: warn and skip
-
-## Safety
-
-Preview before writing; never delete root AGENTS.md; report deleted and standardized files separately.
 
 ## Gotchas
 

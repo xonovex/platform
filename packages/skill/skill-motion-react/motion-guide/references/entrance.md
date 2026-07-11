@@ -1,14 +1,6 @@
-# filename: entrance
+# entrance: Fade, Slide, and Hero Reveals
 
-## Guideline
-
-Use `initial`/`animate` with opacity and transforms (y, x, scale); apply Apple easing `[0.22, 1, 0.36, 1]` for smooth deceleration.
-
-## Rationale
-
-Opacity + transforms are GPU-optimized; transforms avoid layout thrashing; easing creates polished, professional feel.
-
-## Example
+Animate with `initial`/`animate` on opacity + transforms (`y`/`x`/`scale`) only; apply Apple easing `[0.22, 1, 0.36, 1]`. Never animate `margin`.
 
 ```tsx
 function FadeUp({children}) {
@@ -33,13 +25,8 @@ function FadeUp({children}) {
 </motion.section>;
 ```
 
-## Techniques
-
-- Fade up: `initial={{opacity: 0, y: 20}}` → `animate={{opacity: 1, y: 0}}`
-- Fade in scale: `initial={{opacity: 0, scale: 0.95}}` for zoom-in effect
-- Slide directions: `x: -50` (left), `x: 50` (right), `y: 50` (bottom)
+- Fade in scale: `initial={{opacity: 0, scale: 0.95}}` for zoom-in
+- Slide directions: `x: -50` (from left), `x: 50` (right), `y: 50` (bottom)
 - Spring entrance: `type: "spring", stiffness: 300, damping: 20` for bouncy
-- Duration hierarchy: Headlines 0.8s, subheadings 0.6s, body 0.5s, small 0.3-0.4s
-- Stagger children: Parent variant with `staggerChildren: 0.1-0.15` for cascading
-- Apple easing: `ease: [0.22, 1, 0.36, 1]` for professional smooth deceleration
-- Always combine opacity with transform for optimal performance; never use margin for animation
+- Duration hierarchy: headlines 0.8s, subheadings 0.6s, body 0.5s, small 0.3-0.4s
+- Cascading children: parent variant with `staggerChildren: 0.1-0.15`

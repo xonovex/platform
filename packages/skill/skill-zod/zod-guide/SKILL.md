@@ -36,5 +36,4 @@ description: "Use when defining or editing Zod 4.0+ schemas for runtime validati
 
 ### Migration from Zod v3
 
-- Read [references/migration-v4.md](references/migration-v4.md) - Load when migrating from Zod v3 or using deprecated validators
-- Read [references/migration-string-validators.md](references/migration-string-validators.md) - Load when replacing z.string().uuid() patterns
+- Read [references/migration-v4.md](references/migration-v4.md) - Load when migrating from Zod v3, replacing z.string().uuid() patterns, or using deprecated validators

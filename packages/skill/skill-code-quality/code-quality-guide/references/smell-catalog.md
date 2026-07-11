@@ -1,6 +1,6 @@
 # Smell Catalog — What to Audit For, and Who Owns Each
 
-The audit checklist: every code smell, the signal that detects it, and the **one** skill that owns its definition and fix. This file routes; it does not redefine. Organized by design-problem **family** (the peer-reviewed grouping) — _not_ by an application/class/method scope tier, which is an informal, weakly-sourced label, not a citable taxonomy.
+Every code smell, the signal that detects it, and the **one** skill that owns its definition and fix. Routes; does not redefine. Grouped by design-problem **family** (the peer-reviewed grouping), not by an application/class/method scope tier.
 
 Owner key: `robustness.md` = this skill's robustness dimension · **oop-guide** = OO-design smells · **connascence-guide** = coupling/cohesion smells · _here_ = this skill owns the detector (duplication / dead code / over-abstraction / redundant-comment cleanup).
 
@@ -54,5 +54,4 @@ Owner key: `robustness.md` = this skill's robustness dimension · **oop-guide** 
 
 ## Grade and report
 
-- Grade each finding by severity — blast radius × likelihood × remediation effort — group by family or bucket, and report read-only (no edits). See [SKILL.md](../SKILL.md) for the method and [robustness.md](robustness.md) for the robustness signals.
-- The membership and family grouping above follow the peer-reviewed smell taxonomy (cited in SOURCES); the "application / class / method" scope labels are an editorial convenience only.
+Grade each finding by severity — blast radius × likelihood × remediation effort — group by family, and report read-only. See [SKILL.md](../SKILL.md) for the method and [robustness.md](robustness.md) for the robustness signals.

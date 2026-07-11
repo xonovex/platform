@@ -2,17 +2,6 @@
 
 Reduce verbosity in a prompt file while preserving all functional content. Removes duplication, simplifies examples, makes content generic for cross-project use.
 
-## Contents
-
-- [Goal](#goal)
-- [Arguments](#arguments)
-- [Core Workflow](#core-workflow)
-- [Simplification Rules](#simplification-rules)
-- [Implementation Details](#implementation-details)
-- [Error Handling](#error-handling)
-- [Safety](#safety)
-- [Gotchas](#gotchas)
-
 ## Goal
 
 - Reduce file length by 40-60% while maintaining full functionality
@@ -63,28 +52,14 @@ replace specific paths, domain terms, project names with generic equivalents (`p
 
 metadata block, goal, arguments, core workflow, implementation details, error handling, safety guidelines
 
-## Implementation Details
-
-### Analysis
-
-count lines, calculate target (current × reduction%), parse sections, categorize as Essential/Simplifiable/Removable
-
-### Simplification
-
-remove categorized sections, merge duplicates, condense examples (2-3 kept, 10-15 lines), convert paragraphs to bullets
-
-### Generalization
+## Generalization Patterns
 
 1. **Paths:** replace `/packages\/[\w-]+\//g` → `packages/example/`
 2. **Domain terms:** find 3+ related specialized terms (e.g. `users+orders+payments`) and replace with generic equivalents
 3. **Project names:** replace `(\w+)(API|Service|Database|Client)` → `MyProject$2`
 4. **Business context:** remove industry-specific workflows, use generic CRUD examples
 
-### Validation
-
-verify metadata block / arguments / workflow preserved; measure reduction
-
-### Dry-run output
+## Dry-run Output
 
 ```
 === Preview ===

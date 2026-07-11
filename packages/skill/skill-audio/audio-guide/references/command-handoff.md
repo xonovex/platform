@@ -6,7 +6,7 @@ The game thread never touches voice state directly; it posts immutable commands 
 
 ## Rationale
 
-The audio thread cannot take a lock the game thread might hold (it would risk a deadline-missing stall), and two threads mutating the same voice struct is a data race. A lock-free SPSC handoff resolves both: the game thread is the sole producer, the audio thread the sole consumer, ownership of voice state stays entirely on the audio thread, and the only cross-thread contract is the queue's. Commands are self-contained value messages, so no shared object is mutated from two sides. Draining the queue once per block — at a known point, before mixing — keeps command application deterministic and bounded. The queue mechanics (indices, acquire/release ordering, full/empty handling) are not re-derived here; that machinery is owned by lock-free-guide.
+The audio thread cannot take a lock the game thread might hold (deadline-missing stall), and two threads mutating one voice struct is a data race. An SPSC handoff resolves both: single producer (game), single consumer (audio), voice-state ownership stays entirely on the audio thread, and commands are self-contained value messages so no shared object is mutated from two sides. Draining once per block — before mixing — keeps command application deterministic and bounded. The queue mechanics (indices, acquire/release ordering, full/empty handling) are owned by lock-free-guide.
 
 ## How to Apply
 

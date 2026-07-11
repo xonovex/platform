@@ -1,14 +1,6 @@
-# filename: node-materials
+# node-materials: TSL Node Materials
 
-## Guideline
-
-Use TSL (Three Shading Language) for materials that work across WebGL and WebGPU; compose shader nodes instead of writing GLSL.
-
-## Rationale
-
-TSL provides type-safe, composable nodes compiling to GLSL (WebGL) and WGSL (WebGPU); supports future renderers without code changes.
-
-## Example
+Use TSL (Three Shading Language) for materials that run on both WebGL (→GLSL) and WebGPU (→WGSL); compose shader nodes instead of writing raw GLSL.
 
 ```javascript
 import {float, mix, sin, uniform, vec3} from "three/tsl";
@@ -35,4 +27,3 @@ timeUniform.value = clock.getElapsedTime();
 - Material types: MeshBasicNodeMaterial, MeshStandardNodeMaterial, MeshPhysicalNodeMaterial
 - Lighting: `lightingContext()` for advanced PBR lighting effects
 - Composition: Operators like `.mul()`, `.add()`, `.dot()`, `.cross()` chain naturally
-- WebGPU: TSL materials compile to WGSL automatically; works with both renderers

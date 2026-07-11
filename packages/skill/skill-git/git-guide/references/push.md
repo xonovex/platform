@@ -1,35 +1,24 @@
-# Push a branch and keep its diff clean
+# push: Publish a Branch and Keep Its Diff Clean
 
-The local-git steps that precede opening a PR / MR: publish the branch upstream, and
-rebase it onto the base so the diff is just this change. Driving the host — opening the PR,
-posting reviews — is the host skill's job (`github-guide`, `gitlab-guide`, or another
-`skill-<host>`); this file is the git half they defer to.
-
-## Push the branch upstream
+The local-git steps before opening a PR / MR. Driving the host (opening the PR, posting reviews) is the host skill's job (`github-guide` / `gitlab-guide`); this is the git half they defer to.
 
 ```bash
-git push -u origin <branch>        # publish and set the upstream in one step
+git push -u origin <branch>        # publish and set upstream in one step
 ```
 
-- Pushing a branch does **not** open a PR / MR, and opening one does not push — do them in
-  order. The host's create step has nothing to open against until the branch is pushed.
-- An SSH push may print a "post-quantum key exchange" line — it is informational, not an error.
-- Nothing committed ahead of the base → there is nothing to push or open; say so.
+- Pushing does **not** open a PR / MR, and opening one does not push — do both, in order.
+- Nothing committed ahead of the base → nothing to push or open; say so.
+- An SSH push may print a "post-quantum key exchange" line — informational, not an error.
 
 ## Rebase onto the base so the diff is just this change
 
-If the branch is behind its base, a stale merge-base inflates the PR diff with unrelated
-commits. Rebase onto the base before opening, then re-push:
+If the branch is behind its base, a stale merge-base inflates the PR diff with unrelated commits. Rebase, then re-push:
 
 ```bash
 git fetch origin <base>
-git rebase origin/<base>           # replay this branch's commits on top of the base
-git push --force-with-lease        # never plain --force on a shared branch
+git rebase origin/<base>
+git push --force-with-lease        # refuses to clobber commits you haven't seen; never plain --force
 ```
 
-- Use `--force-with-lease`, not `--force` — it refuses to overwrite commits you have not seen,
-  so a teammate's push is not silently clobbered.
-- Conflicts during the rebase → resolve per [merge-resolve.md](merge-resolve.md), then
-  `git rebase --continue`.
-- Rebasing rewrites history; only rebase a branch that is yours / unshared, and never rebase
-  or force-push `main` / `master`.
+- Conflicts during rebase → resolve per [merge-resolve.md](merge-resolve.md), then `git rebase --continue`.
+- Only rebase a branch that is yours / unshared; never rebase or force-push `main` / `master`.

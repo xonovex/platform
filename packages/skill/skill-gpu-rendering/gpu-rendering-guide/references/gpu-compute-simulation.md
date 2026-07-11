@@ -6,7 +6,7 @@ For large element counts (particles, agents, cloth), keep the simulation state r
 
 ## Rationale
 
-A simulation that lives on the CPU and uploads results every frame is bounded by upload bandwidth and by the CPU loop, and reading per-element results back to the CPU forces a pipeline stall (you wait for the GPU to finish, killing parallelism). Moving the state into persistent GPU buffers eliminates both: the data never crosses the bus after init, the update is a single dispatch over all active elements, and the count of live elements is tracked on the GPU and fed straight into an indirect draw/dispatch so the CPU issues a fixed, count-agnostic command. This is what lets element counts scale into the hundreds of thousands without the CPU touching any element.
+A CPU simulation that uploads results every frame is bounded by upload bandwidth and the CPU loop, and reading per-element results back forces a pipeline stall. Persistent GPU buffers eliminate both: data never crosses the bus after init, the update is one dispatch over all active elements, and the GPU-tracked live count feeds an indirect draw/dispatch so the CPU issues a fixed, count-agnostic command. This scales element counts into the hundreds of thousands without the CPU touching any element.
 
 ## How to Apply
 

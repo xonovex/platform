@@ -6,7 +6,7 @@ Make edits transactional — record either the inverse of each operation or a be
 
 ## Rationale
 
-Undo is the defining feature of an editor's data model, and it only works if every state-changing edit is captured. Recording inverse operations (or before/after values) makes undo a pure data operation: pop the last transaction, apply its inverses, push it onto the redo stack. Grouping into transactions matters because one user action ("move three nodes") is many property writes; the user expects one Ctrl+Z to undo all of them, not three. Tying the transaction boundary to the change-notification commit keeps undo, notification, and persistence consistent.
+Undo only works if every state-changing edit is captured. Recording inverses (or before/after values) makes undo pure data: pop the last transaction, apply its inverses, push onto redo. Grouping into transactions matters because one action ("move three nodes") is many writes — the user expects one Ctrl+Z to undo all of them. Tying the transaction boundary to the change-notification commit keeps undo, notification, and persistence consistent.
 
 ## Techniques
 

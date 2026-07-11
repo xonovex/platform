@@ -4,10 +4,6 @@
 
 Treat tracking as a verifiable output: inject an in-memory `FakeAnalyticsTracker` into the unit under test and assert the exact typed events it received.
 
-## Rationale
-
-Tracking is a real behavioral contract — analytics dashboards, funnels, and experiments break silently when an event stops firing or fires with wrong properties. Without a test asserting the typed event, a refactor can drop tracking and no compiler or runtime error catches it. Asserting against the live SDK or network is slow, flaky, and tests the vendor, not your code.
-
 ## How to Apply
 
 1. Depend on the `AnalyticsTracker` interface (not a concrete SDK). Provide a `FakeAnalyticsTracker` that records into an in-memory list and exposes `assertEvent(expected)`, `assertScreen(name)`, `assertNoEvent()`, and `clear()`.

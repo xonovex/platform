@@ -5,15 +5,14 @@ description: "Use when delivering a merge request and its review on GitLab (gitl
 
 # GitLab MR & review delivery — quick reference
 
-How to realize a merge request and its review on GitLab from the shell with the official `glab` CLI (and raw REST where glab has no flag). This is the host-DELIVERY tier and nothing more: the review craft (what a finding says, Conventional Comments labels, blocking vs non-blocking) is `code-review-guide`'s; the MR description craft (what/why/how, sizing, test notes) is `pull-request-guide`'s; the local-git push and rebase are `git-guide`'s push reference. This skill only realizes those on GitLab — the wiring, scopes, anchors, and gating.
+How to realize a merge request and its review on GitLab from the shell with the official `glab` CLI (and raw REST where glab has no flag). Host-delivery only — the review craft (Conventional Comments labels, blocking vs non-blocking) is `code-review-guide`'s, the MR description craft (what/why/how, sizing, test notes) is `pull-request-guide`'s, the local-git push/rebase are `git-guide`'s; this skill wires them onto GitLab (scopes, anchors, gating).
 
 The one thing to internalize: **a GitLab "review" is not one object — you assemble it from a plain summary note, individual position-anchored discussion threads, and a separate approve/withhold signal, and almost every write needs the coarse, all-or-nothing `api` scope plus a sufficient role, so plan around the missing atomic-review endpoint and the absent write-only scope.**
 
-When this skill fires:
+Before any write:
 
-1. Run `glab auth status` and confirm the intended identity on the intended host BEFORE any write — a stale env token silently acts as the wrong user.
+1. Run `glab auth status` and confirm the intended identity on the intended host — a stale env token silently acts as the wrong user.
 2. Re-fetch the three diff SHAs after every push and verify each inline comment came back as a `DiffNote`, never trust a 201 alone.
-3. Load the `references/*.md` file matching the task, not everything upfront.
 
 ## Requirements
 

@@ -6,7 +6,7 @@ An immediate-mode GUI can be accessible — each frame, as you draw a control, a
 
 ## Rationale
 
-The common claim that immediate-mode GUIs can't support screen readers confuses the _API style_ (declare desired state each frame) with the _data_: nothing stops you from also recording, per visible control, the few facts a screen reader needs. Building that side list during the same draw call you already make is cheap and always in sync, and it doubles as an automation surface for UI tests. The same insight that lets a canvas-rendered web app stay accessible (keep a parallel semantic model) applies here — and zoom/contrast aren't new systems at all, they're the DPI-scale factor and theme colors you already expose.
+The claim that immediate-mode GUIs can't support screen readers confuses the _API style_ (declare state each frame) with the _data_: nothing stops you recording, per visible control, the few facts a reader needs. Built during the draw call you already make, the side list is cheap, always in sync, and doubles as a UI-test automation surface — the same parallel-semantic-model trick that keeps canvas-rendered web apps accessible. Zoom and contrast are the DPI-scale factor and theme colors you already expose, not new systems.
 
 ## How to Apply
 

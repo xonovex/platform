@@ -6,7 +6,7 @@ Resample every source to the mixer's internal rate by reading it with a fraction
 
 ## Rationale
 
-A source recorded at one rate cannot be summed against a mixer running at another rate without re-deriving its values at the mixer's sample instants. The clean abstraction is a sampler that, given a fractional time offset, returns the source's value there; advancing that offset by `src_rate / mix_rate` per output sample converts the rate, and scaling the step changes pitch and duration together (step 2.0 plays twice as fast, one octave up). Because real positions land between stored samples, you must interpolate; linear interpolation is cheap and usually adequate, with higher-order kernels (e.g. Hermite/cubic) available when fidelity matters. Doing this per voice lets each sound have its own pitch without touching the others.
+A source at one rate cannot be summed against a mixer at another rate without re-deriving its values at the mixer's sample instants. Model a sampler that, given a fractional time offset, returns the source's value there; advancing that offset by `src_rate / mix_rate` per output sample converts the rate, and scaling the step changes pitch and duration together (step 2.0 plays twice as fast, one octave up). Real positions land between stored samples, so interpolate — linear is cheap and usually adequate, higher-order kernels (Hermite/cubic) when fidelity matters. Per-voice steps let each sound have its own pitch without touching the others.
 
 ## How to Apply
 

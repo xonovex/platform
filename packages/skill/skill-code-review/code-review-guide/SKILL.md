@@ -5,15 +5,7 @@ description: Use when writing, structuring, or labelling code-review feedback on
 
 # Code-review feedback — quick reference
 
-How to write review comments that are unambiguous and actionable, independent of the platform they are posted on. This is the generic tier: for delivering these comments on a specific host (auth, line anchors, the posting API) load the matching host skill — `github-guide` (plugin `xonovex-skill-github`), `gitlab-guide` (plugin `xonovex-skill-gitlab`), or another `skill-<host>`.
-
-The one rule to internalize: **every comment states its type and its urgency. A reader must never have to guess whether a comment blocks the merge.**
-
-When this skill fires:
-
-1. Decide the comment's type (is this a blocking issue, a suggestion, a nitpick, a question?) and its urgency, then lead with that label.
-2. Verify the claim against the real source (the code on the branch, the API signature, the design-system definition) before asserting it.
-3. Load the `references/*.md` file matching the question, not everything upfront.
+Host-independent review-comment craft. **Every comment states its type and its urgency — a reader must never guess whether it blocks the merge.** For delivering comments on a specific host (auth, line anchors, posting API) load the matching host skill — `github-guide` (plugin `xonovex-skill-github`), `gitlab-guide` (plugin `xonovex-skill-gitlab`), or another `skill-<host>`.
 
 ## Essentials
 

@@ -13,10 +13,10 @@ The output is Lua. For Lua runtime semantics and idioms — module pattern, coro
 
 ## Essentials
 
-- **Code organization** - Favor namespaces/functions over classes for clean Lua output; Lua module idioms in **lua-guide**, see [references/namespaces-vs-classes.md](references/namespaces-vs-classes.md), [references/function-patterns.md](references/function-patterns.md)
-- **Performance** - Keep tables stable, design for Lua GC and coroutines; the JIT "why" is in **lua-opinionated-guide**, see [references/stable-tables.md](references/stable-tables.md), [references/coroutine-patterns.md](references/coroutine-patterns.md)
+- **Code organization** - Favor namespaces/functions over classes for clean Lua output; Lua module idioms in **lua-guide**, see [references/namespaces-vs-classes.md](references/namespaces-vs-classes.md)
 - **TSTL features** - Use LuaMultiReturn, decorators when beneficial, see [references/multi-return-functions.md](references/multi-return-functions.md), [references/tstl-decorators.md](references/tstl-decorators.md)
-- **Optimization** - Avoid heavy TypeScript features, see [references/avoiding-heavy-features.md](references/avoiding-heavy-features.md), [references/performance-tips.md](references/performance-tips.md)
+- **Performance** - Keep tables stable, cache lookups, design for Lua GC and coroutines; the JIT "why" is in **lua-opinionated-guide**, see [references/performance-tips.md](references/performance-tips.md), [references/coroutine-patterns.md](references/coroutine-patterns.md)
+- **Optimization** - Avoid heavy TypeScript features, see [references/avoiding-heavy-features.md](references/avoiding-heavy-features.md)
 
 ## Gotchas
 
@@ -28,15 +28,12 @@ The output is Lua. For Lua runtime semantics and idioms — module pattern, coro
 
 ## Progressive disclosure
 
-- Read [references/namespaces-vs-classes.md](references/namespaces-vs-classes.md) - Load when choosing code organization for clean Lua output
+- Read [references/namespaces-vs-classes.md](references/namespaces-vs-classes.md) - Load when choosing code organization, namespaces, or enums for clean Lua output
 - Read [references/multi-return-functions.md](references/multi-return-functions.md) - Load when implementing Lua-style multiple return values
-- Read [references/function-patterns.md](references/function-patterns.md) - Load when defining functions that transpile cleanly
-- Read [references/module-organization.md](references/module-organization.md) - Load when structuring TSTL projects or exports
-- Read [references/stable-tables.md](references/stable-tables.md) - Load when optimizing for Lua GC or JIT performance
 - Read [references/coroutine-patterns.md](references/coroutine-patterns.md) - Load when implementing cooperative multitasking
 - Read [references/lua-interop.md](references/lua-interop.md) - Load when calling Lua code from TypeScript
 - Read [references/tstl-decorators.md](references/tstl-decorators.md) - Load when using TSTL-specific decorators
-- Read [references/performance-tips.md](references/performance-tips.md) - Load when generated Lua code is slow or bloated
+- Read [references/performance-tips.md](references/performance-tips.md) - Load when optimizing for Lua GC/JIT or generated code is slow or bloated
 - Read [references/type-safety.md](references/type-safety.md) - Load when maintaining types across TS/Lua boundary
 - Read [references/avoiding-heavy-features.md](references/avoiding-heavy-features.md) - Load when transpiled output is unexpectedly large
 - Read [references/tsconfig.md](references/tsconfig.md) - Load when configuring TSTL compiler options

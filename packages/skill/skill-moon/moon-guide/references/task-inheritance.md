@@ -1,25 +1,9 @@
 # task-inheritance: Task Inheritance Hierarchy
 
-## Guideline
-
-Define tasks at appropriate levels using `inheritedBy` and `extends` with deep merging in Moon 2.0.
-
-## Rationale
-
-Hierarchical task inheritance allows global defaults with project-specific customizations, reducing configuration duplication while maintaining flexibility.
-
-## Contents
-
-- [inheritedBy Matching](#inheritedby-matching)
-- [extends Syntax](#extends-syntax)
-- [Merging](#merging)
-- [Optional Dependencies](#optional-dependencies)
-- [Composition Patterns](#composition-patterns)
-
-### Example
+Compose tasks with `inheritedBy` (attach to matching projects) and `extends` (chain config files), merged with Moon 2.0 deep merging.
 
 ```yaml
-# .moon/tasks/tag-go.yml - Tag-based mixin
+# .moon/tasks/tag-go.yml - tag-based mixin
 tasks:
   go-build:
     command: [go, build, ./...]
@@ -27,7 +11,7 @@ tasks:
 inheritedBy:
   tag: go
 
-# .moon/tasks/go-library.yml - Extends mixin, adds layer-specific tasks
+# .moon/tasks/go-library.yml - extends the mixin, adds layer-specific tasks
 extends: ./tag-go.yml
 tasks:
   ci-check:
@@ -38,50 +22,33 @@ inheritedBy:
   layer: library
 ```
 
-### Techniques
+## inheritedBy matching
 
-## inheritedBy Matching
+- `toolchain:` — project's language toolchain (go, typescript, rust).
+- `layer:` — project's layer (library, application, configuration).
+- `tag:` — any tag in the project's `tags` array.
+- Multiple criteria = AND (all must match).
 
-- `toolchain:` - Match project's language toolchain (go, typescript, rust)
-- `layer:` - Match project's layer (library, application, configuration)
-- `tag:` - Match any tag in project's tags array
-- Multiple criteria: All must match (AND logic)
-
-## extends Syntax
-
-- Single file: `extends: ./tag-go.yml`
-- Extends chain: Child extends parent, inherits all tasks
-- Override in extending file: Redefine task to customize
-
-## Merging
+## extends & merging
 
 Configs merge sequentially: global → extends → local.
 
-- **fileGroups** combine instead of replace
-- **command arrays** merge (use `script:` to fully replace inherited commands)
-- **args, deps, env, inputs, outputs, toolchains** merge via configurable strategies
-
-Merge strategy options: `mergeArgs`, `mergeDeps`, `mergeEnv`, `mergeInputs`, `mergeOutputs`, `mergeToolchains`, plus `merge` as blanket default. Strategies: `append` (default — local after inherited), `prepend` (local before inherited), `replace` (local replaces inherited), `preserve` (inherited wins, ignore local).
+- `extends: ./tag-go.yml` inherits all tasks; redefine a task in the extending file to override.
+- **fileGroups** and **command arrays** merge (use `script:` to fully replace an inherited command).
+- `args`, `deps`, `env`, `inputs`, `outputs`, `toolchains` merge via strategy: `append` (default, local after inherited), `prepend` (local before), `replace` (local replaces), `preserve` (inherited wins). Set per-key (`mergeDeps`, `mergeArgs`, …) or blanket via `merge`.
 
 ```yaml
-# Project override with command: merges → npm run lint eslint src
-command: [eslint, src]
-
-# Project override with script: replaces completely
-script: npx eslint src
-
-# Project override replacing only deps, inheriting command/options
+# override deps only, inheriting command/options
 tasks:
   npm-publish:
-    deps:
-      - go-build
+    deps: [go-build]
     options:
       mergeDeps: replace
 ```
 
-## Optional Dependencies
+## Optional dependencies
 
-Use `optional: true` when a tag-level task depends on a task that not all inheriting projects define:
+Use `optional: true` when a tag-level task depends on a task that not every inheriting project defines:
 
 ```yaml
 tasks:
@@ -90,32 +57,4 @@ tasks:
       - target: ~:build
         optional: true
       - ^:npm-publish
-```
-
-## Composition Patterns
-
-### Tag-based mixins for mixed packages
-
-```yaml
-# Project with Go + TypeScript
-language: go
-layer: library
-tags: [go, typescript, npm]
-tasks:
-  ci-check:
-    script: echo 'done'
-    deps: [go-build, go-test, build, lint, typecheck]
-```
-
-### Layer templates extending tag mixins
-
-```yaml
-# .moon/tasks/typescript-library.yml
-extends: ./tag-typescript.yml
-tasks:
-  ci-check:
-    deps: [build, test, lint, typecheck]
-inheritedBy:
-  toolchain: typescript
-  layer: library
 ```

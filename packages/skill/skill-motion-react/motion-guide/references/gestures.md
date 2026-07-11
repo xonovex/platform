@@ -1,14 +1,6 @@
-# gestures: Gesture Interactions
+# gestures: Hover, Tap, Focus
 
-## Guideline
-
-Use whileHover/whileTap/whileFocus with spring physics; never use duration for gestures (springs feel responsive).
-
-## Rationale
-
-Spring transitions feel instantaneous and natural; duration-based easing delays feedback.
-
-## Example
+Use `whileHover`/`whileTap`/`whileFocus` with spring transitions, never `duration` (springs give instant feedback).
 
 ```tsx
 <motion.button
@@ -19,11 +11,8 @@ Spring transitions feel instantaneous and natural; duration-based easing delays 
 />
 ```
 
-## Techniques
-
-- whileHover/whileTap/whileFocus: Gesture states; always use spring transitions
-- Spring presets: Snappy (buttons) 400/25, smooth (cards) 300/20, bouncy 200/10
-- Hover effects: y: -8, boxShadow, scale 1.02-1.05
-- Magnetic button: useMotionValue + useSpring for cursor tracking
-- Dock scaling: Distance-based proximity effect via Math.abs(index - hovered)
-- Accessibility: Include whileFocus for keyboard users; test with Tab key
+- Spring presets: snappy (buttons) 400/25, smooth (cards) 300/20, bouncy 200/10
+- Hover effects: `y: -8`, `boxShadow`, `scale: 1.02-1.05`
+- Magnetic button / cursor tracking: `useMotionValue` + `useSpring`
+- Dock scaling: proximity effect via `Math.abs(index - hovered)`
+- Always include `whileFocus` for keyboard users

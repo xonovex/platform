@@ -6,7 +6,7 @@ Persist the model through a stable, versioned on-disk schema; serialize referenc
 
 ## Rationale
 
-Saved files outlive the code that wrote them. The schema in memory will change — properties get added, renamed, removed — but old files must still open. A versioned format plus per-version migration lets the loader transform an old layout into the current one instead of refusing it. Because the in-memory model already references objects by id (not pointer), serialization is mostly mechanical: write ids, re-resolve on load. Deterministic output (stable ordering, stable formatting) is what makes the file usable with diff/merge tools and code review.
+Saved files outlive the code that wrote them; the in-memory schema changes (properties added, renamed, removed) but old files must still open. A versioned format plus per-version migration transforms an old layout into the current one instead of refusing it. Because the model already references objects by id (not pointer), serialization is mostly mechanical: write ids, re-resolve on load. Deterministic output (stable ordering/formatting) is what makes the file usable with diff/merge and review.
 
 ## Techniques
 

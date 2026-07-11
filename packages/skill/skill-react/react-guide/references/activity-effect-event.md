@@ -1,12 +1,6 @@
 # activity-effect-event: Activity Component & useEffectEvent
 
-## Guideline
-
-Use `<Activity mode="hidden">` to preserve state; use `useEffectEvent` for Effect logic that reads latest values without re-triggering.
-
-## Rationale
-
-Activity preserves DOM state during hide (tabs, accordions); useEffectEvent eliminates false re-runs caused by dependency changes.
+Use `<Activity mode="hidden">` to preserve DOM/state when hidden; use `useEffectEvent` for Effect logic that reads latest values without adding them to deps.
 
 ## Example
 
@@ -36,9 +30,7 @@ function ChatRoom({roomId, theme}) {
 
 ## Techniques
 
-- Activity visible/hidden: Preserves state of hidden components (vs conditional render which destroys state)
-- Activity pre-rendering: Load content in background for faster transition when shown
-- useEffectEvent: Read latest prop/state without adding to dependencies; reads current value
-- Solves false re-runs: Chat reconnect on theme change; analytics re-fires on items change
-- Media handling: Activity doesn't pause video/audio automatically; use useLayoutEffect to pause
-- Deprecating useLayoutEffect: useEffectEvent replaces some useLayoutEffect patterns in React 19
+- Activity visible/hidden: preserves state of hidden components (vs conditional render which destroys it)
+- Activity pre-rendering: loads hidden content in background for faster transition when shown
+- useEffectEvent: reads current prop/state without adding to deps; solves false re-runs (reconnect on theme change, analytics re-fire on items change)
+- Activity does NOT pause video/audio automatically; use useLayoutEffect to pause

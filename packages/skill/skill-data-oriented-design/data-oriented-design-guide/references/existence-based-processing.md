@@ -16,13 +16,6 @@ The principle "the absence of a thing is a thing": instead of every item carryin
 - **Absence is a thing** - Rather than nulling a field and checking it, move the item out of the "has it" collection entirely. The collection's membership answers the question.
 - **Move on transition** - When an item changes state, move it between buckets at that moment (rare event) instead of testing its state every frame (common event).
 
-## How to Apply
-
-1. Find a hot loop with a per-item `if (item.state == X)` / `if (item.alive)`.
-2. Replace the flag with collection membership: maintain one bucket per state.
-3. On state change, swap-remove the item from its old bucket and append to the new one.
-4. Rewrite the loop as a branch-free sweep over the relevant bucket(s).
-
 ## Example
 
 ```c

@@ -1,14 +1,6 @@
 # deployments: Secure Deployments
 
-## Guideline
-
-Configure secure, production-ready deployments with security contexts, resource management, and health probes.
-
-## Rationale
-
-Deployments need security hardening, resource limits, and health checks to prevent privilege escalation, resource exhaustion, and availability issues.
-
-## Example
+Harden Deployments: pin image tags (never `latest`), set both pod- and container-level `securityContext` (runAsNonRoot, runAsUser/fsGroup, readOnlyRootFilesystem, allowPrivilegeEscalation false, drop ALL capabilities, seccompProfile RuntimeDefault), define resource requests/limits, and add liveness/readiness probes. With a read-only root fs, mount an `emptyDir` on writable paths (e.g. `/tmp`).
 
 ```yaml
 apiVersion: apps/v1
@@ -49,12 +41,3 @@ spec:
         - name: tmp
           emptyDir: {}
 ```
-
-## Techniques
-
-- Security context: Set runAsNonRoot and fsGroup for pod-level security
-- Container hardening: Use readOnlyRootFilesystem and drop all capabilities
-- Resource limits: Define requests and limits to prevent resource exhaustion
-- Health probes: Add liveness, readiness, startup probes for reliability
-- Image tagging: Use specific tags, never `latest`, for reproducibility
-- Writable paths: Use emptyDir volumes for writable paths with read-only fs

@@ -59,16 +59,6 @@ Pre-hosting is convenient when the docs change infrequently — generate on buil
 
 Both end in similar files in practice but the provenance differs: one is generated from a curated index, the other is a raw dump. Hosting both is fine; using the names interchangeably is confusing.
 
-## Integration With Build Pipelines
-
-Typical setup:
-
-1. CI/CD regenerates per-page `.md` mirrors when source content changes
-2. CI/CD runs `llms_txt2ctx` against the live `/llms.txt`
-3. Both `llms-ctx.txt` and `llms-ctx-full.txt` are deployed alongside the site
-
-When `/llms.txt` itself rarely changes (mostly just link list and descriptions), regenerating the expanded bundles on each docs build keeps them in sync without manual intervention.
-
 ## Gotchas
 
 - A broken `.md` mirror surfaces as a missing section in `llms-ctx.txt` — verify all linked URLs `200 OK` before generating

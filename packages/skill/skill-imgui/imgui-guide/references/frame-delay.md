@@ -6,7 +6,7 @@ When a decision depends on a control that hasn't been issued yet this frame (occ
 
 ## Rationale
 
-Immediate mode issues controls in order and cannot look ahead: when deciding whether the mouse is over control A, it doesn't yet know that overlapping control B will be drawn later and should win. Computing the result during the frame and committing it at frame end (so the last-drawn / topmost control wins) sidesteps this without adding a retained hierarchy. The same pattern resolves tab focus and drag cancellation.
+Immediate mode issues controls in order and cannot look ahead: deciding whether the mouse is over control A, it doesn't yet know overlapping control B will be drawn later and should win. Committing the result at frame end (last-drawn / topmost wins) sidesteps this without a retained hierarchy. The same pattern resolves tab focus and drag cancellation.
 
 ## How to Apply
 

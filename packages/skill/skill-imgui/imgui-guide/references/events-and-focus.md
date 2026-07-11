@@ -6,7 +6,7 @@ Track keyboard focus as a responder chain (root → focused control) built from 
 
 ## Rationale
 
-Immediate mode has no widget tree to walk for focus, so the retained-mode concepts (first responder, responder chain, event bubbling) have to be reconstructed from ids and explicit scope tracking. Processing events in `end_*()` runs them in reverse of issue order, giving outer/earlier controls first refusal; clearing the flag marks the event consumed so nothing else reacts. Handling one event per frame avoids juggling several events' worth of state mutation within a single frame.
+With no widget tree to walk, the responder chain is reconstructed from ids and explicit scope tracking. Processing events in `end_*()` runs them in reverse of issue order, giving outer/earlier controls first refusal; clearing the flag consumes the event so nothing else reacts. One event per frame avoids juggling several events' state mutations in a single frame.
 
 ## How to Apply
 

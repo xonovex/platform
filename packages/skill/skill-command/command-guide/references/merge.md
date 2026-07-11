@@ -49,23 +49,9 @@ rewrite in target's voice → insert in existing sections → match format exact
 
 `workflow` (steps/sequence), `arguments` (patterns/validation), `error-handling` (cases/messages), `examples` (use cases), `validation` (rules/checks), `safety` (guidelines/warnings)
 
-## Implementation
+## Discovery
 
-### Discovery
-
-Accept prompt-file paths or bare names; resolve to the harness-specific location and extension (see [harness-formats.md](harness-formats.md))
-
-### Analysis
-
-Parse target structure → analyze formatting → detect voice → extract conventions → build template
-
-### Extraction
-
-Parse source → extract workflow/arguments/validation → collect examples → filter by aspects
-
-### Integration
-
-Rewrite in target's voice → insert in existing sections → merge workflows → validate consistency
+Accept prompt-file paths or bare names; resolve to the harness-specific location and extension (see [harness-formats.md](harness-formats.md)).
 
 ## Error Handling
 

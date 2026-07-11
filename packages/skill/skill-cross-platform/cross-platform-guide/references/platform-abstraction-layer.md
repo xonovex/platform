@@ -6,7 +6,7 @@ Route every operating-system and windowing call through one narrow abstraction i
 
 ## Rationale
 
-Conditional compilation scattered through application code is the central failure of ad-hoc ports: every feature ends up knowing every platform, so each new target multiplies the surface that must be re-read and re-tested, and platform bugs hide inside otherwise-portable logic. Concentrating OS access behind one interface inverts this — application code depends only on the abstract contract, and a port becomes "write one new backend that fills the interface," with zero edits to callers. Because the interface is the unit of completeness, you can stub it, compile against the stub on day one, and replace stubs one function at a time while the rest of the system keeps building. Grouping by concern (windowing, clipboard, threading/fibers, file watching, time, input, audio) also keeps each backend small enough that a missing or fragile platform feature is isolated to its own struct, not smeared across the codebase.
+The interface is the unit of completeness: stub it, compile against the stub on day one, then replace stubs one function at a time. Group by concern (windowing, clipboard, threading/fibers, file watching, time, input, audio) so a missing or fragile platform feature is isolated to its own struct.
 
 ## How to Apply
 

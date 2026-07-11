@@ -1,12 +1,6 @@
-# migration-anti-patterns: React 19 Anti-Patterns
+# migration-anti-patterns: React 19 Anti-Patterns & Mental Model
 
-## Guideline
-
-Replace useEffect data fetching with Server Components; use Form Actions instead of useState for forms; let Compiler handle memoization.
-
-## Rationale
-
-React 19 provides cleaner solutions; old patterns create unnecessary complexity and performance overhead.
+Think server-first and compiler-optimized: replace `useEffect` data fetching with async Server Components, manual loading state with Suspense/`useActionState`, controlled-input forms with `FormData` + Form Actions, and manual `useMemo`/`useCallback` with the React Compiler.
 
 ## Example
 
@@ -24,7 +18,7 @@ function UserProfile({userId}) {
   return <Profile user={user} />;
 }
 
-// NEW: Server Component
+// NEW: async Server Component - direct DB access, no loading state
 async function UserProfile({userId}) {
   const user = await fetchUser(userId);
   return <Profile user={user} />;
@@ -33,10 +27,10 @@ async function UserProfile({userId}) {
 
 ## Techniques
 
-- Remove useEffect data fetching → Use Server Components (async/await, direct DB)
-- Remove manual loading state → Use useActionState and Suspense
-- Remove useState form fields → Use FormData + Server Actions
-- Remove excessive useMemo/useCallback → Let React Compiler optimize
-- Remove forwardRef wrapper → Pass ref as regular prop in React 19
-- Remove 'use client' everywhere → Server Components by default; client islands only
-- Remove <Suspense/> for errors only → Combine with Error Boundaries for full coverage
+- useEffect data fetching → async Server Components (direct DB/fs); Suspense handles loading
+- Manual loading state → `useActionState` + Suspense boundaries (progressive, not all-or-nothing)
+- useState form fields → `FormData` + Server Actions
+- Excessive useMemo/useCallback → let React Compiler optimize; write clean code
+- forwardRef wrapper → `ref` as regular prop
+- `'use client'` everywhere → Server Components by default; client islands only
+- `<Suspense>` alone → combine with Error Boundaries for full coverage

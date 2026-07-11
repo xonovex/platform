@@ -13,11 +13,7 @@
 
 ### Guideline
 
-Make the accessibility traversal order match the visual reading order, expose headings and collection structure to the semantics tree, and group composites into single swipe stops.
-
-### Rationale
-
-Screen-reader users navigate sequentially (swipe) and by structure (heading rotor, "item X of Y"). If the semantics tree does not encode order, grouping, headings, and collection counts, those navigation modes break: focus jumps around, related elements scatter into separate swipes, heading jump-navigation finds nothing, and lists give no position feedback. Serves 1.3.1 Info and Relationships, 1.3.2 Meaningful Sequence, 2.4.3 Focus Order, and 2.4.6 Headings and Labels.
+Make the accessibility traversal order match the visual reading order, expose headings and collection structure to the semantics tree, and group composites into single swipe stops. Screen-reader users navigate sequentially (swipe) and by structure (heading rotor, "item X of Y"); if the semantics tree does not encode order, grouping, headings, and collection counts, those modes break. Serves 1.3.1 Info and Relationships, 1.3.2 Meaningful Sequence, 2.4.3 Focus Order, and 2.4.6 Headings and Labels.
 
 ## Three independent orders (accessibility vs keyboard vs composition)
 

@@ -2,17 +2,6 @@
 
 Rewrite AI-generated or stiff prose so it reads as a human wrote it. Goal: prose that fits its medium and reader, not prose that beats detectors.
 
-## Contents
-
-- [Workflow](#workflow)
-- [Pattern Catalog](#pattern-catalog)
-- [Adding Voice](#adding-voice)
-- [Safety Rails](#safety-rails)
-- [Required Checks Before Output](#required-checks-before-output)
-- [Output Format](#output-format)
-- [Examples](#examples)
-- [Gotchas](#gotchas)
-
 ## Workflow
 
 1. Read the input (file or inline). Identify medium, audience, intended tone.
@@ -121,9 +110,3 @@ If the user asked for in-place editing, write the FINAL to the source file and p
 ### After (observable consequence)
 
 > The platform handles task tracking and reporting in one place, which cuts down on tool switching.
-
-## Gotchas
-
-- Removing every em dash is over-correction — regularity is the tell, not the punctuation
-- Sterile, voiceless prose looks just as AI-generated as marketing puffery — add a register-appropriate stance
-- Inventing facts (made-up sources, fabricated numbers) to "add specificity" is worse than the AI prose you started with — cut or soften unverifiable claims instead

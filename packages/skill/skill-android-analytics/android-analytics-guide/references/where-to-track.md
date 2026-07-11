@@ -4,11 +4,9 @@
 
 Call the analytics tracker from the presentation layer (ViewModel/presenter) — track a screen view once on screen entry and track events from user-intent callbacks — never from inside a composable body.
 
-## Rationale
-
-A composable re-runs arbitrarily on recomposition, and a `LaunchedEffect(Unit)` re-fires on configuration change (rotation, locale, dark-mode, process-death restore). Tracking from the UI therefore double-counts screen views and fires phantom events you never wrote a user action for. The ViewModel survives recomposition and config change, so it is the only place where "this happened exactly once per real occurrence" holds.
-
 ## How to Apply
+
+Why the ViewModel: it survives recomposition and config change (rotation, locale, dark-mode, process-death restore), where a composable body and `LaunchedEffect(Unit)` re-fire and double-count.
 
 1. Track the screen view in the ViewModel's `init` (or the function that first loads the screen), so it fires once per ViewModel instance — i.e. once per genuine screen entry.
 2. For events, have the composable expose an intent callback (`onCheckoutClicked`) and let the ViewModel call the tracker inside the handler. The composable never touches the tracker.

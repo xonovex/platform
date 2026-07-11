@@ -6,7 +6,7 @@ Fetch vertex data yourself from storage buffers in the shader (programmable vert
 
 ## Rationale
 
-The fixed-function input assembler ties a pipeline to one rigid vertex layout and only ever hands the shader _its own_ vertex. Pulling vertices manually from byte-addressable storage buffers removes both limits: a single shader supports many packings/quantizations by going through an abstract loader (`load_position()`, `load_normal()`, …) that hides offsets and strides; it can read _any_ vertex or the index buffer from any stage; and it can gracefully skip channels a mesh doesn't have. Skinning then needs no special vertex format — the shader just also reads bone influences and matrices from buffers and blends, and variable bone-per-vertex counts cost no wasted space because the influence list is indirected, not padded to a fixed maximum.
+The fixed-function input assembler ties a pipeline to one rigid vertex layout and only ever hands the shader _its own_ vertex. Manual pull from byte-addressable storage buffers removes both limits: one shader supports many packings/quantizations through an abstract loader (`load_position()`, `load_normal()`, …) that hides offsets and strides, reads _any_ vertex or the index buffer from any stage, and skips channels a mesh lacks. Skinning then needs no special vertex format — the shader also reads bone influences and matrices and blends, and variable bone-per-vertex counts waste no space because the influence list is indirected, not padded to a fixed maximum.
 
 ## How to Apply
 

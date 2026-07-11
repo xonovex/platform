@@ -1,39 +1,17 @@
-# router-selection: Choosing the Right Router for Your Environment
+# router-selection: Pick the Router for the Environment
 
-## Guideline
+Pass an explicit `router` to the `Hono` constructor based on deployment; the default is `SmartRouter`.
 
-Select the appropriate Hono router based on deployment environment, optimizing for cold start times in serverless/edge or throughput in traditional servers.
-
-## Rationale
-
-Hono provides multiple router implementations: RegExpRouter (fastest throughput via single regex), LinearRouter (optimized for serverless cold starts), SmartRouter (default, supports all patterns), and PatternRouter (smallest footprint). Choosing correctly impacts cold starts, request throughput, and memory usage.
-
-## Example
+- **RegExpRouter** (`hono/router/reg-exp-router`) — fastest throughput (single compiled regex); use for high-throughput persistent servers.
+- **LinearRouter** (`hono/router/linear-router`) — fastest init, no build step; use for serverless/edge where cold start dominates.
+- **SmartRouter** (default) — picks among the others at runtime; supports all patterns. Use when unsure or mixing pattern types.
+- **PatternRouter** (`hono/router/pattern-router`) — smallest footprint.
 
 ```typescript
 import {Hono} from "hono";
 import {LinearRouter} from "hono/router/linear-router";
 import {RegExpRouter} from "hono/router/reg-exp-router";
 
-// High-throughput traditional server
-const app = new Hono({
-  router: new RegExpRouter(),
-});
-
-// Serverless/edge with fast initialization
-const serverlessApp = new Hono({
-  router: new LinearRouter(),
-});
-
-// Default SmartRouter (no configuration needed)
-const defaultApp = new Hono();
+const server = new Hono({router: new RegExpRouter()}); // high-throughput
+const edge = new Hono({router: new LinearRouter()}); // serverless cold start
 ```
-
-## Techniques
-
-- Identify deployment environment: serverless/edge (prioritize cold starts) or traditional server
-- Use LinearRouter for serverless/edge environments with repeated initialization
-- Use RegExpRouter for high-throughput APIs with persistent connections
-- Use SmartRouter (default) when unsure or mixing pattern types
-- Consider route complexity: wildcards, optional params, regex patterns
-- Profile cold start times and request throughput for your specific use case

@@ -1,14 +1,6 @@
 # network-policies: Network Segmentation with NetworkPolicy
 
-## Guideline
-
-Implement NetworkPolicies to control ingress and egress traffic between pods and namespaces.
-
-## Rationale
-
-Provides network segmentation and least-privilege access control, preventing unauthorized communication between workloads.
-
-## Example
+Control pod ingress/egress with NetworkPolicy. A policy selecting a pod is implicit default-deny for the listed `policyTypes` — anything not explicitly allowed is dropped. Always allow DNS egress (UDP 53 to kube-system), or in-cluster name resolution breaks.
 
 ```yaml
 apiVersion: networking.k8s.io/v1
@@ -47,12 +39,3 @@ spec:
         - protocol: UDP
           port: 53
 ```
-
-## Techniques
-
-- Pod selection: Use podSelector with matchLabels to target specific pods
-- Policy types: Specify policyTypes for ingress, egress, or both rules
-- Namespace selection: Use namespaceSelector to allow traffic from namespaces
-- DNS allowance: Always allow DNS egress to kube-system for pod resolution
-- Explicit rules: Define exact allowed ports and protocols for security
-- Default deny: NetworkPolicy acts as implicit default-deny by default

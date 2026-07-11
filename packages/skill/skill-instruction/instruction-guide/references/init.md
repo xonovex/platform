@@ -4,10 +4,9 @@ Generate a concise AGENTS.md for a directory by scanning its structure, config f
 
 ## Core Workflow
 
-1. Track steps in a task list
-2. Verify no AGENTS.md exists (abort if present — use sync or simplify instead)
-3. Scan structure, configs, code patterns, git history
-4. Generate AGENTS.md in standard format → preview or write → report
+1. Verify no AGENTS.md exists (abort if present — use sync or simplify instead)
+2. Scan structure, configs, code patterns, git history
+3. Generate AGENTS.md in standard format → preview or write → report
 
 ## Discovery
 
@@ -42,16 +41,6 @@ Generate a concise AGENTS.md for a directory by scanning its structure, config f
   - Descriptions restating dir name; predictable guideline links; boilerplate
   - Anything inferable from `package.json` + source
 - **Brevity:** 5-15 lines; if nothing non-obvious → skip, report "No unique content found"
-
-## Error Handling
-
-- AGENTS.md exists: abort, suggest sync or simplify
-- Empty/no unique content: report and skip
-- Permission errors: warn and skip
-
-## Safety
-
-Never overwrite existing AGENTS.md, only create files with genuinely useful content, preview before writing, recommend git commit after recursive runs.
 
 ## Gotchas
 

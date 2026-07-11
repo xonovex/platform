@@ -6,7 +6,7 @@ Allow at most one instance of a given component type per entity. Represent "many
 
 ## Rationale
 
-Permitting multiple instances of one type forces every component to be addressed by an (entity, type, instance-id) triplet instead of just (entity, type). That adds per-instance ids, lookup indirection in hot loops, and ambiguity: when two `mass` and three `position` components coexist, which pairs with which? You also lose semantic clarity — you can no longer speak of "_the_ position of an entity." Single-instance typing keeps matched component arrays co-located and reachable without a lookup, which is the property that makes iteration fast and systems loosely coupled.
+Multiple instances force addressing by an (entity, type, instance-id) triplet instead of (entity, type): per-instance ids, hot-loop lookup indirection, and ambiguity (two `mass` and three `position` components — which pairs with which?). You also lose "_the_ position of an entity." Single-instance typing keeps matched arrays co-located and lookup-free.
 
 ## How to Apply
 

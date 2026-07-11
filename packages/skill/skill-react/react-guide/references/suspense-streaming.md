@@ -1,12 +1,6 @@
 # suspense-streaming: Suspense, Streaming & Error Handling
 
-## Guideline
-
-Use granular Suspense boundaries for independent progressive loading; nest for hierarchical control; combine with Error Boundaries.
-
-## Rationale
-
-Suspense enables streaming—content loads incrementally, not all-or-nothing; React 19 pre-warms siblings for faster perceived performance.
+Use granular Suspense boundaries for independent progressive loading; nest for hierarchical control; combine with Error Boundaries. React 19 pre-warms siblings during suspension for faster transitions.
 
 ## Example
 

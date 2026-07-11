@@ -29,7 +29,6 @@ description: "Use when running git operations or resolving repo-state issues. Tr
 ## Worktree Operations
 
 - **Create** - `<worktree>-feature-<name>` directory with branch, see [references/worktree-create.md](references/worktree-create.md)
-- **Commit** - Auto-commit with plan context, see [references/worktree-commit.md](references/worktree-commit.md)
 - **Validate** - Pre-merge validation checkpoint, see [references/worktree-validate.md](references/worktree-validate.md)
 - **Merge** - Merge feature back to source branch, see [references/worktree-merge.md](references/worktree-merge.md)
 - **Cleanup** - Remove stale and merged worktrees, see [references/worktree-cleanup.md](references/worktree-cleanup.md)
@@ -54,7 +53,6 @@ description: "Use when running git operations or resolving repo-state issues. Tr
 ### Worktree Operations
 
 - Read [references/worktree-create.md](references/worktree-create.md) - Load when creating a feature worktree with branch
-- Read [references/worktree-commit.md](references/worktree-commit.md) - Load when committing inside a feature worktree with plan context
 - Read [references/worktree-validate.md](references/worktree-validate.md) - Load when running pre-merge validation in a feature worktree
 - Read [references/worktree-merge.md](references/worktree-merge.md) - Load when merging a feature worktree back to its source branch
 - Read [references/worktree-cleanup.md](references/worktree-cleanup.md) - Load when removing stale or merged worktrees

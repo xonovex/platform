@@ -4,21 +4,6 @@
 
 Treat the browser as just another platform backend, but restructure the parts the web cannot host: hand the frame loop to the browser via a cooperative main-loop callback, make all file and network access asynchronous, map your explicit-API renderer down to GL ES / WebGL (or WebGPU) — typically by routing only the 2D/UI path — and account for a 32-bit, single-address-space, single-threaded sandbox with growable but fully-committed memory.
 
-## Rationale
-
-A Wasm/Emscripten toolchain compiles your portable C/C++ unchanged, but the browser owns the event loop, the network is non-blocking, the filesystem is virtual, threads are restricted, and pointers are 32-bit — so the platform-specific delta is concentrated and large rather than diffuse. A native `while (running) { tick(); }` loop blocks the browser's event loop and hangs the tab; the browser must drive the frame. Synchronous `fopen`/`read` and blocking sockets do not exist over the network, so assets must be preloaded into the virtual filesystem or fetched asynchronously. The renderer is the deepest cut: browsers expose WebGL (OpenGL ES), not a low-level explicit API, so a Vulkan/D3D12/Metal engine cannot run its native backend — the pragmatic path is to map only the UI/2D draw stream to a tiny GL ES pipeline and defer or stream 3D. Getting these structural constraints right is what makes the same source that runs natively also run in a tab.
-
-## Contents
-
-- Toolchain and serving — output files, local server requirement
-- Build flags and platform defines — selecting the web backend
-- Cooperative main loop — handing the frame to the browser
-- Async file and network access — preload vs fetch, virtual filesystem
-- Memory model — 32-bit pointers, growth, committed memory
-- Rendering — mapping an explicit-API renderer down to GL ES / WebGPU
-- Input — browser event callbacks into the input abstraction
-- Linking — static-only, dynamic-plugin and symbol-collision pitfalls
-
 ## Toolchain and Serving
 
 The Wasm toolchain emits three artifacts: a `.wasm` binary, a `.js` loader/glue file, and an `.html` entry page. Browsers refuse to load Wasm from `file://` for security, so you must serve over HTTP even for local testing (any static server, e.g. `python3 -m http.server`, works). Program `stdout` can be redirected to a DOM element (e.g. a textarea), so command-line tools and the foundation library run and print in the browser before any graphics exist.

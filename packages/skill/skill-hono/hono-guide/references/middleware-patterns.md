@@ -1,46 +1,22 @@
 # middleware-patterns: CORS Configuration and Custom Middleware
 
-## Guideline
-
-Configure CORS differently for development and production, and use middleware factory functions to ensure proper `this` binding and parameterization.
-
-## Rationale
-
-Environment-specific CORS balances development convenience with production security. Middleware factories ensure correct context binding in async operations, enable parameterization, and provide consistent patterns across applications through proper closure over configuration values.
-
-## Example
+Configure `cors()` (from `hono/cors`) per environment: `origin: "*"` in dev; an explicit origin list plus `credentials: true` in prod. Write custom middleware as a factory returning `async (c, next) => {...}`, and register it by calling the factory (`app.use("*", requestId())`) so config is closed over and `this`-dependent helpers keep their binding.
 
 ```typescript
 import type {Context, Next} from "hono";
 import {cors} from "hono/cors";
 
-// Environment-specific CORS
-const isDevelopment = process.env.NODE_ENV === "development";
+app.use(
+  "*",
+  process.env.NODE_ENV === "development"
+    ? cors({origin: "*", maxAge: 86_400})
+    : cors({
+        origin: ["https://app.example.com"],
+        credentials: true,
+        maxAge: 600,
+      }),
+);
 
-if (isDevelopment) {
-  // Development: Permissive
-  app.use(
-    "*",
-    cors({
-      origin: "*",
-      allowMethods: ["GET", "POST", "PUT", "DELETE"],
-      maxAge: 86_400, // 24 hours
-    }),
-  );
-} else {
-  // Production: Restrictive
-  app.use(
-    "*",
-    cors({
-      origin: ["https://app.example.com"],
-      allowMethods: ["GET", "POST", "PUT", "DELETE"],
-      credentials: true,
-      maxAge: 600, // 10 minutes
-    }),
-  );
-}
-
-// Custom middleware factory with proper binding
 function requestId() {
   return async (c: Context, next: Next) => {
     const id = crypto.randomUUID();
@@ -49,15 +25,5 @@ function requestId() {
     await next();
   };
 }
-
 app.use("*", requestId());
 ```
-
-## Techniques
-
-- Import CORS from `hono/cors` and configure based on environment
-- For development use `origin: "*"` for permissive access
-- For production specify allowed origins explicitly
-- Create middleware factory function that returns `async (c, next) => {...}`
-- Call factory function when registering: `app.use("*", requestId())`
-- Never destructure methods from helpers that rely on `this` binding

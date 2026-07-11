@@ -6,7 +6,7 @@ Store the UI as compact, tightly-packed primitive definitions and let the vertex
 
 ## Rationale
 
-A naive IMGUI expands every rectangle into four padded vertices and pushes them over the bus each frame; with tens of thousands of rectangles that bandwidth and the per-state draw-call churn dominate. Storing one ~20-byte primitive instead of ~48 bytes of vertices, and encoding everything the GPU needs (primitive type, which corner, clip, texture) into the data, lets a single shader and a single draw call render the entire UI.
+Storing one ~20-byte primitive instead of ~48 bytes of expanded vertices, and encoding everything the GPU needs (primitive type, corner, clip, texture) into the data, lets a single shader and a single draw call render tens of thousands of rectangles without per-state churn.
 
 ## How to Apply
 

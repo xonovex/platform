@@ -1,12 +1,6 @@
 # plugin-architecture: Plugins and a Runtime Interface Registry
 
-## Guideline
-
-Build the system as many small, independently-loadable plugins that talk only through a central registry of named interfaces — each interface a plain-C struct of function pointers registered under a unique string id — so components discover each other at runtime with zero compile-time coupling and the core stays tiny.
-
-## Rationale
-
-A monolith couples everything at compile time: to use a capability you must link and include its headers, so the dependency graph and the core both grow without bound. Inverting this into "lots of little machines co-operating" needs a runtime rendezvous point. A registry that maps a string id to a struct of function pointers gives exactly that: a plugin `add()`s its interface, any other plugin `first()`s it by name and calls through the table — neither knows the other at build time. Grouping functions into one struct also acts as a namespace and lets you pass a whole API by one pointer. Plain C for the interface is deliberate: C has a stable de-facto ABI (C++ does not), so plugins built by different compilers/versions stay binary-compatible, and the simple shape keeps every API consistent. Supporting _multiple_ implementations of one interface (`first`/`next`) turns extension points into mere "register another implementation of this id" — unit tests, asset importers, and tools all become plugins.
+Build the system as many small, independently-loadable plugins that talk only through a central registry of named interfaces — each interface a plain-C struct of function pointers registered under a unique string id — so components discover each other at runtime with zero compile-time coupling and the core stays tiny. Plain C is deliberate: it has a stable de-facto ABI (C++ does not), so plugins from different compilers stay binary-compatible.
 
 ## How to Apply
 

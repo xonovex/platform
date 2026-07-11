@@ -50,9 +50,7 @@ GitLab classic PATs have **no write-only or comment-only scope**. The split is b
 
 ```bash
 glab auth login --hostname gitlab.example.com --stdin < <(security find-generic-password -a "$USER" -s gitlab-token -w)
-# or read into the env var only at call time:
-export GITLAB_TOKEN="$(secret-tool lookup service gitlab username "$USER")"   # Linux libsecret
-export GITLAB_TOKEN="$(op read 'op://<vault>/gitlab/token')"                   # 1Password, teams
+export GITLAB_TOKEN="$(secret-tool lookup service gitlab username "$USER")"   # or read into the env var only at call time
 ```
 
 - Use a **distinct token per integration** so a compromise is revoked in isolation, and **separate read vs write tokens** (a `read_api` token for listing, an `api` token only where a write happens).

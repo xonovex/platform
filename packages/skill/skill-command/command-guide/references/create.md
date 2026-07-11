@@ -25,21 +25,10 @@ Generate a new reusable prompt file (a.k.a. slash command, user-invocable comman
 6. **Validate Structure** — required sections present, metadata block parses, generic examples, no project-specific content, file length <150 lines
 7. **Write File** — save to the harness-specific location and extension (see [harness-formats.md](harness-formats.md))
 
-## Implementation Details
-
-### Name Generation
-
-lowercase, replace spaces with hyphens, remove special characters, prefix with a category (e.g. `git-`, `code-`, `test-`)
-
-### Required Sections
+## Required Sections
 
 - Metadata block: at minimum a 1-sentence `description`; add other fields (tools, permissions, argument hint, activation scope) appropriate for the target harness — see [harness-formats.md](harness-formats.md)
-- Goal: 3-5 bullet points
-- Usage: 2-3 invocation examples
-- Arguments: list with required/optional, defaults, descriptions
-- Core Workflow: 4-8 numbered steps with sub-bullets
-- Implementation Details: technical approach, key functions
-- Error Handling: common errors and solutions
+- Goal (3-5 bullets), Usage (2-3 examples), Arguments (required/optional, defaults), Core Workflow (4-8 steps), Implementation Details, Error Handling
 
 ## Error Handling
 
@@ -51,9 +40,3 @@ lowercase, replace spaces with hyphens, remove special characters, prefix with a
 ## Safety
 
 Preview before writing, check for existing files, validate the metadata block parses in the target format, ensure no sensitive/project-specific data.
-
-## Gotchas
-
-- A prompt that hardcodes one repo's paths/domain terms isn't reusable — generalize aggressively at generate time, not later
-- A prompt longer than 150 lines usually means two prompts hiding inside — split rather than bloat
-- "Auto-generated name" + existing file is a silent overwrite risk — always check before write

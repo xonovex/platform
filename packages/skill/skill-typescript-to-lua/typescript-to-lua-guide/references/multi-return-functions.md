@@ -1,28 +1,16 @@
-# multi-return-functions: Lua Multi-Return Functions
+# multi-return-functions: Lua Multi-Return with $multi
 
-## Guideline
-
-Use `LuaMultiReturn` and `$multi()` for idiomatic Lua multiple-value returns.
-
-## Rationale
-
-Lua natively supports multiple returns, more efficient than arrays/objects. TSTL provides `LuaMultiReturn` for type-safe multi-returns.
-
-## Example
+Import `LuaMultiReturn` from `"typescript-to-lua"`, type the return as `LuaMultiReturn<[T1, T2, ...]>`, and return via `$multi(...)`. Destructure at the call site. This emits native Lua multiple returns — cheaper than array/object wrappers.
 
 ```typescript
 import {LuaMultiReturn} from "typescript-to-lua";
 
-// Simple multi-return
 function divmod(a: number, b: number): LuaMultiReturn<[number, number]> {
   return $multi(Math.floor(a / b), a % b);
 }
+const [quotient, remainder] = divmod(17, 5); // 3, 2
 
-// Usage
-const [quotient, remainder] = divmod(17, 5);
-// quotient = 3, remainder = 2
-
-// Error handling with optional
+// value-or-error pattern
 function parseJSON(
   json: string,
 ): LuaMultiReturn<[object | null, string | null]> {
@@ -33,23 +21,8 @@ function parseJSON(
   }
 }
 
-// Usage
-const [data, err] = parseJSON('{"key": "value"}');
-if (err) console.error("Parse error:", err);
-else console.log("Data:", data);
-
-// Variadic returns
-function unpack<T extends any[]>(arr: T): LuaMultiReturn<T> {
+// variadic: spread into $multi
+function unpack<T extends unknown[]>(arr: T): LuaMultiReturn<T> {
   return $multi(...arr);
 }
 ```
-
-## Techniques
-
-- Import `LuaMultiReturn` from "typescript-to-lua" package
-- Declare return type as `LuaMultiReturn<[type1, type2, ...]>` for multiple values
-- Return using `$multi(value1, value2, ...)` function call syntax
-- Destructure multi-returns with `const [a, b] = func()` for clarity
-- Use for idiomatic Lua patterns like divmod that return quotient and remainder
-- Implement error handling by returning optional value with error message
-- Support variadic returns with spread operator inside $multi

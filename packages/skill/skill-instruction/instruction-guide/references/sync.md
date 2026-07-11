@@ -4,12 +4,11 @@ Update AGENTS.md files to reflect current directory structure, files, and config
 
 ## Core Workflow
 
-1. Track each file in a task list
-2. **Discover:** scan subdirectories, read `package.json` / config files, identify patterns
-3. **Analyze:** parse Subdirectories section, extract workflows, preserve Integration Points
-4. **Sync:** add new directories, remove deleted ones, update patterns
-5. **Update workflows** (if requested): sync operations, update delegation chains, keep technology names
-6. **Validate and report:** check broken references, show diff
+1. **Discover:** scan subdirectories, read `package.json` / config files, identify patterns
+2. **Analyze:** parse Subdirectories section, extract workflows, preserve Integration Points
+3. **Sync:** add new directories, remove deleted ones, update patterns
+4. **Update workflows** (if requested): sync operations, update delegation chains, keep technology names
+5. **Validate and report:** check broken references, show diff
 
 ## Discovery
 
@@ -50,21 +49,9 @@ check recent commits for directory/file additions not reflected in AGENTS.md
 
 ## Implementation
 
-- Concise format: inline parentheses for files, dash-separated examples
-- Pattern detection: recognize `<name>/` for similar subdirectories
-- Technology preservation: keep actual names (`moon`, `npm`, `Terraform`, `Flux`)
 - Diff output: show added (`+`), removed (`-`), updated (`~`)
-
-## Error Handling
-
-- File not found: verify path
-- No AGENTS.md (`--all`): report missing locations
-- No changes: report "Already synchronized"
-- Parse errors: warn, preserve manual content
-
-## Safety
-
-Preview before writing; preserve manual descriptions, Integration Points, and section structure; keep technology references.
+- `--all` mode: report locations missing an AGENTS.md
+- On parse errors, preserve manual content rather than overwriting
 
 ## Gotchas
 

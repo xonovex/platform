@@ -6,7 +6,7 @@ Represent every piece of tool/editor state as a typed object whose shape is desc
 
 ## Rationale
 
-A central data model has to do generic work over every object — notify on change, undo, serialize, copy, diff — without knowing each type at compile time. If types are ordinary C structs, every one of those operations needs hand-written code per struct and breaks the moment a field is added. Describing types by data (a list of properties with kinds) lets one generic engine handle save/load, change tracking, and undo for all types, and lets new types or properties be introduced at runtime (loaded from a file, added by a plugin) without recompiling. The cost is one indirection per property access, which is negligible for editor-rate workloads.
+A central model must notify/undo/serialize/copy/diff generically over every object without knowing each type at compile time. Ordinary C structs force hand-written per-struct code that breaks when a field is added; data-driven types let one generic engine handle all types and let new types/properties be added at runtime (from a file or plugin) without recompiling. Cost: one indirection per property access — negligible at editor rates.
 
 ## Techniques
 

@@ -1,12 +1,6 @@
 # caller-owns-memory: Caller-Owns-Memory (C)
 
-## Guideline
-
-In this style, libraries never allocate — the caller provides all storage and the library operates on it through pointers + capacities, returning status codes (never an allocated pointer).
-
-## Rationale
-
-This is the defining memory choice of the opinionated style: no hidden `malloc`, nothing to leak, embeddable with no allocator dependency, and batch-friendly. The general principle — ownership, lifetimes, and the allocators the caller plugs in (arena/pool/virtual-memory) — is language-agnostic; see **memory-management-guide**. This doc is just the C mechanics.
+Libraries never allocate — the caller provides all storage; the library operates through pointers + capacities and returns status codes, never an allocated pointer. General ownership/lifetime/allocator theory is language-agnostic (see **memory-management-guide**); this is the C mechanics.
 
 ## How to Apply (C specifics)
 

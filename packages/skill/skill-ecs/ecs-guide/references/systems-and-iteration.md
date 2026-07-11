@@ -6,7 +6,7 @@ A system is a filter (a required component mask) plus a batch loop over the matc
 
 ## Rationale
 
-The whole archetype layout exists so this loop can be a tight, prefetch-friendly walk. Per-element id lookups, virtual dispatch, or branching on rare conditions inside the loop reintroduce the misses the layout was meant to avoid. Because each bucket is independent and components are plain data, the loop parallelizes by simply partitioning the array range across jobs.
+Per-element id lookups, virtual dispatch, or rare-condition branches inside the loop reintroduce the cache misses the archetype layout avoids. Because each bucket is independent and components are plain data, the loop parallelizes by partitioning the array range across jobs.
 
 ## How to Apply
 

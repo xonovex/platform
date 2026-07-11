@@ -1,14 +1,6 @@
-# filename: exit
+# exit: AnimatePresence Unmount Animations
 
-## Guideline
-
-Wrap conditionally rendered elements in `<AnimatePresence>` to enable exit animations; React removes elements instantly without it.
-
-## Rationale
-
-AnimatePresence delays DOM removal until exit animation completes; enables smooth transitions and proper cleanup.
-
-## Example
+Wrap conditionally rendered elements in `<AnimatePresence>` with an `exit` prop; without it React removes elements instantly. Direct children need stable unique `key`s.
 
 ```tsx
 function Modal({isOpen, onClose}) {
@@ -28,13 +20,8 @@ function Modal({isOpen, onClose}) {
 }
 ```
 
-## Techniques
-
-- Always wrap conditionals: `<AnimatePresence>{condition && <motion.div exit={{...}} />}</AnimatePresence>`
-- Unique keys: Required for list animations; prevents animation identity loss on reorder
-- Exit modes: `"sync"` (enter/exit simultaneous), `"wait"` (exit first, then enter), `"popLayout"` (exit removed from flow)
-- Exit callbacks: `onExitComplete={() => {...}}` fires when all exit animations finish
-- Page transitions: Use `key={location.pathname}` with router to trigger exit/enter on route change
-- List animations: `height: 0` on exit shrinks before removal; `opacity: 0` fades
-- Staggered exit: Use parent variant with `staggerDirection: -1` to reverse animation order
-- Modal backdrop: Animate both backdrop (fade) and content (scale) simultaneously for depth
+- Exit modes (`mode` prop): `"sync"` (default, simultaneous), `"wait"` (exit before enter), `"popLayout"` (exit removed from flow)
+- `onExitComplete={() => {...}}` fires when all exit animations finish
+- Page transitions: `key={location.pathname}` triggers exit/enter on route change
+- List collapse: `exit={{height: 0, opacity: 0}}` shrinks before removal
+- Staggered exit: parent variant with `staggerDirection: -1` reverses order

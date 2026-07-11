@@ -1,14 +1,6 @@
 # production-config: Production Configuration
 
-## Guideline
-
-Configure with health checks, externalized config, proper lifecycle management.
-
-## Rationale
-
-Health checks enable failure detection, env vars allow deployment-specific config, volumes preserve data.
-
-## Example
+Add a `HEALTHCHECK` for orchestrator failure detection, externalize deployment config via `ENV`, declare a `VOLUME` for data that must survive restarts, and set a non-root `USER`. The `# syntax=` directive enables BuildKit features.
 
 ```dockerfile
 # syntax=docker/dockerfile:1.7
@@ -26,12 +18,3 @@ EXPOSE 3000
 USER node:node
 CMD ["node", "dist/server.js"]
 ```
-
-## Techniques
-
-- Health checks: Add HEALTHCHECK for orchestration failure detection
-- Environment config: Use ENV for deployment-specific configuration
-- Persistent volumes: Define VOLUME for data that must survive restarts
-- Port exposure: Use EXPOSE to document container ports
-- Non-root user: Set USER for security and orchestration requirements
-- BuildKit syntax: Use syntax directive for advanced features

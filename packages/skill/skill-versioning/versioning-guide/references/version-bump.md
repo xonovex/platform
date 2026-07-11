@@ -2,23 +2,6 @@
 
 Compute the next version for a package, propagate the change to every workspace package that depends on it, and prepend a changelog entry derived from conventional commits.
 
-## Contents
-
-- [Goal](#goal)
-- [Core Workflow](#core-workflow)
-- [Choosing the Next Version](#choosing-the-next-version)
-- [Propagating to Dependents](#propagating-to-dependents)
-- [Idempotency](#idempotency)
-- [Output](#output)
-- [Error Handling](#error-handling)
-- [Gotchas](#gotchas)
-
-## Goal
-
-- Move a package from its current version to the next one (level bump, exact set, or prerelease)
-- Keep workspace dependents consistent and self-versioned
-- Record the change in a changelog without hand-editing
-
 ## Core Workflow
 
 1. **Read** the package's `package.json`; abort if `name` or `version` is missing.

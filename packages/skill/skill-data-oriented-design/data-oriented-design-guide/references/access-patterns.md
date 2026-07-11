@@ -16,13 +16,6 @@ The hardware prefetcher detects constant-stride access and fetches lines ahead o
 - **Avoid random access** - Hash-bucket scatter, indirection tables, and sorting by an unrelated key turn streaming into random fetches; gather/sort into order first, then stream.
 - **Hot in front** - When elements have differing liveness, compact live ones to the front so the active range is contiguous.
 
-## How to Apply
-
-1. Find loops that follow pointers or jump by data-dependent indices.
-2. Replace heap-node graphs with arrays; replace `->next` traversal with `++i` over a packed array in iteration order.
-3. If you must index indirectly, pre-sort or gather into a contiguous scratch buffer, then stream that.
-4. Verify the prefetcher is engaged: a profiler should show high IPC and low memory-stall on the loop.
-
 ## Example
 
 ```c

@@ -6,7 +6,7 @@ Port to a new OS by working through the abstraction interface in interactivity o
 
 ## Rationale
 
-Porting is mostly discovery, and discovery is fastest when you can see and poke the program: a visible, interactive window turns every subsequent gap into an observable symptom instead of a link error in the dark, which is why "get something on screen" beats "implement everything alphabetically." Stub-first keeps the whole program compiling and linking from hour one, so each newly implemented backend function is a small, testable delta rather than a big-bang integration. The other half of porting is the toolchain: a different compiler (GCC/Clang vs MSVC, or Emscripten's stricter Clang) flags real latent bugs and rejects sloppy declarations, and a different pointer width or struct-packing assumption breaks code that hashed or `memcmp`-ed structs assuming a fixed layout. Catching these per target — and re-catching them automatically in CI for every target — is what stops a port from silently rotting the moment someone edits portable code on a different host.
+Interactivity order beats alphabetical: a visible, interactive window turns every subsequent gap into an observable symptom instead of a link error in the dark. Stub-first keeps the program compiling from hour one. The other half is the toolchain: a different compiler (GCC/Clang vs MSVC, or Emscripten's stricter Clang) flags real latent bugs, and a different pointer width or struct-packing assumption breaks code that hashed or `memcmp`-ed structs assuming a fixed layout.
 
 ## How to Apply
 

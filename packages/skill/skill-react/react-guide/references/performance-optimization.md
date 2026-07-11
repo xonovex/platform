@@ -1,17 +1,11 @@
 # performance-optimization: Performance Optimization Techniques
 
-## Guideline
-
-Use memo() for expensive components; lazy-load routes with React.lazy + Suspense; prefer SSR/SSG; let Compiler handle calculations.
-
-## Rationale
-
-memo() prevents unnecessary re-renders; code splitting reduces initial bundle; SSR improves FCP; React 19 Compiler removes manual memoization burden.
+Let the React Compiler handle memoization; reserve `useMemo`/`useCallback` for effect dependencies. Use `memo()` for expensive components, `lazy()` + Suspense for route code-splitting, and Server Components/SSG for FCP and SEO.
 
 ## Example
 
 ```tsx
-// Memoize expensive component
+// Memoize expensive component (skips re-render if props unchanged)
 const ExpensiveList = memo(function ({items, onItemClick}) {
   return (
     <ul>
@@ -39,9 +33,9 @@ function App() {
 
 ## Techniques
 
-- memo(): Wrap expensive components to skip re-render if props unchanged
-- lazy() + Suspense: Code splitting; reduces initial bundle by ~50-70%
-- useCallback: Stabilize callbacks passed to memoized children (pair with memo)
-- useMemo: Only for effect dependencies or expensive one-time calculations
-- React Compiler: In React 19, removes need for manual memoization (vite/next.js config)
-- SSR/SSG: Server Components and static generation for better FCP and SEO
+- `memo()`: wrap expensive components to skip re-render on unchanged props
+- `lazy()` + Suspense: code splitting; cuts initial bundle
+- `useCallback`: stabilize callbacks passed to memoized children (pair with memo)
+- `useMemo`: only for effect dependencies or expensive one-time calculations
+- React Compiler: removes need for manual memoization in React 19
+- SSR/SSG: Server Components and static generation for FCP and SEO

@@ -1,14 +1,6 @@
 # controllers: Controller Pattern
 
-## Guideline
-
-Implement async controllers with typed request/response, wrap in try-catch, pass errors to next().
-
-## Rationale
-
-Type-safe handlers with proper error handling ensure predictable API behavior.
-
-## Example
+Type handlers with `Request<Params, ResBody, ReqBody, Query>` (note the generic order), return `Promise<void>`, wrap the body in try-catch, and forward errors via `next(error)` to the central handler. Check for missing resources (404) before returning data. Call business logic through an injected service, not inline.
 
 ```typescript
 export async function list(
@@ -45,13 +37,3 @@ export async function getById(
   }
 }
 ```
-
-## Techniques
-
-- Type generics: Use Request<Params, ResBody, ReqBody, Query> for type safety
-- Return Promise<void>: Indicates async function that doesn't return a value
-- Try-catch: Wrap all async logic and pass errors to next(error)
-- Validate first: Check for missing resources (404) before returning data
-- Service layer: Call business logic via injected service dependencies
-- Error handler: Pass errors to next() for centralized error handling
-- Standard responses: Return {data: value} or {error: message} structures

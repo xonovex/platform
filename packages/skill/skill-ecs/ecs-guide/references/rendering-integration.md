@@ -6,7 +6,7 @@ Let rendering-relevant components implement renderer-facing interfaces, cull onc
 
 ## Rationale
 
-A frame may touch hundreds of thousands of renderable components across several viewers (main camera, shadow cascades, reflections). Iterating that data once, in parallel, per component type — and expressing "which viewers see this object" as bits — keeps the bridge cache-friendly and avoids visiting any renderable more than once per frame (which is also what makes per-camera state mutation safe). Plugin interfaces keep the core renderer ignorant of specific component types, so new renderable kinds need no core changes.
+Expressing "which viewers see this object" as bits lets a single parallel pass per component type visit each renderable once for all viewers (which is what makes per-camera state mutation safe). Plugin interfaces keep the core renderer ignorant of specific component types, so new renderable kinds need no core changes.
 
 ## How to Apply
 

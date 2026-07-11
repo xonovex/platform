@@ -1,14 +1,6 @@
-# filename: stagger
+# stagger: Sequential Child Animations
 
-## Guideline
-
-Use `staggerChildren` in parent variant transitions to orchestrate sequential child animations; never use manual delays.
-
-## Rationale
-
-Variants + stagger maintains maintainability; auto-sequencing prevents timing bugs; reversible with `staggerDirection: -1`.
-
-## Example
+Use `staggerChildren` in a parent variant's `transition` to sequence children; never use manual `delay: i * 0.1`. Give list items unique `key`s.
 
 ```tsx
 const container = {
@@ -31,12 +23,7 @@ const item = {
 </motion.ul>;
 ```
 
-## Techniques
-
-- Parent variant: `staggerChildren` (per-child delay), `delayChildren` (initial delay before first)
-- Child variant: individual `initial`/`visible`/`exit` states
-- Grid stagger: 0.02-0.05 for dense layouts; 0.08-0.12 for lists; 0.15-0.2 for hero sections
-- Reverse exit: `exit: {transition: {staggerDirection: -1}}` for backwards animation
-- Scroll trigger: `whileInView="visible"` + `viewport={{once: true}}` for scroll-triggered stagger
-- Always use unique `key` on list items for proper animation tracking
-- Never use `delay: i * 0.1`; always use variants + staggerChildren for maintainability
+- `staggerChildren` = per-child delay; `delayChildren` = delay before first
+- Timing: grids 0.02-0.05, lists 0.08-0.12, hero sections 0.15-0.2
+- Reverse exit: `exit: {transition: {staggerDirection: -1}}`
+- Scroll-triggered: `whileInView="visible"` + `viewport={{once: true}}`

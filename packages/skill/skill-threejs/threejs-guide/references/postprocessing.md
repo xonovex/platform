@@ -1,14 +1,6 @@
 # postprocessing: Post-Processing Effects
 
-## Guideline
-
-Use EffectComposer to chain passes (RenderPass→effects→screen); render to intermediate targets for complex pipelines.
-
-## Rationale
-
-Post-processing applies cinematic effects (bloom, grain, color grading) after rendering without modifying materials.
-
-## Example
+Use EffectComposer to chain passes (RenderPass → effects → screen); only the final pass sets `renderToScreen`.
 
 ```javascript
 const composer = new EffectComposer(renderer);

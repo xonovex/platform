@@ -1,12 +1,6 @@
-# typescript-changes: React 19 TypeScript Changes
+# migration-typescript: React 19 TypeScript Changes
 
-## Guideline
-
-Update TypeScript types for React 19's breaking changes to refs, JSX namespace, and removed types.
-
-## Rationale
-
-React 19 changes ref semantics, removes deprecated types, and scopes JSX namespace. Run codemods to automate most migrations.
+Update types for React 19's breaking changes to refs, JSX namespace, and removed types. Codemods automate most of it.
 
 ## Example
 

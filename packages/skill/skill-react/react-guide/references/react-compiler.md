@@ -1,17 +1,11 @@
 # react-compiler: React Compiler & Automatic Memoization
 
-## Guideline
-
-Write clean code without manual memoization; let Compiler handle it automatically; use useMemo/useCallback only for effect dependencies.
-
-## Rationale
-
-Compiler analyzes data flow and applies memoization where beneficial; manual optimization adds overhead and is often incorrect.
+Write clean code without manual memoization; the Compiler applies it where beneficial. Use `useMemo`/`useCallback` only for stable effect dependencies.
 
 ## Example
 
 ```tsx
-// Compiler handles this automatically
+// Compiler memoizes this automatically
 function ProductList({items, onSelect}) {
   const sorted = items.filter((x) => x.active).sort(byName);
   return sorted.map((item) => (
@@ -21,7 +15,7 @@ function ProductList({items, onSelect}) {
   ));
 }
 
-// Manual useMemo only for stable effect dependency
+// Manual useMemo only for a stable effect dependency
 function SearchResults({query}) {
   const searchParams = useMemo(() => ({query, timestamp: Date.now()}), [query]);
   useEffect(() => {
@@ -33,9 +27,6 @@ function SearchResults({query}) {
 
 ## Techniques
 
-- Compiler enabled: Vite react({ babel: { plugins: ['babel-plugin-react-compiler'] } }) or Next.js experimental.reactCompiler
-- Rules of React: Pure functions, immutable state, unconditional hooks (compiler enforces)
-- Manual memoization: Only for stable effect dependencies; let Compiler handle render optimizations
-- Opt-in ('use memo'): Incremental adoption; compile specific components
-- Opt-out ('use no memo'): Skip compilation for legacy/problematic code
-- Keep it simple: Write readable code; Compiler finds and optimizes bottlenecks
+- Enable: Vite `react({ babel: { plugins: ['babel-plugin-react-compiler'] } })` or Next.js `experimental.reactCompiler`
+- Requires Rules of React: pure functions, immutable state, unconditional hooks (compiler enforces)
+- Opt-in per component: `'use memo'`; opt-out: `'use no memo'`

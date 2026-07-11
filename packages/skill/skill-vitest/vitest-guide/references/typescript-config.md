@@ -1,48 +1,14 @@
-# typescript-config: TypeScript Project Configuration for Tests
+# typescript-config: tsconfig for Tests
 
-## Guideline
-
-Verify directory structure before configuring TypeScript project references and test inclusion in tsconfig.json.
-
-## Rationale
-
-Incorrect configuration causes compilation failures and broken builds in CI/CD.
-
-## Example
+Add `test` and `vitest.config.ts` to tsconfig `include` or TypeScript won't type-check them. `references` paths are relative from the current package — count `..` levels against the real directory structure (verify with `ls`, test with `tsc --build`).
 
 ```json
-// For packages/templates/X referencing packages/shared/Y
 {
   "extends": "../../tsconfig.base.json",
-  "compilerOptions": {
-    "rootDir": "src",
-    "outDir": "dist"
-  },
-  "references": [
-    {
-      "path": "../../shared/shared-core" // ✅ Correct - verified with ls
-    },
-    {
-      "path": "../../shared/shared-types"
-    }
-  ],
-  "include": [
-    "src", // ✅ Source files
-    "test", // ✅ Test files
-    "vitest.config.ts" // ✅ Vitest config
-  ],
-  "exclude": [
-    "dist", // ✅ Build output
-    "node_modules" // ✅ Dependencies
-  ]
+  "references": [{"path": "../../shared/shared-core"}],
+  "include": ["src", "test", "vitest.config.ts"],
+  "exclude": ["dist", "node_modules"]
 }
 ```
 
-## Techniques
-
-- Check actual directory structure with `ls` or file explorer before configuring
-- Calculate relative paths from current package to referenced packages
-- Add project references with correct relative paths
-- Include test directories in `include` array (e.g., "test")
-- Exclude build artifacts and node_modules from compilation
-- Test compilation with `tsc --build` to verify paths resolve
+From `packages/templates/X`, `../../shared/shared-core` is correct; `../../../shared/shared-core` (up 3) and `../../shared-core` (missing `shared/`) are the common off-by-one mistakes.

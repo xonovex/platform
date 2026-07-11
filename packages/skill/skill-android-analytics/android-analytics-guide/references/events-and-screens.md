@@ -4,10 +4,6 @@
 
 Never pass string-literal event or screen names to the tracker; model screens as a typed `ScreenName` and events as a sealed event hierarchy so every call site is compiler-checked and IDE-discoverable.
 
-## Rationale
-
-String keys silently drift — a typo (`"buton_click"`), an inconsistent param name, or a renamed screen produces broken analytics that compile and ship fine, then surface as gaps in dashboards weeks later. A typed model makes the set of valid events finite, refactor-safe (rename propagates), and discoverable via autocomplete, so the call site cannot invent an undefined event.
-
 ## How to Apply
 
 1. Define an enum (or sealed `object` constants) `ScreenName` for every trackable screen; fire a screen-view on entry, not on every recomposition or back-navigation.

@@ -1,21 +1,12 @@
 # gizmo-math: The Linear Algebra Behind Robust Gizmos
 
-## Contents
-
-- Screen-space axis projection (the correct way to drag along an axis)
-- Why the 3D-mouse-ray approach is wrong
-- Drag deltas from a stored start parameter
-- Constant screen-size handles
-- 2D point-on-line and 3D line-line intersection helpers
-- Numerical robustness: epsilons and degenerate cases
-
 ### Guideline
 
 Do gizmo drag geometry in screen space: project the gizmo's axis to 2D, project the 2D cursor onto that 2D line, then lift the result back to world space and intersect with the world axis — never build a 3D "mouse ray" from an arbitrary cursor z and intersect it with the axis. Drive the object by the _delta_ of the projected parameter from drag-start, and guard every division with an epsilon so near-parallel axes and zero-length directions cannot explode.
 
 ### Rationale
 
-The cursor is a 2D screen position; the natural question "where along this axis is the cursor pointing?" is a 2D point-to-line projection, and it is exact. The tempting alternative — invent a 3D ray by setting the cursor's z to 0 and 1, then find where it meets the gizmo axis — is not a projection at all: two arbitrary 3D lines generally do not intersect, so the routine actually minimizes the distance between two skew lines. At shallow viewing angles that distance-minimization wanders far from the axis and the object lurches backward instead of tracking the cursor. Pulling the axis into screen space removes the made-up depth entirely: the projection happens in the same 2D space the mouse lives in, then a single screen-to-world step plus an axis intersection recovers the world parameter. Working from a stored start parameter and applying only the difference keeps the object from snapping to the cursor on the first frame and makes the drag frame-rate independent. Constant screen-size handles matter because a gizmo that shrinks with distance becomes unclickable; scaling geometry by view distance fixes the on-screen size. Finally, the robust forms of these tiny linear-algebra helpers all share one failure mode — a denominator that goes to zero when directions become parallel or degenerate — so each needs an explicit epsilon guard and a sane fallback.
+The 3D-ray alternative (set the cursor's z to 0 and 1, intersect with the gizmo axis) is not a projection: two arbitrary 3D lines generally do not intersect, so it minimizes the distance between two skew lines — at shallow viewing angles that wanders off the axis and the object lurches backward. Pulling the axis into 2D screen space (where the mouse lives) removes the made-up depth; one screen-to-world step plus an axis intersection recovers the world parameter. Applying only the delta from a stored start parameter avoids snapping to the cursor on frame one and makes the drag frame-rate independent. The robust helpers share one failure mode — a denominator going to zero as directions become parallel or degenerate — so each needs an epsilon guard and fallback.
 
 ### How to Apply
 

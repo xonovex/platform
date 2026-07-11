@@ -1,14 +1,6 @@
 # docker-compose: Docker Compose Configuration
 
-## Guideline
-
-Use Docker Compose for development with proper secrets, volumes, and health checks.
-
-## Rationale
-
-Simplifies multi-container orchestration during development; secrets, volumes, and health checks mirror production while maintaining security.
-
-## Example
+Point `build.target` at a Dockerfile stage, pass sensitive data through the `secrets:` section (as `*_FILE` env vars, not plain `environment`), mount named `volumes:` for persistence, and mirror the Dockerfile `healthcheck`. Use `restart: unless-stopped` for dev persistence.
 
 ```yaml
 services:
@@ -34,12 +26,3 @@ secrets:
 volumes:
   app-data:
 ```
-
-## Techniques
-
-- Build configuration: Specify build context and target stage in compose
-- Secrets management: Use secrets section for sensitive data, never environment vars
-- Volume mounting: Mount volumes for persistent data matching production layout
-- Health checks: Configure health checks matching Dockerfile definitions
-- Restart policy: Set `unless-stopped` for development persistence
-- Port mapping: Expose ports for local development access

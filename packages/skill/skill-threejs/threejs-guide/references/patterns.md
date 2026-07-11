@@ -1,18 +1,8 @@
-# filename: patterns
+# patterns: Architecture Patterns
 
-## Guideline
-
-Organize scenes in Groups; implement proper cleanup to prevent memory leaks; use delta time for frame-rate independent updates.
-
-## Rationale
-
-Hierarchical organization enables efficient transforms; cleanup prevents GPU memory exhaustion; delta time ensures consistent movement across devices.
-
-## Example
+Organize scenes in Groups; multiply movement by delta time for frame-rate independence; pool objects and clean up to avoid GPU memory exhaustion.
 
 ```javascript
-const scene = new THREE.Scene();
-const clock = new THREE.Clock();
 const world = new THREE.Group();
 world.add(player, enemies, effects);
 scene.add(world);
@@ -30,6 +20,6 @@ function animate() {
 - Scene hierarchy: Group objects (world → player/enemies/effects) for batch transforms
 - Frame-rate independence: Multiply movement by `clock.getDelta()`; use `getElapsedTime()` for animations
 - Cleanup pattern: Dispose geometry/materials; `mixer.stopAllAction()`, remove listeners, call on `beforeunload`
-- Object pooling: Reuse bullets/particles with `.visible` flag instead of create/destroy for performance
+- Object pooling: Reuse bullets/particles with `.visible` flag instead of create/destroy
 - Component pattern: Encapsulate entities (Player class with update/takeDamage methods)
 - Event bus: Centralize game events for decoupled communication between systems

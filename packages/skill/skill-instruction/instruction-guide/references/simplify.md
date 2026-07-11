@@ -4,12 +4,7 @@ Reduce AGENTS.md verbosity by 40-50% while preserving structure, workflows, and 
 
 ## Core Workflow
 
-1. Track steps in a task list
-2. Read file and measure baseline
-3. Analyze sections (Structure, Subdirectories, Workflow, Integration Points)
-4. Apply simplification rules
-5. Preview or write changes
-6. Report metrics
+Measure baseline → analyze sections (Structure, Subdirectories, Workflow, Integration Points) → apply simplification rules → preview or write → report metrics. Skip files <15 lines.
 
 ## Simplification Rules
 
@@ -35,24 +30,7 @@ section headings, dependencies, command examples with actual tool names, file/di
 
 Environment configs (`main.tf`, vars, `backend.sh`) - local, staging
 
-## Implementation
-
-- Skip files <15 lines
-- Preserve section hierarchy
-- Convert verbose descriptions to inline parenthetical details
-- Use `→` for workflow chains
-- Keep actual technology names
-
-## Error Handling
-
-- File not found: verify path
-- Already minimal: skip if <15 lines
-- Invalid reduction: must be 30-60%
-- Not AGENTS.md: warn and confirm
-
-## Safety
-
-Preserve headings/patterns/commands; preview before writing; never remove integration points or technology references.
+Valid reduction range: 30-60%.
 
 ## Gotchas
 

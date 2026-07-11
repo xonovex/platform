@@ -10,11 +10,10 @@ Author and maintain plan documents across their full lifecycle (research → dec
 ## Core Principles
 
 - **Research first** — analyze before authoring; never plan blind
-- **Reports, not code** — research operations produce reports; only `plan-continue` modifies the codebase
+- **Reports, not code** — all research/analysis operations are read-only and generate reports for `plan-create` to consume; only `plan-continue` modifies the codebase
 - **Validation required** — every plan's success criteria back-checks with typecheck / lint / build / tests
 - **Skills to consult** — every plan lists which guideline skills implementers must read first
-- **Read-only research** — exploration / analysis operations never modify files; they generate reports for `plan-create` to consume
-- **Use available tools** — if the environment provides task tracking, file search, code analysis, or other tools, use them rather than working from memory or assumptions
+- **Use available tools** — prefer environment-provided task tracking, file search, and code analysis over working from memory
 
 ## Gotchas
 
@@ -38,28 +37,6 @@ Author and maintain plan documents across their full lifecycle (research → dec
 7. **Execute** — `plan-continue` works through subplans one at a time
 8. **Update** — `plan-update` refreshes status / phase / validation results
 9. **Validate** — `plan-validate` confirms success criteria are met (read-only)
-
-## Code-Research Operations
-
-- **Audit code quality (harden / simplify / align)** — `plan-research` applies the **code-quality-guide** dimensions and reports findings for `plan-create`
-- **Remove barrel exports** — see [references/code-barrels-remove.md](references/code-barrels-remove.md)
-- **Remove non-essential comments** — see [references/code-comments-remove.md](references/code-comments-remove.md)
-- **Extract shared utilities** — see [references/code-shared-extract.md](references/code-shared-extract.md)
-- **Extract reusable templates** — see [references/code-template-extract.md](references/code-template-extract.md)
-- **Scaffold from templates** — see [references/code-template-scaffold.md](references/code-template-scaffold.md)
-- **Scan / group TODO comments** — see [references/todos.md](references/todos.md)
-
-## Plan Operations
-
-- **Research** the codebase + web — see [references/plan-research.md](references/plan-research.md)
-- **Decide** — settle decisions one at a time (walk known / discover unknown) — see [references/plan-decide.md](references/plan-decide.md)
-- **Create** a plan with research — see [references/plan-create.md](references/plan-create.md)
-- **Revise** from feedback (annotations / prompt) — see [references/plan-revise.md](references/plan-revise.md)
-- **Critique** the plan adversarially — see [references/plan-critique.md](references/plan-critique.md)
-- **Generate subplans** from an approved parent — see [references/plan-subplans-create.md](references/plan-subplans-create.md)
-- **Continue** work from an existing plan — see [references/plan-continue.md](references/plan-continue.md)
-- **Update** plan status / progress — see [references/plan-update.md](references/plan-update.md)
-- **Validate** plan achievement — see [references/plan-validate.md](references/plan-validate.md)
 
 ## Progressive Disclosure
 

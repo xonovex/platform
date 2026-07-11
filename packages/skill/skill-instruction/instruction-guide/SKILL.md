@@ -16,8 +16,7 @@ Author, refresh, simplify, consolidate, and port AGENTS.md project-instruction f
 - **Commands are executable** — agents auto-run programmatic checks listed in AGENTS.md; treat command examples as instructions, not just docs
 - **Preserve Project Context** — never modify technology names, paths, or commands
 - **Match Style and Voice** — maintain the target file's formatting and terminology
-- **Structure Integrity** — keep section order and hierarchy intact
-- **Safe Modifications** — preview changes (dry-run) before applying
+- **Structure Integrity** — keep section order and hierarchy intact; preview changes (dry-run) before applying
 - **Signal Over Volume** — keep only non-obvious content; anything inferable from `package.json` + source belongs in the code, not the doc
 - **Living documentation** — update alongside project changes (sync operation)
 
@@ -29,14 +28,6 @@ Author, refresh, simplify, consolidate, and port AGENTS.md project-instruction f
 - Manual descriptions in Subdirectories often encode info the filesystem can't (purpose, owner, status) — preserve verbatim during sync
 - Nested AGENTS.md aren't duplicates — they're scope-specific overrides; never merge a subproject's file into the root
 - Build / test commands listed in AGENTS.md will be **executed** by agents; broken commands waste agent turns
-
-## Operations
-
-- **Init** — bootstrap a fresh AGENTS.md for a directory — see [references/init.md](references/init.md)
-- **Sync** — refresh AGENTS.md to match current directory state — see [references/sync.md](references/sync.md)
-- **Simplify** — reduce verbosity while preserving structure and workflows — see [references/simplify.md](references/simplify.md)
-- **Consolidate** — dedupe across the repo and standardize bullet-list format — see [references/consolidate.md](references/consolidate.md)
-- **Merge / assimilate** — port organizational patterns from another project — see [references/merge.md](references/merge.md)
 
 ## Progressive Disclosure
 

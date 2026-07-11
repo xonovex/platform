@@ -1,14 +1,6 @@
 # project-structure: Project Structure and Organization
 
-## Guideline
-
-Organize using conventional directories: pages, components, layouts, content, public.
-
-## Rationale
-
-Opinionated defaults enable file-based routing, clear separation of concerns, better maintainability, easier navigation.
-
-## Example
+Use Astro's conventional directories. `src/pages/` drives file-based routing; `[slug].astro` becomes a dynamic segment; `public/` files are served as-is at the root.
 
 ```
 src/
@@ -16,22 +8,11 @@ src/
 │   ├── index.astro           # → /
 │   ├── about.astro           # → /about
 │   └── blog/[slug].astro     # → /blog/:slug
-├── components/
-│   ├── Header.astro
-│   ├── Card.tsx
-├── layouts/
-│   ├── BaseLayout.astro
-│   └── BlogLayout.astro
+├── components/               # reusable .astro / framework components
+├── layouts/                  # shared page shells
 ├── content/
-│   ├── config.ts
+│   ├── config.ts             # collection schemas
 │   └── posts/
 └── styles/global.css
+public/                       # served verbatim at site root
 ```
-
-## Techniques
-
-- Pages directory: Place routes in `src/pages/` for automatic file-based routing
-- Components folder: Store reusable components in `src/components/`
-- Layouts directory: Create reusable layouts in `src/layouts/`
-- Content collections: Organize structured content in `src/content/[collection]/`
-- Static assets: Place static files in `public/` directory for direct access

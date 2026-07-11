@@ -1,14 +1,5 @@
 # text-and-targets: Text resize, reflow & touch-target size
 
----
-
-## Contents
-
-- [Size text in scalable units (`sp`), never `dp`](#size-text-in-scalable-units-sp-never-dp)
-- [Let text reflow — no `maxLines=1` + ellipsize that hides content](#let-text-reflow--no-maxlines1--ellipsize-that-hides-content)
-- [Never defeat font scaling globally (`fontScale`, density)](#never-defeat-font-scaling-globally-fontscale-density)
-- [Touch targets ≥ 48dp without enlarging the visual](#touch-targets--48dp-without-enlarging-the-visual)
-
 ## Size text in scalable units (`sp`), never `dp`
 
 ### Guideline

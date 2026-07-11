@@ -1,15 +1,6 @@
 # plan-validate: Validate Plan Achievement
 
-Verify a plan document's objectives have been fully achieved: success criteria pass
-AND the code structurally matches what the plan describes. Read-only — never modifies files.
-
-## Goal
-
-- Run success criteria checks (build, test, grep commands)
-- Audit code vs plan structure (types, functions, naming, data flow)
-- Check cross-subplan consistency (shared concepts described the same way)
-- Report clear pass/fail with evidence
-- Never modify files
+Verify a plan's objectives are fully achieved: success criteria pass AND the code structurally matches what the plan describes. Read-only — never modifies files (use `plan-update` to change status).
 
 ## Core Workflow
 
@@ -30,10 +21,6 @@ AND the code structurally matches what the plan describes. Read-only — never m
 6. **Cross-subplan consistency** — shared concepts named the same way across subplans,
    no contradictions, dependencies reference things that exist
 7. **Report** — per-criterion PASS/FAIL, per-task match/deviation, consistency issues
-
-#### IMPORTANT
-
-Read-only; use `plan-update` to update status.
 
 ### Without Plan Document (Current Work)
 

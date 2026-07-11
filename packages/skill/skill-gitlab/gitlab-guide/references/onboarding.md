@@ -9,7 +9,7 @@ brew install glab            # the only officially supported installer
 glab version                 # confirm
 ```
 
-Community packages exist (snap, dnf, pacman, nixpkgs) but may lag the official release. After install, `glab version` should print a 1.x (or 2.x) version.
+Community packages exist (snap, dnf, pacman, nixpkgs) but may lag the official release.
 
 ## 2. Authenticate
 

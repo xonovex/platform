@@ -1,14 +1,6 @@
-# filename: 3d-effects
+# 3d-effects: 3D Cards and Perspective
 
-## Guideline
-
-Set `perspective` on parent; use `transformStyle: "preserve-3d"` on children; drive 3D via `useMotionValue` + `useSpring`.
-
-## Rationale
-
-Perspective creates 3D depth; preserve-3d enables layering; motion values drive smooth tilt/flip without re-renders.
-
-## Example
+Set `perspective` on the parent, `transformStyle: "preserve-3d"` on children; drive tilt/flip via `useMotionValue` + `useSpring` (no re-renders).
 
 ```tsx
 function Card3D({children}: {children: React.ReactNode}) {
@@ -30,11 +22,9 @@ function Card3D({children}: {children: React.ReactNode}) {
 }
 ```
 
-## Techniques
-
-- Parent perspective: `style={{perspective: 1000}}`; higher = less depth distortion
-- Flip cards: `animate={{rotateY: isFlipped ? 180 : 0}}`; use `backfaceVisibility: "hidden"`
-- 3D carousel: Position items with `rotateY(angle)` and `translateZ()` in transforms
-- Layered stacks: `translateZ(i * 20px)` for depth; `whileHover={{rotateX, rotateY}}` on container
-- Shine effect: Use `useTransform()` to derive shine position from mouse coordinates; gradient follows
-- Transform properties: `rotateX/Y/Z`, `x/y/z`, `scale/scaleX/Y/Z`, `transformOrigin`
+- Parent perspective: `style={{perspective: 1000}}` — higher = less depth distortion
+- Flip cards: `animate={{rotateY: isFlipped ? 180 : 0}}` + `backfaceVisibility: "hidden"`
+- 3D carousel: position items with `rotateY(angle)` + `translateZ()`
+- Layered stacks: `translateZ(i * 20px)` for depth
+- Shine: `useTransform()` to derive gradient position from mouse coords
+- Transform props: `rotateX/Y/Z`, `x/y/z`, `scale/scaleX/Y/Z`, `transformOrigin`

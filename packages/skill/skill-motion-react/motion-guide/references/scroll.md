@@ -1,14 +1,6 @@
-# filename: scroll
+# scroll: Reveals and Parallax
 
-## Guideline
-
-Use `whileInView` for scroll-triggered reveals; use `useScroll()` + `useTransform()` for precise parallax and scroll-linked effects.
-
-## Rationale
-
-`whileInView` leverages Intersection Observer; `useScroll()` enables smooth parallax without scroll listeners; `useTransform` maps scroll range to outputs.
-
-## Example
+Use `whileInView` (Intersection Observer) for scroll-triggered reveals; use `useScroll()` + `useTransform()` for scroll-linked parallax without scroll listeners.
 
 ```tsx
 function ScrollReveal({children}) {
@@ -35,12 +27,8 @@ function Parallax() {
 }
 ```
 
-## Techniques
-
-- `whileInView`: Animates when element enters viewport; `viewport={{once: true, amount: 0.3}}` triggers at 30% visible
-- `useScroll()`: Returns `scrollX/Y` and `scrollXProgress/scrollYProgress` (0-1 normalized)
-- `useTransform(scrollProgress, [0, 1], [outputStart, outputEnd])`: Map scroll to colors, positions, scale
-- `useInView(ref, {once: true})`: Imperative boolean hook for manual control
-- Staggered scroll reveal: `variants` with `staggerChildren` inside `whileInView`
-- Scroll progress bar: `scaleX: scrollYProgress` with `transformOrigin: "left"`
-- Viewport options: `amount` (0-1), `margin` (CSS pixels), `once: true` (single animation)
+- `viewport`: `amount` (0-1 visible fraction), `margin` (CSS px), `once: true` (single fire)
+- `useScroll()`: `scrollX/Y` + `scrollXProgress/scrollYProgress` (0-1)
+- `useInView(ref, {once: true})`: imperative boolean hook
+- Progress bar: `scaleX: scrollYProgress` with `transformOrigin: "left"`
+- Staggered reveal: `variants` + `staggerChildren` inside `whileInView`

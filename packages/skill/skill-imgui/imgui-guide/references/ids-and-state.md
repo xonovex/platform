@@ -6,7 +6,7 @@ Identify every interactive control by a stable unique id and key all persistent 
 
 ## Rationale
 
-In immediate mode there are no retained widget objects to hang state on, yet hover, the currently-pressed control, keyboard focus, and an in-progress drag must survive between frames. An id is the substitute identity. If ids are unstable (derived from screen position) or collide (reused in a loop without scoping), two controls share one state slot and interaction jumps between them.
+The id is the substitute for a retained widget identity. If ids are unstable (derived from screen position) or collide (reused in a loop without scoping), two controls share one state slot and interaction jumps between them.
 
 ## How to Apply
 

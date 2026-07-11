@@ -45,23 +45,9 @@ Rewrite in target's voice → insert in existing sections → match format exact
 
 Extract only specified aspects (e.g., "validation" = validation content only)
 
-## Implementation
-
-### Discovery
+## Discovery
 
 Accept SKILL.md paths or names (e.g., `typescript-guide` → `<skills-dir>/typescript-guide/SKILL.md`)
-
-### Analysis
-
-Parse target structure → analyze bullet/formatting patterns → detect voice → extract style rules → build template
-
-### Extraction
-
-Parse source → extract examples/patterns → read reference files → filter by aspects
-
-### Integration
-
-Rewrite in target's voice → insert in existing sections → merge reference files → validate consistency
 
 ## Error Handling
 

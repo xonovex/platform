@@ -1,14 +1,6 @@
-# filename: layering
+# layering: Combining Patterns with stack()
 
-## Guideline
-
-Use `stack()` to combine independent patterns organized by role (rhythm, bass, harmony, melody) with balanced gain levels.
-
-## Rationale
-
-Clear layer hierarchy prevents overlap and mud; role-based organization enables independent editing and coherent mixes.
-
-## Example
+Combine independent patterns with `stack()`, ordered by role with balanced gains.
 
 ```javascript
 stack(
@@ -19,10 +11,7 @@ stack(
 );
 ```
 
-## Techniques
-
-- Layer hierarchy: Kick 0.8-0.9, Bass 0.5-0.6, Lead 0.4-0.5, Pads 0.2-0.4, Hats 0.2-0.4
-- Multi-layer drums: `.late(0.01)` and `.late(0.02)` offsets for depth
-- Role organization: Rhythm → Bass → Harmony → Melody → Texture in stack order
-- Variable patterns: Define as `const layer = pattern` for clarity and reusability
-- Combination functions: `stack()` simultaneous, `cat()` sequential per cycle, `arrange()` explicit counts
+- Gain hierarchy: kick 0.8-0.9, bass 0.5-0.6, lead 0.4-0.5, pads 0.2-0.4, hats 0.2-0.4
+- Stack order: rhythm → bass → harmony → melody → texture
+- `.late(0.01)` / `.late(0.02)`: micro-offset layered drums for depth
+- `stack()` simultaneous · `cat()` sequential per cycle · `arrange()` explicit cycle counts

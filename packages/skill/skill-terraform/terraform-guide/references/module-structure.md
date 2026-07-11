@@ -1,55 +1,15 @@
 # module-structure: Module Organization
 
-## Guideline
-
-Organize modules with separate directories for reusable modules and environment-specific configurations
-
-## Rationale
-
-Clear separation between modules and environments enables reusability and environment isolation
-
-## Example
+Separate reusable `modules/` (grouped by capability) from per-environment root modules under `environments/`. Every module and env uses the standard `main.tf`, `variables.tf`, `outputs.tf` (+ `backend.tf` for envs); each module carries a `README.md`. Source modules by relative path (`../../modules/network`) for portability.
 
 ```
 terraform/
 ├── modules/
-│   ├── network/
-│   │   ├── main.tf
-│   │   ├── variables.tf
-│   │   ├── outputs.tf
-│   │   └── README.md
-│   ├── compute/
-│   │   ├── main.tf
-│   │   ├── variables.tf
-│   │   ├── outputs.tf
-│   │   └── README.md
-│   └── database/
-│       ├── main.tf
-│       ├── variables.tf
-│       ├── outputs.tf
-│       └── README.md
+│   ├── network/   {main,variables,outputs}.tf + README.md
+│   ├── compute/   {main,variables,outputs}.tf + README.md
+│   └── database/  {main,variables,outputs}.tf + README.md
 └── environments/
-    ├── dev/
-    │   ├── main.tf
-    │   ├── variables.tf
-    │   ├── terraform.tfvars
-    │   └── backend.tf
-    ├── staging/
-    │   ├── main.tf
-    │   ├── variables.tf
-    │   ├── terraform.tfvars
-    │   └── backend.tf
-    └── prod/
-        ├── main.tf
-        ├── variables.tf
-        ├── terraform.tfvars
-        └── backend.tf
+    ├── dev/       {main,variables}.tf + terraform.tfvars + backend.tf
+    ├── staging/   {main,variables}.tf + terraform.tfvars + backend.tf
+    └── prod/      {main,variables}.tf + terraform.tfvars + backend.tf
 ```
-
-## Techniques
-
-- **Modules directory:** Group reusable infrastructure components by capability
-- **Environments directory:** Create separate root modules for dev, staging, prod
-- **Standard files:** Use main.tf, variables.tf, outputs.tf, backend.tf consistently
-- **Module README:** Document each module's purpose, variables, and outputs
-- **Relative sourcing:** Use relative paths in module sources for portability

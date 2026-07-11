@@ -6,7 +6,7 @@ Treat device input as another platform backend behind the input-source interface
 
 ## Rationale
 
-Input devices are heterogeneous, hot-pluggable, and OS-specific, so doing it inline couples gameplay/UI code to one platform's device API and to one controller's quirks. Routing through the same input-source interface the windowing backend uses means callers consume uniform events regardless of platform or device. Probing capabilities (which buttons and axes a device actually reports, and each axis's range and deadzone) before mapping prevents reading garbage from a device that is not the gamepad you assumed. Non-blocking reads keep the device poll inside the frame without stalling it. A mapping table keyed by the raw OS code is what tames the messy reality that one physical control can be 1:1 (a button), 2:1 (two axes → one stick), or 1:2 (one hat axis → two D-pad directions) — a table expresses all three uniformly, whereas `if/else` chains rot.
+Probe capabilities (which buttons/axes a device reports, plus each axis's range and deadzone) before mapping, or you read garbage from a device that is not the gamepad you assumed. A table keyed by raw OS code tames the reality that one physical control can be 1:1 (a button), 2:1 (two axes → one stick), or 1:2 (one hat axis → two D-pad directions); `if/else` chains rot.
 
 ## How to Apply
 

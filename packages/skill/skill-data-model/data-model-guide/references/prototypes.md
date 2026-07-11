@@ -6,7 +6,7 @@ Let any object act as a prototype for another object of the same type, where the
 
 ## Rationale
 
-Editors need "edit the template, all the copies update — but keep the local tweaks" (prefabs, presets, blueprints). Building that as instance-level prototype inheritance, where _any_ object can be a prototype, is far more flexible than class inheritance: it applies to any data type, lives in data rather than code, needs no class hierarchy, and stays decidable (no computed-property expressions, so no halting-problem or surprise recomputation). Storing only overrides is the payoff — files shrink to the differences from the prototype, merges stay clean, and an un-overridden property tracks the prototype automatically. A per-property override bitmask makes "is this inherited or overridden?" an O(1) check, and resolving a property walks the prototype chain until someone overrides it.
+Editors need "edit the template, all copies update — but keep the local tweaks" (prefabs, presets, blueprints). Instance-level prototype inheritance where _any_ object can be a prototype beats class inheritance: it applies to any data type, lives in data not code, needs no class hierarchy, and stays decidable (no computed-property expressions, so no surprise recomputation). Storing only overrides is the payoff — files shrink to the diff from the prototype, merges stay clean, an un-overridden property tracks the prototype automatically. A per-property override bitmask makes "inherited or overridden?" O(1); resolving a property walks the chain until someone overrides it.
 
 ## How to Apply
 

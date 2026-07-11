@@ -1,14 +1,6 @@
 # geometry: Geometry and BufferGeometry
 
-## Guideline
-
-Use built-in geometries for standard shapes; create efficient custom BufferGeometry with position/UV/indices/normals; use InstancedMesh.
-
-## Rationale
-
-Built-ins are optimized; proper BufferGeometry avoids redundant data; InstancedMesh enables thousands of copies in one draw call.
-
-## Example
+Use built-in geometries for standard shapes; build custom BufferGeometry with position/UV/indices/normals; use InstancedMesh for many copies.
 
 ```javascript
 const geometry = new THREE.BufferGeometry();

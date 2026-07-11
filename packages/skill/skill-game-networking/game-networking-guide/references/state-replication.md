@@ -6,15 +6,7 @@ Replicate the game by synchronizing the state of opted-in objects and their comp
 
 ## Rationale
 
-A multiplayer game is, at bottom, the same simulation running on several nodes kept in agreement about object state. If everything were replicated automatically the wire would drown in irrelevant data; if replication required hand-written serialization for every type, prototyping would be painful. The resolution is a two-level opt-in: a component declares whether and how it replicates (no declaration means it never goes on the wire), and each object instance is individually flagged for replication (an object whose components are replicable still isn't sent unless flagged). The owning node watches replicated components for changes and pushes diffs outward. The default path can be deliberately inefficient — copy the whole component as an opaque blob — so multiplayer "just works" early; later you hand the system a field-by-field layout description and per-field change-check cadence so only changed members travel. This lets you ship a prototype fast and optimize the wire format exactly where profiling says to.
-
-## Contents
-
-- Two-level opt-in (component capability + per-object flag)
-- Change detection and watch cadence
-- Whole-object blob vs. described layout
-- Relevancy: sending only to interested nodes
-- Replicating events and variables (RPC-like)
+A two-level opt-in keeps the wire lean without hand-written serialization per type: a component declares whether and how it replicates (no declaration means it never goes on the wire), and each object instance is individually flagged for replication (an object whose components are replicable still isn't sent unless flagged). The owning node watches replicated components for changes and pushes diffs outward. The default path can be deliberately inefficient — copy the whole component as an opaque blob — so multiplayer "just works" early; later you hand the system a field-by-field layout description and per-field change-check cadence so only changed members travel.
 
 ### How to Apply
 

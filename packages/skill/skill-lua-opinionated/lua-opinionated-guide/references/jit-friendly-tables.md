@@ -1,62 +1,22 @@
 # jit-friendly-tables: JIT-Friendly Table Operations
 
-## Guideline
-
-Keep table shapes stable by pre-allocating all fields and avoid adding fields after creation.
-
-## Rationale
-
-LuaJIT optimizes based on table shape. Adding fields later causes shape changes that prevent JIT compilation and reduce performance.
-
-## Example
+Define all fields in the table literal/constructor and never add fields after creation — LuaJIT specializes on table shape, so a later field addition changes the shape and deoptimizes the trace. Pre-allocate arrays to their known size, keep them dense (no `nil` holes, which break `#` and fast array traces), and iterate arrays with numeric `for i = 1, #t` rather than `pairs()`, which the JIT can't compile as tightly.
 
 ```lua
--- ✅ Good - stable tables
+-- ✅ stable shape: all fields in the literal
 local function create_entity(x, y, type)
-    -- Pre-allocate all fields
-    return {
-        x = x,
-        y = y,
-        type = type,
-        velocity_x = 0,
-        velocity_y = 0,
-        health = 100,
-        active = true
-    }
+    return { x = x, y = y, type = type, velocity_x = 0, velocity_y = 0, health = 100, active = true }
 end
 
--- ✅ Good - pre-allocated array
-local function create_array(size)
-    local arr = {}
-    for i = 1, size do
-        arr[i] = 0
-    end
-    return arr
-end
-
--- ❌ Bad - unstable table (fields added after creation)
+-- ❌ unstable shape: fields added after creation
 local function create_entity_bad(x, y)
-    local entity = {x = x, y = y}
-    -- Adding fields later hurts JIT
-    entity.velocity_x = 0
-    entity.velocity_y = 0
+    local entity = { x = x, y = y }
+    entity.velocity_x = 0  -- shape change deoptimizes the JIT
     return entity
 end
 
--- ❌ Bad - using pairs in hot path
-for k, v in pairs(entities) do  -- Slow
-    update_entity(v)
-end
-
--- ✅ Good - numeric for loop
-for i = 1, #entities do  -- Fast
-    update_entity(entities[i])
-end
+-- ✅ pre-allocate dense array, iterate numerically
+local arr = {}
+for i = 1, size do arr[i] = 0 end
+for i = 1, #entities do update_entity(entities[i]) end  -- not pairs()
 ```
-
-## Techniques
-
-- Define all fields in table literal or constructor
-- Pre-allocate arrays with known size
-- Use numeric for loops instead of `pairs` for arrays
-- Avoid sparse arrays

@@ -6,14 +6,7 @@ Separate frequently-accessed (hot) fields from rarely-accessed (cold) fields int
 
 ## Rationale
 
-A "fat struct" mixes fields touched every frame with fields touched once (names, debug data, config, backreferences). Because the cache loads whole 64-byte lines, every hot iteration also pulls in the cold bytes that share the record, inflating the working set and evicting useful data. Splitting shrinks the hot record so far more useful elements fit per line and per cache level, often turning a capacity-miss-bound loop into a streaming one — frequently the single highest-leverage DOD refactor.
-
-## How to Apply
-
-1. Instrument or reason about which fields the hot loops actually read/write every iteration.
-2. Move those into a compact `hot` array; move the rest into a parallel `cold` array indexed the same way (or referenced by a handle).
-3. Keep the two in lockstep by index so element `i` in hot corresponds to element `i` in cold.
-4. Measure: the hot loop should now load fewer cache lines and show fewer capacity misses.
+A "fat struct" mixes fields touched every frame with fields touched once (names, debug data, config, backreferences). Because the cache loads whole 64-byte lines, every hot iteration also pulls in the cold bytes that share the record, inflating the working set and evicting useful data. Splitting shrinks the hot record so far more useful elements fit per line and per cache level, often turning a capacity-miss-bound loop into a streaming one — frequently the single highest-leverage DOD refactor. Keep the hot and cold arrays in lockstep by index so element `i` in hot corresponds to element `i` in cold.
 
 ## Example
 

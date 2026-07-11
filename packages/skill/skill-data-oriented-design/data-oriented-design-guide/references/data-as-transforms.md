@@ -16,13 +16,6 @@ The principle "where there is one, there are many": singletons are rare in real 
 - **Design around the statistics** - Most entities idle, most rays miss, most cells are empty: lay out for the common case and handle the rare case as a separate, smaller stream.
 - **Data first, code second** - Decide the layout from how data is produced and consumed, then write the code that fits it — not the reverse.
 
-## How to Apply
-
-1. List the inputs each system actually reads and the outputs it produces; ignore the conceptual "object."
-2. Express the system as `process(const In *in, Out *out, size_t n)`.
-3. Group same-typed instances into contiguous arrays (one transform sees one type).
-4. Order phases so each pass is a single linear sweep over its input.
-
 ## Example
 
 ```c
@@ -42,7 +35,6 @@ static void integrate(const body_t *in, body_t *out, size_t n, float dt) {
 
 ## Gotchas
 
-- The object model is a comfortable lie about the data; the hardware sees bytes and streams, not objects.
 - Resist hiding the loop behind a per-item method — that reintroduces dispatch and kills batching.
 
 ## Related

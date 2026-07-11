@@ -1,18 +1,9 @@
 # genre-ambient: Ambient and Atmospheric Music
 
-## Guideline
-
-Create atmospheric soundscapes with slow tempos, sparse elements, heavy reverb, and gradual evolution.
-
-## Rationale
-
-Ambient music relies on slow pacing, delayed effects, and minimal change to create meditative, immersive atmospheres.
-
-## Example
+Slow tempo, sparse elements, heavy reverb, and long envelopes for meditative soundscapes.
 
 ```javascript
 setcpm(70 / 4); // 70 BPM
-
 stack(
   note("c2")
     .sound("sine")
@@ -42,10 +33,6 @@ stack(
 );
 ```
 
-## Techniques
-
-- Slow tempo (60-90 BPM): Use `setcpm(70/4)` for 70 BPM
-- Heavy reverb: `.room(0.85-0.95)` for spatial depth
-- Sparse elements: `.degradeBy(0.3-0.5)` to drop notes randomly
-- Long envelopes: `.attack(2-4)` and `.release(3-4)` for gradual transitions
-- Layered drones: Stack multiple sine/triangle notes at different octaves with `.slow()` modulation
+- Tempo 60-90 BPM; reverb `.room(0.85-0.95)`
+- Long envelopes: `.attack(2-4)` `.release(3-4)`
+- `.degradeBy(0.3-0.5)` to thin notes; stack sine/triangle drones across octaves with `.slow()`

@@ -1,37 +1,17 @@
 # async-without-await: Only Use Async When Function Contains Await
 
-## Guideline
-
-Only use `async` when function contains `await` or must return Promise.
-
-## Rationale
-
-Unnecessary `async` adds overhead and misleads readers about async behavior.
-
-## Example
+Mark a function `async` only when it contains `await` or must return a Promise — otherwise drop the keyword. Conversely, keep `async` wherever the body uses `await`; never rewrite an awaiting function into a `.then()` chain just to shed the keyword. Caught by ESLint `@typescript-eslint/require-await`.
 
 ```typescript
-// ❌ Bad: async without await
+// ❌ async, no await
 const middleware = async (c, next) => {
   c.set("user", getUser());
 };
-
-// ✅ Good: Remove async
+// ✅ drop async (sync body)
 const middleware = (c, next) => {
   c.set("user", getUser());
 };
-
-// ✅ Good: Return Promise explicitly if needed
-const middleware = (c, next) => {
-  c.set("user", getUser());
-  return Promise.resolve();
-};
+// ✅ keep async when the body awaits — don't convert to a .then() chain
+const loadConfig = async () =>
+  JSON.parse(await readFile("config.json", "utf8"));
 ```
-
-## Techniques
-
-- Review each `async` function for `await` expressions
-- Remove `async` keyword if no `await` found
-- Return `Promise.resolve()` explicitly if signature requires Promise
-- Run ESLint to find @typescript-eslint/require-await violations
-- Verify function behavior unchanged after removal

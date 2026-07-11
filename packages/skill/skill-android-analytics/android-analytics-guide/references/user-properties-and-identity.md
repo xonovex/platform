@@ -4,10 +4,6 @@
 
 Set slowly-changing user dimensions once via a typed `setUserProperties` call keyed by an enum, and keep identity (user id, session id) inside the tracker layer — never re-derive them into per-event params.
 
-## Rationale
-
-Stuffing `isLoggedIn`, `appLanguage`, or a user id into every event's params means each call site must re-derive state, the values drift between events, and renaming a dimension forces edits across dozens of tracking sites. User properties model dimensions that change rarely and apply to _all_ subsequent events; pushing them per-event inflates payloads, splits the source of truth, and risks leaking identifiers into events that should not carry them. A typed key set also stops two call sites from disagreeing on the spelling of a property key.
-
 ## How to Apply
 
 1. Define a closed key set (an `enum class AnalyticsUserProperty`) and expose `fun setUserProperties(properties: Map<AnalyticsUserProperty, String>)` on the tracker — no raw `String` keys.

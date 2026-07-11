@@ -5,16 +5,15 @@ description: "Use when reflecting on a session or distilling lessons into reusab
 
 # Reflection Guidelines
 
-Reflect on a session to capture development lessons (insights) and integrate them either as AGENTS.md bullets (project instructions) or as a guideline skill (reusable across sessions).
+Reflect on a session to capture development lessons (insights) and integrate them as AGENTS.md bullets (project instructions) or a guideline skill (reusable across sessions).
 
 ## Core Principles
 
-- **Extract from experience** — analyze the session for mistakes, discoveries, and corrections, not hypotheticals
-- **Identify general patterns** — capture only insights that apply beyond the current task
-- **Apply directly by default** — `integrate-instructions` and `integrate-skills` extract from the session and write STRAIGHT to AGENTS.md / the owning skill; persisting insights as `reflections/*.md` first is an optional audit step (`--persist`), not a prerequisite. Use `extract` only when you explicitly want the stored files, or `--from-reflections` to integrate ones already stored.
-- **Route by `applies_to`** — each insight carries `category` / `topic` / `applies_to`; `applies_to` picks the nearest AGENTS.md or the owning skill, whether the insight is held in memory or stored
-- **Two integration paths** — small one-off lessons → AGENTS.md (project instructions); recurring patterns with enough mass → guideline skill
-- **`applied: false` is the pending flag** — only for persisted insights; flip it after the insight is integrated
+- **Extract from the session** — analyze actual mistakes, discoveries, and corrections, not hypotheticals; keep only patterns that apply beyond the current task
+- **Apply directly by default** — `integrate-instructions` / `integrate-skills` extract and write STRAIGHT to AGENTS.md / the owning skill; persisting `reflections/*.md` first is the optional `--persist` audit step, not a prerequisite. Use `extract` only for the stored files, `--from-reflections` to integrate already-stored ones
+- **Route by `applies_to`** — each insight's `category` / `topic` / `applies_to` picks the nearest AGENTS.md or the owning skill
+- **Two paths** — small one-off lessons → AGENTS.md; recurring patterns with 3-7 worth-keeping bullets → guideline skill
+- **`applied: false`** — the pending flag, persisted insights only; flip it after integration
 
 ## Gotchas
 
@@ -23,12 +22,6 @@ Reflect on a session to capture development lessons (insights) and integrate the
 - One-off corrections don't deserve a whole skill — fold them into AGENTS.md instead
 - A skill with only 1-2 essentials is filler — wait until the category has 3-7 worth-keeping bullets
 - A generated skill must follow skill-guide's naming and metadata conventions (`{category}-guide`, its description shape), not an ad-hoc inline format, to avoid drift from sibling skills
-
-## Operations
-
-- **Extract** — capture development lessons from the current session and STORE them as `reflections/*.md` (the explicit persist step) — see [references/extract.md](references/extract.md)
-- **Integrate-instructions** — fold insights into AGENTS.md as bullet points; extracts from the session by default (`--from-reflections` to read stored files) — see [references/integrate-instructions.md](references/integrate-instructions.md)
-- **Integrate-skills** — apply insights into the owning skill (or a new `{category}-guide`); extracts from the session by default (`--from-reflections` to read stored files) — see [references/integrate-skills.md](references/integrate-skills.md)
 
 ## Progressive Disclosure
 

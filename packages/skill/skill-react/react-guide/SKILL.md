@@ -12,11 +12,7 @@ description: "Use when building or editing React 19+ components, hooks, or app r
 ## React 19 Essentials
 
 - **Server-first** - Components run on server by default; add `'use client'` only for interactivity
-- **Compiler handles memoization** - Write clean code; React Compiler optimizes automatically
-- **ref as prop** - Pass `ref` directly, no `forwardRef` wrapper needed
-- **Context as provider** - Use `<Context value={}>` directly, not `.Provider`
 - **Form Actions** - Use `useActionState` and `FormData` instead of controlled inputs
-- **New hooks** - `useActionState`, `useOptimistic`, `use()`, `useFormStatus`
 - **Native metadata** - Use `<title>`, `<meta>`, `<link>` anywhere, auto-hoisted to `<head>`
 
 ## Quick Reference
@@ -107,7 +103,6 @@ function App({children}) {
 
 ### Migration from React 18
 
-- Read [references/migration-paradigm-shifts.md](references/migration-paradigm-shifts.md) - Load when adapting mental model from React 18 to React 19
-- Read [references/migration-anti-patterns.md](references/migration-anti-patterns.md) - Load when avoiding outdated patterns (useEffect for data, manual loading states)
+- Read [references/migration-anti-patterns.md](references/migration-anti-patterns.md) - Load when adapting the React 18→19 mental model or avoiding outdated patterns (useEffect for data, manual loading states)
 - Read [references/migration-deprecations.md](references/migration-deprecations.md) - Load when migrating from React 18 or handling removed APIs
 - Read [references/migration-typescript.md](references/migration-typescript.md) - Load when fixing TypeScript errors after React 19 upgrade

@@ -1,12 +1,10 @@
 # Robustness
 
-Audit existing code for how it behaves at boundaries and under bad input — type safety, validation, error handling, and logging — then grade each finding by severity; this is a read-only pass, you flag and grade, you do not edit.
+Read-only audit of how code behaves at boundaries and under bad input — type safety, validation, error handling, logging — flagging and grading each finding, never editing.
 
-Read the project's own `AGENTS.md` / guidelines / linter + type-checker config **first**: they decide what counts as a violation. A pattern the project bans is high severity even if benign in general; a pattern it explicitly allows is not a finding.
+Read the project's own `AGENTS.md` / guidelines / linter + type-checker config **first**: they decide what counts as a violation. A pattern the project bans is a finding even if benign in general; a pattern it explicitly allows is not.
 
-## What to look for
-
-Group findings by category, then grade each by severity.
+## What to flag
 
 | Category           | Signals to flag                                                                                                                                                                                             |
 | ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -22,53 +20,13 @@ Group findings by category, then grade each by severity.
 - **Medium** — internal type escape, lost error context (cause dropped, generic message), error path with no log, broad catch collapsing distinct failures, long/complex function on a hot path.
 - **Low** — naming/level inconsistency, defensive check just inside a trusted call, mild nesting, stylistic primitive obsession. Note it, don't block on it.
 
-Grade by **blast radius and likelihood**, not line count: an unvalidated request body outranks a 60-line pure helper.
+Grade by **blast radius × likelihood**, not line count: an unvalidated request body outranks a 60-line pure helper.
 
 ## Recognize it fast
 
 - **Boundary map** — where does external data enter (request, env, file, IPC, third-party response)? Each entry without a parse/validate step is a finding.
 - **Follow the error** — for each `throw`/reject, is it caught, and does the catch preserve cause + log with context, or quietly degrade?
 - **Trace one `any`** — where did the untyped value originate? Usually a single missing schema, not N call sites.
-
-## BAD -> GOOD
-
-Parse at the boundary, don't trust then check later:
-
-```
-// BAD — trust the shape, cast it in
-const cfg = JSON.parse(raw) as Config;
-connect(cfg.host, cfg.port);
-
-// GOOD — parse-don't-validate: the type is earned, not asserted
-const cfg = ConfigSchema.parse(JSON.parse(raw)); // throws with field-level detail
-connect(cfg.host, cfg.port);
-```
-
-Preserve cause and context instead of swallowing:
-
-```
-// BAD — failure looks like success
-try { return await fetchUser(id); }
-catch { return null; }
-
-// GOOD — fail-fast, keep the cause, log once with context
-try { return await fetchUser(id); }
-catch (cause) {
-  log.error("fetchUser failed", { id, cause });
-  throw new UserFetchError(id, { cause });
-}
-```
-
-Narrow `unknown`, don't assert through it:
-
-```
-// BAD
-const n = (input as { count: number }).count;
-
-// GOOD
-if (!isCountPayload(input)) throw new InvalidInput("count");
-const n = input.count;
-```
 
 ## Gotchas (false positives)
 

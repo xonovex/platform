@@ -6,7 +6,7 @@ The application owns DPI scaling, not the OS. Lay out the UI in virtual coordina
 
 ## Rationale
 
-Letting the OS bitmap-rescale a high-DPI window blurs everything. Owning the scale keeps the immediate-mode core DPI-unaware (it works in virtual coordinates) while vector primitives, text, thumbnails, and viewports each scale correctly. Per-monitor awareness is essential because a window can straddle or move between monitors with different DPIs.
+Letting the OS bitmap-rescale a high-DPI window blurs everything. Owning the scale keeps the immediate-mode core DPI-unaware (virtual coordinates) while vector primitives, text, thumbnails, and viewports each scale correctly. Per-monitor awareness matters because a window can straddle or move between monitors with different DPIs.
 
 ## How to Apply
 

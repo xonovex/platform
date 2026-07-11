@@ -6,7 +6,7 @@ Every allocation has exactly one owner responsible for freeing it, and a clearly
 
 ## Rationale
 
-Most memory bugs are ownership bugs: a leak (nobody freed), a double-free (two owners freed), or a use-after-free (freed while still borrowed). Manual-memory code has no runtime to arbitrate, so the discipline must be in the design: name the owner, tie the lifetime to a scope or phase, and make borrows visibly shorter than the owner's lifetime. Grouping by lifetime turns N free decisions into one (reset the arena/pool at the boundary), which is both faster and harder to get wrong.
+Most memory bugs are ownership bugs: leak (nobody freed), double-free (two owners freed), use-after-free (freed while still borrowed). With no runtime to arbitrate, the discipline lives in the design: name the owner, tie the lifetime to a scope or phase, make borrows visibly shorter than the owner. Grouping by lifetime turns N free decisions into one arena/pool reset.
 
 ## How to Apply
 

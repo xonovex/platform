@@ -1,14 +1,6 @@
-# filename: math
+# math: Math Utilities
 
-## Guideline
-
-Use Three.js math classes (Vector3, Matrix4, Quaternion) and reuse instances to avoid garbage collection in animation loops.
-
-## Rationale
-
-Three.js math classes are GPU-optimized; allocating new instances every frame causes GC stalls and framerate drops.
-
-## Example
+Use Three.js math classes (Vector3, Matrix4, Quaternion) and reuse instances to avoid per-frame GC stalls in animation loops.
 
 ```javascript
 // Reuse pattern: Define once, mutate in loop

@@ -4,10 +4,6 @@
 
 Apply consent centrally in the tracker layer and never put raw PII in event params or user properties.
 
-## Rationale
-
-If features individually decide whether to track, one missed call ships identified data without consent — a legal/privacy breach. Raw PII (email, name, customer id, phone) in analytics payloads leaks into third-party pipelines, logs, and warehouses you do not control, and is irreversible once sent.
-
 ## How to Apply
 
 1. Expose consent as a `Flow` of the user's current choices (categories: analytics, personalization, ad storage). Read it once inside the tracker implementation; do not pass consent down into feature code.

@@ -16,13 +16,6 @@ DOD claims are about the hardware (cache misses, prefetch, vectorization), and i
 - **Before/after discipline** - Measure the baseline, change one thing, measure again on the same input. Keep the harness fixed so the delta is attributable.
 - **Big-O vs constants and memory** - Treat complexity as a guide, not a verdict; for cache-bound work the constant factor and access pattern dominate at realistic n.
 
-## How to Apply
-
-1. Establish a repeatable benchmark with representative data sizes and distributions.
-2. Record baseline counters: time, cache-misses, IPC, branch-misses.
-3. Make a single layout/access change (e.g. AoS→SoA, hot/cold split).
-4. Re-measure; accept only if the target counters improved on the real workload — revert otherwise.
-
 ## Example
 
 ```sh

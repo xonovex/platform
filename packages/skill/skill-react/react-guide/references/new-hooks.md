@@ -1,12 +1,6 @@
 # new-hooks: React 19 Hooks
 
-## Guideline
-
-Use React 19's new hooks for forms, optimistic updates, and promise/context reading.
-
-## Rationale
-
-These hooks replace manual state management patterns, reducing boilerplate and providing built-in pending states, error handling, and progressive enhancement.
+React 19 hooks for forms, optimistic updates, and promise/context reading — replace manual state with built-in pending states, error handling, and progressive enhancement.
 
 ## Example
 

@@ -4,17 +4,9 @@
 
 Define node kinds as data a registry consumes (pins, defaults, evaluate callback) so any plugin extends the toolbox; let an unwired input fall back to an inline-edited constant so literals need no node; let the author choose asset granularity (one resource per graph, or a coarse "uber-graph" of many); build introspection that previews the value at any pin; and make graphs hot-iterable so an edit re-evaluates without a rebuild.
 
-## Contents
-
-- Data-driven node-type registration (the toolbox is data)
-- Default / constant inputs for unwired pins
-- Asset granularity: fine-grained vs uber-graph, and project data layout
-- Introspection: previewing intermediate values; discoverability
-- Hot-iteration: edit -> recompile -> re-evaluate
-
 ### Rationale
 
-A node graph is valuable precisely because it ships a _toolbox_ rather than a black box: instead of a fixed importer/processor/renderer, the author is handed composable parts and builds the case-specific solution — closer to a customizable kit than a prebuilt feature. That only works if node kinds are data: a plugin registers a new node (its pins, its defaults, its evaluate callback) and a new wire type, and the editor and evaluator pick them up with no core change. Inline constant defaults keep simple graphs readable — most inputs are literals, and forcing a node for each would drown the graph. Asset granularity is a deliberate authoring lever: a graph that outputs a single image or material gives the same fine granularity as a conventional engine and stays shareable across objects, while a graph free to output more becomes a coarser "uber-graph" bundling mesh, material, and textures — appropriate for terrain sculpt/paint maps, generated vertex data such as UV-unwraps, or particle-state buffers in a VFX system, where the data is intrinsically per-object. The granularity choice directly sets the project's data layout, so it is a design decision, not an accident. Introspection is what makes all of this debuggable: the recurring pain in node systems is discoverability (which nodes fit together) and the inability to see the data at an intermediate node — so per-pin preview is not a luxury. Hot-iteration closes the loop: an authoring tool the artist edits live must re-evaluate on change.
+A node graph ships a _toolbox_ rather than a black box — composable parts the author combines into the case-specific solution — which only works if node kinds are data: a plugin registers a node (pins, defaults, evaluate callback) and a new wire type, and the editor and evaluator pick them up with no core change. Inline constant defaults keep simple graphs readable — most inputs are literals. Asset granularity is a deliberate lever: a graph outputting a single image or material stays fine-grained and shareable across objects, while a graph free to output more becomes a coarser "uber-graph" bundling mesh, material, and textures — appropriate for terrain sculpt/paint maps, generated vertex data such as UV-unwraps, or particle-state buffers in a VFX system, where the data is intrinsically per-object. Granularity sets the project's data layout, so it is a design decision. Introspection addresses the two recurring pains — discoverability (which nodes fit together) and seeing the data at an intermediate node — so per-pin preview is not a luxury. Hot-iteration re-evaluates on change.
 
 ### How to Apply
 

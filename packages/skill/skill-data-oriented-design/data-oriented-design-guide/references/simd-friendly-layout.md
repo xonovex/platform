@@ -16,13 +16,6 @@ SIMD processes N lanes per instruction, but only when each lane's input is conti
 - **AoSoA for cache + SIMD** - Tile width = lane count: each tile is one (or a few) vector(s) and sits in one cache line, giving both locality and vectorizability.
 - **Batch of N** - Structure the algorithm to consume N lanes at a time; keep per-lane control flow uniform (no divergent branches) so the vector stays full.
 
-## How to Apply
-
-1. Convert the vectorized field(s) to SoA columns (or AoSoA tiles of width = lane count).
-2. Align each column to the vector width with the language's alignment facility; allocate via an aligned allocator.
-3. Pad the element count up to a multiple of the lane count; initialize padding to a neutral value.
-4. Keep the inner loop branch-free and same-typed; check the disassembly/vectorizer report to confirm vector instructions.
-
 ## Example
 
 ```c

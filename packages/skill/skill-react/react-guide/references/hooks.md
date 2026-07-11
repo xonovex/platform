@@ -1,12 +1,6 @@
-# filename: hooks
+# hooks: Custom Hooks & Rules of Hooks
 
-## Guideline
-
-Follow Rules of Hooks (top-level only, from functions/custom hooks); extract reusable logic into custom hooks with `use` prefix.
-
-## Rationale
-
-Hook rules ensure predictable behavior; custom hooks enable logic reuse without prop drilling; focused hooks maintain single responsibility.
+Call hooks only at top-level (not in loops/conditions), only from functions or custom hooks. Extract reusable logic into custom hooks with a `use` prefix.
 
 ## Example
 
@@ -44,11 +38,9 @@ function useApi<T>(url: string) {
 
 ## Techniques
 
-- Rules of Hooks: Call only at top-level (not loops/conditions); only from functions/custom hooks
-- Custom hooks: Extract reusable logic; name with `use` prefix; single responsibility
-- useApi: Fetch with cancellation flag; handle loading/error/data states; type-generic
-- useLocalStorage: Parse JSON on read; stringify on write; handle errors gracefully
-- usePrevious: Store value in `useRef`; update in `useEffect`; return previous on next render
-- useDebounce: Delay state updates with `setTimeout`; cleanup on unmount
-- Error handling: Type check errors (`instanceof Error`); cleanup in finally blocks
-- Dependencies: Always include full dependency array; avoid stale closures
+- useApi: fetch with cancellation flag; handle loading/error/data states; type-generic
+- useLocalStorage: parse JSON on read; stringify on write; handle errors
+- usePrevious: store value in `useRef`; update in `useEffect`; return previous on next render
+- useDebounce: delay state updates with `setTimeout`; cleanup on unmount
+- Error handling: type-check errors (`instanceof Error`); cleanup in finally blocks
+- Dependencies: include full dependency array; avoid stale closures

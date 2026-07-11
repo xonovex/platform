@@ -37,7 +37,6 @@
 - **Last reviewed:** 2026-06-27
 - **Used for:**
   - `references/template-and-acceptance-criteria.md`
-  - `references/best-practices-appendix.md`
 - **Aspects extracted:**
   - The canonical generalization of user stories; the template, the application of INVEST, and the conversation-over-documentation framing
 

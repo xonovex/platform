@@ -6,7 +6,7 @@ Wrap every user-visible string in a `LOCALIZE(...)` marker that hashes the _sour
 
 ## Rationale
 
-Numeric/string-ID schemes need a maintained ID table: every new string adds a header entry, IDs collide in merges, and removed strings leave orphaned entries. Hashing the source string as the key removes all of that — the call site _is_ the key, so there is no table to keep in sync, no merge conflict, and a missing translation degrades gracefully to readable English instead of a blank or an ID. The per-frame hash cost is negligible because an immediate-mode GUI only localizes the handful of strings actually visible this frame. A marker macro also gives a tool a single token to scan for, so coverage and dead-entry detection become mechanical.
+Numeric/string-ID schemes need a maintained ID table: new strings add header entries, IDs collide in merges, removed strings orphan entries. Hashing the source string makes the call site _the_ key — no table to sync, no merge conflict, and a missing translation degrades to readable English instead of a blank or ID. The per-frame hash cost is negligible because only the handful of strings visible this frame are localized. The marker macro also gives a tool one token to scan, making coverage and dead-entry detection mechanical.
 
 ## How to Apply
 

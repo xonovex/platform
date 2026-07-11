@@ -1,14 +1,6 @@
-# filename: materials
+# materials: Materials
 
-## Guideline
-
-Choose material type based on performance needs; reuse material instances; handle transparency with proper depth writes and render order.
-
-## Rationale
-
-Material complexity directly impacts framerate; fewer unique materials reduce draw calls; transparency requires depth-aware rendering.
-
-## Example
+Choose material type by performance need; reuse material instances to cut draw calls; handle transparency with proper depth writes and render order.
 
 ```javascript
 const pbr = new THREE.MeshStandardMaterial({

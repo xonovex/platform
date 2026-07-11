@@ -1,16 +1,8 @@
 # implementation-variants: Implementation Variant Strategy (C)
 
-## Guideline
+Ship a routine as progressive variants — scalar reference → AoS batch → SoA batch → SIMD — under the `_aos`/`_soa`/`_simde` file/symbol convention. Layout rationale (cache, vectorization) is in **data-oriented-design-guide**; this is the C convention for organizing variants and keeping them honest.
 
-Ship a routine as progressive variants — scalar reference → AoS batch → SoA batch → SIMD — under the `_aos`/`_soa`/`_simde` file/symbol convention, each validated by a parity test against the scalar reference.
-
-## Rationale
-
-Different call sites need different trade-offs: a debuggable scalar reference, an AoS batch for existing structs, a cache-friendly SoA batch for large workloads, and SIMD for hot paths. _Why_ each layout helps (cache behavior, vectorization) is in **data-oriented-design-guide**; this doc is the C convention for organizing the variants and keeping them honest. The scalar version is the source of truth every other variant is tested against.
-
-## How to Apply
-
-1. Write the scalar single-object reference first; it defines correctness.
+1. Write the scalar single-object reference first; it is the correctness source of truth.
 2. Add `_aos`/`_soa`/`_simde` variants as needed, named by suffix (see file-naming).
 3. Run the _same_ test suite across all variants — every batched/SIMD variant must match the scalar output (parity).
 4. Only add the variants a workload actually needs; don't pre-ship SIMD for cold code.

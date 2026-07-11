@@ -1,21 +1,11 @@
 # alignment: Memory Alignment (C)
 
-## Guideline
-
-Use C's alignment mechanics — `_Alignas`, over-aligned types, and an aligned allocator — to satisfy the SIMD and cache-line alignment that other concerns require.
-
-## Rationale
-
-This doc is only the C _how_. The _why/when_ lives elsewhere: aligning/padding for vectorization is a layout decision (see **data-oriented-design-guide**, SIMD-friendly layout), and cache-line-aligning/padding hot or atomic fields to avoid false sharing is a concurrency decision (see **lock-free-guide**). Here: how to express those in C.
-
-## How to Apply (C specifics)
+The C mechanics for the alignment other concerns require. The _why/when_ lives elsewhere: SIMD-friendly layout in **data-oriented-design-guide**, cache-line padding against false sharing in **lock-free-guide**.
 
 1. `_Alignas(16)` (or `alignas`, C11) on a field/type for SIMD; pad a `vec3` to 16 bytes when it must load as a `vec4`.
 2. Allocate over-aligned memory with `aligned_alloc` (C11) or `posix_memalign`; `malloc` only guarantees max-align.
-3. Pad a struct to a whole multiple of the alignment so an _array_ of it stays aligned per element.
+3. Pad a struct to a whole multiple of its alignment so an _array_ of it stays aligned per element.
 4. Source the cache-line size per target with conditional compilation (64 B x86-64, 128 B some ARM).
-
-## Example
 
 ```c
 typedef struct { float x, y, z, _pad; } vec3_t;              // 16B, SIMD-loadable

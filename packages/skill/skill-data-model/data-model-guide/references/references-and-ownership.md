@@ -6,7 +6,7 @@ Link objects to each other by a stable id (local id within a file, GUID across f
 
 ## Rationale
 
-A data model is relocated constantly: storage grows, objects are saved and reloaded at new addresses, an undo restores a deleted object. Raw pointers break across every one of those events. An id survives serialization and relocation, and is resolved to the current object through one indirection table. Separating ownership from reference makes the object graph a tree of owned data plus a set of cross-links: deleting an object cleanly deletes everything it owns, while cross-links to it simply stop resolving — they become null instead of dangling.
+A data model is relocated constantly: storage grows, objects save and reload at new addresses, an undo restores a deleted object — raw pointers break across every one of those events, an id survives them (resolved through one indirection table). Separating ownership from reference makes the graph a tree of owned data plus cross-links: deleting an object cleanly deletes everything it owns, while cross-links to it stop resolving — null instead of dangling.
 
 ## Techniques
 

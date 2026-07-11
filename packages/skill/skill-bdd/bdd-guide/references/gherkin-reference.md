@@ -1,50 +1,29 @@
 # gherkin: Gherkin Keyword Reference
 
-Gherkin is the plain-language notation for capturing an agreed example as an executable scenario. A feature file groups related scenarios, each a concrete example built from steps. The keywords exist so a single document is readable by business people AND runnable against the system — that dual readability is the whole reason to use the grammar rather than free prose.
+The grammar exists so ONE document is both readable by business people and runnable against the system.
 
-## Primary keywords
+## Keywords and non-obvious rules
 
-- **Feature** — names and groups related scenarios; the opening line and free-text description say what capability the file is about. One feature per file.
-- **Rule** — represents one business rule that the scenarios beneath it illustrate. Use it to cluster the examples that belong to the same rule so the document reads as "rule, then its examples".
-- **Scenario** (alias **Example**) — a single concrete example, made of steps. This is the unit that runs.
-- **Scenario Outline** (alias **Scenario Template**) — runs the same scenario once per row of an **Examples** (alias **Scenarios**) table, substituting `<placeholder>` values from the columns. Use it only when the SAME behaviour repeats over a small set of value combinations.
-- **Background** — a set of `Given` steps run before EVERY scenario in the file, so shared preconditions are written once.
-
-## Step keywords
-
-- **Given** — known state: the preconditions that must hold before the action. Put the world into a knowable state; do not describe user interaction here.
-- **When** — the single event or action under examination. Keep one essential `When` per scenario.
-- **Then** — the expected, observable outcome. A `Then` is an ASSERTION: it compares an actual result against an expected one. It must describe something the business can observe, not an internal database row.
-- **And** / **But** — continue the previous step type so several Givens or Thens read naturally. They take the meaning of the keyword above them; `But` is only cosmetic for a negative.
+- **Feature** — one per file; the free-text description names the capability.
+- **Rule** — clusters the scenarios that illustrate one business rule; document reads "rule, then its examples".
+- **Scenario** (alias **Example**) — one concrete example; the unit that runs.
+- **Scenario Outline** (alias **Scenario Template**) — runs once per row of an **Examples** (alias **Scenarios**) table, substituting `<placeholder>` columns. Use only when the SAME behaviour repeats over a few value combinations.
+- **Background** — `Given` steps run before EVERY scenario in the file (shared preconditions written once).
+- **Given / When / Then** — known state / the single event under examination / an observable outcome assertion. Keep one essential `When`; `Then` must be business-observable, not an internal DB row.
+- **And / But** — take the meaning of the keyword above; `But` is purely cosmetic.
 
 ## Declarative over imperative
 
-Write steps DECLARATIVELY — state intent and outcome, not the UI mechanics. Imperative steps ("click the #submit button", "type 4 into the qty field") couple the scenario to the interface, bloat the file, and obscure the rule. Declarative steps survive a redesign and keep the example about behaviour.
+State intent and outcome, not UI mechanics — declarative steps survive a redesign and keep the example about the rule.
 
 ```gherkin
-# BAD — imperative, UI-coupled, no rule visible
-Scenario: Checkout
-  Given I open "/cart"
-  When I click "Add coupon"
-  And I type "SAVE10" into "#code"
-  And I click "Apply"
-  And I click "Pay"
-  Then I see ".total" contains "$45.00"
-```
-
-```gherkin
-# GOOD — declarative, states the rule's behaviour
+# GOOD — declarative
 Feature: Order checkout
 
   Rule: A valid coupon reduces the order total by its percentage
 
     Background:
       Given a cart of items totalling 50.00 EUR
-
-    Scenario: A 10 percent coupon is applied
-      Given a valid coupon "SAVE10" worth 10 percent
-      When the customer checks out
-      Then the order total should be 45.00 EUR
 
     Scenario Outline: Coupons reduce the total by their percentage
       Given a valid coupon worth <percent> percent
@@ -57,6 +36,8 @@ Feature: Order checkout
         | 25      | 37.50 |
 ```
 
-## Keep it small
+Imperative steps (`When I click "#submit"`, `type "SAVE10" into "#code"`) couple the file to the interface and hide the rule.
 
-A scenario with many `When` steps is usually two scenarios; a `Then` that asserts five unrelated things is an Eager-style example — keep one rule per scenario and 2-5 scenarios per `Rule`. Exhaustive value coverage and edge cases belong in unit tests driven by **tdd-guide**, not in more outlines here. The vocabulary the steps are written in (the names for "order", "coupon", "taxi") is the ubiquitous language owned by **ddd-guide**; the step-definition glue code and any stubbing of external services is owned by **testing-guide**. Scenarios are first the OUTPUT of a discovery conversation (see discovery-three-amigos) and only second a regression suite.
+## Ownership
+
+Keep one rule per scenario, 2-5 scenarios per `Rule`; drive exhaustive value/edge coverage into **tdd-guide** unit tests, not more outlines. The vocabulary ("order", "coupon", "taxi") is the ubiquitous language owned by **ddd-guide**; step-definition glue and external stubbing is owned by **testing-guide**. Scenarios are first the OUTPUT of a discovery conversation (see discovery-three-amigos), second a regression suite.

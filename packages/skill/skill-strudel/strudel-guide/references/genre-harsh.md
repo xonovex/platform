@@ -1,14 +1,6 @@
-# filename: genre-harsh
+# genre-harsh: Experimental/Industrial Textures
 
-## Guideline
-
-Create harsh, experimental textures using extreme distortion, bit crushing, noise, and chaotic polyrhythms for intentional sonic destruction.
-
-## Rationale
-
-Harsh music demands intentional degradation and dissonance; extreme effect values and dark scales create cohesive experimental aesthetics.
-
-## Example
+Extreme distortion, bit-crushing, noise, and chaotic polyrhythms for intentional sonic destruction.
 
 ```javascript
 stack(
@@ -23,10 +15,8 @@ stack(
 );
 ```
 
-## Techniques
-
-- Extreme effects: `.crush(2-4)`, `.coarse(32-64)`, `.shape(0.8-2)` for maximum harshness
-- Noise layers: `s("white")` with `.hpf()`, `.bpf()`, `.degradeBy()` for texture
-- Dissonant scales: Locrian, Phrygian, chromatic clusters for dark tonality
-- Glitch methods: `.degradeBy(0.7)`, `.scramble()`, `.stut(8, 0.5)` for chaos
-- Polyrhythms: Competing time signatures `.bd(7,8)`, `.sd(5,8)`, `.hh(11,16)` for instability
+- Extreme effects: `.crush(2-4)` `.coarse(32-64)` `.shape(0.8-2)`
+- Noise: `s("white")` with `.hpf()` `.bpf()` `.degradeBy()`
+- Dark scales: Locrian, Phrygian, chromatic clusters
+- Glitch: `.degradeBy(0.7)` `.scramble()` `.stut(8, 0.5)`
+- Competing polyrhythms: `bd(7,8)`, `sd(5,8)`, `hh(11,16)`

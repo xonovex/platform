@@ -1,69 +1,16 @@
-# openapi-router-hierarchy: Use OpenAPIHono Throughout Router Hierarchy
+# openapi-router-hierarchy: OpenAPIHono at Every Level
 
-## Guideline
-
-Use `OpenAPIHono` for all routers in the hierarchy (root, intermediate, and leaf) to ensure OpenAPI routes appear in the generated specification.
-
-## Rationale
-
-OpenAPI metadata propagation works through the router chain only when all routers use `OpenAPIHono`. Mixing regular `Hono` with `OpenAPIHono` breaks metadata propagation, causing child OpenAPI routes to be "lost" and resulting in incomplete API documentation.
-
-## Example
+Use `OpenAPIHono` (not plain `Hono`) for root, intermediate, and leaf routers. Metadata propagates only through an all-`OpenAPIHono` chain; a single plain `Hono` in the path drops its children's routes from the generated spec. Mount with `.route()` as usual; plain non-OpenAPI routes can still live on an `OpenAPIHono` instance.
 
 ```typescript
-// src/app.ts - Root router
-// src/routes/v1/index.ts - Intermediate router
+import {OpenAPIHono} from "@hono/zod-openapi";
 
-// src/routes/v1/items.ts - Leaf router
-import {
-  createRoute,
-  OpenAPIHono,
-  OpenAPIHono,
-  OpenAPIHono,
-  z,
-} from "@hono/zod-openapi";
+const app = new OpenAPIHono(); // root
+app.route("/api/v1", v1Router);
 
-export function createApp() {
-  // ✅ Use OpenAPIHono for root
-  const app = new OpenAPIHono();
-
-  app.use("*", logger());
-  app.route("/api/v1", v1Router);
-
-  return app;
-}
-
-// ✅ Use OpenAPIHono for intermediate router
-export const v1Router = new OpenAPIHono();
-
+export const v1Router = new OpenAPIHono(); // intermediate
 v1Router.route("/items", itemsRouter);
-v1Router.route("/users", usersRouter);
 
-// ✅ Use OpenAPIHono for leaf router
-export const itemsRouter = new OpenAPIHono();
-
-const listItemsRoute = createRoute({
-  method: "get",
-  path: "/",
-  responses: {
-    200: {
-      content: {"application/json": {schema: ItemListSchema}},
-      description: "List of items",
-    },
-  },
-});
-
-itemsRouter.openapi(listItemsRoute, (c) => {
-  // Handler implementation
-});
+export const itemsRouter = new OpenAPIHono(); // leaf
+itemsRouter.openapi(listItemsRoute, (c) => c.json(itemsService.list(), 200));
 ```
-
-## Techniques
-
-- Import `OpenAPIHono` from `@hono/zod-openapi`
-- Use `OpenAPIHono` for root application router
-- Use `OpenAPIHono` for all intermediate routers (version routers, feature groupings)
-- Use `OpenAPIHono` for all leaf routers (domain-specific routes)
-- Mount routers normally with `.route()` method
-- Verify all routes appear in generated `/openapi.json` spec
-- Regular non-OpenAPI routes can coexist on OpenAPIHono routers

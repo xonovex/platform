@@ -1,14 +1,6 @@
 # routes: Routes with Validation and Auth
 
-## Guideline
-
-Chain validation and auth middleware before controller handlers in route definitions.
-
-## Rationale
-
-Declarative middleware chaining ensures validation/auth happens before business logic.
-
-## Example
+Chain middleware in fixed order per route: `requireAuth` → `requireRole` → `validateParams`/`validateQuery`/`validateBody` → controller. Import the schema types so controller `Request` generics stay typed.
 
 ```typescript
 const router = express.Router();
@@ -43,14 +35,3 @@ router.delete(
 
 export {router as userRoutes};
 ```
-
-## Techniques
-
-- Middleware order: Auth (requireAuth) before validation before controller
-- requireAuth: Verify JWT token and attach user to request
-- requireRole: Check user role after requireAuth
-- validateBody: Validate req.body against Zod schema
-- validateParams: Validate req.params against Zod schema
-- validateQuery: Validate req.query against Zod schema
-- Controller last: Place controller handler after all middleware
-- Type safety: Import schema types for typed Request generics in controllers

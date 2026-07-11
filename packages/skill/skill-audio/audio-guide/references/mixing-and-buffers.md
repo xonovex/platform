@@ -6,7 +6,7 @@ Mix in a single internal format (deinterleaved 32-bit float, fixed internal samp
 
 ## Rationale
 
-A float accumulator with a 23-bit mantissa matches 24-bit integer precision while tolerating sums far outside [-1, 1] without the wraparound that destroys an integer mix — so you can add many voices and decide about loudness afterward. Routing each input channel to each output channel through a gain matrix `m[ic][oc]` generalizes volume, panning, and spatialization into one operation, which also vectorizes cleanly. The dangerous part is discontinuity: instantaneously changing a gain (start, stop, volume jump, pan snap) inserts a step into the waveform that the ear hears as a click or pop, so every coefficient change must be ramped across samples, not applied at once.
+A float accumulator's 23-bit mantissa matches 24-bit integer precision while tolerating sums far outside [-1, 1] without the wraparound that destroys an integer mix — so you can add many voices and decide loudness afterward. Routing each input channel to each output channel through a gain matrix `m[ic][oc]` generalizes volume, panning, and spatialization into one operation that also vectorizes cleanly. The dangerous part is discontinuity: instantaneously changing a gain (start, stop, volume jump, pan snap) inserts a step into the waveform the ear hears as a click, so every coefficient change must be ramped across samples, not applied at once.
 
 ## How to Apply
 

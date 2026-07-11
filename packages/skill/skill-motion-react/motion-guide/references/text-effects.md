@@ -1,14 +1,6 @@
-# filename: text-effects
+# text-effects: Word and Character Reveals
 
-## Guideline
-
-Split text into words/characters in spans; use `overflow: hidden` with `y: ["100%", 0]` for elegant reveal animations.
-
-## Rationale
-
-Splitting enables per-element stagger; `overflow: hidden` masks overflow for clean Y-translate reveals; avoid animating entire text blocks.
-
-## Example
+Split text into per-word/char spans for stagger; wrap each in `overflow: hidden` and translate `y: ["100%", 0]` for masked reveals.
 
 ```tsx
 function TextReveal({text}) {
@@ -38,13 +30,8 @@ function TextReveal({text}) {
 }
 ```
 
-## Techniques
-
-- Word reveal: Split by space, `y: ["100%", 0]`, stagger 0.05-0.15
-- Character reveal: Split by `""`, stagger 0.02-0.05, add `y: 20` for bounce effect
-- Typewriter: Use `useState` + `setInterval`, slice() text incrementally, add blinking cursor
-- Wavy text: Per-character `y: [0, -10, 0]` with delay based on index
-- Gradient animation: `backgroundPosition` with `backgroundSize: "300% 100%"`
-- Word highlight: Overlay `scaleX: 0` → `scaleX: 1` highlight box behind word
-- Overflow masking: Always wrap in `<span style={{overflow: "hidden"}}>` for clean reveals
-- Keep stagger delays small: 0.02-0.1 for natural flow
+- Word reveal: split by `" "`, stagger 0.05-0.15
+- Character reveal: split by `""`, stagger 0.02-0.05, add `y: 20` for bounce
+- Typewriter: `useState` + `setInterval`, `slice()` incrementally, blinking cursor
+- Wavy: per-char `y: [0, -10, 0]` with index-based delay
+- Gradient sweep: animate `backgroundPosition` with `backgroundSize: "300% 100%"`

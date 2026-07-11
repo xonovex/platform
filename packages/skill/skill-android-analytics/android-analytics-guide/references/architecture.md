@@ -4,10 +4,6 @@
 
 Feature code depends on a hand-written `AnalyticsTracker` interface injected via DI; the analytics SDK is referenced only by one implementation module, never by ViewModels, composables, or other feature code.
 
-## Rationale
-
-A directly-imported SDK couples every feature to a vendor: swapping or adding a destination becomes a project-wide edit, tests cannot assert what was tracked without a real network/SDK, and SDK initialization order leaks into UI code. An interface boundary localizes the SDK to one place and makes tracking a substitutable collaborator.
-
 ## How to Apply
 
 1. Define `AnalyticsTracker` in an `api` module with no SDK dependency. Keep the surface small and typed: `trackScreen`, `trackEvent`, `setUserProperties`, plus optional helpers like `trackScreenWithExperiments` and a convenience `trackButtonClickEvent`.

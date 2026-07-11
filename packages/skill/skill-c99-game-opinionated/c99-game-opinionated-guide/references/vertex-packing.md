@@ -1,14 +1,6 @@
 # vertex-packing: Vertex Packing for GPU
 
-## Guideline
-
-Pack mesh data to GPU-ready formats. Support interleaved (single buffer) and non-interleaved (streaming).
-
-## Rationale
-
-GPU-ready vertex formats maximize performance; flexible layouts support different rendering pipelines and optimization strategies.
-
-## Example
+Pack mesh data into GPU-ready formats named `vertex_{components}_{types}_t` (e.g. `vertex_3f_4u8_t`). Support interleaved (all attributes per vertex, single buffer) and streaming (position/normal/UV in separate buffers). Provide `*_pack_size` before allocation. The library never calls a graphics API — the caller uploads.
 
 ```c
 typedef struct {
@@ -26,18 +18,10 @@ void mesh3d_pack_3f_4u8(vertex_3f_4u8_t *out, const mesh3d_t *m, color4u8_t c) {
 }
 
 size_t mesh3d_pack_size(const mesh3d_t *m, vertex_format_t fmt) {
-    switch(fmt) {
-        case VERTEX_FORMAT_3F: return m->vertex_count * 12;
+    switch (fmt) {
+        case VERTEX_FORMAT_3F:     return m->vertex_count * 12;
         case VERTEX_FORMAT_3F_4U8: return m->vertex_count * 16;
     }
     return 0;
 }
 ```
-
-## Techniques
-
-- Vertex format naming: Use `vertex_{components}_{types}_t` (e.g., `vertex_3f_4u8_t`)
-- Interleaved layout: Pack all attributes per-vertex in single buffer
-- Streaming layout: Separate position/normal/UV into different buffers
-- Size queries: Provide `*_pack_size` functions before allocation
-- No GPU calls: Library never touches graphics APIs; caller handles upload

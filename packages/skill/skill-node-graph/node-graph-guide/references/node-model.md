@@ -6,7 +6,7 @@ Model the graph as plain serialized data — a list of nodes, a list of connecti
 
 ## Rationale
 
-When the graph is data rather than code, one definition serves the editor (which draws and edits it), the evaluator (which runs it), and tools (diff, merge, collaborate, hot-reload). A node that is just a typed object with typed pins lets you reflect over it: the editor can render connectors automatically, the type system can validate wires, and any plugin can add a new node kind or a new wire data type without touching the core. Restricting a wire to one-output-to-one-input keeps fan-in unambiguous (each input has at most one source) while fan-out (one output feeding many inputs) stays free. The terminal-node split matters because the graph computes values but does not decide when or where they run — an output node simply exposes a result (an image, a draw call, a buffer) that an owning system later schedules. Collapsing topology into code throws all of this away: you can no longer introspect, serialize, collaborate on, or extend the graph.
+Graph-as-data lets one definition serve the editor, evaluator, and tools (diff, merge, collaborate, hot-reload), and lets any plugin add a node kind or a wire data type without touching the core. One-output-to-one-input keeps fan-in unambiguous (each input has at most one source) while fan-out (one output feeding many inputs) stays free. The terminal-node split matters because the graph computes values but does not decide when or where they run — an output node exposes a result (an image, a draw call, a buffer) that an owning system later schedules.
 
 ## How to Apply
 

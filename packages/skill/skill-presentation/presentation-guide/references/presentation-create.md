@@ -1,12 +1,6 @@
 # presentation-create: Create Presentation Document from Codebase
 
-## Guideline
-
-Generate markdown presentation by exploring codebase and structuring findings into slides.
-
-## Rationale
-
-Transforms technical findings from codebase analysis into structured narrative flow with clear narrative arcs, enabling effective communication of architecture and decisions to various audiences.
+Generate a markdown presentation by exploring a codebase and structuring findings into slides separated by `---`.
 
 ## Example
 

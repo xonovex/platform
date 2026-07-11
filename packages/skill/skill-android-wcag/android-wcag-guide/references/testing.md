@@ -12,11 +12,7 @@
 
 ### Guideline
 
-Treat accessibility as a verified output, not a hope — assert semantics in Compose tests, unit-test the strings that build descriptions, add automated ATF checks where you can (real apps often ship without them — see below), exercise large font scale / dark mode in screenshot tests, keep accessibility lint rules error-level, and run all of it in CI.
-
-### Rationale
-
-Accessibility regressions are invisible in normal QA because the screen still looks fine to a sighted tester at default font scale. Without enforcement, content descriptions get dropped, touch targets shrink, contrast drifts, and headings vanish — silently. Automated checks defend most criteria at once: 1.1.1 Non-text Content (labels), 1.4.3 Contrast (Minimum), 1.4.4 Resize Text and 1.4.10 Reflow (font scale / reflow), 1.4.11 Non-text Contrast, 2.5.8 Target Size (Minimum), and 4.1.2 Name, Role, Value (role + state). A test that merely finds a node by its label proves nothing about whether that label is correct or whether a screen reader can act on it.
+Treat accessibility as a verified output, not a hope — assert semantics in Compose tests, unit-test the strings that build descriptions, add automated ATF checks where you can (real apps often ship without them — see below), exercise large font scale / dark mode in screenshot tests, keep accessibility lint rules error-level, and run all of it in CI. Automated checks defend most criteria at once: 1.1.1 Non-text Content (labels), 1.4.3 Contrast (Minimum), 1.4.4 Resize Text and 1.4.10 Reflow (font scale / reflow), 1.4.11 Non-text Contrast, 2.5.8 Target Size (Minimum), and 4.1.2 Name, Role, Value (role + state). A test that merely finds a node by its label proves nothing about whether that label is correct or whether a screen reader can act on it.
 
 ### How to Apply
 

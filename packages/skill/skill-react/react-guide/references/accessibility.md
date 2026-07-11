@@ -1,12 +1,6 @@
 # accessibility: Accessibility Best Practices
 
-## Guideline
-
-Use semantic HTML, ARIA labels/roles, proper focus management, and keyboard navigation for inclusive components.
-
-## Rationale
-
-Accessible design works for all users (screen readers, keyboards, assistive tech); legal requirement in many jurisdictions.
+Use semantic HTML, ARIA labels/roles, focus management, and keyboard navigation for inclusive components.
 
 ## Example
 
@@ -32,8 +26,8 @@ function Modal({isOpen, onClose, title, children}) {
 ## Techniques
 
 - Semantic HTML: `<button>`, `<nav>`, `<main>`, `<article>` instead of divs
-- ARIA attributes: aria-label, aria-labelledby, aria-describedby, role="dialog", role="list"
+- ARIA: aria-label, aria-labelledby, aria-describedby, role="dialog", role="list"
 - Focus management: useRef + useEffect to move focus to interactive elements
-- Visually hidden text: sr-only class for screen readers ("sr-only" Tailwind utility)
-- Icon buttons: Always include aria-label; never icon-only without text
-- Keyboard navigation: All interactive elements must be focusable via Tab
+- Visually hidden text: `sr-only` Tailwind utility for screen readers
+- Icon buttons: always include aria-label; never icon-only without text
+- Keyboard navigation: all interactive elements focusable via Tab

@@ -6,15 +6,7 @@ Stream per-frame deltas of changed state to nodes already in sync, and send a fu
 
 ## Rationale
 
-Sending the whole world every frame is bandwidth suicide; sending only what changed since the receiver's last known state is the core bandwidth win of networked simulation. But a delta is meaningless without a baseline — the receiver must already hold the state the delta is relative to. A node that just connected has no baseline, so it needs the complete state once (a snapshot / full dump) before incremental deltas make sense. The clean way to get both is to lean on the engine's existing change-tracking system: each frame, propagate watched changes into a tracked state, dump the uncompressed changes since last frame to a buffer, and send that buffer; for a new connection, dump _all_ state instead. The receiver applies the buffer through exactly the same path that loads a saved game, so replication and persistence share one serialization and one apply step rather than maintaining two. Packet-level acknowledgements and out-of-order counts (surfaced by tooling) tell you whether deltas are actually landing.
-
-## Contents
-
-- Baseline requirement: why deltas need prior state
-- Per-frame change dump (delta) vs. full dump (snapshot)
-- Triggering a snapshot on new connections
-- Sharing the save/load apply path
-- Acks and out-of-order accounting
+A delta is meaningless without a baseline — the receiver must already hold the state the delta is relative to. A just-connected node has no baseline, so it needs the complete state once (a snapshot / full dump) before incremental deltas make sense. Lean on the engine's existing change-tracking system: each frame, propagate watched changes into a tracked state, dump the uncompressed changes since last frame to a buffer, and send it; for a new connection, dump _all_ state instead. The receiver applies the buffer through exactly the same path that loads a saved game, so replication and persistence share one serialization and one apply step. Packet acknowledgements and out-of-order counts tell you whether deltas are landing.
 
 ### How to Apply
 

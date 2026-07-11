@@ -6,7 +6,7 @@ When a stateful external system (physics, renderer, audio) must mirror ECS data,
 
 ## Rationale
 
-The ECS stores raw data optimized for batch iteration; it does not inherently know "what changed." The external system, however, needs creation, modification, and deletion told to it explicitly. Brute force (a normal filter-and-batch system that pushes every matching entity) is the simplest correct approach and is fast enough in most cases because the push itself is cache-friendly. Cleverer schemes trade simplicity for speed and each has a sharp edge — most dangerously, callbacks, which fire outside the declared read/write dependencies and therefore break the parallel scheduler (and can recurse).
+The ECS stores raw batch-iteration data and does not inherently know "what changed"; the external system needs creation/modification/deletion told to it explicitly. Brute force (a filter-and-batch system pushing every matching entity) is the simplest correct approach and cache-friendly. Cleverer schemes trade simplicity for speed — most dangerously callbacks, which fire outside the declared read/write dependencies and therefore break the parallel scheduler (and can recurse).
 
 ## How to Apply
 

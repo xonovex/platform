@@ -1,14 +1,6 @@
-# filename: shaders
+# shaders: Custom Shaders
 
-## Guideline
-
-Use ShaderMaterial with uniforms for parameter control; modify built-in shaders via `onBeforeCompile`; move expensive calculations to vertex shader.
-
-## Rationale
-
-Custom shaders enable advanced effects; uniform updates avoid recompilation; vertex-side calculations reduce fragment shader load.
-
-## Example
+Use ShaderMaterial with uniforms for parameter control; modify built-in shaders via `onBeforeCompile`; move expensive calculations to the vertex shader.
 
 ```javascript
 const material = new THREE.ShaderMaterial({

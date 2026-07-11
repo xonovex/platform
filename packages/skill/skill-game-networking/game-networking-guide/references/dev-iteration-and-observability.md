@@ -6,15 +6,7 @@ Make multiplayer debuggable and iterable by abstracting the wire behind the netw
 
 ## Rationale
 
-Multiplayer is hard to debug because the number of possible states is multiplied across several running processes that you can't pause together or step in one debugger. The fix is to make "remote" an abstraction, not a deployment fact: route all node-to-node traffic through one API, and when both nodes live in the same process, short-circuit the wire entirely — deliver to the receiver callback immediately without copying — so you can launch a server node and a client node side by side in one tool and step them together, yet the same code runs unchanged across real machines later. On top of that, real network pain (latency, jitter, limited bandwidth) is something you must be able to _inject_ to hit corner cases without standing up a lossy network, and you need a profiler that can pause every simulation at once and show what packets flew, how many were acked, and how many arrived out of order. Finally, the gap between single-player and multiplayer should be a data branch on node type — a "what node am I" switch whose unnamed/catch-all path runs every branch in sequence — so the single-player build is the multiplayer build with one node running all roles.
-
-## Contents
-
-- Virtual networking: in-process nodes that skip the wire
-- Same code local and remote
-- Injecting latency and bandwidth limits
-- Packet inspection: acks, order, per-type counts
-- Single-player ↔ multiplayer via a topology branch
+Make "remote" an abstraction, not a deployment fact: route all node-to-node traffic through one API, and when both nodes live in the same process, short-circuit the wire entirely — deliver to the receiver callback immediately without copying — so you can launch a server node and a client node side by side in one tool and step them together, yet the same code runs unchanged across real machines. Inject latency, jitter, and bandwidth caps to hit corner cases without standing up a lossy network, and use a profiler that can pause every simulation at once and show what packets flew, how many were acked, and how many arrived out of order. Make the single-player/multiplayer gap a data branch on node type — a "what node am I" switch whose unnamed/catch-all path runs every branch in sequence — so the single-player build is the multiplayer build with one node running all roles.
 
 ### How to Apply
 

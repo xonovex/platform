@@ -1,40 +1,12 @@
-# memory-management: Memory Management Patterns
+# memory-management: Memory Management
 
-## Guideline
-
-Prefer stack allocation and ensure proper cleanup of heap allocations with clear ownership tracking.
-
-## Rationale
-
-Proper memory management prevents leaks and use-after-free bugs. Stack allocation is simpler as it's automatically cleaned up when the function returns.
-
-## Example
+Default to stack allocation for fixed-size, function-scoped data; reach for `malloc`/`calloc` only for dynamic or longer-lived data. Pair every allocation with exactly one `free`, check the return before dereferencing, and free on every error path. Document who owns each allocation.
 
 ```c
-// Stack allocation (preferred)
-void process_data(void) {
-    char buffer[1024];
-    int values[100];
-    // Automatically freed when function returns
-}
-
-// Heap allocation with explicit free
-void dynamic_array(size_t size) {
-    int *array = malloc(size * sizeof(int));
-    if (!array) {
-        return;  // Handle allocation failure
-    }
-
-    // Use array...
-
-    free(array);  // Always free
-}
+int *array = malloc(size * sizeof *array);
+if (!array) return ERR_NOMEM;   // check before use
+/* ... */
+free(array);
 ```
 
-## Techniques
-
-- Default stack: Use stack allocation for fixed-size data by default
-- Heap when needed: Use malloc/calloc only for dynamic or longer-lived data
-- Malloc/free pairing: Always pair every malloc with corresponding free call
-- Failure checking: Check allocation return value before dereferencing
-- Clear ownership: Document who owns and must free each allocation
+For arenas, pools, and ownership models beyond plain malloc/free, see **memory-management-guide**.

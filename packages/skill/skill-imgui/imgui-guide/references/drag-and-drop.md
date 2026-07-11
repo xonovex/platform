@@ -6,7 +6,7 @@ Start from the data representation — a single global id naming the dragged obj
 
 ## Rationale
 
-Drag state must outlive any single window's UI context (you drag _between_ windows), so it can't live in per-control or per-window state. Reducing the whole gesture to "what global id is being dragged?" makes initiation, hover-highlighting, type-checking, and the drop itself simple data operations. Designing the data first keeps the UI code thin and the cross-window case free.
+Drag state must outlive any single window's UI context (you drag _between_ windows), so it can't live in per-control or per-window state. Reducing the gesture to "what global id is being dragged?" makes initiation, hover-highlighting, type-checking, and the drop itself simple data operations, and makes the cross-window case free.
 
 ## How to Apply
 

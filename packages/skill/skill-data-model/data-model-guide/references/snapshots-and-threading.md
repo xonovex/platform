@@ -6,7 +6,7 @@ Give reader threads a consistent view of the model while a writer mutates it by 
 
 ## Rationale
 
-An editor's model is read by threads that must not block the editing thread and must never observe a half-applied edit (a tree mid-relink, a buffer mid-resize). If readers and the writer share mutable state, every read needs a lock and every edit risks tearing. Publishing an immutable snapshot decouples them: readers hold a version that never changes under them, the writer builds the next version privately and swaps it in with one atomic store. Copy-on-write keeps this cheap by sharing the unchanged majority of the model between versions and copying only the touched objects.
+Reader threads must not block the editing thread and must never observe a half-applied edit (a tree mid-relink, a buffer mid-resize). Sharing mutable state means every read needs a lock and every edit risks tearing. Publishing an immutable snapshot decouples them: readers hold a version that never changes under them; the writer builds the next version privately and swaps it in with one atomic store. Copy-on-write keeps this cheap by sharing the unchanged majority and copying only touched objects.
 
 ## Techniques
 

@@ -1,14 +1,6 @@
-# filename: layout
+# layout: FLIP and Shared-Element Transitions
 
-## Guideline
-
-Use `layout` prop for automatic FLIP animations on size/position changes; use `layoutId` for shared element transitions between DOM nodes.
-
-## Rationale
-
-`layout` auto-animates position/size without manually specifying targets; `layoutId` enables seamless transitions across screens (gallery → modal).
-
-## Example
+Add the `layout` prop for automatic FLIP animation of size/position changes; use matching `layoutId` on elements across different DOM states for shared-element morphing.
 
 ```tsx
 function ExpandingCard({expanded}) {
@@ -21,7 +13,7 @@ function ExpandingCard({expanded}) {
   );
 }
 
-// Shared element transition
+// Shared element transition (gallery → modal)
 <motion.div layoutId={`card-${id}`} onClick={() => setSelected(item)}>
   <motion.img layoutId={`image-${id}`} src={item.image} />
 </motion.div>;
@@ -35,13 +27,7 @@ function ExpandingCard({expanded}) {
 }
 ```
 
-## Techniques
-
-- `layout`: Animate position and size changes automatically (FLIP algorithm)
-- `layout="position"`: Only position (for text); `layout="size"`: Only size
-- `layoutId`: Same ID on elements across different DOM states for smooth morphing
-- `<Reorder.Group values={items} onReorder={setItems}>`: Drag-to-reorder with auto-layout
-- `<Reorder.Item value={item}>`: Draggable list item
-- Accordion: Combine `layout` with `AnimatePresence` for smooth expand/collapse
-- Tabs indicator: `layoutId="tab-indicator"` + conditional render for smooth underline transition
-- Always wrap conditional elements in `<AnimatePresence>` for exit animations
+- `layout="position"` (text only) / `layout="size"` (size only)
+- `<Reorder.Group values={items} onReorder={setItems}>` + `<Reorder.Item value={item}>`: drag-to-reorder with auto-layout
+- Accordion: combine `layout` with `AnimatePresence` for expand/collapse
+- Tabs indicator: shared `layoutId="tab-indicator"` for sliding underline

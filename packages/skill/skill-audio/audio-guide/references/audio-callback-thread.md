@@ -6,7 +6,7 @@ Treat the OS audio callback (or the dedicated render thread that feeds it) as a 
 
 ## Rationale
 
-The audio device drains its buffer at a constant rate (e.g. 44.1 kHz x channels). If the next block is not ready when the hardware needs it, the device replays stale samples or silence and the listener hears a click, pop, or dropout. The callback runs on a high-priority thread the OS schedules just ahead of the device's consumption; any unbounded operation — a lock the game thread holds, a `malloc` that hits the kernel, a page fault, a file read — can stall it past the deadline. Unlike a frame drop in rendering, an audio underrun is immediately and harshly audible. The discipline is identical to an interrupt handler: known-bounded work, no waiting on anything another thread might own indefinitely.
+The device drains its buffer at a constant rate; if the next block isn't ready it replays stale samples or silence, and an audio underrun is immediately and harshly audible — far worse than a dropped render frame. The callback runs on a high-priority thread scheduled just ahead of the device, so any unbounded operation (a lock the game thread holds, a `malloc` that hits the kernel, a page fault, a file read) can stall it past the deadline. Treat it like an interrupt handler: known-bounded work, no waiting on anything another thread might own indefinitely.
 
 ## How to Apply
 

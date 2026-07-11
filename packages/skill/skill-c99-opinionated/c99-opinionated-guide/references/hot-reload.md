@@ -1,12 +1,6 @@
 # hot-reload: Hot-Reloadable Native Modules
 
-## Guideline
-
-Make native code reloadable at runtime by putting the module behind a function-pointer API table and keeping all persistent state in host-owned memory — never in the module's globals/statics — so the shared library can be swapped without losing state.
-
-## Rationale
-
-Reloading a `.so`/`.dll` while the program runs gives near-instant iteration (change code, rebuild the module, see it live — no restart, no lost session). It works only with discipline: when the old library is unloaded, everything that lived inside it vanishes — its static/global variables and every function pointer into it. So the contract is: the host owns the state and passes it in on every call (caller-owns-memory), and the host reaches the module only through an API struct it re-fetches after each reload. Code that caches a module function pointer or stashes state in a module global breaks the moment you reload.
+Make native code reloadable at runtime by putting the module behind a function-pointer API table and keeping all persistent state in host-owned memory — never in the module's globals/statics — so the shared library can be swapped without losing state. When the old library unloads, everything inside it vanishes (statics and every function pointer into it), so the host owns the state and re-fetches the API struct after each reload.
 
 ## How to Apply
 

@@ -1,35 +1,7 @@
-# validation: Shellcheck and Shfmt Integration
+# validation: Shellcheck and Shfmt
 
-## Guideline
-
-Validate scripts with shellcheck and format with shfmt for consistent, error-free code.
-
-## Rationale
-
-Shellcheck catches common bugs, portability issues, and anti-patterns automatically. Shfmt ensures consistent formatting across scripts, improving readability and maintainability.
-
-## Example
+Lint with `shellcheck script.sh` (or `find . -name '*.sh' -exec shellcheck {} +`) and fix findings rather than suppressing. When a suppression is genuinely warranted, scope it with an inline `# shellcheck disable=SC2086` on the next line only. Format with `shfmt`; house options: `-i 2` (2-space indent), `-bn` (break before binary ops), `-ci` (indent case bodies), `-sr` (space after redirect).
 
 ```sh
-# Run shellcheck on script
-shellcheck script.sh
-
-# Check all shell scripts in directory
-find . -name '*.sh' -exec shellcheck {} +
-
-# Disable specific warnings (use sparingly)
-# shellcheck disable=SC2086
-variable_without_quotes=$1
-
-# Better: Fix the actual issue
-variable_with_quotes="$1"
+shfmt -i 2 -bn -ci -sr -w script.sh
 ```
-
-## Techniques
-
-- Run `shellcheck script.sh` before committing
-- Use `find . -name '*.sh' -exec shellcheck {} +` to check multiple scripts
-- Fix shellcheck warnings rather than disabling them
-- Format scripts with `shfmt -w script.sh`
-- Use shfmt options: `-i 2` (2-space indent), `-bn` (binary ops), `-ci` (case indent), `-sr` (space after redirect)
-- Integrate shellcheck and shfmt into CI/CD pipelines

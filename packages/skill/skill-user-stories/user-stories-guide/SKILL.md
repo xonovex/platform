@@ -54,4 +54,3 @@ Acceptance criteria (the Confirmation):
 - Read [references/splitting-spidr.md](references/splitting-spidr.md) - Load when splitting a story with the five SPIDR techniques
 - Read [references/splitting-flowchart.md](references/splitting-flowchart.md) - Load when splitting with the full pattern flowchart or slicing vertically
 - Read [references/backlog-refinement.md](references/backlog-refinement.md) - Load when refining the backlog and deciding when an item is ready
-- Read [references/best-practices-appendix.md](references/best-practices-appendix.md) - Load when you want the whole user-story checklist on one page

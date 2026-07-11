@@ -11,12 +11,12 @@ description: "Use when writing or editing Vitest 3+ tests in TypeScript. Trigger
 
 ## Essentials
 
-- **Type safety** - Define response interfaces, cast JSON results, see [references/type-safety.md](references/type-safety.md), [references/json-response-type-safety.md](references/json-response-type-safety.md)
-- **HTTP testing** - Use HTTP 204 for OPTIONS, assert correct status codes, see [references/http-testing.md](references/http-testing.md), [references/cors-preflight-status-code.md](references/cors-preflight-status-code.md)
-- **Timestamp testing** - Avoid flaky comparisons, verify existence or add delays, see [references/timestamp-testing.md](references/timestamp-testing.md)
-- **Mock patterns** - Use simple type casting instead of complex generics, see [references/mock-patterns.md](references/mock-patterns.md)
-- **TypeScript config** - Verify project reference paths match structure, see [references/typescript-config.md](references/typescript-config.md), [references/project-references-path-resolution.md](references/project-references-path-resolution.md)
-- **Test organization** - Organize by endpoint/feature with nested describe blocks, see [references/test-organization.md](references/test-organization.md)
+- **Type safety** - Cast `res.json()` to declared interfaces (references/type-safety.md)
+- **HTTP testing** - Assert the status the middleware actually sends (references/http-testing.md)
+- **Timestamp testing** - Avoid flaky comparisons; verify existence or add delays (references/timestamp-testing.md)
+- **Mock patterns** - `vi.fn()` already returns a `Mock`; skip casts and generics (references/mock-patterns.md)
+- **TypeScript config** - Include test paths; verify project reference levels (references/typescript-config.md)
+- **Test organization** - Mirror API structure under `test/` with nested describe blocks (references/test-organization.md)
 
 ## Gotchas
 
@@ -28,12 +28,9 @@ description: "Use when writing or editing Vitest 3+ tests in TypeScript. Trigger
 
 ## Progressive disclosure
 
-- Read [references/type-safety.md](references/type-safety.md) - Load when test variables lose type information
-- Read [references/json-response-type-safety.md](references/json-response-type-safety.md) - Load when calling res.json() without type assertions
-- Read [references/http-testing.md](references/http-testing.md) - Load when asserting HTTP status codes in API tests
-- Read [references/cors-preflight-status-code.md](references/cors-preflight-status-code.md) - Load when testing CORS OPTIONS requests
+- Read [references/type-safety.md](references/type-safety.md) - Load when calling `res.json()` or test variables lose type information
+- Read [references/http-testing.md](references/http-testing.md) - Load when asserting HTTP status codes or testing CORS OPTIONS requests
 - Read [references/timestamp-testing.md](references/timestamp-testing.md) - Load when tests fail intermittently due to timing
 - Read [references/mock-patterns.md](references/mock-patterns.md) - Load when creating mocks or stubs for tests
-- Read [references/typescript-config.md](references/typescript-config.md) - Load when test files aren't recognized by TypeScript
-- Read [references/project-references-path-resolution.md](references/project-references-path-resolution.md) - Load when imports fail in test files
+- Read [references/typescript-config.md](references/typescript-config.md) - Load when test files aren't recognized by TypeScript or reference imports fail
 - Read [references/test-organization.md](references/test-organization.md) - Load when structuring test suites for large APIs

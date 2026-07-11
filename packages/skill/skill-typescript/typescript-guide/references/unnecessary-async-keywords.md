@@ -1,42 +1,16 @@
-# unnecessary-async-keywords: Remove Async Keyword Without Await Usage
+# unnecessary-async-keywords: Return Promises Directly Instead of Wrapping in Async
 
-## Guideline
-
-Remove `async` from functions that don't use `await`; frameworks allow returning Promises directly.
-
-## Rationale
-
-Unnecessary `async` adds overhead and creates false async expectations.
-
-## Example
+When a function's body just forwards a Promise-producing call (no `await`), drop `async` and return the Promise directly — handlers (e.g. Hono) accept a returned Promise. If the body actually uses `await`, keep `async`. Same ESLint rule as async-without-await: `@typescript-eslint/require-await`.
 
 ```typescript
-// ❌ Bad: async without await
+// ❌ async wrapper around a Promise-returning call
 async function getUser(id: string) {
   return database.users.find(id);
 }
-
-// ✅ Good: Remove async, return Promise directly
+app.get("/users", async (c) => c.json(getUsers()));
+// ✅ return the Promise directly, no async
 function getUser(id: string) {
   return database.users.find(id);
 }
-
-// ❌ Bad: Hono handler with async, no await
-app.get("/users", async (c) => {
-  return c.json(getUsers());
-});
-
-// ✅ Good: Remove async
-app.get("/users", (c) => {
-  return c.json(getUsers());
-});
+app.get("/users", (c) => c.json(getUsers()));
 ```
-
-## Techniques
-
-- Run ESLint to find @typescript-eslint/require-await violations
-- Remove `async` keyword for each flagged function
-- Verify return types still match (Promises ok without `async`)
-- Return Promise directly without `async` wrapper
-- Run tests to ensure behavior unchanged
-- Commit with clear explanation of changes

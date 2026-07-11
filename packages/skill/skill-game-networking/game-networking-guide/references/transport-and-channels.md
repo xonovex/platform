@@ -6,16 +6,7 @@ Build the wire layer on UDP and expose a small transport API where the caller op
 
 ## Rationale
 
-Games need both fire-and-forget data (this frame's input, which is stale next frame) and must-arrive data (a snapshot, a connection handshake), and a single reliable-ordered stream like TCP head-of-line-blocks the cheap data behind the expensive data. UDP gives raw datagrams with no ordering or delivery promises; the engine adds the guarantees selectively on top. The unit of communication is a pipe: a unidirectional path from node A to node B identified by an ever-incrementing id, established by a request/response handshake the receiver can accept or reject; bidirectional talk needs a pipe each way. Every payload sent on a pipe is stamped with a packet type, and the type — not each send call — defines the retransmission policy and whether acknowledgements are required. Callers then send a typed payload with just a pointer and a size; the transport handles fragmentation, acks, and retransmission according to the type's guarantee. Receiving is callback-driven: a receiver callback handles an arriving packet, an accepter decides incoming pipe requests, a bootstrapper runs at node startup.
-
-## Contents
-
-- UDP base and why guarantees are layered on
-- Pipes: unidirectional, ids, one-per-direction
-- Handshake: request / accept / response
-- Packet types and per-type delivery policy
-- Delivery guarantees: unreliable / ordered / reliable
-- Callback interfaces: receiver, accepter, bootstrapper
+Games need both fire-and-forget data (this frame's input, stale next frame) and must-arrive data (a snapshot, a handshake), and a single reliable-ordered stream like TCP head-of-line-blocks the cheap data behind the expensive data. UDP gives raw datagrams with no ordering or delivery promises; the engine adds guarantees selectively on top. The unit of communication is a pipe: a unidirectional path from node A to node B identified by an ever-incrementing id, established by a request/response handshake the receiver can accept or reject; bidirectional talk needs a pipe each way. Every payload is stamped with a packet type, and the type — not each send call — defines the retransmission policy and whether acknowledgements are required. Callers send a typed payload with just a pointer and a size; the transport handles fragmentation, acks, and retransmission per the type's guarantee. Receiving is callback-driven: a receiver callback handles an arriving packet, an accepter decides incoming pipe requests, a bootstrapper runs at node startup.
 
 ### How to Apply
 

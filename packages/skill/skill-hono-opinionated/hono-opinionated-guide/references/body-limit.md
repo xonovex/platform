@@ -1,62 +1,29 @@
-# body-limit: Preventing Large Payload Attacks
+# body-limit: Cap Request Payload Size
 
-## Guideline
-
-Use Body Limit middleware to prevent DoS attacks from oversized request payloads, configuring appropriate limits per endpoint based on expected data.
-
-## Rationale
-
-Large request bodies can exhaust server memory, cause denial of service, and overwhelm downstream services. Body Limit middleware rejects requests before fully reading them, uses stream reading without Content-Length requirements, and returns 413 Payload Too Large status while remaining configurable per route.
-
-## Example
+Apply `bodyLimit` from `hono/body-limit` to reject oversized bodies before fully reading them (stream-based, no `Content-Length` needed). Default response is 413 Payload Too Large. Set a low global `maxSize` and raise it per-route for uploads. `maxSize` is in bytes.
 
 ```typescript
 import {bodyLimit} from "hono/body-limit";
 
-// Global limit for most endpoints
 app.use(
   "*",
   bodyLimit({
     maxSize: 100 * 1024, // 100KB default
-    onError: (c) => {
-      return c.json(
+    onError: (c) =>
+      c.json(
         {
           type: "about:blank#payload-too-large",
           title: "Payload Too Large",
           status: 413,
-          detail: "Request body exceeds 100KB limit",
+          detail: "Body exceeds 100KB",
         },
         413,
-      );
-    },
+      ),
   }),
 );
 
-// Higher limit for file uploads
-app.post(
-  "/upload",
-  bodyLimit({
-    maxSize: 10 * 1024 * 1024, // 10MB for uploads
-  }),
-  async (c) => {
-    const body = await c.req.parseBody();
-    // Handle file upload
-  },
-);
-
-// Stricter limit for JSON APIs
-app.use(
-  "/api/*",
-  bodyLimit({
-    maxSize: 50 * 1024, // 50KB for JSON
-  }),
-);
+// Raise the limit for uploads
+app.post("/upload", bodyLimit({maxSize: 10 * 1024 * 1024}), async (c) => {
+  await c.req.parseBody();
+});
 ```
-
-## Techniques
-
-- Import `bodyLimit` from `hono/body-limit` and set appropriate `maxSize` in bytes
-- Apply globally with app.use() or per-route for flexibility
-- Configure different limits for different endpoints (100KB default, 10MB for uploads)
-- Provide custom `onError` handler for formatted error responses
-- Consider internal vs public services when setting limits

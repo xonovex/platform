@@ -1,14 +1,6 @@
 # islands-architecture: Islands Architecture and Hydration
 
-## Guideline
-
-Ship minimal JavaScript by hydrating only interactive components; static HTML by default.
-
-## Rationale
-
-Astro renders to static HTML by default (zero JS). Framework components only hydrate when marked with directives, resulting in faster loads and better performance.
-
-## Example
+Astro components render to static HTML with zero JS. Framework components ship no JavaScript until marked with a `client:*` directive — pick the cheapest one that works.
 
 ```astro
 ---
@@ -19,16 +11,14 @@ import SearchBar from "../components/SearchBar.tsx";
 <Layout title="Home">
   <h1>Static Content</h1>
   <Counter client:visible />
-  <!-- Hydrate on viewport entry -->
+  <!-- hydrate on viewport entry -->
   <SearchBar client:load />
-  <!-- Hydrate immediately -->
+  <!-- hydrate immediately -->
 </Layout>
 ```
 
-## Techniques
-
-- Static by default: Build pages with Astro components that render zero JavaScript
-- Framework components: Import React, Vue, Svelte only for interactive features
-- client:load: Hydrate immediately for critical interactive components
-- client:visible: Hydrate when component enters viewport for lazy interactivity
-- client:idle: Hydrate during browser idle time for lower-priority features
+- `client:load` — hydrate immediately (critical interactivity)
+- `client:idle` — hydrate on browser idle (lower priority)
+- `client:visible` — hydrate on viewport entry (below-the-fold)
+- `client:media={query}` — hydrate when the media query matches
+- `client:only={framework}` — skip SSR, render client-side only

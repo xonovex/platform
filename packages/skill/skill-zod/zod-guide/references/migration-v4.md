@@ -1,51 +1,20 @@
-# v4-migration: Zod v4 Migration Guide
+# migration-v4: Zod v3 → v4 Migration
 
-## Guideline
+Replace deprecated v3 string refinements with v4 standalone validators, and native TS enums with `z.enum()`. Deprecated forms trigger ESLint deprecation warnings.
 
-Use Zod v4 standalone validators like `z.uuid()`, `z.email()`, and `z.iso.datetime()` instead of deprecated v3 string refinement methods.
-
-## Rationale
-
-Zod v4 changed from string refinements to standalone validators that are more efficient, type-safe, and avoid ESLint deprecation warnings.
-
-## Example
+| v3 (deprecated)         | v4                 |
+| ----------------------- | ------------------ |
+| `z.string().uuid()`     | `z.uuid()`         |
+| `z.string().email()`    | `z.email()`        |
+| `z.string().url()`      | `z.url()`          |
+| `z.string().datetime()` | `z.iso.datetime()` |
+| `z.string().date()`     | `z.iso.date()`     |
+| `z.string().time()`     | `z.iso.time()`     |
+| `z.nativeEnum(E)`       | `z.enum(E)`        |
 
 ```typescript
-// ✅ Correct (v4) - standalone validators
-const UserSchema = z.object({
-  id: z.uuid(), // Not z.string().uuid()
-  email: z.email(), // Not z.string().email()
-  website: z.url(), // Not z.string().url()
-  createdAt: z.iso.datetime(), // Not z.string().datetime()
-  birthDate: z.iso.date(), // Not z.string().date()
-  checkInTime: z.iso.time(), // Not z.string().time()
-});
+const StatusSchema = z.enum(Status); // native TS enum; v3 required z.nativeEnum(Status)
 
-// Native enums now go through z.enum() (z.nativeEnum() is deprecated in v4)
-enum Status {
-  Active = "active",
-  Inactive = "inactive",
-}
-const StatusSchema = z.enum(Status); // v3 required z.nativeEnum(Status)
-
-// String literal unions (unchanged)
-const RoleSchema = z.enum(["admin", "user", "guest"]);
-
-// Default values with transformations
-const ConfigSchema = z.object({
-  port: z.string().transform(Number).pipe(z.number()).default(3000), // ✅ Default matches output type (number)
-
-  timeout: z.string().transform(Number).pipe(z.number()).default(5000), // ✅ Not .default("5000")
-});
+// Defaults must match the transformed output type
+const port = z.string().transform(Number).pipe(z.number()).default(3000); // not .default("3000")
 ```
-
-## Techniques
-
-- Replace `z.string().uuid()` with `z.uuid()`
-- Replace `z.string().email()` with `z.email()`
-- Replace `z.string().url()` with `z.url()`
-- Replace `z.string().datetime()` with `z.iso.datetime()`
-- Replace `z.string().date()` with `z.iso.date()`
-- Replace `z.string().time()` with `z.iso.time()`
-- Update defaults to match output types with transformations
-- Run linter to verify no deprecation warnings

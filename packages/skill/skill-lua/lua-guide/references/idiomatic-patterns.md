@@ -1,45 +1,13 @@
 # idiomatic-patterns: Idiomatic Patterns
 
-## Guideline
-
-Use Lua's idiomatic patterns for common operations like ternary expressions, default values, and safe navigation.
-
-## Rationale
-
-These patterns are widely recognized in Lua community, concise, and leverage Lua's truthiness semantics effectively.
-
-## Example
+Lua truthiness idioms (only `nil` and `false` are falsy):
 
 ```lua
--- ✅ Ternary operator pattern
-local value = condition and true_value or false_value
-
--- ✅ Default value pattern
-local x = config.x or 0
-local name = user.name or "Anonymous"
-
--- ✅ Safe navigation
-local value = obj and obj.field and obj.field.nested
-
--- ✅ Multiple return values
-local ok, result = pcall(risky_function)
-if ok then
-    use_result(result)
-else
-    handle_error(result)
-end
-
--- ✅ Swap variables
-a, b = b, a
-
--- ✅ Unpack table
-local x, y, z = unpack(position)
+local value = condition and true_value or false_value  -- ternary; false_value must be truthy
+local x = config.x or 0                                 -- default value
+local nested = obj and obj.field and obj.field.nested   -- safe navigation
+a, b = b, a                                             -- swap via tuple assignment
+local x, y, z = table.unpack(position)                  -- 5.4: table.unpack, not global unpack
 ```
 
-## Techniques
-
-- Use `and`/`or` for conditional expressions
-- Use `or` for default values
-- Use `and` chain for safe navigation
-- Leverage multiple return values
-- Use tuple assignment for swapping
+The `and`/`or` ternary is broken when `true_value` can itself be `false`/`nil` — use an `if` then.

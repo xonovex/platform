@@ -4,21 +4,13 @@
 
 Let a graph contain another graph behind a typed input/output interface so a subgraph appears as a single node in its parent (the data-flow analog of a function call); generate the subgraph node's pins from that interface; flatten subgraphs into the parent at compile time by inlining their nodes and patching boundary wires; and promote a subgraph to a reusable asset that many graphs instance and locally override.
 
-## Contents
-
-- Subgraph as a node, with a declared interface (inputs/outputs)
-- Interface nodes inside the subgraph and the `+` connector
-- Creating a subgraph from a selection (boundary/dangling wires)
-- Flattening (inlining) at compile time, and why not recursion
-- Function graphs: promoting to an asset, instancing, overrides
-
 ### Guideline (detail)
 
 A subgraph is a graph stored inside a node of its parent. The parent treats it as one node; the subgraph treats the boundary as a set of declared inputs and outputs. Define that interface as data on the graph (a list of inputs and a list of outputs, each with a display name for the UI, a stable id for connection targeting, and a type hash for the expected data). The subgraph node reads the interface and dynamically creates a connector per input and per output; special Input and Output nodes inside the subgraph expose those same boundary pins to the inner nodes.
 
 ### Rationale
 
-Encapsulation is how a node graph scales past a screenful. Behind one node you hide arbitrary internal complexity, name the boundary, and reuse it. Defining the interface as data (display name + id + type hash) means the same definition drives the UI, drives connection validity, and survives serialization — the parent's subgraph node and the inner Input/Output nodes are both generated from it, so they cannot disagree. Flattening at compile time is the key implementation move: rather than teach the evaluator to recurse into subgraphs (which would require it to understand subgraph wrappers and interface nodes), a pre-pass walks the graph and copies every real node and connection into flat lists, skips the wrapper/Input/Output nodes, and patches the wires that crossed the boundary so they connect directly to the inner nodes. The evaluator then sees one ordinary flat graph and needs no subgraph awareness at all. Promoting a subgraph to an asset turns "a reusable block" into "a function": many parent graphs hold a subgraph node that points at the asset, get an instance of it, and may override individual inner nodes locally — edit the asset and every instance updates, while local tweaks stay local.
+Encapsulation is how a node graph scales past a screenful. Defining the interface as data (display name + id + type hash) means one definition drives the UI, connection validity, and serialization — the parent's subgraph node and the inner Input/Output nodes are both generated from it, so they cannot disagree. Flattening at compile time is the key move: rather than teach the evaluator to recurse into subgraphs, a pre-pass copies every real node and connection into flat lists, skips the wrapper/Input/Output nodes, and patches the wires that crossed the boundary so they connect directly to the inner nodes — the evaluator then needs no subgraph awareness. Promoting a subgraph to an asset turns "a reusable block" into "a function": many parent graphs hold a subgraph node pointing at the asset, get an instance, and may override individual inner nodes locally — edit the asset and every instance updates, while local tweaks stay local.
 
 ### How to Apply
 
