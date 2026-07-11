@@ -23,5 +23,7 @@ argument-hint: "[plan-file] [--mode red-team|pre-mortem|falsify|steelman|all]"
 ## Delegation
 
 Load the `plan-guide` skill (plugin `xonovex-skill-plan`) and perform its
-**plan-critique** operation with these arguments. The skill is the source of truth for
-the procedure, output format, and gotchas — do not restate them.
+**plan-critique** operation with these arguments. Run this as a fresh session /
+independent agent that did not author the plan — self-critique defends instead of
+attacks. The skill is the source of truth for the procedure, output format, and
+gotchas — do not restate them.

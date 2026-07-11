@@ -1,6 +1,6 @@
 # plan-critique: Adversarially Stress-Test a Plan
 
-Attack an existing plan to expose its weaknesses before any code is written — flawed assumptions, failure modes, missing cases, unmanaged risks. Read-only: produces a findings report for `plan-revise` to act on; never edits the plan or the codebase.
+Attack an existing plan to expose its weaknesses before any code is written — flawed assumptions, failure modes, missing cases, unmanaged risks. Read-only: produces a findings report for `plan-revise` to act on; never edits the plan or the codebase. Run it as an independent agent — a fresh session that did not author the plan — so it attacks the approach rather than defending it.
 
 ## Critique vs Validate
 
@@ -57,3 +57,4 @@ Next: plan-revise (resolve blocking + major), then re-run plan-critique
 - Findings without severity can't be triaged — always rate and order
 - A critique that edits the plan oversteps — it reports; `plan-revise` applies the fixes
 - Running every mode on a tiny plan is busywork — default to red-team + pre-mortem, escalate to falsify / steelman when the stakes warrant
+- The plan's author critiquing their own plan defends it — run plan-critique in a fresh session (or a separate agent) that did not write the plan

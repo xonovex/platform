@@ -21,6 +21,7 @@ Author and maintain plan documents across their full lifecycle (research → dec
 - A plan without `skills_to_consult` leaves implementers ignoring project conventions
 - Auto-detecting toolchain via `package.json` only misses Moon/Makefile-driven projects — check both
 - Approve the parent with `plan-accept` before `plan-subplans-create` — it requires `status: approved`
+- `plan-critique` must run as an independent agent (fresh session), not the plan's author — self-critique defends instead of attacks
 - "Tests pass" doesn't mean "success criteria met" — `plan-validate` reads the criteria, not just exit codes
 - Auto-continuing to the next plan after completion silently chains work — `plan-continue` STOPS after one
 - Subplans with >7 tasks risk silent drops — target 5–7 tasks each
