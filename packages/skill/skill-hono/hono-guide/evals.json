@@ -8,8 +8,7 @@
       "assertions": [
         "Creates WebSocket helpers with createNodeWebSocket({app}) from @hono/node-ws and calls injectWebSocket on the returned object without destructuring injectWebSocket off it",
         "Uses upgradeWebSocket to define the /ws/chat route handler with an onMessage callback that calls ws.send"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 2,
@@ -17,16 +16,14 @@
       "assertions": [
         "Response body is RFC 7807 Problem Details containing type, title, and status fields (not a plain {error: ...} object)",
         "Includes an issues array mapping each validation problem to at least path and message"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 3,
       "prompt": "Our Hono app must read a DATABASE_URL environment variable inside a route handler, and the same code has to run correctly whether deployed on Node or on Cloudflare Workers. Write the handler.",
       "assertions": [
         "Reads the variable via env(c) imported from hono/adapter rather than accessing process.env or Deno.env directly"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 4,
@@ -34,8 +31,7 @@
       "assertions": [
         "Uses a cookie helper imported from hono/cookie and sets httpOnly: true and secure: true",
         "Sets path: \"/\" and does not set a domain attribute, satisfying the __Host- prefix requirements"
-      ],
-      "load_bearing": true
+      ]
     }
   ]
 }

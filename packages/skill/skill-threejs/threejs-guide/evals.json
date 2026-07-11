@@ -9,8 +9,7 @@
         "The render loop is driven by renderer.setAnimationLoop(...) rather than requestAnimationFrame",
         "The per-frame rotation is scaled by a delta time obtained from a THREE.Clock (e.g. clock.getDelta()) rather than a fixed increment",
         "The device pixel ratio is capped at 2, e.g. renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 2,
@@ -19,8 +18,7 @@
         "Imports the renderer from the 'three/webgpu' entry point (e.g. import * as THREE from 'three/webgpu') and instantiates WebGPURenderer",
         "Awaits renderer.init() before the first render",
         "Uses TSL / node materials (imports from 'three/tsl' and/or a *NodeMaterial such as MeshStandardNodeMaterial) instead of hand-written GLSL ShaderMaterial"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 3,
@@ -28,8 +26,7 @@
       "assertions": [
         "The albedo/base-color texture has its colorSpace set to THREE.SRGBColorSpace",
         "The normal map is treated as data (NoColorSpace) and is NOT assigned SRGBColorSpace"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 4,
@@ -37,8 +34,7 @@
       "assertions": [
         "Identifies that frustum culling relies on the geometry's bounding sphere, which is not automatically computed for Points/LineSegments when positions are set manually",
         "Recommends calling geometry.computeBoundingSphere() (or disabling culling via frustumCulled = false) as the fix"
-      ],
-      "load_bearing": true
+      ]
     }
   ]
 }

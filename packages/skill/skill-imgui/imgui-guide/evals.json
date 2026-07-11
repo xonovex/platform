@@ -8,8 +8,7 @@
       "assertions": [
         "Writes each control under the cursor into a candidate field (e.g. next_hover) during the frame rather than committing hover immediately, so the last-drawn/topmost control's write wins",
         "Promotes the candidate to the active hover value at frame end so controls read the previous frame's resolved hover this frame (a one-frame delay), rather than resolving hover within the same frame"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 2,
@@ -17,8 +16,7 @@
       "assertions": [
         "Encodes each 32-bit index as a byte offset into the primitive buffer in the low 24 bits plus the primitive type and corner id packed into the top 8 bits (6 bits type + 2 bits corner)",
         "Packs primitives tightly with no common/fixed stride (a rect and a glyph differ in size) rather than using a uniform vertex layout, and encodes the clip rectangle into each primitive (GPU clips) instead of issuing per-scissor draw calls"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 3,
@@ -26,8 +24,7 @@
       "assertions": [
         "Uses the hash of the source string itself as the lookup key (wrapping visible text in a LOCALIZE-style marker) instead of numeric/string IDs, and returns the original source string as the fallback on a lookup miss",
         "Recommends a pseudo-localization mode that both transforms strings into recognizable nonsense and pads them noticeably longer (~40%) to surface unmarked strings and layout that breaks under text expansion"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 4,
@@ -35,8 +32,7 @@
       "assertions": [
         "Holds the drag state as a single global id naming the dragged object(s) (outside any per-control or per-window UI context) so it survives across windows, and treats the drop as a data-model mutation",
         "Initiates via a prepare/latch on mouse-press that only starts the actual drag once the cursor leaves the item while still held (aborting if released first), and runs the end-of-frame drag-cancel only AFTER all drop targets have processed the mouse-release"
-      ],
-      "load_bearing": true
+      ]
     }
   ]
 }

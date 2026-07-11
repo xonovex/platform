@@ -9,8 +9,7 @@
         "Uses FetchContent_MakeAvailable(fmt) rather than the FetchContent_GetProperties / FetchContent_Populate pattern",
         "Pins GIT_TAG to an exact tag or commit (e.g. 10.1.1), not a branch name",
         "Links the namespaced imported target fmt::fmt (not a bare `fmt`) via target_link_libraries"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 2,
@@ -19,8 +18,7 @@
         "Requires the standard via target_compile_features(core PUBLIC cxx_std_20) rather than setting the CMAKE_CXX_STANDARD variable",
         "Applies warning flags with per-target target_compile_options (with a visibility keyword), not the global add_compile_options",
         "Guards compiler-specific flags with a generator expression keyed on CXX_COMPILER_ID (e.g. $<$<CXX_COMPILER_ID:GNU,Clang>:...>)"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 3,
@@ -28,8 +26,7 @@
       "assertions": [
         "install(TARGETS mylib ...) associates the target with an EXPORT set, and install(EXPORT ...) is called with a NAMESPACE ending in :: (e.g. mylib::)",
         "Public include directories use the $<BUILD_INTERFACE:...> / $<INSTALL_INTERFACE:...> generator-expression split rather than a single unconditional path"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 4,
@@ -37,8 +34,7 @@
       "assertions": [
         "Calls enable_testing() and registers the test with add_test(NAME ... COMMAND ...)",
         "Assigns a LABELS property (and TIMEOUT) via set_tests_properties so the test can be filtered with `ctest -L`"
-      ],
-      "load_bearing": false
+      ]
     }
   ]
 }

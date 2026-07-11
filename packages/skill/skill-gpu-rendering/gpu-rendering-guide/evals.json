@@ -9,8 +9,7 @@
         "At the start of a frame, waits on the fence for the frame slot it is about to reuse (e.g. frame index modulo N), NOT the fence of the frame just submitted",
         "Keeps only about 2 or 3 frames in flight (double/triple buffering) rather than maximizing the number of in-flight frames",
         "Duplicates per-frame CPU-written GPU resources (uniform/command/instance buffers) per frame slot so writing one slot cannot race the GPU reading another"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 2,
@@ -19,8 +18,7 @@
         "Recommends a render graph / frame graph where each pass declares its resource reads and writes and the graph derives execution order plus the barriers and image-layout transitions",
         "States that transient targets may share (alias) the same physical memory only when their lifetimes do not overlap",
         "Warns that an aliased target's contents are undefined on first use in its new lifetime, so it must be fully cleared or overwritten before being read"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 3,
@@ -29,8 +27,7 @@
         "Specifies a wide-gamut swapchain: PQ/ST2084 Rec.2020 at 10-bit-or-more per channel (e.g. an A2B10G10R10 packed format) for HDR10, or extended-linear scRGB at FP16 (RGBA16F) — not an 8-bit sRGB backbuffer for the HDR path",
         "Applies the display transfer function exactly once in an explicit final pass and does not rely on an automatic sRGB backbuffer to encode",
         "Scales luminance to the display's actual measured peak nits rather than PQ's full 10,000-nit range"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 4,
@@ -38,8 +35,7 @@
       "assertions": [
         "Recommends sub-allocating resources out of a small number of large memory blocks instead of one device allocation per resource, and notes the device allocation count is hard-capped",
         "Uploads static assets by writing to a host-visible staging buffer and copying into a device-local resource, because device-local memory is generally not CPU-mappable"
-      ],
-      "load_bearing": true
+      ]
     }
   ]
 }

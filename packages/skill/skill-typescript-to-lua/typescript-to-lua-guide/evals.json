@@ -9,8 +9,7 @@
         "The function body returns via a `$multi(...)` call",
         "The function's return type is annotated `LuaMultiReturn<[number, number]>` (or equivalent LuaMultiReturn tuple) imported from \"typescript-to-lua\"",
         "The call site destructures the result with array destructuring, e.g. `const [q, r] = divmod(...)`"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 2,
@@ -18,8 +17,7 @@
       "assertions": [
         "The interface is annotated with a `/** @luaTable */` JSDoc comment",
         "The helper function is annotated with a `/** @noSelf */` JSDoc comment"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 3,
@@ -28,8 +26,7 @@
         "The module is organized with a `namespace` (and/or exported free functions) rather than a `class` with instance methods",
         "Vector operations take the vector value(s) as explicit parameters instead of relying on `this`",
         "The output does not define a class with a constructor for the vector type"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 4,
@@ -38,8 +35,7 @@
         "The config contains a top-level `tstl` block (sibling to `compilerOptions`)",
         "Inside `tstl`, `luaTarget` is set to `\"JIT\"`",
         "Inside `tstl`, `sourceMapTraceback` is set to `true`"
-      ],
-      "load_bearing": true
+      ]
     }
   ]
 }

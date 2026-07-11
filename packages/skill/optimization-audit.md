@@ -146,7 +146,7 @@ Before/after are total lines across `SKILL.md` + `references/`, measured from gi
 
 ## Re-running the evals (and adding a new model)
 
-Every skill carries an `evals.json` next to its `SKILL.md` — the output-eval seed consumed by `eval-outputs.py`. It holds the knowledge probes (`prompt` + binary `assertions`, with a `load_bearing` flag) that seed any A/B or ablation run. **291 evals across the catalog, 274 `load_bearing`.** This is the durable "something to start from": no probe needs re-authoring to test a new model.
+Every skill carries an `evals.json` next to its `SKILL.md` — the output-eval seed consumed by `eval-outputs.py`. It holds the knowledge probes (`prompt` + binary `assertions`) that seed any A/B or ablation run. **291 evals across the catalog.** This is the durable "something to start from": no probe needs re-authoring to test a new model.
 
 ### Test one skill on any model
 
@@ -177,4 +177,4 @@ Read each eval's `with_skill` vs `without_skill` pass rate:
 - `with_skill` high, `without_skill` low → still **load-bearing** → keep (restore if a trim removed it).
 - `with_skill` low → the skill or the eval needs attention.
 
-The `load_bearing` evals are the ones a trim must never break. After any future trimming pass, re-run them (or the two-stage ablation: diff removed content → ablate on the weakest model) to confirm nothing load-bearing was lost, exactly as this session did.
+Load-bearing is measured, not declared: after any future trimming pass, re-run the seed on the weakest model (or the two-stage ablation: diff removed content → ablate on the weakest model); an eval a model fails _with_ the skill is one a trim broke — restore it, exactly as this session did.

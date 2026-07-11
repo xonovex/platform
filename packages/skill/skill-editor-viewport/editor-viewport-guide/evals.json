@@ -9,8 +9,7 @@
         "The cursor is projected onto the axis in 2D screen space (project the axis to screen, project the 2D cursor onto that 2D line, then lift back to world) rather than constructing a 3D mouse ray from an arbitrary cursor depth/z and intersecting it with the axis",
         "The object is driven by the delta of the projected parameter relative to a stored drag-start value, not by applying the absolute projected parameter as the position",
         "Divisions are guarded with an epsilon so a near-parallel axis or near-zero-length direction falls back to a no-op instead of exploding"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 2,
@@ -18,8 +17,7 @@
       "assertions": [
         "Picking renders each object's stable id into a GPU buffer/target and reads back the pixel under the cursor, rather than CPU ray-casting against physics shapes / bounding volumes / a BVH",
         "The GPU-to-CPU read-back is asynchronous — the request is queued and the result consumed a frame or two later — not a synchronous same-frame read that stalls the pipeline"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 3,
@@ -28,8 +26,7 @@
         "The outline is produced by edge-detecting a selection id target — comparing each pixel's id to its neighbors' ids in a fullscreen pass — rather than by edge-detecting the depth buffer or scaling/extruding geometry",
         "When the selected object is occluded, the outline's alpha is dimmed rather than discarded/dropped",
         "To avoid outline shimmer under TAA, the closest selection depth is taken over a small neighborhood before comparing against scene depth (not a direct single-tap depth compare)"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 4,
@@ -37,8 +34,7 @@
       "assertions": [
         "Components expose only a small get/set-transform interface that the central gizmo queries/looks up (e.g. a registered function-pointer table by name), rather than inheriting from a gizmo base class or drawing/hit-testing their own handles",
         "get_transform returns both the world and local transform so the gizmo can apply a drag delta in either world or local space"
-      ],
-      "load_bearing": true
+      ]
     }
   ]
 }

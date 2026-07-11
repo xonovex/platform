@@ -9,8 +9,7 @@
         "The inline comment is carried inside a single `gh api` POST to the `repos/acme/widgets/pulls/123/reviews` endpoint (a comments[] entry in the review object), NOT via `gh pr review` and NOT via a standalone `.../pulls/123/comments` call",
         "The review sets `event=REQUEST_CHANGES`",
         "The inline anchor uses `line` (a file line number) plus `side` (e.g. RIGHT), and does NOT compute or use the deprecated diff `position` field"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 2,
@@ -18,8 +17,7 @@
       "assertions": [
         "Uses `gh api graphql` with the `resolveReviewThread` mutation (not any REST endpoint, which cannot resolve threads)",
         "Targets the thread by its node id (a `PRRT_...` threadId) rather than matching by line number"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 3,
@@ -27,16 +25,14 @@
       "assertions": [
         "Pushing commits/refs requires Contents: write, and it explicitly notes Contents: read is NOT sufficient to push",
         "Resolving a review thread requires Pull requests: write AND Contents: read & write together"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 4,
       "prompt": "Our CI job runs the gh CLI and authenticates fine against github.com, but the identical job returns 401 Unauthorized when we point it at our self-hosted GitHub Enterprise Server. What's the likely cause and fix?",
       "assertions": [
         "Identifies that the GitHub Enterprise Server host reads GH_ENTERPRISE_TOKEN (or GITHUB_ENTERPRISE_TOKEN), not GH_TOKEN/GITHUB_TOKEN, and that the token must be supplied via that enterprise variable"
-      ],
-      "load_bearing": true
+      ]
     }
   ]
 }

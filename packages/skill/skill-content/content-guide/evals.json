@@ -9,8 +9,7 @@
         "The rewrite drops marketing-puffery words (at least 'seamless', 'unlock ... potential', and 'game-changer') and instead states something concrete the product does.",
         "The vague attributions 'experts agree' and 'studies show' are either cut or replaced by a specific named source; no unsourced 'experts'/'studies show' claim remains.",
         "No fabricated statistic, source name, publication, or quote is invented to replace the vague claims."
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 2,
@@ -19,8 +18,7 @@
         "Each news post is emitted as a separate Markdown file per language (distinct English and Dutch files), not a single combined bilingual file.",
         "Filenames follow the slug.lang.md convention (e.g. some-slug.en.md and some-slug.nl.md).",
         "Each file's frontmatter includes lang, slug, title, summary, and created_at fields."
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 3,
@@ -29,8 +27,7 @@
         "The guide is organized into sections covering, at minimum: an introduction/welcome, logistics and planning, main attractions and activities, itineraries or strategies, and essential practical information.",
         "Critical practical details such as costs, opening hours, and names are marked in bold.",
         "The output records the date the information was researched or verified (e.g. in the summary or a footer) so it can be re-checked later."
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 4,
@@ -39,8 +36,7 @@
         "Negative parallelism ('not just X, but also Y') and the reflexive rule-of-three list are broken up rather than preserved.",
         "The trailing participle clauses ('creating value', 'ensuring users remain engaged') and the generic 'Overall, the future looks promising' conclusion are removed or replaced with a concrete claim.",
         "The rewrite does not introduce invented facts, fake typos, or forced sentence fragments as a way to appear human."
-      ],
-      "load_bearing": true
+      ]
     }
   ]
 }

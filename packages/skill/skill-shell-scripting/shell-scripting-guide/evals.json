@@ -9,8 +9,7 @@
         "The strict-mode line is `set -eu` (or `set -e` and `set -u`) and does NOT include `-o pipefail`, or pipefail is explicitly noted as bash-only and omitted under the sh shebang",
         "Command existence is checked with `command -v` (not `which` or `type`)",
         "Conditionals use single-bracket `[ ]` tests with `=`, not `[[ ]]` or `==`"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 2,
@@ -18,8 +17,7 @@
       "assertions": [
         "Before appending the line it guards with a grep check (e.g. `grep -qF`) so the line is not duplicated on re-run",
         "The config is written to a temporary file and then moved into place with `mv` for an atomic replacement (not written directly to the final path)"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 3,
@@ -27,8 +25,7 @@
       "assertions": [
         "The read loop uses `IFS= read -r` to preserve leading/trailing whitespace and backslashes",
         "A `trap` on EXIT (and typically INT/TERM) removes the temp directory created via `mktemp -d`"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 4,
@@ -37,8 +34,7 @@
         "The fatal-error helper writes its message to stderr (redirected with `>&2`)",
         "The missing-command failure exits with status 127",
         "The usage/argument-count error exits with status 2"
-      ],
-      "load_bearing": true
+      ]
     }
   ]
 }

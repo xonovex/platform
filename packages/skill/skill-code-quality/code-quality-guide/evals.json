@@ -8,8 +8,7 @@
       "assertions": [
         "Ranks the unvalidated `/orders` request body (req.body.quantity / price / customerId used without validation) as higher severity than the long buildInvoiceLines function",
         "Justifies the ranking by impact/blast radius (a trust-boundary input reaching logic) rather than by the function's line count or length"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 2,
@@ -17,8 +16,7 @@
       "assertions": [
         "Recommends adding a single schema / parse / validation step at the boundary where the file is parsed (the JSON.parse of the config), rather than annotating or asserting a type at each field access / call site",
         "Frames the ~20 `any` uses as one missing-schema finding at the boundary, not as many separate per-site type findings"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 3,
@@ -26,8 +24,7 @@
       "assertions": [
         "Flags the loadUser catch as a problem: a real error is swallowed and mapped to a sentinel (null) so a failure looks like a legitimate 'not found', losing the cause",
         "Does NOT treat the commented best-effort refreshCache catch as a high-severity swallowed error; accepts it (or grades it low) because the comment documents an intentional best-effort/no-data-loss case"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 4,
@@ -35,8 +32,7 @@
       "assertions": [
         "Reports findings without producing a rewritten/fixed version of the module (stays read-only)",
         "Groups or labels each finding by a severity level (e.g. high/medium/low) and/or a category, rather than a flat unranked list"
-      ],
-      "load_bearing": false
+      ]
     }
   ]
 }

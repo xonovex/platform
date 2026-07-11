@@ -9,8 +9,7 @@
         "Each file has YAML frontmatter that includes category, topic, and applies_to fields",
         "The frontmatter sets applied to false on creation",
         "The body is structured around MISTAKE, DISCOVERY, and FIX (how to avoid it)"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 2,
@@ -18,8 +17,7 @@
       "assertions": [
         "States that insights are extracted and written straight into AGENTS.md by default, without a required prior store-then-integrate step",
         "Notes that persisting the lessons to reflections/*.md files first is optional and only happens with a --persist flag (or an explicit extract), not a prerequisite"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 3,
@@ -27,8 +25,7 @@
       "assertions": [
         "Advises against creating a new guideline skill for a single one-off lesson and recommends folding it into AGENTS.md instead",
         "States that a new skill is only warranted once a category has roughly 3-7 worth-keeping bullets (and no existing owner skill covers it)"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 4,
@@ -36,8 +33,7 @@
       "assertions": [
         "Warns that applies_to: [\"general\"] breaks or defeats routing/auto-detection (it cannot pick the correct AGENTS.md or owner skill)",
         "Recommends using a specific routing key (e.g. a directory/package/domain name) instead of general"
-      ],
-      "load_bearing": true
+      ]
     }
   ]
 }

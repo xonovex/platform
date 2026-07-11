@@ -9,8 +9,7 @@
         "The channel is selected via a map/dictionary keyed by a string (key -> factory/constructor), NOT via a switch/if-else chain on the channel kind",
         "The map stores factories/constructors that are called only for the selected channel (lazy construction), not pre-built instances of every channel",
         "The core sending function receives the already-resolved channel/port as a parameter (dependency injection), and the registry/map is NOT passed into the sending function"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 2,
@@ -19,8 +18,7 @@
         "The gate decides based on a capability/guarantee that the plug-in self-declares as data the core reads, NOT on the plug-in's identity/name (no `if kind == \"email\"`-style allowlist)",
         "The check is fail-closed / default-deny: a channel is rejected unless the required capability is positively present (a missing or unreadable declaration is treated as a denial)",
         "The rejection error/message names the required capability, never a specific concrete plug-in"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 3,
@@ -28,8 +26,7 @@
       "assertions": [
         "Advises AGAINST compile-time build tags for this case and recommends resolving the provider at load/deploy time via config/DI/registry population (or run-time registry lookup), because the choice comes from a deploy-time config value",
         "Explicitly reasons about binding time — that the moment the variant is chosen determines the technique, and binding compile-time here would force shipping/rebuilding separate binaries to switch a config-selectable provider"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 4,
@@ -37,8 +34,7 @@
       "assertions": [
         "Recommends central/explicit registration at the composition root over init()-based self-registration",
         "Justifies it on the grounds that central wiring is visible/ordered/testable whereas init() self-registration hides the wiring behind import order"
-      ],
-      "load_bearing": true
+      ]
     }
   ]
 }

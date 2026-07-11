@@ -8,8 +8,7 @@
       "assertions": [
         "States that making Square extend/inherit from Rectangle violates the Liskov substitution principle",
         "Recommends against Square subclassing Rectangle and instead proposes composition or separate/independent types (e.g. immutable shapes or a shared interface rather than a subclass)"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 2,
@@ -17,8 +16,7 @@
       "assertions": [
         "Advises NOT extracting a base class hierarchy yet and instead favors composition or a shared helper, noting a base class is premature with only two implementations",
         "References the guidance that a base class should be extracted only once there are roughly three or more implementations / start flat"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 3,
@@ -26,16 +24,14 @@
       "assertions": [
         "Identifies this as the Refused Bequest smell and/or a Liskov substitution principle violation",
         "Recommends replacing the inheritance with composition (wrapping/delegating to a List) rather than subclassing"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 4,
       "prompt": "I'm writing a Java Money value class and I just added an equals() method so two Money instances with the same amount compare equal. I plan to use Money objects as keys in a HashMap. Anything else I need to do?",
       "assertions": [
         "States that hashCode() must also be overridden to be consistent with equals(), otherwise HashMap/HashSet lookups break silently"
-      ],
-      "load_bearing": false
+      ]
     }
   ]
 }

@@ -9,8 +9,7 @@
         "fareTable is identified as a Stub (a collaborator queried for a value / supplying indirect input), NOT called a Mock",
         "gateway is identified as a Mock or a Spy (its call is a command / indirect output verified by behaviour), NOT merely a Stub",
         "The five doubles are treated as distinct terms rather than using 'mock' as a synonym for every substitute"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 2,
@@ -19,8 +18,7 @@
         "States the Money value object should NOT be doubled and should be constructed as the real object",
         "Recommends state verification (asserting the returned result / resulting state) as the default over asserting on internal calls",
         "Recommends doubling the Repository and Clock (e.g. an in-memory Fake repository and an injected fixed clock), not the value object"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 3,
@@ -28,8 +26,7 @@
       "assertions": [
         "Names the smell as Sensitive Equality (a form of Fragile Test), not just generic 'brittleness'",
         "The fix is to assert on the specific field(s) under test rather than the whole stringified/serialized object"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 4,
@@ -37,8 +34,7 @@
       "assertions": [
         "Answers that it is NOT sufficient because a transitive/indirect dependency (A imports C which imports B) is not caught",
         "Recommends checking transitive reachability so the assertion matches the scope of the rule"
-      ],
-      "load_bearing": true
+      ]
     }
   ]
 }

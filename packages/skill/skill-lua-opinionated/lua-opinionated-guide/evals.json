@@ -8,8 +8,7 @@
       "assertions": [
         "The returned entity table is built as a single table literal/constructor with all fields (x, y, kind, velocity_x, velocity_y, health, active) present at creation",
         "No entity field is assigned via `entity.field = ...` after the table is constructed"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 2,
@@ -17,8 +16,7 @@
       "assertions": [
         "Repeated table-field reads are hoisted into locals (e.g. `local x, y = e.x, e.y` or equivalent) rather than re-indexing the same field multiple times",
         "The loop still iterates with a numeric `for i = 1, #entities` and does not switch to `pairs()`"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 3,
@@ -26,8 +24,7 @@
       "assertions": [
         "`math.sin` and `math.cos` are cached into upvalue/module locals (e.g. `local sin, cos = math.sin, math.cos`) rather than called as `math.sin(...)` inside the loop",
         "Iteration uses a numeric `for i = 1, #angles` loop rather than `pairs()`/`ipairs()`"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 4,
@@ -35,8 +32,7 @@
       "assertions": [
         "The array is filled with a numeric `for i = 1, size do buf[i] = 0 end` producing a dense array with no nil holes",
         "The output does not create a sparse array or rely on `#` over a table with gaps"
-      ],
-      "load_bearing": false
+      ]
     }
   ]
 }

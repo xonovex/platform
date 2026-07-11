@@ -9,8 +9,7 @@
         "The position object sets all three of base_sha, start_sha, and head_sha (fetched from the MR diff_refs or versions endpoint)",
         "It sets position new_line (for the added line) and both old_path and new_path, and does NOT set old_line for the added line",
         "After the POST it verifies the created note type equals DiffNote (e.g. checks notes[0].type == \"DiffNote\") rather than trusting the 201 status"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 2,
@@ -18,8 +17,7 @@
       "assertions": [
         "States that CI_JOB_TOKEN is read-only on merge requests and cannot create MRs or post notes, so a PAT or project/group access token must be used instead",
         "States that writing (create MR / post comment) requires the broad api scope, and that read_api is read-only / write_repository does not cover discussions"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 3,
@@ -27,8 +25,7 @@
       "assertions": [
         "Makes clear there is no single atomic review object / no REST REQUEST_CHANGES: the summary is a plain note, each inline finding is its own discussion, and the verdict is separate",
         "Implements blocking by withholding approval and/or leaving threads unresolved (relying on only_allow_merge_if_all_discussions_are_resolved), not by a REQUEST_CHANGES call"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 4,
@@ -36,8 +33,7 @@
       "assertions": [
         "Uses a REST PUT to the discussions endpoint with resolved=true (e.g. PUT .../discussions/<discussion_id>?resolved=true) and does not require GraphQL",
         "Identifies the thread by its discussion id rather than by line number"
-      ],
-      "load_bearing": true
+      ]
     }
   ]
 }

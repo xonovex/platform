@@ -9,8 +9,7 @@
         "Recommends splitting the person into separate per-context models (e.g. Ordering's Customer, Shipping's Recipient, Billing's AccountHolder) rather than keeping one unified/canonical Customer type",
         "States that each context's model carries only the fields it needs (e.g. Shipping's Recipient holds name/address/phone, Billing holds billing address/tax id/credit terms) and that they are translated at the boundary",
         "Does NOT recommend unifying into one shared Customer type for DRY-ness"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 2,
@@ -19,8 +18,7 @@
         "Makes Order and Shipment separate aggregates (small aggregates) rather than one large aggregate containing everything",
         "Has Order reference Shipment by identity/id rather than holding the Shipment object directly",
         "States that cross-aggregate consistency between Order and Shipment is eventual (e.g. reached afterward via a domain event), not within one transaction"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 3,
@@ -28,8 +26,7 @@
       "assertions": [
         "Introduces an anti-corruption layer / translator that returns our own domain type (e.g. Recipient) and never exposes PartyDTO past the layer",
         "Describes translation in BOTH directions (not merely a thin forwarding client that returns the raw vendor DTO)"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 4,
@@ -37,8 +34,7 @@
       "assertions": [
         "Identifies this as the anemic domain model anti-pattern",
         "Moves behaviour onto Order itself (e.g. Order.addLine recomputes the total internally) so the total-equals-sum-of-subtotals invariant cannot be violated from outside"
-      ],
-      "load_bearing": true
+      ]
     }
   ]
 }

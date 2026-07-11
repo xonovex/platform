@@ -9,8 +9,7 @@
         "Sets C_STANDARD 99 with C_EXTENSIONS OFF (true ISO C99, not the GNU/-std=gnu99 dialect)",
         "Defines a feature-test macro (_XOPEN_SOURCE 700 or _POSIX_C_SOURCE 200809L) so readlink/strnlen are not implicit-declaration errors under strict C99",
         "Adds -Wno-missing-field-initializers and -Wno-missing-braces while keeping -Werror"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 2,
@@ -18,8 +17,7 @@
       "assertions": [
         "Uses snprintf into the fixed buffer rather than strcpy/strcat/sprintf",
         "Checks the snprintf return value to detect truncation, treating a return >= the buffer size (e.g. (size_t)n >= sizeof(buf)) as the too-long error"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 3,
@@ -27,8 +25,7 @@
       "assertions": [
         "Uses the <inttypes.h> format-macro constants (e.g. PRIu32 and PRId16/PRIi16) rather than plain %u/%d/%hd conversions",
         "Includes <inttypes.h>"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 4,
@@ -36,8 +33,7 @@
       "assertions": [
         "Returns a by-value result struct that bundles a bool validity flag together with the uint32_t value, instead of writing the value through an out-parameter",
         "Takes the input as a length-carrying view (pointer plus size_t length) rather than a null-terminated const char* it would strlen or scan"
-      ],
-      "load_bearing": true
+      ]
     }
   ]
 }

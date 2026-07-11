@@ -9,8 +9,7 @@
         "Probes the registry for the exact name@version before publishing (e.g. `npm view <name>@<version> version`) and skips publishing when it already exists",
         "Probes the explicit name@version rather than a bare name or @latest tag",
         "Treats an already-published version as a skip (success), not as an error"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 2,
@@ -19,8 +18,7 @@
         "Classifies only name + version (and valid semver) as npm-blocking requirements; treats missing license/repository/files as policy/warnings, not npm rules",
         "Accepts the `repository` shorthand string \"github:acme/widget\" as valid (does not require the {type,url} object form)",
         "Does not block publishing on the missing license field (npm only warns)"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 3,
@@ -29,8 +27,7 @@
         "Uses `--access public` because scoped packages default to restricted on first publish",
         "Uses a dist-tag such as `--tag next`/`--tag rc` so the pre-release does not land on `latest`",
         "States that `--provenance` only works from a supported CI runner with OIDC (id-token) and fails/does not no-op outside that environment"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 4,
@@ -38,8 +35,7 @@
       "assertions": [
         "Restores the original package.json even when publish fails (try/finally or equivalent)",
         "Notes that `libc` only takes effect when `os` includes `linux` (otherwise it is a no-op)"
-      ],
-      "load_bearing": true
+      ]
     }
   ]
 }

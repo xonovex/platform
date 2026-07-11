@@ -8,8 +8,7 @@
       "assertions": [
         "`<NewsletterSignup />` is hydrated with the `client:visible` directive",
         "`<ThemeToggle />` uses `client:only` with the framework name as its value (e.g. `client:only=\"react\"`), not `client:load` or a bare `client:only`"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 2,
@@ -17,8 +16,7 @@
       "assertions": [
         "The config is defined in `src/content/config.ts` using `defineCollection` and a `z.object({...})` schema imported from `astro:content`",
         "Non-draft posts are retrieved with `getCollection` passing a filter callback on the entry data (e.g. `getCollection(\"posts\", ({ data }) => !data.draft)`)"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 3,
@@ -26,8 +24,7 @@
       "assertions": [
         "Props are typed with an `interface Props` and destructured from `Astro.props` with `variant = \"default\"` as the default",
         "Child content is rendered via a `<slot />` and styles are placed in a component `<style>` block"
-      ],
-      "load_bearing": false
+      ]
     }
   ]
 }

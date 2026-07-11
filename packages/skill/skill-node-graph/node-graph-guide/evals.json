@@ -8,8 +8,7 @@
       "assertions": [
         "States the cache key (validity hash) is computed from the node's own settings combined with the validity hashes of all of its inputs",
         "Warns that omitting any consumed input from the hash produces silent stale reuse with no error, so every input that affects the output must be folded in"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 2,
@@ -17,8 +16,7 @@
       "assertions": [
         "Says subgraphs are flattened/inlined into the parent at compile time so the evaluator sees one flat DAG and never recurses into subgraphs at runtime",
         "Warns that a subgraph transitively containing itself would inline forever / overflow the stack, so cycles must be detected and rejected before inlining"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 3,
@@ -27,8 +25,7 @@
         "States each input pin accepts at most one source wire while an output pin may fan out to many consumers",
         "Says connection type validity is checked at author/connect time (not deferred to evaluation)",
         "Requires an explicit conversion node (e.g. upload/readback) for CPU-vs-GPU image mismatch rather than silently coercing"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 4,
@@ -36,8 +33,7 @@
       "assertions": [
         "Represents the graph as plain serialized data (explicit node list plus connection list plus per-node settings), not topology buried in imperative code",
         "States that terminal/output nodes only surface a result and the owning system schedules the emitted work; if no system consumes the output node the work never runs"
-      ],
-      "load_bearing": true
+      ]
     }
   ]
 }

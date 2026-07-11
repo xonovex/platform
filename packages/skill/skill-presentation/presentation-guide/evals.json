@@ -9,8 +9,7 @@
         "Individual slides are separated by lines containing only `---`",
         "No content slide carries more than 5 bullet points",
         "The deck follows a narrative arc (e.g. problem/context then tension/challenges then resolution/next-steps) rather than being a flat feature checklist"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 2,
@@ -19,8 +18,7 @@
         "The package is created at a path under `packages/presentations/<name>/`",
         "A dedicated theme module (e.g. theme.ts) is generated from the #hex Style Guide colors",
         "Each slide is generated via a factory function that computes its step count (maxSteps) automatically rather than hardcoding it per slide"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 3,
@@ -28,8 +26,7 @@
       "assertions": [
         "The animation timing/order is deterministic and does not use randomness (e.g. Math.random) for delays, durations, or offsets",
         "The bullets animate in a fixed, reproducible sequence"
-      ],
-      "load_bearing": true
+      ]
     }
   ]
 }

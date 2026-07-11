@@ -8,16 +8,14 @@
       "assertions": [
         "The thirty-thousand value is written as 30_000 and the one-million value is written as 1_000_000 (underscore separators grouped by thousands)",
         "The port constant is written as 3000 with no underscore separator"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 2,
       "prompt": "Write a TypeScript log line that reports a server startup using a template literal, embedding a numeric `port` variable and a numeric `retryCount` variable in the message. Show the code.",
       "assertions": [
         "Each numeric value embedded in the template literal is wrapped with String(...) (e.g. ${String(port)}) rather than interpolated directly"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 3,
@@ -25,8 +23,7 @@
       "assertions": [
         "The revised getUser function has no `async` keyword and returns the Promise directly",
         "The revised route handler callback has no `async` keyword"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 4,
@@ -34,8 +31,7 @@
       "assertions": [
         "No `src/middlewares/index.ts` barrel file that re-exports from csrf.ts/jwt.ts is created",
         "app.ts imports csrfProtection and jwtAuth directly from their defining files (./middlewares/csrf.js and ./middlewares/jwt.js)"
-      ],
-      "load_bearing": true
+      ]
     }
   ]
 }

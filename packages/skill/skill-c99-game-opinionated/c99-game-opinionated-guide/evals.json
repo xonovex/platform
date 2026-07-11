@@ -9,8 +9,7 @@
         "The rigid body stores the reciprocal of mass (an inverse-mass / 1-over-mass field), not the mass itself",
         "Static/immovable bodies are represented by an inverse mass of 0.0 (0)",
         "The apply-impulse function scales the impulse by the inverse mass, with no separate branch/if-check special-casing static bodies"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 2,
@@ -19,8 +18,7 @@
         "Provides two separate functions: one that returns the required vertex/index counts, and one that fills a caller-provided buffer",
         "No malloc/calloc/realloc or other internal allocation appears inside the mesh-generation code; the caller supplies the buffers",
         "The build/fill function returns a status or otherwise checks the provided buffer capacity before writing"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 3,
@@ -28,8 +26,7 @@
       "assertions": [
         "Uses a single struct with a type enum tag plus a union of the per-shape data (not separate unrelated structs, function pointers, or a vtable)",
         "The volume function switches on the type tag and has NO default clause in the switch"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 4,
@@ -37,8 +34,7 @@
       "assertions": [
         "The 4x4 matrix is stored column-major (as four column vectors / 16 floats in column order), with the translation placed in the last column (column index 3)",
         "The quaternion component order is x, y, z, w (w last)"
-      ],
-      "load_bearing": true
+      ]
     }
   ]
 }

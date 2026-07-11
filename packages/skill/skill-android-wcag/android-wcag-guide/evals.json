@@ -9,8 +9,7 @@
         "The clickable/semantics sets an explicit Role.Button (e.g. role = Role.Button on clickable or role = Role.Button inside semantics)",
         "The action verb is provided via onClickLabel (not baked into contentDescription), so TalkBack says \"double tap to <verb>\" instead of the generic \"activate\"",
         "The tile is consolidated into one node using mergeDescendants = true or clearAndSetSemantics, and the decorative Icon is given contentDescription = null"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 2,
@@ -19,8 +18,7 @@
         "Uses Modifier.minimumInteractiveComponentSize() (or Modifier.sizeIn / defaultMinSize) to expand the hit area rather than enlarging the drawn icon",
         "The minimum touch target is 48dp (not 24dp and not 44dp)",
         "The Icon itself stays drawn at 24dp (the visual size is not increased)"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 3,
@@ -28,8 +26,7 @@
       "assertions": [
         "Uses Modifier.semantics { traversalIndex = ... } to control the TalkBack traversal order",
         "Gives the body content a lower (or more negative) traversalIndex than the top bar so the body is read first (lower reads earlier)"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 4,
@@ -37,8 +34,7 @@
       "assertions": [
         "Applies Modifier.semantics { heading() } to the title and section-header text nodes, with no level argument (heading() is a flat boolean; there is no heading(level = ...))",
         "Does NOT apply heading() to the TabRow or its tabs (interactive controls with a Role are kept out of the heading rotor)"
-      ],
-      "load_bearing": true
+      ]
     }
   ]
 }

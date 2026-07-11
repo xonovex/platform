@@ -8,8 +8,7 @@
       "assertions": [
         "The solution avoids chaining eager array .filter/.map over the full 20M-element array and instead uses a generator/iterator or lazy stream (or a single pass) so no large intermediate arrays are allocated",
         "The explanation states that chained array map/filter are eager and allocate intermediate arrays"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 2,
@@ -17,8 +16,7 @@
       "assertions": [
         "The pattern matching / branch order places the specific cases (circle, square) before the general fallback case",
         "The function is pure: it returns a value based only on its input with no mutation or side effects"
-      ],
-      "load_bearing": false
+      ]
     },
     {
       "id": 3,
@@ -26,8 +24,7 @@
       "assertions": [
         "The rate-limiter state is passed explicitly to the functions (module-level functions taking the state/context as a parameter) rather than held in a class instance or in module-level/global mutable variables",
         "State transitions return new state (or an updated state value) rather than mutating shared module-level mutable state in place"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 4,
@@ -35,8 +32,7 @@
       "assertions": [
         "The answer states that mapping a transform directly over an array of Promises operates on the Promise objects, not the resolved values, so `u.name` would be undefined / fail",
         "The corrected solution awaits/resolves the Promises (e.g. Promise.all) before applying the name-uppercasing transform"
-      ],
-      "load_bearing": true
+      ]
     }
   ]
 }

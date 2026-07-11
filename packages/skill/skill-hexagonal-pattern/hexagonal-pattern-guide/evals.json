@@ -8,8 +8,7 @@
       "assertions": [
         "The repository interface is declared in the core/domain package where OrderService lives (owned by the consumer), NOT in the Postgres adapter package and NOT in a separate shared/generic 'interfaces' package.",
         "The Postgres adapter package imports the core package to implement the interface (dependency arrow points adapter -> core), and the core package names no Postgres/driver/sql symbols."
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 2,
@@ -17,8 +16,7 @@
       "assertions": [
         "Identifies that passing *http.Request into the core and returning the ORM/gorm row type through the port leaks infrastructure types into the domain (an anemic/leaky port) and violates the pattern.",
         "Recommends the ports use domain-owned neutral types (e.g. a domain Order / OrderRecord value) so no adapter's transport or row type crosses the boundary."
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 3,
@@ -26,8 +24,7 @@
       "assertions": [
         "All concrete adapters are constructed in a single composition root (e.g. main / the entry point) and injected into the service through constructor arguments, with the config selecting the concrete per axis there.",
         "The service holds its repository as a typed port dependency and does NOT fetch collaborators via a global, singleton, package-level Get(), service locator, or a registry passed into the business logic."
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 4,
@@ -35,8 +32,7 @@
       "assertions": [
         "The test substitutes an in-memory fake that implements the same repository port (no real DB/socket) and injects it into the service, rather than requiring real infrastructure.",
         "The test itself plays the primary/driving adapter: it constructs the service, calls the inbound method directly, and asserts on state recorded by the fake."
-      ],
-      "load_bearing": false
+      ]
     }
   ]
 }

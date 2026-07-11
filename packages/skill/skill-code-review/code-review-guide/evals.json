@@ -9,8 +9,7 @@
         "The comment is categorized with the Conventional Comments label `issue`",
         "The comment carries an explicit urgency decoration written as `(blocking)`",
         "The comment states the label and decoration up front (e.g. `issue (blocking)`) rather than only describing the bug in prose"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 2,
@@ -18,8 +17,7 @@
       "assertions": [
         "The auth-check problem is listed first in the summary, ahead of the rename and the batching item (priority order, not file order)",
         "The summary refers the author to the detailed line comments via links/cross-links, and does NOT reference them by ordinal (no `see comment 1/2/3` style numbering)"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 3,
@@ -27,8 +25,7 @@
       "assertions": [
         "Recommends the label `question`",
         "States that the remark should NOT be marked `(blocking)` (question/thought are inherently non-blocking; blocking a question is contradictory)"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 4,
@@ -36,8 +33,7 @@
       "assertions": [
         "States the anchor line number is 13",
         "Specifies the anchor is on the new-file (added/right) side of the diff, not the old-file side"
-      ],
-      "load_bearing": true
+      ]
     }
   ]
 }

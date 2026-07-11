@@ -8,8 +8,7 @@
       "assertions": [
         "The resulting version is 1.2.3, not 1.2.4",
         "The explanation states that finalizing a pre-release lands on the same core version (the pre-release sorts below its release), rather than incrementing the patch"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 2,
@@ -17,8 +16,7 @@
       "assertions": [
         "The @acme/core dependency range in @acme/app becomes ^2.0.0 (the ^ caret operator is preserved, not stripped to a bare 2.0.0)",
         "@acme/app receives a patch bump (e.g. its own version incremented by one patch) because 2.0.0 falls outside the previous ^1.2.0 range"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 3,
@@ -26,8 +24,7 @@
       "assertions": [
         "The release is classified as a MAJOR bump (driven by the breaking change), not minor or patch",
         "The breaking chore!: commit with the BREAKING CHANGE: footer is included/detected as a breaking change and is not dropped or filtered out despite being a chore"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 4,
@@ -35,8 +32,7 @@
       "assertions": [
         "The answer explains that after committing, the working tree equals HEAD so the diff-based signal disappears (returns no difference), causing a re-bump",
         "The recommended fix compares the working-tree version against the published registry version or a release tag instead of against HEAD"
-      ],
-      "load_bearing": true
+      ]
     }
   ]
 }

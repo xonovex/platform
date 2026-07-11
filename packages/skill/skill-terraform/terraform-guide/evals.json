@@ -8,8 +8,7 @@
       "assertions": [
         "The subnet resource uses for_each (keyed by a map/set such as availability zone) rather than count over the list",
         "The answer explains that count over a list is positional, so removing/inserting an element shifts indices and recreates every subsequent resource, whereas for_each keys are stable"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 2,
@@ -17,8 +16,7 @@
       "assertions": [
         "Uses an S3 backend with encrypt = true and a state locking mechanism (dynamodb_table) to prevent concurrent applies from corrupting state",
         "Uses a state key/path unique to the prod environment rather than sharing one state file across environments"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 3,
@@ -26,8 +24,7 @@
       "assertions": [
         "Recommends terraform plan -refresh-only to preview drift",
         "Notes that terraform refresh updates state but does not show what changed / is not the right tool for previewing drift"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 4,
@@ -35,8 +32,7 @@
       "assertions": [
         "Declares backup_retention using optional(number, 7) inside an object() type",
         "The variable has an explicit type = object({ ... }) with instance_class and engine_version as string fields"
-      ],
-      "load_bearing": false
+      ]
     }
   ]
 }

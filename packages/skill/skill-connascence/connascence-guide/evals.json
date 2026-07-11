@@ -8,8 +8,7 @@
       "assertions": [
         "Identifies the boolean flag as control coupling (a caller-passed flag driving the callee's branching)",
         "Recommends splitting Save into two separate named operations/functions (one for validate, one for persist) rather than keeping a single flag-driven function"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 2,
@@ -18,8 +17,7 @@
         "Labels the order.Customer().Address().City() chain as content coupling (reaching through returned objects into their internals) and violating the Law of Demeter",
         "Recommends replacing it with a single method on the direct neighbor (e.g. order.ShippingCity()) that hides the intermediate objects",
         "States the fluent builder chain is a legitimate exception (it returns the same builder, not fresh strangers) and is NOT a Law of Demeter violation"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 3,
@@ -27,8 +25,7 @@
       "assertions": [
         "Names the specific connascence form as connascence of meaning/convention (both distant sites silently agree that 0 means unlimited) rather than only calling it 'tight coupling'",
         "Applies the rule of degree to convert it to connascence of name — e.g. a named/typed value like an explicit Unlimited field or constant so the pact is visible at both call sites"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 4,
@@ -36,8 +33,7 @@
       "assertions": [
         "Identifies this as temporal cohesion (parts grouped because they run in the same phase/startup) and calls it a weak/trap form of cohesion, aiming for functional cohesion instead",
         "Recommends splitting into separate functions so each concern (config, cache, logger) owns the part that changes with it, rather than grouping by when it runs"
-      ],
-      "load_bearing": true
+      ]
     }
   ]
 }

@@ -9,8 +9,7 @@
         "Uses a single Scenario Outline with an Examples table parameterising the coupon percent and resulting total, rather than two duplicated near-identical scenarios.",
         "Steps are declarative and contain no UI-mechanic steps (no 'click', 'type', button labels, or CSS/element selectors).",
         "Groups the scenario(s) under a Gherkin `Rule` keyword."
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 2,
@@ -18,8 +17,7 @@
       "assertions": [
         "States yellow = the user story and blue = a business rule / acceptance criterion.",
         "States green = a concrete example (which becomes a scenario) and red = an open/unanswered question or blocking assumption."
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 3,
@@ -27,8 +25,7 @@
       "assertions": [
         "Recommends roughly 2-5 scenarios per business rule, illustrating the rule rather than one scenario per code path or edge case.",
         "States BDD/acceptance scenarios do not replace unit tests, that there should be far more unit tests than scenarios, and that exhaustive/edge cases belong in unit tests (TDD)."
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 4,
@@ -36,8 +33,7 @@
       "assertions": [
         "Advises stubbing external services/queues/databases and driving the core domain directly instead of automating through the UI/browser.",
         "Identifies that end-to-end-through-the-UI automation is slow, brittle/volatile, and fails to localise the failure."
-      ],
-      "load_bearing": true
+      ]
     }
   ]
 }

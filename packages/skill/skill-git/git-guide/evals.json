@@ -8,8 +8,7 @@
       "assertions": [
         "Recommends `git push --force-with-lease` (not plain `git push --force` or `git push -f`)",
         "Does not suggest force-pushing to main/master"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 2,
@@ -17,8 +16,7 @@
       "assertions": [
         "Creates a worktree directory named `services-feature-auth-fix` and a branch named `services/feature/auth-fix`",
         "Records the source/base branch in a `branch.<branch>.mergeBackTo` git config value"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 3,
@@ -26,16 +24,14 @@
       "assertions": [
         "The commit subject begins with the `chore:` type prefix",
         "The subject is a single lowercase `<type>: <description>` line with no footer/trailer lines"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 4,
       "prompt": "I added `config/local.env` to `.gitignore`, but git still keeps showing it as a tracked/modified file. How do I make git stop tracking it while keeping the file on disk?",
       "assertions": [
         "Instructs to run `git rm --cached config/local.env` (removes from the index without deleting the working-tree file)"
-      ],
-      "load_bearing": false
+      ]
     }
   ]
 }

@@ -8,8 +8,7 @@
       "assertions": [
         "The component accepts `ref` as an ordinary prop and does NOT use `forwardRef()` to wrap the component",
         "The ref prop is typed as a React ref to an input element (e.g. `React.Ref<HTMLInputElement>`) and is forwarded to the `<input>` element"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 2,
@@ -17,8 +16,7 @@
       "assertions": [
         "Uses the `useActionState` hook and destructures its return as `[state, formAction, isPending]` (three values, including the pending flag)",
         "Passes the action to the form via `<form action={formAction}>` and reads field values from `FormData` (e.g. `formData.get(...)`) rather than tracking each input with a controlled `useState`/`value`+`onChange`"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 3,
@@ -26,8 +24,7 @@
       "assertions": [
         "States that manual `useMemo`/`useCallback` are generally no longer needed because the React Compiler applies memoization automatically",
         "Identifies that manual memoization is still warranted to produce a stable dependency for a `useEffect` (effect dependency arrays)"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 4,
@@ -35,8 +32,7 @@
       "assertions": [
         "Recommends the `use()` hook (e.g. `use(Context)`) to read the context",
         "States that `use()` may be called conditionally / after early returns or inside branches, unlike `useContext`"
-      ],
-      "load_bearing": true
+      ]
     }
   ]
 }

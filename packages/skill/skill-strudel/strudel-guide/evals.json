@@ -9,8 +9,7 @@
         "Sets the tempo with setcpm() where the numeric argument is the BPM divided by 4 (e.g. setcpm(130/4) or the equivalent 32.5), not setcpm(130) nor a setbpm/cps call",
         "Combines the kick, clap, and hi-hat parts inside a single stack(...) call so they play in parallel",
         "Uses mini-notation with the kick as s(\"bd*4\") (or bd repeated four times) for four-on-the-floor"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 2,
@@ -18,8 +17,7 @@
       "assertions": [
         "Expresses the per-cycle pitch rotation with angle-bracket alternation mini-notation, e.g. \"<a b c d>\", where one value is selected per cycle",
         "Expresses the snare rhythm with Euclidean mini-notation of the form name(3,8)"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 3,
@@ -27,8 +25,7 @@
       "assertions": [
         "Modulates the low-pass cutoff by passing a signal into .lpf(), specifically a sine.range(min, max) chained with .slow(4) (rather than a static numeric cutoff)",
         "Adds filter resonance via a .lpq(...) call"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 4,
@@ -36,8 +33,7 @@
       "assertions": [
         "Constrains the melody notes with a .scale(...) call using colon-separated scale notation such as \"A3:minor\" (tonic:mode)",
         "Writes the pad chords using apostrophe chord notation on note values, e.g. note(\"a3'min\") and note with 'maj (a<octave>'min / f<octave>'maj)"
-      ],
-      "load_bearing": true
+      ]
     }
   ]
 }

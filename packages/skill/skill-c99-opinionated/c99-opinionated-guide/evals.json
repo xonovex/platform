@@ -8,8 +8,7 @@
       "assertions": [
         "The init function binds the system to a caller-provided array/pointer plus a capacity, and does NOT call malloc/calloc internally to allocate the storage.",
         "The add function returns a status/error code (e.g. a full/overflow status) when at capacity instead of calling realloc or otherwise growing the storage."
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 2,
@@ -18,8 +17,7 @@
         "Parent/child cross-references are stored as integer indices or handles into the pool, not as raw node pointers (e.g. node_t *).",
         "The 'no parent'/'no link' state is an explicit integer sentinel such as -1 or UINT32_MAX rather than a NULL pointer.",
         "The parent pointer is recovered transiently at the point of use (e.g. &pool->nodes[idx]) rather than stored back into the node struct."
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 3,
@@ -27,8 +25,7 @@
       "assertions": [
         "Enables -Werror (or treats correctness warnings as hard errors) while explicitly disabling the unused-symbol family for the library (e.g. -Wno-unused-parameter, -Wno-unused-function, -Wno-unused-variable).",
         "Keeps -Wunused-value as an error (does NOT disable it) rather than blanket-suppressing all unused warnings."
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 4,
@@ -36,8 +33,7 @@
       "assertions": [
         "Introduces a length-carrying view type (pointer plus explicit length field) so comparisons/reads use the stored length instead of repeated strlen/strcmp terminator scans.",
         "Replaces strtok with a stateless/re-entrant split that returns a field and advances a cursor over the remaining input, avoiding repeated rescans to the terminator (the O(n^2) cause)."
-      ],
-      "load_bearing": true
+      ]
     }
   ]
 }

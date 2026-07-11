@@ -8,8 +8,7 @@
       "assertions": [
         "The test asserts the response status equals 204",
         "The request is dispatched via app.request() with method 'OPTIONS' rather than starting a live HTTP server"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 2,
@@ -17,24 +16,21 @@
       "assertions": [
         "Before asserting the updated timestamp is greater, the test introduces an explicit real time delay (e.g. `await new Promise(r => setTimeout(r, ...))`) rather than comparing the two timestamps back-to-back",
         "The greater-than comparison is done on parsed numeric time values (e.g. `new Date(...).getTime()`) rather than on raw timestamp strings"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 3,
       "prompt": "In a Vitest test file I have `import { db } from '../src/db'` and I want to mock the entire '../src/db' module so its exported `query` function returns a fixed row object. Show the mock setup.",
       "assertions": [
         "The vi.mock() factory function does not reference the imported `db` binding (or any other top-level import variable) inside the factory"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 4,
       "prompt": "Write a Vitest mock for an async `getUser(id)` dependency that resolves to `{ id: '123', email: 'test@example.com' }`, then call it and assert it was invoked with '123'.",
       "assertions": [
         "The mock is created with `vi.fn()` and `.mockResolvedValue(...)` is called directly on it with no `as Mock` (or similar) cast and no generic type parameters on vi.fn"
-      ],
-      "load_bearing": false
+      ]
     }
   ]
 }

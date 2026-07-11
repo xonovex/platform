@@ -9,8 +9,7 @@
         "Recommends referencing objects by a stable id (or GUID/handle) resolved through a lookup/indirection table rather than storing raw pointers",
         "States that a reference to a deleted target must resolve to null (a safe miss), not dangle or read freed memory",
         "Recommends a generation/version counter paired with the id (or never reusing ids) so a stale reference to a recycled slot is detected instead of silently aliasing a different object"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 2,
@@ -19,8 +18,7 @@
         "Instances store only their overrides and read all other properties through to the prototype (per-property override flag/bitmask tracking local-vs-inherited)",
         "Serialization persists only the prototype reference plus the overridden deltas, reconstructing inherited values from the prototype on load",
         "Overrides are kept as concrete values, not computed expressions derived from the prototype's value"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 3,
@@ -29,8 +27,7 @@
         "Tags the file with a format version and runs ordered migration steps to bring older files forward to the current schema on load",
         "Unrecognized/unknown properties are skipped (and ideally preserved on resave) rather than rejected, so newer files still open in older code",
         "Emits deterministic output (stable ordering, no embedded timestamps/hash-ordered maps, normalized floats) so files diff cleanly under version control"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 4,
@@ -39,8 +36,7 @@
         "Changes are batched within a transaction and delivered/flushed once at commit rather than notifying synchronously inside each setter",
         "One user action is grouped into a single transaction so it is one undo step, and undo entries capture stable object ids plus values (not pointers or array indices)",
         "A new edit clears the redo stack"
-      ],
-      "load_bearing": true
+      ]
     }
   ]
 }

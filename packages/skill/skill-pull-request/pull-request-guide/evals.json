@@ -8,8 +8,7 @@
       "assertions": [
         "Advises splitting the work into separate PRs rather than opening it as one (e.g. reformat, framework upgrade, and new endpoint as distinct PRs)",
         "Recommends a target size around 50-200 changed lines (treating roughly 400 as a soft cap), or frames the goal as keeping review time under about an hour"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 2,
@@ -18,8 +17,7 @@
         "Rejects or replaces the bare 'tested locally' phrasing with concrete evidence: names the specific environment, the exact scenario, and the observed result",
         "For the fix, states how the bug was confirmed before the change and how the fix was confirmed after",
         "Includes an explicit way to reproduce end to end (a command, request, or link) and/or edge cases checked"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 3,
@@ -28,8 +26,7 @@
         "Produces a lean template of roughly 4-6 prompts/sections rather than a long mandatory checkbox form",
         "Includes distinct sections covering what changed, why (work item/issue link), how tested, and tradeoffs/risks",
         "Includes a section for linking related/sibling PRs or the shared work item"
-      ],
-      "load_bearing": false
+      ]
     },
     {
       "id": 4,
@@ -38,8 +35,7 @@
         "Confirms an atomic, unsplittable change (migration plus dependent code) is acceptable even when large, rather than forcing a split",
         "Says to explicitly flag in the PR that it is one atomic unit and explain why it cannot be split",
         "Advises self-review of the full diff and keeping it a draft until CI is green before flipping to ready and assigning reviewers"
-      ],
-      "load_bearing": true
+      ]
     }
   ]
 }

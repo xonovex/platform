@@ -9,8 +9,7 @@
         "The loop recreates the swapchain when acquire OR present returns VK_ERROR_OUT_OF_DATE_KHR AND also handles VK_SUBOPTIMAL_KHR (both result codes, not just OUT_OF_DATE)",
         "Before recording/reusing a frame slot, it waits (vkWaitForFences) on the fence of the slot about to be reused rather than blocking on the fence of the frame just submitted",
         "Each frame-in-flight slot owns its own fence plus per-slot image-available and render-finished semaphores (and its own command pool)"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 2,
@@ -19,8 +18,7 @@
         "Recommends allocating a few large VkDeviceMemory blocks and sub-allocating each resource from them, instead of one vkAllocateMemory per resource, and cites the maxMemoryAllocationCount cap as the reason",
         "Uploads data into DEVICE_LOCAL resources via a HOST_VISIBLE (staging) buffer copied with vkCmdCopyBuffer/vkCmdCopyBufferToImage, noting DEVICE_LOCAL memory generally cannot be mapped",
         "Mentions honoring VkMemoryRequirements.alignment (and/or bufferImageGranularity) when placing sub-allocations"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 3,
@@ -29,8 +27,7 @@
         "Uses synchronization2: a VkImageMemoryBarrier2 submitted via vkCmdPipelineBarrier2 (with VkDependencyInfo), not the legacy vkCmdPipelineBarrier / VkImageMemoryBarrier",
         "Sets scoped stage/access masks (srcStageMask COLOR_ATTACHMENT_OUTPUT, dstStageMask FRAGMENT_SHADER) rather than ALL_COMMANDS on both sides",
         "Transitions oldLayout COLOR_ATTACHMENT_OPTIMAL to newLayout SHADER_READ_ONLY_OPTIMAL"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 4,
@@ -39,8 +36,7 @@
         "Uses descriptor indexing: one large descriptor-array binding created with VK_DESCRIPTOR_BINDING_UPDATE_AFTER_BIND_BIT (and PARTIALLY_BOUND / VARIABLE_DESCRIPTOR_COUNT) with the descriptorIndexing feature enabled, rather than binding a separate descriptor set per material",
         "The shader indexes the array with nonuniformEXT(...) for the per-draw/divergent index",
         "Defers freeing/reusing an array slot until a VkFence proves no in-flight command buffer still references it (fence-gated deferred deletion)"
-      ],
-      "load_bearing": true
+      ]
     }
   ]
 }

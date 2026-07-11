@@ -8,8 +8,7 @@
       "assertions": [
         "Constructs the app by passing an explicit router to the Hono constructor, e.g. new Hono({router: new LinearRouter()})",
         "Selects LinearRouter (imported from \"hono/router/linear-router\") and justifies it by fastest init / no build step for cold start"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 2,
@@ -17,8 +16,7 @@
       "assertions": [
         "The handler is registered inline inside router.openapi(route, (c) => {...}) rather than extracted into a separate controller function",
         "Every c.json() call passes an explicit literal status code (e.g. c.json(item, 200) and c.json(problem, 404)), never relying on an implicit 200"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 3,
@@ -26,8 +24,7 @@
       "assertions": [
         "Uses the bodyLimit middleware imported from \"hono/body-limit\"",
         "Sets maxSize as a byte value with a low global limit and a larger per-route maxSize applied specifically to the upload route"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 4,
@@ -35,8 +32,7 @@
       "assertions": [
         "Identifies that every router in the chain (root, intermediate, and leaf) must be OpenAPIHono, not plain Hono",
         "States that a single plain Hono anywhere in the path drops its children's routes from the generated spec"
-      ],
-      "load_bearing": true
+      ]
     }
   ]
 }

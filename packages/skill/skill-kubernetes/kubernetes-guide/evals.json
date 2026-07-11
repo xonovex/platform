@@ -8,8 +8,7 @@
       "assertions": [
         "The overlay references the base and applies the patch file using the `patches:` field (not the deprecated `patchesStrategicMerge:` or `bases:`)",
         "Shared labels are set with the `labels:` field (not the deprecated `commonLabels:`)"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 2,
@@ -18,16 +17,14 @@
         "The container securityContext sets `readOnlyRootFilesystem: true` AND an emptyDir volume is mounted at a writable path such as /tmp",
         "The container drops ALL Linux capabilities (`capabilities: {drop: [ALL]}`) and sets `allowPrivilegeEscalation: false`",
         "A seccompProfile of type RuntimeDefault is set and the image tag is pinned to a specific version (not `latest`)"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 3,
       "prompt": "Write a NetworkPolicy that locks down a pod labeled app=api in the production namespace so it only accepts ingress from the ingress-nginx namespace on port 3000 and only reaches a database on port 5432. It uses both Ingress and Egress policyTypes.",
       "assertions": [
         "The egress rules include an explicit allowance for DNS: UDP port 53 to the kube-system namespace (or equivalent DNS egress rule)"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 4,
@@ -35,8 +32,7 @@
       "assertions": [
         "The Secret uses the `stringData` field for the plaintext values (rather than manually base64-encoding under `data`)",
         "The answer states that a plain Secret is only base64-encoded (not encrypted) and must be encrypted with SOPS or External Secrets Operator before committing to Git"
-      ],
-      "load_bearing": true
+      ]
     }
   ]
 }

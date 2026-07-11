@@ -9,8 +9,7 @@
         "The document is written in present/future proposal voice (contains a phrase such as 'This ADR proposes') and never describes the UTC design in past tense as already-completed/shipped work (no 'we standardized', 'the services were changed', 'the schema was generated').",
         "The document contains no em dash (—) characters anywhere.",
         "The document contains a Context section, a Proposal section, an Example uses (or Example) section, and a Decision section."
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 2,
@@ -19,8 +18,7 @@
         "Includes a single-row metadata table with columns Status, Date, and Decision makers, with Status set to 'Pending'.",
         "The Decision section content is '[Pending]', mirroring the Status value in brackets.",
         "The date is written in DD Mon YYYY format (e.g. '11 Jul 2026'), not ISO (2026-07-11) or any other format."
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 3,
@@ -28,8 +26,7 @@
       "assertions": [
         "The reversal is recorded as a NEW superseding ADR rather than by rewriting or editing the content of the accepted ADR 007.",
         "The new ADR uses a filename/heading of the form NNN-kebab-title.md with a zero-padded sequential number following 007 (i.e. 008), and references/supersedes ADR 007."
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 4,
@@ -38,8 +35,7 @@
         "The Context section states the standing design/principles as a bulleted list and marks the deviation from it with a single 'Today, though,' contrast marker.",
         "The Context section does not assert the target state (the single event bus) as already implemented or in use.",
         "The document contains no em dash (—) characters anywhere."
-      ],
-      "load_bearing": true
+      ]
     }
   ]
 }

@@ -8,16 +8,14 @@
       "assertions": [
         "The AGENTS.md body is a flat bullet list under a single top-level `#` title, with no `##`/`###` section headings and no prose paragraphs",
         "The literal names `Terraform`, `terraform fmt`, `terraform validate`, and `Atlantis` all appear unchanged (not replaced with generic terms)"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 2,
       "prompt": "Create an AGENTS.md for this directory: it's a package `@acme/hello` whose `index.ts` exports a single function `greet(name)`, a `tsconfig.json` that just extends the shared config, and a `package.json` whose `build` and `test` scripts only call `tsc` and `vitest`. There are no special conventions, caveats, or gotchas here.",
       "assertions": [
         "The response declines to create an AGENTS.md file (does not emit AGENTS.md content) and explicitly states there is no non-obvious/unique content to document because everything is inferable from package.json plus the source"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 3,
@@ -25,8 +23,7 @@
       "assertions": [
         "The condensed output still contains the literal command names `npm run build` and `npm run test` and the tool name `Vitest`",
         "No fenced or indented command code blocks remain; commands appear inline (backtick-wrapped) rather than in a code block"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 4,
@@ -34,8 +31,7 @@
       "assertions": [
         "Advises against deleting the root AGENTS.md (keep it as the project entry-point doc even though it looks thin)",
         "States that nested/subpackage AGENTS.md follow closest-wins precedence and are scope-specific overrides that should not be merged up into the root"
-      ],
-      "load_bearing": true
+      ]
     }
   ]
 }

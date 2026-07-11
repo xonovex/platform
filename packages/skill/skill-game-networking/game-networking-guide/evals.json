@@ -9,8 +9,7 @@
         "States that the delivery guarantee (unreliable vs ordered vs reliable/deliver-all) is a property of the packet type, not chosen per individual send call, and reserves reliable delivery for must-arrive data (snapshot/handshake) while player input is sent unreliably",
         "Warns that using reliable-ordered delivery for everything recreates TCP-style head-of-line blocking over UDP (one dropped packet stalls everything queued behind it)",
         "States that a pipe/connection is unidirectional (one-way A to B) so a separate pipe is needed for the return direction"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 2,
@@ -18,8 +17,7 @@
       "assertions": [
         "Identifies that a delta is meaningless without a baseline and that applying deltas to a client that never received the initial full state corrupts its world",
         "States that a freshly connected node must first be sent a full snapshot (complete state dump) to establish its baseline before any incremental delta is applied"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 3,
@@ -27,8 +25,7 @@
       "assertions": [
         "Identifies that replication requires two independent opt-ins: a per-component replication capability AND a per-object replication flag on the instance",
         "Concludes the specific object instance is not flagged/marked for replication, so nothing about it is sent even though its component type is replicable"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 4,
@@ -36,8 +33,7 @@
       "assertions": [
         "States that in-process/local delivery never drops or reorders packets, so packet-loss and out-of-order bugs stay hidden until tested on a real socket or under injected adverse conditions",
         "Recommends injecting simulated adverse network conditions (artificial latency and/or bandwidth caps) and/or testing against a real socket to expose those bugs"
-      ],
-      "load_bearing": true
+      ]
     }
   ]
 }

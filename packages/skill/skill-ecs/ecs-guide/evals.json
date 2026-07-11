@@ -9,8 +9,7 @@
         "Recommends a brute-force filter-and-batch system that re-pushes every matching entity's transform to physics each frame as the default, adding dirty/version flags or change lists only when profiling shows the external call dominates",
         "Explicitly advises against propagating transform changes to physics via observer/on-changed callbacks because they fire outside the declared read/write dependencies and break the parallel scheduler (reserving callbacks for lifecycle only)",
         "Notes the one-frame out-of-sync window from batch mirroring and says to order the mirror pass before any raycast/query that depends on it (or query the ECS-side value)"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 2,
@@ -19,8 +18,7 @@
         "States that an entity should hold at most one instance of a given component type, so you should NOT attach the light component multiple times to the same entity",
         "Represents the collection either as child entities each holding one light component, or as a single list-holding component (optionally with an index pointing into a system-private structure)",
         "Justifies this by noting multiple instances would force (entity, type, instance-id) addressing / per-instance ids and lookup indirection instead of clean (entity, type) access"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 3,
@@ -29,8 +27,7 @@
         "The loop walks the co-located transform and velocity arrays directly (raw pointer/index walk over the passed arrays plus a count) with no per-element entity-id/handle lookup and no cross-system call inside the loop",
         "Filters by a required component mask, running over every bucket/archetype whose type is a superset of that mask",
         "Parallelizes by splitting the entity count into ranges (one job per range) and declares/keeps the read and write component sets explicit so a scheduler can run non-conflicting systems concurrently"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 4,
@@ -38,8 +35,7 @@
       "assertions": [
         "Culls per viewer and records results as a per-renderable visibility bitmask (one bit per viewer), filling all bits in a single pass over the component data so each renderable is visited once for all viewers",
         "States that extra viewers (shadows, reflections) are generated during render-graph execution and fold into the viewer array, and must NOT be registered before execution"
-      ],
-      "load_bearing": true
+      ]
     }
   ]
 }

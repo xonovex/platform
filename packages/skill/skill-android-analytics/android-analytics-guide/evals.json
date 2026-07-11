@@ -8,8 +8,7 @@
       "assertions": [
         "The screen-view tracking call is placed in the ViewModel (e.g. its init block or load function), NOT inside the composable body or a LaunchedEffect(Unit)",
         "The checkout tracking is triggered from a ViewModel handler that the composable invokes via a hoisted intent callback (e.g. onCheckoutClicked), with the composable never calling the tracker directly"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 2,
@@ -17,8 +16,7 @@
       "assertions": [
         "A single screen-view call carries all active experiments together (e.g. trackScreenWithExperiments passing a list of Experiment(key, value)), rather than branching the tracking call per variant with if/when",
         "The code does not emit a separately named event per experiment variant"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 3,
@@ -26,8 +24,7 @@
       "assertions": [
         "Raw PII (the user's email and/or customer id) is NOT placed directly in event parameters; the identifier is hashed (e.g. SHA-256) or omitted",
         "Consent is enforced centrally in the tracker/implementation layer (anonymizing or nullifying identifiers when analytics consent is withheld) rather than the ViewModel/feature code checking consent before each call"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 4,
@@ -35,8 +32,7 @@
       "assertions": [
         "The test injects an in-memory fake implementation of the tracker interface rather than the real analytics SDK or a Mockito/mock verify on a string name",
         "It asserts the exact typed event by equality (e.g. ButtonClickEvent with uniqueName \"cart_checkout\"), not a string substring or a call count alone"
-      ],
-      "load_bearing": false
+      ]
     }
   ]
 }

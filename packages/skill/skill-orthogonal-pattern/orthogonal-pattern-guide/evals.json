@@ -9,8 +9,7 @@
         "The proposed top-level directories are named for the varying concerns (e.g. format, sink, compression) rather than for tools or layers (not s3uploader, exportutil, utils, helpers, services)",
         "Variant leaf directories are bare variant names (e.g. sink/s3, format/json) rather than repeating the axis or naming a tool (not sink/s3uploader or format/jsonformat)",
         "A single composition root / registry file is described as the only place that imports and wires the concrete variants, and adding a variant is one new leaf plus one registry entry"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 2,
@@ -19,8 +18,7 @@
         "The answer explicitly states that logging and the policy check are NOT a new axis / sibling variant directory (e.g. no logging/ or policy/ directory placed alongside format/sink/compression)",
         "It recommends applying these concerns once at the composition root over the whole selection, rather than duplicating the check inside each variant leaf",
         "It frames them as cross-cutting concerns and warns that forcing them into a variant causes scattering (duplication across leaves) or tangling"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 3,
@@ -29,8 +27,7 @@
         "Recommends the producing axis emit a neutral data value (e.g. an encoded Record with bytes/content-type/metadata) that the compression axis consumes, so neither axis names the other",
         "Explicitly states the result is N+M implementations rather than N*M per-combination code, with the cross-product living in configuration/selection rather than in code",
         "If it addresses a case where one specific encoder genuinely requires a specific compressor, it places that glue as a bridge file inside the dependent leaf (e.g. format/parquet/zstd.go) rather than a new top-level combined package (not export/parquetzstd/)"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 4,
@@ -38,8 +35,7 @@
       "assertions": [
         "The proposed flags are prefixed by axis and variant, e.g. --sink-s3-bucket and --compression-zstd-level, rather than bare positional or unprefixed names like --bucket and --level",
         "The rationale notes that the axis+variant prefix keeps option names unique (avoiding collisions such as two variants both wanting --level) and that each variant registers its own options at its leaf rather than editing a central parser"
-      ],
-      "load_bearing": true
+      ]
     }
   ]
 }

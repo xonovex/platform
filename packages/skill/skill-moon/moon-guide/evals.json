@@ -8,8 +8,7 @@
       "assertions": [
         "States the extension configuration belongs in the file `.moon/extensions.yml`",
         "Does NOT place the extension config in `.moon/workspace.yml` or `.moon/toolchains.yml`"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 2,
@@ -17,8 +16,7 @@
       "assertions": [
         "Every COPY into the distroless nonroot runtime stage uses `--chown=65532:65532`",
         "Copies the scaffolded `.moon/docker/workspace` before `npm ci` and `.moon/docker/sources` after, and calls `moon docker prune` after the build"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 3,
@@ -26,8 +24,7 @@
       "assertions": [
         "Uses `script:` (not `command:`) for the shell-chained `mkdir ... && go build ...` command",
         "Uses the `${OUTPUT_DIR:-bin}` default-value syntax rather than a bare `$OUTPUT_DIR`"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 4,
@@ -36,8 +33,7 @@
         "Renames `type: library` to `layer: library` and `platform: node` to `toolchains: [node]`",
         "Replaces `local: true` with `preset: 'server'`",
         "States that `projectType` is replaced by `projectLayer` in MQL queries"
-      ],
-      "load_bearing": true
+      ]
     }
   ]
 }

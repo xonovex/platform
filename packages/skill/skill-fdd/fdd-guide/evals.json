@@ -8,8 +8,7 @@
       "assertions": [
         "Lists exactly six milestones (Domain Walkthrough, Design, Design Inspection, Code, Code Inspection, Promote to Build) with weights 1%, 40%, 3%, 45%, 10%, 1% summing to 100%",
         "States the feature reads 44% complete when past Design Inspection but mid-Code (sum of Domain Walkthrough + Design + Design Inspection = 44%), not an even ~16.6% per-milestone split"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 2,
@@ -17,8 +16,7 @@
       "assertions": [
         "States the template as <action> the <result> by/for/of/to a(n) <object> with the connector being one of by, for, of, or to (not fixed to 'of')",
         "Each of the four feature names follows the action-result-object template and names a client-valued function, not a component/class/task (e.g. not 'Build the OrderService')"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 3,
@@ -26,8 +24,7 @@
       "assertions": [
         "Clarifies the two weeks is the MAX SIZE of a single feature, not a sprint/iteration timebox, and that FDD does not use fixed sprints",
         "States most features take about 1-3 days"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 4,
@@ -36,8 +33,7 @@
         "Lists the five processes in order: Develop an Overall Model, Build a Features List, Plan by Feature, Design by Feature, Build by Feature",
         "States FDD uses single-owner-per-class (Class Owner), in deliberate contrast to collective code ownership",
         "Describes a feature team as a transient/dynamic team formed per feature set under a Chief Programmer, not a fixed role and not a 'feature'"
-      ],
-      "load_bearing": true
+      ]
     }
   ]
 }

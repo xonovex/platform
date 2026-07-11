@@ -10,8 +10,7 @@
         "The email field uses z.email() and NOT z.string().email()",
         "The createdAt field uses z.iso.datetime() and NOT z.string().datetime()",
         "The type is derived with z.infer<typeof UserSchema>"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 2,
@@ -20,8 +19,7 @@
         "The default is provided as the numeric value .default(3000) and NOT the string .default(\"3000\")",
         "A .transform (converting to Number) is piped into a numeric schema before the default is applied",
         "The inferred output type resolves to number"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 3,
@@ -29,8 +27,7 @@
       "assertions": [
         "The handler uses .safeParse() rather than .parse()",
         "It branches on the result.success boolean and returns a 400 response containing result.error (e.g. result.error.issues) when success is false"
-      ],
-      "load_bearing": true
+      ]
     },
     {
       "id": 4,
@@ -39,8 +36,7 @@
         "The enum schema uses z.enum(Status) and NOT the deprecated z.nativeEnum(Status)",
         "CreateUserSchema is derived from UserSchema using .omit (or .pick) rather than redefining the fields",
         "UpdateUserSchema is derived using .partial()"
-      ],
-      "load_bearing": true
+      ]
     }
   ]
 }
