@@ -23,7 +23,7 @@ Load the `bdd-guide` skill (plugin `xonovex-skill-bdd`) — and `user-stories-gu
 acceptance-criteria completeness — and follow them to turn the stories (and any provided
 designs) into Given-When-Then scenarios: run three-amigos discovery (business /
 development / testing perspectives), example-map each rule (yellow/green/red/blue cards),
-and write 2-5 declarative scenarios per rule covering happy path, boundaries, errors, UI
+and write the declarative scenarios each rule needs (often a couple, sometimes none) covering happy path, boundaries, errors, UI
 states, and accessibility. Include non-functional acceptance criteria (performance,
 security, load) alongside the functional ones where they matter — they feed the
 acceptance sign-off. The skills are the source of truth for the method — do not restate

@@ -21,7 +21,7 @@ Pop one story (its INVEST qualities owned by **user-stories-guide**) and talk th
 - **Green** — a concrete example illustrating a blue rule; becomes a scenario.
 - **Red** — an unanswered question / assumption blocking agreement.
 
-Read the map as a sizing signal: FULL of blue = too many rules, split it; MANY red = too uncertain, not ready; healthy = a few rules, each with a couple of greens, few reds.
+Read the map as a sizing signal: FULL of blue = too many rules, split it; MANY red = too uncertain, not ready; a SINGLE rule with MANY greens = it hides several rules, tease them apart; healthy = a few rules, each with a couple of greens, few reds.
 
 ```text
 [YELLOW] Assign the best nearby taxi
@@ -32,4 +32,4 @@ Read the map as a sizing signal: FULL of blue = too many rules, split it; MANY r
   [RED] No taxi in range — queue, or reject?
 ```
 
-Each green card becomes a candidate scenario; each blue rule becomes a Gherkin `Rule` (see gherkin-reference). Turn 2-5 greens per rule into scenarios — not one per code path; exhaustive cases go to **tdd-guide**, step glue and stubbing to **testing-guide**. The framing of WHY discovery tests understanding rather than software is in appendix-discovery.
+Each green card becomes a candidate scenario; each blue rule becomes a Gherkin `Rule` (see gherkin-reference). Turn each rule's greens into scenarios (often a couple, sometimes none) — not one per code path; exhaustive cases go to **tdd-guide**, step glue and stubbing to **testing-guide**. The framing of WHY discovery tests understanding rather than software is in appendix-discovery.
