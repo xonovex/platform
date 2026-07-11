@@ -1,6 +1,6 @@
 {
   "name": "xonovex-skill-editor-viewport",
-  "version": "4.1.0",
+  "version": "5.0.0",
   "description": "Xonovex Editor viewport skills",
   "author": {"name": "Xonovex"},
   "skills": ["./editor-viewport-guide"]

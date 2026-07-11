@@ -1,6 +1,6 @@
 {
   "name": "xonovex-skill-reflect",
-  "version": "4.1.0",
+  "version": "5.0.0",
   "description": "Xonovex Reflect skills",
   "author": {"name": "Xonovex"},
   "skills": ["./reflect-guide"]

@@ -1,10 +1,10 @@
 {
   "name": "@xonovex/skill-hono-opinionated",
-  "version": "4.1.0",
+  "version": "5.0.0",
   "private": true,
   "type": "module",
   "dependencies": {
-    "@xonovex/skill-hono": "4.1.0"
+    "@xonovex/skill-hono": "5.0.0"
   },
   "keywords": [
     "xonovex",

@@ -1,11 +1,11 @@
 {
   "name": "@xonovex/skill-code-quality",
-  "version": "4.1.0",
+  "version": "5.0.0",
   "private": true,
   "type": "module",
   "dependencies": {
-    "@xonovex/skill-connascence": "4.1.0",
-    "@xonovex/skill-oop": "4.1.0"
+    "@xonovex/skill-connascence": "5.0.0",
+    "@xonovex/skill-oop": "5.0.0"
   },
   "keywords": [
     "xonovex",

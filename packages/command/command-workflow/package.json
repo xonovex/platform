@@ -1,15 +1,15 @@
 {
   "name": "@xonovex/command-workflow",
-  "version": "4.1.0",
+  "version": "5.0.0",
   "private": true,
   "dependencies": {
-    "@xonovex/skill-bdd": "4.1.0",
-    "@xonovex/skill-code-quality": "4.1.0",
-    "@xonovex/skill-code-review": "4.1.0",
-    "@xonovex/skill-git": "4.1.0",
-    "@xonovex/skill-plan": "4.1.0",
-    "@xonovex/skill-pull-request": "4.1.0",
-    "@xonovex/skill-tdd": "4.1.0"
+    "@xonovex/skill-bdd": "5.0.0",
+    "@xonovex/skill-code-quality": "5.0.0",
+    "@xonovex/skill-code-review": "5.0.0",
+    "@xonovex/skill-git": "5.0.0",
+    "@xonovex/skill-plan": "5.0.0",
+    "@xonovex/skill-pull-request": "5.0.0",
+    "@xonovex/skill-tdd": "5.0.0"
   },
   "keywords": [
     "xonovex",

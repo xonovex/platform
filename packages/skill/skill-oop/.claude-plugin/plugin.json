@@ -1,6 +1,6 @@
 {
   "name": "xonovex-skill-oop",
-  "version": "4.1.0",
+  "version": "5.0.0",
   "description": "Xonovex Object-oriented programming skills",
   "author": {"name": "Xonovex"},
   "skills": ["./oop-guide"]
