@@ -29,7 +29,7 @@ Author, extract, merge, simplify, and validate Agent Skills following the Agent 
 - **Treat skills as software** — least privilege via `allowed-tools`, audit untrusted scripts/URLs, never hardcode secrets, see [references/security.md](references/security.md)
 - **Bullet Format** — `- **Rule** - Brief 5-10 word how-to, see [references/<topic>.md](references/<topic>.md)`
 - **Style Consistency** — match existing skill patterns in structure and voice
-- **Add what the agent lacks; omit what it knows** — no general-knowledge filler
+- **Add what the agent lacks; omit what it knows** — trim to the delta over baseline model knowledge (tier-aware) and verify against the weakest model, see [references/optimize.md](references/optimize.md); no general-knowledge filler
 - **Defaults over menus** — one default, alternatives mentioned briefly
 - **Procedures over declarations** — teach the approach/steps, not a one-off answer
 - **Evals before docs** — build trigger/output evals for the gap first, then write the minimum to pass them; iterate observe→revise, see [references/evaluating-triggers.md](references/evaluating-triggers.md), [references/evaluating-outputs.md](references/evaluating-outputs.md)
@@ -70,6 +70,7 @@ Single index of every reference; each entry names the operation/concept and when
 - Read [references/extract-from-codebase.md](references/extract-from-codebase.md) - Load when extracting patterns from this codebase into a skill
 - Read [references/merge.md](references/merge.md) - Load when porting elements from one skill into another
 - Read [references/simplify.md](references/simplify.md) - Load when condensing a verbose SKILL.md to bullet format or trimming bloated reference files
+- Read [references/optimize.md](references/optimize.md) - Load when trimming a skill to its delta over baseline model knowledge (tier depth) and verifying with a weakest-model ablation that no load-bearing fact was lost
 - Read [references/validate.md](references/validate.md) - Load when auditing a SKILL.md against the spec
 - Read [references/composability.md](references/composability.md) - Load when deciding skill boundaries, owners, tiers, how one skill depends on another, or whether to generalize vs link a concept
 - Read [references/catalog-audit.md](references/catalog-audit.md) - Load when auditing, splitting, or de-duplicating a set of skills onto the composable split

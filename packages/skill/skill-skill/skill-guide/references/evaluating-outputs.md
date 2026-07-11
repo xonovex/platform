@@ -15,22 +15,27 @@ This is about **whether the outputs are good once the skill activates** — not 
 - **Assertions** — specific, binary PASS/FAIL checks the judge grades against
 - **Files** (optional) — input artifacts the skill needs
 
-Store in `evals/evals.json` inside the skill directory:
+Store the seed as `evals.json` at the guide root (next to `SKILL.md`) — the path `eval-outputs.py` is pointed at; optional input artifacts go in `evals/files/`. Record `tier` (`eval-outputs.py` ignores the extra key):
 
 ```json
 {
   "skill_name": "{name}",
+  "tier": "aggressive | moderate | conservative",
   "evals": [
     {
       "id": 1,
       "prompt": "{realistic prompt}",
-      "expected_output": "{success criterion}",
+      "expected_output": "{plain-language success reference — optional}",
       "assertions": ["{verifiable check}", "{another check}"],
       "files": ["evals/files/{input}"]
     }
   ]
 }
 ```
+
+`assertions` are the binary source of truth; `expected_output` is an optional plain-language reference the judge uses to recognise success (and a fallback if `assertions` is omitted). `files` is optional too.
+
+Keep this seed committed per skill. "What the model already knows" is model-specific, so the **weakest model you deploy is the gate** — run any model with `eval-outputs.py --model <m>`. **Load-bearing is measured, not declared:** an eval the model fails **without** the skill is one the skill genuinely carries; if that same eval also fails **with** the skill, a trim removed the fact — restore it. When a model is added, re-run the seed against it: a high without-skill pass rate means the content is now redundant (trim-further candidate); a with-skill-only pass means it stays load-bearing.
 
 ## Automated Runner
 
