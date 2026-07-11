@@ -31,7 +31,7 @@ Load these skills via the `Skill` tool; they are the source of truth for the pro
 - your **host skill** — detect the host from the git remote and load the matching one: `github-guide` (plugin `xonovex-skill-github`) on GitHub, `gitlab-guide` (plugin `xonovex-skill-gitlab`) on GitLab, or another installed `skill-<host>` — and perform its **review-resolve** op: auth, reading threads, matching findings to threads by `commentId`, resolving, replying.
 - `code-review-guide` (plugin `xonovex-skill-code-review`) — the **verify-addressed judgment**: decide whether a finding is genuinely fixed, not just moved.
 
-Command-level glue: route `--pr` / `branch` to PR lookup; detect the host and stop, naming the host skill to install, if none is loaded; source findings from `--findings` else the in-session set carried forward by `pr-review-post`.
+Command-level glue: route `--pr` / `branch` to PR lookup; detect the host and stop, naming the host skill to install, if none is loaded; source findings from `--findings` else the in-session set carried forward by `pr-review-post`; before reporting the review complete, verify the required code-owner approvals via the host skill — a review with open threads or missing required approvals is not done.
 
 ## Examples
 
