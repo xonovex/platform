@@ -35,7 +35,7 @@ Store the seed as `evals.json` at the guide root (next to `SKILL.md`) — the pa
 
 `assertions` are the binary source of truth; `expected_output` is an optional plain-language reference the judge uses to recognise success (and a fallback if `assertions` is omitted). `files` is optional too.
 
-Keep this seed committed per skill. "What the model already knows" is model-specific, so the **weakest model you deploy is the gate** — run any model with `eval-outputs.py --model <m>`. **Load-bearing is measured, not declared:** an eval the model fails **without** the skill is one the skill genuinely carries; if that same eval also fails **with** the skill, a trim removed the fact — restore it. When a model is added, re-run the seed against it: a high without-skill pass rate means the content is now redundant (trim-further candidate); a with-skill-only pass means it stays load-bearing.
+Keep this seed committed per skill. "What the model already knows" is model-specific, so the **weakest model you deploy is the gate** — run any model with `eval-outputs.py --model <m>`. **Which facts are essential is measured, not declared:** an eval the model fails **without** the skill is one the skill genuinely carries; if that same eval also fails **with** the skill, a trim removed the fact — restore it. When a model is added, re-run the seed against it: a high without-skill pass rate means the content is now redundant (trim-further candidate); a with-skill-only pass means it stays essential.
 
 ## Automated Runner
 

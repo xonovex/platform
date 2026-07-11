@@ -59,7 +59,7 @@ Weights are exact and deliberately uneven (Design + Code dominate); an even 16.6
 
 ## Roles and feature teams
 
-Six key roles: **Project Manager, Chief Architect, Development Manager, Chief Programmer, Class Owner, Domain Expert** (plus supporting roles). Two are load-bearing for the inner loop:
+Six key roles: **Project Manager, Chief Architect, Development Manager, Chief Programmer, Class Owner, Domain Expert** (plus supporting roles). Two are essential for the inner loop:
 
 - **Class Owner** — single-owner-per-class: one person responsible for each class (deliberate tension with collective code ownership).
 - **Chief Programmer** — leads a **feature team**: a small team formed dynamically per feature set, pulling in the Class Owners of the classes that set touches. Not a fixed role and not a "feature"; it dissolves and reforms as feature sets change.

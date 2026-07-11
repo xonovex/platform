@@ -23,7 +23,7 @@ Author, refresh, simplify, consolidate, and port AGENTS.md project-instruction f
 ## Gotchas
 
 - AGENTS.md files that restate code are worse than no doc — they rot when the code changes
-- Tech names look like noise but are load-bearing; never substitute generics for `moon` / `Terraform` / `npm`
+- Tech names look like noise but are essential; never substitute generics for `moon` / `Terraform` / `npm`
 - Root AGENTS.md is the project entry-point doc — never auto-delete even if it looks thin
 - Manual descriptions in Subdirectories often encode info the filesystem can't (purpose, owner, status) — preserve verbatim during sync
 - Nested AGENTS.md aren't duplicates — they're scope-specific overrides; never merge a subproject's file into the root

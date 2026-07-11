@@ -1,5 +1,5 @@
 ---
-description: Verify a skill's trims kept load-bearing knowledge — ablate the removed content against the weakest model and restore anything it fails without
+description: Verify a skill's trims kept essential knowledge — ablate the removed content against the weakest model and restore anything it fails without
 allowed-tools:
   - Read
   - Edit
@@ -12,7 +12,7 @@ allowed-tools:
 argument-hint: "[skill-file] [--model <weakest>] [--base <git-ref>] [--report-only]"
 ---
 
-# /xonovex-utility:skill-ablate — Verify no load-bearing knowledge was trimmed
+# /xonovex-utility:skill-ablate — Verify no essential knowledge was trimmed
 
 ## Arguments
 

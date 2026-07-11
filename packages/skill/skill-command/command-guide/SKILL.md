@@ -11,7 +11,7 @@ Author, merge, simplify, and distill reusable user-invocable prompt files (somet
 
 - **Generic by Default** — strip project-specific paths, domain terms, and tech names at author time so prompts reuse across projects
 - **Match Style and Voice** — preserve the target's structure, voice, formatting when merging
-- **Structure Integrity** — front matter, Goal, Arguments, Core Workflow, Implementation, Error Handling are the load-bearing sections
+- **Structure Integrity** — front matter, Goal, Arguments, Core Workflow, Implementation, Error Handling are the essential sections
 - **Safe Modifications** — preview changes (`--dry-run`) before applying
 - **Bound the Body** — target <150 lines per prompt; anything longer usually wants to be two prompts
 - **Delegate, Don't Duplicate** — a command owns its argument contract and delegates the procedure to a guideline skill via the `Skill` tool; the skill is the single source of truth, the command a thin, stable interface

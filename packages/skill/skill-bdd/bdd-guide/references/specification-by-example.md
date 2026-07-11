@@ -16,6 +16,6 @@ Turn agreed examples into the project's specification AND its test suite at once
 
 When examples are both spec and automated check, "specification" and "test" become one artefact. Because it runs against the system every build, a stale statement fails — the documentation cannot silently rot.
 
-Pattern 5 is the load-bearing discipline: if automation rewords "a 10% coupon reduces a 50.00 order to 45.00" into `assert discountEngine.apply(...) == 45`, the business reader can no longer recognise their rule and the doc is dead. Keep the agreed Gherkin wording; step definitions (owned by **testing-guide**) bind that unchanged text to the system.
+Pattern 5 is the essential discipline: if automation rewords "a 10% coupon reduces a 50.00 order to 45.00" into `assert discountEngine.apply(...) == 45`, the business reader can no longer recognise their rule and the doc is dead. Keep the agreed Gherkin wording; step definitions (owned by **testing-guide**) bind that unchanged text to the system.
 
 Keep specs declarative (see gherkin-reference) and refine ruthlessly — a few illustrative examples per rule; exhaustive cases go to **tdd-guide**/**testing-guide**. The vocabulary is the ubiquitous language owned by **ddd-guide**; the scoping story by **user-stories-guide**; the WHY-this-tests-understanding framing in appendix-discovery.

@@ -3,14 +3,14 @@
 Record of the pass that trimmed all 74 skills to their delta over baseline model
 knowledge, and the knowledge-grounded ablation that verified it.
 
-Commits: `6af54791` (trim), `48d551d9` (restore).
+Commits: `6af54791` (trim), `b67816f5` (restore).
 
 ## Result
 
 - 74 skills, **32,332 → 22,310** lines across `SKILL.md` + `references/` (**−31%**).
 - Tiers: 25 aggressive, 25 moderate, 24 conservative.
 - `validate.py` + `moon :ci-check` pass on every skill; `name`/`description` (routing) unchanged.
-- Ablation on the weakest model (Haiku): **72/74 skills filler-only**; 3 removed facts were load-bearing and were restored.
+- Ablation on the weakest model (Haiku): **72/74 skills filler-only**; 3 removed facts were essential and were restored.
 
 ## Method
 
@@ -40,7 +40,7 @@ Stage A audited every skill's removed lines — **72/74 filler-only**. Stage B a
 
 | Removed item                       | no-skill | trimmed | original | Action                      |
 | ---------------------------------- | -------- | ------- | -------- | --------------------------- |
-| moon: distroless uid `65532` chown | 0.33     | 0.33    | 1.00     | restored (load-bearing)     |
+| moon: distroless uid `65532` chown | 0.33     | 0.33    | 1.00     | restored (essential)        |
 | moon: `.moon/extensions.yml`       | 0.67     | 0.67    | 1.00     | restored (reliability)      |
 | expressjs: JWT expiration          | 1.00     | 0.67    | 1.00     | restored (security default) |
 
@@ -174,7 +174,7 @@ done
 Read each eval's `with_skill` vs `without_skill` pass rate:
 
 - `without_skill` **high** → the new model already knows it → that content is now redundant → **trim-further** candidate (only act if this model is the weakest you run).
-- `with_skill` high, `without_skill` low → still **load-bearing** → keep (restore if a trim removed it).
+- `with_skill` high, `without_skill` low → still **essential** → keep (restore if a trim removed it).
 - `with_skill` low → the skill or the eval needs attention.
 
-Load-bearing is measured, not declared: after any future trimming pass, re-run the seed on the weakest model (or the two-stage ablation: diff removed content → ablate on the weakest model); an eval a model fails _with_ the skill is one a trim broke — restore it, exactly as this session did.
+Which facts are essential is measured, not declared: after any future trimming pass, re-run the seed on the weakest model (or the two-stage ablation: diff removed content → ablate on the weakest model); an eval a model fails _with_ the skill is one a trim broke — restore it, exactly as this session did.

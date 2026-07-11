@@ -16,6 +16,6 @@ One author's synthesis for building intuition — a mental model, NOT a standard
 
 ## What to carry
 
-"Plug-ins are adapters behind ports" and "a distributed plug-in core can ride a mesh (keep the port contract identical to the in-process case)" are good instincts. For load-bearing definitions use **hexagonal-pattern-guide** (ports/adapters, the dependency rule) and [core-plugins-registry.md](core-plugins-registry.md) (kernel/registry/composition-root). For coupling vocabulary, **connascence-guide**.
+"Plug-ins are adapters behind ports" and "a distributed plug-in core can ride a mesh (keep the port contract identical to the in-process case)" are good instincts. For essential definitions use **hexagonal-pattern-guide** (ports/adapters, the dependency rule) and [core-plugins-registry.md](core-plugins-registry.md) (kernel/registry/composition-root). For coupling vocabulary, **connascence-guide**.
 
 Back to [SKILL.md](../SKILL.md).

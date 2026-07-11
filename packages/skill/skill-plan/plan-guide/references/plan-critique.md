@@ -12,7 +12,7 @@ Attack an existing plan to expose its weaknesses before any code is written — 
 
 Run one or more adversarial lenses (default: red-team + pre-mortem):
 
-- **red-team** — attack the load-bearing assumptions: what must be true for this to work, and which of those is unproven?
+- **red-team** — attack the essential assumptions: what must be true for this to work, and which of those is unproven?
 - **pre-mortem** — assume it shipped and failed; enumerate the most likely causes, working backward to the decision behind each
 - **falsify** — hunt the single disconfirming case: the input, scale, or sequence the plan does not handle
 - **steelman** — strengthen the weakest section: state the strongest version of the concern, then the minimal change that removes it
@@ -22,7 +22,7 @@ Run one or more adversarial lenses (default: red-team + pre-mortem):
 **Stay in critique mode — no plan authoring, no implementation, read-only.**
 
 1. **Load plan** — read the document; extract approach, assumptions, success criteria, subplan structure
-2. **Ground in the codebase** — verify each load-bearing claim against the actual code; a critique built on a misread of the plan is noise
+2. **Ground in the codebase** — verify each essential claim against the actual code; a critique built on a misread of the plan is noise
 3. **Run each selected mode** — produce concrete findings, not vague worries
 4. **Rate each finding** — severity (blocking / major / minor) and confidence; a finding without a severity can't be triaged
 5. **Tie findings to the plan** — name the section / decision / subplan each one attacks

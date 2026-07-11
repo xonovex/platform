@@ -1,6 +1,6 @@
 # optimize: Trim a Skill to Its Delta Over Baseline Model Knowledge
 
-Cut everything the target model already produces unprompted; keep only what it lacks. Never touch `description`/triggers — they route (see [writing-descriptions.md](writing-descriptions.md)). Condensing mechanics live in [simplify.md](simplify.md); this adds the knowledge-delta discipline, tier depth, and the ablation that proves nothing load-bearing was lost.
+Cut everything the target model already produces unprompted; keep only what it lacks. Never touch `description`/triggers — they route (see [writing-descriptions.md](writing-descriptions.md)). Condensing mechanics live in [simplify.md](simplify.md); this adds the knowledge-delta discipline, tier depth, and the ablation that proves nothing essential was lost.
 
 ## Principle
 
@@ -12,7 +12,7 @@ A guideline skill mostly encodes conventions and non-obvious facts, not novel ca
 - **moderate** — a specific framework/tool or an opinionated overlay: keep the API/opinion delta; cut filler + duplicate examples.
 - **conservative** — version-pinned / exact-fact / spec-heavy (a specific API, spec numbers, this skill): light touch, dedupe only — the specifics are the value.
 
-When unsure whether a detail is load-bearing, keep it.
+When unsure whether a detail is essential, keep it.
 
 ## Cut vs keep
 
@@ -33,7 +33,7 @@ If a trim surfaces a genuine defect (a rule that as written would mislead), fix 
 2. Verify the trim kept its value with an **ablation against the weakest model you deploy** — a stronger model hides value loss:
    - Diff the removed content (`git diff <pre-trim-ref> HEAD -- <skill>`); from the `-` lines list genuine knowledge-at-risk items (non-obvious facts, exact identifiers) — ignore filler.
    - For each, an eval whose correct answer needs that fact — the `evals.json` seed + `eval-outputs.py` runner in [evaluating-outputs.md](evaluating-outputs.md).
-   - Run with-skill vs without-skill on the weakest model: `without-skill` correct → already known, cut was safe; `with-skill` correct only → load-bearing and kept; `with-skill` **wrong** → the trim removed a fact the skill no longer conveys → restore the exact text.
+   - Run with-skill vs without-skill on the weakest model: `without-skill` correct → already known, cut was safe; `with-skill` correct only → essential and kept; `with-skill` **wrong** → the trim removed a fact the skill no longer conveys → restore the exact text.
    - Restore only the flagged facts, then re-validate.
 
 ## At catalog scale

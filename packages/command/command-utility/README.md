@@ -65,7 +65,7 @@ alongside this one.
 | `skill-assimilate` | Augment a skill with elements from another skill        |
 | `skill-optimize`   | Trim a skill to its delta over baseline model knowledge |
 | `skill-evaluate`   | Seed a skill's evals.json output-eval file              |
-| `skill-ablate`     | Verify no load-bearing knowledge was trimmed            |
+| `skill-ablate`     | Verify no essential knowledge was trimmed               |
 
 ### Slash Commands
 

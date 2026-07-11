@@ -10,7 +10,7 @@
 - **Mock** — pre-programmed with **expectations** it **verifies** itself, failing on an unexpected, missing, or out-of-spec call. This is behaviour verification.
 - **Fake** — a working but shortcut implementation unsuitable for production (in-memory DB, a gateway that always approves under €1000). Has real behaviour; a Stub does not.
 
-Load-bearing contrasts: a **Spy is not a Mock** (a Spy records passively; a Mock owns and enforces expectations); a **Fake is not a Stub** (a Fake runs logic; a Stub returns constants).
+Essential contrasts: a **Spy is not a Mock** (a Spy records passively; a Mock owns and enforces expectations); a **Fake is not a Stub** (a Fake runs logic; a Stub returns constants).
 
 ## Indirect input vs indirect output
 
