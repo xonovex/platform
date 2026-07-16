@@ -1,11 +1,18 @@
 ---
 type: plan
 has_subplans: true
-status: pending-approval
+status: approved
 updated: '2026-07-16'
 dependencies:
   plans:
   - composable-workflow-phases
+  subplans:
+  - merge-baseline-and-layout-normalization
+  - merge-walking-skeleton-and-evidence-honesty
+  - merge-adversarial-fixture-corpus-and-runner
+  - merge-plugin-plans-decoupling
+  - merge-traceability-repairs
+  - merge-closure-release-and-validation
 proposed_subplans:
 - merge-baseline-and-layout-normalization
 - merge-walking-skeleton-and-evidence-honesty
@@ -20,10 +27,10 @@ parallel_groups:
 - group: 2
   plans:
   - merge-walking-skeleton-and-evidence-honesty
-  - merge-adversarial-fixture-corpus-and-runner
   - merge-plugin-plans-decoupling
 - group: 3
   plans:
+  - merge-adversarial-fixture-corpus-and-runner
   - merge-traceability-repairs
 - group: 4
   plans:
@@ -140,10 +147,10 @@ Each workstream ends with its own verification checks; the final gate re-runs ev
 | --- | --- | --- | --- |
 | 1 | `merge-baseline-and-layout-normalization` | Baseline gate, port manifest, 9-package flat-layout move, manifest/catalog fixes | None |
 | 2 | `merge-walking-skeleton-and-evidence-honesty` | Skeleton graft, subplan-05 evidence repair, Claude Code probe, validation-policy amendment | Group 1 |
-| 2 | `merge-adversarial-fixture-corpus-and-runner` | Fixture conversion, dedupe, suite indexes, runner + mutation guards, moon wiring | Group 1 |
 | 2 | `merge-plugin-plans-decoupling` | Package/repo validator split, docs link fixes, moon input cleanup | Group 1 |
-| 3 | `merge-traceability-repairs` | D-036–D-039 fix, vocabulary legend, shape checks, worst-offender ID blocks | Group 2 (validator split) |
-| 4 | `merge-closure-release-and-validation` | Optional extras, semver application, parent-plan closure, VALIDATION regeneration, E2E gate | Group 3 |
+| 3 | `merge-adversarial-fixture-corpus-and-runner` | Fixture conversion, dedupe, suite indexes, runner + mutation guards, moon wiring | Groups 1–2 (shares `skill-agent-governance` files with the skeleton subplan) |
+| 3 | `merge-traceability-repairs` | D-036–D-039 fix, vocabulary legend, shape checks, worst-offender ID blocks | Group 2 (extends the repo-level validator from the decoupling subplan) |
+| 4 | `merge-closure-release-and-validation` | Convention-rule grafts, manifest audit, 6.0.1 release, parent-plan closure, VALIDATION regeneration, E2E gate, merge-back | Group 3 |
 
 ## Success Criteria
 
