@@ -6,7 +6,7 @@ The game thread never touches voice state directly; it posts immutable commands 
 
 ## Rationale
 
-The audio thread cannot take a lock the game thread might hold (deadline-missing stall), and two threads mutating one voice struct is a data race. An SPSC handoff resolves both: single producer (game), single consumer (audio), voice-state ownership stays entirely on the audio thread, and commands are self-contained value messages so no shared object is mutated from two sides. Draining once per block — before mixing — keeps command application deterministic and bounded. The queue mechanics (indices, acquire/release ordering, full/empty handling) are owned by lock-free-guide.
+Voice-state ownership stays entirely on the audio thread; commands are self-contained value messages, so no shared object is mutated from two sides and draining once per block keeps command application deterministic. The queue mechanics (indices, acquire/release ordering, full/empty handling) are owned by lock-free-guide.
 
 ## How to Apply
 

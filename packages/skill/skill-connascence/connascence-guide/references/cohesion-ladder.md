@@ -16,7 +16,7 @@ Cohesion is the dual of coupling: how well one module's own parts belong togethe
 
 ## Temporal cohesion is the trap
 
-Grouping by _when_ code runs (the package-by-layer mistake) forces several jobs into one file. Split by what changes together, not when it runs. **The tell**: the only sentence describing the module uses a time word ("first", "during init", "on teardown").
+Grouping by _when_ code runs (the package-by-layer mistake) forces several jobs into one file. Split by what changes together, not when it runs.
 
 ```go
 // BAD — temporal: setup() groups three concerns because they run in one phase.

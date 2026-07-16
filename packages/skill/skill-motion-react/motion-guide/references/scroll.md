@@ -1,6 +1,6 @@
 # scroll: Reveals and Parallax
 
-Use `whileInView` (Intersection Observer) for scroll-triggered reveals; use `useScroll()` + `useTransform()` for scroll-linked parallax without scroll listeners.
+Use `whileInView` for scroll-triggered reveals; use `useScroll()` + `useTransform()` for scroll-linked parallax.
 
 ```tsx
 function ScrollReveal({children}) {

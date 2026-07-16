@@ -10,11 +10,6 @@ Refinement is the ongoing act of breaking down and further defining backlog item
 
 An item is **ready** when it is doable within one sprint — the practical upper bound on story size and the link to INVEST **Small** (see [invest-and-smart.md](invest-and-smart.md)). If it cannot finish inside a sprint, split it (see [splitting-flowchart.md](splitting-flowchart.md)) until each item fits, then pull it into planning.
 
-## Folklore to avoid
-
-- "Refinement is a required weekly grooming meeting" — it is an ongoing activity.
-- "Every item must carry a numeric estimate" — items are **sized** (wording moved from "estimate" to "size"), owned by the Developers, and not strictly required to be a number.
-
 ## Cross-references
 
 - The INVEST **Small** property and sprint-sized bound — [invest-and-smart.md](invest-and-smart.md).

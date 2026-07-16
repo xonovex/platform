@@ -12,13 +12,11 @@ Drive software from concrete, agreed examples of behaviour. Discover them in con
 - **Discover before you formulate** - run a three-amigos conversation over real examples first, see [references/discovery-three-amigos.md](references/discovery-three-amigos.md)
 - **Map examples to size and split the story** - yellow/blue/green/red cards expose scope and gaps, see [references/discovery-three-amigos.md](references/discovery-three-amigos.md)
 - **Write scenarios in Gherkin Given-When-Then** - Feature, Scenario, Background, Outline; declarative steps, see [references/gherkin-reference.md](references/gherkin-reference.md)
-- **A few scenarios per rule, push the rest down** - illustrate each rule with the examples it needs (often ~2-5, sometimes none), then drive exhaustive cases with **tdd-guide** unit tests
 - **Treat scenarios as living documentation** - specs and tests become one trustworthy artefact, see [references/specification-by-example.md](references/specification-by-example.md)
 
 ## Gotchas
 
 - Gherkin/Cucumber is a **collaboration** tool that tests the team's shared UNDERSTANDING of unwritten software, not a testing tool — automation is the third practice, never the purpose, see [references/appendix-discovery.md](references/appendix-discovery.md).
-- BDD does not replace unit testing: drive the core domain with **tdd-guide** and write FAR more unit tests than scenarios; Cucumber writes the right code, unit tests write the code right.
 - "Three amigos" means three PERSPECTIVES (business / development / testing), not exactly three people — invite more; the conversation is the point.
 - Driving scenarios end-to-end through the UI/browser is slow, volatile, and fails to localise the bug — stub external services/queues/DBs and drive the core domain directly.
 - Given-When-Then is the recommended template, not the goal; the essential thing is concrete agreed examples, so do not over-engineer the grammar with deep nesting or imperative "click button X" steps.
@@ -44,4 +42,4 @@ Feature: Assign the best nearby taxi
 - Read [references/gherkin-reference.md](references/gherkin-reference.md) - Load when writing or reviewing feature files: keyword meanings, file structure, declarative vs imperative steps.
 - Read [references/discovery-three-amigos.md](references/discovery-three-amigos.md) - Load when running discovery: the three perspectives, the workshop, and example-mapping card colours.
 - Read [references/specification-by-example.md](references/specification-by-example.md) - Load when establishing the process: the seven patterns, specs-as-tests, and trustworthy living documentation.
-- Read [references/appendix-discovery.md](references/appendix-discovery.md) - Load when you need the underlying framing: testing understanding, scenarios-per-rule, stubbing externals, right-code vs code-right.
+- Read [references/appendix-discovery.md](references/appendix-discovery.md) - Load when you need the underlying framing: testing understanding vs software, the three practices, and stubbing externals to drive the core.

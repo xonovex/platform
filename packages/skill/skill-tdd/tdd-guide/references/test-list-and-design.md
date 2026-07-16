@@ -23,7 +23,7 @@ Orthogonal to test-first; it's the collaborator-substitution style, and it pushe
 - **Classical (Detroit)** — real collaborators wherever practical, a double only where the real thing is awkward (slow, non-deterministic, external). Assert the _result_ (output/state).
 - **Mockist (London)** — a mock for any collaborator with interesting behaviour; assert the expected _calls_.
 
-Tradeoff: mockist tests couple to the _implementation_ (change how the unit collaborates and they break even when observable behaviour is unchanged) but reward smaller/faster fixtures, precise failure localization, and pressure toward clear roles/interfaces. Classical tests couple only to the result, so they survive internal refactoring and give better integration coverage, but a failure points at a cluster of objects and large graphs make setup heavier. Neither is "more modern"; pick per situation. Don't conflate the axes — you can do classical or mockist TDD test-first.
+Tradeoff: mockist tests couple to the _implementation_ (change how the unit collaborates and they break even when observable behaviour is unchanged) but reward smaller/faster fixtures and precise failure localization. Classical tests couple only to the result, so they survive internal refactoring and give better integration coverage, but a failure points at a cluster of objects and large graphs make setup heavier. Neither is "more modern"; pick per situation. Don't conflate the axes — you can do classical or mockist TDD test-first.
 
 ## Cross-references
 

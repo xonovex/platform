@@ -1,6 +1,6 @@
 # transitions: Scene Transitions
 
-Wrap scenes in `<TransitionSeries>` from `@remotion/transitions`, alternating `<TransitionSeries.Sequence>` with `<TransitionSeries.Transition>`. Transitions overlap adjacent scenes, so total duration = sum of sequences − sum of transition durations.
+Wrap scenes in `<TransitionSeries>` from `@remotion/transitions`, alternating `<TransitionSeries.Sequence>` with `<TransitionSeries.Transition>`.
 
 - Effects: `fade()`, `slide({direction})`, `wipe({direction})`, `flip({direction})`, `clockWipe()`
 - Timing: `linearTiming({durationInFrames})` (constant) or `springTiming({config, durationInFrames})`

@@ -11,7 +11,7 @@ Host-independent review-comment craft. **Every comment states its type and its u
 
 - **Label every comment** - Conventional Comments format `label (decoration): subject`; the label categorizes (issue / suggestion / nitpick / question / praise / ...), see [references/conventional-comments.md](references/conventional-comments.md)
 - **Set urgency with a decoration** - `(blocking)` must be fixed before merge, `(non-blocking)` is the author's discretion, `(if-minor)` resolve only if the change is small; absence = ambiguity, see [references/conventional-comments.md](references/conventional-comments.md)
-- **One summary plus anchored inline comments** - a top-level summary carries the verdict and priority-ordered headlines; the detail and suggested code go inline on the exact line, see [references/review-structure.md](references/review-structure.md)
+- **One summary plus anchored inline comments** - a top-level summary carries the verdict and the headline issues; the detail and suggested code go inline on the exact line, see [references/review-structure.md](references/review-structure.md)
 - **Cross-link, never cross-reference by number** - link the summary to its inline threads; a reader does not see your "comment 3" numbering, see [references/review-structure.md](references/review-structure.md)
 - **Verify before you assert** - check each claim against the branch code / API / design-system source and cite `file:line`; never review from memory, see [references/review-structure.md](references/review-structure.md)
 - **Lead with what works, then be specific** - praise is a label too; for every issue show the fix, not just the problem, see [references/review-structure.md](references/review-structure.md)

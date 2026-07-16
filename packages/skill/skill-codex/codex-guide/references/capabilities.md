@@ -31,4 +31,4 @@ Codex loads `hooks.json` or inline `hooks` tables next to active configuration l
 
 ## Guardrail boundary
 
-A Codex hook cannot claim complete mandatory coverage unless the requested operation set is restricted to verified intercepted paths. Use the official release behavior page rather than unreleased schema fields. Managed requirements can restrict hook sources and pin features, but do not distribute scripts from the managed directory.
+A Codex hook cannot claim complete mandatory coverage unless the requested operation set is restricted to verified intercepted paths. Managed requirements can restrict hook sources and pin features, but do not distribute scripts from the managed directory.

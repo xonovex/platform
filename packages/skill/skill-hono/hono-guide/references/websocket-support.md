@@ -24,9 +24,6 @@ wsRouter.get(
       const data = JSON.parse(String(event.data)) as {message: string};
       ws.send(JSON.stringify({echo: data.message}));
     },
-    onError(evt) {
-      console.error("WebSocket error:", evt);
-    },
   })),
 );
 ```

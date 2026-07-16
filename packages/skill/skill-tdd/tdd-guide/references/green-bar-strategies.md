@@ -6,8 +6,6 @@ Three ways to make a red test pass; choose by how sure you are of the real code.
 - **Fake It** — unsure of the real code: return a constant that satisfies the test. Now the same literal lives in the test and the code; removing that duplication during refactor is what drives you to the general implementation. Fake It turns "I don't know how to write this" into "I know how to remove this duplication".
 - **Triangulation** — generalize only once two or more concrete examples force it: fake one test, add a second with a different value the fake can't satisfy, abstract to the shape both pin down.
 
-**Triangulation is a fallback, not the canonical move.** It circulates as if it were _the_ TDD technique; the reserved position is to use it only when you are completely unsure how to refactor toward the general solution. If you can already see how to remove the duplication, write the general solution directly instead of ceremonially adding a second example to "justify" it. It's the last resort before stepping away.
-
 ```
 Is the real implementation obvious right now?
   yes -> Obvious Implementation

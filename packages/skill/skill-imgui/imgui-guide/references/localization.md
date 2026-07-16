@@ -4,10 +4,6 @@
 
 Wrap every user-visible string in a `LOCALIZE(...)` marker that hashes the _source string itself_ as the lookup key, resolve it each frame through a swappable localizer interface that falls back to the source string on a miss, and verify coverage with a pseudo-localization ("gibberish") mode plus an extraction tool — rather than managing numeric string IDs.
 
-## Rationale
-
-Numeric/string-ID schemes need a maintained ID table: new strings add header entries, IDs collide in merges, removed strings orphan entries. Hashing the source string makes the call site _the_ key — no table to sync, no merge conflict, and a missing translation degrades to readable English instead of a blank or ID. The per-frame hash cost is negligible because only the handful of strings visible this frame are localized. The marker macro also gives a tool one token to scan, making coverage and dead-entry detection mechanical.
-
 ## How to Apply
 
 1. Mark every displayed string with `LOCALIZE("text")`; the macro hashes the literal to a key and looks it up in the current localizer.

@@ -13,7 +13,7 @@
 
 ## Native capabilities
 
-Kiro v1 hooks use files under `.kiro/hooks/` and support command or agent actions. Command success can add context; event-specific exit `2` blocks. Agent actions run an agent loop, and prompt-submit agent actions append to the user prompt.
+Kiro v1 hooks use files under `.kiro/hooks/` and support command or agent actions. Command success can add context; event-specific exit `2` blocks; agent actions run an agent loop.
 
 | Semantic intent             | Native mapping                                     | Support                 | Blocking/context                           | Limits                                        |
 | --------------------------- | -------------------------------------------------- | ----------------------- | ------------------------------------------ | --------------------------------------------- |

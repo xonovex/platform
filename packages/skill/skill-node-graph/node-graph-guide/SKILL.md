@@ -14,15 +14,15 @@ Engine-agnostic architecture for a visual node-based graph that authors and non-
 
 ## Essentials
 
-- **Graph is data, not code** - Nodes, typed pins, wires, and constant inputs are serialized objects an editor/evaluator/tool all consume, see [references/node-model.md](references/node-model.md)
-- **Typed pins gate every wire** - A connection is legal only when the producer's output type satisfies the consumer's input type; check at author time, see [references/typing-and-connections.md](references/typing-and-connections.md)
+- **Graph is data, not code** - Nodes, typed pins, wires, and constant inputs are serialized objects, not topology hidden in imperative code, see [references/node-model.md](references/node-model.md)
+- **Typed pins gate every wire** - A wire is legal only when the producer's output type satisfies the consumer's input type, see [references/typing-and-connections.md](references/typing-and-connections.md)
 - **Compile, then run** - Lower the authored graph into a flattened, ordered executable form and evaluate that, instead of walking the editor graph every frame, see [references/evaluation-and-compilation.md](references/evaluation-and-compilation.md)
-- **Cache by validity hash** - Each output carries a hash of its node's settings plus its inputs' hashes; a consumer skips recompute when the hash is unchanged, see [references/evaluation-and-compilation.md](references/evaluation-and-compilation.md)
+- **Cache by validity hash** - Fold every consumed input into an output's hash; a consumer skips recompute when the hash is unchanged, see [references/evaluation-and-compilation.md](references/evaluation-and-compilation.md)
 - **Subgraphs are reusable nodes** - Encapsulate a selection behind a typed input/output interface and instance it from an asset, see [references/subgraphs-and-functions.md](references/subgraphs-and-functions.md)
 
 ## Node model
 
-- **Nodes and pins** - A node is a typed object with named, typed input and output pins; wires connect one output pin to one input pin, see [references/node-model.md](references/node-model.md)
+- **Nodes and pins** - A node is a typed object with named, typed input and output pins, see [references/node-model.md](references/node-model.md)
 - **Data-driven node types** - Register node kinds (pins, defaults, evaluate callback) as data so plugins extend the toolbox, see [references/authoring-and-introspection.md](references/authoring-and-introspection.md)
 - **Constant/default inputs** - An unwired input falls back to a stored constant edited inline; no node is needed for a literal, see [references/authoring-and-introspection.md](references/authoring-and-introspection.md)
 - **Output nodes emit work** - Terminal nodes hand their result (image, draw call, buffer) to the owning system that schedules it, see [references/node-model.md](references/node-model.md)

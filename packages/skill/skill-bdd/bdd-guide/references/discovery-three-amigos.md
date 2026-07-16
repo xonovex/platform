@@ -32,4 +32,4 @@ Read the map as a sizing signal: FULL of blue = too many rules, split it; MANY r
   [RED] No taxi in range — queue, or reject?
 ```
 
-Each green card becomes a candidate scenario; each blue rule becomes a Gherkin `Rule` (see gherkin-reference). Turn each rule's greens into scenarios (often a couple, sometimes none) — not one per code path; exhaustive cases go to **tdd-guide**, step glue and stubbing to **testing-guide**. The framing of WHY discovery tests understanding rather than software is in appendix-discovery.
+Each green card becomes a candidate scenario; each blue rule becomes a Gherkin `Rule` (see gherkin-reference). Step glue and stubbing go to **testing-guide**. The framing of WHY discovery tests understanding rather than software is in appendix-discovery.

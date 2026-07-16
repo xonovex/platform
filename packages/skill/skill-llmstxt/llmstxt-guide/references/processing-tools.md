@@ -57,7 +57,7 @@ Pre-hosting is convenient when the docs change infrequently — generate on buil
 - **`llms-ctx-full.txt`** — spec output of expanding `/llms.txt` + its linked mirrors (including Optional)
 - **`llms-full.txt`** — informal single-file dump of all docs; **not** part of the spec
 
-Both end in similar files in practice but the provenance differs: one is generated from a curated index, the other is a raw dump. Hosting both is fine; using the names interchangeably is confusing.
+Don't use the names interchangeably.
 
 ## Gotchas
 

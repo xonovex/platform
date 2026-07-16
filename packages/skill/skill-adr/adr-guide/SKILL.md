@@ -5,7 +5,7 @@ description: "Use when creating or writing an Architecture Decision Record (ADR)
 
 # ADR authoring
 
-Write Architecture Decision Records in a consistent house style. An ADR captures one decision: the forces behind it, what is proposed, and concrete examples. It reads as a standing proposal regardless of whether the work is built yet.
+Write Architecture Decision Records in a consistent house style. An ADR captures one decision (the forces behind it, what is proposed, and concrete examples) and reads as a standing proposal whether or not the work is built yet.
 
 ## Essentials
 

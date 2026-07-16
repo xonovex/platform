@@ -11,7 +11,7 @@
 | Evidence status        | Runtime version observed; guard contract exercised locally     |
 | Refresh trigger        | Product update, hook schema change, handler change, or 90 days |
 
-The probe observed the installed CLI version, and the walking skeleton exercised the deterministic guard contract (JSON event on stdin, exit 0 allow / exit 2 deny) against that runtime locally. Native hook registration was not exercised: hook-level rows below remain documentation-verified and must not be reported as runtime conformance. Re-run the probe and skeleton whenever the installed version differs from the observed one.
+The guard contract (JSON event on stdin, exit 0 allow / exit 2 deny) was exercised locally; native hook registration was not. Hook-level rows below remain documentation-verified and must not be reported as runtime conformance. Re-run the probe whenever the installed version differs from the observed one.
 
 ## Native handlers and configuration
 

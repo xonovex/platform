@@ -1,6 +1,6 @@
 # exit: AnimatePresence Unmount Animations
 
-Wrap conditionally rendered elements in `<AnimatePresence>` with an `exit` prop; without it React removes elements instantly. Direct children need stable unique `key`s.
+Wrap conditionally rendered elements in `<AnimatePresence>` with an `exit` prop. Direct children need stable unique `key`s.
 
 ```tsx
 function Modal({isOpen, onClose}) {

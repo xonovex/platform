@@ -23,7 +23,7 @@ glab api --method PUT \
 # resolved=false reopens
 ```
 
-- This is the canonical mechanism on GitLab — **unlike GitHub, no GraphQL is required.** (A GraphQL `discussionToggleResolve(input:{id,resolve})` mutation also exists, but it needs a Global ID `gid://gitlab/Discussion/<hash>`, NOT interchangeable with the REST 40-char hex `discussion_id`.)
+- This is the canonical mechanism on GitLab — **unlike GitHub, no GraphQL is required.**
 - **Resolvability is thread-vs-single-comment, not diff-vs-general.** Any MR thread started as a _thread_ — including general threads on the Overview tab — is resolvable; a single comment is not. It is not limited to diff/commit threads.
 - Resolve a single note within a thread: `PUT .../discussions/:discussion_id/notes/:note_id?resolved=true` (`resolved` and `body` are mutually exclusive).
 - `glab mr note resolve <iid> <discussion_id|8char_prefix|noteId>` exists but is **EXPERIMENTAL** (may change or be removed) — prefer the raw `glab api --method PUT` above for stable automation.

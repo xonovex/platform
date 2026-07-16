@@ -1,14 +1,11 @@
-# publish: Idempotent npm Publish
+# publish: npm Publish
 
-Publish `name@version` only if that exact version isn't already on the registry, with correct access, provenance, dist-tag, and platform handling.
+Publish a package with correct access, provenance, dist-tag, and platform handling.
 
 ## Core Workflow
 
-1. **Probe** the registry: `npm view <name>@<version> version`. Exit 0 with non-empty output → already published → skip. E404 / non-zero → proceed.
-2. **(Optional) Inject platform fields** from a sibling `platform.json` (`os` / `cpu` / `libc`) into `package.json`, wrapped in try/finally so the original is **restored even on failure** — npm packs from the on-disk `package.json`, so injected fields must be present at pack time and gone afterward. Don't let sibling-platform publishes race on the same file.
-3. **Publish:** `npm publish [--provenance] --access public [--tag <tag>]`, or `npm publish --dry-run --access public` to preview.
-
-Skip output: `Skipping @scope/pkg@1.5.0 — already published`.
+1. **(Optional) Inject platform fields** from a sibling `platform.json` (`os` / `cpu` / `libc`) into `package.json`, wrapped in try/finally so the original is **restored even on failure** — npm packs from the on-disk `package.json`, so injected fields must be present at pack time and gone afterward. Don't let sibling-platform publishes race on the same file.
+2. **Publish:** `npm publish [--provenance] --access public [--tag <tag>]`, or `npm publish --dry-run --access public` to preview.
 
 ## Access / Provenance / Dist-tag
 
@@ -22,7 +19,5 @@ Skip output: `Skipping @scope/pkg@1.5.0 — already published`.
 
 ## Error Handling
 
-- **Skip (not error)** — the probe finds the version already published.
-- **Error** — `npm publish` fails: provenance prerequisites unmet, missing auth / `--otp` for a 2FA account, or a 403 "cannot publish over previously published version" (the registry's own overwrite guard — the probe is a fail-safe, not a guarantee).
+- **Error** — `npm publish` fails: provenance prerequisites unmet, missing auth / `--otp` for a 2FA account, or a 403 "cannot publish over previously published version" (the registry's own overwrite guard).
 - A probe E404 from a mis-pointed registry / `.npmrc` reads as "not published" and triggers a publish that then fails safely — verify the registry when an unexpected publish is attempted.
-- Probing a bare name or `@latest` (no explicit version) can exit 0 with empty output on some registries — always probe the explicit `name@version`.

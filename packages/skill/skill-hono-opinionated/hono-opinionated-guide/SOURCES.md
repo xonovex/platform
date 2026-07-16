@@ -10,8 +10,6 @@
 - **Aspects extracted:**
   - Body size limits → `references/body-limit.md`
   - Controller patterns (this opinionated variant's split-out approach) → `references/controllers.md`
-  - OpenAPI: explicit status codes → `references/openapi-explicit-status-codes.md`
-  - OpenAPI: inline handlers (this opinionated variant's preferred style) → `references/openapi-inline-handlers.md`
   - OpenAPI: router hierarchy / nesting → `references/openapi-router-hierarchy.md`
   - OpenAPI: spec generation → `references/openapi-spec-generation.md`
   - Router selection (RegExpRouter, SmartRouter, TrieRouter, PatternRouter) → `references/router-selection.md`

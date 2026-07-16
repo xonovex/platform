@@ -2,11 +2,7 @@
 
 ## Guideline
 
-To find what the user clicked, render each object's stable id into a GPU buffer during a picking pass and read back the single pixel under the cursor asynchronously — instead of CPU ray-casting against physics or acceleration-structure proxies — so picking is pixel-perfect, matches exactly what is drawn (alpha masks, skinning, deformation, voxels), and needs no separate spatial structure.
-
-## Rationale
-
-CPU ray picking needs a proxy for every pickable thing: a physics shape, a bounding volume, or a BVH that must be rebuilt for deformable and procedurally generated geometry. It silently fails for anything without a proxy (alpha-cut foliage, GPU-skinned characters, voxel terrain) and couples picking to physics. Rendering ids is the opposite: whatever the GPU rasterizes is exactly what can be picked, at the resolution the user sees, for "a couple of lines" of shared shader code. The cost is a read-back from GPU to CPU, which must be asynchronous — stalling to read a pixel the same frame flushes the pipeline. Queuing the read and consuming it a frame or two later hides the latency completely from the user. Because the picking shader runs over the same rasterization as the main scene, depth ordering is free: with a per-pixel closest-depth test the picked id is always the front-most surface under the cursor.
+To find what the user clicked, render each object's stable id into a GPU buffer during a picking pass and read back the single pixel under the cursor asynchronously — instead of CPU ray-casting against physics or acceleration-structure proxies — so picking is pixel-perfect, matches exactly what is drawn (alpha masks, skinning, deformation, voxels), and needs no separate spatial structure. CPU ray picking silently fails for anything without a proxy (alpha-cut foliage, GPU-skinned characters, voxel terrain); a synchronous read-back the same frame flushes the pipeline, so queue it and consume it a frame or two later.
 
 ## How to Apply
 

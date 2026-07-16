@@ -2,11 +2,7 @@
 
 ## Guideline
 
-Keep gizmo rendering and interaction central and generic; let any object plug into it by implementing a tiny get/set-transform interface (queried, not inherited) instead of giving each component its own gizmo — so one move/rotate/scale tool manipulates transforms, spline control points, wire endpoints, or any custom "position" concept with identical behavior.
-
-## Rationale
-
-If every component type implements its own gizmo, behavior drifts, code duplicates, and improving the tool means editing N components. The opposite extreme — letting components fully draw and hit-test their own gizmos — is even worse for the same reasons. The stable middle is: the editor owns all gizmo geometry, picking, and drag logic; components supply only data through a small interface the editor queries at runtime. Because the interface is queried (a function-pointer table looked up by name) rather than baked into a base class, a component opts in without the editor knowing it exists, and a component that has no transform simply does not implement it. Returning both world and local transforms lets the same gizmo operate in either coordinate space on a modifier key. A priority value resolves the ambiguous case of an object with several transformable aspects, letting a primary transform win while still allowing exotic position concepts (2D, double-precision astronomical coordinates) to participate.
+Keep gizmo rendering and interaction central and generic; let any object plug into it by implementing a tiny get/set-transform interface (queried, not inherited) instead of giving each component its own gizmo — so one move/rotate/scale tool manipulates transforms, spline control points, wire endpoints, or any custom "position" concept with identical behavior. The interface is a function-pointer table looked up by name (not a base class), so a component opts in without the editor knowing it exists. `get_transform` returns both world and local so the same gizmo operates in either coordinate space on a modifier key; a priority value resolves the ambiguous case of an object with several transformable aspects.
 
 ## How to Apply
 

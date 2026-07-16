@@ -5,7 +5,7 @@ description: "Use when delivering a merge request/review, configuring native CI/
 
 # GitLab delivery and enforcement — quick reference
 
-How to realize merge request delivery and provider-native external enforcement on GitLab. The delivery operations wire finished review/MR artifacts onto GitLab; the enforcement operation maps semantic governance intent onto GitLab-native components, pipeline policies, compliance frameworks, protected environments, permissions, and evidence.
+How to realize merge request delivery and provider-native external enforcement on GitLab: wire finished review/MR artifacts onto GitLab, and map governance intent onto GitLab-native components, pipeline policies, compliance frameworks, protected environments, permissions, and evidence.
 
 The one thing to internalize: **a GitLab "review" is not one object — you assemble it from a plain summary note, individual position-anchored discussion threads, and a separate approve/withhold signal, and almost every write needs the coarse, all-or-nothing `api` scope plus a sufficient role, so plan around the missing atomic-review endpoint and the absent write-only scope.**
 

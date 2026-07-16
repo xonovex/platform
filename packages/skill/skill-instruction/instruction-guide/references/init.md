@@ -46,6 +46,5 @@ Generate a concise AGENTS.md for a directory by scanning its structure, config f
 
 - A directory with only boilerplate code (no caveats, no non-obvious config) should NOT get an AGENTS.md — empty docs are worse than no docs
 - Subdirectories that share a structure should use a `<name>/` placeholder pattern rather than enumerating every dir
-- "What an agent could infer from reading package.json + source" is the bar — anything below it is filler
 - Commands listed in AGENTS.md get **executed** by the agent — a stale `npm test` command wastes turns; verify before committing
 - If a subproject already has an AGENTS.md, init writes a nested one — closest-wins precedence makes it scope-specific, not a duplicate of the root

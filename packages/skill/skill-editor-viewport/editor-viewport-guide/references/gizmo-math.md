@@ -4,10 +4,6 @@
 
 Do gizmo drag geometry in screen space: project the gizmo's axis to 2D, project the 2D cursor onto that 2D line, then lift the result back to world space and intersect with the world axis — never build a 3D "mouse ray" from an arbitrary cursor z and intersect it with the axis. Drive the object by the _delta_ of the projected parameter from drag-start, and guard every division with an epsilon so near-parallel axes and zero-length directions cannot explode.
 
-### Rationale
-
-The 3D-ray alternative (set the cursor's z to 0 and 1, intersect with the gizmo axis) is not a projection: two arbitrary 3D lines generally do not intersect, so it minimizes the distance between two skew lines — at shallow viewing angles that wanders off the axis and the object lurches backward. Pulling the axis into 2D screen space (where the mouse lives) removes the made-up depth; one screen-to-world step plus an axis intersection recovers the world parameter. Applying only the delta from a stored start parameter avoids snapping to the cursor on frame one and makes the drag frame-rate independent. The robust helpers share one failure mode — a denominator going to zero as directions become parallel or degenerate — so each needs an epsilon guard and fallback.
-
 ### How to Apply
 
 1. On drag start, compute the projected parameter once and store it as `axis_start`.

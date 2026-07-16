@@ -23,8 +23,6 @@ description: "Use when editing C99 game-engine or runtime code in projects that 
 
 ## Patterns
 
-- **Caller-owns-memory** - Libraries never allocate, app provides arrays
-- **Tagged unions** - Type enum + union for polymorphism, see [references/tagged-unions.md](references/tagged-unions.md)
 - **Inverse mass** - Store `1/mass`, static objects use `0.0`, see [references/physics-patterns.md](references/physics-patterns.md)
 - **SoA optimization** - AoS for single objects, SoA for batches, see [references/mesh-types.md](references/mesh-types.md)
 - **Validation** - Check capacity, bounds, NULL, overflow before operations
@@ -40,7 +38,6 @@ description: "Use when editing C99 game-engine or runtime code in projects that 
 
 - Read [references/math-types.md](references/math-types.md) - Load when working with vectors, matrices, or quaternions
 - Read [references/coordinate-system.md](references/coordinate-system.md) - Load when setting up camera, projection, or mesh normals
-- Read [references/tagged-unions.md](references/tagged-unions.md) - Load when implementing shape or entity polymorphism
 - Read [references/physics-patterns.md](references/physics-patterns.md) - Load when implementing rigid bodies, collision, or constraints
 - Read [references/geometry-pipeline.md](references/geometry-pipeline.md) - Load when converting analytic shapes to renderable meshes
 - Read [references/builder-pattern.md](references/builder-pattern.md) - Load when generating meshes or other variable-size data

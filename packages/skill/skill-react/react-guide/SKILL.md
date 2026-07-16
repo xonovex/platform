@@ -73,7 +73,7 @@ function App({children}) {
 ## Essentials
 
 - **Component design** - Small, composable; lift/minimize state; derive when possible, see [references/component-design.md](references/component-design.md)
-- **Performance** - Let React Compiler handle memoization; manual `useMemo`/`useCallback` for effect deps only, see [references/performance-optimization.md](references/performance-optimization.md)
+- **Performance** - `memo()`, `lazy()` code-splitting, Server Components for FCP/SEO, see [references/performance-optimization.md](references/performance-optimization.md)
 - **Rendering** - Prefer Server Components; use Suspense for streaming, see [references/suspense-streaming.md](references/suspense-streaming.md)
 - **Accessibility** - Semantic HTML, ARIA, keyboard/focus management, see [references/accessibility.md](references/accessibility.md)
 - **Custom hooks** - Extract reusable logic, see [references/hooks.md](references/hooks.md)
@@ -98,7 +98,7 @@ function App({children}) {
 - Read [references/new-hooks.md](references/new-hooks.md) - Load when using useActionState, useOptimistic, use(), or useFormStatus
 - Read [references/server-components.md](references/server-components.md) - Load when building with RSC, Server Actions, or 'use server'/'use client' directives
 - Read [references/suspense-streaming.md](references/suspense-streaming.md) - Load when using Suspense boundaries, streaming, or error handling
-- Read [references/react-compiler.md](references/react-compiler.md) - Load when setting up React Compiler or understanding automatic memoization
+- Read [references/react-compiler.md](references/react-compiler.md) - Load when setting up or configuring the React Compiler
 - Read [references/activity-effect-event.md](references/activity-effect-event.md) - Load when using Activity component or useEffectEvent
 
 ### Migration from React 18

@@ -61,7 +61,7 @@ Pattern this demonstrates:
 
 ## Sibling Convention: `llms-full.txt`
 
-Some projects publish a single-file dump of all their docs as `/llms-full.txt` (e.g. `https://hono.dev/llms-full.txt`). This is **not the spec** — the spec defines `llms.txt` (the curated index) and `llms-ctx*.txt` (processor outputs). The `llms-full.txt` convention is a community pattern that works well for small-to-medium docs sites where the whole corpus fits in a single file.
+Some projects publish a single-file dump of all their docs as `/llms-full.txt` (e.g. `https://hono.dev/llms-full.txt`). This is **not the spec** — the spec defines `llms.txt` (the curated index) and `llms-ctx*.txt` (processor outputs). `llms-full.txt` is a community convention.
 
 When a project provides both:
 

@@ -1,10 +1,10 @@
 # Build dialect & warnings
 
-A clean C99 build pins the language, exposes the platform surface deliberately, and treats warnings as errors — without fighting the idioms C99 is built on.
+Pin the language, expose the platform surface deliberately, and treat warnings as errors — without fighting the idioms C99 is built on.
 
 ## Pin strict ISO C99, not the GNU dialect
 
-`-std=c99` alone is not strict: most toolchains default to the GNU dialect (`-std=gnu99`) and quietly accept extensions. Pin it:
+`-std=c99` alone is not strict: most toolchains default to the GNU dialect (`-std=gnu99`). Designated initializers are ISO C99, not a GNU extension, so there is no reason to enable `C_EXTENSIONS ON`. Pin it:
 
 ```cmake
 set_target_properties(target PROPERTIES
@@ -33,19 +33,6 @@ Turn the build strict, but suppress the warnings that fight idiomatic C99 rather
 - **The unused-symbol family** (`-Wunused-parameter`, `-Wunused-variable`, `-Wunused-function`, `-Wunused-but-set-variable`) is mostly noise for **library** code, which legitimately carries surface a translation unit never references — interface-mandated callback parameters, reflection/mapping tables defined in headers (compiled into every includer), helpers built for callers. Relax these for library targets; keep them for leaf/application code, where an unused symbol is a real dead-code smell. Either way, keep **`-Wunused-value`** (a computed-then-discarded expression is a real bug).
 
 `-Wall -Wextra` do **not** include `-Wsign-conversion` (nor `-Wconversion`). Enable `-Wsign-conversion` to catch the signed/unsigned mix-ups exact-width discipline cares about — chiefly comparing or assigning a signed `int` to a `size_t` count/index, where a negative value silently becomes huge. It can be noisy on existing code; add it deliberately and fix at the type level (keep counts/indices `size_t` end to end) rather than papering over it with casts.
-
-## Detect `snprintf` truncation (and silence `-Wformat-truncation`)
-
-`snprintf` into a fixed buffer is safe but may truncate. GCC's `-Wformat-truncation` (under `-Wall` at `-O1`+) flags it. Check the return value — this both handles the truncation correctly and satisfies the warning:
-
-```c
-int n = snprintf(dst, sizeof(dst), "%s/%s", dir, name);
-if (n < 0 || (size_t)n >= sizeof(dst)) {
-    return false;  /* result too long for dst */
-}
-```
-
-A bare unchecked `snprintf` is the pattern the warning exists to catch.
 
 ## Sanitizers — keep a debug build under ASan + UBSan
 

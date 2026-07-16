@@ -2,11 +2,7 @@
 
 ## Guideline
 
-Identify every interactive control by a stable unique id and key all persistent interaction state (hover, active, focus, drag, tab order) by that id. Keep the persistent store minimal — only what cannot be recomputed each frame.
-
-## Rationale
-
-The id is the substitute for a retained widget identity. If ids are unstable (derived from screen position) or collide (reused in a loop without scoping), two controls share one state slot and interaction jumps between them.
+Identify every interactive control by a stable unique id and key all persistent interaction state (hover, active, focus, drag, tab order) by that id. Keep the persistent store minimal — only what cannot be recomputed each frame. The id is the substitute for a retained widget identity; if ids are unstable (derived from screen position) or collide (reused in a loop without scoping), two controls share one state slot and interaction jumps between them.
 
 ## How to Apply
 

@@ -1,6 +1,6 @@
 # scales-harmony: Scales and Chords
 
-Constrain notes with `.scale()` and use chord notation to keep layers harmonically coherent.
+Constrain notes with `.scale()` and use chord notation.
 
 ```javascript
 stack(

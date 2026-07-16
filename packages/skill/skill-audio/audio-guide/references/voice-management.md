@@ -6,7 +6,7 @@ Play every sound through a voice drawn from a fixed-size, preallocated pool; cap
 
 ## Rationale
 
-A fixed pool keeps the render loop's worst case bounded and the audio thread allocation-free: the inner mix loop iterates at most `MAX_VOICES` times no matter how many plays the game requests. Unbounded voices mean unbounded mix time (deadline misses) and runtime allocation (forbidden on the audio path). When the game wants one more sound than the pool holds, something must lose — "least important / quietest / oldest" beats refusing to play. Because cutting a voice instantly clicks, a slot frees only once its gain has ramped to zero, not the moment you stop it.
+When the game wants one more sound than the pool holds, something must lose — "least important / quietest / oldest" beats refusing to play. Rank by explicit priority first, loudness/age only as tiebreakers. Because cutting a voice instantly clicks, a slot frees only once its gain has ramped to zero, not the moment you stop it.
 
 ## How to Apply
 

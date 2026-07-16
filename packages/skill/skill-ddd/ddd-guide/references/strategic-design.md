@@ -12,9 +12,8 @@ The explicit boundary within which one domain model and its ubiquitous language 
 
 ## Polysemy: one model does not unify
 
-The same word ("Customer", "Product") is polysemic across contexts. Forcing one canonical shared type couples the contexts together — every field one context needs becomes a field the others must carry and keep consistent. That coupling is exactly what a bounded context exists to remove.
+The same word ("Customer") is polysemic across contexts. Each context keeps its own minimal model, translated at the boundary — not coordinated through one shared type.
 
-- BAD: one shared `Customer` with `cart`, `wishlist`, `deliveryAddress`, `taxId`, `creditTerms` — every context drags fields it does not use.
 - GOOD: Ordering's `Customer`, Shipping's `Recipient` (name, address, phone), Billing's `AccountHolder` (billing address, tax id, credit terms) — three minimal models of one person, translated at the boundary.
 
 ## Context map and context-mapping patterns

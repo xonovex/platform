@@ -13,8 +13,6 @@ Enterprise platforms are optional adapters around the governance and workflow po
 | `datadog-guide`          | CI/CD and DORA visibility, OpenTelemetry, LLM observability, audit, catalog, AWS integration, cloud security, telemetry privacy                 | Workflow identity or authoritative source/build/cloud state                  |
 | `agent-governance-guide` | Capability negotiation, transactional configuration, evidence/provider ports, authority, failure policy, conformance, and effective composition | Provider-native commands, schemas, editions, or fallback behavior            |
 
-The audit baseline reused the existing configuration/evidence provider ports, external-enforcement onboarding transaction, and GitHub/GitLab package conventions. The missing owners, edition fixtures, enterprise composition, and marketplace registrations are implemented by the five independent packages and the fixture described below.
-
 A cross-platform flow lives with the platform that initiates it and cross-references the receiving platform's skill by name for its side of the trust relationship: Bitrise-to-AWS federation belongs to `bitrise-guide` with `aws-guide` owning the role-trust semantics, and Datadog's AWS integration belongs to `datadog-guide` with `aws-guide` owning the account-side permissions. No skill defines another platform's native behavior.
 
 ## Capability negotiation

@@ -21,7 +21,6 @@
   - Tables/streams mental model, existence-based processing, "the absence of a thing is a thing"
 - **Aspects extracted:**
   - AoS / SoA / AoSoA layouts → `references/soa-aos-aosoa.md`
-  - Hot/cold field splitting → `references/hot-cold-splitting.md`
   - Existence-based processing, condition tables → `references/existence-based-processing.md`
   - Tables, streams, schemas → `references/data-as-transforms.md`
   - Handles / relational references → `references/handles-and-indices.md`
@@ -36,7 +35,6 @@
 - **Aspects extracted:**
   - Cache lines, locality, miss types → `references/cache-behavior.md`
   - SoA for hot loops, layout selection → `references/soa-aos-aosoa.md`
-  - Hot/cold splitting → `references/hot-cold-splitting.md`
 
 ## Supporting hardware / technique references
 

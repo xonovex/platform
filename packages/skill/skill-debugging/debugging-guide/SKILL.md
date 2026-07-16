@@ -17,23 +17,21 @@ Systematic, hypothesis-driven debugging of native/low-level software, plus desig
 ## Find the cause
 
 - **Bisect to the change** - With a 100% repro, search history for the commit that introduced the bug, see [references/reproduction-and-bisection.md](references/reproduction-and-bisection.md)
-- **Read the callstack and the bytes** - Access violations, freed-memory fill patterns, and watch-window values steer the next hypothesis, see [references/scientific-debugging.md](references/scientific-debugging.md)
+- **Read the callstack and the bytes** - Access violations and watch-window values steer the next hypothesis, see [references/scientific-debugging.md](references/scientific-debugging.md)
 - **Confirm before fixing** - Verify the hypothesis (breakpoint/log) before you commit to a fix direction, see [references/scientific-debugging.md](references/scientific-debugging.md)
 
 ## Make bugs catchable
 
 - **Prefer prevention by design** - Asserts on preconditions, end-of-page allocators, type-safe APIs, and "clean up everything" expose bugs that would otherwise hide, see [references/bug-taxonomy.md](references/bug-taxonomy.md)
-- **Tame intermittency with determinism** - Remove nondeterminism, log to a circular buffer, or record/replay so the rare bug reproduces, see [references/determinism-and-replay.md](references/determinism-and-replay.md)
+- **Tame intermittency with determinism** - Remove nondeterminism or record/replay so the rare bug reproduces, see [references/determinism-and-replay.md](references/determinism-and-replay.md)
 - **Instrument allocations and invariants** - Tag allocations with file/line, count references, validate at API entry, see [references/instrumentation-and-checks.md](references/instrumentation-and-checks.md)
 
 ## Gotchas
 
 - "Access violation" / "segfault" is about an unmapped address, not permissions or threading — it almost always means a garbage or dangling pointer was dereferenced.
 - A bug that lands "in the same spot every time" is a reasonable but unproven 100% repro; if it later "disappears," revise the assumption rather than trusting it.
-- A freed-memory fill pattern (e.g. `0xdddddddd`) at a sane mapped address points to use-after-free, not a random overwrite — random writes rarely produce a clean repeating byte pattern.
 - Bisect lies when the repro is flaky or GOOD/BAD is mis-tagged, and incremental builds can mislead — force clean rebuilds and only bisect a deterministic repro.
 - Adding validation that only re-reports what the debugger already showed you (e.g. "this pointer was freed") buys nothing; instrument to surface the fault _earlier or where it is cheaper to act on_, not to restate it.
-- Garbage collection / refcount-for-liveness doesn't fix a stale-reference bug — it converts a loud crash into a quiet leak plus subtler "two systems, two states" logic bugs.
 - Reaching for "compiler bug" before ruling out your own undefined behavior is almost always wrong; test another compiler/opt level and inspect the assembly first.
 
 ## Progressive Disclosure
@@ -42,4 +40,4 @@ Systematic, hypothesis-driven debugging of native/low-level software, plus desig
 - Read [references/scientific-debugging.md](references/scientific-debugging.md) - Load when you have a repro and need a disciplined process: hypothesis, one change, predict, observe, narrow
 - Read [references/reproduction-and-bisection.md](references/reproduction-and-bisection.md) - Load when building a minimal deterministic repro, shrinking inputs, or bisecting history to the offending commit
 - Read [references/instrumentation-and-checks.md](references/instrumentation-and-checks.md) - Load when adding assertions, invariants, allocation tagging, validation layers, or running sanitizers as tripwires
-- Read [references/determinism-and-replay.md](references/determinism-and-replay.md) - Load when a bug is intermittent and you need to make execution deterministic, stress it, log to a circular buffer, or record/replay it
+- Read [references/determinism-and-replay.md](references/determinism-and-replay.md) - Load when a bug is intermittent and you need to make execution deterministic or record/replay it

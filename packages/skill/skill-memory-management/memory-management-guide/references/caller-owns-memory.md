@@ -6,7 +6,7 @@ A library never allocates; the caller provides all storage and the library opera
 
 ## Rationale
 
-When the caller owns the memory it picks the strategy (stack, pool, arena, virtual-memory block), there is nothing to leak, batch processing needs no per-item allocation, and the library is embeddable with no allocator dependency. Serialization/relocation become the caller's responsibility.
+The caller picks the strategy (stack, pool, arena, virtual-memory block), there is nothing to leak, and the library is embeddable with no allocator dependency.
 
 ## How to Apply
 

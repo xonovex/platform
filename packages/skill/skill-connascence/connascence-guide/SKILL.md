@@ -19,8 +19,7 @@ Grade a seam by naming its worst coupling and its strongest connascence, then we
 
 - "Tightly coupled" is not actionable — name the connascence form and the coupling rung, then you know the fix.
 - Strong connascence is fine _inside_ one module; it's only a problem _across_ a boundary (rule of locality).
-- Control coupling hides as configuration — a behavior flag passed into a shared function recouples its callers; split into two functions.
-- Law of Demeter is a heuristic, not a law — fluent builders and pure data pipelines are deliberate exceptions; it targets reaching through a stranger to depend on or mutate its internals.
+- Law of Demeter is a heuristic, not a law — pure data pipelines are a deliberate exception; it targets reaching through a stranger to depend on or mutate its internals.
 - Coupling and cohesion trade off — splitting a module to "loosen coupling" can shred its cohesion; grade both before cutting.
 
 ## Example

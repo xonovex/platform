@@ -20,7 +20,6 @@ description: "Use when editing PostgreSQL 15+ queries, schemas, or migrations. T
 
 ## Gotchas
 
-- Indexes don't help if a query wraps the column in a function: `WHERE lower(email) = …` misses an index on `email`; create a functional index instead
 - `ANALYZE` updates planner statistics — bulk inserts without re-analyzing produce stale plans and full scans
 - `JSONB` supports indexing (GIN); `JSON` doesn't — pick JSONB unless you specifically need preserved formatting
 - DDL inside transactions is allowed (unlike MySQL) — wrap migrations in `BEGIN`/`COMMIT` for atomicity

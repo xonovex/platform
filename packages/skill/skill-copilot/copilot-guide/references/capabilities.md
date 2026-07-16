@@ -14,7 +14,7 @@
 
 ## Handler correction
 
-The current hook reference is not command-only. Command handlers are supported across hook types; HTTP handlers are documented with TLS and environment allowlist rules; prompt handlers are limited to `sessionStart` and interactive CLI startup behavior. Preserve this correction when revisiting older plans.
+The current hook reference is not command-only. Command handlers are supported across hook types; HTTP handlers are documented with TLS and environment allowlist rules; prompt handlers are limited to `sessionStart` and interactive CLI startup behavior.
 
 | Semantic intent       | Native mapping                | CLI                          | Cloud agent             | Guarantee notes                                    |
 | --------------------- | ----------------------------- | ---------------------------- | ----------------------- | -------------------------------------------------- |

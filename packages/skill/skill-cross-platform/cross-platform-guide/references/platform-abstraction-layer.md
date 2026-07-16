@@ -4,10 +4,6 @@
 
 Route every operating-system and windowing call through one narrow abstraction interface — a struct of function pointers (or a header whose implementation is selected at build time) — and forbid application, renderer, and engine code from ever calling an OS API directly or guarding logic with platform `#ifdef`s.
 
-## Rationale
-
-The interface is the unit of completeness: stub it, compile against the stub on day one, then replace stubs one function at a time. Group by concern (windowing, clipboard, threading/fibers, file watching, time, input, audio) so a missing or fragile platform feature is isolated to its own struct.
-
 ## How to Apply
 
 1. Carve the OS surface into cohesive interfaces by concern: one for general OS services (threading, fibers, time, filesystem, file-system change monitoring), one for windowing, one for clipboard/selection, one for input sources, one for the audio backend.

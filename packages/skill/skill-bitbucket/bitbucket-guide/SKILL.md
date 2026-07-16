@@ -13,7 +13,7 @@ Operate Bitbucket as an optional source, pull-request, CI/deployment, and native
 - **Never infer Cloud parity** — Cloud Pipelines, OIDC, shared configurations, deployments, custom checks, and Cloud scopes do not exist on Data Center merely because both products host repositories.
 - **Bind exact revisions** — preserve repository UUID/project key, commit hash, pull-request ID/version, pipeline/build/status, artifact, deployment, check, and webhook-delivery references.
 - **Use native gates** — combine branch permissions, merge checks or server-side policy, exact-revision build status, protected deployments, and least-privilege identities according to the detected product.
-- **Federate where supported** — constrain Cloud OIDC issuer/audience/subject claims for temporary AWS access and never generate static keys by default.
+- **Federate where supported** — constrain Cloud OIDC subject claims (workspace, repository, environment, branch/tag) for temporary AWS access; a wildcard subject is not least privilege.
 - **Transact configuration** — discover, preview native mutations and authority, authorize, apply idempotently, re-read and probe, roll back, and monitor drift.
 
 ## Workflow

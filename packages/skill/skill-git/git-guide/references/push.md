@@ -17,7 +17,7 @@ If the branch is behind its base, a stale merge-base inflates the PR diff with u
 ```bash
 git fetch origin <base>
 git rebase origin/<base>
-git push --force-with-lease        # refuses to clobber commits you haven't seen; never plain --force
+git push --force-with-lease
 ```
 
 - Conflicts during rebase → resolve per [merge-resolve.md](merge-resolve.md), then `git rebase --continue`.

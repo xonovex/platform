@@ -17,8 +17,7 @@ Preview deployment environment restrictions, variables, permissions, concurrency
 1. Read the repository's Bitbucket OIDC issuer, audience, and documented claims.
 2. Preview the AWS identity provider and role trust policy with exact issuer, audience, workspace, repository, environment, branch/tag or other supported subject constraints.
 3. Preview the role permissions and optional session policy at least privilege.
-4. Authorize and apply without creating an IAM access key.
-5. Verify the build receives temporary credentials, record expiry and role-session evidence, prove the intended AWS call succeeds, and prove a different repository/environment/action fails.
-6. Roll back the owned trust and role grants, then verify assumption fails while retained pipeline/audit evidence still resolves.
+4. Verify the build receives temporary credentials, record expiry and role-session evidence, prove the intended AWS call succeeds, and prove a different repository/environment/action fails.
+5. Roll back the owned trust and role grants, then verify assumption fails while retained pipeline/audit evidence still resolves.
 
-If the required claims cannot be constrained or the tier/runner lacks OIDC, return unsupported. Never fall back to a generated long-lived access key.
+If the required claims cannot be constrained or the tier/runner lacks OIDC, return unsupported.

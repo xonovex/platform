@@ -11,9 +11,7 @@ Turn the commits behind a version bump into a changelog entry, prepended newest-
 ## Deriving Entries From Commits
 
 - Parse each commit header as a conventional commit `type(scope)!: description`. The `git-guide` skill owns the commit **format**; this is the read side.
-- Bump mapping: `feat` → minor, `fix` → patch, a breaking change → major. A breaking change overrides the type (`fix!:` is major, not patch).
-- **Detect breaking changes from both signals**: a `!` before the `:` in the header _and_ a `BREAKING CHANGE:` / `BREAKING-CHANGE:` footer in the body. A header-only match drops `feat!:` entirely — scan the body for the footer too.
-- An include-set (e.g. `feat,fix,refactor,perf,docs`) is a fine curated filter for _which entries to list_, but check for breaking changes **before** filtering, or a breaking `chore!:` vanishes.
+- An include-set (e.g. `feat,fix,refactor,perf,docs`) is a fine curated filter for _which entries to list_.
 
 ## Bullet Format (Changesets-style)
 

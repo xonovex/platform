@@ -23,7 +23,6 @@ Tenant-agnostic: these patterns apply to any structured multilingual content. Do
 - Hours / prices / contact details rot quickly — note research date so a future refresh knows what to re-verify
 - Multi-language versions must agree on facts — produce one source language, then translate; don't re-research per language
 - Removing every em dash or every "however" is over-correction — regularity is the AI tell, not the punctuation
-- Inventing facts (made-up sources, fabricated numbers) to "add specificity" is worse than the AI prose you started with
 
 ## Progressive Disclosure
 

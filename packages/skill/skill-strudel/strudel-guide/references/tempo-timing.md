@@ -14,5 +14,4 @@ stack(
 - `setcpm(BPM/4)`: 128=house, 138=trance, 170=drum&bass
 - `.slow(n)`: pattern spans n cycles · `.fast(n)`: n repeats per cycle
 - `.early(0.125)` `.late(0.125)`: shift by a fraction of a cycle
-- `.slow(4/3)`: 3-per-cycle over a 4-beat backdrop
 - `.swing(0.2)`: medium swing feel

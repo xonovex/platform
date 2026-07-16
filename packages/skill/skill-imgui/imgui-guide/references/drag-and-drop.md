@@ -4,10 +4,6 @@
 
 Start from the data representation — a single global id naming the dragged object(s) — not from UI mechanics. The drop is a data-model mutation; the UI just reflects it on the next re-render.
 
-## Rationale
-
-Drag state must outlive any single window's UI context (you drag _between_ windows), so it can't live in per-control or per-window state. Reducing the gesture to "what global id is being dragged?" makes initiation, hover-highlighting, type-checking, and the drop itself simple data operations, and makes the cross-window case free.
-
 ## How to Apply
 
 1. Keep one global field, `dragged_objects` (a global id; `0` = nothing dragging), with `start_dragging(id)` / `stop_dragging()` / `get_dragged_objects()`.

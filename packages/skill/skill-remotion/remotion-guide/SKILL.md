@@ -11,12 +11,11 @@ description: "Use when building or editing programmatic video in Remotion. Trigg
 
 ## Essentials
 
-- **Frame-driven animations** - Use `useCurrentFrame()` for all motion; CSS transitions and Tailwind `animate-*` classes are forbidden, see [references/animations.md](references/animations.md)
 - **Timing** - Write in seconds, multiply by `fps` from `useVideoConfig()`; use `interpolate()` or `spring()`, see [references/timing.md](references/timing.md)
 - **Sequencing** - Use `<Sequence>` with `from`/`durationInFrames`; always add `premountFor` to preload, see [references/sequencing.md](references/sequencing.md)
 - **Assets** - Use `staticFile()` for public assets; use `<Img>`, `<Video>`, `<Audio>` components, see [references/assets.md](references/assets.md)
-- **Compositions** - Define in `Root.tsx` with `type` (not interface) for props; use `calculateMetadata()` for dynamic values, see [references/compositions.md](references/compositions.md)
-- **Transitions** - Use `<TransitionSeries>` for scene changes; duration overlaps reduce total length, see [references/transitions.md](references/transitions.md)
+- **Compositions** - Define `<Composition>` in `Root.tsx`; use `calculateMetadata()` for dynamic values, see [references/compositions.md](references/compositions.md)
+- **Transitions** - Use `<TransitionSeries>` for scene changes, see [references/transitions.md](references/transitions.md)
 - **Text** - Load fonts via `@remotion/google-fonts`; measure with `@remotion/layout-utils`, see [references/text.md](references/text.md)
 
 ## Example

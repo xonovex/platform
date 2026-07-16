@@ -4,8 +4,6 @@
 
 Propagate a deadline or remaining budget across dependencies. Set connection, request, queue, execution, model/tool, and cleanup bounds inside it. On expiry, cancel work where supported, stop launching downstream work, and record whether side effects may still complete.
 
-Timeout is an unknown outcome for side-effecting operations until authoritative state is reconciled.
-
 ## Retry only safe operations
 
 Retry transient failures only when the operation is idempotent or protected by a stable idempotency key and reconciliation. Bound attempts and total time, use exponential backoff with jitter, honor server guidance, cap concurrency, and stop on permanent, authorization, validation, stale-version, or cancellation errors.

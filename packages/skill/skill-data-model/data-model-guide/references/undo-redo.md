@@ -12,7 +12,6 @@ Undo only works if every state-changing edit is captured. Recording inverses (or
 
 - **Inverse operations** - For each mutation, record an operation that exactly reverses it: `set(id, prop, old)` inverts `set(id, prop, new)`; `delete` inverts `create`. Undo applies inverses in reverse order.
 - **Before/after snapshots** - Alternatively store the property's old value (for undo) and new value (for redo). Simpler than authoring inverses, at the cost of storing both values; cheap for scalar properties, expensive for large buffers.
-- **Transactions** - Open a transaction at the start of a user action, record every mutation into it, commit at the end. The whole transaction is one undo step. Empty transactions are discarded.
 - **Undo / redo stacks** - Commit pushes the transaction onto the undo stack. Undo pops it, applies inverses, pushes it onto the redo stack. Any new edit clears the redo stack (you cannot redo into a branch you've diverged from).
 - **Bounding history** - Cap the undo stack by count or by memory; drop the oldest transactions. For large-buffer edits, store deltas or only the changed region rather than whole copies.
 - **Undoable vs not** - Pure model mutations are undoable. External side effects — file writes, network calls, spawning a process — are not; keep them out of the journal or make them idempotent and re-issue on redo deliberately.

@@ -17,8 +17,6 @@ Before trusting an artifact or executable module:
 5. preserve verifier, policy, trust-root, source and artifact versions, result, time, limitations, and native references;
 6. reject moving versions, mismatched subjects/digests, untrusted identities, unverifiable claims, or stale evidence before activation.
 
-Checksums, signatures, attestations, protected builders, and transparency logs answer different questions. Compose them according to the threat model; no single mechanism is universally sufficient.
-
 ## Review executable authority
 
 Compare declared and observed tools, filesystem, network, secret, model, provider, data, side-effect, concurrency, retry, timeout, failure, update, disable, and rollback behavior. Require repository trust or user consent at the appropriate authority zone, plus organization change control for managed modules.

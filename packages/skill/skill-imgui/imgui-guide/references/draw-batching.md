@@ -4,10 +4,6 @@
 
 Store the UI as compact, tightly-packed primitive definitions and let the vertex shader synthesize vertices from a metadata-carrying index buffer, so the whole UI submits in a single draw call with no state switches.
 
-## Rationale
-
-Storing one ~20-byte primitive instead of ~48 bytes of expanded vertices, and encoding everything the GPU needs (primitive type, corner, clip, texture) into the data, lets a single shader and a single draw call render tens of thousands of rectangles without per-state churn.
-
 ## How to Apply
 
 1. Write primitives into a shared buffer with **no common stride** — a rectangle and a glyph can differ in size; pack each tightly.

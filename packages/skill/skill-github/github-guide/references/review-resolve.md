@@ -2,11 +2,7 @@
 
 ## Guideline
 
-Resolution is **GraphQL-only** — list `pullRequest.reviewThreads`, match a finding to a thread by its node id (`PRRT_…`), never by line, then `resolveReviewThread`. Reply in-thread with `addPullRequestReviewThreadReply`.
-
-## Rationale
-
-REST has no resolve field and does not model review threads at all; only GraphQL exposes thread resolution and the full reply chains.
+Resolution is **GraphQL-only** — list `pullRequest.reviewThreads`, match a finding to a thread by its node id (`PRRT_…`), never by line, then `resolveReviewThread`. Reply in-thread with `addPullRequestReviewThreadReply`. REST has no resolve field and does not model review threads.
 
 ## List threads (the only source of full reply chains)
 

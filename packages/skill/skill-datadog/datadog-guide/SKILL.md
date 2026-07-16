@@ -48,6 +48,6 @@ Rollback: disable owned integrations/export and preserve authorized retained aud
 
 - Read [references/ci-cd-and-dora.md](references/ci-cd-and-dora.md) - Load when instrumenting pipelines, tests, deployments, services, DORA events, exact revisions, or delivery correlations
 - Read [references/opentelemetry-and-llm.md](references/opentelemetry-and-llm.md) - Load when configuring OTel ingestion, GenAI/LLM traces, evaluations, prompt/content capture, attributes, sampling, or redaction
-- Read [references/audit-catalog-aws-and-cloud-security.md](references/audit-catalog-aws-and-cloud-security.md) - Load when operating Audit Trail, Software Catalog, AWS integration, Cloud Security, ownership, or native cloud/security evidence
+- Read [references/audit-catalog-aws-and-cloud-security.md](references/audit-catalog-aws-and-cloud-security.md) - Load when operating Audit Trail, AWS integration, Cloud Security, or native cloud/security evidence
 - Read [references/privacy-and-onboarding.md](references/privacy-and-onboarding.md) - Load when setting up, diagnosing, dry-running, authorizing data collection, managing keys/roles, retention/residency/access/cost, rolling back, or checking drift
 - Read [references/provider-conformance.md](references/provider-conformance.md) - Load when testing event mapping, telemetry redaction, source references, product tiers, outages, rate limits, rollback, or fresh-context recovery

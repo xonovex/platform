@@ -3,7 +3,7 @@
 - **State verification** — after the action, is the _result_ correct? Inspect the return value or the state of the SUT/Fake.
 - **Behaviour verification** — did the SUT make the _right calls_ on its collaborators (`gateway.charge(1250, 'EUR')` exactly once)?
 
-State verification survives a refactor that changes internal calls but keeps the result; behaviour verification does not. Prefer state by default; reach for behaviour only when there is no observable state to check.
+Prefer state by default; reach for behaviour only when there is no observable state to check.
 
 ## Only mocks insist on behaviour
 

@@ -11,7 +11,6 @@ Saved files outlive the code that wrote them; the in-memory schema changes (prop
 ## Techniques
 
 - **Stable on-disk schema** - Define the file layout explicitly and independently of the in-memory layout. Tag the file with a format version. Treat the on-disk property names/ids as a contract.
-- **Versioning + migration** - On load, read the version; if older, run the chain of migration steps (`v1→v2→v3…`) that each transform the prior layout into the next. New code reads only the current schema; migrations bridge the gap.
 - **References by id** - Owned sub-objects serialize inline under their owner; weak references serialize as the target's id/GUID. On load, write objects first, then resolve ids — an id pointing at a missing object loads as null, mirroring runtime delete semantics.
 - **Text vs binary** - Text (JSON/structured text) diffs and merges well and is human-inspectable — good for source-controlled project files. Binary is compact and fast — good for caches, large buffers, and runtime assets. Models often save text for authoring and binary for shipping.
 - **Deterministic output** - Emit properties and objects in a stable order (by property index, by id), normalize floats/whitespace, and avoid embedding timestamps or hash-ordered maps. Two saves of the same model must be byte-identical so version control shows only real changes.

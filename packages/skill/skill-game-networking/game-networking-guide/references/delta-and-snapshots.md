@@ -6,7 +6,7 @@ Stream per-frame deltas of changed state to nodes already in sync, and send a fu
 
 ## Rationale
 
-A delta is meaningless without a baseline — the receiver must already hold the state the delta is relative to. A just-connected node has no baseline, so it needs the complete state once (a snapshot / full dump) before incremental deltas make sense. Lean on the engine's existing change-tracking system: each frame, propagate watched changes into a tracked state, dump the uncompressed changes since last frame to a buffer, and send it; for a new connection, dump _all_ state instead. The receiver applies the buffer through exactly the same path that loads a saved game, so replication and persistence share one serialization and one apply step. Packet acknowledgements and out-of-order counts tell you whether deltas are landing.
+Lean on the engine's existing change-tracking system: each frame, propagate watched changes into a tracked state, dump the uncompressed changes since last frame to a buffer, and send it; for a new connection, dump _all_ state instead. The receiver applies the buffer through exactly the same path that loads a saved game, so replication and persistence share one serialization and one apply step. Packet acknowledgements and out-of-order counts tell you whether deltas are landing.
 
 ### How to Apply
 
@@ -36,7 +36,6 @@ void on_state(buffer_t buf) { gamestate_load_changes(world, &buf); }
 
 ### Gotchas
 
-- A delta applied without its baseline corrupts the receiver's world silently; always deliver and apply the snapshot first for a new node.
 - Reusing the save/load path is a feature, not a coincidence — but it means a change to the on-disk format is also a wire-format change; version them together.
 - A full snapshot can be large; sending it as one unreliable datagram will fail — it needs reliable, possibly fragmented delivery (see transport-and-channels.md).
 - "Changes since last frame" assumes every prior delta arrived; over an unreliable channel a dropped delta means the receiver's baseline drifts unless deltas are delivered reliably or periodically re-based.

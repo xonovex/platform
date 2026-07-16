@@ -1,11 +1,11 @@
 # script-template: Basic Script Template
 
-Starting point wiring together shebang, strict mode, defaults, logging/`die` helpers, dependency check, arg validation, and a `main`. `pipefail` is not POSIX — add it only under a bash shebang.
+Starting point wiring together shebang, strict mode, defaults, logging/`die` helpers, dependency check, arg validation, and a `main`.
 
 ```sh
 #!/usr/bin/env sh
 # Usage: script.sh <arg1> [arg2]
-set -eu                       # pipefail is bash-only
+set -eu
 
 : "${VERBOSE:=0}"
 

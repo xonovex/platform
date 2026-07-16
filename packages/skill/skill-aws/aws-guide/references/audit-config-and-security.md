@@ -2,7 +2,7 @@
 
 ## CloudTrail
 
-Discover organization/account trails, Lake event data stores, regions, management/data/network activity events, selectors, destinations, encryption, log-file validation, retention, access, alerting, and gaps. Preserve account, region, event ID/time, event source/name, actor/session, resource, request/result classification, trail/event-store reference, and policy/config version.
+Discover organization/account trails, Lake event data stores, regions, management/data/network activity events, selectors, destinations, encryption, access, alerting, and gaps. Preserve account, region, event ID/time, event source/name, actor/session, resource, request/result classification, trail/event-store reference, and policy/config version.
 
 Minimize copied event data. Secrets, request parameters, resource contents, personal data, and cross-account information remain governed by access, redaction, retention, residency, and deletion rules.
 
@@ -10,7 +10,7 @@ Minimize copied event data. Secrets, request parameters, resource contents, pers
 
 Pin the pack template/version, parameters, delivery channel/aggregator, accounts/regions/resources, managed/custom rules, remediation ownership, evaluation time, and result references. Preview rule/remediation permissions, recording cost, unsupported resources/regions, and rollback.
 
-A pack is a collection of rules and remediation guidance, not a compliance certificate. Preserve compliant/noncompliant/not-applicable/insufficient-data states without coercion.
+Preserve compliant/noncompliant/not-applicable/insufficient-data states without coercion.
 
 ## Security Hub
 

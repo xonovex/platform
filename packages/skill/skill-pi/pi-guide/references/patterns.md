@@ -11,7 +11,7 @@ Keep the semantic contract in **agent-governance-guide** and translate only the 
 | Specialist agent     | Explicit bounded launcher                                    | Attenuated authority, depth and budgets enforced    |
 | Organization-managed | Native managed configuration plus pinned executable delivery | Only within verified native and external guarantees |
 
-Translate the deterministic templates for protected paths, secrets, tool policy, formatting, validation, audit, context injection, and privileged operations. Record native event, handler, matcher, input schema, output/exit behavior, timeout, concurrency, permissions, data exposure, evidence, and rollback.
+Record native event, handler, matcher, input schema, output/exit behavior, timeout, concurrency, permissions, data exposure, evidence, and rollback for each translated template.
 
 ## Pi mappings
 

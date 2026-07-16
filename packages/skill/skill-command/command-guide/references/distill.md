@@ -5,9 +5,8 @@ Refactor a self-contained ("fat") command — one that inlines its whole Goal / 
 ## Goal
 
 - Move a command's procedure, output format, and gotchas into a guideline-skill reference
-- Reduce the command to its frontmatter, argument contract, and a delegation block (~15-25 lines, down from 70-160)
+- Reduce the command to its frontmatter, argument contract, and a delegation block (~15-25 lines)
 - Wire the command plugin to depend on the skill plugin so the skill is present at run time
-- Preserve behavior: the distilled command, when invoked, loads the skill and produces the same output
 
 ## Arguments
 

@@ -6,7 +6,7 @@ Build a lock-free LIFO by CAS-ing a new node onto `head`; but recognize that the
 
 ## Rationale
 
-This is the canonical lock-free structure: push and pop are each a short CAS loop on a single `head` pointer. Push is safe in isolation. Pop, however, dereferences `head->next` to compute the new head — and between that read and the CAS another thread can pop and free the very node you're holding, giving (a) a torn/incorrect `next` (ABA) and (b) a dereference of freed memory. This is the textbook example of why "lock-free" and "safe to free" are different problems.
+Push and pop are each a short CAS loop on a single `head` pointer. Push is safe in isolation. Pop dereferences `head->next` to compute the new head — and between that read and the CAS another thread can pop and free the node you are holding, giving (a) a torn/incorrect `next` (ABA) and (b) a dereference of freed memory.
 
 ## Example
 

@@ -9,7 +9,7 @@ Classify every bug into a class, then prefer the structural change that makes th
 3. **Leak:** tag allocations with `__FILE__`/`__LINE__`, total bytes per subsystem, assert the counter is zero on that system's shutdown.
 4. **Overwrite (buffer overrun / use-after-free):** route suspect allocations through an end-of-page allocator so an OOB or after-free write faults _immediately_ at the offending instruction.
 5. **Race:** add a "run single-threaded" flag to confirm threading is involved, keep concurrency to known patterns, run TSan — reclamation/race detail owned by lock-free-guide.
-6. **Design flaw / failed spec:** redesign so misuse is unrepresentable — single-purpose APIs that don't flip behavior on a flag, types that prevent wrong calls, explicit handles over global state.
+6. **Design flaw / failed spec:** redesign so misuse is unrepresentable — single-purpose APIs that don't flip behavior on a flag, types that prevent wrong calls.
 
 Proper teardown ("clean up everything") is itself a prevention technique: tearing down exposes lifetime bugs that never-free code hides.
 

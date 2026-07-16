@@ -85,18 +85,12 @@ Column(
 
 ### How to Apply
 
-1. Mark the screen title AND every section header with `Modifier.semantics { heading() }`. TalkBack's heading-navigation control jumps between these; without it the user must swipe through every element.
-2. Apply it to the text/label node, not its container, so the announced "heading" text is the visible title.
-3. A heading is still a normal focus stop. Do not add a redundant "heading" word to the label, TalkBack appends the role itself.
-4. `heading()` is a flat boolean — there is **no** `heading(level = …)`, and TalkBack does not announce heading levels on Android. A screen's outline is simply the ordered set of `heading()` nodes (see "Section box" below); convey depth with typography and reading order, not a level.
-5. **Don't mark controls as headings.** Tabs, buttons, and chips are operable controls that already expose a `Role` (e.g. `Role.Tab` with a selected state) — adding `heading()` pollutes the heading rotor, which is for jumping between _content_ sections, and is semantically wrong (fails the intent of 1.3.1 / 2.4.6). A tab row is navigated by its tab role, not by heading navigation.
-6. **In a list, mark each item a heading.** For a list of cards/rows, put `heading()` on each item (alongside its consolidated label) so a screen-reader user skims the list with the heading gesture/rotor instead of swiping through every card and its inner button. This is the conventional hierarchy: a section title is a heading, and each item under it is a heading too.
+1. Apply it to the text/label node, not its container, so the announced "heading" text is the visible title.
+2. A heading is still a normal focus stop. Do not add a redundant "heading" word to the label, TalkBack appends the role itself.
+3. **In a list, mark each item a heading.** For a list of cards/rows, put `heading()` on each item (alongside its consolidated label) so a screen-reader user skims the list with the heading gesture/rotor instead of swiping through every card and its inner button.
 
 ```kotlin
-// Bad — tab row marked as a heading; the rotor lands on a control
-TabRow(/* ... */, modifier = Modifier.semantics { heading() })
-
-// Good — tabs keep their tab role; each list card is the heading-nav target
+// Each list card is the heading-nav target; tabs keep their own tab role
 TabRow(/* ... */)                                   // a control, not a heading
 items(messages) { message ->
     Card(
@@ -107,18 +101,6 @@ items(messages) { message ->
         },
     ) { /* card content; interactive children stay separately focusable */ }
 }
-```
-
-```kotlin
-// Bad - title is announced as plain text; no heading-nav target on the screen
-Text("Your messages", style = MaterialTheme.typography.titleLarge)
-
-// Good
-Text(
-    text = "Your messages",
-    style = MaterialTheme.typography.titleLarge,
-    modifier = Modifier.semantics { heading() },
-)
 ```
 
 ## Collections (`collectionInfo` / `collectionItemInfo`)

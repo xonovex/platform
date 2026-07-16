@@ -22,7 +22,7 @@ Grant only the permissions the operation needs. Per the GitHub fine-grained-PAT 
 | Top-level PR conversation comment (a PR is an issue)                                | **Issues: write**                                       |
 | Resolve a thread (`resolveReviewThread`, GraphQL)                                   | **Pull requests: write** AND **Contents: read & write** |
 
-- **Contents: read is NOT enough to push** — pushing and ref creation are Contents: write operations. Contents: read suffices only to open a PR and post a review.
+- **Contents: read is NOT enough to push** — it suffices only to open a PR and post a review, never to push commits/refs.
 - `Pull requests: write` subsumes read; `Metadata: read` is auto-required on every fine-grained token.
 - `resolveReviewThread` needs the non-obvious **Contents: read & write** on top of Pull requests: write, or it fails "Resource not accessible by integration" (community #44650). Classic `repo` has no such gap.
 - **Fine-grained gaps (2025–2026):** cannot contribute to public repos where you are a non-member, cannot be used by outside collaborators, cannot span multiple orgs — use a classic PAT for those. Org-approval-required tokens sit "pending" (read public only, 403/404 on writes) until an admin approves.

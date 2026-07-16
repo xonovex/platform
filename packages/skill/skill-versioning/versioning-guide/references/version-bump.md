@@ -53,5 +53,4 @@ Prefix every line with `[dry-run]` when previewing.
 
 ## Gotchas
 
-- Finalizing a pre-release lands on its own core (`1.2.3-beta.4` → `1.2.3`); jumping to `1.2.4` orphans the release the prerelease was leading up to.
 - `--no-dependents` and `--no-changelog` are independent — skipping dependents still writes the primary package's changelog, and skipping the changelog still propagates to dependents.

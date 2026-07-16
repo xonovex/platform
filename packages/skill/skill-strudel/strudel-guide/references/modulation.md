@@ -1,6 +1,6 @@
 # modulation: Dynamic Parameter Modulation
 
-Drive parameters with signal generators instead of static values for organic movement.
+Drive parameters with signal generators for movement.
 
 ```javascript
 note("c2*8")

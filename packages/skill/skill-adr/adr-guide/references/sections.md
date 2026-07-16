@@ -24,7 +24,6 @@
 
 - One `###` heading per concrete scenario.
 - Show a real example payload in a fenced block (e.g. `json5`), then a numbered producer → consumer walkthrough ending in the result.
-- Two short scenarios usually beat one exhaustive one.
 
 ## Decision
 

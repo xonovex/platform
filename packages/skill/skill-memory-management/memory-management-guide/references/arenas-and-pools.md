@@ -38,7 +38,6 @@ static void arena_reset(arena_t *a) { a->used = 0; }   // free everything, O(1)
 
 ## Gotchas
 
-- Arenas cannot free individual objects; an object outliving its arena's reset is a use-after-free — match lifetimes.
 - Bump allocation has no bounds safety unless you check capacity; always assert/return on overflow.
 - Pointers into a growing/reset arena become invalid — prefer offsets/handles across a boundary. (Exception: a reserve/commit arena never moves, so pointers survive growth; only reset invalidates them.)
 - Reserve is cheap but not infinite (address space, overcommit/page-table limits); pick a sane ceiling and still assert on commit failure.

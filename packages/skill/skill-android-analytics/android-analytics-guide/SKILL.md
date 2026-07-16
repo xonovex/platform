@@ -51,7 +51,7 @@ Each reference is a trigger — read it only when the user's intent matches; do 
 
 - Read [references/architecture.md](references/architecture.md) - Load when introducing or reviewing the tracker abstraction, the api/impl module split, or dependency injection of analytics.
 - Read [references/where-to-track.md](references/where-to-track.md) - Load when deciding where a tracking call belongs, or fixing duplicate / recomposition-driven events.
-- Read [references/events-and-screens.md](references/events-and-screens.md) - Load when defining or naming events and screen views, button/toggle clicks, or A/B experiments on a screen.
+- Read [references/events-and-screens.md](references/events-and-screens.md) - Load when defining or naming events and screen views, or button/toggle clicks.
 - Read [references/user-properties-and-identity.md](references/user-properties-and-identity.md) - Load when setting user properties, login status, or user / session identity.
 - Read [references/consent-and-privacy.md](references/consent-and-privacy.md) - Load when gating tracking on consent, anonymizing, or removing PII from events.
 - Read [references/testing.md](references/testing.md) - Load when testing that something is (or is not) tracked, using a fake / test tracker.

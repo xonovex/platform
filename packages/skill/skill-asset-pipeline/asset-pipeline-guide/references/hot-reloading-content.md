@@ -6,7 +6,7 @@ Watch source files for changes, recompile only the affected dependency closure i
 
 ## Rationale
 
-The same deterministic compile that runs offline can run while the app is up, turning iteration into a save-and-see loop. The pieces exist: the file watcher detects the edit, dependency tracking names the outputs to recook, content hashing skips the unchanged, and the compile runs on a background task so the frame loop never blocks. The hard part is the swap: runtime data may be referenced by code already mid-frame, so freeing the old resource the instant the new one is ready can crash work submitted against the old handle. The safe pattern is publish-then-retire — make the new version available, repoint references atomically (handle swap or generation bump), and defer freeing the old version until in-flight work referencing it completes, gated by the same fence/frame-in-flight boundary the renderer already tracks. The cost is transient extra memory while both versions live briefly.
+The hard part of hot-reload is the swap: runtime data may be referenced by code already mid-frame, so freeing the old resource the instant the new one is ready can crash work submitted against the old handle. The safe pattern is publish-then-retire — build the new version fully off to the side (never mutate the live resource in place), repoint references atomically (handle swap or generation bump), and defer freeing the old version until in-flight work referencing it completes, gated by the same fence/frame-in-flight boundary the renderer already tracks.
 
 ## How to Apply
 

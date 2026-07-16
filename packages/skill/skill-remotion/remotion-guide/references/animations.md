@@ -1,7 +1,5 @@
 # animations: Frame-Driven Animation
 
-Drive all motion with `useCurrentFrame()` + `interpolate()` or `spring()`. CSS transitions and Tailwind `animate-*` classes never render — Remotion captures each frame as a still.
-
 ```tsx
 import {
   Easing,

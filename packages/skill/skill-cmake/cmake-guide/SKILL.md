@@ -13,7 +13,7 @@ description: "Use when editing CMake build files for C/C++ projects on CMake 3.2
 
 - **Target-based builds** - Use targets, no global include/link dirs, see [references/target-types.md](references/target-types.md), [references/compile-options.md](references/compile-options.md)
 - **Visibility specifiers** - Use PUBLIC/PRIVATE/INTERFACE correctly, see [references/visibility-specifiers.md](references/visibility-specifiers.md)
-- **Dependencies** - Declare explicitly with FetchContent/find_package, see [references/find-package.md](references/find-package.md), [references/fetchcontent.md](references/fetchcontent.md)
+- **Dependencies** - Declare explicitly with find_package, see [references/find-package.md](references/find-package.md)
 - **Testing** - Enable testing with CTest, see [references/testing.md](references/testing.md)
 - **Project structure** - Organize multi-directory projects, see [references/project-structure.md](references/project-structure.md)
 
@@ -30,7 +30,6 @@ description: "Use when editing CMake build files for C/C++ projects on CMake 3.2
 - Read [references/visibility-specifiers.md](references/visibility-specifiers.md) - Load when deciding PUBLIC vs PRIVATE vs INTERFACE
 - Read [references/compile-options.md](references/compile-options.md) - Load when adding compiler flags to targets
 - Read [references/find-package.md](references/find-package.md) - Load when integrating external dependencies
-- Read [references/fetchcontent.md](references/fetchcontent.md) - Load when vendoring dependencies from git/archives
 - Read [references/testing.md](references/testing.md) - Load when setting up CTest or test targets
 - Read [references/project-structure.md](references/project-structure.md) - Load when organizing multi-directory CMake projects
 - Read [references/generator-expressions.md](references/generator-expressions.md) - Load when using conditional build configuration

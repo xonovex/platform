@@ -27,6 +27,4 @@ Recognizers for common OO-design problems and the principle each violates.
 ## Gotchas
 
 - Liskov substitution is about behavior, not just signatures — `Square extends Rectangle` is the classic violation despite matching types
-- Equality (`equals` / `==`) and hashing must agree — overriding one and not the other breaks `HashSet`/`HashMap` silently
-- Premature class hierarchies are harder to refactor than premature composition — start flat, extract a base only when ≥3 implementations exist
 - Mutable shared state plus method calls = order-dependent behavior; making fields `final`/`readonly` is the cheapest correctness lever

@@ -4,10 +4,6 @@
 
 An immediate-mode GUI can be accessible — each frame, as you draw a control, also register it (role, label, rect, state) into a small side list that _is_ a retained semantic tree, expose that list to platform accessibility APIs and to automation/virtual input, and reuse the DPI-scale and theme machinery you already have for zoom and high contrast.
 
-## Rationale
-
-The claim that immediate-mode GUIs can't support screen readers confuses the _API style_ (declare state each frame) with the _data_: nothing stops you recording, per visible control, the few facts a reader needs. Built during the draw call you already make, the side list is cheap, always in sync, and doubles as a UI-test automation surface — the same parallel-semantic-model trick that keeps canvas-rendered web apps accessible. Zoom and contrast are the DPI-scale factor and theme colors you already expose, not new systems.
-
 ## How to Apply
 
 1. As each control is drawn, call `register_control(ui, role, label, rect)` with its role (button, checkbox, static text, custom), accessible label, and screen rect — accumulating a per-frame list of semantic objects.

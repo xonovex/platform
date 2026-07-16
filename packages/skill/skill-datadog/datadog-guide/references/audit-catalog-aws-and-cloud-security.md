@@ -1,12 +1,8 @@
-# Audit, Catalog, AWS, and Cloud Security
+# Audit, AWS, and Cloud Security
 
 ## Audit Trail
 
-Discover product/tier, event scope, actors, configuration/admin actions, retention, access roles, archive/export, notifications, and gaps. Preserve event ID/time, actor, action, target, organization/site, result, configuration version, and native reference. Audit events support accountability but do not replace the authoritative target's state or AWS CloudTrail.
-
-## Software Catalog
-
-Declare the source of truth for service identity, owner, lifecycle, contacts, repositories, dependencies, environments, and metadata schema. Preview synchronization direction, conflict behavior, permissions, data exposure, and deletion. Do not let an observed telemetry tag silently overwrite authoritative ownership.
+Discover product/tier, event scope, actors, configuration/admin actions, retention, access roles, archive/export, notifications, and gaps. Preserve event ID/time, actor, action, target, organization/site, result, configuration version, and native reference.
 
 ## AWS integration
 

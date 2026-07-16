@@ -32,8 +32,7 @@ Two elements are connascent if changing one forces a matching change in the othe
 // Connascence of meaning (non-local): distant sites must agree 0 means "no limit".
 cache.Get(key, 0)                    // call site
 if ttl == 0 { /* unlimited */ }      // far-away handler — silent pact
-// Rule of degree → connascence of name; the pact is now visible.
-cache.Get(key, TTL{Unlimited: true})
+// Rule of degree → connascence of name makes the pact visible.
 ```
 
 Connascence grades the _pact_; the [coupling ladder](coupling-ladder.md) grades the _channel_ carrying it — grade both.

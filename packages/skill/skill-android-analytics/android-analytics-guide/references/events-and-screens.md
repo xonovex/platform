@@ -9,7 +9,6 @@ Never pass string-literal event or screen names to the tracker; model screens as
 1. Define an enum (or sealed `object` constants) `ScreenName` for every trackable screen; fire a screen-view on entry, not on every recomposition or back-navigation.
 2. Define a sealed `AnalyticsEvent` hierarchy. One concrete type per user action (`ButtonClickEvent`, `ToggleChangeEvent`), never a free-form `CustomEvent(name, map)`.
 3. Give click-type events a stable `uniqueName` (snake_case, prefixed by area, e.g. `cart_checkout`) plus optional structured params as typed fields — not a loose `Map`.
-4. For A/B tests, do not branch the tracking call by hand. Pass the active experiments alongside the screen view via `trackScreenWithExperiments`, modelling each as `Experiment(key, value)` so several experiments ride one screen view.
 
 ## Example
 
@@ -31,17 +30,6 @@ sealed interface AnalyticsEvent {
 
 tracker.trackEvent(AnalyticsEvent.ButtonClickEvent(uniqueName = "cart_checkout"))
 tracker.trackScreen(ScreenName.CART)
-
-// A/B: one screen view carries every active experiment
-data class Experiment(val key: String, val value: String)
-
-tracker.trackScreenWithExperiments(
-    screenName = ScreenName.CART,
-    experiments = listOf(
-        Experiment("checkout_layout", "compact"),
-        Experiment("price_badge", "variant_b"),
-    ),
-)
 ```
 
 ## Counter-Example

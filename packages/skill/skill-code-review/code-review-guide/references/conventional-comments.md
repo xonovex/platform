@@ -21,7 +21,6 @@ In a multi-paragraph markdown body, put `<label> (decoration)` as its own bold f
 | `suggestion` | A proposed improvement.                        | Sometimes           |
 | `issue`      | A problem (bug, regression, gap).              | Often               |
 | `todo`       | A small, necessary change before merge.        | Usually             |
-| `question`   | You need information to assess the code.       | No                  |
 | `thought`    | A non-actionable idea or observation.          | No                  |
 | `chore`      | A process task (changelog, rebase, generated). | Varies              |
 
@@ -48,7 +47,6 @@ Keep the two in sync: label-without-enforcement is fine (advisory); enforcement-
 
 - `issue (blocking)`: Add a null check for `user` — it NPEs when the session expired.
 - `suggestion (non-blocking)`: Consider renaming `x` to `userCount`.
-- `question`: Does the order matter once a thread has won here?
 
 Machine-parseable shape:
 

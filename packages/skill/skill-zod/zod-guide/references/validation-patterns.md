@@ -1,13 +1,11 @@
-# validation-patterns: safeParse vs parse vs pipe
+# validation-patterns: multi-step validation with pipe
 
-- `.safeParse()` — external input (API, user, services); returns `{ success, data | error }`, never throws.
-- `.parse()` — trusted/controlled data only; throws on failure.
-- `.pipe()` — feed a `.transform()` result into a second schema for multi-step, type-safe validation.
+- `.pipe()` — feed a `.transform()` result into a second schema for multi-step, type-safe validation. Apply `.transform().pipe()` before `.default()`.
 
 ```typescript
-const result = CreateUserSchema.safeParse(req.body);
-if (!result.success) {
-  return res.status(400).json({error: result.error.issues});
-}
-const user = await createUser(result.data);
+const PortSchema = z
+  .string()
+  .transform((s) => parseInt(s, 10))
+  .pipe(z.number().int().min(1024).max(65535))
+  .default("3000");
 ```

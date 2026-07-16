@@ -2,11 +2,7 @@
 
 ## Guideline
 
-Strings follow the same caller-owns rule as everything else in this style — a non-owning **view** for reads, a bounded **builder** over caller memory for writes — and the libc terminator-scan cluster (`strlen`/`strcmp`/`strcat`/`strtok`) is avoided.
-
-## Rationale
-
-A C string carries no length, so every `strlen`/`strcmp`/`strcat`/`strtok` rescans to the terminator — an O(n) hidden cost that becomes O(n²) inside a loop. The infamous case: GTA Online spent minutes at load because a JSON parser re-`strlen`'d the whole buffer once per token. Carry the length explicitly and the rescans, and the hidden allocations, both disappear.
+Strings follow the same caller-owns rule as everything else in this style — a non-owning **view** for reads, a bounded **builder** over caller memory for writes — and the libc terminator-scan cluster (`strlen`/`strcmp`/`strcat`/`strtok`) is avoided (it rescans to the terminator on every call, so a loop over it is silently O(n²)).
 
 ## View — non-owning slice (pointer + length)
 

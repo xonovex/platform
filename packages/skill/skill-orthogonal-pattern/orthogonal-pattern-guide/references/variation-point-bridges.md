@@ -2,7 +2,7 @@
 
 Axes are rarely _perfectly_ independent: one variant sometimes needs specifics produced by another. That dependency is a **bridge** — the seam where two axes touch. The goal is not "no coupling" but "no _leaked_ coupling": localize the glue at one bridge so both axes keep varying on their own. See [finding-axes.md](finding-axes.md) and **connascence-guide**.
 
-- **Information leakage is the why** — one design decision showing up across multiple variants is leaked when each re-encodes it, becoming connascent in N places. The bridge confines that decision to one site. "Compressors need what the encoder produced" is one decision — encode it once, not re-derived in `gzip`, `zstd`, and `none` separately.
+- **Confine a shared decision to one site** — "compressors need what the encoder produced" is one decision; encode it once at the bridge, not re-derived in `gzip`, `zstd`, and `none` separately.
 - **Two axes touched = a bridge** — if removing one feature would force edits on _two_ axes, the seam between them is a bridge. Name it, place it in the more-dependent leaf, keep both axis ports ignorant of each other.
 
 ## Cross-tree constraint vs cross-cutting concern

@@ -6,7 +6,7 @@ Record every input each cook actually consumed — source files, included sub-re
 
 ## Rationale
 
-Without a dependency record you either recook everything on any change (slow) or guess which outputs are affected (wrong). A precise record gives the exact set of outputs whose validity hash could change. It dovetails with content hashing: because an output's validity hash folds in its inputs' hashes, a changed input propagates a new hash down the edges and the cache lookup misses for precisely the stale outputs. Reference by stable identity (GUID/object identity that survives renames and moves), not fragile paths. The dominant failure mode is under-reporting — a dependency the cook read but never recorded is invisible, so editing it reimports nothing and ships stale data. The cost: compilers must report what they touch, routing all input access through a tracked interface rather than reading files directly.
+A precise dependency record gives the exact set of outputs whose validity hash could change, instead of recooking everything (slow) or guessing (wrong). Reference by stable identity (GUID/object identity that survives renames and moves), not fragile paths. The dominant failure mode is under-reporting — a dependency the cook read but never recorded is invisible, so editing it reimports nothing and ships stale data. The cost: compilers must route all input access through a tracked interface rather than reading files directly.
 
 ## How to Apply
 

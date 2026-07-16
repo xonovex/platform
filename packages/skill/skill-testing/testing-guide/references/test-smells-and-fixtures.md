@@ -11,11 +11,7 @@ Naming a smell points at the fix. Most setup-half smells come from how the fixtu
   - **Sensitive Equality** — asserting against a whole stringified/serialized object, so an unrelated field/format/order change reddens the bar. Fix: assert on the specific fields.
   - **Indirect Testing** — exercising the SUT through a distant collaborator, so a change anywhere on the path breaks it. Fix: test the unit directly. (Over-mocking is a third Fragile cause — see [state-vs-behaviour-and-what-to-mock.md](state-vs-behaviour-and-what-to-mock.md).)
 - **Erratic Test** — flaky: different results with no code change, from uncontrolled non-determinism (wall clock, seeds, time zones, concurrency, network, order-dependence on leftover state). Violates FIRST Repeatable/Independent. Fix: inject a fixed clock and seed, double external seams, no shared mutable fixture.
-- **Tautological Test** — green for the wrong reason; nothing it asserts can fail. The tell: you cannot name an input or change that would make it red. Two forms:
-  - **Scope mismatch** — assertion narrower than the rule (an architecture test checks direct imports while the forbidden dependency is reached transitively).
-  - **After-the-fact baseline** — a golden/characterization test generated from already-changed code; prevents future drift but did not prove the change preserved behaviour.
-
-  Fix: first name the concrete input/change that must fail, then align the assertion with the rule (check transitive reachability when the rule is transitive; capture golden baselines _before_ the change).
+- **Tautological Test** — green for the wrong reason; nothing it asserts can fail. The tell: you cannot name an input or change that would make it red. A common form is the **After-the-fact baseline** — a golden/characterization test generated from already-changed code; it prevents future drift but did not prove the change preserved behaviour. Fix: first name the concrete input/change that must fail, then capture golden baselines _before_ the change.
 
 Smells breed each other: a bloated fixture makes setup Obscure → people lean on a shared external fixture → Mystery Guest _and_ Erratic. Fixing the root (usually the fixture and the unit's size) clears several at once.
 

@@ -1,4 +1,4 @@
-# text-and-targets: Text resize, reflow & touch-target size
+# text-and-targets: Text resize & reflow
 
 ## Size text in scalable units (`sp`), never `dp`
 
@@ -108,60 +108,6 @@ AppContent()
 
 A `@Preview(fontScale = 2.0f)` or a screenshot test that pins a scale is correct — it exercises scaling rather than suppressing it.
 
----
-
-## Touch targets ≥ 48dp without enlarging the visual
-
-### Guideline
-
-Every clickable element must expose a touch target of at least 48x48dp; expand the hit area, not the icon, when the visual is smaller.
-
-### Rationale
-
-Small targets are hard to actuate for users with motor or vision impairments. WCAG 2.5.8 Target Size (Minimum) requires 24x24 CSS px at AA, and 2.5.5 Target Size (Enhanced, AAA) wants 44x44; Android Material guidance and `minimumInteractiveComponentSize()` standardize on 48dp, which satisfies both.
-
-### How to Apply
-
-1. On any element carrying `Modifier.clickable {}` whose own size may fall below 48dp, add `Modifier.minimumInteractiveComponentSize()` (it grows only the touch area, leaving the drawn content centered at its visual size).
-2. Where you control the box directly, use `Modifier.sizeIn(minWidth = 48.dp, minHeight = 48.dp)` or `Modifier.defaultMinSize(minWidth = 48.dp, minHeight = 48.dp)`.
-3. Order matters: apply `.clickable` (then `.padding` inside it) so the padding is part of the ripple/hit area, not outside it. Keep the icon itself at its design size (e.g. 24dp) inside the larger target. With `minimumInteractiveComponentSize()`, place it _before_ `.clickable`/`.toggleable` (`.minimumInteractiveComponentSize().clickable {}`) so the enlarged region is the interactive one — the reverse leaves the extra area untappable.
-4. Prefer a design-system control that already guarantees the minimum touch target over a bare `Icon` + `clickable`.
-
-### Example
-
-```kotlin
-// Bad — 32dp icon button: hit area is below the 48dp minimum
-Box(
-    modifier = Modifier
-        .size(32.dp)
-        .clickable(onClick = onClose),
-    contentAlignment = Alignment.Center,
-) {
-    Icon(Icons.Default.Close, contentDescription = "Close")
-}
-
-// Good — visual stays 24dp, touch area is >= 48dp
-Box(
-    modifier = Modifier
-        .minimumInteractiveComponentSize() // expands hit area only
-        .clickable(
-            onClick = onClose,
-            role = Role.Button,
-        ),
-    contentAlignment = Alignment.Center,
-) {
-    Icon(
-        imageVector = Icons.Default.Close,
-        contentDescription = "Close",
-        modifier = Modifier.size(24.dp),
-    )
-}
-```
-
-### Counter-Example
-
-2.5.8 exempts targets whose function is also reachable via an equivalent control on the same screen, and inline targets in a sentence/text block; a word styled as a link inside flowing copy need not hit 48dp. Prefer giving it room anyway.
-
 ### Related
 
-./contrast-and-color.md (text legibility). Prefer design-system type-scale tokens and controls that already meet the touch-target minimum.
+./contrast-and-color.md (text legibility). Prefer design-system type-scale tokens.

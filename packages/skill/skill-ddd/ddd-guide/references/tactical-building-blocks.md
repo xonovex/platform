@@ -20,13 +20,10 @@ Example: `Order` is the root; its `OrderLine` value objects live inside; the inv
 Heuristics with documented reasons to break them, not laws:
 
 1. **Model true invariants in consistency boundaries** — put in one aggregate only what must stay consistent together within a single transaction.
-2. **Design small aggregates** — often just the root plus value-typed properties; large aggregates lose to performance, scalability, transaction contention.
+2. **Design small aggregates** — often just the root plus value-typed properties.
 3. **Reference other aggregates by identity** — hold the other root's id, not its object.
-4. **Use eventual consistency outside the boundary** — one transaction modifies one aggregate; cross-aggregate consistency is reached afterward (e.g. via a domain event).
+4. **Use eventual consistency outside the boundary** — cross-aggregate consistency is reached afterward via a domain event.
 
-Break rule 4 only for a small, tightly-coupled invariant that genuinely must be immediate.
-
-- BAD: a `Customer` aggregate directly containing every `Order`, `OrderLine`, and `Shipment`, all loaded and locked to add one line.
 - GOOD: `Order` and `Shipment` are separate aggregates; `Order` holds `shipmentId`; placing an order emits an event Shipping consumes, reaching consistency eventually.
 
 ## Domain event
@@ -44,13 +41,6 @@ A persistence-ignorant, collection-like abstraction over aggregate **roots**: as
 
 - **Domain service** — domain logic that fits no single entity/value object: a calculation or policy spanning several aggregates, named in the ubiquitous language (`FareCalculator`, an account-to-account transfer).
 - **Application service** — thin orchestration with no domain rules: loads aggregates via repositories, invokes domain behaviour, coordinates the transaction and events; the entry point a controller calls. If it starts making domain decisions, push that logic down into the model.
-
-## Anemic-domain-model anti-pattern
-
-Entities that are bags of getters/setters with no behaviour, while all logic lives in services that reach in and manipulate the data. It has the shape of a domain model but binds no rules to the data they protect, so invariants scatter and go unenforced.
-
-- BAD: `Order.getLines()`/`setTotal()` plus `OrderService.recalculate(order)` — any caller can set an inconsistent total.
-- GOOD: `Order.addLine(line)` updates the lines and recomputes the total internally, so "total equals sum of subtotals" cannot be violated from outside.
 
 ## Cross-references
 

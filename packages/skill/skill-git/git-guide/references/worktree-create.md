@@ -8,10 +8,9 @@ Create a sibling worktree with a feature branch for isolated development, derivi
 - Branch: `<worktree>/feature/<feature-name>`
 - Use a type-descriptive prefix conveying the kind of change (`feature/`, `fix/`, `docs/`, `hotfix/`), not a single generic `feature` segment
 
-| In worktree | Feature        | Directory                   | Branch                      |
-| ----------- | -------------- | --------------------------- | --------------------------- |
-| `services`  | `auth-fix`     | `services-feature-auth-fix` | `services/feature/auth-fix` |
-| `api`       | `new-endpoint` | `api-feature-new-endpoint`  | `api/feature/new-endpoint`  |
+| In worktree | Feature    | Directory                   | Branch                      |
+| ----------- | ---------- | --------------------------- | --------------------------- |
+| `services`  | `auth-fix` | `services-feature-auth-fix` | `services/feature/auth-fix` |
 
 ## Steps
 

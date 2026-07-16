@@ -15,4 +15,3 @@ Convert a category's insights into concise AGENTS.md bullets.
 - Insights that restate code (e.g. "use `useMemo`") are filler — only keep what a fresh reader couldn't infer from the code
 - Auto-detection on `applies_to: ["general"]` picks the root AGENTS.md, rarely what you want — require a specific routing key
 - Don't bump `applied: true` before the actual write — it leaves orphaned insights
-- Apply directly by default — write `reflections/*.md` only with `--persist` or after an explicit `extract`; don't force a store-then-integrate two-step

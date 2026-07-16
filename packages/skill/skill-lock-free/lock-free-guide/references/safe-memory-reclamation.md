@@ -6,7 +6,7 @@ In a lock-free structure, removing a node from the logical structure is not the 
 
 ## Rationale
 
-This is the central hard problem of lock-free programming. Without a lock, a thread can be reading node X at the exact moment another thread unlinks and frees it — a use-after-free, and the source of ABA when the address is recycled. A garbage collector solves this for you; in C you must build the equivalent. Every scheme trades reader cost, memory overhead, and reclamation latency differently.
+Without a lock, a thread can be reading node X at the exact moment another thread unlinks and frees it — a use-after-free, and the source of ABA when the address is recycled. In C you must build the GC equivalent; each scheme trades reader cost, memory overhead, and reclamation latency differently.
 
 ## Schemes
 

@@ -7,7 +7,7 @@
 - **Used for:** success-criteria definitions and AA scope across all references
 - **Aspects extracted:**
   - Perceivable / Operable / Understandable / Robust success criteria → criteria mapping in every reference
-  - AA thresholds (1.4.3 contrast 4.5:1 / 3:1, 1.4.4 resize 200%, 1.4.10 reflow, 2.5.8 target 24x24) → `contrast-and-color.md`, `text-and-targets.md`
+  - AA thresholds (1.4.3 contrast 4.5:1 / 3:1, 1.4.4 resize 200%, 1.4.10 reflow) → `contrast-and-color.md`, `text-and-targets.md`
 
 ## Jetpack Compose accessibility (Android Developers)
 
@@ -18,7 +18,7 @@
   - `semantics` / `clearAndSetSemantics` / `mergeDescendants` / Role / `invisibleToUser` → `labelling.md`
   - `traversalIndex` / `isTraversalGroup` / `heading()` / `CollectionInfo` → `focus-order.md`
   - `stateDescription` / `liveRegion` / `toggleable` / `CustomAccessibilityAction` → `state-and-announcements.md`
-  - `minimumInteractiveComponentSize` / font scaling → `text-and-targets.md`
+  - font scaling / text reflow → `text-and-targets.md`
   - Compose test semantics assertions → `testing.md`
 
 ## Production Android codebase (applied patterns)

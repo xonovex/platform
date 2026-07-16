@@ -18,8 +18,6 @@ Rewrite AI-generated or stiff prose so it reads as a human wrote it. Goal: prose
 - **Inflated significance** — Cut `pivotal`, `testament`, `stands as`, `reflects broader`, `evolving landscape`. Replace with a concrete change or decision.
 - **Credibility signaling** — Drop `featured in major publications`, `leading expert`. Name the publication, the date, or the specific work.
 - **Participle fake-depth** — Avoid trailing `-ing` clauses (`creating`, `reinforcing`, `highlighting`, `ensuring`). Make it a separate sentence with a real claim.
-- **Marketing tone** — Strip `vibrant`, `seamless`, `breathtaking`, `unlock potential`. Say what the thing actually does.
-- **Vague attributions** — Replace `experts argue`, `observers note`, `research suggests` with a named source or cut the claim.
 - **Generic filler sections** — Delete "challenges and future prospects" wrap-ups. Use a specific event or constraint instead.
 
 ### Language patterns
@@ -67,7 +65,6 @@ Removing AI tells is half the job. Sterile, voiceless prose is just as obvious a
 - Don't strip useful structure (headings, lists, citations, accessibility) for style alone.
 - Don't claim detector safety. Detectors are probabilistic, not proof.
 - Em dashes, semicolons, and `however` are not AI tells on their own. **Regularity is.**
-- Don't invent facts to add specificity. If you can't verify a number, name, quote, or causal claim, attribute it, soften it, or cut it.
 
 ## Required Checks Before Output
 

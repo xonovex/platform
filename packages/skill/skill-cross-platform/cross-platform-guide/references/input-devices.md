@@ -4,10 +4,6 @@
 
 Treat device input as another platform backend behind the input-source interface: enumerate devices via the OS's device directory (on Linux, evdev nodes under `/dev/input`, preferring stable `by-id`/`by-path` symlinks), probe capabilities before trusting a device, read events non-blocking, detect hotplug by watching the device directory, and translate raw OS codes to your engine's buttons/axes through a data-driven mapping table rather than scattered conditionals.
 
-## Rationale
-
-Probe capabilities (which buttons/axes a device reports, plus each axis's range and deadzone) before mapping, or you read garbage from a device that is not the gamepad you assumed. A table keyed by raw OS code tames the reality that one physical control can be 1:1 (a button), 2:1 (two axes → one stick), or 1:2 (one hat axis → two D-pad directions); `if/else` chains rot.
-
 ## How to Apply
 
 1. Enumerate already-connected devices by listing the OS device directory; on Linux read `/dev/input` and prefer the descriptive `by-id`/`by-path` symlinks (joysticks/gamepads commonly end in `-event-joystick`) over raw `eventN` numbers, which are unstable across reboots/replugs.

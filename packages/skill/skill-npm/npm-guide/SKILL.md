@@ -10,7 +10,6 @@ Validate publish-readiness and publish packages idempotently, with correct acces
 ## Core Principles
 
 - **npm requires only name + version** — `license` / `repository` / `files` are house policy, not npm rules, and `private: true` blocks publishing outright, see [references/publish-check.md](references/publish-check.md)
-- **Publish idempotently** — probe `npm view <name>@<version>` and skip if present; the registry also refuses to overwrite an existing version, see [references/publish.md](references/publish.md)
 - **Provenance needs CI + OIDC** — `--provenance` only works from a supported runner with `id-token` permission, the public registry, and a matching `repository`; it errors elsewhere, see [references/publish.md](references/publish.md)
 - **Access is derived** — unscoped packages are always public; scoped packages default to restricted and need `--access public` on first publish, see [references/publish.md](references/publish.md)
 - **Platform packages gate install** — `os` / `cpu` / `libc` restrict where a native-binary package installs; inject and restore those fields safely, see [references/publish.md](references/publish.md)

@@ -51,4 +51,4 @@ for (size_t b = 0; b < N / W; b++)
 
 ## Related
 
-[references/hot-cold-splitting.md](./hot-cold-splitting.md), [references/simd-friendly-layout.md](./simd-friendly-layout.md), [references/cache-behavior.md](./cache-behavior.md), [references/access-patterns.md](./access-patterns.md)
+[references/simd-friendly-layout.md](./simd-friendly-layout.md), [references/cache-behavior.md](./cache-behavior.md), [references/access-patterns.md](./access-patterns.md)

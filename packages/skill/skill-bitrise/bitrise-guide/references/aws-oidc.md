@@ -10,7 +10,7 @@ Read the actual Bitrise OIDC configuration and sample claims for the selected wo
 - AWS account, identity provider, role, trust conditions, permissions boundary, role policy, maximum session duration, and session tags;
 - Bitrise Workflow/Step changes, network path, data accessed, expected CloudTrail/build evidence, verification, rollback, and drift.
 
-Reject wildcard or unverified claims that let another workspace, app, repository, workflow, or environment assume the role. Do not generate an IAM user or access key when OIDC is unavailable; return unsupported with remediation.
+Reject wildcard or unverified claims that let another workspace, app, repository, workflow, or environment assume the role.
 
 ## Verification
 

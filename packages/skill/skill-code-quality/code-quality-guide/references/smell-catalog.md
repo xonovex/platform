@@ -6,13 +6,12 @@ Owner key: `robustness.md` = this skill's robustness dimension · **oop-guide** 
 
 ## Bloaters — grown too large
 
-| Smell                    | Detector signal                                                 | Owner                                                             |
-| ------------------------ | --------------------------------------------------------------- | ----------------------------------------------------------------- |
-| Long Method              | function over ~30 lines; high cyclomatic / cognitive complexity | `robustness.md` (code smells)                                     |
-| Large Class / God Object | many fields/methods, low cohesion, `Manager`/`Util` grab-bag    | **oop-guide** (SRP)                                               |
-| Primitive Obsession      | a domain concept carried as a raw string/number; magic literals | `robustness.md` / **connascence-guide**                           |
-| Long Parameter List      | more than ~4 params, especially boolean flag params             | `robustness.md` + **connascence-guide** (connascence of position) |
-| Data Clumps              | the same group of values always travels together                | **connascence-guide**                                             |
+| Smell               | Detector signal                                                 | Owner                                                             |
+| ------------------- | --------------------------------------------------------------- | ----------------------------------------------------------------- |
+| Long Method         | function over ~30 lines; high cyclomatic / cognitive complexity | `robustness.md` (code smells)                                     |
+| Primitive Obsession | a domain concept carried as a raw string/number; magic literals | `robustness.md` / **connascence-guide**                           |
+| Long Parameter List | more than ~4 params, especially boolean flag params             | `robustness.md` + **connascence-guide** (connascence of position) |
+| Data Clumps         | the same group of values always travels together                | **connascence-guide**                                             |
 
 ## Object-Orientation Abusers
 
@@ -36,8 +35,6 @@ Owner key: `robustness.md` = this skill's robustness dimension · **oop-guide** 
 
 | Smell                    | Detector signal                                                                                                  | Owner                                                           |
 | ------------------------ | ---------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
-| Duplicated Code          | identical / near-identical logic in 2+ places                                                                    | _here_ (DUPLICATES)                                             |
-| Dead Code                | unreachable or never-called code, exports, params                                                                | _here_ (DEAD CODE)                                              |
 | Speculative Generality   | abstraction / hook with no current user                                                                          | _here_ (OVER-ENGINEERING)                                       |
 | Comments (noise)         | a comment restating a well-named declaration, narrating a plan / provenance, or denser than the surrounding code | _here_ (REDUNDANT COMMENT) — rename to self-document, or delete |
 | Lazy Class / Data Class  | a class too thin to justify itself, or only fields                                                               | **oop-guide**                                                   |

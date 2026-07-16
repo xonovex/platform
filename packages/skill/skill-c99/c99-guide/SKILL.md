@@ -16,7 +16,7 @@ description: "Use when editing or reviewing general-purpose C99 — libraries, C
 ## Best practices
 
 - **Error handling** - Use return codes, check all fallible operations, see [references/error-handling.md](references/error-handling.md)
-- **Value-oriented APIs** - Return small results by value or in a `{ok, value}` result struct; reserve out-params for large or multiple results, see [references/value-types.md](references/value-types.md)
+- **Value-oriented APIs** - Return small results by value; reserve out-params for large or multiple results, see [references/value-types.md](references/value-types.md)
 - **Strings** - Borrow length-carrying views, write through bounded builders over caller memory — not `strlen`/`strcat`/`strtok` rescans, see [references/string-views.md](references/string-views.md)
 - **Input validation** - Check bounds, NULL pointers, division by zero
 - **Readability** - Small functions, clear naming, comments for non-obvious logic
@@ -33,7 +33,6 @@ description: "Use when editing or reviewing general-purpose C99 — libraries, C
 - Return-by-value is for _small_ PODs; returning a large struct just copies it — large or caller-owned results still take a pointer
 - `-std=c99` usually still means the GNU dialect — set `C_EXTENSIONS OFF` for true ISO C99, then `#define _XOPEN_SOURCE 700` or POSIX calls (`readlink`, `strnlen`, `ssize_t`) become implicit-declaration errors
 - `-Wextra`'s `-Wmissing-field-initializers`/`-Wmissing-braces` fire on intentional zero-init — suppress those two, keep the rest of `-Werror`
-- A bare `snprintf` into a fixed buffer trips `-Wformat-truncation`; check its return (`>= size` ⇒ truncated) to handle the case and clear the warning
 
 ## Progressive disclosure
 

@@ -1,6 +1,6 @@
 # test-double-taxonomy: The Five Doubles and the Reconciliation Table
 
-**Test Double** is the umbrella term for any object substituted for a real collaborator. There are five kinds, routinely collapsed into the word "mock". The name is documentation — pick the one that matches what the double does, because a "mock" that only returns canned data tells a reader the test checks interactions when it checks state.
+**Test Double** is the umbrella term for any object substituted for a real collaborator. There are five kinds, routinely collapsed into the word "mock". The name is documentation — pick the one that matches what the double does.
 
 ## The five kinds, precisely
 

@@ -48,7 +48,6 @@ queue_present(present, swapchain, idx, /*wait*/ render_done);
 - A layout transition is mandatory even when the data is ready; using an image in the wrong layout is undefined behavior.
 - Cross-queue waits order GPU work but do not make memory available/visible the way a barrier does within a queue — you often still need both at a queue boundary.
 - Forgetting a queue-ownership transfer for a resource shared across queues corrupts it on at least one queue; use a transfer or a concurrent/shared mode.
-- Waiting on a fence every frame with a full stall defeats frames-in-flight; wait on the fence for the frame slot you are about to reuse, not the one just submitted, see [references/command-recording-and-frames.md](./command-recording-and-frames.md).
 
 ## Related
 

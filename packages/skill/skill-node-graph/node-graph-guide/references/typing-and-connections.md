@@ -2,16 +2,16 @@
 
 ## Guideline
 
-Give every pin a stable type identity (a type hash), permit a wire only when the producer's output type satisfies the consumer's input type, surface mismatches at author time, insert explicit conversion nodes instead of silently coercing, and let a node resolve concrete pin types from what is wired into it when it is genuinely polymorphic.
+Give every pin a stable type identity (a type hash), permit a wire only when the producer's output type satisfies the consumer's input type, insert explicit conversion nodes instead of silently coercing, and let a node resolve concrete pin types from what is wired into it when it is genuinely polymorphic.
 
 ## Rationale
 
-The type system is what lets a non-programmer wire the graph without a runtime crash. A stable type hash lets the editor reject illegal connections as they are drawn, grey out incompatible connectors, and explain why — feedback the author needs immediately, not at evaluation. Refusing silent coercion matters because a CPU image (bits in system memory) vs a GPU image (bits in video memory) is not cosmetic: papering over it hides real cost (an upload, a readback) and real failure modes; an explicit conversion node keeps that cost visible. Variant nodes avoid a combinatorial explosion of near-identical kinds, but their pin types must be re-resolved every time a wire changes, or the graph drifts into a half-typed state where validation lies.
+The type system is what lets a non-programmer wire the graph without a runtime crash. Refusing silent coercion matters because a CPU image (bits in system memory) vs a GPU image (bits in video memory) is not cosmetic: papering over it hides real cost (an upload, a readback) and real failure modes; an explicit conversion node keeps that cost visible. Variant nodes avoid a combinatorial explosion of near-identical kinds, but their pin types must be re-resolved every time a wire changes, or the graph drifts into a half-typed state where validation lies.
 
 ## How to Apply
 
 1. Assign each pin a `type_hash`; treat it as the connection contract, not a hint.
-2. On a connect attempt, compare output `type_hash` to input `type_hash`; accept on a match (or a declared subtype/satisfies rule), reject otherwise with a visible reason.
+2. On a connect attempt, compare output `type_hash` to input `type_hash`; accept on a match or a declared subtype/satisfies rule.
 3. When two types are related but not identical (e.g. CPU image vs GPU image), offer an explicit conversion node (upload, readback, format change) rather than coercing.
 4. For a polymorphic node, mark pins as "resolved from connection"; when a neighbor wire changes, re-derive the concrete types and re-validate every wire the change touched.
 5. Re-run validation on every connect/disconnect, not only at evaluation, so the editor never reports a graph as valid while a polymorphic pin is unresolved.
@@ -41,7 +41,6 @@ void resolve_pins(node_t *n, const graph_t *g) {
 
 ## Gotchas
 
-- Comparing pin types only at evaluation is too late; the author has already wired a broken graph and lost the context to fix it. Validate on connect.
 - A variant pin left unresolved (nothing wired yet) has no concrete type; a downstream type check against it must report "unresolved", not "compatible".
 - Silent coercion between CPU and GPU payloads hides an upload or a readback — costs that dominate a frame; force an explicit conversion node.
 - A conversion node is still a node with a validity hash; an upload/readback is cacheable, so do not re-run it when its input is unchanged (see evaluation-and-compilation.md).

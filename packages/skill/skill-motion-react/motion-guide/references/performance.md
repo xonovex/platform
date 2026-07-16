@@ -1,6 +1,6 @@
 # performance: GPU Transforms and Reduced Motion
 
-Animate only `x/y/z`, `scale`, `rotate`, `skew`, `opacity` (no layout recalc); use `scaleX/Y` or the `layout` prop for size changes. Gate animations on `useReducedMotion()` (WCAG 2.1 prefers-reduced-motion).
+Animate only `x/y/z`, `scale`, `rotate`, `skew`, `opacity`; use `scaleX/Y` or the `layout` prop for size changes. Gate animations on `useReducedMotion()`.
 
 ```tsx
 import {motion, useReducedMotion} from "motion/react";

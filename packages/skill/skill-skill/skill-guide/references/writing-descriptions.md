@@ -9,13 +9,6 @@
 - **Concise** — a short paragraph; ≤1024 chars (spec limit)
 - **Positive routing only** — describe what the skill is for and let triggers route; do not add "Skip …" clauses, enumerate out-of-scope work, or point to other skills by name in the description
 
-## Anatomy
-
-A strong description usually contains:
-
-1. **What** — a verb-led sentence describing what the skill does
-2. **When to trigger** — situations or prompt shapes that should activate it
-
 ## Before / After
 
 ```yaml
@@ -29,8 +22,6 @@ description: >
   explore, transform, or visualize it, even when they don't say "CSV"
   or "analysis."
 ```
-
-The improved version is more specific about _what_ and broader about _when_ it applies.
 
 ## Gotchas
 

@@ -1,6 +1,6 @@
 # builder-pattern: Builder Pattern for Meshes
 
-Two-phase construction: `*_req()` returns exact vertex/index counts, `*_build()` fills a caller-provided buffer and returns a status (never allocates; caller picks stack/pool/arena). Name the pair `{shape}_mesh{dim}_req` / `{shape}_mesh{dim}_build`. Always check the build status for insufficient-capacity errors.
+Name the mesh builder pair `{shape}_mesh{dim}_req` (returns exact vertex/index counts) / `{shape}_mesh{dim}_build` (fills a caller-provided buffer, returns a status).
 
 ```c
 mesh_req_t req = sphere_mesh3d_req(1.0f, 32, 16);

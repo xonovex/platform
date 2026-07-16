@@ -11,21 +11,9 @@ BAD  internal/{encode, sink, compression}/   # 'encode' is a verb, the rest are 
 GOOD internal/{format, sink, compression}/   # three nouns, three questions, one altitude
 ```
 
-## The axis dir supplies context — keep the leaf bare
-
-`sink/s3` reads as "the s3 variant of sink"; suffixing to `sink/s3uploader` repeats the parent. Name the leaf for the variant, nothing more. A homeless top-level `exportutil/` means an axis's own helpers leaked out — push them into `sink/shared/`.
-
-| BAD (leaf repeats axis)       | GOOD (bare leaf)   |
-| ----------------------------- | ------------------ |
-| `sink/s3uploader`             | `sink/s3`          |
-| `format/jsonformat`           | `format/json`      |
-| `sink/stdoutsink`             | `sink/stdout`      |
-| `compression/gzipcompression` | `compression/gzip` |
-| `sink/filewriter`             | `sink/file`        |
-
 ## Options are namespaced by axis + variant
 
-A per-variant option carries its axis and variant as a prefix, so the flag namespace is isomorphic to the tree. Namespaced named options weaken connascence: positional flags impose connascence of position (caller and parser must agree on order; a reorder silently breaks them), a name imposes connascence of name — the weaker, more local form (rule of degree). The prefix also makes each name unique, so `--level` for two variants never collides. Adding a variant adds a leaf plus its own `--<axis>-<variant>-*` options, not an edit to a god-parser. See **connascence-guide**.
+A per-variant option carries its axis and variant as a prefix, so the flag namespace is isomorphic to the tree. The prefix makes each name unique, so `--level` for two variants never collides. Adding a variant adds a leaf plus its own `--<axis>-<variant>-*` options, not an edit to a god-parser.
 
 ```
 BAD   --bucket ...  --level ...        # position-coupled: which axis? which variant? collides across variants

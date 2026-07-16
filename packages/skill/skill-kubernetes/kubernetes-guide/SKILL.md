@@ -12,8 +12,7 @@ description: "Use when editing Kubernetes manifests in GitOps repos. Triggers on
 ## Essentials
 
 - **Organization** - Use namespaces, labels, annotations consistently, see [references/deployments.md](references/deployments.md)
-- **Container images** - No `latest` tags, set requests/limits and probes, see [references/deployments.md](references/deployments.md)
-- **Security** - Run as non-root, read-only FS, drop capabilities, see [references/deployments.md](references/deployments.md)
+- **Container images** - Set requests/limits and probes, see [references/deployments.md](references/deployments.md)
 - **Configuration** - Use ConfigMaps/Secrets, SOPS/External Secrets for secrets, see [references/configmaps-secrets.md](references/configmaps-secrets.md)
 - **Multi-environment** - Manage with Kustomize bases/overlays, validate with `--dry-run`, see [references/kustomize.md](references/kustomize.md), [references/validation.md](references/validation.md)
 

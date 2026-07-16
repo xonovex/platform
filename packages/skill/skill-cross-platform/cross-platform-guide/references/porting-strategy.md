@@ -4,10 +4,6 @@
 
 Port to a new OS by working through the abstraction interface in interactivity order — get a window on screen, then input, then the rest of the OS services, then audio/dialogs — stubbing each interface first and replacing stubs incrementally, while pinning down toolchain differences (compiler strictness, pointer width, struct layout) and wiring a per-target CI build before declaring the platform done.
 
-## Rationale
-
-Interactivity order beats alphabetical: a visible, interactive window turns every subsequent gap into an observable symptom instead of a link error in the dark. Stub-first keeps the program compiling from hour one. The other half is the toolchain: a different compiler (GCC/Clang vs MSVC, or Emscripten's stricter Clang) flags real latent bugs, and a different pointer width or struct-packing assumption breaks code that hashed or `memcmp`-ed structs assuming a fixed layout.
-
 ## How to Apply
 
 1. Add the new platform to the build system as a first-class config (its own defines, output type, and compiler invocation); start it linking against the default stub backend so it runs immediately.

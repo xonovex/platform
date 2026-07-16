@@ -10,11 +10,8 @@ A data model is relocated constantly: storage grows, objects save and reload at 
 
 ## Techniques
 
-- **Refer by id** - Store the target's id, not its address. Dereference through a registry: `resolve(id) -> object*` or null. Cache the resolved pointer only within a scope where no edit can move or delete it.
 - **Strong / owning (sub-object)** - A parent owns its sub-objects. Ownership is exclusive and forms a tree: each object has at most one owner. Deleting (or freeing) the parent recursively deletes its owned sub-objects. Serialization writes sub-objects inline under their owner.
-- **Weak / reference** - A reference points at an object it does not own. Many references may target one object. On the target's deletion the reference is left pointing at a now-absent id, and `resolve` returns null — a guaranteed safe miss, never a dangling read.
 - **Local ids vs GUIDs** - Inside one file, small monotonically-assigned local ids are compact and fast. For links that cross files, span sessions, or merge between users, use a globally-unique id (GUID) so two independently-authored objects never collide.
-- **Generation / no-reuse** - If local ids are recycled, pair each with a generation counter (id + generation) so a stale reference to a reused slot is detected; otherwise never reuse an id within a model's lifetime.
 - **Resolve at the boundary** - Keep ids in storage and on disk; resolve to pointers only transiently inside an operation. This keeps the model relocatable and serializable end to end.
 - **Identity (GUID) vs role (name/path)** - A GUID names an _identity_: it always resolves to the same specific object, stays valid across rename/move, and looks up in O(1) — but it doesn't adapt when you swap one object for another. A name or path (`head/left_eye`, `../player/head`) names a _role_: it late-binds to whatever object currently fills that slot, so a replacement inherits the references — but it's fragile under rename/move/delete and costs a hierarchical lookup. Default to GUIDs; reserve name/path references for the few places that genuinely need dynamic role-binding (visual-scripting "find entity by name", animation retargeting). Resolve a name once at spawn, not every frame, and prefer fully-qualified paths over global recursive search.
 
@@ -53,7 +50,6 @@ object_t *cached_target = resolve(m, ref_id); // valid only within this scope
 
 ## Gotchas
 
-- A weak reference whose target was deleted must resolve to null; a model that instead leaves it pointing at whatever object reused the id has a silent aliasing bug.
 - An object must have exactly one owner — two strong owners cause double-delete; convert all but one to weak references.
 - Cross-file links need GUIDs: local ids are only unique within the file that minted them, so a merge or import will collide them.
 - Resolving an id every access has a cost; batch-resolve once per operation, but never cache a pointer across an edit that can delete or relocate.

@@ -17,7 +17,6 @@ Drive production code from a failing test, one small step at a time: red (write 
 
 ## Gotchas
 
-- Triangulation is a fallback, not the canonical move — reach for it only when you cannot yet see the general solution; obvious implementation and fake it are used far more often.
 - Skipping refactor leaves the duplication you committed to go green (including a constant duplicated between test and code) — removing it is exactly what the third step is for.
 - "Refactor" means change structure without changing behaviour while the test stays green; it is not "rewrite", "optimize", or "add the next feature".
 - The test list is a list of test IDEAS, not a batch of tests written up front — write them one at a time to preserve the cycle.

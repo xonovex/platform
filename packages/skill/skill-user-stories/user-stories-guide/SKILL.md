@@ -11,18 +11,17 @@ A user story is a placeholder for a conversation about user value, not a specifi
 
 - **Check every story against INVEST** - Independent, Negotiable, Valuable, Estimable, Small, Testable, see [references/invest-and-smart.md](references/invest-and-smart.md)
 - **Treat the story as the 3 Cs** - a Card invites a Conversation, confirmed by a Confirmation test, see [references/three-cs.md](references/three-cs.md)
-- **Write who / what / why, then acceptance criteria** - "As a / I want / so that" plus happy-path, boundary, error and UI checks, see [references/template-and-acceptance-criteria.md](references/template-and-acceptance-criteria.md)
+- **Write who / what / why, then acceptance criteria** - "As a / I want / so that" plus acceptance criteria, see [references/template-and-acceptance-criteria.md](references/template-and-acceptance-criteria.md)
 - **Split a too-big story vertically** - SPIDR for a quick set, the splitting flowchart for the full decision tree, see [references/splitting-spidr.md](references/splitting-spidr.md) and [references/splitting-flowchart.md](references/splitting-flowchart.md)
 - **Refine the backlog continuously** - break items down until each is doable within one sprint and ready, see [references/backlog-refinement.md](references/backlog-refinement.md)
 
 ## Gotchas
 
-- INVEST "S" is **Small** (a few person-weeks at most, finishable within a sprint), not "Sized appropriately".
 - A walking skeleton is **production code with tests** linking the main components end to end — not a throwaway prototype or a research spike.
 - Never split horizontally ("build the DB", "build the API", "build the UI"); those are tasks/components. Every story is a thin **vertical** slice.
 - A Spike yields **knowledge, not shippable value**, so it is a last-resort move, not itself a vertically-sliced story.
 - The template is a conversation starter, not a mandatory format — no method prescribes a fixed story format.
-- Acceptance criteria are not just the happy path; cover boundaries, error/invalid cases, and UI changes. They can later be written as Given-When-Then for automation — that notation is owned by **bdd-guide**.
+- Acceptance criteria can later be written as Given-When-Then for automation — that notation is owned by **bdd-guide**.
 - Backlog refinement is an **ongoing** activity, not a fixed weekly "grooming meeting"; sizing is the Developers' responsibility.
 
 ## Example

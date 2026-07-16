@@ -2,7 +2,7 @@
 
 ## Guideline
 
-A GitLab review has NO single object — assemble three parts and publish each immediately: a summary note, one position-anchored discussion per inline finding, and a separate approve/withhold verdict. This realizes `code-review-guide`'s findings on GitLab — what each comment says (Conventional Comments labels, blocking vs non-blocking, summary-plus-inline structure) is that skill's craft; this file is only how to deliver it.
+A GitLab review has NO single object — assemble three parts and publish each immediately: a summary note, one position-anchored discussion per inline finding, and a separate approve/withhold verdict. Comment content (labels, blocking vs non-blocking) is `code-review-guide`'s craft; this file is delivery only.
 
 ## (1) Summary — a plain note
 

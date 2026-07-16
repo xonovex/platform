@@ -23,7 +23,7 @@ Prefer the least adaptive reliable evaluator for each fact:
 4. test representative assistive-technology and platform combinations selected by the support profile;
 5. use qualified human review for semantics, usability, context, applicability, and claims automation cannot establish.
 
-Models may help cluster findings or draft non-authoritative descriptions. They do not invent passes, criteria, test execution, user evidence, or assessor authority.
+Models do not invent passes, criteria, test execution, user evidence, or assessor authority.
 
 ## Make tests reproducible
 
@@ -42,7 +42,7 @@ Publish through the selected native provider with:
 - remediation and retest requirements plus any separate exception reference;
 - assessor role, independence, qualification, and accountable decision boundary.
 
-A summary count is presentation, not the result. Preserve criterion-level outcomes and evidence.
+Preserve criterion-level outcomes and evidence, not only a summary count.
 
 ## Validate the assessment itself
 

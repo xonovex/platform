@@ -13,7 +13,7 @@ Make "remote" an abstraction, not a deployment fact: route all node-to-node traf
 1. Route every node-to-node message through the network API; never let nodes touch each other's state directly, so the API can choose wire vs. in-process delivery.
 2. Short-circuit local delivery: if the destination node is in the same process, call its receiver callback immediately and skip serialization/copies — identical behavior, zero wire cost.
 3. Run multiple nodes in one process for development (e.g. a server tab and a client tab) and step them under one debugger; the code is byte-for-byte what ships across real machines.
-4. Provide knobs to inject adverse conditions per pipe/node: artificial latency and upload/download bandwidth caps, so corner cases are reproducible without a real lossy network.
+4. Provide debug-layer knobs to inject adverse conditions per pipe/node (artificial latency, upload/download bandwidth caps).
 5. Build a packet inspector that can pause all simulations together and answer "what packets of type X were sent N frames ago," "how many were acked last frame," "how many arrived out of order."
 6. Branch single-player vs. multiplayer on node type via a topology switch; give it a catch-all (no node name) path that runs every branch in sequence, so a single node can play all roles for the offline build.
 
@@ -24,9 +24,6 @@ Make "remote" an abstraction, not a deployment fact: route all node-to-node traf
 net_o *net = net_create();
 net_node_o *server = net_create_node(net, 7777);
 net_node_o *client = net_create_node(net, 7778);
-// Dev-only knobs: reproduce bad networks without one.
-net_pipe_set_added_latency_ms(net, c2s_pipe, 120);
-net_node_set_bandwidth_caps(net, server, /*up*/ 256 * 1024, /*down*/ 0);
 
 // Topology branch: server and client take different paths; a node with no
 // name is "catch-all" and runs ALL branches in order -> single-player build.

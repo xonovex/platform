@@ -11,7 +11,6 @@ description: "Use when writing or reviewing shared-memory concurrent code: atomi
 
 ## Essentials
 
-- **Default relaxed, escalate deliberately** - Pick the weakest ordering that is correct, see [references/memory-ordering.md](references/memory-ordering.md)
 - **No data races** - Every shared mutable location touched by 2+ threads is atomic or lock-protected, see [references/memory-model.md](references/memory-model.md)
 - **CAS loops retry** - `compare_exchange_weak` in a loop; reload the expected value on failure, see [references/atomics-and-cas.md](references/atomics-and-cas.md)
 - **Lock-free needs reclamation** - Removing a node from a shared structure is not freeing it, see [references/safe-memory-reclamation.md](references/safe-memory-reclamation.md)
@@ -47,7 +46,6 @@ description: "Use when writing or reviewing shared-memory concurrent code: atomi
 - A successful CAS proves only that the bit pattern matched — not that nothing happened in between (ABA); pointers reused after free defeat it.
 - `volatile` is not atomic and gives no ordering — it never makes concurrent C correct; use `_Atomic`/`atomic_*`.
 - `compare_exchange_weak` may fail spuriously even when the value matches — only ever use it inside a retry loop.
-- `seq_cst` is the safe default for a first draft but the slowest; relaxing it later requires a proof, not a guess.
 - Removing a node from a lock-free list does not mean no other thread is still dereferencing it — freeing too early is a use-after-free.
 - Two unrelated atomics on the same cache line still contend (false sharing) — alignment, not correctness, but it can erase all your scaling.
 

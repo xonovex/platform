@@ -14,32 +14,7 @@ Editors need "edit the template, all copies update — but keep the local tweaks
 2. Resolve a property by checking the instance's override bitmask: if the bit is set, use the instance's value; otherwise read through to the prototype — recursively up the whole chain.
 3. Setting a property sets its override bit; "revert to prototype" clears the bit and drops the local value.
 4. For sub-object collections (sets), track three states per child: _inherited_ (comes from the prototype untouched), _instantiated_ (a local overridable copy — itself a child prototype), and _removed_ (suppressed from the inherited set). Represent edits as add/remove/instantiate ops, not a wholesale value override.
-5. Serialize only the overrides plus the prototype reference; reconstruct inherited values from the prototype on load.
-6. Propagate a prototype edit to instances at resolve time (instances read through), so no push/copy step is needed.
-
-## Example
-
-```c
-// Instance stores prototype + an override bitmask; unset bits read through the chain.
-typedef struct object_t {
-    object_id_t prototype;     // 0 = no prototype (a root)
-    uint64_t    overridden;    // bit i set => property i is local, else inherit
-    value_t     props[MAX_PROPS];
-} object_t;
-
-value_t resolve(const model_t *m, object_id_t id, int prop) {
-    const object_t *o = obj(m, id);
-    if (o->overridden & (1ull << prop)) return o->props[prop];  // local override
-    if (o->prototype) return resolve(m, o->prototype, prop);    // walk the chain
-    return default_value(m, type_of(o), prop);                  // root: schema default
-}
-
-void set_prop(model_t *m, object_id_t id, int prop, value_t v) {
-    object_t *o = obj(m, id);
-    o->props[prop] = v;
-    o->overridden |= (1ull << prop);   // now diverges from prototype; only this is saved
-}
-```
+5. Propagate a prototype edit to instances at resolve time (instances read through), so no push/copy step is needed.
 
 ## Gotchas
 

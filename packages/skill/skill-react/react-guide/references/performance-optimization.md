@@ -1,6 +1,6 @@
 # performance-optimization: Performance Optimization Techniques
 
-Let the React Compiler handle memoization; reserve `useMemo`/`useCallback` for effect dependencies. Use `memo()` for expensive components, `lazy()` + Suspense for route code-splitting, and Server Components/SSG for FCP and SEO.
+Use `memo()` for expensive components, `lazy()` + Suspense for route code-splitting, and Server Components/SSG for FCP and SEO.
 
 ## Example
 
@@ -36,6 +36,5 @@ function App() {
 - `memo()`: wrap expensive components to skip re-render on unchanged props
 - `lazy()` + Suspense: code splitting; cuts initial bundle
 - `useCallback`: stabilize callbacks passed to memoized children (pair with memo)
-- `useMemo`: only for effect dependencies or expensive one-time calculations
-- React Compiler: removes need for manual memoization in React 19
+- `useMemo`: memoize expensive one-time calculations
 - SSR/SSG: Server Components and static generation for FCP and SEO

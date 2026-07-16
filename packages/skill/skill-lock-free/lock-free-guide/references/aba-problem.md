@@ -6,11 +6,7 @@ Never assume a successful CAS means the location was untouched; if a value can c
 
 ## Rationale
 
-CAS compares bit patterns. If thread T reads head = A, stalls, and meanwhile another thread pops A, pushes B, and pushes A again (often the _same freed-then-reallocated node_), T's CAS still sees A and succeeds — but the surrounding structure has silently changed. The classic failure is a lock-free stack pop that swings `head` to a stale `A->next`, corrupting the list or touching freed memory.
-
-## Why CAS alone is insufficient
-
-the danger appears specifically when memory is _reclaimed and reused_. Without reclamation a node is never freed, so address A can't be recycled into a different logical node mid-operation; with reclamation, A's address can mean different things at different times, and CAS cannot tell them apart.
+CAS compares bit patterns. If thread T reads head = A, stalls, and meanwhile another thread pops A, pushes B, and pushes A again (often the _same freed-then-reallocated node_), T's CAS still sees A and succeeds — but the structure has silently changed. The danger appears specifically when memory is _reclaimed and reused_: without reclamation address A can't be recycled into a different logical node mid-operation; with reclamation it can, and CAS cannot tell them apart.
 
 ## Mitigations
 

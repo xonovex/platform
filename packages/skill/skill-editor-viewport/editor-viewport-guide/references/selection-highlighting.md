@@ -2,11 +2,7 @@
 
 ## Guideline
 
-Highlight the selection with a crisp constant-width outline by rendering selected objects' ids into a separate single-channel target, then edge-detecting that id target in one fullscreen pass after post-processing — comparing each pixel's id to its neighbors' to find silhouette edges, and comparing selection depth to scene depth so an occluded outline is dimmed rather than dropped.
-
-## Rationale
-
-A good selection outline must be readable, crisp, anti-aliased, a constant one pixel wide, composited after post-processing, still visible (dimmed) when the selected object is hidden behind unselected geometry, and cheap for any shader to opt into. Writing a selection id into a dedicated render target and doing edge detection on it satisfies all of these at once: edges fall exactly on silhouette boundaries (where the id changes), width is controlled by the sampling kernel rather than the geometry, and the pass runs late so it overlays the final image. The hard part is occlusion. Comparing the selection depth directly against the scene depth would be correct only if the depth buffers were stable — but with temporal anti-aliasing every frame applies a different sub-pixel jitter, so a direct compare makes the outline shimmer. Taking the closest selection depth over a small neighborhood before comparing both smooths jitter and lets the outline bleed slightly over occluders, which reads as a deliberate, soft hidden-outline rather than noise.
+Highlight the selection with a crisp constant-width outline by rendering selected objects' ids into a separate single-channel target, then edge-detecting that id target in one fullscreen pass after post-processing — comparing each pixel's id to its neighbors' to find silhouette edges, and comparing selection depth to scene depth so an occluded outline is dimmed rather than dropped. Edges fall exactly on silhouette boundaries (where the id changes) and outline width comes from the sampling kernel, not the geometry. For occlusion, a direct selection-vs-scene depth compare shimmers because TAA jitters depth per frame; take the closest selection depth over a small neighborhood before comparing.
 
 ## How to Apply
 

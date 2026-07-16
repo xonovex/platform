@@ -39,11 +39,9 @@ caveats, gotchas, non-obvious constraints, style rules, or architectural decisio
 - Skip root AGENTS.md (always unique)
 - Redundant = removing title, description, guideline links, and code summaries leaves nothing
 - When unsure, keep the file
-- **Respect nested precedence:** the AGENTS.md closest to the edited file wins. Don't merge a subproject's AGENTS.md up into the root — its scope is intentionally narrower.
+- **Respect nested precedence:** the AGENTS.md closest to the edited file wins. Don't merge a subproject's AGENTS.md up into the root.
 
 ## Gotchas
 
 - A 100-line AGENTS.md that only restates code is _more_ redundant than a 5-line one with a real gotcha
 - Don't merge AGENTS.md files across distant subdirs — colocate signal with the code it applies to
-- Root AGENTS.md is the project's entry-point doc; never auto-delete even if it looks thin
-- A subproject's AGENTS.md may _look_ redundant against the root, but the closest-wins precedence means it's an intentional override — read both before classifying

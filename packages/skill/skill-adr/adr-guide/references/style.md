@@ -2,7 +2,7 @@
 
 ## Present-tense proposal voice
 
-Write the whole ADR in present (or future) tense as a standing proposal, never past tense — even for functionality that already ships. A retroactive ADR reads identically to a brand-new one. Convert passive past participles into active present.
+Write the whole ADR in present (or future) tense as a standing proposal, never past tense, even for functionality that already ships. Convert passive past participles into active present.
 
 - Bad: "The schema is generated from the spec." (passive, reads as done)
 - Good: "The build generates the schema from the spec."

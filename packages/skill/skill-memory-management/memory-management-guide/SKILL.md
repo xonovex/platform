@@ -28,7 +28,6 @@ General principles for allocating, owning, and freeing memory in manual-memory o
 
 ## Gotchas
 
-- An arena cannot free individual objects — anything outliving its reset is a use-after-free; match lifetimes.
 - Bump allocation has no bounds safety unless you check capacity; always assert/return on overflow.
 - Two owners means double-free or leak; decide ownership explicitly, don't infer it.
 - Pointers into a growing/reset allocation dangle — prefer offsets/handles across a boundary (a virtual-memory reserve/commit block is the exception: it never moves).

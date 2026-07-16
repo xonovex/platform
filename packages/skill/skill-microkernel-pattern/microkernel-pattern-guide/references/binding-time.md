@@ -34,6 +34,6 @@ ch := reg.Channels[cfg.Kind]
 return ch.Send(msg) // no shared body to edit
 ```
 
-**Pitfalls:** bound too early = ship N binaries or rebuild to switch a config-selectable backend, and a per-request capability check cannot live at compile time; bound too late = registry/keys/dispatch for a decision that resolves once per build, plus a config surface that can express invalid states. Name the moment the variant actually changes, then pick the cheapest technique that resolves then.
+**Pitfalls:** bound too late = registry/keys/dispatch for a decision that resolves once per build, plus a config surface that can express invalid states. Name the moment the variant actually changes, then pick the cheapest technique that resolves then.
 
 See [core-plugins-registry.md](core-plugins-registry.md) (run-time lookup), [wiring.md](wiring.md) (load-time population), **connascence-guide**. Back to [SKILL.md](../SKILL.md).

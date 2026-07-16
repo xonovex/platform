@@ -2,11 +2,11 @@
 
 ## Guideline
 
-Record GPU work into command streams allocated from a context owned by one thread for one frame and reset wholesale; record independent passes in parallel into separate streams executed by a primary one; double- or triple-buffer all per-frame mutable resources behind one fence per frame so the CPU prepares frame N+1 while the GPU consumes frame N, and never overwrites a resource the GPU still reads.
+Record GPU work into command streams allocated from a context owned by one thread for one frame and reset wholesale; record independent passes in parallel into separate streams executed by a primary one; keep per-frame mutable resources in slots behind one fence per frame so the CPU prepares frame N+1 while the GPU consumes frame N.
 
 ## Rationale
 
-Command-recording memory is not thread-safe and cannot be freed per-stream cheaply; the efficient model is one recording context per thread per frame slot, recording into it, submitting, then resetting the whole context in O(1) once the GPU is done — enforced by a per-slot fence the submission signals on completion, waited before the CPU reuses that slot's context, command memory, bindings, and ring-buffer ranges. Keep a small number of frame slots in flight (typically 2 or 3): the CPU records slot i while the GPU executes slot i-1. Recording is the parallelizable part of a frame — split passes across threads, each writing a secondary stream with its own context, then have one primary stream execute them in order. The swapchain ties it together: acquire an image (waiting a queue-side signal), render, present (waiting render-done), and gate the slot's next reuse on its fence.
+Command-recording memory is not thread-safe and cannot be freed per-stream cheaply; the efficient model is one recording context per thread per frame slot, recording into it, submitting, then resetting the whole context in O(1) once the GPU is done — enforced by a per-slot fence the submission signals on completion, waited before the CPU reuses that slot's context, command memory, bindings, and ring-buffer ranges. Keep a small number of frame slots in flight: the CPU records slot i while the GPU executes slot i-1. Recording is the parallelizable part of a frame — split passes across threads, each writing a secondary stream with its own context, then have one primary stream execute them in order. The swapchain ties it together: acquire an image (waiting a queue-side signal), render, present (waiting render-done), and gate the slot's next reuse on its fence.
 
 ## Techniques
 
@@ -14,10 +14,7 @@ Command-recording memory is not thread-safe and cannot be freed per-stream cheap
 - **Primary vs secondary** - Primary streams are submitted to a queue; secondary streams are recorded by worker threads and invoked from a primary.
 - **Multi-threaded recording** - Partition draws/passes across threads, each recording its own secondary stream into its own context; join, then a primary executes them. Recording scales; submission stays single-threaded.
 - **Sort keys** - Tag each recorded command with a 64-bit sort key; merge all threads' streams and sort by key before submission. GPU execution order is then decoupled from the order (and thread) commands were recorded in, so workers record independently and ordering is resolved once, afterward.
-- **Frames in flight** - N frame slots (2 = double, 3 = triple buffer), each with its own recording contexts, per-frame bindings, ring-buffer ranges, and one fence.
-- **Per-frame resource sets** - Anything the GPU reads that the CPU also rewrites (uniforms, instance buffers, dynamic bindings) is duplicated per slot so writing slot i can't race the GPU reading slot i-1.
 - **Acquire/submit/present loop** - acquire image (signal image-available) → record → submit (wait image-available, signal render-done, signal fence) → present (wait render-done), see [references/synchronization.md](./synchronization.md).
-- **Fence-gated reuse** - At frame start, wait the fence for the slot about to be reused — not the one just submitted — so the CPU runs ahead by N-1 frames.
 
 ## Example
 
@@ -55,10 +52,7 @@ void draw_frame(uint64_t frame) {
 
 - Recording into (or resetting) a context whose previous submission's fence has not signaled corrupts in-flight GPU work — always gate reuse on the slot fence.
 - Sharing one recording context across threads is a data race; contexts are externally synchronized — one context per thread.
-- Waiting on the fence of the frame you just submitted (instead of the slot you are about to reuse) collapses frames-in-flight back to a full CPU/GPU stall.
-- Per-frame resources must be genuinely duplicated; a single shared dynamic buffer written each frame races the GPU reading last frame's value.
 - The swapchain can return out-of-date/suboptimal on resize; recreate the swapchain and dependent targets, do not present into a stale image.
-- More frames in flight adds input latency and multiplies per-frame memory; 2–3 is the usual sweet spot, not "as many as possible".
 - Without a sort key, GPU order _is_ the order commands were recorded, so multi-threaded recording forces threads to coordinate their relative ordering; a per-command key lets each thread record obliviously and the order is sorted out after the join.
 
 ## Related

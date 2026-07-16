@@ -1,13 +1,12 @@
 # timestamp-testing: Avoid Flaky Timestamp Assertions
 
-Rapid operations can complete within the same millisecond, so `updated.updatedAt !== created.updatedAt` is flaky. Prefer asserting existence/format or a before/after range; assert inequality only after an explicit delay.
+Rapid operations can share a millisecond, so `updated.updatedAt !== created.updatedAt` is flaky. Assert existence/format, or put the delay in the **test body** (not the implementation under test) before comparing.
 
 ```typescript
-// ✅ existence + format
+// existence + format
 expect(updated.updatedAt).toBeDefined();
-expect(new Date(updated.updatedAt)).toBeInstanceOf(Date);
 
-// ✅ inequality only after a real delay
+// inequality only after a delay in the test itself
 await new Promise((r) => setTimeout(r, 50));
 const updated = await updateUser(created.id);
 expect(new Date(updated.updatedAt).getTime()).toBeGreaterThan(

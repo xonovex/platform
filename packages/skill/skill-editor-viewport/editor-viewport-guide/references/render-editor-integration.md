@@ -6,7 +6,7 @@ Bridge the renderer and the editor with a thin, render-pipeline-agnostic API: th
 
 ## Rationale
 
-Picking, selection highlighting, and overlay rendering (grids, gizmos) live in the borderland between two subsystems that change at different rates and are owned by different code. If editor code reaches directly into the renderer, every pipeline change ripples into tools and every tool couples to one rendering backend. A narrow data seam inverts that: the editor populates a small struct and calls one function; the viewport layer decides how to realize it. This keeps the editor portable across rendering backends, lets the renderer evolve freely, and makes each feature trivially multi-viewport because the per-viewport state lives behind the seam, not in the editor. Compositing editor overlays after tone-mapping and in the same sRGB color space as the rest of the UI keeps their colors consistent and predictable regardless of the scene's HDR pipeline.
+If editor code reaches directly into the renderer, every pipeline change ripples into tools and every tool couples to one rendering backend. A narrow data seam inverts that: the editor populates a small struct and calls one function; the viewport layer decides how to realize it. This keeps the editor portable across backends and makes each feature trivially multi-viewport because the per-viewport state lives behind the seam. Compositing overlays after tone-mapping and in the same sRGB space as the UI keeps their colors consistent regardless of the scene's HDR pipeline.
 
 ## How to Apply
 

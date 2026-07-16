@@ -2,11 +2,7 @@
 
 ## Guideline
 
-The application owns DPI scaling, not the OS. Lay out the UI in virtual coordinates (1:1 at 100% / 96 DPI), apply the per-monitor scale at the edges (vertex shader and rect conversion), and key the font atlas by DPI so text stays sharp.
-
-## Rationale
-
-Letting the OS bitmap-rescale a high-DPI window blurs everything. Owning the scale keeps the immediate-mode core DPI-unaware (virtual coordinates) while vector primitives, text, thumbnails, and viewports each scale correctly. Per-monitor awareness matters because a window can straddle or move between monitors with different DPIs.
+The application owns DPI scaling, not the OS. Lay out the UI in virtual coordinates (1:1 at 100% / 96 DPI), apply the per-monitor scale at the edges (vertex shader and rect conversion), and key the font atlas by DPI so text stays sharp. Per-monitor awareness matters because a window can straddle or move between monitors with different DPIs.
 
 ## How to Apply
 

@@ -10,7 +10,6 @@ Operate AWS as an optional runtime, authorization, governance, audit, configurat
 ## Essentials
 
 - **Discover authority first** — resolve partition, organization/account/OU, region, caller ARN/session, identity policies, boundaries, SCPs, resource policies, trust policies, and service configuration before evaluation or mutation.
-- **Prefer temporary federation** — use workforce/workload federation, OIDC, IAM roles, and short sessions; never create long-lived access keys by default.
 - **Evaluate all policy layers** — an allow is effective only within identity/resource policy, permissions boundary, session policy, SCP/RCP where applicable, explicit denies, and service-specific authorization.
 - **Separate guardrails from grants** — SCPs set maximum permissions and do not grant access; role policies and resource policies provide authorized actions.
 - **Preserve native evidence** — return opaque STS session, IAM policy, CloudTrail event, Config evaluation, Security Hub finding, and target-resource references with account/region/revision/freshness.
@@ -30,7 +29,6 @@ Operate AWS as an optional runtime, authorization, governance, audit, configurat
 - OIDC trust with a broad subject can grant every repository/project/workflow the role even when the permissions policy looks narrow.
 - IAM policy simulation is evidence, not final proof for every service condition or resource policy; run bounded allowed and denied live probes where safe.
 - CloudTrail Event history, trails, Lake event data stores, region coverage, data events, retention, and integrity are distinct configuration choices.
-- Config conformance packs and Security Hub standards/findings are assessment evidence, not automatic legal or security compliance.
 - Break-glass is a scoped, monitored, expiring exception with independent evidence; it is not a permanent admin role shared by automation.
 
 ## Example

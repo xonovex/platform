@@ -15,22 +15,14 @@ Without `_XOPEN_SOURCE` (or equivalent), strict `-std=c99` turns every POSIX cal
 
 ## Unused symbols are library surface, not defects
 
-The decisive split: **`-Werror` for correctness warnings, but the unused-_symbol_ family is not an error for library code.**
+For library code, `-Werror` on correctness warnings, but relax the whole unused-_symbol_ family (a library legitimately carries interface-mandated parameters, header-defined reflection/mapping tables, and `_DEFAULT` helpers its own TUs never reference). Keep **`-Wunused-value`** — a discarded computation is a real bug — as a hard error:
 
 ```
 -Werror -Wno-unused-parameter -Wno-unused-variable -Wno-unused-but-set-variable -Wno-unused-function
         -Wno-missing-field-initializers -Wno-missing-braces   # ZII is intentional
 ```
 
-A library legitimately carries surface its own translation units never reference:
-
-- interface-mandated callback/vtable parameters,
-- reflection / enum-name / backend-mapping tables defined in **headers** — these compile into _every_ includer, so a consumer that doesn't use one would otherwise fail `-Werror` on the library's header,
-- `_DEFAULT` consts and helpers built for callers.
-
-Forcing `(void)param;` and `__attribute__((unused))` across that surface is noise that fights the nature of a library. So relax the unused-symbol family for it — but keep **`-Wunused-value`** (a discarded computation is a real bug) and every correctness warning as a hard error. Leaf/application targets keep the full set: there, an unused symbol _is_ dead code.
-
-This is the one place the "fix every warning" reflex is wrong: for a library, unused surface is the point.
+Leaf/application targets keep the full set: there, an unused symbol _is_ dead code.
 
 ## snprintf truncation
 

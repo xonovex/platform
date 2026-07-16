@@ -8,14 +8,14 @@ INVEST checks one story; SMART checks the tasks a ready story is broken into. A 
 - **N — Negotiable** — not a fixed contract; details co-created in conversation.
 - **V — Valuable** — value the customer can see (not "add a payments table").
 - **E — Estimable** — understood well enough to size and rank.
-- **S — Small** — a few days up to ~two weeks, finishable within a sprint. The canonical expansion is **Small**, not "Sized appropriately".
+- **S — Small** — a few days up to ~two weeks, finishable within a sprint.
 - **T — Testable** — a test can confirm it is done.
 
 Fails **Small** or **Estimable** → split (see [splitting-spidr.md](splitting-spidr.md), [splitting-flowchart.md](splitting-flowchart.md)).
 
 ## SMART (the tasks beneath a story)
 
-**Specific · Measurable · Achievable · Relevant · Time-boxed** (hours, not weeks). The canonical "A" is **Achievable** and "R" is **Relevant** — not "Assignable / Agreed-upon / Realistic", which circulate but are non-canonical.
+**Specific · Measurable · Achievable · Relevant · Time-boxed** (hours, not weeks).
 
 INVEST governs the story (customer value); SMART governs its tasks (engineering work). Do not cross-apply them.
 

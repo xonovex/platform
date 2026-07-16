@@ -6,7 +6,7 @@ Let rendering-relevant components implement renderer-facing interfaces, cull onc
 
 ## Rationale
 
-Expressing "which viewers see this object" as bits lets a single parallel pass per component type visit each renderable once for all viewers (which is what makes per-camera state mutation safe). Plugin interfaces keep the core renderer ignorant of specific component types, so new renderable kinds need no core changes.
+Expressing "which viewers see this object" as bits lets a single parallel pass per component type visit each renderable once for all viewers, instead of re-traversing the scene once per camera.
 
 ## How to Apply
 

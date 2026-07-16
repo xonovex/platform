@@ -11,7 +11,7 @@ Resolve and record:
 - entity, product, system, sector, organization-size, research, open-source, national-security, or personal-use scope where relevant;
 - confirmed facts, assumptions, unresolved questions, candidate obligations, evidence, source version, reviewer, and review date.
 
-Unknown classification or role fails visibly when a profile claims a regulated guarantee. Do not choose the convenient role or infer legal conclusions from marketing labels.
+Unknown classification or role fails visibly when a profile claims a regulated guarantee.
 
 ## Keep claim authority explicit
 
@@ -23,7 +23,7 @@ Distinguish:
 - qualified domain, security, privacy, accessibility, or legal review;
 - accountable organizational decisions and external authority.
 
-An agent can assemble sources, identify questions, and draft candidate mappings. It cannot replace licensed text, qualified legal advice, a notified or accredited assessment, organizational accountability, or regulator authority.
+An agent drafts candidate mappings; it cannot replace licensed text, qualified legal advice, a notified or accredited assessment, organizational accountability, or regulator authority.
 
 ## Map frameworks without claiming equivalence
 

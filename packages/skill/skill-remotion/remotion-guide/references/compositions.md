@@ -1,6 +1,6 @@
 # compositions: Composition Structure and Metadata
 
-Register `<Composition>` in `Root.tsx` with required `id`, `component`, `durationInFrames`, `fps`, `width`, `height`. Type props with `type` + `z.infer` (not `interface` — better `defaultProps`/Zod inference); pass a Zod `schema` (`zColor()`, `z.number().min().max()`, `z.enum()`) for the visual param editor and `defaultProps` for every field. Resolve dynamic duration/dimensions async via `calculateMetadata({props}) => ({durationInFrames, ...})`.
+Register `<Composition>` in `Root.tsx` with required `id`, `component`, `durationInFrames`, `fps`, `width`, `height`. Pass a Zod `schema` (`zColor()` for colors, `z.number().min().max()`, `z.enum()`) for the visual param editor. Resolve dynamic duration/dimensions async via `calculateMetadata({props}) => ({durationInFrames, ...})`.
 
 ```tsx
 const schema = z.object({
@@ -8,9 +8,8 @@ const schema = z.object({
   backgroundColor: zColor(),
   fontSize: z.number().min(10).max(200),
 });
-type Props = z.infer<typeof schema>;
 
-<Composition<Props>
+<Composition
   id="MyVideo"
   component={MyVideo}
   durationInFrames={300}

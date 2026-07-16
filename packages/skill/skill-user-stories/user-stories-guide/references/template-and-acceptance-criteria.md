@@ -12,16 +12,9 @@ The template forces What and Why while keeping How open — exactly what makes a
 
 ## Acceptance criteria
 
-The Confirmation from the 3 Cs (see [three-cs.md](three-cs.md)) written down. Good coverage spans four categories, not just the first:
+The Confirmation from the 3 Cs (see [three-cs.md](three-cs.md)) written down.
 
-- **Happy path** — the main success scenario.
-- **Boundaries** — empty, zero, minimum, maximum, first, last.
-- **Errors / invalid cases** — rejected input, failed dependency, unmet precondition.
-- **UI changes** — visible state changes: what the user now sees, what becomes enabled or hidden.
-
-**Sufficiency:** criteria are enough only when every rule has at least one confirmable (testable) criterion across the four categories; a rule with no confirmable criterion is not ready.
-
-Criteria CAN be expressed as Given-When-Then (owned by **bdd-guide**); designing the tests themselves — levels, doubles, structure — is owned by **testing-guide**. This skill stops at "criteria exist and cover the four categories".
+Criteria CAN be expressed as Given-When-Then (owned by **bdd-guide**); designing the tests themselves — levels, doubles, structure — is owned by **testing-guide**. This skill stops at "criteria exist".
 
 ## Example
 

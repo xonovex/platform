@@ -13,7 +13,7 @@ Operate Bitrise as an optional mobile CI, artifact, deployment-status, and nativ
 - **Compose native units** — Workflows group Steps; Pipelines orchestrate Workflows; triggers select them. Keep each identity/version and evidence reference explicit.
 - **Pin executable Steps** — prefer verified sources and exact reviewed versions; verification is provenance evidence, not permission or compatibility proof.
 - **Protect secrets and artifacts** — disclose pull-request exposure, runner trust, variable scope, artifact access/retention, network/data flow, and build-status publication.
-- **Federate AWS access** — constrain Bitrise OIDC claims and issue temporary least-privilege role sessions; never create access keys by default.
+- **Federate AWS access** — constrain Bitrise OIDC claims to the intended workspace/app/repository/workflow/environment.
 - **Transact setup** — discover, preview exact native changes, authorize, apply idempotently, re-read and probe, roll back, and detect drift.
 
 ## Workflow

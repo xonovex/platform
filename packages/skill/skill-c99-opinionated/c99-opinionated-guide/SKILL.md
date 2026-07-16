@@ -16,7 +16,7 @@ description: "Use when editing systems or embedded C99 code in projects that fol
 
 - **Implementation variants** - Ship scalar → AoS → SoA → SIMD with `_*` suffixes + parity tests; layout rationale in **data-oriented-design-guide**, see [references/implementation-variants.md](references/implementation-variants.md)
 - **Caller-owns-memory** - This style's default; the general principle (arenas/ownership) lives in **memory-management-guide**, see [references/caller-owns-memory.md](references/caller-owns-memory.md)
-- **Handles & indices** - Store cross-object references as a stable index or generational handle into a caller-owned array, never a raw pointer — relocatable, serializable, deterministic, see [references/handles-and-indices.md](references/handles-and-indices.md)
+- **Handles & indices** - Reference objects by index into a caller-owned array; add a generation counter when slots are recycled so stale handles fail their check, see [references/handles-and-indices.md](references/handles-and-indices.md)
 - **Alignment** - C `_Alignas`/aligned allocation; the _why_ is in **data-oriented-design-guide** (SIMD) and **lock-free-guide** (false sharing), see [references/alignment.md](references/alignment.md)
 - **Composability** - Composable stages/primitives over a uniform currency, explicit caller-wired composition, see [references/composability.md](references/composability.md)
 - **Hot reload** - Reloadable native modules via API/function-pointer tables + host-owned state, see [references/hot-reload.md](references/hot-reload.md)
@@ -43,7 +43,6 @@ description: "Use when editing systems or embedded C99 code in projects that fol
 - One header including another silently reintroduces the include cascade and recompilation storms — keep the no-header-includes rule machine-checked in CI
 - A cached plugin-interface or cross-module function pointer dangles after reload/unload — re-fetch from the registry, never stash it across that boundary
 - A C API that lets a caller keep a borrowed pointer past the call is a lifetime contract a GC language can't honor; default to call-scoped pointers and document the rare exceptions
-- A raw pointer stored into a caller-owned array dangles the moment that array is re-bound, compacted, or grown — store an index/handle and resolve it per use; pointer values also vary run to run (ASLR/allocator), breaking determinism and serialization
 - A recycled slot makes a bare index alias a different object — add a generation counter to the handle so a stale reference fails its check instead of reading the wrong data
 - `strlen`/`strcmp`/`strtok` rescan to the terminator on every call, so a loop over them is silently O(n²) (the GTA Online JSON-load case) — carry length in a view and never rescan
 

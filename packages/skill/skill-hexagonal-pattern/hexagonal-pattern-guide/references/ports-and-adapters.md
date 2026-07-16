@@ -19,7 +19,6 @@ type OrderRepository interface { // driven port: the core calls out
 ```
 
 - Grade each boundary with **connascence-guide**: a port should carry only name/type, never positional or algorithmic assumptions about its implementation.
-- A neutral value (e.g. `OrderRecord`) crosses the boundary so no adapter leaks its own row or blob type into the core.
 
 ## Relationship to other patterns
 

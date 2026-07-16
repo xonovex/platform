@@ -13,7 +13,7 @@
 
 ## Native capabilities
 
-Pi extensions are TypeScript modules with lifecycle events, custom tools, commands, UI, session state, and provider access. Packages can bundle extensions, skills, prompt templates, and themes. Project-local dynamic resources load only after project trust. None of this is a built-in sandbox.
+Pi extensions are TypeScript modules with lifecycle events, custom tools, commands, session state, and provider access; packages bundle extensions, skills, templates, and themes. Project-local resources load only after project trust, and none of this is a built-in sandbox.
 
 | Semantic intent                | Native mapping                               | Support                         | Blocking/context                          | Ordering and limits                                                 |
 | ------------------------------ | -------------------------------------------- | ------------------------------- | ----------------------------------------- | ------------------------------------------------------------------- |

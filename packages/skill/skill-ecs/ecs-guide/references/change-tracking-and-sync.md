@@ -6,12 +6,12 @@ When a stateful external system (physics, renderer, audio) must mirror ECS data,
 
 ## Rationale
 
-The ECS stores raw batch-iteration data and does not inherently know "what changed"; the external system needs creation/modification/deletion told to it explicitly. Brute force (a filter-and-batch system pushing every matching entity) is the simplest correct approach and cache-friendly. Cleverer schemes trade simplicity for speed — most dangerously callbacks, which fire outside the declared read/write dependencies and therefore break the parallel scheduler (and can recurse).
+Brute force (a filter-and-batch system pushing every matching entity) is the simplest correct approach and cache-friendly. Callbacks are the dangerous alternative: they fire outside the declared read/write dependencies and therefore break the parallel scheduler (and can recurse).
 
 ## How to Apply
 
 1. Start with **brute force**: a system that runs over all matching entities and pushes their state to the external system (`setGlobalPose(...)`).
-2. If only a few of many change per frame, add per-component **dirty/version flags**, or a hierarchical tree of version flags for O(log N) skipping of unchanged subtrees.
+2. If only a few of many change per frame, add per-component **dirty/version flags**.
 3. Need polling without push? Maintain **change lists** per component/type that systems drain — this preserves automatic parallelization via declared read/write locks.
 4. For lifecycle only (creation/teardown), callbacks are acceptable; for general propagation they are not.
 5. Sequence dependent passes so the mirror runs _before_ anything that raycasts/queries the external system this frame.

@@ -26,14 +26,10 @@ void      pool_free(pool_t *p, handle_t h);     // the one owner reclaims
 
 // Lifetime by phase: everything for the frame dies together — no per-object frees.
 arena_reset(&frame_arena);   // end of frame
-
-// Bad: ambiguous ownership — does the caller free the returned pointer? both might, or neither.
-node_t *get_node(graph_t *g, int i);            // owning or borrowing? unclear -> leak or double-free
 ```
 
 ## Gotchas
 
-- Returning a raw pointer rarely documents ownership; prefer a handle, an explicit `_borrow`/`_take` naming convention, or a comment stating who frees.
 - A borrowed pointer cached across an allocation, reset, or free dangles — re-fetch it, or hold a handle.
 - Reference counting has its own hazards (cycles leak; the inc/dec is a cost and, when shared across threads, a race — see lock-free-guide); don't reach for it to paper over unclear ownership.
 

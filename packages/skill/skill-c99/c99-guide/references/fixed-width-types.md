@@ -33,15 +33,6 @@ typedef struct {
 
 Reach for exact-width by default; these are for the uncommon case where you are explicitly trading storage against speed.
 
-## Print and scan them portably
-
-`%d` / `%u` do not match fixed-width types on every platform. Use the `<inttypes.h>` macros:
-
-```c
-#include <inttypes.h>
-printf("id=%" PRIu32 " off=%" PRId16 "\n", r.id, r.offset);
-```
-
 ## Why it matters
 
 Determinism and portability. A struct of exact-width fields has the same size and layout on every target, so it serializes, hashes, and compares bit-identically. A struct of `int`/`long` does not: `long` is 32-bit on Windows and 64-bit on most 64-bit Unix targets, and that single difference silently breaks save files, network packets, and cross-compiler reproducibility.

@@ -1,44 +1,12 @@
 # Structure Mirrors the Model
 
-Make the directory tree isomorphic to the conceptual model so reading it reveals the axes and variants with no external map — the structure should scream the domain, not the layer. See [SKILL.md](../SKILL.md).
-
-## Package by variation point, not by layer
-
-- **Top dir per axis** — name each directory for one design decision likely to change. A newcomer reads the dirs and recovers the model.
-- **Leaf per variant, plus `shared/`** — each axis dir holds bare variant siblings plus a `shared/` core. See [naming-symmetry.md](naming-symmetry.md).
-- **Each axis owns its own types/utils/shared** — a root full of `utils/`, `helpers/`, `types/`, `services/`, `controllers/` smears one axis across many dirs (package-by-layer) and hides the axes. Push every helper down into the axis that uses it.
-
-```
-BAD  package-by-layer — screams the framework, hides the model
-internal/{types,utils,services,controllers}/
-GOOD package-by-axis — screams the domain
-internal/
-  format/{shared,json,csv,parquet}/    # how a record is encoded
-  sink/{shared,file,s3,stdout}/        # where the bytes land
-  compression/{shared,none,gzip,zstd}/ # how the bytes are squeezed
-  registry.go                          # single composition root
-```
+Make the directory tree isomorphic to the conceptual model so reading it reveals the axes and variants with no external map — the structure should scream the domain, not the layer. Name each top dir for one axis, hold bare variant siblings plus a `shared/` core, and let each axis own its own types/utils rather than a root-level `utils/`/`helpers/`/`services/`. See [SKILL.md](../SKILL.md) and [naming-symmetry.md](naming-symmetry.md).
 
 ## Ports and adapters
 
 - **Each axis interface is a port** — the abstract contract lives in that axis's `shared/`; consumers depend on the port, never a concrete leaf (the microkernel structure).
 - **Each concrete variant is an adapter** — `sink/s3/` adapts object storage to the `Sink` port. Swapping variants is Strategy; bridging a port to a foreign API is the adapter side of hexagonal.
 - **Consumers are adapters too** — a CLI and a scheduled service are two driving adapters over the same ports; anything both need lives below them in `shared/`. See [applying-the-layout.md](applying-the-layout.md).
-
-## One composition root
-
-A single file (a `DefaultRegistry`) is the only thing that imports every concrete variant and binds it to its port; everything else depends on interfaces only. That one-way fan-in keeps the graph acyclic and the swap surface tiny.
-
-```go
-// registry.go — the ONLY importer of concrete variants
-func DefaultRegistry() Registry {
-  return Registry{
-    Format:      map[string]Encoder{"json": json.New(), "csv": csv.New(), "parquet": parquet.New()},
-    Sink:        map[string]Sink{"file": file.New(), "s3": s3.New(), "stdout": stdout.New()},
-    Compression: map[string]Compressor{"none": none.New(), "gzip": gzip.New(), "zstd": zstd.New()},
-  }
-}
-```
 
 ## Stable abstract core, unstable concrete leaves
 

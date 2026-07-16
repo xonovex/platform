@@ -22,7 +22,7 @@ description: "Use when editing or scaffolding Express 5+ API servers in TypeScri
 
 - Express 4 swallows unhandled async errors silently — wrap async handlers or upgrade to Express 5 (which forwards to error middleware)
 - Error-handling middleware needs **four** parameters `(err, req, res, next)` — three-arg middleware is a regular handler, not an error one
-- Middleware order is execution order — auth before route, error handler last; misordering creates security holes or silent skips
+- Middleware order is execution order — auth must run before its route handler; misordering creates security holes or silent skips
 - `res.json()` ends the response — calling it twice (e.g. after `next()`) throws `Cannot set headers after they are sent`
 
 ## Progressive disclosure
@@ -34,5 +34,4 @@ description: "Use when editing or scaffolding Express 5+ API servers in TypeScri
 - Read [references/authentication.md](references/authentication.md) - Load when implementing JWT auth or session management
 - Read [references/error-handling.md](references/error-handling.md) - Load when centralizing error responses
 - Read [references/responses.md](references/responses.md) - Load when standardizing API response formats
-- Read [references/app-setup.md](references/app-setup.md) - Load when configuring Express app initialization
 - Read [references/testing.md](references/testing.md) - Load when writing unit or integration tests

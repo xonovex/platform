@@ -1,6 +1,6 @@
 # effects: Audio Effects and Processing
 
-Chain effects with dot notation; watch gain staging to avoid clipping.
+Chain effects with dot notation; mind gain staging.
 
 ```javascript
 note("c2*8")

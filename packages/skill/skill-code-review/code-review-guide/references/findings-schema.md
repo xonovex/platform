@@ -25,13 +25,7 @@ The single canonical shape shared by every stage (analyze → refine → post �
 
 `decoration` and `blocking` must agree — dropping `blocking` flips the decoration off `(blocking)`. Bodies are self-contained (no "see the other comment") since findings post/edit/resolve independently.
 
-## Anchoring to new-file lines
-
-Anchors are **new-file** line numbers (the side a host inline comment attaches to), never old-file or absolute:
-
-- Parse each hunk header `@@ -a,b +c,d @@` and walk it: `+` and context lines advance the new-file counter; `-` lines do not.
-- `+` line → `lineType: ADDED`; unchanged in-hunk line → `lineType: CONTEXT`.
-- A `path` / `line` that is not a real ADDED/CONTEXT diff line orphans when posted — re-anchor to one in a changed hunk.
+Anchors are **new-file** line numbers (the side a host inline comment attaches to), never old-file or absolute: a `+` line is `lineType: ADDED`, an unchanged in-hunk line is `CONTEXT`; a `path` / `line` that is not a real ADDED/CONTEXT diff line orphans when posted.
 
 ## Building the JSON
 

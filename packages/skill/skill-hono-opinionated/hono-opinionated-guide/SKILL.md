@@ -16,9 +16,9 @@ An overlay on **hono-guide**. Apply **hono-guide** for all generic Hono work —
 - **Foundation** - Everything generic lives in **hono-guide**; this skill layers OpenAPI-first conventions on top
 
 - **Async controllers** - Remove unnecessary `async` from synchronous handlers, see [references/controllers.md](references/controllers.md)
-- **OpenAPI type inference** - Use inline handlers for type safety, explicit status codes, OpenAPIHono hierarchy, see [references/openapi-inline-handlers.md](references/openapi-inline-handlers.md), [references/openapi-explicit-status-codes.md](references/openapi-explicit-status-codes.md), [references/openapi-router-hierarchy.md](references/openapi-router-hierarchy.md)
+- **OpenAPIHono hierarchy** - Every router in the chain must be `OpenAPIHono`, see [references/openapi-router-hierarchy.md](references/openapi-router-hierarchy.md)
 - **OpenAPI documentation** - Use `app.doc()` for automatic spec generation, see [references/openapi-spec-generation.md](references/openapi-spec-generation.md)
-- **Router selection** - LinearRouter for serverless, RegExpRouter for high-throughput, see [references/router-selection.md](references/router-selection.md)
+- **Router selection** - RegExpRouter for high-throughput persistent servers, see [references/router-selection.md](references/router-selection.md)
 - **Request limits** - Use `bodyLimit` middleware to prevent DoS, see [references/body-limit.md](references/body-limit.md)
 
 ## Example
@@ -43,17 +43,13 @@ export function createApp() {
 
 ## Gotchas
 
-- Inline OpenAPI handlers tie validation, status codes, and types together — splitting them later is painful, write them inline from day one
-- Explicit status codes (`c.json(body, 201)`) are required by the OpenAPI generator — implicit 200 produces wrong specs
 - Router hierarchy: parent routes inherit middleware; mounting a sub-router with `.route()` runs the parent middleware first
 - Picking the router (RegExpRouter / SmartRouter / TrieRouter / PatternRouter) is a startup decision — switching requires testing all routes
 
 ## Progressive disclosure
 
 - Read [references/controllers.md](references/controllers.md) - Load when seeing unnecessary async functions
-- Read [references/openapi-inline-handlers.md](references/openapi-inline-handlers.md) - Load when OpenAPI loses type inference
-- Read [references/openapi-explicit-status-codes.md](references/openapi-explicit-status-codes.md) - Load when defining OpenAPI response schemas
 - Read [references/openapi-router-hierarchy.md](references/openapi-router-hierarchy.md) - Load when composing multiple routers
 - Read [references/openapi-spec-generation.md](references/openapi-spec-generation.md) - Load when generating OpenAPI documentation
-- Read [references/router-selection.md](references/router-selection.md) - Load when optimizing for serverless/edge or high-throughput
+- Read [references/router-selection.md](references/router-selection.md) - Load when optimizing for high-throughput persistent servers
 - Read [references/body-limit.md](references/body-limit.md) - Load when preventing oversized request payloads

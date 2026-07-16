@@ -19,6 +19,4 @@ import SearchBar from "../components/SearchBar.tsx";
 
 - `client:load` — hydrate immediately (critical interactivity)
 - `client:idle` — hydrate on browser idle (lower priority)
-- `client:visible` — hydrate on viewport entry (below-the-fold)
 - `client:media={query}` — hydrate when the media query matches
-- `client:only={framework}` — skip SSR, render client-side only

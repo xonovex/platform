@@ -1,6 +1,6 @@
 # multi-stage-builds: Multi-Stage Build Pattern
 
-Separate deps/build/runtime into named stages (`AS <name>`); `COPY --from=<stage>` only the artifacts into a minimal runtime base (distroless or alpine). Keeps build tools out of the final image.
+Use a distroless runtime base (`gcr.io/distroless/nodejs22`, `USER nonroot:nonroot`) and a separate `deps` stage that installs only production dependencies before the `build` stage.
 
 ```dockerfile
 # syntax=docker/dockerfile:1.7

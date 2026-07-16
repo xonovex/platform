@@ -6,7 +6,7 @@ Compute a content hash over (source bytes + settings + the content hashes of eve
 
 ## Rationale
 
-Once compilation is deterministic, the output is a pure function of its inputs, so the input hash is a complete identity for the output (the same principle Git uses). Keying the cache on it cooks each distinct (input, settings, platform) combination at most once anywhere — a teammate or CI machine that already produced the artifact serves it directly. The hash must fold in dependencies' hashes transitively, not just the direct source, so an upstream change ripples down. The hash must cover everything that can affect the output and nothing that cannot: a path, host name, or timestamp breaks content-addressing and stops two machines from sharing.
+Compilation is deterministic, so the input hash is a complete identity for the output; keying the cache on it cooks each distinct (input, settings, platform) combination at most once. The hash must fold in dependencies' hashes transitively, not just the direct source. It must exclude anything that cannot affect the output: a path, host name, or timestamp breaks content-addressing and stops two machines from sharing.
 
 ## How to Apply
 

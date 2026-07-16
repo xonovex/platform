@@ -11,11 +11,8 @@ Name the worst rung a seam sits on, then push it one rung down. The ranking is t
 - **Data (best)** — plain parameters, no control; the callee depends only on the values it reads.
 
 ```go
-// Control coupling — BAD: caller drives the callee's branch with a flag.
+// Control coupling: caller drives the callee's branch with a flag.
 repo.Save(order, dryRun) // callee: if dryRun { validate } else { persist }
-// GOOD: split the branch into named operations.
-repo.Validate(order)
-repo.Persist(order)
 ```
 
 ## Tie to connascence

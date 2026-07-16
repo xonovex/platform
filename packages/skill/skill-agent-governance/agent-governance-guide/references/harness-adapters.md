@@ -4,7 +4,7 @@
 
 The governance owner defines semantic intents, guarantees, evidence, trust, and lifecycle requirements. A harness owner translates those requirements to native events, handlers, configuration scopes, diagnostics, and failure behavior. The adapter never creates a universal hook filename or treats similar event names as equivalent guarantees.
 
-Each harness owner depends on this contract and owns only product-specific facts. Keep platform URLs and provenance in that owner's `SOURCES.md`.
+Keep platform URLs and provenance in the harness owner's `SOURCES.md`.
 
 ## Adapter declaration
 

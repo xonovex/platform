@@ -13,7 +13,7 @@ Vanilla Three.js for scene setup, rendering, meshes, materials, lights, animatio
 - **Render loop** - Frame-rate independence with `clock.getDelta()`, see [references/scene-fundamentals.md](references/scene-fundamentals.md)
 - **Disposal** - Dispose geometries, materials, textures to prevent memory leaks, see [references/scene-fundamentals.md](references/scene-fundamentals.md)
 - **Pixel ratio** - Cap at 2 with `Math.min(devicePixelRatio, 2)`, see [references/scene-fundamentals.md](references/scene-fundamentals.md)
-- **Color space** - Use `SRGBColorSpace` for colors, `NoColorSpace` for data, see [references/textures.md](references/textures.md)
+- **Color space** - `NoColorSpace` for data textures (normal/roughness/metalness), not sRGB, see [references/textures.md](references/textures.md)
 - **Shadows** - Enable on renderer, light, mesh; keep frustum tight, see [references/lighting-shadows.md](references/lighting-shadows.md)
 
 ## Core Topics
@@ -41,5 +41,4 @@ Vanilla Three.js for scene setup, rendering, meshes, materials, lights, animatio
 - Geometries, materials, and textures must be explicitly `.dispose()`d — JS GC doesn't free GPU memory; long sessions leak VRAM
 - `BufferGeometry` replaced legacy `Geometry` years ago — old tutorials using `Geometry` silently fail on current versions
 - `renderer.setPixelRatio(window.devicePixelRatio)` is critical for retina — without it, scenes render at 1× and look blurry
-- Frustum culling is automatic for `Mesh`, but `LineSegments`/`Points` need explicit `geometry.computeBoundingSphere()` first
 - Loading a `.glb`/`.gltf` is async — accessing `scene.children` immediately after `loader.load()` returns an empty array
