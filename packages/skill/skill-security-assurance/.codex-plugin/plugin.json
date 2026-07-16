@@ -1,0 +1,19 @@
+{
+  "name": "xonovex-skill-security-assurance",
+  "version": "5.0.0",
+  "description": "Xonovex security assurance skills",
+  "author": {"name": "Xonovex"},
+  "skills": "./skills",
+  "interface": {
+    "displayName": "Security Assurance",
+    "shortDescription": "Risk, controls, evidence, and supply-chain trust",
+    "longDescription": "Plan and operate threat-informed security assurance across controls, secure development, exact-revision verification, supply-chain trust, exceptions, and incidents.",
+    "developerName": "Xonovex",
+    "category": "Productivity",
+    "capabilities": ["Read", "Write"],
+    "defaultPrompt": [
+      "Create a security assurance plan",
+      "Review this release's security evidence"
+    ]
+  }
+}

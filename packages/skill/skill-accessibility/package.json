@@ -1,0 +1,17 @@
+{
+  "name": "@xonovex/skill-accessibility",
+  "version": "5.0.0",
+  "private": true,
+  "type": "module",
+  "keywords": [
+    "xonovex",
+    "skill",
+    "accessibility",
+    "wcag",
+    "assurance"
+  ],
+  "scripts": {
+    "fmt": "prettier --write .",
+    "fmt:check": "prettier --check ."
+  }
+}

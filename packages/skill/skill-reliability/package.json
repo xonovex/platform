@@ -1,0 +1,17 @@
+{
+  "name": "@xonovex/skill-reliability",
+  "version": "5.0.0",
+  "private": true,
+  "type": "module",
+  "keywords": [
+    "xonovex",
+    "skill",
+    "reliability",
+    "resilience",
+    "operations"
+  ],
+  "scripts": {
+    "fmt": "prettier --write .",
+    "fmt:check": "prettier --check ."
+  }
+}

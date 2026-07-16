@@ -17,6 +17,11 @@
       "description": "Xonovex workflow commands — planning, code analysis, git"
     },
     {
+      "name": "xonovex-skill-accessibility",
+      "source": "./packages/skill/skill-accessibility",
+      "description": "Xonovex accessibility assurance skills"
+    },
+    {
       "name": "xonovex-skill-adr",
       "source": "./packages/skill/skill-adr",
       "description": "Xonovex ADR skills"
@@ -25,6 +30,11 @@
       "name": "xonovex-skill-agent-governance",
       "source": "./packages/skill/skill-agent-governance",
       "description": "Xonovex agent governance contract skills"
+    },
+    {
+      "name": "xonovex-skill-ai-governance",
+      "source": "./packages/skill/skill-ai-governance",
+      "description": "Xonovex AI governance and risk skills"
     },
     {
       "name": "xonovex-skill-android-analytics",
@@ -372,9 +382,19 @@
       "description": "Xonovex Reflect skills"
     },
     {
+      "name": "xonovex-skill-reliability",
+      "source": "./packages/skill/skill-reliability",
+      "description": "Xonovex reliability and resilience skills"
+    },
+    {
       "name": "xonovex-skill-remotion",
       "source": "./packages/skill/skill-remotion",
       "description": "Xonovex Remotion skills"
+    },
+    {
+      "name": "xonovex-skill-security-assurance",
+      "source": "./packages/skill/skill-security-assurance",
+      "description": "Xonovex security assurance skills"
     },
     {
       "name": "xonovex-skill-shell-scripting",

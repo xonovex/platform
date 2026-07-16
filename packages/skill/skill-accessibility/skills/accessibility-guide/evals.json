@@ -1,0 +1,33 @@
+{
+  "skill_name": "accessibility-guide",
+  "tier": "moderate",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Assess release candidate sha256:abc against WCAG 2.2 AA. We have an automated scanner report; tell me what evidence is still missing and what result to publish.",
+      "assertions": [
+        "Pins WCAG 2.2, level AA, the exact subject revision, applicable criteria, assessor origin, tools, environments, and limitations",
+        "Treats automation as partial evidence and requires representative keyboard, zoom/reflow, assistive-technology, error, focus, and dynamic-status testing where applicable",
+        "Publishes criterion-level pass, fail, not-applicable, and not-tested outcomes with findings, severity, evidence references, gaps, and reassessment conditions"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "A critical checkout flow fails one accessibility criterion. Product wants a permanent waiver because remediation is expensive. Define the safe workflow.",
+      "assertions": [
+        "Rejects a permanent default waiver and records exact scope, owner, authorized approver, affected users, rationale, compensating access, remediation owner, evidence, start, expiry, and review",
+        "Requires qualified accessibility and affected-user review appropriate to impact and never represents the exception as conformance",
+        "Blocks or fails visibly when the selected profile makes the criterion mandatory and no adequate enforcement or authorized unexpired exception exists"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Create an organization accessibility profile that works for web and native applications without inventing one universal scanner.",
+      "assertions": [
+        "Keeps the profile semantic and selects pinned standards, levels, applicable criteria, evidence, actors, freshness, and failure behavior independently of tools",
+        "Uses platform-specific implementation and test adapters while preserving comparable criterion-level outcomes and native evidence references",
+        "Includes design, implementation, automated checks, human and assistive-technology verification, release gating, monitoring, exceptions, drift, and retirement"
+      ]
+    }
+  ]
+}

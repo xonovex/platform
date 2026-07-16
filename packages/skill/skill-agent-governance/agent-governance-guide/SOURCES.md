@@ -5,8 +5,8 @@ The governance contract is an Xonovex architectural synthesis. Sources support c
 ## S-NIST-80053 — Security and privacy controls
 
 - **URL:** https://csrc.nist.gov/pubs/sp/800/53/r5/upd1/final
-- **Last reviewed:** 2026-07-14
-- **Used for:** `references/architecture.md`, `references/execution.md`, `references/policy-and-authority.md`, `references/modules.md`, `references/profiles.md`, `references/onboarding.md`, `references/inspect.md`, `references/conformance.md`, `references/drift.md`, `references/module-management.md`, `references/external-enforcement.md`, `references/external-enforcement-onboarding.md`
+- **Last reviewed:** 2026-07-16
+- **Used for:** `references/architecture.md`, `references/execution.md`, `references/policy-and-authority.md`, `references/modules.md`, `references/profiles.md`, `references/onboarding.md`, `references/inspect.md`, `references/conformance.md`, `references/drift.md`, `references/module-management.md`, `references/external-enforcement.md`, `references/external-enforcement-onboarding.md`, `references/policy-bundles.md`, `references/catalog-and-inventory.md`, `references/operations-and-learning.md`
 - **Aspects extracted:** Access, audit, configuration, incident, contingency, and supply-chain control families. Mappings remain contextual.
 
 ## S-NIST-800207 — Zero Trust Architecture
@@ -19,15 +19,15 @@ The governance contract is an Xonovex architectural synthesis. Sources support c
 ## S-NIST-80061 — Incident response
 
 - **URL:** https://csrc.nist.gov/pubs/sp/800/61/r3/final
-- **Last reviewed:** 2026-07-14
-- **Used for:** `references/policy-and-authority.md`, `references/conformance.md`
+- **Last reviewed:** 2026-07-16
+- **Used for:** `references/policy-and-authority.md`, `references/conformance.md`, `references/operations-and-learning.md`
 - **Aspects extracted:** Incident preparation, response, recovery, exception evidence, and post-event review.
 
 ## S-NIST-PRIVACY — Privacy Framework
 
 - **URL:** https://www.nist.gov/privacy-framework
-- **Last reviewed:** 2026-07-14
-- **Used for:** `references/policy-and-authority.md`, `references/profiles.md`, `references/onboarding.md`, `references/inspect.md`
+- **Last reviewed:** 2026-07-16
+- **Used for:** `references/policy-and-authority.md`, `references/profiles.md`, `references/onboarding.md`, `references/inspect.md`, `references/data-and-telemetry.md`, `references/operations-and-learning.md`
 - **Aspects extracted:** Data minimization and privacy-risk management; version and applicability remain explicit.
 
 ## S-AGENTSKILLS — Agent Skills specification
@@ -48,7 +48,7 @@ The governance contract is an Xonovex architectural synthesis. Sources support c
 
 - **URL:** https://www.openpolicyagent.org/docs
 - **Last reviewed:** 2026-07-14
-- **Used for:** `references/policy-and-authority.md`, `references/profiles.md`, `references/external-enforcement.md`, `assets/external-enforcement-fixtures.json`
+- **Used for:** `references/policy-and-authority.md`, `references/profiles.md`, `references/external-enforcement.md`, `references/policy-bundles.md`, `assets/external-enforcement-fixtures.json`, `assets/governance-operations-fixtures.json`
 - **Aspects extracted:** Policy decision and enforcement separation while keeping the policy engine optional, plus versioned bundles/decisions and operational inputs used by the optional remote policy-provider pattern. Cache, outage, replay-evidence, and fail-closed requirements are Xonovex governance constraints.
 
 ## S-SUPPLY-CHAIN — Executable-module provenance options
@@ -62,15 +62,15 @@ The governance contract is an Xonovex architectural synthesis. Sources support c
 
 - **URLs:** https://spdx.dev/learn/areas-of-interest/ai/ · https://cyclonedx.org/capabilities/mlbom/
 - **Last reviewed:** 2026-07-14
-- **Used for:** `references/inspect.md`, `references/conformance.md`
+- **Used for:** `references/inspect.md`, `references/conformance.md`, `references/catalog-and-inventory.md`
 - **Aspects extracted:** Inventories may include models, data, tools, agents, and software relationships alongside governance modules without requiring one BOM representation.
 
 ## S-OTEL-GENAI — OpenTelemetry GenAI semantic conventions
 
-- **URL:** https://opentelemetry.io/docs/specs/semconv/gen-ai/
-- **Last reviewed:** 2026-07-14
-- **Used for:** `references/events-and-capabilities.md`, `references/profiles.md`, `references/inspect.md`, `references/drift.md`
-- **Aspects extracted:** Interoperable agent/model/tool telemetry with stability, cost, and sensitive-data caveats.
+- **URLs:** https://opentelemetry.io/docs/specs/semconv/gen-ai/ · https://github.com/open-telemetry/semantic-conventions-genai
+- **Last reviewed:** 2026-07-16
+- **Used for:** `references/events-and-capabilities.md`, `references/profiles.md`, `references/inspect.md`, `references/drift.md`, `references/data-and-telemetry.md`, `assets/governance-operations-fixtures.json`
+- **Aspects extracted:** Interoperable agent/model/tool telemetry with stability, cost, and sensitive-data caveats. The core 1.43.0 documentation now points to a separate GenAI semantic-conventions repository without releases; location, schema, stability, and version are drift-sensitive.
 
 ## S-HEXAGONAL — Hexagonal architecture
 

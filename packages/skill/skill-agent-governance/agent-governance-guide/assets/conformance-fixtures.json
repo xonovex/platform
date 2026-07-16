@@ -23,6 +23,7 @@
     "human-task"
   ],
   "moduleClassifications": [
+    "knowledge-only",
     "advisory",
     "evidence-producing",
     "enforcing",

@@ -29,6 +29,10 @@ Compose policy, execution, enforcement, enablement, evidence, and trust without 
 - **Adapt harnesses** — map semantic event intents to versioned native capabilities without inventing a universal hook file — see [references/harness-adapters.md](references/harness-adapters.md)
 - **Onboard harness modules** — inspect, preview, authorize, apply, verify, roll back, disable, update, and detect drift through native configuration — see [references/harness-onboarding.md](references/harness-onboarding.md)
 - **Replay the walking skeleton** — prove independent adoption, native onboarding, deterministic and bounded execution, external enforcement, provider evidence, drift, and rollback — see [references/walking-skeleton.md](references/walking-skeleton.md)
+- **Compose policy bundles** — select domain-owned policies, interchangeable decision providers, adequate enforcement, explicit failure, and separate evidence — see [references/policy-bundles.md](references/policy-bundles.md)
+- **Govern data and telemetry** — classify, minimize, route, redact, correlate, retain, authorize, and test model/agent/tool/policy/provider data — see [references/data-and-telemetry.md](references/data-and-telemetry.md)
+- **Resolve catalog and inventory** — search compatible modules/profiles and publish the observed effective environment when selected — see [references/catalog-and-inventory.md](references/catalog-and-inventory.md)
+- **Operate and learn** — canary, roll back, emergency-disable, detect drift, respond, retire, measure, and promote learning through review — see [references/operations-and-learning.md](references/operations-and-learning.md)
 
 ## Gotchas
 
@@ -59,3 +63,7 @@ Compose policy, execution, enforcement, enablement, evidence, and trust without 
 - Read [references/harness-patterns.md](references/harness-patterns.md) - Load when selecting deterministic hooks, bounded model evaluators, bounded agent launchers, or organization-managed harness modules
 - Read [references/enterprise-platforms.md](references/enterprise-platforms.md) - Load when composing independently owned enterprise work-item, source, CI, cloud-governance, and observability providers
 - Read [references/walking-skeleton.md](references/walking-skeleton.md) - Load when proving the complete onboarding composition, replaying fresh-context evidence, or exercising disablement, drift, rollback, and adversarial cases
+- Read [references/policy-bundles.md](references/policy-bundles.md) - Load when selecting security, privacy, accessibility, reliability, AI, supply-chain, data, cost, or regulated policy bundles and mapping them to deterministic, provider-native, or optional OPA decisions and enforcement
+- Read [references/data-and-telemetry.md](references/data-and-telemetry.md) - Load when classifying, routing, redacting, correlating, retaining, sampling, or authorizing prompt/context/model/agent/MCP/tool/policy/CI/provider/privileged-operation data and telemetry
+- Read [references/catalog-and-inventory.md](references/catalog-and-inventory.md) - Load when searching or composing the module/profile catalog, comparing adoption modes and authority zones, resolving conflicts/compatibility/trust, or inventorying the effective agent environment
+- Read [references/operations-and-learning.md](references/operations-and-learning.md) - Load when updating, canarying, rolling back, disabling, supporting, measuring, learning from, responding to incidents in, or retiring governance modules and policies

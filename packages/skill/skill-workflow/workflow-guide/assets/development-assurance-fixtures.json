@@ -421,17 +421,70 @@
           {
             "identity": "skill:workflow-guide",
             "version": "5.0.0",
-            "provenance": "plugin:xonovex-skill-workflow@5.0.0"
+            "provenance": "plugin:xonovex-skill-workflow@5.0.0",
+            "componentKind": "skill",
+            "effectiveState": "installed"
           },
           {
             "identity": "ci-component:governance",
             "version": "sha256:abcd",
-            "provenance": "gitlab:component:8"
+            "provenance": "gitlab:component:8",
+            "componentKind": "governance-module",
+            "effectiveState": "observed-effective",
+            "effectiveSelectionEvidence": "gitlab:pipeline-policy:12",
+            "classification": "enforcing",
+            "adoptionModes": ["external-enforcement-only", "integrated"],
+            "authorityZones": ["organization-managed"],
+            "requestedPermissions": ["pipeline:block"],
+            "effectivePermissions": ["pipeline:block"]
+          },
+          {
+            "identity": "policy-bundle:secure",
+            "version": "secure@7",
+            "provenance": "policy-provider:bundle:secure@7",
+            "componentKind": "policy-bundle",
+            "effectiveState": "evidence-producing",
+            "classification": "enforcing",
+            "adoptionModes": ["governance-only", "integrated"],
+            "authorityZones": ["organization-managed"],
+            "requestedPermissions": [],
+            "effectivePermissions": []
           },
           {
             "identity": "permission:network",
             "version": "denied",
-            "provenance": "effective-policy:12"
+            "provenance": "effective-policy:12",
+            "componentKind": "effective-permission",
+            "effectiveState": "observed-effective",
+            "effectiveSelectionEvidence": "effective-policy:12"
+          }
+        ]
+      }
+    },
+    {
+      "id": "agent-environment-rejects-unproven-effective-module",
+      "contract": "inventory",
+      "expectedValid": false,
+      "expectedCode": "inventory-effective-state-unproven",
+      "inventory": {
+        "subjectReference": "agent-environment:team-b",
+        "subjectRevision": "inventory-snapshot-12",
+        "specialization": "agent-environment",
+        "generator": {
+          "executor": "deterministic",
+          "identity": "environment-inspector",
+          "version": "2"
+        },
+        "components": [
+          {
+            "identity": "plugin:release-policy",
+            "version": "5.0.0",
+            "provenance": "plugin-catalog:release-policy@5.0.0",
+            "componentKind": "governance-module",
+            "effectiveState": "observed-effective",
+            "classification": "enforcing",
+            "adoptionModes": ["integrated"],
+            "authorityZones": ["project"]
           }
         ]
       }

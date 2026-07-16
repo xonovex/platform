@@ -1,0 +1,74 @@
+[
+  {
+    "query": "assess this exact web release against WCAG 2.2 AA and publish reviewable evidence",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "versioned accessibility assurance"
+  },
+  {
+    "query": "decide which WCAG criteria apply to our authenticated dashboard and document the gaps",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "applicability and gap analysis"
+  },
+  {
+    "query": "combine automated accessibility scans with keyboard and screen-reader testing",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "layered verification"
+  },
+  {
+    "query": "design an expiring accessibility exception with owner, remediation, and reassessment",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "accessibility governance"
+  },
+  {
+    "query": "make accessibility a release profile without claiming the scanner proves compliance",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "profile and evidence boundaries"
+  },
+  {
+    "query": "retest focus, zoom, errors, and dynamic status after this UI revision",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "exact-revision assessment"
+  },
+  {
+    "query": "retire an obsolete accessibility waiver after verifying the replacement",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "operational lifecycle"
+  },
+  {
+    "query": "add contentDescription to this Jetpack Compose icon",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near miss: Android implementation owner"
+  },
+  {
+    "query": "implement an aria-live React component",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near miss: framework implementation"
+  },
+  {
+    "query": "write a generic unit test for a parser",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near miss: testing owner"
+  },
+  {
+    "query": "pick a color palette for a poster",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near miss: visual design without assurance intent"
+  },
+  {
+    "query": "configure a security policy engine",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near miss: security governance"
+  }
+]

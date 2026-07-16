@@ -1,0 +1,33 @@
+{
+  "skill_name": "security-assurance-guide",
+  "tier": "moderate",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Create security release assurance for artifact sha256:abc using NIST 800-53, SLSA, and Sigstore. A signed artifact should pass automatically.",
+      "assertions": [
+        "Scopes the system, threat model, applicability, exact artifact/source/build/dependency identities, selected control objectives, owners, versions, evidence, freshness, and gaps",
+        "Treats signatures and provenance as inputs to a configured trust policy, verifies subject, digest, signer identity, builder and source claims, and does not equate them with overall security",
+        "Keeps framework crosswalks contextual and requires layered verification, adequate enforcement, explicit failure behavior, exception handling, rollback, and accountable acceptance"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "A mandatory security scanner is down during release. Define the decision and failure path.",
+      "assertions": [
+        "Separates the policy decision, enforcement action, scanner outage evidence, and release authorization references",
+        "Fails closed or requires independently adequate fresh evidence when the selected mandatory control declares that behavior; never converts the outage to a silent pass",
+        "Allows only a scoped authorized expiring exception or break-glass with compensating controls, notification, revocation, review, and preserved audit evidence"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Review a repository plugin that requests file, network, secret, and deployment access and may run hooks concurrently.",
+      "assertions": [
+        "Requires repository trust plus pinned source, digest or verified provenance, owner, compatibility, declared and observed permissions, data flows, side effects, and failure behavior",
+        "Tests least privilege, denied capabilities, prompt or input injection boundaries, duplicate and concurrent execution, reentrancy, timeouts, partial failure, evidence leakage, and stale versions",
+        "Requires previewed enablement, verified disablement, canary update, rollback or emergency disable, drift monitoring, support ownership, and incident response"
+      ]
+    }
+  ]
+}

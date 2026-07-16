@@ -182,6 +182,44 @@ export const validateInventory = (inventory, specializations) => {
   ) {
     return "model-authoritative-inventory-fact";
   }
+  if (inventory.specialization === "agent-environment") {
+    const allowedStates = [
+      "available",
+      "installed",
+      "selected",
+      "enabled",
+      "observed-effective",
+      "evidence-producing",
+    ];
+    if (
+      inventory.components.some(
+        ({componentKind, effectiveState}) =>
+          !componentKind || !allowedStates.includes(effectiveState),
+      )
+    ) {
+      return "agent-environment-state-incomplete";
+    }
+    if (
+      inventory.components.some(
+        ({effectiveState, effectiveSelectionEvidence}) =>
+          effectiveState === "observed-effective" &&
+          !effectiveSelectionEvidence,
+      )
+    ) {
+      return "inventory-effective-state-unproven";
+    }
+    if (
+      inventory.components.some(
+        ({componentKind, classification, adoptionModes, authorityZones}) =>
+          ["governance-module", "policy-bundle"].includes(componentKind) &&
+          (!classification ||
+            !adoptionModes?.length ||
+            !authorityZones?.length),
+      )
+    ) {
+      return "governance-inventory-placement-incomplete";
+    }
+  }
   return null;
 };
 

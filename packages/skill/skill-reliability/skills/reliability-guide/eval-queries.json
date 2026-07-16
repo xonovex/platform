@@ -1,0 +1,74 @@
+[
+  {
+    "query": "define service objectives, error budgets, dependencies, and user-impact indicators for this capability",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "reliability objectives"
+  },
+  {
+    "query": "design timeout, retry, idempotency, concurrency, backpressure, and cancellation behavior",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "failure semantics"
+  },
+  {
+    "query": "test backup, restore, rollback, degraded mode, and continuity against observed objectives",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "recovery assurance"
+  },
+  {
+    "query": "build a canary update and emergency-disable process for an operational module",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "safe change"
+  },
+  {
+    "query": "prepare incident response, recovery verification, corrective action, and learning review",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "operational response"
+  },
+  {
+    "query": "measure reliability without ranking individual developers or gaming deployment frequency",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "healthy metrics"
+  },
+  {
+    "query": "retire a stale policy module without losing coverage or evidence",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "safe retirement"
+  },
+  {
+    "query": "debug a segmentation fault",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near miss: native debugging"
+  },
+  {
+    "query": "instrument an HTTP handler with OpenTelemetry",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near miss: observability implementation"
+  },
+  {
+    "query": "configure Kubernetes livenessProbe YAML",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near miss: platform implementation"
+  },
+  {
+    "query": "investigate a security incident and preserve forensic evidence",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near miss: security assurance"
+  },
+  {
+    "query": "optimize a slow SQL query",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near miss: database performance"
+  }
+]

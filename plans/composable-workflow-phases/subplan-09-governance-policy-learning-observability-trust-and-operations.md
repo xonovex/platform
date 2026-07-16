@@ -3,7 +3,7 @@ type: plan
 has_subplans: false
 parent_plan: ../composable-workflow-phases.md
 parallel_group: 6
-status: pending
+status: complete
 dependencies:
   plans:
   - agent-harness-adapters-and-onboarding
@@ -27,12 +27,12 @@ skills_to_consult:
 - reliability-guide
 - versioning-guide
 validation:
-  type_check: pending
-  lint: pending
-  build: pending
-  tests: pending
-  integration: pending
-updated: '2026-07-14'
+  type_check: passed
+  lint: passed
+  build: passed
+  tests: passed
+  integration: passed
+updated: '2026-07-16'
 decision_refs:
 - D-003
 - D-006
@@ -205,13 +205,13 @@ Mapping IDs resolve through the parent plan’s `traceability/` artifacts. These
 
 ## Success Criteria
 
-- [ ] Policies operate across lifecycle and general agent activity.
-- [ ] Enforcement is layered, explainable, and profile-selected.
-- [ ] Data and telemetry governance is explicit and privacy-preserving.
-- [ ] Catalog composition is searchable, compatible, and conflict-aware.
-- [ ] Modules are inventoried, versioned, owned, updateable, rollbackable, and retireable.
-- [ ] Drift, exceptions, break-glass, and governance incidents are first-class.
-- [ ] Learning improves modules and policies through governed adoption.
+- [x] Policies operate across lifecycle and general agent activity.
+- [x] Enforcement is layered, explainable, and profile-selected.
+- [x] Data and telemetry governance is explicit and privacy-preserving.
+- [x] Catalog composition is searchable, compatible, and conflict-aware.
+- [x] Modules are inventoried, versioned, owned, updateable, rollbackable, and retireable.
+- [x] Drift, exceptions, break-glass, and governance incidents are first-class.
+- [x] Learning improves modules and policies through governed adoption.
 
 ## Files Modified/Created
 

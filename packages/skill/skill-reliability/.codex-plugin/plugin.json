@@ -1,0 +1,19 @@
+{
+  "name": "xonovex-skill-reliability",
+  "version": "5.0.0",
+  "description": "Xonovex reliability and resilience skills",
+  "author": {"name": "Xonovex"},
+  "skills": "./skills",
+  "interface": {
+    "displayName": "Reliability and Resilience",
+    "shortDescription": "Failure semantics, recovery, and safe operations",
+    "longDescription": "Design and operate reliable services and governance modules through explicit objectives, bounded failures, progressive change, recovery, incidents, learning, and retirement.",
+    "developerName": "Xonovex",
+    "category": "Productivity",
+    "capabilities": ["Read", "Write"],
+    "defaultPrompt": [
+      "Design reliability for this service",
+      "Plan a safe canary and rollback"
+    ]
+  }
+}

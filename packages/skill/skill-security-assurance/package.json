@@ -1,0 +1,17 @@
+{
+  "name": "@xonovex/skill-security-assurance",
+  "version": "5.0.0",
+  "private": true,
+  "type": "module",
+  "keywords": [
+    "xonovex",
+    "skill",
+    "security",
+    "assurance",
+    "supply-chain"
+  ],
+  "scripts": {
+    "fmt": "prettier --write .",
+    "fmt:check": "prettier --check ."
+  }
+}

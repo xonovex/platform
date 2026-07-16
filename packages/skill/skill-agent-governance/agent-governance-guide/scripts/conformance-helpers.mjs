@@ -52,6 +52,7 @@ export const expectedVocabulary = {
     "human-task",
   ],
   moduleClassifications: [
+    "knowledge-only",
     "advisory",
     "evidence-producing",
     "enforcing",

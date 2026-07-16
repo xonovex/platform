@@ -1,0 +1,7 @@
+{
+  "name": "xonovex-skill-accessibility",
+  "version": "5.0.0",
+  "description": "Xonovex accessibility assurance skills",
+  "author": {"name": "Xonovex"},
+  "skills": ["./skills/accessibility-guide"]
+}

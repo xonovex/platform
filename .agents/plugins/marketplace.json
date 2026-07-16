@@ -29,6 +29,18 @@
       "category": "Productivity"
     },
     {
+      "name": "xonovex-skill-accessibility",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-accessibility"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
       "name": "xonovex-skill-adr",
       "source": {
         "source": "local",
@@ -45,6 +57,18 @@
       "source": {
         "source": "local",
         "path": "./packages/skill/skill-agent-governance"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-ai-governance",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-ai-governance"
       },
       "policy": {
         "installation": "AVAILABLE",
@@ -833,10 +857,34 @@
       "category": "Productivity"
     },
     {
+      "name": "xonovex-skill-reliability",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-reliability"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
       "name": "xonovex-skill-remotion",
       "source": {
         "source": "local",
         "path": "./packages/skill/skill-remotion"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-security-assurance",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-security-assurance"
       },
       "policy": {
         "installation": "AVAILABLE",

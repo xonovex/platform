@@ -1,0 +1,74 @@
+[
+  {
+    "query": "classify our AI-system role and applicable obligations before selecting a regulated profile",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "AI applicability"
+  },
+  {
+    "query": "create an AI risk register with harms, affected people, controls, residual risk, and owners",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "AI risk management"
+  },
+  {
+    "query": "inventory models, datasets, prompts, agents, tools, evaluations, and provenance for this release",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "AI inventory"
+  },
+  {
+    "query": "design human oversight and safe intervention for a high-impact model decision",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "human oversight"
+  },
+  {
+    "query": "evaluate model accuracy, robustness, bias gaps, abuse, and cybersecurity at an exact revision",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "AI evaluation"
+  },
+  {
+    "query": "plan AI production monitoring, meaningful-change reassessment, and serious-incident escalation",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "post-deployment governance"
+  },
+  {
+    "query": "map NIST AI RMF to our controls without claiming certification or legal equivalence",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "contextual crosswalk"
+  },
+  {
+    "query": "call a chat completion API from TypeScript",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near miss: API implementation"
+  },
+  {
+    "query": "prompt the model to summarize this document",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near miss: ordinary model use"
+  },
+  {
+    "query": "trace an LLM request with OpenTelemetry attributes",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near miss: observability implementation"
+  },
+  {
+    "query": "debug a Python machine-learning training loop",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near miss: ML implementation"
+  },
+  {
+    "query": "write a generic data-retention policy",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near miss: data governance without AI context"
+  }
+]

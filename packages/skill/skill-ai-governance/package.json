@@ -1,0 +1,17 @@
+{
+  "name": "@xonovex/skill-ai-governance",
+  "version": "5.0.0",
+  "private": true,
+  "type": "module",
+  "keywords": [
+    "xonovex",
+    "skill",
+    "ai",
+    "governance",
+    "risk"
+  ],
+  "scripts": {
+    "fmt": "prettier --write .",
+    "fmt:check": "prettier --check ."
+  }
+}
