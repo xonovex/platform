@@ -3,7 +3,7 @@
   "version": "6.0.0",
   "description": "Xonovex reliability and resilience skills",
   "author": {"name": "Xonovex"},
-  "skills": "./skills",
+  "skills": "./reliability-guide",
   "interface": {
     "displayName": "Reliability and Resilience",
     "shortDescription": "Failure semantics, recovery, and safe operations",

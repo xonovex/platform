@@ -3,5 +3,5 @@
   "version": "6.0.0",
   "description": "Xonovex AI governance and risk skills",
   "author": {"name": "Xonovex"},
-  "skills": ["./skills/ai-governance-guide"]
+  "skills": ["./ai-governance-guide"]
 }

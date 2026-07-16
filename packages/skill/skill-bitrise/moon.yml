@@ -7,6 +7,6 @@ tasks:
     options:
       cache: false
   skill-validate:
-    script: npx moon-skill-validate skills/bitrise-guide
+    script: npx moon-skill-validate bitrise-guide
   skill-audit-sources:
     script: node ../../../node_modules/@xonovex/script-moon-skill-audit-sources/dist/src/index.js skills/bitrise-guide

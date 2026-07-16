@@ -3,5 +3,5 @@
   "version": "6.0.0",
   "description": "Xonovex reliability and resilience skills",
   "author": {"name": "Xonovex"},
-  "skills": ["./skills/reliability-guide"]
+  "skills": ["./reliability-guide"]
 }

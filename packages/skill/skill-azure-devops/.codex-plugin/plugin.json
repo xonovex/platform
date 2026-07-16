@@ -5,7 +5,7 @@
   "author": {
     "name": "Xonovex"
   },
-  "skills": "./skills",
+  "skills": "./azure-devops-guide",
   "interface": {
     "displayName": "Azure DevOps",
     "shortDescription": "Edition-aware Boards, Repos, and Pipelines operations",

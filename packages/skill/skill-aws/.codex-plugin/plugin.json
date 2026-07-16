@@ -5,7 +5,7 @@
   "author": {
     "name": "Xonovex"
   },
-  "skills": "./skills",
+  "skills": "./aws-guide",
   "interface": {
     "displayName": "AWS Governance",
     "shortDescription": "Federated AWS identity, guardrails, and evidence",

@@ -367,11 +367,11 @@ const evalFiles = [
   "packages/skill/skill-copilot/copilot-guide/evals.json",
   "packages/skill/skill-pi/pi-guide/evals.json",
   "packages/skill/skill-opencode/opencode-guide/evals.json",
-  "packages/skill/skill-azure-devops/skills/azure-devops-guide/evals.json",
-  "packages/skill/skill-bitbucket/skills/bitbucket-guide/evals.json",
-  "packages/skill/skill-bitrise/skills/bitrise-guide/evals.json",
-  "packages/skill/skill-aws/skills/aws-guide/evals.json",
-  "packages/skill/skill-datadog/skills/datadog-guide/evals.json",
+  "packages/skill/skill-azure-devops/azure-devops-guide/evals.json",
+  "packages/skill/skill-bitbucket/bitbucket-guide/evals.json",
+  "packages/skill/skill-bitrise/bitrise-guide/evals.json",
+  "packages/skill/skill-aws/aws-guide/evals.json",
+  "packages/skill/skill-datadog/datadog-guide/evals.json",
 ];
 for (const evalFile of evalFiles) {
   const evalPath = resolve(repositoryRoot, evalFile);

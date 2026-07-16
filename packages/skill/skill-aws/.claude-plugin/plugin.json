@@ -3,5 +3,5 @@
   "version": "6.0.0",
   "description": "Xonovex AWS governance and evidence skills",
   "author": {"name": "Xonovex"},
-  "skills": ["./skills/aws-guide"]
+  "skills": ["./aws-guide"]
 }

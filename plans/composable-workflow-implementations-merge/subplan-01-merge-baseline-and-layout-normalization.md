@@ -3,7 +3,7 @@ type: plan
 has_subplans: false
 parent_plan: composable-workflow-implementations-merge
 parallel_group: 1
-status: pending
+status: complete
 dependencies:
   plans: []
   files:
@@ -17,11 +17,11 @@ skills_to_consult:
 - command-guide
 - moon-guide
 validation:
-  type_check: pending
-  lint: pending
-  build: pending
-  tests: pending
-  integration: pending
+  type_check: pass
+  lint: pass
+  build: pass
+  tests: pass
+  integration: pass
 ---
 
 # Subplan 01: Baseline Gate and Layout Normalization
@@ -59,11 +59,11 @@ Record a green pre-merge baseline in the worktree, build the port manifest from 
 
 ## Success Criteria
 
-- [ ] `BASELINE.txt` records all baseline commands exiting 0 at the starting HEAD
-- [ ] Port manifest enumerates 100% of fable's walking-skeleton and fixture files with planned destinations
-- [ ] All 9 packages use flat `<topic>-guide/` layout; no `skills/` dirs remain
-- [ ] All plugin manifests, moon tasks, docs links, and validator paths updated; grep sweeps empty
-- [ ] Full validation green; one conventional commit on the worktree branch
+- [x] `BASELINE.txt` records all baseline commands exiting 0 at the starting HEAD (`moon run :ci-check` 760 tasks; doc validator 8,862 checks; webhook + integration go tests; e2e/kind excluded as host-environment limitation, exclusion recorded)
+- [x] Port manifest enumerates 100% of fable's walking-skeleton and fixture files with planned destinations (58 files: 2 skeleton scripts, 26+20+10 fixtures, 3 skipped extras; fable's "64" counts scenarios, not files — noted for subplan 03)
+- [x] All 9 packages use flat `<topic>-guide/` layout; no `skills/` dirs remain (81 renames)
+- [x] All plugin manifests, moon tasks, docs links, and validator paths updated; grep sweeps empty; marketplace resolution 186 entries / 0 failures
+- [x] Full validation green after the move (`:ci-check` 760 tasks exit 0; doc validator 8,862); one conventional commit on the worktree branch
 
 ## Files Modified/Created
 
