@@ -42,3 +42,75 @@ export const forbiddenClaims: readonly RegExp[] = [
   /(?:provides?|ensures?|establishes?|achieves?) automatic compliance/i,
   /silently launch(?:es|ing)? (?:a |an )?(?:child )?agent/i,
 ];
+
+const cellCount = (row: string): number =>
+  row.trim().replace(/^\|/, "").replace(/\|$/, "").split("|").length;
+
+export const tableShapeFailures = (
+  content: string,
+  label: string,
+): string[] => {
+  const failures: string[] = [];
+  const lines = content.split("\n");
+  let headerCells: number | null = null;
+  for (const [index, line] of lines.entries()) {
+    const isRow = line.trimStart().startsWith("|");
+    if (!isRow) {
+      headerCells = null;
+      continue;
+    }
+    if (headerCells === null) {
+      headerCells = cellCount(line);
+      continue;
+    }
+    if (/^\s*\|[\s:-]+\|/.test(line) && /^[\s|:-]+$/.test(line)) continue;
+    if (cellCount(line) !== headerCells) {
+      failures.push(
+        `${label} line ${String(index + 1)}: row has ${String(cellCount(line))} cells, header has ${String(headerCells)}`,
+      );
+    }
+  }
+  return failures;
+};
+
+export const legendClasses = (content: string): Set<string> =>
+  new Set(
+    [...content.matchAll(/^- \*\*([^*]+)\*\*/gm)].flatMap((match) =>
+      match[1] === undefined ? [] : [match[1].trim()],
+    ),
+  );
+
+export const offLegendClassifications = (
+  content: string,
+  legend: Set<string>,
+): string[] =>
+  [...content.matchAll(/^\| (D-\d{3}) \| [^|]* \| ([^|]+) \|/gm)].flatMap(
+    (match) => {
+      const id = match[1];
+      const classification = match[2]?.trim();
+      if (id === undefined || classification === undefined) return [];
+      return legend.has(classification)
+        ? []
+        : [`${id}: classification '${classification}' is not in the legend`];
+    },
+  );
+
+export const blanketIdBlockFailures = (content: string): string[] => {
+  const blocks = new Map<string, {rows: number; distinct: Set<string>}>();
+  for (const match of content.matchAll(
+    /^\| (subplan-\d{2}-[^ ]+) \| \d+ \| [^|]* \| ([^|]*\|[^|]*\|[^|]*) \|$/gm,
+  )) {
+    const subplan = match[1];
+    const block = match[2];
+    if (subplan === undefined || block === undefined) continue;
+    const entry = blocks.get(subplan) ?? {rows: 0, distinct: new Set<string>()};
+    entry.rows += 1;
+    entry.distinct.add(block.trim());
+    blocks.set(subplan, entry);
+  }
+  return [...blocks.entries()].flatMap(([subplan, {rows, distinct}]) =>
+    rows > 1 && distinct.size === 1
+      ? [`${subplan}: every task row carries an identical ID block`]
+      : [],
+  );
+};

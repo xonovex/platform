@@ -1,9 +1,12 @@
 import {describe, expect, it} from "vitest";
 import {
+  blanketIdBlockFailures,
   createChecker,
   forbiddenClaims,
   markdownLinkTargets,
+  offLegendClassifications,
   tableIds,
+  tableShapeFailures,
 } from "./validate.js";
 
 describe("createChecker", () => {
@@ -45,5 +48,40 @@ describe("forbiddenClaims", () => {
     const qualified = "A skill documents the policy; enforcement is separate.";
     expect(forbiddenClaims.some((claim) => claim.test(overclaim))).toBe(true);
     expect(forbiddenClaims.some((claim) => claim.test(qualified))).toBe(false);
+  });
+});
+
+describe("tableShapeFailures", () => {
+  it("flags rows whose cell count differs from their header", () => {
+    const good = "| a | b |\n| --- | --- |\n| 1 | 2 |";
+    const bad = "| a | b |\n| --- | --- |\n| 1 | 2 | 3 |";
+    expect(tableShapeFailures(good, "t")).toEqual([]);
+    expect(tableShapeFailures(bad, "t")).toHaveLength(1);
+  });
+});
+
+describe("offLegendClassifications", () => {
+  it("flags classification cells outside the legend", () => {
+    const legend = new Set(["platform-derived"]);
+    const rows =
+      "| D-001 | statement | platform-derived | S-A | why |\n" +
+      "| D-002 | statement | governance synthesis | S-A | why |";
+    expect(offLegendClassifications(rows, legend)).toEqual([
+      "D-002: classification 'governance synthesis' is not in the legend",
+    ]);
+  });
+});
+
+describe("blanketIdBlockFailures", () => {
+  it("flags a subplan whose every task row shares one ID block", () => {
+    const blanket =
+      "| subplan-01-x.md | 1 | intent | D-001 | C-001 | S-A |\n" +
+      "| subplan-01-x.md | 2 | other | D-001 | C-001 | S-A |";
+    const varied =
+      "| subplan-02-y.md | 1 | intent | D-001 | C-001 | S-A |\n" +
+      "| subplan-02-y.md | 2 | other | D-002 | C-001 | S-A |";
+    expect(blanketIdBlockFailures(blanket)).toHaveLength(1);
+    expect(blanketIdBlockFailures(varied)).toEqual([]);
+    expect(blanketIdBlockFailures(blanket + "\n" + varied)).toHaveLength(1);
   });
 });

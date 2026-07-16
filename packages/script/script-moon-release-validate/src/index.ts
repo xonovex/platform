@@ -3,10 +3,14 @@ import {existsSync, readdirSync, readFileSync, statSync} from "node:fs";
 import {dirname, resolve} from "node:path";
 import {fileURLToPath} from "node:url";
 import {
+  blanketIdBlockFailures,
   createChecker,
   forbiddenClaims,
+  legendClasses,
   markdownLinkTargets,
+  offLegendClassifications,
   tableIds,
+  tableShapeFailures,
 } from "./validate.js";
 
 interface MarketplaceEntry {
@@ -304,6 +308,38 @@ check(
   /licensed (?:full )?text/i.test(sourceRegistry) &&
     validationPolicy.includes("licensed-text-required"),
   "source registry and policy preserve licensed-standard flags",
+);
+
+const shapeTargets: [string, string][] = [
+  [sourceRegistry, "source-registry.md"],
+  [decisionMatrix, "decision-source-matrix.md"],
+  [controlCrosswalk, "control-crosswalk.md"],
+  [platformMatrix, "platform-capability-matrix.md"],
+  [subplanTraceability, "subplan-traceability.md"],
+];
+for (const [content, label] of shapeTargets) {
+  const shapeFailures = tableShapeFailures(content, label);
+  check(
+    shapeFailures.length === 0,
+    `table shapes valid in ${label}: ${shapeFailures.join("; ")}`,
+  );
+}
+
+const legend = legendClasses(decisionMatrix);
+check(
+  legend.size === 4,
+  `decision legend defines 4 classes, found ${String(legend.size)}`,
+);
+const offLegend = offLegendClassifications(decisionMatrix, legend);
+check(
+  offLegend.length === 0,
+  `decision classifications stay in the legend: ${offLegend.join("; ")}`,
+);
+
+const blanketBlocks = blanketIdBlockFailures(subplanTraceability);
+check(
+  blanketBlocks.length === 0,
+  `no subplan repeats one identical ID block on every task: ${blanketBlocks.join("; ")}`,
 );
 
 const parentPlan = read(
