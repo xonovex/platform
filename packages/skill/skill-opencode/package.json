@@ -1,0 +1,20 @@
+{
+  "name": "@xonovex/skill-opencode",
+  "version": "5.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@xonovex/skill-agent-governance": "5.0.0"
+  },
+  "keywords": [
+    "xonovex",
+    "skill",
+    "opencode",
+    "plugins",
+    "governance"
+  ],
+  "scripts": {
+    "fmt": "prettier --write .",
+    "fmt:check": "prettier --check ."
+  }
+}

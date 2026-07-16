@@ -1,0 +1,10 @@
+{
+  "name": "xonovex-skill-opencode",
+  "version": "5.0.0",
+  "description": "Xonovex OpenCode harness governance skills",
+  "author": {
+    "name": "Xonovex"
+  },
+  "skills": "./opencode-guide",
+  "dependencies": ["xonovex-skill-agent-governance"]
+}

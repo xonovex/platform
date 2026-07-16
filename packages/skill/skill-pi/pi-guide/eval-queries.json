@@ -1,0 +1,32 @@
+[
+  {
+    "query": "map a mandatory protected-path control to Pi and tell me whether it can actually block",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "native capability and guarantee mapping"
+  },
+  {
+    "query": "preview onboarding a project-provided Pi executable module without applying it",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "advisory transactional onboarding"
+  },
+  {
+    "query": "what version and trust probes should I run before relying on this Pi hook or extension?",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "versioned matrix and executable trust"
+  },
+  {
+    "query": "write a unit test using Arrange-Act-Assert",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near miss owned by testing guidance"
+  },
+  {
+    "query": "create a generic governance policy outcome schema",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "generic contract owned by agent-governance-guide"
+  }
+]

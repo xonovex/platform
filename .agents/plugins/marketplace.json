@@ -173,6 +173,18 @@
       "category": "Productivity"
     },
     {
+      "name": "xonovex-skill-claude-code",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-claude-code"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
       "name": "xonovex-skill-cmake",
       "source": {
         "source": "local",
@@ -209,6 +221,18 @@
       "category": "Productivity"
     },
     {
+      "name": "xonovex-skill-codex",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-codex"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
       "name": "xonovex-skill-connascence",
       "source": {
         "source": "local",
@@ -225,6 +249,18 @@
       "source": {
         "source": "local",
         "path": "./packages/skill/skill-content"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-copilot",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-copilot"
       },
       "policy": {
         "installation": "AVAILABLE",
@@ -473,6 +509,18 @@
       "category": "Productivity"
     },
     {
+      "name": "xonovex-skill-kiro",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-kiro"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
       "name": "xonovex-skill-kubernetes",
       "source": {
         "source": "local",
@@ -605,10 +653,34 @@
       "category": "Productivity"
     },
     {
+      "name": "xonovex-skill-opencode",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-opencode"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
       "name": "xonovex-skill-orthogonal-pattern",
       "source": {
         "source": "local",
         "path": "./packages/skill/skill-orthogonal-pattern"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-pi",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-pi"
       },
       "policy": {
         "installation": "AVAILABLE",

@@ -79,4 +79,46 @@ The governance contract is an Xonovex architectural synthesis. Sources support c
 - **Used for:** `references/architecture.md`, `references/modules.md`, `references/onboarding.md`, `references/module-management.md`
 - **Aspects extracted:** Core-owned ports, native adapters, inward dependencies, and composition-root wiring.
 
-Harness capabilities and limitations require adapter-specific official sources and version-pinned conformance probes before release.
+## S-HARNESS-CLAUDE — Claude Code hooks
+
+- **URLs:** https://code.claude.com/docs/en/hooks · https://code.claude.com/docs/en/configuration · https://code.claude.com/docs/en/plugins-reference
+- **Last reviewed:** 2026-07-16
+- **Used for:** `references/harness-adapters.md`, `assets/harness-conformance-fixtures.json`, `assets/harness-module-templates.json`
+- **Aspects extracted:** Handler types, event-specific blocking and context behavior, parallel matching handlers, settings scopes, managed hook restrictions, plugin packaging, and experimental agent handlers.
+
+## S-HARNESS-CODEX — Codex hooks
+
+- **URLs:** https://learn.chatgpt.com/docs/hooks · https://learn.chatgpt.com/docs/plugins · https://learn.chatgpt.com/docs/managed-configuration
+- **Last reviewed:** 2026-07-16
+- **Used for:** `references/harness-adapters.md`, `assets/harness-conformance-fixtures.json`, `assets/harness-module-templates.json`
+- **Aspects extracted:** Hook discovery, configuration scopes, trust hashes, concurrent command handlers, managed requirements, plugin hooks, covered tool paths, and parsed-but-skipped prompt, agent, and asynchronous handlers.
+
+## S-HARNESS-KIRO — Kiro hooks
+
+- **URLs:** https://kiro.dev/docs/hooks/ · https://kiro.dev/docs/hooks/actions/ · https://kiro.dev/docs/hooks/types/ · https://kiro.dev/docs/hooks/management/ · https://kiro.dev/docs/cli/v3/
+- **Last reviewed:** 2026-07-16
+- **Used for:** `references/harness-adapters.md`, `assets/harness-conformance-fixtures.json`, `assets/harness-module-templates.json`
+- **Aspects extracted:** Versioned workspace hook files, command and agent actions, triggers, event-specific exit-code blocking, disable behavior, generated-hook review, and CLI v3 alignment.
+
+## S-HARNESS-COPILOT — GitHub Copilot hooks
+
+- **URLs:** https://docs.github.com/en/copilot/reference/hooks-reference · https://docs.github.com/en/copilot/concepts/agents/hooks · https://docs.github.com/en/copilot/reference/copilot-cli-reference/cli-plugin-reference · https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/add-skills
+- **Last reviewed:** 2026-07-16
+- **Used for:** `references/harness-adapters.md`, `assets/harness-conformance-fixtures.json`, `assets/harness-module-templates.json`
+- **Aspects extracted:** CLI/cloud surface differences, policy/user/project/plugin scopes, command and HTTP handlers, limited prompt handlers, event decisions, cloud sandbox constraints, plugin packaging, and skill trust warnings.
+
+## S-HARNESS-PI — Pi extensions and packages
+
+- **URLs:** https://pi.dev/docs/latest/extensions · https://pi.dev/docs/latest/packages · https://pi.dev/docs/latest/security · https://pi.dev/docs/latest/settings · https://pi.dev/docs/latest/skills
+- **Last reviewed:** 2026-07-16
+- **Used for:** `references/harness-adapters.md`, `assets/harness-conformance-fixtures.json`, `assets/harness-module-templates.json`
+- **Aspects extracted:** Extension events and ordering, project trust, package scopes and pinning, context injection, tool interception, full-process permissions, and absence of a built-in sandbox.
+
+## S-HARNESS-OPENCODE — OpenCode plugins
+
+- **URL:** https://opencode.ai/docs/plugins/
+- **Last reviewed:** 2026-07-16
+- **Used for:** `references/harness-adapters.md`, `assets/harness-conformance-fixtures.json`, `assets/harness-module-templates.json`
+- **Aspects extracted:** Global/project plugin loading, sequential load order, JavaScript/TypeScript events, tool interception, permissions and session events, shell environment mutation, custom tools, and experimental compaction context.
+
+Harness capabilities and limitations require adapter-specific official sources and version-pinned conformance probes before release. The 2026-07-16 fixture snapshot records documentation conformance; its `not-installed` runtime probes are explicit non-results rather than passing runtime evidence.

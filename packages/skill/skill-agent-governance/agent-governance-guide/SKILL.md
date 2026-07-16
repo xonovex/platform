@@ -24,6 +24,8 @@ Compose policy, execution, enforcement, enablement, evidence, and trust without 
 - **Evaluate drift** — compare intended and observed versions, capabilities, policy, evidence freshness, and native configuration — see [references/drift.md](references/drift.md)
 - **Manage modules** — list, inspect, preview, enable, disable, upgrade, or remove modules through lifecycle-safe native adapters — see [references/module-management.md](references/module-management.md)
 - **Validate providers** — check policy, configuration, evidence, replay, privacy, rollback, and drift ports without requiring one engine or format — see [references/provider-contracts.md](references/provider-contracts.md)
+- **Adapt harnesses** — map semantic event intents to versioned native capabilities without inventing a universal hook file — see [references/harness-adapters.md](references/harness-adapters.md)
+- **Onboard harness modules** — inspect, preview, authorize, apply, verify, roll back, disable, update, and detect drift through native configuration — see [references/harness-onboarding.md](references/harness-onboarding.md)
 
 ## Gotchas
 
@@ -47,3 +49,6 @@ Compose policy, execution, enforcement, enablement, evidence, and trust without 
 - Read [references/conformance.md](references/conformance.md) - Load when validating any governance contract or fixture
 - Read [references/drift.md](references/drift.md) - Load when comparing intended and observed governance state
 - Read [references/module-management.md](references/module-management.md) - Load when changing module lifecycle state
+- Read [references/harness-adapters.md](references/harness-adapters.md) - Load when defining or reviewing an agent-harness adapter or capability matrix
+- Read [references/harness-onboarding.md](references/harness-onboarding.md) - Load when advising or executing harness-specific setup, rollback, disable, update, or drift checks
+- Read [references/harness-patterns.md](references/harness-patterns.md) - Load when selecting deterministic hooks, bounded model evaluators, bounded agent launchers, or organization-managed harness modules

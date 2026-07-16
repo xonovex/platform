@@ -1,0 +1,20 @@
+{
+  "name": "@xonovex/skill-copilot",
+  "version": "5.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@xonovex/skill-agent-governance": "5.0.0"
+  },
+  "keywords": [
+    "xonovex",
+    "skill",
+    "copilot",
+    "hooks",
+    "governance"
+  ],
+  "scripts": {
+    "fmt": "prettier --write .",
+    "fmt:check": "prettier --check ."
+  }
+}

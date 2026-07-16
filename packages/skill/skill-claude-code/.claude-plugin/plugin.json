@@ -1,0 +1,10 @@
+{
+  "name": "xonovex-skill-claude-code",
+  "version": "5.0.0",
+  "description": "Xonovex Claude Code harness governance skills",
+  "author": {
+    "name": "Xonovex"
+  },
+  "skills": ["./code-harness-guide"],
+  "dependencies": ["xonovex-skill-agent-governance"]
+}

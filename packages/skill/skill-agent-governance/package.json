@@ -12,6 +12,6 @@
   "scripts": {
     "fmt": "prettier --write .",
     "fmt:check": "prettier --check .",
-    "test": "node agent-governance-guide/scripts/validate-fixtures.mjs"
+    "test": "node agent-governance-guide/scripts/validate-fixtures.mjs && node agent-governance-guide/scripts/validate-harness-fixtures.mjs"
   }
 }

@@ -1,0 +1,10 @@
+{
+  "name": "xonovex-skill-kiro",
+  "version": "5.0.0",
+  "description": "Xonovex Kiro harness governance skills",
+  "author": {
+    "name": "Xonovex"
+  },
+  "skills": ["./kiro-guide"],
+  "dependencies": ["xonovex-skill-agent-governance"]
+}

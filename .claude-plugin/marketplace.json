@@ -77,6 +77,11 @@
       "description": "Xonovex Caveman writing-style skill"
     },
     {
+      "name": "xonovex-skill-claude-code",
+      "source": "./packages/skill/skill-claude-code",
+      "description": "Xonovex Claude Code harness governance skills"
+    },
+    {
       "name": "xonovex-skill-cmake",
       "source": "./packages/skill/skill-cmake",
       "description": "Xonovex CMake skills"
@@ -92,6 +97,11 @@
       "description": "Xonovex Code review skills"
     },
     {
+      "name": "xonovex-skill-codex",
+      "source": "./packages/skill/skill-codex",
+      "description": "Xonovex Codex harness governance skills"
+    },
+    {
       "name": "xonovex-skill-command",
       "source": "./packages/skill/skill-command",
       "description": "Xonovex Command skill — author, merge, simplify reusable user-invocable prompt files"
@@ -105,6 +115,11 @@
       "name": "xonovex-skill-content",
       "source": "./packages/skill/skill-content",
       "description": "Xonovex Content skills"
+    },
+    {
+      "name": "xonovex-skill-copilot",
+      "source": "./packages/skill/skill-copilot",
+      "description": "Xonovex GitHub Copilot harness governance skills"
     },
     {
       "name": "xonovex-skill-cross-platform",
@@ -222,6 +237,11 @@
       "description": "Xonovex Instruction skills"
     },
     {
+      "name": "xonovex-skill-kiro",
+      "source": "./packages/skill/skill-kiro",
+      "description": "Xonovex Kiro harness governance skills"
+    },
+    {
       "name": "xonovex-skill-kubernetes",
       "source": "./packages/skill/skill-kubernetes",
       "description": "Xonovex Kubernetes skills"
@@ -282,9 +302,19 @@
       "description": "Xonovex Object-oriented programming skills"
     },
     {
+      "name": "xonovex-skill-opencode",
+      "source": "./packages/skill/skill-opencode",
+      "description": "Xonovex OpenCode harness governance skills"
+    },
+    {
       "name": "xonovex-skill-orthogonal-pattern",
       "source": "./packages/skill/skill-orthogonal-pattern",
       "description": "Xonovex Orthogonal pattern skills"
+    },
+    {
+      "name": "xonovex-skill-pi",
+      "source": "./packages/skill/skill-pi",
+      "description": "Xonovex Pi harness governance skills"
     },
     {
       "name": "xonovex-skill-plan",

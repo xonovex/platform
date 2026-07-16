@@ -1,0 +1,10 @@
+{
+  "name": "xonovex-skill-codex",
+  "version": "5.0.0",
+  "description": "Xonovex Codex harness governance skills",
+  "author": {
+    "name": "Xonovex"
+  },
+  "skills": "./codex-guide",
+  "dependencies": ["xonovex-skill-agent-governance"]
+}
