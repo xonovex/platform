@@ -3,7 +3,7 @@ type: plan
 has_subplans: false
 parent_plan: composable-workflow-implementations-merge
 parallel_group: 4
-status: in_progress
+status: complete
 dependencies:
   plans:
   - merge-walking-skeleton-and-evidence-honesty
@@ -58,7 +58,7 @@ Graft the three convention rules, complete and audit the port manifest, ship the
 - [x] 6.0.1 lockstep across 93 packages, both marketplaces, 186 manifests, lockfile; release notes name the 9 relocated packages (bump commit body + MIGRATION.md 6.0.1 section)
 - [x] `composable-workflow-phases` complete with `completed_date: 2026-07-16`; `VALIDATION.txt` regenerated with the qualified result line per amended rule 5
 - [x] E2E gate green (`:ci-check` + envtest integration = 773 tasks, exit 0; ≥ baseline with e2e/kind excluded identically); all three grep sweeps empty
-- [ ] Worktree merged back to `main` (user-confirmed) and removed — **mandatory-human gate, awaiting confirmation**
+- [x] Branch merged back to `main` (user-confirmed, fast-forward e18d54f5 → 3e29bcc9); the worktree is retained at the user's request instead of removed
 
 ## Files Modified/Created
 
