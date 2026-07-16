@@ -1,5 +1,5 @@
 AUDITABLE COMPOSABLE WORKFLOW RELEASE VALIDATION
-Date: 2026-07-16
+Date: 2026-07-16 (revalidated after the implementations merge)
 
 Sources: 94
 Decisions: 39
@@ -9,32 +9,42 @@ Subplans: 11
 Numbered tasks mapped: 150
 Lockstep command/skill packages: 93
 Plugin manifests: 186
-Executable documentation checks: 8862
+Repository release-validation checks: 7249
+Package documentation checks (command-workflow): 62
+Conformance scenario fixtures: 56 (36 governance/enterprise + 20 workflow), machine-run
+Walking-skeleton executable checks: 17
 
-RESULT: PASS
+RESULT: PASS (candidate matrices: 5 harnesses and 5 enterprise platforms
+remain documentation-derived and unprobed; Claude Code is the only
+runtime-probed harness)
 
 Checks:
 - Parent and all subplans resolve
 - Eleven-subplan exception is explicit and limited to one optional enterprise-platform extension
 - Azure DevOps, Bitbucket Cloud/Data Center, Bitrise, AWS and Datadog use official-source mappings
 - Cloud/self-managed editions and tiers are not conflated
-- CI-to-AWS onboarding is federation/temporary-credential first
+- CI-to-AWS onboarding is federation/temporary-credential first; the static-credential prohibition is a shared platform-neutral clause
 - Datadog telemetry onboarding includes privacy, retention, access and cost boundaries
 - Every subplan has decision/control/source frontmatter
-- Every numbered subplan task has an exact traceability row
-- All decision/control/source IDs resolve
+- Every numbered subplan task has an exact traceability row with a per-task ID set; no subplan carries one identical ID block on every task (machine-checked)
+- All decision/control/source IDs resolve; all traceability tables are shape-valid (row cell counts match headers, machine-checked)
+- All 39 decision classifications are constrained to the four-class legend (machine-checked)
 - Storage neutrality and provider-native evidence remain intact
 - Both composable planes and all five adoption modes are documented
 - Harness and enterprise skill eval specifications resolve and include observable assertions
 - Conformance fixtures cover concurrency, idempotency, recursion, authority, rollback, drift, telemetry and provider boundaries
-- Package, manifest, marketplace, internal dependency and lockfile versions align at 6.0.0
+- The 56-scenario adversarial corpus is validated by machine runners with index bijection, owner existence and mutation guards in both contract skills
+- The governance walking skeleton executes in CI: 17/17 checks covering consent gating, idempotent apply, explained denials, an independent local gate, drift detection/remediation, checksum module trust, evidence dedup, recursion limits, exception expiry and rollback
+- Claude Code probed at 2.1.211 on 2026-07-16 (CLI version observed; guard exit-code contract exercised locally; native hook registration not exercised — hook rows stay documentation-verified; re-probe on version change)
+- The shipped command-workflow package validates itself without repository context; repository-wide release validation runs as a separate CI task
+- Package, manifest, marketplace, internal dependency and lockfile versions align at 6.0.1
 - Migration, rollback, diagram and prohibited-claim guards pass
 - Format, lint, typecheck, build, repository tests and all skill validators pass
 
 Warnings / required runtime reviews:
-- Harness executables were not installed; capability rows and model-driven eval specifications remain runtime-unverified until pinned-version probes run.
+- Five harness adapters (Codex, Kiro, Copilot, Pi, OpenCode) and all five enterprise platforms carry explicit candidate (documentation-derived) status; capability rows remain runtime-unverified until pinned-version probes run, and the result line above is qualified accordingly per validation-policy rule 5.
+- Kubernetes end-to-end operator tests (Kind-based go-test-e2e*) are excluded on the validation host due to a docker/runc incompatibility; webhook unit and envtest integration suites pass.
 - `npm audit` reports six transitive dependency advisories (1 low, 2 moderate, 3 high); dependency remediation remains a separate reviewed change.
-- Vendor capabilities remain version-pinned-conformance-required.
 - Azure DevOps Services/Server and Bitbucket Cloud/Data Center must be detected before recommendations are applied.
 - Account tiers, runner types, regions and installed apps can materially change capabilities.
 - AWS trust policies and Datadog data collection require organization-specific security/privacy review.
