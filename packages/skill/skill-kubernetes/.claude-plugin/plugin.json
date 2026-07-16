@@ -1,7 +1,9 @@
 {
   "name": "xonovex-skill-kubernetes",
-  "version": "6.0.0",
+  "version": "6.0.1",
   "description": "Xonovex Kubernetes skills",
-  "author": {"name": "Xonovex"},
+  "author": {
+    "name": "Xonovex"
+  },
   "skills": ["./kubernetes-guide"]
 }

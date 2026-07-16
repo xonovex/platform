@@ -1,13 +1,13 @@
 {
   "name": "@xonovex/skill-orthogonal-pattern",
-  "version": "6.0.0",
+  "version": "6.0.1",
   "private": true,
   "type": "module",
   "dependencies": {
-    "@xonovex/skill-connascence": "6.0.0",
-    "@xonovex/skill-ddd": "6.0.0",
-    "@xonovex/skill-hexagonal-pattern": "6.0.0",
-    "@xonovex/skill-microkernel-pattern": "6.0.0"
+    "@xonovex/skill-connascence": "6.0.1",
+    "@xonovex/skill-ddd": "6.0.1",
+    "@xonovex/skill-hexagonal-pattern": "6.0.1",
+    "@xonovex/skill-microkernel-pattern": "6.0.1"
   },
   "keywords": [
     "xonovex",

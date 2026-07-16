@@ -1,8 +1,10 @@
 {
   "name": "xonovex-utility",
-  "version": "6.0.0",
+  "version": "6.0.1",
   "description": "Xonovex utility commands — skills, instructions, reflect, content, versioning",
-  "author": {"name": "Xonovex"},
+  "author": {
+    "name": "Xonovex"
+  },
   "dependencies": [
     "xonovex-skill-content",
     "xonovex-skill-reflect",

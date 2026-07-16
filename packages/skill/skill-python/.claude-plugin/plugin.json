@@ -1,8 +1,10 @@
 {
   "name": "xonovex-skill-python",
-  "version": "6.0.0",
+  "version": "6.0.1",
   "description": "Xonovex Python skills",
-  "author": {"name": "Xonovex"},
+  "author": {
+    "name": "Xonovex"
+  },
   "skills": ["./python-guide"],
   "dependencies": ["xonovex-skill-fp", "xonovex-skill-oop"]
 }

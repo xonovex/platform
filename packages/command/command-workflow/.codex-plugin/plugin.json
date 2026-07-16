@@ -1,6 +1,6 @@
 {
   "name": "xonovex-workflow",
-  "version": "6.0.0",
+  "version": "6.0.1",
   "description": "Composable lifecycle, planning, delivery, and governance commands",
   "author": {
     "name": "Xonovex"

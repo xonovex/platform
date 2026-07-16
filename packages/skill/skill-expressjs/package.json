@@ -1,10 +1,10 @@
 {
   "name": "@xonovex/skill-expressjs",
-  "version": "6.0.0",
+  "version": "6.0.1",
   "private": true,
   "type": "module",
   "dependencies": {
-    "@xonovex/skill-zod": "6.0.0"
+    "@xonovex/skill-zod": "6.0.1"
   },
   "keywords": [
     "xonovex",

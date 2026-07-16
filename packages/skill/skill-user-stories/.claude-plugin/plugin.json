@@ -1,7 +1,9 @@
 {
   "name": "xonovex-skill-user-stories",
-  "version": "6.0.0",
+  "version": "6.0.1",
   "description": "Xonovex User story skills",
-  "author": {"name": "Xonovex"},
+  "author": {
+    "name": "Xonovex"
+  },
   "skills": ["./user-stories-guide"]
 }

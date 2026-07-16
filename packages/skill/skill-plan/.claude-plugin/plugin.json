@@ -1,8 +1,10 @@
 {
   "name": "xonovex-skill-plan",
-  "version": "6.0.0",
+  "version": "6.0.1",
   "description": "Xonovex early lifecycle and Planning skills",
-  "author": {"name": "Xonovex"},
+  "author": {
+    "name": "Xonovex"
+  },
   "skills": ["./plan-guide"],
   "dependencies": ["xonovex-skill-code-quality", "xonovex-skill-workflow"]
 }

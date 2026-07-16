@@ -1,12 +1,12 @@
 {
   "name": "@xonovex/skill-c99-opinionated",
-  "version": "6.0.0",
+  "version": "6.0.1",
   "private": true,
   "type": "module",
   "dependencies": {
-    "@xonovex/skill-c99": "6.0.0",
-    "@xonovex/skill-data-oriented-design": "6.0.0",
-    "@xonovex/skill-memory-management": "6.0.0"
+    "@xonovex/skill-c99": "6.0.1",
+    "@xonovex/skill-data-oriented-design": "6.0.1",
+    "@xonovex/skill-memory-management": "6.0.1"
   },
   "keywords": [
     "xonovex",

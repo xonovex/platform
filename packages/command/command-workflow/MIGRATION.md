@@ -1,5 +1,19 @@
 # Migrating from 5.x to 6.0.0
 
+## 6.0.1
+
+Patch release. Nine skill packages moved their guide directories from a
+nested `skills/<topic>-guide/` layout to the flat `<topic>-guide/` layout
+their plugin manifests now reference: skill-accessibility,
+skill-ai-governance, skill-aws, skill-azure-devops, skill-bitbucket,
+skill-bitrise, skill-datadog, skill-reliability, and
+skill-security-assurance. Harnesses resolve skills through each plugin's
+manifest, so no consumer action is needed beyond upgrading; the previous
+nested layout was unreliable for the Codex loader. The release also adds
+the executable governance walking skeleton, the adversarial conformance
+scenario corpus with machine runners, and repository-decoupled package
+validation.
+
 Version 6 is a coordinated breaking release of every command and skill plugin. Keep command plugins, skill plugins, plugin manifests, and the marketplace on one major version; mixed 5.x/6.x installations are unsupported.
 
 ## Why this is breaking

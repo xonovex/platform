@@ -1,7 +1,9 @@
 {
   "name": "xonovex-skill-content",
-  "version": "6.0.0",
+  "version": "6.0.1",
   "description": "Xonovex Content skills",
-  "author": {"name": "Xonovex"},
+  "author": {
+    "name": "Xonovex"
+  },
   "skills": ["./content-guide"]
 }

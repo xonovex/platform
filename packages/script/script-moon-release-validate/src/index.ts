@@ -73,7 +73,7 @@ const codexMarketplace = readJson(
 ) as Marketplace;
 const releaseVersion = marketplace.metadata.version;
 
-check(releaseVersion === "6.0.0", "marketplace release must be 6.0.0");
+check(releaseVersion === "6.0.1", "marketplace release must be 6.0.1");
 
 const pluginPackages = [
   ...childDirectories(resolve(repositoryRoot, "packages/command")),
