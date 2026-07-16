@@ -1,0 +1,7 @@
+{
+  "name": "xonovex-skill-datadog",
+  "version": "5.0.0",
+  "description": "Xonovex Datadog observability and evidence skills",
+  "author": {"name": "Xonovex"},
+  "skills": ["./skills/datadog-guide"]
+}

@@ -1,0 +1,7 @@
+{
+  "name": "xonovex-skill-azure-devops",
+  "version": "5.0.0",
+  "description": "Xonovex Azure DevOps platform skills",
+  "author": {"name": "Xonovex"},
+  "skills": ["./skills/azure-devops-guide"]
+}

@@ -1,0 +1,33 @@
+{
+  "skill_name": "azure-devops-guide",
+  "tier": "moderate",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "We use Azure DevOps Services. Protect main with a reusable validation pipeline and a resource approval, then explain exactly what to preview and how to prove a developer cannot bypass it.",
+      "assertions": [
+        "Separates the reusable/versioned template, branch build-validation policy, and protected-resource approval/check as distinct native controls",
+        "Binds validation and evidence to the exact pull-request source commit and preserves native policy, build, check/approval, and artifact references",
+        "Requires discover, exact preview, authorization, idempotent apply, authoritative re-read, positive and bypass-negative probes, rollback, and drift detection"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "A script written for Azure DevOps Services REST 7.2 needs to run against Azure DevOps Server. Can it silently retry with an older api-version when a field is rejected?",
+      "assertions": [
+        "Requires explicit Services versus Server release detection and a version-pinned capability result",
+        "Rejects silent API downgrade or weaker fallback and returns unsupported/unknown when the Server probe has not passed",
+        "Distinguishes documentation conformance from a live Server conformance pass"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Onboard Azure Pipelines to deploy through an Azure service connection. We want no stored client secret, minimum permissions, expiry verification, drift detection, and complete uninstall guidance.",
+      "assertions": [
+        "Prefers workload identity federation or managed identity and does not create a long-lived secret by default",
+        "Previews issuer/audience/subject, project/pipeline authorization, Azure role scope, credential/network/data changes, and rollback without exposing credential values",
+        "Verifies temporary credential expiry, an allowed action, an out-of-scope denial, authoritative service-connection/RBAC state, drift, and owned-resource-only rollback"
+      ]
+    }
+  ]
+}

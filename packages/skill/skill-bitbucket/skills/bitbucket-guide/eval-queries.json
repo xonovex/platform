@@ -1,0 +1,74 @@
+[
+  {
+    "query": "require a Bitbucket Cloud pipeline status before merge and prove a spoofed status cannot satisfy it",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "Cloud exact-revision merge gate"
+  },
+  {
+    "query": "use a shared Bitbucket Pipelines configuration across our mobile repositories",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "Cloud shared pipeline configuration"
+  },
+  {
+    "query": "configure Bitbucket Pipelines OIDC for a least-privilege AWS role without access keys",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "Cloud OIDC"
+  },
+  {
+    "query": "our Bitbucket Data Center 10.3 instance needs pull request build status and webhook conformance",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "Data Center versioned operations"
+  },
+  {
+    "query": "can I use Bitbucket Cloud custom merge checks on our self-managed Bitbucket instance",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "Cloud/Data Center parity rejection"
+  },
+  {
+    "query": "recover pipeline and artifact evidence from opaque Bitbucket references after restart",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "native reference recovery"
+  },
+  {
+    "query": "preview and roll back branch permissions, deployment restrictions, secrets, and webhook changes in Bitbucket",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "transactional onboarding"
+  },
+  {
+    "query": "configure GitHub Actions required checks and rulesets",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near miss: GitHub owner"
+  },
+  {
+    "query": "create an Azure Boards work item for this feature",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near miss: Azure DevOps owner"
+  },
+  {
+    "query": "write a platform-neutral source provider port",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near miss: workflow/governance owner"
+  },
+  {
+    "query": "set up an AWS Organizations service control policy",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near miss: AWS owner"
+  },
+  {
+    "query": "choose a branching strategy for a monorepo",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near miss: general git design"
+  }
+]

@@ -113,10 +113,58 @@
       "category": "Productivity"
     },
     {
+      "name": "xonovex-skill-aws",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-aws"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-azure-devops",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-azure-devops"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
       "name": "xonovex-skill-bdd",
       "source": {
         "source": "local",
         "path": "./packages/skill/skill-bdd"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-bitbucket",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-bitbucket"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-bitrise",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-bitrise"
       },
       "policy": {
         "installation": "AVAILABLE",
@@ -297,6 +345,18 @@
       "source": {
         "source": "local",
         "path": "./packages/skill/skill-data-oriented-design"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-datadog",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-datadog"
       },
       "policy": {
         "installation": "AVAILABLE",

@@ -1,0 +1,21 @@
+{
+  "name": "xonovex-skill-bitbucket",
+  "version": "5.0.0",
+  "description": "Xonovex Bitbucket platform skills",
+  "author": {
+    "name": "Xonovex"
+  },
+  "skills": "./skills",
+  "interface": {
+    "displayName": "Bitbucket",
+    "shortDescription": "Cloud and Data Center source and CI operations",
+    "longDescription": "Operate and onboard Bitbucket Cloud or Data Center with explicit capabilities, native controls and evidence, secure OIDC, rollback, and drift handling.",
+    "developerName": "Xonovex",
+    "category": "Productivity",
+    "capabilities": ["Read", "Write"],
+    "defaultPrompt": [
+      "Compare Bitbucket Cloud and Data Center capabilities",
+      "Onboard Bitbucket controls safely"
+    ]
+  }
+}

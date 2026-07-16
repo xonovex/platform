@@ -56,3 +56,4 @@ Compose policy, execution, enforcement, enablement, evidence, and trust without 
 - Read [references/harness-adapters.md](references/harness-adapters.md) - Load when defining or reviewing an agent-harness adapter or capability matrix
 - Read [references/harness-onboarding.md](references/harness-onboarding.md) - Load when advising or executing harness-specific setup, rollback, disable, update, or drift checks
 - Read [references/harness-patterns.md](references/harness-patterns.md) - Load when selecting deterministic hooks, bounded model evaluators, bounded agent launchers, or organization-managed harness modules
+- Read [references/enterprise-platforms.md](references/enterprise-platforms.md) - Load when composing independently owned enterprise work-item, source, CI, cloud-governance, and observability providers

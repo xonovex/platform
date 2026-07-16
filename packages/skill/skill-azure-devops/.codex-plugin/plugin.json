@@ -1,0 +1,21 @@
+{
+  "name": "xonovex-skill-azure-devops",
+  "version": "5.0.0",
+  "description": "Xonovex Azure DevOps platform skills",
+  "author": {
+    "name": "Xonovex"
+  },
+  "skills": "./skills",
+  "interface": {
+    "displayName": "Azure DevOps",
+    "shortDescription": "Edition-aware Boards, Repos, and Pipelines operations",
+    "longDescription": "Operate and onboard Azure DevOps Services or Server with native work-item, repository, pipeline, policy, evidence, rollback, and drift controls.",
+    "developerName": "Xonovex",
+    "category": "Productivity",
+    "capabilities": ["Read", "Write"],
+    "defaultPrompt": [
+      "Review our Azure DevOps controls",
+      "Onboard an Azure DevOps provider safely"
+    ]
+  }
+}

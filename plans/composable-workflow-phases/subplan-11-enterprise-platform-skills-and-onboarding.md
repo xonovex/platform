@@ -3,7 +3,7 @@ type: plan
 has_subplans: false
 parent_plan: ../composable-workflow-phases.md
 parallel_group: 3
-status: pending
+status: complete
 dependencies:
   plans:
   - workflow-governance-contracts-profiles-and-execution
@@ -25,12 +25,12 @@ skills_to_consult:
 - orthogonal-pattern-guide
 - versioning-guide
 validation:
-  type_check: pending
-  lint: pending
-  build: pending
-  tests: pending
-  integration: pending
-updated: '2026-07-14'
+  type_check: passed
+  lint: passed
+  build: passed
+  tests: passed
+  integration: passed
+updated: '2026-07-16'
 decision_refs:
 - D-001
 - D-003
@@ -177,14 +177,14 @@ Mapping IDs resolve through the parent plan’s `traceability/` artifacts. Platf
 
 ## Success Criteria
 
-- [ ] Five optional skill owners exist and can be installed independently.
-- [ ] Azure DevOps Services/Server and Bitbucket Cloud/Data Center are detected and documented separately.
-- [ ] Azure Boards, Bitbucket source/PRs, Bitrise CI, AWS runtime/governance and Datadog evidence compose through opaque native references.
-- [ ] CI-to-AWS onboarding uses temporary federated credentials where supported and never creates static keys by default.
-- [ ] Datadog onboarding explicitly controls content, redaction, retention, residency, access, sampling and cost.
-- [ ] Every capability claim is backed by official documentation and a pinned-version conformance test.
-- [ ] Setup is previewable, authorized, idempotent, verifiable, reversible and drift-aware.
-- [ ] Unsupported editions, tiers and features fail clearly without silent fallback.
+- [x] Five optional skill owners exist and can be installed independently.
+- [x] Azure DevOps Services/Server and Bitbucket Cloud/Data Center are detected and documented separately.
+- [x] Azure Boards, Bitbucket source/PRs, Bitrise CI, AWS runtime/governance and Datadog evidence compose through opaque native references.
+- [x] CI-to-AWS onboarding uses temporary federated credentials where supported and never creates static keys by default.
+- [x] Datadog onboarding explicitly controls content, redaction, retention, residency, access, sampling and cost.
+- [x] Every capability claim is backed by official documentation and a pinned-version conformance test.
+- [x] Setup is previewable, authorized, idempotent, verifiable, reversible and drift-aware.
+- [x] Unsupported editions, tiers and features fail clearly without silent fallback.
 
 ## Files Modified/Created
 

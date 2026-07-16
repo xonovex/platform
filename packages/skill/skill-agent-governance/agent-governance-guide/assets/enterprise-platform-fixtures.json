@@ -1,0 +1,452 @@
+{
+  "version": "1.0.0",
+  "sourceSnapshot": "2026-07-16",
+  "platforms": [
+    {
+      "id": "azure-devops",
+      "owner": "azure-devops-guide",
+      "variants": [
+        {
+          "product": "azure-devops-services",
+          "testedVersion": "services-docs-2026-07-14",
+          "apiVersion": "7.2",
+          "supportState": "documentation-conformant",
+          "capabilities": [
+            "work-items",
+            "pull-requests",
+            "branch-policies",
+            "pipeline-templates",
+            "approvals-checks",
+            "artifacts",
+            "service-connections",
+            "service-hooks"
+          ],
+          "nativeReferences": [
+            "work-item",
+            "pull-request",
+            "commit",
+            "build",
+            "artifact",
+            "policy",
+            "service-hook"
+          ]
+        },
+        {
+          "product": "azure-devops-server",
+          "testedVersion": "server-2022.2",
+          "apiVersion": "7.1",
+          "supportState": "documentation-conformant",
+          "capabilities": [
+            "work-items",
+            "pull-requests",
+            "branch-policies",
+            "pipeline-templates",
+            "builds",
+            "artifacts",
+            "service-hooks"
+          ],
+          "unsupportedUntilProbe": [
+            "services-only-check-types",
+            "services-workload-identity-defaults"
+          ],
+          "nativeReferences": [
+            "work-item",
+            "pull-request",
+            "commit",
+            "build",
+            "artifact",
+            "policy",
+            "service-hook"
+          ]
+        }
+      ],
+      "sourceRefs": [
+        "S-AZDO-TEMPLATES",
+        "S-AZDO-APPROVALS",
+        "S-AZDO-BRANCH",
+        "S-AZDO-WORKITEMS",
+        "S-AZDO-SERVICE-CONNECTIONS",
+        "S-AZDO-REST",
+        "S-AZDO-SERVICE-HOOKS"
+      ]
+    },
+    {
+      "id": "bitbucket",
+      "owner": "bitbucket-guide",
+      "variants": [
+        {
+          "product": "bitbucket-cloud",
+          "testedVersion": "cloud-docs-2026-07-14",
+          "apiVersion": "2.0",
+          "supportState": "documentation-conformant",
+          "capabilities": [
+            "repositories",
+            "pull-requests",
+            "pipelines",
+            "shared-configurations",
+            "deployments",
+            "merge-checks",
+            "custom-checks",
+            "branch-permissions",
+            "oidc",
+            "webhooks"
+          ],
+          "nativeReferences": [
+            "repository",
+            "commit",
+            "pull-request",
+            "pipeline",
+            "artifact",
+            "deployment",
+            "build-status",
+            "webhook-delivery"
+          ]
+        },
+        {
+          "product": "bitbucket-data-center",
+          "testedVersion": "10.3",
+          "apiVersion": "1003",
+          "supportState": "documentation-conformant",
+          "capabilities": [
+            "repositories",
+            "pull-requests",
+            "permissions",
+            "build-status",
+            "deployment-status",
+            "rest",
+            "webhooks",
+            "installed-apps"
+          ],
+          "unsupportedUntilProbe": [
+            "cloud-pipelines",
+            "cloud-oidc",
+            "cloud-shared-configurations",
+            "cloud-custom-checks"
+          ],
+          "nativeReferences": [
+            "project",
+            "repository",
+            "commit",
+            "pull-request",
+            "build-status",
+            "deployment-status",
+            "webhook-delivery"
+          ]
+        }
+      ],
+      "sourceRefs": [
+        "S-BITBUCKET-CLOUD-PIPELINES",
+        "S-BITBUCKET-CLOUD-OIDC",
+        "S-BITBUCKET-CLOUD-REST",
+        "S-BITBUCKET-CLOUD-WEBHOOKS",
+        "S-BITBUCKET-DC",
+        "S-BITBUCKET-DC-REST"
+      ]
+    },
+    {
+      "id": "bitrise",
+      "owner": "bitrise-guide",
+      "variants": [
+        {
+          "product": "bitrise",
+          "testedVersion": "hosted-docs-2026-07-14",
+          "apiVersion": "current-v0.1",
+          "supportState": "documentation-conformant",
+          "capabilities": [
+            "workflows",
+            "pipelines",
+            "steps",
+            "triggers",
+            "secrets",
+            "artifacts",
+            "build-status",
+            "api",
+            "webhooks",
+            "hosted-runner",
+            "self-hosted-runner",
+            "aws-oidc"
+          ],
+          "nativeReferences": [
+            "app",
+            "workflow",
+            "pipeline",
+            "build",
+            "artifact",
+            "build-status",
+            "webhook-delivery"
+          ]
+        }
+      ],
+      "sourceRefs": [
+        "S-BITRISE-WORKFLOWS",
+        "S-BITRISE-SECRETS",
+        "S-BITRISE-ARTIFACTS",
+        "S-BITRISE-TRIGGERS",
+        "S-BITRISE-OIDC-AWS",
+        "S-BITRISE-BUILD-STATUS",
+        "S-BITRISE-VERIFIED-STEPS"
+      ]
+    },
+    {
+      "id": "aws",
+      "owner": "aws-guide",
+      "variants": [
+        {
+          "product": "aws-commercial-partition",
+          "testedVersion": "service-docs-2026-07-14",
+          "apiVersion": "service-specific",
+          "supportState": "documentation-conformant",
+          "capabilities": [
+            "iam-federation",
+            "oidc",
+            "permissions-boundaries",
+            "organizations-scps",
+            "cloudtrail",
+            "config-conformance-packs",
+            "security-hub",
+            "evidence"
+          ],
+          "nativeReferences": [
+            "role-session",
+            "policy",
+            "cloudtrail-event",
+            "config-evaluation",
+            "security-hub-finding"
+          ]
+        }
+      ],
+      "sourceRefs": [
+        "S-AWS-IAM-BEST",
+        "S-AWS-OIDC",
+        "S-AWS-SCP",
+        "S-AWS-CLOUDTRAIL",
+        "S-AWS-CONFIG",
+        "S-AWS-SECURITY-HUB"
+      ]
+    },
+    {
+      "id": "datadog",
+      "owner": "datadog-guide",
+      "variants": [
+        {
+          "product": "datadog-saas",
+          "testedVersion": "product-docs-2026-07-14",
+          "apiVersion": "v2-where-supported",
+          "supportState": "documentation-conformant",
+          "capabilities": [
+            "ci-visibility",
+            "cd-visibility",
+            "dora",
+            "opentelemetry",
+            "llm-observability",
+            "audit-trail",
+            "software-catalog",
+            "aws-integration",
+            "cloud-security"
+          ],
+          "nativeReferences": [
+            "pipeline",
+            "test",
+            "deployment",
+            "trace",
+            "audit-event",
+            "catalog-entity",
+            "cloud-security-finding"
+          ]
+        }
+      ],
+      "sourceRefs": [
+        "S-DATADOG-CI",
+        "S-DATADOG-CD",
+        "S-DATADOG-OTEL",
+        "S-DATADOG-AUDIT",
+        "S-DATADOG-CATALOG",
+        "S-DATADOG-AWS",
+        "S-DATADOG-CLOUD-SECURITY",
+        "S-DATADOG-LLM",
+        "S-DATADOG-DORA"
+      ]
+    }
+  ],
+  "onboarding": {
+    "steps": [
+      "discover",
+      "assess",
+      "propose",
+      "preview",
+      "authorize",
+      "apply",
+      "verify",
+      "record",
+      "operate"
+    ],
+    "previewFields": [
+      "nativeChanges",
+      "permissions",
+      "credentialFlow",
+      "networkDestinations",
+      "dataCategories",
+      "costImpact",
+      "failureBehavior",
+      "evidence",
+      "verification",
+      "rollback",
+      "driftOwner"
+    ],
+    "authorizationBoundToPreview": true,
+    "applyIdempotent": true,
+    "verifyAuthoritativeState": true,
+    "rollbackRetainsEvidence": true,
+    "driftDetection": true
+  },
+  "federationCases": [
+    {
+      "id": "bitrise-to-aws-constrained-oidc",
+      "expectedValid": true,
+      "issuerPinned": true,
+      "audienceConstrained": true,
+      "subjectConstrained": true,
+      "temporaryCredentials": true,
+      "leastPrivilegeRole": true,
+      "createsLongLivedAccessKey": false,
+      "preview": true,
+      "verifyExpiry": true,
+      "rollback": true
+    },
+    {
+      "id": "ci-to-aws-static-key-default",
+      "expectedValid": false,
+      "expectedCode": "long-lived-key-default",
+      "issuerPinned": false,
+      "audienceConstrained": false,
+      "subjectConstrained": false,
+      "temporaryCredentials": false,
+      "leastPrivilegeRole": false,
+      "createsLongLivedAccessKey": true,
+      "preview": true,
+      "verifyExpiry": false,
+      "rollback": true
+    },
+    {
+      "id": "oidc-wildcard-subject",
+      "expectedValid": false,
+      "expectedCode": "unconstrained-oidc-claims",
+      "issuerPinned": true,
+      "audienceConstrained": true,
+      "subjectConstrained": false,
+      "temporaryCredentials": true,
+      "leastPrivilegeRole": true,
+      "createsLongLivedAccessKey": false,
+      "preview": true,
+      "verifyExpiry": true,
+      "rollback": true
+    }
+  ],
+  "telemetryCases": [
+    {
+      "id": "datadog-minimized-telemetry",
+      "expectedValid": true,
+      "purposeDeclared": true,
+      "contentCaptureDefault": false,
+      "redaction": true,
+      "sampling": true,
+      "retention": true,
+      "residency": true,
+      "access": true,
+      "deletion": true,
+      "costBudget": true
+    },
+    {
+      "id": "datadog-unredacted-prompt-default",
+      "expectedValid": false,
+      "expectedCode": "unsafe-telemetry-default",
+      "purposeDeclared": false,
+      "contentCaptureDefault": true,
+      "redaction": false,
+      "sampling": false,
+      "retention": false,
+      "residency": false,
+      "access": false,
+      "deletion": false,
+      "costBudget": false
+    }
+  ],
+  "negativeCases": [
+    {
+      "id": "unsupported-edition",
+      "expectedOutcome": "unsupported",
+      "silentFallback": false
+    },
+    {
+      "id": "provider-outage",
+      "expectedOutcome": "fail-visible",
+      "silentFallback": false
+    },
+    {
+      "id": "rate-limit",
+      "expectedOutcome": "bounded-retry",
+      "silentFallback": false
+    },
+    {
+      "id": "duplicate-request",
+      "expectedOutcome": "reconcile-native-identity",
+      "silentFallback": false
+    },
+    {
+      "id": "partial-apply",
+      "expectedOutcome": "rollback-or-degraded",
+      "silentFallback": false
+    },
+    {
+      "id": "secret-exposure",
+      "expectedOutcome": "deny",
+      "silentFallback": false
+    },
+    {
+      "id": "broken-artifact-status-link",
+      "expectedOutcome": "invalid-evidence",
+      "silentFallback": false
+    }
+  ],
+  "mixedStack": {
+    "centralResultStore": false,
+    "freshContextRecovery": true,
+    "providers": {
+      "workItem": {
+        "platform": "azure-devops",
+        "referenceKind": "work-item",
+        "opaque": true
+      },
+      "source": {
+        "platform": "bitbucket",
+        "referenceKind": "commit-and-pull-request",
+        "opaque": true
+      },
+      "mobileCi": {
+        "platform": "bitrise",
+        "referenceKind": "build-and-artifact",
+        "opaque": true
+      },
+      "runtimeGovernance": {
+        "platform": "aws",
+        "referenceKind": "role-session-and-audit",
+        "opaque": true
+      },
+      "observability": {
+        "platform": "datadog",
+        "referenceKind": "telemetry-and-audit",
+        "opaque": true
+      }
+    },
+    "relationshipFields": [
+      "subject",
+      "revision",
+      "origin",
+      "freshness",
+      "authority",
+      "limitations",
+      "reference"
+    ],
+    "traceIsWorkflowIdentity": false
+  }
+}

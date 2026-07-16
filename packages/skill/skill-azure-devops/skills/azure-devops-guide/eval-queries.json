@@ -1,0 +1,74 @@
+[
+  {
+    "query": "link Azure Boards work item 381 to the pull request and preserve both native references",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "Boards relationships and Repos references"
+  },
+  {
+    "query": "add an Azure Repos build validation policy to main and test that a stale status cannot merge",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "branch policy and exact-revision evidence"
+  },
+  {
+    "query": "onboard an Azure Pipelines service connection without creating a client secret",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "workload identity federation"
+  },
+  {
+    "query": "our Azure DevOps Server 2022 instance rejects api-version 7.2; choose the supported operation",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "Server/API detection"
+  },
+  {
+    "query": "make an Azure Pipelines extends template mandatory and preview approvals, checks, permissions, and rollback",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "reusable enforcement onboarding"
+  },
+  {
+    "query": "configure a service hook for completed builds and handle duplicate or out-of-order deliveries",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "service-hook conformance"
+  },
+  {
+    "query": "recover a workflow result from an Azure Boards work-item reference in a fresh process",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "opaque provider reference"
+  },
+  {
+    "query": "set up Bitbucket Pipelines OIDC to assume an AWS role",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near miss: Bitbucket owner"
+  },
+  {
+    "query": "write a platform-neutral configuration-provider interface",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near miss: governance contract"
+  },
+  {
+    "query": "design a generic lifecycle workflow for planning and release",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near miss: workflow owner"
+  },
+  {
+    "query": "create an Azure ARM Terraform module for a virtual network",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near miss: Azure infrastructure, not Azure DevOps"
+  },
+  {
+    "query": "instrument an app with Azure Monitor OpenTelemetry",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near miss: observability product"
+  }
+]

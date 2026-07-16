@@ -128,4 +128,12 @@ The governance contract is an Xonovex architectural synthesis. Sources support c
 - **Used for:** `references/harness-adapters.md`, `assets/harness-conformance-fixtures.json`, `assets/harness-module-templates.json`
 - **Aspects extracted:** Global/project plugin loading, sequential load order, JavaScript/TypeScript events, tool interception, permissions and session events, shell environment mutation, custom tools, and experimental compaction context.
 
+## S-ENTERPRISE-PLATFORMS — Optional enterprise provider composition
+
+- **URL:** https://learn.microsoft.com/en-us/rest/api/azure/devops/?view=azure-devops-rest-7.2
+- **Additional URLs:** https://developer.atlassian.com/cloud/bitbucket/rest/intro/ · https://developer.atlassian.com/server/bitbucket/rest/v1003/ · https://docs.bitrise.io/en/bitrise-ci/workflows-and-pipelines.html · https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html · https://docs.datadoghq.com/continuous_integration/
+- **Last reviewed:** 2026-07-16
+- **Used for:** `references/enterprise-platforms.md`, `assets/enterprise-platform-fixtures.json`
+- **Aspects extracted:** Provider-native identities and references, explicit cloud/self-managed variants, temporary least-privilege credentials, and independent work-item/source/CI/runtime/telemetry roles. The shared capability-negotiation, transactional-onboarding, failure-policy, and no-central-store composition rules are Xonovex architectural synthesis; detailed claims remain owned and sourced by each platform skill.
+
 Harness capabilities and limitations require adapter-specific official sources and version-pinned conformance probes before release. The 2026-07-16 fixture snapshot records documentation conformance; its `not-installed` runtime probes are explicit non-results rather than passing runtime evidence.

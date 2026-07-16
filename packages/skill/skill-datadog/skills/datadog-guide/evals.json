@@ -1,0 +1,33 @@
+{
+  "skill_name": "datadog-guide",
+  "tier": "moderate",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Onboard Datadog for Bitrise mobile CI, AWS deployments, and DORA. We need exact evidence links but Datadog must not become our source of truth.",
+      "assertions": [
+        "Defines consistent service/environment/version/repository/commit/pipeline/build/artifact/deployment mappings and preserves independent Bitrise, source-host, AWS, and Datadog opaque references",
+        "States that Datadog correlations/aggregates are views and do not replace authoritative source, build, deployment, cloud, or workflow identity",
+        "Tests retries, duplicate/late/failed/rolled-back/out-of-band deployments, incomplete mappings, outages, rollback, and fresh-context reference resolution"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Enable Datadog LLM Observability for an internal agent. Default to no prompt, completion, tool output, source, secrets, or personal data. Show how to verify privacy and cost.",
+      "assertions": [
+        "Uses metadata-only collection by default and requires separate declared purpose/authorization before sensitive content capture",
+        "Previews fields/content, pre-egress redaction, sampling, retention, residency, access, deletion/export, downstream use, volume and cost budget",
+        "Uses prohibited-data canaries plus allowed-metadata, role-denial, sampling/retention, outage/backpressure, deletion, rollback, and drift probes"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Configure Datadog AWS integration, Cloud Security, Audit Trail, and Software Catalog. Can Datadog findings replace CloudTrail and own service metadata automatically?",
+      "assertions": [
+        "Rejects replacing AWS CloudTrail/Config/Security Hub or authoritative target state with Datadog observations and keeps their native references separate",
+        "Requires an explicit Software Catalog source of truth and prevents observed telemetry tags from silently overwriting ownership",
+        "Previews least-privilege AWS role/external trust, accounts/regions/resources/data/cost, finding/audit access/retention, verification, rollback, and drift"
+      ]
+    }
+  ]
+}

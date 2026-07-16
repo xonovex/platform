@@ -1,0 +1,33 @@
+{
+  "skill_name": "bitbucket-guide",
+  "tier": "moderate",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "We have Bitbucket Cloud Premium. Onboard a shared validation pipeline, required merge signal, protected production deployment, and native evidence. Include bypass and outage tests.",
+      "assertions": [
+        "Detects Cloud plan/runner capabilities and keeps shared pipeline, branch/merge control, build status/check, and deployment restriction as distinct native mechanisms",
+        "Pins reusable configuration, binds status/build/artifact/deployment evidence to the exact commit, inventories bypass actors, and tests omitted/renamed/spoofed/stale/failed/outage cases",
+        "Uses exact preview, authorization, idempotent apply, authoritative verify, rollback, drift detection, and opaque native references"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "A team wants to copy our Bitbucket Cloud Pipelines, OIDC, and custom merge-check setup to Bitbucket Data Center 10.3. Explain the safe approach.",
+      "assertions": [
+        "Treats Cloud and Data Center as separate products and pins Data Center 10.3/API/app discovery",
+        "Returns Cloud Pipelines, Cloud OIDC, shared configurations, and Cloud custom checks as unsupported until a separately identified Data Center-native capability or installed app passes conformance",
+        "Requires versioned REST, permissions/bypass, build/deployment status, webhook/app, upgrade, outage, and rollback probes without silent emulation"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Set up Bitbucket Pipelines to assume AWS permissions for production deployments. We do not allow stored AWS keys or wildcard repository access.",
+      "assertions": [
+        "Uses Bitbucket Cloud OIDC and AWS temporary role credentials and never creates a static access key by default",
+        "Previews and constrains issuer, audience, workspace, repository, environment and supported branch/tag/subject claims plus least-privilege role permissions",
+        "Verifies credential expiry, intended allow, cross-repository/environment denial, native pipeline/CloudTrail evidence, rollback, and drift"
+      ]
+    }
+  ]
+}

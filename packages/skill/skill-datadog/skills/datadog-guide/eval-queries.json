@@ -1,0 +1,74 @@
+[
+  {
+    "query": "correlate Bitrise pipeline and AWS deployment references in Datadog CI/CD Visibility",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "CI/CD evidence correlation"
+  },
+  {
+    "query": "define DORA deployment events without double-counting rollbacks and retries",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "DORA mapping"
+  },
+  {
+    "query": "configure Datadog OpenTelemetry sampling and redact high-cardinality personal tags",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "OTel governance"
+  },
+  {
+    "query": "enable LLM Observability metadata but keep prompts, tool output, and source code out",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "LLM privacy"
+  },
+  {
+    "query": "onboard Datadog AWS integration with least privilege and keep CloudTrail as authority",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "AWS integration boundary"
+  },
+  {
+    "query": "audit who changed Datadog retention and preserve the native Audit Trail reference",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "audit evidence"
+  },
+  {
+    "query": "preview telemetry residency, access, retention, deletion, sampling, and cost before collecting",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "privacy onboarding"
+  },
+  {
+    "query": "author an AWS IAM OIDC role trust policy",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near miss: AWS owner"
+  },
+  {
+    "query": "configure Bitrise Workflows and mobile build triggers",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near miss: Bitrise owner"
+  },
+  {
+    "query": "write a platform-neutral telemetry provider interface",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near miss: governance owner"
+  },
+  {
+    "query": "debug application business logic from a stack trace",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near miss: application debugging"
+  },
+  {
+    "query": "choose a PostgreSQL query monitoring index",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near miss: database tuning"
+  }
+]

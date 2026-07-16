@@ -1,0 +1,74 @@
+[
+  {
+    "query": "create a least-privilege AWS role for CI OIDC without IAM user access keys",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "workload federation"
+  },
+  {
+    "query": "explain why this AWS SCP does not grant the deployment permission",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "SCP semantics"
+  },
+  {
+    "query": "preview a progressive SCP rollout across test and production OUs with break-glass",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "organization guardrails"
+  },
+  {
+    "query": "configure organization CloudTrail, Config conformance packs, and Security Hub evidence",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "audit/config/security"
+  },
+  {
+    "query": "prove this OIDC role cannot be assumed from another repository or environment",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "claim and denial conformance"
+  },
+  {
+    "query": "recover an AWS governance decision from CloudTrail and Security Hub references after restart",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "native evidence recovery"
+  },
+  {
+    "query": "design an expiring monitored AWS break-glass path with rollback",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "exception operations"
+  },
+  {
+    "query": "configure Bitrise workflow triggers and mobile artifacts",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near miss: Bitrise owner"
+  },
+  {
+    "query": "set up Datadog AWS integration and telemetry retention",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near miss: Datadog owner"
+  },
+  {
+    "query": "write a cloud-neutral policy provider interface",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near miss: governance owner"
+  },
+  {
+    "query": "deploy an application with Terraform modules",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near miss: infrastructure implementation"
+  },
+  {
+    "query": "debug a generic Kubernetes admission webhook",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near miss: Kubernetes owner"
+  }
+]

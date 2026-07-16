@@ -1,0 +1,33 @@
+{
+  "skill_name": "aws-guide",
+  "tier": "moderate",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Our Bitrise production build needs AWS deployment access. Design the AWS side: no static keys, constrained claims, 30-minute credentials, least privilege, evidence, and rollback.",
+      "assertions": [
+        "Uses an AWS OIDC provider and IAM role with temporary STS credentials and never creates an IAM user/access key by default",
+        "Constrains issuer, audience, provider-supported workspace/app/repository/workflow/environment subject claims and applies least-privilege policy, boundary/session controls, and short duration",
+        "Verifies intended allow, cross-identity/environment/action denial, expiry, CloudTrail/target evidence, rollback, and trust/policy drift"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Roll out an SCP that prevents disabling security logging across all member accounts. Explain grants, canary rollout, break-glass, and proof.",
+      "assertions": [
+        "States that SCPs limit maximum permissions and never grant access, and evaluates inherited SCPs with identity/resource policies, boundaries/session policy, and explicit denies",
+        "Inventories organization/root/OU/account hierarchy and starts with a test OU/account before progressive production attachment",
+        "Previews blast radius and rollback, tests critical-service allows and target denies, monitors CloudTrail, and uses an expiring independently evidenced break-glass path"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Use CloudTrail, Config conformance packs, and Security Hub as release evidence. Can we call a passing pack proof of compliance and store copied event payloads centrally?",
+      "assertions": [
+        "Rejects treating Config packs or Security Hub standards/findings as certification or automatic compliance",
+        "Preserves separate opaque CloudTrail event, Config evaluation, Security Hub finding, target resource, policy/version, account/region, freshness and limitation references",
+        "Minimizes copied sensitive payloads and requires explicit region/event coverage, retention, access, redaction, outage/delay, duplicate, rollback, and fresh-context probes"
+      ]
+    }
+  ]
+}

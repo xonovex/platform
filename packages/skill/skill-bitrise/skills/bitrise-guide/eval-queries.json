@@ -1,0 +1,74 @@
+[
+  {
+    "query": "compose Bitrise Pipelines from reusable Workflows and pin every custom Step version",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "native composition and Step trust"
+  },
+  {
+    "query": "prevent fork pull requests from receiving protected Bitrise secrets",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "secret exposure boundary"
+  },
+  {
+    "query": "link a Bitrise build artifact and Git status to the exact mobile commit",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "native evidence linkage"
+  },
+  {
+    "query": "use Bitrise OIDC to assume an AWS deployment role without static keys",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "AWS OIDC onboarding"
+  },
+  {
+    "query": "why are the same commit and workflow launched twice by our Bitrise trigger map",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "trigger duplicates"
+  },
+  {
+    "query": "audit a self-hosted Bitrise runner for cache, network, and credential isolation",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "runner trust boundary"
+  },
+  {
+    "query": "roll back Bitrise workflow, secrets, webhook, and AWS trust drift",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "transactional operations"
+  },
+  {
+    "query": "configure Bitbucket Cloud Pipelines shared YAML",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near miss: Bitbucket owner"
+  },
+  {
+    "query": "write an AWS SCP for all organization accounts",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near miss: AWS owner"
+  },
+  {
+    "query": "create a generic CI workflow contract",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near miss: platform-neutral workflow"
+  },
+  {
+    "query": "publish DORA metrics to Datadog",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near miss: Datadog owner"
+  },
+  {
+    "query": "choose iOS signing settings in Xcode",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near miss: mobile build tooling"
+  }
+]

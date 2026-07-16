@@ -52,9 +52,29 @@
       "description": "Xonovex Low-level audio skills"
     },
     {
+      "name": "xonovex-skill-aws",
+      "source": "./packages/skill/skill-aws",
+      "description": "Xonovex AWS governance and evidence skills"
+    },
+    {
+      "name": "xonovex-skill-azure-devops",
+      "source": "./packages/skill/skill-azure-devops",
+      "description": "Xonovex Azure DevOps platform skills"
+    },
+    {
       "name": "xonovex-skill-bdd",
       "source": "./packages/skill/skill-bdd",
       "description": "Xonovex Behaviour/acceptance-driven development skills"
+    },
+    {
+      "name": "xonovex-skill-bitbucket",
+      "source": "./packages/skill/skill-bitbucket",
+      "description": "Xonovex Bitbucket platform skills"
+    },
+    {
+      "name": "xonovex-skill-bitrise",
+      "source": "./packages/skill/skill-bitrise",
+      "description": "Xonovex Bitrise platform skills"
     },
     {
       "name": "xonovex-skill-c99",
@@ -135,6 +155,11 @@
       "name": "xonovex-skill-data-oriented-design",
       "source": "./packages/skill/skill-data-oriented-design",
       "description": "Xonovex Data-oriented design skills"
+    },
+    {
+      "name": "xonovex-skill-datadog",
+      "source": "./packages/skill/skill-datadog",
+      "description": "Xonovex Datadog observability and evidence skills"
     },
     {
       "name": "xonovex-skill-ddd",

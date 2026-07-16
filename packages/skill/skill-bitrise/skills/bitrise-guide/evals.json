@@ -1,0 +1,33 @@
+{
+  "skill_name": "bitrise-guide",
+  "tier": "moderate",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Onboard a Bitrise mobile pipeline with reusable Workflows, pinned Steps, fork-safe secrets, artifacts, required Git status, and a self-hosted release runner. Show verification and rollback.",
+      "assertions": [
+        "Separates Pipeline, Workflow, Step, trigger, runner, artifact, and Git-status identities and pins executable Steps/configuration",
+        "Denies protected secrets to untrusted/fork code and inventories self-hosted host, cleanup, cache, network, credential, concurrency, and incident boundaries",
+        "Binds build/artifact/status to the exact commit and uses preview, authorization, idempotent apply, authoritative verify, bypass/outage/duplicate probes, rollback, and drift"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Give us a Bitrise-to-AWS production deployment setup. No access keys, no wildcard app or environment claims, and we need proof credentials expire.",
+      "assertions": [
+        "Uses Bitrise OIDC and AWS temporary role credentials and refuses to create a long-lived key by default",
+        "Constrains issuer, audience, workspace/app/repository/workflow/environment and supported source claims plus least-privilege role permissions",
+        "Verifies expiry, intended allow, cross-app/environment/action denial, Bitrise and AWS evidence, rollback, and drift"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "A Bitrise build succeeded, but the pull request accepted a status from a previous commit and the artifact URL later expired. How should conformance catch this?",
+      "assertions": [
+        "Requires exact repository/commit binding and rejects stale, renamed, spoofed, missing, cancelled, timed-out, or wrong-provider statuses",
+        "Preserves separate build, Step, artifact digest/access/retention, source-host status, and deployment references",
+        "Tests fresh-context resolution and treats expired/unresolvable artifacts as invalid or limited evidence rather than silently copying them"
+      ]
+    }
+  ]
+}
