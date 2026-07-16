@@ -36,6 +36,12 @@
     "rationale": "governance-only external enforcement onboarding"
   },
   {
+    "query": "replay the governance walking skeleton across Claude Code, required CI, non-file evidence, fresh-context recovery, drift, and rollback",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "end-to-end governance onboarding composition"
+  },
+  {
     "query": "validate the semantic fields in this PlanningResult",
     "should_trigger": false,
     "split": "train",

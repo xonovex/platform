@@ -28,6 +28,7 @@ Compose policy, execution, enforcement, enablement, evidence, and trust without 
 - **Onboard external controls** — discover, preview, apply, verify, roll back, and adopt provider-native controls without requiring harness or workflow modules — see [references/external-enforcement-onboarding.md](references/external-enforcement-onboarding.md)
 - **Adapt harnesses** — map semantic event intents to versioned native capabilities without inventing a universal hook file — see [references/harness-adapters.md](references/harness-adapters.md)
 - **Onboard harness modules** — inspect, preview, authorize, apply, verify, roll back, disable, update, and detect drift through native configuration — see [references/harness-onboarding.md](references/harness-onboarding.md)
+- **Replay the walking skeleton** — prove independent adoption, native onboarding, deterministic and bounded execution, external enforcement, provider evidence, drift, and rollback — see [references/walking-skeleton.md](references/walking-skeleton.md)
 
 ## Gotchas
 
@@ -57,3 +58,4 @@ Compose policy, execution, enforcement, enablement, evidence, and trust without 
 - Read [references/harness-onboarding.md](references/harness-onboarding.md) - Load when advising or executing harness-specific setup, rollback, disable, update, or drift checks
 - Read [references/harness-patterns.md](references/harness-patterns.md) - Load when selecting deterministic hooks, bounded model evaluators, bounded agent launchers, or organization-managed harness modules
 - Read [references/enterprise-platforms.md](references/enterprise-platforms.md) - Load when composing independently owned enterprise work-item, source, CI, cloud-governance, and observability providers
+- Read [references/walking-skeleton.md](references/walking-skeleton.md) - Load when proving the complete onboarding composition, replaying fresh-context evidence, or exercising disablement, drift, rollback, and adversarial cases

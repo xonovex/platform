@@ -1,0 +1,542 @@
+{
+  "schemaVersion": "1.0.0",
+  "scenario": {
+    "id": "composable-governance-walking-skeleton",
+    "subject": {
+      "workspace": "fixture:repository:42",
+      "revision": "sha256:4b6f4c9b2a7e5d1f",
+      "authorityZone": "organization-managed"
+    },
+    "contractReferences": {
+      "harness": {
+        "platform": "claude-code",
+        "matrixVersion": "1.0.0"
+      },
+      "hostedCi": {
+        "platform": "github",
+        "fixtureId": "github-native-defense-in-depth"
+      },
+      "externalCompositionId": "harness-and-required-ci-are-independent",
+      "operatorPolicyFixtureId": "kubernetes-agentpolicy-resource-bypass-denied",
+      "enterpriseComposition": {
+        "fixtureId": "mixedStack",
+        "federationCaseId": "bitrise-to-aws-constrained-oidc",
+        "telemetryCaseId": "datadog-minimized-telemetry"
+      },
+      "evidenceProviderFixtureId": "non-file-evidence-provider"
+    },
+    "discovery": {
+      "harness": {
+        "platform": "claude-code",
+        "runtimeVersion": "fixture-runtime-1.0.0",
+        "probeCommand": "claude --version",
+        "probeStatus": "probed",
+        "matrixVersion": "1.0.0",
+        "surface": "CLI and IDE",
+        "supportedCapabilities": [
+          "pre-tool-command",
+          "post-tool",
+          "model-evaluator",
+          "context-after-compaction"
+        ],
+        "handlerTypes": ["command", "command-http-mcp-tool", "prompt"],
+        "configurationScopes": [
+          "managed",
+          "user",
+          "project",
+          "local",
+          "plugin",
+          "component"
+        ],
+        "diagnosticsReference": "opaque:claude:diagnostics:42"
+      },
+      "installedModules": [],
+      "ciControls": [
+        {
+          "platform": "github",
+          "requiredCheck": "xonovex/governance",
+          "rulesetActive": true,
+          "bypassActors": []
+        }
+      ],
+      "operatorControls": {
+        "agentPolicyCount": 1,
+        "policyLookupFailure": "deny",
+        "runtimeClass": "kata"
+      },
+      "providerCapabilities": {
+        "hostedCi": ["required-check", "ruleset", "protected-environment"],
+        "enterprise": [
+          "work-item",
+          "source-and-pull-request",
+          "build-and-artifact",
+          "role-session-and-audit",
+          "telemetry-and-audit"
+        ],
+        "evidence": ["publish", "resolve", "correlate", "reconstruct"]
+      },
+      "selectedProfiles": [
+        "governance:organization-mandatory",
+        "execution:deterministic-first",
+        "enforcement:defense-in-depth",
+        "data:minimized",
+        "telemetry:metadata-only"
+      ]
+    },
+    "adoptionPaths": [
+      {
+        "mode": "governance-only",
+        "ordinaryAgentTask": true,
+        "workflowCapabilitySelected": false,
+        "governanceModules": [
+          "context-injection",
+          "protected-path",
+          "tool-policy",
+          "validation",
+          "audit"
+        ],
+        "resultReferences": [
+          "opaque:policy:decision:allow-42",
+          "opaque:hook:execution:allow-42"
+        ]
+      },
+      {
+        "mode": "workflow-only",
+        "ordinaryAgentTask": false,
+        "workflowCapabilitySelected": true,
+        "governanceModules": [],
+        "resultReferences": [
+          "opaque:azure-devops:work-item:42",
+          "opaque:bitbucket:pull-request:42",
+          "opaque:bitrise:build:42",
+          "opaque:aws:role-session:42",
+          "opaque:datadog:trace:42"
+        ]
+      },
+      {
+        "mode": "integrated",
+        "ordinaryAgentTask": true,
+        "workflowCapabilitySelected": true,
+        "governanceModules": [
+          "context-injection",
+          "protected-path",
+          "tool-policy",
+          "validation",
+          "audit"
+        ],
+        "resultReferences": [
+          "opaque:bitbucket:commit:42",
+          "opaque:github:check-run:42",
+          "opaque:evidence:walking-skeleton:42"
+        ]
+      }
+    ],
+    "recommendation": {
+      "modules": [
+        {
+          "id": "context-injection",
+          "classification": "advisory",
+          "nativeCapability": "context-after-compaction"
+        },
+        {
+          "id": "protected-path",
+          "classification": "enforcing",
+          "nativeCapability": "pre-tool-command"
+        },
+        {
+          "id": "tool-policy",
+          "classification": "enforcing",
+          "nativeCapability": "pre-tool-command"
+        },
+        {
+          "id": "validation",
+          "classification": "evidence-producing",
+          "nativeCapability": "post-tool"
+        },
+        {
+          "id": "audit",
+          "classification": "evidence-producing",
+          "nativeCapability": "post-tool"
+        },
+        {
+          "id": "github-required-check",
+          "classification": "external-enforcing",
+          "nativeCapability": "required-ci-check"
+        }
+      ],
+      "conflicts": [],
+      "unsupportedRequirements": []
+    },
+    "preview": {
+      "reference": "opaque:configuration:preview:42",
+      "digest": "sha256:preview-42",
+      "nativeChanges": [
+        {
+          "owner": "claude-code",
+          "subject": "<plugin>/hooks/hooks.json",
+          "operation": "install-pinned-plugin-hooks",
+          "beforeDigest": "sha256:absent",
+          "afterDigest": "sha256:claude-hooks-42"
+        },
+        {
+          "owner": "claude-code",
+          "subject": "<repo>/.claude/settings.json",
+          "operation": "enable-owned-plugin-entry",
+          "beforeDigest": "sha256:claude-settings-41",
+          "afterDigest": "sha256:claude-settings-42"
+        },
+        {
+          "owner": "github",
+          "subject": "repository-ruleset:42",
+          "operation": "require-xonovex-governance-check",
+          "beforeDigest": "sha256:github-ruleset-41",
+          "afterDigest": "sha256:github-ruleset-42"
+        }
+      ],
+      "requestedPermissions": {
+        "filesystem": ["workspace:read", "owned-settings-entry:write"],
+        "tools": ["read", "validate"],
+        "network": [
+          "api.github.com",
+          "selected-model-provider",
+          "self-controlled-evidence-api"
+        ],
+        "secrets": [],
+        "providers": ["github", "self-controlled-evidence-api"]
+      },
+      "moduleTrust": {
+        "authorityZone": "organization-managed",
+        "source": "organization-module-registry:governance-hooks",
+        "revision": "8f4cc72a789d4d2f385f87f6cb97a39118980e0c",
+        "digest": "sha256:claude-hooks-42",
+        "provenanceReference": "opaque:provenance:governance-hooks:42",
+        "verified": true,
+        "permissionExpansion": false
+      },
+      "dataFlow": [
+        {
+          "destination": "selected-model-provider",
+          "categories": ["policy-facts", "operation-metadata"],
+          "contentCapture": false,
+          "redacted": true
+        },
+        {
+          "destination": "self-controlled-evidence-api",
+          "categories": [
+            "subject",
+            "revision",
+            "decision",
+            "native-references"
+          ],
+          "contentCapture": false,
+          "redacted": true
+        }
+      ],
+      "modelUse": {
+        "purpose": "advisory classification of one proposed operation",
+        "timeBudgetSeconds": 30,
+        "tokenBudget": 2000,
+        "costBudget": 1,
+        "toolScope": [],
+        "failureMode": "fail-visible"
+      },
+      "failureBehavior": {
+        "mandatoryPolicy": "fail-closed",
+        "advisoryEvaluator": "fail-visible",
+        "evidencePublication": "fail-visible"
+      },
+      "verification": [
+        "native-diagnostics",
+        "permitted-tool-probe",
+        "denied-tool-probe",
+        "required-check-bypass-probe",
+        "fresh-context-recovery"
+      ],
+      "rollback": {
+        "available": true,
+        "targetReference": "opaque:configuration:snapshot:41",
+        "retainsEvidence": true
+      }
+    },
+    "authorization": {
+      "reference": "opaque:authorization:42",
+      "previewReference": "opaque:configuration:preview:42",
+      "previewDigest": "sha256:preview-42",
+      "actor": "fixture:platform-security",
+      "authority": "organization-managed",
+      "authorized": true,
+      "expiresAt": "2026-07-17T00:00:00Z"
+    },
+    "application": {
+      "idempotencyKey": "walking-skeleton:42",
+      "authorizationReference": "opaque:authorization:42",
+      "applied": true,
+      "applyReference": "opaque:configuration:apply:42",
+      "installedModules": [
+        "context-injection",
+        "protected-path",
+        "tool-policy",
+        "validation",
+        "audit",
+        "github-required-check"
+      ],
+      "verificationReference": "opaque:configuration:verify:42",
+      "verified": true,
+      "nativeDiagnostics": [
+        {
+          "capability": "pre-tool-command",
+          "probe": "pre-tool-exit-2-denies",
+          "outcome": "pass",
+          "reference": "opaque:claude:probe:pre-tool-42"
+        },
+        {
+          "capability": "post-tool",
+          "probe": "post-tool-context",
+          "outcome": "pass",
+          "reference": "opaque:claude:probe:post-tool-42"
+        },
+        {
+          "capability": "context-after-compaction",
+          "probe": "compact-context-reinjected",
+          "outcome": "pass",
+          "reference": "opaque:claude:probe:compaction-42"
+        }
+      ]
+    },
+    "lifecycleEvents": [
+      "discover",
+      "assess",
+      "recommend",
+      "preview",
+      "authorize",
+      "apply",
+      "verify",
+      "record",
+      "operate"
+    ],
+    "policyProbes": [
+      {
+        "id": "permitted-read",
+        "operation": "read:packages/skill/skill-agent-governance/package.json",
+        "outcome": "allow",
+        "reason": "read operation is within the approved workspace scope",
+        "decisionReference": "opaque:policy:decision:allow-42",
+        "enforcementReference": "opaque:hook:execution:allow-42"
+      },
+      {
+        "id": "denied-protected-write",
+        "operation": "write:.github/workflows/release.yml",
+        "outcome": "deny",
+        "reason": "protected path requires an authorized external change",
+        "decisionReference": "opaque:policy:decision:deny-42",
+        "enforcementReference": "opaque:hook:execution:deny-42"
+      }
+    ],
+    "advisoryReview": {
+      "moduleId": "bounded-policy-evaluator",
+      "executorClass": "model",
+      "advisory": true,
+      "authoritative": false,
+      "timeBudgetSeconds": 30,
+      "tokenBudget": 2000,
+      "costBudget": 1,
+      "retryLimit": 0,
+      "toolScope": [],
+      "filesystemScope": [],
+      "networkScope": ["selected-model-provider"],
+      "secretScope": [],
+      "output": {
+        "outcome": "advise",
+        "reasons": ["protected release configuration changed"],
+        "evidenceRequests": ["required-ci-check"]
+      },
+      "resultReference": "opaque:model-evaluation:42",
+      "failureMode": "fail-visible"
+    },
+    "evidence": {
+      "providerKind": "database-api",
+      "providerFixtureId": "non-file-evidence-provider",
+      "sidecarFiles": [],
+      "publishedRecords": [
+        {
+          "kind": "decision",
+          "reference": "opaque:policy:decision:deny-42",
+          "subject": "fixture:repository:42",
+          "revision": "sha256:4b6f4c9b2a7e5d1f"
+        },
+        {
+          "kind": "enforcement",
+          "reference": "opaque:hook:execution:deny-42",
+          "subject": "fixture:repository:42",
+          "revision": "sha256:4b6f4c9b2a7e5d1f"
+        },
+        {
+          "kind": "model-inference",
+          "reference": "opaque:model-evaluation:42",
+          "subject": "fixture:repository:42",
+          "revision": "sha256:4b6f4c9b2a7e5d1f"
+        },
+        {
+          "kind": "required-check",
+          "reference": "opaque:github:check-run:42",
+          "subject": "fixture:repository:42",
+          "revision": "sha256:4b6f4c9b2a7e5d1f"
+        },
+        {
+          "kind": "configuration",
+          "reference": "opaque:configuration:verify:42",
+          "subject": "fixture:repository:42",
+          "revision": "sha256:4b6f4c9b2a7e5d1f"
+        },
+        {
+          "kind": "correlation",
+          "reference": "opaque:evidence:walking-skeleton:42",
+          "subject": "fixture:repository:42",
+          "revision": "sha256:4b6f4c9b2a7e5d1f"
+        }
+      ],
+      "freshContextRecovery": {
+        "newProcess": true,
+        "originalConversationAvailable": false,
+        "localSidecarAvailable": false,
+        "inputReferences": [
+          "opaque:policy:decision:deny-42",
+          "opaque:hook:execution:deny-42",
+          "opaque:model-evaluation:42",
+          "opaque:github:check-run:42"
+        ],
+        "resolvedSubject": "fixture:repository:42",
+        "resolvedRevision": "sha256:4b6f4c9b2a7e5d1f",
+        "outcome": "reconstructed"
+      }
+    },
+    "externalEnforcement": {
+      "compositionFixtureId": "harness-and-required-ci-are-independent",
+      "platformFixtureId": "github-native-defense-in-depth",
+      "harnessHookEnabled": false,
+      "exactRevision": true,
+      "requiredCheck": "xonovex/governance",
+      "checkConclusion": "failure",
+      "checkReference": "opaque:github:check-run:42",
+      "targetMutation": "denied",
+      "failureBehavior": "fail-closed"
+    },
+    "enterpriseComposition": {
+      "centralResultStore": false,
+      "freshContextRecovery": true,
+      "providerReferences": [
+        {
+          "platform": "azure-devops",
+          "reference": "opaque:azure-devops:work-item:42"
+        },
+        {
+          "platform": "bitbucket",
+          "reference": "opaque:bitbucket:pull-request:42"
+        },
+        {
+          "platform": "bitrise",
+          "reference": "opaque:bitrise:build:42"
+        },
+        {
+          "platform": "aws",
+          "reference": "opaque:aws:role-session:42"
+        },
+        {
+          "platform": "datadog",
+          "reference": "opaque:datadog:trace:42"
+        }
+      ],
+      "federationCaseId": "bitrise-to-aws-constrained-oidc",
+      "telemetryCaseId": "datadog-minimized-telemetry"
+    },
+    "drift": {
+      "intendedDigest": "sha256:claude-hooks-42",
+      "observedDigest": "sha256:claude-hooks-tampered",
+      "classification": "weakening",
+      "detected": true,
+      "reported": true,
+      "resultReference": "opaque:drift:42",
+      "remediation": {
+        "recommendation": "restore the authorized organization-managed module digest",
+        "previewReference": "opaque:configuration:preview:43",
+        "authorizationReference": "opaque:authorization:43",
+        "outcome": "applied",
+        "resultReference": "opaque:configuration:apply:43"
+      }
+    },
+    "rollback": {
+      "authorizationReference": "opaque:authorization:rollback-42",
+      "targetReference": "opaque:configuration:snapshot:41",
+      "removedModules": [
+        "context-injection",
+        "protected-path",
+        "tool-policy",
+        "validation",
+        "audit",
+        "github-required-check"
+      ],
+      "nativeReferences": [
+        "opaque:claude:rollback:42",
+        "opaque:github:ruleset-rollback:42"
+      ],
+      "verified": true,
+      "installedModulesAfterRollback": [],
+      "driftDetectedAfterRollback": false,
+      "evidenceRetained": true
+    }
+  },
+  "negativeCases": [
+    {
+      "id": "untrusted-project-module",
+      "kind": "module-trust",
+      "authorityZone": "project",
+      "executable": true,
+      "projectTrusted": false,
+      "reviewed": false,
+      "observedOutcome": "deny",
+      "reasonCode": "project-trust-required"
+    },
+    {
+      "id": "unsupported-hook-type",
+      "kind": "capability",
+      "platform": "claude-code",
+      "capability": "agent-verifier",
+      "mandatory": true,
+      "observedOutcome": "deny",
+      "reasonCode": "unsupported-capability"
+    },
+    {
+      "id": "policy-service-unavailable",
+      "kind": "policy-outage",
+      "mandatory": true,
+      "authenticatedCacheAvailable": false,
+      "observedOutcome": "deny",
+      "reasonCode": "policy-service-unavailable"
+    },
+    {
+      "id": "concurrent-duplicate-event",
+      "kind": "duplicate-event",
+      "idempotencyKey": "walking-skeleton:event:42",
+      "invocations": 2,
+      "sideEffectCount": 1,
+      "observedOutcome": "reconciled",
+      "reasonCode": "duplicate-reconciled"
+    },
+    {
+      "id": "recursive-agent-launch",
+      "kind": "agent-recursion",
+      "maximumDepth": 1,
+      "requestedDepth": 2,
+      "observedOutcome": "deny",
+      "reasonCode": "recursion-denied"
+    },
+    {
+      "id": "expired-exception",
+      "kind": "exception-expiry",
+      "evaluationTime": "2026-07-16T12:00:00Z",
+      "expiresAt": "2026-07-16T11:59:59Z",
+      "observedOutcome": "deny",
+      "reasonCode": "exception-expired"
+    }
+  ]
+}

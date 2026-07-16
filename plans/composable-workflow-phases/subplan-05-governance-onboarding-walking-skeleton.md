@@ -3,7 +3,7 @@ type: plan
 has_subplans: false
 parent_plan: ../composable-workflow-phases.md
 parallel_group: 4
-status: pending
+status: complete
 dependencies:
   plans:
   - agent-harness-adapters-and-onboarding
@@ -20,12 +20,12 @@ skills_to_consult:
 - security-assurance-guide
 - git-guide
 validation:
-  type_check: pending
-  lint: pending
-  build: pending
-  tests: pending
-  integration: pending
-updated: '2026-07-14'
+  type_check: passed
+  lint: passed
+  build: passed
+  tests: passed
+  integration: passed
+updated: '2026-07-16'
 decision_refs:
 - D-001
 - D-003
@@ -163,14 +163,14 @@ Mapping IDs resolve through the parent plan’s `traceability/` artifacts. These
 
 ## Success Criteria
 
-- [ ] Workflow-only, governance-only, and integrated adoption paths all work without hidden coupling.
-- [ ] Onboarding discovers and explains the actual environment.
-- [ ] User sees and authorizes all native changes and permissions.
-- [ ] Deterministic enforcement and bounded semantic advice coexist.
-- [ ] Mandatory control has an independent external enforcement layer.
-- [ ] Evidence is provider-native and recoverable by opaque reference.
-- [ ] Drift, exception, disablement, and rollback work.
-- [ ] Unsupported or unsafe compositions fail clearly.
+- [x] Workflow-only, governance-only, and integrated adoption paths all work without hidden coupling.
+- [x] Onboarding discovers and explains the actual environment.
+- [x] User sees and authorizes all native changes and permissions.
+- [x] Deterministic enforcement and bounded semantic advice coexist.
+- [x] Mandatory control has an independent external enforcement layer.
+- [x] Evidence is provider-native and recoverable by opaque reference.
+- [x] Drift, exception, disablement, and rollback work.
+- [x] Unsupported or unsafe compositions fail clearly.
 
 ## Files Modified/Created
 

@@ -63,6 +63,17 @@
         "Applies idempotently only after authorization, re-reads authoritative state, and runs positive plus negative bypass/outage probes",
         "Rolls back to captured native versions, re-runs allow/deny probes, retains evidence, and assigns drift ownership"
       ]
+    },
+    {
+      "id": 8,
+      "prompt": "Prove our governance onboarding architecture end to end with one harness, a hosted required CI check, a non-file evidence provider, and our Azure DevOps/Bitbucket/Bitrise/AWS/Datadog stack. Include fresh-context recovery, drift, rollback, and the main failure probes.",
+      "assertions": [
+        "Exercises governance-only around an ordinary agent task, workflow-only through provider-native results, and an integrated composition without making either plane a prerequisite for the other",
+        "Discovers native capabilities and controls, previews exact changes and authority, binds authorization before idempotent apply, and verifies one allow plus one explained deterministic denial",
+        "Constrains semantic model or agent advice with a closed result schema, budgets, attenuated scopes, visible failure behavior, and a provider-native inference reference distinct from authoritative evidence",
+        "Reconstructs provider-native evidence in a fresh process from opaque references without local sidecars or a central result store and preserves independent CI enforcement when the harness hook is disabled",
+        "Detects weakening drift, records an explicitly authorized remediation or waiver, verifies full rollback, and safely handles untrusted modules, unsupported handlers, policy outage, duplicate events, recursion, and expired exceptions"
+      ]
     }
   ]
 }
