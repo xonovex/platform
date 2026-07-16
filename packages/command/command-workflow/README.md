@@ -67,6 +67,25 @@ identity.
 | `plan-update`                 | Publish current status and exact-revision validation evidence           |
 | `plan-validate`               | Validate success criteria and Definition of Done without mutation       |
 
+## Development and assurance
+
+| Command               | Description                                                                  |
+| --------------------- | ---------------------------------------------------------------------------- |
+| `develop-run`         | Execute exact Planning assignments with least-adaptive suitable executors    |
+| `develop-consolidate` | Combine exact Development results without claiming Acceptance or Integration |
+| `develop-abandon`     | Preserve partial Development state, evidence, reason, cleanup, and retry     |
+| `deliver-publish`     | Publish a provider-native reviewable candidate at an immutable revision      |
+| `inventory-generate`  | Generate deterministic SBOM, AI/ML/CBOM, service, or agent inventories       |
+| `assessment-run`      | Assess any exact workflow result against pinned applicable criteria          |
+| `review-run`          | Publish deliverable-specific findings with explicit reviewer independence    |
+| `qa-run`              | Publish deliverable-specific test and environment evidence                   |
+
+Development assigns exact Planning revisions to isolated workspaces and publishes one
+result per assignment. Consolidation produces another Development result; it is not the
+accepted-target mutation owned by Integration. Inventory facts come from deterministic or
+external sources. Review, QA, and Assessment preserve evaluator origin and become stale
+when their bound subject, policy, evaluator, or required environment changes.
+
 ## Delivery and governance
 
 | Command                                        | Description                                                                       |

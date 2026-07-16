@@ -49,7 +49,7 @@ These are semantic requirements, not field names or a required serialization. A 
 
 Profiles may omit or compose capabilities, but they never rename away the underlying result kind or erase its independent publication and pickup boundary.
 
-An `Inventory` result may additionally describe installed skills, plugins, hooks, extensions, MCP servers, CI components, policy bundles, models, tools, and requested/effective permissions. Each entry retains native identity/version, provenance, relationships, authority zone, observed state, and gaps. This optional inventory is not required to use one AIBOM or BOM format; an adapter may also link a provider-native SPDX, CycloneDX, package, or platform inventory by opaque reference.
+An `Inventory` result may specialize as an SBOM, AIBOM/AI-SBOM, ML-BOM, CBOM, service inventory, or agent-environment inventory. It may describe software, models, datasets, prompts, agents, cryptographic assets, services, installed skills, plugins, hooks, extensions, MCP servers, CI components, policy bundles, tools, and requested/effective permissions. Deterministic sources establish component identities, versions, relationships, and provenance; model enrichment is non-authoritative and limited to sourced descriptions. Each entry retains native identity/version, provenance, relationships, authority zone, observed state, and gaps. This optional inventory is not required to use one serialization; an adapter may link a provider-native SPDX, CycloneDX, package, or platform inventory by opaque reference.
 
 ## Ephemeral `PhaseResultHandle`
 
@@ -70,7 +70,7 @@ The handle is a logical operation result, not a universal document. Providers ma
 
 - Publish each result independently when its profile requires a pickup boundary.
 - Bind review, QA, assessment, acceptance, and privileged operations to exact native subject revisions.
-- Re-evaluate evidence when the subject, policy, profile, capability matrix, or relevant source changes.
+- Re-evaluate evidence when the subject, policy, profile, criteria, evaluator/tool/module, environment, capability matrix, or relevant source changes.
 - Keep artifact validity, capability exit, human Acceptance, Integration execution, Release, and cumulative completion as distinct evaluations.
 - Treat runtime trace and session identifiers as correlation only.
 - Resolve provider operations and version strength through [providers.md](providers.md); do not infer provider capabilities from a native-reference shape.

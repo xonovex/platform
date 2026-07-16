@@ -18,6 +18,42 @@
     "rationale": "ephemeral provider-reconstructed handle"
   },
   {
+    "query": "run these three accepted child plans; two can go in parallel workspaces, but use scripts for the generated rename and an agent only for the adaptive implementation",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "development assignment, isolation, and least-adaptive executor selection"
+  },
+  {
+    "query": "combine development:api@9 and development:ui@6 into a candidate workspace, rerun validation, and don't treat that as integration into main",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "exact-revision development consolidation boundary"
+  },
+  {
+    "query": "publish this candidate to our database-backed artifact provider and return its immutable native revision; do not make a local markdown fallback",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "provider-native deliverable publication"
+  },
+  {
+    "query": "generate an AI-SBOM for model-service@sha256:1234; prose enrichment is fine but the LLM must not guess model versions or components",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "deterministic authoritative inventory with bounded enrichment"
+  },
+  {
+    "query": "assess planning:42@7 against our risk criteria, while keeping code review and QA as separate deliverable-only results",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "generic Assessment and focused Review/QA boundaries"
+  },
+  {
+    "query": "the subject SHA stayed the same but the scanner, policy bundle, and QA environment changed; decide whether yesterday's evidence is stale",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "assurance freshness binding"
+  },
+  {
     "query": "design a governance hook that denies network tools when a policy says so",
     "should_trigger": false,
     "split": "train",
@@ -28,5 +64,23 @@
     "should_trigger": false,
     "split": "validation",
     "rationale": "near-miss owned by a BDD method skill"
+  },
+  {
+    "query": "write one Vitest unit test for rejectsExpiredToken and choose whether the clock should be a stub or fake",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss owned by testing and framework skills"
+  },
+  {
+    "query": "post these Conventional Comments findings as inline GitHub review threads",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near-miss owned by code-review craft and GitHub provider skills"
+  },
+  {
+    "query": "configure an organization GitHub ruleset to require the governance check and prevent administrator bypass",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss owned by GitHub external-enforcement onboarding"
   }
 ]

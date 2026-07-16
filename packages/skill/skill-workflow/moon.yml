@@ -10,4 +10,6 @@ tasks:
     command: npm run test
     inputs:
       - workflow-guide/assets/conformance-fixtures.json
+      - workflow-guide/assets/development-assurance-fixtures.json
+      - workflow-guide/references/*.md
       - workflow-guide/scripts/*.mjs

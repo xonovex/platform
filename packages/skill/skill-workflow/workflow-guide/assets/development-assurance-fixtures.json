@@ -1,0 +1,820 @@
+{
+  "purpose": "Deterministic fixtures for Development, Deliverable Publication, Inventory, Assessment, Review, QA, exact-revision freshness, and external enforcement evidence.",
+  "inventorySpecializations": [
+    "sbom",
+    "ai-sbom",
+    "ml-bom",
+    "cbom",
+    "service",
+    "agent-environment"
+  ],
+  "cases": [
+    {
+      "id": "mechanical-edit-selects-deterministic-tool",
+      "contract": "executor-selection",
+      "expectedValid": true,
+      "expectedExecutor": "deterministic",
+      "input": {
+        "workShape": "mechanical",
+        "requestedExecutor": "deterministic"
+      }
+    },
+    {
+      "id": "narrow-transform-selects-bounded-model",
+      "contract": "executor-selection",
+      "expectedValid": true,
+      "expectedExecutor": "model",
+      "input": {
+        "workShape": "bounded-transform",
+        "requestedExecutor": "model",
+        "bounds": {
+          "fixedInputs": true,
+          "outputSchema": "change-set-v1",
+          "validator": "validate-change-set@3",
+          "retryLimit": 1,
+          "tokenBudget": 4000,
+          "timeoutSeconds": 120
+        }
+      }
+    },
+    {
+      "id": "adaptive-implementation-selects-bounded-agent",
+      "contract": "executor-selection",
+      "expectedValid": true,
+      "expectedExecutor": "agent",
+      "input": {
+        "workShape": "adaptive",
+        "requestedExecutor": "agent",
+        "bounds": {
+          "purpose": "implement planning:42@7",
+          "resultContract": "Development",
+          "toolScope": ["read", "edit", "test"],
+          "filesystemScope": ["packages/example"],
+          "networkScope": [],
+          "maxDepth": 1,
+          "tokenBudget": 12000,
+          "costBudget": 2,
+          "timeoutSeconds": 900,
+          "cancellation": "kill-descendants"
+        }
+      }
+    },
+    {
+      "id": "agent-cannot-bypass-deterministic-mechanical-path",
+      "contract": "executor-selection",
+      "expectedValid": false,
+      "expectedCode": "least-adaptive-executor-bypassed",
+      "input": {
+        "workShape": "mechanical",
+        "requestedExecutor": "agent",
+        "bounds": {}
+      }
+    },
+    {
+      "id": "adaptive-agent-requires-complete-bounds",
+      "contract": "executor-selection",
+      "expectedValid": false,
+      "expectedCode": "unbounded-agent",
+      "input": {
+        "workShape": "adaptive",
+        "requestedExecutor": "agent",
+        "bounds": {
+          "purpose": "implement planning:42@7",
+          "resultContract": "Development"
+        }
+      }
+    },
+    {
+      "id": "parallel-development-uses-isolated-workspaces",
+      "contract": "development",
+      "expectedValid": true,
+      "development": {
+        "mode": "run",
+        "planningReference": "task-system:planning:7",
+        "planningRevision": "4",
+        "maxConcurrency": 2,
+        "assignments": [
+          {
+            "id": "api",
+            "group": "parallel-1",
+            "workspaceReference": "workspace:api:1"
+          },
+          {
+            "id": "ui",
+            "group": "parallel-1",
+            "workspaceReference": "workspace:ui:1"
+          }
+        ],
+        "outcome": "complete"
+      }
+    },
+    {
+      "id": "parallel-development-rejects-shared-workspace",
+      "contract": "development",
+      "expectedValid": false,
+      "expectedCode": "workspace-isolation-missing",
+      "development": {
+        "mode": "run",
+        "planningReference": "task-system:planning:7",
+        "planningRevision": "4",
+        "maxConcurrency": 2,
+        "assignments": [
+          {
+            "id": "api",
+            "group": "parallel-1",
+            "workspaceReference": "workspace:shared:1"
+          },
+          {
+            "id": "ui",
+            "group": "parallel-1",
+            "workspaceReference": "workspace:shared:1"
+          }
+        ],
+        "outcome": "complete"
+      }
+    },
+    {
+      "id": "consolidation-publishes-development-result",
+      "contract": "development",
+      "expectedValid": true,
+      "development": {
+        "mode": "consolidate",
+        "planningReference": "task-system:planning:7",
+        "planningRevision": "4",
+        "sourceResults": [
+          {"reference": "development:api", "revision": "9"},
+          {"reference": "development:ui", "revision": "6"}
+        ],
+        "targetWorkspaceReference": "workspace:consolidated:1",
+        "targetStartingRevision": "base-12",
+        "resultRevision": "candidate-13",
+        "conflictPolicy": "dependency-order-then-fail",
+        "integrationPerformed": false,
+        "outcome": "complete"
+      }
+    },
+    {
+      "id": "consolidation-cannot-change-accepted-target",
+      "contract": "development",
+      "expectedValid": false,
+      "expectedCode": "consolidation-is-integration",
+      "development": {
+        "mode": "consolidate",
+        "planningReference": "task-system:planning:7",
+        "planningRevision": "4",
+        "sourceResults": [{"reference": "development:api", "revision": "9"}],
+        "targetWorkspaceReference": "production:main",
+        "targetStartingRevision": "accepted-12",
+        "resultRevision": "accepted-13",
+        "conflictPolicy": "take-source",
+        "integrationPerformed": true,
+        "outcome": "complete"
+      }
+    },
+    {
+      "id": "partial-development-preserves-successful-siblings",
+      "contract": "development",
+      "expectedValid": true,
+      "development": {
+        "mode": "run",
+        "planningReference": "task-system:planning:7",
+        "planningRevision": "4",
+        "maxConcurrency": 2,
+        "assignments": [
+          {
+            "id": "api",
+            "group": "parallel-1",
+            "workspaceReference": "workspace:api:1"
+          },
+          {
+            "id": "ui",
+            "group": "parallel-1",
+            "workspaceReference": "workspace:ui:1"
+          }
+        ],
+        "outcome": "partial",
+        "successfulAssignments": ["api"],
+        "failedAssignments": ["ui"],
+        "failureBehavior": "preserve-success",
+        "retry": {
+          "enabled": true,
+          "idempotencyKey": "planning:7@4:ui",
+          "retryLimit": 1
+        }
+      }
+    },
+    {
+      "id": "development-retry-requires-idempotency",
+      "contract": "development",
+      "expectedValid": false,
+      "expectedCode": "unsafe-retry",
+      "development": {
+        "mode": "run",
+        "planningReference": "task-system:planning:7",
+        "planningRevision": "4",
+        "assignments": [
+          {
+            "id": "api",
+            "group": "serial-1",
+            "workspaceReference": "workspace:api:1"
+          }
+        ],
+        "outcome": "failed",
+        "retry": {"enabled": true, "retryLimit": 2}
+      }
+    },
+    {
+      "id": "abandonment-preserves-partial-result",
+      "contract": "development",
+      "expectedValid": true,
+      "development": {
+        "mode": "abandon",
+        "planningReference": "task-system:planning:7",
+        "planningRevision": "4",
+        "reason": "dependency superseded the selected approach",
+        "partialResultReference": "development:api:partial",
+        "cleanupOutcome": "workspace-preserved",
+        "outcome": "abandoned"
+      }
+    },
+    {
+      "id": "non-file-deliverable-publication",
+      "contract": "deliverable",
+      "expectedValid": true,
+      "deliverable": {
+        "providerContext": "opaque-task-system",
+        "providerAvailable": true,
+        "nativeReference": "task-system:candidate:82",
+        "immutableRevision": "17",
+        "intendedTarget": "task-system:target:main",
+        "sourceDevelopmentRevisions": ["development:api@9"],
+        "publicationStatus": "published"
+      }
+    },
+    {
+      "id": "hosted-deliverable-publication",
+      "contract": "deliverable",
+      "expectedValid": true,
+      "deliverable": {
+        "providerContext": "github-pull-request",
+        "providerAvailable": true,
+        "nativeReference": "github:pull-request:204",
+        "immutableRevision": "62f2ac2cb13bf85d37621f5f7bc75d744a9f0719",
+        "intendedTarget": "github:branch:main",
+        "sourceDevelopmentRevisions": [
+          "git:commit:62f2ac2cb13bf85d37621f5f7bc75d744a9f0719"
+        ],
+        "publicationStatus": "published"
+      }
+    },
+    {
+      "id": "deliverable-requires-immutable-revision",
+      "contract": "deliverable",
+      "expectedValid": false,
+      "expectedCode": "deliverable-not-revision-bound",
+      "deliverable": {
+        "providerContext": "repository",
+        "providerAvailable": true,
+        "nativeReference": "repository:branch:feature",
+        "intendedTarget": "repository:branch:main",
+        "sourceDevelopmentRevisions": ["development:api@9"],
+        "publicationStatus": "published"
+      }
+    },
+    {
+      "id": "unavailable-explicit-deliverable-provider",
+      "contract": "deliverable",
+      "expectedValid": false,
+      "expectedCode": "explicit-provider-unavailable",
+      "deliverable": {
+        "providerContext": "gitlab-merge-request",
+        "providerAvailable": false,
+        "fallbackProvider": "local-file",
+        "nativeReference": "local:candidate.md",
+        "immutableRevision": "digest-1",
+        "intendedTarget": "gitlab:branch:main",
+        "sourceDevelopmentRevisions": ["development:api@9"],
+        "publicationStatus": "published"
+      }
+    },
+    {
+      "id": "deterministic-sbom-inventory",
+      "contract": "inventory",
+      "expectedValid": true,
+      "inventory": {
+        "subjectReference": "deliverable:204",
+        "subjectRevision": "62f2ac2cb13bf85d37621f5f7bc75d744a9f0719",
+        "specialization": "sbom",
+        "generator": {
+          "executor": "deterministic",
+          "identity": "syft",
+          "version": "1.29.0"
+        },
+        "components": [
+          {
+            "identity": "pkg:npm/example@1.2.3",
+            "version": "1.2.3",
+            "provenance": "package-lock.json"
+          }
+        ]
+      }
+    },
+    {
+      "id": "model-may-enrich-only-description",
+      "contract": "inventory",
+      "expectedValid": true,
+      "inventory": {
+        "subjectReference": "deliverable:model-service",
+        "subjectRevision": "digest:model-service:8",
+        "specialization": "ai-sbom",
+        "generator": {
+          "executor": "deterministic",
+          "identity": "inventory-tool",
+          "version": "4"
+        },
+        "components": [
+          {
+            "identity": "model:classifier",
+            "version": "sha256:1234",
+            "provenance": "model-registry:17"
+          }
+        ],
+        "enrichments": [
+          {
+            "field": "description",
+            "origin": "model",
+            "authoritative": false,
+            "sourceReferences": ["model-registry:17"]
+          }
+        ]
+      }
+    },
+    {
+      "id": "inventory-rejects-guessed-version",
+      "contract": "inventory",
+      "expectedValid": false,
+      "expectedCode": "guessed-inventory-fact",
+      "inventory": {
+        "subjectReference": "deliverable:204",
+        "subjectRevision": "commit-1",
+        "specialization": "ml-bom",
+        "generator": {
+          "executor": "deterministic",
+          "identity": "inventory-tool",
+          "version": "4"
+        },
+        "components": [
+          {
+            "identity": "model:classifier",
+            "version": "probably-2",
+            "versionOrigin": "guessed",
+            "provenance": "README"
+          }
+        ]
+      }
+    },
+    {
+      "id": "inventory-rejects-model-authored-identity",
+      "contract": "inventory",
+      "expectedValid": false,
+      "expectedCode": "model-authoritative-inventory-fact",
+      "inventory": {
+        "subjectReference": "deliverable:204",
+        "subjectRevision": "commit-1",
+        "specialization": "service",
+        "generator": {
+          "executor": "deterministic",
+          "identity": "inventory-tool",
+          "version": "4"
+        },
+        "components": [
+          {
+            "identity": "service:api",
+            "version": "commit-1",
+            "provenance": "deploy-record:8"
+          }
+        ],
+        "enrichments": [
+          {
+            "field": "version",
+            "origin": "model",
+            "authoritative": true,
+            "sourceReferences": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "agent-environment-inventory",
+      "contract": "inventory",
+      "expectedValid": true,
+      "inventory": {
+        "subjectReference": "agent-environment:team-a",
+        "subjectRevision": "inventory-snapshot-11",
+        "specialization": "agent-environment",
+        "generator": {
+          "executor": "deterministic",
+          "identity": "environment-inspector",
+          "version": "2"
+        },
+        "components": [
+          {
+            "identity": "skill:workflow-guide",
+            "version": "5.0.0",
+            "provenance": "plugin:xonovex-skill-workflow@5.0.0"
+          },
+          {
+            "identity": "ci-component:governance",
+            "version": "sha256:abcd",
+            "provenance": "gitlab:component:8"
+          },
+          {
+            "identity": "permission:network",
+            "version": "denied",
+            "provenance": "effective-policy:12"
+          }
+        ]
+      }
+    },
+    {
+      "id": "generic-assessment-can-target-planning",
+      "contract": "assurance",
+      "expectedValid": true,
+      "assurance": {
+        "kind": "Assessment",
+        "subjectKind": "Planning",
+        "subjectReference": "task-system:planning:7",
+        "subjectRevision": "4",
+        "criteria": {"identity": "risk-profile", "version": "2026-07"},
+        "outcome": "pass",
+        "evidence": [
+          {
+            "origin": "human",
+            "nativeReference": "assessment:review:44",
+            "verified": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "independent-deliverable-review",
+      "contract": "assurance",
+      "expectedValid": true,
+      "assurance": {
+        "kind": "Review",
+        "subjectKind": "DeliverablePublication",
+        "subjectReference": "github:pull-request:204",
+        "subjectRevision": "62f2ac2cb13bf85d37621f5f7bc75d744a9f0719",
+        "criteria": {"identity": "code-review", "version": "5.0.0"},
+        "subjectAuthor": "actor:author",
+        "assessor": "actor:reviewer",
+        "independenceRequired": true,
+        "outcome": "pass",
+        "evidence": [
+          {
+            "origin": "human",
+            "nativeReference": "github:review:91",
+            "verified": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "qa-records-exact-environment",
+      "contract": "assurance",
+      "expectedValid": true,
+      "assurance": {
+        "kind": "QA",
+        "subjectKind": "DeliverablePublication",
+        "subjectReference": "gitlab:merge-request:87",
+        "subjectRevision": "commit:abc",
+        "criteria": {"identity": "quality-profile", "version": "3"},
+        "environment": {"identity": "linux-node", "version": "node-24.4.1"},
+        "outcome": "pass",
+        "evidence": [
+          {
+            "origin": "external",
+            "nativeReference": "gitlab:job:998",
+            "verified": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "review-rejects-self-assessment",
+      "contract": "assurance",
+      "expectedValid": false,
+      "expectedCode": "assessor-independence-failed",
+      "assurance": {
+        "kind": "Review",
+        "subjectKind": "DeliverablePublication",
+        "subjectReference": "github:pull-request:204",
+        "subjectRevision": "commit:abc",
+        "criteria": {"identity": "code-review", "version": "5.0.0"},
+        "subjectAuthor": "actor:author",
+        "assessor": "actor:author",
+        "independenceRequired": true,
+        "outcome": "pass",
+        "evidence": [
+          {
+            "origin": "human",
+            "nativeReference": "github:review:91",
+            "verified": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "review-remains-deliverable-specific",
+      "contract": "assurance",
+      "expectedValid": false,
+      "expectedCode": "deliverable-specific-assurance-required",
+      "assurance": {
+        "kind": "Review",
+        "subjectKind": "Planning",
+        "subjectReference": "task-system:planning:7",
+        "subjectRevision": "4",
+        "criteria": {"identity": "code-review", "version": "5.0.0"},
+        "outcome": "pass",
+        "evidence": [
+          {
+            "origin": "model",
+            "nativeReference": "review:model:1",
+            "verified": true,
+            "authoritative": false
+          }
+        ]
+      }
+    },
+    {
+      "id": "prompt-injection-cannot-widen-assessment",
+      "contract": "assurance",
+      "expectedValid": false,
+      "expectedCode": "untrusted-evidence-instructions",
+      "assurance": {
+        "kind": "Assessment",
+        "subjectKind": "Research",
+        "subjectReference": "research:44",
+        "subjectRevision": "8",
+        "criteria": {"identity": "security-profile", "version": "2"},
+        "outcome": "pass",
+        "evidence": [
+          {
+            "origin": "external",
+            "nativeReference": "scanner:report:3",
+            "verified": true,
+            "treatAsInstructions": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "poisoned-evidence-is-rejected",
+      "contract": "assurance",
+      "expectedValid": false,
+      "expectedCode": "poisoned-evidence",
+      "assurance": {
+        "kind": "Assessment",
+        "subjectKind": "Inventory",
+        "subjectReference": "inventory:12",
+        "subjectRevision": "5",
+        "criteria": {"identity": "supply-chain-profile", "version": "4"},
+        "outcome": "pass",
+        "evidence": [
+          {
+            "origin": "external",
+            "nativeReference": "report:tampered",
+            "verified": false
+          }
+        ]
+      }
+    },
+    {
+      "id": "partial-required-assessment-cannot-pass",
+      "contract": "assurance",
+      "expectedValid": false,
+      "expectedCode": "partial-evidence-passed",
+      "assurance": {
+        "kind": "Assessment",
+        "subjectKind": "DeliverablePublication",
+        "subjectReference": "deliverable:204",
+        "subjectRevision": "commit:abc",
+        "criteria": {"identity": "security-profile", "version": "2"},
+        "outcome": "pass",
+        "partial": true,
+        "failedEvaluators": ["dynamic-scanner"],
+        "evidence": [
+          {
+            "origin": "deterministic",
+            "nativeReference": "static:report:1",
+            "verified": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "concurrent-multidisciplinary-assurance-preserves-results",
+      "contract": "assurance-batch",
+      "expectedValid": true,
+      "assuranceBatch": {
+        "subjectReference": "deliverable:204",
+        "subjectRevision": "commit:abc",
+        "maxConcurrency": 6,
+        "results": [
+          {
+            "kind": "Review",
+            "nativeResultReference": "review:91",
+            "subjectRevision": "commit:abc"
+          },
+          {
+            "kind": "QA",
+            "nativeResultReference": "qa:92",
+            "subjectRevision": "commit:abc"
+          },
+          {
+            "kind": "Assessment",
+            "family": "security",
+            "nativeResultReference": "assessment:security:93",
+            "subjectRevision": "commit:abc"
+          },
+          {
+            "kind": "Assessment",
+            "family": "accessibility",
+            "nativeResultReference": "assessment:accessibility:94",
+            "subjectRevision": "commit:abc"
+          },
+          {
+            "kind": "Assessment",
+            "family": "ai",
+            "nativeResultReference": "assessment:ai:95",
+            "subjectRevision": "commit:abc"
+          },
+          {
+            "kind": "Assessment",
+            "family": "supply-chain",
+            "nativeResultReference": "assessment:supply-chain:96",
+            "subjectRevision": "commit:abc"
+          }
+        ]
+      }
+    },
+    {
+      "id": "unchanged-assurance-binding-is-fresh",
+      "contract": "freshness",
+      "expectedValid": true,
+      "freshness": {
+        "requiredBindings": [
+          "subjectRevision",
+          "policyVersion",
+          "evaluatorVersion",
+          "environmentVersion"
+        ],
+        "binding": {
+          "subjectRevision": "a",
+          "policyVersion": "1",
+          "evaluatorVersion": "2",
+          "environmentVersion": "3"
+        },
+        "current": {
+          "subjectRevision": "a",
+          "policyVersion": "1",
+          "evaluatorVersion": "2",
+          "environmentVersion": "3"
+        }
+      }
+    },
+    {
+      "id": "changed-subject-invalidates-evidence",
+      "contract": "freshness",
+      "expectedValid": false,
+      "expectedCode": "stale-evidence:subjectRevision",
+      "freshness": {
+        "requiredBindings": ["subjectRevision", "policyVersion"],
+        "binding": {"subjectRevision": "a", "policyVersion": "1"},
+        "current": {"subjectRevision": "b", "policyVersion": "1"}
+      }
+    },
+    {
+      "id": "changed-policy-invalidates-evidence",
+      "contract": "freshness",
+      "expectedValid": false,
+      "expectedCode": "stale-evidence:policyVersion",
+      "freshness": {
+        "requiredBindings": ["subjectRevision", "policyVersion"],
+        "binding": {"subjectRevision": "a", "policyVersion": "1"},
+        "current": {"subjectRevision": "a", "policyVersion": "2"}
+      }
+    },
+    {
+      "id": "changed-evaluator-invalidates-evidence",
+      "contract": "freshness",
+      "expectedValid": false,
+      "expectedCode": "stale-evidence:evaluatorVersion",
+      "freshness": {
+        "requiredBindings": ["subjectRevision", "evaluatorVersion"],
+        "binding": {"subjectRevision": "a", "evaluatorVersion": "scanner-1"},
+        "current": {"subjectRevision": "a", "evaluatorVersion": "scanner-2"}
+      }
+    },
+    {
+      "id": "changed-environment-invalidates-evidence",
+      "contract": "freshness",
+      "expectedValid": false,
+      "expectedCode": "stale-evidence:environmentVersion",
+      "freshness": {
+        "requiredBindings": ["subjectRevision", "environmentVersion"],
+        "binding": {"subjectRevision": "a", "environmentVersion": "linux-1"},
+        "current": {"subjectRevision": "a", "environmentVersion": "linux-2"}
+      }
+    },
+    {
+      "id": "github-required-check-evidence",
+      "contract": "external-evidence",
+      "expectedValid": true,
+      "externalEvidence": {
+        "provider": "github",
+        "modulePin": "0123456789abcdef0123456789abcdef01234567",
+        "subjectRevision": "62f2ac2cb13bf85d37621f5f7bc75d744a9f0719",
+        "nativeReference": "github:check-run:998",
+        "checkIdentity": "organization-governance / validate",
+        "sourceIdentity": "github-app:actions",
+        "outcome": "success",
+        "mandatory": true,
+        "guaranteed": true,
+        "governedActorCanBypass": false
+      }
+    },
+    {
+      "id": "gitlab-policy-job-evidence",
+      "contract": "external-evidence",
+      "expectedValid": true,
+      "externalEvidence": {
+        "provider": "gitlab",
+        "modulePin": "e3262fdd0914fa823210cdb79a8c421e2cef79d8",
+        "subjectRevision": "commit:abc",
+        "nativeReference": "gitlab:job:998",
+        "checkIdentity": "organization-governance:validate",
+        "sourceIdentity": "pipeline-policy:44",
+        "outcome": "success",
+        "mandatory": true,
+        "guaranteed": true,
+        "governedActorCanBypass": false
+      }
+    },
+    {
+      "id": "moving-ci-module-pin-is-rejected",
+      "contract": "external-evidence",
+      "expectedValid": false,
+      "expectedCode": "mutable-ci-module",
+      "externalEvidence": {
+        "provider": "github",
+        "modulePin": "main",
+        "subjectRevision": "commit:abc",
+        "nativeReference": "github:check-run:998",
+        "checkIdentity": "organization-governance / validate",
+        "sourceIdentity": "github-app:actions",
+        "outcome": "success",
+        "mandatory": true,
+        "guaranteed": true,
+        "governedActorCanBypass": false
+      }
+    },
+    {
+      "id": "harness-only-tool-check-cannot-be-mandatory-proof",
+      "contract": "external-evidence",
+      "expectedValid": false,
+      "expectedCode": "mandatory-control-bypassable",
+      "externalEvidence": {
+        "provider": "harness-hook",
+        "modulePin": "hook-module-5",
+        "subjectRevision": "commit:abc",
+        "nativeReference": "harness:event:22",
+        "checkIdentity": "before-tool-use",
+        "sourceIdentity": "project-hook",
+        "outcome": "success",
+        "mandatory": true,
+        "guaranteed": false,
+        "governedActorCanBypass": true
+      }
+    },
+    {
+      "id": "spoofed-required-check-is-rejected",
+      "contract": "external-evidence",
+      "expectedValid": false,
+      "expectedCode": "spoofed-check-identity",
+      "externalEvidence": {
+        "provider": "github",
+        "modulePin": "0123456789abcdef0123456789abcdef01234567",
+        "subjectRevision": "commit:abc",
+        "nativeReference": "github:check-run:999",
+        "checkIdentity": "organization-governance / validate",
+        "sourceIdentity": "user-workflow",
+        "expectedSourceIdentity": "github-app:governance",
+        "outcome": "success",
+        "mandatory": true,
+        "guaranteed": true,
+        "governedActorCanBypass": false
+      }
+    }
+  ]
+}

@@ -6,6 +6,7 @@ import {
   validateResultProvider,
   validateWorkflowCase,
 } from "./conformance-helpers.mjs";
+import {validateDevelopmentAssuranceFixtures} from "./validate-development-assurance-fixtures.mjs";
 
 const fixtureUrl = new URL(
   "../assets/conformance-fixtures.json",
@@ -59,6 +60,8 @@ const providerFailures = fixture.providerFixtures.flatMap((provider) => {
 
 exerciseTaskSystemProvider();
 
+const developmentAssurance = validateDevelopmentAssuranceFixtures();
+
 const failures = fixture.cases.flatMap((testCase) => {
   const code = validateWorkflowCase(testCase);
   const valid = code === null;
@@ -79,4 +82,7 @@ if (providerFailures.length > 0 || failures.length > 0) {
 
 console.log(
   `workflow fixtures valid: ${fixture.resultContracts.length} result contracts, ${fixture.providerFixtures.length} providers, ${fixture.cases.length} cases`,
+);
+console.log(
+  `development and assurance fixtures valid: ${developmentAssurance.cases} cases, ${developmentAssurance.inventorySpecializations} inventory specializations`,
 );
