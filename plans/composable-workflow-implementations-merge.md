@@ -165,7 +165,7 @@ Executable checks (all must exit 0, wired into CI where noted):
 - `run-skeleton.sh --yes`: 17/17 checks; consent stop without `--yes`; shellcheck clean; workspace and repo clean afterwards (CI: moon test).
 - Fixture runner over the full corpus, including a demonstrated mutation-guard failure (CI: moon test).
 - Existing platform validators: `validate-walking-skeleton-fixtures.mjs` and siblings still pass (CI).
-- Split documentation validators: package-scoped + repo-level, combined checks ≥ 8,862 (CI).
+- Split documentation validators: package-scoped + repo-level, combined checks ≥ 8,862 at split time (verified: 8,800 + 62); the traceability repairs then removed ~1,550 duplicated ID references from the artifacts themselves, so the post-repair count is lower while the check *set* is a superset (all original check kinds plus three new shape checks) — recorded in subplans 04 and 05 (CI).
 - `go test ./internal/webhook/` (CI).
 - Full moon gate: format, lint, typecheck, build, test across all affected projects.
 

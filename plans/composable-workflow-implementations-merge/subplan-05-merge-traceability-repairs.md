@@ -3,7 +3,7 @@ type: plan
 has_subplans: false
 parent_plan: composable-workflow-implementations-merge
 parallel_group: 3
-status: pending
+status: complete
 dependencies:
   plans:
   - merge-plugin-plans-decoupling
@@ -16,11 +16,11 @@ skills_to_consult:
 - typescript-guide
 - testing-guide
 validation:
-  type_check: pending
-  lint: pending
-  build: pending
-  tests: pending
-  integration: pending
+  type_check: pass
+  lint: pass
+  build: pass
+  tests: pass
+  integration: pass
 ---
 
 # Subplan 05: Traceability Repairs
@@ -47,11 +47,11 @@ Repair the shared traceability defects both implementations inherited — broken
 
 ## Success Criteria
 
-- [ ] D-036–D-039 render as 5-column rows with consistent separators
-- [ ] Classification vocabulary fully legend-constrained
-- [ ] Subplans 01/05/10 have per-task ID sets; blanket-block flag active for the rest
-- [ ] Three new shape checks in the repo-level validator, each proven to fail on seeded regressions
-- [ ] One conventional commit
+- [x] D-036–D-039 render as 5-column rows with comma separators (39/39 rows shape-valid)
+- [x] Classification vocabulary fully legend-constrained: 23 ad-hoc variants mapped to the 4 legend classes per-row (synthesis never reclassified as derived, honoring validation-policy rule 6)
+- [x] Per-task ID sets: subplans 10 and 11 fully repaired (were 15/15 blanket), plus the nine-row repeat groups in subplans 01 and 05; every narrowed ID drawn from its subplan's recorded union so all references still resolve; max identical-cell repeat now ≤ 3 in the repaired subplans
+- [x] Three new shape checks (row cell-count vs header across all five traceability artifacts; legend-constrained classifications; identical-ID-block flag) with vitest-tested helpers, each proven to fail on a live seeded regression and pass after restore. Note: the validator's check count dropped 8,800 → 7,249 because ~1,550 duplicated ID references were removed from the repaired artifact — the check set is a superset of the split baseline; parent-plan criterion reconciled
+- [x] One conventional commit (plus this bookkeeping)
 
 ## Files Modified/Created
 
