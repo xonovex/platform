@@ -15,6 +15,8 @@ Enterprise platforms are optional adapters around the governance and workflow po
 
 The audit baseline reused the existing configuration/evidence provider ports, external-enforcement onboarding transaction, and GitHub/GitLab package conventions. The missing owners, edition fixtures, enterprise composition, and marketplace registrations are implemented by the five independent packages and the fixture described below.
 
+A cross-platform flow lives with the platform that initiates it and cross-references the receiving platform's skill by name for its side of the trust relationship: Bitrise-to-AWS federation belongs to `bitrise-guide` with `aws-guide` owning the role-trust semantics, and Datadog's AWS integration belongs to `datadog-guide` with `aws-guide` owning the account-side permissions. No skill defines another platform's native behavior.
+
 ## Capability negotiation
 
 1. Detect product, deployment model, edition, account or tier, native version, API version, region or residency, installed extensions, and effective actor before selecting a capability.
@@ -46,7 +48,7 @@ Helpers default to read-only discovery or dry-run. A state-changing operation re
 ## Credentials and data
 
 - Prefer workload identity, OIDC, managed identity, or another provider-supported federation path that issues temporary credentials. Trust policies constrain issuer, audience, subject, repository/project/workspace, environment, branch/tag, and role session where claims exist.
-- Never create a long-lived AWS access key by default. If federation is unavailable, return unsupported with remediation instead of silently generating a key.
+- Never create a long-lived access key or other static credential by default on any platform. If federation is unavailable, return unsupported with remediation instead of silently generating one; a static credential is only an explicit, labeled, expiring exception.
 - Separate discovery credentials from configuration credentials and runtime credentials. Request only the native scopes used by the selected operation.
 - Keep secrets out of command arguments, previews, logs, artifacts, native references, and fixtures. Report secret identifiers and access paths, not values.
 - Telemetry collection starts with metadata and identifiers. Content capture, prompts, source, tool output, personal data, and model input/output require a declared purpose, authorization, redaction, sampling, retention, residency, access, deletion, and cost policy.
@@ -71,5 +73,6 @@ Each provider remains the source of truth for its own record. Relationships carr
 - Mandatory privileged actions fail closed on missing or invalid authority/evidence unless a scoped, authorized, expiring exception or break-glass record applies. Advisory telemetry fails visibly and states that no enforcement occurred.
 - Retries are bounded and cancellable; side effects use provider idempotency or reconcile by native identity before retrying.
 - Conformance pins the product or edition, tested version/API, source snapshot, capabilities, limitations, and native reference kinds. Documentation conformance does not claim a live tenant probe passed.
+- Every platform claim traces to official documentation pinned with a retrieval date in the owning skill's `SOURCES.md`; a detailed capability claim additionally requires an edition/version-pinned probe before a release relies on it. A claim without a pinned source or probe is a release blocker for the owning skill.
 
 Run `node scripts/validate-enterprise-platform-fixtures.mjs` from the guide directory or `npx moon run skill-agent-governance:test` from the repository root.

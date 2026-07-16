@@ -105,15 +105,15 @@ contract guides (schema, must_not required, index bijection, owner existence,
 
 ## Skipped extras (owner: subplan 06)
 
-| Source                                                                                | Disposition                                                                                            | Status  |
-| ------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ | ------- |
-| packages/diagram/diagram-agent-workflow/two-plane-architecture.dot                    | skip — platform's target-architecture.dot already depicts both planes (Key Decision 6)                 | pending |
-| packages/diagram/diagram-agent-workflow/two-plane-architecture.png                    | skip — rendered artifact of skipped .dot                                                               | pending |
-| skill-agent-governance/agent-governance-guide/references/platform-skill-convention.md | skip — content covered by enterprise-platforms.md; three distinct rules grafted there (Key Decision 6) | pending |
+| Source                                                                                | Disposition                                                                                            | Status |
+| ------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ | ------ |
+| packages/diagram/diagram-agent-workflow/two-plane-architecture.dot                    | skip — platform's target-architecture.dot already depicts both planes (Key Decision 6)                 | done   |
+| packages/diagram/diagram-agent-workflow/two-plane-architecture.png                    | skip — rendered artifact of skipped .dot                                                               | done   |
+| skill-agent-governance/agent-governance-guide/references/platform-skill-convention.md | skip — content covered by enterprise-platforms.md; three distinct rules grafted there (Key Decision 6) | done   |
 
 ## Non-file grafts tracked here
 
-| Item                                                | Owner      | Status                                                                                                                  |
-| --------------------------------------------------- | ---------- | ----------------------------------------------------------------------------------------------------------------------- |
-| Claude Code local probe (fable precedent: 2.1.211)  | subplan 02 | done — observed 2.1.211 on 2026-07-16, recorded in code-harness-guide capabilities.md with rerun-on-version-change note |
-| Three convention rules into enterprise-platforms.md | subplan 06 | pending                                                                                                                 |
+| Item                                                | Owner      | Status                                                                                                                                                |
+| --------------------------------------------------- | ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Claude Code local probe (fable precedent: 2.1.211)  | subplan 02 | done — observed 2.1.211 on 2026-07-16, recorded in code-harness-guide capabilities.md with rerun-on-version-change note                               |
+| Three convention rules into enterprise-platforms.md | subplan 06 | done — initiating-platform ownership added; static-credential prohibition generalized platform-neutral; SOURCES.md pinning + probe precondition added |
