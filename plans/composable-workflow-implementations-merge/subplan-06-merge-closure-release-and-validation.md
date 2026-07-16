@@ -3,7 +3,7 @@ type: plan
 has_subplans: false
 parent_plan: composable-workflow-implementations-merge
 parallel_group: 4
-status: pending
+status: in_progress
 dependencies:
   plans:
   - merge-walking-skeleton-and-evidence-honesty
@@ -21,11 +21,11 @@ skills_to_consult:
 - git-guide
 - skill-guide
 validation:
-  type_check: pending
-  lint: pending
-  build: pending
-  tests: pending
-  integration: pending
+  type_check: pass
+  lint: pass
+  build: pass
+  tests: pass
+  integration: pass
 ---
 
 # Subplan 06: Closure, Release, and End-to-End Validation
@@ -53,12 +53,12 @@ Graft the three convention rules, complete and audit the port manifest, ship the
 
 ## Success Criteria
 
-- [ ] Three convention rules present in `enterprise-platforms.md`; both extras recorded as reasoned skips
-- [ ] Port manifest 100% final and audit-clean
-- [ ] 6.0.1 lockstep across 93 packages; release notes name the 9 relocated packages
-- [ ] `composable-workflow-phases` complete with date; `VALIDATION.txt` honest and qualified
-- [ ] E2E gate green, ≥ baseline, sweeps empty
-- [ ] Worktree merged back to `main` (user-confirmed) and removed
+- [x] Three convention rules present in `enterprise-platforms.md` (initiating-platform ownership; platform-neutral static-credential prohibition; SOURCES.md pinning + probe precondition); both extras recorded as reasoned skips
+- [x] Port manifest 100% final and audit-clean (63 rows, zero pending, all destinations exist)
+- [x] 6.0.1 lockstep across 93 packages, both marketplaces, 186 manifests, lockfile; release notes name the 9 relocated packages (bump commit body + MIGRATION.md 6.0.1 section)
+- [x] `composable-workflow-phases` complete with `completed_date: 2026-07-16`; `VALIDATION.txt` regenerated with the qualified result line per amended rule 5
+- [x] E2E gate green (`:ci-check` + envtest integration = 773 tasks, exit 0; ≥ baseline with e2e/kind excluded identically); all three grep sweeps empty
+- [ ] Worktree merged back to `main` (user-confirmed) and removed — **mandatory-human gate, awaiting confirmation**
 
 ## Files Modified/Created
 
