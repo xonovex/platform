@@ -1,133 +1,82 @@
-digraph AgenticTargetArchitecture {
-  // Target architecture: commands as reusable workflow steps, driven
-  // manually, semi-agentically, or autonomously from the same definitions.
+digraph TargetArchitecture {
   rankdir=TB;
   compound=true;
   newrank=true;
   splines=polyline;
   nodesep=0.5;
-  ranksep=0.9;
+  ranksep=0.75;
 
-  node [shape=box, style="rounded,filled", fillcolor=white, fontname="Arial", fontsize=11];
+  node [shape=box, style="rounded,filled", fillcolor=white, fontname="Arial", fontsize=10];
   edge [fontname="Arial", fontsize=9];
 
-  // Triggers and outer loops
-  subgraph cluster_signals {
-    label="Triggers & Outer Loops";
+  actors [label="Accountable actors and automation\nhuman | deterministic coordinator | bounded model | bounded agent | external system", shape=house, fillcolor="#e8d5f5"];
+  composition [label="Profile and catalog resolver\nadoption mode + modules + versions + dependencies\nauthority zones + permissions + data flow + limitations", fillcolor="#fff3cd"];
+  actors -> composition [label="select / authorize"];
+
+  subgraph cluster_contracts {
+    label="Semantic Core";
     style=filled;
-    fillcolor="#fdf0f0";
+    fillcolor="#edf4ff";
 
-    human [label="Human\n(slash command, approval,\nveto, escalation target)", shape=house, fillcolor=lavender];
-    schedule [label="Schedule\n(audits, evals,\nreflect integration)", shape=cds, fillcolor="#ffe6cc"];
-    sensor_ci [label="Sensor: CI\n(pipeline failed,\nMR feedback)", shape=cds, fillcolor="#ffe6cc"];
-    sensor_obs [label="Sensor: Observability\n(obs Alertmanager receiver:\nMimir ruler alerts, Falco,\nFlagger canary events)", shape=cds, fillcolor="#ffe6cc"];
+    workflow [label="Workflow Plane\nlifecycle capabilities + exact results\nprovider ports + completion", fillcolor="#d9e8ff"];
+    governance [label="Governance Plane\napplicability + policy + authority\nexceptions + executor bounds", fillcolor="#ffe4cc"];
+    events [label="Semantic event intents\nportable meaning, no universal native format", fillcolor="#fff7e6"];
+    providers [label="Provider ports\nresult | configuration | policy | evidence\ntelemetry | identity | artifact | deployment", fillcolor="#e5f5ff"];
 
-    ci_sentinel [label="(CI Sentinel agent:\nclassify failure,\npropose fix workflow)", shape=ellipse, fillcolor=lightyellow];
-    obs_analyst [label="(Observability Analyst agent:\ntriage, read-only\nLoki / Mimir / Tempo)", shape=ellipse, fillcolor=lightyellow];
-    fleet [label="(Fleet Supervisor:\nstuck runs, budgets,\nescalation)", shape=ellipse, fillcolor=lightyellow];
+    workflow -> governance [label="optional exact evidence", style=dashed];
+    governance -> workflow [label="optional authorization", style=dashed];
+    governance -> events;
+    workflow -> providers;
+    governance -> providers;
   }
 
-  // Orchestration
-  subgraph cluster_orchestration {
-    label="Orchestration (deterministic control flow - no LLM decides the graph)";
-    style=filled;
-    fillcolor="#eef6ff";
+  composition -> workflow [label="optional"];
+  composition -> governance [label="optional"];
 
-    wf_def [label="Workflow definitions\nworkflows/*.yml\n(steps, gates, loops,\nmax iterations, budgets)", shape=note];
-    orchestrator [label="Orchestrator (one semantics, three interpreters)\nL1: workflow-next command (in-session)\nL2: agent-cli workflow run (headless loop)\nL3: WorkflowRun controller (agent-operator-go,\ndeployed on the ci cluster)"];
-    gate [label="Gate\npolicy: manual | assisted | auto\naudit trail per decision", shape=diamond, fillcolor=lightcoral];
-    reviewer [label="(Gate reviewer agents:\nplan-critique,\npr-review-analyze, ...)", shape=ellipse, fillcolor=lightyellow];
+  subgraph cluster_execution {
+    label="Execution and Native Integration";
+    style=filled;
+    fillcolor="#f8f3ff";
+
+    executors [label="Executor contracts\ndeterministic | model | agent | human | external\nleast adaptive + explicit authority + validation"];
+    native [label="Native adapters\nharness configuration/hooks/plugins\nprovider APIs and platform modules", fillcolor="#efe5ff"];
+    external [label="External enforcement\nGitHub/GitLab/Azure DevOps/Bitbucket/Bitrise\nCI + repository + environment + identity + AWS", fillcolor="#ffd9d9"];
+    runtime [label="Runtime boundary\nworkspace trust + sandbox/isolation\nfilesystem/network/secrets/model budgets\nconcurrency + cancellation + kill behavior", fillcolor="#f3e6ff"];
+
+    executors -> runtime;
+    native -> runtime;
+    external -> runtime [label="privileged path"];
   }
 
-  // State
-  subgraph cluster_state {
-    label="Workflow State (git is the source of truth)";
-    style=filled;
-    fillcolor="#f7f7ee";
+  events -> native [label="versioned capability matrix"];
+  governance -> executors [label="select + attenuate"];
+  governance -> external [label="decision reference"];
+  providers -> native [label="port implementation"];
+  providers -> external [label="port implementation"];
 
-    plans [label="plans/<plan>.md + subplans\n(frontmatter: status, skills,\nparallel groups)", shape=note];
-    journal [label="plans/<plan>/runs/*.yaml\n(step results: status, evidence,\nartifacts, suggested next)", shape=note];
+  subgraph cluster_operations {
+    label="Enablement, Evidence, and Feedback";
+    style=filled;
+    fillcolor="#eefbea";
+
+    onboarding [label="Onboarding transaction\ndiscover → assess → preview → authorize\napply → verify → record", fillcolor="#dff5d8"];
+    evidence [label="Provider-native evidence\nsubject + revision + source + policy/version\noutcome + freshness + sensitivity + limitations", shape=folder, fillcolor="#d9f2e6"];
+    observability [label="Observability\nminimized traces/metrics/logs/events\ncorrelation + retention + access + cost", fillcolor="#d7f3f0"];
+    feedback [label="Feedback and operations\ndrift + incidents + effectiveness + learning\ncanary + rollback + disable + retirement", shape=cds, fillcolor="#d5efe8"];
+
+    onboarding -> evidence [label="configuration proof"];
+    evidence -> observability [label="correlate"];
+    observability -> feedback;
+    feedback -> onboarding [label="reviewed update", style=dashed];
   }
 
-  // Steps
-  subgraph cluster_steps {
-    label="Steps (reusable at every maturity level)";
-    style=filled;
-    fillcolor="#e8f0fe";
+  composition -> onboarding [label="effective preview"];
+  runtime -> evidence [label="execution outcome"];
+  native -> evidence [label="native reference"];
+  external -> evidence [label="enforcement reference"];
+  evidence -> workflow [label="selected result evidence", style=dashed];
+  feedback -> governance [label="reviewed policy/profile change", style=dashed];
 
-    steps [label="Commands as steps\nplan-*, pr-*, git-commit, reflect-*\n+ result contract (machine-readable outcome)", fillcolor=lightblue];
-    skills [label="Skills\n(procedure source of truth,\nsteps stay thin)"];
-  }
-
-  // Runners
-  subgraph cluster_runners {
-    label="Runners (same step, three homes)";
-    style=filled;
-    fillcolor="#f0eafe";
-
-    r_session [label="Interactive session\n(today's default)"];
-    r_headless [label="agent-cli run, headless\n(isolation x provision x network,\npinned nix toolchain)"];
-    r_cluster [label="AgentRun Job on the ci cluster\n(AgentWorkspace worktrees, gVisor/Kata,\ndeny-all egress + model-provider\nAPI exception)"];
-  }
-
-  // Delivery and GitOps boundary
-  subgraph cluster_delivery {
-    label="Delivery (agents stop at the PR - GitOps deploys; Talos/Cilium fleet, staging not shown)";
-    style=filled;
-    fillcolor="#e6ffe6";
-
-    pr [label="PR / MR"];
-    gitlab_ci [label="GitLab CI (ci cluster):\nrunner + autoscaler, Trivy,\ncosign v3 keyless signing"];
-    flux [label="Flux\n(standalone per cluster)", shape=cds, fillcolor=lightsteelblue];
-    prod [label="main cluster:\ntenant namespaces, Flagger\nGateway API canary, Kyverno enforce"];
-    obs [label="obs cluster:\nMimir / Loki / Tempo / Grafana\n(Alloy from all clusters;\nAlertmanager -> Discord / email)"];
-    mgmt [label="mgmt cluster:\nfleet services (image automation,\nnotification aggregation) -\nholds no spoke credentials,\nhosts no agent stack"];
-  }
-
-  boundary_note [label="Boundary: no agent mutates a cluster.\nDeliverables move only as commits/PRs;\nruntime signals return only through sensors.", shape=note, fillcolor=lightyellow];
-
-  // Trigger edges
-  human -> orchestrator [label="start / resume"];
-  schedule -> orchestrator [label="maintenance\nworkflows"];
-  sensor_ci -> ci_sentinel;
-  ci_sentinel -> orchestrator [label="open fix\nworkflow"];
-  sensor_obs -> obs_analyst;
-  obs_analyst -> orchestrator [label="open incident\nworkflow"];
-  fleet -> orchestrator [label="pause /\nescalate"];
-  fleet -> human [label="notify", style=dashed];
-
-  // Orchestration edges
-  wf_def -> orchestrator [label="shape"];
-  plans -> orchestrator [label="state"];
-  journal -> orchestrator [label="last results"];
-  orchestrator -> gate [label="at each gate"];
-  reviewer -> gate [label="recommendation"];
-  human -> gate [label="approval\n(manual / assisted)", style=dashed];
-  gate -> orchestrator [label="verdict\n(audited)"];
-
-  // Dispatch to runners
-  orchestrator -> r_session [label="L0 / L1"];
-  orchestrator -> r_headless [label="L2"];
-  orchestrator -> r_cluster [label="L3"];
-  r_session -> steps [label="fresh agent session\nexecutes one step"];
-  r_headless -> steps;
-  r_cluster -> steps;
-
-  // Step effects
-  steps -> skills [label="consult", style=dashed];
-  steps -> journal [label="write result"];
-  steps -> plans [label="update status"];
-  steps -> pr [label="pr-create /\ngit-commit --push"];
-
-  // Delivery and feedback loops
-  pr -> gitlab_ci [label="pipeline"];
-  gitlab_ci -> pr [label="checks", style=dashed];
-  pr -> flux [label="merge -> GitOps"];
-  flux -> prod;
-  flux -> mgmt [style=dashed];
-  prod -> obs [label="telemetry"];
-  gitlab_ci -> sensor_ci [label="events", style=dashed, constraint=false];
-  obs -> sensor_obs [label="alerts / events", style=dashed, constraint=false];
-
-  boundary_note -> pr [style=invis];
+  invariant [label="Invariant\nDecision, enforcement, authorization, configuration, workflow result, and evidence stay distinct.\nSkills and capability declarations do not prove enforcement.\nCrosswalks organize review; they do not establish certification, equivalence, or legal compliance.", shape=note, fillcolor="#fff3cd"];
+  invariant -> evidence [style=invis];
 }

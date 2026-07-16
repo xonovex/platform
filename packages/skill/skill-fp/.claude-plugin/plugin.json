@@ -1,6 +1,6 @@
 {
   "name": "xonovex-skill-fp",
-  "version": "5.0.0",
+  "version": "6.0.0",
   "description": "Xonovex Functional programming skills",
   "author": {"name": "Xonovex"},
   "skills": ["./fp-guide"]

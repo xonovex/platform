@@ -1,10 +1,10 @@
 {
   "name": "@xonovex/skill-ecs",
-  "version": "5.0.0",
+  "version": "6.0.0",
   "private": true,
   "type": "module",
   "dependencies": {
-    "@xonovex/skill-data-oriented-design": "5.0.0"
+    "@xonovex/skill-data-oriented-design": "6.0.0"
   },
   "keywords": [
     "xonovex",

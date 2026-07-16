@@ -1,370 +1,80 @@
-digraph Workflow {
-  // Graph settings
+digraph ComposableWorkflow {
   rankdir=TB;
   compound=true;
   newrank=true;
   splines=polyline;
-  nodesep=0.6;
+  nodesep=0.45;
   ranksep=0.8;
 
-  // Default node/edge styles
-  node [shape=box, style="rounded,filled", fillcolor=lightblue, fontname="Arial", fontsize=11];
+  node [shape=box, style="rounded,filled", fillcolor=white, fontname="Arial", fontsize=10];
   edge [fontname="Arial", fontsize=9];
 
-  // Legend
-  subgraph cluster_legend {
-    label="Legend";
-    style=dashed;
-    fontsize=10;
-
-    leg_cmd [label="Command / Skill", fillcolor=lightblue];
-    leg_agent [label="(AI Agent Session)", shape=ellipse, fillcolor=lightyellow];
-    leg_human [label="Decision (HITL or AI)", shape=diamond, fillcolor=lightcoral];
-    leg_loop [label="Feedback Loop", shape=cds, fillcolor=lightgreen];
-    leg_parallel [label="Parallel Execution", shape=parallelogram, fillcolor=wheat];
-    leg_session [label="--- New Session ---", shape=plaintext, fontcolor=gray40];
-    leg_3amigos [label="Three Amigos", shape=tab, fillcolor="#e8d5f5"];
-    leg_owners [label="Code Owner (CODEOWNERS)", fillcolor=lightcoral];
-    leg_note [label="Also: code-quality audit\n(harden/simplify/align),\nshared-extract (run as needed)", shape=note, fillcolor=white, fontsize=9];
-
-    leg_cmd -> leg_agent -> leg_human -> leg_loop -> leg_parallel -> leg_session -> leg_3amigos -> leg_owners [style=invis];
-  }
-
-  // Entry triage (any session / any agent)
-  right_size [label="Trivial change?\n(one-sentence diff)", shape=diamond, fillcolor=lightcoral];
-
-  // Discovery Phase (Three Amigos)
-  subgraph cluster_discovery {
-    label="Discovery Phase (Three Amigos: business + development + testing)";
+  subgraph cluster_adoption {
+    label="Independent Adoption";
     style=filled;
-    fillcolor="#f3e8ff";
+    fillcolor="#f7f7f7";
 
-    story_input [label="Story presented\n(As a / I want / so that)", shape=tab, fillcolor="#e8d5f5"];
-    story_refine [label="story-refine\n(INVEST check, vertical\nslicing, SPIDR splits)", fillcolor=lightblue];
-    story_refine_agent [label="(Agent:\n- Apply INVEST criteria\n- Split too-big stories\n- Walking skeleton first\n- Ensure each is testable)", shape=ellipse, fillcolor="#ffffcc"];
-    example_mapping [label="Example Mapping\n(Three Amigos session)", shape=tab, fillcolor="#e8d5f5"];
-    example_mapping_note [label="Yellow = rules\nGreen = examples\nRed = questions\nBlue = the story", shape=note, fillcolor=lightyellow, fontsize=9];
-    too_many_questions [label="Too many\nquestions?\n(red cards)", shape=diamond, fillcolor=lightcoral];
+    profile [label="Effective composition preview\nworkflow-only | governance-only | enablement-only\nexternal-enforcement-only | integrated", shape=note, fillcolor="#fff3cd"];
+    user [label="User or organization\nselects modules and presets", shape=house, fillcolor="#e8d5f5"];
+    user -> profile [label="select + authorize"];
   }
 
-  // Formulation Phase
-  subgraph cluster_formulation {
-    label="Formulation Phase (formalize acceptance scenarios)";
+  subgraph cluster_workflow {
+    label="Workflow Plane — provider-native lifecycle results";
     style=filled;
     fillcolor="#e8f0fe";
 
-    acceptance_formalize [label="acceptance-formalize\n(Given-When-Then from\nexamples + designs)", fillcolor=lightblue];
-    acceptance_agent [label="(Agent:\n- Write Gherkin scenarios\n- 2-5 per rule\n- Cover happy path,\n  boundaries, errors\n- Declarative steps only)", shape=ellipse, fillcolor="#ffffcc"];
-    scenarios_review [label="Scenarios\ncomplete?", shape=diamond, fillcolor=lightcoral];
+    lifecycle [label="Discovery → Research → Formulation\nDesign / Decision / Planning → Development\nDelivery / Review / QA / Assessment / Acceptance\nIntegration / Transition / Release → Observation\nIncident / Corrective Action → Retirement", fillcolor="#d9e8ff"];
+    workflow_profiles [label="Workflow profiles\nmethods + topology + completion\nexecutors + providers + evidence"];
+    results [label="Exact semantic results\nopaque provider reference + revision\nfreshness + evidence + limitations", shape=folder, fillcolor="#dff4ff"];
+
+    workflow_profiles -> lifecycle [label="compose"];
+    lifecycle -> results [label="publish"];
   }
 
-  // Research Phase
-  subgraph cluster_research {
-    label="Research Phase (AI Agent Session)";
+  subgraph cluster_governance {
+    label="Governance Plane — ordinary agent activity and privileged operations";
     style=filled;
-    fillcolor="#f0f8ff";
+    fillcolor="#fff0e6";
 
-    plan_research [label="plan-research", fillcolor=lightblue];
-    plan_research_agent [label="(Agent:\n- Explore codebase\n- Research viability\n- Find alternatives\n- Assess complexity\n- Read designs)", shape=ellipse, fillcolor="#ffffcc"];
-    research_review [label="Good idea?\n(HITL or AI)", shape=diamond, fillcolor=lightcoral];
-    plan_decide [label="plan-decide\n(settle open decisions\none at a time, optional)", fillcolor=lightblue];
-    plan_decide_agent [label="(Agent:\n- Walk known decisions\n- Discover unknown ones\n- Question user down\n  the design tree)", shape=ellipse, fillcolor="#ffffcc"];
+    governance_profiles [label="Governance profiles\npolicy + authority + executors\ndata + telemetry + trust"];
+    decisions [label="Policy decision point\nallow | deny | ask | advise | observe\nrequire evidence | exception | break glass", fillcolor="#ffe4cc"];
+    intents [label="Semantic event intents\nworkspace | prompt | tool | permission\nfile | model | child agent | privileged operation", fillcolor="#ffe9d9"];
+    native [label="Native adapters\nClaude Code | Codex | Kiro | Copilot\nPi | OpenCode | provider APIs", fillcolor="#fff7e6"];
+    enforcement [label="External enforcement\nrepository | CI | deployment | admission\nidentity | cloud | provider permission", fillcolor="#ffd6d6"];
+
+    governance_profiles -> decisions [label="evaluate"];
+    decisions -> intents [label="bind"];
+    intents -> native [label="map by capability matrix"];
+    decisions -> enforcement [label="apply when required"];
   }
 
-  // Planning Phase
-  subgraph cluster_planning {
-    label="Planning Phase (AI Agent Sessions)";
+  subgraph cluster_enablement {
+    label="Transactional Onboarding and Operations";
     style=filled;
-    fillcolor=lightyellow;
+    fillcolor="#eefbe8";
 
-    session_planning [label="--- New Session (optional) ---", shape=plaintext, fontcolor=gray40];
-    plan_create [label="plan-create\n(TDD via tdd-guide /\nBDD via bdd-guide)", fillcolor=lightblue];
-    plan_create_agent [label="(Agent:\n- Create plans/<plan>.md\n- Link acceptance scenarios\n- Frontmatter: status, skills,\n  versions, parallelization\n- skills_to_consult list)", shape=ellipse, fillcolor="#ffffcc"];
-    plan_review [label="Review Plan\n(HITL or AI)", shape=diamond, fillcolor=lightcoral];
-    plan_critique [label="plan-critique\n(adversarial stress-test:\nred-team, pre-mortem,\nfalsify, steelman)", fillcolor=lightblue];
-    plan_critique_agent [label="(Agent:\n- Find weaknesses\n- Challenge assumptions\n- Check vs acceptance criteria\n- Expose risks)", shape=ellipse, fillcolor="#ffffcc"];
-    plan_revise [label="plan-revise\n(apply feedback)", fillcolor=lightblue];
-    plan_accept [label="plan-accept\n(set status: approved)", fillcolor=lightblue];
-    plan_reject [label="plan-reject\n(set status: rejected,\nwith reason)", fillcolor=lightblue];
-    plan_subplans [label="plan-subplans-create\n(optional)", fillcolor=lightblue];
-    plan_subplans_agent [label="(Agent:\n- Create plans/<plan>/<subplans>.md\n- Detect parallel groups\n- 5-7 tasks per subplan\n- Map scenarios to subplans)", shape=ellipse, fillcolor="#ffffcc"];
-    git_commit_plans [label="git-commit\n(commit pending plans)", fillcolor=lightblue];
+    onboarding [label="Onboarding\ndiscover → assess → preview → authorize\napply → verify → record", fillcolor="#ddf5d5"];
+    operation [label="Operate\ndiagnose | update | disable | remove\nrollback | drift | emergency stop", fillcolor="#e8f8df"];
+    evidence [label="Provider-native evidence\ndecision + enforcement + authorization\nconfiguration + execution + audit", shape=folder, fillcolor="#d9f2e6"];
+    feedback [label="Feedback and learning\ntelemetry + incidents + effectiveness\nreviewed promotion only", shape=cds, fillcolor="#d7f3f0"];
+
+    onboarding -> operation [label="verified state"];
+    operation -> evidence [label="record"];
+    evidence -> feedback [label="observe"];
+    feedback -> onboarding [label="reviewed change", style=dashed];
   }
 
-  // Worktree Setup
-  subgraph cluster_worktree_setup {
-    label="Worktree Setup";
-    style=filled;
-    fillcolor="#e6ffe6";
+  profile -> workflow_profiles [label="optional", lhead=cluster_workflow];
+  profile -> governance_profiles [label="optional", lhead=cluster_governance];
+  profile -> onboarding [label="optional", lhead=cluster_enablement];
 
-    session_worktree [label="--- New Session (optional) ---", shape=plaintext, fontcolor=gray40];
-    plan_worktree_create [label="plan-worktree-create", fillcolor=lightblue];
-    worktree_agent [label="(Agent:\n- Create ../<repo>-<feature>\n- Set git config\n  branch.<branch>.plan)", shape=ellipse, fillcolor="#ffffcc"];
-    cd_worktree [label="cd <worktree-dir>", shape=box, fillcolor=white];
-  }
+  results -> decisions [label="exact evidence reference\nwhen selected", style=dashed];
+  native -> evidence [label="native outcome"];
+  enforcement -> evidence [label="native outcome"];
+  evidence -> results [label="authorization / assessment\nwhen selected", style=dashed];
+  feedback -> governance_profiles [label="reviewed policy change", style=dashed];
 
-  // Development Cycle
-  subgraph cluster_dev_cycle {
-    label="Development Cycle (Iterative, Per Session)";
-    style=filled;
-    fillcolor="#e6f3ff";
-
-    session_dev [label="--- New Session ---", shape=plaintext, fontcolor=gray40];
-
-    plan_continue [label="plan-continue", fillcolor=lightblue];
-    plan_continue_agent [label="(Agent:\n- Auto-detect plan from\n  worktree git config\n- Find where left off\n- Load context, create todos)", shape=ellipse, fillcolor="#ffffcc"];
-
-    work [label="Implementation Work\n(code + tests for\nacceptance scenarios)", shape=parallelogram, fillcolor=wheat];
-
-    plan_validate [label="plan-validate", fillcolor=lightblue];
-    validate_agent [label="(Agent:\n- Validate vs guidelines\n- Validate vs plan/subplan\n- Run test suite\n- Report evidence)", shape=ellipse, fillcolor="#ffffcc"];
-
-    reflect_extract [label="reflect-extract\n(optional)", fillcolor=lightblue];
-    reflect_agent [label="(Agent:\n- Analyze session\n- Extract self-corrections\n- Save to reflections/\n  with frontmatter)", shape=ellipse, fillcolor="#ffffcc"];
-
-    plan_update [label="plan-update", fillcolor=lightblue];
-    update_agent [label="(Agent:\n- Update subplan status\n- Auto-update parent plan(s))", shape=ellipse, fillcolor="#ffffcc"];
-
-    more_subplans [label="More Subplans?\n(HITL or AI)", shape=diamond, fillcolor=lightcoral];
-  }
-
-  // Code Quality Phase
-  subgraph cluster_quality {
-    label="Code Quality Phase (Optional, Separate Session)";
-    style=filled;
-    fillcolor="#fff5e6";
-
-    session_quality [label="--- New Session ---", shape=plaintext, fontcolor=gray40];
-    code_quality [label="plan-research\n(code-quality audit:\nharden / simplify / align,\nvia code-quality-guide)", fillcolor=lightblue];
-    quality_loop [label="Another\ncoding loop?", shape=diamond, fillcolor=lightcoral];
-  }
-
-  // Parallel Execution
-  subgraph cluster_parallel {
-    label="Parallel Subplan Execution (Multiple Worktrees)";
-    style=dashed;
-    fillcolor=wheat;
-
-    parallel_note [label="Each parallel agent needs\nits own worktree for subplans\nin same parallel group", shape=note, fillcolor=lightyellow];
-    worktree_1 [label="Worktree A\nSubplan 1\n(parallel_group: 1)", shape=parallelogram];
-    worktree_2 [label="Worktree B\nSubplan 2\n(parallel_group: 1)", shape=parallelogram];
-    worktree_3 [label="Worktree C\nSubplan 3\n(parallel_group: 2)", shape=parallelogram];
-  }
-
-  // Merge / Delivery Phase
-  subgraph cluster_merge {
-    label="Merge / Delivery";
-    style=filled;
-    fillcolor="#ffe6e6";
-
-    session_merge [label="--- New Session ---", shape=plaintext, fontcolor=gray40];
-
-    merge_or_abandon [label="Merge or Abandon?\n(HITL or AI)", shape=diamond, fillcolor=lightcoral];
-
-    plan_worktree_merge [label="plan-worktree-merge", fillcolor=lightblue];
-    merge_agent [label="(Agent:\n- Intelligent conflict resolution\n  (knows the plan)\n- Merge to parent branch\n- Parallel groups merge to\n  parent before next group)", shape=ellipse, fillcolor="#ffffcc"];
-
-    plan_worktree_abandon [label="plan-worktree-abandon", fillcolor=pink, style="rounded,filled,dashed"];
-    abandon_agent [label="(Agent:\n- Document reason\n- Extract learnings\n- Cleanup worktree)", shape=ellipse, fillcolor="#ffffcc"];
-
-    cd_parent [label="cd <parent-dir>", shape=box, fillcolor=white];
-
-    plan_validate_parent [label="plan-validate\n(on parent plan, optional)", fillcolor=lightblue];
-    validate_parent_agent [label="(Agent:\n- Validate parallel group\n  together on parent)", shape=ellipse, fillcolor="#ffffcc"];
-
-    pr_create [label="pr-create\n(open PR, any host)", fillcolor=lightblue];
-  }
-
-  // PR / Code Review Loop
-  subgraph cluster_review {
-    label="PR / Code Review Loop";
-    style=filled;
-    fillcolor="#f5f0ff";
-
-    // Automated reviewer track
-    pr_review_analyze [label="pr-review-analyze\n(diff -> structured findings:\nConventional Comments\nlabels + blocking flags)", fillcolor=lightblue];
-    pr_review_analyze_agent [label="(Agent:\n- Review branch diff\n- Ground in code + domain skills\n- Label + blocking-flag each\n- Summary + line anchors)", shape=ellipse, fillcolor="#ffffcc"];
-    pr_review_refine [label="pr-review-refine\n(reword / relabel / re-anchor /\nmerge / split / drop;\n--final = ready)", fillcolor=lightblue];
-    pr_review_refine_agent [label="(Agent:\n- Per-finding: keep / reword /\n  relabel / re-anchor /\n  merge / split / drop\n- Re-validate anchors,\n  re-derive summary)", shape=ellipse, fillcolor="#ffffcc"];
-    pr_review_post [label="pr-review-post\n(publish to PR: summary +\nlabelled inline comments\n+ blocking tasks, any host)", fillcolor=lightblue];
-    pr_review_post_agent [label="(Agent:\n- Detect host from remote\n- Post summary + inline\n- Promote blocking tasks\n- Write back comment ids)", shape=ellipse, fillcolor="#ffffcc"];
-
-    // Human reviewer track
-    code_owners [label="Code owners review\n(CODEOWNERS required\nreviewers, HITL)", fillcolor=lightcoral];
-
-    review_addressed [label="Author addresses findings\n(AI review + code owners)", shape=parallelogram, fillcolor=wheat];
-
-    pr_review_resolve [label="pr-review-resolve\n(verify each fix, resolve\nits thread; leave\nstill-broken open)", fillcolor=lightblue];
-    pr_review_resolve_agent [label="(Agent:\n- Match findings to threads\n- Verify each genuinely fixed\n- Resolve fixed threads,\n  optionally reply)", shape=ellipse, fillcolor="#ffffcc"];
-
-    review_clear [label="Findings resolved\n& code owners approved?", shape=diamond, fillcolor=lightcoral];
-  }
-
-  // QA Acceptance Phase
-  subgraph cluster_qa {
-    label="QA Acceptance";
-    style=filled;
-    fillcolor="#ffe6e6";
-
-    acceptance_validate [label="acceptance-validate\n(validate acceptance\ncriteria against PR)", fillcolor="#e8d5f5"];
-    acceptance_validate_agent [label="(Agent:\n- Load original scenarios\n- Verify each Given-When-Then\n  is covered by tests\n- Report pass/fail per scenario\n- Flag gaps or regressions)", shape=ellipse, fillcolor="#ffffcc"];
-    qa_verdict [label="Product owner accepts?\n(human sign-off, distinct\nfrom code-review approval)", shape=diamond, fillcolor=lightcoral];
-  }
-
-  // Learning Integration Loop
-  subgraph cluster_reflect_loop {
-    label="Continuous Learning Loop (Out-of-band)";
-    style=filled;
-    fillcolor="#e8f5e9";
-
-    reflect_integrate [label="reflect-to-instructions\n(optional)", fillcolor=lightblue];
-    integrate_agent [label="(Agent:\n- Merge reflections to\n  guidelines/AGENTS.md\n- Mark applied)", shape=ellipse, fillcolor="#ffffcc"];
-
-    skills_active [label="Improved Guidelines\nActive in Next Sessions", shape=cds, fillcolor="#ccffcc"];
-
-    simplify_note [label="*-simplify commands run\n\"eventual completion\"\nfor instructions, skills,\nslash commands", shape=note, fillcolor=lightyellow, fontsize=9];
-  }
-
-  // Completion
-  subgraph cluster_complete {
-    label="Completion";
-    style=filled;
-    fillcolor="#e6ffe6";
-
-    dod_gate [label="Definition of Done met?\n(review, docs, no regressions,\nNFRs — team release gate)", shape=diamond, fillcolor=lightcoral];
-    git_commit_push [label="git-commit --push\n(when fully complete)", fillcolor=lightblue];
-    end [label="Feature Complete\n(acceptance met)", shape=oval, fillcolor=green];
-  }
-
-  // === EDGES ===
-
-  // Entry triage
-  right_size -> story_input [label="No: full flow"];
-  right_size -> work [label="Yes: implement\ndirectly", style=dashed];
-
-  // Discovery flow (Three Amigos loop)
-  story_input -> story_refine;
-  story_refine -> story_refine_agent;
-  story_refine_agent -> example_mapping;
-  example_mapping -> example_mapping_note [style=invis];
-  example_mapping -> too_many_questions;
-  too_many_questions -> story_input [label="Yes: story\nnot ready,\nrefine more", style=dashed];
-  too_many_questions -> acceptance_formalize [label="No: proceed\nto formulation"];
-
-  // Formulation flow
-  acceptance_formalize -> acceptance_agent;
-  acceptance_agent -> scenarios_review;
-  scenarios_review -> example_mapping [label="Gaps found:\nmore examples\nneeded", style=dashed];
-  scenarios_review -> plan_research [label="Complete:\nready for dev"];
-
-  // Research flow
-  plan_research -> plan_research_agent;
-  plan_research_agent -> research_review;
-  research_review -> plan_decide [label="Proceed"];
-  research_review -> plan_research [label="Iterate\nresearch", style=dashed];
-  plan_decide -> plan_decide_agent;
-  plan_decide_agent -> plan_create;
-
-  // Planning flow
-  plan_create -> plan_create_agent;
-  plan_create_agent -> plan_review;
-  plan_review -> plan_accept [label="Approve"];
-  plan_accept -> plan_subplans;
-  plan_review -> plan_reject [label="Reject", style=dashed];
-  plan_reject -> plan_revise [label="address", style=dashed];
-  plan_review -> plan_critique [label="Stress-test\n(optional)", style=dashed];
-  plan_critique -> plan_critique_agent;
-  plan_critique_agent -> plan_revise [label="findings"];
-  plan_review -> plan_revise [label="Feedback", style=dashed];
-  plan_revise -> plan_review [label="re-review", style=dashed];
-  plan_subplans -> plan_subplans_agent;
-  plan_subplans_agent -> git_commit_plans;
-  git_commit_plans -> plan_worktree_create;
-
-  // Worktree setup flow
-  plan_worktree_create -> worktree_agent;
-  worktree_agent -> cd_worktree;
-  cd_worktree -> plan_continue;
-
-  // Development cycle flow
-  plan_continue -> plan_continue_agent;
-  plan_continue_agent -> work;
-  work -> plan_validate [label="after\nimplementation"];
-  plan_validate -> validate_agent;
-  validate_agent -> reflect_extract [label="optional"];
-  validate_agent -> plan_update [style=dashed, label="skip"];
-  reflect_extract -> reflect_agent;
-  reflect_agent -> plan_update;
-  plan_update -> update_agent;
-  update_agent -> more_subplans;
-
-  more_subplans -> plan_continue [label="Yes\n(next pending,\nnew session)"];
-  more_subplans -> code_quality [label="No\n(all complete)"];
-
-  // Code quality flow
-  code_quality -> quality_loop;
-  quality_loop -> work [label="Yes\n(fix issues)", style=dashed];
-  quality_loop -> merge_or_abandon [label="No\n(proceed)"];
-
-  // Parallel execution (shown separately)
-  plan_continue_agent -> parallel_note [style=dotted, label="parallel\nsubplans"];
-  parallel_note -> worktree_1 [style=invis];
-  worktree_1 -> worktree_2 [style=invis];
-  worktree_2 -> worktree_3 [label="sequential\ndependency\n(group 1 -> 2)"];
-
-  // Merge / Delivery + QA flow
-  merge_or_abandon -> plan_worktree_merge [label="Merge"];
-  merge_or_abandon -> plan_worktree_abandon [label="Abandon", style=dashed];
-
-  plan_worktree_merge -> merge_agent;
-  merge_agent -> cd_parent;
-  cd_parent -> plan_validate_parent;
-  plan_validate_parent -> validate_parent_agent;
-  validate_parent_agent -> pr_create;
-
-  // PR / code review loop (automated track + code owners)
-  pr_create -> pr_review_analyze;
-  pr_create -> code_owners [label="request\nreviewers", style=dashed];
-  pr_review_analyze -> pr_review_analyze_agent;
-  pr_review_analyze_agent -> pr_review_refine;
-  pr_review_refine -> pr_review_refine_agent;
-  pr_review_refine_agent -> pr_review_post;
-  pr_review_post -> pr_review_post_agent;
-  pr_review_post_agent -> review_addressed;
-  code_owners -> review_addressed [label="owner\ncomments"];
-  review_addressed -> pr_review_resolve;
-  pr_review_resolve -> pr_review_resolve_agent;
-  pr_review_resolve_agent -> review_clear;
-  review_addressed -> work [label="fix findings\n(back to coding loop)", style=dashed];
-  review_clear -> review_addressed [label="No: findings still open,\nfix and re-resolve", style=dashed];
-  review_clear -> acceptance_validate [label="Yes: clean\n& approved"];
-
-  // QA acceptance
-  acceptance_validate -> acceptance_validate_agent;
-  acceptance_validate_agent -> qa_verdict;
-  qa_verdict -> dod_gate [label="Accepted"];
-  dod_gate -> git_commit_push [label="Yes"];
-  dod_gate -> work [label="No: DoD gaps\n(fix)", style=dashed];
-  qa_verdict -> work [label="Gaps found:\nfix and\nre-validate", style=dashed];
-
-  // Abandon flow
-  plan_worktree_abandon -> abandon_agent;
-  abandon_agent -> reflect_integrate [label="extract\nlearnings"];
-  abandon_agent -> end [label="cleanup\ncomplete", style=dotted];
-
-  // Learning integration loop
-  reflect_agent -> reflect_integrate [label="later\n(out-of-band)"];
-  reflect_integrate -> integrate_agent;
-  integrate_agent -> skills_active;
-  integrate_agent -> simplify_note [style=dotted];
-
-  // Completion
-  git_commit_push -> end;
-
-  // Session boundary visual hints (invisible edges for layout)
-  session_planning -> plan_create [style=invis];
-  session_worktree -> plan_worktree_create [style=invis];
-  session_dev -> plan_continue [style=invis];
-  session_quality -> code_quality [style=invis];
-  session_merge -> plan_worktree_merge [style=invis];
+  boundary [label="Boundaries\nNo universal hook schema or mandatory workflow YAML\nSkills are advisory/setup capability, not enforcement proof\nModels and agents are explicit, bounded, and non-authoritative\nTelemetry correlates but does not become workflow identity", shape=note, fillcolor="#fff3cd"];
+  boundary -> profile [style=invis];
 }

@@ -3,7 +3,7 @@ type: plan
 has_subplans: false
 parent_plan: ../composable-workflow-phases.md
 parallel_group: 7
-status: pending
+status: complete
 dependencies:
   plans:
   - governance-policy-learning-observability-trust-and-operations
@@ -23,12 +23,12 @@ skills_to_consult:
 - testing-guide
 - git-guide
 validation:
-  type_check: pending
-  lint: pending
-  build: pending
-  tests: pending
-  integration: pending
-updated: '2026-07-14'
+  type_check: passed
+  lint: passed
+  build: passed
+  tests: passed
+  integration: passed
+updated: '2026-07-16'
 decision_refs:
 - D-001
 - D-002
@@ -276,16 +276,26 @@ Mapping IDs resolve through the parent plan’s `traceability/` artifacts. These
 
 ## Success Criteria
 
-- [ ] Documentation clearly explains the two independent composable planes and all supported adoption modes.
-- [ ] Every platform guide is versioned and names limitations.
-- [ ] Users can choose individual modules or presets and see the effective composition.
-- [ ] Onboarding guidance always includes preview, consent, verification, rollback, and trust.
-- [ ] Skills are not represented as proof of enforcement.
-- [ ] CI and harness examples use native reusable mechanisms and least privilege.
-- [ ] No example introduces mandatory workflow YAML/sidecars or a universal hook schema.
-- [ ] Every decision, control, platform claim and numbered subplan task has resolvable traceability.
-- [ ] Legal, licensed-standard, vendor-conformance and synthesis statuses remain explicit.
-- [ ] Full validation passes and breaking migration is complete.
+- [x] Documentation clearly explains the two independent composable planes and all supported adoption modes.
+- [x] Every platform guide is versioned and names limitations.
+- [x] Users can choose individual modules or presets and see the effective composition.
+- [x] Onboarding guidance always includes preview, consent, verification, rollback, and trust.
+- [x] Skills are not represented as proof of enforcement.
+- [x] CI and harness examples use native reusable mechanisms and least privilege.
+- [x] No example introduces mandatory workflow YAML/sidecars or a universal hook schema.
+- [x] Every decision, control, platform claim and numbered subplan task has resolvable traceability.
+- [x] Legal, licensed-standard, vendor-conformance and synthesis statuses remain explicit.
+- [x] Full validation passes and breaking migration is complete.
+
+## Completion Evidence
+
+- Published architecture, composition, execution-selection, harness-capability, platform-onboarding, security/policy, validation/traceability, and 5.x-to-6.0.0 migration guidance.
+- Reconciled 93 command/skill packages, 186 plugin manifests, both marketplaces, internal dependencies, Moon tasks, and `package-lock.json` at the coordinated `6.0.0` release baseline.
+- Added executable documentation validation covering 8,862 release, link, traceability, evaluation, fixture, diagram, migration, legal/ISO-status, and prohibited-claim checks.
+- Regenerated and visually reviewed all three workflow/governance diagram assets from their Graphviz sources.
+- Verified current primary documentation for the six harnesses, seven external platform owners, applicable EU legal instruments, and cited ISO public abstracts; corrected the Pi source to its current canonical documentation URL.
+- Passed format, lint, typecheck, build, repository tests, all skill validators, focused workflow/governance conformance tests, static claim searches, diagram generation, and generated-asset checks.
+- Harness executables were not installed in the validation environment. Harness matrices and model-driven eval specifications are documentation/fixture-validated and remain explicitly runtime-unverified pending installed-version probes.
 
 ## Files Modified/Created
 

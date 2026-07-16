@@ -1,6 +1,6 @@
 {
   "name": "xonovex-skill-agent-governance",
-  "version": "5.0.0",
+  "version": "6.0.0",
   "description": "Xonovex agent governance contract skills",
   "author": {"name": "Xonovex"},
   "skills": ["./agent-governance-guide"]

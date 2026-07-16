@@ -1,10 +1,10 @@
 {
   "name": "@xonovex/skill-typescript-to-lua",
-  "version": "5.0.0",
+  "version": "6.0.0",
   "private": true,
   "type": "module",
   "dependencies": {
-    "@xonovex/skill-lua": "5.0.0"
+    "@xonovex/skill-lua": "6.0.0"
   },
   "keywords": [
     "xonovex",

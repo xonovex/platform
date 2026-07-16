@@ -3,7 +3,7 @@
   "owner": {"name": "Xonovex"},
   "metadata": {
     "description": "Official Xonovex development tools",
-    "version": "5.0.0"
+    "version": "6.0.0"
   },
   "plugins": [
     {
@@ -14,7 +14,7 @@
     {
       "name": "xonovex-workflow",
       "source": "./packages/command/command-workflow",
-      "description": "Xonovex workflow commands — planning, code analysis, git"
+      "description": "Xonovex composable lifecycle, delivery, and governance commands"
     },
     {
       "name": "xonovex-skill-accessibility",

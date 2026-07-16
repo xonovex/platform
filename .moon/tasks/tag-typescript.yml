@@ -126,6 +126,12 @@ tasks:
     options:
       cache: false
       mergeDeps: append
+  lint-fix:
+    command: noop
+    deps: [ts-lint-fix]
+    options:
+      cache: false
+      mergeDeps: append
   typecheck:
     command: noop
     deps: [ts-typecheck]

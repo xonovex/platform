@@ -1,11 +1,11 @@
 {
   "name": "@xonovex/skill-microkernel-pattern",
-  "version": "5.0.0",
+  "version": "6.0.0",
   "private": true,
   "type": "module",
   "dependencies": {
-    "@xonovex/skill-connascence": "5.0.0",
-    "@xonovex/skill-hexagonal-pattern": "5.0.0"
+    "@xonovex/skill-connascence": "6.0.0",
+    "@xonovex/skill-hexagonal-pattern": "6.0.0"
   },
   "keywords": [
     "xonovex",

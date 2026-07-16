@@ -10,12 +10,21 @@ AI coding agents handle prompts, tools, and code changes. What they don't manage
 
 Xonovex fills this gap. It currently supports [Claude Code](https://docs.anthropic.com/en/docs/claude-code) and [OpenCode](https://github.com/anomalyco/opencode) as agents, with sandboxing via bubblewrap and Docker, VM-level isolation via gVisor and Kata Containers, confidential computing via [Confidential Containers (CoCo)](https://github.com/confidential-containers) with AMD SEV-SNP and Intel TDX, model routing through providers like Gemini, GLM, and GPT, workspace management with Git and [Jujutsu](https://github.com/jj-vcs/jj), reproducible toolchains via Nix, and Kubernetes orchestration for running agents at scale.
 
-The included skills are token-efficient, harness-neutral, and based on current research and best practices (Agent Skills spec, agentskills.io, agents.md).
+The included skills are token-efficient, harness-neutral, and based on current research and best practices (Agent Skills spec, agentskills.io, agents.md). Skills provide instructions, references, scripts, and setup capabilities; installing one is not proof that a policy executes or blocks an action.
 
 - **[agent-cli-go](packages/agent/agent-cli-go/)** configures sandboxes, providers, and terminal sessions, then launches the agent
 - **[agent-operator-go](packages/agent/agent-operator-go/)** orchestrates agents as Kubernetes Jobs with managed workspaces, provider secrets, shared multi-agent workspaces, namespace-level policy enforcement, network isolation, and Nix toolchain provisioning
 - **[moon-nix-toolchain](packages/moon/moon-nix-toolchain/)** wraps every Moon task in the repository's Nix flake dev shell, giving reproducible flake-pinned toolchains in local runs, pre-commit hooks, and CI
 - **[Skills](packages/skill/)** give agents coding guidelines they follow automatically; plan-driven development with worktrees, project-instruction management, insight extraction, and skill authoring all live here as consolidated skill packages
+
+## Composable Workflow and Governance
+
+The platform exposes two independently adoptable planes:
+
+- The **workflow plane** publishes provider-native lifecycle results from discovery through retirement. Profiles choose methods, executors, providers, and topology without requiring one file format.
+- The **governance plane** composes policy, authority, semantic event intents, native harness adapters, external enforcement, onboarding, evidence, trust, and observability. It can protect ordinary agent activity without lifecycle commands.
+
+Use either plane alone, use enablement or external enforcement alone, or integrate them. A profile must show the effective composition and limitations before any configuration-changing onboarding step. See the [workflow command documentation](packages/command/command-workflow/README.md), [architecture and composition guide](packages/command/command-workflow/docs/architecture-and-composition.md), and [v6 migration guide](packages/command/command-workflow/MIGRATION.md).
 
 ## Quick Start
 
@@ -69,7 +78,7 @@ EOF
 
 ### Agent Plugins
 
-Each skill is a separate plugin. Skills are applied **automatically** when the agent detects a relevant task — no explicit slash-command invocation needed. Skills also work cross-harness (Claude Code, OpenCode, etc.) since they follow the [Agent Skills spec](https://agentskills.io/specification).
+Each skill is a separate plugin. A compatible harness can route to an installed skill when its description matches the task; user-invocable commands explicitly load hard skill dependencies. Harness support, loading behavior, permissions, and native enforcement remain product-specific. The skills follow the [Agent Skills spec](https://agentskills.io/specification).
 
 #### Claude Code
 
@@ -136,7 +145,8 @@ Tasks are managed with [Moon](https://moonrepo.dev/):
 
 ```bash
 npx moon run <project>:<task>    # run a specific task
-npx moon run :<task>             # run task across all projects
+npx moon run :<task>             # run a single-colon task across matching projects
+npm run fmt:check                # run the repository format-check aggregate
 moon query projects              # list all projects
 ```
 

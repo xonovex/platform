@@ -4,6 +4,19 @@ Provider-native lifecycle commands for discovery through retirement. Canonical r
 meaning stays stable while profiles independently select methods, executors, providers,
 workspaces, and governance.
 
+Workflow and governance are separate composable planes. Installing this command plugin
+does not require harness governance, and installing governance or onboarding modules does
+not require lifecycle commands.
+
+## Guides
+
+- [Architecture and composition](docs/architecture-and-composition.md)
+- [Harness capabilities and onboarding](docs/harness-capabilities.md)
+- [External platform onboarding](docs/platform-onboarding.md)
+- [Security and policy enforcement](docs/security-and-policy.md)
+- [Validation and traceability](docs/validation-and-traceability.md)
+- [Migration from 5.x to 6.0.0](MIGRATION.md)
+
 ## Installation
 
 ### Claude Code
@@ -130,3 +143,5 @@ notified, revoked, and reviewed.
 - Local files, Git repositories, hosted trackers, and databases are peers selected by profile/context; none is the universal fallback.
 
 [View workflow diagram](../../diagram/diagram-agent-workflow/workflow-diagram.png)
+
+[View target architecture](../../diagram/diagram-agent-workflow/target-architecture.png)

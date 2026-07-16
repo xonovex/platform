@@ -1,10 +1,10 @@
 {
   "name": "@xonovex/skill-code-review",
-  "version": "5.0.0",
+  "version": "6.0.0",
   "private": true,
   "type": "module",
   "dependencies": {
-    "@xonovex/skill-code-quality": "5.0.0"
+    "@xonovex/skill-code-quality": "6.0.0"
   },
   "keywords": [
     "xonovex",

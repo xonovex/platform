@@ -1,14 +1,14 @@
 {
   "name": "@xonovex/command-utility",
-  "version": "5.0.0",
+  "version": "6.0.0",
   "private": true,
   "dependencies": {
-    "@xonovex/skill-command": "5.0.0",
-    "@xonovex/skill-content": "5.0.0",
-    "@xonovex/skill-instruction": "5.0.0",
-    "@xonovex/skill-reflect": "5.0.0",
-    "@xonovex/skill-skill": "5.0.0",
-    "@xonovex/skill-versioning": "5.0.0"
+    "@xonovex/skill-command": "6.0.0",
+    "@xonovex/skill-content": "6.0.0",
+    "@xonovex/skill-instruction": "6.0.0",
+    "@xonovex/skill-reflect": "6.0.0",
+    "@xonovex/skill-skill": "6.0.0",
+    "@xonovex/skill-versioning": "6.0.0"
   },
   "keywords": [
     "xonovex",

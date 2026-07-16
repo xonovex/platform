@@ -1,5 +1,5 @@
-AUDITABLE ENTERPRISE-PLATFORM PLAN-SET VALIDATION
-Date: 2026-07-14
+AUDITABLE COMPOSABLE WORKFLOW RELEASE VALIDATION
+Date: 2026-07-16
 
 Sources: 94
 Decisions: 39
@@ -7,6 +7,9 @@ Controls/obligations: 45
 Platform matrix entries: 14
 Subplans: 11
 Numbered tasks mapped: 150
+Lockstep command/skill packages: 93
+Plugin manifests: 186
+Executable documentation checks: 8862
 
 RESULT: PASS
 
@@ -21,8 +24,16 @@ Checks:
 - Every numbered subplan task has an exact traceability row
 - All decision/control/source IDs resolve
 - Storage neutrality and provider-native evidence remain intact
+- Both composable planes and all five adoption modes are documented
+- Harness and enterprise skill eval specifications resolve and include observable assertions
+- Conformance fixtures cover concurrency, idempotency, recursion, authority, rollback, drift, telemetry and provider boundaries
+- Package, manifest, marketplace, internal dependency and lockfile versions align at 6.0.0
+- Migration, rollback, diagram and prohibited-claim guards pass
+- Format, lint, typecheck, build, repository tests and all skill validators pass
 
-Warnings / required implementation reviews:
+Warnings / required runtime reviews:
+- Harness executables were not installed; capability rows and model-driven eval specifications remain runtime-unverified until pinned-version probes run.
+- `npm audit` reports six transitive dependency advisories (1 low, 2 moderate, 3 high); dependency remediation remains a separate reviewed change.
 - Vendor capabilities remain version-pinned-conformance-required.
 - Azure DevOps Services/Server and Bitbucket Cloud/Data Center must be detected before recommendations are applied.
 - Account tiers, runner types, regions and installed apps can materially change capabilities.

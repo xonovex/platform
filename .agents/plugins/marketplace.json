@@ -461,6 +461,18 @@
       "category": "Productivity"
     },
     {
+      "name": "xonovex-skill-fable",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-fable"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
       "name": "xonovex-skill-fdd",
       "source": {
         "source": "local",
@@ -501,6 +513,30 @@
       "source": {
         "source": "local",
         "path": "./packages/skill/skill-git"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-github",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-github"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-gitlab",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-gitlab"
       },
       "policy": {
         "installation": "AVAILABLE",
@@ -717,6 +753,18 @@
       "source": {
         "source": "local",
         "path": "./packages/skill/skill-node-graph"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-npm",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-npm"
       },
       "policy": {
         "installation": "AVAILABLE",
@@ -1017,6 +1065,18 @@
       "source": {
         "source": "local",
         "path": "./packages/skill/skill-user-stories"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-versioning",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-versioning"
       },
       "policy": {
         "installation": "AVAILABLE",

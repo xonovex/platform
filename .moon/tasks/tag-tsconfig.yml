@@ -111,6 +111,12 @@ tasks:
     options:
       cache: false
       mergeDeps: append
+  lint-fix:
+    command: noop
+    deps: [tsconfig-lint-fix]
+    options:
+      cache: false
+      mergeDeps: append
   typecheck:
     command: noop
     deps: [tsconfig-typecheck]

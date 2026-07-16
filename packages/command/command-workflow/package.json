@@ -1,14 +1,15 @@
 {
   "name": "@xonovex/command-workflow",
-  "version": "5.0.0",
+  "version": "6.0.0",
   "private": true,
   "dependencies": {
-    "@xonovex/skill-agent-governance": "5.0.0",
-    "@xonovex/skill-code-quality": "5.0.0",
-    "@xonovex/skill-code-review": "5.0.0",
-    "@xonovex/skill-plan": "5.0.0",
-    "@xonovex/skill-pull-request": "5.0.0",
-    "@xonovex/skill-workflow": "5.0.0"
+    "@xonovex/skill-agent-governance": "6.0.0",
+    "@xonovex/skill-code-quality": "6.0.0",
+    "@xonovex/skill-code-review": "6.0.0",
+    "@xonovex/skill-plan": "6.0.0",
+    "@xonovex/skill-pull-request": "6.0.0",
+    "@xonovex/skill-testing": "6.0.0",
+    "@xonovex/skill-workflow": "6.0.0"
   },
   "keywords": [
     "xonovex",
@@ -17,6 +18,7 @@
   ],
   "scripts": {
     "fmt:check": "prettier --check .",
-    "fmt": "prettier --write ."
+    "fmt": "prettier --write .",
+    "test": "node scripts/validate-documentation.mjs"
   }
 }
