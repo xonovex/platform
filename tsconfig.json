@@ -36,6 +36,9 @@
       "path": "./packages/script/script-moon-npm-publish"
     },
     {
+      "path": "./packages/script/script-moon-release-validate"
+    },
+    {
       "path": "./packages/script/script-moon-skill-audit-sources"
     },
     {

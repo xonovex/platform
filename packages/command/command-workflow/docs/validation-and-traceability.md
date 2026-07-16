@@ -1,15 +1,6 @@
 # Validation and Traceability
 
-Release baseline: **6.0.0**. The repository plan set is the authoritative design-time traceability record:
-
-- [source registry](../../../../plans/composable-workflow-phases/traceability/source-registry.md)
-- [decision-to-source matrix](../../../../plans/composable-workflow-phases/traceability/decision-source-matrix.md)
-- [control and obligation crosswalk](../../../../plans/composable-workflow-phases/traceability/control-crosswalk.md)
-- [platform capability matrix](../../../../plans/composable-workflow-phases/traceability/platform-capability-matrix.md)
-- [subplan task traceability](../../../../plans/composable-workflow-phases/traceability/subplan-traceability.md)
-- [validation policy](../../../../plans/composable-workflow-phases/traceability/validation-policy.md)
-
-The release validator requires all **94 sources**, **39 decisions**, **45 controls/obligations**, **14 platform entries**, **11 subplans**, and **150 numbered tasks** to resolve. It also validates marketplace/package lockstep, plugin dependencies, local documentation links, migration coverage, diagram semantics, and prohibited public claims.
+Release baseline: **6.0.0**. The repository maintaining this plugin keeps the authoritative design-time traceability record — a source registry, decision-to-source matrix, control and obligation crosswalk, platform capability matrix, subplan task traceability, and validation policy — and validates it with a repository-level release validator (the `release-validate` moon task) requiring all **94 sources**, **39 decisions**, **45 controls/obligations**, **14 platform entries**, **11 subplans**, and **150 numbered tasks** to resolve, alongside marketplace/package lockstep, plugin dependencies, migration coverage, diagram semantics, and prohibited public claims. This package validates its own contents — documentation links, manifest dependency consistency, migration coverage, the validation matrix below, and prohibited claims — via `scripts/validate-documentation.mjs`, which runs without repository context.
 
 ## Mapping status and caveats
 

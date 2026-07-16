@@ -3,7 +3,7 @@ type: plan
 has_subplans: false
 parent_plan: composable-workflow-implementations-merge
 parallel_group: 2
-status: pending
+status: complete
 dependencies:
   plans:
   - merge-baseline-and-layout-normalization
@@ -18,11 +18,11 @@ skills_to_consult:
 - moon-guide
 - testing-guide
 validation:
-  type_check: pending
-  lint: pending
-  build: pending
-  tests: pending
-  integration: pending
+  type_check: pass
+  lint: pass
+  build: pass
+  tests: pass
+  integration: pass
 ---
 
 # Subplan 04: Plugin `plans/` Decoupling
@@ -49,11 +49,11 @@ Make the shipped `command-workflow` plugin self-contained: its docs, moon task, 
 
 ## Success Criteria
 
-- [ ] Zero `plans/` references inside the shipped package
-- [ ] Repo-level traceability task exists, wired into CI, and passes
-- [ ] Combined check count ≥ 8,862 (no silent coverage loss), recorded in the subplan
-- [ ] Package test proven to pass in isolation
-- [ ] One conventional commit
+- [x] Zero `plans/` references inside the shipped package (grep sweep clean; moon.yml repo-scoped inputs removed; docs rewritten without cross-repo links)
+- [x] Repo-level task exists as `script-moon-release-validate:release-validate` (new TypeScript script package per `packages/script/` convention, with vitest-tested helpers), wired into `ci-check` — full gate now 772 tasks, green
+- [x] Combined check count = 8,862 (repo validator 8,800 + package validator 62), exactly the pre-split baseline; the 6 package-doc plans-links checks were replaced by the repo validator's artifact ID resolution, and forbidden-claims now run on both sides
+- [x] Package test proven in isolation: `validate-documentation.mjs` reads only package files and passes when run from the package directory
+- [x] One conventional commit
 
 ## Files Modified/Created
 

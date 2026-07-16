@@ -1,0 +1,37 @@
+$schema: https://moonrepo.dev/schemas/project.json
+language: typescript
+tags: [typescript-script]
+tasks:
+  install:
+    command:
+      - npm
+      - install
+      - -w
+      - "@xonovex/script-moon-release-validate"
+    deps:
+      - ~:build
+    options:
+      cache: false
+      runFromWorkspaceRoot: true
+  release-validate:
+    command: node packages/script/script-moon-release-validate/dist/src/index.js
+    deps:
+      - ~:build
+    inputs:
+      - src/**/*
+      - /README.md
+      - /package-lock.json
+      - /.claude-plugin/marketplace.json
+      - /.agents/plugins/marketplace.json
+      - /plans/composable-workflow-phases.md
+      - /plans/composable-workflow-phases/**/*
+      - /packages/command/*/package.json
+      - /packages/skill/*/package.json
+      - /packages/diagram/diagram-agent-workflow/*
+    options:
+      runFromWorkspaceRoot: true
+  ci-check:
+    deps:
+      - release-validate
+    options:
+      mergeDeps: append

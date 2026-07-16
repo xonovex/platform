@@ -21,10 +21,6 @@ tasks:
       - MIGRATION.md
       - docs/*.md
       - scripts/*.mjs
-      - /plans/composable-workflow-phases.md
-      - /plans/composable-workflow-phases/**/*.md
-      - /packages/diagram/diagram-agent-workflow/*.dot
-      - /packages/skill/**/evals.json
     options:
       cache: false
   ci-check:
