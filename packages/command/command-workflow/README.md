@@ -86,20 +86,41 @@ accepted-target mutation owned by Integration. Inventory facts come from determi
 external sources. Review, QA, and Assessment preserve evaluator origin and become stale
 when their bound subject, policy, evaluator, or required environment changes.
 
+## Acceptance and operational lifecycle
+
+| Command                 | Description                                                                                       |
+| ----------------------- | ------------------------------------------------------------------------------------------------- |
+| `acceptance-validate`   | Assemble fresh exact-revision evidence without claiming accountable sign-off                      |
+| `acceptance-decide`     | Record human Acceptance bound to subject, target, evidence, policy, actor, and expiry             |
+| `integration-validate`  | Preflight authorization and protected target capabilities without mutation                        |
+| `integration-run`       | Execute Integration only through an explicit externally enforced target capability                |
+| `transition-run`        | Plan, execute, verify, or roll back data, users, providers, flags, support, and resilience        |
+| `release-run`           | Execute, verify, roll back, or recover through controlled automation and protected environments   |
+| `observe-run`           | Publish monitoring, user, security, AI, cost, accessibility, and delivery evidence                |
+| `incident-run`          | Declare, update, contain, recover, escalate, or close an urgent Incident                          |
+| `corrective-action-run` | Plan, execute, verify, and close corrective work with effectiveness and learning evidence         |
+| `retirement-run`        | Retire models, data, credentials, features, APIs, infrastructure, dependencies, and configuration |
+
+Evidence assembly may use bounded agents or models, but only a provider-authenticated
+accountable human records Acceptance. Integration, target-changing Transition and Release,
+data deletion, and Retirement revalidate exact subject, target, evidence, policy, actor, and
+expiry bindings at a non-bypassable external enforcement point. Ordinary tool access is
+not authorization. Exceptions and break-glass remain scoped, expiring, compensated,
+notified, revoked, and reviewed.
+
 ## Delivery and governance
 
-| Command                                        | Description                                                                       |
-| ---------------------------------------------- | --------------------------------------------------------------------------------- |
-| `acceptance-validate`                          | Validate an exact deliverable revision using neutral or selected criteria methods |
-| `git-commit`                                   | Commit/push through an installed Git capability                                   |
-| `plan-worktree-{create,merge,abandon,cleanup}` | Optional Git-worktree workspace operations                                        |
-| `pr-create`                                    | Open a provider-native pull/merge request through the detected host adapter       |
-| `pr-review-{analyze,refine,post,resolve}`      | Produce, refine, publish, and resolve review findings                             |
-| `workflow-inspect`                             | Inspect workflow results, profile topology, evidence, and completion gaps         |
-| `workflow-governance-inspect`                  | Inspect effective policies, modules, authority, enforcement, and exceptions       |
-| `workflow-conformance`                         | Validate workflow and governance semantic contracts                               |
-| `workflow-drift`                               | Compare intended and observed governance state                                    |
-| `workflow-modules`                             | Inspect or manage governance modules through native adapters                      |
+| Command                                        | Description                                                                 |
+| ---------------------------------------------- | --------------------------------------------------------------------------- |
+| `git-commit`                                   | Commit/push through an installed Git capability                             |
+| `plan-worktree-{create,merge,abandon,cleanup}` | Optional Git-worktree workspace operations                                  |
+| `pr-create`                                    | Open a provider-native pull/merge request through the detected host adapter |
+| `pr-review-{analyze,refine,post,resolve}`      | Produce, refine, publish, and resolve review findings                       |
+| `workflow-inspect`                             | Inspect workflow results, profile topology, evidence, and completion gaps   |
+| `workflow-governance-inspect`                  | Inspect effective policies, modules, authority, enforcement, and exceptions |
+| `workflow-conformance`                         | Validate workflow and governance semantic contracts                         |
+| `workflow-drift`                               | Compare intended and observed governance state                              |
+| `workflow-modules`                             | Inspect or manage governance modules through native adapters                |
 
 ## Design decisions
 

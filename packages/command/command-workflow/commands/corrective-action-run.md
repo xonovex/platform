@@ -1,0 +1,27 @@
+---
+description: Plan, execute, verify, or close a provider-native Corrective Action with effectiveness and learning evidence
+allowed-tools:
+  - Read
+  - Bash
+  - Glob
+  - Grep
+  - AskUserQuestion
+  - Skill
+argument-hint: "<plan|execute|verify|close> <source-reference> [--revision <native-revision>] [--action <reference>] [--provider <selection>]"
+---
+
+# /xonovex-workflow:corrective-action-run — Run Corrective Action
+
+## Arguments
+
+- Mode (required): `plan`, `execute`, `verify`, or `close`.
+- `source-reference` (required): Exact Incident, finding, Observation, or assurance result.
+- `--revision` (optional): Exact source revision.
+- `--action` (optional): Existing Corrective Action reference for revise/verify/close.
+- `--provider` (optional): Result and evidence provider selection.
+
+## Delegation
+
+Load `workflow-guide` and perform **corrective-action-run**. Soft-select root-cause,
+verification, provider, and domain skills. Load `agent-governance-guide` before any
+privileged correction; closure requires verification, effectiveness, and learning evidence.

@@ -54,6 +54,42 @@
     "rationale": "assurance freshness binding"
   },
   {
+    "query": "assemble acceptance evidence for candidate sha256:aaa, but leave the exact-target sign-off to the accountable human approver",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "evidence-only preparation versus human Acceptance"
+  },
+  {
+    "query": "preflight integration into main@100 and reject it if the acceptance evidence, target revision, or policy version drifted",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "exact-revision authorization and Integration preflight"
+  },
+  {
+    "query": "release artifact sha256:bbb through the protected environment; stop and roll back if its health gate fails",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "controlled Release and rollback"
+  },
+  {
+    "query": "publish an observation for deployment:42 covering user, security, AI, cost, accessibility, monitoring, and delivery evidence",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "multi-source Observation result"
+  },
+  {
+    "query": "declare this critical incident, contain it with scoped break-glass, preserve the timeline, then create and verify corrective actions",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "Incident, emergency authority, and Corrective Action lifecycle"
+  },
+  {
+    "query": "retire the old model, dataset, credential, endpoint, infrastructure, and provider config, with deletion and revocation proof",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "multi-resource Retirement verification"
+  },
+  {
     "query": "design a governance hook that denies network tools when a policy says so",
     "should_trigger": false,
     "split": "train",

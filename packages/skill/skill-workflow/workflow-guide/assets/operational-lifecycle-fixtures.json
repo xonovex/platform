@@ -1,0 +1,849 @@
+{
+  "purpose": "Deterministic fixtures for Acceptance, exact-revision authorization, privileged Integration and operational lifecycle capabilities, exceptions, break-glass, agent assistance, rollback, incidents, data deletion, and Retirement verification.",
+  "templates": {
+    "acceptance-evidence": {
+      "mode": "evidence",
+      "subject": {"reference": "deliverable:42", "revision": "sha256:aaa"},
+      "target": {"reference": "branch:main", "revision": "commit:100"},
+      "policy": {"identity": "delivery-policy", "version": "7"},
+      "evidence": [
+        {
+          "reference": "qa:42",
+          "revision": "5",
+          "origin": "external",
+          "outcome": "pass"
+        },
+        {
+          "reference": "review:42",
+          "revision": "3",
+          "origin": "human",
+          "outcome": "pass"
+        }
+      ],
+      "assistance": {
+        "origin": "agent",
+        "authority": "advisory",
+        "sourceReferences": ["qa:42@5", "review:42@3"],
+        "fabricatesHumanAuthorization": false,
+        "regulatoryConclusion": false
+      }
+    },
+    "acceptance-decision": {
+      "mode": "decision",
+      "subject": {"reference": "deliverable:42", "revision": "sha256:aaa"},
+      "subjectAuthor": "human:developer",
+      "target": {"reference": "branch:main", "revision": "commit:100"},
+      "policy": {"identity": "delivery-policy", "version": "7"},
+      "evidencePackageReference": "acceptance-evidence:42@2",
+      "decision": "accept",
+      "actor": {
+        "identity": "human:owner",
+        "role": "product-owner",
+        "type": "human",
+        "accountable": true
+      },
+      "independenceRequired": true,
+      "decidedAt": "2026-07-16T09:00:00Z",
+      "expiresAt": "2026-07-16T17:00:00Z"
+    },
+    "authorization": {
+      "authorization": {
+        "subject": {"reference": "deliverable:42", "revision": "sha256:aaa"},
+        "target": {"reference": "branch:main", "revision": "commit:100"},
+        "action": "integration",
+        "actor": {
+          "identity": "human:owner",
+          "role": "release-approver",
+          "type": "human",
+          "accountable": true
+        },
+        "evidence": [
+          {
+            "reference": "qa:42",
+            "revision": "5",
+            "validUntil": "2026-07-16T16:30:00Z"
+          }
+        ],
+        "policy": {"identity": "delivery-policy", "version": "7"},
+        "issuedAt": "2026-07-16T09:00:00Z",
+        "expiresAt": "2026-07-16T17:00:00Z",
+        "decision": "allow"
+      },
+      "request": {
+        "subject": {"reference": "deliverable:42", "revision": "sha256:aaa"},
+        "target": {"reference": "branch:main", "revision": "commit:100"},
+        "action": "integration",
+        "evidence": [{"reference": "qa:42", "revision": "5"}],
+        "policy": {"identity": "delivery-policy", "version": "7"},
+        "now": "2026-07-16T10:00:00Z"
+      }
+    },
+    "break-glass": {
+      "access": {
+        "kind": "break-glass",
+        "owner": "human:incident-commander",
+        "approver": {
+          "identity": "human:security-lead",
+          "role": "emergency-approver",
+          "type": "human"
+        },
+        "scope": {
+          "actions": ["integration"],
+          "targets": ["branch:main"]
+        },
+        "rationale": "Contain active supply-chain compromise",
+        "compensatingControls": [
+          "two-person-live-review",
+          "read-only-audit-stream"
+        ],
+        "evidenceReference": "incident:77@4",
+        "start": "2026-07-16T09:55:00Z",
+        "expiresAt": "2026-07-16T10:25:00Z",
+        "postUseReviewRequired": true,
+        "emergencyReason": "Block compromised artifact promotion",
+        "accessEvidenceReference": "iam-session:emergency-9",
+        "notificationReference": "page:security-12",
+        "containment": "freeze target after mutation",
+        "revocationPlan": "revoke emergency session after verification",
+        "explicitInvocation": true
+      },
+      "request": {
+        "target": {"reference": "branch:main", "revision": "commit:100"},
+        "action": "integration",
+        "now": "2026-07-16T10:00:00Z"
+      }
+    },
+    "privileged-operation": {
+      "intent": "integration",
+      "capability": "external-enforcement",
+      "ordinaryToolMutation": false,
+      "request": {
+        "subject": {"reference": "deliverable:42", "revision": "sha256:aaa"},
+        "target": {"reference": "branch:main", "revision": "commit:100"},
+        "action": "integration",
+        "evidence": [{"reference": "qa:42", "revision": "5"}],
+        "policy": {"identity": "delivery-policy", "version": "7"},
+        "now": "2026-07-16T10:00:00Z"
+      },
+      "authorization": {
+        "subject": {"reference": "deliverable:42", "revision": "sha256:aaa"},
+        "target": {"reference": "branch:main", "revision": "commit:100"},
+        "action": "integration",
+        "actor": {
+          "identity": "human:owner",
+          "role": "release-approver",
+          "type": "human",
+          "accountable": true
+        },
+        "evidence": [
+          {
+            "reference": "qa:42",
+            "revision": "5",
+            "validUntil": "2026-07-16T16:30:00Z"
+          }
+        ],
+        "policy": {"identity": "delivery-policy", "version": "7"},
+        "issuedAt": "2026-07-16T09:00:00Z",
+        "expiresAt": "2026-07-16T17:00:00Z",
+        "decision": "allow"
+      },
+      "enforcement": {
+        "kind": "protected-target",
+        "nativeReference": "ruleset:main@8",
+        "blocking": true,
+        "governedActorCanBypass": false,
+        "failurePolicy": "fail-closed"
+      },
+      "credentials": {
+        "issuedAt": "2026-07-16T09:59:00Z",
+        "expiresAt": "2026-07-16T10:10:00Z",
+        "requiredScopes": ["target:integrate"],
+        "effectiveScopes": ["target:integrate"]
+      },
+      "outcome": {
+        "status": "success",
+        "nativeReference": "merge:42",
+        "verificationReference": "target-check:main@101"
+      },
+      "rollbackPlanReference": "rollback-plan:42@1",
+      "irreversible": false
+    },
+    "transition": {
+      "mode": "execute",
+      "source": {"reference": "service:v1", "revision": "deploy:20"},
+      "target": {"reference": "service:v2", "revision": "deploy:0"},
+      "plan": {
+        "areas": [
+          "data",
+          "users",
+          "providers",
+          "flags",
+          "training",
+          "support",
+          "resilience"
+        ],
+        "rollbackTriggers": ["error-rate-above-threshold"]
+      },
+      "operation": {
+        "intent": "transition",
+        "capability": "external-enforcement",
+        "ordinaryToolMutation": false,
+        "request": {
+          "subject": {"reference": "service:v1", "revision": "deploy:20"},
+          "target": {"reference": "service:v2", "revision": "deploy:0"},
+          "action": "transition",
+          "evidence": [{"reference": "readiness:2", "revision": "4"}],
+          "policy": {"identity": "transition-policy", "version": "3"},
+          "now": "2026-07-16T10:00:00Z"
+        },
+        "authorization": {
+          "subject": {"reference": "service:v1", "revision": "deploy:20"},
+          "target": {"reference": "service:v2", "revision": "deploy:0"},
+          "action": "transition",
+          "actor": {
+            "identity": "human:service-owner",
+            "role": "transition-approver",
+            "type": "human",
+            "accountable": true
+          },
+          "evidence": [{"reference": "readiness:2", "revision": "4"}],
+          "policy": {"identity": "transition-policy", "version": "3"},
+          "issuedAt": "2026-07-16T09:00:00Z",
+          "expiresAt": "2026-07-16T17:00:00Z",
+          "decision": "allow"
+        },
+        "enforcement": {
+          "kind": "protected-service-operation",
+          "nativeReference": "change-gate:22",
+          "blocking": true,
+          "governedActorCanBypass": false,
+          "failurePolicy": "fail-closed"
+        },
+        "credentials": {
+          "issuedAt": "2026-07-16T09:59:00Z",
+          "expiresAt": "2026-07-16T10:30:00Z",
+          "requiredScopes": ["service:transition"],
+          "effectiveScopes": ["service:transition"]
+        },
+        "outcome": {
+          "status": "success",
+          "nativeReference": "change:22",
+          "verificationReference": "transition-check:22"
+        },
+        "rollbackPlanReference": "transition-rollback:22",
+        "irreversible": false
+      }
+    },
+    "release": {
+      "artifact": {"reference": "artifact:42", "digest": "sha256:bbb"},
+      "protectedEnvironment": {
+        "reference": "environment:production",
+        "revision": "19"
+      },
+      "approvalReference": "environment-approval:42",
+      "automation": {
+        "controlled": true,
+        "nativeReference": "deployment-pipeline:8"
+      },
+      "reportedStatus": "success",
+      "operation": {
+        "intent": "release",
+        "capability": "external-enforcement",
+        "ordinaryToolMutation": false,
+        "request": {
+          "subject": {"reference": "artifact:42", "revision": "sha256:bbb"},
+          "target": {"reference": "environment:production", "revision": "19"},
+          "action": "release",
+          "evidence": [{"reference": "integration:42", "revision": "2"}],
+          "policy": {"identity": "release-policy", "version": "9"},
+          "now": "2026-07-16T10:00:00Z"
+        },
+        "authorization": {
+          "subject": {"reference": "artifact:42", "revision": "sha256:bbb"},
+          "target": {"reference": "environment:production", "revision": "19"},
+          "action": "release",
+          "actor": {
+            "identity": "human:release-manager",
+            "role": "production-approver",
+            "type": "human",
+            "accountable": true
+          },
+          "evidence": [{"reference": "integration:42", "revision": "2"}],
+          "policy": {"identity": "release-policy", "version": "9"},
+          "issuedAt": "2026-07-16T09:00:00Z",
+          "expiresAt": "2026-07-16T17:00:00Z",
+          "decision": "allow"
+        },
+        "enforcement": {
+          "kind": "protected-environment",
+          "nativeReference": "environment:production@19",
+          "blocking": true,
+          "governedActorCanBypass": false,
+          "failurePolicy": "fail-closed"
+        },
+        "credentials": {
+          "issuedAt": "2026-07-16T09:59:00Z",
+          "expiresAt": "2026-07-16T10:30:00Z",
+          "requiredScopes": ["environment:deploy"],
+          "effectiveScopes": ["environment:deploy"]
+        },
+        "outcome": {
+          "status": "success",
+          "nativeReference": "deployment:42",
+          "verificationReference": "health-gate:42"
+        },
+        "rollbackPlanReference": "release-rollback:42",
+        "irreversible": false
+      }
+    },
+    "observation": {
+      "subject": {"reference": "deployment:42", "revision": "sha256:bbb"},
+      "window": {
+        "start": "2026-07-16T10:00:00Z",
+        "end": "2026-07-16T11:00:00Z"
+      },
+      "baselines": ["slo:checkout@4", "cost-baseline:checkout@2"],
+      "signals": [
+        {
+          "kind": "monitoring",
+          "nativeReference": "metrics:1",
+          "observedAt": "2026-07-16T11:00:00Z",
+          "freshness": "current"
+        },
+        {
+          "kind": "user",
+          "nativeReference": "support:1",
+          "observedAt": "2026-07-16T10:45:00Z",
+          "freshness": "current"
+        },
+        {
+          "kind": "security",
+          "nativeReference": "siem:1",
+          "observedAt": "2026-07-16T10:58:00Z",
+          "freshness": "current"
+        },
+        {
+          "kind": "ai",
+          "nativeReference": "model-monitor:1",
+          "observedAt": "2026-07-16T10:57:00Z",
+          "freshness": "current"
+        },
+        {
+          "kind": "cost",
+          "nativeReference": "cost:1",
+          "observedAt": "2026-07-16T10:55:00Z",
+          "freshness": "current"
+        },
+        {
+          "kind": "accessibility",
+          "nativeReference": "a11y:1",
+          "observedAt": "2026-07-16T10:40:00Z",
+          "freshness": "current"
+        },
+        {
+          "kind": "delivery-outcome",
+          "nativeReference": "delivery:1",
+          "observedAt": "2026-07-16T10:59:00Z",
+          "freshness": "current"
+        }
+      ],
+      "assistance": {
+        "origin": "model",
+        "authority": "advisory",
+        "sourceReferences": ["metrics:1", "support:1"],
+        "fabricatesHumanAuthorization": false,
+        "regulatoryConclusion": false
+      }
+    },
+    "incident": {
+      "reference": "incident:77",
+      "scope": "checkout production and affected customers",
+      "severity": "critical",
+      "owner": "human:incident-commander",
+      "currentState": "recovering",
+      "timeline": [
+        {"at": "2026-07-16T10:02:00Z", "event": "alert", "evidence": "alert:9"},
+        {
+          "at": "2026-07-16T10:05:00Z",
+          "event": "containment",
+          "evidence": "change:freeze"
+        }
+      ],
+      "actions": ["contain", "recover"],
+      "reportingApplicability": {
+        "status": "pending-review",
+        "sources": ["current-incident-policy:7"]
+      },
+      "severityChanged": true,
+      "escalationReference": "page:leadership-4",
+      "assistance": {
+        "origin": "agent",
+        "authority": "advisory",
+        "sourceReferences": ["alert:9", "change:freeze"],
+        "fabricatesHumanAuthorization": false,
+        "regulatoryConclusion": false
+      }
+    },
+    "corrective-action": {
+      "sourceReference": "incident:77",
+      "sourceRevision": "6",
+      "cause": "unbounded retry amplification",
+      "action": "add bounded backoff and concurrency guard",
+      "owner": "team:checkout",
+      "dueState": "implemented",
+      "status": "verifying",
+      "verification": {
+        "nativeReference": "qa:retry-guard@2",
+        "outcome": "pass"
+      },
+      "effectiveness": {"status": "observing", "window": "14d"}
+    },
+    "retirement": {
+      "resources": [
+        {
+          "kind": "data",
+          "reference": "dataset:legacy-prompts",
+          "revision": "8",
+          "action": "delete",
+          "evidenceReference": "deletion-job:42",
+          "deletionEvidenceReference": "provider-deletion-proof:42",
+          "holdDisposition": "no-active-hold:legal-review-4",
+          "verified": true
+        },
+        {
+          "kind": "credential",
+          "reference": "credential:legacy-service",
+          "revision": "3",
+          "action": "revoke",
+          "evidenceReference": "iam-revocation:9",
+          "verified": true
+        }
+      ],
+      "residualRiskDisposition": "accepted by service owner; observe denied access for 7d",
+      "operation": {
+        "intent": "retirement",
+        "capability": "external-enforcement",
+        "ordinaryToolMutation": false,
+        "request": {
+          "subject": {"reference": "retirement-set:42", "revision": "1"},
+          "target": {"reference": "provider:legacy-service", "revision": "12"},
+          "action": "retirement",
+          "evidence": [{"reference": "retirement-plan:42", "revision": "3"}],
+          "policy": {"identity": "retirement-policy", "version": "5"},
+          "now": "2026-07-16T10:00:00Z"
+        },
+        "authorization": {
+          "subject": {"reference": "retirement-set:42", "revision": "1"},
+          "target": {"reference": "provider:legacy-service", "revision": "12"},
+          "action": "retirement",
+          "actor": {
+            "identity": "human:service-owner",
+            "role": "retirement-approver",
+            "type": "human",
+            "accountable": true
+          },
+          "evidence": [{"reference": "retirement-plan:42", "revision": "3"}],
+          "policy": {"identity": "retirement-policy", "version": "5"},
+          "issuedAt": "2026-07-16T09:00:00Z",
+          "expiresAt": "2026-07-16T17:00:00Z",
+          "decision": "allow"
+        },
+        "enforcement": {
+          "kind": "provider-resource-policy",
+          "nativeReference": "provider-policy:retirement@5",
+          "blocking": true,
+          "governedActorCanBypass": false,
+          "failurePolicy": "fail-closed"
+        },
+        "credentials": {
+          "issuedAt": "2026-07-16T09:59:00Z",
+          "expiresAt": "2026-07-16T10:30:00Z",
+          "requiredScopes": ["resource:retire"],
+          "effectiveScopes": ["resource:retire"]
+        },
+        "outcome": {
+          "status": "success",
+          "nativeReference": "retirement-job:42",
+          "verificationReference": "retirement-check:42"
+        },
+        "irreversible": true,
+        "irreversibilityHandling": "verified export, hold review, staged deletion, provider proof"
+      }
+    },
+    "agent-assistance": {
+      "origin": "agent",
+      "authority": "advisory",
+      "sourceReferences": ["incident:77@6", "metrics:1"],
+      "fabricatesHumanAuthorization": false,
+      "regulatoryConclusion": false
+    }
+  },
+  "cases": [
+    {
+      "id": "acceptance-evidence-remains-advisory",
+      "contract": "acceptance",
+      "template": "acceptance-evidence",
+      "expectedValid": true
+    },
+    {
+      "id": "evidence-assembly-cannot-claim-signoff",
+      "contract": "acceptance",
+      "template": "acceptance-evidence",
+      "input": {"decision": "accept"},
+      "expectedValid": false,
+      "expectedCode": "evidence-assembly-claims-acceptance"
+    },
+    {
+      "id": "accountable-human-records-acceptance",
+      "contract": "acceptance",
+      "template": "acceptance-decision",
+      "expectedValid": true
+    },
+    {
+      "id": "agent-cannot-record-human-acceptance",
+      "contract": "acceptance",
+      "template": "acceptance-decision",
+      "input": {"actor": {"type": "agent"}},
+      "expectedValid": false,
+      "expectedCode": "human-acceptance-required"
+    },
+    {
+      "id": "exact-revision-authorization-is-valid",
+      "contract": "authorization",
+      "template": "authorization",
+      "expectedValid": true
+    },
+    {
+      "id": "target-drift-invalidates-authorization",
+      "contract": "authorization",
+      "template": "authorization",
+      "input": {"request": {"target": {"revision": "commit:101"}}},
+      "expectedValid": false,
+      "expectedCode": "authorization-target-drift"
+    },
+    {
+      "id": "stale-evidence-invalidates-authorization",
+      "contract": "authorization",
+      "template": "authorization",
+      "input": {
+        "request": {"evidence": [{"reference": "qa:42", "revision": "6"}]}
+      },
+      "expectedValid": false,
+      "expectedCode": "authorization-stale-evidence"
+    },
+    {
+      "id": "policy-drift-invalidates-authorization",
+      "contract": "authorization",
+      "template": "authorization",
+      "input": {"request": {"policy": {"version": "8"}}},
+      "expectedValid": false,
+      "expectedCode": "authorization-policy-drift"
+    },
+    {
+      "id": "expired-authorization-fails-closed",
+      "contract": "authorization",
+      "template": "authorization",
+      "input": {"request": {"now": "2026-07-16T17:00:00Z"}},
+      "expectedValid": false,
+      "expectedCode": "authorization-expired"
+    },
+    {
+      "id": "protected-integration-operation-is-valid",
+      "contract": "privileged-operation",
+      "template": "privileged-operation",
+      "expectedValid": true
+    },
+    {
+      "id": "ordinary-tool-cannot-bypass-integration",
+      "contract": "privileged-operation",
+      "template": "privileged-operation",
+      "input": {"ordinaryToolMutation": true},
+      "expectedValid": false,
+      "expectedCode": "ordinary-tool-bypass"
+    },
+    {
+      "id": "bypassable-control-cannot-enforce-integration",
+      "contract": "privileged-operation",
+      "template": "privileged-operation",
+      "input": {"enforcement": {"governedActorCanBypass": true}},
+      "expectedValid": false,
+      "expectedCode": "external-enforcement-inadequate"
+    },
+    {
+      "id": "transition-covers-operational-readiness",
+      "contract": "transition",
+      "template": "transition",
+      "expectedValid": true
+    },
+    {
+      "id": "transition-rollback-preserves-verification",
+      "contract": "transition",
+      "template": "transition",
+      "input": {
+        "mode": "rollback",
+        "verification": ["transition-check:rollback-22"]
+      },
+      "expectedValid": true
+    },
+    {
+      "id": "transition-rollback-requires-verification",
+      "contract": "transition",
+      "template": "transition",
+      "input": {"mode": "rollback", "verification": []},
+      "expectedValid": false,
+      "expectedCode": "transition-verification-missing"
+    },
+    {
+      "id": "controlled-release-is-valid",
+      "contract": "release",
+      "template": "release",
+      "expectedValid": true
+    },
+    {
+      "id": "failed-release-preserves-recovery",
+      "contract": "release",
+      "template": "release",
+      "input": {
+        "reportedStatus": "failed",
+        "recoveryResultReference": "release-recovery:42",
+        "operation": {"outcome": {"status": "failed"}}
+      },
+      "expectedValid": true
+    },
+    {
+      "id": "failed-release-cannot-be-reported-success",
+      "contract": "release",
+      "template": "release",
+      "input": {
+        "recoveryResultReference": "release-recovery:42",
+        "operation": {"outcome": {"status": "failed"}}
+      },
+      "expectedValid": false,
+      "expectedCode": "failed-release-reported-success"
+    },
+    {
+      "id": "failed-release-requires-rollback-or-recovery-result",
+      "contract": "release",
+      "template": "release",
+      "input": {
+        "reportedStatus": "failed",
+        "operation": {"outcome": {"status": "failed"}}
+      },
+      "expectedValid": false,
+      "expectedCode": "release-failure-unrecovered"
+    },
+    {
+      "id": "observation-composes-required-signal-families",
+      "contract": "observation",
+      "template": "observation",
+      "expectedValid": true
+    },
+    {
+      "id": "observation-reports-missing-accessibility-signal",
+      "contract": "observation",
+      "template": "observation",
+      "input": {
+        "signals": [
+          {
+            "kind": "monitoring",
+            "nativeReference": "metrics:1",
+            "observedAt": "2026-07-16T11:00:00Z",
+            "freshness": "current"
+          }
+        ]
+      },
+      "expectedValid": false,
+      "expectedCode": "observation-coverage-incomplete"
+    },
+    {
+      "id": "incident-escalation-is-recorded",
+      "contract": "incident",
+      "template": "incident",
+      "expectedValid": true
+    },
+    {
+      "id": "severity-change-requires-escalation",
+      "contract": "incident",
+      "template": "incident",
+      "input": {"escalationReference": null},
+      "expectedValid": false,
+      "expectedCode": "incident-escalation-missing"
+    },
+    {
+      "id": "qualified-human-records-reporting-conclusion",
+      "contract": "incident",
+      "template": "incident",
+      "input": {
+        "reportingApplicability": {
+          "status": "applicable",
+          "reviewer": {
+            "identity": "human:privacy-counsel",
+            "qualification": "incident-reporting-review",
+            "type": "human"
+          },
+          "sources": ["current-law-text:2026-07-16", "incident-policy:7"]
+        }
+      },
+      "expectedValid": true
+    },
+    {
+      "id": "agent-cannot-record-regulatory-conclusion",
+      "contract": "incident",
+      "template": "incident",
+      "input": {
+        "reportingApplicability": {
+          "status": "applicable",
+          "reviewer": {
+            "identity": "agent:investigator",
+            "qualification": "none",
+            "type": "agent"
+          },
+          "sources": ["summary:1"]
+        }
+      },
+      "expectedValid": false,
+      "expectedCode": "qualified-reporting-review-required"
+    },
+    {
+      "id": "incident-closure-requires-recovery-and-review",
+      "contract": "incident",
+      "template": "incident",
+      "input": {"currentState": "closed"},
+      "expectedValid": false,
+      "expectedCode": "incident-closure-incomplete"
+    },
+    {
+      "id": "verified-incident-can-close",
+      "contract": "incident",
+      "template": "incident",
+      "input": {
+        "currentState": "closed",
+        "containmentVerified": true,
+        "recoveryVerified": true,
+        "postIncidentReviewReference": "postmortem:77"
+      },
+      "expectedValid": true
+    },
+    {
+      "id": "corrective-action-remains-open-during-effectiveness-window",
+      "contract": "corrective-action",
+      "template": "corrective-action",
+      "expectedValid": true
+    },
+    {
+      "id": "effective-corrective-action-can-close-with-learning",
+      "contract": "corrective-action",
+      "template": "corrective-action",
+      "input": {
+        "status": "closed",
+        "effectiveness": {"status": "effective"},
+        "learningReference": "learning:77",
+        "residualRiskDisposition": "accepted"
+      },
+      "expectedValid": true
+    },
+    {
+      "id": "ineffective-corrective-action-cannot-close",
+      "contract": "corrective-action",
+      "template": "corrective-action",
+      "input": {"status": "closed", "effectiveness": {"status": "partial"}},
+      "expectedValid": false,
+      "expectedCode": "corrective-action-closure-incomplete"
+    },
+    {
+      "id": "scoped-break-glass-is-valid",
+      "contract": "emergency-access",
+      "template": "break-glass",
+      "expectedValid": true
+    },
+    {
+      "id": "scoped-exception-is-valid",
+      "contract": "emergency-access",
+      "template": "break-glass",
+      "input": {"access": {"kind": "exception"}},
+      "expectedValid": true
+    },
+    {
+      "id": "expired-break-glass-fails-closed",
+      "contract": "emergency-access",
+      "template": "break-glass",
+      "input": {"request": {"now": "2026-07-16T10:25:00Z"}},
+      "expectedValid": false,
+      "expectedCode": "emergency-access-expired"
+    },
+    {
+      "id": "break-glass-requires-notification",
+      "contract": "emergency-access",
+      "template": "break-glass",
+      "input": {"access": {"notificationReference": null}},
+      "expectedValid": false,
+      "expectedCode": "break-glass-contract-incomplete"
+    },
+    {
+      "id": "retirement-verifies-data-and-credential-actions",
+      "contract": "retirement",
+      "template": "retirement",
+      "expectedValid": true
+    },
+    {
+      "id": "data-deletion-requires-provider-proof-and-hold-disposition",
+      "contract": "retirement",
+      "template": "retirement",
+      "input": {
+        "resources": [
+          {
+            "kind": "data",
+            "reference": "dataset:legacy-prompts",
+            "revision": "8",
+            "action": "delete",
+            "evidenceReference": "deletion-job:42",
+            "verified": true
+          }
+        ]
+      },
+      "expectedValid": false,
+      "expectedCode": "data-deletion-evidence-missing"
+    },
+    {
+      "id": "retirement-remains-open-with-unverified-resource",
+      "contract": "retirement",
+      "template": "retirement",
+      "input": {
+        "resources": [
+          {
+            "kind": "credential",
+            "reference": "credential:legacy-service",
+            "revision": "3",
+            "action": "revoke",
+            "evidenceReference": "iam-revocation:9",
+            "verified": false
+          }
+        ]
+      },
+      "expectedValid": false,
+      "expectedCode": "retirement-verification-missing"
+    },
+    {
+      "id": "agent-may-summarize-sourced-operational-evidence",
+      "contract": "agent-assistance",
+      "template": "agent-assistance",
+      "expectedValid": true
+    },
+    {
+      "id": "agent-cannot-fabricate-human-authorization",
+      "contract": "agent-assistance",
+      "template": "agent-assistance",
+      "input": {"fabricatesHumanAuthorization": true},
+      "expectedValid": false,
+      "expectedCode": "fabricated-human-authorization"
+    },
+    {
+      "id": "agent-cannot-fabricate-regulatory-conclusion",
+      "contract": "agent-assistance",
+      "template": "agent-assistance",
+      "input": {"regulatoryConclusion": true},
+      "expectedValid": false,
+      "expectedCode": "fabricated-regulatory-conclusion"
+    }
+  ]
+}

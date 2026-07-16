@@ -11,5 +11,6 @@ tasks:
     inputs:
       - workflow-guide/assets/conformance-fixtures.json
       - workflow-guide/assets/development-assurance-fixtures.json
+      - workflow-guide/assets/operational-lifecycle-fixtures.json
       - workflow-guide/references/*.md
       - workflow-guide/scripts/*.mjs
