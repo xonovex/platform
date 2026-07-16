@@ -1,0 +1,37 @@
+{
+  "id": "adapter-blocking",
+  "contract": "harness-adapters",
+  "scenario": "Deny semantics are per-event facts: what a deny suppresses (the action, queued side effects, sibling handlers) is declared exactly as probed, and a control requiring stronger suppression than the event provides cannot bind there.",
+  "given": {
+    "adapter": {
+      "harness": "example-harness 2.1",
+      "events": {
+        "pre_tool": {
+          "deny_suppresses": ["guarded_action"],
+          "deny_does_not_suppress": [
+            "sibling_handlers",
+            "already_queued_output"
+          ]
+        }
+      }
+    },
+    "control": {
+      "id": "block-secret-read",
+      "requires": "deny suppresses the guarded action before any side effect"
+    }
+  },
+  "when": "the control is bound to pre_tool and a deny fires alongside a sibling handler",
+  "expect": {
+    "outcome": "report",
+    "reasons": [
+      "the guarded tool call is suppressed",
+      "sibling handler effects are reported as possible, matching the declaration",
+      "the binding is valid because the control's requirement matches deny_suppresses"
+    ],
+    "must_not": [
+      "claim sibling suppression the probe did not demonstrate",
+      "bind a control needing pre-side-effect suppression to an event that only cancels the action afterward",
+      "treat exit-code conventions as portable across harnesses without probing"
+    ]
+  }
+}

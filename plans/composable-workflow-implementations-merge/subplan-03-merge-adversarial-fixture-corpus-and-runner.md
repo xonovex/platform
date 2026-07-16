@@ -3,7 +3,7 @@ type: plan
 has_subplans: false
 parent_plan: composable-workflow-implementations-merge
 parallel_group: 3
-status: pending
+status: complete
 dependencies:
   plans:
   - merge-baseline-and-layout-normalization
@@ -22,11 +22,11 @@ skills_to_consult:
 - skill-guide
 - moon-guide
 validation:
-  type_check: pending
-  lint: pending
-  build: pending
-  tests: pending
-  integration: pending
+  type_check: pass
+  lint: pass
+  build: pass
+  tests: pass
+  integration: pass
 ---
 
 # Subplan 03: Adversarial Fixture Corpus and Runner
@@ -54,11 +54,11 @@ Port fable's 64 adversarial fixtures as JSON into the owning platform guides, in
 
 ## Success Criteria
 
-- [ ] Every fable fixture has a manifest disposition: ported (JSON) or skip-with-reason
-- [ ] Zero orphan fixtures, machine-checked; suites reference every ported fixture once
-- [ ] Runner + mutation guards wired into moon test for both contract skills
-- [ ] 10-fixture spot-audit recorded, zero semantic deviations
-- [ ] Full validation green; one conventional commit
+- [x] Every fable fixture has a manifest disposition: all 56 ported as JSON (dedupe review concluded the 4 flagged fixtures are complementary, not duplicates — reasons recorded per row)
+- [x] Zero orphan fixtures, machine-checked: `index.json` bijection enforced by the runner; every fixture's `contract` re-pointed to and matched against its owning platform reference (36 gov/enterprise → 20 references incl. cross-package enterprise guides; 20 workflow → 16 references incl. plan-guide early-lifecycle ops)
+- [x] `validate-conformance-scenario-fixtures.mjs` in both contract guides with 4 mutation guards each (schema tamper, missing index entry, contract mismatch, ghost entry), wired into both packages' test scripts and moon inputs
+- [x] Fidelity audit exceeded requirement: full corpus 56/56 compared field-by-field against fable originals — zero non-contract differences (recorded in port manifest)
+- [x] Full validation green (`:ci-check` 760 tasks, doc validator 8,862); one conventional commit
 
 ## Files Modified/Created
 

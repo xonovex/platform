@@ -1,0 +1,55 @@
+{
+  "id": "mixed-enterprise-stack",
+  "contract": "enterprise-platforms",
+  "scenario": "Five independent platform owners each hold their own slice of lifecycle evidence for one change; the composition resolves end to end through opaque native cross-references with no central workflow record, and removing any one module leaves the others' results intact.",
+  "given": {
+    "platforms": [
+      {
+        "owner": "work-item system",
+        "holds": "the story and its acceptance decision",
+        "reference_kind": "work-item id + URL"
+      },
+      {
+        "owner": "source host",
+        "holds": "the pull request, review, and merge evidence",
+        "reference_kind": "repository/PR ids + commit SHA"
+      },
+      {
+        "owner": "mobile CI service",
+        "holds": "build, test, and artifact evidence for the change",
+        "reference_kind": "build slug + artifact references, status posted to the source host"
+      },
+      {
+        "owner": "cloud provider",
+        "holds": "runtime controls and deployment audit trail",
+        "reference_kind": "role/audit-event identifiers via federated (non-static) credentials"
+      },
+      {
+        "owner": "observability platform",
+        "holds": "deployment and operation telemetry, correlated by correlation ids",
+        "reference_kind": "native event/dashboard references, content-minimized"
+      }
+    ],
+    "cross_references": [
+      "work item cites the pull request URL",
+      "pull request cites the commit SHA; CI posts build status to it",
+      "deployment audit cites the build artifact reference",
+      "telemetry correlates by correlation ids that carry no authority"
+    ]
+  },
+  "when": "a fresh session inspects the change's lifecycle state starting from only the work-item reference",
+  "expect": {
+    "outcome": "report",
+    "reasons": [
+      "every capability's result resolves through its owning platform's native records",
+      "the inspection reconstructs the full chain by following opaque cross-references",
+      "each platform's evidence identifies source, actor, native revision, and freshness"
+    ],
+    "must_not": [
+      "introduce a central workflow database, universal envelope, or sidecar record",
+      "normalize one platform's identifiers into another's schema",
+      "break sibling results when any one platform module is uninstalled",
+      "use long-lived static credentials for the CI-to-cloud link"
+    ]
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "id": "external-admission-privileged",
+  "contract": "external-enforcement",
+  "scenario": "A namespace admission policy requires sandboxed runtime classes for agent workloads; a non-compliant workload is rejected, and a bypass attempt that sidesteps the policed resource type is caught only by an independent layer — which the composition must therefore require.",
+  "given": {
+    "enforcement": [
+      {
+        "kind": "admission-policy",
+        "scope": "namespace 'agents'",
+        "control": "agent runs require runtimeClass in [sandboxed classes], security context, egress policy",
+        "polices": "the agent-run resource type via validating webhook"
+      },
+      {
+        "kind": "namespace-guardrails",
+        "controls": ["resource quota", "limit range", "default-deny egress"],
+        "independent_of": "admission-policy"
+      }
+    ],
+    "events": [
+      {
+        "action": "create agent run with no runtimeClass"
+      },
+      {
+        "action": "create a raw workload directly, bypassing the policed resource type"
+      }
+    ]
+  },
+  "when": "both creations are attempted in the namespace",
+  "expect": {
+    "outcome": "report",
+    "reasons": [
+      "the non-compliant agent run is rejected at admission, fail closed, with the violated field named",
+      "the raw-workload path is recorded as a bypass surface of the admission policy",
+      "the profile requires the independent namespace guardrails (quota, egress default-deny) to cover that surface"
+    ],
+    "must_not": [
+      "claim the admission webhook governs workloads created outside the policed resource type",
+      "mutate the non-compliant run into compliance instead of rejecting it",
+      "treat an installed webhook as proof that a policy object exists in the namespace"
+    ]
+  }
+}

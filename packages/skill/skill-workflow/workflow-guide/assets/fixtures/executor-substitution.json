@@ -1,0 +1,29 @@
+{
+  "id": "executor-substitution",
+  "contract": "architecture",
+  "scenario": "A model executor is offered for a validation step the capability contract requires from a deterministic executor; the substitution must be rejected.",
+  "given": {
+    "capability": {
+      "id": "qa",
+      "validation": "test suite executed by a deterministic runner",
+      "permitted_executors": ["deterministic", "external"]
+    },
+    "offered_execution": {
+      "executor": "model",
+      "claim": "model asserts the test suite would pass based on reading the diff"
+    }
+  },
+  "when": "the offered execution is checked against the capability contract",
+  "expect": {
+    "outcome": "reject",
+    "reasons": [
+      "executor class 'model' is not permitted for capability 'qa' validation",
+      "the claim is an LLM-derived fact where authoritative inspection is possible"
+    ],
+    "must_not": [
+      "accept model output as evidence of test results",
+      "record the substitution as a deterministic execution",
+      "downgrade the validation requirement to advisory"
+    ]
+  }
+}

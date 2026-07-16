@@ -1,0 +1,49 @@
+{
+  "id": "unsupported-mandatory-control",
+  "contract": "profiles",
+  "scenario": "A profile marks a control mandatory but no selected enforcement point can guarantee it; composition must fail visibly instead of downgrading.",
+  "given": {
+    "profile": {
+      "mandatory_controls": [
+        {
+          "id": "pre-privileged-operation-gate",
+          "enforcement_intent": "before-privileged-operation",
+          "blocking": "required"
+        }
+      ]
+    },
+    "environment": {
+      "enforcement_points": [
+        {
+          "kind": "harness-hooks",
+          "capability_matrix": {
+            "before-privileged-operation": {
+              "supported": false
+            }
+          }
+        },
+        {
+          "kind": "ci",
+          "capability_matrix": {
+            "before-privileged-operation": {
+              "supported": false
+            }
+          }
+        }
+      ]
+    }
+  },
+  "when": "the composition is validated before any work runs",
+  "expect": {
+    "outcome": "reject",
+    "reasons": [
+      "names the unmet mandatory control 'pre-privileged-operation-gate'",
+      "names the enforcement points consulted and why each cannot guarantee it"
+    ],
+    "must_not": [
+      "silently downgrade the control to advisory",
+      "proceed with work while deferring the check",
+      "claim enforcement parity a capability matrix does not record"
+    ]
+  }
+}

@@ -12,5 +12,11 @@ tasks:
     command: npm run test
     inputs:
       - agent-governance-guide/assets/*.json
+      - agent-governance-guide/assets/fixtures/*.json
       - agent-governance-guide/assets/walking-skeleton/*.sh
+      - /packages/skill/skill-aws/aws-guide/references/*.md
+      - /packages/skill/skill-azure-devops/azure-devops-guide/references/*.md
+      - /packages/skill/skill-bitbucket/bitbucket-guide/references/*.md
+      - /packages/skill/skill-bitrise/bitrise-guide/references/*.md
+      - /packages/skill/skill-datadog/datadog-guide/references/*.md
       - agent-governance-guide/scripts/*.mjs

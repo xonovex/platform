@@ -1,0 +1,29 @@
+{
+  "id": "monitor-not-enforcement",
+  "contract": "provider-conformance",
+  "scenario": "A profile lists a Datadog monitor as the sole guaranteeing enforcement point for a mandatory control; the binding must be rejected and reported with an actual enforcement layer required — the monitor may remain as the control's detection/evidence side.",
+  "given": {
+    "profile": {
+      "control": "no unapproved deployment reaches production (mandatory)",
+      "binding": ["Datadog monitor alerting on deployment events"],
+      "other_layers": "none"
+    },
+    "matrix": {
+      "org-mandated blocking enforcement": "unsupported — monitors are detective"
+    }
+  },
+  "when": "profile composition negotiates the mandatory control against the matrix",
+  "expect": {
+    "outcome": "reject",
+    "reasons": [
+      "the monitor is detective — it observes and alerts after the fact and cannot block the deployment",
+      "the matrix records blocking enforcement as unsupported, so no verified blocking enforcement point exists for the control",
+      "the report names the gap and requires an actual enforcement layer (for example a CD approval gate or cloud control owned by that platform's skill), with the monitor retained as detection/evidence"
+    ],
+    "must_not": [
+      "accept the monitor as the guaranteeing enforcement point for a mandatory control",
+      "present alert latency or auto-remediation as equivalent to blocking",
+      "drop or downgrade the control silently instead of reporting the gap"
+    ]
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "id": "federated-over-static",
+  "contract": "iam-and-federation",
+  "scenario": "A CI system requests AWS access to deploy; the default answer is an OIDC identity provider plus a role with a conditioned trust policy, previewed as exact JSON; generating an IAM user with access keys is refused as the default, allowed only as an explicit, labeled, expiring exception.",
+  "given": {
+    "request": "CI needs credentials to deploy into the target account",
+    "ci_system": {
+      "oidc_issuer": "available"
+    },
+    "context": {
+      "federation": "supported in the detected account context (probe result)"
+    }
+  },
+  "when": "the onboarding advisor assembles the credential recommendation",
+  "expect": {
+    "outcome": "allow",
+    "reasons": [
+      "an OIDC identity provider is created for the CI issuer and the pipeline assumes a role via web identity",
+      "the trust policy carries conditions constraining the audience and subject claims to the specific pipeline, previewed as exact JSON with named principals",
+      "verification assumes the role from CI, attempts an out-of-scope action, and confirms the deny; policy versions are recorded for rollback"
+    ],
+    "must_not": [
+      "create an IAM user with long-lived access keys as the default",
+      "issue any static key without an explicit, labeled, expiring exception record with an owner and rotation duty",
+      "leave the trust policy without audience and subject conditions"
+    ]
+  }
+}

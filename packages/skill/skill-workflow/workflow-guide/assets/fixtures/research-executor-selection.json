@@ -1,0 +1,39 @@
+{
+  "id": "research-executor-selection",
+  "contract": "research-run",
+  "scenario": "A simple lookup question stays deterministic; a bounded synthesis question uses a model with citations; only genuine unknown-trail exploration selects an agent, with justification recorded — and the escalations are auditable.",
+  "given": {
+    "questions": [
+      {
+        "id": "q1",
+        "text": "which version of the payments library is deployed?",
+        "nature": "inspectable fact"
+      },
+      {
+        "id": "q2",
+        "text": "summarize the constraints the three collected standards impose",
+        "nature": "synthesis over collected material"
+      },
+      {
+        "id": "q3",
+        "text": "which services would break if the session-token format changes?",
+        "nature": "discovery-driven exploration across unknown dependents"
+      }
+    ]
+  },
+  "when": "executors are selected for each question",
+  "expect": {
+    "outcome": "report",
+    "reasons": [
+      "q1 is answered deterministically; a model answer would be an LLM-derived fact and is rejected",
+      "q2 uses a bounded model with fixed inputs and per-finding citations to the collected material",
+      "q3 selects an agent with a recorded justification and full launch bounds",
+      "each result records its executor class and, for escalations, the justification"
+    ],
+    "must_not": [
+      "let a model originate the deployed version",
+      "run an agent for q1 or q2 because scripting felt inconvenient",
+      "accept q3's agent launch without depth/budget/tool bounds"
+    ]
+  }
+}

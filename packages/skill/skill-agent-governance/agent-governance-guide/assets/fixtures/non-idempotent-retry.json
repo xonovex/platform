@@ -1,0 +1,32 @@
+{
+  "id": "non-idempotent-retry",
+  "contract": "modules",
+  "scenario": "A side-effecting module times out after its side effect landed, and the platform retries; the side effect must not apply twice.",
+  "given": {
+    "module": {
+      "id": "environment-tagger",
+      "behavior_class": "configuration-changing",
+      "declared": {
+        "idempotency": "idempotent (keyed on subject + change id)",
+        "retry": "platform may retry on timeout"
+      }
+    },
+    "runtime_state": {
+      "first_invocation": "side effect applied, acknowledgement lost, reported timeout",
+      "retry_invocation": "same subject, same change id"
+    }
+  },
+  "when": "the retry executes",
+  "expect": {
+    "outcome": "accept",
+    "reasons": [
+      "the retry converges on the already-applied state without a second mutation",
+      "evidence shows one applied change with a retried acknowledgement"
+    ],
+    "must_not": [
+      "apply the configuration change twice",
+      "report the retry as a distinct second change",
+      "accept a module that declares retry-safe without declaring how idempotency is keyed"
+    ]
+  }
+}

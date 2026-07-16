@@ -1,0 +1,31 @@
+{
+  "id": "plan-gated-merge-check",
+  "contract": "cloud-source-and-controls",
+  "scenario": "A mandatory before-integration control is bound to a required custom merge check, but the workspace plan does not include custom merge checks; the gap must be reported with remediation, never silently skipped or downgraded.",
+  "given": {
+    "environment": {
+      "edition": "Cloud",
+      "workspace_plan": "tier without custom merge checks"
+    },
+    "matrix": {
+      "custom merge checks": {
+        "this_plan": "unavailable (plan-gated)"
+      }
+    },
+    "request": "enforce the policy scanner as a required custom merge check on main"
+  },
+  "when": "the mandatory control is bound to the merge gate",
+  "expect": {
+    "outcome": "report",
+    "reasons": [
+      "the plan gating is reported with the matrix entry cited, and the control is not claimed as enforced",
+      "alternatives are labeled by strength — built-in required merge checks and branch permissions where the plan supports them, or a plan change as the remediation",
+      "the merge gate's actual state (which checks block, which merely suggest) is stated from configuration, not intent"
+    ],
+    "must_not": [
+      "silently skip the check and report the merge gate as enforced",
+      "downgrade to a suggested (non-blocking) check without naming the downgrade",
+      "emulate enforcement with advisory automation and call it a merge check"
+    ]
+  }
+}

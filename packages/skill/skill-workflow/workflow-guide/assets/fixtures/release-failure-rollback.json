@@ -1,0 +1,31 @@
+{
+  "id": "release-failure-rollback",
+  "contract": "release-run",
+  "scenario": "A staged release trips its declared failure criteria at 10% exposure; the abort path rolls the exposure back to zero.",
+  "given": {
+    "release": {
+      "subject": "app at digest sha-a",
+      "target": "production, staged exposure",
+      "abort criteria": "error rate above threshold, declared before exposure"
+    },
+    "events": [
+      "exposure reaches 10%",
+      "error rate exceeds the declared threshold",
+      "rollback executes and verifies at 0% exposure"
+    ]
+  },
+  "when": "the ReleaseResult is published",
+  "expect": {
+    "outcome": "report",
+    "reasons": [
+      "the result records a failed-and-rolled-back release as the honest outcome",
+      "the timeline includes the exposure state at failure and the verified rollback",
+      "a retry is a new execution under a still-valid authorization, not an edit of this result"
+    ],
+    "must_not": [
+      "smooth the failure into a released-after-retries narrative",
+      "leave the exposure state ambiguous after the abort",
+      "delete or rewrite the failed release record when a later attempt succeeds"
+    ]
+  }
+}

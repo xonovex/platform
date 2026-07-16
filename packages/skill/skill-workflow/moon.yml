@@ -12,5 +12,7 @@ tasks:
       - workflow-guide/assets/conformance-fixtures.json
       - workflow-guide/assets/development-assurance-fixtures.json
       - workflow-guide/assets/operational-lifecycle-fixtures.json
+      - workflow-guide/assets/fixtures/*.json
       - workflow-guide/references/*.md
+      - /packages/skill/skill-plan/plan-guide/references/*.md
       - workflow-guide/scripts/*.mjs

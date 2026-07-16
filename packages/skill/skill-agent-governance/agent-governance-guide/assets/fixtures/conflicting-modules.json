@@ -1,0 +1,34 @@
+{
+  "id": "conflicting-modules",
+  "contract": "modules",
+  "scenario": "Two modules bind the same control point with contradictory failure modes; the conflict must be surfaced with both sources named, never auto-resolved.",
+  "given": {
+    "modules": [
+      {
+        "id": "secret-scan",
+        "zone": "organization",
+        "control_point": "before-tool-use",
+        "failure_mode": "deny"
+      },
+      {
+        "id": "fast-path",
+        "zone": "project",
+        "control_point": "before-tool-use",
+        "failure_mode": "ignore"
+      }
+    ]
+  },
+  "when": "the two modules are composed onto the control point",
+  "expect": {
+    "outcome": "reject",
+    "reasons": [
+      "modules 'secret-scan' and 'fast-path' declare contradictory failure modes on 'before-tool-use'",
+      "both modules and their zones are named in the report"
+    ],
+    "must_not": [
+      "resolve by load order, file order, or last-writer-wins",
+      "let the project-zone module weaken the organization-zone failure mode",
+      "disable either module silently to make composition succeed"
+    ]
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "id": "inventory-no-fabrication",
+  "contract": "inventory-generate",
+  "scenario": "During inventory generation a dependency's version is unreadable; a model offers a remembered version. The inventory records an unknown, never the model's guess — and enrichment stays in its own non-authoritative fields.",
+  "given": {
+    "scope": "one service at revision rev-a",
+    "collection": [
+      {
+        "entry": "parser-lib",
+        "source": "lockfile",
+        "version": "3.1.4"
+      },
+      {
+        "entry": "legacy-blob",
+        "source": "vendored directory, no manifest",
+        "version": "unreadable by inspection"
+      }
+    ],
+    "model_offer": {
+      "claim": "legacy-blob is probably 2.x, commonly 2.7"
+    },
+    "enrichment": {
+      "parser-lib": "human-readable description of its role"
+    }
+  },
+  "when": "the InventoryResult is assembled",
+  "expect": {
+    "outcome": "report",
+    "reasons": [
+      "parser-lib appears with its inspected version and source",
+      "legacy-blob appears with version recorded as unknown and a finding to resolve it",
+      "the model's description enrichment sits in enrichment fields, labeled non-authoritative"
+    ],
+    "must_not": [
+      "record 2.7 or any model-remembered version as legacy-blob's version",
+      "omit legacy-blob to keep the inventory tidy",
+      "let enrichment overwrite any authoritative field"
+    ]
+  }
+}

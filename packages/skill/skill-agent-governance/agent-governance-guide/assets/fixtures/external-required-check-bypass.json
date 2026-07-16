@@ -1,0 +1,37 @@
+{
+  "id": "external-required-check-bypass",
+  "contract": "external-enforcement",
+  "scenario": "A code-host required check gates integration; an admin bypass merges past it. The bypass is evidenced as an exception-shaped event, and the independent second layer still gates the release.",
+  "given": {
+    "enforcement": [
+      {
+        "kind": "repository-ruleset",
+        "control": "integration requires check 'governance-verify' and independent review",
+        "bypass_list": ["repo-admins"]
+      },
+      {
+        "kind": "protected-environment",
+        "control": "release requires named approver",
+        "independent_of": "repository-ruleset"
+      }
+    ],
+    "event": {
+      "actor": "repo-admin",
+      "action": "bypass-merge of a change with check 'governance-verify' failing"
+    }
+  },
+  "when": "the bypassed change proceeds toward release",
+  "expect": {
+    "outcome": "report",
+    "reasons": [
+      "the bypass merge is recorded as a bypass-list event with actor and scope (exception-shaped, auditable)",
+      "the release gate at the protected environment still blocks until approval",
+      "the profile reports 'integration' control as bypassed for this change, not as passed"
+    ],
+    "must_not": [
+      "record the bypassed check as satisfied",
+      "treat the bypass list as a silent allow rather than a recorded exception path",
+      "count two rules with the same bypass surface as two independent layers"
+    ]
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "id": "consolidation-not-integration",
+  "contract": "development-contracts",
+  "scenario": "Two parallel workspaces consolidate cleanly into the development line; the consolidated work still passes through the Integration capability's independent controls before reaching the mainline.",
+  "given": {
+    "parallel_assignments": [
+      {
+        "workspace": "ws-a",
+        "status": "complete, validated"
+      },
+      {
+        "workspace": "ws-b",
+        "status": "complete, validated"
+      }
+    ],
+    "consolidation": {
+      "result": "ws-a and ws-b merged into the development line, conflicts resolved, validation green"
+    },
+    "integration_controls": [
+      "independent review required (no self-approval)",
+      "required checks at the mainline gate"
+    ]
+  },
+  "when": "the consolidated development line is proposed for the mainline",
+  "expect": {
+    "outcome": "report",
+    "reasons": [
+      "consolidation is recorded as a development-internal step in the DevelopmentResults",
+      "the mainline landing still runs Integration's controls; clean consolidation grants no bypass",
+      "review and required checks evaluate the consolidated revision, not the pre-merge workspaces"
+    ],
+    "must_not": [
+      "treat successful consolidation as completed Integration",
+      "inherit workspace-level validation as a substitute for mainline gates",
+      "land on the mainline directly because both workspaces were individually validated"
+    ]
+  }
+}

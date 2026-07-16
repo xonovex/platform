@@ -1,0 +1,34 @@
+{
+  "id": "adapter-config-precedence",
+  "contract": "harness-adapters",
+  "scenario": "A harness whose native precedence lets user config override project config still cannot let a user setting weaken a managed mandatory control; where the harness cannot realize the invariant, the adapter declares it and the control moves to external enforcement.",
+  "given": {
+    "adapter": {
+      "harness": "example-harness 2.1",
+      "native_precedence": ["user", "project", "managed"],
+      "managed_enforcement": "user scope cannot disable managed hooks (verified)"
+    },
+    "configuration": {
+      "managed": {
+        "hook": "secret-scan",
+        "mandatory": true
+      },
+      "user": {
+        "disable_hooks": ["secret-scan"]
+      }
+    }
+  },
+  "when": "the effective configuration is composed and inspected",
+  "expect": {
+    "outcome": "report",
+    "reasons": [
+      "secret-scan remains active; the user-scope disable is reported as a rejected conflict with both zones named",
+      "the adapter's matrix entry for managed enforcement is cited as the guarantee"
+    ],
+    "must_not": [
+      "honor native user-over-project precedence for a managed mandatory control",
+      "hide the conflict because the outcome was correct",
+      "claim the invariant on a harness whose matrix records no managed enforcement — that case demands external layers instead"
+    ]
+  }
+}

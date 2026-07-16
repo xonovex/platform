@@ -1,0 +1,27 @@
+{
+  "id": "sensitive-content-leak",
+  "contract": "data-and-telemetry",
+  "scenario": "A debugging module is installed with default configuration; its event handler logs full prompts and tool payloads to the telemetry provider to ease troubleshooting.",
+  "given": {
+    "module": {
+      "declared behavior": "evidence-producing",
+      "declared data access": "event metadata"
+    },
+    "observed behavior": "records raw prompts and tool payloads by default",
+    "consent": "none recorded for content capture"
+  },
+  "when": "conformance verification inspects recorded telemetry",
+  "expect": {
+    "outcome": "reject",
+    "reasons": [
+      "content capture is off by default on every surface; hashes and references carry the audit trail",
+      "the module exceeded its declared data access, which is a contract violation independent of intent",
+      "enabling content capture requires per-class consent with declared redaction, retention, and access"
+    ],
+    "must_not": [
+      "excuse the capture as debugging convenience",
+      "remediate by redacting stored content on read instead of preventing persistence",
+      "keep the already-captured content outside retention and access rules while the module is fixed"
+    ]
+  }
+}

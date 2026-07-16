@@ -1,0 +1,36 @@
+{
+  "id": "stale-policy",
+  "contract": "policy-and-authority",
+  "scenario": "A decision is requested against a policy bundle past its declared freshness bound; a mandatory control fails closed, an advisory one reports staleness.",
+  "given": {
+    "policy_bundle": {
+      "id": "data-handling",
+      "version": "3.1.0",
+      "freshness_bound": "30 days",
+      "age": "90 days"
+    },
+    "controls": [
+      {
+        "id": "residency-gate",
+        "mandatory": true
+      },
+      {
+        "id": "naming-advice",
+        "mandatory": false
+      }
+    ]
+  },
+  "when": "a decision is requested from the stale bundle",
+  "expect": {
+    "outcome": "report",
+    "reasons": [
+      "'residency-gate' (mandatory) returns deny — stale policy means fail closed",
+      "'naming-advice' (advisory) proceeds as observe with staleness reported"
+    ],
+    "must_not": [
+      "answer the mandatory control from the stale bundle as if fresh",
+      "silently refresh or re-pin the bundle during the decision",
+      "drop the advisory control from the report because it degraded"
+    ]
+  }
+}

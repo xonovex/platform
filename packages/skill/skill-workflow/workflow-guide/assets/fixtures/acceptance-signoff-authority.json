@@ -1,0 +1,35 @@
+{
+  "id": "acceptance-signoff-authority",
+  "contract": "acceptance-decide",
+  "scenario": "An agent assembles a complete, all-green acceptance evidence package and, because every check passed, records the acceptance decision itself.",
+  "given": {
+    "deliverable": "service at digest sha-a",
+    "evidence package": [
+      {
+        "qa": "pass at sha-a, fresh"
+      },
+      {
+        "review": "approved at sha-a, fresh"
+      },
+      {
+        "assessment": "pass at sha-a, fresh"
+      }
+    ],
+    "acceptance conditions": "all covered by the package",
+    "deciding actor": "none present"
+  },
+  "when": "the assembling agent publishes an AcceptanceResult with decision accept",
+  "expect": {
+    "outcome": "reject",
+    "reasons": [
+      "the fitness decision requires the verified accountable human or designated external authority",
+      "evidence assembly and sign-off are separate acts by separate authorities",
+      "the package is presented for decision; completeness does not convert into acceptance"
+    ],
+    "must_not": [
+      "treat an all-green evidence package as an implicit acceptance",
+      "attribute the decision to a human who did not verifiably record it",
+      "downgrade the missing decision to a warning while publishing the result"
+    ]
+  }
+}

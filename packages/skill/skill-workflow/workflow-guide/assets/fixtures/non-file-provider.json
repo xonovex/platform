@@ -1,0 +1,35 @@
+{
+  "id": "non-file-provider",
+  "contract": "results",
+  "scenario": "Results persist and round-trip through a provider that has no filesystem representation; a fresh consumer rebuilds working state from opaque references alone.",
+  "given": {
+    "provider": {
+      "kind": "work-item-service",
+      "storage": "remote API, no local files"
+    },
+    "results": [
+      {
+        "capability": "planning",
+        "subject": "item-ref-opaque-1",
+        "native_revision": "rev-a",
+        "evidence": ["evidence-ref-opaque-1"]
+      }
+    ],
+    "consumer": {
+      "session": "fresh, no prior handles, no local cache"
+    }
+  },
+  "when": "the consumer inspects the subject and reconstructs lifecycle state",
+  "expect": {
+    "outcome": "report",
+    "reasons": [
+      "planning result reported with its opaque reference and native revision",
+      "handle rebuilt from provider state on this use, not from a persisted handle"
+    ],
+    "must_not": [
+      "require a file, sidecar, or local database to resolve the result",
+      "persist the reconstructed handle as a durable identity",
+      "normalize the provider's reference into a foreign schema"
+    ]
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "id": "external-policy-injection",
+  "contract": "external-enforcement",
+  "scenario": "An organization pipeline policy injects a mandatory gate job into a project's pipeline; the project attempts to neutralize it via a same-name job and an allow-failure setting. Both attempts fail visibly.",
+  "given": {
+    "enforcement": {
+      "kind": "pipeline-execution-policy",
+      "source": "security-policy project, version policy-rev-9",
+      "injects": {
+        "job": "org-governance-gate",
+        "required": true,
+        "allow_failure": false
+      }
+    },
+    "project_pipeline": {
+      "jobs": [
+        {
+          "name": "org-governance-gate",
+          "definition": "project-defined no-op with the same name"
+        },
+        {
+          "name": "tests"
+        }
+      ]
+    }
+  },
+  "when": "the pipeline runs under the policy",
+  "expect": {
+    "outcome": "report",
+    "reasons": [
+      "the policy-injected job runs as defined by the policy source, not the project's same-name job",
+      "the name collision is surfaced as a conflict finding naming both sources",
+      "the gate failing fails the pipeline; project settings cannot mark it allow-failure"
+    ],
+    "must_not": [
+      "let the project's same-name job shadow the injected gate silently",
+      "honor a project-level allow-failure on a policy-mandated job",
+      "assume merge/precedence order that the platform version's documentation does not state"
+    ]
+  }
+}

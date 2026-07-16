@@ -1,0 +1,35 @@
+{
+  "id": "missing-provenance",
+  "contract": "module-trust",
+  "scenario": "Two modules arrive without provenance: an organization-managed one is rejected outright; a project one requires explicit recorded content review before it may run.",
+  "given": {
+    "modules": [
+      {
+        "id": "org-release-gate",
+        "zone": "organization",
+        "behavior_class": "enforcing",
+        "provenance": "none"
+      },
+      {
+        "id": "team-lint-hook",
+        "zone": "project",
+        "behavior_class": "advisory",
+        "provenance": "none",
+        "trust_record": "none"
+      }
+    ]
+  },
+  "when": "both modules are presented for loading",
+  "expect": {
+    "outcome": "report",
+    "reasons": [
+      "'org-release-gate' rejected — organization-managed modules require provenance and change control",
+      "'team-lint-hook' blocked pending explicit recorded trust review of its content"
+    ],
+    "must_not": [
+      "accept user or project consent as a substitute for organization provenance",
+      "run the project module while its review is pending",
+      "convert the pending review into a silent allow after a timeout"
+    ]
+  }
+}

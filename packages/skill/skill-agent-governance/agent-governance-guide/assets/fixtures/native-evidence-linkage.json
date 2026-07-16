@@ -1,0 +1,42 @@
+{
+  "id": "native-evidence-linkage",
+  "contract": "boards",
+  "scenario": "A change's lifecycle evidence spans a work item, a pull request, and a build; a fresh session reconstructs the chain from the work-item reference alone through native links, with exact-revision anchoring.",
+  "given": {
+    "records": [
+      {
+        "kind": "work item",
+        "id": 1234,
+        "links": ["pull request 88"],
+        "state_transition": "Accepted by named product owner"
+      },
+      {
+        "kind": "pull request",
+        "id": 88,
+        "votes": "2 approvals, no self-approval",
+        "merge_commit": "sha-a"
+      },
+      {
+        "kind": "build",
+        "run": 456,
+        "commit": "sha-a",
+        "artifacts": ["artifact-ref-1"],
+        "posted_status": "PR 88 build validation succeeded"
+      }
+    ]
+  },
+  "when": "a fresh session inspects work item 1234 with no prior context",
+  "expect": {
+    "outcome": "report",
+    "reasons": [
+      "the chain work item → PR → build → artifact resolves via native links and ids only",
+      "every evidence item is anchored to sha-a; a later build on sha-b would not satisfy PR 88's record",
+      "the acceptance actor is the named human from the work-item revision history"
+    ],
+    "must_not": [
+      "require a central store or exported copy to resolve the chain",
+      "accept a build on a different commit as evidence for this integration",
+      "attribute acceptance to the automation that transitioned the state on someone's behalf without the recorded actor"
+    ]
+  }
+}

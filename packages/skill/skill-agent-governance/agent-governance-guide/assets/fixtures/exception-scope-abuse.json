@@ -1,0 +1,34 @@
+{
+  "id": "exception-scope-abuse",
+  "contract": "policy-and-authority",
+  "scenario": "A valid, unexpired exception waives a provenance control for one repository; a decision in a sibling repository cites the same exception, and a later decision in the covered repository cites it for a different control.",
+  "given": {
+    "exception": {
+      "scope": "provenance control, repository alpha only",
+      "owner": "recorded",
+      "expiry": "unexpired"
+    },
+    "decisions": [
+      {
+        "subject": "repository beta, provenance control, cites the exception"
+      },
+      {
+        "subject": "repository alpha, secret-exposure control, cites the exception"
+      }
+    ]
+  },
+  "when": "the policy decision point evaluates both decisions",
+  "expect": {
+    "outcome": "reject",
+    "reasons": [
+      "an exception applies only within its recorded scope of control and subjects",
+      "repository beta is outside the subject scope; the secret-exposure control is outside the control scope",
+      "each refusal names the exception, its actual scope, and the unweakened control in force"
+    ],
+    "must_not": [
+      "stretch an exception to similar subjects or related controls",
+      "treat citation of a valid exception as sufficient without scope evaluation",
+      "soften the out-of-scope outcome to advisory because an exception exists somewhere"
+    ]
+  }
+}

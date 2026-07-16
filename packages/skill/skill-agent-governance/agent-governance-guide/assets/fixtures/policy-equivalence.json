@@ -1,0 +1,41 @@
+{
+  "id": "policy-equivalence",
+  "contract": "provider-contracts",
+  "scenario": "The same decision context evaluated by a plain deterministic implementation and by a policy-engine-backed implementation produces the same semantic decision; no engine is privileged in conformance.",
+  "given": {
+    "decision_context": {
+      "intent": "before-privileged-operation",
+      "actor": {
+        "zone": "session",
+        "role": "developer"
+      },
+      "subject": "release of payments-service @ rev-a",
+      "profile": "regulated-release",
+      "prior_evidence": ["review approval @ rev-a", "qa verdict @ rev-a"]
+    },
+    "providers": [
+      {
+        "id": "simple-rules",
+        "implementation": "deterministic rule set, no engine"
+      },
+      {
+        "id": "engine-backed",
+        "implementation": "policy-engine bundle evaluating the same policy version"
+      }
+    ]
+  },
+  "when": "both providers decide the same context at the same policy version",
+  "expect": {
+    "outcome": "report",
+    "reasons": [
+      "both return the same outcome (ask — independent human approver required)",
+      "both cite the same policy identity and version in explain",
+      "both name the same missing obligation and remediation"
+    ],
+    "must_not": [
+      "differ in outcome, obligations, or exception applicability between engines",
+      "require the caller to know which implementation served the decision",
+      "treat the engine-backed result as more authoritative than the plain rules"
+    ]
+  }
+}

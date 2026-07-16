@@ -1,0 +1,33 @@
+{
+  "id": "moving-version",
+  "contract": "module-trust",
+  "scenario": "A module is referenced by a floating tag whose content changed since the trust review; unpinned resolution cannot be verified and is quarantined.",
+  "given": {
+    "module": {
+      "id": "ci-assurance-pack",
+      "zone": "project",
+      "reference": "latest",
+      "trust_record": {
+        "reviewed_content": "sha256:cccc",
+        "reviewed_version": "2.0.0"
+      }
+    },
+    "live_resolution": {
+      "version": "2.1.0",
+      "checksum": "sha256:dddd"
+    }
+  },
+  "when": "the module reference is resolved at load time",
+  "expect": {
+    "outcome": "reject",
+    "reasons": [
+      "reference 'latest' resolved to 2.1.0, which is not the reviewed, pinned 2.0.0",
+      "remediation names pinning to an exact version and re-running trust review"
+    ],
+    "must_not": [
+      "execute the newly resolved content under the old trust decision",
+      "auto-pin to whatever 'latest' currently is",
+      "treat a semver-compatible bump as exempt from re-verification"
+    ]
+  }
+}

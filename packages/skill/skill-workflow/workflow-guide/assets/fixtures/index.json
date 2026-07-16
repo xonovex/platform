@@ -1,0 +1,84 @@
+{
+  "fixtures": [
+    {
+      "file": "acceptance-signoff-authority.json",
+      "reference": "packages/skill/skill-workflow/workflow-guide/references/acceptance-decide.md"
+    },
+    {
+      "file": "authorization-target-drift.json",
+      "reference": "packages/skill/skill-workflow/workflow-guide/references/operational-contracts.md"
+    },
+    {
+      "file": "consolidation-not-integration.json",
+      "reference": "packages/skill/skill-workflow/workflow-guide/references/development-contracts.md"
+    },
+    {
+      "file": "decision-authority.json",
+      "reference": "packages/skill/skill-plan/plan-guide/references/decision-accept.md"
+    },
+    {
+      "file": "development-executor-mapping.json",
+      "reference": "packages/skill/skill-workflow/workflow-guide/references/development-contracts.md"
+    },
+    {
+      "file": "emergency-bypass.json",
+      "reference": "packages/skill/skill-workflow/workflow-guide/references/operational-contracts.md"
+    },
+    {
+      "file": "executor-substitution.json",
+      "reference": "packages/skill/skill-workflow/workflow-guide/references/architecture.md"
+    },
+    {
+      "file": "incident-escalation.json",
+      "reference": "packages/skill/skill-workflow/workflow-guide/references/incident-run.md"
+    },
+    {
+      "file": "inventory-no-fabrication.json",
+      "reference": "packages/skill/skill-workflow/workflow-guide/references/inventory-generate.md"
+    },
+    {
+      "file": "method-neutral-formulation.json",
+      "reference": "packages/skill/skill-plan/plan-guide/references/formulation-run.md"
+    },
+    {
+      "file": "non-file-provider.json",
+      "reference": "packages/skill/skill-workflow/workflow-guide/references/results.md"
+    },
+    {
+      "file": "policy-drift-stale-authorization.json",
+      "reference": "packages/skill/skill-workflow/workflow-guide/references/operational-contracts.md"
+    },
+    {
+      "file": "release-failure-rollback.json",
+      "reference": "packages/skill/skill-workflow/workflow-guide/references/release-run.md"
+    },
+    {
+      "file": "research-executor-selection.json",
+      "reference": "packages/skill/skill-plan/plan-guide/references/research-run.md"
+    },
+    {
+      "file": "retirement-verification.json",
+      "reference": "packages/skill/skill-workflow/workflow-guide/references/retirement-run.md"
+    },
+    {
+      "file": "review-prompt-injection.json",
+      "reference": "packages/skill/skill-workflow/workflow-guide/references/review-run.md"
+    },
+    {
+      "file": "stale-evidence.json",
+      "reference": "packages/skill/skill-workflow/workflow-guide/references/assessment-run.md"
+    },
+    {
+      "file": "task-system-provider.json",
+      "reference": "packages/skill/skill-workflow/workflow-guide/references/providers.md"
+    },
+    {
+      "file": "unsupported-mandatory-control.json",
+      "reference": "packages/skill/skill-workflow/workflow-guide/references/profiles.md"
+    },
+    {
+      "file": "weakening-without-exception.json",
+      "reference": "packages/skill/skill-workflow/workflow-guide/references/profiles.md"
+    }
+  ]
+}

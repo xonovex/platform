@@ -10,99 +10,110 @@ reconciles the scenario-level count during conversion.
 
 ## Walking skeleton (owner: subplan 02)
 
-| Source @82303137 | Destination | Disposition | Status |
-| --- | --- | --- | --- |
-| skill-agent-governance/agent-governance-guide/assets/walking-skeleton/guard.sh | same path (platform) | port (verbatim — scripts are self-contained; no fable-only identifiers found) | done |
-| skill-agent-governance/agent-governance-guide/assets/walking-skeleton/run-skeleton.sh | same path (platform) | port (verbatim — scripts are self-contained; no fable-only identifiers found) | done |
+| Source @82303137                                                                      | Destination          | Disposition                                                                   | Status |
+| ------------------------------------------------------------------------------------- | -------------------- | ----------------------------------------------------------------------------- | ------ |
+| skill-agent-governance/agent-governance-guide/assets/walking-skeleton/guard.sh        | same path (platform) | port (verbatim — scripts are self-contained; no fable-only identifiers found) | done   |
+| skill-agent-governance/agent-governance-guide/assets/walking-skeleton/run-skeleton.sh | same path (platform) | port (verbatim — scripts are self-contained; no fable-only identifiers found) | done   |
 
 ## Governance fixtures (owner: subplan 03) — 26 files
 
 Destination: `packages/skill/skill-agent-governance/agent-governance-guide/assets/fixtures/<name>.json`; disposition `adapt` (YAML→JSON, identifier re-point) unless noted.
 
-| Source fixture | Disposition | Status |
-| --- | --- | --- |
-| adapter-blocking.yaml | adapt | pending |
-| adapter-config-precedence.yaml | adapt | pending |
-| adapter-context-injection.yaml | adapt | pending |
-| adapter-event-mapping.yaml | adapt | pending |
-| concurrent-duplicate-execution.yaml | adapt | pending |
-| concurrent-hooks.yaml | adapt | pending |
-| conflicting-modules.yaml | adapt | pending |
-| exception-expiry.yaml | adapt | pending |
-| exception-scope-abuse.yaml | adapt | pending |
-| experimental-feature.yaml | adapt | pending |
-| external-admission-privileged.yaml | adapt — dedupe review vs external-enforcement-fixtures.json | pending |
-| external-policy-injection.yaml | adapt | pending |
-| external-required-check-bypass.yaml | adapt — dedupe review vs external-enforcement-fixtures.json | pending |
-| missing-provenance.yaml | adapt | pending |
-| mixed-enterprise-stack.yaml | adapt — dedupe review vs enterprise-platform-fixtures.json mixedStack | pending |
-| moving-version.yaml | adapt | pending |
-| non-idempotent-retry.yaml | adapt | pending |
-| policy-equivalence.yaml | adapt | pending |
-| recursion-limit.yaml | adapt | pending |
-| rollback-failure.yaml | adapt | pending |
-| sensitive-content-leak.yaml | adapt | pending |
-| stale-policy.yaml | adapt | pending |
-| tampered-module.yaml | adapt | pending |
-| telemetry-outage.yaml | adapt | pending |
-| unexpected-permissions.yaml | adapt | pending |
-| unsupported-hook.yaml | adapt | pending |
+| Source fixture                      | Disposition                                                                                            | Status |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------ | ------ |
+| adapter-blocking.yaml               | adapt                                                                                                  | done   |
+| adapter-config-precedence.yaml      | adapt                                                                                                  | done   |
+| adapter-context-injection.yaml      | adapt                                                                                                  | done   |
+| adapter-event-mapping.yaml          | adapt                                                                                                  | done   |
+| concurrent-duplicate-execution.yaml | adapt                                                                                                  | done   |
+| concurrent-hooks.yaml               | adapt                                                                                                  | done   |
+| conflicting-modules.yaml            | adapt                                                                                                  | done   |
+| exception-expiry.yaml               | adapt                                                                                                  | done   |
+| exception-scope-abuse.yaml          | adapt                                                                                                  | done   |
+| experimental-feature.yaml           | adapt                                                                                                  | done   |
+| external-admission-privileged.yaml  | adapt — dedupe review: complementary angle (bypass-surface / exception-shaped bypass evidence); ported | done   |
+| external-policy-injection.yaml      | adapt                                                                                                  | done   |
+| external-required-check-bypass.yaml | adapt — dedupe review: complementary angle (bypass-surface / exception-shaped bypass evidence); ported | done   |
+| missing-provenance.yaml             | adapt                                                                                                  | done   |
+| mixed-enterprise-stack.yaml         | adapt — dedupe review: five-owner removal-independence composition absent from existing set; ported    | done   |
+| moving-version.yaml                 | adapt                                                                                                  | done   |
+| non-idempotent-retry.yaml           | adapt                                                                                                  | done   |
+| policy-equivalence.yaml             | adapt                                                                                                  | done   |
+| recursion-limit.yaml                | adapt                                                                                                  | done   |
+| rollback-failure.yaml               | adapt                                                                                                  | done   |
+| sensitive-content-leak.yaml         | adapt                                                                                                  | done   |
+| stale-policy.yaml                   | adapt                                                                                                  | done   |
+| tampered-module.yaml                | adapt                                                                                                  | done   |
+| telemetry-outage.yaml               | adapt                                                                                                  | done   |
+| unexpected-permissions.yaml         | adapt                                                                                                  | done   |
+| unsupported-hook.yaml               | adapt                                                                                                  | done   |
 
 ## Workflow fixtures (owner: subplan 03) — 20 files
 
 Destination: `packages/skill/skill-workflow/workflow-guide/assets/fixtures/<name>.json`; disposition `adapt` (YAML→JSON, identifier re-point).
 
-| Source fixture | Disposition | Status |
-| --- | --- | --- |
-| acceptance-signoff-authority.yaml | adapt | pending |
-| authorization-target-drift.yaml | adapt | pending |
-| consolidation-not-integration.yaml | adapt | pending |
-| decision-authority.yaml | adapt | pending |
-| development-executor-mapping.yaml | adapt | pending |
-| emergency-bypass.yaml | adapt | pending |
-| executor-substitution.yaml | adapt | pending |
-| incident-escalation.yaml | adapt | pending |
-| inventory-no-fabrication.yaml | adapt | pending |
-| method-neutral-formulation.yaml | adapt | pending |
-| non-file-provider.yaml | adapt | pending |
-| policy-drift-stale-authorization.yaml | adapt | pending |
-| release-failure-rollback.yaml | adapt | pending |
-| research-executor-selection.yaml | adapt | pending |
-| retirement-verification.yaml | adapt | pending |
-| review-prompt-injection.yaml | adapt | pending |
-| stale-evidence.yaml | adapt | pending |
-| task-system-provider.yaml | adapt | pending |
-| unsupported-mandatory-control.yaml | adapt | pending |
-| weakening-without-exception.yaml | adapt | pending |
+| Source fixture                        | Disposition | Status |
+| ------------------------------------- | ----------- | ------ |
+| acceptance-signoff-authority.yaml     | adapt       | done   |
+| authorization-target-drift.yaml       | adapt       | done   |
+| consolidation-not-integration.yaml    | adapt       | done   |
+| decision-authority.yaml               | adapt       | done   |
+| development-executor-mapping.yaml     | adapt       | done   |
+| emergency-bypass.yaml                 | adapt       | done   |
+| executor-substitution.yaml            | adapt       | done   |
+| incident-escalation.yaml              | adapt       | done   |
+| inventory-no-fabrication.yaml         | adapt       | done   |
+| method-neutral-formulation.yaml       | adapt       | done   |
+| non-file-provider.yaml                | adapt       | done   |
+| policy-drift-stale-authorization.yaml | adapt       | done   |
+| release-failure-rollback.yaml         | adapt       | done   |
+| research-executor-selection.yaml      | adapt       | done   |
+| retirement-verification.yaml          | adapt       | done   |
+| review-prompt-injection.yaml          | adapt       | done   |
+| stale-evidence.yaml                   | adapt       | done   |
+| task-system-provider.yaml             | adapt       | done   |
+| unsupported-mandatory-control.yaml    | adapt       | done   |
+| weakening-without-exception.yaml      | adapt       | done   |
 
 ## Enterprise fixtures (owner: subplan 03) — 10 files
 
-Platform centralizes enterprise conformance fixtures in `skill-agent-governance` (its enterprise skills ship no assets). Destination: merged as cases into `agent-governance-guide/assets/enterprise-platform-fixtures.json` (or sibling conformance set); disposition `adapt`.
+Platform centralizes enterprise conformance fixtures in `skill-agent-governance` (its enterprise skills ship no assets). Destination: individual files in `agent-governance-guide/assets/fixtures/<id>.json` (centralized enterprise conformance ownership; existing aggregate sets untouched); disposition `adapt`.
 
-| Source fixture | Disposition | Status |
-| --- | --- | --- |
-| skill-aws/aws-guide/assets/fixtures/federated-over-static.yaml | adapt — dedupe review (platform mixedStack federation case) | pending |
-| skill-aws/aws-guide/assets/fixtures/scp-limit-not-grant.yaml | adapt | pending |
-| skill-azure-devops/azure-devops-guide/assets/fixtures/edition-detection.yaml | adapt | pending |
-| skill-azure-devops/azure-devops-guide/assets/fixtures/native-evidence-linkage.yaml | adapt | pending |
-| skill-bitbucket/bitbucket-guide/assets/fixtures/cloud-dc-no-parity.yaml | adapt | pending |
-| skill-bitbucket/bitbucket-guide/assets/fixtures/plan-gated-merge-check.yaml | adapt | pending |
-| skill-bitrise/bitrise-guide/assets/fixtures/fork-pr-secret-exposure.yaml | adapt | pending |
-| skill-bitrise/bitrise-guide/assets/fixtures/oidc-over-static-keys.yaml | adapt | pending |
-| skill-datadog/datadog-guide/assets/fixtures/llm-content-capture-default.yaml | adapt | pending |
-| skill-datadog/datadog-guide/assets/fixtures/monitor-not-enforcement.yaml | adapt | pending |
+| Source fixture                                                                     | Disposition                                                                                        | Status |
+| ---------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- | ------ |
+| skill-aws/aws-guide/assets/fixtures/federated-over-static.yaml                     | adapt — dedupe review: allow-path OIDC recommendation complements existing deny-path cases; ported | done   |
+| skill-aws/aws-guide/assets/fixtures/scp-limit-not-grant.yaml                       | adapt                                                                                              | done   |
+| skill-azure-devops/azure-devops-guide/assets/fixtures/edition-detection.yaml       | adapt                                                                                              | done   |
+| skill-azure-devops/azure-devops-guide/assets/fixtures/native-evidence-linkage.yaml | adapt                                                                                              | done   |
+| skill-bitbucket/bitbucket-guide/assets/fixtures/cloud-dc-no-parity.yaml            | adapt                                                                                              | done   |
+| skill-bitbucket/bitbucket-guide/assets/fixtures/plan-gated-merge-check.yaml        | adapt                                                                                              | done   |
+| skill-bitrise/bitrise-guide/assets/fixtures/fork-pr-secret-exposure.yaml           | adapt                                                                                              | done   |
+| skill-bitrise/bitrise-guide/assets/fixtures/oidc-over-static-keys.yaml             | adapt                                                                                              | done   |
+| skill-datadog/datadog-guide/assets/fixtures/llm-content-capture-default.yaml       | adapt                                                                                              | done   |
+| skill-datadog/datadog-guide/assets/fixtures/monitor-not-enforcement.yaml           | adapt                                                                                              | done   |
+
+## Conversion record (subplan 03)
+
+All 56 fixtures converted YAML→JSON mechanically; the only adapted field is
+`contract`, re-pointed to the owning platform reference basename recorded in
+each guide's `assets/fixtures/index.json`. Fidelity audit 2026-07-16: full
+corpus (56/56, exceeds the required 10-fixture spot-audit) compared
+field-by-field against the fable originals at the pin — zero non-contract
+differences. Runners: `validate-conformance-scenario-fixtures.mjs` in both
+contract guides (schema, must_not required, index bijection, owner existence,
+4 mutation guards each), wired into both packages' moon test tasks.
 
 ## Skipped extras (owner: subplan 06)
 
-| Source | Disposition | Status |
-| --- | --- | --- |
-| packages/diagram/diagram-agent-workflow/two-plane-architecture.dot | skip — platform's target-architecture.dot already depicts both planes (Key Decision 6) | pending |
-| packages/diagram/diagram-agent-workflow/two-plane-architecture.png | skip — rendered artifact of skipped .dot | pending |
+| Source                                                                                | Disposition                                                                                            | Status  |
+| ------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ | ------- |
+| packages/diagram/diagram-agent-workflow/two-plane-architecture.dot                    | skip — platform's target-architecture.dot already depicts both planes (Key Decision 6)                 | pending |
+| packages/diagram/diagram-agent-workflow/two-plane-architecture.png                    | skip — rendered artifact of skipped .dot                                                               | pending |
 | skill-agent-governance/agent-governance-guide/references/platform-skill-convention.md | skip — content covered by enterprise-platforms.md; three distinct rules grafted there (Key Decision 6) | pending |
 
 ## Non-file grafts tracked here
 
-| Item | Owner | Status |
-| --- | --- | --- |
-| Claude Code local probe (fable precedent: 2.1.211) | subplan 02 | done — observed 2.1.211 on 2026-07-16, recorded in code-harness-guide capabilities.md with rerun-on-version-change note |
-| Three convention rules into enterprise-platforms.md | subplan 06 | pending |
+| Item                                                | Owner      | Status                                                                                                                  |
+| --------------------------------------------------- | ---------- | ----------------------------------------------------------------------------------------------------------------------- |
+| Claude Code local probe (fable precedent: 2.1.211)  | subplan 02 | done — observed 2.1.211 on 2026-07-16, recorded in code-harness-guide capabilities.md with rerun-on-version-change note |
+| Three convention rules into enterprise-platforms.md | subplan 06 | pending                                                                                                                 |

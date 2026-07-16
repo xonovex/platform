@@ -1,0 +1,37 @@
+{
+  "id": "recursion-limit",
+  "contract": "execution",
+  "scenario": "An agent at its declared depth limit attempts to launch a further agent; the launch must be rejected at launch time with the limit cited.",
+  "given": {
+    "launcher_module": {
+      "id": "dependency-analyzer",
+      "launch_constraints": {
+        "maximum_depth": 1,
+        "tool_scope": "read-only",
+        "budget": {
+          "tokens": 100000,
+          "wall_clock": "10m"
+        }
+      }
+    },
+    "runtime_state": {
+      "current_depth": 1,
+      "requested_launch": {
+        "purpose": "analyze one more package"
+      }
+    }
+  },
+  "when": "the depth-1 agent requests a child agent",
+  "expect": {
+    "outcome": "reject",
+    "reasons": [
+      "launch exceeds declared maximum depth 1 of module 'dependency-analyzer'",
+      "the rejection is recorded as evidence with the launcher module named"
+    ],
+    "must_not": [
+      "grant the launch with a reduced budget as a compromise",
+      "let the child inherit authority to retry the launch itself",
+      "count the rejected launch as a completed sub-result"
+    ]
+  }
+}

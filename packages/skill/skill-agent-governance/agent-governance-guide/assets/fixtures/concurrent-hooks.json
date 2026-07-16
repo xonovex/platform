@@ -1,0 +1,40 @@
+{
+  "id": "concurrent-hooks",
+  "contract": "events-and-capabilities",
+  "scenario": "Two handlers run concurrently on one event; one denies while its sibling performs a side effect. The deny must not be assumed to suppress the sibling's side effect.",
+  "given": {
+    "harness_matrix": {
+      "entries": {
+        "before-tool-use": {
+          "status": "stable",
+          "blocking": true,
+          "ordering": "concurrent",
+          "deny_suppresses_siblings": false
+        }
+      }
+    },
+    "handlers": [
+      {
+        "id": "policy-gate",
+        "behavior": "returns deny"
+      },
+      {
+        "id": "usage-logger",
+        "behavior": "appends to an external usage log (side effect)"
+      }
+    ]
+  },
+  "when": "the event fires and both handlers execute",
+  "expect": {
+    "outcome": "report",
+    "reasons": [
+      "the action is denied by 'policy-gate'",
+      "the report states that 'usage-logger' side effects may have occurred despite the deny"
+    ],
+    "must_not": [
+      "claim the sibling side effect was rolled back without evidence",
+      "require serial execution the adapter does not guarantee",
+      "mark a non-idempotent handler safe for this event without declaration"
+    ]
+  }
+}
