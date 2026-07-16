@@ -1,6 +1,6 @@
 ---
 name: github-guide
-description: "Use when delivering a pull request and its review on GitHub (github.com or GitHub Enterprise Server) from the command line with the `gh` CLI and `gh api` — opening a PR with `gh pr create`, posting a structured review with line-anchored inline comments, resolving review threads, detecting that the host is GitHub from the git remote, and scoping a classic or fine-grained token. Triggers on a github.com / GHES remote, `gh pr create`, `gh api .../pulls/.../reviews`, an inline review comment by path+line, resolving a review thread (resolveReviewThread), REQUEST_CHANGES / branch-protection merge gating, or GH_TOKEN / GH_ENTERPRISE_TOKEN scopes — even when the user doesn't say 'gh' but the repo is hosted on GitHub."
+description: "Use when delivering a pull request/review or implementing an optional result-provider adapter on GitHub (github.com or GitHub Enterprise Server) with `gh`/`gh api`. Triggers on `gh pr create`, `gh api .../pulls/.../reviews`, inline review comments, resolveReviewThread, REQUEST_CHANGES, GH_TOKEN/GH_ENTERPRISE_TOKEN scopes, or mapping GitHub Issues to opaque workflow result resolve/read/publish/revise/relate/version capabilities — even when the user doesn't say 'gh' but the repo is hosted on GitHub."
 ---
 
 # GitHub PR & review delivery — quick reference
@@ -35,6 +35,7 @@ When this skill fires:
 - **Write the PR body with pull-request-guide** — `gh pr create --body-file` takes a description authored per `pull-request-guide`.
 - **Resolve a thread** — GraphQL-only `resolveReviewThread` by thread node id (`PRRT_…`), matched by id never by line; list threads with `pullRequest.reviewThreads`. See [references/review-resolve.md](references/review-resolve.md).
 - **Scope the token per operation** — push needs Contents: write; open-PR / post-review need Pull requests: write; resolve also needs Contents: read & write on a fine-grained token. See [references/auth.md](references/auth.md).
+- **Adapt Issues as an optional result provider** — preserve GitHub-native issue/comment references, disclose freshness-only versioning, and never make GitHub a core workflow dependency. See [references/provider-conformance.md](references/provider-conformance.md).
 
 ## Gotchas
 
@@ -89,3 +90,4 @@ Each reference is a trigger — read only the one matching the user's intent; do
 - Read [references/create.md](references/create.md) — Load when opening a PR: `gh pr create` flags, draft, reviewers/labels, issue-linking and auto-close semantics, the additive-body / replace-on-edit trap, idempotency guard, and the raw `POST /pulls` REST equivalent.
 - Read [references/review-post.md](references/review-post.md) — Load when publishing a review: the single `.../reviews` object, the exact path/line/side inline anchor model, the REQUEST_CHANGES blocking mechanism, and deep-linking from `html_url`.
 - Read [references/review-resolve.md](references/review-resolve.md) — Load when resolving/replying on threads: listing `reviewThreads`, matching a finding to a thread by id (never line), the GraphQL `resolveReviewThread` mutation, in-thread replies, and the conversation-resolution merge gate.
+- Read [references/provider-conformance.md](references/provider-conformance.md) — Load when mapping GitHub Issues/comments to the optional workflow result-provider port or testing opaque-reference, restart, revision, retry, relationship, and failure behavior.

@@ -1,6 +1,6 @@
 ---
 name: gitlab-guide
-description: "Use when delivering a merge request and its review on GitLab (gitlab.com, self-managed, or Dedicated) with the official glab CLI — opening an MR with `glab mr create`, posting a structured review (summary note + line-anchored inline discussions), resolving review threads, approving/withholding approval, detecting the GitLab host from the git remote, and choosing token type and scopes (the broad `api` scope for any write, `read_api` for reads). Triggers on a gitlab.com or self-managed GitLab remote, `glab`, a merge request / MR, opening an MR against main, posting an inline MR comment, a position object with base/start/head SHAs, resolving a discussion / thread, approving an MR, or a GitLab token scope question — even when the user doesn't say 'glab'."
+description: "Use when delivering a merge request/review or implementing an optional result-provider adapter on GitLab (GitLab.com, self-managed, or Dedicated) with `glab`/the API. Triggers on `glab mr create`, inline MR discussions, base/start/head SHAs, resolving threads, approvals, GitLab token scopes, or mapping GitLab Issues to opaque workflow result resolve/read/publish/revise/relate/version capabilities — even when the user doesn't say 'glab'."
 ---
 
 # GitLab MR & review delivery — quick reference
@@ -30,6 +30,7 @@ Before any write:
 - **Resolve a thread** — `PUT .../discussions/:discussion_id?resolved=true` (REST is enough on GitLab; no GraphQL needed); match by discussion `id`, never by line. See [references/review-resolve.md](references/review-resolve.md).
 - **Deep-link** — MR notes carry no `web_url`; build `<mr_url>#note_<note_id>` from the returned note `id`. See [references/review-post.md](references/review-post.md).
 - **Auth & host** — `api` scope for writes (`read_api` reads), `GITLAB_HOST` targets self-managed, `GITLAB_TOKEN` is the general auth token. See [references/auth.md](references/auth.md).
+- **Adapt Issues as an optional result provider** — preserve GitLab-native issue/note references, disclose edition and freshness-only version limits, and never make GitLab a core workflow dependency. See [references/provider-conformance.md](references/provider-conformance.md).
 
 ## Gotchas
 
@@ -86,3 +87,4 @@ Each reference is a trigger — read it only when the user's intent matches; do 
 - Read [references/create.md](references/create.md) — Load when opening or updating an MR: push, `glab mr create` flags, draft, reviewers / labels, issue-link / close semantics, the one-open-MR-per-branch 409, additive-body rules, and the raw REST equivalent.
 - Read [references/review-post.md](references/review-post.md) — Load when publishing a review: the summary note, the exact inline position model (three SHAs + conditional line keys), verifying `DiffNote`, the blocking mechanism, and the `#note_<id>` deep-link.
 - Read [references/review-resolve.md](references/review-resolve.md) — Load when listing threads, matching a finding to a discussion by id, resolving via the REST PUT, replying in-thread, and the merge-gating effect.
+- Read [references/provider-conformance.md](references/provider-conformance.md) — Load when mapping GitLab Issues/notes to the optional workflow result-provider port or testing opaque-reference, restart, revision, retry, relationship, edition, and failure behavior.

@@ -1,0 +1,30 @@
+{
+  "skill_name": "workflow-guide",
+  "tier": "moderate",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Inspect a Research result stored in a hosted work item. The runtime context was compacted, so only the provider, work-item id, revision, and linked source ids remain. Explain the valid handoff.",
+      "assertions": [
+        "Treats the provider context, opaque native reference, optional native revision, source references, and available capabilities as an ephemeral PhaseResultHandle reconstructed from provider-native state.",
+        "Does not require persisting a universal handle document, central workflow id, YAML/JSON sidecar, or runtime trace id as workflow identity."
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Validate a software-delivery profile whose Review stage groups Review and QA, while another profile runs those two capabilities concurrently. What must remain true?",
+      "assertions": [
+        "Requires Review and QA to retain independent semantic result contracts, publication boundaries, exact subject revisions, and exit evaluations in both profiles.",
+        "Allows the profiles to present or schedule the capabilities differently when dependencies and evidence rules are explicit."
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "A command explicitly selects a hosted artifact provider that is unavailable, but a writable local directory exists. Decide whether publication may continue locally.",
+      "assertions": [
+        "Fails visibly instead of silently falling back to the local provider for the side-effecting publication.",
+        "Explains that provider axes resolve independently and local publication is valid only when the local provider is explicitly selected or is the axis-specific profile/default choice."
+      ]
+    }
+  ]
+}

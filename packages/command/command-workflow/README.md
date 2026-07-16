@@ -68,32 +68,38 @@ Learning: reflect-to-instructions / reflect-to-skill fold learnings into guideli
 
 ## Commands
 
-| Command                 | Description                                                                                |
-| ----------------------- | ------------------------------------------------------------------------------------------ |
-| `plan-research`         | Research codebase + web, or run a read-only code-quality audit (harden / simplify / align) |
-| `plan-decide`           | Settle decisions one at a time — walk known open ones, or discover them by questioning     |
-| `plan-create`           | Create a high-level plan for user review (test-first plans route to tdd / bdd guides)      |
-| `plan-revise`           | Apply annotations and prompt feedback to the plan                                          |
-| `plan-critique`         | Adversarially stress-test a plan to expose weaknesses                                      |
-| `plan-accept`           | Approve a plan for execution (sanity-check, set status: approved)                          |
-| `plan-reject`           | Reject a plan with a reason (set status: rejected, keep the plan)                          |
-| `plan-subplans-create`  | Generate detailed subplans with parallel execution detection                               |
-| `plan-worktree-create`  | Create a git worktree for a feature branch                                                 |
-| `plan-continue`         | Resume work from an existing plan                                                          |
-| `plan-validate`         | Verify that a plan or current work has been fully achieved                                 |
-| `plan-update`           | Update plan status and test results                                                        |
-| `story-refine`          | Refine user stories against INVEST and split them vertically (SPIDR)                       |
-| `acceptance-formalize`  | Formalize acceptance criteria as Given-When-Then scenarios (three-amigos)                  |
-| `acceptance-validate`   | Validate a PR against its acceptance scenarios, pass/fail per scenario                     |
-| `git-commit`            | Commit and push changes                                                                    |
-| `pr-create`             | Open a pull request with a drafted description (any host)                                  |
-| `pr-review-analyze`     | Review a branch diff into a structured findings file                                       |
-| `pr-review-refine`      | Refine review findings one by one before publishing                                        |
-| `pr-review-post`        | Publish a structured, labelled code review to a PR (any host)                              |
-| `pr-review-resolve`     | Verify fixes and resolve the review's blocking threads                                     |
-| `plan-worktree-merge`   | Merge feature worktree back to source                                                      |
-| `plan-worktree-abandon` | Document and abandon a feature with reason and learnings                                   |
-| `plan-worktree-cleanup` | Remove stale and merged worktrees, and prune leftover admin metadata                       |
+| Command                       | Description                                                                                |
+| ----------------------------- | ------------------------------------------------------------------------------------------ |
+| `plan-research`               | Research codebase + web, or run a read-only code-quality audit (harden / simplify / align) |
+| `plan-decide`                 | Settle decisions one at a time — walk known open ones, or discover them by questioning     |
+| `plan-create`                 | Create a high-level plan for user review (test-first plans route to tdd / bdd guides)      |
+| `plan-revise`                 | Apply annotations and prompt feedback to the plan                                          |
+| `plan-critique`               | Adversarially stress-test a plan to expose weaknesses                                      |
+| `plan-accept`                 | Approve a plan for execution (sanity-check, set status: approved)                          |
+| `plan-reject`                 | Reject a plan with a reason (set status: rejected, keep the plan)                          |
+| `plan-subplans-create`        | Generate detailed subplans with parallel execution detection                               |
+| `plan-worktree-create`        | Create a git worktree for a feature branch                                                 |
+| `plan-continue`               | Resume work from an existing plan                                                          |
+| `plan-validate`               | Verify that a plan or current work has been fully achieved                                 |
+| `plan-update`                 | Update plan status and test results                                                        |
+| `story-refine`                | Refine user stories against INVEST and split them vertically (SPIDR)                       |
+| `acceptance-formalize`        | Formalize acceptance criteria as Given-When-Then scenarios (three-amigos)                  |
+| `acceptance-validate`         | Validate a PR against its acceptance scenarios, pass/fail per scenario                     |
+| `git-commit`                  | Commit and push changes                                                                    |
+| `pr-create`                   | Open a pull request with a drafted description (any host)                                  |
+| `pr-review-analyze`           | Review a branch diff into a structured findings file                                       |
+| `pr-review-refine`            | Refine review findings one by one before publishing                                        |
+| `pr-review-post`              | Publish a structured, labelled code review to a PR (any host)                              |
+| `pr-review-resolve`           | Verify fixes and resolve the review's blocking threads                                     |
+| `plan-worktree-merge`         | Merge feature worktree back to source                                                      |
+| `plan-worktree-abandon`       | Document and abandon a feature with reason and learnings                                   |
+| `plan-worktree-cleanup`       | Remove stale and merged worktrees, and prune leftover admin metadata                       |
+| `workflow-inspect`            | Inspect workflow results, profile topology, evidence, and completion gaps                  |
+| `workflow-governance-inspect` | Inspect effective policies, modules, authority, enforcement, and exceptions                |
+| `workflow-conformance`        | Validate workflow and governance semantic contracts                                        |
+| `workflow-onboard-advise`     | Discover and preview governance onboarding without applying changes                        |
+| `workflow-drift`              | Compare intended and observed governance state                                             |
+| `workflow-modules`            | Inspect or lifecycle-manage governance modules through native adapters                     |
 
 ## Design Decisions
 

@@ -6,6 +6,7 @@
     "name": "Xonovex"
   },
   "dependencies": [
+    "xonovex-skill-agent-governance",
     "xonovex-skill-plan",
     "xonovex-skill-git",
     "xonovex-skill-pull-request",
@@ -14,6 +15,7 @@
     "xonovex-skill-tdd",
     "xonovex-skill-bdd",
     "xonovex-skill-user-stories",
-    "xonovex-skill-testing"
+    "xonovex-skill-testing",
+    "xonovex-skill-workflow"
   ]
 }

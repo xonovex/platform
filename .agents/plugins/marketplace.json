@@ -41,6 +41,18 @@
       "category": "Productivity"
     },
     {
+      "name": "xonovex-skill-agent-governance",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-agent-governance"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
       "name": "xonovex-skill-android-analytics",
       "source": {
         "source": "local",
@@ -837,6 +849,18 @@
       "source": {
         "source": "local",
         "path": "./packages/skill/skill-vitest"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-workflow",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-workflow"
       },
       "policy": {
         "installation": "AVAILABLE",

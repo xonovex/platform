@@ -1,0 +1,13 @@
+$schema: https://moonrepo.dev/schemas/project.json
+language: unknown
+tags: [skill]
+tasks:
+  build:
+    command: echo 'build complete'
+    options:
+      cache: false
+  test:
+    command: npm run test
+    inputs:
+      - agent-governance-guide/assets/conformance-fixtures.json
+      - agent-governance-guide/scripts/*.mjs

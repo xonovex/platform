@@ -1,0 +1,467 @@
+{
+  "purpose": "Conformance test data only; this file is not a required workflow representation.",
+  "resultContracts": [
+    {
+      "kind": "Discovery",
+      "requiredSemantics": [
+        "problem-or-opportunity",
+        "affected-context",
+        "observations",
+        "unknowns"
+      ]
+    },
+    {
+      "kind": "Research",
+      "requiredSemantics": [
+        "question-and-scope",
+        "sources-and-method",
+        "findings",
+        "limitations"
+      ]
+    },
+    {
+      "kind": "Formulation",
+      "requiredSemantics": [
+        "candidate-behavior",
+        "examples",
+        "constraints",
+        "ambiguities"
+      ]
+    },
+    {
+      "kind": "ExperienceDesign",
+      "requiredSemantics": [
+        "users-and-tasks",
+        "interaction-decisions",
+        "accessibility",
+        "validation-evidence"
+      ]
+    },
+    {
+      "kind": "SolutionDesign",
+      "requiredSemantics": [
+        "boundaries",
+        "interfaces",
+        "qualities",
+        "trade-offs"
+      ]
+    },
+    {
+      "kind": "Decision",
+      "requiredSemantics": [
+        "decision",
+        "options",
+        "rationale",
+        "consequences",
+        "authority"
+      ]
+    },
+    {
+      "kind": "Planning",
+      "requiredSemantics": [
+        "objective",
+        "scope-and-tasks",
+        "dependencies",
+        "validation",
+        "success-criteria"
+      ]
+    },
+    {
+      "kind": "Development",
+      "requiredSemantics": [
+        "subject-revision",
+        "changes",
+        "validation",
+        "unresolved-findings"
+      ]
+    },
+    {
+      "kind": "DeliverablePublication",
+      "requiredSemantics": [
+        "native-reference",
+        "immutable-revision",
+        "intended-target",
+        "publication-status"
+      ]
+    },
+    {
+      "kind": "Review",
+      "requiredSemantics": [
+        "subject-revision",
+        "reviewer-and-independence",
+        "findings",
+        "disposition"
+      ]
+    },
+    {
+      "kind": "QA",
+      "requiredSemantics": [
+        "subject-revision",
+        "environment",
+        "test-scope",
+        "results",
+        "gaps"
+      ]
+    },
+    {
+      "kind": "Assessment",
+      "requiredSemantics": [
+        "criteria-and-version",
+        "applicability",
+        "method",
+        "evidence",
+        "results"
+      ]
+    },
+    {
+      "kind": "Inventory",
+      "requiredSemantics": [
+        "scope-and-revision",
+        "component-identities",
+        "relationships",
+        "provenance"
+      ],
+      "optionalComponents": [
+        "skills",
+        "plugins",
+        "hooks",
+        "extensions",
+        "mcp-servers",
+        "ci-components",
+        "policy-bundles",
+        "models",
+        "tools",
+        "permissions"
+      ]
+    },
+    {
+      "kind": "DataGovernance",
+      "requiredSemantics": [
+        "data-and-flows",
+        "authorization-and-lineage",
+        "quality",
+        "gaps",
+        "controls"
+      ]
+    },
+    {
+      "kind": "Acceptance",
+      "requiredSemantics": [
+        "deliverable-revision",
+        "target",
+        "actor-authority",
+        "evidence",
+        "decision",
+        "expiry"
+      ]
+    },
+    {
+      "kind": "Integration",
+      "requiredSemantics": [
+        "accepted-revision",
+        "target",
+        "authorization-freshness",
+        "action",
+        "outcome",
+        "rollback"
+      ]
+    },
+    {
+      "kind": "Transition",
+      "requiredSemantics": [
+        "source-and-target",
+        "readiness",
+        "migration",
+        "rollback",
+        "outcome"
+      ]
+    },
+    {
+      "kind": "Release",
+      "requiredSemantics": [
+        "integrated-revision",
+        "release-target",
+        "approvals",
+        "action",
+        "outcome",
+        "rollback"
+      ]
+    },
+    {
+      "kind": "Observation",
+      "requiredSemantics": [
+        "subject-and-window",
+        "signals",
+        "baselines",
+        "findings",
+        "freshness"
+      ]
+    },
+    {
+      "kind": "Incident",
+      "requiredSemantics": [
+        "scope",
+        "severity",
+        "timeline",
+        "impact",
+        "actions",
+        "current-state"
+      ]
+    },
+    {
+      "kind": "CorrectiveAction",
+      "requiredSemantics": [
+        "source-finding",
+        "cause",
+        "action-and-owner",
+        "verification",
+        "effectiveness"
+      ]
+    },
+    {
+      "kind": "Retirement",
+      "requiredSemantics": [
+        "subject-and-scope",
+        "authorization",
+        "archive-migrate-delete",
+        "verification",
+        "residual-risk"
+      ]
+    },
+    {
+      "kind": "Learning",
+      "requiredSemantics": [
+        "source-results",
+        "lesson",
+        "effectiveness",
+        "proposal",
+        "review-and-promotion"
+      ]
+    }
+  ],
+  "inventoryOptionalComponents": [
+    "skills",
+    "plugins",
+    "hooks",
+    "extensions",
+    "mcp-servers",
+    "ci-components",
+    "policy-bundles",
+    "models",
+    "tools",
+    "permissions"
+  ],
+  "providerFixtures": [
+    {
+      "id": "self-controlled-task-system",
+      "authority": "self-controlled",
+      "storage": "non-file-task-records",
+      "optionalImplementation": false,
+      "requiresFile": false,
+      "requiresUniversalSerialization": false,
+      "nativeReferencesOpaque": true,
+      "reconstructableAfterRestart": true,
+      "operations": [
+        "resolve",
+        "read",
+        "publish",
+        "revise",
+        "relate",
+        "version",
+        "capabilities"
+      ],
+      "expectedValid": true
+    },
+    {
+      "id": "repository-backed-results",
+      "authority": "repository",
+      "storage": "git-native",
+      "optionalImplementation": true,
+      "requiresFile": false,
+      "requiresUniversalSerialization": false,
+      "nativeReferencesOpaque": true,
+      "reconstructableAfterRestart": true,
+      "operations": [
+        "resolve",
+        "read",
+        "publish",
+        "revise",
+        "relate",
+        "version",
+        "capabilities"
+      ],
+      "expectedValid": true
+    },
+    {
+      "id": "github-issues-results",
+      "authority": "hosted",
+      "storage": "github-native",
+      "optionalImplementation": true,
+      "requiresFile": false,
+      "requiresUniversalSerialization": false,
+      "nativeReferencesOpaque": true,
+      "reconstructableAfterRestart": true,
+      "operations": [
+        "resolve",
+        "read",
+        "publish",
+        "revise",
+        "relate",
+        "version",
+        "capabilities"
+      ],
+      "expectedValid": true
+    },
+    {
+      "id": "gitlab-issues-results",
+      "authority": "hosted",
+      "storage": "gitlab-native",
+      "optionalImplementation": true,
+      "requiresFile": false,
+      "requiresUniversalSerialization": false,
+      "nativeReferencesOpaque": true,
+      "reconstructableAfterRestart": true,
+      "operations": [
+        "resolve",
+        "read",
+        "publish",
+        "revise",
+        "relate",
+        "version",
+        "capabilities"
+      ],
+      "expectedValid": true
+    },
+    {
+      "id": "file-only-provider",
+      "authority": "local",
+      "storage": "file",
+      "optionalImplementation": true,
+      "requiresFile": true,
+      "requiresUniversalSerialization": true,
+      "nativeReferencesOpaque": false,
+      "reconstructableAfterRestart": true,
+      "operations": ["resolve", "read", "publish", "version"],
+      "expectedValid": false,
+      "expectedCode": "storage-coupled-provider"
+    },
+    {
+      "id": "provider-without-relations",
+      "authority": "self-controlled",
+      "storage": "non-file-task-records",
+      "optionalImplementation": false,
+      "requiresFile": false,
+      "requiresUniversalSerialization": false,
+      "nativeReferencesOpaque": true,
+      "reconstructableAfterRestart": true,
+      "operations": [
+        "resolve",
+        "read",
+        "publish",
+        "revise",
+        "version",
+        "capabilities"
+      ],
+      "expectedValid": false,
+      "expectedCode": "missing-provider-operation:relate"
+    }
+  ],
+  "cases": [
+    {
+      "id": "non-file-provider-handoff",
+      "contract": "handle",
+      "expectedValid": true,
+      "handle": {
+        "kind": "Research",
+        "providerContext": "opaque-database-provider",
+        "nativeReference": "opaque:record:42",
+        "nativeRevision": "revision-7",
+        "sourceReferences": ["opaque:record:12"],
+        "availableCapabilities": ["resolve", "comment", "link"]
+      }
+    },
+    {
+      "id": "persisted-universal-handle",
+      "contract": "handle",
+      "expectedValid": false,
+      "expectedCode": "universal-envelope",
+      "handle": {
+        "kind": "Planning",
+        "providerContext": "file",
+        "nativeReference": "plans/example.md",
+        "sourceReferences": [],
+        "availableCapabilities": ["resolve"],
+        "requiredPersistedUniversalEnvelope": true
+      }
+    },
+    {
+      "id": "runtime-trace-as-identity",
+      "contract": "handle",
+      "expectedValid": false,
+      "expectedCode": "runtime-identity",
+      "handle": {
+        "kind": "Development",
+        "providerContext": "git",
+        "nativeReference": "commit:abc",
+        "sourceReferences": [],
+        "availableCapabilities": ["resolve"],
+        "workflowIdentitySource": "runtime-trace-id"
+      }
+    },
+    {
+      "id": "composite-preserves-results",
+      "contract": "profile",
+      "expectedValid": true,
+      "profile": {
+        "includedResults": ["Review", "QA"],
+        "preservedResults": ["Review", "QA"],
+        "explicitProvider": "non-file-provider",
+        "providerAvailable": true,
+        "mandatoryControls": []
+      }
+    },
+    {
+      "id": "composite-erases-qa",
+      "contract": "profile",
+      "expectedValid": false,
+      "expectedCode": "result-erased",
+      "profile": {
+        "includedResults": ["Review", "QA"],
+        "preservedResults": ["Review"],
+        "providerAvailable": true,
+        "mandatoryControls": []
+      }
+    },
+    {
+      "id": "explicit-provider-unavailable",
+      "contract": "profile",
+      "expectedValid": false,
+      "expectedCode": "explicit-provider-unavailable",
+      "profile": {
+        "includedResults": ["Planning"],
+        "preservedResults": ["Planning"],
+        "explicitProvider": "hosted-provider",
+        "providerAvailable": false,
+        "fallbackProvider": "local-file",
+        "mandatoryControls": []
+      }
+    },
+    {
+      "id": "mandatory-control-without-enforcement",
+      "contract": "profile",
+      "expectedValid": false,
+      "expectedCode": "no-enforcement-guarantee",
+      "profile": {
+        "includedResults": ["Acceptance"],
+        "preservedResults": ["Acceptance"],
+        "providerAvailable": true,
+        "mandatoryControls": [
+          {
+            "id": "signed-evidence",
+            "enforcementPoints": [{"supported": true, "guaranteed": false}]
+          }
+        ]
+      }
+    }
+  ]
+}

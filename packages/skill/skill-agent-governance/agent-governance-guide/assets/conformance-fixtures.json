@@ -1,0 +1,1173 @@
+{
+  "purpose": "Conformance test data only; this file is not a required governance manifest.",
+  "evaluationTime": "2026-07-16T12:00:00Z",
+  "executorClasses": ["deterministic", "model", "agent", "human", "external"],
+  "policyOutcomes": [
+    "allow",
+    "deny",
+    "ask",
+    "advise",
+    "observe",
+    "require-evidence",
+    "exception",
+    "break-glass"
+  ],
+  "moduleKinds": [
+    "script",
+    "model-evaluator",
+    "agent-launcher",
+    "external-job",
+    "plugin",
+    "skill",
+    "mcp-integration",
+    "human-task"
+  ],
+  "moduleClassifications": [
+    "advisory",
+    "evidence-producing",
+    "enforcing",
+    "configuration-changing",
+    "privileged"
+  ],
+  "authorityZones": [
+    "organization-managed",
+    "project",
+    "user",
+    "session-runtime",
+    "external"
+  ],
+  "adoptionModes": [
+    "workflow-only",
+    "governance-only",
+    "enablement-only",
+    "external-enforcement-only",
+    "integrated"
+  ],
+  "provenanceVerificationMethods": [
+    "package-metadata",
+    "signature",
+    "checksum",
+    "slsa-attestation",
+    "provider-native"
+  ],
+  "semanticEventIntents": [
+    "session",
+    "prompt",
+    "model",
+    "tool",
+    "capability",
+    "result",
+    "configuration",
+    "context-compaction",
+    "subagent",
+    "workspace",
+    "privileged-operation"
+  ],
+  "capabilityMatrixFields": [
+    "event",
+    "handler-type",
+    "blocking",
+    "output-context",
+    "ordering-concurrency",
+    "managed-configuration",
+    "version",
+    "limitations",
+    "trust-boundary"
+  ],
+  "profileFacets": [
+    "lifecycle",
+    "governance",
+    "executor",
+    "enforcement",
+    "data",
+    "telemetry",
+    "distribution"
+  ],
+  "onboardingStages": [
+    "discover",
+    "assess",
+    "recommend",
+    "preview",
+    "approve",
+    "apply",
+    "verify",
+    "rollback",
+    "drift",
+    "upgrade",
+    "remove"
+  ],
+  "providerContracts": [
+    {
+      "id": "deterministic-policy-provider",
+      "providerKind": "policy",
+      "operations": [
+        "evaluate",
+        "request-evidence",
+        "explain",
+        "resolve-exception",
+        "version",
+        "replay"
+      ],
+      "storageNeutral": true,
+      "nativeReferencesOpaque": true,
+      "versioned": true,
+      "reconstructableAfterRestart": true,
+      "failureBehavior": "fail-visible",
+      "deterministic": true,
+      "historicalReplay": true,
+      "expectedValid": true
+    },
+    {
+      "id": "policy-provider-without-replay",
+      "providerKind": "policy",
+      "operations": [
+        "evaluate",
+        "request-evidence",
+        "explain",
+        "resolve-exception",
+        "version",
+        "replay"
+      ],
+      "storageNeutral": true,
+      "nativeReferencesOpaque": true,
+      "versioned": true,
+      "reconstructableAfterRestart": true,
+      "failureBehavior": "fail-visible",
+      "deterministic": true,
+      "historicalReplay": false,
+      "expectedValid": false,
+      "expectedCode": "policy-replay-unsupported"
+    },
+    {
+      "id": "policy-provider-without-restart-reconstruction",
+      "providerKind": "policy",
+      "operations": [
+        "evaluate",
+        "request-evidence",
+        "explain",
+        "resolve-exception",
+        "version",
+        "replay"
+      ],
+      "storageNeutral": true,
+      "nativeReferencesOpaque": true,
+      "versioned": true,
+      "reconstructableAfterRestart": false,
+      "failureBehavior": "fail-visible",
+      "deterministic": true,
+      "historicalReplay": true,
+      "expectedValid": false,
+      "expectedCode": "provider-not-reconstructable"
+    },
+    {
+      "id": "transactional-configuration-provider",
+      "providerKind": "configuration",
+      "operations": [
+        "inspect",
+        "diff",
+        "preview",
+        "apply",
+        "verify",
+        "rollback",
+        "export",
+        "import",
+        "detect-drift"
+      ],
+      "storageNeutral": true,
+      "nativeReferencesOpaque": true,
+      "versioned": true,
+      "reconstructableAfterRestart": true,
+      "failureBehavior": "fail-closed",
+      "previewBeforeApply": true,
+      "idempotentApply": true,
+      "verifiableRollback": true,
+      "driftDetection": true,
+      "expectedValid": true
+    },
+    {
+      "id": "configuration-provider-without-rollback",
+      "providerKind": "configuration",
+      "operations": [
+        "inspect",
+        "diff",
+        "preview",
+        "apply",
+        "verify",
+        "rollback",
+        "export",
+        "import",
+        "detect-drift"
+      ],
+      "storageNeutral": true,
+      "nativeReferencesOpaque": true,
+      "versioned": true,
+      "reconstructableAfterRestart": true,
+      "failureBehavior": "fail-closed",
+      "previewBeforeApply": true,
+      "idempotentApply": true,
+      "verifiableRollback": false,
+      "driftDetection": true,
+      "expectedValid": false,
+      "expectedCode": "configuration-transaction-incomplete"
+    },
+    {
+      "id": "privacy-preserving-evidence-provider",
+      "providerKind": "evidence",
+      "operations": [
+        "publish",
+        "resolve",
+        "correlate",
+        "redact",
+        "retention",
+        "authorize-access",
+        "version"
+      ],
+      "storageNeutral": true,
+      "nativeReferencesOpaque": true,
+      "versioned": true,
+      "reconstructableAfterRestart": true,
+      "failureBehavior": "fail-visible",
+      "dataMinimization": true,
+      "redaction": true,
+      "retention": true,
+      "accessControl": true,
+      "correlation": true,
+      "expectedValid": true
+    },
+    {
+      "id": "evidence-provider-without-redaction",
+      "providerKind": "evidence",
+      "operations": [
+        "publish",
+        "resolve",
+        "correlate",
+        "redact",
+        "retention",
+        "authorize-access",
+        "version"
+      ],
+      "storageNeutral": true,
+      "nativeReferencesOpaque": true,
+      "versioned": true,
+      "reconstructableAfterRestart": true,
+      "failureBehavior": "fail-visible",
+      "dataMinimization": true,
+      "redaction": false,
+      "retention": true,
+      "accessControl": true,
+      "correlation": true,
+      "expectedValid": false,
+      "expectedCode": "evidence-governance-incomplete"
+    }
+  ],
+  "policyCases": [
+    {
+      "id": "deterministic-and-opa-require-signed-evidence",
+      "expected": {
+        "policyVersion": "release-policy@7",
+        "subject": "artifact:sha256:abc",
+        "outcome": "require-evidence",
+        "reasons": ["signature-required"],
+        "evidenceRequests": ["signature-verification"],
+        "explanation": "A verified signature is required before release.",
+        "exception": null
+      },
+      "implementations": [
+        {
+          "provider": "deterministic-rules",
+          "implementation": "deterministic",
+          "historicalReplay": true,
+          "nativeOutput": {
+            "rule": "release-signature",
+            "matched": true,
+            "outcome": "require-evidence"
+          },
+          "semanticDecision": {
+            "decisionReference": "rules:decision:41",
+            "policyVersion": "release-policy@7",
+            "subject": "artifact:sha256:abc",
+            "outcome": "require-evidence",
+            "reasons": ["signature-required"],
+            "evidenceRequests": ["signature-verification"],
+            "explanation": "A verified signature is required before release.",
+            "exception": null
+          },
+          "replayDecision": {
+            "decisionReference": "rules:replay:41",
+            "policyVersion": "release-policy@7",
+            "subject": "artifact:sha256:abc",
+            "outcome": "require-evidence",
+            "reasons": ["signature-required"],
+            "evidenceRequests": ["signature-verification"],
+            "explanation": "A verified signature is required before release.",
+            "exception": null
+          }
+        },
+        {
+          "provider": "opa-adapter",
+          "implementation": "opa",
+          "historicalReplay": true,
+          "nativeOutput": {
+            "result": [{"expressions": [{"value": "require-evidence"}]}]
+          },
+          "semanticDecision": {
+            "decisionReference": "opa:decision:92",
+            "policyVersion": "release-policy@7",
+            "subject": "artifact:sha256:abc",
+            "outcome": "require-evidence",
+            "reasons": ["signature-required"],
+            "evidenceRequests": ["signature-verification"],
+            "explanation": "A verified signature is required before release.",
+            "exception": null
+          },
+          "replayDecision": {
+            "decisionReference": "opa:replay:92",
+            "policyVersion": "release-policy@7",
+            "subject": "artifact:sha256:abc",
+            "outcome": "require-evidence",
+            "reasons": ["signature-required"],
+            "evidenceRequests": ["signature-verification"],
+            "explanation": "A verified signature is required before release.",
+            "exception": null
+          }
+        }
+      ],
+      "expectedValid": true
+    },
+    {
+      "id": "deterministic-and-opa-honor-scoped-exception",
+      "expected": {
+        "policyVersion": "tool-policy@3",
+        "subject": "operation:deploy:42",
+        "outcome": "exception",
+        "reasons": ["approved-exception"],
+        "evidenceRequests": ["post-operation-review"],
+        "explanation": "A scoped, unexpired exception authorizes this operation.",
+        "exception": "exception:change-42"
+      },
+      "implementations": [
+        {
+          "provider": "deterministic-rules",
+          "implementation": "deterministic",
+          "historicalReplay": true,
+          "nativeOutput": {
+            "rule": "scoped-exception",
+            "matched": true,
+            "outcome": "exception"
+          },
+          "semanticDecision": {
+            "decisionReference": "rules:decision:42",
+            "policyVersion": "tool-policy@3",
+            "subject": "operation:deploy:42",
+            "outcome": "exception",
+            "reasons": ["approved-exception"],
+            "evidenceRequests": ["post-operation-review"],
+            "explanation": "A scoped, unexpired exception authorizes this operation.",
+            "exception": "exception:change-42"
+          },
+          "replayDecision": {
+            "decisionReference": "rules:replay:42",
+            "policyVersion": "tool-policy@3",
+            "subject": "operation:deploy:42",
+            "outcome": "exception",
+            "reasons": ["approved-exception"],
+            "evidenceRequests": ["post-operation-review"],
+            "explanation": "A scoped, unexpired exception authorizes this operation.",
+            "exception": "exception:change-42"
+          }
+        },
+        {
+          "provider": "opa-adapter",
+          "implementation": "opa",
+          "historicalReplay": true,
+          "nativeOutput": {
+            "result": [{"expressions": [{"value": "exception"}]}]
+          },
+          "semanticDecision": {
+            "decisionReference": "opa:decision:93",
+            "policyVersion": "tool-policy@3",
+            "subject": "operation:deploy:42",
+            "outcome": "exception",
+            "reasons": ["approved-exception"],
+            "evidenceRequests": ["post-operation-review"],
+            "explanation": "A scoped, unexpired exception authorizes this operation.",
+            "exception": "exception:change-42"
+          },
+          "replayDecision": {
+            "decisionReference": "opa:replay:93",
+            "policyVersion": "tool-policy@3",
+            "subject": "operation:deploy:42",
+            "outcome": "exception",
+            "reasons": ["approved-exception"],
+            "evidenceRequests": ["post-operation-review"],
+            "explanation": "A scoped, unexpired exception authorizes this operation.",
+            "exception": "exception:change-42"
+          }
+        }
+      ],
+      "expectedValid": true
+    }
+  ],
+  "configurationCases": [
+    {
+      "id": "authorized-idempotent-apply",
+      "previewed": true,
+      "authorized": true,
+      "applied": true,
+      "verified": true,
+      "partialApplication": false,
+      "rollbackStatus": "not-needed",
+      "driftDetected": false,
+      "driftReported": false,
+      "retryCount": 1,
+      "idempotencyKey": "configuration-change:42",
+      "expectedValid": true
+    },
+    {
+      "id": "partial-application-rolled-back",
+      "previewed": true,
+      "authorized": true,
+      "applied": false,
+      "verified": false,
+      "partialApplication": true,
+      "rollbackStatus": "succeeded",
+      "driftDetected": false,
+      "driftReported": false,
+      "retryCount": 0,
+      "idempotencyKey": "configuration-change:43",
+      "expectedValid": true
+    },
+    {
+      "id": "partial-application-rollback-failed",
+      "previewed": true,
+      "authorized": true,
+      "applied": false,
+      "verified": false,
+      "partialApplication": true,
+      "rollbackStatus": "failed",
+      "driftDetected": true,
+      "driftReported": true,
+      "retryCount": 0,
+      "idempotencyKey": "configuration-change:44",
+      "expectedValid": false,
+      "expectedCode": "rollback-failure"
+    },
+    {
+      "id": "detected-drift-reported",
+      "previewed": false,
+      "authorized": false,
+      "applied": false,
+      "verified": false,
+      "partialApplication": false,
+      "rollbackStatus": "not-needed",
+      "driftDetected": true,
+      "driftReported": true,
+      "retryCount": 0,
+      "idempotencyKey": null,
+      "expectedValid": true
+    },
+    {
+      "id": "detected-drift-suppressed",
+      "previewed": false,
+      "authorized": false,
+      "applied": false,
+      "verified": false,
+      "partialApplication": false,
+      "rollbackStatus": "not-needed",
+      "driftDetected": true,
+      "driftReported": false,
+      "retryCount": 0,
+      "idempotencyKey": null,
+      "expectedValid": false,
+      "expectedCode": "drift-unreported"
+    },
+    {
+      "id": "retry-without-idempotency-key",
+      "previewed": true,
+      "authorized": true,
+      "applied": true,
+      "verified": true,
+      "partialApplication": false,
+      "rollbackStatus": "not-needed",
+      "driftDetected": false,
+      "driftReported": false,
+      "retryCount": 1,
+      "idempotencyKey": null,
+      "expectedValid": false,
+      "expectedCode": "duplicate-risk-uncontrolled"
+    }
+  ],
+  "evidenceCases": [
+    {
+      "id": "minimized-provider-native-evidence",
+      "nativeReference": "evidence-system:event:42",
+      "correlationReference": "trace:run:9",
+      "capturesSensitiveContent": false,
+      "contentCaptureAuthorized": false,
+      "redacted": true,
+      "retentionDefined": true,
+      "accessControlled": true,
+      "expectedValid": true
+    },
+    {
+      "id": "unauthorized-raw-prompt-capture",
+      "nativeReference": "telemetry:event:51",
+      "correlationReference": "trace:run:10",
+      "capturesSensitiveContent": true,
+      "contentCaptureAuthorized": false,
+      "redacted": true,
+      "retentionDefined": true,
+      "accessControlled": true,
+      "expectedValid": false,
+      "expectedCode": "sensitive-content-unauthorized"
+    },
+    {
+      "id": "evidence-without-retention",
+      "nativeReference": "evidence-system:event:52",
+      "correlationReference": "trace:run:11",
+      "capturesSensitiveContent": false,
+      "contentCaptureAuthorized": false,
+      "redacted": true,
+      "retentionDefined": false,
+      "accessControlled": true,
+      "expectedValid": false,
+      "expectedCode": "evidence-governance-incomplete"
+    }
+  ],
+  "moduleRequiredFields": [
+    "identity",
+    "source",
+    "provenance",
+    "version",
+    "compatibility",
+    "classification",
+    "adoptionModes",
+    "authorityZones",
+    "permissions",
+    "tools",
+    "filesystem",
+    "network",
+    "secrets",
+    "dataFlows",
+    "sideEffects",
+    "timeoutMs",
+    "retryLimit",
+    "ordering",
+    "concurrency",
+    "idempotent",
+    "reentrant",
+    "duplicateSafe",
+    "failureMode",
+    "upgrade",
+    "disable",
+    "rollback",
+    "trust",
+    "owner",
+    "supportStatus"
+  ],
+  "moduleFixtures": {
+    "trusted-configuration-module": {
+      "identity": "governance-configurator",
+      "source": "package:governance-configurator",
+      "version": "5.0.0",
+      "compatibility": {
+        "platforms": ["example-harness"],
+        "testedVersions": ["1.4.0"]
+      },
+      "classification": "configuration-changing",
+      "adoptionModes": ["enablement-only", "integrated"],
+      "authorityZones": ["organization-managed"],
+      "permissions": {
+        "declared": ["repository:read", "configuration:write"],
+        "approved": ["repository:read", "configuration:write"],
+        "observed": ["repository:read", "configuration:write"]
+      },
+      "tools": ["provider-api"],
+      "filesystem": ["repository:read"],
+      "network": ["provider.example:443"],
+      "secrets": ["provider-token"],
+      "dataFlows": ["repository-metadata-to-provider"],
+      "sideEffects": "configuration-change",
+      "timeoutMs": 30000,
+      "retryLimit": 2,
+      "ordering": "adapter-declared",
+      "concurrency": "parallel",
+      "idempotent": true,
+      "reentrant": true,
+      "duplicateSafe": true,
+      "failureMode": "fail-visible",
+      "upgrade": {"preview": true, "targetPinned": true, "verification": true},
+      "disable": {"supported": true, "coverageChecked": true},
+      "rollback": {"supported": true, "verified": true, "status": "ready"},
+      "trust": {
+        "reviewed": true,
+        "userConsent": false,
+        "organizationChangeControlled": true
+      },
+      "owner": "platform-team",
+      "supportStatus": "supported",
+      "provenance": {
+        "versionPinned": true,
+        "expectedDigest": "sha256:abc",
+        "observedDigest": "sha256:abc",
+        "verification": [
+          {"method": "checksum", "verified": true},
+          {"method": "slsa-attestation", "verified": true}
+        ]
+      }
+    }
+  },
+  "moduleCases": [
+    {
+      "id": "trusted-configuration-module",
+      "fixture": "trusted-configuration-module",
+      "expectedValid": true
+    },
+    {
+      "id": "tampered-module",
+      "fixture": "trusted-configuration-module",
+      "overrides": {"provenance": {"observedDigest": "sha256:tampered"}},
+      "expectedValid": false,
+      "expectedCode": "tampered-module"
+    },
+    {
+      "id": "unexpected-permission-expansion",
+      "fixture": "trusted-configuration-module",
+      "overrides": {
+        "permissions": {
+          "observed": ["repository:read", "configuration:write", "network:any"]
+        }
+      },
+      "expectedValid": false,
+      "expectedCode": "unexpected-permissions"
+    },
+    {
+      "id": "moving-module-version",
+      "fixture": "trusted-configuration-module",
+      "overrides": {
+        "version": "latest",
+        "provenance": {"versionPinned": false}
+      },
+      "expectedValid": false,
+      "expectedCode": "moving-version"
+    },
+    {
+      "id": "missing-module-provenance",
+      "fixture": "trusted-configuration-module",
+      "overrides": {"source": null},
+      "expectedValid": false,
+      "expectedCode": "missing-provenance"
+    },
+    {
+      "id": "unverified-module-provenance",
+      "fixture": "trusted-configuration-module",
+      "overrides": {
+        "provenance": {
+          "verification": [
+            {"method": "signature", "verified": false},
+            {"method": "provider-native", "verified": false}
+          ]
+        }
+      },
+      "expectedValid": false,
+      "expectedCode": "provenance-unverified"
+    },
+    {
+      "id": "concurrent-duplicate-execution",
+      "fixture": "trusted-configuration-module",
+      "overrides": {"concurrency": "parallel", "duplicateSafe": false},
+      "expectedValid": false,
+      "expectedCode": "duplicate-execution-unsafe"
+    },
+    {
+      "id": "non-idempotent-retry",
+      "fixture": "trusted-configuration-module",
+      "overrides": {"idempotent": false, "retryLimit": 2},
+      "expectedValid": false,
+      "expectedCode": "non-idempotent-retry"
+    },
+    {
+      "id": "non-reentrant-parallel-execution",
+      "fixture": "trusted-configuration-module",
+      "overrides": {"concurrency": "parallel", "reentrant": false},
+      "expectedValid": false,
+      "expectedCode": "reentrancy-unsafe"
+    },
+    {
+      "id": "rollback-failure",
+      "fixture": "trusted-configuration-module",
+      "overrides": {"rollback": {"verified": false, "status": "failed"}},
+      "expectedValid": false,
+      "expectedCode": "rollback-failure"
+    },
+    {
+      "id": "project-module-without-trust-review",
+      "fixture": "trusted-configuration-module",
+      "overrides": {
+        "authorityZones": ["project"],
+        "trust": {"reviewed": false, "organizationChangeControlled": false}
+      },
+      "expectedValid": false,
+      "expectedCode": "trust-review-required"
+    },
+    {
+      "id": "user-module-without-consent",
+      "fixture": "trusted-configuration-module",
+      "overrides": {
+        "authorityZones": ["user"],
+        "trust": {
+          "reviewed": true,
+          "userConsent": false,
+          "organizationChangeControlled": false
+        }
+      },
+      "expectedValid": false,
+      "expectedCode": "user-consent-required"
+    },
+    {
+      "id": "organization-module-without-change-control",
+      "fixture": "trusted-configuration-module",
+      "overrides": {"trust": {"organizationChangeControlled": false}},
+      "expectedValid": false,
+      "expectedCode": "organization-provenance-uncontrolled"
+    },
+    {
+      "id": "module-without-timeout",
+      "fixture": "trusted-configuration-module",
+      "overrides": {"timeoutMs": null},
+      "expectedValid": false,
+      "expectedCode": "timeout-unspecified"
+    },
+    {
+      "id": "partial-application-without-rollback",
+      "fixture": "trusted-configuration-module",
+      "overrides": {
+        "rollback": {
+          "supported": false,
+          "verified": false,
+          "status": "unavailable"
+        }
+      },
+      "expectedValid": false,
+      "expectedCode": "rollback-unavailable"
+    }
+  ],
+  "cases": [
+    {
+      "id": "deterministic-authoritative-inspection",
+      "kind": "executor",
+      "identity": "repository-inspection",
+      "version": "1",
+      "purpose": "inspect authoritative repository state",
+      "executorClass": "deterministic",
+      "inputReferences": ["repository:revision:abc"],
+      "resultContract": "RepositoryInspectionResult",
+      "sideEffects": "none",
+      "toolScope": ["repository:read"],
+      "filesystemScope": ["repository:read"],
+      "networkScope": [],
+      "secretScope": [],
+      "modelScope": [],
+      "providerScope": ["repository"],
+      "dataScope": ["repository-metadata"],
+      "inputValidation": "native revision resolves",
+      "outputValidation": "result references inspected revision",
+      "evidenceOrigin": "repository",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "concurrency": "serial",
+      "ordering": "deterministic",
+      "cancellation": "supported",
+      "killBehavior": "terminate",
+      "failureBehavior": "fail-visible",
+      "authoritativeInspectionAvailable": true,
+      "outputTreatedAsAuthoritative": true,
+      "expectedValid": true
+    },
+    {
+      "id": "model-replaces-authoritative-inspection",
+      "kind": "executor",
+      "identity": "repository-classifier",
+      "version": "1",
+      "purpose": "classify repository state",
+      "executorClass": "model",
+      "inputReferences": ["repository:revision:abc"],
+      "resultContract": "RepositoryClassificationResult",
+      "sideEffects": "none",
+      "toolScope": [],
+      "filesystemScope": [],
+      "networkScope": [],
+      "secretScope": [],
+      "modelScope": ["bounded-model"],
+      "providerScope": ["model-provider"],
+      "dataScope": ["repository-metadata"],
+      "inputValidation": "native revision resolves",
+      "outputValidation": "structured classification validates",
+      "evidenceOrigin": "model-inference",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "concurrency": "serial",
+      "ordering": "deterministic-input-order",
+      "cancellation": "supported",
+      "killBehavior": "terminate",
+      "failureBehavior": "fail-visible",
+      "authoritativeInspectionAvailable": true,
+      "outputTreatedAsAuthoritative": true,
+      "expectedValid": false,
+      "expectedCode": "authoritative-evidence-replaced"
+    },
+    {
+      "id": "executor-without-cancellation-contract",
+      "kind": "executor",
+      "identity": "repository-inspection",
+      "version": "1",
+      "purpose": "inspect authoritative repository state",
+      "executorClass": "deterministic",
+      "inputReferences": ["repository:revision:abc"],
+      "resultContract": "RepositoryInspectionResult",
+      "sideEffects": "none",
+      "toolScope": ["repository:read"],
+      "filesystemScope": ["repository:read"],
+      "networkScope": [],
+      "secretScope": [],
+      "modelScope": [],
+      "providerScope": ["repository"],
+      "dataScope": ["repository-metadata"],
+      "inputValidation": "native revision resolves",
+      "outputValidation": "result references inspected revision",
+      "evidenceOrigin": "repository",
+      "timeoutSeconds": 30,
+      "retryLimit": 1,
+      "concurrency": "serial",
+      "ordering": "deterministic",
+      "killBehavior": "terminate",
+      "failureBehavior": "fail-visible",
+      "authoritativeInspectionAvailable": true,
+      "outputTreatedAsAuthoritative": true,
+      "expectedValid": false,
+      "expectedCode": "executor-contract-incomplete"
+    },
+    {
+      "id": "unsupported-mandatory-hook",
+      "kind": "enforcement",
+      "mandatory": true,
+      "capability": {"support": "unsupported", "blocking": false},
+      "expectedValid": false,
+      "expectedCode": "unsupported-enforcement"
+    },
+    {
+      "id": "experimental-mandatory-hook",
+      "kind": "enforcement",
+      "mandatory": true,
+      "capability": {"support": "experimental", "blocking": true},
+      "expectedValid": false,
+      "expectedCode": "unsupported-enforcement"
+    },
+    {
+      "id": "supported-enforcement-with-separate-records",
+      "kind": "enforcement",
+      "mandatory": true,
+      "capability": {"support": "supported", "blocking": true},
+      "references": {
+        "decision": "policy:decision:47",
+        "enforcement": "ci:gate:47",
+        "evidence": "evidence:check:47"
+      },
+      "expectedValid": true
+    },
+    {
+      "id": "decision-and-enforcement-share-reference",
+      "kind": "enforcement",
+      "mandatory": true,
+      "capability": {"support": "supported", "blocking": true},
+      "references": {
+        "decision": "policy:decision:48",
+        "enforcement": "policy:decision:48",
+        "evidence": "evidence:check:48"
+      },
+      "expectedValid": false,
+      "expectedCode": "decision-enforcement-conflated"
+    },
+    {
+      "id": "conflicting-modules",
+      "kind": "composition",
+      "modules": [
+        {"id": "a", "conflictsWith": ["b"]},
+        {"id": "b", "conflictsWith": []}
+      ],
+      "conflictResolution": null,
+      "expectedValid": false,
+      "expectedCode": "module-conflict"
+    },
+    {
+      "id": "concurrent-hooks-assumed-serial",
+      "kind": "ordering",
+      "requiresSerial": true,
+      "adapterOrdering": "concurrent",
+      "expectedValid": false,
+      "expectedCode": "ordering-unguaranteed"
+    },
+    {
+      "id": "unbounded-agent-recursion",
+      "kind": "agent",
+      "purpose": "investigate",
+      "maxDepth": null,
+      "modelProvider": "bounded-model-provider",
+      "timeBudgetSeconds": 60,
+      "tokenBudget": 1000,
+      "costBudget": 1,
+      "toolScope": ["read"],
+      "filesystemScope": ["repository:read"],
+      "networkScope": [],
+      "secretScope": [],
+      "dataScope": ["repository"],
+      "authorityAttenuated": true,
+      "resultContract": "InvestigationResult",
+      "outputValidation": "InvestigationResult validator",
+      "evidence": "provider-native investigation evidence",
+      "cancellation": "cooperative",
+      "failureBehavior": "advise",
+      "observable": true,
+      "killSwitch": true,
+      "expectedValid": false,
+      "expectedCode": "unbounded-agent"
+    },
+    {
+      "id": "bounded-agent",
+      "kind": "agent",
+      "purpose": "investigate",
+      "maxDepth": 1,
+      "modelProvider": "bounded-model-provider",
+      "timeBudgetSeconds": 60,
+      "tokenBudget": 1000,
+      "costBudget": 1,
+      "toolScope": ["read"],
+      "filesystemScope": ["repository:read"],
+      "networkScope": [],
+      "secretScope": [],
+      "dataScope": ["repository"],
+      "authorityAttenuated": true,
+      "resultContract": "InvestigationResult",
+      "outputValidation": "InvestigationResult validator",
+      "evidence": "provider-native investigation evidence",
+      "cancellation": "cooperative",
+      "failureBehavior": "advise",
+      "observable": true,
+      "killSwitch": true,
+      "expectedValid": true
+    },
+    {
+      "id": "agent-without-cost-budget",
+      "kind": "agent",
+      "purpose": "investigate",
+      "maxDepth": 1,
+      "modelProvider": "bounded-model-provider",
+      "timeBudgetSeconds": 60,
+      "tokenBudget": 1000,
+      "costBudget": null,
+      "toolScope": ["read"],
+      "filesystemScope": ["repository:read"],
+      "networkScope": [],
+      "secretScope": [],
+      "dataScope": ["repository"],
+      "authorityAttenuated": true,
+      "resultContract": "InvestigationResult",
+      "outputValidation": "InvestigationResult validator",
+      "evidence": "provider-native investigation evidence",
+      "cancellation": "cooperative",
+      "failureBehavior": "advise",
+      "observable": true,
+      "killSwitch": true,
+      "expectedValid": false,
+      "expectedCode": "unbounded-agent"
+    },
+    {
+      "id": "stale-mandatory-policy",
+      "kind": "policy",
+      "mandatory": true,
+      "fresh": false,
+      "expectedValid": false,
+      "expectedCode": "stale-policy"
+    },
+    {
+      "id": "expired-exception",
+      "kind": "exception",
+      "owner": "security-team",
+      "scope": "release-42",
+      "control": "signed-release-evidence",
+      "authorizedApprover": "release-authority",
+      "rationale": "emergency repair",
+      "compensatingControls": ["manual-review"],
+      "evidence": ["opaque:audit:1"],
+      "affectedSubjects": ["artifact:release-42"],
+      "start": "2026-07-15T10:00:00Z",
+      "expiry": "2026-07-15T12:00:00Z",
+      "reviewRequired": true,
+      "expectedValid": false,
+      "expectedCode": "exception-expired"
+    },
+    {
+      "id": "authorized-scoped-exception",
+      "kind": "exception",
+      "owner": "security-team",
+      "scope": "release-43",
+      "control": "signed-release-evidence",
+      "authorizedApprover": "release-authority",
+      "rationale": "temporary signer outage",
+      "compensatingControls": ["two-person-manual-verification"],
+      "evidence": ["opaque:audit:2"],
+      "affectedSubjects": ["artifact:release-43"],
+      "start": "2026-07-16T10:00:00Z",
+      "expiry": "2026-07-17T12:00:00Z",
+      "reviewRequired": true,
+      "expectedValid": true
+    },
+    {
+      "id": "exception-without-expiry",
+      "kind": "exception",
+      "owner": "security-team",
+      "scope": "release-44",
+      "control": "signed-release-evidence",
+      "authorizedApprover": "release-authority",
+      "rationale": "temporary signer outage",
+      "compensatingControls": ["two-person-manual-verification"],
+      "evidence": ["opaque:audit:3"],
+      "affectedSubjects": ["artifact:release-44"],
+      "start": "2026-07-16T10:00:00Z",
+      "reviewRequired": true,
+      "expectedValid": false,
+      "expectedCode": "incomplete-exception"
+    },
+    {
+      "id": "authorized-break-glass",
+      "kind": "break-glass",
+      "owner": "incident-commander",
+      "scope": "production-recovery-45",
+      "control": "deployment-separation-of-duties",
+      "authorizedApprover": "emergency-access-authority",
+      "rationale": "restore critical service",
+      "compensatingControls": ["live-independent-monitoring"],
+      "evidence": ["opaque:audit:4"],
+      "affectedSubjects": ["deployment:production:45"],
+      "start": "2026-07-16T10:00:00Z",
+      "expiry": "2026-07-16T13:00:00Z",
+      "reviewRequired": true,
+      "emergencyReason": "critical production outage",
+      "timeLimitedAccess": true,
+      "explicitInvocation": true,
+      "authoritativeAccessEvidence": ["access-system:event:45"],
+      "notificationRequired": true,
+      "containmentPlan": "limit access to recovery deployment",
+      "revocationRequired": true,
+      "postEventReviewRequired": true,
+      "expectedValid": true
+    },
+    {
+      "id": "break-glass-without-authoritative-access-evidence",
+      "kind": "break-glass",
+      "owner": "incident-commander",
+      "scope": "production-recovery-46",
+      "control": "deployment-separation-of-duties",
+      "authorizedApprover": "emergency-access-authority",
+      "rationale": "restore critical service",
+      "compensatingControls": ["live-independent-monitoring"],
+      "evidence": ["opaque:audit:5"],
+      "affectedSubjects": ["deployment:production:46"],
+      "start": "2026-07-16T10:00:00Z",
+      "expiry": "2026-07-16T13:00:00Z",
+      "reviewRequired": true,
+      "emergencyReason": "critical production outage",
+      "timeLimitedAccess": true,
+      "explicitInvocation": true,
+      "authoritativeAccessEvidence": [],
+      "notificationRequired": true,
+      "containmentPlan": "limit access to recovery deployment",
+      "revocationRequired": true,
+      "postEventReviewRequired": true,
+      "expectedValid": false,
+      "expectedCode": "incomplete-break-glass"
+    },
+    {
+      "id": "non-file-evidence-provider",
+      "kind": "provider",
+      "providerType": "database-api",
+      "nativeReference": "opaque:evidence:99",
+      "requiresFile": false,
+      "expectedValid": true
+    },
+    {
+      "id": "unauthorized-profile-weakening",
+      "kind": "profile",
+      "facets": [
+        "lifecycle",
+        "governance",
+        "executor",
+        "enforcement",
+        "data",
+        "telemetry",
+        "distribution"
+      ],
+      "strengthening": "additive",
+      "weakensMandatoryControl": true,
+      "authorizedException": false,
+      "adequateEnforcement": true,
+      "expectedValid": false,
+      "expectedCode": "unauthorized-weakening"
+    },
+    {
+      "id": "mandatory-control-without-guarantee",
+      "kind": "profile",
+      "facets": [
+        "lifecycle",
+        "governance",
+        "executor",
+        "enforcement",
+        "data",
+        "telemetry",
+        "distribution"
+      ],
+      "strengthening": "additive",
+      "weakensMandatoryControl": false,
+      "authorizedException": false,
+      "adequateEnforcement": false,
+      "expectedValid": false,
+      "expectedCode": "no-enforcement-guarantee"
+    },
+    {
+      "id": "additive-cross-facet-profile",
+      "kind": "profile",
+      "facets": [
+        "lifecycle",
+        "governance",
+        "executor",
+        "enforcement",
+        "data",
+        "telemetry",
+        "distribution"
+      ],
+      "strengthening": "additive",
+      "weakensMandatoryControl": false,
+      "authorizedException": false,
+      "adequateEnforcement": true,
+      "expectedValid": true
+    },
+    {
+      "id": "profile-missing-telemetry-facet",
+      "kind": "profile",
+      "facets": [
+        "lifecycle",
+        "governance",
+        "executor",
+        "enforcement",
+        "data",
+        "distribution"
+      ],
+      "strengthening": "additive",
+      "weakensMandatoryControl": false,
+      "authorizedException": false,
+      "adequateEnforcement": true,
+      "expectedValid": false,
+      "expectedCode": "profile-composition-incomplete"
+    }
+  ]
+}

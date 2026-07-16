@@ -60,6 +60,12 @@
     "rationale": "404-hides-existence; read X-Accepted-GitHub-Permissions"
   },
   {
+    "query": "use GitHub Issues as an optional workflow result provider and reconstruct the opaque result after restart",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "GitHub-specific adapter for the storage-neutral result-provider port"
+  },
+  {
     "query": "open a merge request on a GitLab-hosted repo with glab and request reviewers",
     "should_trigger": false,
     "split": "train",
@@ -82,5 +88,11 @@
     "should_trigger": false,
     "split": "validation",
     "rationale": "near-miss: PR description craft, use pull-request-guide"
+  },
+  {
+    "query": "define a storage-neutral result-provider port without choosing a hosted platform",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near-miss: provider semantics belong to workflow-guide until GitHub is selected"
   }
 ]

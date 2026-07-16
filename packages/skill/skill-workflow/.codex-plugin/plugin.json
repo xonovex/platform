@@ -1,0 +1,9 @@
+{
+  "name": "xonovex-skill-workflow",
+  "version": "5.0.0",
+  "description": "Xonovex composable workflow contract skills",
+  "author": {
+    "name": "Xonovex"
+  },
+  "skills": "./workflow-guide"
+}

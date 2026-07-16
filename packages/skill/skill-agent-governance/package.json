@@ -1,0 +1,17 @@
+{
+  "name": "@xonovex/skill-agent-governance",
+  "version": "5.0.0",
+  "private": true,
+  "type": "module",
+  "keywords": [
+    "xonovex",
+    "skill",
+    "agent",
+    "governance"
+  ],
+  "scripts": {
+    "fmt": "prettier --write .",
+    "fmt:check": "prettier --check .",
+    "test": "node agent-governance-guide/scripts/validate-fixtures.mjs"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "name": "@xonovex/skill-workflow",
+  "version": "5.0.0",
+  "private": true,
+  "type": "module",
+  "keywords": [
+    "xonovex",
+    "skill",
+    "workflow"
+  ],
+  "scripts": {
+    "fmt": "prettier --write .",
+    "fmt:check": "prettier --check .",
+    "test": "node workflow-guide/scripts/validate-fixtures.mjs"
+  }
+}

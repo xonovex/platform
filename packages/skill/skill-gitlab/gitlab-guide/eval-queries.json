@@ -60,6 +60,12 @@
     "rationale": "one-open-MR-per-branch idempotency"
   },
   {
+    "query": "use GitLab Issues and notes as an optional workflow result provider with opaque restart recovery",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "GitLab-specific adapter for the storage-neutral result-provider port"
+  },
+  {
     "query": "open a pull request and request reviewers on a GitHub-hosted repo with gh",
     "should_trigger": false,
     "split": "train",
@@ -82,5 +88,11 @@
     "should_trigger": false,
     "split": "train",
     "rationale": "near-miss: PR description craft, use pull-request-guide"
+  },
+  {
+    "query": "define generic policy and result providers without selecting a code host",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near-miss: provider semantics belong to workflow-guide and agent-governance-guide until GitLab is selected"
   }
 ]

@@ -1,0 +1,30 @@
+AUDITABLE ENTERPRISE-PLATFORM PLAN-SET VALIDATION
+Date: 2026-07-14
+
+Sources: 94
+Decisions: 39
+Controls/obligations: 45
+Platform matrix entries: 14
+Subplans: 11
+Numbered tasks mapped: 150
+
+RESULT: PASS
+
+Checks:
+- Parent and all subplans resolve
+- Eleven-subplan exception is explicit and limited to one optional enterprise-platform extension
+- Azure DevOps, Bitbucket Cloud/Data Center, Bitrise, AWS and Datadog use official-source mappings
+- Cloud/self-managed editions and tiers are not conflated
+- CI-to-AWS onboarding is federation/temporary-credential first
+- Datadog telemetry onboarding includes privacy, retention, access and cost boundaries
+- Every subplan has decision/control/source frontmatter
+- Every numbered subplan task has an exact traceability row
+- All decision/control/source IDs resolve
+- Storage neutrality and provider-native evidence remain intact
+
+Warnings / required implementation reviews:
+- Vendor capabilities remain version-pinned-conformance-required.
+- Azure DevOps Services/Server and Bitbucket Cloud/Data Center must be detected before recommendations are applied.
+- Account tiers, runner types, regions and installed apps can materially change capabilities.
+- AWS trust policies and Datadog data collection require organization-specific security/privacy review.
+- Crosswalks remain partial/contextual and do not establish certification or compliance.

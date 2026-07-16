@@ -1,0 +1,32 @@
+[
+  {
+    "query": "validate this PlanningResult and its provider-native handoff without forcing it into a YAML schema",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "workflow result and storage-neutral conformance"
+  },
+  {
+    "query": "our Discover stage groups discovery and formulation; can the profile still publish them separately?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "composite presentation must preserve constituent results"
+  },
+  {
+    "query": "after compaction, reconstruct the PhaseResultHandle from this GitHub issue and commit reference",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "ephemeral provider-reconstructed handle"
+  },
+  {
+    "query": "design a governance hook that denies network tools when a policy says so",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss owned by agent-governance-guide"
+  },
+  {
+    "query": "write Given-When-Then examples for this checkout story",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near-miss owned by a BDD method skill"
+  }
+]
