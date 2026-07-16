@@ -44,6 +44,17 @@
         "Classifies updated_at as freshness-only and binds exact-revision assurance to immutable commit/pipeline/job/artifact/deployment references",
         "Rejects silent local or cross-provider fallback for side effects when the explicitly selected GitLab provider is unavailable"
       ]
+    },
+    {
+      "id": 6,
+      "prompt": "Onboard mandatory governance checks and protected production releases across our GitLab group. We want reusable components rather than copied YAML, immutable dependencies, typed inputs and component tests, central policy injection that projects cannot omit, safe merge/name semantics, compliance scope, protected deployment approval, preview/rollback, and evidence. Explain the design and bypass tests.",
+      "assertions": [
+        "Uses a full-SHA-pinned CI/CD component with typed inputs, configurable unique job names/stages, nested dependency review, and component-project tests covering missing inputs and duplicate inclusion",
+        "Uses a protected security-policy project plus pipeline execution policy for mandatory injection, documents project/project-policy/group-policy merge order and deliberate suffix on_conflict versus suffix never behavior, and tests omitted project CI plus name/variable conflicts",
+        "Uses compliance frameworks only for native classification/control/reporting and explicitly rejects treating framework assignment as certification or proof of legal compliance",
+        "Protects release/deployment targets and environments with eligible approval, least-privilege credentials, exact commit/artifact binding, and pipeline/job/artifact/deployment evidence",
+        "Uses discover, rendered preview, authorize, apply, authoritative re-read/negative-probe verify, rollback, and drift steps without requiring an agent harness or lifecycle module"
+      ]
     }
   ]
 }

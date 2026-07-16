@@ -3,7 +3,7 @@ type: plan
 has_subplans: false
 parent_plan: ../composable-workflow-phases.md
 parallel_group: 3
-status: pending
+status: complete
 dependencies:
   plans:
   - provider-policy-and-module-conformance
@@ -19,12 +19,12 @@ skills_to_consult:
 - security-assurance-guide
 - versioning-guide
 validation:
-  type_check: pending
-  lint: pending
-  build: pending
-  tests: pending
-  integration: pending
-updated: '2026-07-14'
+  type_check: passed
+  lint: passed
+  build: passed
+  tests: passed
+  integration: passed
+updated: '2026-07-16'
 decision_refs:
 - D-006
 - D-007
@@ -110,12 +110,12 @@ Mapping IDs resolve through the parent plan’s `traceability/` artifacts. These
 
 ## Success Criteria
 
-- [ ] GitHub and GitLab onboarding uses native reusable/versioned mechanisms.
-- [ ] External enforcement is independent from harness hooks and can provide defense in depth.
-- [ ] AgentPolicy/admission controls map to semantic governance intents.
-- [ ] Privileged actions have enforceable external gates.
-- [ ] Setup modules are previewable, reversible, and provider-native.
-- [ ] Platform-specific merge, precedence, and failure behavior is documented and tested.
+- [x] GitHub and GitLab onboarding uses native reusable/versioned mechanisms.
+- [x] External enforcement is independent from harness hooks and can provide defense in depth.
+- [x] AgentPolicy/admission controls map to semantic governance intents.
+- [x] Privileged actions have enforceable external gates.
+- [x] Setup modules are previewable, reversible, and provider-native.
+- [x] Platform-specific merge, precedence, and failure behavior is documented and tested.
 
 ## Files Modified/Created
 

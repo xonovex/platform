@@ -55,13 +55,13 @@ spec:
                       description: Maximum allowed timeout for AgentRuns (e.g. "2h0m0s").
                     maxResources:
                       type: object
-                      description: Upper bound for any single container's resource limits.
+                      description: Resource ceilings; every named resource requires an explicit limit, and requests and limits must not exceed the ceiling.
                       x-kubernetes-preserve-unknown-fields: true
                     allowedImages:
                       type: array
                       items:
                         type: string
-                      description: Allowed container image prefixes.
+                      description: Allowed explicit or AgentPolicy-defaulted container image prefixes.
                     allowedRuntimeClassNames:
                       type: array
                       items:

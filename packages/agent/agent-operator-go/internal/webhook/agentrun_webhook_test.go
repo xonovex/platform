@@ -85,12 +85,14 @@ func TestAgentRunWebhook_Validate_NixSpec(t *testing.T) {
 		nix     *agentv1alpha1.NixSpec
 		wantErr bool
 	}{
-		{"valid packages", &agentv1alpha1.NixSpec{NixpkgsRev: "abc", Packages: []string{"ripgrep"}, Image: "ghcr.io/x/agent@sha256:1"}, false},
-		{"valid flake", &agentv1alpha1.NixSpec{NixpkgsRev: "abc", FlakeRef: "/repo", Image: "ghcr.io/x/agent@sha256:1"}, false},
-		{"missing rev", &agentv1alpha1.NixSpec{Packages: []string{"ripgrep"}, Image: "ghcr.io/x/agent@sha256:1"}, true},
-		{"packages and flake", &agentv1alpha1.NixSpec{NixpkgsRev: "abc", Packages: []string{"ripgrep"}, FlakeRef: "/repo", Image: "ghcr.io/x/agent@sha256:1"}, true},
-		{"no source", &agentv1alpha1.NixSpec{NixpkgsRev: "abc", Image: "ghcr.io/x/agent@sha256:1"}, true},
+		{"valid packages", &agentv1alpha1.NixSpec{NixpkgsRev: "abc", Packages: []string{"ripgrep"}, Image: "ghcr.io/x/agent@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}, false},
+		{"valid flake", &agentv1alpha1.NixSpec{NixpkgsRev: "abc", FlakeRef: "/repo", Image: "ghcr.io/x/agent@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}, false},
+		{"missing rev", &agentv1alpha1.NixSpec{Packages: []string{"ripgrep"}, Image: "ghcr.io/x/agent@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}, true},
+		{"packages and flake", &agentv1alpha1.NixSpec{NixpkgsRev: "abc", Packages: []string{"ripgrep"}, FlakeRef: "/repo", Image: "ghcr.io/x/agent@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}, true},
+		{"no source", &agentv1alpha1.NixSpec{NixpkgsRev: "abc", Image: "ghcr.io/x/agent@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}, true},
 		{"missing image", &agentv1alpha1.NixSpec{NixpkgsRev: "abc", Packages: []string{"ripgrep"}}, true},
+		{"moving image tag", &agentv1alpha1.NixSpec{NixpkgsRev: "abc", Packages: []string{"ripgrep"}, Image: "ghcr.io/x/agent:latest"}, true},
+		{"malformed digest", &agentv1alpha1.NixSpec{NixpkgsRev: "abc", Packages: []string{"ripgrep"}, Image: "ghcr.io/x/agent@sha256:not-a-digest"}, true},
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {

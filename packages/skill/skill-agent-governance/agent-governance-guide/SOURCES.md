@@ -6,7 +6,7 @@ The governance contract is an Xonovex architectural synthesis. Sources support c
 
 - **URL:** https://csrc.nist.gov/pubs/sp/800/53/r5/upd1/final
 - **Last reviewed:** 2026-07-14
-- **Used for:** `references/architecture.md`, `references/execution.md`, `references/policy-and-authority.md`, `references/modules.md`, `references/profiles.md`, `references/onboarding.md`, `references/inspect.md`, `references/conformance.md`, `references/drift.md`, `references/module-management.md`
+- **Used for:** `references/architecture.md`, `references/execution.md`, `references/policy-and-authority.md`, `references/modules.md`, `references/profiles.md`, `references/onboarding.md`, `references/inspect.md`, `references/conformance.md`, `references/drift.md`, `references/module-management.md`, `references/external-enforcement.md`, `references/external-enforcement-onboarding.md`
 - **Aspects extracted:** Access, audit, configuration, incident, contingency, and supply-chain control families. Mappings remain contextual.
 
 ## S-NIST-800207 — Zero Trust Architecture
@@ -48,14 +48,14 @@ The governance contract is an Xonovex architectural synthesis. Sources support c
 
 - **URL:** https://www.openpolicyagent.org/docs
 - **Last reviewed:** 2026-07-14
-- **Used for:** `references/policy-and-authority.md`, `references/profiles.md`
-- **Aspects extracted:** Policy decision and enforcement separation while keeping the policy engine optional.
+- **Used for:** `references/policy-and-authority.md`, `references/profiles.md`, `references/external-enforcement.md`, `assets/external-enforcement-fixtures.json`
+- **Aspects extracted:** Policy decision and enforcement separation while keeping the policy engine optional, plus versioned bundles/decisions and operational inputs used by the optional remote policy-provider pattern. Cache, outage, replay-evidence, and fail-closed requirements are Xonovex governance constraints.
 
 ## S-SUPPLY-CHAIN — Executable-module provenance options
 
 - **URLs:** https://slsa.dev/spec/v1.2/ · https://in-toto.io/ · https://theupdateframework.io/ · https://docs.sigstore.dev/
 - **Last reviewed:** 2026-07-14
-- **Used for:** `references/modules.md`, `references/module-trust.md`, `references/module-management.md`, `references/conformance.md`
+- **Used for:** `references/modules.md`, `references/module-trust.md`, `references/module-management.md`, `references/conformance.md`, `references/external-enforcement.md`, `assets/external-enforcement-fixtures.json`
 - **Aspects extracted:** Pinned subjects, verifiable provenance/signatures/digests, secure update metadata, and rollback-aware distribution. Each mechanism remains optional and requires a declared trust policy.
 
 ## S-INVENTORY — Optional AI and governance inventory
@@ -78,6 +78,13 @@ The governance contract is an Xonovex architectural synthesis. Sources support c
 - **Last reviewed:** 2026-07-14
 - **Used for:** `references/architecture.md`, `references/modules.md`, `references/onboarding.md`, `references/module-management.md`
 - **Aspects extracted:** Core-owned ports, native adapters, inward dependencies, and composition-root wiring.
+
+## S-EXTERNAL-ENFORCEMENT — Native external controls
+
+- **URLs:** https://docs.github.com/en/actions/how-tos/reuse-automations/reuse-workflows · https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/about-rulesets · https://docs.github.com/en/actions/how-tos/deploy/configure-and-manage-deployments/manage-environments · https://docs.github.com/en/actions/reference/security/secure-use · https://docs.gitlab.com/ci/components/ · https://docs.gitlab.com/user/application_security/policies/pipeline_execution_policies/ · https://docs.gitlab.com/user/compliance/compliance_frameworks/ · https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/ · https://git-scm.com/docs/githooks · https://git-scm.com/docs/git-config#Documentation/git-config.txt-corehooksPath
+- **Last reviewed:** 2026-07-16
+- **Used for:** `references/external-enforcement.md`, `references/external-enforcement-onboarding.md`, `assets/external-enforcement-fixtures.json`
+- **Aspects extracted:** Native reusable workflow/component mechanisms, immutable pins, ruleset and pipeline-policy layering, protected environments, least-privilege execution, provider-native evidence, admission controls, and tracked local hook configuration. The provider-neutral adapter contract, defense-in-depth rule, transactional onboarding, failure policy, governance-only recipes, and cross-provider mappings are Xonovex architectural synthesis.
 
 ## S-HARNESS-CLAUDE — Claude Code hooks
 

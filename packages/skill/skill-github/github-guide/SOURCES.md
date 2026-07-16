@@ -63,6 +63,20 @@
 - **Last reviewed:** 2026-06-26
 - **Used for:** closing-keyword auto-close-on-default-branch semantics in create.md; the REQUEST_CHANGES blocking + dismissal mechanism (review-post.md) and the conversation-resolution merge gate (review-resolve.md).
 
+## GitHub Actions and external enforcement
+
+- **URLs:**
+  - https://docs.github.com/en/actions/how-tos/reuse-automations/reuse-workflows
+  - https://docs.github.com/en/actions/tutorials/create-actions/create-a-composite-action
+  - https://docs.github.com/en/actions/reference/security/secure-use
+  - https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/about-rulesets
+  - https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets
+  - https://docs.github.com/en/actions/how-tos/deploy/configure-and-manage-deployments/manage-environments
+  - https://docs.github.com/en/actions/how-tos/secure-your-work/use-artifact-attestations/use-artifact-attestations
+- **Last reviewed:** 2026-07-16
+- **Used for:** `references/automation-and-enforcement.md`
+- **Aspects extracted:** `workflow_call` location/input/secret behavior; same-commit and full-SHA references; nested permission attenuation; composite-action scope; full-SHA immutable action pins; least-privilege tokens and untrusted-input handling; aggregated ruleset layering and bypass actors; exact required checks; environment reviewers, self-review prevention, target restrictions and secret release; OIDC/attestation permissions and native evidence. Transaction, failure-policy, exact-revision, and governance-only adoption rules are Xonovex adapter constraints.
+
 ## gh CLI limitations (tracking issues)
 
 - **URLs:**
@@ -79,4 +93,5 @@
 1. Re-fetch the `gh` manual and the REST/GraphQL reference pages above; scan for new/removed flags and fields (especially `gh pr review` gaining inline support, and any REST resolve-thread endpoint).
 2. Re-verify a read call (`gh api user`, `gh api graphql -f query='query{viewer{login}}'`) and one `X-Accepted-GitHub-Permissions` header against a `.../reviews` endpoint.
 3. Re-confirm the fine-grained-PAT scope table (Contents: write to push; resolve needing Contents: read & write).
-4. Bump **Last reviewed** above.
+4. Re-test reusable workflow pin/secret/permission behavior, ruleset layering and required-check source binding, environment approval semantics, and artifact-attestation permissions.
+5. Bump **Last reviewed** above.

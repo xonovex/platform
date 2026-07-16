@@ -1,11 +1,11 @@
 ---
 name: github-guide
-description: "Use when delivering a pull request/review or implementing an optional result-provider adapter on GitHub (github.com or GitHub Enterprise Server) with `gh`/`gh api`. Triggers on `gh pr create`, `gh api .../pulls/.../reviews`, inline review comments, resolveReviewThread, REQUEST_CHANGES, GH_TOKEN/GH_ENTERPRISE_TOKEN scopes, or mapping GitHub Issues to opaque workflow result resolve/read/publish/revise/relate/version capabilities — even when the user doesn't say 'gh' but the repo is hosted on GitHub."
+description: "Use when delivering a pull request/review, configuring native CI/repository enforcement, or implementing an optional result-provider adapter on GitHub (github.com or GitHub Enterprise Server). Triggers on `gh pr create`, inline reviews, resolveReviewThread, reusable workflows/composite actions, SHA pinning, required checks/rulesets, protected environments, attestations, GitHub token permissions, or mapping Issues to opaque workflow result capabilities — even when the user doesn't say 'gh'."
 ---
 
-# GitHub PR & review delivery — quick reference
+# GitHub delivery and enforcement — quick reference
 
-How to realize a pull request and its review on GitHub from the shell. This is the host-**delivery** tier: it does not teach the craft, only how to land it on GitHub.
+How to realize pull request delivery and provider-native external enforcement on GitHub. The delivery operations do not teach review/PR craft; the enforcement operation maps semantic governance intent onto GitHub-native workflow, repository, environment, permission, attestation, and evidence mechanisms.
 
 - _What a good review comment says_ (Conventional Comments labels, blocking vs non-blocking, summary plus inline, cross-linking) belongs to **`code-review-guide`**.
 - _What a good PR description says_ (sizing, how-tested, tradeoffs, self-review) belongs to **`pull-request-guide`**.
@@ -36,6 +36,7 @@ When this skill fires:
 - **Resolve a thread** — GraphQL-only `resolveReviewThread` by thread node id (`PRRT_…`), matched by id never by line; list threads with `pullRequest.reviewThreads`. See [references/review-resolve.md](references/review-resolve.md).
 - **Scope the token per operation** — push needs Contents: write; open-PR / post-review need Pull requests: write; resolve also needs Contents: read & write on a fine-grained token. See [references/auth.md](references/auth.md).
 - **Adapt Issues as an optional result provider** — preserve GitHub-native issue/comment references, disclose freshness-only versioning, and never make GitHub a core workflow dependency. See [references/provider-conformance.md](references/provider-conformance.md).
+- **Enforce with native automation** — use SHA-pinned reusable workflows/actions, required checks and layered rulesets, protected environments, least-privilege tokens/OIDC, attestations, and provider-native evidence. See [references/automation-and-enforcement.md](references/automation-and-enforcement.md).
 
 ## Gotchas
 
@@ -91,3 +92,4 @@ Each reference is a trigger — read only the one matching the user's intent; do
 - Read [references/review-post.md](references/review-post.md) — Load when publishing a review: the single `.../reviews` object, the exact path/line/side inline anchor model, the REQUEST_CHANGES blocking mechanism, and deep-linking from `html_url`.
 - Read [references/review-resolve.md](references/review-resolve.md) — Load when resolving/replying on threads: listing `reviewThreads`, matching a finding to a thread by id (never line), the GraphQL `resolveReviewThread` mutation, in-thread replies, and the conversation-resolution merge gate.
 - Read [references/provider-conformance.md](references/provider-conformance.md) — Load when mapping GitHub Issues/comments to the optional workflow result-provider port or testing opaque-reference, restart, revision, retry, relationship, and failure behavior.
+- Read [references/automation-and-enforcement.md](references/automation-and-enforcement.md) — Load when configuring or onboarding reusable workflows/actions, required checks, rulesets, protected environments, token/OIDC permissions, attestations, evidence, rollback, or governance-only GitHub adoption.

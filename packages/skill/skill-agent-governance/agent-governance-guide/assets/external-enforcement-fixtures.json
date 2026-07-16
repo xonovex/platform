@@ -1,0 +1,242 @@
+{
+  "version": "1.0.0",
+  "platformFixtures": [
+    {
+      "id": "github-native-defense-in-depth",
+      "platform": "github",
+      "expectedValid": true,
+      "moduleRef": "8f4cc72a789d4d2f385f87f6cb97a39118980e0c",
+      "requiredCheck": "xonovex/governance",
+      "rulesetActive": true,
+      "bypassActors": [],
+      "environment": {
+        "name": "production",
+        "requiredReviewer": true,
+        "preventSelfReview": true
+      },
+      "permissions": {
+        "contents": "read",
+        "id-token": "write",
+        "attestations": "write"
+      },
+      "evidence": ["check-run", "artifact-digest", "attestation", "deployment"]
+    },
+    {
+      "id": "github-moving-workflow-ref",
+      "platform": "github",
+      "expectedValid": false,
+      "expectedCode": "immutable-module-pin",
+      "moduleRef": "main",
+      "requiredCheck": "xonovex/governance",
+      "rulesetActive": true,
+      "bypassActors": [],
+      "environment": {
+        "name": "production",
+        "requiredReviewer": true,
+        "preventSelfReview": true
+      },
+      "permissions": {
+        "contents": "read"
+      },
+      "evidence": ["check-run"]
+    },
+    {
+      "id": "gitlab-native-defense-in-depth",
+      "platform": "gitlab",
+      "expectedValid": true,
+      "componentRef": "e3262fdd0914fa823210cdb79a8c421e2cef79d8",
+      "typedInputs": true,
+      "componentTested": true,
+      "configurableJobName": true,
+      "pipelineExecutionPolicy": true,
+      "jobConflictStrategy": "never",
+      "protectedEnvironment": true,
+      "evidence": ["pipeline", "job", "artifact-digest", "deployment"]
+    },
+    {
+      "id": "gitlab-ambiguous-job-name",
+      "platform": "gitlab",
+      "expectedValid": false,
+      "expectedCode": "ambiguous-job-name",
+      "componentRef": "e3262fdd0914fa823210cdb79a8c421e2cef79d8",
+      "typedInputs": true,
+      "componentTested": true,
+      "configurableJobName": false,
+      "pipelineExecutionPolicy": true,
+      "jobConflictStrategy": "on_conflict",
+      "protectedEnvironment": true,
+      "evidence": ["pipeline", "job"]
+    },
+    {
+      "id": "kubernetes-agentpolicy-resource-bypass-denied",
+      "platform": "kubernetes",
+      "expectedValid": true,
+      "agentPolicyCount": 1,
+      "policyLookupFailure": "deny",
+      "runtimeClass": "kata",
+      "securityContextRequired": true,
+      "networkPolicyRequired": true,
+      "maxTimeout": "1h",
+      "maxResources": {
+        "cpu": "500m",
+        "memory": "1Gi"
+      },
+      "attempt": {
+        "cpuLimit": "2",
+        "expectedOutcome": "deny"
+      },
+      "toolchainPinned": true,
+      "namespaceQuota": true,
+      "evidence": [
+        "admission-verdict",
+        "object-generation",
+        "policy-resource-version"
+      ]
+    }
+  ],
+  "compositionCases": [
+    {
+      "id": "client-hook-cannot-be-mandatory",
+      "expectedValid": false,
+      "expectedCode": "bypassable-enforcement",
+      "mandatory": true,
+      "enforcementPoints": ["client-hook"],
+      "exactRevision": false,
+      "failureBehavior": "advisory"
+    },
+    {
+      "id": "harness-and-required-ci-are-independent",
+      "expectedValid": true,
+      "mandatory": true,
+      "enforcementPoints": ["harness-hook", "required-ci-check"],
+      "exactRevision": true,
+      "failureBehavior": "fail-closed"
+    },
+    {
+      "id": "harness-bypass-without-external-layer",
+      "expectedValid": false,
+      "expectedCode": "independent-layer-required",
+      "mandatory": true,
+      "enforcementPoints": ["harness-hook"],
+      "exactRevision": true,
+      "failureBehavior": "fail-closed"
+    },
+    {
+      "id": "release-protected-by-external-gate",
+      "expectedValid": true,
+      "mandatory": true,
+      "privilegedOperation": "release",
+      "enforcementPoints": [
+        "required-ci-check",
+        "protected-environment",
+        "provider-permission"
+      ],
+      "exactRevision": true,
+      "authorizedActor": true,
+      "rollback": true,
+      "failureBehavior": "fail-closed"
+    },
+    {
+      "id": "release-chat-approval-only",
+      "expectedValid": false,
+      "expectedCode": "privileged-gate-required",
+      "mandatory": true,
+      "privilegedOperation": "release",
+      "enforcementPoints": ["chat-approval"],
+      "exactRevision": true,
+      "authorizedActor": true,
+      "rollback": true,
+      "failureBehavior": "fail-closed"
+    }
+  ],
+  "policyServiceCases": [
+    {
+      "id": "mandatory-outage-denies",
+      "expectedValid": true,
+      "mandatory": true,
+      "outageOutcome": "deny",
+      "cache": {
+        "authenticated": true,
+        "subjectBound": true,
+        "policyVersion": "governance-7",
+        "expired": false
+      },
+      "historicalEvidence": {
+        "decisionRef": "decision-91",
+        "inputDigest": "sha256:af91",
+        "policyVersion": "governance-7"
+      }
+    },
+    {
+      "id": "mandatory-outage-allows",
+      "expectedValid": false,
+      "expectedCode": "mandatory-outage-must-deny",
+      "mandatory": true,
+      "outageOutcome": "allow",
+      "cache": {
+        "authenticated": true,
+        "subjectBound": true,
+        "policyVersion": "governance-7",
+        "expired": false
+      },
+      "historicalEvidence": {
+        "decisionRef": "decision-92",
+        "inputDigest": "sha256:af92",
+        "policyVersion": "governance-7"
+      }
+    },
+    {
+      "id": "expired-cache-cannot-authorize",
+      "expectedValid": false,
+      "expectedCode": "invalid-decision-cache",
+      "mandatory": true,
+      "outageOutcome": "deny",
+      "cache": {
+        "authenticated": true,
+        "subjectBound": true,
+        "policyVersion": "governance-7",
+        "expired": true
+      },
+      "historicalEvidence": {
+        "decisionRef": "decision-93",
+        "inputDigest": "sha256:af93",
+        "policyVersion": "governance-7"
+      }
+    }
+  ],
+  "onboardingCases": [
+    {
+      "id": "previewable-reversible-native-onboarding",
+      "expectedValid": true,
+      "steps": [
+        "discover",
+        "assess",
+        "propose",
+        "preview",
+        "authorize",
+        "apply",
+        "verify",
+        "record",
+        "operate"
+      ],
+      "nativeChanges": true,
+      "permissionsShown": true,
+      "dataFlowsShown": true,
+      "rollback": true,
+      "negativeProbe": true,
+      "driftOwner": "platform-security"
+    },
+    {
+      "id": "opaque-apply-without-preview",
+      "expectedValid": false,
+      "expectedCode": "incomplete-onboarding-transaction",
+      "steps": ["apply", "verify"],
+      "nativeChanges": false,
+      "permissionsShown": false,
+      "dataFlowsShown": false,
+      "rollback": false,
+      "negativeProbe": false,
+      "driftOwner": ""
+    }
+  ]
+}

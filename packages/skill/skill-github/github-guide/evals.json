@@ -43,6 +43,17 @@
         "Classifies issue/comment updated_at as a freshness token rather than an immutable revision and binds exact-revision assurance to an immutable commit/check/artifact reference",
         "Rejects silent fallback to a local file or another provider for side effects when the explicitly selected GitHub provider is unavailable"
       ]
+    },
+    {
+      "id": 6,
+      "prompt": "Onboard mandatory governance checks and protected production releases across our GitHub organization. We want reusable automation rather than copied YAML, immutable dependencies, least privilege, a merge gate that developers cannot omit, deployment approval, attestations, preview/rollback, and evidence. Explain the native design and the bypass tests.",
+      "assertions": [
+        "Uses a reusable workflow (and composite action only for reusable steps), pins cross-repository workflows/actions to full commit SHAs, and gives the reusable workflow a stable required-check identity",
+        "Enforces the check with an active ruleset or branch protection, explains that matching rulesets layer with the most restrictive duplicate rule, and inventories/tests every bypass actor plus omitted/renamed/spoofed/skipped checks",
+        "Places target-changing release/deployment work behind a protected environment with authorized review, target restrictions, least-privilege short-lived credentials, and exact artifact/revision binding",
+        "Publishes provider-native workflow/check/artifact-attestation/deployment evidence and separates decision, enforcement, target mutation, and verification records",
+        "Uses discover, preview, authorize, apply, re-read/negative-probe verify, rollback, and drift steps without requiring an agent harness or lifecycle module"
+      ]
     }
   ]
 }

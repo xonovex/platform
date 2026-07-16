@@ -2,6 +2,7 @@ package webhook
 
 import (
 	"context"
+	"encoding/hex"
 	"fmt"
 	"strings"
 	"time"
@@ -35,7 +36,15 @@ func (w *AgentRunWebhook) SetupWebhookWithManager(mgr ctrl.Manager) error {
 }
 
 // Default implements admission.Defaulter
-func (w *AgentRunWebhook) Default(_ context.Context, run *agentv1alpha1.AgentRun) error {
+func (w *AgentRunWebhook) Default(ctx context.Context, run *agentv1alpha1.AgentRun) error {
+	policy, err := w.namespacePolicy(ctx, run.Namespace)
+	if err != nil {
+		return err
+	}
+	if policy != nil {
+		applyPolicyDefaults(run, policy)
+	}
+
 	if run.Spec.Timeout == nil {
 		defaultTimeout := metav1.Duration{Duration: time.Hour}
 		run.Spec.Timeout = &defaultTimeout
@@ -126,21 +135,51 @@ func (w *AgentRunWebhook) validate(ctx context.Context, run *agentv1alpha1.Agent
 		}
 	}
 
-	// Look up AgentPolicy in the namespace
-	if w.Client != nil {
-		var policyList agentv1alpha1.AgentPolicyList
-		if err := w.Client.List(ctx, &policyList, client.InNamespace(run.Namespace)); err != nil {
-			warnings = append(warnings, "AgentPolicy lookup failed: "+err.Error())
-			return warnings, nil
-		}
-		if len(policyList.Items) > 0 {
-			if err := enforcePolicy(run, &policyList.Items[0]); err != nil {
-				return nil, err
-			}
+	policy, err := w.namespacePolicy(ctx, run.Namespace)
+	if err != nil {
+		return nil, err
+	}
+	if policy != nil {
+		if err := enforcePolicy(run, policy); err != nil {
+			return nil, err
 		}
 	}
 
 	return warnings, nil
+}
+
+func (w *AgentRunWebhook) namespacePolicy(ctx context.Context, namespace string) (*agentv1alpha1.AgentPolicy, error) {
+	if w.Client == nil {
+		return nil, nil
+	}
+
+	var policyList agentv1alpha1.AgentPolicyList
+	if err := w.Client.List(ctx, &policyList, client.InNamespace(namespace)); err != nil {
+		return nil, fmt.Errorf("list AgentPolicy in namespace %q: %w", namespace, err)
+	}
+
+	switch len(policyList.Items) {
+	case 0:
+		return nil, nil
+	case 1:
+		return policyList.Items[0].DeepCopy(), nil
+	default:
+		return nil, fmt.Errorf("namespace %q has %d AgentPolicies; exactly one is supported", namespace, len(policyList.Items))
+	}
+}
+
+func applyPolicyDefaults(run *agentv1alpha1.AgentRun, policy *agentv1alpha1.AgentPolicy) {
+	defaults := policy.Spec.Defaults
+	if run.Spec.Image == "" && defaults.Image != "" {
+		run.Spec.Image = defaults.Image
+	}
+	if run.Spec.Timeout == nil && defaults.Timeout != nil {
+		run.Spec.Timeout = defaults.Timeout.DeepCopy()
+	}
+	if run.Spec.RuntimeClassName == nil && defaults.RuntimeClassName != nil {
+		runtimeClassName := *defaults.RuntimeClassName
+		run.Spec.RuntimeClassName = &runtimeClassName
+	}
 }
 
 // validateNixSpec validates the nix toolchain: a pinned rev, exactly one source
@@ -163,6 +202,13 @@ func validateNixSpec(nix *agentv1alpha1.NixSpec) error {
 	}
 	if nix.Image == "" {
 		return fmt.Errorf("nix toolchain requires a pre-built pinned image (build-time provisioning)")
+	}
+	imageParts := strings.SplitN(nix.Image, "@sha256:", 2)
+	if len(imageParts) != 2 || imageParts[0] == "" || len(imageParts[1]) != 64 {
+		return fmt.Errorf("nix toolchain image must use an immutable @sha256: digest")
+	}
+	if _, err := hex.DecodeString(imageParts[1]); err != nil {
+		return fmt.Errorf("nix toolchain image must use an immutable @sha256: digest")
 	}
 	return nil
 }
@@ -211,14 +257,37 @@ func enforcePolicy(run *agentv1alpha1.AgentRun, policy *agentv1alpha1.AgentPolic
 	}
 
 	// Enforce max timeout
-	if e.MaxTimeout != nil && run.Spec.Timeout != nil {
+	if e.MaxTimeout != nil {
+		if run.Spec.Timeout == nil {
+			return fmt.Errorf("policy requires an explicit or default timeout")
+		}
 		if run.Spec.Timeout.Duration > e.MaxTimeout.Duration {
 			return fmt.Errorf("timeout %v exceeds policy maximum %v", run.Spec.Timeout.Duration, e.MaxTimeout.Duration)
 		}
 	}
 
+	// Enforce resource ceilings. A missing limit is unbounded from the policy's
+	// perspective, so every resource named by MaxResources requires a limit.
+	if e.MaxResources != nil {
+		for name, maximum := range *e.MaxResources {
+			limit, found := run.Spec.Resources.Limits[name]
+			if !found {
+				return fmt.Errorf("policy requires a resource limit for %s", name)
+			}
+			if limit.Cmp(maximum) > 0 {
+				return fmt.Errorf("resource limit %s=%s exceeds policy maximum %s", name, limit.String(), maximum.String())
+			}
+			if request, found := run.Spec.Resources.Requests[name]; found && request.Cmp(maximum) > 0 {
+				return fmt.Errorf("resource request %s=%s exceeds policy maximum %s", name, request.String(), maximum.String())
+			}
+		}
+	}
+
 	// Enforce allowed images
-	if len(e.AllowedImages) > 0 && run.Spec.Image != "" {
+	if len(e.AllowedImages) > 0 {
+		if run.Spec.Image == "" {
+			return fmt.Errorf("policy requires an explicit or default image")
+		}
 		allowed := false
 		for _, prefix := range e.AllowedImages {
 			if strings.HasPrefix(run.Spec.Image, prefix) {

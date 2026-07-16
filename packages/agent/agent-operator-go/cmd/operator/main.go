@@ -80,6 +80,10 @@ func main() {
 		setupLog.Error(err, "unable to set up webhook", "webhook", "AgentRun")
 		os.Exit(1)
 	}
+	if err = (&webhook.AgentToolchainWebhook{}).SetupWebhookWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to set up webhook", "webhook", "AgentToolchain")
+		os.Exit(1)
+	}
 
 	if err := mgr.AddHealthzCheck("healthz", healthz.Ping); err != nil {
 		setupLog.Error(err, "unable to set up health check")

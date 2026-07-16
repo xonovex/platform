@@ -18,6 +18,24 @@
     "rationale": "transactional advisory onboarding"
   },
   {
+    "query": "map this mandatory policy to independent CI, repository rules, protected environments, admission, and provider permissions",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "provider-neutral external enforcement adapter"
+  },
+  {
+    "query": "define fail-closed cached OPA decisions with historical policy-version evidence",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "optional policy decision service and outage behavior"
+  },
+  {
+    "query": "adopt governance-only CI and Kubernetes admission controls without installing harness or lifecycle modules",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "governance-only external enforcement onboarding"
+  },
+  {
     "query": "validate the semantic fields in this PlanningResult",
     "should_trigger": false,
     "split": "train",
@@ -28,5 +46,11 @@
     "should_trigger": false,
     "split": "validation",
     "rationale": "near-miss owned by testing-guide"
+  },
+  {
+    "query": "configure a GitHub ruleset and reusable workflow with exact API fields",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near-miss: provider-specific mechanics belong to github-guide after GitHub is selected"
   }
 ]

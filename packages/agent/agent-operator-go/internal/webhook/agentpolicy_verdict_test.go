@@ -6,6 +6,7 @@ import (
 	"time"
 
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	agentv1alpha1 "github.com/xonovex/platform/packages/agent/agent-operator-go/api/v1alpha1"
@@ -79,6 +80,16 @@ func TestEnforcePolicy_VerdictGoldens(t *testing.T) {
 			enforced:   agentv1alpha1.AgentPolicyEnforced{AllowedImages: []string{"ghcr.io/xonovex/"}},
 			run:        agentv1alpha1.AgentRunSpec{Image: "docker.io/evil/img:latest"},
 			wantReason: "is not in the allowed images list",
+		},
+		{
+			name: "resource-ceiling-bypass-denied",
+			enforced: agentv1alpha1.AgentPolicyEnforced{MaxResources: &corev1.ResourceList{
+				corev1.ResourceCPU: resource.MustParse("500m"),
+			}},
+			run: agentv1alpha1.AgentRunSpec{Resources: corev1.ResourceRequirements{Limits: corev1.ResourceList{
+				corev1.ResourceCPU: resource.MustParse("2"),
+			}}},
+			wantReason: "exceeds policy maximum",
 		},
 	}
 

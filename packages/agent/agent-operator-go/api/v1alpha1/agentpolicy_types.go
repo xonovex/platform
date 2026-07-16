@@ -26,11 +26,13 @@ type AgentPolicyEnforced struct {
 	// MaxTimeout is the maximum allowed timeout for AgentRuns.
 	MaxTimeout *metav1.Duration `json:"maxTimeout,omitempty"`
 
-	// MaxResources defines the upper bound for any single container's resource limits.
+	// MaxResources defines resource ceilings. Every named resource requires an
+	// explicit limit; requests and limits must not exceed the ceiling.
 	MaxResources *corev1.ResourceList `json:"maxResources,omitempty"`
 
-	// AllowedImages is a list of allowed container image prefixes.
-	// If set, AgentRun.Spec.Image must match one of these prefixes.
+	// AllowedImages is a list of allowed container image prefixes. If set, the
+	// AgentRun must carry an explicit image or receive an AgentPolicy default,
+	// and the resulting image must match one of these prefixes.
 	AllowedImages []string `json:"allowedImages,omitempty"`
 
 	// AllowedRuntimeClassNames lists permitted runtimeClassNames.

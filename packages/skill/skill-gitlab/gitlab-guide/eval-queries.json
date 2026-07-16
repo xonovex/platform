@@ -66,6 +66,18 @@
     "rationale": "GitLab-specific adapter for the storage-neutral result-provider port"
   },
   {
+    "query": "onboard a SHA-pinned GitLab CI/CD component with typed inputs and enforce it through a group pipeline execution policy",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "GitLab-native reusable CI and centrally injected policy enforcement"
+  },
+  {
+    "query": "how do GitLab pipeline execution policy job suffix conflicts and project versus group policy merge order work",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "GitLab-native policy precedence and naming behavior"
+  },
+  {
     "query": "open a pull request and request reviewers on a GitHub-hosted repo with gh",
     "should_trigger": false,
     "split": "train",
@@ -94,5 +106,11 @@
     "should_trigger": false,
     "split": "validation",
     "rationale": "near-miss: provider semantics belong to workflow-guide and agent-governance-guide until GitLab is selected"
+  },
+  {
+    "query": "define a platform-neutral external-enforcement adapter without selecting GitLab or another provider",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near-miss: semantic external enforcement belongs to agent-governance-guide until GitLab is selected"
   }
 ]

@@ -1,11 +1,11 @@
 ---
 name: gitlab-guide
-description: "Use when delivering a merge request/review or implementing an optional result-provider adapter on GitLab (GitLab.com, self-managed, or Dedicated) with `glab`/the API. Triggers on `glab mr create`, inline MR discussions, base/start/head SHAs, resolving threads, approvals, GitLab token scopes, or mapping GitLab Issues to opaque workflow result resolve/read/publish/revise/relate/version capabilities — even when the user doesn't say 'glab'."
+description: "Use when delivering a merge request/review, configuring native CI/policy enforcement, or implementing an optional result-provider adapter on GitLab (GitLab.com, self-managed, or Dedicated). Triggers on `glab mr create`, inline discussions, approvals, CI/CD components/typed inputs, SHA pinning, pipeline execution policies, compliance frameworks, protected environments, GitLab token scopes, or mapping Issues to opaque workflow result capabilities — even when the user doesn't say 'glab'."
 ---
 
-# GitLab MR & review delivery — quick reference
+# GitLab delivery and enforcement — quick reference
 
-How to realize a merge request and its review on GitLab from the shell with the official `glab` CLI (and raw REST where glab has no flag). Host-delivery only — the review craft (Conventional Comments labels, blocking vs non-blocking) is `code-review-guide`'s, the MR description craft (what/why/how, sizing, test notes) is `pull-request-guide`'s, the local-git push/rebase are `git-guide`'s; this skill wires them onto GitLab (scopes, anchors, gating).
+How to realize merge request delivery and provider-native external enforcement on GitLab. The delivery operations wire finished review/MR artifacts onto GitLab; the enforcement operation maps semantic governance intent onto GitLab-native components, pipeline policies, compliance frameworks, protected environments, permissions, and evidence.
 
 The one thing to internalize: **a GitLab "review" is not one object — you assemble it from a plain summary note, individual position-anchored discussion threads, and a separate approve/withhold signal, and almost every write needs the coarse, all-or-nothing `api` scope plus a sufficient role, so plan around the missing atomic-review endpoint and the absent write-only scope.**
 
@@ -31,6 +31,7 @@ Before any write:
 - **Deep-link** — MR notes carry no `web_url`; build `<mr_url>#note_<note_id>` from the returned note `id`. See [references/review-post.md](references/review-post.md).
 - **Auth & host** — `api` scope for writes (`read_api` reads), `GITLAB_HOST` targets self-managed, `GITLAB_TOKEN` is the general auth token. See [references/auth.md](references/auth.md).
 - **Adapt Issues as an optional result provider** — preserve GitLab-native issue/note references, disclose edition and freshness-only version limits, and never make GitLab a core workflow dependency. See [references/provider-conformance.md](references/provider-conformance.md).
+- **Enforce with native automation** — use pinned, typed, tested CI/CD components, pipeline execution policies, compliance frameworks, protected environments, least-privilege credentials, and provider-native evidence. See [references/automation-and-enforcement.md](references/automation-and-enforcement.md).
 
 ## Gotchas
 
@@ -88,3 +89,4 @@ Each reference is a trigger — read it only when the user's intent matches; do 
 - Read [references/review-post.md](references/review-post.md) — Load when publishing a review: the summary note, the exact inline position model (three SHAs + conditional line keys), verifying `DiffNote`, the blocking mechanism, and the `#note_<id>` deep-link.
 - Read [references/review-resolve.md](references/review-resolve.md) — Load when listing threads, matching a finding to a discussion by id, resolving via the REST PUT, replying in-thread, and the merge-gating effect.
 - Read [references/provider-conformance.md](references/provider-conformance.md) — Load when mapping GitLab Issues/notes to the optional workflow result-provider port or testing opaque-reference, restart, revision, retry, relationship, edition, and failure behavior.
+- Read [references/automation-and-enforcement.md](references/automation-and-enforcement.md) — Load when configuring or onboarding CI/CD components, typed inputs, pipeline execution policies, compliance frameworks, protected environments, policy projects, evidence, rollback, or governance-only GitLab adoption.

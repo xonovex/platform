@@ -210,7 +210,49 @@ spec:
 | `nix.flakeRef` / `nix.shell` | string | Project flake + devShell (project-flake source; mutually exclusive with `packages`) |
 | `nix.image` | string | Pre-built, digest-pinned agent OCI image the pod runs (required; satisfies `RequirePinnedProvision`) |
 
-The `nix` toolchain selects the pre-built image as the pod image — the **same content-addressed store-path closure** the CLI resolves (built from the same `flake.lock` + `nix/agent-env.nix`, verified with `nix path-info -r`). The pod starts by image pull: **no `nix-env` emptyDir, no `nixos/nix` init container, no per-pod `nix profile install`**. The webhook rejects a `NixSpec` missing `nixpkgsRev` or `image`. Build/push the image with `npx moon run agent-operator-go:agent-image-build` (→ `nix build .#legacyPackages.<sys>.agentImage` + skopeo push).
+The `nix` toolchain selects the pre-built image as the pod image — the **same content-addressed store-path closure** the CLI resolves (built from the same `flake.lock` + `nix/agent-env.nix`, verified with `nix path-info -r`). The pod starts by image pull: **no `nix-env` emptyDir, no `nixos/nix` init container, no per-pod `nix profile install`**. The AgentRun and AgentToolchain webhooks reject a `NixSpec` without `nixpkgsRev`, exactly one packages/flake source, and an `@sha256:` image digest. Build/push the image with `npx moon run agent-operator-go:agent-image-build` (→ `nix build .#legacyPackages.<sys>.agentImage` + skopeo push).
+
+### AgentPolicy
+
+Namespace-scoped admission policy for AgentRuns. Use at most one AgentPolicy per namespace; policy lookup failure or multiple policies reject admission because the effective authority would be unknown. A namespace without AgentPolicy receives the operator's baseline hardening but no additional policy constraints.
+
+```yaml
+apiVersion: agent.xonovex.com/v1alpha1
+kind: AgentPolicy
+metadata:
+  name: agent-governance
+  namespace: ai-agents
+spec:
+  enforced:
+    runtimeClassName: kata
+    allowedRuntimeClassNames: [kata, gvisor]
+    requireSecurityContext: true
+    requireNetworkPolicy: true
+    maxTimeout: 1h
+    maxResources:
+      cpu: "2"
+      memory: 4Gi
+    allowedImages:
+      - ghcr.io/example/agents/
+  defaults:
+    image: ghcr.io/example/agents/runtime@sha256:<digest>
+    timeout: 30m
+    runtimeClassName: kata
+```
+
+| Governance intent | Native admission behavior | Independent verification |
+| --- | --- | --- |
+| Runtime isolation | Requires or allowlists `runtimeClassName` | Verify the cluster RuntimeClass and runtime implementation |
+| Container hardening | Rejects explicit privilege escalation and root weakening | Inspect the generated Pod security context and cluster admission policy |
+| Network restriction | Rejects `networkPolicy.disabled: true` when required | Verify generated NetworkPolicy behavior with the installed network plugin |
+| Duration bound | Requires an explicit/policy-defaulted timeout at or below `maxTimeout` | Observe Job timeout and terminal status |
+| Resource bound | Requires a limit for each `maxResources` entry; rejects requests/limits above it | Keep namespace LimitRange and ResourceQuota as an independent layer |
+| Image restriction | Requires an explicit/policy-defaulted image matching `allowedImages` | Add digest/signature/provenance admission when prefix allowlisting is insufficient |
+| Toolchain pinning | AgentToolchain/inline Nix validation requires revision, source, and image digest | Verify registry digest and the built closure provenance |
+
+Policy defaults are applied before built-in timeout defaulting. Fields resolved later from an AgentHarness are not available to the AgentRun admission decision, so a mandatory image/resource/runtime constraint must be explicit on AgentRun or supplied by AgentPolicy defaults.
+
+Admission configuration and the webhook endpoint must be reachable for these controls to enforce. Verify installation with negative probes for a wrong runtime class, disabled network policy, excessive timeout/resource limit, disallowed or missing image, moving Nix image tag, policy API outage, and duplicate namespace policies. An accepted object is admission evidence only; it does not prove the runtime, network, registry, or quota layer behaved correctly.
 
 ## Installation
 
@@ -756,12 +798,10 @@ go test -tags=e2e_coco -v -timeout=600s ./test/e2e-coco/
 
 ### What the tests cover
 
-- **Unit (68 tests):** Builders (PVC, Job, containers, env vars, workspace PVC/Job/worktree), webhooks (defaulting and validation for all CRDs including workspaceRef rules), resolvers (harness, provider, workspace, toolchain).
-- **Integration (20 tests):** Reconciler logic against a real API server. PVC/Job creation, phase transitions (Running, Succeeded, Failed, TimedOut), provider resolution, AgentHarness defaults, terminal phase skipping, AgentWorkspace PVC creation, workspace Ready/Failed transitions, AgentRun with workspaceRef waiting for workspace Ready.
-- **E2E (7 tests):** Full cluster behavior. Pod scheduling, PVC binding, init container failure propagation, owner reference garbage collection, Docker image deployment with health probe validation, multi-agent workspace with concurrent runs, full-cycle pipeline (git clone + fake agent binary -> Succeeded).
-- **E2E gVisor (5 tests):** Sandbox isolation verification (dmesg gVisor banner), runtimeClassName propagation to Job/Pod, AgentHarness default inheritance, full workflow (Secret + Provider + Harness + git clone + agent -> Succeeded inside gVisor), workspace-based run (init Job has no runtimeClassName, agent Job does).
-- **E2E Kata (4 tests):** VM isolation verification (guest kernel differs from host, /dev/pmem0), runtimeClassName propagation to Job/Pod, AgentHarness default inheritance, full workflow (Secret + Provider + Harness + git clone + agent -> Succeeded inside Kata VM, skips in unprivileged kind).
-- **E2E CoCo (5 tests):** Confidential Containers runtimeClassName propagation (kata-cc, kata-tdx), AgentHarness default inheritance, full workflow (Secret + Provider + git clone + agent -> Succeeded with kata-cc), workspace-based run (init Job has no runtimeClassName, agent Job does).
+- **Unit:** Builders (PVC, Job, containers, env vars, workspace PVC/Job/worktree), policy/admission bypass cases, webhooks, resolvers, providers, and toolchains.
+- **Integration:** Reconciler logic against a real API server, including resource creation, phase transitions, provider resolution, harness defaults, terminal phases, and shared workspaces.
+- **E2E:** Full cluster scheduling, storage, initialization, owner cleanup, image deployment, multi-agent workspaces, and the full agent pipeline.
+- **E2E gVisor/Kata/CoCo:** RuntimeClass propagation, harness defaults, complete runs, workspace paths, and runtime-specific isolation evidence where the environment supports it.
 
 ## Architecture
 

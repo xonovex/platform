@@ -66,6 +66,18 @@
     "rationale": "GitHub-specific adapter for the storage-neutral result-provider port"
   },
   {
+    "query": "onboard a SHA-pinned reusable GitHub Actions workflow as a required ruleset check with a protected production environment",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "GitHub-native reusable CI, repository, and deployment enforcement"
+  },
+  {
+    "query": "why can this GitHub ruleset be bypassed and how do matching rulesets and required checks combine",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "GitHub-native ruleset layering and bypass behavior"
+  },
+  {
     "query": "open a merge request on a GitLab-hosted repo with glab and request reviewers",
     "should_trigger": false,
     "split": "train",
@@ -94,5 +106,11 @@
     "should_trigger": false,
     "split": "validation",
     "rationale": "near-miss: provider semantics belong to workflow-guide until GitHub is selected"
+  },
+  {
+    "query": "define a platform-neutral external-enforcement adapter without selecting GitHub or another provider",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near-miss: semantic external enforcement belongs to agent-governance-guide until GitHub is selected"
   }
 ]

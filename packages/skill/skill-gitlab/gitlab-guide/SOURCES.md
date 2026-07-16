@@ -31,6 +31,13 @@
 - **Last reviewed:** 2026-06-26
 - **Used for:** role requirements (>= Developer / MR author / eligible approver), the reviewer "Request changes" state being Premium/Ultimate and not a REST object, `only_allow_merge_if_all_discussions_are_resolved` merge gating (threads block, single comments do not), auto-resolve-on-outdated behavior, and `Closes/Fixes/Resolves #N` issue-closing into the default branch.
 
+## GitLab CI/CD and external enforcement
+
+- **URLs:** https://docs.gitlab.com/ci/components/ · https://docs.gitlab.com/ci/yaml/inputs/ · https://docs.gitlab.com/user/application_security/policies/pipeline_execution_policies/ · https://docs.gitlab.com/user/compliance/compliance_frameworks/ · https://docs.gitlab.com/ci/environments/protected_environments/ · https://docs.gitlab.com/ci/environments/deployment_approvals/ · https://docs.gitlab.com/ci/jobs/job_artifacts/
+- **Last reviewed:** 2026-07-16
+- **Used for:** `references/automation-and-enforcement.md`
+- **Aspects extracted:** Component layout, typed inputs, configurable job naming, commit/release/partial/latest references, component tests and catalog release/security guidance; pipeline-policy application without project CI, job-conflict suffix behavior, project/project-policy/group-policy merge order, reserved stages, injection strategies and failure modes; compliance-framework scope; protected-environment/deployment approval and provider-native pipeline/job/artifact/deployment evidence. Transaction, exact-revision, failure-policy, governance-only adoption, and no-certification claims are Xonovex adapter constraints.
+
 ## glab tracking issues
 
 - **URLs:** https://gitlab.com/gitlab-org/cli/-/work_items/7646 · https://gitlab.com/gitlab-org/cli/-/issues/7999
@@ -42,4 +49,5 @@
 1. Re-check the glab CLI docs for renamed flags / env vars (the `GLAB_` prefix migration) and whether the `glab mr note` resolve/list subcommands are still EXPERIMENTAL.
 2. Re-verify the Discussions API position fields and the `DiffNote` downgrade behavior, and confirm `read_api` vs `api` scope split and CI_JOB_TOKEN read-only status are unchanged.
 3. Re-run a read smoke test (`glab auth status` + `glab mr list`) against a real instance.
-4. Bump each **Last reviewed** above.
+4. Re-test component input/pin/catalog behavior, pipeline-policy merge/name/variable semantics, compliance-framework scope, and protected-environment approval behavior against each supported edition/version.
+5. Bump each **Last reviewed** above.

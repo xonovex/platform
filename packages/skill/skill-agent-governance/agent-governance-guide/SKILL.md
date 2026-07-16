@@ -24,6 +24,8 @@ Compose policy, execution, enforcement, enablement, evidence, and trust without 
 - **Evaluate drift** — compare intended and observed versions, capabilities, policy, evidence freshness, and native configuration — see [references/drift.md](references/drift.md)
 - **Manage modules** — list, inspect, preview, enable, disable, upgrade, or remove modules through lifecycle-safe native adapters — see [references/module-management.md](references/module-management.md)
 - **Validate providers** — check policy, configuration, evidence, replay, privacy, rollback, and drift ports without requiring one engine or format — see [references/provider-contracts.md](references/provider-contracts.md)
+- **Adapt external enforcement** — map semantic policy intents onto CI, repository, deployment, admission, provider-permission, or policy-service controls — see [references/external-enforcement.md](references/external-enforcement.md)
+- **Onboard external controls** — discover, preview, apply, verify, roll back, and adopt provider-native controls without requiring harness or workflow modules — see [references/external-enforcement-onboarding.md](references/external-enforcement-onboarding.md)
 - **Adapt harnesses** — map semantic event intents to versioned native capabilities without inventing a universal hook file — see [references/harness-adapters.md](references/harness-adapters.md)
 - **Onboard harness modules** — inspect, preview, authorize, apply, verify, roll back, disable, update, and detect drift through native configuration — see [references/harness-onboarding.md](references/harness-onboarding.md)
 
@@ -41,6 +43,8 @@ Compose policy, execution, enforcement, enablement, evidence, and trust without 
 - Read [references/events-and-capabilities.md](references/events-and-capabilities.md) - Load when mapping semantic event intents to a harness capability matrix
 - Read [references/policy-and-authority.md](references/policy-and-authority.md) - Load when defining decisions, enforcement, actors, evidence origin, exceptions, or break-glass
 - Read [references/provider-contracts.md](references/provider-contracts.md) - Load when defining or validating policy, configuration, telemetry, or evidence provider operations
+- Read [references/external-enforcement.md](references/external-enforcement.md) - Load when enforcing policy through CI, repository rules, protected environments, admission, provider permissions, local hooks, or a policy decision service
+- Read [references/external-enforcement-onboarding.md](references/external-enforcement-onboarding.md) - Load when discovering, previewing, applying, verifying, rolling back, or adopting external controls without harness or lifecycle modules
 - Read [references/modules.md](references/modules.md) - Load when authoring a script, evaluator, agent launcher, external job, plugin, skill, MCP integration, or human-task module
 - Read [references/module-trust.md](references/module-trust.md) - Load when reviewing executable-module trust, provenance, permissions, signatures/checksums/attestations, retries, rollback, or upgrades
 - Read [references/profiles.md](references/profiles.md) - Load when composing governance, executor, enforcement, data, telemetry, or distribution requirements
