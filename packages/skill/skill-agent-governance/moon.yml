@@ -12,4 +12,5 @@ tasks:
     command: npm run test
     inputs:
       - agent-governance-guide/assets/*.json
+      - agent-governance-guide/assets/walking-skeleton/*.sh
       - agent-governance-guide/scripts/*.mjs

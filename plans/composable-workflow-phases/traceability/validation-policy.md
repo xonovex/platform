@@ -1,6 +1,6 @@
 # Traceability Validation Policy
 
-Last verified: **2026-07-14**
+Last verified: **2026-07-16**
 
 The final documentation and validation plan must fail when any of the following is true:
 
@@ -8,7 +8,7 @@ The final documentation and validation plan must fail when any of the following 
 2. A mandatory control has no control ID, applicability rule, evidence requirement or enforcement point.
 3. A legal obligation lacks an exact regulation/article candidate mapping, current-text review flag or qualified-review requirement.
 4. A detailed ISO claim is based only on a public abstract without a licensed-text verification flag.
-5. A platform capability lacks official documentation, a pinned tested version or a conformance probe.
+5. A platform capability lacks official documentation; or a capability claim is presented as runtime-verified without both a pinned tested version and a conformance probe. A capability backed by documentation alone must carry an explicit candidate (documentation-derived) status, and a result line covering unprobed capabilities must state the unprobed count — an unqualified PASS over unprobed capabilities is itself a validation failure.
 6. Architectural synthesis is presented as a legal, standards or vendor requirement.
 7. A crosswalk claims one-to-one equivalence, certification or compliance without an authoritative assessment.
 8. A subplan task has no decision/control/source traceability.
@@ -40,6 +40,6 @@ The release candidate must include generated reports proving:
 - all numbered subplan tasks are mapped;
 - no orphan decision/control/source IDs remain;
 - source versions and retrieval dates are recorded;
-- platform claims have conformance results;
+- platform claims have conformance results, or carry an explicit candidate status counted in the qualified result line;
 - legal and licensed-standard caveats remain visible;
 - stale sources or changed platform behavior block release or are explicitly waived.

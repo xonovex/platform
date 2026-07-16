@@ -3,7 +3,7 @@ type: plan
 has_subplans: false
 parent_plan: composable-workflow-implementations-merge
 parallel_group: 2
-status: pending
+status: complete
 dependencies:
   plans:
   - merge-baseline-and-layout-normalization
@@ -21,11 +21,11 @@ skills_to_consult:
 - testing-guide
 - moon-guide
 validation:
-  type_check: pending
-  lint: pending
-  build: pending
-  tests: pending
-  integration: pending
+  type_check: pass
+  lint: pass
+  build: pass
+  tests: pass
+  integration: pass
 ---
 
 # Subplan 02: Walking-Skeleton Graft and Evidence Honesty
@@ -59,12 +59,12 @@ Port fable's executable walking skeleton into `skill-agent-governance`, run it a
 
 ## Success Criteria
 
-- [ ] Skeleton executes in CI (moon test) with 17/17 checks; consent gate proven
-- [ ] No fable-only identifiers anywhere under `packages/`
-- [ ] `walking-skeleton.md` distinguishes recorded scenario from executable run
-- [ ] Claude Code matrix has dated probe + observed version + drift note; five others explicitly candidate
-- [ ] Subplan-05 claims match evidence; validation-policy rule 5 amended
-- [ ] Port manifest updated; one conventional commit
+- [x] Skeleton executes in CI (moon test) with 17/17 checks; consent gate proven (stops after preview without `--yes`); shellcheck clean; repo untouched after runs
+- [x] No fable-only identifiers anywhere under `packages/` (scripts were self-contained; grep sweep clean)
+- [x] `walking-skeleton.md` distinguishes recorded scenario from executable run
+- [x] Claude Code matrix records `2.1.211 (Claude Code)` probed 2026-07-16 with rerun-on-version-change note; hook-level rows explicitly stay documentation-verified; five other harnesses unchanged (candidate)
+- [x] Subplan-05 has an Evidence section separating executed from fixture-recorded claims, per-criterion labels; validation-policy rule 5 amended (candidate status + qualified result line mandatory)
+- [x] Port manifest updated (skeleton rows done, probe recorded); one conventional commit
 
 ## Files Modified/Created
 

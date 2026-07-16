@@ -12,8 +12,8 @@ reconciles the scenario-level count during conversion.
 
 | Source @82303137 | Destination | Disposition | Status |
 | --- | --- | --- | --- |
-| skill-agent-governance/agent-governance-guide/assets/walking-skeleton/guard.sh | same path (platform) | adapt (identifier re-point) | pending |
-| skill-agent-governance/agent-governance-guide/assets/walking-skeleton/run-skeleton.sh | same path (platform) | adapt (identifier re-point) | pending |
+| skill-agent-governance/agent-governance-guide/assets/walking-skeleton/guard.sh | same path (platform) | port (verbatim — scripts are self-contained; no fable-only identifiers found) | done |
+| skill-agent-governance/agent-governance-guide/assets/walking-skeleton/run-skeleton.sh | same path (platform) | port (verbatim — scripts are self-contained; no fable-only identifiers found) | done |
 
 ## Governance fixtures (owner: subplan 03) — 26 files
 
@@ -104,5 +104,5 @@ Platform centralizes enterprise conformance fixtures in `skill-agent-governance`
 
 | Item | Owner | Status |
 | --- | --- | --- |
-| Claude Code local probe (fable precedent: 2.1.211) | subplan 02 | pending |
+| Claude Code local probe (fable precedent: 2.1.211) | subplan 02 | done — observed 2.1.211 on 2026-07-16, recorded in code-harness-guide capabilities.md with rerun-on-version-change note |
 | Three convention rules into enterprise-platforms.md | subplan 06 | pending |

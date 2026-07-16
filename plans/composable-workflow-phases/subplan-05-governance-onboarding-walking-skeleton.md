@@ -161,16 +161,23 @@ Mapping IDs resolve through the parent plan’s `traceability/` artifacts. These
 4. Permission, authority attenuation, cost, and data-redaction assertions.
 5. Full rollback and post-rollback drift verification.
 
+## Evidence
+
+Two evidence classes back this subplan; neither is presented as the other.
+
+- **Executed locally (2026-07-16):** `agent-governance-guide/assets/walking-skeleton/run-skeleton.sh --yes` — 17/17 checks, wired into `skill-agent-governance:test` so CI re-executes it. Demonstrates local environment discovery (observed harness `2.1.211 (Claude Code)`, configuration layers), preview-then-consent (the script stops without `--yes`), idempotent apply, allow/deny with explained denials, an independent locally re-invoked CI-shaped gate with the hook disabled, drift detection and remediation, checksum module trust, evidence dedup, recursion limit, exception expiry, and rollback.
+- **Fixture-recorded only (not executed):** hosted CI/platform enforcement (GitHub required check, rulesets), the live-tenant provider round-trip behind opaque references, and the bounded LLM evaluator leg. These are validated compositions in `validate-walking-skeleton-fixtures.mjs`, not runtime conformance; live probes remain candidate runs requiring credentials.
+
 ## Success Criteria
 
-- [x] Workflow-only, governance-only, and integrated adoption paths all work without hidden coupling.
-- [x] Onboarding discovers and explains the actual environment.
-- [x] User sees and authorizes all native changes and permissions.
-- [x] Deterministic enforcement and bounded semantic advice coexist.
-- [x] Mandatory control has an independent external enforcement layer.
-- [x] Evidence is provider-native and recoverable by opaque reference.
-- [x] Drift, exception, disablement, and rollback work.
-- [x] Unsupported or unsafe compositions fail clearly.
+- [x] Workflow-only, governance-only, and integrated adoption paths all work without hidden coupling (fixture-validated adoption paths).
+- [x] Onboarding discovers and explains the actual environment (executed: local harness version and configuration layers).
+- [x] User sees and authorizes all native changes and permissions (executed: preview stops without explicit consent).
+- [x] Deterministic enforcement and bounded semantic advice coexist (deterministic leg executed; bounded-evaluator leg fixture-recorded).
+- [x] Mandatory control has an independent external enforcement layer (executed locally as a re-invoked CI-shaped gate; hosted enforcement fixture-recorded).
+- [x] Evidence is provider-native and recoverable by opaque reference (fixture-recorded; local run demonstrates deduplicated evidence records only).
+- [x] Drift, exception, disablement, and rollback work (executed).
+- [x] Unsupported or unsafe compositions fail clearly (executed: tampered module, unsupported intent, outage fail-closed; remainder fixture-recorded).
 
 ## Files Modified/Created
 

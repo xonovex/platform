@@ -1,6 +1,22 @@
 # Governance Onboarding Walking Skeleton
 
-Use the walking skeleton to prove that governance, workflow results, harness adaptation, external enforcement, and provider evidence compose without collapsing into one platform or persisted envelope. It is a recorded conformance scenario, not a claim that a live tenant or locally installed harness passed.
+Use the walking skeleton to prove that governance, workflow results, harness adaptation, external enforcement, and provider evidence compose without collapsing into one platform or persisted envelope. The skeleton ships as two artifacts with distinct evidence value:
+
+- **Executable local run** (`assets/walking-skeleton/run-skeleton.sh`) — a self-contained script that executes the onboarding lifecycle against a temporary workspace and exits nonzero on any failed check. What it demonstrates was actually run.
+- **Recorded conformance scenario** (the fixture replay validated by `scripts/validate-walking-skeleton-fixtures.mjs`) — a cross-checked composition over the governance, harness, external-enforcement, enterprise-platform, and module-template fixtures. It proves the contracts compose; it is not a claim that a live tenant or hosted platform passed.
+
+## Executable local run
+
+`run-skeleton.sh` mutates only a `mktemp -d` workspace and removes it on exit; the repository is never touched. Without arguments it discovers the environment, previews the exact change (module identity, checksum, permissions, failure mode, rollback), and stops — consent is a real gate, not documentation. With `--yes` it continues through apply, verification, and rollback, executing 17 checks:
+
+- idempotent apply (re-application converges to the same reference);
+- a permitted operation allowed and a protected operation denied with a reason naming the policy and remediation (`guard.sh`, exit 0/2 semantics);
+- an independent CI-shaped second layer that still denies with the hook disabled;
+- weakening drift detected against the applied reference and remediated;
+- a tampered module refused by checksum, an unsupported hook intent rejected, mandatory fail-closed and advisory observe under policy outage, concurrent duplicate evidence deduplicated, a recursive agent launch refused at the depth limit, and an expired exception denying while citing its exception id;
+- rollback that removes the applied configuration and leaves drift clean.
+
+The second layer is a locally re-invoked gate shaped like a required CI check; hosted-platform enforcement remains fixture-recorded (below). `guard.sh` is the deterministic policy decision point: JSON event on stdin, one JSON decision on stdout, exit 0 allow / 2 deny.
 
 ## Selected coordinates
 
@@ -43,4 +59,4 @@ The harness hook is early feedback, not the mandatory boundary. The required CI 
 
 ## Validation
 
-Run `node scripts/validate-walking-skeleton-fixtures.mjs` from this guide directory or `npx moon run skill-agent-governance:test` from the repository root. The validator cross-checks the walking skeleton against the governance, harness, external-enforcement, enterprise-platform, and module-template fixtures before replaying its recorded outcomes.
+Run `assets/walking-skeleton/run-skeleton.sh --yes` for the executable proof and `node scripts/validate-walking-skeleton-fixtures.mjs` from this guide directory for the recorded scenario, or `npx moon run skill-agent-governance:test` from the repository root to run both. The validator cross-checks the walking skeleton against the governance, harness, external-enforcement, enterprise-platform, and module-template fixtures before replaying its recorded outcomes.

@@ -7,11 +7,11 @@
 | Matrix version         | `1.0.0`                                                        |
 | Documentation snapshot | `2026-07-16`                                                   |
 | Runtime probe          | `claude --version`                                             |
-| Observed runtime       | Not installed in the validation environment                    |
-| Evidence status        | Documentation-verified; runtime-unverified                     |
+| Observed runtime       | `2.1.211 (Claude Code)`, probed `2026-07-16`                   |
+| Evidence status        | Runtime version observed; guard contract exercised locally     |
 | Refresh trigger        | Product update, hook schema change, handler change, or 90 days |
 
-Runtime-unverified means no local handler was executed. It must not be reported as runtime conformance.
+The probe observed the installed CLI version, and the walking skeleton exercised the deterministic guard contract (JSON event on stdin, exit 0 allow / exit 2 deny) against that runtime locally. Native hook registration was not exercised: hook-level rows below remain documentation-verified and must not be reported as runtime conformance. Re-run the probe and skeleton whenever the installed version differs from the observed one.
 
 ## Native handlers and configuration
 
