@@ -1,6 +1,6 @@
 # plan-research: Research Codebase and Web for Requirements
 
-Research codebase and web for requirements; present findings for review. Does **not** create plans — run `plan-decide` afterward to settle open decisions one by one, then `plan-create`. No plan file created unless the user asks to save findings.
+Research codebase and web for a planning-oriented report. This specialized read-only analysis does not create Planning or canonical Research results: use `research-run` when the result must be reusable/provider-native, `decision-create` for authority-bound choices, then `plan-create`.
 
 ## Core Workflow
 
@@ -10,11 +10,11 @@ Research codebase and web for requirements; present findings for review. Does **
 2. **Codebase exploration** (parallel where possible) — architecture, patterns, integration points; existing library versions and similar implementations; testing/build patterns and applicable coding guidelines
 3. **Web research** — search for latest versions; fetch official docs
 4. **Synthesize** codebase + web
-5. **Present or save** — when findings contain open decisions (ambiguities, contradictions, unsettled trade-offs), say so and recommend `plan-decide`
+5. **Present or save** — when findings contain open decisions, recommend `decision-create`; when the report needs a durable cross-context handoff, publish it through `research-run`
 
 ## Code-quality audits
 
-When the request is an inward code-quality audit rather than forward/web research — hardening (type safety, validation, error handling, logging), simplification (duplicates, dead code, unused deps, over-abstraction), or alignment/consistency between two implementations — load the **code-quality-guide** skill and apply its matching dimension, producing the same read-only report grouped by category and graded by severity (no edits, no plan). Then continue with `plan-decide` / `plan-create`.
+When the request is an inward code-quality audit rather than forward/web research — hardening (type safety, validation, error handling, logging), simplification (duplicates, dead code, unused deps, over-abstraction), or alignment/consistency between two implementations — load the **code-quality-guide** skill and apply its matching dimension, producing the same read-only report grouped by category and graded by severity (no edits, no Planning mutation). Then use `decision-create` / `plan-create` as needed.
 
 ## Details
 

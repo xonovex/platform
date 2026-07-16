@@ -4,9 +4,8 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "@xonovex/skill-bdd": "5.0.0",
     "@xonovex/skill-code-quality": "5.0.0",
-    "@xonovex/skill-tdd": "5.0.0"
+    "@xonovex/skill-workflow": "5.0.0"
   },
   "keywords": [
     "xonovex",
@@ -15,6 +14,7 @@
   ],
   "scripts": {
     "fmt": "prettier --write .",
-    "fmt:check": "prettier --check ."
+    "fmt:check": "prettier --check .",
+    "test": "node plan-guide/scripts/validate-early-lifecycle-fixtures.mjs"
   }
 }

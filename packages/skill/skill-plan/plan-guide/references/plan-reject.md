@@ -1,15 +1,12 @@
-# plan-reject: Reject a Plan
+# plan-reject: Reject an Exact Planning Revision
 
-Record that a plan is not approved, with a reason, so it is not expanded or executed. Does NOT delete the plan — it stays for revision or reference.
+Record an authorized rejection without deleting or rewriting the Planning result.
 
-## Core Workflow
+## Core workflow
 
-1. **Locate plan** — user message, git config, or most recent `plans/*.md`
-2. **Capture the reason** — from the prompt; if none was given, ask the user why in one sentence. A rejection without a reason is not actionable
-3. **Record it** — set `status: rejected`, refresh the `updated` date, and append the reason under a `## Rejection` section (date + reason) so the history stays visible
-4. **Present** the reason and the suggested next step — `plan-revise` to address it, `plan-research` if context was missing, or leave it rejected — then STOP
+1. Resolve the Planning provider context, opaque native reference, exact revision, and current authority/status evidence.
+2. Capture the rejecting actor's authority reference, reason, required changes or terminal rationale, and any review trigger.
+3. Publish rejected status against the exact revision through the selected provider.
+4. Preserve the subject, its prior revisions, critiques, evidence, and relationships; return the native status reference and stop.
 
-## Gotchas
-
-- A `rejected` plan fails `plan-subplans-create` (which requires `status: approved`) — it cannot be executed until addressed and re-accepted with `plan-accept`
-- Never delete the plan on rejection — the reason and history are the point
+Apply [early-lifecycle-contracts.md](early-lifecycle-contracts.md). Models cannot fabricate the rejection or delete the result as a shortcut.

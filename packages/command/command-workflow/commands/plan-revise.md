@@ -1,25 +1,28 @@
 ---
-description: "Draft: apply your annotations and prompt feedback to the plan document (approve separately with plan-accept)"
+description: Revise an exact Planning revision from explicit native feedback and publish a new revision
 allowed-tools:
   - Read
+  - Write
   - Edit
+  - Bash
   - Glob
   - Grep
   - AskUserQuestion
   - Skill
-argument-hint: "[plan-file]"
+argument-hint: "<native-reference> [--revision <native-revision>] [--feedback <reference>...] [--provider <selection>]"
 ---
 
-# /xonovex-workflow:plan-revise — Revise Plan from Feedback
-
-> Lifecycle: research → decide → create → **revise** ⇄ critique → subplans-create → continue → update → validate
+# /xonovex-workflow:plan-revise — Revise Planning Result
 
 ## Arguments
 
-- `plan-file` (optional): Path to plan document (auto-detects from git config or most recent plan in `plans/`)
+- `native-reference` (required): Opaque Planning reference.
+- `--revision` (required when not provider-implied): Exact subject revision.
+- `--feedback` (repeatable): Native feedback, critique, or annotation reference.
+- `--provider` (optional): Explicit result provider.
 
 ## Delegation
 
-Load the `plan-guide` skill (plugin `xonovex-skill-plan`) and perform its
-**plan-revise** operation with these arguments. The skill is the source of truth for
-the procedure, output format, and gotchas — do not restate them.
+Load `plan-guide` and perform **plan-revise**; load `workflow-guide` for provider and
+revision contracts. Resolve every item, publish a new native revision with supersession,
+and stop without implementing or transferring approval from the prior revision.

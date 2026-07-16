@@ -2,11 +2,18 @@ $schema: https://moonrepo.dev/schemas/project.json
 language: unknown
 tags: [skill]
 dependsOn:
-  - skill-bdd
   - skill-code-quality
-  - skill-tdd
+  - skill-workflow
 tasks:
   build:
     command: echo 'build complete'
+    options:
+      cache: false
+  test:
+    command: npm run test
+    inputs:
+      - plan-guide/assets/early-lifecycle-fixtures.json
+      - plan-guide/references/*.md
+      - plan-guide/scripts/*.mjs
     options:
       cache: false

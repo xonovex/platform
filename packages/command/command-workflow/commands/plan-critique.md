@@ -1,29 +1,27 @@
 ---
-description: "Draft: adversarially stress-test the written plan before approval; reports findings for plan-revise to fix"
+description: Independently stress-test an exact Planning revision and publish separate findings
 allowed-tools:
   - Read
+  - Write
+  - Bash
   - Glob
   - Grep
-  - Bash
   - Task
-  - Write
   - Skill
-argument-hint: "[plan-file] [--mode red-team|pre-mortem|falsify|steelman|all]"
+argument-hint: "<native-reference> [--revision <native-revision>] [--provider <selection>] [--mode red-team|pre-mortem|falsify|steelman|all]"
 ---
 
-# /xonovex-workflow:plan-critique — Adversarially Critique a Plan
-
-> Lifecycle: research → decide → create → revise ⇄ **critique** → subplans-create → continue → update → validate
+# /xonovex-workflow:plan-critique — Critique Planning Result
 
 ## Arguments
 
-- `plan-file` (optional): Path to the plan document (auto-detects from git config or the most recent plan in `plans/`).
-- `--mode <mode>` (optional): Which adversarial lens(es) to run — `red-team`, `pre-mortem`, `falsify`, `steelman`, or `all`. Default: `red-team` + `pre-mortem`.
+- `native-reference` (required): Opaque Planning reference.
+- `--revision` (required when not provider-implied): Exact revision to critique.
+- `--provider` (optional): Provider for the critique result.
+- `--mode` (optional): Adversarial lens; defaults to red-team plus pre-mortem.
 
 ## Delegation
 
-Load the `plan-guide` skill (plugin `xonovex-skill-plan`) and perform its
-**plan-critique** operation with these arguments. Run this as a fresh session /
-independent agent that did not author the plan — self-critique defends instead of
-attacks. The skill is the source of truth for the procedure, output format, and
-gotchas — do not restate them.
+Load `plan-guide` and perform **plan-critique** in fresh independent context; load
+`workflow-guide` for exact-revision and native publication contracts. Publish separate
+findings and do not revise, approve, or implement the Planning result.

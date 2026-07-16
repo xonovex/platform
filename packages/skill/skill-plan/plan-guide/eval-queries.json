@@ -1,0 +1,42 @@
+[
+  {
+    "query": "Capture what we know and do not know about the dispatch delays, but do not force it into user stories yet.",
+    "should_trigger": true
+  },
+  {
+    "query": "Research whether this API can support regional retention rules, cite provenance and confidence, then publish the result back to our tracker.",
+    "should_trigger": true
+  },
+  {
+    "query": "Turn these observations into candidate behavior and constraints. BDD is available, but use a neutral formulation unless it actually helps.",
+    "should_trigger": true
+  },
+  {
+    "query": "Create an optional experience design from work-item UX-44, include accessibility review, and keep critique independent from revision.",
+    "should_trigger": true
+  },
+  {
+    "query": "We lost the previous session. Resume planning from native result result:782 without assuming a file path.",
+    "should_trigger": true
+  },
+  {
+    "query": "Choose between the two data-boundary options, but a model must not claim the architecture authority decision.",
+    "should_trigger": true
+  },
+  {
+    "query": "Write a React component that renders a decision table.",
+    "should_trigger": false
+  },
+  {
+    "query": "Fix the failing unit test in src/cache.test.ts.",
+    "should_trigger": false
+  },
+  {
+    "query": "Generate a database migration for the research_sources table.",
+    "should_trigger": false
+  },
+  {
+    "query": "Make the accessibility icon blue on hover.",
+    "should_trigger": false
+  }
+]

@@ -1,26 +1,27 @@
 ---
-description: "Draft: reject a plan with a reason — set status: rejected and record why, without deleting it"
+description: Record an authorized rejection against an exact Planning revision without deleting it
 allowed-tools:
   - Read
-  - Edit
+  - Write
+  - Bash
   - Glob
   - Grep
   - AskUserQuestion
   - Skill
-argument-hint: "[plan-file] [reason]"
+argument-hint: "<native-reference> [--revision <native-revision>] [--authority-reference <reference>] [--reason <text>] [--provider <selection>]"
 ---
 
-# /xonovex-workflow:plan-reject — Reject a Plan
-
-> Lifecycle: research → decide → create → revise ⇄ critique → **reject** → (revise / discard)
+# /xonovex-workflow:plan-reject — Reject Planning Result
 
 ## Arguments
 
-- `plan-file` (optional): Path to plan document (auto-detects from git config or most recent plan in `plans/`)
-- `reason` (optional): Why the plan is rejected; prompted for if omitted
+- `native-reference` (required): Opaque Planning reference.
+- `--revision` (required when not provider-implied): Exact revision under rejection.
+- `--authority-reference` (optional only when provider context proves authority): Actor/role reference.
+- `--reason` (required): Rejection rationale or required changes.
+- `--provider` (optional): Status/decision provider.
 
 ## Delegation
 
-Load the `plan-guide` skill (plugin `xonovex-skill-plan`) and perform its
-**plan-reject** operation with these arguments. The skill is the source of truth for
-the procedure, output format, and gotchas — do not restate them.
+Load `plan-guide` and perform **plan-reject**; load `workflow-guide` for provider-native
+result contracts. Publish rejection against the exact revision, preserve history, and stop.

@@ -1,30 +1,31 @@
 ---
-description: "Draft: create a high-level plan from research for user review before detailed subplans"
+description: Publish a high-level provider-native Planning result from resolved lifecycle references for review
 allowed-tools:
   - Write
   - Read
+  - Bash
   - Glob
   - Grep
+  - Task
   - TaskCreate
   - TaskUpdate
   - AskUserQuestion
   - Skill
-argument-hint: "[spec-file-or-requirements] [--interactive] [--depends-on <plan>] [--dry-run]"
+argument-hint: "[subject-or-source-reference] [--source <reference>...] [--profile <reference>] [--provider <selection>] [--method <selection>] [--dry-run]"
 ---
 
-# /xonovex-workflow:plan-create — Create Plan with Research
-
-> Lifecycle: research → decide → **create** → revise ⇄ critique → subplans-create → continue → update → validate
+# /xonovex-workflow:plan-create — Create Planning Result
 
 ## Arguments
 
-- `spec-file-or-requirements` (optional): Path to spec or inline requirements (defaults to conversation context)
-- `--interactive` (optional): Ask context-dependent technical questions during research
-- `--depends-on <plan>` (optional): Mark dependency on another plan
-- `--dry-run` (optional): Preview without writing files
+- `subject-or-source-reference` (optional): Subject or opaque Research/Decision/Formulation/Design reference; defaults to resolved current lifecycle context.
+- `--source` (repeatable): Additional opaque native source reference.
+- `--profile`, `--provider`, `--method` (optional): Independent workflow-axis selections.
+- `--dry-run` (optional): Preview the provider-native publication without applying it.
 
 ## Delegation
 
-Load the `plan-guide` skill (plugin `xonovex-skill-plan`) and perform its
-**plan-create** operation with these arguments. The skill is the source of truth for
-the procedure, output format, and gotchas — do not restate them.
+Load `plan-guide` and perform **plan-create**; load `workflow-guide` for result,
+provider, profile, and handle contracts. Resolve source references through their providers,
+publish one high-level Planning result, and stop before child plans or implementation. Do
+not assume a file, Git repository, or current conversation is the persistent source of truth.

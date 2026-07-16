@@ -1,5 +1,5 @@
 ---
-description: "Pre-plan: research codebase and web for requirements without creating a plan"
+description: "Specialized codebase/web research or read-only code-quality analysis; use research-run for canonical reusable Research results"
 allowed-tools:
   - Read
   - Bash
@@ -15,9 +15,9 @@ allowed-tools:
 argument-hint: "<requirements> [--interactive] [--save-to <file>]"
 ---
 
-# /xonovex-workflow:plan-research — Research Codebase and Web
+# /xonovex-workflow:plan-research — Research Codebase and Web for Planning
 
-> Lifecycle: **research** → decide → create → revise ⇄ critique → subplans-create → continue → update → validate
+> Specialized analysis: use `research-run` when the output must be a provider-native canonical Research result.
 
 ## Arguments
 

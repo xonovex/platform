@@ -19,6 +19,6 @@ argument-hint: "[feature-name] [--from <branch>]"
 
 ## Delegation
 
-Load the `git-guide` skill (plugin `xonovex-skill-git`) and perform its
-**worktree-create** operation with these arguments. The skill is the source of truth
-for the procedure, output format, and gotchas — do not restate them.
+Load an installed capability that provides Git worktree creation and perform its
+worktree-create operation. This workspace method is a soft dependency: if unavailable,
+stop and name the capability to install; do not make Git worktrees a Planning prerequisite.

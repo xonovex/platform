@@ -1,5 +1,5 @@
 ---
-description: "Execution: resume work from an existing plan document with full context loading"
+description: Resume one provider-native Planning result by reconstructing its handle and completing only the first actionable child
 allowed-tools:
   - Read
   - Write
@@ -12,24 +12,20 @@ allowed-tools:
   - TaskUpdate
   - AskUserQuestion
   - Skill
-argument-hint: "[document-path]"
+argument-hint: "[native-reference] [--provider-context <context>] [--revision <native-revision>]"
 ---
 
-# /xonovex-workflow:plan-continue — Continue Progress from Plan
-
-> Lifecycle: research → decide → create → revise ⇄ critique → subplans-create → **continue** → update → validate
+# /xonovex-workflow:plan-continue — Continue Planning Result
 
 ## Arguments
 
-`/plan-continue [document-path]`
-
-- `document-path` (optional): Path to plan document. Resolution order if omitted:
-  1. Check git config for associated plan (feature worktree)
-  2. **Use current conversation context** - if a `/xonovex-workflow:plan-create`, `/xonovex-workflow:plan-research`, or similar command was run earlier in this conversation, continue from that research/plan. Do NOT search for other plans.
-  3. Only if no context exists: Ask user which plan to continue
+- `native-reference` (optional only when current provider context identifies one result): Opaque parent/child Planning reference.
+- `--provider-context` (optional): Explicit provider selection/context.
+- `--revision` (optional): Exact native revision; otherwise resolve current provider revision and verify freshness.
 
 ## Delegation
 
-Load the `plan-guide` skill (plugin `xonovex-skill-plan`) and perform its
-**plan-continue** operation with these arguments. The skill is the source of truth for
-the procedure, output format, and gotchas — do not restate them.
+Load `plan-guide` and perform **plan-continue**; load `workflow-guide` for provider and
+ephemeral-handle contracts. Reconstruct state from the native reference after context
+loss, baseline the actual toolchain, load required skills, complete one actionable Planning
+result, publish exact-revision evidence/status, and stop.

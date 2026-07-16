@@ -1,34 +1,28 @@
-# plan-create: Create High-Level Plan with Research
+# plan-create: Publish a High-Level Planning Result
 
-Generate a high-level parent plan from research already in the conversation, presenting architecture decisions for review BEFORE any detailed subplans. Save the plan and STOP (user reviews, then runs `plan-subplans-create`).
+Create one high-level parent Planning result from resolved lifecycle inputs, present it for review, and stop before detailed child plans or implementation.
 
-## Prerequisites
+## Preconditions
 
-Run `plan-research` first (incl. its code-quality audits). This command assumes research is already in the conversation and does **NOT** explore the codebase or delegate to search agents.
+- Resolve material Research, Decision, Formulation, Experience Design, and Solution Design inputs through their provider contexts and opaque native references.
+- Assess native revisions and freshness. If material research or decisions are missing, route to `research-run` or `decision-create` instead of inventing them.
+- Apply the method, executor, policy, authority, and publication rules in [early-lifecycle-contracts.md](early-lifecycle-contracts.md).
 
-## Core Workflow
+## Core workflow
 
-**Do NOT switch into a plan-authoring mode. Do NOT implement.**
+1. Resolve the selected workflow profile and independent result-provider, method, workspace, and policy axes.
+2. Gather objective, scope, exclusions, source references, accepted decisions, dependencies, constraints, risks, validation, success criteria, and unresolved gaps.
+3. Propose parent-level components and child Planning result names only; keep detailed implementation tasks for `plan-subplans-create`.
+4. List non-empty `skills_to_consult` capabilities for implementers. If a selected method is test-first or acceptance-first, load a matching installed TDD/BDD/testing capability; do not require one when the method is not selected.
+5. Publish a canonical Planning result through the selected provider with status `pending-approval`, provider-native revision, source relationships, profile/policy versions, and follow-up capabilities.
+6. Present the provider context, opaque native reference, revision, risks, and unresolved gaps; stop for review.
 
-1. **Gather requirements** — read spec or conversation; ask clarifications only if interactive mode was requested
-2. **Document key decisions** — technology choices with versions, rationale, alternatives
-3. **Assess risks** — trade-offs, alternatives considered, open questions
-4. **Propose subplan structure** — subplan names only, no implementation detail
-5. **Write plan** — save to `plans/<feature-name>.md` (standalone file, not inside an existing plan dir unless requested); show summary; STOP
+## Planning semantics
 
-## Test-first plans
-
-When the request is test-first, apply **tdd-guide**'s red-green-refactor (or **bdd-guide** for acceptance-first): structure each step as failing-test → implement → refactor, keep one assertion failing at a time, and list the test doubles per **testing-guide**. Same document shape — the steps just lead with the test.
-
-## Plan shape
-
-- **Frontmatter** — `type: plan`, `has_subplans: true`, `status: pending-approval`, `dependencies.plans: []`, `proposed_subplans: []`, `skills_to_consult: [skill-names]`, `research_sources: {documentation: [], versions: {}}`
-- **`skills_to_consult`** — MUST list applicable coding guidelines (e.g. `typescript-guide`, `react-guide`, `testing-guide`); never empty
-- **Sections** — Overview (2-3 sentences), Goals, Current State (stack/integration), Research Findings (recommended library with version/rationale/pros-cons/docs, alternatives), Proposed Approach (numbered components/files), Risk Assessment, Proposed Child Plans (with execution groups), Success Criteria, Estimated Effort
+The result contains objective, scope, tasks/components, dependencies, risks, validation, success criteria, status, and skills/capabilities to consult. A provider may represent these as a work item, database record, repository document, issue hierarchy, or another native resource. A local Markdown provider may use plan frontmatter and `plans/`, but that representation is not the workflow contract and Git is not required.
 
 ## Gotchas
 
-- Skipping research and going straight to plan-create produces vague plans — the prerequisite isn't optional
-- `skills_to_consult` empty means implementers won't read project conventions — at least list language guides
-- Mixing detailed implementation steps into the parent plan defeats the create → review → subplans flow
-- A plan proposing >10 subplans is too coarse — split into multiple parent plans
+- A conversation summary is not a Research or Decision reference after context loss; resolve native state.
+- An explicitly selected unavailable hosted/database/work-item provider fails instead of falling back to a local file.
+- Publishing detailed child plans in this operation bypasses parent review.

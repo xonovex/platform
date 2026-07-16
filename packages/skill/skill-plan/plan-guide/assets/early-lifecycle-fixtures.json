@@ -1,0 +1,367 @@
+{
+  "purpose": "Conformance test data only; providers keep lifecycle results in their native representation.",
+  "commandContracts": [
+    "discovery-run",
+    "research-run",
+    "formulation-run",
+    "experience-design-create",
+    "experience-design-revise",
+    "experience-design-critique",
+    "experience-design-accept",
+    "solution-design-create",
+    "solution-design-revise",
+    "solution-design-critique",
+    "solution-design-accept",
+    "decision-create",
+    "decision-revise",
+    "decision-critique",
+    "decision-accept",
+    "plan-create"
+  ],
+  "operationContracts": [
+    {
+      "operation": "discovery-run",
+      "resultKind": "Discovery",
+      "preferredExecutors": [
+        "deterministic",
+        "bounded-model",
+        "adaptive-agent"
+      ],
+      "policyIntents": ["data-access", "privacy", "regulated-applicability"]
+    },
+    {
+      "operation": "research-run",
+      "resultKind": "Research",
+      "preferredExecutors": [
+        "deterministic",
+        "bounded-model",
+        "adaptive-agent"
+      ],
+      "policyIntents": [
+        "data-access",
+        "external-research",
+        "privacy",
+        "regulated-applicability"
+      ]
+    },
+    {
+      "operation": "formulation-run",
+      "resultKind": "Formulation",
+      "preferredExecutors": ["bounded-model", "adaptive-agent", "human"],
+      "policyIntents": [
+        "privacy",
+        "accessibility",
+        "security",
+        "regulated-applicability"
+      ]
+    },
+    {
+      "operation": "experience-design-create",
+      "resultKind": "ExperienceDesign",
+      "preferredExecutors": ["bounded-model", "adaptive-agent", "human"],
+      "policyIntents": [
+        "data-access",
+        "privacy",
+        "accessibility",
+        "regulated-applicability"
+      ]
+    },
+    {
+      "operation": "solution-design-create",
+      "resultKind": "SolutionDesign",
+      "preferredExecutors": ["bounded-model", "adaptive-agent", "human"],
+      "policyIntents": [
+        "data-access",
+        "privacy",
+        "security",
+        "architecture",
+        "regulated-applicability"
+      ]
+    },
+    {
+      "operation": "decision-create",
+      "resultKind": "Decision",
+      "preferredExecutors": [
+        "deterministic",
+        "bounded-model",
+        "human",
+        "qualified-human"
+      ],
+      "policyIntents": [
+        "privacy",
+        "security",
+        "architecture",
+        "regulated-applicability"
+      ]
+    },
+    {
+      "operation": "plan-create",
+      "resultKind": "Planning",
+      "preferredExecutors": [
+        "deterministic",
+        "bounded-model",
+        "adaptive-agent",
+        "human"
+      ],
+      "policyIntents": [
+        "data-access",
+        "privacy",
+        "security",
+        "architecture",
+        "regulated-applicability"
+      ]
+    }
+  ],
+  "dependencyPolicy": {
+    "requiredHardDependencies": [
+      "xonovex-skill-plan",
+      "xonovex-skill-workflow"
+    ],
+    "forbiddenHardDependencies": [
+      "xonovex-skill-bdd",
+      "xonovex-skill-user-stories",
+      "xonovex-skill-git",
+      "xonovex-skill-github",
+      "xonovex-skill-gitlab"
+    ],
+    "selectableMethods": ["neutral", "user-stories", "bdd", "example-mapping"],
+    "selectableProviderClasses": [
+      "artifact",
+      "work-item",
+      "code-host",
+      "database",
+      "file"
+    ]
+  },
+  "cases": [
+    {
+      "id": "lightweight-neutral-workflow",
+      "valid": true,
+      "profile": "lightweight",
+      "capabilities": ["Discovery", "Formulation", "Planning"],
+      "method": "neutral",
+      "provider": {
+        "available": true,
+        "context": "task-db:local",
+        "nativeReference": "task:184",
+        "nativeRevision": "7"
+      },
+      "executors": ["deterministic", "bounded-model"],
+      "policyIntents": ["data-access"],
+      "governanceRequired": false
+    },
+    {
+      "id": "optional-experience-design",
+      "valid": true,
+      "profile": "experience",
+      "capabilities": [
+        "Discovery",
+        "Research",
+        "Formulation",
+        "ExperienceDesign",
+        "Planning"
+      ],
+      "method": "user-research-capability",
+      "provider": {
+        "available": true,
+        "context": "work-items:hosted",
+        "nativeReference": "work-item:UX-44",
+        "nativeRevision": "12"
+      },
+      "executors": ["deterministic", "bounded-model", "human"],
+      "policyIntents": ["data-access", "privacy", "accessibility"],
+      "governanceRequired": false
+    },
+    {
+      "id": "optional-solution-design",
+      "valid": true,
+      "profile": "architecture",
+      "capabilities": ["Research", "SolutionDesign", "Decision", "Planning"],
+      "method": "architecture-capability",
+      "provider": {
+        "available": true,
+        "context": "repository:designs",
+        "nativeReference": "design:payments-v3",
+        "nativeRevision": "sha256:91af"
+      },
+      "executors": ["deterministic", "adaptive-agent", "human"],
+      "policyIntents": ["data-access", "security", "architecture"],
+      "governanceRequired": false
+    },
+    {
+      "id": "regulated-ai-qualified-decision",
+      "valid": true,
+      "profile": "regulated-ai",
+      "capabilities": [
+        "Discovery",
+        "Research",
+        "Formulation",
+        "ExperienceDesign",
+        "SolutionDesign",
+        "Decision",
+        "Planning"
+      ],
+      "method": "neutral",
+      "provider": {
+        "available": true,
+        "context": "grc:native",
+        "nativeReference": "assessment:AI-91",
+        "nativeRevision": "5"
+      },
+      "executors": [
+        "deterministic",
+        "bounded-model",
+        "adaptive-agent",
+        "qualified-human"
+      ],
+      "decisionAuthority": {
+        "executor": "qualified-human",
+        "authorityReference": "role:risk-owner"
+      },
+      "policyIntents": [
+        "data-access",
+        "external-research",
+        "privacy",
+        "accessibility",
+        "security",
+        "architecture",
+        "regulated-applicability"
+      ],
+      "governanceRequired": true
+    },
+    {
+      "id": "ai-advisory-bounded-exploration",
+      "valid": true,
+      "profile": "ai-advisory",
+      "capabilities": ["Discovery", "Research", "Formulation", "Planning"],
+      "method": "neutral",
+      "provider": {
+        "available": true,
+        "context": "database:ai-research",
+        "nativeReference": "research:assist-23",
+        "nativeRevision": "6"
+      },
+      "executors": [
+        "deterministic",
+        "bounded-model",
+        "adaptive-agent",
+        "human"
+      ],
+      "policyIntents": [
+        "data-access",
+        "external-research",
+        "privacy",
+        "security"
+      ],
+      "governanceRequired": false
+    },
+    {
+      "id": "regulated-qualified-decision",
+      "valid": true,
+      "profile": "regulated",
+      "capabilities": ["Research", "Decision", "Planning"],
+      "method": "neutral",
+      "provider": {
+        "available": true,
+        "context": "grc:controls",
+        "nativeReference": "decision:CTRL-18",
+        "nativeRevision": "2"
+      },
+      "executors": ["deterministic", "qualified-human"],
+      "decisionAuthority": {
+        "executor": "qualified-human",
+        "authorityReference": "role:control-owner"
+      },
+      "policyIntents": ["security", "regulated-applicability"],
+      "governanceRequired": true
+    },
+    {
+      "id": "fresh-context-provider-recovery",
+      "valid": true,
+      "profile": "workflow-only",
+      "capabilities": ["Research", "Planning"],
+      "method": "neutral",
+      "provider": {
+        "available": true,
+        "context": "database:results",
+        "nativeReference": "result:782",
+        "nativeRevision": "14"
+      },
+      "resume": {
+        "conversationAvailable": false,
+        "resolvedFromNativeReference": true
+      },
+      "executors": ["deterministic"],
+      "policyIntents": ["data-access"],
+      "governanceRequired": false
+    },
+    {
+      "id": "selectable-bdd-formulation-method",
+      "valid": true,
+      "profile": "acceptance-first",
+      "capabilities": ["Discovery", "Formulation", "Planning"],
+      "method": "bdd",
+      "provider": {
+        "available": true,
+        "context": "work-items:team",
+        "nativeReference": "requirement:AC-27",
+        "nativeRevision": "3"
+      },
+      "executors": ["bounded-model", "human"],
+      "policyIntents": ["data-access"],
+      "governanceRequired": false
+    },
+    {
+      "id": "exact-revision-mismatch",
+      "valid": false,
+      "profile": "governed",
+      "capabilities": ["SolutionDesign", "Decision"],
+      "method": "neutral",
+      "provider": {
+        "available": true,
+        "context": "repository:designs",
+        "nativeReference": "design:auth",
+        "nativeRevision": "rev:9"
+      },
+      "subjectRevision": "rev:8",
+      "executors": ["human"],
+      "policyIntents": ["security", "architecture"],
+      "expectedCode": "subject-revision-mismatch"
+    },
+    {
+      "id": "explicit-provider-unavailable",
+      "valid": false,
+      "profile": "workflow-only",
+      "capabilities": ["Discovery"],
+      "method": "neutral",
+      "provider": {
+        "available": false,
+        "explicitlySelected": true,
+        "fallbackAttempted": true
+      },
+      "executors": ["deterministic"],
+      "policyIntents": ["data-access"],
+      "expectedCode": "explicit-provider-unavailable"
+    },
+    {
+      "id": "model-fabricates-authority",
+      "valid": false,
+      "profile": "regulated",
+      "capabilities": ["Decision"],
+      "method": "neutral",
+      "provider": {
+        "available": true,
+        "context": "work-items:risk",
+        "nativeReference": "decision:R-18",
+        "nativeRevision": "1"
+      },
+      "executors": ["bounded-model"],
+      "decisionAuthority": {
+        "executor": "bounded-model",
+        "authorityReference": "role:risk-owner"
+      },
+      "policyIntents": ["regulated-applicability"],
+      "expectedCode": "decision-authority-invalid"
+    }
+  ]
+}

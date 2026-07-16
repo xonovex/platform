@@ -21,6 +21,6 @@ argument-hint: "[reason] [--remove-worktree] [--no-plan] [--commit] [--dry-run]"
 
 ## Delegation
 
-Load the `git-guide` skill (plugin `xonovex-skill-git`) and perform its
-**worktree-abandon** operation with these arguments. The skill is the source of truth
-for the procedure, output format, and gotchas — do not restate them.
+Load an installed capability that provides safe Git worktree abandonment and perform its
+worktree-abandon operation. This is a soft dependency: if unavailable, stop and identify
+the missing capability instead of deleting or rewriting state directly.

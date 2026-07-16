@@ -1,29 +1,29 @@
 ---
-description: "Execution: update a plan document with the latest implementation status and test results"
+description: Publish current implementation status and exact-revision validation evidence as a new Planning revision
 allowed-tools:
   - Read
+  - Write
   - Edit
   - Bash
   - Glob
+  - Grep
   - TaskUpdate
-  - TaskList
   - Skill
-argument-hint: "[document-path] [--dry-run]"
+argument-hint: "<native-reference> [--revision <native-revision>] [--provider <selection>] [--evidence <reference>...]"
 ---
 
-# /xonovex-workflow:plan-update — Update Plan Progress
-
-> Lifecycle: research → decide → create → revise ⇄ critique → subplans-create → continue → **update** → validate
+# /xonovex-workflow:plan-update — Update Planning Result
 
 ## Arguments
 
-`/plan-update [document-path] [--dry-run]`
-
-- `document-path` (optional): Path to plan document (auto-detects from git config if omitted)
-- `--dry-run` (optional): Preview changes without modifying files
+- `native-reference` (required): Opaque Planning reference.
+- `--revision` (required when not provider-implied): Exact revision to update.
+- `--provider` (optional): Result provider.
+- `--evidence` (repeatable): Native Development, validation, review, or policy evidence reference.
 
 ## Delegation
 
-Load the `plan-guide` skill (plugin `xonovex-skill-plan`) and perform its
-**plan-update** operation with these arguments. The skill is the source of truth for
-the procedure, output format, and gotchas — do not restate them.
+Load `plan-guide` and perform **plan-update**; load `workflow-guide` for provider-native
+revision contracts. Verify tasks and criteria against exact evidence, publish a new
+Planning revision, preserve unavailable validation categories, and do not infer completion
+from conversation memory.

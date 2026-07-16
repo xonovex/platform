@@ -1,6 +1,8 @@
-# Workflow Commands
+# Composable Workflow Commands
 
-Plan-driven development workflow with worktrees and parallel execution.
+Provider-native lifecycle commands for discovery through retirement. Canonical result
+meaning stays stable while profiles independently select methods, executors, providers,
+workspaces, and governance.
 
 ## Installation
 
@@ -18,92 +20,73 @@ codex plugin marketplace add xonovex/platform
 codex plugin add xonovex-workflow@xonovex-marketplace
 ```
 
-### Dependencies
+## Dependencies
 
-Each command delegates its procedure to a guideline skill, declared in `plugin.json`
-`dependencies`. On Claude Code, installing this plugin auto-installs those skills; if a
-depended-on skill is missing the command is disabled with `dependency-unsatisfied`. On
-Codex, `dependencies` is not auto-installed — install the delegated skill plugins
-alongside this one.
+Commands load their owning guideline skills at runtime. Plugin dependencies guarantee the
+core workflow, planning, governance, review, and testing capabilities are installed.
 
-The `pr-*` commands additionally load a **host-delivery skill** chosen from the git remote
-to open PRs/MRs and post reviews — `xonovex-skill-github` (GitHub), `xonovex-skill-gitlab`
-(GitLab), or another `xonovex-skill-<host>`. These are pluggable, not hard dependencies:
-install the one matching your host. With none installed, the `pr-*` commands still load and
-tell you which host skill to add.
+Methods and native adapters are soft dependencies selected per operation. User stories,
+BDD, example mapping, user research, accessibility, architecture, Git/worktrees, GitHub,
+GitLab, databases, work-item trackers, and artifact providers are not universal
+prerequisites. When an explicitly selected capability is unavailable, the command fails
+visibly and names what is missing; it never silently substitutes a local file or provider.
 
+## Early lifecycle
+
+```text
+Discovery -> Research -> Formulation -> optional Experience Design / Solution Design
+         -> Decision -> Planning -> child Planning results -> Development
 ```
-+---------------------+     +---------------------+     +---------------------+
-|      Research       |     |      Planning       |     |   Worktree Setup    |
-+---------------------+     +---------------------+     +---------------------+
-| 1. plan-research    |---->| 1. plan-create      |---->| 1. plan-worktree-   |
-|    - viability      |     | 2. plan-subplans    |     |      create         |
-|    - alternatives   |     | 3. git-commit       |     | 2. cd <worktree>    |
-| 2. plan-decide      |     |                     |     |                     |
-+---------------------+     +---------------------+     +---------------------+
-                                                                  |
-            +-----------------------------------------------------+
-            |
-            v
-+---------------------+     +---------------------+     +---------------------+
-|  Development Loop   |     |    Code Quality     |     |        Merge        |
-+---------------------+     +---------------------+     +---------------------+
-| 1. plan-continue    |---->| 1. plan-research    |---->| 1. plan-worktree-   |
-| 2. (implement)      |     |    (code-quality    |     |      merge          |
-| 3. plan-validate    |     |     audit)          |     | 2. git-commit       |
-| 4. reflect-extract  |     +---------------------+     |      --push         |
-| 5. plan-update      |            |                    +---------------------+
-+---------------------+            |                              |
-            ^                      |                              |
-            |                      |                              v
-            +--- more subplans? ---+                    +---------------------+
-                                                        |        Done         |
-                                                        +---------------------+
 
-Parallel: Multiple agents work on parallel subplan groups in separate worktrees
-Learning: reflect-to-instructions / reflect-to-skill fold learnings into guidelines for future sessions
-```
+Each capability publishes its own provider-native result and opaque reference. Critique,
+revision, and authority-bound acceptance remain independent operations. Fresh-context
+resume resolves native references; conversation and runtime traces are not persistent
+identity.
+
+| Command                                             | Description                                                                                      |
+| --------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| `discovery-run`                                     | Iterate observations, assumptions, affected context, and unknowns without forcing stories        |
+| `research-run`                                      | Produce reusable evidence, provenance, confidence, uncertainty, and bounded synthesis            |
+| `formulation-run`                                   | Formulate candidate behavior, examples, constraints, and ambiguities with a neutral default      |
+| `experience-design-{create,critique,revise,accept}` | Manage an optional Experience Design result at exact revisions                                   |
+| `solution-design-{create,critique,revise,accept}`   | Manage an optional Solution Design result at exact revisions                                     |
+| `decision-{create,critique,revise,accept}`          | Keep evidence, recommendation, authority, and supersession separate                              |
+| `workflow-onboard-advise`                           | Recommend profile-compatible methods, skills, providers, executors, and modules without applying |
+
+## Planning and execution
+
+| Command                       | Description                                                             |
+| ----------------------------- | ----------------------------------------------------------------------- |
+| `plan-research`               | Specialized read-only codebase/web research or code-quality analysis    |
+| `plan-create`                 | Publish a high-level Planning result from opaque lifecycle references   |
+| `plan-revise`                 | Apply feedback to an exact Planning revision and publish a new revision |
+| `plan-critique`               | Independently stress-test an exact Planning revision                    |
+| `plan-accept` / `plan-reject` | Record an authority-bound status decision against an exact revision     |
+| `plan-subplans-create`        | Publish detailed child Planning results and dependency/execution groups |
+| `plan-continue`               | Reconstruct native state and complete one actionable child result       |
+| `plan-update`                 | Publish current status and exact-revision validation evidence           |
+| `plan-validate`               | Validate success criteria and Definition of Done without mutation       |
+
+## Delivery and governance
+
+| Command                                        | Description                                                                       |
+| ---------------------------------------------- | --------------------------------------------------------------------------------- |
+| `acceptance-validate`                          | Validate an exact deliverable revision using neutral or selected criteria methods |
+| `git-commit`                                   | Commit/push through an installed Git capability                                   |
+| `plan-worktree-{create,merge,abandon,cleanup}` | Optional Git-worktree workspace operations                                        |
+| `pr-create`                                    | Open a provider-native pull/merge request through the detected host adapter       |
+| `pr-review-{analyze,refine,post,resolve}`      | Produce, refine, publish, and resolve review findings                             |
+| `workflow-inspect`                             | Inspect workflow results, profile topology, evidence, and completion gaps         |
+| `workflow-governance-inspect`                  | Inspect effective policies, modules, authority, enforcement, and exceptions       |
+| `workflow-conformance`                         | Validate workflow and governance semantic contracts                               |
+| `workflow-drift`                               | Compare intended and observed governance state                                    |
+| `workflow-modules`                             | Inspect or manage governance modules through native adapters                      |
+
+## Design decisions
+
+- Lifecycle commands depend on semantic result and provider ports, not provider formats.
+- Neutral methods are available without story/Gherkin skills; specialist methods remain selectable.
+- Deterministic collection is preferred, model synthesis is bounded, agents are reserved for adaptive exploration, and human/qualified authority is never fabricated.
+- Local files, Git repositories, hosted trackers, and databases are peers selected by profile/context; none is the universal fallback.
 
 [View workflow diagram](../../diagram/diagram-agent-workflow/workflow-diagram.png)
-
-## Commands
-
-| Command                       | Description                                                                                |
-| ----------------------------- | ------------------------------------------------------------------------------------------ |
-| `plan-research`               | Research codebase + web, or run a read-only code-quality audit (harden / simplify / align) |
-| `plan-decide`                 | Settle decisions one at a time — walk known open ones, or discover them by questioning     |
-| `plan-create`                 | Create a high-level plan for user review (test-first plans route to tdd / bdd guides)      |
-| `plan-revise`                 | Apply annotations and prompt feedback to the plan                                          |
-| `plan-critique`               | Adversarially stress-test a plan to expose weaknesses                                      |
-| `plan-accept`                 | Approve a plan for execution (sanity-check, set status: approved)                          |
-| `plan-reject`                 | Reject a plan with a reason (set status: rejected, keep the plan)                          |
-| `plan-subplans-create`        | Generate detailed subplans with parallel execution detection                               |
-| `plan-worktree-create`        | Create a git worktree for a feature branch                                                 |
-| `plan-continue`               | Resume work from an existing plan                                                          |
-| `plan-validate`               | Verify that a plan or current work has been fully achieved                                 |
-| `plan-update`                 | Update plan status and test results                                                        |
-| `story-refine`                | Refine user stories against INVEST and split them vertically (SPIDR)                       |
-| `acceptance-formalize`        | Formalize acceptance criteria as Given-When-Then scenarios (three-amigos)                  |
-| `acceptance-validate`         | Validate a PR against its acceptance scenarios, pass/fail per scenario                     |
-| `git-commit`                  | Commit and push changes                                                                    |
-| `pr-create`                   | Open a pull request with a drafted description (any host)                                  |
-| `pr-review-analyze`           | Review a branch diff into a structured findings file                                       |
-| `pr-review-refine`            | Refine review findings one by one before publishing                                        |
-| `pr-review-post`              | Publish a structured, labelled code review to a PR (any host)                              |
-| `pr-review-resolve`           | Verify fixes and resolve the review's blocking threads                                     |
-| `plan-worktree-merge`         | Merge feature worktree back to source                                                      |
-| `plan-worktree-abandon`       | Document and abandon a feature with reason and learnings                                   |
-| `plan-worktree-cleanup`       | Remove stale and merged worktrees, and prune leftover admin metadata                       |
-| `workflow-inspect`            | Inspect workflow results, profile topology, evidence, and completion gaps                  |
-| `workflow-governance-inspect` | Inspect effective policies, modules, authority, enforcement, and exceptions                |
-| `workflow-conformance`        | Validate workflow and governance semantic contracts                                        |
-| `workflow-onboard-advise`     | Discover and preview governance onboarding without applying changes                        |
-| `workflow-drift`              | Compare intended and observed governance state                                             |
-| `workflow-modules`            | Inspect or lifecycle-manage governance modules through native adapters                     |
-
-## Design Decisions
-
-- **Domain-agnostic commands**: the agent figures out what to do based on context
-- **No hooks except git hooks**: agents decide when something cannot be fixed
-- **Plans committed in git**: continue from another machine, branch off for alternatives
-- **`*-simplify` commands**: generalize, compress, remove duplication

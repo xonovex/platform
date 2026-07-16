@@ -1,0 +1,28 @@
+---
+description: Formulate candidate behavior, requirements, examples, and constraints with a neutral default method
+allowed-tools:
+  - Read
+  - Write
+  - Edit
+  - Bash
+  - Glob
+  - Grep
+  - Task
+  - AskUserQuestion
+  - Skill
+argument-hint: "<subject-or-native-reference> [--profile <reference>] [--provider <selection>] [--method <selection>] [--executor <class>]"
+---
+
+# /xonovex-workflow:formulation-run — Run Formulation
+
+## Arguments
+
+- `subject-or-native-reference` (required): Discovery/Research input, subject, or opaque native reference.
+- `--profile`, `--provider`, `--method`, `--executor` (optional): Independent axis selections; neutral is the default method.
+
+## Delegation
+
+Load `plan-guide` (plugin `xonovex-skill-plan`) and perform **formulation-run**. Load
+`workflow-guide` (plugin `xonovex-skill-workflow`) for result and provider contracts.
+User stories, BDD, and example mapping are selectable installed methods, not hard
+dependencies. Publish a canonical Formulation result through the selected provider.

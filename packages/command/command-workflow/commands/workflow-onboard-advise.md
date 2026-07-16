@@ -1,26 +1,27 @@
 ---
-description: Discover an environment and preview compatible governance modules, permissions, data flows, verification, and rollback without applying changes
+description: Recommend profile-compatible lifecycle methods, skills, providers, executors, policy evidence, and environment modules without applying changes
 allowed-tools:
   - Bash
   - Read
   - Glob
   - Grep
   - Skill
-argument-hint: "[scope] [--profile <reference>] [--module <name>]"
+argument-hint: "[scope] [--profile <reference>] [--provider <selection>] [--module <name>]"
 ---
 
-# /xonovex-workflow:workflow-onboard-advise — Advise Governance Onboarding
+# /xonovex-workflow:workflow-onboard-advise — Advise Workflow and Governance Onboarding
 
 ## Arguments
 
-- `scope` (optional): Environment, repository, organization, harness, CI, or provider scope to discover; defaults to the current environment.
-- `--profile <reference>` (optional): Desired governance profile.
-- `--module <name>` (optional): Candidate module to assess and preview.
+- `scope` (optional): Environment, repository, organization, harness, CI, provider, or workflow scope; defaults to current environment.
+- `--profile` (optional): Desired workflow/governance profile reference.
+- `--provider` (optional): Candidate result provider to assess.
+- `--module` (optional): Candidate skill, adapter, policy, harness, CI, or environment module.
 
 ## Delegation
 
-Load the `agent-governance-guide` skill (plugin
-`xonovex-skill-agent-governance`) and perform its **advise onboarding** operation with
-these arguments. Stop after discovery, assessment, recommendation, and exact preview;
-this command never authorizes or applies configuration. The skill is the source of truth
-for capabilities, permissions, data flows, verification, rollback, output, and gotchas.
+Load `plan-guide` and perform **lifecycle-onboard-advise**, `workflow-guide` for profile,
+provider, and result semantics, and `agent-governance-guide` for module trust, permissions,
+data flows, enforcement guarantees, verification, rollback, and drift. Recommend compatible
+methods, skills, providers, executors, and modules; stop after discovery, assessment,
+recommendation, and exact preview. Never authorize or apply configuration.

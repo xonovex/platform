@@ -1,19 +1,13 @@
-# plan-accept: Approve a Plan for Execution
+# plan-accept: Approve an Exact Planning Revision
 
-Record the user's approval on a plan document so it can be expanded into subplans. Terminal decision — do NOT edit the plan's content or implement anything.
+Record the accountable actor's approval against one exact Planning revision. This is a terminal authority action for the revision; do not revise, expand, or implement in the same operation.
 
-## Precondition
+## Core workflow
 
-A plan with `status: pending-approval` (or `rejected`, when re-accepting after fixes). If feedback is still open, run `plan-revise` first.
+1. Resolve the Planning provider context, opaque native reference, exact revision, critiques, source evidence, and profile requirements.
+2. Sanity-check non-empty `skills_to_consult`, reconciled dependencies, validation and success criteria, unresolved feedback, evidence freshness, and provider capabilities.
+3. Verify the actor and authority reference required by the profile. A model may summarize but cannot impersonate or infer approval.
+4. Obtain accept, reject, or conditional status with conditions, expiry/review triggers, and rationale.
+5. Publish the status decision against the exact revision and return its native reference, authority/evidence references, and next capability.
 
-## Core Workflow
-
-1. **Locate plan** — user message, git config, or most recent `plans/*.md`
-2. **Sanity check before approving** — confirm `skills_to_consult` is populated, `dependencies` are reconciled, success criteria exist, and no unresolved annotation markers remain (`NOTE:` / `FIXME:` / `>>>`). If any are missing, report them and STOP — do not approve a half-finished plan
-3. **Set `status: approved`** and refresh the `updated` date; change nothing else
-4. **Present** a one-line confirmation and the next step (`plan-subplans-create`), then STOP
-
-## Gotchas
-
-- Approving only flips the status — it does not generate subplans or implement; `plan-subplans-create` is the next step and requires `status: approved`
-- Never approve a plan with unresolved annotations or missing `skills_to_consult` — fix via `plan-revise` first
+Apply [early-lifecycle-contracts.md](early-lifecycle-contracts.md). Approval of revision N does not transfer to revision N+1.

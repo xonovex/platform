@@ -3,13 +3,10 @@ language: unknown
 tags: [command]
 dependsOn:
   - skill-agent-governance
-  - skill-bdd
   - skill-code-quality
   - skill-code-review
-  - skill-git
   - skill-plan
   - skill-pull-request
-  - skill-tdd
   - skill-workflow
 tasks:
   build:

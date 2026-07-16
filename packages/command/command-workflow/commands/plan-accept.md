@@ -1,25 +1,27 @@
 ---
-description: "Draft: approve a plan for execution — set status: approved after a final sanity check"
+description: Record an authorized approval decision against an exact provider-native Planning revision
 allowed-tools:
   - Read
-  - Edit
+  - Write
+  - Bash
   - Glob
   - Grep
   - AskUserQuestion
   - Skill
-argument-hint: "[plan-file]"
+argument-hint: "<native-reference> [--revision <native-revision>] [--authority-reference <reference>] [--provider <selection>]"
 ---
 
-# /xonovex-workflow:plan-accept — Approve a Plan
-
-> Lifecycle: research → decide → create → revise ⇄ critique → **accept** → subplans-create → continue → update → validate
+# /xonovex-workflow:plan-accept — Accept Planning Result
 
 ## Arguments
 
-- `plan-file` (optional): Path to plan document (auto-detects from git config or most recent plan in `plans/`)
+- `native-reference` (required): Opaque Planning reference.
+- `--revision` (required when not provider-implied): Exact revision under approval.
+- `--authority-reference` (optional only when provider context proves authority): Actor/role reference.
+- `--provider` (optional): Status/decision provider.
 
 ## Delegation
 
-Load the `plan-guide` skill (plugin `xonovex-skill-plan`) and perform its
-**plan-accept** operation with these arguments. The skill is the source of truth for
-the procedure, output format, and gotchas — do not restate them.
+Load `plan-guide` and perform **plan-accept**; load `workflow-guide` for provider-native
+result contracts. Verify authority, bind the decision to the exact revision, publish it,
+and stop. A model may summarize but cannot fabricate approval.

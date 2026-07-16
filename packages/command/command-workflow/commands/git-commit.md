@@ -26,6 +26,7 @@ argument-hint: >-
 
 ## Delegation
 
-Load the `git-guide` skill (plugin `xonovex-skill-git`) and perform its **commit**
-operation with these arguments. The skill is the source of truth for the procedure,
-output format, and gotchas — do not restate them.
+Load an installed capability that provides safe Git commit/push operations and perform
+its commit workflow with these arguments. This is a soft dependency: if no compatible
+Git capability is installed, stop and name the missing capability instead of improvising
+or changing another provider.

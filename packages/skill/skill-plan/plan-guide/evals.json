@@ -33,6 +33,38 @@
         "The plan includes a non-empty skills_to_consult list naming applicable coding-guideline skills for implementers",
         "It stops at the high-level/parent plan and does NOT write out detailed implementation subplans in the same pass"
       ]
+    },
+    {
+      "id": 5,
+      "prompt": "Run discovery on the dispatch-delay problem. We use a hosted tracker, do not want user stories by default, and may lose this agent session before formulation.",
+      "assertions": [
+        "Produces a canonical Discovery result with observations, assumptions, unknowns, and affected context without requiring user-story or Gherkin form",
+        "Publishes through the selected provider and returns an opaque native reference that can be resolved after context loss"
+      ]
+    },
+    {
+      "id": 6,
+      "prompt": "Research whether our support assistant can process EU customer transcripts. Separate evidence from synthesis, state confidence, and account for privacy and regulated applicability.",
+      "assertions": [
+        "Separates cited evidence and provenance from synthesized findings, limitations, uncertainty, and open questions",
+        "Requests semantic data-access, external-research, privacy, and regulated-applicability policy intents without embedding one policy engine or hook format"
+      ]
+    },
+    {
+      "id": 7,
+      "prompt": "Critique solution design design:payments-v3 at revision sha256:91af, then let our architecture owner decide whether to accept it.",
+      "assertions": [
+        "Critique runs in fresh independent context and remains separate from revision and acceptance",
+        "Acceptance binds to the exact native revision and preserves the human authority reference rather than allowing the model to fabricate authority"
+      ]
+    },
+    {
+      "id": 8,
+      "prompt": "Create a planning result from research result:782 and decision R-18. The result provider is our task database, not files or Git.",
+      "assertions": [
+        "Consumes the opaque native input references by asking the selected providers to resolve them rather than parsing their shapes",
+        "Publishes a provider-native Planning result and does not silently fall back to a local plan file or require Git"
+      ]
     }
   ]
 }

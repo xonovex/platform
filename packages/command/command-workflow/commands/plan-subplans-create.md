@@ -1,28 +1,30 @@
 ---
-description: "Execution: expand an approved parent plan into detailed subplans with parallel-group detection"
+description: Expand an approved Planning revision into provider-native child Planning results and execution groups
 allowed-tools:
   - Write
   - Read
+  - Bash
   - Glob
   - Grep
   - TaskCreate
   - TaskUpdate
   - Skill
-argument-hint: "[parent-plan-file] [--by-phase] [--dry-run]"
+argument-hint: "<native-reference> [--revision <native-revision>] [--provider <selection>] [--by-phase] [--dry-run]"
 ---
 
-# /xonovex-workflow:plan-subplans-create — Generate Detailed Subplans from Parent Plan
-
-> Lifecycle: research → decide → create → revise ⇄ critique → **subplans-create** → continue → update → validate
+# /xonovex-workflow:plan-subplans-create — Create Child Planning Results
 
 ## Arguments
 
-- `parent-plan-file` (required): Path to approved parent plan (e.g., `plans/auth.md`)
-- `--by-phase` (optional): Split by phase markers instead of logical grouping
-- `--dry-run` (optional): Preview without writing files
+- `native-reference` (required): Opaque approved parent Planning reference.
+- `--revision` (required when not provider-implied): Exact approved revision.
+- `--provider` (optional): Child result provider.
+- `--by-phase` (optional): Group by explicit lifecycle/profile phases instead of logical components.
+- `--dry-run` (optional): Preview native child publications and relationships.
 
 ## Delegation
 
-Load the `plan-guide` skill (plugin `xonovex-skill-plan`) and perform its
-**plan-subplans-create** operation with these arguments. The skill is the source of
-truth for the procedure, output format, and gotchas — do not restate them.
+Load `plan-guide` and perform **plan-subplans-create**; load `workflow-guide` for native
+result, provider, relation, and profile contracts. Publish child Planning results and
+execution groups, then stop. Files, line numbers, Git configuration, and worktrees are
+optional provider/workspace behavior.

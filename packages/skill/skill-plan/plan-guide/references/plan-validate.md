@@ -1,39 +1,14 @@
-# plan-validate: Validate Plan Achievement
+# plan-validate: Validate a Planning Result
 
-Verify a plan's objectives are fully achieved: success criteria pass, the code structurally matches what the plan describes, AND the team's Definition of Done is met. Read-only — never modifies files (use `plan-update` to change status).
+Read-only validation confirms whether one Planning result's success criteria and Definition of Done are met at exact revisions. It reports evidence and gaps; it does not revise status or implementation.
 
-## Core Workflow
+## Core workflow
 
-### With Plan Document
+1. Resolve the provider context, opaque Planning reference, exact revision, child results, source results, profile, and evidence references.
+2. Resolve the exact subject/workspace revisions being claimed. Reject stale, mismatched, missing, or unresolvable evidence.
+3. Run applicable typecheck, lint, build, tests, integration, policy, and profile-specific checks through selected adapters. Record not-applicable/unavailable categories with rationale.
+4. Check every success criterion, task, review/documentation requirement, non-functional requirement, unresolved finding, and cumulative completion rule independently.
+5. Report PASS/FAIL/WARN per criterion with native evidence references, limitations, and the exact revisions checked.
+6. Publish validation evidence if a provider was selected for the report, but do not mutate the Planning result or claim Acceptance.
 
-1. **Load plan** — read document, extract tasks, success criteria, file lists
-2. **Parse metadata** — extract status, dependencies from frontmatter
-3. **Check subplans** — if subplans exist, read and report their status
-4. **Criteria checks** — run each success criterion command and report pass/fail:
-   - Type check, lint, build, tests — detect toolchain from project, don't hardcode
-   - Grep checks from the plan (e.g. "zero direct calls outside X")
-5. **Structural audit** — for each plan task, search the codebase to verify:
-   - Types/functions mentioned in the plan exist in the code
-   - Files created/removed as stated
-   - Naming matches (plan says `foo_t`, code doesn't still use the old name `bar_t`)
-   - Data flow matches (plan says "A reads from B", code doesn't have A reading from C)
-   - Report deviations as: "plan says X, code has Y"
-6. **Cross-subplan consistency** — shared concepts named the same way across subplans,
-   no contradictions, dependencies reference things that exist
-7. **Report** — per-criterion PASS/FAIL, per-task match/deviation, consistency issues
-8. **Definition of Done** — beyond the plan's own success criteria, confirm the team's Definition of Done (review complete, docs updated, no known regressions, NFRs met); the DoD is the release gate
-
-### Without Plan Document (Current Work)
-
-1. **Identify goal** — review conversation to extract objective and success criteria
-2. **Design tests** — create validation tests for each criterion
-3. **Execute** — run tests, collect evidence
-4. **Report** — clear pass/fail with evidence and recommendations
-
-## Gotchas
-
-- Criteria checks alone miss structural drift — code can pass all greps but implement something different from what the plan describes
-- Cross-subplan consistency issues compound silently — one wrong name in an early subplan propagates through all later ones
-- "Tests pass" without checking coverage misses gaps — read success criteria, not just exit codes
-- A subplan still `in_progress` blocks parent validation — surface it explicitly
-- A plan is not done on green tests alone — success criteria are plan-specific; the Definition of Done is the team-wide release gate (review, docs, no regressions, NFRs); check both
+Apply [early-lifecycle-contracts.md](early-lifecycle-contracts.md). Green tests alone do not satisfy the Definition of Done, and a runtime trace is not persistent identity.

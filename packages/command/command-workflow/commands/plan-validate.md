@@ -1,5 +1,5 @@
 ---
-description: "Execution: verify that a plan or current work has been fully achieved"
+description: Validate an exact Planning revision and its Definition of Done without mutating it
 allowed-tools:
   - Bash
   - Read
@@ -8,24 +8,22 @@ allowed-tools:
   - Task
   - TaskCreate
   - TaskUpdate
-  - TaskList
+  - Write
   - Skill
-argument-hint: "[plan-file] [--detailed]"
+argument-hint: "<native-reference> [--revision <native-revision>] [--provider <selection>] [--publish-evidence]"
 ---
 
-# /xonovex-workflow:plan-validate — Validate Plan Achievement
-
-> Lifecycle: research → decide → create → revise ⇄ critique → subplans-create → continue → update → **validate**
+# /xonovex-workflow:plan-validate — Validate Planning Result
 
 ## Arguments
 
-`/plan-validate [plan-file] [--detailed]`
-
-- `plan-file` (optional): Path to plan document (if omitted, validates current conversation goal)
-- `--detailed` (optional): Comprehensive analysis with full evidence trail
+- `native-reference` (required): Opaque Planning reference.
+- `--revision` (required when not provider-implied): Exact revision to validate.
+- `--provider` (optional): Provider used to resolve the result and optionally publish validation evidence.
+- `--publish-evidence` (optional): Publish the read-only validation report through the selected provider.
 
 ## Delegation
 
-Load the `plan-guide` skill (plugin `xonovex-skill-plan`) and perform its
-**plan-validate** operation with these arguments. The skill is the source of truth for
-the procedure, output format, and gotchas — do not restate them.
+Load `plan-guide` and perform **plan-validate**; load `workflow-guide` for exact-revision
+and evidence contracts. Check every criterion and Definition of Done item independently,
+report stale/missing evidence, and do not revise status or claim Acceptance.
