@@ -1,0 +1,89 @@
+# Kubernetes test coverage for agent-operator-go: the envtest integration suite
+# plus the four Kind-based e2e suites (e2e, e2e-gvisor, e2e-kata, e2e-coco).
+#
+# DORMANT: this workflow cannot run until it reaches the remote default branch.
+# Once there, trigger it with workflow_dispatch or wait for the nightly schedule.
+#
+# First-run expectations:
+# - Each e2e suite creates its own Kind cluster on the hosted runner (Docker is
+#   preinstalled on ubuntu-latest); kind/kubectl/setup-envtest come from the nix
+#   devshell.
+# - e2e-gvisor downloads runsc; e2e-kata downloads a Kata release and needs
+#   /dev/kvm for its VM-isolation test.
+# - Kata VM-isolation and CoCo confidential-runtime tests self-skip in
+#   unprivileged Kind: a green job with skips proves wiring, not runtime
+#   isolation. Each job summary reports executed-vs-skipped counts per suite so
+#   a pass-by-skip stays visible.
+name: E2E
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 3 * * *"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  test:
+    name: ${{ matrix.suite }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    strategy:
+      fail-fast: false
+      matrix:
+        suite:
+          - integration
+          - e2e
+          - e2e-gvisor
+          - e2e-kata
+          - e2e-coco
+
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - uses: ./.github/actions/setup-nix
+
+      - name: Run suite
+        run: nix develop --command bash -c "npm ci && npx moon run agent-operator-go:go-test-$SUITE" 2>&1 | tee "$RUNNER_TEMP/suite.log"
+        env:
+          SUITE: ${{ matrix.suite }}
+          # Lets moon resolve the github:// nix toolchain plugin without API rate limits.
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Report executed-vs-skipped counts
+        if: always()
+        run: |
+          log="$RUNNER_TEMP/suite.log"
+          if [ ! -f "$log" ]; then
+            printf '### %s\n\nNo test log produced (suite failed before running tests).\n\n' "$SUITE" >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          passed=$(grep -c -- '--- PASS:' "$log" || true)
+          failed=$(grep -c -- '--- FAIL:' "$log" || true)
+          skipped=$(grep -c -- '--- SKIP:' "$log" || true)
+          {
+            printf '### %s\n\n' "$SUITE"
+            printf '| Executed (pass) | Executed (fail) | Skipped |\n'
+            printf '| --- | --- | --- |\n'
+            printf '| %s | %s | %s |\n\n' "$passed" "$failed" "$skipped"
+            if [ "$skipped" -gt 0 ]; then
+              printf 'Skipped tests (kata/coco isolation tests self-skip in unprivileged Kind):\n\n```\n'
+              grep -- '--- SKIP:' "$log" || true
+              printf '```\n'
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+        env:
+          SUITE: ${{ matrix.suite }}

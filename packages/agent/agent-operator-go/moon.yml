@@ -39,13 +39,7 @@ tasks:
       cache: false
       runFromWorkspaceRoot: true
   go-test-integration:
-    command:
-      - go
-      - test
-      - -tags=integration
-      - -v
-      - -timeout=300s
-      - ./test/integration/
+    script: KUBEBUILDER_ASSETS="$(setup-envtest use -i -p path)" go test -tags=integration -v -timeout=300s ./test/integration/
     deps:
       - go-build
     inputs:
@@ -94,6 +88,22 @@ tasks:
       - -v
       - -timeout=600s
       - ./test/e2e-kata/
+    deps:
+      - go-build
+    inputs:
+      - '@globs(sources)'
+      - '@globs(tests)'
+    outputs: []
+    options:
+      cache: false
+  go-test-e2e-coco:
+    command:
+      - go
+      - test
+      - -tags=e2e_coco
+      - -v
+      - -timeout=600s
+      - ./test/e2e-coco/
     deps:
       - go-build
     inputs:

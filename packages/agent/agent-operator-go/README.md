@@ -771,8 +771,11 @@ kubectl logs job/fix-auth-bug -c git-clone
 go test ./...
 
 # Integration tests (envtest, real API server, no kubelet)
-# Requires: setup-envtest (go install sigs.k8s.io/controller-runtime/tools/setup-envtest@latest)
-KUBEBUILDER_ASSETS=$(setup-envtest use -p path) go test -tags=integration -v -timeout=300s ./test/integration/
+# Requires: setup-envtest, provided by the nix devshell (nix/k8s.nix)
+# The moon task wires KUBEBUILDER_ASSETS itself — no manual export needed:
+npx moon run agent-operator-go:go-test-integration
+# Direct invocation outside moon:
+KUBEBUILDER_ASSETS="$(setup-envtest use -i -p path)" go test -tags=integration -v -timeout=300s ./test/integration/
 
 # E2E tests (Kind, full cluster with scheduling and garbage collection)
 # Requires: kind, kubectl, Docker
@@ -802,6 +805,44 @@ go test -tags=e2e_coco -v -timeout=600s ./test/e2e-coco/
 - **Integration:** Reconciler logic against a real API server, including resource creation, phase transitions, provider resolution, harness defaults, terminal phases, and shared workspaces.
 - **E2E:** Full cluster scheduling, storage, initialization, owner cleanup, image deployment, multi-agent workspaces, and the full agent pipeline.
 - **E2E gVisor/Kata/CoCo:** RuntimeClass propagation, harness defaults, complete runs, workspace paths, and runtime-specific isolation evidence where the environment supports it.
+
+### Known host issue: Kind node exec fails (`setns process: exec: already started`)
+
+On affected hosts every Kind-based e2e suite fails at cluster creation ("Writing
+configuration") before running a single test, with:
+
+```
+OCI runtime exec failed: exec failed: unable to start container process: error starting setns process: exec: already started
+```
+
+Observed 2026-07-16 with docker 29.1.3 / runc 1.4.0 on kernel 7.0.6-gentoo
+(cgroup v2, nsdelegate). Findings from the investigation:
+
+- `docker exec` into a plain container (alpine) works, with or without
+  `--privileged`.
+- `docker exec` into a Kind node container fails identically with or without
+  `--privileged`, on both `kindest/node:v1.35.0` and `v1.31.9` — the node-image
+  version is irrelevant.
+- The node container runs systemd in a private cgroup namespace: its PID 1
+  sits in the child cgroup `init.scope` while controllers are enabled on the
+  container's root cgroup, so attaching an exec'd process to that root cgroup
+  violates cgroup v2's internal-process constraint. The `exec: already started`
+  text is Go's `os/exec` error for a second `Start` on one `Cmd`, which places
+  the fault in runc's exec/cgroup-attach retry path, not in the kernel setns
+  call itself.
+- Best hypothesis: a runc 1.4.0 exec bug triggered by systemd containers on
+  this kernel/cgroup layout. Portage carries runc 1.4.2 (stable) and 1.4.3
+  (~testing); upgrading and restarting docker is the untested candidate fix —
+  it needs root, so it was not applied.
+- Separately, the kata suite extracts a multi-GB Kata release into `$TMPDIR`;
+  on a small tmpfs `/tmp` it fails at `tar` (ENOSPC) before reaching Kind. Set
+  `TMPDIR` to a disk-backed path to get past that and reach the same Kind
+  failure as the other suites.
+
+Working alternative: `.github/workflows/e2e.yml` runs the integration suite
+and all four e2e suites on a hosted runner. It is dormant until it reaches the
+remote default branch; trigger it with `workflow_dispatch` or wait for its
+nightly schedule.
 
 ## Architecture
 
