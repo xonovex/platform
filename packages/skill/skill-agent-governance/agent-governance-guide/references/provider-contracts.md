@@ -8,7 +8,7 @@ Required semantic operations are `evaluate`, `request-evidence`, `explain`, `res
 
 - Evaluate explicit subject, action, actor, authority, contextual facts, applicability, policy/profile versions, and evidence freshness deterministically for the same inputs and versions.
 - Return outcome, reasons, required evidence or remediation, explanation, expiry, limitations, and an opaque decision reference. Keep the decision distinct from enforcement and enforcement evidence.
-- Resolve exceptions and break-glass references only within their declared scope, authority, time, compensating controls, and review requirements.
+- Resolve exception references, including emergency ones, only within their declared scope, authority, time, compensating controls, and review requirements.
 - Retain or reconstruct the policy version and input/evidence references required to replay a historical decision. Replay reports missing or changed inputs rather than silently evaluating current state as history.
 - Treat a native policy language or engine as optional. A deterministic rules adapter and an OPA adapter conform when they produce the same semantic decision for the same versioned facts.
 

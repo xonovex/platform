@@ -1,6 +1,6 @@
 ---
 name: workflow-guide
-description: "Use when defining, executing, inspecting, composing, or validating lifecycle workflow capabilities, provider-native result contracts, ephemeral result handles, workflow profiles, development and assurance work, human Acceptance, privileged Integration, Transition, Release, Observation, Incident, Corrective Action, Retirement, or cross-provider handoffs. Triggers on workflow result, PhaseResultHandle, exact-revision assurance, evidence freshness, authorization drift, rollback, break-glass, provider-native evidence, or workflow conformance, even when the user doesn't say 'workflow architecture'."
+description: "Use when defining, executing, inspecting, composing, or validating lifecycle workflow capabilities, provider-native result contracts, ephemeral result handles, workflow profiles, development and assurance work, human Acceptance, privileged Integration, Transition, Release, Observation, Incident, Corrective Action, Retirement, or cross-provider handoffs. Triggers on workflow result, PhaseResultHandle, exact-revision assurance, evidence freshness, authorization drift, rollback, emergency-exception, provider-native evidence, or workflow conformance, even when the user doesn't say 'workflow architecture'."
 ---
 
 # Composable Workflow Contracts and Operations
@@ -74,7 +74,7 @@ Keep lifecycle meaning stable while methods, executors, providers, topology, and
 - Read [references/assessment-run.md](references/assessment-run.md) - Load when assessing any exact workflow result against a pinned framework, policy, risk, security, accessibility, AI, or supply-chain criterion set
 - Read [references/review-run.md](references/review-run.md) - Load when reviewing an exact Deliverable Publication revision and publishing independent findings
 - Read [references/qa-run.md](references/qa-run.md) - Load when validating an exact Deliverable Publication revision in one or more recorded environments
-- Read [references/operational-contracts.md](references/operational-contracts.md) - Load when binding authorization, privileged operations, exception or break-glass behavior, agent assistance, or operational failure policy
+- Read [references/operational-contracts.md](references/operational-contracts.md) - Load when binding authorization, privileged operations, exception or emergency-exception behavior, agent assistance, or operational failure policy
 - Read [references/acceptance-validate.md](references/acceptance-validate.md) - Load when assembling fresh evidence for a separate accountable Acceptance decision
 - Read [references/acceptance-decide.md](references/acceptance-decide.md) - Load when an accountable human accepts, conditionally accepts, or rejects an exact Deliverable revision
 - Read [references/integration-validate.md](references/integration-validate.md) - Load when preflighting exact-revision Integration authorization and external-enforcement capabilities without mutation

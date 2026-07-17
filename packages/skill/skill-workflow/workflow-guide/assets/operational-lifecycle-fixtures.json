@@ -1,5 +1,5 @@
 {
-  "purpose": "Deterministic fixtures for Acceptance, exact-revision authorization, privileged Integration and operational lifecycle capabilities, exceptions, break-glass, agent assistance, rollback, incidents, data deletion, and Retirement verification.",
+  "purpose": "Deterministic fixtures for Acceptance, exact-revision authorization, privileged Integration and operational lifecycle capabilities, exceptions, emergency-exception, agent assistance, rollback, incidents, data deletion, and Retirement verification.",
   "templates": {
     "acceptance-evidence": {
       "mode": "evidence",
@@ -118,9 +118,9 @@
         "now": "2026-07-16T10:00:00Z"
       }
     },
-    "break-glass": {
+    "emergency-exception": {
       "access": {
-        "kind": "break-glass",
+        "kind": "emergency-exception",
         "owner": "human:incident-commander",
         "approver": {
           "identity": "human:security-lead",
@@ -1127,16 +1127,16 @@
       "expectedCode": "corrective-action-closure-incomplete"
     },
     {
-      "id": "scoped-break-glass-is-valid",
+      "id": "scoped-emergency-exception-is-valid",
       "contract": "emergency-access",
-      "template": "break-glass",
+      "template": "emergency-exception",
       "profileTemplate": "governed-profile",
       "expectedValid": true
     },
     {
       "id": "scoped-exception-is-valid",
       "contract": "emergency-access",
-      "template": "break-glass",
+      "template": "emergency-exception",
       "profileTemplate": "governed-profile",
       "input": {
         "access": {
@@ -1146,9 +1146,9 @@
       "expectedValid": true
     },
     {
-      "id": "break-glass-requires-accountable-approver",
+      "id": "emergency-exception-requires-accountable-approver",
       "contract": "emergency-access",
-      "template": "break-glass",
+      "template": "emergency-exception",
       "input": {
         "access": {
           "approver": {
@@ -1162,7 +1162,7 @@
     {
       "id": "exception-approver-accountability-is-not-optional",
       "contract": "emergency-access",
-      "template": "break-glass",
+      "template": "emergency-exception",
       "input": {
         "access": {
           "kind": "exception",
@@ -1175,9 +1175,9 @@
       "expectedCode": "emergency-access-contract-incomplete"
     },
     {
-      "id": "expired-break-glass-fails-closed",
+      "id": "expired-emergency-exception-fails-closed",
       "contract": "emergency-access",
-      "template": "break-glass",
+      "template": "emergency-exception",
       "profileTemplate": "governed-profile",
       "input": {
         "request": {
@@ -1188,9 +1188,9 @@
       "expectedCode": "emergency-access-expired"
     },
     {
-      "id": "break-glass-requires-notification",
+      "id": "emergency-exception-requires-notification",
       "contract": "emergency-access",
-      "template": "break-glass",
+      "template": "emergency-exception",
       "profileTemplate": "governed-profile",
       "input": {
         "access": {
@@ -1198,12 +1198,12 @@
         }
       },
       "expectedValid": false,
-      "expectedCode": "break-glass-contract-incomplete"
+      "expectedCode": "emergency-exception-contract-incomplete"
     },
     {
-      "id": "break-glass-approver-cannot-rely-on-own-grant",
+      "id": "emergency-exception-approver-cannot-rely-on-own-grant",
       "contract": "emergency-access",
-      "template": "break-glass",
+      "template": "emergency-exception",
       "profileTemplate": "governed-profile",
       "input": {
         "access": {
@@ -1216,7 +1216,7 @@
     {
       "id": "exception-approver-cannot-rely-on-own-grant",
       "contract": "emergency-access",
-      "template": "break-glass",
+      "template": "emergency-exception",
       "profileTemplate": "governed-profile",
       "input": {
         "access": {
@@ -1230,7 +1230,7 @@
     {
       "id": "emergency-access-record-cannot-waive-profile-independence",
       "contract": "emergency-access",
-      "template": "break-glass",
+      "template": "emergency-exception",
       "profileTemplate": "governed-profile",
       "input": {
         "access": {
@@ -1249,7 +1249,7 @@
     {
       "id": "emergency-access-independence-requirement-undeclared",
       "contract": "emergency-access",
-      "template": "break-glass",
+      "template": "emergency-exception",
       "input": {
         "access": {
           "owner": "human:security-lead"
@@ -1261,7 +1261,7 @@
     {
       "id": "emergency-access-independence-unverifiable-without-owner-identity",
       "contract": "emergency-access",
-      "template": "break-glass",
+      "template": "emergency-exception",
       "profileTemplate": "governed-profile",
       "input": {
         "access": {
@@ -1276,7 +1276,7 @@
     {
       "id": "profile-may-waive-emergency-access-independence",
       "contract": "emergency-access",
-      "template": "break-glass",
+      "template": "emergency-exception",
       "profileTemplate": "solo-profile",
       "input": {
         "access": {
@@ -1296,7 +1296,7 @@
           }
         },
         "emergencyAccess": {
-          "kind": "break-glass",
+          "kind": "emergency-exception",
           "owner": "human:security-lead",
           "approver": {
             "identity": "human:security-lead",

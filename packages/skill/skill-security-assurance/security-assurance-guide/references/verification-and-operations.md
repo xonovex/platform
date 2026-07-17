@@ -8,13 +8,13 @@ Record subject, policy/control/evaluator/environment versions, inputs, origin, a
 
 ## Exercise failure and adversarial paths
 
-Test malformed and hostile input, direct and indirect injection, privilege expansion, secret and sensitive-data canaries, missing enforcement, stale versions, dependency and policy-provider outage, telemetry loss, duplicate and concurrent execution, ordering, timeout, cancellation, partial changes, rollback failure, exception abuse, unauthorized break-glass, and fresh-context evidence reconstruction.
+Test malformed and hostile input, direct and indirect injection, privilege expansion, secret and sensitive-data canaries, missing enforcement, stale versions, dependency and policy-provider outage, telemetry loss, duplicate and concurrent execution, ordering, timeout, cancellation, partial changes, rollback failure, exception abuse, unauthorized emergency exceptions, and fresh-context evidence reconstruction.
 
 A test proves something only if a concrete bad case makes it fail. Include known-denied and known-failing fixtures; avoid baselines generated only after the implementation change.
 
-## Handle exceptions and break-glass
+## Handle exceptions and emergency exceptions
 
-An exception records exact scope, control, owner, authorized approver, rationale, compensating controls, affected subjects, evidence, start, expiry, review, remediation, and revocation. Break-glass additionally records emergency reason, explicit invocation, authoritative access evidence, notification, containment, time-limited access, revocation, and post-event review.
+An exception records exact scope, control, owner, authorized approver, rationale, compensating controls, affected subjects, evidence, start, expiry, review, remediation, and revocation. An emergency exception additionally records emergency reason, explicit invocation, authoritative access evidence, notification, containment, time-limited access, revocation, and post-event review.
 
 Expired, ownerless, unreviewed, evidence-free, overbroad, or repeatedly renewed records fail closed for mandatory controls. Review patterns of use for systemic problems without turning individual usage into surveillance.
 

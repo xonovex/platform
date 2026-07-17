@@ -10,7 +10,7 @@
     "observe",
     "require-evidence",
     "exception",
-    "break-glass"
+    "emergency-exception"
   ],
   "moduleKinds": [
     "script",
@@ -1040,8 +1040,8 @@
       "expectedCode": "incomplete-exception"
     },
     {
-      "id": "authorized-break-glass",
-      "kind": "break-glass",
+      "id": "authorized-emergency-exception",
+      "kind": "emergency-exception",
       "owner": "incident-commander",
       "scope": "production-recovery-45",
       "control": "deployment-separation-of-duties",
@@ -1064,8 +1064,8 @@
       "expectedValid": true
     },
     {
-      "id": "break-glass-without-authoritative-access-evidence",
-      "kind": "break-glass",
+      "id": "emergency-exception-without-authoritative-access-evidence",
+      "kind": "emergency-exception",
       "owner": "incident-commander",
       "scope": "production-recovery-46",
       "control": "deployment-separation-of-duties",
@@ -1086,7 +1086,7 @@
       "revocationRequired": true,
       "postEventReviewRequired": true,
       "expectedValid": false,
-      "expectedCode": "incomplete-break-glass"
+      "expectedCode": "incomplete-emergency-exception"
     },
     {
       "id": "non-file-evidence-provider",

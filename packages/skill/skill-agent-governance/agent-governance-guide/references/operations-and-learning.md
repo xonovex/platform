@@ -25,7 +25,7 @@ Fail visibly when mandatory guarantees become invalid. Never auto-promote drift 
 
 ## Extract learning candidates
 
-Capture candidates from lifecycle results, onboarding, policy denials, incidents, exceptions, break-glass, drift, update/rollback, support, and module failures. Each candidate records source evidence, scope, owner, affected outcomes, proposed owning skill/policy/module, expected benefit, risks, privacy/incentive limits, conflicts, expiry, and review status.
+Capture candidates from lifecycle results, onboarding, policy denials, incidents, exceptions, emergency exceptions, drift, update/rollback, support, and module failures. Each candidate records source evidence, scope, owner, affected outcomes, proposed owning skill/policy/module, expected benefit, risks, privacy/incentive limits, conflicts, expiry, and review status.
 
 Deduplicate and test the causal claim. Route general guidance to its owning skill, organization-specific rules to governed policy/instructions, and executable changes to their module. Do not create a new owner for one weak observation.
 
@@ -35,7 +35,7 @@ Use **reflect-guide** for extracting reusable session lessons; its promotion mus
 
 ## Measure effectiveness without surveillance
 
-Use balanced system-level measures such as control/enforcement coverage, evidence freshness, false positives/negatives, bypass attempts, exception/break-glass age, drift age, update/rollback/recovery success, incident outcomes, onboarding time, user friction, accessibility, cost, and DORA outcomes where relevant.
+Use balanced system-level measures such as control/enforcement coverage, evidence freshness, false positives/negatives, bypass attempts, exception/emergency-exception age, drift age, update/rollback/recovery success, incident outcomes, onboarding time, user friction, accessibility, cost, and DORA outcomes where relevant.
 
 Each measure declares purpose, audience, source/quality, aggregation/minimum cohort, access, retention/deletion, interpretation limits, prohibited uses, likely gaming behavior, counter-metrics, and qualitative review. Never rank individuals, infer productivity from activity, or auto-punish/auto-promote from a metric.
 

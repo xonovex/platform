@@ -3,9 +3,9 @@ import {fileURLToPath} from "node:url";
 import {
   mergeFixture,
   validateAgent,
-  validateBreakGlass,
   validateComposition,
   validateConfigurationCase,
+  validateEmergencyException,
   validateEnforcement,
   validateEvidenceCase,
   validateException,
@@ -35,7 +35,8 @@ const validators = {
   agent: validateAgent,
   policy: validatePolicy,
   exception: (testCase) => validateException(testCase, evaluationTime),
-  "break-glass": (testCase) => validateBreakGlass(testCase, evaluationTime),
+  "emergency-exception": (testCase) =>
+    validateEmergencyException(testCase, evaluationTime),
   provider: validateNativeProvider,
   profile: validateProfile,
 };

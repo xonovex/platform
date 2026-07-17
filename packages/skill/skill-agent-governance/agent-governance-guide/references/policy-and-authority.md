@@ -10,7 +10,7 @@ A policy decision records:
 - outcome, reasons, required remediation or evidence, and expiry;
 - evidence origin and limitations.
 
-Supported outcomes are `allow`, `deny`, `ask`, `advise`, `observe`, `require-evidence`, `exception`, and `break-glass`.
+Supported outcomes are `allow`, `deny`, `ask`, `advise`, `observe`, `require-evidence`, `exception`, and `emergency-exception`.
 
 ## Decision and enforcement separation
 
@@ -34,6 +34,6 @@ Evidence is authoritative only for the declared subject, revision, scope, source
 
 An exception includes scope, control, owner, authorized approver, rationale, compensating controls, start, expiry, evidence, affected subjects, and mandatory review. It cannot authorize outside the approver's authority or silently become a default.
 
-## Break-glass contract
+## Emergency-exception contract
 
-Break-glass additionally requires emergency reason, time-limited access, explicit invocation, authoritative access-system evidence, immediate notification where applicable, containment, revocation, and post-event review. Expired, ownerless, evidence-free, or unreviewed break-glass state fails closed for mandatory controls.
+An emergency exception additionally requires emergency reason, time-limited access, explicit invocation, authoritative access-system evidence, immediate notification where applicable, containment, revocation, and post-event review. Expired, ownerless, evidence-free, or unreviewed emergency-exception state fails closed for mandatory controls.

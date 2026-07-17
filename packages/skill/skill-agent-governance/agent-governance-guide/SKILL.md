@@ -1,6 +1,6 @@
 ---
 name: agent-governance-guide
-description: "Use when defining, inspecting, onboarding, or validating governance for agent, model, tool, hook, policy, module, evidence, exception, break-glass, or privileged-operation behavior. Triggers on policy decision versus enforcement, semantic hook intents, harness capability matrices, bounded model or child-agent execution, authority attenuation, governance profiles, module conformance, drift, managed configuration, or advisory onboarding, even when the user doesn't say 'agent governance'."
+description: "Use when defining, inspecting, onboarding, or validating governance for agent, model, tool, hook, policy, module, evidence, exception, emergency-exception, or privileged-operation behavior. Triggers on policy decision versus enforcement, semantic hook intents, harness capability matrices, bounded model or child-agent execution, authority attenuation, governance profiles, module conformance, drift, managed configuration, or advisory onboarding, even when the user doesn't say 'agent governance'."
 ---
 
 # Agent Governance Contracts
@@ -48,7 +48,7 @@ Compose policy, execution, enforcement, enablement, evidence, and trust without 
 - Read [references/autonomy.md](references/autonomy.md) - Load when grading or raising an autonomy posture, coupling a level to required oversight, or bounding escalation windows and safe defaults
 - Read [references/actors.md](references/actors.md) - Load when recording an actor, deciding what a role string may mean, requiring independence or segregation of duties, or checking which actor rules code enforces
 - Read [references/events-and-capabilities.md](references/events-and-capabilities.md) - Load when mapping semantic event intents to a harness capability matrix
-- Read [references/policy-and-authority.md](references/policy-and-authority.md) - Load when defining decisions, enforcement, actors, evidence origin, exceptions, or break-glass
+- Read [references/policy-and-authority.md](references/policy-and-authority.md) - Load when defining decisions, enforcement, actors, evidence origin, exceptions, or emergency exceptions
 - Read [references/provider-contracts.md](references/provider-contracts.md) - Load when defining or validating policy, configuration, telemetry, or evidence provider operations
 - Read [references/external-enforcement.md](references/external-enforcement.md) - Load when enforcing policy through CI, repository rules, protected environments, admission, provider permissions, local hooks, or a policy decision service
 - Read [references/external-enforcement-onboarding.md](references/external-enforcement-onboarding.md) - Load when discovering, previewing, applying, verifying, rolling back, or adopting external controls without harness or lifecycle modules

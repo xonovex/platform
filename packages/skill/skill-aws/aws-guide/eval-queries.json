@@ -12,7 +12,7 @@
     "rationale": "SCP semantics"
   },
   {
-    "query": "preview a progressive SCP rollout across test and production OUs with break-glass",
+    "query": "preview a progressive SCP rollout across test and production OUs with emergency-exception",
     "should_trigger": true,
     "split": "train",
     "rationale": "organization guardrails"
@@ -36,7 +36,7 @@
     "rationale": "native evidence recovery"
   },
   {
-    "query": "design an expiring monitored AWS break-glass path with rollback",
+    "query": "design an expiring monitored AWS emergency-exception path with rollback",
     "should_trigger": true,
     "split": "validation",
     "rationale": "exception operations"

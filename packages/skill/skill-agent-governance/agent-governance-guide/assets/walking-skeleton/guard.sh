@@ -33,7 +33,7 @@ emit() {
 # Decision-point outage: mandatory controls fail closed, advisory ones observe.
 if [ "$POLICY_UNAVAILABLE" = "1" ]; then
   if [ "$MANDATORY" = "1" ]; then
-    emit deny "policy decision point unavailable — mandatory control fails closed; retry or invoke break-glass explicitly"
+    emit deny "policy decision point unavailable — mandatory control fails closed; retry or invoke an emergency exception explicitly"
     exit 2
   fi
   emit observe "policy decision point unavailable — advisory control proceeds as observe; staleness reported"

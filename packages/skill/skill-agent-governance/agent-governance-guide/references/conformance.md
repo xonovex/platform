@@ -13,7 +13,7 @@ Validate each selected contract independently, then validate the effective compo
 - Enforcement: native event/action, adequate guarantee, explicit failure, separate decision/evidence references.
 - Module: identity, classification, adoption modes, authority zones, provenance, compatibility, permissions, tools, filesystem, network, secrets, data flows, side effects, timeout, retry, ordering, concurrency, idempotency, reentrancy, failure, ownership, support, upgrade, disable, and rollback.
 - Profile: additive strengthening, non-weakening, adequate enforcement, actor rules, data/telemetry/distribution requirements.
-- Exception/break-glass: owner, authority, scope, rationale, compensating controls, expiry, evidence, review.
+- Exception/emergency-exception: owner, authority, scope, rationale, compensating controls, expiry, evidence, review.
 - Onboarding: exact preview, authorization, idempotent apply, verification, rollback, drift.
 
 ## Required failures

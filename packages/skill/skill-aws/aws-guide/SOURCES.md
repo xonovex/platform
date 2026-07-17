@@ -45,5 +45,5 @@
 ## Refresh Workflow
 
 1. Re-check IAM/OIDC, Organizations/SCP, CloudTrail, Config, and Security Hub service documentation and regional/partition behavior.
-2. Re-run policy-layer, OIDC, temporary-expiry, organization rollout, break-glass, evidence, outage, rollback, and drift probes.
+2. Re-run policy-layer, OIDC, temporary-expiry, organization rollout, emergency-exception, evidence, outage, rollback, and drift probes.
 3. Keep documentation conformance separate from live account evidence and update **Last reviewed**.

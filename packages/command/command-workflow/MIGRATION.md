@@ -49,4 +49,4 @@ All existing `plan-*`, worktree, PR, and review command names that remain in the
 
 Pin the marketplace and every installed command/skill plugin back to the last verified `5.0.0` set. Restore captured native configuration and executable digests through each onboarding adapter, remove only v6-owned entries, and re-run v5 diagnostics. Preserve provider-native workflow, authorization, policy, enforcement, and audit evidence even when the v5 client cannot interpret a v6 semantic result.
 
-Do not translate a v6 acceptance, enforcement, exception, break-glass, or privileged-operation result into a weaker v5 state. Pause the affected operation or retain a read-only evidence link until an authorized migration path is available.
+Do not translate a v6 acceptance, enforcement, exception, emergency-exception, or privileged-operation result into a weaker v5 state. Pause the affected operation or retain a read-only evidence link until an authorized migration path is available.

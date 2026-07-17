@@ -2,7 +2,7 @@
 
 ## Gather candidates from operational evidence
 
-Extract reusable candidates from the current session and, when provided, lifecycle results, onboarding outcomes, policy denials, incidents, exceptions, break-glass reviews, drift, rollbacks, support cases, and module failures. Preserve the exact source reference/version, scope, observed outcome, discovery, proposed lesson, affected owners, confidence, conflicts, privacy limits, and expiry.
+Extract reusable candidates from the current session and, when provided, lifecycle results, onboarding outcomes, policy denials, incidents, exceptions, emergency-exception reviews, drift, rollbacks, support cases, and module failures. Preserve the exact source reference/version, scope, observed outcome, discovery, proposed lesson, affected owners, confidence, conflicts, privacy limits, and expiry.
 
 Do not infer a causal lesson from one metric or event without checking alternative explanations, data quality, selection bias, incentives, and whether the observation recurs beyond its original context.
 

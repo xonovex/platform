@@ -9,7 +9,7 @@ Enterprise platforms are optional adapters around the governance and workflow po
 | `azure-devops-guide`     | Boards work items, Repos and pull requests, branch policies, Pipelines, service connections, REST, service hooks, Services/Server detection     | Bitbucket source semantics, Bitrise execution, AWS policy, Datadog telemetry |
 | `bitbucket-guide`        | Cloud/Data Center detection, repositories, pull requests, Pipelines where supported, deployments, checks, permissions, REST, webhooks           | Azure Boards, Bitrise, AWS, Datadog                                          |
 | `bitrise-guide`          | Workflows, Pipelines, Steps, triggers, secrets, artifacts, statuses, runners, API/webhooks, Bitrise-to-AWS OIDC                                 | Repository-provider or AWS-policy semantics                                  |
-| `aws-guide`              | IAM and federation, Organizations/SCPs, CloudTrail, Config, Security Hub, AWS-native evidence and break-glass-safe setup                        | CI-provider identity claims or Datadog configuration                         |
+| `aws-guide`              | IAM and federation, Organizations/SCPs, CloudTrail, Config, Security Hub, AWS-native evidence and emergency-exception-safe setup                | CI-provider identity claims or Datadog configuration                         |
 | `datadog-guide`          | CI/CD and DORA visibility, OpenTelemetry, LLM observability, audit, catalog, AWS integration, cloud security, telemetry privacy                 | Workflow identity or authoritative source/build/cloud state                  |
 | `agent-governance-guide` | Capability negotiation, transactional configuration, evidence/provider ports, authority, failure policy, conformance, and effective composition | Provider-native commands, schemas, editions, or fallback behavior            |
 
@@ -68,7 +68,7 @@ Each provider remains the source of truth for its own record. Relationships carr
 ## Failure and conformance
 
 - Provider outage, rate limit, stale version, missing tier, unsupported edition, invalid OIDC claim, unauthorized access, duplicate request, partial apply, drift, secret exposure, broken artifact/status linkage, and telemetry-redaction failure are explicit outcomes.
-- Mandatory privileged actions fail closed on missing or invalid authority/evidence unless a scoped, authorized, expiring exception or break-glass record applies. Advisory telemetry fails visibly and states that no enforcement occurred.
+- Mandatory privileged actions fail closed on missing or invalid authority/evidence unless a scoped, authorized, expiring exception record, including an emergency one, applies. Advisory telemetry fails visibly and states that no enforcement occurred.
 - Retries are bounded and cancellable; side effects use provider idempotency or reconcile by native identity before retrying.
 - Conformance pins the product or edition, tested version/API, source snapshot, capabilities, limitations, and native reference kinds. Documentation conformance does not claim a live tenant probe passed.
 - Every platform claim traces to official documentation pinned with a retrieval date in the owning skill's `SOURCES.md`; a detailed capability claim additionally requires an edition/version-pinned probe before a release relies on it. A claim without a pinned source or probe is a release blocker for the owning skill.

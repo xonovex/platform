@@ -128,7 +128,7 @@ Evidence assembly may use bounded agents or models, but only a provider-authenti
 accountable human records Acceptance. Integration, target-changing Transition and Release,
 data deletion, and Retirement revalidate exact subject, target, evidence, policy, actor, and
 expiry bindings at a non-bypassable external enforcement point. Ordinary tool access is
-not authorization. Exceptions and break-glass remain scoped, expiring, compensated,
+not authorization. Exceptions and emergency exceptions remain scoped, expiring, compensated,
 notified, revoked, and reviewed.
 
 ## Delivery and governance

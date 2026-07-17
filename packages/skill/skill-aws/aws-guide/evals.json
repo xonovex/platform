@@ -13,11 +13,11 @@
     },
     {
       "id": 2,
-      "prompt": "Roll out an SCP that prevents disabling security logging across all member accounts. Explain grants, canary rollout, break-glass, and proof.",
+      "prompt": "Roll out an SCP that prevents disabling security logging across all member accounts. Explain grants, canary rollout, emergency-exception, and proof.",
       "assertions": [
         "States that SCPs limit maximum permissions and never grant access, and evaluates inherited SCPs with identity/resource policies, boundaries/session policy, and explicit denies",
         "Inventories organization/root/OU/account hierarchy and starts with a test OU/account before progressive production attachment",
-        "Previews blast radius and rollback, tests critical-service allows and target denies, monitors CloudTrail, and uses an expiring independently evidenced break-glass path"
+        "Previews blast radius and rollback, tests critical-service allows and target denies, monitors CloudTrail, and uses an expiring independently evidenced emergency-exception path"
       ]
     },
     {

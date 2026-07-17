@@ -8,7 +8,7 @@ allowed-tools:
   - Task
   - AskUserQuestion
   - Skill
-argument-hint: "<declare|update|contain|recover|close> [incident-reference] [--severity <level>] [--authorization <reference>] [--break-glass <reference>] [--provider <selection>]"
+argument-hint: "<declare|update|contain|recover|close> [incident-reference] [--severity <level>] [--authorization <reference>] [--emergency-exception <reference>] [--provider <selection>]"
 ---
 
 # /xonovex-workflow:incident-run — Run Incident Response
@@ -18,7 +18,7 @@ argument-hint: "<declare|update|contain|recover|close> [incident-reference] [--s
 - Action (required): `declare`, `update`, `contain`, `recover`, or `close`.
 - `incident-reference` (required except for declaration): Opaque provider-native Incident reference.
 - `--severity` (optional): Current severity under the selected incident policy.
-- `--authorization`, `--break-glass` (conditional): Privileged-response authority.
+- `--authorization`, `--emergency-exception` (conditional): Privileged-response authority.
 - `--provider` (optional): Incident/evidence provider selection.
 
 ## Delegation

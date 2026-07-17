@@ -157,7 +157,7 @@ export const validateAuthorization = ({authorization, request}) => {
 // approver holds reads as another party and passes.
 export const validateEmergencyAccess = ({access, request, profile}) => {
   if (
-    !["exception", "break-glass"].includes(access?.kind) ||
+    !["exception", "emergency-exception"].includes(access?.kind) ||
     !hasEveryValue(access, [
       "owner",
       "rationale",
@@ -197,7 +197,7 @@ export const validateEmergencyAccess = ({access, request, profile}) => {
     return "emergency-access-expired";
   }
   if (
-    access.kind === "break-glass" &&
+    access.kind === "emergency-exception" &&
     (!hasEveryValue(access, [
       "emergencyReason",
       "accessEvidenceReference",
@@ -207,7 +207,7 @@ export const validateEmergencyAccess = ({access, request, profile}) => {
     ]) ||
       access.explicitInvocation !== true)
   ) {
-    return "break-glass-contract-incomplete";
+    return "emergency-exception-contract-incomplete";
   }
   return null;
 };

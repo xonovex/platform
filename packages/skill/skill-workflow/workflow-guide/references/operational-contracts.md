@@ -23,8 +23,8 @@ mutation, and Retirement use this sequence:
    requested semantic intent, current policy/profile version, and fresh prerequisite
    evidence.
 2. Resolve an authorization whose actor, scope, action, target, bindings, conditions, and
-   expiry exactly cover the request. Evaluate any exception or break-glass record
-   separately.
+   expiry exactly cover the request. Evaluate any exception or emergency-exception
+   record separately.
 3. Select a provider or external-enforcement adapter that declares this semantic intent,
    blocks at the target boundary, cannot be bypassed by the governed actor, and fails with
    the profile-required behavior. An ordinary shell, write, merge, deploy, delete, or tool
@@ -59,13 +59,13 @@ including ordering, concurrency, bypass, context, and tested version. A harness 
 provide earlier defense and evidence but cannot replace a required external point the
 governed actor cannot bypass.
 
-## Exceptions and break-glass
+## Exceptions and emergency exceptions
 
 An exception records owner, authorized human approver, exact subjects/actions/controls,
 rationale, compensating controls, start, expiry, provider evidence, and mandatory review.
-Break-glass additionally records the emergency reason, explicit invocation, authoritative
-access evidence, notification, containment, revocation, and post-use review. Effective
-scope cannot exceed the approver's authority.
+An emergency exception additionally records the emergency reason, explicit invocation,
+authoritative access evidence, notification, containment, revocation, and post-use review.
+Effective scope cannot exceed the approver's authority.
 
 Expired, ownerless, evidence-free, unreviewed, out-of-scope, or silently persistent
 emergency access fails closed. Publish use and revocation evidence separately from the

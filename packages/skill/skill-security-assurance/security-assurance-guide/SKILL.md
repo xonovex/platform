@@ -1,6 +1,6 @@
 ---
 name: security-assurance-guide
-description: "Use when planning, reviewing, or operating security assurance across risk, controls, secure development, verification, software supply chain, privileged changes, exceptions, incidents, and evidence. Triggers on threat models, NIST CSF or SP 800-53 profiles, SSDF, control selection and coverage, SLSA or artifact provenance, signatures and attestations, security release gates, scanner outages, compensating controls, break-glass, or security claims, even when the user doesn't say 'security assurance'."
+description: "Use when planning, reviewing, or operating security assurance across risk, controls, secure development, verification, software supply chain, privileged changes, exceptions, incidents, and evidence. Triggers on threat models, NIST CSF or SP 800-53 profiles, SSDF, control selection and coverage, SLSA or artifact provenance, signatures and attestations, security release gates, scanner outages, compensating controls, emergency exceptions, or security claims, even when the user doesn't say 'security assurance'."
 ---
 
 # Security Assurance
@@ -39,4 +39,4 @@ Operations: canary policy update · verified rollback · incident owner · retai
 - Read [references/risk-and-controls.md](references/risk-and-controls.md) - Load when threat modelling, selecting or tailoring controls, assigning enforcement and evidence, mapping frameworks, or accepting residual risk
 - Read [references/secure-development.md](references/secure-development.md) - Load when integrating security requirements, design review, implementation, verification, vulnerability handling, release, or retirement into development
 - Read [references/supply-chain.md](references/supply-chain.md) - Load when inventorying or verifying dependencies, artifacts, builders, signatures, attestations, executable modules, updates, provenance, or trust
-- Read [references/verification-and-operations.md](references/verification-and-operations.md) - Load when designing assurance evidence, release gates, negative tests, scanner outages, exceptions, break-glass, incidents, drift, rollback, or corrective action
+- Read [references/verification-and-operations.md](references/verification-and-operations.md) - Load when designing assurance evidence, release gates, negative tests, scanner outages, exceptions, emergency exceptions, incidents, drift, rollback, or corrective action

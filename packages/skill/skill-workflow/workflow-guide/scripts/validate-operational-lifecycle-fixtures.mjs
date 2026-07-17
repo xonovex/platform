@@ -120,7 +120,7 @@ const requiredCaseIds = [
   "acceptance-independence-requirement-undeclared",
   "acceptance-independence-unverifiable-without-author",
   "profile-may-waive-acceptance-independence",
-  "break-glass-approver-cannot-rely-on-own-grant",
+  "emergency-exception-approver-cannot-rely-on-own-grant",
   "exception-approver-cannot-rely-on-own-grant",
   "emergency-access-record-cannot-waive-profile-independence",
   "emergency-access-independence-requirement-undeclared",
@@ -129,7 +129,7 @@ const requiredCaseIds = [
   "privileged-operation-record-cannot-supply-its-own-profile",
   "unaccountable-human-cannot-record-acceptance",
   "unaccountable-human-cannot-authorize",
-  "break-glass-requires-accountable-approver",
+  "emergency-exception-requires-accountable-approver",
   "exception-approver-accountability-is-not-optional",
 ];
 

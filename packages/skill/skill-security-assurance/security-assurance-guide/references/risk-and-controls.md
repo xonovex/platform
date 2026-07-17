@@ -33,4 +33,4 @@ A crosswalk records source/target version, scope, relationship strength, rationa
 
 An accountable authorized risk owner decides within declared authority using current evidence, known gaps, expiry, monitoring, incident, and reassessment conditions. An agent may assemble the record and recommend; it cannot create acceptance authority.
 
-Exceptions and break-glass are separate scoped decisions. They do not edit the control baseline or become permanent defaults.
+Exceptions and emergency exceptions are separate scoped decisions. They do not edit the control baseline or become permanent defaults.

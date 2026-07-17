@@ -17,7 +17,7 @@
       "assertions": [
         "Separates the policy decision, enforcement action, scanner outage evidence, and release authorization references",
         "Fails closed or requires independently adequate fresh evidence when the selected mandatory control declares that behavior; never converts the outage to a silent pass",
-        "Allows only a scoped authorized expiring exception or break-glass with compensating controls, notification, revocation, review, and preserved audit evidence"
+        "Allows only a scoped authorized expiring exception or emergency-exception with compensating controls, notification, revocation, review, and preserved audit evidence"
       ]
     },
     {

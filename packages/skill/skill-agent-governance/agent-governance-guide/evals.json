@@ -51,7 +51,7 @@
         "Treats OPA as one policy-provider implementation and keeps policy decision separate from native enforcement",
         "Sends minimized canonical facts with subject/action/actor/authority/version/freshness and records decision reference, input digest, policy/data version, outcome, explanation, expiry, and service identity",
         "Allows only authenticated subject-and-version-bound unexpired cache entries and never converts a cache miss or invalid response into allow",
-        "Fails closed for mandatory outage/expired cache/version mismatch/replay failure unless a valid scoped exception or break-glass record applies, while preserving historical replay evidence"
+        "Fails closed for mandatory outage/expired cache/version mismatch/replay failure unless a valid scoped exception or emergency-exception record applies, while preserving historical replay evidence"
       ]
     },
     {

@@ -45,7 +45,7 @@ Mandatory intent is conformant only when at least one selected point cannot be b
 
 - Discover every applicable organization, group, repository/project, environment, namespace, and external-authority source before claiming an effective result.
 - Preserve native layering. GitHub rulesets aggregate and the most restrictive duplicate rule applies; GitLab project and group pipeline-policy jobs merge in provider-defined order and job-name handling changes the result. Provider skills own the detailed mechanics.
-- Record every bypass actor, application, role, exception, and break-glass path. A control with an undisclosed bypass path is unsupported for mandatory use.
+- Record every bypass actor, application, role, exception, and emergency-exception path. A control with an undisclosed bypass path is unsupported for mandatory use.
 - Use unique stable job/check names. Verify that the merge rule requires the exact emitted name and expected application/provider; a similarly named user job is not equivalent evidence.
 - Treat skipped, neutral, cancelled, timed-out, missing, stale, or duplicate checks according to an explicit policy. Never coerce them to success.
 - Keep policy decision, native enforcement action, target mutation, and evidence publication as separate records.
@@ -66,7 +66,7 @@ A remote service is an optional policy-provider adapter; OPA is one implementati
 - Send canonical, minimized facts with subject revision, actor, action, authority, profile/policy version, and evidence freshness. Do not send raw prompts, source, secrets, or personal data without a declared need.
 - Record the returned decision reference, policy/data bundle version, input digest, outcome, explanation, expiry, and service identity. Preserve enough historical material to replay the original version.
 - Cache only signed or otherwise authenticated decisions with an explicit subject, policy version, expiry, and cache key. A cache miss never becomes allow.
-- For mandatory privileged operations, outage, invalid response, expired cache, version mismatch, or replay failure is fail-closed unless an authorized, scoped, expiring exception or break-glass path says otherwise.
+- For mandatory privileged operations, outage, invalid response, expired cache, version mismatch, or replay failure is fail-closed unless an authorized, scoped, expiring exception path, including an emergency one, says otherwise.
 - Advisory checks may fail-visible and continue, but must state that no enforcement occurred.
 - Prevent thundering-herd retries with bounded backoff and cancellation. Reconcile duplicate decisions and evidence idempotently.
 

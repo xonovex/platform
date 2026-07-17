@@ -11,7 +11,8 @@
    for every dependency, consumer, secret, data copy, backup, replica, and provider route.
 3. Apply [operational-contracts.md](operational-contracts.md) before target-changing or
    irreversible work. Use the protected provider capability with exact authorization,
-   external enforcement, least privilege, and separate exception/break-glass evidence.
+   external enforcement, least privilege, and separate exception/emergency-exception
+   evidence.
 4. Execute in dependency-safe stages. Record native mutation, deletion, revocation,
    migration, archive, notification, and failure references. Never infer deletion from a
    missing local file or a successful request alone.

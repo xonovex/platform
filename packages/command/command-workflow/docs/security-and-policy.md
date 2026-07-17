@@ -18,7 +18,7 @@ Use package locks, immutable revisions, checksums, signatures, transparency, att
 
 ## Policy decision and enforcement
 
-A decision point evaluates versioned policy against subject, action, actor/executor, authority zone, facts, applicability, and evidence. It returns `allow`, `deny`, `ask`, `advise`, `observe`, `require-evidence`, `exception`, or `break-glass`, plus reasons, expiry, and evidence requests.
+A decision point evaluates versioned policy against subject, action, actor/executor, authority zone, facts, applicability, and evidence. It returns `allow`, `deny`, `ask`, `advise`, `observe`, `require-evidence`, `exception`, or `emergency-exception`, plus reasons, expiry, and evidence requests.
 
 An enforcement point separately applies that decision at a native harness event, CI gate, repository rule, protected environment, deployment/admission control, identity/provider operation, or accountable human control. Record the decision, enforcement action, native subject/revision, result, and evidence separately.
 
@@ -30,10 +30,10 @@ A hook can cover one event or product surface but cannot establish an organizati
 
 Every control and module declares `fail-closed`, `fail-visible`, or `advisory` behavior. Test allow/deny, stale policy, unsupported capability, invalid output, timeout, dependency outage, bypass, concurrent siblings, duplicate/retry, partial application, evidence loss, emergency disable, and rollback.
 
-## Exceptions and break glass
+## Exceptions and emergency exceptions
 
 An exception records control, subject/scope, owner, authorized approver, rationale, start/expiry, compensating controls, evidence, affected operations, and review. It cannot exceed the approver's authority or become a silent default.
 
-Break glass additionally requires an emergency reason, explicit invocation, strong authentication, shortest viable duration, authoritative access-system evidence, immediate notification where applicable, containment, automatic expiry/revocation, and post-event review. It does not erase policy, audit, or retained evidence.
+An emergency exception additionally requires an emergency reason, explicit invocation, strong authentication, shortest viable duration, authoritative access-system evidence, immediate notification where applicable, containment, automatic expiry/revocation, and post-event review. It does not erase policy, audit, or retained evidence.
 
 Detailed module and policy contracts live in [`module-trust.md`](../../../skill/skill-agent-governance/agent-governance-guide/references/module-trust.md) and [`policy-bundles.md`](../../../skill/skill-agent-governance/agent-governance-guide/references/policy-bundles.md).

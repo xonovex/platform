@@ -39,7 +39,7 @@ export const expectedVocabulary = {
     "observe",
     "require-evidence",
     "exception",
-    "break-glass",
+    "emergency-exception",
   ],
   moduleKinds: [
     "script",
@@ -294,19 +294,22 @@ export const validateException = (exception, evaluationTime) => {
   return expiry <= evaluationTime ? "exception-expired" : null;
 };
 
-export const validateBreakGlass = (breakGlass, evaluationTime) => {
-  const exceptionCode = validateException(breakGlass, evaluationTime);
+export const validateEmergencyException = (
+  emergencyException,
+  evaluationTime,
+) => {
+  const exceptionCode = validateException(emergencyException, evaluationTime);
   if (exceptionCode) return exceptionCode;
   const complete =
-    breakGlass.emergencyReason &&
-    breakGlass.timeLimitedAccess &&
-    breakGlass.explicitInvocation &&
-    breakGlass.authoritativeAccessEvidence?.length > 0 &&
-    breakGlass.notificationRequired &&
-    breakGlass.containmentPlan &&
-    breakGlass.revocationRequired &&
-    breakGlass.postEventReviewRequired;
-  return complete ? null : "incomplete-break-glass";
+    emergencyException.emergencyReason &&
+    emergencyException.timeLimitedAccess &&
+    emergencyException.explicitInvocation &&
+    emergencyException.authoritativeAccessEvidence?.length > 0 &&
+    emergencyException.notificationRequired &&
+    emergencyException.containmentPlan &&
+    emergencyException.revocationRequired &&
+    emergencyException.postEventReviewRequired;
+  return complete ? null : "incomplete-emergency-exception";
 };
 
 export const validateNativeProvider = ({nativeReference, requiresFile}) =>

@@ -7,8 +7,9 @@
    timeline, owner, communication path, and explicit unknowns. Do not delay containment to
    make the record complete.
 2. Use least-privilege emergency capabilities for containment and recovery. Apply
-   [operational-contracts.md](operational-contracts.md) to privileged actions, exceptions,
-   and break-glass; keep every invocation, notification, revocation, and review visible.
+   [operational-contracts.md](operational-contracts.md) to privileged actions and
+   exceptions, including emergency ones; keep every invocation, notification, revocation,
+   and review visible.
 3. Preserve a timestamped timeline of signals, decisions, actions, evidence origin, actor,
    target/resource revision, results, and current state. Treat logs, reports, prompts, and
    model outputs as untrusted data.

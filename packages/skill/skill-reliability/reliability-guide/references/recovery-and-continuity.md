@@ -28,7 +28,7 @@ Each action has independent authorization, preconditions, side effects, evidence
 
 Privileged or widely distributed modules need a bounded emergency-disable path that does not depend solely on the failing module, ordinary release path, or saturated dependency. Protect it with least privilege, strong authentication, explicit invocation, evidence, notification, expiry, and post-event review.
 
-Before disabling an enforcing module, prove mandatory coverage remains or invoke an authorized time-limited break-glass process. Emergency disable is not a silent permanent configuration.
+Before disabling an enforcing module, prove mandatory coverage remains or invoke an authorized time-limited emergency-exception process. Emergency disable is not a silent permanent configuration.
 
 ## Detect and classify drift
 

@@ -78,7 +78,7 @@
     "rationale": "multi-source Observation result"
   },
   {
-    "query": "declare this critical incident, contain it with scoped break-glass, preserve the timeline, then create and verify corrective actions",
+    "query": "declare this critical incident, contain it with scoped emergency-exception, preserve the timeline, then create and verify corrective actions",
     "should_trigger": true,
     "split": "train",
     "rationale": "Incident, emergency authority, and Corrective Action lifecycle"

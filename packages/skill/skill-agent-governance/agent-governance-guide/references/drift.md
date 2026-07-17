@@ -6,7 +6,7 @@
 - declared versus observed event support, handler execution, blocking, ordering, and managed configuration;
 - expected versus effective permissions, data flows, secrets, network, side effects, and failure behavior;
 - required versus fresh decision, enforcement, configuration, and evidence references;
-- active exceptions and break-glass records versus expiry and review state.
+- active exception records, including emergency ones, versus expiry and review state.
 
 ## Workflow
 
