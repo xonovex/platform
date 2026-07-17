@@ -33,6 +33,14 @@ const mergeFixture = (base, override) => {
   );
 };
 
+// The profile is resolved from the case's own `profileTemplate`/`profile` keys
+// and handed to each validator beside the record, never out of it: a case that
+// hides a profile inside `input` is passing a record field, and no validator
+// reads one. A case that declares no profile resolves to `{}`, which every
+// independence check rejects as undeclared.
+const resolveProfile = (testCase, templates) =>
+  mergeFixture(templates[testCase.profileTemplate] ?? {}, testCase.profile);
+
 const validateCase = (testCase, templates) => {
   const input = mergeFixture(
     templates[testCase.template] ?? {},
@@ -41,26 +49,36 @@ const validateCase = (testCase, templates) => {
   if (testCase.contract === "acceptance") {
     return validateAcceptance({
       acceptance: input,
-      profile: mergeFixture(
-        templates[testCase.profileTemplate] ?? {},
-        testCase.profile,
-      ),
+      profile: resolveProfile(testCase, templates),
     });
   }
   if (testCase.contract === "authorization") {
     return validateAuthorization(input);
   }
   if (testCase.contract === "emergency-access") {
-    return validateEmergencyAccess(input);
+    return validateEmergencyAccess({
+      access: input.access,
+      request: input.request,
+      profile: resolveProfile(testCase, templates),
+    });
   }
   if (testCase.contract === "privileged-operation") {
-    return validatePrivilegedOperation(input);
+    return validatePrivilegedOperation({
+      operation: input,
+      profile: resolveProfile(testCase, templates),
+    });
   }
   if (testCase.contract === "transition") {
-    return validateTransition(input);
+    return validateTransition({
+      transition: input,
+      profile: resolveProfile(testCase, templates),
+    });
   }
   if (testCase.contract === "release") {
-    return validateRelease(input);
+    return validateRelease({
+      release: input,
+      profile: resolveProfile(testCase, templates),
+    });
   }
   if (testCase.contract === "observation") {
     return validateObservation(input);
@@ -72,7 +90,10 @@ const validateCase = (testCase, templates) => {
     return validateCorrectiveAction(input);
   }
   if (testCase.contract === "retirement") {
-    return validateRetirement(input);
+    return validateRetirement({
+      retirement: input,
+      profile: resolveProfile(testCase, templates),
+    });
   }
   if (testCase.contract === "agent-assistance") {
     return validateAgentAssistance(input);
@@ -80,9 +101,13 @@ const validateCase = (testCase, templates) => {
   return `unknown-contract:${testCase.contract}`;
 };
 
-// Acceptance independence is resolved from the profile, so these cases prove a
-// record cannot elect the check applied to it. Deleting one would silently
-// reopen the self-approval path; requiredCaseIds keeps them under test.
+// Acceptance and emergency-access independence are resolved from the profile,
+// so these cases prove a record cannot elect the check applied to it. Deleting
+// one would silently reopen the self-approval path; requiredCaseIds keeps them
+// under test. The emergency-access set covers both kinds because the pair it
+// separates — approving an exception and relying on it — does not vary by kind,
+// and covers an operation that carries its own profile because the emergency
+// access check is reached through validatePrivilegedOperation as well.
 //
 // `accountable` is spelled out separately at each site that records a decision
 // actor, so one negative case per site keeps the sites from forking: a template
@@ -95,6 +120,13 @@ const requiredCaseIds = [
   "acceptance-independence-requirement-undeclared",
   "acceptance-independence-unverifiable-without-author",
   "profile-may-waive-acceptance-independence",
+  "break-glass-approver-cannot-rely-on-own-grant",
+  "exception-approver-cannot-rely-on-own-grant",
+  "emergency-access-record-cannot-waive-profile-independence",
+  "emergency-access-independence-requirement-undeclared",
+  "emergency-access-independence-unverifiable-without-owner-identity",
+  "profile-may-waive-emergency-access-independence",
+  "privileged-operation-record-cannot-supply-its-own-profile",
   "unaccountable-human-cannot-record-acceptance",
   "unaccountable-human-cannot-authorize",
   "break-glass-requires-accountable-approver",

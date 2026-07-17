@@ -37,14 +37,14 @@ Independence constrains who may decide about a subject relative to who produced 
 
 Every level requires the deciding actor to differ from the author by identity; the stronger two add a requirement on top of that. **Only the identity component is enforced, and only as an inequality between two identity strings.** It does not detect one person holding two identities, a shared or service account, a delegated approval, or teammates approving each other in turn. The reporting-line and legal-entity components of `distinct-team` and `distinct-organization` are not expressible in the actor record at all — it carries no team or organization field — so a profile requiring either gets the identity comparison from code and must enforce the remainder in its provider and record the native evidence.
 
-**The profile elects the check, never the record under scrutiny.** The acceptance and Review contracts in **workflow-guide** resolve the required level from the governing profile — one of the three levels above, or `none` to require no comparison — and ignore any independence field the record carries, so a record cannot waive, weaken, or silently skip the comparison applied to it. Resolution fails closed:
+**The profile elects the check, never the record under scrutiny.** The acceptance, Review, and emergency-access contracts in **workflow-guide** resolve the required level from the governing profile — one of the three levels above, or `none` to require no comparison — and ignore any independence field the record carries, so a record cannot waive, weaken, or silently skip the comparison applied to it. Resolution fails closed:
 
-| Profile declares                                        | Record state                            | Result                                                             |
-| ------------------------------------------------------- | --------------------------------------- | ------------------------------------------------------------------ |
-| A level above `none`                                    | Deciding actor equals the author        | `acceptance-independence-failed` or `assessor-independence-failed` |
-| A level above `none`                                    | Either identity missing or not a string | `independence-unverifiable`                                        |
-| `none`                                                  | Any                                     | No comparison                                                      |
-| Nothing, or a value outside `none` and the three levels | Any                                     | `independence-requirement-undeclared`                              |
+| Profile declares                                        | Record state                            | Result                                                                                                      |
+| ------------------------------------------------------- | --------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| A level above `none`                                    | Deciding actor equals the author        | `acceptance-independence-failed`, `assessor-independence-failed`, or `emergency-access-independence-failed` |
+| A level above `none`                                    | Either identity missing or not a string | `independence-unverifiable`                                                                                 |
+| `none`                                                  | Any                                     | No comparison                                                                                               |
+| Nothing, or a value outside `none` and the three levels | Any                                     | `independence-requirement-undeclared`                                                                       |
 
 Waiving the comparison therefore takes an explicit `none` from the declaring profile — the authority that owns the requirement — and a profile that is silent fails rather than passes.
 
@@ -52,7 +52,7 @@ Autonomy's oversight coupling depends on independence from `A1` upward — see [
 
 ## Segregation of duties
 
-Segregation of duties assigns conflicting duties to different actors across a lifecycle, so that no single actor can both create a risk and clear it. Independence is one instrument of it — the author/approver pair on one decision — not the whole of it. Duties a profile separates typically include:
+Segregation of duties assigns conflicting duties to different actors across a lifecycle, so that no single actor can both create a risk and clear it. Independence is one instrument of it — one decider weighed against one other party inside a single record — not the whole of it. Duties a profile separates typically include:
 
 - authoring a subject and accepting it;
 - requesting a privileged action and authorizing it;
@@ -60,7 +60,9 @@ Segregation of duties assigns conflicting duties to different actors across a li
 - approving an exception and relying on it;
 - operating a control and assessing its effectiveness.
 
-Only the first pair is enforced, through the identity comparison above. The rest are contracts a profile declares and its provider enforces; this plane records the resulting actors but never compares them across decisions.
+Two pairs are enforced, each through the identity comparison above and each within a single record: authoring a subject and accepting it, and approving an exception and relying on it. The second compares an exception or break-glass approver's `identity` against the `owner` the access is held by, resolving the requirement from the profile like every other independence check.
+
+That second comparison is weaker than its name suggests. `owner` names the party the access is held by and carries no declared shape: it is one unstructured value, checked for presence, and it legitimately ranges over parties that are not people — `team:checkout` is a valid owner. So the comparison catches an owner that repeats the approver's identity verbatim, and nothing else. An owner naming a team or group the approver belongs to, or a second identity the approver holds, reads as a different party and passes; an owner that is not a string at all fails closed as `independence-unverifiable` rather than being interpreted. The remaining pairs are contracts a profile declares and its provider enforces; this plane records the resulting actors but never compares them across decisions.
 
 ## What code enforces today
 
@@ -72,7 +74,9 @@ Only the first pair is enforced, through the identity comparison above. The rest
 | The identity component of every independence level                                  | Enforced         | Inequality of two identity strings, resolved from the profile; fails closed when the profile is silent or an identity is missing |
 | The team and organization components of `distinct-team` and `distinct-organization` | **Not enforced** | Not expressible in the actor record                                                                                              |
 | One person holding two identities, or a shared account                              | **Not enforced** | The provider that issues and authenticates identities                                                                            |
-| Segregation of duties beyond the author/approver pair                               | **Not enforced** | The profile and its provider                                                                                                     |
+| Approving an exception and relying on it                                            | Enforced         | Inequality of an exception or break-glass approver's `identity` and the access `owner`, resolved from the profile                |
+| An `owner` naming a team, a group, or any other non-person party                    | **Not enforced** | `owner` has no declared shape; only an owner repeating the approver's identity verbatim is caught                                |
+| Segregation of duties beyond those two pairs                                        | **Not enforced** | The profile and its provider                                                                                                     |
 | `identity` is authentic and belongs to the actor                                    | **Not enforced** | The provider that issues and authenticates it                                                                                    |
 
 Nothing gates on a role. A reader who sees `release-approver` on a decision learns what the actor claimed, not that a control tested the claim. Everything marked not enforced is a contract a profile and its provider must uphold: recording it proves the claim was made, not that a control verified it — the same rule that makes an installed module no evidence that a control executes, per [policy-and-authority.md](policy-and-authority.md).

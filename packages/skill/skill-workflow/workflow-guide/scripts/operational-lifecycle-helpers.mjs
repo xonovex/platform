@@ -150,9 +150,12 @@ export const validateAuthorization = ({authorization, request}) => {
 // Bypassing a control is the strongest authority a record can carry, so the
 // approver meets the same actor contract validateAcceptance requires of a
 // decision actor: a human that is accountable. `owner` names the party the
-// access is held by, not the actor that approved it, and is checked only for
-// presence.
-export const validateEmergencyAccess = ({access, request}) => {
+// access is held by, and the approver may not be that party: approving an
+// exception and relying on it are separate duties. checkIndependence compares
+// the two as identity strings, so only an owner repeating the approver's
+// identity verbatim is caught — an owner naming a team or a second identity the
+// approver holds reads as another party and passes.
+export const validateEmergencyAccess = ({access, request, profile}) => {
   if (
     !["exception", "break-glass"].includes(access?.kind) ||
     !hasEveryValue(access, [
@@ -173,6 +176,13 @@ export const validateEmergencyAccess = ({access, request}) => {
   ) {
     return "emergency-access-contract-incomplete";
   }
+  const independenceCode = checkIndependence({
+    required: profile?.independence?.emergencyAccess,
+    decider: access.approver.identity,
+    author: access.owner,
+    failureCode: "emergency-access-independence-failed",
+  });
+  if (independenceCode !== null) return independenceCode;
   if (
     !access.scope.actions.includes(request?.action) ||
     !access.scope.targets.includes(request?.target?.reference)
@@ -202,7 +212,10 @@ export const validateEmergencyAccess = ({access, request}) => {
   return null;
 };
 
-export const validatePrivilegedOperation = (operation) => {
+// `profile` stays a sibling of `operation` down this whole chain: an operation
+// that carried its own profile could declare `none` and waive the emergency
+// access check applied to it.
+export const validatePrivilegedOperation = ({operation, profile}) => {
   if (
     ![
       "integration",
@@ -237,6 +250,7 @@ export const validatePrivilegedOperation = (operation) => {
     ? validateEmergencyAccess({
         access: operation.emergencyAccess,
         request: operation.request,
+        profile,
       })
     : validateAuthorization({
         authorization: operation.authorization,
@@ -282,7 +296,7 @@ export const validatePrivilegedOperation = (operation) => {
   return null;
 };
 
-export const validateTransition = (transition) => {
+export const validateTransition = ({transition, profile}) => {
   const requiredAreas = [
     "data",
     "users",
@@ -307,11 +321,12 @@ export const validateTransition = (transition) => {
   ) {
     return "transition-intent-mismatch";
   }
-  if (
-    ["execute", "rollback"].includes(transition.mode) &&
-    validatePrivilegedOperation(transition.operation) !== null
-  ) {
-    return validatePrivilegedOperation(transition.operation);
+  if (["execute", "rollback"].includes(transition.mode)) {
+    const operationCode = validatePrivilegedOperation({
+      operation: transition.operation,
+      profile,
+    });
+    if (operationCode !== null) return operationCode;
   }
   if (
     ["verify", "rollback"].includes(transition.mode) &&
@@ -322,7 +337,7 @@ export const validateTransition = (transition) => {
   return null;
 };
 
-export const validateRelease = (release) => {
+export const validateRelease = ({release, profile}) => {
   if (
     !hasEveryValue(release?.artifact, ["reference", "digest"]) ||
     !hasEveryValue(release?.protectedEnvironment, ["reference", "revision"]) ||
@@ -335,7 +350,10 @@ export const validateRelease = (release) => {
   if (release.operation?.intent !== "release") {
     return "release-intent-mismatch";
   }
-  const operationCode = validatePrivilegedOperation(release.operation);
+  const operationCode = validatePrivilegedOperation({
+    operation: release.operation,
+    profile,
+  });
   if (operationCode !== null) return operationCode;
   if (
     release.operation.outcome.status === "failed" &&
@@ -473,7 +491,7 @@ export const validateCorrectiveAction = (correctiveAction) => {
   return null;
 };
 
-export const validateRetirement = (retirement) => {
+export const validateRetirement = ({retirement, profile}) => {
   const supportedKinds = [
     "model",
     "data",
@@ -503,7 +521,10 @@ export const validateRetirement = (retirement) => {
   if (retirement.operation?.intent !== "retirement") {
     return "retirement-intent-mismatch";
   }
-  const operationCode = validatePrivilegedOperation(retirement.operation);
+  const operationCode = validatePrivilegedOperation({
+    operation: retirement.operation,
+    profile,
+  });
   if (operationCode !== null) return operationCode;
   if (
     retirement.resources.some(

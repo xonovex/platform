@@ -652,7 +652,8 @@
       "version": "7",
       "independence": {
         "acceptance": "distinct-identity",
-        "review": "distinct-identity"
+        "review": "distinct-identity",
+        "emergencyAccess": "distinct-identity"
       }
     },
     "solo-profile": {
@@ -660,7 +661,8 @@
       "version": "1",
       "independence": {
         "acceptance": "none",
-        "review": "none"
+        "review": "none",
+        "emergencyAccess": "none"
       }
     }
   },
@@ -1128,12 +1130,14 @@
       "id": "scoped-break-glass-is-valid",
       "contract": "emergency-access",
       "template": "break-glass",
+      "profileTemplate": "governed-profile",
       "expectedValid": true
     },
     {
       "id": "scoped-exception-is-valid",
       "contract": "emergency-access",
       "template": "break-glass",
+      "profileTemplate": "governed-profile",
       "input": {
         "access": {
           "kind": "exception"
@@ -1174,6 +1178,7 @@
       "id": "expired-break-glass-fails-closed",
       "contract": "emergency-access",
       "template": "break-glass",
+      "profileTemplate": "governed-profile",
       "input": {
         "request": {
           "now": "2026-07-16T10:25:00Z"
@@ -1186,6 +1191,7 @@
       "id": "break-glass-requires-notification",
       "contract": "emergency-access",
       "template": "break-glass",
+      "profileTemplate": "governed-profile",
       "input": {
         "access": {
           "notificationReference": null
@@ -1193,6 +1199,131 @@
       },
       "expectedValid": false,
       "expectedCode": "break-glass-contract-incomplete"
+    },
+    {
+      "id": "break-glass-approver-cannot-rely-on-own-grant",
+      "contract": "emergency-access",
+      "template": "break-glass",
+      "profileTemplate": "governed-profile",
+      "input": {
+        "access": {
+          "owner": "human:security-lead"
+        }
+      },
+      "expectedValid": false,
+      "expectedCode": "emergency-access-independence-failed"
+    },
+    {
+      "id": "exception-approver-cannot-rely-on-own-grant",
+      "contract": "emergency-access",
+      "template": "break-glass",
+      "profileTemplate": "governed-profile",
+      "input": {
+        "access": {
+          "kind": "exception",
+          "owner": "human:security-lead"
+        }
+      },
+      "expectedValid": false,
+      "expectedCode": "emergency-access-independence-failed"
+    },
+    {
+      "id": "emergency-access-record-cannot-waive-profile-independence",
+      "contract": "emergency-access",
+      "template": "break-glass",
+      "profileTemplate": "governed-profile",
+      "input": {
+        "access": {
+          "owner": "human:security-lead",
+          "independence": "none",
+          "profile": {
+            "independence": {
+              "emergencyAccess": "none"
+            }
+          }
+        }
+      },
+      "expectedValid": false,
+      "expectedCode": "emergency-access-independence-failed"
+    },
+    {
+      "id": "emergency-access-independence-requirement-undeclared",
+      "contract": "emergency-access",
+      "template": "break-glass",
+      "input": {
+        "access": {
+          "owner": "human:security-lead"
+        }
+      },
+      "expectedValid": false,
+      "expectedCode": "independence-requirement-undeclared"
+    },
+    {
+      "id": "emergency-access-independence-unverifiable-without-owner-identity",
+      "contract": "emergency-access",
+      "template": "break-glass",
+      "profileTemplate": "governed-profile",
+      "input": {
+        "access": {
+          "owner": {
+            "identity": "human:security-lead"
+          }
+        }
+      },
+      "expectedValid": false,
+      "expectedCode": "independence-unverifiable"
+    },
+    {
+      "id": "profile-may-waive-emergency-access-independence",
+      "contract": "emergency-access",
+      "template": "break-glass",
+      "profileTemplate": "solo-profile",
+      "input": {
+        "access": {
+          "owner": "human:security-lead"
+        }
+      },
+      "expectedValid": true
+    },
+    {
+      "id": "privileged-operation-record-cannot-supply-its-own-profile",
+      "contract": "privileged-operation",
+      "template": "privileged-operation",
+      "input": {
+        "profile": {
+          "independence": {
+            "emergencyAccess": "none"
+          }
+        },
+        "emergencyAccess": {
+          "kind": "break-glass",
+          "owner": "human:security-lead",
+          "approver": {
+            "identity": "human:security-lead",
+            "role": "emergency-approver",
+            "type": "human",
+            "accountable": true
+          },
+          "scope": {
+            "actions": ["integration"],
+            "targets": ["branch:main"]
+          },
+          "rationale": "Contain active supply-chain compromise",
+          "compensatingControls": ["two-person-live-review"],
+          "evidenceReference": "incident:77@4",
+          "start": "2026-07-16T09:55:00Z",
+          "expiresAt": "2026-07-16T10:25:00Z",
+          "postUseReviewRequired": true,
+          "emergencyReason": "Block compromised artifact promotion",
+          "accessEvidenceReference": "iam-session:emergency-9",
+          "notificationReference": "page:security-12",
+          "containment": "freeze target after mutation",
+          "revocationPlan": "revoke emergency session after verification",
+          "explicitInvocation": true
+        }
+      },
+      "expectedValid": false,
+      "expectedCode": "independence-requirement-undeclared"
     },
     {
       "id": "retirement-verifies-data-and-credential-actions",
