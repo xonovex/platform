@@ -1,3 +1,5 @@
+import {checkIndependence} from "./independence-helpers.mjs";
+
 const hasValue = (value) =>
   value !== undefined && value !== null && value !== "";
 
@@ -33,7 +35,7 @@ const evidenceMatches = (authorized, current) =>
     ),
   );
 
-export const validateAcceptance = (acceptance) => {
+export const validateAcceptance = ({acceptance, profile}) => {
   if (
     !hasEveryValue(acceptance?.subject, ["reference", "revision"]) ||
     !hasEveryValue(acceptance?.target, ["reference", "revision"]) ||
@@ -77,13 +79,12 @@ export const validateAcceptance = (acceptance) => {
     ) {
       return "human-acceptance-required";
     }
-    if (
-      acceptance.independenceRequired &&
-      acceptance.actor.identity === acceptance.subjectAuthor
-    ) {
-      return "acceptance-independence-failed";
-    }
-    return null;
+    return checkIndependence({
+      required: profile?.independence?.acceptance,
+      decider: acceptance.actor.identity,
+      author: acceptance.subjectAuthor,
+      failureCode: "acceptance-independence-failed",
+    });
   }
 
   return "unknown-acceptance-mode";

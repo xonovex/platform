@@ -142,8 +142,14 @@
         "planningReference": "task-system:planning:7",
         "planningRevision": "4",
         "sourceResults": [
-          {"reference": "development:api", "revision": "9"},
-          {"reference": "development:ui", "revision": "6"}
+          {
+            "reference": "development:api",
+            "revision": "9"
+          },
+          {
+            "reference": "development:ui",
+            "revision": "6"
+          }
         ],
         "targetWorkspaceReference": "workspace:consolidated:1",
         "targetStartingRevision": "base-12",
@@ -162,7 +168,12 @@
         "mode": "consolidate",
         "planningReference": "task-system:planning:7",
         "planningRevision": "4",
-        "sourceResults": [{"reference": "development:api", "revision": "9"}],
+        "sourceResults": [
+          {
+            "reference": "development:api",
+            "revision": "9"
+          }
+        ],
         "targetWorkspaceReference": "production:main",
         "targetStartingRevision": "accepted-12",
         "resultRevision": "accepted-13",
@@ -220,7 +231,10 @@
           }
         ],
         "outcome": "failed",
-        "retry": {"enabled": true, "retryLimit": 2}
+        "retry": {
+          "enabled": true,
+          "retryLimit": 2
+        }
       }
     },
     {
@@ -498,7 +512,10 @@
         "subjectKind": "Planning",
         "subjectReference": "task-system:planning:7",
         "subjectRevision": "4",
-        "criteria": {"identity": "risk-profile", "version": "2026-07"},
+        "criteria": {
+          "identity": "risk-profile",
+          "version": "2026-07"
+        },
         "outcome": "pass",
         "evidence": [
           {
@@ -512,16 +529,25 @@
     {
       "id": "independent-deliverable-review",
       "contract": "assurance",
+      "profile": {
+        "identity": "code-review-profile",
+        "version": "5",
+        "independence": {
+          "review": "distinct-identity"
+        }
+      },
       "expectedValid": true,
       "assurance": {
         "kind": "Review",
         "subjectKind": "DeliverablePublication",
         "subjectReference": "github:pull-request:204",
         "subjectRevision": "62f2ac2cb13bf85d37621f5f7bc75d744a9f0719",
-        "criteria": {"identity": "code-review", "version": "5.0.0"},
+        "criteria": {
+          "identity": "code-review",
+          "version": "5.0.0"
+        },
         "subjectAuthor": "actor:author",
         "assessor": "actor:reviewer",
-        "independenceRequired": true,
         "outcome": "pass",
         "evidence": [
           {
@@ -541,8 +567,14 @@
         "subjectKind": "DeliverablePublication",
         "subjectReference": "gitlab:merge-request:87",
         "subjectRevision": "commit:abc",
-        "criteria": {"identity": "quality-profile", "version": "3"},
-        "environment": {"identity": "linux-node", "version": "node-24.4.1"},
+        "criteria": {
+          "identity": "quality-profile",
+          "version": "3"
+        },
+        "environment": {
+          "identity": "linux-node",
+          "version": "node-24.4.1"
+        },
         "outcome": "pass",
         "evidence": [
           {
@@ -556,6 +588,13 @@
     {
       "id": "review-rejects-self-assessment",
       "contract": "assurance",
+      "profile": {
+        "identity": "code-review-profile",
+        "version": "5",
+        "independence": {
+          "review": "distinct-identity"
+        }
+      },
       "expectedValid": false,
       "expectedCode": "assessor-independence-failed",
       "assurance": {
@@ -563,10 +602,136 @@
         "subjectKind": "DeliverablePublication",
         "subjectReference": "github:pull-request:204",
         "subjectRevision": "commit:abc",
-        "criteria": {"identity": "code-review", "version": "5.0.0"},
+        "criteria": {
+          "identity": "code-review",
+          "version": "5.0.0"
+        },
         "subjectAuthor": "actor:author",
         "assessor": "actor:author",
-        "independenceRequired": true,
+        "outcome": "pass",
+        "evidence": [
+          {
+            "origin": "human",
+            "nativeReference": "github:review:91",
+            "verified": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "review-record-cannot-waive-profile-independence",
+      "contract": "assurance",
+      "profile": {
+        "identity": "code-review-profile",
+        "version": "5",
+        "independence": {
+          "review": "distinct-identity"
+        }
+      },
+      "expectedValid": false,
+      "expectedCode": "assessor-independence-failed",
+      "assurance": {
+        "kind": "Review",
+        "subjectKind": "DeliverablePublication",
+        "subjectReference": "github:pull-request:204",
+        "subjectRevision": "commit:abc",
+        "criteria": {
+          "identity": "code-review",
+          "version": "5.0.0"
+        },
+        "subjectAuthor": "actor:author",
+        "assessor": "actor:author",
+        "outcome": "pass",
+        "evidence": [
+          {
+            "origin": "human",
+            "nativeReference": "github:review:91",
+            "verified": true
+          }
+        ],
+        "independenceRequired": false
+      }
+    },
+    {
+      "id": "review-independence-requirement-undeclared",
+      "contract": "assurance",
+      "expectedValid": false,
+      "expectedCode": "independence-requirement-undeclared",
+      "assurance": {
+        "kind": "Review",
+        "subjectKind": "DeliverablePublication",
+        "subjectReference": "github:pull-request:204",
+        "subjectRevision": "commit:abc",
+        "criteria": {
+          "identity": "code-review",
+          "version": "5.0.0"
+        },
+        "subjectAuthor": "actor:author",
+        "assessor": "actor:author",
+        "outcome": "pass",
+        "evidence": [
+          {
+            "origin": "human",
+            "nativeReference": "github:review:91",
+            "verified": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "review-independence-unverifiable-without-assessor",
+      "contract": "assurance",
+      "profile": {
+        "identity": "code-review-profile",
+        "version": "5",
+        "independence": {
+          "review": "distinct-identity"
+        }
+      },
+      "expectedValid": false,
+      "expectedCode": "independence-unverifiable",
+      "assurance": {
+        "kind": "Review",
+        "subjectKind": "DeliverablePublication",
+        "subjectReference": "github:pull-request:204",
+        "subjectRevision": "commit:abc",
+        "criteria": {
+          "identity": "code-review",
+          "version": "5.0.0"
+        },
+        "subjectAuthor": "actor:author",
+        "outcome": "pass",
+        "evidence": [
+          {
+            "origin": "human",
+            "nativeReference": "github:review:91",
+            "verified": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "profile-may-waive-review-independence",
+      "contract": "assurance",
+      "profile": {
+        "identity": "solo-profile",
+        "version": "1",
+        "independence": {
+          "review": "none"
+        }
+      },
+      "expectedValid": true,
+      "assurance": {
+        "kind": "Review",
+        "subjectKind": "DeliverablePublication",
+        "subjectReference": "github:pull-request:204",
+        "subjectRevision": "commit:abc",
+        "criteria": {
+          "identity": "code-review",
+          "version": "5.0.0"
+        },
+        "subjectAuthor": "actor:author",
+        "assessor": "actor:author",
         "outcome": "pass",
         "evidence": [
           {
@@ -587,7 +752,10 @@
         "subjectKind": "Planning",
         "subjectReference": "task-system:planning:7",
         "subjectRevision": "4",
-        "criteria": {"identity": "code-review", "version": "5.0.0"},
+        "criteria": {
+          "identity": "code-review",
+          "version": "5.0.0"
+        },
         "outcome": "pass",
         "evidence": [
           {
@@ -609,7 +777,10 @@
         "subjectKind": "Research",
         "subjectReference": "research:44",
         "subjectRevision": "8",
-        "criteria": {"identity": "security-profile", "version": "2"},
+        "criteria": {
+          "identity": "security-profile",
+          "version": "2"
+        },
         "outcome": "pass",
         "evidence": [
           {
@@ -631,7 +802,10 @@
         "subjectKind": "Inventory",
         "subjectReference": "inventory:12",
         "subjectRevision": "5",
-        "criteria": {"identity": "supply-chain-profile", "version": "4"},
+        "criteria": {
+          "identity": "supply-chain-profile",
+          "version": "4"
+        },
         "outcome": "pass",
         "evidence": [
           {
@@ -652,7 +826,10 @@
         "subjectKind": "DeliverablePublication",
         "subjectReference": "deliverable:204",
         "subjectRevision": "commit:abc",
-        "criteria": {"identity": "security-profile", "version": "2"},
+        "criteria": {
+          "identity": "security-profile",
+          "version": "2"
+        },
         "outcome": "pass",
         "partial": true,
         "failedEvaluators": ["dynamic-scanner"],
@@ -743,8 +920,14 @@
       "expectedCode": "stale-evidence:subjectRevision",
       "freshness": {
         "requiredBindings": ["subjectRevision", "policyVersion"],
-        "binding": {"subjectRevision": "a", "policyVersion": "1"},
-        "current": {"subjectRevision": "b", "policyVersion": "1"}
+        "binding": {
+          "subjectRevision": "a",
+          "policyVersion": "1"
+        },
+        "current": {
+          "subjectRevision": "b",
+          "policyVersion": "1"
+        }
       }
     },
     {
@@ -754,8 +937,14 @@
       "expectedCode": "stale-evidence:policyVersion",
       "freshness": {
         "requiredBindings": ["subjectRevision", "policyVersion"],
-        "binding": {"subjectRevision": "a", "policyVersion": "1"},
-        "current": {"subjectRevision": "a", "policyVersion": "2"}
+        "binding": {
+          "subjectRevision": "a",
+          "policyVersion": "1"
+        },
+        "current": {
+          "subjectRevision": "a",
+          "policyVersion": "2"
+        }
       }
     },
     {
@@ -765,8 +954,14 @@
       "expectedCode": "stale-evidence:evaluatorVersion",
       "freshness": {
         "requiredBindings": ["subjectRevision", "evaluatorVersion"],
-        "binding": {"subjectRevision": "a", "evaluatorVersion": "scanner-1"},
-        "current": {"subjectRevision": "a", "evaluatorVersion": "scanner-2"}
+        "binding": {
+          "subjectRevision": "a",
+          "evaluatorVersion": "scanner-1"
+        },
+        "current": {
+          "subjectRevision": "a",
+          "evaluatorVersion": "scanner-2"
+        }
       }
     },
     {
@@ -776,8 +971,14 @@
       "expectedCode": "stale-evidence:environmentVersion",
       "freshness": {
         "requiredBindings": ["subjectRevision", "environmentVersion"],
-        "binding": {"subjectRevision": "a", "environmentVersion": "linux-1"},
-        "current": {"subjectRevision": "a", "environmentVersion": "linux-2"}
+        "binding": {
+          "subjectRevision": "a",
+          "environmentVersion": "linux-1"
+        },
+        "current": {
+          "subjectRevision": "a",
+          "environmentVersion": "linux-2"
+        }
       }
     },
     {

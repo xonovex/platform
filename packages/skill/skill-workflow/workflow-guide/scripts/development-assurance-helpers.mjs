@@ -1,3 +1,5 @@
+import {checkIndependence} from "./independence-helpers.mjs";
+
 const requiredModelBounds = [
   "fixedInputs",
   "outputSchema",
@@ -223,7 +225,7 @@ export const validateInventory = (inventory, specializations) => {
   return null;
 };
 
-export const validateAssurance = (assurance) => {
+export const validateAssurance = ({assurance, profile}) => {
   if (
     !assurance?.subjectReference ||
     !assurance.subjectRevision ||
@@ -238,12 +240,14 @@ export const validateAssurance = (assurance) => {
   ) {
     return "deliverable-specific-assurance-required";
   }
-  if (
-    assurance.kind === "Review" &&
-    assurance.independenceRequired &&
-    (!assurance.assessor || assurance.assessor === assurance.subjectAuthor)
-  ) {
-    return "assessor-independence-failed";
+  if (assurance.kind === "Review") {
+    const independenceCode = checkIndependence({
+      required: profile?.independence?.review,
+      decider: assurance.assessor,
+      author: assurance.subjectAuthor,
+      failureCode: "assessor-independence-failed",
+    });
+    if (independenceCode !== null) return independenceCode;
   }
   if (
     assurance.kind === "QA" &&

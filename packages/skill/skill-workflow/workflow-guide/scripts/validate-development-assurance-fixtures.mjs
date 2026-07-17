@@ -36,7 +36,10 @@ const validateCase = (testCase, inventorySpecializations) => {
     return validateInventory(testCase.inventory, inventorySpecializations);
   }
   if (testCase.contract === "assurance") {
-    return validateAssurance(testCase.assurance);
+    return validateAssurance({
+      assurance: testCase.assurance,
+      profile: testCase.profile,
+    });
   }
   if (testCase.contract === "assurance-batch") {
     return validateAssuranceBatch(testCase.assuranceBatch);
@@ -50,8 +53,23 @@ const validateCase = (testCase, inventorySpecializations) => {
   return `unknown-contract:${testCase.contract}`;
 };
 
+// Review independence is resolved from the profile, so these cases prove an
+// assessor cannot elect the check applied to them. Deleting one would silently
+// reopen the self-assessment path; requiredCaseIds keeps them under test.
+const requiredCaseIds = [
+  "review-rejects-self-assessment",
+  "review-record-cannot-waive-profile-independence",
+  "review-independence-requirement-undeclared",
+  "review-independence-unverifiable-without-assessor",
+  "profile-may-waive-review-independence",
+];
+
 export const validateDevelopmentAssuranceFixtures = () => {
   const fixture = JSON.parse(readFileSync(fileURLToPath(fixtureUrl), "utf8"));
+  const presentCaseIds = new Set(fixture.cases.map(({id}) => id));
+  const missingCaseIds = requiredCaseIds
+    .filter((id) => !presentCaseIds.has(id))
+    .map((id) => `required fixture case is missing: ${id}`);
   const failures = fixture.cases.flatMap((testCase) => {
     const code = validateCase(testCase, fixture.inventorySpecializations);
     const valid = code === null;
@@ -64,9 +82,9 @@ export const validateDevelopmentAssuranceFixtures = () => {
         ];
   });
 
-  if (failures.length > 0) {
+  if (missingCaseIds.length > 0 || failures.length > 0) {
     throw new Error(
-      `development and assurance fixture failures:\n${failures.join("\n")}`,
+      `development and assurance fixture failures:\n${[...missingCaseIds, ...failures].join("\n")}`,
     );
   }
 

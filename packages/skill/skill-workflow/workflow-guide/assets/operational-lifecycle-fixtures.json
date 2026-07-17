@@ -3,9 +3,18 @@
   "templates": {
     "acceptance-evidence": {
       "mode": "evidence",
-      "subject": {"reference": "deliverable:42", "revision": "sha256:aaa"},
-      "target": {"reference": "branch:main", "revision": "commit:100"},
-      "policy": {"identity": "delivery-policy", "version": "7"},
+      "subject": {
+        "reference": "deliverable:42",
+        "revision": "sha256:aaa"
+      },
+      "target": {
+        "reference": "branch:main",
+        "revision": "commit:100"
+      },
+      "policy": {
+        "identity": "delivery-policy",
+        "version": "7"
+      },
       "evidence": [
         {
           "reference": "qa:42",
@@ -30,10 +39,19 @@
     },
     "acceptance-decision": {
       "mode": "decision",
-      "subject": {"reference": "deliverable:42", "revision": "sha256:aaa"},
+      "subject": {
+        "reference": "deliverable:42",
+        "revision": "sha256:aaa"
+      },
       "subjectAuthor": "human:developer",
-      "target": {"reference": "branch:main", "revision": "commit:100"},
-      "policy": {"identity": "delivery-policy", "version": "7"},
+      "target": {
+        "reference": "branch:main",
+        "revision": "commit:100"
+      },
+      "policy": {
+        "identity": "delivery-policy",
+        "version": "7"
+      },
       "evidencePackageReference": "acceptance-evidence:42@2",
       "decision": "accept",
       "actor": {
@@ -42,14 +60,19 @@
         "type": "human",
         "accountable": true
       },
-      "independenceRequired": true,
       "decidedAt": "2026-07-16T09:00:00Z",
       "expiresAt": "2026-07-16T17:00:00Z"
     },
     "authorization": {
       "authorization": {
-        "subject": {"reference": "deliverable:42", "revision": "sha256:aaa"},
-        "target": {"reference": "branch:main", "revision": "commit:100"},
+        "subject": {
+          "reference": "deliverable:42",
+          "revision": "sha256:aaa"
+        },
+        "target": {
+          "reference": "branch:main",
+          "revision": "commit:100"
+        },
         "action": "integration",
         "actor": {
           "identity": "human:owner",
@@ -64,17 +87,34 @@
             "validUntil": "2026-07-16T16:30:00Z"
           }
         ],
-        "policy": {"identity": "delivery-policy", "version": "7"},
+        "policy": {
+          "identity": "delivery-policy",
+          "version": "7"
+        },
         "issuedAt": "2026-07-16T09:00:00Z",
         "expiresAt": "2026-07-16T17:00:00Z",
         "decision": "allow"
       },
       "request": {
-        "subject": {"reference": "deliverable:42", "revision": "sha256:aaa"},
-        "target": {"reference": "branch:main", "revision": "commit:100"},
+        "subject": {
+          "reference": "deliverable:42",
+          "revision": "sha256:aaa"
+        },
+        "target": {
+          "reference": "branch:main",
+          "revision": "commit:100"
+        },
         "action": "integration",
-        "evidence": [{"reference": "qa:42", "revision": "5"}],
-        "policy": {"identity": "delivery-policy", "version": "7"},
+        "evidence": [
+          {
+            "reference": "qa:42",
+            "revision": "5"
+          }
+        ],
+        "policy": {
+          "identity": "delivery-policy",
+          "version": "7"
+        },
         "now": "2026-07-16T10:00:00Z"
       }
     },
@@ -108,7 +148,10 @@
         "explicitInvocation": true
       },
       "request": {
-        "target": {"reference": "branch:main", "revision": "commit:100"},
+        "target": {
+          "reference": "branch:main",
+          "revision": "commit:100"
+        },
         "action": "integration",
         "now": "2026-07-16T10:00:00Z"
       }
@@ -118,16 +161,36 @@
       "capability": "external-enforcement",
       "ordinaryToolMutation": false,
       "request": {
-        "subject": {"reference": "deliverable:42", "revision": "sha256:aaa"},
-        "target": {"reference": "branch:main", "revision": "commit:100"},
+        "subject": {
+          "reference": "deliverable:42",
+          "revision": "sha256:aaa"
+        },
+        "target": {
+          "reference": "branch:main",
+          "revision": "commit:100"
+        },
         "action": "integration",
-        "evidence": [{"reference": "qa:42", "revision": "5"}],
-        "policy": {"identity": "delivery-policy", "version": "7"},
+        "evidence": [
+          {
+            "reference": "qa:42",
+            "revision": "5"
+          }
+        ],
+        "policy": {
+          "identity": "delivery-policy",
+          "version": "7"
+        },
         "now": "2026-07-16T10:00:00Z"
       },
       "authorization": {
-        "subject": {"reference": "deliverable:42", "revision": "sha256:aaa"},
-        "target": {"reference": "branch:main", "revision": "commit:100"},
+        "subject": {
+          "reference": "deliverable:42",
+          "revision": "sha256:aaa"
+        },
+        "target": {
+          "reference": "branch:main",
+          "revision": "commit:100"
+        },
         "action": "integration",
         "actor": {
           "identity": "human:owner",
@@ -142,7 +205,10 @@
             "validUntil": "2026-07-16T16:30:00Z"
           }
         ],
-        "policy": {"identity": "delivery-policy", "version": "7"},
+        "policy": {
+          "identity": "delivery-policy",
+          "version": "7"
+        },
         "issuedAt": "2026-07-16T09:00:00Z",
         "expiresAt": "2026-07-16T17:00:00Z",
         "decision": "allow"
@@ -170,8 +236,14 @@
     },
     "transition": {
       "mode": "execute",
-      "source": {"reference": "service:v1", "revision": "deploy:20"},
-      "target": {"reference": "service:v2", "revision": "deploy:0"},
+      "source": {
+        "reference": "service:v1",
+        "revision": "deploy:20"
+      },
+      "target": {
+        "reference": "service:v2",
+        "revision": "deploy:0"
+      },
       "plan": {
         "areas": [
           "data",
@@ -189,16 +261,36 @@
         "capability": "external-enforcement",
         "ordinaryToolMutation": false,
         "request": {
-          "subject": {"reference": "service:v1", "revision": "deploy:20"},
-          "target": {"reference": "service:v2", "revision": "deploy:0"},
+          "subject": {
+            "reference": "service:v1",
+            "revision": "deploy:20"
+          },
+          "target": {
+            "reference": "service:v2",
+            "revision": "deploy:0"
+          },
           "action": "transition",
-          "evidence": [{"reference": "readiness:2", "revision": "4"}],
-          "policy": {"identity": "transition-policy", "version": "3"},
+          "evidence": [
+            {
+              "reference": "readiness:2",
+              "revision": "4"
+            }
+          ],
+          "policy": {
+            "identity": "transition-policy",
+            "version": "3"
+          },
           "now": "2026-07-16T10:00:00Z"
         },
         "authorization": {
-          "subject": {"reference": "service:v1", "revision": "deploy:20"},
-          "target": {"reference": "service:v2", "revision": "deploy:0"},
+          "subject": {
+            "reference": "service:v1",
+            "revision": "deploy:20"
+          },
+          "target": {
+            "reference": "service:v2",
+            "revision": "deploy:0"
+          },
           "action": "transition",
           "actor": {
             "identity": "human:service-owner",
@@ -206,8 +298,16 @@
             "type": "human",
             "accountable": true
           },
-          "evidence": [{"reference": "readiness:2", "revision": "4"}],
-          "policy": {"identity": "transition-policy", "version": "3"},
+          "evidence": [
+            {
+              "reference": "readiness:2",
+              "revision": "4"
+            }
+          ],
+          "policy": {
+            "identity": "transition-policy",
+            "version": "3"
+          },
           "issuedAt": "2026-07-16T09:00:00Z",
           "expiresAt": "2026-07-16T17:00:00Z",
           "decision": "allow"
@@ -235,7 +335,10 @@
       }
     },
     "release": {
-      "artifact": {"reference": "artifact:42", "digest": "sha256:bbb"},
+      "artifact": {
+        "reference": "artifact:42",
+        "digest": "sha256:bbb"
+      },
       "protectedEnvironment": {
         "reference": "environment:production",
         "revision": "19"
@@ -251,16 +354,36 @@
         "capability": "external-enforcement",
         "ordinaryToolMutation": false,
         "request": {
-          "subject": {"reference": "artifact:42", "revision": "sha256:bbb"},
-          "target": {"reference": "environment:production", "revision": "19"},
+          "subject": {
+            "reference": "artifact:42",
+            "revision": "sha256:bbb"
+          },
+          "target": {
+            "reference": "environment:production",
+            "revision": "19"
+          },
           "action": "release",
-          "evidence": [{"reference": "integration:42", "revision": "2"}],
-          "policy": {"identity": "release-policy", "version": "9"},
+          "evidence": [
+            {
+              "reference": "integration:42",
+              "revision": "2"
+            }
+          ],
+          "policy": {
+            "identity": "release-policy",
+            "version": "9"
+          },
           "now": "2026-07-16T10:00:00Z"
         },
         "authorization": {
-          "subject": {"reference": "artifact:42", "revision": "sha256:bbb"},
-          "target": {"reference": "environment:production", "revision": "19"},
+          "subject": {
+            "reference": "artifact:42",
+            "revision": "sha256:bbb"
+          },
+          "target": {
+            "reference": "environment:production",
+            "revision": "19"
+          },
           "action": "release",
           "actor": {
             "identity": "human:release-manager",
@@ -268,8 +391,16 @@
             "type": "human",
             "accountable": true
           },
-          "evidence": [{"reference": "integration:42", "revision": "2"}],
-          "policy": {"identity": "release-policy", "version": "9"},
+          "evidence": [
+            {
+              "reference": "integration:42",
+              "revision": "2"
+            }
+          ],
+          "policy": {
+            "identity": "release-policy",
+            "version": "9"
+          },
           "issuedAt": "2026-07-16T09:00:00Z",
           "expiresAt": "2026-07-16T17:00:00Z",
           "decision": "allow"
@@ -297,7 +428,10 @@
       }
     },
     "observation": {
-      "subject": {"reference": "deployment:42", "revision": "sha256:bbb"},
+      "subject": {
+        "reference": "deployment:42",
+        "revision": "sha256:bbb"
+      },
       "window": {
         "start": "2026-07-16T10:00:00Z",
         "end": "2026-07-16T11:00:00Z"
@@ -362,7 +496,11 @@
       "owner": "human:incident-commander",
       "currentState": "recovering",
       "timeline": [
-        {"at": "2026-07-16T10:02:00Z", "event": "alert", "evidence": "alert:9"},
+        {
+          "at": "2026-07-16T10:02:00Z",
+          "event": "alert",
+          "evidence": "alert:9"
+        },
         {
           "at": "2026-07-16T10:05:00Z",
           "event": "containment",
@@ -396,7 +534,10 @@
         "nativeReference": "qa:retry-guard@2",
         "outcome": "pass"
       },
-      "effectiveness": {"status": "observing", "window": "14d"}
+      "effectiveness": {
+        "status": "observing",
+        "window": "14d"
+      }
     },
     "retirement": {
       "resources": [
@@ -425,16 +566,36 @@
         "capability": "external-enforcement",
         "ordinaryToolMutation": false,
         "request": {
-          "subject": {"reference": "retirement-set:42", "revision": "1"},
-          "target": {"reference": "provider:legacy-service", "revision": "12"},
+          "subject": {
+            "reference": "retirement-set:42",
+            "revision": "1"
+          },
+          "target": {
+            "reference": "provider:legacy-service",
+            "revision": "12"
+          },
           "action": "retirement",
-          "evidence": [{"reference": "retirement-plan:42", "revision": "3"}],
-          "policy": {"identity": "retirement-policy", "version": "5"},
+          "evidence": [
+            {
+              "reference": "retirement-plan:42",
+              "revision": "3"
+            }
+          ],
+          "policy": {
+            "identity": "retirement-policy",
+            "version": "5"
+          },
           "now": "2026-07-16T10:00:00Z"
         },
         "authorization": {
-          "subject": {"reference": "retirement-set:42", "revision": "1"},
-          "target": {"reference": "provider:legacy-service", "revision": "12"},
+          "subject": {
+            "reference": "retirement-set:42",
+            "revision": "1"
+          },
+          "target": {
+            "reference": "provider:legacy-service",
+            "revision": "12"
+          },
           "action": "retirement",
           "actor": {
             "identity": "human:service-owner",
@@ -442,8 +603,16 @@
             "type": "human",
             "accountable": true
           },
-          "evidence": [{"reference": "retirement-plan:42", "revision": "3"}],
-          "policy": {"identity": "retirement-policy", "version": "5"},
+          "evidence": [
+            {
+              "reference": "retirement-plan:42",
+              "revision": "3"
+            }
+          ],
+          "policy": {
+            "identity": "retirement-policy",
+            "version": "5"
+          },
           "issuedAt": "2026-07-16T09:00:00Z",
           "expiresAt": "2026-07-16T17:00:00Z",
           "decision": "allow"
@@ -476,6 +645,22 @@
       "sourceReferences": ["incident:77@6", "metrics:1"],
       "fabricatesHumanAuthorization": false,
       "regulatoryConclusion": false
+    },
+    "governed-profile": {
+      "identity": "delivery-profile",
+      "version": "7",
+      "independence": {
+        "acceptance": "distinct-identity",
+        "review": "distinct-identity"
+      }
+    },
+    "solo-profile": {
+      "identity": "solo-profile",
+      "version": "1",
+      "independence": {
+        "acceptance": "none",
+        "review": "none"
+      }
     }
   },
   "cases": [
@@ -489,7 +674,9 @@
       "id": "evidence-assembly-cannot-claim-signoff",
       "contract": "acceptance",
       "template": "acceptance-evidence",
-      "input": {"decision": "accept"},
+      "input": {
+        "decision": "accept"
+      },
       "expectedValid": false,
       "expectedCode": "evidence-assembly-claims-acceptance"
     },
@@ -497,15 +684,119 @@
       "id": "accountable-human-records-acceptance",
       "contract": "acceptance",
       "template": "acceptance-decision",
+      "profileTemplate": "governed-profile",
       "expectedValid": true
     },
     {
       "id": "agent-cannot-record-human-acceptance",
       "contract": "acceptance",
       "template": "acceptance-decision",
-      "input": {"actor": {"type": "agent"}},
+      "profileTemplate": "governed-profile",
+      "input": {
+        "actor": {
+          "type": "agent"
+        }
+      },
       "expectedValid": false,
       "expectedCode": "human-acceptance-required"
+    },
+    {
+      "id": "author-cannot-accept-own-subject",
+      "contract": "acceptance",
+      "template": "acceptance-decision",
+      "profileTemplate": "governed-profile",
+      "input": {
+        "actor": {
+          "identity": "human:developer"
+        }
+      },
+      "expectedValid": false,
+      "expectedCode": "acceptance-independence-failed"
+    },
+    {
+      "id": "record-cannot-waive-profile-independence",
+      "contract": "acceptance",
+      "template": "acceptance-decision",
+      "profileTemplate": "governed-profile",
+      "input": {
+        "actor": {
+          "identity": "human:developer"
+        },
+        "independenceRequired": false
+      },
+      "expectedValid": false,
+      "expectedCode": "acceptance-independence-failed"
+    },
+    {
+      "id": "acceptance-independence-requirement-undeclared",
+      "contract": "acceptance",
+      "template": "acceptance-decision",
+      "input": {
+        "actor": {
+          "identity": "human:developer"
+        }
+      },
+      "expectedValid": false,
+      "expectedCode": "independence-requirement-undeclared"
+    },
+    {
+      "id": "acceptance-independence-level-unknown",
+      "contract": "acceptance",
+      "template": "acceptance-decision",
+      "profileTemplate": "governed-profile",
+      "profile": {
+        "independence": {
+          "acceptance": "distinct-vibes"
+        }
+      },
+      "input": {
+        "actor": {
+          "identity": "human:developer"
+        }
+      },
+      "expectedValid": false,
+      "expectedCode": "independence-requirement-undeclared"
+    },
+    {
+      "id": "acceptance-independence-unverifiable-without-author",
+      "contract": "acceptance",
+      "template": "acceptance-decision",
+      "profileTemplate": "governed-profile",
+      "input": {
+        "subjectAuthor": null
+      },
+      "expectedValid": false,
+      "expectedCode": "independence-unverifiable"
+    },
+    {
+      "id": "stronger-independence-level-still-compares-identity",
+      "contract": "acceptance",
+      "template": "acceptance-decision",
+      "profileTemplate": "governed-profile",
+      "profile": {
+        "independence": {
+          "acceptance": "distinct-team"
+        }
+      },
+      "input": {
+        "actor": {
+          "identity": "human:developer"
+        }
+      },
+      "expectedValid": false,
+      "expectedCode": "acceptance-independence-failed"
+    },
+    {
+      "id": "profile-may-waive-acceptance-independence",
+      "contract": "acceptance",
+      "template": "acceptance-decision",
+      "profileTemplate": "solo-profile",
+      "input": {
+        "actor": {
+          "identity": "human:developer"
+        }
+      },
+      "expectedValid": true
     },
     {
       "id": "exact-revision-authorization-is-valid",
@@ -517,7 +808,13 @@
       "id": "target-drift-invalidates-authorization",
       "contract": "authorization",
       "template": "authorization",
-      "input": {"request": {"target": {"revision": "commit:101"}}},
+      "input": {
+        "request": {
+          "target": {
+            "revision": "commit:101"
+          }
+        }
+      },
       "expectedValid": false,
       "expectedCode": "authorization-target-drift"
     },
@@ -526,7 +823,14 @@
       "contract": "authorization",
       "template": "authorization",
       "input": {
-        "request": {"evidence": [{"reference": "qa:42", "revision": "6"}]}
+        "request": {
+          "evidence": [
+            {
+              "reference": "qa:42",
+              "revision": "6"
+            }
+          ]
+        }
       },
       "expectedValid": false,
       "expectedCode": "authorization-stale-evidence"
@@ -535,7 +839,13 @@
       "id": "policy-drift-invalidates-authorization",
       "contract": "authorization",
       "template": "authorization",
-      "input": {"request": {"policy": {"version": "8"}}},
+      "input": {
+        "request": {
+          "policy": {
+            "version": "8"
+          }
+        }
+      },
       "expectedValid": false,
       "expectedCode": "authorization-policy-drift"
     },
@@ -543,7 +853,11 @@
       "id": "expired-authorization-fails-closed",
       "contract": "authorization",
       "template": "authorization",
-      "input": {"request": {"now": "2026-07-16T17:00:00Z"}},
+      "input": {
+        "request": {
+          "now": "2026-07-16T17:00:00Z"
+        }
+      },
       "expectedValid": false,
       "expectedCode": "authorization-expired"
     },
@@ -557,7 +871,9 @@
       "id": "ordinary-tool-cannot-bypass-integration",
       "contract": "privileged-operation",
       "template": "privileged-operation",
-      "input": {"ordinaryToolMutation": true},
+      "input": {
+        "ordinaryToolMutation": true
+      },
       "expectedValid": false,
       "expectedCode": "ordinary-tool-bypass"
     },
@@ -565,7 +881,11 @@
       "id": "bypassable-control-cannot-enforce-integration",
       "contract": "privileged-operation",
       "template": "privileged-operation",
-      "input": {"enforcement": {"governedActorCanBypass": true}},
+      "input": {
+        "enforcement": {
+          "governedActorCanBypass": true
+        }
+      },
       "expectedValid": false,
       "expectedCode": "external-enforcement-inadequate"
     },
@@ -589,7 +909,10 @@
       "id": "transition-rollback-requires-verification",
       "contract": "transition",
       "template": "transition",
-      "input": {"mode": "rollback", "verification": []},
+      "input": {
+        "mode": "rollback",
+        "verification": []
+      },
       "expectedValid": false,
       "expectedCode": "transition-verification-missing"
     },
@@ -606,7 +929,11 @@
       "input": {
         "reportedStatus": "failed",
         "recoveryResultReference": "release-recovery:42",
-        "operation": {"outcome": {"status": "failed"}}
+        "operation": {
+          "outcome": {
+            "status": "failed"
+          }
+        }
       },
       "expectedValid": true
     },
@@ -616,7 +943,11 @@
       "template": "release",
       "input": {
         "recoveryResultReference": "release-recovery:42",
-        "operation": {"outcome": {"status": "failed"}}
+        "operation": {
+          "outcome": {
+            "status": "failed"
+          }
+        }
       },
       "expectedValid": false,
       "expectedCode": "failed-release-reported-success"
@@ -627,7 +958,11 @@
       "template": "release",
       "input": {
         "reportedStatus": "failed",
-        "operation": {"outcome": {"status": "failed"}}
+        "operation": {
+          "outcome": {
+            "status": "failed"
+          }
+        }
       },
       "expectedValid": false,
       "expectedCode": "release-failure-unrecovered"
@@ -665,7 +1000,9 @@
       "id": "severity-change-requires-escalation",
       "contract": "incident",
       "template": "incident",
-      "input": {"escalationReference": null},
+      "input": {
+        "escalationReference": null
+      },
       "expectedValid": false,
       "expectedCode": "incident-escalation-missing"
     },
@@ -708,7 +1045,9 @@
       "id": "incident-closure-requires-recovery-and-review",
       "contract": "incident",
       "template": "incident",
-      "input": {"currentState": "closed"},
+      "input": {
+        "currentState": "closed"
+      },
       "expectedValid": false,
       "expectedCode": "incident-closure-incomplete"
     },
@@ -736,7 +1075,9 @@
       "template": "corrective-action",
       "input": {
         "status": "closed",
-        "effectiveness": {"status": "effective"},
+        "effectiveness": {
+          "status": "effective"
+        },
         "learningReference": "learning:77",
         "residualRiskDisposition": "accepted"
       },
@@ -746,7 +1087,12 @@
       "id": "ineffective-corrective-action-cannot-close",
       "contract": "corrective-action",
       "template": "corrective-action",
-      "input": {"status": "closed", "effectiveness": {"status": "partial"}},
+      "input": {
+        "status": "closed",
+        "effectiveness": {
+          "status": "partial"
+        }
+      },
       "expectedValid": false,
       "expectedCode": "corrective-action-closure-incomplete"
     },
@@ -760,14 +1106,22 @@
       "id": "scoped-exception-is-valid",
       "contract": "emergency-access",
       "template": "break-glass",
-      "input": {"access": {"kind": "exception"}},
+      "input": {
+        "access": {
+          "kind": "exception"
+        }
+      },
       "expectedValid": true
     },
     {
       "id": "expired-break-glass-fails-closed",
       "contract": "emergency-access",
       "template": "break-glass",
-      "input": {"request": {"now": "2026-07-16T10:25:00Z"}},
+      "input": {
+        "request": {
+          "now": "2026-07-16T10:25:00Z"
+        }
+      },
       "expectedValid": false,
       "expectedCode": "emergency-access-expired"
     },
@@ -775,7 +1129,11 @@
       "id": "break-glass-requires-notification",
       "contract": "emergency-access",
       "template": "break-glass",
-      "input": {"access": {"notificationReference": null}},
+      "input": {
+        "access": {
+          "notificationReference": null
+        }
+      },
       "expectedValid": false,
       "expectedCode": "break-glass-contract-incomplete"
     },
@@ -833,7 +1191,9 @@
       "id": "agent-cannot-fabricate-human-authorization",
       "contract": "agent-assistance",
       "template": "agent-assistance",
-      "input": {"fabricatesHumanAuthorization": true},
+      "input": {
+        "fabricatesHumanAuthorization": true
+      },
       "expectedValid": false,
       "expectedCode": "fabricated-human-authorization"
     },
@@ -841,7 +1201,9 @@
       "id": "agent-cannot-fabricate-regulatory-conclusion",
       "contract": "agent-assistance",
       "template": "agent-assistance",
-      "input": {"regulatoryConclusion": true},
+      "input": {
+        "regulatoryConclusion": true
+      },
       "expectedValid": false,
       "expectedCode": "fabricated-regulatory-conclusion"
     }

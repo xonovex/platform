@@ -39,7 +39,13 @@ const validateCase = (testCase, templates) => {
     testCase.input,
   );
   if (testCase.contract === "acceptance") {
-    return validateAcceptance(input);
+    return validateAcceptance({
+      acceptance: input,
+      profile: mergeFixture(
+        templates[testCase.profileTemplate] ?? {},
+        testCase.profile,
+      ),
+    });
   }
   if (testCase.contract === "authorization") {
     return validateAuthorization(input);
@@ -74,8 +80,23 @@ const validateCase = (testCase, templates) => {
   return `unknown-contract:${testCase.contract}`;
 };
 
+// Acceptance independence is resolved from the profile, so these cases prove a
+// record cannot elect the check applied to it. Deleting one would silently
+// reopen the self-approval path; requiredCaseIds keeps them under test.
+const requiredCaseIds = [
+  "author-cannot-accept-own-subject",
+  "record-cannot-waive-profile-independence",
+  "acceptance-independence-requirement-undeclared",
+  "acceptance-independence-unverifiable-without-author",
+  "profile-may-waive-acceptance-independence",
+];
+
 export const validateOperationalLifecycleFixtures = () => {
   const fixture = JSON.parse(readFileSync(fileURLToPath(fixtureUrl), "utf8"));
+  const presentCaseIds = new Set(fixture.cases.map(({id}) => id));
+  const missingCaseIds = requiredCaseIds
+    .filter((id) => !presentCaseIds.has(id))
+    .map((id) => `required fixture case is missing: ${id}`);
   const failures = fixture.cases.flatMap((testCase) => {
     const code = validateCase(testCase, fixture.templates);
     const valid = code === null;
@@ -88,9 +109,9 @@ export const validateOperationalLifecycleFixtures = () => {
         ];
   });
 
-  if (failures.length > 0) {
+  if (missingCaseIds.length > 0 || failures.length > 0) {
     throw new Error(
-      `operational lifecycle fixture failures:\n${failures.join("\n")}`,
+      `operational lifecycle fixture failures:\n${[...missingCaseIds, ...failures].join("\n")}`,
     );
   }
 

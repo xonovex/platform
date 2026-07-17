@@ -13,6 +13,8 @@ A profile declares semantics, not one config format:
 - required governance evidence and the guarantee an enforcement point must provide;
 - failure behavior when a dependency, evidence item, provider, or enforcement capability is unavailable.
 
+A profile declares its actor and independence requirements; **agent-governance-guide** defines them and states which of them code enforces. The independence requirement is resolved from this declaration and fails closed when it is absent; declaring any other requirement here does not enforce it.
+
 ## Composition rules
 
 1. Compose requirements by semantic identity, never by copying provider or harness configuration.
