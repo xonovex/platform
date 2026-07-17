@@ -77,8 +77,8 @@ You never review "the work" — you review a revision.
 **This is the line the lens exists to make visible.** `acceptance-validate` assembles fresh evidence
 and explicitly cannot sign off, authorize Integration, or fabricate accountable authority. A clean
 validation is not an approval — an accountable human records that separately with `acceptance-decide`,
-and that half belongs to the [PM Quickstart](pm-quickstart.md). The split is
-deliberate: an agent may assemble, only a human decides.
+and that half belongs to the [PM Quickstart](pm-quickstart.md). The split is deliberate: an agent may
+assemble, only a human decides.
 
 ### Alongside: validate a plan
 
