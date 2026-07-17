@@ -2,39 +2,30 @@ digraph AutonomyLadder {
   rankdir=LR;
   splines=polyline;
   nodesep=0.45;
-  ranksep=0.7;
+  ranksep=0.9;
 
   node [shape=box, style="rounded,filled", fillcolor=white, fontname="Arial", fontsize=10];
   edge [fontname="Arial", fontsize=9];
 
   a0 [label="A0 — Manual\nAdvances: a human invokes every capability\nGates: human decides inline, synchronously\nRunner: interactive session\nReview: human only", fillcolor="#e8f0fe"];
-  a1 [label="A1 — Assisted and adversarial (recommended starting point)\nAdvances: a human still invokes every capability\nGates: human decides, informed by independent critique\nRunner: interactive session\nReview: human + independent critique of exact revisions", fillcolor="#dcecff"];
+  a1 [label="A1 — Assisted and adversarial\n(recommended starting point)\nAdvances: a human still invokes every capability\nGates: human decides, informed by independent critique\nRunner: interactive session\nReview: human + independent critique of exact revisions", fillcolor="#dcecff"];
   a2 [label="A2 — Supervised autonomous\nAdvances: a headless session runs unattended\nto the next human gate, then stops\nGates: asynchronous human approval on exact revisions\nRunner: sandboxed headless session\nReview: automated findings + human sign-off", fillcolor="#d8f2e3"];
-  a3 [label="A3 — Triggered autonomous with HITL (eventual goal)\nAdvances: schedules, sensors, or humans trigger runs\nGates: policy verdict + protected target + human sign-off\nRunner: isolated per-run jobs under admission control\nReview: automated + human-in-the-loop escalation", fillcolor="#ccebd8"];
+  a3 [label="A3 — Triggered autonomous with HITL\n(eventual goal)\nAdvances: schedules, sensors, or humans trigger runs\nGates: policy verdict + protected target + human sign-off\nRunner: isolated per-run jobs under admission control\nReview: automated + human-in-the-loop escalation", fillcolor="#ccebd8"];
 
   a0 -> a1 [label="add independent critique\nof exact revisions"];
   a1 -> a2 [label="add headless runner,\nrun journal, async gates"];
   a2 -> a3 [label="add triggers, admission policy,\nHITL escalation, per-run provenance"];
 
-  scope [label="Guidance for adopting teams — not a posture claim\nThis ladder grades an adopter's own environment; adopting these contracts confers no level\nA1 is the recommended starting point; A0–A2 are reachable with an interactive or sandboxed headless session\nA3 is the eventual goal — its triggers, admission control, and escalation routing\nare targets an adopter builds and proves, not shipped components", shape=note, fillcolor="#fff3cd"];
-  scope -> a0 [style=invis];
+  scope [label="Guidance for adopting teams — not a posture claim\nThis ladder grades an adopter's own environment; adopting these\ncontracts confers no level. A1 is the recommended starting point;\nA0–A2 are reachable with an interactive or sandboxed headless session.\nA3 is the eventual goal — its triggers, admission control, and escalation\nrouting are targets an adopter builds and proves, not shipped components", shape=note, fillcolor="#fff3cd"];
 
   distinction [label="A-levels are not L-levels\nAutonomy (A0–A3) grades the posture: how far a run advances unattended\nComposition maturity (L0–L3, maturity-ladder) grades the configuration:\ncontracts, enforcement, evidence, and management\nThe two axes are independent — cite the prefix, never a bare \"level 2\"", shape=note, fillcolor="#fff3cd"];
-  distinction -> a0 [style=invis];
-
-  selection [label="Executor selection does not change with autonomy\nA work shape still selects the least adaptive class that fits,\nand authority or ownership still selects human or external\nRaising autonomy never widens a task's permitted executor class\nExecutor classes are owned by agent-governance-guide execution contract", shape=note, fillcolor="#f3e6ff"];
-  selection -> a2 [style=invis];
-
-  coupling [label="Safety invariant at every level\nNever raise autonomy without matching oversight (do-not-deploy coupling)\nAn unanswered escalation falls back to a safe default — pause or abandon —\nafter a bounded window; silence is never approval\nPer-run provenance (model, prompt, tools, permissions) is recorded by the runtime", shape=note, fillcolor="#ffe5e5"];
-  coupling -> a3 [style=invis];
 
   invariants [label="Unchanged at every level\nSame capabilities, same results, same exact-revision references, same gate definitions\nOnly gate policy, runner, and who advances the run change\nHigh-impact gates — plan acceptance, merge, acceptance sign-off — stay human at every level\nNo hidden agent launch; authority only attenuates", shape=note, fillcolor="#fff3cd"];
-  invariants -> a1 [style=invis];
 
-  advances [label="Who advances", shape=plaintext];
-  gates [label="Gate policy", shape=plaintext];
-  runner [label="Runner", shape=plaintext];
-  review [label="Review", shape=plaintext];
-  oversight [label="Oversight", shape=plaintext];
-  advances -> gates -> runner -> review -> oversight [style=invis];
+  selection [label="Executor selection does not change with autonomy\nA work shape still selects the least adaptive class that fits,\nand authority or ownership still selects human or external\nRaising autonomy never widens a task's permitted executor class\nExecutor classes are owned by agent-governance-guide execution contract", shape=note, fillcolor="#f3e6ff"];
+
+  coupling [label="Safety invariant at every level\nNever raise autonomy without matching oversight (do-not-deploy coupling)\nAn unanswered escalation falls back to a safe default — pause or abandon —\nafter a bounded window; silence is never approval\nPer-run provenance (model, prompt, tools, permissions) is recorded by the runtime", shape=note, fillcolor="#ffe5e5"];
+
+  {rank=same; scope; distinction; invariants; selection; coupling;}
+  scope -> a0 [style=invis];
 }

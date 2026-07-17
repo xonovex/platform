@@ -17,18 +17,11 @@ digraph CompositionMaturity {
   l2 -> l3 [label="add managed authority,\noperations, and feedback"];
 
   adoption [label="Adoption is composable at every level\nworkflow-only | governance-only | enablement-only\nexternal-enforcement-only | integrated", shape=note, fillcolor="#fff3cd"];
-  adoption -> l0 [style=invis];
 
   selection [label="Execution selection at every level\ndeterministic script → script + bounded model → bounded agent\nhuman or external system when authority/ownership requires it\nNo hidden agent launch; authority only attenuates", shape=note, fillcolor="#f3e6ff"];
-  selection -> l2 [style=invis];
 
   invariants [label="Invariants at every level\nNo universal hook parity, mandatory workflow YAML, or skills-as-enforcement claim\nPolicy decision, enforcement, and provider-native evidence remain separate\nExceptions and break glass are scoped, expiring, compensated, and reviewed\nCrosswalks are not certification or automatic compliance", shape=note, fillcolor="#ffe5e5"];
-  invariants -> l3 [style=invis];
 
-  native [label="Native adapters", shape=plaintext];
-  enforcement [label="External enforcement", shape=plaintext];
-  evidence [label="Provider-native evidence", shape=plaintext];
-  onboarding [label="Onboarding", shape=plaintext];
-  feedback [label="Feedback", shape=plaintext];
-  native -> enforcement -> evidence -> onboarding -> feedback [style=invis];
+  {rank=same; adoption; selection; invariants;}
+  adoption -> l0 [style=invis];
 }
