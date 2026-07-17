@@ -39,7 +39,7 @@ digraph ComposableWorkflow {
 
     governance_profiles [label="Governance profiles\npolicy + authority + executors\ndata + telemetry + trust"];
     decisions [label="Policy decision point\nallow | deny | ask | advise | observe\nrequire evidence | exception | break glass", fillcolor="#ffe4cc"];
-    intents [label="Semantic event intents\nworkspace | prompt | tool | permission\nfile | model | child agent | privileged operation", fillcolor="#ffe9d9"];
+    intents [label="Semantic event intents — governance taxonomy owns the vocabulary\nsession | prompt | model | tool | permission | capability\nresult | configuration | compaction | subagent\nworkspace | privileged operation", fillcolor="#ffe9d9"];
     native [label="Native adapters\nClaude Code | Codex | Kiro | Copilot\nPi | OpenCode | provider APIs", fillcolor="#fff7e6"];
     enforcement [label="External enforcement\nrepository | CI | deployment | admission\nidentity | cloud | provider permission", fillcolor="#ffd6d6"];
 

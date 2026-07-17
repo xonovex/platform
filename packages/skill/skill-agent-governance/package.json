@@ -12,6 +12,6 @@
   "scripts": {
     "fmt": "prettier --write .",
     "fmt:check": "prettier --check .",
-    "test": "node agent-governance-guide/scripts/validate-fixtures.mjs && node agent-governance-guide/scripts/validate-harness-fixtures.mjs && node agent-governance-guide/scripts/validate-external-enforcement-fixtures.mjs && node agent-governance-guide/scripts/validate-enterprise-platform-fixtures.mjs && node agent-governance-guide/scripts/validate-walking-skeleton-fixtures.mjs && node agent-governance-guide/scripts/validate-governance-operations-fixtures.mjs && node agent-governance-guide/scripts/validate-conformance-scenario-fixtures.mjs && node agent-governance-guide/scripts/validate-executor-vocabulary.mjs && bash agent-governance-guide/assets/walking-skeleton/run-skeleton.sh --yes"
+    "test": "node agent-governance-guide/scripts/validate-fixtures.mjs && node agent-governance-guide/scripts/validate-harness-fixtures.mjs && node agent-governance-guide/scripts/validate-external-enforcement-fixtures.mjs && node agent-governance-guide/scripts/validate-enterprise-platform-fixtures.mjs && node agent-governance-guide/scripts/validate-walking-skeleton-fixtures.mjs && node agent-governance-guide/scripts/validate-governance-operations-fixtures.mjs && node agent-governance-guide/scripts/validate-conformance-scenario-fixtures.mjs && node agent-governance-guide/scripts/validate-executor-vocabulary.mjs && node agent-governance-guide/scripts/validate-event-intent-vocabulary.mjs && bash agent-governance-guide/assets/walking-skeleton/run-skeleton.sh --yes"
   }
 }

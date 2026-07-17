@@ -14,6 +14,9 @@ tasks:
       - agent-governance-guide/assets/*.json
       - agent-governance-guide/assets/fixtures/*.json
       - agent-governance-guide/assets/walking-skeleton/*.sh
+      - agent-governance-guide/references/*.md
+      - /packages/command/command-workflow/docs/*.md
+      - /packages/diagram/diagram-agent-workflow/*.dot
       - /packages/skill/skill-aws/aws-guide/references/*.md
       - /packages/skill/skill-azure-devops/azure-devops-guide/references/*.md
       - /packages/skill/skill-bitbucket/bitbucket-guide/references/*.md

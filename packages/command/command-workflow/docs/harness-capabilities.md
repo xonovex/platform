@@ -13,9 +13,15 @@ Matrix release: **1.0.0**. Documentation snapshot and validation date: **2026-07
 
 ## Semantic intents, native adapters
 
-Portable intents include workspace activation, session start/resume, prompt submission, tool preflight/result, permission request, file mutation, compaction, child-agent launch/completion, privileged operation, and completion. Each adapter records the native mapping, handler type, product surface, tested version/date, blocking/context behavior, ordering/concurrency, covered operations, data exposure, authority, evidence, and limitations.
+The [event intent taxonomy](../../../skill/skill-agent-governance/agent-governance-guide/references/events-and-capabilities.md) owns the vocabulary. This section is the harness-adapter view of it and adds no family of its own; `validate-event-intent-vocabulary.mjs` in that guide fails the build if the two diverge.
 
-Matching names do not imply parity. A mandatory intent fails conformance when its native mapping is unsupported, experimental, stale, partial for the requested operation set, or unable to provide the required enforcement guarantee.
+Families: `session`, `prompt`, `model`, `tool`, `permission`, `capability`, `result`, `configuration`, `compaction`, `subagent`, `workspace`, `privileged operation`.
+
+The six matrices above natively map nine of them: session, prompt, model, tool, permission, capability, compaction, subagent, and workspace. No matrix maps a dedicated native event for result, configuration, or privileged operation. Those are recorded as unsupported rather than approximated onto a nearby event: result and configuration move to external enforcement, and privileged operations are gated through the tool family plus an independent control. Recording the absence is mandatory — omitting an unsupported intent is what the adapter contract forbids.
+
+Each adapter records the native mapping, handler type, product surface, tested version/date, blocking/context behavior, ordering/concurrency, covered operations, data exposure, authority, evidence, and limitations.
+
+Matching names do not imply parity. A mandatory intent fails conformance when its native mapping is unsupported, experimental, stale, partial for the requested operation set, or unable to provide the required enforcement guarantee. Support varies within a family and between families on one surface: a cloud surface can block `preToolUse` while its `permissionRequest` gate has no effect, so permission is selected and evidenced separately from tool.
 
 ## Harness onboarding transaction
 
