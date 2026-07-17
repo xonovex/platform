@@ -1,0 +1,64 @@
+digraph AdoptionMap {
+  rankdir=TB;
+  compound=true;
+  newrank=true;
+  splines=polyline;
+  nodesep=0.5;
+  ranksep=0.6;
+
+  node [shape=box, style="rounded,filled", fillcolor=white, fontname="Arial", fontsize=10];
+  edge [fontname="Arial", fontsize=9];
+
+  adopter [label="Any adopter — hobbyist · solo dev · small team · regulated enterprise\nsame pieces, same selection logic, different answers per control\nteam shape is an axis of the profile contract, not a level", shape=house, fillcolor="#e8d5f5"];
+
+  subgraph cluster_workflow {
+    label="Workflow track — each box is a complete stopping point";
+    labeljust=l;
+    style=filled;
+    fillcolor="#edf4ff";
+
+    skills [label="Guideline skills\ncraft knowledge per file type and vocabulary\nindependent of everything else on this map", fillcolor="#e8f0fe"];
+    commands [label="Workflow commands (workflow-only)\n59 stage × verb slash commands · native references resume work\nhuman, revision-exact gates", fillcolor="#dcecff"];
+    profiles [label="Profiles and composition\nindependent axes: profile · method · providers · policy\nstrengthening-only — conflicts fail visibly", fillcolor="#d3e8ff"];
+
+    commands -> profiles [label="shaped by"];
+    skills -> commands [style=invis];
+  }
+
+  subgraph cluster_governance {
+    label="Governance track";
+    labeljust=l;
+    style=filled;
+    fillcolor="#fff8ec";
+
+    contracts [label="Governance contracts — semantics without enforcement\nexecutor classes · module classifications · transactional enablement\nmodule authority ladder: choose the lowest authority that meets the requirement", fillcolor="#ffe4cc"];
+    choice [label="Per-control choice\nwho must it bind? · what failure behavior? · what impact?\nmandatory ⇒ at least one non-bypassable point\nmultiple types may back one control — their value is independence", fillcolor="#fff3cd"];
+
+    subgraph cluster_types {
+      label="Enforcement types — independent peers, chosen per control";
+      labeljust=l;
+      style=filled;
+      fillcolor="#fdf1f1";
+
+      hook [label="Harness hook\nbinds the agent session it is configured in\nin-session blocking — early feedback, not a security boundary", fillcolor="#efe5ff"];
+      external [label="External enforcement\nbinds every actor — human or agent, hooked or not\nrequired CI checks · rulesets · protected environments · provider permissions", fillcolor="#ffd9d9"];
+      admission [label="Runtime admission (optional infrastructure)\nbinds workloads entering a cluster — homelab or enterprise\nAgentPolicy or any equivalent admission control", fillcolor="#f3e6ff", style="rounded,filled,dashed"];
+    }
+
+    contracts -> choice [label="semantics to enforce"];
+    choice -> hook;
+    choice -> external;
+    choice -> admission [style=dashed];
+  }
+
+  adopter -> skills [lhead=cluster_workflow, label="compose any subset"];
+  adopter -> contracts [lhead=cluster_governance, label="compose any subset"];
+  profiles -> contracts [label="semantic references — optional, both ways", style=dashed, dir=both, constraint=false];
+
+  modes [label="Adoption modes are named compositions, not levels\nworkflow-only · governance-only · enablement-only\nexternal-enforcement-only · integrated\nunselected pieces stay explicit gaps", shape=note, fillcolor="#fff3cd"];
+  ladder [label="The only ladder is autonomy — A0–A3\noversight coupling decides which pieces are load-bearing\nsee the autonomy-ladder diagram", shape=note, fillcolor="#f3e6ff"];
+  honesty [label="Honesty rules everywhere\neach mode states its expected absence\ninstalled ≠ enforced · documented ≠ observed", shape=note, fillcolor="#ffe5e5"];
+
+  {rank=same; modes; ladder; honesty;}
+  external -> modes [style=invis];
+}

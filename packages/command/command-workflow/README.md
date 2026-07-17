@@ -20,6 +20,7 @@ title. Each names the subset one perspective runs and the gates it answers for:
 
 Reference guides:
 
+- [Adoption map](docs/adoption-map.md) — compose what you need, from guideline skills to enforced pipelines
 - [Architecture and composition](docs/architecture-and-composition.md)
 - [Harness capabilities and onboarding](docs/harness-capabilities.md)
 - [External platform onboarding](docs/platform-onboarding.md)
@@ -158,3 +159,12 @@ notified, revoked, and reviewed.
 
 [View autonomy ladder](../../diagram/diagram-agent-workflow/autonomy-ladder.png) — A0–A3, grading a posture: how far a
 run advances unattended. Guidance for adopting teams; `agent-governance-guide` owns the model.
+
+[View adoption map](../../diagram/diagram-agent-workflow/adoption-map.png) — the two composable tracks and the
+per-control enforcement choice; [docs/adoption-map.md](docs/adoption-map.md) is the companion guide.
+
+[View enforcement types](../../diagram/diagram-agent-workflow/enforcement-types.png) — one policy decision reaching
+three independent enforcement types, each with its own evidence.
+
+[View variation axes](../../diagram/diagram-agent-workflow/variation-axes.png) — every independent choice in the
+platform, grouped by owner; no edges between axes is the point.

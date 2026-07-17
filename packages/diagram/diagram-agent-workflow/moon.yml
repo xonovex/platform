@@ -7,6 +7,9 @@ tasks:
       - graph-build-workflow
       - graph-build-target
       - graph-build-autonomy
+      - graph-build-adoption
+      - graph-build-enforcement
+      - graph-build-axes
       - graph-build-developer
       - graph-build-pm
       - graph-build-qa
@@ -33,6 +36,30 @@ tasks:
       - autonomy-ladder.dot
     outputs:
       - autonomy-ladder.png
+    options:
+      cache: true
+  graph-build-adoption:
+    command: dot -Tpng -o adoption-map.png adoption-map.dot
+    inputs:
+      - adoption-map.dot
+    outputs:
+      - adoption-map.png
+    options:
+      cache: true
+  graph-build-enforcement:
+    command: dot -Tpng -o enforcement-types.png enforcement-types.dot
+    inputs:
+      - enforcement-types.dot
+    outputs:
+      - enforcement-types.png
+    options:
+      cache: true
+  graph-build-axes:
+    command: dot -Tpng -o variation-axes.png variation-axes.dot
+    inputs:
+      - variation-axes.dot
+    outputs:
+      - variation-axes.png
     options:
       cache: true
   graph-build-developer:

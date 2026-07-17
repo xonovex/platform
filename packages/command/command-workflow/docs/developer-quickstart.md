@@ -192,6 +192,7 @@ The command help is written abstractly so it can back any storage backend. Trans
 ## See also
 
 - [README](../README.md) — the full command table
+- [Adoption map](adoption-map.md) — compose what you need, from guideline skills to enforced pipelines
 - [PM Quickstart](pm-quickstart.md) · [QA Quickstart](qa-quickstart.md) ·
   [UX Quickstart](ux-quickstart.md) — the same actor-neutral commands read from the other seats
 - [Architecture and composition](architecture-and-composition.md) — the two-planes model

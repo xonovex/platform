@@ -148,6 +148,7 @@ when the window expires, and a timeout never advances a gate.
 ## See also
 
 - [README](../README.md) — the full command table
+- [Adoption map](adoption-map.md) — compose what you need, from guideline skills to enforced pipelines
 - [Developer Quickstart](developer-quickstart.md) — the sibling lens, and the jargon decoder
 - [QA Quickstart](qa-quickstart.md) · [UX Quickstart](ux-quickstart.md) — the other lenses
 - [`plan-guide`](../../../skill/skill-plan/plan-guide/SKILL.md) and

@@ -1,0 +1,52 @@
+digraph EnforcementTypes {
+  rankdir=TB;
+  compound=true;
+  newrank=true;
+  splines=polyline;
+  nodesep=0.5;
+  ranksep=0.65;
+
+  node [shape=box, style="rounded,filled", fillcolor=white, fontname="Arial", fontsize=10];
+  edge [fontname="Arial", fontsize=9];
+
+  actor [label="Agent session or human actor\nrequests an operation against an exact revision\ntool call · target mutation · deployment · privileged operation", shape=house, fillcolor="#e8d5f5"];
+
+  subgraph cluster_decision {
+    label="Decision — one place";
+    labeljust=l;
+    style=filled;
+    fillcolor="#edf4ff";
+
+    decision [label="Policy decision point\nversioned outcome: allow / deny / ask, with reason\ndeterministic rules provider or policy decision service\nguard contract: JSON event on stdin → decision · exit 0 allow / 2 deny", fillcolor="#d9e8ff"];
+  }
+
+  subgraph cluster_enforcement {
+    label="Enforcement types — independent peers, chosen per control";
+    labeljust=l;
+    style=filled;
+    fillcolor="#fdf1f1";
+
+    hook [label="Harness hook — in-session\nsemantic intent → native event via versioned capability matrix\nbinds the configured agent session: early feedback\nnot a security boundary — user-scope configuration can be edited", fillcolor="#efe5ff"];
+    external [label="External enforcement — pipelines and provider controls\nrequired CI check · ruleset / branch protection\nprotected environment · provider permission\nbinds every actor: the non-bypassable authority for mandatory controls", fillcolor="#ffd9d9"];
+    admission [label="Runtime admission — optional, workload clusters\nAgentPolicy validating webhook — namespace authority, fail-closed\nbinds admitted workloads: any equivalent control satisfies the intent", fillcolor="#f3e6ff", style="rounded,filled,dashed"];
+  }
+
+  evidence [label="Separate correlated records\npolicy decision · enforcement action · authorization\nconfiguration mutation · workflow result · evidence\ncorrelation links them — ownership never collapses", shape=folder, fillcolor="#d9f2e6"];
+
+  actor -> decision [label="minimized canonical facts\nsubject + revision + actor + policy version"];
+  decision -> hook [label="verdict"];
+  decision -> external [label="verdict"];
+  decision -> admission [label="verdict", style=dashed];
+
+  hook -> evidence [label="hook enforcement reference"];
+  external -> evidence [label="native enforcement reference"];
+  admission -> evidence [label="admission reference", style=dashed];
+  decision -> evidence [label="decision reference"];
+
+  independence [label="Independence — proven by the walking skeleton\ndisable the harness hook → the required CI check still denies\na mandatory control needs at least one non-bypassable point,\nexact-revision binding, declared failure behavior, resolvable evidence", shape=note, fillcolor="#fff3cd"];
+  failure [label="Failure behavior\nmandatory + outage / invalid response / expired cache → fail closed\nadvisory → observe, and state that no enforcement occurred\nskipped, cancelled, or missing checks are never success", shape=note, fillcolor="#ffe5e5"];
+  privileged [label="Privileged operations bar\nIntegration · Release · deployment · secrets · data deletion · Retirement\nexact revisions · segregation of duties · short-lived credentials\nprotected target-side gate · digest/provenance · rollback · retained evidence", shape=note, fillcolor="#f3e6ff"];
+
+  {rank=same; independence; failure; privileged;}
+  evidence -> independence [style=invis];
+}

@@ -1,0 +1,85 @@
+digraph VariationAxes {
+  rankdir=TB;
+  compound=true;
+  newrank=true;
+  splines=polyline;
+  nodesep=0.35;
+  ranksep=0.5;
+
+  node [shape=box, style="rounded,filled", fillcolor=white, fontname="Arial", fontsize=10];
+  edge [fontname="Arial", fontsize=9];
+
+  planes [label="Root orthogonality — Workflow plane ⊥ Governance plane\nadopt either, both, or neither\nintegration only through semantic references", shape=house, fillcolor="#e8d5f5"];
+
+  subgraph cluster_workflow {
+    label="Workflow variation axes — workflow-guide owns; one resolution order for all";
+    labeljust=l;
+    style=filled;
+    fillcolor="#edf4ff";
+
+    wprofile [label="Workflow profile\nrequired capabilities\ntopology · completion", fillcolor="#dcecff"];
+    wmethod [label="Method\nuser stories · BDD ·\nexample mapping · neutral", fillcolor="#dcecff"];
+    wproviders [label="Provider axes (four)\nartifact · work-item\ncode-host · workspace", fillcolor="#dcecff"];
+    wpolicy [label="Policy\nquality · security\ngovernance", fillcolor="#dcecff"];
+    wlearning [label="Learning policy\nhow feedback and\nlearning are promoted", fillcolor="#dcecff"];
+
+    {rank=same; wprofile; wmethod; wproviders; wpolicy; wlearning;}
+  }
+
+  subgraph cluster_governance {
+    label="Governance profile facets — agent-governance-guide owns";
+    labeljust=l;
+    style=filled;
+    fillcolor="#fff8ec";
+
+    f1 [label="lifecycle", fillcolor="#ffe4cc"];
+    f2 [label="governance", fillcolor="#ffe4cc"];
+    f3 [label="executor", fillcolor="#ffe4cc"];
+    f4 [label="enforcement", fillcolor="#ffe4cc"];
+    f5 [label="data", fillcolor="#ffe4cc"];
+    f6 [label="telemetry", fillcolor="#ffe4cc"];
+    f7 [label="distribution", fillcolor="#ffe4cc"];
+
+    {rank=same; f1; f2; f3; f4; f5; f6; f7;}
+  }
+
+  subgraph cluster_cross {
+    label="Cross-cutting pairs — independent axes made safe by a coupling rule";
+    labeljust=l;
+    style=filled;
+    fillcolor="#f6f0fb";
+
+    c1 [label="Autonomy ⊥ Oversight\nnever raise autonomy without\nmatching, observed oversight", fillcolor="#efe5ff"];
+    c2 [label="Autonomy ⊥ Executor class\nraising autonomy never widens\na task's permitted executor", fillcolor="#efe5ff"];
+    c3 [label="Team shape ⊥ everything\nsolo · small-team · regulated —\na profile input, never a level", fillcolor="#efe5ff"];
+
+    {rank=same; c1; c2; c3;}
+  }
+
+  subgraph cluster_sandbox {
+    label="Agent sandbox confinement axes — packages/agent owns";
+    labeljust=l;
+    style=filled;
+    fillcolor="#eefbf1";
+
+    iso [label="Isolation\nnone · bwrap · docker", fillcolor="#d8f2e3"];
+    prov [label="Provision\nnone · nix · command", fillcolor="#d8f2e3"];
+    net [label="Network\nhost · none · proxy", fillcolor="#d8f2e3"];
+    guarantees [label="+ hostPassthrough knob · four independently-requestable fail-closed guarantees\nRequirePinnedProvision · RequireHostToolsUnreachable\nRequireEgressRestricted · RequireKernelIsolation", fillcolor="#ccebd8"];
+
+    {rank=same; iso; prov; net;}
+  }
+
+  planes -> wproviders [style=invis];
+  wproviders -> f4 [style=invis];
+  f4 -> c2 [style=invis];
+  c2 -> prov [style=invis];
+  prov -> guarantees [style=invis];
+
+  independence [label="No edges between axes — that is the point\nany value on one axis composes with any value on every other\nresolution order, applied per axis: explicit argument → selected profile\n→ project instructions → environment detection → axis default → fail visibly and ask", shape=note, fillcolor="#fff3cd"];
+  percontrol [label="Per-control enforcement dimensions\nwho must it bind? · what failure behavior? · what impact?\nasked once per control, never once per organization", shape=note, fillcolor="#ffe5e5"];
+  ordered [label="Not axes — the ordered scales\nautonomy A0–A3 (oversight prerequisites)\nmodule authority ladder (least privilege)\nisolation strength (sandbox spectrum)", shape=note, fillcolor="#f3e6ff"];
+
+  {rank=same; independence; percontrol; ordered;}
+  guarantees -> percontrol [style=invis];
+}

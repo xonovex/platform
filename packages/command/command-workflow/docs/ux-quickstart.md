@@ -155,6 +155,7 @@ restated here:
 ## See also
 
 - [README](../README.md) — the full command table
+- [Adoption map](adoption-map.md) — compose what you need, from guideline skills to enforced pipelines
 - [Developer Quickstart](developer-quickstart.md) — the sibling lens, and the jargon decoder
 - [PM Quickstart](pm-quickstart.md) · [QA Quickstart](qa-quickstart.md) — the
   other lenses
