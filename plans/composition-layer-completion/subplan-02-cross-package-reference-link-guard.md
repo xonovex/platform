@@ -3,7 +3,7 @@ type: plan
 has_subplans: false
 parent_plan: ../composition-layer-completion.md
 parallel_group: 1
-status: pending
+status: complete
 dependencies:
   plans: []
   files:
@@ -18,11 +18,11 @@ skills_to_consult:
   - testing-guide
   - moon-guide
 validation:
-  type_check: not_run
-  lint: not_run
-  build: not_run
-  tests: not_run
-updated: "2026-07-17"
+  type_check: pass
+  lint: pass
+  build: pass
+  tests: pass
+updated: "2026-07-18"
 ---
 
 # Cross-Skill / Cross-Package Reference-Link Guard
@@ -81,3 +81,52 @@ capability registry.
 relative markdown links only; prose mentions — "see `execution.md`", bolded skill names — are
 not parsed. Mechanical resolution keeps the guard trustworthy, and skill renames already fail
 loudly via `marketplace.json` lockstep.
+
+## Implementation notes (completed 2026-07-18)
+
+`build`, `typecheck`, `lint`, and `tests` all pass via `moon` for
+`script-moon-skill-validate` (24 vitest cases across 4 files); the guard resolves 64/64
+cross-package links on `main`. Adversarial verification: renaming
+`agent-governance-guide/references/actors.md` away makes `command-workflow:cross-package-links`
+exit non-zero, naming the source (`architecture-and-composition.md`) and the exact broken
+link; restoring the file returns the guard to 64/64.
+
+What landed in `packages/script/script-moon-skill-validate/src/`:
+
+- `reference-file-links.ts` — refactored to export the shared link primitives (`MD_LINK_RE`,
+  `relativeLinkTarget`, `isFile`); `checkReferenceFileLinks` behavior is byte-identical (its
+  five existing tests still pass).
+- `cross-package-links.ts` — `checkCrossPackageLinks(repoRoot, report)` discovers the scan
+  scope (every skill `SKILL.md` and `references/*.md`, plus `command-workflow/docs/*.md` and
+  `commands/*.md`), and validates only links whose resolved target escapes the source file's
+  own `packages/<layer>/<package>` root. External / placeholder / ellipsis / anchor forms are
+  skipped, reusing `relativeLinkTarget`.
+- `links-cli.ts` — the `moon-skill-links` bin: scans the repo root (cwd), prints PASS/FAIL,
+  exits non-zero on any broken cross-package link.
+- `cross-package-links.test.ts` — boundary-crossing resolve/break, intra-package ignored,
+  each skip rule, in-page fragment, and an aggregate-scan case.
+
+Wiring: a `cross-package-links` task on the `command-workflow` project runs the built CLI from
+the workspace root and is added to that project's `ci-check`; its `inputs` list the full scan
+scope so `moon ci --affected` re-runs it when any scoped file changes.
+
+### Deviations from the tasks (with rationale)
+
+- **Scope narrowed to boundary-crossing links, and `command-workflow/docs` was already
+  covered.** Research the plan predated missed that `command-workflow/scripts/validate-documentation.mjs`
+  (run by `command-workflow:test`) already resolves all links in `README.md`, `MIGRATION.md`,
+  and `docs/**/*.md`, including cross-package ones. The genuine gaps were the
+  `commands/*.md` delegations (never scanned) and cross-package links in skill `SKILL.md`
+  (`index.ts`'s `REF_LINK_RE` matches only `references/…`). Validating only boundary-crossing
+  links gives a clean division of labour — intra-package links stay owned by
+  `checkReferenceFileLinks` (skill references) and `validate-documentation.mjs`
+  (command-workflow docs) — instead of re-checking them.
+- **New test file rather than extending `reference-file-links.test.ts`.** The new logic lives
+  in `cross-package-links.ts`, so its tests are co-located in `cross-package-links.test.ts`;
+  `reference-file-links.test.ts` stays focused on the (unchanged) intra-skill check.
+- **Wired via a `command-workflow` task, not `tag-skill.yml`.** A repo-wide scan run once fits
+  the composition hub (which already dependsOn the composed skills); running it per
+  skill-tagged package would repeat the whole-repo scan and still skip the `command`-tagged
+  `command-workflow`. The task invokes the built CLI directly (`node …/links-cli.js`) for
+  deterministic execution; the `moon-skill-links` bin is kept for manual use and fresh
+  `npm ci` installs.

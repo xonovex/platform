@@ -1,7 +1,7 @@
 import {readdirSync, readFileSync, statSync} from "node:fs";
 import {join} from "node:path";
 
-const MD_LINK_RE = /\[[^\]]*\]\(([^)\s]+)\)/g;
+export const MD_LINK_RE = /\[[^\]]*\]\(([^)\s]+)\)/g;
 const EXTERNAL_LINK_RE = /^(?:https?|mailto):/i;
 
 // Minimal sink the check reports through; the CLI's Report satisfies it.
@@ -10,7 +10,7 @@ export interface LinkReport {
   addPass(message: string): void;
 }
 
-const isFile = (path: string): boolean => {
+export const isFile = (path: string): boolean => {
   try {
     return statSync(path).isFile();
   } catch {
@@ -24,6 +24,18 @@ const isDir = (path: string): boolean => {
   } catch {
     return false;
   }
+};
+
+// The file a markdown link points at, with any in-page fragment stripped, or
+// null when the link names no real sibling file: an external scheme
+// (http/https/mailto), a placeholder or elided illustrative form (<topic>.md,
+// {topic}.md, the …/pull/PR and …/commit/hash ellipsis links documented in the
+// versioning changelog guide), or a pure #anchor.
+export const relativeLinkTarget = (raw: string): string | null => {
+  if (EXTERNAL_LINK_RE.test(raw)) return null;
+  if (raw.includes("<") || raw.includes("{") || raw.includes("…")) return null;
+  const target = raw.split("#", 1)[0] ?? "";
+  return target === "" ? null : target;
 };
 
 // Resolve every markdown link inside each references/*.md relative to that
@@ -52,15 +64,8 @@ export const checkReferenceFileLinks = (
     for (const m of text.matchAll(MD_LINK_RE)) {
       const raw = m[1];
       if (raw === undefined) continue;
-      // Skip external schemes (http/https/mailto).
-      if (EXTERNAL_LINK_RE.test(raw)) continue;
-      // Skip placeholder and elided illustrative forms: <topic>.md, {topic}.md,
-      // and the ellipsis links documented in the versioning changelog guide
-      // (…/pull/PR, …/commit/hash) — none of these name a real file.
-      if (raw.includes("<") || raw.includes("{") || raw.includes("…")) continue;
-      // Drop any in-page fragment; a pure #anchor has no file to resolve.
-      const target = raw.split("#", 1)[0] ?? "";
-      if (target === "") continue;
+      const target = relativeLinkTarget(raw);
+      if (target === null) continue;
       if (isFile(join(refsDir, target))) {
         resolved += 1;
       } else {

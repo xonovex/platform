@@ -4,7 +4,8 @@
   "private": true,
   "type": "module",
   "bin": {
-    "moon-skill-validate": "./dist/src/index.js"
+    "moon-skill-validate": "./dist/src/index.js",
+    "moon-skill-links": "./dist/src/links-cli.js"
   },
   "dependencies": {
     "@xonovex/script-moon-common": "0.0.0",

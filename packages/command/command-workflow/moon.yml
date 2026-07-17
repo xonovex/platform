@@ -23,8 +23,23 @@ tasks:
       - scripts/*.mjs
     options:
       cache: false
+  cross-package-links:
+    command:
+      - node
+      - packages/script/script-moon-skill-validate/dist/src/links-cli.js
+    deps:
+      - script-moon-skill-validate:build
+    inputs:
+      - /packages/skill/*/*/SKILL.md
+      - /packages/skill/*/*/references/*.md
+      - /packages/command/command-workflow/docs/*.md
+      - /packages/command/command-workflow/commands/*.md
+      - /packages/script/script-moon-skill-validate/src/*.ts
+    options:
+      cache: false
+      runFromWorkspaceRoot: true
   ci-check:
-    deps: [test]
+    deps: [test, cross-package-links]
     options:
       cache: false
       mergeDeps: append
