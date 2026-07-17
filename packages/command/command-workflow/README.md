@@ -156,8 +156,5 @@ notified, revoked, and reviewed.
 
 [View target architecture](../../diagram/diagram-agent-workflow/target-architecture.png)
 
-[View composition maturity ladder](../../diagram/diagram-agent-workflow/maturity-ladder.png) — L0–L3, grading an adopted
-composition: contracts, enforcement, evidence, and management.
-
 [View autonomy ladder](../../diagram/diagram-agent-workflow/autonomy-ladder.png) — A0–A3, grading a posture: how far a
-run advances unattended. A distinct axis from L0–L3; `agent-governance-guide` owns the model.
+run advances unattended. Guidance for adopting teams; `agent-governance-guide` owns the model.

@@ -18,7 +18,6 @@ digraph AutonomyLadder {
 
   scope [label="Guidance for adopting teams — not a posture claim\nThis ladder grades an adopter's own environment; adopting these\ncontracts confers no level. A1 is the recommended starting point;\nA0–A2 are reachable with an interactive or sandboxed headless session.\nA3 is the eventual goal — its triggers, admission control, and escalation\nrouting are targets an adopter builds and proves, not shipped components", shape=note, fillcolor="#fff3cd"];
 
-  distinction [label="A-levels are not L-levels\nAutonomy (A0–A3) grades the posture: how far a run advances unattended\nComposition maturity (L0–L3, maturity-ladder) grades the configuration:\ncontracts, enforcement, evidence, and management\nThe two axes are independent — cite the prefix, never a bare \"level 2\"", shape=note, fillcolor="#fff3cd"];
 
   invariants [label="Unchanged at every level\nSame capabilities, same results, same exact-revision references, same gate definitions\nOnly gate policy, runner, and who advances the run change\nHigh-impact gates — plan acceptance, merge, acceptance sign-off — stay human at every level\nNo hidden agent launch; authority only attenuates", shape=note, fillcolor="#fff3cd"];
 
@@ -26,6 +25,6 @@ digraph AutonomyLadder {
 
   coupling [label="Safety invariant at every level\nNever raise autonomy without matching oversight (do-not-deploy coupling)\nAn unanswered escalation falls back to a safe default — pause or abandon —\nafter a bounded window; silence is never approval\nPer-run provenance (model, prompt, tools, permissions) is recorded by the runtime", shape=note, fillcolor="#ffe5e5"];
 
-  {rank=same; scope; distinction; invariants; selection; coupling;}
+  {rank=same; scope; invariants; selection; coupling;}
   scope -> a0 [style=invis];
 }

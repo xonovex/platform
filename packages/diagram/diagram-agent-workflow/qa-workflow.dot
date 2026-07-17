@@ -5,6 +5,7 @@ digraph QaWorkflow {
   splines=polyline;
   nodesep=0.4;
   ranksep=0.7;
+  pad=0.3;
 
   node [shape=box, style="rounded,filled", fillcolor=white, fontname="Arial", fontsize=10];
   edge [fontname="Arial", fontsize=9];
@@ -119,7 +120,7 @@ digraph QaWorkflow {
   anysubject -> binding [ltail=cluster_assess, lhead=cluster_fresh, weight=20];
   nocoerce -> binding [ltail=cluster_qa, label="no pinned criteria — skip", style=dashed];
   stale -> accval [label="bindings still fresh", ltail=cluster_fresh, lhead=cluster_handoff, weight=20];
-  stale -> reviewrun [label="changed — re-run against\nthe new revision", style=dashed, ltail=cluster_fresh, lhead=cluster_review];
+  stale -> reviewrun [label="  subject changed —\n  re-run at the new revision  ", style=dashed, ltail=cluster_fresh, lhead=cluster_review];
 
   start -> planvalidate [label="a plan to check\ninstead of a deliverable", style=dashed, lhead=cluster_planvalidate];
   planvalidate -> binding [ltail=cluster_planvalidate, lhead=cluster_fresh, label="reports stale\nor missing evidence", style=dashed];

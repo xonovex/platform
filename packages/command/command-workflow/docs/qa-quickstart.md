@@ -5,7 +5,9 @@ tester is: `review-run --independent` asks for a reviewer distinct from the auth
 title. A role is a way to _read_ the command set — which of the 59 you actually run, and what your
 results are worth. The [README](../README.md) documents all 59 commands and their contracts; the
 [Developer Quickstart](developer-quickstart.md) is the sibling lens for the seat that writes the code,
-and it owns the shared vocabulary (native references, `--revision`, `--profile`, `--method`).
+and it owns the shared vocabulary (native references, `--revision`, `--profile`, `--method`). See the
+[qa-workflow diagram](../../../diagram/diagram-agent-workflow/qa-workflow.png) for this lens at a
+glance.
 
 `bdd-guide` makes the same move for discovery: the
 [Three Amigos](../../../skill/skill-bdd/bdd-guide/references/discovery-three-amigos.md) are three

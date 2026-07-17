@@ -5,7 +5,9 @@ designer is: `experience-design-create` asks for a subject and publishes a propo
 asks who you are. A role is a way to _read_ the command set — which of the 59 you actually run, and
 where your work binds. The [README](../README.md) documents all 59 commands and their contracts; the
 [Developer Quickstart](developer-quickstart.md) is the sibling lens for the seat that writes the code,
-and it owns the shared vocabulary (native references, `--revision`, `--profile`, `--method`).
+and it owns the shared vocabulary (native references, `--revision`, `--profile`, `--method`). See the
+[ux-workflow diagram](../../../diagram/diagram-agent-workflow/ux-workflow.png) for the same flow at
+a glance.
 
 `bdd-guide` makes the same move for discovery: the
 [Three Amigos](../../../skill/skill-bdd/bdd-guide/references/discovery-three-amigos.md) are three

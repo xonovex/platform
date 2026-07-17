@@ -12,7 +12,7 @@ This ladder is guidance for a team adopting these contracts. It grades an adopte
 
 Autonomy grades a **posture**: how far a run advances before a human must act. It is an aggregate, not a property any single capability owns. Each task still selects its executor independently — see [execution.md](execution.md) for the executor classes and the selection rules. Autonomy describes what that population of per-task choices, plus gate policy and runner, adds up to for an environment or profile.
 
-Levels use an `A` prefix and are cited as `A0`–`A3`. They are a distinct axis from the `L0`–`L3` composition maturity levels; never cite a bare "level 2".
+Levels use an `A` prefix and are cited as `A0`–`A3`. Cite the prefix: a bare "level 2" is ambiguous wherever another ladder numbers its own levels.
 
 ## Levels
 
@@ -68,16 +68,4 @@ An unattended run that needs a human raises an escalation. An escalation is boun
 
 Escalation routing is oversight, so `A3` is unavailable where the route has no accountable recipient.
 
-## Relation to composition maturity
-
-Autonomy and composition maturity grade different things and are not comparable:
-
-|                    | Composition maturity (`L0`–`L3`)                                 | Autonomy (`A0`–`A3`)                                             |
-| ------------------ | ---------------------------------------------------------------- | ---------------------------------------------------------------- |
-| Grades             | The configuration — contracts, enforcement, evidence, management | The posture — how far a run advances unattended                  |
-| Unit               | An adopted composition                                           | An environment or profile, aggregating per-task executor choices |
-| Executor selection | Identical at every level                                         | Identical at every level                                         |
-
-Both ladders fix executor selection as identical at every level, and neither ladder's levels imply the other's. A composition at `L2` — independently enforced — may run at `A0`, because enforcement says nothing about who advances the run. An `A2` posture on an `L0` composition is the dangerous quadrant: work proceeds unattended while enforcement is advisory, and the oversight coupling above forbids it.
-
-The relationship is one-directional: composition maturity supplies the enforcement and evidence that autonomy's oversight coupling requires. Raising `L` never raises `A`; it only makes a higher `A` available.
+Advisory oversight does not satisfy the coupling. A control that is installed but not observed to execute leaves the level unavailable, however mature the surrounding configuration is — running unattended against advisory enforcement is the case this coupling exists to forbid.

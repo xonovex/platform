@@ -47,7 +47,7 @@ digraph UxWorkflow {
     revise [label="experience-design-revise <design-ref> --revision <rev> --feedback <critique-ref>\nresolves every feedback item · publishes a NEW revision\npreserves supersession · never overwrites or silently accepts the subject", fillcolor="#ddf5d5"];
 
     critique -> revise [label="findings"];
-    revise -> critique [label="re-critique the new revision", style=dashed];
+    revise -> critique [label="re-critique", style=dashed];
   }
 
   subgraph cluster_accept {
