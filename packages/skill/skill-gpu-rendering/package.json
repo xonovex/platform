@@ -1,10 +1,10 @@
 {
   "name": "@xonovex/skill-gpu-rendering",
-  "version": "6.0.1",
+  "version": "6.1.0",
   "private": true,
   "type": "module",
   "dependencies": {
-    "@xonovex/skill-memory-management": "6.0.1"
+    "@xonovex/skill-memory-management": "6.1.0"
   },
   "keywords": [
     "xonovex",
