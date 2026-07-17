@@ -56,12 +56,22 @@ const validateCase = (testCase, inventorySpecializations) => {
 // Review independence is resolved from the profile, so these cases prove an
 // assessor cannot elect the check applied to them. Deleting one would silently
 // reopen the self-assessment path; requiredCaseIds keeps them under test.
+//
+// `distinct-team` cannot be satisfied by the identity comparison alone, so three
+// cases pin the provider-evidence requirement on the Review path: a distinct
+// assessor with the evidence reference recorded passes, the same record without
+// it fails closed as `independence-provider-evidence-required` rather than
+// downgrading to identity-only, and a self-assessment is still caught as
+// `assessor-independence-failed` even when the evidence is present.
 const requiredCaseIds = [
   "review-rejects-self-assessment",
   "review-record-cannot-waive-profile-independence",
   "review-independence-requirement-undeclared",
   "review-independence-unverifiable-without-assessor",
   "profile-may-waive-review-independence",
+  "review-distinct-team-with-provider-evidence-is-valid",
+  "review-distinct-team-without-provider-evidence-fails-closed",
+  "review-distinct-team-self-grant-caught-with-provider-evidence",
 ];
 
 export const validateDevelopmentAssuranceFixtures = () => {

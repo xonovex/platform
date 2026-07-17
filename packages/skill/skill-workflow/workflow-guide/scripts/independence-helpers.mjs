@@ -9,20 +9,48 @@ const independenceLevels = [
   "distinct-organization",
 ];
 
-const isIdentity = (value) => typeof value === "string" && value.length > 0;
+// `distinct-team` and `distinct-organization` demand reporting-line or
+// legal-entity separation on top of identity. That separation is not expressible
+// in the actor record — it carries no team or organization field — and is not
+// resolvable here: membership and legal entity are provider state. For these
+// levels the identity inequality is insufficient by construction, so the record
+// must carry a reference to the provider evidence proving the provider checked
+// the separation. Absent or empty, the check fails closed rather than silently
+// downgrading to the identity comparison alone.
+const providerEnforcedLevels = ["distinct-team", "distinct-organization"];
+
+const isNonEmptyString = (value) =>
+  typeof value === "string" && value.length > 0;
 
 // Every level above `none` requires the deciding actor to differ from the
 // subject's author by identity. `distinct-team` and `distinct-organization`
-// additionally require reporting-line or legal-entity separation, which the
-// actor record cannot express; checkIndependence enforces only the identity
-// component of every level and leaves the rest to the profile's provider.
-export const checkIndependence = ({required, decider, author, failureCode}) => {
+// additionally require a recorded provider-evidence reference that the provider
+// checked the reporting-line or legal-entity separation; checkIndependence
+// enforces the identity component of every level and, for the stronger two, that
+// the provider's separation evidence was recorded — never the separation itself,
+// which stays provider state. The self-grant inequality is evaluated before the
+// evidence requirement, so an author clearing their own subject is caught at any
+// level regardless of whether evidence is present.
+export const checkIndependence = ({
+  required,
+  decider,
+  author,
+  providerEvidence,
+  failureCode,
+}) => {
   if (!independenceLevels.includes(required)) {
     return "independence-requirement-undeclared";
   }
   if (required === "none") return null;
-  if (!isIdentity(decider) || !isIdentity(author)) {
+  if (!isNonEmptyString(decider) || !isNonEmptyString(author)) {
     return "independence-unverifiable";
   }
-  return decider === author ? failureCode : null;
+  if (decider === author) return failureCode;
+  if (
+    providerEnforcedLevels.includes(required) &&
+    !isNonEmptyString(providerEvidence)
+  ) {
+    return "independence-provider-evidence-required";
+  }
+  return null;
 };

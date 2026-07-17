@@ -245,6 +245,7 @@ export const validateAssurance = ({assurance, profile}) => {
       required: profile?.independence?.review,
       decider: assurance.assessor,
       author: assurance.subjectAuthor,
+      providerEvidence: assurance.independenceEvidenceReference,
       failureCode: "assessor-independence-failed",
     });
     if (independenceCode !== null) return independenceCode;

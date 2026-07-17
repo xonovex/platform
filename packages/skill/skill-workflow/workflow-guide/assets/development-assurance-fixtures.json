@@ -743,6 +743,106 @@
       }
     },
     {
+      "id": "review-distinct-team-with-provider-evidence-is-valid",
+      "contract": "assurance",
+      "profile": {
+        "identity": "code-review-profile",
+        "version": "5",
+        "independence": {
+          "review": "distinct-team"
+        }
+      },
+      "expectedValid": true,
+      "assurance": {
+        "kind": "Review",
+        "subjectKind": "DeliverablePublication",
+        "subjectReference": "github:pull-request:204",
+        "subjectRevision": "62f2ac2cb13bf85d37621f5f7bc75d744a9f0719",
+        "criteria": {
+          "identity": "code-review",
+          "version": "5.0.0"
+        },
+        "subjectAuthor": "actor:author",
+        "assessor": "actor:reviewer",
+        "independenceEvidenceReference": "hr:reporting-line:204",
+        "outcome": "pass",
+        "evidence": [
+          {
+            "origin": "human",
+            "nativeReference": "github:review:91",
+            "verified": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "review-distinct-team-without-provider-evidence-fails-closed",
+      "contract": "assurance",
+      "profile": {
+        "identity": "code-review-profile",
+        "version": "5",
+        "independence": {
+          "review": "distinct-team"
+        }
+      },
+      "expectedValid": false,
+      "expectedCode": "independence-provider-evidence-required",
+      "assurance": {
+        "kind": "Review",
+        "subjectKind": "DeliverablePublication",
+        "subjectReference": "github:pull-request:204",
+        "subjectRevision": "62f2ac2cb13bf85d37621f5f7bc75d744a9f0719",
+        "criteria": {
+          "identity": "code-review",
+          "version": "5.0.0"
+        },
+        "subjectAuthor": "actor:author",
+        "assessor": "actor:reviewer",
+        "outcome": "pass",
+        "evidence": [
+          {
+            "origin": "human",
+            "nativeReference": "github:review:91",
+            "verified": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "review-distinct-team-self-grant-caught-with-provider-evidence",
+      "contract": "assurance",
+      "profile": {
+        "identity": "code-review-profile",
+        "version": "5",
+        "independence": {
+          "review": "distinct-team"
+        }
+      },
+      "expectedValid": false,
+      "expectedCode": "assessor-independence-failed",
+      "assurance": {
+        "kind": "Review",
+        "subjectKind": "DeliverablePublication",
+        "subjectReference": "github:pull-request:204",
+        "subjectRevision": "62f2ac2cb13bf85d37621f5f7bc75d744a9f0719",
+        "criteria": {
+          "identity": "code-review",
+          "version": "5.0.0"
+        },
+        "subjectAuthor": "actor:author",
+        "assessor": "actor:author",
+        "independenceEvidenceReference": "hr:reporting-line:204",
+        "outcome": "pass",
+        "evidence": [
+          {
+            "origin": "human",
+            "nativeReference": "github:review:91",
+            "verified": true
+          }
+        ]
+      }
+    },
+    {
       "id": "review-remains-deliverable-specific",
       "contract": "assurance",
       "expectedValid": false,

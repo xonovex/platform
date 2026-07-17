@@ -101,6 +101,7 @@ export const validateAcceptance = ({acceptance, profile}) => {
       required: profile?.independence?.acceptance,
       decider: acceptance.actor.identity,
       author: acceptance.subjectAuthor,
+      providerEvidence: acceptance.independenceEvidenceReference,
       failureCode: "acceptance-independence-failed",
     });
   }
@@ -176,8 +177,12 @@ export const validateAuthorization = ({authorization, request}) => {
 // identity and the owner as strings, so a person-owner (`human:` kind) whose id
 // equals the approver's identity is caught as a self-grant. An owner naming a
 // team or role the approver belongs to, or a second identity the same person
-// holds, still reads as another party and passes: membership and identity
-// linkage are not expressible in the record.
+// holds, still reads as another party and passes the identity comparison:
+// membership and identity linkage are not expressible in the record. When the
+// profile requires `distinct-team` or `distinct-organization`, a distinct
+// approver additionally needs the record's independenceEvidenceReference, so the
+// stronger level fails closed as independence-provider-evidence-required rather
+// than silently downgrading to the identity comparison alone.
 export const validateEmergencyAccess = ({access, request, profile}) => {
   if (
     !["exception", "emergency-exception"].includes(access?.kind) ||
@@ -203,6 +208,7 @@ export const validateEmergencyAccess = ({access, request, profile}) => {
     required: profile?.independence?.emergencyAccess,
     decider: access.approver.identity,
     author: access.owner,
+    providerEvidence: access.independenceEvidenceReference,
     failureCode: "emergency-access-independence-failed",
   });
   if (independenceCode !== null) return independenceCode;

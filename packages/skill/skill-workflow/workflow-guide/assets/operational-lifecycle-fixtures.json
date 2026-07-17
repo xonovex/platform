@@ -803,6 +803,53 @@
       "expectedCode": "acceptance-independence-failed"
     },
     {
+      "id": "acceptance-distinct-team-with-provider-evidence-is-valid",
+      "contract": "acceptance",
+      "template": "acceptance-decision",
+      "profileTemplate": "governed-profile",
+      "profile": {
+        "independence": {
+          "acceptance": "distinct-team"
+        }
+      },
+      "input": {
+        "independenceEvidenceReference": "iam:team-separation:42"
+      },
+      "expectedValid": true
+    },
+    {
+      "id": "acceptance-distinct-team-without-provider-evidence-fails-closed",
+      "contract": "acceptance",
+      "template": "acceptance-decision",
+      "profileTemplate": "governed-profile",
+      "profile": {
+        "independence": {
+          "acceptance": "distinct-team"
+        }
+      },
+      "expectedValid": false,
+      "expectedCode": "independence-provider-evidence-required"
+    },
+    {
+      "id": "acceptance-distinct-team-self-grant-caught-with-provider-evidence",
+      "contract": "acceptance",
+      "template": "acceptance-decision",
+      "profileTemplate": "governed-profile",
+      "profile": {
+        "independence": {
+          "acceptance": "distinct-team"
+        }
+      },
+      "input": {
+        "actor": {
+          "identity": "human:developer"
+        },
+        "independenceEvidenceReference": "iam:team-separation:42"
+      },
+      "expectedValid": false,
+      "expectedCode": "acceptance-independence-failed"
+    },
+    {
       "id": "profile-may-waive-acceptance-independence",
       "contract": "acceptance",
       "template": "acceptance-decision",
@@ -1367,6 +1414,55 @@
         }
       },
       "expectedValid": true
+    },
+    {
+      "id": "emergency-access-distinct-team-with-provider-evidence-is-valid",
+      "contract": "emergency-access",
+      "template": "emergency-exception",
+      "profileTemplate": "governed-profile",
+      "profile": {
+        "independence": {
+          "emergencyAccess": "distinct-team"
+        }
+      },
+      "input": {
+        "access": {
+          "independenceEvidenceReference": "iam:team-separation:77"
+        }
+      },
+      "expectedValid": true
+    },
+    {
+      "id": "emergency-access-distinct-team-without-provider-evidence-fails-closed",
+      "contract": "emergency-access",
+      "template": "emergency-exception",
+      "profileTemplate": "governed-profile",
+      "profile": {
+        "independence": {
+          "emergencyAccess": "distinct-team"
+        }
+      },
+      "expectedValid": false,
+      "expectedCode": "independence-provider-evidence-required"
+    },
+    {
+      "id": "emergency-access-distinct-team-self-grant-caught-with-provider-evidence",
+      "contract": "emergency-access",
+      "template": "emergency-exception",
+      "profileTemplate": "governed-profile",
+      "profile": {
+        "independence": {
+          "emergencyAccess": "distinct-team"
+        }
+      },
+      "input": {
+        "access": {
+          "owner": "human:security-lead",
+          "independenceEvidenceReference": "iam:team-separation:77"
+        }
+      },
+      "expectedValid": false,
+      "expectedCode": "emergency-access-independence-failed"
     },
     {
       "id": "privileged-operation-record-cannot-supply-its-own-profile",

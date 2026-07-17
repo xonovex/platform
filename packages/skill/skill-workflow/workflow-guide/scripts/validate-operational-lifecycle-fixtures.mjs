@@ -124,12 +124,27 @@ const validateCase = (testCase, templates) => {
 // Deleting a rejection case would silently reopen an owner the self-grant
 // comparison cannot read; deleting the acceptance case would let the set be
 // narrowed away from the parties the record legitimately ranges over.
+//
+// `distinct-team` and `distinct-organization` cannot be satisfied by the
+// identity comparison alone, so each independence-carrying contract keeps three
+// cases proving the provider-evidence requirement: a distinct decider with the
+// evidence reference recorded passes, the same record without the evidence fails
+// closed as `independence-provider-evidence-required` rather than downgrading to
+// identity-only, and a self-grant is still caught as the contract's
+// `*-independence-failed` code even when the evidence is present — pinning that
+// the identity inequality is evaluated before the evidence requirement. Deleting
+// the without-evidence case would reopen the silent downgrade; deleting the
+// with-evidence case would let the evidence reference stop threading into the
+// check for that contract.
 const requiredCaseIds = [
   "author-cannot-accept-own-subject",
   "record-cannot-waive-profile-independence",
   "acceptance-independence-requirement-undeclared",
   "acceptance-independence-unverifiable-without-author",
   "profile-may-waive-acceptance-independence",
+  "acceptance-distinct-team-with-provider-evidence-is-valid",
+  "acceptance-distinct-team-without-provider-evidence-fails-closed",
+  "acceptance-distinct-team-self-grant-caught-with-provider-evidence",
   "emergency-exception-approver-cannot-rely-on-own-grant",
   "exception-approver-cannot-rely-on-own-grant",
   "emergency-access-record-cannot-waive-profile-independence",
@@ -143,6 +158,9 @@ const requiredCaseIds = [
   "incident-rejects-malformed-owner",
   "corrective-action-rejects-malformed-owner",
   "profile-may-waive-emergency-access-independence",
+  "emergency-access-distinct-team-with-provider-evidence-is-valid",
+  "emergency-access-distinct-team-without-provider-evidence-fails-closed",
+  "emergency-access-distinct-team-self-grant-caught-with-provider-evidence",
   "privileged-operation-record-cannot-supply-its-own-profile",
   "unaccountable-human-cannot-record-acceptance",
   "unaccountable-human-cannot-authorize",
