@@ -22,6 +22,7 @@ tasks:
       - /packages/skill/skill-bitbucket/bitbucket-guide/references/*.md
       - /packages/skill/skill-bitrise/bitrise-guide/references/*.md
       - /packages/skill/skill-datadog/datadog-guide/references/*.md
+      - /packages/skill/skill-plan/plan-guide/references/*.md
       - /packages/skill/skill-plan/plan-guide/scripts/*.mjs
       - /packages/skill/skill-workflow/workflow-guide/scripts/*.mjs
       - agent-governance-guide/scripts/*.mjs
