@@ -5,7 +5,7 @@
   },
   "metadata": {
     "description": "Official Xonovex development tools",
-    "version": "6.0.1"
+    "version": "6.1.0"
   },
   "plugins": [
     {
@@ -57,6 +57,11 @@
       "name": "xonovex-skill-astro",
       "source": "./packages/skill/skill-astro",
       "description": "Xonovex Astro skills"
+    },
+    {
+      "name": "xonovex-skill-atlassian",
+      "source": "./packages/skill/skill-atlassian",
+      "description": "Xonovex Atlassian Cloud CLI skills"
     },
     {
       "name": "xonovex-skill-audio",
@@ -212,6 +217,11 @@
       "name": "xonovex-skill-fdd",
       "source": "./packages/skill/skill-fdd",
       "description": "Xonovex Feature-driven development skills"
+    },
+    {
+      "name": "xonovex-skill-figma",
+      "source": "./packages/skill/skill-figma",
+      "description": "Xonovex Figma REST API skills"
     },
     {
       "name": "xonovex-skill-fp",

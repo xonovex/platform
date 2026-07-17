@@ -1,0 +1,101 @@
+[
+  {
+    "query": "https://www.figma.com/design/aB12cD34eF56/Checkout?node-id=42-7 — what's in this frame?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "figma.com link + node-id, the core case"
+  },
+  {
+    "query": "pull the colors and typography from this figma file",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "design-token extraction"
+  },
+  {
+    "query": "export that frame as a png at 2x",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "image render"
+  },
+  {
+    "query": "the api returns an empty nodes map for node-id 200-7, why?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "dash-vs-colon gotcha, clearly figma REST"
+  },
+  {
+    "query": "where should I put my X-Figma-Token for these curl calls",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "auth/token handling for the REST API"
+  },
+  {
+    "query": "get the design spec for the empty-state screen from figma",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "read node + extract spec"
+  },
+
+  {
+    "query": "build this empty-state screen in SwiftUI from the design",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: implementing the design in UI code, not the REST read"
+  },
+  {
+    "query": "connect to Figma with OAuth instead of a REST token",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: OAuth MCP, not the token-based REST path"
+  },
+  {
+    "query": "render this Compose screen to match the design",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: UI implementation, not the REST read"
+  },
+  {
+    "query": "commit and push my changes",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "unrelated, git-guide"
+  },
+
+  {
+    "query": "resolve this figma.com/design link into a file key and node id",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "url parsing"
+  },
+  {
+    "query": "fetch the node json for ids 42:7 from api.figma.com",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "read-nodes endpoint"
+  },
+  {
+    "query": "list the published components in this figma file",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "components endpoint"
+  },
+  {
+    "query": "download the signed image url before it expires",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "images endpoint expiry"
+  },
+
+  {
+    "query": "map these design tokens onto my UI component library",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near-miss: implementation, not the REST read"
+  },
+  {
+    "query": "rotate my personal access token in figma settings",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "auth: token rotation is in scope"
+  }
+]

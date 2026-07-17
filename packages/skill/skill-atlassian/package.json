@@ -1,0 +1,17 @@
+{
+  "name": "@xonovex/skill-atlassian",
+  "version": "6.1.0",
+  "private": true,
+  "type": "module",
+  "keywords": [
+    "xonovex",
+    "skill",
+    "atlassian",
+    "acli",
+    "jira"
+  ],
+  "scripts": {
+    "fmt": "prettier --write .",
+    "fmt:check": "prettier --check ."
+  }
+}

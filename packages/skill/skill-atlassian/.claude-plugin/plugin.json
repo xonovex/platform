@@ -1,0 +1,9 @@
+{
+  "name": "xonovex-skill-atlassian",
+  "version": "6.1.0",
+  "description": "Xonovex Atlassian Cloud CLI skills",
+  "author": {
+    "name": "Xonovex"
+  },
+  "skills": ["./atlassian-guide"]
+}

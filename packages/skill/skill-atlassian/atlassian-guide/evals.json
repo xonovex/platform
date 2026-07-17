@@ -1,0 +1,47 @@
+{
+  "skill_name": "atlassian-guide",
+  "tier": "moderate",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Web OAuth is disabled by our admin, so I need to authenticate the Atlassian CLI (acli) to our Jira Cloud site with a personal API token. Give me the exact login command.",
+      "assertions": [
+        "Uses `acli jira auth login` (the per-product path), NOT `acli auth login` (which is the global OAuth path and does not accept an API token)",
+        "Feeds the token via STDIN — piped (`echo \"$TOKEN\" | acli jira auth login ... --token`) or redirected from a file — and NOT passed as a literal value after `--token`",
+        "Passes the site as the bare host `<site>.atlassian.net` (no `https://` prefix) with `--email`"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "After I log in with acli, where does my Jira API token actually live? Is it sitting in plaintext in a config file I need to gitignore?",
+      "assertions": [
+        "States that acli writes the token to the OS keychain natively (e.g. macOS Keychain, service `acli`) — you do not hand-store it",
+        "Clarifies the `~/.config/acli/*.yaml` files hold only non-secret profile data (site, email, account id, auth_type), not the token"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "`brew install acli` fails with `Refusing to load formula atlassian/acli/acli from untrusted tap`. How do I install it?",
+      "assertions": [
+        "Instructs to run `brew trust atlassian/acli` (or `brew trust --formula atlassian/acli/acli`) first, then re-run `brew install acli`",
+        "Does NOT suggest that acli is in homebrew-core or available as a cask — it ships from Atlassian's own tap"
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "Can I use acli to work with our self-hosted Atlassian Server / Data Center (including our on-prem Bitbucket)?",
+      "assertions": [
+        "States acli is Atlassian Cloud only (`*.atlassian.net`) and cannot authenticate against a self-hosted Server / Data Center instance",
+        "Redirects self-hosted Bitbucket work to the REST-over-curl route (bitbucket-guide) rather than acli"
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "Find all Jira issues assigned to me that aren't done, from the terminal, as machine-readable output I can parse.",
+      "assertions": [
+        "Uses `acli jira workitem search --jql \"...\"` with a JQL clause resolving the current user (e.g. `assignee = currentUser()` and `statusCategory != Done`)",
+        "Adds `--json` for machine-readable output rather than scraping the default table"
+      ]
+    }
+  ]
+}

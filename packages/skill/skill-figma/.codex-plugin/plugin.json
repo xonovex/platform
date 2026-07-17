@@ -1,0 +1,9 @@
+{
+  "name": "xonovex-skill-figma",
+  "version": "6.1.0",
+  "description": "Xonovex Figma REST API skills",
+  "author": {
+    "name": "Xonovex"
+  },
+  "skills": "./figma-guide"
+}

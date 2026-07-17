@@ -1,0 +1,15 @@
+{
+  "name": "@xonovex/skill-figma",
+  "version": "6.1.0",
+  "private": true,
+  "type": "module",
+  "keywords": [
+    "xonovex",
+    "skill",
+    "figma"
+  ],
+  "scripts": {
+    "fmt": "prettier --write .",
+    "fmt:check": "prettier --check ."
+  }
+}
