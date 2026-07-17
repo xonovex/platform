@@ -15,4 +15,6 @@ tasks:
       - workflow-guide/assets/fixtures/*.json
       - workflow-guide/references/*.md
       - /packages/skill/skill-plan/plan-guide/references/*.md
+      - /packages/skill/skill-agent-governance/agent-governance-guide/references/*.md
       - workflow-guide/scripts/*.mjs
+      - workflow-guide/scripts/*.ts

@@ -1,5 +1,14 @@
 import {checkIndependence} from "./independence-helpers.mjs";
 
+// Canonical work-shape vocabulary owned by this module: selectDevelopmentExecutor
+// branches on these literals, and the composition-vocabulary guard validates the
+// development-contracts work-shape table and the assurance fixtures against them.
+export const developmentWorkShapes = [
+  "mechanical",
+  "bounded-transform",
+  "adaptive",
+];
+
 const requiredModelBounds = [
   "fixedInputs",
   "outputSchema",

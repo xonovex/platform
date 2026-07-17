@@ -2,7 +2,7 @@
 // the record under scrutiny: a record cannot elect, waive, or weaken the check
 // applied to it. checkIndependence therefore reads `required` from the profile
 // and ignores any independence field the record carries.
-const independenceLevels = [
+export const independenceLevels = [
   "none",
   "distinct-identity",
   "distinct-team",

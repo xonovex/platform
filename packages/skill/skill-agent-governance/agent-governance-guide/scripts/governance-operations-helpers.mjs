@@ -1,3 +1,5 @@
+import {expectedVocabulary} from "./conformance-helpers.mjs";
+
 const allowedPolicyDomains = [
   "security",
   "privacy",
@@ -14,14 +16,7 @@ const allowedDecisionProviders = ["deterministic", "provider-native", "opa"];
 
 const allowedFailureModes = ["fail-closed", "fail-visible", "advisory"];
 
-const allowedModuleClassifications = [
-  "knowledge-only",
-  "advisory",
-  "evidence-producing",
-  "enforcing",
-  "configuration-changing",
-  "privileged",
-];
+const allowedModuleClassifications = expectedVocabulary.moduleClassifications;
 
 const requiredCatalogFields = [
   "id",

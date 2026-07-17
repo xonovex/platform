@@ -11,6 +11,9 @@ const adapterViewPath =
 const diagramViewPath =
   "packages/diagram/diagram-agent-workflow/workflow-diagram.dot";
 
+const adoptionMapViewPath =
+  "packages/command/command-workflow/docs/adoption-map.md";
+
 const readSource = (path) => readFileSync(new URL(path, repoRootUrl), "utf8");
 
 // The owner declares the families; the views are compared against whatever it
@@ -46,6 +49,22 @@ const extractDiagramFamilies = (source) => {
     .flatMap((line) => line.split("|"))
     .map((part) => part.trim())
     .filter((part) => part.length > 0);
+
+  return families.length > 0 ? families : null;
+};
+
+// The adoption map names the same families inline as an Oxford-comma prose list
+// between the "intent families —" lead and the owner-reference link.
+const extractAdoptionMapFamilies = (source) => {
+  const match = /intent families —([\s\S]*?)\(\[events-and-capabilities/.exec(
+    source,
+  );
+  if (!match) return null;
+  const families = match[1]
+    .replace(/,?\s+and\s+/g, ", ")
+    .split(/,\s*/)
+    .map((family) => family.trim())
+    .filter((family) => family.length > 0);
 
   return families.length > 0 ? families : null;
 };
@@ -94,6 +113,10 @@ if (ownerFamilies === null) {
     {
       site: `${diagramViewPath} (intents node label)`,
       families: extractDiagramFamilies(readSource(diagramViewPath)),
+    },
+    {
+      site: `${adoptionMapViewPath} (Semantic intents list)`,
+      families: extractAdoptionMapFamilies(readSource(adoptionMapViewPath)),
     },
   ];
 

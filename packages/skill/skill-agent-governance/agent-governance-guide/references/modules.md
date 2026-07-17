@@ -22,7 +22,7 @@ identity and version
 source and provenance
 owner, support status, and lifecycle state
 supported platforms and tested versions
-classification: advisory | evidence-producing | enforcing | configuration-changing | privileged
+classification: knowledge-only | advisory | evidence-producing | enforcing | configuration-changing | privileged
 supported adoption modes and authority zones
 semantic intents and native enforcement points
 executor class and result/evidence contract

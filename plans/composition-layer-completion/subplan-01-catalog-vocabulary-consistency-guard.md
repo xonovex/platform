@@ -3,7 +3,7 @@ type: plan
 has_subplans: false
 parent_plan: ../composition-layer-completion.md
 parallel_group: 1
-status: pending
+status: complete
 dependencies:
   plans: []
   files:
@@ -31,8 +31,8 @@ skills_to_consult:
 validation:
   type_check: not_run
   lint: not_run
-  build: not_run
-  tests: not_run
+  build: pass
+  tests: pass
 updated: "2026-07-18"
 ---
 
@@ -127,3 +127,56 @@ catalog and giving the workflow plane the vocabulary check it lacks today.
 None. Phase 1 is independent of the other phases — it guards vocabulary drift over the
 existing catalog and is cited by no other phase as a prerequisite. It can run concurrently
 with the cross-package link guard and the capability registry.
+
+## Implementation notes (completed 2026-07-18)
+
+Two self-contained validators land, modeled on `validate-executor-vocabulary.mjs` (owner
+plus declaring sites, set-difference comparison, and derived mutation guards with a
+dud-guard-zero assertion), both wired into the skills' `test` scripts and reachable from
+CI. `build` and `tests` pass via `moon`; skill packages define no `type_check`/`lint`
+task, so those are `not_run`. Adversarial verification: mutating any one covered site
+fails the owning `moon` test naming the diverging file (13/13 sites), all validators pass
+on `main`, and the dud-guard count is zero.
+
+- `agent-governance-guide/scripts/validate-composition-vocabulary.ts` — 5 vocabularies
+  across 9 machine-readable declaring sites, 20 mutation guards. `policyOutcomes`
+  (owner `expectedVocabulary` ↔ `policy-and-authority.md`); `moduleClassifications`
+  (owner ↔ `catalog-and-inventory.md` bullets ↔ `modules.md` declaration line);
+  `adoptionModes` (owner ↔ `catalog-and-inventory.md`, `architecture.md`, and the
+  cross-package `architecture-and-composition.md` and `adoption-map.md` mode tables,
+  lower-cased to reconcile display capitalization); `authorityZones`
+  (owner ↔ `catalog-and-inventory.md`); `profileFacets` (owner ↔ `adoption-map.md` facet
+  span).
+- `workflow-guide/scripts/validate-composition-vocabulary.ts` — 2 vocabularies across 3
+  sites, 8 mutation guards. `independenceLevels` (owner `independence-helpers.mjs`, now
+  exported, ↔ `actors.md` levels table, compared against the above-`none` levels) and the
+  work shapes (new owner `developmentWorkShapes` in `development-assurance-helpers.mjs`
+  ↔ `development-contracts.md` table ↔ `development-assurance-fixtures.json`).
+- `validate-event-intent-vocabulary.mjs` gains `adoption-map.md` as a third view.
+
+Supporting edits: `governance-operations-helpers.mjs` `allowedModuleClassifications` now
+imports `expectedVocabulary.moduleClassifications` (connascence of value collapses to
+connascence of name); `modules.md` adds the missing `knowledge-only` classification so its
+enumeration matches the owner; `actors.md` "why no registry" claim is rewritten to name
+exactly the machine-validated vocabularies; the root `engines.node` floor is raised to
+`>=22.18.0` (parent Decision 1 precursor) so Node runs the `.ts` validators via native
+type stripping.
+
+### Scope decisions (sites deliberately left as human-readable views)
+
+Several sites named in the tasks declare a vocabulary in human display form, not machine
+tokens. Registering them would couple the guard to display wording or force a lossy
+display→token map — re-introducing the connascence the guard removes — so they stay
+human-readable views, per the parent plan's prose-brittleness risk mitigation:
+
+- `moduleKinds`: `modules.md` table uses display names (`Bounded model evaluator` ≠
+  `model-evaluator`), so it is not machine-validatable; it remains validated by
+  `validateVocabulary` (owner ↔ conformance fixture), and `actors.md` now states this
+  honestly rather than claiming full cross-site validation.
+- The `authorityZones` table in `architecture.md` (`Repository/project`,
+  `Session/runtime`), the executor-class prose in `adoption-map.md`
+  (`deterministic script/API` ≠ `deterministic`), and the scaffolded
+  `moduleClassifications` prose in `adoption-map.md` ("from … through … to …") are display
+  views, not registered.
+- `external-enforcement-onboarding.md` names only 2 of 5 adoption modes (a subset
+  mention, not a closed-set declaration); not registered.

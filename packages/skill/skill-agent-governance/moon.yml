@@ -25,3 +25,4 @@ tasks:
       - /packages/skill/skill-plan/plan-guide/scripts/*.mjs
       - /packages/skill/skill-workflow/workflow-guide/scripts/*.mjs
       - agent-governance-guide/scripts/*.mjs
+      - agent-governance-guide/scripts/*.ts
