@@ -13,10 +13,10 @@ not require lifecycle commands.
 Role quickstarts are lenses over the same actor-neutral commands — no command knows a job
 title. Each names the subset one perspective runs and the gates it answers for:
 
-- [Developer quickstart](docs/developer-quickstart.md)
-- [Product owner quickstart](docs/product-owner-quickstart.md)
-- [QA quickstart](docs/qa-quickstart.md)
-- [UX quickstart](docs/ux-quickstart.md)
+- [Developer quickstart](docs/developer-quickstart.md) — [diagram](../../diagram/diagram-agent-workflow/developer-workflow.png)
+- [PM quickstart](docs/pm-quickstart.md) — [diagram](../../diagram/diagram-agent-workflow/pm-workflow.png)
+- [QA quickstart](docs/qa-quickstart.md) — [diagram](../../diagram/diagram-agent-workflow/qa-workflow.png)
+- [UX quickstart](docs/ux-quickstart.md) — [diagram](../../diagram/diagram-agent-workflow/ux-workflow.png)
 
 Reference guides:
 

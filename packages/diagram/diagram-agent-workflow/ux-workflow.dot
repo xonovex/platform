@@ -1,0 +1,114 @@
+digraph UxWorkflow {
+  rankdir=TB;
+  compound=true;
+  newrank=true;
+  splines=polyline;
+  nodesep=0.4;
+  ranksep=0.7;
+
+  node [shape=box, style="rounded,filled", fillcolor=white, fontname="Arial", fontsize=10];
+  edge [fontname="Arial", fontsize=9];
+
+  start [label="Experience to design", shape=house, fillcolor="#e8d5f5"];
+  nosurface [label="No real interaction surface? A copy change?\nSkip experience-design-* entirely — the whole family is optional\nsolution-design-* is not this lens either —\narchitecture belongs to the developer lens", shape=note, fillcolor="#fff3cd"];
+  start -> nosurface [label="nothing to design", style=dashed];
+
+  subgraph cluster_frame {
+    label="1 · Frame  (shared, not owned — the PO lens opens with the same commands)";
+    style=filled;
+    fillcolor="#f7f7f7";
+
+    discovery [label="discovery-run <problem>\nobservations, assumptions, unknowns\nforces no story, no Gherkin, no artifact shape", fillcolor="#eaf6ff"];
+    research [label="research-run <question> --scope <boundary>\nuser research is a selectable --method here, not a command\nevidence and provenance stay distinct from synthesis", fillcolor="#eaf6ff"];
+    formulation [label="formulation-run <subject>\nonly if the behavior is yours to state", fillcolor="#eaf6ff"];
+    reuse [label="Already run by someone else?\nRead the result by its native reference\ninstead of re-running — that handle is how you\npick up their work rather than repeat it", shape=note, fillcolor="#fff3cd"];
+
+    discovery -> research -> formulation;
+    {rank=same; research; reuse;}
+  }
+
+  subgraph cluster_design {
+    label="2 · Design  (publishes a proposed result — mandatory for no profile)";
+    style=filled;
+    fillcolor="#e8f0fe";
+
+    create [label="experience-design-create <subject-or-ref> [--method <selection>]\ntakes a Discovery / Research / Formulation / Decision reference\npublishes a PROPOSED Experience Design result", fillcolor="#d9e8ff"];
+    capability [label="Soft-selects the installed research, interaction, content,\nprototyping, and accessibility capabilities the profile selects —\nnone is a hard dependency\nA capability explicitly selected but not installed FAILS VISIBLY\nand names what is missing, rather than being quietly substituted", shape=note, fillcolor="#fff3cd"];
+
+    {rank=same; create; capability;}
+  }
+
+  subgraph cluster_critique {
+    label="3 · Critique → Revise  (the pair loops until the design holds)";
+    style=filled;
+    fillcolor="#eefbe8";
+
+    critique [label="experience-design-critique <design-ref> --revision <rev>\nFRESH, independent session · publishes separate findings\ndoes not revise, does not accept —\nthe session that made the design defends it", fillcolor="#ddf5d5"];
+    revise [label="experience-design-revise <design-ref> --revision <rev> --feedback <critique-ref>\nresolves every feedback item · publishes a NEW revision\npreserves supersession · never overwrites or silently accepts the subject", fillcolor="#ddf5d5"];
+
+    critique -> revise [label="findings"];
+    revise -> critique [label="re-critique the new revision", style=dashed];
+  }
+
+  subgraph cluster_accept {
+    label="4 · Accept";
+    style=filled;
+    fillcolor="#e8f0fe";
+
+    accept [label="experience-design-accept <design-ref> --revision <rev> --authority-reference <actor>\n◆ human gate\nrecords accept | reject | conditional against ONE exact revision\na model may prepare the brief but must not fabricate\nthe actor, qualification, or decision", fillcolor="#ffe4cc"];
+    notrelease [label="Identical in shape to plan-accept and decision-accept —\nlearn one, read all three\nBut a design accept is not a release accept:\nacceptance-decide ◆ downstream is a separate,\nseparately-bound sign-off", shape=note, fillcolor="#fff3cd"];
+
+    {rank=same; accept; notrelease;}
+  }
+
+  start -> discovery [label="new problem space", lhead=cluster_frame];
+  start -> create [label="framing already published —\npick it up by native reference", style=dashed, lhead=cluster_design];
+  formulation -> create [ltail=cluster_frame, lhead=cluster_design, label="reference"];
+  create -> critique [ltail=cluster_design, lhead=cluster_critique];
+  create -> accept [label="accepted on first draft —\nat the cost of the adversarial reader", style=dashed, lhead=cluster_accept];
+  critique -> accept [label="design holds", ltail=cluster_critique, lhead=cluster_accept];
+  revise -> accept [label="new revision → fresh accept gate\nbound to that exact revision", style=dashed, lhead=cluster_accept];
+
+  subgraph cluster_accessibility {
+    label="Where accessibility binds — not a stage you pass · four points · none of them substitutes for another";
+    style=filled;
+    fillcolor="#fff0e6";
+
+    a11ydesign [label="Design  —  experience-design-create  (stage 2)\nsoft-selects an installed accessibility\ncapability when the profile selects it\nRequirements and intent — NOT evidence", fillcolor="#ffe4cc"];
+    a11ytest [label="Test  —  qa-run <deliverable-ref> --revision <rev>\n--scope accessibility --environment <env-ref>\nPublishes test evidence in recorded environments", fillcolor="#ffe9d9"];
+    a11yassess [label="Assess  —  assessment-run <subject-ref>\n--revision <rev> --criteria <standard-ref>\nGrades ONE exact revision against a pinned standard,\nversion, and level · reports pass · fail ·\nnot-applicable · not-tested, with origins and limitations", fillcolor="#ffe9d9"];
+    a11yobserve [label="Observe  —  observe-run <subject-ref> --window <range>\nAccessibility evidence from production\nTelemetry can identify a possible barrier —\nit does not replace direct evaluation", fillcolor="#ffe9d9"];
+
+    {rank=same; a11ydesign; a11ytest;}
+    {rank=same; a11yassess; a11yobserve;}
+    a11ydesign -> a11ytest [style=invis];
+    a11yassess -> a11yobserve [style=invis];
+    a11ydesign -> a11yassess [style=invis];
+    a11ytest -> a11yobserve [style=invis];
+  }
+
+  accept -> a11ydesign [label="the developer lens builds it —\nyou return at test · assess · observe", style=dashed, ltail=cluster_accept, lhead=cluster_accessibility];
+
+  subgraph cluster_authority {
+    label="Authority binds separately from evidence";
+    style=filled;
+    fillcolor="#fff0e6";
+
+    scanner [label="A scanner is authoritative only for its declared\nscope, version, subject, and environment\nA clean report is not proof that every applicable\ncriterion passes · 'not-applicable' needs a\ncriterion-specific reason and a reviewer — never\na synonym for untested or inconvenient", fillcolor="#ffd6d6"];
+    exception [label="An exception preserves a known gap and a\nremediation duty\nIt never turns a failed criterion into a pass,\nand never establishes conformance by itself", fillcolor="#ffd6d6"];
+    humanreview [label="Qualified human review   ◆\nScanners and agents supply evidence, never\naccountable conformance by themselves\nA profile that makes a criterion mandatory needs a\nprotected gate or an accountable human control the\nsame actor doing the work cannot bypass", fillcolor="#ffe4cc"];
+    freshness [label="Conformance applies to the declared subject,\nscope, version, level, and dependencies\nA changed UI, content path, component, platform,\nor assistive-technology environment may\ninvalidate the evidence", fillcolor="#ffe9d9"];
+
+    {rank=same; scanner; exception;}
+    {rank=same; humanreview; freshness;}
+    scanner -> exception [style=invis];
+    humanreview -> freshness [style=invis];
+    scanner -> humanreview [style=invis];
+    exception -> freshness [style=invis];
+  }
+
+  a11yassess -> scanner [label="evidence — never conformance by itself", style=dashed, ltail=cluster_accessibility, lhead=cluster_authority];
+
+  legend [label="A role is a LENS over actor-neutral commands — no command asks who you are: experience-design-create asks for a subject and publishes a proposed result\nVerb convention: -run execute · -create draft (proposed) · -critique attack (FRESH session) · -revise new revision · -accept authority over one exact revision\n◆ = mandatory human gate — authority over an exact revision, not a job title   ·   dashed = optional / loop back   ·   results pass by opaque native reference, not conversation memory", shape=note, fillcolor="#fff3cd"];
+  legend -> start [style=invis];
+}

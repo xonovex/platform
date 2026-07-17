@@ -1,11 +1,13 @@
-# Product Owner Quickstart
+# PM Quickstart
 
 A lens over the same actor-neutral commands — not a different set of them. No command knows what a
-product owner is: `plan-accept` asks for authority over an exact revision, never for a job title. A
+PM is: `plan-accept` asks for authority over an exact revision, never for a job title. A
 role is a way to _read_ the command set — which of the 59 you actually run, and which gates you
 personally answer for. The [README](../README.md) documents all 59 commands and their contracts; the
 [Developer Quickstart](developer-quickstart.md) is the sibling lens for the seat that writes the code,
-and it owns the shared vocabulary (native references, `--revision`, `--profile`, `--method`).
+and it owns the shared vocabulary (native references, `--revision`, `--profile`, `--method`). See the
+[pm-workflow diagram](../../../diagram/diagram-agent-workflow/pm-workflow.png) for the same flow
+at a glance.
 
 `bdd-guide` makes the same move for discovery: the
 [Three Amigos](../../../skill/skill-bdd/bdd-guide/references/discovery-three-amigos.md) are three

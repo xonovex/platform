@@ -31,7 +31,7 @@ Four stages: **Frame → Design → Critique → Accept.**
 /xonovex-workflow:formulation-run <subject>            # only if the behavior is yours to state
 ```
 
-- These are the same commands the [PO lens](product-owner-quickstart.md) opens with — deliberately.
+- These are the same commands the [PO lens](pm-quickstart.md) opens with — deliberately.
   Discovery and Research belong to no role. **If someone already ran them, read the result by its
   native reference instead of re-running them**; that handle is how you pick up their work rather than
   repeat it.
@@ -77,7 +77,7 @@ Four stages: **Frame → Design → Critique → Accept.**
 - Records an accept, reject, or conditional decision **against one exact revision**. A model may
   prepare the brief but must not fabricate the actor, qualification, or decision.
 - Identical in shape to `plan-accept` and `decision-accept` — learn one, read all three. The
-  [PO lens](product-owner-quickstart.md) covers the authority half.
+  [PO lens](pm-quickstart.md) covers the authority half.
 - **A design accept is not a release accept.** `acceptance-decide` downstream is a separate,
   separately-bound sign-off.
 
@@ -154,7 +154,7 @@ restated here:
 
 - [README](../README.md) — the full command table
 - [Developer Quickstart](developer-quickstart.md) — the sibling lens, and the jargon decoder
-- [Product Owner Quickstart](product-owner-quickstart.md) · [QA Quickstart](qa-quickstart.md) — the
+- [PM Quickstart](pm-quickstart.md) · [QA Quickstart](qa-quickstart.md) — the
   other lenses
 - [`accessibility-guide`](../../../skill/skill-accessibility/accessibility-guide/SKILL.md) and
   [`plan-guide`](../../../skill/skill-plan/plan-guide/SKILL.md) — the behavior each command runs

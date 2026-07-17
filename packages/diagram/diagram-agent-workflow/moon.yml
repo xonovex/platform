@@ -9,6 +9,9 @@ tasks:
       - graph-build-maturity
       - graph-build-autonomy
       - graph-build-developer
+      - graph-build-pm
+      - graph-build-qa
+      - graph-build-ux
   graph-build-workflow:
     command: dot -Tpng -o workflow-diagram.png workflow-diagram.dot
     inputs:
@@ -47,5 +50,29 @@ tasks:
       - developer-workflow.dot
     outputs:
       - developer-workflow.png
+    options:
+      cache: true
+  graph-build-pm:
+    command: dot -Tpng -o pm-workflow.png pm-workflow.dot
+    inputs:
+      - pm-workflow.dot
+    outputs:
+      - pm-workflow.png
+    options:
+      cache: true
+  graph-build-qa:
+    command: dot -Tpng -o qa-workflow.png qa-workflow.dot
+    inputs:
+      - qa-workflow.dot
+    outputs:
+      - qa-workflow.png
+    options:
+      cache: true
+  graph-build-ux:
+    command: dot -Tpng -o ux-workflow.png ux-workflow.dot
+    inputs:
+      - ux-workflow.dot
+    outputs:
+      - ux-workflow.png
     options:
       cache: true

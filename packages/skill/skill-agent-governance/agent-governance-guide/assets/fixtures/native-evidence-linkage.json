@@ -8,7 +8,7 @@
         "kind": "work item",
         "id": 1234,
         "links": ["pull request 88"],
-        "state_transition": "Accepted by named product owner"
+        "state_transition": "Accepted by named PM"
       },
       {
         "kind": "pull request",

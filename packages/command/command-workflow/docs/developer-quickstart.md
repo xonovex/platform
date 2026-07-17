@@ -192,7 +192,7 @@ The command help is written abstractly so it can back any storage backend. Trans
 ## See also
 
 - [README](../README.md) — the full command table
-- [Product Owner Quickstart](product-owner-quickstart.md) · [QA Quickstart](qa-quickstart.md) ·
+- [PM Quickstart](pm-quickstart.md) · [QA Quickstart](qa-quickstart.md) ·
   [UX Quickstart](ux-quickstart.md) — the same actor-neutral commands read from the other seats
 - [Architecture and composition](architecture-and-composition.md) — the two-planes model
 - [`workflow-guide`](../../../skill/skill-workflow/workflow-guide/SKILL.md) and

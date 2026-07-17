@@ -75,7 +75,7 @@ You never review "the work" — you review a revision.
 **This is the line the lens exists to make visible.** `acceptance-validate` assembles fresh evidence
 and explicitly cannot sign off, authorize Integration, or fabricate accountable authority. A clean
 validation is not an approval — an accountable human records that separately with `acceptance-decide`,
-and that half belongs to the [Product Owner Quickstart](product-owner-quickstart.md). The split is
+and that half belongs to the [PM Quickstart](pm-quickstart.md). The split is
 deliberate: an agent may assemble, only a human decides.
 
 ### Alongside: validate a plan
@@ -172,7 +172,7 @@ restated here:
 
 - [README](../README.md) — the full command table
 - [Developer Quickstart](developer-quickstart.md) — the sibling lens, and the jargon decoder
-- [Product Owner Quickstart](product-owner-quickstart.md) · [UX Quickstart](ux-quickstart.md) — the
+- [PM Quickstart](pm-quickstart.md) · [UX Quickstart](ux-quickstart.md) — the
   other lenses
 - [Validation and traceability](validation-and-traceability.md) — the evidence chain end to end
 - [`code-review-guide`](../../../skill/skill-code-review/code-review-guide/SKILL.md) and
