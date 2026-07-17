@@ -8,17 +8,20 @@ dependencies:
   plans: []
   files:
     - packages/skill/skill-agent-governance/agent-governance-guide/scripts/*.mjs
+    - packages/skill/skill-agent-governance/agent-governance-guide/scripts/*.ts
     - packages/skill/skill-agent-governance/agent-governance-guide/references/*.md
     - packages/skill/skill-agent-governance/agent-governance-guide/assets/conformance-fixtures.json
     - packages/skill/skill-agent-governance/package.json
     - packages/skill/skill-agent-governance/moon.yml
     - packages/skill/skill-workflow/workflow-guide/scripts/*.mjs
+    - packages/skill/skill-workflow/workflow-guide/scripts/*.ts
     - packages/skill/skill-workflow/workflow-guide/references/development-contracts.md
     - packages/skill/skill-workflow/workflow-guide/references/profiles.md
     - packages/skill/skill-workflow/workflow-guide/assets/development-assurance-fixtures.json
     - packages/skill/skill-workflow/package.json
     - packages/skill/skill-workflow/moon.yml
     - packages/command/command-workflow/docs/architecture-and-composition.md
+    - packages/command/command-workflow/docs/adoption-map.md
 skills_to_consult:
   - plan-guide
   - skill-guide
@@ -30,7 +33,7 @@ validation:
   lint: not_run
   build: not_run
   tests: not_run
-updated: "2026-07-17"
+updated: "2026-07-18"
 ---
 
 # Catalog-Wide Vocabulary-Consistency Guard
@@ -45,8 +48,11 @@ catalog and giving the workflow plane the vocabulary check it lacks today.
 
 ## Tasks
 
-1. Create `packages/skill/skill-agent-governance/agent-governance-guide/scripts/validate-composition-vocabulary.mjs`,
-   modeled on `validate-executor-vocabulary.mjs`: a data-driven registry that, for each
+1. Create `packages/skill/skill-agent-governance/agent-governance-guide/scripts/validate-composition-vocabulary.ts`
+   (erasable-syntax TypeScript run directly by Node per the parent's Decision 1; the root
+   `engines` floor raise to `>=22.18.0` is owned by the runtime plan's Phase 1 — land it first
+   if this plan executes before it), modeled on `validate-executor-vocabulary.mjs`: a
+   data-driven registry that, for each
    vocabulary, names the canonical owner (`expectedVocabulary` in
    `agent-governance-guide/scripts/conformance-helpers.mjs`) and lists every declaring site
    with an extractor (constant import, JSON key, prose-table regex, prose backtick-list
@@ -59,7 +65,13 @@ catalog and giving the workflow plane the vocabulary check it lacks today.
    `references/external-enforcement-onboarding.md`, and cross-package
    `packages/command/command-workflow/docs/architecture-and-composition.md` adoption-modes
    table (`adoptionModes`); `references/catalog-and-inventory.md` (`authorityZones`); both
-   `profiles.md` facet lists (`profileFacets`).
+   `profiles.md` facet lists (`profileFacets`); and cross-package
+   `packages/command/command-workflow/docs/adoption-map.md` — its modes table
+   (`adoptionModes`), its axes-section facet list (`profileFacets`), and its
+   module-classification prose (`moduleClassifications`). Also register `adoption-map.md`
+   as a view site in the two existing guards: the executor-class enumeration joins
+   `validate-executor-vocabulary.mjs` and the twelve-family intent list joins
+   `validate-event-intent-vocabulary.mjs`.
 3. Remove the second independent machine-read declaration: edit
    `agent-governance-guide/scripts/governance-operations-helpers.mjs` lines 17-24 so
    `allowedModuleClassifications` imports `expectedVocabulary.moduleClassifications` from
@@ -68,7 +80,7 @@ catalog and giving the workflow plane the vocabulary check it lacks today.
    `enforcing`, `configuration-changing`, `privileged`) — collapsing connascence of value
    to connascence of name.
 4. Give the workflow plane its own vocabulary check (it has no `validateVocabulary` analog):
-   add `packages/skill/skill-workflow/workflow-guide/scripts/validate-composition-vocabulary.mjs`
+   add `packages/skill/skill-workflow/workflow-guide/scripts/validate-composition-vocabulary.ts`
    covering `independenceLevels` (owner `workflow-guide/scripts/independence-helpers.mjs`
    lines 5-10 — export the constant so it has a canonical owner; views
    `agent-governance-guide/references/actors.md` independence table lines 32-36 and 42-48)
@@ -88,7 +100,8 @@ catalog and giving the workflow plane the vocabulary check it lacks today.
 7. Wire the new validators into the `test` script of
    `packages/skill/skill-agent-governance/package.json` and
    `packages/skill/skill-workflow/package.json`, and add the newly-read cross-package /
-   cross-file inputs (`command-workflow/docs/architecture-and-composition.md`, workflow
+   cross-file inputs (`command-workflow/docs/architecture-and-composition.md`,
+   `command-workflow/docs/adoption-map.md`, workflow
    `references/development-contracts.md`, `assets/development-assurance-fixtures.json`) to
    the corresponding `moon.yml` `test` `inputs` (governance `moon.yml` already lists
    `command-workflow/docs/*.md`).

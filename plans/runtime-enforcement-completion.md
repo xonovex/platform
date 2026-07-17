@@ -9,8 +9,11 @@ dependencies:
     - composable-workflow-implementations-merge
     - environment-hardening
   files:
+    - package.json
     - packages/skill/skill-workflow/workflow-guide/scripts/*.mjs
+    - packages/skill/skill-workflow/workflow-guide/scripts/*.ts
     - packages/skill/skill-agent-governance/agent-governance-guide/scripts/*.mjs
+    - packages/skill/skill-agent-governance/agent-governance-guide/scripts/*.ts
     - packages/skill/skill-agent-governance/agent-governance-guide/assets/walking-skeleton/*
     - packages/skill/skill-agent-governance/agent-governance-guide/references/autonomy.md
     - packages/skill/skill-claude-code/code-harness-guide/references/capabilities.md
@@ -85,6 +88,33 @@ prohibited action). The two are complementary and must cross-reference, not abso
 The specification baseline both extend is [composable-workflow-phases.md](composable-workflow-phases.md)
 and its descendants ([composable-workflow-implementations-merge.md](composable-workflow-implementations-merge.md),
 [environment-hardening.md](environment-hardening.md)).
+
+## Decisions (settled 2026-07-17)
+
+1. **Language seam — option (a), in TypeScript.** The decision point is a long-running
+   TypeScript policy-decision service with a versioned JSON request/response contract that
+   imports the authoritative validators — never a reimplementation. The validators migrate
+   `.mjs` → erasable-syntax `.ts`, executed directly by Node via native type stripping; the
+   root `engines` floor rises from `>=20.0.0` to `>=22.18.0` (target: Node 24 LTS). The floor
+   raise is a shared precursor: the composition plan's new validators are authored `.ts`
+   against it — whichever plan executes first lands it first.
+2. **Deployment topology — endpoint-configurable, sidecar default.** The webhook calls a
+   configurable decision-service endpoint (flag/env, default: pod-local sidecar) and denies
+   mandatory operations when it is unreachable, regardless of topology. Phase 5 proves the
+   sidecar topology only; a separate Deployment + Service is documented as
+   supported-by-contract with a NetworkPolicy example, not e2e-proven.
+3. **Live-agent proofs are maintainer-run probes.** Phases 2–3 prove via bundled repeatable
+   probe scripts whose dated, version-stamped results land as capability-matrix evidence,
+   re-earned on the refresh trigger; no PR gate requires a live model session; CI runs only
+   the deterministic checks. Probe scripts are structured so a scheduled CI job could adopt
+   them later without change.
+4. **Trigger surface — both CRDs.** Phase 4 ships `AgentSchedule` (time-based CronJob analog)
+   and `AgentTrigger` (event-based), each minimal and hand-maintained.
+5. **`AgentTrigger` v1 event source — authenticated webhook receiver.** A
+   bearer-token-authenticated HTTP receiver hosted as a runnable in the existing operator
+   manager; token from a Secret, NetworkPolicy-gated; an authenticated POST creates the
+   templated `AgentRun`, unauthenticated or unmatched posts create nothing. Phase 5's drift
+   detector reuses this receiver as its remediation path.
 
 ## Current state (VERIFIED)
 
@@ -246,14 +276,16 @@ verdict as provider-native evidence, and fails closed on any error or missing in
 
 **Tasks.**
 
-- Decide the decision-point boundary and language seam (see Risks): expose the `.mjs` validators as a
-  callable **policy decision service** (deterministic Node process / bounded API) with a stable
-  request/response contract, keeping decision separate from enforcement per the framework
-  (`composable-workflow-phases.md` plane 2). New scripts live beside the validators under
+- Per Decision 1, raise the root `engines` Node floor to `>=22.18.0` (target Node 24 LTS),
+  migrate the validator `.mjs` files to erasable-syntax `.ts` run directly via native type
+  stripping, and expose them as a long-running **TypeScript policy decision service** with a
+  stable, versioned JSON request/response contract, keeping decision separate from enforcement
+  per the framework (`composable-workflow-phases.md` plane 2). New scripts live beside the validators under
   `packages/skill/skill-workflow/workflow-guide/scripts/` and
   `packages/skill/skill-agent-governance/agent-governance-guide/scripts/`; do not fork the validator
   logic.
-- Implement a thin **enforcement adapter** that calls the decision service at a real gate. Primary
+- Implement a thin **enforcement adapter** that calls the decision service — through a
+  configurable endpoint (flag/env, default: the pod-local sidecar per Decision 2) — at a real gate. Primary
   target: extend the operator's live admission surface so a governed lifecycle operation (modelled on
   an `AgentRun` annotation/label or a new `AgentPolicy.Spec.Enforced` governance field) is checked by
   the verdict — `packages/agent/agent-operator-go/internal/webhook/agentrun_webhook.go`,
@@ -305,7 +337,9 @@ can enforce at the harness.
   matrix-identity `Evidence status` line to record that native hook registration was exercised — with
   the probe date and observed version. Do **not** upgrade rows that were not actually exercised.
 - Add a repeatable end-to-end test/harness-probe script (bundled with the adapter) that a maintainer
-  can re-run to reconfirm the block after a harness update, per the matrix `Refresh trigger`.
+  can re-run to reconfirm the block after a harness update, per the matrix `Refresh trigger`. Per
+  Decision 3 this proof is a maintainer-run probe, not a CI gate — CI runs only the deterministic
+  checks — and the script is structured so a scheduled CI job could adopt it unchanged.
 
 **Acceptance criteria.**
 
@@ -335,7 +369,8 @@ turned into a live, observable run.
   verdict; assert the run **cannot advance** past a gate whose verdict is deny.
 - Keep the existing `run-skeleton.sh` as the deterministic contract-shape check but add a
   runtime-real counterpart under `agent-governance-guide/assets/walking-skeleton/` that exercises the
-  real harness + real decision point (clearly labelled which is simulation vs live).
+  real harness + real decision point (clearly labelled which is simulation vs live). The live
+  counterpart is a maintainer-run probe per Decision 3; CI runs only the deterministic simulation.
 - Prove one negative path: a self-approved acceptance or an executor escalation is blocked mid-run and
   produces an escalation/deny evidence record.
 
@@ -357,9 +392,13 @@ run without the oversight it depends on.
 
 **Tasks.**
 
-- Add a **trigger surface** to the operator: a schedule/sensor mechanism that creates `AgentRun`s
-  (new `AgentSchedule`/`AgentTrigger` CRD in `api/v1alpha1/` + reconciler in `internal/controller/`),
-  so "schedules, sensors, or humans trigger runs" is real, not just human-initiated reconcile.
+- Add a **trigger surface** to the operator per Decisions 4-5: two new CRDs in `api/v1alpha1/` with
+  reconcilers in `internal/controller/` — `AgentSchedule` (time-based CronJob analog: cron
+  expression, `AgentRun` template, `suspend`, concurrency policy) and `AgentTrigger` (event-based:
+  a declared endpoint whose bearer token comes from a Secret, served by an HTTP receiver hosted as
+  a runnable in the existing manager, NetworkPolicy-gated; an authenticated POST creates the
+  templated `AgentRun`, unauthenticated or unmatched posts create nothing) — so "schedules,
+  sensors, or humans trigger runs" is real, not just human-initiated reconcile.
 - Add **per-run provenance**: an accountable-owner field on `AgentRunSpec`
   (`api/v1alpha1/agentrun_types.go`) that admission requires for triggered runs, and a run journal
   recording model/provider/prompt/tools/granted-permissions (the AIBOM `AGENTS.md` describes) written
@@ -404,9 +443,14 @@ made real.
   to live data instead of a prompt.
 - Implement **incident containment**: on a detected drift or anomaly, exercise a tested kill-switch /
   pause on the live run (building on the operator's Job/AgentRun lifecycle and the escalation router
-  from Phase 4), and record the containment as evidence — wiring `incident-run`.
+  from Phase 4), and record the containment as evidence — wiring `incident-run`. Remediation runs
+  are raised by POSTing to the Phase 4 `AgentTrigger` receiver (Decision 5) — no second trigger
+  mechanism.
 - Demonstrate on a live (kind/e2e) estate: induce drift (disable a required control) and an incident
-  (a run breaching policy), and show detection + containment with evidence.
+  (a run breaching policy), and show detection + containment with evidence. The estate runs the
+  sidecar decision-service topology (Decision 2) — the only topology e2e proves; document the
+  separate-Deployment alternative with a NetworkPolicy example as supported-by-contract, not
+  e2e-proven.
 
 **Acceptance criteria.**
 
@@ -420,11 +464,11 @@ made real.
 
 ## Risks and unknowns
 
-- **Language seam (Go operator vs Node validators).** The validators are `.mjs`; the live enforcement
-  point is Go. Options: (a) a Node policy-decision service the operator calls over a local contract;
-  (b) port the validators to Go (risks divergence from the authoritative source, forbidden by the
-  no-fork constraint); (c) embed a JS runtime. **Open — must be decided before Phase 1.** Recommended
-  default: (a), keeping decision and enforcement decoupled per the framework.
+- **Language seam (Go operator vs Node validators) — DECIDED (Decision 1).** Option (a): a
+  TypeScript policy-decision service the operator calls over a local contract, keeping decision and
+  enforcement decoupled per the framework. Residual risk: the `.mjs` → `.ts` migration and the Node
+  engine-floor raise touch every skill package that runs validators, and direct execution requires
+  erasable-syntax-only TypeScript (no enums/namespaces/parameter properties).
 - **Admission timing vs lifecycle semantics.** The AgentRun webhook fires at pod-creation admission,
   but governance gates (acceptance, integration, release) are lifecycle events that do not map 1:1 to
   a K8s object create. Modelling a "governed operation" as an admissible resource (or a distinct
@@ -448,7 +492,7 @@ made real.
 
 ## Success criteria
 
-Completion of the runtime / enforcement layer means:
+Completion of the runtime / enforcement surface means:
 
 - At least one running program invokes the reference validators on real lifecycle operations, returns
   an allow/deny verdict with the exact failure code, records verdict evidence, and fails closed — the
@@ -464,7 +508,7 @@ Completion of the runtime / enforcement layer means:
   its required oversight is absent, unverified, or degraded (Phase 4).
 - Drift is detected and an incident contained on a live estate from real telemetry, with the effective
   autonomy level demoted when oversight degrades (Phase 5).
-- Defense in depth holds: a mandatory control fails closed at two independent enforcement layers
+- Defense in depth holds: a mandatory control fails closed at two independent enforcement points
   (harness hook + admission) in the reference composition.
 - Validation gates pass without regression: operator `go test ./...` (unit + integration + e2e tags),
   the workflow/governance `validate-*` scripts, typecheck, lint, and build.

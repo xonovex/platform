@@ -75,9 +75,9 @@ None. Phase 2 is independent of the other phases — the parent cites no cross-p
 prerequisite for the link guard. It can run concurrently with the vocabulary guard and the
 capability registry.
 
-## Open decisions
+## Decision (settled 2026-07-17)
 
-The parent leaves one decision open for this phase (Phase 2 tasks): whether by-name
-cross-skill references — prose such as "see `execution.md`" or "**agent-governance-guide**
-owns…" — are in scope for the guard, and if so, whether to validate that the named
-skill/reference exists. State the choice; do not resolve it here.
+**By-name cross-skill references are out of scope** (parent Decision 2). The guard validates
+relative markdown links only; prose mentions — "see `execution.md`", bolded skill names — are
+not parsed. Mechanical resolution keeps the guard trustworthy, and skill renames already fail
+loudly via `marketplace.json` lockstep.

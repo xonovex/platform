@@ -9,6 +9,7 @@ dependencies:
   files:
     - packages/skill/skill-workflow/workflow-guide/references/conformance.md
     - packages/skill/skill-workflow/workflow-guide/scripts/*.mjs
+    - packages/skill/skill-workflow/workflow-guide/scripts/*.ts
     - packages/skill/skill-workflow/workflow-guide/assets/*.json
     - packages/skill/skill-workflow/package.json
     - packages/skill/skill-workflow/moon.yml
@@ -34,12 +35,11 @@ updated: "2026-07-17"
 
 ## Objective
 
-Prove "you can't assemble it wrong": a full selection (workflow profile + governance profile
-
-- selected capabilities + providers + modules + methods) is validated as one artifact for
-  topology completeness and dangling references across both planes, backing the promise
-  `workflow-conformance` already makes ("validate their composition") with a named contract and
-  helper instead of prose.
+Prove "you can't assemble it wrong": a full selection (workflow profile + governance profile +
+selected capabilities + providers + modules + methods) is validated as one artifact for
+topology completeness and dangling references across both planes, backing the promise
+`workflow-conformance` already makes ("validate their composition") with a named contract and
+helper instead of prose.
 
 ## Tasks
 
@@ -53,17 +53,19 @@ Prove "you can't assemble it wrong": a full selection (workflow profile + govern
    mandatory cross-plane guarantees bound to an adequate enforcement point.
 2. Implement `validateAssembledComposition` in
    `workflow-guide/scripts/conformance-helpers.mjs` (or a new
-   `workflow-guide/scripts/composition-helpers.mjs`) that takes a full assembled selection
+   `workflow-guide/scripts/composition-helpers.ts` — new files are TypeScript per the
+   parent's Decision 1) that takes a full assembled selection
    and returns the first failure code, composing the existing `validateProfile`,
    `validateComposition` (`agent-governance-guide/scripts/conformance-helpers.mjs`
    lines 219-225), and provider/enforcement validators rather than duplicating them.
-3. Add fixtures under `workflow-guide/assets/`: a passing integrated composition (built from
-   a Phase 3 shipped reference profile) plus adversarial cases — a dangling method reference,
-   a selected-but-absent capability, an incompatible provider, and a missing cross-plane
-   enforcement point.
-4. Add `workflow-guide/scripts/validate-assembled-composition.mjs` that exercises the
-   fixtures with mutation guards (dud-guard count zero), matching the precedent in the
-   existing `validate-*.mjs` scripts.
+3. Add fixtures under `workflow-guide/assets/fixtures/` (test-only, per `conformance.md`
+   line 30): a passing integrated composition (built from the Phase 3 integrated reference
+   profile and the governance profile it pairs with) plus adversarial cases — a dangling
+   method reference, a selected-but-absent capability, an incompatible provider, and a
+   missing cross-plane enforcement point.
+4. Add `workflow-guide/scripts/validate-assembled-composition.ts` (TypeScript per the
+   parent's Decision 1) that exercises the fixtures with mutation guards (dud-guard count
+   zero), matching the precedent in the existing `validate-*.mjs` scripts.
 5. Wire `packages/command/command-workflow/commands/workflow-conformance.md` so its "validate
    their composition" step delegates to this contract; update the command doc if the
    operation name changes.

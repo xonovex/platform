@@ -59,9 +59,9 @@ completeness check consult, and it marks the verified unshipped methods.
    methods with no shipped skill (`skill-user-stories`, `skill-bdd`, and
    `skill-accessibility` ship; `skill-example-mapping`, `skill-user-research`, and a general
    architecture-review skill do not exist — `skill-adr` covers decision records, not
-   review). Per Open decisions, either annotate them inline as adopter-supplied capabilities
-   (naming the contract to satisfy) or ship reference skills; do not leave bare names
-   implying a shipped skill.
+   review). Per the settled Decision below, annotate all three inline as adopter-supplied
+   capabilities, naming the contract each must satisfy; do not leave bare names implying a
+   shipped skill.
 4. Credit and preserve the existing correct marking pattern: keep
    `agent-governance-guide/references/autonomy.md` line 9's "`A3` is the eventual goal, not
    a description of what exists"; cross-reference the sibling
@@ -81,7 +81,7 @@ completeness check consult, and it marks the verified unshipped methods.
   `adopter-supplied`, with no unclassified entries (verified by the registry validator).
 - `early-lifecycle-contracts.md` no longer lists a selectable method that is neither shipped
   nor marked adopter-supplied (verified against the `packages/skill/` directory listing —
-  `example mapping`, `user research`, `architecture review` are now marked or shipped).
+  `example mapping`, `user research`, `architecture review` are now marked adopter-supplied).
 - A profile referencing a capability that is neither shipped nor marked adopter-supplied is
   rejected by a CI-run check.
 - The `A3` placeholder remains marked in `autonomy.md`; the runtime build is cross-referenced
@@ -95,13 +95,9 @@ modules) and does not consume the Phase 3 shipped profiles, so it runs concurren
 vocabulary guard (Phase 1) and the link guard (Phase 2). Its registry feeds Phase 3 (the
 reference-profile validator) and Phase 5 (the completeness check).
 
-## Open decisions
+## Decision (settled 2026-07-17)
 
-The parent leaves one decision open for this phase (Risks and unknowns, "Adopter-supplied vs
-ship decision (Phase 4)"):
-
-- **(c) Ship vs mark the three missing method skills.** Whether to ship
-  `example-mapping`, `user-research`, and `architecture-review` reference skills or mark them
-  adopter-supplied capabilities. Shipping expands the catalog beyond this plan's stated
-  intent; marking keeps the graph honest without new skills. Decide per capability; do not
-  resolve it here.
+- **(c) Mark, don't ship** (parent Decision 5). All three — `example-mapping`,
+  `user-research`, `architecture-review` — are classified `adopter-supplied` in the registry,
+  each naming the reference contract to satisfy. No new packages, no marketplace churn in
+  this plan; shipping any later is a registry flip plus a normal skill-create pass.

@@ -39,11 +39,16 @@ control stops producing evidence.
 
 ## Tasks
 
-1. Add a **trigger surface** to the operator: a schedule/sensor CRD in
-   `packages/agent/agent-operator-go/api/v1alpha1/` plus a reconciler in
-   `packages/agent/agent-operator-go/internal/controller/` that creates `AgentRun`s, so "schedules,
-   sensors, or humans trigger runs" (`autonomy.md:24`) is real, not only human-initiated reconcile;
-   hand-maintain the CRD manifest and `zz_generated.deepcopy.go` per the controller-gen constraint
+1. Add a **trigger surface** to the operator per the settled Decisions below: two CRDs in
+   `packages/agent/agent-operator-go/api/v1alpha1/` with reconcilers in
+   `packages/agent/agent-operator-go/internal/controller/` that create `AgentRun`s —
+   `AgentSchedule` (time-based CronJob analog: cron expression, `AgentRun` template, `suspend`,
+   concurrency policy) and `AgentTrigger` (event-based: declared endpoint + bearer token from a
+   Secret, served by an HTTP receiver hosted as a runnable in the existing manager,
+   NetworkPolicy-gated; an authenticated POST creates the templated run, unauthenticated or
+   unmatched posts create nothing) — so "schedules, sensors, or humans trigger runs"
+   (`autonomy.md:24`) is real, not only human-initiated reconcile; hand-maintain both CRD
+   manifests and `zz_generated.deepcopy.go` per the controller-gen constraint
    (`agent-operator-go/AGENTS.md`).
 2. Add **per-run provenance**: an accountable-owner field on `AgentRunSpec`
    (`api/v1alpha1/agentrun_types.go`, which today has no owner field) that admission requires for
@@ -61,15 +66,17 @@ control stops producing evidence.
    trigger).
 5. Add tests under `internal/controller/` and `internal/webhook/`: a triggered run without an
    accountable escalation recipient is refused; an expired escalation takes its declared safe default; a
-   run missing provenance is denied admission at A3.
+   run missing provenance is denied admission at A3; an authenticated `AgentTrigger` POST creates the
+   templated run while an unauthenticated or unmatched POST creates nothing.
 6. Update `autonomy.md` only where the runtime now backs a previously-aspirational claim (e.g. its
    note at line 9 that "`A3` ... triggers, admission control, and escalation routing are targets an
    adopter builds"), without overstating coverage beyond what the operator actually enforces.
 
 ## Acceptance criteria
 
-- A schedule/sensor creates an `AgentRun` with no human in the loop, and that run carries an accountable
-  owner and a per-run provenance journal — both asserted by `go test ./...`.
+- Both trigger paths — an `AgentSchedule` firing and an authenticated `AgentTrigger` POST — create an
+  `AgentRun` with no human in the loop, each carrying an accountable owner and a per-run provenance
+  journal, asserted by `go test ./...`; an unauthenticated or unmatched POST creates nothing.
 - An unattended run that needs a human raises an escalation with a window and safe default; on expiry the
   safe default is taken and recorded; a test proves silence never advances a gate.
 - Admission refuses an A3 run when the governance verdict is not enforced at a non-bypassable point, when
@@ -90,10 +97,12 @@ This subplan shares parallel group 2 with `claude-code-native-hook-block` (Phase
 Phase 1 and touch disjoint files (Phase 2 edits skill/harness assets; this edits operator Go), so they
 run concurrently.
 
-## Open decisions
+## Decisions (settled 2026-07-17)
 
-- **Trigger CRD shape.** The parent names the trigger surface as a "new `AgentSchedule`/`AgentTrigger`
-  CRD" (Phase 4, Task 1) without deciding whether it is a single time-based `AgentSchedule`, a distinct
-  event/sensor `AgentTrigger`, or both. The parent leaves the choice open; decide it before Task 1 given
-  the manual CRD/deepcopy maintenance cost (controller-gen broken on Go 1.25+), and keep the chosen
-  surface minimal. This subplan does not invent the answer.
+- **Trigger CRD shape: both** (parent Decision 4). `AgentSchedule` (time-based CronJob analog) and
+  `AgentTrigger` (event-based) ship together, each kept minimal, accepting the doubled
+  hand-maintenance tax (controller-gen broken on Go 1.25+).
+- **`AgentTrigger` v1 event source: authenticated webhook receiver** (parent Decision 5). A
+  bearer-token-authenticated HTTP receiver hosted as a runnable in the existing operator manager
+  (token from a Secret, NetworkPolicy-gated) — "sensor" means anything that can POST. Phase 5's
+  drift detector reuses this receiver as its remediation path.

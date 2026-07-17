@@ -66,7 +66,8 @@ harness (Phase 2) plus the real decision point (Phase 1), and a governance viola
   escalation) halts the run at the offending gate and records the exact failure code — verified against
   the real harness + decision point, not simulated.
 - The live counterpart is distinguishable in-repo from the simulation (distinct file names/labels), and
-  both pass their checks on a clean checkout.
+  both pass their checks on a clean checkout — the live counterpart as a maintainer-run probe per
+  parent Decision 3; CI runs only the deterministic simulation.
 
 ## Dependencies
 
@@ -78,7 +79,5 @@ harness (Phase 2) plus the real decision point (Phase 1), and a governance viola
   task is "Author a real end-to-end scenario **driving the lead harness (Phase 2)**." A runtime-real run
   needs Phase 2's registered, block-proven hook; without it the harness leg is still a simulation.
 
-Because Phase 3 depends on Phase 2, it sits in group 3 (after group 2), not concurrent with Phase 2.
-(The launching agent's brief described Phase 2 and Phase 3 as concurrent; the parent's explicit "Phase
-3 proves them together" and the "driving the lead harness (Phase 2)" task make the P3→P2 edge a hard
-dependency — this is flagged for the orchestrator to reconcile.)
+Because Phase 3 depends on Phase 2, it sits in group 3 (after group 2), not concurrent with
+Phase 2 — matching the parent's `parallel_groups`.

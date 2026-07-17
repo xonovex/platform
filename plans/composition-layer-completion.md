@@ -7,9 +7,11 @@ dependencies:
   plans: []
   files:
     - packages/skill/skill-agent-governance/agent-governance-guide/scripts/*.mjs
+    - packages/skill/skill-agent-governance/agent-governance-guide/scripts/*.ts
     - packages/skill/skill-agent-governance/agent-governance-guide/references/*.md
-    - packages/skill/skill-agent-governance/agent-governance-guide/assets/*.json
+    - packages/skill/skill-agent-governance/agent-governance-guide/assets/**/*.json
     - packages/skill/skill-workflow/workflow-guide/scripts/*.mjs
+    - packages/skill/skill-workflow/workflow-guide/scripts/*.ts
     - packages/skill/skill-workflow/workflow-guide/references/*.md
     - packages/skill/skill-workflow/workflow-guide/assets/**/*.json
     - packages/skill/skill-plan/plan-guide/scripts/*.mjs
@@ -57,7 +59,7 @@ validation:
   lint: not_run
   build: not_run
   tests: not_run
-updated: "2026-07-17"
+updated: "2026-07-18"
 ---
 
 # Composition-Layer Completion
@@ -77,6 +79,34 @@ The composition **grammar** is already strong. This plan credits and locks it in
 adds the missing guardrails and the missing shipped library so an adopter can select a
 worked composition, inspect it, and be told — by a check, not by prose — when the pieces do
 not fit.
+
+## Decisions (settled 2026-07-17)
+
+1. **New validators are TypeScript.** Every validator this plan adds is authored in
+   erasable-syntax TypeScript executed directly by Node via native type stripping, matching
+   the sibling runtime plan's Decision 1. The root `engines` Node floor raise (`>=20.0.0` →
+   `>=22.18.0`, target Node 24 LTS) is a shared precursor owned by the runtime plan's
+   Phase 1 — whichever plan executes first lands it first.
+2. **By-name references are out of scope (Phase 2).** The link guard validates relative
+   markdown links only; prose mentions ("see `execution.md`", bolded skill names) are not
+   parsed — mechanical resolution keeps the guard trustworthy, and skill renames already fail
+   loudly via `marketplace.json` lockstep.
+3. **Profile library home and serialization (Phase 3).** Per-plane homes:
+   `workflow-guide/assets/profiles/*.json` and
+   `agent-governance-guide/assets/profiles/*.json`, prettier-formatted JSON, distinct from
+   `assets/fixtures/`. An integrated reference profile is a workflow profile whose governance
+   facet names its governance profile by identity; `--profile <reference>` resolves the name
+   in the owning plane's library and follows the cross-reference, and the Phase 5
+   completeness check validates the pair as one assembled selection.
+4. **Coverage target (Phase 3).** Five reference profiles — one per adoption mode — promoted
+   from the existing fixtures, with the three team shapes distributed across them
+   (workflow-only/solo, integrated/small-team, a regulated governance-only or
+   external-enforcement-only entry, enablement-only from `code-review-profile`). Within-mode
+   shape variants are documented extension, not shipped files.
+5. **The three unshipped methods are marked, not shipped (Phase 4).** `example-mapping`,
+   `user-research`, and `architecture-review` are classified `adopter-supplied` in the
+   registry, each naming the reference contract to satisfy; shipping any later is a registry
+   flip plus a normal skill-create pass.
 
 ## Current state (VERIFIED)
 
@@ -200,7 +230,8 @@ objects inside `conformance-fixtures.json`, `development-assurance-fixtures.json
 `additive-cross-facet-profile`. There is **no shipped, adopter-facing, selectable profile**.
 The commands accept `--profile <reference>` (verified in `workflow-inspect.md`,
 `workflow-onboard-advise.md`, `workflow-conformance.md`, `workflow-modules.md`,
-`workflow-drift.md`) but nothing ships for a reference to point at.
+`workflow-drift.md`, and `workflow-governance-inspect.md`) but nothing ships for a reference
+to point at.
 
 ### Gap 3 — No proven "you can't assemble it wrong" check
 
@@ -264,8 +295,8 @@ to the whole catalog.
 **Tasks.**
 
 - Build a data-driven vocabulary registry (one new validator, e.g.
-  `agent-governance-guide/scripts/validate-composition-vocabulary.mjs`, following the
-  structure of `validate-executor-vocabulary.mjs`) that, for each vocabulary, names the
+  `agent-governance-guide/scripts/validate-composition-vocabulary.ts` — TypeScript per
+  Decision 1 — following the structure of `validate-executor-vocabulary.mjs`) that, for each vocabulary, names the
   canonical owner and lists every declaring site with an extractor (constant import, JSON
   key, prose-table regex, prose backtick-list regex, `.dot` label parse). Cover:
   `policyOutcomes`, `moduleKinds`, `moduleClassifications`, `authorityZones`,
@@ -277,7 +308,11 @@ to the whole catalog.
   `catalog-and-inventory.md`, `architecture.md`, `external-enforcement-onboarding.md`, and
   `command-workflow/docs/architecture-and-composition.md` (`adoptionModes`); both
   `profiles.md` facet lists (`profileFacets`); `actors.md` lines 32-36
-  (`independenceLevels`).
+  (`independenceLevels`). The later-added `command-workflow/docs/adoption-map.md` is a
+  further view site: its modes table (`adoptionModes`), axes-section facet list
+  (`profileFacets`), and module-classification prose (`moduleClassifications`) join the new
+  guard, and its executor-class and event-intent enumerations join the two existing guards'
+  site lists.
 - **Remove the second independent machine-read declaration**: make
   `governance-operations-helpers.mjs` `allowedModuleClassifications` import
   `expectedVocabulary.moduleClassifications` (per one-owner rule,
@@ -325,9 +360,9 @@ link in the composition grammar.
 - Cover the verified live links: `architecture-and-composition.md` lines 49/57,
   `developer-quickstart.md` lines 198-199, `platform-onboarding.md` lines 7-11, and any
   other `](../../../skill/...)` targets.
-- Decide (see Open questions) whether by-name cross-skill references (e.g. prose "see
-  `execution.md`" / "**agent-governance-guide** owns…") are in scope; if so, validate that the
-  named skill/reference exists.
+- By-name cross-skill references (e.g. prose "see `execution.md`" /
+  "**agent-governance-guide** owns…") are out of scope per Decision 2 — the guard validates
+  relative markdown links only.
 - Keep the existing intra-skill `checkReferenceFileLinks` behavior unchanged; this phase only
   adds the boundary-crossing coverage it deliberately skips.
 - Wire into CI via a `moon` task (reuse `tag-skill.yml` or add a repo-root task); ensure the
@@ -350,22 +385,25 @@ resolves to a real, worked composition — one per adoption mode and/or team sha
 
 **Tasks.**
 
-- Decide the home and schema (see Open questions): a new location such as
-  `skill-workflow/workflow-guide/assets/profiles/` and/or
-  `agent-governance-guide/assets/profiles/`, distinct from `assets/fixtures/` (which
-  `conformance.md` line 30 explicitly says are test inputs, not shipped profiles). The schema
+- Per Decision 3, create the per-plane library homes
+  `skill-workflow/workflow-guide/assets/profiles/` and
+  `agent-governance-guide/assets/profiles/` (prettier-formatted JSON), distinct from
+  `assets/fixtures/` (which `conformance.md` line 30 explicitly says are test inputs, not
+  shipped profiles); an integrated profile pairs by semantic reference from the workflow
+  profile's governance facet. The schema
   must satisfy the profile contract in both `profiles.md` files (identity, version, owner,
   scope, included capabilities, preserved results, topology, evidence/completion, axis
   requirements, actor/independence, enforcement guarantee, failure behavior; governance
   facets `lifecycle/governance/executor/enforcement/data/telemetry/distribution`).
 - Promote a curated set from the existing fixture profiles into real reference profiles.
-  Minimum coverage: at least one worked profile per adoption mode — workflow-only,
-  governance-only, enablement-only, external-enforcement-only, integrated — and/or per team
-  shape — solo, small-team, regulated (reuse `solo-profile`, `governed-profile`,
-  `security-profile`, `supply-chain-profile`, `code-review-profile` as starting points).
+  Coverage per Decision 4: five profiles, one per adoption mode — workflow-only,
+  governance-only, enablement-only, external-enforcement-only, integrated — with the team
+  shapes solo, small-team, and regulated distributed across them (reuse `solo-profile`,
+  `governed-profile`, `security-profile`, `supply-chain-profile`, `code-review-profile` as
+  starting points).
 - Define selection: how `workflow-onboard-advise` recommends one and how `workflow-inspect` /
-  `workflow-conformance` resolve `--profile <reference>` to a library entry. Update those
-  command docs' argument descriptions to point at the library, and add a short
+  `workflow-conformance` / `workflow-governance-inspect` resolve `--profile <reference>` to a
+  library entry. Update those command docs' argument descriptions to point at the library, and add a short
   "Reference profiles" section to `workflow-guide/references/profiles.md` (and the governance
   `profiles.md`) that lists the shipped profiles and how to select or extend one.
 - Add a validator that every shipped reference profile passes the profile contract
@@ -405,7 +443,8 @@ references.
   `architecture review` in `early-lifecycle-contracts.md` line 9 are selectable methods with
   no shipped skill — either annotate them inline as adopter-supplied capabilities (naming the
   contract to satisfy) or ship a reference skill; do not leave them as bare names implying a
-  shipped skill. Decide per capability (see Open questions).
+  shipped skill. Per Decision 5, all three are marked adopter-supplied, each naming the
+  contract to satisfy.
 - Credit and preserve the existing correct marking pattern: `autonomy.md`'s explicit "`A3` is
   the eventual goal, not a description of what exists". Cross-reference the sibling
   runtime-enforcement plan for the `A3` trigger/admission/escalation **build**; keep only the
@@ -442,10 +481,10 @@ promise `workflow-conformance` already makes.
   `conformance-helpers.mjs` (or a new `composition-helpers.mjs`) that takes a full assembled
   selection and returns the first failure code, composing the existing `validateProfile`,
   `validateComposition`, and provider/enforcement validators rather than duplicating them.
-- Add fixtures under `assets/` (a passing integrated composition plus adversarial cases: a
-  dangling method reference, a selected-but-absent capability, an incompatible provider, a
-  missing cross-plane enforcement point) and a `validate-*.mjs` that exercises them with
-  mutation guards.
+- Add fixtures under `assets/fixtures/` (a passing integrated composition plus adversarial
+  cases: a dangling method reference, a selected-but-absent capability, an incompatible
+  provider, a missing cross-plane enforcement point) and a `validate-*.ts` (TypeScript per
+  Decision 1) that exercises them with mutation guards.
 - Wire `workflow-conformance` so its "validate their composition" step delegates to this
   contract; update the command doc if the operation name changes.
 - Wire the new validator into the skill `test` task and `moon.yml` inputs.
@@ -475,9 +514,9 @@ promise `workflow-conformance` already makes.
 - **Fixture-vs-library confusion.** Promoting fixture profiles into a shipped library risks
   re-coupling test data and shipped assets. Mitigation: keep the library in a separate
   directory and keep `assets/fixtures/` as test-only, per `conformance.md` line 30.
-- **Adopter-supplied vs ship decision (Phase 4).** Whether to ship `example-mapping` /
-  `user-research` / `architecture-review` skills or mark them adopter-supplied is a scope call
-  for the maintainer; shipping them expands the catalog beyond this plan's intent.
+- **Adopter-supplied vs ship decision (Phase 4) — DECIDED (Decision 5).** All three —
+  `example-mapping` / `user-research` / `architecture-review` — are marked adopter-supplied;
+  shipping any later is a registry flip plus a normal skill-create pass, outside this plan.
 - **Sibling runtime plan boundary.** `A3` triggers, admission control, and enforcement
   adapters must stay in the runtime plan. Risk of scope bleed when marking placeholders.
   Mitigation: this plan only _marks and validates references_; any build is cross-referenced.
@@ -498,8 +537,9 @@ The composition layer is complete for this plan when:
    every declaring site" claim is true.
 2. Cross-skill / cross-package reference links are CI-validated; a renamed contract target
    fails a `moon` task.
-3. A shipped, adopter-facing reference profile library exists (at least one worked profile per
-   adoption mode and/or team shape), each validated against the profile contract, and the
+3. A shipped, adopter-facing reference profile library exists (five worked profiles — one per
+   adoption mode, with the three team shapes distributed across them, in per-plane
+   `assets/profiles/` homes), each validated against the profile contract, and the
    compose/inspect commands resolve `--profile <reference>` to it.
 4. Every selectable capability is classified `shipped` or `adopter-supplied`; no bare
    placeholder methods remain in the early-lifecycle contract; the `A3` placeholder stays

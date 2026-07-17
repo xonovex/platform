@@ -61,7 +61,9 @@ rows actually exercised are upgraded — the rest stay documentation-verified.
    `PostToolUse`, `PermissionRequest`, model/agent/http rows).
 5. Add a repeatable **refresh probe script** bundled with the adapter under
    `code-harness-guide/` that re-registers the hook and reconfirms the block/allow pair on a clean
-   checkout, per the matrix `Refresh trigger` (line 12).
+   checkout, per the matrix `Refresh trigger` (line 12). Per parent Decision 3 this is a
+   maintainer-run probe, not a CI gate — CI stays hermetic — and the script is structured so a
+   scheduled CI job could adopt it unchanged.
 
 ## Acceptance criteria
 

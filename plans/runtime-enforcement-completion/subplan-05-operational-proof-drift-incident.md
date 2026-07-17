@@ -56,11 +56,14 @@ live kind/e2e estate.
    pause on the live run (building on the operator's Job/AgentRun lifecycle and the Phase 4 escalation
    router) and record the containment as evidence — wiring the `incident-run` contract
    (`packages/command/command-workflow/commands/incident-run.md`); wire `observe-run.md` to the emitted
-   traces/metrics.
+   traces/metrics. Remediation runs are raised by POSTing to the Phase 4 `AgentTrigger` receiver
+   (parent Decision 5) — no second trigger mechanism.
 4. Add an **e2e proof** under `packages/agent/agent-operator-go/test/e2e/` (built with the existing
    `-tags=e2e` harness): induce drift by disabling a required oversight control and induce an incident
    with a policy-breaching run, then show detection + containment with evidence and effective-autonomy
-   demotion.
+   demotion. The estate runs the sidecar decision-service topology (parent Decision 2) — the only
+   topology e2e proves; document the separate-Deployment alternative with a NetworkPolicy example as
+   supported-by-contract, not e2e-proven.
 5. Assert **no sensitive-content regression**: the telemetry seam does not log prompts/secrets by
    default, verified by an automated check over the emitted signals.
 
