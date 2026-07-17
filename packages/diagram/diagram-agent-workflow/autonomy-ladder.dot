@@ -16,15 +16,12 @@ digraph AutonomyLadder {
   a1 -> a2 [label="add headless runner,\nrun journal, async gates"];
   a2 -> a3 [label="add triggers, admission policy,\nHITL escalation, per-run provenance"];
 
-  scope [label="Guidance for adopting teams — not a posture claim\nThis ladder grades an adopter's own environment; adopting these\ncontracts confers no level. A1 is the recommended starting point;\nA0–A2 are reachable with an interactive or sandboxed headless session.\nA3 is the eventual goal — its triggers, admission control, and escalation\nrouting are targets an adopter builds and proves, not shipped components", shape=note, fillcolor="#fff3cd"];
+  scope [label="Guidance for adopting teams — not a posture claim\nAdopting these contracts confers no level\nagent-governance-guide autonomy.md owns the model", shape=note, fillcolor="#fff3cd"];
 
+  invariants [label="Unchanged at every level\nCapabilities, results, exact-revision references, gate definitions\nExecutor selection — raising autonomy never widens a task's permitted class\nHigh-impact gates stay human · no hidden agent launch", shape=note, fillcolor="#f3e6ff"];
 
-  invariants [label="Unchanged at every level\nSame capabilities, same results, same exact-revision references, same gate definitions\nOnly gate policy, runner, and who advances the run change\nHigh-impact gates — plan acceptance, merge, acceptance sign-off — stay human at every level\nNo hidden agent launch; authority only attenuates", shape=note, fillcolor="#fff3cd"];
+  coupling [label="Safety invariant\nNever raise autonomy without matching oversight (do-not-deploy coupling)\nSilence is never approval — an unanswered escalation\nfalls back to pause or abandon", shape=note, fillcolor="#ffe5e5"];
 
-  selection [label="Executor selection does not change with autonomy\nA work shape still selects the least adaptive class that fits,\nand authority or ownership still selects human or external\nRaising autonomy never widens a task's permitted executor class\nExecutor classes are owned by agent-governance-guide execution contract", shape=note, fillcolor="#f3e6ff"];
-
-  coupling [label="Safety invariant at every level\nNever raise autonomy without matching oversight (do-not-deploy coupling)\nAn unanswered escalation falls back to a safe default — pause or abandon —\nafter a bounded window; silence is never approval\nPer-run provenance (model, prompt, tools, permissions) is recorded by the runtime", shape=note, fillcolor="#ffe5e5"];
-
-  {rank=same; scope; invariants; selection; coupling;}
+  {rank=same; scope; invariants; coupling;}
   scope -> a0 [style=invis];
 }
