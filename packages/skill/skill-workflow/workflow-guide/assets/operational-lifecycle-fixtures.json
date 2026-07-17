@@ -1027,6 +1027,16 @@
       "expectedValid": true
     },
     {
+      "id": "incident-rejects-malformed-owner",
+      "contract": "incident",
+      "template": "incident",
+      "input": {
+        "owner": "x"
+      },
+      "expectedValid": false,
+      "expectedCode": "incident-contract-incomplete"
+    },
+    {
       "id": "severity-change-requires-escalation",
       "contract": "incident",
       "template": "incident",
@@ -1098,6 +1108,16 @@
       "contract": "corrective-action",
       "template": "corrective-action",
       "expectedValid": true
+    },
+    {
+      "id": "corrective-action-rejects-malformed-owner",
+      "contract": "corrective-action",
+      "template": "corrective-action",
+      "input": {
+        "owner": "x"
+      },
+      "expectedValid": false,
+      "expectedCode": "corrective-action-contract-incomplete"
     },
     {
       "id": "effective-corrective-action-can-close-with-learning",
@@ -1308,6 +1328,30 @@
       "input": {
         "access": {
           "owner": "team:incident-response"
+        }
+      },
+      "expectedValid": true
+    },
+    {
+      "id": "emergency-access-accepts-service-owner",
+      "contract": "emergency-access",
+      "template": "emergency-exception",
+      "profileTemplate": "governed-profile",
+      "input": {
+        "access": {
+          "owner": "service:release-pipeline"
+        }
+      },
+      "expectedValid": true
+    },
+    {
+      "id": "emergency-access-accepts-role-owner",
+      "contract": "emergency-access",
+      "template": "emergency-exception",
+      "profileTemplate": "governed-profile",
+      "input": {
+        "access": {
+          "owner": "role:incident-commander"
         }
       },
       "expectedValid": true

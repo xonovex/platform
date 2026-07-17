@@ -446,6 +446,7 @@ export const validateIncident = (incident) => {
       "owner",
       "currentState",
     ]) ||
+    !isPartyReference(incident.owner) ||
     !hasValue(incident.scope) ||
     !isNonEmptyArray(incident.timeline) ||
     !isNonEmptyArray(incident.actions) ||
@@ -497,6 +498,7 @@ export const validateCorrectiveAction = (correctiveAction) => {
       "owner",
       "dueState",
     ]) ||
+    !isPartyReference(correctiveAction.owner) ||
     !hasValue(correctiveAction.verification?.nativeReference) ||
     !hasValue(correctiveAction.effectiveness?.status)
   ) {
