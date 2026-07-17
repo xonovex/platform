@@ -114,6 +114,16 @@ const validateCase = (testCase, templates) => {
 // carrying `accountable: true` passes whether or not the site still reads the
 // field. The emergency-access cases cover both a false and an absent value, and
 // both kinds, because the approver contract does not vary by kind.
+//
+// The emergency-access owner is a party reference, not a bare present value, so
+// four cases keep the shape under test: a non-party string (no `<kind>:<id>`
+// structure), an unknown-kind reference (`agent:` — an advisory executor kind
+// the party set excludes, exercised on a plain exception to prove the guard
+// does not vary by kind), a non-string object, and a non-person `team:` owner
+// the set accepts (pinning that the party set is not narrowed to people).
+// Deleting a rejection case would silently reopen an owner the self-grant
+// comparison cannot read; deleting the acceptance case would let the set be
+// narrowed away from the parties the record legitimately ranges over.
 const requiredCaseIds = [
   "author-cannot-accept-own-subject",
   "record-cannot-waive-profile-independence",
@@ -124,7 +134,10 @@ const requiredCaseIds = [
   "exception-approver-cannot-rely-on-own-grant",
   "emergency-access-record-cannot-waive-profile-independence",
   "emergency-access-independence-requirement-undeclared",
-  "emergency-access-independence-unverifiable-without-owner-identity",
+  "emergency-access-rejects-non-party-owner",
+  "emergency-access-rejects-agent-owner",
+  "emergency-access-rejects-object-owner",
+  "emergency-access-accepts-non-person-owner",
   "profile-may-waive-emergency-access-independence",
   "privileged-operation-record-cannot-supply-its-own-profile",
   "unaccountable-human-cannot-record-acceptance",

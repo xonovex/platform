@@ -8,6 +8,24 @@ const hasEveryValue = (value, fields) =>
 
 const isNonEmptyArray = (value) => Array.isArray(value) && value.length > 0;
 
+// A party reference names who holds a duty or an access in the `<kind>:<id>`
+// form the fixtures already use for `owner` and `identity` alike. `kind` is one
+// of a closed set of party kinds that can be accountable for holding an access —
+// a person, a team, a service principal, or a named role — and `id` is any
+// non-empty remainder. The set excludes the advisory executor kinds `agent` and
+// `model`: assistance is never accountable, so an access held by one is
+// malformed rather than merely dependent.
+const partyKinds = ["human", "team", "service", "role"];
+
+const isPartyReference = (value) => {
+  if (typeof value !== "string") return false;
+  const separator = value.indexOf(":");
+  const hasKindAndId = separator > 0 && separator < value.length - 1;
+  const kindDeclared =
+    hasKindAndId && partyKinds.includes(value.slice(0, separator));
+  return kindDeclared;
+};
+
 const timestamp = (value) => Date.parse(value ?? "");
 
 const isValidTimeRange = (start, end) =>
@@ -150,16 +168,21 @@ export const validateAuthorization = ({authorization, request}) => {
 // Bypassing a control is the strongest authority a record can carry, so the
 // approver meets the same actor contract validateAcceptance requires of a
 // decision actor: a human that is accountable. `owner` names the party the
-// access is held by, and the approver may not be that party: approving an
-// exception and relying on it are separate duties. checkIndependence compares
-// the two as identity strings, so only an owner repeating the approver's
-// identity verbatim is caught — an owner naming a team or a second identity the
-// approver holds reads as another party and passes.
+// access is held by as a party reference — a `<kind>:<id>` string whose kind is
+// one of the declared party kinds — and a malformed, unknown-kind, or non-string
+// owner fails closed as emergency-access-contract-incomplete before any
+// comparison. The approver may not be that party: approving an exception and
+// relying on it are separate duties. checkIndependence compares the approver
+// identity and the owner as strings, so a person-owner (`human:` kind) whose id
+// equals the approver's identity is caught as a self-grant. An owner naming a
+// team or role the approver belongs to, or a second identity the same person
+// holds, still reads as another party and passes: membership and identity
+// linkage are not expressible in the record.
 export const validateEmergencyAccess = ({access, request, profile}) => {
   if (
     !["exception", "emergency-exception"].includes(access?.kind) ||
+    !isPartyReference(access?.owner) ||
     !hasEveryValue(access, [
-      "owner",
       "rationale",
       "evidenceReference",
       "start",

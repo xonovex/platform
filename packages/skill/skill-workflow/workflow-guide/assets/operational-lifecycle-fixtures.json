@@ -1259,7 +1259,7 @@
       "expectedCode": "independence-requirement-undeclared"
     },
     {
-      "id": "emergency-access-independence-unverifiable-without-owner-identity",
+      "id": "emergency-access-rejects-object-owner",
       "contract": "emergency-access",
       "template": "emergency-exception",
       "profileTemplate": "governed-profile",
@@ -1271,7 +1271,46 @@
         }
       },
       "expectedValid": false,
-      "expectedCode": "independence-unverifiable"
+      "expectedCode": "emergency-access-contract-incomplete"
+    },
+    {
+      "id": "emergency-access-rejects-non-party-owner",
+      "contract": "emergency-access",
+      "template": "emergency-exception",
+      "profileTemplate": "governed-profile",
+      "input": {
+        "access": {
+          "owner": "x"
+        }
+      },
+      "expectedValid": false,
+      "expectedCode": "emergency-access-contract-incomplete"
+    },
+    {
+      "id": "emergency-access-rejects-agent-owner",
+      "contract": "emergency-access",
+      "template": "emergency-exception",
+      "profileTemplate": "governed-profile",
+      "input": {
+        "access": {
+          "kind": "exception",
+          "owner": "agent:autonomous-bot"
+        }
+      },
+      "expectedValid": false,
+      "expectedCode": "emergency-access-contract-incomplete"
+    },
+    {
+      "id": "emergency-access-accepts-non-person-owner",
+      "contract": "emergency-access",
+      "template": "emergency-exception",
+      "profileTemplate": "governed-profile",
+      "input": {
+        "access": {
+          "owner": "team:incident-response"
+        }
+      },
+      "expectedValid": true
     },
     {
       "id": "profile-may-waive-emergency-access-independence",
