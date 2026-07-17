@@ -7,6 +7,8 @@ tasks:
       - graph-build-workflow
       - graph-build-target
       - graph-build-maturity
+      - graph-build-autonomy
+      - graph-build-developer
   graph-build-workflow:
     command: dot -Tpng -o workflow-diagram.png workflow-diagram.dot
     inputs:
@@ -29,5 +31,21 @@ tasks:
       - maturity-ladder.dot
     outputs:
       - maturity-ladder.png
+    options:
+      cache: true
+  graph-build-autonomy:
+    command: dot -Tpng -o autonomy-ladder.png autonomy-ladder.dot
+    inputs:
+      - autonomy-ladder.dot
+    outputs:
+      - autonomy-ladder.png
+    options:
+      cache: true
+  graph-build-developer:
+    command: dot -Tpng -o developer-workflow.png developer-workflow.dot
+    inputs:
+      - developer-workflow.dot
+    outputs:
+      - developer-workflow.png
     options:
       cache: true
