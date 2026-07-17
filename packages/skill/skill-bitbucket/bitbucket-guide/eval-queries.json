@@ -70,5 +70,29 @@
     "should_trigger": false,
     "split": "validation",
     "rationale": "near miss: general git design"
+  },
+  {
+    "query": "our self-hosted Bitbucket Data Center REST call returns 401, is this a Bearer vs Basic token problem?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "Data Center REST auth failure, Bearer vs Basic and DC < 9.4 rule"
+  },
+  {
+    "query": "post an inline review comment anchored to a specific added line on a self-hosted Bitbucket pull request over /rest/api/1.0",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "Data Center inline anchored comment via REST 1.0"
+  },
+  {
+    "query": "turn a PR comment into a BLOCKER task on our Bitbucket Data Center repo so it has to be resolved before merge",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "Data Center BLOCKER task and merge-gate caveat"
+  },
+  {
+    "query": "set up SSH so I can clone from our self-hosted Bitbucket on port 7999 and mint a separate token for the REST API",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "Data Center first-time SSH clone plus HTTP access token"
   }
 ]

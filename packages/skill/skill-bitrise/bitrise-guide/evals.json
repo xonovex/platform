@@ -28,6 +28,24 @@
         "Preserves separate build, Step, artifact digest/access/retention, source-host status, and deployment references",
         "Tests fresh-context resolution and treats expired/unresolvable artifacts as invalid or limited evidence rather than silently copying them"
       ]
+    },
+    {
+      "id": 4,
+      "prompt": "A pull request's Bitrise emulator check is red. Pull the failing build's log, tell me whether it's a real test failure or infra flakiness, then re-run it if it's flaky.",
+      "assertions": [
+        "Maps the commit to its build via the git host's build-status endpoint (no Bitrise token) and reads the log with the Bitrise API, fetching a finished build's `expiring_raw_log_url` with no Authorization header",
+        "Distinguishes emulator/infra flakiness (`device offline`, `AdbCommandRejectedException`, `Expected N tests, received 1` with the shard reporting `0 failed`) from a real failure (`(N failed)` > 0 or an assertion/stack trace) and re-triggers only flakiness",
+        "Re-triggers with `POST /v0.1/apps/{app}/builds` using the real `original_build_params.workflow_id` (not the build-status `key` label) and treats a HTTP-200 `status:error` \"did not match any workflows\" response as a no-op, not success"
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "How do I authenticate to the Bitrise API, and where should I keep the token?",
+      "assertions": [
+        "States the personal access token is account-wide (not repo-scoped; the same token reads logs and starts builds) and is sent as a raw `Authorization: <token>` header with no `Bearer`/`token` prefix, verified by `GET /v0.1/me` returning 200",
+        "Stores it outside any repository — OS keychain first, not `~/.netrc` — and never inlines, echoes, or commits the literal value",
+        "Uses a least-privilege automation account, the shortest practical expiry, and a distinct token per integration, revoking and reissuing first on any suspected leak"
+      ]
     }
   ]
 }

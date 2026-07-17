@@ -15,6 +15,8 @@ Operate Azure DevOps as an optional provider for work items, source and pull req
 - **Prefer reusable enforcement** — use version-pinned templates, build-validation policies, approvals/checks on protected resources, scoped permissions, and independently resolvable evidence.
 - **Federate cloud access** — prefer workload identity federation or another temporary credential path; never create long-lived cloud secrets by default.
 - **Transact every setup** — discover, preview exact native changes and authority, authorize, apply idempotently, re-read to verify, retain rollback, and detect drift.
+- **Drive the Services CLI directly** — install and connect `az` plus the `azure-devops` extension, then `az repos pr create` / `update` / link / review from the shell, deriving `--org` and `--project` from the git remote (`v3/<org>/<project>/<repo>`), not the configured default.
+- **Handle CLI credentials safely** — prefer a short-lived `az login` or workload-identity federation; use a PAT only when a flow cannot, scope it (Code and Work Items read/write, single org, shortest expiry), keep it in the OS keychain or a secret manager, read it into `AZURE_DEVOPS_EXT_PAT` at call time, and never inline, `echo`, or commit it.
 
 ## Workflow
 
@@ -55,3 +57,9 @@ Rollback: restore captured policy revision and verify the deny probe still holds
 - Read [references/rest-and-service-hooks.md](references/rest-and-service-hooks.md) - Load when calling REST APIs, selecting versions, handling pagination/retries, or configuring service-hook delivery
 - Read [references/onboarding.md](references/onboarding.md) - Load when setting up, diagnosing, dry-running, verifying, rolling back, uninstalling, or checking drift
 - Read [references/provider-conformance.md](references/provider-conformance.md) - Load when testing edition/version claims, native references, outage behavior, retries, unsupported features, or fresh-context recovery
+- Read [references/first-time-setup.md](references/first-time-setup.md) - Load when installing `az`, signing in (`az login`, device code, managed identity, tenant), adding the `azure-devops` extension, setting org/project defaults, or verifying CLI access from a fresh machine
+- Read [references/auth.md](references/auth.md) - Load when choosing between `az login` and a PAT, scoping/storing/rotating a PAT, sending it via `AZURE_DEVOPS_EXT_PAT` or Basic auth for raw REST, or verifying a credential before a call
+- Read [references/create-pr.md](references/create-pr.md) - Load when opening a PR with `az repos pr create` (push first, derive coordinates from the remote, capture the id/URL, confirm merge status)
+- Read [references/update-pr.md](references/update-pr.md) - Load when changing a PR's title, description, or draft state, or refreshing it after new commits
+- Read [references/linking.md](references/linking.md) - Load when cross-linking PRs with `!<PRID>` or linking work items with `#<WorkItemId>` and `--work-items`
+- Read [references/reviewers-autocomplete.md](references/reviewers-autocomplete.md) - Load when adding reviewers or setting auto-complete and draft on a PR

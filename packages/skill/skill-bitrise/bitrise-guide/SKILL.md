@@ -15,6 +15,10 @@ Operate Bitrise as an optional mobile CI, artifact, deployment-status, and nativ
 - **Protect secrets and artifacts** — disclose pull-request exposure, runner trust, variable scope, artifact access/retention, network/data flow, and build-status publication.
 - **Federate AWS access** — constrain Bitrise OIDC claims to the intended workspace/app/repository/workflow/environment.
 - **Transact setup** — discover, preview exact native changes, authorize, apply idempotently, re-read and probe, roll back, and detect drift.
+- **Install nothing** — the Bitrise API is REST/token-only: no CLI, no `auth login`, no credential helper. Mint a personal access token, keychain it, and send it with `curl`; the `bitrise` CLI is a local `bitrise.yml` workflow runner, not an API client.
+- **Authenticate with an account-wide token** — the Bitrise API personal access token is account-wide (not repo-scoped; the same token reads logs and starts builds), sent as a raw `Authorization: <token>` header with no `Bearer`/`token` prefix and verified by `GET /v0.1/me` returning 200; store it outside the repo (OS keychain), never `~/.netrc`.
+- **Find and read a build from a commit** — map a commit to its build via the git host's build-status API, split the app and build slugs out of the `app.bitrise.io` URL, and read the log (finished build: fetch `expiring_raw_log_url` with no auth header; running build: paginated `log_chunks`).
+- **Triage, then re-trigger** — distinguish emulator/infra flakiness (`device offline`, `AdbCommandRejectedException`, `Expected N tests, received 1`) from a real failure (`(N failed)` > 0 or an assertion trace), and re-run with `POST /v0.1/apps/{app}/builds` using the real `original_build_params.workflow_id`.
 
 ## Workflow
 
@@ -32,6 +36,8 @@ Operate Bitrise as an optional mobile CI, artifact, deployment-status, and nativ
 - A Verified Step still needs exact version selection, source review, permissions/data-flow inspection, and compatibility testing.
 - OIDC is safe only when issuer, audience, subject/repository/app/workspace, and deployment context are constrained in AWS.
 - Artifact availability is not permanent evidence: record retention/access policy and an immutable content digest where the build provides one.
+- A build-status `key` label is a display name, not a triggerable `workflow_id`; re-triggering an unknown name returns HTTP 200 with `status:error` and starts no build. Confirm the real id from a prior build first.
+- A project's concrete app slug, git-host, and workflow-name mappings belong in that project's own instructions (e.g. AGENTS.md), not in this skill.
 
 ## Example
 
@@ -52,3 +58,6 @@ Rollback: restore captured configuration and remove only owned AWS trust/grants
 - Read [references/aws-oidc.md](references/aws-oidc.md) - Load when onboarding Bitrise-to-AWS temporary credentials, authoring trust claims, verifying expiry, or removing access
 - Read [references/onboarding.md](references/onboarding.md) - Load when setting up, diagnosing, dry-running, verifying, rolling back, uninstalling, or checking drift
 - Read [references/provider-conformance.md](references/provider-conformance.md) - Load when testing plan/runner/Step claims, secret exposure, artifacts/statuses, OIDC, outages, or fresh-context recovery
+- Read [references/first-time-setup.md](references/first-time-setup.md) - Load when starting from zero on a new machine or account: learning there is no CLI to install, creating a personal access token, storing it, and verifying with `GET /v0.1/me` before resolving an app slug
+- Read [references/auth.md](references/auth.md) - Load when authenticating to the Bitrise API, storing/rotating the account-wide personal access token, fixing a 401, or discovering an app slug
+- Read [references/builds.md](references/builds.md) - Load when mapping a commit to its build, reading or downloading a build log, triaging emulator flakiness vs a real failure, inspecting a build's real workflow id, or re-triggering a build or PR check

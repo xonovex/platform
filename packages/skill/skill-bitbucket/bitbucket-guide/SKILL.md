@@ -15,6 +15,9 @@ Operate Bitbucket as an optional source, pull-request, CI/deployment, and native
 - **Use native gates** — combine branch permissions, merge checks or server-side policy, exact-revision build status, protected deployments, and least-privilege identities according to the detected product.
 - **Federate where supported** — constrain Cloud OIDC subject claims (workspace, repository, environment, branch/tag) for temporary AWS access; a wildcard subject is not least privilege.
 - **Transact configuration** — discover, preview native mutations and authority, authorize, apply idempotently, re-read and probe, roll back, and monitor drift.
+- **Split git and REST auth on Data Center** — git over SSH (host alias, port 7999); REST needs an independent least-privilege HTTP access token (Pull requests: write / `REPO_WRITE`) in the keychain, sent as `Authorization: Bearer` or a `0600 ~/.netrc`, one auth proving nothing about the other.
+- **Drive Data Center over `/rest/api/1.0` with curl** — no usable first-party CLI, third-party Bitbucket tools are Cloud-only, confirm a read returns 200 before any write, serialize every JSON payload.
+- **Mutate PR comments and tasks in place** — anchor inline comments to an exact diff line and confirm `anchor.orphaned` is false, then edit / flip to a merge-gating BLOCKER task / resolve (`state: RESOLVED`) / thread (`parent.id`) via PUT/POST carrying the comment's current version, preserving the comment id so deep-links survive.
 
 ## Workflow
 
@@ -32,6 +35,9 @@ Operate Bitbucket as an optional source, pull-request, CI/deployment, and native
 - Webhooks can retry, duplicate, and arrive out of order. Reconcile by delivery/event/native object identity and re-read authoritative state.
 - A passing status with the wrong key/name, app/provider, repository, or commit is not equivalent evidence.
 - OIDC removes stored cloud keys only when the AWS trust policy constrains the actual Bitbucket claims; wildcard subjects are not least privilege.
+- A Data Center inline anchor with the wrong `line` / `lineType` / `fileType` comes back `anchor.orphaned: true` and does not attach; a comment `PUT` needs the comment's current `version` or it `409`s; a group/world-readable `~/.netrc` is ignored by curl — `chmod 600`.
+- A `severity: BLOCKER` comment becomes a task but only gates the merge button if a repo admin enabled the "all tasks resolved" check, which is invisible over the API — describe it as a task, not a guaranteed gate.
+- Hand-escaped JSON breaks on the first backtick or quote in a comment body — serialize every payload with `python3 -c 'import json,...'`.
 
 ## Example
 
@@ -52,3 +58,6 @@ Rollback: restore captured branch/deployment configuration and remove only owned
 - Read [references/data-center.md](references/data-center.md) - Load when operating a Data Center deployment, versioned REST, repositories/pull requests, permissions, statuses, webhooks, or installed apps
 - Read [references/onboarding.md](references/onboarding.md) - Load when setting up, diagnosing, dry-running, verifying, rolling back, uninstalling, or checking drift
 - Read [references/provider-conformance.md](references/provider-conformance.md) - Load when testing edition/version claims, tier restrictions, native references, retries/outages, unsupported features, or fresh-context recovery
+- Read [references/auth.md](references/auth.md) - Load when a Data Center REST call fails auth, creating/scoping an HTTP access token, choosing `Authorization: Bearer` vs Basic `~/.netrc`, the DC < 9.4 repo-token Basic-401 rule, keychain-first storage, wiring CI/CD stored-secret vs OIDC, or rotating a leaked token
+- Read [references/first-time-setup.md](references/first-time-setup.md) - Load when setting up a new machine or account: generating an ed25519 SSH key, registering the public key, a `~/.ssh/config` host alias (port 7999), cloning over SSH, or minting a separate HTTP access token for REST
+- Read [references/pr-comments.md](references/pr-comments.md) - Load when posting top-level or inline anchored comments, editing a comment (PUT with version), converting a comment to a merge-gating BLOCKER task, resolving a task (state RESOLVED), threaded replies (parent.id), or deep-linking between comments over `/rest/api/1.0`

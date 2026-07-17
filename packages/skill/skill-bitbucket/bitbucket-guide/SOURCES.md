@@ -40,6 +40,14 @@
 - **Used for:** `references/editions-and-capabilities.md`, `references/data-center.md`, `references/provider-conformance.md`
 - **Aspects extracted:** Data Center 10.3 documentation and REST v1003 resources for projects, repositories, pull requests, permissions, build/deployment status, hooks, administration, and installed-app boundaries.
 
+## Bitbucket Data Center REST 1.0 (pull-request comments and auth)
+
+- **URL:** https://developer.atlassian.com/server/bitbucket/rest/
+- **Additional URLs:** https://confluence.atlassian.com/bitbucketserver/commenting-on-a-pull-request-1027119882.html
+- **Last reviewed:** 2026-07-17
+- **Used for:** `references/auth.md`, `references/first-time-setup.md`, `references/pr-comments.md`
+- **Aspects extracted:** `/rest/api/1.0` pull-request comment endpoints, the inline `anchor` shape (`diffType` / `path` / `line` / `lineType` / `fileType`) and `anchor.orphaned`, comment `version` on edit (`409` on stale), `severity` `NORMAL` vs `BLOCKER` tasks, `blocker-comments`, the "all tasks resolved" merge check, resolving via `state` `RESOLVED`, threaded replies via `parent.id` (Data Center uses `text` + `parent.id`, not Cloud's `content.raw`), `overview?commentId=` deep-links, HTTP-access-token auth (Bearer vs Basic `~/.netrc`, the DC < 9.4 repo-token Basic-401 rule, unlike Bitbucket Cloud's `email:token` Basic on `api.bitbucket.org`), and the SSH-git-vs-HTTP-REST auth split for first-time setup (SSH port 7999).
+
 ## Refresh Workflow
 
 1. Re-check Cloud plan/runner/check/Pipelines behavior and the supported Data Center release/API/app matrix independently.

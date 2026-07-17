@@ -8,7 +8,7 @@ Reconcile concurrent duplicate events by app, commit, trigger, and intended exec
 
 ## API and webhooks
 
-Use the documented API surface with scoped tokens, pagination, bounded rate-limit retries, cancellation, and native request/build identifiers. Keep tokens out of arguments, logs, URLs, fixtures, and error output.
+Use the documented API surface with pagination, bounded rate-limit retries, cancellation, and native request/build identifiers. The Bitrise API personal access token is account-wide, not scoped to one app or repository; the real mitigation is a least-privilege automation account, the shortest practical expiry, and a distinct token per integration (see auth.md). Keep tokens out of arguments, logs, URLs, fixtures, and error output.
 
 Treat incoming/outgoing webhooks as untrusted notifications. Authenticate receivers where supported, reject replay, minimize retained payloads, and resolve authoritative app/build/artifact state from native references.
 

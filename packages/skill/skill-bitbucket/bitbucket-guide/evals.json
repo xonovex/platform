@@ -28,6 +28,24 @@
         "Previews and constrains issuer, audience, workspace, repository, environment and supported branch/tag/subject claims plus least-privilege role permissions",
         "Verifies credential expiry, intended allow, cross-repository/environment denial, native pipeline/CloudTrail evidence, rollback, and drift"
       ]
+    },
+    {
+      "id": 4,
+      "prompt": "On our self-hosted Bitbucket Data Center repo, post an inline review comment anchored to an added line of a pull request over the REST API, then make it a blocker task. There is no CLI.",
+      "assertions": [
+        "Drives /rest/api/1.0 with curl (no first-party CLI, third-party Bitbucket tools are Cloud-only), confirms a read returns 200 before writing, and serializes the JSON body rather than hand-escaping it",
+        "Anchors with diffType/path/line plus lineType ADDED and fileType TO, and checks anchor.orphaned is false before trusting the placement",
+        "Flips severity to BLOCKER via an in-place PUT carrying the comment's current version (409 on a stale version), preserves the comment id, and states a BLOCKER only gates merge if an admin enabled the all-tasks-resolved check"
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "First-time setup for a new laptop against our self-hosted Bitbucket Data Center: I need to clone over SSH and also call the REST API.",
+      "assertions": [
+        "Generates an ed25519 SSH key, registers only the public key, and adds a ~/.ssh/config host alias with port 7999, IdentityFile, and IdentitiesOnly yes for git",
+        "Mints a separate least-privilege HTTP access token for REST and keeps it out of plaintext, treating SSH-for-git and HTTP-token-for-REST as independent auths",
+        "Notes a project/repo-scoped token is Bearer-only on DC < 9.4 (Basic 401s) while a personal token also works with Basic, and does not assume this Data Center setup carries over to Bitbucket Cloud"
+      ]
     }
   ]
 }

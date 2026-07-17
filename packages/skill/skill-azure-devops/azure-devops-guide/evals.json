@@ -28,6 +28,24 @@
         "Previews issuer/audience/subject, project/pipeline authorization, Azure role scope, credential/network/data changes, and rollback without exposing credential values",
         "Verifies temporary credential expiry, an allowed action, an out-of-scope denial, authoritative service-connection/RBAC state, drift, and owned-resource-only rollback"
       ]
+    },
+    {
+      "id": 4,
+      "prompt": "Open a pull request on Azure DevOps Services from the shell for branch feat/x against main, and give me the URL and a mergeability check.",
+      "assertions": [
+        "Pushes the branch first and derives --org/--project/--repository from the git remote (v3/<org>/<project>/<repo>), not the configured CLI default",
+        "Runs az repos pr create, captures pullRequestId with --query pullRequestId -o tsv, and builds the .../_git/<repo>/pullrequest/<id> URL",
+        "Confirms mergeStatus is succeeded via az repos pr show and notes --draft true for work in progress"
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "I have to use a personal access token for an Azure DevOps CLI flow that cannot use az login. How do I scope, store, and hand it to the tooling safely?",
+      "assertions": [
+        "Scopes the PAT to only Code (Read & Write) and Work Items (Read & Write), a single org, and the shortest expiry, created/rotated at _usersSettings/tokens",
+        "Stores it in the OS keychain or a secret manager and reads it into AZURE_DEVOPS_EXT_PAT at call time (Basic :PAT for raw REST), never inlining, echoing, or committing the value",
+        "Verifies the credential with a cheap pre-call HTTP probe and treats a 203/HTML sign-in redirect as an unauthenticated token rather than success"
+      ]
     }
   ]
 }

@@ -70,5 +70,35 @@
     "should_trigger": false,
     "split": "validation",
     "rationale": "near miss: mobile build tooling"
+  },
+  {
+    "query": "pull the failing Bitrise build log and tell me which test actually failed",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "read a failing build log via the Bitrise API"
+  },
+  {
+    "query": "is this a flaky emulator (device offline) or a real test failure?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "triage infra flakiness vs a real failure from the log"
+  },
+  {
+    "query": "re-trigger the emulator workflow on my branch after a flaky build",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "re-trigger a build via POST /v0.1/apps/{app}/builds"
+  },
+  {
+    "query": "which Bitrise build corresponds to commit <commit-sha> and did it pass?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "map a commit to its Bitrise build via the git host build-status"
+  },
+  {
+    "query": "how do I authenticate to api.bitrise.io and where should I store the token?",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "Bitrise API account-wide personal access token auth and storage"
   }
 ]

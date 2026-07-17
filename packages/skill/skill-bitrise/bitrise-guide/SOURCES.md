@@ -43,6 +43,20 @@
 - **Used for:** `references/workflows-pipelines-and-steps.md`
 - **Aspects extracted:** Verified Step distribution expectations; verification remains distinct from version pinning, permissions, and runtime trust.
 
+## Bitrise API (v0.1)
+
+- **URL:** https://api-docs.bitrise.io/ (Bitrise REST API reference)
+- **Last reviewed:** 2026-07-17
+- **Used for:** `references/auth.md`, `references/builds.md`, `references/first-time-setup.md`
+- **Aspects extracted:** the `/v0.1/me`, `/v0.1/apps`, `/v0.1/apps/{app}/builds`, `/v0.1/apps/{app}/builds/{build}`, and `/v0.1/apps/{app}/builds/{build}/log` endpoints; the raw `Authorization: <token>` account-wide personal-access-token header; the `log` response shape (`is_archived`, `log_chunks`, `expiring_raw_log_url`); and the `POST /builds` `hook_info` + `build_params` trigger payload with its HTTP-200 `status:error` no-op on an unknown `workflow_id`.
+
+## Bitrise CLI
+
+- **URL:** https://github.com/bitrise-io/bitrise
+- **Last reviewed:** 2026-07-17
+- **Used for:** `references/first-time-setup.md`
+- **Aspects extracted:** the `bitrise` CLI is the local/build-machine `bitrise.yml` workflow runner (`bitrise run`, `bitrise validate`) and exposes no REST API commands — no personal-access-token auth, app listing, build reads, or log fetching — confirming the API path is curl/token-only.
+
 ## Refresh Workflow
 
 1. Re-check workspace plan, stack/runner, Workflow/Pipeline/Step, trigger, secret, artifact, status, API/webhook, and OIDC behavior.
