@@ -48,7 +48,7 @@ This presentation is not the ontology. Another profile may split composites, run
 ## Valid profile examples
 
 - A workflow-only local profile explicitly selects a non-file database provider, keeps Discovery and Planning results independent, and has no harness-hook dependency.
-- A governed profile requires exact-revision QA and signed evidence, selects two independent enforcement layers that guarantee those requirements, and keeps policy decisions separate from their enforcement records.
+- A governed profile requires exact-revision QA and signed evidence, selects two independent enforcement points that guarantee those requirements, and keeps policy decisions separate from their enforcement records.
 
 ## Rejection examples
 

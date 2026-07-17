@@ -1,6 +1,6 @@
 # Harness Module Patterns
 
-## Adoption ladder
+## Module authority ladder
 
 Choose the lowest-authority composition that meets the requirement:
 

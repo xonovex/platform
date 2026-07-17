@@ -11,12 +11,12 @@ Use the walking skeleton to prove that governance, workflow results, harness ada
 
 - idempotent apply (re-application converges to the same reference);
 - a permitted operation allowed and a protected operation denied with a reason naming the policy and remediation (`guard.sh`, exit 0/2 semantics);
-- an independent CI-shaped second layer that still denies with the hook disabled;
+- an independent CI-shaped second enforcement point that still denies with the hook disabled;
 - weakening drift detected against the applied reference and remediated;
 - a tampered module refused by checksum, an unsupported hook intent rejected, mandatory fail-closed and advisory observe under policy outage, concurrent duplicate evidence deduplicated, a recursive agent launch refused at the depth limit, and an expired exception denying while citing its exception id;
 - rollback that removes the applied configuration and leaves drift clean.
 
-The second layer is a locally re-invoked gate shaped like a required CI check; hosted-platform enforcement remains fixture-recorded (below). `guard.sh` is the deterministic policy decision point: JSON event on stdin, one JSON decision on stdout, exit 0 allow / 2 deny.
+That second enforcement point is a locally re-invoked gate shaped like a required CI check; hosted-platform enforcement remains fixture-recorded (below). `guard.sh` is the deterministic policy decision point: JSON event on stdin, one JSON decision on stdout, exit 0 allow / 2 deny.
 
 ## Selected coordinates
 

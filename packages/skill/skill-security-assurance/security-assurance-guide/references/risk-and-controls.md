@@ -23,7 +23,7 @@ Choose controls to meet explicit outcomes. For each control record:
 - evidence origin, exact subject/revision, evaluator version, freshness, limitations, and native references;
 - dependencies, conflicts, exceptions, residual risk, verification, drift, update, rollback, and retirement.
 
-Prefer defense in depth across independent layers. Do not count duplicated tools that share the same blind spot as independent controls.
+Prefer defense in depth across independent controls. Do not count duplicated tools that share the same blind spot as independent controls.
 
 ## Map sources carefully
 

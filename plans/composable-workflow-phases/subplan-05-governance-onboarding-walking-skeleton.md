@@ -174,7 +174,7 @@ Two evidence classes back this subplan; neither is presented as the other.
 - [x] Onboarding discovers and explains the actual environment (executed: local harness version and configuration layers).
 - [x] User sees and authorizes all native changes and permissions (executed: preview stops without explicit consent).
 - [x] Deterministic enforcement and bounded semantic advice coexist (deterministic leg executed; bounded-evaluator leg fixture-recorded).
-- [x] Mandatory control has an independent external enforcement layer (executed locally as a re-invoked CI-shaped gate; hosted enforcement fixture-recorded).
+- [x] Mandatory control has an independent external enforcement point (executed locally as a re-invoked CI-shaped gate; hosted enforcement fixture-recorded).
 - [x] Evidence is provider-native and recoverable by opaque reference (fixture-recorded; local run demonstrates deduplicated evidence records only).
 - [x] Drift, exception, disablement, and rollback work (executed).
 - [x] Unsupported or unsafe compositions fail clearly (executed: tampered module, unsupported intent, outage fail-closed; remainder fixture-recorded).

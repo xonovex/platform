@@ -12,7 +12,7 @@ So a behavior that must happen **every time, automatically** is a requirement pr
 
 ## Lowest surface that meets the requirement
 
-**agent-governance-guide** owns the adoption ladder and the rule to choose the lowest-authority composition. That rule is least privilege and it holds. It is also only half a decision: the chosen rung must still **meet the requirement**. Reading down to the cheapest rung — rather than the cheapest rung that qualifies — is how "always do X" lands in AGENTS.md.
+**agent-governance-guide** owns the module authority ladder and the rule to choose the lowest-authority composition. That rule is least privilege and it holds. It is also only half a decision: the chosen rung must still **meet the requirement**. Reading down to the cheapest rung — rather than the cheapest rung that qualifies — is how "always do X" lands in AGENTS.md.
 
 Knowledge-only is the correct default and covers most rules. It stops being correct the moment the requirement says _automatically_.
 

@@ -80,7 +80,7 @@ Implement modular enforcement and onboarding outside agent harnesses. Extend Git
 8. Define privileged-operation controls for Integration, Release, secrets, data deletion, infrastructure, and Retirement at external enforcement points.
 9. Create onboarding modules that discover existing CI/rules/policies, propose reusable components, preview changes, apply natively, verify, and roll back.
 10. Provide governance-only adoption recipes where GitHub/GitLab CI and repository controls enforce selected policies without installing agent-harness or lifecycle modules.
-11. Add fixtures for GitHub and GitLab plus one Kubernetes admission scenario; test bypass attempts and independent enforcement layers.
+11. Add fixtures for GitHub and GitLab plus one Kubernetes admission scenario; test bypass attempts and independent enforcement points.
 
 ## Traceability
 
@@ -96,7 +96,7 @@ Implement modular enforcement and onboarding outside agent harnesses. Extend Git
 | 8 | Define privileged-operation controls for Integration, Release, secrets, data deletion, infrastructure, and Retirement at external enforcement points. | D-006, D-007, D-012, D-013, D-018, D-028, D-030, D-034, D-022 | C-002, C-005, C-006, C-010, C-011, C-015, C-032, C-035, C-037, C-038, C-014, C-040 | S-GITHUB-REUSABLE, S-GITHUB-COMPOSITE, S-GITHUB-RULESETS, S-GITHUB-ENV, S-GITHUB-SECURE, S-GITLAB-COMPONENTS, S-GITLAB-PIPELINE-POLICY, S-GITLAB-COMPLIANCE, S-NIST-80053, S-ISO-12207, S-ISO-15288 |
 | 9 | Create onboarding modules that discover existing CI/rules/policies, propose reusable components, preview changes, apply natively, verify, and roll back. | D-006, D-007, D-012, D-013, D-018, D-028, D-030, D-034 | C-002, C-005, C-006, C-010, C-011, C-015, C-032, C-035, C-037, C-038 | S-GITHUB-REUSABLE, S-GITHUB-COMPOSITE, S-GITHUB-RULESETS, S-GITHUB-ENV, S-GITHUB-SECURE, S-GITLAB-COMPONENTS, S-GITLAB-PIPELINE-POLICY, S-GITLAB-COMPLIANCE, S-NIST-80053 |
 | 10 | Provide governance-only adoption recipes where GitHub/GitLab CI and repository controls enforce selected policies without installing agent-harness or lifecycle modules. | D-006, D-007, D-012, D-013, D-018, D-028, D-030, D-034, D-004, D-005, D-017 | C-002, C-005, C-006, C-010, C-011, C-015, C-032, C-035, C-037, C-038 | S-GITHUB-REUSABLE, S-GITHUB-COMPOSITE, S-GITHUB-RULESETS, S-GITHUB-ENV, S-GITHUB-SECURE, S-GITLAB-COMPONENTS, S-GITLAB-PIPELINE-POLICY, S-GITLAB-COMPLIANCE, S-NIST-80053, S-HARNESS-CLAUDE, S-HARNESS-CODEX, S-HARNESS-KIRO, S-HARNESS-COPILOT, S-HARNESS-OPENCODE, S-HARNESS-PI |
-| 11 | Add fixtures for GitHub and GitLab plus one Kubernetes admission scenario; test bypass attempts and independent enforcement layers. | D-006, D-007, D-012, D-013, D-018, D-028, D-030, D-034 | C-002, C-005, C-006, C-010, C-011, C-015, C-032, C-035, C-037, C-038 | S-GITHUB-REUSABLE, S-GITHUB-COMPOSITE, S-GITHUB-RULESETS, S-GITHUB-ENV, S-GITHUB-SECURE, S-GITLAB-COMPONENTS, S-GITLAB-PIPELINE-POLICY, S-GITLAB-COMPLIANCE, S-NIST-80053 |
+| 11 | Add fixtures for GitHub and GitLab plus one Kubernetes admission scenario; test bypass attempts and independent enforcement points. | D-006, D-007, D-012, D-013, D-018, D-028, D-030, D-034 | C-002, C-005, C-006, C-010, C-011, C-015, C-032, C-035, C-037, C-038 | S-GITHUB-REUSABLE, S-GITHUB-COMPOSITE, S-GITHUB-RULESETS, S-GITHUB-ENV, S-GITHUB-SECURE, S-GITLAB-COMPONENTS, S-GITLAB-PIPELINE-POLICY, S-GITLAB-COMPLIANCE, S-NIST-80053 |
 
 Mapping IDs resolve through the parent plan’s `traceability/` artifacts. These mappings do not imply equivalence, certification or legal compliance.
 

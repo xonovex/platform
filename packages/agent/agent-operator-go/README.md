@@ -246,7 +246,7 @@ spec:
 | Container hardening | Rejects explicit privilege escalation and root weakening | Inspect the generated Pod security context and cluster admission policy |
 | Network restriction | Rejects `networkPolicy.disabled: true` when required | Verify generated NetworkPolicy behavior with the installed network plugin |
 | Duration bound | Requires an explicit/policy-defaulted timeout at or below `maxTimeout` | Observe Job timeout and terminal status |
-| Resource bound | Requires a limit for each `maxResources` entry; rejects requests/limits above it | Keep namespace LimitRange and ResourceQuota as an independent layer |
+| Resource bound | Requires a limit for each `maxResources` entry; rejects requests/limits above it | Keep namespace LimitRange and ResourceQuota as an independent control |
 | Image restriction | Requires an explicit/policy-defaulted image matching `allowedImages` | Add digest/signature/provenance admission when prefix allowlisting is insufficient |
 | Toolchain pinning | AgentToolchain/inline Nix validation requires revision, source, and image digest | Verify registry digest and the built closure provenance |
 

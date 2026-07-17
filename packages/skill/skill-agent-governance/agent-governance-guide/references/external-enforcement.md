@@ -4,7 +4,7 @@
 
 [Adapter declaration](#adapter-declaration) · [Enforcement-point mapping](#enforcement-point-mapping) · [Native precedence and bypass](#native-precedence-and-bypass) · [Reusable CI and supply-chain rules](#reusable-ci-and-supply-chain-rules) · [Policy decision services](#policy-decision-services) · [Privileged operations](#privileged-operations) · [AgentPolicy mapping](#xonovex-agentpolicy-and-admission-mapping) · [Local hooks](#local-hooks)
 
-External enforcement applies a semantic policy decision through a native control outside the agent harness. It is an independent defense layer, not a portable configuration format and not proof that another enforcement point ran.
+External enforcement applies a semantic policy decision through a native control outside the agent harness. It is an independent enforcement type, not a portable configuration format and not proof that another enforcement point ran.
 
 ## Adapter declaration
 
@@ -22,7 +22,7 @@ fail-closed, fail-visible, or advisory behavior for timeout, outage, cancellatio
 idempotency, concurrency, naming-conflict, duplicate, and reentrancy behavior
 enforcement and evidence references, freshness, retention, redaction, and access
 preview, authorization, apply, verify, rollback, drift, upgrade, and removal capabilities
-limitations and controls that require another independent layer
+limitations and controls that require another independent enforcement point
 ```
 
 The semantic adapter consumes policy intent and explicit native context. It never imports a provider YAML/JSON schema into governance policy, treats a successful configuration write as verification, or turns a CI run identifier into workflow-result identity.
@@ -89,18 +89,18 @@ Client-side hooks, labels, issue comments, chat approval, an installed skill, or
 
 `AgentPolicy` is a namespace-scoped Kubernetes admission adapter for `AgentRun`; `AgentToolchain` admission is a separate enforcing resource.
 
-| Semantic intent               | Native field/control                               | Scope and limitation                                                                                                                       |
-| ----------------------------- | -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| Kernel-isolated runtime       | `runtimeClassName`, `allowedRuntimeClassNames`     | Admission verifies the requested runtime class; cluster RuntimeClass/runtime implementation remains an external dependency                 |
-| Harden container execution    | `requireSecurityContext`                           | Rejects explicit privilege escalation or root weakening; pod builder supplies hardened defaults                                            |
-| Restrict egress               | `requireNetworkPolicy`, `network`, `networkPolicy` | Requires the operator NetworkPolicy path; cluster network plugin behavior must be verified independently                                   |
-| Bound duration                | `maxTimeout`                                       | Rejects a missing or excessive effective admission value                                                                                   |
-| Bound CPU/memory              | `maxResources`                                     | Requires and caps configured request/limit quantities for named resources; namespace LimitRange/ResourceQuota provide an independent layer |
-| Restrict images               | `allowedImages`                                    | Requires an allowed explicit/default image prefix; digest/provenance policy needs an additional admission or registry control              |
-| Pin toolchains                | `AgentToolchain`/inline Nix validation             | Requires a pinned nixpkgs revision, one source, and a digest-pinned pre-built image                                                        |
-| Establish namespace authority | One `AgentPolicy` per namespace                    | Missing policy means baseline operator hardening only; lookup failure or multiple policies fail closed                                     |
+| Semantic intent               | Native field/control                               | Scope and limitation                                                                                                                         |
+| ----------------------------- | -------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| Kernel-isolated runtime       | `runtimeClassName`, `allowedRuntimeClassNames`     | Admission verifies the requested runtime class; cluster RuntimeClass/runtime implementation remains an external dependency                   |
+| Harden container execution    | `requireSecurityContext`                           | Rejects explicit privilege escalation or root weakening; pod builder supplies hardened defaults                                              |
+| Restrict egress               | `requireNetworkPolicy`, `network`, `networkPolicy` | Requires the operator NetworkPolicy path; cluster network plugin behavior must be verified independently                                     |
+| Bound duration                | `maxTimeout`                                       | Rejects a missing or excessive effective admission value                                                                                     |
+| Bound CPU/memory              | `maxResources`                                     | Requires and caps configured request/limit quantities for named resources; namespace LimitRange/ResourceQuota provide an independent control |
+| Restrict images               | `allowedImages`                                    | Requires an allowed explicit/default image prefix; digest/provenance policy needs an additional admission or registry control                |
+| Pin toolchains                | `AgentToolchain`/inline Nix validation             | Requires a pinned nixpkgs revision, one source, and a digest-pinned pre-built image                                                          |
+| Establish namespace authority | One `AgentPolicy` per namespace                    | Missing policy means baseline operator hardening only; lookup failure or multiple policies fail closed                                       |
 
-Admission evidence identifies the Kubernetes object UID/generation and policy resource version. It does not prove the runtime plugin, network plugin, registry, or later deployment behaved correctly; retain their native evidence as independent layers.
+Admission evidence identifies the Kubernetes object UID/generation and policy resource version. It does not prove the runtime plugin, network plugin, registry, or later deployment behaved correctly; retain their native evidence as independent controls.
 
 ## Local hooks
 

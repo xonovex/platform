@@ -18,4 +18,4 @@ Show tenant, issuer, audience, subject, application/managed identity, service-co
 4. Resolve provider-native pipeline, role-assignment/activity, and target-resource evidence.
 5. Verify rollback removes only owned federation, grants, and connection resources without erasing retained evidence.
 
-Treat service-connection authorization and Azure RBAC as independent layers; success in one does not prove the other is least privilege.
+Treat service-connection authorization and Azure RBAC as independent controls; success in one does not prove the other is least privilege.
