@@ -1,6 +1,6 @@
 ---
 type: plan
-has_subplans: false
+has_subplans: true
 status: approved
 approved_date: "2026-07-17"
 dependencies:
@@ -18,6 +18,30 @@ dependencies:
     - packages/command/command-workflow/docs/*.md
     - packages/script/script-moon-skill-validate/src/*.ts
     - .moon/tasks/tag-skill.yml
+  subplans:
+    - catalog-vocabulary-consistency-guard
+    - cross-package-reference-link-guard
+    - adopter-facing-reference-profile-library
+    - capability-registry-and-placeholder-marking
+    - assembled-composition-completeness-check
+proposed_subplans:
+  - catalog-vocabulary-consistency-guard
+  - cross-package-reference-link-guard
+  - adopter-facing-reference-profile-library
+  - capability-registry-and-placeholder-marking
+  - assembled-composition-completeness-check
+parallel_groups:
+  - group: 1
+    plans:
+      - catalog-vocabulary-consistency-guard
+      - cross-package-reference-link-guard
+      - capability-registry-and-placeholder-marking
+  - group: 2
+    plans:
+      - adopter-facing-reference-profile-library
+  - group: 3
+    plans:
+      - assembled-composition-completeness-check
 skills_to_consult:
   - plan-guide
   - skill-guide

@@ -1,6 +1,6 @@
 ---
 type: plan
-has_subplans: false
+has_subplans: true
 status: approved
 approved_date: "2026-07-17"
 dependencies:
@@ -19,6 +19,32 @@ dependencies:
     - packages/agent/agent-operator-go/internal/controller/*.go
     - packages/agent/agent-cli-go/internal/**/*.go
     - packages/command/command-workflow/commands/*.md
+  subplans:
+    - governance-decision-point-fail-closed
+    - claude-code-native-hook-block
+    - walking-skeleton-runtime-real
+    - a3-unattended-orchestration-runtime
+    - operational-proof-drift-incident
+proposed_subplans:
+  - governance-decision-point-fail-closed
+  - claude-code-native-hook-block
+  - walking-skeleton-runtime-real
+  - a3-unattended-orchestration-runtime
+  - operational-proof-drift-incident
+parallel_groups:
+  - group: 1
+    plans:
+      - governance-decision-point-fail-closed
+  - group: 2
+    plans:
+      - claude-code-native-hook-block
+      - a3-unattended-orchestration-runtime
+  - group: 3
+    plans:
+      - walking-skeleton-runtime-real
+  - group: 4
+    plans:
+      - operational-proof-drift-incident
 skills_to_consult:
   - plan-guide
   - hexagonal-pattern-guide
