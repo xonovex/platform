@@ -19,10 +19,10 @@ const fixtures = JSON.parse(readFileSync(fixturePath, "utf8"));
 
 const allowedExecutors = new Set([
   "deterministic",
-  "bounded-model",
-  "adaptive-agent",
+  "model",
+  "agent",
   "human",
-  "qualified-human",
+  "external",
 ]);
 const allowedPolicyIntents = new Set([
   "data-access",
@@ -55,6 +55,11 @@ const expectIncludes = (content, expected, context) => {
   }
 };
 
+const isQualifiedActor = (actor) =>
+  typeof actor.qualification === "string" &&
+  actor.qualification.length > 0 &&
+  actor.qualification !== "none";
+
 const classifyCase = (fixture) => {
   if (
     fixture.subjectRevision !== undefined &&
@@ -67,11 +72,17 @@ const classifyCase = (fixture) => {
     return "explicit-provider-unavailable";
   }
 
-  if (
-    fixture.decisionAuthority &&
-    !["human", "qualified-human"].includes(fixture.decisionAuthority.executor)
-  ) {
-    return "decision-authority-invalid";
+  if (fixture.decisionAuthority) {
+    if (fixture.decisionAuthority.executor !== "human") {
+      return "decision-authority-invalid";
+    }
+
+    if (
+      fixture.decisionAuthority.qualificationRequired === true &&
+      !isQualifiedActor(fixture.decisionAuthority)
+    ) {
+      return "decision-authority-unqualified";
+    }
   }
 
   if (!fixture.provider?.available) {
@@ -216,6 +227,7 @@ const requiredCaseIds = new Set([
   "exact-revision-mismatch",
   "explicit-provider-unavailable",
   "model-fabricates-authority",
+  "regulated-decision-without-qualification",
 ]);
 
 for (const fixture of fixtures.cases) {

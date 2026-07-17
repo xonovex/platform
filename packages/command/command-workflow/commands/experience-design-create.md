@@ -17,7 +17,8 @@ argument-hint: "<subject-or-native-reference> [--profile <reference>] [--provide
 ## Arguments
 
 - `subject-or-native-reference` (required): Subject or opaque Discovery/Research/Formulation/Decision reference.
-- `--profile`, `--provider`, `--method`, `--executor` (optional): Independent selections.
+- `--profile`, `--provider`, `--method` (optional): Independent selections.
+- `--executor` (optional): `deterministic` | `model` | `agent` | `human` | `external` — a requested ceiling that may be rejected; see `agent-governance-guide`.
 
 ## Delegation
 

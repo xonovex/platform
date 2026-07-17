@@ -10,6 +10,23 @@
 | `human`         | Accountable judgment, approval, review, or manual action               | Record identity, role, independence, scope, decision, and native evidence                                   |
 | `external`      | CI, deployment, identity, monitoring, GRC, or another system of record | Preserve native subject, revision, policy/version, decision, and freshness                                  |
 
+The identity, role, and independence the `human` row records are defined in [actors.md](actors.md), which also states which of them code enforces.
+
+## Selecting a class
+
+`deterministic`, `model`, and `agent` answer how much adaptivity the work itself needs, so a work shape selects among them — see **workflow-guide** for the work-shape literals and the classification procedure. `human` and `external` answer who must own the outcome: select them when accountable judgment or a system of record holds the authority, never because the work is hard. They are orthogonal to work shape, so no work shape selects them.
+
+Select deterministic execution whenever authoritative inspection can establish the fact. A model or agent may interpret evidence, identify candidates, or investigate gaps, but cannot silently replace the authoritative check.
+
+## Executor requests
+
+An executor request — an `--executor` argument, profile field, or equivalent — is a requested ceiling, not a decision. Resolve its value through the caller's axis precedence, which the calling lifecycle guide states, then validate the resolved request against:
+
+- **least-adaptive** — reject a `model` or `agent` request where a `deterministic` executor can authoritatively establish the same result;
+- **deterministic-authority** — never treat `model` or `agent` output as authoritative where a deterministic check or an external system of record establishes the fact.
+
+A request only narrows or confirms what work shape and these rules already permit; it never widens them. Where a narrower request cannot complete the work, reject the request rather than escalate to a more adaptive class. Record requested and effective class whenever they differ.
+
 ## Base contract
 
 Every capability execution declares:
@@ -22,8 +39,6 @@ Every capability execution declares:
 - timeout, retry, concurrency, ordering, cancellation, and kill behavior;
 - failure behavior: deny, ask, advise, observe, or explicitly ignore;
 - telemetry and audit references with sensitivity, redaction, retention, and access rules.
-
-Select deterministic execution whenever authoritative inspection can establish the fact. A model or agent may interpret evidence, identify candidates, or investigate gaps, but cannot silently replace the authoritative check.
 
 ## Bounded model execution
 

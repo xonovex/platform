@@ -10,16 +10,21 @@ Concurrent assignments require distinct workspace references or a provider guara
 
 ## Executor selection
 
-Choose the least adaptive permitted executor that can complete the task:
+A work shape selects among the deterministic, model, and agent classes. Classify the assignment by taking the first match, which yields the least adaptive shape that fits:
 
-| Work shape                                                               | Default executor             | Required boundary                                                                                     |
-| ------------------------------------------------------------------------ | ---------------------------- | ----------------------------------------------------------------------------------------------------- |
-| Mechanical rename, formatting, generated edit, deterministic validation  | Deterministic script or tool | Exact inputs, tool/version, dry run where supported, idempotency, validation                          |
-| Narrow classification or transform over fixed supplied context           | Bounded model                | Fixed inputs, output schema, validator, budget, retry ceiling, non-authoritative origin               |
-| Adaptive multi-file implementation or investigation with branching tools | Bounded agent                | Purpose, result contract, tools/data/filesystem/network, depth, token/cost/time budgets, cancellation |
-| Accountable or qualified judgment                                        | Human or external authority  | Identity, role, scope, independence or qualification, native evidence                                 |
+1. a tool or script can produce and verify the result from exact inputs — `mechanical`;
+2. otherwise, the whole input set is known and can be supplied up front and the output is schema-checkable — `bounded-transform`;
+3. otherwise, the work must discover its own inputs through branching tool use — `adaptive`.
 
-A requested model or agent is rejected when a deterministic executor can authoritatively establish the same result. Model or agent output never replaces deterministic validation or external authoritative evidence.
+| Work shape          | Selected executor            | Required boundary                                                                                     |
+| ------------------- | ---------------------------- | ----------------------------------------------------------------------------------------------------- |
+| `mechanical`        | Deterministic script or tool | Exact inputs, tool/version, dry run where supported, idempotency, validation                          |
+| `bounded-transform` | Bounded model                | Fixed inputs, output schema, validator, budget, retry ceiling, non-authoritative origin               |
+| `adaptive`          | Bounded agent                | Purpose, result contract, tools/data/filesystem/network, depth, token/cost/time budgets, cancellation |
+
+A shape outside these three literals is rejected rather than defaulted, and a model or agent whose required boundary is incomplete is rejected as unbounded.
+
+`human` and `external` are separate classes that no work shape selects. Choose them orthogonally when authority or ownership — not difficulty — requires it: accountable judgment, approval, or another system of record. Qualification is an attribute of the human actor record, not a class of its own. Use **agent-governance-guide** for the executor class definitions, the actor record, and the semantics of an `--executor` request.
 
 ## Semantic intents and runtime adapters
 

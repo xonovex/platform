@@ -21,7 +21,8 @@ argument-hint: "<planning-reference...> [--revision <native-revision>] [--profil
 
 - `planning-reference...` (required): One or more opaque child Planning references.
 - `--revision` (repeatable): Exact native Planning revision corresponding to each reference.
-- `--profile`, `--workspace`, `--executor` (optional): Independent profile, workspace-provider, or executor selections.
+- `--profile`, `--workspace` (optional): Independent profile or workspace-provider selections.
+- `--executor` (optional): `deterministic` | `model` | `agent` | `human` | `external` — a requested ceiling that may be rejected; see `agent-governance-guide`.
 - `--max-concurrency` (optional): Bound ready assignments; the profile/provider limit remains authoritative when lower.
 
 ## Delegation

@@ -4,7 +4,7 @@ Discovery, Research, Formulation, Experience Design, Solution Design, Decision, 
 
 ## Axis resolution
 
-Resolve each axis independently in this order: explicit command argument, selected workflow profile, project instructions, unambiguous environment detection, axis-specific default, then a visible request for selection. Never infer a method from a provider or a provider from a native-reference shape.
+Resolve each axis independently in this order: explicit command argument, selected workflow profile, project instructions, unambiguous environment detection, axis-specific default, then a visible request for selection. Resolution yields a requested value, not a grant — an `--executor` request additionally passes the validation in Executor selection below. Never infer a method from a provider or a provider from a native-reference shape.
 
 - **Method** — neutral is the default. User stories, BDD, example mapping, user research, accessibility review, architecture review, and other installed skills are selectable capabilities, not prerequisites.
 - **Provider** — ask the selected provider to resolve, read, publish, revise, relate, and version its native result. An explicitly selected unavailable provider fails; no silent file fallback.
@@ -13,15 +13,9 @@ Resolve each axis independently in this order: explicit command argument, select
 
 ## Executor selection
 
-Choose the least adaptive class that can complete the operation within declared time, cost, tool, data, and output bounds.
+Every early lifecycle operation selects from `deterministic`, `model`, `agent`, `human`, and `external`. **agent-governance-guide** owns the class definitions, their boundaries, and the rules that validate or reject a requested executor.
 
-| Class             | Preferred work                                                                                                 | Constraint                                                              |
-| ----------------- | -------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
-| `deterministic`   | Resolve native references, enumerate sources, validate schemas/revisions, collect known facts, publish results | Does not synthesize missing meaning                                     |
-| `bounded-model`   | Classify, summarize, compare, or draft within supplied evidence and an output schema                           | Must expose uncertainty and cannot invent evidence or authority         |
-| `adaptive-agent`  | Open-ended exploration with branching queries or tools                                                         | Requires explicit bounds, stop conditions, and recorded tool/data scope |
-| `human`           | Contextual judgment, stakeholder intent, ordinary approval or acceptance                                       | Preserve identity and authority reference                               |
-| `qualified-human` | Regulated, safety, security, privacy, accessibility, architecture, or other role-bound decisions               | Verify qualification and authority; a model cannot substitute           |
+Qualification is an attribute of a human actor record, not a class. A profile that requires regulated, safety, security, privacy, accessibility, architecture, or other role-bound judgment binds its Decision to a `human` whose record carries the matching qualification; a model or agent cannot supply it, and an unqualified human does not satisfy it. **agent-governance-guide** owns the actor record and evidence-origin contract.
 
 Escalation changes the executor, not the result kind. Record executor origin, bounds, material tool/data use, and limitations in the native result.
 

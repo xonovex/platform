@@ -46,6 +46,8 @@ Organization-managed requirements cannot be silently weakened by project, user, 
 
 Deterministic or authoritative external evidence takes precedence for facts it can establish. Models and agents may interpret evidence or investigate gaps; they cannot silently replace the authoritative check or create their own authority.
 
+The identity, role, and independence the Human row records are defined in [`actors.md`](../../../skill/skill-agent-governance/agent-governance-guide/references/actors.md), which states which of them code enforces and which a profile or provider must uphold itself. A recorded role is an audit label; no capability selects behavior from it.
+
 ## Provider-native results and evidence
 
 Every result preserves a semantic type plus an opaque provider reference and revision/freshness token. Local files, Git, hosted work items, databases, CI runs, artifacts, deployments, monitoring systems, and human records are peer providers selected by profile and context. There is no universal file fallback.

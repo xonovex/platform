@@ -19,7 +19,8 @@ argument-hint: "<subject-reference> [--revision <native-revision>] --criteria <r
 - `subject-reference` (required): Opaque reference to any canonical workflow result.
 - `--revision` (optional): Exact native subject revision.
 - `--criteria` (required): Pinned framework, policy, risk, security, accessibility, AI, supply-chain, privacy, legal, or other criterion set.
-- `--profile`, `--provider`, `--executor` (optional): Independent selections.
+- `--profile`, `--provider` (optional): Independent selections.
+- `--executor` (optional): `deterministic` | `model` | `agent` | `human` | `external` — a requested ceiling that may be rejected; see `agent-governance-guide`.
 
 ## Delegation
 
