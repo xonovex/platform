@@ -1,6 +1,6 @@
 # GitLab auth — token types and exact per-operation scopes
 
-`glab` authenticates the API with a token; the scope you need is driven entirely by whether the call reads or writes, and a sufficient scope still needs a sufficient role. First-time `glab auth login` flow is in [onboarding.md](onboarding.md); this file covers token type, the exact least-privilege scope per operation, env vars, storage, self-managed targeting, and CI.
+`glab` authenticates the API with a token; the scope you need is driven entirely by whether the call reads or writes, and a sufficient scope still needs a sufficient role. First-time `glab auth login` flow is in [first-time-setup.md](first-time-setup.md); this file covers token type, the exact least-privilege scope per operation, env vars, storage, self-managed targeting, and CI.
 
 ## Token types
 

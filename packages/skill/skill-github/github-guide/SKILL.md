@@ -23,7 +23,7 @@ When this skill fires:
 
 ## Requirements
 
-- `gh` authenticated to the target host. First-time install + `gh auth login` + protocol + clone + verify are in [references/onboarding.md](references/onboarding.md); token families, per-operation least-privilege scopes, and storage are in [references/auth.md](references/auth.md).
+- `gh` authenticated to the target host. First-time install + `gh auth login` + protocol + clone + verify are in [references/first-time-setup.md](references/first-time-setup.md); token families, per-operation least-privilege scopes, and storage are in [references/auth.md](references/auth.md).
 - The git remote points at GitHub: `gh repo view --json nameWithOwner,url` resolves it; a `github.com` host (or a GHES host) on `git remote get-url origin` is the detection signal. For GHES, set `GH_HOST` / `--hostname` and use `GH_ENTERPRISE_TOKEN` (see auth).
 
 ## Essentials
@@ -37,6 +37,7 @@ When this skill fires:
 - **Scope the token per operation** — push needs Contents: write; open-PR / post-review need Pull requests: write; resolve also needs Contents: read & write on a fine-grained token. See [references/auth.md](references/auth.md).
 - **Adapt Issues as an optional result provider** — preserve GitHub-native issue/comment references, disclose freshness-only versioning, and never make GitHub a core workflow dependency. See [references/provider-conformance.md](references/provider-conformance.md).
 - **Enforce with native automation** — use SHA-pinned reusable workflows/actions, required checks and layered rulesets, protected environments, least-privilege tokens/OIDC, attestations, and provider-native evidence. See [references/automation-and-enforcement.md](references/automation-and-enforcement.md).
+- **Transact every setup** — discover, preview the exact native changes and authority, authorize, apply idempotently against observed revisions, re-read and probe both allow and deny, retain rollback, and own the drift. See [references/onboarding.md](references/onboarding.md).
 
 ## Gotchas
 
@@ -86,10 +87,11 @@ gh api graphql -f query='mutation($t:ID!){resolveReviewThread(input:{threadId:$t
 
 Each reference is a trigger — read only the one matching the user's intent; do not preload everything.
 
-- Read [references/onboarding.md](references/onboarding.md) — Load when setting up a fresh machine/account: installing `gh`, running `gh auth login`, picking HTTPS vs SSH, making gh the git credential helper, cloning, and verifying with a read call (GHES included).
+- Read [references/first-time-setup.md](references/first-time-setup.md) — Load when setting up a fresh machine/account: installing `gh`, running `gh auth login`, picking HTTPS vs SSH, making gh the git credential helper, cloning, and verifying with a read call (GHES included).
 - Read [references/auth.md](references/auth.md) — Load when auth fails, choosing classic vs fine-grained PAT, scoping a token per operation (push / open-PR / review / resolve), the GH_TOKEN vs GH_ENTERPRISE_TOKEN split, keyring storage, or wiring tokens into CI / GitHub Actions.
 - Read [references/create.md](references/create.md) — Load when opening a PR: `gh pr create` flags, draft, reviewers/labels, issue-linking and auto-close semantics, the additive-body / replace-on-edit trap, idempotency guard, and the raw `POST /pulls` REST equivalent.
 - Read [references/review-post.md](references/review-post.md) — Load when publishing a review: the single `.../reviews` object, the exact path/line/side inline anchor model, the REQUEST_CHANGES blocking mechanism, and deep-linking from `html_url`.
 - Read [references/review-resolve.md](references/review-resolve.md) — Load when resolving/replying on threads: listing `reviewThreads`, matching a finding to a thread by id (never line), the GraphQL `resolveReviewThread` mutation, in-thread replies, and the conversation-resolution merge gate.
 - Read [references/provider-conformance.md](references/provider-conformance.md) — Load when mapping GitHub Issues/comments to the optional workflow result-provider port or testing opaque-reference, restart, revision, retry, relationship, and failure behavior.
 - Read [references/automation-and-enforcement.md](references/automation-and-enforcement.md) — Load when configuring or onboarding reusable workflows/actions, required checks, rulesets, protected environments, token/OIDC permissions, attestations, evidence, rollback, or governance-only GitHub adoption.
+- Read [references/onboarding.md](references/onboarding.md) — Load when setting up, diagnosing, dry-running, verifying, rolling back, uninstalling, or checking drift on repository/organization governance.

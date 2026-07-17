@@ -1,6 +1,6 @@
 # GitHub auth — token families and per-operation least-privilege scopes
 
-`gh` and `gh api` authenticate with a token. There are two families with different scope models; pick the narrowest scope for the operation, scope it per endpoint, and store it in the OS keyring. Onboarding (the interactive `gh auth login` flow) is in [onboarding.md](onboarding.md); this file is the token + scope + storage reference.
+`gh` and `gh api` authenticate with a token. There are two families with different scope models; pick the narrowest scope for the operation, scope it per endpoint, and store it in the OS keyring. First-time setup (the interactive `gh auth login` flow) is in [first-time-setup.md](first-time-setup.md); this file is the token + scope + storage reference.
 
 ## Two token families
 

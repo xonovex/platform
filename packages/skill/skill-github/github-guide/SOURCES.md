@@ -14,7 +14,7 @@
   - https://docs.github.com/en/github-cli/github-cli/quickstart
   - https://github.com/cli/cli/blob/trunk/docs/install_linux.md
 - **Last reviewed:** 2026-06-26
-- **Used for:** install (onboarding.md), `gh auth login` / `status` / `setup-git` flow, the GH_TOKEN / GH_ENTERPRISE_TOKEN / GH_HOST environment split (auth.md), `gh pr create` flags + `gh pr edit` replace-on-body behavior (create.md), and the `gh pr review` inline-comment limitation (review-post.md).
+- **Used for:** install (first-time-setup.md), `gh auth login` / `status` / `setup-git` flow, the GH_TOKEN / GH_ENTERPRISE_TOKEN / GH_HOST environment split (auth.md), `gh pr create` flags + `gh pr edit` replace-on-body behavior (create.md), and the `gh pr review` inline-comment limitation (review-post.md).
 
 ## GitHub REST API
 
