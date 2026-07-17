@@ -15,7 +15,7 @@ argument-hint: "[subject] [--plane <workflow|governance|both>] [--profile <refer
 
 - `subject` (optional): Result, handle, profile, module, policy, capability matrix, exception, onboarding result, or native reference; defaults to the current context.
 - `--plane <workflow|governance|both>` (optional): Contract owner to validate; defaults to auto-detection, then both when the subject crosses planes.
-- `--profile <reference>` (optional): Profile whose requirements and guarantees apply.
+- `--profile <reference>` (optional): Profile whose requirements and guarantees apply, resolved to a shipped reference profile in the owning plane's `assets/profiles/` library; an integrated reference validates the paired workflow and governance profiles together.
 
 ## Delegation
 

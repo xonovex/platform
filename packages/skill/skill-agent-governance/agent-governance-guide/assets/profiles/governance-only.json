@@ -1,0 +1,39 @@
+{
+  "note": "Shipped reference profile (governance plane). A regulated organization protecting ordinary prompt, tool, model, workspace, and privileged activity through governance policy and evidence, with no lifecycle command required. Selectable as --profile governance-only-profile, and named by the integrated workflow profile's governance facet. Validated by validate-reference-profiles.ts against the governance profile contract; capabilities resolve against the capability registry.",
+  "identity": "governance-only-profile",
+  "version": "1",
+  "owner": "organization-managed",
+  "scope": "Baseline governance over agent activity, independent of any lifecycle workflow.",
+  "applicability": "Regulated organization with mandatory policy and evidence requirements.",
+  "adoptionMode": "governance-only",
+  "teamShape": "regulated",
+  "facets": [
+    "lifecycle",
+    "governance",
+    "executor",
+    "enforcement",
+    "data",
+    "telemetry",
+    "distribution"
+  ],
+  "strengthening": "additive",
+  "weakensMandatoryControl": false,
+  "authorizedException": false,
+  "adequateEnforcement": true,
+  "facetRequirements": {
+    "lifecycle": "No workflow plane is required; lifecycle evidence is consumed only when a workflow profile is also selected.",
+    "governance": "Mandatory security and privacy policies with declared applicability, accountable actors, exception handling, and fail-closed behavior.",
+    "executor": "Prefers deterministic and external executors for authoritative facts; agent execution requires a bounded launcher.",
+    "enforcement": "Required semantic intents (security, privacy, data-access) bind to enforcement points with adequate, non-experimental guarantees.",
+    "data": "Sensitive data is classified, minimized, redacted, retained, and access-controlled per policy.",
+    "telemetry": "Decision and evidence telemetry is published with correlation but no sensitive content capture.",
+    "distribution": "Modules declare provenance, trust, pinning, upgrade, rollback, and retirement."
+  },
+  "capabilities": {
+    "executor-class": ["deterministic", "model", "agent", "human", "external"],
+    "provider-port": ["policy", "evidence-and-telemetry"],
+    "governance-module": ["advisory", "evidence-producing", "enforcing"]
+  },
+  "failureBehavior": "Mandatory controls fail closed; a policy outage on a mandatory control denies, while advisory controls observe.",
+  "absenceReport": "Lifecycle results are not prerequisites; no workflow plane is claimed."
+}

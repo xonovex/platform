@@ -14,7 +14,7 @@ argument-hint: "[scope] [--profile <reference>] [--include-advisory]"
 ## Arguments
 
 - `scope` (optional): Repository, project, user, session, external system, or native configuration reference; defaults to the current environment.
-- `--profile <reference>` (optional): Explicit governance profile reference.
+- `--profile <reference>` (optional): Explicit governance profile reference, resolved to a shipped reference profile in `agent-governance-guide/assets/profiles/`.
 - `--include-advisory` (optional): Include advisory modules alongside evidence-producing and enforcing modules.
 
 ## Delegation

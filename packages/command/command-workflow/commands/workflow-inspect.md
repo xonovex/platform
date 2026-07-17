@@ -14,7 +14,7 @@ argument-hint: "[result-or-profile] [--profile <reference>] [--provider <name>]"
 ## Arguments
 
 - `result-or-profile` (optional): Opaque native result reference, local result, or profile to inspect; defaults to the current workflow context.
-- `--profile <reference>` (optional): Explicit profile reference or identity.
+- `--profile <reference>` (optional): Explicit profile reference or identity, resolved to a shipped reference profile in `workflow-guide/assets/profiles/`; an integrated reference follows its governance-facet cross-reference into `agent-governance-guide/assets/profiles/`.
 - `--provider <name>` (optional): Explicit provider capability for resolving the input; fail visibly if unavailable.
 
 ## Delegation

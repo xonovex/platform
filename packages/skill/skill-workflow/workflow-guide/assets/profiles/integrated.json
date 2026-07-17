@@ -1,0 +1,80 @@
+{
+  "note": "Shipped reference profile (workflow plane, integrated composition). A small team running the lifecycle with a governance plane joined by exact semantic reference: this workflow profile's governance facet names its governance profile by identity, and --profile integrated-profile resolves the pair. Validated by validate-reference-profiles.ts; the named governance profile must exist in the governance library and pass the governance profile contract.",
+  "identity": "integrated-profile",
+  "version": "1",
+  "owner": "project",
+  "scope": "A small team taking a change from discovery through acceptance and integration under a governance plane.",
+  "applicability": "Trusted project repository with reviewed instructions and a selected governance profile.",
+  "adoptionMode": "integrated",
+  "teamShape": "small-team",
+  "includedResults": [
+    "Discovery",
+    "Planning",
+    "Development",
+    "Review",
+    "QA",
+    "Acceptance",
+    "Integration"
+  ],
+  "preservedResults": [
+    "Discovery",
+    "Planning",
+    "Development",
+    "Review",
+    "QA",
+    "Acceptance",
+    "Integration"
+  ],
+  "explicitProvider": "non-file-provider",
+  "providerAvailable": true,
+  "mandatoryControls": [
+    {
+      "id": "accepted-deliverable-evidence",
+      "enforcementPoints": [{"supported": true, "guaranteed": true}]
+    }
+  ],
+  "topology": {
+    "allowedSequence": [
+      "Discovery",
+      "Planning",
+      "Development",
+      "Review",
+      "Acceptance",
+      "Integration"
+    ],
+    "concurrency": ["Review", "QA"],
+    "iteration": true,
+    "backwardEdges": ["Review->Planning"],
+    "compositePresentation": "Review = Review + QA; Integrate = Integration (explicit post-acceptance)"
+  },
+  "requiredInputs": "Each capability resolves its inputs from the selected provider; Acceptance additionally consumes the governance evidence reference.",
+  "publicationBoundaries": "Results publish to the selected provider; governance decision, enforcement, and evidence stay separate references.",
+  "exitRules": "Acceptance exits only with the governance evidence its profile requires; Integration exits after an accepted deliverable.",
+  "completionEvidence": "An accepted, integrated deliverable with preserved Review/QA results and the required governance evidence reference.",
+  "capabilities": {
+    "method": ["user-stories", "bdd"],
+    "executor-class": ["deterministic", "model", "agent", "human"],
+    "provider-port": ["result-provider"]
+  },
+  "actor": {
+    "acceptance": "human"
+  },
+  "authorization": "Acceptance is authorized by a distinct reviewer per the governance profile.",
+  "freshness": "Acceptance binds to the exact native revision; governance evidence must be fresh per its profile.",
+  "independence": {
+    "acceptance": "distinct-identity",
+    "review": "distinct-identity",
+    "emergencyAccess": "distinct-identity"
+  },
+  "governance": {
+    "profile": "governance-only-profile",
+    "requiredEvidence": [
+      "policy decision reference",
+      "enforcement reference",
+      "evidence reference"
+    ],
+    "enforcementGuarantee": "Every mandatory control binds to a supported, guaranteed enforcement point in the named governance profile."
+  },
+  "failureBehavior": "If the named governance profile is unavailable or a mandatory control has no guaranteed enforcement point, fail visibly; unselected modules remain explicit gaps, not hidden defaults.",
+  "absenceReport": "Only the workflow and governance profiles selected here apply; anything unselected is an explicit gap."
+}

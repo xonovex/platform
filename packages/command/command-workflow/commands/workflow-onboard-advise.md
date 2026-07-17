@@ -14,7 +14,7 @@ argument-hint: "[scope] [--profile <reference>] [--provider <selection>] [--modu
 ## Arguments
 
 - `scope` (optional): Environment, repository, organization, harness, CI, provider, or workflow scope; defaults to current environment.
-- `--profile` (optional): Desired workflow/governance profile reference.
+- `--profile` (optional): Desired workflow/governance profile reference; onboard-advise recommends a compatible shipped reference profile from the per-plane `assets/profiles/` libraries plus the methods, providers, executors, and modules to satisfy it.
 - `--provider` (optional): Candidate result provider to assess.
 - `--module` (optional): Candidate skill, adapter, policy, harness, CI, or environment module.
 

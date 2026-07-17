@@ -16,7 +16,7 @@ argument-hint: "<list|inspect|enable|disable|upgrade|remove> [module] [--apply] 
 - `list|inspect|enable|disable|upgrade|remove` (required): Module lifecycle operation.
 - `module` (optional): Module identity or native reference; required except for `list`.
 - `--apply` (optional): Apply an already previewed and authorized change; without this flag changing operations stop after preview.
-- `--profile <reference>` (optional): Profile whose requirements must remain satisfied.
+- `--profile <reference>` (optional): Profile whose requirements must remain satisfied, resolved to a shipped reference profile in `agent-governance-guide/assets/profiles/` (or the governance profile a workflow reference pairs with).
 
 ## Delegation
 

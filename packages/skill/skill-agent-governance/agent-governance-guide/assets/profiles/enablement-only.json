@@ -1,0 +1,43 @@
+{
+  "note": "Shipped reference profile (governance plane). A small team using native onboarding adapters to preview, authorize, apply, verify, roll back, and monitor configuration transactionally — enablement without an ongoing policy guarantee. Selectable as --profile enablement-only-profile. Validated by validate-reference-profiles.ts against the governance profile contract; capabilities resolve against the capability registry.",
+  "identity": "enablement-only-profile",
+  "version": "1",
+  "owner": "project",
+  "scope": "Transactional configuration setup and previews via native adapters, seeded from the code-review team shape.",
+  "applicability": "Small team enabling native controls before committing to an ongoing policy guarantee.",
+  "adoptionMode": "enablement-only",
+  "teamShape": "small-team",
+  "facets": [
+    "lifecycle",
+    "governance",
+    "executor",
+    "enforcement",
+    "data",
+    "telemetry",
+    "distribution"
+  ],
+  "strengthening": "additive",
+  "weakensMandatoryControl": false,
+  "authorizedException": false,
+  "adequateEnforcement": true,
+  "facetRequirements": {
+    "lifecycle": "No workflow plane; enablement precedes and does not replace lifecycle governance.",
+    "governance": "Advisory setup with declared owner and rollback behavior; no ongoing mandatory guarantee is claimed.",
+    "executor": "Deterministic adapters apply configuration; a human authorizes each transactional change.",
+    "enforcement": "No enforcing guarantee is asserted until an enforcing module is separately selected.",
+    "data": "Previews avoid capturing sensitive content; applied settings follow the adapter's native data rules.",
+    "telemetry": "Apply, verify, rollback, and drift are monitored through the adapter's native evidence.",
+    "distribution": "Configuration changes are previewed, authorized, applied transactionally, verified, and reversible."
+  },
+  "capabilities": {
+    "executor-class": ["deterministic", "human"],
+    "provider-port": ["configuration"],
+    "governance-module": [
+      "knowledge-only",
+      "advisory",
+      "configuration-changing"
+    ]
+  },
+  "failureBehavior": "A configuration change that cannot be previewed, verified, or rolled back is refused rather than applied.",
+  "absenceReport": "No ongoing policy guarantee unless an enforcing module is separately selected."
+}

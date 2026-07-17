@@ -56,3 +56,22 @@ This presentation is not the ontology. Another profile may split composites, run
 - A hosted provider was explicitly selected but silently replaced by a local file.
 - A runtime trace ID is used as the persistent workflow key.
 - A mandatory control names an advisory or unsupported hook as its only enforcement point.
+
+## Reference profiles
+
+Shipped, selectable reference profiles live in `assets/profiles/`, distinct from the
+test-only `assets/fixtures/`. Each is a worked composition satisfying the contract above;
+`validate-reference-profiles.ts` runs every one through `validateProfile` and resolves its
+declared capabilities against the **agent-governance-guide** capability registry.
+
+- `workflow-only-profile` — a solo maintainer running the lifecycle with no governance
+  plane.
+- `integrated-profile` — a small team whose governance facet names `governance-only-profile`
+  by identity; `--profile integrated-profile` resolves the workflow profile and follows that
+  cross-reference into the governance library.
+
+Select one with `--profile <identity>`; `workflow-onboard-advise` recommends a compatible
+profile. Extend a reference by composing additively (composition rule 2): copy the closest
+one, adjust its included capabilities, provider, method, and independence requirements, and
+keep every capability it names resolvable in the registry. Within-mode team-shape variants
+are a documented extension, not additional shipped files.

@@ -1,0 +1,64 @@
+{
+  "note": "Shipped reference profile (workflow plane). A solo maintainer running the lifecycle with no governance plane and no external enforcement. Selectable as --profile workflow-only-profile. Validated by validate-reference-profiles.ts against the workflow profile contract; capabilities resolve against the agent-governance capability registry. This is a worked reference, not a test fixture.",
+  "identity": "workflow-only-profile",
+  "version": "1",
+  "owner": "user",
+  "scope": "One maintainer taking a change from discovery to an accepted deliverable.",
+  "applicability": "Single-owner project with no mandatory organizational policy.",
+  "adoptionMode": "workflow-only",
+  "teamShape": "solo",
+  "includedResults": [
+    "Discovery",
+    "Planning",
+    "Development",
+    "Review",
+    "QA",
+    "Acceptance"
+  ],
+  "preservedResults": [
+    "Discovery",
+    "Planning",
+    "Development",
+    "Review",
+    "QA",
+    "Acceptance"
+  ],
+  "explicitProvider": "non-file-provider",
+  "providerAvailable": true,
+  "mandatoryControls": [],
+  "topology": {
+    "allowedSequence": [
+      "Discovery",
+      "Planning",
+      "Development",
+      "Review",
+      "Acceptance"
+    ],
+    "concurrency": ["Review", "QA"],
+    "iteration": true,
+    "backwardEdges": ["Review->Planning"],
+    "compositePresentation": "Discover = Discovery; Plan = Planning; Review = Review + QA"
+  },
+  "requiredInputs": "Each capability resolves its inputs from the selected provider's native reference.",
+  "publicationBoundaries": "Each result publishes to the selected non-file provider; no shared serialized manifest.",
+  "exitRules": "A capability exits when its result contract is satisfied and published.",
+  "completionEvidence": "An accepted deliverable whose Review and QA results are preserved.",
+  "capabilities": {
+    "method": ["user-stories"],
+    "executor-class": ["deterministic", "model", "agent", "human"],
+    "provider-port": ["result-provider"]
+  },
+  "actor": {
+    "acceptance": "human"
+  },
+  "authorization": "The maintainer authorizes their own acceptance.",
+  "freshness": "Acceptance binds to the exact native revision reviewed.",
+  "independence": {
+    "acceptance": "none",
+    "review": "none",
+    "emergencyAccess": "none"
+  },
+  "governance": null,
+  "failureBehavior": "If the selected provider is unavailable, fail visibly; no silent file fallback.",
+  "absenceReport": "No harness policy or external enforcement guarantee is claimed."
+}

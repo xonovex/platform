@@ -16,5 +16,9 @@ tasks:
       - workflow-guide/references/*.md
       - /packages/skill/skill-plan/plan-guide/references/*.md
       - /packages/skill/skill-agent-governance/agent-governance-guide/references/*.md
+      - workflow-guide/assets/profiles/*.json
       - workflow-guide/scripts/*.mjs
       - workflow-guide/scripts/*.ts
+      - /packages/skill/skill-agent-governance/agent-governance-guide/assets/profiles/*.json
+      - /packages/skill/skill-agent-governance/agent-governance-guide/assets/capability-registry.json
+      - /packages/skill/skill-agent-governance/agent-governance-guide/scripts/*.mjs

@@ -14,7 +14,7 @@ argument-hint: "[scope] [--profile <reference>] [--baseline <reference>]"
 ## Arguments
 
 - `scope` (optional): Native configuration, repository, harness, provider, or environment scope; defaults to the current environment.
-- `--profile <reference>` (optional): Intended profile state.
+- `--profile <reference>` (optional): Intended profile state, resolved to a shipped reference profile in the owning plane's `assets/profiles/` library.
 - `--baseline <reference>` (optional): Provider-native configuration or evidence reference to compare.
 
 ## Delegation
