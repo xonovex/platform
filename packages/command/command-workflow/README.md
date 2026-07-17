@@ -10,6 +10,16 @@ not require lifecycle commands.
 
 ## Guides
 
+Role quickstarts are lenses over the same actor-neutral commands — no command knows a job
+title. Each names the subset one perspective runs and the gates it answers for:
+
+- [Developer quickstart](docs/developer-quickstart.md)
+- [Product owner quickstart](docs/product-owner-quickstart.md)
+- [QA quickstart](docs/qa-quickstart.md)
+- [UX quickstart](docs/ux-quickstart.md)
+
+Reference guides:
+
 - [Architecture and composition](docs/architecture-and-composition.md)
 - [Harness capabilities and onboarding](docs/harness-capabilities.md)
 - [External platform onboarding](docs/platform-onboarding.md)
@@ -145,3 +155,9 @@ notified, revoked, and reviewed.
 [View workflow diagram](../../diagram/diagram-agent-workflow/workflow-diagram.png)
 
 [View target architecture](../../diagram/diagram-agent-workflow/target-architecture.png)
+
+[View composition maturity ladder](../../diagram/diagram-agent-workflow/maturity-ladder.png) — L0–L3, grading an adopted
+composition: contracts, enforcement, evidence, and management.
+
+[View autonomy ladder](../../diagram/diagram-agent-workflow/autonomy-ladder.png) — A0–A3, grading a posture: how far a
+run advances unattended. A distinct axis from L0–L3; `agent-governance-guide` owns the model.

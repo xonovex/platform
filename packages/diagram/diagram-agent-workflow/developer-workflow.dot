@@ -1,0 +1,100 @@
+digraph DeveloperWorkflow {
+  rankdir=TB;
+  compound=true;
+  newrank=true;
+  splines=polyline;
+  nodesep=0.4;
+  ranksep=0.7;
+
+  node [shape=box, style="rounded,filled", fillcolor=white, fontname="Arial", fontsize=10];
+  edge [fontname="Arial", fontsize=9];
+
+  start [label="Feature or change to build", shape=house, fillcolor="#e8d5f5"];
+  trivial [label="One-line / trivial change?\nImplement directly → git-commit", shape=note, fillcolor="#fff3cd"];
+  start -> trivial [label="trivial", style=dashed];
+
+  subgraph cluster_understand {
+    label="1 · Understand  (optional — skip for a one-sentence change)";
+    style=filled;
+    fillcolor="#f7f7f7";
+
+    research [label="research-run\ndurable, cited evidence", fillcolor="#eaf6ff"];
+    formulation [label="formulation-run\ncandidate requirements + examples", fillcolor="#eaf6ff"];
+    design [label="decision-* / solution-design-* / experience-design-*\ncreate → critique → revise → accept  (only when they apply)", shape=note, fillcolor="#fff3cd"];
+    research -> formulation;
+  }
+
+  subgraph cluster_plan {
+    label="2 · Plan";
+    style=filled;
+    fillcolor="#e8f0fe";
+
+    planresearch [label="plan-research\nread-only: codebase + web", fillcolor="#d9e8ff"];
+    plancreate [label="plan-create\nhigh-level plan · pending-approval", fillcolor="#d9e8ff"];
+    plancritique [label="plan-critique\nadversarial · FRESH session", fillcolor="#dff4ff"];
+    planrevise [label="plan-revise\napply findings → new revision", fillcolor="#dff4ff"];
+    planaccept [label="plan-accept  ◆ human gate\nsets status: approved", fillcolor="#ffe4cc"];
+    subplans [label="plan-subplans-create\ndetailed child plans + parallel groups", fillcolor="#d9e8ff"];
+
+    planresearch -> plancreate -> plancritique;
+    plancreate -> planaccept [label="straightforward — skip critique", style=dashed];
+    plancritique -> planrevise [label="findings"];
+    planrevise -> plancritique [label="re-critique", style=dashed];
+    plancritique -> planaccept [label="solid"];
+    planaccept -> subplans [label="approved"];
+  }
+
+  subgraph cluster_build {
+    label="3 · Build  (the only stage that writes code)";
+    style=filled;
+    fillcolor="#eefbe8";
+
+    plancontinue [label="plan-continue\ncompletes ONE subplan, then stops", fillcolor="#ddf5d5"];
+    developrun [label="parallel / formal alternative\ndevelop-run  +  develop-consolidate", shape=note, fillcolor="#fff3cd"];
+    validate [label="plan-validate\nread-only PASS / FAIL / WARN", fillcolor="#ddf5d5"];
+
+    plancontinue -> plancontinue [label="next subplan"];
+    plancontinue -> validate [label="all subplans done"];
+    plancontinue -> developrun [style=invis];
+  }
+
+  subgraph cluster_ship {
+    label="4 · Ship";
+    style=filled;
+    fillcolor="#e8f0fe";
+
+    commit [label="git-commit\nrun repeatedly during build", fillcolor="#d9e8ff"];
+    pr [label="pr-create\nopen PR / MR from the branch", fillcolor="#d9e8ff"];
+    review [label="optional AI review pipeline\npr-review: analyze → refine → post → resolve", shape=note, fillcolor="#fff3cd"];
+    merge [label="Human review + merge", shape=house, fillcolor="#e8d5f5"];
+
+    commit -> pr -> merge;
+    pr -> review [style=dashed];
+    review -> merge [style=dashed];
+  }
+
+  start -> planresearch [label="well scoped", lhead=cluster_plan];
+  start -> research [label="fuzzy / greenfield", lhead=cluster_understand];
+  formulation -> planresearch [ltail=cluster_understand, lhead=cluster_plan];
+  subplans -> plancontinue [ltail=cluster_plan, lhead=cluster_build, label="assign"];
+  validate -> commit [ltail=cluster_build, lhead=cluster_ship];
+
+  subgraph cluster_governed {
+    label="Governed extension — skip unless regulated";
+    style=filled;
+    fillcolor="#fff0e6";
+
+    publish [label="deliver-publish", fillcolor="#ffe4cc"];
+    reviewqa [label="review-run  +  qa-run\nfindings + test evidence", fillcolor="#ffe9d9"];
+    accept [label="acceptance-validate → acceptance-decide\n(authenticated human signs off)", fillcolor="#ffd6d6"];
+    integrate [label="integration-validate → integration-run\n(protected external gate)", fillcolor="#ffd6d6"];
+    release [label="transition-run / release-run → observe-run", fillcolor="#fff7e6"];
+
+    publish -> reviewqa -> accept -> integrate -> release;
+  }
+
+  merge -> publish [label="regulated flow", style=dashed, lhead=cluster_governed];
+
+  legend [label="Verb convention: -research read-only · -create draft · -critique attack (fresh session) · -revise new revision · -accept/-reject authority gate · -run/-continue execute · -validate check\n◆ = mandatory human gate   ·   dashed = optional / loop back   ·   results pass by opaque native reference, not conversation memory", shape=note, fillcolor="#fff3cd"];
+  legend -> start [style=invis];
+}
