@@ -47,7 +47,7 @@ These are semantic requirements, not field names or a required serialization. A 
 | Retirement              | Subject and scope, authorization, archive/migration/deletion actions, verification, residual risk                 |
 | Learning                | Source results, lesson and effectiveness evidence, proposed change, reviewer, promotion/rollback state            |
 
-Profiles may omit or compose capabilities, but they never rename away the underlying result kind or erase its independent publication and pickup boundary.
+Profiles may omit or compose capabilities, but they never rename away the underlying result kind or erase its independent publication and pickup boundary. Where a result records an actor, authority, or independence, **agent-governance-guide** defines those terms and states which of them code enforces.
 
 An `Inventory` result may specialize as an SBOM, AIBOM/AI-SBOM, ML-BOM, CBOM, service inventory, or agent-environment inventory. It may describe software, models, datasets, prompts, agents, cryptographic assets, services, installed skills, plugins, hooks, extensions, MCP servers, CI components, policy bundles, tools, and requested/effective permissions. Deterministic sources establish component identities, versions, relationships, and provenance; model enrichment is non-authoritative and limited to sourced descriptions. Each entry retains native identity/version, provenance, relationships, authority zone, observed state, and gaps. This optional inventory is not required to use one serialization; an adapter may link a provider-native SPDX, CycloneDX, package, or platform inventory by opaque reference.
 

@@ -45,6 +45,8 @@ Compose policy, execution, enforcement, enablement, evidence, and trust without 
 
 - Read [references/architecture.md](references/architecture.md) - Load when assigning plane ownership, adoption modes, trust zones, or dependency directions
 - Read [references/execution.md](references/execution.md) - Load when selecting or constraining deterministic, model, agent, human, or external execution
+- Read [references/autonomy.md](references/autonomy.md) - Load when grading or raising an autonomy posture, coupling a level to required oversight, or bounding escalation windows and safe defaults
+- Read [references/actors.md](references/actors.md) - Load when recording an actor, deciding what a role string may mean, requiring independence or segregation of duties, or checking which actor rules code enforces
 - Read [references/events-and-capabilities.md](references/events-and-capabilities.md) - Load when mapping semantic event intents to a harness capability matrix
 - Read [references/policy-and-authority.md](references/policy-and-authority.md) - Load when defining decisions, enforcement, actors, evidence origin, exceptions, or break-glass
 - Read [references/provider-contracts.md](references/provider-contracts.md) - Load when defining or validating policy, configuration, telemetry, or evidence provider operations

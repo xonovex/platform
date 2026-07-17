@@ -19,7 +19,7 @@ Inventory, Review, QA, and Assessment publish independent results against exact 
 | Human or qualified assessor        | Accountable disposition, contextual or role-bound judgment         | Record identity, role, qualification, independence, and scope                 |
 | External system                    | Provider-native check, artifact, report, approval, or audit record | Preserve subject revision, evaluator/policy version, outcome, and freshness   |
 
-Static tools, scanners, CI, bounded model review, independent agents, and humans may compose in one capability. Record each origin separately; do not normalize copied logs into a stronger authority class.
+Static tools, scanners, CI, bounded model review, independent agents, and humans may compose in one capability. Record each origin separately; do not normalize copied logs into a stronger authority class. The identity, role, and independence a human or agent row records are defined by **agent-governance-guide**, which also states which of them code enforces and which a profile must uphold itself.
 
 ## Freshness binding
 
@@ -30,7 +30,7 @@ subject native reference and revision or digest
 criteria, policy, profile, and control versions
 evaluator, scanner, model, module, and ruleset versions
 environment identity and relevant configuration versions
-actor identity, role, independence, and qualification where required
+actor identity and qualification, with role and independence where the profile binds them
 evaluation time, expiry, native evidence references, and limitations
 ```
 

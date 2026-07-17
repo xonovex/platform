@@ -20,7 +20,7 @@ Do not claim a decision was enforced merely because a policy file, skill, or hoo
 
 ## Actors and evidence origin
 
-Profiles declare required role, authority, independence, segregation of duties, qualification, and permitted evidence origin. Distinguish:
+Profiles declare the actor requirements a decision must satisfy, plus qualification and permitted evidence origin. [actors.md](actors.md) owns the actor record, what a role string may mean, independence, segregation of duties, and which of them code enforces; declaring a requirement there is not the same as enforcing it. Distinguish evidence origin:
 
 - agent recommendation;
 - model inference;
