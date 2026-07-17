@@ -147,6 +147,11 @@ export const validateAuthorization = ({authorization, request}) => {
   return null;
 };
 
+// Bypassing a control is the strongest authority a record can carry, so the
+// approver meets the same actor contract validateAcceptance requires of a
+// decision actor: a human that is accountable. `owner` names the party the
+// access is held by, not the actor that approved it, and is checked only for
+// presence.
 export const validateEmergencyAccess = ({access, request}) => {
   if (
     !["exception", "break-glass"].includes(access?.kind) ||
@@ -159,6 +164,7 @@ export const validateEmergencyAccess = ({access, request}) => {
     ]) ||
     !hasEveryValue(access.approver, ["identity", "role"]) ||
     access.approver.type !== "human" ||
+    access.approver.accountable !== true ||
     !isNonEmptyArray(access.scope?.actions) ||
     !isNonEmptyArray(access.scope?.targets) ||
     !isNonEmptyArray(access.compensatingControls) ||

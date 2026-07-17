@@ -56,7 +56,7 @@
       "decision": "accept",
       "actor": {
         "identity": "human:owner",
-        "role": "product-owner",
+        "role": "pm",
         "type": "human",
         "accountable": true
       },
@@ -125,7 +125,8 @@
         "approver": {
           "identity": "human:security-lead",
           "role": "emergency-approver",
-          "type": "human"
+          "type": "human",
+          "accountable": true
         },
         "scope": {
           "actions": ["integration"],
@@ -701,6 +702,19 @@
       "expectedCode": "human-acceptance-required"
     },
     {
+      "id": "unaccountable-human-cannot-record-acceptance",
+      "contract": "acceptance",
+      "template": "acceptance-decision",
+      "profileTemplate": "governed-profile",
+      "input": {
+        "actor": {
+          "accountable": false
+        }
+      },
+      "expectedValid": false,
+      "expectedCode": "human-acceptance-required"
+    },
+    {
       "id": "author-cannot-accept-own-subject",
       "contract": "acceptance",
       "template": "acceptance-decision",
@@ -803,6 +817,20 @@
       "contract": "authorization",
       "template": "authorization",
       "expectedValid": true
+    },
+    {
+      "id": "unaccountable-human-cannot-authorize",
+      "contract": "authorization",
+      "template": "authorization",
+      "input": {
+        "authorization": {
+          "actor": {
+            "accountable": false
+          }
+        }
+      },
+      "expectedValid": false,
+      "expectedCode": "human-authorization-required"
     },
     {
       "id": "target-drift-invalidates-authorization",
@@ -1112,6 +1140,35 @@
         }
       },
       "expectedValid": true
+    },
+    {
+      "id": "break-glass-requires-accountable-approver",
+      "contract": "emergency-access",
+      "template": "break-glass",
+      "input": {
+        "access": {
+          "approver": {
+            "accountable": false
+          }
+        }
+      },
+      "expectedValid": false,
+      "expectedCode": "emergency-access-contract-incomplete"
+    },
+    {
+      "id": "exception-approver-accountability-is-not-optional",
+      "contract": "emergency-access",
+      "template": "break-glass",
+      "input": {
+        "access": {
+          "kind": "exception",
+          "approver": {
+            "accountable": null
+          }
+        }
+      },
+      "expectedValid": false,
+      "expectedCode": "emergency-access-contract-incomplete"
     },
     {
       "id": "expired-break-glass-fails-closed",

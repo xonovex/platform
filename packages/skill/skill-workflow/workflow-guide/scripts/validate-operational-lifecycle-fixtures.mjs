@@ -83,12 +83,22 @@ const validateCase = (testCase, templates) => {
 // Acceptance independence is resolved from the profile, so these cases prove a
 // record cannot elect the check applied to it. Deleting one would silently
 // reopen the self-approval path; requiredCaseIds keeps them under test.
+//
+// `accountable` is spelled out separately at each site that records a decision
+// actor, so one negative case per site keeps the sites from forking: a template
+// carrying `accountable: true` passes whether or not the site still reads the
+// field. The emergency-access cases cover both a false and an absent value, and
+// both kinds, because the approver contract does not vary by kind.
 const requiredCaseIds = [
   "author-cannot-accept-own-subject",
   "record-cannot-waive-profile-independence",
   "acceptance-independence-requirement-undeclared",
   "acceptance-independence-unverifiable-without-author",
   "profile-may-waive-acceptance-independence",
+  "unaccountable-human-cannot-record-acceptance",
+  "unaccountable-human-cannot-authorize",
+  "break-glass-requires-accountable-approver",
+  "exception-approver-accountability-is-not-optional",
 ];
 
 export const validateOperationalLifecycleFixtures = () => {
