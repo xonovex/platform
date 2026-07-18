@@ -27,6 +27,10 @@ vcs:
   sync: true
 constraints:
   enforceLayerRelationships: true
+docker:
+  scaffold:
+    configsPhaseGlobs:
+      - packages/config/ts-config-*/src/index.json
 hasher:
   optimization: performance
   walkStrategy: vcs
