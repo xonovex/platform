@@ -1,5 +1,5 @@
 ---
-description: Optimize a skill (or the whole catalog) to its delta over the weakest model — baseline-measure, tier-aware trim, validate.py gate, and ablation-restore of any essential fact lost
+description: Optimize a skill (or the whole catalog) to its delta over the weakest model in five phases — Baseline, Scope, Excise, Gate, Ablate: measure priors, set trim depth, cut to the delta, validate.py, then ablate-restore any essential fact lost
 allowed-tools:
   - Read
   - Edit
@@ -27,8 +27,12 @@ argument-hint: "[skill-file|--all] [--model <weakest>] [--tier auto|aggressive|m
 ## Delegation
 
 Load the `skill-guide` skill (plugin `xonovex-skill-skill`) and run its **optimize**
-operation end to end for the target(s): measure the weakest model's baseline against each
-skill's `evals.json` with the skill absent, classify tier, trim to the knowledge delta,
-gate with `scripts/validate.py`, then ablate — re-measure with the trimmed skill in context
-and restore any essential fact it no longer conveys. The skill is the source of truth for
-the procedure, tiers, and gotchas — do not restate them.
+operation end to end for the target(s), in five phases:
+
+1. **Baseline** — measure the weakest model against each skill's `evals.json` with the skill absent, to map what it already knows.
+2. **Scope** — classify the trim depth (aggressive/moderate/conservative) for the skill's type.
+3. **Excise** — cut to the knowledge delta; dedupe; fix any defect the cut surfaces.
+4. **Gate** — `scripts/validate.py` must pass.
+5. **Ablate** — re-measure with the trimmed skill in context and restore any essential fact it no longer conveys.
+
+The skill is the source of truth for the procedure, tiers, and gotchas — do not restate them.
