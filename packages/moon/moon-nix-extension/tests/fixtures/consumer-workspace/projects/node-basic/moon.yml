@@ -1,0 +1,22 @@
+$schema: https://moonrepo.dev/schemas/project.json
+language: javascript
+layer: application
+tasks:
+  detected-node:
+    command: node
+    args: [fixture]
+    inputs: [source.txt]
+    options:
+      shell: false
+  cacheable:
+    script: |
+      mkdir -p outputs
+      printf '%s\n' cacheable >> "$MOON_FIXTURE_COUNTER_DIR/node-basic"
+      printf '%s\n' result > outputs/cacheable.txt
+    inputs: [source.txt]
+    outputs: [outputs/cacheable.txt]
+  uncached:
+    script: printf '%s\n' uncached >> "$MOON_FIXTURE_COUNTER_DIR/uncached"
+    inputs: [source.txt]
+    options:
+      cache: false

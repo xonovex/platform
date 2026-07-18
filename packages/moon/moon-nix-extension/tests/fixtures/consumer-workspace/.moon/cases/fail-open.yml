@@ -1,0 +1,3 @@
+extends: './extensions-base.yml'
+nix-environment:
+  failClosed: false

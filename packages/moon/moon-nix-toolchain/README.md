@@ -2,6 +2,33 @@
 
 A moon toolchain plugin that runs selected tasks inside the workspace's Nix flake dev shell, so flake-pinned tools are used identically across local `moon run`, the git pre-commit hook, and CI — with no per-developer setup.
 
+## Choose one Nix plugin
+
+Every workspace must use exactly one Xonovex Nix plugin.
+
+| Capability      | `moon_nix_extension`                                                             | `moon_nix_toolchain`                                                                 |
+| --------------- | -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| Recommended use | New consumers                                                                    | Compatibility or special-purpose consumers                                           |
+| Task selection  | Detected native toolchains plus typed project/task overrides                     | Explicit `nix` toolchain selection plus task, toolchain, tag, and language selectors |
+| Environment     | Dynamically composes central, mapping-gated components through `lib.mkMoonShell` | Selects a workspace or automatically discovered project devShell                     |
+| Realization     | Lazy, when an active task runs                                                   | Eager, through `setup_environment`                                                   |
+| Cache contract  | Consumer declares central and project Nix inputs                                 | Plugin adds resolved flake, shell, and lock data through `hash_task_contents`        |
+
+The extension is recommended for new consumers and is pinned as:
+
+```yaml
+nix-environment:
+  plugin: "github://xonovex/platform/moon_nix_extension@moon_nix_extension-v0.1.0"
+```
+
+This toolchain plugin remains supported for consumers that need explicit `nix`
+selection, automatic cache hashing, eager shell setup, automatic project-flake
+discovery, or tag/language selectors. Migrating replaces the old plugin
+configuration atomically in one reviewed PR; do not configure both plugins,
+even temporarily. Arbitrary peer command replacement is unsupported by the
+extension. Retiring this plugin requires a separate plan after hook parity and
+consumer migration are complete.
+
 ## What it does
 
 Registers a `Nix` toolchain. Tasks that select it are rewritten to run inside `nix develop <root> --command …`, so binaries resolve from the flake's dev shell instead of the developer's `$PATH`. It is generic — the root is resolved at runtime and it carries no consumer-specific config. A project that ships its own `flake.nix` is wrapped with that flake (see [Per-project flakes](#per-project-flakes)); otherwise the workspace flake is used.
@@ -18,7 +45,7 @@ Register the plugin in `.moon/toolchains.yml`, pinned to a release tag:
 
 ```yaml
 nix:
-  plugin: 'github://xonovex/platform/moon_nix_toolchain@moon_nix_toolchain-v0.6.0'
+  plugin: "github://xonovex/platform/moon_nix_toolchain@moon_nix_toolchain-v0.6.1"
 ```
 
 Opt a project in via its `moon.yml` (moon has no global toolchain default, so this is per project):
@@ -42,7 +69,7 @@ An unset, empty, or `default` value selects the flake's default devShell. `shell
 
 ```yaml
 nix:
-  plugin: 'github://xonovex/platform/moon_nix_toolchain@moon_nix_toolchain-v0.6.0'
+  plugin: "github://xonovex/platform/moon_nix_toolchain@moon_nix_toolchain-v0.6.1"
   # Tag-based: every project tagged `go` runs its tasks in `nix develop <root>#go`,
   # without enumerating task ids or relying on a real toolchain id.
   shellByTag:
@@ -79,7 +106,7 @@ By default a task on a host without `nix` runs unchanged on host tools — conve
 
 ```yaml
 nix:
-  plugin: 'github://xonovex/platform/moon_nix_toolchain@moon_nix_toolchain-v0.6.0'
+  plugin: "github://xonovex/platform/moon_nix_toolchain@moon_nix_toolchain-v0.6.1"
   # Tasks in any project carrying one of these tags MUST run inside nix.
   failClosedByTag: [cmake]
   # Or key the same contract on the project language:

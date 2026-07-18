@@ -1,12 +1,14 @@
 use extism_pdk::*;
+use moon_nix_runtime::guard::{decide_wrap, WrapFacts, WrapGuard, SENTINEL};
+use moon_nix_runtime::serialize::escape_nix_string;
+use moon_nix_runtime::target::{resolve_flake_target as resolve_runtime_flake_target, FlakeTarget};
+use moon_nix_runtime::wrap::{
+    effective_shell as resolve_effective_shell, flake_ref, plan_command, plan_script, WrapDecision,
+};
 use moon_pdk::*;
 use moon_pdk_api::*;
 use schematic::{Config, SchemaBuilder};
 use std::collections::HashMap;
-
-/// Env var set on a wrapped task so a task is wrapped at most once, even outside
-/// a dev shell (belt-and-suspenders alongside the `IN_NIX_SHELL` guard).
-const SENTINEL: &str = "MOON_NIX_WRAPPED";
 
 /// Typed `nix` toolchain configuration, validated against the schema returned by
 /// `define_toolchain_config`. The devShell selectors are resolved most-specific
@@ -116,19 +118,6 @@ pub fn define_toolchain_config() -> FnResult<Json<DefineToolchainConfigOutput>> 
     }))
 }
 
-/// The nix flake a task is wrapped with: the real path passed to `nix develop`. A
-/// project-local `flake.nix` wins over the workspace flake; either way the resolved
-/// devShell selector (`resolve_shell`) is applied, so a project flake routes a task to
-/// `{root}#<shell>` when a selector matches. For a project flake a selected name the
-/// flake does not expose is dropped (`effective_shell`), falling back to its `default`.
-struct WrapTarget {
-    root: String,
-    /// True when `root` is a project-local flake (`<project>/flake.nix`), false for the
-    /// workspace flake. Only project-flake selectors are existence-checked before
-    /// routing; the workspace flake is curated to expose its configured devShells.
-    is_project_flake: bool,
-}
-
 /// Return the flake to wrap the task with, or `None` when the task must run
 /// unchanged: already inside a dev shell (CI's outer `nix develop`), already
 /// wrapped, `nix` is unavailable for a non-opted project, or no real path resolves.
@@ -140,32 +129,30 @@ fn resolve_wrap_target(
     project: &ProjectFragment,
     target_id: &str,
     config: &NixToolchainConfig,
-) -> AnyResult<Option<WrapTarget>> {
-    if !get_host_env_var("IN_NIX_SHELL")?
-        .unwrap_or_default()
-        .is_empty()
-    {
-        return Ok(None);
-    }
+) -> AnyResult<Option<FlakeTarget>> {
+    let facts = WrapFacts {
+        in_nix_shell: !get_host_env_var("IN_NIX_SHELL")?
+            .unwrap_or_default()
+            .is_empty(),
+        already_wrapped: get_host_env_var(SENTINEL)?.unwrap_or_default() == "1",
+        nix_available: command_exists(&get_host_environment()?, "nix"),
+    };
 
-    if get_host_env_var(SENTINEL)?.unwrap_or_default() == "1" {
-        return Ok(None);
-    }
+    match decide_wrap(facts) {
+        WrapGuard::Unchanged => Ok(None),
+        WrapGuard::Ready => resolve_flake_target(context, project.source.as_str()),
+        WrapGuard::MissingNix => {
+            if fail_closed_opted_in(project.id.as_str(), config)? {
+                return Err(anyhow!(
+                    "nix is required for `{target_id}` but `nix` was not found on PATH; \
+                     this project opted into fail-closed nix \
+                     (failClosedByTag / failClosedByLanguage)"
+                ));
+            }
 
-    if !command_exists(&get_host_environment()?, "nix") {
-        // Fail closed for opted-in projects: a task that must run inside nix must
-        // not silently fall back to host tools when `nix` is absent.
-        if fail_closed_opted_in(project.id.as_str(), config)? {
-            return Err(anyhow!(
-                "nix is required for `{target_id}` but `nix` was not found on PATH; \
-                 this project opted into fail-closed nix \
-                 (failClosedByTag / failClosedByLanguage)"
-            ));
+            Ok(None)
         }
-        return Ok(None);
     }
-
-    resolve_flake_target(context, project.source.as_str())
 }
 
 /// Resolve the flake that wraps a task purely from paths, with no runtime guards:
@@ -176,8 +163,8 @@ fn resolve_wrap_target(
 fn resolve_flake_target(
     context: &MoonContext,
     project_source: &str,
-) -> AnyResult<Option<WrapTarget>> {
-    if !project_source.is_empty() {
+) -> AnyResult<Option<FlakeTarget>> {
+    let project_flake_root = if !project_source.is_empty() {
         if let Some(project_root) = context.workspace_root.join(project_source).real_path() {
             // Detect the project flake over the host: the plugin's sandbox has no
             // direct read access to the workspace, so `VirtualPath::is_file` cannot
@@ -188,18 +175,26 @@ fn resolve_flake_target(
             if exec_captured("test", ["-f", flake_path.as_ref()])
                 .is_ok_and(|result| result.exit_code == 0)
             {
-                return Ok(Some(WrapTarget {
-                    root: project_root.to_string_lossy().into_owned(),
-                    is_project_flake: true,
-                }));
+                Some(project_root.to_string_lossy().into_owned())
+            } else {
+                None
             }
+        } else {
+            None
         }
-    }
+    } else {
+        None
+    };
 
-    Ok(context.workspace_root.real_path().map(|path| WrapTarget {
-        root: path.to_string_lossy().into_owned(),
-        is_project_flake: false,
-    }))
+    let workspace_root = context
+        .workspace_root
+        .real_path()
+        .map(|path| path.to_string_lossy().into_owned());
+
+    Ok(resolve_runtime_flake_target(
+        workspace_root,
+        project_flake_root,
+    ))
 }
 
 /// Trim a configured devShell name, treating empty or `default` as no selection
@@ -255,15 +250,6 @@ fn resolve_shell(
     Ok(config.shell.as_deref().and_then(normalize_shell))
 }
 
-/// Build the `nix develop` flake reference: the flake root, plus a `#<shell>`
-/// attribute when a named devShell is selected, else the root's default devShell.
-fn flake_ref(root: &str, shell: Option<&str>) -> String {
-    match shell {
-        Some(shell) => format!("{root}#{shell}"),
-        None => root.to_string(),
-    }
-}
-
 /// Whether the flake at `root` exposes a devShell named `shell` for the current
 /// system. Evaluates `<root>#devShells` only (attribute names, never building the
 /// shell) and never writes a lock file, so it does not mutate the project. `nix` is
@@ -271,12 +257,7 @@ fn flake_ref(root: &str, shell: Option<&str>) -> String {
 /// `devShells` output, missing system) reports `false` so the wrap degrades to the
 /// flake's `default` rather than emitting a `#<shell>` that `nix develop` rejects.
 fn flake_exposes_shell(root: &str, shell: &str) -> bool {
-    // Escape the name for a `"..."` Nix string literal: backslash, double-quote, and
-    // the `${` interpolation opener (`\${` is a literal `${`).
-    let escaped = shell
-        .replace('\\', "\\\\")
-        .replace('"', "\\\"")
-        .replace("${", "\\${");
+    let escaped = escape_nix_string(shell);
     let reference = format!("{root}#devShells");
     let apply =
         format!("sets: builtins.hasAttr \"{escaped}\" (sets.${{builtins.currentSystem}} or {{}})");
@@ -300,11 +281,12 @@ fn flake_exposes_shell(root: &str, shell: &str) -> bool {
 /// configured `#<shell>` can never hard-fail `nix develop`. Workspace-flake selectors
 /// and the no-selector case are returned unchanged — the existence probe runs only
 /// for a project flake with a resolved name.
-fn effective_shell(target: &WrapTarget, shell: Option<String>) -> Option<String> {
-    match shell {
-        Some(name) if target.is_project_flake && !flake_exposes_shell(&target.root, &name) => None,
-        other => other,
-    }
+fn effective_shell(target: &FlakeTarget, shell: Option<String>) -> Option<String> {
+    let named_shell_available = shell
+        .as_deref()
+        .is_none_or(|name| !target.is_project_flake || flake_exposes_shell(&target.root, name));
+
+    resolve_effective_shell(target, shell, named_shell_available)
 }
 
 /// Read a flake's `flake.lock` over the host so its pinned inputs fold into the
@@ -320,98 +302,91 @@ fn flake_lock_contents(root: &str) -> String {
         .unwrap_or_default()
 }
 
-/// Quote a string for safe inclusion as a single POSIX shell argument.
-fn shell_quote(value: &str) -> String {
-    format!("'{}'", value.replace('\'', "'\\''"))
+fn command_output(decision: WrapDecision) -> ExtendTaskCommandOutput {
+    let mut output = ExtendTaskCommandOutput::default();
+    let WrapDecision::Command { command, args } = decision else {
+        return output;
+    };
+
+    output.command = Some(command);
+    output.args = Some(Extend::Replace(args));
+    output.env.insert(SENTINEL.into(), "1".into());
+    output
+}
+
+fn script_output(decision: WrapDecision) -> ExtendTaskScriptOutput {
+    let mut output = ExtendTaskScriptOutput::default();
+    let WrapDecision::Script(script) = decision else {
+        return output;
+    };
+
+    output.script = Some(script);
+    output.env.insert(SENTINEL.into(), "1".into());
+    output
 }
 
 #[plugin_fn]
 pub fn extend_task_command(
     Json(input): Json<ExtendTaskCommandInput>,
 ) -> FnResult<Json<ExtendTaskCommandOutput>> {
-    let mut output = ExtendTaskCommandOutput::default();
-
     let config: NixToolchainConfig = parse_toolchain_config_schema(input.toolchain_config.clone())?;
 
-    let Some(target) = resolve_wrap_target(
+    let target = resolve_wrap_target(
         &input.context,
         &input.project,
         input.task.target.id.as_str(),
         &config,
-    )?
-    else {
-        return Ok(Json(output));
+    )?;
+
+    let decision = match target {
+        Some(target) => {
+            let shell = effective_shell(
+                &target,
+                resolve_shell(
+                    input.task.target.get_task_id().ok(),
+                    &input.task.toolchains,
+                    input.project.id.as_str(),
+                    &config,
+                )?,
+            );
+            plan_command(Some(&target), shell.as_deref(), input.command, input.args)
+        }
+        None => WrapDecision::Unchanged,
     };
 
-    // Resolve the devShell selector for every flake, project-local or workspace, then
-    // drop a project-flake name the flake does not expose so the wrap falls back to its
-    // default devShell instead of a `#<shell>` that `nix develop` would reject.
-    let shell = effective_shell(
-        &target,
-        resolve_shell(
-            input.task.target.get_task_id().ok(),
-            &input.task.toolchains,
-            input.project.id.as_str(),
-            &config,
-        )?,
-    );
-
-    // Rebuild the entire argv: nix develop <flakeref> --command <cmd> <args...>.
-    // `--command` must be the last `nix` flag; everything after it is the child
-    // argv, passed through verbatim with no shell layer.
-    let mut args = vec![
-        "develop".to_string(),
-        flake_ref(&target.root, shell.as_deref()),
-        "--command".to_string(),
-        input.command.clone(),
-    ];
-    args.extend(input.args.clone());
-
-    output.command = Some("nix".into());
-    output.args = Some(Extend::Replace(args));
-    output.env.insert(SENTINEL.into(), "1".into());
-
-    Ok(Json(output))
+    Ok(Json(command_output(decision)))
 }
 
 #[plugin_fn]
 pub fn extend_task_script(
     Json(input): Json<ExtendTaskScriptInput>,
 ) -> FnResult<Json<ExtendTaskScriptOutput>> {
-    let mut output = ExtendTaskScriptOutput::default();
-
     let config: NixToolchainConfig = parse_toolchain_config_schema(input.toolchain_config.clone())?;
 
-    let Some(target) = resolve_wrap_target(
+    let target = resolve_wrap_target(
         &input.context,
         &input.project,
         input.task.target.id.as_str(),
         &config,
-    )?
-    else {
-        return Ok(Json(output));
+    )?;
+
+    let decision = match target {
+        Some(target) => {
+            let shell = effective_shell(
+                &target,
+                resolve_shell(
+                    input.task.target.get_task_id().ok(),
+                    &input.task.toolchains,
+                    input.project.id.as_str(),
+                    &config,
+                )?,
+            );
+            plan_script(Some(&target), shell.as_deref(), &input.script)
+        }
+        None => WrapDecision::Unchanged,
     };
 
-    let shell = effective_shell(
-        &target,
-        resolve_shell(
-            input.task.target.get_task_id().ok(),
-            &input.task.toolchains,
-            input.project.id.as_str(),
-            &config,
-        )?,
-    );
-
-    // A script is one opaque string, so it needs a shell layer inside the dev
-    // shell: nix develop <flakeref> --command bash -c "<original script>".
-    output.script = Some(format!(
-        "nix develop {} --command bash -c {}",
-        shell_quote(&flake_ref(&target.root, shell.as_deref())),
-        shell_quote(&input.script)
-    ));
-    output.env.insert(SENTINEL.into(), "1".into());
-
-    Ok(Json(output))
+    Ok(Json(script_output(decision)))
 }
 
 #[plugin_fn]

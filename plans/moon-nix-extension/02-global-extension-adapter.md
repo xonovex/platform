@@ -3,7 +3,7 @@ type: plan
 has_subplans: false
 parent_plan: plans/moon-nix-extension.md
 parallel_group: 2
-status: pending
+status: complete
 dependencies:
   plans:
     - 01-shared-nix-runtime
@@ -17,11 +17,11 @@ skills_to_consult:
   - testing-guide
   - shell-scripting-guide
 validation:
-  type_check: pending
-  lint: pending
-  build: pending
-  tests: pending
-  integration: pending
+  type_check: passed
+  lint: passed
+  build: passed
+  tests: passed
+  integration: passed
 ---
 
 # 02 — Build the global extension adapter and composable flake contract
@@ -223,23 +223,23 @@ not hand-edited around escaping failures.
 
 ## Success Criteria
 
-- [ ] `moon_nix_extension.wasm` builds as an independently deployable artifact
+- [x] `moon_nix_extension.wasm` builds as an independently deployable artifact
       with only a static Rust dependency on `moon-nix-runtime`.
-- [ ] Moon validates the documented camelCase config and rejects malformed
+- [x] Moon validates the documented camelCase config and rejects malformed
       override unions/keys before wrapping an affected task.
-- [ ] A detected Node task without `system` resolves `[general, node]` through
+- [x] A detected Node task without `system` resolves `[general, node]` through
       mapping-gated `baseComponents`; an unmapped/unoverridden task is unchanged.
-- [ ] Project then full-target task precedence exactly matches parent decision
+- [x] Project then full-target task precedence exactly matches parent decision
       9, including deterministic installable transition errors.
-- [ ] Central components use only `lib.mkMoonShell`; project/task installables
+- [x] Central components use only `lib.mkMoonShell`; project/task installables
       accept only canonical workspace-contained locked `path:` flakes.
-- [ ] Command argv and script text survive quoting/escaping tests with the same
+- [x] Command argv and script text survive quoting/escaping tests with the same
       exit behavior and working directory as the original task.
-- [ ] Outer Nix/nested Moon re-entry is idempotent without relying on or loading
+- [x] Outer Nix/nested Moon re-entry is idempotent without relying on or loading
       the Nix toolchain plugin.
-- [ ] Arbitrary peer command replacement is documented as unsupported instead
+- [x] Arbitrary peer command replacement is documented as unsupported instead
       of being falsely claimed safe through the sentinel.
-- [ ] Runtime, existing toolchain, extension, flake, clippy, rustfmt, and WASM
+- [x] Runtime, existing toolchain, extension, flake, clippy, rustfmt, and WASM
       validation commands all pass.
 
 ## Files Modified/Created
@@ -254,6 +254,23 @@ not hand-edited around escaping failures.
 
 Requires completed subplan `01-shared-nix-runtime`. This is execution group 2;
 subplan 03 must wait for it to merge.
+
+## Validation Results
+
+- 30 runtime tests, 31 existing toolchain tests, and 17 extension tests pass.
+  Runtime, toolchain, and extension `ci-check` tasks pass; the extension
+  `github-check` task also passes, including clippy, rustfmt, optimized WASM
+  build, `wasm-validate`, and changelog-version checks.
+- `nix flake check` passes. Read-only evaluations accept `[general, node]`,
+  `[general, go, node]`, and the deliberate empty component set; an unknown
+  component fails with an error that names the missing component.
+- Local `moon extension info` reports the expected configuration schema and
+  only the registration, configuration, command, and script extension hooks.
+  The optimized WASM exports those same four hooks plus memory.
+- `cargo tree` reports `moon_nix_runtime` as a direct path dependency compiled
+  into the extension, with no runtime plugin locator or dynamic dependency.
+- Existing static devShell derivation paths are unchanged, and
+  `git diff --check` passes.
 
 ## Estimated Duration
 

@@ -1,0 +1,61 @@
+$schema: https://moonrepo.dev/schemas/project.json
+layer: application
+tasks:
+  project-shell:
+    script: |
+      special-moon-marker
+      if command -v moon-general-marker >/dev/null 2>&1; then
+        printf '%s\n' 'unexpected workspace component in project shell' >&2
+        exit 1
+      fi
+    inputs:
+      - source.txt
+      - flake.nix
+      - flake.lock
+      - nix/**/*
+  bootstrap:
+    script: |
+      special-bootstrap-marker
+      if command -v special-moon-marker >/dev/null 2>&1; then
+        printf '%s\n' 'unexpected moon project shell in bootstrap shell' >&2
+        exit 1
+      fi
+    inputs:
+      - source.txt
+      - flake.nix
+      - flake.lock
+      - nix/**/*
+  supersede:
+    command: bash
+    args:
+      - -c
+      - |
+        moon-general-marker
+        moon-node24-marker
+        if command -v special-moon-marker >/dev/null 2>&1; then
+          printf '%s\n' 'project installable was not superseded' >&2
+          exit 1
+        fi
+    inputs: [source.txt]
+    options:
+      shell: false
+  cacheable:
+    script: |
+      mkdir -p outputs
+      printf '%s\n' cacheable >> "$MOON_FIXTURE_COUNTER_DIR/special-compiler"
+      printf '%s\n' result > outputs/cacheable.txt
+    inputs:
+      - source.txt
+      - flake.nix
+      - flake.lock
+      - nix/**/*
+    outputs: [outputs/cacheable.txt]
+  negative:
+    command: special-moon-marker
+    inputs:
+      - source.txt
+      - flake.nix
+      - flake.lock
+      - nix/**/*
+    options:
+      shell: false

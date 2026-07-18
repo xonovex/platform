@@ -25,8 +25,11 @@ fi
 missing=0
 while IFS= read -r pkg; do
   dir="${pkg%/package.json}"
-  grep -q "\"${dir}\":" package-lock.json || { echo "validate-lockfile: ${dir} is missing from package-lock.json"; missing=1; }
-done < <(git ls-files 'packages/*/*/package.json' 'packages/*/package.json')
+  grep -q "\"${dir}\":" package-lock.json || {
+    echo "validate-lockfile: ${dir} is missing from package-lock.json"
+    missing=1
+  }
+done < <(git ls-files ':(glob)packages/*/*/package.json' ':(glob)packages/*/package.json')
 
 if [ "$missing" -ne 0 ]; then
   echo "validate-lockfile: package-lock.json is out of sync. Run 'npm install' and stage package-lock.json, then commit again." >&2

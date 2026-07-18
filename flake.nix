@@ -18,6 +18,18 @@
     let
       supportedSystems = [ "x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin" ];
       forAllSystems = nixpkgs.lib.genAttrs supportedSystems;
+      mkMoonShell = system: names:
+        let
+          pkgs = nixpkgs.legacyPackages.${system};
+          shells = nixShells.devShells.${system};
+          missingNames = builtins.filter (name: !(builtins.hasAttr name shells)) names;
+        in
+        if missingNames != [ ] then
+          throw "unknown Moon Nix environment component(s): ${builtins.concatStringsSep ", " missingNames}"
+        else
+          pkgs.mkShell {
+            inputsFrom = map (name: shells.${name}) names;
+          };
 
       # The agent image (dockerTools) is Linux-only; scope the smoke outputs that
       # realize it to Linux systems.
@@ -36,28 +48,22 @@
         };
     in
     {
-      devShells = forAllSystems (system:
-        let
-          pkgs = nixpkgs.legacyPackages.${system};
-          g = nixShells.devShells.${system};
-        in
-        {
-          # Full shell — composed from the shared per-tool devShells in nix/.
-          # g.docker supplies hadolint, which `docker-lint` (folded into ci-check
-          # via the docker tag's `lint` alias) needs on PATH.
-          default = pkgs.mkShell {
-            inputsFrom = [ g.node g.go g.k8s g.shell g.rust g.release g.ci g.docker g.general ];
-          };
+      lib.mkMoonShell = mkMoonShell;
 
-          # Lean per-purpose shells, selected via the nix toolchain `shellByTag` setting.
-          go = pkgs.mkShell { inputsFrom = [ g.go g.general ]; };
-          shell = pkgs.mkShell { inputsFrom = [ g.shell g.general ]; };
-          rust = pkgs.mkShell { inputsFrom = [ g.rust g.release g.general ]; };
+      devShells = forAllSystems (system: {
+        # Full shell — composed from the shared per-tool devShells in nix/.
+        # The docker component supplies hadolint, which `docker-lint` (folded into
+        # ci-check via the docker tag's `lint` alias) needs on PATH.
+        default = mkMoonShell system [ "node" "go" "k8s" "shell" "rust" "release" "ci" "docker" "general" ];
 
-          # Smoke: agent-env.nix resolves a devShell from one closure.
-          agentEnvTest = (agentTestEnv system).devShell;
-        }
-      );
+        # Lean per-purpose shells, selected via the nix toolchain `shellByTag` setting.
+        go = mkMoonShell system [ "go" "general" ];
+        shell = mkMoonShell system [ "shell" "general" ];
+        rust = mkMoonShell system [ "rust" "release" "general" ];
+
+        # Smoke: agent-env.nix resolves a devShell from one closure.
+        agentEnvTest = (agentTestEnv system).devShell;
+      });
 
       packages = forLinux (system: {
         # Smoke: mkAgentImage.nix builds a streamLayeredImage from the closure.

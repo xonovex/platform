@@ -1,0 +1,6 @@
+extends: './extensions-base.yml'
+nix-environment:
+  environmentByTask:
+    system:negative:
+      components: ['bad component']
+      mode: replace

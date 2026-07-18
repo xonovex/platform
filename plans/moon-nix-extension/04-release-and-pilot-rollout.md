@@ -3,7 +3,8 @@ type: plan
 has_subplans: false
 parent_plan: plans/moon-nix-extension.md
 parallel_group: 4
-status: pending
+status: in_progress
+updated: 2026-07-19
 dependencies:
   plans:
     - 03-cache-contract-and-consumer-fixture
@@ -24,10 +25,10 @@ skills_to_consult:
   - versioning-guide
   - git-guide
 validation:
-  type_check: pending
-  lint: pending
-  build: pending
-  tests: pending
+  type_check: passed
+  lint: passed
+  build: passed
+  tests: passed
   integration: pending
 ---
 
@@ -164,6 +165,73 @@ dual-plugin root configuration, even temporarily.
    cache inputs, verify null version ownership, pass full CI, and remove the old
    pin only when that whole workspace no longer needs it.
 
+## Execution Evidence — 2026-07-19
+
+Pre-release qualification and documentation are complete. Publication and all
+post-release work remain pending behind the required reviewed PR and human
+merge gate.
+
+Completed locally:
+
+- Aligned the extension README, toolchain README, and Moon package instructions
+  on the one-plugin role matrix, atomic migration rule, retained toolchain use
+  cases, cache/setup differences, and separate retirement gate.
+- Documented the complete pinned extension configuration, null native versions,
+  central `mkMoonShell`, inherited cache inputs, scoped component/installable
+  overrides, locked project flake, `GITHUB_TOKEN`, and independent sidecar
+  verification contract.
+- Confirmed `moon_nix_extension` is version 0.1.0 in both `Cargo.toml` and
+  `Cargo.lock`, and expanded the 0.1.0 changelog to cover mapping, composition,
+  overrides, consumer-owned cache inputs, lazy realization, and standalone WASM
+  deployment.
+- Passed the runtime, toolchain, and extension `ci-check` gates plus the
+  standalone consumer integration fixture. The combined run completed 27 Moon
+  tasks successfully.
+- Passed `moon-nix-extension:github-check`,
+  `moon-nix-extension:github-publish-dry-run`, and
+  `moon-nix-extension:ci-publish-dry-run`. The dry run would create
+  `moon_nix_extension-v0.1.0` and found exactly one non-empty optimized WASM
+  (2,078,164 bytes) plus its 90-byte SHA-256 sidecar.
+- Passed explicit `wasm-validate --enable-all`, `nix flake check`, and Prettier
+  checks for all modified Markdown files.
+- Verified the local tag list, `origin` tags, and GitHub Releases contain no
+  `moon_nix_extension-v0.1.0` tag or release.
+
+Artifact evidence:
+
+```text
+451cbf820f19b9b4cc0a04fd05e5d886c569fdfa6831431c9d14785f5c4c544e  moon_nix_extension.wasm
+moon_nix_extension.wasm: OK
+```
+
+The sidecar intentionally records the downloadable asset basename. Check it
+from the asset directory, as shown in the corrected validation command below;
+checking that sidecar from the repository root cannot resolve the sibling WASM.
+
+Required release PR handoff:
+
+- Proposed title: `version packages: release moon_nix_extension 0.1.0`.
+- Include the implementation from subplans 01–03 plus the release
+  documentation/changelog qualification from this subplan.
+- Include the successful commands and artifact evidence above in the PR body.
+- Do not push, open, or merge the PR without explicit human authorization. The
+  current worktree is on `main`, is ahead of `origin/main`, and contains the
+  plan implementation as uncommitted changes, so it has not been repackaged
+  into a release branch or committed implicitly.
+
+Post-merge sequence:
+
+1. Verify the release workflow, merge-commit tag target, exact two assets, and
+   downloaded checksum before resolving the immutable locator.
+2. Create the separate nested Xonovex pinned-consumer PR and add the
+   `released-consumer-smoke` CI task without changing the root toolchain pin.
+3. Record blocking Moon 2.3.5 results, isolated current-2.4.x compatibility,
+   and cold/warm startup observations.
+4. Treat the Xonovex root workspace and Drodan as later prospective consumers.
+   Each migration PR must remove explicit `nix` selection, add the extension
+   locator and cache inputs, verify null native version ownership, pass full
+   CI, and remove the old pin only when the entire workspace no longer needs it.
+
 ## Validation Steps
 
 Before the release PR:
@@ -175,7 +243,7 @@ npx moon run moon-nix-extension:ci-check
 npx moon run moon-nix-extension:integration
 npx moon run moon-nix-extension:github-check
 npx moon run moon-nix-extension:github-publish-dry-run
-sha256sum -c packages/moon/moon-nix-extension/target/wasm32-wasip1/release/moon_nix_extension.wasm.sha256
+(cd packages/moon/moon-nix-extension/target/wasm32-wasip1/release && sha256sum -c moon_nix_extension.wasm.sha256)
 nix flake check
 ```
 
@@ -194,12 +262,12 @@ consumer PR evidence.
 
 ## Success Criteria
 
-- [ ] Both READMEs and `packages/moon/AGENTS.md` describe the distinct plugin
+- [x] Both READMEs and `packages/moon/AGENTS.md` describe the distinct plugin
       roles, one-plugin steady state, retained toolchain use cases, cache/setup
       differences, and separate retirement gate consistently.
-- [ ] Cargo.toml, Cargo.lock, changelog, crate name, WASM name, tag, and pinned
+- [x] Cargo.toml, Cargo.lock, changelog, crate name, WASM name, tag, and pinned
       locator all agree on `moon_nix_extension` 0.1.0.
-- [ ] Complete CI, integration, GitHub check, dry-run, WASM validation, and
+- [x] Complete CI, integration, GitHub check, dry-run, WASM validation, and
       local checksum verification pass before publication.
 - [ ] A reviewed PR with `version packages` in its title—not a direct local
       publish—causes the existing release workflow to create the tag/release.
@@ -212,7 +280,7 @@ consumer PR evidence.
       inputs and null native versions.
 - [ ] Moon 2.4.x compatibility is explicitly recorded without changing the
       workspace pin or overstating support if it fails.
-- [ ] No Drodan consumer or existing Xonovex root pin is changed implicitly;
+- [x] No Drodan consumer or existing Xonovex root pin is changed implicitly;
       later workspace migrations have a documented checklist.
 
 ## Files Modified/Created

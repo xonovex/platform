@@ -3,7 +3,8 @@ type: plan
 has_subplans: false
 parent_plan: plans/moon-nix-extension.md
 parallel_group: 3
-status: pending
+status: complete
+updated: 2026-07-19
 dependencies:
   plans:
     - 02-global-extension-adapter
@@ -11,16 +12,19 @@ dependencies:
     - packages/moon/moon-nix-extension/moon.yml
     - packages/moon/moon-nix-extension/README.md
     - packages/moon/moon-nix-extension/tests/**
+    - packages/moon/moon-nix-extension/src/lib.rs
+    - packages/moon/moon-nix-runtime/src/installable.rs
+    - packages/moon/moon-nix-runtime/tests/installable_test.rs
 skills_to_consult:
   - moon-guide
   - testing-guide
   - shell-scripting-guide
 validation:
-  type_check: pending
-  lint: pending
-  build: pending
-  tests: pending
-  integration: pending
+  type_check: passed
+  lint: passed
+  build: passed
+  tests: passed
+  integration: passed
 ---
 
 # 03 — Prove the cache/adoption contract in a standalone consumer workspace
@@ -173,27 +177,27 @@ Nix black-box gate is Linux because CI publishes the WASI artifact from Linux.
 
 ## Success Criteria
 
-- [ ] The nested fixture uses the repository-pinned Moon 2.3.5, the local
+- [x] The nested fixture uses the repository-pinned Moon 2.3.5, the local
       extension WASM, native toolchains with null versions, and no `nix`
       toolchain/plugin locator.
-- [ ] Moon itself reports Node detection without `system`; mapping-gated
+- [x] Moon itself reports Node detection without `system`; mapping-gated
       `baseComponents` still resolves `[general, node]`.
-- [ ] A real polyglot project/task resolves the stable deduplicated
+- [x] A real polyglot project/task resolves the stable deduplicated
       `[general, go, node]` set without a predeclared combination shell.
-- [ ] Project/task append, replace, installable, and supersession behavior
+- [x] Project/task append, replace, installable, and supersession behavior
       matches parent decision 9 for command and script tasks.
-- [ ] Every unsafe/malformed path, union, component, flake, and evaluation case
+- [x] Every unsafe/malformed path, union, component, flake, and evaluation case
       fails non-zero with a deterministic actionable diagnostic.
-- [ ] `version: null` produces no Proto-managed Node/Go installation while the
+- [x] `version: null` produces no Proto-managed Node/Go installation while the
       Nix marker executables are available to the task.
-- [ ] Central and selected project Nix/config changes invalidate only the
+- [x] Central and selected project Nix/config changes invalidate only the
       declared consumers; unrelated edits remain cached; uncached tasks rerun.
-- [ ] Isolated trace/config evidence proves the toolchain-plugin artifact is
+- [x] Isolated trace/config evidence proves the toolchain-plugin artifact is
       not a runtime companion.
-- [ ] Fixture validation rejects any Nix toolchain locator/selection; nested
+- [x] Fixture validation rejects any Nix toolchain locator/selection; nested
       extension re-entry remains idempotent, and arbitrary peer command
       replacement remains explicitly unsupported.
-- [ ] The integration task is part of `moon-nix-extension:ci-check`, and the
+- [x] The integration task is part of `moon-nix-extension:ci-check`, and the
       extension/runtime/toolchain gates remain green.
 
 ## Files Modified/Created
@@ -203,11 +207,33 @@ Nix black-box gate is Linux because CI publishes the WASI artifact from Linux.
 - Created: `packages/moon/moon-nix-extension/tests/fixtures/consumer-workspace/**`
 - Created: `packages/moon/moon-nix-extension/tests/integration/**` (or an
   equivalently focused runner under `tests/`)
+- Modified: `packages/moon/moon-nix-extension/src/lib.rs` and focused tests to
+  pass validated component values through the task environment instead of
+  exposing a generated expression in Nix evaluation diagnostics
+- Modified: `packages/moon/moon-nix-runtime/src/installable.rs` and tests for
+  the fixed expression/environment serialization contract
 
 ## Dependencies
 
 Requires completed subplan `02-global-extension-adapter`. This is execution
 group 3; release/pilot work must not begin until the black-box gate passes.
+
+## Validation Results
+
+- The standalone consumer runner passes from a normal shell and from the
+  repository's Nix-wrapped Moon task. Repeated runs pass with isolated cold
+  Moon/Proto/plugin state, and each run proves warm task cache hits through
+  `runReport.json`, `lastRun.json`, and `moon hash` manifests.
+- Moon 2.3.5 reports `[javascript, npm, node]` for the direct Node command and
+  `[go, javascript, npm, node]` for the opaque polyglot script. Run reports show
+  the version-null native toolchain setup actions skipped.
+- Central and project flake/config mutation assertions, unrelated-file cache
+  stability, uncached reruns, all positive environment combinations, the full
+  negative matrix, sentinel re-entry, and standalone plugin/config assertions
+  pass.
+- Runtime (30), extension (17), and existing toolchain (31) tests pass. The
+  extension and toolchain `ci-check` gates, clippy, rustfmt, optimized WASM
+  build, shellcheck, shfmt, `nix flake check`, and `git diff --check` pass.
 
 ## Estimated Duration
 

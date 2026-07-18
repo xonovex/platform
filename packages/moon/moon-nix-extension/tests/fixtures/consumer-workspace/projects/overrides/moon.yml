@@ -1,0 +1,45 @@
+$schema: https://moonrepo.dev/schemas/project.json
+language: javascript
+layer: application
+tasks:
+  project-append:
+    script: |
+      moon-general-marker
+      moon-node-marker
+      moon-postgresql-marker
+      for unexpected in moon-go-marker moon-node20-marker moon-node24-marker moon-protobuf-marker; do
+        if command -v "$unexpected" >/dev/null 2>&1; then
+          printf 'unexpected component command: %s\n' "$unexpected" >&2
+          exit 1
+        fi
+      done
+    inputs: [source.txt]
+  task-append:
+    script: |
+      moon-general-marker
+      moon-node-marker
+      moon-postgresql-marker
+      moon-protobuf-marker
+      for unexpected in moon-go-marker moon-node20-marker moon-node24-marker; do
+        if command -v "$unexpected" >/dev/null 2>&1; then
+          printf 'unexpected component command: %s\n' "$unexpected" >&2
+          exit 1
+        fi
+      done
+    inputs: [source.txt]
+  task-replace:
+    command: bash
+    args:
+      - -c
+      - |
+        moon-general-marker
+        moon-node24-marker
+        for unexpected in moon-go-marker moon-node-marker moon-node20-marker moon-postgresql-marker moon-protobuf-marker; do
+          if command -v "$unexpected" >/dev/null 2>&1; then
+            printf 'unexpected component command: %s\n' "$unexpected" >&2
+            exit 1
+          fi
+        done
+    inputs: [source.txt]
+    options:
+      shell: false

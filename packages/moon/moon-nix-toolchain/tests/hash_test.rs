@@ -96,6 +96,7 @@ async fn project_flake_lock_chosen_over_workspace_lock() {
 #[serial]
 async fn setup_environment_pre_builds_devshell_when_nix_present() {
     let sandbox = create_empty_moon_sandbox();
+    let expected_root = format!("{}/", sandbox.root.to_string_lossy());
     let plugin = sandbox.create_toolchain("nix").await;
 
     let output = plugin
@@ -118,6 +119,7 @@ async fn setup_environment_pre_builds_devshell_when_nix_present() {
     // nix develop <flakeref> --command true — args[1] is the resolved flake ref.
     assert_eq!(args.len(), 4, "got: {args:?}");
     assert_eq!(args[0], "develop");
+    assert_eq!(args[1], expected_root);
     assert_eq!(args[2], "--command");
     assert_eq!(args[3], "true");
 }

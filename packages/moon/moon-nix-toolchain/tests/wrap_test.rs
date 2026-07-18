@@ -152,19 +152,21 @@ async fn wraps_script_task_via_bash() {
     reset_wrap_env();
 
     let sandbox = create_empty_moon_sandbox();
+    let expected_root = format!("{}/", sandbox.root.to_string_lossy());
     let plugin = sandbox.create_toolchain("nix").await;
 
     let output = plugin
         .extend_task_script(ExtendTaskScriptInput {
-            script: "echo hi && ls".into(),
+            script: "echo 'hi' && ls".into(),
             ..Default::default()
         })
         .await;
 
     let script = output.script.expect("script should be wrapped");
-    assert!(script.starts_with("nix develop "), "got: {script}");
-    assert!(script.contains("--command bash -c "), "got: {script}");
-    assert!(script.contains("echo hi && ls"), "got: {script}");
+    assert_eq!(
+        script,
+        format!("nix develop '{expected_root}' --command bash -c 'echo '\\''hi'\\'' && ls'")
+    );
     assert_eq!(output.env.get(SENTINEL).map(String::as_str), Some("1"));
 }
 
@@ -513,12 +515,32 @@ async fn define_toolchain_config_exposes_camel_case_schema() {
         "shellByToolchain",
         "shellByTag",
         "shellByLanguage",
+        "failClosedByTag",
+        "failClosedByLanguage",
     ] {
         assert!(
             rendered.contains(key),
             "schema should expose `{key}`: {rendered}"
         );
     }
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 1)]
+#[serial]
+async fn register_toolchain_preserves_public_metadata() {
+    let sandbox = create_empty_moon_sandbox();
+    let plugin = sandbox.create_toolchain("nix").await;
+
+    let input = serde_json::from_value(serde_json::json!({ "id": "nix" })).unwrap();
+
+    let output = plugin.register_toolchain(input).await;
+
+    assert_eq!(output.name, "Nix");
+    assert_eq!(output.plugin_version, "0.6.1");
+    assert_eq!(
+        output.description.as_deref(),
+        Some("Runs every task inside the project's or workspace's nix flake dev shell.")
+    );
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 1)]

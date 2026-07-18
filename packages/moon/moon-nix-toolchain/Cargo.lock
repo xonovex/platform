@@ -2721,10 +2721,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "moon_nix_runtime"
+version = "0.1.0"
+
+[[package]]
 name = "moon_nix_toolchain"
 version = "0.6.1"
 dependencies = [
  "extism-pdk",
+ "moon_nix_runtime",
  "moon_pdk",
  "moon_pdk_api",
  "moon_pdk_test_utils",

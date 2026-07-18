@@ -1,0 +1,10 @@
+[package]
+name = "moon_nix_runtime"
+version = "0.1.0"
+edition = "2021"
+description = "Shared pure runtime for Xonovex Moon Nix adapters."
+license = "MIT"
+publish = false
+
+[lib]
+crate-type = ["lib"]

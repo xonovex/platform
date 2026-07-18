@@ -3,13 +3,14 @@ type: plan
 has_subplans: false
 parent_plan: plans/moon-nix-extension.md
 parallel_group: 1
-status: pending
+status: complete
 dependencies:
   plans: []
   files:
     - packages/moon/moon-nix-runtime/**
     - packages/moon/moon-nix-toolchain/Cargo.toml
     - packages/moon/moon-nix-toolchain/Cargo.lock
+    - packages/moon/moon-nix-toolchain/moon.yml
     - packages/moon/moon-nix-toolchain/src/lib.rs
     - packages/moon/moon-nix-toolchain/tests/**
 skills_to_consult:
@@ -17,11 +18,11 @@ skills_to_consult:
   - testing-guide
   - git-guide
 validation:
-  type_check: pending
-  lint: pending
-  build: pending
-  tests: pending
-  integration: pending
+  type_check: passed
+  lint: passed
+  build: passed
+  tests: passed
+  integration: passed
 ---
 
 # 01 — Extract the shared Nix runtime without changing the toolchain plugin
@@ -155,18 +156,18 @@ dirty Xonovex file was changed.
 
 ## Success Criteria
 
-- [ ] `moon-nix-runtime` is a private normal Rust library with its own passing
+- [x] `moon-nix-runtime` is a private normal Rust library with its own passing
       check/build/test/lint/format aggregate and no plugin/release surface.
-- [ ] PDK calls and Moon fragments remain in the toolchain adapter; shared
+- [x] PDK calls and Moon fragments remain in the toolchain adapter; shared
       runtime functions consume explicit data and return deterministic values.
-- [ ] Every pre-extraction `moon_nix_toolchain` test passes unchanged or with
+- [x] Every pre-extraction `moon_nix_toolchain` test passes unchanged or with
       strictly additive assertions.
-- [ ] The toolchain's schema, selector precedence, diagnostics, hook exports,
+- [x] The toolchain's schema, selector precedence, diagnostics, hook exports,
       artifact name, version, and release tag convention are unchanged.
-- [ ] `hash_task_contents` still changes only for its documented flake target,
+- [x] `hash_task_contents` still changes only for its documented flake target,
       selector, and lock inputs; `setup_environment` still emits the same eager
       realization command.
-- [ ] The optimized toolchain WASM is self-contained and has no runtime
+- [x] The optimized toolchain WASM is self-contained and has no runtime
       dependency on another plugin artifact or locator.
 
 ## Files Modified/Created
@@ -176,6 +177,7 @@ dirty Xonovex file was changed.
 - Created: `packages/moon/moon-nix-runtime/tests/**`
 - Modified: `packages/moon/moon-nix-toolchain/Cargo.toml`
 - Modified: `packages/moon/moon-nix-toolchain/Cargo.lock`
+- Modified: `packages/moon/moon-nix-toolchain/moon.yml`
 - Modified: `packages/moon/moon-nix-toolchain/src/lib.rs`
 - Modified only if required to freeze behavior:
   `packages/moon/moon-nix-toolchain/tests/**`
@@ -183,6 +185,20 @@ dirty Xonovex file was changed.
 ## Dependencies
 
 None. This is execution group 1 and must merge before subplan 02.
+
+## Validation Results
+
+- Baseline: 30 toolchain tests passed (4 hash, 26 wrap); `ci-check` and
+  `github-check` passed; the optimized artifact was
+  `moon_nix_toolchain.wasm` with the six toolchain hook exports.
+- Final: 14 runtime tests and 31 toolchain tests passed (4 hash, 27 wrap).
+  Runtime and toolchain `ci-check` plus toolchain `github-check` passed.
+- `cargo tree` reports `moon_nix_runtime v0.1.0` as a direct path dependency
+  with no dependencies of its own. The runtime produces no WASM artifact.
+- The optimized artifact remains `moon_nix_toolchain.wasm`; its exports remain
+  memory plus `define_toolchain_config`, `extend_task_command`,
+  `extend_task_script`, `hash_task_contents`, `register_toolchain`, and
+  `setup_environment`.
 
 ## Estimated Duration
 

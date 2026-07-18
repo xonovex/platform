@@ -1,0 +1,11 @@
+$schema: https://moonrepo.dev/schemas/toolchain.json
+go:
+  version: null
+npm:
+  version: null
+node:
+  version: null
+javascript:
+  packageManager: npm
+  syncPackageManagerField: false
+  syncProjectWorkspaceDependencies: false
