@@ -1,0 +1,230 @@
+{
+  "note": "Test-only fixtures for validateAssembledComposition (composition-helpers.ts). Each case is a full assembled selection across both planes; the validator returns the first failure code or null. Not a persisted composition schema.",
+  "cases": [
+    {
+      "id": "valid-integrated-composition",
+      "expectedValid": true,
+      "selection": {
+        "adoptionMode": "integrated",
+        "absenceReport": "Only the selected workflow and governance profiles apply; unselected modules remain explicit gaps, not hidden defaults.",
+        "workflowProfile": {
+          "identity": "integrated-profile",
+          "includedResults": ["Planning", "Review", "QA", "Acceptance"],
+          "preservedResults": ["Planning", "Review", "QA", "Acceptance"],
+          "explicitProvider": "non-file-provider",
+          "providerAvailable": true,
+          "mandatoryControls": [
+            {
+              "id": "accepted-deliverable-evidence",
+              "enforcementPoints": [{"supported": true, "guaranteed": true}]
+            }
+          ],
+          "governance": {"profile": "governance-only-profile"}
+        },
+        "governanceProfile": {
+          "identity": "governance-only-profile",
+          "facets": [
+            "lifecycle",
+            "governance",
+            "executor",
+            "enforcement",
+            "data",
+            "telemetry",
+            "distribution"
+          ],
+          "strengthening": "additive",
+          "weakensMandatoryControl": false,
+          "authorizedException": false,
+          "adequateEnforcement": true
+        },
+        "capabilities": {
+          "method": ["user-stories", "bdd"],
+          "executor-class": ["deterministic", "model", "agent", "human"],
+          "provider-port": [
+            "result-provider",
+            "policy",
+            "evidence-and-telemetry"
+          ],
+          "governance-module": ["advisory", "evidence-producing"]
+        },
+        "requiredCapabilities": {
+          "method": ["user-stories"],
+          "executor-class": ["deterministic", "human"],
+          "provider-port": ["result-provider", "policy"]
+        },
+        "modules": [{"id": "advisory-review", "conflictsWith": []}],
+        "conflictResolution": false,
+        "providers": [
+          {"port": "result-provider", "available": true, "compatible": true},
+          {"port": "policy", "available": true, "compatible": true},
+          {
+            "port": "evidence-and-telemetry",
+            "available": true,
+            "compatible": true
+          }
+        ],
+        "mandatoryControls": [
+          {
+            "id": "accepted-deliverable-evidence",
+            "enforcementPoints": [{"supported": true, "guaranteed": true}]
+          }
+        ]
+      }
+    },
+    {
+      "id": "absence-report-missing",
+      "expectedValid": false,
+      "expectedCode": "absence-report-missing",
+      "selection": {
+        "adoptionMode": "workflow-only",
+        "absenceReport": "",
+        "workflowProfile": null,
+        "governanceProfile": null,
+        "capabilities": {"method": ["user-stories"]}
+      }
+    },
+    {
+      "id": "workflow-profile-result-erased",
+      "expectedValid": false,
+      "expectedCode": "result-erased",
+      "selection": {
+        "adoptionMode": "workflow-only",
+        "absenceReport": "No harness policy or external enforcement guarantee is claimed.",
+        "workflowProfile": {
+          "includedResults": ["QA"],
+          "preservedResults": [],
+          "mandatoryControls": []
+        },
+        "governanceProfile": null,
+        "capabilities": {}
+      }
+    },
+    {
+      "id": "governance-profile-composition-incomplete",
+      "expectedValid": false,
+      "expectedCode": "profile-composition-incomplete",
+      "selection": {
+        "adoptionMode": "governance-only",
+        "absenceReport": "Lifecycle results are not prerequisites.",
+        "workflowProfile": null,
+        "governanceProfile": {
+          "identity": "partial-profile",
+          "facets": ["lifecycle"],
+          "strengthening": "additive",
+          "weakensMandatoryControl": false,
+          "authorizedException": false,
+          "adequateEnforcement": true
+        },
+        "capabilities": {}
+      }
+    },
+    {
+      "id": "dangling-governance-reference",
+      "expectedValid": false,
+      "expectedCode": "dangling-governance-reference",
+      "selection": {
+        "adoptionMode": "integrated",
+        "absenceReport": "Unselected modules remain explicit gaps.",
+        "workflowProfile": {
+          "identity": "integrated-profile",
+          "includedResults": [],
+          "preservedResults": [],
+          "mandatoryControls": [],
+          "governance": {"profile": "ghost-profile"}
+        },
+        "governanceProfile": {
+          "identity": "governance-only-profile",
+          "facets": [
+            "lifecycle",
+            "governance",
+            "executor",
+            "enforcement",
+            "data",
+            "telemetry",
+            "distribution"
+          ],
+          "strengthening": "additive",
+          "weakensMandatoryControl": false,
+          "authorizedException": false,
+          "adequateEnforcement": true
+        },
+        "capabilities": {}
+      }
+    },
+    {
+      "id": "module-conflict",
+      "expectedValid": false,
+      "expectedCode": "module-conflict",
+      "selection": {
+        "adoptionMode": "governance-only",
+        "absenceReport": "Lifecycle results are not prerequisites.",
+        "workflowProfile": null,
+        "governanceProfile": null,
+        "capabilities": {},
+        "modules": [
+          {"id": "enforcing-a", "conflictsWith": ["enforcing-b"]},
+          {"id": "enforcing-b", "conflictsWith": []}
+        ],
+        "conflictResolution": false
+      }
+    },
+    {
+      "id": "dangling-method-reference",
+      "expectedValid": false,
+      "expectedCode": "dangling-capability",
+      "selection": {
+        "adoptionMode": "workflow-only",
+        "absenceReport": "No harness policy or external enforcement guarantee is claimed.",
+        "workflowProfile": null,
+        "governanceProfile": null,
+        "capabilities": {"method": ["ghost-method"]}
+      }
+    },
+    {
+      "id": "selected-but-absent-capability",
+      "expectedValid": false,
+      "expectedCode": "missing-capability",
+      "selection": {
+        "adoptionMode": "workflow-only",
+        "absenceReport": "No harness policy or external enforcement guarantee is claimed.",
+        "workflowProfile": null,
+        "governanceProfile": null,
+        "capabilities": {"method": ["user-stories"]},
+        "requiredCapabilities": {"method": ["bdd"]}
+      }
+    },
+    {
+      "id": "incompatible-provider",
+      "expectedValid": false,
+      "expectedCode": "incompatible-provider",
+      "selection": {
+        "adoptionMode": "governance-only",
+        "absenceReport": "Lifecycle results are not prerequisites.",
+        "workflowProfile": null,
+        "governanceProfile": null,
+        "capabilities": {},
+        "providers": [
+          {"port": "policy", "available": true, "compatible": false}
+        ]
+      }
+    },
+    {
+      "id": "missing-cross-plane-enforcement",
+      "expectedValid": false,
+      "expectedCode": "unenforced-mandatory-control",
+      "selection": {
+        "adoptionMode": "integrated",
+        "absenceReport": "Unselected modules remain explicit gaps.",
+        "workflowProfile": null,
+        "governanceProfile": null,
+        "capabilities": {},
+        "mandatoryControls": [
+          {
+            "id": "signed-evidence",
+            "enforcementPoints": [{"supported": true, "guaranteed": false}]
+          }
+        ]
+      }
+    }
+  ]
+}

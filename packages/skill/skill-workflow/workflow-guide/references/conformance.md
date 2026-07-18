@@ -25,6 +25,21 @@ Fail conformance when any of these is true:
 - a mandatory cross-plane requirement has no adequate enforcement guarantee;
 - YAML, JSON, files, Git, tickets, or one provider/harness are treated as universal requirements.
 
+## Whole composition
+
+Validate a full assembled selection — a workflow profile, the governance profile it pairs with, and the capabilities, providers, modules, and methods selected under them — as one artifact, so a catalog cannot be assembled inconsistent or incomplete. `validateAssembledComposition` (`scripts/composition-helpers.ts`) composes the per-plane `validateProfile` and `validateComposition` and the capability registry rather than re-deriving them, and returns the first failure. A whole composition fails when:
+
+- the adoption mode's expected-absence report is missing (`absence-report-missing`);
+- either plane's profile fails its own contract;
+- an integrated workflow profile names a governance profile that is not the one assembled (`dangling-governance-reference`);
+- selected modules leave an unresolved conflict (`module-conflict`);
+- a selected capability is neither shipped nor adopter-supplied in the capability registry (`dangling-capability`);
+- a required capability is not selected (`missing-capability`);
+- a selected provider is unavailable or incompatible (`incompatible-provider`);
+- a mandatory cross-plane control has no supported, guaranteed enforcement point (`unenforced-mandatory-control`).
+
+Run `node scripts/validate-assembled-composition.ts`; it assembles a shipped reference profile into a complete composition and rejects each adversarial fixture with its own code.
+
 ## Fixtures
 
 Run `node scripts/validate-fixtures.mjs` from the guide directory or `npx moon run skill-workflow:test` from the repository root. The JSON fixture is test data for the abstract semantics; it is not a persisted workflow schema.

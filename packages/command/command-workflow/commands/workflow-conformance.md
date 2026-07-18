@@ -28,5 +28,8 @@ Load the owning skills and perform their **conformance** operations:
   exceptions, onboarding, and governance profiles.
 
 The skills own the semantic checks, output, and gotchas. Validate each plane
-independently before validating their composition; do not invent a universal persisted
-schema or treat skill installation as enforcement evidence.
+independently, then validate their whole composition against the
+`validateAssembledComposition` contract in the `workflow-guide` conformance reference
+(both profiles, selected capabilities, providers, modules, and cross-plane enforcement as
+one artifact); do not invent a universal persisted schema or treat skill installation as
+enforcement evidence.

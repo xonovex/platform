@@ -22,6 +22,10 @@ Reject unsupported or experimental mandatory hooks, unbounded model/agent execut
 
 Run `node scripts/validate-fixtures.mjs` from the guide directory or `npx moon run skill-agent-governance:test` from the repository root. Fixture JSON is deterministic test input for the abstract contract, not a required module or policy manifest. `scripts/conformance-helpers.mjs` exports the provider and module checks for harness and CI adapters.
 
+## Whole composition
+
+An integrated selection is validated as one artifact across both planes by `validateAssembledComposition` — see the "Whole composition" section of the `workflow-guide` conformance contract. It composes this plane's `validateProfile` and `validateComposition` and the capability registry, failing on a dangling capability, provider, module, or cross-plane enforcement reference rather than checking only one plane at a time.
+
 ## Scenario fixture corpus
 
 `assets/fixtures/` holds adversarial given/when/expect scenarios — one JSON file per scenario with an `expect.must_not` prohibition list — spanning adapter semantics, module contracts, trust, exceptions, external enforcement, provider policy and configuration, data governance, and the enterprise platforms. `assets/fixtures/index.json` maps every scenario to the reference file owning its contract; `scripts/validate-conformance-scenario-fixtures.mjs` enforces schema, contract-to-owner agreement, owner existence, index bijection, and its own mutation guards. A conformance verification replays each scenario against the owning contract and reports any `must_not` behavior as a failure.

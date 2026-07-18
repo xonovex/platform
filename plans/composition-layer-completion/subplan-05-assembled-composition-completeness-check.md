@@ -3,7 +3,7 @@ type: plan
 has_subplans: false
 parent_plan: ../composition-layer-completion.md
 parallel_group: 3
-status: pending
+status: complete
 dependencies:
   plans: []
   files:
@@ -26,9 +26,9 @@ skills_to_consult:
 validation:
   type_check: not_run
   lint: not_run
-  build: not_run
-  tests: not_run
-updated: "2026-07-17"
+  build: pass
+  tests: pass
+updated: "2026-07-18"
 ---
 
 # Whole-Assembled-Composition Completeness Check
@@ -91,3 +91,51 @@ check to validate "a shipped reference profile assembled into a full composition
 Phase 3 library) and to "consult the Phase 4 registry so an unshipped, unmarked capability …
 is reported as a dangling reference" (needs the Phase 4 registry). This is the last phase and
 runs alone in its group.
+
+## Implementation notes (completed 2026-07-18)
+
+`build` and `tests` pass via `moon` (`skill-workflow:test` includes the assembled-composition
+validator); skill packages define no `type_check`/`lint` task. `format-check` passes for all
+three affected packages and the cross-package link guard stays at 64/64. The validator proves
+a shipped composition assembles and every adversarial case is rejected with its own code (1
+shipped integrated composition + 10 fixtures + 4 mutation guards, dud-guard count zero).
+End-to-end adversarial verification (3/3): dropping `user-stories` from the capability
+registry makes the real shipped integrated composition fail `dangling-capability` (proving the
+registry consultation is live, not fixture-only), pointing the integrated profile's governance
+facet at a ghost identity yields `dangling-governance-reference`, and both restore to green.
+
+- `workflow-guide/scripts/composition-helpers.ts` — `validateAssembledComposition(selection)`
+  is a composition root: it wires the workflow and governance `validateProfile`, governance
+  `validateComposition`, and the capability-registry `resolveCapability` rather than
+  re-deriving them, and adds only the cross-plane checks no single plane owns — the
+  adoption-mode absence report, the integrated profile pairing, required-capability presence,
+  provider compatibility, and mandatory cross-plane enforcement. It returns the first failure
+  code: `absence-report-missing`, the per-plane profile codes, `dangling-governance-reference`,
+  `module-conflict`, `dangling-capability`, `missing-capability`, `incompatible-provider`, or
+  `unenforced-mandatory-control`.
+- `workflow-guide/assets/assembled-composition-fixtures.json` — a passing integrated
+  composition plus nine adversarial cases, one per failure code.
+- `workflow-guide/scripts/validate-assembled-composition.ts` — assembles the real Phase 3
+  `integrated-profile` + `governance-only-profile` into a full composition (expects valid),
+  runs the fixtures, and embeds mutation guards.
+- `workflow-guide/references/conformance.md` gains a "Whole composition" section naming the
+  contract and its failure codes; `agent-governance-guide/references/conformance.md`
+  cross-references it; `workflow-conformance.md` now names `validateAssembledComposition` as the
+  backing for its "validate their composition" step — the promise is contract-backed, not prose.
+- Wired into the `skill-workflow` `package.json` test and `moon.yml` inputs.
+
+### Deviations (with rationale)
+
+- **Fixtures live in `assets/`, not `assets/fixtures/`.** `assets/fixtures/` is the scenario
+  corpus whose `validate-conformance-scenario-fixtures.mjs` enforces an `index.json` bijection
+  and per-file scenario schema; a multi-case fixture there fails that validator. Multi-case
+  fixtures (`conformance-fixtures.json`, …) live in `assets/` directly, so
+  `assembled-composition-fixtures.json` does too. The task's "assets/fixtures/" wording is
+  imprecise for this file type.
+- **Helper in a new `composition-helpers.ts` imported by the validator via a `.ts` import**
+  (parent Decision 1: new files are TypeScript; Node's native type-stripping resolves a
+  `./composition-helpers.ts` import), rather than adding a `.mjs` export to
+  `conformance-helpers.mjs`.
+- **Tests live in the validator** (a CI-run `validate-*.ts` with mutation guards), matching the
+  sibling validators, rather than a separate `.test.ts`. Targeted `prettier --write` on the new
+  files only; no `npm`.

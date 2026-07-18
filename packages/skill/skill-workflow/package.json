@@ -11,6 +11,6 @@
   "scripts": {
     "fmt": "prettier --write .",
     "fmt:check": "prettier --check .",
-    "test": "node workflow-guide/scripts/validate-fixtures.mjs && node workflow-guide/scripts/validate-conformance-scenario-fixtures.mjs && node workflow-guide/scripts/validate-composition-vocabulary.ts && node workflow-guide/scripts/validate-reference-profiles.ts"
+    "test": "node workflow-guide/scripts/validate-fixtures.mjs && node workflow-guide/scripts/validate-conformance-scenario-fixtures.mjs && node workflow-guide/scripts/validate-composition-vocabulary.ts && node workflow-guide/scripts/validate-reference-profiles.ts && node workflow-guide/scripts/validate-assembled-composition.ts"
   }
 }
