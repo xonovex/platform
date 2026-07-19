@@ -6,6 +6,7 @@ on:
       - ".github/workflows/skill-evals.yml"
       - ".moon/tasks/tag-skill.yml"
       - "packages/script/script-moon-common/**"
+      - "packages/script/script-moon-ci-workflows/**"
       - "packages/script/script-moon-skill-eval-outputs/**"
       - "packages/script/script-moon-skill-eval-triggers/**"
       - "packages/skill/**"
@@ -28,13 +29,21 @@ jobs:
       (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
     runs-on: ubuntu-latest
     outputs:
-      count: ${{ steps.select.outputs.count }}
       skills: ${{ steps.select.outputs.skills }}
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           fetch-depth: 0
           persist-credentials: false
+
+      - uses: ./.github/actions/setup-nix
+        with:
+          cache-workspace: true
+
+      - name: Build workflow orchestration
+        run: nix develop --command bash -c "npm ci && npx moon run script-moon-ci-workflows:build"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - id: select
         name: Select full or changed-skill matrix
@@ -48,15 +57,13 @@ jobs:
           if [[ "${GITHUB_EVENT_NAME}" == "pull_request" ]]; then
             args+=(--changed "${BASE_SHA}" "${HEAD_SHA}")
           fi
-          skills="$(node packages/skill/skill-skill/skill-guide/scripts/list-eval-matrix.mjs "${args[@]}")"
-          count="$(jq 'length' <<<"${skills}")"
+          skills="$(nix develop --command npx moon-ci-workflows skill-eval-matrix "${args[@]}")"
           printf 'skills=%s\n' "${skills}" >>"${GITHUB_OUTPUT}"
-          printf 'count=%s\n' "${count}" >>"${GITHUB_OUTPUT}"
 
   eval:
     name: ${{ matrix.skill.package }} ${{ matrix.mode }} eval
     needs: matrix
-    if: needs.matrix.outputs.count != '0'
+    if: needs.matrix.outputs.skills != '[]'
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -83,85 +90,25 @@ jobs:
       - name: Install repository dependencies
         run: nix develop --command npm ci
 
+      - name: Build workflow orchestration
+        run: nix develop --command npx moon run script-moon-ci-workflows:build
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Install pinned Claude Code evaluator
         run: nix develop --command npm install --no-save @anthropic-ai/claude-code@2.1.211
 
-      - name: Build trigger evaluator
-        if: matrix.mode == 'trigger'
-        run: nix develop --command npx moon run script-moon-skill-eval-triggers:install
-
-      - name: Build output evaluator
-        if: matrix.mode == 'output'
-        run: nix develop --command npx moon run script-moon-skill-eval-outputs:install
-
-      - name: Run validation trigger evals
-        if: matrix.mode == 'trigger'
-        shell: bash
+      - name: Run skill evals
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          EVAL_SOURCE: packages/skill/skill-${{ matrix.skill.package }}/${{ matrix.skill.guide }}/eval-queries.json
-        run: |
-          set -euo pipefail
-          batch_size=8
-          validation_count="$(jq '[.[] | select(.split == "validation")] | length' "${EVAL_SOURCE}")"
-          offset=0
-          batch=1
-          batch_dir="${RUNNER_TEMP}/skill-trigger-eval-batches/${{ matrix.skill.package }}"
-          result_dir=".skill-eval-results/${{ matrix.skill.package }}/trigger"
-          mkdir -p "${batch_dir}" "${result_dir}"
-          while (( offset < validation_count )); do
-            batch_file="${batch_dir}/batch-${batch}.json"
-            jq --argjson start "${offset}" --argjson end "$((offset + batch_size))" \
-              '[.[] | select(.split == "validation")][$start:$end]' \
-              "${EVAL_SOURCE}" >"${batch_file}"
-            nix develop --command npx moon-skill-eval-triggers \
-              "${batch_file}" \
-              "xonovex-skill-${{ matrix.skill.package }}:${{ matrix.skill.guide }}" \
-              validation \
-              --runs 3 \
-              --model haiku \
-              --max-budget-usd 0.05 \
-              --plugin-dir "packages/skill/skill-${{ matrix.skill.package }}" \
-              | tee "${result_dir}/batch-${batch}.txt"
-            offset=$((offset + batch_size))
-            batch=$((batch + 1))
-          done
-
-      - name: Run complete output-eval suite in bounded batches
-        if: matrix.mode == 'output'
-        shell: bash
-        env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          EVAL_SOURCE: packages/skill/skill-${{ matrix.skill.package }}/${{ matrix.skill.guide }}/evals.json
-        run: |
-          set -euo pipefail
-          batch_size=6
-          eval_count="$(jq '.evals | length' "${EVAL_SOURCE}")"
-          offset=0
-          batch=1
-          batch_dir="${RUNNER_TEMP}/skill-eval-batches/${{ matrix.skill.package }}"
-          mkdir -p "${batch_dir}"
-          while (( offset < eval_count )); do
-            batch_file="${batch_dir}/batch-${batch}.json"
-            jq --argjson start "${offset}" --argjson end "$((offset + batch_size))" \
-              '.evals = .evals[$start:$end]' \
-              "${EVAL_SOURCE}" >"${batch_file}"
-            nix develop --command npx moon-skill-eval-outputs \
-              "${batch_file}" \
-              "xonovex-skill-${{ matrix.skill.package }}:${{ matrix.skill.guide }}" \
-              "batch-${batch}" \
-              --runs 1 \
-              --concurrency 2 \
-              --model haiku \
-              --judge-model sonnet \
-              --max-budget-usd 0.10 \
-              --judge-max-budget-usd 0.10 \
-              --plugin-dir "packages/skill/skill-${{ matrix.skill.package }}" \
-              --eval-cwd "${GITHUB_WORKSPACE}" \
-              --workspace ".skill-eval-results/${{ matrix.skill.package }}/output"
-            offset=$((offset + batch_size))
-            batch=$((batch + 1))
-          done
+          MODE: ${{ matrix.mode }}
+          SKILL_PACKAGE: ${{ matrix.skill.package }}
+          SKILL_GUIDE: ${{ matrix.skill.guide }}
+        run: >-
+          nix develop --command npx moon-ci-workflows skill-eval-run
+          "$MODE" "$SKILL_PACKAGE" "$SKILL_GUIDE"
+          --repository-root "$GITHUB_WORKSPACE"
+          --temporary-root "$RUNNER_TEMP"
 
       - name: Upload benchmark evidence
         if: success() || failure()

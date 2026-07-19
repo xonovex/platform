@@ -1,5 +1,5 @@
-# Kubernetes test coverage for agent-operator-go: the envtest integration suite
-# plus the four Kind-based e2e suites (e2e, e2e-gvisor, e2e-kata, e2e-coco).
+# Scheduled Kubernetes test coverage for the four Kind-based e2e suites
+# (e2e, e2e-gvisor, e2e-kata, e2e-coco). Ordinary CI owns envtest integration.
 #
 # DORMANT: this workflow cannot run until it reaches the remote default branch.
 # Once there, trigger it with workflow_dispatch or wait for the nightly schedule.
@@ -33,20 +33,43 @@ defaults:
     shell: bash
 
 jobs:
+  matrix:
+    name: Select E2E suites
+    runs-on: ubuntu-latest
+    outputs:
+      suites: ${{ steps.select.outputs.suites }}
+
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - uses: ./.github/actions/setup-nix
+        with:
+          cache-workspace: true
+
+      - name: Build workflow orchestration
+        run: nix develop --command bash -c "npm ci && npx moon run script-moon-ci-workflows:build"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - id: select
+        name: Select suites
+        run: |
+          suites="$(nix develop --command npx moon-ci-workflows e2e-matrix)"
+          printf 'suites=%s\n' "$suites" >> "$GITHUB_OUTPUT"
+
   test:
     name: ${{ matrix.suite }}
+    needs: matrix
     runs-on: ubuntu-latest
     timeout-minutes: 45
 
     strategy:
       fail-fast: false
       matrix:
-        suite:
-          - integration
-          - e2e
-          - e2e-gvisor
-          - e2e-kata
-          - e2e-coco
+        suite: ${{ fromJSON(needs.matrix.outputs.suites) }}
 
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
@@ -56,8 +79,14 @@ jobs:
 
       - uses: ./.github/actions/setup-nix
 
+      - name: Build workflow orchestration
+        run: nix develop --command bash -c "npm ci && npx moon run script-moon-ci-workflows:build"
+        env:
+          # Lets moon resolve the github:// nix toolchain plugin without API rate limits.
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Run suite
-        run: nix develop --command bash -c "npm ci && npx moon run agent-operator-go:go-test-$SUITE" 2>&1 | tee "$RUNNER_TEMP/suite.log"
+        run: nix develop --command npx moon-ci-workflows e2e-run "$SUITE" 2>&1 | tee "$RUNNER_TEMP/suite.log"
         env:
           SUITE: ${{ matrix.suite }}
           # Lets moon resolve the github:// nix toolchain plugin without API rate limits.
@@ -66,24 +95,10 @@ jobs:
       - name: Report executed-vs-skipped counts
         if: always()
         run: |
-          log="$RUNNER_TEMP/suite.log"
-          if [ ! -f "$log" ]; then
-            printf '### %s\n\nNo test log produced (suite failed before running tests).\n\n' "$SUITE" >> "$GITHUB_STEP_SUMMARY"
-            exit 0
+          if [ -x node_modules/.bin/moon-ci-workflows ]; then
+            nix develop --command npx moon-ci-workflows e2e-summary "$SUITE" "$RUNNER_TEMP/suite.log" >> "$GITHUB_STEP_SUMMARY"
+          else
+            printf '### %s\n\nNo test log produced (workflow orchestration failed to build).\n' "$SUITE" >> "$GITHUB_STEP_SUMMARY"
           fi
-          passed=$(grep -c -- '--- PASS:' "$log" || true)
-          failed=$(grep -c -- '--- FAIL:' "$log" || true)
-          skipped=$(grep -c -- '--- SKIP:' "$log" || true)
-          {
-            printf '### %s\n\n' "$SUITE"
-            printf '| Executed (pass) | Executed (fail) | Skipped |\n'
-            printf '| --- | --- | --- |\n'
-            printf '| %s | %s | %s |\n\n' "$passed" "$failed" "$skipped"
-            if [ "$skipped" -gt 0 ]; then
-              printf 'Skipped tests (kata/coco isolation tests self-skip in unprivileged Kind):\n\n```\n'
-              grep -- '--- SKIP:' "$log" || true
-              printf '```\n'
-            fi
-          } >> "$GITHUB_STEP_SUMMARY"
         env:
           SUITE: ${{ matrix.suite }}
