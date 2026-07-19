@@ -30,6 +30,7 @@ func governedPolicy(required bool) *agentv1alpha1.AgentPolicy {
 		Spec: agentv1alpha1.AgentPolicySpec{Enforced: agentv1alpha1.AgentPolicyEnforced{
 			RequireGovernanceVerdict: required,
 			GovernancePolicyVersion:  "governance-policy/1",
+			AllowedRuntimeClassNames: []string{"kata"},
 		}},
 	}
 }

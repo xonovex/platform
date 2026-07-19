@@ -114,7 +114,11 @@ func (i *Isolator) buildArgs(cfg isoshared.RunConfig, c provision.Contribution) 
 
 	// Network — applied EXPLICITLY via the network bridge (regression guard:
 	// --unshare-net for none/proxy).
-	args = append(args, networkArgs(cfg.Network)...)
+	netArgs, err := networkArgs(cfg.Network)
+	if err != nil {
+		return nil, err
+	}
+	args = append(args, netArgs...)
 
 	// Sandbox-local HOME: a tmpfs at the home path (no host-$HOME bind), with only
 	// the curated config paths bound back read-only.
@@ -211,7 +215,7 @@ func (i *Isolator) sandboxEnv(cfg isoshared.RunConfig, c provision.Contribution,
 	}
 	env["PATH"] = strings.Join(pathEntries, ":")
 
-	// Provider tokens + contribution env + custom env + proxy env.
+	// Provider tokens + contribution env + custom env.
 	providerEnv, err := agentcmd.BuildProviderEnv(cfg.Agent, cfg.Provider)
 	if err != nil {
 		return nil, err
@@ -225,9 +229,5 @@ func (i *Isolator) sandboxEnv(cfg isoshared.RunConfig, c provision.Contribution,
 	for k, v := range envutil.ParseCustomEnv(cfg.CustomEnv) {
 		env[k] = v
 	}
-	for k, v := range cfg.ProxyEnv {
-		env[k] = v
-	}
-
 	return env, nil
 }

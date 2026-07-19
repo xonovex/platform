@@ -1,6 +1,7 @@
 package docker
 
 import (
+	"errors"
 	"os"
 	"strings"
 	"testing"
@@ -107,8 +108,8 @@ func TestDocker_NetworkExplicit(t *testing.T) {
 	if args := dockerCommand(t, dockerCfg(netshared.ModeHost, work), provision.Contribution{}); !argHasPair(args, "--network", "host") {
 		t.Error("network host must emit --network host")
 	}
-	if args := dockerCommand(t, dockerCfg(netshared.ModeProxy, work), provision.Contribution{}); !argHasPair(args, "--network", "bridge") {
-		t.Error("network proxy must keep a reachable bridge")
+	if _, err := NewIsolator().Command(dockerCfg(netshared.ModeProxy, work), provision.Contribution{}); !errors.Is(err, netshared.ErrProxyEnforcementUnavailable) {
+		t.Errorf("network proxy error = %v, want %v", err, netshared.ErrProxyEnforcementUnavailable)
 	}
 }
 

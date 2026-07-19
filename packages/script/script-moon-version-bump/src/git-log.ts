@@ -1,4 +1,4 @@
-import {execSync} from "node:child_process";
+import {execFileSync} from "node:child_process";
 
 interface Commit {
   readonly hash: string;
@@ -32,26 +32,37 @@ const getLastVersionRef = (
   currentVersion: string,
 ): string | undefined => {
   // Walk back through commits that touched package.json to find where version differs
-  const hashes = execSync(`git log --format=%H -- ${pkgDir}/package.json`, {
-    cwd: rootDir,
-    encoding: "utf8",
-  })
+  const hashes = execFileSync(
+    // eslint-disable-next-line sonarjs/no-os-command-from-path
+    "git",
+    ["log", "--format=%H", "--", `${pkgDir}/package.json`],
+    {
+      cwd: rootDir,
+      encoding: "utf8",
+    },
+  )
     .trim()
     .split("\n")
     .filter(Boolean);
 
   for (const hash of hashes) {
-    try {
-      const oldPkgJson = execSync(`git show ${hash}:${pkgDir}/package.json`, {
-        cwd: rootDir,
-        encoding: "utf8",
-      });
-      const oldVersion = (JSON.parse(oldPkgJson) as {version?: string}).version;
-      if (oldVersion !== currentVersion) {
-        return hash;
-      }
-    } catch {
-      // Commit may not have this file, skip
+    const path = `${pkgDir}/package.json`;
+    const listed = execFileSync(
+      // eslint-disable-next-line sonarjs/no-os-command-from-path
+      "git",
+      ["ls-tree", "-z", "--name-only", hash, "--", path],
+      {cwd: rootDir, encoding: "utf8"},
+    );
+    if (listed.length === 0) continue;
+
+    // eslint-disable-next-line sonarjs/no-os-command-from-path
+    const oldPkgJson = execFileSync("git", ["show", `${hash}:${path}`], {
+      cwd: rootDir,
+      encoding: "utf8",
+    });
+    const oldVersion = (JSON.parse(oldPkgJson) as {version?: string}).version;
+    if (oldVersion !== currentVersion) {
+      return hash;
     }
   }
 
@@ -67,8 +78,10 @@ const getCommitsSince = (
   pkgDir: string,
   sinceRef: string,
 ): readonly Commit[] => {
-  const raw = execSync(
-    `git log --format="%x00%H|%aN%n%B" ${sinceRef}..HEAD -- ${pkgDir}`,
+  const raw = execFileSync(
+    // eslint-disable-next-line sonarjs/no-os-command-from-path
+    "git",
+    ["log", "--format=%x00%H|%aN%n%B", `${sinceRef}..HEAD`, "--", pkgDir],
     {cwd: rootDir, encoding: "utf8"},
   );
   return raw

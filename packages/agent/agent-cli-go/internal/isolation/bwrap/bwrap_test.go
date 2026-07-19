@@ -1,6 +1,7 @@
 package bwrap
 
 import (
+	"errors"
 	"os"
 	"os/exec"
 	"strings"
@@ -109,19 +110,16 @@ func TestBwrap_DenyDefaultHardening(t *testing.T) {
 
 func TestBwrap_NetworkExplicit(t *testing.T) {
 	work := t.TempDir()
-	// none + proxy must emit --unshare-net (the regression guard); host shares.
-	for _, net := range []netshared.Mode{netshared.ModeNone, netshared.ModeProxy} {
-		args := bwrapCommand(t, claudeCfg(net, false, work), provision.Contribution{})
-		if !argHas(args, "--unshare-net") {
-			t.Errorf("network %q must emit --unshare-net", net)
-		}
-		if argHas(args, "--share-net") {
-			t.Errorf("network %q must not share the net", net)
-		}
+	args := bwrapCommand(t, claudeCfg(netshared.ModeNone, false, work), provision.Contribution{})
+	if !argHas(args, "--unshare-net") || argHas(args, "--share-net") {
+		t.Error("network none must --unshare-net and not --share-net")
 	}
-	args := bwrapCommand(t, claudeCfg(netshared.ModeHost, false, work), provision.Contribution{})
+	args = bwrapCommand(t, claudeCfg(netshared.ModeHost, false, work), provision.Contribution{})
 	if !argHas(args, "--share-net") || argHas(args, "--unshare-net") {
 		t.Error("network host must --share-net and not --unshare-net")
+	}
+	if _, err := NewIsolator().Command(claudeCfg(netshared.ModeProxy, false, work), provision.Contribution{}); !errors.Is(err, netshared.ErrProxyEnforcementUnavailable) {
+		t.Errorf("network proxy error = %v, want %v", err, netshared.ErrProxyEnforcementUnavailable)
 	}
 }
 

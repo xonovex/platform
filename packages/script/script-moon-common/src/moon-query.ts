@@ -1,4 +1,4 @@
-import {execSync} from "node:child_process";
+import {execFileSync} from "node:child_process";
 import {existsSync} from "node:fs";
 import {join} from "node:path";
 
@@ -9,7 +9,7 @@ export interface MoonProject {
 
 export const queryMoonProjects = (rootDir: string): readonly MoonProject[] => {
   // eslint-disable-next-line sonarjs/no-os-command-from-path
-  const output = execSync("npx moon query projects", {
+  const output = execFileSync("npx", ["moon", "query", "projects"], {
     encoding: "utf8",
     maxBuffer: 10 * 1024 * 1024,
     cwd: rootDir,

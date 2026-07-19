@@ -5,11 +5,22 @@ import {
   mkdirSync,
   readdirSync,
   readFileSync,
-  statSync,
   writeFileSync,
 } from "node:fs";
 import {dirname, join, resolve} from "node:path";
 import {parseCliArgs} from "@xonovex/script-moon-common";
+import {
+  isDirectory,
+  isFile,
+  resolveGuideDirectory,
+} from "@xonovex/script-moon-common/fs";
+import {
+  evalEntries,
+  normalizeEval,
+  parseJudgeResults,
+  parseOutputOptions,
+  type NormalizedEval,
+} from "./validation.js";
 
 const TOKEN_KEYS = [
   "input_tokens",
@@ -17,23 +28,6 @@ const TOKEN_KEYS = [
   "cache_creation_input_tokens",
   "cache_read_input_tokens",
 ] as const;
-
-interface EvalInput {
-  readonly id?: string | number;
-  readonly prompt?: unknown;
-  readonly expected_output?: unknown;
-  readonly assertions?: unknown;
-  readonly files?: unknown;
-  readonly [key: string]: unknown;
-}
-
-interface NormEval {
-  readonly id: string | number;
-  readonly prompt: string;
-  readonly expected_output: string;
-  readonly assertions: readonly string[];
-  readonly files: readonly string[];
-}
 
 interface GenResult {
   readonly text: string;
@@ -80,7 +74,7 @@ interface RunContext {
   readonly judge_model: string;
   readonly iter_dir: string;
   readonly runs: number;
-  readonly build_prompt: (e: NormEval) => string;
+  readonly build_prompt: (e: NormalizedEval) => string;
 }
 
 interface MeanBlock {
@@ -97,22 +91,6 @@ interface ArmBlock {
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null && !Array.isArray(value);
-
-const isFile = (path: string): boolean => {
-  try {
-    return statSync(path).isFile();
-  } catch {
-    return false;
-  }
-};
-
-const isDir = (path: string): boolean => {
-  try {
-    return statSync(path).isDirectory();
-  } catch {
-    return false;
-  }
-};
 
 const round = (value: number, digits = 0): number => {
   const factor = 10 ** digits;
@@ -202,6 +180,7 @@ const extractJson = (text: string): Record<string, unknown> | null => {
 interface ProcOutput {
   readonly stdout: string;
   readonly timedOut: boolean;
+  readonly error: string | null;
 }
 
 const runClaude = (
@@ -217,7 +196,15 @@ const runClaude = (
       ...(cwd ? {cwd} : {}),
     });
     let stdout = "";
+    let stderr = "";
     let timedOut = false;
+    let settled = false;
+    const finish = (error: string | null): void => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      resolvePromise({stdout, timedOut, error});
+    };
     const timer = setTimeout(() => {
       timedOut = true;
       child.kill("SIGKILL");
@@ -226,16 +213,21 @@ const runClaude = (
     child.stdout.on("data", (chunk: string) => {
       stdout += chunk;
     });
-    child.stderr.on("data", () => {
-      // discard; Python captures but does not use generation stderr
+    child.stderr.setEncoding("utf8");
+    child.stderr.on("data", (chunk: string) => {
+      stderr += chunk;
     });
-    child.on("error", () => {
-      clearTimeout(timer);
-      resolvePromise({stdout, timedOut});
+    child.on("error", (error) => {
+      finish(error.message);
     });
-    child.on("close", () => {
-      clearTimeout(timer);
-      resolvePromise({stdout, timedOut});
+    child.on("close", (code) => {
+      if (timedOut || code === 0) {
+        finish(null);
+        return;
+      }
+      const detail = stderr.trim();
+      const detailSuffix = detail.length > 0 ? `: ${detail}` : "";
+      finish(`claude exited ${String(code)}${detailSuffix}`);
     });
   });
 
@@ -255,6 +247,15 @@ const generate = async (
       duration_ms: timeout * 1000,
       skill_triggered: false,
       error: "timeout",
+    };
+  }
+  if (proc.error) {
+    return {
+      text: "",
+      total_tokens: 0,
+      duration_ms: 0,
+      skill_triggered: false,
+      error: proc.error,
     };
   }
 
@@ -370,8 +371,11 @@ const grade = async (
     args.push("--model", model);
   }
 
-  let verdict: Record<string, unknown> | null = null;
+  let verdict: unknown = null;
   const proc = await runClaude(args, rubric, undefined, 300 * 1000);
+  if (proc.error) {
+    return allFail(`judge process error: ${proc.error}`);
+  }
   if (!proc.timedOut) {
     try {
       const outer: unknown = JSON.parse(proc.stdout);
@@ -383,24 +387,24 @@ const grade = async (
     }
   }
 
-  if (!verdict || !Array.isArray(verdict.assertion_results)) {
+  const verdictResults = parseJudgeResults(verdict);
+  if (verdictResults === undefined) {
     return allFail("unparseable judge output");
   }
 
-  const verdictResults = verdict.assertion_results as unknown[];
   const results: AssertionResult[] = assertions.map((a, i) => {
-    const item: unknown = i < verdictResults.length ? verdictResults[i] : {};
-    const passed = isRecord(item) ? Boolean(item.passed) : false;
-    const evidenceRaw = isRecord(item) ? item.evidence : "";
-    const evidence =
-      (typeof evidenceRaw === "string" ? evidenceRaw : "") || "no evidence";
-    return {text: a, passed, evidence};
+    const item = verdictResults[i];
+    return {
+      text: a,
+      passed: item?.passed ?? false,
+      evidence: item?.evidence ?? "no evidence",
+    };
   });
   return summarize(results);
 };
 
 const runJob = async (
-  evalObj: NormEval,
+  evalObj: NormalizedEval,
   arm: string,
   runIdx: number,
   ctx: RunContext,
@@ -533,27 +537,6 @@ const runPool = async <T, R>(
   return results;
 };
 
-// Resolve the guide dir for a base dir: base itself if it holds SKILL.md, else
-// the single immediate subdir that does (the skill-package layout, e.g.
-// skill-c99/c99-guide/SKILL.md, where the simple moon task runs the bin from
-// the package root). >1 match is ambiguous; 0 falls back to base so the
-// existing evals-not-found error still fires.
-const resolveGuideDir = (base: string): string => {
-  if (isFile(join(base, "SKILL.md"))) {
-    return base;
-  }
-  const nested = readdirSync(base)
-    .map((entry) => join(base, entry))
-    .filter((p) => isFile(join(p, "SKILL.md")));
-  if (nested.length > 1) {
-    process.stderr.write(
-      `Error: multiple SKILL.md found under ${base}; pass one explicitly\n`,
-    );
-    process.exit(2);
-  }
-  return nested[0] ?? base;
-};
-
 // Pull the "name:" frontmatter value out of ./SKILL.md (ergonomic default).
 const skillNameFromSkillMd = (path: string): string | undefined => {
   if (!isFile(path)) return undefined;
@@ -625,7 +608,7 @@ const main = async (argv: readonly string[]): Promise<number> => {
   // Ergonomic positional defaults. With no explicit positionals the bin runs
   // from the skill package root, so descend into the single guide subdir that
   // holds SKILL.md before defaulting the evals path / reading skill_name.
-  const guideDir = resolveGuideDir(resolve("."));
+  const guideDir = resolveGuideDirectory(resolve("."));
   const evalsArg = positionals[0] ?? join(guideDir, "evals.json");
   const evalsFile = resolve(evalsArg);
 
@@ -661,46 +644,30 @@ const main = async (argv: readonly string[]): Promise<number> => {
     return 2;
   }
 
-  const dataEvals = isRecord(data) ? data.evals : data;
-  const evals: unknown[] = Array.isArray(dataEvals) ? dataEvals : [];
+  const entriesResult = evalEntries(data);
+  if (!entriesResult.success) {
+    process.stderr.write(
+      `Error: invalid eval structure in ${evalsArg}: ${entriesResult.error}\n`,
+    );
+    return 2;
+  }
+  const evals = entriesResult.data;
   if (evals.length === 0) {
     process.stderr.write(`Error: ${evalsArg} has no evals\n`);
     return 2;
   }
 
   // Normalize each eval: require id + prompt + (assertions | expected_output).
-  const norm: NormEval[] = [];
+  const norm: NormalizedEval[] = [];
   for (const [i, raw] of evals.entries()) {
-    const e = raw as EvalInput;
-    if (!isRecord(e) || !("prompt" in e)) {
-      process.stderr.write(`Skipping eval #${String(i)}: missing prompt\n`);
-      continue;
-    }
-    let assertions: string[] = Array.isArray(e.assertions)
-      ? (e.assertions as unknown[]).map(String)
-      : [];
-    const expectedOutput =
-      typeof e.expected_output === "string" ? e.expected_output : "";
-    if (assertions.length === 0 && expectedOutput) {
-      assertions = [expectedOutput];
-    }
-    if (assertions.length === 0) {
-      const idLabel = e.id ?? i;
+    const result = normalizeEval(raw, i + 1);
+    if (!result.success) {
       process.stderr.write(
-        `Skipping eval ${String(idLabel)}: no assertions or expected_output\n`,
+        `Skipping eval #${String(i + 1)}: ${result.error}\n`,
       );
       continue;
     }
-    const files = Array.isArray(e.files)
-      ? (e.files as unknown[]).map(String)
-      : [];
-    norm.push({
-      id: e.id ?? i + 1,
-      prompt: String(e.prompt),
-      expected_output: expectedOutput,
-      assertions,
-      files,
-    });
+    norm.push(result.data);
   }
   if (norm.length === 0) {
     process.stderr.write("Error: no gradable evals\n");
@@ -709,12 +676,10 @@ const main = async (argv: readonly string[]): Promise<number> => {
 
   const runsRaw =
     (values.runs as string | undefined) ?? process.env.RUNS ?? "1";
-  const runs = Number(runsRaw);
   const concurrencyRaw =
     (values.concurrency as string | undefined) ??
     process.env.CONCURRENCY ??
     "4";
-  const concurrency = Math.max(1, Number(concurrencyRaw));
   const claudeModel =
     (values.model as string | undefined) ?? process.env.CLAUDE_MODEL ?? "haiku";
   const judgeModel =
@@ -729,7 +694,6 @@ const main = async (argv: readonly string[]): Promise<number> => {
     (values["gen-timeout"] as string | undefined) ??
     process.env.GEN_TIMEOUT ??
     "600";
-  const timeout = Number(timeoutRaw);
   const workspaceArg =
     (values.workspace as string | undefined) ?? process.env.WORKSPACE ?? "";
   const cwdArg =
@@ -739,7 +703,22 @@ const main = async (argv: readonly string[]): Promise<number> => {
     (values["max-budget-usd"] as string | undefined) ??
     process.env.MAX_BUDGET_USD ??
     "";
-  const budget = budgetRaw ? Number(budgetRaw) : null;
+  const optionsResult = parseOutputOptions({
+    runs: runsRaw,
+    concurrency: concurrencyRaw,
+    timeout: timeoutRaw,
+    ...(budgetRaw ? {budget: budgetRaw} : {}),
+    ...(iteration ? {iteration} : {}),
+  });
+  if (!optionsResult.success) {
+    process.stderr.write(
+      `Error: invalid evaluator options: ${optionsResult.error}\n`,
+    );
+    return 2;
+  }
+  const {runs, concurrency, timeout} = optionsResult.data;
+  const budget = optionsResult.data.budget ?? null;
+  iteration = optionsResult.data.iteration ?? "";
 
   const short = skillName.split(":").pop() ?? skillName;
 
@@ -751,7 +730,7 @@ const main = async (argv: readonly string[]): Promise<number> => {
     if (existsSync(base)) {
       for (const entry of readdirSync(base)) {
         const m = /^iteration-(\d+)$/.exec(entry);
-        if (m && isDir(join(base, entry))) {
+        if (m && isDirectory(join(base, entry))) {
           maxExisting = Math.max(maxExisting, Number(m[1]));
         }
       }
@@ -776,7 +755,7 @@ const main = async (argv: readonly string[]): Promise<number> => {
 
   const evalsDir = dirname(evalsFile);
 
-  const buildPrompt = (e: NormEval): string => {
+  const buildPrompt = (e: NormalizedEval): string => {
     let prompt = e.prompt;
     const files = e.files;
     if (files.length > 0) {
@@ -809,7 +788,7 @@ const main = async (argv: readonly string[]): Promise<number> => {
 
   const arms = ["with_skill", "without_skill"] as const;
   interface Job {
-    readonly e: NormEval;
+    readonly e: NormalizedEval;
     readonly arm: string;
     readonly r: number;
   }

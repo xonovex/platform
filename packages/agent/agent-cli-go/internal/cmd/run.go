@@ -10,7 +10,6 @@ import (
 
 	cfgpkg "github.com/xonovex/platform/packages/cli/agent-cli-go/internal/config"
 	isoshared "github.com/xonovex/platform/packages/cli/agent-cli-go/internal/isolation/shared"
-	"github.com/xonovex/platform/packages/cli/agent-cli-go/internal/network/proxy"
 	netshared "github.com/xonovex/platform/packages/cli/agent-cli-go/internal/network/shared"
 	provnix "github.com/xonovex/platform/packages/cli/agent-cli-go/internal/provision/nix"
 	provshared "github.com/xonovex/platform/packages/cli/agent-cli-go/internal/provision/shared"
@@ -23,7 +22,6 @@ import (
 	wsshared "github.com/xonovex/platform/packages/cli/agent-cli-go/internal/workspace/shared"
 	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/agents"
 	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/isolation"
-	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/network"
 	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/policy"
 	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/providers"
 	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/provision"
@@ -41,35 +39,37 @@ var runCmd = &cobra.Command{
 }
 
 var (
-	flagAgent                     string
-	flagProvider                  string
-	flagIsolation                 string
-	flagProvision                 string
-	flagNetwork                   string
-	flagNetworkProxyEgressAllow   []string
-	flagIsolationBwrapPassthrough bool
-	flagIsolationDockerRuntime    string
-	flagInitCommand               []string
-	flagNixSource                 string
-	flagNixRev                    string
-	flagNixPackages               []string
-	flagNixShell                  string
-	flagWorkDir                   string
-	flagWorktreeBranch            string
-	flagWorktreeSourceBranch      string
-	flagWorktreeDir               string
-	flagConfig                    string
-	flagBind                      []string
-	flagRoBind                    []string
-	flagEnv                       []string
-	flagImage                     string
-	flagTerminal                  string
-	flagTerminalSession           string
-	flagTerminalWindow            string
-	flagTerminalDetach            bool
-	flagVCS                       string
-	flagDryRun                    bool
-	flagRequirePinned             bool
+	flagAgent                       string
+	flagProvider                    string
+	flagIsolation                   string
+	flagProvision                   string
+	flagNetwork                     string
+	flagIsolationBwrapPassthrough   bool
+	flagIsolationDockerRuntime      string
+	flagInitCommand                 []string
+	flagNixSource                   string
+	flagNixRev                      string
+	flagNixPackages                 []string
+	flagNixShell                    string
+	flagWorkDir                     string
+	flagWorktreeBranch              string
+	flagWorktreeSourceBranch        string
+	flagWorktreeDir                 string
+	flagConfig                      string
+	flagBind                        []string
+	flagRoBind                      []string
+	flagEnv                         []string
+	flagImage                       string
+	flagTerminal                    string
+	flagTerminalSession             string
+	flagTerminalWindow              string
+	flagTerminalDetach              bool
+	flagVCS                         string
+	flagDryRun                      bool
+	flagRequirePinnedProvision      bool
+	flagRequireHostToolsUnreachable bool
+	flagRequireEgressRestricted     bool
+	flagRequireKernelIsolation      bool
 )
 
 func init() {
@@ -85,7 +85,6 @@ func init() {
 	// Per-type knobs under the --<axis>-<type>-<option> grammar.
 	runCmd.Flags().StringVar(&flagIsolationDockerRuntime, "isolation-docker-runtime", "", "Kernel-isolating container runtime, e.g. runsc (docker only)")
 	runCmd.Flags().BoolVar(&flagIsolationBwrapPassthrough, "isolation-bwrap-passthrough", false, "Expose host/base-image tools as a fallback (bwrap only; forfeits host-tools-unreachable)")
-	runCmd.Flags().StringSliceVar(&flagNetworkProxyEgressAllow, "network-proxy-egress-allow", []string{}, "Extra egress allowlist host for --network proxy (proxy only, repeatable)")
 	runCmd.Flags().StringSliceVar(&flagInitCommand, "init-command", []string{}, "Init command to run before the agent for --provision command (repeatable)")
 	runCmd.Flags().StringVar(&flagNixSource, "nix-source", "packages", "Nix source for --provision nix (packages, flake)")
 	runCmd.Flags().StringVar(&flagNixRev, "nix-rev", "", "Pinned nixpkgs rev for --nix-source packages")
@@ -109,30 +108,41 @@ func init() {
 	runCmd.Flags().StringVar(&flagVCS, "vcs", "git", "VCS type for worktree (git, jj)")
 	runCmd.Flags().BoolVarP(&flagDryRun, "dry-run", "n", false, "Show configuration without executing")
 
-	// Bare policy flag.
-	runCmd.Flags().BoolVar(&flagRequirePinned, "require-pinned-toolchain", false,
-		"Mandate pinned provisioning + host-tools-unreachable; reject leaky/host-exposed cells")
+	// Independent policy guarantees.
+	runCmd.Flags().BoolVar(&flagRequirePinnedProvision, "require-pinned-provision", false,
+		"Require provisioning from a pinned source")
+	runCmd.Flags().BoolVar(&flagRequireHostToolsUnreachable, "require-host-tools-unreachable", false,
+		"Require host tools to be unreachable from the sandbox")
+	runCmd.Flags().BoolVar(&flagRequireEgressRestricted, "require-egress-restricted", false,
+		"Require network egress to be disabled or enforced by a supported transport")
+	runCmd.Flags().BoolVar(&flagRequireKernelIsolation, "require-kernel-isolation", false,
+		"Require a kernel-isolating runtime such as docker with runsc")
 }
 
 // flags is the axis-resolution view of the run flags. It is the input to
 // resolveAxes, keeping the resolution testable without a live cobra command.
 type flags struct {
-	isolation                 string
-	provision                 string
-	network                   string
-	image                     string
-	isolationDockerRuntime    string
-	isolationBwrapPassthrough bool
-	requirePinned             bool
-	isolationChanged          bool
-	provisionChanged          bool
+	isolation                   string
+	provision                   string
+	network                     string
+	image                       string
+	isolationDockerRuntime      string
+	isolationBwrapPassthrough   bool
+	requirePinnedProvision      bool
+	requireHostToolsUnreachable bool
+	requireEgressRestricted     bool
+	requireKernelIsolation      bool
+	isolationChanged            bool
+	provisionChanged            bool
 }
 
 // policy derives the demanded guarantees from the bare policy flags.
 func (f flags) policy() policy.SandboxPolicy {
 	return policy.SandboxPolicy{
-		RequirePinnedProvision:      f.requirePinned,
-		RequireHostToolsUnreachable: f.requirePinned,
+		RequirePinnedProvision:      f.requirePinnedProvision,
+		RequireHostToolsUnreachable: f.requireHostToolsUnreachable,
+		RequireEgressRestricted:     f.requireEgressRestricted,
+		RequireKernelIsolation:      f.requireKernelIsolation,
 	}
 }
 
@@ -170,6 +180,9 @@ func resolveAxes(f flags) (resolvedAxes, error) {
 	net, err := netshared.ParseMode(netStr)
 	if err != nil {
 		return resolvedAxes{}, err
+	}
+	if net == netshared.ModeProxy {
+		return resolvedAxes{}, netshared.ErrProxyEnforcementUnavailable
 	}
 
 	pol := f.policy()
@@ -245,15 +258,18 @@ func runAgent(cmd *cobra.Command, args []string) error {
 	bindPaths := wsshared.BuildBindPaths(append(append([]string{}, fileConfig.BindPaths...), flagBind...), sourceRepoDir)
 
 	axes, err := resolveAxes(flags{
-		isolation:                 flagIsolation,
-		provision:                 flagProvision,
-		network:                   flagNetwork,
-		image:                     flagImage,
-		isolationDockerRuntime:    flagIsolationDockerRuntime,
-		isolationBwrapPassthrough: flagIsolationBwrapPassthrough,
-		requirePinned:             flagRequirePinned,
-		isolationChanged:          cmd.Flags().Changed("isolation"),
-		provisionChanged:          cmd.Flags().Changed("provision"),
+		isolation:                   flagIsolation,
+		provision:                   flagProvision,
+		network:                     flagNetwork,
+		image:                       flagImage,
+		isolationDockerRuntime:      flagIsolationDockerRuntime,
+		isolationBwrapPassthrough:   flagIsolationBwrapPassthrough,
+		requirePinnedProvision:      flagRequirePinnedProvision,
+		requireHostToolsUnreachable: flagRequireHostToolsUnreachable,
+		requireEgressRestricted:     flagRequireEgressRestricted,
+		requireKernelIsolation:      flagRequireKernelIsolation,
+		isolationChanged:            cmd.Flags().Changed("isolation"),
+		provisionChanged:            cmd.Flags().Changed("provision"),
 	})
 	if err != nil {
 		return err
@@ -287,7 +303,6 @@ func runAgent(cmd *cobra.Command, args []string) error {
 		WorkDir:         workDir,
 		RepoDir:         sourceRepoDir,
 		Network:         axes.Network,
-		ProxyEnv:        proxyEnv(axes.Network),
 		HostPassthrough: axes.Passthrough,
 		Image:           axes.Image,
 		Runtime:         axes.Runtime,
@@ -401,20 +416,6 @@ func provisionInput(provName provision.ProvisionMethod, repoDir, workDir string)
 		in.NixSource = src
 	}
 	return in, nil
-}
-
-// proxyEnv builds the resolved proxy egress environment (allowlist folded in) for
-// the proxy network mode, or nil for any other mode or when no proxy URL is set.
-// The mode gate is essential: without it, a host-side AGENT_SANDBOX_PROXY would be
-// injected into the sandbox regardless of the requested --network.
-func proxyEnv(mode netshared.Mode) map[string]string {
-	if mode != netshared.ModeProxy {
-		return nil
-	}
-	return proxy.Options{
-		EgressAllowlist: append(append([]string{}, network.DefaultEgressAllowlist...), flagNetworkProxyEgressAllow...),
-		URL:             netshared.ProxyURL(),
-	}.Env()
 }
 
 // executeWithTerminal runs the resolved cell inside a terminal wrapper.

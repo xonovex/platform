@@ -1,6 +1,11 @@
 #!/usr/bin/env node
-import {readdirSync, readFileSync, statSync} from "node:fs";
+import {readdirSync, readFileSync} from "node:fs";
 import {basename, dirname, join, resolve} from "node:path";
+import {
+  isDirectory,
+  isFile,
+  resolveGuideDirectory,
+} from "@xonovex/script-moon-common/fs";
 import {parse as parseYaml} from "yaml";
 import {checkReferenceFileLinks} from "./reference-file-links.js";
 
@@ -76,42 +81,11 @@ const pyTypeName = (value: unknown): string => {
   return typeof value;
 };
 
-const isFile = (path: string): boolean => {
-  try {
-    return statSync(path).isFile();
-  } catch {
-    return false;
-  }
-};
-
-const isDir = (path: string): boolean => {
-  try {
-    return statSync(path).isDirectory();
-  } catch {
-    return false;
-  }
-};
-
 const resolveTarget = (arg: string): {skill: string; skillDir: string} => {
   const target = resolve(arg);
   let skill: string;
-  if (isDir(target)) {
-    if (isFile(join(target, "SKILL.md"))) {
-      skill = join(target, "SKILL.md");
-    } else {
-      // Skill-package layout: the SKILL.md lives in a single guide subdir
-      // (e.g. skill-c99/c99-guide/SKILL.md), so descend one level.
-      const nested = readdirSync(target)
-        .map((entry) => join(target, entry, "SKILL.md"))
-        .filter((p) => isFile(p));
-      if (nested.length > 1) {
-        process.stderr.write(
-          `Error: multiple SKILL.md found under ${target}; pass one explicitly\n`,
-        );
-        process.exit(2);
-      }
-      skill = nested[0] ?? join(target, "SKILL.md");
-    }
+  if (isDirectory(target)) {
+    skill = join(resolveGuideDirectory(target), "SKILL.md");
   } else if (isFile(target)) {
     skill = target;
   } else {
@@ -513,7 +487,7 @@ const checkReferences = (
 
 const checkReferenceTocs = (skillDir: string, report: Report): void => {
   const refsDir = join(skillDir, "references");
-  if (!isDir(refsDir)) {
+  if (!isDirectory(refsDir)) {
     return;
   }
   const tocRe = /^## *(?:Contents|Table of Contents)\b/im;

@@ -8,6 +8,11 @@ dependsOn:
   - shared-core-go
   - shared-agent-go
 tasks:
+  ci-check:
+    deps:
+      - go-test-integration
+    options:
+      mergeDeps: append
   docker-build:
     command:
       - docker

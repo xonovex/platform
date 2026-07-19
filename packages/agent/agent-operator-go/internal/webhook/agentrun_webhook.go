@@ -6,6 +6,7 @@ import (
 	"strings"
 	"time"
 
+	corev1 "k8s.io/api/core/v1"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
@@ -154,7 +155,7 @@ func (w *AgentRunWebhook) validate(ctx context.Context, run *agentv1alpha1.Agent
 	if err := w.applyReferencedDefaults(ctx, effectiveRun); err != nil {
 		return nil, err
 	}
-	if err := validateExecutionBoundary(effectiveRun); err != nil {
+	if err := validateExecutionBoundary(effectiveRun, policy); err != nil {
 		return nil, err
 	}
 	if err := validateAutonomyOversight(effectiveRun, policy); err != nil {
@@ -210,7 +211,7 @@ func (w *AgentRunWebhook) applyReferencedDefaults(ctx context.Context, run *agen
 	return nil
 }
 
-func validateExecutionBoundary(run *agentv1alpha1.AgentRun) error {
+func validateExecutionBoundary(run *agentv1alpha1.AgentRun, policy *agentv1alpha1.AgentPolicy) error {
 	if run.Spec.Image == "" {
 		return fmt.Errorf("agent execution requires an explicit agent-capable image or harness/toolchain image default")
 	}
@@ -220,7 +221,26 @@ func validateExecutionBoundary(run *agentv1alpha1.AgentRun) error {
 	if run.Spec.RuntimeClassName == nil || strings.TrimSpace(*run.Spec.RuntimeClassName) == "" {
 		return fmt.Errorf("agent execution requires an explicit sandboxed runtimeClassName or harness/policy default")
 	}
+	if !runtimeClassApproved(*run.Spec.RuntimeClassName, policy) {
+		return fmt.Errorf("runtimeClassName %q is not declared sandboxed by the namespace AgentPolicy", *run.Spec.RuntimeClassName)
+	}
 	return nil
+}
+
+func runtimeClassApproved(runtimeClassName string, policy *agentv1alpha1.AgentPolicy) bool {
+	if policy == nil {
+		return false
+	}
+	enforced := policy.Spec.Enforced
+	if enforced.RuntimeClassName != nil && *enforced.RuntimeClassName == runtimeClassName {
+		return true
+	}
+	for _, allowed := range enforced.AllowedRuntimeClassNames {
+		if allowed == runtimeClassName {
+			return true
+		}
+	}
+	return false
 }
 
 func validateAutonomyOversight(run *agentv1alpha1.AgentRun, policy *agentv1alpha1.AgentPolicy) error {
@@ -364,14 +384,11 @@ func enforcePolicy(run *agentv1alpha1.AgentRun, policy *agentv1alpha1.AgentPolic
 		}
 	}
 
-	// Enforce no privilege escalation weakening
-	if e.RequireSecurityContext && run.Spec.SecurityContext != nil {
-		sc := run.Spec.SecurityContext
-		if sc.AllowPrivilegeEscalation != nil && *sc.AllowPrivilegeEscalation {
-			return fmt.Errorf("policy prohibits AllowPrivilegeEscalation=true")
-		}
-		if sc.RunAsNonRoot != nil && !*sc.RunAsNonRoot {
-			return fmt.Errorf("policy requires RunAsNonRoot=true")
+	// Reject every override honored by the pod builder that can weaken its
+	// hardened container or pod security-context defaults.
+	if e.RequireSecurityContext {
+		if err := validateSecurityContextOverrides(run); err != nil {
+			return err
 		}
 	}
 
@@ -427,4 +444,67 @@ func enforcePolicy(run *agentv1alpha1.AgentRun, policy *agentv1alpha1.AgentPolic
 	}
 
 	return nil
+}
+
+func validateSecurityContextOverrides(run *agentv1alpha1.AgentRun) error {
+	if sc := run.Spec.SecurityContext; sc != nil {
+		if sc.AllowPrivilegeEscalation != nil && *sc.AllowPrivilegeEscalation {
+			return fmt.Errorf("policy prohibits AllowPrivilegeEscalation=true")
+		}
+		if sc.RunAsNonRoot != nil && !*sc.RunAsNonRoot {
+			return fmt.Errorf("policy requires RunAsNonRoot=true")
+		}
+		if sc.ReadOnlyRootFilesystem != nil && !*sc.ReadOnlyRootFilesystem {
+			return fmt.Errorf("policy requires ReadOnlyRootFilesystem=true")
+		}
+		if sc.RunAsUser != nil && *sc.RunAsUser == 0 {
+			return fmt.Errorf("policy prohibits RunAsUser=0")
+		}
+		if sc.RunAsGroup != nil && *sc.RunAsGroup == 0 {
+			return fmt.Errorf("policy prohibits RunAsGroup=0")
+		}
+		if sc.SeccompProfile != nil && sc.SeccompProfile.Type == corev1.SeccompProfileTypeUnconfined {
+			return fmt.Errorf("policy prohibits an unconfined container seccomp profile")
+		}
+		if sc.Capabilities != nil {
+			if len(sc.Capabilities.Add) > 0 {
+				return fmt.Errorf("policy prohibits adding Linux capabilities")
+			}
+			if !hasCapability(sc.Capabilities.Drop, "ALL") {
+				return fmt.Errorf("policy requires dropping all Linux capabilities")
+			}
+		}
+	}
+
+	if sc := run.Spec.PodSecurityContext; sc != nil {
+		if sc.RunAsNonRoot != nil && !*sc.RunAsNonRoot {
+			return fmt.Errorf("policy requires pod RunAsNonRoot=true")
+		}
+		if sc.RunAsUser != nil && *sc.RunAsUser == 0 {
+			return fmt.Errorf("policy prohibits pod RunAsUser=0")
+		}
+		if sc.RunAsGroup != nil && *sc.RunAsGroup == 0 {
+			return fmt.Errorf("policy prohibits pod RunAsGroup=0")
+		}
+		if sc.FSGroup != nil && *sc.FSGroup == 0 {
+			return fmt.Errorf("policy prohibits pod FSGroup=0")
+		}
+		if sc.SeccompProfile != nil && sc.SeccompProfile.Type == corev1.SeccompProfileTypeUnconfined {
+			return fmt.Errorf("policy prohibits an unconfined pod seccomp profile")
+		}
+		if len(sc.Sysctls) > 0 {
+			return fmt.Errorf("policy prohibits pod sysctl overrides")
+		}
+	}
+
+	return nil
+}
+
+func hasCapability(capabilities []corev1.Capability, target corev1.Capability) bool {
+	for _, capability := range capabilities {
+		if strings.EqualFold(string(capability), string(target)) {
+			return true
+		}
+	}
+	return false
 }

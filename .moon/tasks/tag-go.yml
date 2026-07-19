@@ -47,7 +47,7 @@ tasks:
       set -euo pipefail
       go test -v -coverprofile=coverage.out ./...
       coverage="$(go tool cover -func=coverage.out | awk '/^total:/ { gsub(/%/, "", $3); print $3 }')"
-      awk -v coverage="$coverage" 'BEGIN { if (coverage + 0 < 30) { printf "coverage %.1f%% is below 30%%\n", coverage > "/dev/stderr"; exit 1 } }'
+      awk -v coverage="$coverage" 'BEGIN { if (coverage + 0 < 35) { printf "coverage %.1f%% is below 35%%\n", coverage > "/dev/stderr"; exit 1 } }'
     toolchain: [system, nix]
     deps:
     - ^:go-build

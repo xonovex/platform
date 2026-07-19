@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import {execSync} from "node:child_process";
+import {execFileSync} from "node:child_process";
 import {writeFileSync} from "node:fs";
 import {dirname, join} from "node:path";
 import {fileURLToPath} from "node:url";
@@ -41,7 +41,8 @@ const output =
   join(root, "npm-publish-graph.png");
 const dotOutput = values.dot as string | undefined;
 
-const dot = execSync(`npx moon action-graph ${target} --dot`, {
+// eslint-disable-next-line sonarjs/no-os-command-from-path
+const dot = execFileSync("npx", ["moon", "action-graph", target, "--dot"], {
   cwd: root,
   encoding: "utf8",
   stdio: ["pipe", "pipe", "pipe"],
@@ -51,9 +52,9 @@ const graph = filterDotGraph(dot, taskFilter);
 const filtered = buildFilteredDot(graph);
 
 // eslint-disable-next-line sonarjs/no-os-command-from-path
-const png = execSync("dot -Tpng", {
+const png = execFileSync("dot", ["-Tpng"], {
   input: filtered,
-  maxBuffer: 10 * 1024 * 1024,
+  maxBuffer: 128 * 1024 * 1024,
 });
 
 writeFileSync(output, png);

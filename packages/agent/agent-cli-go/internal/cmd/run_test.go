@@ -18,18 +18,9 @@ func TestParseNetwork(t *testing.T) {
 	}
 }
 
-// TestProxyEnv_GatedByMode locks the fix that a host-side AGENT_SANDBOX_PROXY is
-// only injected for --network proxy, never for host/none.
-func TestProxyEnv_GatedByMode(t *testing.T) {
-	t.Setenv("AGENT_SANDBOX_PROXY", "http://127.0.0.1:3128")
-	if env := proxyEnv(netshared.ModeHost); env != nil {
-		t.Errorf("proxyEnv(host) = %v, want nil even with AGENT_SANDBOX_PROXY set", env)
-	}
-	if env := proxyEnv(netshared.ModeNone); env != nil {
-		t.Errorf("proxyEnv(none) = %v, want nil", env)
-	}
-	if env := proxyEnv(netshared.ModeProxy); env == nil || env["HTTPS_PROXY"] != "http://127.0.0.1:3128" {
-		t.Errorf("proxyEnv(proxy) = %v, want the proxy env", env)
+func TestResolveAxes_ProxyFailsClosed(t *testing.T) {
+	if _, err := resolveAxes(flags{network: "proxy"}); !errors.Is(err, netshared.ErrProxyEnforcementUnavailable) {
+		t.Fatalf("resolveAxes(proxy) error = %v, want %v", err, netshared.ErrProxyEnforcementUnavailable)
 	}
 }
 
@@ -52,7 +43,7 @@ func TestResolveAxes_DockerRuntimeWiresKernelIsolation(t *testing.T) {
 // TestResolveAxes_PinnedComboDefault confirms that requiring a pinned toolchain
 // with no explicit cell selects the bwrap × nix combo.
 func TestResolveAxes_PinnedComboDefault(t *testing.T) {
-	axes, err := resolveAxes(flags{requirePinned: true})
+	axes, err := resolveAxes(flags{requirePinnedProvision: true})
 	if err != nil {
 		t.Fatalf("resolveAxes = %v", err)
 	}
@@ -64,11 +55,11 @@ func TestResolveAxes_PinnedComboDefault(t *testing.T) {
 func TestResolveAxes_DockerPinnedPolicyRequiresDigest(t *testing.T) {
 	digest := "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 	base := flags{
-		isolation:        "docker",
-		provision:        "none",
-		requirePinned:    true,
-		isolationChanged: true,
-		provisionChanged: true,
+		isolation:              "docker",
+		provision:              "none",
+		requirePinnedProvision: true,
+		isolationChanged:       true,
+		provisionChanged:       true,
 	}
 
 	pinned := base
@@ -81,6 +72,26 @@ func TestResolveAxes_DockerPinnedPolicyRequiresDigest(t *testing.T) {
 	mutable.image = "ghcr.io/xonovex/agent:latest"
 	if _, err := resolveAxes(mutable); !errors.Is(err, policy.ErrPinnedProvisionUnmet) {
 		t.Fatalf("resolveAxes(mutable image) error = %v, want %v", err, policy.ErrPinnedProvisionUnmet)
+	}
+}
+
+func TestFlagsPolicyMapsGuaranteesIndependently(t *testing.T) {
+	tests := []struct {
+		name  string
+		flags flags
+		want  policy.SandboxPolicy
+	}{
+		{"pinned", flags{requirePinnedProvision: true}, policy.SandboxPolicy{RequirePinnedProvision: true}},
+		{"host tools", flags{requireHostToolsUnreachable: true}, policy.SandboxPolicy{RequireHostToolsUnreachable: true}},
+		{"egress", flags{requireEgressRestricted: true}, policy.SandboxPolicy{RequireEgressRestricted: true}},
+		{"kernel", flags{requireKernelIsolation: true}, policy.SandboxPolicy{RequireKernelIsolation: true}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.flags.policy(); got != tt.want {
+				t.Errorf("policy() = %+v, want %+v", got, tt.want)
+			}
+		})
 	}
 }
 

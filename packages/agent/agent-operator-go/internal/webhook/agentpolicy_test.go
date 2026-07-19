@@ -123,6 +123,85 @@ func TestEnforcePolicy_AllowsSecurityContextWithCompliantValues(t *testing.T) {
 	}
 }
 
+func TestEnforcePolicy_RejectsSecurityContextWeakening(t *testing.T) {
+	zero := int64(0)
+	falseValue := false
+	unconfined := &corev1.SeccompProfile{Type: corev1.SeccompProfileTypeUnconfined}
+	tests := []struct {
+		name   string
+		mutate func(*agentv1alpha1.AgentRun)
+		phrase string
+	}{
+		{"writable root", func(run *agentv1alpha1.AgentRun) {
+			run.Spec.SecurityContext = &corev1.SecurityContext{ReadOnlyRootFilesystem: &falseValue}
+		}, "ReadOnlyRootFilesystem"},
+		{"container uid zero", func(run *agentv1alpha1.AgentRun) {
+			run.Spec.SecurityContext = &corev1.SecurityContext{RunAsUser: &zero}
+		}, "RunAsUser=0"},
+		{"container gid zero", func(run *agentv1alpha1.AgentRun) {
+			run.Spec.SecurityContext = &corev1.SecurityContext{RunAsGroup: &zero}
+		}, "RunAsGroup=0"},
+		{"container seccomp unconfined", func(run *agentv1alpha1.AgentRun) {
+			run.Spec.SecurityContext = &corev1.SecurityContext{SeccompProfile: unconfined}
+		}, "unconfined container seccomp"},
+		{"capability add", func(run *agentv1alpha1.AgentRun) {
+			run.Spec.SecurityContext = &corev1.SecurityContext{Capabilities: &corev1.Capabilities{Add: []corev1.Capability{"NET_ADMIN"}, Drop: []corev1.Capability{"ALL"}}}
+		}, "adding Linux capabilities"},
+		{"capability drop override", func(run *agentv1alpha1.AgentRun) {
+			run.Spec.SecurityContext = &corev1.SecurityContext{Capabilities: &corev1.Capabilities{Drop: []corev1.Capability{"NET_RAW"}}}
+		}, "dropping all Linux capabilities"},
+		{"pod root", func(run *agentv1alpha1.AgentRun) {
+			run.Spec.PodSecurityContext = &corev1.PodSecurityContext{RunAsNonRoot: &falseValue}
+		}, "pod RunAsNonRoot"},
+		{"pod uid zero", func(run *agentv1alpha1.AgentRun) {
+			run.Spec.PodSecurityContext = &corev1.PodSecurityContext{RunAsUser: &zero}
+		}, "pod RunAsUser=0"},
+		{"pod gid zero", func(run *agentv1alpha1.AgentRun) {
+			run.Spec.PodSecurityContext = &corev1.PodSecurityContext{RunAsGroup: &zero}
+		}, "pod RunAsGroup=0"},
+		{"pod fs group zero", func(run *agentv1alpha1.AgentRun) {
+			run.Spec.PodSecurityContext = &corev1.PodSecurityContext{FSGroup: &zero}
+		}, "pod FSGroup=0"},
+		{"pod seccomp unconfined", func(run *agentv1alpha1.AgentRun) {
+			run.Spec.PodSecurityContext = &corev1.PodSecurityContext{SeccompProfile: unconfined}
+		}, "unconfined pod seccomp"},
+		{"pod sysctl", func(run *agentv1alpha1.AgentRun) {
+			run.Spec.PodSecurityContext = &corev1.PodSecurityContext{Sysctls: []corev1.Sysctl{{Name: "net.ipv4.ip_forward", Value: "1"}}}
+		}, "sysctl overrides"},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			run := baseRun()
+			test.mutate(run)
+			err := enforcePolicy(run, basePolicy())
+			if err == nil || !strings.Contains(err.Error(), test.phrase) {
+				t.Fatalf("enforcePolicy() error = %v, want phrase %q", err, test.phrase)
+			}
+		})
+	}
+}
+
+func TestValidateExecutionBoundary_RequiresAdminApprovedRuntimeClass(t *testing.T) {
+	run := baseRun()
+	if err := validateExecutionBoundary(run, nil); err == nil || !strings.Contains(err.Error(), "not declared sandboxed") {
+		t.Fatalf("validateExecutionBoundary(no policy) error = %v, want sandbox declaration error", err)
+	}
+
+	unapproved := &agentv1alpha1.AgentPolicy{Spec: agentv1alpha1.AgentPolicySpec{Enforced: agentv1alpha1.AgentPolicyEnforced{
+		AllowedRuntimeClassNames: []string{"gvisor"},
+	}}}
+	if err := validateExecutionBoundary(run, unapproved); err == nil || !strings.Contains(err.Error(), "not declared sandboxed") {
+		t.Fatalf("validateExecutionBoundary(unapproved) error = %v, want sandbox declaration error", err)
+	}
+
+	approved := unapproved.DeepCopy()
+	approved.Spec.Enforced.AllowedRuntimeClassNames = append(approved.Spec.Enforced.AllowedRuntimeClassNames, "kata")
+	if err := validateExecutionBoundary(run, approved); err != nil {
+		t.Fatalf("validateExecutionBoundary(approved) error = %v", err)
+	}
+}
+
 func TestEnforcePolicy_RejectsDisabledNetworkPolicy(t *testing.T) {
 	run := baseRun()
 	run.Spec.NetworkPolicy = &agentv1alpha1.AgentNetworkPolicy{Disabled: true}

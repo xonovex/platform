@@ -1,7 +1,13 @@
 #!/usr/bin/env node
 import {execFileSync} from "node:child_process";
-import {readdirSync, readFileSync, statSync, writeFileSync} from "node:fs";
+import {readdirSync, readFileSync, writeFileSync} from "node:fs";
 import {basename, join, resolve, sep} from "node:path";
+import {
+  isDirectory,
+  isFile,
+  resolveGuideDirectory,
+} from "@xonovex/script-moon-common/fs";
+import {parseArgs, type ParsedArgs} from "./args.js";
 
 const URL_RE = /\*\*URL:\*\*\s*(\S+)/;
 const REVIEWED_RE = /\*\*Last reviewed:\*\*\s*(\d{4}-\d{2}-\d{2})/;
@@ -69,16 +75,6 @@ interface SkillReport {
   sources: readonly SourceReport[];
   uncovered_refs: readonly string[];
   problems: number;
-}
-
-interface ParsedArgs {
-  target: string | undefined;
-  all: string | undefined;
-  maxAge: number;
-  fetch: boolean;
-  markReviewed: string | undefined;
-  json: boolean;
-  pull: boolean;
 }
 
 const HELP = `Audit a skill's upstream sources (SOURCES.md) for drift.
@@ -227,53 +223,17 @@ const parseSources = (text: string): Source[] => {
   return sources.filter((s) => s.url);
 };
 
-const isFile = (target: string): boolean => {
-  try {
-    return statSync(target).isFile();
-  } catch {
-    return false;
-  }
-};
-
-const isDir = (target: string): boolean => {
-  try {
-    return statSync(target).isDirectory();
-  } catch {
-    return false;
-  }
-};
-
-// The skill/guide dir for a base dir: base itself if base/SKILL.md exists,
-// else the single immediate subdir containing SKILL.md (skill-package layout,
-// e.g. skill-c99/c99-guide/SKILL.md). >1 match is ambiguous; 0 falls back to
-// base so the existing not-found error still fires.
-const resolveGuideDir = (base: string): string => {
-  if (isFile(join(base, "SKILL.md"))) {
-    return base;
-  }
-  const nested = readdirSync(base)
-    .map((entry) => join(base, entry))
-    .filter((dir) => isFile(join(dir, "SKILL.md")));
-  if (nested.length > 1) {
-    process.stderr.write(
-      `error: multiple SKILL.md found under ${base}; pass one explicitly\n`,
-    );
-    process.exit(2);
-  }
-  return nested[0] ?? base;
-};
-
 const resolveSourcesFile = (target: string): string | undefined => {
   if (isFile(target) && basename(target) === "SOURCES.md") {
     return target;
   }
-  if (isDir(target)) {
+  if (isDirectory(target)) {
     if (isFile(join(target, "SOURCES.md"))) {
       return join(target, "SOURCES.md");
     }
     // No SOURCES.md directly: descend into the single guide subdir (identified
     // by SKILL.md, per the skill-package layout) and use its SOURCES.md.
-    const guideDir = resolveGuideDir(target);
+    const guideDir = resolveGuideDirectory(target);
     if (isFile(join(guideDir, "SOURCES.md"))) {
       return join(guideDir, "SOURCES.md");
     }
@@ -311,7 +271,7 @@ const fetchStatus = async (url: string, timeout = 15): Promise<FetchReport> => {
 
 const listExistingRefs = (skillDir: string): Set<string> => {
   const refsDir = join(skillDir, "references");
-  if (!isDir(refsDir)) return new Set<string>();
+  if (!isDirectory(refsDir)) return new Set<string>();
   const refs = new Set<string>();
   for (const entry of readdirSync(refsDir)) {
     if (entry.endsWith(".md") && isFile(join(refsDir, entry))) {
@@ -327,7 +287,7 @@ const listExistingRefs = (skillDir: string): Set<string> => {
 const findWorkspaceRoot = (start: string): string => {
   let dir = resolve(start);
   for (;;) {
-    if (isDir(join(dir, ".moon"))) return dir;
+    if (isDirectory(join(dir, ".moon"))) return dir;
     const parent = resolve(dir, "..");
     if (parent === dir) return resolve(start);
     dir = parent;
@@ -393,7 +353,7 @@ const computeDrift = (
     commits: [],
     review_refs: [],
   };
-  if (!isDir(checkout) || !isDir(join(checkout, ".git"))) {
+  if (!isDirectory(checkout) || !isDirectory(join(checkout, ".git"))) {
     return {...report, note: "checkout not found or not a git repo"};
   }
   report.resolved = true;
@@ -635,118 +595,10 @@ const printTextReport = (rep: SkillReport, maxAge: number): void => {
   );
 };
 
-const isOptionToken = (token: string | undefined): boolean =>
-  token !== undefined && token.startsWith("-") && token !== "-";
-
-const parseArgv = (argv: readonly string[]): ParsedArgs => {
-  const parsed: ParsedArgs = {
-    target: undefined,
-    all: undefined,
-    maxAge: 180,
-    fetch: false,
-    markReviewed: undefined,
-    json: false,
-    pull: false,
-  };
-  const positionals: string[] = [];
-
-  // Manual scan to reproduce argparse semantics, including the optional-value
-  // flags --all [ROOT] and --mark-reviewed [TITLE] that node:util cannot model.
-  for (let i = 0; i < argv.length; i++) {
-    const arg = argv[i];
-    if (arg === undefined) continue;
-    switch (arg) {
-      case "-h":
-      case "--help": {
-        console.log(HELP);
-        process.exit(0);
-      }
-      case "--fetch": {
-        parsed.fetch = true;
-        break;
-      }
-      case "--pull": {
-        parsed.pull = true;
-        break;
-      }
-      case "--json": {
-        parsed.json = true;
-        break;
-      }
-      default: {
-        if (arg === "--max-age" || arg.startsWith("--max-age=")) {
-          let raw: string | undefined;
-          if (arg.startsWith("--max-age=")) {
-            raw = arg.slice("--max-age=".length);
-          } else {
-            raw = argv[i + 1];
-            i += 1;
-          }
-          if (raw === undefined || isOptionToken(raw)) {
-            process.stderr.write(
-              "error: argument --max-age: expected one argument\n",
-            );
-            process.exit(2);
-          }
-          const value = Number(raw);
-          if (!Number.isInteger(value)) {
-            process.stderr.write(
-              `error: argument --max-age: invalid int value: '${raw}'\n`,
-            );
-            process.exit(2);
-          }
-          parsed.maxAge = value;
-        } else if (arg === "--all" || arg.startsWith("--all=")) {
-          if (arg.startsWith("--all=")) {
-            parsed.all = arg.slice("--all=".length);
-          } else {
-            const next = argv[i + 1];
-            if (next !== undefined && !isOptionToken(next)) {
-              parsed.all = next;
-              i += 1;
-            } else {
-              parsed.all = ".";
-            }
-          }
-        } else if (
-          arg === "--mark-reviewed" ||
-          arg.startsWith("--mark-reviewed=")
-        ) {
-          if (arg.startsWith("--mark-reviewed=")) {
-            parsed.markReviewed = arg.slice("--mark-reviewed=".length);
-          } else {
-            const next = argv[i + 1];
-            if (next !== undefined && !isOptionToken(next)) {
-              parsed.markReviewed = next;
-              i += 1;
-            } else {
-              parsed.markReviewed = "";
-            }
-          }
-        } else if (isOptionToken(arg)) {
-          process.stderr.write(`error: unrecognized arguments: ${arg}\n`);
-          process.exit(2);
-        } else {
-          positionals.push(arg);
-        }
-      }
-    }
-  }
-
-  if (positionals.length > 1) {
-    process.stderr.write(
-      `error: unrecognized arguments: ${positionals.slice(1).join(" ")}\n`,
-    );
-    process.exit(2);
-  }
-  parsed.target = positionals[0];
-  return parsed;
-};
-
 const collectTargets = (args: ParsedArgs): string[] => {
   if (args.all !== undefined) {
     const root = args.all;
-    if (!isDir(root)) {
+    if (!isDirectory(root)) {
       process.stderr.write(`error: --all root not a directory: ${root}\n`);
       process.exit(2);
     }
@@ -795,7 +647,7 @@ const walkSourcesFiles = (root: string): string[] => {
     }
     for (const entry of entries) {
       const full = join(dir, entry);
-      if (isDir(full)) {
+      if (isDirectory(full)) {
         if (entry === "node_modules") continue;
         walk(full);
       } else if (entry === "SOURCES.md") {
@@ -808,7 +660,11 @@ const walkSourcesFiles = (root: string): string[] => {
 };
 
 const main = async (argv: readonly string[]): Promise<number> => {
-  const args = parseArgv(argv);
+  const args = parseArgs(argv);
+  if (args.help) {
+    console.log(HELP);
+    return 0;
+  }
   const today = new Date();
   const targets = collectTargets(args);
 

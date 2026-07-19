@@ -140,7 +140,11 @@ func (i *Isolator) buildArgs(cfg isoshared.RunConfig, c provision.Contribution) 
 	)
 
 	// Network — applied EXPLICITLY via the network bridge.
-	args = append(args, networkArgs(cfg.Network)...)
+	netArgs, err := networkArgs(cfg.Network)
+	if err != nil {
+		return nil, err
+	}
+	args = append(args, netArgs...)
 
 	// Run as the current user so written files are owned by the caller.
 	args = append(args, "-u", fmt.Sprintf("%d:%d", os.Getuid(), os.Getgid()))
@@ -244,9 +248,5 @@ func (i *Isolator) containerEnv(cfg isoshared.RunConfig, c provision.Contributio
 	for k, v := range envutil.ParseCustomEnv(cfg.CustomEnv) {
 		env[k] = v
 	}
-	for k, v := range cfg.ProxyEnv {
-		env[k] = v
-	}
-
 	return env, nil
 }

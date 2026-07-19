@@ -22,9 +22,8 @@ type RunConfig struct {
 	RepoDir string
 
 	// Network is the egress mode; the isolator emits its own network flags via its
-	// network.go bridge and applies ProxyEnv (already resolved, allowlist folded in).
-	Network  netshared.Mode
-	ProxyEnv map[string]string
+	// network.go bridge.
+	Network netshared.Mode
 
 	// HostPassthrough is the bwrap knob: expose host tool dirs as a fallback.
 	HostPassthrough bool

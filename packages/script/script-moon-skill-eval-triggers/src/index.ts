@@ -1,8 +1,10 @@
 #!/usr/bin/env node
 import {spawn, spawnSync} from "node:child_process";
-import {readdirSync, readFileSync, statSync} from "node:fs";
-import {dirname, join, resolve} from "node:path";
+import {readFileSync} from "node:fs";
+import {join, resolve} from "node:path";
 import {createInterface} from "node:readline";
+import {isFile, resolveGuideDirectory} from "@xonovex/script-moon-common/fs";
+import {parseQueries, parseTriggerOptions} from "./validation.js";
 
 const PROG = "moon-skill-eval-triggers";
 
@@ -23,13 +25,6 @@ Options (flag overrides env):
 const DEFAULT_DISALLOWED =
   "Bash,Edit,Write,NotebookEdit,WebFetch,WebSearch,Read,Glob,Grep,Task,TodoWrite";
 
-interface QueryEntry {
-  readonly query?: unknown;
-  readonly should_trigger?: unknown;
-  readonly rationale?: unknown;
-  readonly split?: unknown;
-}
-
 interface ResultRecord {
   readonly query: string;
   readonly should_trigger: boolean;
@@ -42,37 +37,6 @@ interface ResultRecord {
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null && !Array.isArray(value);
-
-const isFile = (path: string): boolean => {
-  try {
-    return statSync(path).isFile();
-  } catch {
-    return false;
-  }
-};
-
-// The skill/guide dir for a base dir: the base itself when it holds SKILL.md,
-// else the single immediate subdir that does. The simple moon task runs this bin
-// from a skill PACKAGE root (e.g. skill-c99) whose SKILL.md lives one level down
-// in a single guide subdir (skill-c99/c99-guide/SKILL.md), so descend into it.
-// >1 candidate -> error + exit 2; 0 -> fall back to base so the caller's existing
-// "not found" error still fires. Mirrors validate's resolveTarget.
-const resolveGuideDir = (base: string): string => {
-  if (isFile(join(base, "SKILL.md"))) {
-    return base;
-  }
-  const nested = readdirSync(base)
-    .map((entry) => join(base, entry, "SKILL.md"))
-    .filter((p) => isFile(p));
-  if (nested.length > 1) {
-    process.stderr.write(
-      `multiple SKILL.md found under ${base}; pass one explicitly\n`,
-    );
-    process.exit(2);
-  }
-  const match = nested[0];
-  return match === undefined ? base : dirname(match);
-};
 
 const usageError = (message: string): never => {
   process.stderr.write(`${USAGE}\n${PROG}: error: ${message}\n`);
@@ -334,7 +298,7 @@ const main = async (argv: readonly string[]): Promise<number> => {
   // The simple moon task runs this bin from a skill package root whose SKILL.md
   // and eval-queries.json live one level down in a single guide subdir, so the
   // cwd-based defaults must descend into that guide dir first.
-  const guideDir = resolveGuideDir(resolve("."));
+  const guideDir = resolveGuideDirectory(resolve("."));
 
   // queries defaults to <guideDir>/eval-queries.json
   const queriesArg = cli.positionals[0] ?? join(guideDir, "eval-queries.json");
@@ -380,35 +344,21 @@ const main = async (argv: readonly string[]): Promise<number> => {
     return 2;
   }
 
-  const runs =
-    cli.runs === undefined ? Number(process.env.RUNS ?? "3") : Number(cli.runs);
-  const threshold =
-    cli.threshold === undefined
-      ? Number(process.env.THRESHOLD ?? "0.5")
-      : Number(cli.threshold);
+  const runsRaw = cli.runs ?? process.env.RUNS ?? "3";
+  const thresholdRaw = cli.threshold ?? process.env.THRESHOLD ?? "0.5";
   const claudeModel = cli.model ?? process.env.CLAUDE_MODEL ?? "haiku";
   const disallowed =
     cli.disallowed ?? process.env.DISALLOWED_TOOLS ?? DEFAULT_DISALLOWED;
-  const budget =
-    cli.maxBudget === undefined
-      ? Number(process.env.MAX_BUDGET_USD ?? "0.10")
-      : Number(cli.maxBudget);
-
-  if (!Number.isInteger(runs) || Number.isNaN(runs)) {
-    usageError(
-      `argument --runs: invalid int value: '${cli.runs ?? process.env.RUNS ?? ""}'`,
-    );
+  const budgetRaw = cli.maxBudget ?? process.env.MAX_BUDGET_USD ?? "0.10";
+  const optionsResult = parseTriggerOptions({
+    runs: runsRaw,
+    threshold: thresholdRaw,
+    budget: budgetRaw,
+  });
+  if (!optionsResult.success) {
+    return usageError(`invalid evaluator options: ${optionsResult.error}`);
   }
-  if (Number.isNaN(threshold)) {
-    usageError(
-      `argument --threshold: invalid float value: '${cli.threshold ?? process.env.THRESHOLD ?? ""}'`,
-    );
-  }
-  if (Number.isNaN(budget)) {
-    usageError(
-      `argument --max-budget-usd: invalid float value: '${cli.maxBudget ?? process.env.MAX_BUDGET_USD ?? ""}'`,
-    );
-  }
+  const {runs, threshold, budget} = optionsResult.data;
 
   const short = skillName.split(":").pop() ?? skillName;
 
@@ -438,31 +388,26 @@ const main = async (argv: readonly string[]): Promise<number> => {
     process.stderr.write(`Error: invalid JSON in ${queriesFile}: ${detail}\n`);
     return 2;
   }
-  if (!Array.isArray(parsed)) {
+  const queryResult = parseQueries(parsed);
+  if (!queryResult.success) {
     process.stderr.write(
-      `Error: ${queriesFile} must contain a top-level array\n`,
+      `Error: invalid queries in ${queriesFile}: ${queryResult.error}\n`,
     );
     return 2;
   }
 
-  let queries = parsed as unknown[];
+  let queries = queryResult.data;
   if (split !== "all") {
-    queries = queries.filter((q) => isRecord(q) && q.split === split);
+    queries = queries.filter((query) => query.split === split);
   }
 
   let passed = 0;
   let failed = 0;
   let total = 0;
 
-  for (const q of queries) {
-    if (!isRecord(q)) {
-      continue;
-    }
-    const entry = q as QueryEntry;
-    const query = typeof entry.query === "string" ? entry.query : "";
-    const shouldTrigger = Boolean(entry.should_trigger);
-    const rationale =
-      typeof entry.rationale === "string" ? entry.rationale : "";
+  for (const entry of queries) {
+    const {query, rationale} = entry;
+    const shouldTrigger = entry.should_trigger;
 
     let triggers = 0;
     for (let i = 0; i < runs; i++) {

@@ -21,7 +21,6 @@ export default defineConfig({
       ],
       reporter: ["text", "html", "lcov"],
     },
-    passWithNoTests: true,
     fakeTimers: {
       toFake: [
         "setTimeout",

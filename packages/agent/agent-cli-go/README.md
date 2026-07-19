@@ -20,7 +20,7 @@ agent-cli run -a opencode
 
 # Run with the three sandbox axes (isolation × provision × network)
 agent-cli run --isolation bwrap --provision command --init-command 'echo setup'
-agent-cli run --isolation docker --network proxy --network-proxy-egress-allow github.com
+agent-cli run --isolation docker --network none
 agent-cli run --isolation bwrap --provision nix --nix-source packages --nix-rev <rev> --nix-packages ripgrep
 agent-cli run --isolation bwrap --provision nix --nix-source flake --nix-shell default
 
@@ -44,9 +44,8 @@ Options:
   -p, --provider <name>        Model provider for the agent
   --isolation <method>         Isolation: none, bwrap, docker (default: none)
   --provision <method>         Provision: none, nix, command (default: none)
-  --network <method>           Network egress: host, none, proxy (default: host)
-  --network-proxy-egress-allow <host>
-                               Extra allowlist host for --network proxy (repeatable)
+  --network <method>           Network egress: host, none, proxy (default: host;
+                               proxy is rejected until an enforceable transport exists)
   --isolation-bwrap-passthrough
                                Expose host tools to bwrap (forfeits host-tools-unreachable)
   --init-command <cmd>         Init command for --provision command (repeatable)
@@ -54,7 +53,11 @@ Options:
   --nix-rev <rev>              Pinned nixpkgs rev for --nix-source packages
   --nix-packages <pkg>         Package for --nix-source packages (repeatable)
   --nix-shell <name>           devShell for --nix-source flake (default: default)
-  --require-pinned-toolchain   Mandate pinned provisioning + host-tools-unreachable
+  --require-pinned-provision   Require provisioning from a pinned source
+  --require-host-tools-unreachable
+                               Require host tools to be unreachable
+  --require-egress-restricted  Require disabled or enforceably restricted egress
+  --require-kernel-isolation   Require a kernel-isolating runtime such as runsc
   -w, --work-dir <dir>         Working directory
   --worktree-branch <branch>   Create worktree with branch
   -t, --terminal <wrapper>     Terminal wrapper: tmux

@@ -87,8 +87,18 @@ func TestAgentRunWebhook_Default_PreservesExistingValues(t *testing.T) {
 	}
 }
 
+func sandboxedAgentRunWebhook() *AgentRunWebhook {
+	policy := &agentv1alpha1.AgentPolicy{
+		ObjectMeta: metav1.ObjectMeta{Name: "sandbox-runtime-policy"},
+		Spec: agentv1alpha1.AgentPolicySpec{Enforced: agentv1alpha1.AgentPolicyEnforced{
+			AllowedRuntimeClassNames: []string{"kata"},
+		}},
+	}
+	return &AgentRunWebhook{Client: fake.NewClientBuilder().WithScheme(testutil.NewScheme()).WithObjects(policy).Build()}
+}
+
 func TestAgentRunWebhook_Validate_ValidStandalone(t *testing.T) {
-	w := &AgentRunWebhook{}
+	w := sandboxedAgentRunWebhook()
 	runtimeClassName := "kata"
 	run := &agentv1alpha1.AgentRun{
 		Spec: agentv1alpha1.AgentRunSpec{
@@ -179,7 +189,7 @@ func runWithNix(nix *agentv1alpha1.NixSpec) *agentv1alpha1.AgentRun {
 }
 
 func TestAgentRunWebhook_Validate_NixSpec(t *testing.T) {
-	w := &AgentRunWebhook{}
+	w := sandboxedAgentRunWebhook()
 	cases := []struct {
 		name    string
 		nix     *agentv1alpha1.NixSpec
@@ -205,7 +215,7 @@ func TestAgentRunWebhook_Validate_NixSpec(t *testing.T) {
 }
 
 func TestAgentRunWebhook_Validate_ValidWorkspaceRef(t *testing.T) {
-	w := &AgentRunWebhook{}
+	w := sandboxedAgentRunWebhook()
 	runtimeClassName := "kata"
 	run := &agentv1alpha1.AgentRun{
 		Spec: agentv1alpha1.AgentRunSpec{
@@ -222,7 +232,7 @@ func TestAgentRunWebhook_Validate_ValidWorkspaceRef(t *testing.T) {
 }
 
 func TestAgentRunWebhook_Validate_MissingWorkspaceAndWorkspaceRef(t *testing.T) {
-	w := &AgentRunWebhook{}
+	w := sandboxedAgentRunWebhook()
 	run := &agentv1alpha1.AgentRun{
 		Spec: agentv1alpha1.AgentRunSpec{},
 	}
@@ -234,7 +244,7 @@ func TestAgentRunWebhook_Validate_MissingWorkspaceAndWorkspaceRef(t *testing.T) 
 }
 
 func TestAgentRunWebhook_Validate_MissingRepoURL(t *testing.T) {
-	w := &AgentRunWebhook{}
+	w := sandboxedAgentRunWebhook()
 	run := &agentv1alpha1.AgentRun{
 		Spec: agentv1alpha1.AgentRunSpec{
 			Workspace: &agentv1alpha1.WorkspaceSpec{
@@ -250,7 +260,7 @@ func TestAgentRunWebhook_Validate_MissingRepoURL(t *testing.T) {
 }
 
 func TestAgentRunWebhook_Validate_BothWorkspaceRefAndInline(t *testing.T) {
-	w := &AgentRunWebhook{}
+	w := sandboxedAgentRunWebhook()
 	run := &agentv1alpha1.AgentRun{
 		Spec: agentv1alpha1.AgentRunSpec{
 			WorkspaceRef: "my-workspace",
@@ -269,7 +279,7 @@ func TestAgentRunWebhook_Validate_BothWorkspaceRefAndInline(t *testing.T) {
 }
 
 func TestAgentRunWebhook_Validate_BothHarnessRefAndInline(t *testing.T) {
-	w := &AgentRunWebhook{}
+	w := sandboxedAgentRunWebhook()
 	run := &agentv1alpha1.AgentRun{
 		Spec: agentv1alpha1.AgentRunSpec{
 			HarnessRef: "my-harness",
@@ -291,7 +301,7 @@ func TestAgentRunWebhook_Validate_BothHarnessRefAndInline(t *testing.T) {
 }
 
 func TestAgentRunWebhook_Validate_BothProviderRefAndInline(t *testing.T) {
-	w := &AgentRunWebhook{}
+	w := sandboxedAgentRunWebhook()
 	run := &agentv1alpha1.AgentRun{
 		Spec: agentv1alpha1.AgentRunSpec{
 			ProviderRef: "my-provider",
@@ -356,7 +366,7 @@ func TestAgentRunWebhook_Validate_InvalidAgentType(t *testing.T) {
 }
 
 func TestAgentRunWebhook_Validate_ValidAgentType(t *testing.T) {
-	w := &AgentRunWebhook{}
+	w := sandboxedAgentRunWebhook()
 	runtimeClassName := "kata"
 	run := &agentv1alpha1.AgentRun{
 		Spec: agentv1alpha1.AgentRunSpec{
@@ -399,7 +409,7 @@ func TestAgentRunWebhook_Validate_InvalidWorkspaceType(t *testing.T) {
 }
 
 func TestAgentRunWebhook_Validate_ValidWorkspaceTypeJujutsu(t *testing.T) {
-	w := &AgentRunWebhook{}
+	w := sandboxedAgentRunWebhook()
 	runtimeClassName := "kata"
 	run := &agentv1alpha1.AgentRun{
 		Spec: agentv1alpha1.AgentRunSpec{
@@ -442,7 +452,7 @@ func TestAgentRunWebhook_Validate_InvalidToolchainType(t *testing.T) {
 }
 
 func TestAgentRunWebhook_ValidateUpdate(t *testing.T) {
-	w := &AgentRunWebhook{}
+	w := sandboxedAgentRunWebhook()
 	runtimeClassName := "kata"
 	image := "ghcr.io/xonovex/agent@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 	oldRun := &agentv1alpha1.AgentRun{
@@ -548,7 +558,7 @@ func TestAgentRunWebhook_Validate_MaliciousCommit(t *testing.T) {
 }
 
 func TestAgentRunWebhook_Validate_InlineHarnessOnly(t *testing.T) {
-	w := &AgentRunWebhook{}
+	w := sandboxedAgentRunWebhook()
 	runtimeClassName := "kata"
 	run := &agentv1alpha1.AgentRun{
 		Spec: agentv1alpha1.AgentRunSpec{

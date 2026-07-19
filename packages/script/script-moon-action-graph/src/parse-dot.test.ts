@@ -6,26 +6,42 @@ const sampleDot = `digraph {
     1 [label="RunTask(core:npm-publish)"]
     2 [label="RunTask(skills:npm-publish)"]
     3 [label="RunTask(core:build)"]
+    4 [label="RunTask(config:compile)"]
     0 -> 1
     0 -> 2
     1 -> 2
     1 -> 3
+    3 -> 4
 }`;
 
 describe("filterDotGraph", () => {
   it("should extract nodes matching the task filter", () => {
     const {nodes} = filterDotGraph(sampleDot, "npm-publish");
-    expect([...nodes.values()]).toEqual(["core", "skills"]);
+    expect([...nodes.values()]).toEqual([
+      "core:npm-publish",
+      "skills:npm-publish",
+      "core:build",
+      "config:compile",
+    ]);
   });
 
-  it("should extract edges between matching nodes", () => {
+  it("should preserve the full dependency closure and its edges", () => {
     const {edges} = filterDotGraph(sampleDot, "npm-publish");
-    expect(edges).toEqual(['    "core" -> "skills"']);
+    expect(edges).toEqual([
+      '    "core:npm-publish" -> "skills:npm-publish"',
+      '    "core:npm-publish" -> "core:build"',
+      '    "core:build" -> "config:compile"',
+    ]);
   });
 
   it("should support comma-separated filters", () => {
     const {nodes} = filterDotGraph(sampleDot, "npm-publish,build");
-    expect([...nodes.values()]).toEqual(["core", "skills", "core"]);
+    expect([...nodes.values()]).toEqual([
+      "core:npm-publish",
+      "skills:npm-publish",
+      "core:build",
+      "config:compile",
+    ]);
   });
 
   it("should return empty for non-matching filter", () => {
@@ -40,9 +56,9 @@ describe("buildFilteredDot", () => {
     const graph = filterDotGraph(sampleDot, "npm-publish");
     const result = buildFilteredDot(graph);
     expect(result).toContain("digraph {");
-    expect(result).toContain('"core"');
-    expect(result).toContain('"skills"');
-    expect(result).toContain('"core" -> "skills"');
+    expect(result).toContain('"core:npm-publish"');
+    expect(result).toContain('"skills:npm-publish"');
+    expect(result).toContain('"core:npm-publish" -> "skills:npm-publish"');
     expect(result).toContain("rankdir=LR");
   });
 });
