@@ -62,9 +62,12 @@ tasks:
     inputs:
       - "@globs(sources)"
       - "@globs(tests)"
+    env:
+      TMPDIR: /var/tmp
     outputs: []
     options:
       cache: false
+    toolchain: [system, nix]
   go-test-e2e-gvisor:
     command:
       - go
@@ -78,9 +81,12 @@ tasks:
     inputs:
       - "@globs(sources)"
       - "@globs(tests)"
+    env:
+      TMPDIR: /var/tmp
     outputs: []
     options:
       cache: false
+    toolchain: [system, nix]
   go-test-e2e-kata:
     command:
       - go
@@ -94,9 +100,12 @@ tasks:
     inputs:
       - "@globs(sources)"
       - "@globs(tests)"
+    env:
+      TMPDIR: /var/tmp
     outputs: []
     options:
       cache: false
+    toolchain: [system, nix]
   go-test-e2e-coco:
     command:
       - go
@@ -110,6 +119,9 @@ tasks:
     inputs:
       - "@globs(sources)"
       - "@globs(tests)"
+    env:
+      TMPDIR: /var/tmp
     outputs: []
     options:
       cache: false
+    toolchain: [system, nix]

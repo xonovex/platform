@@ -4,9 +4,11 @@ package e2e_kata
 
 import (
 	"bytes"
+	"fmt"
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 
@@ -21,6 +23,19 @@ import (
 )
 
 const e2eAgentImage = "e2e-agent:e2e"
+
+type kataVMProbeResult struct {
+	hostKernel       string
+	guestKernel      string
+	pmemDevice       string
+	unsupportedCause string
+	err              error
+}
+
+var (
+	kataVMProbeOnce sync.Once
+	kataVMProbe     kataVMProbeResult
+)
 
 func createNamespace(t *testing.T, prefix string) string {
 	t.Helper()
@@ -69,99 +84,123 @@ func buildAndLoadE2EAgentImage(t *testing.T) {
 	}
 }
 
-// TestE2E_Kata_VMIsolation verifies that Kata actually runs containers inside
-// a hypervisor VM by comparing the guest kernel to the host kernel.
-func TestE2E_Kata_VMIsolation(t *testing.T) {
-	ns := createNamespace(t, "e2e-kata-vm")
+func probeKataVM() kataVMProbeResult {
+	ns := &corev1.Namespace{ObjectMeta: metav1.ObjectMeta{GenerateName: "e2e-kata-vm-"}}
+	if err := k8sClient.Create(ctx, ns); err != nil {
+		return kataVMProbeResult{err: fmt.Errorf("create probe namespace: %w", err)}
+	}
+	defer func() { _ = k8sClient.Delete(ctx, ns) }()
 
-	// Get the host kernel version from the kind node
 	var hostKernelBuf bytes.Buffer
 	hostCmd := exec.Command("docker", "exec", clusterName+"-control-plane", "uname", "-r")
 	hostCmd.Stdout = &hostKernelBuf
 	if err := hostCmd.Run(); err != nil {
-		t.Fatalf("failed to get host kernel: %v", err)
+		return kataVMProbeResult{err: fmt.Errorf("get host kernel: %w", err)}
 	}
 	hostKernel := strings.TrimSpace(hostKernelBuf.String())
-	t.Logf("Host kernel: %s", hostKernel)
 
-	// Create a pod with kata runtime that sleeps so we can exec into it
 	runtimeClass := "kata"
 	pod := &corev1.Pod{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      "kata-vm-check",
-			Namespace: ns,
-		},
+		ObjectMeta: metav1.ObjectMeta{Name: "kata-vm-check", Namespace: ns.Name},
 		Spec: corev1.PodSpec{
 			RuntimeClassName: &runtimeClass,
 			RestartPolicy:    corev1.RestartPolicyNever,
-			Containers: []corev1.Container{
-				{
-					Name:    "check",
-					Image:   "busybox:1.37",
-					Command: []string{"sleep", "300"},
-				},
-			},
+			Containers: []corev1.Container{{
+				Name:    "check",
+				Image:   "busybox:1.37",
+				Command: []string{"sleep", "300"},
+			}},
 		},
 	}
 	if err := k8sClient.Create(ctx, pod); err != nil {
-		t.Fatalf("failed to create Pod: %v", err)
+		return kataVMProbeResult{hostKernel: hostKernel, err: fmt.Errorf("create Kata probe Pod: %w", err)}
 	}
-	t.Cleanup(func() { _ = k8sClient.Delete(ctx, pod) })
 
-	// Wait for pod to be Running
 	var lastPod corev1.Pod
-	deadline := time.After(180 * time.Second)
+	deadline := time.NewTimer(180 * time.Second)
+	defer deadline.Stop()
 	tick := time.NewTicker(1 * time.Second)
 	defer tick.Stop()
-	podRunning := false
-	for !podRunning {
+	for {
 		select {
-		case <-deadline:
+		case <-deadline.C:
 			out, _ := exec.Command("kubectl", "--context", "kind-"+clusterName,
-				"-n", ns, "describe", "pod", "kata-vm-check").CombinedOutput()
+				"-n", ns.Name, "describe", "pod", "kata-vm-check").CombinedOutput()
 			describeOut := string(out)
-			// Kata VMs need privileged containers for /dev/kvm access inside kind nodes.
-			// When running in unprivileged kind, the VM fails to connect via vsock.
 			if strings.Contains(describeOut, "vsock") || strings.Contains(describeOut, "QEMU") {
-				t.Skipf("Kata VM cannot start inside kind (likely unprivileged container). Use a real cluster or privileged kind.\nDescribe:\n%s", describeOut)
+				return kataVMProbeResult{
+					hostKernel:       hostKernel,
+					unsupportedCause: "Kata VM cannot start inside Kind on this host (vsock/QEMU startup failed)",
+				}
 			}
-			t.Fatalf("Pod never reached Running (phase=%s). Describe:\n%s", lastPod.Status.Phase, describeOut)
+			return kataVMProbeResult{
+				hostKernel: hostKernel,
+				err:        fmt.Errorf("Kata probe Pod never reached Running (phase=%s):\n%s", lastPod.Status.Phase, describeOut),
+			}
 		case <-tick.C:
-			if err := k8sClient.Get(ctx, client.ObjectKeyFromObject(pod), &lastPod); err == nil {
-				podRunning = lastPod.Status.Phase == corev1.PodRunning
+			if err := k8sClient.Get(ctx, client.ObjectKeyFromObject(pod), &lastPod); err == nil && lastPod.Status.Phase == corev1.PodRunning {
+				goto podRunning
 			}
 		}
 	}
 
-	// Exec into the pod and get the guest kernel version
+podRunning:
 	var guestKernelBuf bytes.Buffer
 	execCmd := exec.Command("kubectl", "--context", "kind-"+clusterName,
-		"-n", ns, "exec", "kata-vm-check", "--", "uname", "-r")
+		"-n", ns.Name, "exec", "kata-vm-check", "--", "uname", "-r")
 	execCmd.Stdout = &guestKernelBuf
 	execCmd.Stderr = &guestKernelBuf
 	if err := execCmd.Run(); err != nil {
-		t.Fatalf("failed to exec uname in kata pod: %v\noutput: %s", err, guestKernelBuf.String())
+		return kataVMProbeResult{
+			hostKernel: hostKernel,
+			err:        fmt.Errorf("exec uname in Kata probe Pod: %w: %s", err, guestKernelBuf.String()),
+		}
 	}
 	guestKernel := strings.TrimSpace(guestKernelBuf.String())
-	t.Logf("Guest kernel: %s", guestKernel)
 
-	// Kata runs a lightweight guest kernel — it must differ from the host kernel
-	if guestKernel == hostKernel {
-		t.Errorf("guest kernel (%s) matches host kernel — container is NOT running in a Kata VM", guestKernel)
-	} else {
-		t.Logf("VM isolation confirmed: host=%s, guest=%s", hostKernel, guestKernel)
-	}
-
-	// Additional check: /dev/pmem0 exists inside Kata VMs (rootfs is passed via PMEM)
 	var pmemBuf bytes.Buffer
 	pmemCmd := exec.Command("kubectl", "--context", "kind-"+clusterName,
-		"-n", ns, "exec", "kata-vm-check", "--", "ls", "/dev/pmem0")
+		"-n", ns.Name, "exec", "kata-vm-check", "--", "ls", "/dev/pmem0")
 	pmemCmd.Stdout = &pmemBuf
 	pmemCmd.Stderr = &pmemBuf
-	if err := pmemCmd.Run(); err != nil {
-		t.Logf("/dev/pmem0 not found (may vary by Kata config): %s", pmemBuf.String())
+	_ = pmemCmd.Run()
+
+	return kataVMProbeResult{
+		hostKernel:  hostKernel,
+		guestKernel: guestKernel,
+		pmemDevice:  strings.TrimSpace(pmemBuf.String()),
+	}
+}
+
+func requireKataVM(t *testing.T) kataVMProbeResult {
+	t.Helper()
+	kataVMProbeOnce.Do(func() {
+		kataVMProbe = probeKataVM()
+	})
+	if kataVMProbe.unsupportedCause != "" {
+		t.Skip(kataVMProbe.unsupportedCause + "; use a real cluster or privileged Kind")
+	}
+	if kataVMProbe.err != nil {
+		t.Fatalf("Kata VM capability probe failed: %v", kataVMProbe.err)
+	}
+	return kataVMProbe
+}
+
+// TestE2E_Kata_VMIsolation verifies that Kata actually runs containers inside
+// a hypervisor VM by comparing the guest kernel to the host kernel.
+func TestE2E_Kata_VMIsolation(t *testing.T) {
+	probe := requireKataVM(t)
+	t.Logf("Host kernel: %s", probe.hostKernel)
+	t.Logf("Guest kernel: %s", probe.guestKernel)
+	if probe.guestKernel == probe.hostKernel {
+		t.Errorf("guest kernel (%s) matches host kernel — container is NOT running in a Kata VM", probe.guestKernel)
 	} else {
-		t.Logf("/dev/pmem0 present — confirms Kata VM")
+		t.Logf("VM isolation confirmed: host=%s, guest=%s", probe.hostKernel, probe.guestKernel)
+	}
+	if probe.pmemDevice == "/dev/pmem0" {
+		t.Log("/dev/pmem0 present — confirms Kata VM")
+	} else {
+		t.Logf("/dev/pmem0 not found (may vary by Kata config): %s", probe.pmemDevice)
 	}
 }
 
@@ -289,6 +328,7 @@ func TestE2E_Kata_DefaultRuntimeClassNameFromHarness(t *testing.T) {
 // works end-to-end inside a Kata VM sandbox.
 // Skips gracefully if Kata VM cannot start in unprivileged kind.
 func TestE2E_Kata_FullCycleWithGitClone(t *testing.T) {
+	requireKataVM(t)
 	buildAndLoadE2EAgentImage(t)
 
 	ns := createNamespace(t, "e2e-kata-fullcycle")
