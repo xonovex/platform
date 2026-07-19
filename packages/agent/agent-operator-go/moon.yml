@@ -13,6 +13,40 @@ tasks:
       - go-test-integration
     options:
       mergeDeps: append
+  ci-e2e:
+    command: noop
+    deps: [go-test-e2e]
+    options:
+      cache: false
+      runInCI: false
+  ci-e2e-gvisor:
+    command: noop
+    deps: [go-test-e2e-gvisor]
+    options:
+      cache: false
+      runInCI: false
+  ci-e2e-kata:
+    command: noop
+    deps: [go-test-e2e-kata]
+    options:
+      cache: false
+      runInCI: false
+  ci-e2e-coco:
+    command: noop
+    deps: [go-test-e2e-coco]
+    options:
+      cache: false
+      runInCI: false
+  ci-e2e-summary:
+    command:
+      - go
+      - run
+      - ./cmd/e2e-summary
+    inputs:
+      - cmd/e2e-summary/**/*
+    options:
+      cache: false
+      runInCI: false
   docker-build:
     command:
       - docker

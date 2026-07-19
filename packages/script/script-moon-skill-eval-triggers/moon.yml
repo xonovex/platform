@@ -18,3 +18,15 @@ tasks:
     options:
       cache: false
       runFromWorkspaceRoot: true
+  ci-runtime:
+    command:
+      - npm
+      - install
+      - --no-save
+      - "@anthropic-ai/claude-code@2.1.211"
+    deps:
+      - ~:install
+    options:
+      cache: false
+      runFromWorkspaceRoot: true
+      runInCI: false

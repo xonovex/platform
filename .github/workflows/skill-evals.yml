@@ -6,7 +6,6 @@ on:
       - ".github/workflows/skill-evals.yml"
       - ".moon/tasks/tag-skill.yml"
       - "packages/script/script-moon-common/**"
-      - "packages/script/script-moon-ci-workflows/**"
       - "packages/script/script-moon-skill-eval-outputs/**"
       - "packages/script/script-moon-skill-eval-triggers/**"
       - "packages/skill/**"
@@ -40,25 +39,32 @@ jobs:
         with:
           cache-workspace: true
 
-      - name: Build workflow orchestration
-        run: nix develop --command bash -c "npm ci && npx moon run script-moon-ci-workflows:build"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Install repository dependencies
+        run: nix develop --command npm ci
 
       - id: select
         name: Select full or changed-skill matrix
         shell: bash
-        env:
-          BASE_SHA: ${{ github.event.pull_request.base.sha }}
-          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
           set -euo pipefail
-          args=(packages/skill)
+          affected=()
           if [[ "${GITHUB_EVENT_NAME}" == "pull_request" ]]; then
-            args+=(--changed "${BASE_SHA}" "${HEAD_SHA}")
+            affected+=(--affected="${BASE_SHA}" --downstream deep)
           fi
-          skills="$(nix develop --command npx moon-ci-workflows skill-eval-matrix "${args[@]}")"
+          nix develop --command npx moon query tasks \
+            --id ci-skill-eval-trigger "${affected[@]}" \
+            >"${RUNNER_TEMP}/skill-eval-trigger-tasks.json"
+          nix develop --command npx moon query tasks \
+            --id ci-skill-eval-output "${affected[@]}" \
+            >"${RUNNER_TEMP}/skill-eval-output-tasks.json"
+          skills="$(nix develop --command jq -sc \
+            '[.[].tasks | keys[]] | unique | map({project: ., package: ltrimstr("skill-")})' \
+            "${RUNNER_TEMP}/skill-eval-trigger-tasks.json" \
+            "${RUNNER_TEMP}/skill-eval-output-tasks.json")"
           printf 'skills=%s\n' "${skills}" >>"${GITHUB_OUTPUT}"
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   eval:
     name: ${{ matrix.skill.package }} ${{ matrix.mode }} eval
@@ -90,31 +96,18 @@ jobs:
       - name: Install repository dependencies
         run: nix develop --command npm ci
 
-      - name: Build workflow orchestration
-        run: nix develop --command npx moon run script-moon-ci-workflows:build
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Install pinned Claude Code evaluator
-        run: nix develop --command npm install --no-save @anthropic-ai/claude-code@2.1.211
-
       - name: Run skill evals
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          MODE: ${{ matrix.mode }}
-          SKILL_PACKAGE: ${{ matrix.skill.package }}
-          SKILL_GUIDE: ${{ matrix.skill.guide }}
-        run: >-
-          nix develop --command npx moon-ci-workflows skill-eval-run
-          "$MODE" "$SKILL_PACKAGE" "$SKILL_GUIDE"
-          --repository-root "$GITHUB_WORKSPACE"
-          --temporary-root "$RUNNER_TEMP"
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MOON_TARGET: ${{ matrix.skill.project }}:ci-skill-eval-${{ matrix.mode }}
+        run: nix develop --command npx moon run "$MOON_TARGET"
 
       - name: Upload benchmark evidence
         if: success() || failure()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: skill-eval-${{ matrix.skill.package }}-${{ matrix.mode }}
-          path: .skill-eval-results/${{ matrix.skill.package }}/${{ matrix.mode }}
+          path: packages/skill/${{ matrix.skill.project }}/.skill-eval-results/${{ matrix.mode }}
           if-no-files-found: warn
           retention-days: 30

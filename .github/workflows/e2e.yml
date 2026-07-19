@@ -33,43 +33,23 @@ defaults:
     shell: bash
 
 jobs:
-  matrix:
-    name: Select E2E suites
-    runs-on: ubuntu-latest
-    outputs:
-      suites: ${{ steps.select.outputs.suites }}
-
-    steps:
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
-        with:
-          fetch-depth: 0
-          persist-credentials: false
-
-      - uses: ./.github/actions/setup-nix
-        with:
-          cache-workspace: true
-
-      - name: Build workflow orchestration
-        run: nix develop --command bash -c "npm ci && npx moon run script-moon-ci-workflows:build"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - id: select
-        name: Select suites
-        run: |
-          suites="$(nix develop --command npx moon-ci-workflows e2e-matrix)"
-          printf 'suites=%s\n' "$suites" >> "$GITHUB_OUTPUT"
-
   test:
     name: ${{ matrix.suite }}
-    needs: matrix
     runs-on: ubuntu-latest
     timeout-minutes: 45
 
     strategy:
       fail-fast: false
       matrix:
-        suite: ${{ fromJSON(needs.matrix.outputs.suites) }}
+        include:
+          - suite: e2e
+            target: agent-operator-go:ci-e2e
+          - suite: e2e-gvisor
+            target: agent-operator-go:ci-e2e-gvisor
+          - suite: e2e-kata
+            target: agent-operator-go:ci-e2e-kata
+          - suite: e2e-coco
+            target: agent-operator-go:ci-e2e-coco
 
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
@@ -79,15 +59,13 @@ jobs:
 
       - uses: ./.github/actions/setup-nix
 
-      - name: Build workflow orchestration
-        run: nix develop --command bash -c "npm ci && npx moon run script-moon-ci-workflows:build"
-        env:
-          # Lets moon resolve the github:// nix toolchain plugin without API rate limits.
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Install repository dependencies
+        run: nix develop --command npm ci
 
       - name: Run suite
-        run: nix develop --command npx moon-ci-workflows e2e-run "$SUITE" 2>&1 | tee "$RUNNER_TEMP/suite.log"
+        run: nix develop --command npx moon run "$MOON_TARGET" 2>&1 | tee "$RUNNER_TEMP/suite.log"
         env:
+          MOON_TARGET: ${{ matrix.target }}
           SUITE: ${{ matrix.suite }}
           # Lets moon resolve the github:// nix toolchain plugin without API rate limits.
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -95,10 +73,12 @@ jobs:
       - name: Report executed-vs-skipped counts
         if: always()
         run: |
-          if [ -x node_modules/.bin/moon-ci-workflows ]; then
-            nix develop --command npx moon-ci-workflows e2e-summary "$SUITE" "$RUNNER_TEMP/suite.log" >> "$GITHUB_STEP_SUMMARY"
+          if [ -x node_modules/.bin/moon ]; then
+            nix develop --command npx moon run agent-operator-go:ci-e2e-summary -- \
+              "$SUITE" "$RUNNER_TEMP/suite.log" "$GITHUB_STEP_SUMMARY"
           else
-            printf '### %s\n\nNo test log produced (workflow orchestration failed to build).\n' "$SUITE" >> "$GITHUB_STEP_SUMMARY"
+            printf '### %s\n\nNo test log produced (repository dependencies failed to install).\n' "$SUITE" >> "$GITHUB_STEP_SUMMARY"
           fi
         env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SUITE: ${{ matrix.suite }}

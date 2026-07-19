@@ -27,9 +27,6 @@
       "path": "./packages/script/script-moon-action-graph"
     },
     {
-      "path": "./packages/script/script-moon-ci-workflows"
-    },
-    {
       "path": "./packages/script/script-moon-common"
     },
     {
@@ -61,9 +58,6 @@
     },
     {
       "path": "./packages/shared/shared-core"
-    },
-    {
-      "path": "packages/agent/agent-cli"
     }
   ]
 }

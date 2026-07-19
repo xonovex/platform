@@ -42,12 +42,17 @@ describe("trigger query validation", () => {
 });
 
 describe("trigger numeric options", () => {
-  it("accepts bounded runs, a probability threshold, and a positive budget", () => {
+  it("accepts bounded runs, batching, a probability threshold, and a positive budget", () => {
     expect(
-      parseTriggerOptions({runs: "3", threshold: "0.5", budget: "0.05"}),
+      parseTriggerOptions({
+        runs: "3",
+        threshold: "0.5",
+        budget: "0.05",
+        batchSize: "8",
+      }),
     ).toEqual({
       success: true,
-      data: {runs: 3, threshold: 0.5, budget: 0.05},
+      data: {runs: 3, threshold: 0.5, budget: 0.05, batchSize: 8},
     });
   });
 
@@ -60,6 +65,7 @@ describe("trigger numeric options", () => {
     {runs: "1", threshold: "0.5", budget: "-1"},
     {runs: "1", threshold: "0.5", budget: "0"},
     {runs: "1", threshold: "0.5", budget: "0.06"},
+    {runs: "1", threshold: "0.5", budget: "0.05", batchSize: "0"},
   ])("rejects invalid options: %o", (input) => {
     expect(parseTriggerOptions(input).success).toBe(false);
   });

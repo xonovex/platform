@@ -77,5 +77,58 @@ tasks:
     options:
       cache: false
       runInCI: false
+  ci-skill-eval-trigger:
+    command:
+      - npx
+      - moon-skill-eval-triggers
+      - --split
+      - validation
+      - --runs
+      - "3"
+      - --model
+      - haiku
+      - --max-budget-usd
+      - "0.05"
+      - --batch-size
+      - "8"
+      - --workspace
+      - .skill-eval-results/trigger
+      - --plugin-dir
+      - .
+    deps:
+      - target: ~:build
+        optional: true
+      - script-moon-skill-eval-triggers:ci-runtime
+    inputs:
+      - /.github/workflows/skill-evals.yml
+      - /packages/skill/AGENTS.md
+      - /packages/skill/skill-skill/skill-guide/scripts/**/*
+    options:
+      cache: false
+      runInCI: false
+  ci-skill-eval-output:
+    script: >-
+      npx moon-skill-eval-outputs
+      --runs 1
+      --concurrency 2
+      --model haiku
+      --judge-model sonnet
+      --max-budget-usd 0.10
+      --judge-max-budget-usd 0.10
+      --batch-size 6
+      --workspace .skill-eval-results/output
+      --plugin-dir .
+      --eval-cwd "$workspaceRoot"
+    deps:
+      - target: ~:build
+        optional: true
+      - script-moon-skill-eval-outputs:ci-runtime
+    inputs:
+      - /.github/workflows/skill-evals.yml
+      - /packages/skill/AGENTS.md
+      - /packages/skill/skill-skill/skill-guide/scripts/**/*
+    options:
+      cache: false
+      runInCI: false
 inheritedBy:
   tag: skill

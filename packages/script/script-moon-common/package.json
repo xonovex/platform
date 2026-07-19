@@ -5,6 +5,10 @@
   "type": "module",
   "exports": {
     ".": "./dist/src/index.js",
+    "./batches": {
+      "types": "./src/batches.ts",
+      "default": "./dist/src/batches.js"
+    },
     "./fs": {
       "types": "./src/fs.ts",
       "default": "./dist/src/fs.js"

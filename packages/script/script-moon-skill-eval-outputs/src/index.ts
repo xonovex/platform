@@ -10,6 +10,7 @@ import {
 } from "node:fs";
 import {dirname, join, resolve} from "node:path";
 import {parseCliArgs} from "@xonovex/script-moon-common";
+import {boundedBatches} from "@xonovex/script-moon-common/batches";
 import {resolveExecutable} from "@xonovex/script-moon-common/executable";
 import {
   isDirectory,
@@ -645,6 +646,10 @@ const main = async (argv: readonly string[]): Promise<number> => {
           description:
             "parallel claude invocations (env CONCURRENCY, default/maximum 2)",
         },
+        "batch-size": {
+          type: "string",
+          description: "evals per sequential batch",
+        },
         model: {
           type: "string",
           description:
@@ -807,12 +812,14 @@ const main = async (argv: readonly string[]): Promise<number> => {
     (values["judge-max-budget-usd"] as string | undefined) ??
     process.env.JUDGE_MAX_BUDGET_USD ??
     "0.10";
+  const batchSizeRaw = values["batch-size"] as string | undefined;
   const optionsResult = parseOutputOptions({
     runs: runsRaw,
     concurrency: concurrencyRaw,
     timeout: timeoutRaw,
     budget: budgetRaw,
     judgeBudget: judgeBudgetRaw,
+    ...(batchSizeRaw === undefined ? {} : {batchSize: batchSizeRaw}),
     ...(iteration ? {iteration} : {}),
   });
   if (!optionsResult.success) {
@@ -821,15 +828,22 @@ const main = async (argv: readonly string[]): Promise<number> => {
     );
     return 2;
   }
-  const {runs, concurrency, timeout} = optionsResult.data;
+  const {runs, concurrency, timeout, batchSize} = optionsResult.data;
   const budget = optionsResult.data.budget;
   const judgeBudget = optionsResult.data.judgeBudget;
   iteration = optionsResult.data.iteration ?? "";
 
-  const modelCalls = outputModelCallCount(norm.length, runs);
-  if (modelCalls > MAX_OUTPUT_MODEL_CALLS) {
+  const evalBatches = boundedBatches(
+    norm,
+    batchSize ?? Math.max(norm.length, 1),
+  );
+  const maxBatchModelCalls = Math.max(
+    0,
+    ...evalBatches.map((batch) => outputModelCallCount(batch.length, runs)),
+  );
+  if (maxBatchModelCalls > MAX_OUTPUT_MODEL_CALLS) {
     process.stderr.write(
-      `Error: output eval would launch ${String(modelCalls)} model calls; ` +
+      `Error: output eval batch would launch ${String(maxBatchModelCalls)} model calls; ` +
         `maximum is ${String(MAX_OUTPUT_MODEL_CALLS)}. Split the eval set into bounded batches.\n`,
     );
     return 2;
@@ -908,7 +922,9 @@ const main = async (argv: readonly string[]): Promise<number> => {
       `concurrency: ${String(concurrency)}  workspace: ${iterDir}\n` +
       `gen model: ${claudeModel || "<default>"}  judge model: ${judgeModel || "<default>"}\n` +
       `caps: generation=$${String(budget)}/6 turns  judge=$${String(judgeBudget)}/1 turn  ` +
-      `model_calls=${String(modelCalls)}/${String(MAX_OUTPUT_MODEL_CALLS)}  retries=0\n---\n`,
+      `model_calls=${String(outputModelCallCount(norm.length, runs))}  ` +
+      `batches=${String(evalBatches.length)}  ` +
+      `max_batch_calls=${String(maxBatchModelCalls)}/${String(MAX_OUTPUT_MODEL_CALLS)}  retries=0\n---\n`,
   );
 
   const arms = ["with_skill", "without_skill"] as const;
@@ -917,43 +933,53 @@ const main = async (argv: readonly string[]): Promise<number> => {
     readonly arm: EvaluationArm;
     readonly r: number;
   }
-  const jobs: Job[] = [];
-  for (const e of norm) {
-    for (const arm of arms) {
-      for (let r = 0; r < runs; r += 1) {
-        jobs.push({e, arm, r});
+  const records: JobRecord[] = [];
+  for (const [batchIndex, batch] of evalBatches.entries()) {
+    process.stderr.write(
+      `batch ${String(batchIndex + 1)}/${String(evalBatches.length)}: ` +
+        `${String(batch.length)} evals\n`,
+    );
+    const jobs: Job[] = [];
+    for (const e of batch) {
+      for (const arm of arms) {
+        for (let r = 0; r < runs; r += 1) {
+          jobs.push({e, arm, r});
+        }
       }
     }
-  }
 
-  const records = await runFailFastPool(
-    jobs,
-    concurrency,
-    (job) => runJob(job.e, job.arm, job.r, ctx),
-    (record) => findEvaluationInfrastructureFailures([record]).length > 0,
-  );
+    const batchRecords = await runFailFastPool(
+      jobs,
+      concurrency,
+      (job) => runJob(job.e, job.arm, job.r, ctx),
+      (record) => findEvaluationInfrastructureFailures([record]).length > 0,
+    );
+    records.push(...batchRecords);
 
-  const infrastructureFailures = findEvaluationInfrastructureFailures(records);
-  if (infrastructureFailures.length > 0) {
-    writeFileSync(
-      invalidRunPath,
-      JSON.stringify(
-        {
-          skill: skillName,
-          iteration,
-          status: "invalid",
-          failures: infrastructureFailures,
-        },
-        null,
-        2,
-      ),
-      {encoding: "utf8"},
-    );
-    process.stderr.write(
-      `invalid benchmark evidence: ${String(infrastructureFailures.length)} infrastructure failure(s)\n` +
-        `diagnostic: ${invalidRunPath}\n`,
-    );
-    return 2;
+    const infrastructureFailures =
+      findEvaluationInfrastructureFailures(batchRecords);
+    if (infrastructureFailures.length > 0) {
+      writeFileSync(
+        invalidRunPath,
+        JSON.stringify(
+          {
+            skill: skillName,
+            iteration,
+            status: "invalid",
+            batch: batchIndex + 1,
+            failures: infrastructureFailures,
+          },
+          null,
+          2,
+        ),
+        {encoding: "utf8"},
+      );
+      process.stderr.write(
+        `invalid benchmark evidence: ${String(infrastructureFailures.length)} infrastructure failure(s)\n` +
+          `diagnostic: ${invalidRunPath}\n`,
+      );
+      return 2;
+    }
   }
 
   // Per-eval stdout lines.
@@ -989,6 +1015,7 @@ const main = async (argv: readonly string[]): Promise<number> => {
     iteration,
     runs_per_arm: runs,
     eval_count: norm.length,
+    batch_count: evalBatches.length,
     run_summary: {
       with_skill: withBlock,
       without_skill: withoutBlock,

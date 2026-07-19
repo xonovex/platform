@@ -23,6 +23,12 @@ const TriggerOptionsSchema = z.object({
     .pipe(z.int().positive().max(3)),
   threshold: FiniteNumberTextSchema.pipe(z.number().min(0).max(1)),
   budget: FiniteNumberTextSchema.pipe(z.number().positive().max(0.05)),
+  batchSize: z
+    .string()
+    .regex(/^\d+$/, "must be a positive integer")
+    .transform(Number)
+    .pipe(z.int().positive())
+    .optional(),
 });
 
 interface TriggerClaudeOptions {

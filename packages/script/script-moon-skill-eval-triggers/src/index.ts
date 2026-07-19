@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 import {spawn, spawnSync} from "node:child_process";
-import {readFileSync} from "node:fs";
+import {mkdirSync, readFileSync, rmSync, writeFileSync} from "node:fs";
 import {dirname, join, resolve} from "node:path";
 import {createInterface} from "node:readline";
+import {boundedBatches} from "@xonovex/script-moon-common/batches";
 import {resolveExecutable} from "@xonovex/script-moon-common/executable";
 import {
   isDirectory,
@@ -31,6 +32,9 @@ Options (flag overrides env):
     --runs N             / RUNS=N             runs per query (default: 3)
     --threshold F        / THRESHOLD=F        trigger-rate cutoff for a pass (default: 0.5)
     --model M            / CLAUDE_MODEL=M     model for \`claude --model\` (default: haiku)
+    --split S                                  train | validation | all (default: all)
+    --batch-size N                             queries per sequential batch
+    --workspace PATH                           directory for JSONL and summary evidence
     --plugin-dir PATH    / PLUGIN_DIR=PATH     target-only local plugin directory
     --max-budget-usd N   / MAX_BUDGET_USD=N   hard per-run spend cap (default/max: 0.05)
     -h, --help                                show this help and exit`;
@@ -288,6 +292,9 @@ interface ParsedCli {
   readonly runs?: string;
   readonly threshold?: string;
   readonly model?: string;
+  readonly split?: string;
+  readonly batchSize?: string;
+  readonly workspace?: string;
   readonly pluginDir?: string;
   readonly maxBudget?: string;
 }
@@ -296,6 +303,9 @@ const OPTION_FLAGS = new Set([
   "--runs",
   "--threshold",
   "--model",
+  "--split",
+  "--batch-size",
+  "--workspace",
   "--plugin-dir",
   "--max-budget-usd",
 ]);
@@ -305,6 +315,9 @@ const parseCli = (argv: readonly string[]): ParsedCli => {
   let runs: string | undefined;
   let threshold: string | undefined;
   let model: string | undefined;
+  let split: string | undefined;
+  let batchSize: string | undefined;
+  let workspace: string | undefined;
   let pluginDir: string | undefined;
   let maxBudget: string | undefined;
 
@@ -356,6 +369,18 @@ const parseCli = (argv: readonly string[]): ParsedCli => {
           model = value;
           break;
         }
+        case "--split": {
+          split = value;
+          break;
+        }
+        case "--batch-size": {
+          batchSize = value;
+          break;
+        }
+        case "--workspace": {
+          workspace = value;
+          break;
+        }
         case "--plugin-dir": {
           pluginDir = value;
           break;
@@ -375,7 +400,17 @@ const parseCli = (argv: readonly string[]): ParsedCli => {
     i += 1;
   }
 
-  return {positionals, runs, threshold, model, pluginDir, maxBudget};
+  return {
+    positionals,
+    runs,
+    threshold,
+    model,
+    split,
+    batchSize,
+    workspace,
+    pluginDir,
+    maxBudget,
+  };
 };
 
 const main = async (argv: readonly string[]): Promise<number> => {
@@ -415,7 +450,15 @@ const main = async (argv: readonly string[]): Promise<number> => {
   const skillName = resolveSkillName();
 
   // split defaults to all; argparse validates against the choices.
-  const split = cli.positionals[2] ?? "all";
+  const positionalSplit = cli.positionals[2];
+  if (
+    cli.split !== undefined &&
+    positionalSplit !== undefined &&
+    cli.split !== positionalSplit
+  ) {
+    usageError("split must not be provided twice with different values");
+  }
+  const split = cli.split ?? positionalSplit ?? "all";
   if (split !== "train" && split !== "validation" && split !== "all") {
     usageError(
       `argument split: invalid choice: '${split}' (choose from 'train', 'validation', 'all')`,
@@ -451,11 +494,12 @@ const main = async (argv: readonly string[]): Promise<number> => {
     runs: runsRaw,
     threshold: thresholdRaw,
     budget: budgetRaw,
+    ...(cli.batchSize === undefined ? {} : {batchSize: cli.batchSize}),
   });
   if (!optionsResult.success) {
     return usageError(`invalid evaluator options: ${optionsResult.error}`);
   }
-  const {runs, threshold, budget} = optionsResult.data;
+  const {runs, threshold, budget, batchSize} = optionsResult.data;
 
   const short = skillName.split(":").pop() ?? skillName;
   const pluginDirRaw =
@@ -496,63 +540,120 @@ const main = async (argv: readonly string[]): Promise<number> => {
   if (split !== "all") {
     queries = queries.filter((query) => query.split === split);
   }
-  const modelRuns = triggerModelRunCount(queries.length, runs);
-  if (modelRuns > MAX_TRIGGER_MODEL_RUNS) {
+  const queryBatches = boundedBatches(
+    queries,
+    batchSize ?? Math.max(queries.length, 1),
+  );
+  const maxBatchModelRuns = Math.max(
+    0,
+    ...queryBatches.map((batch) => triggerModelRunCount(batch.length, runs)),
+  );
+  if (maxBatchModelRuns > MAX_TRIGGER_MODEL_RUNS) {
     process.stderr.write(
-      `Error: trigger eval would launch ${String(modelRuns)} model runs; maximum is ${String(MAX_TRIGGER_MODEL_RUNS)}\n`,
+      `Error: trigger eval batch would launch ${String(maxBatchModelRuns)} model runs; ` +
+        `maximum is ${String(MAX_TRIGGER_MODEL_RUNS)}\n`,
     );
     return 2;
+  }
+
+  const workspace =
+    cli.workspace === undefined ? undefined : resolve(cli.workspace);
+  if (workspace !== undefined) {
+    mkdirSync(workspace, {recursive: true});
+    rmSync(join(workspace, "results.jsonl"), {force: true});
+    rmSync(join(workspace, "summary.json"), {force: true});
+    rmSync(join(workspace, "invalid-run.json"), {force: true});
   }
 
   let passed = 0;
   let failed = 0;
   let total = 0;
+  const results: ResultRecord[] = [];
 
-  for (const entry of queries) {
-    const {query, rationale} = entry;
-    const shouldTrigger = entry.should_trigger;
+  for (const [batchIndex, batch] of queryBatches.entries()) {
+    process.stderr.write(
+      `batch ${String(batchIndex + 1)}/${String(queryBatches.length)}: ` +
+        `${String(batch.length)} queries\n`,
+    );
+    for (const entry of batch) {
+      const {query, rationale} = entry;
+      const shouldTrigger = entry.should_trigger;
 
-    let triggers = 0;
-    for (let i = 0; i < runs; i++) {
-      const outcome = await checkTriggered(
-        query,
-        claudeArgs,
-        skillName,
-        short,
-        claudeExecutable,
-      );
-      if (outcome.error !== null) {
-        process.stderr.write(
-          `Error: trigger infrastructure failure for query ${JSON.stringify(query)}: ${outcome.error}\n`,
+      let triggers = 0;
+      for (let i = 0; i < runs; i += 1) {
+        const outcome = await checkTriggered(
+          query,
+          claudeArgs,
+          skillName,
+          short,
+          claudeExecutable,
         );
-        return 2;
+        if (outcome.error !== null) {
+          if (workspace !== undefined) {
+            writeFileSync(
+              join(workspace, "invalid-run.json"),
+              `${JSON.stringify({query, error: outcome.error}, null, 2)}\n`,
+              "utf8",
+            );
+          }
+          process.stderr.write(
+            `Error: trigger infrastructure failure for query ${JSON.stringify(query)}: ${outcome.error}\n`,
+          );
+          return 2;
+        }
+        if (outcome.triggered) {
+          triggers += 1;
+        }
       }
-      if (outcome.triggered) {
-        triggers += 1;
+
+      const rate = runs ? triggers / runs : 0;
+      const triggeredMajority = rate >= threshold;
+      const passes = triggeredMajority === shouldTrigger;
+
+      total += 1;
+      if (passes) {
+        passed += 1;
+      } else {
+        failed += 1;
       }
+
+      const result: ResultRecord = {
+        query,
+        should_trigger: shouldTrigger,
+        triggers,
+        runs,
+        trigger_rate: Math.round(rate * 1000) / 1000,
+        pass: passes,
+        rationale,
+      };
+      results.push(result);
+      process.stdout.write(`${JSON.stringify(result)}\n`);
     }
+  }
 
-    const rate = runs ? triggers / runs : 0;
-    const triggeredMajority = rate >= threshold;
-    const passes = triggeredMajority === shouldTrigger;
-
-    total += 1;
-    if (passes) {
-      passed += 1;
-    } else {
-      failed += 1;
-    }
-
-    const result: ResultRecord = {
-      query,
-      should_trigger: shouldTrigger,
-      triggers,
-      runs,
-      trigger_rate: Math.round(rate * 1000) / 1000,
-      pass: passes,
-      rationale,
-    };
-    process.stdout.write(`${JSON.stringify(result)}\n`);
+  if (workspace !== undefined) {
+    writeFileSync(
+      join(workspace, "results.jsonl"),
+      results.map((result) => JSON.stringify(result)).join("\n") + "\n",
+      "utf8",
+    );
+    writeFileSync(
+      join(workspace, "summary.json"),
+      `${JSON.stringify(
+        {
+          skill: skillName,
+          split,
+          batches: queryBatches.length,
+          queries: total,
+          runs_per_query: runs,
+          passed,
+          failed,
+        },
+        null,
+        2,
+      )}\n`,
+      "utf8",
+    );
   }
 
   process.stderr.write("---\n");
@@ -561,7 +662,9 @@ const main = async (argv: readonly string[]): Promise<number> => {
     `skill: ${skillName}  split: ${split}  runs: ${String(runs)}  ` +
       `threshold: ${String(threshold)}  model: ${modelLabel}  ` +
       `budget/run: $${String(budget)}  tools: Skill  timeout: 60s  ` +
-      `output-limit: ${String(TRIGGER_OUTPUT_LIMIT)} chars\n`,
+      `output-limit: ${String(TRIGGER_OUTPUT_LIMIT)} chars  ` +
+      `batches: ${String(queryBatches.length)}  ` +
+      `model-runs: ${String(triggerModelRunCount(queries.length, runs))}\n`,
   );
   process.stderr.write(
     `passed: ${String(passed)} / ${String(total)}   failed: ${String(failed)}\n`,

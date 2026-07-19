@@ -218,6 +218,7 @@ describe("numeric option validation", () => {
         timeout: "600",
         budget: "0.1",
         judgeBudget: "0.1",
+        batchSize: "6",
         iteration: "iteration-3",
       }),
     ).toEqual({
@@ -228,6 +229,7 @@ describe("numeric option validation", () => {
         timeout: 600,
         budget: 0.1,
         judgeBudget: 0.1,
+        batchSize: 6,
         iteration: "iteration-3",
       },
     });
@@ -242,6 +244,7 @@ describe("numeric option validation", () => {
     {runs: "1", concurrency: "1", timeout: "1", budget: "Infinity"},
     {runs: "1", concurrency: "1", timeout: "1", budget: "0.11"},
     {runs: "1", concurrency: "1", timeout: "1", judgeBudget: "0.11"},
+    {runs: "1", concurrency: "1", timeout: "1", batchSize: "0"},
     {
       runs: "1",
       concurrency: "1",

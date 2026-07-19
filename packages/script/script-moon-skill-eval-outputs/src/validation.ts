@@ -74,6 +74,12 @@ const OutputOptionsSchema = z.object({
   timeout: PositiveNumberTextSchema,
   budget: GenerationBudgetTextSchema.default(0.1),
   judgeBudget: JudgeBudgetTextSchema.default(0.1),
+  batchSize: z
+    .string()
+    .regex(/^\d+$/, "must be a positive integer")
+    .transform(Number)
+    .pipe(z.int().positive())
+    .optional(),
   iteration: z
     .string()
     .regex(/^iteration-[1-9]\d*$/, "must match iteration-N")
