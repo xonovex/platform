@@ -57,6 +57,8 @@
         default = mkMoonShell system [ "node" "go" "k8s" "shell" "rust" "release" "ci" "docker" "general" ];
 
         # Lean per-purpose shells, selected via the nix toolchain `shellByTag` setting.
+        ci = mkMoonShell system [ "ci" "general" ];
+        docker = mkMoonShell system [ "docker" "general" ];
         go = mkMoonShell system [ "go" "general" ];
         shell = mkMoonShell system [ "shell" "general" ];
         rust = mkMoonShell system [ "rust" "release" "general" ];

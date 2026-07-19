@@ -1,0 +1,25 @@
+$schema: https://moonrepo.dev/schemas/project.json
+language: unknown
+layer: configuration
+tags:
+  - ci
+tasks:
+  github-actions-lint:
+    command:
+      - zizmor
+      - --offline
+      - .github/
+    toolchain: [system, nix]
+    inputs:
+      - /.github/**/*
+      - /flake.lock
+      - /flake.nix
+      - /nix/ci.nix
+    options:
+      cache: true
+      runFromWorkspaceRoot: true
+  ci-check:
+    command: noop
+    deps: [github-actions-lint]
+    options:
+      cache: false

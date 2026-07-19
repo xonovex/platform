@@ -21,9 +21,10 @@
           pkgs = nixpkgs.legacyPackages.${system};
           g = nixShells.devShells.${system};
           # `default` and the named `go` devShell are the same composite shell, so the
-          # nix toolchain plugin's shellByTag `go` routing resolves to it.
+          # nix toolchain plugin's shellByTag `go` routing resolves to it. Docker
+          # tooling is included because this project also inherits Docker lint tasks.
           devShell = pkgs.mkShell {
-            inputsFrom = [ g.go g.shell g.k8s ];
+            inputsFrom = [ g.go g.shell g.k8s g.docker ];
           };
         in {
           default = devShell;

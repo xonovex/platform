@@ -11,8 +11,9 @@ tasks:
     command:
       - hadolint
       - Dockerfile
+    toolchain: [system, nix]
     inputs:
-      - '@globs(dockerfiles)'
+      - "@globs(dockerfiles)"
     outputs: []
     options:
       cache: true

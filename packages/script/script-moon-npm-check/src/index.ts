@@ -35,9 +35,9 @@ const errors = validatePackage(pkg);
 
 if (pkg.files && Array.isArray(pkg.files)) {
   for (const file of pkg.files) {
-    if (!existsSync(join(process.cwd(), String(file)))) {
+    if (!existsSync(join(process.cwd(), file))) {
       logWarning(
-        `  Warning: file "${String(file)}" does not exist yet (may be created during build)`,
+        `  Warning: file "${file}" does not exist yet (may be created during build)`,
       );
     }
   }
