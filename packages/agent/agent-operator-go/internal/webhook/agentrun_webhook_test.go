@@ -89,8 +89,11 @@ func TestAgentRunWebhook_Default_PreservesExistingValues(t *testing.T) {
 
 func TestAgentRunWebhook_Validate_ValidStandalone(t *testing.T) {
 	w := &AgentRunWebhook{}
+	runtimeClassName := "kata"
 	run := &agentv1alpha1.AgentRun{
 		Spec: agentv1alpha1.AgentRunSpec{
+			Image:            "ghcr.io/xonovex/agent@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+			RuntimeClassName: &runtimeClassName,
 			Workspace: &agentv1alpha1.WorkspaceSpec{
 				Repository: agentv1alpha1.RepositorySpec{
 					URL: "https://github.com/example/repo.git",
@@ -108,9 +111,65 @@ func TestAgentRunWebhook_Validate_ValidStandalone(t *testing.T) {
 	}
 }
 
+func TestAgentRunWebhook_Validate_RequiresPinnedImageAndSandboxRuntime(t *testing.T) {
+	tests := []struct {
+		name       string
+		mutate     func(*agentv1alpha1.AgentRun)
+		wantPhrase string
+	}{
+		{
+			name: "mutable image",
+			mutate: func(run *agentv1alpha1.AgentRun) {
+				run.Spec.Image = "ghcr.io/xonovex/agent:latest"
+			},
+			wantPhrase: "immutable @sha256",
+		},
+		{
+			name: "missing runtime class",
+			mutate: func(run *agentv1alpha1.AgentRun) {
+				run.Spec.RuntimeClassName = nil
+			},
+			wantPhrase: "sandboxed runtimeClassName",
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			run := baseRun()
+			test.mutate(run)
+
+			_, err := (&AgentRunWebhook{}).ValidateCreate(context.Background(), run)
+			if err == nil || !strings.Contains(err.Error(), test.wantPhrase) {
+				t.Fatalf("ValidateCreate() error = %v, want phrase %q", err, test.wantPhrase)
+			}
+		})
+	}
+}
+
+func TestAgentRunWebhook_Default_AppliesInlineHarnessExecutionDefaults(t *testing.T) {
+	runtimeClassName := "kata"
+	run := &agentv1alpha1.AgentRun{Spec: agentv1alpha1.AgentRunSpec{Harness: &agentv1alpha1.AgentSpec{
+		DefaultImage:            "ghcr.io/xonovex/agent@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+		DefaultRuntimeClassName: &runtimeClassName,
+	}}}
+
+	if err := (&AgentRunWebhook{}).Default(context.Background(), run); err != nil {
+		t.Fatalf("Default() error = %v", err)
+	}
+
+	if run.Spec.Image != run.Spec.Harness.DefaultImage {
+		t.Errorf("Image = %q, want harness default %q", run.Spec.Image, run.Spec.Harness.DefaultImage)
+	}
+	if run.Spec.RuntimeClassName == nil || *run.Spec.RuntimeClassName != runtimeClassName {
+		t.Errorf("RuntimeClassName = %v, want %q", run.Spec.RuntimeClassName, runtimeClassName)
+	}
+}
+
 func runWithNix(nix *agentv1alpha1.NixSpec) *agentv1alpha1.AgentRun {
+	runtimeClassName := "kata"
 	return &agentv1alpha1.AgentRun{
 		Spec: agentv1alpha1.AgentRunSpec{
+			RuntimeClassName: &runtimeClassName,
 			Workspace: &agentv1alpha1.WorkspaceSpec{
 				Repository: agentv1alpha1.RepositorySpec{URL: "https://github.com/example/repo.git"},
 			},
@@ -147,9 +206,12 @@ func TestAgentRunWebhook_Validate_NixSpec(t *testing.T) {
 
 func TestAgentRunWebhook_Validate_ValidWorkspaceRef(t *testing.T) {
 	w := &AgentRunWebhook{}
+	runtimeClassName := "kata"
 	run := &agentv1alpha1.AgentRun{
 		Spec: agentv1alpha1.AgentRunSpec{
-			WorkspaceRef: "my-workspace",
+			WorkspaceRef:     "my-workspace",
+			Image:            "ghcr.io/xonovex/agent@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+			RuntimeClassName: &runtimeClassName,
 		},
 	}
 
@@ -295,8 +357,11 @@ func TestAgentRunWebhook_Validate_InvalidAgentType(t *testing.T) {
 
 func TestAgentRunWebhook_Validate_ValidAgentType(t *testing.T) {
 	w := &AgentRunWebhook{}
+	runtimeClassName := "kata"
 	run := &agentv1alpha1.AgentRun{
 		Spec: agentv1alpha1.AgentRunSpec{
+			Image:            "ghcr.io/xonovex/agent@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+			RuntimeClassName: &runtimeClassName,
 			Harness: &agentv1alpha1.AgentSpec{
 				Type: agentv1alpha1.AgentTypeClaude,
 			},
@@ -335,8 +400,11 @@ func TestAgentRunWebhook_Validate_InvalidWorkspaceType(t *testing.T) {
 
 func TestAgentRunWebhook_Validate_ValidWorkspaceTypeJujutsu(t *testing.T) {
 	w := &AgentRunWebhook{}
+	runtimeClassName := "kata"
 	run := &agentv1alpha1.AgentRun{
 		Spec: agentv1alpha1.AgentRunSpec{
+			Image:            "ghcr.io/xonovex/agent@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+			RuntimeClassName: &runtimeClassName,
 			Workspace: &agentv1alpha1.WorkspaceSpec{
 				Type: agentv1alpha1.WorkspaceTypeJujutsu,
 				Repository: agentv1alpha1.RepositorySpec{
@@ -375,8 +443,12 @@ func TestAgentRunWebhook_Validate_InvalidToolchainType(t *testing.T) {
 
 func TestAgentRunWebhook_ValidateUpdate(t *testing.T) {
 	w := &AgentRunWebhook{}
+	runtimeClassName := "kata"
+	image := "ghcr.io/xonovex/agent@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 	oldRun := &agentv1alpha1.AgentRun{
 		Spec: agentv1alpha1.AgentRunSpec{
+			Image:            image,
+			RuntimeClassName: &runtimeClassName,
 			Workspace: &agentv1alpha1.WorkspaceSpec{
 				Repository: agentv1alpha1.RepositorySpec{URL: "https://example.com/repo.git"},
 			},
@@ -384,6 +456,8 @@ func TestAgentRunWebhook_ValidateUpdate(t *testing.T) {
 	}
 	newRun := &agentv1alpha1.AgentRun{
 		Spec: agentv1alpha1.AgentRunSpec{
+			Image:            image,
+			RuntimeClassName: &runtimeClassName,
 			Workspace: &agentv1alpha1.WorkspaceSpec{
 				Repository: agentv1alpha1.RepositorySpec{URL: "https://example.com/repo.git"},
 			},
@@ -475,11 +549,13 @@ func TestAgentRunWebhook_Validate_MaliciousCommit(t *testing.T) {
 
 func TestAgentRunWebhook_Validate_InlineHarnessOnly(t *testing.T) {
 	w := &AgentRunWebhook{}
+	runtimeClassName := "kata"
 	run := &agentv1alpha1.AgentRun{
 		Spec: agentv1alpha1.AgentRunSpec{
 			Harness: &agentv1alpha1.AgentSpec{
-				Type:         agentv1alpha1.AgentTypeOpencode,
-				DefaultImage: "custom:latest",
+				Type:                    agentv1alpha1.AgentTypeOpencode,
+				DefaultImage:            "ghcr.io/xonovex/agent@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+				DefaultRuntimeClassName: &runtimeClassName,
 			},
 			Workspace: &agentv1alpha1.WorkspaceSpec{
 				Repository: agentv1alpha1.RepositorySpec{

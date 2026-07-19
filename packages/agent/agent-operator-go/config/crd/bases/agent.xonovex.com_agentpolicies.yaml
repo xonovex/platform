@@ -79,7 +79,8 @@ spec:
                   properties:
                     image:
                       type: string
-                      description: Default container image.
+                      description: Digest-pinned container image used when AgentRun.Spec.Image is not set.
+                      pattern: ^.+@sha256:[0-9a-fA-F]{64}$
                     timeout:
                       type: string
                       description: Default timeout (e.g. "30m0s").

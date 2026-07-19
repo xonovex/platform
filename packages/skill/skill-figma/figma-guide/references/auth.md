@@ -1,5 +1,9 @@
 # auth: Authenticate to the Figma REST API
 
+## Contents
+
+[Credential type and scope](#credential-type-and-scope) · [How this skill sends it](#how-this-skill-sends-it) · [Local storage](#where-to-store-it-local--keychain-first) · [CI/CD](#cicd) · [Cloud / production](#cloud--production) · [Hygiene](#hygiene)
+
 ## Credential type and scope
 
 Figma REST API calls authenticate with a **personal access token** (create at Figma → Settings → Security → Personal access tokens). Treat it like a password — it grants API access across the whole account.

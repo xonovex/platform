@@ -4,11 +4,16 @@ metadata:
   name: agentrun-sample
   namespace: default
 spec:
-  agent: claude
+  harness:
+    type: claude
   providerRef: anthropic-provider
-  repository:
-    url: https://github.com/example/repo.git
-    branch: main
+  image: ghcr.io/example/agents/claude@sha256:<digest>
+  runtimeClassName: kata
+  workspace:
+    type: git
+    repository:
+      url: https://github.com/example/repo.git
+      branch: main
   prompt: "Review the codebase and suggest improvements"
   networkPolicy:
     egress:
@@ -23,8 +28,7 @@ spec:
           - port: 443
             protocol: TCP
   timeout: 30m
-  # For Confidential Computing (AMD SEV-SNP):
-  # runtimeClassName: kata-cc
+  # For Confidential Computing (AMD SEV-SNP), replace runtimeClassName with kata-cc:
   # nodeSelector:
   #   kubernetes.azure.com/confidential-computing: "true"  # AKS example
   # For Confidential Computing (Intel TDX):

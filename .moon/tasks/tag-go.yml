@@ -43,12 +43,11 @@ tasks:
     options:
       cache: true
   go-test-coverage:
-    command:
-    - go
-    - test
-    - -v
-    - -coverprofile=coverage.out
-    - ./...
+    script: |
+      set -euo pipefail
+      go test -v -coverprofile=coverage.out ./...
+      coverage="$(go tool cover -func=coverage.out | awk '/^total:/ { gsub(/%/, "", $3); print $3 }')"
+      awk -v coverage="$coverage" 'BEGIN { if (coverage + 0 < 30) { printf "coverage %.1f%% is below 30%%\n", coverage > "/dev/stderr"; exit 1 } }'
     toolchain: [system, nix]
     deps:
     - ^:go-build
@@ -149,6 +148,11 @@ tasks:
     options:
       cache: false
       mergeDeps: append
+  coverage:
+    command: noop
+    deps: [go-test-coverage]
+    options:
+      cache: false
   format-check:
     command: noop
     deps: [go-format-check]
@@ -157,11 +161,16 @@ tasks:
       mergeDeps: append
   ci-check:
     command: echo 'ci-check complete'
-    deps: [build, lint, typecheck, test, format-check]
+    deps: [build, lint, typecheck, test, coverage, format-check]
     options:
       cache: false
   go-clean:
     script: rm -rf dist coverage.out
+    options:
+      cache: false
+  clean:
+    command: noop
+    deps: [go-clean]
     options:
       cache: false
 inheritedBy:

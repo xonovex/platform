@@ -50,7 +50,8 @@ spec:
                   description: Default provider name
                 defaultImage:
                   type: string
-                  description: Default container image
+                  description: Digest-pinned container image used when AgentRun.Spec.Image is empty.
+                  pattern: ^.+@sha256:[0-9a-fA-F]{64}$
                 defaultResources:
                   type: object
                   description: Default resource requirements

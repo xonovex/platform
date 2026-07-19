@@ -1,5 +1,9 @@
 # Bitrise API auth and app discovery
 
+## Contents
+
+[Token type and scope](#token-type-and-scope) · [How this skill sends it](#how-this-skill-sends-it) · [Local storage](#where-to-store-it-local--keychain-first) · [CI/CD](#cicd--inside-a-bitrise-pipeline) · [Cloud / production](#cloud--production) · [Hygiene](#hygiene) · [Verify auth](#verify-auth) · [Discover an app](#discovering-an-app-slug)
+
 ## Token type and scope
 
 Bitrise API calls authenticate with a **personal access token** (Bitrise -> Account settings -> Security -> Personal access tokens). Treat it like a password.

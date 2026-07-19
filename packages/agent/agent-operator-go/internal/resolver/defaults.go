@@ -4,13 +4,9 @@ import (
 	"time"
 
 	agentv1alpha1 "github.com/xonovex/platform/packages/agent/agent-operator-go/api/v1alpha1"
-	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/isolation"
 )
 
-const (
-	DefaultImage   = isolation.DefaultContainerImage
-	DefaultTimeout = time.Hour
-)
+const DefaultTimeout = time.Hour
 
 // ResolvedDefaults holds the resolved configuration values
 type ResolvedDefaults struct {
@@ -23,7 +19,7 @@ type ResolvedDefaults struct {
 // ApplyHarnessDefaults resolves image, timeout, runtimeClassName from the harness,
 // mutating the run in place for runtimeClassName, and returning image and timeout.
 func ApplyHarnessDefaults(run *agentv1alpha1.AgentRun, harness *agentv1alpha1.AgentHarness) ResolvedDefaults {
-	image := DefaultImage
+	image := ""
 	timeout := DefaultTimeout
 
 	if harness != nil {

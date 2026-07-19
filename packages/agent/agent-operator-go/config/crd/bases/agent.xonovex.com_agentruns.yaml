@@ -108,7 +108,8 @@ spec:
                       description: Default provider name
                     defaultImage:
                       type: string
-                      description: Default container image
+                      description: Digest-pinned container image used when AgentRun.Spec.Image is empty.
+                      pattern: ^.+@sha256:[0-9a-fA-F]{64}$
                     defaultResources:
                       type: object
                       description: Default resource requirements
@@ -335,7 +336,8 @@ spec:
                             type: string
                         image:
                           type: string
-                          description: Nix container image for the init container (default nixos/nix:latest)
+                          description: Pre-built, digest-pinned Nix agent image used by the pod.
+                          pattern: ^.+@sha256:[0-9a-fA-F]{64}$
                         storeSizeLimit:
                           type: string
                           description: Size limit for the Nix store EmptyDir volume (default 10Gi)
@@ -420,7 +422,8 @@ spec:
                                 x-kubernetes-int-or-string: true
                 image:
                   type: string
-                  description: Container image for the agent
+                  description: Digest-pinned container image for the agent. It must be set directly or resolved from a harness, toolchain, or policy default.
+                  pattern: ^.+@sha256:[0-9a-fA-F]{64}$
                 nodeSelector:
                   type: object
                   additionalProperties:

@@ -9,6 +9,7 @@ import (
 
 	isoshared "github.com/xonovex/platform/packages/cli/agent-cli-go/internal/isolation/shared"
 	netshared "github.com/xonovex/platform/packages/cli/agent-cli-go/internal/network/shared"
+	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/agentcmd"
 	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/agents"
 	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/providers"
 	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/provision"
@@ -31,52 +32,65 @@ func (i *Isolator) Available() (bool, error) { return true, nil }
 // HidesHost reports false: host execution always exposes the host.
 func (i *Isolator) HidesHost(bool, string) bool { return false }
 
+// PinnedProvision mirrors the selected provisioner's immutability because host
+// execution has no image input.
+func (i *Isolator) PinnedProvision(_ provision.ProvisionMethod, provisionerPinned bool, _ string) bool {
+	return provisionerPinned
+}
+
 // KernelIsolated reports false: there is no namespace or kernel boundary.
 func (i *Isolator) KernelIsolated(string) bool { return false }
 
 // Run executes the agent on the host. It fails CLOSED when a network restriction
 // is requested: with no namespace there is no way to unshare or proxy egress.
 func (i *Isolator) Run(cfg isoshared.RunConfig, c provision.Contribution) (int, error) {
-	if cfg.Network != netshared.ModeHost {
-		return 1, fmt.Errorf("isolation=none cannot restrict network egress (network=%q); use bwrap or docker", cfg.Network)
+	cmd, env, err := i.hostCommand(cfg, c)
+	if err != nil {
+		return 1, err
 	}
-	cmd, env := i.hostCommand(cfg, c)
 	return isoshared.SpawnSandboxInDir(cmd[0], cmd[1:], env, cfg.WorkDir, "host execution", cfg.Verbose)
 }
 
 // Command returns the host command (for display / terminal wrappers).
-func (i *Isolator) Command(cfg isoshared.RunConfig, c provision.Contribution) []string {
-	cmd, _ := i.hostCommand(cfg, c)
-	return cmd
+func (i *Isolator) Command(cfg isoshared.RunConfig, c provision.Contribution) ([]string, error) {
+	cmd, _, err := i.hostCommand(cfg, c)
+	return cmd, err
 }
 
 // TerminalCommand returns the host command AND its full resolved environment
 // (provider tokens, custom env, and the provisioner's PATH/env). Unlike
 // bwrap/docker, host execution bakes nothing into the command, so the wrapper
 // must carry this environment for the agent to see its toolchain.
-func (i *Isolator) TerminalCommand(cfg isoshared.RunConfig, c provision.Contribution) ([]string, []string) {
+func (i *Isolator) TerminalCommand(cfg isoshared.RunConfig, c provision.Contribution) ([]string, []string, error) {
 	return i.hostCommand(cfg, c)
 }
 
 // hostCommand builds the host command and environment, applying the Contribution.
-func (i *Isolator) hostCommand(cfg isoshared.RunConfig, c provision.Contribution) ([]string, []string) {
+func (i *Isolator) hostCommand(cfg isoshared.RunConfig, c provision.Contribution) ([]string, []string, error) {
+	if cfg.Network != netshared.ModeHost {
+		return nil, nil, fmt.Errorf("isolation=none cannot restrict network egress (network=%q); use bwrap or docker", cfg.Network)
+	}
+	if _, err := isoshared.ResolveDirectory(cfg.WorkDir, "work directory"); err != nil {
+		return nil, nil, err
+	}
 	var providerCliArgs []string
-	var providerEnv map[string]string
+	agentEnv := map[string]string{}
 	if cfg.Provider != nil {
 		providerCliArgs = providers.GetProviderCliArgs(cfg.Provider)
-		providerEnv, _ = providers.BuildProviderEnv(cfg.Provider)
+		var err error
+		agentEnv, err = agentcmd.BuildProviderEnv(cfg.Agent, cfg.Provider)
+		if err != nil {
+			return nil, nil, err
+		}
 	}
 	execOpts := types.AgentExecOptions{Sandbox: false, ProviderCliArgs: providerCliArgs}
 
 	var agentArgs []string
-	var agentEnv map[string]string
 	switch cfg.Agent.Type {
 	case types.AgentClaude:
 		agentArgs = agents.BuildClaudeArgs(cfg.AgentArgs, execOpts)
-		agentEnv = agents.BuildClaudeEnv(providerEnv)
 	case types.AgentOpencode:
 		agentArgs = agents.BuildOpencodeArgs(cfg.AgentArgs, execOpts)
-		agentEnv = agents.BuildOpencodeEnv(providerEnv)
 	}
 
 	cmd := append([]string{cfg.Agent.Binary}, agentArgs...)
@@ -100,5 +114,5 @@ func (i *Isolator) hostCommand(cfg isoshared.RunConfig, c provision.Contribution
 		env = append(env, "PATH="+path)
 	}
 
-	return cmd, env
+	return cmd, env, nil
 }

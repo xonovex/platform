@@ -7,7 +7,7 @@ spec:
   defaultAgent: claude
   defaultProviders:
     claude: anthropic-provider
-  defaultImage: "node:trixie-slim"
+  defaultImage: "ghcr.io/example/agents/claude@sha256:<digest>"
   defaultTimeout: 1h
   storageClass: standard
   storageSize: 10Gi

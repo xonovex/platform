@@ -1,5 +1,9 @@
 # Bitbucket Data Center auth — SSH for git, HTTP token for REST
 
+## Contents
+
+[REST interface](#no-usable-cli--use-rest) · [Resolve the host](#resolve-the-real-host) · [Credential type and scope](#credential-type-and-scope) · [How this skill sends it](#how-this-skill-sends-it-keychain-is-the-source-of-truth) · [Local storage](#where-to-store-it-local--keychain-first) · [CI/CD](#cicd) · [Cloud / production](#cloud--production) · [Hygiene](#hygiene)
+
 These recipes target a self-hosted Bitbucket Server / Data Center instance and its REST 1.0 API at `/rest/api/1.0`. git and the REST API authenticate through two independent mechanisms: git over SSH is unrelated to REST over HTTPS, and having one working tells you nothing about the other. This file covers the REST side — the HTTP access token, where to keep it, and how `curl` sends it. Bitbucket Cloud (`api.bitbucket.org`, REST 2.0) is a separate product with a different auth model; never infer Cloud parity from a Data Center setup (see [data-center.md](data-center.md) for the versioned-REST boundary).
 
 ## No usable CLI — use REST

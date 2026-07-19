@@ -3,7 +3,9 @@ type: plan
 has_subplans: false
 parent_plan: environment-hardening
 parallel_group: 1
-status: pending
+status: complete
+updated: '2026-07-19'
+completed_date: '2026-07-19'
 dependencies:
   plans: []
   files:
@@ -13,11 +15,11 @@ skills_to_consult:
 - npm-guide
 - versioning-guide
 validation:
-  type_check: pending
-  lint: pending
-  build: pending
-  tests: pending
-  integration: pending
+  type_check: complete
+  lint: complete
+  build: complete
+  tests: complete
+  integration: complete
 ---
 
 # Subplan 03: Dependency Advisory Remediation
@@ -42,10 +44,14 @@ Clear the six npm-audit advisories (1 low, 2 moderate, 3 high: @babel/core, form
 
 ## Success Criteria
 
-- [ ] Zero advisories (or explicit waiver with revisit date)
-- [ ] Diff confined to `package-lock.json` (+ VALIDATION.txt note)
-- [ ] Plugin lockstep untouched at 6.0.1, machine-checked
-- [ ] Full gate green; one isolated conventional commit; remote untouched
+- [x] Zero advisories (or explicit waiver with revisit date)
+- [x] Diff confined to `package-lock.json` (+ VALIDATION.txt note)
+- [x] Plugin lockstep untouched at 6.0.1, machine-checked
+- [x] Full gate green; one isolated conventional commit; remote untouched
+
+## Completion
+
+Completed by commit `052865b1` (`fix(deps): clear npm audit advisories via transitive updates`). The commit changed only `package-lock.json` and this plan set's validation note, cleared all six advisories without overrides or direct-dependency changes, and left the then-current 6.0.1 plugin catalog in lockstep. On 2026-07-19, `npm audit` still reports zero vulnerabilities, `npm ci --dry-run --ignore-scripts` accepts the lockfile, and the later 6.1.0 catalog contains one machine-verified plugin version across 95 package and marketplace entries.
 
 ## Files Modified/Created
 

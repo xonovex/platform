@@ -1,5 +1,9 @@
 # contrast-and-color: Contrast & use of color
 
+## Contents
+
+[Guideline](#guideline) · [Contrast ratios](#contrast-ratios-143-1411) · [Color-independent meaning](#never-rely-on-color-alone-141) · [Semantic theme tokens](#source-colors-from-semantic-theme-tokens) · [Light and dark themes](#verify-both-light-and-dark-themes)
+
 ## Guideline
 
 Meet the WCAG AA contrast thresholds, and never let color be the only carrier of meaning — pair it with an icon, a text label, and a status-naming `contentDescription`. Serves 1.4.3 Contrast (Minimum), 1.4.11 Non-text Contrast, and 1.4.1 Use of Color.

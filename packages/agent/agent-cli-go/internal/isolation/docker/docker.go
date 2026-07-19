@@ -55,7 +55,19 @@ func (i *Isolator) Available() (bool, error) {
 // HidesHost reports whether host tools are unreachable. The host filesystem is
 // never mounted, so the actual host is always hidden; an image-less container,
 // however, resolves host-equivalent tools, so a pinned image is required.
-func (i *Isolator) HidesHost(_ bool, image string) bool { return image != "" }
+func (i *Isolator) HidesHost(_ bool, image string) bool {
+	return isolation.IsDigestPinnedImage(resolveImage(image))
+}
+
+// PinnedProvision requires the container image itself to be digest-pinned. A
+// separate provisioner must also be pinned unless the image is the only source
+// of tools.
+func (i *Isolator) PinnedProvision(method provision.ProvisionMethod, provisionerPinned bool, image string) bool {
+	if !isolation.IsDigestPinnedImage(resolveImage(image)) {
+		return false
+	}
+	return method == provision.ProvisionNone || provisionerPinned
+}
 
 // KernelIsolated reports whether the runtime gives a kernel boundary (gVisor
 // runsc); default runc is attack-surface reduction, not a kernel boundary.
@@ -65,25 +77,45 @@ func (i *Isolator) KernelIsolated(runtime string) bool {
 
 // Run executes the agent in a docker container.
 func (i *Isolator) Run(cfg isoshared.RunConfig, c provision.Contribution) (int, error) {
-	return isoshared.SpawnSandbox("docker", i.buildArgs(cfg, c), os.Environ(), "Docker sandbox", cfg.Verbose)
+	args, err := i.buildArgs(cfg, c)
+	if err != nil {
+		return 1, err
+	}
+	return isoshared.SpawnSandbox("docker", args, os.Environ(), "Docker sandbox", cfg.Verbose)
 }
 
 // Command returns the full docker command (for display / terminal wrappers).
-func (i *Isolator) Command(cfg isoshared.RunConfig, c provision.Contribution) []string {
-	return append([]string{"docker"}, i.buildArgs(cfg, c)...)
+func (i *Isolator) Command(cfg isoshared.RunConfig, c provision.Contribution) ([]string, error) {
+	args, err := i.buildArgs(cfg, c)
+	if err != nil {
+		return nil, err
+	}
+	return append([]string{"docker"}, args...), nil
 }
 
 // TerminalCommand returns the docker command plus the host env to launch it; the
 // container environment is baked into the command via -e, so the wrapper needs
 // only the host env.
-func (i *Isolator) TerminalCommand(cfg isoshared.RunConfig, c provision.Contribution) ([]string, []string) {
-	return i.Command(cfg, c), os.Environ()
+func (i *Isolator) TerminalCommand(cfg isoshared.RunConfig, c provision.Contribution) ([]string, []string, error) {
+	command, err := i.Command(cfg, c)
+	return command, os.Environ(), err
 }
 
-func (i *Isolator) buildArgs(cfg isoshared.RunConfig, c provision.Contribution) []string {
-	homeDir, _ := os.UserHomeDir()
-	if cfg.HomeDir != "" {
-		homeDir = cfg.HomeDir
+func (i *Isolator) buildArgs(cfg isoshared.RunConfig, c provision.Contribution) ([]string, error) {
+	homeDir, err := isoshared.ResolveHomeDir(cfg.HomeDir)
+	if err != nil {
+		return nil, err
+	}
+	workDir, err := isoshared.ResolveDirectory(cfg.WorkDir, "work directory")
+	if err != nil {
+		return nil, err
+	}
+	repoDir := ""
+	if cfg.RepoDir != "" {
+		repoDir, err = isoshared.ResolveDirectory(cfg.RepoDir, "repository directory")
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	args := []string{"run", "--rm", "-it"}
@@ -114,65 +146,78 @@ func (i *Isolator) buildArgs(cfg isoshared.RunConfig, c provision.Contribution) 
 	args = append(args, "-u", fmt.Sprintf("%d:%d", os.Getuid(), os.Getgid()))
 
 	// Workspace (rw — the only writable host bind) + working directory.
-	args = append(args, "-w", cfg.WorkDir, "-v", fmt.Sprintf("%s:%s", cfg.WorkDir, cfg.WorkDir))
-	if cfg.RepoDir != "" && cfg.RepoDir != cfg.WorkDir {
-		args = append(args, "-v", fmt.Sprintf("%s:%s:ro", cfg.RepoDir, cfg.RepoDir))
+	args = append(args, "-w", workDir, "-v", fmt.Sprintf("%s:%s", workDir, workDir))
+	if repoDir != "" && repoDir != workDir {
+		args = append(args, "-v", fmt.Sprintf("%s:%s:ro", repoDir, repoDir))
 	}
 
 	// Curated config paths, read-only, into the synthetic HOME.
 	for _, configPath := range isolation.UserConfigPaths {
 		src := filepath.Join(homeDir, configPath)
-		if _, err := os.Stat(src); err == nil {
+		exists, err := isoshared.OptionalPath(src, "user config path")
+		if err != nil {
+			return nil, err
+		}
+		if exists {
 			args = append(args, "-v", fmt.Sprintf("%s:%s:ro", src, filepath.Join(containerHome, configPath)))
 		}
 	}
 
 	// Contribution: read-only binds of the provisioned closure's requisites.
 	for _, p := range c.RoBindPaths {
-		if _, err := os.Stat(p); err == nil {
-			args = append(args, "-v", fmt.Sprintf("%s:%s:ro", p, p))
+		resolved, err := isoshared.ResolveExistingPath(p, "provisioned read-only bind")
+		if err != nil {
+			return nil, err
 		}
+		args = append(args, "-v", fmt.Sprintf("%s:%s:ro", resolved, resolved))
 	}
 
 	// Caller-supplied extra binds.
 	for _, path := range cfg.BindPaths {
-		if abs, err := filepath.Abs(path); err == nil {
-			if _, err := os.Stat(abs); err == nil {
-				args = append(args, "-v", fmt.Sprintf("%s:%s", abs, abs))
-			}
+		resolved, err := isoshared.ResolveExistingPath(path, "read-write bind")
+		if err != nil {
+			return nil, err
 		}
+		args = append(args, "-v", fmt.Sprintf("%s:%s", resolved, resolved))
 	}
 	for _, path := range cfg.RoBindPaths {
-		if abs, err := filepath.Abs(path); err == nil {
-			if _, err := os.Stat(abs); err == nil {
-				args = append(args, "-v", fmt.Sprintf("%s:%s:ro", abs, abs))
-			}
+		resolved, err := isoshared.ResolveExistingPath(path, "read-only bind")
+		if err != nil {
+			return nil, err
 		}
+		args = append(args, "-v", fmt.Sprintf("%s:%s:ro", resolved, resolved))
 	}
 
 	// Environment.
-	for k, v := range i.containerEnv(cfg, c) {
+	containerEnv, err := i.containerEnv(cfg, c)
+	if err != nil {
+		return nil, err
+	}
+	for k, v := range containerEnv {
 		args = append(args, "-e", fmt.Sprintf("%s=%s", k, v))
 	}
 
 	// Image (pinned by the caller; falls back to the shared default).
-	image := cfg.Image
-	if image == "" {
-		image = isolation.DefaultContainerImage
-	}
-	args = append(args, image)
+	args = append(args, resolveImage(cfg.Image))
 
 	// Agent command, wrapped with the provisioner's init commands.
 	agentCmd := agentcmd.BuildAgentCommand(cfg.Agent, cfg.Provider, cfg.AgentArgs, "")
 	args = append(args, isoshared.WrapWithInitCommands(agentCmd, c.InitCommands)...)
 
-	return args
+	return args, nil
+}
+
+func resolveImage(image string) string {
+	if image == "" {
+		return isolation.DefaultContainerImage
+	}
+	return image
 }
 
 // containerEnv builds the container environment: HOME/TMPDIR/SHELL/PATH, the
 // contribution's env, the provider tokens, the caller's custom env, and the
 // proxy egress env.
-func (i *Isolator) containerEnv(cfg isoshared.RunConfig, c provision.Contribution) map[string]string {
+func (i *Isolator) containerEnv(cfg isoshared.RunConfig, c provision.Contribution) (map[string]string, error) {
 	env := map[string]string{
 		"HOME":   containerHome,
 		"TMPDIR": "/tmp",
@@ -186,10 +231,12 @@ func (i *Isolator) containerEnv(cfg isoshared.RunConfig, c provision.Contributio
 	pathEntries = append(pathEntries, "/usr/local/bin", "/usr/bin", "/bin")
 	env["PATH"] = strings.Join(pathEntries, ":")
 
-	if providerEnv, err := agentcmd.BuildProviderEnv(cfg.Agent, cfg.Provider); err == nil {
-		for k, v := range providerEnv {
-			env[k] = v
-		}
+	providerEnv, err := agentcmd.BuildProviderEnv(cfg.Agent, cfg.Provider)
+	if err != nil {
+		return nil, err
+	}
+	for k, v := range providerEnv {
+		env[k] = v
 	}
 	for k, v := range c.Env {
 		env[k] = v
@@ -201,5 +248,5 @@ func (i *Isolator) containerEnv(cfg isoshared.RunConfig, c provision.Contributio
 		env[k] = v
 	}
 
-	return env
+	return env, nil
 }

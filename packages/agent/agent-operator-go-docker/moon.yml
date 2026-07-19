@@ -1,5 +1,6 @@
 $schema: https://moonrepo.dev/schemas/project.json
 language: bash
+tags: [shell]
 layer: unknown
 dependsOn: []
 tasks:

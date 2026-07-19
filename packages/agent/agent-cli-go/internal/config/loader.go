@@ -4,6 +4,7 @@
 package config
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -22,25 +23,34 @@ type FileConfig struct {
 }
 
 // GetDefaultConfigPath returns the default config file path.
-func GetDefaultConfigPath() string {
-	home, _ := os.UserHomeDir()
-	return filepath.Join(home, ".config", "sandboxed-claude", "config")
+func GetDefaultConfigPath() (string, error) {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return "", fmt.Errorf("resolve user home directory: %w", err)
+	}
+	return filepath.Join(home, ".config", "sandboxed-claude", "config"), nil
 }
 
 // LoadConfigFile loads configuration from a YAML or TOML file. If path is empty,
 // it tries the default config path.
 func LoadConfigFile(path string) (*FileConfig, error) {
+	explicit := path != ""
 	if path == "" {
-		defaultPath := GetDefaultConfigPath()
+		defaultPath, err := GetDefaultConfigPath()
+		if err != nil {
+			return nil, err
+		}
 		if _, err := os.Stat(defaultPath); os.IsNotExist(err) {
 			return &FileConfig{}, nil
+		} else if err != nil {
+			return nil, fmt.Errorf("inspect default config %q: %w", defaultPath, err)
 		}
 		path = defaultPath
 	}
 
 	data, err := os.ReadFile(path)
 	if err != nil {
-		if os.IsNotExist(err) {
+		if os.IsNotExist(err) && !explicit {
 			return &FileConfig{}, nil
 		}
 		return nil, err
@@ -97,14 +107,5 @@ func parseKeyValueConfig(content string) *FileConfig {
 		}
 	}
 
-	return config
-}
-
-// LoadDefaultConfig loads config from the default path if it exists.
-func LoadDefaultConfig() *FileConfig {
-	config, err := LoadConfigFile("")
-	if err != nil {
-		return &FileConfig{}
-	}
 	return config
 }

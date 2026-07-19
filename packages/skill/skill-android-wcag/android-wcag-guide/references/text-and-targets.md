@@ -1,5 +1,9 @@
 # text-and-targets: Text resize & reflow
 
+## Contents
+
+[Scalable text units](#size-text-in-scalable-units-sp-never-dp) · [Text reflow](#let-text-reflow--no-maxlines1--ellipsize-that-hides-content) · [Font scaling](#never-defeat-font-scaling-globally-fontscale-density)
+
 ## Size text in scalable units (`sp`), never `dp`
 
 ### Guideline

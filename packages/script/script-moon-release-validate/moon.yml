@@ -2,6 +2,11 @@ $schema: https://moonrepo.dev/schemas/project.json
 language: typescript
 tags: [typescript-script]
 tasks:
+  coverage:
+    command: noop
+    deps: [ts-coverage]
+    options:
+      cache: false
   ts-test:
     deps:
       - ~:ts-build
@@ -37,6 +42,7 @@ tasks:
       runFromWorkspaceRoot: true
   ci-check:
     deps:
+      - coverage
       - release-validate
     options:
       mergeDeps: append

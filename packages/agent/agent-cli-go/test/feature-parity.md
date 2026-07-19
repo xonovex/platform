@@ -11,7 +11,7 @@ This document tracks feature parity between the TypeScript `script-agent` and Go
 - [x] Isolation axis (`--isolation`): none, bwrap, docker
 - [x] Provision axis (`--provision`): none, nix, command
 - [x] Network axis (`--network`): host, none, proxy
-- [x] Host passthrough (`--host-passthrough`); egress allowlist (`--egress-allow`); init command (`--init-command`)
+- [x] Host passthrough (`--isolation-bwrap-passthrough`); egress allowlist (`--network-proxy-egress-allow`); init command (`--init-command`)
 - [x] Nix source flags (`--nix-source`, `--nix-rev`, `--nix-packages`, `--nix-shell`)
 - [x] Work directory (`-w`/`--work-dir`)
 - [x] Worktree support (`--worktree-branch`, `--worktree-source-branch`, `--worktree-dir`)

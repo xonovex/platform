@@ -1,6 +1,7 @@
 package bwrap
 
 import (
+	"os"
 	"os/exec"
 	"strings"
 	"testing"
@@ -31,11 +32,19 @@ func TestBwrap_NetworkNoneBlocksEgress(t *testing.T) {
 func claudeCfg(net netshared.Mode, passthrough bool, workDir string) isoshared.RunConfig {
 	return isoshared.RunConfig{
 		Agent:           &types.AgentConfig{Type: types.AgentClaude, Binary: "claude"},
-		HomeDir:         "/home/testuser",
 		WorkDir:         workDir,
 		Network:         net,
 		HostPassthrough: passthrough,
 	}
+}
+
+func bwrapCommand(t *testing.T, cfg isoshared.RunConfig, c provision.Contribution) []string {
+	t.Helper()
+	command, err := NewIsolator().Command(cfg, c)
+	if err != nil {
+		t.Fatalf("Command() error = %v", err)
+	}
+	return command
 }
 
 // argHas reports whether args contains s.
@@ -70,7 +79,7 @@ func setenvValue(args []string, key string) string {
 
 func TestBwrap_DenyDefaultHardening(t *testing.T) {
 	work := t.TempDir()
-	args := NewIsolator().Command(claudeCfg(netshared.ModeNone, false, work), provision.Contribution{})
+	args := bwrapCommand(t, claudeCfg(netshared.ModeNone, false, work), provision.Contribution{})
 
 	if !argHasPair(args, "--dev", "/dev") {
 		t.Error("missing minimal --dev /dev")
@@ -81,11 +90,15 @@ func TestBwrap_DenyDefaultHardening(t *testing.T) {
 	if !argHas(args, "--clearenv") {
 		t.Error("missing --clearenv")
 	}
-	if !argHasPair(args, "--tmpfs", "/home/testuser") {
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		t.Fatalf("UserHomeDir() error = %v", err)
+	}
+	if !argHasPair(args, "--tmpfs", homeDir) {
 		t.Error("HOME must be a sandbox-local tmpfs")
 	}
 	// No host-$HOME bind in deny-default mode.
-	if argHasPair(args, "--bind", "/home/testuser") {
+	if argHasTriple(args, "--bind", homeDir, homeDir) {
 		t.Error("must not bind host-$HOME in deny-default mode")
 	}
 	// No host system dirs bound.
@@ -98,7 +111,7 @@ func TestBwrap_NetworkExplicit(t *testing.T) {
 	work := t.TempDir()
 	// none + proxy must emit --unshare-net (the regression guard); host shares.
 	for _, net := range []netshared.Mode{netshared.ModeNone, netshared.ModeProxy} {
-		args := NewIsolator().Command(claudeCfg(net, false, work), provision.Contribution{})
+		args := bwrapCommand(t, claudeCfg(net, false, work), provision.Contribution{})
 		if !argHas(args, "--unshare-net") {
 			t.Errorf("network %q must emit --unshare-net", net)
 		}
@@ -106,7 +119,7 @@ func TestBwrap_NetworkExplicit(t *testing.T) {
 			t.Errorf("network %q must not share the net", net)
 		}
 	}
-	args := NewIsolator().Command(claudeCfg(netshared.ModeHost, false, work), provision.Contribution{})
+	args := bwrapCommand(t, claudeCfg(netshared.ModeHost, false, work), provision.Contribution{})
 	if !argHas(args, "--share-net") || argHas(args, "--unshare-net") {
 		t.Error("network host must --share-net and not --unshare-net")
 	}
@@ -121,7 +134,7 @@ func TestBwrap_AppliesContribution(t *testing.T) {
 		Env:          map[string]string{"FOO": "bar"},
 		InitCommands: []string{"echo hi"},
 	}
-	args := NewIsolator().Command(claudeCfg(netshared.ModeNone, false, work), c)
+	args := bwrapCommand(t, claudeCfg(netshared.ModeNone, false, work), c)
 
 	if !argHasTriple(args, "--ro-bind", closure, closure) {
 		t.Error("contribution RoBindPaths must be ro-bound")
@@ -144,9 +157,24 @@ func TestBwrap_AppliesContribution(t *testing.T) {
 
 func TestBwrap_HostPassthrough(t *testing.T) {
 	work := t.TempDir()
-	args := NewIsolator().Command(claudeCfg(netshared.ModeHost, true, work), provision.Contribution{})
+	args := bwrapCommand(t, claudeCfg(netshared.ModeHost, true, work), provision.Contribution{})
 	if !argHasTriple(args, "--ro-bind", "/usr", "/usr") {
 		t.Error("HostPassthrough must ro-bind host /usr")
+	}
+}
+
+func TestBwrap_CommandRejectsMissingBindAndProviderToken(t *testing.T) {
+	work := t.TempDir()
+	cfg := claudeCfg(netshared.ModeNone, false, work)
+	cfg.RoBindPaths = []string{work + "/missing"}
+	if _, err := NewIsolator().Command(cfg, provision.Contribution{}); err == nil {
+		t.Error("Command() error = nil, want missing bind error")
+	}
+
+	cfg.RoBindPaths = nil
+	cfg.Provider = &types.ModelProvider{AuthTokenEnv: "MISSING_BWRAP_TEST_TOKEN"}
+	if _, err := NewIsolator().Command(cfg, provision.Contribution{}); err == nil {
+		t.Error("Command() error = nil, want missing provider token error")
 	}
 }
 

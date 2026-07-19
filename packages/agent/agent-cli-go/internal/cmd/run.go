@@ -227,16 +227,22 @@ func runAgent(cmd *cobra.Command, args []string) error {
 
 	workDir := flagWorkDir
 	if workDir == "" {
-		workDir, _ = os.Getwd()
+		workDir, err = os.Getwd()
+		if err != nil {
+			return fmt.Errorf("resolve current working directory: %w", err)
+		}
 	}
-	workDir, _ = filepath.Abs(workDir)
+	workDir, err = filepath.Abs(workDir)
+	if err != nil {
+		return fmt.Errorf("resolve work directory %q: %w", workDir, err)
+	}
 
 	sourceRepoDir, workDir, err := setupWorktree(workDir, verbose)
 	if err != nil {
 		return err
 	}
 
-	bindPaths := wsshared.BuildBindPaths(flagBind, sourceRepoDir)
+	bindPaths := wsshared.BuildBindPaths(append(append([]string{}, fileConfig.BindPaths...), flagBind...), sourceRepoDir)
 
 	axes, err := resolveAxes(flags{
 		isolation:                 flagIsolation,
@@ -277,6 +283,7 @@ func runAgent(cmd *cobra.Command, args []string) error {
 	}
 
 	runCfg := isoshared.RunConfig{
+		HomeDir:         fileConfig.HomeDir,
 		WorkDir:         workDir,
 		RepoDir:         sourceRepoDir,
 		Network:         axes.Network,
@@ -285,16 +292,24 @@ func runAgent(cmd *cobra.Command, args []string) error {
 		Image:           axes.Image,
 		Runtime:         axes.Runtime,
 		BindPaths:       bindPaths,
-		RoBindPaths:     flagRoBind,
-		CustomEnv:       flagEnv,
+		RoBindPaths:     append(append([]string{}, fileConfig.RoBindPaths...), flagRoBind...),
+		CustomEnv:       append(append([]string{}, fileConfig.CustomEnv...), flagEnv...),
 		Agent:           agent,
 		Provider:        provider,
 		AgentArgs:       args,
 		Verbose:         verbose,
 	}
 
+	// Construct the command before choosing a dispatch path. This shared
+	// preflight makes dry-run, terminal, and direct execution reject the same
+	// invalid paths and missing provider credentials.
+	command, err := axes.Isolation.Command(runCfg, contribution)
+	if err != nil {
+		return fmt.Errorf("prepare sandbox command: %w", err)
+	}
+
 	if flagDryRun {
-		return printDryRun(axes, runCfg, contribution, agent, provider, args, workDir)
+		return printDryRun(axes, command, agent, provider, args, workDir)
 	}
 
 	if flagTerminal != "" {
@@ -426,7 +441,10 @@ func executeWithTerminal(axes resolvedAxes, runCfg isoshared.RunConfig, contribu
 	// Each isolator owns its terminal launch: bwrap/docker bake their env into the
 	// command and return the host env; none returns the agent command with its full
 	// resolved environment (provider + custom + the provisioner's PATH/env).
-	fullCommand, env := axes.Isolation.TerminalCommand(runCfg, contribution)
+	fullCommand, env, err := axes.Isolation.TerminalCommand(runCfg, contribution)
+	if err != nil {
+		return fmt.Errorf("prepare terminal command: %w", err)
+	}
 
 	if verbose {
 		scriptlib.LogInfo("Using terminal wrapper: " + flagTerminal)
@@ -443,7 +461,7 @@ func executeWithTerminal(axes resolvedAxes, runCfg isoshared.RunConfig, contribu
 }
 
 // printDryRun displays what would be executed without running it.
-func printDryRun(axes resolvedAxes, runCfg isoshared.RunConfig, contribution provision.Contribution, agent *types.AgentConfig, provider *types.ModelProvider, args []string, workDir string) error {
+func printDryRun(axes resolvedAxes, command []string, agent *types.AgentConfig, provider *types.ModelProvider, args []string, workDir string) error {
 	scriptlib.LogInfo("Dry run - would execute:")
 
 	if axes.IsolationName == isolation.IsolationNone {
@@ -459,7 +477,6 @@ func printDryRun(axes resolvedAxes, runCfg isoshared.RunConfig, contribution pro
 		}
 	}
 
-	command := axes.Isolation.Command(runCfg, contribution)
 	if len(command) > 0 {
 		fmt.Println(strings.Join(command, " "))
 	}

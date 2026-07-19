@@ -1,5 +1,9 @@
 # Bitbucket Data Center PR comments — post, anchor, edit, blocker tasks, links
 
+## Contents
+
+[Find the PR](#find-the-pr-for-a-branch) · [Top-level comments](#post-a-top-level-comment) · [Inline comments](#post-an-inline-anchored-comment) · [Edit](#edit-a-comment) · [Blocker tasks](#blocker-tasks-merge-gating) · [Resolve a task](#resolve-a-task) · [Reply](#reply-on-a-thread) · [Deep links](#deep-link-between-comments) · [Fields](#severity--state-fields-reference)
+
 These recipes drive a self-hosted Bitbucket Server / Data Center pull request over its REST 1.0 API; they do not apply to Bitbucket Cloud, whose REST 2.0 comment model differs (Cloud uses `content.raw` and `inline`, not the `text` + `anchor` shape below). For _what_ a review comment should say — Conventional Comments labels, blocking versus non-blocking, pairing one summary with line-anchored inline detail — see the code-review-guide skill; this file covers _how_ to deliver that on Bitbucket over REST.
 
 All paths are under `BASE=https://<host>/rest/api/1.0/projects/<KEY>/repos/<repo>` and `PR=$BASE/pull-requests/<id>` (resolve `<host>` / `<KEY>` / `<repo>` from your instance's coordinates). How the token reaches these calls — `curl -n` versus `Authorization: Bearer` — is in [auth.md](auth.md).

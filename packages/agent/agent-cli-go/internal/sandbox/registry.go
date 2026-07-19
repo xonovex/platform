@@ -112,7 +112,7 @@ func Select(reg *Registry, req Request, pol policy.SandboxPolicy) (isoshared.Iso
 		return nil, nil, err
 	}
 	caps := policy.Capabilities{
-		Pinned:               prov.Pinned(),
+		Pinned:               iso.PinnedProvision(req.Provision, prov.Pinned(), req.Image),
 		HostToolsUnreachable: iso.HidesHost(req.Passthrough, req.Image),
 		EgressRestricted:     netshared.EgressIsRestricted(req.Network),
 		KernelIsolated:       iso.KernelIsolated(req.Runtime),

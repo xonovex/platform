@@ -20,15 +20,26 @@ func cfg(net netshared.Mode) isoshared.RunConfig {
 
 func TestNone_FailsClosedOnNetworkRestriction(t *testing.T) {
 	for _, net := range []netshared.Mode{netshared.ModeNone, netshared.ModeProxy} {
-		if code, err := NewIsolator().Run(cfg(net), provision.Contribution{}); err == nil || code == 0 {
+		i := NewIsolator()
+		c := provision.Contribution{}
+		if code, err := i.Run(cfg(net), c); err == nil || code == 0 {
 			t.Errorf("Run(network=%q) = (%d, %v), want fail-closed error (none cannot restrict egress)", net, code, err)
+		}
+		if _, err := i.Command(cfg(net), c); err == nil {
+			t.Errorf("Command(network=%q) error = nil, want fail-closed error", net)
+		}
+		if _, _, err := i.TerminalCommand(cfg(net), c); err == nil {
+			t.Errorf("TerminalCommand(network=%q) error = nil, want fail-closed error", net)
 		}
 	}
 }
 
 func TestNone_CommandNoPermissionBypass(t *testing.T) {
 	// Host execution must NOT inject the sandbox permission bypass (Sandbox=false).
-	cmd := NewIsolator().Command(cfg(netshared.ModeHost), provision.Contribution{})
+	cmd, err := NewIsolator().Command(cfg(netshared.ModeHost), provision.Contribution{})
+	if err != nil {
+		t.Fatalf("Command() error = %v", err)
+	}
 	if cmd[0] != "claude" {
 		t.Fatalf("command[0] = %q, want claude", cmd[0])
 	}
@@ -43,7 +54,10 @@ func TestNone_AppliesContribution(t *testing.T) {
 		Env:          map[string]string{"FOO": "bar"},
 		InitCommands: []string{"echo hi"},
 	}
-	cmd, env := NewIsolator().hostCommand(cfg(netshared.ModeHost), c)
+	cmd, env, err := NewIsolator().hostCommand(cfg(netshared.ModeHost), c)
+	if err != nil {
+		t.Fatalf("hostCommand() error = %v", err)
+	}
 
 	if cmd[0] != "sh" || cmd[1] != "-c" {
 		t.Fatalf("init command must wrap the agent in sh -c, got %v", cmd)
@@ -65,6 +79,14 @@ func TestNone_AppliesContribution(t *testing.T) {
 	}
 	if !foundFoo {
 		t.Error("contribution env not applied")
+	}
+}
+
+func TestNone_CommandRejectsMissingProviderToken(t *testing.T) {
+	cfg := cfg(netshared.ModeHost)
+	cfg.Provider = &types.ModelProvider{AuthTokenEnv: "MISSING_NONE_TEST_TOKEN"}
+	if _, err := NewIsolator().Command(cfg, provision.Contribution{}); err == nil {
+		t.Error("Command() error = nil, want missing provider token error")
 	}
 }
 

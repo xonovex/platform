@@ -16,8 +16,8 @@ func TestApplyHarnessDefaults_NoHarness(t *testing.T) {
 
 	d := ApplyHarnessDefaults(run, nil)
 
-	if d.Image != DefaultImage {
-		t.Errorf("Image = %q, want %q", d.Image, DefaultImage)
+	if d.Image != "" {
+		t.Errorf("Image = %q, want no unsafe built-in image", d.Image)
 	}
 	if d.Timeout != DefaultTimeout {
 		t.Errorf("Timeout = %v, want %v", d.Timeout, DefaultTimeout)

@@ -3,6 +3,11 @@ language: unknown
 dependsOn:
   - script-moon-action-graph
 tasks:
+  ci-check:
+    command: noop
+    deps: [graph-build]
+    options:
+      cache: false
   graph-build-npm-check:
     command: npx moon-action-graph :npm-check npm-check npm-check-graph.png
     deps:

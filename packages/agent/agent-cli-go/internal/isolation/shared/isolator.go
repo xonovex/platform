@@ -51,13 +51,17 @@ type RunConfig struct {
 type Isolator interface {
 	Available() (bool, error)
 	Run(cfg RunConfig, c provision.Contribution) (int, error)
-	Command(cfg RunConfig, c provision.Contribution) []string
+	Command(cfg RunConfig, c provision.Contribution) ([]string, error)
 	// TerminalCommand returns the command AND the environment to launch it under a
 	// terminal wrapper. Isolators that bake the environment into the command
 	// (bwrap/docker) return the host environment; the host (none) isolator, which
 	// bakes nothing, returns the agent command with its full resolved environment
 	// (provider tokens, custom env, and the provisioner's PATH/env).
-	TerminalCommand(cfg RunConfig, c provision.Contribution) (command []string, env []string)
+	TerminalCommand(cfg RunConfig, c provision.Contribution) (command []string, env []string, err error)
+	// PinnedProvision reports whether all tool inputs used by this isolator are
+	// immutable. Image-based isolators must account for the image as well as any
+	// separate provisioner contribution.
+	PinnedProvision(method provision.ProvisionMethod, provisionerPinned bool, image string) bool
 	// HidesHost reports whether, for this request, host tools are off PATH and not
 	// bind-reachable (so RequireHostToolsUnreachable can be honored). It depends on
 	// the passthrough knob and, for image-based isolators, whether a pinned image

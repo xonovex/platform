@@ -1,3 +1,11 @@
 $schema: https://moonrepo.dev/schemas/project.json
 language: typescript
 tags: [typescript-script]
+tasks:
+  coverage:
+    command: noop
+    deps: [ts-coverage]
+    options:
+      cache: false
+  ci-check:
+    deps: [coverage]

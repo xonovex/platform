@@ -1,6 +1,11 @@
 $schema: https://moonrepo.dev/schemas/project.json
 language: unknown
 tasks:
+  ci-check:
+    command: noop
+    deps: [graph-build]
+    options:
+      cache: false
   graph-build:
     command: noop
     deps:

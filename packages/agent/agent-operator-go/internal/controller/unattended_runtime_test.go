@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 	"time"
 
@@ -14,6 +15,7 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
+	"sigs.k8s.io/controller-runtime/pkg/client/interceptor"
 
 	agentv1alpha1 "github.com/xonovex/platform/packages/agent/agent-operator-go/api/v1alpha1"
 	runtel "github.com/xonovex/platform/packages/agent/agent-operator-go/internal/telemetry"
@@ -144,6 +146,53 @@ func TestAgentTriggerReceiver_AuthenticationControlsCreation(t *testing.T) {
 	}
 	if updated.Status.Journal == nil {
 		t.Fatal("triggered run journal is nil")
+	}
+}
+
+func TestAgentTriggerReceiver_StatusUpdateFailureIsReported(t *testing.T) {
+	trigger := &agentv1alpha1.AgentTrigger{
+		ObjectMeta: metav1.ObjectMeta{Name: "repository-event", Namespace: "test"},
+		Spec: agentv1alpha1.AgentTriggerSpec{
+			Endpoint:       "repository",
+			TokenSecretRef: agentv1alpha1.SecretKeyRef{Name: "trigger-token", Key: "token"},
+			Template:       agentv1alpha1.AgentRunTemplate{Spec: unattendedRunSpec()},
+		},
+	}
+	secret := &corev1.Secret{
+		ObjectMeta: metav1.ObjectMeta{Name: "trigger-token", Namespace: "test"},
+		Data:       map[string][]byte{"token": []byte("correct-token")},
+	}
+	scheme := testutil.NewScheme()
+	baseClient := fake.NewClientBuilder().
+		WithScheme(scheme).
+		WithStatusSubresource(&agentv1alpha1.AgentTrigger{}, &agentv1alpha1.AgentRun{}).
+		WithObjects(trigger, secret).
+		Build()
+	failingClient := interceptor.NewClient(baseClient, interceptor.Funcs{
+		SubResourceUpdate: func(context.Context, client.Client, string, client.Object, ...client.SubResourceUpdateOption) error {
+			return apierrors.NewServiceUnavailable("status API unavailable")
+		},
+	})
+	receiver := &AgentTriggerReceiver{Client: failingClient, Scheme: scheme}
+	request := httptest.NewRequest(http.MethodPost, "/v1/triggers/test/repository", nil)
+	request.Header.Set("Authorization", "Bearer correct-token")
+	request.Header.Set("Idempotency-Key", "event-status-failure")
+	response := httptest.NewRecorder()
+
+	receiver.ServeHTTP(response, request)
+
+	if response.Code != http.StatusInternalServerError || !strings.Contains(response.Body.String(), "trigger-status-update-failed") {
+		t.Fatalf("response = %d %s, want status-update failure", response.Code, response.Body.String())
+	}
+}
+
+func TestWriteTriggerResponse_EncodingFailureReturnsInternalError(t *testing.T) {
+	response := httptest.NewRecorder()
+
+	writeTriggerResponse(context.Background(), response, http.StatusCreated, make(chan int))
+
+	if response.Code != http.StatusInternalServerError {
+		t.Fatalf("status = %d, want %d", response.Code, http.StatusInternalServerError)
 	}
 }
 

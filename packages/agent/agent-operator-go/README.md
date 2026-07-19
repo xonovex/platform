@@ -55,8 +55,8 @@ spec:
 | `resources` | object | K8s resource requirements for the agent container |
 | `timeout` | duration | Max run duration (default: `1h`) |
 | `env` | list | Additional environment variables |
-| `image` | string | Container image override |
-| `runtimeClassName` | string | Pod runtime class for sandboxed execution (e.g. `gvisor`, `kata`) |
+| `image` | string | Digest-pinned agent image override; required unless resolved from a harness, toolchain, or policy |
+| `runtimeClassName` | string | Sandboxed pod runtime class; required unless resolved from a harness or policy |
 | `nodeSelector` | map | Node selector for pod scheduling |
 | `tolerations` | list | Tolerations for pod scheduling |
 
@@ -72,7 +72,7 @@ metadata:
 spec:
   type: claude
   defaultProvider: gemini-provider
-  defaultImage: "node:trixie-slim"
+  defaultImage: "ghcr.io/example/agents/claude@sha256:<digest>"
   defaultRuntimeClassName: gvisor
   defaultTimeout: 1h
   env:
@@ -86,7 +86,7 @@ spec:
 | --- | --- | --- |
 | `type` | string | Agent type (`claude`, `opencode`) |
 | `defaultProvider` | string | Default provider name |
-| `defaultImage` | string | Default container image |
+| `defaultImage` | string | Default digest-pinned agent image |
 | `defaultResources` | object | Default resource requirements |
 | `defaultTimeout` | duration | Default timeout for agent runs |
 | `defaultRuntimeClassName` | string | Default pod runtime class (e.g. `gvisor`, `kata`) |
@@ -247,10 +247,10 @@ spec:
 | Network restriction | Rejects `networkPolicy.disabled: true` when required | Verify generated NetworkPolicy behavior with the installed network plugin |
 | Duration bound | Requires an explicit/policy-defaulted timeout at or below `maxTimeout` | Observe Job timeout and terminal status |
 | Resource bound | Requires a limit for each `maxResources` entry; rejects requests/limits above it | Keep namespace LimitRange and ResourceQuota as an independent control |
-| Image restriction | Requires an explicit/policy-defaulted image matching `allowedImages` | Add digest/signature/provenance admission when prefix allowlisting is insufficient |
+| Image restriction | Requires a digest-pinned image resolved from the run, harness, toolchain, or policy, then applies `allowedImages` | Add signature/provenance admission when digest pinning is insufficient |
 | Toolchain pinning | AgentToolchain/inline Nix validation requires revision, source, and image digest | Verify registry digest and the built closure provenance |
 
-Policy defaults are applied before built-in timeout defaulting. Fields resolved later from an AgentHarness are not available to the AgentRun admission decision, so a mandatory image/resource/runtime constraint must be explicit on AgentRun or supplied by AgentPolicy defaults.
+Policy defaults are applied before harness and toolchain references are resolved at admission. The admitted AgentRun stores the exact digest-pinned image and sandboxed runtime class that policy approved; missing or mutable image inputs and missing runtime classes are rejected even when no AgentPolicy exists.
 
 Admission configuration and the webhook endpoint must be reachable for these controls to enforce. Verify installation with negative probes for a wrong runtime class, disabled network policy, excessive timeout/resource limit, disallowed or missing image, moving Nix image tag, policy API outage, and duplicate namespace policies. An accepted object is admission evidence only; it does not prove the runtime, network, registry, or quota layer behaved correctly.
 
@@ -709,7 +709,7 @@ metadata:
 spec:
   harness:
     type: claude
-    defaultImage: "node:22-slim"
+    defaultImage: "ghcr.io/example/agents/claude@sha256:<digest>"
     defaultTimeout: 30m
     defaultRuntimeClassName: gvisor
   providerRef: gemini-provider

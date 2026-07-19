@@ -1,5 +1,9 @@
 # CLI Credential Storage and Choice
 
+## Contents
+
+[Credential type and scope](#credential-type-and-scope) · [How the CLI sends it](#how-the-cli-sends-it) · [Verify before any real call](#verify-before-any-real-call) · [Local storage](#where-to-store-it-locally-keychain-first) · [CI/CD](#cicd) · [Cloud / production](#cloud--production) · [Hygiene](#hygiene-checklist)
+
 Connecting the CLI — install, `az login`, the `azure-devops` extension, org/project defaults — is in [first-time-setup.md](first-time-setup.md). This file covers the concrete credential mechanics for the Azure DevOps Services CLI path: how to scope, store, send, verify, and rotate a credential when driving `az repos` / `az boards` or raw REST. The _why_ is owned elsewhere: prefer short-lived, federated credentials for the reasons in [service-connections.md](service-connections.md), and keep every token out of URLs, logs, history, and previews for the reasons in [rest-and-service-hooks.md](rest-and-service-hooks.md). What follows is the operational how.
 
 ## Credential type and scope

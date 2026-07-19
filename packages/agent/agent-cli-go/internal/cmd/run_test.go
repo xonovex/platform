@@ -1,9 +1,11 @@
 package cmd
 
 import (
+	"errors"
 	"testing"
 
 	netshared "github.com/xonovex/platform/packages/cli/agent-cli-go/internal/network/shared"
+	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/policy"
 	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/validation"
 )
 
@@ -56,6 +58,29 @@ func TestResolveAxes_PinnedComboDefault(t *testing.T) {
 	}
 	if axes.IsolationName != "bwrap" || axes.ProvisionName != "nix" {
 		t.Errorf("pinned default = (%s, %s), want (bwrap, nix)", axes.IsolationName, axes.ProvisionName)
+	}
+}
+
+func TestResolveAxes_DockerPinnedPolicyRequiresDigest(t *testing.T) {
+	digest := "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+	base := flags{
+		isolation:        "docker",
+		provision:        "none",
+		requirePinned:    true,
+		isolationChanged: true,
+		provisionChanged: true,
+	}
+
+	pinned := base
+	pinned.image = "ghcr.io/xonovex/agent@sha256:" + digest
+	if _, err := resolveAxes(pinned); err != nil {
+		t.Fatalf("resolveAxes(digest image) error = %v", err)
+	}
+
+	mutable := base
+	mutable.image = "ghcr.io/xonovex/agent:latest"
+	if _, err := resolveAxes(mutable); !errors.Is(err, policy.ErrPinnedProvisionUnmet) {
+		t.Fatalf("resolveAxes(mutable image) error = %v, want %v", err, policy.ErrPinnedProvisionUnmet)
 	}
 }
 

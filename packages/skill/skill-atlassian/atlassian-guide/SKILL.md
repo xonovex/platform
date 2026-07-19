@@ -1,6 +1,6 @@
 ---
 name: atlassian-guide
-description: "Use when driving Atlassian Cloud from the command line with the official `acli` (Atlassian CLI) — installing it (Homebrew tap-trust), authenticating a Jira or Confluence Cloud site with an API token or web OAuth, checking or switching accounts, and running Jira work-item operations (search by JQL, view, create, transition, comment). `acli` stores the token in the OS keychain natively. Triggers on `acli`, the official Atlassian CLI, `acli jira` / `acli auth`, authenticating to a `*.atlassian.net` site, an API token from id.atlassian.com when web OAuth is admin-restricted, `brew install acli`, JQL from the terminal, or creating / transitioning a Jira work item — even when the user doesn't say 'acli' and only says 'Jira' or 'Atlassian'. Not for self-hosted Bitbucket Server (bitbucket-guide) or Azure DevOps (azure-devops-guide)."
+description: "Use when operating Atlassian Cloud from the command line with the official `acli`: install it, authenticate Jira or Confluence with web OAuth or an API token, switch accounts, and search, view, create, transition, or comment on Jira work items. Triggers on `acli`, `acli jira`, `acli auth`, `*.atlassian.net`, JQL in a terminal, API-token authentication, or Jira work-item operations, even when the user doesn't say 'acli' and only says 'Jira' or 'Atlassian'."
 ---
 
 # Atlassian CLI (acli) Guidelines

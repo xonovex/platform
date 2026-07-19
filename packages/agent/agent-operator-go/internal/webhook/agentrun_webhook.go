@@ -2,7 +2,6 @@ package webhook
 
 import (
 	"context"
-	"encoding/hex"
 	"fmt"
 	"strings"
 	"time"
@@ -16,6 +15,7 @@ import (
 
 	agentv1alpha1 "github.com/xonovex/platform/packages/agent/agent-operator-go/api/v1alpha1"
 	"github.com/xonovex/platform/packages/agent/agent-operator-go/internal/plugins"
+	"github.com/xonovex/platform/packages/agent/agent-operator-go/internal/resolver"
 	"github.com/xonovex/platform/packages/agent/agent-operator-go/internal/validator"
 )
 
@@ -45,6 +45,9 @@ func (w *AgentRunWebhook) Default(ctx context.Context, run *agentv1alpha1.AgentR
 	}
 	if policy != nil {
 		applyPolicyDefaults(run, policy)
+	}
+	if err := w.applyReferencedDefaults(ctx, run); err != nil {
+		return err
 	}
 
 	if run.Spec.Timeout == nil {
@@ -144,14 +147,24 @@ func (w *AgentRunWebhook) validate(ctx context.Context, run *agentv1alpha1.Agent
 	if err != nil {
 		return nil, err
 	}
-	if err := validateAutonomyOversight(run, policy); err != nil {
+	effectiveRun := run.DeepCopy()
+	if policy != nil {
+		applyPolicyDefaults(effectiveRun, policy)
+	}
+	if err := w.applyReferencedDefaults(ctx, effectiveRun); err != nil {
+		return nil, err
+	}
+	if err := validateExecutionBoundary(effectiveRun); err != nil {
+		return nil, err
+	}
+	if err := validateAutonomyOversight(effectiveRun, policy); err != nil {
 		return nil, err
 	}
 	if policy != nil {
-		if err := enforcePolicy(run, policy); err != nil {
+		if err := enforcePolicy(effectiveRun, policy); err != nil {
 			return nil, err
 		}
-		governanceWarnings, err := w.enforceGovernance(ctx, run, policy)
+		governanceWarnings, err := w.enforceGovernance(ctx, effectiveRun, policy)
 		if err != nil {
 			return nil, err
 		}
@@ -159,6 +172,55 @@ func (w *AgentRunWebhook) validate(ctx context.Context, run *agentv1alpha1.Agent
 	}
 
 	return warnings, nil
+}
+
+// applyReferencedDefaults resolves harness and toolchain references during
+// admission so the stored AgentRun contains the exact image and runtime class
+// that policy validation approved. Toolchain images take precedence because the
+// controller executes that image.
+func (w *AgentRunWebhook) applyReferencedDefaults(ctx context.Context, run *agentv1alpha1.AgentRun) error {
+	if (run.Spec.HarnessRef != "" || run.Spec.ToolchainRef != "") && w.Client == nil {
+		return fmt.Errorf("referenced harness or toolchain requires a Kubernetes client during admission")
+	}
+
+	harness, err := resolver.ResolveHarness(ctx, w.Client, run.Namespace, run.Spec.HarnessRef, run.Spec.Harness)
+	if err != nil {
+		return fmt.Errorf("resolve harness defaults: %w", err)
+	}
+	if harness != nil {
+		if run.Spec.Image == "" {
+			run.Spec.Image = harness.Spec.DefaultImage
+		}
+		if run.Spec.RuntimeClassName == nil && harness.Spec.DefaultRuntimeClassName != nil {
+			runtimeClassName := *harness.Spec.DefaultRuntimeClassName
+			run.Spec.RuntimeClassName = &runtimeClassName
+		}
+	}
+
+	toolchain, err := resolver.ResolveToolchain(ctx, w.Client, run.Namespace, run.Spec.ToolchainRef, run.Spec.Toolchain)
+	if err != nil {
+		return fmt.Errorf("resolve toolchain defaults: %w", err)
+	}
+	if toolchain != nil && toolchain.Nix != nil {
+		if err := validateNixSpec(toolchain.Nix); err != nil {
+			return err
+		}
+		run.Spec.Image = toolchain.Nix.Image
+	}
+	return nil
+}
+
+func validateExecutionBoundary(run *agentv1alpha1.AgentRun) error {
+	if run.Spec.Image == "" {
+		return fmt.Errorf("agent execution requires an explicit agent-capable image or harness/toolchain image default")
+	}
+	if err := validator.ValidatePinnedImageReference(run.Spec.Image); err != nil {
+		return fmt.Errorf("agent execution image: %w", err)
+	}
+	if run.Spec.RuntimeClassName == nil || strings.TrimSpace(*run.Spec.RuntimeClassName) == "" {
+		return fmt.Errorf("agent execution requires an explicit sandboxed runtimeClassName or harness/policy default")
+	}
+	return nil
 }
 
 func validateAutonomyOversight(run *agentv1alpha1.AgentRun, policy *agentv1alpha1.AgentPolicy) error {
@@ -271,11 +333,7 @@ func validateNixSpec(nix *agentv1alpha1.NixSpec) error {
 	if nix.Image == "" {
 		return fmt.Errorf("nix toolchain requires a pre-built pinned image (build-time provisioning)")
 	}
-	imageParts := strings.SplitN(nix.Image, "@sha256:", 2)
-	if len(imageParts) != 2 || imageParts[0] == "" || len(imageParts[1]) != 64 {
-		return fmt.Errorf("nix toolchain image must use an immutable @sha256: digest")
-	}
-	if _, err := hex.DecodeString(imageParts[1]); err != nil {
+	if err := validator.ValidatePinnedImageReference(nix.Image); err != nil {
 		return fmt.Errorf("nix toolchain image must use an immutable @sha256: digest")
 	}
 	return nil

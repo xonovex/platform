@@ -1,5 +1,9 @@
 # humanize: Remove AI Writing Patterns
 
+## Contents
+
+[Workflow](#workflow) · [Pattern catalog](#pattern-catalog) · [Adding voice](#adding-voice) · [Safety rails](#safety-rails) · [Required checks](#required-checks-before-output) · [Output format](#output-format) · [Examples](#examples)
+
 Rewrite AI-generated or stiff prose so it reads as a human wrote it. Goal: prose that fits its medium and reader, not prose that beats detectors.
 
 ## Workflow

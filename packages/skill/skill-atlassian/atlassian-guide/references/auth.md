@@ -1,5 +1,9 @@
 # auth: Authenticate acli to Atlassian Cloud
 
+## Contents
+
+[Auth surfaces](#two-auth-surfaces) · [Credential type and scope](#credential-type-and-scope) · [How this skill sends it](#how-this-skill-sends-it) · [Native keychain](#where-acli-keeps-the-token-os-keychain--native) · [Switch accounts](#switch-accounts) · [CI/CD](#cicd) · [Cloud / production](#cloud--production) · [Hygiene](#hygiene)
+
 Installing and connecting `acli` (tap, `brew trust`, first login, verify) is in [first-time-setup.md](first-time-setup.md). This file covers the **credential**: the two auth surfaces, the API-token path when web OAuth is admin-restricted, where `acli` keeps the secret, switching accounts, CI/CD, and hygiene.
 
 ## Two auth surfaces

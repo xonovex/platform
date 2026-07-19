@@ -167,6 +167,7 @@ type NixSpec struct {
 	Shell string `json:"shell,omitempty"`
 	// Image is the pre-built, digest-pinned nix agent image the pod runs. Required
 	// for the nix toolchain — it satisfies RequirePinnedProvision.
+	// +kubebuilder:validation:Pattern=`^.+@sha256:[0-9a-fA-F]{64}$`
 	Image string `json:"image,omitempty"`
 }
 
@@ -212,7 +213,8 @@ type AgentSpec struct {
 	Type AgentType `json:"type"`
 	// DefaultProvider is the default provider name
 	DefaultProvider string `json:"defaultProvider,omitempty"`
-	// DefaultImage is the default container image
+	// DefaultImage is the digest-pinned container image used when AgentRun.Spec.Image is empty.
+	// +kubebuilder:validation:Pattern=`^.+@sha256:[0-9a-fA-F]{64}$`
 	DefaultImage string `json:"defaultImage,omitempty"`
 	// DefaultResources are the default resource requirements
 	DefaultResources corev1.ResourceRequirements `json:"defaultResources,omitempty"`
@@ -324,7 +326,9 @@ type AgentRunSpec struct {
 	Timeout *metav1.Duration `json:"timeout,omitempty"`
 	// Env are additional environment variables
 	Env []corev1.EnvVar `json:"env,omitempty"`
-	// Image is the container image for the agent
+	// Image is the digest-pinned container image for the agent. It must be set
+	// directly or resolved from a harness, toolchain, or policy default.
+	// +kubebuilder:validation:Pattern=`^.+@sha256:[0-9a-fA-F]{64}$`
 	Image string `json:"image,omitempty"`
 	// NodeSelector for pod scheduling
 	NodeSelector map[string]string `json:"nodeSelector,omitempty"`

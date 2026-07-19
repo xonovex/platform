@@ -51,7 +51,8 @@ type AgentPolicyEnforced struct {
 
 // AgentPolicyDefaults defines overridable defaults applied when AgentRun fields are absent.
 type AgentPolicyDefaults struct {
-	// Image is the default container image when AgentRun.Spec.Image is not set.
+	// Image is the digest-pinned container image used when AgentRun.Spec.Image is not set.
+	// +kubebuilder:validation:Pattern=`^.+@sha256:[0-9a-fA-F]{64}$`
 	Image string `json:"image,omitempty"`
 
 	// Timeout is the default timeout when AgentRun.Spec.Timeout is not set.

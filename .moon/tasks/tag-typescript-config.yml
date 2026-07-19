@@ -17,7 +17,7 @@ tasks:
       cache: false
       mergeDeps: replace
   ts-clean:
-    script: rm -rf dist
+    script: rm -rf dist coverage *.tsbuildinfo
     options:
       cache: false
 inheritedBy:

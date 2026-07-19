@@ -3,6 +3,7 @@ package webhook
 import (
 	"context"
 	"errors"
+	"strings"
 	"testing"
 	"time"
 
@@ -21,6 +22,7 @@ func boolPtr(b bool) *bool    { return &b }
 func strPtr(s string) *string { return &s }
 
 func baseRun() *agentv1alpha1.AgentRun {
+	digest := "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 	return &agentv1alpha1.AgentRun{
 		ObjectMeta: metav1.ObjectMeta{Namespace: "test-ns"},
 		Spec: agentv1alpha1.AgentRunSpec{
@@ -30,7 +32,7 @@ func baseRun() *agentv1alpha1.AgentRun {
 				},
 			},
 			RuntimeClassName: strPtr("kata"),
-			Image:            "ghcr.io/xonovex/agent:latest",
+			Image:            "ghcr.io/xonovex/agent@sha256:" + digest,
 			Timeout:          &metav1.Duration{Duration: 30 * time.Minute},
 		},
 	}
@@ -253,10 +255,7 @@ func TestEnforcePolicy_RejectsRuntimeClassNotInAllowedList(t *testing.T) {
 	}
 }
 
-func TestEnforcePolicy_NoPolicy_AllowsAll(t *testing.T) {
-	// When no policy exists, enforcePolicy is never called.
-	// This test verifies the webhook's validate() path via direct call
-	// with a nil Client (no policy lookup).
+func TestAgentRunWebhook_NoPolicyStillRequiresExecutionBoundary(t *testing.T) {
 	w := &AgentRunWebhook{Client: nil}
 	run := &agentv1alpha1.AgentRun{
 		Spec: agentv1alpha1.AgentRunSpec{
@@ -269,8 +268,8 @@ func TestEnforcePolicy_NoPolicy_AllowsAll(t *testing.T) {
 	}
 
 	_, err := w.validate(context.Background(), run)
-	if err != nil {
-		t.Errorf("validate() error = %v, want nil (no policy should allow all)", err)
+	if err == nil || !strings.Contains(err.Error(), "agent-capable image") {
+		t.Errorf("validate() error = %v, want fail-closed image requirement", err)
 	}
 }
 

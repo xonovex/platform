@@ -42,6 +42,12 @@ func (i *Isolator) Available() (bool, error) {
 // deny-default mode; HostPassthrough forfeits the guarantee.
 func (i *Isolator) HidesHost(passthrough bool, _ string) bool { return !passthrough }
 
+// PinnedProvision mirrors the selected provisioner's immutability because
+// bubblewrap supplies no image-based tools of its own.
+func (i *Isolator) PinnedProvision(_ provision.ProvisionMethod, provisionerPinned bool, _ string) bool {
+	return provisionerPinned
+}
+
 // KernelIsolated reports false: bwrap is attack-surface reduction, not a kernel
 // trust boundary.
 func (i *Isolator) KernelIsolated(_ string) bool { return false }
@@ -50,26 +56,45 @@ func (i *Isolator) KernelIsolated(_ string) bool { return false }
 // built entirely from --setenv (the parent env is cleared by --clearenv), so the
 // parent process only needs its own environment to launch bwrap.
 func (i *Isolator) Run(cfg isoshared.RunConfig, c provision.Contribution) (int, error) {
-	args := i.buildArgs(cfg, c)
+	args, err := i.buildArgs(cfg, c)
+	if err != nil {
+		return 1, err
+	}
 	return isoshared.SpawnSandbox("bwrap", args, os.Environ(), "Bubblewrap sandbox", cfg.Verbose)
 }
 
 // Command returns the full bwrap command (for display / terminal wrappers).
-func (i *Isolator) Command(cfg isoshared.RunConfig, c provision.Contribution) []string {
-	return append([]string{"bwrap"}, i.buildArgs(cfg, c)...)
+func (i *Isolator) Command(cfg isoshared.RunConfig, c provision.Contribution) ([]string, error) {
+	args, err := i.buildArgs(cfg, c)
+	if err != nil {
+		return nil, err
+	}
+	return append([]string{"bwrap"}, args...), nil
 }
 
 // TerminalCommand returns the bwrap command plus the host env to launch it; the
 // sandbox environment is baked into the command via --setenv, so the wrapper
 // needs only the host env.
-func (i *Isolator) TerminalCommand(cfg isoshared.RunConfig, c provision.Contribution) ([]string, []string) {
-	return i.Command(cfg, c), os.Environ()
+func (i *Isolator) TerminalCommand(cfg isoshared.RunConfig, c provision.Contribution) ([]string, []string, error) {
+	command, err := i.Command(cfg, c)
+	return command, os.Environ(), err
 }
 
-func (i *Isolator) buildArgs(cfg isoshared.RunConfig, c provision.Contribution) []string {
-	homeDir, _ := os.UserHomeDir()
-	if cfg.HomeDir != "" {
-		homeDir = cfg.HomeDir
+func (i *Isolator) buildArgs(cfg isoshared.RunConfig, c provision.Contribution) ([]string, error) {
+	homeDir, err := isoshared.ResolveHomeDir(cfg.HomeDir)
+	if err != nil {
+		return nil, err
+	}
+	workDir, err := isoshared.ResolveDirectory(cfg.WorkDir, "work directory")
+	if err != nil {
+		return nil, err
+	}
+	repoDir := ""
+	if cfg.RepoDir != "" {
+		repoDir, err = isoshared.ResolveDirectory(cfg.RepoDir, "repository directory")
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	args := []string{
@@ -96,15 +121,19 @@ func (i *Isolator) buildArgs(cfg isoshared.RunConfig, c provision.Contribution) 
 	args = append(args, "--tmpfs", homeDir)
 	for _, configPath := range isolation.UserConfigPaths {
 		src := filepath.Join(homeDir, configPath)
-		if _, err := os.Stat(src); err == nil {
+		exists, err := isoshared.OptionalPath(src, "user config path")
+		if err != nil {
+			return nil, err
+		}
+		if exists {
 			args = append(args, "--ro-bind", src, src)
 		}
 	}
 
 	// Workspace (rw) + source repo (ro for worktrees).
-	args = append(args, "--bind", cfg.WorkDir, cfg.WorkDir)
-	if cfg.RepoDir != "" && cfg.RepoDir != cfg.WorkDir {
-		args = append(args, "--ro-bind", cfg.RepoDir, cfg.RepoDir)
+	args = append(args, "--bind", workDir, workDir)
+	if repoDir != "" && repoDir != workDir {
+		args = append(args, "--ro-bind", repoDir, repoDir)
 	}
 
 	// HostPassthrough: restore host tool reachability (leaky mode).
@@ -118,31 +147,37 @@ func (i *Isolator) buildArgs(cfg isoshared.RunConfig, c provision.Contribution) 
 
 	// Contribution: read-only binds of the provisioned closure's requisites.
 	for _, p := range c.RoBindPaths {
-		if _, err := os.Stat(p); err == nil {
-			args = append(args, "--ro-bind", p, p)
+		resolved, err := isoshared.ResolveExistingPath(p, "provisioned read-only bind")
+		if err != nil {
+			return nil, err
 		}
+		args = append(args, "--ro-bind", resolved, resolved)
 	}
 
 	// Caller-supplied extra binds.
 	for _, path := range cfg.BindPaths {
-		if abs, err := filepath.Abs(path); err == nil {
-			if _, err := os.Stat(abs); err == nil {
-				args = append(args, "--bind", abs, abs)
-			}
+		resolved, err := isoshared.ResolveExistingPath(path, "read-write bind")
+		if err != nil {
+			return nil, err
 		}
+		args = append(args, "--bind", resolved, resolved)
 	}
 	for _, path := range cfg.RoBindPaths {
-		if abs, err := filepath.Abs(path); err == nil {
-			if _, err := os.Stat(abs); err == nil {
-				args = append(args, "--ro-bind", abs, abs)
-			}
+		resolved, err := isoshared.ResolveExistingPath(path, "read-only bind")
+		if err != nil {
+			return nil, err
 		}
+		args = append(args, "--ro-bind", resolved, resolved)
 	}
 
-	args = append(args, "--chdir", cfg.WorkDir)
+	args = append(args, "--chdir", workDir)
 
 	// Explicit setenv allowlist (since --clearenv wiped everything).
-	for k, v := range i.sandboxEnv(cfg, c, homeDir) {
+	sandboxEnv, err := i.sandboxEnv(cfg, c, homeDir)
+	if err != nil {
+		return nil, err
+	}
+	for k, v := range sandboxEnv {
 		args = append(args, "--setenv", k, v)
 	}
 
@@ -151,14 +186,14 @@ func (i *Isolator) buildArgs(cfg isoshared.RunConfig, c provision.Contribution) 
 	agentCmd := agentcmd.BuildAgentCommand(cfg.Agent, cfg.Provider, cfg.AgentArgs, "")
 	args = append(args, isoshared.WrapWithInitCommands(agentCmd, c.InitCommands)...)
 
-	return args
+	return args, nil
 }
 
 // sandboxEnv builds the explicit environment allowlist for inside the sandbox:
 // HOME/PATH/TMPDIR/SHELL, the contribution's env, the provider tokens, the
 // caller's custom env, and the proxy egress env. API keys reach the sandbox ONLY
 // through this allowlist.
-func (i *Isolator) sandboxEnv(cfg isoshared.RunConfig, c provision.Contribution, homeDir string) map[string]string {
+func (i *Isolator) sandboxEnv(cfg isoshared.RunConfig, c provision.Contribution, homeDir string) (map[string]string, error) {
 	env := map[string]string{
 		"HOME":   homeDir,
 		"TMPDIR": "/tmp",
@@ -177,10 +212,12 @@ func (i *Isolator) sandboxEnv(cfg isoshared.RunConfig, c provision.Contribution,
 	env["PATH"] = strings.Join(pathEntries, ":")
 
 	// Provider tokens + contribution env + custom env + proxy env.
-	if providerEnv, err := agentcmd.BuildProviderEnv(cfg.Agent, cfg.Provider); err == nil {
-		for k, v := range providerEnv {
-			env[k] = v
-		}
+	providerEnv, err := agentcmd.BuildProviderEnv(cfg.Agent, cfg.Provider)
+	if err != nil {
+		return nil, err
+	}
+	for k, v := range providerEnv {
+		env[k] = v
 	}
 	for k, v := range c.Env {
 		env[k] = v
@@ -192,5 +229,5 @@ func (i *Isolator) sandboxEnv(cfg isoshared.RunConfig, c provision.Contribution,
 		env[k] = v
 	}
 
-	return env
+	return env, nil
 }

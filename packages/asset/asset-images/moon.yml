@@ -1,2 +1,14 @@
 $schema: https://moonrepo.dev/schemas/project.json
 language: unknown
+tasks:
+  asset-check:
+    script: test "$(file --brief --mime-type multiple-agents.png)" = "image/png"
+    inputs:
+      - "*.png"
+    options:
+      cache: true
+  ci-check:
+    command: noop
+    deps: [asset-check]
+    options:
+      cache: false

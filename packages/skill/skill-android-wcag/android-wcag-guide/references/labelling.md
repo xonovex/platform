@@ -1,5 +1,9 @@
 # labelling: Screen-reader labelling & non-text content
 
+## Contents
+
+[Guideline](#guideline) · [How to apply](#how-to-apply) · [Example](#example) · [Hide idiom](#counter-example-deliberate-hide-idiom) · [Text-to-speech codes](#counter-example-spell-codes-out-for-text-to-speech) · [When null is wrong](#counter-example-when-null-is-wrong) · [Testable spoken labels](#carry-the-spoken-label-as-data-build-it-where-it-is-testable) · [Counter-examples](#counter-examples-to-avoid)
+
 ## Guideline
 
 Every meaningful graphic carries a localized text alternative, every decorative graphic is silenced, and every composite control exposes exactly one focusable node with one label and one role to TalkBack. Missing or wrong alternatives violate 1.1.1 Non-text Content; a control with no name/role or an inconsistent one violates 4.1.2 Name, Role, Value. Over-exposed children turn one tile into a dozen swipe stops and read raw concatenated junk; under-exposed controls are invisible to the assistive layer entirely.

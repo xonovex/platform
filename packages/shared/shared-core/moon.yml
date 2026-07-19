@@ -1,5 +1,12 @@
 $schema: https://moonrepo.dev/schemas/project.json
 tasks:
+  coverage:
+    command: noop
+    deps: [ts-coverage]
+    options:
+      cache: false
+  ci-check:
+    deps: [coverage]
   ts-build:
     deps:
       - ^:build

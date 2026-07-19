@@ -6,8 +6,8 @@ DOCKERFILE="packages/agent/agent-operator-go/Dockerfile"
 BUILDER="xonovex-builder"
 
 # The named builder stays isolated because each operation selects it explicitly.
-docker buildx inspect "$BUILDER" > /dev/null 2>&1 \
-  || docker buildx create --name "$BUILDER"
+docker buildx inspect "$BUILDER" >/dev/null 2>&1 ||
+  docker buildx create --name "$BUILDER"
 
 # Read-only registry layer cache, shared with docker-publish.sh. A miss or missing
 # GHCR access is non-fatal; buildx falls back to a full build.
@@ -25,4 +25,4 @@ docker buildx build \
 
 # Cap the persistent BuildKit cache: the docker-container builder keeps its own
 # cache volume that is never auto-pruned and balloons unbounded otherwise.
-docker buildx prune --builder "$BUILDER" --keep-storage "${BUILDX_CACHE_KEEP:-20GB}" --force > /dev/null 2>&1 || true
+docker buildx prune --builder "$BUILDER" --keep-storage "${BUILDX_CACHE_KEEP:-20GB}" --force >/dev/null 2>&1 || true

@@ -1,6 +1,7 @@
 package docker
 
 import (
+	"os"
 	"strings"
 	"testing"
 
@@ -13,10 +14,18 @@ import (
 func dockerCfg(net netshared.Mode, workDir string) isoshared.RunConfig {
 	return isoshared.RunConfig{
 		Agent:   &types.AgentConfig{Type: types.AgentClaude, Binary: "claude"},
-		HomeDir: "/home/testuser",
 		WorkDir: workDir,
 		Network: net,
 	}
+}
+
+func dockerCommand(t *testing.T, cfg isoshared.RunConfig, c provision.Contribution) []string {
+	t.Helper()
+	command, err := NewIsolator().Command(cfg, c)
+	if err != nil {
+		t.Fatalf("Command() error = %v", err)
+	}
+	return command
 }
 
 func argHas(args []string, s string) bool {
@@ -48,7 +57,7 @@ func envValue(args []string, key string) (string, bool) {
 
 func TestDocker_SecurityDefaults(t *testing.T) {
 	work := t.TempDir()
-	args := NewIsolator().Command(dockerCfg(netshared.ModeNone, work), provision.Contribution{})
+	args := dockerCommand(t, dockerCfg(netshared.ModeNone, work), provision.Contribution{})
 
 	if !argHas(args, "--read-only") {
 		t.Error("missing --read-only rootfs")
@@ -81,20 +90,24 @@ func TestDocker_SecurityDefaults(t *testing.T) {
 		}
 	}
 	// No whole host-$HOME mount.
-	if argHasPair(args, "-v", "/home/testuser:/home/testuser") {
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		t.Fatalf("UserHomeDir() error = %v", err)
+	}
+	if argHasPair(args, "-v", homeDir+":"+homeDir) {
 		t.Error("must not mount the whole host $HOME")
 	}
 }
 
 func TestDocker_NetworkExplicit(t *testing.T) {
 	work := t.TempDir()
-	if args := NewIsolator().Command(dockerCfg(netshared.ModeNone, work), provision.Contribution{}); !argHasPair(args, "--network", "none") {
+	if args := dockerCommand(t, dockerCfg(netshared.ModeNone, work), provision.Contribution{}); !argHasPair(args, "--network", "none") {
 		t.Error("network none must emit --network none")
 	}
-	if args := NewIsolator().Command(dockerCfg(netshared.ModeHost, work), provision.Contribution{}); !argHasPair(args, "--network", "host") {
+	if args := dockerCommand(t, dockerCfg(netshared.ModeHost, work), provision.Contribution{}); !argHasPair(args, "--network", "host") {
 		t.Error("network host must emit --network host")
 	}
-	if args := NewIsolator().Command(dockerCfg(netshared.ModeProxy, work), provision.Contribution{}); !argHasPair(args, "--network", "bridge") {
+	if args := dockerCommand(t, dockerCfg(netshared.ModeProxy, work), provision.Contribution{}); !argHasPair(args, "--network", "bridge") {
 		t.Error("network proxy must keep a reachable bridge")
 	}
 }
@@ -103,11 +116,11 @@ func TestDocker_RuntimeWired(t *testing.T) {
 	work := t.TempDir()
 	cfg := dockerCfg(netshared.ModeNone, work)
 	cfg.Runtime = "runsc"
-	if args := NewIsolator().Command(cfg, provision.Contribution{}); !argHasPair(args, "--runtime", "runsc") {
+	if args := dockerCommand(t, cfg, provision.Contribution{}); !argHasPair(args, "--runtime", "runsc") {
 		t.Error("RunConfig.Runtime must emit --runtime <runtime>")
 	}
 	// Default runc emits no --runtime flag.
-	if args := NewIsolator().Command(dockerCfg(netshared.ModeNone, work), provision.Contribution{}); argHas(args, "--runtime") {
+	if args := dockerCommand(t, dockerCfg(netshared.ModeNone, work), provision.Contribution{}); argHas(args, "--runtime") {
 		t.Error("empty Runtime must not emit --runtime")
 	}
 }
@@ -120,7 +133,7 @@ func TestDocker_AppliesContribution(t *testing.T) {
 		PathEntries: []string{"/nix/store/abc/bin"},
 		Env:         map[string]string{"FOO": "bar"},
 	}
-	args := NewIsolator().Command(dockerCfg(netshared.ModeNone, work), c)
+	args := dockerCommand(t, dockerCfg(netshared.ModeNone, work), c)
 
 	if !argHasPair(args, "-v", closure+":"+closure+":ro") {
 		t.Error("contribution RoBindPaths must be mounted read-only")
@@ -141,13 +154,32 @@ func TestDocker_Capabilities(t *testing.T) {
 	if i.HidesHost(false, "") {
 		t.Error("image-less docker resolves host-equivalent tools (does not hide host)")
 	}
-	if !i.HidesHost(false, "alpine:3.20") {
-		t.Error("docker with a pinned image hides the host")
+	digest := "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+	if i.HidesHost(false, "alpine:3.20") {
+		t.Error("docker with a mutable tag must not claim to hide host-equivalent image tools")
+	}
+	if !i.HidesHost(false, "alpine@sha256:"+digest) {
+		t.Error("docker with a digest-pinned image hides host-equivalent tools")
 	}
 	if !i.KernelIsolated("runsc") || !i.KernelIsolated("gvisor") {
 		t.Error("docker + runsc/gvisor is a kernel boundary")
 	}
 	if i.KernelIsolated("") {
 		t.Error("docker default runc is not a kernel boundary")
+	}
+}
+
+func TestDocker_CommandRejectsMissingBindAndProviderToken(t *testing.T) {
+	work := t.TempDir()
+	cfg := dockerCfg(netshared.ModeNone, work)
+	cfg.BindPaths = []string{work + "/missing"}
+	if _, err := NewIsolator().Command(cfg, provision.Contribution{}); err == nil {
+		t.Error("Command() error = nil, want missing bind error")
+	}
+
+	cfg.BindPaths = nil
+	cfg.Provider = &types.ModelProvider{AuthTokenEnv: "MISSING_DOCKER_TEST_TOKEN"}
+	if _, err := NewIsolator().Command(cfg, provision.Contribution{}); err == nil {
+		t.Error("Command() error = nil, want missing provider token error")
 	}
 }

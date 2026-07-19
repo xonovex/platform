@@ -20,6 +20,7 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/log"
 
 	agentv1alpha1 "github.com/xonovex/platform/packages/agent/agent-operator-go/api/v1alpha1"
 )
@@ -79,12 +80,12 @@ type AgentTriggerReceiver struct {
 
 func (r *AgentTriggerReceiver) ServeHTTP(response http.ResponseWriter, request *http.Request) {
 	if request.Method != http.MethodPost {
-		writeTriggerResponse(response, http.StatusMethodNotAllowed, map[string]string{"failureCode": "trigger-method-not-allowed"})
+		writeTriggerResponse(request.Context(), response, http.StatusMethodNotAllowed, map[string]string{"failureCode": "trigger-method-not-allowed"})
 		return
 	}
 	namespace, endpoint, matched := parseTriggerPath(request.URL.Path)
 	if !matched {
-		writeTriggerResponse(response, http.StatusNotFound, map[string]string{"failureCode": "trigger-not-found"})
+		writeTriggerResponse(request.Context(), response, http.StatusNotFound, map[string]string{"failureCode": "trigger-not-found"})
 		return
 	}
 
@@ -94,17 +95,17 @@ func (r *AgentTriggerReceiver) ServeHTTP(response http.ResponseWriter, request *
 		if apierrors.IsNotFound(err) {
 			status = http.StatusNotFound
 		}
-		writeTriggerResponse(response, status, map[string]string{"failureCode": "trigger-not-found"})
+		writeTriggerResponse(request.Context(), response, status, map[string]string{"failureCode": "trigger-not-found"})
 		return
 	}
 	token, err := readTriggerToken(request.Context(), r.Client, trigger)
 	if err != nil {
-		writeTriggerResponse(response, http.StatusServiceUnavailable, map[string]string{"failureCode": "trigger-token-unavailable"})
+		writeTriggerResponse(request.Context(), response, http.StatusServiceUnavailable, map[string]string{"failureCode": "trigger-token-unavailable"})
 		return
 	}
 	provided := strings.TrimPrefix(request.Header.Get("Authorization"), "Bearer ")
 	if provided == "" || subtle.ConstantTimeCompare([]byte(provided), token) != 1 {
-		writeTriggerResponse(response, http.StatusUnauthorized, map[string]string{"failureCode": "trigger-unauthorized"})
+		writeTriggerResponse(request.Context(), response, http.StatusUnauthorized, map[string]string{"failureCode": "trigger-unauthorized"})
 		return
 	}
 
@@ -118,19 +119,22 @@ func (r *AgentTriggerReceiver) ServeHTTP(response http.ResponseWriter, request *
 	}
 	run := buildTriggeredRun(trigger.Spec.Template, trigger.Namespace, trigger.Name, "AgentTrigger", idempotencyKey)
 	if err := ctrl.SetControllerReference(trigger, run, r.Scheme); err != nil {
-		writeTriggerResponse(response, http.StatusInternalServerError, map[string]string{"failureCode": "trigger-owner-reference-failed"})
+		writeTriggerResponse(request.Context(), response, http.StatusInternalServerError, map[string]string{"failureCode": "trigger-owner-reference-failed"})
 		return
 	}
 	if err := r.Client.Create(request.Context(), run); err != nil && !apierrors.IsAlreadyExists(err) {
-		writeTriggerResponse(response, http.StatusInternalServerError, map[string]string{"failureCode": "trigger-run-create-failed"})
+		writeTriggerResponse(request.Context(), response, http.StatusInternalServerError, map[string]string{"failureCode": "trigger-run-create-failed"})
 		return
 	}
 
 	trigger.Status.LastRunName = run.Name
 	triggeredAt := metav1.NewTime(now)
 	trigger.Status.LastTriggeredTime = &triggeredAt
-	_ = r.Client.Status().Update(request.Context(), trigger)
-	writeTriggerResponse(response, http.StatusCreated, map[string]string{"run": run.Namespace + "/" + run.Name})
+	if err := r.Client.Status().Update(request.Context(), trigger); err != nil {
+		writeTriggerResponse(request.Context(), response, http.StatusInternalServerError, map[string]string{"failureCode": "trigger-status-update-failed"})
+		return
+	}
+	writeTriggerResponse(request.Context(), response, http.StatusCreated, map[string]string{"run": run.Namespace + "/" + run.Name})
 }
 
 func (r *AgentTriggerReceiver) Start(ctx context.Context) error {
@@ -142,14 +146,20 @@ func (r *AgentTriggerReceiver) Start(ctx context.Context) error {
 		WriteTimeout:      10 * time.Second,
 		IdleTimeout:       30 * time.Second,
 	}
+	shutdownErr := make(chan error, 1)
 	go func() {
 		<-ctx.Done()
 		shutdownContext, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
-		_ = server.Shutdown(shutdownContext)
+		shutdownErr <- server.Shutdown(shutdownContext)
 	}()
 	if err := server.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 		return err
+	}
+	if ctx.Err() != nil {
+		if err := <-shutdownErr; err != nil {
+			return fmt.Errorf("shut down trigger receiver: %w", err)
+		}
 	}
 	return nil
 }
@@ -223,8 +233,16 @@ func buildTriggeredRun(template agentv1alpha1.AgentRunTemplate, namespace, sourc
 	}
 }
 
-func writeTriggerResponse(response http.ResponseWriter, status int, payload any) {
+func writeTriggerResponse(ctx context.Context, response http.ResponseWriter, status int, payload any) {
+	encoded, err := json.Marshal(payload)
+	if err != nil {
+		log.FromContext(ctx).Error(err, "encode trigger response")
+		http.Error(response, "failed to encode response", http.StatusInternalServerError)
+		return
+	}
 	response.Header().Set("Content-Type", "application/json")
 	response.WriteHeader(status)
-	_ = json.NewEncoder(response).Encode(payload)
+	if _, err := response.Write(append(encoded, '\n')); err != nil {
+		log.FromContext(ctx).Error(err, "write trigger response")
+	}
 }

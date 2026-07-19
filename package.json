@@ -63,7 +63,6 @@
     "fmt:check": "moon run :format-check",
     "typecheck": "moon run :typecheck",
     "coverage": "moon run :coverage",
-    "dev": "moon run :dev",
     "clean": "moon run :clean",
     "check:all": "moon run :lint :typecheck",
     "check:fast": "moon run :lint-fix :typecheck --concurrency=4",

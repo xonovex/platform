@@ -1,5 +1,9 @@
 # state-and-announcements: State, live regions, announcements & custom actions
 
+## Contents
+
+[Toggle state](#toggle--selection-state) · [Live regions](#live-regions-413-status-messages) · [In-flight state](#announce-a-transient-in-flight-state-on-the-control) · [Transient announcements](#imperative-announcements-for-transient-events) · [Custom actions](#custom-actions-and-the-primary-verb) · [Disabled controls](#disabled-controls) · [Join helper](#standardize-one-join-helper) · [Validation timing](#validate-on-blur-not-on-first-render) · [Counter-examples](#counter-examples-anti-patterns-to-reject-in-review)
+
 ### Guideline
 
 Expose every dynamic state change to accessibility services with a localized `stateDescription`, the correct interaction `Role`, a live region only for content that persists on screen, an imperative announcement only for transient events, and named verbs for every actionable element. This serves 4.1.2 Name, Role, Value (state must be programmatically determinable and announced when it changes) and 4.1.3 Status Messages (AA-only — content changes that are not focus changes must be announced without moving focus). Named verbs serve 2.1.1 Keyboard / general operability.

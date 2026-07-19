@@ -103,7 +103,7 @@ tasks:
     options:
       cache: true
   ts-coverage:
-    script: npx vitest run --coverage
+    script: npx vitest run --coverage --coverage.thresholds.lines 50 --coverage.thresholds.functions 50 --coverage.thresholds.branches 50 --coverage.thresholds.statements 50
     deps:
     - ^:build
     inputs:
@@ -114,6 +114,10 @@ tasks:
     - coverage
     options:
       cache: true
+  ts-clean:
+    script: rm -rf dist coverage *.tsbuildinfo
+    options:
+      cache: false
   build:
     command: noop
     deps: [ts-build]
@@ -150,6 +154,11 @@ tasks:
     options:
       cache: false
       mergeDeps: append
+  clean:
+    command: noop
+    deps: [ts-clean]
+    options:
+      cache: false
   ci-check:
     command: echo 'ci-check complete'
     deps:

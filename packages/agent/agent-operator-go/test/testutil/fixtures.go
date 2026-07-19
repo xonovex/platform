@@ -110,12 +110,15 @@ func WithWorkspaceRef(ref string) AgentRunOption {
 
 // NewAgentRun creates an AgentRun with defaults and applies options.
 func NewAgentRun(namespace, name string, opts ...AgentRunOption) *agentv1alpha1.AgentRun {
+	runtimeClassName := "kata"
 	run := &agentv1alpha1.AgentRun{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      name,
 			Namespace: namespace,
 		},
 		Spec: agentv1alpha1.AgentRunSpec{
+			Image:            "ghcr.io/xonovex/agent@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+			RuntimeClassName: &runtimeClassName,
 			Workspace: &agentv1alpha1.WorkspaceSpec{
 				Repository: agentv1alpha1.RepositorySpec{URL: "https://github.com/example/repo"},
 			},

@@ -22,9 +22,14 @@ type fakeIsolator struct {
 
 func (f fakeIsolator) Available() (bool, error)                                     { return f.available, nil }
 func (f fakeIsolator) Run(isoshared.RunConfig, provision.Contribution) (int, error) { return 0, nil }
-func (f fakeIsolator) Command(isoshared.RunConfig, provision.Contribution) []string { return nil }
-func (f fakeIsolator) TerminalCommand(isoshared.RunConfig, provision.Contribution) ([]string, []string) {
+func (f fakeIsolator) Command(isoshared.RunConfig, provision.Contribution) ([]string, error) {
 	return nil, nil
+}
+func (f fakeIsolator) TerminalCommand(isoshared.RunConfig, provision.Contribution) ([]string, []string, error) {
+	return nil, nil, nil
+}
+func (f fakeIsolator) PinnedProvision(_ provision.ProvisionMethod, provisionerPinned bool, _ string) bool {
+	return provisionerPinned
 }
 func (f fakeIsolator) HidesHost(_ bool, _ string) bool { return f.hidesHost }
 func (f fakeIsolator) KernelIsolated(_ string) bool    { return f.kernelIso }
