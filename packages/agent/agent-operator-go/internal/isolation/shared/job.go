@@ -53,7 +53,7 @@ func tmpVolume() corev1.Volume {
 // BuildJob creates the Kubernetes Job for an AgentRun. It is the single pod
 // realizer: a nil ws produces the standalone Job, a non-nil ws produces the
 // workspace-based Job. pvcName is the workspace PVC the pod mounts.
-func BuildJob(run *agentv1alpha1.AgentRun, providerEnv map[string]string, pvcName, image string, timeout time.Duration, agentType agentv1alpha1.AgentType, wsType agentv1alpha1.WorkspaceType, tc *agentv1alpha1.ToolchainSpec, ttl *int32, ws *WorkspaceBinding) *batchv1.Job {
+func BuildJob(run *agentv1alpha1.AgentRun, providerEnv map[string]string, pvcName, image string, timeout time.Duration, agentType agentv1alpha1.AgentType, wsType agentv1alpha1.WorkspaceType, tc *agentv1alpha1.ToolchainSpec, ttl *int32, ws *WorkspaceBinding) (*batchv1.Job, error) {
 	activeDeadlineSeconds := int64(timeout.Seconds())
 	backoffLimit := int32(0)
 
@@ -75,12 +75,26 @@ func BuildJob(run *agentv1alpha1.AgentRun, providerEnv map[string]string, pvcNam
 			}
 		}
 		volumes = append(volumes, tmpVolume())
-		initContainers = BuildWorktreeInitContainers(run, image, wsType, ws.WorktreeBranch, ws.SourceBranch, run.Spec.SecurityContext)
-		mainContainers = BuildWorkspaceMainContainers(run, providerEnv, image, agentType, ws.SharedVolumes, ws.SharedVolumePVCs, run.Spec.SecurityContext)
+		var err error
+		initContainers, err = BuildWorktreeInitContainers(run, image, wsType, ws.WorktreeBranch, ws.SourceBranch, run.Spec.SecurityContext)
+		if err != nil {
+			return nil, err
+		}
+		mainContainers, err = BuildWorkspaceMainContainers(run, providerEnv, image, agentType, ws.SharedVolumes, ws.SharedVolumePVCs, run.Spec.SecurityContext)
+		if err != nil {
+			return nil, err
+		}
 	} else {
 		volumes = append(volumes, tmpVolume())
-		initContainers = BuildInitContainers(run, image, wsType, run.Spec.SecurityContext)
-		mainContainers = BuildMainContainers(run, providerEnv, image, agentType, run.Spec.SecurityContext)
+		var err error
+		initContainers, err = BuildInitContainers(run, image, wsType, run.Spec.SecurityContext)
+		if err != nil {
+			return nil, err
+		}
+		mainContainers, err = BuildMainContainers(run, providerEnv, image, agentType, run.Spec.SecurityContext)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	job := &batchv1.Job{
@@ -113,16 +127,19 @@ func BuildJob(run *agentv1alpha1.AgentRun, providerEnv map[string]string, pvcNam
 
 	applyPodHardening(&job.Spec.Template.Spec, run, tc)
 
-	return job
+	return job, nil
 }
 
 // BuildWorkspaceInitJob creates the Job that clones the repository into the
 // workspace PVC (run by the AgentWorkspace controller).
-func BuildWorkspaceInitJob(ws *agentv1alpha1.AgentWorkspace, pvcName, image string, runtimeClassName *string) *batchv1.Job {
+func BuildWorkspaceInitJob(ws *agentv1alpha1.AgentWorkspace, pvcName, image string, runtimeClassName *string) (*batchv1.Job, error) {
 	activeDeadlineSeconds := int64((10 * time.Minute).Seconds())
 	backoffLimit := int32(0)
 
-	strategy, _ := plugins.GetVCSStrategy(ws.Spec.Type)
+	strategy, err := plugins.GetVCSStrategy(ws.Spec.Type)
+	if err != nil {
+		return nil, fmt.Errorf("resolve VCS strategy for workspace type %q: %w", ws.Spec.Type, err)
+	}
 	script := wsshared.CloneScript(ws.Spec.Repository, strategy)
 
 	return &batchv1.Job{
@@ -166,5 +183,5 @@ func BuildWorkspaceInitJob(ws *agentv1alpha1.AgentWorkspace, pvcName, image stri
 				},
 			},
 		},
-	}
+	}, nil
 }

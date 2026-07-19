@@ -10,9 +10,7 @@ spec:
       app.kubernetes.io/component: manager
   policyTypes: [Ingress]
   ingress:
-    - from:
-        - namespaceSelector: {}
-      ports:
+    - ports:
         - protocol: TCP
           port: 8081
         - protocol: TCP

@@ -2,6 +2,7 @@ import {execFileSync} from "node:child_process";
 import {mkdirSync, mkdtempSync, writeFileSync} from "node:fs";
 import {tmpdir} from "node:os";
 import {join} from "node:path";
+import {resolveExecutable} from "@xonovex/script-moon-common/executable";
 import {describe, expect, it} from "vitest";
 import {detectVersionChanges, resolveGitRef, type GitReader} from "./detect.js";
 
@@ -60,8 +61,7 @@ describe("detectVersionChanges", () => {
 describe("resolveGitRef", () => {
   it("fails for an unknown ref", () => {
     const root = mkdtempSync(join(tmpdir(), "version-ref-"));
-    // eslint-disable-next-line sonarjs/no-os-command-from-path
-    execFileSync("git", ["init", "--quiet"], {cwd: root});
+    execFileSync(resolveExecutable("git"), ["init", "--quiet"], {cwd: root});
     expect(() => resolveGitRef(root, "definitely-not-a-ref")).toThrow();
   });
 });

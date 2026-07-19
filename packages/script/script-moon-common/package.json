@@ -8,7 +8,18 @@
     "./fs": {
       "types": "./src/fs.ts",
       "default": "./dist/src/fs.js"
+    },
+    "./executable": {
+      "types": "./src/executable.ts",
+      "default": "./dist/src/executable.js"
+    },
+    "./package-json": {
+      "types": "./src/package-json.ts",
+      "default": "./dist/src/package-json.js"
     }
+  },
+  "dependencies": {
+    "zod": "^4.4.3"
   },
   "devDependencies": {},
   "keywords": [

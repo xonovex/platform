@@ -188,6 +188,13 @@ export default defineConfig(
     "**/.assetsignore",
   ]),
 
+  {
+    linterOptions: {
+      noInlineConfig: true,
+      reportUnusedDisableDirectives: "error",
+    },
+  },
+
   // Git ignores
   gitignorePath ? includeIgnoreFile(gitignorePath) : {},
 
@@ -241,6 +248,18 @@ export default defineConfig(
     },
     rules: {
       "@typescript-eslint/no-unused-vars": "off",
+      "no-warning-comments": [
+        "error",
+        {
+          terms: [
+            "eslint-disable",
+            "@ts-ignore",
+            "@ts-expect-error",
+            "@ts-nocheck",
+          ],
+          location: "anywhere",
+        },
+      ],
       "regexp/no-super-linear-backtracking": "off",
       "perfectionist/sort-exports": "off",
       "perfectionist/sort-imports": "off",
@@ -346,14 +365,6 @@ export default defineConfig(
       "sonarjs/no-trivial-assertions": "off",
       "sonarjs/prefer-specific-assertions": "off",
       "sonarjs/super-linear-regex": "off",
-    },
-  },
-
-  // Typescript type definitions
-  {
-    files: GLOB_DECLARATIONS,
-    rules: {
-      "unicorn/no-abusive-eslint-disable": "off",
     },
   },
 

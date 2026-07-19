@@ -1,17 +1,10 @@
 name: Release
 
 on:
-  push:
-    tags:
-      - "v*"
   workflow_dispatch:
     inputs:
       cache-workspace:
         description: "Cache .moon/cache and node_modules"
-        type: boolean
-        default: true
-      dry_run:
-        description: "Perform a dry run (no actual publishing)"
         type: boolean
         default: true
       base:
@@ -34,7 +27,6 @@ jobs:
     runs-on: ubuntu-latest
 
     if: |
-      (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')) ||
       (github.event_name == 'workflow_dispatch') ||
       (github.event_name == 'pull_request' && github.event.pull_request.merged == true && contains(github.event.pull_request.title, 'version packages'))
 
@@ -59,7 +51,7 @@ jobs:
       - run: rm -f .moon/cache/runReport.json
 
       - name: Publish
-        if: inputs.dry_run != true
+        if: github.event_name == 'pull_request'
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -68,7 +60,7 @@ jobs:
           nix develop --command bash -c "npm ci && npx moon ci --color --concurrency 1 --base $BASE :ci-publish"
 
       - name: Publish (dry run)
-        if: inputs.dry_run == true
+        if: github.event_name == 'workflow_dispatch'
         env:
           BASE: ${{ inputs.base || 'HEAD~1' }}
         run: |

@@ -2,13 +2,13 @@ import {execFileSync} from "node:child_process";
 import {mkdirSync, mkdtempSync, writeFileSync} from "node:fs";
 import {tmpdir} from "node:os";
 import {join} from "node:path";
+import {resolveExecutable} from "@xonovex/script-moon-common/executable";
 import {describe, expect, it} from "vitest";
 import {detectDepUpdates} from "./dep-updates.js";
 import {getGitVersion} from "./git.js";
 
 const runGit = (cwd: string, args: readonly string[]): void => {
-  // eslint-disable-next-line sonarjs/no-os-command-from-path
-  execFileSync("git", [...args], {cwd, stdio: "ignore"});
+  execFileSync(resolveExecutable("git"), [...args], {cwd, stdio: "ignore"});
 };
 
 const createRepository = (): {

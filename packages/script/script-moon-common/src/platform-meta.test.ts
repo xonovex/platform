@@ -42,4 +42,10 @@ describe("readPlatformMeta", () => {
       libc: ["glibc", "musl"],
     });
   });
+
+  it("should reject platform metadata without a CPU list", () => {
+    writeFileSync(join(tmp, "platform.json"), JSON.stringify({os: ["linux"]}));
+
+    expect(() => readPlatformMeta(tmp)).toThrow("invalid platform metadata");
+  });
 });

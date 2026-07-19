@@ -1,7 +1,11 @@
 import {execFileSync} from "node:child_process";
 import {readFileSync} from "node:fs";
 import {relative} from "node:path";
-import type {PackageJson} from "@xonovex/script-moon-common";
+import {resolveExecutable} from "@xonovex/script-moon-common/executable";
+import {
+  parsePackageJson,
+  type PackageJson,
+} from "@xonovex/script-moon-common/package-json";
 import type {DepUpdate} from "./changelog.js";
 
 const getWorkspaceDeps = (pkg: PackageJson): ReadonlyMap<string, string> => {
@@ -23,24 +27,28 @@ const detectDepUpdates = (
   rootDir: string,
   pkgPath: string,
 ): readonly DepUpdate[] => {
-  const currentPkg = JSON.parse(readFileSync(pkgPath, "utf8")) as PackageJson;
+  const currentPkg = parsePackageJson(readFileSync(pkgPath, "utf8"), pkgPath);
   const currentDeps = getWorkspaceDeps(currentPkg);
 
   const relativePath = relative(rootDir, pkgPath);
   const listed = execFileSync(
-    // eslint-disable-next-line sonarjs/no-os-command-from-path
-    "git",
+    resolveExecutable("git"),
     ["ls-tree", "-z", "--name-only", "HEAD", "--", relativePath],
     {cwd: rootDir, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"]},
   );
   if (listed.length === 0) return [];
 
-  // eslint-disable-next-line sonarjs/no-os-command-from-path
-  const oldPkgJson = execFileSync("git", ["show", `HEAD:${relativePath}`], {
-    cwd: rootDir,
-    encoding: "utf8",
-  });
-  const oldDeps = getWorkspaceDeps(JSON.parse(oldPkgJson) as PackageJson);
+  const oldPkgJson = execFileSync(
+    resolveExecutable("git"),
+    ["show", `HEAD:${relativePath}`],
+    {
+      cwd: rootDir,
+      encoding: "utf8",
+    },
+  );
+  const oldDeps = getWorkspaceDeps(
+    parsePackageJson(oldPkgJson, `HEAD:${relativePath}`),
+  );
 
   const updates: DepUpdate[] = [];
   for (const [name, version] of currentDeps) {

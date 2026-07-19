@@ -8,6 +8,7 @@ import {
   logSuccess,
   parseCliArgs,
 } from "@xonovex/script-moon-common";
+import {resolveExecutable} from "@xonovex/script-moon-common/executable";
 import {buildFilteredDot, filterDotGraph} from "./parse-dot.js";
 
 const root = findWorkspaceRoot(dirname(fileURLToPath(import.meta.url)));
@@ -41,18 +42,20 @@ const output =
   join(root, "npm-publish-graph.png");
 const dotOutput = values.dot as string | undefined;
 
-// eslint-disable-next-line sonarjs/no-os-command-from-path
-const dot = execFileSync("npx", ["moon", "action-graph", target, "--dot"], {
-  cwd: root,
-  encoding: "utf8",
-  stdio: ["pipe", "pipe", "pipe"],
-});
+const dot = execFileSync(
+  resolveExecutable("npx"),
+  ["moon", "action-graph", target, "--dot"],
+  {
+    cwd: root,
+    encoding: "utf8",
+    stdio: ["pipe", "pipe", "pipe"],
+  },
+);
 
 const graph = filterDotGraph(dot, taskFilter);
 const filtered = buildFilteredDot(graph);
 
-// eslint-disable-next-line sonarjs/no-os-command-from-path
-const png = execFileSync("dot", ["-Tpng"], {
+const png = execFileSync(resolveExecutable("dot"), ["-Tpng"], {
   input: filtered,
   maxBuffer: 128 * 1024 * 1024,
 });

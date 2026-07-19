@@ -261,6 +261,7 @@ Admission configuration and the webhook endpoint must be reachable for these con
 - Kubernetes cluster (v1.28+)
 - `kubectl` configured to access the cluster
 - `kustomize` (or `kubectl` with built-in kustomize)
+- cert-manager v1.16+ with its CA injector enabled
 
 ### Install CRDs
 
@@ -275,7 +276,10 @@ kubectl apply -k https://github.com/xonovex/platform//packages/agent/agent-opera
 kubectl apply -k https://github.com/xonovex/platform//packages/agent/agent-operator-go/config/default
 ```
 
-The manager deployment uses `ghcr.io/xonovex/agent-operator-go:latest`.
+The default overlay deploys the admission service and uses cert-manager to issue
+its serving certificate and inject the CA bundle into the webhook configurations.
+The manager deployment uses the digest-pinned image declared in
+`config/manager/manager.yaml`.
 
 To build locally:
 

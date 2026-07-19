@@ -8,6 +8,7 @@ import {
   forbiddenClaims,
   markdownLinkTargets,
   offLegendClassifications,
+  releaseWorkflowFailures,
   tableIds,
   tableShapeFailures,
 } from "./validate.js";
@@ -99,5 +100,52 @@ describe("blanketIdBlockFailures", () => {
     expect(blanketIdBlockFailures(blanket)).toHaveLength(1);
     expect(blanketIdBlockFailures(varied)).toEqual([]);
     expect(blanketIdBlockFailures(blanket + "\n" + varied)).toHaveLength(1);
+  });
+});
+
+describe("releaseWorkflowFailures", () => {
+  it("accepts PR-only publishing with dispatch limited to dry runs", () => {
+    const workflow = `
+on:
+  workflow_dispatch:
+  pull_request:
+jobs:
+  release:
+    steps:
+      - name: Publish
+        if: github.event_name == 'pull_request'
+        run: publish
+      - name: Publish (dry run)
+        if: github.event_name == 'workflow_dispatch'
+        run: dry-run
+      - uses: example/report@sha
+`;
+
+    expect(releaseWorkflowFailures(workflow)).toEqual([]);
+  });
+
+  it("rejects tag and dispatch-controlled publishing", () => {
+    const workflow = `
+on:
+  push:
+    tags: ["v*"]
+jobs:
+  release:
+    steps:
+      - name: Publish
+        if: inputs.dry_run != true
+        run: publish
+      - name: Publish (dry run)
+        if: inputs.dry_run == true
+        run: dry-run
+      - uses: example/report@sha
+`;
+
+    expect(releaseWorkflowFailures(workflow)).toEqual([
+      "release workflow must not publish from pushed tags",
+      "release workflow must not derive publish authority from a dispatch input",
+      "publish step must be restricted to the pull_request event",
+      "manual dispatch must be restricted to the dry-run publish step",
+    ]);
   });
 });

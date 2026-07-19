@@ -2,6 +2,7 @@ import {execFileSync} from "node:child_process";
 import {existsSync, readFileSync} from "node:fs";
 import {join} from "node:path";
 import type {MoonProject} from "@xonovex/script-moon-common";
+import {resolveExecutable} from "@xonovex/script-moon-common/executable";
 
 interface PackageJson {
   readonly name?: unknown;
@@ -37,8 +38,7 @@ const publishableVersion = (
 
 export const resolveGitRef = (rootDir: string, ref: string): string =>
   execFileSync(
-    // eslint-disable-next-line sonarjs/no-os-command-from-path
-    "git",
+    resolveExecutable("git"),
     ["rev-parse", "--verify", "--end-of-options", `${ref}^{commit}`],
     {cwd: rootDir, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"]},
   ).trim();
@@ -46,18 +46,20 @@ export const resolveGitRef = (rootDir: string, ref: string): string =>
 export const createGitReader = (rootDir: string): GitReader => ({
   readFile: (commit, path) => {
     const listed = execFileSync(
-      // eslint-disable-next-line sonarjs/no-os-command-from-path
-      "git",
+      resolveExecutable("git"),
       ["ls-tree", "-z", "--name-only", commit, "--", path],
       {cwd: rootDir, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"]},
     );
     if (listed.length === 0) return;
-    // eslint-disable-next-line sonarjs/no-os-command-from-path
-    return execFileSync("git", ["show", `${commit}:${path}`], {
-      cwd: rootDir,
-      encoding: "utf8",
-      stdio: ["ignore", "pipe", "pipe"],
-    });
+    return execFileSync(
+      resolveExecutable("git"),
+      ["show", `${commit}:${path}`],
+      {
+        cwd: rootDir,
+        encoding: "utf8",
+        stdio: ["ignore", "pipe", "pipe"],
+      },
+    );
   },
 });
 

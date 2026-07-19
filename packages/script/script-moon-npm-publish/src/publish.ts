@@ -1,4 +1,5 @@
 import {spawnSync} from "node:child_process";
+import {resolveExecutable} from "@xonovex/script-moon-common/executable";
 
 interface PackageIdentity {
   readonly name: string;
@@ -28,11 +29,14 @@ export const publishArgs = (dryRun: boolean): readonly string[] =>
     : ["publish", "--provenance", "--access", "public"];
 
 export const isPublished = ({name, version}: PackageIdentity): boolean => {
-  // eslint-disable-next-line sonarjs/no-os-command-from-path
-  const result = spawnSync("npm", ["view", `${name}@${version}`, "version"], {
-    encoding: "utf8",
-    stdio: ["ignore", "pipe", "pipe"],
-  });
+  const result = spawnSync(
+    resolveExecutable("npm"),
+    ["view", `${name}@${version}`, "version"],
+    {
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+    },
+  );
   if (result.error) throw result.error;
   if (result.status === 0) return true;
   if (/\bE404\b|404 Not Found/i.test(result.stderr)) return false;

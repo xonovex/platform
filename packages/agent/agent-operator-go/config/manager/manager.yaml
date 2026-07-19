@@ -38,6 +38,9 @@ spec:
             - containerPort: 8090
               name: trigger
               protocol: TCP
+            - containerPort: 9443
+              name: webhook
+              protocol: TCP
           livenessProbe:
             httpGet:
               path: /healthz
@@ -63,6 +66,10 @@ spec:
             capabilities:
               drop:
                 - ALL
+          volumeMounts:
+            - name: webhook-cert
+              mountPath: /tmp/k8s-webhook-server/serving-certs
+              readOnly: true
         - name: governance-decision
           image: ghcr.io/xonovex/governance-decision-service:0.1.0
           env:
@@ -107,3 +114,6 @@ spec:
       volumes:
         - name: governance-evidence
           emptyDir: {}
+        - name: webhook-cert
+          secret:
+            secretName: agent-operator-webhook-server-cert

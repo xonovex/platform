@@ -9,6 +9,7 @@ import {
   legendClasses,
   markdownLinkTargets,
   offLegendClassifications,
+  releaseWorkflowFailures,
   tableIds,
   tableShapeFailures,
 } from "./validate.js";
@@ -193,6 +194,13 @@ for (const target of markdownLinkTargets(rootReadme)) {
     existsSync(resolve(repositoryRoot, target)),
     `README.md link resolves: ${target}`,
   );
+}
+
+const releaseWorkflow = read(
+  resolve(repositoryRoot, ".github/workflows/release.yml"),
+);
+for (const failure of releaseWorkflowFailures(releaseWorkflow)) {
+  check(false, failure);
 }
 for (const forbiddenClaim of forbiddenClaims) {
   check(

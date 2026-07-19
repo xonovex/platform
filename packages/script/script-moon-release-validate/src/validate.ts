@@ -114,3 +114,41 @@ export const blanketIdBlockFailures = (content: string): string[] => {
       : [],
   );
 };
+
+export const releaseWorkflowFailures = (content: string): string[] => {
+  const failures: string[] = [];
+  if (/^\s{2}push:\s*$/m.test(content) || content.includes("refs/tags/")) {
+    failures.push("release workflow must not publish from pushed tags");
+  }
+  if (/inputs\.dry_run\s*!=\s*true/.test(content)) {
+    failures.push(
+      "release workflow must not derive publish authority from a dispatch input",
+    );
+  }
+
+  const publishStep =
+    /\n\s+- name: Publish\n([\s\S]*?)(?=\n\s+- (?:name:|uses:))/u.exec(
+      content,
+    )?.[1];
+  if (
+    publishStep === undefined ||
+    !/if:\s*github\.event_name == 'pull_request'/.test(publishStep)
+  ) {
+    failures.push("publish step must be restricted to the pull_request event");
+  }
+
+  const dryRunStep =
+    /\n\s+- name: Publish \(dry run\)\n([\s\S]*?)(?=\n\s+- (?:name:|uses:))/u.exec(
+      content,
+    )?.[1];
+  if (
+    dryRunStep === undefined ||
+    !/if:\s*github\.event_name == 'workflow_dispatch'/.test(dryRunStep)
+  ) {
+    failures.push(
+      "manual dispatch must be restricted to the dry-run publish step",
+    );
+  }
+
+  return failures;
+};

@@ -106,7 +106,11 @@ func (r *AgentWorkspaceReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 			image = DefaultWorkspaceInitImage
 		}
 
-		job := isoshared.BuildWorkspaceInitJob(&ws, workspacePVCName, image, ws.Spec.RuntimeClassName)
+		job, err := isoshared.BuildWorkspaceInitJob(&ws, workspacePVCName, image, ws.Spec.RuntimeClassName)
+		if err != nil {
+			log.Error(err, "failed to build workspace init job")
+			return r.updateWorkspacePhase(ctx, &ws, agentv1alpha1.AgentWorkspacePhaseFailed, fmt.Sprintf("WorkspaceInitBuildFailed: %v", err))
+		}
 		if err := ctrl.SetControllerReference(&ws, job, r.Scheme); err != nil {
 			return ctrl.Result{}, err
 		}

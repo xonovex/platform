@@ -6,6 +6,7 @@ import {
   parseCliArgs,
   readPlatformMeta,
 } from "@xonovex/script-moon-common";
+import {resolveExecutable} from "@xonovex/script-moon-common/executable";
 import {isPublished, parsePackageIdentity, publishArgs} from "./publish.js";
 
 const {values} = parseCliArgs({
@@ -40,8 +41,9 @@ if (isPublished(identity)) {
   }
 
   try {
-    // eslint-disable-next-line sonarjs/no-os-command-from-path
-    execFileSync("npm", [...publishArgs(dryRun)], {stdio: "inherit"});
+    execFileSync(resolveExecutable("npm"), [...publishArgs(dryRun)], {
+      stdio: "inherit",
+    });
   } finally {
     if (platformMeta) {
       writeFileSync(pkgPath, original);

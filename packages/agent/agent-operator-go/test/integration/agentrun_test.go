@@ -28,6 +28,17 @@ func createNamespace(t *testing.T, prefix string) string {
 	if err := k8sClient.Create(ctx, ns); err != nil {
 		t.Fatalf("failed to create namespace: %v", err)
 	}
+	policy := &agentv1alpha1.AgentPolicy{
+		ObjectMeta: metav1.ObjectMeta{Name: "integration-policy", Namespace: ns.Name},
+		Spec: agentv1alpha1.AgentPolicySpec{
+			Enforced: agentv1alpha1.AgentPolicyEnforced{
+				AllowedRuntimeClassNames: []string{"kata"},
+			},
+		},
+	}
+	if err := k8sClient.Create(ctx, policy); err != nil {
+		t.Fatalf("failed to create AgentPolicy: %v", err)
+	}
 	t.Cleanup(func() {
 		_ = k8sClient.Delete(ctx, ns)
 	})

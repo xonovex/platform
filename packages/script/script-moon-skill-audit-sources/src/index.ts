@@ -2,6 +2,7 @@
 import {execFileSync} from "node:child_process";
 import {readdirSync, readFileSync, writeFileSync} from "node:fs";
 import {basename, join, resolve, sep} from "node:path";
+import {resolveExecutable} from "@xonovex/script-moon-common/executable";
 import {
   isDirectory,
   isFile,
@@ -106,11 +107,11 @@ version and the commits since the pinned commit on watched paths.`;
 // code unit as \uXXXX (surrogate pairs become two escapes, as in CPython).
 const ensureAscii = (text: string): string =>
   text.replaceAll(/[\u0080-\uFFFF]/g, (ch) => {
-    // charCodeAt (UTF-16 code unit), not codePointAt: the regex matches one code
-    // unit at a time, so astral chars must emit two \uXXXX surrogate escapes to
-    // match CPython, which codePointAt's combined code point would not produce.
-    // eslint-disable-next-line unicorn/prefer-code-point
-    const code = ch.charCodeAt(0).toString(16).padStart(4, "0");
+    // The non-Unicode regex matches one UTF-16 code unit, so codePointAt sees
+    // each surrogate independently and preserves CPython's two-escape output.
+    const codePoint = ch.codePointAt(0);
+    if (codePoint === undefined) return ch;
+    const code = codePoint.toString(16).padStart(4, "0");
     return String.raw`\u${code}`;
   });
 
@@ -296,8 +297,7 @@ const findWorkspaceRoot = (start: string): string => {
 
 const git = (cwd: string, args: readonly string[]): string | undefined => {
   try {
-    // eslint-disable-next-line sonarjs/no-os-command-from-path
-    return execFileSync("git", [...args], {
+    return execFileSync(resolveExecutable("git"), [...args], {
       cwd,
       encoding: "utf8",
       stdio: ["ignore", "pipe", "ignore"],

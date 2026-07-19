@@ -1,8 +1,8 @@
 namespace: agent-operator-system
 
-namePrefix: agent-operator-
-
 resources:
+  - ../certmanager
   - ../crd
   - ../rbac
   - ../manager
+  - ../webhook

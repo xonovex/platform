@@ -20,7 +20,7 @@ func workspaceRun() *agentv1alpha1.AgentRun {
 }
 
 func TestBuildInitContainers(t *testing.T) {
-	containers := BuildInitContainers(workspaceRun(), "node:latest", agentv1alpha1.WorkspaceTypeGit, nil)
+	containers := mustBuildInitContainers(t, workspaceRun(), "node:latest", agentv1alpha1.WorkspaceTypeGit, nil)
 
 	if len(containers) != 1 {
 		t.Fatalf("len(containers) = %d, want 1", len(containers))
@@ -41,7 +41,7 @@ func TestBuildInitContainers(t *testing.T) {
 }
 
 func TestBuildInitContainers_SecurityContextDefaults(t *testing.T) {
-	containers := BuildInitContainers(workspaceRun(), "image", agentv1alpha1.WorkspaceTypeGit, nil)
+	containers := mustBuildInitContainers(t, workspaceRun(), "image", agentv1alpha1.WorkspaceTypeGit, nil)
 	sc := containers[0].SecurityContext
 	if sc == nil {
 		t.Fatal("init container SecurityContext should not be nil")
@@ -55,7 +55,7 @@ func TestBuildInitContainers_SecurityContextDefaults(t *testing.T) {
 }
 
 func TestBuildMainContainers_WithoutNix(t *testing.T) {
-	containers := BuildMainContainers(workspaceRun(), nil, "image:latest", agentv1alpha1.AgentTypeClaude, nil)
+	containers := mustBuildMainContainers(t, workspaceRun(), nil, "image:latest", agentv1alpha1.AgentTypeClaude, nil)
 	c := containers[0]
 	for _, vm := range c.VolumeMounts {
 		if vm.Name == "nix-env" {
@@ -72,7 +72,7 @@ func TestBuildMainContainers_WithoutNix(t *testing.T) {
 func TestBuildMainContainers_Claude(t *testing.T) {
 	run := workspaceRun()
 	run.ObjectMeta = metav1.ObjectMeta{Name: "test"}
-	containers := BuildMainContainers(run, nil, "image:latest", agentv1alpha1.AgentTypeClaude, nil)
+	containers := mustBuildMainContainers(t, run, nil, "image:latest", agentv1alpha1.AgentTypeClaude, nil)
 
 	if len(containers) != 1 {
 		t.Fatalf("len(containers) = %d, want 1", len(containers))
@@ -103,7 +103,7 @@ func TestBuildMainContainers_Claude(t *testing.T) {
 func TestBuildMainContainers_ClaudeWithPrompt(t *testing.T) {
 	run := workspaceRun()
 	run.Spec.Prompt = "Fix the tests"
-	containers := BuildMainContainers(run, nil, "image", agentv1alpha1.AgentTypeClaude, nil)
+	containers := mustBuildMainContainers(t, run, nil, "image", agentv1alpha1.AgentTypeClaude, nil)
 
 	args := containers[0].Args
 	foundPrint := false
@@ -127,7 +127,7 @@ func TestBuildMainContainers_ClaudeWithPrompt(t *testing.T) {
 func TestBuildMainContainers_Opencode(t *testing.T) {
 	run := workspaceRun()
 	run.Spec.Provider = &agentv1alpha1.ProviderSpec{CliArgs: []string{"--model", "google/gemini-2.5-pro"}}
-	containers := BuildMainContainers(run, nil, "image", agentv1alpha1.AgentTypeOpencode, nil)
+	containers := mustBuildMainContainers(t, run, nil, "image", agentv1alpha1.AgentTypeOpencode, nil)
 
 	c := containers[0]
 	if c.Command[0] != "opencode" {
@@ -143,7 +143,7 @@ func TestBuildMainContainers_WithProviderEnv(t *testing.T) {
 		"ANTHROPIC_BASE_URL": "http://proxy:8080",
 		"API_TIMEOUT_MS":     "60000",
 	}
-	containers := BuildMainContainers(workspaceRun(), providerEnv, "image", agentv1alpha1.AgentTypeClaude, nil)
+	containers := mustBuildMainContainers(t, workspaceRun(), providerEnv, "image", agentv1alpha1.AgentTypeClaude, nil)
 
 	envMap := make(map[string]string)
 	for _, env := range containers[0].Env {
@@ -158,7 +158,7 @@ func TestBuildMainContainers_WithProviderEnv(t *testing.T) {
 }
 
 func TestBuildMainContainers_SecurityContextDefaults(t *testing.T) {
-	containers := BuildMainContainers(workspaceRun(), nil, "image", agentv1alpha1.AgentTypeClaude, nil)
+	containers := mustBuildMainContainers(t, workspaceRun(), nil, "image", agentv1alpha1.AgentTypeClaude, nil)
 	sc := containers[0].SecurityContext
 	if sc == nil {
 		t.Fatal("SecurityContext should not be nil")
@@ -180,7 +180,7 @@ func TestBuildMainContainers_SecurityContextDefaults(t *testing.T) {
 func TestBuildMainContainers_SecurityContextOverride(t *testing.T) {
 	allowPrivEsc := true
 	override := &corev1.SecurityContext{AllowPrivilegeEscalation: &allowPrivEsc}
-	containers := BuildMainContainers(workspaceRun(), nil, "image", agentv1alpha1.AgentTypeClaude, override)
+	containers := mustBuildMainContainers(t, workspaceRun(), nil, "image", agentv1alpha1.AgentTypeClaude, override)
 	sc := containers[0].SecurityContext
 	if *sc.AllowPrivilegeEscalation != true {
 		t.Error("AllowPrivilegeEscalation override should be true")
@@ -191,7 +191,7 @@ func TestBuildMainContainers_SecurityContextOverride(t *testing.T) {
 }
 
 func TestBuildMainContainers_TmpVolumeMount(t *testing.T) {
-	containers := BuildMainContainers(workspaceRun(), nil, "image", agentv1alpha1.AgentTypeClaude, nil)
+	containers := mustBuildMainContainers(t, workspaceRun(), nil, "image", agentv1alpha1.AgentTypeClaude, nil)
 	foundTmp := false
 	for _, vm := range containers[0].VolumeMounts {
 		if vm.Name == "tmp" && vm.MountPath == "/tmp" {
@@ -200,5 +200,21 @@ func TestBuildMainContainers_TmpVolumeMount(t *testing.T) {
 	}
 	if !foundTmp {
 		t.Error("expected /tmp volume mount for ReadOnlyRootFilesystem")
+	}
+}
+
+func TestBuildMainContainers_UnknownAgentTypeReturnsError(t *testing.T) {
+	_, err := BuildMainContainers(workspaceRun(), nil, "image", "unknown", nil)
+
+	if err == nil {
+		t.Fatal("expected unknown agent type to return an error")
+	}
+}
+
+func TestBuildInitContainers_UnknownWorkspaceTypeReturnsError(t *testing.T) {
+	_, err := BuildInitContainers(workspaceRun(), "image", "unknown", nil)
+
+	if err == nil {
+		t.Fatal("expected unknown workspace type to return an error")
 	}
 }

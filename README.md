@@ -42,6 +42,7 @@ The sandbox is selected by three orthogonal axes — `--isolation {none,bwrap,do
 ### Agent Kubernetes Operator
 
 ```bash
+# Requires cert-manager v1.16+ with its CA injector enabled
 # Install CRDs and deploy the operator
 kubectl apply -k https://github.com/xonovex/platform//packages/agent/agent-operator-go/config/crd
 kubectl apply -k https://github.com/xonovex/platform//packages/agent/agent-operator-go/config/default

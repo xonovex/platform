@@ -1,0 +1,21 @@
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: agent-operator-selfsigned-issuer
+  namespace: system
+spec:
+  selfSigned: {}
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: agent-operator-serving-cert
+  namespace: system
+spec:
+  dnsNames:
+    - agent-operator-webhook-service.agent-operator-system.svc
+    - agent-operator-webhook-service.agent-operator-system.svc.cluster.local
+  issuerRef:
+    kind: Issuer
+    name: agent-operator-selfsigned-issuer
+  secretName: agent-operator-webhook-server-cert

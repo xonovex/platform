@@ -7,14 +7,17 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+	"time"
 
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/envtest"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
+	crwebhook "sigs.k8s.io/controller-runtime/pkg/webhook"
 
 	"github.com/xonovex/platform/packages/agent/agent-operator-go/internal/controller"
+	agentwebhook "github.com/xonovex/platform/packages/agent/agent-operator-go/internal/webhook"
 	"github.com/xonovex/platform/packages/agent/agent-operator-go/test/testutil"
 )
 
@@ -36,6 +39,11 @@ func TestMain(m *testing.M) {
 		CRDDirectoryPaths: []string{
 			filepath.Join("..", "..", "config", "crd", "bases"),
 		},
+		WebhookInstallOptions: envtest.WebhookInstallOptions{
+			Paths: []string{
+				filepath.Join("..", "..", "config", "webhook", "manifests.yaml"),
+			},
+		},
 		Scheme: scheme,
 	}
 
@@ -49,9 +57,30 @@ func TestMain(m *testing.M) {
 		Metrics: metricsserver.Options{
 			BindAddress: "0",
 		},
+		WebhookServer: crwebhook.NewServer(crwebhook.Options{
+			Host:    testEnv.WebhookInstallOptions.LocalServingHost,
+			Port:    testEnv.WebhookInstallOptions.LocalServingPort,
+			CertDir: testEnv.WebhookInstallOptions.LocalServingCertDir,
+		}),
 	})
 	if err != nil {
 		panic("failed to create manager: " + err.Error())
+	}
+
+	if err := (&agentwebhook.AgentRunWebhook{Client: mgr.GetClient()}).SetupWebhookWithManager(mgr); err != nil {
+		panic("failed to setup AgentRun webhook: " + err.Error())
+	}
+	if err := (&agentwebhook.AgentHarnessWebhook{}).SetupWebhookWithManager(mgr); err != nil {
+		panic("failed to setup AgentHarness webhook: " + err.Error())
+	}
+	if err := (&agentwebhook.AgentProviderWebhook{}).SetupWebhookWithManager(mgr); err != nil {
+		panic("failed to setup AgentProvider webhook: " + err.Error())
+	}
+	if err := (&agentwebhook.AgentToolchainWebhook{}).SetupWebhookWithManager(mgr); err != nil {
+		panic("failed to setup AgentToolchain webhook: " + err.Error())
+	}
+	if err := (&agentwebhook.AgentWorkspaceWebhook{}).SetupWebhookWithManager(mgr); err != nil {
+		panic("failed to setup AgentWorkspace webhook: " + err.Error())
 	}
 
 	if err := (&controller.AgentRunReconciler{
@@ -78,11 +107,18 @@ func TestMain(m *testing.M) {
 		panic("failed to setup AgentWorkspace controller: " + err.Error())
 	}
 
+	managerStopped := make(chan error, 1)
 	go func() {
-		if err := mgr.Start(ctx); err != nil {
-			panic("failed to start manager: " + err.Error())
-		}
+		managerStopped <- mgr.Start(ctx)
 	}()
+
+	webhookDeadline := time.Now().Add(10 * time.Second)
+	for mgr.GetWebhookServer().StartedChecker()(nil) != nil {
+		if time.Now().After(webhookDeadline) {
+			panic("webhook server did not start")
+		}
+		time.Sleep(20 * time.Millisecond)
+	}
 
 	// Wait for caches to sync before running tests
 	if !mgr.GetCache().WaitForCacheSync(ctx) {
@@ -94,6 +130,9 @@ func TestMain(m *testing.M) {
 	code := m.Run()
 
 	cancel()
+	if err := <-managerStopped; err != nil {
+		panic("manager stopped with an error: " + err.Error())
+	}
 	if err := testEnv.Stop(); err != nil {
 		panic("failed to stop envtest: " + err.Error())
 	}

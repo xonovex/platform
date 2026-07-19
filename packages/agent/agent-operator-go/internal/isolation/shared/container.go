@@ -1,6 +1,8 @@
 package shared
 
 import (
+	"fmt"
+
 	corev1 "k8s.io/api/core/v1"
 
 	agentv1alpha1 "github.com/xonovex/platform/packages/agent/agent-operator-go/api/v1alpha1"
@@ -24,22 +26,27 @@ func buildEnvVars(run *agentv1alpha1.AgentRun, providerEnv map[string]string) []
 }
 
 // buildAgentCommand resolves the harness command for the agent type.
-func buildAgentCommand(run *agentv1alpha1.AgentRun, agentType agentv1alpha1.AgentType) ([]string, []string) {
-	if b, err := plugins.GetHarnessCommand(agentType); err == nil {
-		return b.Command(run)
+func buildAgentCommand(run *agentv1alpha1.AgentRun, agentType agentv1alpha1.AgentType) ([]string, []string, error) {
+	builder, err := plugins.GetHarnessCommand(agentType)
+	if err != nil {
+		return nil, nil, fmt.Errorf("resolve harness command for agent type %q: %w", agentType, err)
 	}
-	return []string{"claude"}, nil
+	command, args := builder.Command(run)
+	return command, args, nil
 }
 
 // BuildInitContainers builds init containers for standalone runs (clone into the
 // workspace PVC). A nil Workspace yields an empty repo (the webhook requires one
 // for standalone runs); this guards the reconciler against a panic if reached.
-func BuildInitContainers(run *agentv1alpha1.AgentRun, image string, wsType agentv1alpha1.WorkspaceType, sc *corev1.SecurityContext) []corev1.Container {
+func BuildInitContainers(run *agentv1alpha1.AgentRun, image string, wsType agentv1alpha1.WorkspaceType, sc *corev1.SecurityContext) ([]corev1.Container, error) {
 	var repo agentv1alpha1.RepositorySpec
 	if run.Spec.Workspace != nil {
 		repo = run.Spec.Workspace.Repository
 	}
-	strategy, _ := plugins.GetVCSStrategy(wsType)
+	strategy, err := plugins.GetVCSStrategy(wsType)
+	if err != nil {
+		return nil, fmt.Errorf("resolve VCS strategy for workspace type %q: %w", wsType, err)
+	}
 
 	return []corev1.Container{
 		{
@@ -52,13 +59,16 @@ func BuildInitContainers(run *agentv1alpha1.AgentRun, image string, wsType agent
 			},
 			SecurityContext: DefaultContainerSecurityContext(sc),
 		},
-	}
+	}, nil
 }
 
 // BuildMainContainers builds the main agent container for standalone runs.
-func BuildMainContainers(run *agentv1alpha1.AgentRun, providerEnv map[string]string, image string, agentType agentv1alpha1.AgentType, sc *corev1.SecurityContext) []corev1.Container {
+func BuildMainContainers(run *agentv1alpha1.AgentRun, providerEnv map[string]string, image string, agentType agentv1alpha1.AgentType, sc *corev1.SecurityContext) ([]corev1.Container, error) {
 	env := buildEnvVars(run, providerEnv)
-	command, args := buildAgentCommand(run, agentType)
+	command, args, err := buildAgentCommand(run, agentType)
+	if err != nil {
+		return nil, err
+	}
 
 	return []corev1.Container{
 		{
@@ -74,14 +84,17 @@ func BuildMainContainers(run *agentv1alpha1.AgentRun, providerEnv map[string]str
 			},
 			SecurityContext: DefaultContainerSecurityContext(sc),
 		},
-	}
+	}, nil
 }
 
 // BuildWorktreeInitContainers builds the init container that creates a git
 // worktree (or jj workspace) for a workspace-based AgentRun.
-func BuildWorktreeInitContainers(run *agentv1alpha1.AgentRun, image string, wsType agentv1alpha1.WorkspaceType, worktreeBranch, sourceBranch string, sc *corev1.SecurityContext) []corev1.Container {
+func BuildWorktreeInitContainers(run *agentv1alpha1.AgentRun, image string, wsType agentv1alpha1.WorkspaceType, worktreeBranch, sourceBranch string, sc *corev1.SecurityContext) ([]corev1.Container, error) {
 	worktreePath := wsshared.WorktreePath(run.Name)
-	strategy, _ := plugins.GetVCSStrategy(wsType)
+	strategy, err := plugins.GetVCSStrategy(wsType)
+	if err != nil {
+		return nil, fmt.Errorf("resolve VCS strategy for workspace type %q: %w", wsType, err)
+	}
 	script, name := wsshared.WorktreeScriptAndName(strategy, worktreePath, worktreeBranch, sourceBranch)
 
 	return []corev1.Container{
@@ -95,14 +108,17 @@ func BuildWorktreeInitContainers(run *agentv1alpha1.AgentRun, image string, wsTy
 			},
 			SecurityContext: DefaultContainerSecurityContext(sc),
 		},
-	}
+	}, nil
 }
 
 // BuildWorkspaceMainContainers builds the main agent container for workspace-based
 // runs (working dir is the per-run worktree; shared volumes are mounted).
-func BuildWorkspaceMainContainers(run *agentv1alpha1.AgentRun, providerEnv map[string]string, image string, agentType agentv1alpha1.AgentType, sharedVolumes []agentv1alpha1.SharedVolumeSpec, sharedVolumePVCs map[string]string, sc *corev1.SecurityContext) []corev1.Container {
+func BuildWorkspaceMainContainers(run *agentv1alpha1.AgentRun, providerEnv map[string]string, image string, agentType agentv1alpha1.AgentType, sharedVolumes []agentv1alpha1.SharedVolumeSpec, sharedVolumePVCs map[string]string, sc *corev1.SecurityContext) ([]corev1.Container, error) {
 	env := buildEnvVars(run, providerEnv)
-	command, args := buildAgentCommand(run, agentType)
+	command, args, err := buildAgentCommand(run, agentType)
+	if err != nil {
+		return nil, err
+	}
 	worktreePath := wsshared.WorktreePath(run.Name)
 
 	volumeMounts := []corev1.VolumeMount{
@@ -126,5 +142,5 @@ func BuildWorkspaceMainContainers(run *agentv1alpha1.AgentRun, providerEnv map[s
 			VolumeMounts:    volumeMounts,
 			SecurityContext: DefaultContainerSecurityContext(sc),
 		},
-	}
+	}, nil
 }

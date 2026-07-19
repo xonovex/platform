@@ -105,6 +105,7 @@ func WithRuntimeClassName(name string) AgentRunOption {
 func WithWorkspaceRef(ref string) AgentRunOption {
 	return func(r *agentv1alpha1.AgentRun) {
 		r.Spec.WorkspaceRef = ref
+		r.Spec.Workspace = nil
 	}
 }
 

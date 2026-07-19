@@ -128,13 +128,26 @@ func main() {
 	}
 
 	if err = (&webhook.AgentRunWebhook{
+		Client:         mgr.GetClient(),
 		DecisionClient: webhook.NewHTTPGovernanceDecisionClient(decisionServiceURL),
 	}).SetupWebhookWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to set up webhook", "webhook", "AgentRun")
 		os.Exit(1)
 	}
+	if err = (&webhook.AgentHarnessWebhook{}).SetupWebhookWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to set up webhook", "webhook", "AgentHarness")
+		os.Exit(1)
+	}
+	if err = (&webhook.AgentProviderWebhook{}).SetupWebhookWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to set up webhook", "webhook", "AgentProvider")
+		os.Exit(1)
+	}
 	if err = (&webhook.AgentToolchainWebhook{}).SetupWebhookWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to set up webhook", "webhook", "AgentToolchain")
+		os.Exit(1)
+	}
+	if err = (&webhook.AgentWorkspaceWebhook{}).SetupWebhookWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to set up webhook", "webhook", "AgentWorkspace")
 		os.Exit(1)
 	}
 

@@ -364,7 +364,7 @@ func (r *AgentRunReconciler) reconcileExecutionResources(
 		if err := r.ensureAgentServiceAccount(ctx, run.Namespace); err != nil {
 			return ctrl.Result{}, err
 		}
-		job := isoshared.BuildJob(
+		job, err := isoshared.BuildJob(
 			run,
 			execution.providerEnv,
 			pvcName,
@@ -376,6 +376,10 @@ func (r *AgentRunReconciler) reconcileExecutionResources(
 			execution.defaults.TTL,
 			binding,
 		)
+		if err != nil {
+			logger.Error(err, "failed to build agent Job")
+			return r.updatePhase(ctx, run, agentv1alpha1.AgentRunPhaseFailed, fmt.Sprintf("JobBuildFailed: %v", err))
+		}
 		if err := ctrl.SetControllerReference(run, job, r.Scheme); err != nil {
 			return ctrl.Result{}, err
 		}

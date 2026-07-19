@@ -3,6 +3,7 @@ import {spawn, spawnSync} from "node:child_process";
 import {readFileSync} from "node:fs";
 import {join, resolve} from "node:path";
 import {createInterface} from "node:readline";
+import {resolveExecutable} from "@xonovex/script-moon-common/executable";
 import {isFile, resolveGuideDirectory} from "@xonovex/script-moon-common/fs";
 import {parseQueries, parseTriggerOptions} from "./validation.js";
 
@@ -111,10 +112,10 @@ const checkTriggered = (
   claudeArgs: readonly string[],
   target: string,
   short: string,
+  claudeExecutable: string,
 ): Promise<boolean> =>
   new Promise((resolvePromise) => {
-    // eslint-disable-next-line sonarjs/no-os-command-from-path
-    const proc = spawn("claude", [...claudeArgs, query], {
+    const proc = spawn(claudeExecutable, [...claudeArgs, query], {
       stdio: ["ignore", "pipe", "ignore"],
     });
 
@@ -336,9 +337,16 @@ const main = async (argv: readonly string[]): Promise<number> => {
     return 2;
   }
 
-  // shutil.which("claude") equivalent — verify claude is available on PATH.
-  // eslint-disable-next-line sonarjs/no-os-command-from-path
-  const claudeProbe = spawnSync("claude", ["--version"], {stdio: "ignore"});
+  let claudeExecutable: string;
+  try {
+    claudeExecutable = resolveExecutable("claude");
+  } catch {
+    process.stderr.write("Error: 'claude' CLI not found in PATH\n");
+    return 2;
+  }
+  const claudeProbe = spawnSync(claudeExecutable, ["--version"], {
+    stdio: "ignore",
+  });
   if (claudeProbe.error) {
     process.stderr.write("Error: 'claude' CLI not found in PATH\n");
     return 2;
@@ -411,7 +419,15 @@ const main = async (argv: readonly string[]): Promise<number> => {
 
     let triggers = 0;
     for (let i = 0; i < runs; i++) {
-      if (await checkTriggered(query, claudeArgs, skillName, short)) {
+      if (
+        await checkTriggered(
+          query,
+          claudeArgs,
+          skillName,
+          short,
+          claudeExecutable,
+        )
+      ) {
         triggers += 1;
       }
     }

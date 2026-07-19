@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import {spawn, spawnSync} from "node:child_process";
+import {spawn} from "node:child_process";
 import {
   existsSync,
   mkdirSync,
@@ -9,6 +9,7 @@ import {
 } from "node:fs";
 import {dirname, join, resolve} from "node:path";
 import {parseCliArgs} from "@xonovex/script-moon-common";
+import {resolveExecutable} from "@xonovex/script-moon-common/executable";
 import {
   isDirectory,
   isFile,
@@ -110,9 +111,12 @@ const pstdev = (values: readonly number[]): number => {
 };
 
 const which = (cmd: string): boolean => {
-  const probe = process.platform === "win32" ? "where" : "which";
-  const result = spawnSync(probe, [cmd], {stdio: "ignore"});
-  return result.status === 0;
+  try {
+    resolveExecutable(cmd);
+    return true;
+  } catch {
+    return false;
+  }
 };
 
 const matchSkill = (
@@ -190,8 +194,7 @@ const runClaude = (
   timeoutMs: number,
 ): Promise<ProcOutput> =>
   new Promise((resolvePromise) => {
-    // eslint-disable-next-line sonarjs/no-os-command-from-path
-    const child = spawn("claude", [...args, finalArg], {
+    const child = spawn(resolveExecutable("claude"), [...args, finalArg], {
       stdio: ["ignore", "pipe", "pipe"],
       ...(cwd ? {cwd} : {}),
     });

@@ -20,7 +20,7 @@ var updateGolden = flag.Bool("update-golden", false, "regenerate pod-spec golden
 // in testdata/*.golden.yaml. The goldens were generated from the post-merge
 // builder, so they lock the pod spec against FUTURE drift; the merge itself is
 // verified by the field-assertion tests in this package (job_test, workspace_job_test).
-func goldenJobs() map[string]*batchv1.Job {
+func goldenJobs(t *testing.T) map[string]*batchv1.Job {
 	stdRun := func() *agentv1alpha1.AgentRun {
 		return &agentv1alpha1.AgentRun{
 			ObjectMeta: metav1.ObjectMeta{Name: "golden-run", Namespace: "default"},
@@ -41,18 +41,18 @@ func goldenJobs() map[string]*batchv1.Job {
 	}
 
 	return map[string]*batchv1.Job{
-		"standalone-claude-git": BuildJob(stdRun(), nil, "golden-pvc", "node:trixie-slim", time.Hour,
+		"standalone-claude-git": mustBuildJob(t, stdRun(), nil, "golden-pvc", "node:trixie-slim", time.Hour,
 			agentv1alpha1.AgentTypeClaude, agentv1alpha1.WorkspaceTypeGit, nil, nil, nil),
-		"workspace-git": BuildJob(wsRun, nil, "my-workspace-ws", "node:trixie-slim", time.Hour,
+		"workspace-git": mustBuildJob(t, wsRun, nil, "my-workspace-ws", "node:trixie-slim", time.Hour,
 			agentv1alpha1.AgentTypeClaude, agentv1alpha1.WorkspaceTypeGit, nil, nil,
 			&WorkspaceBinding{WorktreeBranch: "feature", WorkspaceRef: "my-workspace"}),
-		"nix-image": BuildJob(stdRun(), nil, "golden-pvc", "ghcr.io/xonovex/agent@sha256:abc", time.Hour,
+		"nix-image": mustBuildJob(t, stdRun(), nil, "golden-pvc", "ghcr.io/xonovex/agent@sha256:abc", time.Hour,
 			agentv1alpha1.AgentTypeClaude, agentv1alpha1.WorkspaceTypeGit, nixTC, nil, nil),
 	}
 }
 
 func TestBuildJobGolden(t *testing.T) {
-	for name, job := range goldenJobs() {
+	for name, job := range goldenJobs(t) {
 		got, err := yaml.Marshal(job)
 		if err != nil {
 			t.Fatalf("marshal %s: %v", name, err)
