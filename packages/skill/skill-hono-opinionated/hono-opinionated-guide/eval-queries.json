@@ -24,30 +24,6 @@
     "split": "train"
   },
   {
-    "query": "Help me handle controllers correctly in this Hono Opinionated task, including the edge cases that usually get missed.",
-    "rationale": "implicit task cue derived from the controllers reference",
-    "should_trigger": true,
-    "split": "train"
-  },
-  {
-    "query": "Help me handle openapi router hierarchy correctly in this Hono Opinionated task, including the edge cases that usually get missed.",
-    "rationale": "implicit task cue derived from the openapi router hierarchy reference",
-    "should_trigger": true,
-    "split": "validation"
-  },
-  {
-    "query": "Help me handle openapi spec generation correctly in this Hono Opinionated task, including the edge cases that usually get missed.",
-    "rationale": "implicit task cue derived from the openapi spec generation reference",
-    "should_trigger": true,
-    "split": "validation"
-  },
-  {
-    "query": "Help me handle router selection correctly in this Hono Opinionated task, including the edge cases that usually get missed.",
-    "rationale": "implicit task cue derived from the router selection reference",
-    "should_trigger": true,
-    "split": "validation"
-  },
-  {
     "query": "I need to add a SIMD variant of my vec3_dot in lib/math/vec3.c — the rest of the project uses _sse4 and _avx2 suffixes",
     "rationale": "near miss owned by c99-opinionated-guide",
     "should_trigger": false,
@@ -93,6 +69,30 @@
     "query": "add bounds-checked variants to the matrix ops in src/dsp/",
     "rationale": "near miss owned by c99-opinionated-guide",
     "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "A review comment on `work/controllers/` says the controllers change handles the normal fixture but leaves the failure path undefined. For this Hono Opinionated task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
+    "rationale": "implicit task cue derived from the controllers reference",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "quick pre-merge sanity check: after the openapi router hierarchy change under `work/openapi-router-hierarchy/`, a clean checkout behaves differently from my local run. What Hono Opinionated-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "rationale": "implicit task cue derived from the openapi router hierarchy reference",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "The clean Linux CI job fails only for the minimal openapi spec generation fixture under `work/openapi-spec-generation/`, while the full local fixture passes. Trace the Hono Opinionated-specific boundary that could cause the difference, then propose a patch and a regression check.",
+    "rationale": "implicit task cue derived from the openapi spec generation reference",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "A review comment on `work/router-selection/` says the router selection change handles the normal fixture but leaves the failure path undefined. For this Hono Opinionated task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
+    "rationale": "implicit task cue derived from the router selection reference",
+    "should_trigger": true,
     "split": "validation"
   }
 ]

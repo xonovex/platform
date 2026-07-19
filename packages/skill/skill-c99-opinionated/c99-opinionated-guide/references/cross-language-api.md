@@ -34,8 +34,8 @@ int image_write(image_o *img, const uint8_t *pixels, uint64_t size);  // returns
 - Untagged unions, bitfields, and variadics compile fine in C but silently can't be bound by many FFIs — the failure shows up only in the binding, not your build.
 - Hand-written bindings drift the moment the C API changes; generate them from one spec so they can't fall out of sync.
 - Direct 1:1 C bindings are almost never pleasant to use in another language — budget for an idiomatic wrapper layer (the generator should produce it) over the raw FFI.
-- Returning a pointer into internal state leaks your layout and ties the caller to your allocator; return a value/struct or fill a caller-provided buffer instead (pairs with [references/caller-owns-memory.md](./caller-owns-memory.md)).
+- Returning a pointer into internal state leaks your layout and ties the caller to your allocator; return a value/struct or fill a caller-provided buffer instead, following **memory-management-guide**.
 
 ## Related
 
-[references/plugin-architecture.md](./plugin-architecture.md), [references/caller-owns-memory.md](./caller-owns-memory.md), [references/physical-design.md](./physical-design.md)
+[references/plugin-architecture.md](./plugin-architecture.md), **memory-management-guide**, [references/physical-design.md](./physical-design.md)

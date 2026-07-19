@@ -18,28 +18,16 @@
     "split": "train"
   },
   {
-    "query": "Help me handle presentation create correctly in this Presentation task, including the edge cases that usually get missed.",
-    "rationale": "implicit task cue derived from the presentation create reference",
-    "should_trigger": true,
-    "split": "train"
-  },
-  {
-    "query": "Help me handle presentation motion scaffold correctly in this Presentation task, including the edge cases that usually get missed.",
-    "rationale": "implicit task cue derived from the presentation motion scaffold reference",
-    "should_trigger": true,
-    "split": "train"
-  },
-  {
     "query": "Review this Presentation change for core principles and fix the concrete issues you find.",
     "rationale": "implicit task cue derived from the Core Principles section",
     "should_trigger": true,
-    "split": "validation"
+    "split": "train"
   },
   {
     "query": "Review this Presentation change for workflow and fix the concrete issues you find.",
     "rationale": "implicit task cue derived from the Workflow section",
     "should_trigger": true,
-    "split": "validation"
+    "split": "train"
   },
   {
     "query": "Help me with scaffolding Motion-based slide packages; apply the relevant Presentation conventions and call out the important edge cases.",
@@ -72,25 +60,37 @@
     "split": "train"
   },
   {
-    "query": "Help me handle application structure correctly in this Hono task, including the edge cases that usually get missed.",
+    "query": "A review comment on `work/presentation-create/` says the presentation create change handles the normal fixture but leaves the failure path undefined. For this Presentation task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
+    "rationale": "implicit task cue derived from the presentation create reference",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "quick pre-merge sanity check: after the presentation motion scaffold change under `work/presentation-motion-scaffold/`, a clean checkout behaves differently from my local run. What Presentation-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "rationale": "implicit task cue derived from the presentation motion scaffold reference",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "A review comment on `work/application-structure/` says the application structure change handles the normal fixture but leaves the failure path undefined. For this Hono task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
     "rationale": "near miss owned by hono-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "Help me handle validation type safety correctly in this Hono task, including the edge cases that usually get missed.",
+    "query": "quick pre-merge sanity check: after the validation type safety change under `work/validation-type-safety/`, a clean checkout behaves differently from my local run. What Hono-specific assumption could cause that? Show the correction and the exact narrow validation.",
     "rationale": "near miss owned by hono-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "Help me handle middleware patterns correctly in this Hono task, including the edge cases that usually get missed.",
+    "query": "The clean Linux CI job fails only for the minimal middleware patterns fixture under `work/middleware-patterns/`, while the full local fixture passes. Trace the Hono-specific boundary that could cause the difference, then propose a patch and a regression check.",
     "rationale": "near miss owned by hono-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "Help me handle middleware combine correctly in this Hono task, including the edge cases that usually get missed.",
+    "query": "A review comment on `work/middleware-combine/` says the middleware combine change handles the normal fixture but leaves the failure path undefined. For this Hono task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
     "rationale": "near miss owned by hono-guide",
     "should_trigger": false,
     "split": "validation"

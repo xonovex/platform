@@ -24,30 +24,6 @@
     "split": "train"
   },
   {
-    "query": "Help me handle cte patterns correctly in this Sql Postgresql task, including the edge cases that usually get missed.",
-    "rationale": "implicit task cue derived from the cte patterns reference",
-    "should_trigger": true,
-    "split": "train"
-  },
-  {
-    "query": "Help me handle data types correctly in this Sql Postgresql task, including the edge cases that usually get missed.",
-    "rationale": "implicit task cue derived from the data types reference",
-    "should_trigger": true,
-    "split": "validation"
-  },
-  {
-    "query": "Help me handle indexing correctly in this Sql Postgresql task, including the edge cases that usually get missed.",
-    "rationale": "implicit task cue derived from the indexing reference",
-    "should_trigger": true,
-    "split": "validation"
-  },
-  {
-    "query": "Help me handle constraints correctly in this Sql Postgresql task, including the edge cases that usually get missed.",
-    "rationale": "implicit task cue derived from the constraints reference",
-    "should_trigger": true,
-    "split": "validation"
-  },
-  {
     "query": "Using Zod 4, write a TypeScript schema named UserSchema for a user object with these fields: an id that is a UUID, an email address, a createdAt that is an ISO datetime string, and a name string between 1 and 100 characters. Also export the inferred TypeScript type.",
     "rationale": "near miss owned by zod-guide",
     "should_trigger": false,
@@ -72,25 +48,49 @@
     "split": "train"
   },
   {
-    "query": "Help me handle migration v4 correctly in this Zod task, including the edge cases that usually get missed.",
+    "query": "Review this Zod change for requirements and fix the concrete issues you find.",
     "rationale": "near miss owned by zod-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "Help me handle schema organization correctly in this Zod task, including the edge cases that usually get missed.",
+    "query": "A review comment on `work/cte-patterns/` says the cte patterns change handles the normal fixture but leaves the failure path undefined. For this Sql Postgresql task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
+    "rationale": "implicit task cue derived from the cte patterns reference",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "quick pre-merge sanity check: after the data types change under `work/data-types/`, a clean checkout behaves differently from my local run. What Sql Postgresql-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "rationale": "implicit task cue derived from the data types reference",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "The clean Linux CI job fails only for the minimal indexing fixture under `work/indexing/`, while the full local fixture passes. Trace the Sql Postgresql-specific boundary that could cause the difference, then propose a patch and a regression check.",
+    "rationale": "implicit task cue derived from the indexing reference",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "A review comment on `work/constraints/` says the constraints change handles the normal fixture but leaves the failure path undefined. For this Sql Postgresql task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
+    "rationale": "implicit task cue derived from the constraints reference",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "A review comment on `work/migration-v4/` says the migration v4 change handles the normal fixture but leaves the failure path undefined. For this Zod task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
     "rationale": "near miss owned by zod-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "Help me handle validation patterns correctly in this Zod task, including the edge cases that usually get missed.",
+    "query": "quick pre-merge sanity check: after the schema organization change under `work/schema-organization/`, a clean checkout behaves differently from my local run. What Zod-specific assumption could cause that? Show the correction and the exact narrow validation.",
     "rationale": "near miss owned by zod-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "Review this Zod change for requirements and fix the concrete issues you find.",
+    "query": "The clean Linux CI job fails only for the minimal validation patterns fixture under `work/validation-patterns/`, while the full local fixture passes. Trace the Zod-specific boundary that could cause the difference, then propose a patch and a regression check.",
     "rationale": "near miss owned by zod-guide",
     "should_trigger": false,
     "split": "validation"

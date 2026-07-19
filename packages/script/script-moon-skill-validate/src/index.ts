@@ -8,6 +8,7 @@ import {
 } from "@xonovex/script-moon-common/fs";
 import {parse as parseYaml} from "yaml";
 import {checkCatalogFiles} from "./catalog-files.js";
+import {descriptionRoutingErrors} from "./description-routing.js";
 import {checkReferenceFileLinks} from "./reference-file-links.js";
 
 const NAME_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
@@ -244,6 +245,17 @@ const checkFrontmatter = (
       report.addWarn(
         "description: no 'even when the user doesn't say…' clause — " +
           "may miss implicit triggers",
+      );
+    }
+
+    const routingErrors = descriptionRoutingErrors(
+      desc,
+      typeof name === "string" ? name : undefined,
+    );
+    for (const error of routingErrors) report.addFail(error);
+    if (routingErrors.length === 0) {
+      report.addPass(
+        "description: routing uses positive triggers without other skill names",
       );
     }
   } else {

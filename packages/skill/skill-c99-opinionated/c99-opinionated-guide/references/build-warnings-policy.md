@@ -52,4 +52,4 @@ The `_req()`/`_init()` sizing pattern (see caller-owns-memory) covers string bui
 
 ### Related
 
-[references/caller-owns-memory.md](./caller-owns-memory.md), [references/string-handling.md](./string-handling.md), [references/safety-validations.md](./safety-validations.md)
+**memory-management-guide**, [references/string-handling.md](./string-handling.md), [references/safety-validations.md](./safety-validations.md)

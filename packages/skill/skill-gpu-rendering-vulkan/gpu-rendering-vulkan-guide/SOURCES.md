@@ -54,6 +54,7 @@
 
 ## Game-engine development blog (archive)
 
+- **Provenance:** Locally archived game-engine development articles
 - **Last reviewed:** 2026-05-27
 - **Used for:**
   - `SKILL.md` → Pipelines & binding, Commands & present, Setup (device memory)

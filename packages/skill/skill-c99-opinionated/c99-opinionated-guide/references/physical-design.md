@@ -31,10 +31,10 @@ void system_a_run(struct system_a_o *a, struct other_system_o *dep, struct file_
 
 - The rule only holds if it's enforced — one "harmless" header include reintroduces the cascade; gate it in CI, don't rely on discipline.
 - Opaque handles push type-confusion bugs to runtime (you cast `opaque` to a concrete type in the `.c`); keep the cast in exactly one place and assert the tag if you can.
-- Forward-declaration-only interfaces mean callers can't see struct sizes/layout — pass by pointer and allocate behind the system's own API (pairs with [references/caller-owns-memory.md](./caller-owns-memory.md)).
+- Forward-declaration-only interfaces mean callers can't see struct sizes/layout — pass by pointer and apply the caller-owned storage contract from **memory-management-guide**.
 - A header that "needs" another system's struct by value is a design smell — it's reaching across a boundary; pass a handle/pointer instead.
 - This governs _physical_ layout; the _runtime_ wiring of those systems (discovery, registration) is [references/plugin-architecture.md](./plugin-architecture.md).
 
 ## Related
 
-[references/plugin-architecture.md](./plugin-architecture.md), [references/file-naming.md](./file-naming.md), [references/caller-owns-memory.md](./caller-owns-memory.md), [references/hot-reload.md](./hot-reload.md)
+[references/plugin-architecture.md](./plugin-architecture.md), [references/file-naming.md](./file-naming.md), **memory-management-guide**, [references/hot-reload.md](./hot-reload.md)

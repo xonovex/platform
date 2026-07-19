@@ -39,4 +39,4 @@ A genuinely single-step operation with no reuse or variation does not need a sta
 
 ## Related
 
-[references/caller-owns-memory.md](./caller-owns-memory.md), [references/implementation-variants.md](./implementation-variants.md), **data-oriented-design-guide**
+**memory-management-guide**, [references/implementation-variants.md](./implementation-variants.md), **data-oriented-design-guide**

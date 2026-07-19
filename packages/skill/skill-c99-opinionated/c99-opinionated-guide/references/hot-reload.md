@@ -44,4 +44,4 @@ const module_api *api = ((const module_api *(*)(void))dlsym(lib, "load_module"))
 
 ## Related
 
-[references/caller-owns-memory.md](./caller-owns-memory.md), [references/composability.md](./composability.md), [references/file-naming.md](./file-naming.md)
+**memory-management-guide**, [references/composability.md](./composability.md), [references/file-naming.md](./file-naming.md)

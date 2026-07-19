@@ -118,3 +118,9 @@
   - `allowed-tools` frontmatter (experimental, space-separated allowlist) → least-privilege section; the "reduces blast radius, not injection likelihood" framing also informed by the security-considerations section of https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview
   - `compatibility` field for declaring network/runtime needs → network/runtime section
   - Treat-skills-as-software, audit untrusted scripts/URLs, fetched-content-as-untrusted-data, no hardcoded secrets → repo-original synthesis (not a transcription of an upstream "Security" page)
+
+## Guide-level synthesis
+
+- **Provenance:** Repository-original integration of the source blocks above; these references combine multiple inputs or maintained conventions rather than one exclusive upstream
+- **References:** references/decompose.md, references/extract-from-codebase.md, references/merge.md, references/optimize.md, references/simplify.md, references/workflow-skills.md
+- **Last reviewed:** 2026-05-27

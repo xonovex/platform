@@ -7,6 +7,7 @@ Product-specific facts are pinned to the documentation snapshot below. The local
 - **URL:** https://pi.dev/docs/latest/extensions
 - **Last reviewed:** 2026-07-16
 - **Used for:** `capabilities.md`, `onboarding.md`, `patterns.md`
+- **References:** references/capabilities.md, references/onboarding.md, references/patterns.md
 - **Aspects extracted:** Events, event ordering, tool blocking and mutation, result middleware, context injection, compaction, custom tools, output limits, session behavior, and full-process extension authority.
 
 ## Pi packages, settings, skills, and security
@@ -18,6 +19,7 @@ Product-specific facts are pinned to the documentation snapshot below. The local
   - https://pi.dev/docs/latest/security
 - **Last reviewed:** 2026-07-16
 - **Used for:** `capabilities.md`, `onboarding.md`, `patterns.md`
+- **References:** references/capabilities.md, references/onboarding.md, references/patterns.md
 - **Aspects extracted:** Package sources and pins, install/update/remove, user/project scopes, filters, project trust, skill discovery, full system access, and absence of a built-in sandbox.
 
 ## Refresh workflow
@@ -26,3 +28,9 @@ Product-specific facts are pinned to the documentation snapshot below. The local
 2. Run the documented version probe and replace `not-installed` only with the observed version.
 3. Execute every named deterministic probe on the observed surface; keep unsupported and experimental results explicit.
 4. Update the matrix version and review date when behavior changes.
+
+## Guide-level synthesis
+
+- **Provenance:** Repository-original integration of the source blocks above; these references combine multiple inputs or maintained conventions rather than one exclusive upstream
+- **References:** references/capabilities.md, references/onboarding.md, references/patterns.md
+- **Last reviewed:** 2026-07-16

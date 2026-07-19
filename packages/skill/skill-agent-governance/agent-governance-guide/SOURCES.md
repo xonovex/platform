@@ -137,3 +137,9 @@ The governance contract is an Xonovex architectural synthesis. Sources support c
 - **Aspects extracted:** Provider-native identities and references, explicit cloud/self-managed variants, temporary least-privilege credentials, and independent work-item/source/CI/runtime/telemetry roles. The shared capability-negotiation, transactional-onboarding, failure-policy, and no-central-store composition rules are Xonovex architectural synthesis; detailed claims remain owned and sourced by each platform skill.
 
 Harness capabilities and limitations require adapter-specific official sources and version-pinned conformance probes before release. The 2026-07-16 fixture snapshot records documentation conformance; its `not-installed` runtime probes are explicit non-results rather than passing runtime evidence.
+
+## Guide-level synthesis
+
+- **Provenance:** Repository-original integration of the source blocks above; these references combine multiple inputs or maintained conventions rather than one exclusive upstream
+- **References:** references/actors.md, references/autonomy.md, references/harness-onboarding.md, references/harness-patterns.md, references/provider-contracts.md, references/walking-skeleton.md
+- **Last reviewed:** 2026-07-16

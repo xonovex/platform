@@ -8,4 +8,5 @@
   - https://docs.python.org/3.12/library/asyncio.html
 - **Last reviewed:** 2026-07-19
 - **Used for:** `SKILL.md` and all `references/`; typing, dataclasses, exceptions, async functions, resource management, packaging, testing, and performance boundaries.
+- **References:** all
 - **Aspects extracted:** Python 3.12 language/library behavior and signatures. Style choices stricter than the language are Xonovex conventions.

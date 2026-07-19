@@ -1,8 +1,8 @@
 ---
 name: skill-guide
 description: "Use when authoring, reviewing, extracting, merging, simplifying, decomposing, or validating Agent Skills (SKILL.md plus references / scripts / assets), or when auditing, splitting, de-duplicating, or tiering a whole set of skills. Triggers on edits under a skills directory, on prompts about creating a new skill, progressive disclosure, reference files, pattern extraction, merging or assimilating skills, simplification to bullet format, validation against the Agent Skills spec, description tuning, evaluating trigger rate / output quality, or making a catalog composable (one owner per concept, cross-references, general→language→framework tiers) — even when the user doesn't say 'skill'."
-compatibility: "Node.js 22+ runs catalog maintenance; Python 3.11+ with uv runs legacy validators. Trigger/output evals additionally require a credentialed Claude CLI and network access; source fetch/update options perform explicit network or file writes."
-allowed-tools: "Read Bash(node:*) Bash(uv:*) Bash(claude:*)"
+compatibility: "Node.js 22+ and Git run catalog maintenance; Python 3.11+ with uv runs legacy validators. Trigger/output evals additionally require a credentialed Claude CLI and network access; source fetch/update options perform explicit network or file writes."
+allowed-tools: "Read Bash(git:*) Bash(node:*) Bash(uv:*) Bash(claude:*)"
 ---
 
 # Skill Guidelines Management
@@ -23,10 +23,10 @@ Author, extract, merge, simplify, and validate Agent Skills following the Agent 
 - **Progressive Disclosure** — SKILL.md contains essentials; `references/*` contains depth, loaded on demand
 - **Project Independence** — remove project-specific paths, names, domains; when concrete instance coordinates (hosts, orgs, repos, ids) are genuinely needed, isolate them in one on-demand reference (e.g. a dedicated `coordinates.md`) so the rest stays reusable and swappable; a general / architectural-pattern skill must also illustrate with a neutral domain (orders, storage, notifications), never the codebase that motivated it — map real concepts onto the neutral example, see [references/guideline-skills.md](references/guideline-skills.md)
 - **Composable split** — one concept has one owner skill; prefer small mix-and-match skills, cross-reference others by name instead of duplicating, and generalize anything not inherently language/API-specific into a general skill that specific skills link to for the "why", see [references/composability.md](references/composability.md)
-- **Design to coexist** — a skill is one capability among many loaded together; it must work alongside others, never assume it is the only one, and depend on others by described capability (soft) or exact declared name in the plugin's `dependencies` (hard) — always pointing upward through the general→language→framework tiers so the general tier never depends on a specific one, see [references/composability.md](references/composability.md)
+- **Design to coexist** — a skill is one capability among many loaded together; use by-name advisory handoffs for concept ownership, capability descriptions for optional runtime selection, and manifest dependencies only when the core workflow requires an exact skill; hard dependencies point upward and stay acyclic, see [references/composability.md](references/composability.md)
 - **Routing-first descriptions** — the description is the router (discovery sees only name+description); tune the trigger words, and debug mis-routes by asking "which skill did you use?", see [references/writing-descriptions.md](references/writing-descriptions.md)
 - **Advisory, not enforced** — a skill is routed to a model that reads it, never executed by the harness, so it may not load and may not be followed; a behavior that must happen every time, automatically, needs a hook, a hook plus a bounded model, or an agent instead — **instruction-guide** owns that decision procedure, **agent-governance-guide** the executor classes and hook mechanics
-- **Sources in SOURCES.md** — cite provenance only in `SOURCES.md`; never name authors, companies, talks, books, or blogs inside `SKILL.md` or `references/*` (tool/API/standard names are fine); for content distilled from a versioned upstream, pin its version + commit + watched source paths so currency is checkable by diffing the pinned commit to latest, and refresh against the released tag
+- **Sources in SOURCES.md** — cite provenance only in `SOURCES.md`; every source maps to the guidance it feeds through `**References:** all`, an explicit reference-file list, or an existing machine-readable `**Used for:**` / `**Aspects extracted:**` mapping (prefer `**References:**` for new edits), and repository-original material uses `**Provenance:**`; never name authors, companies, talks, books, or blogs inside `SKILL.md` or `references/*` (tool/API/standard names are fine); for versioned upstreams, pin the version + commit + watched paths
 - **Verify against source** — check every command, flag, signature, version, and count against the authoritative tool/API/docs before stating it; distilled facts drift and even a confident review "fix" can be wrong, so confirm against source before applying it
 - **Credential capability skills** — a skill that authenticates to an external service gets a keychain-first `auth.md` (OS keychain → secret-manager CLI → CI/CD secret → cloud vault; never hardcode), with first-time install / connect / init in a separate `onboarding.md`
 - **Treat skills as software** — least privilege via `allowed-tools`, audit untrusted scripts/URLs, never hardcode secrets, see [references/security.md](references/security.md)
@@ -56,12 +56,14 @@ Author, extract, merge, simplify, and validate Agent Skills following the Agent 
 
 ## Scripts
 
-PEP 723 self-contained Python scripts (run with `uv run <script>` — `uv` creates an isolated env on first run, no manual install step):
+Bundled maintenance scripts. Python entries use PEP 723 and run with `uv run <script>` (`uv` creates an isolated environment on first run); JavaScript entries run with Node.js 22+:
 
 - `scripts/validate.py <skill-dir>` — spec / quality / harness-neutrality audit (read-only; exits non-zero on errors)
 - `scripts/eval-triggers.py <queries.json> <skill-name>` — run trigger-eval queries against a skill (Claude Code reference implementation; requires `claude` CLI in PATH)
 - `scripts/eval-outputs.py <evals.json> <skill-name>` — run output-quality evals with-skill vs without-skill; writes per-arm pass rate / tokens / duration + `benchmark.json` (requires `claude` CLI in PATH)
 - `scripts/audit-sources.py <skill-dir>` — audit a skill's `SOURCES.md` for drift: staleness vs `Last reviewed`, dangling provenance, source→reference mapping; `--fetch` to check URLs, `--mark-reviewed` to stamp the date after review (read-only by default)
+- `scripts/complete-trigger-evals.mjs [catalog-root]` — replace legacy generated queries and fill missing trigger-eval polarities with realistic deterministic scenarios
+- `scripts/list-eval-matrix.mjs [catalog-root] [--changed BASE HEAD]` — emit the full or changed-skill model-eval matrix as JSON
 
 Cross-platform (macOS / Linux / Windows wherever `uv` is installed). Install `uv` with `brew install uv` or `curl -LsSf https://astral.sh/uv/install.sh | sh`.
 

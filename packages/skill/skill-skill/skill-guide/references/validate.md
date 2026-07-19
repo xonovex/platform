@@ -23,7 +23,7 @@ A reference implementation lives at [scripts/validate.py](../scripts/validate.py
 - `description` present, 1-1024 chars (warns on `<…>` angle-bracket markup — fine for component/generic references)
 - `description` starts with imperative cue ("Use when...", "Use this skill when...")
 - `description` includes trigger contexts ("Triggers on...", "even when the user doesn't say...")
-- `description` includes skip/scope boundary clauses where adjacent skills exist
+- `description` positively distinguishes the relevant user intent or context where adjacent skills share trigger words; it does not use skip/out-of-scope clauses or name other skills
 - Optional fields obey their limits/types: `compatibility` ≤500 chars, `license` string, `metadata` string→string map, `allowed-tools` space-separated token string
 - No unknown top-level fields (outside `name`/`description`/`license`/`compatibility`/`metadata`/`allowed-tools`)
 

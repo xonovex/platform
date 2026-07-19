@@ -15,6 +15,7 @@
   - https://github.com/cli/cli/blob/trunk/docs/install_linux.md
 - **Last reviewed:** 2026-06-26
 - **Used for:** install (first-time-setup.md), `gh auth login` / `status` / `setup-git` flow, the GH_TOKEN / GH_ENTERPRISE_TOKEN / GH_HOST environment split (auth.md), `gh pr create` flags + `gh pr edit` replace-on-body behavior (create.md), and the `gh pr review` inline-comment limitation (review-post.md).
+- **References:** references/auth.md, references/create.md, references/first-time-setup.md, references/review-post.md
 
 ## GitHub REST API
 
@@ -25,6 +26,7 @@
   - https://docs.github.com/en/rest/using-the-rest-api/troubleshooting-the-rest-api
 - **Last reviewed:** 2026-06-26
 - **Used for:** `POST /pulls` (no-push, head/base semantics) in create.md; the `.../pulls/{n}/reviews` object with `comments[]` path/line/side/start_line/start_side/commit_id and the deprecated `position` field in review-post.md; the 404-on-private and `X-Accepted-GitHub-Permissions` header behavior in auth.md.
+- **References:** references/auth.md, references/create.md, references/review-post.md
 
 ## GitHub Issues as a provider
 
@@ -41,6 +43,7 @@
   - https://docs.github.com/en/graphql/reference/pulls
 - **Last reviewed:** 2026-06-26
 - **Used for:** `resolveReviewThread` / `unresolveReviewThread` / `addPullRequestReviewThreadReply` mutations and the `pullRequest.reviewThreads` connection in review-resolve.md.
+- **References:** references/review-resolve.md
 
 ## Tokens, permissions, and Actions
 
@@ -51,6 +54,7 @@
   - https://github.com/orgs/community/discussions/44650
 - **Last reviewed:** 2026-06-26
 - **Used for:** the per-operation scope table (Contents: write to push, Pull requests: write to open/review, resolve needing Contents: read & write), classic `repo` scope, and the Actions `permissions:` block in auth.md.
+- **References:** references/auth.md
 
 ## Issue linking, branch protection, and rulesets
 
@@ -62,6 +66,7 @@
   - https://github.blog/changelog/2026-02-17-required-reviewer-rule-is-now-generally-available/
 - **Last reviewed:** 2026-06-26
 - **Used for:** closing-keyword auto-close-on-default-branch semantics in create.md; the REQUEST_CHANGES blocking + dismissal mechanism (review-post.md) and the conversation-resolution merge gate (review-resolve.md).
+- **References:** references/create.md, references/review-post.md, references/review-resolve.md
 
 ## GitHub Actions and external enforcement
 
@@ -87,6 +92,13 @@
   - https://github.com/orgs/community/discussions/10076
 - **Last reviewed:** 2026-06-26
 - **Used for:** `gh pr review` has no inline support (#12396), `.../pulls/{n}/comments` 422s on line/side (#13358), and related thread/resolve gaps that force the drop to `gh api` REST + GraphQL.
+- **References:** references/review-post.md, references/review-resolve.md
+
+## Guide-level synthesis
+
+- **Provenance:** Repository-original integration of the source blocks above; these references combine multiple inputs or maintained conventions rather than one exclusive upstream
+- **References:** references/auth.md, references/create.md, references/first-time-setup.md, references/onboarding.md, references/review-post.md, references/review-resolve.md
+- **Last reviewed:** 2026-07-16
 
 ## Refresh Workflow
 

@@ -8,4 +8,5 @@
   - https://react.dev/learn/you-might-not-need-an-effect
 - **Last reviewed:** 2026-07-19
 - **Used for:** `SKILL.md` and all `references/`; React 19 components, hooks, effects, context, forms, transitions, refs, routing boundaries, and rendering behavior.
+- **References:** all
 - **Aspects extracted:** Current React API semantics and official guidance on purity, state, effects, refs, transitions, and component composition.

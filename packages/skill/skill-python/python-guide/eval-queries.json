@@ -24,30 +24,6 @@
     "split": "train"
   },
   {
-    "query": "Help me handle dataclasses type hints correctly in this Python task, including the edge cases that usually get missed.",
-    "rationale": "implicit task cue derived from the dataclasses type hints reference",
-    "should_trigger": true,
-    "split": "train"
-  },
-  {
-    "query": "Help me handle type checking correctly in this Python task, including the edge cases that usually get missed.",
-    "rationale": "implicit task cue derived from the type checking reference",
-    "should_trigger": true,
-    "split": "validation"
-  },
-  {
-    "query": "Help me handle generators comprehensions correctly in this Python task, including the edge cases that usually get missed.",
-    "rationale": "implicit task cue derived from the generators comprehensions reference",
-    "should_trigger": true,
-    "split": "validation"
-  },
-  {
-    "query": "Help me handle caching functions correctly in this Python task, including the edge cases that usually get missed.",
-    "rationale": "implicit task cue derived from the caching functions reference",
-    "should_trigger": true,
-    "split": "validation"
-  },
-  {
     "query": "add proper types to the response shape in src/api/users.ts so the consumer doesn't have to cast",
     "rationale": "near miss owned by typescript-guide",
     "should_trigger": false,
@@ -93,6 +69,30 @@
     "query": "the strict-mode flag is off in this package's tsconfig — turn it on and fix what falls out",
     "rationale": "near miss owned by typescript-guide",
     "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "A review comment on `work/dataclasses-type-hints/` says the dataclasses type hints change handles the normal fixture but leaves the failure path undefined. For this Python task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
+    "rationale": "implicit task cue derived from the dataclasses type hints reference",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "quick pre-merge sanity check: after the type checking change under `work/type-checking/`, a clean checkout behaves differently from my local run. What Python-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "rationale": "implicit task cue derived from the type checking reference",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "The clean Linux CI job fails only for the minimal generators comprehensions fixture under `work/generators-comprehensions/`, while the full local fixture passes. Trace the Python-specific boundary that could cause the difference, then propose a patch and a regression check.",
+    "rationale": "implicit task cue derived from the generators comprehensions reference",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "A review comment on `work/caching-functions/` says the caching functions change handles the normal fixture but leaves the failure path undefined. For this Python task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
+    "rationale": "implicit task cue derived from the caching functions reference",
+    "should_trigger": true,
     "split": "validation"
   }
 ]

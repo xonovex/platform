@@ -1,4 +1,10 @@
-import {mkdirSync, mkdtempSync, rmSync, writeFileSync} from "node:fs";
+import {
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from "node:fs";
 import {tmpdir} from "node:os";
 import {join} from "node:path";
 import {afterEach, describe, expect, it} from "vitest";
@@ -93,6 +99,26 @@ describe("checkCatalogFiles", () => {
     );
     expect(report.errors).toContain(
       "catalog: scripted skills need a non-empty allowed-tools policy",
+    );
+  });
+
+  it("rejects generated routing boilerplate", () => {
+    const skillDir = makeSkill();
+    const path = join(skillDir, "eval-queries.json");
+    const queries = JSON.parse(readFileSync(path, "utf8")) as {
+      query: string;
+    }[];
+    const query =
+      "I'm reviewing `src/widgets` in a Example project. The happy path works, but widgets is unclear. Identify one realistic failure case.";
+    const first = queries[0];
+    if (first === undefined) throw new Error("fixture has no trigger queries");
+    first.query = query;
+    writeFileSync(path, JSON.stringify(queries));
+
+    const report = checkCatalogFiles(skillDir, {name: "example-guide"});
+
+    expect(report.errors).toContain(
+      `catalog: generic trigger eval query must be replaced: '${query}'`,
     );
   });
 });

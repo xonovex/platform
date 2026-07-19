@@ -24,30 +24,6 @@
     "split": "train"
   },
   {
-    "query": "Help me handle deployments correctly in this Kubernetes task, including the edge cases that usually get missed.",
-    "rationale": "implicit task cue derived from the deployments reference",
-    "should_trigger": true,
-    "split": "train"
-  },
-  {
-    "query": "Help me handle configmaps secrets correctly in this Kubernetes task, including the edge cases that usually get missed.",
-    "rationale": "implicit task cue derived from the configmaps secrets reference",
-    "should_trigger": true,
-    "split": "validation"
-  },
-  {
-    "query": "Help me handle kustomize correctly in this Kubernetes task, including the edge cases that usually get missed.",
-    "rationale": "implicit task cue derived from the kustomize reference",
-    "should_trigger": true,
-    "split": "validation"
-  },
-  {
-    "query": "Help me handle validation correctly in this Kubernetes task, including the edge cases that usually get missed.",
-    "rationale": "implicit task cue derived from the validation reference",
-    "should_trigger": true,
-    "split": "validation"
-  },
-  {
     "query": "I'm writing TypeScript that compiles to Lua with the typescript-to-lua transpiler. Write a `divmod` function that takes two numbers and returns both the quotient (floored) and the remainder so the generated Lua uses native Lua multiple return values rather than an array or object wrapper. Include a call site that consumes both values.",
     "rationale": "near miss owned by typescript-to-lua-guide",
     "should_trigger": false,
@@ -72,25 +48,49 @@
     "split": "train"
   },
   {
-    "query": "Help me handle namespaces vs classes correctly in this Typescript To Lua task, including the edge cases that usually get missed.",
+    "query": "A review comment on `work/deployments/` says the deployments change handles the normal fixture but leaves the failure path undefined. For this Kubernetes task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
+    "rationale": "implicit task cue derived from the deployments reference",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "quick pre-merge sanity check: after the configmaps secrets change under `work/configmaps-secrets/`, a clean checkout behaves differently from my local run. What Kubernetes-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "rationale": "implicit task cue derived from the configmaps secrets reference",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "The clean Linux CI job fails only for the minimal kustomize fixture under `work/kustomize/`, while the full local fixture passes. Trace the Kubernetes-specific boundary that could cause the difference, then propose a patch and a regression check.",
+    "rationale": "implicit task cue derived from the kustomize reference",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "A review comment on `work/validation/` says the validation change handles the normal fixture but leaves the failure path undefined. For this Kubernetes task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
+    "rationale": "implicit task cue derived from the validation reference",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "A review comment on `work/namespaces-vs-classes/` says the namespaces vs classes change handles the normal fixture but leaves the failure path undefined. For this Typescript To Lua task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
     "rationale": "near miss owned by typescript-to-lua-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "Help me handle multi return functions correctly in this Typescript To Lua task, including the edge cases that usually get missed.",
+    "query": "quick pre-merge sanity check: after the multi return functions change under `work/multi-return-functions/`, a clean checkout behaves differently from my local run. What Typescript To Lua-specific assumption could cause that? Show the correction and the exact narrow validation.",
     "rationale": "near miss owned by typescript-to-lua-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "Help me handle tstl decorators correctly in this Typescript To Lua task, including the edge cases that usually get missed.",
+    "query": "The clean Linux CI job fails only for the minimal tstl decorators fixture under `work/tstl-decorators/`, while the full local fixture passes. Trace the Typescript To Lua-specific boundary that could cause the difference, then propose a patch and a regression check.",
     "rationale": "near miss owned by typescript-to-lua-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "Help me handle performance tips correctly in this Typescript To Lua task, including the edge cases that usually get missed.",
+    "query": "A review comment on `work/performance-tips/` says the performance tips change handles the normal fixture but leaves the failure path undefined. For this Typescript To Lua task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
     "rationale": "near miss owned by typescript-to-lua-guide",
     "should_trigger": false,
     "split": "validation"

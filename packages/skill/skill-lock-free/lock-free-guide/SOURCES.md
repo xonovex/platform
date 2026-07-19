@@ -50,6 +50,7 @@
 
 ## Game-engine development blog (archive)
 
+- **Provenance:** Locally archived game-engine development articles
 - **Last reviewed:** 2026-05-27
 - **Used for:**
   - `SKILL.md` → Reclamation & scaling
@@ -57,6 +58,12 @@
 - **Aspects extracted:**
   - "Fiber based job system" — fibers yield instead of blocking a worker → `references/scalable-architecture.md`
   - "Multi-Threading The Truth" — immutable snapshots / atomic version swap for read-mostly data → `references/safe-memory-reclamation.md`
+
+## Guide-level synthesis
+
+- **Provenance:** Repository-original integration of the source blocks above; these references combine multiple inputs or maintained conventions rather than one exclusive upstream
+- **References:** references/spsc-ring-buffer.md
+- **Last reviewed:** 2026-05-27
 
 ## Refresh Workflow
 

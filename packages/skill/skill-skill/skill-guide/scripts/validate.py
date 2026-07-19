@@ -40,6 +40,11 @@ PROGRESSIVE_DISCLOSURE_RE = re.compile(
 HEADING_RE = re.compile(r"^#{1,6} ", re.MULTILINE)
 CODE_FENCE_OPEN_RE = re.compile(r"^```([a-zA-Z0-9_+-]+)?\s*$", re.MULTILINE)
 LOAD_WHEN_RE = re.compile(r"load when", re.IGNORECASE)
+NEGATIVE_ROUTING_CLAUSE_RE = re.compile(
+    r"(?:^|[.!?]\s+)(?:skip\b|do not use\b|don't use\b|out[- ]of[- ]scope\b)",
+    re.IGNORECASE,
+)
+NAMED_SKILL_RE = re.compile(r"\b[a-z0-9]+(?:-[a-z0-9]+)*-guide\b", re.IGNORECASE)
 
 HARNESS_PATTERNS = [
     # Proprietary tool / function / mode names
@@ -167,6 +172,31 @@ def check_loader_quoting(fm_raw: str, report: Report) -> None:
         )
 
 
+def description_routing_errors(
+    description: str, own_skill_name: str | None
+) -> list[str]:
+    errors: list[str] = []
+    if NEGATIVE_ROUTING_CLAUSE_RE.search(description):
+        errors.append(
+            "description: routing must use positive triggers only; "
+            "move skip/out-of-scope guidance to the body"
+        )
+    named_skills = sorted(
+        {
+            match.group(0).lower()
+            for match in NAMED_SKILL_RE.finditer(description)
+            if match.group(0).lower()
+            != (own_skill_name.lower() if own_skill_name is not None else None)
+        }
+    )
+    if named_skills:
+        errors.append(
+            f"description: names other skill(s) {', '.join(named_skills)}; "
+            "put by-name handoffs in the body"
+        )
+    return errors
+
+
 def check_frontmatter(fm: dict, parent_name: str, report: Report) -> None:
     # name
     name = fm.get("name")
@@ -235,6 +265,16 @@ def check_frontmatter(fm: dict, parent_name: str, report: Report) -> None:
             report.add_warn(
                 "description: no 'even when the user doesn't say…' clause — "
                 "may miss implicit triggers"
+            )
+
+        routing_errors = description_routing_errors(
+            desc, name if isinstance(name, str) else None
+        )
+        for error in routing_errors:
+            report.add_fail(error)
+        if not routing_errors:
+            report.add_pass(
+                "description: routing uses positive triggers without other skill names"
             )
 
     # description: XML tags (platform spec) — warn, since descriptions legitimately

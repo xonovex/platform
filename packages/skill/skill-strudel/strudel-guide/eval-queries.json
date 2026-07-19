@@ -24,30 +24,6 @@
     "split": "train"
   },
   {
-    "query": "Help me handle tempo timing correctly in this Strudel task, including the edge cases that usually get missed.",
-    "rationale": "implicit task cue derived from the tempo timing reference",
-    "should_trigger": true,
-    "split": "train"
-  },
-  {
-    "query": "Help me handle mini notation correctly in this Strudel task, including the edge cases that usually get missed.",
-    "rationale": "implicit task cue derived from the mini notation reference",
-    "should_trigger": true,
-    "split": "validation"
-  },
-  {
-    "query": "Help me handle layering correctly in this Strudel task, including the edge cases that usually get missed.",
-    "rationale": "implicit task cue derived from the layering reference",
-    "should_trigger": true,
-    "split": "validation"
-  },
-  {
-    "query": "Help me handle sounds correctly in this Strudel task, including the edge cases that usually get missed.",
-    "rationale": "implicit task cue derived from the sounds reference",
-    "should_trigger": true,
-    "split": "validation"
-  },
-  {
     "query": "In a Remotion project running at 30fps, write a React component that fades a headline in from opacity 0 to 1 over the first half second and slides it up 40px at the same time. Give me the full component code.",
     "rationale": "near miss owned by remotion-guide",
     "should_trigger": false,
@@ -72,25 +48,49 @@
     "split": "train"
   },
   {
-    "query": "Help me handle timing correctly in this Remotion task, including the edge cases that usually get missed.",
+    "query": "A review comment on `work/tempo-timing/` says the tempo timing change handles the normal fixture but leaves the failure path undefined. For this Strudel task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
+    "rationale": "implicit task cue derived from the tempo timing reference",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "quick pre-merge sanity check: after the mini notation change under `work/mini-notation/`, a clean checkout behaves differently from my local run. What Strudel-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "rationale": "implicit task cue derived from the mini notation reference",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "The clean Linux CI job fails only for the minimal layering fixture under `work/layering/`, while the full local fixture passes. Trace the Strudel-specific boundary that could cause the difference, then propose a patch and a regression check.",
+    "rationale": "implicit task cue derived from the layering reference",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "A review comment on `work/sounds/` says the sounds change handles the normal fixture but leaves the failure path undefined. For this Strudel task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
+    "rationale": "implicit task cue derived from the sounds reference",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "A review comment on `work/timing/` says the timing change handles the normal fixture but leaves the failure path undefined. For this Remotion task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
     "rationale": "near miss owned by remotion-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "Help me handle sequencing correctly in this Remotion task, including the edge cases that usually get missed.",
+    "query": "quick pre-merge sanity check: after the sequencing change under `work/sequencing/`, a clean checkout behaves differently from my local run. What Remotion-specific assumption could cause that? Show the correction and the exact narrow validation.",
     "rationale": "near miss owned by remotion-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "Help me handle assets correctly in this Remotion task, including the edge cases that usually get missed.",
+    "query": "The clean Linux CI job fails only for the minimal assets fixture under `work/assets/`, while the full local fixture passes. Trace the Remotion-specific boundary that could cause the difference, then propose a patch and a regression check.",
     "rationale": "near miss owned by remotion-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "Help me handle compositions correctly in this Remotion task, including the edge cases that usually get missed.",
+    "query": "A review comment on `work/compositions/` says the compositions change handles the normal fixture but leaves the failure path undefined. For this Remotion task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
     "rationale": "near miss owned by remotion-guide",
     "should_trigger": false,
     "split": "validation"

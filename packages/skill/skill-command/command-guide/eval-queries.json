@@ -18,36 +18,6 @@
     "split": "train"
   },
   {
-    "query": "Help me handle distill correctly in this Command task, including the edge cases that usually get missed.",
-    "rationale": "implicit task cue derived from the distill reference",
-    "should_trigger": true,
-    "split": "train"
-  },
-  {
-    "query": "Help me handle create correctly in this Command task, including the edge cases that usually get missed.",
-    "rationale": "implicit task cue derived from the create reference",
-    "should_trigger": true,
-    "split": "train"
-  },
-  {
-    "query": "Help me handle merge correctly in this Command task, including the edge cases that usually get missed.",
-    "rationale": "implicit task cue derived from the merge reference",
-    "should_trigger": true,
-    "split": "validation"
-  },
-  {
-    "query": "Help me handle simplify correctly in this Command task, including the edge cases that usually get missed.",
-    "rationale": "implicit task cue derived from the simplify reference",
-    "should_trigger": true,
-    "split": "validation"
-  },
-  {
-    "query": "Help me handle harness formats correctly in this Command task, including the edge cases that usually get missed.",
-    "rationale": "implicit task cue derived from the harness formats reference",
-    "should_trigger": true,
-    "split": "validation"
-  },
-  {
     "query": "this packages/auth dir doesn't have an AGENTS.md yet — set one up",
     "rationale": "near miss owned by instruction-guide",
     "should_trigger": false,
@@ -93,6 +63,36 @@
     "query": "add a CLAUDE.md to the new monorepo workspace at packages/billing",
     "rationale": "near miss owned by instruction-guide",
     "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "A review comment on `work/distill/` says the distill change handles the normal fixture but leaves the failure path undefined. For this Command task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
+    "rationale": "implicit task cue derived from the distill reference",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "quick pre-merge sanity check: after the create change under `work/create/`, a clean checkout behaves differently from my local run. What Command-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "rationale": "implicit task cue derived from the create reference",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "The clean Linux CI job fails only for the minimal merge fixture under `work/merge/`, while the full local fixture passes. Trace the Command-specific boundary that could cause the difference, then propose a patch and a regression check.",
+    "rationale": "implicit task cue derived from the merge reference",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "A review comment on `work/simplify/` says the simplify change handles the normal fixture but leaves the failure path undefined. For this Command task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
+    "rationale": "implicit task cue derived from the simplify reference",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "quick pre-merge sanity check: after the harness formats change under `work/harness-formats/`, a clean checkout behaves differently from my local run. What Command-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "rationale": "implicit task cue derived from the harness formats reference",
+    "should_trigger": true,
     "split": "validation"
   }
 ]

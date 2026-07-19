@@ -9,7 +9,11 @@ import {
   resolveGuideDirectory,
 } from "@xonovex/script-moon-common/fs";
 import {parseArgs, type ParsedArgs} from "./args.js";
-import {parseSources, type Source} from "./source-parser.js";
+import {
+  hasReferenceMapping,
+  parseSources,
+  type Source,
+} from "./source-parser.js";
 
 const REVIEWED_RE = /\*\*Last reviewed:\*\*\s*(\d{4}-\d{2}-\d{2})/;
 const HEADER_RE = /^##\s+(.*\S)\s*$/;
@@ -40,6 +44,8 @@ interface SourceReport {
   age_days: number | null;
   stale: boolean;
   refs: readonly string[];
+  covers_all_references: boolean;
+  reference_mapping_missing: boolean;
   dangling_refs: readonly string[];
   fetch?: FetchReport;
   fetches?: readonly FetchReport[];
@@ -73,6 +79,8 @@ Usage:
       -h, --help           show this help
 
 A source block may add upstream-drift fields:
+      **References:** all | a.md, b.md
+                                      reference files this source supports
       **Checkout:** <path>            local source repo (relative to workspace root)
       **Version:** <semver>           version the skill is pinned to
       **Commit:** <hash>              commit the skill was distilled from
@@ -319,6 +327,7 @@ const auditSkill = async (
   for (const s of sources) {
     const age = s.reviewed ? daysBetween(today, s.reviewed) : null;
     const stale = age !== null && age > maxAge;
+    const referenceMappingMissing = !hasReferenceMapping(s);
     const dangling = [...s.refs].filter((r) => !existingRefs.has(r)).toSorted();
     for (const r of s.refs) covered.add(r);
     const report: SourceReport = {
@@ -330,11 +339,17 @@ const auditSkill = async (
       age_days: age,
       stale,
       refs: [...s.refs].toSorted(),
+      covers_all_references: s.coversAllReferences,
+      reference_mapping_missing: referenceMappingMissing,
       dangling_refs: dangling,
     };
+    if (s.coversAllReferences) {
+      for (const reference of existingRefs) covered.add(reference);
+    }
     if (age === null || stale || dangling.length > 0) {
       problems += 1;
     }
+    if (referenceMappingMissing) problems += 1;
     if (doFetch && s.urls.length > 0) {
       const fetches = await Promise.all(s.urls.map((url) => fetchStatus(url)));
       report.fetch = fetches[0];
@@ -352,6 +367,7 @@ const auditSkill = async (
   }
 
   const uncovered = [...existingRefs].filter((r) => !covered.has(r)).toSorted();
+  problems += uncovered.length;
   if (sources.length === 0) problems += 1;
   return {
     skill: basename(resolve(skillDir)),
@@ -411,6 +427,9 @@ const printTextReport = (rep: SkillReport, maxAge: number): void => {
     if (s.last_reviewed === null) {
       flags.push("MISSING REVIEW DATE");
     }
+    if (s.reference_mapping_missing) {
+      flags.push("MISSING REFERENCE MAPPING");
+    }
     if (s.dangling_refs.length > 0) {
       flags.push(`DANGLING: ${s.dangling_refs.join(", ")}`);
     }
@@ -442,10 +461,14 @@ const printTextReport = (rep: SkillReport, maxAge: number): void => {
     for (const [index, fetch] of fetches.entries()) {
       console.log(`    fetch ${String(index + 1).padEnd(7)}: ${fetch.detail}`);
     }
-    if (s.refs.length > 0) {
+    if (s.covers_all_references) {
+      console.log("    feeds         : all references");
+    } else if (s.refs.length > 0) {
       console.log(
         `    feeds         : ${s.refs.map((r) => "references/" + r).join(", ")}`,
       );
+    } else {
+      console.log("    feeds         : (missing)");
     }
     if (drift) {
       if (drift.resolved) {
@@ -480,7 +503,7 @@ const printTextReport = (rep: SkillReport, maxAge: number): void => {
   }
   if (rep.uncovered_refs.length > 0) {
     console.log(
-      "\n  reference files with no upstream source (repo-original or provenance gap):",
+      "\n  reference files with no declared source or repository-original provenance:",
     );
     for (const r of rep.uncovered_refs) {
       console.log(`    references/${r}`);
@@ -622,9 +645,9 @@ const main = async (argv: readonly string[]): Promise<number> => {
 
 try {
   const code = await main(process.argv.slice(2));
-  process.exit(code);
+  process.exitCode = code;
 } catch (error) {
   const message = error instanceof Error ? error.message : String(error);
   process.stderr.write(`error: ${message}\n`);
-  process.exit(2);
+  process.exitCode = 2;
 }

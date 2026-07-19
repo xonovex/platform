@@ -5,6 +5,7 @@
 - **Title:** Kuba Guzik — "caveman-micro" (`caveman-micro.txt`)
 - **URL:** https://github.com/kuba-guzik/caveman-micro
 - **Last reviewed:** 2026-06-27
+- **References:** all
 - **Used for:**
   - `SKILL.md` → all sections
 - **Aspects extracted:**

@@ -20,14 +20,15 @@ Specific tiers link **up** to the general tier for the rationale; the general ti
 
 - `fp-guide` / `oop-guide` → `typescript-guide` / `python-guide` / `lua-guide` / `c99-guide` → `hono-guide` / `react-guide` / `c99-opinionated-guide`.
 
-## Depending on another skill
+## Relating to another skill
 
-A skill (or command) can depend on another skill two ways — both reference it by **name or capability**, never by copying its content or by a cross-package file link (those don't resolve at load time):
+A skill or command relates to another capability in three distinct ways. Never copy the other skill's content or use a cross-package file link:
 
-- **Soft** — describe the _capability needed_ and let the agent select the best-fitting installed skill at run time. Nothing is named or declared, and the consumer degrades gracefully when none matches or none is loaded. Use this when the right implementation is interchangeable or context-chosen — e.g. one of a family of target-specific skills, picked to match the current environment.
-- **Hard** — name the _exact_ skill and declare it in the plugin's `dependencies` — a bare plugin-name string (e.g. `xonovex-skill-connascence`), added to BOTH `.claude-plugin/plugin.json` and `.codex-plugin/plugin.json` — so it is guaranteed present (install ≠ in-context — still load it via the `Skill` tool). Use this when one specific skill is always required.
+- **Advisory handoff** — name the concept owner (`owned by **testing-guide**`, `see **bdd-guide**`) so the agent can continue there when it is available. The current skill remains useful without it, so this does not create an installation dependency and may point laterally.
+- **Soft selection** — describe the _capability needed_ without naming one implementation, then let the agent select the best installed match at runtime. Use this for interchangeable or context-selected providers; degrade gracefully when none exists.
+- **Hard dependency** — name the exact skill because the current skill's core workflow cannot complete without it, and add the bare plugin name to `dependencies` in BOTH manifests. Installation still does not put the skill in context, so load it explicitly when needed.
 
-Either way, dependencies point **upward only** — a specific skill may depend on a general one; the general tier never depends on a specific skill, and there are no cycles. The depended-on skill (or one matching the described capability) must exist in the catalog or the dependency dangles — update every referrer when retiring or merging a skill.
+Hard dependencies point **upward only** — a specific skill may require a general one; the general tier never requires a specific one, and the manifest graph has no cycles. Advisory handoffs may be reciprocal because they do not promise installation or loading. Every named handoff and declared dependency must still resolve to an existing catalog skill. The composition validator enforces the mechanical contract: matching package-derived manifest names, matching dependency lists, named hard-dependency handoffs, no missing targets, and no cycles. Whether a workflow truly cannot complete without a dependency and whether an edge points upward remain author-review decisions.
 
 ## Generalize-or-link decision
 
@@ -40,5 +41,5 @@ For any concept appearing in a language/framework skill, ask: **is this concept 
 
 - Prefer many small single-concern skills over one large bundle — they mix and match per task.
 - The general tier must stay self-contained: it explains the principle without referencing any language or framework skill.
-- Cross-reference by **skill name**, bolded in prose (`**hono-guide**`) — readers route by name, and names survive repackaging that file paths do not.
+- Mark advisory ownership handoffs by **skill name**, bolded in prose (`owned by **hono-guide**`) — readers route by name, and names survive repackaging that file paths do not.
 - A description routes by its own trigger words, not by naming other skills; keep cross-references in the body, which links the owning skill by name for depth.

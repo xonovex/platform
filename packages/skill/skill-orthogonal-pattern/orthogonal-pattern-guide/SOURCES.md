@@ -118,6 +118,12 @@
 - **Aspects extracted:**
   - Structure mirrors team communication; single owner per axis; bounded-context / domain-seam alignment; fitness functions / architecture tests → `references/structure-isomorphism.md`, `references/applying-the-layout.md`
 
+## Guide-level synthesis
+
+- **Provenance:** Repository-original integration of the source blocks above; these references combine multiple inputs or maintained conventions rather than one exclusive upstream
+- **References:** references/modular-code.md, references/naming-symmetry.md
+- **Last reviewed:** 2026-06-27
+
 ## Refresh Workflow
 
 1. Re-read the upstream source(s) above

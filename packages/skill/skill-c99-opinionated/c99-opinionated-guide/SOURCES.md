@@ -1,16 +1,14 @@
 # Sources
 
-The C99 style here (implementation variants, caller-owns-memory, alignment,
-handles/indices, string handling, file naming, safety validations, testing patterns) is
-repo-original/general C knowledge — those reference files have no single upstream and
-are expected to show as "uncovered" in the source audit. This guide is an **overlay on
-c99-guide**: the generic C99 idioms it shares — const-correctness, designated
-initializers, inline-over-macros, compound literals, and baseline error/memory patterns —
-are not duplicated here; c99-guide owns them. The architecture references below are
-distilled from the engine blog archive.
+This guide is an **overlay on c99-guide**: generic C99 idioms remain there, while
+**memory-management-guide** owns allocation, ownership, and lifetime theory and
+**data-oriented-design-guide** owns stable-handle layout and iteration tradeoffs. This
+guide retains only the C99-specific boundary validations and style decisions. The
+architecture references below are distilled from the engine blog archive.
 
 ## Game-engine development blog (archive)
 
+- **Provenance:** Locally archived game-engine development articles
 - **Last reviewed:** 2026-05-27
 - **Used for:**
   - `SKILL.md` → Architecture, Gotchas
@@ -36,18 +34,25 @@ distilled from the engine blog archive.
 
 ## Modern C / data-oriented C conference talks
 
+- **Provenance:** Locally reviewed recordings and transcripts about modern C and data-oriented implementation
 - **Last reviewed:** 2026-06-13
 - **Used for:**
   - `SKILL.md` → Architecture (Handles & indices), Safety (Strings), Gotchas
   - The data-oriented decisions that distinguish this style from generic C99
 - **Aspects extracted:**
-  - "Reference objects via array indexes, not raw pointers" — indices/generational handles into caller-owned arrays survive relocation, serialize position-independently, pack tighter, and stay deterministic; generation counters guard slot reuse → `references/handles-and-indices.md`, sharpened bounded-container/handle-resolution rules in `references/safety-validations.md`
+  - "Reference objects via array indexes, not raw pointers" — the general handle model is owned by **data-oriented-design-guide**; the C99-specific bounds-before-generation check and scoped-pointer rule feed `references/safety-validations.md`
   - "Replace the legacy libc string trap" — `strlen`/`strtok` terminator rescans go O(n²) in a loop (the GTA Online JSON-load case); the owning-vs-non-owning split (length-carrying view for reads, bounded caller-owned builder for writes) → `references/string-handling.md`
   - Address/UndefinedBehavior sanitizers as the runtime net for hand-carved arena/caller-owned memory → `references/build-warnings-policy.md`
   - Memory arenas / aggregate "free the whole lifetime at once" allocation reinforce the existing caller-owns-memory direction; the general allocator theory stays in **memory-management-guide**
 
 The C11 `_Generic` overloading and macro-heavy metaprogramming (defer macros, stb_ds-style
 meta-header dynamic arrays) from the same talks are intentionally **excluded** from this guide.
+
+## Guide-level synthesis
+
+- **Provenance:** Repository-original integration of the source blocks above; these references combine multiple inputs or maintained conventions rather than one exclusive upstream
+- **References:** references/alignment.md, references/file-naming.md, references/implementation-variants.md, references/testing-patterns.md
+- **Last reviewed:** 2026-06-13
 
 ## Refresh Workflow
 

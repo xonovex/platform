@@ -33,7 +33,7 @@ Only the H1 is required. The other sections are optional but follow this orderin
 
 Each list item is:
 
-- A markdown hyperlink `[name](url)` _(required)_
+- A markdown hyperlink such as `[name](https://example.com/page)` _(required)_
 - Optionally followed by `:` and brief notes
 
 ### The "Optional" section

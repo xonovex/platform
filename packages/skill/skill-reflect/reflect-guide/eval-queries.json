@@ -30,24 +30,6 @@
     "split": "train"
   },
   {
-    "query": "Help me handle governed promotion correctly in this Reflect task, including the edge cases that usually get missed.",
-    "rationale": "implicit task cue derived from the governed promotion reference",
-    "should_trigger": true,
-    "split": "validation"
-  },
-  {
-    "query": "Help me handle extract correctly in this Reflect task, including the edge cases that usually get missed.",
-    "rationale": "implicit task cue derived from the extract reference",
-    "should_trigger": true,
-    "split": "validation"
-  },
-  {
-    "query": "Help me handle integrate instructions correctly in this Reflect task, including the edge cases that usually get missed.",
-    "rationale": "implicit task cue derived from the integrate instructions reference",
-    "should_trigger": true,
-    "split": "validation"
-  },
-  {
     "query": "I have a Claude Code slash command at `.claude/commands/changelog.md`. Its body uses `$ARGUMENTS` for the user input and embeds git output inline with `` !`git log --oneline -20` ``. I want to port this same command to the Gemini CLI. Tell me exactly what to change and where the file goes.",
     "rationale": "near miss owned by command-guide",
     "should_trigger": false,
@@ -66,31 +48,49 @@
     "split": "train"
   },
   {
-    "query": "Help me handle distill correctly in this Command task, including the edge cases that usually get missed.",
+    "query": "A review comment on `work/governed-promotion/` says the governed promotion change handles the normal fixture but leaves the failure path undefined. For this Reflect task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
+    "rationale": "implicit task cue derived from the governed promotion reference",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "quick pre-merge sanity check: after the extract change under `work/extract/`, a clean checkout behaves differently from my local run. What Reflect-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "rationale": "implicit task cue derived from the extract reference",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "The clean Linux CI job fails only for the minimal integrate instructions fixture under `work/integrate-instructions/`, while the full local fixture passes. Trace the Reflect-specific boundary that could cause the difference, then propose a patch and a regression check.",
+    "rationale": "implicit task cue derived from the integrate instructions reference",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "A review comment on `work/distill/` says the distill change handles the normal fixture but leaves the failure path undefined. For this Command task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
     "rationale": "near miss owned by command-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "Help me handle create correctly in this Command task, including the edge cases that usually get missed.",
+    "query": "quick pre-merge sanity check: after the create change under `work/create/`, a clean checkout behaves differently from my local run. What Command-specific assumption could cause that? Show the correction and the exact narrow validation.",
     "rationale": "near miss owned by command-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "Help me handle merge correctly in this Command task, including the edge cases that usually get missed.",
+    "query": "The clean Linux CI job fails only for the minimal merge fixture under `work/merge/`, while the full local fixture passes. Trace the Command-specific boundary that could cause the difference, then propose a patch and a regression check.",
     "rationale": "near miss owned by command-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "Help me handle simplify correctly in this Command task, including the edge cases that usually get missed.",
+    "query": "A review comment on `work/simplify/` says the simplify change handles the normal fixture but leaves the failure path undefined. For this Command task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
     "rationale": "near miss owned by command-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "Help me handle harness formats correctly in this Command task, including the edge cases that usually get missed.",
+    "query": "quick pre-merge sanity check: after the harness formats change under `work/harness-formats/`, a clean checkout behaves differently from my local run. What Command-specific assumption could cause that? Show the correction and the exact narrow validation.",
     "rationale": "near miss owned by command-guide",
     "should_trigger": false,
     "split": "validation"

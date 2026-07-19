@@ -21,6 +21,12 @@
 - **Used for:** `references/service-objectives.md`, `references/operations-and-learning.md`
 - **Aspects extracted:** Delivery, feedback, automation, observability, documentation, security, user-focus, and organizational capabilities. This source is delivery research and is not Regulation (EU) 2022/2554.
 
+## Guide-level synthesis
+
+- **Provenance:** Repository-original integration of the source blocks above; these references combine multiple inputs or maintained conventions rather than one exclusive upstream
+- **References:** references/failure-semantics.md
+- **Last reviewed:** 2026-07-16
+
 ## Refresh Workflow
 
 1. Re-check current incident, contingency, configuration, and delivery-capability guidance.

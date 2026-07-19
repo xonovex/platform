@@ -127,3 +127,9 @@
   - `$@` (all args) and `{{name}}` (named placeholders) substitution
   - `/name` invocation; skills separate via `/skill:name`
   - `--no-prompt-templates` disable flag
+
+## Guide-level synthesis
+
+- **Provenance:** Repository-original integration of the source blocks above; these references combine multiple inputs or maintained conventions rather than one exclusive upstream
+- **References:** references/create.md, references/distill.md, references/merge.md, references/simplify.md
+- **Last reviewed:** 2026-05-13

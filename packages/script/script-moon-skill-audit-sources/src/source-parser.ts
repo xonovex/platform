@@ -6,6 +6,10 @@ const HTTP_URL_RE = /https?:\/\/\S+/g;
 const REVIEWED_RE = /\*\*Last reviewed:\*\*\s*(\d{4}-\d{2}-\d{2})/;
 const PROVENANCE_RE = /\*\*Provenance:\*\*\s*(.+\S)\s*$/;
 const REF_RE = /references\/([a-z0-9][a-z0-9-]*\.md)/g;
+const ARROW_REF_RE = /(?:->|→)\s*`?([a-z0-9][a-z0-9-]*\.md)`?/g;
+const REFERENCES_RE = /\*\*References:\*\*\s*(.*\S)?\s*$/;
+const LEGACY_ALL_REFERENCES_RE =
+  /\*\*Used for:\*\*.*\b(?:all `references\/`|all references|every [^\n]* reference)/i;
 const CHECKOUT_RE = /\*\*Checkout:\*\*\s*(\S+)/;
 const VERSION_RE = /\*\*Version:\*\*\s*v?(\d+\.\d+\.\d+)/;
 const COMMIT_RE = /\*\*Commit:\*\*\s*([0-9a-f]{7,40})/;
@@ -24,12 +28,17 @@ export interface Source {
   readonly reviewed: Date | undefined;
   readonly reviewedRaw: string | undefined;
   readonly refs: ReadonlySet<string>;
+  readonly coversAllReferences: boolean;
   readonly lineNo: number;
   readonly checkout: string | undefined;
   readonly version: string | undefined;
   readonly commit: string | undefined;
   readonly watches: readonly Watch[];
 }
+
+export const hasReferenceMapping = (
+  source: Pick<Source, "refs" | "coversAllReferences">,
+): boolean => source.coversAllReferences || source.refs.size > 0;
 
 interface MutableSource {
   title: string;
@@ -38,6 +47,7 @@ interface MutableSource {
   reviewed: Date | undefined;
   reviewedRaw: string | undefined;
   refs: Set<string>;
+  coversAllReferences: boolean;
   lineNo: number;
   checkout: string | undefined;
   version: string | undefined;
@@ -78,6 +88,27 @@ const findRefs = (line: string): string[] => {
   return found;
 };
 
+const findArrowRefs = (line: string): string[] => {
+  ARROW_REF_RE.lastIndex = 0;
+  return [...line.matchAll(ARROW_REF_RE)]
+    .map((match) => match[1])
+    .filter((reference): reference is string => reference !== undefined);
+};
+
+const parseReferencesField = (
+  value: string,
+): {all: boolean; refs: readonly string[]} => {
+  const normalized = value.trim().replace(/^[-:]\s*/, "");
+  if (/^all(?:\s+references)?$/i.test(normalized)) {
+    return {all: true, refs: []};
+  }
+  const refs = normalized
+    .split(",")
+    .map((reference) => basename(reference.trim().replaceAll("`", "")))
+    .filter((reference) => /^[a-z0-9][a-z0-9-]*\.md$/.test(reference));
+  return {all: false, refs};
+};
+
 const findUrls = (line: string): string[] => {
   HTTP_URL_RE.lastIndex = 0;
   return [...line.matchAll(HTTP_URL_RE)]
@@ -89,6 +120,7 @@ export const parseSources = (text: string): Source[] => {
   const sources: MutableSource[] = [];
   let current: MutableSource | undefined;
   let readingUrlList = false;
+  let readingReferenceList = false;
   const lines = text.split("\n");
   for (const [index, line] of lines.entries()) {
     const header = HEADER_RE.exec(line);
@@ -100,6 +132,7 @@ export const parseSources = (text: string): Source[] => {
         reviewed: undefined,
         reviewedRaw: undefined,
         refs: new Set<string>(),
+        coversAllReferences: false,
         lineNo: index,
         checkout: undefined,
         version: undefined,
@@ -108,6 +141,7 @@ export const parseSources = (text: string): Source[] => {
       };
       sources.push(current);
       readingUrlList = false;
+      readingReferenceList = false;
       continue;
     }
     if (current === undefined) continue;
@@ -119,6 +153,23 @@ export const parseSources = (text: string): Source[] => {
       current.urls.push(...findUrls(line));
     } else {
       readingUrlList = false;
+    }
+
+    const referencesMatch = REFERENCES_RE.exec(line);
+    if (referencesMatch) {
+      readingReferenceList = true;
+      const parsed = parseReferencesField(referencesMatch[1] ?? "");
+      current.coversAllReferences ||= parsed.all;
+      for (const reference of parsed.refs) current.refs.add(reference);
+    } else if (readingReferenceList && /^\s{2,}-\s+/.test(line)) {
+      const parsed = parseReferencesField(line);
+      current.coversAllReferences ||= parsed.all;
+      for (const reference of parsed.refs) current.refs.add(reference);
+    } else {
+      readingReferenceList = false;
+    }
+    if (LEGACY_ALL_REFERENCES_RE.test(line)) {
+      current.coversAllReferences = true;
     }
 
     const provenanceMatch = PROVENANCE_RE.exec(line);
@@ -152,6 +203,7 @@ export const parseSources = (text: string): Source[] => {
       for (const reference of refs) current.refs.add(reference);
     }
     for (const reference of findRefs(line)) current.refs.add(reference);
+    for (const reference of findArrowRefs(line)) current.refs.add(reference);
   }
 
   return sources

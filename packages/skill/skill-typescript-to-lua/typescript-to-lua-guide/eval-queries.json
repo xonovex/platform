@@ -24,30 +24,6 @@
     "split": "train"
   },
   {
-    "query": "Help me handle namespaces vs classes correctly in this Typescript To Lua task, including the edge cases that usually get missed.",
-    "rationale": "implicit task cue derived from the namespaces vs classes reference",
-    "should_trigger": true,
-    "split": "train"
-  },
-  {
-    "query": "Help me handle multi return functions correctly in this Typescript To Lua task, including the edge cases that usually get missed.",
-    "rationale": "implicit task cue derived from the multi return functions reference",
-    "should_trigger": true,
-    "split": "validation"
-  },
-  {
-    "query": "Help me handle tstl decorators correctly in this Typescript To Lua task, including the edge cases that usually get missed.",
-    "rationale": "implicit task cue derived from the tstl decorators reference",
-    "should_trigger": true,
-    "split": "validation"
-  },
-  {
-    "query": "Help me handle performance tips correctly in this Typescript To Lua task, including the edge cases that usually get missed.",
-    "rationale": "implicit task cue derived from the performance tips reference",
-    "should_trigger": true,
-    "split": "validation"
-  },
-  {
     "query": "I have a Hono app configured with `app.use('*', cors())`. Write a Vitest test that verifies the CORS preflight (OPTIONS) request to `/api/users` with an Origin header succeeds and that the Access-Control-Allow-Origin header is returned.",
     "rationale": "near miss owned by vitest-guide",
     "should_trigger": false,
@@ -72,25 +48,49 @@
     "split": "train"
   },
   {
-    "query": "Help me handle type safety correctly in this Vitest task, including the edge cases that usually get missed.",
+    "query": "A review comment on `work/namespaces-vs-classes/` says the namespaces vs classes change handles the normal fixture but leaves the failure path undefined. For this Typescript To Lua task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
+    "rationale": "implicit task cue derived from the namespaces vs classes reference",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "quick pre-merge sanity check: after the multi return functions change under `work/multi-return-functions/`, a clean checkout behaves differently from my local run. What Typescript To Lua-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "rationale": "implicit task cue derived from the multi return functions reference",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "The clean Linux CI job fails only for the minimal tstl decorators fixture under `work/tstl-decorators/`, while the full local fixture passes. Trace the Typescript To Lua-specific boundary that could cause the difference, then propose a patch and a regression check.",
+    "rationale": "implicit task cue derived from the tstl decorators reference",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "A review comment on `work/performance-tips/` says the performance tips change handles the normal fixture but leaves the failure path undefined. For this Typescript To Lua task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
+    "rationale": "implicit task cue derived from the performance tips reference",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "A review comment on `work/type-safety/` says the type safety change handles the normal fixture but leaves the failure path undefined. For this Vitest task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
     "rationale": "near miss owned by vitest-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "Help me handle http testing correctly in this Vitest task, including the edge cases that usually get missed.",
+    "query": "quick pre-merge sanity check: after the http testing change under `work/http-testing/`, a clean checkout behaves differently from my local run. What Vitest-specific assumption could cause that? Show the correction and the exact narrow validation.",
     "rationale": "near miss owned by vitest-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "Help me handle timestamp testing correctly in this Vitest task, including the edge cases that usually get missed.",
+    "query": "The clean Linux CI job fails only for the minimal timestamp testing fixture under `work/timestamp-testing/`, while the full local fixture passes. Trace the Vitest-specific boundary that could cause the difference, then propose a patch and a regression check.",
     "rationale": "near miss owned by vitest-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "Help me handle typescript config correctly in this Vitest task, including the edge cases that usually get missed.",
+    "query": "A review comment on `work/typescript-config/` says the typescript config change handles the normal fixture but leaves the failure path undefined. For this Vitest task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
     "rationale": "near miss owned by vitest-guide",
     "should_trigger": false,
     "split": "validation"

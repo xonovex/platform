@@ -1,6 +1,6 @@
 ---
 name: user-stories-guide
-description: "Use when writing, evaluating, splitting, or refining user stories — applying INVEST, the 3 Cs (Card / Conversation / Confirmation), the 'As a / I want / so that' template, writing acceptance criteria, slicing vertically into a walking skeleton, splitting with SPIDR or the splitting-pattern flowchart, and refining the backlog into ready items. Triggers on user story, INVEST, story splitting, SPIDR, vertical slice, walking skeleton, acceptance criteria, 'As a... I want... so that...', 3 Cs, backlog refinement / grooming, SMART tasks — even when the user doesn't say 'user story'. Skip Given-When-Then and executable specs (bdd-guide), test design and levels (testing-guide), domain modelling (ddd-guide), the FDD feature list (fdd-guide), and the coupling theory behind 'Independent' (connascence-guide)."
+description: "Use when writing, evaluating, splitting, or refining user stories — applying INVEST, the 3 Cs (Card / Conversation / Confirmation), the 'As a / I want / so that' template, writing acceptance criteria, slicing vertically into a walking skeleton, splitting with SPIDR or the splitting-pattern flowchart, and refining the backlog into ready items. Triggers on user story, INVEST, story splitting, SPIDR, vertical slice, walking skeleton, acceptance criteria, 'As a... I want... so that...', 3 Cs, backlog refinement / grooming, SMART tasks — even when the user doesn't say 'user story'."
 ---
 
 # User Stories

@@ -24,28 +24,10 @@
     "split": "train"
   },
   {
-    "query": "Help me handle humanize correctly in this Content task, including the edge cases that usually get missed.",
-    "rationale": "implicit task cue derived from the humanize reference",
-    "should_trigger": true,
-    "split": "train"
-  },
-  {
-    "query": "Help me handle news add correctly in this Content task, including the edge cases that usually get missed.",
-    "rationale": "implicit task cue derived from the news add reference",
-    "should_trigger": true,
-    "split": "validation"
-  },
-  {
-    "query": "Help me handle travelguide add correctly in this Content task, including the edge cases that usually get missed.",
-    "rationale": "implicit task cue derived from the travelguide add reference",
-    "should_trigger": true,
-    "split": "validation"
-  },
-  {
     "query": "Review this Content change for core principles and fix the concrete issues you find.",
     "rationale": "implicit task cue derived from the Core Principles section",
     "should_trigger": true,
-    "split": "validation"
+    "split": "train"
   },
   {
     "query": "respond like a caveman from now on",
@@ -93,6 +75,24 @@
     "query": "Rewrite this in caveman speak: 'I just went ahead and ran the full test suite, and it looks like everything is basically passing now, so I think we should probably be good to proceed with the deployment.'",
     "rationale": "near miss owned by caveman",
     "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "A review comment on `work/humanize/` says the humanize change handles the normal fixture but leaves the failure path undefined. For this Content task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
+    "rationale": "implicit task cue derived from the humanize reference",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "quick pre-merge sanity check: after the news add change under `work/news-add/`, a clean checkout behaves differently from my local run. What Content-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "rationale": "implicit task cue derived from the news add reference",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "The clean Linux CI job fails only for the minimal travelguide add fixture under `work/travelguide-add/`, while the full local fixture passes. Trace the Content-specific boundary that could cause the difference, then propose a patch and a regression check.",
+    "rationale": "implicit task cue derived from the travelguide add reference",
+    "should_trigger": true,
     "split": "validation"
   }
 ]

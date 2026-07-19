@@ -24,22 +24,10 @@
     "split": "train"
   },
   {
-    "query": "Help me handle jit friendly tables correctly in this Lua Opinionated task, including the edge cases that usually get missed.",
-    "rationale": "implicit task cue derived from the jit friendly tables reference",
-    "should_trigger": true,
-    "split": "train"
-  },
-  {
-    "query": "Help me handle cache lookups correctly in this Lua Opinionated task, including the edge cases that usually get missed.",
-    "rationale": "implicit task cue derived from the cache lookups reference",
-    "should_trigger": true,
-    "split": "validation"
-  },
-  {
     "query": "Review this Lua Opinionated change for requirements and fix the concrete issues you find.",
     "rationale": "implicit task cue derived from the Requirements section",
     "should_trigger": true,
-    "split": "validation"
+    "split": "train"
   },
   {
     "query": "Review this Lua Opinionated change for essentials and fix the concrete issues you find.",
@@ -72,25 +60,37 @@
     "split": "train"
   },
   {
-    "query": "Help me handle namespaces vs classes correctly in this Typescript To Lua task, including the edge cases that usually get missed.",
+    "query": "A review comment on `work/jit-friendly-tables/` says the jit friendly tables change handles the normal fixture but leaves the failure path undefined. For this Lua Opinionated task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
+    "rationale": "implicit task cue derived from the jit friendly tables reference",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "quick pre-merge sanity check: after the cache lookups change under `work/cache-lookups/`, a clean checkout behaves differently from my local run. What Lua Opinionated-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "rationale": "implicit task cue derived from the cache lookups reference",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "A review comment on `work/namespaces-vs-classes/` says the namespaces vs classes change handles the normal fixture but leaves the failure path undefined. For this Typescript To Lua task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
     "rationale": "near miss owned by typescript-to-lua-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "Help me handle multi return functions correctly in this Typescript To Lua task, including the edge cases that usually get missed.",
+    "query": "quick pre-merge sanity check: after the multi return functions change under `work/multi-return-functions/`, a clean checkout behaves differently from my local run. What Typescript To Lua-specific assumption could cause that? Show the correction and the exact narrow validation.",
     "rationale": "near miss owned by typescript-to-lua-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "Help me handle tstl decorators correctly in this Typescript To Lua task, including the edge cases that usually get missed.",
+    "query": "The clean Linux CI job fails only for the minimal tstl decorators fixture under `work/tstl-decorators/`, while the full local fixture passes. Trace the Typescript To Lua-specific boundary that could cause the difference, then propose a patch and a regression check.",
     "rationale": "near miss owned by typescript-to-lua-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "Help me handle performance tips correctly in this Typescript To Lua task, including the edge cases that usually get missed.",
+    "query": "A review comment on `work/performance-tips/` says the performance tips change handles the normal fixture but leaves the failure path undefined. For this Typescript To Lua task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
     "rationale": "near miss owned by typescript-to-lua-guide",
     "should_trigger": false,
     "split": "validation"

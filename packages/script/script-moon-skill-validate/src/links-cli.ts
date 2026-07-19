@@ -5,9 +5,7 @@ import {type LinkReport} from "./reference-file-links.js";
 const HELP_TEXT = [
   "usage: moon-skill-links [-h] [repo-root]",
   "",
-  "Validate that every boundary-crossing relative markdown link across the",
-  "composition surface (skill SKILL.md and references, command-workflow docs and",
-  "commands) resolves to a real file.",
+  "Validate composition links plus paired, resolvable, acyclic skill dependencies.",
   "",
   "positional arguments:",
   "  repo-root   repository root to scan (defaults to the current directory)",
@@ -46,12 +44,10 @@ const main = (argv: readonly string[]): number => {
   }
 
   if (errors.length > 0) {
-    console.log(
-      `Result: FAIL (${String(errors.length)} broken cross-package link(s))`,
-    );
+    console.log(`Result: FAIL (${String(errors.length)} composition error(s))`);
     return 1;
   }
-  console.log("Result: PASS (no broken cross-package links)");
+  console.log("Result: PASS (composition links and dependencies are valid)");
   return 0;
 };
 

@@ -24,30 +24,6 @@
     "split": "train"
   },
   {
-    "query": "Help me handle entrance correctly in this Motion task, including the edge cases that usually get missed.",
-    "rationale": "implicit task cue derived from the entrance reference",
-    "should_trigger": true,
-    "split": "train"
-  },
-  {
-    "query": "Help me handle gestures correctly in this Motion task, including the edge cases that usually get missed.",
-    "rationale": "implicit task cue derived from the gestures reference",
-    "should_trigger": true,
-    "split": "validation"
-  },
-  {
-    "query": "Help me handle scroll correctly in this Motion task, including the edge cases that usually get missed.",
-    "rationale": "implicit task cue derived from the scroll reference",
-    "should_trigger": true,
-    "split": "validation"
-  },
-  {
-    "query": "Help me handle layout correctly in this Motion task, including the edge cases that usually get missed.",
-    "rationale": "implicit task cue derived from the layout reference",
-    "should_trigger": true,
-    "split": "validation"
-  },
-  {
     "query": "make this client component server-rendered if possible — it's just fetching the user's recent orders",
     "rationale": "near miss owned by react-guide",
     "should_trigger": false,
@@ -93,6 +69,30 @@
     "query": "i think the React Compiler is over-memoizing this list, can you check src/feed/Feed.tsx",
     "rationale": "near miss owned by react-guide",
     "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "A review comment on `work/entrance/` says the entrance change handles the normal fixture but leaves the failure path undefined. For this Motion task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
+    "rationale": "implicit task cue derived from the entrance reference",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "quick pre-merge sanity check: after the gestures change under `work/gestures/`, a clean checkout behaves differently from my local run. What Motion-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "rationale": "implicit task cue derived from the gestures reference",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "The clean Linux CI job fails only for the minimal scroll fixture under `work/scroll/`, while the full local fixture passes. Trace the Motion-specific boundary that could cause the difference, then propose a patch and a regression check.",
+    "rationale": "implicit task cue derived from the scroll reference",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "A review comment on `work/layout/` says the layout change handles the normal fixture but leaves the failure path undefined. For this Motion task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
+    "rationale": "implicit task cue derived from the layout reference",
+    "should_trigger": true,
     "split": "validation"
   }
 ]

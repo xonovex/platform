@@ -5,7 +5,7 @@ description: "Use when designing the architecture of a low-level GPU renderer on
 
 # GPU Rendering Guidelines (Explicit-API Architecture)
 
-API-agnostic architecture for a low-level GPU renderer. The concepts hold across explicit APIs (Vulkan, D3D12, Metal, WebGPU); names differ but the model is the same. For one API's concrete how-to use the matching API skill (e.g. gpu-rendering-vulkan-guide); for the general allocator principle behind GPU memory, see memory-management-guide.
+API-agnostic architecture for a low-level GPU renderer. The concepts hold across explicit APIs (Vulkan, D3D12, Metal, WebGPU); names differ but the model is the same. For one API's concrete how-to use the matching API skill (e.g. **gpu-rendering-vulkan-guide**); for the general allocator principle behind GPU memory, see **memory-management-guide**.
 
 ## Requirements
 

@@ -14,3 +14,9 @@ Besides the Agent Skills frontmatter/body checks, validation requires the packag
 - `eval-queries.json` with at least eight positive and eight negative routes, including train/validation coverage for each polarity;
 - reviewed `SOURCES.md` URL or explicit repository-original provenance;
 - `compatibility` and `allowed-tools` frontmatter for any skill that bundles scripts.
+
+The workspace-level composition check verifies boundary-crossing Markdown links and named skill handoffs. It also requires matching Claude and Codex manifests whose names match their packages, requires every hard dependency to appear as a named handoff in the depending skill, and rejects duplicate plugin names, dangling dependencies, and dependency cycles:
+
+```bash
+npx moon run script-moon-skill-validate:composition-check
+```

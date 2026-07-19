@@ -24,30 +24,6 @@
     "split": "train"
   },
   {
-    "query": "Help me handle memory management correctly in this C99 task, including the edge cases that usually get missed.",
-    "rationale": "implicit task cue derived from the memory management reference",
-    "should_trigger": true,
-    "split": "train"
-  },
-  {
-    "query": "Help me handle designated initializers correctly in this C99 task, including the edge cases that usually get missed.",
-    "rationale": "implicit task cue derived from the designated initializers reference",
-    "should_trigger": true,
-    "split": "validation"
-  },
-  {
-    "query": "Help me handle const correctness correctly in this C99 task, including the edge cases that usually get missed.",
-    "rationale": "implicit task cue derived from the const correctness reference",
-    "should_trigger": true,
-    "split": "validation"
-  },
-  {
-    "query": "Help me handle fixed width types correctly in this C99 task, including the edge cases that usually get missed.",
-    "rationale": "implicit task cue derived from the fixed width types reference",
-    "should_trigger": true,
-    "split": "validation"
-  },
-  {
     "query": "Write a Lua 5.4 function `load_config(path)` that opens the file at `path`, reads all of it, and returns the parsed contents. Show how a caller would use it when the file might not exist, falling back to a default config instead of crashing.",
     "rationale": "near miss owned by lua-guide",
     "should_trigger": false,
@@ -72,25 +48,49 @@
     "split": "train"
   },
   {
-    "query": "Help me handle module pattern correctly in this Lua task, including the edge cases that usually get missed.",
+    "query": "A review comment on `work/memory-management/` says the memory management change handles the normal fixture but leaves the failure path undefined. For this C99 task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
+    "rationale": "implicit task cue derived from the memory management reference",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "quick pre-merge sanity check: after the designated initializers change under `work/designated-initializers/`, a clean checkout behaves differently from my local run. What C99-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "rationale": "implicit task cue derived from the designated initializers reference",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "The clean Linux CI job fails only for the minimal const correctness fixture under `work/const-correctness/`, while the full local fixture passes. Trace the C99-specific boundary that could cause the difference, then propose a patch and a regression check.",
+    "rationale": "implicit task cue derived from the const correctness reference",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "A review comment on `work/fixed-width-types/` says the fixed width types change handles the normal fixture but leaves the failure path undefined. For this C99 task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
+    "rationale": "implicit task cue derived from the fixed width types reference",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "A review comment on `work/module-pattern/` says the module pattern change handles the normal fixture but leaves the failure path undefined. For this Lua task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
     "rationale": "near miss owned by lua-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "Help me handle local variables correctly in this Lua task, including the edge cases that usually get missed.",
+    "query": "quick pre-merge sanity check: after the local variables change under `work/local-variables/`, a clean checkout behaves differently from my local run. What Lua-specific assumption could cause that? Show the correction and the exact narrow validation.",
     "rationale": "near miss owned by lua-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "Help me handle metatables correctly in this Lua task, including the edge cases that usually get missed.",
+    "query": "The clean Linux CI job fails only for the minimal metatables fixture under `work/metatables/`, while the full local fixture passes. Trace the Lua-specific boundary that could cause the difference, then propose a patch and a regression check.",
     "rationale": "near miss owned by lua-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "Help me handle coroutines correctly in this Lua task, including the edge cases that usually get missed.",
+    "query": "A review comment on `work/coroutines/` says the coroutines change handles the normal fixture but leaves the failure path undefined. For this Lua task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
     "rationale": "near miss owned by lua-guide",
     "should_trigger": false,
     "split": "validation"

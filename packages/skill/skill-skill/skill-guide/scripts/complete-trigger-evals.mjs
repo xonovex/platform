@@ -11,6 +11,12 @@ import {basename, join, resolve} from "node:path";
 const MIN_PER_POLARITY = 8;
 const FRONTMATTER_RE = /^---\n([\s\S]*?)\n---\n([\s\S]*)$/;
 const REFERENCE_RE = /references\/([a-z0-9][a-z0-9-]*\.md)/g;
+const GENERATED_QUERY_RES = [
+  /^Help me handle .+ correctly in this .+ task, including the edge cases that usually get missed\.$/,
+  /^I'm reviewing `[^`]+` in an? .+ project\. The happy path works, but .+ is unclear\./,
+  /^A teammate says our .+ change may mishandle .+ before release\. Inspect the likely risk around /,
+  /^CI started failing after we changed .+ in an? .+ project\. Use /,
+];
 const WORD_RE = /[a-z][a-z0-9-]{2,}/g;
 const STOP_WORDS = new Set([
   "about",
@@ -166,6 +172,26 @@ const humanize = (value) =>
     .replaceAll("-", " ")
     .replace(/\b\w/g, (letter) => letter.toUpperCase());
 
+const slugify = (value) =>
+  value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+
+const isGeneratedQuery = (query) =>
+  GENERATED_QUERY_RES.some((pattern) => pattern.test(query));
+
+const scenarioQuery = (skillName, topic, index) => {
+  const subject = humanize(skillName);
+  const path = `work/${slugify(topic) || "change"}/`;
+  const templates = [
+    `A review comment on \`${path}\` says the ${topic} change handles the normal fixture but leaves the failure path undefined. For this ${subject} task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.`,
+    `quick pre-merge sanity check: after the ${topic} change under \`${path}\`, a clean checkout behaves differently from my local run. What ${subject}-specific assumption could cause that? Show the correction and the exact narrow validation.`,
+    `The clean Linux CI job fails only for the minimal ${topic} fixture under \`${path}\`, while the full local fixture passes. Trace the ${subject}-specific boundary that could cause the difference, then propose a patch and a regression check.`,
+  ];
+  return templates[index % templates.length];
+};
+
 const referenceTopics = (body) => {
   const topics = [];
   for (const match of body.matchAll(REFERENCE_RE)) {
@@ -201,6 +227,7 @@ const deduplicate = (entries) => {
   const seen = new Set();
   return entries.filter((entry) => {
     if (!isRecord(entry) || typeof entry.query !== "string") return true;
+    if (isGeneratedQuery(entry.query.trim())) return false;
     const key = entry.query.trim().toLowerCase();
     if (seen.has(key)) return false;
     seen.add(key);
@@ -223,16 +250,26 @@ const addPositiveSeeds = (skill) => {
       rationale:
         "output-eval task also exercises this skill's routing boundary",
     })),
-    ...referenceTopics(skill.body).map((topic) => ({
-      query: `Help me handle ${topic} correctly in this ${humanize(skill.name)} task, including the edge cases that usually get missed.`,
+    ...referenceTopics(skill.body).map((topic, index) => ({
+      query: scenarioQuery(skill.name, topic, index),
       rationale: `implicit task cue derived from the ${topic} reference`,
     })),
-    ...headingTopics(skill.body).map((topic) => ({
-      query: `Review this ${humanize(skill.name)} change for ${topic.toLowerCase()} and fix the concrete issues you find.`,
+    ...headingTopics(skill.body).map((topic, index) => ({
+      query: scenarioQuery(
+        skill.name,
+        topic.toLowerCase(),
+        index + referenceTopics(skill.body).length,
+      ),
       rationale: `implicit task cue derived from the ${topic} section`,
     })),
-    ...descriptionTopics(skill.description).map((topic) => ({
-      query: `Help me with ${topic}; apply the relevant ${humanize(skill.name)} conventions and call out the important edge cases.`,
+    ...descriptionTopics(skill.description).map((topic, index) => ({
+      query: scenarioQuery(
+        skill.name,
+        topic,
+        index +
+          referenceTopics(skill.body).length +
+          headingTopics(skill.body).length,
+      ),
       rationale: `routing cue derived from the description's ${topic} trigger`,
     })),
   ];

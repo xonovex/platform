@@ -7,6 +7,7 @@ Product-specific facts are pinned to the documentation snapshot below. The local
 - **URL:** https://learn.chatgpt.com/docs/hooks
 - **Last reviewed:** 2026-07-16
 - **Used for:** `capabilities.md`, `onboarding.md`, `patterns.md`
+- **References:** references/capabilities.md, references/onboarding.md, references/patterns.md
 - **Aspects extracted:** Hook locations, config shapes, trust review, managed requirements, plugin hooks, concurrency, executing command handlers, skipped prompt/agent/async handlers, events, output schemas, and guardrail coverage.
 
 ## Codex plugins and skills
@@ -16,6 +17,7 @@ Product-specific facts are pinned to the documentation snapshot below. The local
   - https://learn.chatgpt.com/docs/skills
 - **Last reviewed:** 2026-07-16
 - **Used for:** `onboarding.md`, `patterns.md`
+- **References:** references/onboarding.md, references/patterns.md
 - **Aspects extracted:** Plugin installation, bundled skills and hooks, new-session activation, and the distinction between instructions and enforcement.
 
 ## Codex managed configuration
@@ -23,6 +25,7 @@ Product-specific facts are pinned to the documentation snapshot below. The local
 - **URL:** https://learn.chatgpt.com/docs/managed-configuration
 - **Last reviewed:** 2026-07-16
 - **Used for:** `capabilities.md`, `onboarding.md`
+- **References:** references/capabilities.md, references/onboarding.md
 - **Aspects extracted:** Managed configuration and organizational control layers; native behavior remains subject to the hook release reference and runtime probes.
 
 ## Refresh workflow
@@ -31,3 +34,9 @@ Product-specific facts are pinned to the documentation snapshot below. The local
 2. Run the documented version probe and replace `not-installed` only with the observed version.
 3. Execute every named deterministic probe on the observed surface; keep unsupported and experimental results explicit.
 4. Update the matrix version and review date when behavior changes.
+
+## Guide-level synthesis
+
+- **Provenance:** Repository-original integration of the source blocks above; these references combine multiple inputs or maintained conventions rather than one exclusive upstream
+- **References:** references/capabilities.md, references/onboarding.md, references/patterns.md
+- **Last reviewed:** 2026-07-16

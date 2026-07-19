@@ -21,7 +21,7 @@ typedef struct { const char *data; size_t len; } strview_t;   /* not required nu
 typedef struct { char *data; size_t len, capacity; bool truncated; } strbuilder_t;
 ```
 
-- Caller owns the buffer: `_req(max_len)` returns the byte count, the caller sizes storage, `_init(buf, cap)` binds it — no allocation inside, consistent with [references/caller-owns-memory.md](./caller-owns-memory.md).
+- Caller owns the buffer: `_req(max_len)` returns the byte count, the caller sizes storage, `_init(buf, cap)` binds it — no allocation inside, consistent with **memory-management-guide**.
 - Every append is bounded against `capacity`; overflow is dropped, the result stays null-terminated, and a `truncated` flag latches so the caller checks once after a run of appends, not per call.
 - Expose both `view()` (length-carrying) and `cstr()`; a formatted append wraps `vsnprintf` into the remaining space.
 
@@ -29,4 +29,4 @@ This pair replaces the `strcpy`/`strcat`/`sprintf`/`strtok`/`strlen` cluster: re
 
 ### Related
 
-[references/caller-owns-memory.md](./caller-owns-memory.md), [references/build-warnings-policy.md](./build-warnings-policy.md) (snprintf truncation)
+**memory-management-guide**, [references/safety-validations.md](./safety-validations.md), [references/build-warnings-policy.md](./build-warnings-policy.md) (snprintf truncation)

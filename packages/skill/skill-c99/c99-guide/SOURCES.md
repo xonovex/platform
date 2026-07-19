@@ -23,6 +23,12 @@ The C11 `_Generic` overloading and macro-heavy metaprogramming (defer macros, st
 meta-header dynamic arrays) from the same talks are intentionally **excluded** — out of scope
 for this C99 guide.
 
+## Guide-level synthesis
+
+- **Provenance:** Repository-original integration of the source blocks above; these references combine multiple inputs or maintained conventions rather than one exclusive upstream
+- **References:** references/compound-literals.md, references/const-correctness.md, references/inline-functions.md, references/memory-management.md
+- **Last reviewed:** 2026-06-13
+
 ## Refresh Workflow
 
 1. Re-read the upstream source(s) above

@@ -8,6 +8,12 @@ const URL_FIELD_RE = /\*\*URLs?:\*\*/i;
 const HTTP_URL_RE = /https?:\/\/\S+/i;
 const PROVENANCE_RE = /\*\*Provenance:\*\*\s*\S+/i;
 const REVIEWED_RE = /\*\*Last reviewed:\*\*\s*\d{4}-\d{2}-\d{2}/i;
+const GENERIC_TRIGGER_QUERY_RES = [
+  /^Help me handle .+ correctly in this .+ task, including the edge cases that usually get missed\.$/i,
+  /^I'm reviewing `[^`]+` in an? .+ project\. The happy path works, but .+ is unclear\./i,
+  /^A teammate says our .+ change may mishandle .+ before release\. Inspect the likely risk around /i,
+  /^CI started failing after we changed .+ in an? .+ project\. Use /i,
+];
 
 export interface CatalogFileReport {
   readonly passes: readonly string[];
@@ -27,6 +33,9 @@ const readJson = (path: string, errors: string[]): unknown => {
     return undefined;
   }
 };
+
+const isGenericTriggerQuery = (query: string): boolean =>
+  GENERIC_TRIGGER_QUERY_RES.some((pattern) => pattern.test(query.trim()));
 
 const checkOutputEvals = (
   skillDir: string,
@@ -125,6 +134,11 @@ const checkTriggerEvals = (
       const key = query.trim().toLowerCase();
       if (seen.has(key)) {
         errors.push(`catalog: duplicate trigger query '${query}'`);
+      }
+      if (isGenericTriggerQuery(query)) {
+        errors.push(
+          `catalog: generic trigger eval query must be replaced: '${query}'`,
+        );
       }
       seen.add(key);
     }

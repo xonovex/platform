@@ -7,10 +7,10 @@ Commits: `6af54791` (trim), `b67816f5` (restore).
 
 ## 2026-07-19 catalog follow-up
 
-- Current catalog: **93 skills**, **27,838** `SKILL.md` + `references/` lines, **385 output evals**, and **1,616 trigger queries**.
+- Current catalog: **93 skills**, **27,844** `SKILL.md` + `references/` lines, **385 output evals**, and **1,616 trigger queries**.
 - Tiers: 25 aggressive, 44 moderate, 24 conservative.
 - Every skill now has `evals.json`, at least 8 positive plus 8 sibling-aware negative trigger queries with train/validation splits, and reviewed source provenance.
-- The 19 post-baseline skills below are all moderate-tier. Their local-plugin A/B suite is defined in `.github/workflows/skill-evals.yml`: monthly when `SKILL_EVALS_ENABLED=true`, or manually, with Haiku generation, Sonnet judging, one run per arm, a $0.10/six-turn generation cap, and a $0.10/one-turn judge cap. The scheduled job selects at most six evals, while the runner independently refuses more than 24 total model calls, more than two concurrent calls, higher spend caps, or more than three runs per arm. Generation exposes only `Skill,Read` or `Read`; judging exposes no tools; settings and MCP discovery are disabled; minimal fixed system prompts replace the general coding context; calls are never retried automatically, and failed generations are not judged.
+- The 19 post-baseline skills below are all moderate-tier. The catalog-wide local-plugin A/B suite is defined in `.github/workflows/skill-evals.yml`: monthly when `SKILL_EVALS_ENABLED=true`, manually, or for changed skills on enabled internal pull requests. Scheduled/manual runs select all 93 skills; pull requests select directly changed skills, while shared evaluator changes select the full catalog. Trigger validation runs each query three times. Output evaluation runs every probe once per arm in batches of at most six, with Haiku generation, Sonnet judging, a $0.10/six-turn generation cap, and a $0.10/one-turn judge cap. The runner independently refuses more than 24 total model calls per batch, more than two concurrent calls, higher spend caps, or more than three runs per arm. Generation exposes only `Skill,Read` or `Read`; judging exposes no tools; settings and MCP discovery are disabled; minimal fixed system prompts replace the general coding context; calls are never retried automatically, and failed generations are not judged.
 
 | Post-baseline skill  | Output evals | Distilled lines | Live A/B status                                     |
 | -------------------- | -----------: | --------------: | --------------------------------------------------- |
@@ -197,9 +197,7 @@ Each eval runs twice — **with** the skill and **without** it (no-skill baselin
 
 The **weakest model you deploy is the gate** — "what the model already knows" is model-specific, so re-verify against the new model. Re-run the seed across the catalog:
 
-```bash
-Use the **Skill model evals** workflow for the post-baseline matrix, or invoke `moon-skill-eval-outputs` per package with `--plugin-dir` as above. Keep live model calls out of pull-request CI; ordinary CI validates the eval schemas, routing balance, train/validation splits, provenance, and scripted-skill capabilities without credentials or network access.
-```
+Use the **Skill model evals** workflow for the full catalog, or invoke `moon-skill-eval-outputs` per package with `--plugin-dir` as above. Live pull-request model evals are opt-in through `SKILL_EVALS_ENABLED` and restricted to internal pull requests; ordinary CI validates the eval schemas, routing balance, train/validation splits, provenance, and scripted-skill capabilities without credentials or network access.
 
 Read each eval's `with_skill` vs `without_skill` pass rate:
 
