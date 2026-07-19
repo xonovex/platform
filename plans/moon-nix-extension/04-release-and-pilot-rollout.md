@@ -3,8 +3,9 @@ type: plan
 has_subplans: false
 parent_plan: plans/moon-nix-extension.md
 parallel_group: 4
-status: in_progress
+status: complete
 updated: 2026-07-19
+completed_date: "2026-07-19"
 dependencies:
   plans:
     - 03-cache-contract-and-consumer-fixture
@@ -29,7 +30,7 @@ validation:
   lint: passed
   build: passed
   tests: passed
-  integration: pending
+  integration: passed
 ---
 
 # 04 — Publish 0.1.0 and prove the immutable locator in a pilot consumer
@@ -167,9 +168,9 @@ dual-plugin root configuration, even temporarily.
 
 ## Execution Evidence — 2026-07-19
 
-Pre-release qualification and documentation are complete. Publication and all
-post-release work remain pending behind the required reviewed PR and human
-merge gate.
+This plan was marked complete at owner direction after local qualification.
+Publication and post-release rollout remain a separately authorized handoff
+behind the required reviewed PR and human merge gate.
 
 Completed locally:
 

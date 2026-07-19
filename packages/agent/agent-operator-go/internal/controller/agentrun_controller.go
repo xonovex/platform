@@ -3,12 +3,14 @@ package controller
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
 	networkingv1 "k8s.io/api/networking/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
+	apimeta "k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
@@ -23,14 +25,25 @@ import (
 	"github.com/xonovex/platform/packages/agent/agent-operator-go/internal/plugins"
 	"github.com/xonovex/platform/packages/agent/agent-operator-go/internal/provider"
 	"github.com/xonovex/platform/packages/agent/agent-operator-go/internal/resolver"
+	runtel "github.com/xonovex/platform/packages/agent/agent-operator-go/internal/telemetry"
 	wsshared "github.com/xonovex/platform/packages/agent/agent-operator-go/internal/workspace/shared"
+)
+
+const (
+	governanceCorrelationAnnotation   = "governance.xonovex.com/correlation-id"
+	oversightStateAnnotation          = "governance.xonovex.com/oversight-state"
+	appliedPolicyReferenceAnnotation  = "governance.xonovex.com/applied-policy-reference"
+	observedPolicyReferenceAnnotation = "governance.xonovex.com/observed-policy-reference"
 )
 
 // AgentRunReconciler reconciles an AgentRun object
 type AgentRunReconciler struct {
 	client.Client
-	Scheme   *runtime.Scheme
-	Recorder events.EventRecorder
+	Scheme            *runtime.Scheme
+	Recorder          events.EventRecorder
+	Now               func() time.Time
+	Telemetry         runtel.Sink
+	RemediationRouter RemediationRouter
 }
 
 // +kubebuilder:rbac:groups=agent.xonovex.com,resources=agentruns,verbs=get;list;watch;create;update;patch;delete
@@ -60,8 +73,13 @@ func (r *AgentRunReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 	// Skip if already completed
 	if agentRun.Status.Phase == agentv1alpha1.AgentRunPhaseSucceeded ||
 		agentRun.Status.Phase == agentv1alpha1.AgentRunPhaseFailed ||
-		agentRun.Status.Phase == agentv1alpha1.AgentRunPhaseTimedOut {
+		agentRun.Status.Phase == agentv1alpha1.AgentRunPhaseTimedOut ||
+		agentRun.Status.Phase == agentv1alpha1.AgentRunPhasePaused {
 		return ctrl.Result{}, nil
+	}
+
+	if result, handled, err := r.reconcileOversight(ctx, &agentRun); handled || err != nil {
+		return result, err
 	}
 
 	// Branch based on workspace mode
@@ -70,6 +88,203 @@ func (r *AgentRunReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 	}
 
 	return r.reconcileStandalone(ctx, &agentRun)
+}
+
+func (r *AgentRunReconciler) reconcileOversight(ctx context.Context, run *agentv1alpha1.AgentRun) (ctrl.Result, bool, error) {
+	requestedLevel := agentv1alpha1.AutonomyLevelManual
+	if run.Spec.Autonomy != nil && run.Spec.Autonomy.Level != "" {
+		requestedLevel = run.Spec.Autonomy.Level
+	}
+	if run.Spec.Provenance == nil {
+		if requestedLevel != agentv1alpha1.AutonomyLevelUnattended {
+			return ctrl.Result{}, false, nil
+		}
+		run.Status.EffectiveAutonomy = agentv1alpha1.AutonomyLevelSupervised
+		return r.updatePhaseHandled(ctx, run, agentv1alpha1.AgentRunPhaseFailed, "A3ProvenanceMissing: unattended execution requires a provenance journal")
+	}
+
+	if run.Status.Journal == nil {
+		if run.Status.JobName != "" {
+			return r.containOversightDrift(ctx, run, "A3ProvenanceDrift: provenance journal disappeared after execution started")
+		}
+		now := metav1.NewTime(r.currentTime())
+		provenance := run.Spec.Provenance
+		run.Status.Journal = &agentv1alpha1.AgentRunJournal{
+			RecordedAt:         now,
+			Generation:         run.Generation,
+			AccountableOwner:   run.Spec.AccountableOwner,
+			Model:              provenance.Model,
+			Provider:           provenance.Provider,
+			PromptReference:    provenance.PromptReference,
+			Tools:              append([]string(nil), provenance.Tools...),
+			GrantedPermissions: append([]string(nil), provenance.GrantedPermissions...),
+		}
+		run.Status.EffectiveAutonomy = requestedLevel
+		if err := r.Status().Update(ctx, run); err != nil {
+			return ctrl.Result{}, true, err
+		}
+		r.recordSignal(ctx, run, "provenance.recorded", "provenance", "healthy")
+		return ctrl.Result{Requeue: true}, true, nil
+	}
+
+	if requestedLevel == agentv1alpha1.AutonomyLevelUnattended {
+		assessment := r.assessA3Oversight(ctx, run)
+		if assessment.Detected {
+			if r.RemediationRouter != nil {
+				if err := r.RemediationRouter.Raise(ctx, run, assessment); err != nil {
+					r.recordSignal(ctx, run, "remediation.trigger", "agent-trigger", "failed")
+				} else {
+					r.recordSignal(ctx, run, "remediation.trigger", "agent-trigger", "created")
+				}
+			}
+			return r.containOversightDrift(ctx, run, strings.Join(assessment.FailureCodes, ","))
+		}
+	}
+
+	if requestedLevel != agentv1alpha1.AutonomyLevelUnattended || run.Spec.Autonomy == nil || !run.Spec.Autonomy.NeedsHuman {
+		return ctrl.Result{}, false, nil
+	}
+	return r.reconcileEscalation(ctx, run)
+}
+
+func (r *AgentRunReconciler) reconcileEscalation(ctx context.Context, run *agentv1alpha1.AgentRun) (ctrl.Result, bool, error) {
+	route := run.Spec.Autonomy.EscalationRoute
+	if route == nil || route.Recipient == "" || route.Window.Duration <= 0 {
+		run.Status.EffectiveAutonomy = agentv1alpha1.AutonomyLevelSupervised
+		return r.updatePhaseHandled(ctx, run, agentv1alpha1.AgentRunPhaseFailed, "A3EscalationRouteUnavailable: unattended execution requires a bounded accountable recipient")
+	}
+
+	now := r.currentTime()
+	if run.Status.Escalation == nil {
+		requestedAt := metav1.NewTime(now)
+		expiresAt := metav1.NewTime(now.Add(route.Window.Duration))
+		run.Status.Escalation = &agentv1alpha1.AgentEscalationStatus{
+			Recipient:   route.Recipient,
+			RequestedAt: requestedAt,
+			ExpiresAt:   expiresAt,
+			SafeDefault: route.SafeDefault,
+			Outcome:     agentv1alpha1.EscalationOutcomePending,
+		}
+		apimeta.SetStatusCondition(&run.Status.Conditions, metav1.Condition{
+			Type:               "Escalation",
+			Status:             metav1.ConditionTrue,
+			Reason:             "AwaitingRecipient",
+			Message:            "execution is paused pending an accountable response",
+			ObservedGeneration: run.Generation,
+		})
+		if err := r.Status().Update(ctx, run); err != nil {
+			return ctrl.Result{}, true, err
+		}
+		r.recordSignal(ctx, run, "escalation.requested", "escalation-route", "pending")
+		return ctrl.Result{RequeueAfter: route.Window.Duration}, true, nil
+	}
+	if now.Before(run.Status.Escalation.ExpiresAt.Time) {
+		return ctrl.Result{RequeueAfter: run.Status.Escalation.ExpiresAt.Sub(now)}, true, nil
+	}
+
+	run.Status.CompletionTime = &metav1.Time{Time: now}
+	if run.Status.Escalation.SafeDefault == agentv1alpha1.EscalationSafeDefaultAbandon {
+		run.Status.Escalation.Outcome = agentv1alpha1.EscalationOutcomeAbandoned
+		r.recordSignal(ctx, run, "escalation.expired", "escalation-route", "abandoned")
+		return r.updatePhaseHandled(ctx, run, agentv1alpha1.AgentRunPhaseFailed, "EscalationExpired: safe default abandoned the run")
+	}
+	run.Status.Escalation.Outcome = agentv1alpha1.EscalationOutcomePaused
+	r.recordSignal(ctx, run, "escalation.expired", "escalation-route", "paused")
+	return r.updatePhaseHandled(ctx, run, agentv1alpha1.AgentRunPhasePaused, "EscalationExpired: safe default paused the run")
+}
+
+func (r *AgentRunReconciler) assessA3Oversight(ctx context.Context, run *agentv1alpha1.AgentRun) runtel.DriftAssessment {
+	correlationPresent := run.Annotations[governanceCorrelationAnnotation] != ""
+	forcedDegradation := run.Annotations[oversightStateAnnotation] == "degraded"
+	signals := []runtel.Signal{
+		r.oversightSignal(run, "governance-verdict", correlationPresent && !forcedDegradation),
+		r.oversightSignal(run, "protected-target", run.Spec.Autonomy != nil && len(run.Spec.Autonomy.ProtectedTargets) > 0),
+		r.oversightSignal(run, "escalation-route", run.Spec.Autonomy != nil && run.Spec.Autonomy.EscalationRoute != nil && run.Spec.Autonomy.EscalationRoute.Recipient != ""),
+		r.oversightSignal(run, "provenance", run.Status.Journal != nil),
+	}
+	required := []string{"governance-verdict", "protected-target", "escalation-route", "provenance"}
+	if applied := run.Annotations[appliedPolicyReferenceAnnotation]; applied != "" {
+		signals = append(signals, r.oversightSignal(run, "applied-reference", run.Annotations[observedPolicyReferenceAnnotation] == applied))
+		required = append(required, "applied-reference")
+	}
+	for _, signal := range signals {
+		if r.Telemetry != nil {
+			r.Telemetry.Record(ctx, signal)
+		}
+	}
+	assessment := runtel.AssessA3(signals, required)
+	if assessment.Detected {
+		r.recordSignal(ctx, run, "drift.detected", "oversight", "degraded")
+	}
+	return assessment
+}
+
+func (r *AgentRunReconciler) oversightSignal(run *agentv1alpha1.AgentRun, control string, healthy bool) runtel.Signal {
+	outcome := "degraded"
+	if healthy {
+		outcome = "healthy"
+	}
+	return runtel.Signal{
+		CorrelationID:     runCorrelationID(run),
+		RunReference:      fmt.Sprintf("agentrun:%s/%s", run.Namespace, run.Name),
+		Kind:              "oversight.control",
+		Control:           control,
+		Outcome:           outcome,
+		EffectiveAutonomy: string(run.Status.EffectiveAutonomy),
+	}
+}
+
+func (r *AgentRunReconciler) containOversightDrift(ctx context.Context, run *agentv1alpha1.AgentRun, message string) (ctrl.Result, bool, error) {
+	if run.Status.JobName != "" {
+		job := &batchv1.Job{ObjectMeta: metav1.ObjectMeta{Name: run.Status.JobName, Namespace: run.Namespace}}
+		if err := r.Delete(ctx, job); err != nil && !errors.IsNotFound(err) {
+			return ctrl.Result{}, true, err
+		}
+	}
+	run.Status.EffectiveAutonomy = agentv1alpha1.AutonomyLevelSupervised
+	run.Status.CompletionTime = &metav1.Time{Time: r.currentTime()}
+	run.Status.Containment = &agentv1alpha1.AgentContainmentStatus{
+		RecordedAt:    metav1.Time{Time: r.currentTime()},
+		CorrelationID: runCorrelationID(run),
+		Reason:        message,
+		Action:        "kill-and-pause",
+		DemotedTo:     agentv1alpha1.AutonomyLevelSupervised,
+	}
+	r.recordSignal(ctx, run, "incident.containment", "kill-switch", "paused")
+	return r.updatePhaseHandled(ctx, run, agentv1alpha1.AgentRunPhasePaused, message)
+}
+
+func (r *AgentRunReconciler) updatePhaseHandled(ctx context.Context, run *agentv1alpha1.AgentRun, phase agentv1alpha1.AgentRunPhase, message string) (ctrl.Result, bool, error) {
+	result, err := r.updatePhase(ctx, run, phase, message)
+	return result, true, err
+}
+
+func (r *AgentRunReconciler) currentTime() time.Time {
+	if r.Now != nil {
+		return r.Now().UTC()
+	}
+	return time.Now().UTC()
+}
+
+func (r *AgentRunReconciler) recordSignal(ctx context.Context, run *agentv1alpha1.AgentRun, kind, control, outcome string) {
+	if r.Telemetry == nil {
+		return
+	}
+	r.Telemetry.Record(ctx, runtel.Signal{
+		CorrelationID:     runCorrelationID(run),
+		RunReference:      fmt.Sprintf("agentrun:%s/%s", run.Namespace, run.Name),
+		Kind:              kind,
+		Control:           control,
+		Outcome:           outcome,
+		EffectiveAutonomy: string(run.Status.EffectiveAutonomy),
+	})
+}
+
+func runCorrelationID(run *agentv1alpha1.AgentRun) string {
+	if correlationID := run.Annotations[governanceCorrelationAnnotation]; correlationID != "" {
+		return correlationID
+	}
+	return fmt.Sprintf("agentrun:%s/%s:generation:%d", run.Namespace, run.Name, run.Generation)
 }
 
 func (r *AgentRunReconciler) reconcileStandalone(ctx context.Context, agentRun *agentv1alpha1.AgentRun) (ctrl.Result, error) {
@@ -82,6 +297,7 @@ func (r *AgentRunReconciler) reconcileStandalone(ctx context.Context, agentRun *
 	harness, err := resolver.ResolveHarness(ctx, r.Client, agentRun.Namespace, agentRun.Spec.HarnessRef, agentRun.Spec.Harness)
 	if err != nil {
 		log.Error(err, "failed to resolve harness", "harnessRef", agentRun.Spec.HarnessRef)
+		return r.updatePhase(ctx, agentRun, agentv1alpha1.AgentRunPhaseFailed, fmt.Sprintf("HarnessResolutionFailed: %v", err))
 	}
 
 	// Determine agent type from harness
@@ -105,6 +321,7 @@ func (r *AgentRunReconciler) reconcileStandalone(ctx context.Context, agentRun *
 	tc, err := resolver.ResolveToolchain(ctx, r.Client, agentRun.Namespace, agentRun.Spec.ToolchainRef, agentRun.Spec.Toolchain)
 	if err != nil {
 		log.Error(err, "failed to resolve toolchain", "toolchainRef", agentRun.Spec.ToolchainRef)
+		return r.updatePhase(ctx, agentRun, agentv1alpha1.AgentRunPhaseFailed, fmt.Sprintf("ToolchainResolutionFailed: %v", err))
 	}
 
 	// Get workspace config
@@ -246,6 +463,7 @@ func (r *AgentRunReconciler) reconcileWithWorkspace(ctx context.Context, agentRu
 	harness, err := resolver.ResolveHarness(ctx, r.Client, agentRun.Namespace, agentRun.Spec.HarnessRef, agentRun.Spec.Harness)
 	if err != nil {
 		log.Error(err, "failed to resolve harness", "harnessRef", agentRun.Spec.HarnessRef)
+		return r.updatePhase(ctx, agentRun, agentv1alpha1.AgentRunPhaseFailed, fmt.Sprintf("HarnessResolutionFailed: %v", err))
 	}
 	agentType := agentv1alpha1.AgentTypeClaude
 	if harness != nil {
@@ -267,6 +485,7 @@ func (r *AgentRunReconciler) reconcileWithWorkspace(ctx context.Context, agentRu
 	tc, err := resolver.ResolveToolchain(ctx, r.Client, agentRun.Namespace, agentRun.Spec.ToolchainRef, agentRun.Spec.Toolchain)
 	if err != nil {
 		log.Error(err, "failed to resolve toolchain", "toolchainRef", agentRun.Spec.ToolchainRef)
+		return r.updatePhase(ctx, agentRun, agentv1alpha1.AgentRunPhaseFailed, fmt.Sprintf("ToolchainResolutionFailed: %v", err))
 	}
 
 	// Get workspace type and worktree info from AgentWorkspace CRD

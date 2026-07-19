@@ -70,6 +70,10 @@ A remote service is an optional policy-provider adapter; OPA is one implementati
 - Advisory checks may fail-visible and continue, but must state that no enforcement occurred.
 - Prevent thundering-herd retries with bounded backoff and cancellation. Reconcile duplicate decisions and evidence idempotently.
 
+### Xonovex decision-service deployment topology
+
+The operator distribution runs the decision service as a sidecar so admission-to-decision traffic stays on loopback and shares the Pod's lifecycle. A separate Deployment remains supported by the same HTTP contract when independent scaling or ownership is required. In that topology, expose only the decision port through a ClusterIP Service, apply default-deny ingress, and allow port `8787` solely from operator-manager Pods. The example in `config/manager/decision-service-network-policy.example.yaml` is intentionally not part of the sidecar kustomization; copy and specialize its namespace and labels only when selecting the separate-Deployment topology.
+
 ## Privileged operations
 
 Integration, Release, production deployment, secret access/rotation, infrastructure mutation, data deletion, and Retirement require a protected external point with:

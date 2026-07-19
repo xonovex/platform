@@ -12,7 +12,7 @@ import {
   validateRelease,
   validateRetirement,
   validateTransition,
-} from "./operational-lifecycle-helpers.mjs";
+} from "./operational-lifecycle-helpers.ts";
 
 const fixtureUrl = new URL(
   "../assets/operational-lifecycle-fixtures.json",

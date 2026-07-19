@@ -1,2 +1,4 @@
 resources:
   - manager.yaml
+  - trigger-network-policy.yaml
+  - trigger-service.yaml

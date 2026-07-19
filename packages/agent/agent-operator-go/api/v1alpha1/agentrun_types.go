@@ -27,6 +27,37 @@ const (
 	AgentRunPhaseSucceeded    AgentRunPhase = "Succeeded"
 	AgentRunPhaseFailed       AgentRunPhase = "Failed"
 	AgentRunPhaseTimedOut     AgentRunPhase = "TimedOut"
+	AgentRunPhasePaused       AgentRunPhase = "Paused"
+)
+
+// AutonomyLevel is the effective degree of unattended execution.
+// +kubebuilder:validation:Enum=A0;A1;A2;A3
+type AutonomyLevel string
+
+const (
+	AutonomyLevelManual     AutonomyLevel = "A0"
+	AutonomyLevelAssisted   AutonomyLevel = "A1"
+	AutonomyLevelSupervised AutonomyLevel = "A2"
+	AutonomyLevelUnattended AutonomyLevel = "A3"
+)
+
+// EscalationSafeDefault is applied when an accountable recipient does not
+// answer within the declared window.
+// +kubebuilder:validation:Enum=pause;abandon
+type EscalationSafeDefault string
+
+const (
+	EscalationSafeDefaultPause   EscalationSafeDefault = "pause"
+	EscalationSafeDefaultAbandon EscalationSafeDefault = "abandon"
+)
+
+// EscalationOutcome records the result of an unattended escalation.
+type EscalationOutcome string
+
+const (
+	EscalationOutcomePending   EscalationOutcome = "Pending"
+	EscalationOutcomePaused    EscalationOutcome = "Paused"
+	EscalationOutcomeAbandoned EscalationOutcome = "Abandoned"
 )
 
 // WorkspaceType represents the version control system used for workspace management
@@ -201,8 +232,74 @@ type AgentSpec struct {
 	DefaultTTLSecondsAfterFinished *int32 `json:"defaultTtlSecondsAfterFinished,omitempty"`
 }
 
+// AgentRunProvenance declares the minimized AIBOM inputs that the reconciler
+// journals before execution. PromptReference is an opaque reference; prompt
+// content is deliberately excluded.
+type AgentRunProvenance struct {
+	Model              string   `json:"model"`
+	Provider           string   `json:"provider"`
+	PromptReference    string   `json:"promptReference"`
+	Tools              []string `json:"tools"`
+	GrantedPermissions []string `json:"grantedPermissions"`
+}
+
+// AgentEscalationRoute bounds a human escalation and declares the outcome that
+// is safe when the recipient does not answer.
+type AgentEscalationRoute struct {
+	Recipient   string                `json:"recipient"`
+	Window      metav1.Duration       `json:"window"`
+	SafeDefault EscalationSafeDefault `json:"safeDefault"`
+}
+
+// AgentAutonomySpec couples A3 execution to protected targets, escalation, and
+// fail-closed governance admission.
+type AgentAutonomySpec struct {
+	Level            AutonomyLevel         `json:"level,omitempty"`
+	ProtectedTargets []string              `json:"protectedTargets,omitempty"`
+	EscalationRoute  *AgentEscalationRoute `json:"escalationRoute,omitempty"`
+	NeedsHuman       bool                  `json:"needsHuman,omitempty"`
+}
+
+// AgentRunJournal is the reconciler-recorded, content-minimized provenance for
+// one exact AgentRun generation.
+type AgentRunJournal struct {
+	RecordedAt         metav1.Time `json:"recordedAt"`
+	Generation         int64       `json:"generation"`
+	AccountableOwner   string      `json:"accountableOwner"`
+	Model              string      `json:"model"`
+	Provider           string      `json:"provider"`
+	PromptReference    string      `json:"promptReference"`
+	Tools              []string    `json:"tools"`
+	GrantedPermissions []string    `json:"grantedPermissions"`
+}
+
+// AgentEscalationStatus records the bounded escalation and its safe result.
+type AgentEscalationStatus struct {
+	Recipient   string                `json:"recipient"`
+	RequestedAt metav1.Time           `json:"requestedAt"`
+	ExpiresAt   metav1.Time           `json:"expiresAt"`
+	SafeDefault EscalationSafeDefault `json:"safeDefault"`
+	Outcome     EscalationOutcome     `json:"outcome"`
+}
+
+// AgentContainmentStatus is durable evidence that a drift or policy anomaly
+// stopped a live run.
+type AgentContainmentStatus struct {
+	RecordedAt    metav1.Time   `json:"recordedAt"`
+	CorrelationID string        `json:"correlationId"`
+	Reason        string        `json:"reason"`
+	Action        string        `json:"action"`
+	DemotedTo     AutonomyLevel `json:"demotedTo"`
+}
+
 // AgentRunSpec defines the desired state of AgentRun
 type AgentRunSpec struct {
+	// AccountableOwner identifies the person or team accountable for this run.
+	AccountableOwner string `json:"accountableOwner,omitempty"`
+	// Provenance declares the minimized model/provider/prompt/tool/permission AIBOM.
+	Provenance *AgentRunProvenance `json:"provenance,omitempty"`
+	// Autonomy configures the requested autonomy level and its oversight coupling.
+	Autonomy *AgentAutonomySpec `json:"autonomy,omitempty"`
 	// HarnessRef references an AgentHarness in the namespace
 	HarnessRef string `json:"harnessRef,omitempty"`
 	// Harness is an inline harness configuration
@@ -275,6 +372,14 @@ type AgentRunStatus struct {
 	ExitCode *int32 `json:"exitCode,omitempty"`
 	// WorkspacePVC is the name of the workspace PersistentVolumeClaim
 	WorkspacePVC string `json:"workspacePVC,omitempty"`
+	// EffectiveAutonomy is the highest level whose required oversight is healthy.
+	EffectiveAutonomy AutonomyLevel `json:"effectiveAutonomy,omitempty"`
+	// Journal is written before execution and contains no prompt or secret content.
+	Journal *AgentRunJournal `json:"journal,omitempty"`
+	// Escalation records a bounded human escalation and its safe default.
+	Escalation *AgentEscalationStatus `json:"escalation,omitempty"`
+	// Containment records a drift-triggered kill switch and autonomy demotion.
+	Containment *AgentContainmentStatus `json:"containment,omitempty"`
 }
 
 // +kubebuilder:object:root=true

@@ -1,3 +1,6 @@
+import {execFileSync} from "node:child_process";
+import {dirname, resolve} from "node:path";
+import {fileURLToPath} from "node:url";
 import {describe, expect, it} from "vitest";
 import {
   blanketIdBlockFailures,
@@ -17,6 +20,19 @@ describe("createChecker", () => {
     checker.check(false, "also fails");
     expect(checker.checks()).toBe(3);
     expect(checker.failures()).toEqual(["fails", "also fails"]);
+  });
+});
+
+describe("release validator", () => {
+  it("validates the repository release inputs end to end", () => {
+    const sourceDirectory = dirname(fileURLToPath(import.meta.url));
+    const entrypoint = resolve(sourceDirectory, "../dist/src/index.js");
+
+    const output = execFileSync(process.execPath, [entrypoint], {
+      encoding: "utf8",
+    });
+
+    expect(output).toContain("Release validation passed:");
   });
 });
 

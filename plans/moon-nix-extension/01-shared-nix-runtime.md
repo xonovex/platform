@@ -4,6 +4,8 @@ has_subplans: false
 parent_plan: plans/moon-nix-extension.md
 parallel_group: 1
 status: complete
+updated: 2026-07-19
+completed_date: "2026-07-19"
 dependencies:
   plans: []
   files:

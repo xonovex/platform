@@ -1,4 +1,4 @@
-import {checkIndependence} from "./independence-helpers.mjs";
+import {checkIndependence} from "./independence-helpers.ts";
 
 // Canonical work-shape vocabulary owned by this module: selectDevelopmentExecutor
 // branches on these literals, and the composition-vocabulary guard validates the

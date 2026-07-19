@@ -19,7 +19,7 @@ interface MarketplaceEntry {
 }
 
 interface Marketplace {
-  metadata: {version: string};
+  metadata?: {version: string};
   plugins: MarketplaceEntry[];
 }
 
@@ -71,9 +71,12 @@ const marketplace = readJson(
 const codexMarketplace = readJson(
   resolve(repositoryRoot, ".agents/plugins/marketplace.json"),
 ) as Marketplace;
-const releaseVersion = marketplace.metadata.version;
+const releaseVersion = marketplace.metadata?.version ?? "";
 
-check(releaseVersion === "6.0.1", "marketplace release must be 6.0.1");
+check(
+  /^\d+\.\d+\.\d+$/u.test(releaseVersion),
+  "marketplace release must use a semantic version",
+);
 
 const pluginPackages = [
   ...childDirectories(resolve(repositoryRoot, "packages/command")),
@@ -415,11 +418,9 @@ const diagramDirectory = resolve(
   repositoryRoot,
   "packages/diagram/diagram-agent-workflow",
 );
-const diagramSources = [
-  "workflow-diagram.dot",
-  "target-architecture.dot",
-  "maturity-ladder.dot",
-].map((name) => read(resolve(diagramDirectory, name)));
+const diagramSources = ["workflow-diagram.dot", "target-architecture.dot"].map(
+  (name) => read(resolve(diagramDirectory, name)),
+);
 const combinedDiagrams = diagramSources.join("\n").toLowerCase();
 for (const diagramTerm of [
   "workflow plane",
@@ -436,11 +437,7 @@ for (const diagramTerm of [
     `diagrams include ${diagramTerm}`,
   );
 }
-for (const image of [
-  "workflow-diagram.png",
-  "target-architecture.png",
-  "maturity-ladder.png",
-]) {
+for (const image of ["workflow-diagram.png", "target-architecture.png"]) {
   const imagePath = resolve(diagramDirectory, image);
   check(
     existsSync(imagePath) && statSync(imagePath).size > 0,

@@ -1,6 +1,6 @@
 import {readFileSync} from "node:fs";
-import {developmentWorkShapes} from "./development-assurance-helpers.mjs";
-import {independenceLevels} from "./independence-helpers.mjs";
+import {developmentWorkShapes} from "./development-assurance-helpers.ts";
+import {independenceLevels} from "./independence-helpers.ts";
 
 // The workflow plane owns two closed vocabularies that are also declared in prose
 // and fixtures: the independence levels (owned by independence-helpers, mirrored

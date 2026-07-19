@@ -23,3 +23,8 @@ Load the `agent-governance-guide` skill (plugin
 `xonovex-skill-agent-governance`) and perform its **evaluate drift** operation with these
 arguments. The skill is the source of truth for read-only discovery, classification,
 conformance, evidence, output, remediation preview, and gotchas — do not restate them.
+For an `AgentRun`, evaluate the runtime's correlated `oversight.control` signals and
+compare applied/observed policy references. Treat `status.effectiveAutonomy` and
+`status.containment` as the authoritative demotion/kill-switch result. Any approved
+remediation run must enter through the authenticated `AgentTrigger` POST surface; do not
+create a second trigger path.

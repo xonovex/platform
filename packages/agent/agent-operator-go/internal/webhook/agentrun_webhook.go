@@ -11,6 +11,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 
+	"k8s.io/apimachinery/pkg/api/equality"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	agentv1alpha1 "github.com/xonovex/platform/packages/agent/agent-operator-go/api/v1alpha1"
@@ -20,7 +21,8 @@ import (
 
 // AgentRunWebhook implements defaulting and validation for AgentRun
 type AgentRunWebhook struct {
-	Client client.Client
+	Client         client.Client
+	DecisionClient GovernanceDecisionClient
 }
 
 var _ admission.Defaulter[*agentv1alpha1.AgentRun] = &AgentRunWebhook{}
@@ -59,7 +61,10 @@ func (w *AgentRunWebhook) ValidateCreate(ctx context.Context, run *agentv1alpha1
 }
 
 // ValidateUpdate implements admission.Validator
-func (w *AgentRunWebhook) ValidateUpdate(ctx context.Context, _ *agentv1alpha1.AgentRun, newObj *agentv1alpha1.AgentRun) (admission.Warnings, error) {
+func (w *AgentRunWebhook) ValidateUpdate(ctx context.Context, oldObj *agentv1alpha1.AgentRun, newObj *agentv1alpha1.AgentRun) (admission.Warnings, error) {
+	if !equality.Semantic.DeepEqual(oldObj.Spec, newObj.Spec) {
+		return nil, fmt.Errorf("AgentRun spec is immutable after creation; create a new run for changed execution inputs")
+	}
 	return w.validate(ctx, newObj)
 }
 
@@ -139,13 +144,76 @@ func (w *AgentRunWebhook) validate(ctx context.Context, run *agentv1alpha1.Agent
 	if err != nil {
 		return nil, err
 	}
+	if err := validateAutonomyOversight(run, policy); err != nil {
+		return nil, err
+	}
 	if policy != nil {
 		if err := enforcePolicy(run, policy); err != nil {
 			return nil, err
 		}
+		governanceWarnings, err := w.enforceGovernance(ctx, run, policy)
+		if err != nil {
+			return nil, err
+		}
+		warnings = append(warnings, governanceWarnings...)
 	}
 
 	return warnings, nil
+}
+
+func validateAutonomyOversight(run *agentv1alpha1.AgentRun, policy *agentv1alpha1.AgentPolicy) error {
+	triggerKind := run.Annotations[agentv1alpha1.TriggeredByKindAnnotation]
+	if triggerKind != "" {
+		if triggerKind != "AgentSchedule" && triggerKind != "AgentTrigger" {
+			return fmt.Errorf("triggered run has unsupported trigger kind %q", triggerKind)
+		}
+		if run.Annotations[agentv1alpha1.TriggeredByNameAnnotation] == "" {
+			return fmt.Errorf("triggered run requires a trigger name")
+		}
+		if run.Spec.AccountableOwner == "" {
+			return fmt.Errorf("triggered run requires an accountableOwner")
+		}
+		if err := validateRunProvenance(run.Spec.Provenance); err != nil {
+			return fmt.Errorf("triggered run %w", err)
+		}
+	}
+
+	if run.Spec.Autonomy == nil || run.Spec.Autonomy.Level != agentv1alpha1.AutonomyLevelUnattended {
+		return nil
+	}
+	if run.Spec.AccountableOwner == "" {
+		return fmt.Errorf("A3 run requires an accountableOwner")
+	}
+	if err := validateRunProvenance(run.Spec.Provenance); err != nil {
+		return fmt.Errorf("A3 run %w", err)
+	}
+	if len(run.Spec.Autonomy.ProtectedTargets) == 0 {
+		return fmt.Errorf("A3 run requires at least one protected target")
+	}
+	route := run.Spec.Autonomy.EscalationRoute
+	if route == nil || route.Recipient == "" {
+		return fmt.Errorf("A3 run requires an accountable escalation recipient")
+	}
+	if route.Window.Duration <= 0 {
+		return fmt.Errorf("A3 escalation window must be positive")
+	}
+	if route.SafeDefault != agentv1alpha1.EscalationSafeDefaultPause && route.SafeDefault != agentv1alpha1.EscalationSafeDefaultAbandon {
+		return fmt.Errorf("A3 escalation safeDefault must be pause or abandon")
+	}
+	if policy == nil || !policy.Spec.Enforced.RequireGovernanceVerdict {
+		return fmt.Errorf("A3 run requires a non-bypassable governance verdict at admission")
+	}
+	return nil
+}
+
+func validateRunProvenance(provenance *agentv1alpha1.AgentRunProvenance) error {
+	if provenance == nil || provenance.Model == "" || provenance.Provider == "" || provenance.PromptReference == "" {
+		return fmt.Errorf("requires provenance with model, provider, and promptReference")
+	}
+	if provenance.Tools == nil || provenance.GrantedPermissions == nil {
+		return fmt.Errorf("requires provenance with declared tools and grantedPermissions")
+	}
+	return nil
 }
 
 func (w *AgentRunWebhook) namespacePolicy(ctx context.Context, namespace string) (*agentv1alpha1.AgentPolicy, error) {

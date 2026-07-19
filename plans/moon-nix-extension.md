@@ -1,8 +1,9 @@
 ---
 type: plan
 has_subplans: true
-status: approved
-updated: 2026-07-18
+status: complete
+updated: 2026-07-19
+completed_date: "2026-07-19"
 feature: moon-nix-extension
 dependencies:
   plans: []

@@ -1,0 +1,12 @@
+{
+  "name": "@xonovex/governance-decision-runtime",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.18.0"
+  },
+  "dependencies": {
+    "zod": "4.1.11"
+  }
+}

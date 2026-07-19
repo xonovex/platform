@@ -3,7 +3,7 @@ type: plan
 has_subplans: false
 parent_plan: ../runtime-enforcement-completion.md
 parallel_group: 2
-status: pending
+status: complete
 dependencies:
   plans:
     - governance-decision-point-fail-closed
@@ -18,11 +18,11 @@ skills_to_consult:
   - testing-guide
   - connascence-guide
 validation:
-  type_check: not_run
-  lint: not_run
-  build: not_run
-  tests: not_run
-updated: "2026-07-17"
+  type_check: passed
+  lint: passed
+  build: passed
+  tests: passed
+updated: "2026-07-19"
 ---
 
 # One Claude Code Native Hook Proven to Block a Denied Action End-to-End

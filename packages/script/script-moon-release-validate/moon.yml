@@ -2,6 +2,11 @@ $schema: https://moonrepo.dev/schemas/project.json
 language: typescript
 tags: [typescript-script]
 tasks:
+  ts-test:
+    deps:
+      - ~:ts-build
+    options:
+      mergeDeps: append
   install:
     command:
       - npm

@@ -3,7 +3,7 @@ type: plan
 has_subplans: false
 parent_plan: ../runtime-enforcement-completion.md
 parallel_group: 3
-status: pending
+status: complete
 dependencies:
   plans:
     - governance-decision-point-fail-closed
@@ -11,18 +11,18 @@ dependencies:
   files:
     - packages/skill/skill-agent-governance/agent-governance-guide/assets/walking-skeleton/*
     - packages/command/command-workflow/commands/*.md
-    - packages/skill/skill-workflow/workflow-guide/scripts/*.mjs
+    - packages/skill/skill-workflow/workflow-guide/scripts/*.ts
 skills_to_consult:
   - plan-guide
   - shell-scripting-guide
   - testing-guide
   - connascence-guide
 validation:
-  type_check: not_run
-  lint: not_run
-  build: not_run
-  tests: not_run
-updated: "2026-07-17"
+  type_check: passed
+  lint: passed
+  build: passed
+  tests: passed
+updated: "2026-07-19"
 ---
 
 # The Walking Skeleton Made Runtime-Real

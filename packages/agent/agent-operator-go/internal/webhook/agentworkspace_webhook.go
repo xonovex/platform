@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 
+	"k8s.io/apimachinery/pkg/api/equality"
 	"k8s.io/apimachinery/pkg/api/resource"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
@@ -49,7 +50,10 @@ func (w *AgentWorkspaceWebhook) ValidateCreate(_ context.Context, ws *agentv1alp
 }
 
 // ValidateUpdate implements admission.Validator
-func (w *AgentWorkspaceWebhook) ValidateUpdate(_ context.Context, _ *agentv1alpha1.AgentWorkspace, newObj *agentv1alpha1.AgentWorkspace) (admission.Warnings, error) {
+func (w *AgentWorkspaceWebhook) ValidateUpdate(_ context.Context, oldObj *agentv1alpha1.AgentWorkspace, newObj *agentv1alpha1.AgentWorkspace) (admission.Warnings, error) {
+	if !equality.Semantic.DeepEqual(oldObj.Spec, newObj.Spec) {
+		return nil, fmt.Errorf("AgentWorkspace spec is immutable after creation; create a new workspace for changed repository or execution inputs")
+	}
 	return w.validate(newObj)
 }
 

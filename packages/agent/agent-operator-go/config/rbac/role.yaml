@@ -8,8 +8,12 @@ rules:
     resources:
       - agentruns
       - agentproviders
-      - agentconfigs
+      - agentworkspaces
+      - agentharnesses
+      - agenttoolchains
       - agentpolicies
+      - agentschedules
+      - agenttriggers
     verbs:
       - get
       - list
@@ -23,8 +27,10 @@ rules:
     resources:
       - agentruns/status
       - agentproviders/status
-      - agentconfigs/status
+      - agentworkspaces/status
       - agentpolicies/status
+      - agentschedules/status
+      - agenttriggers/status
     verbs:
       - get
       - update
@@ -33,6 +39,7 @@ rules:
       - agent.xonovex.com
     resources:
       - agentruns/finalizers
+      - agentworkspaces/finalizers
     verbs:
       - update
   - apiGroups:

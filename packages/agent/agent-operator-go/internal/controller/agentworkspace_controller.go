@@ -21,11 +21,16 @@ import (
 	wsshared "github.com/xonovex/platform/packages/agent/agent-operator-go/internal/workspace/shared"
 )
 
+// DefaultWorkspaceInitImage is pinned to the multi-architecture OCI index for
+// alpine/git 2.54.0. Operators may configure another digest-pinned image.
+const DefaultWorkspaceInitImage = "docker.io/alpine/git:2.54.0@sha256:697cb1c85aefc5724febaec2202a974e0d66f6abb6be91a9a86d0c8757af692a"
+
 // AgentWorkspaceReconciler reconciles an AgentWorkspace object
 type AgentWorkspaceReconciler struct {
 	client.Client
-	Scheme   *runtime.Scheme
-	Recorder events.EventRecorder
+	Scheme             *runtime.Scheme
+	Recorder           events.EventRecorder
+	WorkspaceInitImage string
 }
 
 // +kubebuilder:rbac:groups=agent.xonovex.com,resources=agentworkspaces,verbs=get;list;watch;create;update;patch;delete
@@ -96,7 +101,10 @@ func (r *AgentWorkspaceReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 	// 3. Create init Job if needed
 	initJobName := fmt.Sprintf("%s-init", ws.Name)
 	if ws.Status.InitJobName == "" {
-		image := "alpine/git:latest"
+		image := r.WorkspaceInitImage
+		if image == "" {
+			image = DefaultWorkspaceInitImage
+		}
 
 		job := isoshared.BuildWorkspaceInitJob(&ws, workspacePVCName, image, ws.Spec.RuntimeClassName)
 		if err := ctrl.SetControllerReference(&ws, job, r.Scheme); err != nil {

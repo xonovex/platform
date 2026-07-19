@@ -6,7 +6,7 @@ This ladder is guidance for a team adopting these contracts. It grades an adopte
 
 **Start at `A1`.** It is the recommended starting point for an adopting team: it needs only an interactive session and an independent critique, so it is reachable without a headless runner, a run journal, or admission control, and it establishes the adversarial reading that every higher level assumes.
 
-`A0`–`A2` describe postures an adopter can reach today with an interactive or sandboxed headless session. **`A3` is the eventual goal, not a description of what exists.** Its triggers, admission control, and escalation routing are targets an adopter builds and proves; the `A3` row defines what the posture would require and is not an inventory of available components. Where such a control is absent, the level is simply unavailable — see [Oversight coupling](#oversight-coupling).
+`A0`–`A2` describe postures an adopter can reach with an interactive or sandboxed headless session. The Xonovex operator supplies concrete `A3` building blocks: cron and authenticated HTTP triggers, governance admission, content-minimized per-run provenance, and bounded escalation with pause/abandon defaults. An adopter still has to deploy and prove those controls in its own environment; installing the operator alone does not confer `A3`. Where a required control is absent, the level is unavailable — see [Oversight coupling](#oversight-coupling).
 
 ## What autonomy grades
 

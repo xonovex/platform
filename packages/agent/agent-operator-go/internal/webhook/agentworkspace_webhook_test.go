@@ -164,7 +164,7 @@ func TestAgentWorkspaceWebhook_Validate_DuplicateSharedVolumeName(t *testing.T) 
 	}
 }
 
-func TestAgentWorkspaceWebhook_ValidateUpdate(t *testing.T) {
+func TestAgentWorkspaceWebhook_ValidateUpdateRejectsSpecMutation(t *testing.T) {
 	old := &agentv1alpha1.AgentWorkspace{
 		Spec: agentv1alpha1.AgentWorkspaceSpec{
 			Repository: agentv1alpha1.RepositorySpec{URL: "https://github.com/org/repo.git"},
@@ -178,8 +178,22 @@ func TestAgentWorkspaceWebhook_ValidateUpdate(t *testing.T) {
 
 	webhook := &AgentWorkspaceWebhook{}
 	_, err := webhook.ValidateUpdate(context.Background(), old, new)
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
+	if err == nil {
+		t.Fatal("expected immutable spec error")
+	}
+}
+
+func TestAgentWorkspaceWebhook_ValidateUpdateAllowsMetadataMutation(t *testing.T) {
+	old := &agentv1alpha1.AgentWorkspace{
+		ObjectMeta: metav1.ObjectMeta{Name: "workspace"},
+		Spec:       agentv1alpha1.AgentWorkspaceSpec{Repository: agentv1alpha1.RepositorySpec{URL: "https://github.com/org/repo.git"}},
+	}
+	updated := old.DeepCopy()
+	updated.Labels = map[string]string{"owner": "platform"}
+
+	webhook := &AgentWorkspaceWebhook{}
+	if _, err := webhook.ValidateUpdate(context.Background(), old, updated); err != nil {
+		t.Fatalf("metadata-only update failed: %v", err)
 	}
 }
 

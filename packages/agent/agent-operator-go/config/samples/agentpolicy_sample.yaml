@@ -5,6 +5,8 @@ metadata:
   namespace: ai-agents
 spec:
   enforced:
+    requireGovernanceVerdict: true
+    governancePolicyVersion: governance-policy/1
     runtimeClassName: kata
     requireSecurityContext: true
     requireNetworkPolicy: true

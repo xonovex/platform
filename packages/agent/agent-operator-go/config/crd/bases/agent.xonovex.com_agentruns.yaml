@@ -40,6 +40,59 @@ spec:
               type: object
               description: AgentRunSpec defines the desired state of AgentRun
               properties:
+                accountableOwner:
+                  type: string
+                  description: Person or team accountable for the run
+                provenance:
+                  type: object
+                  description: Content-minimized model, provider, prompt, tool, and permission AIBOM
+                  required:
+                    [
+                      model,
+                      provider,
+                      promptReference,
+                      tools,
+                      grantedPermissions,
+                    ]
+                  properties:
+                    model:
+                      type: string
+                    provider:
+                      type: string
+                    promptReference:
+                      type: string
+                    tools:
+                      type: array
+                      items:
+                        type: string
+                    grantedPermissions:
+                      type: array
+                      items:
+                        type: string
+                autonomy:
+                  type: object
+                  description: Requested autonomy and required oversight controls
+                  properties:
+                    level:
+                      type: string
+                      enum: [A0, A1, A2, A3]
+                    protectedTargets:
+                      type: array
+                      items:
+                        type: string
+                    needsHuman:
+                      type: boolean
+                    escalationRoute:
+                      type: object
+                      required: [recipient, window, safeDefault]
+                      properties:
+                        recipient:
+                          type: string
+                        window:
+                          type: string
+                        safeDefault:
+                          type: string
+                          enum: [pause, abandon]
                 harnessRef:
                   type: string
                   description: References an AgentHarness in the namespace
@@ -391,7 +444,8 @@ spec:
                         type: integer
                         format: int64
                 runtimeClassName:
-                  description: RuntimeClassName sets the pod runtimeClassName for
+                  description:
+                    RuntimeClassName sets the pod runtimeClassName for
                     VM-based isolation (e.g. Kata Containers)
                   type: string
                 securityContext:
@@ -432,6 +486,7 @@ spec:
                     - Succeeded
                     - Failed
                     - TimedOut
+                    - Paused
                 conditions:
                   type: array
                   items:
@@ -482,3 +537,64 @@ spec:
                 workspacePVC:
                   type: string
                   description: Name of the workspace PersistentVolumeClaim
+                effectiveAutonomy:
+                  type: string
+                  enum: [A0, A1, A2, A3]
+                journal:
+                  type: object
+                  properties:
+                    recordedAt:
+                      type: string
+                      format: date-time
+                    generation:
+                      type: integer
+                      format: int64
+                    accountableOwner:
+                      type: string
+                    model:
+                      type: string
+                    provider:
+                      type: string
+                    promptReference:
+                      type: string
+                    tools:
+                      type: array
+                      items:
+                        type: string
+                    grantedPermissions:
+                      type: array
+                      items:
+                        type: string
+                escalation:
+                  type: object
+                  properties:
+                    recipient:
+                      type: string
+                    requestedAt:
+                      type: string
+                      format: date-time
+                    expiresAt:
+                      type: string
+                      format: date-time
+                    safeDefault:
+                      type: string
+                      enum: [pause, abandon]
+                    outcome:
+                      type: string
+                      enum: [Pending, Paused, Abandoned]
+                containment:
+                  type: object
+                  description: Durable evidence of drift-triggered containment
+                  properties:
+                    recordedAt:
+                      type: string
+                      format: date-time
+                    correlationId:
+                      type: string
+                    reason:
+                      type: string
+                    action:
+                      type: string
+                    demotedTo:
+                      type: string
+                      enum: [A0, A1, A2, A3]

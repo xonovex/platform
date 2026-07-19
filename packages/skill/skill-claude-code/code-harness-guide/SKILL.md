@@ -15,6 +15,7 @@ Map the semantic contracts owned by **agent-governance-guide** to Claude Code's 
 - **Assume parallel matching** - Make handlers reentrant and do not expect a denial to cancel sibling side effects.
 - **Respect settings authority** - Managed, user, project, local, plugin, and component hooks have native precedence and trust rules.
 - **Onboard transactionally** - Preview exact settings/plugin changes, permissions, data flow, verification, disable, and rollback before apply.
+- **Probe governed writes** - Run `scripts/refresh-pre-tool-use-probe.sh` after hook or runtime changes.
 
 ## Gotchas
 
@@ -33,3 +34,4 @@ A mandatory protected-path control selects `PreToolUse` with a deterministic com
 - Read [references/capabilities.md](references/capabilities.md) - Load when mapping semantic intents to native events, handlers, guarantees, versions, ordering, context, or limitations
 - Read [references/onboarding.md](references/onboarding.md) - Load when discovering, previewing, applying, verifying, disabling, rolling back, updating, or detecting drift
 - Read [references/patterns.md](references/patterns.md) - Load when translating deterministic hooks, model evaluators, specialist agents, or managed adoption recipes
+- Read [references/pre-tool-use-governance.md](references/pre-tool-use-governance.md) - Load when registering or refreshing the governed `PreToolUse` write hook

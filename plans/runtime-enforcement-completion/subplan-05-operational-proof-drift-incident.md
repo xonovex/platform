@@ -3,7 +3,8 @@ type: plan
 has_subplans: false
 parent_plan: ../runtime-enforcement-completion.md
 parallel_group: 4
-status: pending
+status: complete
+completed_date: "2026-07-19"
 dependencies:
   plans:
     - governance-decision-point-fail-closed
@@ -22,14 +23,19 @@ skills_to_consult:
   - shell-scripting-guide
   - connascence-guide
 validation:
-  type_check: not_run
-  lint: not_run
-  build: not_run
-  tests: not_run
-updated: "2026-07-17"
+  type_check: passed
+  lint: passed
+  build: passed
+  tests: passed
+  e2e: passed
+updated: "2026-07-19"
 ---
 
 # Operational Proof: Drift Detection and Incident Containment on a Live Estate
+
+## Execution evidence — 2026-07-19
+
+The reconciler emits closed-shape OpenTelemetry spans/metrics, while the decision service and Claude hook emit content-minimized OTLP JSON logs. The native Claude Code `2.1.211` hook probe was rerun after telemetry wiring: the deny/allow pair passed, two verdict records and four paired verdict/enforcement telemetry records were emitted, and the allowed enforcement signal carried no failure code. The signal-fed detector recomputes A3 controls, detects missing/degraded/divergent evidence, demotes to A2, deletes the live Job, pauses the run, and records durable containment; remediation uses only an authenticated `AgentTrigger` POST. Unit tests cover telemetry minimization, drift, deletion, demotion, containment, and remediation routing. Two initial Kind attempts were blocked while the host still used runc 1.4.0 (`OCI runtime exec failed ... exec: already started` while Kind read `/kind/version`). After upgrading the host to runc 1.4.3 (`bb14dabeb7185bb72c8c86735d090dcb20f36587`), the same targeted proof passed against Kind v0.31.0 with Kubernetes v1.35.0: it created the governed A3 run and Job, induced oversight degradation, observed A3-to-A2 demotion, verified Job deletion and durable containment evidence, and observed the run Paused. The scenario passed in 2.78 seconds (30.568 seconds including cluster lifecycle), and Kind removed the cluster afterward.
 
 ## Objective
 

@@ -1,4 +1,4 @@
-import {checkIndependence} from "./independence-helpers.mjs";
+import {checkIndependence} from "./independence-helpers.ts";
 
 const hasValue = (value) =>
   value !== undefined && value !== null && value !== "";

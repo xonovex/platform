@@ -26,7 +26,7 @@ const permissionRejectionCodes = new Set([
 ]);
 
 const workflowHelpersPath =
-  "packages/skill/skill-workflow/workflow-guide/scripts/development-assurance-helpers.mjs";
+  "packages/skill/skill-workflow/workflow-guide/scripts/development-assurance-helpers.ts";
 
 const readSource = (path) => readFileSync(new URL(path, repoRootUrl), "utf8");
 

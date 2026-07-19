@@ -3,7 +3,7 @@ type: plan
 has_subplans: false
 parent_plan: ../runtime-enforcement-completion.md
 parallel_group: 1
-status: pending
+status: complete
 dependencies:
   plans: []
   files:
@@ -26,11 +26,11 @@ skills_to_consult:
   - testing-guide
   - connascence-guide
 validation:
-  type_check: not_run
-  lint: not_run
-  build: not_run
-  tests: not_run
-updated: "2026-07-17"
+  type_check: passed
+  lint: passed
+  build: passed
+  tests: passed
+updated: "2026-07-19"
 ---
 
 # Governance Decision Point That Invokes the Validators and Fails Closed
@@ -56,10 +56,10 @@ and A3 orchestration (Phase 4) all gate through.
    decision service** beside the validators — new `.ts` under
    `packages/skill/skill-workflow/workflow-guide/scripts/` and
    `packages/skill/skill-agent-governance/agent-governance-guide/scripts/` — that imports
-   `checkIndependence` (`workflow-guide/scripts/independence-helpers`),
+   `checkIndependence` (`workflow-guide/scripts/independence-helpers.ts`),
    `validateEmergencyAccess` and `validatePrivilegedOperation`
-   (`workflow-guide/scripts/operational-lifecycle-helpers`), and `selectDevelopmentExecutor`
-   / `validateDevelopment` (`workflow-guide/scripts/development-assurance-helpers`) **without
+   (`workflow-guide/scripts/operational-lifecycle-helpers.ts`), and `selectDevelopmentExecutor`
+   / `validateDevelopment` (`workflow-guide/scripts/development-assurance-helpers.ts`) **without
    forking them**, exposing one long-running service with a stable, versioned JSON
    request/response contract (subject reference, operation, inputs → decision, exact failure
    code, policy version, correlation id).

@@ -9,7 +9,7 @@ import {
   validateDevelopment,
   validateExternalEvidence,
   validateInventory,
-} from "./development-assurance-helpers.mjs";
+} from "./development-assurance-helpers.ts";
 
 const fixtureUrl = new URL(
   "../assets/development-assurance-fixtures.json",

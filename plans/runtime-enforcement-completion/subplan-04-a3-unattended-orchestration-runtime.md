@@ -3,7 +3,7 @@ type: plan
 has_subplans: false
 parent_plan: ../runtime-enforcement-completion.md
 parallel_group: 2
-status: pending
+status: complete
 dependencies:
   plans:
     - governance-decision-point-fail-closed
@@ -20,14 +20,18 @@ skills_to_consult:
   - testing-guide
   - connascence-guide
 validation:
-  type_check: not_run
-  lint: not_run
-  build: not_run
-  tests: not_run
-updated: "2026-07-17"
+  type_check: passed
+  lint: passed
+  build: passed
+  tests: passed
+updated: "2026-07-19"
 ---
 
 # A3 Unattended-Orchestration Runtime Coupled to the Oversight Invariant
+
+## Execution evidence — 2026-07-19
+
+The operator now registers `AgentSchedule` and `AgentTrigger`, serves the authenticated trigger receiver behind a namespace-gated NetworkPolicy, requires A3 ownership/provenance/protected targets/escalation/governance admission, writes the minimized per-run journal before creating a Job, and applies pause/abandon on escalation expiry. Controller and webhook tests cover both trigger paths, unauthorized/unmatched requests, missing A3 oversight, journal creation, and safe-default expiry. `go test ./...`, `go vet ./...`, CRD installation through envtest, and the bare `agent-operator-go:go-test-integration` Moon task pass.
 
 ## Objective
 

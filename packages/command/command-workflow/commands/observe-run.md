@@ -23,4 +23,8 @@ argument-hint: "<subject-reference> [--revision <native-revision>] --window <ran
 
 Load `workflow-guide` and perform **observe-run**. Soft-select monitoring, user-feedback,
 security, AI, cost, accessibility, delivery-outcome, and provider skills. Keep bounded
-model/agent summaries advisory and linked to provider-native source evidence.
+model/agent summaries advisory and linked to provider-native source evidence. For an
+operator-managed `AgentRun`, read the correlated `xonovex.*` OpenTelemetry spans/metrics
+and the content-minimized decision/hook OTLP logs; use `status.journal`,
+`status.escalation`, and `status.containment` as durable runtime evidence without copying
+prompt or Secret content into the observation.

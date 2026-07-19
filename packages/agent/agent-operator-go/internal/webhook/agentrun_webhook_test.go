@@ -2,13 +2,54 @@ package webhook
 
 import (
 	"context"
+	"strings"
 	"testing"
 	"time"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"sigs.k8s.io/controller-runtime/pkg/client/fake"
 
 	agentv1alpha1 "github.com/xonovex/platform/packages/agent/agent-operator-go/api/v1alpha1"
+	"github.com/xonovex/platform/packages/agent/agent-operator-go/test/testutil"
 )
+
+func TestAgentRunWebhook_Validate_A3OversightCoupling(t *testing.T) {
+	valid := baseRun()
+	valid.Name = "a3-run"
+	valid.Spec.AccountableOwner = "team:platform"
+	valid.Spec.Provenance = &agentv1alpha1.AgentRunProvenance{
+		Model: "model", Provider: "provider", PromptReference: "prompt://1",
+		Tools: []string{"Read"}, GrantedPermissions: []string{"repository:read"},
+	}
+	valid.Spec.Autonomy = &agentv1alpha1.AgentAutonomySpec{
+		Level: agentv1alpha1.AutonomyLevelUnattended, ProtectedTargets: []string{"repository:main"},
+		EscalationRoute: &agentv1alpha1.AgentEscalationRoute{
+			Recipient: "human:on-call", Window: metav1.Duration{Duration: time.Minute}, SafeDefault: agentv1alpha1.EscalationSafeDefaultPause,
+		},
+	}
+
+	tests := []struct {
+		name       string
+		mutate     func(*agentv1alpha1.AgentRun)
+		policy     *agentv1alpha1.AgentPolicy
+		wantPhrase string
+	}{
+		{name: "missing provenance", mutate: func(run *agentv1alpha1.AgentRun) { run.Spec.Provenance = nil }, policy: governedPolicy(true), wantPhrase: "requires provenance"},
+		{name: "missing recipient", mutate: func(run *agentv1alpha1.AgentRun) { run.Spec.Autonomy.EscalationRoute.Recipient = "" }, policy: governedPolicy(true), wantPhrase: "escalation recipient"},
+		{name: "verdict not enforced", mutate: func(_ *agentv1alpha1.AgentRun) {}, policy: governedPolicy(false), wantPhrase: "non-bypassable governance verdict"},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			run := valid.DeepCopy()
+			test.mutate(run)
+			w := &AgentRunWebhook{Client: fake.NewClientBuilder().WithScheme(testutil.NewScheme()).WithObjects(test.policy).Build()}
+			_, err := w.ValidateCreate(context.Background(), run)
+			if err == nil || !strings.Contains(err.Error(), test.wantPhrase) {
+				t.Fatalf("ValidateCreate() error = %v, want phrase %q", err, test.wantPhrase)
+			}
+		})
+	}
+}
 
 func TestAgentRunWebhook_Default_SetsTimeout(t *testing.T) {
 	w := &AgentRunWebhook{}
@@ -352,6 +393,17 @@ func TestAgentRunWebhook_ValidateUpdate(t *testing.T) {
 	_, err := w.ValidateUpdate(context.Background(), oldRun, newRun)
 	if err != nil {
 		t.Errorf("ValidateUpdate() error = %v", err)
+	}
+}
+
+func TestAgentRunWebhook_ValidateUpdateRejectsExecutionMutation(t *testing.T) {
+	w := &AgentRunWebhook{}
+	oldRun := baseRun()
+	newRun := oldRun.DeepCopy()
+	newRun.Spec.Prompt = "changed after execution started"
+
+	if _, err := w.ValidateUpdate(context.Background(), oldRun, newRun); err == nil {
+		t.Fatal("expected immutable spec error")
 	}
 }
 

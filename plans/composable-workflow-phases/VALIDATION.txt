@@ -1,5 +1,5 @@
 AUDITABLE COMPOSABLE WORKFLOW RELEASE VALIDATION
-Date: 2026-07-16 (revalidated after the implementations merge)
+Date: 2026-07-19
 
 Sources: 94
 Decisions: 39
@@ -7,9 +7,9 @@ Controls/obligations: 45
 Platform matrix entries: 14
 Subplans: 11
 Numbered tasks mapped: 150
-Lockstep command/skill packages: 93
-Plugin manifests: 186
-Repository release-validation checks: 7249
+Lockstep command/skill packages: 95
+Plugin manifests: 190
+Repository release-validation checks: 7274
 Package documentation checks (command-workflow): 62
 Conformance scenario fixtures: 56 (36 governance/enterprise + 20 workflow), machine-run
 Walking-skeleton executable checks: 17
@@ -35,16 +35,24 @@ Checks:
 - Conformance fixtures cover concurrency, idempotency, recursion, authority, rollback, drift, telemetry and provider boundaries
 - The 56-scenario adversarial corpus is validated by machine runners with index bijection, owner existence and mutation guards in both contract skills
 - The governance walking skeleton executes in CI: 17/17 checks covering consent gating, idempotent apply, explained denials, an independent local gate, drift detection/remediation, checksum module trust, evidence dedup, recursion limits, exception expiry and rollback
-- Claude Code probed at 2.1.211 on 2026-07-16 (CLI version observed; guard exit-code contract exercised locally; native hook registration not exercised — hook rows stay documentation-verified; re-probe on version change)
+- Claude Code probed at 2.1.211 on 2026-07-19 through a real project-scoped PreToolUse hook: the protected operation was denied before execution, the allowed operation completed, and sanitized evidence was captured; re-probe on version change
+- The governance decision service uses the authoritative workflow validators, fails closed on invalid or unavailable context, and emits append-only verdict evidence plus closed-shape OpenTelemetry enforcement records
+- The operator enforces mandatory governance references and bounded escalation for protected A3 runs, journals an AIBOM before creating a Job, demotes and pauses runs when oversight degrades, deletes the active Job, and routes remediation only through authenticated AgentTrigger requests
+- AgentSchedule and AgentTrigger CRDs, schedule concurrency, bearer-secret authentication, idempotency, ownership/provenance, escalation expiry, telemetry privacy, drift containment and remediation routing are covered by unit or envtest integration suites
+- The Kind-tagged A3 oversight-degradation proof passed after the host upgraded to runc 1.4.3: a governed A3 run created a live Job, degraded oversight caused A3-to-A2 demotion, the Job was deleted, durable containment evidence was recorded, and the run entered Paused
+- The operational lifecycle probe executed real Claude CLI discovery, acceptance-validation and integration-validation commands at one immutable Git revision, allowed the independent gates, and denied a self-approval negative control
+- AgentRun and AgentWorkspace specifications are immutable after creation while metadata and status remain updateable
+- The operator integration task is self-sufficient from a bare Moon invocation and installs all eight CRDs through envtest
+- The workspace bootstrap image is an explicit, configurable, fully digest-pinned alpine/git reference; the CLI completion path propagates generator and writer errors
 - The shipped command-workflow package validates itself without repository context; repository-wide release validation runs as a separate CI task
-- Package, manifest, marketplace, internal dependency and lockfile versions align at 6.0.1
+- Package, manifest, marketplace, internal dependency and lockfile versions align at 6.1.0
+- `npm audit` reports zero vulnerabilities after dependency remediation
 - Migration, rollback, diagram and prohibited-claim guards pass
 - Format, lint, typecheck, build, repository tests and all skill validators pass
 
 Warnings / required runtime reviews:
 - Five harness adapters (Codex, Kiro, Copilot, Pi, OpenCode) and all five enterprise platforms carry explicit candidate (documentation-derived) status; capability rows remain runtime-unverified until pinned-version probes run, and the result line above is qualified accordingly per validation-policy rule 5.
-- Kubernetes end-to-end operator coverage (2026-07-16 disposition): all four Kind suites (e2e, e2e-gvisor, e2e-kata, e2e-coco) are moon-wired and go-test-integration is self-sufficient (the task wires KUBEBUILDER_ASSETS via setup-envtest from the nix devshell; verified green from a bare moon run). The Kind suites remain unrunnable on the validation host: docker exec into systemd containers fails (runc 1.4.0, kernel 7.0.6-gentoo), investigated, time-boxed and documented in the operator README with an untested runc-upgrade candidate fix; all four suites fail only with that documented signature. CI coverage is prepared but dormant: .github/workflows/e2e.yml runs integration plus all four suites with per-suite executed-vs-skipped counts, passes actionlint and zizmor, and cannot run until the owner's no-push deferral ends — it activates when it reaches the remote default branch (reactivation condition: owner resumes pushing; then workflow_dispatch or nightly schedule). Until then the release remains e2e-unexercised; webhook unit and envtest integration suites pass locally.
-- `npm audit` reports six transitive dependency advisories (1 low, 2 moderate, 3 high); dependency remediation remains a separate reviewed change.
+- Kubernetes end-to-end operator coverage (2026-07-19 disposition): all four existing Kind suites and the new A3 oversight-degradation scenario are moon-wired, and go-test-integration is self-sufficient (KUBEBUILDER_ASSETS is supplied through setup-envtest from the Nix devshell; verified green from a bare Moon run). The initial `exec: already started` startup blocker was resolved by upgrading the host from runc 1.4.0 to runc 1.4.3 (`bb14dabeb7185bb72c8c86735d090dcb20f36587`). A minimal Kind cluster reached Ready in 18 seconds, and the targeted A3 live-estate scenario passed in 2.78 seconds (30.568 seconds including cluster lifecycle). The remaining full and variant Kind suites were not rerun during this focused validation.
 - Azure DevOps Services/Server and Bitbucket Cloud/Data Center must be detected before recommendations are applied.
 - Account tiers, runner types, regions and installed apps can materially change capabilities.
 - AWS trust policies and Datadog data collection require organization-specific security/privacy review.

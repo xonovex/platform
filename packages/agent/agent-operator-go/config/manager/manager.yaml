@@ -22,15 +22,21 @@ spec:
       terminationGracePeriodSeconds: 10
       containers:
         - name: manager
-          image: ghcr.io/xonovex/agent-operator-go:latest
+          image: ghcr.io/xonovex/agent-operator-go:0.1.30
           command:
             - /operator
           args:
             - --leader-elect
             - --health-probe-bind-address=:8081
+            - --decision-service-url=http://127.0.0.1:8787
+            - --trigger-bind-address=:8090
+            - --workspace-init-image=docker.io/alpine/git:2.54.0@sha256:697cb1c85aefc5724febaec2202a974e0d66f6abb6be91a9a86d0c8757af692a
           ports:
             - containerPort: 8081
               name: health
+              protocol: TCP
+            - containerPort: 8090
+              name: trigger
               protocol: TCP
           livenessProbe:
             httpGet:
@@ -53,8 +59,51 @@ spec:
               memory: 64Mi
           securityContext:
             allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
             capabilities:
               drop:
                 - ALL
+        - name: governance-decision
+          image: ghcr.io/xonovex/governance-decision-service:0.1.0
+          env:
+            - name: DECISION_EVIDENCE_PATH
+              value: /var/lib/xonovex/verdicts.jsonl
+          ports:
+            - containerPort: 8787
+              name: decision
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8787
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 8787
+            initialDelaySeconds: 2
+            periodSeconds: 5
+          resources:
+            limits:
+              cpu: 250m
+              memory: 128Mi
+            requests:
+              cpu: 10m
+              memory: 32Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+          volumeMounts:
+            - name: governance-evidence
+              mountPath: /var/lib/xonovex
       securityContext:
         runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      volumes:
+        - name: governance-evidence
+          emptyDir: {}

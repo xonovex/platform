@@ -1,8 +1,9 @@
 ---
 type: plan
 has_subplans: true
-status: approved
+status: complete
 approved_date: "2026-07-17"
+completed_date: "2026-07-19"
 dependencies:
   plans:
     - composable-workflow-phases
@@ -60,14 +61,29 @@ skills_to_consult:
   - git-guide
   - moon-guide
 validation:
-  type_check: not_run
-  lint: not_run
-  build: not_run
-  tests: not_run
-updated: "2026-07-17"
+  type_check: passed
+  lint: passed
+  build: passed
+  tests: passed
+  e2e: passed
+updated: "2026-07-19"
 ---
 
 # Runtime Enforcement Completion
+
+## Execution evidence — 2026-07-19
+
+Phases 1–4 are implemented and locally validated: the shared decision point fails closed, the real
+Claude Code `PreToolUse` hook blocks denied work, the lifecycle probe executes real discovery and
+independent validation commands, and the operator supplies governed A3 schedules/triggers,
+provenance, escalation and admission controls. Phase 5's telemetry, drift detector, containment and
+authenticated remediation path are also implemented and pass deterministic, unit and envtest gates.
+After the host upgraded from runc 1.4.0 to runc 1.4.3 (`bb14dabeb7185bb72c8c86735d090dcb20f36587`),
+a minimal Kind cluster reached Ready in 18 seconds and the targeted Kind-tagged A3 proof passed. The
+proof created a governed A3 run and live Job, induced oversight degradation, demoted the run to A2,
+deleted the Job, recorded durable containment evidence, and left the run Paused. The scenario passed
+in 2.78 seconds (30.568 seconds for the e2e package including cluster lifecycle), and Kind removed the
+cluster after the run. All five subplans are complete.
 
 ## Objective
 
@@ -116,7 +132,7 @@ and its descendants ([composable-workflow-implementations-merge.md](composable-w
    templated `AgentRun`, unauthenticated or unmatched posts create nothing. Phase 5's drift
    detector reuses this receiver as its remediation path.
 
-## Current state (VERIFIED)
+## Baseline state (verified before implementation)
 
 ### The contracts are validated by fixtures, not enforced at runtime
 

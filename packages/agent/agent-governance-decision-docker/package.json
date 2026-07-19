@@ -1,0 +1,13 @@
+{
+  "name": "@xonovex/agent-governance-decision-docker",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Container image for the Xonovex governance decision service",
+  "keywords": [
+    "xonovex",
+    "agent",
+    "governance",
+    "decision",
+    "docker"
+  ]
+}
