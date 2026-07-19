@@ -14,7 +14,7 @@
   {
     "query": "what version and trust probes should I run before relying on this Claude Code hook or extension?",
     "should_trigger": true,
-    "split": "validation",
+    "split": "train",
     "rationale": "versioned matrix and executable trust"
   },
   {
@@ -26,7 +26,73 @@
   {
     "query": "create a generic governance policy outcome schema",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "generic contract owned by agent-governance-guide"
+  },
+  {
+    "query": "A mandatory profile selects a Claude Code pre-operation handler. Validate whether the installed surface can enforce it.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Advise onboarding a repository-provided Claude Code hook, plugin, extension, or package. Do not mutate yet.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Provide deterministic, model-evaluator, and specialist-agent patterns for Claude Code.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Help me handle capabilities correctly in this Code Harness task, including the edge cases that usually get missed.",
+    "rationale": "implicit task cue derived from the capabilities reference",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Help me handle onboarding correctly in this Code Harness task, including the edge cases that usually get missed.",
+    "rationale": "implicit task cue derived from the onboarding reference",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "map a mandatory protected-path control to Codex and tell me whether it can actually block",
+    "rationale": "near miss owned by codex-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "preview onboarding a project-provided Codex executable module without applying it",
+    "rationale": "near miss owned by codex-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "what version and trust probes should I run before relying on this Codex hook or extension?",
+    "rationale": "near miss owned by codex-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "A mandatory profile selects a Codex pre-operation handler. Validate whether the installed surface can enforce it.",
+    "rationale": "near miss owned by codex-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Advise onboarding a repository-provided Codex hook, plugin, extension, or package. Do not mutate yet.",
+    "rationale": "near miss owned by codex-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Provide deterministic, model-evaluator, and specialist-agent patterns for Codex.",
+    "rationale": "near miss owned by codex-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

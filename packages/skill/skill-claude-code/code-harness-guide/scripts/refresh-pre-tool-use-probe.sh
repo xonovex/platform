@@ -8,11 +8,18 @@ service="$repository_root/packages/skill/skill-agent-governance/agent-governance
 handler="$script_dir/governance-pre-tool-use.sh"
 settings="$guide_dir/assets/pre-tool-use-settings.json"
 port="${DECISION_SERVICE_PORT:-18787}"
-workspace="$(mktemp -d)"
-evidence="$workspace/verdicts.jsonl"
-telemetry="$workspace/telemetry.jsonl"
-service_log="$workspace/decision-service.log"
+workspace=""
+evidence=""
+telemetry=""
+service_log=""
 service_pid=""
+
+usage() {
+  printf '%s\n' 'Usage: refresh-pre-tool-use-probe.sh --confirm-dangerous-probe' \
+    '' \
+    'Downloads pinned Claude Code through npm, runs it with bypass permissions,' \
+    'starts a loopback decision service, and attempts writes in a temporary directory.'
+}
 
 die() {
   printf 'ERROR: %s\n' "$1" >&2
@@ -29,7 +36,7 @@ cleanup() {
     kill "$service_pid" 2>/dev/null || true
     wait "$service_pid" 2>/dev/null || true
   fi
-  if [ -n "${PROBE_OUTPUT_DIR:-}" ]; then
+  if [ -n "${PROBE_OUTPUT_DIR:-}" ] && [ -n "$workspace" ]; then
     mkdir -p "$PROBE_OUTPUT_DIR"
     cp "$workspace/denied.json" "$PROBE_OUTPUT_DIR/denied.json" 2>/dev/null || true
     cp "$workspace/allowed.json" "$PROBE_OUTPUT_DIR/allowed.json" 2>/dev/null || true
@@ -37,9 +44,34 @@ cleanup() {
     cp "$telemetry" "$PROBE_OUTPUT_DIR/telemetry.jsonl" 2>/dev/null || true
     cp "$service_log" "$PROBE_OUTPUT_DIR/decision-service.log" 2>/dev/null || true
   fi
-  rm -rf "$workspace"
+  if [ -n "$workspace" ] && [ -d "$workspace" ]; then
+    rm -rf -- "$workspace"
+  fi
   exit "$code"
 }
+
+case "${1:-}" in
+  --confirm-dangerous-probe)
+    [ "$#" -eq 1 ] || die "unexpected arguments after --confirm-dangerous-probe" 2
+    ;;
+  -h | --help)
+    usage
+    exit 0
+    ;;
+  "")
+    usage >&2
+    die "explicit --confirm-dangerous-probe acknowledgement is required" 2
+    ;;
+  *)
+    usage >&2
+    die "unknown option: $1" 2
+    ;;
+esac
+
+workspace="$(mktemp -d)"
+evidence="$workspace/verdicts.jsonl"
+telemetry="$workspace/telemetry.jsonl"
+service_log="$workspace/decision-service.log"
 
 trap cleanup EXIT INT TERM
 
@@ -47,6 +79,7 @@ require_command curl
 require_command jq
 require_command node
 require_command npx
+require_command seq
 
 mkdir -p "$workspace/.claude/hooks" "$workspace/secrets" "$workspace/src"
 cp "$handler" "$workspace/.claude/hooks/governance-pre-tool-use.sh"

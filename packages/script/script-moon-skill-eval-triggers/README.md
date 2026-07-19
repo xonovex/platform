@@ -5,8 +5,12 @@ TRIGGER eval (ported from `eval-triggers.py`): runs the queries in an `eval-quer
 ## Usage
 
 ```bash
-npx moon-skill-eval-triggers [eval-queries.json] [skill-name] [train|validation|all] [--runs N] [--threshold F] [--model M] [--max-budget-usd N]
+npx moon-skill-eval-triggers [eval-queries.json] [skill-name] [train|validation|all] [--runs N] [--threshold F] [--model M] [--max-budget-usd N] [--plugin-dir PATH]
 # queries defaults to ./eval-queries.json; skill-name defaults to the name in ./SKILL.md
 ```
 
 Requires the `claude` CLI on PATH.
+
+Each run loads only the target local plugin and its declared local plugin dependencies, with empty user/project/local settings and MCP configuration. Plugin preflight requires skill-only manifests and rejects commands, agents, hooks, MCP, LSP, and settings components. `Skill` is the only exposed tool; `Read`, shell, file mutation, web, browser, task, and undeclared plugins are unavailable. The process is killed as soon as the target Skill call appears.
+
+Negative runs are limited to one turn, 2,000 streamed response characters, 60 seconds, and $0.05. The spend cap can only be lowered, runs per query are limited to three, and one invocation may schedule at most 24 model runs. Larger query sets must be split into bounded batches. Any timeout, cap, output limit, process failure, or unavailable target skill exits `2` immediately instead of being scored as a routing result. There are no automatic retries.

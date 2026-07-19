@@ -68,7 +68,7 @@
   {
     "query": "I'm designing a new tool with three independent config dimensions — input format, transport, and output sink — how do I lay out the packages so adding one input doesn't touch the others?",
     "should_trigger": true,
-    "split": "validation",
+    "split": "train",
     "rationale": "validation positive: orthogonal axes + cross-product, fan-out layout, open-for-extension"
   },
   {
@@ -86,13 +86,13 @@
   {
     "query": "write the kubernetes Deployment and NetworkPolicy manifests for this service",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "validation negative: authoring k8s manifests -> kubernetes-guide, not package decomposition"
   },
   {
     "query": "profile whether the broad-phase is cache-bound before I change any layout",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "validation negative: measurement of runtime cache behavior -> data-oriented-design-guide"
   },
   {
@@ -122,25 +122,25 @@
   {
     "query": "should I model this as an abstract base class with virtual methods or a plain interface — which OO construct fits?",
     "should_trigger": false,
-    "split": "train",
+    "split": "validation",
     "rationale": "near-miss: class/paradigm construct choice -> oop-guide, not axis decomposition"
   },
   {
     "query": "logging, metrics, and the auth check are copied into every backend and I keep forgetting one — where should concerns that touch every backend live?",
     "should_trigger": true,
-    "split": "train",
+    "split": "validation",
     "rationale": "cross-cutting concerns: scattering/tangling, weave once at the composition root, not a sibling axis"
   },
   {
     "query": "should the storage backend be picked at compile time with build flags, or at runtime from config — and how does that change the wiring?",
     "should_trigger": false,
-    "split": "train",
+    "split": "validation",
     "rationale": "near-miss: binding time -> microkernel-pattern-guide"
   },
   {
     "query": "we split the monolith into packages but everything still imports everything — how do I actually enforce the module boundaries?",
     "should_trigger": true,
-    "split": "train",
+    "split": "validation",
     "rationale": "false modularity / distributed monolith: enforce with import/architecture tests + data ownership, not folders"
   },
   {
@@ -158,7 +158,7 @@
   {
     "query": "write the actual bubblewrap unshare/bind syscall sequence for the sandbox runner",
     "should_trigger": false,
-    "split": "train",
+    "split": "validation",
     "rationale": "near-miss: implementing one variant's internals, not deciding the decomposition"
   }
 ]

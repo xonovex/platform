@@ -16,6 +16,19 @@ validation.
 
 Version 6 is a coordinated breaking release of every command and skill plugin. Keep command plugins, skill plugins, plugin manifests, and the marketplace on one major version; mixed 5.x/6.x installations are unsupported.
 
+### Retired skill plugin names
+
+Remove retired plugin entries before installing their replacements; keeping both makes routing ownership ambiguous.
+
+| Retired plugin              | Replacement             |
+| --------------------------- | ----------------------- |
+| `xonovex-skill-general-fp`  | `xonovex-skill-fp`      |
+| `xonovex-skill-general-oop` | `xonovex-skill-oop`     |
+| `xonovex-skill-insights`    | `xonovex-skill-reflect` |
+| `xonovex-skill-prompt`      | `xonovex-skill-command` |
+
+Run `node packages/skill/skill-skill/skill-guide/scripts/check-retired-plugins.mjs` from the repository to detect stale local cache bundles. Codex users uninstall from the `/plugins` browser; Claude Code users run `claude plugin uninstall <retired-name>@xonovex-marketplace` at the installation's scope. Start a new session after the replacements are installed.
+
 ## Why this is breaking
 
 The workflow changed from a mostly local plan-and-worktree sequence into provider-native lifecycle results plus an independently adoptable governance plane. Removed commands have no compatibility wrappers, acceptance now separates evidence assembly from accountable decision, and commands preserve opaque native result references rather than assuming local files are the only source of truth.

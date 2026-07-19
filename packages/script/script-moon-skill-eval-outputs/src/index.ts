@@ -5,6 +5,7 @@ import {
   mkdirSync,
   readdirSync,
   readFileSync,
+  rmSync,
   writeFileSync,
 } from "node:fs";
 import {dirname, join, resolve} from "node:path";
@@ -13,13 +14,23 @@ import {resolveExecutable} from "@xonovex/script-moon-common/executable";
 import {
   isDirectory,
   isFile,
+  resolveClaudePluginDirectories,
   resolveGuideDirectory,
 } from "@xonovex/script-moon-common/fs";
 import {
+  buildGenerationClaudeArgs,
+  buildGenerationPrompt,
+  buildJudgeClaudeArgs,
   evalEntries,
+  findEvaluationInfrastructureFailures,
+  MAX_OUTPUT_MODEL_CALLS,
   normalizeEval,
+  outputModelCallCount,
   parseJudgeResults,
   parseOutputOptions,
+  runFailFastPool,
+  streamTextDeltaLength,
+  type EvaluationArm,
   type NormalizedEval,
 } from "./validation.js";
 
@@ -54,15 +65,17 @@ interface GradeSummary {
 interface Graded {
   readonly assertion_results: readonly AssertionResult[];
   readonly summary: GradeSummary;
+  readonly error: string | null;
 }
 
 interface JobRecord {
   readonly id: string | number;
-  readonly arm: string;
+  readonly arm: EvaluationArm;
   readonly pass_rate: number;
   readonly tokens: number;
   readonly duration_ms: number;
   readonly skill_triggered: boolean;
+  readonly error: string | null;
 }
 
 interface RunContext {
@@ -73,6 +86,7 @@ interface RunContext {
   readonly target: string;
   readonly short: string;
   readonly judge_model: string;
+  readonly judge_budget: number;
   readonly iter_dir: string;
   readonly runs: number;
   readonly build_prompt: (e: NormalizedEval) => string;
@@ -152,6 +166,16 @@ const skillInObj = (
   return false;
 };
 
+const skillAvailableInObj = (
+  obj: Record<string, unknown>,
+  target: string,
+  short: string,
+): boolean => {
+  if (obj.type !== "system" || obj.subtype !== "init") return false;
+  const skills = Array.isArray(obj.skills) ? obj.skills : [];
+  return skills.some((skill) => matchSkill(skill, target, short));
+};
+
 const sumTokens = (usage: unknown): number => {
   if (!isRecord(usage)) return 0;
   let total = 0;
@@ -184,14 +208,37 @@ const extractJson = (text: string): Record<string, unknown> | null => {
 interface ProcOutput {
   readonly stdout: string;
   readonly timedOut: boolean;
+  readonly outputLimitExceeded: boolean;
   readonly error: string | null;
 }
+
+const claudeFailureDetail = (stdout: string): string => {
+  const lines = stdout.trim().split(/\r?\n/).toReversed();
+  for (const line of lines) {
+    let value: unknown;
+    try {
+      value = JSON.parse(line);
+    } catch {
+      continue;
+    }
+    if (!isRecord(value)) continue;
+    const result = typeof value.result === "string" ? value.result.trim() : "";
+    const subtype =
+      typeof value.subtype === "string" ? value.subtype.trim() : "";
+    if (result && (value.is_error === true || subtype.startsWith("error"))) {
+      return result.slice(0, 500);
+    }
+    if (subtype.startsWith("error")) return subtype.slice(0, 500);
+  }
+  return "";
+};
 
 const runClaude = (
   args: readonly string[],
   finalArg: string,
   cwd: string | undefined,
   timeoutMs: number,
+  maxOutputCharacters: number | null = null,
 ): Promise<ProcOutput> =>
   new Promise((resolvePromise) => {
     const child = spawn(resolveExecutable("claude"), [...args, finalArg], {
@@ -201,12 +248,15 @@ const runClaude = (
     let stdout = "";
     let stderr = "";
     let timedOut = false;
+    let outputLimitExceeded = false;
+    let partialLine = "";
+    let outputCharacters = 0;
     let settled = false;
     const finish = (error: string | null): void => {
       if (settled) return;
       settled = true;
       clearTimeout(timer);
-      resolvePromise({stdout, timedOut, error});
+      resolvePromise({stdout, timedOut, outputLimitExceeded, error});
     };
     const timer = setTimeout(() => {
       timedOut = true;
@@ -215,6 +265,24 @@ const runClaude = (
     child.stdout.setEncoding("utf8");
     child.stdout.on("data", (chunk: string) => {
       stdout += chunk;
+      if (maxOutputCharacters === null || outputLimitExceeded) return;
+      partialLine += chunk;
+      const lines = partialLine.split(/\r?\n/);
+      partialLine = lines.pop() ?? "";
+      for (const line of lines) {
+        let event: unknown;
+        try {
+          event = JSON.parse(line);
+        } catch {
+          continue;
+        }
+        outputCharacters += streamTextDeltaLength(event);
+        if (outputCharacters > maxOutputCharacters) {
+          outputLimitExceeded = true;
+          child.kill("SIGKILL");
+          break;
+        }
+      }
     });
     child.stderr.setEncoding("utf8");
     child.stderr.on("data", (chunk: string) => {
@@ -228,7 +296,7 @@ const runClaude = (
         finish(null);
         return;
       }
-      const detail = stderr.trim();
+      const detail = stderr.trim() || claudeFailureDetail(stdout);
       const detailSuffix = detail.length > 0 ? `: ${detail}` : "";
       finish(`claude exited ${String(code)}${detailSuffix}`);
     });
@@ -241,8 +309,18 @@ const generate = async (
   timeout: number,
   target: string,
   short: string,
+  expectSkill: boolean,
 ): Promise<GenResult> => {
-  const proc = await runClaude(claudeArgs, prompt, cwd, timeout * 1000);
+  const proc = await runClaude(claudeArgs, prompt, cwd, timeout * 1000, 10_000);
+  if (proc.outputLimitExceeded) {
+    return {
+      text: "",
+      total_tokens: 0,
+      duration_ms: 0,
+      skill_triggered: false,
+      error: "output-limit",
+    };
+  }
   if (proc.timedOut) {
     return {
       text: "",
@@ -266,6 +344,7 @@ const generate = async (
   let usage: unknown = {};
   let duration = 0;
   let triggered = false;
+  let available = false;
   for (const rawLine of proc.stdout.split(/\r?\n/)) {
     const line = rawLine.trim();
     if (!line) continue;
@@ -276,6 +355,9 @@ const generate = async (
       continue;
     }
     if (!isRecord(obj)) continue;
+    if (skillAvailableInObj(obj, target, short)) {
+      available = true;
+    }
     if (skillInObj(obj, target, short)) {
       triggered = true;
     }
@@ -291,7 +373,7 @@ const generate = async (
     text,
     total_tokens: sumTokens(usage),
     duration_ms: duration,
-    skill_triggered: triggered,
+    skill_triggered: expectSkill && (triggered || available),
     error: text ? null : "no-result",
   };
 };
@@ -325,7 +407,10 @@ Return ONLY minified JSON, no markdown fences, one object per assertion in order
 {"assertion_results":[{"text":"<assertion>","passed":true,"evidence":"<quote or reason>"}]}
 `;
 
-const summarize = (results: readonly AssertionResult[]): Graded => {
+const summarize = (
+  results: readonly AssertionResult[],
+  error: string | null = null,
+): Graded => {
   const passed = results.filter((r) => r.passed).length;
   const total = results.length;
   return {
@@ -336,6 +421,7 @@ const summarize = (results: readonly AssertionResult[]): Graded => {
       total,
       pass_rate: total > 0 ? round(passed / total, 3) : 0,
     },
+    error,
   };
 };
 
@@ -345,10 +431,12 @@ const grade = async (
   assertions: readonly string[],
   response: string,
   model: string,
+  budget: number,
 ): Promise<Graded> => {
   const allFail = (reason: string): Graded =>
     summarize(
       assertions.map((a) => ({text: a, passed: false, evidence: reason})),
+      reason,
     );
 
   if (!response.trim()) {
@@ -363,38 +451,34 @@ const grade = async (
     .replace("{assertions}", numbered)
     .replace("{response}", response);
 
-  const args = [
-    "-p",
-    "--output-format",
-    "json",
-    "--disallowedTools=Bash,Edit,Write,Read,NotebookEdit,WebFetch," +
-      "WebSearch,Glob,Grep,Task,Skill,TodoWrite",
-  ];
-  if (model) {
-    args.push("--model", model);
-  }
-
-  let verdict: unknown = null;
+  const args = buildJudgeClaudeArgs({
+    model,
+    budget,
+    assertionCount: assertions.length,
+  });
   const proc = await runClaude(args, rubric, undefined, 300 * 1000);
   if (proc.error) {
     return allFail(`judge process error: ${proc.error}`);
   }
-  if (!proc.timedOut) {
-    try {
-      const outer: unknown = JSON.parse(proc.stdout);
+  if (proc.timedOut) return allFail("judge timeout");
+  let verdict: unknown = null;
+  try {
+    const outer: unknown = JSON.parse(proc.stdout);
+    const structured = isRecord(outer) ? outer.structured_output : null;
+    if (isRecord(structured)) {
+      verdict = structured;
+    } else {
       const inner =
         isRecord(outer) && typeof outer.result === "string" ? outer.result : "";
       verdict = extractJson(inner);
-    } catch {
-      verdict = null;
     }
+  } catch {
+    verdict = null;
   }
-
   const verdictResults = parseJudgeResults(verdict);
   if (verdictResults === undefined) {
     return allFail("unparseable judge output");
   }
-
   const results: AssertionResult[] = assertions.map((a, i) => {
     const item = verdictResults[i];
     return {
@@ -408,11 +492,15 @@ const grade = async (
 
 const runJob = async (
   evalObj: NormalizedEval,
-  arm: string,
+  arm: EvaluationArm,
   runIdx: number,
   ctx: RunContext,
 ): Promise<JobRecord> => {
-  const prompt = ctx.build_prompt(evalObj);
+  const prompt = buildGenerationPrompt(
+    ctx.build_prompt(evalObj),
+    arm,
+    ctx.target,
+  );
   const args = arm === "with_skill" ? ctx.with_args : ctx.without_args;
   const gen = await generate(
     prompt,
@@ -421,14 +509,26 @@ const runJob = async (
     ctx.timeout,
     ctx.target,
     ctx.short,
+    arm === "with_skill",
   );
-  const graded = await grade(
-    evalObj.prompt,
-    evalObj.expected_output,
-    evalObj.assertions,
-    gen.text,
-    ctx.judge_model,
-  );
+  const generationHealthy =
+    gen.error === null && (arm !== "with_skill" || gen.skill_triggered);
+  const graded = generationHealthy
+    ? await grade(
+        evalObj.prompt,
+        evalObj.expected_output,
+        evalObj.assertions,
+        gen.text,
+        ctx.judge_model,
+        ctx.judge_budget,
+      )
+    : summarize(
+        evalObj.assertions.map((assertion) => ({
+          text: assertion,
+          passed: false,
+          evidence: "not graded because generation evidence is invalid",
+        })),
+      );
 
   let armDir = join(ctx.iter_dir, `eval-${String(evalObj.id)}`, arm);
   if (ctx.runs > 1) {
@@ -473,6 +573,7 @@ const runJob = async (
     tokens: gen.total_tokens,
     duration_ms: gen.duration_ms,
     skill_triggered: gen.skill_triggered,
+    error: gen.error ?? graded.error,
   };
 };
 
@@ -516,30 +617,6 @@ const aggregateArm = (
   return block;
 };
 
-// Async concurrency pool over jobs (replaces ThreadPoolExecutor).
-const runPool = async <T, R>(
-  items: readonly T[],
-  limit: number,
-  worker: (item: T) => Promise<R>,
-): Promise<R[]> => {
-  const results: R[] = [];
-  let next = 0;
-  const runWorker = async (): Promise<void> => {
-    while (next < items.length) {
-      const idx = next;
-      next += 1;
-      const item = items[idx];
-      if (item === undefined) break;
-      results.push(await worker(item));
-    }
-  };
-  const pool = Array.from({length: Math.min(limit, items.length)}, () =>
-    runWorker(),
-  );
-  await Promise.all(pool);
-  return results;
-};
-
 // Pull the "name:" frontmatter value out of ./SKILL.md (ergonomic default).
 const skillNameFromSkillMd = (path: string): string | undefined => {
   if (!isFile(path)) return undefined;
@@ -561,13 +638,12 @@ const main = async (argv: readonly string[]): Promise<number> => {
       options: {
         runs: {
           type: "string",
-          description:
-            "runs per arm per eval (env RUNS, default 1; >1 measures variance)",
+          description: "runs per arm per eval (env RUNS, default 1, maximum 3)",
         },
         concurrency: {
           type: "string",
           description:
-            "parallel claude invocations (env CONCURRENCY, default 4)",
+            "parallel claude invocations (env CONCURRENCY, default/maximum 2)",
         },
         model: {
           type: "string",
@@ -598,10 +674,20 @@ const main = async (argv: readonly string[]): Promise<number> => {
           description:
             "working dir for generation runs (env EVAL_CWD, default current dir)",
         },
+        "plugin-dir": {
+          type: "string",
+          description:
+            "load the with-skill arm from a local plugin directory (env PLUGIN_DIR)",
+        },
         "max-budget-usd": {
           type: "string",
           description:
-            "optional hard per-generation spend cap (env MAX_BUDGET_USD; unset = no cap)",
+            "hard per-generation spend cap up to 0.10 (env MAX_BUDGET_USD, default 0.10)",
+        },
+        "judge-max-budget-usd": {
+          type: "string",
+          description:
+            "hard per-judge spend cap up to 0.10 (env JUDGE_MAX_BUDGET_USD, default 0.10)",
         },
       },
     },
@@ -682,7 +768,7 @@ const main = async (argv: readonly string[]): Promise<number> => {
   const concurrencyRaw =
     (values.concurrency as string | undefined) ??
     process.env.CONCURRENCY ??
-    "4";
+    "2";
   const claudeModel =
     (values.model as string | undefined) ?? process.env.CLAUDE_MODEL ?? "haiku";
   const judgeModel =
@@ -702,15 +788,31 @@ const main = async (argv: readonly string[]): Promise<number> => {
   const cwdArg =
     (values["eval-cwd"] as string | undefined) ?? process.env.EVAL_CWD ?? "";
   const cwd = cwdArg || undefined;
+  const pluginDirRaw =
+    (values["plugin-dir"] as string | undefined) ??
+    process.env.PLUGIN_DIR ??
+    "";
+  const pluginDir = pluginDirRaw ? resolve(pluginDirRaw) : undefined;
+  if (pluginDir !== undefined && !isDirectory(pluginDir)) {
+    process.stderr.write(
+      `Error: local plugin directory not found: ${pluginDirRaw}\n`,
+    );
+    return 2;
+  }
   const budgetRaw =
     (values["max-budget-usd"] as string | undefined) ??
     process.env.MAX_BUDGET_USD ??
-    "";
+    "0.10";
+  const judgeBudgetRaw =
+    (values["judge-max-budget-usd"] as string | undefined) ??
+    process.env.JUDGE_MAX_BUDGET_USD ??
+    "0.10";
   const optionsResult = parseOutputOptions({
     runs: runsRaw,
     concurrency: concurrencyRaw,
     timeout: timeoutRaw,
-    ...(budgetRaw ? {budget: budgetRaw} : {}),
+    budget: budgetRaw,
+    judgeBudget: judgeBudgetRaw,
     ...(iteration ? {iteration} : {}),
   });
   if (!optionsResult.success) {
@@ -720,8 +822,18 @@ const main = async (argv: readonly string[]): Promise<number> => {
     return 2;
   }
   const {runs, concurrency, timeout} = optionsResult.data;
-  const budget = optionsResult.data.budget ?? null;
+  const budget = optionsResult.data.budget;
+  const judgeBudget = optionsResult.data.judgeBudget;
   iteration = optionsResult.data.iteration ?? "";
+
+  const modelCalls = outputModelCallCount(norm.length, runs);
+  if (modelCalls > MAX_OUTPUT_MODEL_CALLS) {
+    process.stderr.write(
+      `Error: output eval would launch ${String(modelCalls)} model calls; ` +
+        `maximum is ${String(MAX_OUTPUT_MODEL_CALLS)}. Split the eval set into bounded batches.\n`,
+    );
+    return 2;
+  }
 
   const short = skillName.split(":").pop() ?? skillName;
 
@@ -742,19 +854,26 @@ const main = async (argv: readonly string[]): Promise<number> => {
   }
   const iterDir = join(base, iteration);
   mkdirSync(iterDir, {recursive: true});
+  const benchmarkPath = join(iterDir, "benchmark.json");
+  const invalidRunPath = join(iterDir, "invalid-run.json");
+  rmSync(benchmarkPath, {force: true});
+  rmSync(invalidRunPath, {force: true});
 
-  const genBase = ["-p", "--output-format", "stream-json", "--verbose"];
-  if (claudeModel) {
-    genBase.push("--model", claudeModel);
-  }
-  if (budget && budget > 0) {
-    genBase.push("--max-budget-usd", String(budget));
-  }
-  const withArgs = disallowed
-    ? [...genBase, `--disallowedTools=${disallowed}`]
-    : [...genBase];
-  const withoutDisallowed = [disallowed, "Skill"].filter(Boolean).join(",");
-  const withoutArgs = [...genBase, `--disallowedTools=${withoutDisallowed}`];
+  const withArgs = buildGenerationClaudeArgs({
+    arm: "with_skill",
+    model: claudeModel,
+    budget,
+    disallowedTools: disallowed,
+    ...(pluginDir
+      ? {pluginDirectories: resolveClaudePluginDirectories(pluginDir)}
+      : {}),
+  });
+  const withoutArgs = buildGenerationClaudeArgs({
+    arm: "without_skill",
+    model: claudeModel,
+    budget,
+    disallowedTools: disallowed,
+  });
 
   const evalsDir = dirname(evalsFile);
 
@@ -778,6 +897,7 @@ const main = async (argv: readonly string[]): Promise<number> => {
     target: skillName,
     short,
     judge_model: judgeModel,
+    judge_budget: judgeBudget,
     iter_dir: iterDir,
     runs,
     build_prompt: buildPrompt,
@@ -786,13 +906,15 @@ const main = async (argv: readonly string[]): Promise<number> => {
   process.stderr.write(
     `skill: ${skillName}  evals: ${String(norm.length)}  runs/arm: ${String(runs)}  ` +
       `concurrency: ${String(concurrency)}  workspace: ${iterDir}\n` +
-      `gen model: ${claudeModel || "<default>"}  judge model: ${judgeModel || "<default>"}\n---\n`,
+      `gen model: ${claudeModel || "<default>"}  judge model: ${judgeModel || "<default>"}\n` +
+      `caps: generation=$${String(budget)}/6 turns  judge=$${String(judgeBudget)}/1 turn  ` +
+      `model_calls=${String(modelCalls)}/${String(MAX_OUTPUT_MODEL_CALLS)}  retries=0\n---\n`,
   );
 
   const arms = ["with_skill", "without_skill"] as const;
   interface Job {
     readonly e: NormalizedEval;
-    readonly arm: string;
+    readonly arm: EvaluationArm;
     readonly r: number;
   }
   const jobs: Job[] = [];
@@ -804,9 +926,35 @@ const main = async (argv: readonly string[]): Promise<number> => {
     }
   }
 
-  const records = await runPool(jobs, concurrency, (job) =>
-    runJob(job.e, job.arm, job.r, ctx),
+  const records = await runFailFastPool(
+    jobs,
+    concurrency,
+    (job) => runJob(job.e, job.arm, job.r, ctx),
+    (record) => findEvaluationInfrastructureFailures([record]).length > 0,
   );
+
+  const infrastructureFailures = findEvaluationInfrastructureFailures(records);
+  if (infrastructureFailures.length > 0) {
+    writeFileSync(
+      invalidRunPath,
+      JSON.stringify(
+        {
+          skill: skillName,
+          iteration,
+          status: "invalid",
+          failures: infrastructureFailures,
+        },
+        null,
+        2,
+      ),
+      {encoding: "utf8"},
+    );
+    process.stderr.write(
+      `invalid benchmark evidence: ${String(infrastructureFailures.length)} infrastructure failure(s)\n` +
+        `diagnostic: ${invalidRunPath}\n`,
+    );
+    return 2;
+  }
 
   // Per-eval stdout lines.
   for (const e of norm) {
@@ -856,11 +1004,9 @@ const main = async (argv: readonly string[]): Promise<number> => {
       },
     },
   };
-  writeFileSync(
-    join(iterDir, "benchmark.json"),
-    JSON.stringify(benchmark, null, 2),
-    {encoding: "utf8"},
-  );
+  writeFileSync(benchmarkPath, JSON.stringify(benchmark, null, 2), {
+    encoding: "utf8",
+  });
 
   const delta = benchmark.run_summary.delta;
   process.stderr.write(
@@ -870,7 +1016,7 @@ const main = async (argv: readonly string[]): Promise<number> => {
       `without_skill pass_rate: ${String(withoutBlock.pass_rate.mean)}  ` +
       `tokens: ${String(withoutBlock.tokens.mean)}\n` +
       `delta pass_rate: ${String(delta.pass_rate)}  tokens: ${String(delta.tokens)}\n` +
-      `benchmark: ${join(iterDir, "benchmark.json")}\n`,
+      `benchmark: ${benchmarkPath}\n`,
   );
   return delta.pass_rate > 0 ? 0 : 1;
 };

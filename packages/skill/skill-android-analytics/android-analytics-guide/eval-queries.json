@@ -38,7 +38,7 @@
   {
     "query": "write a test that asserts the screen-view event is tracked",
     "should_trigger": true,
-    "split": "train",
+    "split": "validation",
     "rationale": "analytics testing"
   },
   {
@@ -74,13 +74,31 @@
   {
     "query": "translate the Dutch strings in res/values",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "i18n, unrelated"
   },
   {
     "query": "which design-system component should I use for this card?",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "design system, out of scope for analytics guidance"
+  },
+  {
+    "query": "make this Compose screen accessible for TalkBack",
+    "rationale": "near miss owned by android-wcag-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "TalkBack reads the icons in the wrong order on this composable — fix the focus order",
+    "rationale": "near miss owned by android-wcag-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "add contentDescription to these images and mark the decorative ones as ignored",
+    "rationale": "near miss owned by android-wcag-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

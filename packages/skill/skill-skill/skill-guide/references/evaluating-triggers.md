@@ -35,8 +35,9 @@ These belong **in the test queries**, not in the description itself. Generic que
 - `trigger_rate = triggers / runs`
 - Should-trigger passes if rate ≥0.5; should-not-trigger passes if rate <0.5
 - Detect triggering via the harness's tool-call log (varies by harness)
-- Reference implementation: [scripts/eval-triggers.py](../scripts/eval-triggers.py) — PEP 723 self-contained Python. Streams the tool-call log and terminates the run on first match. Targets Claude Code's `claude` CLI; adapt the `check_triggered` function for other harnesses. Run with `uv run scripts/eval-triggers.py <queries.json> <skill-name>`.
-- **Cost control** — a run where the skill _doesn't_ fire would otherwise execute the whole task, which dominates token spend. Keep it cheap: `--model haiku`, the default tool-blocking (everything but `Skill`, so non-triggering runs stay short), a `--max-budget-usd` per-run ceiling, and `--runs 1` on the `train` split while iterating.
+- Reference implementation: [scripts/eval-triggers.py](../scripts/eval-triggers.py) — PEP 723 self-contained Python. It loads only the target local plugin and its declared local dependencies after rejecting any non-skill plugin components, exposes only `Skill`, streams the tool-call log, and terminates the run on first match. Runs are capped at one turn, $0.05, 2,000 response characters, and 24 total model calls per invocation, with no retries. Targets Claude Code's `claude` CLI; adapt `check_triggered` for other harnesses. Run with `uv run scripts/eval-triggers.py <queries.json> <skill-name> --plugin-dir <plugin>`.
+- **Cost and mutation control** — a run where the skill _doesn't_ fire would otherwise execute the whole task. The runner disables inherited settings, MCP, persistence, Chrome, and every tool except `Skill`; limits each run to one turn, 60 seconds, 2,000 response characters, and at most $0.05; limits one invocation to 24 model runs; and never retries. Use `--runs 1` on `train` while iterating.
+- Treat timeout, cap exhaustion, output-limit, process failure, or a missing target skill as invalid infrastructure (`exit 2`), never as a negative routing result.
 
 ## Train / Validation Split
 

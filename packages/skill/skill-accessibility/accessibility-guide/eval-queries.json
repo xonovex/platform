@@ -26,7 +26,7 @@
   {
     "query": "make accessibility a release profile without claiming the scanner proves compliance",
     "should_trigger": true,
-    "split": "validation",
+    "split": "train",
     "rationale": "profile and evidence boundaries"
   },
   {
@@ -56,19 +56,43 @@
   {
     "query": "write a generic unit test for a parser",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "near miss: testing owner"
   },
   {
     "query": "pick a color palette for a poster",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "near miss: visual design without assurance intent"
   },
   {
     "query": "configure a security policy engine",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "near miss: security governance"
+  },
+  {
+    "query": "Assess release candidate sha256:abc against WCAG 2.2 AA. We have an automated scanner report; tell me what evidence is still missing and what result to publish.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "build a threat-informed security assurance plan with exact control and evidence ownership",
+    "rationale": "near miss owned by security-assurance-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "select NIST 800-53 controls for this system without claiming a one-to-one compliance mapping",
+    "rationale": "near miss owned by security-assurance-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "verify artifact provenance, signatures, dependencies, build identity, and rollback before release",
+    "rationale": "near miss owned by security-assurance-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

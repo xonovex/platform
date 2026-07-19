@@ -1,0 +1,98 @@
+[
+  {
+    "query": "I'm deploying a Hono API to a serverless edge runtime where cold-start latency is the dominant cost. Show me how to construct the Hono application instance, choosing the most appropriate router for this deployment, and briefly explain why.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Using @hono/zod-openapi, add a GET /items/{id} endpoint that returns the item as JSON or a 404 problem-details response when it isn't found. Wire it into an OpenAPIHono router with a createRoute schema.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Protect my Hono API so clients can't send huge request bodies and exhaust memory. I want a small global cap on all routes but a much larger allowance on the /upload route.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "I have a root Hono app, a /api/v1 router, and an /items leaf router mounted with .route(). The generated OpenAPI spec is missing all the /items routes. What is wrong and how do I fix the router composition?",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Help me handle controllers correctly in this Hono Opinionated task, including the edge cases that usually get missed.",
+    "rationale": "implicit task cue derived from the controllers reference",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Help me handle openapi router hierarchy correctly in this Hono Opinionated task, including the edge cases that usually get missed.",
+    "rationale": "implicit task cue derived from the openapi router hierarchy reference",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Help me handle openapi spec generation correctly in this Hono Opinionated task, including the edge cases that usually get missed.",
+    "rationale": "implicit task cue derived from the openapi spec generation reference",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Help me handle router selection correctly in this Hono Opinionated task, including the edge cases that usually get missed.",
+    "rationale": "implicit task cue derived from the router selection reference",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "I need to add a SIMD variant of my vec3_dot in lib/math/vec3.c — the rest of the project uses _sse4 and _avx2 suffixes",
+    "rationale": "near miss owned by c99-opinionated-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "convert this AoS particle list to SoA for cache locality",
+    "rationale": "near miss owned by c99-opinionated-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "in firmware/sensor/sensor_read.c can you change the read function so the caller passes the buffer instead of malloc'ing one",
+    "rationale": "near miss owned by c99-opinionated-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "stub out the alignment-aware allocator for our DSP target",
+    "rationale": "near miss owned by c99-opinionated-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "rename modules to follow our snake_case_subsystem.c convention — there's a few stragglers in src/net/",
+    "rationale": "near miss owned by c99-opinionated-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "in lib/io/ ring_buffer should expose iter functions that don't allocate",
+    "rationale": "near miss owned by c99-opinionated-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "we're seeing alignment faults on the M4 build, can you audit the struct layouts in firmware/",
+    "rationale": "near miss owned by c99-opinionated-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "add bounds-checked variants to the matrix ops in src/dsp/",
+    "rationale": "near miss owned by c99-opinionated-guide",
+    "should_trigger": false,
+    "split": "validation"
+  }
+]

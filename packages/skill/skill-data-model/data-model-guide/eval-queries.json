@@ -74,13 +74,13 @@
   {
     "query": "write fwrite/fread routines to dump and reload this fixed C struct of camera settings to a binary file",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "validation negative: plain serialization of a fixed struct, no model/schema/versioning"
   },
   {
     "query": "I want prefabs in my editor: edit a template object and have all placed copies update, but each copy can tweak individual properties and keep those tweaks — how do I store and resolve that?",
     "should_trigger": true,
-    "split": "train",
+    "split": "validation",
     "rationale": "prototypes: prototype/instance inheritance, per-property override, read-through resolution, edit propagation"
   },
   {
@@ -88,5 +88,29 @@
     "should_trigger": true,
     "split": "validation",
     "rationale": "validation positive: prototypes override bitmask + inherited/instantiated/removed sub-objects, delta serialization"
+  },
+  {
+    "query": "Using Zod 4, write a TypeScript schema named UserSchema for a user object with these fields: an id that is a UUID, an email address, a createdAt that is an ISO datetime string, and a name string between 1 and 100 characters. Also export the inferred TypeScript type.",
+    "rationale": "near miss owned by zod-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "In Zod 4, write a schema for an environment variable PORT that arrives as a string, is converted to a number, must be an integer between 1024 and 65535, and falls back to port 3000 when the variable is absent. Show the inferred output type.",
+    "rationale": "near miss owned by zod-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Write an Express-style POST handler in TypeScript that validates an incoming request body against a Zod schema called CreateUserSchema and returns HTTP 400 with the validation errors if the body is invalid, otherwise creates the user. The handler must not throw on invalid input.",
+    "rationale": "near miss owned by zod-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "In Zod 4, define a StatusSchema from an existing native TypeScript enum named Status. Then, given a UserSchema object schema, derive a CreateUserSchema that drops the id field and an UpdateUserSchema that makes all of CreateUserSchema's fields optional.",
+    "rationale": "near miss owned by zod-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

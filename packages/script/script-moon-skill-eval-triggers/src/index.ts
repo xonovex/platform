@@ -1,11 +1,23 @@
 #!/usr/bin/env node
 import {spawn, spawnSync} from "node:child_process";
 import {readFileSync} from "node:fs";
-import {join, resolve} from "node:path";
+import {dirname, join, resolve} from "node:path";
 import {createInterface} from "node:readline";
 import {resolveExecutable} from "@xonovex/script-moon-common/executable";
-import {isFile, resolveGuideDirectory} from "@xonovex/script-moon-common/fs";
-import {parseQueries, parseTriggerOptions} from "./validation.js";
+import {
+  isDirectory,
+  isFile,
+  resolveClaudePluginDirectories,
+  resolveGuideDirectory,
+} from "@xonovex/script-moon-common/fs";
+import {
+  buildTriggerClaudeArgs,
+  MAX_TRIGGER_MODEL_RUNS,
+  parseQueries,
+  parseTriggerOptions,
+  streamTextDeltaLength,
+  triggerModelRunCount,
+} from "./validation.js";
 
 const PROG = "moon-skill-eval-triggers";
 
@@ -19,12 +31,12 @@ Options (flag overrides env):
     --runs N             / RUNS=N             runs per query (default: 3)
     --threshold F        / THRESHOLD=F        trigger-rate cutoff for a pass (default: 0.5)
     --model M            / CLAUDE_MODEL=M     model for \`claude --model\` (default: haiku)
-    --disallowed-tools L / DISALLOWED_TOOLS=L tools blocked during the eval
-    --max-budget-usd N   / MAX_BUDGET_USD=N   hard per-run spend cap (default: 0.10; 0 disables)
+    --plugin-dir PATH    / PLUGIN_DIR=PATH     target-only local plugin directory
+    --max-budget-usd N   / MAX_BUDGET_USD=N   hard per-run spend cap (default/max: 0.05)
     -h, --help                                show this help and exit`;
 
-const DEFAULT_DISALLOWED =
-  "Bash,Edit,Write,NotebookEdit,WebFetch,WebSearch,Read,Glob,Grep,Task,TodoWrite";
+const TRIGGER_TIMEOUT_MS = 60_000;
+const TRIGGER_OUTPUT_LIMIT = 2000;
 
 interface ResultRecord {
   readonly query: string;
@@ -34,6 +46,11 @@ interface ResultRecord {
   readonly trigger_rate: number;
   readonly pass: boolean;
   readonly rationale: string;
+}
+
+interface TriggerOutcome {
+  readonly triggered: boolean;
+  readonly error: string | null;
 }
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
@@ -103,8 +120,34 @@ const checkLine = (line: string, target: string, short: string): boolean => {
   return false;
 };
 
+const skillAvailableLine = (
+  line: string,
+  target: string,
+  short: string,
+): boolean => {
+  let obj: unknown;
+  try {
+    obj = JSON.parse(line);
+  } catch {
+    return false;
+  }
+  if (!isRecord(obj) || obj.type !== "system" || obj.subtype !== "init") {
+    return false;
+  }
+  const skills = Array.isArray(obj.skills) ? obj.skills : [];
+  return skills.some((skill) => matchSkill(skill, target, short));
+};
+
+const textDeltaLength = (line: string): number => {
+  try {
+    return streamTextDeltaLength(JSON.parse(line));
+  } catch {
+    return 0;
+  }
+};
+
 /**
- * Resolve true if a matching Skill call appears in the claude stream.
+ * Resolve the target trigger result or an infrastructure error.
  * Terminates the claude process on first match — no further tools fire.
  */
 const checkTriggered = (
@@ -113,28 +156,40 @@ const checkTriggered = (
   target: string,
   short: string,
   claudeExecutable: string,
-): Promise<boolean> =>
+): Promise<TriggerOutcome> =>
   new Promise((resolvePromise) => {
     const proc = spawn(claudeExecutable, [...claudeArgs, query], {
-      stdio: ["ignore", "pipe", "ignore"],
+      stdio: ["ignore", "pipe", "pipe"],
     });
 
     let matched = false;
+    let targetAvailable = false;
+    let timedOut = false;
+    let outputLimitExceeded = false;
+    let outputCharacters = 0;
+    let stderr = "";
+    let spawnError: string | null = null;
     let settled = false;
     let killTimer: NodeJS.Timeout | undefined;
 
     const rl = createInterface({input: proc.stdout, crlfDelay: Infinity});
 
-    const finish = (): void => {
+    const finish = (outcome: TriggerOutcome): void => {
       if (settled) {
         return;
       }
       settled = true;
+      clearTimeout(timeoutTimer);
       if (killTimer) {
         clearTimeout(killTimer);
       }
-      resolvePromise(matched);
+      resolvePromise(outcome);
     };
+
+    const timeoutTimer = setTimeout(() => {
+      timedOut = true;
+      killProc();
+    }, TRIGGER_TIMEOUT_MS);
 
     const killProc = (): void => {
       if (proc.exitCode === null && proc.signalCode === null) {
@@ -153,26 +208,61 @@ const checkTriggered = (
       if (!line) {
         return;
       }
+      targetAvailable ||= skillAvailableLine(line, target, short);
       if (checkLine(line, target, short)) {
         matched = true;
+        rl.close();
+        killProc();
+        return;
+      }
+      outputCharacters += textDeltaLength(line);
+      if (outputCharacters > TRIGGER_OUTPUT_LIMIT) {
+        outputLimitExceeded = true;
         rl.close();
         killProc();
       }
     });
 
-    rl.on("close", () => {
-      // If we matched, the process is being killed; wait for its exit below.
-      if (!matched) {
-        finish();
+    proc.stderr.setEncoding("utf8");
+    proc.stderr.on("data", (chunk: string) => {
+      stderr += chunk;
+    });
+
+    proc.on("error", (error) => {
+      spawnError = error.message;
+    });
+
+    proc.on("close", (code) => {
+      if (matched) {
+        finish({triggered: true, error: null});
+        return;
       }
-    });
-
-    proc.on("error", () => {
-      finish();
-    });
-
-    proc.on("close", () => {
-      finish();
+      if (timedOut) {
+        finish({triggered: false, error: "timeout"});
+        return;
+      }
+      if (outputLimitExceeded) {
+        finish({triggered: false, error: "output-limit"});
+        return;
+      }
+      if (spawnError !== null) {
+        finish({triggered: false, error: spawnError});
+        return;
+      }
+      if (code !== 0) {
+        const detail = stderr.trim();
+        const detailSuffix = detail.length > 0 ? `: ${detail}` : "";
+        finish({
+          triggered: false,
+          error: `claude exited ${String(code)}${detailSuffix}`,
+        });
+        return;
+      }
+      if (!targetAvailable) {
+        finish({triggered: false, error: "target skill unavailable"});
+        return;
+      }
+      finish({triggered: false, error: null});
     });
   });
 
@@ -198,7 +288,7 @@ interface ParsedCli {
   readonly runs?: string;
   readonly threshold?: string;
   readonly model?: string;
-  readonly disallowed?: string;
+  readonly pluginDir?: string;
   readonly maxBudget?: string;
 }
 
@@ -206,7 +296,7 @@ const OPTION_FLAGS = new Set([
   "--runs",
   "--threshold",
   "--model",
-  "--disallowed-tools",
+  "--plugin-dir",
   "--max-budget-usd",
 ]);
 
@@ -215,7 +305,7 @@ const parseCli = (argv: readonly string[]): ParsedCli => {
   let runs: string | undefined;
   let threshold: string | undefined;
   let model: string | undefined;
-  let disallowed: string | undefined;
+  let pluginDir: string | undefined;
   let maxBudget: string | undefined;
 
   const takeValue = (
@@ -266,8 +356,8 @@ const parseCli = (argv: readonly string[]): ParsedCli => {
           model = value;
           break;
         }
-        case "--disallowed-tools": {
-          disallowed = value;
+        case "--plugin-dir": {
+          pluginDir = value;
           break;
         }
         case "--max-budget-usd": {
@@ -285,7 +375,7 @@ const parseCli = (argv: readonly string[]): ParsedCli => {
     i += 1;
   }
 
-  return {positionals, runs, threshold, model, disallowed, maxBudget};
+  return {positionals, runs, threshold, model, pluginDir, maxBudget};
 };
 
 const main = async (argv: readonly string[]): Promise<number> => {
@@ -354,10 +444,9 @@ const main = async (argv: readonly string[]): Promise<number> => {
 
   const runsRaw = cli.runs ?? process.env.RUNS ?? "3";
   const thresholdRaw = cli.threshold ?? process.env.THRESHOLD ?? "0.5";
-  const claudeModel = cli.model ?? process.env.CLAUDE_MODEL ?? "haiku";
-  const disallowed =
-    cli.disallowed ?? process.env.DISALLOWED_TOOLS ?? DEFAULT_DISALLOWED;
-  const budgetRaw = cli.maxBudget ?? process.env.MAX_BUDGET_USD ?? "0.10";
+  const modelRaw = cli.model ?? process.env.CLAUDE_MODEL ?? "haiku";
+  const claudeModel = modelRaw.trim().length > 0 ? modelRaw : "haiku";
+  const budgetRaw = cli.maxBudget ?? process.env.MAX_BUDGET_USD ?? "0.05";
   const optionsResult = parseTriggerOptions({
     runs: runsRaw,
     threshold: thresholdRaw,
@@ -369,24 +458,23 @@ const main = async (argv: readonly string[]): Promise<number> => {
   const {runs, threshold, budget} = optionsResult.data;
 
   const short = skillName.split(":").pop() ?? skillName;
-
-  const claudeArgs: string[] = [
-    "-p",
-    "--output-format",
-    "stream-json",
-    "--verbose",
-  ];
-  if (claudeModel) {
-    claudeArgs.push("--model", claudeModel);
+  const pluginDirRaw =
+    cli.pluginDir ?? process.env.PLUGIN_DIR ?? dirname(guideDir);
+  const pluginDirectory = resolve(pluginDirRaw);
+  if (
+    !isDirectory(pluginDirectory) ||
+    !isFile(join(pluginDirectory, ".claude-plugin", "plugin.json"))
+  ) {
+    process.stderr.write(
+      `Error: target plugin directory is invalid: ${pluginDirectory}\n`,
+    );
+    return 2;
   }
-  if (disallowed) {
-    // Use --opt=val to avoid the variadic parser swallowing the prompt.
-    claudeArgs.push(`--disallowedTools=${disallowed}`);
-  }
-  if (budget && budget > 0) {
-    // Hard per-run ceiling so a non-triggering run can't execute the whole task.
-    claudeArgs.push("--max-budget-usd", String(budget));
-  }
+  const claudeArgs = buildTriggerClaudeArgs({
+    model: claudeModel,
+    budget,
+    pluginDirectories: resolveClaudePluginDirectories(pluginDirectory),
+  });
 
   let parsed: unknown;
   try {
@@ -408,6 +496,13 @@ const main = async (argv: readonly string[]): Promise<number> => {
   if (split !== "all") {
     queries = queries.filter((query) => query.split === split);
   }
+  const modelRuns = triggerModelRunCount(queries.length, runs);
+  if (modelRuns > MAX_TRIGGER_MODEL_RUNS) {
+    process.stderr.write(
+      `Error: trigger eval would launch ${String(modelRuns)} model runs; maximum is ${String(MAX_TRIGGER_MODEL_RUNS)}\n`,
+    );
+    return 2;
+  }
 
   let passed = 0;
   let failed = 0;
@@ -419,15 +514,20 @@ const main = async (argv: readonly string[]): Promise<number> => {
 
     let triggers = 0;
     for (let i = 0; i < runs; i++) {
-      if (
-        await checkTriggered(
-          query,
-          claudeArgs,
-          skillName,
-          short,
-          claudeExecutable,
-        )
-      ) {
+      const outcome = await checkTriggered(
+        query,
+        claudeArgs,
+        skillName,
+        short,
+        claudeExecutable,
+      );
+      if (outcome.error !== null) {
+        process.stderr.write(
+          `Error: trigger infrastructure failure for query ${JSON.stringify(query)}: ${outcome.error}\n`,
+        );
+        return 2;
+      }
+      if (outcome.triggered) {
         triggers += 1;
       }
     }
@@ -457,11 +557,11 @@ const main = async (argv: readonly string[]): Promise<number> => {
 
   process.stderr.write("---\n");
   const modelLabel = claudeModel || "<default>";
-  const budgetLabel = budget && budget > 0 ? `$${String(budget)}` : "none";
   process.stderr.write(
     `skill: ${skillName}  split: ${split}  runs: ${String(runs)}  ` +
       `threshold: ${String(threshold)}  model: ${modelLabel}  ` +
-      `budget/run: ${budgetLabel}  disallowed: ${disallowed}\n`,
+      `budget/run: $${String(budget)}  tools: Skill  timeout: 60s  ` +
+      `output-limit: ${String(TRIGGER_OUTPUT_LIMIT)} chars\n`,
   );
   process.stderr.write(
     `passed: ${String(passed)} / ${String(total)}   failed: ${String(failed)}\n`,

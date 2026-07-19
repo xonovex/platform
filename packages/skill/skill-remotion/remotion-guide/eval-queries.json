@@ -1,0 +1,98 @@
+[
+  {
+    "query": "In a Remotion project running at 30fps, write a React component that fades a headline in from opacity 0 to 1 over the first half second and slides it up 40px at the same time. Give me the full component code.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Build a Remotion scene with 60 confetti pieces scattered at varied starting x/y positions and slightly different fall speeds, so it looks organic. Provide the component.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "I have two Remotion scenes, each 2 seconds long, at 30fps. I want a half-second crossfade between them. Show me how to wire this up and tell me the total duration of the final video in frames.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Register a new Remotion composition in Root.tsx called 'Intro' (1920x1080, 30fps, 5 seconds) whose title text, background color, and font size are editable in the Remotion Studio visual props editor. Include the code.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Help me handle timing correctly in this Remotion task, including the edge cases that usually get missed.",
+    "rationale": "implicit task cue derived from the timing reference",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Help me handle sequencing correctly in this Remotion task, including the edge cases that usually get missed.",
+    "rationale": "implicit task cue derived from the sequencing reference",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Help me handle assets correctly in this Remotion task, including the edge cases that usually get missed.",
+    "rationale": "implicit task cue derived from the assets reference",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Help me handle compositions correctly in this Remotion task, including the edge cases that usually get missed.",
+    "rationale": "implicit task cue derived from the compositions reference",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "make this client component server-rendered if possible — it's just fetching the user's recent orders",
+    "rationale": "near miss owned by react-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "add a useActionState hook for the contact form so we can show pending state",
+    "rationale": "near miss owned by react-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "the streaming Suspense boundary on /dashboard isn't cutting at the right spot, can you adjust where the fallback shows",
+    "rationale": "near miss owned by react-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "convert the old forwardRef pattern in Button.tsx to ref-as-prop",
+    "rationale": "near miss owned by react-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Form submission in checkout/page.tsx is double-firing — can you wire up useFormStatus properly",
+    "rationale": "near miss owned by react-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "fetch the user's posts inside a use() call instead of useEffect — we want it to suspend",
+    "rationale": "near miss owned by react-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "the search filter in components/Filters.tsx re-renders on every keystroke even though the parent doesn't change — fix it",
+    "rationale": "near miss owned by react-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "i think the React Compiler is over-memoizing this list, can you check src/feed/Feed.tsx",
+    "rationale": "near miss owned by react-guide",
+    "should_trigger": false,
+    "split": "validation"
+  }
+]

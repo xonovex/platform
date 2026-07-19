@@ -2,6 +2,7 @@
 
 ## Flagship Android app codebase (applied patterns)
 
+- **Provenance:** Repository-local implementation patterns generalized during the original skill distillation
 - **Last reviewed:** 2026-06-16
 - **Used for:** the SDK-agnostic Android analytics patterns this skill generalizes
 - **Aspects extracted:**

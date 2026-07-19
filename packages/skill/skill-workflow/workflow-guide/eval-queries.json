@@ -14,7 +14,7 @@
   {
     "query": "after compaction, reconstruct the PhaseResultHandle from this GitHub issue and commit reference",
     "should_trigger": true,
-    "split": "validation",
+    "split": "train",
     "rationale": "ephemeral provider-reconstructed handle"
   },
   {
@@ -26,7 +26,7 @@
   {
     "query": "combine development:api@9 and development:ui@6 into a candidate workspace, rerun validation, and don't treat that as integration into main",
     "should_trigger": true,
-    "split": "validation",
+    "split": "train",
     "rationale": "exact-revision development consolidation boundary"
   },
   {
@@ -38,7 +38,7 @@
   {
     "query": "generate an AI-SBOM for model-service@sha256:1234; prose enrichment is fine but the LLM must not guess model versions or components",
     "should_trigger": true,
-    "split": "validation",
+    "split": "train",
     "rationale": "deterministic authoritative inventory with bounded enrichment"
   },
   {
@@ -50,13 +50,13 @@
   {
     "query": "the subject SHA stayed the same but the scanner, policy bundle, and QA environment changed; decide whether yesterday's evidence is stale",
     "should_trigger": true,
-    "split": "validation",
+    "split": "train",
     "rationale": "assurance freshness binding"
   },
   {
     "query": "assemble acceptance evidence for candidate sha256:aaa, but leave the exact-target sign-off to the accountable human approver",
     "should_trigger": true,
-    "split": "train",
+    "split": "validation",
     "rationale": "evidence-only preparation versus human Acceptance"
   },
   {
@@ -68,7 +68,7 @@
   {
     "query": "release artifact sha256:bbb through the protected environment; stop and roll back if its health gate fails",
     "should_trigger": true,
-    "split": "train",
+    "split": "validation",
     "rationale": "controlled Release and rollback"
   },
   {
@@ -80,7 +80,7 @@
   {
     "query": "declare this critical incident, contain it with scoped emergency-exception, preserve the timeline, then create and verify corrective actions",
     "should_trigger": true,
-    "split": "train",
+    "split": "validation",
     "rationale": "Incident, emergency authority, and Corrective Action lifecycle"
   },
   {
@@ -98,7 +98,7 @@
   {
     "query": "write Given-When-Then examples for this checkout story",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "near-miss owned by a BDD method skill"
   },
   {
@@ -110,7 +110,7 @@
   {
     "query": "post these Conventional Comments findings as inline GitHub review threads",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "near-miss owned by code-review craft and GitHub provider skills"
   },
   {
@@ -118,5 +118,23 @@
     "should_trigger": false,
     "split": "train",
     "rationale": "near-miss owned by GitHub external-enforcement onboarding"
+  },
+  {
+    "query": "can this mandatory prompt hook block in Codex, or is it only advisory on the installed version?",
+    "rationale": "near miss owned by agent-governance-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "design a bounded child-agent launch with an attenuated tool and network scope",
+    "rationale": "near miss owned by agent-governance-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "preview governance module onboarding and show rollback before applying anything",
+    "rationale": "near miss owned by agent-governance-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

@@ -26,7 +26,7 @@
   {
     "query": "I pass a boolean flag into this shared method that switches its behavior — code smell?",
     "should_trigger": true,
-    "split": "validation",
+    "split": "train",
     "rationale": "control coupling on the ladder"
   },
   {
@@ -44,7 +44,55 @@
   {
     "query": "which module should own the nix provisioning code — it feels misfiled",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "near-miss: where a boundary goes -> orthogonal-pattern-guide"
+  },
+  {
+    "query": "Review this Go function for coupling problems and tell me how to fix the worst one:\n\n```go\nfunc (r *Repo) Save(order Order, dryRun bool) error {\n    if dryRun {\n        return validate(order)\n    }\n    return r.persist(order)\n}\n```\n\nCallers do `repo.Save(order, true)` in some places and `repo.Save(order, false)` in others.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Is a chained expression like `order.Customer().Address().City()` a problem in our codebase? Explain concretely what it costs and what to do instead. Also: we have a builder used as `NewQuery().Where(x).OrderBy(y).Build()` — is that the same problem?",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "A billing function reads an Order's total by passing a magic number: `cache.Get(key, 0)` where `0` means \"no expiry\", and a far-away handler does `if ttl == 0 { /* unlimited */ }`. Grade this coupling precisely and give me the fix.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "I have a Terraform config that creates private subnets, one per availability zone, from a variable list of AZs. Right now removing a single AZ from the middle of the list forces Terraform to recreate several unrelated subnets. Write the resource and any supporting locals so this stops happening.",
+    "rationale": "near miss owned by terraform-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Set up the remote state backend for our production environment's Terraform root module. We're on AWS. Show the backend configuration and explain the key decisions.",
+    "rationale": "near miss owned by terraform-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Someone changed our infrastructure manually in the cloud console. I want to see what has drifted from our Terraform state before I decide whether to reconcile it. What command should I run and why?",
+    "rationale": "near miss owned by terraform-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Add a Terraform variable named database_config that is a structured object with instance_class (string), engine_version (string), and a backup_retention number that callers may omit and should default to 7. We're on Terraform 1.12.",
+    "rationale": "near miss owned by terraform-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Help me handle module structure correctly in this Terraform task, including the edge cases that usually get missed.",
+    "rationale": "near miss owned by terraform-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

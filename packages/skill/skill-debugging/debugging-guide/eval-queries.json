@@ -50,13 +50,13 @@
   {
     "query": "I want to tag every allocation with file and line and check the counter is zero on shutdown to catch leaks",
     "should_trigger": true,
-    "split": "train",
+    "split": "validation",
     "rationale": "allocation instrumentation for leak detection -> instrumentation-and-checks.md"
   },
   {
     "query": "should I just never destroy the document and clean up at exit so we stop hitting these dangling-pointer crashes",
     "should_trigger": true,
-    "split": "train",
+    "split": "validation",
     "rationale": "prevention reflection: never-free hides bugs; proper teardown exposes them -> bug-taxonomy.md"
   },
   {
@@ -92,7 +92,31 @@
   {
     "query": "convert this AoS particle array to SoA so the hot loop is cache friendly",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "near-miss: data layout for performance -> data-oriented-design-guide"
+  },
+  {
+    "query": "I have a Rectangle class with mutable width and height and setWidth/setHeight methods. I now need a Square type in the same system. What's the cleanest way to model Square given I already have Rectangle?",
+    "rationale": "near miss owned by oop-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Two of my classes each have a handful of nearly identical helper methods. Should I pull those into a shared abstract base class so both can inherit them? Give me a concrete recommendation.",
+    "rationale": "near miss owned by oop-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Code review: a NonRemovableList subclass extends List but overrides its remove() method to throw UnsupportedOperationException because removal isn't allowed. Is this a good design? Name the problem.",
+    "rationale": "near miss owned by oop-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "I'm writing a Java Money value class and I just added an equals() method so two Money instances with the same amount compare equal. I plan to use Money objects as keys in a HashMap. Anything else I need to do?",
+    "rationale": "near miss owned by oop-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

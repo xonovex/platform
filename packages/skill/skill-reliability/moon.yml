@@ -9,4 +9,4 @@ tasks:
   skill-validate:
     script: npx moon-skill-validate reliability-guide
   skill-audit-sources:
-    script: node ../../../node_modules/@xonovex/script-moon-skill-audit-sources/dist/src/index.js skills/reliability-guide
+    script: node ../../../node_modules/@xonovex/script-moon-skill-audit-sources/dist/src/index.js reliability-guide

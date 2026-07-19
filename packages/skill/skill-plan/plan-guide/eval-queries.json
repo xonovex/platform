@@ -1,42 +1,88 @@
 [
   {
     "query": "Capture what we know and do not know about the dispatch delays, but do not force it into user stories yet.",
-    "should_trigger": true
+    "should_trigger": true,
+    "split": "train"
   },
   {
     "query": "Research whether this API can support regional retention rules, cite provenance and confidence, then publish the result back to our tracker.",
-    "should_trigger": true
+    "should_trigger": true,
+    "split": "train"
   },
   {
     "query": "Turn these observations into candidate behavior and constraints. BDD is available, but use a neutral formulation unless it actually helps.",
-    "should_trigger": true
+    "should_trigger": true,
+    "split": "train"
   },
   {
     "query": "Create an optional experience design from work-item UX-44, include accessibility review, and keep critique independent from revision.",
-    "should_trigger": true
+    "should_trigger": true,
+    "split": "train"
   },
   {
     "query": "We lost the previous session. Resume planning from native result result:782 without assuming a file path.",
-    "should_trigger": true
+    "should_trigger": true,
+    "split": "train"
   },
   {
     "query": "Choose between the two data-boundary options, but a model must not claim the architecture authority decision.",
-    "should_trigger": true
+    "should_trigger": true,
+    "split": "validation"
   },
   {
     "query": "Write a React component that renders a decision table.",
-    "should_trigger": false
+    "should_trigger": false,
+    "split": "train"
   },
   {
     "query": "Fix the failing unit test in src/cache.test.ts.",
-    "should_trigger": false
+    "should_trigger": false,
+    "split": "train"
   },
   {
     "query": "Generate a database migration for the research_sources table.",
-    "should_trigger": false
+    "should_trigger": false,
+    "split": "train"
   },
   {
     "query": "Make the accessibility icon blue on hover.",
-    "should_trigger": false
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "I have an approved parent plan for adding OAuth login to our web app. Break it down into detailed implementation subplans I can hand off for execution.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Before we plan this data-layer refactor, help me settle the open design decisions. There are several unresolved trade-offs (naming, where the migration logic lives, and how much of the old contract to keep).",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "I need to add a SIMD variant of my vec3_dot in lib/math/vec3.c — the rest of the project uses _sse4 and _avx2 suffixes",
+    "rationale": "near miss owned by c99-opinionated-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "convert this AoS particle list to SoA for cache locality",
+    "rationale": "near miss owned by c99-opinionated-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "in firmware/sensor/sensor_read.c can you change the read function so the caller passes the buffer instead of malloc'ing one",
+    "rationale": "near miss owned by c99-opinionated-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "stub out the alignment-aware allocator for our DSP target",
+    "rationale": "near miss owned by c99-opinionated-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

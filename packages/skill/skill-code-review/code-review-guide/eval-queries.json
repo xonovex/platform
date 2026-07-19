@@ -32,7 +32,7 @@
   {
     "query": "write clear actionable review feedback that leads with what is good",
     "should_trigger": true,
-    "split": "train",
+    "split": "validation",
     "rationale": "tone and structure"
   },
   {
@@ -82,5 +82,17 @@
     "should_trigger": false,
     "split": "validation",
     "rationale": "near-miss: repo settings, not review-comment craft"
+  },
+  {
+    "query": "help me write a good pull request description for this change",
+    "rationale": "near miss owned by pull-request-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "this PR is getting huge, what should I do about it",
+    "rationale": "near miss owned by pull-request-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

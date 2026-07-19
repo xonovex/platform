@@ -1,0 +1,98 @@
+[
+  {
+    "query": "I have a Terraform config that creates private subnets, one per availability zone, from a variable list of AZs. Right now removing a single AZ from the middle of the list forces Terraform to recreate several unrelated subnets. Write the resource and any supporting locals so this stops happening.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Set up the remote state backend for our production environment's Terraform root module. We're on AWS. Show the backend configuration and explain the key decisions.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Someone changed our infrastructure manually in the cloud console. I want to see what has drifted from our Terraform state before I decide whether to reconcile it. What command should I run and why?",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Add a Terraform variable named database_config that is a structured object with instance_class (string), engine_version (string), and a backup_retention number that callers may omit and should default to 7. We're on Terraform 1.12.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Help me handle module structure correctly in this Terraform task, including the edge cases that usually get missed.",
+    "rationale": "implicit task cue derived from the module structure reference",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Help me handle module definition correctly in this Terraform task, including the edge cases that usually get missed.",
+    "rationale": "implicit task cue derived from the module definition reference",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Help me handle typed variables correctly in this Terraform task, including the edge cases that usually get missed.",
+    "rationale": "implicit task cue derived from the typed variables reference",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Help me handle root module correctly in this Terraform task, including the edge cases that usually get missed.",
+    "rationale": "implicit task cue derived from the root module reference",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Write a Lua 5.4 function `load_config(path)` that opens the file at `path`, reads all of it, and returns the parsed contents. Show how a caller would use it when the file might not exist, falling back to a default config instead of crashing.",
+    "rationale": "near miss owned by lua-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "In Lua, write a function that takes an array of a few thousand numbers and returns them as a single comma-separated string. Make it efficient for large inputs.",
+    "rationale": "near miss owned by lua-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "I'm iterating in a running Lua process. I edited `myapp.settings` on disk, but calling `require(\"myapp.settings\")` again keeps returning the stale version from before my edit. How do I force it to pick up the new file? Show the code.",
+    "rationale": "near miss owned by lua-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Write a Lua 5.4 function `paginate(total, per_page)` that returns two values: the number of full pages needed to hold all items (rounded up is not required — use floor of total divided by per_page), and the exact average items-per-page as a decimal number.",
+    "rationale": "near miss owned by lua-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Help me handle module pattern correctly in this Lua task, including the edge cases that usually get missed.",
+    "rationale": "near miss owned by lua-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Help me handle local variables correctly in this Lua task, including the edge cases that usually get missed.",
+    "rationale": "near miss owned by lua-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Help me handle metatables correctly in this Lua task, including the edge cases that usually get missed.",
+    "rationale": "near miss owned by lua-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Help me handle coroutines correctly in this Lua task, including the edge cases that usually get missed.",
+    "rationale": "near miss owned by lua-guide",
+    "should_trigger": false,
+    "split": "validation"
+  }
+]

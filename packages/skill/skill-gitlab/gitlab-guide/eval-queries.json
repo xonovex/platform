@@ -20,7 +20,7 @@
   {
     "query": "my inline MR comment came back as a plain note instead of attaching to the diff — what's wrong with the position SHAs?",
     "should_trigger": true,
-    "split": "validation",
+    "split": "train",
     "rationale": "DiffNote downgrade / three-SHA position model"
   },
   {
@@ -44,13 +44,13 @@
   {
     "query": "set up glab against our self-managed GitLab instance and verify access",
     "should_trigger": true,
-    "split": "validation",
+    "split": "train",
     "rationale": "auth login --hostname / onboarding / read verify"
   },
   {
     "query": "approve a merge request from the command line on GitLab",
     "should_trigger": true,
-    "split": "train",
+    "split": "validation",
     "rationale": "glab mr approve verdict"
   },
   {
@@ -68,7 +68,7 @@
   {
     "query": "onboard a SHA-pinned GitLab CI/CD component with typed inputs and enforce it through a group pipeline execution policy",
     "should_trigger": true,
-    "split": "train",
+    "split": "validation",
     "rationale": "GitLab-native reusable CI and centrally injected policy enforcement"
   },
   {
@@ -92,7 +92,7 @@
   {
     "query": "how should I label my review feedback blocking vs non-blocking and structure the summary?",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "near-miss: review comment craft, use code-review-guide"
   },
   {
@@ -104,7 +104,7 @@
   {
     "query": "define generic policy and result providers without selecting a code host",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "near-miss: provider semantics belong to workflow-guide and agent-governance-guide until GitLab is selected"
   },
   {
@@ -112,5 +112,17 @@
     "should_trigger": false,
     "split": "validation",
     "rationale": "near-miss: semantic external enforcement belongs to agent-governance-guide until GitLab is selected"
+  },
+  {
+    "query": "open a pull request against main with reviewers and a label using the gh CLI",
+    "rationale": "near miss owned by github-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "post an inline review comment anchored to a specific line on a GitHub pull request",
+    "rationale": "near miss owned by github-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

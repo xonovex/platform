@@ -1,0 +1,98 @@
+[
+  {
+    "query": "Write an Express 5 + TypeScript login route handler. It should look up the user by email, verify the submitted password against the stored hash, and on success return a signed JWT the client will send on future API requests.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Write a centralized error-handling middleware for an Express 5 + TypeScript API that turns thrown errors into JSON responses, and show how it is registered on the app.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Write a reusable Express + TypeScript middleware factory that validates an incoming request body against a given Zod schema before the route handler runs.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Set up the main app entrypoint (app.ts) for an Express 5 + TypeScript API: wire helmet, cors, morgan, JSON body parsing, mount the route modules, and handle unmatched routes.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Help me handle project structure correctly in this Expressjs task, including the edge cases that usually get missed.",
+    "rationale": "implicit task cue derived from the project structure reference",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Help me handle validation correctly in this Expressjs task, including the edge cases that usually get missed.",
+    "rationale": "implicit task cue derived from the validation reference",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Help me handle error handling correctly in this Expressjs task, including the edge cases that usually get missed.",
+    "rationale": "implicit task cue derived from the error handling reference",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Help me handle authentication correctly in this Expressjs task, including the edge cases that usually get missed.",
+    "rationale": "implicit task cue derived from the authentication reference",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "In a Hono API running on Node with @hono/node-server, add a WebSocket endpoint at /ws/chat that echoes each incoming message back to the sender. Show both the server bootstrap code and the route definition.",
+    "rationale": "near miss owned by hono-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Write a reusable helper for our Hono API that turns a Zod validation failure into a standardized structured JSON error response for a 400. Show the exact response body shape it produces.",
+    "rationale": "near miss owned by hono-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Our Hono app must read a DATABASE_URL environment variable inside a route handler, and the same code has to run correctly whether deployed on Node or on Cloudflare Workers. Write the handler.",
+    "rationale": "near miss owned by hono-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "In a Hono handler, set a secure session cookie that JavaScript cannot read, is only transmitted over HTTPS, and uses the __Host- name prefix. Write the cookie-setting code.",
+    "rationale": "near miss owned by hono-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Help me handle application structure correctly in this Hono task, including the edge cases that usually get missed.",
+    "rationale": "near miss owned by hono-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Help me handle validation type safety correctly in this Hono task, including the edge cases that usually get missed.",
+    "rationale": "near miss owned by hono-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Help me handle middleware patterns correctly in this Hono task, including the edge cases that usually get missed.",
+    "rationale": "near miss owned by hono-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Help me handle middleware combine correctly in this Hono task, including the edge cases that usually get missed.",
+    "rationale": "near miss owned by hono-guide",
+    "should_trigger": false,
+    "split": "validation"
+  }
+]

@@ -2,7 +2,12 @@ import {mkdirSync, mkdtempSync, rmSync, writeFileSync} from "node:fs";
 import {tmpdir} from "node:os";
 import {join} from "node:path";
 import {afterEach, beforeEach, describe, expect, it} from "vitest";
-import {isDirectory, isFile, resolveGuideDirectory} from "./fs.js";
+import {
+  isDirectory,
+  isFile,
+  resolveClaudePluginDirectories,
+  resolveGuideDirectory,
+} from "./fs.js";
 
 describe("filesystem helpers", () => {
   let root: string;
@@ -40,5 +45,68 @@ describe("filesystem helpers", () => {
       writeFileSync(join(root, name, "SKILL.md"), "guide");
     }
     expect(() => resolveGuideDirectory(root)).toThrow("multiple SKILL.md");
+  });
+
+  it("resolves local Claude plugin dependencies before the target", () => {
+    const dependency = join(root, "dependency");
+    const target = join(root, "target");
+    for (const directory of [dependency, target]) {
+      mkdirSync(join(directory, ".claude-plugin"), {recursive: true});
+    }
+    writeFileSync(
+      join(dependency, ".claude-plugin", "plugin.json"),
+      JSON.stringify({name: "dependency", skills: ["./guide"]}),
+    );
+    writeFileSync(
+      join(target, ".claude-plugin", "plugin.json"),
+      JSON.stringify({
+        name: "target",
+        skills: ["./guide"],
+        dependencies: ["dependency"],
+      }),
+    );
+
+    expect(resolveClaudePluginDirectories(target)).toEqual([
+      dependency,
+      target,
+    ]);
+  });
+
+  it("rejects a missing local Claude plugin dependency", () => {
+    const target = join(root, "target");
+    mkdirSync(join(target, ".claude-plugin"), {recursive: true});
+    writeFileSync(
+      join(target, ".claude-plugin", "plugin.json"),
+      JSON.stringify({
+        name: "target",
+        skills: ["./guide"],
+        dependencies: ["missing"],
+      }),
+    );
+
+    expect(() => resolveClaudePluginDirectories(target)).toThrow(
+      "target -> missing",
+    );
+  });
+
+  it("rejects non-skill Claude plugin capabilities", () => {
+    const target = join(root, "target");
+    mkdirSync(join(target, ".claude-plugin"), {recursive: true});
+    writeFileSync(
+      join(target, ".claude-plugin", "plugin.json"),
+      JSON.stringify({name: "target", skills: ["./guide"], hooks: {}}),
+    );
+    expect(() => resolveClaudePluginDirectories(target)).toThrow(
+      "is not skill-only",
+    );
+
+    writeFileSync(
+      join(target, ".claude-plugin", "plugin.json"),
+      JSON.stringify({name: "target", skills: ["./guide"]}),
+    );
+    mkdirSync(join(target, "hooks"));
+    expect(() => resolveClaudePluginDirectories(target)).toThrow(
+      "contains hooks",
+    );
   });
 });

@@ -1,0 +1,98 @@
+[
+  {
+    "query": "I have a Claude Code slash command at `.claude/commands/changelog.md`. Its body uses `$ARGUMENTS` for the user input and embeds git output inline with `` !`git log --oneline -20` ``. I want to port this same command to the Gemini CLI. Tell me exactly what to change and where the file goes.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "We have a ~140-line Claude Code slash command that inlines its entire Goal, Workflow, Output format, and Gotchas. I want to refactor it into a thin command that keeps only its argument contract and delegates the actual procedure to a reusable guideline skill. It's packaged as a plugin. Walk me through every step so nothing breaks at run time.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "I just finished a task where I stripped every `console.log` call out of `packages/billing-service/src/` for our invoicing app. Save this as a reusable slash command I can run on other projects.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Help me handle distill correctly in this Command task, including the edge cases that usually get missed.",
+    "rationale": "implicit task cue derived from the distill reference",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Help me handle create correctly in this Command task, including the edge cases that usually get missed.",
+    "rationale": "implicit task cue derived from the create reference",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Help me handle merge correctly in this Command task, including the edge cases that usually get missed.",
+    "rationale": "implicit task cue derived from the merge reference",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Help me handle simplify correctly in this Command task, including the edge cases that usually get missed.",
+    "rationale": "implicit task cue derived from the simplify reference",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Help me handle harness formats correctly in this Command task, including the edge cases that usually get missed.",
+    "rationale": "implicit task cue derived from the harness formats reference",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "this packages/auth dir doesn't have an AGENTS.md yet — set one up",
+    "rationale": "near miss owned by instruction-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "bootstrap a CLAUDE.md for the new services/notifications package i just scaffolded",
+    "rationale": "near miss owned by instruction-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "i want claude to know what's in apps/admin — write the agent docs from scratch",
+    "rationale": "near miss owned by instruction-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "no AGENTS.md anywhere in this repo, can you create one for the root",
+    "rationale": "near miss owned by instruction-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "document this directory for an AI agent — first time",
+    "rationale": "near miss owned by instruction-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "scaffold an AGENTS.md for libs/shared/ that covers the conventions",
+    "rationale": "near miss owned by instruction-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "we just split out the analytics package — can you create instructions for it",
+    "rationale": "near miss owned by instruction-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "add a CLAUDE.md to the new monorepo workspace at packages/billing",
+    "rationale": "near miss owned by instruction-guide",
+    "should_trigger": false,
+    "split": "validation"
+  }
+]

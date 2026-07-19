@@ -1,0 +1,98 @@
+[
+  {
+    "query": "I have a Hono app configured with `app.use('*', cors())`. Write a Vitest test that verifies the CORS preflight (OPTIONS) request to `/api/users` with an Origin header succeeds and that the Access-Control-Allow-Origin header is returned.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Write a Vitest test for an async updateUser(id) function. The test should create a record, update it, and verify that the record's updatedAt timestamp is strictly newer than the original createdAt.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "In a Vitest test file I have `import { db } from '../src/db'` and I want to mock the entire '../src/db' module so its exported `query` function returns a fixed row object. Show the mock setup.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Write a Vitest mock for an async `getUser(id)` dependency that resolves to `{ id: '123', email: 'test@example.com' }`, then call it and assert it was invoked with '123'.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Help me handle type safety correctly in this Vitest task, including the edge cases that usually get missed.",
+    "rationale": "implicit task cue derived from the type safety reference",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Help me handle http testing correctly in this Vitest task, including the edge cases that usually get missed.",
+    "rationale": "implicit task cue derived from the http testing reference",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Help me handle timestamp testing correctly in this Vitest task, including the edge cases that usually get missed.",
+    "rationale": "implicit task cue derived from the timestamp testing reference",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Help me handle typescript config correctly in this Vitest task, including the edge cases that usually get missed.",
+    "rationale": "implicit task cue derived from the typescript config reference",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "In a Hono API running on Node with @hono/node-server, add a WebSocket endpoint at /ws/chat that echoes each incoming message back to the sender. Show both the server bootstrap code and the route definition.",
+    "rationale": "near miss owned by hono-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Write a reusable helper for our Hono API that turns a Zod validation failure into a standardized structured JSON error response for a 400. Show the exact response body shape it produces.",
+    "rationale": "near miss owned by hono-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Our Hono app must read a DATABASE_URL environment variable inside a route handler, and the same code has to run correctly whether deployed on Node or on Cloudflare Workers. Write the handler.",
+    "rationale": "near miss owned by hono-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "In a Hono handler, set a secure session cookie that JavaScript cannot read, is only transmitted over HTTPS, and uses the __Host- name prefix. Write the cookie-setting code.",
+    "rationale": "near miss owned by hono-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Help me handle application structure correctly in this Hono task, including the edge cases that usually get missed.",
+    "rationale": "near miss owned by hono-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Help me handle validation type safety correctly in this Hono task, including the edge cases that usually get missed.",
+    "rationale": "near miss owned by hono-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Help me handle middleware patterns correctly in this Hono task, including the edge cases that usually get missed.",
+    "rationale": "near miss owned by hono-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Help me handle middleware combine correctly in this Hono task, including the edge cases that usually get missed.",
+    "rationale": "near miss owned by hono-guide",
+    "should_trigger": false,
+    "split": "validation"
+  }
+]

@@ -39,7 +39,9 @@ Keep this seed committed per skill. "What the model already knows" is model-spec
 
 ## Automated Runner
 
-`scripts/eval-outputs.py <evals.json> <skill-name>` runs the whole loop below: each eval runs in an isolated `claude -p` context **with the skill** and **without it** (Skill tool blocked), in parallel; outputs are graded by a reference-guided LLM-as-judge (binary per assertion, evidence required); results land in the workspace layout and `benchmark.json`. Env: `RUNS`, `CONCURRENCY`, `CLAUDE_MODEL`, `JUDGE_MODEL`. Do the manual loop when you need human grading or file-producing skills the runner doesn't capture.
+`scripts/eval-outputs.py <evals.json> <skill-name>` runs the whole loop below: each eval runs in an isolated `claude -p` context **with the exact namespaced slash skill invoked** and **without it** (the original prompt with the Skill tool blocked), in parallel; generation loads the target plugin plus declared local dependencies only in the activated arm after rejecting non-skill plugin components, exposes only `Skill`/`Read` or baseline `Read`, excludes project/local settings and MCP discovery, and does not persist sessions. Outputs are graded by a reference-guided LLM-as-judge (binary per assertion, evidence required); failed generations are not judged, and a hard 24-model-call ceiling requires large suites to be split into bounded batches. Results land in the workspace layout and `benchmark.json`. Env: `RUNS`, `CONCURRENCY`, `CLAUDE_MODEL`, `JUDGE_MODEL`. Do the manual loop when you need human grading or file-producing skills the runner doesn't capture.
+
+The runner refuses to publish a benchmark when any generation/judge call times out, exhausts its budget, exits unsuccessfully, returns unparseable grading, or fails to expose the target in an activated arm. It removes a stale `benchmark.json`, writes `invalid-run.json`, and exits `2`; valid negative or zero deltas remain real quality results and exit `1`.
 
 ## Designing Prompts
 

@@ -7,6 +7,7 @@ were distilled from conference-talk material on modern, data-oriented C.
 
 ## Modern C / data-oriented C conference talks
 
+- **Provenance:** Repository-original C99 conventions supplemented by conference-talk notes retained during the original distillation
 - **Last reviewed:** 2026-06-13
 - **Used for:**
   - `SKILL.md` → Fixed-width types, Value-oriented APIs, Quality (sanitizers), Gotchas

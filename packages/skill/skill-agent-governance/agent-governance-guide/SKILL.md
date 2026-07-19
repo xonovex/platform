@@ -1,6 +1,8 @@
 ---
 name: agent-governance-guide
 description: "Use when defining, inspecting, onboarding, or validating governance for agent, model, tool, hook, policy, module, evidence, exception, emergency-exception, or privileged-operation behavior. Triggers on policy decision versus enforcement, semantic hook intents, harness capability matrices, bounded model or child-agent execution, authority attenuation, governance profiles, module conformance, drift, managed configuration, or advisory onboarding, even when the user doesn't say 'agent governance'."
+compatibility: "Node.js 22+ is required for bundled conformance validators and the local decision-service walking skeleton; scripts read repository fixtures and write only explicit evidence or temporary test paths."
+allowed-tools: "Read Bash(node:*) Bash(npx:*)"
 ---
 
 # Agent Governance Contracts

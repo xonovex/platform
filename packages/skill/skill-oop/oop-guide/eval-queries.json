@@ -1,0 +1,98 @@
+[
+  {
+    "query": "I have a Rectangle class with mutable width and height and setWidth/setHeight methods. I now need a Square type in the same system. What's the cleanest way to model Square given I already have Rectangle?",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Two of my classes each have a handful of nearly identical helper methods. Should I pull those into a shared abstract base class so both can inherit them? Give me a concrete recommendation.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Code review: a NonRemovableList subclass extends List but overrides its remove() method to throw UnsupportedOperationException because removal isn't allowed. Is this a good design? Name the problem.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "I'm writing a Java Money value class and I just added an equals() method so two Money instances with the same amount compare equal. I plan to use Money objects as keys in a HashMap. Anything else I need to do?",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Review this Oop change for stances and fix the concrete issues you find.",
+    "rationale": "implicit task cue derived from the Stances section",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Review this Oop change for design smells and fix the concrete issues you find.",
+    "rationale": "implicit task cue derived from the Design smells section",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Help me with classes; apply the relevant Oop conventions and call out the important edge cases.",
+    "rationale": "routing cue derived from the description's classes trigger",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Help me with inheritance; apply the relevant Oop conventions and call out the important edge cases.",
+    "rationale": "routing cue derived from the description's inheritance trigger",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Write a Lua 5.4 function `load_config(path)` that opens the file at `path`, reads all of it, and returns the parsed contents. Show how a caller would use it when the file might not exist, falling back to a default config instead of crashing.",
+    "rationale": "near miss owned by lua-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "In Lua, write a function that takes an array of a few thousand numbers and returns them as a single comma-separated string. Make it efficient for large inputs.",
+    "rationale": "near miss owned by lua-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "I'm iterating in a running Lua process. I edited `myapp.settings` on disk, but calling `require(\"myapp.settings\")` again keeps returning the stale version from before my edit. How do I force it to pick up the new file? Show the code.",
+    "rationale": "near miss owned by lua-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Write a Lua 5.4 function `paginate(total, per_page)` that returns two values: the number of full pages needed to hold all items (rounded up is not required — use floor of total divided by per_page), and the exact average items-per-page as a decimal number.",
+    "rationale": "near miss owned by lua-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Help me handle module pattern correctly in this Lua task, including the edge cases that usually get missed.",
+    "rationale": "near miss owned by lua-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Help me handle local variables correctly in this Lua task, including the edge cases that usually get missed.",
+    "rationale": "near miss owned by lua-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Help me handle metatables correctly in this Lua task, including the edge cases that usually get missed.",
+    "rationale": "near miss owned by lua-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Help me handle coroutines correctly in this Lua task, including the edge cases that usually get missed.",
+    "rationale": "near miss owned by lua-guide",
+    "should_trigger": false,
+    "split": "validation"
+  }
+]

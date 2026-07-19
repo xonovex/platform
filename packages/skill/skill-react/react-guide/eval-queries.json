@@ -41,7 +41,6 @@
     "split": "train",
     "rationale": "perf / memoization, doesn't say 'React'"
   },
-
   {
     "query": "add a fade-in when the testimonial card scrolls into view",
     "should_trigger": false,
@@ -72,11 +71,10 @@
     "split": "train",
     "rationale": "near-miss: backend handler, should match zod-guide"
   },
-
   {
     "query": "i think the React Compiler is over-memoizing this list, can you check src/feed/Feed.tsx",
     "should_trigger": true,
-    "split": "validation",
+    "split": "train",
     "rationale": "direct React 19 Compiler"
   },
   {
@@ -103,7 +101,6 @@
     "split": "validation",
     "rationale": "React 19 + Compiler"
   },
-
   {
     "query": "explain the difference between Vue 3 Composition API and Options API",
     "should_trigger": false,

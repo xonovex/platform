@@ -62,7 +62,7 @@
   {
     "query": "lay the float arrays out so the inner loop auto-vectorizes with aligned AVX loads instead of falling back to scalar gathers",
     "should_trigger": true,
-    "split": "validation",
+    "split": "train",
     "rationale": "validation positive: SIMD-friendly SoA layout + alignment"
   },
   {
@@ -80,7 +80,7 @@
   {
     "query": "write a lock-free single-producer single-consumer ring buffer for our audio thread",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "validation negative: lock-free/threading -> lock-free-guide"
   },
   {
@@ -92,7 +92,7 @@
   {
     "query": "I want always-on counters for draw calls and allocations that I can leave in the hot path without slowing it down, and plot over the last few hundred frames to catch hitches",
     "should_trigger": true,
-    "split": "train",
+    "split": "validation",
     "rationale": "statistics-recording: per-frame accumulator, cached pointer (one store), ring history, graph readout"
   },
   {
@@ -100,5 +100,17 @@
     "should_trigger": true,
     "split": "validation",
     "rationale": "validation positive: statistics-recording returned-accumulator-pointer pattern, lazy history"
+  },
+  {
+    "query": "Write an async Python function fetch_all(urls) that retrieves the body of each URL over HTTP and returns them as a list. The URLs are independent of one another and there may be dozens of them.",
+    "rationale": "near miss owned by python-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Define a Python data model for a paginated API response: it holds a list of items whose element type varies per endpoint, a total count, and an optional next-page cursor string.",
+    "rationale": "near miss owned by python-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

@@ -1,0 +1,98 @@
+[
+  {
+    "query": "Write a Strudel.cc live-coding snippet for a driving techno groove at 130 BPM. Include a four-on-the-floor kick, an offbeat clap, and closed hi-hats layered together.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "In Strudel, create a percussion pattern where the kick note cycles through four different pitches, one new pitch on each successive cycle, and a snare plays a Euclidean rhythm of 3 hits spread across 8 steps.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Write a Strudel acid bassline on a sawtooth oscillator whose low-pass filter cutoff continuously sweeps open and closed over a 4-cycle period, with heavy filter resonance.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "In Strudel, write a short melodic line constrained to an A minor scale in a low octave, plus a pad layer that plays explicit chords (an A minor and an F major triad). Keep the two layers harmonically coherent.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Help me handle tempo timing correctly in this Strudel task, including the edge cases that usually get missed.",
+    "rationale": "implicit task cue derived from the tempo timing reference",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Help me handle mini notation correctly in this Strudel task, including the edge cases that usually get missed.",
+    "rationale": "implicit task cue derived from the mini notation reference",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Help me handle layering correctly in this Strudel task, including the edge cases that usually get missed.",
+    "rationale": "implicit task cue derived from the layering reference",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Help me handle sounds correctly in this Strudel task, including the edge cases that usually get missed.",
+    "rationale": "implicit task cue derived from the sounds reference",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "In a Remotion project running at 30fps, write a React component that fades a headline in from opacity 0 to 1 over the first half second and slides it up 40px at the same time. Give me the full component code.",
+    "rationale": "near miss owned by remotion-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Build a Remotion scene with 60 confetti pieces scattered at varied starting x/y positions and slightly different fall speeds, so it looks organic. Provide the component.",
+    "rationale": "near miss owned by remotion-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "I have two Remotion scenes, each 2 seconds long, at 30fps. I want a half-second crossfade between them. Show me how to wire this up and tell me the total duration of the final video in frames.",
+    "rationale": "near miss owned by remotion-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Register a new Remotion composition in Root.tsx called 'Intro' (1920x1080, 30fps, 5 seconds) whose title text, background color, and font size are editable in the Remotion Studio visual props editor. Include the code.",
+    "rationale": "near miss owned by remotion-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Help me handle timing correctly in this Remotion task, including the edge cases that usually get missed.",
+    "rationale": "near miss owned by remotion-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Help me handle sequencing correctly in this Remotion task, including the edge cases that usually get missed.",
+    "rationale": "near miss owned by remotion-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Help me handle assets correctly in this Remotion task, including the edge cases that usually get missed.",
+    "rationale": "near miss owned by remotion-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Help me handle compositions correctly in this Remotion task, including the edge cases that usually get missed.",
+    "rationale": "near miss owned by remotion-guide",
+    "should_trigger": false,
+    "split": "validation"
+  }
+]

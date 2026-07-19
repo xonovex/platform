@@ -50,25 +50,25 @@
   {
     "query": "we need to emit different compressed texture formats and byte order per target platform but share one source asset — how should the pipeline handle platforms",
     "should_trigger": true,
-    "split": "train",
+    "split": "validation",
     "rationale": "import-and-compile: target platform as an input folded into output and cache key"
   },
   {
     "query": "references between our baked assets break whenever someone renames or moves a source file — how should asset dependencies be keyed so they survive reorg",
     "should_trigger": true,
-    "split": "train",
+    "split": "validation",
     "rationale": "dependency-tracking: edges by stable identity (GUID) not path"
   },
   {
     "query": "should we do all the mip generation and vertex optimization while importing the FBX, or keep import dumb and do that later",
     "should_trigger": true,
-    "split": "train",
+    "split": "validation",
     "rationale": "raw-vs-runtime-formats: minimal massaging on import, heavy work deferred to compile"
   },
   {
     "query": "a file watcher fires several times for one save and we end up recompiling the asset three times in a row",
     "should_trigger": true,
-    "split": "train",
+    "split": "validation",
     "rationale": "hot-reloading-content: debounce/coalesce watcher events"
   },
   {
@@ -80,19 +80,43 @@
   {
     "query": "I'm modeling assets as typed objects that reference each other by id — how should I design the schema and the reference fields themselves",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "near-miss: how assets are modeled as typed objects/references -> data-model-guide"
   },
   {
     "query": "what discipline keeps my C structs and function pointers safe to swap when I reload a shared library at runtime",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "near-miss: reload-safety discipline of the C code itself -> c99-opinionated-guide"
   },
   {
     "query": "how do I declare render passes so the frame graph derives barriers and transitions for my Vulkan renderer",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "near-miss: GPU render-graph architecture -> gpu-rendering-guide, not the asset pipeline"
+  },
+  {
+    "query": "I want artists to build effects by dragging boxes onto a canvas and connecting their inputs and outputs with wires instead of writing code — how should I structure the thing they're editing",
+    "rationale": "near miss owned by node-graph-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "each box has little sockets on the left and right and I need to stop people from plugging a color output into a number input — what's the right way to validate a connection as they draw it",
+    "rationale": "near miss owned by node-graph-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "my editor graph is getting walked from scratch every frame and it's slow; I'd rather turn the authored graph into some flat ordered thing once and just run that",
+    "rationale": "near miss owned by node-graph-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "some nodes do expensive image filtering and I don't want to recompute them when nothing upstream changed — how do I know a node's result is still valid",
+    "rationale": "near miss owned by node-graph-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

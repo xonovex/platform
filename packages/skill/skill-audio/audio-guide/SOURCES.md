@@ -2,6 +2,7 @@
 
 ## Game-engine development blog (archive)
 
+- **Provenance:** Archived engine-development source material retained from the original skill distillation; no stable upstream URL was recorded
 - **Last reviewed:** 2026-05-27
 - **Used for:**
   - `SKILL.md` → Essentials, The render path, Mixing and signal, Voices and control, Gotchas

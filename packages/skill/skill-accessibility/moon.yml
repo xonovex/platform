@@ -9,4 +9,4 @@ tasks:
   skill-validate:
     script: npx moon-skill-validate accessibility-guide
   skill-audit-sources:
-    script: node ../../../node_modules/@xonovex/script-moon-skill-audit-sources/dist/src/index.js skills/accessibility-guide
+    script: node ../../../node_modules/@xonovex/script-moon-skill-audit-sources/dist/src/index.js accessibility-guide

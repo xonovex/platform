@@ -26,7 +26,7 @@
   {
     "query": "is passing my plugin registry into the services to look things up a bad idea?",
     "should_trigger": true,
-    "split": "validation",
+    "split": "train",
     "rationale": "service-locator anti-pattern; inject at the root instead"
   },
   {
@@ -38,7 +38,7 @@
   {
     "query": "grade how tightly these two modules are coupled and how to weaken the worst seam",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "near-miss: coupling vocabulary -> connascence-guide"
   },
   {
@@ -46,5 +46,53 @@
     "should_trigger": false,
     "split": "train",
     "rationale": "near-miss: decomposition/boundaries -> orthogonal-pattern-guide"
+  },
+  {
+    "query": "We have a notification service in Go that currently sends messages over email, SMS, and push. We keep having to touch the sending code every time a new channel is added. Sketch a design that lets us add new channels later without rewriting the sender, and show the sending function's signature.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Our notification core must guarantee that certain sensitive messages only go out over channels that provide end-to-end encryption. We keep adding new channels over time. How should the core enforce this check so it stays correct as channels are added? Show the gating code in Go.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "We have a payment-gateway integration that today has a single provider, but we know a second provider is coming and which one to use will be chosen from a config/environment value at deploy time. A colleague proposes selecting the provider with compile-time build tags. Advise us on the selection mechanism and justify it.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "I need to add a SIMD variant of my vec3_dot in lib/math/vec3.c — the rest of the project uses _sse4 and _avx2 suffixes",
+    "rationale": "near miss owned by c99-opinionated-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "convert this AoS particle list to SoA for cache locality",
+    "rationale": "near miss owned by c99-opinionated-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "in firmware/sensor/sensor_read.c can you change the read function so the caller passes the buffer instead of malloc'ing one",
+    "rationale": "near miss owned by c99-opinionated-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "stub out the alignment-aware allocator for our DSP target",
+    "rationale": "near miss owned by c99-opinionated-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "rename modules to follow our snake_case_subsystem.c convention — there's a few stragglers in src/net/",
+    "rationale": "near miss owned by c99-opinionated-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

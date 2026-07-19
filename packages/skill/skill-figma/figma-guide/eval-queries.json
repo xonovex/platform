@@ -35,7 +35,6 @@
     "split": "train",
     "rationale": "read node + extract spec"
   },
-
   {
     "query": "build this empty-state screen in SwiftUI from the design",
     "should_trigger": false,
@@ -60,11 +59,10 @@
     "split": "train",
     "rationale": "unrelated, git-guide"
   },
-
   {
     "query": "resolve this figma.com/design link into a file key and node id",
     "should_trigger": true,
-    "split": "validation",
+    "split": "train",
     "rationale": "url parsing"
   },
   {
@@ -85,11 +83,10 @@
     "split": "validation",
     "rationale": "images endpoint expiry"
   },
-
   {
     "query": "map these design tokens onto my UI component library",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "near-miss: implementation, not the REST read"
   },
   {
@@ -97,5 +94,23 @@
     "should_trigger": true,
     "split": "validation",
     "rationale": "auth: token rotation is in scope"
+  },
+  {
+    "query": "add proper types to the response shape in src/api/users.ts so the consumer doesn't have to cast",
+    "rationale": "near miss owned by typescript-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "this is throwing 'Cannot find module' on `import { foo } from './bar'` — what's the ESM dance for relative imports",
+    "rationale": "near miss owned by typescript-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "convert this Promise.all-with-side-effects mess to a clean async function in src/jobs/sync.ts",
+    "rationale": "near miss owned by typescript-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

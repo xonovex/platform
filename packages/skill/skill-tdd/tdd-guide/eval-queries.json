@@ -20,7 +20,7 @@
   {
     "query": "help me build a test list and work it one item at a time without writing them all up front",
     "should_trigger": true,
-    "split": "validation",
+    "split": "train",
     "rationale": "test list / to-do list, owned by tdd"
   },
   {
@@ -38,7 +38,7 @@
   {
     "query": "my green bar never refactors — is that still TDD?",
     "should_trigger": true,
-    "split": "train",
+    "split": "validation",
     "rationale": "refactor-step discipline, an owned gotcha"
   },
   {
@@ -50,7 +50,7 @@
   {
     "query": "structure this test with Arrange-Act-Assert and make it follow FIRST",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "near-miss: anatomy of a single test (AAA / FIRST / naming) -> testing-guide"
   },
   {
@@ -62,7 +62,7 @@
   {
     "query": "this class has low cohesion and too many responsibilities — how should I redesign it?",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "near-miss: the design bar the refactor aims at -> oop-guide / connascence-guide"
   },
   {
@@ -70,5 +70,29 @@
     "should_trigger": false,
     "split": "train",
     "rationale": "near-miss: framework API mechanics -> vitest-guide"
+  },
+  {
+    "query": "Implement a `discountedTotal(items, rate)` function test-first, where each item has a `price`. Show the ordered sequence of failing tests and the exact code change you make to pass each one, step by step.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "help me run a three amigos session and write Given-When-Then scenarios for the checkout story before we code",
+    "rationale": "near miss owned by bdd-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "how do I structure a feature file with Background and a Scenario Outline for the coupon rules?",
+    "rationale": "near miss owned by bdd-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "we want to do example mapping on this story — what do the yellow, blue, green and red cards mean?",
+    "rationale": "near miss owned by bdd-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

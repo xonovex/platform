@@ -1,0 +1,98 @@
+[
+  {
+    "query": "I have a log file with about 20 million lines already loaded as an array of strings in JavaScript. Write a function that keeps only the ERROR lines, extracts the timestamp from each, and returns the first 10. Explain any performance concerns.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Write a pure function `describeShape` that takes a discriminated-union shape value (a circle, a square, or any other shape) and returns a human-readable string. Handle the circle and square cases specifically and provide a fallback for everything else.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Design a small rate-limiter module in TypeScript that tracks how many requests each client has made in the current window and decides whether to allow the next request. Show the module's public functions and how a caller uses them.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "I have an array of user IDs and an async function `fetchUser(id)` that returns a Promise. I want a composed pipeline that fetches every user and then uppercases each user's name. Someone told me to just `ids.map(fetchUser).map(u => u.name.toUpperCase())`. Is that correct? Show the right way.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Review this Fp change for core principles and fix the concrete issues you find.",
+    "rationale": "implicit task cue derived from the Core principles section",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Help me with pure functions; apply the relevant Fp conventions and call out the important edge cases.",
+    "rationale": "routing cue derived from the description's pure functions trigger",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Help me with immutability; apply the relevant Fp conventions and call out the important edge cases.",
+    "rationale": "routing cue derived from the description's immutability trigger",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Help me with function composition; apply the relevant Fp conventions and call out the important edge cases.",
+    "rationale": "routing cue derived from the description's function composition trigger",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Write an async Python function fetch_all(urls) that retrieves the body of each URL over HTTP and returns them as a list. The URLs are independent of one another and there may be dozens of them.",
+    "rationale": "near miss owned by python-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Define a Python data model for a paginated API response: it holds a list of items whose element type varies per endpoint, a total count, and an optional next-page cursor string.",
+    "rationale": "near miss owned by python-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "I have a pure, deterministic function that is expensive and gets called repeatedly with the same arguments. Show me how to memoize it two ways: one that keeps every result, and one that caps memory by keeping only the most recently used results.",
+    "rationale": "near miss owned by python-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Write a reusable Python helper that wraps a block of database work in a transaction so callers can use it with a 'with' statement, committing when the block succeeds.",
+    "rationale": "near miss owned by python-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Help me handle dataclasses type hints correctly in this Python task, including the edge cases that usually get missed.",
+    "rationale": "near miss owned by python-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Help me handle type checking correctly in this Python task, including the edge cases that usually get missed.",
+    "rationale": "near miss owned by python-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Help me handle generators comprehensions correctly in this Python task, including the edge cases that usually get missed.",
+    "rationale": "near miss owned by python-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Help me handle caching functions correctly in this Python task, including the edge cases that usually get missed.",
+    "rationale": "near miss owned by python-guide",
+    "should_trigger": false,
+    "split": "validation"
+  }
+]

@@ -1,0 +1,98 @@
+[
+  {
+    "query": "In a CMakeLists.txt for an executable target named `app`, add the fmt formatting library as a source dependency fetched from https://github.com/fmtlib/fmt.git at version 10.1.1, and link it to `app`. Show the CMake code.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "I have a CMake library target `core`. Make it require C++20, and add `-Wall -Wextra -pedantic` warnings on GCC/Clang and `/W4` on MSVC, without affecting other targets in the build. Write the CMake commands.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "I have a library target `mylib` with public headers in `include/`. Write the CMake install rules so that a downstream project can consume it with find_package and get a properly namespaced imported target.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Set up CTest for a project. Register a test executable `unit_tests` as a test, tag it so it can be run selectively as a group, and give it a 30-second timeout. Show the CMake code.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Help me handle target types correctly in this Cmake task, including the edge cases that usually get missed.",
+    "rationale": "implicit task cue derived from the target types reference",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Help me handle compile options correctly in this Cmake task, including the edge cases that usually get missed.",
+    "rationale": "implicit task cue derived from the compile options reference",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Help me handle visibility specifiers correctly in this Cmake task, including the edge cases that usually get missed.",
+    "rationale": "implicit task cue derived from the visibility specifiers reference",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Help me handle find package correctly in this Cmake task, including the edge cases that usually get missed.",
+    "rationale": "implicit task cue derived from the find package reference",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "I have a Hono app configured with `app.use('*', cors())`. Write a Vitest test that verifies the CORS preflight (OPTIONS) request to `/api/users` with an Origin header succeeds and that the Access-Control-Allow-Origin header is returned.",
+    "rationale": "near miss owned by vitest-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Write a Vitest test for an async updateUser(id) function. The test should create a record, update it, and verify that the record's updatedAt timestamp is strictly newer than the original createdAt.",
+    "rationale": "near miss owned by vitest-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "In a Vitest test file I have `import { db } from '../src/db'` and I want to mock the entire '../src/db' module so its exported `query` function returns a fixed row object. Show the mock setup.",
+    "rationale": "near miss owned by vitest-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Write a Vitest mock for an async `getUser(id)` dependency that resolves to `{ id: '123', email: 'test@example.com' }`, then call it and assert it was invoked with '123'.",
+    "rationale": "near miss owned by vitest-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Help me handle type safety correctly in this Vitest task, including the edge cases that usually get missed.",
+    "rationale": "near miss owned by vitest-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Help me handle http testing correctly in this Vitest task, including the edge cases that usually get missed.",
+    "rationale": "near miss owned by vitest-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Help me handle timestamp testing correctly in this Vitest task, including the edge cases that usually get missed.",
+    "rationale": "near miss owned by vitest-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Help me handle typescript config correctly in this Vitest task, including the edge cases that usually get missed.",
+    "rationale": "near miss owned by vitest-guide",
+    "should_trigger": false,
+    "split": "validation"
+  }
+]

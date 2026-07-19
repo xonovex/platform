@@ -32,7 +32,7 @@
   {
     "query": "how should rendering components hook into the engine so I can cull lots of meshes per camera and feed several shadow views in one pass?",
     "should_trigger": true,
-    "split": "train",
+    "split": "validation",
     "rationale": "implicit: ECS->renderer interfaces, per-viewer visibility bitmasks"
   },
   {
@@ -62,13 +62,37 @@
   {
     "query": "refactor my GameObject base class and its Update() override hierarchy so subclasses share behavior through inheritance",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "validation negative: class/inheritance game-object design -> oop-guide"
   },
   {
     "query": "tune this LuaJIT table layout so the hot path stays JIT-friendly and avoids rehashing",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "validation negative: LuaJIT table tuning -> lua-opinionated-guide"
+  },
+  {
+    "query": "I'm writing an immediate-mode GUI and my hover highlight flickers between two overlapping panels — how should I decide which control the mouse is over?",
+    "rationale": "near miss owned by imgui-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "our editor UI pushes tens of thousands of rectangles to the GPU every frame and it's bandwidth-bound — how do I get the whole UI down to one draw call?",
+    "rationale": "near miss owned by imgui-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "how do I add Tab/Shift-Tab keyboard navigation and 'first responder' style focus to an IMGUI that has no widget tree?",
+    "rationale": "near miss owned by imgui-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "I want to drag an item from one panel and drop it onto another panel in my tool — what's the cleanest way to track the drag across windows?",
+    "rationale": "near miss owned by imgui-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

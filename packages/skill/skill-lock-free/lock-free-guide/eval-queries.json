@@ -62,7 +62,7 @@
   {
     "query": "I think I need a compare-exchange loop to atomically clamp a shared max value — show the weak vs strong choice",
     "should_trigger": true,
-    "split": "validation",
+    "split": "train",
     "rationale": "CAS loop, weak vs strong"
   },
   {
@@ -92,13 +92,31 @@
   {
     "query": "tune this LuaJIT hot loop with stable table shapes and preallocated arrays",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "near-miss: language-specific perf, use lua-opinionated-guide"
   },
   {
     "query": "align my vec4 struct to 16 bytes so the SIMD loads don't fault",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "near-miss: single-threaded SIMD alignment, not concurrency"
+  },
+  {
+    "query": "Set up the compiler configuration (CMake) for a C99 library target named `netcodec` that calls `readlink` and `strnlen`. Configure it for strict ISO C99, treat warnings as errors with `-Wall -Wextra`, and make sure it still compiles cleanly even though the code uses partial designated initializers like `(cfg_t){ .port = 8080 }` throughout.",
+    "rationale": "near miss owned by c99-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Write a C function that builds a filesystem path by joining a directory and a filename into a fixed 256-byte stack buffer, and returns an error if the joined path would be too long to fit.",
+    "rationale": "near miss owned by c99-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "I have this C struct that is written to disk and sent over the network:\n\n```c\ntypedef struct { uint32_t id; int16_t offset; uint8_t flags; } record_t;\n```\n\nWrite a portable printf statement that logs all three fields on one line.",
+    "rationale": "near miss owned by c99-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

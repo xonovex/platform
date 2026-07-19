@@ -1,0 +1,98 @@
+[
+  {
+    "query": "Write a production Dockerfile for a Node.js 22 web service that builds TypeScript with `npm run build` and serves on port 3000. Keep the final image as small and secure as reasonably possible.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Our Docker builds re-run `npm ci` on almost every commit even when only application source changed, and installing system packages with apt-get bloats the image. Show the Dockerfile layer ordering and the apt-get command you would use to fix both problems.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Add a database password to a containerized Node app without baking the secret into the image, and make sure the build context does not leak local files. Provide the relevant Dockerfile/compose lines and any supporting file.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Add a container health check to a Node.js image so a Kubernetes/Compose orchestrator can detect when the app stops responding. Show the Dockerfile instruction.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Help me handle multi stage builds correctly in this Docker task, including the edge cases that usually get missed.",
+    "rationale": "implicit task cue derived from the multi stage builds reference",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Help me handle security correctly in this Docker task, including the edge cases that usually get missed.",
+    "rationale": "implicit task cue derived from the security reference",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Help me handle production config correctly in this Docker task, including the edge cases that usually get missed.",
+    "rationale": "implicit task cue derived from the production config reference",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Help me handle docker compose correctly in this Docker task, including the edge cases that usually get missed.",
+    "rationale": "implicit task cue derived from the docker compose reference",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "We're on moonrepo 2.0. I want to enable and configure one of Moon's built-in extensions in our workspace. Which config file does the extension configuration go in, and show me a minimal example of the config block.",
+    "rationale": "near miss owned by moon-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Write a multi-stage Dockerfile that uses `moon docker scaffold` and `moon docker prune` to build our Node service `my-service`, with a final runtime stage based on `gcr.io/distroless/nodejs22-debian12:nonroot`. Make sure the app can actually read its files at runtime.",
+    "rationale": "near miss owned by moon-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "In a Moon 2.0 `.moon/tasks/*.yml` task, I need a build step that runs `mkdir -p bin && go build -o bin/app ./cmd/...` and also sets an OUTPUT_DIR env var that should default to `bin` when it is not already set in the environment. Write the task definition.",
+    "rationale": "near miss owned by moon-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Migrate this moon v1 project config to moon 2.0:\n\n```yaml\ntype: library\nplatform: node\ntasks:\n  dev:\n    command: 'npm run dev'\n    local: true\n```\n\nAlso tell me what MQL field replaces `projectType` when I later query these projects.",
+    "rationale": "near miss owned by moon-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Help me handle task configuration correctly in this Moon task, including the edge cases that usually get missed.",
+    "rationale": "near miss owned by moon-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Help me handle task inheritance correctly in this Moon task, including the edge cases that usually get missed.",
+    "rationale": "near miss owned by moon-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Help me handle tag based filtering correctly in this Moon task, including the edge cases that usually get missed.",
+    "rationale": "near miss owned by moon-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Help me handle query language correctly in this Moon task, including the edge cases that usually get missed.",
+    "rationale": "near miss owned by moon-guide",
+    "should_trigger": false,
+    "split": "validation"
+  }
+]

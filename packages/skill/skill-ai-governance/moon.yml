@@ -9,4 +9,4 @@ tasks:
   skill-validate:
     script: npx moon-skill-validate ai-governance-guide
   skill-audit-sources:
-    script: node ../../../node_modules/@xonovex/script-moon-skill-audit-sources/dist/src/index.js skills/ai-governance-guide
+    script: node ../../../node_modules/@xonovex/script-moon-skill-audit-sources/dist/src/index.js ai-governance-guide

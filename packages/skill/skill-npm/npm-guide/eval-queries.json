@@ -62,13 +62,37 @@
   {
     "query": "bump every dependent package and tag the release version",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "validation negative — owned by versioning-guide"
   },
   {
     "query": "add a new dependency to package.json",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "validation negative — package.json edit, not publishing"
+  },
+  {
+    "query": "Write a shell/Node routine that publishes the npm package described by the current package.json, but only if that exact name@version is not already on the registry (so re-running it in CI is safe). Show the command(s) and the skip logic.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "add proper types to the response shape in src/api/users.ts so the consumer doesn't have to cast",
+    "rationale": "near miss owned by typescript-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "this is throwing 'Cannot find module' on `import { foo } from './bar'` — what's the ESM dance for relative imports",
+    "rationale": "near miss owned by typescript-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "convert this Promise.all-with-side-effects mess to a clean async function in src/jobs/sync.ts",
+    "rationale": "near miss owned by typescript-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

@@ -13,6 +13,8 @@ npx moon-skill-audit-sources <skill-dir> --mark-reviewed
 npx moon-skill-audit-sources <skill-dir> --pull          # fetch tags before the drift check
 ```
 
+Source blocks may use `**URL:**`, an inline or bulleted `**URLs:**` list, or `**Provenance:**` for repository-original material without a truthful upstream URL. Every real source block needs `**Last reviewed:** YYYY-MM-DD`; a guide with no recognized source blocks fails. `--all` audits only `SOURCES.md` files adjacent to a real `SKILL.md`, so templates and assets do not inflate catalog counts.
+
 ## Upstream-drift fields (optional, per source block)
 
 ```

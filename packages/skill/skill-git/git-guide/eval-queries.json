@@ -41,7 +41,6 @@
     "split": "train",
     "rationale": "colloquial ship; relies on commit-and-push"
   },
-
   {
     "query": "i've got a merge conflict in package-lock.json — help me resolve it",
     "should_trigger": false,
@@ -72,11 +71,10 @@
     "split": "train",
     "rationale": "read-only git, not commit-and-push"
   },
-
   {
     "query": "commit what i have so far with a wip message",
     "should_trigger": true,
-    "split": "validation",
+    "split": "train",
     "rationale": "wip commit"
   },
   {
@@ -103,7 +101,6 @@
     "split": "validation",
     "rationale": "colloquial commit + push"
   },
-
   {
     "query": "what's the convention for naming feature branches here",
     "should_trigger": false,

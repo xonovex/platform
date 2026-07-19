@@ -1,6 +1,8 @@
 ---
 name: skill-guide
 description: "Use when authoring, reviewing, extracting, merging, simplifying, decomposing, or validating Agent Skills (SKILL.md plus references / scripts / assets), or when auditing, splitting, de-duplicating, or tiering a whole set of skills. Triggers on edits under a skills directory, on prompts about creating a new skill, progressive disclosure, reference files, pattern extraction, merging or assimilating skills, simplification to bullet format, validation against the Agent Skills spec, description tuning, evaluating trigger rate / output quality, or making a catalog composable (one owner per concept, cross-references, general→language→framework tiers) — even when the user doesn't say 'skill'."
+compatibility: "Node.js 22+ runs catalog maintenance; Python 3.11+ with uv runs legacy validators. Trigger/output evals additionally require a credentialed Claude CLI and network access; source fetch/update options perform explicit network or file writes."
+allowed-tools: "Read Bash(node:*) Bash(uv:*) Bash(claude:*)"
 ---
 
 # Skill Guidelines Management

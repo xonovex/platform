@@ -1,0 +1,98 @@
+[
+  {
+    "query": "Design a PostgreSQL table for meeting-room reservations. Each reservation has a room, a start time, and an end time. The database itself must guarantee that two reservations for the same room can never overlap in time. Write the CREATE TABLE statement.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "We have a products table with tens of millions of rows and an API endpoint that lets users page through them ordered by created_at descending. The current implementation uses LIMIT with a page offset and gets slower on deeper pages. Rewrite the pagination query so it stays fast on any page.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "This query is doing a sequential scan and is slow on a large users table: SELECT * FROM users WHERE lower(email) = 'user@example.com'. There is already a B-tree index on the email column but the planner ignores it. Add an index that makes this query use an index scan.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Set up a PostgreSQL readwrite role for an application in the public schema. The application user must be able to SELECT/INSERT/UPDATE/DELETE on all existing tables, on any tables created later without re-granting, and it must be able to insert into tables that use identity/serial columns. Provide the SQL.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Help me handle cte patterns correctly in this Sql Postgresql task, including the edge cases that usually get missed.",
+    "rationale": "implicit task cue derived from the cte patterns reference",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Help me handle data types correctly in this Sql Postgresql task, including the edge cases that usually get missed.",
+    "rationale": "implicit task cue derived from the data types reference",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Help me handle indexing correctly in this Sql Postgresql task, including the edge cases that usually get missed.",
+    "rationale": "implicit task cue derived from the indexing reference",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Help me handle constraints correctly in this Sql Postgresql task, including the edge cases that usually get missed.",
+    "rationale": "implicit task cue derived from the constraints reference",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Using Zod 4, write a TypeScript schema named UserSchema for a user object with these fields: an id that is a UUID, an email address, a createdAt that is an ISO datetime string, and a name string between 1 and 100 characters. Also export the inferred TypeScript type.",
+    "rationale": "near miss owned by zod-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "In Zod 4, write a schema for an environment variable PORT that arrives as a string, is converted to a number, must be an integer between 1024 and 65535, and falls back to port 3000 when the variable is absent. Show the inferred output type.",
+    "rationale": "near miss owned by zod-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Write an Express-style POST handler in TypeScript that validates an incoming request body against a Zod schema called CreateUserSchema and returns HTTP 400 with the validation errors if the body is invalid, otherwise creates the user. The handler must not throw on invalid input.",
+    "rationale": "near miss owned by zod-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "In Zod 4, define a StatusSchema from an existing native TypeScript enum named Status. Then, given a UserSchema object schema, derive a CreateUserSchema that drops the id field and an UpdateUserSchema that makes all of CreateUserSchema's fields optional.",
+    "rationale": "near miss owned by zod-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Help me handle migration v4 correctly in this Zod task, including the edge cases that usually get missed.",
+    "rationale": "near miss owned by zod-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Help me handle schema organization correctly in this Zod task, including the edge cases that usually get missed.",
+    "rationale": "near miss owned by zod-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Help me handle validation patterns correctly in this Zod task, including the edge cases that usually get missed.",
+    "rationale": "near miss owned by zod-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Review this Zod change for requirements and fix the concrete issues you find.",
+    "rationale": "near miss owned by zod-guide",
+    "should_trigger": false,
+    "split": "validation"
+  }
+]

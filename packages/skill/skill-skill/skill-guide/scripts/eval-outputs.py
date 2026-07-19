@@ -22,8 +22,8 @@ evals.json shape (either a bare array of evals, or {"skill_name", "evals": [...]
     ]
 
 Options (flag overrides env; env keeps the loop/CI ergonomics):
-    --runs N / RUNS=N                  runs per arm per eval (default: 1; >1 measures variance)
-    --concurrency N / CONCURRENCY=N    parallel claude invocations (default: 4)
+    --runs N / RUNS=N                  runs per arm per eval (default: 1; maximum: 3)
+    --concurrency N / CONCURRENCY=N    parallel claude invocations (default/maximum: 2)
     --model M / CLAUDE_MODEL=M         model for the generation runs (haiku/sonnet/opus)
     --judge-model M / JUDGE_MODEL=M    model for grading (default: claude default)
     --disallowed-tools L / DISALLOWED_TOOLS=L
@@ -34,7 +34,11 @@ Options (flag overrides env; env keeps the loop/CI ergonomics):
     --workspace DIR / WORKSPACE=DIR    workspace base dir (default: "<skill>-workspace")
     --eval-cwd DIR / EVAL_CWD=DIR      working dir for generation runs (default: current dir;
                                        must be where the skill resolves — installed plugin / project)
-    --max-budget-usd N / MAX_BUDGET_USD=N  optional hard per-generation spend cap (unset = no cap)
+    --plugin-dir PATH / PLUGIN_DIR=PATH
+                                       target-only local plugin directory
+    --max-budget-usd N / MAX_BUDGET_USD=N  hard per-generation spend cap (default/max: 0.10)
+    --judge-max-budget-usd N / JUDGE_MAX_BUDGET_USD=N
+                                       hard per-judge spend cap (default/max: 0.10)
 
 Method (mirrors SkillsBench / skill-creator 2.0):
     - Each eval runs in two arms, vanilla (Skill disallowed) and skill-augmented,
@@ -67,6 +71,7 @@ import shutil
 import statistics
 import subprocess
 import sys
+import threading
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
@@ -76,6 +81,89 @@ TOKEN_KEYS = (
     "cache_creation_input_tokens",
     "cache_read_input_tokens",
 )
+
+GENERATION_SYSTEM_PROMPT = (
+    "Answer the user request directly. Use the explicitly invoked skill as "
+    "authoritative guidance. Read only files that the skill itself identifies "
+    "as necessary. Keep the final response under 1,000 words."
+)
+JUDGE_SYSTEM_PROMPT = (
+    "Grade only the supplied response against the supplied assertions and "
+    "return exactly the requested JSON."
+)
+MAX_OUTPUT_MODEL_CALLS = 24
+CLAUDE_SKILL_PLUGIN_FIELDS = {
+    "author", "dependencies", "description", "name", "skills", "version",
+}
+CLAUDE_EXECUTABLE_COMPONENTS = (
+    "commands", "agents", "hooks", ".mcp.json", ".lsp.json", "settings.json",
+    ".claude/settings.json",
+)
+
+
+def read_plugin_manifest(directory: Path) -> tuple[str, list[str]]:
+    manifest_path = directory / ".claude-plugin" / "plugin.json"
+    try:
+        value = json.loads(manifest_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as error:
+        raise ValueError(f"invalid Claude plugin manifest: {manifest_path}") from error
+    if not isinstance(value, dict) or not isinstance(value.get("name"), str):
+        raise ValueError(f"Claude plugin manifest has no name: {manifest_path}")
+    unsupported = sorted(set(value) - CLAUDE_SKILL_PLUGIN_FIELDS)
+    if unsupported:
+        raise ValueError(
+            f"Claude eval plugin is not skill-only: {manifest_path} has "
+            f"{unsupported[0]}"
+        )
+    skills = value.get("skills")
+    if not isinstance(skills, list) or not skills or not all(
+        isinstance(skill, str) for skill in skills
+    ):
+        raise ValueError(f"Claude plugin skills are invalid: {manifest_path}")
+    dependencies = value.get("dependencies", [])
+    if not isinstance(dependencies, list) or not all(
+        isinstance(dependency, str) for dependency in dependencies
+    ):
+        raise ValueError(f"Claude plugin dependencies are invalid: {manifest_path}")
+    executable = next(
+        (entry for entry in CLAUDE_EXECUTABLE_COMPONENTS if (directory / entry).exists()),
+        None,
+    )
+    if executable is not None:
+        raise ValueError(
+            f"Claude eval plugin is not skill-only: {directory} contains {executable}"
+        )
+    return value["name"], dependencies
+
+
+def resolve_plugin_directories(target: Path) -> list[Path]:
+    target = target.resolve()
+    directories: dict[str, Path] = {}
+    for directory in target.parent.iterdir():
+        if not (directory / ".claude-plugin" / "plugin.json").is_file():
+            continue
+        name, _ = read_plugin_manifest(directory)
+        directories[name] = directory
+
+    ordered: list[Path] = []
+    visited: set[str] = set()
+
+    def visit(directory: Path) -> None:
+        name, dependencies = read_plugin_manifest(directory)
+        if name in visited:
+            return
+        visited.add(name)
+        for dependency in dependencies:
+            dependency_directory = directories.get(dependency)
+            if dependency_directory is None:
+                raise ValueError(
+                    f"local Claude plugin dependency not found: {name} -> {dependency}"
+                )
+            visit(dependency_directory)
+        ordered.append(directory)
+
+    visit(target)
+    return ordered
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -95,9 +183,9 @@ def build_parser() -> argparse.ArgumentParser:
         help="workspace dir name for this run (default: auto 'iteration-N')",
     )
     p.add_argument("--runs", type=int, default=int(os.environ.get("RUNS", "1")),
-                   help="runs per arm per eval (env RUNS, default 1; >1 measures variance)")
-    p.add_argument("--concurrency", type=int, default=int(os.environ.get("CONCURRENCY", "4")),
-                   help="parallel claude invocations (env CONCURRENCY, default 4)")
+                   help="runs per arm per eval (env RUNS, default 1, maximum 3)")
+    p.add_argument("--concurrency", type=int, default=int(os.environ.get("CONCURRENCY", "2")),
+                   help="parallel claude invocations (env CONCURRENCY, default/maximum 2)")
     p.add_argument("--model", default=os.environ.get("CLAUDE_MODEL", "haiku"),
                    help="model for the generation runs (env CLAUDE_MODEL, default haiku)")
     p.add_argument("--judge-model", default=os.environ.get("JUDGE_MODEL", ""),
@@ -111,10 +199,16 @@ def build_parser() -> argparse.ArgumentParser:
                    help="workspace base dir (env WORKSPACE, default '<skill>-workspace')")
     p.add_argument("--eval-cwd", default=os.environ.get("EVAL_CWD"),
                    help="working dir for generation runs (env EVAL_CWD, default current dir)")
+    p.add_argument("--plugin-dir", default=os.environ.get("PLUGIN_DIR"),
+                   help="target-only local plugin directory (env PLUGIN_DIR)")
     p.add_argument("--max-budget-usd", type=float,
-                   default=(float(os.environ["MAX_BUDGET_USD"]) if os.environ.get("MAX_BUDGET_USD") else None),
-                   help="optional hard per-generation spend cap passed to `claude --max-budget-usd` "
-                        "(env MAX_BUDGET_USD; unset = no cap — output eval needs the task to finish)")
+                   default=float(os.environ.get("MAX_BUDGET_USD", "0.10")),
+                   help="hard per-generation spend cap, maximum 0.10 "
+                        "(env MAX_BUDGET_USD, default 0.10)")
+    p.add_argument("--judge-max-budget-usd", type=float,
+                   default=float(os.environ.get("JUDGE_MAX_BUDGET_USD", "0.10")),
+                   help="hard per-judge spend cap, maximum 0.10 "
+                        "(env JUDGE_MAX_BUDGET_USD, default 0.10)")
     return p
 
 
@@ -144,6 +238,16 @@ def skill_in_obj(obj: dict, target: str, short: str) -> bool:
     return False
 
 
+def skill_available_in_obj(obj: dict, target: str, short: str) -> bool:
+    """True when Claude's init event exposes the target skill."""
+    if obj.get("type") != "system" or obj.get("subtype") != "init":
+        return False
+    skills = obj.get("skills")
+    return isinstance(skills, list) and any(
+        match_skill(skill, target, short) for skill in skills
+    )
+
+
 def sum_tokens(usage: object) -> int:
     if not isinstance(usage, dict):
         return 0
@@ -169,25 +273,116 @@ def extract_json(text: str) -> dict | None:
         return None
 
 
+def stream_text_delta_length(value: object) -> int:
+    if not isinstance(value, dict) or value.get("type") != "stream_event":
+        return 0
+    event = value.get("event")
+    if not isinstance(event, dict) or event.get("type") != "content_block_delta":
+        return 0
+    delta = event.get("delta")
+    if not isinstance(delta, dict) or delta.get("type") != "text_delta":
+        return 0
+    text = delta.get("text")
+    return len(text) if isinstance(text, str) else 0
+
+
+def claude_failure_detail(stdout: str) -> str:
+    for line in reversed(stdout.strip().splitlines()):
+        try:
+            value = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        if not isinstance(value, dict):
+            continue
+        result = value.get("result")
+        subtype = value.get("subtype")
+        detail = result.strip() if isinstance(result, str) else ""
+        kind = subtype.strip() if isinstance(subtype, str) else ""
+        if detail and (value.get("is_error") is True or kind.startswith("error")):
+            return detail[:500]
+        if kind.startswith("error"):
+            return kind[:500]
+    return ""
+
+
+def run_generation_process(
+    command: list[str], timeout: int, cwd: str | None, max_output_chars: int,
+) -> dict:
+    proc = subprocess.Popen(
+        command,
+        stdin=subprocess.DEVNULL,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+        cwd=cwd,
+    )
+    stdout_lines: list[str] = []
+    stderr_chunks: list[str] = []
+    output_limit_exceeded = threading.Event()
+
+    def read_stdout() -> None:
+        output_chars = 0
+        assert proc.stdout is not None
+        for line in proc.stdout:
+            stdout_lines.append(line)
+            try:
+                event = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            output_chars += stream_text_delta_length(event)
+            if output_chars > max_output_chars:
+                output_limit_exceeded.set()
+                proc.kill()
+                break
+
+    def read_stderr() -> None:
+        assert proc.stderr is not None
+        stderr_chunks.append(proc.stderr.read())
+
+    stdout_thread = threading.Thread(target=read_stdout)
+    stderr_thread = threading.Thread(target=read_stderr)
+    stdout_thread.start()
+    stderr_thread.start()
+    timed_out = False
+    try:
+        return_code = proc.wait(timeout=timeout)
+    except subprocess.TimeoutExpired:
+        timed_out = True
+        proc.kill()
+        return_code = proc.wait()
+    stdout_thread.join()
+    stderr_thread.join()
+    return {
+        "returncode": return_code,
+        "stdout": "".join(stdout_lines),
+        "stderr": "".join(stderr_chunks),
+        "timed_out": timed_out,
+        "output_limit_exceeded": output_limit_exceeded.is_set(),
+    }
+
+
 def generate(
-    prompt: str, claude_args: list[str], cwd: str | None, timeout: int, target: str, short: str
+    prompt: str, claude_args: list[str], cwd: str | None, timeout: int,
+    target: str, short: str, expect_skill: bool,
 ) -> dict:
     """Run one generation; return final text, tokens, duration, and trigger flag."""
-    try:
-        proc = subprocess.run(
-            ["claude", *claude_args, prompt],
-            stdin=subprocess.DEVNULL,
-            capture_output=True,
-            text=True,
-            timeout=timeout,
-            cwd=cwd,
-        )
-    except subprocess.TimeoutExpired:
+    proc = run_generation_process(
+        ["claude", *claude_args, prompt], timeout, cwd, 10_000,
+    )
+    if proc["output_limit_exceeded"]:
+        return {"text": "", "total_tokens": 0, "duration_ms": 0,
+                "skill_triggered": False, "error": "output-limit"}
+    if proc["timed_out"]:
         return {"text": "", "total_tokens": 0, "duration_ms": timeout * 1000,
                 "skill_triggered": False, "error": "timeout"}
+    if proc["returncode"] != 0:
+        detail = proc["stderr"].strip() or claude_failure_detail(proc["stdout"])
+        error = f"claude exited {proc['returncode']}{': ' + detail if detail else ''}"
+        return {"text": "", "total_tokens": 0, "duration_ms": 0,
+                "skill_triggered": False, "error": error}
 
-    text, usage, duration, triggered = "", {}, 0, False
-    for line in proc.stdout.splitlines():
+    text, usage, duration, triggered, available = "", {}, 0, False, False
+    for line in proc["stdout"].splitlines():
         line = line.strip()
         if not line:
             continue
@@ -197,18 +392,17 @@ def generate(
             continue
         if not isinstance(obj, dict):
             continue
-        if skill_in_obj(obj, target, short):
-            triggered = True
+        available = available or skill_available_in_obj(obj, target, short)
+        triggered = triggered or skill_in_obj(obj, target, short)
         if obj.get("type") == "result":
             text = obj.get("result", "") or ""
             usage = obj.get("usage") or {}
             duration = obj.get("duration_ms", 0) or 0
-
     return {
         "text": text,
         "total_tokens": sum_tokens(usage),
         "duration_ms": duration,
-        "skill_triggered": triggered,
+        "skill_triggered": expect_skill and (triggered or available),
         "error": None if text else "no-result",
     }
 
@@ -244,12 +438,13 @@ Return ONLY minified JSON, no markdown fences, one object per assertion in order
 
 
 def grade(
-    prompt: str, expected: str, assertions: list[str], response: str, model: str
+    prompt: str, expected: str, assertions: list[str], response: str, model: str,
+    budget: float,
 ) -> dict:
     """Reference-guided, binary LLM-as-judge grading of one response."""
     def all_fail(reason: str) -> dict:
         results = [{"text": a, "passed": False, "evidence": reason} for a in assertions]
-        return summarize(results)
+        return summarize(results, reason)
 
     if not response.strip():
         return all_fail("empty response")
@@ -259,23 +454,59 @@ def grade(
         prompt=prompt, expected=expected or "(none provided)",
         assertions=numbered, response=response,
     )
+    schema = json.dumps({
+        "type": "object",
+        "properties": {
+            "assertion_results": {
+                "type": "array",
+                "minItems": len(assertions),
+                "maxItems": len(assertions),
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "text": {"type": "string"},
+                        "passed": {"type": "boolean"},
+                        "evidence": {"type": "string"},
+                    },
+                    "required": ["text", "passed", "evidence"],
+                    "additionalProperties": False,
+                },
+            },
+        },
+        "required": ["assertion_results"],
+        "additionalProperties": False,
+    }, separators=(",", ":"))
     args = [
         "-p", "--output-format", "json",
-        "--disallowedTools=Bash,Edit,Write,Read,NotebookEdit,WebFetch,"
-        "WebSearch,Glob,Grep,Task,Skill,TodoWrite",
+        "--setting-sources", "", "--strict-mcp-config", "--mcp-config",
+        '{"mcpServers":{}}', "--no-session-persistence", "--no-chrome",
+        "--tools", "", "--max-budget-usd", str(budget), "--max-turns", "1",
+        "--system-prompt", JUDGE_SYSTEM_PROMPT,
+        "--json-schema", schema,
     ]
     if model:
         args.extend(["--model", model])
+    verdict = None
     try:
         proc = subprocess.run(
             ["claude", *args, rubric],
             stdin=subprocess.DEVNULL, capture_output=True, text=True, timeout=300,
         )
+        if proc.returncode != 0:
+            detail = proc.stderr.strip() or claude_failure_detail(proc.stdout)
+            suffix = f": {detail}" if detail else ""
+            return all_fail(
+                f"judge process error: claude exited {proc.returncode}{suffix}"
+            )
         outer = json.loads(proc.stdout)
-        verdict = extract_json(outer.get("result", "") if isinstance(outer, dict) else "")
-    except (subprocess.TimeoutExpired, json.JSONDecodeError):
+        structured = outer.get("structured_output") if isinstance(outer, dict) else None
+        verdict = structured if isinstance(structured, dict) else extract_json(
+            outer.get("result", "") if isinstance(outer, dict) else ""
+        )
+    except subprocess.TimeoutExpired:
+        return all_fail("judge timeout")
+    except json.JSONDecodeError:
         verdict = None
-
     if not verdict or not isinstance(verdict.get("assertion_results"), list):
         return all_fail("unparseable judge output")
 
@@ -284,13 +515,13 @@ def grade(
         item = verdict["assertion_results"][i] if i < len(verdict["assertion_results"]) else {}
         results.append({
             "text": a,
-            "passed": bool(item.get("passed", False)) if isinstance(item, dict) else False,
+            "passed": item.get("passed") is True if isinstance(item, dict) else False,
             "evidence": (item.get("evidence", "") if isinstance(item, dict) else "") or "no evidence",
         })
     return summarize(results)
 
 
-def summarize(results: list[dict]) -> dict:
+def summarize(results: list[dict], error: str | None = None) -> dict:
     passed = sum(1 for r in results if r["passed"])
     total = len(results)
     return {
@@ -299,18 +530,38 @@ def summarize(results: list[dict]) -> dict:
             "passed": passed, "failed": total - passed, "total": total,
             "pass_rate": round(passed / total, 3) if total else 0.0,
         },
+        "error": error,
     }
 
 
 def run_job(eval_obj: dict, arm: str, run_idx: int, ctx: dict) -> dict:
     """Generate + grade one (eval, arm, run); write artifacts; return a record."""
     prompt = ctx["build_prompt"](eval_obj)
+    if arm == "with_skill":
+        prompt = f'/{ctx["target"]} {prompt}'
     args = ctx["with_args"] if arm == "with_skill" else ctx["without_args"]
-    gen = generate(prompt, args, ctx["cwd"], ctx["timeout"], ctx["target"], ctx["short"])
-    graded = grade(
-        eval_obj["prompt"], eval_obj.get("expected_output", ""),
-        eval_obj["assertions"], gen["text"], ctx["judge_model"],
+    gen = generate(
+        prompt, args, ctx["cwd"], ctx["timeout"], ctx["target"], ctx["short"],
+        arm == "with_skill",
     )
+    generation_healthy = gen["error"] is None and (
+        arm != "with_skill" or gen["skill_triggered"]
+    )
+    if generation_healthy:
+        graded = grade(
+            eval_obj["prompt"], eval_obj.get("expected_output", ""),
+            eval_obj["assertions"], gen["text"], ctx["judge_model"],
+            ctx["judge_budget"],
+        )
+    else:
+        graded = summarize([
+            {
+                "text": assertion,
+                "passed": False,
+                "evidence": "not graded because generation evidence is invalid",
+            }
+            for assertion in eval_obj["assertions"]
+        ])
 
     arm_dir = ctx["iter_dir"] / f"eval-{eval_obj['id']}" / arm
     if ctx["runs"] > 1:
@@ -334,6 +585,7 @@ def run_job(eval_obj: dict, arm: str, run_idx: int, ctx: dict) -> dict:
         "pass_rate": graded["summary"]["pass_rate"],
         "tokens": gen["total_tokens"], "duration_ms": gen["duration_ms"],
         "skill_triggered": gen["skill_triggered"],
+        "error": gen["error"] or graded.get("error"),
     }
 
 
@@ -404,14 +656,45 @@ def main(argv: list[str]) -> int:
         return 2
 
     runs = args.runs
-    concurrency = max(1, args.concurrency)
+    concurrency = args.concurrency
     claude_model = args.model
     judge_model = args.judge_model
     disallowed = args.disallowed_tools
     timeout = args.gen_timeout
     cwd = args.eval_cwd or None
     budget = args.max_budget_usd
+    judge_budget = args.judge_max_budget_usd
+    if not 1 <= runs <= 3:
+        sys.stderr.write("Error: --runs must be between 1 and 3\n")
+        return 2
+    if not 1 <= concurrency <= 2:
+        sys.stderr.write("Error: --concurrency must be between 1 and 2\n")
+        return 2
+    if not 0 < budget <= 0.10:
+        sys.stderr.write("Error: --max-budget-usd must be > 0 and <= 0.10\n")
+        return 2
+    if not 0 < judge_budget <= 0.10:
+        sys.stderr.write("Error: --judge-max-budget-usd must be > 0 and <= 0.10\n")
+        return 2
+    model_calls = len(norm) * runs * 4
+    if model_calls > MAX_OUTPUT_MODEL_CALLS:
+        sys.stderr.write(
+            f"Error: output eval would launch {model_calls} model calls; "
+            f"maximum is {MAX_OUTPUT_MODEL_CALLS}. "
+            "Split the eval set into bounded batches.\n"
+        )
+        return 2
     short = skill_name.rsplit(":", 1)[-1]
+
+    plugin_dir = Path(args.plugin_dir) if args.plugin_dir else evals_file.parent.parent
+    if not plugin_dir.is_dir():
+        sys.stderr.write(f"Error: target plugin directory is invalid: {plugin_dir}\n")
+        return 2
+    try:
+        plugin_directories = resolve_plugin_directories(plugin_dir)
+    except ValueError as error:
+        sys.stderr.write(f"Error: {error}\n")
+        return 2
 
     base = Path(args.workspace) if args.workspace else Path(f"{short}-workspace")
     if not iteration:
@@ -420,15 +703,30 @@ def main(argv: list[str]) -> int:
         iteration = f"iteration-{max(existing, default=0) + 1}"
     iter_dir = base / iteration
     iter_dir.mkdir(parents=True, exist_ok=True)
+    benchmark_path = iter_dir / "benchmark.json"
+    invalid_run_path = iter_dir / "invalid-run.json"
+    benchmark_path.unlink(missing_ok=True)
+    invalid_run_path.unlink(missing_ok=True)
 
-    gen_base = ["-p", "--output-format", "stream-json", "--verbose"]
+    gen_base = [
+        "-p", "--output-format", "stream-json", "--verbose",
+        "--include-partial-messages",
+        "--setting-sources", "", "--strict-mcp-config", "--mcp-config",
+        '{"mcpServers":{}}', "--no-session-persistence", "--no-chrome",
+        "--max-turns", "6", "--system-prompt", GENERATION_SYSTEM_PROMPT,
+    ]
     if claude_model:
         gen_base.extend(["--model", claude_model])
-    if budget and budget > 0:
-        gen_base.extend(["--max-budget-usd", str(budget)])
-    with_args = [*gen_base, f"--disallowedTools={disallowed}"] if disallowed else list(gen_base)
+    gen_base.extend(["--max-budget-usd", str(budget)])
+    with_args = [*gen_base, "--tools", "Skill,Read"]
+    if disallowed:
+        with_args.append(f"--disallowedTools={disallowed}")
+    for plugin_directory in plugin_directories:
+        with_args.extend(["--plugin-dir", str(plugin_directory)])
     without_disallowed = ",".join(filter(None, [disallowed, "Skill"]))
-    without_args = [*gen_base, f"--disallowedTools={without_disallowed}"]
+    without_args = [
+        *gen_base, "--tools", "Read", f"--disallowedTools={without_disallowed}"
+    ]
 
     evals_dir = evals_file.parent
 
@@ -445,14 +743,17 @@ def main(argv: list[str]) -> int:
     ctx = {
         "with_args": with_args, "without_args": without_args, "cwd": cwd,
         "timeout": timeout, "target": skill_name, "short": short,
-        "judge_model": judge_model, "iter_dir": iter_dir, "runs": runs,
+        "judge_model": judge_model, "judge_budget": judge_budget,
+        "iter_dir": iter_dir, "runs": runs,
         "build_prompt": build_prompt,
     }
 
     sys.stderr.write(
         f"skill: {skill_name}  evals: {len(norm)}  runs/arm: {runs}  "
         f"concurrency: {concurrency}  workspace: {iter_dir}\n"
-        f"gen model: {claude_model or '<default>'}  judge model: {judge_model or '<default>'}\n---\n"
+        f"gen model: {claude_model or '<default>'}  judge model: {judge_model or '<default>'}\n"
+        f"caps: generation=${budget}/6 turns  judge=${judge_budget}/1 turn  "
+        f"model_calls={model_calls}/{MAX_OUTPUT_MODEL_CALLS}  retries=0\n---\n"
     )
 
     jobs = [(e, arm, r) for e in norm for arm in ("with_skill", "without_skill")
@@ -461,7 +762,34 @@ def main(argv: list[str]) -> int:
     with ThreadPoolExecutor(max_workers=concurrency) as pool:
         futures = [pool.submit(run_job, e, arm, r, ctx) for e, arm, r in jobs]
         for fut in as_completed(futures):
-            records.append(fut.result())
+            record = fut.result()
+            records.append(record)
+            failed = record["error"] or (
+                record["arm"] == "with_skill" and not record["skill_triggered"]
+            )
+            if failed:
+                for pending in futures:
+                    pending.cancel()
+                break
+
+    failures = [
+        {"id": record["id"], "arm": record["arm"],
+         "reason": record["error"] or "target skill did not activate"}
+        for record in records
+        if record["error"] or (
+            record["arm"] == "with_skill" and not record["skill_triggered"]
+        )
+    ]
+    if failures:
+        invalid_run_path.write_text(json.dumps({
+            "skill": skill_name, "iteration": iteration,
+            "status": "invalid", "failures": failures,
+        }, indent=2), encoding="utf-8")
+        sys.stderr.write(
+            f"invalid benchmark evidence: {len(failures)} infrastructure failure(s)\n"
+            f"diagnostic: {invalid_run_path}\n"
+        )
+        return 2
 
     # Per-eval stdout lines.
     for e in norm:
@@ -497,7 +825,7 @@ def main(argv: list[str]) -> int:
             },
         },
     }
-    (iter_dir / "benchmark.json").write_text(json.dumps(benchmark, indent=2), encoding="utf-8")
+    benchmark_path.write_text(json.dumps(benchmark, indent=2), encoding="utf-8")
 
     delta = benchmark["run_summary"]["delta"]
     sys.stderr.write(
@@ -507,7 +835,7 @@ def main(argv: list[str]) -> int:
         f"without_skill pass_rate: {without_block['pass_rate']['mean']}  "
         f"tokens: {without_block['tokens']['mean']}\n"
         f"delta pass_rate: {delta['pass_rate']}  tokens: {delta['tokens']}\n"
-        f"benchmark: {iter_dir / 'benchmark.json'}\n"
+        f"benchmark: {benchmark_path}\n"
     )
     return 0 if delta["pass_rate"] > 0 else 1
 

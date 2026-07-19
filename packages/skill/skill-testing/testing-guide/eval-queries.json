@@ -26,13 +26,13 @@
   {
     "query": "my fixture setup is a mess of canned objects — should I use a Test Data Builder or an Object Mother?",
     "should_trigger": true,
-    "split": "validation",
+    "split": "train",
     "rationale": "fixture-creation patterns owned here"
   },
   {
     "query": "name this test and split it — it verifies five things at once",
     "should_trigger": true,
-    "split": "train",
+    "split": "validation",
     "rationale": "test naming plus the Eager Test smell, both owned here"
   },
   {
@@ -62,7 +62,7 @@
   {
     "query": "what kind of coupling does this over-mocked test reveal and how do I reduce it?",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "near-miss: the coupling diagnosis/vocabulary is owned by connascence-guide; testing only flags the symptom"
   },
   {
@@ -74,13 +74,25 @@
   {
     "query": "audit this module for dead code and missing input validation, read-only",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "near-miss: read-only smell audit is owned by code-quality-guide"
   },
   {
     "query": "should I grow this design with classical or mockist TDD as my development style?",
     "should_trigger": false,
-    "split": "train",
+    "split": "validation",
     "rationale": "near-miss: classical-vs-mockist as a development/design style is owned by tdd-guide"
+  },
+  {
+    "query": "track a screen view when this ViewModel loads",
+    "rationale": "near miss owned by android-analytics-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "where should the analytics call go — in the composable or the view model?",
+    "rationale": "near miss owned by android-analytics-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

@@ -1,0 +1,123 @@
+name: Skill model evals
+
+on:
+  schedule:
+    - cron: "17 3 1 * *"
+  workflow_dispatch:
+
+concurrency:
+  group: skill-model-evals
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  output-eval:
+    name: ${{ matrix.package }} output eval
+    if: github.event_name == 'workflow_dispatch' || vars.SKILL_EVALS_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        include:
+          - package: accessibility
+            guide: accessibility-guide
+          - package: agent-governance
+            guide: agent-governance-guide
+          - package: ai-governance
+            guide: ai-governance-guide
+          - package: atlassian
+            guide: atlassian-guide
+          - package: aws
+            guide: aws-guide
+          - package: azure-devops
+            guide: azure-devops-guide
+          - package: bitbucket
+            guide: bitbucket-guide
+          - package: bitrise
+            guide: bitrise-guide
+          - package: claude-code
+            guide: code-harness-guide
+          - package: codex
+            guide: codex-guide
+          - package: copilot
+            guide: copilot-guide
+          - package: datadog
+            guide: datadog-guide
+          - package: figma
+            guide: figma-guide
+          - package: kiro
+            guide: kiro-guide
+          - package: opencode
+            guide: opencode-guide
+          - package: pi
+            guide: pi-guide
+          - package: reliability
+            guide: reliability-guide
+          - package: security-assurance
+            guide: security-assurance-guide
+          - package: workflow
+            guide: workflow-guide
+
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - uses: ./.github/actions/setup-nix
+        with:
+          cache-workspace: true
+
+      - name: Require model-eval credential
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: test -n "$ANTHROPIC_API_KEY"
+
+      - name: Install repository dependencies
+        run: nix develop --command npm ci
+
+      - name: Install pinned Claude Code evaluator
+        run: nix develop --command npm install --no-save @anthropic-ai/claude-code@2.1.211
+
+      - name: Build output evaluator
+        run: nix develop --command npx moon run script-moon-skill-eval-outputs:install
+
+      - name: Prepare bounded eval batch
+        env:
+          EVAL_BATCH: packages/skill/skill-${{ matrix.package }}/${{ matrix.guide }}/.bounded-evals.json
+          EVAL_SOURCE: packages/skill/skill-${{ matrix.package }}/${{ matrix.guide }}/evals.json
+        run: >-
+          jq
+          'if type == "array" then .[:6] else .evals = .evals[:6] end'
+          "$EVAL_SOURCE"
+          > "$EVAL_BATCH"
+
+      - name: Run local-plugin A/B
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: >-
+          nix develop --command npx moon-skill-eval-outputs
+          packages/skill/skill-${{ matrix.package }}/${{ matrix.guide }}/.bounded-evals.json
+          xonovex-skill-${{ matrix.package }}:${{ matrix.guide }}
+          iteration-1
+          --runs 1
+          --concurrency 2
+          --model haiku
+          --judge-model sonnet
+          --max-budget-usd 0.10
+          --judge-max-budget-usd 0.10
+          --plugin-dir packages/skill/skill-${{ matrix.package }}
+          --eval-cwd ${{ github.workspace }}
+          --workspace .skill-eval-results/${{ matrix.package }}
+
+      - name: Upload benchmark evidence
+        if: success() || failure()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: skill-eval-${{ matrix.package }}
+          path: .skill-eval-results/${{ matrix.package }}/iteration-1
+          if-no-files-found: warn
+          retention-days: 30

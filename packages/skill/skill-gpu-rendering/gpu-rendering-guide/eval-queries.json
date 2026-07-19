@@ -68,43 +68,43 @@
   {
     "query": "how do I architect uploads of static GPU-resident data versus dynamic per-frame data — staging into a device-local tier for one, a persistent-mapped ring for the other",
     "should_trigger": true,
-    "split": "validation",
+    "split": "train",
     "rationale": "validation positive: gpu-memory-strategy tiers + staging + ring buffer, API-neutral"
   },
   {
     "query": "I want to record draw calls from several worker threads at once and then submit them in order — how should I structure per-thread per-frame recording contexts",
     "should_trigger": true,
-    "split": "validation",
+    "split": "train",
     "rationale": "validation positive: per-thread contexts, primary/secondary, multi-threaded recording, conceptual"
   },
   {
     "query": "explain the model for replacing a pile of binary cross-queue waits between graphics and async-compute with a single monotonic timeline value we can also wait on from the CPU",
     "should_trigger": true,
-    "split": "validation",
+    "split": "train",
     "rationale": "validation positive: timeline value generalizing cross-queue waits + CPU waits, concept"
   },
   {
     "query": "walk me through the concrete vkCreateSwapchainKHR + vkAcquireNextImageKHR + vkQueuePresentKHR calls and the VkFence per frame for my Vulkan loop",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "validation negative: concrete Vulkan swapchain how-to -> gpu-rendering-vulkan-guide"
   },
   {
     "query": "I want my vertex shader to read positions straight out of a big storage buffer instead of binding a vertex layout, so I can support quantized formats and morph targets from one shader",
     "should_trigger": true,
-    "split": "train",
+    "split": "validation",
     "rationale": "vertex-assembly-skinning: programmable vertex pull behind a loader, custom packing, morph targets"
   },
   {
     "query": "our characters animate but the bone count per vertex varies a lot and a fixed 4-bone vertex format wastes memory — how should I store skin influences and do the blend on the GPU",
     "should_trigger": true,
-    "split": "train",
+    "split": "validation",
     "rationale": "vertex-assembly-skinning: indirected influence list (count+offset), in-shader linear blend skinning"
   },
   {
     "query": "we have a million particles and uploading them every frame and reading results back is killing us — I want the whole simulation to live on the GPU and drive its own draw count",
     "should_trigger": true,
-    "split": "train",
+    "split": "validation",
     "rationale": "gpu-compute-simulation: GPU-resident state, compute update, indirect draw from GPU-tracked count"
   },
   {
@@ -116,7 +116,7 @@
   {
     "query": "I'm adding HDR10 output — which swapchain color space and format do I pick, and where do I apply the Rec.2020 conversion and PQ curve relative to tone mapping and UI?",
     "should_trigger": true,
-    "split": "train",
+    "split": "validation",
     "rationale": "hdr-output: PQ/Rec.2020 swapchain, linear pipeline, own final color-space + transfer encode"
   },
   {
@@ -130,5 +130,23 @@
     "should_trigger": false,
     "split": "train",
     "rationale": "near-miss: CPU-only data layout -> data-oriented-design-guide, not GPU simulation"
+  },
+  {
+    "query": "give me the exact VkImageMemoryBarrier2 with srcStageMask/srcAccessMask and dstStageMask/dstAccessMask plus the oldLayout/newLayout for reading a color attachment as a sampled texture, and the vkCmdPipelineBarrier2 call",
+    "rationale": "near miss owned by gpu-rendering-vulkan-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "we're calling vkAllocateMemory once per VkImage and hit maxMemoryAllocationCount on big levels — how do I pick memory types from VkPhysicalDeviceMemoryProperties and sub-allocate from a few large VkDeviceMemory blocks honoring VkMemoryRequirements alignment",
+    "rationale": "near miss owned by gpu-rendering-vulkan-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "I want one giant sampler2D array the shader indexes by an integer — how do I set up VkDescriptorSetLayout with update-after-bind and descriptor indexing and use nonuniformEXT",
+    "rationale": "near miss owned by gpu-rendering-vulkan-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

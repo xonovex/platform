@@ -26,7 +26,7 @@
   {
     "query": "prepare incident evidence, containment, recovery, and corrective-action verification",
     "should_trigger": true,
-    "split": "validation",
+    "split": "train",
     "rationale": "security operations"
   },
   {
@@ -56,19 +56,43 @@
   {
     "query": "write a Kubernetes NetworkPolicy manifest",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "near miss: Kubernetes implementation"
   },
   {
     "query": "review this TypeScript function for readability",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "near miss: code quality"
   },
   {
     "query": "set an SLO for an API",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "near miss: reliability owner"
+  },
+  {
+    "query": "Create security release assurance for artifact sha256:abc using NIST 800-53, SLSA, and Sigstore. A signed artifact should pass automatically.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "assess this exact web release against WCAG 2.2 AA and publish reviewable evidence",
+    "rationale": "near miss owned by accessibility-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "decide which WCAG criteria apply to our authenticated dashboard and document the gaps",
+    "rationale": "near miss owned by accessibility-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "combine automated accessibility scans with keyboard and screen-reader testing",
+    "rationale": "near miss owned by accessibility-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

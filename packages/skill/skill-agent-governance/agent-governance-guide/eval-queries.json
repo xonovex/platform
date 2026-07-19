@@ -14,7 +14,7 @@
   {
     "query": "preview governance module onboarding and show rollback before applying anything",
     "should_trigger": true,
-    "split": "validation",
+    "split": "train",
     "rationale": "transactional advisory onboarding"
   },
   {
@@ -26,13 +26,13 @@
   {
     "query": "define fail-closed cached OPA decisions with historical policy-version evidence",
     "should_trigger": true,
-    "split": "validation",
+    "split": "train",
     "rationale": "optional policy decision service and outage behavior"
   },
   {
     "query": "adopt governance-only CI and Kubernetes admission controls without installing harness or lifecycle modules",
     "should_trigger": true,
-    "split": "train",
+    "split": "validation",
     "rationale": "governance-only external enforcement onboarding"
   },
   {
@@ -50,13 +50,49 @@
   {
     "query": "write a unit test using Arrange-Act-Assert",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "near-miss owned by testing-guide"
   },
   {
     "query": "configure a GitHub ruleset and reusable workflow with exact API fields",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "near-miss: provider-specific mechanics belong to github-guide after GitHub is selected"
+  },
+  {
+    "query": "A mandatory profile selects an experimental prompt hook on a harness where the tested adapter says the handler is parsed but not executed. Validate the composition.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "map a mandatory protected-path control to Claude Code and tell me whether it can actually block",
+    "rationale": "near miss owned by code-harness-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "preview onboarding a project-provided Claude Code executable module without applying it",
+    "rationale": "near miss owned by code-harness-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "what version and trust probes should I run before relying on this Claude Code hook or extension?",
+    "rationale": "near miss owned by code-harness-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "A mandatory profile selects a Claude Code pre-operation handler. Validate whether the installed surface can enforce it.",
+    "rationale": "near miss owned by code-harness-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Advise onboarding a repository-provided Claude Code hook, plugin, extension, or package. Do not mutate yet.",
+    "rationale": "near miss owned by code-harness-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

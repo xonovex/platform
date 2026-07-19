@@ -1,0 +1,98 @@
+[
+  {
+    "query": "We're on moonrepo 2.0. I want to enable and configure one of Moon's built-in extensions in our workspace. Which config file does the extension configuration go in, and show me a minimal example of the config block.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Write a multi-stage Dockerfile that uses `moon docker scaffold` and `moon docker prune` to build our Node service `my-service`, with a final runtime stage based on `gcr.io/distroless/nodejs22-debian12:nonroot`. Make sure the app can actually read its files at runtime.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "In a Moon 2.0 `.moon/tasks/*.yml` task, I need a build step that runs `mkdir -p bin && go build -o bin/app ./cmd/...` and also sets an OUTPUT_DIR env var that should default to `bin` when it is not already set in the environment. Write the task definition.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Migrate this moon v1 project config to moon 2.0:\n\n```yaml\ntype: library\nplatform: node\ntasks:\n  dev:\n    command: 'npm run dev'\n    local: true\n```\n\nAlso tell me what MQL field replaces `projectType` when I later query these projects.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Help me handle task configuration correctly in this Moon task, including the edge cases that usually get missed.",
+    "rationale": "implicit task cue derived from the task configuration reference",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Help me handle task inheritance correctly in this Moon task, including the edge cases that usually get missed.",
+    "rationale": "implicit task cue derived from the task inheritance reference",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Help me handle tag based filtering correctly in this Moon task, including the edge cases that usually get missed.",
+    "rationale": "implicit task cue derived from the tag based filtering reference",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Help me handle query language correctly in this Moon task, including the edge cases that usually get missed.",
+    "rationale": "implicit task cue derived from the query language reference",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "I have a Hono app configured with `app.use('*', cors())`. Write a Vitest test that verifies the CORS preflight (OPTIONS) request to `/api/users` with an Origin header succeeds and that the Access-Control-Allow-Origin header is returned.",
+    "rationale": "near miss owned by vitest-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Write a Vitest test for an async updateUser(id) function. The test should create a record, update it, and verify that the record's updatedAt timestamp is strictly newer than the original createdAt.",
+    "rationale": "near miss owned by vitest-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "In a Vitest test file I have `import { db } from '../src/db'` and I want to mock the entire '../src/db' module so its exported `query` function returns a fixed row object. Show the mock setup.",
+    "rationale": "near miss owned by vitest-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Write a Vitest mock for an async `getUser(id)` dependency that resolves to `{ id: '123', email: 'test@example.com' }`, then call it and assert it was invoked with '123'.",
+    "rationale": "near miss owned by vitest-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Help me handle type safety correctly in this Vitest task, including the edge cases that usually get missed.",
+    "rationale": "near miss owned by vitest-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Help me handle http testing correctly in this Vitest task, including the edge cases that usually get missed.",
+    "rationale": "near miss owned by vitest-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Help me handle timestamp testing correctly in this Vitest task, including the edge cases that usually get missed.",
+    "rationale": "near miss owned by vitest-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Help me handle typescript config correctly in this Vitest task, including the edge cases that usually get missed.",
+    "rationale": "near miss owned by vitest-guide",
+    "should_trigger": false,
+    "split": "validation"
+  }
+]

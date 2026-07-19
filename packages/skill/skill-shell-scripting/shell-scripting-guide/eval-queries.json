@@ -1,0 +1,98 @@
+[
+  {
+    "query": "Write a portable shell script that must run under dash and busybox sh, not just bash. It should verify that jq is installed, take a filename as its first argument, and abort early on any error or unset variable.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Write a shell script that ensures the line `export PATH=\"$PATH:/opt/tool/bin\"` is present in the user's ~/.profile, and regenerates a config file at /etc/app/config from a template. A provisioning system runs it repeatedly, so re-running must not duplicate the line and must not corrupt the config if the script is interrupted mid-write.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Write a shell script that reads a list of file paths from an input file, one path per line where paths may contain spaces, tabs, or backslashes, and processes each path. It also needs a temporary working directory that is always removed, even if the script exits early or is interrupted.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Write a bash script with a helper for fatal errors and meaningful exit statuses. It requires the docker command to be present and takes exactly one argument, an image name. A caller should be able to distinguish a usage error from a missing-command error purely by the script's exit code.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Help me handle posix compatibility correctly in this Shell Scripting task, including the edge cases that usually get missed.",
+    "rationale": "implicit task cue derived from the posix compatibility reference",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Help me handle strict mode correctly in this Shell Scripting task, including the edge cases that usually get missed.",
+    "rationale": "implicit task cue derived from the strict mode reference",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Help me handle quoting correctly in this Shell Scripting task, including the edge cases that usually get missed.",
+    "rationale": "implicit task cue derived from the quoting reference",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Help me handle functions correctly in this Shell Scripting task, including the edge cases that usually get missed.",
+    "rationale": "implicit task cue derived from the functions reference",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "add proper types to the response shape in src/api/users.ts so the consumer doesn't have to cast",
+    "rationale": "near miss owned by typescript-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "this is throwing 'Cannot find module' on `import { foo } from './bar'` — what's the ESM dance for relative imports",
+    "rationale": "near miss owned by typescript-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "convert this Promise.all-with-side-effects mess to a clean async function in src/jobs/sync.ts",
+    "rationale": "near miss owned by typescript-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "drop the barrel export in shared/index.ts and import directly from each module",
+    "rationale": "near miss owned by typescript-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "tighten this `any` in src/utils/parseDate.ts to something usable",
+    "rationale": "near miss owned by typescript-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "make PORT a typed env var with a default of 3000 instead of the loose process.env.PORT we have now",
+    "rationale": "near miss owned by typescript-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "fix the inferred return type on this generic helper — it widens to `unknown` and the callers all have to assert",
+    "rationale": "near miss owned by typescript-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "the strict-mode flag is off in this package's tsconfig — turn it on and fix what falls out",
+    "rationale": "near miss owned by typescript-guide",
+    "should_trigger": false,
+    "split": "validation"
+  }
+]

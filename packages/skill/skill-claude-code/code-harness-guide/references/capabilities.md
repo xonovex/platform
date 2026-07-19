@@ -11,7 +11,7 @@
 | Evidence status        | `PreToolUse` command registration runtime-verified             |
 | Refresh trigger        | Product update, hook schema change, handler change, or 90 days |
 
-The project-scoped `Edit|Write` `PreToolUse` command hook was registered in a real `2.1.211` session on `2026-07-19`. The harness blocked `secrets/probe.key`, allowed `src/probe.txt`, and the shared decision service recorded both verdicts plus the paired minimized enforcement telemetry. Only that row is runtime-verified; every other hook-level row remains documentation-verified. Re-run `scripts/refresh-pre-tool-use-probe.sh` whenever the installed version or hook contract changes.
+The project-scoped `Edit|Write` `PreToolUse` command hook was registered in a real `2.1.211` session on `2026-07-19`. The harness blocked `secrets/probe.key`, allowed `src/probe.txt`, and the shared decision service recorded both verdicts plus the paired minimized enforcement telemetry. Only that row is runtime-verified; every other hook-level row remains documentation-verified. After reviewing the probe's network and bypass-permissions behavior, re-run `scripts/refresh-pre-tool-use-probe.sh --confirm-dangerous-probe` whenever the installed version or hook contract changes.
 
 ## Native handlers and configuration
 

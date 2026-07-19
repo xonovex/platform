@@ -41,7 +41,6 @@
     "split": "train",
     "rationale": "embedded layout audit, doesn't say 'C'"
   },
-
   {
     "query": "I'm writing a Defold game in C — physics/collision needs vectors and quaternions",
     "should_trigger": false,
@@ -72,29 +71,28 @@
     "split": "train",
     "rationale": "near-miss: game engine, should match c99-game-opinionated-guide"
   },
-
   {
     "query": "add bounds-checked variants to the matrix ops in src/dsp/",
     "should_trigger": true,
-    "split": "validation",
+    "split": "train",
     "rationale": "systems DSP"
   },
   {
     "query": "make our pixel buffer struct hot-friendly — split the metadata fields out",
     "should_trigger": true,
-    "split": "validation",
+    "split": "train",
     "rationale": "DOD intent without naming it"
   },
   {
     "query": "the embedded build complains about VLAs — can you switch the parser to fixed-size?",
     "should_trigger": true,
-    "split": "validation",
+    "split": "train",
     "rationale": "embedded constraint"
   },
   {
     "query": "I'm porting our DSP routines to a STM32 — what's our convention for buffer ownership?",
     "should_trigger": true,
-    "split": "validation",
+    "split": "train",
     "rationale": "caller-owns-memory in embedded port"
   },
   {
@@ -103,7 +101,6 @@
     "split": "validation",
     "rationale": "strict file naming, generic phrasing"
   },
-
   {
     "query": "show me how to write a basic linked list in C99 for my CS homework",
     "should_trigger": false,
@@ -125,13 +122,13 @@
   {
     "query": "editing one header in our C engine triggers a near-full rebuild and compiles are crawling — how should I restructure headers and includes to fix incremental build times?",
     "should_trigger": true,
-    "split": "train",
+    "split": "validation",
     "rationale": "physical-design: no header-includes-header rule, one header per system, opaque handles, acyclic deps"
   },
   {
     "query": "I want my C engine to be a set of DLLs that register capabilities and discover each other at runtime by name instead of linking against each other — how do I structure the interfaces?",
     "should_trigger": true,
-    "split": "train",
+    "split": "validation",
     "rationale": "plugin-architecture: string-keyed registry of plain-C function-pointer interfaces, runtime discovery"
   },
   {
@@ -143,7 +140,7 @@
   {
     "query": "our entity structs in sim/ store node_t* pointers to each other and it breaks when the pool array grows — and we can't serialize the graph. how should we reference between them?",
     "should_trigger": true,
-    "split": "train",
+    "split": "validation",
     "rationale": "handles-and-indices: index/generational-handle references over raw pointers for relocatable, serializable structures"
   },
   {

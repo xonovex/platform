@@ -26,7 +26,7 @@
   {
     "query": "onboard Datadog AWS integration with least privilege and keep CloudTrail as authority",
     "should_trigger": true,
-    "split": "validation",
+    "split": "train",
     "rationale": "AWS integration boundary"
   },
   {
@@ -56,19 +56,43 @@
   {
     "query": "write a platform-neutral telemetry provider interface",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "near miss: governance owner"
   },
   {
     "query": "debug application business logic from a stack trace",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "near miss: application debugging"
   },
   {
     "query": "choose a PostgreSQL query monitoring index",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "near miss: database tuning"
+  },
+  {
+    "query": "Onboard Datadog for Bitrise mobile CI, AWS deployments, and DORA. We need exact evidence links but Datadog must not become our source of truth.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "create a least-privilege AWS role for CI OIDC without IAM user access keys",
+    "rationale": "near miss owned by aws-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "explain why this AWS SCP does not grant the deployment permission",
+    "rationale": "near miss owned by aws-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "preview a progressive SCP rollout across test and production OUs with break-glass",
+    "rationale": "near miss owned by aws-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

@@ -1,0 +1,98 @@
+[
+  {
+    "query": "Using vanilla Three.js, set up a WebGLRenderer and a render loop that spins a cube smoothly. It must keep a consistent rotation speed regardless of frame rate and stay crisp on high-DPI / retina displays. Give me the renderer setup and the loop.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Write a Three.js setup that renders with WebGPU and gives a mesh a material whose color animates over time. It should target modern browsers and use Three's cross-renderer shader approach rather than raw GLSL.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "I'm applying an albedo/base-color texture and a normal map to a MeshStandardMaterial. Colors look washed out and the lighting is off. Show me how to load and configure both textures correctly for color-accurate PBR.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "I have a THREE.Points cloud of about 50,000 particles built from a BufferGeometry with positions I set manually. When I orbit the camera, the entire point cloud sometimes vanishes even though points are clearly within view. What's causing this and how do I fix it?",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Help me handle scene fundamentals correctly in this Threejs task, including the edge cases that usually get missed.",
+    "rationale": "implicit task cue derived from the scene fundamentals reference",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Help me handle textures correctly in this Threejs task, including the edge cases that usually get missed.",
+    "rationale": "implicit task cue derived from the textures reference",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Help me handle lighting shadows correctly in this Threejs task, including the edge cases that usually get missed.",
+    "rationale": "implicit task cue derived from the lighting shadows reference",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Help me handle geometry correctly in this Threejs task, including the edge cases that usually get missed.",
+    "rationale": "implicit task cue derived from the geometry reference",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "In a Hono API running on Node with @hono/node-server, add a WebSocket endpoint at /ws/chat that echoes each incoming message back to the sender. Show both the server bootstrap code and the route definition.",
+    "rationale": "near miss owned by hono-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Write a reusable helper for our Hono API that turns a Zod validation failure into a standardized structured JSON error response for a 400. Show the exact response body shape it produces.",
+    "rationale": "near miss owned by hono-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Our Hono app must read a DATABASE_URL environment variable inside a route handler, and the same code has to run correctly whether deployed on Node or on Cloudflare Workers. Write the handler.",
+    "rationale": "near miss owned by hono-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "In a Hono handler, set a secure session cookie that JavaScript cannot read, is only transmitted over HTTPS, and uses the __Host- name prefix. Write the cookie-setting code.",
+    "rationale": "near miss owned by hono-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Help me handle application structure correctly in this Hono task, including the edge cases that usually get missed.",
+    "rationale": "near miss owned by hono-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Help me handle validation type safety correctly in this Hono task, including the edge cases that usually get missed.",
+    "rationale": "near miss owned by hono-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Help me handle middleware patterns correctly in this Hono task, including the edge cases that usually get missed.",
+    "rationale": "near miss owned by hono-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Help me handle middleware combine correctly in this Hono task, including the edge cases that usually get missed.",
+    "rationale": "near miss owned by hono-guide",
+    "should_trigger": false,
+    "split": "validation"
+  }
+]

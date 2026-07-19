@@ -26,7 +26,7 @@
   {
     "query": "which of our dependencies are unused or redundant — report only, no removals",
     "should_trigger": true,
-    "split": "validation",
+    "split": "train",
     "rationale": "simplify: unused dependencies, read-only"
   },
   {
@@ -44,7 +44,55 @@
   {
     "query": "go ahead and apply all the simplifications you found and run the tests",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "near-miss: implementing the changes, not a read-only audit"
+  },
+  {
+    "query": "Here is part of a Node/Express service. Of the quality problems in it, which should I address first, and why?\n\n```ts\nfunction buildInvoiceLines(rows: Row[]): string {\n  let out = '';\n  for (const r of rows) {\n    for (const item of r.items) {\n      if (item.qty > 0) {\n        if (item.discount) {\n          out += `${item.name}: ${item.qty} @ ${item.price} (-${item.discount})\\n`;\n        } else {\n          out += `${item.name}: ${item.qty} @ ${item.price}\\n`;\n        }\n      }\n    }\n  }\n  // ...roughly 45 lines total, pure string assembly, no I/O\n  return out;\n}\n\napp.post('/orders', (req, res) => {\n  const qty = req.body.quantity;\n  const total = qty * req.body.price;\n  db.insertOrder({ customerId: req.body.customerId, total });\n  res.json({ total });\n});\n```",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "This config loader is riddled with `any` and my linter flags it in about 20 spots. How should I characterize the type-safety problem and what is the right fix?\n\n```ts\nconst data: any = JSON.parse(await readFile(configPath, 'utf8'));\nconst host = data.server.host;\nconst port: any = data.server.port;\nconst retries = data.server.retries;\nconst endpoints: any[] = data.endpoints;\nconst timeout = data.limits.timeout;\n// ...~15 more reads of fields off `data`, each typed any\n```",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Do a read-only audit of the error handling in this file and tell me which catches are genuinely a problem worth fixing.\n\n```ts\ntry {\n  await refreshCache(key);\n} catch (err) {\n  // cache refresh is best-effort; a miss is fine and we recompute later\n}\n\nasync function loadUser(id: string) {\n  try {\n    return await db.getUser(id);\n  } catch (err) {\n    return null;\n  }\n}\n```",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "I have a Terraform config that creates private subnets, one per availability zone, from a variable list of AZs. Right now removing a single AZ from the middle of the list forces Terraform to recreate several unrelated subnets. Write the resource and any supporting locals so this stops happening.",
+    "rationale": "near miss owned by terraform-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Set up the remote state backend for our production environment's Terraform root module. We're on AWS. Show the backend configuration and explain the key decisions.",
+    "rationale": "near miss owned by terraform-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Someone changed our infrastructure manually in the cloud console. I want to see what has drifted from our Terraform state before I decide whether to reconcile it. What command should I run and why?",
+    "rationale": "near miss owned by terraform-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Add a Terraform variable named database_config that is a structured object with instance_class (string), engine_version (string), and a backup_retention number that callers may omit and should default to 7. We're on Terraform 1.12.",
+    "rationale": "near miss owned by terraform-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Help me handle module structure correctly in this Terraform task, including the edge cases that usually get missed.",
+    "rationale": "near miss owned by terraform-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

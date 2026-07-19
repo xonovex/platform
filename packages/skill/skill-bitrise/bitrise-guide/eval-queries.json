@@ -26,19 +26,19 @@
   {
     "query": "why are the same commit and workflow launched twice by our Bitrise trigger map",
     "should_trigger": true,
-    "split": "validation",
+    "split": "train",
     "rationale": "trigger duplicates"
   },
   {
     "query": "audit a self-hosted Bitrise runner for cache, network, and credential isolation",
     "should_trigger": true,
-    "split": "validation",
+    "split": "train",
     "rationale": "runner trust boundary"
   },
   {
     "query": "roll back Bitrise workflow, secrets, webhook, and AWS trust drift",
     "should_trigger": true,
-    "split": "validation",
+    "split": "train",
     "rationale": "transactional operations"
   },
   {
@@ -56,19 +56,19 @@
   {
     "query": "create a generic CI workflow contract",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "near miss: platform-neutral workflow"
   },
   {
     "query": "publish DORA metrics to Datadog",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "near miss: Datadog owner"
   },
   {
     "query": "choose iOS signing settings in Xcode",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "near miss: mobile build tooling"
   },
   {
@@ -80,7 +80,7 @@
   {
     "query": "is this a flaky emulator (device offline) or a real test failure?",
     "should_trigger": true,
-    "split": "train",
+    "split": "validation",
     "rationale": "triage infra flakiness vs a real failure from the log"
   },
   {
@@ -92,7 +92,7 @@
   {
     "query": "which Bitrise build corresponds to commit <commit-sha> and did it pass?",
     "should_trigger": true,
-    "split": "train",
+    "split": "validation",
     "rationale": "map a commit to its Bitrise build via the git host build-status"
   },
   {
@@ -100,5 +100,23 @@
     "should_trigger": true,
     "split": "validation",
     "rationale": "Bitrise API account-wide personal access token auth and storage"
+  },
+  {
+    "query": "require a Bitbucket Cloud pipeline status before merge and prove a spoofed status cannot satisfy it",
+    "rationale": "near miss owned by bitbucket-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "use a shared Bitbucket Pipelines configuration across our mobile repositories",
+    "rationale": "near miss owned by bitbucket-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "configure Bitbucket Pipelines OIDC for a least-privilege AWS role without access keys",
+    "rationale": "near miss owned by bitbucket-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

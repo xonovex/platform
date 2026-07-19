@@ -56,19 +56,19 @@
   {
     "query": "my translate gizmo jumps to the cursor on the first frame of the drag and our math divides by something that's basically zero when the handle points toward the camera",
     "should_trigger": true,
-    "split": "train",
+    "split": "validation",
     "rationale": "gizmo-math: apply the delta from a stored start parameter and guard near-parallel/degenerate denominators with an epsilon"
   },
   {
     "query": "our transform handles become tiny and unclickable when the camera pulls back — how do I keep them a constant size on screen",
     "should_trigger": true,
-    "split": "train",
+    "split": "validation",
     "rationale": "gizmo-math: scale handle geometry by camera distance for constant on-screen pixel size"
   },
   {
     "query": "where should the boundary sit between editor code and the renderer for things like the grid and selection overlays so editor code never touches command buffers",
     "should_trigger": true,
-    "split": "train",
+    "split": "validation",
     "rationale": "render-editor-integration: thin POD data seam, viewport layer owns pipeline details, composite after post in sRGB"
   },
   {
@@ -86,7 +86,7 @@
   {
     "query": "model the component/entity data so each renderable stores its transform and the system iterates them cache-friendly",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "near-miss: generic component/data model layout -> ecs-guide / data-model-guide, not the viewport gizmo interface"
   },
   {
@@ -104,7 +104,31 @@
   {
     "query": "show me the exact VkImageMemoryBarrier2 and vkCmdPipelineBarrier2 for transitioning my id render target from color-attachment to a sampled read",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "validation negative: concrete Vulkan barrier how-to -> gpu-rendering-vulkan-guide, not the viewport seam"
+  },
+  {
+    "query": "Using vanilla Three.js, set up a WebGLRenderer and a render loop that spins a cube smoothly. It must keep a consistent rotation speed regardless of frame rate and stay crisp on high-DPI / retina displays. Give me the renderer setup and the loop.",
+    "rationale": "near miss owned by threejs-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Write a Three.js setup that renders with WebGPU and gives a mesh a material whose color animates over time. It should target modern browsers and use Three's cross-renderer shader approach rather than raw GLSL.",
+    "rationale": "near miss owned by threejs-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "I'm applying an albedo/base-color texture and a normal map to a MeshStandardMaterial. Colors look washed out and the lighting is off. Show me how to load and configure both textures correctly for color-accurate PBR.",
+    "rationale": "near miss owned by threejs-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "I have a THREE.Points cloud of about 50,000 particles built from a BufferGeometry with positions I set manually. When I orbit the camera, the entire point cloud sometimes vanishes even though points are clearly within view. What's causing this and how do I fix it?",
+    "rationale": "near miss owned by threejs-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

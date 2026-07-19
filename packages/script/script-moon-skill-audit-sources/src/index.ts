@@ -9,36 +9,10 @@ import {
   resolveGuideDirectory,
 } from "@xonovex/script-moon-common/fs";
 import {parseArgs, type ParsedArgs} from "./args.js";
+import {parseSources, type Source} from "./source-parser.js";
 
-const URL_RE = /\*\*URL:\*\*\s*(\S+)/;
 const REVIEWED_RE = /\*\*Last reviewed:\*\*\s*(\d{4}-\d{2}-\d{2})/;
-const REF_RE = /references\/([a-z0-9][a-z0-9-]*\.md)/g;
 const HEADER_RE = /^##\s+(.*\S)\s*$/;
-// Optional upstream-drift fields. A source carrying **Checkout:** is also
-// diffed against its local source repo (latest tag vs pinned, commits since).
-const CHECKOUT_RE = /\*\*Checkout:\*\*\s*(\S+)/;
-const VERSION_RE = /\*\*Version:\*\*\s*v?(\d+\.\d+\.\d+)/;
-const COMMIT_RE = /\*\*Commit:\*\*\s*([0-9a-f]{7,40})/;
-// **Watch:** <source-subpath> -> ref-a.md, ref-b.md  (path may contain spaces)
-const WATCH_RE = /\*\*Watch:\*\*\s*(.+?)\s*(?:->|→)\s*(.+\S)\s*$/;
-
-interface Watch {
-  path: string;
-  refs: readonly string[];
-}
-
-interface Source {
-  title: string;
-  url: string | undefined;
-  reviewed: Date | undefined;
-  reviewedRaw: string | undefined;
-  refs: Set<string>;
-  lineNo: number;
-  checkout: string | undefined;
-  version: string | undefined;
-  commit: string | undefined;
-  watches: Watch[];
-}
 
 interface FetchReport {
   status: string;
@@ -60,12 +34,15 @@ interface DriftReport {
 interface SourceReport {
   title: string;
   url: string | undefined;
+  urls: readonly string[];
+  provenance: string | undefined;
   last_reviewed: string | null;
   age_days: number | null;
   stale: boolean;
   refs: readonly string[];
   dangling_refs: readonly string[];
   fetch?: FetchReport;
+  fetches?: readonly FetchReport[];
   drift?: DriftReport;
 }
 
@@ -122,25 +99,6 @@ const toIsoDate = (date: Date): string => {
   return `${year}-${month}-${day}`;
 };
 
-const parseIsoDate = (raw: string): Date | undefined => {
-  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(raw);
-  if (m?.[1] === undefined || m[2] === undefined || m[3] === undefined) {
-    return undefined;
-  }
-  const year = Number(m[1]);
-  const month = Number(m[2]);
-  const day = Number(m[3]);
-  const date = new Date(year, month - 1, day);
-  if (
-    date.getFullYear() !== year ||
-    date.getMonth() !== month - 1 ||
-    date.getDate() !== day
-  ) {
-    return undefined;
-  }
-  return date;
-};
-
 const daysBetween = (today: Date, reviewed: Date): number => {
   const msPerDay = 24 * 60 * 60 * 1000;
   const a = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate());
@@ -150,78 +108,6 @@ const daysBetween = (today: Date, reviewed: Date): number => {
     reviewed.getDate(),
   );
   return Math.round((a - b) / msPerDay);
-};
-
-const findRefs = (line: string): string[] => {
-  const found: string[] = [];
-  REF_RE.lastIndex = 0;
-  let m: RegExpExecArray | null;
-  while ((m = REF_RE.exec(line)) !== null) {
-    if (m[1] !== undefined) found.push(m[1]);
-  }
-  return found;
-};
-
-const parseSources = (text: string): Source[] => {
-  const sources: Source[] = [];
-  let current: Source | undefined;
-  const lines = text.split("\n");
-  for (const [i, line] of lines.entries()) {
-    const header = HEADER_RE.exec(line);
-    if (header) {
-      current = {
-        title: header[1] ?? "",
-        url: undefined,
-        reviewed: undefined,
-        reviewedRaw: undefined,
-        refs: new Set<string>(),
-        lineNo: i,
-        checkout: undefined,
-        version: undefined,
-        commit: undefined,
-        watches: [],
-      };
-      sources.push(current);
-      continue;
-    }
-    if (current === undefined) continue;
-    const urlMatch = URL_RE.exec(line);
-    if (urlMatch?.[1] !== undefined) {
-      current.url = urlMatch[1];
-    }
-    const reviewedMatch = REVIEWED_RE.exec(line);
-    if (reviewedMatch?.[1] !== undefined) {
-      current.reviewedRaw = reviewedMatch[1];
-      current.reviewed = parseIsoDate(reviewedMatch[1]);
-    }
-    const checkoutMatch = CHECKOUT_RE.exec(line);
-    if (checkoutMatch?.[1] !== undefined) {
-      current.checkout = checkoutMatch[1];
-    }
-    const versionMatch = VERSION_RE.exec(line);
-    if (versionMatch?.[1] !== undefined) {
-      current.version = versionMatch[1];
-    }
-    const commitMatch = COMMIT_RE.exec(line);
-    if (commitMatch?.[1] !== undefined) {
-      current.commit = commitMatch[1];
-    }
-    const watchMatch = WATCH_RE.exec(line);
-    if (watchMatch?.[1] !== undefined && watchMatch[2] !== undefined) {
-      const refs = watchMatch[2]
-        .split(",")
-        .map((r) => basename(r.trim()))
-        .filter((r) => r.endsWith(".md"));
-      current.watches.push({path: watchMatch[1], refs});
-      // Watched refs are fed by this source too — count them toward coverage.
-      for (const ref of refs) current.refs.add(ref);
-    }
-    for (const ref of findRefs(line)) {
-      current.refs.add(ref);
-    }
-  }
-  // A block is a real source only if it carries a URL (others are prose notes).
-  return sources.filter((s) => s.url);
 };
 
 const resolveSourcesFile = (target: string): string | undefined => {
@@ -438,21 +324,22 @@ const auditSkill = async (
     const report: SourceReport = {
       title: s.title,
       url: s.url,
+      urls: s.urls,
+      provenance: s.provenance,
       last_reviewed: s.reviewedRaw ?? null,
       age_days: age,
       stale,
       refs: [...s.refs].toSorted(),
       dangling_refs: dangling,
     };
-    if (stale || dangling.length > 0) {
+    if (age === null || stale || dangling.length > 0) {
       problems += 1;
     }
-    if (doFetch && s.url) {
-      const fetchReport = await fetchStatus(s.url);
-      report.fetch = fetchReport;
-      if (fetchReport.status !== "ok") {
-        problems += 1;
-      }
+    if (doFetch && s.urls.length > 0) {
+      const fetches = await Promise.all(s.urls.map((url) => fetchStatus(url)));
+      report.fetch = fetches[0];
+      report.fetches = fetches;
+      problems += fetches.filter((fetch) => fetch.status !== "ok").length;
     }
     if (s.checkout !== undefined) {
       const drift = computeDrift(workspaceRoot, s, pull);
@@ -465,6 +352,7 @@ const auditSkill = async (
   }
 
   const uncovered = [...existingRefs].filter((r) => !covered.has(r)).toSorted();
+  if (sources.length === 0) problems += 1;
   return {
     skill: basename(resolve(skillDir)),
     sources_file: sourcesFile,
@@ -520,12 +408,16 @@ const printTextReport = (rep: SkillReport, maxAge: number): void => {
     if (s.stale) {
       flags.push(`STALE (${String(s.age_days)}d)`);
     }
+    if (s.last_reviewed === null) {
+      flags.push("MISSING REVIEW DATE");
+    }
     if (s.dangling_refs.length > 0) {
       flags.push(`DANGLING: ${s.dangling_refs.join(", ")}`);
     }
-    const fetch = s.fetch;
-    if (fetch && fetch.status !== "ok") {
-      flags.push(`URL ${fetch.status}`);
+    const fetches = s.fetches ?? (s.fetch ? [s.fetch] : []);
+    const failedFetches = fetches.filter((fetch) => fetch.status !== "ok");
+    if (failedFetches.length > 0) {
+      flags.push(`URL ${failedFetches[0]?.status ?? "error"}`);
     }
     const drift = s.drift;
     if (drift?.behind) {
@@ -537,13 +429,18 @@ const printTextReport = (rep: SkillReport, maxAge: number): void => {
     }
     const marker = flags.length > 0 ? flags.join("  ") : "ok";
     console.log(`\n  [${marker}] ${s.title}`);
-    console.log(`    url           : ${String(s.url)}`);
+    console.log(
+      `    urls          : ${s.urls.length > 0 ? s.urls.join(", ") : "(none)"}`,
+    );
+    if (s.provenance) {
+      console.log(`    provenance    : ${s.provenance}`);
+    }
     console.log(
       `    last reviewed : ${s.last_reviewed ?? "(none)"}` +
         (s.age_days === null ? "" : `  (${String(s.age_days)}d ago)`),
     );
-    if (fetch) {
-      console.log(`    fetch         : ${fetch.detail}`);
+    for (const [index, fetch] of fetches.entries()) {
+      console.log(`    fetch ${String(index + 1).padEnd(7)}: ${fetch.detail}`);
     }
     if (s.refs.length > 0) {
       console.log(
@@ -650,7 +547,7 @@ const walkSourcesFiles = (root: string): string[] => {
       if (isDirectory(full)) {
         if (entry === "node_modules") continue;
         walk(full);
-      } else if (entry === "SOURCES.md") {
+      } else if (entry === "SOURCES.md" && isFile(join(dir, "SKILL.md"))) {
         found.push(full);
       }
     }

@@ -26,7 +26,7 @@
   {
     "query": "evaluate model accuracy, robustness, bias gaps, abuse, and cybersecurity at an exact revision",
     "should_trigger": true,
-    "split": "validation",
+    "split": "train",
     "rationale": "AI evaluation"
   },
   {
@@ -56,19 +56,43 @@
   {
     "query": "trace an LLM request with OpenTelemetry attributes",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "near miss: observability implementation"
   },
   {
     "query": "debug a Python machine-learning training loop",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "near miss: ML implementation"
   },
   {
     "query": "write a generic data-retention policy",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "near miss: data governance without AI context"
+  },
+  {
+    "query": "We are deploying an AI system in the EU. Tell us whether the AI Act applies and give us the controls we must implement.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "build a threat-informed security assurance plan with exact control and evidence ownership",
+    "rationale": "near miss owned by security-assurance-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "select NIST 800-53 controls for this system without claiming a one-to-one compliance mapping",
+    "rationale": "near miss owned by security-assurance-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "verify artifact provenance, signatures, dependencies, build identity, and rollback before release",
+    "rationale": "near miss owned by security-assurance-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

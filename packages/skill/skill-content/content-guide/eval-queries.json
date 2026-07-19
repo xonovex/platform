@@ -1,0 +1,98 @@
+[
+  {
+    "query": "Rewrite this so it reads like a person wrote it, not an AI: 'Our platform offers a seamless, intuitive experience that empowers teams to unlock their full potential. Experts agree it's a game-changer, and studies show productivity has never been better.'",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Add two short news posts about recent electric-vehicle developments to our content site. We publish in both English and Dutch, and each post is a Markdown file with frontmatter.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Write a travel guide for visitors to the city of Porto that we can publish on our multilingual content site.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "This blog paragraph feels robotic. Make it sound human without changing the facts: 'The release was pivotal. It was not just faster, but also cleaner and more reliable. This delivers a robust, seamless experience — creating value — while ensuring users remain engaged. Overall, the future looks promising.'",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Help me handle humanize correctly in this Content task, including the edge cases that usually get missed.",
+    "rationale": "implicit task cue derived from the humanize reference",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Help me handle news add correctly in this Content task, including the edge cases that usually get missed.",
+    "rationale": "implicit task cue derived from the news add reference",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Help me handle travelguide add correctly in this Content task, including the edge cases that usually get missed.",
+    "rationale": "implicit task cue derived from the travelguide add reference",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Review this Content change for core principles and fix the concrete issues you find.",
+    "rationale": "implicit task cue derived from the Core Principles section",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "respond like a caveman from now on",
+    "rationale": "near miss owned by caveman",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "cut the filler, give me terse blunt answers",
+    "rationale": "near miss owned by caveman",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "rewrite this paragraph in caveman speak",
+    "rationale": "near miss owned by caveman",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "stop hedging and drop the pleasantries in your replies",
+    "rationale": "near miss owned by caveman",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "make these replies as short and direct as possible, no padding",
+    "rationale": "near miss owned by caveman",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Respond like a caveman. Does `git reset --soft HEAD~1` keep my staged changes or throw them away, and what is the exact command to undo the last commit while keeping everything staged?",
+    "rationale": "near miss owned by caveman",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Caveman speak, minimal words. Show me a Python snippet that catches a division-by-zero error and prints a message, and tell me when it triggers.",
+    "rationale": "near miss owned by caveman",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Rewrite this in caveman speak: 'I just went ahead and ran the full test suite, and it looks like everything is basically passing now, so I think we should probably be good to proceed with the deployment.'",
+    "rationale": "near miss owned by caveman",
+    "should_trigger": false,
+    "split": "validation"
+  }
+]

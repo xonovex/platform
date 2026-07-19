@@ -1,0 +1,98 @@
+[
+  {
+    "query": "In our LuaJIT game engine, write a factory function `create_entity(x, y, kind)` that returns a new entity table. Entities need position (x, y), a kind, a velocity (velocity_x, velocity_y starting at 0), health (starts at 100), and an active flag (starts true). Not all of these are known at the call site, so make it clean and efficient for a hot update loop.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "This LuaJIT function runs every frame over thousands of entities and shows up hot in the profiler. Rewrite it to be faster without changing behavior:\n\n```lua\nfunction update_positions(entities, dt)\n    for i = 1, #entities do\n        local e = entities[i]\n        e.x = e.x + e.velocity_x * dt\n        e.y = e.y + e.velocity_y * dt\n    end\nend\n```",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Write a LuaJIT hot-loop function that computes and stores sin and cos of each angle in a large numeric array `angles` into two output arrays. Optimize it for repeated per-frame execution.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "I need to build a large lookup buffer in LuaJIT: an array `buf` of `size` numbers, each initialized to 0, that I'll later index into during a hot loop. Show the idiomatic performant way to create and fill it.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Help me handle jit friendly tables correctly in this Lua Opinionated task, including the edge cases that usually get missed.",
+    "rationale": "implicit task cue derived from the jit friendly tables reference",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Help me handle cache lookups correctly in this Lua Opinionated task, including the edge cases that usually get missed.",
+    "rationale": "implicit task cue derived from the cache lookups reference",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Review this Lua Opinionated change for requirements and fix the concrete issues you find.",
+    "rationale": "implicit task cue derived from the Requirements section",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Review this Lua Opinionated change for essentials and fix the concrete issues you find.",
+    "rationale": "implicit task cue derived from the Essentials section",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "I'm writing TypeScript that compiles to Lua with the typescript-to-lua transpiler. Write a `divmod` function that takes two numbers and returns both the quotient (floored) and the remainder so the generated Lua uses native Lua multiple return values rather than an array or object wrapper. Include a call site that consumes both values.",
+    "rationale": "near miss owned by typescript-to-lua-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "In a typescript-to-lua project I need an interface that compiles directly to a plain raw Lua table with no runtime wrapper, and a standalone helper function that must NOT receive an implicit `self` parameter in the generated Lua. Write the TypeScript.",
+    "rationale": "near miss owned by typescript-to-lua-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "I'm building a small 2D vector math module (add, magnitude) in TypeScript that compiles to Lua via typescript-to-lua. Write it in the way that produces the cleanest, most efficient Lua output for this transpiler.",
+    "rationale": "near miss owned by typescript-to-lua-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Set up the tsconfig.json for a typescript-to-lua project that targets LuaJIT and should remap Lua stack traces back to the original TypeScript line numbers. Show the config.",
+    "rationale": "near miss owned by typescript-to-lua-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Help me handle namespaces vs classes correctly in this Typescript To Lua task, including the edge cases that usually get missed.",
+    "rationale": "near miss owned by typescript-to-lua-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Help me handle multi return functions correctly in this Typescript To Lua task, including the edge cases that usually get missed.",
+    "rationale": "near miss owned by typescript-to-lua-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Help me handle tstl decorators correctly in this Typescript To Lua task, including the edge cases that usually get missed.",
+    "rationale": "near miss owned by typescript-to-lua-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Help me handle performance tips correctly in this Typescript To Lua task, including the edge cases that usually get missed.",
+    "rationale": "near miss owned by typescript-to-lua-guide",
+    "should_trigger": false,
+    "split": "validation"
+  }
+]

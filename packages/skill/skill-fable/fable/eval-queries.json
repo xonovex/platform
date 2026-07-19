@@ -1,0 +1,98 @@
+[
+  {
+    "query": "Here's the situation: I had you modify the serialized structs and rerun the whole suite. All 24 tests passed and the golden files came out byte-identical. Report back to me on where this landed.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "My editor's language server is flagging three type errors, but they're all on files I never touched in this change, and my full build plus test suite are green. Should I ship this or dig into those errors first?",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Status check: the build compiles clean and the module boundary check passes. What's left is wiring up the end-to-end harness. Tell me where we are and what happens next.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Review this Fable change for voice — terse and verdict-first and fix the concrete issues you find.",
+    "rationale": "implicit task cue derived from the Voice — terse and verdict-first section",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Review this Fable change for confidence — discount noise, don't hedge and fix the concrete issues you find.",
+    "rationale": "implicit task cue derived from the Confidence — discount noise, don't hedge section",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Review this Fable change for cadence — momentum and parallelism and fix the concrete issues you find.",
+    "rationale": "implicit task cue derived from the Cadence — momentum and parallelism section",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Review this Fable change for formatting — minimal in flow and fix the concrete issues you find.",
+    "rationale": "implicit task cue derived from the Formatting — minimal in flow section",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Review this Fable change for what fable mode does not change and fix the concrete issues you find.",
+    "rationale": "implicit task cue derived from the What Fable mode does NOT change section",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "these two modules feel way too tightly coupled — tell me concretely what kind of coupling it is and how to loosen the worst part",
+    "rationale": "near miss owned by connascence-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "is a chained call like order.getCustomer().getAddress().getCity() a problem, and what do I do about it?",
+    "rationale": "near miss owned by connascence-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "should this function take positional arguments or a named options object — which couples callers less?",
+    "rationale": "near miss owned by connascence-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "this helper module is just a grab-bag of unrelated init steps that run at startup — is that bad cohesion?",
+    "rationale": "near miss owned by connascence-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "I pass a boolean flag into this shared method that switches its behavior — code smell?",
+    "rationale": "near miss owned by connascence-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Review this Go function for coupling problems and tell me how to fix the worst one:\n\n```go\nfunc (r *Repo) Save(order Order, dryRun bool) error {\n    if dryRun {\n        return validate(order)\n    }\n    return r.persist(order)\n}\n```\n\nCallers do `repo.Save(order, true)` in some places and `repo.Save(order, false)` in others.",
+    "rationale": "near miss owned by connascence-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Is a chained expression like `order.Customer().Address().City()` a problem in our codebase? Explain concretely what it costs and what to do instead. Also: we have a builder used as `NewQuery().Where(x).OrderBy(y).Build()` — is that the same problem?",
+    "rationale": "near miss owned by connascence-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "A billing function reads an Order's total by passing a magic number: `cache.Get(key, 0)` where `0` means \"no expiry\", and a far-away handler does `if ttl == 0 { /* unlimited */ }`. Grade this coupling precisely and give me the fix.",
+    "rationale": "near miss owned by connascence-guide",
+    "should_trigger": false,
+    "split": "validation"
+  }
+]

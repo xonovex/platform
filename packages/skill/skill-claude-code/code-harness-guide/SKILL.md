@@ -1,6 +1,8 @@
 ---
 name: code-harness-guide
 description: "Use when mapping agent-governance intents to Claude Code hooks, plugins, skills, settings, or managed configuration. Triggers on SessionStart, UserPromptSubmit, PreToolUse, PermissionRequest, PostToolUse, compaction, command/prompt/agent/HTTP/MCP-tool handlers, parallel hook behavior, allowManagedHooksOnly, or onboarding and testing Claude Code automation — even when the user doesn't say 'harness adapter'."
+compatibility: "The opt-in runtime probe requires Bash, curl, jq, Node.js, npm, network access, and Claude credentials; it runs pinned Claude Code in a temporary workspace with bypass permissions."
+allowed-tools: "Read Bash(curl:*) Bash(jq:*) Bash(node:*) Bash(npx:*)"
 ---
 
 # Claude Code Harness Governance
@@ -15,7 +17,7 @@ Map the semantic contracts owned by **agent-governance-guide** to Claude Code's 
 - **Assume parallel matching** - Make handlers reentrant and do not expect a denial to cancel sibling side effects.
 - **Respect settings authority** - Managed, user, project, local, plugin, and component hooks have native precedence and trust rules.
 - **Onboard transactionally** - Preview exact settings/plugin changes, permissions, data flow, verification, disable, and rollback before apply.
-- **Probe governed writes** - Run `scripts/refresh-pre-tool-use-probe.sh` after hook or runtime changes.
+- **Probe governed writes** - After reviewing the script, run `scripts/refresh-pre-tool-use-probe.sh --confirm-dangerous-probe` from a credentialed maintainer environment after hook or runtime changes.
 
 ## Gotchas
 
@@ -24,6 +26,7 @@ Map the semantic contracts owned by **agent-governance-guide** to Claude Code's 
 - There is no standalone `.claude/hooks.json`; standalone hooks live under the `hooks` key in a settings file.
 - All matching handlers run in parallel, so a blocking result does not undo a sibling handler that already produced a side effect.
 - Managed settings may restrict hook sources, but executable distribution and provenance remain separate.
+- The live probe downloads pinned Claude Code through npm, uses bypass permissions, starts a loopback service, and attempts one denied plus one allowed write inside a temporary directory; it refuses to run without `--confirm-dangerous-probe`.
 
 ## Example
 

@@ -26,7 +26,7 @@
   {
     "query": "prepare incident response, recovery verification, corrective action, and learning review",
     "should_trigger": true,
-    "split": "validation",
+    "split": "train",
     "rationale": "operational response"
   },
   {
@@ -56,19 +56,43 @@
   {
     "query": "configure Kubernetes livenessProbe YAML",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "near miss: platform implementation"
   },
   {
     "query": "investigate a security incident and preserve forensic evidence",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "near miss: security assurance"
   },
   {
     "query": "optimize a slow SQL query",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "near miss: database performance"
+  },
+  {
+    "query": "Design reliability for a policy service used by agent hooks and CI. Clients retry and hooks can run concurrently.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "validate this PlanningResult and its provider-native handoff without forcing it into a YAML schema",
+    "rationale": "near miss owned by workflow-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "our Discover stage groups discovery and formulation; can the profile still publish them separately?",
+    "rationale": "near miss owned by workflow-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "after compaction, reconstruct the PhaseResultHandle from this GitHub issue and commit reference",
+    "rationale": "near miss owned by workflow-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

@@ -26,19 +26,19 @@
   {
     "query": "can I use Bitbucket Cloud custom merge checks on our self-managed Bitbucket instance",
     "should_trigger": true,
-    "split": "validation",
+    "split": "train",
     "rationale": "Cloud/Data Center parity rejection"
   },
   {
     "query": "recover pipeline and artifact evidence from opaque Bitbucket references after restart",
     "should_trigger": true,
-    "split": "validation",
+    "split": "train",
     "rationale": "native reference recovery"
   },
   {
     "query": "preview and roll back branch permissions, deployment restrictions, secrets, and webhook changes in Bitbucket",
     "should_trigger": true,
-    "split": "validation",
+    "split": "train",
     "rationale": "transactional onboarding"
   },
   {
@@ -56,31 +56,31 @@
   {
     "query": "write a platform-neutral source provider port",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "near miss: workflow/governance owner"
   },
   {
     "query": "set up an AWS Organizations service control policy",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "near miss: AWS owner"
   },
   {
     "query": "choose a branching strategy for a monorepo",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "near miss: general git design"
   },
   {
     "query": "our self-hosted Bitbucket Data Center REST call returns 401, is this a Bearer vs Basic token problem?",
     "should_trigger": true,
-    "split": "train",
+    "split": "validation",
     "rationale": "Data Center REST auth failure, Bearer vs Basic and DC < 9.4 rule"
   },
   {
     "query": "post an inline review comment anchored to a specific added line on a self-hosted Bitbucket pull request over /rest/api/1.0",
     "should_trigger": true,
-    "split": "train",
+    "split": "validation",
     "rationale": "Data Center inline anchored comment via REST 1.0"
   },
   {
@@ -94,5 +94,23 @@
     "should_trigger": true,
     "split": "validation",
     "rationale": "Data Center first-time SSH clone plus HTTP access token"
+  },
+  {
+    "query": "link Azure Boards work item 381 to the pull request and preserve both native references",
+    "rationale": "near miss owned by azure-devops-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "add an Azure Repos build validation policy to main and test that a stale status cannot merge",
+    "rationale": "near miss owned by azure-devops-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "onboard an Azure Pipelines service connection without creating a client secret",
+    "rationale": "near miss owned by azure-devops-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

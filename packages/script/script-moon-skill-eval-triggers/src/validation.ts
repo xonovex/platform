@@ -20,14 +20,27 @@ const TriggerOptionsSchema = z.object({
     .string()
     .regex(/^\d+$/, "must be a positive integer")
     .transform(Number)
-    .pipe(z.int().positive()),
+    .pipe(z.int().positive().max(3)),
   threshold: FiniteNumberTextSchema.pipe(z.number().min(0).max(1)),
-  budget: FiniteNumberTextSchema.pipe(z.number().nonnegative()),
+  budget: FiniteNumberTextSchema.pipe(z.number().positive().max(0.05)),
 });
+
+interface TriggerClaudeOptions {
+  readonly model: string;
+  readonly budget: number;
+  readonly pluginDirectories: readonly string[];
+}
 
 type ValidationResult<T> =
   | {readonly success: true; readonly data: T}
   | {readonly success: false; readonly error: string};
+
+export const MAX_TRIGGER_MODEL_RUNS = 24;
+
+export const triggerModelRunCount = (
+  queryCount: number,
+  runs: number,
+): number => queryCount * runs;
 
 const errorText = (error: z.ZodError): string =>
   error.issues
@@ -53,6 +66,53 @@ export const parseTriggerOptions = (
   return result.success
     ? {success: true, data: result.data}
     : {success: false, error: errorText(result.error)};
+};
+
+export const buildTriggerClaudeArgs = (
+  options: TriggerClaudeOptions,
+): readonly string[] => {
+  const args = [
+    "-p",
+    "--output-format",
+    "stream-json",
+    "--verbose",
+    "--include-partial-messages",
+    "--setting-sources",
+    "",
+    "--strict-mcp-config",
+    "--mcp-config",
+    '{"mcpServers":{}}',
+    "--no-session-persistence",
+    "--no-chrome",
+    "--model",
+    options.model,
+    "--max-budget-usd",
+    String(options.budget),
+    "--max-turns",
+    "1",
+    "--system-prompt",
+    "Decide only whether the available skill applies to the user request. " +
+      "If it applies, invoke Skill immediately. Otherwise reply with one short sentence. " +
+      "Do not perform the requested task.",
+    "--tools",
+    "Skill",
+  ];
+  for (const pluginDirectory of options.pluginDirectories) {
+    args.push("--plugin-dir", pluginDirectory);
+  }
+  return args;
+};
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" && value !== null && !Array.isArray(value);
+
+export const streamTextDeltaLength = (input: unknown): number => {
+  if (!isRecord(input) || input.type !== "stream_event") return 0;
+  const event = input.event;
+  if (!isRecord(event) || event.type !== "content_block_delta") return 0;
+  const delta = event.delta;
+  if (!isRecord(delta) || delta.type !== "text_delta") return 0;
+  return typeof delta.text === "string" ? delta.text.length : 0;
 };
 
 export type Query = z.infer<typeof QuerySchema>;

@@ -50,13 +50,13 @@
   {
     "query": "one node should adapt its input and output types depending on what's wired into it — a CPU image vs a GPU image — instead of me making two near-identical nodes",
     "should_trigger": true,
-    "split": "train",
+    "split": "validation",
     "rationale": "polymorphic/variant node resolving pin types from connections -> typing-and-connections.md"
   },
   {
     "query": "the last node in my graph produces a draw call but nothing actually runs it; where is the work supposed to get scheduled from",
     "should_trigger": true,
-    "split": "train",
+    "split": "validation",
     "rationale": "terminal/output node hands result to owning system which schedules -> node-model.md (scheduling itself -> gpu-rendering-guide)"
   },
   {
@@ -92,7 +92,37 @@
   {
     "query": "I'm designing the reflectable typed object store with properties and references that everything serializes into",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "near-miss: the underlying typed data model / object store -> data-model-guide, not the graph layer on top"
+  },
+  {
+    "query": "our editor lets artists drop in an FBX or PNG and we want them edited in-tool but shipped as packed GPU-ready data — how should we structure the two forms so editing and loading don't fight each other",
+    "rationale": "near miss owned by asset-pipeline-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "we want one plugin per file format that just parses into a common scene representation, and then separate per-type steps that turn meshes and textures into runtime data",
+    "rationale": "near miss owned by asset-pipeline-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "changing the texture compression preset doesn't seem to rebuild anything, artists keep seeing the old result until they delete the cache by hand",
+    "rationale": "near miss owned by asset-pipeline-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "why does editing one shader include header force a rebuild of our entire content set instead of just the materials that use it",
+    "rationale": "near miss owned by asset-pipeline-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "I want a build cache that two developers and CI can all share so if one person already baked an asset nobody else has to bake it again",
+    "rationale": "near miss owned by asset-pipeline-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

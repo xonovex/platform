@@ -26,7 +26,7 @@
   {
     "query": "explain the 3 Cs — card, conversation, confirmation — for our stories",
     "should_trigger": true,
-    "split": "validation",
+    "split": "train",
     "rationale": "the 3 Cs model is owned here"
   },
   {
@@ -44,7 +44,7 @@
   {
     "query": "rewrite this story using the As a / I want / so that template",
     "should_trigger": true,
-    "split": "train",
+    "split": "validation",
     "rationale": "the story template is owned by user-stories"
   },
   {
@@ -68,7 +68,7 @@
   {
     "query": "define the bounded contexts and ubiquitous language for our payments domain",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "near-miss: domain modelling and ubiquitous language are owned by ddd-guide"
   },
   {
@@ -80,7 +80,25 @@
   {
     "query": "these two stories keep breaking each other — analyse the coupling between the modules",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "near-miss: coupling theory behind Independent is owned by connascence-guide"
+  },
+  {
+    "query": "we're adopting FDD — what are the five processes and which run once vs per feature set?",
+    "rationale": "near miss owned by fdd-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "how should I name features? something like 'calculate the total of an order'?",
+    "rationale": "near miss owned by fdd-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "how do I report percent-complete per feature with the design and code milestones?",
+    "rationale": "near miss owned by fdd-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

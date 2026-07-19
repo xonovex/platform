@@ -1,0 +1,98 @@
+[
+  {
+    "query": "Using Zod 4, write a TypeScript schema named UserSchema for a user object with these fields: an id that is a UUID, an email address, a createdAt that is an ISO datetime string, and a name string between 1 and 100 characters. Also export the inferred TypeScript type.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "In Zod 4, write a schema for an environment variable PORT that arrives as a string, is converted to a number, must be an integer between 1024 and 65535, and falls back to port 3000 when the variable is absent. Show the inferred output type.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Write an Express-style POST handler in TypeScript that validates an incoming request body against a Zod schema called CreateUserSchema and returns HTTP 400 with the validation errors if the body is invalid, otherwise creates the user. The handler must not throw on invalid input.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "In Zod 4, define a StatusSchema from an existing native TypeScript enum named Status. Then, given a UserSchema object schema, derive a CreateUserSchema that drops the id field and an UpdateUserSchema that makes all of CreateUserSchema's fields optional.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Help me handle migration v4 correctly in this Zod task, including the edge cases that usually get missed.",
+    "rationale": "implicit task cue derived from the migration v4 reference",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Help me handle schema organization correctly in this Zod task, including the edge cases that usually get missed.",
+    "rationale": "implicit task cue derived from the schema organization reference",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Help me handle validation patterns correctly in this Zod task, including the edge cases that usually get missed.",
+    "rationale": "implicit task cue derived from the validation patterns reference",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Review this Zod change for requirements and fix the concrete issues you find.",
+    "rationale": "implicit task cue derived from the Requirements section",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Write an Express 5 + TypeScript login route handler. It should look up the user by email, verify the submitted password against the stored hash, and on success return a signed JWT the client will send on future API requests.",
+    "rationale": "near miss owned by expressjs-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Write a centralized error-handling middleware for an Express 5 + TypeScript API that turns thrown errors into JSON responses, and show how it is registered on the app.",
+    "rationale": "near miss owned by expressjs-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Write a reusable Express + TypeScript middleware factory that validates an incoming request body against a given Zod schema before the route handler runs.",
+    "rationale": "near miss owned by expressjs-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Set up the main app entrypoint (app.ts) for an Express 5 + TypeScript API: wire helmet, cors, morgan, JSON body parsing, mount the route modules, and handle unmatched routes.",
+    "rationale": "near miss owned by expressjs-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Help me handle project structure correctly in this Expressjs task, including the edge cases that usually get missed.",
+    "rationale": "near miss owned by expressjs-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Help me handle validation correctly in this Expressjs task, including the edge cases that usually get missed.",
+    "rationale": "near miss owned by expressjs-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Help me handle error handling correctly in this Expressjs task, including the edge cases that usually get missed.",
+    "rationale": "near miss owned by expressjs-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Help me handle authentication correctly in this Expressjs task, including the edge cases that usually get missed.",
+    "rationale": "near miss owned by expressjs-guide",
+    "should_trigger": false,
+    "split": "validation"
+  }
+]

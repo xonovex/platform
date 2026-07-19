@@ -1,6 +1,8 @@
 ---
 name: workflow-guide
 description: "Use when defining, executing, inspecting, composing, or validating lifecycle workflow capabilities, provider-native result contracts, ephemeral result handles, workflow profiles, development and assurance work, human Acceptance, privileged Integration, Transition, Release, Observation, Incident, Corrective Action, Retirement, or cross-provider handoffs. Triggers on workflow result, PhaseResultHandle, exact-revision assurance, evidence freshness, authorization drift, rollback, emergency-exception, provider-native evidence, or workflow conformance, even when the user doesn't say 'workflow architecture'."
+compatibility: "Node.js 22+ is required for bundled fixture and composition validators; scripts read repository fixtures and write only explicit evidence or temporary test paths."
+allowed-tools: "Read Bash(node:*) Bash(npx:*)"
 ---
 
 # Composable Workflow Contracts and Operations

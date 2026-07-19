@@ -92,7 +92,31 @@
   {
     "query": "wire up a thread pool with an async job API so I can await results from worker threads",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "near-miss: high-level async/pool usage, not real-time audio"
+  },
+  {
+    "query": "In a Remotion project running at 30fps, write a React component that fades a headline in from opacity 0 to 1 over the first half second and slides it up 40px at the same time. Give me the full component code.",
+    "rationale": "near miss owned by remotion-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Build a Remotion scene with 60 confetti pieces scattered at varied starting x/y positions and slightly different fall speeds, so it looks organic. Provide the component.",
+    "rationale": "near miss owned by remotion-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "I have two Remotion scenes, each 2 seconds long, at 30fps. I want a half-second crossfade between them. Show me how to wire this up and tell me the total duration of the final video in frames.",
+    "rationale": "near miss owned by remotion-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Register a new Remotion composition in Root.tsx called 'Intro' (1920x1080, 30fps, 5 seconds) whose title text, background color, and font size are editable in the Remotion Studio visual props editor. Include the code.",
+    "rationale": "near miss owned by remotion-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

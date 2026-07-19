@@ -50,19 +50,19 @@
   {
     "query": "I need to find connected gamepads on Linux and read their button presses — how do I enumerate /dev/input and tell a controller apart from a keyboard",
     "should_trigger": true,
-    "split": "train",
+    "split": "validation",
     "rationale": "input-devices: evdev enumeration, by-id symlinks, BTN_GAMEPAD capability probe"
   },
   {
     "query": "my controller's analog sticks drift at rest and the dpad shows up as a single axis — how do I read the deadzone and split the hat into directions",
     "should_trigger": true,
-    "split": "train",
+    "split": "validation",
     "rationale": "input-devices: per-axis flat deadzone via EVIOCGABS, 1:2 hat->dpad mapping table"
   },
   {
     "query": "controllers plugged in after my game launches never get picked up — I only scan devices once at startup, how do I detect hotplug",
     "should_trigger": true,
-    "split": "train",
+    "split": "validation",
     "rationale": "input-devices: hotplug via watching the device directory for changes, not a one-time enumerate"
   },
   {
@@ -80,13 +80,13 @@
   {
     "query": "set up a CMake target that fetches a dependency with FetchContent and links it PRIVATE with proper include visibility",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "validation negative: build-system mechanics -> cmake-guide, not the porting concept"
   },
   {
     "query": "what naming convention should I use for the SIMD and scalar implementation variants of this C module and how do I lay out the .c files",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "validation negative: C dialect file-naming/implementation variants -> c99-opinionated-guide"
   },
   {
@@ -100,5 +100,29 @@
     "should_trigger": true,
     "split": "validation",
     "rationale": "validation positive: input as a backend behind the input-source interface -> input-devices.md + platform-abstraction-layer.md"
+  },
+  {
+    "query": "help me run a three amigos session and write Given-When-Then scenarios for the checkout story before we code",
+    "rationale": "near miss owned by bdd-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "how do I structure a feature file with Background and a Scenario Outline for the coupon rules?",
+    "rationale": "near miss owned by bdd-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "we want to do example mapping on this story — what do the yellow, blue, green and red cards mean?",
+    "rationale": "near miss owned by bdd-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "set up acceptance-test-driven development so the specs become living documentation the business can read",
+    "rationale": "near miss owned by bdd-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

@@ -32,10 +32,9 @@
   {
     "query": "before we install this third-party skill, audit its scripts and the URLs it fetches and lock down what tools it's allowed to use",
     "should_trigger": true,
-    "split": "train",
+    "split": "validation",
     "rationale": "security audit of an untrusted skill + allowed-tools least privilege"
   },
-
   {
     "query": "simplify our AGENTS.md — it's gotten verbose and repeats itself across sections",
     "should_trigger": false,
@@ -60,7 +59,6 @@
     "split": "train",
     "rationale": "near-miss: software supply-chain/dependency audit, not an Agent Skill"
   },
-
   {
     "query": "write trigger-eval queries for our new docker-guide and check the description routes them correctly",
     "should_trigger": true,
@@ -73,11 +71,10 @@
     "split": "validation",
     "rationale": "validation positive — implicit de-duplication / composability"
   },
-
   {
     "query": "consolidate the duplicated AGENTS.md files across our packages into one canonical set",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "validation negative: project instructions, should match instruction-guide"
   },
   {
@@ -85,5 +82,17 @@
     "should_trigger": false,
     "split": "validation",
     "rationale": "validation negative — near-miss, should match command-guide"
+  },
+  {
+    "query": "I have a Claude Code slash command at `.claude/commands/changelog.md`. Its body uses `$ARGUMENTS` for the user input and embeds git output inline with `` !`git log --oneline -20` ``. I want to port this same command to the Gemini CLI. Tell me exactly what to change and where the file goes.",
+    "rationale": "near miss owned by command-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "We have a ~140-line Claude Code slash command that inlines its entire Goal, Workflow, Output format, and Gotchas. I want to refactor it into a thin command that keeps only its argument contract and delegates the actual procedure to a reusable guideline skill. It's packaged as a plugin. Walk me through every step so nothing breaks at run time.",
+    "rationale": "near miss owned by command-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

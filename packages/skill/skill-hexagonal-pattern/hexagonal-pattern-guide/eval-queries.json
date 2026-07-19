@@ -26,7 +26,7 @@
   {
     "query": "set up ports and adapters / clean architecture for this checkout service",
     "should_trigger": true,
-    "split": "validation",
+    "split": "train",
     "rationale": "explicit hexagonal/clean architecture request"
   },
   {
@@ -38,7 +38,7 @@
   {
     "query": "grade how tightly these two modules are coupled and how to loosen it",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "near-miss: coupling vocabulary -> connascence-guide"
   },
   {
@@ -46,5 +46,53 @@
     "should_trigger": false,
     "split": "train",
     "rationale": "near-miss: where a boundary goes -> orthogonal-pattern-guide"
+  },
+  {
+    "query": "I have a Go OrderService that directly calls a Postgres client to save orders. Refactor it so the business logic no longer depends on Postgres and I could swap in another database later. Show which package each type goes in and how the pieces depend on one another.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Review this hexagonal design: my domain's PlaceOrder inbound port takes the raw *http.Request from the web handler, and my repository outbound port returns the ORM's gorm row struct straight to the service. Is anything wrong with that, and if so how should I fix it?",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Show me how to wire together my HTTP handler, order service, and repository at application startup, where a config value selects between a Postgres store and an in-memory store. I want it done cleanly.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "In a CMakeLists.txt for an executable target named `app`, add the fmt formatting library as a source dependency fetched from https://github.com/fmtlib/fmt.git at version 10.1.1, and link it to `app`. Show the CMake code.",
+    "rationale": "near miss owned by cmake-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "I have a CMake library target `core`. Make it require C++20, and add `-Wall -Wextra -pedantic` warnings on GCC/Clang and `/W4` on MSVC, without affecting other targets in the build. Write the CMake commands.",
+    "rationale": "near miss owned by cmake-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "I have a library target `mylib` with public headers in `include/`. Write the CMake install rules so that a downstream project can consume it with find_package and get a properly namespaced imported target.",
+    "rationale": "near miss owned by cmake-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Set up CTest for a project. Register a test executable `unit_tests` as a test, tag it so it can be run selectively as a group, and give it a 30-second timeout. Show the CMake code.",
+    "rationale": "near miss owned by cmake-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Help me handle target types correctly in this Cmake task, including the edge cases that usually get missed.",
+    "rationale": "near miss owned by cmake-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

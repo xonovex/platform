@@ -26,19 +26,19 @@
   {
     "query": "make an Azure Pipelines extends template mandatory and preview approvals, checks, permissions, and rollback",
     "should_trigger": true,
-    "split": "validation",
+    "split": "train",
     "rationale": "reusable enforcement onboarding"
   },
   {
     "query": "configure a service hook for completed builds and handle duplicate or out-of-order deliveries",
     "should_trigger": true,
-    "split": "validation",
+    "split": "train",
     "rationale": "service-hook conformance"
   },
   {
     "query": "recover a workflow result from an Azure Boards work-item reference in a fresh process",
     "should_trigger": true,
-    "split": "validation",
+    "split": "train",
     "rationale": "opaque provider reference"
   },
   {
@@ -56,31 +56,31 @@
   {
     "query": "design a generic lifecycle workflow for planning and release",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "near miss: workflow owner"
   },
   {
     "query": "create an Azure ARM Terraform module for a virtual network",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "near miss: Azure infrastructure, not Azure DevOps"
   },
   {
     "query": "instrument an app with Azure Monitor OpenTelemetry",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "near miss: observability product"
   },
   {
     "query": "create a pull request on Azure DevOps with az repos pr create and capture the id",
     "should_trigger": true,
-    "split": "train",
+    "split": "validation",
     "rationale": "Services CLI create-pr mechanics"
   },
   {
     "query": "store an Azure DevOps PAT safely and pass it to the az CLI",
     "should_trigger": true,
-    "split": "train",
+    "split": "validation",
     "rationale": "CLI credential storage and AZURE_DEVOPS_EXT_PAT"
   },
   {
@@ -94,5 +94,23 @@
     "should_trigger": true,
     "split": "validation",
     "rationale": "reviewers / auto-complete mechanics"
+  },
+  {
+    "query": "require a Bitbucket Cloud pipeline status before merge and prove a spoofed status cannot satisfy it",
+    "rationale": "near miss owned by bitbucket-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "use a shared Bitbucket Pipelines configuration across our mobile repositories",
+    "rationale": "near miss owned by bitbucket-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "configure Bitbucket Pipelines OIDC for a least-privilege AWS role without access keys",
+    "rationale": "near miss owned by bitbucket-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

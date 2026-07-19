@@ -26,7 +26,7 @@
   {
     "query": "who's the chief programmer vs the class owner, and how do feature teams form?",
     "should_trigger": true,
-    "split": "validation",
+    "split": "train",
     "rationale": "FDD role structure and dynamically formed feature teams"
   },
   {
@@ -38,7 +38,7 @@
   {
     "query": "set up Design by Feature and Build by Feature as the iterative inner loop for our team",
     "should_trigger": true,
-    "split": "train",
+    "split": "validation",
     "rationale": "FDD processes 4 and 5 as the per-feature-set loop"
   },
   {
@@ -50,7 +50,7 @@
   {
     "query": "split this user story into thin vertical slices and check it against INVEST",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "near-miss: client-value slicing and INVEST -> user-stories-guide"
   },
   {
@@ -62,7 +62,7 @@
   {
     "query": "what's the right red-green-refactor rhythm for building this feature test-first?",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "near-miss: test-first development rhythm -> tdd-guide"
   },
   {
@@ -70,5 +70,29 @@
     "should_trigger": false,
     "split": "train",
     "rationale": "near-miss: design/coupling quality bar -> oop-guide and connascence-guide; FDD only schedules the inspection"
+  },
+  {
+    "query": "We're adopting Feature-Driven Development. Set up the per-feature build tracking: list every milestone we mark off as a feature moves from design through to being promoted into the build, and give the percent weight each one contributes so a feature's percent-complete is the running total. Then show what percent-complete a feature reads once it has passed design inspection and is midway through coding.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "is this user story good? \"As a rider I want to pay for my trip\" — does it pass INVEST?",
+    "rationale": "near miss owned by user-stories-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "this story is too big for a sprint, how do I split it into smaller stories?",
+    "rationale": "near miss owned by user-stories-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "what does SPIDR stand for and when do I use a spike to split a story?",
+    "rationale": "near miss owned by user-stories-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

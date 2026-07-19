@@ -7,6 +7,7 @@ import {
   resolveGuideDirectory,
 } from "@xonovex/script-moon-common/fs";
 import {parse as parseYaml} from "yaml";
+import {checkCatalogFiles} from "./catalog-files.js";
 import {checkReferenceFileLinks} from "./reference-file-links.js";
 
 const NAME_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
@@ -624,6 +625,9 @@ const main = (argv: readonly string[]): number => {
   checkReferenceTocs(skillDir, report);
   checkReferenceFileLinks(skillDir, report);
   checkHarnessNeutrality(body, report);
+  const catalogReport = checkCatalogFiles(skillDir, fm);
+  for (const pass of catalogReport.passes) report.addPass(pass);
+  for (const error of catalogReport.errors) report.addFail(error);
 
   return renderReport(report, skillPath, skillDir);
 };

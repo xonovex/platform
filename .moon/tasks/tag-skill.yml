@@ -32,7 +32,7 @@ tasks:
       mergeDeps: append
   ci-check:
     command: echo 'ci-check complete'
-    deps: [build, format-check, skill-validate]
+    deps: [build, format-check, skill-audit-sources, skill-validate]
     options:
       cache: false
   skill-validate:
@@ -55,7 +55,6 @@ tasks:
       - script-moon-skill-audit-sources:install
     options:
       cache: false
-      runInCI: false
   skill-eval-triggers:
     command:
       - npx

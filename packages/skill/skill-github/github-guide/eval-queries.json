@@ -44,7 +44,7 @@
   {
     "query": "my Closes #123 didn't close the issue when the PR merged, why",
     "should_trigger": true,
-    "split": "validation",
+    "split": "train",
     "rationale": "closing keyword auto-closes only on merge into default branch"
   },
   {
@@ -68,7 +68,7 @@
   {
     "query": "onboard a SHA-pinned reusable GitHub Actions workflow as a required ruleset check with a protected production environment",
     "should_trigger": true,
-    "split": "train",
+    "split": "validation",
     "rationale": "GitHub-native reusable CI, repository, and deployment enforcement"
   },
   {
@@ -92,19 +92,19 @@
   {
     "query": "how should I label review feedback as blocking vs nit and structure the summary",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "near-miss: review content/labels craft, use code-review-guide"
   },
   {
     "query": "what should I write in the PR description and how do I split a large change",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "near-miss: PR description craft, use pull-request-guide"
   },
   {
     "query": "define a storage-neutral result-provider port without choosing a hosted platform",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "near-miss: provider semantics belong to workflow-guide until GitHub is selected"
   },
   {
@@ -112,5 +112,17 @@
     "should_trigger": false,
     "split": "validation",
     "rationale": "near-miss: semantic external enforcement belongs to agent-governance-guide until GitHub is selected"
+  },
+  {
+    "query": "open a merge request against main with glab on this GitLab repo",
+    "rationale": "near miss owned by gitlab-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "I pushed my branch, now create an MR on gitlab.com and add reviewers",
+    "rationale": "near miss owned by gitlab-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

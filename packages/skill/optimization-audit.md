@@ -1,9 +1,40 @@
 # Skill Catalog Optimization Audit
 
-Record of the pass that trimmed all 74 skills to their delta over baseline model
-knowledge, and the knowledge-grounded ablation that verified it.
+Record of the original pass that trimmed 74 skills to their delta over baseline
+model knowledge, plus the current-catalog follow-up for skills added afterward.
 
 Commits: `6af54791` (trim), `b67816f5` (restore).
+
+## 2026-07-19 catalog follow-up
+
+- Current catalog: **93 skills**, **27,838** `SKILL.md` + `references/` lines, **385 output evals**, and **1,616 trigger queries**.
+- Tiers: 25 aggressive, 44 moderate, 24 conservative.
+- Every skill now has `evals.json`, at least 8 positive plus 8 sibling-aware negative trigger queries with train/validation splits, and reviewed source provenance.
+- The 19 post-baseline skills below are all moderate-tier. Their local-plugin A/B suite is defined in `.github/workflows/skill-evals.yml`: monthly when `SKILL_EVALS_ENABLED=true`, or manually, with Haiku generation, Sonnet judging, one run per arm, a $0.10/six-turn generation cap, and a $0.10/one-turn judge cap. The scheduled job selects at most six evals, while the runner independently refuses more than 24 total model calls, more than two concurrent calls, higher spend caps, or more than three runs per arm. Generation exposes only `Skill,Read` or `Read`; judging exposes no tools; settings and MCP discovery are disabled; minimal fixed system prompts replace the general coding context; calls are never retried automatically, and failed generations are not judged.
+
+| Post-baseline skill  | Output evals | Distilled lines | Live A/B status                                     |
+| -------------------- | -----------: | --------------: | --------------------------------------------------- |
+| `accessibility`      |            3 |             157 | valid: 0.445 vs 0.222, delta +0.223                 |
+| `agent-governance`   |            8 |           1,385 | invalid: activated response crossed output ceiling  |
+| `ai-governance`      |            3 |             172 | valid: 0.889 vs 0.111, delta +0.778                 |
+| `atlassian`          |            5 |             354 | valid: 1.000 vs 0.100, delta +0.900                 |
+| `aws`                |            3 |             153 | valid: 0.778 vs 0.222, delta +0.556                 |
+| `azure-devops`       |            5 |             498 | valid: 0.467 vs 0.067, delta +0.400                 |
+| `bitbucket`          |            5 |             563 | invalid: activated response crossed output ceiling  |
+| `bitrise`            |            5 |             461 | invalid: activated response crossed output ceiling  |
+| `claude-code`        |            3 |             142 | dependency fixed; final one-eval smoke delta +1.000 |
+| `codex`              |            3 |             124 | activated; interim $0.05 judge process exited 1     |
+| `copilot`            |            3 |             121 | activated; interim $0.05 judge process exited 1     |
+| `datadog`            |            3 |             151 | invalid: activated response crossed output ceiling  |
+| `figma`              |            5 |             336 | valid: 0.700 vs 0.000, delta +0.700                 |
+| `kiro`               |            3 |             119 | activated; interim $0.05 judge process exited 1     |
+| `opencode`           |            3 |             119 | activated; interim $0.05 judge process exited 1     |
+| `pi`                 |            3 |             122 | activated; interim $0.05 judge process exited 1     |
+| `reliability`        |            3 |             178 | valid: 0.333 vs 0.000, delta +0.333                 |
+| `security-assurance` |            3 |             165 | invalid: generation process failure                 |
+| `workflow`           |           16 |             905 | refused preflight: 64 calls exceeds hard maximum    |
+
+The authenticated local calibration produced seven valid full A/B benchmarks, a valid final-cap Claude Code dependency smoke, and bounded invalid diagnostics for the remaining skills. Invalid runs never publish `benchmark.json`: zero-token, process, judge, output-limit, missing-activation, and aggregate-limit failures are infrastructure or skill-behavior findings, not optimization scores. The initial full results used the earlier per-call caps while the containment layers were being calibrated; future scheduled evidence uses the final lower caps and bounded six-eval batch. Re-run a bounded batch before changing a tier or trimming content from a live result.
 
 ## Result
 
@@ -146,15 +177,18 @@ Before/after are total lines across `SKILL.md` + `references/`, measured from gi
 
 ## Re-running the evals (and adding a new model)
 
-Every skill carries an `evals.json` next to its `SKILL.md` — the output-eval seed consumed by `eval-outputs.py`. It holds the knowledge probes (`prompt` + binary `assertions`) that seed any A/B or ablation run. **291 evals across the catalog.** This is the durable "something to start from": no probe needs re-authoring to test a new model.
+Every skill carries an `evals.json` next to its `SKILL.md` — the output-eval seed consumed by `moon-skill-eval-outputs`. It holds the knowledge probes (`prompt` + binary `assertions`) that seed any A/B or ablation run. **385 evals across the catalog.** This is the durable "something to start from": no probe needs re-authoring to test a new model.
 
 ### Test one skill on any model
 
 ```bash
-uv run packages/skill/skill-skill/skill-guide/scripts/eval-outputs.py \
-  packages/skill/<skill>/<guide>/evals.json <plugin>:<guide> --model <model>
-# e.g. …/eval-outputs.py packages/skill/skill-typescript/typescript-guide/evals.json \
-#        xonovex-skill-typescript:typescript-guide --model haiku
+npx moon-skill-eval-outputs \
+  packages/skill/<skill>/<guide>/evals.json <plugin>:<guide> \
+  --model <model> --plugin-dir packages/skill/<skill>
+# e.g. npx moon-skill-eval-outputs \
+#   packages/skill/skill-typescript/typescript-guide/evals.json \
+#   xonovex-skill-typescript:typescript-guide --model haiku \
+#   --plugin-dir packages/skill/skill-typescript
 ```
 
 Each eval runs twice — **with** the skill and **without** it (no-skill baseline) — graded on its assertions by an LLM judge. The script exits `0` iff with-skill beats no-skill. Needs the `claude` CLI, and `--eval-cwd` set to where the skill resolves (installed plugin or this repo).
@@ -164,11 +198,7 @@ Each eval runs twice — **with** the skill and **without** it (no-skill baselin
 The **weakest model you deploy is the gate** — "what the model already knows" is model-specific, so re-verify against the new model. Re-run the seed across the catalog:
 
 ```bash
-for d in packages/skill/skill-*/*/evals.json; do
-  guide=$(basename "$(dirname "$d")")
-  uv run packages/skill/skill-skill/skill-guide/scripts/eval-outputs.py \
-    "$d" "xonovex-skill-${guide%-guide}:$guide" --model <new-model>
-done
+Use the **Skill model evals** workflow for the post-baseline matrix, or invoke `moon-skill-eval-outputs` per package with `--plugin-dir` as above. Keep live model calls out of pull-request CI; ordinary CI validates the eval schemas, routing balance, train/validation splits, provenance, and scripted-skill capabilities without credentials or network access.
 ```
 
 Read each eval's `with_skill` vs `without_skill` pass rate:

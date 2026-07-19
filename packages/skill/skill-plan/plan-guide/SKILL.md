@@ -1,6 +1,8 @@
 ---
 name: plan-guide
 description: "Use when discovering, researching, formulating, designing, deciding, planning, revising, critiquing, continuing, or validating work — covers neutral early-lifecycle results, optional experience/solution design, authority-bound decisions, provider-native planning, and code research. Triggers on problem discovery, evidence and uncertainty, requirements formulation, UX or architecture results, decision briefs, plans/subplans, fresh-context resume, code cleanup/hardening/alignment, even when the user doesn't say 'plan'."
+compatibility: "Node.js 22+ is required only for the bundled early-lifecycle fixture validator, which reads repository fixtures without network access."
+allowed-tools: "Read Bash(node:*)"
 ---
 
 # Early Lifecycle, Planning, and Code-Research Guidelines

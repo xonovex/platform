@@ -38,7 +38,7 @@
   {
     "query": "transition JIRA-123 to Done from the command line",
     "should_trigger": true,
-    "split": "train",
+    "split": "validation",
     "rationale": "jira workitem transition"
   },
   {
@@ -68,7 +68,37 @@
   {
     "query": "write a good description for my pull request",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "near-miss: PR content craft, use pull-request-guide"
+  },
+  {
+    "query": "In a Hono API running on Node with @hono/node-server, add a WebSocket endpoint at /ws/chat that echoes each incoming message back to the sender. Show both the server bootstrap code and the route definition.",
+    "rationale": "near miss owned by hono-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Write a reusable helper for our Hono API that turns a Zod validation failure into a standardized structured JSON error response for a 400. Show the exact response body shape it produces.",
+    "rationale": "near miss owned by hono-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Our Hono app must read a DATABASE_URL environment variable inside a route handler, and the same code has to run correctly whether deployed on Node or on Cloudflare Workers. Write the handler.",
+    "rationale": "near miss owned by hono-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "In a Hono handler, set a secure session cookie that JavaScript cannot read, is only transmitted over HTTPS, and uses the __Host- name prefix. Write the cookie-setting code.",
+    "rationale": "near miss owned by hono-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Help me handle application structure correctly in this Hono task, including the edge cases that usually get missed.",
+    "rationale": "near miss owned by hono-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

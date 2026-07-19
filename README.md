@@ -135,6 +135,32 @@ codex plugin add xonovex-skill-vitest@xonovex-marketplace
 # … see .agents/plugins/marketplace.json for the full list
 ```
 
+### Upgrades and retired skill plugins
+
+Upgrade the marketplace and selected plugins together; start a new session after changing an installation. Four pre-5.x plugin names are retired and must not remain installed alongside their replacements:
+
+| Retired plugin              | Replacement             |
+| --------------------------- | ----------------------- |
+| `xonovex-skill-general-fp`  | `xonovex-skill-fp`      |
+| `xonovex-skill-general-oop` | `xonovex-skill-oop`     |
+| `xonovex-skill-insights`    | `xonovex-skill-reflect` |
+| `xonovex-skill-prompt`      | `xonovex-skill-command` |
+
+Detect stale local bundles before or after an upgrade:
+
+```bash
+node packages/skill/skill-skill/skill-guide/scripts/check-retired-plugins.mjs
+```
+
+In Codex CLI, open `codex`, run `/plugins`, select each retired installed entry, and choose **Uninstall plugin**; then install its replacement. For Claude Code user-scope installations:
+
+```bash
+claude plugin uninstall xonovex-skill-general-fp@xonovex-marketplace
+claude plugin uninstall xonovex-skill-general-oop@xonovex-marketplace
+claude plugin uninstall xonovex-skill-insights@xonovex-marketplace
+claude plugin uninstall xonovex-skill-prompt@xonovex-marketplace
+```
+
 ## Development
 
 ```bash
