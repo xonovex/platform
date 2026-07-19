@@ -1,8 +1,7 @@
-# Scheduled Kubernetes test coverage for the four Kind-based e2e suites
+# Manually dispatched Kubernetes test coverage for the four Kind-based e2e suites
 # (e2e, e2e-gvisor, e2e-kata, e2e-coco). Ordinary CI owns envtest integration.
 #
-# DORMANT: this workflow cannot run until it reaches the remote default branch.
-# Once there, trigger it with workflow_dispatch or wait for the nightly schedule.
+# Trigger this workflow with workflow_dispatch.
 #
 # First-run expectations:
 # - Each e2e suite creates its own Kind cluster on the hosted runner (Docker is
@@ -18,8 +17,6 @@ name: E2E
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "17 3 * * *"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}

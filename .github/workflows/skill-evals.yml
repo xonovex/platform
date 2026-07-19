@@ -1,20 +1,10 @@
 name: Skill model evals
 
 on:
-  pull_request:
-    paths:
-      - ".github/workflows/skill-evals.yml"
-      - ".moon/tasks/tag-skill.yml"
-      - "packages/script/script-moon-common/**"
-      - "packages/script/script-moon-skill-eval-outputs/**"
-      - "packages/script/script-moon-skill-eval-triggers/**"
-      - "packages/skill/**"
-  schedule:
-    - cron: "17 3 1 * *"
   workflow_dispatch:
 
 concurrency:
-  group: skill-model-evals-${{ github.event.pull_request.number || github.ref }}
+  group: skill-model-evals-${{ github.ref }}
   cancel-in-progress: false
 
 permissions:
@@ -23,9 +13,6 @@ permissions:
 jobs:
   matrix:
     name: Select skill evals
-    if: >-
-      (github.event_name == 'workflow_dispatch' || vars.SKILL_EVALS_ENABLED == 'true') &&
-      (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
     runs-on: ubuntu-latest
     outputs:
       skills: ${{ steps.select.outputs.skills }}
@@ -43,19 +30,15 @@ jobs:
         run: nix develop --command npm ci
 
       - id: select
-        name: Select full or changed-skill matrix
+        name: Select skill matrix
         shell: bash
         run: |
           set -euo pipefail
-          affected=()
-          if [[ "${GITHUB_EVENT_NAME}" == "pull_request" ]]; then
-            affected+=(--affected="${BASE_SHA}" --downstream deep)
-          fi
           nix develop --command npx moon query tasks \
-            --id ci-skill-eval-trigger "${affected[@]}" \
+            --id ci-skill-eval-trigger \
             >"${RUNNER_TEMP}/skill-eval-trigger-tasks.json"
           nix develop --command npx moon query tasks \
-            --id ci-skill-eval-output "${affected[@]}" \
+            --id ci-skill-eval-output \
             >"${RUNNER_TEMP}/skill-eval-output-tasks.json"
           skills="$(nix develop --command jq -sc \
             '[.[].tasks | keys[]] | unique | map({project: ., package: ltrimstr("skill-")})' \
@@ -63,7 +46,6 @@ jobs:
             "${RUNNER_TEMP}/skill-eval-output-tasks.json")"
           printf 'skills=%s\n' "${skills}" >>"${GITHUB_OUTPUT}"
         env:
-          BASE_SHA: ${{ github.event.pull_request.base.sha }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   eval:
