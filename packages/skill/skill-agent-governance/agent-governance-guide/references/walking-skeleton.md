@@ -3,7 +3,7 @@
 Use the walking skeleton to prove that governance, workflow results, harness adaptation, external enforcement, and provider evidence compose without collapsing into one platform or persisted envelope. The skeleton ships as three artifacts with distinct evidence value:
 
 - **Executable local run** (`assets/walking-skeleton/run-skeleton.sh`) — a self-contained script that executes the onboarding lifecycle against a temporary workspace and exits nonzero on any failed check. What it demonstrates was actually run.
-- **Live harness run** (`assets/walking-skeleton/run-live-lifecycle.sh`) — a maintainer-run probe that invokes the real Claude Code command harness, the installed workflow command definitions, and the decision service. It gates acceptance and integration, then proves a self-approved acceptance cannot advance.
+- **Live harness run** (`assets/walking-skeleton/run-live-lifecycle.sh`) — a maintainer-run probe that invokes the real Claude Code command harness, the installed workflow command definitions, and the decision service. It records separate decision and enforcement receipts for each gate, proves self-approval cannot advance, and makes a real agent `Write` attempt whose protected mutation must be blocked by the native hook.
 - **Recorded conformance scenario** (the fixture replay validated by `scripts/validate-walking-skeleton-fixtures.mjs`) — a cross-checked composition over the governance, harness, external-enforcement, enterprise-platform, and module-template fixtures. It proves the contracts compose; it is not a claim that a live tenant or hosted platform passed.
 
 ## Executable local run
@@ -21,7 +21,7 @@ That second enforcement point is a locally re-invoked gate shaped like a require
 
 ## Live harness run
 
-The live counterpart is intentionally excluded from CI because it uses the installed provider runtime and credentials. It copies the repository's discovery, acceptance-validation, and integration-validation command definitions into a temporary Claude Code project, reads the recorded Phase 2 native-capability probe, and starts the Phase 1 decision service. The harness outputs are observations, not fabricated human acceptance or external mutations. Both high-impact gates carry the exact Git revision in their subject and verdict evidence. The negative path uses the same author and decider and must produce `acceptance-independence-failed` before another lifecycle command can run.
+The live counterpart is intentionally excluded from CI because it uses the installed provider runtime and credentials. It copies the repository's discovery, acceptance-validation, and integration-validation command definitions into a temporary Claude Code project, reads the recorded Phase 2 native-capability probe, and starts the Phase 1 decision service. The harness outputs are observations, not fabricated human acceptance or external mutations. Both high-impact gates carry the exact Git revision in their decision and workflow-script enforcement evidence. The negative path uses the same author and decider and must produce `acceptance-independence-failed`; it then invokes the real agent against a protected path and requires both file absence and a content-addressed `PreToolUse` enforcement record.
 
 Run it from the repository root with an accountable local identity and optionally retain sanitized probe output:
 

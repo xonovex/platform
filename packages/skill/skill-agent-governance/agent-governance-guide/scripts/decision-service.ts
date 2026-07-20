@@ -4,11 +4,19 @@ import {
   type ServerResponse,
 } from "node:http";
 import {pathToFileURL} from "node:url";
+import {z} from "zod";
 import {
   decideGovernance,
+  governanceDecisionApiVersion,
+  governanceEvaluatorVersion,
+  governancePolicyVersion,
   type RecordVerdictEvidence,
 } from "../../../skill-workflow/workflow-guide/scripts/governance-decision.ts";
-import {createJsonlEvidenceRecorder} from "./verdict-evidence.ts";
+import {
+  createJsonlEnforcementRecorder,
+  createJsonlEvidenceRecorder,
+  type RecordEnforcementEvidence,
+} from "./verdict-evidence.ts";
 import {
   createOTLPJsonlRecorder,
   type RecordRuntimeSignal,
@@ -16,6 +24,23 @@ import {
 
 const defaultPort = 8_787;
 const maximumRequestBytes = 1_048_576;
+const operationDigestSchema = z.string().regex(/^sha256:[0-9a-f]{64}$/u);
+const enforcementEvidenceSchema = z
+  .object({
+    apiVersion: z.literal(governanceDecisionApiVersion),
+    correlationId: z.string().min(1),
+    subjectReference: z.string().min(1),
+    subjectRevision: z.string().min(1).optional(),
+    outcome: z.enum(["allow", "deny", "observe"]),
+    failureCode: z.string().min(1).optional(),
+    policyVersion: z.literal(governancePolicyVersion),
+    evaluatorVersion: z.literal(governanceEvaluatorVersion),
+    operationDigest: operationDigestSchema,
+    protectedTargetsDigest: operationDigestSchema,
+    decisionEvidenceReference: z.string().min(1),
+    enforcementPoint: z.string().min(1),
+  })
+  .strict();
 
 const readJsonBody = async (request: IncomingMessage): Promise<unknown> => {
   const chunks: Buffer[] = [];
@@ -41,6 +66,7 @@ const sendJson = (
 export const createDecisionRequestHandler =
   (
     recordEvidence: RecordVerdictEvidence,
+    recordEnforcement: RecordEnforcementEvidence,
     recordTelemetry: RecordRuntimeSignal = async () => undefined,
   ) =>
   async (request: IncomingMessage, response: ServerResponse): Promise<void> => {
@@ -50,29 +76,24 @@ export const createDecisionRequestHandler =
     }
     if (request.method === "POST" && request.url === "/v1/enforcements") {
       try {
-        const payload = await readJsonBody(request);
-        if (payload === null || typeof payload !== "object") {
-          throw new Error("enforcement-signal-invalid");
-        }
-        const correlationId = Reflect.get(payload, "correlationId");
-        const outcome = Reflect.get(payload, "outcome");
-        const failureCode = Reflect.get(payload, "failureCode");
-        if (
-          typeof correlationId !== "string" ||
-          correlationId.length === 0 ||
-          typeof outcome !== "string" ||
-          !["allow", "deny", "observe"].includes(outcome) ||
-          (failureCode !== undefined && typeof failureCode !== "string")
-        ) {
-          throw new Error("enforcement-signal-invalid");
-        }
+        const payload = enforcementEvidenceSchema.parse(
+          await readJsonBody(request),
+        );
+        const evidenceReference = await recordEnforcement(payload);
         await recordTelemetry({
-          correlationId,
-          kind: "hook.enforcement",
-          outcome,
-          ...(failureCode === undefined ? {} : {failureCode}),
+          correlationId: payload.correlationId,
+          kind: "governance.enforcement",
+          outcome: payload.outcome,
+          ...(payload.failureCode === undefined
+            ? {}
+            : {failureCode: payload.failureCode}),
         });
-        sendJson(response, 202, {status: "recorded"});
+        sendJson(response, 202, {
+          apiVersion: payload.apiVersion,
+          correlationId: payload.correlationId,
+          status: "recorded",
+          evidenceReference,
+        });
       } catch {
         sendJson(response, 400, {failureCode: "enforcement-signal-invalid"});
       }
@@ -109,10 +130,27 @@ export const startDecisionService = async (): Promise<void> => {
     process.env.DECISION_EVIDENCE_PATH ?? "/var/lib/xonovex/verdicts.jsonl";
   const telemetryPath =
     process.env.DECISION_TELEMETRY_PATH ?? "/var/lib/xonovex/telemetry.jsonl";
-  const evidence = await createJsonlEvidenceRecorder(evidencePath);
+  const enforcementPath =
+    process.env.DECISION_ENFORCEMENT_PATH ??
+    "/var/lib/xonovex/enforcements.jsonl";
+  const evidenceBaseReference = process.env.DECISION_EVIDENCE_BASE_REFERENCE;
+  const enforcementBaseReference =
+    process.env.DECISION_ENFORCEMENT_BASE_REFERENCE;
+  const evidence = await createJsonlEvidenceRecorder(
+    evidencePath,
+    evidenceBaseReference,
+  );
+  const enforcement = await createJsonlEnforcementRecorder(
+    enforcementPath,
+    enforcementBaseReference,
+  );
   const telemetry = await createOTLPJsonlRecorder(telemetryPath);
   const server = createServer(
-    createDecisionRequestHandler(evidence.record, telemetry),
+    createDecisionRequestHandler(
+      evidence.record,
+      enforcement.record,
+      telemetry,
+    ),
   );
   server.listen(port, "0.0.0.0");
 };

@@ -56,6 +56,8 @@ type EscalationOutcome string
 
 const (
 	EscalationOutcomePending   EscalationOutcome = "Pending"
+	EscalationOutcomeApproved  EscalationOutcome = "Approved"
+	EscalationOutcomeRejected  EscalationOutcome = "Rejected"
 	EscalationOutcomePaused    EscalationOutcome = "Paused"
 	EscalationOutcomeAbandoned EscalationOutcome = "Abandoned"
 )
@@ -248,9 +250,11 @@ type AgentRunProvenance struct {
 // AgentEscalationRoute bounds a human escalation and declares the outcome that
 // is safe when the recipient does not answer.
 type AgentEscalationRoute struct {
-	Recipient   string                `json:"recipient"`
-	Window      metav1.Duration       `json:"window"`
-	SafeDefault EscalationSafeDefault `json:"safeDefault"`
+	Recipient                   string                `json:"recipient"`
+	Window                      metav1.Duration       `json:"window"`
+	SafeDefault                 EscalationSafeDefault `json:"safeDefault"`
+	BlockedSignalTokenSecretRef SecretKeyRef          `json:"blockedSignalTokenSecretRef"`
+	ResponseTokenSecretRef      SecretKeyRef          `json:"responseTokenSecretRef"`
 }
 
 // AgentAutonomySpec couples A3 execution to protected targets, escalation, and
@@ -259,29 +263,48 @@ type AgentAutonomySpec struct {
 	Level            AutonomyLevel         `json:"level,omitempty"`
 	ProtectedTargets []string              `json:"protectedTargets,omitempty"`
 	EscalationRoute  *AgentEscalationRoute `json:"escalationRoute,omitempty"`
-	NeedsHuman       bool                  `json:"needsHuman,omitempty"`
 }
 
 // AgentRunJournal is the reconciler-recorded, content-minimized provenance for
 // one exact AgentRun generation.
 type AgentRunJournal struct {
-	RecordedAt         metav1.Time `json:"recordedAt"`
-	Generation         int64       `json:"generation"`
-	AccountableOwner   string      `json:"accountableOwner"`
-	Model              string      `json:"model"`
-	Provider           string      `json:"provider"`
-	PromptReference    string      `json:"promptReference"`
-	Tools              []string    `json:"tools"`
-	GrantedPermissions []string    `json:"grantedPermissions"`
+	RecordedAt              metav1.Time `json:"recordedAt"`
+	Generation              int64       `json:"generation"`
+	AccountableOwner        string      `json:"accountableOwner"`
+	Model                   string      `json:"model"`
+	Provider                string      `json:"provider"`
+	PromptReference         string      `json:"promptReference"`
+	Tools                   []string    `json:"tools"`
+	GrantedPermissions      []string    `json:"grantedPermissions"`
+	ExecutionImage          string      `json:"executionImage,omitempty"`
+	RuntimeClassName        string      `json:"runtimeClassName,omitempty"`
+	AgentType               AgentType   `json:"agentType,omitempty"`
+	ProviderEnvironmentKeys []string    `json:"providerEnvironmentKeys,omitempty"`
+	ExecutionSpecDigest     string      `json:"executionSpecDigest,omitempty"`
 }
 
 // AgentEscalationStatus records the bounded escalation and its safe result.
 type AgentEscalationStatus struct {
-	Recipient   string                `json:"recipient"`
-	RequestedAt metav1.Time           `json:"requestedAt"`
-	ExpiresAt   metav1.Time           `json:"expiresAt"`
-	SafeDefault EscalationSafeDefault `json:"safeDefault"`
-	Outcome     EscalationOutcome     `json:"outcome"`
+	Recipient         string                `json:"recipient"`
+	SubjectRevision   string                `json:"subjectRevision"`
+	RequestedAt       metav1.Time           `json:"requestedAt"`
+	ExpiresAt         metav1.Time           `json:"expiresAt"`
+	SafeDefault       EscalationSafeDefault `json:"safeDefault"`
+	Outcome           EscalationOutcome     `json:"outcome"`
+	DeliveryReference string                `json:"deliveryReference"`
+	Responder         string                `json:"responder,omitempty"`
+	ResponseReference string                `json:"responseReference,omitempty"`
+	RespondedAt       *metav1.Time          `json:"respondedAt,omitempty"`
+}
+
+// AgentBlockedStatus is an authenticated runtime observation that execution
+// cannot continue without an accountable decision.
+type AgentBlockedStatus struct {
+	ReportedAt        metav1.Time `json:"reportedAt"`
+	SubjectRevision   string      `json:"subjectRevision"`
+	Reporter          string      `json:"reporter"`
+	ReasonCode        string      `json:"reasonCode"`
+	EvidenceReference string      `json:"evidenceReference"`
 }
 
 // AgentContainmentStatus is durable evidence that a drift or policy anomaly
@@ -382,6 +405,8 @@ type AgentRunStatus struct {
 	Journal *AgentRunJournal `json:"journal,omitempty"`
 	// Escalation records a bounded human escalation and its safe default.
 	Escalation *AgentEscalationStatus `json:"escalation,omitempty"`
+	// Blocked records an authenticated runtime signal that requires escalation.
+	Blocked *AgentBlockedStatus `json:"blocked,omitempty"`
 	// Containment records a drift-triggered kill switch and autonomy demotion.
 	Containment *AgentContainmentStatus `json:"containment,omitempty"`
 }

@@ -183,6 +183,12 @@ lifecycle commands) or **enablement-only** (transactional setup with no ongoing 
 This piece supplies the vocabulary and discipline that the enforcement types below bind to
 native controls.
 
+**Trigger and execution are independent.** A manual action, harness hook, CI/CD hook, provider
+webhook, schedule, sensor, API, or another agent can start the same trusted template. The
+template then selects one of three runtime families: deterministic workflow script; workflow
+script followed by a bounded model; or observed `A1`/`A2`/`A3` oversight followed by a bounded
+agent executing an explicit workflow skill. A hook is only one trigger source.
+
 **Executor classes.** Every task selects the least adaptive executor that fits:
 deterministic script/API → script plus bounded model → bounded agent → human → external
 system, each with a required boundary (pinned inputs, closed schemas, budgets, attenuated
@@ -206,7 +212,7 @@ grades a _posture_ — how far a run advances before a human must act — from `
 invokes everything) through `A1` (adds an independent critique the author cannot suppress),
 `A2` (headless to the next human gate; requires a run journal, asynchronous exact-revision
 approval, cancellation, and a kill switch) to `A3` (non-human triggers under admission
-control; an eventual goal an adopter builds and proves, not a description of what exists) —
+control; a posture an adopter must deploy, observe, and prove rather than infer from installation) —
 drawn in the
 [autonomy-ladder diagram](../../../diagram/diagram-agent-workflow/autonomy-ladder.png).
 **Start at `A1`.** Two rules govern the whole ladder: raising a level never widens what a

@@ -17,17 +17,33 @@ PROTECTED_PATTERN="${PROTECTED_PATTERN:-(^|/)secrets/|\.key$}"
 MANDATORY="${MANDATORY:-1}"
 POLICY_UNAVAILABLE="${POLICY_UNAVAILABLE:-0}"
 POLICY_VERSION="${POLICY_VERSION:-skeleton-policy/1}"
+SUBJECT_REVISION="${SUBJECT_REVISION:?SUBJECT_REVISION is required}"
+EVALUATOR_VERSION="${EVALUATOR_VERSION:?EVALUATOR_VERSION is required}"
 
 event="$(cat)"
 tool="$(jq -r '.tool // "unknown"' <<<"$event")"
 path="$(jq -r '.path // ""' <<<"$event")"
 event_id="$(jq -r '.event_id // "none"' <<<"$event")"
+operation_digest="sha256:$(jq -cS . <<<"$event" | sha256sum | cut -d' ' -f1)"
 
 emit() {
   # emit <decision> <reason> — compact JSON so decisions are JSONL-safe
   jq -cn --arg d "$1" --arg r "$2" --arg p "$POLICY_VERSION" \
-    --arg t "$tool" --arg pa "$path" --arg e "$event_id" \
-    '{decision:$d, reason:$r, policy_version:$p, tool:$t, path:$pa, event_id:$e}'
+    --arg evaluator "$EVALUATOR_VERSION" --arg t "$tool" --arg pa "$path" \
+    --arg e "$event_id" --arg subject "path:$path" --arg revision "$SUBJECT_REVISION" \
+    --arg digest "$operation_digest" \
+    '{
+      decision:$d,
+      reason:$r,
+      policy_version:$p,
+      evaluator_version:$evaluator,
+      tool:$t,
+      path:$pa,
+      event_id:$e,
+      subject_reference:$subject,
+      subject_revision:$revision,
+      operation_digest:$digest
+    }'
 }
 
 # Decision-point outage: mandatory controls fail closed, advisory ones observe.

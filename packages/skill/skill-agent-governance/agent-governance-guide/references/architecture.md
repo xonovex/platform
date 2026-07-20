@@ -1,5 +1,25 @@
 # Governance Architecture and Authority
 
+## Independent trigger, execution, and oversight dimensions
+
+A hook is one possible trigger, not the organizing abstraction. A workflow invocation keeps three dimensions independent:
+
+| Dimension          | Values                                                                                                   |
+| ------------------ | -------------------------------------------------------------------------------------------------------- |
+| Trigger origin     | manual action, agent-harness hook, CI/CD hook, provider webhook, schedule, sensor, API, or another agent |
+| Execution family   | workflow script; workflow script followed by a bounded LLM; bounded agent executing a workflow skill     |
+| Oversight maturity | none for deterministic/model execution; observed `A1`, `A2`, or `A3` controls for an agent launch        |
+
+The trigger supplies origin, actor, idempotency, subject, and exact revision. It does not select authority or adaptivity implicitly. The trusted workflow template selects one of these execution families:
+
+```text
+any trigger ─┬─> workflow script
+             ├─> workflow script ─> bounded LLM
+             └─> observed A1/A2/A3 oversight ─> bounded agent ─> workflow skill
+```
+
+The runtime contract in `scripts/workflow-runtime.ts` and the native command implementation in `scripts/workflow-command-runtime.ts` enforce that separation. `scripts/workflow-trigger-adapters.ts` binds minimized, authenticated native-event metadata to a trusted template without converting a trigger into an executor.
+
 ## Plane boundaries
 
 Governance owns applicability, policy, authority, actor requirements, exceptions, evidence requirements, and effective composition. Execution implements declared capability contracts. Enforcement applies decisions through native adapters. Enablement changes configuration transactionally. Providers own native state and evidence. Observability correlates executions without becoming a workflow identity. Distribution owns package trust and lifecycle.

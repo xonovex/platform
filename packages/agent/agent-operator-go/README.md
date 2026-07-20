@@ -37,28 +37,49 @@ spec:
       memory: "2Gi"
 ```
 
-**Lifecycle phases:** `Pending` -> `Initializing` -> `Running` -> `Succeeded` | `Failed` | `TimedOut`
+**Lifecycle phases:** `Pending` -> `Initializing` -> `Running` -> `Succeeded` | `Failed` | `TimedOut` | `Paused`
+
+#### Trigger and autonomy boundaries
+
+Trigger source is independent from execution. An `AgentRun` can be created manually, from an `AgentSchedule`, or by an authenticated `AgentTrigger` request; CI/CD and provider webhooks use the same trigger receiver. The generic workflow runtime also accepts agent-harness hooks, sensors, APIs, and agent-originated events without changing the selected execution family.
+
+The Kubernetes adapter implements `A0` and `A3`. Admission rejects `A1`/`A2` because this controller does not verify their independent-critique and asynchronous-gate contracts; use the governance workflow runtime for those levels. An `A3` run requires:
+
+- exact model/provider/prompt/tool/permission provenance and protected targets;
+- a mandatory namespace governance policy and minimized operation annotation;
+- admission-minted decision and enforcement references bound to the immutable spec digest;
+- distinct readable blocked-signal and accountable-response token references, plus a configured provider escalation router;
+- persistent decision/enforcement evidence storage.
+
+The runtime reports a genuine block with an authenticated `POST /v1/blocks/{namespace}/{run}` carrying the exact subject revision, reporter, reason code, and content-addressed evidence reference. Only then does the controller deliver the escalation. The accountable recipient uses a different credential to call `POST /v1/escalations/{namespace}/{run}` with `approve` or `reject`, the same subject revision, actor, and provider response reference. The controller rejects equal credentials, so the runtime cannot answer its own escalation. Approval resumes reconciliation, rejection fails the run, and silence applies the predeclared `pause` or `abandon` default.
+
+The operator supplies the authenticated endpoints, but an agent harness must explicitly implement blocked-state detection, submit the block request, and wait on `GET /v1/escalations/{namespace}/{run}` before continuing or stopping. That status read uses `blockedSignalTokenSecretRef`; only the accountable-response service receives `responseTokenSecretRef`. The run's NetworkPolicy must allow the receiver endpoint, and the receiver base URL must be reachable from both the runtime and escalation provider. A harness without this adapter can execute an `A3` run but cannot claim the escalation control is operational.
+
+Configure `--escalation-router-url`, `--escalation-router-token-file`, and `--escalation-response-base-url` together. Without an observed route and token, `A3` fails closed. The bundled decision service stores verdict and enforcement JSONL on the `agent-operator-governance-evidence` PVC; production overlays should set storage class, capacity, backup, retention, and access policy.
 
 #### Full spec reference
 
-| Field | Type | Description |
-| --- | --- | --- |
-| `harnessRef` | string | Name of an AgentHarness in the same namespace |
-| `harness` | object | Inline harness config (mutually exclusive with `harnessRef`) |
-| `providerRef` | string | Name of an AgentProvider in the same namespace |
-| `provider` | object | Inline provider config (mutually exclusive with `providerRef`) |
-| `workspaceRef` | string | Name of an AgentWorkspace for shared workspace support |
-| `workspace` | object | Inline workspace config (mutually exclusive with `workspaceRef`) |
-| `toolchainRef` | string | Name of an AgentToolchain in the same namespace |
-| `toolchain` | object | Inline toolchain config (mutually exclusive with `toolchainRef`) |
-| `prompt` | string | Task prompt for headless execution |
-| `resources` | object | K8s resource requirements for the agent container |
-| `timeout` | duration | Max run duration (default: `1h`) |
-| `env` | list | Additional environment variables |
-| `image` | string | Digest-pinned agent image override; required unless resolved from a harness, toolchain, or policy |
-| `runtimeClassName` | string | Sandboxed pod runtime class; required unless resolved from a harness or policy |
-| `nodeSelector` | map | Node selector for pod scheduling |
-| `tolerations` | list | Tolerations for pod scheduling |
+| Field              | Type     | Description                                                                                       |
+| ------------------ | -------- | ------------------------------------------------------------------------------------------------- |
+| `accountableOwner` | string   | Person or team accountable for the run                                                            |
+| `provenance`       | object   | Content-minimized model, provider, prompt-reference, tool, and permission inputs                  |
+| `autonomy`         | object   | `A0` or fully coupled `A3` controls; `A1`/`A2` are rejected by this adapter                       |
+| `harnessRef`       | string   | Name of an AgentHarness in the same namespace                                                     |
+| `harness`          | object   | Inline harness config (mutually exclusive with `harnessRef`)                                      |
+| `providerRef`      | string   | Name of an AgentProvider in the same namespace                                                    |
+| `provider`         | object   | Inline provider config (mutually exclusive with `providerRef`)                                    |
+| `workspaceRef`     | string   | Name of an AgentWorkspace for shared workspace support                                            |
+| `workspace`        | object   | Inline workspace config (mutually exclusive with `workspaceRef`)                                  |
+| `toolchainRef`     | string   | Name of an AgentToolchain in the same namespace                                                   |
+| `toolchain`        | object   | Inline toolchain config (mutually exclusive with `toolchainRef`)                                  |
+| `prompt`           | string   | Task prompt for headless execution                                                                |
+| `resources`        | object   | K8s resource requirements for the agent container                                                 |
+| `timeout`          | duration | Max run duration (default: `1h`)                                                                  |
+| `env`              | list     | Additional environment variables                                                                  |
+| `image`            | string   | Digest-pinned agent image override; required unless resolved from a harness, toolchain, or policy |
+| `runtimeClassName` | string   | Sandboxed pod runtime class; required unless resolved from a harness or policy                    |
+| `nodeSelector`     | map      | Node selector for pod scheduling                                                                  |
+| `tolerations`      | list     | Tolerations for pod scheduling                                                                    |
 
 ### AgentHarness
 
@@ -82,15 +103,15 @@ spec:
 
 #### Full spec reference
 
-| Field | Type | Description |
-| --- | --- | --- |
-| `type` | string | Agent type (`claude`, `opencode`) |
-| `defaultProvider` | string | Default provider name |
-| `defaultImage` | string | Default digest-pinned agent image |
-| `defaultResources` | object | Default resource requirements |
-| `defaultTimeout` | duration | Default timeout for agent runs |
-| `defaultRuntimeClassName` | string | Default pod runtime class (e.g. `gvisor`, `kata`) |
-| `env` | list | Default environment variables |
+| Field                     | Type     | Description                                       |
+| ------------------------- | -------- | ------------------------------------------------- |
+| `type`                    | string   | Agent type (`claude`, `opencode`)                 |
+| `defaultProvider`         | string   | Default provider name                             |
+| `defaultImage`            | string   | Default digest-pinned agent image                 |
+| `defaultResources`        | object   | Default resource requirements                     |
+| `defaultTimeout`          | duration | Default timeout for agent runs                    |
+| `defaultRuntimeClassName` | string   | Default pod runtime class (e.g. `gvisor`, `kata`) |
+| `env`                     | list     | Default environment variables                     |
 
 ### AgentProvider
 
@@ -117,13 +138,13 @@ The controller validates that the referenced Secret exists and contains the spec
 
 #### Full spec reference
 
-| Field | Type | Description |
-| --- | --- | --- |
-| `type` | string | Provider type (e.g. `anthropic`, `openai`) |
-| `displayName` | string | Human-readable name |
-| `authTokenSecretRef` | object | Secret reference for auth token |
-| `environment` | map | Environment variables to set |
-| `cliArgs` | list | Additional CLI arguments |
+| Field                | Type   | Description                                |
+| -------------------- | ------ | ------------------------------------------ |
+| `type`               | string | Provider type (e.g. `anthropic`, `openai`) |
+| `displayName`        | string | Human-readable name                        |
+| `authTokenSecretRef` | object | Secret reference for auth token            |
+| `environment`        | map    | Environment variables to set               |
+| `cliArgs`            | list   | Additional CLI arguments                   |
 
 ### AgentWorkspace
 
@@ -154,18 +175,18 @@ spec:
 
 #### Full spec reference
 
-| Field | Type | Description |
-| --- | --- | --- |
-| `type` | string | Workspace type (`git` or `jj`) |
-| `repository.url` | string | Git repository URL (required) |
-| `repository.branch` | string | Branch to checkout |
-| `storageClass` | string | Storage class for workspace PVC (must support RWX) |
-| `storageSize` | string | Storage size for workspace PVC (default: `10Gi`) |
-| `sharedVolumes[].name` | string | Volume name (used as PVC suffix) |
-| `sharedVolumes[].mountPath` | string | Mount path in agent containers |
-| `sharedVolumes[].storageSize` | string | PVC size for this volume (default: `1Gi`) |
-| `git.worktree` | object | Git worktree configuration |
-| `jj.revision` | string | Jujutsu revision |
+| Field                         | Type   | Description                                        |
+| ----------------------------- | ------ | -------------------------------------------------- |
+| `type`                        | string | Workspace type (`git` or `jj`)                     |
+| `repository.url`              | string | Git repository URL (required)                      |
+| `repository.branch`           | string | Branch to checkout                                 |
+| `storageClass`                | string | Storage class for workspace PVC (must support RWX) |
+| `storageSize`                 | string | Storage size for workspace PVC (default: `10Gi`)   |
+| `sharedVolumes[].name`        | string | Volume name (used as PVC suffix)                   |
+| `sharedVolumes[].mountPath`   | string | Mount path in agent containers                     |
+| `sharedVolumes[].storageSize` | string | PVC size for this volume (default: `1Gi`)          |
+| `git.worktree`                | object | Git worktree configuration                         |
+| `jj.revision`                 | string | Jujutsu revision                                   |
 
 #### Volume layout
 
@@ -202,13 +223,13 @@ spec:
 
 #### Full spec reference
 
-| Field | Type | Description |
-| --- | --- | --- |
-| `type` | string | Toolchain type (`nix`) |
-| `nix.nixpkgsRev` | string | Pinned nixpkgs rev the image was built from (required reproducibility pin) |
-| `nix.packages` | list | Nixpkgs attribute names baked into the image (packages source; mutually exclusive with `flakeRef`) |
-| `nix.flakeRef` / `nix.shell` | string | Project flake + devShell (project-flake source; mutually exclusive with `packages`) |
-| `nix.image` | string | Pre-built, digest-pinned agent OCI image the pod runs (required; satisfies `RequirePinnedProvision`) |
+| Field                        | Type   | Description                                                                                          |
+| ---------------------------- | ------ | ---------------------------------------------------------------------------------------------------- |
+| `type`                       | string | Toolchain type (`nix`)                                                                               |
+| `nix.nixpkgsRev`             | string | Pinned nixpkgs rev the image was built from (required reproducibility pin)                           |
+| `nix.packages`               | list   | Nixpkgs attribute names baked into the image (packages source; mutually exclusive with `flakeRef`)   |
+| `nix.flakeRef` / `nix.shell` | string | Project flake + devShell (project-flake source; mutually exclusive with `packages`)                  |
+| `nix.image`                  | string | Pre-built, digest-pinned agent OCI image the pod runs (required; satisfies `RequirePinnedProvision`) |
 
 The `nix` toolchain selects the pre-built image as the pod image — the **same content-addressed store-path closure** the CLI resolves (built from the same `flake.lock` + `nix/agent-env.nix`, verified with `nix path-info -r`). The pod starts by image pull: **no `nix-env` emptyDir, no `nixos/nix` init container, no per-pod `nix profile install`**. The AgentRun and AgentToolchain webhooks reject a `NixSpec` without `nixpkgsRev`, exactly one packages/flake source, and an `@sha256:` image digest. Build/push the image with `npx moon run agent-operator-go:agent-image-build` (→ `nix build .#legacyPackages.<sys>.agentImage` + skopeo push).
 
@@ -240,15 +261,15 @@ spec:
     runtimeClassName: kata
 ```
 
-| Governance intent | Native admission behavior | Independent verification |
-| --- | --- | --- |
-| Runtime isolation | Requires or allowlists `runtimeClassName` | Verify the cluster RuntimeClass and runtime implementation |
-| Container hardening | Rejects explicit privilege escalation and root weakening | Inspect the generated Pod security context and cluster admission policy |
-| Network restriction | Rejects `networkPolicy.disabled: true` when required | Verify generated NetworkPolicy behavior with the installed network plugin |
-| Duration bound | Requires an explicit/policy-defaulted timeout at or below `maxTimeout` | Observe Job timeout and terminal status |
-| Resource bound | Requires a limit for each `maxResources` entry; rejects requests/limits above it | Keep namespace LimitRange and ResourceQuota as an independent control |
-| Image restriction | Requires a digest-pinned image resolved from the run, harness, toolchain, or policy, then applies `allowedImages` | Add signature/provenance admission when digest pinning is insufficient |
-| Toolchain pinning | AgentToolchain/inline Nix validation requires revision, source, and image digest | Verify registry digest and the built closure provenance |
+| Governance intent   | Native admission behavior                                                                                         | Independent verification                                                  |
+| ------------------- | ----------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| Runtime isolation   | Requires or allowlists `runtimeClassName`                                                                         | Verify the cluster RuntimeClass and runtime implementation                |
+| Container hardening | Rejects explicit privilege escalation and root weakening                                                          | Inspect the generated Pod security context and cluster admission policy   |
+| Network restriction | Rejects `networkPolicy.disabled: true` when required                                                              | Verify generated NetworkPolicy behavior with the installed network plugin |
+| Duration bound      | Requires an explicit/policy-defaulted timeout at or below `maxTimeout`                                            | Observe Job timeout and terminal status                                   |
+| Resource bound      | Requires a limit for each `maxResources` entry; rejects requests/limits above it                                  | Keep namespace LimitRange and ResourceQuota as an independent control     |
+| Image restriction   | Requires a digest-pinned image resolved from the run, harness, toolchain, or policy, then applies `allowedImages` | Add signature/provenance admission when digest pinning is insufficient    |
+| Toolchain pinning   | AgentToolchain/inline Nix validation requires revision, source, and image digest                                  | Verify registry digest and the built closure provenance                   |
 
 Policy defaults are applied before harness and toolchain references are resolved at admission. The admitted AgentRun stores the exact digest-pinned image and sandboxed runtime class that policy approved; missing or mutable image inputs and missing runtime classes are rejected even when no AgentPolicy exists.
 
@@ -519,6 +540,7 @@ spec:
 ```
 
 The agent container image must include the `jj` binary. When workspace type is `jj`:
+
 - **Standalone clone**: `git clone ... && jj git init --colocate`
 - **Standalone worktree**: `jj workspace add` instead of `git worktree add`
 - **Workspace init**: clone + `jj git init --colocate`
@@ -853,17 +875,19 @@ nightly schedule.
 Each AgentRun triggers one of two paths:
 
 **Standalone path** (no `workspaceRef`):
+
 1. **Workspace PVC** (RWO) is created for persistent git storage
 2. **Job** is created with init container (git clone) and main container (agent binary)
 3. Controller watches Job status and updates AgentRun phase
 
 **Workspace path** (with `workspaceRef`):
+
 1. **AgentWorkspace** must be in `Ready` phase (requeue if not)
 2. **Job** is created using the workspace's shared PVC (RWX) with init container (git worktree add) and main container (agent binary working in the worktree)
 3. Shared volume PVCs are mounted at configured paths (e.g. `~/.claude/`)
 4. Controller watches Job status and updates AgentRun phase
 
-**RuntimeClassName** is applied to the Job's PodSpec when set on the AgentRun or inherited from the referenced AgentHarness. Both init and main containers run in the sandboxed runtime. Workspace init Jobs do *not* inherit runtimeClassName; only agent Jobs do.
+**RuntimeClassName** is applied to the Job's PodSpec when set on the AgentRun or inherited from the referenced AgentHarness. Both init and main containers run in the sandboxed runtime. Workspace init Jobs do _not_ inherit runtimeClassName; only agent Jobs do.
 
 ```
 Standalone:                         Workspace:

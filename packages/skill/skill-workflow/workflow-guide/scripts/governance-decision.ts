@@ -1,3 +1,4 @@
+import {createHash} from "node:crypto";
 import {z} from "zod";
 import {
   selectDevelopmentExecutor,
@@ -11,29 +12,40 @@ import {
 
 export const governanceDecisionApiVersion =
   "governance.xonovex.com/v1alpha1" as const;
+export const governancePolicyVersion = "governance-policy/1" as const;
+export const governanceEvaluatorVersion = "governance-evaluator/1" as const;
 
 const inputSchema = z.record(z.string(), z.unknown());
 const operationSchema = z.discriminatedUnion("kind", [
-  z.object({kind: z.literal("independence"), input: inputSchema}),
-  z.object({kind: z.literal("emergency-access"), input: inputSchema}),
-  z.object({kind: z.literal("privileged-operation"), input: inputSchema}),
-  z.object({kind: z.literal("development"), input: inputSchema}),
-  z.object({kind: z.literal("protected-path"), input: inputSchema}),
+  z.object({kind: z.literal("independence"), input: inputSchema}).strict(),
+  z.object({kind: z.literal("emergency-access"), input: inputSchema}).strict(),
+  z
+    .object({kind: z.literal("privileged-operation"), input: inputSchema})
+    .strict(),
+  z.object({kind: z.literal("development"), input: inputSchema}).strict(),
+  z.object({kind: z.literal("protected-path"), input: inputSchema}).strict(),
 ]);
 
-export const governanceDecisionRequestSchema = z.object({
-  apiVersion: z.literal(governanceDecisionApiVersion),
-  correlationId: z.string().min(1),
-  subject: z.object({
-    reference: z.string().min(1),
-    revision: z.string().min(1).optional(),
-  }),
-  policy: z.object({
-    version: z.string().min(1),
-    enforcement: z.enum(["mandatory", "advisory"]),
-  }),
-  operation: operationSchema,
-});
+export const governanceDecisionRequestSchema = z
+  .object({
+    apiVersion: z.literal(governanceDecisionApiVersion),
+    correlationId: z.string().min(1),
+    subject: z
+      .object({
+        reference: z.string().min(1),
+        revision: z.string().min(1).optional(),
+      })
+      .strict(),
+    policy: z
+      .object({
+        version: z.literal(governancePolicyVersion),
+        enforcement: z.enum(["mandatory", "advisory"]),
+      })
+      .strict(),
+    protectedTargetReferences: z.array(z.string().min(1)).optional(),
+    operation: operationSchema,
+  })
+  .strict();
 
 export type GovernanceDecisionRequest = z.infer<
   typeof governanceDecisionRequestSchema
@@ -44,9 +56,13 @@ export interface VerdictEvidence {
   readonly apiVersion: typeof governanceDecisionApiVersion;
   readonly correlationId: string;
   readonly subjectReference: string;
+  readonly subjectRevision?: string;
   readonly decision: GovernanceDecision;
   readonly failureCode?: string;
   readonly policyVersion: string;
+  readonly evaluatorVersion: typeof governanceEvaluatorVersion;
+  readonly operationDigest: string;
+  readonly protectedTargetsDigest: string;
 }
 
 export interface GovernanceDecisionResponse extends VerdictEvidence {
@@ -70,14 +86,47 @@ const nestedField = (value: unknown, field: string): unknown => {
   return Reflect.get(value, field);
 };
 
+const canonicalize = (value: unknown): unknown => {
+  if (Array.isArray(value)) return value.map((item) => canonicalize(item));
+  if (value === null || typeof value !== "object") return value;
+  return Object.fromEntries(
+    Object.entries(value)
+      .sort(([left], [right]) => left.localeCompare(right))
+      .map(([key, item]) => [key, canonicalize(item)]),
+  );
+};
+
+export const digestGovernanceOperation = (operation: unknown): string =>
+  `sha256:${createHash("sha256")
+    .update(JSON.stringify(canonicalize(operation)) ?? "null")
+    .digest("hex")}`;
+
+export const digestProtectedTargets = (
+  protectedTargetReferences: readonly string[],
+): string => digestGovernanceOperation([...protectedTargetReferences].sort());
+
 const fallbackContract = (request: unknown) => {
   const policy = nestedField(request, "policy");
   const subject = nestedField(request, "subject");
+  const operation = nestedField(request, "operation");
+  const protectedTargetReferences = nestedField(
+    request,
+    "protectedTargetReferences",
+  );
   return {
     correlationId:
       stringField(request, "correlationId") ?? "missing-correlation-id",
     subjectReference: stringField(subject, "reference") ?? "unknown-subject",
+    subjectRevision: stringField(subject, "revision"),
     policyVersion: stringField(policy, "version") ?? "unknown-policy",
+    operationDigest: digestGovernanceOperation(operation),
+    protectedTargetsDigest: digestProtectedTargets(
+      Array.isArray(protectedTargetReferences)
+        ? protectedTargetReferences.filter(
+            (reference): reference is string => typeof reference === "string",
+          )
+        : [],
+    ),
     enforcement:
       stringField(policy, "enforcement") === "advisory"
         ? ("advisory" as const)
@@ -89,10 +138,20 @@ const evaluateOperation = (
   request: GovernanceDecisionRequest,
 ): string | null => {
   const {input, kind} = request.operation;
-  if (kind === "independence") return checkIndependence(input);
-  if (kind === "emergency-access") return validateEmergencyAccess(input);
+  if (kind === "independence") {
+    return checkIndependence(
+      input as unknown as Parameters<typeof checkIndependence>[0],
+    );
+  }
+  if (kind === "emergency-access") {
+    return validateEmergencyAccess(
+      input as unknown as Parameters<typeof validateEmergencyAccess>[0],
+    );
+  }
   if (kind === "privileged-operation") {
-    return validatePrivilegedOperation(input);
+    return validatePrivilegedOperation(
+      input as unknown as Parameters<typeof validatePrivilegedOperation>[0],
+    );
   }
   if (kind === "protected-path") {
     const path = input.path;
@@ -104,7 +163,9 @@ const evaluateOperation = (
       : null;
   }
 
-  const selection = selectDevelopmentExecutor(input);
+  const selection = selectDevelopmentExecutor(
+    input as unknown as Parameters<typeof selectDevelopmentExecutor>[0],
+  );
   if (selection.code) return selection.code;
   return input.development === undefined
     ? null
@@ -128,7 +189,12 @@ export const decideGovernance = async (
     ? {
         correlationId: parsed.data.correlationId,
         subjectReference: parsed.data.subject.reference,
+        subjectRevision: parsed.data.subject.revision,
         policyVersion: parsed.data.policy.version,
+        operationDigest: digestGovernanceOperation(parsed.data.operation),
+        protectedTargetsDigest: digestProtectedTargets(
+          parsed.data.protectedTargetReferences ?? [],
+        ),
         enforcement: parsed.data.policy.enforcement,
       }
     : fallbackContract(untrustedRequest);
@@ -146,9 +212,15 @@ export const decideGovernance = async (
     apiVersion: governanceDecisionApiVersion,
     correlationId: contract.correlationId,
     subjectReference: contract.subjectReference,
+    ...(contract.subjectRevision === undefined
+      ? {}
+      : {subjectRevision: contract.subjectRevision}),
     decision: verdictFor(contract.enforcement, failureCode),
     ...(failureCode === null ? {} : {failureCode}),
     policyVersion: contract.policyVersion,
+    evaluatorVersion: governanceEvaluatorVersion,
+    operationDigest: contract.operationDigest,
+    protectedTargetsDigest: contract.protectedTargetsDigest,
   };
 
   try {

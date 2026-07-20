@@ -41,6 +41,7 @@ cleanup() {
     cp "$workspace/denied.json" "$PROBE_OUTPUT_DIR/denied.json" 2>/dev/null || true
     cp "$workspace/allowed.json" "$PROBE_OUTPUT_DIR/allowed.json" 2>/dev/null || true
     cp "$evidence" "$PROBE_OUTPUT_DIR/verdicts.jsonl" 2>/dev/null || true
+    cp "$enforcement" "$PROBE_OUTPUT_DIR/enforcements.jsonl" 2>/dev/null || true
     cp "$telemetry" "$PROBE_OUTPUT_DIR/telemetry.jsonl" 2>/dev/null || true
     cp "$service_log" "$PROBE_OUTPUT_DIR/decision-service.log" 2>/dev/null || true
   fi
@@ -70,6 +71,7 @@ esac
 
 workspace="$(mktemp -d)"
 evidence="$workspace/verdicts.jsonl"
+enforcement="$workspace/enforcements.jsonl"
 telemetry="$workspace/telemetry.jsonl"
 service_log="$workspace/decision-service.log"
 
@@ -88,6 +90,7 @@ cp "$settings" "$workspace/.claude/settings.json"
 
 DECISION_SERVICE_PORT="$port" \
   DECISION_EVIDENCE_PATH="$evidence" \
+  DECISION_ENFORCEMENT_PATH="$enforcement" \
   DECISION_TELEMETRY_PATH="$telemetry" \
   node "$service" >"$service_log" 2>&1 &
 service_pid=$!
@@ -144,7 +147,7 @@ telemetry_records="$(wc -l <"$telemetry")"
 [ "$telemetry_records" -eq 4 ] || die "expected four governance and hook telemetry records, found $telemetry_records"
 jq -s -e '
   [.[] | .resourceLogs[].scopeLogs[].logRecords[] | ([.attributes[] | {(.key): .value.stringValue}] | add)]
-  | any(."xonovex.signal.kind" == "hook.enforcement"
+  | any(."xonovex.signal.kind" == "governance.enforcement"
       and ."xonovex.signal.outcome" == "allow"
       and (has("xonovex.failure.code") | not))
 ' "$telemetry" >/dev/null || die "allowed enforcement telemetry carried a failure code"

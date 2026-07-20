@@ -185,6 +185,41 @@ describe("decideGovernance", () => {
     assert.equal(allowed.decision, "allow");
   });
 
+  it("binds protected targets into verdict evidence independently of operation order", async () => {
+    const evidence = memoryRecorder();
+    const operation = {
+      kind: "independence" as const,
+      input: {required: "none", failureCode: "independence-failed"},
+    };
+    const first = await decideGovernance(
+      {
+        ...baseRequest(operation),
+        protectedTargetReferences: [
+          "repository:main",
+          "environment:production",
+        ],
+      },
+      evidence.record,
+    );
+    const second = await decideGovernance(
+      {
+        ...baseRequest(operation),
+        correlationId: "correlation-2",
+        protectedTargetReferences: [
+          "environment:production",
+          "repository:main",
+        ],
+      },
+      evidence.record,
+    );
+
+    assert.equal(first.protectedTargetsDigest, second.protectedTargetsDigest);
+    assert.notEqual(
+      first.protectedTargetsDigest,
+      "sha256:4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    );
+  });
+
   it("fails closed for mandatory evidence outages and observes advisory outages", async () => {
     const unavailable = async (): Promise<string> => {
       throw new Error("evidence unavailable");

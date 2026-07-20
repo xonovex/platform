@@ -6,7 +6,9 @@ This ladder is guidance for a team adopting these contracts. It grades an adopte
 
 **Start at `A1`.** It is the recommended starting point for an adopting team: it needs only an interactive session and an independent critique, so it is reachable without a headless runner, a run journal, or admission control, and it establishes the adversarial reading that every higher level assumes.
 
-`A0`–`A2` describe postures an adopter can reach with an interactive or sandboxed headless session. The Xonovex operator supplies concrete `A3` building blocks: cron and authenticated HTTP triggers, governance admission, content-minimized per-run provenance, and bounded escalation with pause/abandon defaults. An adopter still has to deploy and prove those controls in its own environment; installing the operator alone does not confer `A3`. Where a required control is absent, the level is unavailable — see [Oversight coupling](#oversight-coupling).
+The workflow runtime can launch a workflow-skill agent at `A1`, `A2`, or `A3` only after a registered verifier returns observed evidence for that exact level. The Kubernetes `AgentRun` adapter implements `A0` and the concrete `A3` path; it rejects `A1` and `A2` instead of silently accepting levels whose controls it does not verify. Teams can reach `A1`–`A2` with the workflow runtime or another interactive/headless runner.
+
+The operator's `A3` building blocks are cron and authenticated HTTP triggers, admission-minted decision and enforcement evidence, content-minimized per-run provenance, an authenticated runtime blocked signal, provider-routed escalation, authenticated exact-revision approve/reject responses, and pause/abandon defaults. Block reporting and accountable response use distinct non-equal credentials, so the runtime cannot answer its own escalation. The recipient router, tokens, persistent evidence storage, admission webhooks, and protected targets must all be deployed and observed; installing the operator alone does not confer `A3`. Where a required control is absent, the level is unavailable — see [Oversight coupling](#oversight-coupling).
 
 ## What autonomy grades
 
@@ -23,7 +25,7 @@ Levels use an `A` prefix and are cited as `A0`–`A3`. Cite the prefix: a bare "
 | `A2`  | Headless session runs unattended to the next human gate, then stops | Asynchronous human approval on exact revisions     | Sandboxed headless session                    | Automated findings + human sign-off             |
 | `A3`  | Schedules, sensors, or humans trigger runs                          | Policy verdict + protected target + human sign-off | Isolated per-run jobs under admission control | Automated + human-in-the-loop escalation        |
 
-`A1` adds an adversarial reader, not unattended execution: an independent critique of an exact revision, run in a fresh context rather than by the author. `A2` is the first level where work proceeds with nobody watching, so it is the first level that requires a run journal and asynchronous approval on exact revisions. `A3` adds non-human triggers, which is what makes admission control and escalation mandatory rather than optional.
+`A1` adds an adversarial reader, not unattended execution: an independent critique of an exact revision, run in a fresh context rather than by the author. `A2` is the first level where work proceeds with nobody watching, so it is the first level that requires a run journal and asynchronous approval on exact revisions. `A3` permits non-human triggers, which is what makes admission control and escalation mandatory rather than optional. A hook is not required: a schedule, sensor, API, CI/CD event, provider webhook, agent-harness hook, another agent, or a human can originate the same exact-revision run.
 
 A level is a ceiling for an environment, not a badge. Different profiles in one organization may sit at different levels, and a single profile may run high-impact capabilities at `A0` while routine ones sit at `A2`.
 
@@ -58,7 +60,7 @@ Per-run provenance — model, prompt, tools, and permissions — is recorded by 
 
 ## Escalation and safe defaults
 
-An unattended run that needs a human raises an escalation. An escalation is bounded, never open-ended:
+An unattended run raises an escalation only after the runtime reports an authenticated, content-addressed blocked observation for the exact run revision. A desired-state boolean does not stand in for that observation. The runner supplies the endpoint, while the agent harness still needs a concrete blocked-state adapter, access only to the blocked-signal credential, network reachability, and an authenticated status wait before it resumes. The accountable-response credential remains outside the runtime. An escalation is bounded, never open-ended:
 
 - declare the window and the safe default before the run starts, not when the escalation fires;
 - **an unanswered escalation falls back to a safe default — pause or abandon — when the window expires.** Silence is never approval, and a timeout never advances a gate;
@@ -66,6 +68,6 @@ An unattended run that needs a human raises an escalation. An escalation is boun
 - record the escalation, the window, the expiry, and the safe default taken as evidence — an expired escalation is an outcome to review, not a silent non-event;
 - an abandoned run preserves partial state, reason, and cleanup for retry.
 
-Escalation routing is oversight, so `A3` is unavailable where the route has no accountable recipient.
+Escalation routing is oversight, so `A3` is unavailable where the provider router cannot return a delivery reference, the response endpoint/token is unavailable, or the route has no accountable recipient. Approval and rejection responses retain responder identity and provider-native response reference; silence remains pause or abandon.
 
 Advisory oversight does not satisfy the coupling. A control that is installed but not observed to execute leaves the level unavailable, however mature the surrounding configuration is — running unattended against advisory enforcement is the case this coupling exists to forbid.

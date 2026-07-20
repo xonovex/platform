@@ -1,9 +1,12 @@
 package controller
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"slices"
 	"strings"
 	"testing"
 	"time"
@@ -18,12 +21,85 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client/interceptor"
 
 	agentv1alpha1 "github.com/xonovex/platform/packages/agent/agent-operator-go/api/v1alpha1"
+	governancecontracts "github.com/xonovex/platform/packages/agent/agent-operator-go/internal/governance"
 	runtel "github.com/xonovex/platform/packages/agent/agent-operator-go/internal/telemetry"
 	"github.com/xonovex/platform/packages/agent/agent-operator-go/test/testutil"
 )
 
 type recordingTelemetrySink struct {
 	signals []runtel.Signal
+}
+
+type stubEscalationRouter struct {
+	deliveryReference string
+	err               error
+}
+
+func (router *stubEscalationRouter) Raise(_ context.Context, _ *agentv1alpha1.AgentRun, _ *agentv1alpha1.AgentEscalationStatus) (string, error) {
+	return router.deliveryReference, router.err
+}
+
+func markRunAdmissionEvidence(t *testing.T, run *agentv1alpha1.AgentRun) {
+	t.Helper()
+	operation := map[string]any{"kind": "development", "input": map[string]any{"workShape": "adaptive"}}
+	encodedOperation := `{"input":{"workShape":"adaptive"},"kind":"development"}`
+	operationDigest, err := governancecontracts.DigestJSON(operation)
+	if err != nil {
+		t.Fatalf("digest operation: %v", err)
+	}
+	subjectRevision, err := governancecontracts.AgentRunSubjectRevision(run)
+	if err != nil {
+		t.Fatalf("digest run spec: %v", err)
+	}
+	protectedTargetDigest, err := governancecontracts.DigestJSON([]string{"repository:main"})
+	if err != nil {
+		t.Fatalf("digest protected targets: %v", err)
+	}
+	if run.Annotations == nil {
+		run.Annotations = map[string]string{}
+	}
+	run.Annotations[governanceCorrelationAnnotation] = "correlation-1"
+	run.Annotations[governanceOperationAnnotation] = encodedOperation
+	run.Annotations[governanceDecisionAnnotation] = "allow"
+	run.Annotations[governanceSubjectRevisionAnnotation] = subjectRevision
+	run.Annotations[governancePolicyVersionAnnotation] = "governance-policy/1"
+	run.Annotations[governanceEvaluatorVersionAnnotation] = "governance-evaluator/1"
+	run.Annotations[governanceOperationDigestAnnotation] = operationDigest
+	run.Annotations[governanceDecisionEvidenceAnnotation] = "evidence://decision#sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+	run.Annotations[governanceEnforcementEvidenceAnnotation] = "evidence://enforcement#sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+	run.Annotations[governanceProtectedTargetsDigestAnnotation] = protectedTargetDigest
+}
+
+func runJournal(run *agentv1alpha1.AgentRun) *agentv1alpha1.AgentRunJournal {
+	return &agentv1alpha1.AgentRunJournal{
+		Generation:              run.Generation,
+		AccountableOwner:        run.Spec.AccountableOwner,
+		Model:                   run.Spec.Provenance.Model,
+		Provider:                run.Spec.Provenance.Provider,
+		PromptReference:         run.Spec.Provenance.PromptReference,
+		Tools:                   append([]string(nil), run.Spec.Provenance.Tools...),
+		GrantedPermissions:      append([]string(nil), run.Spec.Provenance.GrantedPermissions...),
+		ExecutionImage:          "ghcr.io/example/agent@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+		RuntimeClassName:        "kata",
+		AgentType:               agentv1alpha1.AgentTypeClaude,
+		ProviderEnvironmentKeys: []string{},
+		ExecutionSpecDigest:     "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+	}
+}
+
+func markRunBlocked(t *testing.T, run *agentv1alpha1.AgentRun) {
+	t.Helper()
+	subjectRevision, err := governancecontracts.AgentRunSubjectRevision(run)
+	if err != nil {
+		t.Fatalf("digest blocked run: %v", err)
+	}
+	run.Status.Blocked = &agentv1alpha1.AgentBlockedStatus{
+		ReportedAt:        metav1.NewTime(time.Now().UTC()),
+		SubjectRevision:   subjectRevision,
+		Reporter:          "agent-harness:claude",
+		ReasonCode:        "accountable-decision-required",
+		EvidenceReference: "evidence://blocked#sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+	}
 }
 
 func (sink *recordingTelemetrySink) Record(_ context.Context, signal runtel.Signal) {
@@ -186,6 +262,215 @@ func TestAgentTriggerReceiver_StatusUpdateFailureIsReported(t *testing.T) {
 	}
 }
 
+func TestAgentTriggerReceiver_AuthenticatedEscalationApproval(t *testing.T) {
+	now := time.Date(2026, time.July, 19, 12, 0, 0, 0, time.UTC)
+	run := &agentv1alpha1.AgentRun{
+		ObjectMeta: metav1.ObjectMeta{Name: "needs-approval", Namespace: "test"},
+		Spec:       unattendedRunSpec(),
+		Status: agentv1alpha1.AgentRunStatus{Escalation: &agentv1alpha1.AgentEscalationStatus{
+			Recipient:         "human:on-call",
+			SubjectRevision:   "spec-sha256:exact",
+			RequestedAt:       metav1.NewTime(now),
+			ExpiresAt:         metav1.NewTime(now.Add(time.Minute)),
+			SafeDefault:       agentv1alpha1.EscalationSafeDefaultPause,
+			Outcome:           agentv1alpha1.EscalationOutcomePending,
+			DeliveryReference: "pagerduty:incident-1",
+		}},
+	}
+	secret := &corev1.Secret{
+		ObjectMeta: metav1.ObjectMeta{Name: "escalation-token", Namespace: "test"},
+		Data:       map[string][]byte{"signal": []byte("signal-token"), "response": []byte("response-token")},
+	}
+	scheme := testutil.NewScheme()
+	kubeClient := fake.NewClientBuilder().
+		WithScheme(scheme).
+		WithStatusSubresource(&agentv1alpha1.AgentRun{}).
+		WithObjects(run, secret).
+		Build()
+	receiver := &AgentTriggerReceiver{Client: kubeClient, Scheme: scheme, Now: func() time.Time { return now }}
+	payload, err := json.Marshal(map[string]string{
+		"decision": "approve", "subjectRevision": "spec-sha256:exact",
+		"actor": "human:reviewer", "responseReference": "pagerduty:response-1",
+	})
+	if err != nil {
+		t.Fatalf("encode response: %v", err)
+	}
+
+	unauthorized := httptest.NewRecorder()
+	receiver.ServeHTTP(unauthorized, httptest.NewRequest(http.MethodPost, "/v1/escalations/test/needs-approval", bytes.NewReader(payload)))
+	if unauthorized.Code != http.StatusUnauthorized {
+		t.Fatalf("unauthorized status = %d", unauthorized.Code)
+	}
+
+	authorizedRequest := httptest.NewRequest(http.MethodPost, "/v1/escalations/test/needs-approval", bytes.NewReader(payload))
+	authorizedRequest.Header.Set("Authorization", "Bearer response-token")
+	authorized := httptest.NewRecorder()
+	receiver.ServeHTTP(authorized, authorizedRequest)
+	if authorized.Code != http.StatusAccepted {
+		t.Fatalf("authorized response = %d %s", authorized.Code, authorized.Body.String())
+	}
+	var updated agentv1alpha1.AgentRun
+	if err := kubeClient.Get(context.Background(), client.ObjectKeyFromObject(run), &updated); err != nil {
+		t.Fatalf("get run: %v", err)
+	}
+	if updated.Status.Escalation.Outcome != agentv1alpha1.EscalationOutcomeApproved ||
+		updated.Status.Escalation.Responder != "human:reviewer" || updated.Status.Escalation.RespondedAt == nil {
+		t.Fatalf("escalation = %#v", updated.Status.Escalation)
+	}
+
+	wrongStatusCredential := httptest.NewRequest(http.MethodGet, "/v1/escalations/test/needs-approval", nil)
+	wrongStatusCredential.Header.Set("Authorization", "Bearer response-token")
+	wrongStatusResponse := httptest.NewRecorder()
+	receiver.ServeHTTP(wrongStatusResponse, wrongStatusCredential)
+	if wrongStatusResponse.Code != http.StatusUnauthorized {
+		t.Fatalf("response credential read status = %d, want unauthorized", wrongStatusResponse.Code)
+	}
+
+	statusRequest := httptest.NewRequest(http.MethodGet, "/v1/escalations/test/needs-approval", nil)
+	statusRequest.Header.Set("Authorization", "Bearer signal-token")
+	statusResponse := httptest.NewRecorder()
+	receiver.ServeHTTP(statusResponse, statusRequest)
+	if statusResponse.Code != http.StatusOK || !strings.Contains(statusResponse.Body.String(), `"outcome":"Approved"`) {
+		t.Fatalf("runtime escalation status = %d %s", statusResponse.Code, statusResponse.Body.String())
+	}
+}
+
+func TestAgentTriggerReceiver_AuthenticatedBlockedSignal(t *testing.T) {
+	now := time.Date(2026, time.July, 19, 12, 0, 0, 0, time.UTC)
+	run := &agentv1alpha1.AgentRun{
+		ObjectMeta: metav1.ObjectMeta{Name: "running-agent", Namespace: "test"},
+		Spec:       unattendedRunSpec(),
+	}
+	run.Status.JobName = "running-agent"
+	run.Status.Journal = runJournal(run)
+	subjectRevision, err := governancecontracts.AgentRunSubjectRevision(run)
+	if err != nil {
+		t.Fatalf("digest run: %v", err)
+	}
+	secret := &corev1.Secret{
+		ObjectMeta: metav1.ObjectMeta{Name: "escalation-token", Namespace: "test"},
+		Data:       map[string][]byte{"signal": []byte("signal-token"), "response": []byte("response-token")},
+	}
+	scheme := testutil.NewScheme()
+	kubeClient := fake.NewClientBuilder().
+		WithScheme(scheme).
+		WithStatusSubresource(&agentv1alpha1.AgentRun{}).
+		WithObjects(run, secret).
+		Build()
+	receiver := &AgentTriggerReceiver{Client: kubeClient, Scheme: scheme, Now: func() time.Time { return now }}
+	payload, err := json.Marshal(map[string]string{
+		"subjectRevision":   subjectRevision,
+		"reporter":          "agent-harness:claude",
+		"reasonCode":        "accountable-decision-required",
+		"evidenceReference": "evidence://blocked#sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+	})
+	if err != nil {
+		t.Fatalf("encode blocked signal: %v", err)
+	}
+	request := httptest.NewRequest(http.MethodPost, "/v1/blocks/test/running-agent", bytes.NewReader(payload))
+	request.Header.Set("Authorization", "Bearer signal-token")
+	response := httptest.NewRecorder()
+
+	receiver.ServeHTTP(response, request)
+
+	if response.Code != http.StatusAccepted {
+		t.Fatalf("blocked response = %d %s", response.Code, response.Body.String())
+	}
+	var updated agentv1alpha1.AgentRun
+	if err := kubeClient.Get(context.Background(), client.ObjectKeyFromObject(run), &updated); err != nil {
+		t.Fatalf("get run: %v", err)
+	}
+	if updated.Status.Blocked == nil || updated.Status.Blocked.SubjectRevision != subjectRevision ||
+		updated.Status.Blocked.Reporter != "agent-harness:claude" {
+		t.Fatalf("blocked status = %#v", updated.Status.Blocked)
+	}
+}
+
+func TestAgentRunReconciler_DeliversEscalationBeforeWaiting(t *testing.T) {
+	now := time.Date(2026, time.July, 19, 12, 0, 0, 0, time.UTC)
+	run := &agentv1alpha1.AgentRun{
+		ObjectMeta: metav1.ObjectMeta{Name: "needs-human", Namespace: "test"},
+		Spec:       unattendedRunSpec(),
+	}
+	markRunAdmissionEvidence(t, run)
+	run.Status.Journal = runJournal(run)
+	markRunBlocked(t, run)
+	secret := &corev1.Secret{
+		ObjectMeta: metav1.ObjectMeta{Name: "escalation-token", Namespace: "test"},
+		Data:       map[string][]byte{"signal": []byte("signal-token"), "response": []byte("response-token")},
+	}
+	kubeClient := fake.NewClientBuilder().
+		WithScheme(testutil.NewScheme()).
+		WithStatusSubresource(&agentv1alpha1.AgentRun{}).
+		WithObjects(run, secret).
+		Build()
+	reconciler := &AgentRunReconciler{
+		Client: kubeClient, Now: func() time.Time { return now },
+		EscalationRouter: &stubEscalationRouter{deliveryReference: "pagerduty:incident-1"},
+	}
+
+	if _, err := reconciler.Reconcile(context.Background(), ctrl.Request{NamespacedName: client.ObjectKeyFromObject(run)}); err != nil {
+		t.Fatalf("reconcile escalation: %v", err)
+	}
+	var updated agentv1alpha1.AgentRun
+	if err := kubeClient.Get(context.Background(), client.ObjectKeyFromObject(run), &updated); err != nil {
+		t.Fatalf("get run: %v", err)
+	}
+	if updated.Status.Escalation == nil || updated.Status.Escalation.Outcome != agentv1alpha1.EscalationOutcomePending ||
+		updated.Status.Escalation.DeliveryReference != "pagerduty:incident-1" {
+		t.Fatalf("escalation = %#v", updated.Status.Escalation)
+	}
+	if updated.Status.JobName != "" {
+		t.Fatalf("execution advanced before response: %q", updated.Status.JobName)
+	}
+}
+
+func TestAgentRunReconciler_RecordsResolvedExecutionInsteadOfTrustingDeclaredProvenance(t *testing.T) {
+	now := time.Date(2026, time.July, 19, 12, 0, 0, 0, time.UTC)
+	runtimeClassName := "kata"
+	run := &agentv1alpha1.AgentRun{
+		ObjectMeta: metav1.ObjectMeta{Name: "observed-provenance", Namespace: "test"},
+		Spec:       unattendedRunSpec(),
+	}
+	run.Status.Journal = runJournal(run)
+	run.Status.Journal.ExecutionImage = ""
+	run.Status.Journal.RuntimeClassName = ""
+	run.Status.Journal.AgentType = ""
+	run.Status.Journal.ProviderEnvironmentKeys = nil
+	run.Status.Journal.ExecutionSpecDigest = ""
+	job := &batchv1.Job{Spec: batchv1.JobSpec{Template: corev1.PodTemplateSpec{Spec: corev1.PodSpec{
+		RuntimeClassName: &runtimeClassName,
+		Containers: []corev1.Container{{
+			Name: "agent", Image: "ghcr.io/example/agent@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+			Command: []string{"claude"}, Args: []string{"--print", "private prompt"},
+			Env: []corev1.EnvVar{{Name: "ANTHROPIC_API_KEY", Value: "secret-value"}},
+		}},
+	}}}}
+	execution := &resolvedRunExecution{
+		agentType:   agentv1alpha1.AgentTypeClaude,
+		providerEnv: map[string]string{"ANTHROPIC_API_KEY": "secret-value"},
+		image:       "ghcr.io/example/agent@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+	}
+	reconciler := &AgentRunReconciler{Now: func() time.Time { return now }}
+
+	observed, err := reconciler.observeResolvedExecution(run, execution, job)
+	if err != nil || !observed {
+		t.Fatalf("observeResolvedExecution() = %v, %v", observed, err)
+	}
+	if run.Status.Journal.ExecutionSpecDigest == "" ||
+		!slices.Equal(run.Status.Journal.ProviderEnvironmentKeys, []string{"ANTHROPIC_API_KEY"}) {
+		t.Fatalf("journal = %#v", run.Status.Journal)
+	}
+	if strings.Contains(run.Status.Journal.ExecutionSpecDigest, "secret-value") || strings.Contains(run.Status.Journal.ExecutionSpecDigest, "private prompt") {
+		t.Fatalf("execution digest leaked input content: %q", run.Status.Journal.ExecutionSpecDigest)
+	}
+
+	job.Spec.Template.Spec.Containers[0].Image = "ghcr.io/example/agent@sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+	if _, err := reconciler.observeResolvedExecution(run, execution, job); err == nil {
+		t.Fatal("changed resolved execution did not cause provenance drift")
+	}
+}
+
 func TestWriteTriggerResponse_EncodingFailureReturnsInternalError(t *testing.T) {
 	response := httptest.NewRecorder()
 
@@ -215,13 +500,22 @@ func TestAgentRunReconciler_ExpiredEscalationUsesSafeDefault(t *testing.T) {
 			},
 		},
 	}
-	run.Spec.Autonomy.NeedsHuman = true
+	markRunAdmissionEvidence(t, run)
+	run.Status.Journal = runJournal(run)
+	markRunBlocked(t, run)
+	secret := &corev1.Secret{
+		ObjectMeta: metav1.ObjectMeta{Name: "escalation-token", Namespace: "test"},
+		Data:       map[string][]byte{"signal": []byte("signal-token"), "response": []byte("response-token")},
+	}
 	kubeClient := fake.NewClientBuilder().
 		WithScheme(testutil.NewScheme()).
 		WithStatusSubresource(&agentv1alpha1.AgentRun{}).
-		WithObjects(run).
+		WithObjects(run, secret).
 		Build()
-	reconciler := &AgentRunReconciler{Client: kubeClient, Now: func() time.Time { return now }}
+	reconciler := &AgentRunReconciler{
+		Client: kubeClient, Now: func() time.Time { return now },
+		EscalationRouter: &stubEscalationRouter{deliveryReference: "pagerduty:incident-1"},
+	}
 
 	if _, err := reconciler.Reconcile(context.Background(), ctrl.Request{NamespacedName: client.ObjectKeyFromObject(run)}); err != nil {
 		t.Fatalf("reconcile escalation: %v", err)
@@ -235,6 +529,63 @@ func TestAgentRunReconciler_ExpiredEscalationUsesSafeDefault(t *testing.T) {
 	}
 	if updated.Status.JobName != "" {
 		t.Fatalf("silence advanced to job %q", updated.Status.JobName)
+	}
+}
+
+func TestAgentRunReconciler_ApprovedEscalationResumesExactRun(t *testing.T) {
+	now := time.Date(2026, time.July, 19, 12, 0, 0, 0, time.UTC)
+	run := &agentv1alpha1.AgentRun{
+		ObjectMeta: metav1.ObjectMeta{Name: "approved-run", Namespace: "test"},
+		Spec:       unattendedRunSpec(),
+	}
+	markRunAdmissionEvidence(t, run)
+	run.Status.Journal = runJournal(run)
+	markRunBlocked(t, run)
+	run.Status.Escalation = &agentv1alpha1.AgentEscalationStatus{
+		Recipient:         "human:on-call",
+		SubjectRevision:   run.Status.Blocked.SubjectRevision,
+		RequestedAt:       metav1.NewTime(now.Add(-time.Minute)),
+		ExpiresAt:         metav1.NewTime(now.Add(time.Minute)),
+		SafeDefault:       agentv1alpha1.EscalationSafeDefaultPause,
+		Outcome:           agentv1alpha1.EscalationOutcomeApproved,
+		DeliveryReference: "pagerduty:incident-1",
+		Responder:         "human:reviewer",
+		ResponseReference: "pagerduty:response-1",
+	}
+	secret := &corev1.Secret{
+		ObjectMeta: metav1.ObjectMeta{Name: "escalation-token", Namespace: "test"},
+		Data:       map[string][]byte{"signal": []byte("signal-token"), "response": []byte("response-token")},
+	}
+	kubeClient := fake.NewClientBuilder().WithScheme(testutil.NewScheme()).WithObjects(secret).Build()
+	reconciler := &AgentRunReconciler{
+		Client: kubeClient, Now: func() time.Time { return now },
+		EscalationRouter: &stubEscalationRouter{deliveryReference: "pagerduty:incident-1"},
+	}
+
+	_, handled, err := reconciler.reconcileOversight(context.Background(), run)
+
+	if err != nil || handled {
+		t.Fatalf("reconcileOversight() handled/error = %v/%v, want resume", handled, err)
+	}
+}
+
+func TestAgentRunReconciler_RejectsEqualBlockedAndResponseCredentials(t *testing.T) {
+	run := &agentv1alpha1.AgentRun{
+		ObjectMeta: metav1.ObjectMeta{Name: "equal-credentials", Namespace: "test"},
+		Spec:       unattendedRunSpec(),
+	}
+	secret := &corev1.Secret{
+		ObjectMeta: metav1.ObjectMeta{Name: "escalation-token", Namespace: "test"},
+		Data:       map[string][]byte{"signal": []byte("same-token"), "response": []byte("same-token")},
+	}
+	kubeClient := fake.NewClientBuilder().WithScheme(testutil.NewScheme()).WithObjects(secret).Build()
+	reconciler := &AgentRunReconciler{
+		Client:           kubeClient,
+		EscalationRouter: &stubEscalationRouter{deliveryReference: "pagerduty:incident-1"},
+	}
+
+	if reconciler.observedEscalationRouteHealthy(context.Background(), run) {
+		t.Fatal("equal blocked-signal and response credentials were treated as healthy")
 	}
 }
 
@@ -307,9 +658,11 @@ func unattendedRunSpec() agentv1alpha1.AgentRunSpec {
 			Level:            agentv1alpha1.AutonomyLevelUnattended,
 			ProtectedTargets: []string{"repository:main"},
 			EscalationRoute: &agentv1alpha1.AgentEscalationRoute{
-				Recipient:   "human:on-call",
-				Window:      metav1.Duration{Duration: time.Minute},
-				SafeDefault: agentv1alpha1.EscalationSafeDefaultPause,
+				Recipient:                   "human:on-call",
+				Window:                      metav1.Duration{Duration: time.Minute},
+				SafeDefault:                 agentv1alpha1.EscalationSafeDefaultPause,
+				BlockedSignalTokenSecretRef: agentv1alpha1.SecretKeyRef{Name: "escalation-token", Key: "signal"},
+				ResponseTokenSecretRef:      agentv1alpha1.SecretKeyRef{Name: "escalation-token", Key: "response"},
 			},
 		},
 	}

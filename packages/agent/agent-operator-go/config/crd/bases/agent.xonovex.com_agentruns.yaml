@@ -80,11 +80,16 @@ spec:
                       type: array
                       items:
                         type: string
-                    needsHuman:
-                      type: boolean
                     escalationRoute:
                       type: object
-                      required: [recipient, window, safeDefault]
+                      required:
+                        [
+                          recipient,
+                          window,
+                          safeDefault,
+                          blockedSignalTokenSecretRef,
+                          responseTokenSecretRef,
+                        ]
                       properties:
                         recipient:
                           type: string
@@ -93,6 +98,22 @@ spec:
                         safeDefault:
                           type: string
                           enum: [pause, abandon]
+                        responseTokenSecretRef:
+                          type: object
+                          required: [name, key]
+                          properties:
+                            name:
+                              type: string
+                            key:
+                              type: string
+                        blockedSignalTokenSecretRef:
+                          type: object
+                          required: [name, key]
+                          properties:
+                            name:
+                              type: string
+                            key:
+                              type: string
                 harnessRef:
                   type: string
                   description: References an AgentHarness in the namespace
@@ -568,10 +589,25 @@ spec:
                       type: array
                       items:
                         type: string
+                    executionImage:
+                      type: string
+                    runtimeClassName:
+                      type: string
+                    agentType:
+                      type: string
+                      enum: [claude, opencode]
+                    providerEnvironmentKeys:
+                      type: array
+                      items:
+                        type: string
+                    executionSpecDigest:
+                      type: string
                 escalation:
                   type: object
                   properties:
                     recipient:
+                      type: string
+                    subjectRevision:
                       type: string
                     requestedAt:
                       type: string
@@ -584,7 +620,31 @@ spec:
                       enum: [pause, abandon]
                     outcome:
                       type: string
-                      enum: [Pending, Paused, Abandoned]
+                      enum: [Pending, Approved, Rejected, Paused, Abandoned]
+                    deliveryReference:
+                      type: string
+                    responder:
+                      type: string
+                    responseReference:
+                      type: string
+                    respondedAt:
+                      type: string
+                      format: date-time
+                blocked:
+                  type: object
+                  description: Authenticated runtime observation that execution requires an accountable decision
+                  properties:
+                    reportedAt:
+                      type: string
+                      format: date-time
+                    subjectRevision:
+                      type: string
+                    reporter:
+                      type: string
+                    reasonCode:
+                      type: string
+                    evidenceReference:
+                      type: string
                 containment:
                   type: object
                   description: Durable evidence of drift-triggered containment

@@ -4,7 +4,7 @@ import {dirname} from "node:path";
 
 export interface MinimizedRuntimeSignal {
   readonly correlationId: string;
-  readonly kind: "governance.verdict" | "hook.enforcement";
+  readonly kind: "governance.verdict" | "governance.enforcement";
   readonly outcome: string;
   readonly failureCode?: string;
   readonly policyVersion?: string;

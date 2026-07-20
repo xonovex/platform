@@ -25,6 +25,8 @@ func TestAgentRunWebhook_Validate_A3OversightCoupling(t *testing.T) {
 		Level: agentv1alpha1.AutonomyLevelUnattended, ProtectedTargets: []string{"repository:main"},
 		EscalationRoute: &agentv1alpha1.AgentEscalationRoute{
 			Recipient: "human:on-call", Window: metav1.Duration{Duration: time.Minute}, SafeDefault: agentv1alpha1.EscalationSafeDefaultPause,
+			BlockedSignalTokenSecretRef: agentv1alpha1.SecretKeyRef{Name: "escalation-token", Key: "signal"},
+			ResponseTokenSecretRef:      agentv1alpha1.SecretKeyRef{Name: "escalation-token", Key: "response"},
 		},
 	}
 
@@ -37,6 +39,11 @@ func TestAgentRunWebhook_Validate_A3OversightCoupling(t *testing.T) {
 		{name: "missing provenance", mutate: func(run *agentv1alpha1.AgentRun) { run.Spec.Provenance = nil }, policy: governedPolicy(true), wantPhrase: "requires provenance"},
 		{name: "missing recipient", mutate: func(run *agentv1alpha1.AgentRun) { run.Spec.Autonomy.EscalationRoute.Recipient = "" }, policy: governedPolicy(true), wantPhrase: "escalation recipient"},
 		{name: "verdict not enforced", mutate: func(_ *agentv1alpha1.AgentRun) {}, policy: governedPolicy(false), wantPhrase: "non-bypassable governance verdict"},
+		{name: "same blocked and response token", mutate: func(run *agentv1alpha1.AgentRun) {
+			run.Spec.Autonomy.EscalationRoute.BlockedSignalTokenSecretRef = run.Spec.Autonomy.EscalationRoute.ResponseTokenSecretRef
+		}, policy: governedPolicy(true), wantPhrase: "must be distinct"},
+		{name: "A1 unsupported by AgentRun", mutate: func(run *agentv1alpha1.AgentRun) { run.Spec.Autonomy.Level = agentv1alpha1.AutonomyLevelAssisted }, policy: governedPolicy(true), wantPhrase: "does not implement A1/A2"},
+		{name: "A2 unsupported by AgentRun", mutate: func(run *agentv1alpha1.AgentRun) { run.Spec.Autonomy.Level = agentv1alpha1.AutonomyLevelSupervised }, policy: governedPolicy(true), wantPhrase: "does not implement A1/A2"},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {

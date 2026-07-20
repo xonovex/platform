@@ -76,3 +76,9 @@ Experimental support may be selected for an advisory or evidence-only profile wh
 ## Conformance assets
 
 `assets/harness-conformance-fixtures.json` contains documentation-versioned platform matrices and semantic cases. `assets/harness-module-templates.json` contains semantic templates that must be translated by a harness owner. Run `node scripts/validate-harness-fixtures.mjs`; the validator rejects silent degradation, incomplete onboarding, unsafe trust, assumed serial execution, and unbounded evaluator or agent templates.
+
+## Runtime implementation status
+
+The bundled enforcing harness adapter is deliberately narrow: Claude Code `PreToolUse` for `Edit` and `Write`, implemented by `governance-pre-tool-use.sh` and backed by a pinned live capability probe. It validates the full decision contract and records a separate enforcement receipt. The other harness matrices and templates are documentation/conformance assets until their own native adapter and runtime probe exist; they must not be reported as installed or runtime-verified.
+
+CI/CD hooks, provider webhooks, schedules, sensors, APIs, manual calls, and agent-originated events enter through the source-neutral workflow trigger contract. That contract proves origin preservation and execution independence; it does not claim that a particular hosted provider has been configured.

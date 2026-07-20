@@ -75,6 +75,12 @@ spec:
           env:
             - name: DECISION_EVIDENCE_PATH
               value: /var/lib/xonovex/verdicts.jsonl
+            - name: DECISION_ENFORCEMENT_PATH
+              value: /var/lib/xonovex/enforcements.jsonl
+            - name: DECISION_EVIDENCE_BASE_REFERENCE
+              value: pvc://agent-operator-governance-evidence/verdicts.jsonl
+            - name: DECISION_ENFORCEMENT_BASE_REFERENCE
+              value: pvc://agent-operator-governance-evidence/enforcements.jsonl
           ports:
             - containerPort: 8787
               name: decision
@@ -113,7 +119,23 @@ spec:
           type: RuntimeDefault
       volumes:
         - name: governance-evidence
-          emptyDir: {}
+          persistentVolumeClaim:
+            claimName: agent-operator-governance-evidence
         - name: webhook-cert
           secret:
             secretName: agent-operator-webhook-server-cert
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: agent-operator-governance-evidence
+  namespace: system
+  labels:
+    app.kubernetes.io/name: agent-operator
+    app.kubernetes.io/component: governance-evidence
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi

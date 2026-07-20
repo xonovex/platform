@@ -3,6 +3,7 @@ package webhook
 import (
 	"context"
 	"errors"
+	"slices"
 	"strings"
 	"testing"
 
@@ -10,18 +11,50 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
 
 	agentv1alpha1 "github.com/xonovex/platform/packages/agent/agent-operator-go/api/v1alpha1"
+	governancecontracts "github.com/xonovex/platform/packages/agent/agent-operator-go/internal/governance"
 	"github.com/xonovex/platform/packages/agent/agent-operator-go/test/testutil"
 )
 
 type stubGovernanceDecisionClient struct {
-	response GovernanceDecisionResponse
-	err      error
-	request  GovernanceDecisionRequest
+	response           GovernanceDecisionResponse
+	err                error
+	request            GovernanceDecisionRequest
+	enforcementRequest GovernanceEnforcementRequest
+	enforcementErr     error
 }
 
 func (s *stubGovernanceDecisionClient) Decide(_ context.Context, request GovernanceDecisionRequest) (GovernanceDecisionResponse, error) {
 	s.request = request
-	return s.response, s.err
+	response := s.response
+	if s.err == nil {
+		response.APIVersion = request.APIVersion
+		response.CorrelationID = request.CorrelationID
+		response.SubjectReference = request.Subject.Reference
+		response.SubjectRevision = request.Subject.Revision
+		response.PolicyVersion = request.Policy.Version
+		response.EvaluatorVersion = governanceEvaluatorVersion
+		response.OperationDigest, _ = digestGovernanceOperation(request.Operation)
+		protectedTargets := append([]string(nil), request.ProtectedTargetReferences...)
+		slices.Sort(protectedTargets)
+		response.ProtectedTargetsDigest, _ = governancecontracts.DigestJSON(protectedTargets)
+		if response.EvidenceReference == "" {
+			response.EvidenceReference = "evidence://decisions/correlation-1#sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+		}
+	}
+	return response, s.err
+}
+
+func (s *stubGovernanceDecisionClient) RecordEnforcement(_ context.Context, request GovernanceEnforcementRequest) (GovernanceEnforcementResponse, error) {
+	s.enforcementRequest = request
+	if s.enforcementErr != nil {
+		return GovernanceEnforcementResponse{}, s.enforcementErr
+	}
+	return GovernanceEnforcementResponse{
+		APIVersion:        request.APIVersion,
+		CorrelationID:     request.CorrelationID,
+		Status:            "recorded",
+		EvidenceReference: "evidence://enforcements/correlation-1#sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+	}, nil
 }
 
 func governedPolicy(required bool) *agentv1alpha1.AgentPolicy {
@@ -86,6 +119,9 @@ func TestAgentRunWebhook_GovernanceVerdicts(t *testing.T) {
 			if decisionClient.request.Policy.Enforcement != "mandatory" {
 				t.Fatalf("enforcement = %q, want mandatory", decisionClient.request.Policy.Enforcement)
 			}
+			if decisionClient.enforcementRequest.Outcome != test.decision || decisionClient.enforcementRequest.EnforcementPoint != "kubernetes:AgentRun:admission" {
+				t.Fatalf("enforcement evidence = %#v", decisionClient.enforcementRequest)
+			}
 		})
 	}
 }
@@ -120,5 +156,67 @@ func TestAgentRunWebhook_GovernanceDecisionOutage(t *testing.T) {
 				t.Fatalf("warnings = %v, want %d", warnings, test.wantWarnings)
 			}
 		})
+	}
+}
+
+func TestAgentRunWebhook_GovernanceEvidenceOutageFailsClosed(t *testing.T) {
+	policy := governedPolicy(true)
+	webhook := &AgentRunWebhook{
+		Client: fake.NewClientBuilder().WithScheme(testutil.NewScheme()).WithObjects(policy).Build(),
+		DecisionClient: &stubGovernanceDecisionClient{
+			response:       GovernanceDecisionResponse{Decision: "allow"},
+			enforcementErr: errors.New("evidence store unavailable"),
+		},
+	}
+
+	_, err := webhook.ValidateCreate(context.Background(), governedRun(`{"kind":"independence","input":{}}`))
+	if err == nil || !strings.Contains(err.Error(), "governance-enforcement-evidence-unavailable") {
+		t.Fatalf("ValidateCreate() error = %v", err)
+	}
+}
+
+type mismatchedGovernanceDecisionClient struct {
+	stubGovernanceDecisionClient
+}
+
+func (s *mismatchedGovernanceDecisionClient) Decide(ctx context.Context, request GovernanceDecisionRequest) (GovernanceDecisionResponse, error) {
+	response, err := s.stubGovernanceDecisionClient.Decide(ctx, request)
+	response.OperationDigest = "sha256:tampered"
+	return response, err
+}
+
+func TestAgentRunWebhook_RejectsMismatchedDecisionEvidence(t *testing.T) {
+	policy := governedPolicy(true)
+	webhook := &AgentRunWebhook{
+		Client: fake.NewClientBuilder().WithScheme(testutil.NewScheme()).WithObjects(policy).Build(),
+		DecisionClient: &mismatchedGovernanceDecisionClient{stubGovernanceDecisionClient: stubGovernanceDecisionClient{
+			response: GovernanceDecisionResponse{Decision: "allow"},
+		}},
+	}
+
+	_, err := webhook.ValidateCreate(context.Background(), governedRun(`{"kind":"independence","input":{}}`))
+	if err == nil || !strings.Contains(err.Error(), "governance-decision-invalid") {
+		t.Fatalf("ValidateCreate() error = %v", err)
+	}
+}
+
+func TestAgentRunWebhook_DefaultBindsGovernanceToFinalDefaultedSpec(t *testing.T) {
+	policy := governedPolicy(true)
+	run := governedRun(`{"kind":"independence","input":{"required":"distinct-identity","decider":"reviewer","author":"author","failureCode":"independence-failed"}}`)
+	decisionClient := &stubGovernanceDecisionClient{response: GovernanceDecisionResponse{Decision: "allow"}}
+	webhook := &AgentRunWebhook{
+		Client:         fake.NewClientBuilder().WithScheme(testutil.NewScheme()).WithObjects(policy).Build(),
+		DecisionClient: decisionClient,
+	}
+
+	if err := webhook.Default(context.Background(), run); err != nil {
+		t.Fatalf("Default() error = %v", err)
+	}
+	expectedRevision, err := governancecontracts.AgentRunSubjectRevision(run)
+	if err != nil {
+		t.Fatalf("digest defaulted run: %v", err)
+	}
+	if run.Spec.Timeout == nil || run.Annotations[governanceSubjectRevisionAnnotation] != expectedRevision {
+		t.Fatalf("timeout/revision = %v/%q, want %q", run.Spec.Timeout, run.Annotations[governanceSubjectRevisionAnnotation], expectedRevision)
 	}
 }

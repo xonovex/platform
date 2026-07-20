@@ -12,6 +12,7 @@ Compose policy, execution, enforcement, enablement, evidence, and trust without 
 ## Core Principles
 
 - **Independent plane** — governance can protect ordinary agent activity without workflow commands; workflow can operate without harness governance.
+- **Independent trigger and execution axes** — manual, harness, CI/CD, webhook, schedule, sensor, API, and agent triggers preserve their native origin while a trusted template independently selects script, script-plus-LLM, or observed-oversight agent-plus-workflow-skill execution.
 - **Decision before enforcement** — a policy decision point returns a versioned outcome; a separate enforcement point applies it and records evidence.
 - **Deterministic first** — inspect authoritative state directly; bounded model or agent execution is explicit, validated, attenuated, observable, cancellable, and never silently authoritative.
 - **Capabilities, not parity** — semantic event intents are portable, while every harness publishes versioned native support, blocking, ordering, context, limitations, and trust boundaries.
@@ -35,6 +36,7 @@ Compose policy, execution, enforcement, enablement, evidence, and trust without 
 - **Govern data and telemetry** — classify, minimize, route, redact, correlate, retain, authorize, and test model/agent/tool/policy/provider data — see [references/data-and-telemetry.md](references/data-and-telemetry.md)
 - **Resolve catalog and inventory** — search compatible modules/profiles and publish the observed effective environment when selected — see [references/catalog-and-inventory.md](references/catalog-and-inventory.md)
 - **Operate and learn** — canary, roll back, emergency-disable, detect drift, respond, retire, measure, and promote learning through review — see [references/operations-and-learning.md](references/operations-and-learning.md)
+- **Execute trigger-neutral workflows** — normalize native origin, bind an exact subject revision, select one registered execution family, enforce budgets and `A1`/`A2`/`A3` oversight, and retain content-addressed evidence — see [references/architecture.md](references/architecture.md) and [references/execution.md](references/execution.md)
 
 ## Gotchas
 

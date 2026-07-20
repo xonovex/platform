@@ -12,6 +12,20 @@
 
 The identity, role, and independence the `human` row records are defined in [actors.md](actors.md), which also states which of them code enforces.
 
+## Workflow execution families
+
+The runtime exposes three concrete compositions. Trigger source is orthogonal to all three.
+
+| Family                 | Runtime order                                                                                                       | Boundary                                                                                           |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| `workflow-script`      | Run one registered deterministic command                                                                            | Timeout, closed JSON result, durable execution evidence                                            |
+| `workflow-script-llm`  | Establish deterministic facts, then pass only that closed result to a registered model evaluator                    | Overall timeout, retry ceiling, token/cost budgets, closed model result                            |
+| `agent-workflow-skill` | Verify observed `A1`/`A2`/`A3` oversight, then launch a registered agent with one explicit workflow-skill reference | Overall timeout, retry/child-depth ceilings, token/cost budgets, cancellation, closed agent result |
+
+Registered commands execute directly with `shell: false`, minimized environment, bounded output, abort propagation, and terminate/kill behavior. Success and failure both produce content-addressed JSONL evidence bound to the trigger reference and exact subject revision.
+
+A workflow script is executable deterministic software with a versioned input/output contract. A prompt or slash-command file is harness context: it may instruct a model, but it is not a deterministic workflow script merely because a hook or CI job invokes it. Likewise, a workflow skill constrains an adaptive agent; the skill is not itself the trigger.
+
 ## Selecting a class
 
 `deterministic`, `model`, and `agent` answer how much adaptivity the work itself needs, so a work shape selects among them — see **workflow-guide** for the work-shape literals and the classification procedure. `human` and `external` answer who must own the outcome: select them when accountable judgment or a system of record holds the authority, never because the work is hard. They are orthogonal to work shape, so no work shape selects them.

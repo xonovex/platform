@@ -50,10 +50,14 @@ func (w *AgentRunWebhook) Default(ctx context.Context, run *agentv1alpha1.AgentR
 	if err := w.applyReferencedDefaults(ctx, run); err != nil {
 		return err
 	}
-
 	if run.Spec.Timeout == nil {
 		defaultTimeout := metav1.Duration{Duration: time.Hour}
 		run.Spec.Timeout = &defaultTimeout
+	}
+	if policy != nil {
+		if _, err := w.enforceGovernance(ctx, run, policy); err != nil {
+			return err
+		}
 	}
 
 	return nil
@@ -260,7 +264,13 @@ func validateAutonomyOversight(run *agentv1alpha1.AgentRun, policy *agentv1alpha
 		}
 	}
 
-	if run.Spec.Autonomy == nil || run.Spec.Autonomy.Level != agentv1alpha1.AutonomyLevelUnattended {
+	if run.Spec.Autonomy == nil {
+		return nil
+	}
+	if run.Spec.Autonomy.Level == agentv1alpha1.AutonomyLevelAssisted || run.Spec.Autonomy.Level == agentv1alpha1.AutonomyLevelSupervised {
+		return fmt.Errorf("AgentRun does not implement A1/A2 oversight verification; use the workflow runtime agent-workflow-skill family or request A0/A3")
+	}
+	if run.Spec.Autonomy.Level != agentv1alpha1.AutonomyLevelUnattended {
 		return nil
 	}
 	if run.Spec.AccountableOwner == "" {
@@ -281,6 +291,15 @@ func validateAutonomyOversight(run *agentv1alpha1.AgentRun, policy *agentv1alpha
 	}
 	if route.SafeDefault != agentv1alpha1.EscalationSafeDefaultPause && route.SafeDefault != agentv1alpha1.EscalationSafeDefaultAbandon {
 		return fmt.Errorf("A3 escalation safeDefault must be pause or abandon")
+	}
+	if route.ResponseTokenSecretRef.Name == "" || route.ResponseTokenSecretRef.Key == "" {
+		return fmt.Errorf("A3 escalation requires responseTokenSecretRef name and key")
+	}
+	if route.BlockedSignalTokenSecretRef.Name == "" || route.BlockedSignalTokenSecretRef.Key == "" {
+		return fmt.Errorf("A3 escalation requires blockedSignalTokenSecretRef name and key")
+	}
+	if route.BlockedSignalTokenSecretRef == route.ResponseTokenSecretRef {
+		return fmt.Errorf("A3 blocked-signal and response token references must be distinct")
 	}
 	if policy == nil || !policy.Spec.Enforced.RequireGovernanceVerdict {
 		return fmt.Errorf("A3 run requires a non-bypassable governance verdict at admission")

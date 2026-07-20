@@ -19,6 +19,10 @@ PASS=0
 FAIL=0
 
 say() { printf '%s\n' "$*"; }
+die() {
+  printf 'ERROR: %s\n' "$1" >&2
+  exit 1
+}
 check() {
   # check <name> <expected> <actual>
   if [ "$2" = "$3" ]; then
@@ -36,18 +40,26 @@ run_guard() {
   shift 3
   local out rc=0
   out="$(jq -n --arg t "$tool" --arg p "$path" --arg e "$eid" \
-    '{tool:$t, path:$p, event_id:$e}' | env "$@" bash "$GUARD")" || rc=$?
+    '{tool:$t, path:$p, event_id:$e}' | env \
+    SUBJECT_REVISION="$APPLIED_REF" EVALUATOR_VERSION="guard.sh@sha256:$GUARD_SHA" \
+    "$@" bash "$GUARD")" || rc=$?
   printf '%s' "$out"
   return "$rc"
 }
 
 record_evidence() {
   # record_evidence <decision-json>  — idempotent per event_id (concurrent-duplicate safety)
-  local eid compact
+  local eid compact digest record existing
   compact="$(jq -c . <<<"$1")"
   eid="$(jq -r '.event_id' <<<"$compact")"
-  if ! grep -qF "\"event_id\":\"$eid\"" "$EVIDENCE" 2>/dev/null; then
-    printf '%s\n' "$compact" >>"$EVIDENCE"
+  digest="$(printf '%s' "$compact" | sha256sum | cut -d' ' -f1)"
+  record="$(jq -c --arg reference "local://walking-skeleton/evidence.jsonl#sha256:$digest" \
+    '. + {evidence_reference:$reference}' <<<"$compact")"
+  existing="$(jq -c --arg eid "$eid" 'select(.event_id == $eid)' "$EVIDENCE" 2>/dev/null || true)"
+  if [ -z "$existing" ]; then
+    printf '%s\n' "$record" >>"$EVIDENCE"
+  elif [ "$existing" != "$record" ]; then
+    die "evidence correlation collision for $eid"
   fi
 }
 
@@ -130,7 +142,7 @@ check "rollback removes applied configuration" "absent" "$([ ! -f "$SETTINGS" ] 
 check "post-rollback drift clean (nothing applied remains)" "clean" "$([ ! -f "$SETTINGS" ] && echo clean || echo drift)"
 
 say "== evidence =="
-say "  $(wc -l <"$EVIDENCE") evidence record(s); decisions carry policy_version + event_id (correlation only)"
+say "  $(wc -l <"$EVIDENCE") content-addressed record(s); decisions bind subject revision, operation digest, policy, evaluator, and event correlation"
 
 say ""
 say "Result: $PASS passed, $FAIL failed"

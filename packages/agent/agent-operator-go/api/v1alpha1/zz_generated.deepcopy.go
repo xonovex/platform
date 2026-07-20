@@ -338,6 +338,9 @@ func (in *AgentRunJournal) DeepCopyInto(out *AgentRunJournal) {
 	if in.GrantedPermissions != nil {
 		out.GrantedPermissions = append([]string(nil), in.GrantedPermissions...)
 	}
+	if in.ProviderEnvironmentKeys != nil {
+		out.ProviderEnvironmentKeys = append([]string(nil), in.ProviderEnvironmentKeys...)
+	}
 }
 
 func (in *AgentRunJournal) DeepCopy() *AgentRunJournal {
@@ -351,6 +354,9 @@ func (in *AgentRunJournal) DeepCopy() *AgentRunJournal {
 
 func (in *AgentEscalationStatus) DeepCopyInto(out *AgentEscalationStatus) {
 	*out = *in
+	if in.RespondedAt != nil {
+		out.RespondedAt = in.RespondedAt.DeepCopy()
+	}
 }
 
 func (in *AgentEscalationStatus) DeepCopy() *AgentEscalationStatus {
@@ -358,6 +364,19 @@ func (in *AgentEscalationStatus) DeepCopy() *AgentEscalationStatus {
 		return nil
 	}
 	out := new(AgentEscalationStatus)
+	in.DeepCopyInto(out)
+	return out
+}
+
+func (in *AgentBlockedStatus) DeepCopyInto(out *AgentBlockedStatus) {
+	*out = *in
+}
+
+func (in *AgentBlockedStatus) DeepCopy() *AgentBlockedStatus {
+	if in == nil {
+		return nil
+	}
+	out := new(AgentBlockedStatus)
 	in.DeepCopyInto(out)
 	return out
 }
@@ -505,6 +524,10 @@ func (in *AgentRunStatus) DeepCopyInto(out *AgentRunStatus) {
 	if in.Escalation != nil {
 		out.Escalation = new(AgentEscalationStatus)
 		in.Escalation.DeepCopyInto(out.Escalation)
+	}
+	if in.Blocked != nil {
+		out.Blocked = new(AgentBlockedStatus)
+		in.Blocked.DeepCopyInto(out.Blocked)
 	}
 	if in.Containment != nil {
 		out.Containment = new(AgentContainmentStatus)
