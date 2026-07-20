@@ -5,7 +5,7 @@ dependsOn:
 tasks:
   ci-check:
     command: noop
-    deps: [graph-build]
+    deps: [graph-check]
     options:
       cache: false
   graph-build-npm-check:
@@ -53,5 +53,52 @@ tasks:
       - ~:graph-build-ci-publish
       - ~:graph-build-ci-publish-dry-run
       - ~:graph-build-ci-publish-full
+    options:
+      cache: false
+  graph-check-npm-check:
+    command: npx moon-action-graph :npm-check npm-check npm-check-graph.png --check
+    deps:
+      - script-moon-action-graph:build
+    options:
+      cache: false
+  graph-check-npm-publish:
+    command: npx moon-action-graph :npm-publish npm-publish npm-publish-graph.png --check
+    deps:
+      - script-moon-action-graph:build
+    options:
+      cache: false
+  graph-check-ci-check:
+    command: npx moon-action-graph :ci-check ci-check ci-check-graph.png --check
+    deps:
+      - script-moon-action-graph:build
+    options:
+      cache: false
+  graph-check-ci-publish:
+    command: npx moon-action-graph :ci-publish ci-publish ci-publish-graph.png --check
+    deps:
+      - script-moon-action-graph:build
+    options:
+      cache: false
+  graph-check-ci-publish-dry-run:
+    command: npx moon-action-graph :ci-publish-dry-run ci-publish-dry-run ci-publish-dry-run-graph.png --check
+    deps:
+      - script-moon-action-graph:build
+    options:
+      cache: false
+  graph-check-ci-publish-full:
+    command: npx moon-action-graph :ci-publish npm-publish,ci-publish ci-publish-full-graph.png --check
+    deps:
+      - script-moon-action-graph:build
+    options:
+      cache: false
+  graph-check:
+    command: noop
+    deps:
+      - ~:graph-check-npm-check
+      - ~:graph-check-npm-publish
+      - ~:graph-check-ci-check
+      - ~:graph-check-ci-publish
+      - ~:graph-check-ci-publish-dry-run
+      - ~:graph-check-ci-publish-full
     options:
       cache: false

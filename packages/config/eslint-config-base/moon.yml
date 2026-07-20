@@ -7,3 +7,16 @@ tags:
   - typescript-config
 dependsOn:
   - ts-config-node
+tasks:
+  ts-test:
+    script: npx vitest run
+    deps:
+      - ^:build
+    inputs:
+      - "@globs(sources)"
+      - "@globs(tests)"
+      - "@globs(configs)"
+    outputs: []
+    options:
+      cache: true
+      mergeDeps: replace

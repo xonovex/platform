@@ -17,8 +17,22 @@ tasks:
       - /nix/ci.nix
     options:
       cache: true
+  nix-flake-check:
+    command:
+      - nix
+      - flake
+      - check
+      - --print-build-logs
+    toolchain: [system, nix]
+    inputs:
+      - /flake.lock
+      - /flake.nix
+      - /nix/**/*
+    options:
+      cache: true
+      runFromWorkspaceRoot: true
   ci-check:
     command: noop
-    deps: [github-actions-lint]
+    deps: [github-actions-lint, nix-flake-check]
     options:
       cache: false

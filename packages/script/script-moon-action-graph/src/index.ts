@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 import {execFileSync} from "node:child_process";
-import {writeFileSync} from "node:fs";
 import {dirname, join} from "node:path";
 import {fileURLToPath} from "node:url";
 import {
@@ -9,6 +8,7 @@ import {
   parseCliArgs,
 } from "@xonovex/script-moon-common";
 import {resolveExecutable} from "@xonovex/script-moon-common/executable";
+import {writeOrCheckGeneratedFile} from "./generated-file.js";
 import {buildFilteredDot, filterDotGraph} from "./parse-dot.js";
 
 const root = findWorkspaceRoot(dirname(fileURLToPath(import.meta.url)));
@@ -29,6 +29,10 @@ const {values, positionals} = parseCliArgs({
     },
     output: {type: "string", short: "o", description: "Output PNG path"},
     dot: {type: "string", short: "d", description: "Output DOT file path"},
+    check: {
+      type: "boolean",
+      description: "Verify generated files without modifying them",
+    },
   },
 });
 
@@ -41,6 +45,7 @@ const output =
   positionals[2] ??
   join(root, "npm-publish-graph.png");
 const dotOutput = values.dot as string | undefined;
+const check = values.check === true;
 
 const dot = execFileSync(
   resolveExecutable("npx"),
@@ -60,13 +65,13 @@ const png = execFileSync(resolveExecutable("dot"), ["-Tpng"], {
   maxBuffer: 128 * 1024 * 1024,
 });
 
-writeFileSync(output, png);
+writeOrCheckGeneratedFile(output, png, check);
 
 if (dotOutput) {
-  writeFileSync(dotOutput, filtered);
+  writeOrCheckGeneratedFile(dotOutput, filtered, check);
 }
 
 const dotSuffix = dotOutput ? ` and ${dotOutput}` : "";
 logSuccess(
-  `Wrote ${output}${dotSuffix} (${String(graph.nodes.size)} nodes, ${String(graph.edges.length)} edges)`,
+  `${check ? "Verified" : "Wrote"} ${output}${dotSuffix} (${String(graph.nodes.size)} nodes, ${String(graph.edges.length)} edges)`,
 );

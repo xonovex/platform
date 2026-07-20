@@ -40,7 +40,7 @@ func createNamespace(t *testing.T, prefix string) string {
 		t.Fatalf("failed to create AgentPolicy: %v", err)
 	}
 	t.Cleanup(func() {
-		_ = k8sClient.Delete(ctx, ns)
+		cleanupIntegrationNamespace(t, ns.Name)
 	})
 	return ns.Name
 }
