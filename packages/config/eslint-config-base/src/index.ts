@@ -273,7 +273,7 @@ export default defineConfig(
       "sonarjs/pseudo-random": "off",
       "sonarjs/no-alphabetical-sort": "off",
       "sonarjs/function-return-type": "off",
-      "sonarjs/cognitive-complexity": "off",
+      "sonarjs/cognitive-complexity": ["error", 30],
       "sonarjs/regex-complexity": "off",
       "sonarjs/anchor-precedence": "off",
       "sonarjs/no-commented-code": "off",

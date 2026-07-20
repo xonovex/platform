@@ -4,6 +4,13 @@ tags: [typescript-script]
 dependsOn:
   - script-moon-common
 tasks:
+  ts-coverage:
+    script: >-
+      npx vitest run --coverage --coverage.include='src/**'
+      --coverage.thresholds.lines 45
+      --coverage.thresholds.functions 45
+      --coverage.thresholds.branches 35
+      --coverage.thresholds.statements 45
   ts-build:
     deps:
       - script-moon-common:build

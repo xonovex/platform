@@ -38,12 +38,7 @@ export const relativeLinkTarget = (raw: string): string | null => {
   return target === "" ? null : target;
 };
 
-// Resolve every markdown link inside each references/*.md relative to that
-// file's own directory. The body-scan check only sees links in SKILL.md, so a
-// broken sibling link written inside a reference file — e.g.
-// [references/foo.md](references/foo.md), which resolves to the non-existent
-// references/references/foo.md instead of the sibling references/foo.md —
-// would otherwise pass unnoticed. A broken link is a fact, so each is a FAIL.
+// checkReferenceFileLinks resolves links relative to their containing document.
 export const checkReferenceFileLinks = (
   skillDir: string,
   report: LinkReport,
@@ -77,7 +72,7 @@ export const checkReferenceFileLinks = (
     }
   }
 
-  if (resolved > 0 && broken === 0) {
+  if (broken === 0 && resolved > 0) {
     report.addPass(
       `reference links: ${String(resolved)}/${String(resolved)} link(s) resolve`,
     );

@@ -1,5 +1,5 @@
 import {describe, expect, it} from "vitest";
-import {main} from "./index.js";
+import {main} from "./evaluate.js";
 
 describe("main", () => {
   it("fails cleanly when the query file is missing", async () => {

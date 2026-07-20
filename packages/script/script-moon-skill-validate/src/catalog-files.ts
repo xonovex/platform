@@ -37,6 +37,86 @@ const readJson = (path: string, errors: string[]): unknown => {
 const isGenericTriggerQuery = (query: string): boolean =>
   GENERIC_TRIGGER_QUERY_RES.some((pattern) => pattern.test(query.trim()));
 
+interface TriggerEntry {
+  readonly shouldTrigger: boolean;
+  readonly split: string | undefined;
+}
+
+const checkTriggerQuery = (
+  query: unknown,
+  index: number,
+  seen: Set<string>,
+  errors: string[],
+): void => {
+  if (typeof query !== "string" || query.trim().length === 0) {
+    errors.push(
+      `catalog: eval-queries.json entry ${String(index + 1)} needs a non-empty query`,
+    );
+    return;
+  }
+  const key = query.trim().toLowerCase();
+  if (seen.has(key)) {
+    errors.push(`catalog: duplicate trigger query '${query}'`);
+  }
+  if (isGenericTriggerQuery(query)) {
+    errors.push(
+      `catalog: generic trigger eval query must be replaced: '${query}'`,
+    );
+  }
+  seen.add(key);
+};
+
+const checkTriggerEntry = (
+  value: unknown,
+  index: number,
+  seen: Set<string>,
+  errors: string[],
+): TriggerEntry | undefined => {
+  if (!isRecord(value)) {
+    errors.push(
+      `catalog: eval-queries.json entry ${String(index + 1)} must be an object`,
+    );
+    return undefined;
+  }
+  checkTriggerQuery(value.query, index, seen, errors);
+  if (typeof value.should_trigger !== "boolean") {
+    errors.push(
+      `catalog: eval-queries.json entry ${String(index + 1)} needs boolean should_trigger`,
+    );
+    return undefined;
+  }
+  const split = value.split;
+  if (typeof split !== "string" || !QUERY_SPLITS.has(split)) {
+    errors.push(
+      `catalog: eval-queries.json entry ${String(index + 1)} needs split train or validation`,
+    );
+    return {shouldTrigger: value.should_trigger, split: undefined};
+  }
+  return {shouldTrigger: value.should_trigger, split};
+};
+
+const checkTriggerMinimums = (
+  positive: number,
+  negative: number,
+  splitCounts: ReadonlyMap<string, number>,
+  errors: string[],
+): void => {
+  if (positive < 8 || negative < 8) {
+    errors.push(
+      `catalog: trigger evals need at least 8 positive and 8 negative queries (found ${String(positive)}/${String(negative)})`,
+    );
+  }
+  for (const polarity of ["positive", "negative"]) {
+    for (const split of QUERY_SPLITS) {
+      if ((splitCounts.get(`${polarity}:${split}`) ?? 0) < 2) {
+        errors.push(
+          `catalog: trigger evals need at least 2 ${polarity} ${split} queries`,
+        );
+      }
+    }
+  }
+};
+
 const checkOutputEvals = (
   skillDir: string,
   skillName: unknown,
@@ -119,64 +199,16 @@ const checkTriggerEvals = (
   const splitCounts = new Map<string, number>();
   const seen = new Set<string>();
   for (const [index, entry] of raw.entries()) {
-    if (!isRecord(entry)) {
-      errors.push(
-        `catalog: eval-queries.json entry ${String(index + 1)} must be an object`,
-      );
-      continue;
-    }
-    const query = entry.query;
-    if (typeof query !== "string" || query.trim().length === 0) {
-      errors.push(
-        `catalog: eval-queries.json entry ${String(index + 1)} needs a non-empty query`,
-      );
-    } else {
-      const key = query.trim().toLowerCase();
-      if (seen.has(key)) {
-        errors.push(`catalog: duplicate trigger query '${query}'`);
-      }
-      if (isGenericTriggerQuery(query)) {
-        errors.push(
-          `catalog: generic trigger eval query must be replaced: '${query}'`,
-        );
-      }
-      seen.add(key);
-    }
-    if (typeof entry.should_trigger !== "boolean") {
-      errors.push(
-        `catalog: eval-queries.json entry ${String(index + 1)} needs boolean should_trigger`,
-      );
-      continue;
-    }
-    if (entry.should_trigger) positive += 1;
+    const checked = checkTriggerEntry(entry, index, seen, errors);
+    if (checked === undefined) continue;
+    if (checked.shouldTrigger) positive += 1;
     else negative += 1;
-
-    const split = entry.split;
-    if (typeof split !== "string" || !QUERY_SPLITS.has(split)) {
-      errors.push(
-        `catalog: eval-queries.json entry ${String(index + 1)} needs split train or validation`,
-      );
-    } else {
-      const polarity = entry.should_trigger ? "positive" : "negative";
-      const key = `${polarity}:${split}`;
-      splitCounts.set(key, (splitCounts.get(key) ?? 0) + 1);
-    }
+    if (checked.split === undefined) continue;
+    const polarity = checked.shouldTrigger ? "positive" : "negative";
+    const key = `${polarity}:${checked.split}`;
+    splitCounts.set(key, (splitCounts.get(key) ?? 0) + 1);
   }
-
-  if (positive < 8 || negative < 8) {
-    errors.push(
-      `catalog: trigger evals need at least 8 positive and 8 negative queries (found ${String(positive)}/${String(negative)})`,
-    );
-  }
-  for (const polarity of ["positive", "negative"]) {
-    for (const split of QUERY_SPLITS) {
-      if ((splitCounts.get(`${polarity}:${split}`) ?? 0) < 2) {
-        errors.push(
-          `catalog: trigger evals need at least 2 ${polarity} ${split} queries`,
-        );
-      }
-    }
-  }
+  checkTriggerMinimums(positive, negative, splitCounts, errors);
   if (errors.every((error) => !error.includes("trigger eval"))) {
     passes.push(
       `catalog: trigger evals cover ${String(positive)} positive and ${String(negative)} negative routes with train/validation splits`,

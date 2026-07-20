@@ -65,6 +65,83 @@ const generateChangelog = (
   }
 };
 
+interface DependentUpdateOptions {
+  readonly rootDir: string;
+  readonly packagePath: string;
+  readonly packageName: string;
+  readonly newVersion: string;
+  readonly dryRun: boolean;
+  readonly noChangelog: boolean;
+  readonly changelogPath: string | undefined;
+  readonly gitBase: string | undefined;
+  readonly includedTypes: ReadonlySet<string> | undefined;
+}
+
+const updateDependents = (options: DependentUpdateOptions): number => {
+  let updated = 0;
+  for (const dependentPath of findAllPackageJsonPaths(options.rootDir)) {
+    if (dependentPath === options.packagePath) continue;
+    const dependent = readPkg(dependentPath);
+    const result = updateDependent(
+      dependent,
+      dependentPath,
+      options.packageName,
+      options.newVersion,
+      () => getGitVersion(options.rootDir, dependentPath),
+    );
+    if (!result.depsChanged) continue;
+
+    if (result.versionBumped) {
+      const label = options.dryRun ? "[dry-run] " : "";
+      logInfo(
+        `${label}${dependent.name ?? dependentPath}: ${String(result.oldVersion)} -> ${String(result.newVersion)} (dependency updated)`,
+      );
+    }
+    if (!options.dryRun) writePkg(dependentPath, result.pkg);
+    updated += 1;
+
+    if (
+      !options.noChangelog &&
+      result.versionBumped &&
+      result.oldVersion &&
+      result.newVersion
+    ) {
+      generateChangelog(
+        options.rootDir,
+        dependentPath,
+        dependent.name ?? dependentPath,
+        result.oldVersion,
+        result.newVersion,
+        options.dryRun,
+        [{name: options.packageName, version: options.newVersion}],
+        options.changelogPath,
+        options.gitBase,
+        options.includedTypes,
+      );
+    }
+  }
+  return updated;
+};
+
+const validateVersionRequest = (
+  exact: string | undefined,
+  bumpType: BumpType,
+): void => {
+  if (exact !== undefined) {
+    if (!/^\d+\.\d+\.\d+(?:-\w+\.\d+)?$/.test(exact)) {
+      logError(
+        `Invalid exact version: ${exact}. Expected format: X.Y.Z or X.Y.Z-tag.N`,
+      );
+      process.exit(1);
+    }
+    return;
+  }
+  if (!(["patch", "minor", "major"] as const).includes(bumpType)) {
+    logError(`Invalid bump type: ${bumpType}. Use patch, minor, or major.`);
+    process.exit(1);
+  }
+};
+
 const main = (): void => {
   const {values, positionals} = parseCliArgs({
     name: "moon-version-bump",
@@ -140,17 +217,7 @@ const main = (): void => {
     process.exit(1);
   }
 
-  if (exact) {
-    if (!/^\d+\.\d+\.\d+(?:-\w+\.\d+)?$/.test(exact)) {
-      logError(
-        `Invalid exact version: ${exact}. Expected format: X.Y.Z or X.Y.Z-tag.N`,
-      );
-      process.exit(1);
-    }
-  } else if (!["patch", "minor", "major"].includes(bumpType)) {
-    logError(`Invalid bump type: ${bumpType}. Use patch, minor, or major.`);
-    process.exit(1);
-  }
+  validateVersionRequest(exact, bumpType);
 
   const oldVersion = pkg.version;
   const rootDir = findWorkspaceRoot(cwd);
@@ -171,58 +238,20 @@ const main = (): void => {
     }
   }
 
-  // Update dependents across workspace
-  const allPaths = findAllPackageJsonPaths(rootDir);
-  let depsUpdated = 0;
-
-  if (!noDependents) {
-    for (const depPkgPath of allPaths) {
-      if (depPkgPath === pkgPath) continue;
-      const depPkg = readPkg(depPkgPath);
-      const result = updateDependent(
-        depPkg,
-        depPkgPath,
-        pkg.name,
+  const depsUpdated = noDependents
+    ? 0
+    : updateDependents({
+        rootDir,
+        packagePath: pkgPath,
+        packageName: pkg.name,
         newVersion,
-        () => getGitVersion(rootDir, depPkgPath),
-      );
-      if (result.depsChanged) {
-        if (result.versionBumped) {
-          const label = dryRun ? "[dry-run] " : "";
-          logInfo(
-            `${label}${depPkg.name ?? depPkgPath}: ${String(result.oldVersion)} -> ${String(result.newVersion)} (dependency updated)`,
-          );
-        }
-        if (!dryRun) writePkg(depPkgPath, result.pkg);
-        depsUpdated++;
+        dryRun,
+        noChangelog,
+        changelogPath,
+        gitBase,
+        includedTypes,
+      });
 
-        // Generate changelog for dependents that got version-bumped
-        if (
-          !noChangelog &&
-          result.versionBumped &&
-          result.oldVersion &&
-          result.newVersion
-        ) {
-          const depName = depPkg.name ?? depPkgPath;
-          const depUpdate: DepUpdate = {name: pkg.name, version: newVersion};
-          generateChangelog(
-            rootDir,
-            depPkgPath,
-            depName,
-            result.oldVersion,
-            result.newVersion,
-            dryRun,
-            [depUpdate],
-            changelogPath,
-            gitBase,
-            includedTypes,
-          );
-        }
-      }
-    }
-  }
-
-  // Generate changelog for the primary package
   if (!noChangelog && newVersion !== oldVersion) {
     generateChangelog(
       rootDir,

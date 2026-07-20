@@ -384,7 +384,11 @@ type preparedWorkspace struct {
 // prepareWorkspace validates and optionally creates the requested workspace.
 func prepareWorkspace(options runOptions, workDir string, verbose bool) (preparedWorkspace, error) {
 	if options.worktreeBranch == "" {
-		return preparedWorkspace{executionDir: workDir, displayDir: workDir}, nil
+		return preparedWorkspace{
+			sourceRepoDir: workDir,
+			executionDir:  workDir,
+			displayDir:    workDir,
+		}, nil
 	}
 
 	if err := validation.ValidateBranch(options.worktreeBranch); err != nil {

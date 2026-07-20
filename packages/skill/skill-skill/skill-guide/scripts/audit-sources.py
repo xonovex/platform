@@ -124,8 +124,6 @@ def resolve_sources_file(target: Path) -> Path | None:
     if target.is_dir():
         if (target / "SOURCES.md").is_file():
             return target / "SOURCES.md"
-        # No SOURCES.md directly: descend into the single guide subdir (identified
-        # by SKILL.md, per the skill-package layout) and use its SOURCES.md.
         guide_dir = resolve_guide_dir(target)
         if (guide_dir / "SOURCES.md").is_file():
             return guide_dir / "SOURCES.md"

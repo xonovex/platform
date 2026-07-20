@@ -1,12 +1,13 @@
 import {describe, expect, it} from "vitest";
+import {main} from "./evaluate.js";
 import {
+  aggregateArm,
   claudeFailureDetail,
   extractJson,
-  main,
   meanBlock,
   summarize,
   sumTokens,
-} from "./index.js";
+} from "./output-results.js";
 
 describe("output evaluation helpers", () => {
   it("sums supported token fields and ignores invalid values", () => {
@@ -64,6 +65,38 @@ describe("output evaluation helpers", () => {
     expect(meanBlock([], 1)).toEqual({mean: 0});
     expect(meanBlock([1, 3], 1)).toEqual({mean: 2});
     expect(meanBlock([1, 3], 2)).toEqual({mean: 2, stddev: 1});
+  });
+
+  it("aggregates repeated runs by evaluation before averaging the arm", () => {
+    const records = [
+      {
+        id: 1,
+        arm: "with_skill" as const,
+        pass_rate: 1,
+        tokens: 100,
+        duration_ms: 10,
+        skill_triggered: true,
+        error: null,
+      },
+      {
+        id: 1,
+        arm: "with_skill" as const,
+        pass_rate: 0,
+        tokens: 200,
+        duration_ms: 20,
+        skill_triggered: false,
+        error: null,
+      },
+    ];
+
+    const result = aggregateArm(records, "with_skill", 2);
+
+    expect(result).toEqual({
+      pass_rate: {mean: 0.5},
+      tokens: {mean: 150},
+      duration_ms: {mean: 15},
+      skill_trigger_rate: {mean: 0.5},
+    });
   });
 });
 

@@ -1,0 +1,108 @@
+import {writeFileSync} from "node:fs";
+import {join} from "node:path";
+import {checkTriggered} from "./trigger-process.js";
+import {type Query} from "./validation.js";
+
+export interface ResultRecord {
+  readonly query: string;
+  readonly should_trigger: boolean;
+  readonly triggers: number;
+  readonly runs: number;
+  readonly trigger_rate: number;
+  readonly pass: boolean;
+  readonly rationale: string;
+}
+
+export interface TriggerEvaluationResult {
+  readonly success: boolean;
+  readonly results: readonly ResultRecord[];
+  readonly passed: number;
+  readonly failed: number;
+  readonly total: number;
+}
+
+export type TriggerCheck = typeof checkTriggered;
+
+export interface TriggerEvaluationOptions {
+  readonly queryBatches: readonly (readonly Query[])[];
+  readonly runs: number;
+  readonly threshold: number;
+  readonly claudeArgs: readonly string[];
+  readonly skillName: string;
+  readonly shortName: string;
+  readonly claudeExecutable: string;
+  readonly workspace: string | undefined;
+  readonly check?: TriggerCheck;
+}
+
+const evaluateQuery = async (
+  entry: Query,
+  options: TriggerEvaluationOptions,
+): Promise<ResultRecord | undefined> => {
+  let triggers = 0;
+  for (let index = 0; index < options.runs; index += 1) {
+    const outcome = await (options.check ?? checkTriggered)(
+      entry.query,
+      options.claudeArgs,
+      options.skillName,
+      options.shortName,
+      options.claudeExecutable,
+    );
+    if (outcome.error !== null) {
+      if (options.workspace !== undefined) {
+        writeFileSync(
+          join(options.workspace, "invalid-run.json"),
+          `${JSON.stringify({query: entry.query, error: outcome.error}, null, 2)}\n`,
+          "utf8",
+        );
+      }
+      process.stderr.write(
+        `Error: trigger infrastructure failure for query ${JSON.stringify(entry.query)}: ${outcome.error}\n`,
+      );
+      return undefined;
+    }
+    if (outcome.triggered) {
+      triggers += 1;
+    }
+  }
+
+  const rate = triggers / options.runs;
+  return {
+    query: entry.query,
+    should_trigger: entry.should_trigger,
+    triggers,
+    runs: options.runs,
+    trigger_rate: Math.round(rate * 1000) / 1000,
+    pass: rate >= options.threshold === entry.should_trigger,
+    rationale: entry.rationale,
+  };
+};
+
+export const runTriggerEvaluation = async (
+  options: TriggerEvaluationOptions,
+): Promise<TriggerEvaluationResult> => {
+  const results: ResultRecord[] = [];
+  for (const [batchIndex, batch] of options.queryBatches.entries()) {
+    process.stderr.write(
+      `batch ${String(batchIndex + 1)}/${String(options.queryBatches.length)}: ` +
+        `${String(batch.length)} queries\n`,
+    );
+    for (const entry of batch) {
+      const result = await evaluateQuery(entry, options);
+      if (result === undefined) {
+        return {success: false, results, passed: 0, failed: 0, total: 0};
+      }
+      results.push(result);
+      process.stdout.write(`${JSON.stringify(result)}\n`);
+    }
+  }
+
+  const passed = results.filter((result) => result.pass).length;
+  return {
+    success: true,
+    results,
+    passed,
+    failed: results.length - passed,
+    total: results.length,
+  };
+};

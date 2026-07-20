@@ -13,6 +13,12 @@ tasks:
     options:
       mergeDeps: append
   ts-coverage:
+    script: >-
+      npx vitest run --coverage --coverage.include='src/**'
+      --coverage.thresholds.lines 80
+      --coverage.thresholds.functions 100
+      --coverage.thresholds.branches 65
+      --coverage.thresholds.statements 80
     deps:
       - ~:ts-build
     options:

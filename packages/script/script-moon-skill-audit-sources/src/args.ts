@@ -9,8 +9,71 @@ interface ParsedArgs {
   readonly help: boolean;
 }
 
+interface ValueOption {
+  readonly name: "all" | "markReviewed" | "maxAge";
+  readonly value: string;
+  readonly nextIndex: number;
+}
+
 const isOptionToken = (token: string | undefined): boolean =>
-  token !== undefined && token.startsWith("-") && token !== "-";
+  token !== undefined && token !== "-" && token.startsWith("-");
+
+const optionalValue = (
+  argv: readonly string[],
+  index: number,
+  inline: string | undefined,
+  fallback: string,
+): {readonly value: string; readonly nextIndex: number} => {
+  if (inline !== undefined) return {value: inline, nextIndex: index};
+  const next = argv[index + 1];
+  return next !== undefined && !isOptionToken(next)
+    ? {value: next, nextIndex: index + 1}
+    : {value: fallback, nextIndex: index};
+};
+
+const valueOption = (
+  argv: readonly string[],
+  index: number,
+  argument: string,
+): ValueOption | undefined => {
+  const equals = argument.indexOf("=");
+  const flag = equals === -1 ? argument : argument.slice(0, equals);
+  const inline = equals === -1 ? undefined : argument.slice(equals + 1);
+  switch (flag) {
+    case "--all": {
+      const option = optionalValue(argv, index, inline, ".");
+      return {name: "all", ...option};
+    }
+    case "--mark-reviewed": {
+      const option = optionalValue(argv, index, inline, "");
+      return {name: "markReviewed", ...option};
+    }
+    case "--max-age": {
+      const raw = inline ?? argv[index + 1];
+      if (raw === undefined || isOptionToken(raw)) {
+        throw new Error("argument --max-age: expected one argument");
+      }
+      return {
+        name: "maxAge",
+        value: raw,
+        nextIndex: inline === undefined ? index + 1 : index,
+      };
+    }
+    default: {
+      return undefined;
+    }
+  }
+};
+
+const parseMaxAge = (raw: string): number => {
+  const value = Number(raw);
+  if (!Number.isInteger(value) || value < 0) {
+    throw new Error(
+      `argument --max-age: invalid non-negative int value: '${raw}'`,
+    );
+  }
+  return value;
+};
 
 export const parseArgs = (argv: readonly string[]): ParsedArgs => {
   let all: string | undefined;
@@ -21,79 +84,42 @@ export const parseArgs = (argv: readonly string[]): ParsedArgs => {
   let pull = false;
   let help = false;
   const positionals: string[] = [];
+  const consumed = new Set<number>();
 
-  for (let i = 0; i < argv.length; i++) {
-    const arg = argv[i];
-    if (arg === undefined) continue;
-    switch (arg) {
+  for (const [index, argument] of argv.entries()) {
+    if (consumed.has(index)) continue;
+    switch (argument) {
       case "-h":
       case "--help": {
         help = true;
-        break;
+        continue;
       }
       case "--fetch": {
         fetch = true;
-        break;
+        continue;
       }
       case "--pull": {
         pull = true;
-        break;
+        continue;
       }
       case "--json": {
         json = true;
-        break;
-      }
-      default: {
-        if (arg === "--max-age" || arg.startsWith("--max-age=")) {
-          const inline = arg.startsWith("--max-age=")
-            ? arg.slice("--max-age=".length)
-            : undefined;
-          const raw = inline ?? argv[i + 1];
-          if (inline === undefined) i += 1;
-          if (raw === undefined || isOptionToken(raw)) {
-            throw new Error("argument --max-age: expected one argument");
-          }
-          const value = Number(raw);
-          if (!Number.isInteger(value) || value < 0) {
-            throw new Error(
-              `argument --max-age: invalid non-negative int value: '${raw}'`,
-            );
-          }
-          maxAge = value;
-        } else if (arg === "--all" || arg.startsWith("--all=")) {
-          if (arg.startsWith("--all=")) {
-            all = arg.slice("--all=".length);
-          } else {
-            const next = argv[i + 1];
-            if (next !== undefined && !isOptionToken(next)) {
-              all = next;
-              i += 1;
-            } else {
-              all = ".";
-            }
-          }
-        } else if (
-          arg === "--mark-reviewed" ||
-          arg.startsWith("--mark-reviewed=")
-        ) {
-          if (arg.startsWith("--mark-reviewed=")) {
-            markReviewed = arg.slice("--mark-reviewed=".length);
-          } else {
-            const next = argv[i + 1];
-            if (next !== undefined && !isOptionToken(next)) {
-              markReviewed = next;
-              i += 1;
-            } else {
-              markReviewed = "";
-            }
-          }
-        } else if (isOptionToken(arg)) {
-          throw new Error(`unrecognized arguments: ${arg}`);
-        } else {
-          positionals.push(arg);
-        }
+        continue;
       }
     }
+
+    const option = valueOption(argv, index, argument);
+    if (option !== undefined) {
+      if (option.nextIndex > index) consumed.add(option.nextIndex);
+      if (option.name === "all") all = option.value;
+      if (option.name === "markReviewed") markReviewed = option.value;
+      if (option.name === "maxAge") maxAge = parseMaxAge(option.value);
+      continue;
+    }
+    if (isOptionToken(argument)) {
+      throw new Error(`unrecognized arguments: ${argument}`);
+    }
+    positionals.push(argument);
   }
 
   if (positionals.length > 1) {

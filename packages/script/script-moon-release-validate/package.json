@@ -6,7 +6,9 @@
   "bin": {
     "moon-release-validate": "./dist/src/index.js"
   },
-  "dependencies": {},
+  "dependencies": {
+    "zod": "^4.4.3"
+  },
   "devDependencies": {},
   "keywords": [
     "xonovex",

@@ -6,8 +6,13 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/spf13/cobra"
+
+	isoshared "github.com/xonovex/platform/packages/cli/agent-cli-go/internal/isolation/shared"
 	netshared "github.com/xonovex/platform/packages/cli/agent-cli-go/internal/network/shared"
 	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/policy"
+	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/provision"
+	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/types"
 	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/validation"
 )
 
@@ -69,6 +74,110 @@ func TestPrepareWorkspaceDryRunDoesNotCreateDirectory(t *testing.T) {
 	}
 	if _, err := os.Stat(target); !os.IsNotExist(err) {
 		t.Fatalf("dry run created worktree directory %q", target)
+	}
+}
+
+func TestPrepareWorkspaceWithoutWorktreeUsesSourceDirectory(t *testing.T) {
+	workDir := t.TempDir()
+
+	workspace, err := prepareWorkspace(runOptions{}, workDir, false)
+
+	if err != nil {
+		t.Fatalf("prepareWorkspace() error = %v", err)
+	}
+	if workspace.sourceRepoDir != workDir || workspace.executionDir != workDir || workspace.displayDir != workDir {
+		t.Errorf("workspace = %+v, want every directory to be %q", workspace, workDir)
+	}
+}
+
+func TestRunAgentDryRunBuildsHostCommand(t *testing.T) {
+	workDir := t.TempDir()
+	configPath := filepath.Join(workDir, "config.yaml")
+	if err := os.WriteFile(configPath, []byte("{}\n"), 0o600); err != nil {
+		t.Fatalf("WriteFile() error = %v", err)
+	}
+	command := &cobra.Command{}
+	command.Flags().Bool("verbose", false, "")
+	command.Flags().String("isolation", "none", "")
+	command.Flags().String("provision", "none", "")
+	options := runOptions{
+		agent:     "claude",
+		isolation: "none",
+		provision: "none",
+		network:   "host",
+		workDir:   workDir,
+		config:    configPath,
+		vcs:       "git",
+		dryRun:    true,
+	}
+
+	err := runAgent(command, []string{"review"}, options)
+
+	if err != nil {
+		t.Fatalf("runAgent() error = %v", err)
+	}
+}
+
+func TestRunAgentRejectsUnknownAgent(t *testing.T) {
+	command := &cobra.Command{}
+	command.Flags().Bool("verbose", false, "")
+
+	err := runAgent(command, nil, runOptions{agent: "unknown"})
+
+	if err == nil {
+		t.Fatal("runAgent() error = nil, want unknown-agent error")
+	}
+}
+
+func TestResolveProviderPrefersCommandOption(t *testing.T) {
+	provider, err := resolveProvider(types.AgentClaude, "gemini", "glm")
+
+	if err != nil {
+		t.Fatalf("resolveProvider() error = %v", err)
+	}
+	if provider == nil || provider.Name != "gemini" {
+		t.Fatalf("resolveProvider() = %+v, want gemini", provider)
+	}
+}
+
+func TestResolveProviderRejectsUnknownProvider(t *testing.T) {
+	provider, err := resolveProvider(types.AgentClaude, "unknown", "")
+
+	if err == nil || provider != nil {
+		t.Fatalf("resolveProvider() = (%+v, %v), want nil provider and error", provider, err)
+	}
+}
+
+func TestProvisionInputPreservesInitCommandsWithoutNix(t *testing.T) {
+	options := runOptions{initCommands: []string{"npm install"}}
+
+	input, err := provisionInput(provision.ProvisionNone, options, t.TempDir(), t.TempDir())
+
+	if err != nil {
+		t.Fatalf("provisionInput() error = %v", err)
+	}
+	if len(input.InitCommands) != 1 || input.InitCommands[0] != "npm install" {
+		t.Fatalf("InitCommands = %v, want npm install", input.InitCommands)
+	}
+}
+
+func TestProvisionInputRejectsUnknownNixSource(t *testing.T) {
+	options := runOptions{nixSource: "unknown"}
+
+	_, err := provisionInput(provision.ProvisionNix, options, t.TempDir(), t.TempDir())
+
+	if err == nil {
+		t.Fatal("provisionInput() error = nil, want invalid-source error")
+	}
+}
+
+func TestExecuteWithTerminalRejectsUnknownType(t *testing.T) {
+	options := runOptions{terminal: "unknown"}
+
+	err := executeWithTerminal(resolvedAxes{}, isoshared.RunConfig{}, provision.Contribution{}, t.TempDir(), false, options)
+
+	if err == nil {
+		t.Fatal("executeWithTerminal() error = nil, want unknown-terminal error")
 	}
 }
 

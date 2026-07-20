@@ -11,9 +11,7 @@ projects:
     - packages/docker/*
     - packages/script/*
     - packages/moon/*
-    # Tenant roots may hold AGENTS.md/CLAUDE.md instruction files; the globs above
-    # match them as project roots, so exclude markdown to keep project location to
-    # directories only.
+    # The project globs exclude Markdown tenant files so locations stay directories.
     - "!**/*.md"
   sources:
     github-actions: .github

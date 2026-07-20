@@ -98,8 +98,6 @@ def resolve_target(arg: str) -> tuple[Path, Path]:
         if (target / "SKILL.md").is_file():
             skill = target / "SKILL.md"
         else:
-            # Skill-package layout: the SKILL.md lives in a single guide subdir
-            # (e.g. skill-c99/c99-guide/SKILL.md), so descend one level.
             nested = sorted(p for p in target.glob("*/SKILL.md") if p.is_file())
             if len(nested) > 1:
                 sys.stderr.write(

@@ -50,7 +50,7 @@ tasks:
   go-package-coverage:
     script: >-
       bash "$workspaceRoot/.moon/scripts/check-go-package-coverage.sh"
-      ./internal/cmd=35
+      ./internal/cmd=65
       ./internal/config=60
       ./internal/provision/nix=30
       ./internal/workspace/git=18

@@ -116,6 +116,83 @@ const findUrls = (line: string): string[] => {
     .filter((url) => url.length > 0);
 };
 
+const createSource = (title: string, lineNo: number): MutableSource => ({
+  title,
+  urls: [],
+  provenance: undefined,
+  reviewed: undefined,
+  reviewedRaw: undefined,
+  refs: new Set<string>(),
+  coversAllReferences: false,
+  lineNo,
+  checkout: undefined,
+  version: undefined,
+  commit: undefined,
+  watches: [],
+});
+
+const collectUrls = (
+  source: MutableSource,
+  line: string,
+  readingList: boolean,
+): boolean => {
+  if (URL_FIELD_RE.test(line)) {
+    source.urls.push(...findUrls(line));
+    return true;
+  }
+  if (readingList && /^\s{2,}-\s+/.test(line)) {
+    source.urls.push(...findUrls(line));
+    return true;
+  }
+  return false;
+};
+
+const collectReferences = (
+  source: MutableSource,
+  line: string,
+  readingList: boolean,
+): boolean => {
+  const field = REFERENCES_RE.exec(line)?.[1];
+  const listItem = readingList && /^\s{2,}-\s+/.test(line);
+  if (field !== undefined || listItem) {
+    const parsed = parseReferencesField(field ?? line);
+    source.coversAllReferences ||= parsed.all;
+    for (const reference of parsed.refs) source.refs.add(reference);
+  }
+  if (LEGACY_ALL_REFERENCES_RE.test(line)) {
+    source.coversAllReferences = true;
+  }
+  return field !== undefined || listItem;
+};
+
+const collectMetadata = (source: MutableSource, line: string): void => {
+  const provenance = PROVENANCE_RE.exec(line)?.[1];
+  if (provenance !== undefined) source.provenance = provenance;
+  const reviewed = REVIEWED_RE.exec(line)?.[1];
+  if (reviewed !== undefined) {
+    source.reviewedRaw = reviewed;
+    source.reviewed = parseIsoDate(reviewed);
+  }
+  const checkout = CHECKOUT_RE.exec(line)?.[1];
+  if (checkout !== undefined) source.checkout = checkout;
+  const version = VERSION_RE.exec(line)?.[1];
+  if (version !== undefined) source.version = version;
+  const commit = COMMIT_RE.exec(line)?.[1];
+  if (commit !== undefined) source.commit = commit;
+
+  const watch = WATCH_RE.exec(line);
+  if (watch?.[1] !== undefined && watch[2] !== undefined) {
+    const refs = watch[2]
+      .split(",")
+      .map((reference) => basename(reference.trim()))
+      .filter((reference) => reference.endsWith(".md"));
+    source.watches.push({path: watch[1], refs});
+    for (const reference of refs) source.refs.add(reference);
+  }
+  for (const reference of findRefs(line)) source.refs.add(reference);
+  for (const reference of findArrowRefs(line)) source.refs.add(reference);
+};
+
 export const parseSources = (text: string): Source[] => {
   const sources: MutableSource[] = [];
   let current: MutableSource | undefined;
@@ -125,20 +202,7 @@ export const parseSources = (text: string): Source[] => {
   for (const [index, line] of lines.entries()) {
     const header = HEADER_RE.exec(line);
     if (header) {
-      current = {
-        title: header[1] ?? "",
-        urls: [],
-        provenance: undefined,
-        reviewed: undefined,
-        reviewedRaw: undefined,
-        refs: new Set<string>(),
-        coversAllReferences: false,
-        lineNo: index,
-        checkout: undefined,
-        version: undefined,
-        commit: undefined,
-        watches: [],
-      };
+      current = createSource(header[1] ?? "", index);
       sources.push(current);
       readingUrlList = false;
       readingReferenceList = false;
@@ -146,64 +210,13 @@ export const parseSources = (text: string): Source[] => {
     }
     if (current === undefined) continue;
 
-    if (URL_FIELD_RE.test(line)) {
-      readingUrlList = true;
-      current.urls.push(...findUrls(line));
-    } else if (readingUrlList && /^\s{2,}-\s+/.test(line)) {
-      current.urls.push(...findUrls(line));
-    } else {
-      readingUrlList = false;
-    }
-
-    const referencesMatch = REFERENCES_RE.exec(line);
-    if (referencesMatch) {
-      readingReferenceList = true;
-      const parsed = parseReferencesField(referencesMatch[1] ?? "");
-      current.coversAllReferences ||= parsed.all;
-      for (const reference of parsed.refs) current.refs.add(reference);
-    } else if (readingReferenceList && /^\s{2,}-\s+/.test(line)) {
-      const parsed = parseReferencesField(line);
-      current.coversAllReferences ||= parsed.all;
-      for (const reference of parsed.refs) current.refs.add(reference);
-    } else {
-      readingReferenceList = false;
-    }
-    if (LEGACY_ALL_REFERENCES_RE.test(line)) {
-      current.coversAllReferences = true;
-    }
-
-    const provenanceMatch = PROVENANCE_RE.exec(line);
-    if (provenanceMatch?.[1] !== undefined) {
-      current.provenance = provenanceMatch[1];
-    }
-    const reviewedMatch = REVIEWED_RE.exec(line);
-    if (reviewedMatch?.[1] !== undefined) {
-      current.reviewedRaw = reviewedMatch[1];
-      current.reviewed = parseIsoDate(reviewedMatch[1]);
-    }
-    const checkoutMatch = CHECKOUT_RE.exec(line);
-    if (checkoutMatch?.[1] !== undefined) {
-      current.checkout = checkoutMatch[1];
-    }
-    const versionMatch = VERSION_RE.exec(line);
-    if (versionMatch?.[1] !== undefined) {
-      current.version = versionMatch[1];
-    }
-    const commitMatch = COMMIT_RE.exec(line);
-    if (commitMatch?.[1] !== undefined) {
-      current.commit = commitMatch[1];
-    }
-    const watchMatch = WATCH_RE.exec(line);
-    if (watchMatch?.[1] !== undefined && watchMatch[2] !== undefined) {
-      const refs = watchMatch[2]
-        .split(",")
-        .map((reference) => basename(reference.trim()))
-        .filter((reference) => reference.endsWith(".md"));
-      current.watches.push({path: watchMatch[1], refs});
-      for (const reference of refs) current.refs.add(reference);
-    }
-    for (const reference of findRefs(line)) current.refs.add(reference);
-    for (const reference of findArrowRefs(line)) current.refs.add(reference);
+    readingUrlList = collectUrls(current, line, readingUrlList);
+    readingReferenceList = collectReferences(
+      current,
+      line,
+      readingReferenceList,
+    );
+    collectMetadata(current, line);
   }
 
   return sources

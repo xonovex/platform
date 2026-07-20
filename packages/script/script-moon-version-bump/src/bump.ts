@@ -14,7 +14,7 @@ export const bumpVersion = (
 
   if (preid) {
     const expectedPrefix = `${preid}.`;
-    if (prereleaseStr.startsWith(expectedPrefix) && type === "patch") {
+    if (type === "patch" && prereleaseStr.startsWith(expectedPrefix)) {
       const preNum = Number(prereleaseStr.slice(expectedPrefix.length));
       return `${String(major)}.${String(minor)}.${String(patch)}-${preid}.${String(preNum + 1)}`;
     }

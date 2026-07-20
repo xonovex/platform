@@ -1,5 +1,5 @@
 import {describe, expect, it} from "vitest";
-import {main} from "./index.js";
+import {main} from "./audit.js";
 
 describe("main", () => {
   it("renders help without auditing the filesystem", async () => {

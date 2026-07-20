@@ -6,16 +6,7 @@ import {
   type LinkReport,
 } from "./reference-file-links.js";
 
-// A composition doc's link to a contract in another skill or package is a fact:
-// the target file must exist. checkReferenceFileLinks already validates the
-// intra-skill links inside each references/*.md, and command-workflow's own
-// documentation check validates links that stay inside command-workflow.
-// The gap this guard closes is the boundary-crossing links — a SKILL.md or a
-// command or composition document pointing at another package — which no
-// per-skill run resolves. It scans the composition surface once and fails on any
-// cross-package link whose target has moved or been renamed. Intra-package links
-// are left to the checks that already own them, so a link is validated here only
-// when it escapes its own packages/<layer>/<pkg> root.
+// This module validates relative links that cross package boundaries.
 
 const exists = (path: string): boolean => {
   try {
@@ -53,6 +44,13 @@ interface SkillPluginManifest {
 interface SkillPackageSurface {
   readonly guideNames: readonly string[];
   readonly markdown: string;
+}
+
+interface SkillPackageCheck {
+  readonly valid: boolean;
+  readonly pair: boolean;
+  readonly manifest: SkillPluginManifest | undefined;
+  readonly surface: SkillPackageSurface | undefined;
 }
 
 const NAMED_GUIDE_RE = /\*\*([a-z0-9][a-z0-9-]*-guide)\*\*/g;
@@ -117,81 +115,81 @@ const canonicalCycle = (cycle: readonly string[]): string => {
     : [...canonical, first].join(" → ");
 };
 
-export const checkSkillDependencies = (
+const skillPackageSurface = (pkgDir: string): SkillPackageSurface => {
+  const guideNames = readdirSync(pkgDir)
+    .filter((entry) => isFile(join(pkgDir, entry, "SKILL.md")))
+    .toSorted();
+  const files = guideNames.flatMap((guide) => {
+    const guideDir = join(pkgDir, guide);
+    return [
+      join(guideDir, "SKILL.md"),
+      ...markdownEntries(join(guideDir, "references")),
+    ];
+  });
+  return {
+    guideNames,
+    markdown: files.map((file) => readFileSync(file, "utf8")).join("\n"),
+  };
+};
+
+const checkSkillPackage = (
+  pkgDir: string,
+  pkg: string,
   repoRoot: string,
   report: LinkReport,
-): void => {
-  const skillRoot = join(repoRoot, "packages", "skill");
-  if (!isDir(skillRoot)) return;
-  const manifests = new Map<string, SkillPluginManifest>();
-  const surfaces = new Map<string, SkillPackageSurface>();
-  let pairs = 0;
-  let valid = true;
-  for (const pkg of readdirSync(skillRoot).toSorted()) {
-    const pkgDir = join(skillRoot, pkg);
-    if (!pkg.startsWith("skill-") || !isDir(pkgDir)) continue;
-    const claudePath = join(pkgDir, ".claude-plugin", "plugin.json");
-    const codexPath = join(pkgDir, ".codex-plugin", "plugin.json");
-    const hasGuide = readdirSync(pkgDir).some((entry) =>
-      isFile(join(pkgDir, entry, "SKILL.md")),
+): SkillPackageCheck | undefined => {
+  const claudePath = join(pkgDir, ".claude-plugin", "plugin.json");
+  const codexPath = join(pkgDir, ".codex-plugin", "plugin.json");
+  const hasGuide = readdirSync(pkgDir).some((entry) =>
+    isFile(join(pkgDir, entry, "SKILL.md")),
+  );
+  if (!hasGuide && !isFile(claudePath) && !isFile(codexPath)) return undefined;
+  if (!isFile(claudePath) || !isFile(codexPath)) {
+    report.addFail(
+      `skill dependencies: ${relative(repoRoot, pkgDir)} needs both Claude and Codex manifests`,
     );
-    if (!hasGuide && !isFile(claudePath) && !isFile(codexPath)) continue;
-    if (!isFile(claudePath) || !isFile(codexPath)) {
-      valid = false;
-      report.addFail(
-        `skill dependencies: ${relative(repoRoot, pkgDir)} needs both Claude and Codex manifests`,
-      );
-      continue;
-    }
-    const claude = readSkillPluginManifest(claudePath, repoRoot, report);
-    const codex = readSkillPluginManifest(codexPath, repoRoot, report);
-    if (claude === undefined || codex === undefined) {
-      valid = false;
-      continue;
-    }
-    pairs += 1;
-    const expectedName = `xonovex-${pkg}`;
-    if (claude.name !== expectedName || codex.name !== expectedName) {
-      valid = false;
-      report.addFail(
-        `skill dependencies: manifests in ${relative(repoRoot, pkgDir)} must be named ${expectedName}`,
-      );
-    }
-    if (claude.name !== codex.name) {
-      valid = false;
-      report.addFail(
-        `skill dependencies: manifest names differ in ${relative(repoRoot, pkgDir)} (${claude.name} != ${codex.name})`,
-      );
-      continue;
-    }
-    if (!sameStrings(claude.dependencies, codex.dependencies)) {
-      valid = false;
-      report.addFail(
-        `skill dependencies: manifest dependencies differ for ${claude.name}`,
-      );
-    }
-    if (manifests.has(codex.name)) {
-      valid = false;
-      report.addFail(`skill dependencies: duplicate plugin name ${codex.name}`);
-    } else {
-      manifests.set(codex.name, codex);
-      const guideNames = readdirSync(pkgDir)
-        .filter((entry) => isFile(join(pkgDir, entry, "SKILL.md")))
-        .toSorted();
-      const files = guideNames.flatMap((guide) => {
-        const guideDir = join(pkgDir, guide);
-        return [
-          join(guideDir, "SKILL.md"),
-          ...markdownEntries(join(guideDir, "references")),
-        ];
-      });
-      surfaces.set(codex.name, {
-        guideNames,
-        markdown: files.map((file) => readFileSync(file, "utf8")).join("\n"),
-      });
-    }
+    return {valid: false, pair: false, manifest: undefined, surface: undefined};
+  }
+  const claude = readSkillPluginManifest(claudePath, repoRoot, report);
+  const codex = readSkillPluginManifest(codexPath, repoRoot, report);
+  if (claude === undefined || codex === undefined) {
+    return {valid: false, pair: false, manifest: undefined, surface: undefined};
   }
 
+  let valid = true;
+  const expectedName = `xonovex-${pkg}`;
+  if (claude.name !== expectedName || codex.name !== expectedName) {
+    valid = false;
+    report.addFail(
+      `skill dependencies: manifests in ${relative(repoRoot, pkgDir)} must be named ${expectedName}`,
+    );
+  }
+  if (claude.name !== codex.name) {
+    report.addFail(
+      `skill dependencies: manifest names differ in ${relative(repoRoot, pkgDir)} (${claude.name} != ${codex.name})`,
+    );
+    return {valid: false, pair: true, manifest: undefined, surface: undefined};
+  }
+  if (!sameStrings(claude.dependencies, codex.dependencies)) {
+    valid = false;
+    report.addFail(
+      `skill dependencies: manifest dependencies differ for ${claude.name}`,
+    );
+  }
+  return {
+    valid,
+    pair: true,
+    manifest: codex,
+    surface: skillPackageSurface(pkgDir),
+  };
+};
+
+const checkDeclaredDependencies = (
+  manifests: ReadonlyMap<string, SkillPluginManifest>,
+  surfaces: ReadonlyMap<string, SkillPackageSurface>,
+  report: LinkReport,
+): boolean => {
+  let valid = true;
   for (const manifest of manifests.values()) {
     for (const dependency of manifest.dependencies) {
       if (!manifests.has(dependency)) {
@@ -217,7 +215,12 @@ export const checkSkillDependencies = (
       }
     }
   }
+  return valid;
+};
 
+const dependencyCycles = (
+  manifests: ReadonlyMap<string, SkillPluginManifest>,
+): ReadonlySet<string> => {
   const state = new Map<string, "visiting" | "visited">();
   const cycles = new Set<string>();
   const visit = (name: string, path: readonly string[]): void => {
@@ -235,12 +238,47 @@ export const checkSkillDependencies = (
     state.set(name, "visited");
   };
   for (const name of manifests.keys()) visit(name, []);
-  for (const cycle of cycles) {
+  return cycles;
+};
+
+export const checkSkillDependencies = (
+  repoRoot: string,
+  report: LinkReport,
+): void => {
+  const skillRoot = join(repoRoot, "packages", "skill");
+  if (!isDir(skillRoot)) return;
+  const manifests = new Map<string, SkillPluginManifest>();
+  const surfaces = new Map<string, SkillPackageSurface>();
+  let pairs = 0;
+  let valid = true;
+  for (const pkg of readdirSync(skillRoot).toSorted()) {
+    const pkgDir = join(skillRoot, pkg);
+    if (!pkg.startsWith("skill-") || !isDir(pkgDir)) continue;
+    const checked = checkSkillPackage(pkgDir, pkg, repoRoot, report);
+    if (checked === undefined) continue;
+    valid &&= checked.valid;
+    if (checked.pair) pairs += 1;
+    if (checked.manifest === undefined || checked.surface === undefined) {
+      continue;
+    }
+    if (manifests.has(checked.manifest.name)) {
+      valid = false;
+      report.addFail(
+        `skill dependencies: duplicate plugin name ${checked.manifest.name}`,
+      );
+    } else {
+      manifests.set(checked.manifest.name, checked.manifest);
+      surfaces.set(checked.manifest.name, checked.surface);
+    }
+  }
+
+  valid = checkDeclaredDependencies(manifests, surfaces, report) && valid;
+  for (const cycle of dependencyCycles(manifests)) {
     valid = false;
     report.addFail(`skill dependencies: dependency cycle ${cycle}`);
   }
 
-  if (pairs > 0 && valid) {
+  if (valid && pairs > 0) {
     report.addPass(
       `skill dependencies: ${String(pairs)} manifest pair(s) agree with no dangling dependencies or cycles`,
     );
@@ -282,8 +320,7 @@ const markdownEntries = (dir: string): string[] =>
         .map((entry) => join(dir, entry))
     : [];
 
-// Every skill's SKILL.md and its references/*.md, across the two-level skill
-// package layout (packages/skill/<package>/<guide>/).
+// collectSkillMarkdown returns guide and reference Markdown across skill packages.
 const collectSkillMarkdown = (repoRoot: string): string[] => {
   const skillRoot = join(repoRoot, "packages", "skill");
   if (!isDir(skillRoot)) return [];

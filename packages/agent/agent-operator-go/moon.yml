@@ -11,7 +11,7 @@ tasks:
   go-package-coverage:
     script: >-
       bash "$workspaceRoot/.moon/scripts/check-go-package-coverage.sh"
-      ./internal/controller=15
+      ./internal/controller=45
       ./internal/provision/nix=80
       ./internal/workspace/git=80
       ./internal/workspace/jj=80
