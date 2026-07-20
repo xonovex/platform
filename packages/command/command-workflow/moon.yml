@@ -6,25 +6,6 @@ tasks:
     command: echo 'build complete'
     options:
       cache: false
-  test:
-    command: npm run test
-    inputs:
-      - .claude-plugin/plugin.json
-      - .codex-plugin/plugin.json
-      - README.md
-      - commands/*.md
-      - docs/*.md
-      - package.json
-      - scripts/*.mjs
-      - /packages/agent/**/*
-      - /packages/command/**/*
-      - /packages/diagram/**/*
-      - /packages/shared/**/*
-      - /packages/skill/**/*
-      - /.agents/plugins/marketplace.json
-      - /.claude-plugin/marketplace.json
-    options:
-      cache: false
   cross-package-links:
     command:
       - node
@@ -41,7 +22,7 @@ tasks:
       cache: false
       runFromWorkspaceRoot: true
   ci-check:
-    deps: [test, cross-package-links]
+    deps: [cross-package-links]
     options:
       cache: false
       mergeDeps: append

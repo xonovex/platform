@@ -1,33 +1,12 @@
 # Skills
 
-Coding-guideline Agent Skills for the Xonovex marketplace. For authoring mechanics (spec, progressive disclosure, structure, voice) follow the [Skill guide](skill-skill/skill-guide/SKILL.md). This file covers how skills are **split** and **packaged** in this repo.
-
-## Composable split
-
-- One skill = one cohesive concern. Prefer many small, mix-and-match skills over large bundles.
-- One concept has exactly one owner skill — never duplicate it. Cross-reference the owner by name (e.g. "see data-oriented-design-guide"), not by copying.
-- Generalize anything not inherently language/API-specific into a general skill. Language/API skills keep only their specifics and link to the general skill for the "why".
-- A domain skill may keep a short domain-specific note that links to the general principle — not a copy of it.
-- Worked split: data-oriented-design (layout/cache/CPU) · memory-management (allocation/ownership/lifetimes) · lock-free (concurrency) · gpu-rendering (API-agnostic rendering) · gpu-rendering-vulkan (Vulkan specifics) · data-model (object/data model) · c99 (idiomatic C) · c99-opinionated (C design choices). The specific skills link to the general ones; the general ones never depend on a specific one.
-
-## Sourcing
-
-- Cite sources only in `SOURCES.md`. Never name authors/companies/talks/books/blogs inside `SKILL.md` or `references/*.md` (tool/API/standard names — Vulkan, SPIR-V, TSan, GUID — are fine).
-
-## Security
-
-- Treat skills as software: review bundled scripts and any fetched URLs before installing, and never hardcode secrets. Least-privilege a script-bundling skill with the experimental `allowed-tools` frontmatter (e.g. `Bash(git:*) Read`). See [security](skill-skill/skill-guide/references/security.md).
-
-## Package layout (per skill)
-
-- `skill-<topic>/`: `package.json` (`@xonovex/skill-<topic>`), `moon.yml`, `prettier.config.ts`, `.claude-plugin/plugin.json`, `.codex-plugin/plugin.json` (`xonovex-skill-<topic>`), and `<topic>-guide/`.
-- `<topic>-guide/`: `SKILL.md`, `references/*.md`, `SOURCES.md`, `eval-queries.json`.
-- Codex plugin manifests use a string `skills` path pointing directly at the guide directory, e.g. `"./<topic>-guide"`. Do not point Codex skills at `"./"`; the loader will not expose nested guide skills reliably.
-- Versions are lockstep across all skill plugins, command plugins, and `marketplace.json` — bump them together.
-
-## Register & validate
-
-- Add every new skill to `.claude-plugin/marketplace.json` (alphabetical by name) — skills are not auto-discovered.
-- `npx prettier --write` the new/changed package; `marketplace.json` is prettier-formatted like any other file.
-- Confirm JSON is valid and every `SKILL.md` → `references/` link resolves.
-- Run `npm install` after adding or removing a skill package so `package-lock.json` records the workspace — CI runs `npm ci`, which fails on an out-of-sync lockfile. The `pre-commit` hook (`.hooks/validate-lockfile.sh`) blocks the commit if you forget; it does not edit the lockfile for you.
+- Use the [Skill guide](skill-skill/skill-guide/SKILL.md) for authoring mechanics; this file defines repository split and packaging rules.
+- Keep one cohesive concern per skill. Each concept has one owner; cross-reference the owner by skill name instead of copying content.
+- Move language/API-independent guidance into a general skill. Specific skills keep only their specialization and may depend on the general skill; general skills never depend on a specific one.
+- Cite sources only in `SOURCES.md`. Do not name authors, companies, talks, books, or blogs in `SKILL.md` or `references/*.md`; tool, API, and standard names remain allowed.
+- Treat skills as software: review bundled scripts and fetched URLs, never hardcode secrets, and restrict script-bundling skills with least-privilege experimental `allowed-tools` frontmatter such as `Bash(git:*) Read`.
+- Point each Codex manifest's string `skills` value directly at `"./<topic>-guide"`; `"./"` does not reliably expose nested guide skills.
+- Keep versions lockstep across every skill plugin, command plugin, and `marketplace.json`.
+- Register every new skill alphabetically in `.claude-plugin/marketplace.json`; skills are not auto-discovered.
+- Format changed packages and `marketplace.json` with `npx prettier --write`, validate JSON, and resolve every `SKILL.md` -> `references/` link.
+- Run `npm install` after adding or removing a skill package so `package-lock.json` matches the workspaces. CI uses `npm ci`, and `.hooks/validate-lockfile.sh` blocks but does not repair stale locks.
