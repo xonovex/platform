@@ -1,12 +1,6 @@
 $schema: https://moonrepo.dev/schemas/project.json
 language: unknown
 tags: [command]
-dependsOn:
-  - skill-code-quality
-  - skill-code-review
-  - skill-plan
-  - skill-pull-request
-  - skill-testing
 tasks:
   build:
     command: echo 'build complete'
@@ -15,9 +9,20 @@ tasks:
   test:
     command: npm run test
     inputs:
+      - .claude-plugin/plugin.json
+      - .codex-plugin/plugin.json
       - README.md
+      - commands/*.md
       - docs/*.md
+      - package.json
       - scripts/*.mjs
+      - /packages/agent/**/*
+      - /packages/command/**/*
+      - /packages/diagram/**/*
+      - /packages/shared/**/*
+      - /packages/skill/**/*
+      - /.agents/plugins/marketplace.json
+      - /.claude-plugin/marketplace.json
     options:
       cache: false
   cross-package-links:

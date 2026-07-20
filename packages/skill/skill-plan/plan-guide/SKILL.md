@@ -1,99 +1,64 @@
 ---
 name: plan-guide
-description: "Use when discovering, researching, formulating, designing, deciding, planning, revising, critiquing, continuing, or validating work — covers neutral early-lifecycle results, optional experience/solution design, authority-bound decisions, provider-native planning, and code research. Triggers on problem discovery, evidence and uncertainty, requirements formulation, UX or architecture results, decision briefs, plans/subplans, fresh-context resume, code cleanup/hardening/alignment, even when the user doesn't say 'plan'."
-allowed-tools: "Read"
+description: "Use when researching, creating, reviewing, revising, expanding, continuing, updating, or validating implementation plans, or when auditing code for hardening, simplification, alignment, shared extraction, templates, or TODO inventory. Triggers on plan and subplan work, plan-driven implementation, codebase research for future work, and read-only code-quality analysis, even when the user doesn't say 'plan'."
 ---
 
-# Early Lifecycle, Planning, and Code-Research Guidelines
+# Planning and Code-Research Guidelines
 
-Produce Discovery, Research, Formulation, optional Design, Decision, and Planning results without binding their meaning to one method, provider, file layout, or agent session. Also run code-research operations that feed those results.
+Provide planning and code-research procedures selected by a caller or generic operation. This skill owns the planning behavior, not invocation, lifecycle governance, or persistence.
 
 ## Core Principles
 
-- **Neutral semantics** — result meaning stays stable while methods, artifacts, and persistence vary
-- **Selectable persistence** — use the caller's chosen in-session, file, hosted, database, or other persistence model
-- **Research first** — distinguish evidence, provenance, uncertainty, and synthesis before authoring or deciding
-- **Reports, not code** — all research/analysis operations are read-only and generate reports for `plan-create` to consume; only `plan-continue` modifies the codebase
-- **Validation required** — every plan's success criteria back-checks with typecheck / lint / build / tests
-- **Skills to consult** — every plan lists which guideline skills implementers must read first
-- **Use available tools** — prefer environment-provided task tracking, file search, and code analysis over working from memory
+- **Explicit subjects** — accept an inline plan or an opaque provider-native reference plus an optional native revision
+- **Provider-owned references** — let a selected provider resolve, version, relate, or persist native resources; otherwise return inline results
+- **Research first** — ground plans in codebase evidence, constraints, uncertainty, and relevant external sources
+- **Read-only analysis** — research, audits, critique, and validation report findings without changing their subjects; only continuation implements planned work
+- **One requested operation** — research, create, critique, revise, expand, continue, update, or validate without silently performing another operation
+- **Skills to consult** — plans name applicable implementation capabilities, and continuation loads them before editing
+- **Evidence-based validation** — check explicit success criteria and Definition of Done evidence, not merely command exit codes
 
-## Early Lifecycle Operations
+## Planning Operations
 
-- **Discovery run** — iterate observations, assumptions, affected context, and unknowns — see [references/discovery-run.md](references/discovery-run.md)
-- **Research run** — collect and synthesize evidence with provenance and uncertainty — see [references/research-run.md](references/research-run.md)
-- **Formulation run** — express candidate behavior, examples, constraints, and ambiguities — see [references/formulation-run.md](references/formulation-run.md)
-- **Experience Design** — create, independently [critique](references/experience-design-critique.md), [revise](references/experience-design-revise.md), and [accept](references/experience-design-accept.md) optional experience results — see [references/experience-design-create.md](references/experience-design-create.md)
-- **Solution Design** — create, independently [critique](references/solution-design-critique.md), [revise](references/solution-design-revise.md), and [accept](references/solution-design-accept.md) optional solution results — see [references/solution-design-create.md](references/solution-design-create.md)
-- **Decision** — [create](references/decision-create.md), independently [critique](references/decision-critique.md), [revise](references/decision-revise.md), and [accept](references/decision-accept.md) authority-bound results
+- **Research** — investigate codebase and external evidence for a future plan — see [references/plan-research.md](references/plan-research.md)
+- **Create** — author one high-level plan and stop before detailed subplans — see [references/plan-create.md](references/plan-create.md)
+- **Critique** — independently stress-test one plan without revising it — see [references/plan-critique.md](references/plan-critique.md)
+- **Revise** — apply explicit feedback to a new plan revision — see [references/plan-revise.md](references/plan-revise.md)
+- **Expand** — derive focused child plans and their execution ordering — see [references/plan-subplans-create.md](references/plan-subplans-create.md)
+- **Continue** — implement one plan or child plan and stop — see [references/plan-continue.md](references/plan-continue.md)
+- **Update** — refresh descriptive progress and validation evidence — see [references/plan-update.md](references/plan-update.md)
+- **Validate** — evaluate explicit success criteria without changing the plan — see [references/plan-validate.md](references/plan-validate.md)
 
 ## Gotchas
 
-- A method such as user stories or BDD is selectable — making it the entry contract excludes valid workflows and creates a hard dependency
-- An unavailable explicitly selected provider is an error — silently writing a local file changes the user's source of truth
-- A model can prepare a decision brief but cannot fabricate stakeholder statements, human acceptance, professional qualification, or delegated authority
-- Skipping Research and going straight to Planning produces vague plans built on assumed context
-- A plan without `skills_to_consult` leaves implementers ignoring project conventions
-- Auto-detecting toolchain via `package.json` only misses Moon/Makefile-driven projects — check both
-- Approve the parent with `plan-accept` before `plan-subplans-create` — it requires `status: approved`
-- `plan-critique` must run as an independent agent (fresh session), not the plan's author — self-critique defends instead of attacks
-- A change describable in one sentence (a one-line diff) skips discovery and planning — implement it directly; heavy up-front spec on a trivial edit is waste
-- A plan is done when the team's Definition of Done is met (review, docs, no regressions, NFRs), not when tests merely pass — `plan-validate` checks the DoD, not just success criteria
-- "Tests pass" doesn't mean "success criteria met" — `plan-validate` reads the criteria, not just exit codes
-- Auto-continuing to the next plan after completion silently chains work — `plan-continue` STOPS after one
-- Subplans with >7 tasks risk silent drops — target 5–7 tasks each
-- Skipping the verification re-read before marking complete is the #1 cause of incomplete work
-
-## Plan Lifecycle
-
-1. **Create** — `plan-create` resolves Research, Decision, Formulation, and Design native references and publishes the parent Planning result; selected test/acceptance methods load matching installed skills
-2. **Revise** — `plan-revise` applies explicit feedback to an exact Planning revision and publishes a new native revision
-3. **Critique** — `plan-critique` independently stress-tests an exact Planning revision, feeding a separate result into revise
-4. **Accept / Reject** — `plan-accept` or `plan-reject` records an authorized status decision against the exact revision
-5. **Expand** — `plan-subplans-create` publishes detailed child Planning results and provider-native relationships
-6. **Execute** — `plan-continue` reconstructs native handles and works through one child Planning result at a time
-7. **Update** — `plan-update` publishes current status and validation results as a new revision
-8. **Validate** — `plan-validate` checks success criteria and Definition of Done against exact revisions and evidence
+- An opaque reference is provider data — never infer its storage shape or silently replace its provider with a local file
+- Status is optional descriptive metadata — do not use approval or status fields to authorize or gate another planning operation
+- Successful validation is evidence about criteria, not approval, acceptance, publication, or permission to proceed
+- A plan without `skills_to_consult` leaves implementers without project-specific guidance
+- Toolchain discovery limited to one manifest misses workspace-level or task-runner validation
+- Critique needs fresh independent context; continuation needs reconstructed subject context after session loss
+- Expansion may use any explicit parent plan, regardless of whether it has an approval field
+- Continuation completes one target and stops instead of silently chaining into the next child
+- Subplans with more than seven tasks risk silent drops — target five to seven focused tasks
+- Re-read tasks and success criteria before reporting completion; green tests alone do not prove the plan is done
 
 ## Progressive Disclosure
 
-### Early lifecycle
+### Planning
 
-- Read [references/early-lifecycle-contracts.md](references/early-lifecycle-contracts.md) - Load when selecting methods and providers, handling authority, publishing native results, or resuming after context loss
-- Read [references/discovery-run.md](references/discovery-run.md) - Load when discovering a problem/opportunity through neutral iterative observations, assumptions, and unknowns
-- Read [references/research-run.md](references/research-run.md) - Load when producing reusable evidence with provenance, confidence, uncertainty, limitations, and bounded exploration
-- Read [references/formulation-run.md](references/formulation-run.md) - Load when formulating candidate behavior, examples, constraints, and ambiguities without mandating stories or Gherkin
-- Read [references/experience-design-create.md](references/experience-design-create.md) - Load when creating an optional Experience Design result
-- Read [references/experience-design-critique.md](references/experience-design-critique.md) - Load when independently critiquing an exact Experience Design revision
-- Read [references/experience-design-revise.md](references/experience-design-revise.md) - Load when revising Experience Design from explicit feedback or critique references
-- Read [references/experience-design-accept.md](references/experience-design-accept.md) - Load when recording an authorized decision on an exact Experience Design revision
-- Read [references/solution-design-create.md](references/solution-design-create.md) - Load when creating an optional Solution Design result
-- Read [references/solution-design-critique.md](references/solution-design-critique.md) - Load when independently critiquing an exact Solution Design revision
-- Read [references/solution-design-revise.md](references/solution-design-revise.md) - Load when revising Solution Design from explicit feedback or critique references
-- Read [references/solution-design-accept.md](references/solution-design-accept.md) - Load when recording an authorized decision on an exact Solution Design revision
-- Read [references/decision-create.md](references/decision-create.md) - Load when preparing and recording one evidence-grounded, authority-bound Decision result
-- Read [references/decision-critique.md](references/decision-critique.md) - Load when independently critiquing a Decision without acting as its authority
-- Read [references/decision-revise.md](references/decision-revise.md) - Load when revising an exact Decision while preserving evidence, authority, and supersession
-- Read [references/decision-accept.md](references/decision-accept.md) - Load when an authorized actor records a decision against an exact native revision
+- Read [references/plan-research.md](references/plan-research.md) - Load when researching codebase and external evidence for a future plan, or running a read-only code-quality audit
+- Read [references/plan-create.md](references/plan-create.md) - Load when authoring a high-level implementation plan from explicit inputs
+- Read [references/plan-critique.md](references/plan-critique.md) - Load when independently stress-testing an exact plan without changing it
+- Read [references/plan-revise.md](references/plan-revise.md) - Load when applying explicit feedback or annotations to a plan
+- Read [references/plan-subplans-create.md](references/plan-subplans-create.md) - Load when expanding a parent plan into detailed child plans
+- Read [references/plan-continue.md](references/plan-continue.md) - Load when resuming implementation from an existing plan
+- Read [references/plan-update.md](references/plan-update.md) - Load when refreshing a plan with current progress and validation evidence
+- Read [references/plan-validate.md](references/plan-validate.md) - Load when checking a plan's success criteria and Definition of Done without mutation
 
-### Research
+### Code research
 
-- Read [references/plan-research.md](references/plan-research.md) - Load when researching codebase + web for a future plan, or running a read-only code-quality audit (harden / simplify / align — applies code-quality-guide)
 - Read [references/code-barrels-remove.md](references/code-barrels-remove.md) - Load when analyzing barrel exports for removal
 - Read [references/code-comments-remove.md](references/code-comments-remove.md) - Load when identifying non-essential comments
 - Read [references/code-shared-extract.md](references/code-shared-extract.md) - Load when finding duplicated patterns to extract
 - Read [references/code-template-extract.md](references/code-template-extract.md) - Load when creating reusable templates from existing code
 - Read [references/code-template-scaffold.md](references/code-template-scaffold.md) - Load when generating new code from templates
 - Read [references/todos.md](references/todos.md) - Load when scanning and grouping TODO comments
-
-### Plan lifecycle
-
-- Read [references/plan-create.md](references/plan-create.md) - Load when publishing a high-level Planning result from opaque native lifecycle references
-- Read [references/plan-revise.md](references/plan-revise.md) - Load when applying native feedback, critique references, annotations, or prompt instructions to an exact Planning revision
-- Read [references/plan-critique.md](references/plan-critique.md) - Load when adversarially stress-testing a plan to expose weaknesses (red-team / pre-mortem / falsify / steelman), read-only
-- Read [references/plan-accept.md](references/plan-accept.md) - Load when approving a plan for execution (sanity-check, then set status: approved)
-- Read [references/plan-reject.md](references/plan-reject.md) - Load when rejecting a plan with a reason (set status: rejected, record why, keep the plan)
-- Read [references/plan-subplans-create.md](references/plan-subplans-create.md) - Load when expanding an approved plan into detailed parallelizable subplans
-- Read [references/plan-continue.md](references/plan-continue.md) - Load when resuming implementation work from an existing plan
-- Read [references/plan-update.md](references/plan-update.md) - Load when refreshing a plan with current status / validation / progress
-- Read [references/plan-validate.md](references/plan-validate.md) - Load when verifying a plan's success criteria are met (read-only)

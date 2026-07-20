@@ -4,66 +4,74 @@
   "evals": [
     {
       "id": 1,
-      "prompt": "I have an approved parent plan for adding OAuth login to our web app. Break it down into detailed implementation subplans I can hand off for execution.",
+      "prompt": "Research the codebase and current official documentation needed to plan request throttling for packages/api. Return the report inline and do not edit anything.",
       "assertions": [
-        "No single subplan is given more than 7 tasks (work is split into subplans of roughly 5-7 tasks each)",
-        "Execution ordering (parallel vs sequential) is decided by whether subplans touch overlapping files/packages: non-overlapping ones may run in parallel, overlapping ones are sequenced"
+        "The report separates observed code or source evidence from inference, uncertainty, and unresolved questions",
+        "The operation remains read-only and stops without creating a plan or changing code"
       ]
     },
     {
       "id": 2,
-      "prompt": "Before we plan this data-layer refactor, help me settle the open design decisions. There are several unresolved trade-offs (naming, where the migration logic lives, and how much of the old contract to keep).",
+      "prompt": "Create one high-level implementation plan from the inline migration research below. Return it inline; detailed child plans can come later.",
       "assertions": [
-        "Presents only ONE decision at a time and stops for the answer, rather than listing or batching all the decisions in one response",
-        "The decision is presented as prose with an explicit recommended option (not a neutral multiple-choice list and not a forced-option question widget)"
+        "The plan includes objective, scope, dependencies, risks, validation, explicit success criteria, and a non-empty skills_to_consult list",
+        "The result stays at parent-plan level and does not create detailed child plans or require an approval status"
       ]
     },
     {
       "id": 3,
-      "prompt": "Resume the implementation work on my authentication plan, which has several subplans.",
+      "prompt": "Critique tracker plan:782 at revision 9f31 using red-team and pre-mortem lenses. The prior authoring context is unavailable.",
       "assertions": [
-        "Establishes a baseline by running validation (typecheck / lint / build / tests) before making code changes",
-        "Works on a single plan/subplan and stops when it is complete instead of automatically continuing to the next subplan"
+        "The provider is asked to resolve the opaque plan reference and exact revision instead of the reference shape being parsed locally",
+        "The critique runs in fresh independent context, reports evidence-linked failure modes, and does not revise the plan or change status"
       ]
     },
     {
       "id": 4,
-      "prompt": "Create a high-level plan for adding rate limiting to our API, based on the research we just did.",
+      "prompt": "Revise this inline plan from the attached feedback. Two comments are unresolved, and I need a traceable result rather than an overwrite.",
       "assertions": [
-        "The plan includes a non-empty skills_to_consult list naming applicable coding-guideline skills for implementers",
-        "It stops at the high-level/parent plan and does NOT write out detailed implementation subplans in the same pass"
+        "Every feedback item receives an applied, deferred, rejected, unresolved, or scope-change disposition with rationale",
+        "The output preserves the source and returns a distinct revised plan without assigning approval semantics to status"
       ]
     },
     {
       "id": 5,
-      "prompt": "Run discovery on the dispatch-delay problem. We use a hosted tracker, do not want user stories by default, and may lose this agent session before formulation.",
+      "prompt": "Expand this parent plan into detailed child plans. It has no approval or status field; sequence children that overlap on mutable files.",
       "assertions": [
-        "Produces a canonical Discovery result with observations, assumptions, unknowns, and affected context without requiring user-story or Gherkin form",
-        "Publishes through the selected provider and returns an opaque native reference that can be resolved after context loss"
+        "Expansion proceeds from the explicit parent without requiring approval or a particular status value",
+        "Children contain roughly five to seven focused tasks and are grouped or sequenced from dependencies and overlapping mutable resources"
       ]
     },
     {
       "id": 6,
-      "prompt": "Research whether our support assistant can process EU customer transcripts. Separate evidence from synthesis, state confidence, and account for privacy and regulated applicability.",
+      "prompt": "Resume implementation from provider plan:auth-44 revision a110 after losing the previous session. Complete one actionable child and stop.",
       "assertions": [
-        "Separates cited evidence and provenance from synthesized findings, limitations, uncertainty, and open questions",
-        "Records applicable data-access, external-research, privacy, and regulated constraints"
+        "The operation reconstructs the explicit provider-native subject, baselines applicable validation, and loads the target's skills before editing",
+        "It completes and verifies only one actionable target, reports evidence and remaining work, and does not continue to another child"
       ]
     },
     {
       "id": 7,
-      "prompt": "Critique solution design design:payments-v3 at revision sha256:91af, then let our architecture owner decide whether to accept it.",
+      "prompt": "Update this implementation plan from the supplied task and validation evidence without changing scope.",
       "assertions": [
-        "Critique runs in fresh independent context and remains separate from revision and acceptance",
-        "Acceptance binds to the exact native revision and preserves the human authority reference rather than allowing the model to fabricate authority"
+        "Each task and success criterion is compared with concrete implementation or validation evidence",
+        "Any status is presented as optional descriptive metadata and is not treated as authorization or a gate"
       ]
     },
     {
       "id": 8,
-      "prompt": "Create a planning result from research result:782 and decision R-18. The result provider is our task database, not files or Git.",
+      "prompt": "Validate this plan against its explicit success criteria and Definition of Done at commit 8a02. Return the evidence inline.",
       "assertions": [
-        "Consumes the opaque native input references by asking the selected providers to resolve them rather than parsing their shapes",
-        "Publishes a provider-native Planning result and does not silently fall back to a local plan file or require Git"
+        "Every criterion receives an independent pass, fail, or blocked result with reproducible evidence and freshness",
+        "The operation remains read-only and does not mutate status, claim approval, or treat green tests as sufficient by themselves"
+      ]
+    },
+    {
+      "id": 9,
+      "prompt": "Audit packages/worker for hardening opportunities before planning changes. Focus on validation and error handling, make no edits, and grade actionable findings by severity.",
+      "assertions": [
+        "The audit loads the applicable code-quality capability and grounds categorized findings in exact code evidence",
+        "The report is read-only, distinguishes findings from recommendations, and stops without implementing changes"
       ]
     }
   ]

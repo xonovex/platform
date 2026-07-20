@@ -3,7 +3,9 @@ type: plan
 has_subplans: false
 parent_plan: ../symmetric-workflow-commands.md
 parallel_group: 4
-status: pending
+status: complete
+updated: 2026-07-20
+completed_date: "2026-07-20"
 dependencies:
   plans:
     - subplan-01-command-contract-and-inventory.md
@@ -28,11 +30,11 @@ skills_to_consult:
   - moon-guide
   - git-guide
 validation:
-  type_check: pending
-  lint: pending
-  build: pending
-  tests: pending
-  integration: pending
+  type_check: passed
+  lint: passed
+  build: passed
+  tests: passed
+  integration: passed
 ---
 
 # Subplan 05: Validation and breaking release
@@ -178,19 +180,19 @@ const expectedCommands = new Set([
 
 ## Success criteria
 
-- [ ] Validation derives and enforces the exact 12-command inventory.
-- [ ] Tests fail for asymmetric inventory, malformed prompts, stale lifecycle
+- [x] Validation derives and enforces the exact 12-command inventory.
+- [x] Tests fail for asymmetric inventory, malformed prompts, stale lifecycle
       concepts, and broken cross-package links.
-- [ ] Residue checks distinguish retained execution security from removed
+- [x] Residue checks distinguish retained execution security from removed
       workflow governance.
-- [ ] No active source/config/documentation/eval surface references removed
+- [x] No active source/config/documentation/eval surface references removed
       commands, runtimes, profiles, gates, triggers, or schedules.
-- [ ] `shared-agent-go` remains functionally unchanged and passes its checks.
-- [ ] All affected Moon, TypeScript, Vitest, Go, Kubernetes, diagram, formatting,
+- [x] `shared-agent-go` remains functionally unchanged and passes its checks.
+- [x] All affected Moon, TypeScript, Vitest, Go, Kubernetes, diagram, formatting,
       and release-dry-run checks pass without warnings.
-- [ ] Plugin/package/catalog metadata is synchronized for the next lockstep
+- [x] Plugin/package/catalog metadata is synchronized for the next lockstep
       major release.
-- [ ] No branch is created, nothing is pushed/published, and no migration or
+- [x] No branch is created, nothing is pushed/published, and no migration or
       compatibility artifact is added.
 
 ## Files modified/created
@@ -218,6 +220,30 @@ const expectedCommands = new Set([
   and metadata that overlap the preceding outputs.
 - Completion makes the parent plan ready for implementation validation, not
   automatic publishing.
+
+## Validation Results
+
+- All five affected package `ci-check` targets pass: command workflow, plan
+  skill, workflow diagram, agent operator, and shared agent policy.
+- The skill validator passes build, typecheck, lint, formatting, coverage, and
+  all 24 tests; cross-package validation resolves 4/4 links, 248/248 handoffs,
+  and 90 dependency pairs.
+- The release validator passes 987 checks across 92 lockstep command and skill
+  packages at version `7.0.0`, including package, Claude, Codex, marketplace,
+  dependency, description, and lockfile parity.
+- Command validation passes nine focused fixture tests and 11 validation groups
+  over the exact 12-command inventory. Final semantic-residue and tracked-file
+  checks find no active removed surface, and `shared-agent-go` has no diff.
+- Operator unit, coverage, formatting, lint, build, envtest integration,
+  manifest, and generated-code checks pass. Both updated diagrams render and
+  were visually inspected.
+- `npm audit --audit-level=moderate` reports zero vulnerabilities, and
+  `git diff --check` passes. npm 11.16's `dedupe` command emits an upstream
+  advisory for `esbuild@0.28.1` because that command path does not load the
+  root `allowScripts` policy; `npm install` and `npm approve-scripts` confirm
+  the pinned approval is effective with no unreviewed install scripts.
+- No branch, push, publish, `MIGRATION.md`, alias, wrapper, or compatibility
+  artifact was created.
 
 ## Estimated duration
 

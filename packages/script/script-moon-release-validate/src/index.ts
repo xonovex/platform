@@ -12,6 +12,7 @@ import {
 interface MarketplaceEntry {
   name: string;
   source: string | {path?: string};
+  description?: string;
 }
 
 interface Marketplace {
@@ -22,6 +23,7 @@ interface Marketplace {
 interface PackageManifest {
   name: string;
   version?: string;
+  description?: string;
   dependencies?: Record<string, string>;
   devDependencies?: Record<string, string>;
   peerDependencies?: Record<string, string>;
@@ -74,6 +76,12 @@ const codexEntries = new Map(
     entry.name,
     typeof entry.source === "string" ? entry.source : entry.source.path,
   ]),
+);
+const claudeDescriptions = new Map(
+  marketplace.plugins.map((entry) => [entry.name, entry.description]),
+);
+const codexDescriptions = new Map(
+  codexMarketplace.plugins.map((entry) => [entry.name, entry.description]),
 );
 
 for (const pluginPackage of pluginPackages) {
@@ -133,6 +141,24 @@ for (const pluginPackage of pluginPackages) {
     codexEntries.get(codexManifest.name) === source,
     `${codexManifest.name} has the expected Codex marketplace source`,
   );
+  if (packageJson.description !== undefined) {
+    check(
+      claudeManifest.description === packageJson.description,
+      `${packageJson.name} package and Claude manifest descriptions match`,
+    );
+    check(
+      codexManifest.description === packageJson.description,
+      `${packageJson.name} package and Codex manifest descriptions match`,
+    );
+    check(
+      claudeDescriptions.get(claudeManifest.name) === packageJson.description,
+      `${packageJson.name} package and Claude marketplace descriptions match`,
+    );
+    check(
+      codexDescriptions.get(codexManifest.name) === packageJson.description,
+      `${packageJson.name} package and Codex marketplace descriptions match`,
+    );
+  }
 
   for (const [dependency, version] of Object.entries({
     ...packageJson.dependencies,

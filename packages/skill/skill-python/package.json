@@ -1,11 +1,11 @@
 {
   "name": "@xonovex/skill-python",
-  "version": "6.1.0",
+  "version": "7.0.0",
   "private": true,
   "type": "module",
   "dependencies": {
-    "@xonovex/skill-fp": "6.1.0",
-    "@xonovex/skill-oop": "6.1.0"
+    "@xonovex/skill-fp": "7.0.0",
+    "@xonovex/skill-oop": "7.0.0"
   },
   "keywords": [
     "xonovex",

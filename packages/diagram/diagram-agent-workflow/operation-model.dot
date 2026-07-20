@@ -1,0 +1,136 @@
+digraph OperationModel {
+  graph [
+    bgcolor="white",
+    fontname="Arial",
+    fontsize=18,
+    label="Composable operation model",
+    labelloc=t,
+    nodesep=0.35,
+    pad=0.25,
+    ranksep=0.55,
+    splines=ortho
+  ];
+  node [
+    color="#4b5563",
+    fillcolor="white",
+    fontname="Arial",
+    fontsize=10,
+    shape=box,
+    style="rounded,filled"
+  ];
+  edge [
+    color="#6b7280",
+    fontname="Arial",
+    fontsize=9
+  ];
+
+  subgraph cluster_selection {
+    color="#93c5fd";
+    fillcolor="#eff6ff";
+    label="Orthogonal selections";
+    style="rounded,filled";
+
+    kind [label="kind\nsubject or result noun"];
+    perspective [label="perspective\nevidence or stakeholder lens"];
+    method [label="method\nselected procedure"];
+    capability [label="agent capability\ninstalled skill, tool, or adapter"];
+    provider [label="provider\nresolves and persists"];
+    reference [label="reference + native revision\nopaque provider locator"];
+
+    {rank=same; kind; perspective; method;}
+    {rank=same; capability; provider; reference;}
+  }
+
+  subgraph cluster_invocation {
+    color="#c4b5fd";
+    fillcolor="#f5f3ff";
+    label="Independent invocation inputs";
+    style="rounded,filled";
+
+    trigger [label="trigger\nmanual · harness hook · CI/CD\nwebhook · scheduler"];
+    executor [label="executor\nhuman · deterministic script\nLLM · agent"];
+    metadata [label="optional executor metadata\nprovider or harness owned"];
+
+    {rank=same; trigger; executor; metadata;}
+  }
+
+  contract [
+    fillcolor="#fef3c7",
+    label="One command call\nselect one operation; keep every other axis independent",
+    penwidth=2,
+    shape=component
+  ];
+
+  subgraph cluster_operations {
+    color="#86efac";
+    fillcolor="#f0fdf4";
+    label="Eight sibling operations — compose as needed; no required order";
+    style="rounded,filled";
+
+    operation [
+      fillcolor="#dcfce7",
+      label="operation\nsame semantics for every trigger and executor",
+      shape=ellipse
+    ];
+    create [label="create"];
+    review [label="review"];
+    revise [label="revise"];
+    decide [label="decide"];
+    execute [label="execute"];
+    validate [label="validate"];
+    publish [label="publish"];
+    abandon [label="abandon"];
+
+    {rank=same; create; review; revise; decide;}
+    {rank=same; execute; validate; publish; abandon;}
+
+    operation -> create [arrowhead=none];
+    operation -> review [arrowhead=none];
+    operation -> revise [arrowhead=none];
+    operation -> decide [arrowhead=none];
+    operation -> execute [arrowhead=none];
+    operation -> validate [arrowhead=none];
+    operation -> publish [arrowhead=none];
+    operation -> abandon [arrowhead=none];
+  }
+
+  result [
+    fillcolor="#e0f2fe",
+    label="result\ninline, or provider-native locator + revision\nwhen an explicit destination is supplied",
+    shape=folder
+  ];
+
+  subgraph cluster_workspace {
+    color="#d1d5db";
+    fillcolor="#f9fafb";
+    label="Workspace utilities — explicit and outside operation semantics";
+    style="dashed,filled";
+
+    workspace_create [label="workspace-create"];
+    workspace_merge [label="workspace-merge"];
+    workspace_abandon [label="workspace-abandon"];
+    workspace_cleanup [label="workspace-cleanup"];
+
+    {rank=same; workspace_create; workspace_merge; workspace_abandon; workspace_cleanup;}
+  }
+
+  kind -> contract;
+  perspective -> contract;
+  method -> contract;
+  capability -> contract;
+  provider -> contract;
+  reference -> contract;
+  trigger -> contract;
+  executor -> contract;
+  metadata -> contract;
+  contract -> operation;
+  operation -> result;
+
+  legend [
+    color="#f59e0b",
+    fillcolor="#fffbeb",
+    label="Lines show inputs and possible composition, not gates, permissions, or lifecycle stages.",
+    shape=note
+  ];
+  workspace_cleanup -> legend [style=invis];
+}

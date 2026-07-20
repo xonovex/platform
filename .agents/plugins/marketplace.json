@@ -22,6 +22,7 @@
         "source": "local",
         "path": "./packages/command/command-workflow"
       },
+      "description": "Xonovex composable operation and workspace commands",
       "policy": {
         "installation": "AVAILABLE",
         "authentication": "ON_INSTALL"
@@ -826,6 +827,7 @@
         "source": "local",
         "path": "./packages/skill/skill-plan"
       },
+      "description": "Xonovex planning and read-only code-research skills",
       "policy": {
         "installation": "AVAILABLE",
         "authentication": "ON_INSTALL"

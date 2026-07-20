@@ -1,23 +1,21 @@
-# plan-continue: Continue One Planning Result
+# plan-continue: Continue One Plan
 
-Resume implementation from one parent or child Planning result. Start immediately, complete only the first actionable result, publish status/evidence, and stop.
+Resume implementation from one explicit inline plan or provider-native plan reference plus an optional native revision. Start immediately, complete only the first actionable target, return changes and evidence, and stop.
 
-## Core workflow
+## Core Workflow
 
-1. **Resolve input** — use an explicit provider context + opaque native reference; otherwise current reconstructed handle, unambiguous workspace association, or ask. Never glob for an arbitrary plan or infer identity from a file name.
-2. **Reconstruct** — ask the selected provider to resolve the requested native revision and rebuild the operation state needed to continue; verify available capabilities and applicable requirements.
-3. **Select one** — if the result relates child plans, read only provider-native metadata in declared order until the first `in_progress` or `pending` child. Do not load every child body.
-4. **Load target** — resolve that one target fully, including tasks, dependencies, blockers, success criteria, source references, and skills/capabilities to consult.
-5. **Baseline** — discover the actual toolchain beyond one manifest and run applicable typecheck, lint, build, tests, and integration checks before changes. Record unavailable categories explicitly.
-6. **Consult skills** — load every target `skills_to_consult` capability and its relevant progressive references before implementation; fail visibly for a mandatory unavailable skill.
-7. **Execute** — create task tracking for the target's highest-priority pending work, implement all of it, and keep Development evidence bound to the exact workspace/subject revision.
-8. **Verify** — re-read tasks and success criteria, run applicable validation, and resolve warnings at root cause.
-9. **Publish** — write complete/blocked status, validation evidence, limitations, and resulting exact revision through the selected provider; stop without advancing to another child.
-
-Apply [early-lifecycle-contracts.md](early-lifecycle-contracts.md). Local plan files and Git worktrees are supported only when selected providers/workspace adapters own them.
+1. **Resolve input** — use the explicit plan supplied by the caller. Let the selected provider resolve an opaque reference and optional revision; do not glob for an arbitrary plan or infer provider identity from a reference shape.
+2. **Select one target** — when the plan relates ordered children, scan metadata only until the first child with unfinished tasks or unmet criteria. Treat status as a hint, verify it against evidence, and do not require a particular status value.
+3. **Load the target** — resolve only that target fully, including tasks, dependencies, blockers, success criteria, sources, and `skills_to_consult`.
+4. **Baseline** — discover the actual project toolchain and run applicable typecheck, lint, build, tests, and integration checks before changes. Record unavailable or not-applicable categories.
+5. **Consult skills** — load every applicable `skills_to_consult` capability and its relevant progressive references before implementation. Report any mandatory unavailable capability.
+6. **Execute** — track the target's pending work, implement all of it, preserve unrelated worktree changes, and resolve warnings at root cause.
+7. **Verify** — re-read every task and success criterion, run applicable validation, and distinguish new failures from baseline failures.
+8. **Return one result** — report changes, evidence, limitations, descriptive progress, and remaining work. Persist only when the caller requested a provider destination, then stop without advancing to another child.
 
 ## Gotchas
 
-- Unchanged conversation memory is not fresh-context recovery; provider resolution is.
+- Reconstruct provider-native inputs after context loss; conversation memory is not persistent identity.
+- A `complete` status does not prove tasks or criteria are satisfied, and another status does not block work requested by the caller.
 - Passing tests do not prove every success criterion or Definition of Done item.
-- Automatically continuing to the next child silently chains authority and scope.
+- Automatically continuing to the next child silently expands scope.

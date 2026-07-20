@@ -1,20 +1,24 @@
-# plan-critique: Independently Stress-Test a Planning Revision
+# plan-critique: Independently Stress-Test a Plan
 
-Critique an exact Planning revision before implementation. Publish separate findings for `plan-revise`; never edit or approve the subject.
+Review an inline plan or an exact provider-native plan reference without changing it. Use the optional native revision to pin mutable provider state, run in fresh context, and return separate findings inline or through an explicitly selected result provider.
 
 ## Lenses
 
 - **Red-team** — attack essential assumptions and unproven dependencies.
 - **Pre-mortem** — assume delivery failed and trace likely causes to planning choices.
-- **Falsify** — find the concrete input, scale, sequence, provider, or context-loss case the plan misses.
-- **Steelman** — strengthen the weakest section with the smallest change that removes its failure.
+- **Falsify** — find concrete inputs, scales, sequences, environments, or recovery cases the plan misses.
+- **Steelman** — identify the smallest change that would strengthen a weak section.
 
-## Core workflow
+## Core Workflow
 
-1. Resolve the Planning provider context, opaque native reference, exact revision, source references, profile, and success criteria.
-2. Start fresh independent context that did not author the subject. Reconstruct the ephemeral handle from native state, not conversation memory.
-3. Ground essential claims by resolving their source/evidence references and relevant environment facts.
-4. Run the selected lenses and produce concrete findings with severity, confidence, affected result section, failure mode, and suggested direction.
-5. Publish a separate critique result/evidence reference bound to the exact Planning revision; stop.
+1. Resolve the explicit plan, supporting references, review criteria, and optional native revision. Require an exact revision when the selected provider otherwise exposes mutable state.
+2. Start fresh independent context that did not author the plan. Reconstruct provider-native inputs instead of relying on conversation memory.
+3. Ground material claims in source evidence and current environment facts.
+4. Apply the selected lenses and report findings with severity, confidence, affected section, failure mode, evidence, and suggested direction.
+5. Return the critique as a separate result. Persist it only to an explicitly requested provider destination.
 
-Apply [early-lifecycle-contracts.md](early-lifecycle-contracts.md). A critique cannot revise, accept, or grant authority.
+## Gotchas
+
+- Critique never revises the subject or changes its descriptive status.
+- A passing critique is not validation and does not authorize implementation.
+- Vague findings without a failure mode or supporting evidence are not actionable.

@@ -1,10 +1,11 @@
 {
   "name": "@xonovex/skill-plan",
-  "version": "6.1.0",
+  "version": "7.0.0",
+  "description": "Xonovex planning and read-only code-research skills",
   "private": true,
   "type": "module",
   "dependencies": {
-    "@xonovex/skill-code-quality": "6.1.0"
+    "@xonovex/skill-code-quality": "7.0.0"
   },
   "keywords": [
     "xonovex",

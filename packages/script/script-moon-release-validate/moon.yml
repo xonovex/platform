@@ -40,7 +40,11 @@ tasks:
       - /.claude-plugin/marketplace.json
       - /.agents/plugins/marketplace.json
       - /packages/command/*/package.json
+      - /packages/command/*/.claude-plugin/plugin.json
+      - /packages/command/*/.codex-plugin/plugin.json
       - /packages/skill/*/package.json
+      - /packages/skill/*/.claude-plugin/plugin.json
+      - /packages/skill/*/.codex-plugin/plugin.json
     options:
       runFromWorkspaceRoot: true
   ci-check:

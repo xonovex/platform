@@ -3,7 +3,9 @@ type: plan
 has_subplans: false
 parent_plan: ../symmetric-workflow-commands.md
 parallel_group: 3
-status: pending
+status: complete
+updated: 2026-07-20
+completed_date: "2026-07-20"
 dependencies:
   plans:
     - subplan-01-command-contract-and-inventory.md
@@ -27,11 +29,11 @@ skills_to_consult:
   - testing-guide
   - shell-scripting-guide
 validation:
-  type_check: pending
-  lint: pending
-  build: pending
-  tests: pending
-  integration: pending
+  type_check: not_applicable
+  lint: passed
+  build: passed
+  tests: passed
+  integration: passed
 ---
 
 # Subplan 03: Role, reference, and invocation guides
@@ -153,17 +155,17 @@ tracker: provider-native item key
 
 ## Success criteria
 
-- [ ] One README, one role-lens guide, one reference guide, and one invocation
+- [x] One README, one role-lens guide, one reference guide, and one invocation
       guide explain the complete public model.
-- [ ] Every role composes the same operation vocabulary.
-- [ ] QA validation and developer PR review are separate responsibilities.
-- [ ] Provider-native locators remain opaque; no universal reference layer is
+- [x] Every role composes the same operation vocabulary.
+- [x] QA validation and developer PR review are separate responsibilities.
+- [x] Provider-native locators remain opaque; no universal reference layer is
       implied.
-- [ ] Trigger, executor, agent maturity, and role do not change command
+- [x] Trigger, executor, agent maturity, and role do not change command
       semantics.
-- [ ] One non-lifecycle diagram replaces all four role workflows and renders
+- [x] One non-lifecycle diagram replaces all four role workflows and renders
       successfully.
-- [ ] All links and documentation validation checks pass.
+- [x] All links and documentation validation checks pass.
 
 ## Files modified/created
 

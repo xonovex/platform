@@ -1,7 +1,7 @@
 {
   "name": "xonovex-skill-plan",
-  "version": "6.1.0",
-  "description": "Xonovex early lifecycle and Planning skills",
+  "version": "7.0.0",
+  "description": "Xonovex planning and read-only code-research skills",
   "author": {
     "name": "Xonovex"
   },

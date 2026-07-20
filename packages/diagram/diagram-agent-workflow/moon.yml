@@ -7,41 +7,10 @@ tasks:
     options:
       cache: false
   graph-build:
-    command: noop
-    deps:
-      - graph-build-developer
-      - graph-build-pm
-      - graph-build-qa
-      - graph-build-ux
-  graph-build-developer:
-    command: dot -Tpng -o developer-workflow.png developer-workflow.dot
+    command: dot -Tpng -o operation-model.png operation-model.dot
     inputs:
-      - developer-workflow.dot
+      - operation-model.dot
     outputs:
-      - developer-workflow.png
-    options:
-      cache: true
-  graph-build-pm:
-    command: dot -Tpng -o pm-workflow.png pm-workflow.dot
-    inputs:
-      - pm-workflow.dot
-    outputs:
-      - pm-workflow.png
-    options:
-      cache: true
-  graph-build-qa:
-    command: dot -Tpng -o qa-workflow.png qa-workflow.dot
-    inputs:
-      - qa-workflow.dot
-    outputs:
-      - qa-workflow.png
-    options:
-      cache: true
-  graph-build-ux:
-    command: dot -Tpng -o ux-workflow.png ux-workflow.dot
-    inputs:
-      - ux-workflow.dot
-    outputs:
-      - ux-workflow.png
+      - operation-model.png
     options:
       cache: true

@@ -1,14 +1,8 @@
 {
   "name": "@xonovex/command-workflow",
-  "version": "6.1.0",
+  "version": "7.0.0",
+  "description": "Xonovex composable operation and workspace commands",
   "private": true,
-  "dependencies": {
-    "@xonovex/skill-code-quality": "6.1.0",
-    "@xonovex/skill-code-review": "6.1.0",
-    "@xonovex/skill-plan": "6.1.0",
-    "@xonovex/skill-pull-request": "6.1.0",
-    "@xonovex/skill-testing": "6.1.0"
-  },
   "keywords": [
     "xonovex",
     "command",
@@ -17,6 +11,6 @@
   "scripts": {
     "fmt:check": "prettier --check .",
     "fmt": "prettier --write .",
-    "test": "node scripts/validate-documentation.mjs"
+    "test": "node --test scripts/*.test.mjs && node scripts/validate-documentation.mjs"
   }
 }

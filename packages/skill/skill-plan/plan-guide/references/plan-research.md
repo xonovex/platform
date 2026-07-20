@@ -1,39 +1,22 @@
-# plan-research: Research Codebase and Web for Requirements
+# plan-research: Research Codebase and External Evidence for a Plan
 
-Research codebase and web for a planning-oriented report. This specialized read-only analysis does not create Planning or canonical Research results: use `research-run` when the result must be reusable/provider-native, `decision-create` for authority-bound choices, then `plan-create`.
+Produce a read-only, planning-oriented report from an inline subject or an opaque provider-native reference plus an optional revision. Let a selected provider resolve native inputs; return the report inline unless the caller explicitly requests provider persistence.
 
 ## Core Workflow
 
-**Delegate codebase exploration to read-only search agents where available; otherwise grep/find/read directly. Stay in research mode — do not switch into plan-authoring.**
+1. **Resolve the subject** — use the supplied inline request or ask the selected provider to resolve the opaque reference and optional native revision. Clarify only material ambiguity.
+2. **Inspect the codebase** — find architecture, integration points, similar implementations, dependency versions, validation tasks, and applicable implementation skills. Parallelize independent searches where available.
+3. **Research external facts** — when current versions, APIs, standards, or recommendations matter, consult authoritative sources and record provenance and freshness.
+4. **Separate evidence from synthesis** — distinguish observed facts, inferred implications, constraints, uncertainty, and unresolved questions.
+5. **Return one report** — include current stack, relevant locations, options or recommendation, risks, skills to consult, and sources. Persist only through an explicitly selected destination provider.
 
-1. **Gather requirements** — parse input; ask clarifications only if interactive mode was requested
-2. **Codebase exploration** (parallel where possible) — architecture, patterns, integration points; existing library versions and similar implementations; testing/build patterns and applicable coding guidelines
-3. **Web research** — search for latest versions; fetch official docs
-4. **Synthesize** codebase + web
-5. **Present or save** — when findings contain open decisions, recommend `decision-create`; when the report needs a durable cross-context handoff, publish it through `research-run`
+## Code-Quality Audits
 
-## Code-quality audits
-
-When the request is an inward code-quality audit rather than forward/web research — hardening (type safety, validation, error handling, logging), simplification (duplicates, dead code, unused deps, over-abstraction), or alignment/consistency between two implementations — load the **code-quality-guide** skill and apply its matching dimension, producing the same read-only report grouped by category and graded by severity (no edits, no Planning mutation). Then use `decision-create` / `plan-create` as needed.
-
-## Details
-
-- **Version detection** — read manifests (`package.json`, `pyproject.toml`, `go.mod`, `Cargo.toml`) → web search for latest → fetch docs
-- **Output** — current stack, recommended libraries (versions + rationale), code locations, integration points, skills to consult, considerations
-
-```
-Research: Add rate limiting to API
-Current Stack: Hono 4.0.2, Redis 4.6.0
-Code Locations:
-- Middleware pattern: packages/api/src/middleware/
-- Similar: packages/auth/src/middleware/throttle.ts
-Recommended: @upstash/ratelimit@1.0.0 (latest stable) — fits existing Redis
-  https://upstash.com/docs/ratelimit
-Skills: typescript-guide, hono-guide
-```
+For inward-facing hardening, simplification, or alignment research, load **code-quality-guide** and apply its matching dimensions. Keep the audit read-only, group findings by category, grade actionable findings by severity, and identify exact code evidence. Route focused barrel, comment, shared-extraction, template, and TODO work to this skill's corresponding code-research references.
 
 ## Gotchas
 
-- A vague requirement turns research into a fishing trip — clarify before exploring
-- Library version conflicts surface late if you don't read manifests first — start there
-- Producing a plan during research conflates phases — keep research read-only and let the user decide whether to plan
+- Research is not plan authoring or implementation; stop after the report.
+- Read project-level task runners as well as language manifests before naming validation commands.
+- Do not treat conversation memory as a durable source when the caller supplied a provider reference.
+- An explicitly selected unavailable provider or source fails visibly instead of falling back to another storage model.

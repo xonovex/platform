@@ -1,10 +1,12 @@
 # Agent Operator Go
 
-- **AgentRun** — creates Jobs for agent execution (standalone or workspace-based); 4 concerns via ref/inline: harness, provider, workspace, toolchain
+- **AgentRun** — the only execution request API; creates Jobs for agent execution (standalone or workspace-based); 4 concerns via ref/inline: harness, provider, workspace, toolchain
 - **AgentHarness** — agent type defaults (image, timeout, runtimeClassName, env)
 - **AgentProvider** — reusable provider config with K8s secret management
 - **AgentWorkspace** — shared RWX PVC for multi-agent coordination (git worktrees, shared config volumes)
 - **AgentToolchain** — toolchain config (e.g. Nix packages)
+
+- External callers create `AgentRun` resources directly through the Kubernetes API. Scheduling, event ingress, and trigger interpretation are outside the operator.
 
 - **Nix toolchain = nix-built OCI image** (not a per-pod install): `NixSpec` carries a pin (`nixpkgsRev`), a source (`packages` XOR `flakeRef`/`shell`), and a pre-built digest-pinned `image`. The pod runs that image (built from the same `flake.lock` + `nix/agent-env.nix` as the CLI — the SAME content-addressed store-path closure, verified via `nix path-info -r`, not byte-identical layers). Build/push the image with `npx moon run agent-operator-go:agent-image-build` (→ `nix build .#legacyPackages.<sys>.agentImage` + skopeo push). The webhook requires a pinned image (`RequirePinnedProvision`); there is no `nixos/nix` init container or `nix-env` emptyDir.
 - **Untrusted-pod hardening** (fail closed): a sandboxed `runtimeClassName` via the existing `DefaultRuntimeClassName`/`AllowedRuntimeClassNames` machinery (set it on the harness — `RequireKernelIsolation`, never default runc); a dedicated zero-RBAC ServiceAccount (`agent-runner`, created by the controller) with `automountServiceAccountToken=false`; default resource requests/limits + the namespace `LimitRange`/`ResourceQuota` in `config/agent/`; a default-deny egress `NetworkPolicy` per `AgentRun` mapped from `Network` (`none`=DNS-only, `proxy`=public-except-metadata/RFC1918/loopback + DNS, `host`=allow-all), FQDN-aware via Cilium `toFQDNs`/Squid as the upgrade; `readOnlyRootFilesystem=true` reconciled with a writable HOME `emptyDir` + `fsGroup=1000`.

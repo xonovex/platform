@@ -3,7 +3,5 @@ resources:
   - bases/agent.xonovex.com_agentpolicies.yaml
   - bases/agent.xonovex.com_agentproviders.yaml
   - bases/agent.xonovex.com_agentruns.yaml
-  - bases/agent.xonovex.com_agentschedules.yaml
   - bases/agent.xonovex.com_agenttoolchains.yaml
-  - bases/agent.xonovex.com_agenttriggers.yaml
   - bases/agent.xonovex.com_agentworkspaces.yaml

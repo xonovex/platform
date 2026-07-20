@@ -1,22 +1,22 @@
-# plan-revise: Revise an Exact Planning Result
+# plan-revise: Revise a Plan from Explicit Feedback
 
-Apply explicit feedback to one Planning revision, publish a new provider-native revision, and stop. Approval remains a separate authority action.
+Create one revised plan from an inline plan or provider-native reference, explicit feedback, and an optional native revision. Preserve the source and return the new result inline unless the caller requests provider persistence.
 
-## Feedback inputs
+## Feedback Inputs
 
-Accept opaque native feedback/critique references, prompt instructions, or provider-native annotations. For a selected Markdown provider, annotation markers may include HTML comments, callouts, inline notes, strike/replace, insertion/deletion markers, or `TODO`/`FIXME`/`QUESTION` lines.
+Accept inline feedback, provider-native feedback references, or provider-native annotations. For Markdown plans, annotations may be HTML comments, callouts, inline notes, strike/replace markers, insertion/deletion markers, or `TODO`/`FIXME`/`QUESTION` lines.
 
-## Core workflow
+## Core Workflow
 
-1. Resolve the Planning provider context, native reference, exact revision, and all feedback/critique references; apply [early-lifecycle-contracts.md](early-lifecycle-contracts.md).
-2. Enumerate every distinct item before mutation. If two authority-bearing instructions conflict, stop for the responsible actor.
-3. Resolve each item as correction, deletion, addition, question, rejection, or scope change; preserve unresolved items with owner and rationale.
-4. Propagate changed decisions through approach, risks, dependencies, child-plan proposal, validation, and success criteria. Re-evaluate stale source references.
-5. Publish a new Planning native revision with supersession and source relationships; leave status pending approval unless an independent authority action already exists for this exact revision.
-6. Return the new opaque reference/revision and item-by-item disposition; stop.
+1. Resolve the explicit plan, feedback, supporting references, and optional native revision through the selected provider when applicable.
+2. Enumerate every distinct feedback item before editing. Stop on materially conflicting instructions that the available evidence cannot resolve.
+3. Classify each item as applied, deferred, rejected, unresolved question, or scope change, with a concise rationale.
+4. Propagate accepted changes through scope, approach, dependencies, risks, proposed children, validation, success criteria, and skills to consult.
+5. Produce a traceable new revision without invisibly overwriting the source. Status, when present, remains descriptive metadata.
+6. Return the revised plan and item-by-item disposition inline, or persist to an explicitly requested provider destination and return its native reference and revision.
 
 ## Gotchas
 
-- Never overwrite history invisibly or transfer an approval from an earlier revision.
-- Editing a local file is valid only when that file provider was selected; its versioning behavior must still produce a resolvable revision.
-- Implementing while revising conflates Planning with Development.
+- Do not implement the plan while revising it.
+- Do not silently discard feedback or stale source evidence.
+- A previous status value has no authorization effect on the revised result.

@@ -9,13 +9,13 @@ import {
 // A composition doc's link to a contract in another skill or package is a fact:
 // the target file must exist. checkReferenceFileLinks already validates the
 // intra-skill links inside each references/*.md, and command-workflow's own
-// documentation check validates links that stay inside command-workflow/docs.
+// documentation check validates links that stay inside command-workflow.
 // The gap this guard closes is the boundary-crossing links — a SKILL.md or a
-// command delegation pointing at ../../../skill/<other>/…/contract.md — which no
-// per-skill run and no command-package run resolves. It scans the composition
-// surface once and fails on any cross-package link whose target has moved or been
-// renamed. Intra-package links are left to the checks that already own them, so a
-// link is validated here only when it escapes its own packages/<layer>/<pkg> root.
+// command or composition document pointing at another package — which no
+// per-skill run resolves. It scans the composition surface once and fails on any
+// cross-package link whose target has moved or been renamed. Intra-package links
+// are left to the checks that already own them, so a link is validated here only
+// when it escapes its own packages/<layer>/<pkg> root.
 
 const exists = (path: string): boolean => {
   try {
@@ -301,16 +301,16 @@ const collectSkillMarkdown = (repoRoot: string): string[] => {
   return files;
 };
 
-// command-workflow's docs and command delegations. Its README/MIGRATION/docs
-// links are already validated by the package's own documentation check; the
-// commands/*.md delegations are not, and neither run resolves cross-package
-// targets, which this guard does.
+// command-workflow's current published surface. Its package-local validator owns
+// inventory, prompt structure, and links that stay inside the package; this guard
+// owns only links from README/docs/commands that cross a package boundary.
 const collectCommandWorkflowMarkdown = (repoRoot: string): string[] => {
   const base = join(repoRoot, "packages", "command", "command-workflow");
   return [
+    join(base, "README.md"),
     ...markdownEntries(join(base, "docs")),
     ...markdownEntries(join(base, "commands")),
-  ];
+  ].filter(isFile);
 };
 
 // The packages/<layer>/<package> root a file lives under, or null when the file

@@ -5,7 +5,7 @@
   },
   "metadata": {
     "description": "Official Xonovex development tools",
-    "version": "6.1.0"
+    "version": "7.0.0"
   },
   "plugins": [
     {
@@ -16,7 +16,7 @@
     {
       "name": "xonovex-workflow",
       "source": "./packages/command/command-workflow",
-      "description": "Xonovex lifecycle, planning, delivery, and review commands"
+      "description": "Xonovex composable operation and workspace commands"
     },
     {
       "name": "xonovex-skill-accessibility",
@@ -356,7 +356,7 @@
     {
       "name": "xonovex-skill-plan",
       "source": "./packages/skill/skill-plan",
-      "description": "Xonovex Plan skills"
+      "description": "Xonovex planning and read-only code-research skills"
     },
     {
       "name": "xonovex-skill-presentation",

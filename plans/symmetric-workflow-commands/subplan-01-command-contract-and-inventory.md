@@ -3,7 +3,9 @@ type: plan
 has_subplans: false
 parent_plan: ../symmetric-workflow-commands.md
 parallel_group: 1
-status: pending
+status: complete
+updated: 2026-07-20
+completed_date: "2026-07-20"
 dependencies:
   plans: []
   files: []
@@ -13,11 +15,11 @@ skills_to_consult:
   - git-guide
   - testing-guide
 validation:
-  type_check: pending
-  lint: pending
-  build: pending
-  tests: pending
-  integration: pending
+  type_check: not_applicable
+  lint: not_applicable
+  build: passed
+  tests: passed
+  integration: passed
 ---
 
 # Subplan 01: Command contract and inventory
@@ -146,21 +148,21 @@ Return the result and any provider-native reference/revision.
 1. `find packages/command/command-workflow/commands -maxdepth 1 -type f -name '*.md' | sort`
 2. `test "$(find packages/command/command-workflow/commands -maxdepth 1 -type f -name '*.md' | wc -l)" -eq 12`
 3. `rg -n -- '--profile|mandatory.*gate|approval.*gate|authority-reference|A1|A2|A3|AgentTrigger|AgentSchedule' packages/command/command-workflow/commands` must return no matches.
-4. `npx moon run command-workflow:fmt-check`
+4. `npx moon run command-workflow:format-check`
 5. `npx moon run command-workflow:build`
 6. `git diff --check`
 
 ## Success criteria
 
-- [ ] Exactly eight core operation prompts and four workspace prompts exist.
-- [ ] Every prompt has one narrow operation invariant and uses the common
+- [x] Exactly eight core operation prompts and four workspace prompts exist.
+- [x] Every prompt has one narrow operation invariant and uses the common
       subject/reference/result vocabulary.
-- [ ] Kind, perspective, method, capability, provider, executor, trigger, role,
+- [x] Kind, perspective, method, capability, provider, executor, trigger, role,
       and agent maturity remain orthogonal.
-- [ ] Provider references stay opaque and persistence is never implicit.
-- [ ] Workspace utilities contain no plan approval or lifecycle coupling.
-- [ ] No hard skill dependency or umbrella workflow owner remains.
-- [ ] No compatibility surface for the former commands exists.
+- [x] Provider references stay opaque and persistence is never implicit.
+- [x] Workspace utilities contain no plan approval or lifecycle coupling.
+- [x] No hard skill dependency or umbrella workflow owner remains.
+- [x] No compatibility surface for the former commands exists.
 
 ## Files modified/created
 
@@ -169,8 +171,11 @@ Return the result and any provider-native reference/revision.
 - Create: the 12 command files listed in task 1.
 - Modify: `packages/command/command-workflow/package.json`.
 - Modify: `packages/command/command-workflow/moon.yml`.
-- Verify only: `packages/command/command-workflow/.claude-plugin/plugin.json`.
-- Verify only: `packages/command/command-workflow/.codex-plugin/plugin.json`.
+- Modify:
+  `packages/command/command-workflow/.claude-plugin/plugin.json` and
+  `packages/command/command-workflow/.codex-plugin/plugin.json` to remove the
+  matching hard dependency declarations without changing version or description.
+- Modify: `package-lock.json`.
 
 ## Dependencies
 
@@ -178,6 +183,22 @@ Return the result and any provider-native reference/revision.
 - Can run in parallel with subplan 04 because their implementation files do not
   overlap.
 - Subplans 02, 03, and 05 consume this command contract.
+
+## Validation Results
+
+- The command directory contains exactly the eight core operations and four
+  workspace utilities named by this subplan.
+- Every core prompt contains the common subject/reference/revision/kind/
+  perspective/criteria/method/capability/provider/result vocabulary. The
+  forbidden lifecycle, profile, authority-reference, maturity-label, and
+  operator-trigger scan returns no matches.
+- `npx moon run command-workflow:ci-check` passes, including formatting,
+  build, 61 documentation checks, 14 cross-package links, 248 skill handoffs,
+  and 90 dependency-manifest pairs.
+- The effective Moon project defines no typecheck or lint task for this
+  documentation-only package; those validation dimensions are not applicable.
+- `npx moon project command-workflow` reports no universal skill dependency,
+  and `git diff --check` passes.
 
 ## Estimated duration
 

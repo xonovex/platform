@@ -1,87 +1,107 @@
 [
   {
-    "query": "Capture what we know and do not know about the dispatch delays, but do not force it into user stories yet.",
+    "query": "Research the code paths and current library versions we need before planning rate limiting for packages/api. Keep it read-only and cite the evidence.",
     "should_trigger": true,
     "split": "train"
   },
   {
-    "query": "Research whether this API can support regional retention rules, cite provenance and confidence, then publish the result back to our tracker.",
+    "query": "Create a high-level implementation plan from the migration notes below, including risks, validation, and the coding skills the implementer must consult.",
     "should_trigger": true,
     "split": "train"
   },
   {
-    "query": "Turn these observations into candidate behavior and constraints. BDD is available, but use a neutral formulation unless it actually helps.",
+    "query": "Red-team plans/cache-redesign.md in a fresh context and report concrete failure modes without editing it.",
     "should_trigger": true,
     "split": "train"
   },
   {
-    "query": "Create an optional experience design from work-item UX-44, include accessibility review, and keep critique independent from revision.",
+    "query": "Revise this inline rollout plan from the six review comments, preserve unresolved feedback, and return the new plan inline.",
     "should_trigger": true,
     "split": "train"
   },
   {
-    "query": "We lost the previous session. Resume planning from native result result:782 without assuming a file path.",
+    "query": "This parent plan has no status field. Expand it into focused subplans and sequence any children that touch the same packages.",
     "should_trigger": true,
     "split": "train"
   },
   {
-    "query": "Choose between the two data-boundary options, but a model must not claim the architecture authority decision.",
-    "should_trigger": true,
-    "split": "validation"
-  },
-  {
-    "query": "Write a React component that renders a decision table.",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
-    "query": "Fix the failing unit test in src/cache.test.ts.",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
-    "query": "Generate a database migration for the research_sources table.",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
-    "query": "Make the accessibility icon blue on hover.",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
-    "query": "I have an approved parent plan for adding OAuth login to our web app. Break it down into detailed implementation subplans I can hand off for execution.",
-    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "query": "The previous chat is gone. Continue exactly one child from tracker plan:782 at revision 9f31, baseline the repo first, then stop.",
     "should_trigger": true,
     "split": "validation"
   },
   {
-    "query": "Before we plan this data-layer refactor, help me settle the open design decisions. There are several unresolved trade-offs (naming, where the migration logic lives, and how much of the old contract to keep).",
-    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "query": "Update the implementation plan using the attached test evidence and task results, but do not change its scope.",
     "should_trigger": true,
     "split": "validation"
   },
   {
-    "query": "I need to add a SIMD variant of my vec3_dot in lib/math/vec3.c — the rest of the project uses _sse4 and _avx2 suffixes",
-    "rationale": "near miss owned by c99-opinionated-guide",
+    "query": "Validate every success criterion in this plan against commit 8a02 and report pass, fail, or blocked with evidence.",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Audit packages/worker for weak error handling and validation before we plan hardening work; grade findings by severity and make no edits.",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Inventory and group the TODO and FIXME comments under packages/agent so we can decide what belongs in a cleanup plan.",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Design the onboarding journey and responsive wireframes for the new account setup experience.",
+    "rationale": "UX design is outside the planning skill boundary",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "convert this AoS particle list to SoA for cache locality",
-    "rationale": "near miss owned by c99-opinionated-guide",
+    "query": "Review pull request #418 for correctness, security issues, and maintainability, then draft inline comments.",
+    "rationale": "Pull-request review has a separate owner",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Publish version 7.0.0 of the npm packages, generate release notes, and create the tags.",
+    "rationale": "Release execution is outside the planning skill boundary",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Respond to the production latency incident, preserve the timeline, coordinate mitigation, and prepare the postmortem.",
+    "rationale": "Incident response is outside the planning skill boundary",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Build a database adapter that stores arbitrary provider references and implements optimistic revision locking.",
+    "rationale": "Provider storage implementation is outside the planning skill boundary",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Fix the null pointer crash in packages/cache/src/store.ts and add a regression test.",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "in firmware/sensor/sensor_read.c can you change the read function so the caller passes the buffer instead of malloc'ing one",
-    "rationale": "near miss owned by c99-opinionated-guide",
+    "query": "Choose between Kafka and NATS for event delivery and record an architecture decision with the final outcome.",
+    "rationale": "Decision ownership is outside the planning skill boundary",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "stub out the alignment-aware allocator for our DSP target",
-    "rationale": "near miss owned by c99-opinionated-guide",
+    "query": "Write Given-When-Then scenarios for the refund policy with the product owner.",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Create the Kubernetes CronJob that invokes our backup endpoint every night at 02:00 UTC.",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Refactor this React form into smaller components and replace the local state with a reducer.",
     "should_trigger": false,
     "split": "validation"
   }

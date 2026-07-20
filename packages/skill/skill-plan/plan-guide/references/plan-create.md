@@ -1,28 +1,28 @@
-# plan-create: Publish a High-Level Planning Result
+# plan-create: Create a High-Level Plan
 
-Create one high-level parent Planning result from resolved lifecycle inputs, present it for review, and stop before detailed child plans or implementation.
+Create one high-level plan from explicit inline inputs or provider-native references plus optional revisions. Return the plan inline unless the caller explicitly requests a provider-native destination, and stop before detailed child plans or implementation.
 
-## Preconditions
+## Core Workflow
 
-- Resolve material Research, Decision, Formulation, Experience Design, and Solution Design inputs through their provider contexts and opaque native references.
-- Assess native revisions and freshness. If material research or decisions are missing, route to `research-run` or `decision-create` instead of inventing them.
-- Apply the method, authority, and publication rules in [early-lifecycle-contracts.md](early-lifecycle-contracts.md).
+1. Resolve the subject and supporting references. Let the selected provider interpret opaque references and optional native revisions; do not parse their shapes locally.
+2. Gather the objective, scope, exclusions, evidence, known constraints, unresolved questions, dependencies, risks, validation requirements, success criteria, and Definition of Done.
+3. Propose parent-level components and child-plan names only. Leave detailed implementation tasks to plan expansion.
+4. Add a non-empty `skills_to_consult` list naming the implementation capabilities required by the affected code and toolchain.
+5. Create the plan with its assumptions and evidence links visible. Status may be included as descriptive provider metadata, but it has no gating or authorization meaning.
+6. Return the plan inline or ask the selected provider to persist it to the explicitly requested destination and return the native reference and revision it supplies.
 
-## Core workflow
+## Plan Contents
 
-1. Resolve the selected profile, result provider, method, and workspace.
-2. Gather objective, scope, exclusions, source references, accepted decisions, dependencies, constraints, risks, validation, success criteria, and unresolved gaps.
-3. Propose parent-level components and child Planning result names only; keep detailed implementation tasks for `plan-subplans-create`.
-4. List non-empty `skills_to_consult` capabilities for implementers. If a selected method is test-first or acceptance-first, load a matching installed TDD/BDD/testing capability; do not require one when the method is not selected.
-5. Publish a canonical Planning result through the selected provider with status `pending-approval`, provider-native revision, source relationships, relevant versions, and follow-up capabilities.
-6. Present the provider context, opaque native reference, revision, risks, and unresolved gaps; stop for review.
-
-## Planning semantics
-
-The result contains objective, scope, tasks/components, dependencies, risks, validation, success criteria, status, and skills/capabilities to consult. A provider may represent these as a work item, database record, repository document, issue hierarchy, or another native resource. A local Markdown provider may use plan frontmatter and `plans/`, but that representation is not the result contract and Git is not required.
+- Objective, scope, and explicit exclusions
+- Evidence and supporting references
+- Parent-level components and proposed child plans
+- Dependencies, constraints, risks, and unresolved questions
+- Validation steps, success criteria, and Definition of Done
+- `skills_to_consult`
 
 ## Gotchas
 
-- A conversation summary is not a Research or Decision reference after context loss; resolve native state.
-- An explicitly selected unavailable hosted/database/work-item provider fails instead of falling back to a local file.
-- Publishing detailed child plans in this operation bypasses parent review.
+- Missing material evidence remains an explicit gap; do not invent it.
+- Creating detailed child plans here mixes creation with expansion.
+- Do not require an approval field or assign authority semantics to status.
+- Never replace an explicitly selected unavailable provider with a local plan file.

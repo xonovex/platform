@@ -18,7 +18,7 @@ Isolators and provisioners are **plugins resolved by an explicit registry**, not
 
 - The CLI `internal/sandbox` package defines only the `Isolator`/`Provisioner` interfaces + a `Registry` (factory maps) + `Select(reg, req, pol)`. Each plugin declares its own guarantees (`Provisioner.Pinned()`, `Isolator.HidesHost()`/`KernelIsolated()`), and the shared `sandbox.EnforcePolicy(Capabilities, policy)` is method-agnostic — it checks computed capability booleans, never an enum.
 - The composition root `internal/sandbox/plugins.DefaultRegistry()` is the ONLY place that imports the concrete plugin packages (`bwrap`/`docker`/`none`/`nixprov`). **Adding an isolator or provisioner is a new package plus one `Register` call there** — zero edits to `Select`, the registry, or the policy engine. Tests build their own minimal `Registry` (no global mutable state).
-- The operator mirrors this with a `builder.ResolveToolchain` registry (`ToolchainType → Toolchain{Image, Pinned}`), so the controller and pod-hardening never name a concrete toolchain.
+- The operator mirrors this with the `internal/plugins.ResolveToolchain` registry (`ToolchainType → Toolchain`), so the controller and pod-hardening never name a concrete toolchain.
 
 ## Policy — four independently-requestable guarantees (fail CLOSED)
 
@@ -35,12 +35,7 @@ Isolators and provisioners are **plugins resolved by an explicit registry**, not
 - `mkAgentImage` is **vendored/adapted** from `nothingnesses/agent-images` (bus-factor 1): numeric uid-1000 hand-written passwd/group, `/workspace`, pre-created XDG dirs.
 - `numtide/llm-agents.nix` is a `flake.lock`-pinned input — **packaging only; isolation out of scope**. Consumers pin via `flake.lock` alone. The binary-cache trusted key NAME is `niks3.numtide.com` (`niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g=`); adding `cache.numtide.com` is a TRUST EXPANSION (numtide's CI/signing key builds the agent binaries) — not enabled by default.
 
-## Governance & oversight
-
-- **Accountability:** every `AgentRun` carries a named accountable owner; human overseers must hold the competence and authority to understand the system's limits and intervene.
-- **Anomaly + stop:** behavior-level anomaly detection (beyond timeout/budget) plus a tested kill-switch / emergency stop, building on Falco + `TaskStop` / Fleet-pause.
-- **AI bill-of-materials:** each run records model/provider, prompt, tools, and granted permissions in its run journal for audit.
-
 ## Operator path
 
+- `AgentRun` is the only execution request API. External callers create runs through the Kubernetes API; scheduling, event ingress, and trigger interpretation stay outside the operator.
 - Provisions via a **nix-built OCI image** (no per-pod `nix profile install`); pods start by image pull. Admission requires every untrusted run to resolve both a digest-pinned agent image and a sandboxed `runtimeClassName` from the run, harness, toolchain, or namespace policy (wires `RequirePinnedProvision` and `RequireKernelIsolation`), binds a dedicated **zero-RBAC ServiceAccount** with `automountServiceAccountToken=false`, gets default resource requests/limits + a namespace `LimitRange`/`ResourceQuota`, and always gets a **default-deny egress `NetworkPolicy`** per `AgentRun` (mapped from `Network`; metadata/RFC1918/loopback blocked, FQDN-aware via Cilium `toFQDNs`/Squid as the upgrade). `readOnlyRootFilesystem=true` is reconciled with writable HOME/XDG `emptyDir`s + `fsGroup=1000`.

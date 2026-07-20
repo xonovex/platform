@@ -12,8 +12,6 @@ rules:
       - agentharnesses
       - agenttoolchains
       - agentpolicies
-      - agentschedules
-      - agenttriggers
     verbs:
       - get
       - list
@@ -29,8 +27,6 @@ rules:
       - agentproviders/status
       - agentworkspaces/status
       - agentpolicies/status
-      - agentschedules/status
-      - agenttriggers/status
     verbs:
       - get
       - update

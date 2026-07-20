@@ -39,13 +39,20 @@ spec:
 
 **Lifecycle phases:** `Pending` -> `Initializing` -> `Running` -> `Succeeded` | `Failed` | `TimedOut`
 
-#### Trigger and workflow boundaries
+#### Submission boundary
 
-An `AgentRun` can be created manually, from an `AgentSchedule`, or by an authenticated `AgentTrigger` request. The operator records trigger origin annotations but executes the same immutable run specification for every source.
+`AgentRun` is the operator's execution request API. Manual tools, harness hooks,
+CI/CD systems, webhook handlers, Kubernetes CronJobs, and other external
+integrations create `AgentRun` resources through the Kubernetes API. The
+operator has no scheduling or event-ingress listener and does not interpret
+caller-specific trigger metadata.
 
-The operator executes the submitted run specification. Any additional approval, policy, evidence, or escalation requirements belong to the caller or the native platform that submits the run.
+The operator admits and reconciles the submitted run specification. Any
+additional approval, policy, evidence, or escalation requirements belong to
+the caller or the native platform that submits the run.
 
 `AgentPolicy` is optional. Without one, admission still requires a digest-pinned execution image and an explicit runtime class but does not require that runtime class to appear in an operator-owned allowlist. When one namespace policy exists, only its declared defaults and constraints are applied.
+
 #### Full spec reference
 
 | Field              | Type     | Description                                                                                       |
@@ -308,9 +315,10 @@ go run ./cmd/operator/ \
 
 ## Usage
 
-### Standalone agent run (full workflow)
+### Standalone agent run (direct submission)
 
-The typical workflow: create a Secret, an AgentProvider, optionally an AgentHarness for defaults, then run an agent.
+Create a Secret, an AgentProvider, optionally an AgentHarness for defaults, then
+submit an AgentRun directly.
 
 ```bash
 # 1. Create a Secret for your provider credentials
@@ -858,7 +866,7 @@ nightly schedule.
 
 ## Architecture
 
-Each AgentRun triggers one of two paths:
+Each AgentRun reconciles along one of two paths:
 
 **Standalone path** (no `workspaceRef`):
 

@@ -43,6 +43,31 @@ const makeRepo = (files: Record<string, string>): string => {
 const manifest = (name: string, dependencies: readonly string[] = []): string =>
   JSON.stringify({name, dependencies});
 
+const workflowCommandNames = [
+  "abandon",
+  "create",
+  "decide",
+  "execute",
+  "publish",
+  "review",
+  "revise",
+  "validate",
+  "workspace-abandon",
+  "workspace-cleanup",
+  "workspace-create",
+  "workspace-merge",
+] as const;
+
+const workflowCommands = (
+  overrides: Readonly<Record<string, string>> = {},
+): Record<string, string> =>
+  Object.fromEntries(
+    workflowCommandNames.map((name) => [
+      `packages/command/command-workflow/commands/${name}.md`,
+      overrides[name] ?? `# ${name}\n`,
+    ]),
+  );
+
 afterEach(() => {
   while (created.length > 0) {
     const dir = created.pop();
@@ -155,20 +180,28 @@ describe("checkMarkdownFilesForCrossPackageLinks", () => {
 });
 
 describe("checkCrossPackageLinks", () => {
-  it("scans discovered skill SKILL.md files and reports the aggregate pass", () => {
+  it("scans the twelve-command surface and retained planning references", () => {
     const repo = makeRepo({
-      "packages/skill/skill-x/x-guide/SKILL.md":
-        "# X\nSee [g](../../skill-y/y-guide/references/g.md).\n",
-      "packages/skill/skill-x/.claude-plugin/plugin.json":
-        '{"name":"xonovex-skill-x"}',
-      "packages/skill/skill-x/.codex-plugin/plugin.json":
-        '{"name":"xonovex-skill-x"}',
-      "packages/skill/skill-y/y-guide/references/g.md": "# G\n",
+      ...workflowCommands(),
+      "packages/command/command-workflow/README.md":
+        "See the [operation model](../../diagram/diagram-agent-workflow/operation-model.png).\n",
+      "packages/command/command-workflow/docs/invocation.md":
+        "See the [submission boundary](../../../agent/agent-operator-go/README.md).\n",
+      "packages/diagram/diagram-agent-workflow/operation-model.png": "image",
+      "packages/agent/agent-operator-go/README.md": "# Operator\n",
+      "packages/skill/skill-plan/plan-guide/SKILL.md":
+        "# Plan\nSee [create](references/plan-create.md).\n",
+      "packages/skill/skill-plan/plan-guide/references/plan-create.md":
+        "# plan-create\n",
+      "packages/skill/skill-plan/.claude-plugin/plugin.json":
+        manifest("xonovex-skill-plan"),
+      "packages/skill/skill-plan/.codex-plugin/plugin.json":
+        manifest("xonovex-skill-plan"),
     });
     const report = makeSink();
     checkCrossPackageLinks(repo, report);
     expect(report.fails).toEqual([]);
-    expect(report.passes).toContain("cross-package links: 1/1 link(s) resolve");
+    expect(report.passes).toContain("cross-package links: 2/2 link(s) resolve");
   });
 
   it("fails when a discovered SKILL.md points at a moved contract", () => {

@@ -29,12 +29,10 @@ func init() {
 func main() {
 	var probeAddr string
 	var enableLeaderElection bool
-	var triggerBindAddress string
 	var workspaceInitImage string
 
 	flag.StringVar(&probeAddr, "health-probe-bind-address", ":8081", "The address the probe endpoint binds to.")
 	flag.BoolVar(&enableLeaderElection, "leader-elect", false, "Enable leader election for controller manager.")
-	flag.StringVar(&triggerBindAddress, "trigger-bind-address", ":8090", "The address the authenticated AgentTrigger receiver binds to.")
 	flag.StringVar(&workspaceInitImage, "workspace-init-image", controller.DefaultWorkspaceInitImage, "Digest-pinned image used to initialize shared workspaces.")
 
 	opts := zap.Options{Development: true}
@@ -83,31 +81,6 @@ func main() {
 		WorkspaceInitImage: workspaceInitImage,
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "AgentWorkspace")
-		os.Exit(1)
-	}
-
-	if err = (&controller.AgentScheduleReconciler{
-		Client: mgr.GetClient(),
-		Scheme: mgr.GetScheme(),
-	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "AgentSchedule")
-		os.Exit(1)
-	}
-
-	if err = (&controller.AgentTriggerReconciler{
-		Client: mgr.GetClient(),
-		Scheme: mgr.GetScheme(),
-	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "AgentTrigger")
-		os.Exit(1)
-	}
-
-	if err = mgr.Add(&controller.AgentTriggerReceiver{
-		Client:  mgr.GetClient(),
-		Scheme:  mgr.GetScheme(),
-		Address: triggerBindAddress,
-	}); err != nil {
-		setupLog.Error(err, "unable to add AgentTrigger receiver")
 		os.Exit(1)
 	}
 

@@ -1,17 +1,91 @@
-# Lifecycle Workflow Commands
+# Composable Workflow Commands
 
-Independently invocable commands for discovery through retirement. Each command owns its
-operation and loads only the guideline skills needed for that invocation.
+Twelve independently invocable commands share one contract: select one operation,
+provide a subject, and add only the dimensions needed for that call. The command
+semantics do not depend on a lifecycle stage, role, trigger, executor, or agent
+maturity label.
 
 ## Guides
 
-Role quickstarts are lenses over the same actor-neutral commands — no command knows a job
-title. Each names the subset one perspective runs and the gates it answers for:
+- [Role lenses](docs/role-lenses.md) show illustrative compositions for PM/PO, UX,
+  developer, QA, and developer-reviewer perspectives.
+- [Provider-native references](docs/references.md) explain how subjects, revisions,
+  and result destinations are resolved without a universal identifier layer.
+- [Invocation and execution](docs/invocation.md) separates how a call starts from
+  who or what executes it.
+- [Operation model](../../diagram/diagram-agent-workflow/operation-model.png) shows
+  the operations, selection axes, invocation inputs, and results without prescribing
+  a stage order.
 
-- [Developer quickstart](docs/developer-quickstart.md) — [diagram](../../diagram/diagram-agent-workflow/developer-workflow.png)
-- [PM quickstart](docs/pm-quickstart.md) — [diagram](../../diagram/diagram-agent-workflow/pm-workflow.png)
-- [QA quickstart](docs/qa-quickstart.md) — [diagram](../../diagram/diagram-agent-workflow/qa-workflow.png)
-- [UX quickstart](docs/ux-quickstart.md) — [diagram](../../diagram/diagram-agent-workflow/ux-workflow.png)
+## Operations
+
+The eight core operations are siblings. Each call performs exactly the operation
+named by its command; callers compose calls only when their work needs more than one.
+
+| Command                            | Operation                                                                          |
+| ---------------------------------- | ---------------------------------------------------------------------------------- |
+| [`create`](commands/create.md)     | Produce a new result without changing the subject.                                 |
+| [`review`](commands/review.md)     | Evaluate an exact subject against explicit criteria without changing it.           |
+| [`revise`](commands/revise.md)     | Produce a traceable new revision from explicit feedback.                           |
+| [`decide`](commands/decide.md)     | Record a descriptive outcome and rationale without granting authority.             |
+| [`execute`](commands/execute.md)   | Carry out one bounded subject and report the observable result.                    |
+| [`validate`](commands/validate.md) | Check an exact subject against explicit criteria and return evidence.              |
+| [`publish`](commands/publish.md)   | Publish an exact subject to an explicit destination and return its native locator. |
+| [`abandon`](commands/abandon.md)   | Stop work while preserving the reason, partial result, and retry boundary.         |
+
+The four workspace utilities manage explicitly selected workspaces. They sit outside
+the operation model: no core operation implicitly creates, merges, abandons, or cleans
+a workspace.
+
+| Command                                              | Utility                                                                 |
+| ---------------------------------------------------- | ----------------------------------------------------------------------- |
+| [`workspace-create`](commands/workspace-create.md)   | Create one workspace from an exact source.                              |
+| [`workspace-merge`](commands/workspace-merge.md)     | Validate and merge one workspace into one destination.                  |
+| [`workspace-abandon`](commands/workspace-abandon.md) | Preserve the reason and recoverable state when abandoning a workspace.  |
+| [`workspace-cleanup`](commands/workspace-cleanup.md) | Preview and remove only explicitly selected stale or merged workspaces. |
+
+## Independent dimensions
+
+Each dimension answers a separate question. Supplying one must not silently select a
+value for another.
+
+| Dimension        | Question it answers                                                       | Contract                                                                        |
+| ---------------- | ------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| Operation        | What should happen?                                                       | One of the eight command verbs.                                                 |
+| Kind             | What kind of subject or result is involved?                               | An open domain selection, inferred only when unambiguous.                       |
+| Perspective      | From which evidence or stakeholder lens should the subject be considered? | Changes emphasis, not command semantics.                                        |
+| Method           | Which procedure should guide the operation?                               | Selects a method capability when one is requested.                              |
+| Executor         | Who or what performs the call?                                            | A human, deterministic script, LLM, or agent; it does not change the operation. |
+| Agent capability | Which installed skill, tool, or adapter is needed?                        | Loaded only when selected or unambiguous.                                       |
+| Trigger          | What initiated the call?                                                  | Manual use, a harness hook, CI/CD, a webhook, or a scheduler.                   |
+| Provider         | Which native system resolves or persists the subject or result?           | Owns authentication, locator interpretation, revisions, and effects.            |
+| Reference        | Where is the provider-native subject, evidence, or destination?           | Remains opaque to the command.                                                  |
+
+The common arguments also keep criteria, supporting references, source revisions, and
+result destinations explicit. Refer to each command file for its required arguments
+and side-effect boundary.
+
+## Capability selection
+
+Commands load only the capabilities needed by the selected kind, perspective, method,
+or provider. A selected capability must be installed and available at execution time.
+If it is missing, the call stops and identifies the missing capability. It does not
+substitute another capability, invent an umbrella workflow skill, or silently fall
+back to a local file or provider.
+
+## Composition examples
+
+These are examples, not a required workflow:
+
+```text
+create -> review -> revise
+review -> publish
+execute -> validate
+create -> decide
+```
+
+Any operation may be called alone. Repeated operations and different orderings are
+valid when the subject and selected method require them.
 
 ## Installation
 
@@ -28,105 +102,3 @@ claude plugin install xonovex-workflow@xonovex-marketplace
 codex plugin marketplace add xonovex/platform
 codex plugin add xonovex-workflow@xonovex-marketplace
 ```
-
-## Dependencies
-
-Commands explicitly load their owning guideline skills. Plugin dependencies make planning,
-review, code-quality, and testing guidance available; no command must use every capability.
-
-Methods and native adapters are soft dependencies selected per operation. User stories,
-BDD, example mapping, user research, accessibility, architecture, Git/worktrees, GitHub,
-GitLab, databases, work-item trackers, and artifact providers are not universal
-prerequisites. When an explicitly selected capability is unavailable, the command fails
-visibly and names what is missing; it never silently substitutes a local file or provider.
-
-## Early lifecycle
-
-```text
-Discovery -> Research -> Formulation -> optional Experience Design / Solution Design
-         -> Decision -> Planning -> child Planning results -> Development
-```
-
-Each capability publishes its own provider-native result and opaque reference. Critique,
-revision, and authority-bound acceptance remain independent operations. Fresh-context
-resume resolves native references; conversation and execution traces are not persistent
-identity.
-
-| Command                                             | Description                                                                                 |
-| --------------------------------------------------- | ------------------------------------------------------------------------------------------- |
-| `discovery-run`                                     | Iterate observations, assumptions, affected context, and unknowns without forcing stories   |
-| `research-run`                                      | Produce reusable evidence, provenance, confidence, uncertainty, and bounded synthesis       |
-| `formulation-run`                                   | Formulate candidate behavior, examples, constraints, and ambiguities with a neutral default |
-| `experience-design-{create,critique,revise,accept}` | Manage an optional Experience Design result at exact revisions                              |
-| `solution-design-{create,critique,revise,accept}`   | Manage an optional Solution Design result at exact revisions                                |
-| `decision-{create,critique,revise,accept}`          | Keep evidence, recommendation, authority, and supersession separate                         |
-
-## Planning and execution
-
-| Command                       | Description                                                             |
-| ----------------------------- | ----------------------------------------------------------------------- |
-| `plan-research`               | Specialized read-only codebase/web research or code-quality analysis    |
-| `plan-create`                 | Publish a high-level Planning result from opaque lifecycle references   |
-| `plan-revise`                 | Apply feedback to an exact Planning revision and publish a new revision |
-| `plan-critique`               | Independently stress-test an exact Planning revision                    |
-| `plan-accept` / `plan-reject` | Record an authority-bound status decision against an exact revision     |
-| `plan-subplans-create`        | Publish detailed child Planning results and dependency/execution groups |
-| `plan-continue`               | Reconstruct native state and complete one actionable child result       |
-| `plan-update`                 | Publish current status and exact-revision validation evidence           |
-| `plan-validate`               | Validate success criteria and Definition of Done without mutation       |
-
-## Development and assurance
-
-| Command               | Description                                                                  |
-| --------------------- | ---------------------------------------------------------------------------- |
-| `develop-run`         | Execute exact Planning assignments and publish independent results           |
-| `develop-consolidate` | Combine exact Development results without claiming Acceptance or Integration |
-| `develop-abandon`     | Preserve partial Development state, evidence, reason, cleanup, and retry     |
-| `deliver-publish`     | Publish a provider-native reviewable candidate at an immutable revision      |
-| `inventory-generate`  | Generate deterministic SBOM, AI/ML/CBOM, service, or agent inventories       |
-| `assessment-run`      | Assess any exact workflow result against pinned applicable criteria          |
-| `review-run`          | Publish deliverable-specific findings with explicit reviewer independence    |
-| `qa-run`              | Publish deliverable-specific test and environment evidence                   |
-
-Development assigns exact Planning revisions to isolated workspaces and publishes one
-result per assignment. Consolidation produces another Development result; it is not the
-accepted-target mutation owned by Integration. Inventory facts come from deterministic or
-external sources. Review, QA, and Assessment preserve evaluator origin and become stale
-when their bound subject, policy, evaluator, or required environment changes.
-
-## Acceptance and operational lifecycle
-
-| Command                 | Description                                                                                       |
-| ----------------------- | ------------------------------------------------------------------------------------------------- |
-| `acceptance-validate`   | Assemble fresh exact-revision evidence without claiming accountable sign-off                      |
-| `acceptance-decide`     | Record human Acceptance bound to subject, target, evidence, policy, actor, and expiry             |
-| `integration-validate`  | Preflight authorization and protected target capabilities without mutation                        |
-| `integration-run`       | Execute Integration only through an explicit externally enforced target capability                |
-| `transition-run`        | Plan, execute, verify, or roll back data, users, providers, flags, support, and resilience        |
-| `release-run`           | Execute, verify, roll back, or recover through controlled automation and protected environments   |
-| `observe-run`           | Publish monitoring, user, security, AI, cost, accessibility, and delivery evidence                |
-| `incident-run`          | Declare, update, contain, recover, escalate, or close an urgent Incident                          |
-| `corrective-action-run` | Plan, execute, verify, and close corrective work with effectiveness and learning evidence         |
-| `retirement-run`        | Retire models, data, credentials, features, APIs, infrastructure, dependencies, and configuration |
-
-Evidence assembly may use bounded agents or models, but only a provider-authenticated
-accountable human records Acceptance. Integration, target-changing Transition and Release,
-data deletion, and Retirement revalidate exact subject, target, evidence, policy, actor, and
-expiry bindings at a non-bypassable external enforcement point. Ordinary tool access is
-not authorization. Exceptions and emergency exceptions remain scoped, expiring, compensated,
-notified, revoked, and reviewed.
-
-## Delivery
-
-| Command                                        | Description                                                                 |
-| ---------------------------------------------- | --------------------------------------------------------------------------- |
-| `git-commit`                                   | Commit/push through an installed Git capability                             |
-| `plan-worktree-{create,merge,abandon,cleanup}` | Optional Git-worktree workspace operations                                  |
-| `pr-create`                                    | Open a provider-native pull/merge request through the detected host adapter |
-| `pr-review-{analyze,refine,post,resolve}`      | Produce, refine, publish, and resolve review findings                       |
-
-## Design decisions
-
-- Commands delegate their procedures to declared guideline skills.
-- Neutral methods are available without story/Gherkin skills; specialist methods remain selectable.
-- Local files, Git repositories, hosted trackers, and databases are peers selected by context; none is the universal fallback.

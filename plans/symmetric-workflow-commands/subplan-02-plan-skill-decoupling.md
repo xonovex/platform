@@ -3,7 +3,9 @@ type: plan
 has_subplans: false
 parent_plan: ../symmetric-workflow-commands.md
 parallel_group: 2
-status: pending
+status: complete
+updated: 2026-07-20
+completed_date: "2026-07-20"
 dependencies:
   plans:
     - subplan-01-command-contract-and-inventory.md
@@ -23,11 +25,11 @@ skills_to_avoid:
   - workflow-runtime-guide
   - ai-governance-guide
 validation:
-  type_check: pending
-  lint: pending
-  build: pending
-  tests: pending
-  integration: pending
+  type_check: not_applicable
+  lint: not_applicable
+  build: passed
+  tests: passed
+  integration: passed
 ---
 
 # Subplan 02: Plan skill decoupling
@@ -148,16 +150,16 @@ Output: inline result or provider-native reference returned by the selected prov
 
 ## Success criteria
 
-- [ ] `skill-plan` owns only planning and code-research behavior.
-- [ ] All 18 out-of-bound reference files are deleted without compatibility
+- [x] `skill-plan` owns only planning and code-research behavior.
+- [x] All 18 out-of-bound reference files are deleted without compatibility
       replacements.
-- [ ] Retained plan operations accept explicit inline/provider-native inputs and
+- [x] Retained plan operations accept explicit inline/provider-native inputs and
       do not require a profile or approval state.
-- [ ] Status and validation cannot authorize or gate later work.
-- [ ] Evals positively cover the reduced boundary and negatively reject former
+- [x] Status and validation cannot authorize or gate later work.
+- [x] Evals positively cover the reduced boundary and negatively reject former
       lifecycle responsibilities.
-- [ ] Package descriptions and source notes match present behavior.
-- [ ] All skill formatting, audit, and link checks pass.
+- [x] Package descriptions and source notes match present behavior.
+- [x] All skill formatting, audit, and link checks pass.
 
 ## Files modified/created
 

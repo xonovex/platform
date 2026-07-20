@@ -3,7 +3,9 @@ type: plan
 has_subplans: false
 parent_plan: ../symmetric-workflow-commands.md
 parallel_group: 1
-status: pending
+status: complete
+updated: 2026-07-20
+completed_date: "2026-07-20"
 dependencies:
   plans: []
   files: []
@@ -13,11 +15,11 @@ skills_to_consult:
   - testing-guide
   - git-guide
 validation:
-  type_check: pending
-  lint: pending
-  build: pending
-  tests: pending
-  integration: pending
+  type_check: passed
+  lint: passed
+  build: passed
+  tests: passed
+  integration: passed
 ---
 
 # Subplan 04: External trigger boundary
@@ -136,21 +138,22 @@ external caller -> Kubernetes API -> AgentRun -> AgentRunReconciler -> secured w
 
 ## Success criteria
 
-- [ ] Trigger/schedule Go types, controllers, receiver, tests, CRDs, RBAC,
+- [x] Trigger/schedule Go types, controllers, receiver, tests, CRDs, RBAC,
       service, network policy, arguments, and dependencies are gone.
-- [ ] The operator exposes no trigger-specific network listener.
-- [ ] A direct `AgentRun` remains the complete execution entry point.
-- [ ] Retained controller, admission, integration, and security tests pass.
-- [ ] `AgentPolicy` and shared sandbox policy are unchanged except for accurate
+- [x] The operator exposes no trigger-specific network listener.
+- [x] A direct `AgentRun` remains the complete execution entry point.
+- [x] Retained controller, admission, integration, and security tests pass.
+- [x] `AgentPolicy` and shared sandbox policy are unchanged except for accurate
       documentation.
-- [ ] Agent documentation makes trigger ownership external and contains no
+- [x] Agent documentation makes trigger ownership external and contains no
       stale lifecycle-governance claims.
-- [ ] No replacement trigger abstraction or compatibility API is introduced.
+- [x] No replacement trigger abstraction or compatibility API is introduced.
 
 ## Files modified/created
 
 - Delete: `api/v1alpha1/agenttrigger_types.go`.
 - Modify: `api/v1alpha1/zz_generated.deepcopy.go` and scheme metadata as needed.
+- Create: `api/v1alpha1/groupversion_info_test.go`.
 - Delete: `internal/controller/agentschedule_controller.go` and its test.
 - Delete: `internal/controller/agenttrigger_controller.go` and its test.
 - Modify: `cmd/operator/main.go`.
@@ -168,6 +171,21 @@ external caller -> Kubernetes API -> AgentRun -> AgentRunReconciler -> secured w
 - Can run in parallel with subplan 01 because their files do not overlap.
 - Must finish before subplan 03 publishes Kubernetes invocation examples and
   before subplan 05 runs final residue/release validation.
+
+## Validation Results
+
+- `npx moon run agent-operator-go:ci-check` passes formatting, lint, typecheck,
+  build, unit/coverage, and envtest integration tasks. The retained API scheme
+  and runtime deep-copy test keeps aggregate coverage at 45.9% against the 35%
+  gate.
+- `npx moon run shared-agent-go:ci-check` passes with no functional diff in the
+  shared policy package.
+- `kubectl kustomize` builds all six retained roots: cert-manager, CRDs,
+  default, manager, RBAC, and webhooks.
+- The trigger/schedule residue scan returns no matches, the manager exposes
+  only health and webhook ports, and `git diff --check` passes.
+- `architecture.png` was regenerated from `architecture.dot` at 150 DPI and
+  visually inspected for readable direct-submission labels.
 
 ## Estimated duration
 
