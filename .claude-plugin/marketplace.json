@@ -29,6 +29,16 @@
       "description": "Xonovex ADR skills"
     },
     {
+      "name": "xonovex-skill-agent-governance",
+      "source": "./packages/skill/skill-agent-governance",
+      "description": "Xonovex agent governance skills"
+    },
+    {
+      "name": "xonovex-skill-ai-governance",
+      "source": "./packages/skill/skill-ai-governance",
+      "description": "Xonovex AI governance and risk skills"
+    },
+    {
       "name": "xonovex-skill-android-analytics",
       "source": "./packages/skill/skill-android-analytics",
       "description": "Xonovex Android analytics skills"
@@ -462,6 +472,11 @@
       "name": "xonovex-skill-vitest",
       "source": "./packages/skill/skill-vitest",
       "description": "Xonovex Vitest skills"
+    },
+    {
+      "name": "xonovex-skill-workflow",
+      "source": "./packages/skill/skill-workflow",
+      "description": "Xonovex symmetric workflow operation skills"
     },
     {
       "name": "xonovex-skill-zod",

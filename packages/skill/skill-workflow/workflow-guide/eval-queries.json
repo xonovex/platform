@@ -1,0 +1,128 @@
+[
+  {
+    "query": "create a new architecture note from these source links without modifying the sources",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "new-result creation with an explicit non-mutation boundary"
+  },
+  {
+    "query": "review this exact proposal against the acceptance criteria and report findings without editing it",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "read-only review of an exact subject"
+  },
+  {
+    "query": "revise proposal revision 7 from these review findings and preserve a trace to the source revision",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "traceable revision from explicit feedback"
+  },
+  {
+    "query": "compare the three options and record the selected outcome and rationale, but do not approve or merge anything",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "descriptive decision without implied authority"
+  },
+  {
+    "query": "execute this bounded migration step and return the observable result; do not publish or create a workspace",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "bounded execution with explicit side-effect limits"
+  },
+  {
+    "query": "validate artifact sha256:abc against policy version 4 and return the evidence separately from the artifact",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "exact-subject validation against explicit criteria"
+  },
+  {
+    "query": "publish this exact package revision to the selected registry and return its registry-native locator; fail if that provider is unavailable",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "explicit provider publication with no implicit fallback"
+  },
+  {
+    "query": "abandon this attempt, preserving why it stopped, what partial result exists, and what would be needed to retry",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "explicit abandonment with recoverable state"
+  },
+  {
+    "query": "create an isolated workspace from main at this exact commit and report its native location",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "explicit workspace creation from an exact source"
+  },
+  {
+    "query": "merge this selected workspace into main only after checking revisions, status, and conflicts",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "safe workspace merge with preflight checks"
+  },
+  {
+    "query": "abandon the selected workspace but preserve its branch and recoverable state unless removal is explicitly confirmed",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "recoverable workspace abandonment"
+  },
+  {
+    "query": "preview stale workspaces, then clean up only the exact ones I confirm",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "preview-first explicit workspace cleanup"
+  },
+  {
+    "query": "review, revise, and validate this result in the order required by its evidence; do not impose a standard lifecycle",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "illustrative composition of independent stage-neutral operations"
+  },
+  {
+    "query": "design a governance hook that denies network tools when a policy says so",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near miss owned by an agent-governance capability"
+  },
+  {
+    "query": "build an AI risk register and map its controls to the NIST AI RMF",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near miss owned by an AI-governance capability"
+  },
+  {
+    "query": "set an availability SLO and calculate the error budget for this service",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near miss owned by a reliability capability"
+  },
+  {
+    "query": "threat-model this authentication flow and identify trust-boundary abuse cases",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near miss owned by a security-assurance capability"
+  },
+  {
+    "query": "write one Vitest unit test for rejectsExpiredToken and choose whether the clock should be a stub or fake",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near miss owned by testing and framework capabilities"
+  },
+  {
+    "query": "refactor this React component to remove its duplicated loading state",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near miss owned by a React implementation capability"
+  },
+  {
+    "query": "configure a Kubernetes Deployment with a readiness probe and resource limits",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near miss owned by a Kubernetes capability"
+  },
+  {
+    "query": "write Conventional Comments feedback for the issues in this pull request",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near miss owned by a code-review craft capability"
+  }
+]

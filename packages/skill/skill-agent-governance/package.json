@@ -1,0 +1,17 @@
+{
+  "name": "@xonovex/skill-agent-governance",
+  "version": "7.0.0",
+  "private": true,
+  "type": "module",
+  "keywords": [
+    "xonovex",
+    "skill",
+    "workflow",
+    "runtime",
+    "controls"
+  ],
+  "scripts": {
+    "fmt": "prettier --write .",
+    "fmt:check": "prettier --check ."
+  }
+}

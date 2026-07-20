@@ -1,0 +1,70 @@
+{
+  "skill_name": "workflow-guide",
+  "tier": "moderate",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "A proposal already exists at revision 7. The user supplies review findings and asks for an updated proposal. Select and perform the operation without changing revision 7 in place.",
+      "assertions": [
+        "Selects revise rather than create, review, or execute because an existing subject must produce a traceable successor from explicit feedback.",
+        "Resolves revision 7 exactly, preserves it unchanged, and returns the new revision with its source revision and applied or unresolved feedback."
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "The user asks to review a design against maintainability criteria and later validate the resulting implementation against its test criteria. Explain and compose the calls.",
+      "assertions": [
+        "Keeps review and validate as separate sibling operations with exact subjects, criteria, evidence, and results rather than treating either as a lifecycle stage.",
+        "Allows the calls in the requested order without claiming that the order is globally required or silently revising either subject."
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Compare two release options, record option B as preferred, and then merge it because the decision says approved.",
+      "assertions": [
+        "Uses decide only to record the descriptive outcome, rationale, alternatives, and evidence.",
+        "Does not treat the decision result as authorization to merge, publish, or perform any other privileged mutation."
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "Execute three bounded changes. Two succeed and one fails. The user did not request a workspace or publication, but a local output directory is writable.",
+      "assertions": [
+        "Reports the successful, failed, and unresolved effects truthfully without claiming total success or discarding successful observable results.",
+        "Does not implicitly create or merge a workspace, publish outputs, or use the writable directory as an unselected destination."
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "Publish package revision 4 to an explicitly selected hosted registry. The registry is unavailable, while a local filesystem provider is available.",
+      "assertions": [
+        "Fails visibly without publishing because the selected provider or destination cannot be resolved or used.",
+        "Does not silently fall back to the local filesystem and returns a provider-native locator only after verified hosted publication."
+      ]
+    },
+    {
+      "id": 6,
+      "prompt": "A subject reference could identify either a Git revision or a hosted work item. The user asks to validate it but provides no provider, revision, or criteria.",
+      "assertions": [
+        "Stops for the missing or ambiguous provider-native subject, exact revision, and validation criteria instead of inventing a universal identifier or guessing dimensions.",
+        "Keeps provider authentication, locator interpretation, and effects in the selected provider capability while the workflow operation remains provider-neutral."
+      ]
+    },
+    {
+      "id": 7,
+      "prompt": "Create a Git worktree from main@abc, implement a change, and merge the worktree into main. State the boundaries between the calls.",
+      "assertions": [
+        "Treats workspace-create, execute, and workspace-merge as three explicit independent calls and does not imply that execute owns workspace lifecycle.",
+        "Requires an exact source and destination, clean-state and conflict checks, confirmation before merge, and removes the workspace only after a verified successful merge."
+      ]
+    },
+    {
+      "id": 8,
+      "prompt": "Clean up old workspaces. One is dirty, one is unmerged, one is merged and clean, and one cannot be inspected because its provider capability is missing.",
+      "assertions": [
+        "Previews candidates with their provider-native references and state, then removes only the explicitly confirmed merged and clean workspace.",
+        "Preserves the dirty, unmerged, and uninspectable workspaces and reports why each was skipped instead of guessing or force-removing it."
+      ]
+    }
+  ]
+}

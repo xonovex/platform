@@ -1,0 +1,98 @@
+[
+  {
+    "query": "what does Xonovex governance actually enforce, and can I run a workflow with no controls?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "direct question about the governance execution kernel's enforcement boundary"
+  },
+  {
+    "query": "compose the same script so it can be run manually, from an agent hook, or from CI",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "trigger and executor dimensions must remain independent"
+  },
+  {
+    "query": "make this policy advisory first and mandatory later without rewriting the policy",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "explicit observe versus enforce control selection"
+  },
+  {
+    "query": "does marking my agent A3 automatically enable approval and escalation?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "maturity must be derived and non-operative"
+  },
+  {
+    "query": "wire our nightly schedule to the same script-plus-LLM executor as the manual command, with audit output but no blocking controls",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "composition spans trigger, executor, evidence, and optional controls"
+  },
+  {
+    "query": "build a generic plugin registry with capability declarations",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "generic plugin architecture is owned by microkernel-pattern-guide"
+  },
+  {
+    "query": "write a Kubernetes NetworkPolicy for this namespace",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "Kubernetes host policy is owned by kubernetes-guide"
+  },
+  {
+    "query": "write a portable Bash pre-commit hook that runs shellcheck",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "shell implementation is owned by shell-scripting-guide when no workflow composition is requested"
+  },
+  {
+    "query": "choose whether this request should use create, review, revise, or validate",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "operation selection is owned by a workflow capability rather than the governance overlay"
+  },
+  {
+    "query": "configure a GitHub ruleset that requires our existing CI status check",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "provider-native repository enforcement is owned by github-guide"
+  },
+  {
+    "query": "Design a Xonovex workflow that can be started manually, by a Claude hook, or by CI. It should run the same review script in every case and should not require governance controls.",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "output evaluation task for independent dimensions"
+  },
+  {
+    "query": "Our agent-with-workflow-skill composition is called A3. Does selecting A3 turn on provenance, approval, and escalation in Xonovex? Explain exactly what is enforced.",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "output evaluation task for derived maturity and enforcement clarity"
+  },
+  {
+    "query": "A webhook should launch an agent with our workflow skill, while a separate control only observes tool denials. Show the exact composition.",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "implicit composition request combines an open trigger, agent-skill executor, and observing control"
+  },
+  {
+    "query": "review this TypeScript agent hook for maintainability and code smells",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "code-quality review is not a request to compose or inspect workflow runtime dimensions"
+  },
+  {
+    "query": "implement an LLM call in our existing workflow script using the OpenAI API",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "provider API implementation is separate from selecting a script-plus-LLM executor adapter"
+  },
+  {
+    "query": "create a GitLab CI schedule that runs npm test every night",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "native CI configuration alone is owned by the GitLab adapter guidance"
+  }
+]

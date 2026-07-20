@@ -3,7 +3,8 @@
 Twelve independently invocable commands share one contract: select one operation,
 provide a subject, and add only the dimensions needed for that call. The command
 semantics do not depend on a lifecycle stage, role, trigger, executor, or agent
-maturity label.
+maturity label. Each public command preserves its argument contract and delegates
+the operation procedure to the required `workflow-guide` skill.
 
 ## Guides
 
@@ -67,11 +68,12 @@ and side-effect boundary.
 
 ## Capability selection
 
-Commands load only the capabilities needed by the selected kind, perspective, method,
-or provider. A selected capability must be installed and available at execution time.
+Commands always load the required `workflow-guide` operation, then load only the
+additional capabilities needed by the selected kind, perspective, method, or
+provider. A selected capability must be installed and available at execution time.
 If it is missing, the call stops and identifies the missing capability. It does not
-substitute another capability, invent an umbrella workflow skill, or silently fall
-back to a local file or provider.
+substitute another capability, invent an umbrella domain, method, or provider
+capability, or silently fall back to a local file or provider.
 
 ## Composition examples
 

@@ -18,12 +18,6 @@ argument-hint: >-
 
 # /xonovex-workflow:decide — Decide
 
-## Goal
-
-- Resolve one question into a stated outcome and rationale.
-- Keep evidence, recommendation, and the recorded outcome distinguishable.
-- Describe the decision without granting authority or changing operational state.
-
 ## Arguments
 
 - `subject` (required): Inline decision question or one opaque provider-native
@@ -37,29 +31,8 @@ argument-hint: >-
 - `--criteria` (repeatable, optional): Explicit decision criteria.
 - `--result` (optional): Explicit provider-native destination reference.
 
-## Core Workflow
+## Delegation
 
-1. Resolve explicit selections. Infer kind or provider only when unambiguous, report
-   the inference and basis, and stop when multiple choices remain.
-2. Load only selected or unambiguous decision, domain, method, and provider
-   capabilities. Name and stop on an unavailable explicit capability.
-3. When a provider capability is resolved, let it interpret opaque references and
-   revisions.
-4. Compare the evidence against the criteria, then record the outcome, rationale,
-   alternatives, assumptions, and uncertainty.
-5. Return the result inline or persist it only to an explicit `--result`, returning a
-   native locator and revision when supported.
-
-## Implementation
-
-The result is descriptive: it never approves, rejects, authorizes, promotes, or changes
-a gate. Kind, perspective, method, capability, and provider stay independent, and
-invocation trigger, executor, identity, and agent maturity do not affect the semantics.
-
-## Error Handling
-
-- Unclear decision question or materially missing evidence: stop and identify the gap.
-- Ambiguous kind or provider: present the viable choices instead of guessing.
-- Unavailable explicit capability: name it without substituting another.
-- Requested authority effect: return the descriptive decision and state that the
-  separate authority action was not performed.
+Load the `workflow-guide` skill (plugin `xonovex-skill-workflow`) and perform its
+**Decide** operation with these arguments. The skill is the source of truth for the
+procedure, output, and error handling; do not restate them.

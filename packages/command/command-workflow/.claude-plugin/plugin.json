@@ -5,5 +5,5 @@
   "author": {
     "name": "Xonovex"
   },
-  "dependencies": []
+  "dependencies": ["xonovex-skill-workflow"]
 }

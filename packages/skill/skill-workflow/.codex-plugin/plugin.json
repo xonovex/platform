@@ -1,0 +1,21 @@
+{
+  "name": "xonovex-skill-workflow",
+  "version": "7.0.0",
+  "description": "Xonovex symmetric workflow operation skills",
+  "author": {
+    "name": "Xonovex"
+  },
+  "skills": "./workflow-guide",
+  "interface": {
+    "displayName": "Symmetric Workflow",
+    "shortDescription": "Compose stage-neutral workflow operations",
+    "longDescription": "Select and execute eight stage-neutral operations plus four explicit workspace utilities across independent capability and provider dimensions.",
+    "developerName": "Xonovex",
+    "category": "Productivity",
+    "capabilities": ["Read", "Write"],
+    "defaultPrompt": [
+      "Choose the workflow operation that matches this request",
+      "Compose these workflow operations without imposing a stage order"
+    ]
+  }
+}

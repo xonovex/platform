@@ -19,12 +19,6 @@ argument-hint: >-
 
 # /xonovex-workflow:publish — Publish
 
-## Goal
-
-- Publish one exact subject to one explicit destination.
-- Keep provider behavior behind the selected provider capability.
-- Return the provider-native locator and revision without changing the source.
-
 ## Arguments
 
 - `subject` (required): Inline content or one opaque provider-native reference.
@@ -38,27 +32,8 @@ argument-hint: >-
 - `--confirm` (optional): Explicitly authorize the described publication effect.
 - `--dry-run` (optional): Resolve and preview the publication without applying it.
 
-## Core Workflow
+## Delegation
 
-1. Pin the subject revision and destination. Infer kind or provider only when
-   unambiguous, report the inference and basis, and stop on ambiguity.
-2. Load only explicitly selected or unambiguous publication, domain, method, and
-   provider capabilities. Never substitute for an unavailable explicit capability.
-3. Let the resolved provider capability interpret all opaque references and own native
-   authentication, identifiers, revisions, idempotency, and publication effects.
-4. Preview the exact effect. Apply it only when `--confirm` or the original request
-   already explicitly authorizes that subject, destination, and effect.
-5. Return the provider-native result locator and revision when supported.
-
-## Implementation
-
-Publication never revises the source or implies a gate decision. Kind, perspective,
-method, capability, and provider stay orthogonal; invocation trigger, executor,
-identity, and agent maturity do not select provider behavior.
-
-## Error Handling
-
-- Missing destination or mutable source revision: stop before publishing.
-- Ambiguous provider or destination: report the viable choices without guessing.
-- Unavailable explicit capability: name it and stop without fallback.
-- Missing authorization: return the dry-run preview and request confirmation.
+Load the `workflow-guide` skill (plugin `xonovex-skill-workflow`) and perform its
+**Publish** operation with these arguments. The skill is the source of truth for the
+procedure, output, and error handling; do not restate them.
