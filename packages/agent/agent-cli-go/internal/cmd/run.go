@@ -31,92 +31,109 @@ import (
 	"github.com/xonovex/platform/packages/shared/shared-core-go/pkg/scriptlib"
 )
 
-var runCmd = &cobra.Command{
-	Use:   "run [agent-args...]",
-	Short: "Run an AI coding agent",
-	Long:  `Run an AI coding agent with specified provider and sandbox options.`,
-	RunE:  runAgent,
+type runOptions struct {
+	agent                       string
+	provider                    string
+	isolation                   string
+	provision                   string
+	network                     string
+	isolationBwrapPassthrough   bool
+	isolationDockerRuntime      string
+	initCommands                []string
+	nixSource                   string
+	nixRev                      string
+	nixPackages                 []string
+	nixShell                    string
+	workDir                     string
+	worktreeBranch              string
+	worktreeSourceBranch        string
+	worktreeDir                 string
+	config                      string
+	bindPaths                   []string
+	roBindPaths                 []string
+	customEnv                   []string
+	image                       string
+	terminal                    string
+	terminalSession             string
+	terminalWindow              string
+	terminalDetach              bool
+	vcs                         string
+	dryRun                      bool
+	requirePinnedProvision      bool
+	requireHostToolsUnreachable bool
+	requireEgressRestricted     bool
+	requireKernelIsolation      bool
 }
 
-var (
-	flagAgent                       string
-	flagProvider                    string
-	flagIsolation                   string
-	flagProvision                   string
-	flagNetwork                     string
-	flagIsolationBwrapPassthrough   bool
-	flagIsolationDockerRuntime      string
-	flagInitCommand                 []string
-	flagNixSource                   string
-	flagNixRev                      string
-	flagNixPackages                 []string
-	flagNixShell                    string
-	flagWorkDir                     string
-	flagWorktreeBranch              string
-	flagWorktreeSourceBranch        string
-	flagWorktreeDir                 string
-	flagConfig                      string
-	flagBind                        []string
-	flagRoBind                      []string
-	flagEnv                         []string
-	flagImage                       string
-	flagTerminal                    string
-	flagTerminalSession             string
-	flagTerminalWindow              string
-	flagTerminalDetach              bool
-	flagVCS                         string
-	flagDryRun                      bool
-	flagRequirePinnedProvision      bool
-	flagRequireHostToolsUnreachable bool
-	flagRequireEgressRestricted     bool
-	flagRequireKernelIsolation      bool
-)
+func newRunCommand() *cobra.Command {
+	options := runOptions{
+		agent:     "claude",
+		isolation: "none",
+		provision: "none",
+		network:   "host",
+		nixSource: "packages",
+		nixShell:  "default",
+		vcs:       "git",
+	}
+	cmd := &cobra.Command{
+		Use:   "run [agent-args...]",
+		Short: "Run an AI coding agent",
+		Long:  `Run an AI coding agent with specified provider and sandbox options.`,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return runAgent(cmd, args, options)
+		},
+	}
+
+	// Bare axis selectors.
+	cmd.Flags().StringVarP(&options.agent, "agent", "a", options.agent, "Agent to run (claude, opencode)")
+	cmd.Flags().StringVarP(&options.provider, "provider", "p", "", "Model provider")
+	cmd.Flags().StringVar(&options.isolation, "isolation", options.isolation, "Isolation axis (none, bwrap, docker)")
+	cmd.Flags().StringVar(&options.provision, "provision", options.provision, "Provision axis (none, nix, command)")
+	cmd.Flags().StringVar(&options.network, "network", options.network, "Network egress axis (host, none, proxy)")
+
+	// Per-type knobs under the --<axis>-<type>-<option> grammar.
+	cmd.Flags().StringVar(&options.isolationDockerRuntime, "isolation-docker-runtime", "", "Kernel-isolating container runtime, e.g. runsc (docker only)")
+	cmd.Flags().BoolVar(&options.isolationBwrapPassthrough, "isolation-bwrap-passthrough", false, "Expose host/base-image tools as a fallback (bwrap only; forfeits host-tools-unreachable)")
+	cmd.Flags().StringSliceVar(&options.initCommands, "init-command", nil, "Init command to run before the agent for --provision command (repeatable)")
+	cmd.Flags().StringVar(&options.nixSource, "nix-source", options.nixSource, "Nix source for --provision nix (packages, flake)")
+	cmd.Flags().StringVar(&options.nixRev, "nix-rev", "", "Pinned nixpkgs rev for --nix-source packages")
+	cmd.Flags().StringSliceVar(&options.nixPackages, "nix-packages", nil, "Packages for --nix-source packages (repeatable)")
+	cmd.Flags().StringVar(&options.nixShell, "nix-shell", options.nixShell, "devShell name for --nix-source flake")
+	cmd.Flags().StringVar(&options.image, "image", "", "Container image (for docker isolation)")
+
+	// Workspace / terminal / misc.
+	cmd.Flags().StringVarP(&options.workDir, "work-dir", "w", "", "Working directory")
+	cmd.Flags().StringVar(&options.worktreeBranch, "worktree-branch", "", "Create worktree with branch name")
+	cmd.Flags().StringVar(&options.worktreeSourceBranch, "worktree-source-branch", "", "Source branch for worktree")
+	cmd.Flags().StringVar(&options.worktreeDir, "worktree-dir", "", "Worktree directory path")
+	cmd.Flags().StringVarP(&options.config, "config", "c", "", "Configuration file")
+	cmd.Flags().StringSliceVar(&options.bindPaths, "bind", nil, "Read-write bind mount")
+	cmd.Flags().StringSliceVar(&options.roBindPaths, "ro-bind", nil, "Read-only bind mount")
+	cmd.Flags().StringSliceVar(&options.customEnv, "env", nil, "Environment variables (KEY=VALUE)")
+	cmd.Flags().StringVarP(&options.terminal, "terminal", "t", "", "Terminal wrapper (tmux)")
+	cmd.Flags().StringVar(&options.terminalSession, "terminal-session", "", "Custom tmux session name")
+	cmd.Flags().StringVar(&options.terminalWindow, "terminal-window", "", "Custom tmux window name")
+	cmd.Flags().BoolVar(&options.terminalDetach, "terminal-detach", false, "Run in background (detach from terminal)")
+	cmd.Flags().StringVar(&options.vcs, "vcs", options.vcs, "VCS type for worktree (git, jj)")
+	cmd.Flags().BoolVarP(&options.dryRun, "dry-run", "n", false, "Show configuration without executing")
+
+	// Independent policy guarantees.
+	cmd.Flags().BoolVar(&options.requirePinnedProvision, "require-pinned-provision", false,
+		"Require provisioning from a pinned source")
+	cmd.Flags().BoolVar(&options.requireHostToolsUnreachable, "require-host-tools-unreachable", false,
+		"Require host tools to be unreachable from the sandbox")
+	cmd.Flags().BoolVar(&options.requireEgressRestricted, "require-egress-restricted", false,
+		"Require network egress to be disabled or enforced by a supported transport")
+	cmd.Flags().BoolVar(&options.requireKernelIsolation, "require-kernel-isolation", false,
+		"Require a kernel-isolating runtime such as docker with runsc")
+
+	return cmd
+}
+
+var runCmd = newRunCommand()
 
 func init() {
 	rootCmd.AddCommand(runCmd)
-
-	// Bare axis selectors.
-	runCmd.Flags().StringVarP(&flagAgent, "agent", "a", "claude", "Agent to run (claude, opencode)")
-	runCmd.Flags().StringVarP(&flagProvider, "provider", "p", "", "Model provider")
-	runCmd.Flags().StringVar(&flagIsolation, "isolation", "none", "Isolation axis (none, bwrap, docker)")
-	runCmd.Flags().StringVar(&flagProvision, "provision", "none", "Provision axis (none, nix, command)")
-	runCmd.Flags().StringVar(&flagNetwork, "network", "host", "Network egress axis (host, none, proxy)")
-
-	// Per-type knobs under the --<axis>-<type>-<option> grammar.
-	runCmd.Flags().StringVar(&flagIsolationDockerRuntime, "isolation-docker-runtime", "", "Kernel-isolating container runtime, e.g. runsc (docker only)")
-	runCmd.Flags().BoolVar(&flagIsolationBwrapPassthrough, "isolation-bwrap-passthrough", false, "Expose host/base-image tools as a fallback (bwrap only; forfeits host-tools-unreachable)")
-	runCmd.Flags().StringSliceVar(&flagInitCommand, "init-command", []string{}, "Init command to run before the agent for --provision command (repeatable)")
-	runCmd.Flags().StringVar(&flagNixSource, "nix-source", "packages", "Nix source for --provision nix (packages, flake)")
-	runCmd.Flags().StringVar(&flagNixRev, "nix-rev", "", "Pinned nixpkgs rev for --nix-source packages")
-	runCmd.Flags().StringSliceVar(&flagNixPackages, "nix-packages", []string{}, "Packages for --nix-source packages (repeatable)")
-	runCmd.Flags().StringVar(&flagNixShell, "nix-shell", "default", "devShell name for --nix-source flake")
-	runCmd.Flags().StringVar(&flagImage, "image", "", "Container image (for docker isolation)")
-
-	// Workspace / terminal / misc.
-	runCmd.Flags().StringVarP(&flagWorkDir, "work-dir", "w", "", "Working directory")
-	runCmd.Flags().StringVar(&flagWorktreeBranch, "worktree-branch", "", "Create worktree with branch name")
-	runCmd.Flags().StringVar(&flagWorktreeSourceBranch, "worktree-source-branch", "", "Source branch for worktree")
-	runCmd.Flags().StringVar(&flagWorktreeDir, "worktree-dir", "", "Worktree directory path")
-	runCmd.Flags().StringVarP(&flagConfig, "config", "c", "", "Configuration file")
-	runCmd.Flags().StringSliceVar(&flagBind, "bind", []string{}, "Read-write bind mount")
-	runCmd.Flags().StringSliceVar(&flagRoBind, "ro-bind", []string{}, "Read-only bind mount")
-	runCmd.Flags().StringSliceVar(&flagEnv, "env", []string{}, "Environment variables (KEY=VALUE)")
-	runCmd.Flags().StringVarP(&flagTerminal, "terminal", "t", "", "Terminal wrapper (tmux)")
-	runCmd.Flags().StringVar(&flagTerminalSession, "terminal-session", "", "Custom tmux session name")
-	runCmd.Flags().StringVar(&flagTerminalWindow, "terminal-window", "", "Custom tmux window name")
-	runCmd.Flags().BoolVar(&flagTerminalDetach, "terminal-detach", false, "Run in background (detach from terminal)")
-	runCmd.Flags().StringVar(&flagVCS, "vcs", "git", "VCS type for worktree (git, jj)")
-	runCmd.Flags().BoolVarP(&flagDryRun, "dry-run", "n", false, "Show configuration without executing")
-
-	// Independent policy guarantees.
-	runCmd.Flags().BoolVar(&flagRequirePinnedProvision, "require-pinned-provision", false,
-		"Require provisioning from a pinned source")
-	runCmd.Flags().BoolVar(&flagRequireHostToolsUnreachable, "require-host-tools-unreachable", false,
-		"Require host tools to be unreachable from the sandbox")
-	runCmd.Flags().BoolVar(&flagRequireEgressRestricted, "require-egress-restricted", false,
-		"Require network egress to be disabled or enforced by a supported transport")
-	runCmd.Flags().BoolVar(&flagRequireKernelIsolation, "require-kernel-isolation", false,
-		"Require a kernel-isolating runtime such as docker with runsc")
 }
 
 // flags is the axis-resolution view of the run flags. It is the input to
@@ -146,9 +163,7 @@ func (f flags) policy() policy.SandboxPolicy {
 	}
 }
 
-// resolvedAxes is the named result of axis resolution (weakening the positional
-// connascence of the former multi-value tuple). It carries the resolved plugin
-// instances plus the knobs the RunConfig needs.
+// resolvedAxes carries the resolved plugin instances and RunConfig values.
 type resolvedAxes struct {
 	Isolation     isoshared.Isolator
 	Provision     provshared.Provisioner
@@ -218,27 +233,27 @@ func resolveAxes(f flags) (resolvedAxes, error) {
 	}, nil
 }
 
-func runAgent(cmd *cobra.Command, args []string) error {
+func runAgent(cmd *cobra.Command, args []string, options runOptions) error {
 	verbose, _ := cmd.Flags().GetBool("verbose")
 
-	agent, err := agents.GetAgent(types.AgentType(flagAgent))
+	agent, err := agents.GetAgent(types.AgentType(options.agent))
 	if err != nil {
 		scriptlib.LogError(err.Error())
 		scriptlib.LogInfo("Available agents: " + fmt.Sprint(agents.GetAgentTypes()))
 		return err
 	}
 
-	fileConfig, err := cfgpkg.LoadConfigFile(flagConfig)
+	fileConfig, err := cfgpkg.LoadConfigFile(options.config)
 	if err != nil {
 		return fmt.Errorf("failed to load config: %w", err)
 	}
 
-	provider, err := resolveProvider(agent.Type, fileConfig.Provider)
+	provider, err := resolveProvider(agent.Type, options.provider, fileConfig.Provider)
 	if err != nil {
 		return err
 	}
 
-	workDir := flagWorkDir
+	workDir := options.workDir
 	if workDir == "" {
 		workDir, err = os.Getwd()
 		if err != nil {
@@ -250,24 +265,24 @@ func runAgent(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("resolve work directory %q: %w", workDir, err)
 	}
 
-	sourceRepoDir, workDir, err := setupWorktree(workDir, verbose)
+	workspace, err := prepareWorkspace(options, workDir, verbose)
 	if err != nil {
 		return err
 	}
 
-	bindPaths := wsshared.BuildBindPaths(append(append([]string{}, fileConfig.BindPaths...), flagBind...), sourceRepoDir)
+	bindPaths := wsshared.BuildBindPaths(append(append([]string{}, fileConfig.BindPaths...), options.bindPaths...), workspace.sourceRepoDir)
 
 	axes, err := resolveAxes(flags{
-		isolation:                   flagIsolation,
-		provision:                   flagProvision,
-		network:                     flagNetwork,
-		image:                       flagImage,
-		isolationDockerRuntime:      flagIsolationDockerRuntime,
-		isolationBwrapPassthrough:   flagIsolationBwrapPassthrough,
-		requirePinnedProvision:      flagRequirePinnedProvision,
-		requireHostToolsUnreachable: flagRequireHostToolsUnreachable,
-		requireEgressRestricted:     flagRequireEgressRestricted,
-		requireKernelIsolation:      flagRequireKernelIsolation,
+		isolation:                   options.isolation,
+		provision:                   options.provision,
+		network:                     options.network,
+		image:                       options.image,
+		isolationDockerRuntime:      options.isolationDockerRuntime,
+		isolationBwrapPassthrough:   options.isolationBwrapPassthrough,
+		requirePinnedProvision:      options.requirePinnedProvision,
+		requireHostToolsUnreachable: options.requireHostToolsUnreachable,
+		requireEgressRestricted:     options.requireEgressRestricted,
+		requireKernelIsolation:      options.requireKernelIsolation,
 		isolationChanged:            cmd.Flags().Changed("isolation"),
 		provisionChanged:            cmd.Flags().Changed("provision"),
 	})
@@ -289,7 +304,7 @@ func runAgent(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("isolation=none cannot restrict network egress (network=%q); use bwrap or docker", axes.Network)
 	}
 
-	input, err := provisionInput(axes.ProvisionName, sourceRepoDir, workDir)
+	input, err := provisionInput(axes.ProvisionName, options, workspace.sourceRepoDir, workspace.executionDir)
 	if err != nil {
 		return err
 	}
@@ -300,15 +315,15 @@ func runAgent(cmd *cobra.Command, args []string) error {
 
 	runCfg := isoshared.RunConfig{
 		HomeDir:         fileConfig.HomeDir,
-		WorkDir:         workDir,
-		RepoDir:         sourceRepoDir,
+		WorkDir:         workspace.executionDir,
+		RepoDir:         workspace.sourceRepoDir,
 		Network:         axes.Network,
 		HostPassthrough: axes.Passthrough,
 		Image:           axes.Image,
 		Runtime:         axes.Runtime,
 		BindPaths:       bindPaths,
-		RoBindPaths:     append(append([]string{}, fileConfig.RoBindPaths...), flagRoBind...),
-		CustomEnv:       append(append([]string{}, fileConfig.CustomEnv...), flagEnv...),
+		RoBindPaths:     append(append([]string{}, fileConfig.RoBindPaths...), options.roBindPaths...),
+		CustomEnv:       append(append([]string{}, fileConfig.CustomEnv...), options.customEnv...),
 		Agent:           agent,
 		Provider:        provider,
 		AgentArgs:       args,
@@ -323,12 +338,12 @@ func runAgent(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("prepare sandbox command: %w", err)
 	}
 
-	if flagDryRun {
-		return printDryRun(axes, command, agent, provider, args, workDir)
+	if options.dryRun {
+		return printDryRun(axes, command, agent, provider, args, workspace.displayDir)
 	}
 
-	if flagTerminal != "" {
-		return executeWithTerminal(axes, runCfg, contribution, workDir, verbose)
+	if options.terminal != "" {
+		return executeWithTerminal(axes, runCfg, contribution, workspace.executionDir, verbose, options)
 	}
 
 	exitCode, err := axes.Isolation.Run(runCfg, contribution)
@@ -343,8 +358,8 @@ func runAgent(cmd *cobra.Command, args []string) error {
 
 // resolveProvider resolves the model provider from the flag, falling back to the
 // file config's provider.
-func resolveProvider(agentType types.AgentType, fileProvider string) (*types.ModelProvider, error) {
-	name := flagProvider
+func resolveProvider(agentType types.AgentType, optionProvider, fileProvider string) (*types.ModelProvider, error) {
+	name := optionProvider
 	if name == "" {
 		name = fileProvider
 	}
@@ -360,30 +375,42 @@ func resolveProvider(agentType types.AgentType, fileProvider string) (*types.Mod
 	return provider, nil
 }
 
-// setupWorktree creates a worktree/workspace when --worktree-branch is set,
-// returning the source repo dir and the (possibly redirected) work dir.
-func setupWorktree(workDir string, verbose bool) (sourceRepoDir, newWorkDir string, err error) {
-	if flagWorktreeBranch == "" {
-		return "", workDir, nil
+type preparedWorkspace struct {
+	sourceRepoDir string
+	executionDir  string
+	displayDir    string
+}
+
+// prepareWorkspace validates and optionally creates the requested workspace.
+func prepareWorkspace(options runOptions, workDir string, verbose bool) (preparedWorkspace, error) {
+	if options.worktreeBranch == "" {
+		return preparedWorkspace{executionDir: workDir, displayDir: workDir}, nil
 	}
 
-	if err := validation.ValidateBranch(flagWorktreeBranch); err != nil {
-		return "", "", fmt.Errorf("invalid --worktree-branch: %w", err)
+	if err := validation.ValidateBranch(options.worktreeBranch); err != nil {
+		return preparedWorkspace{}, fmt.Errorf("invalid --worktree-branch: %w", err)
 	}
-	if flagWorktreeSourceBranch != "" {
-		if err := validation.ValidateBranch(flagWorktreeSourceBranch); err != nil {
-			return "", "", fmt.Errorf("invalid --worktree-source-branch: %w", err)
+	if options.worktreeSourceBranch != "" {
+		if err := validation.ValidateBranch(options.worktreeSourceBranch); err != nil {
+			return preparedWorkspace{}, fmt.Errorf("invalid --worktree-source-branch: %w", err)
 		}
 	}
 
-	vcsType := wsp.VCSType(flagVCS)
+	vcsType := wsp.VCSType(options.vcs)
 	if !vcsType.IsValid() {
-		return "", "", fmt.Errorf("unknown --vcs %q; valid values: git, jj", flagVCS)
+		return preparedWorkspace{}, fmt.Errorf("unknown --vcs %q; valid values: git, jj", options.vcs)
 	}
 
-	wtDir := flagWorktreeDir
+	wtDir := options.worktreeDir
 	if wtDir == "" {
-		wtDir = wsshared.GetDefaultDir(flagWorktreeBranch, filepath.Base(workDir))
+		wtDir = wsshared.GetDefaultDir(options.worktreeBranch, filepath.Base(workDir))
+	}
+	displayDir := wtDir
+	if !filepath.IsAbs(displayDir) {
+		displayDir = filepath.Join(workDir, displayDir)
+	}
+	if options.dryRun {
+		return preparedWorkspace{sourceRepoDir: workDir, executionDir: workDir, displayDir: displayDir}, nil
 	}
 
 	var vcs wsshared.VCS = git.New()
@@ -392,24 +419,24 @@ func setupWorktree(workDir string, verbose bool) (sourceRepoDir, newWorkDir stri
 	}
 
 	created, err := vcs.Setup(wsshared.Config{
-		SourceBranch: flagWorktreeSourceBranch,
-		Branch:       flagWorktreeBranch,
+		SourceBranch: options.worktreeSourceBranch,
+		Branch:       options.worktreeBranch,
 		Dir:          wtDir,
 	}, workDir, verbose)
 	if err != nil {
-		return "", "", err
+		return preparedWorkspace{}, err
 	}
-	return workDir, created, nil
+	return preparedWorkspace{sourceRepoDir: workDir, executionDir: created, displayDir: created}, nil
 }
 
 // provisionInput assembles the neutral provisioner Input. The nix source is built
 // only for the nix provisioner; the others ignore it. An invalid --nix-source is
 // returned as an error here (naming the bad value) rather than degrading to a
 // zero source that fails later with a misleading diagnostic.
-func provisionInput(provName provision.ProvisionMethod, repoDir, workDir string) (provshared.Input, error) {
-	in := provshared.Input{InitCommands: flagInitCommand}
+func provisionInput(provName provision.ProvisionMethod, options runOptions, repoDir, workDir string) (provshared.Input, error) {
+	in := provshared.Input{InitCommands: options.initCommands}
 	if provName == provision.ProvisionNix {
-		src, err := provnix.SourceFromFlags(flagNixSource, flagNixRev, flagNixPackages, flagNixShell, "", repoDir, workDir)
+		src, err := provnix.SourceFromFlags(options.nixSource, options.nixRev, options.nixPackages, options.nixShell, "", repoDir, workDir)
 		if err != nil {
 			return provshared.Input{}, err
 		}
@@ -419,24 +446,24 @@ func provisionInput(provName provision.ProvisionMethod, repoDir, workDir string)
 }
 
 // executeWithTerminal runs the resolved cell inside a terminal wrapper.
-func executeWithTerminal(axes resolvedAxes, runCfg isoshared.RunConfig, contribution provision.Contribution, workDir string, verbose bool) error {
-	terminalType := termshared.TerminalType(flagTerminal)
+func executeWithTerminal(axes resolvedAxes, runCfg isoshared.RunConfig, contribution provision.Contribution, workDir string, verbose bool, options runOptions) error {
+	terminalType := termshared.TerminalType(options.terminal)
 	executor := terminal.GetExecutor(terminalType)
 	if executor == nil {
-		scriptlib.LogError(fmt.Sprintf("Unknown terminal type: %s", flagTerminal))
+		scriptlib.LogError(fmt.Sprintf("Unknown terminal type: %s", options.terminal))
 		scriptlib.LogInfo(fmt.Sprintf("Available types: %v", terminal.GetAvailableTypes()))
-		return fmt.Errorf("unknown terminal type: %s", flagTerminal)
+		return fmt.Errorf("unknown terminal type: %s", options.terminal)
 	}
 	if !executor.IsAvailable() {
-		scriptlib.LogError(fmt.Sprintf("Terminal type %s is not available (not installed)", flagTerminal))
-		return fmt.Errorf("terminal type %s is not available", flagTerminal)
+		scriptlib.LogError(fmt.Sprintf("Terminal type %s is not available (not installed)", options.terminal))
+		return fmt.Errorf("terminal type %s is not available", options.terminal)
 	}
 
 	terminalConfig := &termshared.TerminalConfig{
 		Type:        terminalType,
-		SessionName: flagTerminalSession,
-		WindowName:  flagTerminalWindow,
-		Detach:      flagTerminalDetach,
+		SessionName: options.terminalSession,
+		WindowName:  options.terminalWindow,
+		Detach:      options.terminalDetach,
 	}
 
 	// Each isolator owns its terminal launch: bwrap/docker bake their env into the
@@ -448,7 +475,7 @@ func executeWithTerminal(axes resolvedAxes, runCfg isoshared.RunConfig, contribu
 	}
 
 	if verbose {
-		scriptlib.LogInfo("Using terminal wrapper: " + flagTerminal)
+		scriptlib.LogInfo("Using terminal wrapper: " + options.terminal)
 	}
 
 	exitCode, err := executor.Execute(terminalConfig, fullCommand, env, workDir, verbose)

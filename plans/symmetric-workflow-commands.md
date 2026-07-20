@@ -1,8 +1,9 @@
 ---
 type: plan
 has_subplans: true
-status: approved
+status: complete
 updated: 2026-07-20
+completed_date: "2026-07-20"
 feature: symmetric-workflow-commands
 dependencies:
   plans: []
@@ -372,31 +373,31 @@ security policy from removed lifecycle governance.
 
 ## Success criteria
 
-- [ ] The command plugin exposes exactly eight core operations and four
+- [x] The command plugin exposes exactly eight core operations and four
       workspace utilities with symmetric names and documented contracts.
-- [ ] No command name embeds a role, lifecycle stage, artifact-specific
+- [x] No command name embeds a role, lifecycle stage, artifact-specific
       transition, profile, provider, trigger, executor, or maturity level.
-- [ ] PM/PO, UX, developer, QA, and developer-reviewer documentation uses the
+- [x] PM/PO, UX, developer, QA, and developer-reviewer documentation uses the
       same verbs and clearly separates QA validation from PR review.
-- [ ] Manual, hook, CI/CD, scheduler, LLM, script, and agent invocation are
+- [x] Manual, hook, CI/CD, scheduler, LLM, script, and agent invocation are
       documented as independent composition choices rather than command modes.
-- [ ] A1/A2/A3 or other maturity labels are neither defined nor enforced by the
+- [x] A1/A2/A3 or other maturity labels are neither defined nor enforced by the
       command package.
-- [ ] References are provider-native and opaque to generic commands; no central
+- [x] References are provider-native and opaque to generic commands; no central
       resolver, universal ID, or silent persistence fallback exists.
-- [ ] `skill-plan` contains planning and code-research guidance only and has no
+- [x] `skill-plan` contains planning and code-research guidance only and has no
       profiles, approval gates, authority model, or early-lifecycle ownership.
-- [ ] `AgentTrigger`, `AgentSchedule`, and the operator HTTP trigger receiver are
+- [x] `AgentTrigger`, `AgentSchedule`, and the operator HTTP trigger receiver are
       removed; external event sources can create `AgentRun` directly.
-- [ ] Agent sandbox and execution policy remains intact and is not described as
+- [x] Agent sandbox and execution policy remains intact and is not described as
       lifecycle governance.
-- [ ] Old commands, aliases, compatibility wrappers, migration documents, stale
+- [x] Old commands, aliases, compatibility wrappers, migration documents, stale
       diagrams, and matching eval cases are absent.
-- [ ] Validators derive the command inventory from disk and fail on missing,
+- [x] Validators derive the command inventory from disk and fail on missing,
       extra, asymmetric, or stale surfaces.
-- [ ] All affected Moon checks, Go tests, formatting checks, and repository
+- [x] All affected Moon checks, Go tests, formatting checks, and repository
       residue searches pass without warnings.
-- [ ] Marketplace and release metadata describe the new model and prepare a
+- [x] Marketplace and release metadata describe the new model and prepare a
       coordinated major release through the existing PR-only process.
 
 ## Validation strategy

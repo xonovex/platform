@@ -4,7 +4,7 @@ A Moon extension that maps a task's detected native toolchains to curated Nix
 environment components and runs the task in the resulting workspace devShell.
 It is the recommended Nix integration for new Xonovex consumers.
 
-Version 0.1.0 is qualified against Moon 2.3.5 and Moon PDK 2.0.4. The Moon WASM
+Version 0.1.0 is qualified against Moon 2.4.5 and Moon PDK 2.0.4. The Moon WASM
 extension interface remains experimental, so compatibility with newer Moon
 versions is recorded separately before the declared support version changes.
 

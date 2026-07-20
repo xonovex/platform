@@ -243,3 +243,18 @@ func TestAgentProviderWebhook_ValidateDelete(t *testing.T) {
 		t.Errorf("ValidateDelete() error = %v", err)
 	}
 }
+
+func TestAgentProviderWebhook_RejectsUnknownPreset(t *testing.T) {
+	w := &AgentProviderWebhook{}
+	provider := &agentv1alpha1.AgentProvider{
+		Spec: agentv1alpha1.AgentProviderSpec{PresetRef: "not-a-provider"},
+	}
+
+	warnings, err := w.ValidateCreate(context.Background(), provider)
+	if err == nil {
+		t.Fatal("ValidateCreate() error = nil, want unknown-preset error")
+	}
+	if len(warnings) != 0 {
+		t.Errorf("ValidateCreate() warnings = %v, want none", warnings)
+	}
+}

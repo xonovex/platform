@@ -1,0 +1,74 @@
+import {describe, expect, it} from "vitest";
+import {
+  claudeFailureDetail,
+  extractJson,
+  main,
+  meanBlock,
+  summarize,
+  sumTokens,
+} from "./index.js";
+
+describe("output evaluation helpers", () => {
+  it("sums supported token fields and ignores invalid values", () => {
+    expect(
+      sumTokens({
+        input_tokens: 10.9,
+        output_tokens: "4",
+        cache_creation_input_tokens: "invalid",
+        cache_read_input_tokens: 2,
+      }),
+    ).toBe(16);
+    expect(sumTokens(null)).toBe(0);
+  });
+
+  it("extracts JSON objects from fenced and surrounding text", () => {
+    expect(extractJson('```json\n{"passed":true}\n```')).toEqual({
+      passed: true,
+    });
+    expect(extractJson('result: {"passed":false}')).toEqual({passed: false});
+    expect(extractJson("no object")).toBeNull();
+    expect(extractJson("{invalid}")).toBeNull();
+    expect(extractJson("[1, 2]")).toBeNull();
+  });
+
+  it("finds the latest structured Claude error detail", () => {
+    expect(
+      claudeFailureDetail(
+        [
+          "not-json",
+          '{"subtype":"error_max_turns"}',
+          '{"result":"quota exceeded","is_error":true}',
+        ].join("\n"),
+      ),
+    ).toBe("quota exceeded");
+    expect(claudeFailureDetail('{"subtype":"error_max_turns"}')).toBe(
+      "error_max_turns",
+    );
+    expect(claudeFailureDetail('{"type":"result"}')).toBe("");
+  });
+
+  it("summarizes assertion results including an empty result set", () => {
+    expect(
+      summarize([
+        {text: "first", passed: true, evidence: "yes"},
+        {text: "second", passed: false, evidence: "no"},
+      ]).summary,
+    ).toEqual({passed: 1, failed: 1, total: 2, pass_rate: 0.5});
+    expect(summarize([], "empty")).toMatchObject({
+      summary: {passed: 0, failed: 0, total: 0, pass_rate: 0},
+      error: "empty",
+    });
+  });
+
+  it("computes means and optional population deviation", () => {
+    expect(meanBlock([], 1)).toEqual({mean: 0});
+    expect(meanBlock([1, 3], 1)).toEqual({mean: 2});
+    expect(meanBlock([1, 3], 2)).toEqual({mean: 2, stddev: 1});
+  });
+});
+
+describe("main", () => {
+  it("fails cleanly when the evaluation file is missing", async () => {
+    await expect(main(["missing-evals.json"])).resolves.toBe(2);
+  });
+});

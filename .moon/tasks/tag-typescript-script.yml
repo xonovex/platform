@@ -32,5 +32,14 @@ tasks:
     deps: []
     options:
       mergeDeps: replace
+  coverage:
+    command: noop
+    deps: [ts-coverage]
+    options:
+      cache: false
+  ci-check:
+    deps: [coverage]
+    options:
+      mergeDeps: append
 inheritedBy:
   tag: typescript-script

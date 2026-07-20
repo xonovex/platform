@@ -329,7 +329,7 @@ func TestResolveProvider_PresetRefOverriddenByEnvironment(t *testing.T) {
 	}
 }
 
-func TestResolveProvider_UnknownPresetSoftFailure(t *testing.T) {
+func TestResolveProvider_UnknownPresetReturnsError(t *testing.T) {
 	provider := &agentv1alpha1.AgentProvider{
 		ObjectMeta: metav1.ObjectMeta{Name: "unknown-preset", Namespace: "default"},
 		Spec: agentv1alpha1.AgentProviderSpec{
@@ -349,12 +349,8 @@ func TestResolveProvider_UnknownPresetSoftFailure(t *testing.T) {
 		},
 	}
 
-	env, err := ResolveProvider(context.Background(), c, run, "")
-	if err != nil {
-		t.Fatalf("ResolveProvider() should not error on unknown preset, got %v", err)
-	}
-	if env["CUSTOM_VAR"] != "value" {
-		t.Errorf("CUSTOM_VAR = %q, want %q", env["CUSTOM_VAR"], "value")
+	if _, err := ResolveProvider(context.Background(), c, run, ""); err == nil {
+		t.Fatal("ResolveProvider() error = nil, want unknown-preset error")
 	}
 }
 

@@ -40,7 +40,9 @@ func ResolveProvider(ctx context.Context, c client.Client, run *agentv1alpha1.Ag
 	}
 
 	// Load preset env vars as defaults.
-	mergePresetEnv(env, provider.Spec.PresetRef, provider.Spec.AgentType)
+	if err := mergePresetEnv(env, provider.Spec.PresetRef, provider.Spec.AgentType); err != nil {
+		return nil, err
+	}
 
 	// Copy environment from provider spec (overrides preset).
 	for k, v := range provider.Spec.Environment {
@@ -65,7 +67,9 @@ func ResolveProvider(ctx context.Context, c client.Client, run *agentv1alpha1.Ag
 func resolveInlineProvider(ctx context.Context, c client.Client, namespace string, spec *agentv1alpha1.ProviderSpec) (map[string]string, error) {
 	env := make(map[string]string)
 
-	mergePresetEnv(env, spec.PresetRef, spec.AgentType)
+	if err := mergePresetEnv(env, spec.PresetRef, spec.AgentType); err != nil {
+		return nil, err
+	}
 
 	for k, v := range spec.Environment {
 		env[k] = v
@@ -85,10 +89,9 @@ func resolveInlineProvider(ctx context.Context, c client.Client, namespace strin
 }
 
 // mergePresetEnv loads preset environment variables as defaults into env.
-// Unknown presets are silently ignored for forward compatibility.
-func mergePresetEnv(env map[string]string, presetRef, agentType string) {
+func mergePresetEnv(env map[string]string, presetRef, agentType string) error {
 	if presetRef == "" {
-		return
+		return nil
 	}
 	at := sharedtypes.AgentType(agentType)
 	if at == "" {
@@ -96,11 +99,12 @@ func mergePresetEnv(env map[string]string, presetRef, agentType string) {
 	}
 	preset, err := providers.GetProvider(presetRef, at)
 	if err != nil {
-		return // unknown preset — soft failure
+		return fmt.Errorf("unknown provider preset %q for agent type %q: %w", presetRef, at, err)
 	}
 	for k, v := range preset.Environment {
 		env[k] = v
 	}
+	return nil
 }
 
 func getSecretValue(ctx context.Context, c client.Client, namespace string, ref *agentv1alpha1.SecretKeyRef) (string, error) {

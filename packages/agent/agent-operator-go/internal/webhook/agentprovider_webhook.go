@@ -52,52 +52,60 @@ var blockedEnvKeyPrefixes = []string{
 }
 
 func (w *AgentProviderWebhook) validate(provider *agentv1alpha1.AgentProvider) (admission.Warnings, error) {
-	var warnings admission.Warnings
+	err := validateProviderConfig(
+		provider.Spec.PresetRef,
+		provider.Spec.AgentType,
+		provider.Spec.AuthTokenSecretRef,
+		provider.Spec.Environment,
+		provider.Spec.CliArgs,
+	)
+	return nil, err
+}
 
-	// Warn on unknown preset (not an error for forward compatibility)
-	if provider.Spec.PresetRef != "" {
-		at := sharedtypes.AgentType(provider.Spec.AgentType)
+func validateProviderConfig(presetRef, agentType string, secretRef *agentv1alpha1.SecretKeyRef, environment map[string]string, cliArgs []string) error {
+	if presetRef != "" {
+		at := sharedtypes.AgentType(agentType)
 		if at == "" {
 			at = sharedtypes.AgentClaude
 		}
-		if _, err := providers.GetProvider(provider.Spec.PresetRef, at); err != nil {
-			warnings = append(warnings, fmt.Sprintf("presetRef %q is not a known provider preset for agent type %q", provider.Spec.PresetRef, at))
+		if _, err := providers.GetProvider(presetRef, at); err != nil {
+			return fmt.Errorf("presetRef %q is not a known provider preset for agent type %q: %w", presetRef, at, err)
 		}
 	}
 
-	if provider.Spec.AuthTokenSecretRef != nil {
-		ref := provider.Spec.AuthTokenSecretRef
+	if secretRef != nil {
+		ref := secretRef
 		if ref.Name == "" {
-			return nil, fmt.Errorf("authTokenSecretRef.name is required")
+			return fmt.Errorf("authTokenSecretRef.name is required")
 		}
 		if ref.Key == "" {
-			return nil, fmt.Errorf("authTokenSecretRef.key is required")
+			return fmt.Errorf("authTokenSecretRef.key is required")
 		}
 		if !k8sNamePattern.MatchString(ref.Name) {
-			return nil, fmt.Errorf("authTokenSecretRef.name %q is not a valid Kubernetes resource name", ref.Name)
+			return fmt.Errorf("authTokenSecretRef.name %q is not a valid Kubernetes resource name", ref.Name)
 		}
 	}
 
-	for key := range provider.Spec.Environment {
+	for key := range environment {
 		if !envKeyPattern.MatchString(key) {
-			return nil, fmt.Errorf("environment key %q is not a valid env var name", key)
+			return fmt.Errorf("environment key %q is not a valid env var name", key)
 		}
 		upperKey := strings.ToUpper(key)
 		for _, blocked := range blockedEnvKeyPrefixes {
 			if strings.HasPrefix(upperKey, blocked) {
-				return nil, fmt.Errorf("environment key %q is not allowed (blocked prefix %q)", key, blocked)
+				return fmt.Errorf("environment key %q is not allowed (blocked prefix %q)", key, blocked)
 			}
 		}
 	}
 
-	for i, arg := range provider.Spec.CliArgs {
+	for i, arg := range cliArgs {
 		if arg == "" {
-			return nil, fmt.Errorf("cliArgs[%d] is empty", i)
+			return fmt.Errorf("cliArgs[%d] is empty", i)
 		}
 		if shell.ContainsMetachars(arg) {
-			return nil, fmt.Errorf("cliArgs[%d] %q contains shell metacharacters", i, arg)
+			return fmt.Errorf("cliArgs[%d] %q contains shell metacharacters", i, arg)
 		}
 	}
 
-	return warnings, nil
+	return nil
 }

@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import {isDirectExecution} from "@xonovex/script-moon-common/direct-execution";
 import {checkCrossPackageLinks} from "./cross-package-links.js";
 import {type LinkReport} from "./reference-file-links.js";
 
@@ -14,7 +15,7 @@ const HELP_TEXT = [
   "  -h, --help  show this help message and exit",
 ].join("\n");
 
-const main = (argv: readonly string[]): number => {
+export const main = (argv: readonly string[]): number => {
   if (argv.includes("-h") || argv.includes("--help")) {
     console.log(HELP_TEXT);
     return 0;
@@ -51,4 +52,6 @@ const main = (argv: readonly string[]): number => {
   return 0;
 };
 
-process.exit(main(process.argv.slice(2)));
+if (isDirectExecution(import.meta.url, process.argv[1])) {
+  process.exitCode = main(process.argv.slice(2));
+}

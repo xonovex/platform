@@ -2,6 +2,7 @@
 import {execFileSync} from "node:child_process";
 import {readdirSync, readFileSync, writeFileSync} from "node:fs";
 import {basename, join, resolve, sep} from "node:path";
+import {isDirectExecution} from "@xonovex/script-moon-common/direct-execution";
 import {resolveExecutable} from "@xonovex/script-moon-common/executable";
 import {
   isDirectory,
@@ -579,7 +580,7 @@ const walkSourcesFiles = (root: string): string[] => {
   return found;
 };
 
-const main = async (argv: readonly string[]): Promise<number> => {
+export const main = async (argv: readonly string[]): Promise<number> => {
   const args = parseArgs(argv);
   if (args.help) {
     console.log(HELP);
@@ -643,11 +644,12 @@ const main = async (argv: readonly string[]): Promise<number> => {
   return totalProblems ? 1 : 0;
 };
 
-try {
-  const code = await main(process.argv.slice(2));
-  process.exitCode = code;
-} catch (error) {
-  const message = error instanceof Error ? error.message : String(error);
-  process.stderr.write(`error: ${message}\n`);
-  process.exitCode = 2;
+if (isDirectExecution(import.meta.url, process.argv[1])) {
+  try {
+    process.exitCode = await main(process.argv.slice(2));
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    process.stderr.write(`error: ${message}\n`);
+    process.exitCode = 2;
+  }
 }

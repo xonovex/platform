@@ -4,36 +4,18 @@ import {existsSync} from "node:fs";
 import {createRequire} from "node:module";
 import {arch, platform} from "node:os";
 import {dirname, join} from "node:path";
+import {childExitCode, getBinaryName, getPlatformPackage} from "./launcher.js";
 
 const require = createRequire(import.meta.url);
 
-type Platform = "darwin" | "linux" | "win32";
-type Arch = "arm64" | "x64";
-
-const getPlatformPackage = (): string | undefined => {
-  const os = platform() as Platform;
-  const cpu = arch() as Arch;
-
-  const map: Record<string, string> = {
-    "darwin-arm64": "@xonovex/agent-cli-go-darwin-arm64",
-    "darwin-x64": "@xonovex/agent-cli-go-darwin-x64",
-    "linux-arm64": "@xonovex/agent-cli-go-linux-arm64",
-    "linux-x64": "@xonovex/agent-cli-go-linux-x64",
-    "win32-x64": "@xonovex/agent-cli-go-win32-x64",
-  };
-
-  return map[`${os}-${cpu}`];
-};
-
 const findBinary = (): string => {
-  const packageName = getPlatformPackage();
+  const packageName = getPlatformPackage(platform(), arch());
   if (!packageName) {
     console.error(`No binary available for ${platform()}-${arch()}`);
     process.exit(1);
   }
 
-  const binaryName =
-    platform() === "win32" ? "agent-cli-go.exe" : "agent-cli-go";
+  const binaryName = getBinaryName(platform());
 
   try {
     const packageJsonPath = require.resolve(`${packageName}/package.json`);
@@ -64,8 +46,8 @@ const main = (): void => {
     process.exit(1);
   });
 
-  child.on("close", (code) => {
-    process.exit(code ?? 0);
+  child.on("close", (code, signal) => {
+    process.exit(childExitCode(code, signal));
   });
 };
 

@@ -14,6 +14,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/tools/events"
+	"k8s.io/client-go/util/retry"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
@@ -56,6 +57,9 @@ func (r *AgentRunReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 			return ctrl.Result{}, nil
 		}
 		return ctrl.Result{}, err
+	}
+	if !agentRun.DeletionTimestamp.IsZero() {
+		return ctrl.Result{}, nil
 	}
 
 	// Skip if already completed
@@ -138,11 +142,14 @@ func (r *AgentRunReconciler) reconcileExecutionResources(
 		if err := ctrl.SetControllerReference(run, resource, r.Scheme); err != nil {
 			return ctrl.Result{}, err
 		}
-		if err := r.Create(ctx, resource); err != nil && !errors.IsAlreadyExists(err) {
-			return ctrl.Result{}, fmt.Errorf("create network policy: %w", err)
+		if err := r.Create(ctx, resource); err != nil {
+			if !errors.IsAlreadyExists(err) {
+				return ctrl.Result{}, fmt.Errorf("create network policy: %w", err)
+			}
+		} else {
+			r.Recorder.Eventf(run, nil, corev1.EventTypeNormal, "NetworkPolicyCreated", "NetworkPolicyCreated",
+				"Created NetworkPolicy %s", resource.Name)
 		}
-		r.Recorder.Eventf(run, nil, corev1.EventTypeNormal, "NetworkPolicyCreated", "NetworkPolicyCreated",
-			"Created NetworkPolicy %s", resource.Name)
 	}
 
 	jobName := run.Name
@@ -169,18 +176,20 @@ func (r *AgentRunReconciler) reconcileExecutionResources(
 		if err := ctrl.SetControllerReference(run, job, r.Scheme); err != nil {
 			return ctrl.Result{}, err
 		}
-		if err := r.Create(ctx, job); err != nil && !errors.IsAlreadyExists(err) {
-			return ctrl.Result{}, fmt.Errorf("create agent Job: %w", err)
+		if err := r.Create(ctx, job); err != nil {
+			if !errors.IsAlreadyExists(err) {
+				return ctrl.Result{}, fmt.Errorf("create agent Job: %w", err)
+			}
+		} else {
+			logger.Info("created Job", "jobName", jobName, "agentType", execution.agentType,
+				"runtimeClass", ptrOrEmpty(run.Spec.RuntimeClassName))
+			r.Recorder.Eventf(run, nil, corev1.EventTypeNormal, "AgentRunStarted", "AgentRunStarted",
+				"Created Job %s (agent=%s, provider=%s, runtimeClass=%s)",
+				jobName, string(execution.agentType), run.Spec.ProviderRef, ptrOrEmpty(run.Spec.RuntimeClassName))
 		}
 
-		logger.Info("creating Job", "jobName", jobName, "agentType", execution.agentType,
-			"runtimeClass", ptrOrEmpty(run.Spec.RuntimeClassName))
-		r.Recorder.Eventf(run, nil, corev1.EventTypeNormal, "AgentRunStarted", "AgentRunStarted",
-			"Created Job %s (agent=%s, provider=%s, runtimeClass=%s)",
-			jobName, string(execution.agentType), run.Spec.ProviderRef, ptrOrEmpty(run.Spec.RuntimeClassName))
-
 		run.Status.JobName = jobName
-		if err := r.Status().Update(ctx, run); err != nil {
+		if err := r.updateStatus(ctx, run); err != nil {
 			return ctrl.Result{}, err
 		}
 	}
@@ -367,10 +376,30 @@ func (r *AgentRunReconciler) updatePhase(ctx context.Context, agentRun *agentv1a
 		agentRun.Status.Conditions = append(agentRun.Status.Conditions, condition)
 	}
 
-	if err := r.Status().Update(ctx, agentRun); err != nil {
+	if err := r.updateStatus(ctx, agentRun); err != nil {
 		return ctrl.Result{}, err
 	}
 	return ctrl.Result{}, nil
+}
+
+func (r *AgentRunReconciler) updateStatus(ctx context.Context, run *agentv1alpha1.AgentRun) error {
+	desired := run.DeepCopy().Status
+	key := client.ObjectKeyFromObject(run)
+	return retry.RetryOnConflict(retry.DefaultRetry, func() error {
+		var current agentv1alpha1.AgentRun
+		if err := r.Get(ctx, key, &current); err != nil {
+			if errors.IsNotFound(err) {
+				return nil
+			}
+			return err
+		}
+		current.Status = desired
+		if err := r.Status().Update(ctx, &current); err != nil {
+			return err
+		}
+		*run = current
+		return nil
+	})
 }
 
 func (r *AgentRunReconciler) SetupWithManager(mgr ctrl.Manager) error {

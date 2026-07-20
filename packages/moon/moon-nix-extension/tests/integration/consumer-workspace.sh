@@ -198,7 +198,7 @@ expect_current_failure() {
 
 log 'checking pinned Moon and standalone fixture configuration'
 run_moon "$evidence/moon-version.log" --version
-assert_contains "$evidence/moon-version.log" 'moon 2.3.5'
+assert_contains "$evidence/moon-version.log" 'moon 2.4.5'
 [[ "$(find "$workspace/.moon/plugins" -maxdepth 1 -type f -printf '%f\n')" == 'moon_nix_extension.wasm' ]] \
   || fail 'the fixture must stage only moon_nix_extension.wasm'
 if rg --quiet '^[[:space:]]*nix:|moon_nix_toolchain|toolchains:[[:space:]]*\[[^]]*nix' \

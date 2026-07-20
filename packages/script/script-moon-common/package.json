@@ -17,6 +17,10 @@
       "types": "./src/executable.ts",
       "default": "./dist/src/executable.js"
     },
+    "./direct-execution": {
+      "types": "./src/direct-execution.ts",
+      "default": "./dist/src/direct-execution.js"
+    },
     "./package-json": {
       "types": "./src/package-json.ts",
       "default": "./dist/src/package-json.js"

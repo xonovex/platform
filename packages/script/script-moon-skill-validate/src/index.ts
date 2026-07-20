@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import {readdirSync, readFileSync} from "node:fs";
 import {basename, dirname, join, resolve} from "node:path";
+import {isDirectExecution} from "@xonovex/script-moon-common/direct-execution";
 import {
   isDirectory,
   isFile,
@@ -603,7 +604,7 @@ const HELP_TEXT = [
   "  -h, --help  show this help message and exit",
 ].join("\n");
 
-const main = (argv: readonly string[]): number => {
+export const main = (argv: readonly string[]): number => {
   if (argv.includes("-h") || argv.includes("--help")) {
     console.log(HELP_TEXT);
     return 0;
@@ -644,4 +645,6 @@ const main = (argv: readonly string[]): number => {
   return renderReport(report, skillPath, skillDir);
 };
 
-process.exit(main(process.argv.slice(2)));
+if (isDirectExecution(import.meta.url, process.argv[1])) {
+  process.exitCode = main(process.argv.slice(2));
+}

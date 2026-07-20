@@ -5,7 +5,10 @@ import (
 	"strings"
 	"testing"
 
+	batchv1 "k8s.io/api/batch/v1"
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
 
@@ -98,3 +101,73 @@ func TestAgentRunReconciler_ResolutionFailureMarksRunFailed(t *testing.T) {
 		})
 	}
 }
+
+func TestReconcilersSkipDeletingResources(t *testing.T) {
+	now := metav1.Now()
+	metadata := metav1.ObjectMeta{
+		Name:              "deleting",
+		Namespace:         "test",
+		DeletionTimestamp: &now,
+		Finalizers:        []string{"test.xonovex.com/hold"},
+	}
+
+	tests := []struct {
+		name       string
+		object     client.Object
+		statusType client.Object
+		reconcile  func(client.Client) reconcileFunc
+	}{
+		{
+			name:       "agent run",
+			object:     &agentv1alpha1.AgentRun{ObjectMeta: metadata},
+			statusType: &agentv1alpha1.AgentRun{},
+			reconcile: func(c client.Client) reconcileFunc {
+				return (&AgentRunReconciler{Client: c}).Reconcile
+			},
+		},
+		{
+			name:       "agent workspace",
+			object:     &agentv1alpha1.AgentWorkspace{ObjectMeta: metadata},
+			statusType: &agentv1alpha1.AgentWorkspace{},
+			reconcile: func(c client.Client) reconcileFunc {
+				return (&AgentWorkspaceReconciler{Client: c}).Reconcile
+			},
+		},
+		{
+			name:       "agent provider",
+			object:     &agentv1alpha1.AgentProvider{ObjectMeta: metadata},
+			statusType: &agentv1alpha1.AgentProvider{},
+			reconcile: func(c client.Client) reconcileFunc {
+				return (&AgentProviderReconciler{Client: c}).Reconcile
+			},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			fakeClient := fake.NewClientBuilder().
+				WithScheme(testutil.NewScheme()).
+				WithStatusSubresource(test.statusType).
+				WithObjects(test.object).
+				Build()
+			request := ctrl.Request{NamespacedName: client.ObjectKeyFromObject(test.object)}
+			if _, err := test.reconcile(fakeClient)(context.Background(), request); err != nil {
+				t.Fatalf("Reconcile() error = %v", err)
+			}
+
+			var pvcs corev1.PersistentVolumeClaimList
+			if err := fakeClient.List(context.Background(), &pvcs, client.InNamespace("test")); err != nil {
+				t.Fatalf("list PVCs: %v", err)
+			}
+			var jobs batchv1.JobList
+			if err := fakeClient.List(context.Background(), &jobs, client.InNamespace("test")); err != nil {
+				t.Fatalf("list Jobs: %v", err)
+			}
+			if len(pvcs.Items) != 0 || len(jobs.Items) != 0 {
+				t.Fatalf("deleting resource created %d PVCs and %d Jobs", len(pvcs.Items), len(jobs.Items))
+			}
+		})
+	}
+}
+
+type reconcileFunc func(context.Context, ctrl.Request) (ctrl.Result, error)

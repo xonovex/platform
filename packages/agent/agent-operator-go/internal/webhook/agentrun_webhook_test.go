@@ -284,6 +284,22 @@ func TestAgentRunWebhook_Validate_BothProviderRefAndInline(t *testing.T) {
 	}
 }
 
+func TestAgentRunWebhook_RejectsUnknownInlineProviderPreset(t *testing.T) {
+	w := sandboxedAgentRunWebhook()
+	run := &agentv1alpha1.AgentRun{
+		Spec: agentv1alpha1.AgentRunSpec{
+			Provider: &agentv1alpha1.ProviderSpec{PresetRef: "not-a-provider"},
+			Workspace: &agentv1alpha1.WorkspaceSpec{
+				Repository: agentv1alpha1.RepositorySpec{URL: "https://github.com/example/repo.git"},
+			},
+		},
+	}
+
+	if _, err := w.ValidateCreate(context.Background(), run); err == nil {
+		t.Fatal("ValidateCreate() error = nil, want unknown-preset error")
+	}
+}
+
 func TestAgentRunWebhook_Validate_BothToolchainRefAndInline(t *testing.T) {
 	w := &AgentRunWebhook{}
 	run := &agentv1alpha1.AgentRun{

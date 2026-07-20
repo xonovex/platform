@@ -2,6 +2,8 @@ package cmd
 
 import (
 	"errors"
+	"os"
+	"path/filepath"
 	"testing"
 
 	netshared "github.com/xonovex/platform/packages/cli/agent-cli-go/internal/network/shared"
@@ -24,9 +26,6 @@ func TestResolveAxes_ProxyFailsClosed(t *testing.T) {
 	}
 }
 
-// TestResolveAxes_DockerRuntimeWiresKernelIsolation confirms the new
-// --isolation-docker-runtime flag makes the kernel-isolation capability reachable
-// (previously the hardcoded empty runtime left it dead).
 func TestResolveAxes_DockerRuntimeWiresKernelIsolation(t *testing.T) {
 	axes, err := resolveAxes(flags{isolation: "docker", isolationDockerRuntime: "runsc"})
 	if err != nil {
@@ -40,8 +39,6 @@ func TestResolveAxes_DockerRuntimeWiresKernelIsolation(t *testing.T) {
 	}
 }
 
-// TestResolveAxes_PinnedComboDefault confirms that requiring a pinned toolchain
-// with no explicit cell selects the bwrap × nix combo.
 func TestResolveAxes_PinnedComboDefault(t *testing.T) {
 	axes, err := resolveAxes(flags{requirePinnedProvision: true})
 	if err != nil {
@@ -49,6 +46,29 @@ func TestResolveAxes_PinnedComboDefault(t *testing.T) {
 	}
 	if axes.IsolationName != "bwrap" || axes.ProvisionName != "nix" {
 		t.Errorf("pinned default = (%s, %s), want (bwrap, nix)", axes.IsolationName, axes.ProvisionName)
+	}
+}
+
+func TestPrepareWorkspaceDryRunDoesNotCreateDirectory(t *testing.T) {
+	repoDir := t.TempDir()
+	target := filepath.Join(repoDir, "worktree")
+	workspace, err := prepareWorkspace(runOptions{
+		worktreeBranch: "feature/dry-run",
+		worktreeDir:    target,
+		vcs:            "git",
+		dryRun:         true,
+	}, repoDir, false)
+	if err != nil {
+		t.Fatalf("prepareWorkspace() error = %v", err)
+	}
+	if workspace.executionDir != repoDir {
+		t.Errorf("executionDir = %q, want source repo %q", workspace.executionDir, repoDir)
+	}
+	if workspace.displayDir != target {
+		t.Errorf("displayDir = %q, want target %q", workspace.displayDir, target)
+	}
+	if _, err := os.Stat(target); !os.IsNotExist(err) {
+		t.Fatalf("dry run created worktree directory %q", target)
 	}
 }
 

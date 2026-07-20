@@ -8,6 +8,30 @@ dependsOn:
   - shared-core-go
   - shared-agent-go
 tasks:
+  go-package-coverage:
+    script: >-
+      bash "$workspaceRoot/.moon/scripts/check-go-package-coverage.sh"
+      ./internal/controller=15
+      ./internal/provision/nix=80
+      ./internal/workspace/git=80
+      ./internal/workspace/jj=80
+      ./internal/harness/claude=80
+      ./internal/harness/opencode=80
+    inputs:
+      - "@globs(sources)"
+      - "@globs(tests)"
+      - /.moon/scripts/check-go-package-coverage.sh
+    options:
+      cache: true
+    toolchain: [system, nix]
+  coverage:
+    command: noop
+    deps:
+      - go-test-coverage
+      - go-package-coverage
+    options:
+      cache: false
+      mergeDeps: replace
   ci-check:
     deps:
       - go-test-integration

@@ -109,6 +109,17 @@ func (w *AgentRunWebhook) validate(ctx context.Context, run *agentv1alpha1.Agent
 			return nil, err
 		}
 	}
+	if run.Spec.Provider != nil {
+		if err := validateProviderConfig(
+			run.Spec.Provider.PresetRef,
+			run.Spec.Provider.AgentType,
+			run.Spec.Provider.AuthSecretRef,
+			run.Spec.Provider.Environment,
+			run.Spec.Provider.CliArgs,
+		); err != nil {
+			return nil, fmt.Errorf("invalid inline provider: %w", err)
+		}
+	}
 
 	// Validate inline workspace repository fields
 	if run.Spec.Workspace != nil {

@@ -9,6 +9,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/tools/events"
+	"k8s.io/client-go/util/retry"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
@@ -35,6 +36,9 @@ func (r *AgentProviderReconciler) Reconcile(ctx context.Context, req ctrl.Reques
 			return ctrl.Result{}, nil
 		}
 		return ctrl.Result{}, err
+	}
+	if !provider.DeletionTimestamp.IsZero() {
+		return ctrl.Result{}, nil
 	}
 
 	// Validate secret reference exists
@@ -87,11 +91,31 @@ func (r *AgentProviderReconciler) Reconcile(ctx context.Context, req ctrl.Reques
 	}
 	provider.Status.Conditions = []metav1.Condition{condition}
 
-	if err := r.Status().Update(ctx, &provider); err != nil {
+	if err := r.updateProviderStatus(ctx, &provider); err != nil {
 		return ctrl.Result{}, err
 	}
 
 	return ctrl.Result{}, nil
+}
+
+func (r *AgentProviderReconciler) updateProviderStatus(ctx context.Context, provider *agentv1alpha1.AgentProvider) error {
+	desired := provider.DeepCopy().Status
+	key := client.ObjectKeyFromObject(provider)
+	return retry.RetryOnConflict(retry.DefaultRetry, func() error {
+		var current agentv1alpha1.AgentProvider
+		if err := r.Get(ctx, key, &current); err != nil {
+			if errors.IsNotFound(err) {
+				return nil
+			}
+			return err
+		}
+		current.Status = desired
+		if err := r.Status().Update(ctx, &current); err != nil {
+			return err
+		}
+		*provider = current
+		return nil
+	})
 }
 
 func (r *AgentProviderReconciler) SetupWithManager(mgr ctrl.Manager) error {

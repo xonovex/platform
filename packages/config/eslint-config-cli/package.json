@@ -49,7 +49,7 @@
   "devDependencies": {
     "@xonovex/eslint-config-base": "0.1.22",
     "@xonovex/ts-config-build": "0.1.22",
-    "@types/node": "^26.0.1"
+    "@types/node": "^26.1.1"
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",

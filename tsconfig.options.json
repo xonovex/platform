@@ -42,10 +42,6 @@
     "strict": true,
 
     /* Vitest */
-    "types": [
-      "@testing-library/jest-dom",
-      "vitest/importMeta",
-      "vitest/globals"
-    ]
+    "types": ["vitest/importMeta", "vitest/globals"]
   }
 }

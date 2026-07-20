@@ -11,6 +11,7 @@ import {
 import {dirname, join, resolve} from "node:path";
 import {parseCliArgs} from "@xonovex/script-moon-common";
 import {boundedBatches} from "@xonovex/script-moon-common/batches";
+import {isDirectExecution} from "@xonovex/script-moon-common/direct-execution";
 import {resolveExecutable} from "@xonovex/script-moon-common/executable";
 import {
   isDirectory,
@@ -50,20 +51,20 @@ interface GenResult {
   readonly error: string | null;
 }
 
-interface AssertionResult {
+export interface AssertionResult {
   readonly text: string;
   readonly passed: boolean;
   readonly evidence: string;
 }
 
-interface GradeSummary {
+export interface GradeSummary {
   readonly passed: number;
   readonly failed: number;
   readonly total: number;
   readonly pass_rate: number;
 }
 
-interface Graded {
+export interface Graded {
   readonly assertion_results: readonly AssertionResult[];
   readonly summary: GradeSummary;
   readonly error: string | null;
@@ -93,7 +94,7 @@ interface RunContext {
   readonly build_prompt: (e: NormalizedEval) => string;
 }
 
-interface MeanBlock {
+export interface MeanBlock {
   mean: number;
   stddev?: number;
 }
@@ -177,7 +178,7 @@ const skillAvailableInObj = (
   return skills.some((skill) => matchSkill(skill, target, short));
 };
 
-const sumTokens = (usage: unknown): number => {
+export const sumTokens = (usage: unknown): number => {
   if (!isRecord(usage)) return 0;
   let total = 0;
   for (const key of TOKEN_KEYS) {
@@ -188,7 +189,7 @@ const sumTokens = (usage: unknown): number => {
   return total;
 };
 
-const extractJson = (text: string): Record<string, unknown> | null => {
+export const extractJson = (text: string): Record<string, unknown> | null => {
   if (!text) return null;
   const fenced = /```(?:json)?\s*(\{[\s\S]*?\})\s*```/.exec(text);
   let candidate: string | null = fenced ? (fenced[1] ?? null) : null;
@@ -213,7 +214,7 @@ interface ProcOutput {
   readonly error: string | null;
 }
 
-const claudeFailureDetail = (stdout: string): string => {
+export const claudeFailureDetail = (stdout: string): string => {
   const lines = stdout.trim().split(/\r?\n/).toReversed();
   for (const line of lines) {
     let value: unknown;
@@ -408,7 +409,7 @@ Return ONLY minified JSON, no markdown fences, one object per assertion in order
 {"assertion_results":[{"text":"<assertion>","passed":true,"evidence":"<quote or reason>"}]}
 `;
 
-const summarize = (
+export const summarize = (
   results: readonly AssertionResult[],
   error: string | null = null,
 ): Graded => {
@@ -578,7 +579,10 @@ const runJob = async (
   };
 };
 
-const meanBlock = (values: readonly number[], runs: number): MeanBlock => {
+export const meanBlock = (
+  values: readonly number[],
+  runs: number,
+): MeanBlock => {
   const block: MeanBlock = {
     mean: values.length > 0 ? round(fmean(values), 3) : 0,
   };
@@ -630,7 +634,7 @@ const skillNameFromSkillMd = (path: string): string | undefined => {
   return name.replaceAll(/^["']|["']$/g, "").trim() || undefined;
 };
 
-const main = async (argv: readonly string[]): Promise<number> => {
+export const main = async (argv: readonly string[]): Promise<number> => {
   const {values, positionals} = parseCliArgs(
     {
       name: "moon-skill-eval-outputs",
@@ -1048,11 +1052,12 @@ const main = async (argv: readonly string[]): Promise<number> => {
   return delta.pass_rate > 0 ? 0 : 1;
 };
 
-try {
-  const code = await main(process.argv.slice(2));
-  process.exit(code);
-} catch (error) {
-  const msg = error instanceof Error ? error.message : String(error);
-  process.stderr.write(`Error: ${msg}\n`);
-  process.exit(2);
+if (isDirectExecution(import.meta.url, process.argv[1])) {
+  try {
+    process.exitCode = await main(process.argv.slice(2));
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : String(error);
+    process.stderr.write(`Error: ${msg}\n`);
+    process.exitCode = 2;
+  }
 }

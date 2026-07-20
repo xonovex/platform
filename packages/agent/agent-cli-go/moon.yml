@@ -29,9 +29,48 @@ tasks:
     inputs:
       - src/**/*.ts
   ts-test:
-    script: echo 'no TypeScript tests'
+    command: [npx, vitest, run]
+    inputs:
+      - src/**/*.ts
+      - vitest.config.ts
+    options:
+      cache: true
+  ts-coverage:
+    script: >-
+      npx vitest run --coverage --coverage.include='src/**'
+      --coverage.thresholds.lines 25
+      --coverage.thresholds.functions 25
+      --coverage.thresholds.branches 25
+      --coverage.thresholds.statements 25
+    inputs:
+      - src/**/*.ts
+      - vitest.config.ts
+    outputs:
+      - coverage
+  go-package-coverage:
+    script: >-
+      bash "$workspaceRoot/.moon/scripts/check-go-package-coverage.sh"
+      ./internal/cmd=35
+      ./internal/config=60
+      ./internal/provision/nix=30
+      ./internal/workspace/git=18
+      ./internal/workspace/jj=35
+    inputs:
+      - "@globs(sources)"
+      - "@globs(tests)"
+      - /.moon/scripts/check-go-package-coverage.sh
+    options:
+      cache: true
+    toolchain: [system, nix]
+  coverage:
+    command: noop
+    deps:
+      - go-test-coverage
+      - go-package-coverage
+      - ts-coverage
     options:
       cache: false
+      mergeDeps: replace
   ci-check:
     script: echo 'ci-check complete'
     deps:
@@ -39,10 +78,12 @@ tasks:
       - lint
       - typecheck
       - test
+      - coverage
       - format-check
       - npm-check
     options:
       cache: false
+      mergeDeps: replace
   ci-publish:
     script: echo 'ci-publish complete'
     deps:

@@ -12,6 +12,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/tools/events"
+	"k8s.io/client-go/util/retry"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
@@ -51,6 +52,9 @@ func (r *AgentWorkspaceReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 			return ctrl.Result{}, nil
 		}
 		return ctrl.Result{}, err
+	}
+	if !ws.DeletionTimestamp.IsZero() {
+		return ctrl.Result{}, nil
 	}
 
 	// Skip if already in terminal phase
@@ -115,13 +119,15 @@ func (r *AgentWorkspaceReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 			return ctrl.Result{}, err
 		}
 
-		if err := r.Create(ctx, job); err != nil && !errors.IsAlreadyExists(err) {
-			log.Error(err, "failed to create workspace init job")
-			return ctrl.Result{}, err
+		if err := r.Create(ctx, job); err != nil {
+			if !errors.IsAlreadyExists(err) {
+				log.Error(err, "failed to create workspace init job")
+				return ctrl.Result{}, err
+			}
+		} else {
+			r.Recorder.Eventf(&ws, nil, corev1.EventTypeNormal, "WorkspaceInitStarted", "WorkspaceInitStarted",
+				"Created init Job %s to clone %s", initJobName, ws.Spec.Repository.URL)
 		}
-
-		r.Recorder.Eventf(&ws, nil, corev1.EventTypeNormal, "WorkspaceInitStarted", "WorkspaceInitStarted",
-			"Created init Job %s to clone %s", initJobName, ws.Spec.Repository.URL)
 
 		ws.Status.InitJobName = initJobName
 		if _, err := r.updateWorkspacePhase(ctx, &ws, agentv1alpha1.AgentWorkspacePhaseInitializing, ""); err != nil {
@@ -172,10 +178,30 @@ func (r *AgentWorkspaceReconciler) updateWorkspacePhase(ctx context.Context, ws 
 		ws.Status.Conditions = append(ws.Status.Conditions, condition)
 	}
 
-	if err := r.Status().Update(ctx, ws); err != nil {
+	if err := r.updateWorkspaceStatus(ctx, ws); err != nil {
 		return ctrl.Result{}, err
 	}
 	return ctrl.Result{}, nil
+}
+
+func (r *AgentWorkspaceReconciler) updateWorkspaceStatus(ctx context.Context, workspace *agentv1alpha1.AgentWorkspace) error {
+	desired := workspace.DeepCopy().Status
+	key := client.ObjectKeyFromObject(workspace)
+	return retry.RetryOnConflict(retry.DefaultRetry, func() error {
+		var current agentv1alpha1.AgentWorkspace
+		if err := r.Get(ctx, key, &current); err != nil {
+			if errors.IsNotFound(err) {
+				return nil
+			}
+			return err
+		}
+		current.Status = desired
+		if err := r.Status().Update(ctx, &current); err != nil {
+			return err
+		}
+		*workspace = current
+		return nil
+	})
 }
 
 func (r *AgentWorkspaceReconciler) SetupWithManager(mgr ctrl.Manager) error {

@@ -4,6 +4,7 @@ import {mkdirSync, readFileSync, rmSync, writeFileSync} from "node:fs";
 import {dirname, join, resolve} from "node:path";
 import {createInterface} from "node:readline";
 import {boundedBatches} from "@xonovex/script-moon-common/batches";
+import {isDirectExecution} from "@xonovex/script-moon-common/direct-execution";
 import {resolveExecutable} from "@xonovex/script-moon-common/executable";
 import {
   isDirectory,
@@ -413,7 +414,7 @@ const parseCli = (argv: readonly string[]): ParsedCli => {
   };
 };
 
-const main = async (argv: readonly string[]): Promise<number> => {
+export const main = async (argv: readonly string[]): Promise<number> => {
   const cli = parseCli(argv);
 
   if (cli.positionals.length > 3) {
@@ -672,10 +673,12 @@ const main = async (argv: readonly string[]): Promise<number> => {
   return failed === 0 ? 0 : 1;
 };
 
-try {
-  process.exitCode = await main(process.argv.slice(2));
-} catch (error: unknown) {
-  const detail = error instanceof Error ? error.message : String(error);
-  process.stderr.write(`Error: ${detail}\n`);
-  process.exitCode = 2;
+if (isDirectExecution(import.meta.url, process.argv[1])) {
+  try {
+    process.exitCode = await main(process.argv.slice(2));
+  } catch (error: unknown) {
+    const detail = error instanceof Error ? error.message : String(error);
+    process.stderr.write(`Error: ${detail}\n`);
+    process.exitCode = 2;
+  }
 }
