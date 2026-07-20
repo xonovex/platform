@@ -1,5 +1,5 @@
 ---
-description: Discover a problem or opportunity without forcing one method, provider, executor, or artifact shape
+description: Discover a problem or opportunity without forcing one method, provider, or artifact shape
 allowed-tools:
   - Read
   - Write
@@ -10,7 +10,7 @@ allowed-tools:
   - Task
   - AskUserQuestion
   - Skill
-argument-hint: "<subject-or-native-reference> [--profile <reference>] [--provider <selection>] [--method <selection>] [--executor <class>]"
+argument-hint: "<subject-or-native-reference> [--profile <reference>] [--provider <selection>] [--method <selection>]"
 ---
 
 # /xonovex-workflow:discovery-run — Run Discovery
@@ -18,8 +18,7 @@ argument-hint: "<subject-or-native-reference> [--profile <reference>] [--provide
 ## Arguments
 
 - `subject-or-native-reference` (required): Problem, opportunity, scope, or opaque native input reference.
-- `--profile`, `--provider`, `--method` (optional): Explicit independent axis selections; otherwise use profile/environment resolution.
-- `--executor` (optional): Explicit `deterministic`, `model`, `agent`, `human`, or `external` workflow selection; it does not imply controls or maturity.
+- `--profile`, `--provider`, `--method` (optional): Explicit selections; otherwise use profile/environment resolution.
 
 ## Delegation
 

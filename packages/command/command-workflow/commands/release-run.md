@@ -22,6 +22,5 @@ argument-hint: "<execute|verify|rollback|recover> <integrated-reference> [--revi
 
 ## Delegation
 
-Perform **release-run** with the selected automation/provider skill. If the caller
-supplied a composition, pass it unchanged to the shared workflow runtime. Do not infer
-approval or maturity from the host or executor.
+Perform **release-run** with the selected automation/provider skill and its native
+authorization mechanism.

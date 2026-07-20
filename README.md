@@ -17,23 +17,6 @@ The included skills are token-efficient, harness-neutral, and based on current r
 - **[moon-nix-toolchain](packages/moon/moon-nix-toolchain/)** wraps every Moon task in the repository's Nix flake dev shell, giving reproducible flake-pinned toolchains in local runs, pre-commit hooks, and CI
 - **[Skills](packages/skill/)** give agents coding guidelines they follow automatically; plan-driven development with worktrees, project-instruction management, insight extraction, and skill authoring all live here as consolidated skill packages
 
-## Composable Workflows
-
-An executable workflow composition selects six dimensions independently:
-
-- trigger;
-- executor;
-- host;
-- zero or more controls;
-- zero or more evidence sinks;
-- an optional caller-defined maturity assessment.
-
-Installing a plugin selects none of these dimensions. Manual invocation, harness hooks,
-CI/CD, schedules, and webhooks are interchangeable trigger adapters. Controls explicitly
-choose `observe` or `enforce`, while A1/A2/A3 labels have no built-in execution behavior.
-See the [runtime package](packages/shared/shared-workflow-runtime/) and
-[workflow command documentation](packages/command/command-workflow/README.md).
-
 ## Quick Start
 
 ### Agent CLI

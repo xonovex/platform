@@ -126,13 +126,6 @@ Read it there:
 - **Qualified human review inside accessibility evidence** — scanners and agents supply evidence but
   never accountable conformance by themselves.
 
-## Executors, controls, and maturity
-
-`--executor` selects who performs the design or assessment; it does not add review or
-approval. Select each control explicitly and choose `observe` or `enforce`. A maturity
-label such as A1/A2/A3 may summarize capabilities, but it never changes the executor or
-control selection.
-
 ## What you can skip
 
 - **The whole `experience-design-*` family** — it is optional. Skip it for anything without a real
@@ -147,7 +140,6 @@ control selection.
 ## See also
 
 - [README](../README.md) — the full command table
-- [Adoption map](adoption-map.md) — compose what you need, from guideline skills to enforced pipelines
 - [Developer Quickstart](developer-quickstart.md) — the sibling lens, and the jargon decoder
 - [PM Quickstart](pm-quickstart.md) · [QA Quickstart](qa-quickstart.md) — the
   other lenses

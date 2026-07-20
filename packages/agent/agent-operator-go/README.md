@@ -43,7 +43,7 @@ spec:
 
 An `AgentRun` can be created manually, from an `AgentSchedule`, or by an authenticated `AgentTrigger` request. The operator records trigger origin annotations but executes the same immutable run specification for every source.
 
-The operator is an execution host. It does not define workflow controls, maturity levels, approvals, provenance journals, policy verdicts, or escalation behavior. Compose those independently in the workflow runtime or another control plane, then submit the resulting run to Kubernetes.
+The operator executes the submitted run specification. Any additional approval, policy, evidence, or escalation requirements belong to the caller or the native platform that submits the run.
 
 `AgentPolicy` is optional. Without one, admission still requires a digest-pinned execution image and an explicit runtime class but does not require that runtime class to appear in an operator-owned allowlist. When one namespace policy exists, only its declared defaults and constraints are applied.
 #### Full spec reference

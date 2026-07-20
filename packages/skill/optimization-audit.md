@@ -7,7 +7,7 @@ Commits: `6af54791` (trim), `b67816f5` (restore).
 
 ## 2026-07-19 catalog follow-up
 
-- Current catalog: **90 skills**, **25,825** `SKILL.md` + `references/` lines, **356 output evals**, and **1,582 trigger queries**.
+- Current catalog: **90 skills**, **25,194** `SKILL.md` + `references/` lines, **356 output evals**, and **1,582 trigger queries**.
 - Tiers: 25 aggressive, 41 moderate, 24 conservative.
 - Every skill now has `evals.json`, at least 8 positive plus 8 sibling-aware negative trigger queries with train/validation splits, and reviewed source provenance.
 - The 16 post-baseline skills below are all moderate-tier. The catalog-wide local-plugin A/B suite is defined in `.github/workflows/skill-evals.yml`: monthly when `SKILL_EVALS_ENABLED=true`, manually, or for changed skills on enabled internal pull requests. Scheduled/manual runs select all 90 skills; pull requests select directly changed skills, while shared evaluator changes select the full catalog. Trigger validation runs each query three times. Output evaluation runs every probe once per arm in batches of at most six, with Haiku generation, Sonnet judging, a $0.10/six-turn generation cap, and a $0.10/one-turn judge cap. The runner independently refuses more than 24 total model calls per batch, more than two concurrent calls, higher spend caps, or more than three runs per arm. Generation exposes only `Skill,Read` or `Read`; judging exposes no tools; settings and MCP discovery are disabled; minimal fixed system prompts replace the general coding context; calls are never retried automatically, and failed generations are not judged.

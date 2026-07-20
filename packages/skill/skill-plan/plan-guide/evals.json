@@ -47,7 +47,7 @@
       "prompt": "Research whether our support assistant can process EU customer transcripts. Separate evidence from synthesis, state confidence, and account for privacy and regulated applicability.",
       "assertions": [
         "Separates cited evidence and provenance from synthesized findings, limitations, uncertainty, and open questions",
-        "Records applicable data-access, external-research, privacy, and regulated constraints without selecting a policy engine, hook, or runtime control"
+        "Records applicable data-access, external-research, privacy, and regulated constraints"
       ]
     },
     {

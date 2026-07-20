@@ -17,10 +17,9 @@ argument-hint: "<accepted-reference> [--revision <native-revision>] --target <na
 - `--revision` (optional): Exact accepted source revision.
 - `--target` (required): Protected target and current provider-native revision.
 - `--authorization` (required): Exact Acceptance or other authorization reference.
-- `--profile`, `--provider` (optional): Workflow profile and native enforcement/provider selection.
+- `--profile`, `--provider` (optional): Validation profile and target-provider selection.
 
 ## Delegation
 
-Perform **integration-validate** with the selected target-provider skill. If a composition
-is supplied, explain its selected controls separately. This operation is read-only and
-cannot mutate or reserve the target.
+Perform **integration-validate** with the selected target-provider skill. This operation
+is read-only and cannot mutate or reserve the target.

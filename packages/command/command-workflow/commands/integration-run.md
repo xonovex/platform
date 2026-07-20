@@ -23,6 +23,4 @@ argument-hint: "<accepted-reference> [--revision <native-revision>] --target <na
 ## Delegation
 
 Perform **integration-run** using the selected provider's native target-changing
-capability. If the caller supplied a composition, pass it unchanged to the shared
-workflow runtime. The command does not add an approval, policy engine, hook, or maturity
-requirement.
+capability and authorization mechanism.

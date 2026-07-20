@@ -1,5 +1,5 @@
 ---
-description: Execute exact Planning assignments with the least-adaptive suitable executors and publish independent Development results
+description: Execute exact Planning assignments and publish independent Development results
 allowed-tools:
   - Read
   - Write
@@ -12,7 +12,7 @@ allowed-tools:
   - TaskUpdate
   - AskUserQuestion
   - Skill
-argument-hint: "<planning-reference...> [--revision <native-revision>] [--profile <reference>] [--workspace <selection>] [--executor <class>] [--max-concurrency <count>]"
+argument-hint: "<planning-reference...> [--revision <native-revision>] [--profile <reference>] [--workspace <selection>] [--max-concurrency <count>]"
 ---
 
 # /xonovex-workflow:develop-run — Run Development
@@ -21,8 +21,7 @@ argument-hint: "<planning-reference...> [--revision <native-revision>] [--profil
 
 - `planning-reference...` (required): One or more opaque child Planning references.
 - `--revision` (repeatable): Exact native Planning revision corresponding to each reference.
-- `--profile`, `--workspace` (optional): Independent profile or workspace-provider selections.
-- `--executor` (optional): Explicit `deterministic`, `model`, `agent`, `human`, or `external` workflow selection; it does not imply controls or maturity.
+- `--profile`, `--workspace` (optional): Profile or workspace-provider selections.
 - `--max-concurrency` (optional): Bound ready assignments; the profile/provider limit remains authoritative when lower.
 
 ## Delegation

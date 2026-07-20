@@ -22,6 +22,5 @@ argument-hint: "<plan|execute|verify|rollback> <subject-reference...> [--revisio
 
 ## Delegation
 
-Perform **retirement-run** with the selected resource/provider skills. If the caller
-supplied a composition, pass it unchanged to the shared workflow runtime. Missing local
-state or a successful request is not verification.
+Perform **retirement-run** with the selected resource/provider skills. Missing local state
+or a successful request is not verification.

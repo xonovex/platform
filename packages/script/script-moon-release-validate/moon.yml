@@ -39,11 +39,8 @@ tasks:
       - /.github/workflows/release.yml
       - /.claude-plugin/marketplace.json
       - /.agents/plugins/marketplace.json
-      - /plans/composable-workflow-phases.md
-      - /plans/composable-workflow-phases/**/*
       - /packages/command/*/package.json
       - /packages/skill/*/package.json
-      - /packages/diagram/diagram-agent-workflow/*
     options:
       runFromWorkspaceRoot: true
   ci-check:

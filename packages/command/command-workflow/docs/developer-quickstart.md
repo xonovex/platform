@@ -99,8 +99,8 @@ Key rules:
 /xonovex-workflow:develop-consolidate <dev-ref...> --target-workspace <ref>
 ```
 
-`develop-run` executes planned assignments and publishes one Development result each, picking the
-least-adaptive suitable executor; `develop-consolidate` merges parallel results into one
+`develop-run` executes planned assignments and publishes one Development result each;
+`develop-consolidate` merges parallel results into one
 workspace and re-runs the full validation. Use this track only when you fanned out parallel work;
 otherwise `plan-continue` is simpler. `develop-abandon` cleanly stops an assignment you're giving
 up, preserving the partial work and reason.
@@ -173,9 +173,6 @@ Integration is split the same way, and re-checks every binding at a non-bypassab
 enforcement point; ordinary tool access is not authorization. When something breaks:
 `incident-run → corrective-action-run`. `retirement-run` decommissions resources much later.
 
-The `workflow-inspect` and `workflow-conformance` commands are out-of-band diagnostics you
-can run at any time.
-
 ## Jargon decoder
 
 The command help is written abstractly so it can back any storage backend. Translated:
@@ -187,14 +184,11 @@ The command help is written abstractly so it can back any storage backend. Trans
 | provider         | the storage backend for results, chosen by the profile (not hardcoded); commonly a local Markdown file under `plans/`. Git is optional and a separate workspace concern |
 | `--profile`      | a preset deciding which stages are required vs optional and which policies apply                                                                                        |
 | `--method`       | the technique (user stories, BDD, example mapping, …); `neutral` is always the default                                                                                  |
-| `--executor`     | who does the work — `deterministic`, `model`, `agent`, `human`, or `external`; controls and maturity remain separate selections                                         |
 
 ## See also
 
 - [README](../README.md) — the full command table
-- [Adoption map](adoption-map.md) — compose trigger, executor, host, controls, evidence, and maturity independently
 - [PM Quickstart](pm-quickstart.md) · [QA Quickstart](qa-quickstart.md) ·
   [UX Quickstart](ux-quickstart.md) — the same actor-neutral commands read from the other seats
-- [Architecture and composition](architecture-and-composition.md) — the plugin-runtime model
 - [`plan-guide`](../../../skill/skill-plan/plan-guide/SKILL.md) — planning behavior used by
   the early-lifecycle commands

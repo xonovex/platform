@@ -2,7 +2,6 @@ $schema: https://moonrepo.dev/schemas/project.json
 language: unknown
 tags: [command]
 dependsOn:
-  - shared-workflow-runtime
   - skill-code-quality
   - skill-code-review
   - skill-plan

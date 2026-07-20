@@ -66,25 +66,6 @@ for (const documentationFile of documentationFiles) {
   }
 }
 
-const validationGuide = read(
-  resolve(packageDirectory, "docs/validation-and-traceability.md"),
-);
-for (const matrixTerm of [
-  "Workflow contracts",
-  "Composition runtime",
-  "Executor adapters",
-  "Trigger adapters",
-  "Evidence sinks",
-  "Maturity",
-  "Kubernetes host",
-  "Documentation and release",
-]) {
-  check(
-    validationGuide.includes(matrixTerm),
-    `validation matrix covers ${matrixTerm}`,
-  );
-}
-
 const publishedMarkdown = documentationFiles.map(read).join("\n");
 const forbiddenClaims = [
   /all harnesses (?:have|support|provide)/i,

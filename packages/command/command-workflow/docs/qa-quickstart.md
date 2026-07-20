@@ -140,17 +140,9 @@ capability owns its freshness rules.
 - **`acceptance-decide`** — never yours to shortcut, and never satisfied by your evidence alone. You
   assemble; an authenticated accountable human signs. It rejects a script, model, agent, unqualified
   actor, self-reviewer where independence is required, or copied provider identity.
-- **The independence requirement itself** — where a profile requires it, no maturity label relaxes it,
-  and a self-review does not satisfy it.
+- **The independence requirement itself** — where a profile requires it, a self-review does not satisfy it.
 - **Accountable disposition** — a human or qualified assessor records identity, role, qualification,
   independence, and scope. Scanners, CI, and agents supply evidence, never the disposition.
-
-## Executors, controls, and maturity
-
-`--executor` selects who performs the assessment; it does not select independence,
-critique, or approval controls. Add each wanted control explicitly and choose `observe` or
-`enforce`. A team may define A1/A2/A3 from capabilities such as critique and approval, but
-those labels are descriptive and do not alter execution.
 
 ## What you can skip
 
@@ -164,10 +156,8 @@ those labels are descriptive and do not alter execution.
 ## See also
 
 - [README](../README.md) — the full command table
-- [Adoption map](adoption-map.md) — compose what you need, from guideline skills to enforced pipelines
 - [Developer Quickstart](developer-quickstart.md) — the sibling lens, and the jargon decoder
 - [PM Quickstart](pm-quickstart.md) · [UX Quickstart](ux-quickstart.md) — the
   other lenses
-- [Validation and traceability](validation-and-traceability.md) — the evidence chain end to end
 - [`code-review-guide`](../../../skill/skill-code-review/code-review-guide/SKILL.md) and
   [`testing-guide`](../../../skill/skill-testing/testing-guide/SKILL.md) — the craft each command loads

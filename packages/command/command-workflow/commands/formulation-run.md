@@ -10,7 +10,7 @@ allowed-tools:
   - Task
   - AskUserQuestion
   - Skill
-argument-hint: "<subject-or-native-reference> [--profile <reference>] [--provider <selection>] [--method <selection>] [--executor <class>]"
+argument-hint: "<subject-or-native-reference> [--profile <reference>] [--provider <selection>] [--method <selection>]"
 ---
 
 # /xonovex-workflow:formulation-run — Run Formulation
@@ -18,8 +18,7 @@ argument-hint: "<subject-or-native-reference> [--profile <reference>] [--provide
 ## Arguments
 
 - `subject-or-native-reference` (required): Discovery/Research input, subject, or opaque native reference.
-- `--profile`, `--provider`, `--method` (optional): Independent axis selections; neutral is the default method.
-- `--executor` (optional): Explicit `deterministic`, `model`, `agent`, `human`, or `external` workflow selection; it does not imply controls or maturity.
+- `--profile`, `--provider`, `--method` (optional): Explicit selections; neutral is the default method.
 
 ## Delegation
 

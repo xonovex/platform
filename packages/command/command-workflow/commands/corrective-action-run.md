@@ -23,6 +23,4 @@ argument-hint: "<plan|execute|verify|close> <source-reference> [--revision <nati
 ## Delegation
 
 Perform **corrective-action-run** with selected root-cause, verification, provider, and
-domain skills. Resolve any caller-selected executable composition independently; the
-command does not add a control or maturity requirement. Closure requires the evidence
-selected by the caller.
+domain skills. Closure requires the evidence selected by the caller.

@@ -58,9 +58,6 @@
     },
     {
       "path": "./packages/shared/shared-core"
-    },
-    {
-      "path": "./packages/shared/shared-workflow-runtime"
     }
   ]
 }

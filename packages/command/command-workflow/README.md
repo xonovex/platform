@@ -1,11 +1,7 @@
-# Composable Workflow Commands
+# Lifecycle Workflow Commands
 
 Independently invocable commands for discovery through retirement. Each command owns its
-operation and selects only the methods, providers, workspaces, and executable composition
-needed for that invocation.
-
-Controls are optional plugins around an executor. Installing this command plugin does not
-activate a hook, control, evidence sink, maturity model, or host policy.
+operation and loads only the guideline skills needed for that invocation.
 
 ## Guides
 
@@ -16,15 +12,6 @@ title. Each names the subset one perspective runs and the gates it answers for:
 - [PM quickstart](docs/pm-quickstart.md) — [diagram](../../diagram/diagram-agent-workflow/pm-workflow.png)
 - [QA quickstart](docs/qa-quickstart.md) — [diagram](../../diagram/diagram-agent-workflow/qa-workflow.png)
 - [UX quickstart](docs/ux-quickstart.md) — [diagram](../../diagram/diagram-agent-workflow/ux-workflow.png)
-
-Reference guides:
-
-- [Adoption map](docs/adoption-map.md) — select trigger, executor, host, controls, evidence, and maturity independently
-- [Architecture and composition](docs/architecture-and-composition.md)
-- [Harness capabilities and onboarding](docs/harness-capabilities.md)
-- [External platform onboarding](docs/platform-onboarding.md)
-- [Security and policy enforcement](docs/security-and-policy.md)
-- [Validation and traceability](docs/validation-and-traceability.md)
 
 ## Installation
 
@@ -44,9 +31,8 @@ codex plugin add xonovex-workflow@xonovex-marketplace
 
 ## Dependencies
 
-Commands load their owning guideline skills at runtime. Plugin dependencies make planning,
-portable result handoffs, runtime composition, review, and testing capabilities available;
-no command must use every capability, and installation selects none of them.
+Commands explicitly load their owning guideline skills. Plugin dependencies make planning,
+review, code-quality, and testing guidance available; no command must use every capability.
 
 Methods and native adapters are soft dependencies selected per operation. User stories,
 BDD, example mapping, user research, accessibility, architecture, Git/worktrees, GitHub,
@@ -63,7 +49,7 @@ Discovery -> Research -> Formulation -> optional Experience Design / Solution De
 
 Each capability publishes its own provider-native result and opaque reference. Critique,
 revision, and authority-bound acceptance remain independent operations. Fresh-context
-resume resolves native references; conversation and runtime traces are not persistent
+resume resolves native references; conversation and execution traces are not persistent
 identity.
 
 | Command                                             | Description                                                                                 |
@@ -74,7 +60,6 @@ identity.
 | `experience-design-{create,critique,revise,accept}` | Manage an optional Experience Design result at exact revisions                              |
 | `solution-design-{create,critique,revise,accept}`   | Manage an optional Solution Design result at exact revisions                                |
 | `decision-{create,critique,revise,accept}`          | Keep evidence, recommendation, authority, and supersession separate                         |
-| `workflow-onboard-advise`                           | Recommend a minimal trigger/executor/control/evidence composition without applying          |
 
 ## Planning and execution
 
@@ -94,7 +79,7 @@ identity.
 
 | Command               | Description                                                                  |
 | --------------------- | ---------------------------------------------------------------------------- |
-| `develop-run`         | Execute exact Planning assignments with least-adaptive suitable executors    |
+| `develop-run`         | Execute exact Planning assignments and publish independent results           |
 | `develop-consolidate` | Combine exact Development results without claiming Acceptance or Integration |
 | `develop-abandon`     | Preserve partial Development state, evidence, reason, cleanup, and retry     |
 | `deliver-publish`     | Publish a provider-native reviewable candidate at an immutable revision      |
@@ -131,7 +116,7 @@ expiry bindings at a non-bypassable external enforcement point. Ordinary tool ac
 not authorization. Exceptions and emergency exceptions remain scoped, expiring, compensated,
 notified, revoked, and reviewed.
 
-## Delivery and composition
+## Delivery
 
 | Command                                        | Description                                                                 |
 | ---------------------------------------------- | --------------------------------------------------------------------------- |
@@ -139,29 +124,9 @@ notified, revoked, and reviewed.
 | `plan-worktree-{create,merge,abandon,cleanup}` | Optional Git-worktree workspace operations                                  |
 | `pr-create`                                    | Open a provider-native pull/merge request through the detected host adapter |
 | `pr-review-{analyze,refine,post,resolve}`      | Produce, refine, publish, and resolve review findings                       |
-| `workflow-inspect`                             | Explain selected plugins, capability gates, and enforcement points          |
-| `workflow-conformance`                         | Validate a result/provider handoff or executable composition                |
-| `workflow-onboard-advise`                      | Recommend a minimal composition without installing or enabling it           |
 
 ## Design decisions
 
-- Commands use the small result/provider contract only when portable handoffs are selected.
+- Commands delegate their procedures to declared guideline skills.
 - Neutral methods are available without story/Gherkin skills; specialist methods remain selectable.
-- Deterministic collection is preferred, model synthesis is bounded, agents are reserved for adaptive exploration, and human/qualified authority is never fabricated.
 - Local files, Git repositories, hosted trackers, and databases are peers selected by context; none is the universal fallback.
-- Trigger, executor, host, controls, evidence, and maturity are independent dimensions.
-- Controls default to absent. Every selected control states `observe` or `enforce`; every selected evidence sink states `ignore` or `fail`.
-- A1/A2/A3 have no built-in execution semantics. A caller may derive those labels from its own capability model.
-
-[View workflow diagram](../../diagram/diagram-agent-workflow/workflow-diagram.png)
-
-[View target architecture](../../diagram/diagram-agent-workflow/target-architecture.png)
-
-[View adoption map](../../diagram/diagram-agent-workflow/adoption-map.png) — independent composition dimensions;
-[docs/adoption-map.md](docs/adoption-map.md) is the companion guide.
-
-[View enforcement types](../../diagram/diagram-agent-workflow/enforcement-types.png) — one policy decision reaching
-three independent enforcement types, each with its own evidence.
-
-[View variation axes](../../diagram/diagram-agent-workflow/variation-axes.png) — every independent choice in the
-platform, grouped by owner; no edges between axes is the point.

@@ -114,13 +114,6 @@ Four commands wait for an accountable actor, and nothing advances past them on a
 `--authority-reference` is a claim to be verified, not a credential: actor, qualification, scope, and
 freshness are checked before the decision binds to the revision.
 
-## Executors, controls, and maturity
-
-`--executor` selects who performs the operation; it does not select controls. If approval,
-critique, escalation, or another decision concern is wanted, select that control explicitly
-as `observe` or `enforce`. A1/A2/A3 are optional caller-defined reports over capabilities
-and never change who executes or which gates apply.
-
 ## What you can skip
 
 - **`discovery-run` / `research-run`** — for a well-understood ask you can state in a sentence.
@@ -135,7 +128,6 @@ and never change who executes or which gates apply.
 ## See also
 
 - [README](../README.md) — the full command table
-- [Adoption map](adoption-map.md) — compose what you need, from guideline skills to enforced pipelines
 - [Developer Quickstart](developer-quickstart.md) — the sibling lens, and the jargon decoder
 - [QA Quickstart](qa-quickstart.md) · [UX Quickstart](ux-quickstart.md) — the other lenses
 - [`plan-guide`](../../../skill/skill-plan/plan-guide/SKILL.md) and the selected provider

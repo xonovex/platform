@@ -9,55 +9,10 @@ tasks:
   graph-build:
     command: noop
     deps:
-      - graph-build-workflow
-      - graph-build-target
-      - graph-build-adoption
-      - graph-build-enforcement
-      - graph-build-axes
       - graph-build-developer
       - graph-build-pm
       - graph-build-qa
       - graph-build-ux
-  graph-build-workflow:
-    command: dot -Tpng -o workflow-diagram.png workflow-diagram.dot
-    inputs:
-      - workflow-diagram.dot
-    outputs:
-      - workflow-diagram.png
-    options:
-      cache: true
-  graph-build-target:
-    command: dot -Tpng -o target-architecture.png target-architecture.dot
-    inputs:
-      - target-architecture.dot
-    outputs:
-      - target-architecture.png
-    options:
-      cache: true
-  graph-build-adoption:
-    command: dot -Tpng -o adoption-map.png adoption-map.dot
-    inputs:
-      - adoption-map.dot
-    outputs:
-      - adoption-map.png
-    options:
-      cache: true
-  graph-build-enforcement:
-    command: dot -Tpng -o enforcement-types.png enforcement-types.dot
-    inputs:
-      - enforcement-types.dot
-    outputs:
-      - enforcement-types.png
-    options:
-      cache: true
-  graph-build-axes:
-    command: dot -Tpng -o variation-axes.png variation-axes.dot
-    inputs:
-      - variation-axes.dot
-    outputs:
-      - variation-axes.png
-    options:
-      cache: true
   graph-build-developer:
     command: dot -Tpng -o developer-workflow.png developer-workflow.dot
     inputs:

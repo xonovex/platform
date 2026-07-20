@@ -3,7 +3,6 @@
   "version": "6.1.0",
   "private": true,
   "dependencies": {
-    "@xonovex/workflow-runtime": "0.1.22",
     "@xonovex/skill-code-quality": "6.1.0",
     "@xonovex/skill-code-review": "6.1.0",
     "@xonovex/skill-plan": "6.1.0",

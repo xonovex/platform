@@ -16,7 +16,7 @@
     {
       "name": "xonovex-workflow",
       "source": "./packages/command/command-workflow",
-      "description": "Xonovex composable lifecycle, delivery, and runtime commands"
+      "description": "Xonovex lifecycle, planning, delivery, and review commands"
     },
     {
       "name": "xonovex-skill-accessibility",

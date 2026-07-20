@@ -9,7 +9,7 @@ allowed-tools:
   - Task
   - AskUserQuestion
   - Skill
-argument-hint: "<subject-reference> [--revision <native-revision>] --criteria <reference> [--profile <reference>] [--provider <selection>] [--executor <class>]"
+argument-hint: "<subject-reference> [--revision <native-revision>] --criteria <reference> [--profile <reference>] [--provider <selection>]"
 ---
 
 # /xonovex-workflow:assessment-run — Run an Assessment
@@ -19,8 +19,7 @@ argument-hint: "<subject-reference> [--revision <native-revision>] --criteria <r
 - `subject-reference` (required): Opaque reference to the subject being assessed.
 - `--revision` (optional): Exact native subject revision.
 - `--criteria` (required): Pinned framework, policy, risk, security, accessibility, AI, supply-chain, privacy, legal, or other criterion set.
-- `--profile`, `--provider` (optional): Independent selections.
-- `--executor` (optional): Explicit `deterministic`, `model`, `agent`, `human`, or `external` workflow selection; it does not imply controls or maturity.
+- `--profile`, `--provider` (optional): Assessment context and result provider.
 
 ## Delegation
 

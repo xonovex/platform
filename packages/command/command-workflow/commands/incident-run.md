@@ -24,7 +24,5 @@ argument-hint: "<declare|update|contain|recover|close> [incident-reference] [--s
 ## Delegation
 
 Perform **incident-run** with selected incident, monitoring, security, privacy, legal,
-resilience, and provider skills. If the caller supplied an executable composition, pass
-it unchanged to the shared workflow runtime. Do not infer controls or maturity from
-incident severity, the executor, or an operator-hosted run. Agents cannot fabricate
-reporting applicability, accountable decisions, or notifications.
+resilience, and provider skills. Agents cannot fabricate reporting applicability,
+accountable decisions, or notifications.

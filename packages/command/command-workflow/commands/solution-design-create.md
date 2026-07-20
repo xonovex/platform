@@ -9,7 +9,7 @@ allowed-tools:
   - Task
   - AskUserQuestion
   - Skill
-argument-hint: "<subject-or-native-reference> [--profile <reference>] [--provider <selection>] [--method <selection>] [--executor <class>]"
+argument-hint: "<subject-or-native-reference> [--profile <reference>] [--provider <selection>] [--method <selection>]"
 ---
 
 # /xonovex-workflow:solution-design-create — Create Solution Design
@@ -17,8 +17,7 @@ argument-hint: "<subject-or-native-reference> [--profile <reference>] [--provide
 ## Arguments
 
 - `subject-or-native-reference` (required): Subject or opaque lifecycle input reference.
-- `--profile`, `--provider`, `--method` (optional): Independent selections.
-- `--executor` (optional): Explicit `deterministic`, `model`, `agent`, `human`, or `external` workflow selection; it does not imply controls or maturity.
+- `--profile`, `--provider`, `--method` (optional): Explicit selections.
 
 ## Delegation
 

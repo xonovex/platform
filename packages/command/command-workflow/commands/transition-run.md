@@ -21,6 +21,5 @@ argument-hint: "<plan|execute|verify|rollback> --source <native-reference> --tar
 
 ## Delegation
 
-Perform **transition-run** with the selected provider skill. If the caller supplied a
-composition, pass it unchanged to the shared workflow runtime. The command does not
-derive controls from the target, executor, or host.
+Perform **transition-run** with the selected provider skill and its native authorization
+mechanism.
