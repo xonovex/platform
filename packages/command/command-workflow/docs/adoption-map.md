@@ -1,13 +1,13 @@
 # Adoption Map
 
-Adopt only the dimensions needed by one workflow. There is no required governance stack
+Adopt only the dimensions needed by one workflow. There is no required control stack
 and no maturity level that enables behavior.
 
-| Dimension | Examples                                                     | Required by the kernel                 |
+| Dimension | Examples                                                     | Required by the runtime                |
 | --------- | ------------------------------------------------------------ | -------------------------------------- |
 | Trigger   | Manual command, harness hook, CI/CD hook, schedule, webhook  | An invocation, not a particular origin |
 | Executor  | Script, script plus LLM, agent plus workflow skill           | Exactly one registered plugin          |
-| Host      | Local process, agent harness, CI runner, Kubernetes operator | No; the host is outside the kernel     |
+| Host      | Local process, agent harness, CI runner, Kubernetes operator | No; the host is outside the runtime    |
 | Controls  | Approval, budget, protected target, critique, escalation     | No; select zero or more                |
 | Evidence  | JSONL, provider event, audit service                         | No; select zero or more                |
 | Maturity  | A1/A2/A3 or an organization-specific model                   | No; derived after composition          |

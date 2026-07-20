@@ -22,7 +22,6 @@ argument-hint: "<execute|verify|rollback|recover> <integrated-reference> [--revi
 
 ## Delegation
 
-Load `workflow-guide` and perform **release-run** with the selected automation/provider
-skill. If the caller supplied a composition, load `agent-governance-guide` and apply only
-its selected control modes and evidence behavior. Do not infer approval or maturity from
-the host or executor.
+Perform **release-run** with the selected automation/provider skill. If the caller
+supplied a composition, pass it unchanged to the shared workflow runtime. Do not infer
+approval or maturity from the host or executor.

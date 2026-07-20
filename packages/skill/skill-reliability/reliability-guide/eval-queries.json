@@ -78,20 +78,20 @@
     "split": "validation"
   },
   {
-    "query": "validate this PlanningResult and its provider-native handoff without forcing it into a YAML schema",
-    "rationale": "near miss owned by workflow-guide",
+    "query": "write a Kubernetes HorizontalPodAutoscaler manifest for a deployment",
+    "rationale": "near miss owned by kubernetes-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "our Discover stage groups discovery and formulation; can the profile still publish them separately?",
-    "rationale": "near miss owned by workflow-guide",
+    "query": "configure Datadog log retention and regional data residency",
+    "rationale": "near miss owned by datadog-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "after compaction, reconstruct the PhaseResultHandle from this GitHub issue and commit reference",
-    "rationale": "near miss owned by workflow-guide",
+    "query": "select C11 memory ordering for a lock-free multi-producer queue",
+    "rationale": "near miss owned by lock-free-guide",
     "should_trigger": false,
     "split": "validation"
   }

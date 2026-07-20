@@ -23,5 +23,5 @@ argument-hint: "<native-reference> [--revision <native-revision>] [--authority-r
 
 ## Delegation
 
-Load `plan-guide` and perform **plan-reject**; load `workflow-guide` for provider-native
-result contracts. Publish rejection against the exact revision, preserve history, and stop.
+Load `plan-guide` and perform **plan-reject**. Record the rejection against the requested
+subject, preserve history when supported, and stop.

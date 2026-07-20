@@ -21,6 +21,6 @@ argument-hint: "<native-reference> [--revision <native-revision>] [--profile <re
 
 ## Delegation
 
-Load `plan-guide` and perform **decision-critique** in fresh independent context; load
-`workflow-guide` for exact-revision contracts. Challenge evidence, options, consequences,
-and authority, publish separate findings, and do not make or revise the decision.
+Load `plan-guide` and perform **decision-critique** in fresh independent context.
+Challenge evidence, options, consequences, and authority; do not make or revise the
+decision.

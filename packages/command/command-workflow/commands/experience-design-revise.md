@@ -22,6 +22,5 @@ argument-hint: "<native-reference> [--revision <native-revision>] [--feedback <r
 
 ## Delegation
 
-Load `plan-guide` and perform **experience-design-revise**; load `workflow-guide` for
-native revision and provider semantics. Resolve every feedback item, publish a new native
-revision, preserve supersession, and never overwrite or silently accept the subject.
+Load `plan-guide` and perform **experience-design-revise**. Resolve every feedback item,
+preserve supersession when supported, and never silently accept the subject.

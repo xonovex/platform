@@ -25,7 +25,6 @@ argument-hint: "<question-or-native-reference> [--scope <scope>] [--profile <ref
 
 ## Delegation
 
-Load `plan-guide` (plugin `xonovex-skill-plan`) and perform **research-run**. Load
-`workflow-guide` (plugin `xonovex-skill-workflow`) for result and provider contracts.
-Keep evidence/provenance distinct from synthesis, expose uncertainty, bound adaptive
-exploration, and publish a canonical Research result through the selected provider.
+Load `plan-guide` (plugin `xonovex-skill-plan`) and perform **research-run**. Keep
+evidence/provenance distinct from synthesis, expose uncertainty, and bound adaptive
+exploration.

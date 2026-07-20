@@ -54,12 +54,6 @@
     "rationale": "near miss: Bitrise owner"
   },
   {
-    "query": "write a platform-neutral telemetry provider interface",
-    "should_trigger": false,
-    "split": "train",
-    "rationale": "near miss: governance owner"
-  },
-  {
     "query": "debug application business logic from a stack trace",
     "should_trigger": false,
     "split": "train",
@@ -94,5 +88,11 @@
     "rationale": "near miss owned by aws-guide",
     "should_trigger": false,
     "split": "validation"
+  },
+  {
+    "query": "define an SLO and error-budget policy without choosing a telemetry backend",
+    "rationale": "near miss owned by reliability-guide",
+    "should_trigger": false,
+    "split": "train"
   }
 ]

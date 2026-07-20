@@ -11,7 +11,7 @@
 | Evidence status        | Documentation mapping only                                     |
 | Refresh trigger        | Product update, hook schema change, handler change, or 90 days |
 
-The guide does not install a matcher or policy. Runtime claims belong to the deployment that selects a matcher, workflow adapter, controls, and failure behavior.
+The guide does not install a matcher or policy. Runtime claims belong to the configured deployment and its matcher, handler, and failure behavior.
 
 ## Native handlers and configuration
 

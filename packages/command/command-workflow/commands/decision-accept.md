@@ -22,6 +22,6 @@ argument-hint: "<native-reference> [--revision <native-revision>] [--authority-r
 
 ## Delegation
 
-Load `plan-guide` and perform **decision-accept**; load `workflow-guide` for native result
-contracts. Verify actor, qualification, scope, and freshness, then bind the decision to the
-exact revision. A model may prepare the brief but cannot supply the authority action.
+Load `plan-guide` and perform **decision-accept**. Verify actor, qualification, scope, and
+any required revision binding. A model may prepare the brief but cannot supply the
+authority action.

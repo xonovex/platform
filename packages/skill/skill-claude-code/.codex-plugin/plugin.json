@@ -1,7 +1,7 @@
 {
   "name": "xonovex-skill-claude-code",
   "version": "6.1.0",
-  "description": "Xonovex Claude Code workflow hook skills",
+  "description": "Xonovex Claude Code hook skills",
   "author": {
     "name": "Xonovex"
   },

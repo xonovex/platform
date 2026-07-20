@@ -22,6 +22,6 @@ argument-hint: "<native-reference> [--revision <native-revision>] [--authority-r
 
 ## Delegation
 
-Load `plan-guide` and perform **experience-design-accept**; load `workflow-guide` for
-provider-native result contracts. Bind the authority action to the exact revision. A model
-may prepare the brief but must not fabricate the actor, qualification, or decision.
+Load `plan-guide` and perform **experience-design-accept**. Bind the action to a revision
+when the selected persistence and decision policy require it. A model may prepare the
+brief but must not fabricate the actor, qualification, or decision.

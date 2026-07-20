@@ -24,6 +24,6 @@ argument-hint: "<development-or-planning-reference> --reason <text> [--revision 
 
 ## Delegation
 
-Load `workflow-guide` and perform **develop-abandon**. Load the selected workspace or Git
-skill for cancellation and cleanup mechanics. Publish an abandoned Development result;
-do not erase partial work or silently reuse its identity for a later attempt.
+Perform **develop-abandon** with the selected workspace or Git skill for cancellation and
+cleanup mechanics. Do not erase partial work or silently reuse its provider-native
+reference for a later attempt.

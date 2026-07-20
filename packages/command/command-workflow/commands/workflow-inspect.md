@@ -16,7 +16,7 @@ argument-hint: "<registry.json> [invocation.json]"
 
 ## Delegation
 
-Load `agent-governance-guide` and perform its composition explanation operation. Report
-the selected executor, controls and their observe/enforce modes, evidence sinks and their
-failure modes, available capabilities, missing required capabilities, and exact
-enforcement points. Do not execute plugins, infer a maturity level, or add defaults.
+Inspect the invocation with the shared workflow runtime. Report the selected executor,
+controls and their observe/enforce modes, evidence sinks and their failure modes,
+available capabilities, missing required capabilities, and exact enforcement points. Do
+not execute plugins, infer a maturity level, or add defaults.

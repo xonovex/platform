@@ -1,8 +1,7 @@
 ---
 name: plan-guide
 description: "Use when discovering, researching, formulating, designing, deciding, planning, revising, critiquing, continuing, or validating work — covers neutral early-lifecycle results, optional experience/solution design, authority-bound decisions, provider-native planning, and code research. Triggers on problem discovery, evidence and uncertainty, requirements formulation, UX or architecture results, decision briefs, plans/subplans, fresh-context resume, code cleanup/hardening/alignment, even when the user doesn't say 'plan'."
-compatibility: "Node.js 22+ is required only for the bundled early-lifecycle fixture validator, which reads repository fixtures without network access."
-allowed-tools: "Read Bash(node:*)"
+allowed-tools: "Read"
 ---
 
 # Early Lifecycle, Planning, and Code-Research Guidelines
@@ -11,8 +10,8 @@ Produce Discovery, Research, Formulation, optional Design, Decision, and Plannin
 
 ## Core Principles
 
-- **Neutral semantics** — canonical result meaning stays stable while methods, artifacts, executors, providers, profiles, and optional runtime composition vary independently
-- **Native persistence** — consume and publish opaque provider-native references; local files and Git are selectable providers, not prerequisites
+- **Neutral semantics** — result meaning stays stable while methods, artifacts, executors, and persistence vary independently
+- **Selectable persistence** — use the caller's chosen in-session, file, hosted, database, or other persistence model
 - **Least-adaptive execution** — prefer deterministic collection, bound model synthesis, reserve agents for branching exploration, and preserve human/qualified authority
 - **Research first** — distinguish evidence, provenance, uncertainty, and synthesis before authoring or deciding
 - **Reports, not code** — all research/analysis operations are read-only and generate reports for `plan-create` to consume; only `plan-continue` modifies the codebase
@@ -41,7 +40,7 @@ Produce Discovery, Research, Formulation, optional Design, Decision, and Plannin
 - Approve the parent with `plan-accept` before `plan-subplans-create` — it requires `status: approved`
 - `plan-critique` must run as an independent agent (fresh session), not the plan's author — self-critique defends instead of attacks
 - A change describable in one sentence (a one-line diff) skips discovery and planning — implement it directly; heavy up-front spec on a trivial edit is waste
-- Workflow authority requirements remain explicit result semantics; an executor or maturity label cannot silently satisfy them
+- Authority requirements remain explicit result semantics; an executor label cannot silently satisfy them
 - A plan is done when the team's Definition of Done is met (review, docs, no regressions, NFRs), not when tests merely pass — `plan-validate` checks the DoD, not just success criteria
 - "Tests pass" doesn't mean "success criteria met" — `plan-validate` reads the criteria, not just exit codes
 - Auto-continuing to the next plan after completion silently chains work — `plan-continue` STOPS after one

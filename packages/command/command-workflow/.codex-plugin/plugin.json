@@ -6,12 +6,10 @@
     "name": "Xonovex"
   },
   "dependencies": [
-    "xonovex-skill-agent-governance",
     "xonovex-skill-plan",
     "xonovex-skill-pull-request",
     "xonovex-skill-code-review",
     "xonovex-skill-code-quality",
-    "xonovex-skill-testing",
-    "xonovex-skill-workflow"
+    "xonovex-skill-testing"
   ]
 }

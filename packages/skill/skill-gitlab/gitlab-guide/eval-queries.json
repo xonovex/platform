@@ -60,12 +60,6 @@
     "rationale": "one-open-MR-per-branch idempotency"
   },
   {
-    "query": "use GitLab Issues and notes as an optional workflow result provider with opaque restart recovery",
-    "should_trigger": true,
-    "split": "validation",
-    "rationale": "GitLab-specific adapter for the storage-neutral result-provider port"
-  },
-  {
     "query": "onboard a SHA-pinned GitLab CI/CD component with typed inputs and enforce it through a group pipeline execution policy",
     "should_trigger": true,
     "split": "validation",
@@ -102,18 +96,6 @@
     "rationale": "near-miss: PR description craft, use pull-request-guide"
   },
   {
-    "query": "define generic policy and result providers without selecting a code host",
-    "should_trigger": false,
-    "split": "train",
-    "rationale": "near-miss: provider semantics belong to workflow-guide and agent-governance-guide until GitLab is selected"
-  },
-  {
-    "query": "define a platform-neutral external-enforcement adapter without selecting GitLab or another provider",
-    "should_trigger": false,
-    "split": "validation",
-    "rationale": "near-miss: semantic external enforcement belongs to agent-governance-guide until GitLab is selected"
-  },
-  {
     "query": "open a pull request against main with reviewers and a label using the gh CLI",
     "rationale": "near miss owned by github-guide",
     "should_trigger": false,
@@ -122,6 +104,18 @@
   {
     "query": "post an inline review comment anchored to a specific line on a GitHub pull request",
     "rationale": "near miss owned by github-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "configure a GitHub ruleset that requires code scanning before merge",
+    "rationale": "near miss owned by github-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "restrict Bitbucket Pipelines deployments to repository administrators",
+    "rationale": "near miss owned by bitbucket-guide",
     "should_trigger": false,
     "split": "validation"
   }

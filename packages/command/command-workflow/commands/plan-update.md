@@ -23,7 +23,6 @@ argument-hint: "<native-reference> [--revision <native-revision>] [--provider <s
 
 ## Delegation
 
-Load `plan-guide` and perform **plan-update**; load `workflow-guide` for provider-native
-revision contracts. Verify tasks and criteria against exact evidence, publish a new
-Planning revision, preserve unavailable validation categories, and do not infer completion
-from conversation memory.
+Load `plan-guide` and perform **plan-update**. Verify tasks and criteria against available
+evidence, preserve unavailable validation categories, and do not infer completion from
+conversation memory.

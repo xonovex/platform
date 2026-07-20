@@ -1,6 +1,6 @@
 ---
 name: github-guide
-description: "Use when delivering a pull request/review, configuring native CI/repository enforcement, or implementing an optional result-provider adapter on GitHub (github.com or GitHub Enterprise Server). Triggers on `gh pr create`, inline reviews, resolveReviewThread, reusable workflows/composite actions, SHA pinning, required checks/rulesets, protected environments, attestations, GitHub token permissions, or mapping Issues to opaque workflow result capabilities — even when the user doesn't say 'gh'."
+description: "Use when delivering a pull request/review or configuring native CI/repository enforcement on GitHub (github.com or GitHub Enterprise Server). Triggers on `gh pr create`, inline reviews, resolveReviewThread, reusable workflows/composite actions, SHA pinning, required checks/rulesets, protected environments, attestations, or GitHub token permissions — even when the user doesn't say 'gh'."
 ---
 
 # GitHub delivery and enforcement — quick reference
@@ -35,7 +35,6 @@ When this skill fires:
 - **Write the PR body with pull-request-guide** — `gh pr create --body-file` takes a description authored per `pull-request-guide`.
 - **Resolve a thread** — GraphQL-only `resolveReviewThread` by thread node id (`PRRT_…`), matched by id never by line; list threads with `pullRequest.reviewThreads`. See [references/review-resolve.md](references/review-resolve.md).
 - **Scope the token per operation** — push needs Contents: write; open-PR / post-review need Pull requests: write; resolve also needs Contents: read & write on a fine-grained token. See [references/auth.md](references/auth.md).
-- **Adapt Issues as an optional result provider** — preserve GitHub-native issue/comment references, disclose freshness-only versioning, and never make GitHub a core workflow dependency. See [references/provider-conformance.md](references/provider-conformance.md).
 - **Enforce with native automation** — use SHA-pinned reusable workflows/actions, required checks and layered rulesets, protected environments, least-privilege tokens/OIDC, attestations, and provider-native evidence. See [references/automation-and-enforcement.md](references/automation-and-enforcement.md).
 - **Transact every setup** — discover, preview the exact native changes and authority, authorize, apply idempotently against observed revisions, re-read and probe both allow and deny, retain rollback, and own the drift. See [references/onboarding.md](references/onboarding.md).
 
@@ -92,6 +91,5 @@ Each reference is a trigger — read only the one matching the user's intent; do
 - Read [references/create.md](references/create.md) — Load when opening a PR: `gh pr create` flags, draft, reviewers/labels, issue-linking and auto-close semantics, the additive-body / replace-on-edit trap, idempotency guard, and the raw `POST /pulls` REST equivalent.
 - Read [references/review-post.md](references/review-post.md) — Load when publishing a review: the single `.../reviews` object, the exact path/line/side inline anchor model, the REQUEST_CHANGES blocking mechanism, and deep-linking from `html_url`.
 - Read [references/review-resolve.md](references/review-resolve.md) — Load when resolving/replying on threads: listing `reviewThreads`, matching a finding to a thread by id (never line), the GraphQL `resolveReviewThread` mutation, in-thread replies, and the conversation-resolution merge gate.
-- Read [references/provider-conformance.md](references/provider-conformance.md) — Load when mapping GitHub Issues/comments to the optional workflow result-provider port or testing opaque-reference, restart, revision, retry, relationship, and failure behavior.
 - Read [references/automation-and-enforcement.md](references/automation-and-enforcement.md) — Load when configuring or onboarding reusable workflows/actions, required checks, rulesets, protected environments, token/OIDC permissions, attestations, evidence, rollback, or governance-only GitHub adoption.
 - Read [references/onboarding.md](references/onboarding.md) — Load when setting up, diagnosing, dry-running, verifying, rolling back, uninstalling, or checking drift on repository/organization governance.

@@ -36,28 +36,10 @@
     "rationale": "service-hook conformance"
   },
   {
-    "query": "recover a workflow result from an Azure Boards work-item reference in a fresh process",
-    "should_trigger": true,
-    "split": "train",
-    "rationale": "opaque provider reference"
-  },
-  {
     "query": "set up Bitbucket Pipelines OIDC to assume an AWS role",
     "should_trigger": false,
     "split": "train",
     "rationale": "near miss: Bitbucket owner"
-  },
-  {
-    "query": "write a platform-neutral configuration-provider interface",
-    "should_trigger": false,
-    "split": "train",
-    "rationale": "near miss: governance contract"
-  },
-  {
-    "query": "design a generic lifecycle workflow for planning and release",
-    "should_trigger": false,
-    "split": "train",
-    "rationale": "near miss: workflow owner"
   },
   {
     "query": "create an Azure ARM Terraform module for a virtual network",
@@ -112,5 +94,17 @@
     "rationale": "near miss owned by bitbucket-guide",
     "should_trigger": false,
     "split": "validation"
+  },
+  {
+    "query": "create a reusable GitHub Actions workflow for building and signing releases",
+    "rationale": "near miss owned by github-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "enforce a GitLab CI component through a group pipeline execution policy",
+    "rationale": "near miss owned by gitlab-guide",
+    "should_trigger": false,
+    "split": "train"
   }
 ]

@@ -11,4 +11,4 @@ Advise without installing, configuring, authorizing, or applying changes.
 5. Preview exact native changes only for optional follow-up onboarding: packages, versions, permissions, secrets/network/data access, verification, and rollback.
 6. Publish or return an advisory result with provider-native evidence references and limitations; stop before approval or apply.
 
-Apply [early-lifecycle-contracts.md](early-lifecycle-contracts.md). Do not infer provider support from names or make user-research/accessibility/BDD/Git/provider skills universal prerequisites. Executable runtime composition is advised separately.
+Apply [early-lifecycle-contracts.md](early-lifecycle-contracts.md). Do not infer provider support from names or make user-research/accessibility/BDD/Git/provider skills universal prerequisites.

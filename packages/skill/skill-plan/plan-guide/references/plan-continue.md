@@ -5,7 +5,7 @@ Resume implementation from one parent or child Planning result. Start immediatel
 ## Core workflow
 
 1. **Resolve input** — use an explicit provider context + opaque native reference; otherwise current reconstructed handle, unambiguous workspace association, or ask. Never glob for an arbitrary plan or infer identity from a file name.
-2. **Reconstruct** — ask the selected provider to resolve the exact native revision and rebuild the ephemeral `PhaseResultHandle`; verify freshness, available capabilities, profile/policy requirements, and status.
+2. **Reconstruct** — ask the selected provider to resolve the requested native revision and rebuild the operation state needed to continue; verify available capabilities and applicable requirements.
 3. **Select one** — if the result relates child plans, read only provider-native metadata in declared order until the first `in_progress` or `pending` child. Do not load every child body.
 4. **Load target** — resolve that one target fully, including tasks, dependencies, blockers, success criteria, source references, and skills/capabilities to consult.
 5. **Baseline** — discover the actual toolchain beyond one manifest and run applicable typecheck, lint, build, tests, and integration checks before changes. Record unavailable categories explicitly.

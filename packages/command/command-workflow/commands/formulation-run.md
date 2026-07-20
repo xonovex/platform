@@ -23,7 +23,5 @@ argument-hint: "<subject-or-native-reference> [--profile <reference>] [--provide
 
 ## Delegation
 
-Load `plan-guide` (plugin `xonovex-skill-plan`) and perform **formulation-run**. Load
-`workflow-guide` (plugin `xonovex-skill-workflow`) for result and provider contracts.
-User stories, BDD, and example mapping are selectable installed methods, not hard
-dependencies. Publish a canonical Formulation result through the selected provider.
+Load `plan-guide` (plugin `xonovex-skill-plan`) and perform **formulation-run**. User
+stories, BDD, and example mapping are selectable installed methods, not hard dependencies.

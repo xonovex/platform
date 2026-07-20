@@ -12,6 +12,11 @@ tasks:
       - ~:ts-build
     options:
       mergeDeps: append
+  ts-coverage:
+    deps:
+      - ~:ts-build
+    options:
+      mergeDeps: append
   install:
     command:
       - npm

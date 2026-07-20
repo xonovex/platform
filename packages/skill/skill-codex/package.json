@@ -8,7 +8,7 @@
     "skill",
     "codex",
     "hooks",
-    "workflow"
+    "automation"
   ],
   "scripts": {
     "fmt": "prettier --write .",

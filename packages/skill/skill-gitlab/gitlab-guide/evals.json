@@ -37,16 +37,6 @@
     },
     {
       "id": 5,
-      "prompt": "Our profile explicitly selected GitLab Issues for Planning results. Explain the provider mapping, restart recovery, edition/version checks, and failure behavior. Is issue updated_at an immutable result revision, and should the adapter write a local backup result when GitLab is unavailable?",
-      "assertions": [
-        "Maps GitLab issues/notes to opaque resolve/read/publish/revise/relate/version/capabilities behavior without moving semantic ownership into GitLab",
-        "Reconstructs from GitLab-native project/id/iid/note references after restart and reports offering, edition/tier, and tested version limitations",
-        "Classifies updated_at as freshness-only and binds exact-revision assurance to immutable commit/pipeline/job/artifact/deployment references",
-        "Rejects silent local or cross-provider fallback for side effects when the explicitly selected GitLab provider is unavailable"
-      ]
-    },
-    {
-      "id": 6,
       "prompt": "Onboard mandatory governance checks and protected production releases across our GitLab group. We want reusable components rather than copied YAML, immutable dependencies, typed inputs and component tests, central policy injection that projects cannot omit, safe merge/name semantics, compliance scope, protected deployment approval, preview/rollback, and evidence. Explain the design and bypass tests.",
       "assertions": [
         "Uses a full-SHA-pinned CI/CD component with typed inputs, configurable unique job names/stages, nested dependency review, and component-project tests covering missing inputs and duplicate inclusion",

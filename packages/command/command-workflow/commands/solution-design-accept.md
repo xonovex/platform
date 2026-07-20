@@ -22,6 +22,5 @@ argument-hint: "<native-reference> [--revision <native-revision>] [--authority-r
 
 ## Delegation
 
-Load `plan-guide` and perform **solution-design-accept**; load `workflow-guide` for
-provider-native result contracts. Verify required qualification and bind the authority
-action to the exact revision; a model cannot grant or impersonate authority.
+Load `plan-guide` and perform **solution-design-accept**. Verify any required qualification
+and revision binding; a model cannot grant or impersonate authority.

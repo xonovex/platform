@@ -4,7 +4,7 @@
   "evals": [
     {
       "id": 1,
-      "prompt": "A workflow selects a Kiro pre-operation control in enforce mode. Validate whether the installed surface can provide the requested blocking guarantee.",
+      "prompt": "Can a Kiro PreToolUse hook block this exact tool operation? Validate the installed surface and its coverage.",
       "assertions": [
         "Requires the observed runtime version or an explicit not-installed result and selects the matching versioned capability matrix.",
         "Checks executing handler type, exact covered operations, blocking and failure behavior, ordering, trust, and limitations before accepting the guarantee."

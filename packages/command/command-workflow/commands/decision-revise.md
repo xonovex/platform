@@ -23,6 +23,5 @@ argument-hint: "<native-reference> [--revision <native-revision>] [--feedback <r
 
 ## Delegation
 
-Load `plan-guide` and perform **decision-revise**; load `workflow-guide` for native
-revision and provider semantics. Publish a new revision, preserve prior authority and
-evidence, and reopen authority when material meaning changed.
+Load `plan-guide` and perform **decision-revise**. Preserve prior authority and evidence,
+and reopen authority when material meaning changed.

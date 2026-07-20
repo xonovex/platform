@@ -22,5 +22,4 @@ argument-hint: "<native-reference> [--revision <native-revision>] [--profile <re
 ## Delegation
 
 Load `plan-guide` and perform **experience-design-critique** in a fresh independent
-context. Load `workflow-guide` for exact-revision and result contracts. Publish separate
-findings; do not revise or accept the design.
+context. Publish separate findings; do not revise or accept the design.

@@ -6,9 +6,3 @@ tasks:
     command: echo 'build complete'
     options:
       cache: false
-  test:
-    script: shellcheck code-harness-guide/scripts/*.sh && bash -n code-harness-guide/scripts/*.sh
-    toolchain: [system, nix]
-    inputs:
-      - code-harness-guide/scripts/*.sh
-      - code-harness-guide/assets/*.json

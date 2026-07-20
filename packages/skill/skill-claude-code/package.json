@@ -8,7 +8,7 @@
     "skill",
     "claude-code",
     "hooks",
-    "workflow"
+    "automation"
   ],
   "scripts": {
     "fmt": "prettier --write .",

@@ -22,7 +22,7 @@ argument-hint: "<accepted-reference> [--revision <native-revision>] --target <na
 
 ## Delegation
 
-Load `workflow-guide` and perform **integration-run**, using the selected provider's
-native Integration capability. If the caller supplied a composition, load
-`agent-governance-guide` and apply exactly its selected controls and evidence behavior.
-The command does not add an approval, policy engine, hook, or maturity requirement.
+Perform **integration-run** using the selected provider's native target-changing
+capability. If the caller supplied a composition, pass it unchanged to the shared
+workflow runtime. The command does not add an approval, policy engine, hook, or maturity
+requirement.

@@ -22,6 +22,6 @@ argument-hint: "<deliverable-reference> [--revision <native-revision>] --target 
 
 ## Delegation
 
-Load `workflow-guide` and perform **acceptance-decide**. Load the selected provider skill
-for authoritative human identity and decision recording. Never accept an agent, model,
-script, copied label, or ordinary tool call as accountable human sign-off.
+Perform **acceptance-decide** with the selected identity and decision-provider skills.
+Never accept an agent, model, script, copied label, or ordinary tool call as accountable
+human sign-off.

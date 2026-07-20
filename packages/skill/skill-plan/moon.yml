@@ -3,17 +3,8 @@ language: unknown
 tags: [skill]
 dependsOn:
   - skill-code-quality
-  - skill-workflow
 tasks:
   build:
     command: echo 'build complete'
-    options:
-      cache: false
-  test:
-    command: npm run test
-    inputs:
-      - plan-guide/assets/early-lifecycle-fixtures.json
-      - plan-guide/references/*.md
-      - plan-guide/scripts/*.mjs
     options:
       cache: false

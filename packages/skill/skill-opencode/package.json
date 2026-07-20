@@ -8,7 +8,7 @@
     "skill",
     "opencode",
     "plugins",
-    "workflow"
+    "automation"
   ],
   "scripts": {
     "fmt": "prettier --write .",

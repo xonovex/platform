@@ -21,6 +21,6 @@ argument-hint: "<native-reference> [--revision <native-revision>] [--profile <re
 
 ## Delegation
 
-Load `plan-guide` and perform **solution-design-critique** in fresh independent context;
-load `workflow-guide` for exact-revision contracts. Publish separate findings and do not
-revise the subject or claim architecture/security/privacy authority.
+Load `plan-guide` and perform **solution-design-critique** in fresh independent context.
+Publish separate findings and do not revise the subject or claim architecture, security,
+or privacy authority.

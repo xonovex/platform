@@ -4,7 +4,7 @@
 
 - Run `claude --version`; record absence as `not-installed`.
 - Inspect `/status`, `/hooks`, `/permissions`, managed settings origin, `~/.claude/settings.json`, project settings, local settings, enabled plugins, and component-scoped hooks.
-- Resolve each requested trigger and control guarantee against the capability matrix before recommending a handler.
+- Resolve each requested behavior and guarantee against the capability matrix before recommending a handler.
 - Review every command, URL, MCP tool, prompt, agent definition, environment variable, transcript/path input, and executable source.
 
 ## Preview

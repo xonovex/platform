@@ -22,7 +22,6 @@ argument-hint: "<question-or-native-reference> [--profile <reference>] [--provid
 
 ## Delegation
 
-Load `plan-guide` and perform **decision-create**; load `workflow-guide` for Decision
-result and provider contracts. Present one evidence-grounded decision brief at a time.
-A model or agent may synthesize options and recommend, but only the required human or
-qualified actor can supply authority.
+Load `plan-guide` and perform **decision-create**. Present one evidence-grounded decision
+brief at a time. A model or agent may synthesize options and recommend, but only the
+required human or qualified actor can supply authority.

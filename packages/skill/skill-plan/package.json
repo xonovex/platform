@@ -4,8 +4,7 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "@xonovex/skill-code-quality": "6.1.0",
-    "@xonovex/skill-workflow": "6.1.0"
+    "@xonovex/skill-code-quality": "6.1.0"
   },
   "keywords": [
     "xonovex",
@@ -14,7 +13,6 @@
   ],
   "scripts": {
     "fmt": "prettier --write .",
-    "fmt:check": "prettier --check .",
-    "test": "node plan-guide/scripts/validate-early-lifecycle-fixtures.mjs"
+    "fmt:check": "prettier --check ."
   }
 }

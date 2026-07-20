@@ -2,7 +2,7 @@
 
 Product-specific facts are pinned to the documentation snapshot below. Rows describe documented capabilities unless a separate deployment records runtime evidence.
 
-## Hooks and hook workflows
+## Hooks
 
 - **URLs:**
   - https://code.claude.com/docs/en/hooks
@@ -43,5 +43,5 @@ Product-specific facts are pinned to the documentation snapshot below. Rows desc
 ## Guide-level synthesis
 
 - **Provenance:** Repository-original integration of the source blocks above; these references combine multiple inputs or maintained conventions rather than one exclusive upstream
-- **References:** references/capabilities.md, references/onboarding.md, references/patterns.md, references/pre-tool-use-workflow.md
+- **References:** references/capabilities.md, references/onboarding.md, references/patterns.md
 - **Last reviewed:** 2026-07-19

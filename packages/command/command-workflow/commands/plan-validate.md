@@ -24,6 +24,6 @@ argument-hint: "<native-reference> [--revision <native-revision>] [--provider <s
 
 ## Delegation
 
-Load `plan-guide` and perform **plan-validate**; load `workflow-guide` for exact-revision
-and evidence contracts. Check every criterion and Definition of Done item independently,
-report stale/missing evidence, and do not revise status or claim Acceptance.
+Load `plan-guide` and perform **plan-validate**. Check every criterion and Definition of
+Done item independently, report missing or inapplicable evidence, and do not revise status
+or claim Acceptance.

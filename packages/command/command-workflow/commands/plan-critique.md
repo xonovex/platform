@@ -22,6 +22,5 @@ argument-hint: "<native-reference> [--revision <native-revision>] [--provider <s
 
 ## Delegation
 
-Load `plan-guide` and perform **plan-critique** in fresh independent context; load
-`workflow-guide` for exact-revision and native publication contracts. Publish separate
-findings and do not revise, approve, or implement the Planning result.
+Load `plan-guide` and perform **plan-critique** in fresh independent context. Keep
+findings separate and do not revise, approve, or implement the Planning result.

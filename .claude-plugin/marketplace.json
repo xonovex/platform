@@ -16,7 +16,7 @@
     {
       "name": "xonovex-workflow",
       "source": "./packages/command/command-workflow",
-      "description": "Xonovex composable lifecycle, delivery, and governance commands"
+      "description": "Xonovex composable lifecycle, delivery, and runtime commands"
     },
     {
       "name": "xonovex-skill-accessibility",
@@ -27,16 +27,6 @@
       "name": "xonovex-skill-adr",
       "source": "./packages/skill/skill-adr",
       "description": "Xonovex ADR skills"
-    },
-    {
-      "name": "xonovex-skill-agent-governance",
-      "source": "./packages/skill/skill-agent-governance",
-      "description": "Xonovex agent governance contract skills"
-    },
-    {
-      "name": "xonovex-skill-ai-governance",
-      "source": "./packages/skill/skill-ai-governance",
-      "description": "Xonovex AI governance and risk skills"
     },
     {
       "name": "xonovex-skill-android-analytics",
@@ -406,7 +396,7 @@
     {
       "name": "xonovex-skill-security-assurance",
       "source": "./packages/skill/skill-security-assurance",
-      "description": "Xonovex security assurance skills"
+      "description": "Optional Xonovex security assurance skills"
     },
     {
       "name": "xonovex-skill-shell-scripting",
@@ -472,11 +462,6 @@
       "name": "xonovex-skill-vitest",
       "source": "./packages/skill/skill-vitest",
       "description": "Xonovex Vitest skills"
-    },
-    {
-      "name": "xonovex-skill-workflow",
-      "source": "./packages/skill/skill-workflow",
-      "description": "Xonovex composable workflow contract skills"
     },
     {
       "name": "xonovex-skill-zod",

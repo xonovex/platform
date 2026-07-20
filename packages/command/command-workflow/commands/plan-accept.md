@@ -22,6 +22,6 @@ argument-hint: "<native-reference> [--revision <native-revision>] [--authority-r
 
 ## Delegation
 
-Load `plan-guide` and perform **plan-accept**; load `workflow-guide` for provider-native
-result contracts. Verify authority, bind the decision to the exact revision, publish it,
-and stop. A model may summarize but cannot fabricate approval.
+Load `plan-guide` and perform **plan-accept**. Verify authority and any required revision
+binding, record the decision, and stop. A model may summarize but cannot fabricate
+approval.

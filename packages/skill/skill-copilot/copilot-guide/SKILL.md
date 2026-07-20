@@ -1,11 +1,11 @@
 ---
 name: copilot-guide
-description: "Use when mapping workflow triggers or explicitly selected controls to GitHub Copilot CLI or cloud-agent hooks, policy hooks, plugins, or skills. Triggers on .github/hooks, ~/.copilot/hooks, policy.d, preToolUse, permissionRequest, agentStop, command/HTTP/prompt handlers, cloud sandbox differences, plugin.json, repository trust, disableAllHooks, or Copilot onboarding."
+description: "Use when configuring GitHub Copilot CLI or cloud-agent hooks, policy hooks, plugins, or skills. Triggers on .github/hooks, ~/.copilot/hooks, policy.d, preToolUse, permissionRequest, agentStop, command/HTTP/prompt handlers, cloud sandbox differences, plugin.json, repository trust, disableAllHooks, or Copilot onboarding — even when the user doesn't say 'Copilot hook'."
 ---
 
-# GitHub Copilot Harness Governance
+# GitHub Copilot Hooks and Policy
 
-Map workflow triggers and explicitly selected controls to GitHub Copilot's native configuration and extension surface without embedding policy or inventing a universal hook file.
+Configure GitHub Copilot's native hook and extension surface without inventing unsupported guarantees or a universal hook file.
 
 ## Essentials
 

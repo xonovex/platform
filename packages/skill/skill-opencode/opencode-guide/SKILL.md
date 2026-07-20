@@ -1,11 +1,11 @@
 ---
 name: opencode-guide
-description: "Use when mapping workflow triggers or explicitly selected controls to OpenCode JavaScript or TypeScript plugins, events, custom tools, or configuration. Triggers on .opencode/plugins, opencode.json plugin packages, tool.execute.before/after, permission.asked, session events, file events, shell.env, custom tools, sequential plugin load order, Bun dependency install, plugin trust, or OpenCode onboarding."
+description: "Use when configuring OpenCode JavaScript or TypeScript plugins, events, custom tools, or settings. Triggers on .opencode/plugins, opencode.json plugin packages, tool.execute.before/after, permission.asked, session events, file events, shell.env, custom tools, sequential plugin load order, Bun dependency install, plugin trust, or OpenCode onboarding — even when the user doesn't say 'OpenCode plugin'."
 ---
 
-# OpenCode Harness Governance
+# OpenCode Plugins and Events
 
-Map workflow triggers and explicitly selected controls to OpenCode's native configuration and extension surface without embedding policy or inventing a universal hook file.
+Configure OpenCode's native plugin and event surface without inventing unsupported guarantees or a universal hook file.
 
 ## Essentials
 

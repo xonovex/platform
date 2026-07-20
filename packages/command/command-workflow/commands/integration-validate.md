@@ -21,6 +21,6 @@ argument-hint: "<accepted-reference> [--revision <native-revision>] --target <na
 
 ## Delegation
 
-Load `workflow-guide` and perform **integration-validate**, then soft-select the target
-provider skill. If a composition is supplied, explain its selected controls separately.
-This operation is read-only and cannot mutate or reserve the target.
+Perform **integration-validate** with the selected target-provider skill. If a composition
+is supplied, explain its selected controls separately. This operation is read-only and
+cannot mutate or reserve the target.

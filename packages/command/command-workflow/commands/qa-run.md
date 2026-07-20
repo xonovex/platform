@@ -24,6 +24,6 @@ argument-hint: "<deliverable-reference> [--revision <native-revision>] [--scope 
 
 ## Delegation
 
-Load `workflow-guide` and perform **qa-run**. Load `testing-guide` plus selected domain,
-scanner, CI, and provider skills. Preserve each suite's environment and native evidence;
-publish QA separately and never coerce skipped, stale, partial, or timed-out work to pass.
+Perform **qa-run** with `testing-guide` plus selected domain, scanner, CI, and provider
+skills. Preserve each suite's environment and native evidence; never coerce skipped,
+stale, partial, or timed-out work to pass.

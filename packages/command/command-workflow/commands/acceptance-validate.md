@@ -22,6 +22,6 @@ argument-hint: "<criteria-reference> [--subject <native-reference>] [--revision 
 
 ## Delegation
 
-Load `workflow-guide` and perform **acceptance-validate**. Soft-select installed review,
-testing, assessment, criterion-method, and provider skills required by the profile. This
-operation assembles advisory evidence and cannot create accountable human Acceptance.
+Perform **acceptance-validate** with the selected review, testing, assessment, criterion,
+and provider skills. This operation assembles advisory evidence and cannot create
+accountable human Acceptance.

@@ -25,7 +25,5 @@ argument-hint: "[subject-or-source-reference] [--source <reference>...] [--profi
 
 ## Delegation
 
-Load `plan-guide` and perform **plan-create**; load `workflow-guide` for result,
-provider, profile, and handle contracts. Resolve source references through their providers,
-publish one high-level Planning result, and stop before child plans or implementation. Do
-not assume a file, Git repository, or current conversation is the persistent source of truth.
+Load `plan-guide` and perform **plan-create**. Publish one high-level Planning result
+through the requested persistence and stop before child plans or implementation.

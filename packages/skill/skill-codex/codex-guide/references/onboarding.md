@@ -5,7 +5,7 @@
 - Run `codex --version`; preserve `not-installed` when absent.
 - Inspect active config layers, `~/.codex/hooks.json`, `~/.codex/config.toml`, repository `.codex` files, plugins, managed requirements, project trust, and `/hooks` review state.
 - Inventory hook hashes, enabled/disabled state, covered tool names, command paths, timeouts, and managed script distribution.
-- Resolve each requested trigger and control guarantee against coverage and executing handler types.
+- Resolve each requested behavior and guarantee against coverage and executing handler types.
 
 ## Preview
 

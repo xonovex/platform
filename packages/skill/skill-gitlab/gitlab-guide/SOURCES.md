@@ -14,13 +14,6 @@
 - **Used for:** `POST /merge_requests` (numeric `reviewer_ids`/`assignee_ids`, comma-separated `labels`, 409 one-open-MR-per-branch) and the replace-only `PUT` body / additive `add_labels`/`remove_labels`, `POST /notes` vs `POST /discussions`, the inline position object (`position_type=text`, mandatory `base_sha`/`start_sha`/`head_sha`, required `old_path`+`new_path`, conditional `old_line`/`new_line`), the `DiffNote`-vs-`Note` downgrade, `PUT .../discussions/:discussion_id?resolved=true` (REST-only resolve; thread-vs-single-comment resolvability), single-note resolve, `/approve` (`&sha`, 409), `detailed_merge_status`, and the GraphQL Global-ID `discussionToggleResolve`.
 - **References:** references/create.md, references/review-post.md, references/review-resolve.md
 
-## GitLab Issues as a provider
-
-- **URLs:** https://docs.gitlab.com/api/issues/ · https://docs.gitlab.com/api/notes/ · https://docs.gitlab.com/api/discussions/
-- **Last reviewed:** 2026-07-16
-- **Used for:** `references/provider-conformance.md`
-- **Aspects extracted:** Native issue, note, discussion, ID/IID, visibility, edition, and timestamp behavior used by the optional result-provider adapter. Storage-neutral semantics and the classification of `updated_at` as freshness-only are Xonovex adapter constraints.
-
 ## GitLab tokens, scopes, and CI
 
 - **URLs:** https://docs.gitlab.com/security/tokens/ · https://docs.gitlab.com/user/profile/personal_access_tokens/ · https://docs.gitlab.com/auth/tokens/fine_grained_access_tokens/ · https://docs.gitlab.com/user/project/settings/project_access_tokens/ · https://docs.gitlab.com/ci/jobs/ci_job_token/

@@ -14,7 +14,6 @@ Author, merge, simplify, and distill reusable user-invocable prompt files (somet
 - **Structure Integrity** — front matter, Goal, Arguments, Core Workflow, Implementation, Error Handling are the essential sections
 - **Safe Modifications** — preview changes (`--dry-run`) before applying
 - **Bound the Body** — target <150 lines per prompt; anything longer usually wants to be two prompts
-- **Advisory, not automatic** — a command runs only when invoked and its body is prose a model reads; automatic behavior needs a trigger adapter plus an executor, while controls remain an independent selection — **instruction-guide** owns that decision procedure
 - **Delegate, Don't Duplicate** — a command owns its argument contract and delegates the procedure to a guideline skill via the `Skill` tool; the skill is the single source of truth, the command a thin, stable interface
 - **Depend on Skills Two Ways** — a command depends on a skill either **hard** (name the exact skill and declare it in the command plugin's `dependencies`, so it is guaranteed present) or **soft** (describe the capability needed and let the agent select the best-fitting installed skill at run time, declaring nothing and degrading gracefully when none matches). Use hard when one specific skill is always required, soft when the right implementation depends on context and several interchangeable skills could satisfy it; a command may compose several of each, and either way loads each via the `Skill` tool (install ≠ in-context), see [references/distill.md](references/distill.md)
 

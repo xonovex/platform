@@ -24,7 +24,6 @@ argument-hint: "<native-reference> [--revision <native-revision>] [--provider <s
 
 ## Delegation
 
-Load `plan-guide` and perform **plan-subplans-create**; load `workflow-guide` for native
-result, provider, relation, and profile contracts. Publish child Planning results and
+Load `plan-guide` and perform **plan-subplans-create**. Publish child Planning results and
 execution groups, then stop. Files, line numbers, Git configuration, and worktrees are
-optional provider/workspace behavior.
+optional persistence/workspace behavior.

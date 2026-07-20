@@ -1,11 +1,11 @@
 ---
 name: codex-guide
-description: "Use when mapping workflow triggers or explicitly selected controls to Codex hooks, plugins, skills, config layers, or managed requirements. Triggers on hooks.json, config.toml, requirements.toml, SessionStart, PreToolUse, PermissionRequest, SubagentStart, Stop, plugin-bundled hooks, hook trust hashes, concurrent commands, skipped prompt/agent handlers, or Codex guardrail coverage."
+description: "Use when configuring Codex hooks, plugins, skills, config layers, or managed requirements. Triggers on hooks.json, config.toml, requirements.toml, SessionStart, PreToolUse, PermissionRequest, SubagentStart, Stop, plugin-bundled hooks, hook trust hashes, concurrent commands, skipped prompt/agent handlers, or Codex guardrail coverage — even when the user doesn't say 'Codex hook'."
 ---
 
-# Codex Harness Governance
+# Codex Hooks and Guardrails
 
-Map workflow triggers and explicitly selected controls to Codex's native configuration and extension surface without embedding policy or inventing a universal hook file.
+Configure Codex's native hooks and guardrails without inventing unsupported guarantees or a universal hook file.
 
 ## Essentials
 
@@ -26,7 +26,7 @@ Map workflow triggers and explicitly selected controls to Codex's native configu
 
 ## Example
 
-A composition that selects blocking for every privileged operation cannot rely on Codex `PreToolUse` alone because its documented coverage is partial; the adapter may still use it for covered Bash, patch, and MCP calls while another selected control covers the remainder.
+Codex `PreToolUse` alone cannot block every privileged operation because its documented coverage is partial. Use it only for covered Bash, patch, and MCP calls, and state the uncovered paths explicitly.
 
 ## Progressive Disclosure
 

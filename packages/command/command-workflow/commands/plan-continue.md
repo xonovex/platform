@@ -25,7 +25,6 @@ argument-hint: "[native-reference] [--provider-context <context>] [--revision <n
 
 ## Delegation
 
-Load `plan-guide` and perform **plan-continue**; load `workflow-guide` for provider and
-ephemeral-handle contracts. Reconstruct state from the native reference after context
-loss, baseline the actual toolchain, load required skills, complete one actionable Planning
-result, publish exact-revision evidence/status, and stop.
+Load `plan-guide` and perform **plan-continue**. Reconstruct state from the selected
+persistence after context loss, baseline the actual toolchain, load required skills,
+complete one actionable Planning result, record validation/status, and stop.

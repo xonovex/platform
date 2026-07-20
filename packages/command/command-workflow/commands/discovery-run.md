@@ -23,7 +23,6 @@ argument-hint: "<subject-or-native-reference> [--profile <reference>] [--provide
 
 ## Delegation
 
-Load `plan-guide` (plugin `xonovex-skill-plan`) and perform **discovery-run**. Load
-`workflow-guide` (plugin `xonovex-skill-workflow`) for result, provider, profile, and
-ephemeral-handle contracts. Publish a canonical Discovery result through the selected
-provider; do not assume files, Git, user stories, Gherkin, or one agent session.
+Load `plan-guide` (plugin `xonovex-skill-plan`) and perform **discovery-run**. Persist the
+Discovery result as requested; do not assume files, Git, user stories, Gherkin, or one
+agent session.

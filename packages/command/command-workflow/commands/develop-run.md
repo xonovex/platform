@@ -27,7 +27,6 @@ argument-hint: "<planning-reference...> [--revision <native-revision>] [--profil
 
 ## Delegation
 
-Load `workflow-guide` (plugin `xonovex-skill-workflow`) and perform **develop-run**.
-Load each Planning result's implementation skills before mutation. Use workspace, harness,
-Git, model, agent, and provider skills only when selected; publish one exact-revision
-Development result per assignment and preserve partial failures.
+Perform **develop-run** with each Planning result's selected implementation skills. Use
+workspace, harness, Git, model, agent, and provider skills only when selected, and
+preserve partial failures.

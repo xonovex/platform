@@ -1,7 +1,7 @@
 {
   "name": "xonovex-skill-copilot",
   "version": "6.1.0",
-  "description": "Xonovex GitHub Copilot workflow hook skills",
+  "description": "Xonovex GitHub Copilot hook skills",
   "author": {
     "name": "Xonovex"
   },

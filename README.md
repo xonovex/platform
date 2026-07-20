@@ -19,8 +19,7 @@ The included skills are token-efficient, harness-neutral, and based on current r
 
 ## Composable Workflows
 
-Workflow lifecycle contracts are independent from executable runtime composition. A
-runtime composition selects six dimensions independently:
+An executable workflow composition selects six dimensions independently:
 
 - trigger;
 - executor;
@@ -32,8 +31,8 @@ runtime composition selects six dimensions independently:
 Installing a plugin selects none of these dimensions. Manual invocation, harness hooks,
 CI/CD, schedules, and webhooks are interchangeable trigger adapters. Controls explicitly
 choose `observe` or `enforce`, while A1/A2/A3 labels have no built-in execution behavior.
-See the [workflow command documentation](packages/command/command-workflow/README.md) and
-[architecture and composition guide](packages/command/command-workflow/docs/architecture-and-composition.md).
+See the [runtime package](packages/shared/shared-workflow-runtime/) and
+[workflow command documentation](packages/command/command-workflow/README.md).
 
 ## Quick Start
 
@@ -96,8 +95,9 @@ Each skill is a separate plugin. A compatible harness can route to an installed 
 # Add the Xonovex plugin marketplace
 claude plugin marketplace add xonovex/platform
 
-# Install workflow skills — each covers a full operation lifecycle via consolidated references
+# Install only the independent capabilities you need
 claude plugin install xonovex-skill-plan@xonovex-marketplace          # research, decide, plan, revise, critique, accept/reject, subplans, continue, update, validate, code-align/harden/simplify
+claude plugin install xonovex-skill-security-assurance@xonovex-marketplace # optional security-specific assurance
 claude plugin install xonovex-skill-git@xonovex-marketplace           # commit, merge-resolve, feature-worktree create/merge/abandon/cleanup
 claude plugin install xonovex-skill-instruction@xonovex-marketplace   # AGENTS.md init / sync / simplify / consolidate / merge
 claude plugin install xonovex-skill-reflect@xonovex-marketplace       # session reflection: extract lessons, fold into AGENTS.md or a skill
@@ -123,8 +123,9 @@ claude plugin install xonovex-skill-vitest@xonovex-marketplace
 # Add the Xonovex plugin marketplace
 codex plugin marketplace add xonovex/platform
 
-# Install workflow skills — each covers a full operation lifecycle via consolidated references
+# Install only the independent capabilities you need
 codex plugin add xonovex-skill-plan@xonovex-marketplace          # research, decide, plan, revise, critique, accept/reject, subplans, continue, update, validate, code-align/harden/simplify
+codex plugin add xonovex-skill-security-assurance@xonovex-marketplace # optional security-specific assurance
 codex plugin add xonovex-skill-git@xonovex-marketplace           # commit, merge-resolve, feature-worktree create/merge/abandon/cleanup
 codex plugin add xonovex-skill-instruction@xonovex-marketplace   # AGENTS.md init / sync / simplify / consolidate / merge
 codex plugin add xonovex-skill-reflect@xonovex-marketplace       # session reflection: extract lessons, fold into AGENTS.md or a skill

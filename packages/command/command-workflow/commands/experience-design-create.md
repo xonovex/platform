@@ -23,7 +23,6 @@ argument-hint: "<subject-or-native-reference> [--profile <reference>] [--provide
 ## Delegation
 
 Load `plan-guide` (plugin `xonovex-skill-plan`) and perform
-**experience-design-create**. Load `workflow-guide` (plugin
-`xonovex-skill-workflow`) for result and provider contracts. Use compatible installed
-research, interaction, content, prototyping, and accessibility capabilities as selected;
-publish a proposed Experience Design result without making it mandatory for every profile.
+**experience-design-create**. Use compatible installed research, interaction, content,
+prototyping, and accessibility capabilities as selected; do not make Experience Design
+mandatory.

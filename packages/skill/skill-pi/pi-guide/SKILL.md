@@ -1,11 +1,11 @@
 ---
 name: pi-guide
-description: "Use when mapping workflow triggers or explicitly selected controls to Pi extensions, packages, skills, settings, context injection, tool interception, permissions, or subagent patterns. Triggers on .pi/extensions, pi packages, project_trust, tool_call, tool_result, context, compaction, registerTool, full-system permissions, no built-in sandbox, package pinning, or Pi onboarding."
+description: "Use when configuring Pi extensions, packages, skills, settings, context injection, tool interception, permissions, or subagent patterns. Triggers on .pi/extensions, pi packages, project_trust, tool_call, tool_result, context, compaction, registerTool, full-system permissions, no built-in sandbox, package pinning, or Pi onboarding — even when the user doesn't say 'Pi extension'."
 ---
 
-# Pi Harness Governance
+# Pi Extensions and Tool Interception
 
-Map workflow triggers and explicitly selected controls to Pi's native configuration and extension surface without embedding policy or inventing a universal hook file.
+Configure Pi's native extension and interception surface without inventing unsupported guarantees or a universal hook file.
 
 ## Essentials
 

@@ -1,0 +1,30 @@
+$schema: https://moonrepo.dev/schemas/project.json
+language: typescript
+layer: library
+tags:
+  - npm
+  - scripts
+  - shared
+  - typescript
+tasks:
+  bin-permissions:
+    command: [chmod, +x, dist/src/cli.js]
+    deps: [ts-build]
+    inputs: [dist/src/cli.js]
+    options:
+      cache: false
+  build:
+    deps: [bin-permissions]
+  coverage:
+    command: noop
+    deps: [ts-coverage]
+    options:
+      cache: false
+  ci-check:
+    deps: [coverage]
+  ts-build:
+    deps:
+      - ^:build
+      - vitest-config-node:build
+      - eslint-config-cli:build
+      - ts-config-cli:build

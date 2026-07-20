@@ -1,27 +1,23 @@
 ---
-description: Validate either a lifecycle workflow contract or an executable composition
+description: Validate an executable workflow composition
 allowed-tools:
   - Bash
   - Read
   - Glob
   - Grep
   - Skill
-argument-hint: "<subject> [--kind <lifecycle|composition>] [--registry <registry.json>]"
+argument-hint: "<invocation.json> --registry <registry.json>"
 ---
 
 # /xonovex-workflow:workflow-conformance — Validate a Workflow Contract
 
 ## Arguments
 
-- `subject` (required): Lifecycle result, provider handle, invocation, or native reference.
-- `--kind` (optional): `lifecycle` or `composition`; infer only when the subject is unambiguous.
-- `--registry` (required for a composition): Trusted plugin registry used to resolve the invocation.
+- `invocation.json` (required): Runtime invocation to validate.
+- `--registry` (required): Trusted plugin registry used to resolve the invocation.
 
 ## Delegation
 
-- For `lifecycle`, load `workflow-guide` and perform its conformance operation.
-- For `composition`, load `agent-governance-guide`, validate the invocation against the
-  registry, and explain the resolved plugins, capability gate, and enforcement points.
-
-Do not assemble profiles across these contract types. Lifecycle semantics and executable
-composition are independent and may be used separately.
+Validate the invocation with the shared workflow runtime against the supplied registry.
+Report schema failures, unresolved plugins, missing capabilities, selected control modes,
+evidence failure behavior, and exact enforcement points without executing plugins.

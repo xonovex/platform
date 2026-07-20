@@ -21,7 +21,6 @@ argument-hint: "<plan|execute|verify|rollback> --source <native-reference> --tar
 
 ## Delegation
 
-Load `workflow-guide` and perform **transition-run** with the selected provider skill. If
-the caller supplied a composition, load `agent-governance-guide` and apply only its
-selected controls and evidence behavior. The command does not derive controls from the
-target, executor, or host.
+Perform **transition-run** with the selected provider skill. If the caller supplied a
+composition, pass it unchanged to the shared workflow runtime. The command does not
+derive controls from the target, executor, or host.

@@ -25,7 +25,6 @@ argument-hint: "<development-reference...> --target-workspace <reference> [--rev
 
 ## Delegation
 
-Load `workflow-guide` and perform **develop-consolidate**. Load the selected workspace
-and Git skills for native mechanics. Preserve constituent results, rerun consolidated
-validation, publish a new Development result, and stop if the requested target change is
-actually Integration.
+Perform **develop-consolidate** with the selected workspace and Git skills for native
+mechanics. Preserve constituent results, rerun consolidated validation, and stop if the
+requested target change exceeds the caller's authorized scope.

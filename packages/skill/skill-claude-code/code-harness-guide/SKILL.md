@@ -1,23 +1,21 @@
 ---
 name: code-harness-guide
-description: "Use when mapping workflow triggers or explicitly selected controls to Claude Code hooks, plugins, skills, settings, or managed configuration. Triggers on SessionStart, UserPromptSubmit, PreToolUse, PermissionRequest, PostToolUse, compaction, command/prompt/agent/HTTP/MCP-tool handlers, parallel hook behavior, allowManagedHooksOnly, or onboarding and testing Claude Code automation — even when the user doesn't say 'harness adapter'."
-compatibility: "The optional command-hook transport requires Bash and a separately configured executable that implements the selected workflow composition."
-allowed-tools: "Read Bash(shellcheck:*)"
+description: "Use when configuring Claude Code hooks, plugins, skills, settings, or managed configuration. Triggers on SessionStart, UserPromptSubmit, PreToolUse, PermissionRequest, PostToolUse, compaction, command/prompt/agent/HTTP/MCP-tool handlers, parallel hook behavior, allowManagedHooksOnly, or onboarding and testing Claude Code automation — even when the user doesn't say 'harness adapter'."
 ---
 
-# Claude Code Workflow Hooks
+# Claude Code Hooks
 
-Map workflow triggers and optional controls to Claude Code's native configuration and extension surface without embedding policy in the harness adapter.
+Configure Claude Code's native hook and extension surface without inventing unsupported guarantees or a universal hook format.
 
 ## Essentials
 
 - **Pin the surface** - Record the documentation snapshot and observed `claude --version` result before selecting a guarantee.
-- **Map event semantics** - Translate workflow intents through the versioned capability matrix, never by event-name similarity.
+- **Map event semantics** - Translate requested behavior through the versioned capability matrix, never by event-name similarity.
 - **Preserve handler differences** - Command, HTTP, MCP-tool, prompt, and agent handlers have event-specific support and output behavior.
 - **Assume parallel matching** - Make handlers reentrant and do not expect a denial to cancel sibling side effects.
 - **Respect settings authority** - Managed, user, project, local, plugin, and component hooks have native precedence and trust rules.
 - **Onboard transactionally** - Preview exact settings/plugin changes, permissions, data flow, verification, disable, and rollback before apply.
-- **Keep hooks thin** - Forward the native event to one configured adapter; select controls and enforcement in the trusted workflow composition.
+- **Keep hooks focused** - Give each handler one native event contract and one explicit responsibility.
 
 ## Gotchas
 
@@ -29,11 +27,10 @@ Map workflow triggers and optional controls to Claude Code's native configuratio
 
 ## Example
 
-A project can map `PreToolUse` to a workflow trigger, then independently select a script, script-plus-LLM, or agent executor and zero or more controls in its trusted workflow template.
+A project can use a deterministic `PreToolUse` command to inspect covered tool calls and return Claude Code's documented blocking response when its explicit rule rejects one.
 
 ## Progressive Disclosure
 
 - Read [references/capabilities.md](references/capabilities.md) - Load when mapping semantic intents to native events, handlers, guarantees, versions, ordering, context, or limitations
 - Read [references/onboarding.md](references/onboarding.md) - Load when discovering, previewing, applying, verifying, disabling, rolling back, updating, or detecting drift
 - Read [references/patterns.md](references/patterns.md) - Load when translating deterministic hooks, model evaluators, specialist agents, or managed adoption recipes
-- Read [references/pre-tool-use-workflow.md](references/pre-tool-use-workflow.md) - Load when registering a thin `PreToolUse` workflow adapter

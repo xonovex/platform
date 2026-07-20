@@ -2,7 +2,7 @@
 
 ## Adapter roles
 
-Translate only the trigger, executor, or control role the caller selected:
+Choose the narrowest native pattern that satisfies the requested behavior:
 
 | Mode                 | Native result                                                | Enforcement claim                                   |
 | -------------------- | ------------------------------------------------------------ | --------------------------------------------------- |

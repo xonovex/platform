@@ -1,9 +1,9 @@
 ---
 name: security-assurance-guide
-description: "Use when planning, reviewing, or operating security assurance across risk, controls, secure development, verification, software supply chain, privileged changes, exceptions, incidents, and evidence. Triggers on threat models, NIST CSF or SP 800-53 profiles, SSDF, control selection and coverage, SLSA or artifact provenance, signatures and attestations, security release gates, scanner outages, compensating controls, emergency exceptions, or security claims, even when the user doesn't say 'security assurance'."
+description: "Use when the user, project, or applicable requirement explicitly selects security assurance. Covers threat and control analysis, secure-development criteria, software-supply-chain trust, and security verification. Triggers on threat models, NIST CSF or SP 800-53 profiles, SSDF, SLSA, artifact provenance, signatures, attestations, security gates, scanner gaps, compensating controls, or security claims, even when the user doesn't say 'security assurance' verbatim; an ordinary code change or release is not enough."
 ---
 
-# Security Assurance
+# Optional Security Assurance
 
 Build justified confidence in security outcomes without equating a checklist, scanner, signature, framework mapping, or passing control with compliance or absence of risk.
 
@@ -13,8 +13,13 @@ Build justified confidence in security outcomes without equating a checklist, sc
 - **Select outcome-based controls** — bind preventive, detective, responsive, and recovery controls to owners, enforcement, failure behavior, evidence, gaps, and residual risk, see [references/risk-and-controls.md](references/risk-and-controls.md)
 - **Integrate secure development** — govern requirements, design, implementation, review, testing, vulnerabilities, changes, release, and retirement, see [references/secure-development.md](references/secure-development.md)
 - **Verify the supply chain** — inventory and verify source, dependencies, builders, artifacts, modules, provenance, signatures, permissions, updates, and rollback, see [references/supply-chain.md](references/supply-chain.md)
-- **Assure exact revisions** — layer deterministic evidence, tests, scanners, independent review, intended-denial probes, and freshness checks, see [references/verification-and-operations.md](references/verification-and-operations.md)
-- **Operate the control system** — handle outages, exceptions, incidents, drift, canaries, emergency disable, corrective action, and retirement without silent weakening, see [references/verification-and-operations.md](references/verification-and-operations.md)
+- **Verify security claims** — layer deterministic inspection, tests, scanners, provenance checks, and intended-denial probes, see [references/verification-and-operations.md](references/verification-and-operations.md)
+
+## Boundaries
+
+- This skill does not define a workflow, result provider, runtime, approval process, release process, or incident process.
+- Load testing, operations, incident, privacy, legal, AI, or domain skills separately; this skill contributes only their security-specific criteria.
+- The caller owns whether a security finding blocks, advises, or requires an exception. This skill explains the evidence needed for that decision but does not grant authority.
 
 ## Gotchas
 

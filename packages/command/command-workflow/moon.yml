@@ -2,13 +2,12 @@ $schema: https://moonrepo.dev/schemas/project.json
 language: unknown
 tags: [command]
 dependsOn:
-  - skill-agent-governance
+  - shared-workflow-runtime
   - skill-code-quality
   - skill-code-review
   - skill-plan
   - skill-pull-request
   - skill-testing
-  - skill-workflow
 tasks:
   build:
     command: echo 'build complete'

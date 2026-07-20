@@ -12,5 +12,5 @@
 ## Boundaries
 
 - Examples are evidence for clarity, not an automatic requirement to use Gherkin.
-- A story-shaped artifact is one selectable representation; the canonical result remains Formulation.
+- A story-shaped artifact is one selectable representation; it does not become mandatory.
 - Models may draft and compare but cannot invent stakeholder agreement.

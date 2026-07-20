@@ -25,6 +25,6 @@ digraph VariationAxes {
   {rank=same; trigger; executor; host;}
   {rank=same; controls; evidence; maturity;}
 
-  rule [label="No dimension silently selects another\nA hook does not add a control · an agent does not imply maturity\na host policy does not become workflow governance", shape=note, fillcolor="#fff3cd"];
+  rule [label="No dimension silently selects another\nA hook does not add a control · an agent does not imply maturity\na host policy does not become a runtime control", shape=note, fillcolor="#fff3cd"];
   maturity -> rule [style=invis];
 }

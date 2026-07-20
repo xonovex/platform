@@ -1,11 +1,11 @@
 ---
 name: kiro-guide
-description: "Use when mapping workflow triggers or explicitly selected controls to Kiro IDE or CLI v3 hooks, command actions, or agent actions. Triggers on .kiro/hooks JSON, SessionStart, UserPromptSubmit, PreToolUse, PreTaskExec, file events, exit-code blocking, workspace roots, generated-hook review, hook testing, enable/disable, or Kiro onboarding."
+description: "Use when configuring Kiro IDE or CLI v3 hooks, command actions, or agent actions. Triggers on .kiro/hooks JSON, SessionStart, UserPromptSubmit, PreToolUse, PreTaskExec, file events, exit-code blocking, workspace roots, generated-hook review, hook testing, enable/disable, or Kiro onboarding — even when the user doesn't say 'Kiro hook'."
 ---
 
-# Kiro Harness Governance
+# Kiro Hooks
 
-Map workflow triggers and explicitly selected controls to Kiro's native configuration and extension surface without embedding policy or inventing a universal hook file.
+Configure Kiro's native hook and action surface without inventing unsupported guarantees or a universal hook file.
 
 ## Essentials
 

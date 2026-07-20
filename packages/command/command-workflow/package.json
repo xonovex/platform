@@ -3,13 +3,12 @@
   "version": "6.1.0",
   "private": true,
   "dependencies": {
-    "@xonovex/skill-agent-governance": "6.1.0",
+    "@xonovex/workflow-runtime": "0.1.22",
     "@xonovex/skill-code-quality": "6.1.0",
     "@xonovex/skill-code-review": "6.1.0",
     "@xonovex/skill-plan": "6.1.0",
     "@xonovex/skill-pull-request": "6.1.0",
-    "@xonovex/skill-testing": "6.1.0",
-    "@xonovex/skill-workflow": "6.1.0"
+    "@xonovex/skill-testing": "6.1.0"
   },
   "keywords": [
     "xonovex",

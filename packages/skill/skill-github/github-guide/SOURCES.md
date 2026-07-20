@@ -28,13 +28,6 @@
 - **Used for:** `POST /pulls` (no-push, head/base semantics) in create.md; the `.../pulls/{n}/reviews` object with `comments[]` path/line/side/start_line/start_side/commit_id and the deprecated `position` field in review-post.md; the 404-on-private and `X-Accepted-GitHub-Permissions` header behavior in auth.md.
 - **References:** references/auth.md, references/create.md, references/review-post.md
 
-## GitHub Issues as a provider
-
-- **URLs:** https://docs.github.com/en/rest/issues/issues · https://docs.github.com/en/rest/issues/comments
-- **Last reviewed:** 2026-07-16
-- **Used for:** `references/provider-conformance.md`
-- **Aspects extracted:** Native issue and comment reads/writes, IDs, timestamps, permissions, and API resources used by the optional result-provider adapter. Storage-neutral semantics and the classification of `updated_at` as freshness-only are Xonovex adapter constraints.
-
 ## GitHub GraphQL API
 
 - **URLs:**

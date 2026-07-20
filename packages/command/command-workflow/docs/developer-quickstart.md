@@ -195,6 +195,6 @@ The command help is written abstractly so it can back any storage backend. Trans
 - [Adoption map](adoption-map.md) — compose trigger, executor, host, controls, evidence, and maturity independently
 - [PM Quickstart](pm-quickstart.md) · [QA Quickstart](qa-quickstart.md) ·
   [UX Quickstart](ux-quickstart.md) — the same actor-neutral commands read from the other seats
-- [Architecture and composition](architecture-and-composition.md) — the plugin-kernel model
-- [`workflow-guide`](../../../skill/skill-workflow/workflow-guide/SKILL.md) and
-  [`plan-guide`](../../../skill/skill-plan/plan-guide/SKILL.md) — the behavior each command runs
+- [Architecture and composition](architecture-and-composition.md) — the plugin-runtime model
+- [`plan-guide`](../../../skill/skill-plan/plan-guide/SKILL.md) — planning behavior used by
+  the early-lifecycle commands

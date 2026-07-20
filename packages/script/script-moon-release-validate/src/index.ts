@@ -392,17 +392,13 @@ for (const evalFile of evalFiles) {
 }
 
 const conformanceAssets = [
-  "packages/skill/skill-agent-governance/agent-governance-guide/scripts/workflow-runtime.test.ts",
-  "packages/skill/skill-agent-governance/agent-governance-guide/scripts/workflow-command-runtime.test.ts",
-  "packages/skill/skill-agent-governance/agent-governance-guide/scripts/workflow-trigger-adapters.test.ts",
-  "packages/skill/skill-agent-governance/agent-governance-guide/scripts/workflow-maturity.test.ts",
-  "packages/skill/skill-workflow/workflow-guide/assets/conformance-fixtures.json",
-  "packages/skill/skill-workflow/workflow-guide/assets/development-assurance-fixtures.json",
-  "packages/skill/skill-workflow/workflow-guide/assets/operational-lifecycle-fixtures.json",
+  "packages/shared/shared-workflow-runtime/src/runtime.test.ts",
+  "packages/shared/shared-workflow-runtime/src/command-runtime.test.ts",
+  "packages/shared/shared-workflow-runtime/src/trigger-adapters.test.ts",
+  "packages/shared/shared-workflow-runtime/src/maturity.test.ts",
 ].map((path) => resolve(repositoryRoot, path));
 const conformanceText = conformanceAssets.map(read).join("\n").toLowerCase();
 for (const coverageTerm of [
-  "concurrency",
   "idempotency",
   "capability",
   "executor",
@@ -410,15 +406,10 @@ for (const coverageTerm of [
   "observe",
   "enforce",
   "evidence",
-  "authority",
-  "rollback",
-  "policy",
-  "lifecycle",
-  "provider",
 ]) {
   check(
     conformanceText.includes(coverageTerm),
-    `conformance fixtures cover ${coverageTerm}`,
+    `runtime tests cover ${coverageTerm}`,
   );
 }
 
@@ -431,7 +422,7 @@ const diagramSources = ["workflow-diagram.dot", "target-architecture.dot"].map(
 );
 const combinedDiagrams = diagramSources.join("\n").toLowerCase();
 for (const diagramTerm of [
-  "neutral workflow kernel",
+  "composable workflow runtime",
   "trigger adapter",
   "executor port",
   "control port",

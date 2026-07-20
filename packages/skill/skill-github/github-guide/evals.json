@@ -36,16 +36,6 @@
     },
     {
       "id": 5,
-      "prompt": "We explicitly selected GitHub Issues as the provider for workflow Planning results. Describe the adapter contract and how it recovers after a fresh process starts. Can I use the issue updated_at as an immutable revision and fall back to a local file when GitHub is down?",
-      "assertions": [
-        "Maps the adapter to opaque resolve/read/publish/revise/relate/version/capabilities behavior while keeping the semantic port owned outside GitHub",
-        "Reconstructs from GitHub-native issue/comment references after restart rather than conversation state or a sidecar result file",
-        "Classifies issue/comment updated_at as a freshness token rather than an immutable revision and binds exact-revision assurance to an immutable commit/check/artifact reference",
-        "Rejects silent fallback to a local file or another provider for side effects when the explicitly selected GitHub provider is unavailable"
-      ]
-    },
-    {
-      "id": 6,
       "prompt": "Onboard mandatory governance checks and protected production releases across our GitHub organization. We want reusable automation rather than copied YAML, immutable dependencies, least privilege, a merge gate that developers cannot omit, deployment approval, attestations, preview/rollback, and evidence. Explain the native design and the bypass tests.",
       "assertions": [
         "Uses a reusable workflow (and composite action only for reusable steps), pins cross-repository workflows/actions to full commit SHAs, and gives the reusable workflow a stable required-check identity",

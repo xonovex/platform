@@ -54,12 +54,6 @@
     "rationale": "near miss: Datadog owner"
   },
   {
-    "query": "write a cloud-neutral policy provider interface",
-    "should_trigger": false,
-    "split": "train",
-    "rationale": "near miss: governance owner"
-  },
-  {
     "query": "deploy an application with Terraform modules",
     "should_trigger": false,
     "split": "train",
@@ -94,5 +88,11 @@
     "rationale": "near miss owned by bitbucket-guide",
     "should_trigger": false,
     "split": "validation"
+  },
+  {
+    "query": "write a Terraform module for an encrypted S3 bucket with lifecycle rules",
+    "rationale": "near miss owned by terraform-guide",
+    "should_trigger": false,
+    "split": "train"
   }
 ]

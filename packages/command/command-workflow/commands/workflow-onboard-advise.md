@@ -20,7 +20,7 @@ argument-hint: "[scope] [--trigger <kind>] [--executor <plugin>] [--host <kind>]
 
 ## Delegation
 
-Load `agent-governance-guide`. Discover only facts needed to describe the requested
-composition, report every unselected dimension as unselected, and recommend the smallest
-set of adapters and plugins that satisfies explicit requirements. Treat maturity as an
-optional separate assessment. Do not install, mutate, activate, or imply controls.
+Discover only facts needed to describe the requested composition, report every unselected
+dimension as unselected, and recommend the smallest set of adapters and plugins that
+satisfies explicit requirements. Treat maturity as an optional separate assessment. Do
+not install, mutate, activate, or imply controls.

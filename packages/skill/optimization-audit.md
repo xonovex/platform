@@ -7,32 +7,29 @@ Commits: `6af54791` (trim), `b67816f5` (restore).
 
 ## 2026-07-19 catalog follow-up
 
-- Current catalog: **93 skills**, **27,844** `SKILL.md` + `references/` lines, **385 output evals**, and **1,616 trigger queries**.
-- Tiers: 25 aggressive, 44 moderate, 24 conservative.
+- Current catalog: **90 skills**, **25,825** `SKILL.md` + `references/` lines, **356 output evals**, and **1,582 trigger queries**.
+- Tiers: 25 aggressive, 41 moderate, 24 conservative.
 - Every skill now has `evals.json`, at least 8 positive plus 8 sibling-aware negative trigger queries with train/validation splits, and reviewed source provenance.
-- The 19 post-baseline skills below are all moderate-tier. The catalog-wide local-plugin A/B suite is defined in `.github/workflows/skill-evals.yml`: monthly when `SKILL_EVALS_ENABLED=true`, manually, or for changed skills on enabled internal pull requests. Scheduled/manual runs select all 93 skills; pull requests select directly changed skills, while shared evaluator changes select the full catalog. Trigger validation runs each query three times. Output evaluation runs every probe once per arm in batches of at most six, with Haiku generation, Sonnet judging, a $0.10/six-turn generation cap, and a $0.10/one-turn judge cap. The runner independently refuses more than 24 total model calls per batch, more than two concurrent calls, higher spend caps, or more than three runs per arm. Generation exposes only `Skill,Read` or `Read`; judging exposes no tools; settings and MCP discovery are disabled; minimal fixed system prompts replace the general coding context; calls are never retried automatically, and failed generations are not judged.
+- The 16 post-baseline skills below are all moderate-tier. The catalog-wide local-plugin A/B suite is defined in `.github/workflows/skill-evals.yml`: monthly when `SKILL_EVALS_ENABLED=true`, manually, or for changed skills on enabled internal pull requests. Scheduled/manual runs select all 90 skills; pull requests select directly changed skills, while shared evaluator changes select the full catalog. Trigger validation runs each query three times. Output evaluation runs every probe once per arm in batches of at most six, with Haiku generation, Sonnet judging, a $0.10/six-turn generation cap, and a $0.10/one-turn judge cap. The runner independently refuses more than 24 total model calls per batch, more than two concurrent calls, higher spend caps, or more than three runs per arm. Generation exposes only `Skill,Read` or `Read`; judging exposes no tools; settings and MCP discovery are disabled; minimal fixed system prompts replace the general coding context; calls are never retried automatically, and failed generations are not judged.
 
-| Post-baseline skill  | Output evals | Distilled lines | Live A/B status                                     |
-| -------------------- | -----------: | --------------: | --------------------------------------------------- |
-| `accessibility`      |            3 |             157 | valid: 0.445 vs 0.222, delta +0.223                 |
-| `agent-governance`   |            8 |           1,385 | invalid: activated response crossed output ceiling  |
-| `ai-governance`      |            3 |             172 | valid: 0.889 vs 0.111, delta +0.778                 |
-| `atlassian`          |            5 |             354 | valid: 1.000 vs 0.100, delta +0.900                 |
-| `aws`                |            3 |             153 | valid: 0.778 vs 0.222, delta +0.556                 |
-| `azure-devops`       |            5 |             498 | valid: 0.467 vs 0.067, delta +0.400                 |
-| `bitbucket`          |            5 |             563 | invalid: activated response crossed output ceiling  |
-| `bitrise`            |            5 |             461 | invalid: activated response crossed output ceiling  |
-| `claude-code`        |            3 |             142 | dependency fixed; final one-eval smoke delta +1.000 |
-| `codex`              |            3 |             124 | activated; interim $0.05 judge process exited 1     |
-| `copilot`            |            3 |             121 | activated; interim $0.05 judge process exited 1     |
-| `datadog`            |            3 |             151 | invalid: activated response crossed output ceiling  |
-| `figma`              |            5 |             336 | valid: 0.700 vs 0.000, delta +0.700                 |
-| `kiro`               |            3 |             119 | activated; interim $0.05 judge process exited 1     |
-| `opencode`           |            3 |             119 | activated; interim $0.05 judge process exited 1     |
-| `pi`                 |            3 |             122 | activated; interim $0.05 judge process exited 1     |
-| `reliability`        |            3 |             178 | valid: 0.333 vs 0.000, delta +0.333                 |
-| `security-assurance` |            3 |             165 | invalid: generation process failure                 |
-| `workflow`           |           16 |             905 | refused preflight: 64 calls exceeds hard maximum    |
+| Post-baseline skill                                  | Output evals | Distilled lines | Live A/B status                                     |
+| ---------------------------------------------------- | -----------: | --------------: | --------------------------------------------------- |
+| `accessibility`                                      |            3 |             157 | valid: 0.445 vs 0.222, delta +0.223                 |
+| `atlassian`                                          |            5 |             354 | valid: 1.000 vs 0.100, delta +0.900                 |
+| `aws`                                                |            3 |             153 | valid: 0.778 vs 0.222, delta +0.556                 |
+| `azure-devops`                                       |            5 |             498 | valid: 0.467 vs 0.067, delta +0.400                 |
+| `bitbucket`                                          |            5 |             563 | invalid: activated response crossed output ceiling  |
+| `bitrise`                                            |            5 |             461 | invalid: activated response crossed output ceiling  |
+| `claude-code`                                        |            3 |             142 | dependency fixed; final one-eval smoke delta +1.000 |
+| `codex`                                              |            3 |             124 | activated; interim $0.05 judge process exited 1     |
+| `copilot`                                            |            3 |             121 | activated; interim $0.05 judge process exited 1     |
+| `datadog`                                            |            3 |             151 | invalid: activated response crossed output ceiling  |
+| `figma`                                              |            5 |             336 | valid: 0.700 vs 0.000, delta +0.700                 |
+| `kiro`                                               |            3 |             119 | activated; interim $0.05 judge process exited 1     |
+| `opencode`                                           |            3 |             119 | activated; interim $0.05 judge process exited 1     |
+| `pi`                                                 |            3 |             122 | activated; interim $0.05 judge process exited 1     |
+| `reliability`                                        |            3 |             178 | valid: 0.333 vs 0.000, delta +0.333                 |
+| `security-assurance`                                 |            3 |             165 | invalid: generation process failure                 |
 
 The authenticated local calibration produced seven valid full A/B benchmarks, a valid final-cap Claude Code dependency smoke, and bounded invalid diagnostics for the remaining skills. Invalid runs never publish `benchmark.json`: zero-token, process, judge, output-limit, missing-activation, and aggregate-limit failures are infrastructure or skill-behavior findings, not optimization scores. The initial full results used the earlier per-call caps while the containment layers were being calibrated; future scheduled evidence uses the final lower caps and bounded six-eval batch. Re-run a bounded batch before changing a tier or trimming content from a live result.
 
@@ -177,7 +174,7 @@ Before/after are total lines across `SKILL.md` + `references/`, measured from gi
 
 ## Re-running the evals (and adding a new model)
 
-Every skill carries an `evals.json` next to its `SKILL.md` — the output-eval seed consumed by `moon-skill-eval-outputs`. It holds the knowledge probes (`prompt` + binary `assertions`) that seed any A/B or ablation run. **385 evals across the catalog.** This is the durable "something to start from": no probe needs re-authoring to test a new model.
+Every skill carries an `evals.json` next to its `SKILL.md` — the output-eval seed consumed by `moon-skill-eval-outputs`. It holds the knowledge probes (`prompt` + binary `assertions`) that seed any A/B or ablation run. **356 evals across the catalog.** This is the durable "something to start from": no probe needs re-authoring to test a new model.
 
 ### Test one skill on any model
 

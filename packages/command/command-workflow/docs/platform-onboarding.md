@@ -14,4 +14,4 @@ Those constraints do not create workflow controls or imply maturity.
 
 CI required checks, repository rules, deployment approvals, admission controls, and cloud
 identity policy may be selected as native controls. Register and select each independently;
-do not convert platform presence into a universal governance profile.
+do not convert platform presence into a universal control profile.

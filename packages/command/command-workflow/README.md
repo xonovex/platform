@@ -1,8 +1,8 @@
 # Composable Workflow Commands
 
-Provider-native lifecycle commands for discovery through retirement. Canonical result
-meaning stays stable while methods, executors, providers, workspaces, and executable
-composition vary independently.
+Independently invocable commands for discovery through retirement. Each command owns its
+operation and selects only the methods, providers, workspaces, and executable composition
+needed for that invocation.
 
 Controls are optional plugins around an executor. Installing this command plugin does not
 activate a hook, control, evidence sink, maturity model, or host policy.
@@ -44,9 +44,9 @@ codex plugin add xonovex-workflow@xonovex-marketplace
 
 ## Dependencies
 
-Commands load their owning guideline skills at runtime. Plugin dependencies guarantee the
-core workflow, planning, composition-runtime, review, and testing capabilities are
-installed. Installation makes those capabilities available; it selects none of them.
+Commands load their owning guideline skills at runtime. Plugin dependencies make planning,
+portable result handoffs, runtime composition, review, and testing capabilities available;
+no command must use every capability, and installation selects none of them.
 
 Methods and native adapters are soft dependencies selected per operation. User stories,
 BDD, example mapping, user research, accessibility, architecture, Git/worktrees, GitHub,
@@ -140,12 +140,12 @@ notified, revoked, and reviewed.
 | `pr-create`                                    | Open a provider-native pull/merge request through the detected host adapter |
 | `pr-review-{analyze,refine,post,resolve}`      | Produce, refine, publish, and resolve review findings                       |
 | `workflow-inspect`                             | Explain selected plugins, capability gates, and enforcement points          |
-| `workflow-conformance`                         | Validate a lifecycle contract or executable composition                     |
+| `workflow-conformance`                         | Validate a result/provider handoff or executable composition                |
 | `workflow-onboard-advise`                      | Recommend a minimal composition without installing or enabling it           |
 
 ## Design decisions
 
-- Lifecycle commands depend on semantic result and provider ports, not provider formats.
+- Commands use the small result/provider contract only when portable handoffs are selected.
 - Neutral methods are available without story/Gherkin skills; specialist methods remain selectable.
 - Deterministic collection is preferred, model synthesis is bounded, agents are reserved for adaptive exploration, and human/qualified authority is never fabricated.
 - Local files, Git repositories, hosted trackers, and databases are peers selected by context; none is the universal fallback.

@@ -13,7 +13,7 @@ digraph ComposableWorkflow {
   invocation [label="Invocation\nopen trigger kind · subject · operation\nplugin selections · required capabilities", shape=folder, fillcolor="#dff4ff"];
 
   subgraph cluster_kernel {
-    label="Neutral workflow kernel";
+    label="Composable workflow runtime";
     style=filled;
     fillcolor="#f8f3ff";
 

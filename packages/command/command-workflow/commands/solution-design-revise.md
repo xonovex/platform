@@ -22,6 +22,5 @@ argument-hint: "<native-reference> [--revision <native-revision>] [--feedback <r
 
 ## Delegation
 
-Load `plan-guide` and perform **solution-design-revise**; load `workflow-guide` for
-native revision and provider semantics. Publish a new proposed revision, preserve the
-original and supersession links, and re-evaluate stale evidence.
+Load `plan-guide` and perform **solution-design-revise**. Preserve the original and
+supersession links when supported, and re-evaluate affected evidence.

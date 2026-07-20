@@ -24,6 +24,6 @@ argument-hint: "<development-reference...> --target <native-target> [--revision 
 
 ## Delegation
 
-Load `workflow-guide` and perform **deliver-publish**. Load the selected provider skill
-for native publication, authentication, identifiers, revisions, and side effects. Return
-a Deliverable Publication result; never fall back from an unavailable explicit provider.
+Perform **deliver-publish** with the selected provider skill, which owns native
+publication, authentication, identifiers, revisions, and side effects. Never fall back
+from an unavailable explicit provider.

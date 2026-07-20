@@ -132,8 +132,8 @@ Never re-label stale, skipped, neutral, cancelled, timed-out, missing, or partia
 
 The failure this prevents is the most ordinary one in review: a PASS collected against revision 3,
 quoted at revision 7, on the grounds that nothing important changed in between. The command cannot
-know that — and neither can you. `workflow-guide` owns the full freshness binding in
-[assurance-contracts.md](../../../skill/skill-workflow/workflow-guide/references/assurance-contracts.md).
+know that — and neither can you. The selected review, testing, scanner, or assurance
+capability owns its freshness rules.
 
 ## Gates where a human is mandatory
 

@@ -21,9 +21,9 @@ argument-hint: "<subject-reference> [--revision <native-revision>] --window <ran
 
 ## Delegation
 
-Load `workflow-guide` and perform **observe-run**. Soft-select monitoring, user-feedback,
-security, AI, cost, accessibility, delivery-outcome, and provider skills. Keep bounded
-model/agent summaries advisory and linked to provider-native source evidence. For an
-operator-hosted `AgentRun`, use its phase, conditions, Job/Pod references, and any
-explicitly selected external evidence sink. Do not infer workflow controls or maturity
-from operator status, and do not copy prompt or Secret content into the observation.
+Perform **observe-run** with selected monitoring, user-feedback, security, AI, cost,
+accessibility, delivery-outcome, and provider skills. Keep bounded model/agent summaries
+advisory and linked to provider-native source evidence. For an operator-hosted `AgentRun`,
+use its phase, conditions, Job/Pod references, and any explicitly selected external
+evidence sink. Do not infer workflow controls or maturity from operator status, and do
+not copy prompt or Secret content into the observation.

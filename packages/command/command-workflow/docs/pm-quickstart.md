@@ -138,6 +138,5 @@ and never change who executes or which gates apply.
 - [Adoption map](adoption-map.md) — compose what you need, from guideline skills to enforced pipelines
 - [Developer Quickstart](developer-quickstart.md) — the sibling lens, and the jargon decoder
 - [QA Quickstart](qa-quickstart.md) · [UX Quickstart](ux-quickstart.md) — the other lenses
-- [`plan-guide`](../../../skill/skill-plan/plan-guide/SKILL.md) and
-  [`workflow-guide`](../../../skill/skill-workflow/workflow-guide/SKILL.md) — the behavior each
-  command runs
+- [`plan-guide`](../../../skill/skill-plan/plan-guide/SKILL.md) and the selected provider
+  capability — the behavior each command runs

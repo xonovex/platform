@@ -24,6 +24,6 @@ argument-hint: "<subject-reference> [--revision <native-revision>] --kind <sbom|
 
 ## Delegation
 
-Load `workflow-guide` and perform **inventory-generate**. Load deterministic ecosystem
-generators and the selected provider skill. Never use model output to invent or modify
-component identities, versions, digests, relationships, provenance, or completeness.
+Perform **inventory-generate** with deterministic ecosystem generators and the selected
+provider skill. Never use model output to invent or modify component identities,
+versions, digests, relationships, provenance, or completeness.

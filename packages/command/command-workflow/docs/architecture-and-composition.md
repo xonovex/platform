@@ -1,6 +1,6 @@
 # Architecture and Composition
 
-The executable core is a small plugin kernel. It knows how to resolve one executor, run
+The executable core is a small plugin runtime. It knows how to resolve one executor, run
 selected controls before and after it, and publish to selected evidence sinks. It does not
 know about shell scripts, LLMs, agents, hooks, CI products, Kubernetes, or A1/A2/A3.
 
@@ -25,7 +25,7 @@ or silently add controls.
 
 ## Intrinsic enforcement
 
-The kernel enforces only:
+The runtime enforces only:
 
 - invocation schema validity;
 - plugin registration;
@@ -36,8 +36,5 @@ The kernel enforces only:
 Everything else is an optional plugin or host concern. Retries, budgets, token limits,
 approval, provenance, protected targets, escalation, and maturity are not global defaults.
 
-## Separate workflow semantics
-
-Lifecycle result contracts in `workflow-guide` can be used without this runtime. The
-runtime can execute operations that do not use the lifecycle model. A composition may
-connect them, but neither imports or profiles the other.
+Persistence and provider handoffs remain caller-owned. The runtime executes a selected
+composition without requiring a universal result envelope or storage model.

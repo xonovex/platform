@@ -23,6 +23,5 @@ argument-hint: "<native-reference> [--revision <native-revision>] [--feedback <r
 
 ## Delegation
 
-Load `plan-guide` and perform **plan-revise**; load `workflow-guide` for provider and
-revision contracts. Resolve every item, publish a new native revision with supersession,
-and stop without implementing or transferring approval from the prior revision.
+Load `plan-guide` and perform **plan-revise**. Resolve every item, preserve history when
+supported, and stop without implementing or transferring approval from the prior result.

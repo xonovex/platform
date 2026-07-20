@@ -1,6 +1,6 @@
 ---
 name: gitlab-guide
-description: "Use when delivering a merge request/review, configuring native CI/policy enforcement, or implementing an optional result-provider adapter on GitLab (GitLab.com, self-managed, or Dedicated). Triggers on `glab mr create`, inline discussions, approvals, CI/CD components/typed inputs, SHA pinning, pipeline execution policies, compliance frameworks, protected environments, GitLab token scopes, or mapping Issues to opaque workflow result capabilities — even when the user doesn't say 'glab'."
+description: "Use when delivering a merge request/review or configuring native CI/policy enforcement on GitLab (GitLab.com, self-managed, or Dedicated). Triggers on `glab mr create`, inline discussions, approvals, CI/CD components/typed inputs, SHA pinning, pipeline execution policies, compliance frameworks, protected environments, or GitLab token scopes — even when the user doesn't say 'glab'."
 ---
 
 # GitLab delivery and enforcement — quick reference
@@ -30,7 +30,6 @@ Before any write:
 - **Resolve a thread** — `PUT .../discussions/:discussion_id?resolved=true` (REST is enough on GitLab; no GraphQL needed); match by discussion `id`, never by line. See [references/review-resolve.md](references/review-resolve.md).
 - **Deep-link** — MR notes carry no `web_url`; build `<mr_url>#note_<note_id>` from the returned note `id`. See [references/review-post.md](references/review-post.md).
 - **Auth & host** — `api` scope for writes (`read_api` reads), `GITLAB_HOST` targets self-managed, `GITLAB_TOKEN` is the general auth token. See [references/auth.md](references/auth.md).
-- **Adapt Issues as an optional result provider** — preserve GitLab-native issue/note references, disclose edition and freshness-only version limits, and never make GitLab a core workflow dependency. See [references/provider-conformance.md](references/provider-conformance.md).
 - **Enforce with native automation** — use pinned, typed, tested CI/CD components, pipeline execution policies, compliance frameworks, protected environments, least-privilege credentials, and provider-native evidence. See [references/automation-and-enforcement.md](references/automation-and-enforcement.md).
 - **Transact every governance change** — discover, preview exact group/project mutations and authority, authorize, apply idempotently against observed revisions, verify with allow and deny probes, roll back, and own the drift. See [references/onboarding.md](references/onboarding.md).
 
@@ -90,5 +89,4 @@ Each reference is a trigger — read it only when the user's intent matches; do 
 - Read [references/review-post.md](references/review-post.md) — Load when publishing a review: the summary note, the exact inline position model (three SHAs + conditional line keys), verifying `DiffNote`, the blocking mechanism, and the `#note_<id>` deep-link.
 - Read [references/review-resolve.md](references/review-resolve.md) — Load when listing threads, matching a finding to a discussion by id, resolving via the REST PUT, replying in-thread, and the merge-gating effect.
 - Read [references/onboarding.md](references/onboarding.md) — Load when setting up, diagnosing, dry-running, verifying, rolling back, uninstalling, or checking drift for selected GitLab adapters and controls.
-- Read [references/provider-conformance.md](references/provider-conformance.md) — Load when mapping GitLab Issues/notes to the optional workflow result-provider port or testing opaque-reference, restart, revision, retry, relationship, edition, and failure behavior.
 - Read [references/automation-and-enforcement.md](references/automation-and-enforcement.md) — Load when configuring or onboarding CI/CD components, typed inputs, pipeline execution policies, compliance frameworks, protected environments, policy projects, evidence, rollback, or governance-only GitLab adoption.

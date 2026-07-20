@@ -1,7 +1,7 @@
 {
   "name": "xonovex-skill-opencode",
   "version": "6.1.0",
-  "description": "Xonovex OpenCode workflow hook skills",
+  "description": "Xonovex OpenCode plugin skills",
   "author": {
     "name": "Xonovex"
   },

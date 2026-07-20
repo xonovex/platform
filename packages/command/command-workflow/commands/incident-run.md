@@ -23,9 +23,8 @@ argument-hint: "<declare|update|contain|recover|close> [incident-reference] [--s
 
 ## Delegation
 
-Load `workflow-guide` and perform **incident-run**, then soft-select incident, monitoring,
-security, privacy, legal, resilience, and provider skills. If the caller supplied an
-executable composition, load `agent-governance-guide` to resolve only its selected
-controls and evidence sinks. Do not infer controls or maturity from incident severity,
-the executor, or an operator-hosted run. Agents cannot fabricate reporting applicability,
-accountable decisions, or notifications.
+Perform **incident-run** with selected incident, monitoring, security, privacy, legal,
+resilience, and provider skills. If the caller supplied an executable composition, pass
+it unchanged to the shared workflow runtime. Do not infer controls or maturity from
+incident severity, the executor, or an operator-hosted run. Agents cannot fabricate
+reporting applicability, accountable decisions, or notifications.

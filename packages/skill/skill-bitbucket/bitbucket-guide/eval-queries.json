@@ -54,12 +54,6 @@
     "rationale": "near miss: Azure DevOps owner"
   },
   {
-    "query": "write a platform-neutral source provider port",
-    "should_trigger": false,
-    "split": "train",
-    "rationale": "near miss: workflow/governance owner"
-  },
-  {
     "query": "set up an AWS Organizations service control policy",
     "should_trigger": false,
     "split": "train",
@@ -110,6 +104,12 @@
   {
     "query": "onboard an Azure Pipelines service connection without creating a client secret",
     "rationale": "near miss owned by azure-devops-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "enforce a GitLab CI component through a group pipeline execution policy",
+    "rationale": "near miss owned by gitlab-guide",
     "should_trigger": false,
     "split": "validation"
   }

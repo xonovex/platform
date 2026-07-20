@@ -71,7 +71,7 @@ const validationGuide = read(
 );
 for (const matrixTerm of [
   "Workflow contracts",
-  "Composition kernel",
+  "Composition runtime",
   "Executor adapters",
   "Trigger adapters",
   "Evidence sinks",

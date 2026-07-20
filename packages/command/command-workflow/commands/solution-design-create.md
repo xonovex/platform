@@ -22,7 +22,6 @@ argument-hint: "<subject-or-native-reference> [--profile <reference>] [--provide
 
 ## Delegation
 
-Load `plan-guide` and perform **solution-design-create**; load `workflow-guide` for
-result and provider contracts. Select compatible architecture, security, privacy, data,
-platform, and technology skills by context, then publish a proposed Solution Design
-without making architecture a prerequisite for every profile.
+Load `plan-guide` and perform **solution-design-create**. Select compatible architecture,
+security, privacy, data, platform, and technology skills by context; do not make Solution
+Design a prerequisite.

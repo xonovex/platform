@@ -24,13 +24,7 @@
     "rationale": "near miss owned by testing guidance"
   },
   {
-    "query": "create a generic governance policy outcome schema",
-    "should_trigger": false,
-    "split": "train",
-    "rationale": "generic contract owned by agent-governance-guide"
-  },
-  {
-    "query": "A workflow selects an OpenCode pre-operation control in enforce mode. Validate whether the installed surface can provide the requested blocking guarantee.",
+    "query": "Can an OpenCode tool.execute.before plugin block this exact tool operation? Validate the installed surface and its coverage.",
     "rationale": "output-eval task also exercises this skill's routing boundary",
     "should_trigger": true,
     "split": "train"
@@ -66,7 +60,7 @@
     "split": "train"
   },
   {
-    "query": "A workflow selects a Claude Code pre-operation control in enforce mode. Validate whether the installed surface can provide the requested blocking guarantee.",
+    "query": "Can a Claude Code PreToolUse hook block this exact tool operation? Validate the installed surface and its coverage.",
     "rationale": "near miss owned by code-harness-guide",
     "should_trigger": false,
     "split": "validation"
@@ -94,5 +88,11 @@
     "rationale": "implicit task cue derived from the onboarding reference",
     "should_trigger": true,
     "split": "validation"
+  },
+  {
+    "query": "configure a Pi extension and project-local prompt templates",
+    "rationale": "near miss owned by pi-guide",
+    "should_trigger": false,
+    "split": "train"
   }
 ]
