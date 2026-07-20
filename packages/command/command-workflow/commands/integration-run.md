@@ -22,6 +22,7 @@ argument-hint: "<accepted-reference> [--revision <native-revision>] --target <na
 
 ## Delegation
 
-Load `workflow-guide` and perform **integration-run**. Load `agent-governance-guide` and
-the selected external-enforcement/provider skill. Use only its explicit protected
-Integration capability; ordinary shell, write, merge, or tool calls cannot bypass it.
+Load `workflow-guide` and perform **integration-run**, using the selected provider's
+native Integration capability. If the caller supplied a composition, load
+`agent-governance-guide` and apply exactly its selected controls and evidence behavior.
+The command does not add an approval, policy engine, hook, or maturity requirement.

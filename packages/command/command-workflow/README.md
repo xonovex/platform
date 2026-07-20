@@ -1,12 +1,11 @@
 # Composable Workflow Commands
 
 Provider-native lifecycle commands for discovery through retirement. Canonical result
-meaning stays stable while profiles independently select methods, executors, providers,
-workspaces, and governance.
+meaning stays stable while methods, executors, providers, workspaces, and executable
+composition vary independently.
 
-Workflow and governance are separate composable planes. Installing this command plugin
-does not require harness governance, and installing governance or onboarding modules does
-not require lifecycle commands.
+Controls are optional plugins around an executor. Installing this command plugin does not
+activate a hook, control, evidence sink, maturity model, or host policy.
 
 ## Guides
 
@@ -20,13 +19,12 @@ title. Each names the subset one perspective runs and the gates it answers for:
 
 Reference guides:
 
-- [Adoption map](docs/adoption-map.md) — compose what you need, from guideline skills to enforced pipelines
+- [Adoption map](docs/adoption-map.md) — select trigger, executor, host, controls, evidence, and maturity independently
 - [Architecture and composition](docs/architecture-and-composition.md)
 - [Harness capabilities and onboarding](docs/harness-capabilities.md)
 - [External platform onboarding](docs/platform-onboarding.md)
 - [Security and policy enforcement](docs/security-and-policy.md)
 - [Validation and traceability](docs/validation-and-traceability.md)
-- [Migration from 5.x to 6.0.0](MIGRATION.md)
 
 ## Installation
 
@@ -47,7 +45,8 @@ codex plugin add xonovex-workflow@xonovex-marketplace
 ## Dependencies
 
 Commands load their owning guideline skills at runtime. Plugin dependencies guarantee the
-core workflow, planning, governance, review, and testing capabilities are installed.
+core workflow, planning, composition-runtime, review, and testing capabilities are
+installed. Installation makes those capabilities available; it selects none of them.
 
 Methods and native adapters are soft dependencies selected per operation. User stories,
 BDD, example mapping, user research, accessibility, architecture, Git/worktrees, GitHub,
@@ -67,15 +66,15 @@ revision, and authority-bound acceptance remain independent operations. Fresh-co
 resume resolves native references; conversation and runtime traces are not persistent
 identity.
 
-| Command                                             | Description                                                                                      |
-| --------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
-| `discovery-run`                                     | Iterate observations, assumptions, affected context, and unknowns without forcing stories        |
-| `research-run`                                      | Produce reusable evidence, provenance, confidence, uncertainty, and bounded synthesis            |
-| `formulation-run`                                   | Formulate candidate behavior, examples, constraints, and ambiguities with a neutral default      |
-| `experience-design-{create,critique,revise,accept}` | Manage an optional Experience Design result at exact revisions                                   |
-| `solution-design-{create,critique,revise,accept}`   | Manage an optional Solution Design result at exact revisions                                     |
-| `decision-{create,critique,revise,accept}`          | Keep evidence, recommendation, authority, and supersession separate                              |
-| `workflow-onboard-advise`                           | Recommend profile-compatible methods, skills, providers, executors, and modules without applying |
+| Command                                             | Description                                                                                 |
+| --------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| `discovery-run`                                     | Iterate observations, assumptions, affected context, and unknowns without forcing stories   |
+| `research-run`                                      | Produce reusable evidence, provenance, confidence, uncertainty, and bounded synthesis       |
+| `formulation-run`                                   | Formulate candidate behavior, examples, constraints, and ambiguities with a neutral default |
+| `experience-design-{create,critique,revise,accept}` | Manage an optional Experience Design result at exact revisions                              |
+| `solution-design-{create,critique,revise,accept}`   | Manage an optional Solution Design result at exact revisions                                |
+| `decision-{create,critique,revise,accept}`          | Keep evidence, recommendation, authority, and supersession separate                         |
+| `workflow-onboard-advise`                           | Recommend a minimal trigger/executor/control/evidence composition without applying          |
 
 ## Planning and execution
 
@@ -132,7 +131,7 @@ expiry bindings at a non-bypassable external enforcement point. Ordinary tool ac
 not authorization. Exceptions and emergency exceptions remain scoped, expiring, compensated,
 notified, revoked, and reviewed.
 
-## Delivery and governance
+## Delivery and composition
 
 | Command                                        | Description                                                                 |
 | ---------------------------------------------- | --------------------------------------------------------------------------- |
@@ -140,28 +139,26 @@ notified, revoked, and reviewed.
 | `plan-worktree-{create,merge,abandon,cleanup}` | Optional Git-worktree workspace operations                                  |
 | `pr-create`                                    | Open a provider-native pull/merge request through the detected host adapter |
 | `pr-review-{analyze,refine,post,resolve}`      | Produce, refine, publish, and resolve review findings                       |
-| `workflow-inspect`                             | Inspect workflow results, profile topology, evidence, and completion gaps   |
-| `workflow-governance-inspect`                  | Inspect effective policies, modules, authority, enforcement, and exceptions |
-| `workflow-conformance`                         | Validate workflow and governance semantic contracts                         |
-| `workflow-drift`                               | Compare intended and observed governance state                              |
-| `workflow-modules`                             | Inspect or manage governance modules through native adapters                |
+| `workflow-inspect`                             | Explain selected plugins, capability gates, and enforcement points          |
+| `workflow-conformance`                         | Validate a lifecycle contract or executable composition                     |
+| `workflow-onboard-advise`                      | Recommend a minimal composition without installing or enabling it           |
 
 ## Design decisions
 
 - Lifecycle commands depend on semantic result and provider ports, not provider formats.
 - Neutral methods are available without story/Gherkin skills; specialist methods remain selectable.
 - Deterministic collection is preferred, model synthesis is bounded, agents are reserved for adaptive exploration, and human/qualified authority is never fabricated.
-- Local files, Git repositories, hosted trackers, and databases are peers selected by profile/context; none is the universal fallback.
+- Local files, Git repositories, hosted trackers, and databases are peers selected by context; none is the universal fallback.
+- Trigger, executor, host, controls, evidence, and maturity are independent dimensions.
+- Controls default to absent. Every selected control states `observe` or `enforce`; every selected evidence sink states `ignore` or `fail`.
+- A1/A2/A3 have no built-in execution semantics. A caller may derive those labels from its own capability model.
 
 [View workflow diagram](../../diagram/diagram-agent-workflow/workflow-diagram.png)
 
 [View target architecture](../../diagram/diagram-agent-workflow/target-architecture.png)
 
-[View autonomy ladder](../../diagram/diagram-agent-workflow/autonomy-ladder.png) — A0–A3, grading a posture: how far a
-run advances unattended. Guidance for adopting teams; `agent-governance-guide` owns the model.
-
-[View adoption map](../../diagram/diagram-agent-workflow/adoption-map.png) — the two composable tracks and the
-per-control enforcement choice; [docs/adoption-map.md](docs/adoption-map.md) is the companion guide.
+[View adoption map](../../diagram/diagram-agent-workflow/adoption-map.png) — independent composition dimensions;
+[docs/adoption-map.md](docs/adoption-map.md) is the companion guide.
 
 [View enforcement types](../../diagram/diagram-agent-workflow/enforcement-types.png) — one policy decision reaching
 three independent enforcement types, each with its own evidence.

@@ -27,4 +27,4 @@ Kiro v1 hooks use files under `.kiro/hooks/` and support command or agent action
 | Capability after result     | `PostTaskExec`                                     | Supported               | Advisory/context                           | Native spec-task scope only                   |
 | Model/agent evaluation      | Agent action                                       | Supported               | Event-specific                             | Consumes credits and starts agent loop        |
 
-Ordering and concurrency guarantees are unknown in this documentation snapshot. A profile requiring serial handlers fails until a runtime probe establishes it.
+Ordering and concurrency guarantees are unknown in this documentation snapshot. A selected control requiring serial handlers cannot claim that guarantee until a runtime probe establishes it.

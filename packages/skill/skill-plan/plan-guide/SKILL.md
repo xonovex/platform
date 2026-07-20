@@ -11,7 +11,7 @@ Produce Discovery, Research, Formulation, optional Design, Decision, and Plannin
 
 ## Core Principles
 
-- **Neutral semantics** — canonical result meaning stays stable while methods, artifacts, executors, providers, profiles, and governance vary independently
+- **Neutral semantics** — canonical result meaning stays stable while methods, artifacts, executors, providers, profiles, and optional runtime composition vary independently
 - **Native persistence** — consume and publish opaque provider-native references; local files and Git are selectable providers, not prerequisites
 - **Least-adaptive execution** — prefer deterministic collection, bound model synthesis, reserve agents for branching exploration, and preserve human/qualified authority
 - **Research first** — distinguish evidence, provenance, uncertainty, and synthesis before authoring or deciding
@@ -28,7 +28,7 @@ Produce Discovery, Research, Formulation, optional Design, Decision, and Plannin
 - **Experience Design** — create, independently [critique](references/experience-design-critique.md), [revise](references/experience-design-revise.md), and [accept](references/experience-design-accept.md) optional experience results — see [references/experience-design-create.md](references/experience-design-create.md)
 - **Solution Design** — create, independently [critique](references/solution-design-critique.md), [revise](references/solution-design-revise.md), and [accept](references/solution-design-accept.md) optional solution results — see [references/solution-design-create.md](references/solution-design-create.md)
 - **Decision** — [create](references/decision-create.md), independently [critique](references/decision-critique.md), [revise](references/decision-revise.md), and [accept](references/decision-accept.md) authority-bound results
-- **Onboarding advice** — recommend profile-compatible methods, skills, providers, executors, and modules — see [references/lifecycle-onboard-advise.md](references/lifecycle-onboard-advise.md)
+- **Onboarding advice** — recommend workflow methods, skills, providers, and executors without applying changes — see [references/lifecycle-onboard-advise.md](references/lifecycle-onboard-advise.md)
 
 ## Gotchas
 
@@ -41,7 +41,7 @@ Produce Discovery, Research, Formulation, optional Design, Decision, and Plannin
 - Approve the parent with `plan-accept` before `plan-subplans-create` — it requires `status: approved`
 - `plan-critique` must run as an independent agent (fresh session), not the plan's author — self-critique defends instead of attacks
 - A change describable in one sentence (a one-line diff) skips discovery and planning — implement it directly; heavy up-front spec on a trivial edit is waste
-- High-impact gates — `plan-accept`, worktree merge, and acceptance sign-off — stay mandatory-human at every autonomy level; only low-impact gates may auto-advance — see **agent-governance-guide** for the autonomy levels and the gate-impact rule
+- Workflow authority requirements remain explicit result semantics; an executor or maturity label cannot silently satisfy them
 - A plan is done when the team's Definition of Done is met (review, docs, no regressions, NFRs), not when tests merely pass — `plan-validate` checks the DoD, not just success criteria
 - "Tests pass" doesn't mean "success criteria met" — `plan-validate` reads the criteria, not just exit codes
 - Auto-continuing to the next plan after completion silently chains work — `plan-continue` STOPS after one
@@ -63,7 +63,7 @@ Produce Discovery, Research, Formulation, optional Design, Decision, and Plannin
 
 ### Early lifecycle
 
-- Read [references/early-lifecycle-contracts.md](references/early-lifecycle-contracts.md) - Load when selecting methods/executors/providers, requesting policy intents, handling authority, publishing native results, or resuming after context loss
+- Read [references/early-lifecycle-contracts.md](references/early-lifecycle-contracts.md) - Load when selecting methods/executors/providers, handling authority, publishing native results, or resuming after context loss
 - Read [references/discovery-run.md](references/discovery-run.md) - Load when discovering a problem/opportunity through neutral iterative observations, assumptions, and unknowns
 - Read [references/research-run.md](references/research-run.md) - Load when producing reusable evidence with provenance, confidence, uncertainty, limitations, and bounded exploration
 - Read [references/formulation-run.md](references/formulation-run.md) - Load when formulating candidate behavior, examples, constraints, and ambiguities without mandating stories or Gherkin
@@ -79,7 +79,7 @@ Produce Discovery, Research, Formulation, optional Design, Decision, and Plannin
 - Read [references/decision-critique.md](references/decision-critique.md) - Load when independently critiquing a Decision without acting as its authority
 - Read [references/decision-revise.md](references/decision-revise.md) - Load when revising an exact Decision while preserving evidence, authority, and supersession
 - Read [references/decision-accept.md](references/decision-accept.md) - Load when an authorized actor records a decision against an exact native revision
-- Read [references/lifecycle-onboard-advise.md](references/lifecycle-onboard-advise.md) - Load when recommending methods, skills, providers, executors, and environment modules for a selected workflow profile
+- Read [references/lifecycle-onboard-advise.md](references/lifecycle-onboard-advise.md) - Load when recommending workflow methods, skills, providers, and executors without applying changes
 
 ### Research
 

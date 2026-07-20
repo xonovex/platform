@@ -17,14 +17,23 @@ The included skills are token-efficient, harness-neutral, and based on current r
 - **[moon-nix-toolchain](packages/moon/moon-nix-toolchain/)** wraps every Moon task in the repository's Nix flake dev shell, giving reproducible flake-pinned toolchains in local runs, pre-commit hooks, and CI
 - **[Skills](packages/skill/)** give agents coding guidelines they follow automatically; plan-driven development with worktrees, project-instruction management, insight extraction, and skill authoring all live here as consolidated skill packages
 
-## Composable Workflow and Governance
+## Composable Workflows
 
-The platform exposes two independently adoptable planes:
+Workflow lifecycle contracts are independent from executable runtime composition. A
+runtime composition selects six dimensions independently:
 
-- The **workflow plane** publishes provider-native lifecycle results from discovery through retirement. Profiles choose methods, executors, providers, and topology without requiring one file format.
-- The **governance plane** composes policy, authority, semantic event intents, native harness adapters, external enforcement, onboarding, evidence, trust, and observability. It can protect ordinary agent activity without lifecycle commands.
+- trigger;
+- executor;
+- host;
+- zero or more controls;
+- zero or more evidence sinks;
+- an optional caller-defined maturity assessment.
 
-Use either plane alone, use enablement or external enforcement alone, or integrate them. A profile must show the effective composition and limitations before any configuration-changing onboarding step. See the [workflow command documentation](packages/command/command-workflow/README.md), [architecture and composition guide](packages/command/command-workflow/docs/architecture-and-composition.md), and [v6 migration guide](packages/command/command-workflow/MIGRATION.md).
+Installing a plugin selects none of these dimensions. Manual invocation, harness hooks,
+CI/CD, schedules, and webhooks are interchangeable trigger adapters. Controls explicitly
+choose `observe` or `enforce`, while A1/A2/A3 labels have no built-in execution behavior.
+See the [workflow command documentation](packages/command/command-workflow/README.md) and
+[architecture and composition guide](packages/command/command-workflow/docs/architecture-and-composition.md).
 
 ## Quick Start
 

@@ -219,17 +219,6 @@ export const validateInventory = (inventory, specializations) => {
     ) {
       return "inventory-effective-state-unproven";
     }
-    if (
-      inventory.components.some(
-        ({componentKind, classification, adoptionModes, authorityZones}) =>
-          ["governance-module", "policy-bundle"].includes(componentKind) &&
-          (!classification ||
-            !adoptionModes?.length ||
-            !authorityZones?.length),
-      )
-    ) {
-      return "governance-inventory-placement-incomplete";
-    }
   }
   return null;
 };

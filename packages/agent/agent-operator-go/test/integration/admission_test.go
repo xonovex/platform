@@ -29,7 +29,7 @@ func TestAdmissionRejectsInvalidAgentRun(t *testing.T) {
 
 	err := k8sClient.Create(ctx, run)
 
-	requireAdmissionRejection(t, err, "is not declared sandboxed")
+	requireAdmissionRejection(t, err, "is not allowed by the namespace AgentPolicy")
 }
 
 func TestAdmissionRejectsInvalidAgentHarness(t *testing.T) {

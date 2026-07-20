@@ -1,10 +1,9 @@
 {
   "name": "xonovex-skill-pi",
   "version": "6.1.0",
-  "description": "Xonovex Pi harness governance skills",
+  "description": "Xonovex Pi workflow hook skills",
   "author": {
     "name": "Xonovex"
   },
-  "skills": "./pi-guide",
-  "dependencies": ["xonovex-skill-agent-governance"]
+  "skills": "./pi-guide"
 }

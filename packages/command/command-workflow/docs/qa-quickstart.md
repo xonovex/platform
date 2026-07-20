@@ -2,8 +2,8 @@
 
 A lens over the same actor-neutral commands — not a different set of them. No command knows what a
 tester is: `review-run --independent` asks for a reviewer distinct from the author, not for a job
-title. A role is a way to _read_ the command set — which of the 59 you actually run, and what your
-results are worth. The [README](../README.md) documents all 59 commands and their contracts; the
+title. A role is a way to _read_ the command set — which of the 56 you actually run, and what your
+results are worth. The [README](../README.md) documents all 56 commands and their contracts; the
 [Developer Quickstart](developer-quickstart.md) is the sibling lens for the seat that writes the code,
 and it owns the shared vocabulary (native references, `--revision`, `--profile`, `--method`). See the
 [qa-workflow diagram](../../../diagram/diagram-agent-workflow/qa-workflow.png) for this lens at a
@@ -140,26 +140,17 @@ know that — and neither can you. `workflow-guide` owns the full freshness bind
 - **`acceptance-decide`** — never yours to shortcut, and never satisfied by your evidence alone. You
   assemble; an authenticated accountable human signs. It rejects a script, model, agent, unqualified
   actor, self-reviewer where independence is required, or copied provider identity.
-- **The independence requirement itself** — where a profile requires it, no autonomy level relaxes it,
+- **The independence requirement itself** — where a profile requires it, no maturity label relaxes it,
   and a self-review does not satisfy it.
 - **Accountable disposition** — a human or qualified assessor records identity, role, qualification,
   independence, and scope. Scanners, CI, and agents supply evidence, never the disposition.
 
-## Executors and autonomy
+## Executors, controls, and maturity
 
-Two models appear throughout the argument help. Both are owned elsewhere and deliberately not
-restated here:
-
-- **Executor classes** (`--executor`) —
-  [execution.md](../../../skill/skill-agent-governance/agent-governance-guide/references/execution.md).
-  Read the deterministic-authority rule closely: `model` or `agent` output is never authoritative where
-  a deterministic check or external system of record establishes the fact. A model may triage and
-  cluster your findings; the scanner and the suite own the facts.
-- **Autonomy levels `A0`–`A3`** —
-  [autonomy.md](../../../skill/skill-agent-governance/agent-governance-guide/references/autonomy.md).
-  `A1` adds exactly one thing you care about — an independent critique of an exact revision that the
-  author cannot suppress. `A2` makes sign-off asynchronous on exact revisions; asynchronous is not
-  absent, and high-impact gates stay human at every level.
+`--executor` selects who performs the assessment; it does not select independence,
+critique, or approval controls. Add each wanted control explicitly and choose `observe` or
+`enforce`. A team may define A1/A2/A3 from capabilities such as critique and approval, but
+those labels are descriptive and do not alter execution.
 
 ## What you can skip
 

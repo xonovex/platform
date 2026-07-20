@@ -18,7 +18,7 @@ argument-hint: "<subject-or-native-reference> [--profile <reference>] [--provide
 
 - `subject-or-native-reference` (required): Subject or opaque lifecycle input reference.
 - `--profile`, `--provider`, `--method` (optional): Independent selections.
-- `--executor` (optional): `deterministic` | `model` | `agent` | `human` | `external` — a requested ceiling that may be rejected; see `agent-governance-guide`.
+- `--executor` (optional): Explicit `deterministic`, `model`, `agent`, `human`, or `external` workflow selection; it does not imply controls or maturity.
 
 ## Delegation
 

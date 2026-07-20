@@ -21,6 +21,7 @@ argument-hint: "<plan|execute|verify|rollback> --source <native-reference> --tar
 
 ## Delegation
 
-Load `workflow-guide` and perform **transition-run**. For target-changing modes, load
-`agent-governance-guide` plus the selected protected provider skill and prohibit direct
-ordinary-tool mutation outside its explicit capability.
+Load `workflow-guide` and perform **transition-run** with the selected provider skill. If
+the caller supplied a composition, load `agent-governance-guide` and apply only its
+selected controls and evidence behavior. The command does not derive controls from the
+target, executor, or host.

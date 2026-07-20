@@ -4,7 +4,7 @@
   "evals": [
     {
       "id": 1,
-      "prompt": "A mandatory profile selects a OpenCode pre-operation handler. Validate whether the installed surface can enforce it.",
+      "prompt": "A workflow selects an OpenCode pre-operation control in enforce mode. Validate whether the installed surface can provide the requested blocking guarantee.",
       "assertions": [
         "Requires the observed runtime version or an explicit not-installed result and selects the matching versioned capability matrix.",
         "Checks executing handler type, exact covered operations, blocking and failure behavior, ordering, trust, and limitations before accepting the guarantee."

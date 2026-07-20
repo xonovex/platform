@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"bytes"
 	"context"
 	"crypto/sha256"
 	"crypto/subtle"
@@ -9,7 +8,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
 	"net/http"
 	"strings"
 	"time"
@@ -25,14 +23,9 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
 	agentv1alpha1 "github.com/xonovex/platform/packages/agent/agent-operator-go/api/v1alpha1"
-	governancecontracts "github.com/xonovex/platform/packages/agent/agent-operator-go/internal/governance"
 )
 
-const (
-	triggerPathPrefix    = "/v1/triggers/"
-	escalationPathPrefix = "/v1/escalations/"
-	blockedPathPrefix    = "/v1/blocks/"
-)
+const triggerPathPrefix = "/v1/triggers/"
 
 // AgentTriggerReconciler verifies that an event trigger's bearer-token source
 // is readable before the receiver advertises it as ready.
@@ -86,14 +79,6 @@ type AgentTriggerReceiver struct {
 }
 
 func (r *AgentTriggerReceiver) ServeHTTP(response http.ResponseWriter, request *http.Request) {
-	if strings.HasPrefix(request.URL.Path, blockedPathPrefix) {
-		r.serveBlockedSignal(response, request)
-		return
-	}
-	if strings.HasPrefix(request.URL.Path, escalationPathPrefix) {
-		r.serveEscalation(response, request)
-		return
-	}
 	if request.Method != http.MethodPost {
 		writeTriggerResponse(request.Context(), response, http.StatusMethodNotAllowed, map[string]string{"failureCode": "trigger-method-not-allowed"})
 		return
@@ -150,237 +135,6 @@ func (r *AgentTriggerReceiver) ServeHTTP(response http.ResponseWriter, request *
 		return
 	}
 	writeTriggerResponse(request.Context(), response, http.StatusCreated, map[string]string{"run": run.Namespace + "/" + run.Name})
-}
-
-type blockedSignalRequest struct {
-	SubjectRevision   string `json:"subjectRevision"`
-	Reporter          string `json:"reporter"`
-	ReasonCode        string `json:"reasonCode"`
-	EvidenceReference string `json:"evidenceReference"`
-}
-
-func decodeStrictJSON(input io.Reader, maximumBytes int64, target any) error {
-	payload, err := io.ReadAll(io.LimitReader(input, maximumBytes+1))
-	if err != nil {
-		return err
-	}
-	if int64(len(payload)) > maximumBytes {
-		return fmt.Errorf("JSON input exceeds %d bytes", maximumBytes)
-	}
-	decoder := json.NewDecoder(bytes.NewReader(payload))
-	decoder.DisallowUnknownFields()
-	if err := decoder.Decode(target); err != nil {
-		return err
-	}
-	if err := decoder.Decode(&struct{}{}); !errors.Is(err, io.EOF) {
-		if err == nil {
-			return fmt.Errorf("multiple JSON values")
-		}
-		return err
-	}
-	return nil
-}
-
-func (r *AgentTriggerReceiver) serveBlockedSignal(response http.ResponseWriter, request *http.Request) {
-	if request.Method != http.MethodPost {
-		writeTriggerResponse(request.Context(), response, http.StatusMethodNotAllowed, map[string]string{"failureCode": "blocked-signal-method-not-allowed"})
-		return
-	}
-	namespace, name, matched := parseNamespacedPath(request.URL.Path, blockedPathPrefix)
-	if !matched {
-		writeTriggerResponse(request.Context(), response, http.StatusNotFound, map[string]string{"failureCode": "blocked-signal-run-not-found"})
-		return
-	}
-
-	var run agentv1alpha1.AgentRun
-	if err := r.Client.Get(request.Context(), types.NamespacedName{Namespace: namespace, Name: name}, &run); err != nil {
-		status := http.StatusInternalServerError
-		if apierrors.IsNotFound(err) {
-			status = http.StatusNotFound
-		}
-		writeTriggerResponse(request.Context(), response, status, map[string]string{"failureCode": "blocked-signal-run-not-found"})
-		return
-	}
-	if run.Spec.Autonomy == nil || run.Spec.Autonomy.EscalationRoute == nil {
-		writeTriggerResponse(request.Context(), response, http.StatusConflict, map[string]string{"failureCode": "blocked-signal-not-supported"})
-		return
-	}
-	if run.Status.JobName == "" || !observedProvenanceHealthy(&run) {
-		writeTriggerResponse(request.Context(), response, http.StatusConflict, map[string]string{"failureCode": "blocked-signal-runtime-not-observed"})
-		return
-	}
-	token, err := readSecretToken(request.Context(), r.Client, run.Namespace, run.Spec.Autonomy.EscalationRoute.BlockedSignalTokenSecretRef)
-	if err != nil {
-		writeTriggerResponse(request.Context(), response, http.StatusServiceUnavailable, map[string]string{"failureCode": "blocked-signal-token-unavailable"})
-		return
-	}
-	provided := strings.TrimPrefix(request.Header.Get("Authorization"), "Bearer ")
-	if provided == "" || subtle.ConstantTimeCompare([]byte(provided), token) != 1 {
-		writeTriggerResponse(request.Context(), response, http.StatusUnauthorized, map[string]string{"failureCode": "blocked-signal-unauthorized"})
-		return
-	}
-
-	var submitted blockedSignalRequest
-	if err := decodeStrictJSON(request.Body, 65_536, &submitted); err != nil {
-		writeTriggerResponse(request.Context(), response, http.StatusBadRequest, map[string]string{"failureCode": "blocked-signal-invalid"})
-		return
-	}
-	subjectRevision, err := governancecontracts.AgentRunSubjectRevision(&run)
-	if err != nil || submitted.SubjectRevision != subjectRevision ||
-		strings.TrimSpace(submitted.Reporter) == "" || strings.TrimSpace(submitted.ReasonCode) == "" ||
-		!governancecontracts.ContentAddressedEvidenceReference(submitted.EvidenceReference) {
-		writeTriggerResponse(request.Context(), response, http.StatusBadRequest, map[string]string{"failureCode": "blocked-signal-invalid"})
-		return
-	}
-	if run.Status.Blocked != nil {
-		writeTriggerResponse(request.Context(), response, http.StatusConflict, map[string]string{"failureCode": "blocked-signal-already-recorded"})
-		return
-	}
-
-	reportedAt := metav1.NewTime(time.Now().UTC())
-	if r.Now != nil {
-		reportedAt = metav1.NewTime(r.Now().UTC())
-	}
-	run.Status.Blocked = &agentv1alpha1.AgentBlockedStatus{
-		ReportedAt:        reportedAt,
-		SubjectRevision:   submitted.SubjectRevision,
-		Reporter:          submitted.Reporter,
-		ReasonCode:        submitted.ReasonCode,
-		EvidenceReference: submitted.EvidenceReference,
-	}
-	if err := r.Client.Status().Update(request.Context(), &run); err != nil {
-		writeTriggerResponse(request.Context(), response, http.StatusInternalServerError, map[string]string{"failureCode": "blocked-signal-status-update-failed"})
-		return
-	}
-	writeTriggerResponse(request.Context(), response, http.StatusAccepted, map[string]string{
-		"run":    run.Namespace + "/" + run.Name,
-		"status": "Blocked",
-	})
-}
-
-type escalationResponseRequest struct {
-	Decision          string `json:"decision"`
-	SubjectRevision   string `json:"subjectRevision"`
-	Actor             string `json:"actor"`
-	ResponseReference string `json:"responseReference"`
-}
-
-func (r *AgentTriggerReceiver) serveEscalation(response http.ResponseWriter, request *http.Request) {
-	if request.Method == http.MethodGet {
-		r.serveEscalationStatus(response, request)
-		return
-	}
-	if request.Method != http.MethodPost {
-		writeTriggerResponse(request.Context(), response, http.StatusMethodNotAllowed, map[string]string{"failureCode": "escalation-method-not-allowed"})
-		return
-	}
-	namespace, name, matched := parseNamespacedPath(request.URL.Path, escalationPathPrefix)
-	if !matched {
-		writeTriggerResponse(request.Context(), response, http.StatusNotFound, map[string]string{"failureCode": "escalation-not-found"})
-		return
-	}
-
-	var run agentv1alpha1.AgentRun
-	if err := r.Client.Get(request.Context(), types.NamespacedName{Namespace: namespace, Name: name}, &run); err != nil {
-		status := http.StatusInternalServerError
-		if apierrors.IsNotFound(err) {
-			status = http.StatusNotFound
-		}
-		writeTriggerResponse(request.Context(), response, status, map[string]string{"failureCode": "escalation-not-found"})
-		return
-	}
-	if run.Spec.Autonomy == nil || run.Spec.Autonomy.EscalationRoute == nil || run.Status.Escalation == nil {
-		writeTriggerResponse(request.Context(), response, http.StatusConflict, map[string]string{"failureCode": "escalation-not-pending"})
-		return
-	}
-	token, err := readSecretToken(request.Context(), r.Client, run.Namespace, run.Spec.Autonomy.EscalationRoute.ResponseTokenSecretRef)
-	if err != nil {
-		writeTriggerResponse(request.Context(), response, http.StatusServiceUnavailable, map[string]string{"failureCode": "escalation-token-unavailable"})
-		return
-	}
-	provided := strings.TrimPrefix(request.Header.Get("Authorization"), "Bearer ")
-	if provided == "" || subtle.ConstantTimeCompare([]byte(provided), token) != 1 {
-		writeTriggerResponse(request.Context(), response, http.StatusUnauthorized, map[string]string{"failureCode": "escalation-unauthorized"})
-		return
-	}
-
-	var submitted escalationResponseRequest
-	if err := decodeStrictJSON(request.Body, 65_536, &submitted); err != nil {
-		writeTriggerResponse(request.Context(), response, http.StatusBadRequest, map[string]string{"failureCode": "escalation-response-invalid"})
-		return
-	}
-	if (submitted.Decision != "approve" && submitted.Decision != "reject") ||
-		submitted.SubjectRevision != run.Status.Escalation.SubjectRevision ||
-		strings.TrimSpace(submitted.Actor) == "" || strings.TrimSpace(submitted.ResponseReference) == "" {
-		writeTriggerResponse(request.Context(), response, http.StatusBadRequest, map[string]string{"failureCode": "escalation-response-invalid"})
-		return
-	}
-	if run.Status.Escalation.Outcome != agentv1alpha1.EscalationOutcomePending {
-		writeTriggerResponse(request.Context(), response, http.StatusConflict, map[string]string{"failureCode": "escalation-already-resolved"})
-		return
-	}
-
-	outcome := agentv1alpha1.EscalationOutcomeApproved
-	if submitted.Decision == "reject" {
-		outcome = agentv1alpha1.EscalationOutcomeRejected
-	}
-	respondedAt := metav1.NewTime(time.Now().UTC())
-	if r.Now != nil {
-		respondedAt = metav1.NewTime(r.Now().UTC())
-	}
-	run.Status.Escalation.Outcome = outcome
-	run.Status.Escalation.Responder = submitted.Actor
-	run.Status.Escalation.ResponseReference = submitted.ResponseReference
-	run.Status.Escalation.RespondedAt = &respondedAt
-	if err := r.Client.Status().Update(request.Context(), &run); err != nil {
-		writeTriggerResponse(request.Context(), response, http.StatusInternalServerError, map[string]string{"failureCode": "escalation-status-update-failed"})
-		return
-	}
-	writeTriggerResponse(request.Context(), response, http.StatusAccepted, map[string]string{
-		"run":     run.Namespace + "/" + run.Name,
-		"outcome": string(outcome),
-	})
-}
-
-func (r *AgentTriggerReceiver) serveEscalationStatus(response http.ResponseWriter, request *http.Request) {
-	namespace, name, matched := parseNamespacedPath(request.URL.Path, escalationPathPrefix)
-	if !matched {
-		writeTriggerResponse(request.Context(), response, http.StatusNotFound, map[string]string{"failureCode": "escalation-not-found"})
-		return
-	}
-
-	var run agentv1alpha1.AgentRun
-	if err := r.Client.Get(request.Context(), types.NamespacedName{Namespace: namespace, Name: name}, &run); err != nil {
-		status := http.StatusInternalServerError
-		if apierrors.IsNotFound(err) {
-			status = http.StatusNotFound
-		}
-		writeTriggerResponse(request.Context(), response, status, map[string]string{"failureCode": "escalation-not-found"})
-		return
-	}
-	if run.Spec.Autonomy == nil || run.Spec.Autonomy.EscalationRoute == nil || run.Status.Escalation == nil {
-		writeTriggerResponse(request.Context(), response, http.StatusConflict, map[string]string{"failureCode": "escalation-not-pending"})
-		return
-	}
-	token, err := readSecretToken(request.Context(), r.Client, run.Namespace, run.Spec.Autonomy.EscalationRoute.BlockedSignalTokenSecretRef)
-	if err != nil {
-		writeTriggerResponse(request.Context(), response, http.StatusServiceUnavailable, map[string]string{"failureCode": "escalation-status-token-unavailable"})
-		return
-	}
-	provided := strings.TrimPrefix(request.Header.Get("Authorization"), "Bearer ")
-	if provided == "" || subtle.ConstantTimeCompare([]byte(provided), token) != 1 {
-		writeTriggerResponse(request.Context(), response, http.StatusUnauthorized, map[string]string{"failureCode": "escalation-status-unauthorized"})
-		return
-	}
-
-	escalation := run.Status.Escalation
-	writeTriggerResponse(request.Context(), response, http.StatusOK, map[string]any{
-		"run":             run.Namespace + "/" + run.Name,
-		"subjectRevision": escalation.SubjectRevision,
-		"outcome":         escalation.Outcome,
-		"expiresAt":       escalation.ExpiresAt,
-		"safeDefault":     escalation.SafeDefault,
-	})
 }
 
 func (r *AgentTriggerReceiver) Start(ctx context.Context) error {

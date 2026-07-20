@@ -24,11 +24,11 @@ A work shape selects among the deterministic, model, and agent classes. Classify
 
 A shape outside these three literals is rejected rather than defaulted, and a model or agent whose required boundary is incomplete is rejected as unbounded.
 
-`human` and `external` are separate classes that no work shape selects. Choose them orthogonally when authority or ownership — not difficulty — requires it: accountable judgment, approval, or another system of record. Qualification is an attribute of the human actor record, not a class of its own. Use **agent-governance-guide** for the executor class definitions, the actor record, and the semantics of an `--executor` request.
+`human` and `external` are separate classes that no work shape selects. Choose them orthogonally when authority or ownership — not difficulty — requires it: accountable judgment, approval, or another system of record. Qualification is an attribute of the human actor record, not a class of its own. These workflow executor classes do not select runtime plugins, controls, or maturity.
 
 ## Semantic intents and runtime adapters
 
-Development may request session, tool, capability, result-publication, validation, subagent, workspace, and cancellation intents. Harness adapters own native event names, handler mechanics, ordering, concurrency, timeouts, permission behavior, and capability evidence. Workflow-only execution remains valid unless the selected profile explicitly requires a supported enforcement guarantee.
+Development may request session, tool, capability, result-publication, validation, subagent, workspace, and cancellation intents. Harness adapters own native event names, handler mechanics, ordering, concurrency, timeouts, permission behavior, and capability evidence. Workflow-only execution remains valid. When a separate runtime composition is supplied, its selected controls apply without changing the workflow profile.
 
 ## Workspaces, consolidation, and abandonment
 

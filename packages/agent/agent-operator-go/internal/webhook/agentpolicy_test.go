@@ -182,17 +182,17 @@ func TestEnforcePolicy_RejectsSecurityContextWeakening(t *testing.T) {
 	}
 }
 
-func TestValidateExecutionBoundary_RequiresAdminApprovedRuntimeClass(t *testing.T) {
+func TestValidateExecutionBoundary_AppliesRuntimeAllowlistOnlyWhenConfigured(t *testing.T) {
 	run := baseRun()
-	if err := validateExecutionBoundary(run, nil); err == nil || !strings.Contains(err.Error(), "not declared sandboxed") {
-		t.Fatalf("validateExecutionBoundary(no policy) error = %v, want sandbox declaration error", err)
+	if err := validateExecutionBoundary(run, nil); err != nil {
+		t.Fatalf("validateExecutionBoundary(no policy) error = %v", err)
 	}
 
 	unapproved := &agentv1alpha1.AgentPolicy{Spec: agentv1alpha1.AgentPolicySpec{Enforced: agentv1alpha1.AgentPolicyEnforced{
 		AllowedRuntimeClassNames: []string{"gvisor"},
 	}}}
-	if err := validateExecutionBoundary(run, unapproved); err == nil || !strings.Contains(err.Error(), "not declared sandboxed") {
-		t.Fatalf("validateExecutionBoundary(unapproved) error = %v, want sandbox declaration error", err)
+	if err := validateExecutionBoundary(run, unapproved); err == nil || !strings.Contains(err.Error(), "not allowed") {
+		t.Fatalf("validateExecutionBoundary(unapproved) error = %v, want allowlist error", err)
 	}
 
 	approved := unapproved.DeepCopy()

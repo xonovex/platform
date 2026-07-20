@@ -49,7 +49,6 @@ for (const dependency of workflowClaudeManifest.dependencies) {
 
 const documentationFiles = [
   resolve(packageDirectory, "README.md"),
-  resolve(packageDirectory, "MIGRATION.md"),
   ...markdownFiles(resolve(packageDirectory, "docs")),
 ];
 
@@ -67,34 +66,17 @@ for (const documentationFile of documentationFiles) {
   }
 }
 
-const migration = read(resolve(packageDirectory, "MIGRATION.md"));
-for (const requiredMigrationTerm of [
-  "story-refine",
-  "acceptance-formalize",
-  "plan-decide",
-  "acceptance-decide",
-  "Rollback",
-  "5.0.0",
-  "6.0.0",
-]) {
-  check(
-    migration.includes(requiredMigrationTerm),
-    `migration guide covers ${requiredMigrationTerm}`,
-  );
-}
-
 const validationGuide = read(
   resolve(packageDirectory, "docs/validation-and-traceability.md"),
 );
 for (const matrixTerm of [
   "Workflow contracts",
-  "Governance contracts",
-  "Harness adapters",
-  "Module execution",
-  "Onboarding",
-  "External enforcement",
-  "Enterprise providers",
-  "Reliability and security",
+  "Composition kernel",
+  "Executor adapters",
+  "Trigger adapters",
+  "Evidence sinks",
+  "Maturity",
+  "Kubernetes host",
   "Documentation and release",
 ]) {
   check(

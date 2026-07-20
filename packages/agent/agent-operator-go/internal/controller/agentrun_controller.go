@@ -2,10 +2,7 @@ package controller
 
 import (
 	"context"
-	"crypto/subtle"
-	"encoding/json"
 	"fmt"
-	"slices"
 	"strings"
 	"time"
 
@@ -13,7 +10,6 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	networkingv1 "k8s.io/api/networking/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
-	apimeta "k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
@@ -23,41 +19,19 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
 	agentv1alpha1 "github.com/xonovex/platform/packages/agent/agent-operator-go/api/v1alpha1"
-	governancecontracts "github.com/xonovex/platform/packages/agent/agent-operator-go/internal/governance"
 	isoshared "github.com/xonovex/platform/packages/agent/agent-operator-go/internal/isolation/shared"
 	netshared "github.com/xonovex/platform/packages/agent/agent-operator-go/internal/network/shared"
 	"github.com/xonovex/platform/packages/agent/agent-operator-go/internal/plugins"
 	"github.com/xonovex/platform/packages/agent/agent-operator-go/internal/provider"
 	"github.com/xonovex/platform/packages/agent/agent-operator-go/internal/resolver"
-	runtel "github.com/xonovex/platform/packages/agent/agent-operator-go/internal/telemetry"
 	wsshared "github.com/xonovex/platform/packages/agent/agent-operator-go/internal/workspace/shared"
-)
-
-const (
-	governanceCorrelationAnnotation            = "governance.xonovex.com/correlation-id"
-	governanceOperationAnnotation              = "governance.xonovex.com/operation"
-	governanceDecisionAnnotation               = "governance.xonovex.com/decision"
-	governanceSubjectRevisionAnnotation        = "governance.xonovex.com/subject-revision"
-	governancePolicyVersionAnnotation          = "governance.xonovex.com/policy-version"
-	governanceEvaluatorVersionAnnotation       = "governance.xonovex.com/evaluator-version"
-	governanceOperationDigestAnnotation        = "governance.xonovex.com/operation-digest"
-	governanceDecisionEvidenceAnnotation       = "governance.xonovex.com/decision-evidence-reference"
-	governanceEnforcementEvidenceAnnotation    = "governance.xonovex.com/enforcement-evidence-reference"
-	governanceProtectedTargetsDigestAnnotation = "governance.xonovex.com/protected-targets-digest"
-	oversightStateAnnotation                   = "governance.xonovex.com/oversight-state"
-	appliedPolicyReferenceAnnotation           = "governance.xonovex.com/applied-policy-reference"
-	observedPolicyReferenceAnnotation          = "governance.xonovex.com/observed-policy-reference"
 )
 
 // AgentRunReconciler reconciles an AgentRun object
 type AgentRunReconciler struct {
 	client.Client
-	Scheme            *runtime.Scheme
-	Recorder          events.EventRecorder
-	Now               func() time.Time
-	Telemetry         runtel.Sink
-	RemediationRouter RemediationRouter
-	EscalationRouter  EscalationRouter
+	Scheme   *runtime.Scheme
+	Recorder events.EventRecorder
 }
 
 // +kubebuilder:rbac:groups=agent.xonovex.com,resources=agentruns,verbs=get;list;watch;create;update;patch;delete
@@ -87,13 +61,8 @@ func (r *AgentRunReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 	// Skip if already completed
 	if agentRun.Status.Phase == agentv1alpha1.AgentRunPhaseSucceeded ||
 		agentRun.Status.Phase == agentv1alpha1.AgentRunPhaseFailed ||
-		agentRun.Status.Phase == agentv1alpha1.AgentRunPhaseTimedOut ||
-		agentRun.Status.Phase == agentv1alpha1.AgentRunPhasePaused {
+		agentRun.Status.Phase == agentv1alpha1.AgentRunPhaseTimedOut {
 		return ctrl.Result{}, nil
-	}
-
-	if result, handled, err := r.reconcileOversight(ctx, &agentRun); handled || err != nil {
-		return result, err
 	}
 
 	// Branch based on workspace mode
@@ -104,407 +73,12 @@ func (r *AgentRunReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 	return r.reconcileStandalone(ctx, &agentRun)
 }
 
-func (r *AgentRunReconciler) reconcileOversight(ctx context.Context, run *agentv1alpha1.AgentRun) (ctrl.Result, bool, error) {
-	requestedLevel := agentv1alpha1.AutonomyLevelManual
-	if run.Spec.Autonomy != nil && run.Spec.Autonomy.Level != "" {
-		requestedLevel = run.Spec.Autonomy.Level
-	}
-	if run.Spec.Provenance == nil {
-		if requestedLevel != agentv1alpha1.AutonomyLevelUnattended {
-			return ctrl.Result{}, false, nil
-		}
-		run.Status.EffectiveAutonomy = agentv1alpha1.AutonomyLevelSupervised
-		return r.updatePhaseHandled(ctx, run, agentv1alpha1.AgentRunPhaseFailed, "A3ProvenanceMissing: unattended execution requires a provenance journal")
-	}
-
-	if run.Status.Journal == nil {
-		if run.Status.JobName != "" {
-			return r.containOversightDrift(ctx, run, "A3ProvenanceDrift: provenance journal disappeared after execution started")
-		}
-		now := metav1.NewTime(r.currentTime())
-		provenance := run.Spec.Provenance
-		run.Status.Journal = &agentv1alpha1.AgentRunJournal{
-			RecordedAt:         now,
-			Generation:         run.Generation,
-			AccountableOwner:   run.Spec.AccountableOwner,
-			Model:              provenance.Model,
-			Provider:           provenance.Provider,
-			PromptReference:    provenance.PromptReference,
-			Tools:              append([]string(nil), provenance.Tools...),
-			GrantedPermissions: append([]string(nil), provenance.GrantedPermissions...),
-		}
-		run.Status.EffectiveAutonomy = requestedLevel
-		if err := r.Status().Update(ctx, run); err != nil {
-			return ctrl.Result{}, true, err
-		}
-		r.recordSignal(ctx, run, "provenance.recorded", "provenance", "healthy")
-		return ctrl.Result{Requeue: true}, true, nil
-	}
-
-	if requestedLevel == agentv1alpha1.AutonomyLevelUnattended {
-		assessment := r.assessA3Oversight(ctx, run)
-		if assessment.Detected {
-			if r.RemediationRouter != nil {
-				if err := r.RemediationRouter.Raise(ctx, run, assessment); err != nil {
-					r.recordSignal(ctx, run, "remediation.trigger", "agent-trigger", "failed")
-				} else {
-					r.recordSignal(ctx, run, "remediation.trigger", "agent-trigger", "created")
-				}
-			}
-			return r.containOversightDrift(ctx, run, strings.Join(assessment.FailureCodes, ","))
-		}
-	}
-
-	if requestedLevel != agentv1alpha1.AutonomyLevelUnattended || run.Status.Blocked == nil {
-		return ctrl.Result{}, false, nil
-	}
-	if !observedBlockedSignalHealthy(run) {
-		return r.containOversightDrift(ctx, run, "A3BlockedSignalInvalid: blocked runtime evidence does not match the exact run revision")
-	}
-	return r.reconcileEscalation(ctx, run)
-}
-
-func observedBlockedSignalHealthy(run *agentv1alpha1.AgentRun) bool {
-	if run.Status.Blocked == nil || run.Status.Blocked.Reporter == "" || run.Status.Blocked.ReasonCode == "" ||
-		!governancecontracts.ContentAddressedEvidenceReference(run.Status.Blocked.EvidenceReference) {
-		return false
-	}
-	subjectRevision, err := governancecontracts.AgentRunSubjectRevision(run)
-	return err == nil && run.Status.Blocked.SubjectRevision == subjectRevision
-}
-
-func (r *AgentRunReconciler) reconcileEscalation(ctx context.Context, run *agentv1alpha1.AgentRun) (ctrl.Result, bool, error) {
-	route := run.Spec.Autonomy.EscalationRoute
-	if route == nil || route.Recipient == "" || route.Window.Duration <= 0 {
-		run.Status.EffectiveAutonomy = agentv1alpha1.AutonomyLevelSupervised
-		return r.updatePhaseHandled(ctx, run, agentv1alpha1.AgentRunPhaseFailed, "A3EscalationRouteUnavailable: unattended execution requires a bounded accountable recipient")
-	}
-
-	now := r.currentTime()
-	if run.Status.Escalation == nil {
-		requestedAt := metav1.NewTime(now)
-		expiresAt := metav1.NewTime(now.Add(route.Window.Duration))
-		subjectRevision, err := governancecontracts.AgentRunSubjectRevision(run)
-		if err != nil {
-			return r.updatePhaseHandled(ctx, run, agentv1alpha1.AgentRunPhaseFailed, fmt.Sprintf("A3EscalationRevisionFailed: %v", err))
-		}
-		run.Status.Escalation = &agentv1alpha1.AgentEscalationStatus{
-			Recipient:       route.Recipient,
-			SubjectRevision: subjectRevision,
-			RequestedAt:     requestedAt,
-			ExpiresAt:       expiresAt,
-			SafeDefault:     route.SafeDefault,
-			Outcome:         agentv1alpha1.EscalationOutcomePending,
-		}
-		if r.EscalationRouter == nil {
-			run.Status.EffectiveAutonomy = agentv1alpha1.AutonomyLevelSupervised
-			return r.updatePhaseHandled(ctx, run, agentv1alpha1.AgentRunPhaseFailed, "A3EscalationDeliveryUnavailable: no accountable-recipient router is configured")
-		}
-		deliveryReference, err := r.EscalationRouter.Raise(ctx, run, run.Status.Escalation)
-		if err != nil {
-			run.Status.EffectiveAutonomy = agentv1alpha1.AutonomyLevelSupervised
-			return r.updatePhaseHandled(ctx, run, agentv1alpha1.AgentRunPhaseFailed, fmt.Sprintf("A3EscalationDeliveryFailed: %v", err))
-		}
-		run.Status.Escalation.DeliveryReference = deliveryReference
-		apimeta.SetStatusCondition(&run.Status.Conditions, metav1.Condition{
-			Type:               "Escalation",
-			Status:             metav1.ConditionTrue,
-			Reason:             "AwaitingRecipient",
-			Message:            "execution is paused pending an accountable response",
-			ObservedGeneration: run.Generation,
-		})
-		if err := r.Status().Update(ctx, run); err != nil {
-			return ctrl.Result{}, true, err
-		}
-		r.recordSignal(ctx, run, "escalation.requested", "escalation-route", "pending")
-		return ctrl.Result{RequeueAfter: route.Window.Duration}, true, nil
-	}
-	if run.Status.Escalation.Outcome == agentv1alpha1.EscalationOutcomeApproved {
-		apimeta.SetStatusCondition(&run.Status.Conditions, metav1.Condition{
-			Type:               "Escalation",
-			Status:             metav1.ConditionFalse,
-			Reason:             "RecipientApproved",
-			Message:            "accountable recipient approved execution for the exact run revision",
-			ObservedGeneration: run.Generation,
-		})
-		r.recordSignal(ctx, run, "escalation.responded", "escalation-route", "approved")
-		return ctrl.Result{}, false, nil
-	}
-	if run.Status.Escalation.Outcome == agentv1alpha1.EscalationOutcomeRejected {
-		run.Status.CompletionTime = &metav1.Time{Time: now}
-		r.recordSignal(ctx, run, "escalation.responded", "escalation-route", "rejected")
-		return r.updatePhaseHandled(ctx, run, agentv1alpha1.AgentRunPhaseFailed, "EscalationRejected: accountable recipient rejected the run")
-	}
-	if now.Before(run.Status.Escalation.ExpiresAt.Time) {
-		return ctrl.Result{RequeueAfter: run.Status.Escalation.ExpiresAt.Sub(now)}, true, nil
-	}
-
-	run.Status.CompletionTime = &metav1.Time{Time: now}
-	if run.Status.Escalation.SafeDefault == agentv1alpha1.EscalationSafeDefaultAbandon {
-		run.Status.Escalation.Outcome = agentv1alpha1.EscalationOutcomeAbandoned
-		r.recordSignal(ctx, run, "escalation.expired", "escalation-route", "abandoned")
-		return r.updatePhaseHandled(ctx, run, agentv1alpha1.AgentRunPhaseFailed, "EscalationExpired: safe default abandoned the run")
-	}
-	run.Status.Escalation.Outcome = agentv1alpha1.EscalationOutcomePaused
-	r.recordSignal(ctx, run, "escalation.expired", "escalation-route", "paused")
-	return r.updatePhaseHandled(ctx, run, agentv1alpha1.AgentRunPhasePaused, "EscalationExpired: safe default paused the run")
-}
-
-func (r *AgentRunReconciler) assessA3Oversight(ctx context.Context, run *agentv1alpha1.AgentRun) runtel.DriftAssessment {
-	forcedDegradation := run.Annotations[oversightStateAnnotation] == "degraded"
-	signals := []runtel.Signal{
-		r.oversightSignal(run, "governance-verdict", r.observedGovernanceEvidenceHealthy(run) && !forcedDegradation),
-		r.oversightSignal(run, "protected-target", observedProtectedTargetsHealthy(run)),
-		r.oversightSignal(run, "escalation-route", r.observedEscalationRouteHealthy(ctx, run)),
-		r.oversightSignal(run, "provenance", observedProvenanceHealthy(run)),
-	}
-	required := []string{"governance-verdict", "protected-target", "escalation-route"}
-	if run.Status.JobName != "" || run.Status.Blocked != nil {
-		required = append(required, "provenance")
-	}
-	if applied := run.Annotations[appliedPolicyReferenceAnnotation]; applied != "" {
-		signals = append(signals, r.oversightSignal(run, "applied-reference", run.Annotations[observedPolicyReferenceAnnotation] == applied))
-		required = append(required, "applied-reference")
-	}
-	for _, signal := range signals {
-		if r.Telemetry != nil {
-			r.Telemetry.Record(ctx, signal)
-		}
-	}
-	assessment := runtel.AssessA3(signals, required)
-	if assessment.Detected {
-		r.recordSignal(ctx, run, "drift.detected", "oversight", "degraded")
-	}
-	return assessment
-}
-
-func (r *AgentRunReconciler) observedGovernanceEvidenceHealthy(run *agentv1alpha1.AgentRun) bool {
-	if run.Annotations[governanceCorrelationAnnotation] == "" ||
-		run.Annotations[governanceDecisionAnnotation] != "allow" ||
-		run.Annotations[governancePolicyVersionAnnotation] == "" ||
-		run.Annotations[governanceEvaluatorVersionAnnotation] != "governance-evaluator/1" ||
-		!governancecontracts.ContentAddressedEvidenceReference(run.Annotations[governanceDecisionEvidenceAnnotation]) ||
-		!governancecontracts.ContentAddressedEvidenceReference(run.Annotations[governanceEnforcementEvidenceAnnotation]) {
-		return false
-	}
-	subjectRevision, err := governancecontracts.AgentRunSubjectRevision(run)
-	if err != nil || run.Annotations[governanceSubjectRevisionAnnotation] != subjectRevision {
-		return false
-	}
-	var operation any
-	if err := json.Unmarshal([]byte(run.Annotations[governanceOperationAnnotation]), &operation); err != nil {
-		return false
-	}
-	digest, err := governancecontracts.DigestJSON(operation)
-	return err == nil && run.Annotations[governanceOperationDigestAnnotation] == digest
-}
-
-func observedProtectedTargetsHealthy(run *agentv1alpha1.AgentRun) bool {
-	if run.Spec.Autonomy == nil || len(run.Spec.Autonomy.ProtectedTargets) == 0 {
-		return false
-	}
-	protectedTargets := append([]string(nil), run.Spec.Autonomy.ProtectedTargets...)
-	slices.Sort(protectedTargets)
-	digest, err := governancecontracts.DigestJSON(protectedTargets)
-	return err == nil && run.Annotations[governanceProtectedTargetsDigestAnnotation] == digest
-}
-
-func (r *AgentRunReconciler) observedEscalationRouteHealthy(ctx context.Context, run *agentv1alpha1.AgentRun) bool {
-	if run.Spec.Autonomy == nil || run.Spec.Autonomy.EscalationRoute == nil || r.EscalationRouter == nil {
-		return false
-	}
-	route := run.Spec.Autonomy.EscalationRoute
-	if route.Recipient == "" || route.Window.Duration <= 0 ||
-		route.BlockedSignalTokenSecretRef.Name == "" || route.BlockedSignalTokenSecretRef.Key == "" ||
-		route.ResponseTokenSecretRef.Name == "" || route.ResponseTokenSecretRef.Key == "" ||
-		route.BlockedSignalTokenSecretRef == route.ResponseTokenSecretRef {
-		return false
-	}
-	blockedToken, err := readSecretToken(ctx, r.Client, run.Namespace, route.BlockedSignalTokenSecretRef)
-	if err != nil {
-		return false
-	}
-	responseToken, err := readSecretToken(ctx, r.Client, run.Namespace, route.ResponseTokenSecretRef)
-	return err == nil && subtle.ConstantTimeCompare(blockedToken, responseToken) != 1
-}
-
-func observedProvenanceHealthy(run *agentv1alpha1.AgentRun) bool {
-	journal := run.Status.Journal
-	provenance := run.Spec.Provenance
-	return journal != nil && provenance != nil &&
-		journal.Generation == run.Generation &&
-		journal.AccountableOwner == run.Spec.AccountableOwner &&
-		journal.Model == provenance.Model &&
-		journal.Provider == provenance.Provider &&
-		journal.PromptReference == provenance.PromptReference &&
-		slices.Equal(journal.Tools, provenance.Tools) &&
-		slices.Equal(journal.GrantedPermissions, provenance.GrantedPermissions) &&
-		journal.ExecutionImage != "" && journal.RuntimeClassName != "" &&
-		journal.AgentType != "" && journal.ExecutionSpecDigest != "" &&
-		sha256Digest(journal.ExecutionSpecDigest)
-}
-
-func sha256Digest(value string) bool {
-	return governancecontracts.SHA256Digest(value)
-}
-
-func (r *AgentRunReconciler) oversightSignal(run *agentv1alpha1.AgentRun, control string, healthy bool) runtel.Signal {
-	outcome := "degraded"
-	if healthy {
-		outcome = "healthy"
-	}
-	return runtel.Signal{
-		CorrelationID:     runCorrelationID(run),
-		RunReference:      fmt.Sprintf("agentrun:%s/%s", run.Namespace, run.Name),
-		Kind:              "oversight.control",
-		Control:           control,
-		Outcome:           outcome,
-		EffectiveAutonomy: string(run.Status.EffectiveAutonomy),
-	}
-}
-
-func (r *AgentRunReconciler) containOversightDrift(ctx context.Context, run *agentv1alpha1.AgentRun, message string) (ctrl.Result, bool, error) {
-	if run.Status.JobName != "" {
-		job := &batchv1.Job{ObjectMeta: metav1.ObjectMeta{Name: run.Status.JobName, Namespace: run.Namespace}}
-		if err := r.Delete(ctx, job); err != nil && !errors.IsNotFound(err) {
-			return ctrl.Result{}, true, err
-		}
-	}
-	run.Status.EffectiveAutonomy = agentv1alpha1.AutonomyLevelSupervised
-	run.Status.CompletionTime = &metav1.Time{Time: r.currentTime()}
-	run.Status.Containment = &agentv1alpha1.AgentContainmentStatus{
-		RecordedAt:    metav1.Time{Time: r.currentTime()},
-		CorrelationID: runCorrelationID(run),
-		Reason:        message,
-		Action:        "kill-and-pause",
-		DemotedTo:     agentv1alpha1.AutonomyLevelSupervised,
-	}
-	r.recordSignal(ctx, run, "incident.containment", "kill-switch", "paused")
-	return r.updatePhaseHandled(ctx, run, agentv1alpha1.AgentRunPhasePaused, message)
-}
-
-func (r *AgentRunReconciler) updatePhaseHandled(ctx context.Context, run *agentv1alpha1.AgentRun, phase agentv1alpha1.AgentRunPhase, message string) (ctrl.Result, bool, error) {
-	result, err := r.updatePhase(ctx, run, phase, message)
-	return result, true, err
-}
-
-func (r *AgentRunReconciler) currentTime() time.Time {
-	if r.Now != nil {
-		return r.Now().UTC()
-	}
-	return time.Now().UTC()
-}
-
-func (r *AgentRunReconciler) recordSignal(ctx context.Context, run *agentv1alpha1.AgentRun, kind, control, outcome string) {
-	if r.Telemetry == nil {
-		return
-	}
-	r.Telemetry.Record(ctx, runtel.Signal{
-		CorrelationID:     runCorrelationID(run),
-		RunReference:      fmt.Sprintf("agentrun:%s/%s", run.Namespace, run.Name),
-		Kind:              kind,
-		Control:           control,
-		Outcome:           outcome,
-		EffectiveAutonomy: string(run.Status.EffectiveAutonomy),
-	})
-}
-
-func runCorrelationID(run *agentv1alpha1.AgentRun) string {
-	if correlationID := run.Annotations[governanceCorrelationAnnotation]; correlationID != "" {
-		return correlationID
-	}
-	return fmt.Sprintf("agentrun:%s/%s:generation:%d", run.Namespace, run.Name, run.Generation)
-}
-
 type resolvedRunExecution struct {
 	agentType   agentv1alpha1.AgentType
 	providerEnv map[string]string
 	toolchain   *agentv1alpha1.ToolchainSpec
 	defaults    resolver.ResolvedDefaults
 	image       string
-}
-
-type observedContainerExecution struct {
-	Name            string                      `json:"name"`
-	Image           string                      `json:"image"`
-	Command         []string                    `json:"command,omitempty"`
-	Arguments       []string                    `json:"arguments,omitempty"`
-	EnvironmentKeys []string                    `json:"environmentKeys,omitempty"`
-	Resources       corev1.ResourceRequirements `json:"resources,omitempty"`
-	SecurityContext *corev1.SecurityContext     `json:"securityContext,omitempty"`
-	VolumeMounts    []corev1.VolumeMount        `json:"volumeMounts,omitempty"`
-}
-
-func observedContainer(container corev1.Container) observedContainerExecution {
-	environmentKeys := make([]string, 0, len(container.Env))
-	for _, variable := range container.Env {
-		environmentKeys = append(environmentKeys, variable.Name)
-	}
-	slices.Sort(environmentKeys)
-	return observedContainerExecution{
-		Name:            container.Name,
-		Image:           container.Image,
-		Command:         append([]string(nil), container.Command...),
-		Arguments:       append([]string(nil), container.Args...),
-		EnvironmentKeys: environmentKeys,
-		Resources:       *container.Resources.DeepCopy(),
-		SecurityContext: container.SecurityContext.DeepCopy(),
-		VolumeMounts:    append([]corev1.VolumeMount(nil), container.VolumeMounts...),
-	}
-}
-
-func (r *AgentRunReconciler) observeResolvedExecution(run *agentv1alpha1.AgentRun, execution *resolvedRunExecution, job *batchv1.Job) (bool, error) {
-	if run.Spec.Autonomy == nil || run.Spec.Autonomy.Level != agentv1alpha1.AutonomyLevelUnattended {
-		return false, nil
-	}
-	if run.Status.Journal == nil {
-		return false, fmt.Errorf("A3 resolved execution has no provenance journal")
-	}
-	providerEnvironmentKeys := make([]string, 0, len(execution.providerEnv))
-	for key := range execution.providerEnv {
-		providerEnvironmentKeys = append(providerEnvironmentKeys, key)
-	}
-	slices.Sort(providerEnvironmentKeys)
-	containers := make([]observedContainerExecution, 0, len(job.Spec.Template.Spec.Containers))
-	for _, container := range job.Spec.Template.Spec.Containers {
-		containers = append(containers, observedContainer(container))
-	}
-	initContainers := make([]observedContainerExecution, 0, len(job.Spec.Template.Spec.InitContainers))
-	for _, container := range job.Spec.Template.Spec.InitContainers {
-		initContainers = append(initContainers, observedContainer(container))
-	}
-	digest, err := governancecontracts.DigestJSON(map[string]any{
-		"image":                        execution.image,
-		"agentType":                    execution.agentType,
-		"runtimeClassName":             ptrOrEmpty(job.Spec.Template.Spec.RuntimeClassName),
-		"providerEnvironmentKeys":      providerEnvironmentKeys,
-		"serviceAccountName":           job.Spec.Template.Spec.ServiceAccountName,
-		"automountServiceAccountToken": job.Spec.Template.Spec.AutomountServiceAccountToken,
-		"podSecurityContext":           job.Spec.Template.Spec.SecurityContext,
-		"containers":                   containers,
-		"initContainers":               initContainers,
-		"volumes":                      job.Spec.Template.Spec.Volumes,
-	})
-	if err != nil {
-		return false, fmt.Errorf("digest resolved execution: %w", err)
-	}
-	journal := run.Status.Journal
-	runtimeClassName := ptrOrEmpty(job.Spec.Template.Spec.RuntimeClassName)
-	if journal.ExecutionSpecDigest != "" {
-		if journal.ExecutionSpecDigest != digest || journal.ExecutionImage != execution.image ||
-			journal.RuntimeClassName != runtimeClassName || journal.AgentType != execution.agentType ||
-			!slices.Equal(journal.ProviderEnvironmentKeys, providerEnvironmentKeys) {
-			return false, fmt.Errorf("resolved execution differs from recorded provenance")
-		}
-		return false, nil
-	}
-	journal.RecordedAt = metav1.NewTime(r.currentTime())
-	journal.ExecutionImage = execution.image
-	journal.RuntimeClassName = runtimeClassName
-	journal.AgentType = execution.agentType
-	journal.ProviderEnvironmentKeys = providerEnvironmentKeys
-	journal.ExecutionSpecDigest = digest
-	return true, nil
 }
 
 func (r *AgentRunReconciler) resolveRunExecution(ctx context.Context, run *agentv1alpha1.AgentRun) (*resolvedRunExecution, error) {
@@ -591,18 +165,6 @@ func (r *AgentRunReconciler) reconcileExecutionResources(
 		if err != nil {
 			logger.Error(err, "failed to build agent Job")
 			return r.updatePhase(ctx, run, agentv1alpha1.AgentRunPhaseFailed, fmt.Sprintf("JobBuildFailed: %v", err))
-		}
-		observed, err := r.observeResolvedExecution(run, execution, job)
-		if err != nil {
-			result, _, containmentErr := r.containOversightDrift(ctx, run, fmt.Sprintf("A3ResolvedProvenanceDrift: %v", err))
-			return result, containmentErr
-		}
-		if observed {
-			if err := r.Status().Update(ctx, run); err != nil {
-				return ctrl.Result{}, err
-			}
-			r.recordSignal(ctx, run, "provenance.observed", "resolved-execution", "healthy")
-			return ctrl.Result{Requeue: true}, nil
 		}
 		if err := ctrl.SetControllerReference(run, job, r.Scheme); err != nil {
 			return ctrl.Result{}, err

@@ -3,7 +3,7 @@
 ## Core workflow
 
 1. Resolve the subject and any native input references using [early-lifecycle-contracts.md](early-lifecycle-contracts.md).
-2. Select the profile, provider, neutral-or-explicit method, and least-adaptive executor. Request `data-access`, `privacy`, or `regulated-applicability` intents only when applicable.
+2. Select the profile, provider, neutral-or-explicit method, and least-adaptive executor. Record any applicable data, privacy, or regulated constraints as workflow requirements without selecting runtime controls.
 3. Collect observations deterministically. Use a bounded model for classification or synthesis; use an adaptive agent only when the discovery path genuinely branches.
 4. Separate observed facts, stakeholder statements, assumptions, hypotheses, conflicts, and unknowns. Identify affected context and stakeholders without turning them into mandatory story roles.
 5. Publish a canonical Discovery result with problem or opportunity, affected context, observations, assumptions, unknowns, source references, limitations, and executor origin.

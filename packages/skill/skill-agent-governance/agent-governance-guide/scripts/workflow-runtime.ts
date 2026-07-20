@@ -1,428 +1,455 @@
 import {z} from "zod";
 
-export const workflowInvocationApiVersion =
-  "workflow.xonovex.com/v1alpha1" as const;
+export const workflowInvocationApiVersion = "workflow.xonovex.com/v1" as const;
 
-export const triggerSourceSchema = z.enum([
-  "manual",
-  "agent-harness-hook",
-  "ci-cd-hook",
-  "provider-webhook",
-  "schedule",
-  "sensor",
-  "api",
-  "agent",
-]);
-
-const nativeReferenceSchema = z.string().min(1);
-const commandBudgetSchema = z
+const referenceSchema = z.string().min(1);
+const pluginSelectionSchema = z
   .object({
-    timeoutSeconds: z.number().int().positive().max(3_600),
-  })
-  .strict();
-const adaptiveBudgetSchema = commandBudgetSchema
-  .extend({
-    tokenBudget: z.number().int().positive(),
-    costBudget: z.number().nonnegative(),
-    retryLimit: z.number().int().nonnegative().max(3),
+    plugin: z.string().min(1),
+    input: z.unknown().optional(),
   })
   .strict();
 
-const a1OversightSchema = z
-  .object({
-    level: z.literal("A1"),
-    independentCritiqueReference: nativeReferenceSchema,
-  })
-  .strict();
-const a2OversightSchema = z
-  .object({
-    level: z.literal("A2"),
-    independentCritiqueReference: nativeReferenceSchema,
-    journalReference: nativeReferenceSchema,
-    approvalReference: nativeReferenceSchema,
-    cancellationReference: nativeReferenceSchema,
-    killSwitchReference: nativeReferenceSchema,
-  })
-  .strict();
-const a3OversightSchema = z
-  .object({
-    level: z.literal("A3"),
-    independentCritiqueReference: nativeReferenceSchema,
-    journalReference: nativeReferenceSchema,
-    approvalReference: nativeReferenceSchema,
-    cancellationReference: nativeReferenceSchema,
-    killSwitchReference: nativeReferenceSchema,
-    verdictReference: nativeReferenceSchema,
-    protectedTargetReferences: z.array(nativeReferenceSchema).min(1),
-    escalationReference: nativeReferenceSchema,
-    provenanceReference: nativeReferenceSchema,
-  })
+export const controlModeSchema = z.enum(["observe", "enforce"]);
+export const controlPhaseSchema = z.enum(["before", "after"]);
+
+export const controlSelectionSchema = pluginSelectionSchema
+  .extend({mode: controlModeSchema})
   .strict();
 
-export const autonomyOversightSchema = z.discriminatedUnion("level", [
-  a1OversightSchema,
-  a2OversightSchema,
-  a3OversightSchema,
-]);
-
-const workflowScriptExecutionSchema = z
-  .object({
-    family: z.literal("workflow-script"),
-    module: z.string().min(1),
-    budget: commandBudgetSchema,
-  })
+export const evidenceSelectionSchema = pluginSelectionSchema
+  .extend({failure: z.enum(["ignore", "fail"])})
   .strict();
-const workflowScriptLlmExecutionSchema = z
-  .object({
-    family: z.literal("workflow-script-llm"),
-    module: z.string().min(1),
-    evaluator: z.string().min(1),
-    budget: adaptiveBudgetSchema,
-  })
-  .strict();
-const agentWorkflowSkillExecutionSchema = z
-  .object({
-    family: z.literal("agent-workflow-skill"),
-    launcher: z.string().min(1),
-    workflowSkill: z.string().min(1),
-    oversight: autonomyOversightSchema,
-    budget: adaptiveBudgetSchema,
-    maximumChildDepth: z.number().int().min(0).max(1),
-  })
-  .strict();
-
-export const workflowExecutionSchema = z.discriminatedUnion("family", [
-  workflowScriptExecutionSchema,
-  workflowScriptLlmExecutionSchema,
-  agentWorkflowSkillExecutionSchema,
-]);
 
 export const workflowInvocationSchema = z
   .object({
     apiVersion: z.literal(workflowInvocationApiVersion),
-    invocationId: z.string().min(1),
+    invocationId: referenceSchema,
     trigger: z
       .object({
-        source: triggerSourceSchema,
-        nativeReference: nativeReferenceSchema,
-        actor: z.string().min(1),
-        parentInvocationReference: nativeReferenceSchema.optional(),
-        childDepth: z.number().int().nonnegative().optional(),
+        kind: z.string().min(1),
+        reference: referenceSchema,
+        actor: z.string().min(1).optional(),
+        data: z.unknown().optional(),
       })
       .strict(),
     subject: z
       .object({
-        reference: nativeReferenceSchema,
-        revision: z.string().min(1),
+        reference: referenceSchema,
+        revision: z.string().min(1).optional(),
       })
       .strict(),
-    workflow: z
-      .object({
-        operation: z.string().min(1),
-        profileReference: nativeReferenceSchema.optional(),
-      })
-      .strict(),
-    execution: workflowExecutionSchema,
-    evidenceProviderReference: nativeReferenceSchema,
+    operation: z.string().min(1),
+    executor: pluginSelectionSchema,
+    controls: z.array(controlSelectionSchema).default([]),
+    evidence: z.array(evidenceSelectionSchema).default([]),
+    requiredCapabilities: z.array(z.string().min(1)).default([]),
+    metadata: z.record(z.string(), z.unknown()).default({}),
   })
-  .strict()
-  .superRefine((invocation, context) => {
-    const childDepth = invocation.trigger.childDepth ?? 0;
-    if (
-      childDepth > 0 &&
-      invocation.trigger.parentInvocationReference === undefined
-    ) {
-      context.addIssue({
-        code: "custom",
-        message: "workflow-parent-invocation-reference-missing",
-        path: ["trigger", "parentInvocationReference"],
-      });
-    }
-    if (
-      invocation.trigger.source === "agent" &&
-      invocation.trigger.parentInvocationReference === undefined
-    ) {
-      context.addIssue({
-        code: "custom",
-        message: "workflow-agent-trigger-parent-missing",
-        path: ["trigger", "parentInvocationReference"],
-      });
-    }
-  });
+  .strict();
+
+export const executorResultSchema = z
+  .object({
+    outcome: z.string().min(1),
+    output: z.unknown().optional(),
+    references: z.array(referenceSchema).default([]),
+  })
+  .strict();
+
+export const controlResultSchema = z
+  .object({
+    decision: z.enum(["allow", "deny", "abstain"]),
+    reason: z.string().min(1).optional(),
+    references: z.array(referenceSchema).default([]),
+    data: z.unknown().optional(),
+  })
+  .strict();
 
 export type WorkflowInvocation = z.infer<typeof workflowInvocationSchema>;
-export type TriggerSource = z.infer<typeof triggerSourceSchema>;
-export type AutonomyOversight = z.infer<typeof autonomyOversightSchema>;
+export type ExecutorResult = z.infer<typeof executorResultSchema>;
+export type ControlResult = z.infer<typeof controlResultSchema>;
+export type ControlMode = z.infer<typeof controlModeSchema>;
+export type ControlPhase = z.infer<typeof controlPhaseSchema>;
 
-export const workflowScriptResultSchema = z
-  .object({
-    outcome: z.enum(["completed", "blocked"]),
-    outputReferences: z.array(nativeReferenceSchema),
-    facts: z.record(z.string(), z.unknown()),
-  })
-  .strict();
-export const modelEvaluationResultSchema = z
-  .object({
-    outcome: z.enum(["advise", "pass", "fail"]),
-    reasons: z.array(z.string()),
-    evidenceRequests: z.array(z.string()),
-    usage: z
-      .object({
-        tokens: z.number().int().nonnegative(),
-        cost: z.number().nonnegative(),
-      })
-      .strict(),
-  })
-  .strict();
-export const agentWorkflowResultSchema = z
-  .object({
-    summary: z.string(),
-    findings: z.array(z.string()),
-    evidenceReferences: z.array(nativeReferenceSchema),
-    usage: z
-      .object({
-        tokens: z.number().int().nonnegative(),
-        cost: z.number().nonnegative(),
-      })
-      .strict(),
-  })
-  .strict();
-const oversightVerificationSchema = z
-  .object({
-    level: z.enum(["A1", "A2", "A3"]),
-    observed: z.literal(true),
-    evidenceReferences: z.array(nativeReferenceSchema).min(1),
-  })
-  .strict();
-
-export interface WorkflowRuntimePorts {
-  readonly runScript: (
-    request: {
-      readonly module: string;
-      readonly invocation: WorkflowInvocation;
-    },
-    signal: AbortSignal,
-  ) => Promise<unknown>;
-  readonly runModel: (
-    request: {
-      readonly evaluator: string;
-      readonly invocation: WorkflowInvocation;
-      readonly facts: z.infer<typeof workflowScriptResultSchema>;
-    },
-    signal: AbortSignal,
-  ) => Promise<unknown>;
-  readonly runAgent: (
-    request: {
-      readonly launcher: string;
-      readonly workflowSkill: string;
-      readonly invocation: WorkflowInvocation;
-    },
-    signal: AbortSignal,
-  ) => Promise<unknown>;
-  readonly verifyOversight: (
+export interface WorkflowExecutor {
+  readonly id: string;
+  readonly capabilities: readonly string[];
+  readonly execute: (
     invocation: WorkflowInvocation,
+    input: unknown,
     signal: AbortSignal,
   ) => Promise<unknown>;
-  readonly recordEvidence: (
-    evidence: WorkflowExecutionEvidence,
-  ) => Promise<string>;
 }
 
-export interface WorkflowExecutionEvidence {
+export interface WorkflowControl {
+  readonly id: string;
+  readonly capabilities: readonly string[];
+  readonly phases: readonly ControlPhase[];
+  readonly evaluate: (
+    request: {
+      readonly phase: ControlPhase;
+      readonly invocation: WorkflowInvocation;
+      readonly execution?: ExecutorResult;
+      readonly input: unknown;
+    },
+    signal: AbortSignal,
+  ) => Promise<unknown>;
+}
+
+export interface WorkflowEvidenceEvent {
   readonly apiVersion: typeof workflowInvocationApiVersion;
   readonly invocationId: string;
-  readonly triggerSource: TriggerSource;
-  readonly triggerReference: string;
-  readonly subjectReference: string;
-  readonly subjectRevision: string;
-  readonly workflowOperation: string;
-  readonly executionFamily: WorkflowInvocation["execution"]["family"];
-  readonly evidenceProviderReference: string;
-  readonly outcome: string;
-  readonly outputReferences: readonly string[];
-  readonly oversightReferences: readonly string[];
+  readonly kind:
+    | "composition.started"
+    | "control.evaluated"
+    | "execution.completed"
+    | "composition.completed"
+    | "composition.failed";
+  readonly payload: Readonly<Record<string, unknown>>;
 }
 
-export interface WorkflowExecutionResponse extends WorkflowExecutionEvidence {
-  readonly evidenceReference: string;
+export interface WorkflowEvidenceSink {
+  readonly id: string;
+  readonly capabilities: readonly string[];
+  readonly record: (
+    event: WorkflowEvidenceEvent,
+    input: unknown,
+  ) => Promise<string | undefined>;
 }
 
-const withTimeout = async <Result>(
-  timeoutSeconds: number,
-  run: (signal: AbortSignal) => Promise<Result>,
-): Promise<Result> => {
-  const controller = new AbortController();
-  let rejectTimeout: ((reason: Error) => void) | undefined;
-  const timedOut = new Promise<never>((_resolve, reject) => {
-    rejectTimeout = reject;
-  });
-  const timeout = setTimeout(() => {
-    const error = new Error("workflow-execution-timeout");
-    controller.abort(error);
-    rejectTimeout?.(error);
-  }, timeoutSeconds * 1_000);
-  try {
-    return await Promise.race([run(controller.signal), timedOut]);
-  } finally {
-    clearTimeout(timeout);
+export interface WorkflowPluginRegistry {
+  readonly executors: Readonly<Record<string, WorkflowExecutor>>;
+  readonly controls: Readonly<Record<string, WorkflowControl>>;
+  readonly evidenceSinks: Readonly<Record<string, WorkflowEvidenceSink>>;
+}
+
+interface ResolvedControl {
+  readonly plugin: WorkflowControl;
+  readonly mode: ControlMode;
+  readonly input: unknown;
+}
+
+interface ResolvedEvidenceSink {
+  readonly plugin: WorkflowEvidenceSink;
+  readonly failure: "ignore" | "fail";
+  readonly input: unknown;
+}
+
+interface ResolvedComposition {
+  readonly invocation: WorkflowInvocation;
+  readonly executor: WorkflowExecutor;
+  readonly controls: readonly ResolvedControl[];
+  readonly evidenceSinks: readonly ResolvedEvidenceSink[];
+  readonly capabilities: readonly string[];
+  readonly missingCapabilities: readonly string[];
+}
+
+export interface WorkflowControlObservation {
+  readonly plugin: string;
+  readonly phase: ControlPhase;
+  readonly mode: ControlMode;
+  readonly result: ControlResult;
+}
+
+export interface WorkflowExecutionResponse {
+  readonly invocationId: string;
+  readonly outcome: "executed" | "denied";
+  readonly execution?: ExecutorResult;
+  readonly controls: readonly WorkflowControlObservation[];
+  readonly evidenceReferences: readonly string[];
+}
+
+export interface WorkflowCompositionExplanation {
+  readonly invocationId: string;
+  readonly trigger: string;
+  readonly executor: {
+    readonly plugin: string;
+    readonly capabilities: readonly string[];
+  };
+  readonly controls: readonly {
+    readonly plugin: string;
+    readonly mode: ControlMode;
+    readonly phases: readonly ControlPhase[];
+    readonly capabilities: readonly string[];
+  }[];
+  readonly evidenceSinks: readonly {
+    readonly plugin: string;
+    readonly failure: "ignore" | "fail";
+    readonly capabilities: readonly string[];
+  }[];
+  readonly requiredCapabilities: readonly string[];
+  readonly availableCapabilities: readonly string[];
+  readonly missingCapabilities: readonly string[];
+  readonly enforcementPoints: readonly string[];
+}
+
+const lookupPlugin = <Plugin>(
+  plugins: Readonly<Record<string, Plugin>>,
+  id: string,
+  kind: string,
+): Plugin => {
+  const plugin = plugins[id];
+  if (plugin === undefined) {
+    throw new Error(`workflow-${kind}-not-registered:${id}`);
   }
+  return plugin;
 };
 
-const runWithRetries = async <Result>(
-  retryLimit: number,
-  signal: AbortSignal,
-  run: () => Promise<Result>,
-): Promise<Result> => {
-  let failure: unknown;
-  for (let attempt = 0; attempt <= retryLimit; attempt += 1) {
-    if (signal.aborted) throw signal.reason;
+const uniqueSorted = (values: readonly string[]): readonly string[] =>
+  [...new Set(values)].sort();
+
+const resolveComposition = (
+  untrustedInvocation: unknown,
+  registry: WorkflowPluginRegistry,
+): ResolvedComposition => {
+  const invocation = workflowInvocationSchema.parse(untrustedInvocation);
+  const executor = lookupPlugin(
+    registry.executors,
+    invocation.executor.plugin,
+    "executor",
+  );
+  const controls = invocation.controls.map((selection) => ({
+    plugin: lookupPlugin(registry.controls, selection.plugin, "control"),
+    mode: selection.mode,
+    input: selection.input,
+  }));
+  const evidenceSinks = invocation.evidence.map((selection) => ({
+    plugin: lookupPlugin(
+      registry.evidenceSinks,
+      selection.plugin,
+      "evidence-sink",
+    ),
+    failure: selection.failure,
+    input: selection.input,
+  }));
+  const capabilities = uniqueSorted([
+    ...executor.capabilities,
+    ...controls.flatMap(({plugin}) => plugin.capabilities),
+    ...evidenceSinks.flatMap(({plugin}) => plugin.capabilities),
+  ]);
+  const available = new Set(capabilities);
+  const missingCapabilities = uniqueSorted(
+    invocation.requiredCapabilities.filter(
+      (capability) => !available.has(capability),
+    ),
+  );
+  return {
+    invocation,
+    executor,
+    controls,
+    evidenceSinks,
+    capabilities,
+    missingCapabilities,
+  };
+};
+
+export const explainWorkflowComposition = (
+  untrustedInvocation: unknown,
+  registry: WorkflowPluginRegistry,
+): WorkflowCompositionExplanation => {
+  const composition = resolveComposition(untrustedInvocation, registry);
+  return {
+    invocationId: composition.invocation.invocationId,
+    trigger: composition.invocation.trigger.kind,
+    executor: {
+      plugin: composition.executor.id,
+      capabilities: uniqueSorted(composition.executor.capabilities),
+    },
+    controls: composition.controls.map(({plugin, mode}) => ({
+      plugin: plugin.id,
+      mode,
+      phases: uniqueSorted(plugin.phases) as readonly ControlPhase[],
+      capabilities: uniqueSorted(plugin.capabilities),
+    })),
+    evidenceSinks: composition.evidenceSinks.map(({plugin, failure}) => ({
+      plugin: plugin.id,
+      failure,
+      capabilities: uniqueSorted(plugin.capabilities),
+    })),
+    requiredCapabilities: uniqueSorted(
+      composition.invocation.requiredCapabilities,
+    ),
+    availableCapabilities: composition.capabilities,
+    missingCapabilities: composition.missingCapabilities,
+    enforcementPoints: composition.controls.flatMap(({plugin, mode}) =>
+      mode === "enforce"
+        ? plugin.phases.map((phase) => `${phase}:${plugin.id}`)
+        : [],
+    ),
+  };
+};
+
+const recordEvidence = async (
+  composition: ResolvedComposition,
+  event: WorkflowEvidenceEvent,
+): Promise<readonly string[]> => {
+  const references: string[] = [];
+  for (const sink of composition.evidenceSinks) {
     try {
-      return await run();
+      const reference = await sink.plugin.record(event, sink.input);
+      if (reference !== undefined && reference !== "") {
+        references.push(reference);
+      }
     } catch (error) {
-      failure = error;
+      if (sink.failure === "fail") throw error;
     }
   }
-  throw failure;
+  return references;
 };
 
-const validateUsage = (
-  usage: {readonly tokens: number; readonly cost: number},
-  budget: {readonly tokenBudget: number; readonly costBudget: number},
-): void => {
-  if (usage.tokens > budget.tokenBudget) {
-    throw new Error("workflow-token-budget-exceeded");
+const runControls = async (
+  composition: ResolvedComposition,
+  phase: ControlPhase,
+  execution: ExecutorResult | undefined,
+  signal: AbortSignal,
+): Promise<{
+  readonly observations: readonly WorkflowControlObservation[];
+  readonly evidenceReferences: readonly string[];
+  readonly denied: boolean;
+}> => {
+  const observations: WorkflowControlObservation[] = [];
+  const evidenceReferences: string[] = [];
+  let denied = false;
+  for (const control of composition.controls) {
+    if (!control.plugin.phases.includes(phase)) continue;
+    const result = controlResultSchema.parse(
+      await control.plugin.evaluate(
+        {
+          phase,
+          invocation: composition.invocation,
+          execution,
+          input: control.input,
+        },
+        signal,
+      ),
+    );
+    observations.push({
+      plugin: control.plugin.id,
+      phase,
+      mode: control.mode,
+      result,
+    });
+    evidenceReferences.push(...result.references);
+    evidenceReferences.push(
+      ...(await recordEvidence(composition, {
+        apiVersion: workflowInvocationApiVersion,
+        invocationId: composition.invocation.invocationId,
+        kind: "control.evaluated",
+        payload: {
+          plugin: control.plugin.id,
+          phase,
+          mode: control.mode,
+          decision: result.decision,
+          references: result.references,
+          ...(result.reason === undefined ? {} : {reason: result.reason}),
+        },
+      })),
+    );
+    if (control.mode === "enforce" && result.decision === "deny") {
+      denied = true;
+      break;
+    }
   }
-  if (usage.cost > budget.costBudget) {
-    throw new Error("workflow-cost-budget-exceeded");
-  }
+  return {observations, evidenceReferences, denied};
 };
+
+const inactiveSignal = new AbortController().signal;
 
 export const executeWorkflowInvocation = async (
   untrustedInvocation: unknown,
-  ports: WorkflowRuntimePorts,
+  registry: WorkflowPluginRegistry,
+  signal: AbortSignal = inactiveSignal,
 ): Promise<WorkflowExecutionResponse> => {
-  const invocation = workflowInvocationSchema.parse(untrustedInvocation);
-  const {execution} = invocation;
-  let outcome: string;
-  let outputReferences: readonly string[] = [];
-  let oversightReferences: readonly string[] = [];
-
-  try {
-    if (execution.family === "workflow-script") {
-      const result = await withTimeout(
-        execution.budget.timeoutSeconds,
-        (signal) =>
-          ports.runScript({module: execution.module, invocation}, signal),
-      );
-      const parsed = workflowScriptResultSchema.parse(result);
-      outcome = parsed.outcome;
-      outputReferences = parsed.outputReferences;
-    } else if (execution.family === "workflow-script-llm") {
-      const result = await withTimeout(
-        execution.budget.timeoutSeconds,
-        async (signal) => {
-          const facts = workflowScriptResultSchema.parse(
-            await ports.runScript(
-              {module: execution.module, invocation},
-              signal,
-            ),
-          );
-          const evaluation = await runWithRetries(
-            execution.budget.retryLimit,
-            signal,
-            async () =>
-              modelEvaluationResultSchema.parse(
-                await ports.runModel(
-                  {evaluator: execution.evaluator, invocation, facts},
-                  signal,
-                ),
-              ),
-          );
-          validateUsage(evaluation.usage, execution.budget);
-          return {facts, evaluation};
-        },
-      );
-      outcome = result.evaluation.outcome;
-      outputReferences = result.facts.outputReferences;
-    } else {
-      const childDepth = invocation.trigger.childDepth ?? 0;
-      if (childDepth > execution.maximumChildDepth) {
-        throw new Error("workflow-maximum-child-depth-exceeded");
-      }
-      const result = await withTimeout(
-        execution.budget.timeoutSeconds,
-        async (signal) => {
-          const oversight = oversightVerificationSchema.parse(
-            await ports.verifyOversight(invocation, signal),
-          );
-          if (oversight.level !== execution.oversight.level) {
-            throw new Error("workflow-oversight-level-mismatch");
-          }
-          const agent = await runWithRetries(
-            execution.budget.retryLimit,
-            signal,
-            async () =>
-              agentWorkflowResultSchema.parse(
-                await ports.runAgent(
-                  {
-                    launcher: execution.launcher,
-                    workflowSkill: execution.workflowSkill,
-                    invocation,
-                  },
-                  signal,
-                ),
-              ),
-          );
-          validateUsage(agent.usage, execution.budget);
-          return {agent, oversight};
-        },
-      );
-      outcome = "completed";
-      outputReferences = result.agent.evidenceReferences;
-      oversightReferences = result.oversight.evidenceReferences;
-    }
-  } catch (error) {
-    const code = error instanceof Error ? error.message : String(error);
-    const evidenceReference = await ports.recordEvidence({
-      apiVersion: workflowInvocationApiVersion,
-      invocationId: invocation.invocationId,
-      triggerSource: invocation.trigger.source,
-      triggerReference: invocation.trigger.nativeReference,
-      subjectReference: invocation.subject.reference,
-      subjectRevision: invocation.subject.revision,
-      workflowOperation: invocation.workflow.operation,
-      executionFamily: execution.family,
-      evidenceProviderReference: invocation.evidenceProviderReference,
-      outcome: `failed:${code}`,
-      outputReferences: [],
-      oversightReferences: [],
-    });
-    if (evidenceReference.length === 0) {
-      throw new Error("workflow-evidence-reference-missing", {cause: error});
-    }
+  const composition = resolveComposition(untrustedInvocation, registry);
+  if (composition.missingCapabilities.length > 0) {
     throw new Error(
-      `workflow-execution-failed:${code}:evidence:${evidenceReference}`,
-      {cause: error},
+      `workflow-required-capabilities-missing:${composition.missingCapabilities.join(",")}`,
     );
   }
+  const evidenceReferences: string[] = [];
+  const observations: WorkflowControlObservation[] = [];
 
-  const evidence: WorkflowExecutionEvidence = {
-    apiVersion: workflowInvocationApiVersion,
-    invocationId: invocation.invocationId,
-    triggerSource: invocation.trigger.source,
-    triggerReference: invocation.trigger.nativeReference,
-    subjectReference: invocation.subject.reference,
-    subjectRevision: invocation.subject.revision,
-    workflowOperation: invocation.workflow.operation,
-    executionFamily: execution.family,
-    evidenceProviderReference: invocation.evidenceProviderReference,
-    outcome,
-    outputReferences,
-    oversightReferences,
-  };
-  const evidenceReference = await ports.recordEvidence(evidence);
-  if (evidenceReference.length === 0) {
-    throw new Error("workflow-evidence-reference-missing");
+  try {
+    evidenceReferences.push(
+      ...(await recordEvidence(composition, {
+        apiVersion: workflowInvocationApiVersion,
+        invocationId: composition.invocation.invocationId,
+        kind: "composition.started",
+        payload: {
+          trigger: composition.invocation.trigger.kind,
+          executor: composition.executor.id,
+        },
+      })),
+    );
+
+    const before = await runControls(composition, "before", undefined, signal);
+    observations.push(...before.observations);
+    evidenceReferences.push(...before.evidenceReferences);
+    if (before.denied) {
+      evidenceReferences.push(
+        ...(await recordEvidence(composition, {
+          apiVersion: workflowInvocationApiVersion,
+          invocationId: composition.invocation.invocationId,
+          kind: "composition.completed",
+          payload: {outcome: "denied", phase: "before"},
+        })),
+      );
+      return {
+        invocationId: composition.invocation.invocationId,
+        outcome: "denied",
+        controls: observations,
+        evidenceReferences: uniqueSorted(evidenceReferences),
+      };
+    }
+
+    const execution = executorResultSchema.parse(
+      await composition.executor.execute(
+        composition.invocation,
+        composition.invocation.executor.input,
+        signal,
+      ),
+    );
+    evidenceReferences.push(...execution.references);
+    evidenceReferences.push(
+      ...(await recordEvidence(composition, {
+        apiVersion: workflowInvocationApiVersion,
+        invocationId: composition.invocation.invocationId,
+        kind: "execution.completed",
+        payload: {
+          executor: composition.executor.id,
+          outcome: execution.outcome,
+          references: execution.references,
+        },
+      })),
+    );
+
+    const after = await runControls(composition, "after", execution, signal);
+    observations.push(...after.observations);
+    evidenceReferences.push(...after.evidenceReferences);
+    const outcome = after.denied ? "denied" : "executed";
+    evidenceReferences.push(
+      ...(await recordEvidence(composition, {
+        apiVersion: workflowInvocationApiVersion,
+        invocationId: composition.invocation.invocationId,
+        kind: "composition.completed",
+        payload: {outcome},
+      })),
+    );
+    return {
+      invocationId: composition.invocation.invocationId,
+      outcome,
+      execution,
+      controls: observations,
+      evidenceReferences: uniqueSorted(evidenceReferences),
+    };
+  } catch (error) {
+    const failure = error instanceof Error ? error.message : String(error);
+    await recordEvidence(composition, {
+      apiVersion: workflowInvocationApiVersion,
+      invocationId: composition.invocation.invocationId,
+      kind: "composition.failed",
+      payload: {failure},
+    });
+    throw new Error(`workflow-execution-failed:${failure}`, {cause: error});
   }
-  return {...evidence, evidenceReference};
 };

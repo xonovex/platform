@@ -73,13 +73,7 @@ export const validateProfile = (profile) => {
   ) {
     return "result-erased";
   }
-  const unenforced = profile.mandatoryControls.some(
-    ({enforcementPoints}) =>
-      !enforcementPoints.some(
-        ({supported, guaranteed}) => supported && guaranteed,
-      ),
-  );
-  return unenforced ? "no-enforcement-guarantee" : null;
+  return null;
 };
 
 export const validateResultProvider = (provider) => {

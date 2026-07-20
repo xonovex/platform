@@ -1,37 +1,29 @@
 # Early Lifecycle Execution Contract
 
-Discovery, Research, Formulation, Experience Design, Solution Design, Decision, and Planning keep stable semantic results while methods, executors, providers, profiles, and policy enforcement vary independently. Apply the **workflow-guide** result and provider contracts to every operation.
+Discovery, Research, Formulation, Experience Design, Solution Design, Decision, and Planning keep stable semantic results while methods, workflow executors, providers, and profiles vary independently. Apply the **workflow-guide** result and provider contracts to every operation.
 
 ## Axis resolution
 
 Resolve each axis independently in this order: explicit command argument, selected workflow profile, project instructions, unambiguous environment detection, axis-specific default, then a visible request for selection. Resolution yields a requested value, not a grant — an `--executor` request additionally passes the validation in Executor selection below. Never infer a method from a provider or a provider from a native-reference shape.
 
-- **Method** — neutral is the default. User stories, BDD, example mapping, user research, accessibility review, architecture review, and other installed skills are selectable capabilities, not prerequisites. Of these, user stories, BDD, and accessibility review ship as installable skills; example mapping, user research, and architecture review are adopter-supplied — no skill ships one, so an installed skill must satisfy the method's early-lifecycle result contract (resolve, create, critique, revise, and accept a canonical method result through the **workflow-guide** result and provider contracts). The **agent-governance-guide** capability registry records each method's shipped owner or the adopter-supplied contract it names.
+- **Method** — neutral is the default. User stories, BDD, example mapping, user research, accessibility review, architecture review, and other installed skills are selectable capabilities, not prerequisites. A selected method must satisfy the early-lifecycle result contract through the **workflow-guide** result and provider ports.
 - **Provider** — ask the selected provider to resolve, read, publish, revise, relate, and version its native result. An explicitly selected unavailable provider fails; no silent file fallback.
 - **Profile** — may omit Experience Design or Solution Design, but cannot erase an included capability's independent result.
-- **Governance** — workflow-only execution is valid. When a profile requires a policy outcome, request its semantic intent and consume the evidence reference; never embed a hook schema or policy engine in lifecycle logic.
+- **Runtime composition** — optional and separate. A lifecycle operation may be passed to a composition, but the profile does not select triggers, runtime executors, hosts, controls, evidence sinks, or maturity.
 
 ## Executor selection
 
-Every early lifecycle operation selects from `deterministic`, `model`, `agent`, `human`, and `external`. **agent-governance-guide** owns the class definitions, their boundaries, and the rules that validate or reject a requested executor.
+Every early lifecycle operation selects from `deterministic`, `model`, `agent`, `human`, and `external`. These are workflow-origin labels and do not select runtime plugins or controls.
 
-Qualification is an attribute of a human actor record, not a class. A profile that requires regulated, safety, security, privacy, accessibility, architecture, or other role-bound judgment binds its Decision to a `human` whose record carries the matching qualification; a model or agent cannot supply it, and an unqualified human does not satisfy it. **agent-governance-guide** owns the actor record and evidence-origin contract.
+Qualification is an attribute of a human actor record, not a class. A profile that requires regulated, safety, security, privacy, accessibility, architecture, or other role-bound judgment binds its Decision to a `human` whose record carries the matching qualification; a model or agent cannot supply it, and an unqualified human does not satisfy it.
 
 Escalation changes the executor, not the result kind. Record executor origin, bounds, material tool/data use, and limitations in the native result.
 
-## Policy hook intents
+## Optional control references
 
-Request only the semantic intent needed by the selected profile:
-
-- `data-access` — authorization, minimization, residency, retention, and allowed data classes;
-- `external-research` — permitted networks, sources, licensing, terms, and content handling;
-- `privacy` — personal-data applicability, redaction, purpose, consent or lawful basis, retention, and review;
-- `accessibility` — applicable accessibility criteria, reviewer or test evidence, and unresolved barriers;
-- `security` — threat, trust-boundary, secrets, dependency, abuse, and assurance requirements;
-- `architecture` — decision authority, compatibility, qualities, boundaries, and review requirements;
-- `regulated-applicability` — applicable regimes, qualified actors, required evidence, and failure behavior.
-
-An adapter maps these intents to its native hooks, CI gates, provider controls, or policy service. Advisory output is not enforcement evidence.
+When a separate runtime composition is supplied, preserve its opaque decision and evidence
+references in the workflow result. Do not embed hook names, policy schemas, or control
+defaults in early-lifecycle logic.
 
 ## Result lifecycle
 

@@ -1,80 +1,37 @@
 digraph ComposableWorkflow {
-  rankdir=TB;
+  rankdir=LR;
   compound=true;
   newrank=true;
-  splines=polyline;
   nodesep=0.45;
-  ranksep=0.8;
+  ranksep=0.7;
 
-  node [shape=box, style="rounded,filled", fillcolor=white, fontname="Arial", fontsize=10];
+  node [shape=box, style="rounded,filled", fontname="Arial", fontsize=10];
   edge [fontname="Arial", fontsize=9];
 
-  subgraph cluster_adoption {
-    label="Independent Adoption";
-    style=filled;
-    fillcolor="#f7f7f7";
+  native [label="Native event\nmanual · hook · CI/CD · schedule · webhook", fillcolor="#dcecff"];
+  adapter [label="Trigger adapter\nauthenticate · minimize · normalize\nbind trusted template", fillcolor="#dcecff"];
+  invocation [label="Invocation\nopen trigger kind · subject · operation\nplugin selections · required capabilities", shape=folder, fillcolor="#dff4ff"];
 
-    profile [label="Effective composition preview\nworkflow-only | governance-only | enablement-only\nexternal-enforcement-only | integrated", shape=note, fillcolor="#fff3cd"];
-    user [label="User or organization\nselects modules and presets", shape=house, fillcolor="#e8d5f5"];
-    user -> profile [label="select + authorize"];
+  subgraph cluster_kernel {
+    label="Neutral workflow kernel";
+    style=filled;
+    fillcolor="#f8f3ff";
+
+    resolve [label="Composition root\nresolve registered plugins\ncheck required capabilities", fillcolor="#efe5ff"];
+    before [label="Before controls\n0..n · observe | enforce", fillcolor="#ffe4cc"];
+    execute [label="One executor plugin", fillcolor="#dcecff"];
+    after [label="After controls\n0..n · observe | enforce", fillcolor="#ffe4cc"];
+    sinks [label="Evidence sinks\n0..n · ignore | fail", fillcolor="#d9f2e6"];
+
+    resolve -> before -> execute -> after -> sinks;
   }
 
-  subgraph cluster_workflow {
-    label="Workflow Plane — provider-native lifecycle results";
-    style=filled;
-    fillcolor="#e8f0fe";
+  registry [label="Trusted registry\nexecutables · adapter config\ncapability declarations", shape=folder, fillcolor="#fff3cd"];
+  host [label="Independent host\nprocess · harness · CI runner · Kubernetes", fillcolor="#f3e6ff"];
+  maturity [label="Optional maturity assessment\ncaller-owned model · no runtime effect", fillcolor="#f3e6ff"];
 
-    lifecycle [label="Discovery → Research → Formulation\nDesign / Decision / Planning → Development\nDelivery / Review / QA / Assessment / Acceptance\nIntegration / Transition / Release → Observation\nIncident / Corrective Action → Retirement", fillcolor="#d9e8ff"];
-    workflow_profiles [label="Workflow profiles\nmethods + topology + completion\nexecutors + providers + evidence"];
-    results [label="Exact semantic results\nopaque provider reference + revision\nfreshness + evidence + limitations", shape=folder, fillcolor="#dff4ff"];
-
-    workflow_profiles -> lifecycle [label="compose"];
-    lifecycle -> results [label="publish"];
-  }
-
-  subgraph cluster_governance {
-    label="Governance Plane — ordinary agent activity and privileged operations";
-    style=filled;
-    fillcolor="#fff0e6";
-
-    governance_profiles [label="Governance profiles\npolicy + authority + executors\ndata + telemetry + trust"];
-    decisions [label="Policy decision point\nallow | deny | ask | advise | observe\nrequire evidence | exception | emergency exception", fillcolor="#ffe4cc"];
-    intents [label="Semantic event intents — governance taxonomy owns the vocabulary\nsession | prompt | model | tool | permission | capability\nresult | configuration | compaction | subagent\nworkspace | privileged operation", fillcolor="#ffe9d9"];
-    native [label="Native adapters\nClaude Code | Codex | Kiro | Copilot\nPi | OpenCode | provider APIs", fillcolor="#fff7e6"];
-    enforcement [label="External enforcement\nrepository | CI | deployment | admission\nidentity | cloud | provider permission", fillcolor="#ffd6d6"];
-
-    governance_profiles -> decisions [label="evaluate"];
-    decisions -> intents [label="bind"];
-    intents -> native [label="map by capability matrix"];
-    decisions -> enforcement [label="apply when required"];
-  }
-
-  subgraph cluster_enablement {
-    label="Transactional Onboarding and Operations";
-    style=filled;
-    fillcolor="#eefbe8";
-
-    onboarding [label="Onboarding\ndiscover → assess → preview → authorize\napply → verify → record", fillcolor="#ddf5d5"];
-    operation [label="Operate\ndiagnose | update | disable | remove\nrollback | drift | emergency stop", fillcolor="#e8f8df"];
-    evidence [label="Provider-native evidence\ndecision + enforcement + authorization\nconfiguration + execution + audit", shape=folder, fillcolor="#d9f2e6"];
-    feedback [label="Feedback and learning\ntelemetry + incidents + effectiveness\nreviewed promotion only", shape=cds, fillcolor="#d7f3f0"];
-
-    onboarding -> operation [label="verified state"];
-    operation -> evidence [label="record"];
-    evidence -> feedback [label="observe"];
-    feedback -> onboarding [label="reviewed change", style=dashed];
-  }
-
-  profile -> workflow_profiles [label="optional", lhead=cluster_workflow];
-  profile -> governance_profiles [label="optional", lhead=cluster_governance];
-  profile -> onboarding [label="optional", lhead=cluster_enablement];
-
-  results -> decisions [label="exact evidence reference\nwhen selected", style=dashed];
-  native -> evidence [label="native outcome"];
-  enforcement -> evidence [label="native outcome"];
-  evidence -> results [label="authorization / assessment\nwhen selected", style=dashed];
-  feedback -> governance_profiles [label="reviewed policy change", style=dashed];
-
-  boundary [label="Boundaries\nNo universal hook schema or mandatory workflow YAML\nSkills are advisory/setup capability, not enforcement proof\nModels and agents are explicit, bounded, and non-authoritative\nTelemetry correlates but does not become workflow identity", shape=note, fillcolor="#fff3cd"];
-  boundary -> profile [style=invis];
+  native -> adapter -> invocation -> resolve;
+  registry -> resolve;
+  host -> resolve [style=dashed, label="hosts"];
+  sinks -> maturity [style=dashed, label="capabilities"];
 }

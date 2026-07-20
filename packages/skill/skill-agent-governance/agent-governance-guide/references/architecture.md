@@ -1,51 +1,18 @@
-# Governance Architecture and Authority
+# Architecture
 
-## Independent trigger, execution, and oversight dimensions
+The workflow kernel has three input dimensions and three optional cross-cutting dimensions:
 
-A hook is one possible trigger, not the organizing abstraction. A workflow invocation keeps three dimensions independent:
+| Dimension | Selection                                                         | Kernel assumption                                     |
+| --------- | ----------------------------------------------------------------- | ----------------------------------------------------- |
+| Trigger   | Open `kind`, native reference, optional actor and data            | None about source or trust mechanism                  |
+| Executor  | One registered executor plugin                                    | Returns a neutral outcome and references              |
+| Host      | Process, agent harness, CI runner, Kubernetes, or another adapter | Outside the kernel                                    |
+| Controls  | Zero or more registered control plugins                           | Selection chooses `observe` or `enforce`              |
+| Evidence  | Zero or more registered sink plugins                              | Selection chooses `ignore` or `fail` on sink error    |
+| Maturity  | Optional caller-owned capability model                            | Assessed after composition, never an execution switch |
 
-| Dimension          | Values                                                                                                   |
-| ------------------ | -------------------------------------------------------------------------------------------------------- |
-| Trigger origin     | manual action, agent-harness hook, CI/CD hook, provider webhook, schedule, sensor, API, or another agent |
-| Execution family   | workflow script; workflow script followed by a bounded LLM; bounded agent executing a workflow skill     |
-| Oversight maturity | none for deterministic/model execution; observed `A1`, `A2`, or `A3` controls for an agent launch        |
+The composition root resolves plugin names once and passes concrete executor, control, and evidence ports into execution. The kernel does not import command, LLM, agent, hook, CI, or Kubernetes implementations.
 
-The trigger supplies origin, actor, idempotency, subject, and exact revision. It does not select authority or adaptivity implicitly. The trusted workflow template selects one of these execution families:
+Control phases wrap execution once: before controls run in selection order, the executor runs at most once, then after controls run in selection order. An enforcing denial stops the remaining phase. Observing denials are retained as observations.
 
-```text
-any trigger ─┬─> workflow script
-             ├─> workflow script ─> bounded LLM
-             └─> observed A1/A2/A3 oversight ─> bounded agent ─> workflow skill
-```
-
-The runtime contract in `scripts/workflow-runtime.ts` and the native command implementation in `scripts/workflow-command-runtime.ts` enforce that separation. `scripts/workflow-trigger-adapters.ts` binds minimized, authenticated native-event metadata to a trusted template without converting a trigger into an executor.
-
-## Plane boundaries
-
-Governance owns applicability, policy, authority, actor requirements, exceptions, evidence requirements, and effective composition. Execution implements declared capability contracts. Enforcement applies decisions through native adapters. Enablement changes configuration transactionally. Providers own native state and evidence. Observability correlates executions without becoming a workflow identity. Distribution owns package trust and lifecycle.
-
-Dependencies point inward to semantic contracts and ports:
-
-- policy logic consumes contextual facts and emits decisions without importing a concrete hook, CI system, provider, or policy language;
-- enforcement adapters consume decisions and native event context without redefining policy;
-- executors receive explicit inputs and authority rather than locating ambient capabilities;
-- onboarding invokes native configuration adapters only after preview and authorization;
-- governance may evaluate workflow facts, but governance-only operation never requires workflow results.
-
-Use **workflow-guide** for lifecycle capability, result, and profile semantics when that optional plane is installed.
-
-## Trust and authority zones
-
-| Zone                 | Typical authority                                                        | Rule                                                              |
-| -------------------- | ------------------------------------------------------------------------ | ----------------------------------------------------------------- |
-| Organization-managed | Mandatory policies, managed harness configuration, CI/provider controls  | Lower zones cannot silently weaken it                             |
-| Repository/project   | Trusted project instructions, hooks, plugins, CI, provider configuration | Executable content requires repository trust and review           |
-| User                 | Personal skills, credentials, models, extensions, preferences            | May strengthen; weakening requires authorized exception           |
-| Session/runtime      | Ephemeral context, grants, workspace, temporary credentials, budgets     | Expires with runtime and cannot create durable higher authority   |
-| External authority   | Identity, secrets, CI, deployment, monitoring, GRC, provider systems     | Evidence is authoritative only for its declared subject and scope |
-
-Native precedence differs by platform. Preserve one semantic invariant: a lower-authority source cannot silently weaken a mandatory higher-authority control. Conflicts, unsupported enforcement, and authority expansion fail visibly.
-
-## Adoption modes
-
-Governance-only, enablement-only, external-enforcement-only, workflow-only, and integrated compositions are independently valid. A governance profile may reference workflow evidence, but a baseline governance module protects ordinary prompt, tool, model, workspace, or privileged activity without a lifecycle command.
+Capabilities are inert strings declared by plugins. A composition can name required capabilities; resolution fails before controls or execution when any requirement is absent. External tools can use the same declarations for maturity or inventory without changing runtime semantics.

@@ -37,33 +37,19 @@ spec:
       memory: "2Gi"
 ```
 
-**Lifecycle phases:** `Pending` -> `Initializing` -> `Running` -> `Succeeded` | `Failed` | `TimedOut` | `Paused`
+**Lifecycle phases:** `Pending` -> `Initializing` -> `Running` -> `Succeeded` | `Failed` | `TimedOut`
 
-#### Trigger and autonomy boundaries
+#### Trigger and workflow boundaries
 
-Trigger source is independent from execution. An `AgentRun` can be created manually, from an `AgentSchedule`, or by an authenticated `AgentTrigger` request; CI/CD and provider webhooks use the same trigger receiver. The generic workflow runtime also accepts agent-harness hooks, sensors, APIs, and agent-originated events without changing the selected execution family.
+An `AgentRun` can be created manually, from an `AgentSchedule`, or by an authenticated `AgentTrigger` request. The operator records trigger origin annotations but executes the same immutable run specification for every source.
 
-The Kubernetes adapter implements `A0` and `A3`. Admission rejects `A1`/`A2` because this controller does not verify their independent-critique and asynchronous-gate contracts; use the governance workflow runtime for those levels. An `A3` run requires:
+The operator is an execution host. It does not define workflow controls, maturity levels, approvals, provenance journals, policy verdicts, or escalation behavior. Compose those independently in the workflow runtime or another control plane, then submit the resulting run to Kubernetes.
 
-- exact model/provider/prompt/tool/permission provenance and protected targets;
-- a mandatory namespace governance policy and minimized operation annotation;
-- admission-minted decision and enforcement references bound to the immutable spec digest;
-- distinct readable blocked-signal and accountable-response token references, plus a configured provider escalation router;
-- persistent decision/enforcement evidence storage.
-
-The runtime reports a genuine block with an authenticated `POST /v1/blocks/{namespace}/{run}` carrying the exact subject revision, reporter, reason code, and content-addressed evidence reference. Only then does the controller deliver the escalation. The accountable recipient uses a different credential to call `POST /v1/escalations/{namespace}/{run}` with `approve` or `reject`, the same subject revision, actor, and provider response reference. The controller rejects equal credentials, so the runtime cannot answer its own escalation. Approval resumes reconciliation, rejection fails the run, and silence applies the predeclared `pause` or `abandon` default.
-
-The operator supplies the authenticated endpoints, but an agent harness must explicitly implement blocked-state detection, submit the block request, and wait on `GET /v1/escalations/{namespace}/{run}` before continuing or stopping. That status read uses `blockedSignalTokenSecretRef`; only the accountable-response service receives `responseTokenSecretRef`. The run's NetworkPolicy must allow the receiver endpoint, and the receiver base URL must be reachable from both the runtime and escalation provider. A harness without this adapter can execute an `A3` run but cannot claim the escalation control is operational.
-
-Configure `--escalation-router-url`, `--escalation-router-token-file`, and `--escalation-response-base-url` together. Without an observed route and token, `A3` fails closed. The bundled decision service stores verdict and enforcement JSONL on the `agent-operator-governance-evidence` PVC; production overlays should set storage class, capacity, backup, retention, and access policy.
-
+`AgentPolicy` is optional. Without one, admission still requires a digest-pinned execution image and an explicit runtime class but does not require that runtime class to appear in an operator-owned allowlist. When one namespace policy exists, only its declared defaults and constraints are applied.
 #### Full spec reference
 
 | Field              | Type     | Description                                                                                       |
 | ------------------ | -------- | ------------------------------------------------------------------------------------------------- |
-| `accountableOwner` | string   | Person or team accountable for the run                                                            |
-| `provenance`       | object   | Content-minimized model, provider, prompt-reference, tool, and permission inputs                  |
-| `autonomy`         | object   | `A0` or fully coupled `A3` controls; `A1`/`A2` are rejected by this adapter                       |
 | `harnessRef`       | string   | Name of an AgentHarness in the same namespace                                                     |
 | `harness`          | object   | Inline harness config (mutually exclusive with `harnessRef`)                                      |
 | `providerRef`      | string   | Name of an AgentProvider in the same namespace                                                    |
@@ -241,7 +227,7 @@ Namespace-scoped admission policy for AgentRuns. Use at most one AgentPolicy per
 apiVersion: agent.xonovex.com/v1alpha1
 kind: AgentPolicy
 metadata:
-  name: agent-governance
+  name: agent-policy
   namespace: ai-agents
 spec:
   enforced:
@@ -261,7 +247,7 @@ spec:
     runtimeClassName: kata
 ```
 
-| Governance intent   | Native admission behavior                                                                                         | Independent verification                                                  |
+| Host policy intent  | Native admission behavior                                                                                         | Independent verification                                                  |
 | ------------------- | ----------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
 | Runtime isolation   | Requires or allowlists `runtimeClassName`                                                                         | Verify the cluster RuntimeClass and runtime implementation                |
 | Container hardening | Rejects explicit privilege escalation and root weakening                                                          | Inspect the generated Pod security context and cluster admission policy   |

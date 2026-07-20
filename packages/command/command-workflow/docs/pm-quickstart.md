@@ -2,8 +2,8 @@
 
 A lens over the same actor-neutral commands — not a different set of them. No command knows what a PM
 is: `plan-accept` asks for authority over an exact revision, never for a job title. A role is a way to
-_read_ the command set — which of the 59 you actually run, and which gates you personally answer for.
-The [README](../README.md) documents all 59 commands and their contracts; the
+_read_ the command set — which of the 56 you actually run, and which gates you personally answer for.
+The [README](../README.md) documents all 56 commands and their contracts; the
 [Developer Quickstart](developer-quickstart.md) is the sibling lens for the seat that writes the code,
 and it owns the shared vocabulary (native references, `--revision`, `--profile`, `--method`). See the
 [pm-workflow diagram](../../../diagram/diagram-agent-workflow/pm-workflow.png) for the same flow
@@ -35,8 +35,8 @@ Four stages: **Frame → Decide → Authorize → Sign off.** None of them write
 - **`discovery-run` does not force stories**, and `formulation-run` defaults to `neutral`. Select
   `--method user-stories` or `--method bdd` only when that is genuinely your team's method; an
   explicitly selected method that is not installed fails visibly rather than substituting another.
-- **There is no `story-refine`** — it was removed in 6.0.0. `discovery-run` then `formulation-run`
-  replace it, with the method selected rather than assumed. See [MIGRATION.md](../MIGRATION.md).
+- **There is no `story-refine`** — use `discovery-run` then `formulation-run`, with the method
+  selected rather than assumed.
 - `research-run` keeps evidence and provenance distinct from synthesis and exposes uncertainty
   explicitly. Read the uncertainty — pricing it is the part of the job that is yours.
 
@@ -114,25 +114,12 @@ Four commands wait for an accountable actor, and nothing advances past them on a
 `--authority-reference` is a claim to be verified, not a credential: actor, qualification, scope, and
 freshness are checked before the decision binds to the revision.
 
-## Executors and autonomy
+## Executors, controls, and maturity
 
-Two models appear throughout the argument help. Both are owned elsewhere and deliberately not
-restated here:
-
-- **Executor classes** (`--executor`) —
-  [execution.md](../../../skill/skill-agent-governance/agent-governance-guide/references/execution.md).
-  The class that matters to this lens is `human`: it is selected because accountable judgment must own
-  the outcome, never because the work is hard. An `--executor` value is a requested ceiling that may be
-  rejected, never an escalation.
-- **Autonomy levels `A0`–`A3`** —
-  [autonomy.md](../../../skill/skill-agent-governance/agent-governance-guide/references/autonomy.md).
-  Raising a level changes who is watching and when. It never converts a `human` executor into a `model`
-  one, and high-impact gates stay human at every level. Yours are high-impact: a wrong approval is not
-  both detectable without a human and reversible without an external system of record.
-
-At the unattended levels a run that needs you raises a bounded escalation with a declared window and
-safe default. **Silence is never approval** — an unanswered escalation falls back to pause or abandon
-when the window expires, and a timeout never advances a gate.
+`--executor` selects who performs the operation; it does not select controls. If approval,
+critique, escalation, or another decision concern is wanted, select that control explicitly
+as `observe` or `enforce`. A1/A2/A3 are optional caller-defined reports over capabilities
+and never change who executes or which gates apply.
 
 ## What you can skip
 

@@ -5,7 +5,7 @@
 - One or more opaque native result references, or an in-memory result/handle.
 - Selected or candidate workflow profile.
 - Available provider, method, workspace, policy, and learning capabilities.
-- Optional governance decisions and evidence references.
+- Optional runtime composition and evidence references.
 
 ## Workflow
 
@@ -14,7 +14,7 @@
 3. Resolve every variation axis independently and report explicit, profile, project, detected, or default origin.
 4. Expand composite presentation into constituent canonical capabilities.
 5. Evaluate result validity, publication boundaries, prerequisites, exit status, evidence freshness, authorization, and cumulative completion separately.
-6. Report unsupported operations, missing references, stale evidence, ambiguous selections, and governance guarantee gaps without silently substituting providers or controls.
+6. Report unsupported operations, missing references, stale evidence, and ambiguous selections without silently substituting providers or runtime controls.
 
 ## Output
 

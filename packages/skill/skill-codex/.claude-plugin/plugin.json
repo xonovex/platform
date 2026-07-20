@@ -1,10 +1,9 @@
 {
   "name": "xonovex-skill-codex",
   "version": "6.1.0",
-  "description": "Xonovex Codex harness governance skills",
+  "description": "Xonovex Codex workflow hook skills",
   "author": {
     "name": "Xonovex"
   },
-  "skills": ["./codex-guide"],
-  "dependencies": ["xonovex-skill-agent-governance"]
+  "skills": ["./codex-guide"]
 }

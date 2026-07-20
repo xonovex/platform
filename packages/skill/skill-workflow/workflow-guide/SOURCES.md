@@ -43,7 +43,7 @@ The contract is an Xonovex architectural synthesis. Sources support the recorded
 - **Related URLs:** https://cyclonedx.org/capabilities/mlbom/
 - **Last reviewed:** 2026-07-14
 - **Used for:** `references/results.md`, `references/providers.md`, `references/inventory-generate.md`, `references/conformance.md`
-- **Aspects extracted:** Optional inventories may cover AI/ML and agent/governance components with identities, versions, relationships, and provenance. No one serialization is required by the workflow contract.
+- **Aspects extracted:** Optional inventories may cover AI/ML and agent-runtime components with identities, versions, relationships, and provenance. No one serialization is required by the workflow contract.
 
 ## S-SECURE-DEVELOPMENT-ASSURANCE — Secure development and verification
 

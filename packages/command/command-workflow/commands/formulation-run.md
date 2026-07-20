@@ -19,7 +19,7 @@ argument-hint: "<subject-or-native-reference> [--profile <reference>] [--provide
 
 - `subject-or-native-reference` (required): Discovery/Research input, subject, or opaque native reference.
 - `--profile`, `--provider`, `--method` (optional): Independent axis selections; neutral is the default method.
-- `--executor` (optional): `deterministic` | `model` | `agent` | `human` | `external` — a requested ceiling that may be rejected; see `agent-governance-guide`.
+- `--executor` (optional): Explicit `deterministic`, `model`, `agent`, `human`, or `external` workflow selection; it does not imply controls or maturity.
 
 ## Delegation
 

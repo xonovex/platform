@@ -440,26 +440,24 @@
             "effectiveState": "installed"
           },
           {
-            "identity": "ci-component:governance",
+            "identity": "control:release-policy",
             "version": "sha256:abcd",
             "provenance": "gitlab:component:8",
-            "componentKind": "governance-module",
+            "componentKind": "control-plugin",
             "effectiveState": "observed-effective",
             "effectiveSelectionEvidence": "gitlab:pipeline-policy:12",
             "classification": "enforcing",
-            "adoptionModes": ["external-enforcement-only", "integrated"],
             "authorityZones": ["organization-managed"],
             "requestedPermissions": ["pipeline:block"],
             "effectivePermissions": ["pipeline:block"]
           },
           {
-            "identity": "policy-bundle:secure",
+            "identity": "evidence-sink:audit",
             "version": "secure@7",
-            "provenance": "policy-provider:bundle:secure@7",
-            "componentKind": "policy-bundle",
+            "provenance": "plugin-catalog:audit@7",
+            "componentKind": "evidence-sink",
             "effectiveState": "evidence-producing",
-            "classification": "enforcing",
-            "adoptionModes": ["governance-only", "integrated"],
+            "classification": "recording",
             "authorityZones": ["organization-managed"],
             "requestedPermissions": [],
             "effectivePermissions": []
@@ -494,10 +492,9 @@
             "identity": "plugin:release-policy",
             "version": "5.0.0",
             "provenance": "plugin-catalog:release-policy@5.0.0",
-            "componentKind": "governance-module",
+            "componentKind": "control-plugin",
             "effectiveState": "observed-effective",
             "classification": "enforcing",
-            "adoptionModes": ["integrated"],
             "authorityZones": ["project"]
           }
         ]

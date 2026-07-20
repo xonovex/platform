@@ -22,8 +22,7 @@ import (
 
 // AgentRunWebhook implements defaulting and validation for AgentRun
 type AgentRunWebhook struct {
-	Client         client.Client
-	DecisionClient GovernanceDecisionClient
+	Client client.Client
 }
 
 var _ admission.Defaulter[*agentv1alpha1.AgentRun] = &AgentRunWebhook{}
@@ -54,12 +53,6 @@ func (w *AgentRunWebhook) Default(ctx context.Context, run *agentv1alpha1.AgentR
 		defaultTimeout := metav1.Duration{Duration: time.Hour}
 		run.Spec.Timeout = &defaultTimeout
 	}
-	if policy != nil {
-		if _, err := w.enforceGovernance(ctx, run, policy); err != nil {
-			return err
-		}
-	}
-
 	return nil
 }
 
@@ -162,18 +155,10 @@ func (w *AgentRunWebhook) validate(ctx context.Context, run *agentv1alpha1.Agent
 	if err := validateExecutionBoundary(effectiveRun, policy); err != nil {
 		return nil, err
 	}
-	if err := validateAutonomyOversight(effectiveRun, policy); err != nil {
-		return nil, err
-	}
 	if policy != nil {
 		if err := enforcePolicy(effectiveRun, policy); err != nil {
 			return nil, err
 		}
-		governanceWarnings, err := w.enforceGovernance(ctx, effectiveRun, policy)
-		if err != nil {
-			return nil, err
-		}
-		warnings = append(warnings, governanceWarnings...)
 	}
 
 	return warnings, nil
@@ -226,14 +211,14 @@ func validateExecutionBoundary(run *agentv1alpha1.AgentRun, policy *agentv1alpha
 		return fmt.Errorf("agent execution requires an explicit sandboxed runtimeClassName or harness/policy default")
 	}
 	if !runtimeClassApproved(*run.Spec.RuntimeClassName, policy) {
-		return fmt.Errorf("runtimeClassName %q is not declared sandboxed by the namespace AgentPolicy", *run.Spec.RuntimeClassName)
+		return fmt.Errorf("runtimeClassName %q is not allowed by the namespace AgentPolicy", *run.Spec.RuntimeClassName)
 	}
 	return nil
 }
 
 func runtimeClassApproved(runtimeClassName string, policy *agentv1alpha1.AgentPolicy) bool {
 	if policy == nil {
-		return false
+		return true
 	}
 	enforced := policy.Spec.Enforced
 	if enforced.RuntimeClassName != nil && *enforced.RuntimeClassName == runtimeClassName {
@@ -245,76 +230,6 @@ func runtimeClassApproved(runtimeClassName string, policy *agentv1alpha1.AgentPo
 		}
 	}
 	return false
-}
-
-func validateAutonomyOversight(run *agentv1alpha1.AgentRun, policy *agentv1alpha1.AgentPolicy) error {
-	triggerKind := run.Annotations[agentv1alpha1.TriggeredByKindAnnotation]
-	if triggerKind != "" {
-		if triggerKind != "AgentSchedule" && triggerKind != "AgentTrigger" {
-			return fmt.Errorf("triggered run has unsupported trigger kind %q", triggerKind)
-		}
-		if run.Annotations[agentv1alpha1.TriggeredByNameAnnotation] == "" {
-			return fmt.Errorf("triggered run requires a trigger name")
-		}
-		if run.Spec.AccountableOwner == "" {
-			return fmt.Errorf("triggered run requires an accountableOwner")
-		}
-		if err := validateRunProvenance(run.Spec.Provenance); err != nil {
-			return fmt.Errorf("triggered run %w", err)
-		}
-	}
-
-	if run.Spec.Autonomy == nil {
-		return nil
-	}
-	if run.Spec.Autonomy.Level == agentv1alpha1.AutonomyLevelAssisted || run.Spec.Autonomy.Level == agentv1alpha1.AutonomyLevelSupervised {
-		return fmt.Errorf("AgentRun does not implement A1/A2 oversight verification; use the workflow runtime agent-workflow-skill family or request A0/A3")
-	}
-	if run.Spec.Autonomy.Level != agentv1alpha1.AutonomyLevelUnattended {
-		return nil
-	}
-	if run.Spec.AccountableOwner == "" {
-		return fmt.Errorf("A3 run requires an accountableOwner")
-	}
-	if err := validateRunProvenance(run.Spec.Provenance); err != nil {
-		return fmt.Errorf("A3 run %w", err)
-	}
-	if len(run.Spec.Autonomy.ProtectedTargets) == 0 {
-		return fmt.Errorf("A3 run requires at least one protected target")
-	}
-	route := run.Spec.Autonomy.EscalationRoute
-	if route == nil || route.Recipient == "" {
-		return fmt.Errorf("A3 run requires an accountable escalation recipient")
-	}
-	if route.Window.Duration <= 0 {
-		return fmt.Errorf("A3 escalation window must be positive")
-	}
-	if route.SafeDefault != agentv1alpha1.EscalationSafeDefaultPause && route.SafeDefault != agentv1alpha1.EscalationSafeDefaultAbandon {
-		return fmt.Errorf("A3 escalation safeDefault must be pause or abandon")
-	}
-	if route.ResponseTokenSecretRef.Name == "" || route.ResponseTokenSecretRef.Key == "" {
-		return fmt.Errorf("A3 escalation requires responseTokenSecretRef name and key")
-	}
-	if route.BlockedSignalTokenSecretRef.Name == "" || route.BlockedSignalTokenSecretRef.Key == "" {
-		return fmt.Errorf("A3 escalation requires blockedSignalTokenSecretRef name and key")
-	}
-	if route.BlockedSignalTokenSecretRef == route.ResponseTokenSecretRef {
-		return fmt.Errorf("A3 blocked-signal and response token references must be distinct")
-	}
-	if policy == nil || !policy.Spec.Enforced.RequireGovernanceVerdict {
-		return fmt.Errorf("A3 run requires a non-bypassable governance verdict at admission")
-	}
-	return nil
-}
-
-func validateRunProvenance(provenance *agentv1alpha1.AgentRunProvenance) error {
-	if provenance == nil || provenance.Model == "" || provenance.Provider == "" || provenance.PromptReference == "" {
-		return fmt.Errorf("requires provenance with model, provider, and promptReference")
-	}
-	if provenance.Tools == nil || provenance.GrantedPermissions == nil {
-		return fmt.Errorf("requires provenance with declared tools and grantedPermissions")
-	}
-	return nil
 }
 
 func (w *AgentRunWebhook) namespacePolicy(ctx context.Context, namespace string) (*agentv1alpha1.AgentPolicy, error) {

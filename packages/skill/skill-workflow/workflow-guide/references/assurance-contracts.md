@@ -19,7 +19,7 @@ Inventory, Review, QA, and Assessment publish independent results against exact 
 | Human or qualified assessor        | Accountable disposition, contextual or role-bound judgment         | Record identity, role, qualification, independence, and scope                 |
 | External system                    | Provider-native check, artifact, report, approval, or audit record | Preserve subject revision, evaluator/policy version, outcome, and freshness   |
 
-Static tools, scanners, CI, bounded model review, independent agents, and humans may compose in one capability. Record each origin separately; do not normalize copied logs into a stronger authority class. The identity, role, and independence a human or agent row records are defined by **agent-governance-guide**, which also states which of them code enforces and which a profile must uphold itself.
+Static tools, scanners, CI, bounded model review, independent agents, and humans may compose in one capability. Record each origin separately; do not normalize copied logs into a stronger authority class. Identity, role, and independence are workflow evidence fields, not runtime-control selections.
 
 ## Freshness binding
 
@@ -40,7 +40,7 @@ Re-evaluate when any required value changes. A changed subject always invalidate
 
 Use provider-native reusable CI modules and protected policy mechanisms through their provider skills. Bind GitHub checks to the exact head revision and stable source/check identity; bind GitLab jobs to the exact commit, component/policy revision, and native job/pipeline identity. Immutable module pins, least privilege, trusted runners, independent required checks, and bypass tests belong to the provider adapter.
 
-A harness hook or command can provide early advisory evidence. When a profile declares a mandatory shared control, require an independent external enforcement point that the governed actor cannot bypass and preserve its native evidence reference.
+A harness hook or command can provide advisory evidence. If a separate runtime composition selects a control, preserve its native evidence reference without treating it as workflow-profile enforcement.
 
 ## Adversarial and failure behavior
 

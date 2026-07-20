@@ -21,7 +21,7 @@ argument-hint: "<question-or-native-reference> [--scope <scope>] [--profile <ref
 - `question-or-native-reference` (required): Research question or opaque native input reference.
 - `--scope` (optional): Explicit inclusion, exclusion, retrieval-window, or stop boundaries.
 - `--profile`, `--provider`, `--method` (optional): Independent axis selections.
-- `--executor` (optional): `deterministic` | `model` | `agent` | `human` | `external` — a requested ceiling that may be rejected; see `agent-governance-guide`.
+- `--executor` (optional): Explicit `deterministic`, `model`, `agent`, `human`, or `external` workflow selection; it does not imply controls or maturity.
 
 ## Delegation
 

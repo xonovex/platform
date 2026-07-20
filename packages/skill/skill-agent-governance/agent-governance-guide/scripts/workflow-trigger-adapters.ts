@@ -1,8 +1,6 @@
 import {createHash} from "node:crypto";
 import {z} from "zod";
 import {
-  triggerSourceSchema,
-  workflowExecutionSchema,
   workflowInvocationApiVersion,
   workflowInvocationSchema,
   type WorkflowInvocation,
@@ -10,33 +8,28 @@ import {
 
 export const normalizedTriggerEventSchema = z
   .object({
-    source: triggerSourceSchema,
-    nativeReference: z.string().min(1),
-    actor: z.string().min(1),
+    kind: z.string().min(1),
+    reference: z.string().min(1),
+    actor: z.string().min(1).optional(),
     idempotencyKey: z.string().min(1),
-    parentInvocationReference: z.string().min(1).optional(),
-    childDepth: z.number().int().nonnegative().optional(),
+    data: z.unknown().optional(),
     subject: z
       .object({
         reference: z.string().min(1),
-        revision: z.string().min(1),
+        revision: z.string().min(1).optional(),
       })
       .strict(),
   })
   .strict();
 
-export const trustedWorkflowTemplateSchema = z
-  .object({
-    workflow: z
-      .object({
-        operation: z.string().min(1),
-        profileReference: z.string().min(1).optional(),
-      })
-      .strict(),
-    execution: workflowExecutionSchema,
-    evidenceProviderReference: z.string().min(1),
-  })
-  .strict();
+export const trustedWorkflowTemplateSchema = workflowInvocationSchema.pick({
+  operation: true,
+  executor: true,
+  controls: true,
+  evidence: true,
+  requiredCapabilities: true,
+  metadata: true,
+});
 
 export type NormalizedTriggerEvent = z.infer<
   typeof normalizedTriggerEventSchema
@@ -52,21 +45,17 @@ const invocationIdentity = (
   const digest = createHash("sha256")
     .update(
       JSON.stringify({
-        source: event.source,
-        nativeReference: event.nativeReference,
+        kind: event.kind,
+        reference: event.reference,
         idempotencyKey: event.idempotencyKey,
         subject: event.subject,
-        operation: template.workflow.operation,
-        family: template.execution.family,
+        template,
       }),
     )
     .digest("hex");
   return `workflow:sha256:${digest}`;
 };
 
-// adaptTriggerToWorkflowInvocation is deliberately source-neutral. Native
-// adapters authenticate and minimize their events first; this boundary binds
-// that origin to a trusted execution template without changing execution type.
 export const adaptTriggerToWorkflowInvocation = (
   untrustedEvent: unknown,
   untrustedTemplate: unknown,
@@ -77,17 +66,12 @@ export const adaptTriggerToWorkflowInvocation = (
     apiVersion: workflowInvocationApiVersion,
     invocationId: invocationIdentity(event, template),
     trigger: {
-      source: event.source,
-      nativeReference: event.nativeReference,
-      actor: event.actor,
-      ...(event.parentInvocationReference === undefined
-        ? {}
-        : {parentInvocationReference: event.parentInvocationReference}),
-      ...(event.childDepth === undefined ? {} : {childDepth: event.childDepth}),
+      kind: event.kind,
+      reference: event.reference,
+      ...(event.actor === undefined ? {} : {actor: event.actor}),
+      ...(event.data === undefined ? {} : {data: event.data}),
     },
     subject: event.subject,
-    workflow: template.workflow,
-    execution: template.execution,
-    evidenceProviderReference: template.evidenceProviderReference,
+    ...template,
   });
 };

@@ -1,10 +1,9 @@
 {
   "name": "xonovex-skill-opencode",
   "version": "6.1.0",
-  "description": "Xonovex OpenCode harness governance skills",
+  "description": "Xonovex OpenCode workflow hook skills",
   "author": {
     "name": "Xonovex"
   },
-  "skills": ["./opencode-guide"],
-  "dependencies": ["xonovex-skill-agent-governance"]
+  "skills": ["./opencode-guide"]
 }

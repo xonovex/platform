@@ -1,7 +1,7 @@
 {
   "name": "xonovex-skill-agent-governance",
   "version": "6.1.0",
-  "description": "Xonovex agent governance contract skills",
+  "description": "Composable Xonovex workflow runtime, controls, and maturity",
   "author": {
     "name": "Xonovex"
   },

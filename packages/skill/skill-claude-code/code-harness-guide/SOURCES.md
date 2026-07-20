@@ -1,6 +1,6 @@
 # Claude Code Sources
 
-Product-specific facts are pinned to the documentation snapshot below. A project-scoped `PreToolUse` command hook was runtime-probed separately; unprobed rows remain documentation conformance only.
+Product-specific facts are pinned to the documentation snapshot below. Rows describe documented capabilities unless a separate deployment records runtime evidence.
 
 ## Hooks and hook workflows
 
@@ -43,5 +43,5 @@ Product-specific facts are pinned to the documentation snapshot below. A project
 ## Guide-level synthesis
 
 - **Provenance:** Repository-original integration of the source blocks above; these references combine multiple inputs or maintained conventions rather than one exclusive upstream
-- **References:** references/capabilities.md, references/onboarding.md, references/patterns.md, references/pre-tool-use-governance.md
+- **References:** references/capabilities.md, references/onboarding.md, references/patterns.md, references/pre-tool-use-workflow.md
 - **Last reviewed:** 2026-07-19

@@ -1,11 +1,11 @@
 ---
 name: opencode-guide
-description: "Use when mapping agent-governance intents to OpenCode JavaScript or TypeScript plugins, events, custom tools, or configuration. Triggers on .opencode/plugins, opencode.json plugin packages, tool.execute.before/after, permission.asked, session events, file events, shell.env, custom tools, sequential plugin load order, Bun dependency install, plugin trust, or OpenCode onboarding — even when the user doesn't say 'OpenCode plugin'."
+description: "Use when mapping workflow triggers or explicitly selected controls to OpenCode JavaScript or TypeScript plugins, events, custom tools, or configuration. Triggers on .opencode/plugins, opencode.json plugin packages, tool.execute.before/after, permission.asked, session events, file events, shell.env, custom tools, sequential plugin load order, Bun dependency install, plugin trust, or OpenCode onboarding."
 ---
 
 # OpenCode Harness Governance
 
-Map the semantic contracts owned by **agent-governance-guide** to OpenCode's native configuration and extension surface without redefining policy or inventing a universal hook file.
+Map workflow triggers and explicitly selected controls to OpenCode's native configuration and extension surface without embedding policy or inventing a universal hook file.
 
 ## Essentials
 
@@ -22,7 +22,7 @@ Map the semantic contracts owned by **agent-governance-guide** to OpenCode's nat
 - An npm dependency may be installed automatically at startup.
 - A custom tool with the same name as a built-in tool takes precedence.
 - `shell.env` affects AI shell tools and user terminals; injecting secrets broadens exposure.
-- Compaction customization uses an experimental event and cannot satisfy a mandatory stable profile.
+- Compaction customization uses an experimental event and cannot provide a requested stable guarantee.
 
 ## Example
 

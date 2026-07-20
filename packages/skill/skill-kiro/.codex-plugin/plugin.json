@@ -1,10 +1,9 @@
 {
   "name": "xonovex-skill-kiro",
   "version": "6.1.0",
-  "description": "Xonovex Kiro harness governance skills",
+  "description": "Xonovex Kiro workflow hook skills",
   "author": {
     "name": "Xonovex"
   },
-  "skills": "./kiro-guide",
-  "dependencies": ["xonovex-skill-agent-governance"]
+  "skills": "./kiro-guide"
 }

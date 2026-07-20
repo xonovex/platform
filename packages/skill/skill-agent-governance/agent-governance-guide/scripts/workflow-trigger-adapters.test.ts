@@ -1,67 +1,46 @@
 import assert from "node:assert/strict";
 import {describe, it} from "node:test";
-import type {TriggerSource} from "./workflow-runtime.ts";
 import {adaptTriggerToWorkflowInvocation} from "./workflow-trigger-adapters.ts";
 
-const sources: readonly TriggerSource[] = [
-  "manual",
-  "agent-harness-hook",
-  "ci-cd-hook",
-  "provider-webhook",
-  "schedule",
-  "sensor",
-  "api",
-  "agent",
-];
+const template = {
+  operation: "review",
+  executor: {plugin: "review-script"},
+  controls: [],
+  evidence: [],
+  requiredCapabilities: [],
+  metadata: {},
+};
 
 describe("adaptTriggerToWorkflowInvocation", () => {
-  it("keeps trigger source independent from the selected execution family", () => {
-    for (const source of sources) {
+  it("accepts manual, harness-hook, CI, schedule, and domain-specific trigger names", () => {
+    for (const kind of [
+      "manual",
+      "hook/claude/pre-tool-use",
+      "ci/github/pull-request",
+      "schedule/nightly",
+      "sensor/dependency-drift",
+    ]) {
       const invocation = adaptTriggerToWorkflowInvocation(
         {
-          source,
-          nativeReference: `${source}:event-1`,
-          actor: `external:${source}`,
+          kind,
+          reference: `${kind}:event-1`,
+          actor: "external:test",
           idempotencyKey: "delivery-1",
-          ...(source === "agent"
-            ? {
-                parentInvocationReference: "workflow:parent-1",
-                childDepth: 1,
-              }
-            : {}),
           subject: {reference: "repository:xonovex", revision: "commit:abc123"},
         },
-        {
-          workflow: {operation: "review-run"},
-          execution: {
-            family: "workflow-script",
-            module: "review/1",
-            budget: {timeoutSeconds: 30},
-          },
-          evidenceProviderReference: "evidence:provider-1",
-        },
+        template,
       );
 
-      assert.equal(invocation.trigger.source, source);
-      assert.equal(invocation.execution.family, "workflow-script");
+      assert.equal(invocation.trigger.kind, kind);
+      assert.equal(invocation.executor.plugin, "review-script");
       assert.match(invocation.invocationId, /^workflow:sha256:[0-9a-f]{64}$/u);
     }
   });
 
-  it("changes invocation identity when a native delivery id changes", () => {
-    const template = {
-      workflow: {operation: "review-run"},
-      execution: {
-        family: "workflow-script" as const,
-        module: "review/1",
-        budget: {timeoutSeconds: 30},
-      },
-      evidenceProviderReference: "evidence:provider-1",
-    };
+  it("changes identity when the native idempotency key changes", () => {
     const event = {
-      source: "ci-cd-hook" as const,
-      nativeReference: "github-actions:run-1",
-      actor: "external:github-actions",
+      kind: "ci/github/pull-request",
+      reference: "github:delivery-42",
       idempotencyKey: "delivery-1",
       subject: {reference: "repository:xonovex", revision: "commit:abc123"},
     };
@@ -71,6 +50,23 @@ describe("adaptTriggerToWorkflowInvocation", () => {
       {...event, idempotencyKey: "delivery-2"},
       template,
     );
+
+    assert.notEqual(first.invocationId, second.invocationId);
+  });
+
+  it("changes identity when trusted composition wiring changes", () => {
+    const event = {
+      kind: "manual",
+      reference: "manual:review-42",
+      idempotencyKey: "review-42",
+      subject: {reference: "repository:xonovex", revision: "commit:abc123"},
+    };
+
+    const first = adaptTriggerToWorkflowInvocation(event, template);
+    const second = adaptTriggerToWorkflowInvocation(event, {
+      ...template,
+      controls: [{plugin: "approval", mode: "observe"}],
+    });
 
     assert.notEqual(first.invocationId, second.invocationId);
   });

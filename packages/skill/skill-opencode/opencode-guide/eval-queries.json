@@ -30,7 +30,7 @@
     "rationale": "generic contract owned by agent-governance-guide"
   },
   {
-    "query": "A mandatory profile selects a OpenCode pre-operation handler. Validate whether the installed surface can enforce it.",
+    "query": "A workflow selects an OpenCode pre-operation control in enforce mode. Validate whether the installed surface can provide the requested blocking guarantee.",
     "rationale": "output-eval task also exercises this skill's routing boundary",
     "should_trigger": true,
     "split": "train"
@@ -66,7 +66,7 @@
     "split": "train"
   },
   {
-    "query": "A mandatory profile selects a Claude Code pre-operation handler. Validate whether the installed surface can enforce it.",
+    "query": "A workflow selects a Claude Code pre-operation control in enforce mode. Validate whether the installed surface can provide the requested blocking guarantee.",
     "rationale": "near miss owned by code-harness-guide",
     "should_trigger": false,
     "split": "validation"

@@ -14,7 +14,7 @@ Author, refresh, simplify, consolidate, and port AGENTS.md project-instruction f
 - **Teammate heuristic** — "anything you'd tell a new teammate" belongs here; anything you'd tell a casual visitor belongs in README
 - **Nested precedence** — for monorepos, the AGENTS.md closest to the edited file wins; place subproject-specific guidance in subdirectories
 - **Commands are executable** — agents auto-run programmatic checks listed in AGENTS.md; treat command examples as instructions, not just docs
-- **Advisory, not enforced** — AGENTS.md is read by a model, never executed by the harness; a behavior that must happen every time needs a hook, a hook plus a bounded model, or an agent, see [references/enforcement.md](references/enforcement.md)
+- **Advisory, not executed** — AGENTS.md is read by a model; automatic behavior needs a trigger adapter plus an explicitly selected executor, while controls remain optional, see [references/enforcement.md](references/enforcement.md)
 - **Preserve Project Context** — never modify technology names, paths, or commands
 - **Match Style and Voice** — maintain the target file's formatting and terminology
 - **Structure Integrity** — keep section order and hierarchy intact; preview changes (dry-run) before applying
@@ -33,7 +33,7 @@ Author, refresh, simplify, consolidate, and port AGENTS.md project-instruction f
 
 ## Progressive Disclosure
 
-- Read [references/enforcement.md](references/enforcement.md) - Load when a rule must happen every time or automatically, or when choosing between prose, a hook, a hook plus a bounded model, and an agent
+- Read [references/enforcement.md](references/enforcement.md) - Load when choosing between prose and automatic invocation, then selecting a trigger, executor, host, controls, evidence, or maturity independently
 - Read [references/init.md](references/init.md) - Load when bootstrapping a fresh AGENTS.md for a directory
 - Read [references/sync.md](references/sync.md) - Load when refreshing AGENTS.md to match current filesystem state
 - Read [references/simplify.md](references/simplify.md) - Load when condensing a verbose AGENTS.md

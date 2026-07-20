@@ -19,7 +19,7 @@ argument-hint: "<subject-or-native-reference> [--profile <reference>] [--provide
 
 - `subject-or-native-reference` (required): Problem, opportunity, scope, or opaque native input reference.
 - `--profile`, `--provider`, `--method` (optional): Explicit independent axis selections; otherwise use profile/environment resolution.
-- `--executor` (optional): `deterministic` | `model` | `agent` | `human` | `external` — a requested ceiling that may be rejected; see `agent-governance-guide`.
+- `--executor` (optional): Explicit `deterministic`, `model`, `agent`, `human`, or `external` workflow selection; it does not imply controls or maturity.
 
 ## Delegation
 

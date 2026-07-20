@@ -21,6 +21,6 @@ argument-hint: "<accepted-reference> [--revision <native-revision>] --target <na
 
 ## Delegation
 
-Load `workflow-guide` and perform **integration-validate**. Load `agent-governance-guide`
-for authorization and external-enforcement guarantees, then soft-select the target provider
-skill. This operation is read-only and cannot mutate or reserve the target.
+Load `workflow-guide` and perform **integration-validate**, then soft-select the target
+provider skill. If a composition is supplied, explain its selected controls separately.
+This operation is read-only and cannot mutate or reserve the target.

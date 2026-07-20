@@ -71,14 +71,6 @@
     {
       "file": "task-system-provider.json",
       "reference": "packages/skill/skill-workflow/workflow-guide/references/providers.md"
-    },
-    {
-      "file": "unsupported-mandatory-control.json",
-      "reference": "packages/skill/skill-workflow/workflow-guide/references/profiles.md"
-    },
-    {
-      "file": "weakening-without-exception.json",
-      "reference": "packages/skill/skill-workflow/workflow-guide/references/profiles.md"
     }
   ]
 }

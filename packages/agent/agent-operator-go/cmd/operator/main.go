@@ -2,9 +2,7 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"os"
-	"strings"
 
 	"k8s.io/apimachinery/pkg/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
@@ -14,7 +12,6 @@ import (
 
 	agentv1alpha1 "github.com/xonovex/platform/packages/agent/agent-operator-go/api/v1alpha1"
 	"github.com/xonovex/platform/packages/agent/agent-operator-go/internal/controller"
-	runtel "github.com/xonovex/platform/packages/agent/agent-operator-go/internal/telemetry"
 	"github.com/xonovex/platform/packages/agent/agent-operator-go/internal/validator"
 	"github.com/xonovex/platform/packages/agent/agent-operator-go/internal/webhook"
 )
@@ -32,24 +29,12 @@ func init() {
 func main() {
 	var probeAddr string
 	var enableLeaderElection bool
-	var decisionServiceURL string
 	var triggerBindAddress string
-	var remediationTriggerURL string
-	var remediationTokenFile string
-	var escalationRouterURL string
-	var escalationRouterTokenFile string
-	var escalationResponseBaseURL string
 	var workspaceInitImage string
 
 	flag.StringVar(&probeAddr, "health-probe-bind-address", ":8081", "The address the probe endpoint binds to.")
 	flag.BoolVar(&enableLeaderElection, "leader-elect", false, "Enable leader election for controller manager.")
-	flag.StringVar(&decisionServiceURL, "decision-service-url", decisionServiceURLFromEnvironment(), "Governance decision service base URL.")
 	flag.StringVar(&triggerBindAddress, "trigger-bind-address", ":8090", "The address the authenticated AgentTrigger receiver binds to.")
-	flag.StringVar(&remediationTriggerURL, "remediation-trigger-url", "", "AgentTrigger endpoint used for drift remediation runs.")
-	flag.StringVar(&remediationTokenFile, "remediation-trigger-token-file", "", "File containing the AgentTrigger bearer token for drift remediation.")
-	flag.StringVar(&escalationRouterURL, "escalation-router-url", "", "Provider-native endpoint that delivers accountable-recipient escalation requests.")
-	flag.StringVar(&escalationRouterTokenFile, "escalation-router-token-file", "", "File containing the bearer token for the escalation router.")
-	flag.StringVar(&escalationResponseBaseURL, "escalation-response-base-url", "", "Externally reachable base URL for authenticated escalation responses.")
 	flag.StringVar(&workspaceInitImage, "workspace-init-image", controller.DefaultWorkspaceInitImage, "Digest-pinned image used to initialize shared workspaces.")
 
 	opts := zap.Options{Development: true}
@@ -73,23 +58,10 @@ func main() {
 		os.Exit(1)
 	}
 
-	remediationRouter, err := createRemediationRouter(remediationTriggerURL, remediationTokenFile)
-	if err != nil {
-		setupLog.Error(err, "unable to configure remediation trigger")
-		os.Exit(1)
-	}
-	escalationRouter, err := createEscalationRouter(escalationRouterURL, escalationRouterTokenFile, escalationResponseBaseURL)
-	if err != nil {
-		setupLog.Error(err, "unable to configure escalation router")
-		os.Exit(1)
-	}
 	if err = (&controller.AgentRunReconciler{
-		Client:            mgr.GetClient(),
-		Scheme:            mgr.GetScheme(),
-		Recorder:          mgr.GetEventRecorder("agent-operator"),
-		Telemetry:         runtel.NewOTelSink(),
-		RemediationRouter: remediationRouter,
-		EscalationRouter:  escalationRouter,
+		Client:   mgr.GetClient(),
+		Scheme:   mgr.GetScheme(),
+		Recorder: mgr.GetEventRecorder("agent-operator"),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "AgentRun")
 		os.Exit(1)
@@ -139,10 +111,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	if err = (&webhook.AgentRunWebhook{
-		Client:         mgr.GetClient(),
-		DecisionClient: webhook.NewHTTPGovernanceDecisionClient(decisionServiceURL),
-	}).SetupWebhookWithManager(mgr); err != nil {
+	if err = (&webhook.AgentRunWebhook{Client: mgr.GetClient()}).SetupWebhookWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to set up webhook", "webhook", "AgentRun")
 		os.Exit(1)
 	}
@@ -177,45 +146,4 @@ func main() {
 		setupLog.Error(err, "problem running manager")
 		os.Exit(1)
 	}
-}
-
-func createRemediationRouter(endpoint, tokenFile string) (controller.RemediationRouter, error) {
-	if endpoint == "" && tokenFile == "" {
-		return nil, nil
-	}
-	if endpoint == "" || tokenFile == "" {
-		return nil, fmt.Errorf("remediation trigger URL and token file must be configured together")
-	}
-	token, err := os.ReadFile(tokenFile)
-	if err != nil {
-		return nil, fmt.Errorf("read remediation trigger token file: %w", err)
-	}
-	if strings.TrimSpace(string(token)) == "" {
-		return nil, fmt.Errorf("remediation trigger token file is empty")
-	}
-	return controller.NewAgentTriggerRemediationRouter(endpoint, strings.TrimSpace(string(token))), nil
-}
-
-func createEscalationRouter(endpoint, tokenFile, responseBaseURL string) (controller.EscalationRouter, error) {
-	if endpoint == "" && tokenFile == "" && responseBaseURL == "" {
-		return nil, nil
-	}
-	if endpoint == "" || tokenFile == "" || responseBaseURL == "" {
-		return nil, fmt.Errorf("escalation router URL, token file, and response base URL must be configured together")
-	}
-	token, err := os.ReadFile(tokenFile)
-	if err != nil {
-		return nil, fmt.Errorf("read escalation router token file: %w", err)
-	}
-	if strings.TrimSpace(string(token)) == "" {
-		return nil, fmt.Errorf("escalation router token file is empty")
-	}
-	return controller.NewHTTPEscalationRouter(endpoint, strings.TrimSpace(string(token)), responseBaseURL), nil
-}
-
-func decisionServiceURLFromEnvironment() string {
-	if value := os.Getenv("DECISION_SERVICE_URL"); value != "" {
-		return value
-	}
-	return "http://127.0.0.1:8787"
 }

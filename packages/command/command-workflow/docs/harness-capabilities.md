@@ -1,37 +1,20 @@
-# Harness Capabilities and Onboarding
+# Harness Capabilities
 
-Matrix release: **1.0.0**. Documentation snapshot and validation date: **2026-07-16**. None of the six harness executables was installed in the release-validation environment, so the rows are documentation-verified and runtime-unverified. Runtime claims require a probe against the installed release.
+A harness hook is one trigger adapter and, when the native surface can block, one possible
+enforcement point. It is not a required runtime layer.
 
-| Harness        | Native governance surface                                                                  | Stable useful boundary                                                  | Unsupported, partial, or experimental boundary                                                                                  | Capability and onboarding owner                                                                                                                                                                     |
-| -------------- | ------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Claude Code    | Settings/plugin hooks with command, HTTP, MCP-tool, prompt, and agent handlers             | Event-specific command blocking/context and managed source restrictions | Agent handlers are experimental; matching handlers run in parallel; hooks are not a sandbox                                     | [`code-harness-guide`](../../../skill/skill-claude-code/code-harness-guide/references/capabilities.md) / [onboarding](../../../skill/skill-claude-code/code-harness-guide/references/onboarding.md) |
-| Codex          | `hooks.json`, inline configuration, plugins, and managed requirements                      | Executing command handlers for documented events                        | Prompt/agent and asynchronous command handlers are parsed but do not execute in this snapshot; `PreToolUse` coverage is partial | [`codex-guide`](../../../skill/skill-codex/codex-guide/references/capabilities.md) / [onboarding](../../../skill/skill-codex/codex-guide/references/onboarding.md)                                  |
-| Kiro           | Workspace v1 hook JSON with command or agent actions                                       | Exit code `2` blocks documented pre-events                              | Other non-zero exits generally advise; ordering/concurrency are unverified; agent actions consume credits                       | [`kiro-guide`](../../../skill/skill-kiro/kiro-guide/references/capabilities.md) / [onboarding](../../../skill/skill-kiro/kiro-guide/references/onboarding.md)                                       |
-| GitHub Copilot | CLI/cloud version-1 hooks, policy hooks, plugins, and skills                               | CLI/cloud `preToolUse` with surface-specific handlers                   | Cloud is a subset and has no effective `permissionRequest` gate; prompt handlers are limited; policy hooks are CLI-only         | [`copilot-guide`](../../../skill/skill-copilot/copilot-guide/references/capabilities.md) / [onboarding](../../../skill/skill-copilot/copilot-guide/references/onboarding.md)                        |
-| Pi             | Trusted extensions, packages, skills, settings, and custom tools                           | Sequential `tool_call` preflight with extension-defined blocking        | No built-in sandbox; sibling tools can execute concurrently; child-agent guarantees belong to the launcher                      | [`pi-guide`](../../../skill/skill-pi/pi-guide/references/capabilities.md) / [onboarding](../../../skill/skill-pi/pi-guide/references/onboarding.md)                                                 |
-| OpenCode       | Global/project JavaScript or TypeScript plugins, config packages, events, and custom tools | Sequential `tool.execute.before` interception                           | Permission events do not prove decision control; compaction hook is experimental; plugins have process authority                | [`opencode-guide`](../../../skill/skill-opencode/opencode-guide/references/capabilities.md) / [onboarding](../../../skill/skill-opencode/opencode-guide/references/onboarding.md)                   |
+For each harness integration, record:
 
-## Semantic intents, native adapters
+- native event and normalized trigger kind;
+- input authentication and data minimization;
+- whether the event can block, only observe, or inject context;
+- ordering, concurrency, timeout, and retry behavior;
+- exact executable and trusted template selected;
+- unsupported operations and tested product version.
 
-The [event intent taxonomy](../../../skill/skill-agent-governance/agent-governance-guide/references/events-and-capabilities.md) owns the vocabulary. This section is the harness-adapter view of it and adds no family of its own; `validate-event-intent-vocabulary.mjs` in that guide fails the build if the two diverge.
+The bundled Claude pre-tool-use adapter is deliberately thin. It forwards native standard
+input to the exact executable named by `XONOVEX_WORKFLOW_HOOK_EXECUTABLE`. It does not
+select a policy, control mode, evidence sink, maturity level, or workflow template.
 
-Families: `session`, `prompt`, `model`, `tool`, `permission`, `capability`, `result`, `configuration`, `compaction`, `subagent`, `workspace`, `privileged operation`.
-
-The six matrices above natively map nine of them: session, prompt, model, tool, permission, capability, compaction, subagent, and workspace. No matrix maps a dedicated native event for result, configuration, or privileged operation. Those are recorded as unsupported rather than approximated onto a nearby event: result and configuration move to external enforcement, and privileged operations are gated through the tool family plus an independent control. Recording the absence is mandatory — omitting an unsupported intent is what the adapter contract forbids.
-
-Each adapter records the native mapping, handler type, product surface, tested version/date, blocking/context behavior, ordering/concurrency, covered operations, data exposure, authority, evidence, and limitations.
-
-Matching names do not imply parity. A mandatory intent fails conformance when its native mapping is unsupported, experimental, stale, partial for the requested operation set, or unable to provide the required enforcement guarantee. Support varies within a family and between families on one surface: a cloud surface can block `preToolUse` while its `permissionRequest` gate has no effect, so permission is selected and evidenced separately from tool.
-
-## Harness onboarding transaction
-
-1. Discover the executable version, product surface, native scopes, managed state, project trust, active modules, duplicate handlers, diagnostics, and requested authority.
-2. Assess the selected profile against the matching versioned matrix. Preserve unknown and not-installed states.
-3. Preview exact native files/settings/plugins, permissions, filesystem/network/secret/model/data access, handler concurrency, expected evidence, verification probes, disable behavior, and rollback target.
-4. Obtain explicit authorization for the exact subject, version, scope, and authority request.
-5. Apply idempotently through the native mechanism without replacing unrelated configuration.
-6. Verify native discovery plus allow, deny, context, timeout, malformed-output, concurrency, unsupported-path, and rollback probes.
-7. Record source/version/digest, effective permissions, probe results, limitations, and evidence.
-8. Diagnose, update, disable, remove, roll back, and detect drift through the same adapter.
-
-Project executable hooks, extensions, plugins, packages, and scripts remain disabled until repository trust and executable review are established. Installing an instruction-only skill is advisory capability, not enforcement evidence.
+Keep control configuration in trusted composition wiring. Do not allow an untrusted hook
+payload to choose an executable or turn an observing control into enforcement.

@@ -22,6 +22,7 @@ argument-hint: "<execute|verify|rollback|recover> <integrated-reference> [--revi
 
 ## Delegation
 
-Load `workflow-guide` and perform **release-run**. Load `agent-governance-guide` and the
-selected controlled-automation provider skill. Agents may monitor and advise but cannot
-deploy directly or fabricate protected-environment approval.
+Load `workflow-guide` and perform **release-run** with the selected automation/provider
+skill. If the caller supplied a composition, load `agent-governance-guide` and apply only
+its selected control modes and evidence behavior. Do not infer approval or maturity from
+the host or executor.

@@ -23,5 +23,6 @@ argument-hint: "<plan|execute|verify|close> <source-reference> [--revision <nati
 ## Delegation
 
 Load `workflow-guide` and perform **corrective-action-run**. Soft-select root-cause,
-verification, provider, and domain skills. Load `agent-governance-guide` before any
-privileged correction; closure requires verification, effectiveness, and learning evidence.
+verification, provider, and domain skills. Resolve any caller-selected executable
+composition independently; the command does not add a control or maturity requirement.
+Closure requires the workflow evidence selected by the caller.

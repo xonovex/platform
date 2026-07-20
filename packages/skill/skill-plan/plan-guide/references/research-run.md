@@ -3,7 +3,7 @@
 ## Core workflow
 
 1. Resolve the question, scope, subject, and input references through their selected providers; apply [early-lifecycle-contracts.md](early-lifecycle-contracts.md).
-2. Define inclusion/exclusion boundaries, source classes, retrieval window, decision use, and stop conditions. Request `data-access`, `external-research`, `privacy`, or `regulated-applicability` intents before collection when applicable.
+2. Define inclusion/exclusion boundaries, source classes, retrieval window, decision use, stop conditions, and applicable data/privacy constraints before collection.
 3. Enumerate known sources deterministically. Use adaptive exploration only for unresolved branches, with explicit time, cost, network, tool, and data bounds.
 4. Record each material evidence item with opaque source reference, origin, retrieval or observation time, method, scope, and relevant version/revision. Distinguish direct evidence from inference.
 5. Synthesize with a bounded model or human as appropriate. State finding-level confidence, uncertainty drivers, contradictory evidence, limitations, and open questions; never invent a source to fill a gap.

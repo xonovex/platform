@@ -1,11 +1,11 @@
 ---
 name: pi-guide
-description: "Use when mapping agent-governance intents to Pi extensions, packages, skills, settings, context injection, tool interception, permissions, or subagent patterns. Triggers on .pi/extensions, pi packages, project_trust, tool_call, tool_result, context, compaction, registerTool, full-system permissions, no built-in sandbox, package pinning, or Pi onboarding — even when the user doesn't say 'Pi extension'."
+description: "Use when mapping workflow triggers or explicitly selected controls to Pi extensions, packages, skills, settings, context injection, tool interception, permissions, or subagent patterns. Triggers on .pi/extensions, pi packages, project_trust, tool_call, tool_result, context, compaction, registerTool, full-system permissions, no built-in sandbox, package pinning, or Pi onboarding."
 ---
 
 # Pi Harness Governance
 
-Map the semantic contracts owned by **agent-governance-guide** to Pi's native configuration and extension surface without redefining policy or inventing a universal hook file.
+Map workflow triggers and explicitly selected controls to Pi's native configuration and extension surface without embedding policy or inventing a universal hook file.
 
 ## Essentials
 

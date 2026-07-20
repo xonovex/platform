@@ -1,8 +1,8 @@
 # Claude Code Adoption Patterns
 
-## Adoption modes
+## Adapter roles
 
-Keep the semantic contract in **agent-governance-guide** and translate only the selected mode:
+Translate only the trigger, executor, or control role the caller selected:
 
 | Mode                 | Native result                                                | Enforcement claim                                   |
 | -------------------- | ------------------------------------------------------------ | --------------------------------------------------- |

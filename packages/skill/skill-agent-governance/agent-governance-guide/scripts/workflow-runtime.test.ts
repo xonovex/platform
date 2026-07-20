@@ -2,196 +2,174 @@ import assert from "node:assert/strict";
 import {describe, it} from "node:test";
 import {
   executeWorkflowInvocation,
+  explainWorkflowComposition,
   workflowInvocationApiVersion,
-  type WorkflowExecutionEvidence,
+  type WorkflowControl,
+  type WorkflowEvidenceEvent,
   type WorkflowInvocation,
-  type WorkflowRuntimePorts,
+  type WorkflowPluginRegistry,
 } from "./workflow-runtime.ts";
 
 const baseInvocation = (): WorkflowInvocation => ({
   apiVersion: workflowInvocationApiVersion,
   invocationId: "invocation-1",
   trigger: {
-    source: "manual",
-    nativeReference: "terminal:session-1",
+    kind: "manual",
+    reference: "terminal:session-1",
     actor: "human:maintainer",
   },
   subject: {reference: "repository:xonovex", revision: "commit:abc123"},
-  workflow: {operation: "review-run"},
-  execution: {
-    family: "workflow-script",
-    module: "review-script/1",
-    budget: {timeoutSeconds: 30},
-  },
-  evidenceProviderReference: "evidence:local-test",
+  operation: "review",
+  executor: {plugin: "review"},
+  controls: [],
+  evidence: [],
+  requiredCapabilities: [],
+  metadata: {},
 });
 
-const runtimePorts = (
-  overrides: Partial<WorkflowRuntimePorts> = {},
-): WorkflowRuntimePorts => ({
-  runScript: async () => ({
-    outcome: "completed",
-    outputReferences: ["result:script-1"],
-    facts: {checks: 3},
-  }),
-  runModel: async () => ({
-    outcome: "advise",
-    reasons: ["review one failed check"],
-    evidenceRequests: ["ci:check-1"],
-    usage: {tokens: 200, cost: 0.1},
-  }),
-  runAgent: async () => ({
-    summary: "reviewed exact revision",
-    findings: [],
-    evidenceReferences: ["result:agent-1"],
-    usage: {tokens: 800, cost: 0.5},
-  }),
-  verifyOversight: async () => ({
-    level: "A1",
-    observed: true,
-    evidenceReferences: ["oversight:critique-1"],
-  }),
-  recordEvidence: async (evidence: WorkflowExecutionEvidence) =>
-    `evidence:${evidence.invocationId}`,
+const control = (
+  id: string,
+  decision: "allow" | "deny" | "abstain",
+  capabilities: readonly string[] = [],
+): WorkflowControl => ({
+  id,
+  capabilities,
+  phases: ["before"],
+  evaluate: async () => ({decision, references: [`control:${id}`]}),
+});
+
+const registry = (
+  overrides: Partial<WorkflowPluginRegistry> = {},
+): WorkflowPluginRegistry => ({
+  executors: {
+    review: {
+      id: "review",
+      capabilities: ["execution:script"],
+      execute: async () => ({
+        outcome: "completed",
+        references: ["result:review-1"],
+      }),
+    },
+  },
+  controls: {},
+  evidenceSinks: {},
   ...overrides,
 });
 
 describe("executeWorkflowInvocation", () => {
-  it("preserves a CI/CD hook as origin while a workflow script executes", async () => {
+  it("keeps an arbitrary trigger independent from executor selection", async () => {
     const invocation = baseInvocation();
     invocation.trigger = {
-      source: "ci-cd-hook",
-      nativeReference: "github-actions:run-42",
-      actor: "external:github-actions",
+      kind: "ci/github/pull-request",
+      reference: "github:delivery-42",
     };
 
-    const result = await executeWorkflowInvocation(invocation, runtimePorts());
+    const result = await executeWorkflowInvocation(invocation, registry());
 
-    assert.equal(result.triggerSource, "ci-cd-hook");
-    assert.equal(result.executionFamily, "workflow-script");
-    assert.deepEqual(result.outputReferences, ["result:script-1"]);
+    assert.equal(result.outcome, "executed");
+    assert.equal(result.execution?.outcome, "completed");
   });
 
-  it("uses deterministic facts before bounded model evaluation", async () => {
+  it("records an observing denial without blocking execution", async () => {
     const invocation = baseInvocation();
-    invocation.execution = {
-      family: "workflow-script-llm",
-      module: "assessment-script/1",
-      evaluator: "bounded-assessment/1",
-      budget: {
-        timeoutSeconds: 30,
-        tokenBudget: 500,
-        costBudget: 1,
-        retryLimit: 0,
-      },
-    };
+    invocation.controls = [{plugin: "review-policy", mode: "observe"}];
 
-    const result = await executeWorkflowInvocation(invocation, runtimePorts());
-
-    assert.equal(result.outcome, "advise");
-    assert.deepEqual(result.outputReferences, ["result:script-1"]);
-  });
-
-  it("requires observed A1 oversight before launching an agent with a workflow skill", async () => {
-    const invocation = baseInvocation();
-    invocation.execution = {
-      family: "agent-workflow-skill",
-      launcher: "bounded-agent/1",
-      workflowSkill: "workflow-guide",
-      oversight: {
-        level: "A1",
-        independentCritiqueReference: "review:independent-1",
-      },
-      budget: {
-        timeoutSeconds: 60,
-        tokenBudget: 1_000,
-        costBudget: 1,
-        retryLimit: 0,
-      },
-      maximumChildDepth: 0,
-    };
-
-    const result = await executeWorkflowInvocation(invocation, runtimePorts());
-
-    assert.equal(result.executionFamily, "agent-workflow-skill");
-    assert.deepEqual(result.oversightReferences, ["oversight:critique-1"]);
-  });
-
-  it("rejects an agent-originated child beyond the declared depth", async () => {
-    const invocation = baseInvocation();
-    invocation.trigger = {
-      source: "agent",
-      nativeReference: "agent-run:parent-1",
-      actor: "agent:parent-1",
-      parentInvocationReference: "workflow:parent-1",
-      childDepth: 1,
-    };
-    invocation.execution = {
-      family: "agent-workflow-skill",
-      launcher: "bounded-agent/1",
-      workflowSkill: "workflow-guide",
-      oversight: {
-        level: "A1",
-        independentCritiqueReference: "review:independent-1",
-      },
-      budget: {
-        timeoutSeconds: 60,
-        tokenBudget: 1_000,
-        costBudget: 1,
-        retryLimit: 0,
-      },
-      maximumChildDepth: 0,
-    };
-
-    await assert.rejects(
-      executeWorkflowInvocation(invocation, runtimePorts()),
-      /workflow-maximum-child-depth-exceeded/u,
+    const result = await executeWorkflowInvocation(
+      invocation,
+      registry({controls: {"review-policy": control("review-policy", "deny")}}),
     );
+
+    assert.equal(result.outcome, "executed");
+    assert.equal(result.controls[0]?.result.decision, "deny");
   });
 
-  it("rejects a model result that exceeds its declared token budget", async () => {
+  it("stops before execution when an enforcing control denies", async () => {
+    let executions = 0;
     const invocation = baseInvocation();
-    invocation.execution = {
-      family: "workflow-script-llm",
-      module: "assessment-script/1",
-      evaluator: "bounded-assessment/1",
-      budget: {
-        timeoutSeconds: 30,
-        tokenBudget: 100,
-        costBudget: 1,
-        retryLimit: 0,
-      },
-    };
+    invocation.controls = [{plugin: "review-policy", mode: "enforce"}];
 
-    await assert.rejects(
-      executeWorkflowInvocation(invocation, runtimePorts()),
-      /workflow-token-budget-exceeded/u,
-    );
-  });
-
-  it("times out an uncooperative executor and records failed evidence", async () => {
-    const invocation = baseInvocation();
-    invocation.execution = {
-      family: "workflow-script",
-      module: "uncooperative-script/1",
-      budget: {timeoutSeconds: 1},
-    };
-    let recorded: WorkflowExecutionEvidence | undefined;
-
-    await assert.rejects(
-      executeWorkflowInvocation(
-        invocation,
-        runtimePorts({
-          runScript: async () => await new Promise<never>(() => undefined),
-          recordEvidence: async (evidence) => {
-            recorded = evidence;
-            return "evidence:timeout-1";
+    const result = await executeWorkflowInvocation(
+      invocation,
+      registry({
+        executors: {
+          review: {
+            id: "review",
+            capabilities: [],
+            execute: async () => {
+              executions += 1;
+              return {outcome: "completed"};
+            },
           },
-        }),
-      ),
-      /workflow-execution-timeout/u,
+        },
+        controls: {"review-policy": control("review-policy", "deny")},
+      }),
     );
-    assert.equal(recorded?.outcome, "failed:workflow-execution-timeout");
-    assert.equal(recorded?.triggerReference, "terminal:session-1");
+
+    assert.equal(result.outcome, "denied");
+    assert.equal(result.execution, undefined);
+    assert.equal(executions, 0);
+  });
+
+  it("fails before execution when a required capability is absent", async () => {
+    const invocation = baseInvocation();
+    invocation.requiredCapabilities = ["oversight:independent-review"];
+
+    await assert.rejects(
+      executeWorkflowInvocation(invocation, registry()),
+      /workflow-required-capabilities-missing:oversight:independent-review/u,
+    );
+  });
+
+  it("routes lifecycle events only to explicitly selected evidence sinks", async () => {
+    const events: WorkflowEvidenceEvent[] = [];
+    const invocation = baseInvocation();
+    invocation.evidence = [{plugin: "memory", failure: "fail"}];
+
+    const result = await executeWorkflowInvocation(
+      invocation,
+      registry({
+        evidenceSinks: {
+          memory: {
+            id: "memory",
+            capabilities: ["evidence:memory"],
+            record: async (event) => {
+              events.push(event);
+              return `memory:${event.kind}`;
+            },
+          },
+        },
+      }),
+    );
+
+    assert.deepEqual(
+      events.map(({kind}) => kind),
+      ["composition.started", "execution.completed", "composition.completed"],
+    );
+    assert.deepEqual(result.evidenceReferences, [
+      "memory:composition.completed",
+      "memory:composition.started",
+      "memory:execution.completed",
+      "result:review-1",
+    ]);
+  });
+});
+
+describe("explainWorkflowComposition", () => {
+  it("shows configured enforcement points and missing capabilities without running", () => {
+    const invocation = baseInvocation();
+    invocation.controls = [{plugin: "approval", mode: "enforce"}];
+    invocation.requiredCapabilities = ["control:approval", "evidence:durable"];
+
+    const explanation = explainWorkflowComposition(
+      invocation,
+      registry({
+        controls: {
+          approval: control("approval", "allow", ["control:approval"]),
+        },
+      }),
+    );
+
+    assert.deepEqual(explanation.enforcementPoints, ["before:approval"]);
+    assert.deepEqual(explanation.missingCapabilities, ["evidence:durable"]);
   });
 });

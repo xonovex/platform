@@ -1,23 +1,13 @@
 import {readFileSync} from "node:fs";
 import {developmentWorkShapes} from "./development-assurance-helpers.ts";
-import {independenceLevels} from "./independence-helpers.ts";
 
-// The workflow plane owns two closed vocabularies that are also declared in prose
-// and fixtures: the independence levels (owned by independence-helpers, mirrored
-// in the agent-governance actors reference) and the development work shapes (owned
-// by development-assurance-helpers, mirrored in the development-contracts table and
-// the assurance fixtures). This guard gives the workflow plane the cross-site
-// vocabulary check the governance plane already has, failing the build when a site
-// drifts from its owner. Independence's default `none` level is declared only by
-// the owner and the resolution prose, so the actors levels table is validated
-// against the above-`none` levels it enumerates.
+// The workflow plane owns the development work-shape vocabulary. It is declared
+// in the helper, the development contract, and the assurance fixtures. This guard
+// fails the build when those workflow-owned sites drift.
 
 const repoRootUrl = new URL("../../../../../", import.meta.url);
 
 const workflow = "packages/skill/skill-workflow/workflow-guide";
-const governance =
-  "packages/skill/skill-agent-governance/agent-governance-guide";
-
 const readSource = (path: string): string =>
   readFileSync(new URL(path, repoRootUrl), "utf8");
 
@@ -93,7 +83,6 @@ type Check = {
   sites: Site[];
 };
 
-const actors = readSource(`${governance}/references/actors.md`);
 const developmentContracts = readSource(
   `${workflow}/references/development-contracts.md`,
 );
@@ -101,19 +90,7 @@ const developmentFixtures = readJson(
   `${workflow}/assets/development-assurance-fixtures.json`,
 );
 
-const aboveNoneLevels = independenceLevels.filter((level) => level !== "none");
-
 const checks: Check[] = [
-  {
-    label: "independenceLevels (above none)",
-    expected: aboveNoneLevels,
-    sites: [
-      {
-        site: `${governance}/references/actors.md (Independence levels table)`,
-        values: extractTableTokens(actors, "Independence"),
-      },
-    ],
-  },
   {
     label: "developmentWorkShapes",
     expected: developmentWorkShapes,

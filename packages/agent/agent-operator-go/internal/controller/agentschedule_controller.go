@@ -106,8 +106,7 @@ func (r *AgentScheduleReconciler) activeRun(ctx context.Context, schedule *agent
 	}
 	if run.Status.Phase == agentv1alpha1.AgentRunPhaseSucceeded ||
 		run.Status.Phase == agentv1alpha1.AgentRunPhaseFailed ||
-		run.Status.Phase == agentv1alpha1.AgentRunPhaseTimedOut ||
-		run.Status.Phase == agentv1alpha1.AgentRunPhasePaused {
+		run.Status.Phase == agentv1alpha1.AgentRunPhaseTimedOut {
 		return nil, nil
 	}
 	return &run, nil

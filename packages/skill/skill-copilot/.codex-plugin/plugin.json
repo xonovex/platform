@@ -1,10 +1,9 @@
 {
   "name": "xonovex-skill-copilot",
   "version": "6.1.0",
-  "description": "Xonovex GitHub Copilot harness governance skills",
+  "description": "Xonovex GitHub Copilot workflow hook skills",
   "author": {
     "name": "Xonovex"
   },
-  "skills": "./copilot-guide",
-  "dependencies": ["xonovex-skill-agent-governance"]
+  "skills": "./copilot-guide"
 }

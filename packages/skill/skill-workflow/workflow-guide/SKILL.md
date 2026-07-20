@@ -7,7 +7,7 @@ allowed-tools: "Read Bash(node:*) Bash(npx:*)"
 
 # Composable Workflow Contracts and Operations
 
-Keep lifecycle meaning stable while methods, executors, providers, topology, and governance vary independently.
+Keep lifecycle meaning stable while methods, providers, and topology vary independently.
 
 ## Core Principles
 
@@ -15,7 +15,7 @@ Keep lifecycle meaning stable while methods, executors, providers, topology, and
 - **Opaque handoffs** — exchange provider context plus opaque native references; never invent a central workflow identity, database, or universal persisted envelope.
 - **Ephemeral reconstruction** — use `PhaseResultHandle` only in runtime handoffs and reconstruct it from provider-native state after context loss.
 - **Profiles compose** — profiles include, omit, sequence, parallelize, loop, and present capabilities without erasing their independent results or publication boundaries.
-- **Independent composition** — resolve method, provider, workspace, policy, and learning axes separately; workflow contracts do not require governance hooks.
+- **Independent composition** — resolve method, provider, and workspace separately; executable triggers, hosts, controls, evidence, and maturity are outside workflow contracts.
 - **Least-adaptive execution** — use deterministic tools for authoritative facts and mechanical work, bounded models for narrow transforms, and bounded agents only for adaptive multi-step work.
 - **Exact-revision assurance** — inventory, review, QA, assessment, and enforcement evidence is valid only for its recorded subject, policy, evaluator, and environment versions.
 - **Authority stays explicit** — agents may assemble evidence or advise, but human Acceptance and protected target mutations require exact-scope authorization and provider/external enforcement.
@@ -47,7 +47,7 @@ Keep lifecycle meaning stable while methods, executors, providers, topology, and
 ## Contract Operations
 
 - **Inspect** — resolve native references and report effective capabilities, profile topology, result freshness, and gaps — see [references/inspect.md](references/inspect.md)
-- **Conformance** — validate result semantics, ephemeral handles, provider handoffs, profile topology, publication boundaries, evidence, and cross-plane requirements — see [references/conformance.md](references/conformance.md)
+- **Conformance** — validate result semantics, ephemeral handles, provider handoffs, profile topology, publication boundaries, and evidence — see [references/conformance.md](references/conformance.md)
 
 ## Gotchas
 
@@ -62,10 +62,10 @@ Keep lifecycle meaning stable while methods, executors, providers, topology, and
 
 ## Progressive Disclosure
 
-- Read [references/architecture.md](references/architecture.md) - Load when assigning ownership, checking adoption modes, or deciding allowed dependency directions between planes
+- Read [references/architecture.md](references/architecture.md) - Load when assigning ownership or separating workflow contracts from runtime composition
 - Read [references/results.md](references/results.md) - Load when authoring or interpreting a lifecycle result or `PhaseResultHandle`
 - Read [references/providers.md](references/providers.md) - Load when defining or validating result-provider resolve, read, publish, revise, relate, version, capability, or restart behavior
-- Read [references/profiles.md](references/profiles.md) - Load when composing topology, variation axes, exit rules, cumulative completion, or cross-plane requirements
+- Read [references/profiles.md](references/profiles.md) - Load when composing topology, variation axes, exit rules, or cumulative completion
 - Read [references/development-contracts.md](references/development-contracts.md) - Load when selecting a development executor, assigning parallel work, isolating workspaces, retrying partial failures, or distinguishing consolidation from Integration
 - Read [references/develop-run.md](references/develop-run.md) - Load when executing one or more exact Planning assignments as independently publishable Development results
 - Read [references/develop-consolidate.md](references/develop-consolidate.md) - Load when consolidating exact Development revisions into a development workspace

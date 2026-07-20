@@ -1,5 +1,5 @@
 {
-  "note": "Shipped reference profile (workflow plane). A solo maintainer running the lifecycle with no governance plane and no external enforcement. Selectable as --profile workflow-only-profile. Validated by validate-reference-profiles.ts against the workflow profile contract; capabilities resolve against the agent-governance capability registry. This is a worked reference, not a test fixture.",
+  "note": "Worked workflow-topology example. It does not select an executable runtime, controls, evidence sinks, host, or maturity model.",
   "identity": "workflow-only-profile",
   "version": "1",
   "owner": "user",
@@ -25,7 +25,6 @@
   ],
   "explicitProvider": "non-file-provider",
   "providerAvailable": true,
-  "mandatoryControls": [],
   "topology": {
     "allowedSequence": [
       "Discovery",
@@ -58,7 +57,5 @@
     "review": "none",
     "emergencyAccess": "none"
   },
-  "governance": null,
-  "failureBehavior": "If the selected provider is unavailable, fail visibly; no silent file fallback.",
-  "absenceReport": "No harness policy or external enforcement guarantee is claimed."
+  "failureBehavior": "If the selected provider is unavailable, fail visibly; no silent file fallback."
 }

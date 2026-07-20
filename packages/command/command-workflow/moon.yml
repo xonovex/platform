@@ -18,7 +18,6 @@ tasks:
     command: npm run test
     inputs:
       - README.md
-      - MIGRATION.md
       - docs/*.md
       - scripts/*.mjs
     options:

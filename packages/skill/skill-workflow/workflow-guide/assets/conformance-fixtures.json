@@ -128,7 +128,8 @@
         "extensions",
         "mcp-servers",
         "ci-components",
-        "policy-bundles",
+        "controls",
+        "evidence-sinks",
         "models",
         "tools",
         "permissions"
@@ -246,7 +247,8 @@
     "extensions",
     "mcp-servers",
     "ci-components",
-    "policy-bundles",
+    "controls",
+    "evidence-sinks",
     "models",
     "tools",
     "permissions"
@@ -416,8 +418,7 @@
         "includedResults": ["Review", "QA"],
         "preservedResults": ["Review", "QA"],
         "explicitProvider": "non-file-provider",
-        "providerAvailable": true,
-        "mandatoryControls": []
+        "providerAvailable": true
       }
     },
     {
@@ -428,8 +429,7 @@
       "profile": {
         "includedResults": ["Review", "QA"],
         "preservedResults": ["Review"],
-        "providerAvailable": true,
-        "mandatoryControls": []
+        "providerAvailable": true
       }
     },
     {
@@ -442,25 +442,7 @@
         "preservedResults": ["Planning"],
         "explicitProvider": "hosted-provider",
         "providerAvailable": false,
-        "fallbackProvider": "local-file",
-        "mandatoryControls": []
-      }
-    },
-    {
-      "id": "mandatory-control-without-enforcement",
-      "contract": "profile",
-      "expectedValid": false,
-      "expectedCode": "no-enforcement-guarantee",
-      "profile": {
-        "includedResults": ["Acceptance"],
-        "preservedResults": ["Acceptance"],
-        "providerAvailable": true,
-        "mandatoryControls": [
-          {
-            "id": "signed-evidence",
-            "enforcementPoints": [{"supported": true, "guaranteed": false}]
-          }
-        ]
+        "fallbackProvider": "local-file"
       }
     }
   ]

@@ -22,76 +22,37 @@
     {
       "operation": "discovery-run",
       "resultKind": "Discovery",
-      "preferredExecutors": ["deterministic", "model", "agent"],
-      "policyIntents": ["data-access", "privacy", "regulated-applicability"]
+      "preferredExecutors": ["deterministic", "model", "agent"]
     },
     {
       "operation": "research-run",
       "resultKind": "Research",
-      "preferredExecutors": ["deterministic", "model", "agent"],
-      "policyIntents": [
-        "data-access",
-        "external-research",
-        "privacy",
-        "regulated-applicability"
-      ]
+      "preferredExecutors": ["deterministic", "model", "agent"]
     },
     {
       "operation": "formulation-run",
       "resultKind": "Formulation",
-      "preferredExecutors": ["model", "agent", "human"],
-      "policyIntents": [
-        "privacy",
-        "accessibility",
-        "security",
-        "regulated-applicability"
-      ]
+      "preferredExecutors": ["model", "agent", "human"]
     },
     {
       "operation": "experience-design-create",
       "resultKind": "ExperienceDesign",
-      "preferredExecutors": ["model", "agent", "human"],
-      "policyIntents": [
-        "data-access",
-        "privacy",
-        "accessibility",
-        "regulated-applicability"
-      ]
+      "preferredExecutors": ["model", "agent", "human"]
     },
     {
       "operation": "solution-design-create",
       "resultKind": "SolutionDesign",
-      "preferredExecutors": ["model", "agent", "human"],
-      "policyIntents": [
-        "data-access",
-        "privacy",
-        "security",
-        "architecture",
-        "regulated-applicability"
-      ]
+      "preferredExecutors": ["model", "agent", "human"]
     },
     {
       "operation": "decision-create",
       "resultKind": "Decision",
-      "preferredExecutors": ["deterministic", "model", "human"],
-      "policyIntents": [
-        "privacy",
-        "security",
-        "architecture",
-        "regulated-applicability"
-      ]
+      "preferredExecutors": ["deterministic", "model", "human"]
     },
     {
       "operation": "plan-create",
       "resultKind": "Planning",
-      "preferredExecutors": ["deterministic", "model", "agent", "human"],
-      "policyIntents": [
-        "data-access",
-        "privacy",
-        "security",
-        "architecture",
-        "regulated-applicability"
-      ]
+      "preferredExecutors": ["deterministic", "model", "agent", "human"]
     }
   ],
   "dependencyPolicy": {
@@ -128,9 +89,7 @@
         "nativeReference": "task:184",
         "nativeRevision": "7"
       },
-      "executors": ["deterministic", "model"],
-      "policyIntents": ["data-access"],
-      "governanceRequired": false
+      "executors": ["deterministic", "model"]
     },
     {
       "id": "optional-experience-design",
@@ -150,9 +109,7 @@
         "nativeReference": "work-item:UX-44",
         "nativeRevision": "12"
       },
-      "executors": ["deterministic", "model", "human"],
-      "policyIntents": ["data-access", "privacy", "accessibility"],
-      "governanceRequired": false
+      "executors": ["deterministic", "model", "human"]
     },
     {
       "id": "optional-solution-design",
@@ -166,9 +123,7 @@
         "nativeReference": "design:payments-v3",
         "nativeRevision": "sha256:91af"
       },
-      "executors": ["deterministic", "agent", "human"],
-      "policyIntents": ["data-access", "security", "architecture"],
-      "governanceRequired": false
+      "executors": ["deterministic", "agent", "human"]
     },
     {
       "id": "regulated-ai-qualified-decision",
@@ -196,17 +151,7 @@
         "qualificationRequired": true,
         "qualification": "regulated-ai-risk-review",
         "authorityReference": "role:risk-owner"
-      },
-      "policyIntents": [
-        "data-access",
-        "external-research",
-        "privacy",
-        "accessibility",
-        "security",
-        "architecture",
-        "regulated-applicability"
-      ],
-      "governanceRequired": true
+      }
     },
     {
       "id": "ai-advisory-bounded-exploration",
@@ -220,14 +165,7 @@
         "nativeReference": "research:assist-23",
         "nativeRevision": "6"
       },
-      "executors": ["deterministic", "model", "agent", "human"],
-      "policyIntents": [
-        "data-access",
-        "external-research",
-        "privacy",
-        "security"
-      ],
-      "governanceRequired": false
+      "executors": ["deterministic", "model", "agent", "human"]
     },
     {
       "id": "regulated-qualified-decision",
@@ -247,9 +185,7 @@
         "qualificationRequired": true,
         "qualification": "control-review",
         "authorityReference": "role:control-owner"
-      },
-      "policyIntents": ["security", "regulated-applicability"],
-      "governanceRequired": true
+      }
     },
     {
       "id": "fresh-context-provider-recovery",
@@ -267,9 +203,7 @@
         "conversationAvailable": false,
         "resolvedFromNativeReference": true
       },
-      "executors": ["deterministic"],
-      "policyIntents": ["data-access"],
-      "governanceRequired": false
+      "executors": ["deterministic"]
     },
     {
       "id": "selectable-bdd-formulation-method",
@@ -283,14 +217,12 @@
         "nativeReference": "requirement:AC-27",
         "nativeRevision": "3"
       },
-      "executors": ["model", "human"],
-      "policyIntents": ["data-access"],
-      "governanceRequired": false
+      "executors": ["model", "human"]
     },
     {
       "id": "exact-revision-mismatch",
       "valid": false,
-      "profile": "governed",
+      "profile": "revision-bound",
       "capabilities": ["SolutionDesign", "Decision"],
       "method": "neutral",
       "provider": {
@@ -301,7 +233,6 @@
       },
       "subjectRevision": "rev:8",
       "executors": ["human"],
-      "policyIntents": ["security", "architecture"],
       "expectedCode": "subject-revision-mismatch"
     },
     {
@@ -316,7 +247,6 @@
         "fallbackAttempted": true
       },
       "executors": ["deterministic"],
-      "policyIntents": ["data-access"],
       "expectedCode": "explicit-provider-unavailable"
     },
     {
@@ -336,7 +266,6 @@
         "executor": "model",
         "authorityReference": "role:risk-owner"
       },
-      "policyIntents": ["regulated-applicability"],
       "expectedCode": "decision-authority-invalid"
     },
     {
@@ -358,7 +287,6 @@
         "qualification": "none",
         "authorityReference": "role:delivery-lead"
       },
-      "policyIntents": ["security", "regulated-applicability"],
       "expectedCode": "decision-authority-unqualified"
     }
   ]

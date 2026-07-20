@@ -392,12 +392,10 @@ for (const evalFile of evalFiles) {
 }
 
 const conformanceAssets = [
-  "packages/skill/skill-agent-governance/agent-governance-guide/assets/conformance-fixtures.json",
-  "packages/skill/skill-agent-governance/agent-governance-guide/assets/harness-conformance-fixtures.json",
-  "packages/skill/skill-agent-governance/agent-governance-guide/assets/external-enforcement-fixtures.json",
-  "packages/skill/skill-agent-governance/agent-governance-guide/assets/enterprise-platform-fixtures.json",
-  "packages/skill/skill-agent-governance/agent-governance-guide/assets/walking-skeleton-fixtures.json",
-  "packages/skill/skill-agent-governance/agent-governance-guide/assets/governance-operations-fixtures.json",
+  "packages/skill/skill-agent-governance/agent-governance-guide/scripts/workflow-runtime.test.ts",
+  "packages/skill/skill-agent-governance/agent-governance-guide/scripts/workflow-command-runtime.test.ts",
+  "packages/skill/skill-agent-governance/agent-governance-guide/scripts/workflow-trigger-adapters.test.ts",
+  "packages/skill/skill-agent-governance/agent-governance-guide/scripts/workflow-maturity.test.ts",
   "packages/skill/skill-workflow/workflow-guide/assets/conformance-fixtures.json",
   "packages/skill/skill-workflow/workflow-guide/assets/development-assurance-fixtures.json",
   "packages/skill/skill-workflow/workflow-guide/assets/operational-lifecycle-fixtures.json",
@@ -406,12 +404,14 @@ const conformanceText = conformanceAssets.map(read).join("\n").toLowerCase();
 for (const coverageTerm of [
   "concurrency",
   "idempotency",
-  "recursion",
+  "capability",
+  "executor",
+  "trigger",
+  "observe",
+  "enforce",
+  "evidence",
   "authority",
   "rollback",
-  "drift",
-  "telemetry",
-  "onboarding",
   "policy",
   "lifecycle",
   "provider",
@@ -431,14 +431,14 @@ const diagramSources = ["workflow-diagram.dot", "target-architecture.dot"].map(
 );
 const combinedDiagrams = diagramSources.join("\n").toLowerCase();
 for (const diagramTerm of [
-  "workflow plane",
-  "governance plane",
-  "semantic event intents",
-  "native adapters",
-  "external enforcement",
-  "provider-native evidence",
-  "onboarding",
-  "feedback",
+  "neutral workflow kernel",
+  "trigger adapter",
+  "executor port",
+  "control port",
+  "evidence port",
+  "trusted registry",
+  "independent host",
+  "derived maturity",
 ]) {
   check(
     combinedDiagrams.includes(diagramTerm),

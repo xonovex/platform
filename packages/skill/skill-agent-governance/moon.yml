@@ -11,29 +11,5 @@ tasks:
   test:
     command: npm run test
     inputs:
-      - agent-governance-guide/assets/*.json
-      - agent-governance-guide/assets/fixtures/*.json
-      - agent-governance-guide/assets/walking-skeleton/*.sh
-      - /packages/skill/skill-claude-code/code-harness-guide/assets/pre-tool-use-probe-2026-07-19.json
-      - /packages/skill/skill-claude-code/code-harness-guide/assets/pre-tool-use-settings.json
-      - /packages/skill/skill-claude-code/code-harness-guide/scripts/governance-pre-tool-use.sh
-      - /packages/command/command-workflow/commands/{discovery-run,acceptance-validate,integration-validate}.md
       - agent-governance-guide/references/*.md
-      - /packages/command/command-workflow/docs/*.md
-      - /packages/diagram/diagram-agent-workflow/*.dot
-      - /packages/skill/skill-aws/aws-guide/references/*.md
-      - /packages/skill/skill-azure-devops/azure-devops-guide/references/*.md
-      - /packages/skill/skill-bitbucket/bitbucket-guide/references/*.md
-      - /packages/skill/skill-bitrise/bitrise-guide/references/*.md
-      - /packages/skill/skill-datadog/datadog-guide/references/*.md
-      - /packages/skill/skill-plan/plan-guide/references/*.md
-      - /packages/skill/skill-plan/plan-guide/scripts/*.mjs
-      - /packages/skill/skill-workflow/workflow-guide/scripts/*.{mjs,ts}
-      - agent-governance-guide/scripts/*.mjs
       - agent-governance-guide/scripts/*.ts
-  test-live:
-    command: npm run test:live
-    options:
-      cache: false
-      runInCI: false
-    toolchain: [system, nix]

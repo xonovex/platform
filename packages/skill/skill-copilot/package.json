@@ -3,15 +3,12 @@
   "version": "6.1.0",
   "private": true,
   "type": "module",
-  "dependencies": {
-    "@xonovex/skill-agent-governance": "6.1.0"
-  },
   "keywords": [
     "xonovex",
     "skill",
     "copilot",
     "hooks",
-    "governance"
+    "workflow"
   ],
   "scripts": {
     "fmt": "prettier --write .",

@@ -11,15 +11,6 @@ var _ = resource.Quantity{}
 
 // AgentPolicyEnforced defines constraints that AgentRuns in this namespace cannot override.
 type AgentPolicyEnforced struct {
-	// RequireGovernanceVerdict requires every AgentRun to carry a governed
-	// lifecycle operation and receive an allow verdict from the governance
-	// decision service before admission.
-	RequireGovernanceVerdict bool `json:"requireGovernanceVerdict,omitempty"`
-
-	// GovernancePolicyVersion identifies the policy bundle evaluated by the
-	// governance decision service.
-	GovernancePolicyVersion string `json:"governancePolicyVersion,omitempty"`
-
 	// RuntimeClassName, if set, requires all AgentRuns to use this runtimeClassName.
 	RuntimeClassName *string `json:"runtimeClassName,omitempty"`
 

@@ -23,11 +23,9 @@ argument-hint: "<declare|update|contain|recover|close> [incident-reference] [--s
 
 ## Delegation
 
-Load `workflow-guide` and perform **incident-run**. Load `agent-governance-guide` for
-privileged actions and emergency access, then soft-select incident, monitoring, security,
-privacy, legal, resilience, and provider skills. Agents cannot fabricate reporting
-applicability, accountable decisions, or notifications. For a live operator-managed run,
-containment means the controller deletes the Job, pauses the `AgentRun`, demotes effective
-autonomy, and records `status.containment` plus a correlated
-`incident.containment` signal. Raise follow-up remediation only by authenticated POST to
-the declared `AgentTrigger` endpoint.
+Load `workflow-guide` and perform **incident-run**, then soft-select incident, monitoring,
+security, privacy, legal, resilience, and provider skills. If the caller supplied an
+executable composition, load `agent-governance-guide` to resolve only its selected
+controls and evidence sinks. Do not infer controls or maturity from incident severity,
+the executor, or an operator-hosted run. Agents cannot fabricate reporting applicability,
+accountable decisions, or notifications.

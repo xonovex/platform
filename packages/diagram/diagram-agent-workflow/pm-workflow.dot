@@ -47,7 +47,7 @@ digraph PmWorkflow {
   expowner [label="The UX lens owns experience-design-create / -critique / -revise;\nsolution-design-* belongs to the developer lens", shape=note, fillcolor="#fff3cd"];
   expdesign -> expowner [style=invis];
 
-  authority [label="--authority-reference is a claim to be verified, not a credential\nactor, qualification, scope, and freshness are checked\nbefore the decision binds to the revision\n\n--executor human is selected because accountable judgment must own\nthe outcome, never because the work is hard; raising autonomy A0→A3\nnever converts it into a model executor\n\nSilence is never approval — an unanswered escalation falls back to\npause or abandon when its window expires; a timeout never advances a gate", shape=note, fillcolor="#fff3cd"];
+  authority [label="--authority-reference is a claim to be verified, not a credential\nactor, qualification, scope, and freshness are checked\nbefore the decision binds to the revision\n\n--executor selects who performs the workflow operation\ncontrols are selected independently as observe or enforce\nmaturity labels never change either selection", shape=note, fillcolor="#fff3cd"];
 
   subgraph cluster_authorize {
     label="3 · Authorize — the plan gate";

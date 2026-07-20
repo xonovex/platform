@@ -4,8 +4,7 @@
 
 1. Resolve the exact Deliverable Publication revision, intended target, fresh acceptance
    evidence package, current policy/profile version, open conditions, and the profile's
-   actor requirements. Use **agent-governance-guide** for the actor record, what a role
-   string may mean, independence, segregation of duties, and which of them code enforces.
+   actor requirements.
 2. Present source evidence and limitations without turning agent or model summaries into
    authoritative facts. Require the accountable human to identify themselves through the
    selected provider's authoritative mechanism.

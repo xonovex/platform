@@ -1,5 +1,5 @@
 ---
-description: Create an optional provider-native Experience Design result with independent methods and policy intents
+description: Create an optional provider-native Experience Design result with independently selected methods and providers
 allowed-tools:
   - Read
   - Write
@@ -18,7 +18,7 @@ argument-hint: "<subject-or-native-reference> [--profile <reference>] [--provide
 
 - `subject-or-native-reference` (required): Subject or opaque Discovery/Research/Formulation/Decision reference.
 - `--profile`, `--provider`, `--method` (optional): Independent selections.
-- `--executor` (optional): `deterministic` | `model` | `agent` | `human` | `external` — a requested ceiling that may be rejected; see `agent-governance-guide`.
+- `--executor` (optional): Explicit `deterministic`, `model`, `agent`, `human`, or `external` workflow selection; it does not imply controls or maturity.
 
 ## Delegation
 

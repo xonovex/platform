@@ -41,12 +41,6 @@ spec:
                   type: object
                   description: Enforced constraints — AgentRuns that violate these are rejected by the webhook.
                   properties:
-                    requireGovernanceVerdict:
-                      type: boolean
-                      description: Requires every AgentRun to receive an allow verdict from the governance decision service.
-                    governancePolicyVersion:
-                      type: string
-                      description: Policy bundle version evaluated by the governance decision service.
                     runtimeClassName:
                       type: string
                       description: If set, requires all AgentRuns to use this runtimeClassName.

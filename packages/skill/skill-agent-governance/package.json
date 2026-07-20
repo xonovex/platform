@@ -6,8 +6,9 @@
   "keywords": [
     "xonovex",
     "skill",
-    "agent",
-    "governance"
+    "workflow",
+    "runtime",
+    "controls"
   ],
   "dependencies": {
     "zod": "^4.1.11"
@@ -15,7 +16,6 @@
   "scripts": {
     "fmt": "prettier --write .",
     "fmt:check": "prettier --check .",
-    "test": "node agent-governance-guide/scripts/validate-fixtures.mjs && node agent-governance-guide/scripts/validate-harness-fixtures.mjs && node agent-governance-guide/scripts/validate-external-enforcement-fixtures.mjs && node agent-governance-guide/scripts/validate-enterprise-platform-fixtures.mjs && node agent-governance-guide/scripts/validate-walking-skeleton-fixtures.mjs && node agent-governance-guide/scripts/validate-governance-operations-fixtures.mjs && node agent-governance-guide/scripts/validate-conformance-scenario-fixtures.mjs && node agent-governance-guide/scripts/validate-executor-vocabulary.mjs && node agent-governance-guide/scripts/validate-event-intent-vocabulary.mjs && node agent-governance-guide/scripts/validate-composition-vocabulary.ts && node agent-governance-guide/scripts/validate-capability-registry.ts && node --test agent-governance-guide/scripts/decision-service.test.ts agent-governance-guide/scripts/verdict-telemetry.test.ts agent-governance-guide/scripts/workflow-runtime.test.ts agent-governance-guide/scripts/workflow-command-runtime.test.ts agent-governance-guide/scripts/workflow-trigger-adapters.test.ts && bash agent-governance-guide/assets/walking-skeleton/run-skeleton.sh --yes",
-    "test:live": "bash agent-governance-guide/assets/walking-skeleton/run-live-lifecycle.sh"
+    "test": "node --test agent-governance-guide/scripts/workflow-runtime.test.ts agent-governance-guide/scripts/workflow-command-runtime.test.ts agent-governance-guide/scripts/workflow-trigger-adapters.test.ts agent-governance-guide/scripts/workflow-maturity.test.ts"
   }
 }

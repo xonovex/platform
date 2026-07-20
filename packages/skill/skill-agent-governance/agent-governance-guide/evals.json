@@ -1,78 +1,41 @@
 {
   "skill_name": "agent-governance-guide",
-  "tier": "moderate",
+  "tier": "aggressive",
   "evals": [
     {
       "id": 1,
-      "prompt": "A mandatory profile selects an experimental prompt hook on a harness where the tested adapter says the handler is parsed but not executed. Validate the composition.",
+      "prompt": "Design a Xonovex workflow that can be started manually, by a Claude hook, or by CI. It should run the same review script in every case and should not require governance controls.",
       "assertions": [
-        "Rejects the composition because an unsupported or experimental handler cannot guarantee a mandatory control.",
-        "Keeps the semantic event intent portable while requiring a supported native or independent external enforcement point with explicit failure behavior."
+        "Treats manual, harness-hook, and CI as trigger adapters independent from executor selection",
+        "Selects one script executor with an empty controls list rather than adding a mandatory profile",
+        "Does not assign an A1/A2/A3 maturity level merely because the workflow is automated"
       ]
     },
     {
       "id": 2,
-      "prompt": "Specify a module that launches a specialist agent from a tool hook to investigate a suspicious change.",
+      "prompt": "I want to evaluate an approval policy for two weeks without blocking anything, then enforce it before the executor. How should the composition change?",
       "assertions": [
-        "Requires explicit purpose, model/provider, maximum depth, token/cost/time budget, tool/network/data scope, authority attenuation, result contract, failure behavior, cancellation, and kill switch.",
-        "States that the child receives no more authority than the launcher and that deterministic authoritative inspection remains preferred for facts it can establish."
+        "Uses the same control plugin in before phase and initially selects mode observe",
+        "Explains that an observing deny is recorded but does not block",
+        "Changes only the selection mode to enforce after evaluation, without changing the executor or trigger"
       ]
     },
     {
       "id": 3,
-      "prompt": "An organization policy requires signed release evidence. A user profile disables signature verification through a local exception with no owner or expiry. Decide the effective outcome.",
+      "prompt": "Our agent-with-workflow-skill composition is called A3. Does selecting A3 turn on provenance, approval, and escalation in Xonovex? Explain exactly what is enforced.",
       "assertions": [
-        "Rejects the weakening because lower-authority configuration cannot silently weaken the mandatory organization control.",
-        "Requires an authorized exception with owner, scope, rationale, compensating controls, expiry, evidence, and mandatory review before any weakening is considered."
+        "States that maturity labels are caller-defined assessments and do not turn on behavior",
+        "States that controls must be independently selected and capabilities required explicitly when execution must fail without them",
+        "Lists the kernel's actual intrinsic enforcement boundary: schema, registration, required capabilities, selected enforcing denials, and selected evidence failure behavior"
       ]
     },
     {
       "id": 4,
-      "prompt": "Advise onboarding a repository hook pack. The user has not approved changes yet.",
+      "prompt": "Show me how to find every place this workflow can block before I run it. It uses one advisory control, one mandatory before control, and one mandatory after control.",
       "assertions": [
-        "Performs discovery, assessment, recommendation, and an exact preview of changes, permissions, data flows, failure behavior, verification, and rollback without applying changes.",
-        "Distinguishes advisory guidance from enforcement and requires explicit authorization before native configuration mutation."
-      ]
-    },
-    {
-      "id": 5,
-      "prompt": "A mandatory organization policy currently runs only as a tracked pre-commit hook and an agent-harness hook. Map it to external enforcement for pull requests and production releases, including evidence and bypass behavior.",
-      "assertions": [
-        "Classifies the client hook as advisory/bypassable and the harness hook as an early independent layer, not sufficient mandatory enforcement",
-        "Requires an unbypassable exact-revision CI/repository merge gate for pull requests and a protected environment/provider permission gate for production release",
-        "Separates policy decision, enforcement action, target mutation, and native check/artifact/attestation/deployment evidence",
-        "Declares fail-closed behavior and tests omitted, skipped, spoofed, timeout/outage, bypass-actor, and stale-revision paths"
-      ]
-    },
-    {
-      "id": 6,
-      "prompt": "Use OPA as an optional remote policy decision service for a mandatory release gate. Define what is sent and recorded, how cached decisions work, and what happens when the service is down or historical policy data is unavailable.",
-      "assertions": [
-        "Treats OPA as one policy-provider implementation and keeps policy decision separate from native enforcement",
-        "Sends minimized canonical facts with subject/action/actor/authority/version/freshness and records decision reference, input digest, policy/data version, outcome, explanation, expiry, and service identity",
-        "Allows only authenticated subject-and-version-bound unexpired cache entries and never converts a cache miss or invalid response into allow",
-        "Fails closed for mandatory outage/expired cache/version mismatch/replay failure unless a valid scoped exception or emergency-exception record applies, while preserving historical replay evidence"
-      ]
-    },
-    {
-      "id": 7,
-      "prompt": "Adopt governance-only controls for an existing repository and Kubernetes namespace without installing lifecycle commands or agent-harness modules. Describe the onboarding transaction and rollback proof.",
-      "assertions": [
-        "Accepts governance-only/external-enforcement-only adoption and reports absent harness/lifecycle layers without treating them as prerequisites",
-        "Discovers existing CI/rules/policies/admission/resources/permissions/bypass paths and previews exact native mutations, pins, secrets, data flows, failure behavior, evidence, and rollback before authorization",
-        "Applies idempotently only after authorization, re-reads authoritative state, and runs positive plus negative bypass/outage probes",
-        "Rolls back to captured native versions, re-runs allow/deny probes, retains evidence, and assigns drift ownership"
-      ]
-    },
-    {
-      "id": 8,
-      "prompt": "Prove our governance onboarding architecture end to end with one harness, a hosted required CI check, a non-file evidence provider, and our Azure DevOps/Bitbucket/Bitrise/AWS/Datadog stack. Include fresh-context recovery, drift, rollback, and the main failure probes.",
-      "assertions": [
-        "Exercises governance-only around an ordinary agent task, workflow-only through provider-native results, and an integrated composition without making either plane a prerequisite for the other",
-        "Discovers native capabilities and controls, previews exact changes and authority, binds authorization before idempotent apply, and verifies one allow plus one explained deterministic denial",
-        "Constrains semantic model or agent advice with a closed result schema, budgets, attenuated scopes, visible failure behavior, and a provider-native inference reference distinct from authoritative evidence",
-        "Reconstructs provider-native evidence in a fresh process from opaque references without local sidecars or a central result store and preserves independent CI enforcement when the harness hook is disabled",
-        "Detects weakening drift, records an explicitly authorized remediation or waiver, verifies full rollback, and safely handles untrusted modules, unsupported handlers, policy outage, duplicate events, recursion, and expired exceptions"
+        "Uses composition explanation rather than executing the workflow",
+        "Reports only enforcing controls as enforcement points and distinguishes before from after",
+        "Warns that an after-phase denial cannot undo executor side effects"
       ]
     }
   ]

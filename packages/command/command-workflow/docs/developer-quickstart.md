@@ -1,7 +1,7 @@
 # Developer Quickstart
 
 The everyday path through the workflow commands for a developer building a normal feature.
-The [README](../README.md) documents all 59 commands and their contracts; this guide is the
+The [README](../README.md) documents all 56 commands and their contracts; this guide is the
 subset you actually run, in order. See the [developer-workflow
 diagram](../../../diagram/diagram-agent-workflow/developer-workflow.png) for the same flow at a
 glance.
@@ -173,28 +173,28 @@ Integration is split the same way, and re-checks every binding at a non-bypassab
 enforcement point; ordinary tool access is not authorization. When something breaks:
 `incident-run → corrective-action-run`. `retirement-run` decommissions resources much later.
 
-The `workflow-inspect`, `workflow-governance-inspect`, `workflow-conformance`, `workflow-drift`,
-and `workflow-modules` commands are out-of-band diagnostics you can run at any time.
+The `workflow-inspect` and `workflow-conformance` commands are out-of-band diagnostics you
+can run at any time.
 
 ## Jargon decoder
 
 The command help is written abstractly so it can back any storage backend. Translated:
 
-| Term             | What it means for you                                                                                                                                                       |
-| ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| native reference | an opaque handle/id to a stored result; pass what the previous command gave you                                                                                             |
-| `--revision`     | pick one exact version of that result                                                                                                                                       |
-| provider         | the storage backend for results, chosen by the profile (not hardcoded); commonly a local Markdown file under `plans/`. Git is optional and a separate workspace concern     |
-| `--profile`      | a preset deciding which stages are required vs optional and which policies apply                                                                                            |
-| `--method`       | the technique (user stories, BDD, example mapping, …); `neutral` is always the default                                                                                      |
-| `--executor`     | who does the work — `deterministic`, `model`, `agent`, `human`, or `external`; a requested ceiling, never an escalation, and may be rejected (see `agent-governance-guide`) |
+| Term             | What it means for you                                                                                                                                                   |
+| ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| native reference | an opaque handle/id to a stored result; pass what the previous command gave you                                                                                         |
+| `--revision`     | pick one exact version of that result                                                                                                                                   |
+| provider         | the storage backend for results, chosen by the profile (not hardcoded); commonly a local Markdown file under `plans/`. Git is optional and a separate workspace concern |
+| `--profile`      | a preset deciding which stages are required vs optional and which policies apply                                                                                        |
+| `--method`       | the technique (user stories, BDD, example mapping, …); `neutral` is always the default                                                                                  |
+| `--executor`     | who does the work — `deterministic`, `model`, `agent`, `human`, or `external`; controls and maturity remain separate selections                                         |
 
 ## See also
 
 - [README](../README.md) — the full command table
-- [Adoption map](adoption-map.md) — compose what you need, from guideline skills to enforced pipelines
+- [Adoption map](adoption-map.md) — compose trigger, executor, host, controls, evidence, and maturity independently
 - [PM Quickstart](pm-quickstart.md) · [QA Quickstart](qa-quickstart.md) ·
   [UX Quickstart](ux-quickstart.md) — the same actor-neutral commands read from the other seats
-- [Architecture and composition](architecture-and-composition.md) — the two-planes model
+- [Architecture and composition](architecture-and-composition.md) — the plugin-kernel model
 - [`workflow-guide`](../../../skill/skill-workflow/workflow-guide/SKILL.md) and
   [`plan-guide`](../../../skill/skill-plan/plan-guide/SKILL.md) — the behavior each command runs

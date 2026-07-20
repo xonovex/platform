@@ -2,8 +2,8 @@
 
 A lens over the same actor-neutral commands — not a different set of them. No command knows what a
 designer is: `experience-design-create` asks for a subject and publishes a proposed result; it never
-asks who you are. A role is a way to _read_ the command set — which of the 59 you actually run, and
-where your work binds. The [README](../README.md) documents all 59 commands and their contracts; the
+asks who you are. A role is a way to _read_ the command set — which of the 56 you actually run, and
+where your work binds. The [README](../README.md) documents all 56 commands and their contracts; the
 [Developer Quickstart](developer-quickstart.md) is the sibling lens for the seat that writes the code,
 and it owns the shared vocabulary (native references, `--revision`, `--profile`, `--method`). See the
 [ux-workflow diagram](../../../diagram/diagram-agent-workflow/ux-workflow.png) for the same flow at
@@ -126,20 +126,12 @@ Read it there:
 - **Qualified human review inside accessibility evidence** — scanners and agents supply evidence but
   never accountable conformance by themselves.
 
-## Executors and autonomy
+## Executors, controls, and maturity
 
-Two models appear throughout the argument help. Both are owned elsewhere and deliberately not
-restated here:
-
-- **Executor classes** (`--executor`) —
-  [execution.md](../../../skill/skill-agent-governance/agent-governance-guide/references/execution.md).
-  `human` is selected because accountable judgment must own the outcome, never because the work is
-  hard — which is exactly why a qualified reviewer, and not a better scanner, is what an accessibility
-  conformance claim needs.
-- **Autonomy levels `A0`–`A3`** —
-  [autonomy.md](../../../skill/skill-agent-governance/agent-governance-guide/references/autonomy.md).
-  Raising a level changes who is watching and when. It never converts a `human` executor into a
-  `model` one, and high-impact gates stay human at every level.
+`--executor` selects who performs the design or assessment; it does not add review or
+approval. Select each control explicitly and choose `observe` or `enforce`. A maturity
+label such as A1/A2/A3 may summarize capabilities, but it never changes the executor or
+control selection.
 
 ## What you can skip
 

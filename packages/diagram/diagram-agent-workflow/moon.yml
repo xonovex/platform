@@ -11,7 +11,6 @@ tasks:
     deps:
       - graph-build-workflow
       - graph-build-target
-      - graph-build-autonomy
       - graph-build-adoption
       - graph-build-enforcement
       - graph-build-axes
@@ -33,14 +32,6 @@ tasks:
       - target-architecture.dot
     outputs:
       - target-architecture.png
-    options:
-      cache: true
-  graph-build-autonomy:
-    command: dot -Tpng -o autonomy-ladder.png autonomy-ladder.dot
-    inputs:
-      - autonomy-ladder.dot
-    outputs:
-      - autonomy-ladder.png
     options:
       cache: true
   graph-build-adoption:

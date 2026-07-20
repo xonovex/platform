@@ -24,15 +24,6 @@ const allowedExecutors = new Set([
   "human",
   "external",
 ]);
-const allowedPolicyIntents = new Set([
-  "data-access",
-  "external-research",
-  "privacy",
-  "accessibility",
-  "security",
-  "architecture",
-  "regulated-applicability",
-]);
 const canonicalCapabilities = new Set([
   "Discovery",
   "Research",
@@ -117,12 +108,6 @@ for (const contract of fixtures.operationContracts) {
   for (const executor of contract.preferredExecutors) {
     if (!allowedExecutors.has(executor)) {
       fail(`operation ${contract.operation}: unknown executor ${executor}`);
-    }
-  }
-
-  for (const intent of contract.policyIntents) {
-    if (!allowedPolicyIntents.has(intent)) {
-      fail(`operation ${contract.operation}: unknown policy intent ${intent}`);
     }
   }
 }
@@ -245,12 +230,6 @@ for (const fixture of fixtures.cases) {
     }
   }
 
-  for (const intent of fixture.policyIntents) {
-    if (!allowedPolicyIntents.has(intent)) {
-      fail(`case ${fixture.id}: unknown policy intent ${intent}`);
-    }
-  }
-
   const code = classifyCase(fixture);
 
   if (fixture.valid && code !== null) {
@@ -275,10 +254,6 @@ const sharedContract = readFileSync(
 
 for (const executor of allowedExecutors) {
   expectIncludes(sharedContract, executor, "early lifecycle executor contract");
-}
-
-for (const intent of allowedPolicyIntents) {
-  expectIncludes(sharedContract, intent, "early lifecycle policy contract");
 }
 
 for (const planningReference of [
@@ -307,13 +282,7 @@ const onboarding = readFileSync(
   join(guideDirectory, "references/lifecycle-onboard-advise.md"),
   "utf8",
 );
-for (const concept of [
-  "methods",
-  "skills",
-  "providers",
-  "executor",
-  "environment modules",
-]) {
+for (const concept of ["methods", "skills", "providers", "executor"]) {
   expectIncludes(onboarding, concept, "lifecycle onboarding contract");
 }
 
@@ -325,6 +294,6 @@ if (failures.length > 0) {
   process.exitCode = 1;
 } else {
   console.log(
-    `Early lifecycle fixture validation passed: ${fixtures.operationContracts.length} operations, ${fixtures.cases.length} profile/provider/executor/policy cases`,
+    `Early lifecycle fixture validation passed: ${fixtures.operationContracts.length} operations, ${fixtures.cases.length} workflow/provider/executor cases`,
   );
 }

@@ -1,35 +1,27 @@
 ---
-description: Validate workflow and agent-governance contracts without assuming one provider, harness, policy engine, or configuration format
+description: Validate either a lifecycle workflow contract or an executable composition
 allowed-tools:
   - Bash
   - Read
   - Glob
   - Grep
   - Skill
-argument-hint: "[subject] [--plane <workflow|governance|both>] [--profile <reference>]"
+argument-hint: "<subject> [--kind <lifecycle|composition>] [--registry <registry.json>]"
 ---
 
-# /xonovex-workflow:workflow-conformance — Validate Semantic Conformance
+# /xonovex-workflow:workflow-conformance — Validate a Workflow Contract
 
 ## Arguments
 
-- `subject` (optional): Result, handle, profile, module, policy, capability matrix, exception, onboarding result, or native reference; defaults to the current context.
-- `--plane <workflow|governance|both>` (optional): Contract owner to validate; defaults to auto-detection, then both when the subject crosses planes.
-- `--profile <reference>` (optional): Profile whose requirements and guarantees apply, resolved to a shipped reference profile in the owning plane's `assets/profiles/` library; an integrated reference validates the paired workflow and governance profiles together.
+- `subject` (required): Lifecycle result, provider handle, invocation, or native reference.
+- `--kind` (optional): `lifecycle` or `composition`; infer only when the subject is unambiguous.
+- `--registry` (required for a composition): Trusted plugin registry used to resolve the invocation.
 
 ## Delegation
 
-Load the owning skills and perform their **conformance** operations:
+- For `lifecycle`, load `workflow-guide` and perform its conformance operation.
+- For `composition`, load `agent-governance-guide`, validate the invocation against the
+  registry, and explain the resolved plugins, capability gate, and enforcement points.
 
-- `workflow-guide` (plugin `xonovex-skill-workflow`) for lifecycle results,
-  ephemeral handles, provider handoffs, and workflow profiles.
-- `agent-governance-guide` (plugin `xonovex-skill-agent-governance`) for
-  executors, events, capability matrices, policies, enforcement, modules, authority,
-  exceptions, onboarding, and governance profiles.
-
-The skills own the semantic checks, output, and gotchas. Validate each plane
-independently, then validate their whole composition against the
-`validateAssembledComposition` contract in the `workflow-guide` conformance reference
-(both profiles, selected capabilities, providers, modules, and cross-plane enforcement as
-one artifact); do not invent a universal persisted schema or treat skill installation as
-enforcement evidence.
+Do not assemble profiles across these contract types. Lifecycle semantics and executable
+composition are independent and may be used separately.
