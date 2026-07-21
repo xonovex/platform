@@ -127,7 +127,6 @@ export {
   generateChangelogEntry,
   updateChangelog,
   determineBumpLevel,
-  sectionTitle,
   formatCommitEntry,
 };
-export type {DepUpdate, BumpLevel};
+export type {DepUpdate};

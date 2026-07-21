@@ -11,6 +11,14 @@ import {afterEach, beforeEach, describe, expect, it, vi} from "vitest";
 import {runJob, type RunContext} from "./output-process.js";
 import type {NormalizedEval} from "./validation.js";
 
+const evaluation = (prompt: string): NormalizedEval => ({
+  id: 1,
+  prompt,
+  expected_output: "the answer",
+  assertions: ["response contains the answer"],
+  files: [],
+});
+
 describe("runJob", () => {
   const originalPath = process.env.PATH;
   let temporaryDirectory: string;
@@ -45,14 +53,6 @@ if (args.includes("--json-schema")) {
     process.env.PATH = originalPath;
     vi.restoreAllMocks();
     rmSync(temporaryDirectory, {recursive: true, force: true});
-  });
-
-  const evaluation = (prompt: string): NormalizedEval => ({
-    id: 1,
-    prompt,
-    expected_output: "the answer",
-    assertions: ["response contains the answer"],
-    files: [],
   });
 
   const context = (): RunContext => ({

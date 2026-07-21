@@ -10,6 +10,7 @@ const QuerySchema = z.object({
 const QueryListSchema = z
   .array(QuerySchema)
   .min(1, "must contain at least one query");
+const QuerySplitSchema = z.enum(["train", "validation", "all"]);
 
 const FiniteNumberTextSchema = z
   .string()
@@ -69,9 +70,18 @@ export const parseQueries = (
     : {success: false, error: errorText(result.error)};
 };
 
+export const parseQuerySplit = (
+  input: unknown,
+): ValidationResult<z.infer<typeof QuerySplitSchema>> => {
+  const result = QuerySplitSchema.safeParse(input);
+  return result.success
+    ? {success: true, data: result.data}
+    : {success: false, error: errorText(result.error)};
+};
+
 export const selectQueries = (
   queries: readonly z.infer<typeof QuerySchema>[],
-  split: "train" | "validation" | "all",
+  split: z.infer<typeof QuerySplitSchema>,
 ): ValidationResult<readonly z.infer<typeof QuerySchema>[]> => {
   const selected =
     split === "all"

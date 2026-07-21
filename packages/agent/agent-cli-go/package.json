@@ -20,14 +20,18 @@
   },
   "files": [
     "dist/bin.js",
-    "dist/bin.js.map"
+    "dist/bin.js.map",
+    "dist/launcher.js",
+    "dist/launcher.js.map"
   ],
   "bin": {
     "agent-cli": "dist/bin.js",
     "agent-cli-go": "dist/bin.js"
   },
   "devDependencies": {
-    "@xonovex/ts-config-cli": "0.1.22"
+    "@xonovex/eslint-config-cli": "0.1.22",
+    "@xonovex/ts-config-cli": "0.1.22",
+    "@xonovex/vitest-config-node": "0.1.22"
   },
   "optionalDependencies": {
     "@xonovex/agent-cli-go-linux-x64": "0.1.31",
@@ -35,10 +39,6 @@
     "@xonovex/agent-cli-go-darwin-x64": "0.1.31",
     "@xonovex/agent-cli-go-darwin-arm64": "0.1.31",
     "@xonovex/agent-cli-go-win32-x64": "0.1.31"
-  },
-  "dependencies": {
-    "@xonovex/eslint-config-cli": "0.1.22",
-    "@xonovex/ts-config-cli": "0.1.22"
   },
   "keywords": [
     "xonovex",

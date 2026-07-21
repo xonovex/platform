@@ -70,4 +70,4 @@ const parseCliArgs = (spec: CliSpec, argv?: readonly string[]): ParsedArgs => {
 };
 
 export {parseCliArgs, formatHelp};
-export type {ArgOption, CliSpec, ParsedArgs};
+export type {CliSpec, ParsedArgs};

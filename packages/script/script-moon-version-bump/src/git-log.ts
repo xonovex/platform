@@ -116,6 +116,5 @@ export {
   parseConventionalCommit,
   isIncludedType,
   REPO_URL,
-  INCLUDED_TYPES,
 };
-export type {Commit, ParsedCommit};
+export type {Commit};

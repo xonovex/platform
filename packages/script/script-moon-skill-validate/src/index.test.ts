@@ -29,7 +29,7 @@ describe("skill validator entrypoints", () => {
       import.meta.dirname,
       "../../../skill/skill-code-quality",
     );
-    vi.spyOn(console, "log").mockImplementation(() => undefined);
+    vi.spyOn(console, "log").mockImplementation(() => {});
 
     const result = validateSkill([skill]);
 
@@ -53,7 +53,7 @@ unknown-field: true
 Use references/missing_file.md with @references/legacy.md.
 `,
     );
-    const log = vi.spyOn(console, "log").mockImplementation(() => undefined);
+    const log = vi.spyOn(console, "log").mockImplementation(() => {});
 
     const result = validateSkill([skill]);
 

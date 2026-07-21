@@ -248,10 +248,7 @@ const computeDrift = (
     return {...report, note: "checkout not found or not a git repo"};
   }
   report.resolved = true;
-  if (
-    pull &&
-    git(checkout, ["fetch", "--tags", "--quiet"]) === undefined
-  ) {
+  if (pull && git(checkout, ["fetch", "--tags", "--quiet"]) === undefined) {
     return {
       ...report,
       pull_failed: true,

@@ -2,6 +2,7 @@ import {describe, expect, it} from "vitest";
 import {
   buildTriggerClaudeArgs,
   parseQueries,
+  parseQuerySplit,
   parseTriggerOptions,
   selectQueries,
   streamTextDeltaLength,
@@ -9,6 +10,17 @@ import {
 } from "./validation.js";
 
 describe("trigger query validation", () => {
+  it.each(["train", "validation", "all"])(
+    "accepts the supported query split %s",
+    (split) => {
+      expect(parseQuerySplit(split)).toEqual({success: true, data: split});
+    },
+  );
+
+  it("rejects an unsupported query split", () => {
+    expect(parseQuerySplit("production").success).toBe(false);
+  });
+
   it("accepts exact booleans", () => {
     expect(
       parseQueries([

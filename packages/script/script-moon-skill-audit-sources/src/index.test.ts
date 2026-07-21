@@ -1,3 +1,4 @@
+import {execFileSync} from "node:child_process";
 import {
   mkdirSync,
   mkdtempSync,
@@ -7,6 +8,7 @@ import {
 } from "node:fs";
 import {tmpdir} from "node:os";
 import {join} from "node:path";
+import {resolveExecutable} from "@xonovex/script-moon-common/executable";
 import {afterEach, describe, expect, it, vi} from "vitest";
 import {main} from "./audit.js";
 
@@ -160,9 +162,11 @@ describe("main", () => {
     );
     const checkout = join(skill, "upstream");
     mkdirSync(checkout);
-    execFileSync("git", ["init", "--quiet"], {cwd: checkout});
+    execFileSync(resolveExecutable("git"), ["init", "--quiet"], {
+      cwd: checkout,
+    });
     execFileSync(
-      "git",
+      resolveExecutable("git"),
       ["remote", "add", "origin", "file:///definitely/missing-upstream"],
       {cwd: checkout},
     );
@@ -177,4 +181,3 @@ describe("main", () => {
     });
   });
 });
-import {execFileSync} from "node:child_process";

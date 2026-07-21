@@ -2,7 +2,7 @@ import {existsSync, readFileSync} from "node:fs";
 import {join} from "node:path";
 import {z} from "zod";
 
-export const PlatformMetaSchema = z.strictObject({
+const PlatformMetaSchema = z.strictObject({
   os: z.array(z.string().min(1)).min(1),
   cpu: z.array(z.string().min(1)).min(1),
   libc: z.array(z.string().min(1)).min(1).optional(),

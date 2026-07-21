@@ -13,7 +13,7 @@ export const validatePackage = (pkg: PackageJson): readonly string[] => {
 
   for (const field of REQUIRED_FIELDS) {
     const value = pkg[field as keyof PackageJson];
-    if (!(field in pkg) || value === undefined) {
+    if (value === undefined || !(field in pkg)) {
       errors.push(`Missing required field: ${field}`);
     } else if (
       (typeof value === "string" && value.trim().length === 0) ||

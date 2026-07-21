@@ -16,6 +16,7 @@ import {
   buildTriggerClaudeArgs,
   MAX_TRIGGER_MODEL_RUNS,
   parseQueries,
+  parseQuerySplit,
   parseTriggerOptions,
   selectQueries,
   triggerModelRunCount,
@@ -60,12 +61,14 @@ export const main = async (argv: readonly string[]): Promise<number> => {
   ) {
     usageError("split must not be provided twice with different values");
   }
-  const split = cli.split ?? positionalSplit ?? "all";
-  if (split !== "train" && split !== "validation" && split !== "all") {
-    usageError(
-      `argument split: invalid choice: '${split}' (choose from 'train', 'validation', 'all')`,
+  const splitResult = parseQuerySplit(cli.split ?? positionalSplit ?? "all");
+  if (!splitResult.success) {
+    return usageError(
+      `argument split: invalid choice: '${cli.split ?? positionalSplit ?? ""}' ` +
+        "(choose from 'train', 'validation', 'all')",
     );
   }
+  const split = splitResult.data;
 
   if (!isFile(queriesFile)) {
     process.stderr.write(`Error: queries file not found: ${queriesFile}\n`);

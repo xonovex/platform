@@ -52,6 +52,7 @@
     "@xonovex/ts-config-node": "0.1.22"
   },
   "devDependencies": {
+    "@xonovex/prettier-config": "0.1.22",
     "@xonovex/ts-config-node": "0.1.22",
     "@types/eslint": "9.6.1",
     "@types/eslint-plugin-security": "3.0.1",

@@ -2,6 +2,7 @@ import {readFileSync, writeFileSync} from "node:fs";
 import {z} from "zod";
 
 const DependencyMapSchema = z.record(z.string(), z.string());
+const BinSchema = z.union([z.string(), z.record(z.string(), z.string())]);
 
 export const PackageJsonSchema = z.looseObject({
   name: z.string().optional(),
@@ -16,6 +17,11 @@ export const PackageJsonSchema = z.looseObject({
     })
     .optional(),
   files: z.array(z.string()).optional(),
+  bin: BinSchema.optional(),
+  exports: z.unknown().optional(),
+  main: z.string().optional(),
+  module: z.string().optional(),
+  types: z.string().optional(),
   publishConfig: z
     .looseObject({
       access: z.string().optional(),

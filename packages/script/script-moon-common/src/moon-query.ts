@@ -4,7 +4,7 @@ import {join} from "node:path";
 import {z} from "zod";
 import {resolveExecutable} from "./executable.js";
 
-export const MoonProjectSchema = z.looseObject({
+const MoonProjectSchema = z.looseObject({
   id: z.string().min(1),
   source: z.string().min(1),
 });

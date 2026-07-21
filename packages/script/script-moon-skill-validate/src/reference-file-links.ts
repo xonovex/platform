@@ -10,7 +10,7 @@ export interface LinkReport {
   addPass(message: string): void;
 }
 
-export const isFile = (path: string): boolean => {
+const isFile = (path: string): boolean => {
   try {
     return statSync(path).isFile();
   } catch {

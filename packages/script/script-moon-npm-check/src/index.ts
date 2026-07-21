@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import {existsSync} from "node:fs";
+import {existsSync, readFileSync} from "node:fs";
 import {join} from "node:path";
 import {
   logError,
@@ -8,6 +8,7 @@ import {
   parseCliArgs,
   readPkg,
 } from "@xonovex/script-moon-common";
+import {packagedFilePaths, validatePackedPackage} from "./packed-package.js";
 import {validateDeclaredFiles, validatePackage} from "./validate.js";
 
 parseCliArgs({
@@ -16,6 +17,7 @@ parseCliArgs({
 });
 
 const packageJsonPath = join(process.cwd(), "package.json");
+const packageRoot = process.cwd();
 
 let pkg;
 try {
@@ -25,15 +27,24 @@ try {
   process.exit(1);
 }
 
-if (pkg.private) {
+if (pkg.private === true) {
   logInfo(`Skipping private package ${pkg.name ?? "(unnamed)"}`);
   process.exit(0);
 }
 
+let packedFiles: readonly string[];
+try {
+  packedFiles = packagedFilePaths(packageRoot);
+} catch (error: unknown) {
+  logError(`Failed to inspect packed package: ${String(error)}`);
+  process.exit(1);
+}
+
 const errors = [
   ...validatePackage(pkg),
-  ...validateDeclaredFiles(pkg, (file) =>
-    existsSync(join(process.cwd(), file)),
+  ...validateDeclaredFiles(pkg, (file) => existsSync(join(packageRoot, file))),
+  ...validatePackedPackage(pkg, packedFiles, (file) =>
+    readFileSync(join(packageRoot, file), "utf8"),
   ),
 ];
 

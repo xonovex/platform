@@ -33,17 +33,17 @@ describe("writeOrCheckGeneratedFile", () => {
     const filePath = temporaryFile();
     writeFileSync(filePath, "stale");
 
-    expect(() => writeOrCheckGeneratedFile(filePath, "current", true)).toThrow(
-      `Generated file is stale: ${filePath}`,
-    );
+    expect(() => {
+      writeOrCheckGeneratedFile(filePath, "current", true);
+    }).toThrow(`Generated file is stale: ${filePath}`);
   });
 
   it("rejects a missing generated file in check mode", () => {
     const filePath = temporaryFile();
 
-    expect(() => writeOrCheckGeneratedFile(filePath, "current", true)).toThrow(
-      `Generated file is missing: ${filePath}`,
-    );
+    expect(() => {
+      writeOrCheckGeneratedFile(filePath, "current", true);
+    }).toThrow(`Generated file is missing: ${filePath}`);
   });
 
   it("writes a generated file outside check mode", () => {

@@ -9,8 +9,12 @@ tags:
 dependsOn:
   - shared-agent-go
   - shared-core-go
-  - eslint-config-cli
-  - ts-config-cli
+  - id: eslint-config-cli
+    scope: development
+  - id: ts-config-cli
+    scope: development
+  - id: vitest-config-node
+    scope: development
 tasks:
   ts-build:
     script: npx tsc

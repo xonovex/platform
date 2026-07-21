@@ -3,7 +3,7 @@ import {join} from "node:path";
 import {checkTriggered} from "./trigger-process.js";
 import {type Query} from "./validation.js";
 
-export interface ResultRecord {
+interface ResultRecord {
   readonly query: string;
   readonly should_trigger: boolean;
   readonly triggers: number;

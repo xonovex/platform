@@ -15,7 +15,7 @@ const VERSION_RE = /\*\*Version:\*\*\s*v?(\d+\.\d+\.\d+)/;
 const COMMIT_RE = /\*\*Commit:\*\*\s*([0-9a-f]{7,40})/;
 const WATCH_RE = /\*\*Watch:\*\*\s*(.+?)\s*(?:->|→)\s*(.+\S)\s*$/;
 
-export interface Watch {
+interface Watch {
   readonly path: string;
   readonly refs: readonly string[];
 }
