@@ -1,12 +1,9 @@
-import {mkdtempSync, readFileSync, rmSync, writeFileSync} from "node:fs";
-import {tmpdir} from "node:os";
-import {join} from "node:path";
 import {describe, expect, it} from "vitest";
 import {
   determineBumpLevel,
   formatCommitEntry,
   generateChangelogEntry,
-  updateChangelog,
+  renderUpdatedChangelog,
 } from "./changelog.js";
 import type {Commit} from "./git-log.js";
 
@@ -153,22 +150,34 @@ describe("generateChangelogEntry", () => {
   });
 });
 
-describe("updateChangelog", () => {
+describe("renderUpdatedChangelog", () => {
+  it("renders a new changelog without writing", () => {
+    expect(
+      renderUpdatedChangelog(undefined, "@xonovex/example", "## 1.0.0\n"),
+    ).toBe("# @xonovex/example\n\n## 1.0.0\n");
+  });
+
+  it("inserts an entry after the matching package title", () => {
+    expect(
+      renderUpdatedChangelog(
+        "# @xonovex/example\n\n## 1.0.0\n\n- Initial\n",
+        "@xonovex/example",
+        "## 1.1.0\n\n- Update\n",
+      ),
+    ).toContain("# @xonovex/example\n\n## 1.1.0\n\n- Update\n\n## 1.0.0");
+  });
+
   it("preserves existing history when the package title is missing", () => {
-    const directory = mkdtempSync(join(tmpdir(), "version-changelog-"));
-    const path = join(directory, "CHANGELOG.md");
-    const existing = "# Legacy package\n\n## 1.0.0\n\n- Initial release\n";
-    try {
-      writeFileSync(path, existing, "utf8");
+    const existing = "# Existing package\n\n## 1.0.0\n\n- Initial release\n";
 
-      updateChangelog(path, "@xonovex/current", "## 1.1.0\n\n- Update\n");
+    const updated = renderUpdatedChangelog(
+      existing,
+      "@xonovex/current",
+      "## 1.1.0\n\n- Update\n",
+    );
 
-      const updated = readFileSync(path, "utf8");
-      expect(updated).toContain("# @xonovex/current");
-      expect(updated).toContain("## 1.1.0");
-      expect(updated).toContain(existing);
-    } finally {
-      rmSync(directory, {recursive: true, force: true});
-    }
+    expect(updated).toContain("# @xonovex/current");
+    expect(updated).toContain("## 1.1.0");
+    expect(updated).toContain(existing);
   });
 });

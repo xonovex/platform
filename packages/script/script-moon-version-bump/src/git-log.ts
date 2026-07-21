@@ -33,7 +33,7 @@ const getLastVersionRef = (
   pkgDir: string,
   currentVersion: string,
 ): string | undefined => {
-  // Walk back through commits that touched package.json to find where version differs
+  // The first historical package version that differs bounds the current release.
   const hashes = execFileSync(
     resolveExecutable("git"),
     ["log", "--format=%H", "--", `${pkgDir}/package.json`],
@@ -69,7 +69,7 @@ const getLastVersionRef = (
     }
   }
 
-  // Fall back to the parent of the earliest commit that introduced this package
+  // A never-versioned package starts before the commit that introduced it.
   const earliest = hashes.at(-1);
   return earliest ? `${earliest}~1` : undefined;
 };

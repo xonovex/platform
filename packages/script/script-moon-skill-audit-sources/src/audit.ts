@@ -88,12 +88,10 @@ A source block may add upstream-drift fields:
 When present, the audit also reports the latest released tag vs the pinned
 version and the commits since the pinned commit on watched paths.`;
 
-// Match Python json.dumps(ensure_ascii=True): escape every non-ASCII UTF-16
-// code unit as \uXXXX (surrogate pairs become two escapes, as in CPython).
+// ensureAscii escapes every non-ASCII UTF-16 code unit as \uXXXX.
 const ensureAscii = (text: string): string =>
   text.replaceAll(/[\u0080-\uFFFF]/g, (ch) => {
-    // The non-Unicode regex matches one UTF-16 code unit, so codePointAt sees
-    // each surrogate independently and preserves CPython's two-escape output.
+    // The non-Unicode regex visits each half of a surrogate pair separately.
     const codePoint = ch.codePointAt(0);
     if (codePoint === undefined) return ch;
     const code = codePoint.toString(16).padStart(4, "0");
@@ -172,9 +170,7 @@ const listExistingRefs = (skillDir: string): Set<string> => {
   return refs;
 };
 
-// Walk up from a dir to the moon workspace root (the dir holding `.moon`), so a
-// source's **Checkout:** path resolves the same way the Python tool's
-// REPO_ROOT-relative default did. Falls back to the start dir.
+// findWorkspaceRoot resolves checkout paths from the nearest Moon workspace.
 const findWorkspaceRoot = (start: string): string => {
   let dir = resolve(start);
   for (;;) {
@@ -533,8 +529,7 @@ const collectTargets = (args: ParsedArgs): string[] => {
     }
     return found;
   }
-  // Ergonomic addition: default the target to cwd when neither a target nor
-  // --all is supplied (the Python CLI errors here instead).
+  // collectTargets uses the current directory when no target is supplied.
   const target = args.target ?? process.cwd();
   const sf = resolveSourcesFile(target);
   if (sf === undefined) {
@@ -544,9 +539,7 @@ const collectTargets = (args: ParsedArgs): string[] => {
   return [sf];
 };
 
-// Mirror Python's pathlib.Path ordering, which compares path components one by
-// one (so "skill-c99" sorts before "skill-c99-opinionated") rather than the raw
-// string (where the path separator would flip that order).
+// comparePaths orders path components before comparing path depth.
 const comparePaths = (a: string, b: string): number => {
   const partsA = a.split(sep);
   const partsB = b.split(sep);

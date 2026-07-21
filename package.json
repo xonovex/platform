@@ -62,8 +62,9 @@
     "sync:hooks": "moon sync hooks",
     "prepare": "npm run sync:hooks"
   },
-  "packageManager": "npm@11.10.0",
+  "packageManager": "npm@11.16.0",
   "allowScripts": {
-    "esbuild@0.28.1": true
+    "esbuild": true,
+    "fsevents@2.3.3": true
   }
 }

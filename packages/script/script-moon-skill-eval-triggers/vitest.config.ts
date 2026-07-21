@@ -5,6 +5,24 @@ export default defineConfig({
     include: ["src/**/*.test.ts"],
     coverage: {
       thresholds: {
+        "src/evaluate.ts": {
+          statements: 90,
+          branches: 55,
+          functions: 100,
+          lines: 90,
+        },
+        "src/trigger-config.ts": {
+          statements: 95,
+          branches: 90,
+          functions: 100,
+          lines: 95,
+        },
+        "src/trigger-evaluation.ts": {
+          statements: 90,
+          branches: 85,
+          functions: 100,
+          lines: 90,
+        },
         "src/trigger-process.ts": {
           statements: 80,
           branches: 65,

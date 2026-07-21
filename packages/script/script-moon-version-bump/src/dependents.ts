@@ -17,28 +17,37 @@ export const updateDependent = (
   newVersion: string,
   getGitVersion: () => string | undefined,
 ): DependentUpdate => {
+  const pkg: PackageJson = {
+    ...depPkg,
+    ...(depPkg.dependencies === undefined
+      ? {}
+      : {dependencies: {...depPkg.dependencies}}),
+    ...(depPkg.devDependencies === undefined
+      ? {}
+      : {devDependencies: {...depPkg.devDependencies}}),
+    ...(depPkg.peerDependencies === undefined
+      ? {}
+      : {peerDependencies: {...depPkg.peerDependencies}}),
+    ...(depPkg.optionalDependencies === undefined
+      ? {}
+      : {optionalDependencies: {...depPkg.optionalDependencies}}),
+  };
   let depsChanged = false;
-  if (updateDependencyVersions(depPkg.dependencies, packageName, newVersion))
+  if (updateDependencyVersions(pkg.dependencies, packageName, newVersion))
     depsChanged = true;
-  if (updateDependencyVersions(depPkg.devDependencies, packageName, newVersion))
+  if (updateDependencyVersions(pkg.devDependencies, packageName, newVersion))
     depsChanged = true;
-  if (
-    updateDependencyVersions(depPkg.peerDependencies, packageName, newVersion)
-  )
+  if (updateDependencyVersions(pkg.peerDependencies, packageName, newVersion))
     depsChanged = true;
   if (
-    updateDependencyVersions(
-      depPkg.optionalDependencies,
-      packageName,
-      newVersion,
-    )
+    updateDependencyVersions(pkg.optionalDependencies, packageName, newVersion)
   )
     depsChanged = true;
 
   if (!depsChanged) {
     return {
       path: depPkgPath,
-      pkg: depPkg,
+      pkg,
       depsChanged: false,
       versionBumped: false,
       oldVersion: undefined,
@@ -46,26 +55,25 @@ export const updateDependent = (
     };
   }
 
-  // Patch-bump the dependent's own version if not already bumped
-  if (depPkg.version && !depPkg.private) {
+  if (pkg.version && !pkg.private) {
     const gitVersion = getGitVersion();
-    if (gitVersion === depPkg.version) {
-      const oldVersion = depPkg.version;
-      depPkg.version = bumpVersion(oldVersion, "patch");
+    if (gitVersion === pkg.version) {
+      const oldVersion = pkg.version;
+      pkg.version = bumpVersion(oldVersion, "patch");
       return {
         path: depPkgPath,
-        pkg: depPkg,
+        pkg,
         depsChanged: true,
         versionBumped: true,
         oldVersion,
-        newVersion: depPkg.version,
+        newVersion: pkg.version,
       };
     }
   }
 
   return {
     path: depPkgPath,
-    pkg: depPkg,
+    pkg,
     depsChanged: true,
     versionBumped: false,
     oldVersion: undefined,

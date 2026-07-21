@@ -5,6 +5,18 @@ export default defineConfig({
     include: ["src/**/*.test.ts"],
     coverage: {
       thresholds: {
+        "src/evaluate.ts": {
+          statements: 90,
+          branches: 70,
+          functions: 100,
+          lines: 90,
+        },
+        "src/evaluation-config.ts": {
+          statements: 95,
+          branches: 90,
+          functions: 100,
+          lines: 97,
+        },
         "src/output-process.ts": {
           statements: 80,
           branches: 68,

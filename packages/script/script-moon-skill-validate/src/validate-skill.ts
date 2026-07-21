@@ -59,7 +59,7 @@ class Report {
   }
 }
 
-// splitLines matches Python's newline handling and omits a terminal empty line.
+// splitLines accepts every common newline and omits a terminal empty line.
 const splitLines = (text: string): string[] => {
   if (text.length === 0) return [];
   const parts = text.split(/\r\n|\r|\n/);
@@ -67,8 +67,8 @@ const splitLines = (text: string): string[] => {
   return parts;
 };
 
-// Python type(x).__name__ for the YAML scalar/collection types we surface.
-const pyTypeName = (value: unknown): string => {
+// yamlTypeName returns stable names for surfaced scalar and collection types.
+const yamlTypeName = (value: unknown): string => {
   if (value === null) return "NoneType";
   if (typeof value === "boolean") return "bool";
   if (typeof value === "number")
@@ -163,7 +163,9 @@ const checkName = (
   if (!name) {
     report.addFail("frontmatter: missing 'name'");
   } else if (typeof name !== "string") {
-    report.addFail(`frontmatter: name is ${pyTypeName(name)}, expected string`);
+    report.addFail(
+      `frontmatter: name is ${yamlTypeName(name)}, expected string`,
+    );
   } else if (name.length > 64) {
     report.addFail(
       `frontmatter: name '${name}' is ${String(name.length)} chars (>64 spec limit)`,
@@ -255,7 +257,7 @@ const checkDescription = (fm: Frontmatter, report: Report): void => {
     }
   } else {
     report.addFail(
-      `frontmatter: description is ${pyTypeName(desc)}, expected string`,
+      `frontmatter: description is ${yamlTypeName(desc)}, expected string`,
     );
   }
 
@@ -272,7 +274,7 @@ const checkCompatibility = (fm: Frontmatter, report: Report): void => {
   if (compat !== undefined && compat !== null) {
     if (typeof compat !== "string") {
       report.addFail(
-        `frontmatter: compatibility is ${pyTypeName(compat)}, expected string`,
+        `frontmatter: compatibility is ${yamlTypeName(compat)}, expected string`,
       );
     } else if (compat.length > 500) {
       report.addFail(
@@ -290,7 +292,7 @@ const checkLicense = (fm: Frontmatter, report: Report): void => {
   const lic = fm.license;
   if (lic !== undefined && lic !== null && typeof lic !== "string") {
     report.addWarn(
-      `frontmatter: license is ${pyTypeName(lic)}, expected string`,
+      `frontmatter: license is ${yamlTypeName(lic)}, expected string`,
     );
   }
 };
@@ -315,7 +317,7 @@ const checkAllowedTools = (fm: Frontmatter, report: Report): void => {
   if (allowed !== undefined && allowed !== null) {
     if (typeof allowed !== "string") {
       report.addWarn(
-        `frontmatter: allowed-tools is ${pyTypeName(allowed)}, ` +
+        `frontmatter: allowed-tools is ${yamlTypeName(allowed)}, ` +
           "expected a space-separated string",
       );
     } else if (!/^[\w():*,.\- ]+$/.test(allowed)) {
@@ -620,7 +622,7 @@ export const main = (argv: readonly string[]): number => {
     return 0;
   }
 
-  // Single positional target; ERGONOMIC ADDITION: default to cwd when omitted.
+  // main validates the current directory when no positional target is supplied.
   const positional = argv.find((a) => !a.startsWith("-"));
   const target = positional ?? process.cwd();
 

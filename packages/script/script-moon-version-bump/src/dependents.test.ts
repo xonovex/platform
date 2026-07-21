@@ -19,7 +19,8 @@ describe("updateDependent", () => {
     expect(result.versionBumped).toBe(true);
     expect(result.oldVersion).toBe("1.0.0");
     expect(result.newVersion).toBe("1.0.1");
-    expect(pkg.dependencies["@xonovex/core"]).toBe("1.1.0");
+    expect(result.pkg.dependencies?.["@xonovex/core"]).toBe("1.1.0");
+    expect(pkg.dependencies["@xonovex/core"]).toBe("1.0.0");
   });
 
   it("should skip version bump if already bumped (git version differs)", () => {
@@ -89,7 +90,10 @@ describe("updateDependent", () => {
     );
     expect(result.depsChanged).toBe(true);
     expect(result.versionBumped).toBe(true);
-    expect(pkg.devDependencies["@xonovex/eslint-config"]).toBe("1.1.0");
+    expect(result.pkg.devDependencies?.["@xonovex/eslint-config"]).toBe(
+      "1.1.0",
+    );
+    expect(pkg.devDependencies["@xonovex/eslint-config"]).toBe("1.0.0");
   });
 
   it("should update peerDependencies", () => {
@@ -124,8 +128,11 @@ describe("updateDependent", () => {
     );
     expect(result.depsChanged).toBe(true);
     expect(result.versionBumped).toBe(true);
+    expect(
+      result.pkg.optionalDependencies?.["@xonovex/agent-cli-go-linux-x64"],
+    ).toBe("1.1.0");
     expect(pkg.optionalDependencies["@xonovex/agent-cli-go-linux-x64"]).toBe(
-      "1.1.0",
+      "1.0.0",
     );
   });
 

@@ -7,10 +7,10 @@ tasks:
   ts-coverage:
     script: >-
       npx vitest run --coverage --coverage.include='src/**'
-      --coverage.thresholds.lines 45
-      --coverage.thresholds.functions 45
-      --coverage.thresholds.branches 35
-      --coverage.thresholds.statements 45
+      --coverage.thresholds.lines 85
+      --coverage.thresholds.functions 85
+      --coverage.thresholds.branches 75
+      --coverage.thresholds.statements 85
   ts-build:
     deps:
       - script-moon-common:build

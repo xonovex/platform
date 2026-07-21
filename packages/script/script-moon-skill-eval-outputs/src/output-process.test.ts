@@ -8,6 +8,7 @@ import {
 import {tmpdir} from "node:os";
 import {join} from "node:path";
 import {afterEach, beforeEach, describe, expect, it, vi} from "vitest";
+import {main} from "./evaluate.js";
 import {runJob, type RunContext} from "./output-process.js";
 import type {NormalizedEval} from "./validation.js";
 
@@ -28,7 +29,7 @@ describe("runJob", () => {
     const executable = join(temporaryDirectory, "claude");
     writeFileSync(
       executable,
-      `#!/usr/bin/env node
+      String.raw`#!/usr/bin/env node
 const args = process.argv.slice(2);
 const finalArgument = args.at(-1) ?? "";
 if (!args.includes("--json-schema") && finalArgument.includes("fail-generation")) {
@@ -36,11 +37,13 @@ if (!args.includes("--json-schema") && finalArgument.includes("fail-generation")
   process.exit(3);
 }
 if (args.includes("--json-schema")) {
-  console.log(JSON.stringify({structured_output: {assertion_results: [{passed: true, evidence: "response contains the answer"}]}}));
+  const passed = finalArgument.includes("ASSISTANT RESPONSE:\nthe answer");
+  console.log(JSON.stringify({structured_output: {assertion_results: [{passed, evidence: passed ? "response contains the answer" : "answer missing"}]}}));
 } else {
+  const result = finalArgument.startsWith("/test-skill ") ? "the answer" : "wrong";
   console.log(JSON.stringify({type: "system", subtype: "init", skills: ["test-skill"]}));
   console.log(JSON.stringify({message: {content: [{type: "tool_use", name: "Skill", input: {skill: "test-skill"}}]}}));
-  console.log(JSON.stringify({type: "result", result: "the answer", usage: {input_tokens: 3, output_tokens: 2}, duration_ms: 12}));
+  console.log(JSON.stringify({type: "result", result, usage: {input_tokens: 3, output_tokens: 2}, duration_ms: 12}));
 }
 `,
     );
@@ -119,5 +122,34 @@ if (args.includes("--json-schema")) {
         "utf8",
       ),
     ).toContain("not graded because generation evidence is invalid");
+  });
+
+  it("runs the complete evaluator and writes benchmark evidence", async () => {
+    const evaluationsFile = join(temporaryDirectory, "evals.json");
+    const workspace = join(temporaryDirectory, "workspace");
+    writeFileSync(evaluationsFile, JSON.stringify([evaluation("question")]));
+
+    const exitCode = await main([
+      "--workspace",
+      workspace,
+      evaluationsFile,
+      "test-skill",
+      "iteration-1",
+    ]);
+
+    expect(exitCode).toBe(0);
+    expect(
+      JSON.parse(
+        readFileSync(join(workspace, "iteration-1", "benchmark.json"), "utf8"),
+      ),
+    ).toMatchObject({
+      skill: "test-skill",
+      iteration: "iteration-1",
+      run_summary: {
+        with_skill: {pass_rate: {mean: 1}},
+        without_skill: {pass_rate: {mean: 0}},
+        delta: {pass_rate: 1},
+      },
+    });
   });
 });

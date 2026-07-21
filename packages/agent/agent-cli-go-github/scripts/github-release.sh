@@ -17,8 +17,7 @@ MODE="${3:-}"
 VERSION=$(node -p "require('$CLI_DIR/package.json').version")
 TAG="agent-cli-go-v${VERSION}"
 
-# Extract the section for THIS version (not just the top entry), so a missing changelog
-# entry publishes no notes rather than the previous version's. Fail loudly if absent.
+# Extract the exact release section and require it before publishing notes.
 CHANGELOG=$(awk -v ver="$VERSION" '
   $1 == "##" && $2 == ver {p = 1}
   p && $1 == "##" && $2 != ver {exit}

@@ -1,6 +1,6 @@
 # moon-skill-eval-triggers
 
-TRIGGER eval (ported from `eval-triggers.py`): runs the queries in an `eval-queries.json` and reports whether the target **Skill fires** for each, killing the `claude` run on first match so non-triggering runs stay cheap.
+TRIGGER eval runs the queries in an `eval-queries.json` and reports whether the target **Skill fires** for each, killing the `claude` run on first match so non-triggering runs stay cheap.
 
 ## Usage
 

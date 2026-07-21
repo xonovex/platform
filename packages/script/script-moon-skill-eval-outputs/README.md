@@ -1,6 +1,6 @@
 # moon-skill-eval-outputs
 
-OUTPUT eval (ported from `eval-outputs.py`): runs each eval twice — vanilla vs skill-augmented — in isolated `claude -p` contexts, grades both with a binary reference-guided LLM-as-judge, and writes a `benchmark.json` with pass-rate / token / duration deltas.
+OUTPUT eval runs each eval twice — vanilla vs skill-augmented — in isolated `claude -p` contexts, grades both with a binary reference-guided LLM-as-judge, and writes a `benchmark.json` with pass-rate / token / duration deltas.
 
 ## Usage
 
