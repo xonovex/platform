@@ -9,6 +9,7 @@ import (
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
 	networkingv1 "k8s.io/api/networking/v1"
+	"k8s.io/apimachinery/pkg/api/equality"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -79,7 +80,7 @@ func (r *AgentRunReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 
 type resolvedRunExecution struct {
 	agentType   agentv1alpha1.AgentType
-	providerEnv map[string]string
+	providerEnv []corev1.EnvVar
 	toolchain   *agentv1alpha1.ToolchainSpec
 	defaults    resolver.ResolvedDefaults
 	image       string
@@ -149,6 +150,13 @@ func (r *AgentRunReconciler) reconcileExecutionResources(
 			if !errors.IsAlreadyExists(err) {
 				return ctrl.Result{}, fmt.Errorf("create network policy: %w", err)
 			}
+			var existing networkingv1.NetworkPolicy
+			if err := r.Get(ctx, client.ObjectKeyFromObject(resource), &existing); err != nil {
+				return ctrl.Result{}, fmt.Errorf("get existing network policy: %w", err)
+			}
+			if err := verifyControlledResource(run, &existing, resource.Spec, existing.Spec); err != nil {
+				return ctrl.Result{}, fmt.Errorf("existing NetworkPolicy %q: %w", resource.Name, err)
+			}
 		} else {
 			r.Recorder.Eventf(run, nil, corev1.EventTypeNormal, "NetworkPolicyCreated", "NetworkPolicyCreated",
 				"Created NetworkPolicy %s", resource.Name)
@@ -183,6 +191,13 @@ func (r *AgentRunReconciler) reconcileExecutionResources(
 			if !errors.IsAlreadyExists(err) {
 				return ctrl.Result{}, fmt.Errorf("create agent Job: %w", err)
 			}
+			var existing batchv1.Job
+			if err := r.Get(ctx, client.ObjectKeyFromObject(job), &existing); err != nil {
+				return ctrl.Result{}, fmt.Errorf("get existing agent Job: %w", err)
+			}
+			if err := verifyControlledResource(run, &existing, job.Spec, existing.Spec); err != nil {
+				return ctrl.Result{}, fmt.Errorf("existing Job %q: %w", job.Name, err)
+			}
 		} else {
 			logger.Info("created Job", "jobName", jobName, "agentType", execution.agentType,
 				"runtimeClass", ptrOrEmpty(run.Spec.RuntimeClassName))
@@ -205,6 +220,16 @@ func (r *AgentRunReconciler) reconcileExecutionResources(
 		return ctrl.Result{}, err
 	}
 	return r.reconcileJobStatus(ctx, run, &job)
+}
+
+func verifyControlledResource(run *agentv1alpha1.AgentRun, existing client.Object, desiredSpec, existingSpec any) error {
+	if !metav1.IsControlledBy(existing, run) {
+		return fmt.Errorf("resource is not controlled by AgentRun UID %q", run.UID)
+	}
+	if !equality.Semantic.DeepDerivative(desiredSpec, existingSpec) {
+		return fmt.Errorf("resource specification differs from the admitted execution")
+	}
+	return nil
 }
 
 func (r *AgentRunReconciler) reconcileStandalone(ctx context.Context, agentRun *agentv1alpha1.AgentRun) (ctrl.Result, error) {

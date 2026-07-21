@@ -13,6 +13,8 @@ import (
 	sharednix "github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/provision/nix"
 )
 
+const testRevision = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+
 func installFakeNix(t *testing.T, body string) {
 	t.Helper()
 
@@ -38,7 +40,7 @@ func TestContribute_BindsRequisitesNotWholeStore(t *testing.T) {
 		root:    func(sharednix.NixSource, sharednix.ClosureDescriptor) error { rooted = true; return nil },
 	}
 
-	in := provshared.Input{NixSource: sharednix.NixSource{Kind: sharednix.NixSourcePackages, Rev: "abc123", Packages: []string{"hello"}}}
+	in := provshared.Input{NixSource: sharednix.NixSource{Kind: sharednix.NixSourcePackages, Rev: testRevision, Packages: []string{"hello"}}}
 	c, err := p.Contribute(in)
 	if err != nil {
 		t.Fatalf("Contribute err = %v", err)
@@ -75,7 +77,7 @@ func TestContribute_FailsClosedOnInvalidSource(t *testing.T) {
 		root: func(sharednix.NixSource, sharednix.ClosureDescriptor) error { return nil },
 	}
 	// packages source with no packages fails ValidateSource before resolving.
-	in := provshared.Input{NixSource: sharednix.NixSource{Kind: sharednix.NixSourcePackages, Rev: "abc"}}
+	in := provshared.Input{NixSource: sharednix.NixSource{Kind: sharednix.NixSourcePackages, Rev: testRevision}}
 	if _, err := p.Contribute(in); err == nil {
 		t.Error("Contribute(no packages) = nil, want validation error")
 	}
@@ -85,7 +87,7 @@ func TestContribute_FailsClosedOnInvalidSource(t *testing.T) {
 }
 
 func TestContribute_ReportsResolutionAndRootFailures(t *testing.T) {
-	source := sharednix.NixSource{Kind: sharednix.NixSourcePackages, Rev: "abc", Packages: []string{"hello"}}
+	source := sharednix.NixSource{Kind: sharednix.NixSourcePackages, Rev: testRevision, Packages: []string{"hello"}}
 	tests := []struct {
 		name    string
 		resolve resolveFunc
@@ -130,8 +132,8 @@ func TestPinned(t *testing.T) {
 }
 
 func TestSourceFromFlags(t *testing.T) {
-	pkgs, err := SourceFromFlags("packages", "abc", []string{"ripgrep"}, "", "", "", "")
-	if err != nil || pkgs.Kind != sharednix.NixSourcePackages || pkgs.Rev != "abc" {
+	pkgs, err := SourceFromFlags("packages", testRevision, []string{"ripgrep"}, "", "", "", "")
+	if err != nil || pkgs.Kind != sharednix.NixSourcePackages || pkgs.Rev != testRevision {
 		t.Fatalf("packages source = %+v, err = %v", pkgs, err)
 	}
 
@@ -152,10 +154,13 @@ func TestSourceFromFlags(t *testing.T) {
 	if _, err := SourceFromFlags("bogus", "", nil, "", "", "", ""); err == nil {
 		t.Error("SourceFromFlags(bogus) = nil, want error")
 	}
+	if _, err := SourceFromFlags("packages", "nixos-unstable", []string{"ripgrep"}, "", "", "", ""); err == nil {
+		t.Error("SourceFromFlags(mutable revision) = nil, want immutable revision error")
+	}
 }
 
 func TestGCRootDir_KeyedByEnvID(t *testing.T) {
-	src := sharednix.NixSource{Kind: sharednix.NixSourcePackages, Rev: "abc", Packages: []string{"hello"}}
+	src := sharednix.NixSource{Kind: sharednix.NixSourcePackages, Rev: testRevision, Packages: []string{"hello"}}
 	want := filepath.Join(agentNixDir(), "gcroots", sharednix.ComputeEnvID(src))
 	if got := gcRootDir(src); got != want {
 		t.Errorf("gcRootDir = %q, want %q", got, want)
@@ -172,7 +177,7 @@ func TestResolveClosure_ValidatesKindsAndRequiredInputs(t *testing.T) {
 	if _, err := ResolveClosure(sharednix.NixSource{Kind: "unknown"}); err == nil {
 		t.Error("ResolveClosure(unknown) error = nil")
 	}
-	if _, err := resolvePackages(sharednix.NixSource{Kind: sharednix.NixSourcePackages, Rev: "abc"}); err == nil {
+	if _, err := resolvePackages(sharednix.NixSource{Kind: sharednix.NixSourcePackages, Rev: testRevision}); err == nil {
 		t.Error("resolvePackages(no packages) error = nil")
 	}
 	if _, err := resolveFlake(sharednix.NixSource{Kind: sharednix.NixSourceProjectFlake}); err == nil {
@@ -193,7 +198,7 @@ esac`)
 
 	packages, err := ResolveClosure(sharednix.NixSource{
 		Kind:     sharednix.NixSourcePackages,
-		Rev:      "abc",
+		Rev:      testRevision,
 		Packages: []string{"ripgrep"},
 	})
 	if err != nil {
@@ -256,7 +261,7 @@ func TestRunCmd(t *testing.T) {
 }
 
 func TestRegisterGCRoot_RequiresStorePaths(t *testing.T) {
-	source := sharednix.NixSource{Kind: sharednix.NixSourcePackages, Rev: "abc", Packages: []string{"hello"}}
+	source := sharednix.NixSource{Kind: sharednix.NixSourcePackages, Rev: testRevision, Packages: []string{"hello"}}
 	if err := registerGCRoot(source, sharednix.ClosureDescriptor{}); err == nil {
 		t.Error("registerGCRoot(empty closure) error = nil")
 	}

@@ -145,4 +145,36 @@ describe("main", () => {
     const report = JSON.parse(String(log.mock.calls[0]?.[0])) as unknown[];
     expect(report).toHaveLength(2);
   });
+
+  it("reports a failed explicit upstream pull", async () => {
+    const skill = skillDirectory(
+      "pull-failure-skill",
+      `# Sources
+
+## Primary source
+- **Provenance:** Repository-original guidance
+- **References:** all
+- **Checkout:** upstream
+- **Last reviewed:** 2099-01-01
+`,
+    );
+    const checkout = join(skill, "upstream");
+    mkdirSync(checkout);
+    execFileSync("git", ["init", "--quiet"], {cwd: checkout});
+    execFileSync(
+      "git",
+      ["remote", "add", "origin", "file:///definitely/missing-upstream"],
+      {cwd: checkout},
+    );
+    const log = vi.spyOn(console, "log").mockImplementation(vi.fn());
+
+    const result = await main([skill, "--pull", "--json"]);
+
+    expect(result).toBe(1);
+    expect(JSON.parse(String(log.mock.calls[0]?.[0]))).toMatchObject({
+      problems: 1,
+      sources: [{drift: {pull_failed: true}}],
+    });
+  });
 });
+import {execFileSync} from "node:child_process";

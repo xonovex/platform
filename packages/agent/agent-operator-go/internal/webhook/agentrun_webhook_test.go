@@ -15,6 +15,8 @@ import (
 	"github.com/xonovex/platform/packages/agent/agent-operator-go/test/testutil"
 )
 
+const testNixRevision = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+
 func TestAgentRunWebhook_Default_SetsTimeout(t *testing.T) {
 	w := &AgentRunWebhook{}
 	run := &agentv1alpha1.AgentRun{
@@ -51,9 +53,13 @@ func TestAgentRunWebhook_Default_PreservesExistingValues(t *testing.T) {
 	}
 }
 
-func sandboxedAgentRunWebhook() *AgentRunWebhook {
+func sandboxedAgentRunWebhook(namespaces ...string) *AgentRunWebhook {
+	namespace := ""
+	if len(namespaces) > 0 {
+		namespace = namespaces[0]
+	}
 	policy := &agentv1alpha1.AgentPolicy{
-		ObjectMeta: metav1.ObjectMeta{Name: "sandbox-runtime-policy"},
+		ObjectMeta: metav1.ObjectMeta{Name: "sandbox-runtime-policy", Namespace: namespace},
 		Spec: agentv1alpha1.AgentPolicySpec{Enforced: agentv1alpha1.AgentPolicyEnforced{
 			AllowedRuntimeClassNames: []string{"kata"},
 		}},
@@ -62,7 +68,7 @@ func sandboxedAgentRunWebhook() *AgentRunWebhook {
 }
 
 func TestAgentRunWebhook_Validate_ValidStandalone(t *testing.T) {
-	w := &AgentRunWebhook{}
+	w := sandboxedAgentRunWebhook()
 	runtimeClassName := "kata"
 	run := &agentv1alpha1.AgentRun{
 		Spec: agentv1alpha1.AgentRunSpec{
@@ -112,7 +118,7 @@ func TestAgentRunWebhook_Validate_RequiresPinnedImageAndSandboxRuntime(t *testin
 			run := baseRun()
 			test.mutate(run)
 
-			_, err := (&AgentRunWebhook{}).ValidateCreate(context.Background(), run)
+			_, err := sandboxedAgentRunWebhook(run.Namespace).ValidateCreate(context.Background(), run)
 			if err == nil || !strings.Contains(err.Error(), test.wantPhrase) {
 				t.Fatalf("ValidateCreate() error = %v, want phrase %q", err, test.wantPhrase)
 			}
@@ -139,6 +145,40 @@ func TestAgentRunWebhook_Default_AppliesInlineHarnessExecutionDefaults(t *testin
 	}
 }
 
+func TestAgentRunWebhook_Default_SnapshotsReferencedToolchain(t *testing.T) {
+	toolchain := &agentv1alpha1.AgentToolchain{
+		ObjectMeta: metav1.ObjectMeta{Name: "pinned", Namespace: "test"},
+		Spec: agentv1alpha1.ToolchainSpec{
+			Type: agentv1alpha1.ToolchainTypeNix,
+			Nix: &agentv1alpha1.NixSpec{
+				NixpkgsRev: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+				Packages:   []string{"ripgrep"},
+				Image:      "ghcr.io/xonovex/agent@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+			},
+		},
+	}
+	w := &AgentRunWebhook{Client: fake.NewClientBuilder().WithScheme(testutil.NewScheme()).WithObjects(toolchain).Build()}
+	run := &agentv1alpha1.AgentRun{
+		ObjectMeta: metav1.ObjectMeta{Namespace: "test"},
+		Spec:       agentv1alpha1.AgentRunSpec{ToolchainRef: toolchain.Name},
+	}
+
+	err := w.Default(context.Background(), run)
+
+	if err != nil {
+		t.Fatalf("Default() error = %v", err)
+	}
+	if run.Spec.ToolchainRef != "" {
+		t.Errorf("ToolchainRef = %q, want empty after snapshot", run.Spec.ToolchainRef)
+	}
+	if run.Spec.Toolchain == nil || run.Spec.Toolchain.Nix == nil {
+		t.Fatal("Toolchain snapshot is nil")
+	}
+	if run.Spec.Toolchain.Nix.Image != toolchain.Spec.Nix.Image {
+		t.Errorf("Toolchain image = %q, want %q", run.Spec.Toolchain.Nix.Image, toolchain.Spec.Nix.Image)
+	}
+}
+
 func runWithNix(nix *agentv1alpha1.NixSpec) *agentv1alpha1.AgentRun {
 	runtimeClassName := "kata"
 	return &agentv1alpha1.AgentRun{
@@ -159,14 +199,15 @@ func TestAgentRunWebhook_Validate_NixSpec(t *testing.T) {
 		nix     *agentv1alpha1.NixSpec
 		wantErr bool
 	}{
-		{"valid packages", &agentv1alpha1.NixSpec{NixpkgsRev: "abc", Packages: []string{"ripgrep"}, Image: "ghcr.io/x/agent@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}, false},
-		{"valid flake", &agentv1alpha1.NixSpec{NixpkgsRev: "abc", FlakeRef: "/repo", Image: "ghcr.io/x/agent@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}, false},
+		{"valid packages", &agentv1alpha1.NixSpec{NixpkgsRev: testNixRevision, Packages: []string{"ripgrep"}, Image: "ghcr.io/x/agent@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}, false},
+		{"valid flake", &agentv1alpha1.NixSpec{NixpkgsRev: testNixRevision, FlakeRef: "/repo", Image: "ghcr.io/x/agent@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}, false},
 		{"missing rev", &agentv1alpha1.NixSpec{Packages: []string{"ripgrep"}, Image: "ghcr.io/x/agent@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}, true},
-		{"packages and flake", &agentv1alpha1.NixSpec{NixpkgsRev: "abc", Packages: []string{"ripgrep"}, FlakeRef: "/repo", Image: "ghcr.io/x/agent@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}, true},
-		{"no source", &agentv1alpha1.NixSpec{NixpkgsRev: "abc", Image: "ghcr.io/x/agent@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}, true},
-		{"missing image", &agentv1alpha1.NixSpec{NixpkgsRev: "abc", Packages: []string{"ripgrep"}}, true},
-		{"moving image tag", &agentv1alpha1.NixSpec{NixpkgsRev: "abc", Packages: []string{"ripgrep"}, Image: "ghcr.io/x/agent:latest"}, true},
-		{"malformed digest", &agentv1alpha1.NixSpec{NixpkgsRev: "abc", Packages: []string{"ripgrep"}, Image: "ghcr.io/x/agent@sha256:not-a-digest"}, true},
+		{"mutable rev", &agentv1alpha1.NixSpec{NixpkgsRev: "nixos-unstable", Packages: []string{"ripgrep"}, Image: "ghcr.io/x/agent@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}, true},
+		{"packages and flake", &agentv1alpha1.NixSpec{NixpkgsRev: testNixRevision, Packages: []string{"ripgrep"}, FlakeRef: "/repo", Image: "ghcr.io/x/agent@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}, true},
+		{"no source", &agentv1alpha1.NixSpec{NixpkgsRev: testNixRevision, Image: "ghcr.io/x/agent@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}, true},
+		{"missing image", &agentv1alpha1.NixSpec{NixpkgsRev: testNixRevision, Packages: []string{"ripgrep"}}, true},
+		{"moving image tag", &agentv1alpha1.NixSpec{NixpkgsRev: testNixRevision, Packages: []string{"ripgrep"}, Image: "ghcr.io/x/agent:latest"}, true},
+		{"malformed digest", &agentv1alpha1.NixSpec{NixpkgsRev: testNixRevision, Packages: []string{"ripgrep"}, Image: "ghcr.io/x/agent@sha256:not-a-digest"}, true},
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {

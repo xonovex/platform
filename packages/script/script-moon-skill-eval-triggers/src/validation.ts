@@ -7,6 +7,10 @@ const QuerySchema = z.object({
   split: z.enum(["train", "validation"]).optional(),
 });
 
+const QueryListSchema = z
+  .array(QuerySchema)
+  .min(1, "must contain at least one query");
+
 const FiniteNumberTextSchema = z
   .string()
   .refine(
@@ -59,10 +63,23 @@ const errorText = (error: z.ZodError): string =>
 export const parseQueries = (
   input: unknown,
 ): ValidationResult<readonly z.infer<typeof QuerySchema>[]> => {
-  const result = z.array(QuerySchema).safeParse(input);
+  const result = QueryListSchema.safeParse(input);
   return result.success
     ? {success: true, data: result.data}
     : {success: false, error: errorText(result.error)};
+};
+
+export const selectQueries = (
+  queries: readonly z.infer<typeof QuerySchema>[],
+  split: "train" | "validation" | "all",
+): ValidationResult<readonly z.infer<typeof QuerySchema>[]> => {
+  const selected =
+    split === "all"
+      ? queries
+      : queries.filter((query) => query.split === split);
+  return selected.length > 0
+    ? {success: true, data: selected}
+    : {success: false, error: `split '${split}' has no queries`};
 };
 
 export const parseTriggerOptions = (

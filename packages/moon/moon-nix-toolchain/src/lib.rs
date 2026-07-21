@@ -253,27 +253,38 @@ fn resolve_shell(
 /// Whether the flake at `root` exposes a devShell named `shell` for the current
 /// system. Evaluates `<root>#devShells` only (attribute names, never building the
 /// shell) and never writes a lock file, so it does not mutate the project. `nix` is
-/// guaranteed present past the wrap guards; a probe failure (eval error, no
-/// `devShells` output, missing system) reports `false` so the wrap degrades to the
-/// flake's `default` rather than emitting a `#<shell>` that `nix develop` rejects.
-fn flake_exposes_shell(root: &str, shell: &str) -> bool {
+/// guaranteed present past the wrap guards. A valid `false` result selects the
+/// default shell; command and evaluation failures stop wrapping.
+fn flake_exposes_shell(root: &str, shell: &str) -> AnyResult<bool> {
     let escaped = escape_nix_string(shell);
     let reference = format!("{root}#devShells");
     let apply =
         format!("sets: builtins.hasAttr \"{escaped}\" (sets.${{builtins.currentSystem}} or {{}})");
-    exec_captured(
+    let result = exec_captured(
         "nix",
         [
             "eval",
             "--impure",
-            "--no-write-lock-file",
+            "--no-update-lock-file",
             "--json",
             reference.as_str(),
             "--apply",
             apply.as_str(),
         ],
-    )
-    .is_ok_and(|result| result.exit_code == 0 && result.stdout.trim() == "true")
+    )?;
+    if result.exit_code != 0 {
+        return Err(anyhow!(
+            "failed to inspect devShell {shell:?} in {root:?}: nix eval exited {}",
+            result.exit_code
+        ));
+    }
+    match result.stdout.trim() {
+        "true" => Ok(true),
+        "false" => Ok(false),
+        output => Err(anyhow!(
+            "failed to inspect devShell {shell:?} in {root:?}: unexpected nix eval output {output:?}"
+        )),
+    }
 }
 
 /// The devShell selector actually used to wrap a task. A project-flake selector the
@@ -281,12 +292,17 @@ fn flake_exposes_shell(root: &str, shell: &str) -> bool {
 /// configured `#<shell>` can never hard-fail `nix develop`. Workspace-flake selectors
 /// and the no-selector case are returned unchanged — the existence probe runs only
 /// for a project flake with a resolved name.
-fn effective_shell(target: &FlakeTarget, shell: Option<String>) -> Option<String> {
-    let named_shell_available = shell
-        .as_deref()
-        .is_none_or(|name| !target.is_project_flake || flake_exposes_shell(&target.root, name));
+fn effective_shell(target: &FlakeTarget, shell: Option<String>) -> AnyResult<Option<String>> {
+    let named_shell_available = match shell.as_deref() {
+        Some(name) if target.is_project_flake => flake_exposes_shell(&target.root, name)?,
+        _ => true,
+    };
 
-    resolve_effective_shell(target, shell, named_shell_available)
+    Ok(resolve_effective_shell(
+        target,
+        shell,
+        named_shell_available,
+    ))
 }
 
 /// Read a flake's `flake.lock` over the host so its pinned inputs fold into the
@@ -300,6 +316,51 @@ fn flake_lock_contents(root: &str) -> String {
         .filter(|result| result.exit_code == 0)
         .map(|result| result.stdout)
         .unwrap_or_default()
+}
+
+fn host_file_contents(path: &str) -> Option<String> {
+    exec_captured("cat", [path])
+        .ok()
+        .filter(|result| result.exit_code == 0)
+        .map(|result| result.stdout)
+}
+
+/// Read the flake entry point and its conventional `nix/**/*.nix` modules so
+/// edits to toolchain definitions invalidate Moon's task cache.
+fn flake_source_contents(root: &str) -> Vec<serde_json::Value> {
+    let mut paths = vec![format!("{root}/flake.nix")];
+    let nix_root = format!("{root}/nix");
+    if let Ok(result) = exec_captured(
+        "find",
+        [nix_root.as_str(), "-type", "f", "-name", "*.nix", "-print"],
+    ) {
+        if result.exit_code == 0 {
+            paths.extend(
+                result
+                    .stdout
+                    .lines()
+                    .filter(|path| !path.is_empty())
+                    .map(str::to_owned),
+            );
+        }
+    }
+    paths.sort();
+    paths.dedup();
+
+    paths
+        .into_iter()
+        .filter_map(|path| {
+            let contents = host_file_contents(&path)?;
+            let relative_path = path
+                .strip_prefix(root)
+                .unwrap_or(&path)
+                .trim_start_matches('/');
+            Some(serde_json::json!({
+                "path": relative_path,
+                "contents": contents,
+            }))
+        })
+        .collect()
 }
 
 fn command_output(decision: WrapDecision) -> ExtendTaskCommandOutput {
@@ -348,7 +409,7 @@ pub fn extend_task_command(
                     input.project.id.as_str(),
                     &config,
                 )?,
-            );
+            )?;
             plan_command(Some(&target), shell.as_deref(), input.command, input.args)
         }
         None => WrapDecision::Unchanged,
@@ -380,7 +441,7 @@ pub fn extend_task_script(
                     input.project.id.as_str(),
                     &config,
                 )?,
-            );
+            )?;
             plan_script(Some(&target), shell.as_deref(), &input.script)
         }
         None => WrapDecision::Unchanged,
@@ -416,6 +477,7 @@ pub fn hash_task_contents(
             "flakeRoot": target.root,
             "shell": shell,
             "flakeLock": flake_lock_contents(&target.root),
+            "flakeSources": flake_source_contents(&target.root),
         }));
     }
 
@@ -445,7 +507,13 @@ pub fn setup_environment(
         output.commands.push(
             ExecCommand::new(ExecCommandInput::new(
                 "nix",
-                ["develop", reference.as_str(), "--command", "true"],
+                [
+                    "develop",
+                    "--no-update-lock-file",
+                    reference.as_str(),
+                    "--command",
+                    "true",
+                ],
             ))
             .allow_failure()
             .label(format!("Pre-building nix devShell {reference}")),

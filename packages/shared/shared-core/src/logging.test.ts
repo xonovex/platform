@@ -97,7 +97,11 @@ describe("Logging", () => {
         "debug message",
       );
 
-      process.env.DEBUG = originalDebug;
+      if (originalDebug === undefined) {
+        delete process.env.DEBUG;
+      } else {
+        process.env.DEBUG = originalDebug;
+      }
     });
 
     it("should not log when DEBUG env var is not set", async () => {
@@ -110,7 +114,11 @@ describe("Logging", () => {
 
       expect(consoleErrorSpy).not.toHaveBeenCalled();
 
-      process.env.DEBUG = originalDebug;
+      if (originalDebug === undefined) {
+        delete process.env.DEBUG;
+      } else {
+        process.env.DEBUG = originalDebug;
+      }
     });
   });
 

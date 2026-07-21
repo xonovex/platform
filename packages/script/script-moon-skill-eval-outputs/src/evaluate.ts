@@ -27,6 +27,7 @@ import {
   outputModelCallCount,
   parseOutputOptions,
   runFailFastPool,
+  validateUniqueEvaluationIds,
   type EvaluationArm,
   type NormalizedEval,
 } from "./validation.js";
@@ -94,7 +95,12 @@ const loadEvaluations = (
     process.stderr.write("Error: no gradable evals\n");
     return undefined;
   }
-  return evaluations;
+  const uniqueResult = validateUniqueEvaluationIds(evaluations);
+  if (!uniqueResult.success) {
+    process.stderr.write(`Error: ${uniqueResult.error}\n`);
+    return undefined;
+  }
+  return uniqueResult.data;
 };
 
 const nextIteration = (base: string): string => {

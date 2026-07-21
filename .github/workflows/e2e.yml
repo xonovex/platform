@@ -57,10 +57,10 @@ jobs:
       - uses: ./.github/actions/setup-nix
 
       - name: Install repository dependencies
-        run: nix develop --command npm ci
+        run: nix develop --no-update-lock-file --command npm ci
 
       - name: Run suite
-        run: nix develop --command npx moon run "$MOON_TARGET" 2>&1 | tee "$RUNNER_TEMP/suite.log"
+        run: nix develop --no-update-lock-file --command npx moon run "$MOON_TARGET" 2>&1 | tee "$RUNNER_TEMP/suite.log"
         env:
           MOON_TARGET: ${{ matrix.target }}
           SUITE: ${{ matrix.suite }}
@@ -71,7 +71,7 @@ jobs:
         if: always()
         run: |
           if [ -x node_modules/.bin/moon ]; then
-            nix develop --command npx moon run agent-operator-go:ci-e2e-summary -- \
+            nix develop --no-update-lock-file --command npx moon run agent-operator-go:ci-e2e-summary -- \
               "$SUITE" "$RUNNER_TEMP/suite.log" "$GITHUB_STEP_SUMMARY"
           else
             printf '### %s\n\nNo test log produced (repository dependencies failed to install).\n' "$SUITE" >> "$GITHUB_STEP_SUMMARY"

@@ -5,11 +5,10 @@ import {
   logError,
   logInfo,
   logSuccess,
-  logWarning,
   parseCliArgs,
   readPkg,
 } from "@xonovex/script-moon-common";
-import {validatePackage} from "./validate.js";
+import {validateDeclaredFiles, validatePackage} from "./validate.js";
 
 parseCliArgs({
   name: "moon-npm-check",
@@ -31,17 +30,12 @@ if (pkg.private) {
   process.exit(0);
 }
 
-const errors = validatePackage(pkg);
-
-if (pkg.files && Array.isArray(pkg.files)) {
-  for (const file of pkg.files) {
-    if (!existsSync(join(process.cwd(), file))) {
-      logWarning(
-        `  Warning: file "${file}" does not exist yet (may be created during build)`,
-      );
-    }
-  }
-}
+const errors = [
+  ...validatePackage(pkg),
+  ...validateDeclaredFiles(pkg, (file) =>
+    existsSync(join(process.cwd(), file)),
+  ),
+];
 
 if (errors.length > 0) {
   logError(`\n${pkg.name ?? packageJsonPath} is not ready for publishing:\n`);

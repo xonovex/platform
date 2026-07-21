@@ -11,6 +11,7 @@ import {
   parseOutputOptions,
   runFailFastPool,
   streamTextDeltaLength,
+  validateUniqueEvaluationIds,
 } from "./validation.js";
 
 describe("generation prompt isolation", () => {
@@ -193,6 +194,30 @@ describe("output eval validation", () => {
     expect(evalEntries([{}])).toEqual({success: true, data: [{}]});
     expect(evalEntries({evals: [{}]})).toEqual({success: true, data: [{}]});
     expect(evalEntries({evals: "wrong"}).success).toBe(false);
+  });
+
+  it("rejects evaluation IDs that resolve to the same output directory", () => {
+    const evaluations = [
+      {
+        id: 1,
+        prompt: "First",
+        expected_output: "",
+        assertions: ["First assertion"],
+        files: [],
+      },
+      {
+        id: "1",
+        prompt: "Second",
+        expected_output: "",
+        assertions: ["Second assertion"],
+        files: [],
+      },
+    ];
+
+    expect(validateUniqueEvaluationIds(evaluations)).toEqual({
+      success: false,
+      error: "duplicate eval id: 1",
+    });
   });
 });
 

@@ -68,17 +68,8 @@ func argHasPair(args []string, a, b string) bool {
 	return false
 }
 
-// setenvValue returns the value of a --setenv KEY, or "" if absent.
-func setenvValue(args []string, key string) string {
-	for i := 0; i+2 < len(args); i++ {
-		if args[i] == "--setenv" && args[i+1] == key {
-			return args[i+2]
-		}
-	}
-	return ""
-}
-
 func TestBwrap_DenyDefaultHardening(t *testing.T) {
+	t.Setenv("BWRAP_UNRELATED_HOST_VALUE", "must-not-enter-sandbox")
 	work := t.TempDir()
 	args := bwrapCommand(t, claudeCfg(netshared.ModeNone, false, work), provision.Contribution{})
 
@@ -88,8 +79,8 @@ func TestBwrap_DenyDefaultHardening(t *testing.T) {
 	if argHas(args, "--dev-bind") {
 		t.Error("must not use --dev-bind (exposes /dev/sda, /dev/mem)")
 	}
-	if !argHas(args, "--clearenv") {
-		t.Error("missing --clearenv")
+	if !argHasPair(args, "--unsetenv", "BWRAP_UNRELATED_HOST_VALUE") {
+		t.Error("unrelated host environment variable must be explicitly unset")
 	}
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
@@ -133,14 +124,18 @@ func TestBwrap_AppliesContribution(t *testing.T) {
 		InitCommands: []string{"echo hi"},
 	}
 	args := bwrapCommand(t, claudeCfg(netshared.ModeNone, false, work), c)
+	env, err := NewIsolator().sandboxEnv(claudeCfg(netshared.ModeNone, false, work), c, work)
+	if err != nil {
+		t.Fatalf("sandboxEnv() error = %v", err)
+	}
 
 	if !argHasTriple(args, "--ro-bind", closure, closure) {
 		t.Error("contribution RoBindPaths must be ro-bound")
 	}
-	if path := setenvValue(args, "PATH"); !strings.HasPrefix(path, "/nix/store/abc/bin:") {
+	if path := env["PATH"]; !strings.HasPrefix(path, "/nix/store/abc/bin:") {
 		t.Errorf("PATH = %q, want contribution entry prepended", path)
 	}
-	if setenvValue(args, "FOO") != "bar" {
+	if env["FOO"] != "bar" {
 		t.Error("contribution env not applied")
 	}
 	// Init command wraps the agent: the trailing command is sh -c '... echo hi ...'.
@@ -173,6 +168,22 @@ func TestBwrap_CommandRejectsMissingBindAndProviderToken(t *testing.T) {
 	cfg.Provider = &types.ModelProvider{AuthTokenEnv: "MISSING_BWRAP_TEST_TOKEN"}
 	if _, err := NewIsolator().Command(cfg, provision.Contribution{}); err == nil {
 		t.Error("Command() error = nil, want missing provider token error")
+	}
+}
+
+func TestBwrap_CommandKeepsProviderSecretOutOfArguments(t *testing.T) {
+	const secret = "bwrap-secret-must-not-appear"
+	t.Setenv("BWRAP_TEST_TOKEN", secret)
+	cfg := claudeCfg(netshared.ModeNone, false, t.TempDir())
+	cfg.Provider = &types.ModelProvider{
+		AuthTokenEnv: "BWRAP_TEST_TOKEN",
+		Environment:  map[string]string{"ANTHROPIC_BASE_URL": "http://proxy.example"},
+	}
+
+	command := bwrapCommand(t, cfg, provision.Contribution{})
+
+	if strings.Contains(strings.Join(command, " "), secret) {
+		t.Fatal("bubblewrap command arguments contain the provider secret")
 	}
 }
 

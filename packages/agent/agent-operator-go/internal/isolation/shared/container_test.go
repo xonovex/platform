@@ -139,9 +139,9 @@ func TestBuildMainContainers_Opencode(t *testing.T) {
 }
 
 func TestBuildMainContainers_WithProviderEnv(t *testing.T) {
-	providerEnv := map[string]string{
-		"ANTHROPIC_BASE_URL": "http://proxy:8080",
-		"API_TIMEOUT_MS":     "60000",
+	providerEnv := []corev1.EnvVar{
+		{Name: "ANTHROPIC_BASE_URL", Value: "http://proxy:8080"},
+		{Name: "API_TIMEOUT_MS", Value: "60000"},
 	}
 	containers := mustBuildMainContainers(t, workspaceRun(), providerEnv, "image", agentv1alpha1.AgentTypeClaude, nil)
 

@@ -8,6 +8,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"runtime"
+	"sort"
 	"strings"
 
 	isoshared "github.com/xonovex/platform/packages/cli/agent-cli-go/internal/isolation/shared"
@@ -81,7 +82,11 @@ func (i *Isolator) Run(cfg isoshared.RunConfig, c provision.Contribution) (int, 
 	if err != nil {
 		return 1, err
 	}
-	return isoshared.SpawnSandbox("docker", args, os.Environ(), "Docker sandbox", cfg.Verbose)
+	env, err := i.processEnv(cfg, c)
+	if err != nil {
+		return 1, err
+	}
+	return isoshared.SpawnSandbox("docker", args, env, "Docker sandbox", cfg.Verbose)
 }
 
 // Command returns the full docker command (for display / terminal wrappers).
@@ -93,12 +98,14 @@ func (i *Isolator) Command(cfg isoshared.RunConfig, c provision.Contribution) ([
 	return append([]string{"docker"}, args...), nil
 }
 
-// TerminalCommand returns the docker command plus the host env to launch it; the
-// container environment is baked into the command via -e, so the wrapper needs
-// only the host env.
+// TerminalCommand returns the docker command plus the environment used to launch it.
 func (i *Isolator) TerminalCommand(cfg isoshared.RunConfig, c provision.Contribution) ([]string, []string, error) {
 	command, err := i.Command(cfg, c)
-	return command, os.Environ(), err
+	if err != nil {
+		return nil, nil, err
+	}
+	env, err := i.processEnv(cfg, c)
+	return command, env, err
 }
 
 func (i *Isolator) buildArgs(cfg isoshared.RunConfig, c provision.Contribution) ([]string, error) {
@@ -197,8 +204,13 @@ func (i *Isolator) buildArgs(cfg isoshared.RunConfig, c provision.Contribution) 
 	if err != nil {
 		return nil, err
 	}
-	for k, v := range containerEnv {
-		args = append(args, "-e", fmt.Sprintf("%s=%s", k, v))
+	envNames := make([]string, 0, len(containerEnv))
+	for key := range containerEnv {
+		envNames = append(envNames, key)
+	}
+	sort.Strings(envNames)
+	for _, key := range envNames {
+		args = append(args, "-e", key)
 	}
 
 	// Image (pinned by the caller; falls back to the shared default).
@@ -209,6 +221,14 @@ func (i *Isolator) buildArgs(cfg isoshared.RunConfig, c provision.Contribution) 
 	args = append(args, isoshared.WrapWithInitCommands(agentCmd, c.InitCommands)...)
 
 	return args, nil
+}
+
+func (i *Isolator) processEnv(cfg isoshared.RunConfig, c provision.Contribution) ([]string, error) {
+	containerEnv, err := i.containerEnv(cfg, c)
+	if err != nil {
+		return nil, err
+	}
+	return envutil.EnvMapToSlice(envutil.MergeEnvMaps(envutil.ParseCustomEnv(os.Environ()), containerEnv)), nil
 }
 
 func resolveImage(image string) string {

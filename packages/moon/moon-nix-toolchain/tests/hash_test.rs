@@ -40,6 +40,39 @@ async fn flake_lock_edit_busts_the_hash() {
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
 #[serial]
+async fn flake_source_edit_busts_the_hash() {
+    let sandbox = create_empty_moon_sandbox();
+    std::fs::write(
+        sandbox.root.join("flake.lock"),
+        r#"{"version":7,"nodes":{}}"#,
+    )
+    .unwrap();
+    std::fs::write(sandbox.root.join("flake.nix"), "{ outputs = _: {}; }").unwrap();
+    std::fs::create_dir_all(sandbox.root.join("nix")).unwrap();
+    std::fs::write(
+        sandbox.root.join("nix/toolchain.nix"),
+        "{ pkgs }: pkgs.hello",
+    )
+    .unwrap();
+    let plugin = sandbox.create_toolchain("nix").await;
+
+    let before = plugin.hash_task_contents(ws_input("")).await;
+
+    std::fs::write(
+        sandbox.root.join("nix/toolchain.nix"),
+        "{ pkgs }: pkgs.ripgrep",
+    )
+    .unwrap();
+    let after = plugin.hash_task_contents(ws_input("")).await;
+
+    assert_ne!(
+        before.contents, after.contents,
+        "editing an imported Nix source must change the hashed contents"
+    );
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 1)]
+#[serial]
 async fn unrelated_edit_keeps_the_hash() {
     let sandbox = create_empty_moon_sandbox();
     std::fs::write(
@@ -116,10 +149,10 @@ async fn setup_environment_pre_builds_devshell_when_nix_present() {
     );
     assert_eq!(command.command.command, "nix");
     let args = &command.command.args;
-    // nix develop <flakeref> --command true — args[1] is the resolved flake ref.
-    assert_eq!(args.len(), 4, "got: {args:?}");
+    assert_eq!(args.len(), 5, "got: {args:?}");
     assert_eq!(args[0], "develop");
-    assert_eq!(args[1], expected_root);
-    assert_eq!(args[2], "--command");
-    assert_eq!(args[3], "true");
+    assert_eq!(args[1], "--no-update-lock-file");
+    assert_eq!(args[2], expected_root);
+    assert_eq!(args[3], "--command");
+    assert_eq!(args[4], "true");
 }

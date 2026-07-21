@@ -29,13 +29,6 @@ var UserConfigPaths = []string{
 	".claude.json",
 	".gitconfig",
 	".gitignore_global",
-	".ssh",
 	".config",
 	".npmrc",
-	".npm",
-	".npm-global",
-	".cargo",
-	".rustup",
-	".local",
-	".cache",
 }

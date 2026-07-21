@@ -312,11 +312,13 @@ export const validateRelease = (
   }
 
   check(
-    claudeSources.size === pluginPackages.length,
+    marketplace.plugins.length === pluginPackages.length &&
+      claudeSources.size === pluginPackages.length,
     "Claude marketplace contains every command and skill package exactly once",
   );
   check(
-    codexSources.size === pluginPackages.length,
+    codexMarketplace.plugins.length === pluginPackages.length &&
+      codexSources.size === pluginPackages.length,
     "Codex marketplace contains every command and skill package exactly once",
   );
 

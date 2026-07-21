@@ -10,7 +10,7 @@ import (
 	agentv1alpha1 "github.com/xonovex/platform/packages/agent/agent-operator-go/api/v1alpha1"
 )
 
-func mustBuildJob(t testing.TB, run *agentv1alpha1.AgentRun, providerEnv map[string]string, pvcName, image string, timeout time.Duration, agentType agentv1alpha1.AgentType, workspaceType agentv1alpha1.WorkspaceType, toolchain *agentv1alpha1.ToolchainSpec, ttl *int32, workspace *WorkspaceBinding) *batchv1.Job {
+func mustBuildJob(t testing.TB, run *agentv1alpha1.AgentRun, providerEnv []corev1.EnvVar, pvcName, image string, timeout time.Duration, agentType agentv1alpha1.AgentType, workspaceType agentv1alpha1.WorkspaceType, toolchain *agentv1alpha1.ToolchainSpec, ttl *int32, workspace *WorkspaceBinding) *batchv1.Job {
 	t.Helper()
 	job, err := BuildJob(run, providerEnv, pvcName, image, timeout, agentType, workspaceType, toolchain, ttl, workspace)
 	if err != nil {
@@ -37,7 +37,7 @@ func mustBuildInitContainers(t testing.TB, run *agentv1alpha1.AgentRun, image st
 	return containers
 }
 
-func mustBuildMainContainers(t testing.TB, run *agentv1alpha1.AgentRun, providerEnv map[string]string, image string, agentType agentv1alpha1.AgentType, securityContext *corev1.SecurityContext) []corev1.Container {
+func mustBuildMainContainers(t testing.TB, run *agentv1alpha1.AgentRun, providerEnv []corev1.EnvVar, image string, agentType agentv1alpha1.AgentType, securityContext *corev1.SecurityContext) []corev1.Container {
 	t.Helper()
 	containers, err := BuildMainContainers(run, providerEnv, image, agentType, securityContext)
 	if err != nil {
@@ -55,7 +55,7 @@ func mustBuildWorktreeInitContainers(t testing.TB, run *agentv1alpha1.AgentRun, 
 	return containers
 }
 
-func mustBuildWorkspaceMainContainers(t testing.TB, run *agentv1alpha1.AgentRun, providerEnv map[string]string, image string, agentType agentv1alpha1.AgentType, sharedVolumes []agentv1alpha1.SharedVolumeSpec, sharedVolumePVCs map[string]string, securityContext *corev1.SecurityContext) []corev1.Container {
+func mustBuildWorkspaceMainContainers(t testing.TB, run *agentv1alpha1.AgentRun, providerEnv []corev1.EnvVar, image string, agentType agentv1alpha1.AgentType, sharedVolumes []agentv1alpha1.SharedVolumeSpec, sharedVolumePVCs map[string]string, securityContext *corev1.SecurityContext) []corev1.Container {
 	t.Helper()
 	containers, err := BuildWorkspaceMainContainers(run, providerEnv, image, agentType, sharedVolumes, sharedVolumePVCs, securityContext)
 	if err != nil {

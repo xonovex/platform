@@ -109,7 +109,11 @@ const updateChangelog = (
   const titleIndex = existing.indexOf(title);
 
   if (titleIndex === -1) {
-    writeFileSync(changelogPath, `${title}\n\n${newEntry}`, "utf8");
+    writeFileSync(
+      changelogPath,
+      `${title}\n\n${newEntry}\n${existing}`,
+      "utf8",
+    );
     return;
   }
 

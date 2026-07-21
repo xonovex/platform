@@ -151,6 +151,7 @@ type flags struct {
 	requireKernelIsolation      bool
 	isolationChanged            bool
 	provisionChanged            bool
+	hasCustomBinds              bool
 }
 
 // policy derives the demanded guarantees from the bare policy flags.
@@ -206,12 +207,13 @@ func resolveAxes(f flags) (resolvedAxes, error) {
 
 	reg := plugins.DefaultRegistry()
 	req := sandbox.Request{
-		Isolation:   isoName,
-		Provision:   provName,
-		Network:     net,
-		Passthrough: f.isolationBwrapPassthrough,
-		Runtime:     f.isolationDockerRuntime,
-		Image:       f.image,
+		Isolation:      isoName,
+		Provision:      provName,
+		Network:        net,
+		Passthrough:    f.isolationBwrapPassthrough,
+		Runtime:        f.isolationDockerRuntime,
+		Image:          f.image,
+		HasCustomBinds: f.hasCustomBinds,
 	}
 	iso, prov, err := sandbox.Select(reg, req, pol)
 	if err != nil {
@@ -268,6 +270,7 @@ func runAgent(cmd *cobra.Command, args []string, options runOptions) error {
 	}
 
 	bindPaths := wsshared.BuildBindPaths(append(append([]string{}, fileConfig.BindPaths...), options.bindPaths...), workspace.sourceRepoDir)
+	roBindPaths := append(append([]string{}, fileConfig.RoBindPaths...), options.roBindPaths...)
 
 	axes, err := resolveAxes(flags{
 		isolation:                   options.isolation,
@@ -282,6 +285,7 @@ func runAgent(cmd *cobra.Command, args []string, options runOptions) error {
 		requireKernelIsolation:      options.requireKernelIsolation,
 		isolationChanged:            cmd.Flags().Changed("isolation"),
 		provisionChanged:            cmd.Flags().Changed("provision"),
+		hasCustomBinds:              len(fileConfig.BindPaths)+len(options.bindPaths)+len(roBindPaths) > 0,
 	})
 	if err != nil {
 		return err
@@ -319,7 +323,7 @@ func runAgent(cmd *cobra.Command, args []string, options runOptions) error {
 		Image:           axes.Image,
 		Runtime:         axes.Runtime,
 		BindPaths:       bindPaths,
-		RoBindPaths:     append(append([]string{}, fileConfig.RoBindPaths...), options.roBindPaths...),
+		RoBindPaths:     roBindPaths,
 		CustomEnv:       append(append([]string{}, fileConfig.CustomEnv...), options.customEnv...),
 		Agent:           agent,
 		Provider:        provider,

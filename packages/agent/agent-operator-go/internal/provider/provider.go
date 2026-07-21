@@ -1,11 +1,12 @@
 // Package provider is the provider axis: it resolves an AgentRun's model-provider
 // configuration (inline or referenced) into the environment the agent container
-// needs, fetching auth tokens from Secrets.
+// needs while preserving Secret references.
 package provider
 
 import (
 	"context"
 	"fmt"
+	"sort"
 
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/types"
@@ -17,7 +18,7 @@ import (
 )
 
 // ResolveProvider resolves the provider configuration and returns environment variables.
-func ResolveProvider(ctx context.Context, c client.Client, run *agentv1alpha1.AgentRun, defaultProvider string) (map[string]string, error) {
+func ResolveProvider(ctx context.Context, c client.Client, run *agentv1alpha1.AgentRun, defaultProvider string) ([]corev1.EnvVar, error) {
 	env := make(map[string]string)
 
 	// Use inline provider if specified.
@@ -31,7 +32,7 @@ func ResolveProvider(ctx context.Context, c client.Client, run *agentv1alpha1.Ag
 		providerRef = defaultProvider // from harness
 	}
 	if providerRef == "" {
-		return env, nil
+		return nil, nil
 	}
 
 	var provider agentv1alpha1.AgentProvider
@@ -49,22 +50,20 @@ func ResolveProvider(ctx context.Context, c client.Client, run *agentv1alpha1.Ag
 		env[k] = v
 	}
 
-	// Resolve auth token from secret.
+	var authSecretRef *agentv1alpha1.SecretKeyRef
 	if provider.Spec.AuthTokenSecretRef != nil {
-		token, err := getSecretValue(ctx, c, run.Namespace, provider.Spec.AuthTokenSecretRef)
-		if err != nil {
+		if err := validateSecretKey(ctx, c, run.Namespace, provider.Spec.AuthTokenSecretRef); err != nil {
 			return nil, fmt.Errorf("failed to resolve auth token: %w", err)
 		}
-		// Inject token as ANTHROPIC_AUTH_TOKEN for Anthropic-compatible providers.
 		if _, hasBaseURL := env["ANTHROPIC_BASE_URL"]; hasBaseURL {
-			env["ANTHROPIC_AUTH_TOKEN"] = token
+			authSecretRef = provider.Spec.AuthTokenSecretRef
 		}
 	}
 
-	return env, nil
+	return environmentVariables(env, authSecretRef), nil
 }
 
-func resolveInlineProvider(ctx context.Context, c client.Client, namespace string, spec *agentv1alpha1.ProviderSpec) (map[string]string, error) {
+func resolveInlineProvider(ctx context.Context, c client.Client, namespace string, spec *agentv1alpha1.ProviderSpec) ([]corev1.EnvVar, error) {
 	env := make(map[string]string)
 
 	if err := mergePresetEnv(env, spec.PresetRef, spec.AgentType); err != nil {
@@ -75,17 +74,40 @@ func resolveInlineProvider(ctx context.Context, c client.Client, namespace strin
 		env[k] = v
 	}
 
+	var authSecretRef *agentv1alpha1.SecretKeyRef
 	if spec.AuthSecretRef != nil {
-		token, err := getSecretValue(ctx, c, namespace, spec.AuthSecretRef)
-		if err != nil {
+		if err := validateSecretKey(ctx, c, namespace, spec.AuthSecretRef); err != nil {
 			return nil, fmt.Errorf("failed to resolve inline auth token: %w", err)
 		}
 		if _, hasBaseURL := env["ANTHROPIC_BASE_URL"]; hasBaseURL {
-			env["ANTHROPIC_AUTH_TOKEN"] = token
+			authSecretRef = spec.AuthSecretRef
 		}
 	}
 
-	return env, nil
+	return environmentVariables(env, authSecretRef), nil
+}
+
+func environmentVariables(values map[string]string, authSecretRef *agentv1alpha1.SecretKeyRef) []corev1.EnvVar {
+	keys := make([]string, 0, len(values))
+	for key := range values {
+		keys = append(keys, key)
+	}
+	sort.Strings(keys)
+
+	env := make([]corev1.EnvVar, 0, len(values)+1)
+	for _, key := range keys {
+		env = append(env, corev1.EnvVar{Name: key, Value: values[key]})
+	}
+	if authSecretRef != nil {
+		env = append(env, corev1.EnvVar{
+			Name: "ANTHROPIC_AUTH_TOKEN",
+			ValueFrom: &corev1.EnvVarSource{SecretKeyRef: &corev1.SecretKeySelector{
+				LocalObjectReference: corev1.LocalObjectReference{Name: authSecretRef.Name},
+				Key:                  authSecretRef.Key,
+			}},
+		})
+	}
+	return env
 }
 
 // mergePresetEnv loads preset environment variables as defaults into env.
@@ -107,16 +129,14 @@ func mergePresetEnv(env map[string]string, presetRef, agentType string) error {
 	return nil
 }
 
-func getSecretValue(ctx context.Context, c client.Client, namespace string, ref *agentv1alpha1.SecretKeyRef) (string, error) {
+func validateSecretKey(ctx context.Context, c client.Client, namespace string, ref *agentv1alpha1.SecretKeyRef) error {
 	var secret corev1.Secret
 	if err := c.Get(ctx, types.NamespacedName{Name: ref.Name, Namespace: namespace}, &secret); err != nil {
-		return "", fmt.Errorf("secret %s not found: %w", ref.Name, err)
+		return fmt.Errorf("secret %s not found: %w", ref.Name, err)
 	}
 
-	value, ok := secret.Data[ref.Key]
-	if !ok {
-		return "", fmt.Errorf("key %s not found in secret %s", ref.Key, ref.Name)
+	if _, ok := secret.Data[ref.Key]; !ok {
+		return fmt.Errorf("key %s not found in secret %s", ref.Key, ref.Name)
 	}
-
-	return string(value), nil
+	return nil
 }

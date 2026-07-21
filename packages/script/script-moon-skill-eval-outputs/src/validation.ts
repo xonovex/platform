@@ -333,6 +333,20 @@ export const normalizeEval = (
   };
 };
 
+export const validateUniqueEvaluationIds = (
+  evaluations: readonly NormalizedEval[],
+): ValidationResult<readonly NormalizedEval[]> => {
+  const seen = new Set<string>();
+  for (const evaluation of evaluations) {
+    const id = String(evaluation.id);
+    if (seen.has(id)) {
+      return {success: false, error: `duplicate eval id: ${id}`};
+    }
+    seen.add(id);
+  }
+  return {success: true, data: evaluations};
+};
+
 export const parseJudgeResults = (
   input: unknown,
 ): readonly z.infer<typeof JudgeResultSchema>[] | undefined => {

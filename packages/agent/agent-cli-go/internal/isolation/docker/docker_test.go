@@ -47,15 +47,6 @@ func argHasPair(args []string, a, b string) bool {
 	return false
 }
 
-func envValue(args []string, key string) (string, bool) {
-	for i := 0; i+1 < len(args); i++ {
-		if args[i] == "-e" && strings.HasPrefix(args[i+1], key+"=") {
-			return strings.TrimPrefix(args[i+1], key+"="), true
-		}
-	}
-	return "", false
-}
-
 func TestDocker_SecurityDefaults(t *testing.T) {
 	work := t.TempDir()
 	args := dockerCommand(t, dockerCfg(netshared.ModeNone, work), provision.Contribution{})
@@ -135,18 +126,27 @@ func TestDocker_AppliesContribution(t *testing.T) {
 		Env:         map[string]string{"FOO": "bar"},
 	}
 	args := dockerCommand(t, dockerCfg(netshared.ModeNone, work), c)
+	env, err := NewIsolator().containerEnv(dockerCfg(netshared.ModeNone, work), c)
+	if err != nil {
+		t.Fatalf("containerEnv() error = %v", err)
+	}
 
 	if !argHasPair(args, "-v", closure+":"+closure+":ro") {
 		t.Error("contribution RoBindPaths must be mounted read-only")
 	}
-	if path, ok := envValue(args, "PATH"); !ok || !strings.HasPrefix(path, "/nix/store/abc/bin:") {
+	if path := env["PATH"]; !strings.HasPrefix(path, "/nix/store/abc/bin:") {
 		t.Errorf("PATH = %q, want contribution entry prepended", path)
 	}
-	if v, ok := envValue(args, "FOO"); !ok || v != "bar" {
+	if env["FOO"] != "bar" {
 		t.Error("contribution env not applied")
 	}
-	if home, _ := envValue(args, "HOME"); home != containerHome {
+	if home := env["HOME"]; home != containerHome {
 		t.Errorf("HOME = %q, want synthetic %q", home, containerHome)
+	}
+	for _, key := range []string{"PATH", "FOO", "HOME"} {
+		if !argHasPair(args, "-e", key) {
+			t.Errorf("docker command missing inherited environment name %q", key)
+		}
 	}
 }
 
@@ -182,5 +182,21 @@ func TestDocker_CommandRejectsMissingBindAndProviderToken(t *testing.T) {
 	cfg.Provider = &types.ModelProvider{AuthTokenEnv: "MISSING_DOCKER_TEST_TOKEN"}
 	if _, err := NewIsolator().Command(cfg, provision.Contribution{}); err == nil {
 		t.Error("Command() error = nil, want missing provider token error")
+	}
+}
+
+func TestDocker_CommandKeepsProviderSecretOutOfArguments(t *testing.T) {
+	const secret = "docker-secret-must-not-appear"
+	t.Setenv("DOCKER_TEST_TOKEN", secret)
+	cfg := dockerCfg(netshared.ModeNone, t.TempDir())
+	cfg.Provider = &types.ModelProvider{
+		AuthTokenEnv: "DOCKER_TEST_TOKEN",
+		Environment:  map[string]string{"ANTHROPIC_BASE_URL": "http://proxy.example"},
+	}
+
+	command := dockerCommand(t, cfg, provision.Contribution{})
+
+	if strings.Contains(strings.Join(command, " "), secret) {
+		t.Fatal("docker command arguments contain the provider secret")
 	}
 }

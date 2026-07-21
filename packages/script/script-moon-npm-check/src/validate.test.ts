@@ -1,6 +1,6 @@
 import type {PackageJson} from "@xonovex/script-moon-common";
 import {describe, expect, it} from "vitest";
-import {validatePackage} from "./validate.js";
+import {validateDeclaredFiles, validatePackage} from "./validate.js";
 
 const validPkg: PackageJson = {
   name: "@xonovex/test",
@@ -62,5 +62,27 @@ describe("validatePackage", () => {
     const {publishConfig: _, ...pkg} = validPkg;
     const errors = validatePackage(pkg);
     expect(errors).toContain("publishConfig.access is not set");
+  });
+
+  it("reports empty required strings and file lists", () => {
+    const errors = validatePackage({
+      ...validPkg,
+      name: "",
+      license: "",
+      files: [],
+      repository: {type: "", url: ""},
+    });
+
+    expect(errors).toContain("Required field is empty: name");
+    expect(errors).toContain("Required field is empty: license");
+    expect(errors).toContain("Required field is empty: files");
+    expect(errors).toContain("repository.type is missing");
+    expect(errors).toContain("repository.url is missing");
+  });
+
+  it("reports declared package files that do not exist", () => {
+    expect(
+      validateDeclaredFiles(validPkg, (path) => path === "dist/index.js"),
+    ).toEqual(['Declared package file does not exist: "dist"']);
   });
 });

@@ -90,12 +90,13 @@ func (r *Registry) IsolationMethods() []isolation.IsolationMethod {
 
 // Request bundles the per-run axis selection handed to Select.
 type Request struct {
-	Isolation   isolation.IsolationMethod
-	Provision   provision.ProvisionMethod
-	Network     netshared.Mode
-	Passthrough bool
-	Runtime     string
-	Image       string
+	Isolation      isolation.IsolationMethod
+	Provision      provision.ProvisionMethod
+	Network        netshared.Mode
+	Passthrough    bool
+	Runtime        string
+	Image          string
+	HasCustomBinds bool
 }
 
 // Select resolves the isolator and provisioner for a request and enforces the
@@ -113,7 +114,7 @@ func Select(reg *Registry, req Request, pol policy.SandboxPolicy) (isoshared.Iso
 	}
 	caps := policy.Capabilities{
 		Pinned:               iso.PinnedProvision(req.Provision, prov.Pinned(), req.Image),
-		HostToolsUnreachable: iso.HidesHost(req.Passthrough, req.Image),
+		HostToolsUnreachable: iso.HidesHost(req.Passthrough, req.Image) && !req.HasCustomBinds,
 		EgressRestricted:     netshared.EgressIsRestricted(req.Network),
 		KernelIsolated:       iso.KernelIsolated(req.Runtime),
 	}

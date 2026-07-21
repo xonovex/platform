@@ -11,13 +11,8 @@ import (
 )
 
 // buildEnvVars builds environment variables for the agent container.
-func buildEnvVars(run *agentv1alpha1.AgentRun, providerEnv map[string]string) []corev1.EnvVar {
-	var envVars []corev1.EnvVar
-
-	// Add provider environment variables.
-	for k, v := range providerEnv {
-		envVars = append(envVars, corev1.EnvVar{Name: k, Value: v})
-	}
+func buildEnvVars(run *agentv1alpha1.AgentRun, providerEnv []corev1.EnvVar) []corev1.EnvVar {
+	envVars := append([]corev1.EnvVar{}, providerEnv...)
 
 	// Add spec environment variables (these override provider env).
 	envVars = append(envVars, run.Spec.Env...)
@@ -63,7 +58,7 @@ func BuildInitContainers(run *agentv1alpha1.AgentRun, image string, wsType agent
 }
 
 // BuildMainContainers builds the main agent container for standalone runs.
-func BuildMainContainers(run *agentv1alpha1.AgentRun, providerEnv map[string]string, image string, agentType agentv1alpha1.AgentType, sc *corev1.SecurityContext) ([]corev1.Container, error) {
+func BuildMainContainers(run *agentv1alpha1.AgentRun, providerEnv []corev1.EnvVar, image string, agentType agentv1alpha1.AgentType, sc *corev1.SecurityContext) ([]corev1.Container, error) {
 	env := buildEnvVars(run, providerEnv)
 	command, args, err := buildAgentCommand(run, agentType)
 	if err != nil {
@@ -113,7 +108,7 @@ func BuildWorktreeInitContainers(run *agentv1alpha1.AgentRun, image string, wsTy
 
 // BuildWorkspaceMainContainers builds the main agent container for workspace-based
 // runs (working dir is the per-run worktree; shared volumes are mounted).
-func BuildWorkspaceMainContainers(run *agentv1alpha1.AgentRun, providerEnv map[string]string, image string, agentType agentv1alpha1.AgentType, sharedVolumes []agentv1alpha1.SharedVolumeSpec, sharedVolumePVCs map[string]string, sc *corev1.SecurityContext) ([]corev1.Container, error) {
+func BuildWorkspaceMainContainers(run *agentv1alpha1.AgentRun, providerEnv []corev1.EnvVar, image string, agentType agentv1alpha1.AgentType, sharedVolumes []agentv1alpha1.SharedVolumeSpec, sharedVolumePVCs map[string]string, sc *corev1.SecurityContext) ([]corev1.Container, error) {
 	env := buildEnvVars(run, providerEnv)
 	command, args, err := buildAgentCommand(run, agentType)
 	if err != nil {

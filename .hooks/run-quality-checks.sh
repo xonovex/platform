@@ -35,21 +35,52 @@ TARGETS=":lint-fix,:typecheck,:test,:build"
 NO_BAIL=0
 CONCURRENCY=""
 TIMEOUT=600
-STATUS_MODE="affected"  # "affected" or "staged"
+STATUS_MODE="affected" # "affected" or "staged"
 
 # Parse arguments
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    --project-dir)   PROJECT_DIR="$2"; shift 2 ;;
-    --log-file)      LOG_FILE="$2"; shift 2 ;;
-    --targets)       TARGETS="$2"; shift 2 ;;
-    --affected)      STATUS_MODE="affected"; shift ;;
-    --staged)        STATUS_MODE="staged"; shift ;;
-    --no-bail)       NO_BAIL=1; shift ;;
-    --concurrency)   CONCURRENCY="$2"; shift 2 ;;
-    --timeout)       TIMEOUT="$2"; shift 2 ;;
-    -h|--help)       usage; exit 0 ;;
-    *)               echo "Unknown option: $1" >&2; usage >&2; exit 1 ;;
+  --project-dir)
+    PROJECT_DIR="$2"
+    shift 2
+    ;;
+  --log-file)
+    LOG_FILE="$2"
+    shift 2
+    ;;
+  --targets)
+    TARGETS="$2"
+    shift 2
+    ;;
+  --affected)
+    STATUS_MODE="affected"
+    shift
+    ;;
+  --staged)
+    STATUS_MODE="staged"
+    shift
+    ;;
+  --no-bail)
+    NO_BAIL=1
+    shift
+    ;;
+  --concurrency)
+    CONCURRENCY="$2"
+    shift 2
+    ;;
+  --timeout)
+    TIMEOUT="$2"
+    shift 2
+    ;;
+  -h | --help)
+    usage
+    exit 0
+    ;;
+  *)
+    echo "Unknown option: $1" >&2
+    usage >&2
+    exit 1
+    ;;
   esac
 done
 
@@ -61,42 +92,42 @@ if [[ -z "$LOG_FILE" ]]; then
 fi
 
 cleanup_temp_log() {
-  if (( temp_log )) && [[ -f "$LOG_FILE" ]]; then
+  if ((temp_log)) && [[ -f "$LOG_FILE" ]]; then
     rm -f "$LOG_FILE"
   fi
 }
 
 # Pick moon executable (prefer local, then global, then npx)
 if [[ -x "$PROJECT_DIR/node_modules/.bin/moon" ]]; then
-  MOON=( "$PROJECT_DIR/node_modules/.bin/moon" )
+  MOON=("$PROJECT_DIR/node_modules/.bin/moon")
 elif command -v moon >/dev/null 2>&1; then
-  MOON=( moon )
+  MOON=(moon)
 else
-  MOON=( npx --yes moon )
+  MOON=(npx --yes moon)
 fi
 
 # Build target array from comma-separated string
-IFS=',' read -ra TARGET_ARRAY <<< "$TARGETS"
+IFS=',' read -ra TARGET_ARRAY <<<"$TARGETS"
 
 # Build moon command
-MOON_CMD=( "${MOON[@]}" run "${TARGET_ARRAY[@]}" )
+MOON_CMD=("${MOON[@]}" run "${TARGET_ARRAY[@]}")
 
 # Add status mode (affected vs staged)
 if [[ "$STATUS_MODE" == "staged" ]]; then
-  MOON_CMD+=( --affected --status=staged )
+  MOON_CMD+=(--affected --status=staged)
 else
-  MOON_CMD+=( --affected )
+  MOON_CMD+=(--affected)
 fi
 
 # Suppress progress output - only show on error
-MOON_CMD+=( --log error )
+MOON_CMD+=(--log error)
 
 if [[ -n "$CONCURRENCY" ]]; then
-  MOON_CMD+=( --concurrency "$CONCURRENCY" )
+  MOON_CMD+=(--concurrency "$CONCURRENCY")
 fi
 
-if (( NO_BAIL )); then
-  MOON_CMD+=( --no-bail )
+if ((NO_BAIL)); then
+  MOON_CMD+=(--no-bail)
 fi
 
 # Detect file modifications (lint:fix might modify files)
@@ -104,11 +135,7 @@ git_ok=0
 before_tmp=""
 after_tmp=""
 
-cleanup() {
-  [[ -n "${before_tmp:-}" ]] && rm -f -- "$before_tmp" || true
-  [[ -n "${after_tmp:-}" ]] && rm -f -- "$after_tmp" || true
-}
-trap cleanup EXIT
+trap '[[ -n "${before_tmp:-}" ]] && rm -f -- "$before_tmp" || true; [[ -n "${after_tmp:-}" ]] && rm -f -- "$after_tmp" || true' EXIT
 
 if command -v git >/dev/null 2>&1 && git -C "$PROJECT_DIR" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
   git_ok=1
@@ -155,7 +182,7 @@ fi
 
 # Check for modified files
 changed_files=""
-if (( git_ok )); then
+if ((git_ok)); then
   git -C "$PROJECT_DIR" diff --name-only >"$after_tmp" 2>/dev/null || true
   changed_files="$(comm -13 <(sort -u "$before_tmp") <(sort -u "$after_tmp") | head -n 50 || true)"
 fi
@@ -176,28 +203,28 @@ fi
 
 # Extract moon's summary of which task failed (appears after run_failed error)
 failed_task_summary="$(
-  tail -100 "$LOG_FILE" \
-    | sed -n '/Error: task_runner::run_failed/,$ p' \
-    | head -n 10 \
-    || true
+  tail -100 "$LOG_FILE" |
+    sed -n '/Error: task_runner::run_failed/,$ p' |
+    head -n 10 ||
+    true
 )"
 
 # Extract actual error lines (TypeScript errors, npm errors, build failures)
 # These are the most useful for debugging
 actual_errors="$(
-  grep -E '(error TS[0-9]+:|: error:|npm error command failed|Process .* failed:|Could not resolve|Build failed|FAIL [^r]|AssertionError|Expected .* but|Cannot find module)' "$LOG_FILE" \
-    | grep -v -E '(\[ERROR\].*test \||should .* FAIL|record FAIL)' \
-    | head -n 15 \
-    || true
+  grep -E '(error TS[0-9]+:|: error:|npm error command failed|Process .* failed:|Could not resolve|Build failed|FAIL [^r]|AssertionError|Expected .* but|Cannot find module)' "$LOG_FILE" |
+    grep -v -E '(\[ERROR\].*test \||should .* FAIL|record FAIL)' |
+    head -n 15 ||
+    true
 )"
 
 # If no specific errors found, get context around the failure
 if [[ -z "$actual_errors" ]]; then
   actual_errors="$(
-    tail -200 "$LOG_FILE" \
-      | grep -B 5 'Error: task_runner::run_failed' \
-      | head -20 \
-      || true
+    tail -200 "$LOG_FILE" |
+      grep -B 5 'Error: task_runner::run_failed' |
+      head -20 ||
+      true
   )"
 fi
 

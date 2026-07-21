@@ -28,6 +28,7 @@ fn command_plan_preserves_the_exact_child_argv() {
             command: "nix".to_owned(),
             args: vec![
                 "develop".to_owned(),
+                "--no-update-lock-file".to_owned(),
                 "/workspace#go".to_owned(),
                 "--command".to_owned(),
                 "golangci-lint".to_owned(),
@@ -47,7 +48,7 @@ fn script_plan_quotes_the_flake_and_opaque_script_exactly() {
     assert_eq!(
         decision,
         WrapDecision::Script(
-            r#"nix develop '/workspace#shell' --command bash -c 'echo '\''hi'\'''"#.to_owned()
+            r#"nix develop --no-update-lock-file '/workspace#shell' --command bash -c 'echo '\''hi'\'''"#.to_owned()
         )
     );
 }
@@ -69,6 +70,7 @@ fn expression_command_plan_preserves_the_exact_child_argv() {
             args: vec![
                 "develop".to_owned(),
                 "--impure".to_owned(),
+                "--no-update-lock-file".to_owned(),
                 "--expr".to_owned(),
                 expression.to_owned(),
                 "moon".to_owned(),
@@ -91,7 +93,7 @@ fn installable_script_plan_quotes_every_argument_and_keeps_the_script_opaque() {
     assert_eq!(
         decision,
         WrapDecision::Script(
-            "'nix' 'develop' '--impure' 'path:/workspace with spaces/project#go' '--command' 'bash' '-c' 'printf '\\''%s\\n'\\'' \"$HOME\"'"
+            "'nix' 'develop' '--impure' '--no-update-lock-file' 'path:/workspace with spaces/project#go' '--command' 'bash' '-c' 'printf '\\''%s\\n'\\'' \"$HOME\"'"
                 .to_owned()
         )
     );

@@ -1,6 +1,9 @@
 package envutil
 
-import "strings"
+import (
+	"sort"
+	"strings"
+)
 
 // ParseCustomEnv parses KEY=VALUE environment variable strings into a map.
 // Entries without an "=" are ignored.
@@ -28,9 +31,15 @@ func MergeEnvMaps(envMaps ...map[string]string) map[string]string {
 
 // EnvMapToSlice converts a map of environment variables to a KEY=VALUE slice.
 func EnvMapToSlice(envMap map[string]string) []string {
-	env := make([]string, 0, len(envMap))
-	for k, v := range envMap {
-		env = append(env, k+"="+v)
+	keys := make([]string, 0, len(envMap))
+	for key := range envMap {
+		keys = append(keys, key)
+	}
+	sort.Strings(keys)
+
+	env := make([]string, 0, len(keys))
+	for _, key := range keys {
+		env = append(env, key+"="+envMap[key])
 	}
 	return env
 }

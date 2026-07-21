@@ -62,6 +62,22 @@ tasks:
     options:
       cache: true
     toolchain: [system, nix]
+  go-integration:
+    script: |
+      set -euo pipefail
+      version="$(node -p "require('./package.json').version")"
+      binary="$projectRoot/dist/agent-cli"
+      go build -ldflags="-s -w -X github.com/xonovex/platform/packages/cli/agent-cli-go/internal/cmd.version=$version" -o "$binary" ./cmd/agent-cli
+      AGENT_CLI_BINARY="$binary" AGENT_CLI_VERSION="$version" go test -tags=integration ./test/integration/
+    inputs:
+      - "@globs(sources)"
+      - test/integration/**/*.go
+      - package.json
+      - go.mod
+      - go.sum
+    options:
+      cache: false
+    toolchain: [system, nix]
   coverage:
     command: noop
     deps:
@@ -81,6 +97,7 @@ tasks:
       - coverage
       - format-check
       - npm-check
+      - go-integration
     options:
       cache: false
       mergeDeps: replace

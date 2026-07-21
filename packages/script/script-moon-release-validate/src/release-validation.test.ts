@@ -124,4 +124,27 @@ describe("release input validation", () => {
       rmSync(root, {recursive: true, force: true});
     }
   });
+
+  it("reports duplicate marketplace plugin names", () => {
+    const root = createFixture();
+    const duplicate = {
+      name: "skill-test",
+      source: `./${PACKAGE_PATH}`,
+      description: "Test skill",
+    };
+    writeJson(root, ".claude-plugin/marketplace.json", {
+      metadata: {version: VERSION},
+      plugins: [duplicate, duplicate],
+    });
+
+    try {
+      const result = validateRelease(root);
+
+      expect(result.failures).toContain(
+        "Claude marketplace contains every command and skill package exactly once",
+      );
+    } finally {
+      rmSync(root, {recursive: true, force: true});
+    }
+  });
 });

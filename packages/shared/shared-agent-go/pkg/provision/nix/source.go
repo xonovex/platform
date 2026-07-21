@@ -54,12 +54,23 @@ func ValidatePackageName(name string) bool {
 	return packageNamePattern.MatchString(name)
 }
 
+// IsImmutableRevision reports whether rev is a complete hexadecimal Git object ID.
+func IsImmutableRevision(rev string) bool {
+	if len(rev) != 40 && len(rev) != 64 {
+		return false
+	}
+	_, err := hex.DecodeString(rev)
+	return err == nil
+}
+
 // ValidateSource returns an error if the source is not structurally resolvable.
-// It is pure: it never calls host nix. The committed-lock / concrete-rev pin is
-// enforced at resolve time by the host-resolve provisioner.
+// It is pure and requires package sources to identify an immutable Git object.
 func ValidateSource(s NixSource) error {
 	switch s.Kind {
 	case NixSourcePackages:
+		if !IsImmutableRevision(s.Rev) {
+			return fmt.Errorf("nix source %q requires a complete 40- or 64-character hexadecimal revision", s.Kind)
+		}
 		if len(s.Packages) == 0 {
 			return fmt.Errorf("nix source %q requires at least one package", s.Kind)
 		}

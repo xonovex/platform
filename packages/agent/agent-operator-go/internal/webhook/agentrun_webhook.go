@@ -19,6 +19,7 @@ import (
 	"github.com/xonovex/platform/packages/agent/agent-operator-go/internal/plugins"
 	"github.com/xonovex/platform/packages/agent/agent-operator-go/internal/resolver"
 	"github.com/xonovex/platform/packages/agent/agent-operator-go/internal/validator"
+	sharednix "github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/provision/nix"
 )
 
 // AgentRunWebhook implements defaulting and validation for AgentRun
@@ -224,12 +225,17 @@ func (w *AgentRunWebhook) applyReferencedDefaults(ctx context.Context, run *agen
 		if err := validateNixSpec(toolchain.Nix); err != nil {
 			return err
 		}
+		run.Spec.Toolchain = toolchain.DeepCopy()
+		run.Spec.ToolchainRef = ""
 		run.Spec.Image = toolchain.Nix.Image
 	}
 	return nil
 }
 
 func validateExecutionBoundary(run *agentv1alpha1.AgentRun, policy *agentv1alpha1.AgentPolicy) error {
+	if policy == nil {
+		return fmt.Errorf("namespace requires exactly one AgentPolicy before agent execution")
+	}
 	if run.Spec.Image == "" {
 		return fmt.Errorf("agent execution requires an explicit agent-capable image or harness/toolchain image default")
 	}
@@ -242,12 +248,15 @@ func validateExecutionBoundary(run *agentv1alpha1.AgentRun, policy *agentv1alpha
 	if !runtimeClassApproved(*run.Spec.RuntimeClassName, policy) {
 		return fmt.Errorf("runtimeClassName %q is not allowed by the namespace AgentPolicy", *run.Spec.RuntimeClassName)
 	}
+	if err := validateSecurityContextOverrides(run); err != nil {
+		return err
+	}
 	return nil
 }
 
 func runtimeClassApproved(runtimeClassName string, policy *agentv1alpha1.AgentPolicy) bool {
 	if policy == nil {
-		return true
+		return false
 	}
 	enforced := policy.Spec.Enforced
 	if enforced.RuntimeClassName != nil && *enforced.RuntimeClassName == runtimeClassName {
@@ -302,8 +311,8 @@ func validateNixSpec(nix *agentv1alpha1.NixSpec) error {
 	if nix == nil {
 		return nil
 	}
-	if nix.NixpkgsRev == "" {
-		return fmt.Errorf("nix toolchain requires nixpkgsRev (the reproducibility pin)")
+	if !sharednix.IsImmutableRevision(nix.NixpkgsRev) {
+		return fmt.Errorf("nix toolchain requires nixpkgsRev as a complete 40- or 64-character hexadecimal revision")
 	}
 	hasPackages := len(nix.Packages) > 0
 	hasFlake := nix.FlakeRef != ""
@@ -413,7 +422,7 @@ func enforcePolicy(run *agentv1alpha1.AgentRun, policy *agentv1alpha1.AgentPolic
 		}
 		allowed := false
 		for _, prefix := range e.AllowedImages {
-			if strings.HasPrefix(run.Spec.Image, prefix) {
+			if imageMatchesAllowedReference(run.Spec.Image, prefix) {
 				allowed = true
 				break
 			}
@@ -424,6 +433,19 @@ func enforcePolicy(run *agentv1alpha1.AgentRun, policy *agentv1alpha1.AgentPolic
 	}
 
 	return nil
+}
+
+func imageMatchesAllowedReference(image, allowed string) bool {
+	if allowed == "" {
+		return false
+	}
+	if strings.HasSuffix(allowed, "/") {
+		return strings.HasPrefix(image, allowed)
+	}
+	if strings.Contains(allowed, "@") {
+		return image == allowed
+	}
+	return image == allowed || strings.HasPrefix(image, allowed+"@")
 }
 
 func validateSecurityContextOverrides(run *agentv1alpha1.AgentRun) error {

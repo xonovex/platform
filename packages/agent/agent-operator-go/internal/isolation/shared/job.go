@@ -53,7 +53,7 @@ func tmpVolume() corev1.Volume {
 // BuildJob creates the Kubernetes Job for an AgentRun. It is the single pod
 // realizer: a nil ws produces the standalone Job, a non-nil ws produces the
 // workspace-based Job. pvcName is the workspace PVC the pod mounts.
-func BuildJob(run *agentv1alpha1.AgentRun, providerEnv map[string]string, pvcName, image string, timeout time.Duration, agentType agentv1alpha1.AgentType, wsType agentv1alpha1.WorkspaceType, tc *agentv1alpha1.ToolchainSpec, ttl *int32, ws *WorkspaceBinding) (*batchv1.Job, error) {
+func BuildJob(run *agentv1alpha1.AgentRun, providerEnv []corev1.EnvVar, pvcName, image string, timeout time.Duration, agentType agentv1alpha1.AgentType, wsType agentv1alpha1.WorkspaceType, tc *agentv1alpha1.ToolchainSpec, ttl *int32, ws *WorkspaceBinding) (*batchv1.Job, error) {
 	activeDeadlineSeconds := int64(timeout.Seconds())
 	backoffLimit := int32(0)
 

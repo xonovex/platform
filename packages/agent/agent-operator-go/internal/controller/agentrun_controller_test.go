@@ -4,17 +4,48 @@ import (
 	"context"
 	"strings"
 	"testing"
+	"time"
 
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
 
 	agentv1alpha1 "github.com/xonovex/platform/packages/agent/agent-operator-go/api/v1alpha1"
+	"github.com/xonovex/platform/packages/agent/agent-operator-go/internal/resolver"
 	"github.com/xonovex/platform/packages/agent/agent-operator-go/test/testutil"
 )
+
+func TestReconcileExecutionResources_RejectsUnownedExistingJob(t *testing.T) {
+	run := testutil.NewAgentRun("test", "run")
+	run.UID = types.UID("run-uid")
+	existing := &batchv1.Job{ObjectMeta: metav1.ObjectMeta{Name: run.Name, Namespace: run.Namespace}}
+	fakeClient := fake.NewClientBuilder().
+		WithScheme(testutil.NewScheme()).
+		WithStatusSubresource(&agentv1alpha1.AgentRun{}).
+		WithObjects(run, existing).
+		Build()
+	reconciler := &AgentRunReconciler{Client: fakeClient, Scheme: testutil.NewScheme()}
+	execution := &resolvedRunExecution{
+		agentType: agentv1alpha1.AgentTypeClaude,
+		defaults: resolver.ResolvedDefaults{
+			Timeout:       time.Hour,
+			NetworkPolicy: &agentv1alpha1.AgentNetworkPolicy{Disabled: true},
+		},
+		image: run.Spec.Image,
+	}
+
+	_, err := reconciler.reconcileExecutionResources(
+		context.Background(), run, execution, "workspace-pvc", agentv1alpha1.WorkspaceTypeGit, nil,
+	)
+
+	if err == nil || !strings.Contains(err.Error(), "not controlled by AgentRun") {
+		t.Fatalf("reconcileExecutionResources() error = %v, want ownership error", err)
+	}
+}
 
 func TestAgentRunReconciler_ResolutionFailureMarksRunFailed(t *testing.T) {
 	tests := []struct {

@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"sort"
 	"strings"
 
 	isoshared "github.com/xonovex/platform/packages/cli/agent-cli-go/internal/isolation/shared"
@@ -21,7 +22,7 @@ import (
 // bind) with only the curated config paths bound back read-only; only the
 // workspace (rw) and RepoDir (ro) are bound; /dev is a minimal devtmpfs (not a
 // full --dev-bind, which would expose /dev/sda, /dev/mem and input devices); the
-// environment is cleared (--clearenv) and rebuilt from an explicit allowlist.
+// environment is reduced to an explicit allowlist with --unsetenv.
 // HostPassthrough on restores the leaky behavior: host /usr,/lib,/bin,/etc are
 // ro-bound and the host PATH is appended.
 //
@@ -52,15 +53,17 @@ func (i *Isolator) PinnedProvision(_ provision.ProvisionMethod, provisionerPinne
 // trust boundary.
 func (i *Isolator) KernelIsolated(_ string) bool { return false }
 
-// Run executes the agent in the bubblewrap sandbox. The sandbox environment is
-// built entirely from --setenv (the parent env is cleared by --clearenv), so the
-// parent process only needs its own environment to launch bwrap.
+// Run executes the agent in the bubblewrap sandbox.
 func (i *Isolator) Run(cfg isoshared.RunConfig, c provision.Contribution) (int, error) {
 	args, err := i.buildArgs(cfg, c)
 	if err != nil {
 		return 1, err
 	}
-	return isoshared.SpawnSandbox("bwrap", args, os.Environ(), "Bubblewrap sandbox", cfg.Verbose)
+	env, err := i.processEnv(cfg, c)
+	if err != nil {
+		return 1, err
+	}
+	return isoshared.SpawnSandbox("bwrap", args, env, "Bubblewrap sandbox", cfg.Verbose)
 }
 
 // Command returns the full bwrap command (for display / terminal wrappers).
@@ -72,12 +75,14 @@ func (i *Isolator) Command(cfg isoshared.RunConfig, c provision.Contribution) ([
 	return append([]string{"bwrap"}, args...), nil
 }
 
-// TerminalCommand returns the bwrap command plus the host env to launch it; the
-// sandbox environment is baked into the command via --setenv, so the wrapper
-// needs only the host env.
+// TerminalCommand returns the bwrap command plus the environment used to launch it.
 func (i *Isolator) TerminalCommand(cfg isoshared.RunConfig, c provision.Contribution) ([]string, []string, error) {
 	command, err := i.Command(cfg, c)
-	return command, os.Environ(), err
+	if err != nil {
+		return nil, nil, err
+	}
+	env, err := i.processEnv(cfg, c)
+	return command, env, err
 }
 
 func (i *Isolator) buildArgs(cfg isoshared.RunConfig, c provision.Contribution) ([]string, error) {
@@ -97,6 +102,11 @@ func (i *Isolator) buildArgs(cfg isoshared.RunConfig, c provision.Contribution) 
 		}
 	}
 
+	sandboxEnv, err := i.sandboxEnv(cfg, c, homeDir)
+	if err != nil {
+		return nil, err
+	}
+
 	args := []string{
 		"--unshare-uts",
 		"--unshare-ipc",
@@ -108,8 +118,17 @@ func (i *Isolator) buildArgs(cfg isoshared.RunConfig, c provision.Contribution) 
 		"--dev", "/dev",
 		"--proc", "/proc",
 		"--tmpfs", "/tmp",
-		// Deny-default environment: start empty, add back an explicit allowlist.
-		"--clearenv",
+	}
+	inherited := envutil.ParseCustomEnv(os.Environ())
+	unset := make([]string, 0, len(inherited))
+	for key := range inherited {
+		if _, allowed := sandboxEnv[key]; !allowed {
+			unset = append(unset, key)
+		}
+	}
+	sort.Strings(unset)
+	for _, key := range unset {
+		args = append(args, "--unsetenv", key)
 	}
 
 	// Network is applied explicitly through the network bridge.
@@ -175,21 +194,24 @@ func (i *Isolator) buildArgs(cfg isoshared.RunConfig, c provision.Contribution) 
 
 	args = append(args, "--chdir", workDir)
 
-	// Explicit setenv allowlist (since --clearenv wiped everything).
-	sandboxEnv, err := i.sandboxEnv(cfg, c, homeDir)
-	if err != nil {
-		return nil, err
-	}
-	for k, v := range sandboxEnv {
-		args = append(args, "--setenv", k, v)
-	}
-
 	// Agent command, wrapped with the provisioner's init commands.
 	args = append(args, "--")
 	agentCmd := agentcmd.BuildAgentCommand(cfg.Agent, cfg.Provider, cfg.AgentArgs, "")
 	args = append(args, isoshared.WrapWithInitCommands(agentCmd, c.InitCommands)...)
 
 	return args, nil
+}
+
+func (i *Isolator) processEnv(cfg isoshared.RunConfig, c provision.Contribution) ([]string, error) {
+	homeDir, err := isoshared.ResolveHomeDir(cfg.HomeDir)
+	if err != nil {
+		return nil, err
+	}
+	sandboxEnv, err := i.sandboxEnv(cfg, c, homeDir)
+	if err != nil {
+		return nil, err
+	}
+	return envutil.EnvMapToSlice(envutil.MergeEnvMaps(envutil.ParseCustomEnv(os.Environ()), sandboxEnv)), nil
 }
 
 // sandboxEnv builds the explicit environment allowlist for inside the sandbox:

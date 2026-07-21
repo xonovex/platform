@@ -1,8 +1,17 @@
+import {
+  mkdtempSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from "node:fs";
+import {tmpdir} from "node:os";
+import {join} from "node:path";
 import {describe, expect, it} from "vitest";
 import {
   determineBumpLevel,
   formatCommitEntry,
   generateChangelogEntry,
+  updateChangelog,
 } from "./changelog.js";
 import type {Commit} from "./git-log.js";
 
@@ -146,5 +155,25 @@ describe("generateChangelogEntry", () => {
     expect(entry).toContain("add unit tests");
     expect(entry).not.toContain("add widget");
     expect(entry).not.toContain("resolve crash");
+  });
+});
+
+describe("updateChangelog", () => {
+  it("preserves existing history when the package title is missing", () => {
+    const directory = mkdtempSync(join(tmpdir(), "version-changelog-"));
+    const path = join(directory, "CHANGELOG.md");
+    const existing = "# Legacy package\n\n## 1.0.0\n\n- Initial release\n";
+    try {
+      writeFileSync(path, existing, "utf8");
+
+      updateChangelog(path, "@xonovex/current", "## 1.1.0\n\n- Update\n");
+
+      const updated = readFileSync(path, "utf8");
+      expect(updated).toContain("# @xonovex/current");
+      expect(updated).toContain("## 1.1.0");
+      expect(updated).toContain(existing);
+    } finally {
+      rmSync(directory, {recursive: true, force: true});
+    }
   });
 });

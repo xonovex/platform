@@ -23,6 +23,7 @@
     "dist/bin.js.map"
   ],
   "bin": {
+    "agent-cli": "dist/bin.js",
     "agent-cli-go": "dist/bin.js"
   },
   "devDependencies": {

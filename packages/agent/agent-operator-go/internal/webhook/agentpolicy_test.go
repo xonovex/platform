@@ -184,11 +184,18 @@ func TestEnforcePolicy_RejectsSecurityContextWeakening(t *testing.T) {
 	}
 }
 
-func TestValidateExecutionBoundary_AppliesRuntimeAllowlistOnlyWhenConfigured(t *testing.T) {
+func TestValidateExecutionBoundary_RequiresNamespacePolicy(t *testing.T) {
 	run := baseRun()
-	if err := validateExecutionBoundary(run, nil); err != nil {
-		t.Fatalf("validateExecutionBoundary(no policy) error = %v", err)
+
+	err := validateExecutionBoundary(run, nil)
+
+	if err == nil || !strings.Contains(err.Error(), "requires exactly one AgentPolicy") {
+		t.Fatalf("validateExecutionBoundary(no policy) error = %v, want missing-policy error", err)
 	}
+}
+
+func TestValidateExecutionBoundary_RequiresApprovedRuntimeClass(t *testing.T) {
+	run := baseRun()
 
 	unapproved := &agentv1alpha1.AgentPolicy{Spec: agentv1alpha1.AgentPolicySpec{Enforced: agentv1alpha1.AgentPolicyEnforced{
 		AllowedRuntimeClassNames: []string{"gvisor"},
@@ -201,6 +208,20 @@ func TestValidateExecutionBoundary_AppliesRuntimeAllowlistOnlyWhenConfigured(t *
 	approved.Spec.Enforced.AllowedRuntimeClassNames = append(approved.Spec.Enforced.AllowedRuntimeClassNames, "kata")
 	if err := validateExecutionBoundary(run, approved); err != nil {
 		t.Fatalf("validateExecutionBoundary(approved) error = %v", err)
+	}
+}
+
+func TestValidateExecutionBoundary_RejectsWeakeningSecurityOverrideWithoutPolicySwitch(t *testing.T) {
+	run := baseRun()
+	run.Spec.SecurityContext = &corev1.SecurityContext{AllowPrivilegeEscalation: boolPtr(true)}
+	policy := &agentv1alpha1.AgentPolicy{Spec: agentv1alpha1.AgentPolicySpec{Enforced: agentv1alpha1.AgentPolicyEnforced{
+		AllowedRuntimeClassNames: []string{"kata"},
+	}}}
+
+	err := validateExecutionBoundary(run, policy)
+
+	if err == nil || !strings.Contains(err.Error(), "AllowPrivilegeEscalation") {
+		t.Fatalf("validateExecutionBoundary() error = %v, want security override error", err)
 	}
 }
 
@@ -222,6 +243,19 @@ func TestEnforcePolicy_AllowsEnabledNetworkPolicy(t *testing.T) {
 
 	if err := enforcePolicy(run, policy); err != nil {
 		t.Errorf("enforcePolicy() error = %v, want nil", err)
+	}
+}
+
+func TestEnforcePolicy_RejectsImageRepositoryLookalike(t *testing.T) {
+	run := baseRun()
+	run.Spec.Image = "ghcr.io/xonovex/agent-evil@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+	policy := basePolicy()
+	policy.Spec.Enforced.AllowedImages = []string{"ghcr.io/xonovex/agent"}
+
+	err := enforcePolicy(run, policy)
+
+	if err == nil || !strings.Contains(err.Error(), "allowed images") {
+		t.Fatalf("enforcePolicy() error = %v, want image allowlist error", err)
 	}
 }
 
@@ -380,7 +414,7 @@ func TestEnforcePolicy_RejectsRuntimeClassNotInAllowedList(t *testing.T) {
 	}
 }
 
-func TestAgentRunWebhook_NoPolicyStillRequiresExecutionBoundary(t *testing.T) {
+func TestAgentRunWebhook_RequiresNamespacePolicy(t *testing.T) {
 	w := &AgentRunWebhook{Client: nil}
 	run := &agentv1alpha1.AgentRun{
 		Spec: agentv1alpha1.AgentRunSpec{
@@ -393,8 +427,8 @@ func TestAgentRunWebhook_NoPolicyStillRequiresExecutionBoundary(t *testing.T) {
 	}
 
 	_, err := w.validate(context.Background(), run)
-	if err == nil || !strings.Contains(err.Error(), "agent-capable image") {
-		t.Errorf("validate() error = %v, want fail-closed image requirement", err)
+	if err == nil || !strings.Contains(err.Error(), "requires exactly one AgentPolicy") {
+		t.Errorf("validate() error = %v, want fail-closed policy requirement", err)
 	}
 }
 

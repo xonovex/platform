@@ -27,20 +27,20 @@ jobs:
           cache-workspace: true
 
       - name: Install repository dependencies
-        run: nix develop --command npm ci
+        run: nix develop --no-update-lock-file --command npm ci
 
       - id: select
         name: Select skill matrix
         shell: bash
         run: |
           set -euo pipefail
-          nix develop --command npx moon query tasks \
+          nix develop --no-update-lock-file --command npx moon query tasks \
             --id ci-skill-eval-trigger \
             >"${RUNNER_TEMP}/skill-eval-trigger-tasks.json"
-          nix develop --command npx moon query tasks \
+          nix develop --no-update-lock-file --command npx moon query tasks \
             --id ci-skill-eval-output \
             >"${RUNNER_TEMP}/skill-eval-output-tasks.json"
-          skills="$(nix develop --command jq -sc \
+          skills="$(nix develop --no-update-lock-file --command jq -sc \
             '[.[].tasks | keys[]] | unique | map({project: ., package: ltrimstr("skill-")})' \
             "${RUNNER_TEMP}/skill-eval-trigger-tasks.json" \
             "${RUNNER_TEMP}/skill-eval-output-tasks.json")"
@@ -76,14 +76,14 @@ jobs:
         run: test -n "$ANTHROPIC_API_KEY"
 
       - name: Install repository dependencies
-        run: nix develop --command npm ci
+        run: nix develop --no-update-lock-file --command npm ci
 
       - name: Run skill evals
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           MOON_TARGET: ${{ matrix.skill.project }}:ci-skill-eval-${{ matrix.mode }}
-        run: nix develop --command npx moon run "$MOON_TARGET"
+        run: nix develop --no-update-lock-file --command npx moon run "$MOON_TARGET"
 
       - name: Upload benchmark evidence
         if: success() || failure()

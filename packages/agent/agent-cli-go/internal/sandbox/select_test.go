@@ -103,6 +103,18 @@ func TestSelect_PolicyFromPluginCapabilities(t *testing.T) {
 	}
 }
 
+func TestSelect_RejectsCustomBindsWhenHostToolsMustBeUnreachable(t *testing.T) {
+	reg := testRegistry(fakeIsolator{hidesHost: true}, fakeProvisioner{pinned: true})
+	req := bwrapNixReq()
+	req.HasCustomBinds = true
+
+	_, _, err := Select(reg, req, policy.SandboxPolicy{RequireHostToolsUnreachable: true})
+
+	if !errors.Is(err, policy.ErrHostToolsReachable) {
+		t.Fatalf("Select() error = %v, want %v", err, policy.ErrHostToolsReachable)
+	}
+}
+
 func TestAvailableIsolations(t *testing.T) {
 	reg := NewRegistry().
 		RegisterIsolator(isolation.IsolationNone, func() isoshared.Isolator { return fakeIsolator{available: true} }).

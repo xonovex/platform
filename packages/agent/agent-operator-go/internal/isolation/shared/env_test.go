@@ -19,9 +19,9 @@ func TestBuildEnvVars_Empty(t *testing.T) {
 
 func TestBuildEnvVars_ProviderOnly(t *testing.T) {
 	run := &agentv1alpha1.AgentRun{}
-	providerEnv := map[string]string{
-		"KEY1": "val1",
-		"KEY2": "val2",
+	providerEnv := []corev1.EnvVar{
+		{Name: "KEY1", Value: "val1"},
+		{Name: "KEY2", Value: "val2"},
 	}
 
 	envVars := buildEnvVars(run, providerEnv)
@@ -66,8 +66,8 @@ func TestBuildEnvVars_CombinesProviderAndSpec(t *testing.T) {
 			},
 		},
 	}
-	providerEnv := map[string]string{
-		"PROVIDER_VAR": "from-provider",
+	providerEnv := []corev1.EnvVar{
+		{Name: "PROVIDER_VAR", Value: "from-provider"},
 	}
 
 	envVars := buildEnvVars(run, providerEnv)

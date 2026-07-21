@@ -15,6 +15,7 @@ projects:
     - "!**/*.md"
   sources:
     github-actions: .github
+    repository-shell: .hooks
 vcs:
   hooks:
     commit-msg:

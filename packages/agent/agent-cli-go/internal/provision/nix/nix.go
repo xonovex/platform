@@ -27,9 +27,10 @@ type Options struct {
 // source values are "packages" and "flake"; the latter maps to the
 // NixSourceProjectFlake kind, defaulting the flake ref to repoDir then workDir.
 func SourceFromFlags(kind, rev string, packages []string, shell, flakeRef, repoDir, workDir string) (sharednix.NixSource, error) {
+	var source sharednix.NixSource
 	switch kind {
 	case "", "packages":
-		return sharednix.NixSource{Kind: sharednix.NixSourcePackages, Rev: rev, Packages: packages}, nil
+		source = sharednix.NixSource{Kind: sharednix.NixSourcePackages, Rev: rev, Packages: packages}
 	case "flake":
 		ref := flakeRef
 		if ref == "" {
@@ -41,10 +42,14 @@ func SourceFromFlags(kind, rev string, packages []string, shell, flakeRef, repoD
 		if shell == "" {
 			shell = defaultFlakeShell
 		}
-		return sharednix.NixSource{Kind: sharednix.NixSourceProjectFlake, FlakeRef: ref, Shell: shell}, nil
+		source = sharednix.NixSource{Kind: sharednix.NixSourceProjectFlake, FlakeRef: ref, Shell: shell}
 	default:
 		return sharednix.NixSource{}, fmt.Errorf("unknown nix source %q; valid: packages, flake", kind)
 	}
+	if err := sharednix.ValidateSource(source); err != nil {
+		return sharednix.NixSource{}, err
+	}
+	return source, nil
 }
 
 // agentNixDir is the base directory for agent-nix runtime data (GC-roots).

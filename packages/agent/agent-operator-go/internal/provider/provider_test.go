@@ -19,6 +19,30 @@ func newScheme() *runtime.Scheme {
 	return s
 }
 
+func lookupEnvVar(env []corev1.EnvVar, name string) (corev1.EnvVar, bool) {
+	for _, variable := range env {
+		if variable.Name == name {
+			return variable, true
+		}
+	}
+	return corev1.EnvVar{}, false
+}
+
+func findEnvVar(t testing.TB, env []corev1.EnvVar, name string) corev1.EnvVar {
+	t.Helper()
+	variable, found := lookupEnvVar(env, name)
+	if found {
+		return variable
+	}
+	t.Fatalf("environment variable %q not found", name)
+	return corev1.EnvVar{}
+}
+
+func envValue(t testing.TB, env []corev1.EnvVar, name string) string {
+	t.Helper()
+	return findEnvVar(t, env, name).Value
+}
+
 func TestResolveProvider_NoProvider(t *testing.T) {
 	c := fake.NewClientBuilder().WithScheme(newScheme()).Build()
 
@@ -55,11 +79,11 @@ func TestResolveProvider_InlineProvider(t *testing.T) {
 	if err != nil {
 		t.Fatalf("ResolveProvider() error = %v", err)
 	}
-	if env["ANTHROPIC_BASE_URL"] != "http://proxy:8080" {
-		t.Errorf("ANTHROPIC_BASE_URL = %q, want %q", env["ANTHROPIC_BASE_URL"], "http://proxy:8080")
+	if got := envValue(t, env, "ANTHROPIC_BASE_URL"); got != "http://proxy:8080" {
+		t.Errorf("ANTHROPIC_BASE_URL = %q, want %q", got, "http://proxy:8080")
 	}
-	if env["API_TIMEOUT_MS"] != "3000000" {
-		t.Errorf("API_TIMEOUT_MS = %q, want %q", env["API_TIMEOUT_MS"], "3000000")
+	if got := envValue(t, env, "API_TIMEOUT_MS"); got != "3000000" {
+		t.Errorf("API_TIMEOUT_MS = %q, want %q", got, "3000000")
 	}
 }
 
@@ -93,8 +117,39 @@ func TestResolveProvider_InlineProviderWithSecret(t *testing.T) {
 	if err != nil {
 		t.Fatalf("ResolveProvider() error = %v", err)
 	}
-	if env["ANTHROPIC_AUTH_TOKEN"] != "secret-token-123" {
-		t.Errorf("ANTHROPIC_AUTH_TOKEN = %q, want %q", env["ANTHROPIC_AUTH_TOKEN"], "secret-token-123")
+	auth := findEnvVar(t, env, "ANTHROPIC_AUTH_TOKEN")
+	if auth.Value != "" {
+		t.Errorf("ANTHROPIC_AUTH_TOKEN value = %q, want empty", auth.Value)
+	}
+	if auth.ValueFrom == nil || auth.ValueFrom.SecretKeyRef == nil || auth.ValueFrom.SecretKeyRef.Name != "api-key" || auth.ValueFrom.SecretKeyRef.Key != "token" {
+		t.Errorf("ANTHROPIC_AUTH_TOKEN source = %#v, want api-key/token SecretKeyRef", auth.ValueFrom)
+	}
+}
+
+func TestResolveProvider_DoesNotMaterializeSecretValue(t *testing.T) {
+	const secretValue = "must-not-enter-the-job-spec"
+	secret := &corev1.Secret{
+		ObjectMeta: metav1.ObjectMeta{Name: "api-key", Namespace: "default"},
+		Data:       map[string][]byte{"token": []byte(secretValue)},
+	}
+	c := fake.NewClientBuilder().WithScheme(newScheme()).WithObjects(secret).Build()
+	run := &agentv1alpha1.AgentRun{
+		ObjectMeta: metav1.ObjectMeta{Name: "test", Namespace: "default"},
+		Spec: agentv1alpha1.AgentRunSpec{Provider: &agentv1alpha1.ProviderSpec{
+			AuthSecretRef: &agentv1alpha1.SecretKeyRef{Name: secret.Name, Key: "token"},
+			Environment:   map[string]string{"ANTHROPIC_BASE_URL": "http://proxy:8080"},
+		}},
+	}
+
+	env, err := ResolveProvider(context.Background(), c, run, "")
+
+	if err != nil {
+		t.Fatalf("ResolveProvider() error = %v", err)
+	}
+	for _, variable := range env {
+		if variable.Value == secretValue {
+			t.Fatalf("resolved environment materialized secret value in %q", variable.Name)
+		}
 	}
 }
 
@@ -122,8 +177,8 @@ func TestResolveProvider_ProviderRef(t *testing.T) {
 	if err != nil {
 		t.Fatalf("ResolveProvider() error = %v", err)
 	}
-	if env["ANTHROPIC_BASE_URL"] != "http://proxy:8080" {
-		t.Errorf("ANTHROPIC_BASE_URL = %q, want %q", env["ANTHROPIC_BASE_URL"], "http://proxy:8080")
+	if got := envValue(t, env, "ANTHROPIC_BASE_URL"); got != "http://proxy:8080" {
+		t.Errorf("ANTHROPIC_BASE_URL = %q, want %q", got, "http://proxy:8080")
 	}
 }
 
@@ -160,8 +215,12 @@ func TestResolveProvider_ProviderRefWithSecret(t *testing.T) {
 	if err != nil {
 		t.Fatalf("ResolveProvider() error = %v", err)
 	}
-	if env["ANTHROPIC_AUTH_TOKEN"] != "my-secret-key" {
-		t.Errorf("ANTHROPIC_AUTH_TOKEN = %q, want %q", env["ANTHROPIC_AUTH_TOKEN"], "my-secret-key")
+	auth := findEnvVar(t, env, "ANTHROPIC_AUTH_TOKEN")
+	if auth.Value != "" {
+		t.Errorf("ANTHROPIC_AUTH_TOKEN value = %q, want empty", auth.Value)
+	}
+	if auth.ValueFrom == nil || auth.ValueFrom.SecretKeyRef == nil || auth.ValueFrom.SecretKeyRef.Name != "provider-secret" || auth.ValueFrom.SecretKeyRef.Key != "api-key" {
+		t.Errorf("ANTHROPIC_AUTH_TOKEN source = %#v, want provider-secret/api-key SecretKeyRef", auth.ValueFrom)
 	}
 }
 
@@ -265,8 +324,8 @@ func TestResolveProvider_DefaultFromHarness(t *testing.T) {
 	if err != nil {
 		t.Fatalf("ResolveProvider() error = %v", err)
 	}
-	if env["FROM_HARNESS"] != "true" {
-		t.Errorf("FROM_HARNESS = %q, want %q", env["FROM_HARNESS"], "true")
+	if got := envValue(t, env, "FROM_HARNESS"); got != "true" {
+		t.Errorf("FROM_HARNESS = %q, want %q", got, "true")
 	}
 }
 
@@ -291,7 +350,7 @@ func TestResolveProvider_PresetRef(t *testing.T) {
 	if err != nil {
 		t.Fatalf("ResolveProvider() error = %v", err)
 	}
-	if env["ANTHROPIC_BASE_URL"] == "" {
+	if got := envValue(t, env, "ANTHROPIC_BASE_URL"); got == "" {
 		t.Error("expected ANTHROPIC_BASE_URL from preset, got empty")
 	}
 }
@@ -320,11 +379,11 @@ func TestResolveProvider_PresetRefOverriddenByEnvironment(t *testing.T) {
 	if err != nil {
 		t.Fatalf("ResolveProvider() error = %v", err)
 	}
-	if env["ANTHROPIC_BASE_URL"] != "http://custom:9999" {
-		t.Errorf("ANTHROPIC_BASE_URL = %q, want %q", env["ANTHROPIC_BASE_URL"], "http://custom:9999")
+	if got := envValue(t, env, "ANTHROPIC_BASE_URL"); got != "http://custom:9999" {
+		t.Errorf("ANTHROPIC_BASE_URL = %q, want %q", got, "http://custom:9999")
 	}
 	// Preset's other env vars should still be present
-	if env["API_TIMEOUT_MS"] == "" {
+	if got := envValue(t, env, "API_TIMEOUT_MS"); got == "" {
 		t.Error("expected API_TIMEOUT_MS from preset, got empty")
 	}
 }
@@ -373,10 +432,10 @@ func TestResolveProvider_InlinePresetRef(t *testing.T) {
 	if err != nil {
 		t.Fatalf("ResolveProvider() error = %v", err)
 	}
-	if env["ANTHROPIC_BASE_URL"] != "http://override:8080" {
-		t.Errorf("ANTHROPIC_BASE_URL = %q, want override", env["ANTHROPIC_BASE_URL"])
+	if got := envValue(t, env, "ANTHROPIC_BASE_URL"); got != "http://override:8080" {
+		t.Errorf("ANTHROPIC_BASE_URL = %q, want override", got)
 	}
-	if env["API_TIMEOUT_MS"] == "" {
+	if got := envValue(t, env, "API_TIMEOUT_MS"); got == "" {
 		t.Error("expected API_TIMEOUT_MS from preset")
 	}
 }
@@ -415,7 +474,7 @@ func TestResolveProvider_NoAuthTokenInjectionWithoutBaseURL(t *testing.T) {
 		t.Fatalf("ResolveProvider() error = %v", err)
 	}
 	// Without ANTHROPIC_BASE_URL, the token should NOT be injected as ANTHROPIC_AUTH_TOKEN
-	if _, has := env["ANTHROPIC_AUTH_TOKEN"]; has {
+	if _, has := lookupEnvVar(env, "ANTHROPIC_AUTH_TOKEN"); has {
 		t.Error("ANTHROPIC_AUTH_TOKEN should not be set without ANTHROPIC_BASE_URL")
 	}
 }

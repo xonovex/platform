@@ -22,6 +22,7 @@ tasks:
       - nix
       - flake
       - check
+      - --no-update-lock-file
       - --print-build-logs
     toolchain: [system, nix]
     inputs:
@@ -31,8 +32,26 @@ tasks:
     options:
       cache: true
       runFromWorkspaceRoot: true
+  nix-flake-eval-all-systems:
+    command:
+      - nix
+      - flake
+      - show
+      - --all-systems
+      - --json
+      - --no-update-lock-file
+    inputs:
+      - /flake.lock
+      - /flake.nix
+      - /nix/**/*
+    options:
+      cache: true
+      runFromWorkspaceRoot: true
   ci-check:
     command: noop
-    deps: [github-actions-lint, nix-flake-check]
+    deps:
+      - github-actions-lint
+      - nix-flake-check
+      - nix-flake-eval-all-systems
     options:
       cache: false

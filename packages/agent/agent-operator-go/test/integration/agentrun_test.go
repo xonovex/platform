@@ -448,21 +448,28 @@ func TestAgentRun_ProviderEnvVarsInjectedIntoJob(t *testing.T) {
 		t.Fatalf("Job not created: %v", err)
 	}
 
-	envMap := map[string]string{}
+	envMap := map[string]corev1.EnvVar{}
 	for _, env := range job.Spec.Template.Spec.Containers[0].Env {
-		envMap[env.Name] = env.Value
+		envMap[env.Name] = env
 	}
 
 	expected := map[string]string{
-		"ANTHROPIC_BASE_URL":   "http://proxy:8080",
-		"CUSTOM_VAR":           "custom-value",
-		"ANTHROPIC_AUTH_TOKEN": "test-key-123",
+		"ANTHROPIC_BASE_URL": "http://proxy:8080",
+		"CUSTOM_VAR":         "custom-value",
 	}
 
 	for k, v := range expected {
-		if envMap[k] != v {
-			t.Errorf("env %s = %q, want %q", k, envMap[k], v)
+		if envMap[k].Value != v {
+			t.Errorf("env %s = %q, want %q", k, envMap[k].Value, v)
 		}
+	}
+
+	auth := envMap["ANTHROPIC_AUTH_TOKEN"]
+	if auth.Value != "" {
+		t.Errorf("env ANTHROPIC_AUTH_TOKEN value = %q, want empty", auth.Value)
+	}
+	if auth.ValueFrom == nil || auth.ValueFrom.SecretKeyRef == nil || auth.ValueFrom.SecretKeyRef.Name != "provider-secret" || auth.ValueFrom.SecretKeyRef.Key != "api-key" {
+		t.Errorf("env ANTHROPIC_AUTH_TOKEN source = %#v, want provider-secret/api-key SecretKeyRef", auth.ValueFrom)
 	}
 }
 

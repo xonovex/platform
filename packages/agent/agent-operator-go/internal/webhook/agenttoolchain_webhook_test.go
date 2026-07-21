@@ -16,7 +16,7 @@ func TestAgentToolchainWebhook_ValidatesPinnedNixToolchain(t *testing.T) {
 		{
 			name: "accepts pinned package toolchain",
 			nix: &agentv1alpha1.NixSpec{
-				NixpkgsRev: "abc123",
+				NixpkgsRev: testNixRevision,
 				Packages:   []string{"ripgrep"},
 				Image:      "ghcr.io/example/agent@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
 			},
@@ -24,7 +24,7 @@ func TestAgentToolchainWebhook_ValidatesPinnedNixToolchain(t *testing.T) {
 		{
 			name: "rejects moving image tag",
 			nix: &agentv1alpha1.NixSpec{
-				NixpkgsRev: "abc123",
+				NixpkgsRev: testNixRevision,
 				Packages:   []string{"ripgrep"},
 				Image:      "ghcr.io/example/agent:latest",
 			},
@@ -41,7 +41,7 @@ func TestAgentToolchainWebhook_ValidatesPinnedNixToolchain(t *testing.T) {
 		{
 			name: "rejects shell metacharacters",
 			nix: &agentv1alpha1.NixSpec{
-				NixpkgsRev: "abc123",
+				NixpkgsRev: testNixRevision,
 				Packages:   []string{"ripgrep;whoami"},
 				Image:      "ghcr.io/example/agent@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
 			},

@@ -51,6 +51,7 @@ tasks:
       - test
       - lint
       - format-check
+      - github-check
     options:
       cache: false
   github-check:

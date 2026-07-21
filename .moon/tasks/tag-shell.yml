@@ -6,7 +6,14 @@ fileGroups:
     - "/.editorconfig"
 tasks:
   sh-lint:
-    script: shopt -s globstar nullglob && files=(**/*.sh) && [ ${#files[@]} -gt 0 ] && shellcheck -x "${files[@]}" || echo 'No .sh files found'
+    script: |
+      shopt -s globstar nullglob
+      files=(**/*.sh)
+      if [ "${#files[@]}" -eq 0 ]; then
+        echo 'No .sh files found'
+      else
+        shellcheck -x "${files[@]}"
+      fi
     toolchain: [system, nix]
     inputs:
       - "@globs(sources)"

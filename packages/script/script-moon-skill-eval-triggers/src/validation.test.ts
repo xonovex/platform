@@ -3,6 +3,7 @@ import {
   buildTriggerClaudeArgs,
   parseQueries,
   parseTriggerOptions,
+  selectQueries,
   streamTextDeltaLength,
   triggerModelRunCount,
 } from "./validation.js";
@@ -32,12 +33,29 @@ describe("trigger query validation", () => {
   });
 
   it.each([
+    [],
     [{query: "query", should_trigger: "false"}],
     [{query: "", should_trigger: true}],
     [{query: "query", should_trigger: true, split: "production"}],
     {query: "query", should_trigger: true},
   ])("rejects malformed query data: %o", (input) => {
     expect(parseQueries(input).success).toBe(false);
+  });
+
+  it("rejects a split with no matching queries", () => {
+    const queries = [
+      {
+        query: "Training example",
+        should_trigger: true,
+        rationale: "Relevant",
+        split: "train" as const,
+      },
+    ];
+
+    expect(selectQueries(queries, "validation")).toEqual({
+      success: false,
+      error: "split 'validation' has no queries",
+    });
   });
 });
 

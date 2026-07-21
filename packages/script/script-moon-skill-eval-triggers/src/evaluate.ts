@@ -17,6 +17,7 @@ import {
   MAX_TRIGGER_MODEL_RUNS,
   parseQueries,
   parseTriggerOptions,
+  selectQueries,
   triggerModelRunCount,
 } from "./validation.js";
 
@@ -137,10 +138,12 @@ export const main = async (argv: readonly string[]): Promise<number> => {
     return 2;
   }
 
-  let queries = queryResult.data;
-  if (split !== "all") {
-    queries = queries.filter((query) => query.split === split);
+  const selectionResult = selectQueries(queryResult.data, split);
+  if (!selectionResult.success) {
+    process.stderr.write(`Error: ${selectionResult.error}\n`);
+    return 2;
   }
+  const queries = selectionResult.data;
   const queryBatches = boundedBatches(
     queries,
     batchSize ?? Math.max(queries.length, 1),

@@ -48,7 +48,8 @@ fn flake_ref(output: &ExtendTaskCommandOutput) -> String {
         panic!("expected args to be replaced, got {:?}", output.args);
     };
     assert_eq!(args[0], "develop");
-    args[1].clone()
+    assert_eq!(args[1], "--no-update-lock-file");
+    args[2].clone()
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
@@ -69,10 +70,11 @@ async fn wraps_command_task_in_nix_develop() {
         panic!("expected args to be replaced, got {:?}", output.args);
     };
     assert_eq!(args[0], "develop");
-    assert!(!args[1].is_empty(), "workspace root should be resolved");
-    assert_eq!(args[2], "--command");
-    assert_eq!(args[3], "clang-format");
-    assert_eq!(args[4], "--version");
+    assert_eq!(args[1], "--no-update-lock-file");
+    assert!(!args[2].is_empty(), "workspace root should be resolved");
+    assert_eq!(args[3], "--command");
+    assert_eq!(args[4], "clang-format");
+    assert_eq!(args[5], "--version");
 
     assert_eq!(output.env.get(SENTINEL).map(String::as_str), Some("1"));
 }
@@ -165,7 +167,7 @@ async fn wraps_script_task_via_bash() {
     let script = output.script.expect("script should be wrapped");
     assert_eq!(
         script,
-        format!("nix develop '{expected_root}' --command bash -c 'echo '\\''hi'\\'' && ls'")
+        format!("nix develop --no-update-lock-file '{expected_root}' --command bash -c 'echo '\\''hi'\\'' && ls'")
     );
     assert_eq!(output.env.get(SENTINEL).map(String::as_str), Some("1"));
 }

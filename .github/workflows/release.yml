@@ -57,14 +57,16 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BASE: ${{ inputs.base || 'HEAD~1' }}
         run: |
-          nix develop --command bash -c "npm ci && npx moon ci --color --concurrency 1 --base $BASE :ci-publish"
+          nix develop --no-update-lock-file --command npm ci
+          nix develop --no-update-lock-file --command npx moon ci --color --concurrency 1 --base "$BASE" :ci-publish
 
       - name: Publish (dry run)
         if: github.event_name == 'workflow_dispatch'
         env:
           BASE: ${{ inputs.base || 'HEAD~1' }}
         run: |
-          nix develop --command bash -c "npm ci && npx moon ci --color --concurrency 1 --base $BASE :ci-publish-dry-run"
+          nix develop --no-update-lock-file --command npm ci
+          nix develop --no-update-lock-file --command npx moon ci --color --concurrency 1 --base "$BASE" :ci-publish-dry-run
 
       - uses: moonrepo/run-report-action@bbe7e99bf2aca819ec660ec01fc59d84bdd492d6 # v1
         if: success() || failure()

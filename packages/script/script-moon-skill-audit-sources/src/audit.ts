@@ -25,6 +25,7 @@ interface FetchReport {
 interface DriftReport {
   checkout: string;
   resolved: boolean;
+  pull_failed: boolean;
   pinned_version: string | null;
   latest_version: string | null;
   behind: boolean;
@@ -235,6 +236,7 @@ const computeDrift = (
   const report: DriftReport = {
     checkout,
     resolved: false,
+    pull_failed: false,
     pinned_version: source.version ?? null,
     latest_version: null,
     behind: false,
@@ -246,7 +248,16 @@ const computeDrift = (
     return {...report, note: "checkout not found or not a git repo"};
   }
   report.resolved = true;
-  if (pull) git(checkout, ["fetch", "--tags", "--quiet"]);
+  if (
+    pull &&
+    git(checkout, ["fetch", "--tags", "--quiet"]) === undefined
+  ) {
+    return {
+      ...report,
+      pull_failed: true,
+      note: "failed to fetch upstream tags",
+    };
+  }
 
   const latest = latestSemverTag(checkout);
   const pinnedV = source.version ? parseSemver(source.version) : undefined;
@@ -354,7 +365,7 @@ const auditSkill = async (
     if (s.checkout !== undefined) {
       const drift = computeDrift(workspaceRoot, s, pull);
       report.drift = drift;
-      if (drift.behind || drift.commit_count > 0) {
+      if (drift.pull_failed || drift.behind || drift.commit_count > 0) {
         problems += 1;
       }
     }
@@ -411,6 +422,7 @@ const markReviewed = (
 
 const sourceFlags = (source: SourceReport): readonly string[] => {
   const flags: string[] = [];
+  if (source.drift?.pull_failed) flags.push("PULL FAILED");
   if (source.stale) flags.push(`STALE (${String(source.age_days)}d)`);
   if (source.last_reviewed === null) flags.push("MISSING REVIEW DATE");
   if (source.reference_mapping_missing) {

@@ -1,0 +1,21 @@
+$schema: https://moonrepo.dev/schemas/project.json
+language: bash
+layer: configuration
+tags:
+  - shell
+tasks:
+  sh-lint:
+    script: shellcheck -x "$workspaceRoot"/.hooks/*.sh "$workspaceRoot"/.moon/scripts/*.sh
+    inputs:
+      - "*.sh"
+      - /.moon/scripts/*.sh
+  sh-format:
+    script: shfmt -w "$workspaceRoot"/.hooks/*.sh "$workspaceRoot"/.moon/scripts/*.sh
+    inputs:
+      - "*.sh"
+      - /.moon/scripts/*.sh
+  sh-format-check:
+    script: shfmt -d "$workspaceRoot"/.hooks/*.sh "$workspaceRoot"/.moon/scripts/*.sh
+    inputs:
+      - "*.sh"
+      - /.moon/scripts/*.sh
