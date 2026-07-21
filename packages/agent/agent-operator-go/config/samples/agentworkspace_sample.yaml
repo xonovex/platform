@@ -11,8 +11,8 @@ spec:
   storageSize: 10Gi
   sharedVolumes:
     - name: claude-config
-      mountPath: /root/.claude
+      mountPath: /home/agent/.claude
       storageSize: 1Gi
     - name: opencode-config
-      mountPath: /root/.opencode
+      mountPath: /home/agent/.opencode
       storageSize: 512Mi

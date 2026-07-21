@@ -5,8 +5,7 @@ metadata:
   namespace: default
 spec:
   displayName: Anthropic Claude
-  agentTypes:
-    - claude
+  agentType: claude
   authTokenSecretRef:
     name: anthropic-credentials
     key: api-key

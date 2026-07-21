@@ -4,6 +4,7 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 	"testing"
 
@@ -11,6 +12,7 @@ import (
 
 	isoshared "github.com/xonovex/platform/packages/cli/agent-cli-go/internal/isolation/shared"
 	netshared "github.com/xonovex/platform/packages/cli/agent-cli-go/internal/network/shared"
+	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/isolation"
 	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/policy"
 	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/provision"
 	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/types"
@@ -96,6 +98,11 @@ func TestPrepareWorkspaceWithoutWorktreeUsesSourceDirectory(t *testing.T) {
 
 func TestRunAgentDryRunBuildsHostCommand(t *testing.T) {
 	workDir := t.TempDir()
+	binDir := t.TempDir()
+	if err := os.WriteFile(filepath.Join(binDir, "claude"), []byte("#!/bin/sh\n"), 0o755); err != nil {
+		t.Fatalf("create agent executable: %v", err)
+	}
+	t.Setenv("PATH", binDir)
 	configPath := filepath.Join(workDir, "config.yaml")
 	if err := os.WriteFile(configPath, []byte("{}\n"), 0o600); err != nil {
 		t.Fatalf("WriteFile() error = %v", err)
@@ -183,8 +190,9 @@ func TestResolveProviderRejectsUnknownProvider(t *testing.T) {
 
 func TestProvisionInputPreservesInitCommandsWithoutNix(t *testing.T) {
 	options := runOptions{initCommands: []string{"npm install"}}
+	agent := &types.AgentConfig{Binary: "claude", NixPackage: "claude-code"}
 
-	input, err := provisionInput(provision.ProvisionNone, options, t.TempDir(), t.TempDir())
+	input, err := provisionInput(provision.ProvisionNone, options, agent, t.TempDir(), t.TempDir())
 
 	if err != nil {
 		t.Fatalf("provisionInput() error = %v", err)
@@ -196,11 +204,101 @@ func TestProvisionInputPreservesInitCommandsWithoutNix(t *testing.T) {
 
 func TestProvisionInputRejectsUnknownNixSource(t *testing.T) {
 	options := runOptions{nixSource: "unknown"}
+	agent := &types.AgentConfig{Binary: "claude", NixPackage: "claude-code"}
 
-	_, err := provisionInput(provision.ProvisionNix, options, t.TempDir(), t.TempDir())
+	_, err := provisionInput(provision.ProvisionNix, options, agent, t.TempDir(), t.TempDir())
 
 	if err == nil {
 		t.Fatal("provisionInput() error = nil, want invalid-source error")
+	}
+}
+
+func TestProvisionInputAddsSelectedAgentToNixPackages(t *testing.T) {
+	options := runOptions{
+		nixSource:   "packages",
+		nixRev:      strings.Repeat("a", 40),
+		nixPackages: []string{"ripgrep"},
+	}
+	agent := &types.AgentConfig{Binary: "opencode", NixPackage: "opencode"}
+
+	input, err := provisionInput(provision.ProvisionNix, options, agent, t.TempDir(), t.TempDir())
+
+	if err != nil {
+		t.Fatalf("provisionInput() error = %v", err)
+	}
+	if !slices.Equal(input.NixSource.Packages, []string{"ripgrep", "opencode"}) {
+		t.Errorf("Nix packages = %v, want ripgrep and opencode", input.NixSource.Packages)
+	}
+}
+
+func TestProvisionInputDoesNotDuplicateSelectedAgentPackage(t *testing.T) {
+	options := runOptions{
+		nixSource:   "packages",
+		nixRev:      strings.Repeat("a", 40),
+		nixPackages: []string{"claude-code"},
+	}
+	agent := &types.AgentConfig{Binary: "claude", NixPackage: "claude-code"}
+
+	input, err := provisionInput(provision.ProvisionNix, options, agent, t.TempDir(), t.TempDir())
+
+	if err != nil {
+		t.Fatalf("provisionInput() error = %v", err)
+	}
+	if !slices.Equal(input.NixSource.Packages, []string{"claude-code"}) {
+		t.Errorf("Nix packages = %v, want one claude-code", input.NixSource.Packages)
+	}
+}
+
+func TestValidateAgentExecutableRejectsUnprovisionedDefaultDockerImage(t *testing.T) {
+	agent := &types.AgentConfig{Binary: "claude", NixPackage: "claude-code"}
+	axes := resolvedAxes{IsolationName: isolation.IsolationDocker, ProvisionName: provision.ProvisionNone}
+
+	err := validateAgentExecutable(axes, agent, provision.Contribution{})
+
+	if err == nil || !strings.Contains(err.Error(), "default docker image") {
+		t.Fatalf("validateAgentExecutable() error = %v, want default-image error", err)
+	}
+}
+
+func TestValidateAgentExecutableRejectsUnprovisionedBwrapWithoutPassthrough(t *testing.T) {
+	agent := &types.AgentConfig{Binary: "claude", NixPackage: "claude-code"}
+	axes := resolvedAxes{IsolationName: isolation.IsolationBwrap, ProvisionName: provision.ProvisionNone}
+
+	err := validateAgentExecutable(axes, agent, provision.Contribution{})
+
+	if err == nil || !strings.Contains(err.Error(), "host passthrough is disabled") {
+		t.Fatalf("validateAgentExecutable() error = %v, want passthrough error", err)
+	}
+}
+
+func TestValidateAgentExecutableAcceptsProvisionedNixBinary(t *testing.T) {
+	binDir := filepath.Join(t.TempDir(), "bin")
+	if err := os.MkdirAll(binDir, 0o755); err != nil {
+		t.Fatalf("create bin directory: %v", err)
+	}
+	if err := os.WriteFile(filepath.Join(binDir, "opencode"), []byte("#!/bin/sh\n"), 0o755); err != nil {
+		t.Fatalf("create agent executable: %v", err)
+	}
+	agent := &types.AgentConfig{Binary: "opencode", NixPackage: "opencode"}
+	axes := resolvedAxes{IsolationName: isolation.IsolationBwrap, ProvisionName: provision.ProvisionNix}
+	contribution := provision.Contribution{PathEntries: []string{binDir}}
+
+	err := validateAgentExecutable(axes, agent, contribution)
+
+	if err != nil {
+		t.Fatalf("validateAgentExecutable() error = %v", err)
+	}
+}
+
+func TestValidateAgentExecutableRejectsNixClosureWithoutAgent(t *testing.T) {
+	agent := &types.AgentConfig{Binary: "opencode", NixPackage: "opencode"}
+	axes := resolvedAxes{IsolationName: isolation.IsolationBwrap, ProvisionName: provision.ProvisionNix}
+	contribution := provision.Contribution{PathEntries: []string{t.TempDir()}}
+
+	err := validateAgentExecutable(axes, agent, contribution)
+
+	if err == nil || !strings.Contains(err.Error(), "did not supply") {
+		t.Fatalf("validateAgentExecutable() error = %v, want missing-agent error", err)
 	}
 }
 

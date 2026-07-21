@@ -21,12 +21,12 @@ func buildEnvVars(run *agentv1alpha1.AgentRun, providerEnv []corev1.EnvVar) []co
 }
 
 // buildAgentCommand resolves the harness command for the agent type.
-func buildAgentCommand(run *agentv1alpha1.AgentRun, agentType agentv1alpha1.AgentType) ([]string, []string, error) {
+func buildAgentCommand(run *agentv1alpha1.AgentRun, agentType agentv1alpha1.AgentType, providerCliArgs []string) ([]string, []string, error) {
 	builder, err := plugins.GetHarnessCommand(agentType)
 	if err != nil {
 		return nil, nil, fmt.Errorf("resolve harness command for agent type %q: %w", agentType, err)
 	}
-	command, args := builder.Command(run)
+	command, args := builder.Command(run, providerCliArgs)
 	return command, args, nil
 }
 
@@ -58,9 +58,9 @@ func BuildInitContainers(run *agentv1alpha1.AgentRun, image string, wsType agent
 }
 
 // BuildMainContainers builds the main agent container for standalone runs.
-func BuildMainContainers(run *agentv1alpha1.AgentRun, providerEnv []corev1.EnvVar, image string, agentType agentv1alpha1.AgentType, sc *corev1.SecurityContext) ([]corev1.Container, error) {
+func BuildMainContainers(run *agentv1alpha1.AgentRun, providerEnv []corev1.EnvVar, providerCliArgs []string, image string, agentType agentv1alpha1.AgentType, sc *corev1.SecurityContext) ([]corev1.Container, error) {
 	env := buildEnvVars(run, providerEnv)
-	command, args, err := buildAgentCommand(run, agentType)
+	command, args, err := buildAgentCommand(run, agentType, providerCliArgs)
 	if err != nil {
 		return nil, err
 	}
@@ -108,9 +108,9 @@ func BuildWorktreeInitContainers(run *agentv1alpha1.AgentRun, image string, wsTy
 
 // BuildWorkspaceMainContainers builds the main agent container for workspace-based
 // runs (working dir is the per-run worktree; shared volumes are mounted).
-func BuildWorkspaceMainContainers(run *agentv1alpha1.AgentRun, providerEnv []corev1.EnvVar, image string, agentType agentv1alpha1.AgentType, sharedVolumes []agentv1alpha1.SharedVolumeSpec, sharedVolumePVCs map[string]string, sc *corev1.SecurityContext) ([]corev1.Container, error) {
+func BuildWorkspaceMainContainers(run *agentv1alpha1.AgentRun, providerEnv []corev1.EnvVar, providerCliArgs []string, image string, agentType agentv1alpha1.AgentType, sharedVolumes []agentv1alpha1.SharedVolumeSpec, sharedVolumePVCs map[string]string, sc *corev1.SecurityContext) ([]corev1.Container, error) {
 	env := buildEnvVars(run, providerEnv)
-	command, args, err := buildAgentCommand(run, agentType)
+	command, args, err := buildAgentCommand(run, agentType, providerCliArgs)
 	if err != nil {
 		return nil, err
 	}

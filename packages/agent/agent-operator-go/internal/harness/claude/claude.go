@@ -11,7 +11,7 @@ import (
 type CommandBuilder struct{}
 
 // Command returns the binary and args for an AgentRun.
-func (c *CommandBuilder) Command(run *agentv1alpha1.AgentRun) ([]string, []string) {
+func (c *CommandBuilder) Command(run *agentv1alpha1.AgentRun, _ []string) ([]string, []string) {
 	agent, _ := agents.GetAgent(types.AgentClaude)
 	args := agents.BuildClaudeArgs(nil, types.AgentExecOptions{Sandbox: true})
 	if run.Spec.Prompt != "" {

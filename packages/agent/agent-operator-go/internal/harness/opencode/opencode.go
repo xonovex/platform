@@ -11,12 +11,8 @@ import (
 type CommandBuilder struct{}
 
 // Command returns the binary and args for an AgentRun.
-func (o *CommandBuilder) Command(run *agentv1alpha1.AgentRun) ([]string, []string) {
+func (o *CommandBuilder) Command(_ *agentv1alpha1.AgentRun, providerCliArgs []string) ([]string, []string) {
 	agent, _ := agents.GetAgent(types.AgentOpencode)
-	var providerCliArgs []string
-	if run.Spec.Provider != nil {
-		providerCliArgs = run.Spec.Provider.CliArgs
-	}
 	args := agents.BuildOpencodeArgs(nil, types.AgentExecOptions{
 		Sandbox:         true,
 		ProviderCliArgs: providerCliArgs,

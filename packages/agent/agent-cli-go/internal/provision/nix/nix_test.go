@@ -161,9 +161,27 @@ func TestSourceFromFlags(t *testing.T) {
 
 func TestGCRootDir_KeyedByEnvID(t *testing.T) {
 	src := sharednix.NixSource{Kind: sharednix.NixSourcePackages, Rev: testRevision, Packages: []string{"hello"}}
-	want := filepath.Join(agentNixDir(), "gcroots", sharednix.ComputeEnvID(src))
-	if got := gcRootDir(src); got != want {
+	base, err := agentNixDir()
+	if err != nil {
+		t.Fatalf("agentNixDir() error = %v", err)
+	}
+	want := filepath.Join(base, "gcroots", sharednix.ComputeEnvID(src))
+	got, err := gcRootDir(src)
+	if err != nil {
+		t.Fatalf("gcRootDir() error = %v", err)
+	}
+	if got != want {
 		t.Errorf("gcRootDir = %q, want %q", got, want)
+	}
+}
+
+func TestAgentNixDirReturnsHomeLookupError(t *testing.T) {
+	t.Setenv("HOME", "")
+
+	_, err := agentNixDir()
+
+	if err == nil || !strings.Contains(err.Error(), "resolve user home directory") {
+		t.Fatalf("agentNixDir() error = %v, want home lookup error", err)
 	}
 }
 
@@ -326,13 +344,17 @@ func TestNixprov_Integration(t *testing.T) {
 	if err := registerGCRoot(src, closure); err != nil {
 		t.Fatalf("registerGCRoot: %v", err)
 	}
-	t.Cleanup(func() { _ = os.RemoveAll(gcRootDir(src)) })
+	rootDir, err := gcRootDir(src)
+	if err != nil {
+		t.Fatalf("gcRootDir: %v", err)
+	}
+	t.Cleanup(func() { _ = os.RemoveAll(rootDir) })
 
 	out, err := exec.Command("nix-store", "--query", "--roots", closure.StorePaths[0]).CombinedOutput()
 	if err != nil {
 		t.Fatalf("nix-store --query --roots: %v: %s", err, out)
 	}
-	if !strings.Contains(string(out), gcRootDir(src)) {
-		t.Errorf("closure not rooted under %s; roots:\n%s", gcRootDir(src), out)
+	if !strings.Contains(string(out), rootDir) {
+		t.Errorf("closure not rooted under %s; roots:\n%s", rootDir, out)
 	}
 }

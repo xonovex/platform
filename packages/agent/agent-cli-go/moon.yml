@@ -42,10 +42,10 @@ tasks:
   ts-coverage:
     script: >-
       npx vitest run --coverage --coverage.include='src/**'
-      --coverage.thresholds.lines 25
-      --coverage.thresholds.functions 25
-      --coverage.thresholds.branches 25
-      --coverage.thresholds.statements 25
+      --coverage.thresholds.lines 50
+      --coverage.thresholds.functions 50
+      --coverage.thresholds.branches 50
+      --coverage.thresholds.statements 50
     inputs:
       - src/**/*.ts
       - vitest.config.ts
@@ -54,9 +54,12 @@ tasks:
   go-package-coverage:
     script: >-
       bash "$workspaceRoot/.moon/scripts/check-go-package-coverage.sh"
-      ./internal/cmd=65
+      ./internal/cmd=70
       ./internal/config=60
       ./internal/provision/nix=80
+      ./internal/isolation/bwrap=65
+      ./internal/isolation/docker=65
+      ./internal/isolation/none=80
       ./internal/workspace/git=80
       ./internal/workspace/jj=90
     inputs:

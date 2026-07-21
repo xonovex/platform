@@ -2,6 +2,7 @@ package provider
 
 import (
 	"context"
+	"slices"
 	"testing"
 
 	corev1 "k8s.io/api/core/v1"
@@ -54,7 +55,7 @@ func TestResolveProvider_NoProvider(t *testing.T) {
 	if err != nil {
 		t.Fatalf("ResolveProvider() error = %v", err)
 	}
-	if len(env) != 0 {
+	if len(env.Environment) != 0 {
 		t.Errorf("env = %v, want empty", env)
 	}
 }
@@ -79,10 +80,10 @@ func TestResolveProvider_InlineProvider(t *testing.T) {
 	if err != nil {
 		t.Fatalf("ResolveProvider() error = %v", err)
 	}
-	if got := envValue(t, env, "ANTHROPIC_BASE_URL"); got != "http://proxy:8080" {
+	if got := envValue(t, env.Environment, "ANTHROPIC_BASE_URL"); got != "http://proxy:8080" {
 		t.Errorf("ANTHROPIC_BASE_URL = %q, want %q", got, "http://proxy:8080")
 	}
-	if got := envValue(t, env, "API_TIMEOUT_MS"); got != "3000000" {
+	if got := envValue(t, env.Environment, "API_TIMEOUT_MS"); got != "3000000" {
 		t.Errorf("API_TIMEOUT_MS = %q, want %q", got, "3000000")
 	}
 }
@@ -117,7 +118,7 @@ func TestResolveProvider_InlineProviderWithSecret(t *testing.T) {
 	if err != nil {
 		t.Fatalf("ResolveProvider() error = %v", err)
 	}
-	auth := findEnvVar(t, env, "ANTHROPIC_AUTH_TOKEN")
+	auth := findEnvVar(t, env.Environment, "ANTHROPIC_AUTH_TOKEN")
 	if auth.Value != "" {
 		t.Errorf("ANTHROPIC_AUTH_TOKEN value = %q, want empty", auth.Value)
 	}
@@ -146,7 +147,7 @@ func TestResolveProvider_DoesNotMaterializeSecretValue(t *testing.T) {
 	if err != nil {
 		t.Fatalf("ResolveProvider() error = %v", err)
 	}
-	for _, variable := range env {
+	for _, variable := range env.Environment {
 		if variable.Value == secretValue {
 			t.Fatalf("resolved environment materialized secret value in %q", variable.Name)
 		}
@@ -177,7 +178,7 @@ func TestResolveProvider_ProviderRef(t *testing.T) {
 	if err != nil {
 		t.Fatalf("ResolveProvider() error = %v", err)
 	}
-	if got := envValue(t, env, "ANTHROPIC_BASE_URL"); got != "http://proxy:8080" {
+	if got := envValue(t, env.Environment, "ANTHROPIC_BASE_URL"); got != "http://proxy:8080" {
 		t.Errorf("ANTHROPIC_BASE_URL = %q, want %q", got, "http://proxy:8080")
 	}
 }
@@ -215,7 +216,7 @@ func TestResolveProvider_ProviderRefWithSecret(t *testing.T) {
 	if err != nil {
 		t.Fatalf("ResolveProvider() error = %v", err)
 	}
-	auth := findEnvVar(t, env, "ANTHROPIC_AUTH_TOKEN")
+	auth := findEnvVar(t, env.Environment, "ANTHROPIC_AUTH_TOKEN")
 	if auth.Value != "" {
 		t.Errorf("ANTHROPIC_AUTH_TOKEN value = %q, want empty", auth.Value)
 	}
@@ -324,7 +325,7 @@ func TestResolveProvider_DefaultFromHarness(t *testing.T) {
 	if err != nil {
 		t.Fatalf("ResolveProvider() error = %v", err)
 	}
-	if got := envValue(t, env, "FROM_HARNESS"); got != "true" {
+	if got := envValue(t, env.Environment, "FROM_HARNESS"); got != "true" {
 		t.Errorf("FROM_HARNESS = %q, want %q", got, "true")
 	}
 }
@@ -350,7 +351,7 @@ func TestResolveProvider_PresetRef(t *testing.T) {
 	if err != nil {
 		t.Fatalf("ResolveProvider() error = %v", err)
 	}
-	if got := envValue(t, env, "ANTHROPIC_BASE_URL"); got == "" {
+	if got := envValue(t, env.Environment, "ANTHROPIC_BASE_URL"); got == "" {
 		t.Error("expected ANTHROPIC_BASE_URL from preset, got empty")
 	}
 }
@@ -379,11 +380,11 @@ func TestResolveProvider_PresetRefOverriddenByEnvironment(t *testing.T) {
 	if err != nil {
 		t.Fatalf("ResolveProvider() error = %v", err)
 	}
-	if got := envValue(t, env, "ANTHROPIC_BASE_URL"); got != "http://custom:9999" {
+	if got := envValue(t, env.Environment, "ANTHROPIC_BASE_URL"); got != "http://custom:9999" {
 		t.Errorf("ANTHROPIC_BASE_URL = %q, want %q", got, "http://custom:9999")
 	}
 	// Preset's other env vars should still be present
-	if got := envValue(t, env, "API_TIMEOUT_MS"); got == "" {
+	if got := envValue(t, env.Environment, "API_TIMEOUT_MS"); got == "" {
 		t.Error("expected API_TIMEOUT_MS from preset, got empty")
 	}
 }
@@ -432,10 +433,10 @@ func TestResolveProvider_InlinePresetRef(t *testing.T) {
 	if err != nil {
 		t.Fatalf("ResolveProvider() error = %v", err)
 	}
-	if got := envValue(t, env, "ANTHROPIC_BASE_URL"); got != "http://override:8080" {
+	if got := envValue(t, env.Environment, "ANTHROPIC_BASE_URL"); got != "http://override:8080" {
 		t.Errorf("ANTHROPIC_BASE_URL = %q, want override", got)
 	}
-	if got := envValue(t, env, "API_TIMEOUT_MS"); got == "" {
+	if got := envValue(t, env.Environment, "API_TIMEOUT_MS"); got == "" {
 		t.Error("expected API_TIMEOUT_MS from preset")
 	}
 }
@@ -474,7 +475,54 @@ func TestResolveProvider_NoAuthTokenInjectionWithoutBaseURL(t *testing.T) {
 		t.Fatalf("ResolveProvider() error = %v", err)
 	}
 	// Without ANTHROPIC_BASE_URL, the token should NOT be injected as ANTHROPIC_AUTH_TOKEN
-	if _, has := lookupEnvVar(env, "ANTHROPIC_AUTH_TOKEN"); has {
+	if _, has := lookupEnvVar(env.Environment, "ANTHROPIC_AUTH_TOKEN"); has {
 		t.Error("ANTHROPIC_AUTH_TOKEN should not be set without ANTHROPIC_BASE_URL")
+	}
+}
+
+func TestResolveProvider_MergesPresetAndExplicitCliArgs(t *testing.T) {
+	provider := &agentv1alpha1.AgentProvider{
+		ObjectMeta: metav1.ObjectMeta{Name: "opencode-provider", Namespace: "default"},
+		Spec: agentv1alpha1.AgentProviderSpec{
+			PresetRef: "gemini",
+			AgentType: "opencode",
+			CliArgs:   []string{"--model", "custom/model"},
+		},
+	}
+	c := fake.NewClientBuilder().WithScheme(newScheme()).WithObjects(provider).Build()
+	run := &agentv1alpha1.AgentRun{
+		ObjectMeta: metav1.ObjectMeta{Name: "test", Namespace: "default"},
+		Spec:       agentv1alpha1.AgentRunSpec{ProviderRef: provider.Name},
+	}
+
+	resolved, err := ResolveProvider(context.Background(), c, run, "")
+
+	if err != nil {
+		t.Fatalf("ResolveProvider() error = %v", err)
+	}
+	want := []string{"--model", "google/gemini-2.5-pro", "--model", "custom/model"}
+	if !slices.Equal(resolved.CliArgs, want) {
+		t.Errorf("CliArgs = %v, want %v", resolved.CliArgs, want)
+	}
+}
+
+func TestResolveProvider_InlinePresetContributesCliArgs(t *testing.T) {
+	c := fake.NewClientBuilder().WithScheme(newScheme()).Build()
+	run := &agentv1alpha1.AgentRun{
+		ObjectMeta: metav1.ObjectMeta{Name: "test", Namespace: "default"},
+		Spec: agentv1alpha1.AgentRunSpec{Provider: &agentv1alpha1.ProviderSpec{
+			PresetRef: "gemini",
+			AgentType: "opencode",
+		}},
+	}
+
+	resolved, err := ResolveProvider(context.Background(), c, run, "")
+
+	if err != nil {
+		t.Fatalf("ResolveProvider() error = %v", err)
+	}
+	want := []string{"--model", "google/gemini-2.5-pro"}
+	if !slices.Equal(resolved.CliArgs, want) {
+		t.Errorf("CliArgs = %v, want %v", resolved.CliArgs, want)
 	}
 }

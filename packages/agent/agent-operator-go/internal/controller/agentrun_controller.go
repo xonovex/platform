@@ -79,11 +79,12 @@ func (r *AgentRunReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 }
 
 type resolvedRunExecution struct {
-	agentType   agentv1alpha1.AgentType
-	providerEnv []corev1.EnvVar
-	toolchain   *agentv1alpha1.ToolchainSpec
-	defaults    resolver.ResolvedDefaults
-	image       string
+	agentType       agentv1alpha1.AgentType
+	providerEnv     []corev1.EnvVar
+	providerCliArgs []string
+	toolchain       *agentv1alpha1.ToolchainSpec
+	defaults        resolver.ResolvedDefaults
+	image           string
 }
 
 func (r *AgentRunReconciler) resolveRunExecution(ctx context.Context, run *agentv1alpha1.AgentRun) (*resolvedRunExecution, error) {
@@ -98,7 +99,7 @@ func (r *AgentRunReconciler) resolveRunExecution(ctx context.Context, run *agent
 		agentType = harness.Spec.Type
 		defaultProvider = harness.Spec.DefaultProvider
 	}
-	providerEnv, err := provider.ResolveProvider(ctx, r.Client, run, defaultProvider)
+	resolvedProvider, err := provider.ResolveProvider(ctx, r.Client, run, defaultProvider)
 	if err != nil {
 		return nil, fmt.Errorf("ProviderResolutionFailed: %w", err)
 	}
@@ -120,11 +121,12 @@ func (r *AgentRunReconciler) resolveRunExecution(ctx context.Context, run *agent
 	}
 
 	return &resolvedRunExecution{
-		agentType:   agentType,
-		providerEnv: providerEnv,
-		toolchain:   toolchain,
-		defaults:    defaults,
-		image:       image,
+		agentType:       agentType,
+		providerEnv:     resolvedProvider.Environment,
+		providerCliArgs: resolvedProvider.CliArgs,
+		toolchain:       toolchain,
+		defaults:        defaults,
+		image:           image,
 	}, nil
 }
 
@@ -171,6 +173,7 @@ func (r *AgentRunReconciler) reconcileExecutionResources(
 		job, err := isoshared.BuildJob(
 			run,
 			execution.providerEnv,
+			execution.providerCliArgs,
 			pvcName,
 			execution.image,
 			execution.defaults.Timeout,

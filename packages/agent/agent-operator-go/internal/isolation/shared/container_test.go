@@ -126,9 +126,13 @@ func TestBuildMainContainers_ClaudeWithPrompt(t *testing.T) {
 
 func TestBuildMainContainers_Opencode(t *testing.T) {
 	run := workspaceRun()
-	run.Spec.Provider = &agentv1alpha1.ProviderSpec{CliArgs: []string{"--model", "google/gemini-2.5-pro"}}
-	containers := mustBuildMainContainers(t, run, nil, "image", agentv1alpha1.AgentTypeOpencode, nil)
+	providerCliArgs := []string{"--model", "google/gemini-2.5-pro"}
 
+	containers, err := BuildMainContainers(run, nil, providerCliArgs, "image", agentv1alpha1.AgentTypeOpencode, nil)
+
+	if err != nil {
+		t.Fatalf("BuildMainContainers() error = %v", err)
+	}
 	c := containers[0]
 	if c.Command[0] != "opencode" {
 		t.Errorf("command = %v, want [opencode]", c.Command)
@@ -204,7 +208,7 @@ func TestBuildMainContainers_TmpVolumeMount(t *testing.T) {
 }
 
 func TestBuildMainContainers_UnknownAgentTypeReturnsError(t *testing.T) {
-	_, err := BuildMainContainers(workspaceRun(), nil, "image", "unknown", nil)
+	_, err := BuildMainContainers(workspaceRun(), nil, nil, "image", "unknown", nil)
 
 	if err == nil {
 		t.Fatal("expected unknown agent type to return an error")

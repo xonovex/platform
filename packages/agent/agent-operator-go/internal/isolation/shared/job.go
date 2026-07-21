@@ -53,7 +53,7 @@ func tmpVolume() corev1.Volume {
 // BuildJob creates the Kubernetes Job for an AgentRun. It is the single pod
 // realizer: a nil ws produces the standalone Job, a non-nil ws produces the
 // workspace-based Job. pvcName is the workspace PVC the pod mounts.
-func BuildJob(run *agentv1alpha1.AgentRun, providerEnv []corev1.EnvVar, pvcName, image string, timeout time.Duration, agentType agentv1alpha1.AgentType, wsType agentv1alpha1.WorkspaceType, tc *agentv1alpha1.ToolchainSpec, ttl *int32, ws *WorkspaceBinding) (*batchv1.Job, error) {
+func BuildJob(run *agentv1alpha1.AgentRun, providerEnv []corev1.EnvVar, providerCliArgs []string, pvcName, image string, timeout time.Duration, agentType agentv1alpha1.AgentType, wsType agentv1alpha1.WorkspaceType, tc *agentv1alpha1.ToolchainSpec, ttl *int32, ws *WorkspaceBinding) (*batchv1.Job, error) {
 	activeDeadlineSeconds := int64(timeout.Seconds())
 	backoffLimit := int32(0)
 
@@ -80,7 +80,7 @@ func BuildJob(run *agentv1alpha1.AgentRun, providerEnv []corev1.EnvVar, pvcName,
 		if err != nil {
 			return nil, err
 		}
-		mainContainers, err = BuildWorkspaceMainContainers(run, providerEnv, image, agentType, ws.SharedVolumes, ws.SharedVolumePVCs, run.Spec.SecurityContext)
+		mainContainers, err = BuildWorkspaceMainContainers(run, providerEnv, providerCliArgs, image, agentType, ws.SharedVolumes, ws.SharedVolumePVCs, run.Spec.SecurityContext)
 		if err != nil {
 			return nil, err
 		}
@@ -91,7 +91,7 @@ func BuildJob(run *agentv1alpha1.AgentRun, providerEnv []corev1.EnvVar, pvcName,
 		if err != nil {
 			return nil, err
 		}
-		mainContainers, err = BuildMainContainers(run, providerEnv, image, agentType, run.Spec.SecurityContext)
+		mainContainers, err = BuildMainContainers(run, providerEnv, providerCliArgs, image, agentType, run.Spec.SecurityContext)
 		if err != nil {
 			return nil, err
 		}

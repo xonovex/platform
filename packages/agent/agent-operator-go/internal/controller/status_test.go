@@ -8,6 +8,7 @@ import (
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
 	networkingv1 "k8s.io/api/networking/v1"
+	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/tools/events"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -248,5 +249,73 @@ func TestProviderReconcileReportsSecretReadiness(t *testing.T) {
 				t.Fatalf("Ready = %v, want %v", updated.Status.Ready, test.ready)
 			}
 		})
+	}
+}
+
+func TestProviderReconcileLeavesStableStatusUnchanged(t *testing.T) {
+	provider := testutil.NewAgentProvider(
+		"test",
+		"provider",
+		testutil.WithAuthTokenSecretRef("credentials", "token"),
+	)
+	secret := &corev1.Secret{
+		ObjectMeta: metav1.ObjectMeta{Name: "credentials", Namespace: "test"},
+		Data:       map[string][]byte{"token": []byte("secret")},
+	}
+	fakeClient := fake.NewClientBuilder().
+		WithScheme(testutil.NewScheme()).
+		WithStatusSubresource(&agentv1alpha1.AgentProvider{}).
+		WithObjects(provider, secret).
+		Build()
+	reconciler := &AgentProviderReconciler{Client: fakeClient, Recorder: events.NewFakeRecorder(10)}
+	request := ctrl.Request{NamespacedName: client.ObjectKeyFromObject(provider)}
+
+	if _, err := reconciler.Reconcile(context.Background(), request); err != nil {
+		t.Fatalf("first Reconcile() error = %v", err)
+	}
+	var first agentv1alpha1.AgentProvider
+	if err := fakeClient.Get(context.Background(), request.NamespacedName, &first); err != nil {
+		t.Fatalf("get first AgentProvider: %v", err)
+	}
+	if _, err := reconciler.Reconcile(context.Background(), request); err != nil {
+		t.Fatalf("second Reconcile() error = %v", err)
+	}
+	var second agentv1alpha1.AgentProvider
+	if err := fakeClient.Get(context.Background(), request.NamespacedName, &second); err != nil {
+		t.Fatalf("get second AgentProvider: %v", err)
+	}
+
+	if first.ResourceVersion != second.ResourceVersion {
+		t.Errorf("ResourceVersion changed from %q to %q for stable status", first.ResourceVersion, second.ResourceVersion)
+	}
+	firstReady := meta.FindStatusCondition(first.Status.Conditions, "Ready")
+	secondReady := meta.FindStatusCondition(second.Status.Conditions, "Ready")
+	if firstReady == nil || secondReady == nil || !firstReady.LastTransitionTime.Equal(&secondReady.LastTransitionTime) {
+		t.Errorf("Ready transition time changed for stable status: first=%#v second=%#v", firstReady, secondReady)
+	}
+}
+
+func TestProvidersForSecretReturnsDependentProviders(t *testing.T) {
+	matching := testutil.NewAgentProvider(
+		"test",
+		"matching",
+		testutil.WithAuthTokenSecretRef("credentials", "token"),
+	)
+	unrelated := testutil.NewAgentProvider(
+		"test",
+		"unrelated",
+		testutil.WithAuthTokenSecretRef("other", "token"),
+	)
+	fakeClient := fake.NewClientBuilder().
+		WithScheme(testutil.NewScheme()).
+		WithObjects(matching, unrelated).
+		Build()
+	reconciler := &AgentProviderReconciler{Client: fakeClient}
+	secret := &corev1.Secret{ObjectMeta: metav1.ObjectMeta{Name: "credentials", Namespace: "test"}}
+
+	requests := reconciler.providersForSecret(context.Background(), secret)
+
+	if len(requests) != 1 || requests[0].NamespacedName != client.ObjectKeyFromObject(matching) {
+		t.Fatalf("providersForSecret() = %v, want matching provider", requests)
 	}
 }

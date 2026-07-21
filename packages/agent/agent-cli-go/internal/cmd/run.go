@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 
@@ -98,7 +99,7 @@ func newRunCommand() *cobra.Command {
 	cmd.Flags().StringSliceVar(&options.initCommands, "init-command", nil, "Init command to run before the agent for --provision command (repeatable)")
 	cmd.Flags().StringVar(&options.nixSource, "nix-source", options.nixSource, "Nix source for --provision nix (packages, flake)")
 	cmd.Flags().StringVar(&options.nixRev, "nix-rev", "", "Pinned nixpkgs rev for --nix-source packages")
-	cmd.Flags().StringSliceVar(&options.nixPackages, "nix-packages", nil, "Packages for --nix-source packages (repeatable)")
+	cmd.Flags().StringSliceVar(&options.nixPackages, "nix-packages", nil, "Additional packages for --nix-source packages; selected agent is automatic (repeatable)")
 	cmd.Flags().StringVar(&options.nixShell, "nix-shell", options.nixShell, "devShell name for --nix-source flake")
 	cmd.Flags().StringVar(&options.image, "image", "", "Container image (for docker isolation)")
 
@@ -306,7 +307,7 @@ func runAgent(cmd *cobra.Command, args []string, options runOptions) error {
 		return fmt.Errorf("isolation=none cannot restrict network egress (network=%q); use bwrap or docker", axes.Network)
 	}
 
-	input, err := provisionInput(axes.ProvisionName, options, workspace.sourceRepoDir, workspace.executionDir)
+	input, err := provisionInput(axes.ProvisionName, options, agent, workspace.sourceRepoDir, workspace.executionDir)
 	if err != nil {
 		return err
 	}
@@ -317,6 +318,9 @@ func runAgent(cmd *cobra.Command, args []string, options runOptions) error {
 	customEnv, err := envutil.ParseCustomEnv(append(append([]string{}, fileConfig.CustomEnv...), options.customEnv...))
 	if err != nil {
 		return fmt.Errorf("invalid custom environment: %w", err)
+	}
+	if err := validateAgentExecutable(axes, agent, contribution); err != nil {
+		return err
 	}
 
 	runCfg := isoshared.RunConfig{
@@ -443,16 +447,74 @@ func prepareWorkspace(options runOptions, workDir string, verbose bool) (prepare
 // only for the nix provisioner; the others ignore it. An invalid --nix-source is
 // returned as an error here (naming the bad value) rather than degrading to a
 // zero source that fails later with a misleading diagnostic.
-func provisionInput(provName provision.ProvisionMethod, options runOptions, repoDir, workDir string) (provshared.Input, error) {
+func provisionInput(provName provision.ProvisionMethod, options runOptions, agent *types.AgentConfig, repoDir, workDir string) (provshared.Input, error) {
 	in := provshared.Input{InitCommands: options.initCommands}
 	if provName == provision.ProvisionNix {
-		src, err := provnix.SourceFromFlags(options.nixSource, options.nixRev, options.nixPackages, options.nixShell, "", repoDir, workDir)
+		packages := append([]string{}, options.nixPackages...)
+		if options.nixSource == "" || options.nixSource == "packages" {
+			packages = appendUnique(packages, agent.NixPackage)
+		}
+		src, err := provnix.SourceFromFlags(options.nixSource, options.nixRev, packages, options.nixShell, "", repoDir, workDir)
 		if err != nil {
 			return provshared.Input{}, err
 		}
 		in.NixSource = src
 	}
 	return in, nil
+}
+
+func appendUnique(values []string, value string) []string {
+	if value == "" {
+		return values
+	}
+	for _, current := range values {
+		if current == value {
+			return values
+		}
+	}
+	return append(values, value)
+}
+
+func validateAgentExecutable(axes resolvedAxes, agent *types.AgentConfig, contribution provision.Contribution) error {
+	if axes.ProvisionName == provision.ProvisionNix {
+		if contributionContainsExecutable(contribution, agent.Binary) {
+			return nil
+		}
+		return fmt.Errorf("nix provision did not supply agent executable %q; include package %q or select a flake shell that provides it", agent.Binary, agent.NixPackage)
+	}
+
+	switch axes.IsolationName {
+	case isolation.IsolationNone:
+		if axes.ProvisionName == provision.ProvisionNone {
+			if _, err := exec.LookPath(agent.Binary); err != nil {
+				return fmt.Errorf("agent executable %q is not available on host PATH: %w", agent.Binary, err)
+			}
+		}
+	case isolation.IsolationBwrap:
+		if axes.ProvisionName == provision.ProvisionNone {
+			if !axes.Passthrough {
+				return fmt.Errorf("bwrap with provision=none cannot supply agent executable %q while host passthrough is disabled; use provision=nix or enable --isolation-bwrap-passthrough", agent.Binary)
+			}
+			if _, err := exec.LookPath(agent.Binary); err != nil {
+				return fmt.Errorf("agent executable %q is not available on passthrough PATH: %w", agent.Binary, err)
+			}
+		}
+	case isolation.IsolationDocker:
+		if axes.ProvisionName == provision.ProvisionNone && (axes.Image == "" || axes.Image == isolation.DefaultContainerImage) {
+			return fmt.Errorf("the default docker image does not contain agent executable %q; use provision=nix or a digest-pinned --image that contains it", agent.Binary)
+		}
+	}
+	return nil
+}
+
+func contributionContainsExecutable(contribution provision.Contribution, binary string) bool {
+	for _, directory := range contribution.PathEntries {
+		info, err := os.Stat(filepath.Join(directory, binary))
+		if err == nil && info.Mode().IsRegular() && info.Mode().Perm()&0o111 != 0 {
+			return true
+		}
+	}
+	return false
 }
 
 // executeWithTerminal runs the resolved cell inside a terminal wrapper.

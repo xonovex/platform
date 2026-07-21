@@ -19,8 +19,8 @@ agent-cli run -a claude
 agent-cli run -a opencode
 
 # Run with the three sandbox axes (isolation × provision × network)
-agent-cli run --isolation bwrap --provision command --init-command 'echo setup'
-agent-cli run --isolation docker --network none
+agent-cli run --isolation bwrap --provision command --isolation-bwrap-passthrough --init-command 'command -v claude'
+agent-cli run --isolation docker --provision nix --nix-source packages --nix-rev <rev> --network none
 agent-cli run --isolation bwrap --provision nix --nix-source packages --nix-rev <rev> --nix-packages ripgrep
 agent-cli run --isolation bwrap --provision nix --nix-source flake --nix-shell default
 
@@ -50,7 +50,7 @@ Options:
   --init-command <cmd>         Init command for --provision command (repeatable)
   --nix-source <kind>          Nix source: packages, flake (default: packages)
   --nix-rev <rev>              Pinned nixpkgs rev for --nix-source packages
-  --nix-packages <pkg>         Package for --nix-source packages (repeatable)
+  --nix-packages <pkg>         Additional package for --nix-source packages (repeatable; selected agent is automatic)
   --nix-shell <name>           devShell for --nix-source flake (default: default)
   --require-pinned-provision   Require provisioning from a pinned source
   --require-host-tools-unreachable

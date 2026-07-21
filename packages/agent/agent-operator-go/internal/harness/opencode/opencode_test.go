@@ -9,11 +9,9 @@ import (
 
 func TestCommandBuilderIncludesProviderArguments(t *testing.T) {
 	builder := &CommandBuilder{}
-	run := &agentv1alpha1.AgentRun{Spec: agentv1alpha1.AgentRunSpec{
-		Provider: &agentv1alpha1.ProviderSpec{CliArgs: []string{"--model", "custom/model"}},
-	}}
+	run := &agentv1alpha1.AgentRun{}
 
-	command, args := builder.Command(run)
+	command, args := builder.Command(run, []string{"--model", "custom/model"})
 
 	if len(command) != 1 || command[0] != "opencode" {
 		t.Errorf("command = %v, want [opencode]", command)
@@ -26,7 +24,7 @@ func TestCommandBuilderIncludesProviderArguments(t *testing.T) {
 func TestCommandBuilderSupportsRunWithoutProvider(t *testing.T) {
 	builder := &CommandBuilder{}
 
-	command, args := builder.Command(&agentv1alpha1.AgentRun{})
+	command, args := builder.Command(&agentv1alpha1.AgentRun{}, nil)
 
 	if len(command) != 1 || command[0] != "opencode" || len(args) != 0 {
 		t.Errorf("Command() = %v %v, want executable without arguments", command, args)

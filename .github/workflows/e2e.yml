@@ -1,7 +1,5 @@
-# Manually dispatched Kubernetes test coverage for the four Kind-based e2e suites
-# (e2e, e2e-gvisor, e2e-kata, e2e-coco). Ordinary CI owns envtest integration.
-#
-# Trigger this workflow with workflow_dispatch.
+# Kubernetes test coverage for the four Kind-based e2e suites. Pull requests run
+# the basic and gVisor suites; the weekly and manual runs include Kata and CoCo.
 #
 # First-run expectations:
 # - Each e2e suite creates its own Kind cluster on the hosted runner (Docker is
@@ -16,6 +14,17 @@
 name: E2E
 
 on:
+  pull_request:
+    paths:
+      - .github/actions/setup-nix/**
+      - .github/workflows/e2e.yml
+      - packages/agent/agent-operator-go/**
+      - packages/shared/shared-agent-go/**
+      - packages/shared/shared-core-go/**
+      - flake.lock
+      - flake.nix
+  schedule:
+    - cron: "17 4 * * 0"
   workflow_dispatch:
 
 concurrency:
@@ -41,25 +50,33 @@ jobs:
         include:
           - suite: e2e
             target: agent-operator-go:ci-e2e
+            pull_request: true
           - suite: e2e-gvisor
             target: agent-operator-go:ci-e2e-gvisor
+            pull_request: true
           - suite: e2e-kata
             target: agent-operator-go:ci-e2e-kata
+            pull_request: false
           - suite: e2e-coco
             target: agent-operator-go:ci-e2e-coco
+            pull_request: false
 
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        if: github.event_name != 'pull_request' || matrix.pull_request
         with:
           fetch-depth: 0
           persist-credentials: false
 
       - uses: ./.github/actions/setup-nix
+        if: github.event_name != 'pull_request' || matrix.pull_request
 
       - name: Install repository dependencies
+        if: github.event_name != 'pull_request' || matrix.pull_request
         run: nix develop --no-update-lock-file --command npm ci
 
       - name: Run suite
+        if: github.event_name != 'pull_request' || matrix.pull_request
         run: nix develop --no-update-lock-file --command npx moon run "$MOON_TARGET" 2>&1 | tee "$RUNNER_TEMP/suite.log"
         env:
           MOON_TARGET: ${{ matrix.target }}
@@ -68,7 +85,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Report executed-vs-skipped counts
-        if: always()
+        if: always() && (github.event_name != 'pull_request' || matrix.pull_request)
         run: |
           if [ -x node_modules/.bin/moon ]; then
             nix develop --no-update-lock-file --command npx moon run agent-operator-go:ci-e2e-summary -- \

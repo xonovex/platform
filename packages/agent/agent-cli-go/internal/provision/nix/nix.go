@@ -53,9 +53,12 @@ func SourceFromFlags(kind, rev string, packages []string, shell, flakeRef, repoD
 }
 
 // agentNixDir is the base directory for agent-nix runtime data (GC-roots).
-func agentNixDir() string {
-	home, _ := os.UserHomeDir()
-	return filepath.Join(home, ".local", "share", "agent-nix")
+func agentNixDir() (string, error) {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return "", fmt.Errorf("resolve user home directory: %w", err)
+	}
+	return filepath.Join(home, ".local", "share", "agent-nix"), nil
 }
 
 // resolveFunc resolves a source to a closure; rootFunc registers a GC-root over
@@ -107,8 +110,12 @@ func (p *Provisioner) Contribute(in provshared.Input) (provision.Contribution, e
 
 // gcRootDir is the per-source GC-root directory, keyed by the content hash so the
 // same source reuses one root set across runs.
-func gcRootDir(src sharednix.NixSource) string {
-	return filepath.Join(agentNixDir(), "gcroots", sharednix.ComputeEnvID(src))
+func gcRootDir(src sharednix.NixSource) (string, error) {
+	base, err := agentNixDir()
+	if err != nil {
+		return "", err
+	}
+	return filepath.Join(base, "gcroots", sharednix.ComputeEnvID(src)), nil
 }
 
 // registerGCRoot roots the full dev closure. Rooting each top-level store path
@@ -123,7 +130,10 @@ func registerGCRoot(src sharednix.NixSource, closure sharednix.ClosureDescriptor
 		return fmt.Errorf("closure has no store paths to root")
 	}
 
-	dir := gcRootDir(src)
+	dir, err := gcRootDir(src)
+	if err != nil {
+		return err
+	}
 	if err := os.MkdirAll(dir, 0o755); err != nil {
 		return err
 	}

@@ -11,7 +11,7 @@ func TestCommandBuilderIncludesPrompt(t *testing.T) {
 	builder := &CommandBuilder{}
 	run := &agentv1alpha1.AgentRun{Spec: agentv1alpha1.AgentRunSpec{Prompt: "Review the patch"}}
 
-	command, args := builder.Command(run)
+	command, args := builder.Command(run, nil)
 
 	if len(command) != 1 || command[0] != "claude" {
 		t.Errorf("command = %v, want [claude]", command)
@@ -24,7 +24,7 @@ func TestCommandBuilderIncludesPrompt(t *testing.T) {
 func TestCommandBuilderOmitsEmptyPrompt(t *testing.T) {
 	builder := &CommandBuilder{}
 
-	_, args := builder.Command(&agentv1alpha1.AgentRun{})
+	_, args := builder.Command(&agentv1alpha1.AgentRun{}, nil)
 
 	if slices.Contains(args, "--prompt") {
 		t.Errorf("args = %v, want no prompt", args)

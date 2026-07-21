@@ -12,7 +12,7 @@ import (
 
 func mustBuildJob(t testing.TB, run *agentv1alpha1.AgentRun, providerEnv []corev1.EnvVar, pvcName, image string, timeout time.Duration, agentType agentv1alpha1.AgentType, workspaceType agentv1alpha1.WorkspaceType, toolchain *agentv1alpha1.ToolchainSpec, ttl *int32, workspace *WorkspaceBinding) *batchv1.Job {
 	t.Helper()
-	job, err := BuildJob(run, providerEnv, pvcName, image, timeout, agentType, workspaceType, toolchain, ttl, workspace)
+	job, err := BuildJob(run, providerEnv, nil, pvcName, image, timeout, agentType, workspaceType, toolchain, ttl, workspace)
 	if err != nil {
 		t.Fatalf("build Job: %v", err)
 	}
@@ -39,7 +39,7 @@ func mustBuildInitContainers(t testing.TB, run *agentv1alpha1.AgentRun, image st
 
 func mustBuildMainContainers(t testing.TB, run *agentv1alpha1.AgentRun, providerEnv []corev1.EnvVar, image string, agentType agentv1alpha1.AgentType, securityContext *corev1.SecurityContext) []corev1.Container {
 	t.Helper()
-	containers, err := BuildMainContainers(run, providerEnv, image, agentType, securityContext)
+	containers, err := BuildMainContainers(run, providerEnv, nil, image, agentType, securityContext)
 	if err != nil {
 		t.Fatalf("build main containers: %v", err)
 	}
@@ -57,7 +57,7 @@ func mustBuildWorktreeInitContainers(t testing.TB, run *agentv1alpha1.AgentRun, 
 
 func mustBuildWorkspaceMainContainers(t testing.TB, run *agentv1alpha1.AgentRun, providerEnv []corev1.EnvVar, image string, agentType agentv1alpha1.AgentType, sharedVolumes []agentv1alpha1.SharedVolumeSpec, sharedVolumePVCs map[string]string, securityContext *corev1.SecurityContext) []corev1.Container {
 	t.Helper()
-	containers, err := BuildWorkspaceMainContainers(run, providerEnv, image, agentType, sharedVolumes, sharedVolumePVCs, securityContext)
+	containers, err := BuildWorkspaceMainContainers(run, providerEnv, nil, image, agentType, sharedVolumes, sharedVolumePVCs, securityContext)
 	if err != nil {
 		t.Fatalf("build workspace main containers: %v", err)
 	}
