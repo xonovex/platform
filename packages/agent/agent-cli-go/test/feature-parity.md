@@ -10,8 +10,8 @@ This document tracks feature parity between the TypeScript `script-agent` and Go
 - [x] Provider selection (`-p`/`--provider`)
 - [x] Isolation axis (`--isolation`): none, bwrap, docker
 - [x] Provision axis (`--provision`): none, nix, command
-- [x] Network axis (`--network`): host, none, proxy
-- [x] Host passthrough (`--isolation-bwrap-passthrough`); fail-closed unavailable proxy mode; init command (`--init-command`)
+- [x] Network axis (`--network`): host, none; unsupported proxy requests fail closed
+- [x] Host passthrough (`--isolation-bwrap-passthrough`); init command (`--init-command`)
 - [x] Independent sandbox guarantees (`--require-pinned-provision`, `--require-host-tools-unreachable`, `--require-egress-restricted`, `--require-kernel-isolation`)
 - [x] Nix source flags (`--nix-source`, `--nix-rev`, `--nix-packages`, `--nix-shell`)
 - [x] Work directory (`-w`/`--work-dir`)

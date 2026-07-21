@@ -89,7 +89,7 @@ func newRunCommand() *cobra.Command {
 	cmd.Flags().StringVarP(&options.provider, "provider", "p", "", "Model provider")
 	cmd.Flags().StringVar(&options.isolation, "isolation", options.isolation, "Isolation axis (none, bwrap, docker)")
 	cmd.Flags().StringVar(&options.provision, "provision", options.provision, "Provision axis (none, nix, command)")
-	cmd.Flags().StringVar(&options.network, "network", options.network, "Network egress axis (host, none, proxy)")
+	cmd.Flags().StringVar(&options.network, "network", options.network, "Network egress axis (host, none)")
 
 	// Per-type knobs under the --<axis>-<type>-<option> grammar.
 	cmd.Flags().StringVar(&options.isolationDockerRuntime, "isolation-docker-runtime", "", "Kernel-isolating container runtime, e.g. runsc (docker only)")
@@ -195,9 +195,6 @@ func resolveAxes(f flags) (resolvedAxes, error) {
 	net, err := netshared.ParseMode(netStr)
 	if err != nil {
 		return resolvedAxes{}, err
-	}
-	if net == netshared.ModeProxy {
-		return resolvedAxes{}, netshared.ErrProxyEnforcementUnavailable
 	}
 
 	pol := f.policy()

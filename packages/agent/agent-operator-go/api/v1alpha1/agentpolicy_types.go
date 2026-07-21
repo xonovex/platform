@@ -23,6 +23,10 @@ type AgentPolicyEnforced struct {
 	// (i.e. spec.networkPolicy must not be Disabled).
 	RequireNetworkPolicy bool `json:"requireNetworkPolicy,omitempty"`
 
+	// RequireEgressRestricted, if true, rejects host networking and custom egress
+	// rules whose effective destination set cannot be proven restricted.
+	RequireEgressRestricted bool `json:"requireEgressRestricted,omitempty"`
+
 	// MaxTimeout is the maximum allowed timeout for AgentRuns.
 	MaxTimeout *metav1.Duration `json:"maxTimeout,omitempty"`
 

@@ -112,8 +112,7 @@ func (i *Isolator) buildArgs(cfg isoshared.RunConfig, c provision.Contribution) 
 		"--clearenv",
 	}
 
-	// Network — applied EXPLICITLY via the network bridge (regression guard:
-	// --unshare-net for none/proxy).
+	// Network is applied explicitly through the network bridge.
 	netArgs, err := networkArgs(cfg.Network)
 	if err != nil {
 		return nil, err
@@ -194,9 +193,8 @@ func (i *Isolator) buildArgs(cfg isoshared.RunConfig, c provision.Contribution) 
 }
 
 // sandboxEnv builds the explicit environment allowlist for inside the sandbox:
-// HOME/PATH/TMPDIR/SHELL, the contribution's env, the provider tokens, the
-// caller's custom env, and the proxy egress env. API keys reach the sandbox ONLY
-// through this allowlist.
+// HOME/PATH/TMPDIR/SHELL, the contribution's env, the provider tokens, and the
+// caller's custom env. API keys reach the sandbox only through this allowlist.
 func (i *Isolator) sandboxEnv(cfg isoshared.RunConfig, c provision.Contribution, homeDir string) (map[string]string, error) {
 	env := map[string]string{
 		"HOME":   homeDir,

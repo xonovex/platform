@@ -242,6 +242,7 @@ spec:
     allowedRuntimeClassNames: [kata, gvisor]
     requireSecurityContext: true
     requireNetworkPolicy: true
+    requireEgressRestricted: true
     maxTimeout: 1h
     maxResources:
       cpu: "2"
@@ -254,19 +255,19 @@ spec:
     runtimeClassName: kata
 ```
 
-| Host policy intent  | Native admission behavior                                                                                         | Independent verification                                                  |
-| ------------------- | ----------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
-| Runtime isolation   | Requires or allowlists `runtimeClassName`                                                                         | Verify the cluster RuntimeClass and runtime implementation                |
-| Container hardening | Rejects explicit privilege escalation and root weakening                                                          | Inspect the generated Pod security context and cluster admission policy   |
-| Network restriction | Rejects `networkPolicy.disabled: true` when required                                                              | Verify generated NetworkPolicy behavior with the installed network plugin |
-| Duration bound      | Requires an explicit/policy-defaulted timeout at or below `maxTimeout`                                            | Observe Job timeout and terminal status                                   |
-| Resource bound      | Requires a limit for each `maxResources` entry; rejects requests/limits above it                                  | Keep namespace LimitRange and ResourceQuota as an independent control     |
-| Image restriction   | Requires a digest-pinned image resolved from the run, harness, toolchain, or policy, then applies `allowedImages` | Add signature/provenance admission when digest pinning is insufficient    |
-| Toolchain pinning   | AgentToolchain/inline Nix validation requires revision, source, and image digest                                  | Verify registry digest and the built closure provenance                   |
+| Host policy intent  | Native admission behavior                                                                                           | Independent verification                                                  |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| Runtime isolation   | Requires or allowlists `runtimeClassName`                                                                           | Verify the cluster RuntimeClass and runtime implementation                |
+| Container hardening | Rejects explicit privilege escalation and root weakening                                                            | Inspect the generated Pod security context and cluster admission policy   |
+| Network restriction | Rejects disabled policies, unrestricted host networking, proxy mode without a backend, and unprovable custom egress | Verify generated NetworkPolicy behavior with the installed network plugin |
+| Duration bound      | Requires an explicit/policy-defaulted timeout at or below `maxTimeout`                                              | Observe Job timeout and terminal status                                   |
+| Resource bound      | Requires a limit for each `maxResources` entry; rejects requests/limits above it                                    | Keep namespace LimitRange and ResourceQuota as an independent control     |
+| Image restriction   | Requires a digest-pinned image resolved from the run, harness, toolchain, or policy, then applies `allowedImages`   | Add signature/provenance admission when digest pinning is insufficient    |
+| Toolchain pinning   | AgentToolchain/inline Nix validation requires revision, source, and image digest                                    | Verify registry digest and the built closure provenance                   |
 
 Policy defaults are applied before harness and toolchain references are resolved at admission. The admitted AgentRun stores the exact digest-pinned image and sandboxed runtime class that policy approved; missing or mutable image inputs and missing runtime classes are rejected even when no AgentPolicy exists.
 
-Admission configuration and the webhook endpoint must be reachable for these controls to enforce. Verify installation with negative probes for a wrong runtime class, disabled network policy, excessive timeout/resource limit, disallowed or missing image, moving Nix image tag, policy API outage, and duplicate namespace policies. An accepted object is admission evidence only; it does not prove the runtime, network, registry, or quota layer behaved correctly.
+Admission configuration and the webhook endpoint must be reachable for these controls to enforce. Verify installation with negative probes for a wrong runtime class, disabled or custom-open network policy, host or proxy network mode, invalid workspace storage quantity, excessive timeout/resource limit, disallowed or missing image, moving Nix image tag, policy API outage, and duplicate namespace policies. An accepted object is admission evidence only; it does not prove the runtime, network, registry, or quota layer behaved correctly.
 
 ## Installation
 

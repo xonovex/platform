@@ -6,7 +6,7 @@ func TestEgressIsRestricted(t *testing.T) {
 	cases := map[NetworkMethod]bool{
 		NetworkHost:  false,
 		NetworkNone:  true,
-		NetworkProxy: true,
+		NetworkProxy: false,
 	}
 	for net, want := range cases {
 		if got := EgressIsRestricted(net); got != want {

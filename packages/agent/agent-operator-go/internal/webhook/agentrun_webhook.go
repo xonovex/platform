@@ -7,6 +7,7 @@ import (
 	"time"
 
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/resource"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
@@ -124,6 +125,11 @@ func (w *AgentRunWebhook) validate(ctx context.Context, run *agentv1alpha1.Agent
 	// Validate inline workspace repository fields
 	if run.Spec.Workspace != nil {
 		repo := run.Spec.Workspace.Repository
+		if run.Spec.Workspace.StorageSize != "" {
+			if _, err := resource.ParseQuantity(run.Spec.Workspace.StorageSize); err != nil {
+				return nil, fmt.Errorf("workspace storageSize %q is not a valid resource quantity: %v", run.Spec.Workspace.StorageSize, err)
+			}
+		}
 		if err := validator.ValidateRepositoryURL(repo.URL); err != nil {
 			return nil, err
 		}
@@ -144,6 +150,9 @@ func (w *AgentRunWebhook) validate(ctx context.Context, run *agentv1alpha1.Agent
 
 	// Validate NetworkPolicy egress rules
 	var warnings admission.Warnings
+	if run.Spec.Network == agentv1alpha1.NetworkModeProxy {
+		return nil, fmt.Errorf("network=proxy is unavailable until an enforceable FQDN-aware backend is configured")
+	}
 	if run.Spec.NetworkPolicy != nil && !run.Spec.NetworkPolicy.Disabled {
 		for _, rule := range run.Spec.NetworkPolicy.Egress {
 			if len(rule.To) == 0 {
@@ -195,6 +204,15 @@ func (w *AgentRunWebhook) applyReferencedDefaults(ctx context.Context, run *agen
 		if run.Spec.RuntimeClassName == nil && harness.Spec.DefaultRuntimeClassName != nil {
 			runtimeClassName := *harness.Spec.DefaultRuntimeClassName
 			run.Spec.RuntimeClassName = &runtimeClassName
+		}
+		if run.Spec.SecurityContext == nil && harness.Spec.DefaultSecurityContext != nil {
+			run.Spec.SecurityContext = harness.Spec.DefaultSecurityContext.DeepCopy()
+		}
+		if run.Spec.PodSecurityContext == nil && harness.Spec.DefaultPodSecurityContext != nil {
+			run.Spec.PodSecurityContext = harness.Spec.DefaultPodSecurityContext.DeepCopy()
+		}
+		if run.Spec.NetworkPolicy == nil && harness.Spec.DefaultNetworkPolicy != nil {
+			run.Spec.NetworkPolicy = harness.Spec.DefaultNetworkPolicy.DeepCopy()
 		}
 	}
 
@@ -341,6 +359,23 @@ func enforcePolicy(run *agentv1alpha1.AgentRun, policy *agentv1alpha1.AgentPolic
 	if e.RequireNetworkPolicy {
 		if run.Spec.NetworkPolicy != nil && run.Spec.NetworkPolicy.Disabled {
 			return fmt.Errorf("policy requires NetworkPolicy to be enabled")
+		}
+	}
+
+	if e.RequireEgressRestricted {
+		switch run.Spec.Network {
+		case agentv1alpha1.NetworkModeHost:
+			return fmt.Errorf("policy requires restricted egress; network=host is unrestricted")
+		case agentv1alpha1.NetworkModeProxy:
+			return fmt.Errorf("policy requires restricted egress; network=proxy has no enforceable backend")
+		}
+		if run.Spec.NetworkPolicy != nil {
+			if run.Spec.NetworkPolicy.Disabled {
+				return fmt.Errorf("policy requires restricted egress; NetworkPolicy cannot be disabled")
+			}
+			if len(run.Spec.NetworkPolicy.Egress) > 0 {
+				return fmt.Errorf("policy requires restricted egress; custom egress rules cannot be proven restricted")
+			}
 		}
 	}
 

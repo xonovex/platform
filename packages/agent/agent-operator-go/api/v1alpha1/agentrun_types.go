@@ -54,7 +54,8 @@ const (
 	NetworkModeHost NetworkMode = "host"
 	// NetworkModeNone allows DNS only.
 	NetworkModeNone NetworkMode = "none"
-	// NetworkModeProxy allows public egress except metadata/RFC1918/loopback.
+	// NetworkModeProxy is reserved for an enforceable FQDN-aware proxy backend.
+	// Admission rejects it until such a backend is configured.
 	NetworkModeProxy NetworkMode = "proxy"
 )
 
@@ -243,14 +244,10 @@ type AgentRunSpec struct {
 	SecurityContext *corev1.SecurityContext `json:"securityContext,omitempty"`
 	// PodSecurityContext overrides the default pod-level security context
 	PodSecurityContext *corev1.PodSecurityContext `json:"podSecurityContext,omitempty"`
-	// Network is the egress axis (host, none, proxy) mapped onto the per-AgentRun
-	// egress NetworkPolicy. host = unrestricted (does not satisfy egress-restricted);
-	// none = DNS only; proxy = public egress except metadata/RFC1918/loopback (an
-	// FQDN-aware allowlist is the documented upgrade). Defaults to none.
+	// Network is the egress axis mapped onto the per-AgentRun NetworkPolicy.
+	// host is unrestricted, none is DNS-only, and proxy is rejected until an
+	// enforceable FQDN-aware backend is available. Defaults to none.
 	Network NetworkMode `json:"network,omitempty"`
-	// EgressAllowlist extends the default allowlist for Network=proxy (FQDN-aware
-	// upgrade path; carried for the policy engine, not enforced by L3/L4 rules).
-	EgressAllowlist []string `json:"egressAllowlist,omitempty"`
 	// NetworkPolicy configures the NetworkPolicy applied to agent pods. When set it
 	// takes precedence over Network. Defaults to deny-all egress. Set Disabled:true
 	// to skip creation.

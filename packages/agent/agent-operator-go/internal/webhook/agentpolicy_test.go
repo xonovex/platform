@@ -8,6 +8,7 @@ import (
 	"time"
 
 	corev1 "k8s.io/api/core/v1"
+	networkingv1 "k8s.io/api/networking/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -45,6 +46,7 @@ func basePolicy() *agentv1alpha1.AgentPolicy {
 				RuntimeClassName:         strPtr("kata"),
 				RequireSecurityContext:   true,
 				RequireNetworkPolicy:     true,
+				RequireEgressRestricted:  true,
 				MaxTimeout:               &metav1.Duration{Duration: 2 * time.Hour},
 				AllowedImages:            []string{"ghcr.io/xonovex/"},
 				AllowedRuntimeClassNames: []string{"kata", "gvisor"},
@@ -220,6 +222,50 @@ func TestEnforcePolicy_AllowsEnabledNetworkPolicy(t *testing.T) {
 
 	if err := enforcePolicy(run, policy); err != nil {
 		t.Errorf("enforcePolicy() error = %v, want nil", err)
+	}
+}
+
+func TestEnforcePolicy_RejectsUnrestrictedNetworkConfigurations(t *testing.T) {
+	tests := []struct {
+		name   string
+		mutate func(*agentv1alpha1.AgentRun)
+		phrase string
+	}{
+		{
+			name: "host network",
+			mutate: func(run *agentv1alpha1.AgentRun) {
+				run.Spec.Network = agentv1alpha1.NetworkModeHost
+			},
+			phrase: "network=host",
+		},
+		{
+			name: "proxy without backend",
+			mutate: func(run *agentv1alpha1.AgentRun) {
+				run.Spec.Network = agentv1alpha1.NetworkModeProxy
+			},
+			phrase: "network=proxy",
+		},
+		{
+			name: "custom egress",
+			mutate: func(run *agentv1alpha1.AgentRun) {
+				run.Spec.NetworkPolicy = &agentv1alpha1.AgentNetworkPolicy{
+					Egress: []networkingv1.NetworkPolicyEgressRule{{}},
+				}
+			},
+			phrase: "custom egress",
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			run := baseRun()
+			test.mutate(run)
+
+			err := enforcePolicy(run, basePolicy())
+			if err == nil || !strings.Contains(err.Error(), test.phrase) {
+				t.Fatalf("enforcePolicy() error = %v, want phrase %q", err, test.phrase)
+			}
+		})
 	}
 }
 

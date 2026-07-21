@@ -138,7 +138,10 @@ func (r *AgentRunReconciler) reconcileExecutionResources(
 	logger := log.FromContext(ctx).WithValues("agentRun", run.Name, "namespace", run.Namespace)
 	networkPolicy := execution.defaults.NetworkPolicy
 	if networkPolicy == nil || !networkPolicy.Disabled {
-		resource := netshared.BuildNetworkPolicy(run, networkPolicy)
+		resource, err := netshared.BuildNetworkPolicy(run, networkPolicy)
+		if err != nil {
+			return ctrl.Result{}, err
+		}
 		if err := ctrl.SetControllerReference(run, resource, r.Scheme); err != nil {
 			return ctrl.Result{}, err
 		}

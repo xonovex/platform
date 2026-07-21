@@ -50,6 +50,9 @@ spec:
                     requireNetworkPolicy:
                       type: boolean
                       description: If true, requires AgentRuns to have a NetworkPolicy enabled.
+                    requireEgressRestricted:
+                      type: boolean
+                      description: If true, rejects unrestricted host networking and custom egress rules that cannot be proven restricted.
                     maxTimeout:
                       type: string
                       description: Maximum allowed timeout for AgentRuns (e.g. "2h0m0s").

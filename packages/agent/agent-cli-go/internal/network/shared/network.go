@@ -1,8 +1,7 @@
-// Package shared is the network axis core. Network is a CLOSED enum
-// (host|none|proxy) realized here with no registry — unlike isolation and
-// provision, the variant set is fixed, so there is no lazy-factory plug-in
-// machinery. The per-isolator network flags live in isolation bridge files
-// (isolation/<type>/network.go), which depend on this package one-way only.
+// Package shared is the network axis core. Network is a closed enum with host
+// and none realized here and proxy reserved until an enforceable transport is
+// available. The per-isolator network flags live in isolation bridge files,
+// which depend on this package one-way only.
 package shared
 
 import (
@@ -24,15 +23,16 @@ const (
 	ModeProxy = netenum.NetworkProxy
 )
 
-// EgressIsRestricted reports whether the mode restricts egress (none or proxy);
-// host shares the host network unrestricted and does not qualify.
+// EgressIsRestricted reports whether the mode enforceably restricts egress.
 func EgressIsRestricted(m Mode) bool { return netenum.EgressIsRestricted(m) }
 
 // ParseMode validates s and returns the corresponding Mode.
 func ParseMode(s string) (Mode, error) {
 	switch Mode(s) {
-	case ModeHost, ModeNone, ModeProxy:
+	case ModeHost, ModeNone:
 		return Mode(s), nil
+	case ModeProxy:
+		return "", ErrProxyEnforcementUnavailable
 	default:
 		return "", &InvalidModeError{Value: s}
 	}
@@ -42,5 +42,5 @@ func ParseMode(s string) (Mode, error) {
 type InvalidModeError struct{ Value string }
 
 func (e *InvalidModeError) Error() string {
-	return "unknown network mode " + e.Value + "; valid: host, none, proxy"
+	return "unknown network mode " + e.Value + "; valid: host, none"
 }

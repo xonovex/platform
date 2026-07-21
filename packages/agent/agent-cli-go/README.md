@@ -44,8 +44,7 @@ Options:
   -p, --provider <name>        Model provider for the agent
   --isolation <method>         Isolation: none, bwrap, docker (default: none)
   --provision <method>         Provision: none, nix, command (default: none)
-  --network <method>           Network egress: host, none, proxy (default: host;
-                               proxy is rejected until an enforceable transport exists)
+  --network <method>           Network egress: host, none (default: host)
   --isolation-bwrap-passthrough
                                Expose host tools to bwrap (forfeits host-tools-unreachable)
   --init-command <cmd>         Init command for --provision command (repeatable)

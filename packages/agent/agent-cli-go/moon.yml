@@ -52,9 +52,9 @@ tasks:
       bash "$workspaceRoot/.moon/scripts/check-go-package-coverage.sh"
       ./internal/cmd=65
       ./internal/config=60
-      ./internal/provision/nix=30
-      ./internal/workspace/git=18
-      ./internal/workspace/jj=35
+      ./internal/provision/nix=80
+      ./internal/workspace/git=80
+      ./internal/workspace/jj=90
     inputs:
       - "@globs(sources)"
       - "@globs(tests)"

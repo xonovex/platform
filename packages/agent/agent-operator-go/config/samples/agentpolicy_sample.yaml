@@ -8,6 +8,7 @@ spec:
     runtimeClassName: kata
     requireSecurityContext: true
     requireNetworkPolicy: true
+    requireEgressRestricted: true
     maxTimeout: 2h0m0s
     maxResources:
       cpu: "2"

@@ -6,6 +6,8 @@ import (
 	"testing"
 	"time"
 
+	corev1 "k8s.io/api/core/v1"
+	networkingv1 "k8s.io/api/networking/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
 
@@ -218,6 +220,83 @@ func TestAgentRunWebhook_Validate_MissingRepoURL(t *testing.T) {
 	_, err := w.ValidateCreate(context.Background(), run)
 	if err == nil {
 		t.Error("ValidateCreate() expected error for missing repo URL in inline workspace")
+	}
+}
+
+func TestAgentRunWebhook_Validate_InvalidInlineWorkspaceStorageSize(t *testing.T) {
+	run := baseRun()
+	run.Spec.Workspace.StorageSize = "not-a-quantity"
+
+	_, err := (&AgentRunWebhook{}).ValidateCreate(context.Background(), run)
+	if err == nil || !strings.Contains(err.Error(), "storageSize") {
+		t.Fatalf("ValidateCreate() error = %v, want storageSize validation error", err)
+	}
+}
+
+func TestAgentRunWebhook_Validate_ProxyFailsClosed(t *testing.T) {
+	run := baseRun()
+	run.Spec.Network = agentv1alpha1.NetworkModeProxy
+
+	_, err := (&AgentRunWebhook{}).ValidateCreate(context.Background(), run)
+	if err == nil || !strings.Contains(err.Error(), "network=proxy") {
+		t.Fatalf("ValidateCreate() error = %v, want unavailable proxy error", err)
+	}
+}
+
+func TestAgentRunWebhook_Validate_ReferencedHarnessDefaultsCannotBypassPolicy(t *testing.T) {
+	tests := []struct {
+		name   string
+		mutate func(*agentv1alpha1.AgentHarness)
+		phrase string
+	}{
+		{
+			name: "weak security context",
+			mutate: func(harness *agentv1alpha1.AgentHarness) {
+				harness.Spec.DefaultSecurityContext = &corev1.SecurityContext{
+					AllowPrivilegeEscalation: boolPtr(true),
+				}
+			},
+			phrase: "AllowPrivilegeEscalation",
+		},
+		{
+			name: "custom open egress",
+			mutate: func(harness *agentv1alpha1.AgentHarness) {
+				harness.Spec.DefaultNetworkPolicy = &agentv1alpha1.AgentNetworkPolicy{
+					Egress: []networkingv1.NetworkPolicyEgressRule{{}},
+				}
+			},
+			phrase: "custom egress",
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			runtimeClassName := "kata"
+			harness := &agentv1alpha1.AgentHarness{
+				ObjectMeta: metav1.ObjectMeta{Name: "secure-harness", Namespace: "test-ns"},
+				Spec: agentv1alpha1.AgentSpec{
+					Type:                    agentv1alpha1.AgentTypeClaude,
+					DefaultImage:            baseRun().Spec.Image,
+					DefaultRuntimeClassName: &runtimeClassName,
+				},
+			}
+			test.mutate(harness)
+			policy := basePolicy()
+			policy.ObjectMeta = metav1.ObjectMeta{Name: "sandbox-policy", Namespace: "test-ns"}
+			webhook := &AgentRunWebhook{Client: fake.NewClientBuilder().
+				WithScheme(testutil.NewScheme()).
+				WithObjects(harness, policy).
+				Build()}
+			run := baseRun()
+			run.Spec.HarnessRef = harness.Name
+			run.Spec.Image = ""
+			run.Spec.RuntimeClassName = nil
+
+			_, err := webhook.ValidateCreate(context.Background(), run)
+			if err == nil || !strings.Contains(err.Error(), test.phrase) {
+				t.Fatalf("ValidateCreate() error = %v, want phrase %q", err, test.phrase)
+			}
+		})
 	}
 }
 

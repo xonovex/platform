@@ -5,7 +5,7 @@
 - A Nix toolchain is a pre-built, digest-pinned OCI image, never a per-pod install. `NixSpec` requires `nixpkgsRev`, `packages` XOR `flakeRef`/`shell`, and `image`; the webhook enforces `RequirePinnedProvision`. Build it with `npx moon run agent-operator-go:agent-image-build` (`nix build .#legacyPackages.<sys>.agentImage` plus skopeo push).
 - Build operator images from the same `flake.lock` and `nix/agent-env.nix` closure as the CLI; verify store paths with `nix path-info -r`, not byte-identical layers. Do not add a `nixos/nix` init container or `nix-env` emptyDir.
 - Harden untrusted pods fail-closed: require `RequireKernelIsolation` through a sandboxed `runtimeClassName` in `DefaultRuntimeClassName`/`AllowedRuntimeClassNames`, never default runc; use the controller-created zero-RBAC `agent-runner` ServiceAccount with `automountServiceAccountToken=false`, apply resource defaults plus `config/agent/` limits/quotas, and keep `readOnlyRootFilesystem=true` with a writable HOME `emptyDir` and `fsGroup=1000`.
-- Create a default-deny egress `NetworkPolicy` per run: `none` is DNS-only, `proxy` allows public destinations except metadata/RFC1918/loopback plus DNS, and `host` allows all; use Cilium `toFQDNs`/Squid for FQDN-aware enforcement.
+- Create a default-deny egress `NetworkPolicy` per run: `none` is DNS-only and `host` allows all. Reject `proxy` until a Cilium `toFQDNs`, Squid, or equivalent backend can enforce FQDN-aware policy without direct-socket bypass.
 - Unit: `go test ./...` (builders, resolvers, webhooks)
 - Integration: `go test -tags=integration ./test/integration/` (requires `KUBEBUILDER_ASSETS`)
 - E2E: `go test -tags=e2e ./test/e2e/` (requires Docker, kind, kubectl)

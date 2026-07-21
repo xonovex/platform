@@ -219,8 +219,7 @@ func resolveImage(image string) string {
 }
 
 // containerEnv builds the container environment: HOME/TMPDIR/SHELL/PATH, the
-// contribution's env, the provider tokens, the caller's custom env, and the
-// proxy egress env.
+// contribution's env, the provider tokens, and the caller's custom env.
 func (i *Isolator) containerEnv(cfg isoshared.RunConfig, c provision.Contribution) (map[string]string, error) {
 	env := map[string]string{
 		"HOME":   containerHome,

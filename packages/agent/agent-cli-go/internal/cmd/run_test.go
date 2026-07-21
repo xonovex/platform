@@ -17,8 +17,11 @@ import (
 )
 
 func TestParseNetwork(t *testing.T) {
-	if _, err := netshared.ParseMode("proxy"); err != nil {
-		t.Errorf("ParseMode(proxy) = %v", err)
+	if _, err := netshared.ParseMode("host"); err != nil {
+		t.Errorf("ParseMode(host) = %v", err)
+	}
+	if _, err := netshared.ParseMode("proxy"); !errors.Is(err, netshared.ErrProxyEnforcementUnavailable) {
+		t.Errorf("ParseMode(proxy) error = %v, want %v", err, netshared.ErrProxyEnforcementUnavailable)
 	}
 	if _, err := netshared.ParseMode("bogus"); err == nil {
 		t.Error("ParseMode(bogus) = nil, want error")

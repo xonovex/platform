@@ -47,7 +47,7 @@ describe("main", () => {
 `,
     );
     writeFileSync(join(skill, "references", "details.md"), "# Details\n");
-    const log = vi.spyOn(console, "log").mockImplementation(() => undefined);
+    const log = vi.spyOn(console, "log").mockImplementation(vi.fn());
 
     const result = await main([skill, "--json"]);
 
@@ -70,7 +70,7 @@ describe("main", () => {
 `,
     );
     writeFileSync(join(skill, "references", "uncovered.md"), "# Uncovered\n");
-    const log = vi.spyOn(console, "log").mockImplementation(() => undefined);
+    const log = vi.spyOn(console, "log").mockImplementation(vi.fn());
 
     const result = await main([skill, "--max-age=1"]);
 
@@ -136,7 +136,7 @@ describe("main", () => {
 - **Last reviewed:** 2099-01-01
 `,
     );
-    const log = vi.spyOn(console, "log").mockImplementation(() => undefined);
+    const log = vi.spyOn(console, "log").mockImplementation(vi.fn());
     vi.spyOn(process.stderr, "write").mockImplementation(() => true);
 
     const result = await main(["--all", root, "--json"]);

@@ -1,6 +1,7 @@
 package shared
 
 import (
+	"errors"
 	"testing"
 
 	corev1 "k8s.io/api/core/v1"
@@ -20,9 +21,23 @@ func newTestAgentRun(name, namespace string) *agentv1alpha1.AgentRun {
 	}
 }
 
+func mustBuildNetworkPolicy(
+	t *testing.T,
+	run *agentv1alpha1.AgentRun,
+	networkPolicy *agentv1alpha1.AgentNetworkPolicy,
+) *networkingv1.NetworkPolicy {
+	t.Helper()
+
+	policy, err := BuildNetworkPolicy(run, networkPolicy)
+	if err != nil {
+		t.Fatalf("BuildNetworkPolicy() error = %v", err)
+	}
+	return policy
+}
+
 func TestBuildNetworkPolicy_DefaultNoneDNSOnly(t *testing.T) {
 	run := newTestAgentRun("my-run", "default")
-	np := BuildNetworkPolicy(run, nil)
+	np := mustBuildNetworkPolicy(t, run, nil)
 
 	if np.Name != "my-run-netpol" {
 		t.Errorf("name = %q, want %q", np.Name, "my-run-netpol")
@@ -51,38 +66,15 @@ func TestBuildNetworkPolicy_NetworkMapping(t *testing.T) {
 	// host → a single allow-all rule (explicit opt-in).
 	host := newTestAgentRun("h", "default")
 	host.Spec.Network = "host"
-	if eg := BuildNetworkPolicy(host, nil).Spec.Egress; len(eg) != 1 || len(eg[0].To) != 0 {
+	if eg := mustBuildNetworkPolicy(t, host, nil).Spec.Egress; len(eg) != 1 || len(eg[0].To) != 0 {
 		t.Errorf("host egress = %v, want one allow-all rule", eg)
 	}
 
-	// proxy → DNS + public-except-private (metadata/RFC1918/loopback blocked).
+	// proxy fails closed because NetworkPolicy cannot enforce FQDN allowlists.
 	proxy := newTestAgentRun("p", "default")
 	proxy.Spec.Network = "proxy"
-	eg := BuildNetworkPolicy(proxy, nil).Spec.Egress
-	if len(eg) != 2 {
-		t.Fatalf("proxy egress rules = %d, want 2 (DNS + public)", len(eg))
-	}
-	var block *networkingv1.IPBlock
-	for _, r := range eg {
-		for _, peer := range r.To {
-			if peer.IPBlock != nil {
-				block = peer.IPBlock
-			}
-		}
-	}
-	if block == nil || block.CIDR != "0.0.0.0/0" {
-		t.Fatal("proxy must allow public egress via 0.0.0.0/0")
-	}
-	for _, want := range []string{"169.254.0.0/16", "10.0.0.0/8", "127.0.0.0/8"} {
-		found := false
-		for _, ex := range block.Except {
-			if ex == want {
-				found = true
-			}
-		}
-		if !found {
-			t.Errorf("proxy must block %s (metadata/RFC1918/loopback)", want)
-		}
+	if _, err := BuildNetworkPolicy(proxy, nil); !errors.Is(err, ErrProxyEnforcementUnavailable) {
+		t.Fatalf("BuildNetworkPolicy(proxy) error = %v, want %v", err, ErrProxyEnforcementUnavailable)
 	}
 }
 
@@ -105,7 +97,7 @@ func TestBuildNetworkPolicy_WithEgressRules(t *testing.T) {
 		},
 	}
 
-	np := BuildNetworkPolicy(run, &agentv1alpha1.AgentNetworkPolicy{
+	np := mustBuildNetworkPolicy(t, run, &agentv1alpha1.AgentNetworkPolicy{
 		Egress: []networkingv1.NetworkPolicyEgressRule{protocol},
 	})
 
@@ -117,9 +109,20 @@ func TestBuildNetworkPolicy_WithEgressRules(t *testing.T) {
 	}
 }
 
+func TestBuildNetworkPolicy_EmptyExplicitPolicyDeniesAllEgress(t *testing.T) {
+	run := newTestAgentRun("my-run", "default")
+	run.Spec.Network = agentv1alpha1.NetworkModeHost
+
+	np := mustBuildNetworkPolicy(t, run, &agentv1alpha1.AgentNetworkPolicy{})
+
+	if len(np.Spec.Egress) != 0 {
+		t.Fatalf("egress rules = %d, want deny-all", len(np.Spec.Egress))
+	}
+}
+
 func TestBuildNetworkPolicy_Labels(t *testing.T) {
 	run := newTestAgentRun("test-run", "test-ns")
-	np := BuildNetworkPolicy(run, nil)
+	np := mustBuildNetworkPolicy(t, run, nil)
 
 	expectedLabels := map[string]string{
 		"app.kubernetes.io/name":      "agent-operator",
@@ -140,7 +143,7 @@ func TestBuildNetworkPolicy_Labels(t *testing.T) {
 
 func TestBuildNetworkPolicy_PolicyTypes(t *testing.T) {
 	run := newTestAgentRun("my-run", "default")
-	np := BuildNetworkPolicy(run, nil)
+	np := mustBuildNetworkPolicy(t, run, nil)
 
 	if len(np.Spec.PolicyTypes) != 2 {
 		t.Fatalf("policyTypes = %d, want 2", len(np.Spec.PolicyTypes))

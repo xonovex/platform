@@ -42,7 +42,7 @@ func (i *Isolator) PinnedProvision(_ provision.ProvisionMethod, provisionerPinne
 func (i *Isolator) KernelIsolated(string) bool { return false }
 
 // Run executes the agent on the host. It fails CLOSED when a network restriction
-// is requested: with no namespace there is no way to unshare or proxy egress.
+// is requested: with no namespace there is no way to enforce restricted egress.
 func (i *Isolator) Run(cfg isoshared.RunConfig, c provision.Contribution) (int, error) {
 	cmd, env, err := i.hostCommand(cfg, c)
 	if err != nil {

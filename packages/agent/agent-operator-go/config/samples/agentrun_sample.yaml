@@ -15,18 +15,7 @@ spec:
       url: https://github.com/example/repo.git
       branch: main
   prompt: "Review the codebase and suggest improvements"
-  networkPolicy:
-    egress:
-      - to:
-          - ipBlock:
-              cidr: 0.0.0.0/0
-              except:
-                - 10.0.0.0/8
-                - 172.16.0.0/12
-                - 192.168.0.0/16
-        ports:
-          - port: 443
-            protocol: TCP
+  network: none
   timeout: 30m
   # For Confidential Computing (AMD SEV-SNP), replace runtimeClassName with kata-cc:
   # nodeSelector:

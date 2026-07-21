@@ -406,6 +406,13 @@ spec:
                   description: PodSecurityContext overrides the default pod-level security context.
                   type: object
                   x-kubernetes-preserve-unknown-fields: true
+                network:
+                  description: Network selects the egress mode. Host is unrestricted, none is DNS-only, and proxy is rejected until an enforceable FQDN-aware backend is configured.
+                  type: string
+                  enum:
+                    - host
+                    - none
+                    - proxy
                 networkPolicy:
                   description: NetworkPolicy configures the NetworkPolicy applied to agent pods.
                   type: object

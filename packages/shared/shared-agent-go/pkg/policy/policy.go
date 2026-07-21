@@ -55,8 +55,8 @@ type SandboxPolicy struct {
 	// bind-reachable. Conditioned on closure-only store binds, no host-$HOME bind,
 	// and (docker) a pinned image.
 	RequireHostToolsUnreachable bool
-	// RequireEgressRestricted mandates Network ∈ {none, proxy}; Network=host does
-	// not satisfy it.
+	// RequireEgressRestricted mandates Network=none; host is unrestricted and
+	// proxy remains unavailable without an enforceable transport.
 	RequireEgressRestricted bool
 	// RequireKernelIsolation mandates a kernel boundary: docker --runtime
 	// runsc/gVisor, or a pod with a sandboxed runtimeClass (gVisor/Kata/kata-cc).
@@ -75,7 +75,7 @@ func EnforcePolicy(caps Capabilities, pol SandboxPolicy) error {
 		return fmt.Errorf("the selected isolation leaves host tools reachable: %w", ErrHostToolsReachable)
 	}
 	if pol.RequireEgressRestricted && !caps.EgressRestricted {
-		return fmt.Errorf("the network method does not restrict egress (require-egress-restricted needs none or proxy): %w", ErrEgressUnrestricted)
+		return fmt.Errorf("the network method does not restrict egress (require-egress-restricted needs none): %w", ErrEgressUnrestricted)
 	}
 	if pol.RequireKernelIsolation && !caps.KernelIsolated {
 		return fmt.Errorf("the selected isolation gives no kernel boundary (require-kernel-isolation needs docker --runtime runsc/gVisor or a sandboxed runtimeClass): %w", ErrKernelIsolationUnmet)
