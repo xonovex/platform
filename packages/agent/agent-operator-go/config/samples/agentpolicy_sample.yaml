@@ -19,6 +19,9 @@ spec:
     allowedRuntimeClassNames:
       - kata
       - gvisor
+    allowedSecretNames:
+      - anthropic-credentials
+      - repository-credentials
   defaults:
     image: ghcr.io/xonovex/agent-image@sha256:<digest>
     timeout: 30m0s

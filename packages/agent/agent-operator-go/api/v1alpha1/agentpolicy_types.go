@@ -9,7 +9,7 @@ import (
 // Ensure unused imports don't cause errors
 var _ = resource.Quantity{}
 
-// AgentPolicyEnforced defines constraints that AgentRuns in this namespace cannot override.
+// AgentPolicyEnforced defines constraints that AgentRuns and AgentWorkspaces in this namespace cannot override.
 type AgentPolicyEnforced struct {
 	// RuntimeClassName, if set, requires all AgentRuns to use this runtimeClassName.
 	RuntimeClassName *string `json:"runtimeClassName,omitempty"`
@@ -42,9 +42,14 @@ type AgentPolicyEnforced struct {
 	// AllowedRuntimeClassNames lists permitted runtimeClassNames.
 	// If non-empty, AgentRun.Spec.RuntimeClassName must be in this list.
 	AllowedRuntimeClassNames []string `json:"allowedRuntimeClassNames,omitempty"`
+
+	// AllowedSecretNames lists Secrets that AgentRuns and AgentWorkspaces may
+	// reference. Secret-backed environment variables, provider credentials, and
+	// repository credentials are rejected unless their Secret is listed here.
+	AllowedSecretNames []string `json:"allowedSecretNames,omitempty"`
 }
 
-// AgentPolicyDefaults defines overridable defaults applied when AgentRun fields are absent.
+// AgentPolicyDefaults defines overridable defaults applied when execution fields are absent.
 type AgentPolicyDefaults struct {
 	// Image is the digest-pinned container image used when AgentRun.Spec.Image is not set.
 	// +kubebuilder:validation:Pattern=`^.+@sha256:[0-9a-fA-F]{64}$`
@@ -77,7 +82,7 @@ type AgentPolicyStatus struct {
 // +kubebuilder:resource:scope=Namespaced
 // +kubebuilder:printcolumn:name="Age",type=date,JSONPath=`.metadata.creationTimestamp`
 
-// AgentPolicy defines enforced security constraints and defaults for AgentRuns in a namespace.
+// AgentPolicy defines enforced security constraints and defaults for agent execution in a namespace.
 type AgentPolicy struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`

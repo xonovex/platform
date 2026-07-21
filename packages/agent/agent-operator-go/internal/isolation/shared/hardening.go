@@ -4,9 +4,6 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-
-	agentv1alpha1 "github.com/xonovex/platform/packages/agent/agent-operator-go/api/v1alpha1"
-	"github.com/xonovex/platform/packages/agent/agent-operator-go/internal/plugins"
 )
 
 const (
@@ -58,47 +55,76 @@ func defaultAgentResources() corev1.ResourceRequirements {
 // standalone and workspace Jobs:
 //   - a dedicated zero-RBAC ServiceAccount with no mounted token (the agent never
 //     reaches the Kubernetes API);
-//   - default resource bounds on the agent container when the run did not request
-//     them (node-DoS containment);
-//   - for the nix image (non-root uid 1000 with a read-only rootfs), a writable
-//     HOME emptyDir + fsGroup so the agent can write config/cache/state. The image
-//     bakes only empty XDG dirs under HOME, so the mount shadows nothing.
+//   - resource bounds on every init and main container (node-DoS containment);
+//   - a writable HOME emptyDir + fsGroup so read-only-root containers can write
+//     config, cache, and state without weakening the root filesystem.
 //
-// The container runtimeClassName is left to run.Spec.RuntimeClassName (defaulted
-// from the harness DefaultRuntimeClassName): RequireKernelIsolation is satisfied
-// only by a sandboxed runtimeClass, never by default runc.
-func applyPodHardening(spec *corev1.PodSpec, run *agentv1alpha1.AgentRun, tc *agentv1alpha1.ToolchainSpec) {
+// The caller must resolve a sandboxed runtimeClassName before building the pod;
+// this function never substitutes default runc.
+func applyPodHardening(spec *corev1.PodSpec, resources corev1.ResourceRequirements) {
 	autoMount := false
 	spec.ServiceAccountName = AgentServiceAccountName
 	spec.AutomountServiceAccountToken = &autoMount
 
-	if len(spec.Containers) > 0 {
-		if len(run.Spec.Resources.Requests) > 0 || len(run.Spec.Resources.Limits) > 0 {
-			spec.Containers[0].Resources = run.Spec.Resources
-		} else {
-			spec.Containers[0].Resources = defaultAgentResources()
-		}
+	if len(resources.Requests) == 0 && len(resources.Limits) == 0 {
+		resources = defaultAgentResources()
 	}
-
-	// An image-based toolchain runs non-root at a read-only rootfs; reconcile with
-	// a writable HOME emptyDir + fsGroup.
-	if tcl := plugins.ResolveToolchain(tc); tcl != nil && tcl.Image() != "" {
-		if spec.SecurityContext == nil {
-			spec.SecurityContext = &corev1.PodSecurityContext{}
-		}
-		if spec.SecurityContext.FSGroup == nil {
-			gid := agentFSGroup
-			spec.SecurityContext.FSGroup = &gid
-		}
+	if spec.SecurityContext == nil {
+		spec.SecurityContext = &corev1.PodSecurityContext{}
+	}
+	if spec.SecurityContext.FSGroup == nil {
+		gid := agentFSGroup
+		spec.SecurityContext.FSGroup = &gid
+	}
+	if !hasVolume(spec.Volumes, homeVolumeName) {
 		spec.Volumes = append(spec.Volumes, corev1.Volume{
 			Name:         homeVolumeName,
 			VolumeSource: corev1.VolumeSource{EmptyDir: &corev1.EmptyDirVolumeSource{}},
 		})
-		if len(spec.Containers) > 0 {
-			spec.Containers[0].VolumeMounts = append(spec.Containers[0].VolumeMounts, corev1.VolumeMount{
-				Name:      homeVolumeName,
-				MountPath: agentHome,
-			})
+	}
+	for index := range spec.InitContainers {
+		hardenContainer(&spec.InitContainers[index], resources)
+	}
+	for index := range spec.Containers {
+		hardenContainer(&spec.Containers[index], resources)
+	}
+}
+
+func hardenContainer(container *corev1.Container, resources corev1.ResourceRequirements) {
+	container.Resources = *resources.DeepCopy()
+	ensureVolumeMount(container, corev1.VolumeMount{Name: homeVolumeName, MountPath: agentHome})
+	ensureVolumeMount(container, corev1.VolumeMount{Name: "tmp", MountPath: "/tmp"})
+	setEnvironment(container, "HOME", agentHome)
+	setEnvironment(container, "XDG_CONFIG_HOME", agentHome+"/.config")
+	setEnvironment(container, "XDG_CACHE_HOME", agentHome+"/.cache")
+	setEnvironment(container, "XDG_STATE_HOME", agentHome+"/.local/state")
+}
+
+func ensureVolumeMount(container *corev1.Container, mount corev1.VolumeMount) {
+	for index := range container.VolumeMounts {
+		if container.VolumeMounts[index].Name == mount.Name {
+			container.VolumeMounts[index] = mount
+			return
 		}
 	}
+	container.VolumeMounts = append(container.VolumeMounts, mount)
+}
+
+func setEnvironment(container *corev1.Container, name, value string) {
+	for index := range container.Env {
+		if container.Env[index].Name == name {
+			container.Env[index] = corev1.EnvVar{Name: name, Value: value}
+			return
+		}
+	}
+	container.Env = append(container.Env, corev1.EnvVar{Name: name, Value: value})
+}
+
+func hasVolume(volumes []corev1.Volume, name string) bool {
+	for _, volume := range volumes {
+		if volume.Name == name {
+			return true
+		}
+	}
+	return false
 }

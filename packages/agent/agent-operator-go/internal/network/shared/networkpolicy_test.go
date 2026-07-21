@@ -156,6 +156,35 @@ func TestBuildNetworkPolicy_PolicyTypes(t *testing.T) {
 	}
 }
 
+func TestBuildWorkspaceInitNetworkPolicyAllowsOnlyDNSAndRepositoryPort(t *testing.T) {
+	workspace := &agentv1alpha1.AgentWorkspace{
+		ObjectMeta: metav1.ObjectMeta{Name: "workspace", Namespace: "agents"},
+		Spec: agentv1alpha1.AgentWorkspaceSpec{Repository: agentv1alpha1.RepositorySpec{
+			URL: "https://github.com/org/repo.git",
+		}},
+	}
+
+	policy, err := BuildWorkspaceInitNetworkPolicy(workspace)
+
+	if err != nil {
+		t.Fatalf("BuildWorkspaceInitNetworkPolicy() error = %v", err)
+	}
+	if policy.Name != "workspace-init-netpol" {
+		t.Fatalf("Name = %q, want workspace-init-netpol", policy.Name)
+	}
+	if len(policy.Spec.Ingress) != 0 || len(policy.Spec.Egress) != 2 {
+		t.Fatalf("Ingress = %v, Egress = %v, want denied ingress and two egress rules", policy.Spec.Ingress, policy.Spec.Egress)
+	}
+	selector := policy.Spec.PodSelector.MatchLabels
+	if selector["app.kubernetes.io/component"] != "workspace-init" {
+		t.Fatalf("component selector = %q, want workspace-init", selector["app.kubernetes.io/component"])
+	}
+	httpsPort := policy.Spec.Egress[1].Ports[0].Port
+	if httpsPort == nil || httpsPort.IntValue() != 443 {
+		t.Fatalf("repository port = %v, want 443", httpsPort)
+	}
+}
+
 func protocolPtr(p corev1.Protocol) *corev1.Protocol {
 	return &p
 }

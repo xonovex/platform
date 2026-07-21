@@ -280,7 +280,7 @@ digraph AgentOperatorArchitecture {
           <TR><TD><B>Main: agent</B></TD></TR>
           <TR><TD><FONT POINT-SIZE="8">workingDir: /workspace-wt/{run}</FONT></TD></TR>
           <TR><TD><FONT POINT-SIZE="8">mounts: workspace PVC + shared vols</FONT></TD></TR>
-          <TR><TD><FONT POINT-SIZE="8">e.g. /root/.claude, /root/.opencode</FONT></TD></TR>
+          <TR><TD><FONT POINT-SIZE="8">e.g. /home/agent/.claude, /home/agent/.config/opencode</FONT></TD></TR>
         </TABLE>>,
         fillcolor="#4dd0e1"
       ];

@@ -3,6 +3,7 @@ package webhook
 import (
 	"context"
 	"fmt"
+	"maps"
 	"strings"
 	"time"
 
@@ -14,6 +15,7 @@ import (
 
 	"k8s.io/apimachinery/pkg/api/equality"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/types"
 
 	agentv1alpha1 "github.com/xonovex/platform/packages/agent/agent-operator-go/api/v1alpha1"
 	"github.com/xonovex/platform/packages/agent/agent-operator-go/internal/plugins"
@@ -41,7 +43,7 @@ func (w *AgentRunWebhook) SetupWebhookWithManager(mgr ctrl.Manager) error {
 
 // Default implements admission.Defaulter
 func (w *AgentRunWebhook) Default(ctx context.Context, run *agentv1alpha1.AgentRun) error {
-	policy, err := w.namespacePolicy(ctx, run.Namespace)
+	policy, err := namespacePolicy(ctx, w.Client, run.Namespace)
 	if err != nil {
 		return err
 	}
@@ -51,10 +53,7 @@ func (w *AgentRunWebhook) Default(ctx context.Context, run *agentv1alpha1.AgentR
 	if err := w.applyReferencedDefaults(ctx, run); err != nil {
 		return err
 	}
-	if run.Spec.Timeout == nil {
-		defaultTimeout := metav1.Duration{Duration: time.Hour}
-		run.Spec.Timeout = &defaultTimeout
-	}
+	applyBuiltInDefaults(run)
 	return nil
 }
 
@@ -162,7 +161,7 @@ func (w *AgentRunWebhook) validate(ctx context.Context, run *agentv1alpha1.Agent
 		}
 	}
 
-	policy, err := w.namespacePolicy(ctx, run.Namespace)
+	policy, err := namespacePolicy(ctx, w.Client, run.Namespace)
 	if err != nil {
 		return nil, err
 	}
@@ -173,10 +172,20 @@ func (w *AgentRunWebhook) validate(ctx context.Context, run *agentv1alpha1.Agent
 	if err := w.applyReferencedDefaults(ctx, effectiveRun); err != nil {
 		return nil, err
 	}
+	applyBuiltInDefaults(effectiveRun)
+	if err := validateTimeout(effectiveRun.Spec.Timeout); err != nil {
+		return nil, err
+	}
 	if err := validateExecutionBoundary(effectiveRun, policy); err != nil {
 		return nil, err
 	}
 	if policy != nil {
+		if err := validatePolicyDurations(policy); err != nil {
+			return nil, err
+		}
+		if err := validateRunSecretAccess(effectiveRun, policy); err != nil {
+			return nil, err
+		}
 		if err := enforcePolicy(effectiveRun, policy); err != nil {
 			return nil, err
 		}
@@ -185,13 +194,13 @@ func (w *AgentRunWebhook) validate(ctx context.Context, run *agentv1alpha1.Agent
 	return warnings, nil
 }
 
-// applyReferencedDefaults resolves harness and toolchain references during
-// admission so the stored AgentRun contains the exact image and runtime class
-// that policy validation approved. Toolchain images take precedence because the
-// controller executes that image.
+// applyReferencedDefaults snapshots harness, provider, and toolchain references
+// during admission so reconciliation consumes the exact execution inputs policy
+// approved. Toolchain images take precedence because the controller executes
+// that image.
 func (w *AgentRunWebhook) applyReferencedDefaults(ctx context.Context, run *agentv1alpha1.AgentRun) error {
-	if (run.Spec.HarnessRef != "" || run.Spec.ToolchainRef != "") && w.Client == nil {
-		return fmt.Errorf("referenced harness or toolchain requires a Kubernetes client during admission")
+	if (run.Spec.HarnessRef != "" || run.Spec.ProviderRef != "" || run.Spec.ToolchainRef != "") && w.Client == nil {
+		return fmt.Errorf("referenced harness, provider, or toolchain requires a Kubernetes client during admission")
 	}
 
 	harness, err := resolver.ResolveHarness(ctx, w.Client, run.Namespace, run.Spec.HarnessRef, run.Spec.Harness)
@@ -199,22 +208,39 @@ func (w *AgentRunWebhook) applyReferencedDefaults(ctx context.Context, run *agen
 		return fmt.Errorf("resolve harness defaults: %w", err)
 	}
 	if harness != nil {
-		if run.Spec.Image == "" {
-			run.Spec.Image = harness.Spec.DefaultImage
+		resolver.ApplyHarnessDefaults(run, harness)
+		if run.Spec.ProviderRef == "" && run.Spec.Provider == nil {
+			run.Spec.ProviderRef = harness.Spec.DefaultProvider
 		}
-		if run.Spec.RuntimeClassName == nil && harness.Spec.DefaultRuntimeClassName != nil {
-			runtimeClassName := *harness.Spec.DefaultRuntimeClassName
-			run.Spec.RuntimeClassName = &runtimeClassName
+		if run.Spec.HarnessRef != "" {
+			run.Spec.Harness = harness.Spec.DeepCopy()
+			run.Spec.HarnessRef = ""
 		}
-		if run.Spec.SecurityContext == nil && harness.Spec.DefaultSecurityContext != nil {
-			run.Spec.SecurityContext = harness.Spec.DefaultSecurityContext.DeepCopy()
+	}
+
+	if run.Spec.ProviderRef != "" {
+		var referencedProvider agentv1alpha1.AgentProvider
+		if err := w.Client.Get(ctx, types.NamespacedName{Name: run.Spec.ProviderRef, Namespace: run.Namespace}, &referencedProvider); err != nil {
+			return fmt.Errorf("resolve provider defaults: %w", err)
 		}
-		if run.Spec.PodSecurityContext == nil && harness.Spec.DefaultPodSecurityContext != nil {
-			run.Spec.PodSecurityContext = harness.Spec.DefaultPodSecurityContext.DeepCopy()
+		if err := validateProviderConfig(
+			referencedProvider.Spec.PresetRef,
+			referencedProvider.Spec.AgentType,
+			referencedProvider.Spec.AuthTokenSecretRef,
+			referencedProvider.Spec.Environment,
+			referencedProvider.Spec.CliArgs,
+		); err != nil {
+			return fmt.Errorf("invalid referenced provider: %w", err)
 		}
-		if run.Spec.NetworkPolicy == nil && harness.Spec.DefaultNetworkPolicy != nil {
-			run.Spec.NetworkPolicy = harness.Spec.DefaultNetworkPolicy.DeepCopy()
+		run.Spec.Provider = &agentv1alpha1.ProviderSpec{
+			PresetRef:     referencedProvider.Spec.PresetRef,
+			AgentType:     referencedProvider.Spec.AgentType,
+			Type:          referencedProvider.Spec.Type,
+			AuthSecretRef: referencedProvider.Spec.AuthTokenSecretRef.DeepCopy(),
+			Environment:   maps.Clone(referencedProvider.Spec.Environment),
+			CliArgs:       append([]string{}, referencedProvider.Spec.CliArgs...),
 		}
+		run.Spec.ProviderRef = ""
 	}
 
 	toolchain, err := resolver.ResolveToolchain(ctx, w.Client, run.Namespace, run.Spec.ToolchainRef, run.Spec.Toolchain)
@@ -230,6 +256,66 @@ func (w *AgentRunWebhook) applyReferencedDefaults(ctx context.Context, run *agen
 		run.Spec.Image = toolchain.Nix.Image
 	}
 	return nil
+}
+
+func applyBuiltInDefaults(run *agentv1alpha1.AgentRun) {
+	if run.Spec.Timeout == nil {
+		defaultTimeout := metav1.Duration{Duration: time.Hour}
+		run.Spec.Timeout = &defaultTimeout
+	}
+}
+
+func validateTimeout(timeout *metav1.Duration) error {
+	if timeout == nil || timeout.Duration <= 0 {
+		return fmt.Errorf("timeout must be greater than zero")
+	}
+	return nil
+}
+
+func validatePolicyDurations(policy *agentv1alpha1.AgentPolicy) error {
+	if timeout := policy.Spec.Defaults.Timeout; timeout != nil && timeout.Duration <= 0 {
+		return fmt.Errorf("AgentPolicy default timeout must be greater than zero")
+	}
+	if timeout := policy.Spec.Enforced.MaxTimeout; timeout != nil && timeout.Duration <= 0 {
+		return fmt.Errorf("AgentPolicy maxTimeout must be greater than zero")
+	}
+	return nil
+}
+
+func validateRunSecretAccess(run *agentv1alpha1.AgentRun, policy *agentv1alpha1.AgentPolicy) error {
+	for _, env := range run.Spec.Env {
+		if env.ValueFrom == nil || env.ValueFrom.SecretKeyRef == nil {
+			continue
+		}
+		if err := requireAllowedSecret(env.ValueFrom.SecretKeyRef.Name, env.ValueFrom.SecretKeyRef.Key, policy); err != nil {
+			return fmt.Errorf("env %q: %w", env.Name, err)
+		}
+	}
+	if run.Spec.Provider != nil && run.Spec.Provider.AuthSecretRef != nil {
+		ref := run.Spec.Provider.AuthSecretRef
+		if err := requireAllowedSecret(ref.Name, ref.Key, policy); err != nil {
+			return fmt.Errorf("provider authSecretRef: %w", err)
+		}
+	}
+	if run.Spec.Workspace != nil && run.Spec.Workspace.Repository.CredentialsSecretRef != nil {
+		ref := run.Spec.Workspace.Repository.CredentialsSecretRef
+		if err := requireAllowedSecret(ref.Name, ref.Key, policy); err != nil {
+			return fmt.Errorf("repository credentialsSecretRef: %w", err)
+		}
+	}
+	return nil
+}
+
+func requireAllowedSecret(name, key string, policy *agentv1alpha1.AgentPolicy) error {
+	if strings.TrimSpace(name) == "" || strings.TrimSpace(key) == "" {
+		return fmt.Errorf("secret name and key are required")
+	}
+	for _, allowed := range policy.Spec.Enforced.AllowedSecretNames {
+		if name == allowed {
+			return nil
+		}
+	}
+	return fmt.Errorf("secret %q is not allowed by the namespace AgentPolicy", name)
 }
 
 func validateExecutionBoundary(run *agentv1alpha1.AgentRun, policy *agentv1alpha1.AgentPolicy) error {
@@ -270,13 +356,13 @@ func runtimeClassApproved(runtimeClassName string, policy *agentv1alpha1.AgentPo
 	return false
 }
 
-func (w *AgentRunWebhook) namespacePolicy(ctx context.Context, namespace string) (*agentv1alpha1.AgentPolicy, error) {
-	if w.Client == nil {
+func namespacePolicy(ctx context.Context, kubeClient client.Client, namespace string) (*agentv1alpha1.AgentPolicy, error) {
+	if kubeClient == nil {
 		return nil, nil
 	}
 
 	var policyList agentv1alpha1.AgentPolicyList
-	if err := w.Client.List(ctx, &policyList, client.InNamespace(namespace)); err != nil {
+	if err := kubeClient.List(ctx, &policyList, client.InNamespace(namespace)); err != nil {
 		return nil, fmt.Errorf("list AgentPolicy in namespace %q: %w", namespace, err)
 	}
 

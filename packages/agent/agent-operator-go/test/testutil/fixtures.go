@@ -266,6 +266,13 @@ func WithWorkspaceType(t agentv1alpha1.WorkspaceType) AgentWorkspaceOption {
 	}
 }
 
+// WithWorkspaceRuntimeClassName sets the sandboxed runtime for the workspace init Job.
+func WithWorkspaceRuntimeClassName(name string) AgentWorkspaceOption {
+	return func(ws *agentv1alpha1.AgentWorkspace) {
+		ws.Spec.RuntimeClassName = &name
+	}
+}
+
 // WithWorkspacePhase sets an initial status phase.
 func WithWorkspacePhase(phase agentv1alpha1.AgentWorkspacePhase) AgentWorkspaceOption {
 	return func(ws *agentv1alpha1.AgentWorkspace) {

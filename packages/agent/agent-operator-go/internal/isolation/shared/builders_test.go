@@ -12,7 +12,7 @@ import (
 
 func mustBuildJob(t testing.TB, run *agentv1alpha1.AgentRun, providerEnv []corev1.EnvVar, pvcName, image string, timeout time.Duration, agentType agentv1alpha1.AgentType, workspaceType agentv1alpha1.WorkspaceType, toolchain *agentv1alpha1.ToolchainSpec, ttl *int32, workspace *WorkspaceBinding) *batchv1.Job {
 	t.Helper()
-	job, err := BuildJob(run, providerEnv, nil, pvcName, image, timeout, agentType, workspaceType, toolchain, ttl, workspace)
+	job, err := BuildJob(run, providerEnv, nil, pvcName, image, timeout, agentType, workspaceType, ttl, workspace)
 	if err != nil {
 		t.Fatalf("build Job: %v", err)
 	}
@@ -21,6 +21,10 @@ func mustBuildJob(t testing.TB, run *agentv1alpha1.AgentRun, providerEnv []corev
 
 func mustBuildWorkspaceInitJob(t testing.TB, workspace *agentv1alpha1.AgentWorkspace, pvcName, image string, runtimeClassName *string) *batchv1.Job {
 	t.Helper()
+	if runtimeClassName == nil {
+		defaultRuntimeClassName := "kata"
+		runtimeClassName = &defaultRuntimeClassName
+	}
 	job, err := BuildWorkspaceInitJob(workspace, pvcName, image, runtimeClassName)
 	if err != nil {
 		t.Fatalf("build workspace init Job: %v", err)

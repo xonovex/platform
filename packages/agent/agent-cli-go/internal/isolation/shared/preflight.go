@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 // ResolveHomeDir returns an absolute, existing home directory. An explicit
@@ -33,7 +34,11 @@ func ResolveDirectory(path, purpose string) (string, error) {
 	if !info.IsDir() {
 		return "", fmt.Errorf("%s %q is not a directory", purpose, abs)
 	}
-	return abs, nil
+	resolved, err := filepath.EvalSymlinks(abs)
+	if err != nil {
+		return "", fmt.Errorf("resolve canonical %s %q: %w", purpose, abs, err)
+	}
+	return resolved, nil
 }
 
 // ResolveExistingPath returns an absolute path after verifying it exists.
@@ -48,14 +53,35 @@ func ResolveExistingPath(path, purpose string) (string, error) {
 	return abs, nil
 }
 
-// OptionalPath reports whether an optional path exists while preserving
-// permission and other filesystem errors.
-func OptionalPath(path, purpose string) (bool, error) {
-	if _, err := os.Stat(path); err != nil {
-		if os.IsNotExist(err) {
-			return false, nil
-		}
-		return false, fmt.Errorf("inspect %s %q: %w", purpose, path, err)
+// ResolveContainedOptionalPath resolves an optional home-relative path and
+// rejects roots that escape the canonical home directory through traversal or
+// symlinks. The returned source is canonical and safe to bind read-only.
+func ResolveContainedOptionalPath(homeDir, relative, purpose string) (string, bool, error) {
+	if filepath.IsAbs(relative) {
+		return "", false, fmt.Errorf("%s %q must be relative to the home directory", purpose, relative)
 	}
-	return true, nil
+	clean := filepath.Clean(relative)
+	if clean == "." || clean == ".." || strings.HasPrefix(clean, ".."+string(filepath.Separator)) {
+		return "", false, fmt.Errorf("%s %q escapes the home directory", purpose, relative)
+	}
+	home, err := ResolveDirectory(homeDir, "home directory")
+	if err != nil {
+		return "", false, err
+	}
+	candidate := filepath.Join(home, clean)
+	resolved, err := filepath.EvalSymlinks(candidate)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return "", false, nil
+		}
+		return "", false, fmt.Errorf("resolve %s %q: %w", purpose, candidate, err)
+	}
+	relativeToHome, err := filepath.Rel(home, resolved)
+	if err != nil {
+		return "", false, fmt.Errorf("verify %s containment: %w", purpose, err)
+	}
+	if relativeToHome == ".." || strings.HasPrefix(relativeToHome, ".."+string(filepath.Separator)) || filepath.IsAbs(relativeToHome) {
+		return "", false, fmt.Errorf("%s %q resolves outside home directory %q", purpose, relative, home)
+	}
+	return resolved, true, nil
 }

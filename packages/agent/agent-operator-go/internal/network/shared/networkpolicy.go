@@ -6,6 +6,9 @@ package shared
 import (
 	"errors"
 	"fmt"
+	"net/url"
+	"strconv"
+	"strings"
 
 	corev1 "k8s.io/api/core/v1"
 	networkingv1 "k8s.io/api/networking/v1"
@@ -61,6 +64,69 @@ func BuildNetworkPolicy(run *agentv1alpha1.AgentRun, np *agentv1alpha1.AgentNetw
 			Egress:  egress,
 		},
 	}, nil
+}
+
+// BuildWorkspaceInitNetworkPolicy creates the deny-ingress policy for a
+// workspace clone pod. Egress is limited to DNS and the repository transport's
+// TCP port; the clone job has no need for any other network traffic.
+func BuildWorkspaceInitNetworkPolicy(workspace *agentv1alpha1.AgentWorkspace) (*networkingv1.NetworkPolicy, error) {
+	port, err := repositoryPort(workspace.Spec.Repository.URL)
+	if err != nil {
+		return nil, err
+	}
+	tcp := corev1.ProtocolTCP
+	portValue := intstr.FromInt32(port)
+	return &networkingv1.NetworkPolicy{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      workspace.Name + "-init-netpol",
+			Namespace: workspace.Namespace,
+			Labels: map[string]string{
+				"app.kubernetes.io/name":      "agent-operator",
+				"app.kubernetes.io/instance":  workspace.Name,
+				"app.kubernetes.io/component": "workspace-init-network-policy",
+			},
+		},
+		Spec: networkingv1.NetworkPolicySpec{
+			PodSelector: metav1.LabelSelector{MatchLabels: map[string]string{
+				"app.kubernetes.io/instance":  workspace.Name,
+				"app.kubernetes.io/component": "workspace-init",
+			}},
+			PolicyTypes: []networkingv1.PolicyType{
+				networkingv1.PolicyTypeIngress,
+				networkingv1.PolicyTypeEgress,
+			},
+			Ingress: []networkingv1.NetworkPolicyIngressRule{},
+			Egress: []networkingv1.NetworkPolicyEgressRule{
+				dnsEgressRule(),
+				{Ports: []networkingv1.NetworkPolicyPort{{Protocol: &tcp, Port: &portValue}}},
+			},
+		},
+	}, nil
+}
+
+func repositoryPort(repositoryURL string) (int32, error) {
+	if strings.HasPrefix(repositoryURL, "git@") {
+		return 22, nil
+	}
+	parsed, err := url.Parse(repositoryURL)
+	if err != nil {
+		return 0, fmt.Errorf("parse repository URL for NetworkPolicy: %w", err)
+	}
+	if parsed.Port() != "" {
+		port, err := strconv.ParseInt(parsed.Port(), 10, 32)
+		if err != nil || port < 1 || port > 65535 {
+			return 0, fmt.Errorf("repository URL port %q is invalid", parsed.Port())
+		}
+		return int32(port), nil
+	}
+	switch parsed.Scheme {
+	case "http":
+		return 80, nil
+	case "https":
+		return 443, nil
+	default:
+		return 0, fmt.Errorf("repository URL scheme %q has no supported NetworkPolicy port", parsed.Scheme)
+	}
 }
 
 // egressForNetwork maps the egress axis to NetworkPolicy rules. The default

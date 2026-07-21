@@ -14,6 +14,11 @@ const (
 	WorktreeBasePath = "/workspace-wt"
 	// WorkspaceVolumeName is the name of the workspace volume.
 	WorkspaceVolumeName = "workspace"
+	// RepositoryCredentialsMountPath is the read-only directory containing a
+	// git-credential-store formatted Secret key for private repository clones.
+	RepositoryCredentialsMountPath = "/var/run/agent-repository-credentials"
+	// RepositoryCredentialsFile is the mounted git credential-store file.
+	RepositoryCredentialsFile = RepositoryCredentialsMountPath + "/credentials"
 )
 
 // CloneScript builds the repository clone script for the workspace mount. The
@@ -22,7 +27,11 @@ const (
 func CloneScript(repo agentv1alpha1.RepositorySpec, strategy VCSStrategy) string {
 	script := "set -e\n"
 	script += "cd " + WorkspaceMountPath + "\n"
-	script += "git clone"
+	script += "git"
+	if repo.CredentialsSecretRef != nil {
+		script += " -c " + shell.Quote("credential.helper=store --file="+RepositoryCredentialsFile)
+	}
+	script += " clone"
 	if repo.Branch != "" {
 		script += " --branch " + shell.Quote(repo.Branch)
 	}

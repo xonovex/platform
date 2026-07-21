@@ -39,8 +39,9 @@ func TestE2E_MultiAgentWorkspace(t *testing.T) {
 	// 1. Create workspace
 	ws := testutil.NewAgentWorkspace(ns, "shared-ws",
 		testutil.WithWorkspaceStorageSize("1Gi"),
+		testutil.WithWorkspaceRuntimeClassName("kata"),
 		testutil.WithSharedVolumes(
-			agentv1alpha1.SharedVolumeSpec{Name: "claude-config", MountPath: "/root/.claude", StorageSize: "256Mi"},
+			agentv1alpha1.SharedVolumeSpec{Name: "claude-config", MountPath: "/home/agent/.claude", StorageSize: "256Mi"},
 		),
 	)
 	if err := k8sClient.Create(ctx, ws); err != nil {

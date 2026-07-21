@@ -28,12 +28,15 @@ func createNamespace(t *testing.T, prefix string) string {
 	if err := k8sClient.Create(ctx, ns); err != nil {
 		t.Fatalf("failed to create namespace: %v", err)
 	}
+	runtimeClassName := "kata"
 	policy := &agentv1alpha1.AgentPolicy{
 		ObjectMeta: metav1.ObjectMeta{Name: "integration-policy", Namespace: ns.Name},
 		Spec: agentv1alpha1.AgentPolicySpec{
 			Enforced: agentv1alpha1.AgentPolicyEnforced{
 				AllowedRuntimeClassNames: []string{"kata"},
+				AllowedSecretNames:       []string{"provider-secret"},
 			},
+			Defaults: agentv1alpha1.AgentPolicyDefaults{RuntimeClassName: &runtimeClassName},
 		},
 	}
 	if err := k8sClient.Create(ctx, policy); err != nil {
@@ -323,33 +326,15 @@ func TestAgentRun_PhaseTimedOut(t *testing.T) {
 	testutil.WaitForAgentRunPhase(t, ctx, k8sClient, client.ObjectKeyFromObject(run), agentv1alpha1.AgentRunPhaseTimedOut, 30*time.Second)
 }
 
-func TestAgentRun_FailsOnMissingProvider(t *testing.T) {
+func TestAdmissionRejectsAgentRunWithMissingProvider(t *testing.T) {
 	ns := createNamespace(t, "missing-provider")
 	run := testutil.NewAgentRun(ns, "test-run",
 		testutil.WithProviderRef("nonexistent-provider"),
 	)
 
-	if err := k8sClient.Create(ctx, run); err != nil {
-		t.Fatalf("failed to create AgentRun: %v", err)
-	}
+	err := k8sClient.Create(ctx, run)
 
-	testutil.WaitForAgentRunPhase(t, ctx, k8sClient, client.ObjectKeyFromObject(run), agentv1alpha1.AgentRunPhaseFailed, 30*time.Second)
-
-	var updated agentv1alpha1.AgentRun
-	if err := k8sClient.Get(ctx, client.ObjectKeyFromObject(run), &updated); err != nil {
-		t.Fatalf("failed to get AgentRun: %v", err)
-	}
-
-	found := false
-	for _, cond := range updated.Status.Conditions {
-		if cond.Type == string(agentv1alpha1.AgentRunPhaseFailed) {
-			found = true
-			break
-		}
-	}
-	if !found {
-		t.Error("expected Failed condition on AgentRun")
-	}
+	requireAdmissionRejection(t, err, `AgentProvider.agent.xonovex.com "nonexistent-provider" not found`)
 }
 
 func TestAgentRun_SkipsTerminalPhases(t *testing.T) {

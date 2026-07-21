@@ -43,15 +43,24 @@ func BuildInitContainers(run *agentv1alpha1.AgentRun, image string, wsType agent
 		return nil, fmt.Errorf("resolve VCS strategy for workspace type %q: %w", wsType, err)
 	}
 
+	volumeMounts := []corev1.VolumeMount{
+		{Name: wsshared.WorkspaceVolumeName, MountPath: wsshared.WorkspaceMountPath},
+	}
+	if repo.CredentialsSecretRef != nil {
+		volumeMounts = append(volumeMounts, corev1.VolumeMount{
+			Name:      repositoryCredentialsVolumeName,
+			MountPath: wsshared.RepositoryCredentialsMountPath,
+			ReadOnly:  true,
+		})
+	}
+
 	return []corev1.Container{
 		{
-			Name:    "git-clone",
-			Image:   image,
-			Command: []string{"sh"},
-			Args:    []string{"-c", wsshared.CloneScript(repo, strategy)},
-			VolumeMounts: []corev1.VolumeMount{
-				{Name: wsshared.WorkspaceVolumeName, MountPath: wsshared.WorkspaceMountPath},
-			},
+			Name:            "git-clone",
+			Image:           image,
+			Command:         []string{"sh"},
+			Args:            []string{"-c", wsshared.CloneScript(repo, strategy)},
+			VolumeMounts:    volumeMounts,
 			SecurityContext: DefaultContainerSecurityContext(sc),
 		},
 	}, nil

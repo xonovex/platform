@@ -3,6 +3,8 @@ package shared
 import (
 	"fmt"
 	"maps"
+	"math"
+	"strings"
 	"time"
 
 	batchv1 "k8s.io/api/batch/v1"
@@ -50,11 +52,31 @@ func tmpVolume() corev1.Volume {
 	return corev1.Volume{Name: "tmp", VolumeSource: corev1.VolumeSource{EmptyDir: &corev1.EmptyDirVolumeSource{}}}
 }
 
+const repositoryCredentialsVolumeName = "repository-credentials"
+
+func repositoryCredentialsVolume(ref *agentv1alpha1.SecretKeyRef) corev1.Volume {
+	mode := int32(0440)
+	return corev1.Volume{
+		Name: repositoryCredentialsVolumeName,
+		VolumeSource: corev1.VolumeSource{Secret: &corev1.SecretVolumeSource{
+			SecretName: ref.Name,
+			Items: []corev1.KeyToPath{{
+				Key:  ref.Key,
+				Path: "credentials",
+				Mode: &mode,
+			}},
+		}},
+	}
+}
+
 // BuildJob creates the Kubernetes Job for an AgentRun. It is the single pod
 // realizer: a nil ws produces the standalone Job, a non-nil ws produces the
 // workspace-based Job. pvcName is the workspace PVC the pod mounts.
-func BuildJob(run *agentv1alpha1.AgentRun, providerEnv []corev1.EnvVar, providerCliArgs []string, pvcName, image string, timeout time.Duration, agentType agentv1alpha1.AgentType, wsType agentv1alpha1.WorkspaceType, tc *agentv1alpha1.ToolchainSpec, ttl *int32, ws *WorkspaceBinding) (*batchv1.Job, error) {
-	activeDeadlineSeconds := int64(timeout.Seconds())
+func BuildJob(run *agentv1alpha1.AgentRun, providerEnv []corev1.EnvVar, providerCliArgs []string, pvcName, image string, timeout time.Duration, agentType agentv1alpha1.AgentType, wsType agentv1alpha1.WorkspaceType, ttl *int32, ws *WorkspaceBinding) (*batchv1.Job, error) {
+	if timeout <= 0 {
+		return nil, fmt.Errorf("timeout must be greater than zero")
+	}
+	activeDeadlineSeconds := int64(math.Ceil(timeout.Seconds()))
 	backoffLimit := int32(0)
 
 	labels := map[string]string{
@@ -86,6 +108,9 @@ func BuildJob(run *agentv1alpha1.AgentRun, providerEnv []corev1.EnvVar, provider
 		}
 	} else {
 		volumes = append(volumes, tmpVolume())
+		if run.Spec.Workspace != nil && run.Spec.Workspace.Repository.CredentialsSecretRef != nil {
+			volumes = append(volumes, repositoryCredentialsVolume(run.Spec.Workspace.Repository.CredentialsSecretRef))
+		}
 		var err error
 		initContainers, err = BuildInitContainers(run, image, wsType, run.Spec.SecurityContext)
 		if err != nil {
@@ -125,7 +150,7 @@ func BuildJob(run *agentv1alpha1.AgentRun, providerEnv []corev1.EnvVar, provider
 		},
 	}
 
-	applyPodHardening(&job.Spec.Template.Spec, run, tc)
+	applyPodHardening(&job.Spec.Template.Spec, run.Spec.Resources)
 
 	return job, nil
 }
@@ -133,6 +158,9 @@ func BuildJob(run *agentv1alpha1.AgentRun, providerEnv []corev1.EnvVar, provider
 // BuildWorkspaceInitJob creates the Job that clones the repository into the
 // workspace PVC (run by the AgentWorkspace controller).
 func BuildWorkspaceInitJob(ws *agentv1alpha1.AgentWorkspace, pvcName, image string, runtimeClassName *string) (*batchv1.Job, error) {
+	if runtimeClassName == nil || strings.TrimSpace(*runtimeClassName) == "" {
+		return nil, fmt.Errorf("workspace initialization requires a sandboxed runtimeClassName")
+	}
 	activeDeadlineSeconds := int64((10 * time.Minute).Seconds())
 	backoffLimit := int32(0)
 
@@ -142,7 +170,7 @@ func BuildWorkspaceInitJob(ws *agentv1alpha1.AgentWorkspace, pvcName, image stri
 	}
 	script := wsshared.CloneScript(ws.Spec.Repository, strategy)
 
-	return &batchv1.Job{
+	job := &batchv1.Job{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      fmt.Sprintf("%s-init", ws.Name),
 			Namespace: ws.Namespace,
@@ -179,9 +207,22 @@ func BuildWorkspaceInitJob(ws *agentv1alpha1.AgentWorkspace, pvcName, image stri
 							SecurityContext: DefaultContainerSecurityContext(nil),
 						},
 					},
-					Volumes: []corev1.Volume{pvcVolume(wsshared.WorkspaceVolumeName, pvcName)},
+					Volumes: []corev1.Volume{
+						pvcVolume(wsshared.WorkspaceVolumeName, pvcName),
+						tmpVolume(),
+					},
 				},
 			},
 		},
-	}, nil
+	}
+	if ref := ws.Spec.Repository.CredentialsSecretRef; ref != nil {
+		job.Spec.Template.Spec.Volumes = append(job.Spec.Template.Spec.Volumes, repositoryCredentialsVolume(ref))
+		job.Spec.Template.Spec.Containers[0].VolumeMounts = append(job.Spec.Template.Spec.Containers[0].VolumeMounts, corev1.VolumeMount{
+			Name:      repositoryCredentialsVolumeName,
+			MountPath: wsshared.RepositoryCredentialsMountPath,
+			ReadOnly:  true,
+		})
+	}
+	applyPodHardening(&job.Spec.Template.Spec, corev1.ResourceRequirements{})
+	return job, nil
 }

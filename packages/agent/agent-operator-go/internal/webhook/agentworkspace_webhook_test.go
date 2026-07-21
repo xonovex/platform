@@ -2,12 +2,30 @@ package webhook
 
 import (
 	"context"
+	"strings"
 	"testing"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"sigs.k8s.io/controller-runtime/pkg/client/fake"
 
 	agentv1alpha1 "github.com/xonovex/platform/packages/agent/agent-operator-go/api/v1alpha1"
+	"github.com/xonovex/platform/packages/agent/agent-operator-go/test/testutil"
 )
+
+func sandboxedAgentWorkspaceWebhook() *AgentWorkspaceWebhook {
+	runtimeClassName := "kata"
+	policy := &agentv1alpha1.AgentPolicy{
+		ObjectMeta: metav1.ObjectMeta{Name: "sandbox-policy"},
+		Spec: agentv1alpha1.AgentPolicySpec{
+			Enforced: agentv1alpha1.AgentPolicyEnforced{
+				AllowedRuntimeClassNames: []string{runtimeClassName},
+				AllowedSecretNames:       []string{"repository-credentials"},
+			},
+			Defaults: agentv1alpha1.AgentPolicyDefaults{RuntimeClassName: &runtimeClassName},
+		},
+	}
+	return &AgentWorkspaceWebhook{Client: fake.NewClientBuilder().WithScheme(testutil.NewScheme()).WithObjects(policy).Build()}
+}
 
 func TestAgentWorkspaceWebhook_Default_SetsStorageSize(t *testing.T) {
 	ws := &agentv1alpha1.AgentWorkspace{
@@ -75,7 +93,7 @@ func TestAgentWorkspaceWebhook_Validate_Valid(t *testing.T) {
 		},
 	}
 
-	webhook := &AgentWorkspaceWebhook{}
+	webhook := sandboxedAgentWorkspaceWebhook()
 	_, err := webhook.ValidateCreate(context.Background(), ws)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -93,7 +111,7 @@ func TestAgentWorkspaceWebhook_Validate_ValidWithSharedVolumes(t *testing.T) {
 		},
 	}
 
-	webhook := &AgentWorkspaceWebhook{}
+	webhook := sandboxedAgentWorkspaceWebhook()
 	_, err := webhook.ValidateCreate(context.Background(), ws)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -191,7 +209,7 @@ func TestAgentWorkspaceWebhook_ValidateUpdateAllowsMetadataMutation(t *testing.T
 	updated := old.DeepCopy()
 	updated.Labels = map[string]string{"owner": "platform"}
 
-	webhook := &AgentWorkspaceWebhook{}
+	webhook := sandboxedAgentWorkspaceWebhook()
 	if _, err := webhook.ValidateUpdate(context.Background(), old, updated); err != nil {
 		t.Fatalf("metadata-only update failed: %v", err)
 	}
@@ -217,7 +235,7 @@ func TestAgentWorkspaceWebhook_Validate_ValidStorageSize(t *testing.T) {
 		},
 	}
 
-	webhook := &AgentWorkspaceWebhook{}
+	webhook := sandboxedAgentWorkspaceWebhook()
 	_, err := webhook.ValidateCreate(context.Background(), ws)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -303,9 +321,38 @@ func TestAgentWorkspaceWebhook_Validate_ValidSharedVolumes(t *testing.T) {
 		},
 	}
 
-	webhook := &AgentWorkspaceWebhook{}
+	webhook := sandboxedAgentWorkspaceWebhook()
 	_, err := webhook.ValidateCreate(context.Background(), ws)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
+	}
+}
+
+func TestAgentWorkspaceWebhookRejectsMissingPolicy(t *testing.T) {
+	runtimeClassName := "kata"
+	ws := &agentv1alpha1.AgentWorkspace{Spec: agentv1alpha1.AgentWorkspaceSpec{
+		Repository:       agentv1alpha1.RepositorySpec{URL: "https://github.com/org/repo.git"},
+		RuntimeClassName: &runtimeClassName,
+	}}
+
+	_, err := (&AgentWorkspaceWebhook{}).ValidateCreate(context.Background(), ws)
+
+	if err == nil || !strings.Contains(err.Error(), "requires exactly one AgentPolicy") {
+		t.Fatalf("ValidateCreate() error = %v, want missing-policy error", err)
+	}
+}
+
+func TestAgentWorkspaceWebhookRejectsDisallowedRepositorySecret(t *testing.T) {
+	ws := &agentv1alpha1.AgentWorkspace{Spec: agentv1alpha1.AgentWorkspaceSpec{
+		Repository: agentv1alpha1.RepositorySpec{
+			URL:                  "https://github.com/org/repo.git",
+			CredentialsSecretRef: &agentv1alpha1.SecretKeyRef{Name: "other-secret", Key: "credentials"},
+		},
+	}}
+
+	_, err := sandboxedAgentWorkspaceWebhook().ValidateCreate(context.Background(), ws)
+
+	if err == nil || !strings.Contains(err.Error(), "not allowed") {
+		t.Fatalf("ValidateCreate() error = %v, want Secret policy error", err)
 	}
 }

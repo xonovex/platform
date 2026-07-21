@@ -25,7 +25,7 @@ spec:
       schema:
         openAPIV3Schema:
           type: object
-          description: AgentPolicy defines enforced security constraints and defaults for AgentRuns in a namespace.
+          description: AgentPolicy defines enforced security constraints and defaults for agent execution in a namespace.
           properties:
             apiVersion:
               type: string
@@ -70,6 +70,11 @@ spec:
                       items:
                         type: string
                       description: Permitted runtimeClassNames.
+                    allowedSecretNames:
+                      type: array
+                      items:
+                        type: string
+                      description: Secrets that AgentRuns and AgentWorkspaces may reference for environment, provider, or repository credentials.
                 defaults:
                   type: object
                   description: Defaults applied when AgentRun fields are not set.

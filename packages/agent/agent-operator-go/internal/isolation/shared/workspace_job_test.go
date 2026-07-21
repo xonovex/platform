@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	agentv1alpha1 "github.com/xonovex/platform/packages/agent/agent-operator-go/api/v1alpha1"
@@ -33,7 +34,7 @@ func TestBuildWorkspaceInitJob_Basic(t *testing.T) {
 	if container.Name != "git-clone" || container.Image != "alpine/git:latest" {
 		t.Errorf("container = %s/%s", container.Name, container.Image)
 	}
-	if len(container.VolumeMounts) != 1 || container.VolumeMounts[0].MountPath != "/workspace" {
+	if !hasMount(container.VolumeMounts, "workspace", "/workspace") {
 		t.Error("expected workspace volume mount at /workspace")
 	}
 	script := container.Args[1]
@@ -43,8 +44,18 @@ func TestBuildWorkspaceInitJob_Basic(t *testing.T) {
 	if !strings.Contains(script, "--branch 'main'") {
 		t.Error("expected clone script to contain quoted branch")
 	}
-	if len(job.Spec.Template.Spec.Volumes) != 1 || job.Spec.Template.Spec.Volumes[0].PersistentVolumeClaim.ClaimName != "my-workspace-ws" {
+	if !hasPVC(job.Spec.Template.Spec.Volumes, "workspace", "my-workspace-ws") {
 		t.Error("expected PVC volume my-workspace-ws")
+	}
+	if job.Spec.Template.Spec.ServiceAccountName != AgentServiceAccountName ||
+		job.Spec.Template.Spec.AutomountServiceAccountToken == nil || *job.Spec.Template.Spec.AutomountServiceAccountToken {
+		t.Error("workspace init Job must use the zero-RBAC ServiceAccount without a token")
+	}
+	if len(container.Resources.Requests) == 0 || len(container.Resources.Limits) == 0 {
+		t.Error("workspace init container must have resource requests and limits")
+	}
+	if !hasMount(container.VolumeMounts, homeVolumeName, agentHome) || !hasMount(container.VolumeMounts, "tmp", "/tmp") {
+		t.Error("workspace init container must have writable HOME and /tmp mounts")
 	}
 }
 
@@ -67,16 +78,16 @@ func TestBuildWorkspaceInitJob_WithJujutsu(t *testing.T) {
 	}
 }
 
-func TestBuildWorkspaceInitJob_NoRuntimeClassName(t *testing.T) {
+func TestBuildWorkspaceInitJob_RejectsMissingRuntimeClassName(t *testing.T) {
 	ws := &agentv1alpha1.AgentWorkspace{
 		ObjectMeta: metav1.ObjectMeta{Name: "my-workspace", Namespace: "default"},
 		Spec: agentv1alpha1.AgentWorkspaceSpec{
 			Repository: agentv1alpha1.RepositorySpec{URL: "https://github.com/org/repo.git", Branch: "main"},
 		},
 	}
-	job := mustBuildWorkspaceInitJob(t, ws, "my-workspace-ws", "alpine/git:latest", nil)
-	if job.Spec.Template.Spec.RuntimeClassName != nil {
-		t.Errorf("expected nil RuntimeClassName, got %q", *job.Spec.Template.Spec.RuntimeClassName)
+	_, err := BuildWorkspaceInitJob(ws, "my-workspace-ws", "alpine/git:latest", nil)
+	if err == nil {
+		t.Fatal("BuildWorkspaceInitJob() error = nil, want missing runtimeClassName error")
 	}
 }
 
@@ -196,8 +207,8 @@ func TestBuildWorkspaceJob_Basic(t *testing.T) {
 	if job.Spec.Template.Spec.Containers[0].WorkingDir != "/workspace-wt/agent-1" {
 		t.Errorf("working dir = %s", job.Spec.Template.Spec.Containers[0].WorkingDir)
 	}
-	if len(job.Spec.Template.Spec.Volumes) != 2 || job.Spec.Template.Spec.Volumes[0].PersistentVolumeClaim.ClaimName != "my-workspace-ws" {
-		t.Error("expected workspace + tmp volumes with my-workspace-ws PVC")
+	if len(job.Spec.Template.Spec.Volumes) != 3 || !hasPVC(job.Spec.Template.Spec.Volumes, "workspace", "my-workspace-ws") {
+		t.Error("expected workspace + tmp + home volumes with my-workspace-ws PVC")
 	}
 }
 
@@ -216,8 +227,8 @@ func TestBuildWorkspaceJob_WithSharedVolumes(t *testing.T) {
 		WorkspaceRef:     "my-workspace",
 	})
 
-	if len(job.Spec.Template.Spec.Volumes) != 3 {
-		t.Fatalf("volumes = %d, want 3", len(job.Spec.Template.Spec.Volumes))
+	if len(job.Spec.Template.Spec.Volumes) != 4 {
+		t.Fatalf("volumes = %d, want 4", len(job.Spec.Template.Spec.Volumes))
 	}
 	foundSharedVol := false
 	for _, vol := range job.Spec.Template.Spec.Volumes {
@@ -228,6 +239,49 @@ func TestBuildWorkspaceJob_WithSharedVolumes(t *testing.T) {
 	if !foundSharedVol {
 		t.Error("expected claude-config volume with PVC my-workspace-claude-config")
 	}
+}
+
+func TestBuildWorkspaceInitJob_MountsRepositoryCredentials(t *testing.T) {
+	ws := &agentv1alpha1.AgentWorkspace{
+		ObjectMeta: metav1.ObjectMeta{Name: "private-workspace", Namespace: "default"},
+		Spec: agentv1alpha1.AgentWorkspaceSpec{Repository: agentv1alpha1.RepositorySpec{
+			URL:                  "https://github.com/org/private.git",
+			CredentialsSecretRef: &agentv1alpha1.SecretKeyRef{Name: "repo-auth", Key: "credentials"},
+		}},
+	}
+
+	job := mustBuildWorkspaceInitJob(t, ws, "private-workspace-ws", "alpine/git:latest", nil)
+
+	if !hasMount(job.Spec.Template.Spec.Containers[0].VolumeMounts, repositoryCredentialsVolumeName, "/var/run/agent-repository-credentials") {
+		t.Fatal("clone container is missing repository credential mount")
+	}
+	foundSecret := false
+	for _, volume := range job.Spec.Template.Spec.Volumes {
+		if volume.Name == repositoryCredentialsVolumeName && volume.Secret != nil && volume.Secret.SecretName == "repo-auth" {
+			foundSecret = true
+		}
+	}
+	if !foundSecret {
+		t.Fatal("repository credential Secret volume was not created")
+	}
+}
+
+func hasMount(mounts []corev1.VolumeMount, name, path string) bool {
+	for _, mount := range mounts {
+		if mount.Name == name && mount.MountPath == path {
+			return true
+		}
+	}
+	return false
+}
+
+func hasPVC(volumes []corev1.Volume, name, claimName string) bool {
+	for _, volume := range volumes {
+		if volume.Name == name && volume.PersistentVolumeClaim != nil && volume.PersistentVolumeClaim.ClaimName == claimName {
+			return true
+		}
+	}
+	return false
 }
 
 func TestBuildWorkspaceJob_WithRuntimeClassName(t *testing.T) {

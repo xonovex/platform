@@ -51,7 +51,7 @@ The operator admits and reconciles the submitted run specification. Any
 additional approval, policy, evidence, or escalation requirements belong to
 the caller or the native platform that submits the run.
 
-`AgentPolicy` is optional. Without one, admission still requires a digest-pinned execution image and an explicit runtime class but does not require that runtime class to appear in an operator-owned allowlist. When one namespace policy exists, only its declared defaults and constraints are applied.
+Every execution namespace must contain exactly one `AgentPolicy`. Admission rejects AgentRuns and AgentWorkspaces when the policy is absent or ambiguous, because the operator cannot safely determine runtime-class or Secret authority otherwise.
 
 #### Full spec reference
 
@@ -66,9 +66,9 @@ the caller or the native platform that submits the run.
 | `toolchainRef`     | string   | Name of an AgentToolchain in the same namespace                                                   |
 | `toolchain`        | object   | Inline toolchain config (mutually exclusive with `toolchainRef`)                                  |
 | `prompt`           | string   | Task prompt for headless execution                                                                |
-| `resources`        | object   | K8s resource requirements for the agent container                                                 |
-| `timeout`          | duration | Max run duration (default: `1h`)                                                                  |
-| `env`              | list     | Additional environment variables                                                                  |
+| `resources`        | object   | K8s resource requirements applied to the agent and its init containers                            |
+| `timeout`          | duration | Positive max run duration (default: `1h`)                                                         |
+| `env`              | list     | Additional environment variables; Secret refs require policy allowlisting                         |
 | `image`            | string   | Digest-pinned agent image override; required unless resolved from a harness, toolchain, or policy |
 | `runtimeClassName` | string   | Sandboxed pod runtime class; required unless resolved from a harness or policy                    |
 | `nodeSelector`     | map      | Node selector for pod scheduling                                                                  |
@@ -127,7 +127,7 @@ spec:
     ANTHROPIC_DEFAULT_SONNET_MODEL: "gemini-3-flash-preview"
 ```
 
-The controller validates that the referenced Secret exists and contains the specified key, reporting readiness via `.status.ready`.
+The controller validates that the referenced Secret exists and contains the specified key, reporting readiness via `.status.ready`. Using the provider from an AgentRun also requires the Secret name in `AgentPolicy.spec.enforced.allowedSecretNames`.
 
 #### Full spec reference
 
@@ -153,14 +153,18 @@ spec:
   repository:
     url: https://github.com/org/repo.git
     branch: main
+    # credentialsSecretRef:
+    #   name: repository-credentials
+    #   key: credentials
   storageClass: nfs-csi
   storageSize: 10Gi
+  runtimeClassName: gvisor
   sharedVolumes:
     - name: claude-config
-      mountPath: /root/.claude
+      mountPath: /home/agent/.claude
       storageSize: 1Gi
     - name: opencode-config
-      mountPath: /root/.opencode
+      mountPath: /home/agent/.config/opencode
       storageSize: 512Mi
 ```
 
@@ -173,8 +177,10 @@ spec:
 | `type`                        | string | Workspace type (`git` or `jj`)                     |
 | `repository.url`              | string | Git repository URL (required)                      |
 | `repository.branch`           | string | Branch to checkout                                 |
+| `repository.credentialsSecretRef` | object | Allowlisted Secret key containing one git-credential-store entry for private HTTPS clones |
 | `storageClass`                | string | Storage class for workspace PVC (must support RWX) |
 | `storageSize`                 | string | Storage size for workspace PVC (default: `10Gi`)   |
+| `runtimeClassName`            | string | Sandboxed runtime for the clone Job; defaults from the namespace policy |
 | `sharedVolumes[].name`        | string | Volume name (used as PVC suffix)                   |
 | `sharedVolumes[].mountPath`   | string | Mount path in agent containers                     |
 | `sharedVolumes[].storageSize` | string | PVC size for this volume (default: `1Gi`)          |
@@ -191,9 +197,11 @@ workspace PVC (RWX):
   /workspace-wt/agent-2/   <- worktree for agent-2
 
 shared volume PVCs (RWX, one per sharedVolumes entry):
-  /root/.claude/           <- claude-config PVC
-  /root/.opencode/         <- opencode-config PVC
+  /home/agent/.claude/           <- claude-config PVC
+  /home/agent/.config/opencode/  <- opencode-config PVC
 ```
+
+For a private HTTPS repository, the referenced Secret key contains a standard git credential-store line such as `https://username:token@github.com`. The key is mounted read-only into the clone container only; it is not mounted into the agent container. Keep the Secret encrypted at rest and out of source control.
 
 ### AgentToolchain
 
@@ -228,7 +236,7 @@ The `nix` toolchain selects the pre-built image as the pod image — the **same 
 
 ### AgentPolicy
 
-Namespace-scoped admission policy for AgentRuns. Use at most one AgentPolicy per namespace; policy lookup failure or multiple policies reject admission because the effective authority would be unknown. A namespace without AgentPolicy receives the operator's baseline hardening but no additional policy constraints.
+Namespace-scoped admission policy for AgentRuns and AgentWorkspaces. Exactly one AgentPolicy is required per execution namespace; missing or multiple policies reject admission because the effective authority would be unknown.
 
 ```yaml
 apiVersion: agent.xonovex.com/v1alpha1
@@ -240,6 +248,9 @@ spec:
   enforced:
     runtimeClassName: kata
     allowedRuntimeClassNames: [kata, gvisor]
+    allowedSecretNames:
+      - gemini-credentials
+      - repository-credentials
     requireSecurityContext: true
     requireNetworkPolicy: true
     requireEgressRestricted: true
@@ -263,9 +274,10 @@ spec:
 | Duration bound      | Requires an explicit/policy-defaulted timeout at or below `maxTimeout`                                              | Observe Job timeout and terminal status                                   |
 | Resource bound      | Requires a limit for each `maxResources` entry; rejects requests/limits above it                                    | Keep namespace LimitRange and ResourceQuota as an independent control     |
 | Image restriction   | Requires a digest-pinned image resolved from the run, harness, toolchain, or policy, then applies `allowedImages`   | Add signature/provenance admission when digest pinning is insufficient    |
+| Secret authority    | Rejects env, provider, and repository Secret references whose names are not explicitly allowlisted                | Keep Kubernetes RBAC from granting direct Secret reads to run submitters  |
 | Toolchain pinning   | AgentToolchain/inline Nix validation requires revision, source, and image digest                                    | Verify registry digest and the built closure provenance                   |
 
-Policy defaults are applied before harness and toolchain references are resolved at admission. The admitted AgentRun stores the exact digest-pinned image and sandboxed runtime class that policy approved; missing or mutable image inputs and missing runtime classes are rejected even when no AgentPolicy exists.
+Policy defaults are applied before harness, provider, and toolchain references are resolved at admission. Referenced execution inputs are snapshotted inline, and the admitted AgentRun stores the exact image, runtime, resources, environment, and Secret references that policy approved.
 
 Admission configuration and the webhook endpoint must be reachable for these controls to enforce. Verify installation with negative probes for a wrong runtime class, disabled or custom-open network policy, host or proxy network mode, invalid workspace storage quantity, excessive timeout/resource limit, disallowed or missing image, moving Nix image tag, policy API outage, and duplicate namespace policies. An accepted object is admission evidence only; it does not prove the runtime, network, registry, or quota layer behaved correctly.
 
@@ -628,7 +640,7 @@ spec:
 
 ### Multi-agent shared workspace
 
-Create a workspace with shared volumes, then launch concurrent agents. Each agent gets an isolated git worktree but shares the same checkout and config directories.
+Create a workspace with shared volumes, then launch concurrent agents. Each agent gets an isolated git worktree named from its AgentRun while sharing the same checkout and config directories.
 
 ```yaml
 apiVersion: agent.xonovex.com/v1alpha1
@@ -642,9 +654,10 @@ spec:
     branch: main
   storageClass: nfs-csi
   storageSize: 10Gi
+  runtimeClassName: gvisor
   sharedVolumes:
     - name: claude-config
-      mountPath: /root/.claude
+      mountPath: /home/agent/.claude
       storageSize: 1Gi
 ---
 apiVersion: agent.xonovex.com/v1alpha1
@@ -654,10 +667,6 @@ metadata:
 spec:
   harnessRef: claude-harness
   workspaceRef: my-workspace
-  workspace:
-    git:
-      worktree:
-        branch: agent-1-work
   providerRef: gemini-provider
   prompt: "Fix the login bug"
 ---
@@ -668,10 +677,6 @@ metadata:
 spec:
   harnessRef: claude-harness
   workspaceRef: my-workspace
-  workspace:
-    git:
-      worktree:
-        branch: agent-2-work
   providerRef: gemini-provider
   prompt: "Add unit tests for the auth module"
 ```
@@ -704,6 +709,7 @@ spec:
     branch: main
   storageClass: nfs-csi
   storageSize: 10Gi
+  runtimeClassName: gvisor
 ---
 apiVersion: agent.xonovex.com/v1alpha1
 kind: AgentRun
@@ -712,8 +718,6 @@ metadata:
 spec:
   harnessRef: claude-harness
   workspaceRef: jj-workspace
-  workspace:
-    type: jj
   providerRef: gemini-provider
   prompt: "Implement the search feature"
 ```
@@ -882,7 +886,7 @@ Each AgentRun reconciles along one of two paths:
 3. Shared volume PVCs are mounted at configured paths (e.g. `~/.claude/`)
 4. Controller watches Job status and updates AgentRun phase
 
-**RuntimeClassName** is applied to the Job's PodSpec when set on the AgentRun or inherited from the referenced AgentHarness. Both init and main containers run in the sandboxed runtime. Workspace init Jobs do _not_ inherit runtimeClassName; only agent Jobs do.
+**RuntimeClassName** is required for every execution pod. AgentRun Jobs resolve it from the run, harness, or namespace policy. AgentWorkspace clone Jobs resolve it from the workspace or namespace policy. Init and main containers therefore run inside the approved sandboxed runtime.
 
 ```
 Standalone:                         Workspace:
@@ -897,13 +901,13 @@ AgentRun                            AgentWorkspace
     +-> Job                            +-> AgentHarness (via harnessRef)
           +-> Init: git clone          +-> AgentProvider -> Secret
           +-> Main: agent binary       +-> AgentToolchain (optional)
-          +-> runtimeClassName?        |
+          +-> runtimeClassName         |
                                        +-> Job (uses workspace PVC)
                                              +-> Init: git worktree add
                                              +-> Main: agent binary
                                                    workingDir: /workspace-wt/{run}
                                                    mounts: shared volumes
-                                             +-> runtimeClassName?
+                                             +-> runtimeClassName
 ```
 
 ## Cleanup

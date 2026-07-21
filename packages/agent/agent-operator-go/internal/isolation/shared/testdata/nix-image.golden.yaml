@@ -24,6 +24,15 @@ spec:
         - bypassPermissions
         command:
         - claude
+        env:
+        - name: HOME
+          value: /home/agent
+        - name: XDG_CONFIG_HOME
+          value: /home/agent/.config
+        - name: XDG_CACHE_HOME
+          value: /home/agent/.cache
+        - name: XDG_STATE_HOME
+          value: /home/agent/.local/state
         image: ghcr.io/xonovex/agent@sha256:abc
         name: agent
         resources:
@@ -59,9 +68,24 @@ spec:
           git clone --branch 'main' --single-branch --depth 1 -- 'https://github.com/example/repo.git' .
         command:
         - sh
+        env:
+        - name: HOME
+          value: /home/agent
+        - name: XDG_CONFIG_HOME
+          value: /home/agent/.config
+        - name: XDG_CACHE_HOME
+          value: /home/agent/.cache
+        - name: XDG_STATE_HOME
+          value: /home/agent/.local/state
         image: ghcr.io/xonovex/agent@sha256:abc
         name: git-clone
-        resources: {}
+        resources:
+          limits:
+            cpu: "2"
+            memory: 4Gi
+          requests:
+            cpu: 250m
+            memory: 512Mi
         securityContext:
           allowPrivilegeEscalation: false
           capabilities:
@@ -74,6 +98,10 @@ spec:
         volumeMounts:
         - mountPath: /workspace
           name: workspace
+        - mountPath: /home/agent
+          name: home
+        - mountPath: /tmp
+          name: tmp
       restartPolicy: Never
       securityContext:
         fsGroup: 1000

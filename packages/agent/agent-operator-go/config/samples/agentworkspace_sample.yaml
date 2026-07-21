@@ -9,10 +9,11 @@ spec:
     branch: main
   storageClass: nfs-csi
   storageSize: 10Gi
+  runtimeClassName: kata
   sharedVolumes:
     - name: claude-config
       mountPath: /home/agent/.claude
       storageSize: 1Gi
     - name: opencode-config
-      mountPath: /home/agent/.opencode
+      mountPath: /home/agent/.config/opencode
       storageSize: 512Mi

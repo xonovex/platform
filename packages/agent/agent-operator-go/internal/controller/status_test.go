@@ -74,6 +74,45 @@ func TestReconcileExecutionResourcesCreatesHardenedWorkload(t *testing.T) {
 	}
 }
 
+func TestAgentWorkspaceReconcileCreatesHardenedBootstrapResources(t *testing.T) {
+	ctx := context.Background()
+	runtimeClassName := "kata"
+	workspace := &agentv1alpha1.AgentWorkspace{
+		ObjectMeta: metav1.ObjectMeta{Name: "workspace", Namespace: "test", UID: "workspace-uid"},
+		Spec: agentv1alpha1.AgentWorkspaceSpec{
+			Repository:       agentv1alpha1.RepositorySpec{URL: "https://github.com/example/repo.git"},
+			StorageSize:      "1Gi",
+			RuntimeClassName: &runtimeClassName,
+		},
+	}
+	scheme := testutil.NewScheme()
+	fakeClient := fake.NewClientBuilder().
+		WithScheme(scheme).
+		WithStatusSubresource(&agentv1alpha1.AgentWorkspace{}).
+		WithObjects(workspace).
+		Build()
+	reconciler := &AgentWorkspaceReconciler{
+		Client:   fakeClient,
+		Scheme:   scheme,
+		Recorder: events.NewFakeRecorder(10),
+	}
+
+	_, err := reconciler.Reconcile(ctx, ctrl.Request{NamespacedName: client.ObjectKeyFromObject(workspace)})
+
+	if err != nil {
+		t.Fatalf("Reconcile() error = %v", err)
+	}
+	for _, object := range []client.Object{
+		&corev1.ServiceAccount{ObjectMeta: metav1.ObjectMeta{Name: isoshared.AgentServiceAccountName, Namespace: "test"}},
+		&networkingv1.NetworkPolicy{ObjectMeta: metav1.ObjectMeta{Name: "workspace-init-netpol", Namespace: "test"}},
+		&batchv1.Job{ObjectMeta: metav1.ObjectMeta{Name: "workspace-init", Namespace: "test"}},
+	} {
+		if err := fakeClient.Get(ctx, client.ObjectKeyFromObject(object), object); err != nil {
+			t.Fatalf("get %T: %v", object, err)
+		}
+	}
+}
+
 func TestReconcileJobStatusMapsTerminalAndRunningStates(t *testing.T) {
 	now := metav1.Now()
 	tests := []struct {
@@ -141,6 +180,48 @@ func TestReconcileJobStatusMapsTerminalAndRunningStates(t *testing.T) {
 				t.Fatalf("phase = %q, want %q", updated.Status.Phase, test.want)
 			}
 		})
+	}
+}
+
+func TestReconcileJobStatusRecordsPodNameAndAgentExitCode(t *testing.T) {
+	ctx := context.Background()
+	run := testutil.NewAgentRun("test", "run")
+	job := &batchv1.Job{
+		ObjectMeta: metav1.ObjectMeta{Name: "run", Namespace: "test"},
+		Status: batchv1.JobStatus{Conditions: []batchv1.JobCondition{{
+			Type: batchv1.JobFailed, Status: corev1.ConditionTrue, Message: "failed",
+		}}},
+	}
+	pod := &corev1.Pod{
+		ObjectMeta: metav1.ObjectMeta{Name: "run-pod", Namespace: "test", Labels: map[string]string{"job-name": "run"}},
+		Status: corev1.PodStatus{ContainerStatuses: []corev1.ContainerStatus{{
+			Name: "agent",
+			State: corev1.ContainerState{Terminated: &corev1.ContainerStateTerminated{
+				ExitCode: 17,
+			}},
+		}}},
+	}
+	fakeClient := fake.NewClientBuilder().
+		WithScheme(testutil.NewScheme()).
+		WithStatusSubresource(&agentv1alpha1.AgentRun{}).
+		WithObjects(run, pod).
+		Build()
+	reconciler := &AgentRunReconciler{Client: fakeClient, Recorder: events.NewFakeRecorder(10)}
+
+	_, err := reconciler.reconcileJobStatus(ctx, run, job)
+
+	if err != nil {
+		t.Fatalf("reconcileJobStatus() error = %v", err)
+	}
+	var updated agentv1alpha1.AgentRun
+	if err := fakeClient.Get(ctx, client.ObjectKeyFromObject(run), &updated); err != nil {
+		t.Fatalf("get AgentRun: %v", err)
+	}
+	if updated.Status.PodName != "run-pod" {
+		t.Fatalf("PodName = %q, want run-pod", updated.Status.PodName)
+	}
+	if updated.Status.ExitCode == nil || *updated.Status.ExitCode != 17 {
+		t.Fatalf("ExitCode = %v, want 17", updated.Status.ExitCode)
 	}
 }
 

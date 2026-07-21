@@ -7,6 +7,7 @@ import (
 
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
+	networkingv1 "k8s.io/api/networking/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -19,6 +20,7 @@ import (
 
 	agentv1alpha1 "github.com/xonovex/platform/packages/agent/agent-operator-go/api/v1alpha1"
 	isoshared "github.com/xonovex/platform/packages/agent/agent-operator-go/internal/isolation/shared"
+	netshared "github.com/xonovex/platform/packages/agent/agent-operator-go/internal/network/shared"
 	wsshared "github.com/xonovex/platform/packages/agent/agent-operator-go/internal/workspace/shared"
 )
 
@@ -39,6 +41,8 @@ type AgentWorkspaceReconciler struct {
 // +kubebuilder:rbac:groups=agent.xonovex.com,resources=agentworkspaces/finalizers,verbs=update
 // +kubebuilder:rbac:groups=batch,resources=jobs,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups="",resources=persistentvolumeclaims,verbs=get;list;watch;create;delete
+// +kubebuilder:rbac:groups="",resources=serviceaccounts,verbs=get;list;watch;create
+// +kubebuilder:rbac:groups=networking.k8s.io,resources=networkpolicies,verbs=get;list;watch;create;update;patch;delete
 
 func (r *AgentWorkspaceReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := log.FromContext(ctx).WithValues(
@@ -101,6 +105,12 @@ func (r *AgentWorkspaceReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 			return ctrl.Result{}, err
 		}
 	}
+	if err := ensureAgentServiceAccount(ctx, r.Client, ws.Namespace); err != nil {
+		return ctrl.Result{}, fmt.Errorf("create workspace ServiceAccount: %w", err)
+	}
+	if err := r.ensureWorkspaceInitNetworkPolicy(ctx, &ws); err != nil {
+		return ctrl.Result{}, err
+	}
 
 	// 3. Create init Job if needed
 	initJobName := fmt.Sprintf("%s-init", ws.Name)
@@ -124,6 +134,13 @@ func (r *AgentWorkspaceReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 				log.Error(err, "failed to create workspace init job")
 				return ctrl.Result{}, err
 			}
+			var existing batchv1.Job
+			if err := r.Get(ctx, client.ObjectKeyFromObject(job), &existing); err != nil {
+				return ctrl.Result{}, fmt.Errorf("get existing workspace init Job: %w", err)
+			}
+			if err := verifyControlledResource(&ws, &existing, job.Spec, existing.Spec); err != nil {
+				return ctrl.Result{}, fmt.Errorf("existing workspace init Job %q: %w", job.Name, err)
+			}
 		} else {
 			r.Recorder.Eventf(&ws, nil, corev1.EventTypeNormal, "WorkspaceInitStarted", "WorkspaceInitStarted",
 				"Created init Job %s to clone %s", initJobName, ws.Spec.Repository.URL)
@@ -145,6 +162,29 @@ func (r *AgentWorkspaceReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 	}
 
 	return r.reconcileInitJobStatus(ctx, &ws, &job)
+}
+
+func (r *AgentWorkspaceReconciler) ensureWorkspaceInitNetworkPolicy(ctx context.Context, workspace *agentv1alpha1.AgentWorkspace) error {
+	networkPolicy, err := netshared.BuildWorkspaceInitNetworkPolicy(workspace)
+	if err != nil {
+		return fmt.Errorf("build workspace NetworkPolicy: %w", err)
+	}
+	if err := ctrl.SetControllerReference(workspace, networkPolicy, r.Scheme); err != nil {
+		return err
+	}
+	if err := r.Create(ctx, networkPolicy); err != nil {
+		if !errors.IsAlreadyExists(err) {
+			return fmt.Errorf("create workspace NetworkPolicy: %w", err)
+		}
+		var existing networkingv1.NetworkPolicy
+		if err := r.Get(ctx, client.ObjectKeyFromObject(networkPolicy), &existing); err != nil {
+			return fmt.Errorf("get existing workspace NetworkPolicy: %w", err)
+		}
+		if err := verifyControlledResource(workspace, &existing, networkPolicy.Spec, existing.Spec); err != nil {
+			return fmt.Errorf("existing NetworkPolicy %q: %w", networkPolicy.Name, err)
+		}
+	}
+	return nil
 }
 
 func (r *AgentWorkspaceReconciler) reconcileInitJobStatus(ctx context.Context, ws *agentv1alpha1.AgentWorkspace, job *batchv1.Job) (ctrl.Result, error) {
@@ -208,5 +248,6 @@ func (r *AgentWorkspaceReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&agentv1alpha1.AgentWorkspace{}).
 		Owns(&batchv1.Job{}).
+		Owns(&networkingv1.NetworkPolicy{}).
 		Complete(r)
 }

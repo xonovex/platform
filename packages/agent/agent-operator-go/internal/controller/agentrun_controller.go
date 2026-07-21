@@ -167,7 +167,7 @@ func (r *AgentRunReconciler) reconcileExecutionResources(
 
 	jobName := run.Name
 	if run.Status.JobName == "" {
-		if err := r.ensureAgentServiceAccount(ctx, run.Namespace); err != nil {
+		if err := ensureAgentServiceAccount(ctx, r.Client, run.Namespace); err != nil {
 			return ctrl.Result{}, err
 		}
 		job, err := isoshared.BuildJob(
@@ -179,7 +179,6 @@ func (r *AgentRunReconciler) reconcileExecutionResources(
 			execution.defaults.Timeout,
 			execution.agentType,
 			workspaceType,
-			execution.toolchain,
 			execution.defaults.TTL,
 			binding,
 		)
@@ -225,9 +224,16 @@ func (r *AgentRunReconciler) reconcileExecutionResources(
 	return r.reconcileJobStatus(ctx, run, &job)
 }
 
-func verifyControlledResource(run *agentv1alpha1.AgentRun, existing client.Object, desiredSpec, existingSpec any) error {
-	if !metav1.IsControlledBy(existing, run) {
-		return fmt.Errorf("resource is not controlled by AgentRun UID %q", run.UID)
+func verifyControlledResource(owner client.Object, existing client.Object, desiredSpec, existingSpec any) error {
+	if !metav1.IsControlledBy(existing, owner) {
+		ownerKind := "owner"
+		switch owner.(type) {
+		case *agentv1alpha1.AgentRun:
+			ownerKind = "AgentRun"
+		case *agentv1alpha1.AgentWorkspace:
+			ownerKind = "AgentWorkspace"
+		}
+		return fmt.Errorf("resource is not controlled by %s UID %q", ownerKind, owner.GetUID())
 	}
 	if !equality.Semantic.DeepDerivative(desiredSpec, existingSpec) {
 		return fmt.Errorf("resource specification differs from the admitted execution")
@@ -281,12 +287,12 @@ func (r *AgentRunReconciler) reconcileStandalone(ctx context.Context, agentRun *
 	return r.reconcileExecutionResources(ctx, agentRun, execution, pvcName, wsType, nil)
 }
 
-// ensureAgentServiceAccount creates the dedicated zero-RBAC ServiceAccount agent
-// pods bind to, idempotently. It is a shared namespace resource, so it carries no
-// owner reference (it outlives any single AgentRun).
-func (r *AgentRunReconciler) ensureAgentServiceAccount(ctx context.Context, namespace string) error {
+// ensureAgentServiceAccount creates the dedicated zero-RBAC ServiceAccount used
+// by all untrusted agent and workspace-init pods. It is a shared namespace
+// resource, so it has no owner reference.
+func ensureAgentServiceAccount(ctx context.Context, kubeClient client.Client, namespace string) error {
 	sa := isoshared.BuildAgentServiceAccount(namespace)
-	if err := r.Create(ctx, sa); err != nil && !errors.IsAlreadyExists(err) {
+	if err := kubeClient.Create(ctx, sa); err != nil && !errors.IsAlreadyExists(err) {
 		return err
 	}
 	return nil
@@ -354,6 +360,10 @@ func (r *AgentRunReconciler) reconcileWithWorkspace(ctx context.Context, agentRu
 
 func (r *AgentRunReconciler) reconcileJobStatus(ctx context.Context, agentRun *agentv1alpha1.AgentRun, job *batchv1.Job) (ctrl.Result, error) {
 	now := metav1.Now()
+	statusChanged, err := r.observePodStatus(ctx, agentRun, job)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
 
 	// Check for completion
 	for _, condition := range job.Status.Conditions {
@@ -389,8 +399,48 @@ func (r *AgentRunReconciler) reconcileJobStatus(ctx context.Context, agentRun *a
 			}
 		}
 	}
+	if statusChanged {
+		if err := r.updateStatus(ctx, agentRun); err != nil {
+			return ctrl.Result{}, err
+		}
+	}
 
 	return ctrl.Result{RequeueAfter: 10 * time.Second}, nil
+}
+
+func (r *AgentRunReconciler) observePodStatus(ctx context.Context, agentRun *agentv1alpha1.AgentRun, job *batchv1.Job) (bool, error) {
+	if job.Name == "" {
+		return false, nil
+	}
+	var pods corev1.PodList
+	if err := r.List(ctx, &pods, client.InNamespace(job.Namespace), client.MatchingLabels{"job-name": job.Name}); err != nil {
+		return false, fmt.Errorf("list pods for Job %q: %w", job.Name, err)
+	}
+	if len(pods.Items) == 0 {
+		return false, nil
+	}
+	observed := &pods.Items[0]
+	for index := 1; index < len(pods.Items); index++ {
+		candidate := &pods.Items[index]
+		if candidate.CreationTimestamp.After(observed.CreationTimestamp.Time) ||
+			(candidate.CreationTimestamp.Equal(&observed.CreationTimestamp) && candidate.Name > observed.Name) {
+			observed = candidate
+		}
+	}
+	changed := agentRun.Status.PodName != observed.Name
+	agentRun.Status.PodName = observed.Name
+	for _, containerStatus := range observed.Status.ContainerStatuses {
+		if containerStatus.Name != "agent" || containerStatus.State.Terminated == nil {
+			continue
+		}
+		exitCode := containerStatus.State.Terminated.ExitCode
+		if agentRun.Status.ExitCode == nil || *agentRun.Status.ExitCode != exitCode {
+			agentRun.Status.ExitCode = &exitCode
+			changed = true
+		}
+		break
+	}
+	return changed, nil
 }
 
 func (r *AgentRunReconciler) updatePhase(ctx context.Context, agentRun *agentv1alpha1.AgentRun, phase agentv1alpha1.AgentRunPhase, message string) (ctrl.Result, error) {

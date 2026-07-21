@@ -179,6 +179,121 @@ func TestAgentRunWebhook_Default_SnapshotsReferencedToolchain(t *testing.T) {
 	}
 }
 
+func TestAgentRunWebhook_Default_SnapshotsReferencedHarnessAndProvider(t *testing.T) {
+	runtimeClassName := "kata"
+	harness := &agentv1alpha1.AgentHarness{
+		ObjectMeta: metav1.ObjectMeta{Name: "harness", Namespace: "test"},
+		Spec: agentv1alpha1.AgentSpec{
+			Type:                    agentv1alpha1.AgentTypeClaude,
+			DefaultProvider:         "provider",
+			DefaultImage:            "ghcr.io/xonovex/agent@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+			DefaultRuntimeClassName: &runtimeClassName,
+		},
+	}
+	provider := &agentv1alpha1.AgentProvider{
+		ObjectMeta: metav1.ObjectMeta{Name: "provider", Namespace: "test"},
+		Spec: agentv1alpha1.AgentProviderSpec{
+			PresetRef:          "gemini",
+			AuthTokenSecretRef: &agentv1alpha1.SecretKeyRef{Name: "provider-auth", Key: "token"},
+		},
+	}
+	w := &AgentRunWebhook{Client: fake.NewClientBuilder().WithScheme(testutil.NewScheme()).WithObjects(harness, provider).Build()}
+	run := &agentv1alpha1.AgentRun{
+		ObjectMeta: metav1.ObjectMeta{Namespace: "test"},
+		Spec:       agentv1alpha1.AgentRunSpec{HarnessRef: harness.Name},
+	}
+
+	err := w.Default(context.Background(), run)
+
+	if err != nil {
+		t.Fatalf("Default() error = %v", err)
+	}
+	if run.Spec.HarnessRef != "" || run.Spec.Harness == nil {
+		t.Fatalf("HarnessRef = %q, Harness = %#v, want immutable inline snapshot", run.Spec.HarnessRef, run.Spec.Harness)
+	}
+	if run.Spec.ProviderRef != "" || run.Spec.Provider == nil || run.Spec.Provider.AuthSecretRef == nil {
+		t.Fatalf("ProviderRef = %q, Provider = %#v, want immutable inline snapshot", run.Spec.ProviderRef, run.Spec.Provider)
+	}
+	if run.Spec.Provider.AuthSecretRef.Name != "provider-auth" {
+		t.Fatalf("provider Secret = %q, want provider-auth", run.Spec.Provider.AuthSecretRef.Name)
+	}
+}
+
+func TestAgentRunWebhook_Validate_RejectsUnapprovedSecretReferences(t *testing.T) {
+	tests := []struct {
+		name   string
+		mutate func(*agentv1alpha1.AgentRun)
+	}{
+		{
+			name: "environment",
+			mutate: func(run *agentv1alpha1.AgentRun) {
+				run.Spec.Env = []corev1.EnvVar{{
+					Name: "DATABASE_TOKEN",
+					ValueFrom: &corev1.EnvVarSource{SecretKeyRef: &corev1.SecretKeySelector{
+						LocalObjectReference: corev1.LocalObjectReference{Name: "database-admin"},
+						Key:                  "token",
+					}},
+				}}
+			},
+		},
+		{
+			name: "provider",
+			mutate: func(run *agentv1alpha1.AgentRun) {
+				run.Spec.Provider = &agentv1alpha1.ProviderSpec{
+					AuthSecretRef: &agentv1alpha1.SecretKeyRef{Name: "provider-admin", Key: "token"},
+				}
+			},
+		},
+		{
+			name: "repository",
+			mutate: func(run *agentv1alpha1.AgentRun) {
+				run.Spec.Workspace.Repository.CredentialsSecretRef = &agentv1alpha1.SecretKeyRef{Name: "repository-admin", Key: "credentials"}
+			},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			run := baseRun()
+			test.mutate(run)
+
+			_, err := sandboxedAgentRunWebhook(run.Namespace).ValidateCreate(context.Background(), run)
+
+			if err == nil || !strings.Contains(err.Error(), "not allowed") {
+				t.Fatalf("ValidateCreate() error = %v, want Secret policy error", err)
+			}
+		})
+	}
+}
+
+func TestAgentRunWebhook_Validate_AllowsPolicyApprovedSecret(t *testing.T) {
+	policy := basePolicy()
+	policy.ObjectMeta = metav1.ObjectMeta{Name: "sandbox-policy", Namespace: "test-ns"}
+	policy.Spec.Enforced.AllowedSecretNames = []string{"provider-auth"}
+	w := &AgentRunWebhook{Client: fake.NewClientBuilder().WithScheme(testutil.NewScheme()).WithObjects(policy).Build()}
+	run := baseRun()
+	run.Spec.Provider = &agentv1alpha1.ProviderSpec{
+		AuthSecretRef: &agentv1alpha1.SecretKeyRef{Name: "provider-auth", Key: "token"},
+	}
+
+	_, err := w.ValidateCreate(context.Background(), run)
+
+	if err != nil {
+		t.Fatalf("ValidateCreate() error = %v, want approved Secret", err)
+	}
+}
+
+func TestAgentRunWebhook_Validate_RejectsNonPositiveTimeout(t *testing.T) {
+	run := baseRun()
+	run.Spec.Timeout = &metav1.Duration{}
+
+	_, err := sandboxedAgentRunWebhook(run.Namespace).ValidateCreate(context.Background(), run)
+
+	if err == nil || !strings.Contains(err.Error(), "greater than zero") {
+		t.Fatalf("ValidateCreate() error = %v, want positive-timeout error", err)
+	}
+}
+
 func runWithNix(nix *agentv1alpha1.NixSpec) *agentv1alpha1.AgentRun {
 	runtimeClassName := "kata"
 	return &agentv1alpha1.AgentRun{

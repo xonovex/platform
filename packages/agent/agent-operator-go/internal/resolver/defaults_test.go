@@ -4,6 +4,8 @@ import (
 	"testing"
 	"time"
 
+	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	agentv1alpha1 "github.com/xonovex/platform/packages/agent/agent-operator-go/api/v1alpha1"
@@ -21,6 +23,36 @@ func TestApplyHarnessDefaults_NoHarness(t *testing.T) {
 	}
 	if d.Timeout != DefaultTimeout {
 		t.Errorf("Timeout = %v, want %v", d.Timeout, DefaultTimeout)
+	}
+}
+
+func TestApplyHarnessDefaults_AppliesResourcesAndMergesEnvironment(t *testing.T) {
+	run := &agentv1alpha1.AgentRun{Spec: agentv1alpha1.AgentRunSpec{Env: []corev1.EnvVar{
+		{Name: "OVERRIDE", Value: "run"},
+	}}}
+	harness := &agentv1alpha1.AgentHarness{Spec: agentv1alpha1.AgentSpec{
+		DefaultResources: corev1.ResourceRequirements{
+			Requests: corev1.ResourceList{corev1.ResourceCPU: resource.MustParse("250m")},
+			Limits:   corev1.ResourceList{corev1.ResourceCPU: resource.MustParse("1")},
+		},
+		Env: []corev1.EnvVar{
+			{Name: "HARNESS_ONLY", Value: "default"},
+			{Name: "OVERRIDE", Value: "harness"},
+		},
+	}}
+
+	ApplyHarnessDefaults(run, harness)
+
+	if run.Spec.Resources.Limits.Cpu().String() != "1" {
+		t.Fatalf("CPU limit = %q, want 1", run.Spec.Resources.Limits.Cpu().String())
+	}
+	if len(run.Spec.Env) != 2 || run.Spec.Env[0].Name != "HARNESS_ONLY" || run.Spec.Env[1].Value != "run" {
+		t.Fatalf("Env = %#v, want harness default with run override", run.Spec.Env)
+	}
+
+	ApplyHarnessDefaults(run, harness)
+	if len(run.Spec.Env) != 2 {
+		t.Fatalf("second ApplyHarnessDefaults() duplicated environment: %#v", run.Spec.Env)
 	}
 }
 

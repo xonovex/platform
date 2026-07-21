@@ -141,14 +141,13 @@ func (i *Isolator) buildArgs(cfg isoshared.RunConfig, c provision.Contribution) 
 	// Sandbox-local HOME: a tmpfs at the home path (no host-$HOME bind), with only
 	// the curated config paths bound back read-only.
 	args = append(args, "--tmpfs", homeDir)
-	for _, configPath := range isolation.UserConfigPaths {
-		src := filepath.Join(homeDir, configPath)
-		exists, err := isoshared.OptionalPath(src, "user config path")
+	for _, configPath := range isolation.UserConfigPaths(cfg.Agent.Type) {
+		src, exists, err := isoshared.ResolveContainedOptionalPath(homeDir, configPath, "user config path")
 		if err != nil {
 			return nil, err
 		}
 		if exists {
-			args = append(args, "--ro-bind", src, src)
+			args = append(args, "--ro-bind", src, filepath.Join(homeDir, configPath))
 		}
 	}
 
