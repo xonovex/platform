@@ -115,14 +115,15 @@ async fn detected_node_task_resolves_general_and_node_without_system() {
     assert_eq!(output.command.as_deref(), Some("nix"));
     assert_eq!(args[0], "develop");
     assert_eq!(args[1], "--impure");
-    assert_eq!(args[2], "--no-update-lock-file");
-    assert_eq!(args[3], "--expr");
-    assert_eq!(args[4], MOON_SHELL_EXPRESSION);
-    assert_eq!(args[5], "moon");
-    assert_eq!(args[6], "--command");
-    assert_eq!(args[7], "node");
-    assert_eq!(args[8], "script with spaces.js");
-    assert_eq!(args[9], "${literal}");
+    assert_eq!(&args[2..5], ["--option", "eval-cache", "false"]);
+    assert_eq!(args[5], "--no-update-lock-file");
+    assert_eq!(args[6], "--expr");
+    assert_eq!(args[7], MOON_SHELL_EXPRESSION);
+    assert_eq!(args[8], "moon");
+    assert_eq!(args[9], "--command");
+    assert_eq!(args[10], "node");
+    assert_eq!(args[11], "script with spaces.js");
+    assert_eq!(args[12], "${literal}");
     assert_eq!(output.env.get(SENTINEL).map(String::as_str), Some("1"));
     assert_eq!(
         output.env.get(MOON_COMPONENTS_ENV).map(String::as_str),
@@ -178,7 +179,7 @@ async fn script_task_remains_one_opaque_quoted_bash_argument() {
     let output = plugin.extend_task_script(input).await;
     let wrapped = output.script.unwrap();
 
-    assert!(wrapped.starts_with("'nix' 'develop' '--impure' '--no-update-lock-file' '--expr' "));
+    assert!(wrapped.starts_with("'nix' 'develop' '--impure' '--option' 'eval-cache' 'false' '--no-update-lock-file' '--expr' "));
     assert!(wrapped.contains(&quote_posix(MOON_SHELL_EXPRESSION)));
     assert!(wrapped.contains("'moon' '--command' 'bash' '-c'"));
     assert!(wrapped.ends_with(&quote_posix(script)), "got: {wrapped}");
@@ -215,7 +216,7 @@ async fn project_then_task_override_uses_full_target_and_semantic_host_validatio
     let output = plugin.extend_task_command(input).await;
     let args = replaced_args(&output);
 
-    assert_eq!(args[4], MOON_SHELL_EXPRESSION);
+    assert_eq!(args[7], MOON_SHELL_EXPRESSION);
     assert_eq!(
         output.env.get(MOON_COMPONENTS_ENV).map(String::as_str),
         Some("[\"rust\"]"),
@@ -249,12 +250,13 @@ async fn workspace_installable_is_canonicalized_and_bypasses_the_expression() {
 
     assert_eq!(args[0], "develop");
     assert_eq!(args[1], "--impure");
-    assert_eq!(args[2], "--no-update-lock-file");
+    assert_eq!(&args[2..5], ["--option", "eval-cache", "false"]);
+    assert_eq!(args[5], "--no-update-lock-file");
     assert_eq!(
-        args[3],
+        args[6],
         format!("path:{}#moon", flake_root.canonicalize().unwrap().display())
     );
-    assert_eq!(args[4], "--command");
+    assert_eq!(args[7], "--command");
     assert!(!args.iter().any(|argument| argument == "--expr"));
     assert!(!output.env.contains_key(MOON_FLAKE_ENV));
     assert!(!output.env.contains_key(MOON_COMPONENTS_ENV));

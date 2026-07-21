@@ -48,6 +48,9 @@ pub fn plan_command(
 
     let mut args = vec![
         "develop".to_owned(),
+        "--option".to_owned(),
+        "eval-cache".to_owned(),
+        "false".to_owned(),
         "--no-update-lock-file".to_owned(),
         flake_ref(&target.root, shell),
         "--command".to_owned(),
@@ -72,7 +75,7 @@ pub fn plan_script(
     };
 
     WrapDecision::Script(format!(
-        "nix develop --no-update-lock-file {} --command bash -c {}",
+        "nix develop --option eval-cache false --no-update-lock-file {} --command bash -c {}",
         quote_posix(&flake_ref(&target.root, shell)),
         quote_posix(script)
     ))
@@ -117,6 +120,9 @@ fn develop_args(target: &DevelopTarget) -> Vec<String> {
     let mut args = vec![
         "develop".to_owned(),
         "--impure".to_owned(),
+        "--option".to_owned(),
+        "eval-cache".to_owned(),
+        "false".to_owned(),
         "--no-update-lock-file".to_owned(),
     ];
 

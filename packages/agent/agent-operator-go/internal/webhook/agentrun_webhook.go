@@ -22,6 +22,7 @@ import (
 	"github.com/xonovex/platform/packages/agent/agent-operator-go/internal/resolver"
 	"github.com/xonovex/platform/packages/agent/agent-operator-go/internal/validator"
 	sharednix "github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/provision/nix"
+	agentvalidation "github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/validation"
 )
 
 // AgentRunWebhook implements defaulting and validation for AgentRun
@@ -130,13 +131,13 @@ func (w *AgentRunWebhook) validate(ctx context.Context, run *agentv1alpha1.Agent
 				return nil, fmt.Errorf("workspace storageSize %q is not a valid resource quantity: %v", run.Spec.Workspace.StorageSize, err)
 			}
 		}
-		if err := validator.ValidateRepositoryURL(repo.URL); err != nil {
+		if err := agentvalidation.ValidateRepositoryURL(repo.URL); err != nil {
 			return nil, err
 		}
-		if err := validator.ValidateBranch(repo.Branch); err != nil {
+		if err := agentvalidation.ValidateBranch(repo.Branch); err != nil {
 			return nil, err
 		}
-		if err := validator.ValidateCommit(repo.Commit); err != nil {
+		if err := agentvalidation.ValidateCommit(repo.Commit); err != nil {
 			return nil, err
 		}
 	}

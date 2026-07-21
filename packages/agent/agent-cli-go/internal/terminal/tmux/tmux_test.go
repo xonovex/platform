@@ -3,8 +3,11 @@ package tmux
 import (
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 	"testing"
+
+	termshared "github.com/xonovex/platform/packages/cli/agent-cli-go/internal/terminal/shared"
 )
 
 func TestSanitizeName(t *testing.T) {
@@ -204,4 +207,89 @@ func TestExecutor_IsInside(t *testing.T) {
 	// This test just verifies the method runs without error
 	// The actual result depends on the test environment
 	_ = e.IsInside()
+}
+
+func TestExecutorExecuteKeepsEnvironmentOutOfTmuxArguments(t *testing.T) {
+	tmuxArguments := installFakeTmux(t, false)
+	outputPath := filepath.Join(t.TempDir(), "result")
+	secret := "provider-secret-value"
+	executor := NewExecutor()
+	config := &termshared.TerminalConfig{SessionName: "session", WindowName: "window", Detach: true}
+
+	exitCode, err := executor.Execute(
+		config,
+		[]string{"/bin/sh", "-c", "printf '%s' \"$PROVIDER_TOKEN\" > \"$1\"", "sh", outputPath},
+		[]string{"PROVIDER_TOKEN=" + secret},
+		t.TempDir(),
+		true,
+	)
+
+	if err != nil || exitCode != 0 {
+		t.Fatalf("Execute() exitCode = %d, error = %v", exitCode, err)
+	}
+	result, err := os.ReadFile(outputPath)
+	if err != nil {
+		t.Fatalf("read command output: %v", err)
+	}
+	if string(result) != secret {
+		t.Fatalf("command output = %q, want secret value", result)
+	}
+	arguments, err := os.ReadFile(tmuxArguments)
+	if err != nil {
+		t.Fatalf("read fake tmux arguments: %v", err)
+	}
+	if strings.Contains(string(arguments), secret) || strings.Contains(string(arguments), "PROVIDER_TOKEN") {
+		t.Fatalf("tmux arguments contain environment secret: %q", arguments)
+	}
+}
+
+func TestExecutorExecuteAddsWindowToExistingSession(t *testing.T) {
+	tmuxArguments := installFakeTmux(t, true)
+	executor := NewExecutor()
+	config := &termshared.TerminalConfig{SessionName: "session", WindowName: "window", Detach: true}
+
+	exitCode, err := executor.Execute(config, []string{"/bin/true"}, nil, t.TempDir(), false)
+
+	if err != nil || exitCode != 0 {
+		t.Fatalf("Execute() exitCode = %d, error = %v", exitCode, err)
+	}
+	arguments, err := os.ReadFile(tmuxArguments)
+	if err != nil {
+		t.Fatalf("read fake tmux arguments: %v", err)
+	}
+	if !strings.HasPrefix(string(arguments), "new-window\n") {
+		t.Fatalf("tmux arguments = %q, want new-window", arguments)
+	}
+}
+
+func installFakeTmux(t *testing.T, sessionExists bool) string {
+	t.Helper()
+	directory := t.TempDir()
+	argumentsPath := filepath.Join(directory, "arguments")
+	script := `#!/bin/sh
+if [ "$1" = "has-session" ]; then
+  if [ "${FAKE_TMUX_SESSION_EXISTS:-}" = "1" ]; then
+    exit 0
+  fi
+  exit 1
+fi
+printf '%s\n' "$@" > "$FAKE_TMUX_ARGUMENTS"
+for argument do
+  launch_script="$argument"
+done
+case "$1" in
+  new-session|new-window) /bin/sh "$launch_script" ;;
+esac
+`
+	if err := os.WriteFile(filepath.Join(directory, "tmux"), []byte(script), 0o700); err != nil {
+		t.Fatalf("write fake tmux: %v", err)
+	}
+	t.Setenv("PATH", directory+string(os.PathListSeparator)+os.Getenv("PATH"))
+	t.Setenv("FAKE_TMUX_ARGUMENTS", argumentsPath)
+	if sessionExists {
+		t.Setenv("FAKE_TMUX_SESSION_EXISTS", "1")
+	} else {
+		t.Setenv("FAKE_TMUX_SESSION_EXISTS", "")
+	}
+	return argumentsPath
 }

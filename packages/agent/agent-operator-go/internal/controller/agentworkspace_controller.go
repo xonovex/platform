@@ -22,6 +22,7 @@ import (
 	isoshared "github.com/xonovex/platform/packages/agent/agent-operator-go/internal/isolation/shared"
 	netshared "github.com/xonovex/platform/packages/agent/agent-operator-go/internal/network/shared"
 	wsshared "github.com/xonovex/platform/packages/agent/agent-operator-go/internal/workspace/shared"
+	agentvalidation "github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/validation"
 )
 
 // DefaultWorkspaceInitImage is pinned to the multi-architecture OCI index for
@@ -142,8 +143,12 @@ func (r *AgentWorkspaceReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 				return ctrl.Result{}, fmt.Errorf("existing workspace init Job %q: %w", job.Name, err)
 			}
 		} else {
+			repository, err := agentvalidation.ParseRepositoryURL(ws.Spec.Repository.URL)
+			if err != nil {
+				return r.updateWorkspacePhase(ctx, &ws, agentv1alpha1.AgentWorkspacePhaseFailed, "WorkspaceRepositoryInvalid")
+			}
 			r.Recorder.Eventf(&ws, nil, corev1.EventTypeNormal, "WorkspaceInitStarted", "WorkspaceInitStarted",
-				"Created init Job %s to clone %s", initJobName, ws.Spec.Repository.URL)
+				"Created init Job %s to clone %s", initJobName, repository.Display())
 		}
 
 		ws.Status.InitJobName = initJobName

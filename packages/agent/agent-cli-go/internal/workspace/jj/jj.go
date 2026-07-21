@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 
 	wsshared "github.com/xonovex/platform/packages/cli/agent-cli-go/internal/workspace/shared"
-	"github.com/xonovex/platform/packages/shared/shared-core-go/pkg/scriptlib"
+	"github.com/xonovex/platform/packages/shared/shared-core-go/pkg/logging"
 )
 
 // Workspace is the jj VCS variant: it creates or reuses a jj workspace.
@@ -34,7 +34,7 @@ func (w Workspace) Setup(config wsshared.Config, repoDir string, verbose bool) (
 	// Reuse an existing workspace directory.
 	if _, err := os.Stat(resolvedDir); err == nil {
 		if verbose {
-			scriptlib.LogInfo(fmt.Sprintf("Reusing existing jj workspace at %s", config.Dir))
+			logging.LogInfo(fmt.Sprintf("Reusing existing jj workspace at %s", config.Dir))
 		}
 		return resolvedDir, nil
 	}
@@ -52,7 +52,7 @@ func (w Workspace) Setup(config wsshared.Config, repoDir string, verbose bool) (
 	}
 
 	if verbose {
-		scriptlib.LogInfo(fmt.Sprintf("Creating jj workspace at %s from %s", config.Dir, sourceBranch))
+		logging.LogInfo(fmt.Sprintf("Creating jj workspace at %s from %s", config.Dir, sourceBranch))
 	}
 
 	cmd := exec.Command("jj", "workspace", "add", resolvedDir, "--revision", sourceBranch)
@@ -64,7 +64,7 @@ func (w Workspace) Setup(config wsshared.Config, repoDir string, verbose bool) (
 	}
 
 	if verbose {
-		scriptlib.LogSuccess("jj workspace created successfully")
+		logging.LogSuccess("jj workspace created successfully")
 	}
 	return resolvedDir, nil
 }

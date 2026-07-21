@@ -6,9 +6,6 @@ package shared
 import (
 	"errors"
 	"fmt"
-	"net/url"
-	"strconv"
-	"strings"
 
 	corev1 "k8s.io/api/core/v1"
 	networkingv1 "k8s.io/api/networking/v1"
@@ -16,6 +13,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/intstr"
 
 	agentv1alpha1 "github.com/xonovex/platform/packages/agent/agent-operator-go/api/v1alpha1"
+	agentvalidation "github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/validation"
 )
 
 // ErrProxyEnforcementUnavailable reports that proxy mode has no backend capable
@@ -70,12 +68,12 @@ func BuildNetworkPolicy(run *agentv1alpha1.AgentRun, np *agentv1alpha1.AgentNetw
 // workspace clone pod. Egress is limited to DNS and the repository transport's
 // TCP port; the clone job has no need for any other network traffic.
 func BuildWorkspaceInitNetworkPolicy(workspace *agentv1alpha1.AgentWorkspace) (*networkingv1.NetworkPolicy, error) {
-	port, err := repositoryPort(workspace.Spec.Repository.URL)
+	repository, err := agentvalidation.ParseRepositoryURL(workspace.Spec.Repository.URL)
 	if err != nil {
 		return nil, err
 	}
 	tcp := corev1.ProtocolTCP
-	portValue := intstr.FromInt32(port)
+	portValue := intstr.FromInt32(repository.Port)
 	return &networkingv1.NetworkPolicy{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      workspace.Name + "-init-netpol",
@@ -98,34 +96,33 @@ func BuildWorkspaceInitNetworkPolicy(workspace *agentv1alpha1.AgentWorkspace) (*
 			Ingress: []networkingv1.NetworkPolicyIngressRule{},
 			Egress: []networkingv1.NetworkPolicyEgressRule{
 				dnsEgressRule(),
-				{Ports: []networkingv1.NetworkPolicyPort{{Protocol: &tcp, Port: &portValue}}},
+				{
+					To:    publicNetworkPeers(),
+					Ports: []networkingv1.NetworkPolicyPort{{Protocol: &tcp, Port: &portValue}},
+				},
 			},
 		},
 	}, nil
 }
 
-func repositoryPort(repositoryURL string) (int32, error) {
-	if strings.HasPrefix(repositoryURL, "git@") {
-		return 22, nil
-	}
-	parsed, err := url.Parse(repositoryURL)
-	if err != nil {
-		return 0, fmt.Errorf("parse repository URL for NetworkPolicy: %w", err)
-	}
-	if parsed.Port() != "" {
-		port, err := strconv.ParseInt(parsed.Port(), 10, 32)
-		if err != nil || port < 1 || port > 65535 {
-			return 0, fmt.Errorf("repository URL port %q is invalid", parsed.Port())
-		}
-		return int32(port), nil
-	}
-	switch parsed.Scheme {
-	case "http":
-		return 80, nil
-	case "https":
-		return 443, nil
-	default:
-		return 0, fmt.Errorf("repository URL scheme %q has no supported NetworkPolicy port", parsed.Scheme)
+func publicNetworkPeers() []networkingv1.NetworkPolicyPeer {
+	return []networkingv1.NetworkPolicyPeer{
+		{IPBlock: &networkingv1.IPBlock{
+			CIDR: "0.0.0.0/0",
+			Except: []string{
+				"0.0.0.0/8", "10.0.0.0/8", "100.64.0.0/10", "127.0.0.0/8",
+				"169.254.0.0/16", "172.16.0.0/12", "192.0.0.0/24", "192.0.2.0/24",
+				"192.88.99.0/24", "192.168.0.0/16", "198.18.0.0/15", "198.51.100.0/24",
+				"203.0.113.0/24", "224.0.0.0/4", "240.0.0.0/4",
+			},
+		}},
+		{IPBlock: &networkingv1.IPBlock{
+			CIDR: "::/0",
+			Except: []string{
+				"::/128", "::1/128", "64:ff9b:1::/48", "100::/64",
+				"2001:db8::/32", "fc00::/7", "fe80::/10", "ff00::/8",
+			},
+		}},
 	}
 }
 

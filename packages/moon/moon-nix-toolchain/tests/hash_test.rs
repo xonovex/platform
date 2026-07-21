@@ -149,10 +149,11 @@ async fn setup_environment_pre_builds_devshell_when_nix_present() {
     );
     assert_eq!(command.command.command, "nix");
     let args = &command.command.args;
-    assert_eq!(args.len(), 5, "got: {args:?}");
+    assert_eq!(args.len(), 8, "got: {args:?}");
     assert_eq!(args[0], "develop");
-    assert_eq!(args[1], "--no-update-lock-file");
-    assert_eq!(args[2], expected_root);
-    assert_eq!(args[3], "--command");
-    assert_eq!(args[4], "true");
+    assert_eq!(&args[1..4], ["--option", "eval-cache", "false"]);
+    assert_eq!(args[4], "--no-update-lock-file");
+    assert_eq!(args[5], expected_root);
+    assert_eq!(args[6], "--command");
+    assert_eq!(args[7], "true");
 }

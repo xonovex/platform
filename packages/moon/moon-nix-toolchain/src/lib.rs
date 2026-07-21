@@ -265,6 +265,9 @@ fn flake_exposes_shell(root: &str, shell: &str) -> AnyResult<bool> {
         [
             "eval",
             "--impure",
+            "--option",
+            "eval-cache",
+            "false",
             "--no-update-lock-file",
             "--json",
             reference.as_str(),
@@ -509,6 +512,9 @@ pub fn setup_environment(
                 "nix",
                 [
                     "develop",
+                    "--option",
+                    "eval-cache",
+                    "false",
                     "--no-update-lock-file",
                     reference.as_str(),
                     "--command",

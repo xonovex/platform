@@ -42,10 +42,10 @@ tasks:
   ts-coverage:
     script: >-
       npx vitest run --coverage --coverage.include='src/**'
-      --coverage.thresholds.lines 50
-      --coverage.thresholds.functions 50
-      --coverage.thresholds.branches 50
-      --coverage.thresholds.statements 50
+      --coverage.thresholds.lines 75
+      --coverage.thresholds.functions 60
+      --coverage.thresholds.branches 90
+      --coverage.thresholds.statements 75
     inputs:
       - src/**/*.ts
       - vitest.config.ts
@@ -60,6 +60,8 @@ tasks:
       ./internal/isolation/bwrap=65
       ./internal/isolation/docker=65
       ./internal/isolation/none=80
+      ./internal/isolation/shared=80
+      ./internal/terminal/tmux=75
       ./internal/workspace/git=80
       ./internal/workspace/jj=90
     inputs:

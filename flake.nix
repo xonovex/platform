@@ -16,7 +16,7 @@
 
   outputs = { nixpkgs, nixShells, llm-agents, ... }:
     let
-      supportedSystems = [ "x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin" ];
+      supportedSystems = [ "x86_64-linux" "aarch64-linux" "aarch64-darwin" ];
       forAllSystems = nixpkgs.lib.genAttrs supportedSystems;
       mkMoonShell = system: names:
         let
@@ -29,6 +29,9 @@
         else
           pkgs.mkShell {
             inputsFrom = map (name: shells.${name}) names;
+            # mkMoonShell disables the shared evaluation cache because Moon may
+            # enter several dev shells concurrently.
+            NIX_CONFIG = "eval-cache = false";
           };
 
       # The agent image (dockerTools) is Linux-only; scope the smoke outputs that

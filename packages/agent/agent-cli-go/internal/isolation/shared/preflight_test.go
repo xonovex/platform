@@ -47,3 +47,40 @@ func TestResolveContainedOptionalPathReportsMissingConfig(t *testing.T) {
 		t.Fatalf("resolved = %q, exists = %v, error = %v, want empty, false, nil", resolved, exists, err)
 	}
 }
+
+func TestResolveHomeDirUsesExplicitDirectory(t *testing.T) {
+	home := t.TempDir()
+
+	resolved, err := ResolveHomeDir(home)
+
+	if err != nil || resolved != home {
+		t.Fatalf("ResolveHomeDir() = %q, %v, want %q, nil", resolved, err, home)
+	}
+}
+
+func TestResolveDirectoryRejectsFile(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "file")
+	if err := os.WriteFile(path, []byte("content"), 0o600); err != nil {
+		t.Fatalf("write fixture: %v", err)
+	}
+
+	if _, err := ResolveDirectory(path, "fixture"); err == nil {
+		t.Fatal("ResolveDirectory() error = nil, want file rejection")
+	}
+}
+
+func TestResolveExistingPath(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "file")
+	if err := os.WriteFile(path, []byte("content"), 0o600); err != nil {
+		t.Fatalf("write fixture: %v", err)
+	}
+
+	resolved, err := ResolveExistingPath(path, "fixture")
+
+	if err != nil || resolved != path {
+		t.Fatalf("ResolveExistingPath() = %q, %v, want %q, nil", resolved, err, path)
+	}
+	if _, err := ResolveExistingPath(path+"-missing", "fixture"); err == nil {
+		t.Fatal("ResolveExistingPath() missing error = nil, want error")
+	}
+}

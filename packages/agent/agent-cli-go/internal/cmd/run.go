@@ -30,7 +30,7 @@ import (
 	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/validation"
 	wsp "github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/workspace"
 	"github.com/xonovex/platform/packages/shared/shared-core-go/pkg/envutil"
-	"github.com/xonovex/platform/packages/shared/shared-core-go/pkg/scriptlib"
+	"github.com/xonovex/platform/packages/shared/shared-core-go/pkg/logging"
 )
 
 type runOptions struct {
@@ -239,8 +239,8 @@ func runAgent(cmd *cobra.Command, args []string, options runOptions) error {
 
 	agent, err := agents.GetAgent(types.AgentType(options.agent))
 	if err != nil {
-		scriptlib.LogError(err.Error())
-		scriptlib.LogInfo("Available agents: " + fmt.Sprint(agents.GetAgentTypes()))
+		logging.LogError(err.Error())
+		logging.LogInfo("Available agents: " + fmt.Sprint(agents.GetAgentTypes()))
 		return err
 	}
 
@@ -295,8 +295,8 @@ func runAgent(cmd *cobra.Command, args []string, options runOptions) error {
 
 	available, err := axes.Isolation.Available()
 	if err != nil || !available {
-		scriptlib.LogError(fmt.Sprintf("Isolation method %s is not available", axes.IsolationName))
-		scriptlib.LogInfo(fmt.Sprintf("Available isolations: %v", sandbox.AvailableIsolations(plugins.DefaultRegistry())))
+		logging.LogError(fmt.Sprintf("Isolation method %s is not available", axes.IsolationName))
+		logging.LogInfo(fmt.Sprintf("Available isolations: %v", sandbox.AvailableIsolations(plugins.DefaultRegistry())))
 		return fmt.Errorf("isolation method %s is not available", axes.IsolationName)
 	}
 
@@ -378,8 +378,8 @@ func resolveProvider(agentType types.AgentType, optionProvider, fileProvider str
 	}
 	provider, err := providers.GetProvider(name, agentType)
 	if err != nil {
-		scriptlib.LogError(err.Error())
-		scriptlib.LogInfo("Available providers: " + fmt.Sprint(providers.GetProviderNames(agentType)))
+		logging.LogError(err.Error())
+		logging.LogInfo("Available providers: " + fmt.Sprint(providers.GetProviderNames(agentType)))
 		return nil, err
 	}
 	return provider, nil
@@ -522,12 +522,12 @@ func executeWithTerminal(axes resolvedAxes, runCfg isoshared.RunConfig, contribu
 	terminalType := termshared.TerminalType(options.terminal)
 	executor := terminal.GetExecutor(terminalType)
 	if executor == nil {
-		scriptlib.LogError(fmt.Sprintf("Unknown terminal type: %s", options.terminal))
-		scriptlib.LogInfo(fmt.Sprintf("Available types: %v", terminal.GetAvailableTypes()))
+		logging.LogError(fmt.Sprintf("Unknown terminal type: %s", options.terminal))
+		logging.LogInfo(fmt.Sprintf("Available types: %v", terminal.GetAvailableTypes()))
 		return fmt.Errorf("unknown terminal type: %s", options.terminal)
 	}
 	if !executor.IsAvailable() {
-		scriptlib.LogError(fmt.Sprintf("Terminal type %s is not available (not installed)", options.terminal))
+		logging.LogError(fmt.Sprintf("Terminal type %s is not available (not installed)", options.terminal))
 		return fmt.Errorf("terminal type %s is not available", options.terminal)
 	}
 
@@ -547,7 +547,7 @@ func executeWithTerminal(axes resolvedAxes, runCfg isoshared.RunConfig, contribu
 	}
 
 	if verbose {
-		scriptlib.LogInfo("Using terminal wrapper: " + options.terminal)
+		logging.LogInfo("Using terminal wrapper: " + options.terminal)
 	}
 
 	exitCode, err := executor.Execute(terminalConfig, fullCommand, env, workDir, verbose)
@@ -562,18 +562,18 @@ func executeWithTerminal(axes resolvedAxes, runCfg isoshared.RunConfig, contribu
 
 // printDryRun displays what would be executed without running it.
 func printDryRun(axes resolvedAxes, command []string, agent *types.AgentConfig, provider *types.ModelProvider, args []string, workDir string) error {
-	scriptlib.LogInfo("Dry run - would execute:")
+	logging.LogInfo("Dry run - would execute:")
 
 	if axes.IsolationName == isolation.IsolationNone {
-		scriptlib.LogInfo("  Agent: " + agent.DisplayName)
+		logging.LogInfo("  Agent: " + agent.DisplayName)
 		if provider != nil {
-			scriptlib.LogInfo("  Provider: " + provider.DisplayName)
+			logging.LogInfo("  Provider: " + provider.DisplayName)
 		}
-		scriptlib.LogInfo("  Work directory: " + workDir)
+		logging.LogInfo("  Work directory: " + workDir)
 		if len(args) > 0 {
-			scriptlib.LogInfo("  Arguments: " + fmt.Sprintf("%v", args))
+			logging.LogInfo("  Arguments: " + fmt.Sprintf("%v", args))
 		} else {
-			scriptlib.LogInfo("  Arguments: (none)")
+			logging.LogInfo("  Arguments: (none)")
 		}
 	}
 

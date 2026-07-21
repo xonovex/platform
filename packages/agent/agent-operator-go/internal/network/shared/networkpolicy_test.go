@@ -183,6 +183,38 @@ func TestBuildWorkspaceInitNetworkPolicyAllowsOnlyDNSAndRepositoryPort(t *testin
 	if httpsPort == nil || httpsPort.IntValue() != 443 {
 		t.Fatalf("repository port = %v, want 443", httpsPort)
 	}
+	repositoryRule := policy.Spec.Egress[1]
+	if len(repositoryRule.To) != 2 {
+		t.Fatalf("repository destinations = %v, want public IPv4 and IPv6 peers", repositoryRule.To)
+	}
+	if !containsCIDR(repositoryRule.To[0].IPBlock.Except, "10.0.0.0/8") ||
+		!containsCIDR(repositoryRule.To[0].IPBlock.Except, "169.254.0.0/16") {
+		t.Fatalf("repository IPv4 exclusions = %v, want private and link-local networks", repositoryRule.To[0].IPBlock.Except)
+	}
+	if containsCIDR(repositoryRule.To[1].IPBlock.Except, "::ffff:0:0/96") {
+		t.Fatalf("repository IPv6 exclusions = %v, must not contain IPv4-mapped CIDRs", repositoryRule.To[1].IPBlock.Except)
+	}
+}
+
+func TestBuildWorkspaceInitNetworkPolicyRejectsInternalRepository(t *testing.T) {
+	workspace := &agentv1alpha1.AgentWorkspace{
+		Spec: agentv1alpha1.AgentWorkspaceSpec{Repository: agentv1alpha1.RepositorySpec{
+			URL: "https://169.254.169.254/latest/meta-data",
+		}},
+	}
+
+	if _, err := BuildWorkspaceInitNetworkPolicy(workspace); err == nil {
+		t.Fatal("BuildWorkspaceInitNetworkPolicy() error = nil, want internal repository rejection")
+	}
+}
+
+func containsCIDR(cidrs []string, target string) bool {
+	for _, cidr := range cidrs {
+		if cidr == target {
+			return true
+		}
+	}
+	return false
 }
 
 func protocolPtr(p corev1.Protocol) *corev1.Protocol {
