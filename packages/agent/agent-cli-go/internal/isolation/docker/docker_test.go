@@ -152,8 +152,8 @@ func TestDocker_AppliesContribution(t *testing.T) {
 
 func TestDocker_Capabilities(t *testing.T) {
 	i := NewIsolator()
-	if i.HidesHost(false, "") {
-		t.Error("image-less docker resolves host-equivalent tools (does not hide host)")
+	if !i.HidesHost(false, "") {
+		t.Error("docker with the digest-pinned default image hides host-equivalent tools")
 	}
 	digest := "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 	if i.HidesHost(false, "alpine:3.20") {

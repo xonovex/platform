@@ -2,6 +2,7 @@ package agents
 
 import (
 	"fmt"
+	"sort"
 
 	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/types"
 )
@@ -26,5 +27,8 @@ func GetAgentTypes() []types.AgentType {
 	for t := range agentRegistry {
 		agentTypes = append(agentTypes, t)
 	}
+	sort.Slice(agentTypes, func(i, j int) bool {
+		return agentTypes[i] < agentTypes[j]
+	})
 	return agentTypes
 }

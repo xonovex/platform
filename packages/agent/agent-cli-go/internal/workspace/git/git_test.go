@@ -63,6 +63,26 @@ func TestSetup_CreatesAndReusesNewBranchWorktree(t *testing.T) {
 	}
 }
 
+func TestSetup_ReusesSiblingWorktreeFromWorktreeRepositoryDirectory(t *testing.T) {
+	repoDir := initializeRepository(t)
+	firstWorktree := filepath.Join(t.TempDir(), "first")
+	secondWorktree := filepath.Join(t.TempDir(), "second")
+	if _, err := New().Setup(wsshared.Config{Branch: "feature/first", SourceBranch: "main", Dir: firstWorktree}, repoDir, false); err != nil {
+		t.Fatalf("create first worktree: %v", err)
+	}
+	if _, err := New().Setup(wsshared.Config{Branch: "feature/second", SourceBranch: "main", Dir: secondWorktree}, repoDir, false); err != nil {
+		t.Fatalf("create second worktree: %v", err)
+	}
+
+	result, err := New().Setup(wsshared.Config{Branch: "feature/second", Dir: secondWorktree}, firstWorktree, false)
+	if err != nil {
+		t.Fatalf("Setup() error = %v", err)
+	}
+	if result != secondWorktree {
+		t.Errorf("Setup() = %q, want %q", result, secondWorktree)
+	}
+}
+
 func TestSetup_CreatesWorktreeForExistingBranch(t *testing.T) {
 	repoDir := initializeRepository(t)
 	runGit(t, repoDir, "branch", "existing", "main")

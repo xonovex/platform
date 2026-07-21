@@ -3,6 +3,7 @@ package providers
 import (
 	"fmt"
 	"os"
+	"sort"
 
 	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/types"
 )
@@ -26,24 +27,18 @@ func GetProvider(name string, agentType types.AgentType) (*types.ModelProvider, 
 		return provider, nil
 	}
 
-	// Search all providers for matching name (fallback)
-	for _, provider := range providerRegistry {
-		if provider.Name == name && provider.AgentType == agentType {
-			return provider, nil
-		}
-	}
-
 	return nil, fmt.Errorf("unknown provider: %s for agent %s", name, agentType)
 }
 
 // GetProviderNames returns all provider names for an agent type
 func GetProviderNames(agentType types.AgentType) []string {
 	names := make([]string, 0)
-	for name, provider := range providerRegistry {
+	for _, provider := range providerRegistry {
 		if provider.AgentType == agentType {
-			names = append(names, name)
+			names = append(names, provider.Name)
 		}
 	}
+	sort.Strings(names)
 	return names
 }
 

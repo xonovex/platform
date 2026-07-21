@@ -14,6 +14,7 @@ import (
 	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/providers"
 	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/provision"
 	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/types"
+	"github.com/xonovex/platform/packages/shared/shared-core-go/pkg/envutil"
 )
 
 // Isolator runs the agent directly on the host — no namespace boundary. It
@@ -96,14 +97,11 @@ func (i *Isolator) hostCommand(cfg isoshared.RunConfig, c provision.Contribution
 	cmd := append([]string{cfg.Agent.Binary}, agentArgs...)
 	cmd = isoshared.WrapWithInitCommands(cmd, c.InitCommands)
 
-	env := os.Environ()
-	for k, v := range agentEnv {
-		env = append(env, k+"="+v)
+	customEnv, err := envutil.ParseCustomEnv(cfg.CustomEnv)
+	if err != nil {
+		return nil, nil, err
 	}
-	env = append(env, cfg.CustomEnv...)
-	for k, v := range c.Env {
-		env = append(env, k+"="+v)
-	}
+	env := envutil.MergeEnvMaps(envutil.ParseEnv(os.Environ()), agentEnv, customEnv, c.Env)
 	// Prepend the contribution's tool dirs; host execution always exposes the
 	// host PATH (it cannot hide host tools), so HostPassthrough is implied.
 	if len(c.PathEntries) > 0 {
@@ -111,8 +109,8 @@ func (i *Isolator) hostCommand(cfg isoshared.RunConfig, c provision.Contribution
 		if host := os.Getenv("PATH"); host != "" {
 			path += ":" + host
 		}
-		env = append(env, "PATH="+path)
+		env["PATH"] = path
 	}
 
-	return cmd, env, nil
+	return cmd, envutil.EnvMapToSlice(env), nil
 }

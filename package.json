@@ -32,7 +32,7 @@
     "gitlab-ci-local": "^4.73.0",
     "jiti": "^2.7.0",
     "npm-check-updates": "22.2.9",
-    "prettier": "^3.9.5",
+    "prettier": "^3.9.6",
     "tsx": "^4.23.1",
     "typescript": "6.0.3",
     "vite": "8.0.16",

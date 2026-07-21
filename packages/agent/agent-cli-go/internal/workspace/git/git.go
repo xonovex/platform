@@ -48,24 +48,34 @@ func isWorktreeDirectory(dir string) bool {
 
 // isWorktreeForRepo checks whether worktreeDir belongs to repoDir.
 func isWorktreeForRepo(worktreeDir, repoDir string) bool {
-	worktreeGitDir, err := wsshared.ExecGit([]string{"rev-parse", "--git-dir"}, worktreeDir)
+	worktreeGitDir, err := commonGitDir(worktreeDir)
 	if err != nil {
 		return false
 	}
-	repoGitDir, err := wsshared.ExecGit([]string{"rev-parse", "--git-dir"}, repoDir)
+	repoGitDir, err := commonGitDir(repoDir)
 	if err != nil {
 		return false
 	}
+	return worktreeGitDir == repoGitDir
+}
 
-	resolvedWorktreeGitDir := worktreeGitDir
-	if !filepath.IsAbs(worktreeGitDir) {
-		resolvedWorktreeGitDir = filepath.Join(worktreeDir, worktreeGitDir)
+func commonGitDir(dir string) (string, error) {
+	gitDir, err := wsshared.ExecGit([]string{"rev-parse", "--git-common-dir"}, dir)
+	if err != nil {
+		return "", err
 	}
-	resolvedRepoGitDir := repoGitDir
-	if !filepath.IsAbs(repoGitDir) {
-		resolvedRepoGitDir = filepath.Join(repoDir, repoGitDir)
+	if !filepath.IsAbs(gitDir) {
+		gitDir = filepath.Join(dir, gitDir)
 	}
-	return strings.HasPrefix(resolvedWorktreeGitDir, resolvedRepoGitDir)
+	gitDir, err = filepath.Abs(gitDir)
+	if err != nil {
+		return "", err
+	}
+	resolved, err := filepath.EvalSymlinks(gitDir)
+	if err != nil {
+		return "", err
+	}
+	return filepath.Clean(resolved), nil
 }
 
 // checkExisting inspects an existing directory's worktree status.

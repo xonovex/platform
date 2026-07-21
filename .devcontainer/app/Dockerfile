@@ -19,6 +19,9 @@ ARG DEBIAN_FRONTEND=noninteractive
 # vscode user at UID 1000 matches the typical host user.
 ARG USERNAME=vscode
 
+ARG NIX_VERSION=2.34.7
+ARG NIX_ARCHIVE_SHA256=eafe5042404e818505e28c5ca3d0885f3ec45c31f955489a25bb38258f87560e
+
 # Minimal apt packages — only what Nix and the base image need.
 # All development tools come from Nix (see flake.nix).
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -46,9 +49,14 @@ RUN SUDO_FORCE_REMOVE=yes apt-get purge -y sudo \
 RUN mkdir -m 0755 /nix \
     && mkdir -p /etc/nix \
     && printf 'build-users-group =\nexperimental-features = nix-command flakes\n' > /etc/nix/nix.conf \
-    && curl -L https://nixos.org/nix/install | bash -s -- --no-daemon \
+    && curl --fail --location --show-error \
+      "https://releases.nixos.org/nix/nix-${NIX_VERSION}/nix-${NIX_VERSION}-x86_64-linux.tar.xz" \
+      --output /tmp/nix.tar.xz \
+    && printf '%s  %s\n' "$NIX_ARCHIVE_SHA256" /tmp/nix.tar.xz | sha256sum --check --strict \
+    && tar -xJf /tmp/nix.tar.xz -C /tmp \
+    && "/tmp/nix-${NIX_VERSION}-x86_64-linux/install" --no-daemon \
     && /root/.nix-profile/bin/nix-collect-garbage -d \
-    && rm -rf /nix/var/nix/temproots/*
+    && rm -rf /nix/var/nix/temproots/* "/tmp/nix-${NIX_VERSION}-x86_64-linux" /tmp/nix.tar.xz
 
 # Copy the flake (package definitions + lock file) into the image.
 # flake.nix defines centrally approved package groups.
@@ -124,15 +132,15 @@ USER root
 ENV PATH="/home/$USERNAME/.nix-profile/bin:/home/$USERNAME/.local/bin:${PATH}"
 
 
-# Claude Code (Bun-based CLI, installed as the non-root user)
+# Claude Code and Moon are installed from an integrity-locked npm dependency tree.
+COPY package.json package-lock.json /home/$USERNAME/.local/lib/devcontainer-tools/
+RUN chown -R $USERNAME:$USERNAME /home/$USERNAME/.local
 USER $USERNAME
-RUN curl -fsSL https://claude.ai/install.sh | bash
+RUN npm ci --prefix /home/$USERNAME/.local/lib/devcontainer-tools --omit=dev \
+    && mkdir -p /home/$USERNAME/.local/bin \
+    && ln -s /home/$USERNAME/.local/lib/devcontainer-tools/node_modules/.bin/claude /home/$USERNAME/.local/bin/claude \
+    && ln -s /home/$USERNAME/.local/lib/devcontainer-tools/node_modules/.bin/moon /home/$USERNAME/.local/bin/moon
 USER root
-
-# Moon (monorepo task runner)
-RUN curl -fsSL https://moonrepo.dev/install/moon.sh | bash \
-    && mv /root/.moon/bin/moon /usr/local/bin/moon \
-    || true
 
 # Entrypoint: background IPC socket cleanup loop + sleep infinity.
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh

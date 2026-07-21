@@ -20,7 +20,7 @@ const (
 )
 
 // DefaultContainerImage is the default container image for running agents.
-const DefaultContainerImage = "node:trixie-slim"
+const DefaultContainerImage = "docker.io/library/node:26.3.0-trixie-slim@sha256:95a34da32a840bd9b3b09a5b773591c16923e350174b1c50e1200c75bf15eaa9"
 
 // UserConfigPaths lists home-relative paths that should be bind-mounted
 // into sandboxed environments so agents can access user configuration.

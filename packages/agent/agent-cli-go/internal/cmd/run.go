@@ -28,6 +28,7 @@ import (
 	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/types"
 	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/validation"
 	wsp "github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/workspace"
+	"github.com/xonovex/platform/packages/shared/shared-core-go/pkg/envutil"
 	"github.com/xonovex/platform/packages/shared/shared-core-go/pkg/scriptlib"
 )
 
@@ -313,6 +314,10 @@ func runAgent(cmd *cobra.Command, args []string, options runOptions) error {
 	if err != nil {
 		return err
 	}
+	customEnv, err := envutil.ParseCustomEnv(append(append([]string{}, fileConfig.CustomEnv...), options.customEnv...))
+	if err != nil {
+		return fmt.Errorf("invalid custom environment: %w", err)
+	}
 
 	runCfg := isoshared.RunConfig{
 		HomeDir:         fileConfig.HomeDir,
@@ -324,7 +329,7 @@ func runAgent(cmd *cobra.Command, args []string, options runOptions) error {
 		Runtime:         axes.Runtime,
 		BindPaths:       bindPaths,
 		RoBindPaths:     roBindPaths,
-		CustomEnv:       append(append([]string{}, fileConfig.CustomEnv...), options.customEnv...),
+		CustomEnv:       envutil.EnvMapToSlice(customEnv),
 		Agent:           agent,
 		Provider:        provider,
 		AgentArgs:       args,

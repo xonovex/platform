@@ -56,7 +56,7 @@
           procps
 
           # Node.js (matches the version used in the project root flake)
-          nodejs_20
+          nodejs_22
 
           # Shell
           bash

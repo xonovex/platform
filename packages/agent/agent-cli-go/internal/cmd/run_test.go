@@ -4,6 +4,7 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/spf13/cobra"
@@ -118,6 +119,35 @@ func TestRunAgentDryRunBuildsHostCommand(t *testing.T) {
 
 	if err != nil {
 		t.Fatalf("runAgent() error = %v", err)
+	}
+}
+
+func TestRunAgentRejectsMalformedCustomEnvironment(t *testing.T) {
+	workDir := t.TempDir()
+	configPath := filepath.Join(workDir, "config.yaml")
+	if err := os.WriteFile(configPath, []byte("{}\n"), 0o600); err != nil {
+		t.Fatalf("WriteFile() error = %v", err)
+	}
+	command := &cobra.Command{}
+	command.Flags().Bool("verbose", false, "")
+	command.Flags().String("isolation", "none", "")
+	command.Flags().String("provision", "none", "")
+	options := runOptions{
+		agent:     "claude",
+		isolation: "none",
+		provision: "none",
+		network:   "host",
+		workDir:   workDir,
+		config:    configPath,
+		vcs:       "git",
+		dryRun:    true,
+		customEnv: []string{"MISSING_EQUALS"},
+	}
+
+	err := runAgent(command, nil, options)
+
+	if err == nil || !strings.Contains(err.Error(), "must use KEY=VALUE") {
+		t.Fatalf("runAgent() error = %v, want custom environment validation error", err)
 	}
 }
 

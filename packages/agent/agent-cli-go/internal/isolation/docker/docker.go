@@ -228,7 +228,7 @@ func (i *Isolator) processEnv(cfg isoshared.RunConfig, c provision.Contribution)
 	if err != nil {
 		return nil, err
 	}
-	return envutil.EnvMapToSlice(envutil.MergeEnvMaps(envutil.ParseCustomEnv(os.Environ()), containerEnv)), nil
+	return envutil.EnvMapToSlice(envutil.MergeEnvMaps(envutil.ParseEnv(os.Environ()), containerEnv)), nil
 }
 
 func resolveImage(image string) string {
@@ -264,7 +264,11 @@ func (i *Isolator) containerEnv(cfg isoshared.RunConfig, c provision.Contributio
 	for k, v := range c.Env {
 		env[k] = v
 	}
-	for k, v := range envutil.ParseCustomEnv(cfg.CustomEnv) {
+	customEnv, err := envutil.ParseCustomEnv(cfg.CustomEnv)
+	if err != nil {
+		return nil, err
+	}
+	for k, v := range customEnv {
 		env[k] = v
 	}
 	return env, nil

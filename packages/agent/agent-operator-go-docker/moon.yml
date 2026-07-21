@@ -2,18 +2,53 @@ $schema: https://moonrepo.dev/schemas/project.json
 language: bash
 tags: [shell]
 layer: unknown
-dependsOn: []
+dependsOn:
+  - agent-operator-go
+fileGroups:
+  operator-image:
+    - /packages/agent/agent-operator-go/Dockerfile
+    - /packages/agent/agent-operator-go/**/*.go
+    - /packages/agent/agent-operator-go/go.mod
+    - /packages/agent/agent-operator-go/go.sum
+    - /packages/shared/shared-agent-go/**/*.go
+    - /packages/shared/shared-agent-go/go.mod
+    - /packages/shared/shared-agent-go/go.sum
+    - /packages/shared/shared-core-go/**/*.go
+    - /packages/shared/shared-core-go/go.mod
+    - /packages/shared/shared-core-go/go.sum
 tasks:
   docker-build:
     script: bash packages/agent/agent-operator-go-docker/scripts/docker-build.sh "$workspaceRoot"
-    inputs: []
+    deps:
+      - agent-operator-go:go-build
+    inputs:
+      - "@globs(sources)"
+      - "@globs(operator-image)"
+      - /packages/agent/agent-operator-go/Dockerfile
+      - /packages/agent/agent-operator-go/go.mod
+      - /packages/agent/agent-operator-go/go.sum
+      - /packages/shared/shared-agent-go/go.mod
+      - /packages/shared/shared-agent-go/go.sum
+      - /packages/shared/shared-core-go/go.mod
+      - /packages/shared/shared-core-go/go.sum
     outputs: []
     options:
       cache: false
       runFromWorkspaceRoot: true
   docker-publish:
     script: bash packages/agent/agent-operator-go-docker/scripts/docker-publish.sh "$workspaceRoot"
-    inputs: []
+    deps:
+      - agent-operator-go:go-build
+    inputs:
+      - "@globs(sources)"
+      - "@globs(operator-image)"
+      - /packages/agent/agent-operator-go/Dockerfile
+      - /packages/agent/agent-operator-go/go.mod
+      - /packages/agent/agent-operator-go/go.sum
+      - /packages/shared/shared-agent-go/go.mod
+      - /packages/shared/shared-agent-go/go.sum
+      - /packages/shared/shared-core-go/go.mod
+      - /packages/shared/shared-core-go/go.sum
     outputs: []
     options:
       cache: false

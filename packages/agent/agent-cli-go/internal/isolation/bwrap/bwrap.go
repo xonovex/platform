@@ -119,7 +119,7 @@ func (i *Isolator) buildArgs(cfg isoshared.RunConfig, c provision.Contribution) 
 		"--proc", "/proc",
 		"--tmpfs", "/tmp",
 	}
-	inherited := envutil.ParseCustomEnv(os.Environ())
+	inherited := envutil.ParseEnv(os.Environ())
 	unset := make([]string, 0, len(inherited))
 	for key := range inherited {
 		if _, allowed := sandboxEnv[key]; !allowed {
@@ -211,7 +211,7 @@ func (i *Isolator) processEnv(cfg isoshared.RunConfig, c provision.Contribution)
 	if err != nil {
 		return nil, err
 	}
-	return envutil.EnvMapToSlice(envutil.MergeEnvMaps(envutil.ParseCustomEnv(os.Environ()), sandboxEnv)), nil
+	return envutil.EnvMapToSlice(envutil.MergeEnvMaps(envutil.ParseEnv(os.Environ()), sandboxEnv)), nil
 }
 
 // sandboxEnv builds the explicit environment allowlist for inside the sandbox:
@@ -246,7 +246,11 @@ func (i *Isolator) sandboxEnv(cfg isoshared.RunConfig, c provision.Contribution,
 	for k, v := range c.Env {
 		env[k] = v
 	}
-	for k, v := range envutil.ParseCustomEnv(cfg.CustomEnv) {
+	customEnv, err := envutil.ParseCustomEnv(cfg.CustomEnv)
+	if err != nil {
+		return nil, err
+	}
+	for k, v := range customEnv {
 		env[k] = v
 	}
 	return env, nil
