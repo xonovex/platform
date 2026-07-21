@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	wsshared "github.com/xonovex/platform/packages/cli/agent-cli-go/internal/workspace/shared"
+	wsshared "github.com/xonovex/platform/packages/agent/agent-cli-go/internal/workspace/shared"
 	"github.com/xonovex/platform/packages/shared/shared-core-go/pkg/logging"
 )
 

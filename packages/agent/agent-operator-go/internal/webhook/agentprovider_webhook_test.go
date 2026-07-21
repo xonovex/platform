@@ -11,7 +11,7 @@ func TestAgentProviderWebhook_Validate_Valid(t *testing.T) {
 	w := &AgentProviderWebhook{}
 	provider := &agentv1alpha1.AgentProvider{
 		Spec: agentv1alpha1.AgentProviderSpec{
-			Type: "anthropic",
+			AuthTokenEnv: "ANTHROPIC_AUTH_TOKEN",
 			AuthTokenSecretRef: &agentv1alpha1.SecretKeyRef{
 				Name: "my-secret",
 				Key:  "token",
@@ -41,12 +41,40 @@ func TestAgentProviderWebhook_Validate_Empty(t *testing.T) {
 	}
 }
 
+func TestAgentProviderWebhook_RejectsSecretWithoutCredentialDestination(t *testing.T) {
+	provider := &agentv1alpha1.AgentProvider{
+		Spec: agentv1alpha1.AgentProviderSpec{
+			AuthTokenSecretRef: &agentv1alpha1.SecretKeyRef{Name: "provider-auth", Key: "token"},
+		},
+	}
+
+	_, err := (&AgentProviderWebhook{}).ValidateCreate(context.Background(), provider)
+
+	if err == nil {
+		t.Fatal("ValidateCreate() error = nil, want missing authTokenEnv error")
+	}
+}
+
+func TestAgentProviderWebhook_RejectsCredentialDestinationWithLiteralValue(t *testing.T) {
+	provider := &agentv1alpha1.AgentProvider{
+		Spec: agentv1alpha1.AgentProviderSpec{
+			AuthTokenSecretRef: &agentv1alpha1.SecretKeyRef{Name: "provider-auth", Key: "token"},
+			AuthTokenEnv:       "ANTHROPIC_API_KEY",
+			Environment:        map[string]string{"ANTHROPIC_API_KEY": "literal-secret"},
+		},
+	}
+
+	_, err := (&AgentProviderWebhook{}).ValidateCreate(context.Background(), provider)
+
+	if err == nil {
+		t.Fatal("ValidateCreate() error = nil, want credential destination conflict")
+	}
+}
+
 func TestAgentProviderWebhook_Validate_NilSecretRef(t *testing.T) {
 	w := &AgentProviderWebhook{}
 	provider := &agentv1alpha1.AgentProvider{
-		Spec: agentv1alpha1.AgentProviderSpec{
-			Type: "anthropic",
-		},
+		Spec: agentv1alpha1.AgentProviderSpec{},
 	}
 
 	_, err := w.ValidateCreate(context.Background(), provider)
@@ -217,12 +245,10 @@ func TestAgentProviderWebhook_Validate_InjectionCliArg(t *testing.T) {
 
 func TestAgentProviderWebhook_ValidateUpdate(t *testing.T) {
 	w := &AgentProviderWebhook{}
-	old := &agentv1alpha1.AgentProvider{
-		Spec: agentv1alpha1.AgentProviderSpec{Type: "anthropic"},
-	}
+	old := &agentv1alpha1.AgentProvider{}
 	updated := &agentv1alpha1.AgentProvider{
 		Spec: agentv1alpha1.AgentProviderSpec{
-			Type: "openai",
+			AuthTokenEnv: "OPENAI_API_KEY",
 			AuthTokenSecretRef: &agentv1alpha1.SecretKeyRef{
 				Name: "new-secret",
 				Key:  "api-key",
@@ -253,6 +279,21 @@ func TestAgentProviderWebhook_RejectsUnknownPreset(t *testing.T) {
 	warnings, err := w.ValidateCreate(context.Background(), provider)
 	if err == nil {
 		t.Fatal("ValidateCreate() error = nil, want unknown-preset error")
+	}
+	if len(warnings) != 0 {
+		t.Errorf("ValidateCreate() warnings = %v, want none", warnings)
+	}
+}
+
+func TestAgentProviderWebhook_RejectsLocalOnlyPreset(t *testing.T) {
+	provider := &agentv1alpha1.AgentProvider{
+		Spec: agentv1alpha1.AgentProviderSpec{PresetRef: "gemini"},
+	}
+
+	warnings, err := (&AgentProviderWebhook{}).ValidateCreate(context.Background(), provider)
+
+	if err == nil {
+		t.Fatal("ValidateCreate() error = nil, want local-only-preset error")
 	}
 	if len(warnings) != 0 {
 		t.Errorf("ValidateCreate() warnings = %v, want none", warnings)

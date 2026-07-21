@@ -26,7 +26,10 @@ func buildAgentCommand(run *agentv1alpha1.AgentRun, agentType agentv1alpha1.Agen
 	if err != nil {
 		return nil, nil, fmt.Errorf("resolve harness command for agent type %q: %w", agentType, err)
 	}
-	command, args := builder.Command(run, providerCliArgs)
+	command, args, err := builder.Command(run, providerCliArgs)
+	if err != nil {
+		return nil, nil, fmt.Errorf("build agent command: %w", err)
+	}
 	return command, args, nil
 }
 

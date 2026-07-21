@@ -1,6 +1,6 @@
 package bwrap
 
-import netshared "github.com/xonovex/platform/packages/cli/agent-cli-go/internal/network/shared"
+import netshared "github.com/xonovex/platform/packages/agent/agent-cli-go/internal/network/shared"
 
 // networkArgs returns the bubblewrap network flags for the mode. Proxy mode is
 // rejected until a transport exists that reaches an allowlist proxy without

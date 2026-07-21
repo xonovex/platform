@@ -4,8 +4,8 @@ import (
 	"strings"
 	"testing"
 
-	isoshared "github.com/xonovex/platform/packages/cli/agent-cli-go/internal/isolation/shared"
-	netshared "github.com/xonovex/platform/packages/cli/agent-cli-go/internal/network/shared"
+	isoshared "github.com/xonovex/platform/packages/agent/agent-cli-go/internal/isolation/shared"
+	netshared "github.com/xonovex/platform/packages/agent/agent-cli-go/internal/network/shared"
 	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/provision"
 	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/types"
 )
@@ -84,7 +84,10 @@ func TestNone_AppliesContribution(t *testing.T) {
 
 func TestNone_CommandRejectsMissingProviderToken(t *testing.T) {
 	cfg := cfg(netshared.ModeHost)
-	cfg.Provider = &types.ModelProvider{AuthTokenEnv: "MISSING_NONE_TEST_TOKEN"}
+	cfg.Provider = &types.ModelProvider{
+		CredentialSourceEnv: "MISSING_NONE_TEST_TOKEN",
+		CredentialTargetEnv: "AGENT_PROVIDER_TOKEN",
+	}
 	if _, err := NewIsolator().Command(cfg, provision.Contribution{}); err == nil {
 		t.Error("Command() error = nil, want missing provider token error")
 	}

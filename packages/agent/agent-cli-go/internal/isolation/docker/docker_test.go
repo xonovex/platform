@@ -6,8 +6,8 @@ import (
 	"strings"
 	"testing"
 
-	isoshared "github.com/xonovex/platform/packages/cli/agent-cli-go/internal/isolation/shared"
-	netshared "github.com/xonovex/platform/packages/cli/agent-cli-go/internal/network/shared"
+	isoshared "github.com/xonovex/platform/packages/agent/agent-cli-go/internal/isolation/shared"
+	netshared "github.com/xonovex/platform/packages/agent/agent-cli-go/internal/network/shared"
 	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/provision"
 	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/types"
 )
@@ -179,7 +179,10 @@ func TestDocker_CommandRejectsMissingBindAndProviderToken(t *testing.T) {
 	}
 
 	cfg.BindPaths = nil
-	cfg.Provider = &types.ModelProvider{AuthTokenEnv: "MISSING_DOCKER_TEST_TOKEN"}
+	cfg.Provider = &types.ModelProvider{
+		CredentialSourceEnv: "MISSING_DOCKER_TEST_TOKEN",
+		CredentialTargetEnv: "AGENT_PROVIDER_TOKEN",
+	}
 	if _, err := NewIsolator().Command(cfg, provision.Contribution{}); err == nil {
 		t.Error("Command() error = nil, want missing provider token error")
 	}
@@ -190,8 +193,9 @@ func TestDocker_CommandKeepsProviderSecretOutOfArguments(t *testing.T) {
 	t.Setenv("DOCKER_TEST_TOKEN", secret)
 	cfg := dockerCfg(netshared.ModeNone, t.TempDir())
 	cfg.Provider = &types.ModelProvider{
-		AuthTokenEnv: "DOCKER_TEST_TOKEN",
-		Environment:  map[string]string{"ANTHROPIC_BASE_URL": "http://proxy.example"},
+		CredentialSourceEnv: "DOCKER_TEST_TOKEN",
+		CredentialTargetEnv: "ANTHROPIC_AUTH_TOKEN",
+		Environment:         map[string]string{"ANTHROPIC_BASE_URL": "http://proxy.example"},
 	}
 
 	command := dockerCommand(t, cfg, provision.Contribution{})

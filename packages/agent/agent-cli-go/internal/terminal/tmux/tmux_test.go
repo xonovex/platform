@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	termshared "github.com/xonovex/platform/packages/cli/agent-cli-go/internal/terminal/shared"
+	termshared "github.com/xonovex/platform/packages/agent/agent-cli-go/internal/terminal/shared"
 )
 
 func TestSanitizeName(t *testing.T) {

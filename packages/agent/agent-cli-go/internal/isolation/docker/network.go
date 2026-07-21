@@ -1,6 +1,6 @@
 package docker
 
-import netshared "github.com/xonovex/platform/packages/cli/agent-cli-go/internal/network/shared"
+import netshared "github.com/xonovex/platform/packages/agent/agent-cli-go/internal/network/shared"
 
 // networkArgs returns the docker network flags for the mode. Proxy mode is
 // rejected because a bridge plus proxy environment variables does not prevent

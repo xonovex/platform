@@ -134,13 +134,6 @@ func NewAgentRun(namespace, name string, opts ...AgentRunOption) *agentv1alpha1.
 // AgentProviderOption configures an AgentProvider.
 type AgentProviderOption func(*agentv1alpha1.AgentProvider)
 
-// WithProviderType sets the provider type.
-func WithProviderType(t agentv1alpha1.ProviderType) AgentProviderOption {
-	return func(p *agentv1alpha1.AgentProvider) {
-		p.Spec.Type = t
-	}
-}
-
 // WithAuthTokenSecretRef sets the auth token secret reference.
 func WithAuthTokenSecretRef(name, key string) AgentProviderOption {
 	return func(p *agentv1alpha1.AgentProvider) {
@@ -148,6 +141,13 @@ func WithAuthTokenSecretRef(name, key string) AgentProviderOption {
 			Name: name,
 			Key:  key,
 		}
+	}
+}
+
+// WithAuthTokenEnv sets the provider credential destination.
+func WithAuthTokenEnv(name string) AgentProviderOption {
+	return func(p *agentv1alpha1.AgentProvider) {
+		p.Spec.AuthTokenEnv = name
 	}
 }
 

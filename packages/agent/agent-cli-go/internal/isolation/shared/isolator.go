@@ -5,7 +5,7 @@
 package shared
 
 import (
-	netshared "github.com/xonovex/platform/packages/cli/agent-cli-go/internal/network/shared"
+	netshared "github.com/xonovex/platform/packages/agent/agent-cli-go/internal/network/shared"
 	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/provision"
 	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/types"
 )

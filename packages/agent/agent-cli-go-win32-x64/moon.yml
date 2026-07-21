@@ -17,7 +17,7 @@ tasks:
       version="$(node -p "require('$workspaceRoot/packages/agent/agent-cli-go/package.json').version")"
       mkdir -p bin
       cd "$workspaceRoot/packages/agent/agent-cli-go"
-      go build -ldflags="-s -w -X github.com/xonovex/platform/packages/cli/agent-cli-go/internal/cmd.version=$version" -o "$projectRoot/bin/agent-cli-go${BIN_EXT}" ./cmd/agent-cli
+      go build -ldflags="-s -w -X github.com/xonovex/platform/packages/agent/agent-cli-go/internal/cmd.version=$version" -o "$projectRoot/bin/agent-cli-go${BIN_EXT}" ./cmd/agent-cli
     inputs:
       - /packages/agent/agent-cli-go/**/*.go
       - /packages/agent/agent-cli-go/package.json

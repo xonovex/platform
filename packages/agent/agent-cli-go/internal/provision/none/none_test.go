@@ -3,7 +3,7 @@ package none
 import (
 	"testing"
 
-	provshared "github.com/xonovex/platform/packages/cli/agent-cli-go/internal/provision/shared"
+	provshared "github.com/xonovex/platform/packages/agent/agent-cli-go/internal/provision/shared"
 )
 
 func TestNone_ContributesNothingUnpinned(t *testing.T) {

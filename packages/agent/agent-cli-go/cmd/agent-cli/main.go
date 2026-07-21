@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"github.com/xonovex/platform/packages/cli/agent-cli-go/internal/cmd"
+	"github.com/xonovex/platform/packages/agent/agent-cli-go/internal/cmd"
 	"github.com/xonovex/platform/packages/shared/shared-core-go/pkg/logging"
 )
 

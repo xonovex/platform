@@ -169,13 +169,10 @@ spec:
                   properties:
                     presetRef:
                       type: string
-                      description: References a named provider preset from shared-agent-go
+                      description: References a portable provider preset from shared-agent-go
                     agentType:
                       type: string
                       description: Agent type for preset disambiguation (defaults to "claude")
-                    type:
-                      type: string
-                      description: Provider type
                     authSecretRef:
                       type: object
                       description: References a Secret containing the auth token
@@ -187,6 +184,9 @@ spec:
                           type: string
                         key:
                           type: string
+                    authTokenEnv:
+                      type: string
+                      description: Environment variable that receives the auth token Secret
                     environment:
                       type: object
                       additionalProperties:

@@ -15,8 +15,12 @@ import (
 
 func newScheme() *runtime.Scheme {
 	s := runtime.NewScheme()
-	_ = corev1.AddToScheme(s)
-	_ = agentv1alpha1.AddToScheme(s)
+	if err := corev1.AddToScheme(s); err != nil {
+		panic(err)
+	}
+	if err := agentv1alpha1.AddToScheme(s); err != nil {
+		panic(err)
+	}
 	return s
 }
 
@@ -67,7 +71,6 @@ func TestResolveProvider_InlineProvider(t *testing.T) {
 		ObjectMeta: metav1.ObjectMeta{Name: "test", Namespace: "default"},
 		Spec: agentv1alpha1.AgentRunSpec{
 			Provider: &agentv1alpha1.ProviderSpec{
-				Type: "gemini",
 				Environment: map[string]string{
 					"ANTHROPIC_BASE_URL": "http://proxy:8080",
 					"API_TIMEOUT_MS":     "3000000",
@@ -102,7 +105,7 @@ func TestResolveProvider_InlineProviderWithSecret(t *testing.T) {
 		ObjectMeta: metav1.ObjectMeta{Name: "test", Namespace: "default"},
 		Spec: agentv1alpha1.AgentRunSpec{
 			Provider: &agentv1alpha1.ProviderSpec{
-				Type: "gemini",
+				AuthTokenEnv: "ANTHROPIC_AUTH_TOKEN",
 				AuthSecretRef: &agentv1alpha1.SecretKeyRef{
 					Name: "api-key",
 					Key:  "token",
@@ -138,6 +141,7 @@ func TestResolveProvider_DoesNotMaterializeSecretValue(t *testing.T) {
 		ObjectMeta: metav1.ObjectMeta{Name: "test", Namespace: "default"},
 		Spec: agentv1alpha1.AgentRunSpec{Provider: &agentv1alpha1.ProviderSpec{
 			AuthSecretRef: &agentv1alpha1.SecretKeyRef{Name: secret.Name, Key: "token"},
+			AuthTokenEnv:  "ANTHROPIC_AUTH_TOKEN",
 			Environment:   map[string]string{"ANTHROPIC_BASE_URL": "http://proxy:8080"},
 		}},
 	}
@@ -193,6 +197,7 @@ func TestResolveProvider_ProviderRefWithSecret(t *testing.T) {
 	provider := &agentv1alpha1.AgentProvider{
 		ObjectMeta: metav1.ObjectMeta{Name: "gemini-provider", Namespace: "default"},
 		Spec: agentv1alpha1.AgentProviderSpec{
+			AuthTokenEnv: "ANTHROPIC_AUTH_TOKEN",
 			AuthTokenSecretRef: &agentv1alpha1.SecretKeyRef{
 				Name: "provider-secret",
 				Key:  "api-key",
@@ -245,6 +250,7 @@ func TestResolveProvider_SecretNotFound(t *testing.T) {
 	provider := &agentv1alpha1.AgentProvider{
 		ObjectMeta: metav1.ObjectMeta{Name: "provider", Namespace: "default"},
 		Spec: agentv1alpha1.AgentProviderSpec{
+			AuthTokenEnv: "ANTHROPIC_AUTH_TOKEN",
 			AuthTokenSecretRef: &agentv1alpha1.SecretKeyRef{
 				Name: "nonexistent-secret",
 				Key:  "token",
@@ -280,6 +286,7 @@ func TestResolveProvider_SecretMissingKey(t *testing.T) {
 	provider := &agentv1alpha1.AgentProvider{
 		ObjectMeta: metav1.ObjectMeta{Name: "provider", Namespace: "default"},
 		Spec: agentv1alpha1.AgentProviderSpec{
+			AuthTokenEnv: "ANTHROPIC_AUTH_TOKEN",
 			AuthTokenSecretRef: &agentv1alpha1.SecretKeyRef{
 				Name: "my-secret",
 				Key:  "expected-key",
@@ -334,7 +341,7 @@ func TestResolveProvider_PresetRef(t *testing.T) {
 	provider := &agentv1alpha1.AgentProvider{
 		ObjectMeta: metav1.ObjectMeta{Name: "preset-provider", Namespace: "default"},
 		Spec: agentv1alpha1.AgentProviderSpec{
-			PresetRef: "gemini",
+			PresetRef: "glm",
 		},
 	}
 
@@ -360,7 +367,7 @@ func TestResolveProvider_PresetRefOverriddenByEnvironment(t *testing.T) {
 	provider := &agentv1alpha1.AgentProvider{
 		ObjectMeta: metav1.ObjectMeta{Name: "preset-override", Namespace: "default"},
 		Spec: agentv1alpha1.AgentProviderSpec{
-			PresetRef: "gemini",
+			PresetRef: "glm",
 			Environment: map[string]string{
 				"ANTHROPIC_BASE_URL": "http://custom:9999",
 			},
@@ -421,7 +428,7 @@ func TestResolveProvider_InlinePresetRef(t *testing.T) {
 		ObjectMeta: metav1.ObjectMeta{Name: "test", Namespace: "default"},
 		Spec: agentv1alpha1.AgentRunSpec{
 			Provider: &agentv1alpha1.ProviderSpec{
-				PresetRef: "gemini",
+				PresetRef: "glm",
 				Environment: map[string]string{
 					"ANTHROPIC_BASE_URL": "http://override:8080",
 				},
@@ -441,7 +448,7 @@ func TestResolveProvider_InlinePresetRef(t *testing.T) {
 	}
 }
 
-func TestResolveProvider_NoAuthTokenInjectionWithoutBaseURL(t *testing.T) {
+func TestResolveProvider_InjectsAuthTokenIntoExplicitDestinationWithoutBaseURL(t *testing.T) {
 	secret := &corev1.Secret{
 		ObjectMeta: metav1.ObjectMeta{Name: "api-key", Namespace: "default"},
 		Data: map[string][]byte{
@@ -451,6 +458,7 @@ func TestResolveProvider_NoAuthTokenInjectionWithoutBaseURL(t *testing.T) {
 	provider := &agentv1alpha1.AgentProvider{
 		ObjectMeta: metav1.ObjectMeta{Name: "provider", Namespace: "default"},
 		Spec: agentv1alpha1.AgentProviderSpec{
+			AuthTokenEnv: "CUSTOM_PROVIDER_TOKEN",
 			AuthTokenSecretRef: &agentv1alpha1.SecretKeyRef{
 				Name: "api-key",
 				Key:  "token",
@@ -474,9 +482,9 @@ func TestResolveProvider_NoAuthTokenInjectionWithoutBaseURL(t *testing.T) {
 	if err != nil {
 		t.Fatalf("ResolveProvider() error = %v", err)
 	}
-	// Without ANTHROPIC_BASE_URL, the token should NOT be injected as ANTHROPIC_AUTH_TOKEN
-	if _, has := lookupEnvVar(env.Environment, "ANTHROPIC_AUTH_TOKEN"); has {
-		t.Error("ANTHROPIC_AUTH_TOKEN should not be set without ANTHROPIC_BASE_URL")
+	auth := findEnvVar(t, env.Environment, "CUSTOM_PROVIDER_TOKEN")
+	if auth.ValueFrom == nil || auth.ValueFrom.SecretKeyRef == nil {
+		t.Fatal("CUSTOM_PROVIDER_TOKEN must reference the configured Secret")
 	}
 }
 

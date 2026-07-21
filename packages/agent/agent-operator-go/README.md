@@ -120,6 +120,7 @@ spec:
   authTokenSecretRef:
     name: gemini-credentials
     key: api-key
+  authTokenEnv: ANTHROPIC_AUTH_TOKEN
   environment:
     ANTHROPIC_BASE_URL: "http://litellm-proxy:8317"
     API_TIMEOUT_MS: "3000000"
@@ -131,13 +132,15 @@ The controller validates that the referenced Secret exists and contains the spec
 
 #### Full spec reference
 
-| Field                | Type   | Description                                |
-| -------------------- | ------ | ------------------------------------------ |
-| `type`               | string | Provider type (e.g. `anthropic`, `openai`) |
-| `displayName`        | string | Human-readable name                        |
-| `authTokenSecretRef` | object | Secret reference for auth token            |
-| `environment`        | map    | Environment variables to set               |
-| `cliArgs`            | list   | Additional CLI arguments                   |
+| Field                | Type   | Description                                                        |
+| -------------------- | ------ | ------------------------------------------------------------------ |
+| `presetRef`          | string | Portable shared provider preset; host-loopback presets are rejected |
+| `agentType`          | string | Agent used to resolve `presetRef`; defaults to `claude`             |
+| `displayName`        | string | Human-readable name                                                |
+| `authTokenSecretRef` | object | Secret reference for the auth token                                |
+| `authTokenEnv`       | string | Credential destination; supplied by a preset when omitted           |
+| `environment`        | map    | Environment variables to set                                       |
+| `cliArgs`            | list   | Additional CLI arguments                                           |
 
 ### AgentWorkspace
 
@@ -350,6 +353,7 @@ spec:
   authTokenSecretRef:
     name: gemini-credentials
     key: api-key
+  authTokenEnv: ANTHROPIC_AUTH_TOKEN
   environment:
     ANTHROPIC_BASE_URL: "http://litellm-proxy:8317"
 ```
@@ -757,10 +761,10 @@ metadata:
 spec:
   harnessRef: claude-harness
   provider:
-    type: anthropic
     authSecretRef:
       name: anthropic-credentials
       key: api-key
+    authTokenEnv: ANTHROPIC_API_KEY
     environment:
       ANTHROPIC_BASE_URL: "https://api.anthropic.com"
   workspace:

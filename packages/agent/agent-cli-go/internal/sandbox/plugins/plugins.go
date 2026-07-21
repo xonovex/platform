@@ -7,15 +7,15 @@
 package plugins
 
 import (
-	"github.com/xonovex/platform/packages/cli/agent-cli-go/internal/isolation/bwrap"
-	"github.com/xonovex/platform/packages/cli/agent-cli-go/internal/isolation/docker"
-	isonone "github.com/xonovex/platform/packages/cli/agent-cli-go/internal/isolation/none"
-	isoshared "github.com/xonovex/platform/packages/cli/agent-cli-go/internal/isolation/shared"
-	"github.com/xonovex/platform/packages/cli/agent-cli-go/internal/provision/command"
-	provnix "github.com/xonovex/platform/packages/cli/agent-cli-go/internal/provision/nix"
-	provnone "github.com/xonovex/platform/packages/cli/agent-cli-go/internal/provision/none"
-	provshared "github.com/xonovex/platform/packages/cli/agent-cli-go/internal/provision/shared"
-	"github.com/xonovex/platform/packages/cli/agent-cli-go/internal/sandbox"
+	"github.com/xonovex/platform/packages/agent/agent-cli-go/internal/isolation/bwrap"
+	"github.com/xonovex/platform/packages/agent/agent-cli-go/internal/isolation/docker"
+	isonone "github.com/xonovex/platform/packages/agent/agent-cli-go/internal/isolation/none"
+	isoshared "github.com/xonovex/platform/packages/agent/agent-cli-go/internal/isolation/shared"
+	"github.com/xonovex/platform/packages/agent/agent-cli-go/internal/provision/command"
+	provnix "github.com/xonovex/platform/packages/agent/agent-cli-go/internal/provision/nix"
+	provnone "github.com/xonovex/platform/packages/agent/agent-cli-go/internal/provision/none"
+	provshared "github.com/xonovex/platform/packages/agent/agent-cli-go/internal/provision/shared"
+	"github.com/xonovex/platform/packages/agent/agent-cli-go/internal/sandbox"
 	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/isolation"
 	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/provision"
 )

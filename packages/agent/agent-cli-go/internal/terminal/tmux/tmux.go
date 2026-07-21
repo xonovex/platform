@@ -7,7 +7,7 @@ import (
 	"regexp"
 	"strings"
 
-	termshared "github.com/xonovex/platform/packages/cli/agent-cli-go/internal/terminal/shared"
+	termshared "github.com/xonovex/platform/packages/agent/agent-cli-go/internal/terminal/shared"
 	"github.com/xonovex/platform/packages/shared/shared-core-go/pkg/logging"
 	"github.com/xonovex/platform/packages/shared/shared-core-go/pkg/shell"
 )

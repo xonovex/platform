@@ -46,57 +46,53 @@ func ResolveProvider(ctx context.Context, c client.Client, run *agentv1alpha1.Ag
 		return ResolvedProvider{}, fmt.Errorf("failed to get provider %s: %w", providerRef, err)
 	}
 
-	cliArgs, err := mergePreset(env, provider.Spec.PresetRef, provider.Spec.AgentType)
+	preset, err := mergePreset(env, provider.Spec.PresetRef, provider.Spec.AgentType)
 	if err != nil {
 		return ResolvedProvider{}, err
 	}
-	cliArgs = append(cliArgs, provider.Spec.CliArgs...)
+	cliArgs := append(preset.cliArgs, provider.Spec.CliArgs...)
 
 	// Copy environment from provider spec (overrides preset).
 	for k, v := range provider.Spec.Environment {
 		env[k] = v
 	}
 
-	var authSecretRef *agentv1alpha1.SecretKeyRef
-	if provider.Spec.AuthTokenSecretRef != nil {
-		if err := validateSecretKey(ctx, c, run.Namespace, provider.Spec.AuthTokenSecretRef); err != nil {
-			return ResolvedProvider{}, fmt.Errorf("failed to resolve auth token: %w", err)
-		}
-		if _, hasBaseURL := env["ANTHROPIC_BASE_URL"]; hasBaseURL {
-			authSecretRef = provider.Spec.AuthTokenSecretRef
-		}
+	authTokenEnv := provider.Spec.AuthTokenEnv
+	if authTokenEnv == "" {
+		authTokenEnv = preset.authTokenEnv
+	}
+	if err := validateAuthToken(ctx, c, run.Namespace, authTokenEnv, provider.Spec.AuthTokenSecretRef, env); err != nil {
+		return ResolvedProvider{}, fmt.Errorf("failed to resolve auth token: %w", err)
 	}
 
-	return ResolvedProvider{Environment: environmentVariables(env, authSecretRef), CliArgs: cliArgs}, nil
+	return ResolvedProvider{Environment: environmentVariables(env, authTokenEnv, provider.Spec.AuthTokenSecretRef), CliArgs: cliArgs}, nil
 }
 
 func resolveInlineProvider(ctx context.Context, c client.Client, namespace string, spec *agentv1alpha1.ProviderSpec) (ResolvedProvider, error) {
 	env := make(map[string]string)
 
-	cliArgs, err := mergePreset(env, spec.PresetRef, spec.AgentType)
+	preset, err := mergePreset(env, spec.PresetRef, spec.AgentType)
 	if err != nil {
 		return ResolvedProvider{}, err
 	}
-	cliArgs = append(cliArgs, spec.CliArgs...)
+	cliArgs := append(preset.cliArgs, spec.CliArgs...)
 
 	for k, v := range spec.Environment {
 		env[k] = v
 	}
 
-	var authSecretRef *agentv1alpha1.SecretKeyRef
-	if spec.AuthSecretRef != nil {
-		if err := validateSecretKey(ctx, c, namespace, spec.AuthSecretRef); err != nil {
-			return ResolvedProvider{}, fmt.Errorf("failed to resolve inline auth token: %w", err)
-		}
-		if _, hasBaseURL := env["ANTHROPIC_BASE_URL"]; hasBaseURL {
-			authSecretRef = spec.AuthSecretRef
-		}
+	authTokenEnv := spec.AuthTokenEnv
+	if authTokenEnv == "" {
+		authTokenEnv = preset.authTokenEnv
+	}
+	if err := validateAuthToken(ctx, c, namespace, authTokenEnv, spec.AuthSecretRef, env); err != nil {
+		return ResolvedProvider{}, fmt.Errorf("failed to resolve inline auth token: %w", err)
 	}
 
-	return ResolvedProvider{Environment: environmentVariables(env, authSecretRef), CliArgs: cliArgs}, nil
+	return ResolvedProvider{Environment: environmentVariables(env, authTokenEnv, spec.AuthSecretRef), CliArgs: cliArgs}, nil
 }
 
-func environmentVariables(values map[string]string, authSecretRef *agentv1alpha1.SecretKeyRef) []corev1.EnvVar {
+func environmentVariables(values map[string]string, authTokenEnv string, authSecretRef *agentv1alpha1.SecretKeyRef) []corev1.EnvVar {
 	keys := make([]string, 0, len(values))
 	for key := range values {
 		keys = append(keys, key)
@@ -109,7 +105,7 @@ func environmentVariables(values map[string]string, authSecretRef *agentv1alpha1
 	}
 	if authSecretRef != nil {
 		env = append(env, corev1.EnvVar{
-			Name: "ANTHROPIC_AUTH_TOKEN",
+			Name: authTokenEnv,
 			ValueFrom: &corev1.EnvVarSource{SecretKeyRef: &corev1.SecretKeySelector{
 				LocalObjectReference: corev1.LocalObjectReference{Name: authSecretRef.Name},
 				Key:                  authSecretRef.Key,
@@ -119,22 +115,43 @@ func environmentVariables(values map[string]string, authSecretRef *agentv1alpha1
 	return env
 }
 
-func mergePreset(env map[string]string, presetRef, agentType string) ([]string, error) {
+type presetConfig struct {
+	authTokenEnv string
+	cliArgs      []string
+}
+
+func mergePreset(env map[string]string, presetRef, agentType string) (presetConfig, error) {
 	if presetRef == "" {
-		return nil, nil
+		return presetConfig{}, nil
 	}
 	at := sharedtypes.AgentType(agentType)
 	if at == "" {
 		at = sharedtypes.AgentClaude
 	}
-	preset, err := providers.GetProvider(presetRef, at)
+	preset, err := providers.GetPortableProvider(presetRef, at)
 	if err != nil {
-		return nil, fmt.Errorf("unknown provider preset %q for agent type %q: %w", presetRef, at, err)
+		return presetConfig{}, fmt.Errorf("provider preset %q is unavailable for agent type %q: %w", presetRef, at, err)
 	}
 	for k, v := range preset.Environment {
 		env[k] = v
 	}
-	return append([]string{}, preset.CliArgs...), nil
+	return presetConfig{
+		authTokenEnv: preset.CredentialTargetEnv,
+		cliArgs:      append([]string{}, preset.CliArgs...),
+	}, nil
+}
+
+func validateAuthToken(ctx context.Context, c client.Client, namespace, authTokenEnv string, ref *agentv1alpha1.SecretKeyRef, environment map[string]string) error {
+	if ref == nil {
+		return nil
+	}
+	if authTokenEnv == "" {
+		return fmt.Errorf("authTokenEnv is required when an auth token Secret is configured")
+	}
+	if _, exists := environment[authTokenEnv]; exists {
+		return fmt.Errorf("environment variable %q conflicts with the auth token Secret", authTokenEnv)
+	}
+	return validateSecretKey(ctx, c, namespace, ref)
 }
 
 func validateSecretKey(ctx context.Context, c client.Client, namespace string, ref *agentv1alpha1.SecretKeyRef) error {

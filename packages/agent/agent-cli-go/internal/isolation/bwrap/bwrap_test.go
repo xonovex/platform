@@ -7,8 +7,8 @@ import (
 	"strings"
 	"testing"
 
-	isoshared "github.com/xonovex/platform/packages/cli/agent-cli-go/internal/isolation/shared"
-	netshared "github.com/xonovex/platform/packages/cli/agent-cli-go/internal/network/shared"
+	isoshared "github.com/xonovex/platform/packages/agent/agent-cli-go/internal/isolation/shared"
+	netshared "github.com/xonovex/platform/packages/agent/agent-cli-go/internal/network/shared"
 	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/provision"
 	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/types"
 )
@@ -165,7 +165,10 @@ func TestBwrap_CommandRejectsMissingBindAndProviderToken(t *testing.T) {
 	}
 
 	cfg.RoBindPaths = nil
-	cfg.Provider = &types.ModelProvider{AuthTokenEnv: "MISSING_BWRAP_TEST_TOKEN"}
+	cfg.Provider = &types.ModelProvider{
+		CredentialSourceEnv: "MISSING_BWRAP_TEST_TOKEN",
+		CredentialTargetEnv: "AGENT_PROVIDER_TOKEN",
+	}
 	if _, err := NewIsolator().Command(cfg, provision.Contribution{}); err == nil {
 		t.Error("Command() error = nil, want missing provider token error")
 	}
@@ -176,8 +179,9 @@ func TestBwrap_CommandKeepsProviderSecretOutOfArguments(t *testing.T) {
 	t.Setenv("BWRAP_TEST_TOKEN", secret)
 	cfg := claudeCfg(netshared.ModeNone, false, t.TempDir())
 	cfg.Provider = &types.ModelProvider{
-		AuthTokenEnv: "BWRAP_TEST_TOKEN",
-		Environment:  map[string]string{"ANTHROPIC_BASE_URL": "http://proxy.example"},
+		CredentialSourceEnv: "BWRAP_TEST_TOKEN",
+		CredentialTargetEnv: "ANTHROPIC_AUTH_TOKEN",
+		Environment:         map[string]string{"ANTHROPIC_BASE_URL": "http://proxy.example"},
 	}
 
 	command := bwrapCommand(t, cfg, provision.Contribution{})

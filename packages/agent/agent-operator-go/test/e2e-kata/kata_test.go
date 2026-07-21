@@ -344,6 +344,7 @@ func TestE2E_Kata_FullCycleWithGitClone(t *testing.T) {
 	// Create AgentProvider referencing the secret
 	provider := testutil.NewAgentProvider(ns, "test-provider",
 		testutil.WithAuthTokenSecretRef("provider-token", "api-key"),
+		testutil.WithAuthTokenEnv("ANTHROPIC_AUTH_TOKEN"),
 		testutil.WithEnvironment(map[string]string{
 			"ANTHROPIC_API_KEY": "fake-key",
 			"TEST_ENV_VAR":      "e2e-value",

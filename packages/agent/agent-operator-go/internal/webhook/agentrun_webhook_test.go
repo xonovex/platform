@@ -193,7 +193,7 @@ func TestAgentRunWebhook_Default_SnapshotsReferencedHarnessAndProvider(t *testin
 	provider := &agentv1alpha1.AgentProvider{
 		ObjectMeta: metav1.ObjectMeta{Name: "provider", Namespace: "test"},
 		Spec: agentv1alpha1.AgentProviderSpec{
-			PresetRef:          "gemini",
+			PresetRef:          "glm",
 			AuthTokenSecretRef: &agentv1alpha1.SecretKeyRef{Name: "provider-auth", Key: "token"},
 		},
 	}
@@ -241,6 +241,7 @@ func TestAgentRunWebhook_Validate_RejectsUnapprovedSecretReferences(t *testing.T
 			mutate: func(run *agentv1alpha1.AgentRun) {
 				run.Spec.Provider = &agentv1alpha1.ProviderSpec{
 					AuthSecretRef: &agentv1alpha1.SecretKeyRef{Name: "provider-admin", Key: "token"},
+					AuthTokenEnv:  "ANTHROPIC_AUTH_TOKEN",
 				}
 			},
 		},
@@ -274,6 +275,7 @@ func TestAgentRunWebhook_Validate_AllowsPolicyApprovedSecret(t *testing.T) {
 	run := baseRun()
 	run.Spec.Provider = &agentv1alpha1.ProviderSpec{
 		AuthSecretRef: &agentv1alpha1.SecretKeyRef{Name: "provider-auth", Key: "token"},
+		AuthTokenEnv:  "ANTHROPIC_AUTH_TOKEN",
 	}
 
 	_, err := w.ValidateCreate(context.Background(), run)
@@ -502,9 +504,7 @@ func TestAgentRunWebhook_Validate_BothProviderRefAndInline(t *testing.T) {
 	run := &agentv1alpha1.AgentRun{
 		Spec: agentv1alpha1.AgentRunSpec{
 			ProviderRef: "my-provider",
-			Provider: &agentv1alpha1.ProviderSpec{
-				Type: "gemini",
-			},
+			Provider:    &agentv1alpha1.ProviderSpec{},
 			Workspace: &agentv1alpha1.WorkspaceSpec{
 				Repository: agentv1alpha1.RepositorySpec{
 					URL: "https://github.com/example/repo.git",

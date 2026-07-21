@@ -32,41 +32,93 @@ The sandbox is selected by three orthogonal axes — `--isolation {none,bwrap,do
 
 ### Agent Kubernetes Operator
 
+The operator requires a digest-pinned agent image and an installed sandboxed
+RuntimeClass such as gVisor or Kata. Set these to values available in your cluster:
+
 ```bash
+export XONOVEX_AGENT_IMAGE='ghcr.io/your-org/xonovex-agent@sha256:<64-hex-digest>'
+export XONOVEX_RUNTIME_CLASS='gvisor'
+
 # Requires cert-manager v1.16+ with its CA injector enabled
 # Install CRDs and deploy the operator
 kubectl apply -k https://github.com/xonovex/platform//packages/agent/agent-operator-go/config/crd
 kubectl apply -k https://github.com/xonovex/platform//packages/agent/agent-operator-go/config/default
 
-# Create a provider and run an agent
-kubectl create secret generic gemini-credentials --from-literal=api-key='your-key'
+# Create one policy-governed namespace and provider credential
+kubectl create namespace ai-agents --dry-run=client -o yaml | kubectl apply -f -
+kubectl -n ai-agents create secret generic anthropic-credentials \
+  --from-literal=api-key='your-key' \
+  --dry-run=client -o yaml | kubectl apply -f -
+
 kubectl apply -f - <<EOF
+apiVersion: agent.xonovex.com/v1alpha1
+kind: AgentPolicy
+metadata:
+  name: sandbox-policy
+  namespace: ai-agents
+spec:
+  enforced:
+    runtimeClassName: ${XONOVEX_RUNTIME_CLASS}
+    requireSecurityContext: true
+    requireNetworkPolicy: true
+    maxTimeout: 1h0m0s
+    maxResources:
+      cpu: "2"
+      memory: 4Gi
+    allowedImages:
+      - ${XONOVEX_AGENT_IMAGE}
+    allowedRuntimeClassNames:
+      - ${XONOVEX_RUNTIME_CLASS}
+    allowedSecretNames:
+      - anthropic-credentials
+  defaults:
+    image: ${XONOVEX_AGENT_IMAGE}
+    runtimeClassName: ${XONOVEX_RUNTIME_CLASS}
+    timeout: 30m0s
+---
 apiVersion: agent.xonovex.com/v1alpha1
 kind: AgentProvider
 metadata:
-  name: gemini-provider
+  name: anthropic-provider
+  namespace: ai-agents
 spec:
-  displayName: Google Gemini
+  displayName: Anthropic Claude
   authTokenSecretRef:
-    name: gemini-credentials
+    name: anthropic-credentials
     key: api-key
+  authTokenEnv: ANTHROPIC_API_KEY
+  environment:
+    ANTHROPIC_BASE_URL: https://api.anthropic.com
 ---
 apiVersion: agent.xonovex.com/v1alpha1
 kind: AgentRun
 metadata:
   name: review-code
+  namespace: ai-agents
 spec:
   harness:
     type: claude
-  providerRef: gemini-provider
+  providerRef: anthropic-provider
   workspace:
     type: git
     repository:
-      url: https://github.com/org/repo.git
+      url: https://github.com/xonovex/platform.git
       branch: main
   prompt: "Review the codebase and suggest improvements"
+  network: host
+  resources:
+    requests:
+      cpu: 500m
+      memory: 512Mi
+    limits:
+      cpu: "2"
+      memory: 2Gi
 EOF
 ```
+
+`network: host` permits unrestricted egress so the quick start can reach the
+public model API. Production namespaces should replace it with an enforceable
+cluster-level egress proxy or FQDN-aware policy.
 
 ### Agent Plugins
 
@@ -167,7 +219,7 @@ Tasks are managed with [Moon](https://moonrepo.dev/):
 npx moon run <project>:<task>    # run a specific task
 npx moon run :<task>             # run a single-colon task across matching projects
 npm run fmt:check                # run the repository format-check aggregate
-moon query projects              # list all projects
+npx moon query projects          # list all projects
 ```
 
 ## License

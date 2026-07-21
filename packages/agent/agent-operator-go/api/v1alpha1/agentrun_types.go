@@ -59,9 +59,6 @@ const (
 	NetworkModeProxy NetworkMode = "proxy"
 )
 
-// ProviderType represents the type of AI provider
-type ProviderType string
-
 // ToolchainType represents the type of toolchain
 type ToolchainType string
 
@@ -107,10 +104,11 @@ type ProviderSpec struct {
 	// Defaults to "claude".
 	// +optional
 	AgentType string `json:"agentType,omitempty"`
-	// Type of the provider (e.g., "anthropic", "openai")
-	Type ProviderType `json:"type,omitempty"`
 	// AuthSecretRef references a Secret containing the auth token
 	AuthSecretRef *SecretKeyRef `json:"authSecretRef,omitempty"`
+	// AuthTokenEnv is the environment variable that receives AuthSecretRef.
+	// A portable preset supplies this value when omitted.
+	AuthTokenEnv string `json:"authTokenEnv,omitempty"`
 	// Environment variables to set
 	Environment map[string]string `json:"environment,omitempty"`
 	// CliArgs are additional CLI arguments for the provider

@@ -4,10 +4,12 @@
 
 ```
 packages/
-  agent/                # CLI tools
-    agent-cli/          # Agent Wrapper (TypeScript)
-    agent-cli-go/       # Agent Wrapper (Go)
+  agent/                # Agent CLI, operator, and delivery packages
+    agent-cli-go/       # Agent sandbox CLI (Go)
     agent-cli-go-*/     # Platform-specific Go binaries
+    agent-operator-go/  # Kubernetes operator (Go)
+    agent-operator-go-docker/ # Operator image publishing
+    agent-governance-decision-docker/ # Governance decision image
   asset/                # Static assets
     asset-images/       # Shared images (diagrams, etc.)
   config/               # Shared configuration packages
@@ -20,17 +22,19 @@ packages/
     diagram-agent-workflow/ # Agent workflow diagram
     diagram-moon-action/ # Moon action graph diagrams
   skill/                # Coding guidelines and skills
-    skill-*/ (35)       # Skill packages (guidelines + reference)
+    skill-*/            # Skill packages (instructions, references, scripts, and assets)
   command/              # Workflow and utility commands
     command-utility/    # Utility commands (content, instructions, slash commands)
     command-workflow/   # Workflow commands (plan, git, reflect, code)
   script/               # Internal build scripts
     script-moon-common/ # Shared moon script utilities
     script-moon-*/      # Moon task scripts (action-graph, npm-check, npm-publish, version-bump, version-detect)
+  moon/                 # Shared Moon toolchains and task extensions
+    moon-nix-toolchain/ # Flake-pinned task execution
   shared/               # Shared libraries
     shared-core/        # Core TypeScript library (@xonovex/core)
     shared-core-go/     # Core Go library
-.claude/commands/       # Claude Code slash commands
+    shared-agent-go/    # Shared agent, provider, policy, and provisioning types
 ```
 
 ## Development
@@ -68,9 +72,14 @@ type(scope): description
 | `perf`     | Performance        |
 | `revert`   | Revert commit      |
 
-## Version Bump
+## Version Bump and Release
 
-Packages tagged with `npm` in Moon are versioned in lockstep. A version bump:
+Packages tagged with `npm` in Moon are versioned in lockstep. Version changes
+must be submitted through a reviewed `version packages` pull request. Merging
+that pull request to `main` runs the release workflow; do not publish or tag
+packages directly.
+
+The versioning workflow:
 
 1. Bumps the version in the target package's `package.json`
 2. Updates all workspace packages that depend on it
@@ -78,13 +87,14 @@ Packages tagged with `npm` in Moon are versioned in lockstep. A version bump:
 
 Changed-version packages are detected by comparing each `package.json` `version` against a base git ref (default the previous commit).
 
-## Claude Code Guides
+## Agent Skills
 
-The monorepo contains 35 skill packages in `packages/skill/`, each with a `SKILL.md` containing the guidelines.
+Each package in `packages/skill/` contains a harness-neutral `SKILL.md` and any
+focused references, scripts, or assets needed by that capability.
 
 ## Code Style
 
-- **Paradigm**: Functional programming (see `general-fp-guide`)
+- **Paradigm**: Functional programming (see `packages/skill/skill-fp/fp-guide/SKILL.md`)
 - **Imports**: Direct from source, no re-exports
 - **Design**: Modular functions, explicit context, small focused files
 - **Quality**: Strict types, clear naming, explicit error handling

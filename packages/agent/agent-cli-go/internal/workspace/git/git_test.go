@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	wsshared "github.com/xonovex/platform/packages/cli/agent-cli-go/internal/workspace/shared"
+	wsshared "github.com/xonovex/platform/packages/agent/agent-cli-go/internal/workspace/shared"
 )
 
 func runGit(t *testing.T, cwd string, args ...string) string {

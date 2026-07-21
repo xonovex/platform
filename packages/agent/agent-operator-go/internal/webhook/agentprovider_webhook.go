@@ -42,35 +42,30 @@ var envKeyPattern = regexp.MustCompile(`^[a-zA-Z_][a-zA-Z0-9_]*$`)
 
 var k8sNamePattern = regexp.MustCompile(`^[a-z0-9][a-z0-9\-]{0,251}[a-z0-9]$|^[a-z0-9]$`)
 
-var blockedEnvKeyPrefixes = []string{
-	"LD_",
-	"DYLD_",
-	"PYTHONPATH",
-	"RUBYOPT",
-	"NODE_OPTIONS",
-	"JAVA_TOOL_OPTIONS",
-}
-
 func (w *AgentProviderWebhook) validate(provider *agentv1alpha1.AgentProvider) (admission.Warnings, error) {
 	err := validateProviderConfig(
 		provider.Spec.PresetRef,
 		provider.Spec.AgentType,
 		provider.Spec.AuthTokenSecretRef,
+		provider.Spec.AuthTokenEnv,
 		provider.Spec.Environment,
 		provider.Spec.CliArgs,
 	)
 	return nil, err
 }
 
-func validateProviderConfig(presetRef, agentType string, secretRef *agentv1alpha1.SecretKeyRef, environment map[string]string, cliArgs []string) error {
+func validateProviderConfig(presetRef, agentType string, secretRef *agentv1alpha1.SecretKeyRef, authTokenEnv string, environment map[string]string, cliArgs []string) error {
+	presetAuthTokenEnv := ""
 	if presetRef != "" {
 		at := sharedtypes.AgentType(agentType)
 		if at == "" {
 			at = sharedtypes.AgentClaude
 		}
-		if _, err := providers.GetProvider(presetRef, at); err != nil {
-			return fmt.Errorf("presetRef %q is not a known provider preset for agent type %q: %w", presetRef, at, err)
+		preset, err := providers.GetPortableProvider(presetRef, at)
+		if err != nil {
+			return fmt.Errorf("presetRef %q is not a portable provider preset for agent type %q: %w", presetRef, at, err)
 		}
+		presetAuthTokenEnv = preset.CredentialTargetEnv
 	}
 
 	if secretRef != nil {
@@ -84,17 +79,26 @@ func validateProviderConfig(presetRef, agentType string, secretRef *agentv1alpha
 		if !k8sNamePattern.MatchString(ref.Name) {
 			return fmt.Errorf("authTokenSecretRef.name %q is not a valid Kubernetes resource name", ref.Name)
 		}
+		effectiveAuthTokenEnv := authTokenEnv
+		if effectiveAuthTokenEnv == "" {
+			effectiveAuthTokenEnv = presetAuthTokenEnv
+		}
+		if effectiveAuthTokenEnv == "" {
+			return fmt.Errorf("authTokenEnv is required when authTokenSecretRef is configured")
+		}
+		if err := validateEnvironmentKey(effectiveAuthTokenEnv); err != nil {
+			return fmt.Errorf("authTokenEnv: %w", err)
+		}
+		if _, exists := environment[effectiveAuthTokenEnv]; exists {
+			return fmt.Errorf("environment key %q conflicts with authTokenSecretRef", effectiveAuthTokenEnv)
+		}
+	} else if authTokenEnv != "" {
+		return fmt.Errorf("authTokenEnv requires authTokenSecretRef")
 	}
 
 	for key := range environment {
-		if !envKeyPattern.MatchString(key) {
-			return fmt.Errorf("environment key %q is not a valid env var name", key)
-		}
-		upperKey := strings.ToUpper(key)
-		for _, blocked := range blockedEnvKeyPrefixes {
-			if strings.HasPrefix(upperKey, blocked) {
-				return fmt.Errorf("environment key %q is not allowed (blocked prefix %q)", key, blocked)
-			}
+		if err := validateEnvironmentKey(key); err != nil {
+			return fmt.Errorf("environment key %q: %w", key, err)
 		}
 	}
 
@@ -107,5 +111,18 @@ func validateProviderConfig(presetRef, agentType string, secretRef *agentv1alpha
 		}
 	}
 
+	return nil
+}
+
+func validateEnvironmentKey(key string) error {
+	if !envKeyPattern.MatchString(key) {
+		return fmt.Errorf("is not a valid env var name")
+	}
+	upperKey := strings.ToUpper(key)
+	for _, blocked := range []string{"LD_", "DYLD_", "PYTHONPATH", "RUBYOPT", "NODE_OPTIONS", "JAVA_TOOL_OPTIONS"} {
+		if strings.HasPrefix(upperKey, blocked) {
+			return fmt.Errorf("is not allowed (blocked prefix %q)", blocked)
+		}
+	}
 	return nil
 }

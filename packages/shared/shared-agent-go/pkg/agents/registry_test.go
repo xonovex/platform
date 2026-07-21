@@ -12,8 +12,24 @@ func TestGetAgent(t *testing.T) {
 	if err != nil {
 		t.Fatalf("GetAgent() error = %v", err)
 	}
-	if agent != claudeAgent {
+	if agent.Type != types.AgentClaude || agent.Binary != "claude" {
 		t.Fatalf("GetAgent() = %+v, want Claude agent", agent)
+	}
+}
+
+func TestGetAgentReturnsIndependentConfigurations(t *testing.T) {
+	first, err := GetAgent(types.AgentClaude)
+	if err != nil {
+		t.Fatalf("GetAgent() error = %v", err)
+	}
+	first.Binary = "changed"
+
+	second, err := GetAgent(types.AgentClaude)
+	if err != nil {
+		t.Fatalf("GetAgent() error = %v", err)
+	}
+	if second.Binary == "changed" {
+		t.Fatal("GetAgent() returned shared mutable configuration")
 	}
 }
 

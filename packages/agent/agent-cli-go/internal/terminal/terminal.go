@@ -4,8 +4,8 @@
 package terminal
 
 import (
-	termshared "github.com/xonovex/platform/packages/cli/agent-cli-go/internal/terminal/shared"
-	"github.com/xonovex/platform/packages/cli/agent-cli-go/internal/terminal/tmux"
+	termshared "github.com/xonovex/platform/packages/agent/agent-cli-go/internal/terminal/shared"
+	"github.com/xonovex/platform/packages/agent/agent-cli-go/internal/terminal/tmux"
 )
 
 // GetExecutor returns a terminal executor for the specified type, or nil when no

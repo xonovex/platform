@@ -21,9 +21,3 @@ type AgentExecOptions struct {
 	Sandbox         bool
 	ProviderCliArgs []string
 }
-
-// BuildArgsFunc builds CLI arguments for the agent
-type BuildArgsFunc func(baseArgs []string, options AgentExecOptions) []string
-
-// BuildEnvFunc builds environment variables for the agent
-type BuildEnvFunc func(providerEnv map[string]string) map[string]string

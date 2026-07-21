@@ -402,6 +402,7 @@ func TestAgentRun_ProviderEnvVarsInjectedIntoJob(t *testing.T) {
 
 	provider := testutil.NewAgentProvider(ns, "test-provider",
 		testutil.WithAuthTokenSecretRef("provider-secret", "api-key"),
+		testutil.WithAuthTokenEnv("ANTHROPIC_AUTH_TOKEN"),
 		testutil.WithEnvironment(map[string]string{
 			"ANTHROPIC_BASE_URL": "http://proxy:8080",
 			"CUSTOM_VAR":         "custom-value",

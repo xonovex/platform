@@ -1,4 +1,4 @@
-module github.com/xonovex/platform/packages/cli/agent-cli-go
+module github.com/xonovex/platform/packages/agent/agent-cli-go
 
 go 1.26.0
 

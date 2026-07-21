@@ -2,20 +2,20 @@ apiVersion: agent.xonovex.com/v1alpha1
 kind: AgentRun
 metadata:
   name: agentrun-sample
-  namespace: default
+  namespace: ai-agents
 spec:
   harness:
     type: claude
   providerRef: anthropic-provider
-  image: ghcr.io/example/agents/claude@sha256:<digest>
-  runtimeClassName: kata
   workspace:
     type: git
     repository:
       url: https://github.com/example/repo.git
       branch: main
   prompt: "Review the codebase and suggest improvements"
-  network: none
+  # Public model APIs require egress. Replace unrestricted egress with a cluster-level
+  # egress proxy or FQDN-aware policy before using untrusted repositories.
+  network: host
   timeout: 30m
   # For Confidential Computing (AMD SEV-SNP), replace runtimeClassName with kata-cc:
   # nodeSelector:

@@ -32,7 +32,7 @@ import (
 	"testing"
 )
 
-const modPath = "github.com/xonovex/platform/packages/cli/agent-cli-go"
+const modPath = "github.com/xonovex/platform/packages/agent/agent-cli-go"
 
 // internalRoot returns the absolute path of the internal/ directory.
 func internalRoot(t *testing.T) string {

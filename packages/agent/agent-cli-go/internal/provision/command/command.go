@@ -3,7 +3,7 @@
 package command
 
 import (
-	provshared "github.com/xonovex/platform/packages/cli/agent-cli-go/internal/provision/shared"
+	provshared "github.com/xonovex/platform/packages/agent/agent-cli-go/internal/provision/shared"
 	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/provision"
 )
 

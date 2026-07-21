@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"os"
 
 	"k8s.io/apimachinery/pkg/runtime"
@@ -15,16 +16,6 @@ import (
 	"github.com/xonovex/platform/packages/agent/agent-operator-go/internal/validator"
 	"github.com/xonovex/platform/packages/agent/agent-operator-go/internal/webhook"
 )
-
-var (
-	scheme   = runtime.NewScheme()
-	setupLog = ctrl.Log.WithName("setup")
-)
-
-func init() {
-	_ = clientgoscheme.AddToScheme(scheme)
-	_ = agentv1alpha1.AddToScheme(scheme)
-}
 
 func main() {
 	var probeAddr string
@@ -40,6 +31,12 @@ func main() {
 	flag.Parse()
 
 	ctrl.SetLogger(zap.New(zap.UseFlagOptions(&opts)))
+	setupLog := ctrl.Log.WithName("setup")
+	scheme, err := newScheme()
+	if err != nil {
+		setupLog.Error(err, "unable to register Kubernetes API schemes")
+		os.Exit(1)
+	}
 	if err := validator.ValidatePinnedImageReference(workspaceInitImage); err != nil {
 		setupLog.Error(err, "invalid workspace init image", "image", workspaceInitImage)
 		os.Exit(1)
@@ -119,4 +116,15 @@ func main() {
 		setupLog.Error(err, "problem running manager")
 		os.Exit(1)
 	}
+}
+
+func newScheme() (*runtime.Scheme, error) {
+	scheme := runtime.NewScheme()
+	if err := clientgoscheme.AddToScheme(scheme); err != nil {
+		return nil, fmt.Errorf("register Kubernetes core API: %w", err)
+	}
+	if err := agentv1alpha1.AddToScheme(scheme); err != nil {
+		return nil, fmt.Errorf("register agent API: %w", err)
+	}
+	return scheme, nil
 }
