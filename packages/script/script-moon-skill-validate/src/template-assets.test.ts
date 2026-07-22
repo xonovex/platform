@@ -62,6 +62,7 @@ describe.each(["guideline-skill-template", "workflow-skill-template"])(
         "catalog: 3 output eval(s) are structurally valid",
         "catalog: trigger evals cover 8 positive and 8 negative routes with train/validation splits",
         "catalog: source provenance and review date are present",
+        "credentials: examples avoid plaintext token anti-patterns",
       ]);
     });
   },

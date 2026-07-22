@@ -24,7 +24,7 @@ When this skill fires:
 
 - **Official CLI, Cloud only** - `acli` is Atlassian's first-party CLI for Jira / Confluence **Cloud** (`*.atlassian.net`); it does not support self-hosted Server / Data Center, see [references/first-time-setup.md](references/first-time-setup.md)
 - **Install via the Atlassian tap** - `brew tap atlassian/acli` then `brew install acli`; newer Homebrew first needs `brew trust atlassian/acli`, see [references/first-time-setup.md](references/first-time-setup.md)
-- **Authenticate with an API token** - `echo <token> | acli jira auth login --site <site> --email <you> --token` (the `--token` flag reads stdin); the default when web OAuth (`--web`) is admin-restricted, see [references/auth.md](references/auth.md)
+- **Authenticate with an API token** - Read the token with a hidden prompt or inject it from a CI secret store, then pipe it to `acli jira auth login --token` over stdin; the default when web OAuth (`--web`) is admin-restricted, see [references/auth.md](references/auth.md)
 - **acli owns the secret** - the token is written to the OS keychain (macOS service `acli`); the `~/.config/acli/*.yaml` files hold only site / email / account (non-secret) — nothing to hand-store, see [references/auth.md](references/auth.md)
 - **Verify** - `acli jira auth status` prints site, email, and auth type; run it before any real command, see [references/auth.md](references/auth.md)
 - **Two auth surfaces** - `acli auth *` is global OAuth across sites; `acli jira auth *` is per-product and takes an API token — use the Jira one for token auth, see [references/auth.md](references/auth.md)
@@ -36,7 +36,7 @@ When this skill fires:
 - Newer Homebrew refuses a third-party tap until trusted: `brew install acli` errors `Refusing to load formula ... from untrusted tap` — run `brew trust atlassian/acli` first, then install.
 - `acli` is **Cloud only**. It will not authenticate against a self-hosted Atlassian Server / Data Center host (for a self-hosted Bitbucket, that stays the REST-over-`curl` route — `bitbucket-guide`).
 - Web OAuth (`acli jira auth login --web`) is frequently **disabled by org admins**. When it is, create an API token at `id.atlassian.com/manage-profile/security/api-tokens` and use the `--token` path — token creation is a per-user setting that some orgs also lock down.
-- `--token` reads the value from **stdin only** — pipe it (`echo <token> | ...`) or redirect a file (`... --token < token.txt`). Never pass the token as a literal flag argument (it lands in shell history and `ps`).
+- `--token` reads the value from **stdin only** — use a hidden prompt for interactive setup or CI secret injection for automation. Never type the value into a command, enable shell tracing around it, or create a plaintext scratch file.
 - `acli auth` (global, OAuth, multi-site) and `acli jira auth` (per-product, API token or OAuth) are distinct — API-token login lives under `acli jira auth login`, not `acli auth login`.
 
 ## Example — install, authenticate with an API token, verify, search
@@ -50,8 +50,11 @@ acli --version
 
 # 2. authenticate with an API token (default when web OAuth is admin-restricted)
 #    token from https://id.atlassian.com/manage-profile/security/api-tokens
-echo "$ATLASSIAN_API_TOKEN" | acli jira auth login \
+IFS= read -r -s -p "Atlassian API token: " ATLASSIAN_API_TOKEN
+printf '\n'
+printf '%s' "$ATLASSIAN_API_TOKEN" | acli jira auth login \
   --site <site>.atlassian.net --email you@example.com --token
+unset ATLASSIAN_API_TOKEN
 
 # 3. verify (acli stored the token in the OS keychain; config yaml holds only site/email)
 acli jira auth status              # ✓ Authenticated / Site / Email / Authentication Type: api_token

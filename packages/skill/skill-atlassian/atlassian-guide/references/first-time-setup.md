@@ -37,16 +37,17 @@ Prefer the API-token path — the browser OAuth flow is often disabled by org ad
 ```bash
 # API token (default when web OAuth is admin-restricted)
 # create at https://id.atlassian.com/manage-profile/security/api-tokens
-echo "$ATLASSIAN_API_TOKEN" | acli jira auth login \
+IFS= read -r -s -p "Atlassian API token: " ATLASSIAN_API_TOKEN
+printf '\n'
+printf '%s' "$ATLASSIAN_API_TOKEN" | acli jira auth login \
   --site <site>.atlassian.net --email you@example.com --token
-# OR read from a file (keeps it out of shell history)
-acli jira auth login --site <site>.atlassian.net --email you@example.com --token < token.txt
+unset ATLASSIAN_API_TOKEN
 
 # Web OAuth (only if the admin allows it) — opens a browser
 acli jira auth login --web
 ```
 
-The `--token` flag reads the value from **stdin** — never pass it as a literal flag argument. `acli` writes the token to the OS keychain and records the non-secret profile (site, email, account, `auth_type`) under `~/.config/acli/` — see [auth.md](auth.md).
+The `--token` flag reads the value from **stdin**. Keep shell tracing disabled during login, never pass the token as a literal argument, and do not stage it in a plaintext file. In CI, let the runner inject `ATLASSIAN_API_TOKEN` from its secret store immediately before this command. `acli` writes the token to the OS keychain and records the non-secret profile (site, email, account, `auth_type`) under `~/.config/acli/` — see [auth.md](auth.md).
 
 ## Verify
 

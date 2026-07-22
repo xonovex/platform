@@ -32,15 +32,16 @@ gh auth login                                    # interactive (default)
 
 The default is the **browser / device-code** flow, not a token paste. Answer **GitHub.com vs Other** (for GHES pass `--hostname ghe.example.com`), pick **HTTPS or SSH** for the git protocol, and answer **yes** to authenticate git so `gh` becomes the git credential helper. The token lands in the OS keyring.
 
-Headless / CI — skip interactive login:
+Headless interactive setup — read a classic PAT without echoing or storing it in a scratch file:
 
 ```bash
-export GH_TOKEN=ghp_xxx                           # github.com (GH_ENTERPRISE_TOKEN for GHES)
-# or feed a CLASSIC PAT (min scopes repo, read:org, gist) on stdin:
-gh auth login --with-token < token.txt
+IFS= read -r -s -p "GitHub classic PAT: " GITHUB_CLASSIC_PAT
+printf '\n'
+printf '%s' "$GITHUB_CLASSIC_PAT" | gh auth login --with-token
+unset GITHUB_CLASSIC_PAT
 ```
 
-Do NOT feed a fine-grained PAT to `--with-token` (its per-resource scoping confuses that flow) — use `GH_TOKEN` for fine-grained PATs.
+Do NOT feed a fine-grained PAT to `--with-token` (its per-resource scoping confuses that flow) — inject it as `GH_TOKEN` from a secret store. In CI, configure `GH_TOKEN` in the runner's secret mechanism and validate that it exists without printing it: `: "${GH_TOKEN:?inject GH_TOKEN through the CI secret store}"`.
 
 ## 3. Git protocol
 
@@ -72,6 +73,6 @@ gh api graphql -f query='query{viewer{login}}'   # real GraphQL read
 ```bash
 gh auth login --hostname ghe.example.com
 export GH_HOST=ghe.example.com
-export GH_ENTERPRISE_TOKEN=ghp_xxx               # NOT GH_TOKEN for GHES
+: "${GH_ENTERPRISE_TOKEN:?inject GH_ENTERPRISE_TOKEN through the secret store}"
 gh api user --hostname ghe.example.com -q '.login'
 ```

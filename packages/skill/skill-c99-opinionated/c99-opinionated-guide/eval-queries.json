@@ -147,6 +147,6 @@
     "query": "the parser in src/cfg/ calls strlen and strtok all over a big buffer and load time is terrible — how should I restructure string handling?",
     "should_trigger": true,
     "split": "validation",
-    "rationale": "string-handling: length-carrying views + bounded caller-owned builders, avoid terminator-rescan O(n^2)"
+    "rationale": "cross-skill string routing: c99-guide owns length-carrying views and bounded builders; this overlay adds caller-owned storage"
   }
 ]

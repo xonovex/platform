@@ -16,7 +16,7 @@ description: "Use when editing systems or embedded C99 code in projects that fol
 
 - **Implementation variants** - Ship scalar → AoS → SoA → SIMD with `_*` suffixes + parity tests; layout rationale in **data-oriented-design-guide**, see [references/implementation-variants.md](references/implementation-variants.md)
 - **Handles & indices** - Apply **data-oriented-design-guide** for stable-handle layout and iteration tradeoffs; enforce C99 check ordering and pointer lifetime in [references/safety-validations.md](references/safety-validations.md)
-- **Alignment** - C `_Alignas`/aligned allocation; the _why_ is in **data-oriented-design-guide** (SIMD) and **lock-free-guide** (false sharing), see [references/alignment.md](references/alignment.md)
+- **Alignment** - Strict C99 has no portable over-alignment syntax; isolate a compiler-specific alignment macro and use an explicitly exposed platform allocator, see [references/alignment.md](references/alignment.md); the _why_ is in **data-oriented-design-guide** (SIMD) and **lock-free-guide** (false sharing)
 - **Composability** - Composable stages/primitives over a uniform currency, explicit caller-wired composition, see [references/composability.md](references/composability.md)
 - **Hot reload** - Reloadable native modules via API/function-pointer tables + host-owned state, see [references/hot-reload.md](references/hot-reload.md)
 - **Physical design** - Headers don't include headers; one header = one system's interface; opaque handles + forward declarations; acyclic deps and fast incremental builds, see [references/physical-design.md](references/physical-design.md)
@@ -28,28 +28,27 @@ description: "Use when editing systems or embedded C99 code in projects that fol
 
 - **Input validation** - Check capacity, bounds, NULL, division, overflow, see [references/safety-validations.md](references/safety-validations.md)
 - **Work buffers** - Complex functions use explicit caller-provided scratch buffers; ownership and lifetime come from **memory-management-guide**, C99 boundary checks from [references/safety-validations.md](references/safety-validations.md)
-- **Strings** - Length-carrying views for reads, bounded caller-owned builders for writes; no `strlen`/`strtok` terminator rescans, see [references/string-handling.md](references/string-handling.md)
+- **Strings** - Apply **c99-guide** for length-carrying views and bounded builders; this overlay adds only the caller-owned storage requirement from **memory-management-guide**
 - **SIMD parity** - Test variants against scalar reference, see [references/testing-patterns.md](references/testing-patterns.md)
 
 ## Gotchas
 
 - For a library, `-Werror` on the unused-symbol family is wrong: header reflection/mapping tables and interface-mandated parameters are surface a TU may not reference — relax `-Wno-unused-{parameter,variable,but-set-variable,function}`, keep `-Wunused-value` and correctness warnings
-- `-std=c99` usually keeps the GNU dialect — set `C_EXTENSIONS OFF`, then `_XOPEN_SOURCE=700` or POSIX calls become implicit-declaration errors
+- CMake's `C_STANDARD 99` still selects the GNU dialect while `C_EXTENSIONS` is on — set `C_EXTENSIONS OFF`, then define `_XOPEN_SOURCE=700` or the required `_POSIX_C_SOURCE` value before headers when using POSIX APIs
 - `static inline` in a header gives each TU its own internal-linkage copy (safe, but bloats if the compiler never inlines it); a plain `inline` definition has external linkage and needs exactly one TU to emit the external definition — don't mix the two storage classes for the same function
 - Designated initializers leave unmentioned fields zero-initialized — relying on that for safety means a missing field is silent
 - `unsigned` overflow is defined; signed overflow is undefined behavior — never rely on signed wrap
-- `alignof`/`alignas` interact subtly with `malloc` (always returns max-align) vs custom allocators
+- `_Alignas`, `alignas`, `alignof`, and `aligned_alloc` are C11 facilities, not strict C99; use a guarded implementation extension and `posix_memalign` only after exposing its POSIX declaration
 - One header including another silently reintroduces the include cascade and recompilation storms — keep the no-header-includes rule machine-checked in CI
 - A cached plugin-interface or cross-module function pointer dangles after reload/unload — re-fetch from the registry, never stash it across that boundary
 - A C API that lets a caller keep a borrowed pointer past the call is a lifetime contract a GC language can't honor; default to call-scoped pointers and document the rare exceptions
 - A recycled slot makes a bare index alias a different object — add a generation counter to the handle so a stale reference fails its check instead of reading the wrong data
-- `strlen`/`strcmp`/`strtok` rescan to the terminator on every call, so a loop over them is silently O(n²) (the GTA Online JSON-load case) — carry length in a view and never rescan
+- A loop around `strlen`/`strcmp`/`strtok` can repeatedly rescan the same terminator and become O(n²) — apply the length-carrying views from **c99-guide**
 
 ## Progressive disclosure
 
 - Read [references/build-warnings-policy.md](references/build-warnings-policy.md) - Load when configuring the C standard, feature-test macros, the library-vs-app warning policy, or sanitizers
 - Read [references/implementation-variants.md](references/implementation-variants.md) - Load when choosing between scalar, AoS, SoA, or SIMD implementations
-- Read [references/string-handling.md](references/string-handling.md) - Load when handling strings without terminator rescans or hidden allocations
 - Read [references/alignment.md](references/alignment.md) - Load when aligning data for SIMD or cache performance
 - Read [references/composability.md](references/composability.md) - Load when designing pipelines, multi-stage transforms, or reusable primitive APIs
 - Read [references/hot-reload.md](references/hot-reload.md) - Load when making native code reloadable at runtime or designing a plugin/module boundary

@@ -25,7 +25,7 @@ Pick a flow at the prompt:
 
 - **Web** (browser) — default interactive.
 - **`--device`** — OAuth device flow (needs GitLab 17.9+), ideal for headless / SSH sessions.
-- **Non-interactive** — `glab auth login --hostname H --stdin < token.txt` (preferred over `--token`, which lands in shell history).
+- **Headless interactive** — read the token with a hidden prompt, then `printf '%s' "$GITLAB_PAT" | glab auth login --hostname H --stdin --use-keyring`; unset the variable immediately afterward. In CI, inject `GITLAB_TOKEN` from the runner's secret store instead of creating a token file.
 
 Add `--use-keyring` to store the token in the OS keyring instead of plaintext `~/.config/glab-cli/config.yml`. Token scopes and types are in [auth.md](auth.md) — at minimum the token needs `api` and `write_repository` for full read/write use, or `read_api` for read-only.
 

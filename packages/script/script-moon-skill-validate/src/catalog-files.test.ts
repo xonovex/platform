@@ -60,7 +60,7 @@ describe("checkCatalogFiles", () => {
     const report = checkCatalogFiles(skillDir, {name: "example-guide"});
 
     expect(report.errors).toEqual([]);
-    expect(report.passes).toHaveLength(3);
+    expect(report.passes).toHaveLength(4);
   });
 
   it("rejects missing files and underspecified routing fixtures", () => {
@@ -173,6 +173,60 @@ describe("checkCatalogFiles", () => {
 
     expect(report.errors).toContain(
       "catalog: version-pinned skill needs a Version field in SOURCES.md",
+    );
+  });
+
+  it("requires content or repository drift evidence for versioned web sources", () => {
+    const skillDir = makeSkill();
+    writeFileSync(
+      join(skillDir, "SOURCES.md"),
+      `# Sources
+
+## Versioned docs
+- **URL:** https://example.com/docs
+- **Version:** 2.4.0
+- **References:** all
+- **Last reviewed:** 2026-07-22
+`,
+    );
+
+    const report = checkCatalogFiles(skillDir, {name: "example-guide"});
+
+    expect(report.errors).toContain(
+      "catalog: versioned web source 'Versioned docs' needs Content SHA256 or Checkout + Commit + Watch drift fields",
+    );
+  });
+
+  it("rejects credential examples that encourage plaintext token handling", () => {
+    const skillDir = makeSkill();
+    writeFileSync(
+      join(skillDir, "SKILL.md"),
+      '# Example\n\n```bash\necho "$API_TOKEN" | tool login\ntool login < token.txt\nexport API_TOKEN=secret\n```\n',
+    );
+
+    const report = checkCatalogFiles(skillDir, {name: "example-guide"});
+
+    expect(report.errors).toEqual(
+      expect.arrayContaining([
+        "credentials: SKILL.md pipes a secret through echo",
+        "credentials: SKILL.md reads a secret from token.txt",
+        "credentials: SKILL.md assigns a secret in an export command",
+      ]),
+    );
+  });
+
+  it("allows secret exports sourced from an injected value or secret store", () => {
+    const skillDir = makeSkill();
+    writeFileSync(
+      join(skillDir, "SKILL.md"),
+      '# Example\n\n```bash\nexport API_TOKEN="${INJECTED_TOKEN}"\nexport SERVICE_PAT="$(secret-store read service)"\n```\n',
+    );
+
+    const report = checkCatalogFiles(skillDir, {name: "example-guide"});
+
+    expect(report.errors).toEqual([]);
+    expect(report.passes).toContain(
+      "credentials: examples avoid plaintext token anti-patterns",
     );
   });
 });

@@ -2,8 +2,8 @@
 
 ## Conventional Comments (standard)
 
-- **URL:** https://conventionalcomments.org/
-- **Last reviewed:** 2026-06-24
+- **URL:** https://gitlab.com/conventionalcomments/conventionalcomments.gitlab.io
+- **Last reviewed:** 2026-07-22
 - **Used for:** `references/conventional-comments.md` — label list, the `label (decoration): subject` format, the blocking / non-blocking / if-minor decorations, and the machine-parseable shape
 
 ## Conventional comments — practitioner guides
@@ -28,6 +28,6 @@
 
 ## Refresh Workflow
 
-1. Re-check conventionalcomments.org for any change to the label set or decorations
+1. Re-check the Conventional Comments GitLab repository for any change to the label set or decorations
 2. Fold recurring review-craft lessons (from `reflect-guide` retrospectives) into the references
 3. Bump **Last reviewed** above

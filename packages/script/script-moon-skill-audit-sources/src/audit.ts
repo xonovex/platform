@@ -1,4 +1,5 @@
 import {execFileSync} from "node:child_process";
+import {createHash} from "node:crypto";
 import {readdirSync, readFileSync, writeFileSync} from "node:fs";
 import {basename, join, resolve, sep} from "node:path";
 import {resolveExecutable} from "@xonovex/script-moon-common/executable";
@@ -20,6 +21,7 @@ const HEADER_RE = /^##\s+(.*\S)\s*$/;
 interface FetchReport {
   status: string;
   detail: string;
+  content_sha256?: string;
 }
 
 interface DriftReport {
@@ -51,6 +53,10 @@ interface SourceReport {
   version: string | null;
   commit: string | null;
   watch_count: number;
+  content_sha256: string | null;
+  fetched_content_sha256: string | null;
+  content_changed: boolean;
+  drift_anchor_missing: boolean;
   fetch?: FetchReport;
   fetches?: readonly FetchReport[];
   drift?: DriftReport;
@@ -90,6 +96,7 @@ A source block may add upstream-drift fields:
       **Version:** <semver>           version the skill is pinned to
       **Commit:** <hash>              commit the skill was distilled from
       **Watch:** <subpath> -> a.md    map a source subpath to the references it feeds
+      **Content SHA256:** <digest>    pin ordered fetched web content when no checkout exists
 When present, the audit also reports the latest released tag vs the pinned
 version and the commits since the pinned commit on watched paths.`;
 
@@ -137,7 +144,10 @@ const resolveSourcesFile = (target: string): string | undefined => {
   return undefined;
 };
 
-const fetchStatus = async (url: string, timeout = 15): Promise<FetchReport> => {
+const fetchStatusOnce = async (
+  url: string,
+  timeout: number,
+): Promise<FetchReport> => {
   const controller = new AbortController();
   const timer = setTimeout(() => {
     controller.abort();
@@ -154,13 +164,52 @@ const fetchStatus = async (url: string, timeout = 15): Promise<FetchReport> => {
     if (code === 404) {
       return {status: "missing", detail: `HTTP ${String(code)}`};
     }
-    return {status: code && code < 400 ? "ok" : "error", detail};
+    if (code === 401 || code === 403 || code === 429) {
+      return {status: "restricted", detail};
+    }
+    if (!code || code >= 400) return {status: "error", detail};
+    const body = Buffer.from(await resp.arrayBuffer());
+    return {
+      status: "ok",
+      detail,
+      content_sha256: createHash("sha256").update(body).digest("hex"),
+    };
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     return {status: "error", detail: `unreachable: ${message}`};
   } finally {
     clearTimeout(timer);
   }
+};
+
+const fetchStatus = async (url: string, timeout = 15): Promise<FetchReport> => {
+  let report = await fetchStatusOnce(url, timeout);
+  if (report.status === "error") {
+    report = await fetchStatusOnce(url, timeout);
+  }
+  return report;
+};
+
+const aggregateContentSha256 = (
+  urls: readonly string[],
+  fetches: readonly FetchReport[],
+): string | null => {
+  if (
+    urls.length !== fetches.length ||
+    fetches.some(
+      (fetch) => fetch.status !== "ok" || fetch.content_sha256 === undefined,
+    )
+  ) {
+    return null;
+  }
+  const digest = createHash("sha256");
+  for (const [index, url] of urls.entries()) {
+    digest.update(url);
+    digest.update("\0");
+    digest.update(fetches[index]?.content_sha256 ?? "");
+    digest.update("\n");
+  }
+  return digest.digest("hex");
 };
 
 const listExistingRefs = (skillDir: string): Set<string> => {
@@ -334,6 +383,15 @@ const auditSkill = async (
     const reviewMaxAge = s.version === undefined ? maxAge : versionMaxAge;
     const stale = age !== null && age > reviewMaxAge;
     const referenceMappingMissing = !hasReferenceMapping(s);
+    const driftAnchorMissing =
+      s.version !== undefined &&
+      s.urls.length > 0 &&
+      s.contentSha256 === undefined &&
+      !(
+        s.checkout !== undefined &&
+        s.commit !== undefined &&
+        s.watches.length > 0
+      );
     const dangling = [...s.refs].filter((r) => !existingRefs.has(r)).toSorted();
     for (const r of s.refs) covered.add(r);
     const report: SourceReport = {
@@ -352,6 +410,10 @@ const auditSkill = async (
       version: s.version ?? null,
       commit: s.commit ?? null,
       watch_count: s.watches.length,
+      content_sha256: s.contentSha256 ?? null,
+      fetched_content_sha256: null,
+      content_changed: false,
+      drift_anchor_missing: driftAnchorMissing,
     };
     if (s.coversAllReferences) {
       for (const reference of existingRefs) covered.add(reference);
@@ -360,11 +422,23 @@ const auditSkill = async (
       problems += 1;
     }
     if (referenceMappingMissing) problems += 1;
+    if (driftAnchorMissing) problems += 1;
     if (doFetch && s.urls.length > 0) {
       const fetches = await Promise.all(s.urls.map((url) => fetchStatus(url)));
       report.fetch = fetches[0];
       report.fetches = fetches;
-      problems += fetches.filter((fetch) => fetch.status !== "ok").length;
+      problems += fetches.filter(
+        (fetch) => fetch.status !== "ok" && fetch.status !== "restricted",
+      ).length;
+      report.fetched_content_sha256 = aggregateContentSha256(s.urls, fetches);
+      if (s.contentSha256 !== undefined) {
+        if (report.fetched_content_sha256 === null) {
+          problems += 1;
+        } else if (report.fetched_content_sha256 !== s.contentSha256) {
+          report.content_changed = true;
+          problems += 1;
+        }
+      }
     }
     if (s.checkout !== undefined) {
       const drift = computeDrift(workspaceRoot, s, pull);
@@ -432,6 +506,8 @@ const sourceFlags = (source: SourceReport): readonly string[] => {
   if (source.reference_mapping_missing) {
     flags.push("MISSING REFERENCE MAPPING");
   }
+  if (source.drift_anchor_missing) flags.push("MISSING DRIFT ANCHOR");
+  if (source.content_changed) flags.push("CONTENT CHANGED");
   if (source.dangling_refs.length > 0) {
     flags.push(`DANGLING: ${source.dangling_refs.join(", ")}`);
   }
@@ -501,6 +577,12 @@ const printSource = (source: SourceReport): void => {
   console.log(`    last reviewed : ${source.last_reviewed ?? "(none)"}${age}`);
   for (const [index, fetch] of fetches.entries()) {
     console.log(`    fetch ${String(index + 1).padEnd(7)}: ${fetch.detail}`);
+  }
+  if (source.content_sha256 !== null) {
+    console.log(`    content pin    : ${source.content_sha256}`);
+    console.log(
+      `    fetched hash   : ${source.fetched_content_sha256 ?? "(unavailable)"}`,
+    );
   }
   console.log(`    feeds         : ${sourceFeeds(source)}`);
   printDrift(source);

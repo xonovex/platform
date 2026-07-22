@@ -16,11 +16,14 @@ Create, expire, rotate, and revoke a token at `https://id.atlassian.com/manage-p
 The `--token` flag reads stdin:
 
 ```bash
+IFS= read -r -s -p "Atlassian API token: " ATLASSIAN_API_TOKEN
+printf '\n'
 printf '%s' "$ATLASSIAN_API_TOKEN" | acli jira auth login \
   --site <site>.atlassian.net --email you@example.com --token
+unset ATLASSIAN_API_TOKEN
 ```
 
-After login, `acli` stores the credential in the operating-system secret store. Its `~/.config/acli/*.yaml` files contain profile metadata, not the token. Do not create a second plaintext copy.
+In CI, inject `ATLASSIAN_API_TOKEN` from the runner's secret store immediately before login. Keep shell tracing disabled. After login, `acli` stores the credential in the operating-system secret store. Its `~/.config/acli/*.yaml` files contain profile metadata, not the token. Do not create a second plaintext copy.
 
 ## Verify and switch
 

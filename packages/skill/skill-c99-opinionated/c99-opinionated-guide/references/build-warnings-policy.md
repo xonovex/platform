@@ -46,10 +46,6 @@ target_link_options(target_asan    PRIVATE -fsanitize=address,undefined)
 - **UBSan** traps signed overflow, misaligned access, and out-of-range shifts — relevant when you do alignment math or pointer tagging.
 - ASan and **ThreadSanitizer** are mutually exclusive; give each its own preset. Keep `-fno-omit-frame-pointer -g` for readable traces, and reproduce crashes under ASan or a debugger rather than `printf`.
 
-## Caller-owns extends to strings
-
-The `_req()`/`_init()` sizing pattern (see caller-owns-memory) covers string building too: a builder takes `_req(max_len)` bytes the caller allocates, then every append is bounded against that capacity and latches a `truncated` flag — no hidden allocation, no `strcat` overrun. Reads borrow length-carrying views; only the boundary does the one `strlen`. Full treatment in [references/string-handling.md](./string-handling.md).
-
 ### Related
 
-**memory-management-guide**, [references/string-handling.md](./string-handling.md), [references/safety-validations.md](./safety-validations.md)
+**c99-guide**, **memory-management-guide**, [safety-validations.md](safety-validations.md)

@@ -15,6 +15,9 @@ tasks:
   ts-build:
     deps:
       - script-moon-common:build
+  ts-test:
+    inputs:
+      - /packages/skill/skill-skill/skill-guide/scripts/audit-sources.py
   install:
     command:
       - npm

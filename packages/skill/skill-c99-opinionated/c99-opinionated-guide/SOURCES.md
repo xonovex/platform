@@ -41,7 +41,7 @@ architecture references below are distilled from the engine blog archive.
   - The data-oriented decisions that distinguish this style from generic C99
 - **Aspects extracted:**
   - "Reference objects via array indexes, not raw pointers" — the general handle model is owned by **data-oriented-design-guide**; the C99-specific bounds-before-generation check and scoped-pointer rule feed `references/safety-validations.md`
-  - "Replace the legacy libc string trap" — `strlen`/`strtok` terminator rescans go O(n²) in a loop (the GTA Online JSON-load case); the owning-vs-non-owning split (length-carrying view for reads, bounded caller-owned builder for writes) → `references/string-handling.md`
+  - The caller-owned storage constraint for the string-view and bounded-builder pattern owned by **c99-guide**
   - Address/UndefinedBehavior sanitizers as the runtime net for hand-carved arena/caller-owned memory → `references/build-warnings-policy.md`
   - Memory arenas / aggregate "free the whole lifetime at once" allocation reinforce the existing caller-owns-memory direction; the general allocator theory stays in **memory-management-guide**
 

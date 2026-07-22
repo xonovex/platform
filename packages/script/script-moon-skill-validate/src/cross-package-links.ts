@@ -55,6 +55,10 @@ interface SkillPluginManifest {
 interface SkillPackageSurface {
   readonly guideNames: readonly string[];
   readonly markdown: string;
+  readonly references: readonly {
+    readonly path: string;
+    readonly text: string;
+  }[];
 }
 
 interface SkillPackageCheck {
@@ -144,6 +148,12 @@ const skillPackageSurface = (pkgDir: string): SkillPackageSurface => {
   const guideNames = readdirSync(pkgDir)
     .filter((entry) => isFile(join(pkgDir, entry, "SKILL.md")))
     .toSorted();
+  const references = guideNames.flatMap((guide) =>
+    markdownEntries(join(pkgDir, guide, "references")).map((path) => ({
+      path: relative(pkgDir, path),
+      text: readFileSync(path, "utf8"),
+    })),
+  );
   const files = guideNames.flatMap((guide) => {
     const guideDir = join(pkgDir, guide);
     return [
@@ -154,7 +164,61 @@ const skillPackageSurface = (pkgDir: string): SkillPackageSurface => {
   return {
     guideNames,
     markdown: files.map((file) => readFileSync(file, "utf8")).join("\n"),
+    references,
   };
+};
+
+const contentShingles = (text: string): ReadonlySet<string> => {
+  const words = text
+    .toLowerCase()
+    .replaceAll(/```[\s\S]*?```/g, " ")
+    .replaceAll(/[^a-z0-9_]+/g, " ")
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean);
+  const shingles = new Set<string>();
+  for (let index = 0; index + 4 < words.length; index += 1) {
+    shingles.add(words.slice(index, index + 5).join(" "));
+  }
+  return shingles;
+};
+
+const shingleContainment = (
+  left: ReadonlySet<string>,
+  right: ReadonlySet<string>,
+): number => {
+  const denominator = Math.min(left.size, right.size);
+  if (denominator < 20) return 0;
+  let shared = 0;
+  for (const shingle of left) {
+    if (right.has(shingle)) shared += 1;
+  }
+  return shared / denominator;
+};
+
+const checkDependencyReferenceOverlap = (
+  sourceName: string,
+  targetName: string,
+  source: SkillPackageSurface,
+  target: SkillPackageSurface,
+  report: LinkReport,
+): boolean => {
+  let valid = true;
+  for (const sourceReference of source.references) {
+    const sourceShingles = contentShingles(sourceReference.text);
+    for (const targetReference of target.references) {
+      const containment = shingleContainment(
+        sourceShingles,
+        contentShingles(targetReference.text),
+      );
+      if (containment < 0.3) continue;
+      valid = false;
+      report.addFail(
+        `skill ownership: ${sourceName} ${sourceReference.path} duplicates ${targetName} ${targetReference.path} (${String(Math.round(containment * 100))}% five-word-shingle containment); keep only the dependent skill's specialization`,
+      );
+    }
+  }
+  return valid;
 };
 
 const checkSkillPackage = (
@@ -249,7 +313,9 @@ const checkDeclaredDependencies = (
         continue;
       }
       const targetGuides = surfaces.get(dependency)?.guideNames ?? [];
-      const sourceMarkdown = surfaces.get(manifest.name)?.markdown ?? "";
+      const sourceSurface = surfaces.get(manifest.name);
+      const targetSurface = surfaces.get(dependency);
+      const sourceMarkdown = sourceSurface?.markdown ?? "";
       const namedTargets = targetGuides
         .map((guide) => `**${guide}**`)
         .join(" or ");
@@ -261,6 +327,16 @@ const checkDeclaredDependencies = (
         report.addFail(
           `skill dependencies: ${manifest.name} depends on ${dependency} but does not name ${namedTargets} in its guidance`,
         );
+      }
+      if (sourceSurface !== undefined && targetSurface !== undefined) {
+        valid =
+          checkDependencyReferenceOverlap(
+            manifest.name,
+            dependency,
+            sourceSurface,
+            targetSurface,
+            report,
+          ) && valid;
       }
     }
   }

@@ -21,7 +21,7 @@
 
 ## Software product lines — commonality / variability analysis
 
-- **URL:** https://www.sei.cmu.edu/our-work/software-product-lines/
+- **URL:** https://www.sei.cmu.edu/library/software-product-lines-collection/
 - **Last reviewed:** 2026-06-27
 - **Used for:**
   - `SKILL.md` → Essentials (shared-core + per-variant leaves)

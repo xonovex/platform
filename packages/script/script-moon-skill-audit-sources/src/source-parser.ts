@@ -14,6 +14,7 @@ const CHECKOUT_RE = /\*\*Checkout:\*\*\s*(\S+)/;
 const VERSION_RE = /\*\*Version:\*\*\s*(.+\S)\s*$/;
 const COMMIT_RE = /\*\*Commit:\*\*\s*([0-9a-f]{7,40})/;
 const WATCH_RE = /\*\*Watch:\*\*\s*(.+?)\s*(?:->|→)\s*(.+\S)\s*$/;
+const CONTENT_SHA256_RE = /\*\*Content SHA256:\*\*\s*([0-9a-f]{64})/i;
 
 interface Watch {
   readonly path: string;
@@ -34,6 +35,7 @@ export interface Source {
   readonly version: string | undefined;
   readonly commit: string | undefined;
   readonly watches: readonly Watch[];
+  readonly contentSha256: string | undefined;
 }
 
 export const hasReferenceMapping = (
@@ -53,6 +55,7 @@ interface MutableSource {
   version: string | undefined;
   commit: string | undefined;
   watches: Watch[];
+  contentSha256: string | undefined;
 }
 
 const parseIsoDate = (raw: string): Date | undefined => {
@@ -129,6 +132,7 @@ const createSource = (title: string, lineNo: number): MutableSource => ({
   version: undefined,
   commit: undefined,
   watches: [],
+  contentSha256: undefined,
 });
 
 const collectUrls = (
@@ -184,6 +188,10 @@ const collectMetadata = (source: MutableSource, line: string): void => {
   }
   const commit = COMMIT_RE.exec(line)?.[1];
   if (commit !== undefined) source.commit = commit;
+  const contentSha256 = CONTENT_SHA256_RE.exec(line)?.[1];
+  if (contentSha256 !== undefined) {
+    source.contentSha256 = contentSha256.toLowerCase();
+  }
 
   const watch = WATCH_RE.exec(line);
   if (watch?.[1] !== undefined && watch[2] !== undefined) {

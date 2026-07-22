@@ -5,7 +5,7 @@ Product-specific facts are pinned to the documentation snapshot below. The local
 ## Codex hooks
 
 - **URL:** https://learn.chatgpt.com/docs/hooks
-- **Last reviewed:** 2026-07-16
+- **Last reviewed:** 2026-07-22
 - **Used for:** `capabilities.md`, `onboarding.md`, `patterns.md`
 - **References:** references/capabilities.md, references/onboarding.md, references/patterns.md
 - **Aspects extracted:** Hook locations, config shapes, trust review, managed requirements, plugin hooks, concurrency, executing command handlers, skipped prompt/agent/async handlers, events, output schemas, and guardrail coverage.
@@ -14,16 +14,16 @@ Product-specific facts are pinned to the documentation snapshot below. The local
 
 - **URLs:**
   - https://learn.chatgpt.com/docs/plugins
-  - https://learn.chatgpt.com/docs/skills
-- **Last reviewed:** 2026-07-16
+  - https://learn.chatgpt.com/docs/skills-and-plugins
+- **Last reviewed:** 2026-07-22
 - **Used for:** `onboarding.md`, `patterns.md`
 - **References:** references/onboarding.md, references/patterns.md
 - **Aspects extracted:** Plugin installation, bundled skills and hooks, new-session activation, and the distinction between instructions and enforcement.
 
 ## Codex managed configuration
 
-- **URL:** https://learn.chatgpt.com/docs/managed-configuration
-- **Last reviewed:** 2026-07-16
+- **URL:** https://learn.chatgpt.com/docs/enterprise/managed-configuration
+- **Last reviewed:** 2026-07-22
 - **Used for:** `capabilities.md`, `onboarding.md`
 - **References:** references/capabilities.md, references/onboarding.md
 - **Aspects extracted:** Managed configuration and organizational control layers; native behavior remains subject to the hook release reference and runtime probes.
@@ -39,4 +39,4 @@ Product-specific facts are pinned to the documentation snapshot below. The local
 
 - **Provenance:** Repository-original integration of the source blocks above; these references combine multiple inputs or maintained conventions rather than one exclusive upstream
 - **References:** references/capabilities.md, references/onboarding.md, references/patterns.md
-- **Last reviewed:** 2026-07-16
+- **Last reviewed:** 2026-07-22

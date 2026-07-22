@@ -14,7 +14,8 @@
 
 - **URL:** https://hono.dev/llms-full.txt
 - **Version:** 4.0.0
-- **Last reviewed:** 2026-05-13
+- **Content SHA256:** 8df37b8acbf053d00a810f9bfcb1ae9cfddf2d68a984a2a111c6638d15a80d96
+- **Last reviewed:** 2026-07-22
 - **Used for:**
   - `SKILL.md` → all sections
   - All files under `references/`

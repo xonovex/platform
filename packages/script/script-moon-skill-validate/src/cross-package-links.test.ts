@@ -407,4 +407,45 @@ describe("checkSkillDependencies", () => {
       "skill packaging: Claude manifest in packages/skill/skill-renamed must point directly to ./renamed-guide",
     );
   });
+
+  it("rejects a dependent skill reference that substantially duplicates its dependency", () => {
+    const duplicated = Array.from(
+      {length: 40},
+      (_, index) =>
+        `shared concept phrase number ${String(index)} stays identical`,
+    ).join(" ");
+    const repo = makeRepo({
+      "packages/skill/skill-base/base-guide/SKILL.md": "# Base\n",
+      "packages/skill/skill-base/base-guide/references/concept.md": duplicated,
+      "packages/skill/skill-base/.claude-plugin/plugin.json": manifest(
+        "xonovex-skill-base",
+        [],
+        "claude",
+      ),
+      "packages/skill/skill-base/.codex-plugin/plugin.json":
+        manifest("xonovex-skill-base"),
+      "packages/skill/skill-child/child-guide/SKILL.md":
+        "# Child\nUse **base-guide**.\n",
+      "packages/skill/skill-child/child-guide/references/concept-copy.md":
+        duplicated,
+      "packages/skill/skill-child/.claude-plugin/plugin.json": manifest(
+        "xonovex-skill-child",
+        ["xonovex-skill-base"],
+        "claude",
+      ),
+      "packages/skill/skill-child/.codex-plugin/plugin.json": manifest(
+        "xonovex-skill-child",
+        ["xonovex-skill-base"],
+      ),
+    });
+    const report = makeSink();
+
+    checkSkillDependencies(repo, report);
+
+    expect(report.fails).toContainEqual(
+      expect.stringContaining(
+        "skill ownership: xonovex-skill-child child-guide/references/concept-copy.md duplicates xonovex-skill-base base-guide/references/concept.md",
+      ),
+    );
+  });
 });

@@ -54,7 +54,7 @@ export const selectEvalMatrix = ({entries, changedFiles, limit, offset}) => {
           path.startsWith(`packages/skill/${project}/`),
         ),
       );
-  return rotatedLimit(selected, limit, offset);
+  return selectAll ? rotatedLimit(selected, limit, offset) : selected;
 };
 
 const main = () => {

@@ -1,4 +1,5 @@
-import {execFileSync} from "node:child_process";
+import {execFileSync, spawnSync} from "node:child_process";
+import {createHash} from "node:crypto";
 import {
   mkdirSync,
   mkdtempSync,
@@ -7,7 +8,7 @@ import {
   writeFileSync,
 } from "node:fs";
 import {tmpdir} from "node:os";
-import {join} from "node:path";
+import {join, resolve} from "node:path";
 import {resolveExecutable} from "@xonovex/script-moon-common/executable";
 import {afterEach, describe, expect, it, vi} from "vitest";
 import {main} from "./audit.js";
@@ -17,6 +18,7 @@ describe("main", () => {
 
   afterEach(() => {
     vi.restoreAllMocks();
+    vi.unstubAllGlobals();
     for (const directory of temporaryDirectories) {
       rmSync(directory, {recursive: true, force: true});
     }
@@ -45,6 +47,7 @@ describe("main", () => {
 ## Primary source
 - **URL:** https://example.com/guide
 - **Version:** 2.4.0
+- **Content SHA256:** ${"a".repeat(64)}
 - **References:** all
 - **Last reviewed:** 2099-01-01
 `,
@@ -63,11 +66,77 @@ describe("main", () => {
           version: "2.4.0",
           commit: null,
           watch_count: 0,
+          content_sha256: "a".repeat(64),
+          drift_anchor_missing: false,
           review_max_age_days: 90,
         },
       ],
       problems: 0,
     });
+  });
+
+  it("keeps the shipped portable auditor aligned with the canonical schema", async () => {
+    const skill = skillDirectory(
+      "portable-parity-skill",
+      `# Sources
+
+## Versioned docs
+- **URLs:**
+  - https://example.com/one
+  - https://example.com/two
+- **Version:** 2.4.0
+- **Content SHA256:** ${"c".repeat(64)}
+- **References:** all
+- **Last reviewed:** 2099-01-01
+
+## Repository synthesis
+- **Provenance:** Repository-original guidance
+- **References:** all
+- **Last reviewed:** 2099-01-01
+`,
+    );
+    writeFileSync(join(skill, "references", "details.md"), "# Details\n");
+    const log = vi.spyOn(console, "log").mockImplementation(vi.fn());
+
+    const canonicalResult = await main([skill, "--json"]);
+    const canonical = JSON.parse(String(log.mock.calls[0]?.[0])) as {
+      problems: number;
+      source_count: number;
+      sources: readonly Record<string, unknown>[];
+      uncovered_refs: readonly string[];
+    };
+    const portable = resolve(
+      import.meta.dirname,
+      "../../../skill/skill-skill/skill-guide/scripts/audit-sources.py",
+    );
+    const portableResult = spawnSync("uv", ["run", portable, skill, "--json"], {
+      encoding: "utf8",
+    });
+    const portableReport = JSON.parse(
+      portableResult.stdout,
+    ) as typeof canonical;
+    const comparable = (report: typeof canonical) => ({
+      problems: report.problems,
+      source_count: report.source_count,
+      uncovered_refs: report.uncovered_refs,
+      sources: report.sources.map((source) => ({
+        title: source.title,
+        urls: source.urls,
+        provenance: source.provenance ?? null,
+        version: source.version,
+        content_sha256: source.content_sha256,
+        covers_all_references: source.covers_all_references,
+        reference_mapping_missing: source.reference_mapping_missing,
+        drift_anchor_missing: source.drift_anchor_missing,
+      })),
+    });
+
+    expect(canonicalResult).toBe(0);
+    expect(
+      portableResult.status,
+      `${portableResult.stdout}\n${portableResult.stderr}`,
+    ).toBe(0);
+    expect(comparable(portableReport)).toEqual(comparable(canonical));
   });
 
   it("uses the shorter review cadence for versioned sources", async () => {
@@ -78,6 +147,7 @@ describe("main", () => {
 ## Versioned source
 - **URL:** https://example.com/versioned
 - **Version:** 1.2.3
+- **Content SHA256:** ${"b".repeat(64)}
 - **References:** all
 - **Last reviewed:** 2026-05-13
 `,
@@ -117,6 +187,130 @@ describe("main", () => {
     expect(output).toContain("STALE");
     expect(output).toContain("MISSING REFERENCE MAPPING");
     expect(output).toContain("references/uncovered.md");
+  });
+
+  it("requires a drift anchor for versioned web documentation", async () => {
+    const skill = skillDirectory(
+      "unanchored-skill",
+      `# Sources
+
+## Versioned source
+- **URL:** https://example.com/versioned
+- **Version:** 1.2.3
+- **References:** all
+- **Last reviewed:** 2099-01-01
+`,
+    );
+    const log = vi.spyOn(console, "log").mockImplementation(vi.fn());
+
+    const result = await main([skill, "--json"]);
+
+    expect(result).toBe(1);
+    expect(JSON.parse(String(log.mock.calls[0]?.[0]))).toMatchObject({
+      problems: 1,
+      sources: [{drift_anchor_missing: true}],
+    });
+  });
+
+  it.each([401, 403, 429])(
+    "does not fail a live check solely because a source returns HTTP %i",
+    async (status) => {
+      const skill = skillDirectory(
+        "restricted-skill",
+        `# Sources
+
+## Restricted source
+- **URL:** https://example.com/restricted
+- **References:** all
+- **Last reviewed:** 2099-01-01
+`,
+      );
+      vi.stubGlobal(
+        "fetch",
+        vi.fn().mockResolvedValue(new Response("restricted", {status})),
+      );
+      const log = vi.spyOn(console, "log").mockImplementation(vi.fn());
+
+      const result = await main([skill, "--fetch", "--json"]);
+
+      expect(result).toBe(0);
+      expect(JSON.parse(String(log.mock.calls[0]?.[0]))).toMatchObject({
+        problems: 0,
+        sources: [
+          {fetches: [{status: "restricted", detail: `HTTP ${String(status)}`}]},
+        ],
+      });
+    },
+  );
+
+  it("retries a transient live-check error once", async () => {
+    const skill = skillDirectory(
+      "retry-skill",
+      `# Sources
+
+## Retry source
+- **URL:** https://example.com/retry
+- **References:** all
+- **Last reviewed:** 2099-01-01
+`,
+    );
+    const fetch = vi
+      .fn()
+      .mockResolvedValueOnce(new Response("unavailable", {status: 503}))
+      .mockResolvedValueOnce(new Response("available", {status: 200}));
+    vi.stubGlobal("fetch", fetch);
+    const log = vi.spyOn(console, "log").mockImplementation(vi.fn());
+
+    const result = await main([skill, "--fetch", "--json"]);
+
+    expect(result).toBe(0);
+    expect(fetch).toHaveBeenCalledTimes(2);
+    expect(JSON.parse(String(log.mock.calls[0]?.[0]))).toMatchObject({
+      problems: 0,
+      sources: [{fetches: [{status: "ok", detail: "HTTP 200"}]}],
+    });
+  });
+
+  it("verifies the ordered content digest for versioned web documentation", async () => {
+    const url = "https://example.com/versioned";
+    const bodyDigest = createHash("sha256").update("stable body").digest("hex");
+    const contentDigest = createHash("sha256")
+      .update(url)
+      .update("\0")
+      .update(bodyDigest)
+      .update("\n")
+      .digest("hex");
+    const skill = skillDirectory(
+      "snapshot-skill",
+      `# Sources
+
+## Versioned source
+- **URL:** ${url}
+- **Version:** 1.2.3
+- **Content SHA256:** ${contentDigest}
+- **References:** all
+- **Last reviewed:** 2099-01-01
+`,
+    );
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(new Response("stable body", {status: 200})),
+    );
+    const log = vi.spyOn(console, "log").mockImplementation(vi.fn());
+
+    const result = await main([skill, "--fetch", "--json"]);
+
+    expect(result).toBe(0);
+    expect(JSON.parse(String(log.mock.calls[0]?.[0]))).toMatchObject({
+      problems: 0,
+      sources: [
+        {
+          content_sha256: contentDigest,
+          fetched_content_sha256: contentDigest,
+          content_changed: false,
+        },
+      ],
+    });
   });
 
   it("marks a matching source as reviewed", async () => {

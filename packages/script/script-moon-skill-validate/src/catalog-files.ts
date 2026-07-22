@@ -9,7 +9,22 @@ const HTTP_URL_RE = /https?:\/\/\S+/i;
 const PROVENANCE_RE = /\*\*Provenance:\*\*\s*\S+/i;
 const REVIEWED_RE = /\*\*Last reviewed:\*\*\s*\d{4}-\d{2}-\d{2}/i;
 const VERSION_FIELD_RE = /\*\*Version:\*\*\s*\S+/i;
+const CONTENT_SHA256_FIELD_RE = /\*\*Content SHA256:\*\*\s*[0-9a-f]{64}/i;
+const CHECKOUT_FIELD_RE = /\*\*Checkout:\*\*\s*\S+/i;
+const COMMIT_FIELD_RE = /\*\*Commit:\*\*\s*[0-9a-f]{7,40}/i;
+const WATCH_FIELD_RE = /\*\*Watch:\*\*\s*\S+/i;
 const VERSIONED_DESCRIPTION_RE = /\b\d+(?:\.\d+){0,2}\+/;
+const UNSAFE_CREDENTIAL_PATTERNS: readonly [RegExp, string][] = [
+  [
+    /\becho\s+(?:["']?\$[A-Z_]*(?:TOKEN|KEY|PAT|SECRET|PASSWORD)["']?|<token>)\s*\|/i,
+    "pipes a secret through echo",
+  ],
+  [/<\s*token\.txt\b/i, "reads a secret from token.txt"],
+  [
+    /\bexport\s+[A-Z_]*(?:TOKEN|KEY|PAT|SECRET|PASSWORD)\s*=\s*(?!["']?\$)[^\s]+/i,
+    "assigns a secret in an export command",
+  ],
+];
 const GENERIC_TRIGGER_QUERY_RES = [
   /^Help me handle .+ correctly in this .+ task, including the edge cases that usually get missed\.$/i,
   /^I'm reviewing `[^`]+` in an? .+ project\. The happy path works, but .+ is unclear\./i,
@@ -274,8 +289,52 @@ const checkSources = (
       "catalog: version-pinned skill needs a Version field in SOURCES.md",
     );
   }
+  for (const block of text.split(/^##\s+/m).slice(1)) {
+    if (!VERSION_FIELD_RE.test(block) || !HTTP_URL_RE.test(block)) continue;
+    const hasContentSnapshot = CONTENT_SHA256_FIELD_RE.test(block);
+    const hasRepositoryDriftAnchor =
+      CHECKOUT_FIELD_RE.test(block) &&
+      COMMIT_FIELD_RE.test(block) &&
+      WATCH_FIELD_RE.test(block);
+    if (!hasContentSnapshot && !hasRepositoryDriftAnchor) {
+      const title = block.split(/\r?\n/, 1)[0]?.trim() || "unnamed source";
+      errors.push(
+        `catalog: versioned web source '${title}' needs Content SHA256 or Checkout + Commit + Watch drift fields`,
+      );
+    }
+  }
   if ((hasUrlProvenance || hasDeclaredProvenance) && REVIEWED_RE.test(text)) {
     passes.push("catalog: source provenance and review date are present");
+  }
+};
+
+const checkCredentialExamples = (
+  skillDir: string,
+  passes: string[],
+  errors: string[],
+): void => {
+  const skill = join(skillDir, "SKILL.md");
+  const files: [string, string][] = isFile(skill) ? [["SKILL.md", skill]] : [];
+  const references = join(skillDir, "references");
+  if (isDirectory(references)) {
+    for (const entry of readdirSync(references).toSorted()) {
+      const path = join(references, entry);
+      if (entry.endsWith(".md") && isFile(path)) {
+        files.push([`references/${entry}`, path]);
+      }
+    }
+  }
+  let unsafe = 0;
+  for (const [label, path] of files) {
+    const text = readFileSync(path, "utf8");
+    for (const [pattern, reason] of UNSAFE_CREDENTIAL_PATTERNS) {
+      if (!pattern.test(text)) continue;
+      unsafe += 1;
+      errors.push(`credentials: ${label} ${reason}`);
+    }
+  }
+  if (unsafe === 0) {
+    passes.push("credentials: examples avoid plaintext token anti-patterns");
   }
 };
 
@@ -337,6 +396,7 @@ export const checkCatalogFiles = (
   checkOutputEvals(skillDir, frontmatter.name, passes, errors);
   checkTriggerEvals(skillDir, passes, errors);
   checkSources(skillDir, frontmatter.description, passes, errors);
+  checkCredentialExamples(skillDir, passes, errors);
   checkScriptMetadata(skillDir, frontmatter, passes, errors);
   return {passes, errors};
 };

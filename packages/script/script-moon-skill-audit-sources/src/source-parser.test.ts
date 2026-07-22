@@ -110,4 +110,18 @@ describe("parseSources", () => {
 
     expect(source?.version).toBe("acli 1.3.22-stable");
   });
+
+  it("parses a web-content snapshot", () => {
+    const digest = "a".repeat(64);
+    const [source] = parseSources(`# Sources
+
+## Versioned docs
+- **URL:** https://example.com/docs
+- **Version:** 2.4.0
+- **Content SHA256:** ${digest}
+- **Last reviewed:** 2026-07-22
+`);
+
+    expect(source?.contentSha256).toBe(digest);
+  });
 });

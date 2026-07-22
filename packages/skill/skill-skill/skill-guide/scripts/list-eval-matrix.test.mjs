@@ -30,6 +30,19 @@ describe("selectEvalMatrix", () => {
     ).toEqual(entries.slice(0, 2));
   });
 
+  it("does not truncate directly changed skill packages", () => {
+    expect(
+      selectEvalMatrix({
+        entries,
+        changedFiles: entries.map(
+          ({project}) => `packages/skill/${project}/guide/SKILL.md`,
+        ),
+        limit: 2,
+        offset: 0,
+      }),
+    ).toEqual(entries);
+  });
+
   it("rotates bounded scheduled slices", () => {
     expect(
       selectEvalMatrix({
@@ -58,6 +71,10 @@ describe("selectEvalMatrix", () => {
       'if [[ "${GITHUB_EVENT_NAME}" == "pull_request" ]]',
     );
     expect(workflow).toContain("limit=8");
+    expect(workflow).toContain("github.event_name == 'schedule'");
+    expect(workflow).toContain(
+      "actions/attest@f7c74d28b9d84cb8768d0b8ca14a4bac6ef463e6",
+    );
     expect(workflow).toContain('offset="$(((10#$(date -u +%m) - 1) * 32))"');
     expect(workflow).toContain("-name invalid-run.json");
     expect(workflow).toContain("SKILL_ROUTING_OWNERS:");
