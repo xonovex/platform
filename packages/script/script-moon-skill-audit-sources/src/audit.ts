@@ -42,6 +42,7 @@ interface SourceReport {
   provenance: string | undefined;
   last_reviewed: string | null;
   age_days: number | null;
+  review_max_age_days: number;
   stale: boolean;
   refs: readonly string[];
   covers_all_references: boolean;
@@ -74,6 +75,7 @@ Usage:
                            SOURCES.md file directly
       --all [root]         audit every */SOURCES.md under root (default: cwd)
       --max-age DAYS       staleness threshold in days (default: 180)
+      --version-max-age D  shorter threshold for versioned sources (default: 90)
       --fetch              HTTP-check each URL still resolves
       --pull               fetch tags in each source's **Checkout:** repo first
       --mark-reviewed [T]  stamp 'Last reviewed' to today for sources whose title
@@ -312,6 +314,7 @@ const computeDrift = (
 const auditSkill = async (
   sourcesFile: string,
   maxAge: number,
+  versionMaxAge: number,
   doFetch: boolean,
   pull: boolean,
   today: Date,
@@ -328,7 +331,8 @@ const auditSkill = async (
   let problems = 0;
   for (const s of sources) {
     const age = s.reviewed ? daysBetween(today, s.reviewed) : null;
-    const stale = age !== null && age > maxAge;
+    const reviewMaxAge = s.version === undefined ? maxAge : versionMaxAge;
+    const stale = age !== null && age > reviewMaxAge;
     const referenceMappingMissing = !hasReferenceMapping(s);
     const dangling = [...s.refs].filter((r) => !existingRefs.has(r)).toSorted();
     for (const r of s.refs) covered.add(r);
@@ -339,6 +343,7 @@ const auditSkill = async (
       provenance: s.provenance,
       last_reviewed: s.reviewedRaw ?? null,
       age_days: age,
+      review_max_age_days: reviewMaxAge,
       stale,
       refs: [...s.refs].toSorted(),
       covers_all_references: s.coversAllReferences,
@@ -501,10 +506,15 @@ const printSource = (source: SourceReport): void => {
   printDrift(source);
 };
 
-const printTextReport = (report: SkillReport, maxAge: number): void => {
+const printTextReport = (
+  report: SkillReport,
+  maxAge: number,
+  versionMaxAge: number,
+): void => {
   console.log(`skill: ${report.skill}  (${report.sources_file})`);
   console.log(
-    `sources: ${String(report.source_count)}  max-age: ${String(maxAge)}d`,
+    `sources: ${String(report.source_count)}  max-age: ${String(maxAge)}d  ` +
+      `version-max-age: ${String(versionMaxAge)}d`,
   );
   for (const source of report.sources) printSource(source);
   if (report.uncovered_refs.length > 0) {
@@ -616,7 +626,14 @@ export const main = async (argv: readonly string[]): Promise<number> => {
   const reports: SkillReport[] = [];
   for (const sf of targets) {
     reports.push(
-      await auditSkill(sf, args.maxAge, args.fetch, args.pull, today),
+      await auditSkill(
+        sf,
+        args.maxAge,
+        args.versionMaxAge,
+        args.fetch,
+        args.pull,
+        today,
+      ),
     );
   }
   const totalProblems = reports.reduce((sum, r) => sum + r.problems, 0);
@@ -629,7 +646,7 @@ export const main = async (argv: readonly string[]): Promise<number> => {
       if (i) {
         console.log("\n" + "=".repeat(60));
       }
-      printTextReport(rep, args.maxAge);
+      printTextReport(rep, args.maxAge, args.versionMaxAge);
     }
     if (reports.length > 1) {
       const stale = reports.reduce(

@@ -128,8 +128,8 @@ export const buildTriggerClaudeArgs = (
     "--max-turns",
     "1",
     "--system-prompt",
-    "Decide only whether the available skill applies to the user request. " +
-      "If it applies, invoke Skill immediately. Otherwise reply with one short sentence. " +
+    "Decide which available skill best matches the user request. " +
+      "If one applies, invoke only that Skill immediately. Otherwise reply with one short sentence. " +
       "Do not perform the requested task.",
     "--tools",
     "Skill",

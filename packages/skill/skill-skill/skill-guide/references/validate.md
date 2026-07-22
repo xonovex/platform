@@ -6,7 +6,7 @@
 
 Read-only audit of a SKILL.md against the Agent Skills spec, project conventions, and authoring best practices. Reports pass/fail per check with line numbers.
 
-A reference implementation lives at [scripts/validate.py](../scripts/validate.py) (PEP 723 self-contained Python): `uv run scripts/validate.py <skill-dir>` runs all checks below and exits non-zero on errors.
+The catalog validator runs as `moon-skill-validate --strict <skill-dir>` and exits non-zero on errors or authoring warnings. A portable reference implementation lives at [scripts/validate.py](../scripts/validate.py) (PEP 723 self-contained Python).
 
 ## Core Workflow
 
@@ -50,7 +50,7 @@ A reference implementation lives at [scripts/validate.py](../scripts/validate.py
 
 ## Structural-Pattern Hints (soft signals)
 
-Soft warnings only — these patterns aid agent execution but aren't required. See [instruction-patterns.md](instruction-patterns.md).
+These patterns are advisory during local exploration and fail the repository's strict CI mode until resolved. See [instruction-patterns.md](instruction-patterns.md).
 
 - Multi-step workflow (>3 ordered steps) without a checklist (`- [ ]`) — consider adding one
 - Output-producing skill without an output template — consider adding one

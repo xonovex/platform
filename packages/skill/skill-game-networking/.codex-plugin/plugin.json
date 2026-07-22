@@ -5,6 +5,5 @@
   "author": {
     "name": "Xonovex"
   },
-  "skills": "./game-networking-guide",
-  "dependencies": ["xonovex-skill-data-model"]
+  "skills": "./game-networking-guide"
 }

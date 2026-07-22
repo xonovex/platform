@@ -42,3 +42,18 @@ tasks:
       cache: false
       runFromWorkspaceRoot: true
       runInCI: false
+  ci-routing:
+    script: >-
+      npx moon-skill-eval-routing packages/skill
+      --split all
+      --runs 1
+      --threshold 0.5
+      --batch-size 8
+      --max-budget-usd 0.05
+      --workspace ".skill-eval-results/routing/${SKILL_EVAL_HARNESS:-claude}"
+    deps:
+      - ~:ci-runtime
+    options:
+      cache: false
+      runFromWorkspaceRoot: true
+      runInCI: false

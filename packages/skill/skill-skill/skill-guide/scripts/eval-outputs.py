@@ -10,8 +10,11 @@ Usage:
         skill_name = bare ("git-commit") or plugin-namespaced ("myplugin:git-commit")
         iteration  = name for this run's workspace dir (default: auto "iteration-N")
 
-evals.json shape (either a bare array of evals, or {"skill_name", "evals": [...]}):
-    [
+evals.json shape:
+    {
+      "skill_name": "<skill-name>",
+      "tier": "aggressive | moderate | conservative",
+      "evals": [
       {
         "id": 1,
         "prompt": "<realistic user message>",
@@ -19,7 +22,8 @@ evals.json shape (either a bare array of evals, or {"skill_name", "evals": [...]
         "assertions": ["<verifiable check>", "..."],   # optional; falls back to expected_output
         "files": ["evals/files/input.csv"]             # optional; paths relative to evals.json
       }
-    ]
+      ]
+    }
 
 Options (flag overrides env; env keeps the loop/CI ergonomics):
     --runs N / RUNS=N                  runs per arm per eval (default: 1; maximum: 3)
@@ -56,7 +60,8 @@ Output:
     - Workspace files: <workspace>/<iteration>/eval-<id>/<arm>/{outputs/response.md,
       timing.json, grading.json}, plus <iteration>/benchmark.json.
 
-Exit code: 0 if with-skill mean pass rate exceeds without-skill, else 1.
+Exit code: 0 when the tier-aware absolute pass-rate, delta, and activation gates pass;
+1 for valid evidence below a quality gate; 2 for invalid evidence or configuration.
 
 Cross-platform: works wherever the `claude` CLI is installed (macOS / Linux / Windows).
 """
@@ -92,6 +97,14 @@ JUDGE_SYSTEM_PROMPT = (
     "return exactly the requested JSON."
 )
 MAX_OUTPUT_MODEL_CALLS = 24
+OUTPUT_GATE_POLICIES = {
+    "aggressive": {"minimum_with_skill_pass_rate": 0.75,
+                   "minimum_delta_pass_rate": 0.05},
+    "moderate": {"minimum_with_skill_pass_rate": 0.80,
+                 "minimum_delta_pass_rate": 0.05},
+    "conservative": {"minimum_with_skill_pass_rate": 0.90,
+                     "minimum_delta_pass_rate": 0.10},
+}
 CLAUDE_SKILL_PLUGIN_FIELDS = {
     "author", "dependencies", "description", "name", "skills", "version",
 }
@@ -171,7 +184,7 @@ def build_parser() -> argparse.ArgumentParser:
         description="Run output-quality evals against a skill: with-skill vs without-skill.",
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
-    p.add_argument("evals", help="path to evals.json (array, or {\"evals\": [...]})")
+    p.add_argument("evals", help="path to evals.json with skill_name, tier, and evals")
     p.add_argument(
         "skill_name",
         help="bare ('git-commit') or plugin-namespaced ('plugin:git-commit')",
@@ -615,6 +628,24 @@ def aggregate_arm(records: list[dict], arm: str, runs: int) -> dict:
     return block
 
 
+def evaluate_output_gate(
+    tier: str, with_skill_pass_rate: float, without_skill_pass_rate: float,
+    skill_trigger_rate: float,
+) -> dict:
+    policy = OUTPUT_GATE_POLICIES[tier]
+    checks = {
+        "with_skill_pass_rate": (
+            with_skill_pass_rate >= policy["minimum_with_skill_pass_rate"]
+        ),
+        "delta_pass_rate": (
+            with_skill_pass_rate - without_skill_pass_rate
+            >= policy["minimum_delta_pass_rate"]
+        ),
+        "skill_trigger_rate": skill_trigger_rate == 1.0,
+    }
+    return {"passed": all(checks.values()), "policy": policy, "checks": checks}
+
+
 def main(argv: list[str]) -> int:
     args = build_parser().parse_args(argv)
     evals_file = Path(args.evals)
@@ -633,7 +664,25 @@ def main(argv: list[str]) -> int:
     except json.JSONDecodeError as e:
         sys.stderr.write(f"Error: invalid JSON in {evals_file}: {e}\n")
         return 2
-    evals = data.get("evals", []) if isinstance(data, dict) else data
+    if not isinstance(data, dict):
+        sys.stderr.write(
+            f"Error: {evals_file} must contain skill_name, tier, and evals\n"
+        )
+        return 2
+    declared_skill_name = data.get("skill_name")
+    tier = data.get("tier")
+    if declared_skill_name != skill_name.rsplit(":", 1)[-1]:
+        sys.stderr.write(
+            f"Error: skill name mismatch: requested '{skill_name}' but evals declare "
+            f"'{declared_skill_name}'\n"
+        )
+        return 2
+    if tier not in OUTPUT_GATE_POLICIES:
+        sys.stderr.write(
+            "Error: tier must be aggressive, moderate, or conservative\n"
+        )
+        return 2
+    evals = data.get("evals", [])
     if not isinstance(evals, list) or not evals:
         sys.stderr.write(f"Error: {evals_file} has no evals\n")
         return 2
@@ -811,7 +860,7 @@ def main(argv: list[str]) -> int:
     with_block = aggregate_arm(records, "with_skill", runs)
     without_block = aggregate_arm(records, "without_skill", runs)
     benchmark = {
-        "skill": skill_name, "iteration": iteration,
+        "skill": skill_name, "tier": tier, "iteration": iteration,
         "runs_per_arm": runs, "eval_count": len(norm),
         "run_summary": {
             "with_skill": with_block, "without_skill": without_block,
@@ -825,6 +874,12 @@ def main(argv: list[str]) -> int:
             },
         },
     }
+    benchmark["quality_gate"] = evaluate_output_gate(
+        tier,
+        with_block["pass_rate"]["mean"],
+        without_block["pass_rate"]["mean"],
+        with_block.get("skill_trigger_rate", {}).get("mean", 0.0),
+    )
     benchmark_path.write_text(json.dumps(benchmark, indent=2), encoding="utf-8")
 
     delta = benchmark["run_summary"]["delta"]
@@ -835,9 +890,11 @@ def main(argv: list[str]) -> int:
         f"without_skill pass_rate: {without_block['pass_rate']['mean']}  "
         f"tokens: {without_block['tokens']['mean']}\n"
         f"delta pass_rate: {delta['pass_rate']}  tokens: {delta['tokens']}\n"
+        f"quality gate ({tier}): "
+        f"{'PASS' if benchmark['quality_gate']['passed'] else 'FAIL'}\n"
         f"benchmark: {benchmark_path}\n"
     )
-    return 0 if delta["pass_rate"] > 0 else 1
+    return 0 if benchmark["quality_gate"]["passed"] else 1
 
 
 if __name__ == "__main__":

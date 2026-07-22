@@ -35,7 +35,7 @@ If a trim surfaces a genuine defect (a rule that as written would mislead), fix 
 2. **Ablate** — verify the trim kept its value with an **ablation against the weakest model you deploy** — a stronger model hides value loss:
    - Diff the removed content (`git diff <pre-trim-ref> HEAD -- <skill>`); from the `-` lines list genuine knowledge-at-risk items (non-obvious facts, exact identifiers) — ignore filler.
    - For each, an eval whose correct answer needs that fact — the `evals.json` seed + `eval-outputs.py` runner in [evaluating-outputs.md](evaluating-outputs.md).
-   - Measure the **with-skill** arm against the _repo_ content, not the installed plugin: inject the trimmed `SKILL.md` + `references/` into the weakest model (e.g. `--append-system-prompt-file`) so uncommitted edits are what gets tested — `eval-outputs.py` resolves the installed plugin, so it verifies only released content.
+   - Measure the **with-skill** arm against the _repo_ content, not an installed release: pass the local plugin directory to `moon-skill-eval-outputs` so uncommitted `SKILL.md` and `references/` edits are what get tested.
    - Run with-skill vs without-skill on the weakest model: `without-skill` correct → already known, cut was safe; `with-skill` correct only → essential and kept; `with-skill` **wrong** → the trim removed a fact the skill no longer conveys → restore the exact text.
    - Restore only the flagged facts, then re-validate.
 

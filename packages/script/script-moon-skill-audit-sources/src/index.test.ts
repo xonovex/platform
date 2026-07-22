@@ -58,8 +58,42 @@ describe("main", () => {
     expect(JSON.parse(String(log.mock.calls[0]?.[0]))).toMatchObject({
       skill: "healthy-skill",
       source_count: 1,
-      sources: [{version: "2.4.0", commit: null, watch_count: 0}],
+      sources: [
+        {
+          version: "2.4.0",
+          commit: null,
+          watch_count: 0,
+          review_max_age_days: 90,
+        },
+      ],
       problems: 0,
+    });
+  });
+
+  it("uses the shorter review cadence for versioned sources", async () => {
+    const skill = skillDirectory(
+      "versioned-skill",
+      `# Sources
+
+## Versioned source
+- **URL:** https://example.com/versioned
+- **Version:** 1.2.3
+- **References:** all
+- **Last reviewed:** 2026-05-13
+`,
+    );
+    const log = vi.spyOn(console, "log").mockImplementation(vi.fn());
+
+    const result = await main([
+      skill,
+      "--max-age=180",
+      "--version-max-age=1",
+      "--json",
+    ]);
+
+    expect(result).toBe(1);
+    expect(JSON.parse(String(log.mock.calls[0]?.[0]))).toMatchObject({
+      sources: [{stale: true, review_max_age_days: 1}],
     });
   });
 

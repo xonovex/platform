@@ -1,10 +1,9 @@
 {
   "name": "xonovex-skill-plan",
   "version": "7.0.0",
-  "description": "Xonovex planning and read-only code-research skills",
+  "description": "Xonovex implementation-planning skills",
   "author": {
     "name": "Xonovex"
   },
-  "skills": "./plan-guide",
-  "dependencies": ["xonovex-skill-code-quality"]
+  "skills": "./plan-guide"
 }

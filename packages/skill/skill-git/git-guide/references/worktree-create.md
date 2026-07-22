@@ -20,11 +20,9 @@ git worktree add ../<worktree>-feature-<name> -b <worktree>/feature/<name> <sour
 git -C ../<worktree>-feature-<name> config branch.<branch>.mergeBackTo <source-branch>
 ```
 
-Optionally associate a plan via `git config branch.<branch>.plan <path>`.
-
 ## Gotchas
 
 - The `<worktree>-feature-<name>` dir pattern is what merge/abandon/cleanup detect — non-conforming names break the workflow
-- `branch.<branch>.mergeBackTo` and `branch.<branch>.plan` are custom keys this workflow sets/reads; git ignores them, no built-in behavior
+- `branch.<branch>.mergeBackTo` is a custom key this workflow sets and reads; Git ignores it and provides no built-in behavior
 - `mergeBackTo` is the only record of the source branch — without it `worktree-merge` can't find where to merge back
 - A branch can't be checked out in two worktrees at once — use a different source branch or move the existing worktree

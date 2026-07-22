@@ -38,7 +38,7 @@ Author, extract, merge, simplify, and validate Agent Skills following the Agent 
 
 ## Skill Structure
 
-- **SKILL.md** — frontmatter, essentials (3-7 bullets), Gotchas, one example, progressive disclosure links with load-when triggers
+- **SKILL.md** — frontmatter, essentials (3-7 bullets), Gotchas, progressive disclosure links with load-when triggers, and one compact example only when the default behavior or format is not already obvious
 - **references/\*.md** — statement, rationale, how to apply, examples, counter-examples — one topic per file; don't restate when/why to read the file itself (that lives in the SKILL.md list), though it may point to other references with their own "read when" triggers
 - **Long references** — a reference file >200 lines starts with a `## Contents` list so the agent sees its full scope on a partial read
 - **scripts/** (optional) — bundled executables for repeated work

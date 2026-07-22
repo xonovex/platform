@@ -26,12 +26,7 @@ description: "Use when {writing | reviewing | editing | scaffolding} {Tech} {sco
 - {Non-obvious env-specific fact #2}
 - {Common mistake to avoid, with the one-line reason}
 
-## Example
-
-```{language}
-// Representative idiomatic code showing the default approach
-{code}
-```
+<!-- Add a compact Example section only when the default behavior or format is non-obvious. -->
 
 ## Progressive Disclosure
 

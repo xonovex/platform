@@ -366,7 +366,7 @@
     {
       "name": "xonovex-skill-plan",
       "source": "./packages/skill/skill-plan",
-      "description": "Xonovex planning and read-only code-research skills"
+      "description": "Xonovex implementation-planning skills"
     },
     {
       "name": "xonovex-skill-presentation",

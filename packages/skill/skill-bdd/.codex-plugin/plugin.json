@@ -5,10 +5,5 @@
   "author": {
     "name": "Xonovex"
   },
-  "skills": "./bdd-guide",
-  "dependencies": [
-    "xonovex-skill-user-stories",
-    "xonovex-skill-testing",
-    "xonovex-skill-ddd"
-  ]
+  "skills": "./bdd-guide"
 }

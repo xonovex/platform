@@ -17,10 +17,9 @@ Validate one exact workspace and merge it into one exact destination while prese
 5. Preview the final effect. Merge only with exact-scope authorization, and remove the
    source only after success when removal was explicit.
 
-For a Git worktree, verify the worktree and branch relationship, require
-`branch.<branch>.mergeBackTo`, reject a mismatch with the selected destination, fetch,
-rebase the feature branch onto the current destination, and then merge. Never remove
-the worktree after a failed validation, rebase, or merge.
+Provider-specific update, conflict, and merge mechanics belong to the selected
+capability. This operation owns the validation boundary, exact authorization, failure
+preservation, and optional post-success removal.
 
 ## Error handling
 

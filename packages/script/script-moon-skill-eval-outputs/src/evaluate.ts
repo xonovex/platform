@@ -6,6 +6,7 @@ import {
 import {runJob, type RunContext} from "./output-process.js";
 import {aggregateArm, fmean, round, type JobRecord} from "./output-results.js";
 import {
+  evaluateOutputGate,
   findEvaluationInfrastructureFailures,
   MAX_OUTPUT_MODEL_CALLS,
   outputModelCallCount,
@@ -200,6 +201,7 @@ export const main = async (argv: readonly string[]): Promise<number> => {
   const withoutBlock = aggregateArm(records, "without_skill", config.runs);
   const benchmark = {
     skill: config.skillName,
+    tier: config.tier,
     harness: config.harness,
     model: config.model || null,
     judge_model: config.judgeModel || null,
@@ -221,6 +223,12 @@ export const main = async (argv: readonly string[]): Promise<number> => {
         ),
       },
     },
+    quality_gate: evaluateOutputGate(
+      config.tier,
+      withBlock.pass_rate.mean,
+      withoutBlock.pass_rate.mean,
+      withBlock.skill_trigger_rate?.mean ?? 0,
+    ),
   };
   writeFileSync(config.benchmarkPath, JSON.stringify(benchmark, null, 2), {
     encoding: "utf8",
@@ -234,7 +242,8 @@ export const main = async (argv: readonly string[]): Promise<number> => {
       `without_skill pass_rate: ${String(withoutBlock.pass_rate.mean)}  ` +
       `tokens: ${String(withoutBlock.tokens.mean)}\n` +
       `delta pass_rate: ${String(delta.pass_rate)}  tokens: ${String(delta.tokens)}\n` +
+      `quality gate (${config.tier}): ${benchmark.quality_gate.passed ? "PASS" : "FAIL"}\n` +
       `benchmark: ${config.benchmarkPath}\n`,
   );
-  return delta.pass_rate > 0 ? 0 : 1;
+  return benchmark.quality_gate.passed ? 0 : 1;
 };

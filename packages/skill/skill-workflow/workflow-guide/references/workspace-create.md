@@ -17,10 +17,9 @@ Create one isolated workspace at an explicit target from an exact source, preser
 5. Record the source relationship in provider-native metadata when supported and
    return the workspace locator and revision.
 
-For a Git worktree, require an explicit branch, verify the source and branch resolve,
-reject an existing target or branch checked out elsewhere, use `git worktree add`, and
-record `branch.<branch>.mergeBackTo`. Do not associate a plan, infer a lifecycle stage,
-or derive status from either.
+Provider-specific workspace mechanics and metadata belong to the selected capability.
+This operation owns the source/target contract, safety boundary, and returned locator;
+it does not restate provider commands or unrelated planning metadata.
 
 ## Error handling
 

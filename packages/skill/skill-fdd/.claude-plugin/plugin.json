@@ -5,6 +5,5 @@
   "author": {
     "name": "Xonovex"
   },
-  "skills": ["./fdd-guide"],
-  "dependencies": ["xonovex-skill-ddd", "xonovex-skill-user-stories"]
+  "skills": ["./fdd-guide"]
 }

@@ -40,16 +40,6 @@
     "split": "validation"
   },
   {
-    "query": "Audit packages/worker for weak error handling and validation before we plan hardening work; grade findings by severity and make no edits.",
-    "should_trigger": true,
-    "split": "validation"
-  },
-  {
-    "query": "Inventory and group the TODO and FIXME comments under packages/agent so we can decide what belongs in a cleanup plan.",
-    "should_trigger": true,
-    "split": "validation"
-  },
-  {
     "query": "Design the onboarding journey and responsive wireframes for the new account setup experience.",
     "rationale": "UX design is outside the planning skill boundary",
     "should_trigger": false,
@@ -83,6 +73,18 @@
     "query": "Fix the null pointer crash in packages/cache/src/store.ts and add a regression test.",
     "should_trigger": false,
     "split": "train"
+  },
+  {
+    "query": "Audit packages/worker for weak error handling and validation before we plan hardening work; grade findings by severity and make no edits.",
+    "rationale": "General read-only code-quality audit without an explicit planning-research deliverable",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Inventory and group the TODO and FIXME comments under packages/agent so we can decide what belongs in a cleanup plan.",
+    "rationale": "TODO inventory is a code-quality detector, not a planning operation",
+    "should_trigger": false,
+    "split": "validation"
   },
   {
     "query": "Choose between Kafka and NATS for event delivery and record an architecture decision with the final outcome.",

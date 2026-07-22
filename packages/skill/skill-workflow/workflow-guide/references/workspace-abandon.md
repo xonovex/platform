@@ -17,9 +17,9 @@ Stop using one explicit workspace, record why, and preserve partial work and rec
 5. Keep the workspace by default. Remove the workspace or native reference only after
    exact-scope authorization; never broaden the target.
 
-For a Git worktree, use `git worktree remove` rather than deleting its directory. Never
-force-remove dirty state. Delete a branch only when explicitly selected, preserving a
-snapshot or recovery revision first when requested. Do not read or update a plan.
+Provider-specific snapshot, removal, and reference commands belong to the selected
+capability. This operation owns the abandonment record, recovery boundary, and exact
+authorization for optional removal.
 
 ## Error handling
 

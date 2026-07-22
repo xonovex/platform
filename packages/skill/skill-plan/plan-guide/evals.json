@@ -65,14 +65,6 @@
         "Every criterion receives an independent pass, fail, or blocked result with reproducible evidence and freshness",
         "The operation remains read-only and does not mutate status, claim approval, or treat green tests as sufficient by themselves"
       ]
-    },
-    {
-      "id": 9,
-      "prompt": "Audit packages/worker for hardening opportunities before planning changes. Focus on validation and error handling, make no edits, and grade actionable findings by severity.",
-      "assertions": [
-        "The audit loads the applicable code-quality capability and grounds categorized findings in exact code evidence",
-        "The report is read-only, distinguishes findings from recommendations, and stops without implementing changes"
-      ]
     }
   ]
 }

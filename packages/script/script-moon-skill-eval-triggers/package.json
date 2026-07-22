@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "bin": {
+    "moon-skill-eval-routing": "./dist/src/routing-index.js",
     "moon-skill-eval-triggers": "./dist/src/index.js"
   },
   "dependencies": {

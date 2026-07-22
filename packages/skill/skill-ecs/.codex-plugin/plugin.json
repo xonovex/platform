@@ -5,6 +5,5 @@
   "author": {
     "name": "Xonovex"
   },
-  "skills": "./ecs-guide",
-  "dependencies": ["xonovex-skill-data-oriented-design"]
+  "skills": "./ecs-guide"
 }

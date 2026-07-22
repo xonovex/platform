@@ -30,6 +30,18 @@
     "rationale": "simplify: unused dependencies, read-only"
   },
   {
+    "query": "Audit packages/worker for weak error handling and validation before we plan hardening work; grade findings by severity and make no edits.",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "read-only hardening audit remains code-quality work even when it may inform a later plan"
+  },
+  {
+    "query": "Inventory and group the TODO and FIXME comments under packages/agent so we can decide what belongs in a cleanup plan.",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "read-only TODO and FIXME cleanup inventory"
+  },
+  {
     "query": "write a plan to refactor the auth module over the next sprint",
     "should_trigger": false,
     "split": "train",

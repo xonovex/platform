@@ -103,6 +103,45 @@ describe("checkCodexTriggered", () => {
     expect(outcome).toEqual({triggered: true, error: null});
   });
 
+  it("stages multiple candidate guides while signaling only the target", async () => {
+    const target = mkdtempSync(join(tmpdir(), "codex-trigger-target-"));
+    const competitor = mkdtempSync(join(tmpdir(), "codex-trigger-competitor-"));
+    temporaryDirectories.push(target, competitor);
+    writeFileSync(
+      join(target, "SKILL.md"),
+      "---\nname: target-guide\ndescription: Use for targets.\n---\n",
+    );
+    writeFileSync(
+      join(competitor, "SKILL.md"),
+      "---\nname: competitor-guide\ndescription: Use for competitors.\n---\n",
+    );
+
+    const outcome = await checkCodexTriggered({
+      args: [
+        "--eval",
+        String.raw`
+const {existsSync, readFileSync} = require("node:fs");
+const target = ".agents/skills/target-guide/SKILL.md";
+const competitor = ".agents/skills/competitor-guide/SKILL.md";
+const passed = existsSync(target) && existsSync(competitor) &&
+  readFileSync(target, "utf8").includes("XONOVEX_SKILL_TRIGGERED") &&
+  !readFileSync(competitor, "utf8").includes("XONOVEX_SKILL_TRIGGERED");
+console.log(JSON.stringify({type:"item.completed",item:{type:"agent_message",text:passed ? "XONOVEX_SKILL_TRIGGERED" : "NOT_APPLICABLE"}}));
+`,
+      ],
+      executable: process.execPath,
+      guideDirectory: target,
+      query: "target query",
+      shortName: "target-guide",
+      candidateGuides: [
+        {guideDirectory: target, shortName: "target-guide"},
+        {guideDirectory: competitor, shortName: "competitor-guide"},
+      ],
+    });
+
+    expect(outcome).toEqual({triggered: true, error: null});
+  });
+
   it("returns a clean negative result for malformed and nonmatching output", async () => {
     const outcome = await runCodexNode(`
 console.log("not json");

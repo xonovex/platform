@@ -1,18 +1,18 @@
 ---
 name: plan-guide
-description: "Use when researching, creating, reviewing, revising, expanding, continuing, updating, or validating implementation plans, or when auditing code for hardening, simplification, alignment, shared extraction, templates, or TODO inventory. Triggers on plan and subplan work, plan-driven implementation, codebase research for future work, and read-only code-quality analysis, even when the user doesn't say 'plan'."
+description: "Use when researching, creating, critiquing, revising, expanding, continuing, updating, or validating an implementation plan. Triggers on plan or subplan work, plan-driven implementation, codebase research explicitly intended to support a future plan, success-criteria validation, and resuming work from a plan reference, even when the user doesn't say 'plan'."
 ---
 
-# Planning and Code-Research Guidelines
+# Implementation Planning Guidelines
 
-Provide planning and code-research procedures selected by a caller or generic operation. This skill owns the planning behavior, not invocation, lifecycle governance, or persistence.
+Provide implementation-planning procedures selected by a caller or generic operation. This skill owns planning behavior and planning-oriented research, not general code-quality audits, invocation, lifecycle governance, or persistence.
 
 ## Core Principles
 
 - **Explicit subjects** — accept an inline plan or an opaque provider-native reference plus an optional native revision
 - **Provider-owned references** — let a selected provider resolve, version, relate, or persist native resources; otherwise return inline results
 - **Research first** — ground plans in codebase evidence, constraints, uncertainty, and relevant external sources
-- **Read-only analysis** — research, audits, critique, and validation report findings without changing their subjects; only continuation implements planned work
+- **Read-only analysis** — planning research, critique, and validation report findings without changing their subjects; only continuation implements planned work
 - **One requested operation** — research, create, critique, revise, expand, continue, update, or validate without silently performing another operation
 - **Skills to consult** — plans name applicable implementation capabilities, and continuation loads them before editing
 - **Evidence-based validation** — check explicit success criteria and Definition of Done evidence, not merely command exit codes
@@ -45,7 +45,7 @@ Provide planning and code-research procedures selected by a caller or generic op
 
 ### Planning
 
-- Read [references/plan-research.md](references/plan-research.md) - Load when researching codebase and external evidence for a future plan, or running a read-only code-quality audit
+- Read [references/plan-research.md](references/plan-research.md) - Load when researching codebase and external evidence explicitly for a future plan
 - Read [references/plan-create.md](references/plan-create.md) - Load when authoring a high-level implementation plan from explicit inputs
 - Read [references/plan-critique.md](references/plan-critique.md) - Load when independently stress-testing an exact plan without changing it
 - Read [references/plan-revise.md](references/plan-revise.md) - Load when applying explicit feedback or annotations to a plan
@@ -53,12 +53,3 @@ Provide planning and code-research procedures selected by a caller or generic op
 - Read [references/plan-continue.md](references/plan-continue.md) - Load when resuming implementation from an existing plan
 - Read [references/plan-update.md](references/plan-update.md) - Load when refreshing a plan with current progress and validation evidence
 - Read [references/plan-validate.md](references/plan-validate.md) - Load when checking a plan's success criteria and Definition of Done without mutation
-
-### Code research
-
-- Read [references/code-barrels-remove.md](references/code-barrels-remove.md) - Load when analyzing barrel exports for removal
-- Read [references/code-comments-remove.md](references/code-comments-remove.md) - Load when identifying non-essential comments
-- Read [references/code-shared-extract.md](references/code-shared-extract.md) - Load when finding duplicated patterns to extract
-- Read [references/code-template-extract.md](references/code-template-extract.md) - Load when creating reusable templates from existing code
-- Read [references/code-template-scaffold.md](references/code-template-scaffold.md) - Load when generating new code from templates
-- Read [references/todos.md](references/todos.md) - Load when scanning and grouping TODO comments

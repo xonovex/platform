@@ -5,6 +5,5 @@
   "author": {
     "name": "Xonovex"
   },
-  "skills": ["./gpu-rendering-guide"],
-  "dependencies": ["xonovex-skill-memory-management"]
+  "skills": ["./gpu-rendering-guide"]
 }

@@ -35,7 +35,7 @@ These belong **in the test queries**, not in the description itself. Generic que
 - `trigger_rate = triggers / runs`
 - Should-trigger passes if rate ≥0.5; should-not-trigger passes if rate <0.5
 - Detect triggering via the harness's tool-call log (varies by harness)
-- Repository runner: `npx moon-skill-eval-triggers <queries.json> <skill-name> --harness claude|codex`. The Claude adapter loads only the target local plugin and terminates on the matching Skill call. The Codex adapter stages only the target under an isolated `.agents/skills`, ignores inherited configuration and rules, uses an ephemeral read-only run, and detects a signal that exists only in the activated skill body. The bundled [scripts/eval-triggers.py](../scripts/eval-triggers.py) remains the portable Claude reference implementation.
+- Repository target runner: `npx moon-skill-eval-triggers <queries.json> <skill-name> --harness claude|codex`. It isolates one target for description recall and precision. Catalog routing runner: `npx moon-skill-eval-routing packages/skill --split all --harness claude|codex`. It finds queries with one positive owner and shared negative near-misses, loads those skills together, and passes only when the owner wins. The Claude adapter uses local plugins; the Codex adapter stages only the selected candidate guides under an isolated `.agents/skills`, ignores inherited configuration and rules, and uses an ephemeral read-only run. The bundled [scripts/eval-triggers.py](../scripts/eval-triggers.py) remains the portable target-only Claude reference implementation.
 - **Cost and mutation control** — a run where the skill _doesn't_ fire would otherwise execute the whole task. The runner disables inherited settings, MCP, persistence, Chrome, and every tool except `Skill`; limits each run to one turn, 60 seconds, 2,000 response characters, and at most $0.05; limits one invocation to 24 model runs; and never retries. Use `--runs 1` on `train` while iterating.
 - Treat timeout, cap exhaustion, output-limit, process failure, or a missing target skill as invalid infrastructure (`exit 2`), never as a negative routing result.
 
@@ -58,6 +58,7 @@ These belong **in the test queries**, not in the description itself. Generic que
 4. Repeat until train passes or improvement plateaus (~5 iterations typically enough)
 5. Pick the iteration with the best **validation** pass rate (may not be the last)
 6. Sanity-check with 5-10 fresh queries never seen during optimization
+7. Run catalog routing so target-only gains do not create a sibling-skill ranking regression
 
 ## Gotchas
 
@@ -65,3 +66,4 @@ These belong **in the test queries**, not in the description itself. Generic que
 - A description that scores perfectly on train but poorly on validation is overfit; pick an earlier iteration instead
 - Trigger rate isn't binary — a query that triggers 1/3 of the time still indicates instability; widen the eval set or tighten the description
 - Stopping the run early once outcome is clear cuts cost — many harnesses let you abort once the skill is or isn't invoked
+- Target-only perfection can still lose when sibling descriptions are present — catalog routing is the coexistence gate

@@ -5,6 +5,5 @@
   "author": {
     "name": "Xonovex"
   },
-  "skills": ["./code-review-guide"],
-  "dependencies": ["xonovex-skill-code-quality"]
+  "skills": ["./code-review-guide"]
 }

@@ -1,6 +1,6 @@
 ---
 name: code-quality-guide
-description: "Use when auditing existing code for quality WITHOUT changing it — a read-only pass that finds smells, grades them by severity, and routes each to its owner. Triggers on robustness / hardening (any-types, missing validation, swallowed errors, logging), duplication / dead code / over-abstraction / complexity, magic numbers, or a code-smell audit ('find issues in', 'is this robust', 'remove dead code', 'audit this module'). A smell catalog maps each smell to its owner — even when the user doesn't say 'audit' or 'code quality'."
+description: "Use when auditing existing code for quality WITHOUT changing it — a read-only pass that finds smells, grades them by severity, and routes each to its owner. Triggers on robustness or hardening, duplication, dead code, over-abstraction, complexity, magic numbers, inconsistent implementations, barrel exports, redundant comments, shared-extraction candidates, TODO/FIXME inventory, or a code-smell audit, even when the user doesn't say 'audit' or 'code quality'."
 ---
 
 # Code-Quality Audit
@@ -12,6 +12,7 @@ A read-only pass over existing code: find smells, grade them by severity, report
 - **Read the project's own standards first** — `AGENTS.md` / `POLICY.md` / linked guidelines and the linter config decide what counts as a violation, not generic best-practice
 - **Robustness is this skill's own dimension** — type safety, validation, error handling, logging at boundaries, complexity, see [references/robustness.md](references/robustness.md)
 - **Route every other smell to its owner** — the catalog maps each smell to a detector signal and the skill that owns it, see [references/smell-catalog.md](references/smell-catalog.md)
+- **Keep cleanup inventories read-only** — detect barrels, redundant comments, shared-extraction candidates, and TODO clusters without applying changes, see [references/cleanup-inventories.md](references/cleanup-inventories.md)
 
 ## Gotchas
 
@@ -26,3 +27,4 @@ A read-only pass over existing code: find smells, grade them by severity, report
 
 - Read [references/robustness.md](references/robustness.md) - Load when auditing robustness: type safety, validation, error handling, logging, complexity
 - Read [references/smell-catalog.md](references/smell-catalog.md) - Load when mapping a smell to its detector signal and owning skill (oop-guide / connascence-guide / here)
+- Read [references/cleanup-inventories.md](references/cleanup-inventories.md) - Load when inventorying barrels, redundant comments, duplicated shared candidates, or TODO/FIXME clusters

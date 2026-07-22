@@ -573,6 +573,7 @@ const renderReport = (
   report: Report,
   skillPath: string,
   skillDir: string,
+  strict: boolean,
 ): number => {
   console.log(`Validation: ${skillPath}`);
   console.log(`Skill dir: ${skillDir}`);
@@ -597,6 +598,10 @@ const renderReport = (
     return 1;
   }
   if (nWarn > 0) {
+    if (strict) {
+      console.log(`Result: FAIL (${String(nWarn)} warning(s) in strict mode)`);
+      return 1;
+    }
     console.log(`Result: PASS with ${String(nWarn)} warning(s)`);
     return 0;
   }
@@ -605,7 +610,7 @@ const renderReport = (
 };
 
 const HELP_TEXT = [
-  "usage: moon-skill-validate [-h] [target]",
+  "usage: moon-skill-validate [-h] [--strict] [target]",
   "",
   "Validate a SKILL.md against the Agent Skills spec and authoring best practices.",
   "",
@@ -614,6 +619,7 @@ const HELP_TEXT = [
   "",
   "options:",
   "  -h, --help  show this help message and exit",
+  "  --strict     treat authoring warnings as validation failures",
 ].join("\n");
 
 export const main = (argv: readonly string[]): number => {
@@ -621,6 +627,15 @@ export const main = (argv: readonly string[]): number => {
     console.log(HELP_TEXT);
     return 0;
   }
+
+  const unknownOption = argv.find(
+    (argument) => argument.startsWith("-") && argument !== "--strict",
+  );
+  if (unknownOption !== undefined) {
+    process.stderr.write(`Error: unrecognized argument: ${unknownOption}\n`);
+    return 2;
+  }
+  const strict = argv.includes("--strict");
 
   // main validates the current directory when no positional target is supplied.
   const positional = argv.find((a) => !a.startsWith("-"));
@@ -654,5 +669,5 @@ export const main = (argv: readonly string[]): number => {
   for (const pass of catalogReport.passes) report.addPass(pass);
   for (const error of catalogReport.errors) report.addFail(error);
 
-  return renderReport(report, skillPath, skillDir);
+  return renderReport(report, skillPath, skillDir, strict);
 };

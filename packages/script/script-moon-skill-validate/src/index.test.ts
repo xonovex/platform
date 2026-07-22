@@ -20,6 +20,11 @@ describe("skill validator entrypoints", () => {
     expect(validateSkill(["--help"])).toBe(0);
   });
 
+  it("rejects unknown validator options", () => {
+    vi.spyOn(process.stderr, "write").mockImplementation(() => true);
+    expect(validateSkill(["--unknown"])).toBe(2);
+  });
+
   it("renders link-validator help without scanning the repository", () => {
     expect(validateLinks(["--help"])).toBe(0);
   });
@@ -31,7 +36,7 @@ describe("skill validator entrypoints", () => {
     );
     vi.spyOn(console, "log").mockImplementation(() => {});
 
-    const result = validateSkill([skill]);
+    const result = validateSkill(["--strict", skill]);
 
     expect(result).toBe(0);
   });

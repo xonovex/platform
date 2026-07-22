@@ -1,8 +1,8 @@
 # Sources
 
 The operation model is repository-authored. External sources support provider
-separation and Git workspace mechanics; they do not define a universal lifecycle or
-provider-neutral identifier format.
+separation; they do not define a universal lifecycle or provider-neutral identifier
+format.
 
 ## Repository-authored symmetric operation contract
 
@@ -21,12 +21,3 @@ provider-neutral identifier format.
 - **Used for:** `references/composition.md`, `references/provider-native-references.md`
 - **Aspects extracted:** Separation of operation semantics from technology-specific
   provider adapters and effects.
-
-## Git worktree documentation
-
-- **URL:** https://git-scm.com/docs/git-worktree
-- **Last reviewed:** 2026-07-21
-- **Used for:** `references/workspace-create.md`, `references/workspace-merge.md`,
-  `references/workspace-abandon.md`, `references/workspace-cleanup.md`
-- **Aspects extracted:** Worktree creation, listing, locking, removal, and pruning
-  mechanics. The workflow safety and confirmation rules are repository-authored.

@@ -15,7 +15,7 @@ This is about **whether the outputs are good once the skill activates** — not 
 - **Assertions** — specific, binary PASS/FAIL checks the judge grades against
 - **Files** (optional) — input artifacts the skill needs
 
-Store the seed as `evals.json` at the guide root (next to `SKILL.md`) — the path `eval-outputs.py` is pointed at; optional input artifacts go in `evals/files/`. Record `tier` (`eval-outputs.py` ignores the extra key):
+Store the seed as `evals.json` at the guide root (next to `SKILL.md`); optional input artifacts go in `evals/files/`. `skill_name` and `tier` are required inputs to the repository runner:
 
 ```json
 {
@@ -39,9 +39,9 @@ Keep this seed committed per skill. "What the model already knows" is model-spec
 
 ## Automated Runner
 
-The repository runner `npx moon-skill-eval-outputs <evals.json> <skill-name> --harness claude|codex` runs the loop below. Each eval gets an activated arm with the exact skill explicitly invoked and a baseline arm without it. Claude uses isolated plugin loading and blocks the Skill tool in the baseline. Codex uses separate ephemeral homes, stages only the target skill in the activated home, and runs generation plus judging in a read-only sandbox with inherited configuration and rules ignored. Outputs are graded by a reference-guided judge in the same harness (binary per assertion, evidence required); failed generations are not judged, and a hard 24-model-call ceiling requires bounded batches. Results land in the workspace layout and `benchmark.json`. The bundled `scripts/eval-outputs.py` remains the portable Claude reference implementation. Do the manual loop when you need human grading or file-producing skills the runner doesn't capture.
+The repository runner `npx moon-skill-eval-outputs <evals.json> <skill-name> --harness claude|codex` runs the loop below. Each eval gets repeated activated and baseline arms. Claude uses isolated plugin loading and blocks the Skill tool in the baseline. Codex uses separate ephemeral homes, stages only the target skill in the activated home, and runs generation plus judging in a read-only sandbox with inherited configuration and rules ignored. Outputs are graded by a reference-guided judge in the same harness (binary per assertion, evidence required); failed generations are not judged, and a hard 24-model-call ceiling requires bounded batches. Results land in the workspace layout and `benchmark.json`. The bundled `scripts/eval-outputs.py` remains the portable Claude reference implementation. Do the manual loop when you need human grading or file-producing skills the runner doesn't capture.
 
-The runner refuses to publish a benchmark when any generation/judge call times out, exhausts its budget, exits unsuccessfully, returns unparseable grading, or fails to expose the target in an activated arm. It removes a stale `benchmark.json`, writes `invalid-run.json`, and exits `2`; valid negative or zero deltas remain real quality results and exit `1`.
+The runner refuses to publish a benchmark when any generation/judge call times out, exhausts its budget, exits unsuccessfully, returns unparseable grading, or fails to expose the target in an activated arm. It removes a stale `benchmark.json`, writes `invalid-run.json`, and exits `2`. Valid evidence exits `0` only when the declared tier's absolute with-skill rate, minimum delta, and full activation gates pass; otherwise it exits `1`. Aggressive and moderate tiers require at least 0.75/0.80 absolute pass rate and 0.05 delta; conservative requires 0.90 and 0.10.
 
 ## Designing Prompts
 
@@ -113,11 +113,13 @@ Rule: programmatically verifiable, specific, observable. Not everything needs an
 
 ```json
 {
+  "tier": "moderate",
   "run_summary": {
     "with_skill": {"pass_rate": {"mean": 0.83}, "tokens": {"mean": 3800}},
     "without_skill": {"pass_rate": {"mean": 0.33}, "tokens": {"mean": 2100}},
     "delta": {"pass_rate": 0.5, "tokens": 1700}
-  }
+  },
+  "quality_gate": {"passed": true}
 }
 ```
 
@@ -158,6 +160,7 @@ Then revise. Loop: propose → apply → re-run → grade → review.
 ## Gotchas
 
 - `stddev` only meaningful with multiple runs per case — ignore in tiny test sets
+- One run cannot establish reliability — CI uses at least two runs per arm and records variance when multiple results exist
 - Token-savings count as a regression even with the same pass rate — track both
 - Test cases written before first run often test the wrong thing; revise after seeing outputs
 - Don't add narrow patches for specific failing prompts — that's overfit

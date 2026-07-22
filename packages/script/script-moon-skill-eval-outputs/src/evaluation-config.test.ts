@@ -17,6 +17,12 @@ const validEvaluation = (id: string | number = 1) => ({
   files: [],
 });
 
+const evalFile = (evals: readonly unknown[], skillName = "test-skill") => ({
+  skill_name: skillName,
+  tier: "moderate",
+  evals,
+});
+
 type EvaluationConfigResult = ReturnType<typeof resolveEvaluationConfig>;
 
 const successfulConfig = (result: EvaluationConfigResult): EvaluationConfig => {
@@ -47,7 +53,7 @@ describe("evaluation configuration", () => {
     );
     writeFileSync(
       join(directory, "evals.json"),
-      JSON.stringify([validEvaluation()]),
+      JSON.stringify(evalFile([validEvaluation()])),
     );
   });
 
@@ -111,6 +117,10 @@ describe("evaluation configuration", () => {
   });
 
   it("honors CLI options and explicit positional values", () => {
+    writeFileSync(
+      join(directory, "evals.json"),
+      JSON.stringify(evalFile([validEvaluation()], "explicit-skill")),
+    );
     const config = successfulConfig(
       resolveConfig([
         "--runs",
@@ -129,6 +139,7 @@ describe("evaluation configuration", () => {
 
     expect(config).toMatchObject({
       skillName: "explicit-skill",
+      tier: "moderate",
       iteration: "iteration-4",
       cwd: "run-here",
       model: "cli-model",
@@ -152,7 +163,7 @@ describe("evaluation configuration", () => {
   it("keeps valid evaluations and reports skipped invalid entries", () => {
     writeFileSync(
       join(directory, "evals.json"),
-      JSON.stringify([{prompt: ""}, validEvaluation("valid")]),
+      JSON.stringify(evalFile([{prompt: ""}, validEvaluation("valid")])),
     );
 
     const result = resolveConfig();
@@ -191,10 +202,10 @@ describe("evaluation configuration", () => {
     writeFileSync(evalsPath, JSON.stringify({unknown: []}));
     expect(failureMessage(resolveConfig())).toContain("invalid eval structure");
 
-    writeFileSync(evalsPath, JSON.stringify([]));
+    writeFileSync(evalsPath, JSON.stringify(evalFile([])));
     expect(failureMessage(resolveConfig())).toContain("has no evals");
 
-    writeFileSync(evalsPath, JSON.stringify([{prompt: ""}]));
+    writeFileSync(evalsPath, JSON.stringify(evalFile([{prompt: ""}])));
     expect(resolveConfig()).toMatchObject({
       success: false,
       error: "no gradable evals",
@@ -202,7 +213,7 @@ describe("evaluation configuration", () => {
 
     writeFileSync(
       evalsPath,
-      JSON.stringify([validEvaluation(1), validEvaluation(1)]),
+      JSON.stringify(evalFile([validEvaluation(1), validEvaluation(1)])),
     );
     expect(failureMessage(resolveConfig())).toContain("duplicate eval id");
   });
@@ -219,7 +230,7 @@ describe("evaluation configuration", () => {
     writeFileSync(
       join(directory, "evals.json"),
       JSON.stringify(
-        Array.from({length: 7}, (_, index) => validEvaluation(index)),
+        evalFile(Array.from({length: 7}, (_, index) => validEvaluation(index))),
       ),
     );
     expect(failureMessage(resolveConfig())).toContain(

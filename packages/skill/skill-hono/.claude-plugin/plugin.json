@@ -5,6 +5,5 @@
   "author": {
     "name": "Xonovex"
   },
-  "skills": ["./hono-guide"],
-  "dependencies": ["xonovex-skill-zod"]
+  "skills": ["./hono-guide"]
 }

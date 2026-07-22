@@ -5,6 +5,5 @@
   "author": {
     "name": "Xonovex"
   },
-  "skills": "./expressjs-guide",
-  "dependencies": ["xonovex-skill-zod"]
+  "skills": "./expressjs-guide"
 }

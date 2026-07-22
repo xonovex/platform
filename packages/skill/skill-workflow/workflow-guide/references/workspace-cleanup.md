@@ -18,10 +18,9 @@ Inspect and clean only explicitly named workspaces after classifying their state
 5. Remove only the confirmed set and report what was removed, retained, recoverable,
    and unrecoverable.
 
-For Git worktrees, inventory with `git worktree list`, remove with
-`git worktree remove`, use `git branch -d` for merged branches, and reserve forced
-removal or `git branch -D` for an explicitly confirmed exact target. Run
-`git worktree prune` only after listing the stale metadata it affects.
+Provider-specific inventory, removal, reference, and administration commands belong
+to the selected capability. This operation owns classification, preview, exact target
+selection, and recovery reporting.
 
 ## Error handling
 

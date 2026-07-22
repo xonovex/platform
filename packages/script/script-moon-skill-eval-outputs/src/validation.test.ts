@@ -4,6 +4,7 @@ import {
   buildGenerationPrompt,
   buildJudgeClaudeArgs,
   evalEntries,
+  evaluateOutputGate,
   findEvaluationInfrastructureFailures,
   normalizeEval,
   outputModelCallCount,
@@ -190,10 +191,39 @@ describe("output eval validation", () => {
     expect(normalizeEval(input, 1).success).toBe(false);
   });
 
-  it("accepts both supported eval file envelopes", () => {
-    expect(evalEntries([{}])).toEqual({success: true, data: [{}]});
-    expect(evalEntries({evals: [{}]})).toEqual({success: true, data: [{}]});
+  it("requires the skill name and optimization tier in the eval envelope", () => {
+    expect(
+      evalEntries({
+        skill_name: "test-guide",
+        tier: "moderate",
+        evals: [{}],
+      }),
+    ).toEqual({
+      success: true,
+      data: {skillName: "test-guide", tier: "moderate", evals: [{}]},
+    });
+    expect(evalEntries([{}]).success).toBe(false);
+    expect(evalEntries({evals: [{}]}).success).toBe(false);
     expect(evalEntries({evals: "wrong"}).success).toBe(false);
+  });
+
+  it("applies tiered absolute, delta, and activation quality gates", () => {
+    expect(evaluateOutputGate("moderate", 0.9, 0.8, 1)).toMatchObject({
+      passed: true,
+      policy: {minimumWithSkillPassRate: 0.8, minimumDeltaPassRate: 0.05},
+    });
+    expect(evaluateOutputGate("moderate", 0.333, 0, 1)).toMatchObject({
+      passed: false,
+      checks: {withSkillPassRate: false},
+    });
+    expect(evaluateOutputGate("conservative", 0.9, 0.85, 1)).toMatchObject({
+      passed: false,
+      checks: {deltaPassRate: false},
+    });
+    expect(evaluateOutputGate("aggressive", 1, 0, 0.5)).toMatchObject({
+      passed: false,
+      checks: {skillTriggerRate: false},
+    });
   });
 
   it("rejects evaluation IDs that resolve to the same output directory", () => {

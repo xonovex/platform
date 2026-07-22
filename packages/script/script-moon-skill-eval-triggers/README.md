@@ -16,3 +16,11 @@ Each run loads only the target local plugin and its declared local plugin depend
 Negative runs are limited to one turn, 2,000 streamed response characters, 60 seconds, and $0.05. The spend cap can only be lowered, runs per query are limited to three, and one invocation may schedule at most 24 model runs. Larger query sets must be split into bounded batches. Any timeout, cap, output limit, process failure, or unavailable target skill exits `2` immediately instead of being scored as a routing result. There are no automatic retries.
 
 The Codex adapter copies only the target guide into an isolated user skill directory, ignores user configuration and execution rules, uses ephemeral JSONL output in a read-only sandbox, and detects a marker appended only to the staged copy. Its CLI has no dollar-budget flag, so the run-count, batch, timeout, and output ceilings are the enforced bounds.
+
+## Catalog routing
+
+```bash
+npx moon-skill-eval-routing packages/skill --split all --harness claude --runs 1
+```
+
+Catalog routing finds exact queries that one skill marks positive and one or more other skills mark negative. It loads the expected owner and all of those competing skills in the same isolated run, then passes only when the expected owner is selected. This tests ownership ranking and multi-skill coexistence; the target-only evaluator remains useful for measuring an individual description's recall and precision.

@@ -19,6 +19,12 @@ interface CodexTriggerOptions {
   readonly guideDirectory: string;
   readonly query: string;
   readonly shortName: string;
+  readonly candidateGuides?: readonly CodexCandidateGuide[];
+}
+
+export interface CodexCandidateGuide {
+  readonly guideDirectory: string;
+  readonly shortName: string;
 }
 
 const CODEX_TRIGGER_SIGNAL = "XONOVEX_SKILL_TRIGGERED";
@@ -242,18 +248,23 @@ export const checkCodexTriggered = (
   options: CodexTriggerOptions,
 ): Promise<TriggerOutcome> => {
   const workspace = mkdtempSync(join(tmpdir(), "xonovex-codex-trigger-"));
-  const skillDirectory = join(
-    workspace,
-    ".agents",
-    "skills",
-    options.shortName,
-  );
+  const skillsDirectory = join(workspace, ".agents", "skills");
   const isolatedHome = join(workspace, "home");
   const isolatedCodexHome = join(workspace, ".codex");
-  mkdirSync(join(workspace, ".agents", "skills"), {recursive: true});
+  mkdirSync(skillsDirectory, {recursive: true});
   mkdirSync(isolatedHome, {recursive: true});
   mkdirSync(isolatedCodexHome, {recursive: true});
-  cpSync(options.guideDirectory, skillDirectory, {recursive: true});
+  const candidateGuides = options.candidateGuides ?? [
+    {guideDirectory: options.guideDirectory, shortName: options.shortName},
+  ];
+  for (const candidate of candidateGuides) {
+    cpSync(
+      candidate.guideDirectory,
+      join(skillsDirectory, candidate.shortName),
+      {recursive: true},
+    );
+  }
+  const skillDirectory = join(skillsDirectory, options.shortName);
   appendFileSync(
     join(skillDirectory, "SKILL.md"),
     `\n## Evaluation signal\n\nWhen this skill applies, reply with exactly ${CODEX_TRIGGER_SIGNAL}.\n`,

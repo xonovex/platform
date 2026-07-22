@@ -28,10 +28,13 @@ const EvalInputSchema = z.object({
   files: z.array(RelativeFileSchema).default([]),
 });
 
-const EvalFileSchema = z.union([
-  z.array(z.unknown()),
-  z.object({evals: z.array(z.unknown())}),
-]);
+const OutputTierSchema = z.enum(["aggressive", "moderate", "conservative"]);
+
+const EvalFileSchema = z.object({
+  skill_name: z.string().min(1),
+  tier: OutputTierSchema,
+  evals: z.array(z.unknown()),
+});
 
 const JudgeResultSchema = z.object({
   passed: z.boolean(),
@@ -94,6 +97,29 @@ interface NormalizedEval {
   readonly files: readonly string[];
 }
 
+type OutputTier = z.infer<typeof OutputTierSchema>;
+
+interface ParsedEvalFile {
+  readonly skillName: string;
+  readonly tier: OutputTier;
+  readonly evals: readonly unknown[];
+}
+
+interface OutputGatePolicy {
+  readonly minimumWithSkillPassRate: number;
+  readonly minimumDeltaPassRate: number;
+}
+
+interface OutputGateResult {
+  readonly passed: boolean;
+  readonly policy: OutputGatePolicy;
+  readonly checks: {
+    readonly withSkillPassRate: boolean;
+    readonly deltaPassRate: boolean;
+    readonly skillTriggerRate: boolean;
+  };
+}
+
 type EvaluationArm = "with_skill" | "without_skill";
 
 interface GenerationClaudeOptions {
@@ -132,6 +158,21 @@ type ValidationResult<T> =
   | {readonly success: false; readonly error: string};
 
 export const MAX_OUTPUT_MODEL_CALLS = 24;
+
+const OUTPUT_GATE_POLICIES: Readonly<Record<OutputTier, OutputGatePolicy>> = {
+  aggressive: {
+    minimumWithSkillPassRate: 0.75,
+    minimumDeltaPassRate: 0.05,
+  },
+  moderate: {
+    minimumWithSkillPassRate: 0.8,
+    minimumDeltaPassRate: 0.05,
+  },
+  conservative: {
+    minimumWithSkillPassRate: 0.9,
+    minimumDeltaPassRate: 0.1,
+  },
+};
 
 export const outputModelCallCount = (evalCount: number, runs: number): number =>
   evalCount * runs * 4;
@@ -324,12 +365,36 @@ export const runFailFastPool = async <T, R>(
 
 export const evalEntries = (
   input: unknown,
-): ValidationResult<readonly unknown[]> => {
+): ValidationResult<ParsedEvalFile> => {
   const result = EvalFileSchema.safeParse(input);
   if (!result.success) return {success: false, error: errorText(result.error)};
   return {
     success: true,
-    data: Array.isArray(result.data) ? result.data : result.data.evals,
+    data: {
+      skillName: result.data.skill_name,
+      tier: result.data.tier,
+      evals: result.data.evals,
+    },
+  };
+};
+
+export const evaluateOutputGate = (
+  tier: OutputTier,
+  withSkillPassRate: number,
+  withoutSkillPassRate: number,
+  skillTriggerRate: number,
+): OutputGateResult => {
+  const policy = OUTPUT_GATE_POLICIES[tier];
+  const checks = {
+    withSkillPassRate: withSkillPassRate >= policy.minimumWithSkillPassRate,
+    deltaPassRate:
+      withSkillPassRate - withoutSkillPassRate >= policy.minimumDeltaPassRate,
+    skillTriggerRate: skillTriggerRate === 1,
+  };
+  return {
+    passed: Object.values(checks).every(Boolean),
+    policy,
+    checks,
   };
 };
 
@@ -393,4 +458,7 @@ export type {
   EvaluationHealthRecord,
   EvaluationInfrastructureFailure,
   NormalizedEval,
+  OutputGateResult,
+  OutputTier,
+  ParsedEvalFile,
 };

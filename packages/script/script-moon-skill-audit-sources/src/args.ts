@@ -2,6 +2,7 @@ interface ParsedArgs {
   readonly target: string | undefined;
   readonly all: string | undefined;
   readonly maxAge: number;
+  readonly versionMaxAge: number;
   readonly fetch: boolean;
   readonly markReviewed: string | undefined;
   readonly json: boolean;
@@ -10,7 +11,7 @@ interface ParsedArgs {
 }
 
 interface ValueOption {
-  readonly name: "all" | "markReviewed" | "maxAge";
+  readonly name: "all" | "markReviewed" | "maxAge" | "versionMaxAge";
   readonly value: string;
   readonly nextIndex: number;
 }
@@ -59,17 +60,28 @@ const valueOption = (
         nextIndex: inline === undefined ? index + 1 : index,
       };
     }
+    case "--version-max-age": {
+      const raw = inline ?? argv[index + 1];
+      if (raw === undefined || isOptionToken(raw)) {
+        throw new Error("argument --version-max-age: expected one argument");
+      }
+      return {
+        name: "versionMaxAge",
+        value: raw,
+        nextIndex: inline === undefined ? index + 1 : index,
+      };
+    }
     default: {
       return undefined;
     }
   }
 };
 
-const parseMaxAge = (raw: string): number => {
+const parseMaxAge = (flag: string, raw: string): number => {
   const value = Number(raw);
   if (!Number.isInteger(value) || value < 0) {
     throw new Error(
-      `argument --max-age: invalid non-negative int value: '${raw}'`,
+      `argument ${flag}: invalid non-negative int value: '${raw}'`,
     );
   }
   return value;
@@ -78,6 +90,7 @@ const parseMaxAge = (raw: string): number => {
 export const parseArgs = (argv: readonly string[]): ParsedArgs => {
   let all: string | undefined;
   let maxAge = 180;
+  let versionMaxAge = 90;
   let fetch = false;
   let markReviewed: string | undefined;
   let json = false;
@@ -113,7 +126,12 @@ export const parseArgs = (argv: readonly string[]): ParsedArgs => {
       if (option.nextIndex > index) consumed.add(option.nextIndex);
       if (option.name === "all") all = option.value;
       if (option.name === "markReviewed") markReviewed = option.value;
-      if (option.name === "maxAge") maxAge = parseMaxAge(option.value);
+      if (option.name === "maxAge") {
+        maxAge = parseMaxAge("--max-age", option.value);
+      }
+      if (option.name === "versionMaxAge") {
+        versionMaxAge = parseMaxAge("--version-max-age", option.value);
+      }
       continue;
     }
     if (isOptionToken(argument)) {
@@ -131,6 +149,7 @@ export const parseArgs = (argv: readonly string[]): ParsedArgs => {
     target: positionals[0],
     all,
     maxAge,
+    versionMaxAge,
     fetch,
     markReviewed,
     json,

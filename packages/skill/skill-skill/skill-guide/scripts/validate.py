@@ -8,12 +8,12 @@
 """Validate a SKILL.md against the Agent Skills spec and authoring best practices.
 
 Usage:
-    validate.py <skill-dir>
-    validate.py <path-to-SKILL.md>
+    validate.py [--strict] <skill-dir>
+    validate.py [--strict] <path-to-SKILL.md>
 
 Exit codes:
-    0 = PASS (no errors; warnings allowed)
-    1 = FAIL (one or more errors)
+    0 = PASS (no errors; warnings allowed unless --strict)
+    1 = FAIL (one or more errors, or warnings under --strict)
     2 = usage error / file not found
 
 Read-only — never modifies files.
@@ -88,6 +88,10 @@ def build_parser() -> argparse.ArgumentParser:
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     p.add_argument("target", help="skill directory or path to a SKILL.md")
+    p.add_argument(
+        "--strict", action="store_true",
+        help="treat authoring warnings as validation failures",
+    )
     return p
 
 
@@ -488,7 +492,9 @@ def check_harness_neutrality(body: str, report: Report) -> None:
         report.add_pass("harness-neutrality: clean")
 
 
-def render_report(report: Report, skill_path: Path, skill_dir: Path) -> int:
+def render_report(
+    report: Report, skill_path: Path, skill_dir: Path, strict: bool,
+) -> int:
     print(f"Validation: {skill_path}")
     print(f"Skill dir: {skill_dir}")
     print()
@@ -506,6 +512,9 @@ def render_report(report: Report, skill_path: Path, skill_dir: Path) -> int:
         print(f"Result: FAIL ({n_err} error(s), {n_warn} warning(s))")
         return 1
     if n_warn > 0:
+        if strict:
+            print(f"Result: FAIL ({n_warn} warning(s) in strict mode)")
+            return 1
         print(f"Result: PASS with {n_warn} warning(s)")
         return 0
     print("Result: PASS (no warnings)")
@@ -532,7 +541,7 @@ def main(argv: list[str]) -> int:
     check_reference_tocs(skill_dir, report)
     check_harness_neutrality(body, report)
 
-    return render_report(report, skill_path, skill_dir)
+    return render_report(report, skill_path, skill_dir, args.strict)
 
 
 if __name__ == "__main__":

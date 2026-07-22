@@ -171,7 +171,14 @@ console.log(JSON.stringify({type: "turn.completed", usage: {input_tokens: 4, out
   it("runs the complete evaluator and writes benchmark evidence", async () => {
     const evaluationsFile = join(temporaryDirectory, "evals.json");
     const workspace = join(temporaryDirectory, "workspace");
-    writeFileSync(evaluationsFile, JSON.stringify([evaluation("question")]));
+    writeFileSync(
+      evaluationsFile,
+      JSON.stringify({
+        skill_name: "test-skill",
+        tier: "moderate",
+        evals: [evaluation("question")],
+      }),
+    );
 
     const exitCode = await main([
       "--workspace",
@@ -188,11 +195,55 @@ console.log(JSON.stringify({type: "turn.completed", usage: {input_tokens: 4, out
       ),
     ).toMatchObject({
       skill: "test-skill",
+      tier: "moderate",
       iteration: "iteration-1",
       run_summary: {
         with_skill: {pass_rate: {mean: 1}},
         without_skill: {pass_rate: {mean: 0}},
         delta: {pass_rate: 1},
+      },
+      quality_gate: {passed: true},
+    });
+  });
+
+  it("fails a valid positive delta below the tier's absolute quality floor", async () => {
+    const evaluationsFile = join(temporaryDirectory, "low-quality-evals.json");
+    const workspace = join(temporaryDirectory, "low-quality-workspace");
+    writeFileSync(
+      evaluationsFile,
+      JSON.stringify({
+        skill_name: "test-skill",
+        tier: "moderate",
+        evals: [
+          {
+            ...evaluation("question"),
+            assertions: ["one", "two", "three", "four"],
+          },
+        ],
+      }),
+    );
+
+    const exitCode = await main([
+      "--workspace",
+      workspace,
+      evaluationsFile,
+      "test-skill",
+      "iteration-1",
+    ]);
+
+    expect(exitCode).toBe(1);
+    expect(
+      JSON.parse(
+        readFileSync(join(workspace, "iteration-1", "benchmark.json"), "utf8"),
+      ),
+    ).toMatchObject({
+      run_summary: {
+        with_skill: {pass_rate: {mean: 0.25}},
+        without_skill: {pass_rate: {mean: 0}},
+      },
+      quality_gate: {
+        passed: false,
+        checks: {withSkillPassRate: false, deltaPassRate: true},
       },
     });
   });

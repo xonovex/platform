@@ -5,6 +5,5 @@
   "author": {
     "name": "Xonovex"
   },
-  "skills": ["./tdd-guide"],
-  "dependencies": ["xonovex-skill-testing"]
+  "skills": ["./tdd-guide"]
 }

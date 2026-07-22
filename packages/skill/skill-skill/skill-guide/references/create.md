@@ -53,9 +53,7 @@ description: "Use when {task}. Triggers on {patterns}."
 
 - {Non-obvious env-specific facts}
 
-## Example
-
-{Short representative example}
+<!-- Add a compact Example only when the default behavior or output format is non-obvious. -->
 
 ## Progressive disclosure
 
@@ -64,7 +62,7 @@ description: "Use when {task}. Triggers on {patterns}."
 
 ## Content Rules
 
-- SKILL.md: 3-7 essentials, one representative example, a Gotchas section
+- SKILL.md: 3-7 essentials, a Gotchas section, and one representative example only when it materially clarifies a non-obvious default or format; workflow operation references may carry the example instead
 - Reference files: full explanations, multiple examples, rationale; one topic each — don't restate when/why to read the file itself (its load-when trigger lives in the SKILL.md progressive-disclosure list); pointing to other references with a "read when" trigger is fine
 - Apply the parent SKILL.md Core Principles (add what the agent lacks, defaults over menus, procedures over declarations)
 - Match specificity to fragility — prescriptive only when consistency is required

@@ -10,9 +10,10 @@ Produce a read-only, planning-oriented report from an inline subject or an opaqu
 4. **Separate evidence from synthesis** — distinguish observed facts, inferred implications, constraints, uncertainty, and unresolved questions.
 5. **Return one report** — include current stack, relevant locations, options or recommendation, risks, skills to consult, and sources. Persist only through an explicitly selected destination provider.
 
-## Code-Quality Audits
-
-For inward-facing hardening, simplification, or alignment research, load **code-quality-guide** and apply its matching dimensions. Keep the audit read-only, group findings by category, grade actionable findings by severity, and identify exact code evidence. Route focused barrel, comment, shared-extraction, template, and TODO work to this skill's corresponding code-research references.
+If the request is a general hardening, simplification, alignment, duplication, comment,
+barrel, or TODO audit rather than research for an explicit future plan, hand it to
+**code-quality-guide**. Planning research may cite an existing quality-audit result as
+evidence without redefining its detectors.
 
 ## Gotchas
 

@@ -28,11 +28,11 @@ jobs:
       - name: Install repository dependencies
         run: nix develop --no-update-lock-file --command npm ci
 
-      - name: Check provenance, review age, versions, and live URLs
+      - name: Check provenance, review cadence, declared baselines, and live URLs
         run: |
           set +e
           nix develop --no-update-lock-file --command npx moon-skill-audit-sources \
-            --all packages/skill --max-age 180 --fetch --json \
+            --all packages/skill --max-age 180 --version-max-age 90 --fetch --json \
             >"${RUNNER_TEMP}/skill-source-audit.json"
           status=$?
           set -e
@@ -47,4 +47,4 @@ jobs:
           name: skill-source-audit
           path: ${{ runner.temp }}/skill-source-audit.json
           if-no-files-found: error
-          retention-days: 30
+          retention-days: 90

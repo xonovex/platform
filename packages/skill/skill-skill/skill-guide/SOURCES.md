@@ -128,6 +128,13 @@
 - **References:** references/evaluating-triggers.md, references/evaluating-outputs.md
 - **Aspects extracted:** Codex skill discovery and progressive disclosure; implicit routing from skill descriptions; repository/user skill locations; explicit `$skill-name` invocation; ephemeral JSONL `codex exec`; ignored user configuration and execution rules; read-only sandbox selection.
 
+## Xonovex skill-evaluation policy
+
+- **Provenance:** Repository-original catalog routing, evidence-health, repetition, and tier-gate policy maintained with the evaluator implementations
+- **Last reviewed:** 2026-07-22
+- **References:** references/evaluating-triggers.md, references/evaluating-outputs.md
+- **Aspects extracted:** Competitive multi-skill routing scenarios, two-run CI evidence, full activation, absolute pass-rate floors, and minimum quality deltas are repository conventions.
+
 ## Guide-level synthesis
 
 - **Provenance:** Repository-original integration of the source blocks above; these references combine multiple inputs or maintained conventions rather than one exclusive upstream

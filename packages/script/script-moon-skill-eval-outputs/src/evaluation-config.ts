@@ -19,6 +19,7 @@ import {
   parseOutputOptions,
   validateUniqueEvaluationIds,
   type NormalizedEval,
+  type OutputTier,
 } from "./validation.js";
 
 type EvaluationConfigResult =
@@ -36,7 +37,11 @@ type EvaluationConfigResult =
 type EvaluationLoadResult =
   | {
       readonly success: true;
-      readonly data: readonly NormalizedEval[];
+      readonly data: {
+        readonly evaluations: readonly NormalizedEval[];
+        readonly skillName: string;
+        readonly tier: OutputTier;
+      };
       readonly warnings: readonly string[];
     }
   | {
@@ -71,6 +76,7 @@ export interface EvaluationConfig {
   readonly runs: number;
   readonly shortName: string;
   readonly skillName: string;
+  readonly tier: OutputTier;
   readonly timeout: number;
   readonly withArgs: readonly string[];
   readonly withoutArgs: readonly string[];
@@ -191,7 +197,7 @@ const loadEvaluations = (
       warnings: [],
     };
   }
-  if (entriesResult.data.length === 0) {
+  if (entriesResult.data.evals.length === 0) {
     return {
       success: false,
       error: `${evaluationsArgument} has no evals`,
@@ -201,7 +207,7 @@ const loadEvaluations = (
 
   const warnings: string[] = [];
   const evaluations: NormalizedEval[] = [];
-  for (const [index, raw] of entriesResult.data.entries()) {
+  for (const [index, raw] of entriesResult.data.evals.entries()) {
     const result = normalizeEval(raw, index + 1);
     if (result.success) {
       evaluations.push(result.data);
@@ -214,7 +220,15 @@ const loadEvaluations = (
   }
   const uniqueResult = validateUniqueEvaluationIds(evaluations);
   return uniqueResult.success
-    ? {success: true, data: uniqueResult.data, warnings}
+    ? {
+        success: true,
+        data: {
+          evaluations: uniqueResult.data,
+          skillName: entriesResult.data.skillName,
+          tier: entriesResult.data.tier,
+        },
+        warnings,
+      }
     : {success: false, error: uniqueResult.error, warnings};
 };
 
@@ -293,6 +307,13 @@ export const resolveEvaluationConfig = (
 
   const loaded = loadEvaluations(evaluationsFile, evaluationsArgument);
   if (!loaded.success) return loaded;
+  const requestedShortName = skillName.split(":").pop() ?? skillName;
+  if (requestedShortName !== loaded.data.skillName) {
+    return failure(
+      `skill name mismatch: requested '${skillName}' but evals declare '${loaded.data.skillName}'`,
+      loaded.warnings,
+    );
+  }
 
   const pluginDirectoryArgument =
     (values["plugin-dir"] as string | undefined) ??
@@ -340,8 +361,8 @@ export const resolveEvaluationConfig = (
 
   const {runs, concurrency, timeout, batchSize} = optionsResult.data;
   const evaluationBatches = boundedBatches(
-    loaded.data,
-    batchSize ?? Math.max(loaded.data.length, 1),
+    loaded.data.evaluations,
+    batchSize ?? Math.max(loaded.data.evaluations.length, 1),
   );
   const maxBatchModelCalls = Math.max(
     0,
@@ -394,7 +415,7 @@ export const resolveEvaluationConfig = (
       harness,
       concurrency,
       cwd: evaluationWorkingDirectory || undefined,
-      evaluations: loaded.data,
+      evaluations: loaded.data.evaluations,
       evaluationBatches,
       evaluationsDirectory: dirname(evaluationsFile),
       invalidRunPath: join(iterationDirectory, "invalid-run.json"),
@@ -407,6 +428,7 @@ export const resolveEvaluationConfig = (
       runs,
       shortName,
       skillName,
+      tier: loaded.data.tier,
       timeout,
       withArgs:
         harness === "claude"

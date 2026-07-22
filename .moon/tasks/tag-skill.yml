@@ -39,6 +39,7 @@ tasks:
     command:
       - npx
       - moon-skill-validate
+      - --strict
     deps:
       - target: ~:build
         optional: true
@@ -78,21 +79,14 @@ tasks:
       cache: false
       runInCI: false
   ci-skill-eval-trigger:
-    command:
-      - npx
-      - moon-skill-eval-triggers
-      - --split
-      - validation
-      - --runs
-      - "3"
-      - --max-budget-usd
-      - "0.05"
-      - --batch-size
-      - "8"
-      - --workspace
-      - .skill-eval-results/trigger
-      - --plugin-dir
-      - .
+    script: >-
+      npx moon-skill-eval-triggers
+      --split validation
+      --runs 3
+      --max-budget-usd 0.05
+      --batch-size 8
+      --workspace ".skill-eval-results/trigger/${SKILL_EVAL_HARNESS:-claude}"
+      --plugin-dir .
     deps:
       - target: ~:build
         optional: true
@@ -107,12 +101,12 @@ tasks:
   ci-skill-eval-output:
     script: >-
       npx moon-skill-eval-outputs
-      --runs 1
+      --runs 2
       --concurrency 2
       --max-budget-usd 0.10
       --judge-max-budget-usd 0.10
-      --batch-size 6
-      --workspace .skill-eval-results/output
+      --batch-size 3
+      --workspace ".skill-eval-results/output/${SKILL_EVAL_HARNESS:-claude}"
       --plugin-dir .
       --eval-cwd "$workspaceRoot"
     deps:

@@ -5,9 +5,5 @@
   "author": {
     "name": "Xonovex"
   },
-  "skills": ["./microkernel-pattern-guide"],
-  "dependencies": [
-    "xonovex-skill-connascence",
-    "xonovex-skill-hexagonal-pattern"
-  ]
+  "skills": ["./microkernel-pattern-guide"]
 }

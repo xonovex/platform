@@ -5,6 +5,5 @@
   "author": {
     "name": "Xonovex"
   },
-  "skills": ["./typescript-guide"],
-  "dependencies": ["xonovex-skill-fp", "xonovex-skill-oop"]
+  "skills": ["./typescript-guide"]
 }

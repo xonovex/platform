@@ -26,7 +26,8 @@ git add -A && git commit -m "<type>: <description>"
 git push -o ci.skip <remote> HEAD:<branch>
 ```
 
-In a feature worktree, read plan context from `git config branch.<branch>.plan` and fold it into a multi-line body:
+When the staged change needs more context than the subject can carry, use a concise
+multi-line body derived from the diff and the user's stated intent:
 
 ```
 feat: implement email+password flow with TOTP
@@ -39,4 +40,3 @@ Add LoginFlow with email validation and TOTP verification.
 - Auto-detecting `refactor` on a wide changeset often misses a more specific intent (`feat` / `fix`) — interactive mode is safer for very large diffs
 - `-o ci.skip` skips CI on the push; drop it when you actually want CI to run
 - Default mode commits without asking — risky on dirty trees with mixed-intent changes; pre-stage or use interactive mode
-- A stale `branch.<branch>.plan` config injects irrelevant plan context — clear it when starting unrelated work

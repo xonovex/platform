@@ -4,9 +4,7 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "@xonovex/skill-c99": "7.0.0",
-    "@xonovex/skill-data-oriented-design": "7.0.0",
-    "@xonovex/skill-memory-management": "7.0.0"
+    "@xonovex/skill-c99": "7.0.0"
   },
   "keywords": [
     "xonovex",

@@ -5,6 +5,5 @@
   "author": {
     "name": "Xonovex"
   },
-  "skills": "./python-guide",
-  "dependencies": ["xonovex-skill-fp", "xonovex-skill-oop"]
+  "skills": "./python-guide"
 }
