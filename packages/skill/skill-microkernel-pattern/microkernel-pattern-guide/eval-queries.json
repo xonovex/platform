@@ -72,26 +72,26 @@
     "split": "train"
   },
   {
-    "query": "convert this AoS particle list to SoA for cache locality",
-    "rationale": "near miss owned by c99-opinionated-guide",
+    "query": "decouple my domain logic from Postgres so I can swap the database without rewriting business rules",
+    "rationale": "near miss owned by hexagonal-pattern-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "in firmware/sensor/sensor_read.c can you change the read function so the caller passes the buffer instead of malloc'ing one",
-    "rationale": "near miss owned by c99-opinionated-guide",
+    "query": "In a Hono API running on Node with @hono/node-server, add a WebSocket endpoint at /ws/chat that echoes each incoming message back to the sender. Show both the server bootstrap code and the route definition.",
+    "rationale": "near miss owned by hono-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "stub out the alignment-aware allocator for our DSP target",
-    "rationale": "near miss owned by c99-opinionated-guide",
+    "query": "I have a Terraform config that creates private subnets, one per availability zone, from a variable list of AZs. Right now removing a single AZ from the middle of the list forces Terraform to recreate several unrelated subnets. Write the resource and any supporting locals so this stops happening.",
+    "rationale": "near miss owned by terraform-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "rename modules to follow our snake_case_subsystem.c convention — there's a few stragglers in src/net/",
-    "rationale": "near miss owned by c99-opinionated-guide",
+    "query": "In a Remotion project running at 30fps, write a React component that fades a headline in from opacity 0 to 1 over the first half second and slides it up 40px at the same time. Give me the full component code.",
+    "rationale": "near miss owned by remotion-guide",
     "should_trigger": false,
     "split": "validation"
   }

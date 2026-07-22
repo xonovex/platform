@@ -81,30 +81,30 @@
     "query": "require a Bitbucket Cloud pipeline status before merge and prove a spoofed status cannot satisfy it",
     "rationale": "near miss owned by bitbucket-guide",
     "should_trigger": false,
-    "split": "validation"
+    "split": "train"
   },
   {
-    "query": "use a shared Bitbucket Pipelines configuration across our mobile repositories",
-    "rationale": "near miss owned by bitbucket-guide",
+    "query": "compose Bitrise Pipelines from reusable Workflows and pin every custom Step version",
+    "rationale": "near miss owned by bitrise-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "correlate Bitrise pipeline and AWS deployment references in Datadog CI/CD Visibility",
+    "rationale": "near miss owned by datadog-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "configure Bitbucket Pipelines OIDC for a least-privilege AWS role without access keys",
-    "rationale": "near miss owned by bitbucket-guide",
-    "should_trigger": false,
-    "split": "validation"
-  },
-  {
-    "query": "create a reusable GitHub Actions workflow for building and signing releases",
+    "query": "open a pull request against main with reviewers and a label using the gh CLI",
     "rationale": "near miss owned by github-guide",
     "should_trigger": false,
-    "split": "train"
+    "split": "validation"
   },
   {
-    "query": "enforce a GitLab CI component through a group pipeline execution policy",
-    "rationale": "near miss owned by gitlab-guide",
+    "query": "create a least-privilege AWS role for CI OIDC without IAM user access keys",
+    "rationale": "near miss owned by aws-guide",
     "should_trigger": false,
-    "split": "train"
+    "split": "validation"
   }
 ]

@@ -36,30 +36,6 @@
     "split": "validation"
   },
   {
-    "query": "In a Hono API running on Node with @hono/node-server, add a WebSocket endpoint at /ws/chat that echoes each incoming message back to the sender. Show both the server bootstrap code and the route definition.",
-    "rationale": "near miss owned by hono-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
-    "query": "Write a reusable helper for our Hono API that turns a Zod validation failure into a standardized structured JSON error response for a 400. Show the exact response body shape it produces.",
-    "rationale": "near miss owned by hono-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
-    "query": "Our Hono app must read a DATABASE_URL environment variable inside a route handler, and the same code has to run correctly whether deployed on Node or on Cloudflare Workers. Write the handler.",
-    "rationale": "near miss owned by hono-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
-    "query": "In a Hono handler, set a secure session cookie that JavaScript cannot read, is only transmitted over HTTPS, and uses the __Host- name prefix. Write the cookie-setting code.",
-    "rationale": "near miss owned by hono-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
     "query": "A review comment on `work/presentation-create/` says the presentation create change handles the normal fixture but leaves the failure path undefined. For this Presentation task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
     "rationale": "implicit task cue derived from the presentation create reference",
     "should_trigger": true,
@@ -72,26 +48,50 @@
     "split": "validation"
   },
   {
-    "query": "A review comment on `work/application-structure/` says the application structure change handles the normal fixture but leaves the failure path undefined. For this Hono task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
+    "query": "In a Hono API running on Node with @hono/node-server, add a WebSocket endpoint at /ws/chat that echoes each incoming message back to the sender. Show both the server bootstrap code and the route definition.",
     "rationale": "near miss owned by hono-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "quick pre-merge sanity check: after the validation type safety change under `work/validation-type-safety/`, a clean checkout behaves differently from my local run. What Hono-specific assumption could cause that? Show the correction and the exact narrow validation.",
-    "rationale": "near miss owned by hono-guide",
+    "query": "Write an Express 5 + TypeScript login route handler. It should look up the user by email, verify the submitted password against the stored hash, and on success return a signed JWT the client will send on future API requests.",
+    "rationale": "near miss owned by expressjs-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Research the code paths and current library versions we need before planning rate limiting for packages/api. Keep it read-only and cite the evidence.",
+    "rationale": "near miss owned by plan-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "In an Astro page I already have static content. Add two React components: a `<NewsletterSignup />` in the page footer that should only become interactive once the user scrolls it into view, and a `<ThemeToggle />` that reads `window.localStorage` on mount and therefore must not be server-rendered at all. Show the page frontmatter and markup with the correct hydration for each.",
+    "rationale": "near miss owned by astro-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "map a mandatory protected-path control to Pi and tell me whether it can actually block",
+    "rationale": "near miss owned by pi-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Write a Lua 5.4 function `load_config(path)` that opens the file at `path`, reads all of it, and returns the parsed contents. Show how a caller would use it when the file might not exist, falling back to a default config instead of crashing.",
+    "rationale": "near miss owned by lua-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "The clean Linux CI job fails only for the minimal middleware patterns fixture under `work/middleware-patterns/`, while the full local fixture passes. Trace the Hono-specific boundary that could cause the difference, then propose a patch and a regression check.",
-    "rationale": "near miss owned by hono-guide",
+    "query": "I have a Rectangle class with mutable width and height and setWidth/setHeight methods. I now need a Square type in the same system. What's the cleanest way to model Square given I already have Rectangle?",
+    "rationale": "near miss owned by oop-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "A review comment on `work/middleware-combine/` says the middleware combine change handles the normal fixture but leaves the failure path undefined. For this Hono task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
-    "rationale": "near miss owned by hono-guide",
+    "query": "Write a Strudel.cc live-coding snippet for a driving techno groove at 130 BPM. Include a four-on-the-floor kick, an offbeat clap, and closed hi-hats layered together.",
+    "rationale": "near miss owned by strudel-guide",
     "should_trigger": false,
     "split": "validation"
   }

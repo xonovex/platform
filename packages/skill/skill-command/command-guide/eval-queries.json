@@ -18,54 +18,6 @@
     "split": "train"
   },
   {
-    "query": "this packages/auth dir doesn't have an AGENTS.md yet — set one up",
-    "rationale": "near miss owned by instruction-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
-    "query": "bootstrap a CLAUDE.md for the new services/notifications package i just scaffolded",
-    "rationale": "near miss owned by instruction-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
-    "query": "i want claude to know what's in apps/admin — write the agent docs from scratch",
-    "rationale": "near miss owned by instruction-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
-    "query": "no AGENTS.md anywhere in this repo, can you create one for the root",
-    "rationale": "near miss owned by instruction-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
-    "query": "document this directory for an AI agent — first time",
-    "rationale": "near miss owned by instruction-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
-    "query": "scaffold an AGENTS.md for libs/shared/ that covers the conventions",
-    "rationale": "near miss owned by instruction-guide",
-    "should_trigger": false,
-    "split": "validation"
-  },
-  {
-    "query": "we just split out the analytics package — can you create instructions for it",
-    "rationale": "near miss owned by instruction-guide",
-    "should_trigger": false,
-    "split": "validation"
-  },
-  {
-    "query": "add a CLAUDE.md to the new monorepo workspace at packages/billing",
-    "rationale": "near miss owned by instruction-guide",
-    "should_trigger": false,
-    "split": "validation"
-  },
-  {
     "query": "A review comment on `work/distill/` says the distill change handles the normal fixture but leaves the failure path undefined. For this Command task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
     "rationale": "implicit task cue derived from the distill reference",
     "should_trigger": true,
@@ -93,6 +45,54 @@
     "query": "quick pre-merge sanity check: after the harness formats change under `work/harness-formats/`, a clean checkout behaves differently from my local run. What Command-specific assumption could cause that? Show the correction and the exact narrow validation.",
     "rationale": "implicit task cue derived from the harness formats reference",
     "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "this packages/auth dir doesn't have an AGENTS.md yet — set one up",
+    "rationale": "near miss owned by instruction-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "We just wrapped a debugging session where I made a couple of mistakes and had to correct course. Capture the development lessons from this session and save each one as its own file so a future agent can reuse it. Show me exactly what one of those files should contain.",
+    "rationale": "near miss owned by reflect-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "map a mandatory protected-path control to Claude Code and tell me whether it can actually block",
+    "rationale": "near miss owned by code-harness-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "create a new skill for our GraphQL resolver conventions — SKILL.md plus a few reference files",
+    "rationale": "near miss owned by skill-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "map a mandatory protected-path control to Codex and tell me whether it can actually block",
+    "rationale": "near miss owned by codex-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Our TypeScript HTTP framework docs site at https://acme.dev has getting-started, API reference, routing, and middleware pages, plus a changelog and a migration guide that are only occasionally relevant. Write the llms.txt file we should serve.",
+    "rationale": "near miss owned by llmstxt-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "what does Xonovex governance actually enforce, and can I run a workflow with no controls?",
+    "rationale": "near miss owned by agent-governance-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "map a mandatory protected-path control to GitHub Copilot and tell me whether it can actually block",
+    "rationale": "near miss owned by copilot-guide",
+    "should_trigger": false,
     "split": "validation"
   }
 ]

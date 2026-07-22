@@ -23,6 +23,8 @@ Describe a governance overlay for an already selected operation by choosing inde
 
 This skill explains a governance composition; it does not execute or enforce one. An implementation may claim enforcement only for controls attached to an adequate protected enforcement point with verified failure behavior. Schema validity, registered capabilities, policy presence, maturity labels, hooks, evidence sinks, or approval records alone do not prove enforcement.
 
+The selected operation remains owned by **workflow-guide**. Load **reliability-guide** for failure, recovery, and operating objectives; **security-assurance-guide** for selected security criteria and evidence; and **ai-governance-guide** when the governed subject is an AI system. This skill only composes those capabilities and their enforcement modes.
+
 ## Gotchas
 
 - An observing control can report `deny` without blocking; this is intentional and visible in the result.

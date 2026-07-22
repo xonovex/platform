@@ -1,5 +1,6 @@
 import {
   chmodSync,
+  mkdirSync,
   mkdtempSync,
   readFileSync,
   rmSync,
@@ -62,6 +63,8 @@ if (args.includes("--json-schema")) {
     withArgs: [],
     withoutArgs: [],
     cwd: undefined,
+    guideDirectory: temporaryDirectory,
+    harness: "claude",
     timeout: 2,
     target: "test-skill",
     shortName: "test-skill",
@@ -122,6 +125,47 @@ if (args.includes("--json-schema")) {
         "utf8",
       ),
     ).toContain("not graded because generation evidence is invalid");
+  });
+
+  it("runs generation and judging through the Codex harness", async () => {
+    const codex = join(temporaryDirectory, "codex");
+    const guideDirectory = join(temporaryDirectory, "guide");
+    mkdirSync(guideDirectory);
+    writeFileSync(
+      join(guideDirectory, "SKILL.md"),
+      "---\nname: test-skill\ndescription: Use for test prompts.\n---\n",
+    );
+    writeFileSync(
+      codex,
+      String.raw`#!/usr/bin/env node
+const prompt = process.argv.at(-1) ?? "";
+const text = prompt.includes("ASSISTANT RESPONSE:")
+  ? '{"assertion_results":[{"passed":true,"evidence":"answer present"}]}'
+  : "XONOVEX_SKILL_USED\nthe answer";
+console.log(JSON.stringify({type: "item.completed", item: {type: "agent_message", text}}));
+console.log(JSON.stringify({type: "turn.completed", usage: {input_tokens: 4, output_tokens: 2}}));
+`,
+    );
+    chmodSync(codex, 0o755);
+    const codexContext = {
+      ...context(),
+      guideDirectory,
+      harness: "codex" as const,
+    };
+
+    const record = await runJob(
+      evaluation("answer the question"),
+      "with_skill",
+      0,
+      codexContext,
+    );
+
+    expect(record).toMatchObject({
+      pass_rate: 1,
+      tokens: 6,
+      skill_triggered: true,
+      error: null,
+    });
   });
 
   it("runs the complete evaluator and writes benchmark evidence", async () => {

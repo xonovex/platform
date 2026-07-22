@@ -96,8 +96,8 @@
     "split": "validation"
   },
   {
-    "query": "we have a g-buffer, an SSAO target, and a bloom mip chain all alive at once and VRAM is tight — can we reuse the same memory for targets that aren't used at the same time",
-    "rationale": "near miss owned by gpu-rendering-guide",
+    "query": "I have a Terraform config that creates private subnets, one per availability zone, from a variable list of AZs. Right now removing a single AZ from the middle of the list forces Terraform to recreate several unrelated subnets. Write the resource and any supporting locals so this stops happening.",
+    "rationale": "near miss owned by terraform-guide",
     "should_trigger": false,
     "split": "validation"
   }

@@ -27,7 +27,7 @@
   {
     "query": "The previous chat is gone. Continue exactly one child from tracker plan:782 at revision 9f31, baseline the repo first, then stop.",
     "should_trigger": true,
-    "split": "validation"
+    "split": "train"
   },
   {
     "query": "Update the implementation plan using the attached test evidence and task results, but do not change its scope.",
@@ -82,7 +82,7 @@
   {
     "query": "Fix the null pointer crash in packages/cache/src/store.ts and add a regression test.",
     "should_trigger": false,
-    "split": "validation"
+    "split": "train"
   },
   {
     "query": "Choose between Kafka and NATS for event delivery and record an architecture decision with the final outcome.",

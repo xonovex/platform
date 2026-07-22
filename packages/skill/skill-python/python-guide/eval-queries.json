@@ -24,54 +24,6 @@
     "split": "train"
   },
   {
-    "query": "add proper types to the response shape in src/api/users.ts so the consumer doesn't have to cast",
-    "rationale": "near miss owned by typescript-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
-    "query": "this is throwing 'Cannot find module' on `import { foo } from './bar'` — what's the ESM dance for relative imports",
-    "rationale": "near miss owned by typescript-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
-    "query": "convert this Promise.all-with-side-effects mess to a clean async function in src/jobs/sync.ts",
-    "rationale": "near miss owned by typescript-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
-    "query": "drop the barrel export in shared/index.ts and import directly from each module",
-    "rationale": "near miss owned by typescript-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
-    "query": "tighten this `any` in src/utils/parseDate.ts to something usable",
-    "rationale": "near miss owned by typescript-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
-    "query": "make PORT a typed env var with a default of 3000 instead of the loose process.env.PORT we have now",
-    "rationale": "near miss owned by typescript-guide",
-    "should_trigger": false,
-    "split": "validation"
-  },
-  {
-    "query": "fix the inferred return type on this generic helper — it widens to `unknown` and the callers all have to assert",
-    "rationale": "near miss owned by typescript-guide",
-    "should_trigger": false,
-    "split": "validation"
-  },
-  {
-    "query": "the strict-mode flag is off in this package's tsconfig — turn it on and fix what falls out",
-    "rationale": "near miss owned by typescript-guide",
-    "should_trigger": false,
-    "split": "validation"
-  },
-  {
     "query": "A review comment on `work/dataclasses-type-hints/` says the dataclasses type hints change handles the normal fixture but leaves the failure path undefined. For this Python task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
     "rationale": "implicit task cue derived from the dataclasses type hints reference",
     "should_trigger": true,
@@ -93,6 +45,54 @@
     "query": "A review comment on `work/caching-functions/` says the caching functions change handles the normal fixture but leaves the failure path undefined. For this Python task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
     "rationale": "implicit task cue derived from the caching functions reference",
     "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "add proper types to the response shape in src/api/users.ts so the consumer doesn't have to cast",
+    "rationale": "near miss owned by typescript-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "I have a log file with about 20 million lines already loaded as an array of strings in JavaScript. Write a function that keeps only the ERROR lines, extracts the timestamp from each, and returns the first 10. Explain any performance concerns.",
+    "rationale": "near miss owned by fp-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Using Zod 4, write a TypeScript schema named UserSchema for a user object with these fields: an id that is a UUID, an email address, a createdAt that is an ISO datetime string, and a name string between 1 and 100 characters. Also export the inferred TypeScript type.",
+    "rationale": "near miss owned by zod-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "I have a Hono app configured with `app.use('*', cors())`. Write a Vitest test that verifies the CORS preflight (OPTIONS) request to `/api/users` with an Origin header succeeds and that the Access-Control-Allow-Origin header is returned.",
+    "rationale": "near miss owned by vitest-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "I have a Terraform config that creates private subnets, one per availability zone, from a variable list of AZs. Right now removing a single AZ from the middle of the list forces Terraform to recreate several unrelated subnets. Write the resource and any supporting locals so this stops happening.",
+    "rationale": "near miss owned by terraform-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Write a portable shell script that must run under dash and busybox sh, not just bash. It should verify that jq is installed, take a filename as its first argument, and abort early on any error or unset variable.",
+    "rationale": "near miss owned by shell-scripting-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Set up the compiler configuration (CMake) for a C99 library target named `netcodec` that calls `readlink` and `strnlen`. Configure it for strict ISO C99, treat warnings as errors with `-Wall -Wextra`, and make sure it still compiles cleanly even though the code uses partial designated initializers like `(cfg_t){ .port = 8080 }` throughout.",
+    "rationale": "near miss owned by c99-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "our particle simulator stalls when we have 50k particles — the update loop reads position and velocity out of a fat 96-byte struct, can you restructure it for cache efficiency",
+    "rationale": "near miss owned by data-oriented-design-guide",
+    "should_trigger": false,
     "split": "validation"
   }
 ]

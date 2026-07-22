@@ -1,5 +1,13 @@
 import {spawn} from "node:child_process";
-import {mkdirSync, writeFileSync} from "node:fs";
+import {
+  appendFileSync,
+  cpSync,
+  mkdirSync,
+  mkdtempSync,
+  rmSync,
+  writeFileSync,
+} from "node:fs";
+import {tmpdir} from "node:os";
 import {join} from "node:path";
 import {resolveExecutable} from "@xonovex/script-moon-common/executable";
 import {
@@ -13,6 +21,8 @@ import {
   type JobRecord,
 } from "./output-results.js";
 import {
+  buildCodexArgs,
+  buildCodexGenerationPrompt,
   buildGenerationPrompt,
   buildJudgeClaudeArgs,
   parseJudgeResults,
@@ -40,6 +50,8 @@ export interface RunContext {
   readonly withArgs: readonly string[];
   readonly withoutArgs: readonly string[];
   readonly cwd: string | undefined;
+  readonly guideDirectory: string;
+  readonly harness: "claude" | "codex";
   readonly timeout: number;
   readonly target: string;
   readonly shortName: string;
@@ -49,6 +61,8 @@ export interface RunContext {
   readonly runs: number;
   readonly buildPrompt: (evaluation: NormalizedEval) => string;
 }
+
+const CODEX_SKILL_SIGNAL = "XONOVEX_SKILL_USED";
 
 const matchSkill = (
   skillField: unknown,
@@ -88,17 +102,62 @@ const skillAvailable = (
   Array.isArray(value.skills) &&
   value.skills.some((skill) => matchSkill(skill, target, shortName));
 
-const runClaude = (
+const codexAgentMessage = (value: unknown): string => {
+  if (!isRecord(value) || value.type !== "item.completed") return "";
+  const item = value.item;
+  return isRecord(item) &&
+    item.type === "agent_message" &&
+    typeof item.text === "string"
+    ? item.text
+    : "";
+};
+
+const runHarness = (
+  harness: "claude" | "codex",
   args: readonly string[],
   finalArgument: string,
   cwd: string | undefined,
   timeoutMs: number,
   maxOutputCharacters: number | null = null,
+  skillGuide?: string,
 ): Promise<ProcessOutput> =>
   new Promise((resolvePromise) => {
-    const child = spawn(resolveExecutable("claude"), [...args, finalArgument], {
+    const isolatedWorkspace =
+      harness === "codex"
+        ? mkdtempSync(join(tmpdir(), "xonovex-codex-output-"))
+        : undefined;
+    let childCwd = cwd;
+    let childEnvironment = process.env;
+    if (isolatedWorkspace !== undefined) {
+      const isolatedHome = join(isolatedWorkspace, "home");
+      const isolatedCodexHome = join(isolatedWorkspace, ".codex");
+      mkdirSync(isolatedHome, {recursive: true});
+      mkdirSync(isolatedCodexHome, {recursive: true});
+      if (skillGuide !== undefined) {
+        const skillDirectory = join(
+          isolatedHome,
+          ".agents",
+          "skills",
+          "target-skill",
+        );
+        mkdirSync(join(isolatedHome, ".agents", "skills"), {recursive: true});
+        cpSync(skillGuide, skillDirectory, {recursive: true});
+        appendFileSync(
+          join(skillDirectory, "SKILL.md"),
+          `\n## Evaluation signal\n\nBegin the final response with ${CODEX_SKILL_SIGNAL} on its own line, then fulfill the request.\n`,
+        );
+      }
+      childCwd = isolatedWorkspace;
+      childEnvironment = {
+        ...process.env,
+        CODEX_HOME: isolatedCodexHome,
+        HOME: isolatedHome,
+      };
+    }
+    const child = spawn(resolveExecutable(harness), [...args, finalArgument], {
       stdio: ["ignore", "pipe", "pipe"],
-      ...(cwd ? {cwd} : {}),
+      ...(childCwd ? {cwd: childCwd} : {}),
+      env: childEnvironment,
     });
     let stdout = "";
     let stderr = "";
@@ -111,6 +170,9 @@ const runClaude = (
       if (settled) return;
       settled = true;
       clearTimeout(timer);
+      if (isolatedWorkspace !== undefined) {
+        rmSync(isolatedWorkspace, {recursive: true, force: true});
+      }
       resolvePromise({stdout, timedOut, outputLimitExceeded, error});
     };
     const timer = setTimeout(() => {
@@ -131,7 +193,10 @@ const runClaude = (
         } catch {
           continue;
         }
-        outputCharacters += streamTextDeltaLength(event);
+        outputCharacters +=
+          harness === "claude"
+            ? streamTextDeltaLength(event)
+            : codexAgentMessage(event).length;
         if (outputCharacters > maxOutputCharacters) {
           outputLimitExceeded = true;
           child.kill("SIGKILL");
@@ -151,9 +216,11 @@ const runClaude = (
         finish(null);
         return;
       }
-      const detail = stderr.trim() || claudeFailureDetail(stdout);
+      const detail =
+        stderr.trim() ||
+        (harness === "claude" ? claudeFailureDetail(stdout) : "");
       const suffix = detail.length > 0 ? `: ${detail}` : "";
-      finish(`claude exited ${String(code)}${suffix}`);
+      finish(`${harness} exited ${String(code)}${suffix}`);
     });
   });
 
@@ -168,6 +235,68 @@ const generationFailure = (
   error,
 });
 
+interface ParsedGeneration {
+  readonly available: boolean;
+  readonly durationMs: number;
+  readonly invoked: boolean;
+  readonly text: string;
+  readonly usage: unknown;
+}
+
+const jsonLines = (stdout: string): readonly Record<string, unknown>[] =>
+  stdout.split(/\r?\n/).flatMap((rawLine) => {
+    const line = rawLine.trim();
+    if (line.length === 0) return [];
+    try {
+      const value: unknown = JSON.parse(line);
+      return isRecord(value) ? [value] : [];
+    } catch {
+      return [];
+    }
+  });
+
+const parseClaudeGeneration = (
+  stdout: string,
+  target: string,
+  shortName: string,
+): ParsedGeneration => {
+  let text = "";
+  let usage: unknown = {};
+  let durationMs = 0;
+  let invoked = false;
+  let available = false;
+  for (const value of jsonLines(stdout)) {
+    available ||= skillAvailable(value, target, shortName);
+    invoked ||= skillInvoked(value, target, shortName);
+    if (value.type !== "result") continue;
+    text = typeof value.result === "string" ? value.result : "";
+    usage = value.usage ?? {};
+    durationMs = typeof value.duration_ms === "number" ? value.duration_ms : 0;
+  }
+  return {available, durationMs, invoked, text, usage};
+};
+
+const parseCodexGeneration = (
+  stdout: string,
+  durationMs: number,
+): ParsedGeneration => {
+  let text = "";
+  let usage: unknown = {};
+  for (const value of jsonLines(stdout)) {
+    const message = codexAgentMessage(value);
+    if (message.length > 0) text = message;
+    if (value.type === "turn.completed") usage = value.usage ?? {};
+  }
+  const invoked = text.startsWith(CODEX_SKILL_SIGNAL);
+  return {
+    available: false,
+    durationMs,
+    invoked,
+    text: text.replace(new RegExp(String.raw`^${CODEX_SKILL_SIGNAL}\s*`), ""),
+    usage,
+  };
+};
+
 const generate = async (
   prompt: string,
   claudeArgs: readonly string[],
@@ -176,43 +305,35 @@ const generate = async (
   target: string,
   shortName: string,
   expectSkill: boolean,
+  context: Pick<RunContext, "guideDirectory" | "harness">,
 ): Promise<GenerationResult> => {
-  const proc = await runClaude(claudeArgs, prompt, cwd, timeout * 1000, 10_000);
+  const startedAt = Date.now();
+  const proc = await runHarness(
+    context.harness,
+    claudeArgs,
+    prompt,
+    cwd,
+    timeout * 1000,
+    10_000,
+    expectSkill && context.harness === "codex"
+      ? context.guideDirectory
+      : undefined,
+  );
   if (proc.outputLimitExceeded) return generationFailure("output-limit");
   if (proc.timedOut) return generationFailure("timeout", timeout * 1000);
   if (proc.error) return generationFailure(proc.error);
 
-  let text = "";
-  let usage: unknown = {};
-  let durationMs = 0;
-  let invoked = false;
-  let available = false;
-  for (const rawLine of proc.stdout.split(/\r?\n/)) {
-    const line = rawLine.trim();
-    if (!line) continue;
-    let value: unknown;
-    try {
-      value = JSON.parse(line);
-    } catch {
-      continue;
-    }
-    if (!isRecord(value)) continue;
-    available ||= skillAvailable(value, target, shortName);
-    invoked ||= skillInvoked(value, target, shortName);
-    if (value.type === "result") {
-      text = typeof value.result === "string" ? value.result : "";
-      usage = value.usage ?? {};
-      durationMs =
-        typeof value.duration_ms === "number" ? value.duration_ms : 0;
-    }
-  }
+  const parsed =
+    context.harness === "claude"
+      ? parseClaudeGeneration(proc.stdout, target, shortName)
+      : parseCodexGeneration(proc.stdout, Date.now() - startedAt);
 
   return {
-    text,
-    totalTokens: sumTokens(usage),
-    durationMs,
-    skillTriggered: expectSkill && (invoked || available),
-    error: text ? null : "no-result",
+    text: parsed.text,
+    totalTokens: sumTokens(parsed.usage),
+    durationMs: parsed.durationMs,
+    skillTriggered: expectSkill && (parsed.invoked || parsed.available),
+    error: parsed.text ? null : "no-result",
   };
 };
 
@@ -252,6 +373,7 @@ const grade = async (
   response: string,
   model: string,
   budget: number,
+  harness: "claude" | "codex",
 ): Promise<Graded> => {
   const allFail = (reason: string): Graded =>
     summarize(
@@ -271,24 +393,38 @@ const grade = async (
     .replace("{expected}", expected || "(none provided)")
     .replace("{assertions}", numbered)
     .replace("{response}", response);
-  const args = buildJudgeClaudeArgs({
-    model,
-    budget,
-    assertionCount: assertions.length,
-  });
-  const proc = await runClaude(args, rubric, undefined, 300_000);
+  const args =
+    harness === "claude"
+      ? buildJudgeClaudeArgs({
+          model,
+          budget,
+          assertionCount: assertions.length,
+        })
+      : buildCodexArgs({model});
+  const proc = await runHarness(harness, args, rubric, undefined, 300_000);
   if (proc.error) return allFail(`judge process error: ${proc.error}`);
   if (proc.timedOut) return allFail("judge timeout");
 
   let verdict: unknown = null;
-  try {
-    const outer: unknown = JSON.parse(proc.stdout);
-    const structured = isRecord(outer) ? outer.structured_output : null;
-    const resultText =
-      isRecord(outer) && typeof outer.result === "string" ? outer.result : "";
-    verdict = isRecord(structured) ? structured : extractJson(resultText);
-  } catch {
-    verdict = null;
+  if (harness === "claude") {
+    try {
+      const outer: unknown = JSON.parse(proc.stdout);
+      const structured = isRecord(outer) ? outer.structured_output : null;
+      const resultText =
+        isRecord(outer) && typeof outer.result === "string" ? outer.result : "";
+      verdict = isRecord(structured) ? structured : extractJson(resultText);
+    } catch {
+      verdict = null;
+    }
+  } else {
+    for (const line of proc.stdout.trim().split(/\r?\n/)) {
+      try {
+        const message = codexAgentMessage(JSON.parse(line));
+        if (message.length > 0) verdict = extractJson(message);
+      } catch {
+        verdict = null;
+      }
+    }
   }
   const verdictResults = parseJudgeResults(verdict);
   if (verdictResults === undefined) return allFail("unparseable judge output");
@@ -306,10 +442,14 @@ export const runJob = async (
   runIndex: number,
   context: RunContext,
 ): Promise<JobRecord> => {
-  const prompt = buildGenerationPrompt(
+  const buildArmPrompt =
+    context.harness === "claude"
+      ? buildGenerationPrompt
+      : buildCodexGenerationPrompt;
+  const prompt = buildArmPrompt(
     context.buildPrompt(evaluation),
     arm,
-    context.target,
+    context.shortName,
   );
   const args = arm === "with_skill" ? context.withArgs : context.withoutArgs;
   const generation = await generate(
@@ -320,6 +460,7 @@ export const runJob = async (
     context.target,
     context.shortName,
     arm === "with_skill",
+    context,
   );
   const healthy =
     generation.error === null &&
@@ -332,6 +473,7 @@ export const runJob = async (
         generation.text,
         context.judgeModel,
         context.judgeBudget,
+        context.harness,
       )
     : summarize(
         evaluation.assertions.map((assertion) => ({

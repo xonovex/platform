@@ -84,14 +84,14 @@
     "split": "validation"
   },
   {
-    "query": "Set up the remote state backend for our production environment's Terraform root module. We're on AWS. Show the backend configuration and explain the key decisions.",
-    "rationale": "near miss owned by terraform-guide",
+    "query": "Write an async Python function fetch_all(urls) that retrieves the body of each URL over HTTP and returns them as a list. The URLs are independent of one another and there may be dozens of them.",
+    "rationale": "near miss owned by python-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "Someone changed our infrastructure manually in the cloud console. I want to see what has drifted from our Terraform state before I decide whether to reconcile it. What command should I run and why?",
-    "rationale": "near miss owned by terraform-guide",
+    "query": "I need to add a SIMD variant of my vec3_dot in lib/math/vec3.c — the rest of the project uses _sse4 and _avx2 suffixes",
+    "rationale": "near miss owned by c99-opinionated-guide",
     "should_trigger": false,
     "split": "validation"
   }

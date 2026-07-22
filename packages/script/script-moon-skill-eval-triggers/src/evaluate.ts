@@ -3,7 +3,11 @@ import {join} from "node:path";
 import {usageError} from "./cli.js";
 import {resolveTriggerConfig} from "./trigger-config.js";
 import {runTriggerEvaluation} from "./trigger-evaluation.js";
-import {TRIGGER_OUTPUT_LIMIT} from "./trigger-process.js";
+import {
+  checkCodexTriggered,
+  checkTriggered,
+  TRIGGER_OUTPUT_LIMIT,
+} from "./trigger-process.js";
 import {MAX_TRIGGER_MODEL_RUNS, triggerModelRunCount} from "./validation.js";
 
 export const main = async (argv: readonly string[]): Promise<number> => {
@@ -28,11 +32,26 @@ export const main = async (argv: readonly string[]): Promise<number> => {
     queryBatches: config.queryBatches,
     runs: config.runs,
     threshold: config.threshold,
-    claudeArgs: config.claudeArgs,
     skillName: config.skillName,
-    shortName: config.shortName,
-    claudeExecutable: config.claudeExecutable,
     workspace: config.workspace,
+    check:
+      config.harness === "claude"
+        ? (query) =>
+            checkTriggered(
+              query,
+              config.harnessArgs,
+              config.skillName,
+              config.shortName,
+              config.harnessExecutable,
+            )
+        : (query) =>
+            checkCodexTriggered({
+              args: config.harnessArgs,
+              executable: config.harnessExecutable,
+              guideDirectory: config.guideDirectory,
+              query,
+              shortName: config.shortName,
+            }),
   });
   if (!evaluation.success) {
     return 2;
@@ -50,6 +69,8 @@ export const main = async (argv: readonly string[]): Promise<number> => {
       `${JSON.stringify(
         {
           skill: config.skillName,
+          harness: config.harness,
+          model: config.model || null,
           split: config.split,
           batches: config.queryBatches.length,
           queries: total,
@@ -65,10 +86,16 @@ export const main = async (argv: readonly string[]): Promise<number> => {
   }
 
   process.stderr.write("---\n");
+  const budgetSummary =
+    config.harness === "claude"
+      ? `budget/run: $${String(config.budget)}  `
+      : "";
   process.stderr.write(
-    `skill: ${config.skillName}  split: ${config.split}  runs: ${String(config.runs)}  ` +
-      `threshold: ${String(config.threshold)}  model: ${config.claudeModel}  ` +
-      `budget/run: $${String(config.budget)}  tools: Skill  timeout: 60s  ` +
+    `skill: ${config.skillName}  harness: ${config.harness}  split: ${config.split}  ` +
+      `runs: ${String(config.runs)}  threshold: ${String(config.threshold)}  ` +
+      `model: ${config.model || "<default>"}  ` +
+      budgetSummary +
+      `timeout: 60s  ` +
       `output-limit: ${String(TRIGGER_OUTPUT_LIMIT)} chars  ` +
       `batches: ${String(config.queryBatches.length)}  ` +
       `model-runs: ${String(triggerModelRunCount(config.queryCount, config.runs))}  ` +

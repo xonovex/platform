@@ -44,6 +44,7 @@ describe("main", () => {
 
 ## Primary source
 - **URL:** https://example.com/guide
+- **Version:** 2.4.0
 - **References:** all
 - **Last reviewed:** 2099-01-01
 `,
@@ -57,6 +58,7 @@ describe("main", () => {
     expect(JSON.parse(String(log.mock.calls[0]?.[0]))).toMatchObject({
       skill: "healthy-skill",
       source_count: 1,
+      sources: [{version: "2.4.0", commit: null, watch_count: 0}],
       problems: 0,
     });
   });

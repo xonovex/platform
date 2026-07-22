@@ -1,0 +1,50 @@
+name: Skill source audit
+
+on:
+  schedule:
+    - cron: "11 5 * * 1"
+  workflow_dispatch:
+
+concurrency:
+  group: skill-source-audit
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    name: Fetch and audit skill sources
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
+      - uses: ./.github/actions/setup-nix
+        with:
+          cache-workspace: true
+
+      - name: Install repository dependencies
+        run: nix develop --no-update-lock-file --command npm ci
+
+      - name: Check provenance, review age, versions, and live URLs
+        run: |
+          set +e
+          nix develop --no-update-lock-file --command npx moon-skill-audit-sources \
+            --all packages/skill --max-age 180 --fetch --json \
+            >"${RUNNER_TEMP}/skill-source-audit.json"
+          status=$?
+          set -e
+          jq '{skills: length, problems: map(.problems) | add, versioned_sources: map(.sources[] | select(.version != null)) | length}' \
+            "${RUNNER_TEMP}/skill-source-audit.json"
+          exit "$status"
+
+      - name: Upload source-audit evidence
+        if: success() || failure()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: skill-source-audit
+          path: ${{ runner.temp }}/skill-source-audit.json
+          if-no-files-found: error
+          retention-days: 30

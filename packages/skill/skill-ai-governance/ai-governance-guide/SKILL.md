@@ -16,6 +16,8 @@ Govern AI-system decisions and evidence without treating a framework, model card
 - **Evaluate exact revisions** — test validity, accuracy, robustness, security, abuse, harmful outcomes, resource controls, and control effectiveness with independent origins, see [references/evaluation-and-monitoring.md](references/evaluation-and-monitoring.md)
 - **Monitor meaningful change** — observe production, detect drift, reassess, handle incidents, update safely, and promote learning only through reviewed reversible change, see [references/evaluation-and-monitoring.md](references/evaluation-and-monitoring.md)
 
+Use **security-assurance-guide** for the security-specific threat, control, supply-chain, and verification criteria; **reliability-guide** for service objectives, failure semantics, and recovery; and **agent-governance-guide** for composing execution controls around agent operations. This skill owns AI applicability, accountable risk, inventory, oversight, and assurance integration.
+
 ## Gotchas
 
 - Framework mappings are contextual and often many-to-many; they do not establish equivalence, conformity, certification, or legal compliance.

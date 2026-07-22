@@ -90,8 +90,8 @@
     "split": "validation"
   },
   {
-    "query": "this PR is getting huge, what should I do about it",
-    "rationale": "near miss owned by pull-request-guide",
+    "query": "open a pull request against main with reviewers and a label using the gh CLI",
+    "rationale": "near miss owned by github-guide",
     "should_trigger": false,
     "split": "validation"
   }

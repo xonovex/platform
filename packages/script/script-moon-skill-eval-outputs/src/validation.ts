@@ -110,6 +110,10 @@ interface JudgeClaudeOptions {
   readonly assertionCount: number;
 }
 
+interface CodexOptions {
+  readonly model: string;
+}
+
 interface EvaluationHealthRecord {
   readonly id: string | number;
   readonly arm: EvaluationArm;
@@ -145,6 +149,12 @@ export const buildGenerationPrompt = (
   arm: EvaluationArm,
   skillName: string,
 ): string => (arm === "with_skill" ? `/${skillName} ${prompt}` : prompt);
+
+export const buildCodexGenerationPrompt = (
+  prompt: string,
+  arm: EvaluationArm,
+  skillName: string,
+): string => (arm === "with_skill" ? `$${skillName}\n\n${prompt}` : prompt);
 
 const isolatedClaudeArgs = (outputFormat: "json" | "stream-json") =>
   [
@@ -239,6 +249,21 @@ export const buildJudgeClaudeArgs = (
     schema,
   ];
   if (options.model) args.push("--model", options.model);
+  return args;
+};
+
+export const buildCodexArgs = (options: CodexOptions): readonly string[] => {
+  const args = [
+    "exec",
+    "--json",
+    "--ephemeral",
+    "--sandbox",
+    "read-only",
+    "--ignore-user-config",
+    "--ignore-rules",
+    "--skip-git-repo-check",
+  ];
+  if (options.model.length > 0) args.push("--model", options.model);
   return args;
 };
 

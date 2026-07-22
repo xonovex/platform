@@ -1,6 +1,6 @@
 # accessibility: Accessibility Best Practices
 
-Use semantic landmarks (`<header>`, `<nav>`, `<main>`, `<article>`, `<aside>`), a logical h1→h2→h3 heading order, `aria-label` on nav and complex regions, and always pass `alt` to Astro's `<Image>`.
+**accessibility-guide** owns applicable criteria, assessment evidence, exceptions, and conformance claims. This reference owns the Astro implementation delta: semantic template markup and required `alt` text on Astro's `<Image>`.
 
 ```astro
 <nav aria-label="Main navigation">

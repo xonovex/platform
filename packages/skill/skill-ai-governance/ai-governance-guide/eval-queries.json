@@ -78,20 +78,20 @@
     "split": "validation"
   },
   {
+    "query": "assess this exact web release against WCAG 2.2 AA and publish reviewable evidence",
+    "rationale": "near miss owned by accessibility-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
     "query": "build a threat-informed security assurance plan with exact control and evidence ownership",
     "rationale": "near miss owned by security-assurance-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "select NIST 800-53 controls for this system without claiming a one-to-one compliance mapping",
-    "rationale": "near miss owned by security-assurance-guide",
-    "should_trigger": false,
-    "split": "validation"
-  },
-  {
-    "query": "verify artifact provenance, signatures, dependencies, build identity, and rollback before release",
-    "rationale": "near miss owned by security-assurance-guide",
+    "query": "what does Xonovex governance actually enforce, and can I run a workflow with no controls?",
+    "rationale": "near miss owned by agent-governance-guide",
     "should_trigger": false,
     "split": "validation"
   }

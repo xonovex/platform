@@ -24,30 +24,6 @@
     "split": "train"
   },
   {
-    "query": "Write a Lua 5.4 function `load_config(path)` that opens the file at `path`, reads all of it, and returns the parsed contents. Show how a caller would use it when the file might not exist, falling back to a default config instead of crashing.",
-    "rationale": "near miss owned by lua-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
-    "query": "In Lua, write a function that takes an array of a few thousand numbers and returns them as a single comma-separated string. Make it efficient for large inputs.",
-    "rationale": "near miss owned by lua-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
-    "query": "I'm iterating in a running Lua process. I edited `myapp.settings` on disk, but calling `require(\"myapp.settings\")` again keeps returning the stale version from before my edit. How do I force it to pick up the new file? Show the code.",
-    "rationale": "near miss owned by lua-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
-    "query": "Write a Lua 5.4 function `paginate(total, per_page)` that returns two values: the number of full pages needed to hold all items (rounded up is not required — use floor of total divided by per_page), and the exact average items-per-page as a decimal number.",
-    "rationale": "near miss owned by lua-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
     "query": "A review comment on `work/module-structure/` says the module structure change handles the normal fixture but leaves the failure path undefined. For this Terraform task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
     "rationale": "implicit task cue derived from the module structure reference",
     "should_trigger": true,
@@ -72,26 +48,50 @@
     "split": "validation"
   },
   {
-    "query": "A review comment on `work/module-pattern/` says the module pattern change handles the normal fixture but leaves the failure path undefined. For this Lua task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
+    "query": "Write a Lua 5.4 function `load_config(path)` that opens the file at `path`, reads all of it, and returns the parsed contents. Show how a caller would use it when the file might not exist, falling back to a default config instead of crashing.",
     "rationale": "near miss owned by lua-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "quick pre-merge sanity check: after the local variables change under `work/local-variables/`, a clean checkout behaves differently from my local run. What Lua-specific assumption could cause that? Show the correction and the exact narrow validation.",
-    "rationale": "near miss owned by lua-guide",
+    "query": "harden the user-service module — it's full of `any` and swallowed errors, just tell me what to fix",
+    "rationale": "near miss owned by code-quality-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "I have a log file with about 20 million lines already loaded as an array of strings in JavaScript. Write a function that keeps only the ERROR lines, extracts the timestamp from each, and returns the first 10. Explain any performance concerns.",
+    "rationale": "near miss owned by fp-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Write an async Python function fetch_all(urls) that retrieves the body of each URL over HTTP and returns them as a list. The URLs are independent of one another and there may be dozens of them.",
+    "rationale": "near miss owned by python-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "respond like a caveman from now on",
+    "rationale": "near miss owned by caveman",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "these two modules feel way too tightly coupled — tell me concretely what kind of coupling it is and how to loosen the worst part",
+    "rationale": "near miss owned by connascence-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "The clean Linux CI job fails only for the minimal metatables fixture under `work/metatables/`, while the full local fixture passes. Trace the Lua-specific boundary that could cause the difference, then propose a patch and a regression check.",
-    "rationale": "near miss owned by lua-guide",
+    "query": "Using Zod 4, write a TypeScript schema named UserSchema for a user object with these fields: an id that is a UUID, an email address, a createdAt that is an ISO datetime string, and a name string between 1 and 100 characters. Also export the inferred TypeScript type.",
+    "rationale": "near miss owned by zod-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "A review comment on `work/coroutines/` says the coroutines change handles the normal fixture but leaves the failure path undefined. For this Lua task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
-    "rationale": "near miss owned by lua-guide",
+    "query": "Research the code paths and current library versions we need before planning rate limiting for packages/api. Keep it read-only and cite the evidence.",
+    "rationale": "near miss owned by plan-guide",
     "should_trigger": false,
     "split": "validation"
   }

@@ -102,20 +102,20 @@
     "split": "train"
   },
   {
-    "query": "Two of my classes each have a handful of nearly identical helper methods. Should I pull those into a shared abstract base class so both can inherit them? Give me a concrete recommendation.",
-    "rationale": "near miss owned by oop-guide",
+    "query": "make our particle system stop calling malloc per particle — hand it a buffer it just fills",
+    "rationale": "near miss owned by memory-management-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "Code review: a NonRemovableList subclass extends List but overrides its remove() method to throw UnsupportedOperationException because removal isn't allowed. Is this a good design? Name the problem.",
-    "rationale": "near miss owned by oop-guide",
+    "query": "Write a Lua 5.4 function `load_config(path)` that opens the file at `path`, reads all of it, and returns the parsed contents. Show how a caller would use it when the file might not exist, falling back to a default config instead of crashing.",
+    "rationale": "near miss owned by lua-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "I'm writing a Java Money value class and I just added an equals() method so two Money instances with the same amount compare equal. I plan to use Money objects as keys in a HashMap. Anything else I need to do?",
-    "rationale": "near miss owned by oop-guide",
+    "query": "I have a Hono app configured with `app.use('*', cors())`. Write a Vitest test that verifies the CORS preflight (OPTIONS) request to `/api/users` with an Origin header succeeds and that the Access-Control-Allow-Origin header is returned.",
+    "rationale": "near miss owned by vitest-guide",
     "should_trigger": false,
     "split": "validation"
   }

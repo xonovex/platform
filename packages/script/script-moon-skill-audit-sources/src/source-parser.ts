@@ -11,7 +11,7 @@ const REFERENCES_RE = /\*\*References:\*\*\s*(.*\S)?\s*$/;
 const LEGACY_ALL_REFERENCES_RE =
   /\*\*Used for:\*\*.*\b(?:all `references\/`|all references|every [^\n]* reference)/i;
 const CHECKOUT_RE = /\*\*Checkout:\*\*\s*(\S+)/;
-const VERSION_RE = /\*\*Version:\*\*\s*v?(\d+\.\d+\.\d+)/;
+const VERSION_RE = /\*\*Version:\*\*\s*(.+\S)\s*$/;
 const COMMIT_RE = /\*\*Commit:\*\*\s*([0-9a-f]{7,40})/;
 const WATCH_RE = /\*\*Watch:\*\*\s*(.+?)\s*(?:->|→)\s*(.+\S)\s*$/;
 
@@ -176,7 +176,12 @@ const collectMetadata = (source: MutableSource, line: string): void => {
   const checkout = CHECKOUT_RE.exec(line)?.[1];
   if (checkout !== undefined) source.checkout = checkout;
   const version = VERSION_RE.exec(line)?.[1];
-  if (version !== undefined) source.version = version;
+  if (version !== undefined) {
+    const trimmed = version.trim();
+    source.version = trimmed.startsWith("`")
+      ? /^`([^`]+)`/.exec(trimmed)?.[1]
+      : trimmed;
+  }
   const commit = COMMIT_RE.exec(line)?.[1];
   if (commit !== undefined) source.commit = commit;
 

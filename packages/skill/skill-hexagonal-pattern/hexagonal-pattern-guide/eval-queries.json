@@ -72,26 +72,26 @@
     "split": "train"
   },
   {
-    "query": "I have a CMake library target `core`. Make it require C++20, and add `-Wall -Wextra -pedantic` warnings on GCC/Clang and `/W4` on MSVC, without affecting other targets in the build. Write the CMake commands.",
-    "rationale": "near miss owned by cmake-guide",
+    "query": "I have a Terraform config that creates private subnets, one per availability zone, from a variable list of AZs. Right now removing a single AZ from the middle of the list forces Terraform to recreate several unrelated subnets. Write the resource and any supporting locals so this stops happening.",
+    "rationale": "near miss owned by terraform-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "I have a library target `mylib` with public headers in `include/`. Write the CMake install rules so that a downstream project can consume it with find_package and get a properly namespaced imported target.",
-    "rationale": "near miss owned by cmake-guide",
+    "query": "design a plugin registry so new storage backends register themselves and the core never imports them",
+    "rationale": "near miss owned by microkernel-pattern-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "Set up CTest for a project. Register a test executable `unit_tests` as a test, tag it so it can be run selectively as a group, and give it a 30-second timeout. Show the CMake code.",
-    "rationale": "near miss owned by cmake-guide",
+    "query": "walk me through red-green-refactor on this shopping-cart total function",
+    "rationale": "near miss owned by tdd-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "A review comment on `work/target-types/` says the target types change handles the normal fixture but leaves the failure path undefined. For this Cmake task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
-    "rationale": "near miss owned by cmake-guide",
+    "query": "In a Remotion project running at 30fps, write a React component that fades a headline in from opacity 0 to 1 over the first half second and slides it up 40px at the same time. Give me the full component code.",
+    "rationale": "near miss owned by remotion-guide",
     "should_trigger": false,
     "split": "validation"
   }

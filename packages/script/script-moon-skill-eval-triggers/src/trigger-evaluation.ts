@@ -1,6 +1,6 @@
 import {writeFileSync} from "node:fs";
 import {join} from "node:path";
-import {checkTriggered} from "./trigger-process.js";
+import {type TriggerOutcome} from "./trigger-process.js";
 import {type Query} from "./validation.js";
 
 interface ResultRecord {
@@ -21,18 +21,15 @@ export interface TriggerEvaluationResult {
   readonly total: number;
 }
 
-export type TriggerCheck = typeof checkTriggered;
+export type TriggerCheck = (query: string) => Promise<TriggerOutcome>;
 
 export interface TriggerEvaluationOptions {
   readonly queryBatches: readonly (readonly Query[])[];
   readonly runs: number;
   readonly threshold: number;
-  readonly claudeArgs: readonly string[];
   readonly skillName: string;
-  readonly shortName: string;
-  readonly claudeExecutable: string;
   readonly workspace: string | undefined;
-  readonly check?: TriggerCheck;
+  readonly check: TriggerCheck;
 }
 
 const evaluateQuery = async (
@@ -41,13 +38,7 @@ const evaluateQuery = async (
 ): Promise<ResultRecord | undefined> => {
   let triggers = 0;
   for (let index = 0; index < options.runs; index += 1) {
-    const outcome = await (options.check ?? checkTriggered)(
-      entry.query,
-      options.claudeArgs,
-      options.skillName,
-      options.shortName,
-      options.claudeExecutable,
-    );
+    const outcome = await options.check(entry.query);
     if (outcome.error !== null) {
       if (options.workspace !== undefined) {
         writeFileSync(

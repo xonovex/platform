@@ -90,8 +90,8 @@
     "split": "validation"
   },
   {
-    "query": "what label do I use for a trivial preference-level nitpick in a code review?",
-    "rationale": "near miss owned by code-review-guide",
+    "query": "is this user story good? \"As a rider I want to pay for my trip\" — does it pass INVEST?",
+    "rationale": "near miss owned by user-stories-guide",
     "should_trigger": false,
     "split": "validation"
   }

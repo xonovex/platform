@@ -6,6 +6,7 @@
   - https://docs.python.org/3.12/
   - https://docs.python.org/3.12/library/typing.html
   - https://docs.python.org/3.12/library/asyncio.html
+- **Version:** 3.12.0
 - **Last reviewed:** 2026-07-19
 - **Used for:** `SKILL.md` and all `references/`; typing, dataclasses, exceptions, async functions, resource management, packaging, testing, and performance boundaries.
 - **References:** all

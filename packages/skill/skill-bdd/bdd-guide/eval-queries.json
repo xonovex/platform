@@ -90,8 +90,8 @@
     "split": "validation"
   },
   {
-    "query": "write the test first, then the code — drive this feature test-first",
-    "rationale": "near miss owned by tdd-guide",
+    "query": "our codebase has #ifdef _WIN32 / #ifdef __linux__ branches in basically every source file and adding macOS means touching all of them — how do we restructure so the platform stuff lives in one place",
+    "rationale": "near miss owned by cross-platform-guide",
     "should_trigger": false,
     "split": "validation"
   }

@@ -96,20 +96,20 @@
     "split": "train"
   },
   {
-    "query": "In Zod 4, write a schema for an environment variable PORT that arrives as a string, is converted to a number, must be an integer between 1024 and 65535, and falls back to port 3000 when the variable is absent. Show the inferred output type.",
-    "rationale": "near miss owned by zod-guide",
+    "query": "Design a PostgreSQL table for meeting-room reservations. Each reservation has a room, a start time, and an end time. The database itself must guarantee that two reservations for the same room can never overlap in time. Write the CREATE TABLE statement.",
+    "rationale": "near miss owned by sql-postgresql-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "Write an Express-style POST handler in TypeScript that validates an incoming request body against a Zod schema called CreateUserSchema and returns HTTP 400 with the validation errors if the body is invalid, otherwise creates the user. The handler must not throw on invalid input.",
-    "rationale": "near miss owned by zod-guide",
+    "query": "Write an async Python function fetch_all(urls) that retrieves the body of each URL over HTTP and returns them as a list. The URLs are independent of one another and there may be dozens of them.",
+    "rationale": "near miss owned by python-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "In Zod 4, define a StatusSchema from an existing native TypeScript enum named Status. Then, given a UserSchema object schema, derive a CreateUserSchema that drops the id field and an UpdateUserSchema that makes all of CreateUserSchema's fields optional.",
-    "rationale": "near miss owned by zod-guide",
+    "query": "our renderer hand-writes a barrier before and after every pass and it breaks every time we reorder passes — I want passes to just declare what they read and write and have ordering and transitions figured out for us",
+    "rationale": "near miss owned by gpu-rendering-guide",
     "should_trigger": false,
     "split": "validation"
   }

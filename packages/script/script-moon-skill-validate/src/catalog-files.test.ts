@@ -121,4 +121,36 @@ describe("checkCatalogFiles", () => {
       `catalog: generic trigger eval query must be replaced: '${query}'`,
     );
   });
+
+  it("rejects generated near misses concentrated in one sibling", () => {
+    const skillDir = makeSkill();
+    const path = join(skillDir, "eval-queries.json");
+    const queries = JSON.parse(readFileSync(path, "utf8")) as {
+      rationale?: string;
+      should_trigger: boolean;
+    }[];
+    for (const query of queries.filter(({should_trigger}) => !should_trigger)) {
+      query.rationale = "near miss owned by one-guide";
+    }
+    writeFileSync(path, JSON.stringify(queries));
+
+    const report = checkCatalogFiles(skillDir, {name: "example-guide"});
+
+    expect(report.errors).toContain(
+      "catalog: generated negative routes need at least 3 sibling owners (found 1)",
+    );
+  });
+
+  it("requires a source version for a version-pinned skill", () => {
+    const skillDir = makeSkill();
+
+    const report = checkCatalogFiles(skillDir, {
+      name: "example-guide",
+      description: "Use when editing Example 2.4+ projects.",
+    });
+
+    expect(report.errors).toContain(
+      "catalog: version-pinned skill needs a Version field in SOURCES.md",
+    );
+  });
 });

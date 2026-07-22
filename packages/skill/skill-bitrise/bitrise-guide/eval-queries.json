@@ -108,14 +108,14 @@
     "split": "validation"
   },
   {
-    "query": "use a shared Bitbucket Pipelines configuration across our mobile repositories",
-    "rationale": "near miss owned by bitbucket-guide",
+    "query": "create a least-privilege AWS role for CI OIDC without IAM user access keys",
+    "rationale": "near miss owned by aws-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "configure Bitbucket Pipelines OIDC for a least-privilege AWS role without access keys",
-    "rationale": "near miss owned by bitbucket-guide",
+    "query": "link Azure Boards work item 381 to the pull request and preserve both native references",
+    "rationale": "near miss owned by azure-devops-guide",
     "should_trigger": false,
     "split": "validation"
   }

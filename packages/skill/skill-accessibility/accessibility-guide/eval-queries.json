@@ -84,14 +84,14 @@
     "split": "validation"
   },
   {
-    "query": "select NIST 800-53 controls for this system without claiming a one-to-one compliance mapping",
-    "rationale": "near miss owned by security-assurance-guide",
+    "query": "classify our AI-system role and applicable obligations before selecting a regulated profile",
+    "rationale": "near miss owned by ai-governance-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "verify artifact provenance, signatures, dependencies, build identity, and rollback before release",
-    "rationale": "near miss owned by security-assurance-guide",
+    "query": "link Azure Boards work item 381 to the pull request and preserve both native references",
+    "rationale": "near miss owned by azure-devops-guide",
     "should_trigger": false,
     "split": "validation"
   }

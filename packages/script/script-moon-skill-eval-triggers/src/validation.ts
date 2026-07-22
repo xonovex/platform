@@ -42,6 +42,10 @@ interface TriggerClaudeOptions {
   readonly pluginDirectories: readonly string[];
 }
 
+interface TriggerCodexOptions {
+  readonly model: string;
+}
+
 type ValidationResult<T> =
   | {readonly success: true; readonly data: T}
   | {readonly success: false; readonly error: string};
@@ -133,6 +137,23 @@ export const buildTriggerClaudeArgs = (
   for (const pluginDirectory of options.pluginDirectories) {
     args.push("--plugin-dir", pluginDirectory);
   }
+  return args;
+};
+
+export const buildTriggerCodexArgs = (
+  options: TriggerCodexOptions,
+): readonly string[] => {
+  const args = [
+    "exec",
+    "--json",
+    "--ephemeral",
+    "--sandbox",
+    "read-only",
+    "--ignore-user-config",
+    "--ignore-rules",
+    "--skip-git-repo-check",
+  ];
+  if (options.model.length > 0) args.push("--model", options.model);
   return args;
 };
 

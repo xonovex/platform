@@ -15,6 +15,8 @@ npx moon-skill-audit-sources <skill-dir> --pull          # fetch tags before the
 
 Source blocks may use `**URL:**`, an inline or bulleted `**URLs:**` list, or `**Provenance:**` for repository-original material without a truthful upstream URL. Every source block must declare what it feeds with `**References:** all`, a comma-separated list such as `**References:** references/auth.md, references/onboarding.md`, or an existing machine-readable `**Used for:**` / `**Aspects extracted:**` mapping that names or points to the reference files. Prefer `**References:**` for new and edited blocks. Every reference file must be covered by at least one source block. Every real source block needs `**Last reviewed:** YYYY-MM-DD`; a guide with no recognized source blocks fails. `--all` audits only `SOURCES.md` files adjacent to a real `SKILL.md`, so templates and assets do not inflate catalog counts.
 
+JSON reports retain each source's declared version, commit, and watch count even when no local checkout is available. The catalog validator requires a `**Version:**` baseline whenever a skill description pins a `N+`, `N.N+`, or `N.N.N+` API generation; do not invent a checkout or commit when the source was reviewed from published documentation.
+
 ## Upstream-drift fields (optional, per source block)
 
 ```

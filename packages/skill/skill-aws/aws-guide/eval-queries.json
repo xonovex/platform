@@ -75,24 +75,24 @@
     "query": "require a Bitbucket Cloud pipeline status before merge and prove a spoofed status cannot satisfy it",
     "rationale": "near miss owned by bitbucket-guide",
     "should_trigger": false,
-    "split": "validation"
-  },
-  {
-    "query": "use a shared Bitbucket Pipelines configuration across our mobile repositories",
-    "rationale": "near miss owned by bitbucket-guide",
-    "should_trigger": false,
-    "split": "validation"
-  },
-  {
-    "query": "configure Bitbucket Pipelines OIDC for a least-privilege AWS role without access keys",
-    "rationale": "near miss owned by bitbucket-guide",
-    "should_trigger": false,
-    "split": "validation"
-  },
-  {
-    "query": "write a Terraform module for an encrypted S3 bucket with lifecycle rules",
-    "rationale": "near miss owned by terraform-guide",
-    "should_trigger": false,
     "split": "train"
+  },
+  {
+    "query": "correlate Bitrise pipeline and AWS deployment references in Datadog CI/CD Visibility",
+    "rationale": "near miss owned by datadog-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "compose Bitrise Pipelines from reusable Workflows and pin every custom Step version",
+    "rationale": "near miss owned by bitrise-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "link Azure Boards work item 381 to the pull request and preserve both native references",
+    "rationale": "near miss owned by azure-devops-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

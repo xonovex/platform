@@ -99,22 +99,22 @@
     "query": "open a merge request against main with glab on this GitLab repo",
     "rationale": "near miss owned by gitlab-guide",
     "should_trigger": false,
-    "split": "validation"
+    "split": "train"
   },
   {
-    "query": "I pushed my branch, now create an MR on gitlab.com and add reviewers",
-    "rationale": "near miss owned by gitlab-guide",
+    "query": "link Azure Boards work item 381 to the pull request and preserve both native references",
+    "rationale": "near miss owned by azure-devops-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "add a GitLab push rule that rejects unsigned commits",
-    "rationale": "near miss owned by gitlab-guide",
+    "query": "map a mandatory protected-path control to Pi and tell me whether it can actually block",
+    "rationale": "near miss owned by pi-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "configure Bitbucket Cloud merge checks for the main branch",
+    "query": "require a Bitbucket Cloud pipeline status before merge and prove a spoofed status cannot satisfy it",
     "rationale": "near miss owned by bitbucket-guide",
     "should_trigger": false,
     "split": "validation"

@@ -5,7 +5,7 @@ description: Use when making Android Jetpack Compose UI accessible or meeting WC
 
 # Android (Compose) WCAG 2.2 AA — quick reference
 
-Platform-level accessibility for Jetpack Compose: the `androidx.compose.ui.semantics` APIs and the AA criteria they satisfy. Framework-agnostic — a design system layered on top may bake some of this in, but the techniques here are the platform baseline.
+Platform-level accessibility for Jetpack Compose: the `androidx.compose.ui.semantics` APIs and the AA criteria they satisfy. **accessibility-guide** owns assurance scope, evidence, exceptions, and conformance claims; this skill owns the Android API and test delta. A design system layered on top may bake some of this in, but the techniques here are the platform baseline.
 
 When this skill fires:
 

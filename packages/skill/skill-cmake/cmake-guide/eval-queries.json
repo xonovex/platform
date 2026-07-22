@@ -24,30 +24,6 @@
     "split": "train"
   },
   {
-    "query": "I have a Hono app configured with `app.use('*', cors())`. Write a Vitest test that verifies the CORS preflight (OPTIONS) request to `/api/users` with an Origin header succeeds and that the Access-Control-Allow-Origin header is returned.",
-    "rationale": "near miss owned by vitest-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
-    "query": "Write a Vitest test for an async updateUser(id) function. The test should create a record, update it, and verify that the record's updatedAt timestamp is strictly newer than the original createdAt.",
-    "rationale": "near miss owned by vitest-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
-    "query": "In a Vitest test file I have `import { db } from '../src/db'` and I want to mock the entire '../src/db' module so its exported `query` function returns a fixed row object. Show the mock setup.",
-    "rationale": "near miss owned by vitest-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
-    "query": "Write a Vitest mock for an async `getUser(id)` dependency that resolves to `{ id: '123', email: 'test@example.com' }`, then call it and assert it was invoked with '123'.",
-    "rationale": "near miss owned by vitest-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
     "query": "A review comment on `work/target-types/` says the target types change handles the normal fixture but leaves the failure path undefined. For this Cmake task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
     "rationale": "implicit task cue derived from the target types reference",
     "should_trigger": true,
@@ -72,26 +48,50 @@
     "split": "validation"
   },
   {
-    "query": "A review comment on `work/type-safety/` says the type safety change handles the normal fixture but leaves the failure path undefined. For this Vitest task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
+    "query": "I have a Hono app configured with `app.use('*', cors())`. Write a Vitest test that verifies the CORS preflight (OPTIONS) request to `/api/users` with an Origin header succeeds and that the Access-Control-Allow-Origin header is returned.",
     "rationale": "near miss owned by vitest-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "quick pre-merge sanity check: after the http testing change under `work/http-testing/`, a clean checkout behaves differently from my local run. What Vitest-specific assumption could cause that? Show the correction and the exact narrow validation.",
-    "rationale": "near miss owned by vitest-guide",
+    "query": "add proper types to the response shape in src/api/users.ts so the consumer doesn't have to cast",
+    "rationale": "near miss owned by typescript-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Write a portable shell script that must run under dash and busybox sh, not just bash. It should verify that jq is installed, take a filename as its first argument, and abort early on any error or unset variable.",
+    "rationale": "near miss owned by shell-scripting-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "I have a Terraform config that creates private subnets, one per availability zone, from a variable list of AZs. Right now removing a single AZ from the middle of the list forces Terraform to recreate several unrelated subnets. Write the resource and any supporting locals so this stops happening.",
+    "rationale": "near miss owned by terraform-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Write an async Python function fetch_all(urls) that retrieves the body of each URL over HTTP and returns them as a list. The URLs are independent of one another and there may be dozens of them.",
+    "rationale": "near miss owned by python-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "In a Remotion project running at 30fps, write a React component that fades a headline in from opacity 0 to 1 over the first half second and slides it up 40px at the same time. Give me the full component code.",
+    "rationale": "near miss owned by remotion-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "The clean Linux CI job fails only for the minimal timestamp testing fixture under `work/timestamp-testing/`, while the full local fixture passes. Trace the Vitest-specific boundary that could cause the difference, then propose a patch and a regression check.",
-    "rationale": "near miss owned by vitest-guide",
+    "query": "publish this package to npm",
+    "rationale": "near miss owned by npm-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "A review comment on `work/typescript-config/` says the typescript config change handles the normal fixture but leaves the failure path undefined. For this Vitest task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
-    "rationale": "near miss owned by vitest-guide",
+    "query": "Using Zod 4, write a TypeScript schema named UserSchema for a user object with these fields: an id that is a UUID, an email address, a createdAt that is an ISO datetime string, and a name string between 1 and 100 characters. Also export the inferred TypeScript type.",
+    "rationale": "near miss owned by zod-guide",
     "should_trigger": false,
     "split": "validation"
   }

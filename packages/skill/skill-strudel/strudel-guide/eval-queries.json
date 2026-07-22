@@ -24,30 +24,6 @@
     "split": "train"
   },
   {
-    "query": "In a Remotion project running at 30fps, write a React component that fades a headline in from opacity 0 to 1 over the first half second and slides it up 40px at the same time. Give me the full component code.",
-    "rationale": "near miss owned by remotion-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
-    "query": "Build a Remotion scene with 60 confetti pieces scattered at varied starting x/y positions and slightly different fall speeds, so it looks organic. Provide the component.",
-    "rationale": "near miss owned by remotion-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
-    "query": "I have two Remotion scenes, each 2 seconds long, at 30fps. I want a half-second crossfade between them. Show me how to wire this up and tell me the total duration of the final video in frames.",
-    "rationale": "near miss owned by remotion-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
-    "query": "Register a new Remotion composition in Root.tsx called 'Intro' (1920x1080, 30fps, 5 seconds) whose title text, background color, and font size are editable in the Remotion Studio visual props editor. Include the code.",
-    "rationale": "near miss owned by remotion-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
     "query": "A review comment on `work/tempo-timing/` says the tempo timing change handles the normal fixture but leaves the failure path undefined. For this Strudel task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
     "rationale": "implicit task cue derived from the tempo timing reference",
     "should_trigger": true,
@@ -72,26 +48,50 @@
     "split": "validation"
   },
   {
-    "query": "A review comment on `work/timing/` says the timing change handles the normal fixture but leaves the failure path undefined. For this Remotion task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
+    "query": "In a Remotion project running at 30fps, write a React component that fades a headline in from opacity 0 to 1 over the first half second and slides it up 40px at the same time. Give me the full component code.",
     "rationale": "near miss owned by remotion-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "quick pre-merge sanity check: after the sequencing change under `work/sequencing/`, a clean checkout behaves differently from my local run. What Remotion-specific assumption could cause that? Show the correction and the exact narrow validation.",
-    "rationale": "near miss owned by remotion-guide",
+    "query": "Using Zod 4, write a TypeScript schema named UserSchema for a user object with these fields: an id that is a UUID, an email address, a createdAt that is an ISO datetime string, and a name string between 1 and 100 characters. Also export the inferred TypeScript type.",
+    "rationale": "near miss owned by zod-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Write a Lua 5.4 function `load_config(path)` that opens the file at `path`, reads all of it, and returns the parsed contents. Show how a caller would use it when the file might not exist, falling back to a default config instead of crashing.",
+    "rationale": "near miss owned by lua-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "I have a Hono app configured with `app.use('*', cors())`. Write a Vitest test that verifies the CORS preflight (OPTIONS) request to `/api/users` with an Origin header succeeds and that the Access-Control-Allow-Origin header is returned.",
+    "rationale": "near miss owned by vitest-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "In a Hono API running on Node with @hono/node-server, add a WebSocket endpoint at /ws/chat that echoes each incoming message back to the sender. Show both the server bootstrap code and the route definition.",
+    "rationale": "near miss owned by hono-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "We're on moonrepo 2.0. I want to enable and configure one of Moon's built-in extensions in our workspace. Which config file does the extension configuration go in, and show me a minimal example of the config block.",
+    "rationale": "near miss owned by moon-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "The clean Linux CI job fails only for the minimal assets fixture under `work/assets/`, while the full local fixture passes. Trace the Remotion-specific boundary that could cause the difference, then propose a patch and a regression check.",
-    "rationale": "near miss owned by remotion-guide",
+    "query": "Design a PostgreSQL table for meeting-room reservations. Each reservation has a room, a start time, and an end time. The database itself must guarantee that two reservations for the same room can never overlap in time. Write the CREATE TABLE statement.",
+    "rationale": "near miss owned by sql-postgresql-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "A review comment on `work/compositions/` says the compositions change handles the normal fixture but leaves the failure path undefined. For this Remotion task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
-    "rationale": "near miss owned by remotion-guide",
+    "query": "In a React + TypeScript app, create a reusable component that fades and slides its children upward into view when it first mounts, using the Motion animation library. Show the full component code.",
+    "rationale": "near miss owned by motion-guide",
     "should_trigger": false,
     "split": "validation"
   }

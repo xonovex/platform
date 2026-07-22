@@ -84,14 +84,14 @@
     "split": "validation"
   },
   {
-    "query": "commit and push",
-    "rationale": "near miss owned by git-guide",
+    "query": "publish this package to npm",
+    "rationale": "near miss owned by npm-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "ok we're done — save the changes",
-    "rationale": "near miss owned by git-guide",
+    "query": "map a mandatory protected-path control to Pi and tell me whether it can actually block",
+    "rationale": "near miss owned by pi-guide",
     "should_trigger": false,
     "split": "validation"
   }

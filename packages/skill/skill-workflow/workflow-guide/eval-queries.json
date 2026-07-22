@@ -78,51 +78,51 @@
     "rationale": "illustrative composition of independent stage-neutral operations"
   },
   {
-    "query": "design a governance hook that denies network tools when a policy says so",
+    "query": "what does Xonovex governance actually enforce, and can I run a workflow with no controls?",
+    "rationale": "near miss owned by agent-governance-guide",
     "should_trigger": false,
-    "split": "train",
-    "rationale": "near miss owned by an agent-governance capability"
+    "split": "train"
   },
   {
-    "query": "build an AI risk register and map its controls to the NIST AI RMF",
+    "query": "ship this",
+    "rationale": "near miss owned by git-guide",
     "should_trigger": false,
-    "split": "train",
-    "rationale": "near miss owned by an AI-governance capability"
+    "split": "train"
   },
   {
-    "query": "set an availability SLO and calculate the error budget for this service",
+    "query": "open a pull request against main with reviewers and a label using the gh CLI",
+    "rationale": "near miss owned by github-guide",
     "should_trigger": false,
-    "split": "train",
-    "rationale": "near miss owned by a reliability capability"
+    "split": "train"
   },
   {
-    "query": "threat-model this authentication flow and identify trust-boundary abuse cases",
+    "query": "open a merge request against main with glab on this GitLab repo",
+    "rationale": "near miss owned by gitlab-guide",
     "should_trigger": false,
-    "split": "train",
-    "rationale": "near miss owned by a security-assurance capability"
+    "split": "train"
   },
   {
-    "query": "write one Vitest unit test for rejectsExpiredToken and choose whether the clock should be a stub or fake",
+    "query": "assess this exact web release against WCAG 2.2 AA and publish reviewable evidence",
+    "rationale": "near miss owned by accessibility-guide",
     "should_trigger": false,
-    "split": "validation",
-    "rationale": "near miss owned by testing and framework capabilities"
+    "split": "train"
   },
   {
-    "query": "refactor this React component to remove its duplicated loading state",
+    "query": "how do I install the official Atlassian CLI and log in to Jira?",
+    "rationale": "near miss owned by atlassian-guide",
     "should_trigger": false,
-    "split": "validation",
-    "rationale": "near miss owned by a React implementation capability"
+    "split": "validation"
   },
   {
-    "query": "configure a Kubernetes Deployment with a readiness probe and resource limits",
+    "query": "In an Astro page I already have static content. Add two React components: a `<NewsletterSignup />` in the page footer that should only become interactive once the user scrolls it into view, and a `<ThemeToggle />` that reads `window.localStorage` on mount and therefore must not be server-rendered at all. Show the page frontmatter and markup with the correct hydration for each.",
+    "rationale": "near miss owned by astro-guide",
     "should_trigger": false,
-    "split": "validation",
-    "rationale": "near miss owned by a Kubernetes capability"
+    "split": "validation"
   },
   {
-    "query": "write Conventional Comments feedback for the issues in this pull request",
+    "query": "map a mandatory protected-path control to Kiro and tell me whether it can actually block",
+    "rationale": "near miss owned by kiro-guide",
     "should_trigger": false,
-    "split": "validation",
-    "rationale": "near miss owned by a code-review craft capability"
+    "split": "validation"
   }
 ]

@@ -84,14 +84,14 @@
     "split": "validation"
   },
   {
-    "query": "decide which WCAG criteria apply to our authenticated dashboard and document the gaps",
-    "rationale": "near miss owned by accessibility-guide",
+    "query": "classify our AI-system role and applicable obligations before selecting a regulated profile",
+    "rationale": "near miss owned by ai-governance-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "combine automated accessibility scans with keyboard and screen-reader testing",
-    "rationale": "near miss owned by accessibility-guide",
+    "query": "I need to add a SIMD variant of my vec3_dot in lib/math/vec3.c — the rest of the project uses _sse4 and _avx2 suffixes",
+    "rationale": "near miss owned by c99-opinionated-guide",
     "should_trigger": false,
     "split": "validation"
   }

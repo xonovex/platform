@@ -30,24 +30,6 @@
     "split": "train"
   },
   {
-    "query": "I have a Claude Code slash command at `.claude/commands/changelog.md`. Its body uses `$ARGUMENTS` for the user input and embeds git output inline with `` !`git log --oneline -20` ``. I want to port this same command to the Gemini CLI. Tell me exactly what to change and where the file goes.",
-    "rationale": "near miss owned by command-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
-    "query": "We have a ~140-line Claude Code slash command that inlines its entire Goal, Workflow, Output format, and Gotchas. I want to refactor it into a thin command that keeps only its argument contract and delegates the actual procedure to a reusable guideline skill. It's packaged as a plugin. Walk me through every step so nothing breaks at run time.",
-    "rationale": "near miss owned by command-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
-    "query": "I just finished a task where I stripped every `console.log` call out of `packages/billing-service/src/` for our invoicing app. Save this as a reusable slash command I can run on other projects.",
-    "rationale": "near miss owned by command-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
     "query": "A review comment on `work/governed-promotion/` says the governed promotion change handles the normal fixture but leaves the failure path undefined. For this Reflect task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
     "rationale": "implicit task cue derived from the governed promotion reference",
     "should_trigger": true,
@@ -66,32 +48,50 @@
     "split": "validation"
   },
   {
-    "query": "A review comment on `work/distill/` says the distill change handles the normal fixture but leaves the failure path undefined. For this Command task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
+    "query": "I have a Claude Code slash command at `.claude/commands/changelog.md`. Its body uses `$ARGUMENTS` for the user input and embeds git output inline with `` !`git log --oneline -20` ``. I want to port this same command to the Gemini CLI. Tell me exactly what to change and where the file goes.",
     "rationale": "near miss owned by command-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "quick pre-merge sanity check: after the create change under `work/create/`, a clean checkout behaves differently from my local run. What Command-specific assumption could cause that? Show the correction and the exact narrow validation.",
-    "rationale": "near miss owned by command-guide",
+    "query": "Write a Lua 5.4 function `load_config(path)` that opens the file at `path`, reads all of it, and returns the parsed contents. Show how a caller would use it when the file might not exist, falling back to a default config instead of crashing.",
+    "rationale": "near miss owned by lua-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "The clean Linux CI job fails only for the minimal merge fixture under `work/merge/`, while the full local fixture passes. Trace the Command-specific boundary that could cause the difference, then propose a patch and a regression check.",
-    "rationale": "near miss owned by command-guide",
+    "query": "I have a Rectangle class with mutable width and height and setWidth/setHeight methods. I now need a Square type in the same system. What's the cleanest way to model Square given I already have Rectangle?",
+    "rationale": "near miss owned by oop-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "this packages/auth dir doesn't have an AGENTS.md yet — set one up",
+    "rationale": "near miss owned by instruction-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "make this client component server-rendered if possible — it's just fetching the user's recent orders",
+    "rationale": "near miss owned by react-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "ship this",
+    "rationale": "near miss owned by git-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "A review comment on `work/simplify/` says the simplify change handles the normal fixture but leaves the failure path undefined. For this Command task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
-    "rationale": "near miss owned by command-guide",
+    "query": "map a mandatory protected-path control to Pi and tell me whether it can actually block",
+    "rationale": "near miss owned by pi-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "quick pre-merge sanity check: after the harness formats change under `work/harness-formats/`, a clean checkout behaves differently from my local run. What Command-specific assumption could cause that? Show the correction and the exact narrow validation.",
-    "rationale": "near miss owned by command-guide",
+    "query": "https://www.figma.com/design/aB12cD34eF56/Checkout?node-id=42-7 — what's in this frame?",
+    "rationale": "near miss owned by figma-guide",
     "should_trigger": false,
     "split": "validation"
   }

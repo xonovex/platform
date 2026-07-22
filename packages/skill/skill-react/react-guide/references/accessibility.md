@@ -1,6 +1,6 @@
 # accessibility: Accessibility Best Practices
 
-Use semantic HTML, ARIA labels/roles, focus management, and keyboard navigation for inclusive components.
+**accessibility-guide** owns applicable criteria, assurance evidence, exceptions, and conformance claims. This reference owns only the React implementation delta: semantic JSX, component labels, and hook-based focus management.
 
 ## Example
 

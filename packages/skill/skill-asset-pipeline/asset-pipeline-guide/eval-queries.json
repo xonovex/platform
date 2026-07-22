@@ -102,20 +102,20 @@
     "split": "train"
   },
   {
-    "query": "each box has little sockets on the left and right and I need to stop people from plugging a color output into a number input — what's the right way to validate a connection as they draw it",
-    "rationale": "near miss owned by node-graph-guide",
+    "query": "Using vanilla Three.js, set up a WebGLRenderer and a render loop that spins a cube smoothly. It must keep a consistent rotation speed regardless of frame rate and stay crisp on high-DPI / retina displays. Give me the renderer setup and the loop.",
+    "rationale": "near miss owned by threejs-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "my editor graph is getting walked from scratch every frame and it's slow; I'd rather turn the authored graph into some flat ordered thing once and just run that",
-    "rationale": "near miss owned by node-graph-guide",
+    "query": "I'm writing a small C99 physics engine. Define a rigid body struct and a function that applies a linear impulse to it. It must correctly handle both dynamic bodies and immovable/static bodies.",
+    "rationale": "near miss owned by c99-game-opinionated-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "some nodes do expensive image filtering and I don't want to recompute them when nothing upstream changed — how do I know a node's result is still valid",
-    "rationale": "near miss owned by node-graph-guide",
+    "query": "I'm building the core document store for our level editor — objects of different kinds each with a set of named properties, and I want to add new object types at runtime without recompiling. How should the type/property schema work?",
+    "rationale": "near miss owned by data-model-guide",
     "should_trigger": false,
     "split": "validation"
   }

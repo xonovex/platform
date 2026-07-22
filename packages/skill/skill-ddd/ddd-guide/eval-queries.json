@@ -90,8 +90,8 @@
     "split": "validation"
   },
   {
-    "query": "Set up the remote state backend for our production environment's Terraform root module. We're on AWS. Show the backend configuration and explain the key decisions.",
-    "rationale": "near miss owned by terraform-guide",
+    "query": "I have a Rectangle class with mutable width and height and setWidth/setHeight methods. I now need a Square type in the same system. What's the cleanest way to model Square given I already have Rectangle?",
+    "rationale": "near miss owned by oop-guide",
     "should_trigger": false,
     "split": "validation"
   }

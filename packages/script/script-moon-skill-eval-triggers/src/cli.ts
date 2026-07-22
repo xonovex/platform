@@ -11,7 +11,8 @@ const USAGE = `Usage: ${PROGRAM} [queries.json] [skill_name] [split] [options]
 Options (flag overrides env):
     --runs N             / RUNS=N             runs per query (default: 3)
     --threshold F        / THRESHOLD=F        trigger-rate cutoff for a pass (default: 0.5)
-    --model M            / CLAUDE_MODEL=M     model for \`claude --model\` (default: haiku)
+    --harness H          / SKILL_EVAL_HARNESS harness: claude | codex (default: claude)
+    --model M                                  harness model (defaults: Claude haiku; Codex configured default)
     --split S                                  train | validation | all (default: all)
     --batch-size N                             queries per sequential batch
     --workspace PATH                           directory for JSONL and summary evidence
@@ -23,6 +24,7 @@ export interface ParsedCli {
   readonly positionals: readonly string[];
   readonly runs?: string;
   readonly threshold?: string;
+  readonly harness?: string;
   readonly model?: string;
   readonly split?: string;
   readonly batchSize?: string;
@@ -34,6 +36,7 @@ export interface ParsedCli {
 const OPTION_FLAGS = new Set([
   "--runs",
   "--threshold",
+  "--harness",
   "--model",
   "--split",
   "--batch-size",
@@ -117,6 +120,7 @@ export const parseCli = (argv: readonly string[]): ParsedCli => {
     positionals,
     runs: options["--runs"],
     threshold: options["--threshold"],
+    harness: options["--harness"],
     model: options["--model"],
     split: options["--split"],
     batchSize: options["--batch-size"],

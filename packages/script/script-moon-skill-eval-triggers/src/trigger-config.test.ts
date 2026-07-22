@@ -82,14 +82,15 @@ describe("trigger configuration", () => {
       runs: 3,
       threshold: 0.5,
       budget: 0.05,
-      claudeModel: "haiku",
-      claudeExecutable: "/bin/claude",
+      harness: "claude",
+      model: "haiku",
+      harnessExecutable: "/bin/claude",
       queryCount: 2,
       maxBatchModelRuns: 6,
       workspace: undefined,
     });
     expect(config.queryBatches).toHaveLength(1);
-    expect(config.claudeArgs).toContain(join(directory, "plugin"));
+    expect(config.harnessArgs).toContain(join(directory, "plugin"));
   });
 
   it("honors explicit CLI values and bounded batches", () => {
@@ -115,12 +116,35 @@ describe("trigger configuration", () => {
       split: "validation",
       runs: 2,
       threshold: 0.75,
-      claudeModel: "sonnet",
+      model: "sonnet",
       queryCount: 1,
       maxBatchModelRuns: 2,
       workspace: join(directory, "evidence"),
     });
     expect(config.queryBatches).toHaveLength(1);
+  });
+
+  it("selects the Codex harness with isolated non-interactive arguments", () => {
+    const config = successfulConfig(
+      resolveConfig(["--harness", "codex", "--model", "gpt-test"]),
+    );
+
+    expect(config).toMatchObject({
+      harness: "codex",
+      harnessExecutable: "/bin/claude",
+      model: "gpt-test",
+    });
+    expect(config.harnessArgs).toEqual(
+      expect.arrayContaining([
+        "exec",
+        "--json",
+        "--ephemeral",
+        "--sandbox",
+        "read-only",
+        "--ignore-user-config",
+        "--ignore-rules",
+      ]),
+    );
   });
 
   it("classifies invalid positionals and options as usage errors", () => {

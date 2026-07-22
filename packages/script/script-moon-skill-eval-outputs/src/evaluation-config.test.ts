@@ -94,7 +94,8 @@ describe("evaluation configuration", () => {
       timeout: 30,
       budget: 0.05,
       judgeBudget: 0.04,
-      claudeModel: "generation-model",
+      harness: "claude",
+      model: "generation-model",
       judgeModel: "judge-model",
       cwd: undefined,
       maxBatchModelCalls: 8,
@@ -130,8 +131,22 @@ describe("evaluation configuration", () => {
       skillName: "explicit-skill",
       iteration: "iteration-4",
       cwd: "run-here",
-      claudeModel: "cli-model",
+      model: "cli-model",
     });
+  });
+
+  it("selects Codex for generation and judging", () => {
+    const config = successfulConfig(
+      resolveConfig(["--harness", "codex", "--model", "gpt-test"]),
+    );
+
+    expect(config).toMatchObject({
+      harness: "codex",
+      model: "gpt-test",
+    });
+    expect(config.withArgs).toEqual(
+      expect.arrayContaining(["exec", "--json", "--ephemeral", "gpt-test"]),
+    );
   });
 
   it("keeps valid evaluations and reports skipped invalid entries", () => {

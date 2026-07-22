@@ -10,6 +10,7 @@ import {
   resolveGuideDirectory,
 } from "@xonovex/script-moon-common/fs";
 import {
+  buildCodexArgs,
   buildGenerationClaudeArgs,
   evalEntries,
   MAX_OUTPUT_MODEL_CALLS,
@@ -53,7 +54,8 @@ interface EvaluationConfigOptions {
 export interface EvaluationConfig {
   readonly benchmarkPath: string;
   readonly budget: number;
-  readonly claudeModel: string;
+  readonly guideDirectory: string;
+  readonly harness: "claude" | "codex";
   readonly concurrency: number;
   readonly cwd: string | undefined;
   readonly evaluations: readonly NormalizedEval[];
@@ -65,6 +67,7 @@ export interface EvaluationConfig {
   readonly judgeBudget: number;
   readonly judgeModel: string;
   readonly maxBatchModelCalls: number;
+  readonly model: string;
   readonly runs: number;
   readonly shortName: string;
   readonly skillName: string;
@@ -85,7 +88,7 @@ const cliDefinition = {
     concurrency: {
       type: "string",
       description:
-        "parallel claude invocations (env CONCURRENCY, default/maximum 2)",
+        "parallel model invocations (env CONCURRENCY, default/maximum 2)",
     },
     "batch-size": {
       type: "string",
@@ -94,11 +97,17 @@ const cliDefinition = {
     model: {
       type: "string",
       description:
-        "model for the generation runs (env CLAUDE_MODEL, default haiku)",
+        "generation model (CLAUDE_MODEL or CODEX_MODEL; harness default when empty)",
+    },
+    harness: {
+      type: "string",
+      description:
+        "model harness: claude or codex (env SKILL_EVAL_HARNESS, default claude)",
     },
     "judge-model": {
       type: "string",
-      description: "model for grading (env JUDGE_MODEL)",
+      description:
+        "grading model (JUDGE_MODEL or CODEX_JUDGE_MODEL; harness default when empty)",
     },
     "disallowed-tools": {
       type: "string",
@@ -256,8 +265,18 @@ export const resolveEvaluationConfig = (
   if (!isFile(evaluationsFile)) {
     return failure(`evals file not found: ${evaluationsArgument}`);
   }
-  if (!executableAvailable("claude")) {
-    return failure("'claude' CLI not found in PATH");
+  const harnessInput =
+    (values.harness as string | undefined) ??
+    environment.SKILL_EVAL_HARNESS ??
+    "claude";
+  if (harnessInput !== "claude" && harnessInput !== "codex") {
+    return failure(
+      `invalid harness '${harnessInput}'; expected claude or codex`,
+    );
+  }
+  const harness = harnessInput;
+  if (!executableAvailable(harness)) {
+    return failure(`'${harness}' CLI not found in PATH`);
   }
 
   const skillArgument = positionals[1];
@@ -346,11 +365,16 @@ export const resolveEvaluationConfig = (
     : resolve(workingDirectory, `${shortName}-workspace`);
   const iteration = optionsResult.data.iteration ?? nextIteration(workspace);
   const iterationDirectory = join(workspace, iteration);
-  const claudeModel =
-    (values.model as string | undefined) ?? environment.CLAUDE_MODEL ?? "haiku";
+  const defaultModel = harness === "claude" ? "haiku" : "";
+  const environmentModel =
+    harness === "claude" ? environment.CLAUDE_MODEL : environment.CODEX_MODEL;
+  const model =
+    (values.model as string | undefined) ?? environmentModel ?? defaultModel;
   const judgeModel =
     (values["judge-model"] as string | undefined) ??
-    environment.JUDGE_MODEL ??
+    (harness === "codex"
+      ? environment.CODEX_JUDGE_MODEL
+      : environment.JUDGE_MODEL) ??
     "";
   const disallowedTools =
     (values["disallowed-tools"] as string | undefined) ??
@@ -366,7 +390,8 @@ export const resolveEvaluationConfig = (
     data: {
       benchmarkPath: join(iterationDirectory, "benchmark.json"),
       budget,
-      claudeModel,
+      guideDirectory,
+      harness,
       concurrency,
       cwd: evaluationWorkingDirectory || undefined,
       evaluations: loaded.data,
@@ -378,28 +403,35 @@ export const resolveEvaluationConfig = (
       judgeBudget: optionsResult.data.judgeBudget,
       judgeModel,
       maxBatchModelCalls,
+      model,
       runs,
       shortName,
       skillName,
       timeout,
-      withArgs: buildGenerationClaudeArgs({
-        arm: "with_skill",
-        model: claudeModel,
-        budget,
-        disallowedTools,
-        ...(pluginDirectory
-          ? {
-              pluginDirectories:
-                resolveClaudePluginDirectories(pluginDirectory),
-            }
-          : {}),
-      }),
-      withoutArgs: buildGenerationClaudeArgs({
-        arm: "without_skill",
-        model: claudeModel,
-        budget,
-        disallowedTools,
-      }),
+      withArgs:
+        harness === "claude"
+          ? buildGenerationClaudeArgs({
+              arm: "with_skill",
+              model,
+              budget,
+              disallowedTools,
+              ...(pluginDirectory
+                ? {
+                    pluginDirectories:
+                      resolveClaudePluginDirectories(pluginDirectory),
+                  }
+                : {}),
+            })
+          : buildCodexArgs({model}),
+      withoutArgs:
+        harness === "claude"
+          ? buildGenerationClaudeArgs({
+              arm: "without_skill",
+              model,
+              budget,
+              disallowedTools,
+            })
+          : buildCodexArgs({model}),
     },
   };
 };

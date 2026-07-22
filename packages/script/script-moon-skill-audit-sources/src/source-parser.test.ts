@@ -98,4 +98,16 @@ describe("parseSources", () => {
     expect(hasReferenceMapping(mapped)).toBe(true);
     expect(hasReferenceMapping(unmapped)).toBe(false);
   });
+
+  it("keeps human-readable version baselines", () => {
+    const [source] = parseSources(`# Sources
+
+## Versioned CLI
+- **URL:** https://example.com/docs
+- **Version:** \`acli 1.3.22-stable\`
+- **Last reviewed:** 2026-07-19
+`);
+
+    expect(source?.version).toBe("acli 1.3.22-stable");
+  });
 });

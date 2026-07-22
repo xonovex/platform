@@ -54,44 +54,44 @@
     "split": "train"
   },
   {
-    "query": "is a chained call like order.getCustomer().getAddress().getCity() a problem, and what do I do about it?",
-    "rationale": "near miss owned by connascence-guide",
+    "query": "Write a portable shell script that must run under dash and busybox sh, not just bash. It should verify that jq is installed, take a filename as its first argument, and abort early on any error or unset variable.",
+    "rationale": "near miss owned by shell-scripting-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "should this function take positional arguments or a named options object — which couples callers less?",
-    "rationale": "near miss owned by connascence-guide",
+    "query": "respond like a caveman from now on",
+    "rationale": "near miss owned by caveman",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "this helper module is just a grab-bag of unrelated init steps that run at startup — is that bad cohesion?",
-    "rationale": "near miss owned by connascence-guide",
+    "query": "We're on moonrepo 2.0. I want to enable and configure one of Moon's built-in extensions in our workspace. Which config file does the extension configuration go in, and show me a minimal example of the config block.",
+    "rationale": "near miss owned by moon-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "I pass a boolean flag into this shared method that switches its behavior — code smell?",
-    "rationale": "near miss owned by connascence-guide",
+    "query": "this packages/auth dir doesn't have an AGENTS.md yet — set one up",
+    "rationale": "near miss owned by instruction-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "Review this Go function for coupling problems and tell me how to fix the worst one:\n\n```go\nfunc (r *Repo) Save(order Order, dryRun bool) error {\n    if dryRun {\n        return validate(order)\n    }\n    return r.persist(order)\n}\n```\n\nCallers do `repo.Save(order, true)` in some places and `repo.Save(order, false)` in others.",
-    "rationale": "near miss owned by connascence-guide",
+    "query": "I'm building the core document store for our level editor — objects of different kinds each with a set of named properties, and I want to add new object types at runtime without recompiling. How should the type/property schema work?",
+    "rationale": "near miss owned by data-model-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "Is a chained expression like `order.Customer().Address().City()` a problem in our codebase? Explain concretely what it costs and what to do instead. Also: we have a builder used as `NewQuery().Where(x).OrderBy(y).Build()` — is that the same problem?",
-    "rationale": "near miss owned by connascence-guide",
+    "query": "walk me through red-green-refactor on this shopping-cart total function",
+    "rationale": "near miss owned by tdd-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "A billing function reads an Order's total by passing a magic number: `cache.Get(key, 0)` where `0` means \"no expiry\", and a far-away handler does `if ttl == 0 { /* unlimited */ }`. Grade this coupling precisely and give me the fix.",
-    "rationale": "near miss owned by connascence-guide",
+    "query": "I have a Terraform config that creates private subnets, one per availability zone, from a variable list of AZs. Right now removing a single AZ from the middle of the list forces Terraform to recreate several unrelated subnets. Write the resource and any supporting locals so this stops happening.",
+    "rationale": "near miss owned by terraform-guide",
     "should_trigger": false,
     "split": "validation"
   }

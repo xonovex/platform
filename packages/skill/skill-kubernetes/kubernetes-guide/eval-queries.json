@@ -24,30 +24,6 @@
     "split": "train"
   },
   {
-    "query": "I'm writing TypeScript that compiles to Lua with the typescript-to-lua transpiler. Write a `divmod` function that takes two numbers and returns both the quotient (floored) and the remainder so the generated Lua uses native Lua multiple return values rather than an array or object wrapper. Include a call site that consumes both values.",
-    "rationale": "near miss owned by typescript-to-lua-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
-    "query": "In a typescript-to-lua project I need an interface that compiles directly to a plain raw Lua table with no runtime wrapper, and a standalone helper function that must NOT receive an implicit `self` parameter in the generated Lua. Write the TypeScript.",
-    "rationale": "near miss owned by typescript-to-lua-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
-    "query": "I'm building a small 2D vector math module (add, magnitude) in TypeScript that compiles to Lua via typescript-to-lua. Write it in the way that produces the cleanest, most efficient Lua output for this transpiler.",
-    "rationale": "near miss owned by typescript-to-lua-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
-    "query": "Set up the tsconfig.json for a typescript-to-lua project that targets LuaJIT and should remap Lua stack traces back to the original TypeScript line numbers. Show the config.",
-    "rationale": "near miss owned by typescript-to-lua-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
     "query": "A review comment on `work/deployments/` says the deployments change handles the normal fixture but leaves the failure path undefined. For this Kubernetes task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
     "rationale": "implicit task cue derived from the deployments reference",
     "should_trigger": true,
@@ -72,26 +48,50 @@
     "split": "validation"
   },
   {
-    "query": "A review comment on `work/namespaces-vs-classes/` says the namespaces vs classes change handles the normal fixture but leaves the failure path undefined. For this Typescript To Lua task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
+    "query": "I'm writing TypeScript that compiles to Lua with the typescript-to-lua transpiler. Write a `divmod` function that takes two numbers and returns both the quotient (floored) and the remainder so the generated Lua uses native Lua multiple return values rather than an array or object wrapper. Include a call site that consumes both values.",
     "rationale": "near miss owned by typescript-to-lua-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "quick pre-merge sanity check: after the multi return functions change under `work/multi-return-functions/`, a clean checkout behaves differently from my local run. What Typescript To Lua-specific assumption could cause that? Show the correction and the exact narrow validation.",
-    "rationale": "near miss owned by typescript-to-lua-guide",
+    "query": "Write a production Dockerfile for a Node.js 22 web service that builds TypeScript with `npm run build` and serves on port 3000. Keep the final image as small and secure as reasonably possible.",
+    "rationale": "near miss owned by docker-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "We're on moonrepo 2.0. I want to enable and configure one of Moon's built-in extensions in our workspace. Which config file does the extension configuration go in, and show me a minimal example of the config block.",
+    "rationale": "near miss owned by moon-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "make this client component server-rendered if possible — it's just fetching the user's recent orders",
+    "rationale": "near miss owned by react-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Write a Lua 5.4 function `load_config(path)` that opens the file at `path`, reads all of it, and returns the parsed contents. Show how a caller would use it when the file might not exist, falling back to a default config instead of crashing.",
+    "rationale": "near miss owned by lua-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "link Azure Boards work item 381 to the pull request and preserve both native references",
+    "rationale": "near miss owned by azure-devops-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "The clean Linux CI job fails only for the minimal tstl decorators fixture under `work/tstl-decorators/`, while the full local fixture passes. Trace the Typescript To Lua-specific boundary that could cause the difference, then propose a patch and a regression check.",
-    "rationale": "near miss owned by typescript-to-lua-guide",
+    "query": "Write a Strudel.cc live-coding snippet for a driving techno groove at 130 BPM. Include a four-on-the-floor kick, an offbeat clap, and closed hi-hats layered together.",
+    "rationale": "near miss owned by strudel-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "A review comment on `work/performance-tips/` says the performance tips change handles the normal fixture but leaves the failure path undefined. For this Typescript To Lua task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
-    "rationale": "near miss owned by typescript-to-lua-guide",
+    "query": "I have a Hono app configured with `app.use('*', cors())`. Write a Vitest test that verifies the CORS preflight (OPTIONS) request to `/api/users` with an Origin header succeeds and that the Access-Control-Allow-Origin header is returned.",
+    "rationale": "near miss owned by vitest-guide",
     "should_trigger": false,
     "split": "validation"
   }

@@ -108,20 +108,20 @@
     "split": "train"
   },
   {
-    "query": "how do I structure a feature file with Background and a Scenario Outline for the coupon rules?",
-    "rationale": "near miss owned by bdd-guide",
+    "query": "In a Remotion project running at 30fps, write a React component that fades a headline in from opacity 0 to 1 over the first half second and slides it up 40px at the same time. Give me the full component code.",
+    "rationale": "near miss owned by remotion-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "we want to do example mapping on this story — what do the yellow, blue, green and red cards mean?",
-    "rationale": "near miss owned by bdd-guide",
+    "query": "our renderer hand-writes a barrier before and after every pass and it breaks every time we reorder passes — I want passes to just declare what they read and write and have ordering and transitions figured out for us",
+    "rationale": "near miss owned by gpu-rendering-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "set up acceptance-test-driven development so the specs become living documentation the business can read",
-    "rationale": "near miss owned by bdd-guide",
+    "query": "decouple my domain logic from Postgres so I can swap the database without rewriting business rules",
+    "rationale": "near miss owned by hexagonal-pattern-guide",
     "should_trigger": false,
     "split": "validation"
   }

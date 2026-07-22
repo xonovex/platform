@@ -8,6 +8,8 @@ const URL_FIELD_RE = /\*\*URLs?:\*\*/i;
 const HTTP_URL_RE = /https?:\/\/\S+/i;
 const PROVENANCE_RE = /\*\*Provenance:\*\*\s*\S+/i;
 const REVIEWED_RE = /\*\*Last reviewed:\*\*\s*\d{4}-\d{2}-\d{2}/i;
+const VERSION_FIELD_RE = /\*\*Version:\*\*\s*\S+/i;
+const VERSIONED_DESCRIPTION_RE = /\b\d+(?:\.\d+){0,2}\+/;
 const GENERIC_TRIGGER_QUERY_RES = [
   /^Help me handle .+ correctly in this .+ task, including the edge cases that usually get missed\.$/i,
   /^I'm reviewing `[^`]+` in an? .+ project\. The happy path works, but .+ is unclear\./i,
@@ -38,6 +40,7 @@ const isGenericTriggerQuery = (query: string): boolean =>
   GENERIC_TRIGGER_QUERY_RES.some((pattern) => pattern.test(query.trim()));
 
 interface TriggerEntry {
+  readonly generatedNegativeOwner: string | undefined;
   readonly shouldTrigger: boolean;
   readonly split: string | undefined;
 }
@@ -85,14 +88,23 @@ const checkTriggerEntry = (
     );
     return undefined;
   }
+  const rationale = value.rationale;
+  const generatedNegativeOwner =
+    typeof rationale === "string" && !value.should_trigger
+      ? /^near miss owned by (\S+)$/.exec(rationale.trim())?.[1]
+      : undefined;
   const split = value.split;
   if (typeof split !== "string" || !QUERY_SPLITS.has(split)) {
     errors.push(
       `catalog: eval-queries.json entry ${String(index + 1)} needs split train or validation`,
     );
-    return {shouldTrigger: value.should_trigger, split: undefined};
+    return {
+      generatedNegativeOwner,
+      shouldTrigger: value.should_trigger,
+      split: undefined,
+    };
   }
-  return {shouldTrigger: value.should_trigger, split};
+  return {generatedNegativeOwner, shouldTrigger: value.should_trigger, split};
 };
 
 const checkTriggerMinimums = (
@@ -197,18 +209,30 @@ const checkTriggerEvals = (
   let positive = 0;
   let negative = 0;
   const splitCounts = new Map<string, number>();
+  const generatedNegativeOwners = new Set<string>();
+  let generatedNegativeCount = 0;
   const seen = new Set<string>();
   for (const [index, entry] of raw.entries()) {
     const checked = checkTriggerEntry(entry, index, seen, errors);
     if (checked === undefined) continue;
     if (checked.shouldTrigger) positive += 1;
     else negative += 1;
+    if (checked.generatedNegativeOwner !== undefined) {
+      generatedNegativeOwners.add(checked.generatedNegativeOwner);
+      generatedNegativeCount += 1;
+    }
     if (checked.split === undefined) continue;
     const polarity = checked.shouldTrigger ? "positive" : "negative";
     const key = `${polarity}:${checked.split}`;
     splitCounts.set(key, (splitCounts.get(key) ?? 0) + 1);
   }
   checkTriggerMinimums(positive, negative, splitCounts, errors);
+  const requiredGeneratedOwners = Math.min(3, generatedNegativeCount);
+  if (generatedNegativeOwners.size < requiredGeneratedOwners) {
+    errors.push(
+      `catalog: generated negative routes need at least ${String(requiredGeneratedOwners)} sibling owners (found ${String(generatedNegativeOwners.size)})`,
+    );
+  }
   if (errors.every((error) => !error.includes("trigger eval"))) {
     passes.push(
       `catalog: trigger evals cover ${String(positive)} positive and ${String(negative)} negative routes with train/validation splits`,
@@ -218,6 +242,7 @@ const checkTriggerEvals = (
 
 const checkSources = (
   skillDir: string,
+  description: unknown,
   passes: string[],
   errors: string[],
 ): void => {
@@ -236,6 +261,15 @@ const checkSources = (
   }
   if (!REVIEWED_RE.test(text)) {
     errors.push("catalog: SOURCES.md needs at least one Last reviewed date");
+  }
+  if (
+    typeof description === "string" &&
+    VERSIONED_DESCRIPTION_RE.test(description) &&
+    !VERSION_FIELD_RE.test(text)
+  ) {
+    errors.push(
+      "catalog: version-pinned skill needs a Version field in SOURCES.md",
+    );
   }
   if ((hasUrlProvenance || hasDeclaredProvenance) && REVIEWED_RE.test(text)) {
     passes.push("catalog: source provenance and review date are present");
@@ -299,7 +333,7 @@ export const checkCatalogFiles = (
   const errors: string[] = [];
   checkOutputEvals(skillDir, frontmatter.name, passes, errors);
   checkTriggerEvals(skillDir, passes, errors);
-  checkSources(skillDir, passes, errors);
+  checkSources(skillDir, frontmatter.description, passes, errors);
   checkScriptMetadata(skillDir, frontmatter, passes, errors);
   return {passes, errors};
 };

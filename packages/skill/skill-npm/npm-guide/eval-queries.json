@@ -84,14 +84,14 @@
     "split": "validation"
   },
   {
-    "query": "this is throwing 'Cannot find module' on `import { foo } from './bar'` — what's the ESM dance for relative imports",
-    "rationale": "near miss owned by typescript-guide",
+    "query": "In a CMakeLists.txt for an executable target named `app`, add the fmt formatting library as a source dependency fetched from https://github.com/fmtlib/fmt.git at version 10.1.1, and link it to `app`. Show the CMake code.",
+    "rationale": "near miss owned by cmake-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "convert this Promise.all-with-side-effects mess to a clean async function in src/jobs/sync.ts",
-    "rationale": "near miss owned by typescript-guide",
+    "query": "In a Hono API running on Node with @hono/node-server, add a WebSocket endpoint at /ws/chat that echoes each incoming message back to the sender. Show both the server bootstrap code and the route definition.",
+    "rationale": "near miss owned by hono-guide",
     "should_trigger": false,
     "split": "validation"
   }

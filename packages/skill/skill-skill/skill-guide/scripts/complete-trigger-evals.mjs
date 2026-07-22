@@ -7,6 +7,7 @@ import {
   writeFileSync,
 } from "node:fs";
 import {basename, join, resolve} from "node:path";
+import {fileURLToPath} from "node:url";
 
 const MIN_PER_POLARITY = 8;
 const FRONTMATTER_RE = /^---\n([\s\S]*?)\n---\n([\s\S]*)$/;
@@ -228,11 +229,35 @@ const deduplicate = (entries) => {
   return entries.filter((entry) => {
     if (!isRecord(entry) || typeof entry.query !== "string") return true;
     if (isGeneratedQuery(entry.query.trim())) return false;
+    if (
+      entry.should_trigger === false &&
+      typeof entry.rationale === "string" &&
+      entry.rationale.startsWith("near miss owned by ")
+    ) {
+      return false;
+    }
     const key = entry.query.trim().toLowerCase();
     if (seen.has(key)) return false;
     seen.add(key);
     return true;
   });
+};
+
+export const roundRobinCandidates = (siblings) => {
+  const candidates = [];
+  const maximumQueries = Math.max(
+    0,
+    ...siblings.map((sibling) => sibling.queries.length),
+  );
+  for (let queryIndex = 0; queryIndex < maximumQueries; queryIndex += 1) {
+    for (const sibling of siblings) {
+      const query = sibling.queries[queryIndex];
+      if (typeof query === "string") {
+        candidates.push({owner: sibling.name, query});
+      }
+    }
+  }
+  return candidates;
 };
 
 const addPositiveSeeds = (skill) => {
@@ -316,20 +341,23 @@ const addNegativeSeeds = (skill, skillsByName, allSkills) => {
       .filter((entry) => typeof entry.query === "string")
       .map((entry) => entry.query.trim().toLowerCase()),
   );
-  const candidates = [];
-  for (const siblingName of siblingNames(skill, allSkills)) {
+  const siblings = siblingNames(skill, allSkills).flatMap((siblingName) => {
     const sibling = skillsByName.get(siblingName);
-    if (sibling === undefined) continue;
-    for (const entry of sibling.queries.filter(
-      (query) => query.should_trigger === true,
-    )) {
-      if (typeof entry.query !== "string") continue;
-      candidates.push({
-        query: entry.query,
-        rationale: `near miss owned by ${sibling.name}`,
-      });
-    }
-  }
+    if (sibling === undefined) return [];
+    return [
+      {
+        name: sibling.name,
+        queries: sibling.queries
+          .filter((query) => query.should_trigger === true)
+          .map((entry) => entry.query)
+          .filter((query) => typeof query === "string"),
+      },
+    ];
+  });
+  const candidates = roundRobinCandidates(siblings).map(({owner, query}) => ({
+    query,
+    rationale: `near miss owned by ${owner}`,
+  }));
   for (const candidate of candidates) {
     if (negatives.length >= MIN_PER_POLARITY) break;
     const key = candidate.query.trim().toLowerCase();
@@ -405,4 +433,9 @@ const main = () => {
   }
 };
 
-main();
+if (
+  process.argv[1] !== undefined &&
+  resolve(process.argv[1]) === fileURLToPath(import.meta.url)
+) {
+  main();
+}

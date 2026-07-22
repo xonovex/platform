@@ -114,20 +114,20 @@
     "split": "train"
   },
   {
-    "query": "Write a Three.js setup that renders with WebGPU and gives a mesh a material whose color animates over time. It should target modern browsers and use Three's cross-renderer shader approach rather than raw GLSL.",
-    "rationale": "near miss owned by threejs-guide",
+    "query": "how do I get the business and developers speaking the same vocabulary that also shows up in the code?",
+    "rationale": "near miss owned by ddd-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "I'm applying an albedo/base-color texture and a normal map to a MeshStandardMaterial. Colors look washed out and the lighting is off. Show me how to load and configure both textures correctly for color-accurate PBR.",
-    "rationale": "near miss owned by threejs-guide",
+    "query": "In a Remotion project running at 30fps, write a React component that fades a headline in from opacity 0 to 1 over the first half second and slides it up 40px at the same time. Give me the full component code.",
+    "rationale": "near miss owned by remotion-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "I have a THREE.Points cloud of about 50,000 particles built from a BufferGeometry with positions I set manually. When I orbit the camera, the entire point cloud sometimes vanishes even though points are clearly within view. What's causing this and how do I fix it?",
-    "rationale": "near miss owned by threejs-guide",
+    "query": "make our particle system stop calling malloc per particle — hand it a buffer it just fills",
+    "rationale": "near miss owned by memory-management-guide",
     "should_trigger": false,
     "split": "validation"
   }

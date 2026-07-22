@@ -24,36 +24,6 @@
     "split": "train"
   },
   {
-    "query": "Using Zod 4, write a TypeScript schema named UserSchema for a user object with these fields: an id that is a UUID, an email address, a createdAt that is an ISO datetime string, and a name string between 1 and 100 characters. Also export the inferred TypeScript type.",
-    "rationale": "near miss owned by zod-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
-    "query": "In Zod 4, write a schema for an environment variable PORT that arrives as a string, is converted to a number, must be an integer between 1024 and 65535, and falls back to port 3000 when the variable is absent. Show the inferred output type.",
-    "rationale": "near miss owned by zod-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
-    "query": "Write an Express-style POST handler in TypeScript that validates an incoming request body against a Zod schema called CreateUserSchema and returns HTTP 400 with the validation errors if the body is invalid, otherwise creates the user. The handler must not throw on invalid input.",
-    "rationale": "near miss owned by zod-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
-    "query": "In Zod 4, define a StatusSchema from an existing native TypeScript enum named Status. Then, given a UserSchema object schema, derive a CreateUserSchema that drops the id field and an UpdateUserSchema that makes all of CreateUserSchema's fields optional.",
-    "rationale": "near miss owned by zod-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
-    "query": "Review this Zod change for requirements and fix the concrete issues you find.",
-    "rationale": "near miss owned by zod-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
     "query": "A review comment on `work/cte-patterns/` says the cte patterns change handles the normal fixture but leaves the failure path undefined. For this Sql Postgresql task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
     "rationale": "implicit task cue derived from the cte patterns reference",
     "should_trigger": true,
@@ -78,20 +48,50 @@
     "split": "validation"
   },
   {
-    "query": "A review comment on `work/migration-v4/` says the migration v4 change handles the normal fixture but leaves the failure path undefined. For this Zod task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
+    "query": "Using Zod 4, write a TypeScript schema named UserSchema for a user object with these fields: an id that is a UUID, an email address, a createdAt that is an ISO datetime string, and a name string between 1 and 100 characters. Also export the inferred TypeScript type.",
     "rationale": "near miss owned by zod-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "We're on moonrepo 2.0. I want to enable and configure one of Moon's built-in extensions in our workspace. Which config file does the extension configuration go in, and show me a minimal example of the config block.",
+    "rationale": "near miss owned by moon-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Write a Lua 5.4 function `load_config(path)` that opens the file at `path`, reads all of it, and returns the parsed contents. Show how a caller would use it when the file might not exist, falling back to a default config instead of crashing.",
+    "rationale": "near miss owned by lua-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "In an Astro page I already have static content. Add two React components: a `<NewsletterSignup />` in the page footer that should only become interactive once the user scrolls it into view, and a `<ThemeToggle />` that reads `window.localStorage` on mount and therefore must not be server-rendered at all. Show the page frontmatter and markup with the correct hydration for each.",
+    "rationale": "near miss owned by astro-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Write a Strudel.cc live-coding snippet for a driving techno groove at 130 BPM. Include a four-on-the-floor kick, an offbeat clap, and closed hi-hats layered together.",
+    "rationale": "near miss owned by strudel-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "I have a Hono app configured with `app.use('*', cors())`. Write a Vitest test that verifies the CORS preflight (OPTIONS) request to `/api/users` with an Origin header succeeds and that the Access-Control-Allow-Origin header is returned.",
+    "rationale": "near miss owned by vitest-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "quick pre-merge sanity check: after the schema organization change under `work/schema-organization/`, a clean checkout behaves differently from my local run. What Zod-specific assumption could cause that? Show the correction and the exact narrow validation.",
-    "rationale": "near miss owned by zod-guide",
+    "query": "In a Hono API running on Node with @hono/node-server, add a WebSocket endpoint at /ws/chat that echoes each incoming message back to the sender. Show both the server bootstrap code and the route definition.",
+    "rationale": "near miss owned by hono-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "The clean Linux CI job fails only for the minimal validation patterns fixture under `work/validation-patterns/`, while the full local fixture passes. Trace the Zod-specific boundary that could cause the difference, then propose a patch and a regression check.",
-    "rationale": "near miss owned by zod-guide",
+    "query": "I have a Terraform config that creates private subnets, one per availability zone, from a variable list of AZs. Right now removing a single AZ from the middle of the list forces Terraform to recreate several unrelated subnets. Write the resource and any supporting locals so this stops happening.",
+    "rationale": "near miss owned by terraform-guide",
     "should_trigger": false,
     "split": "validation"
   }

@@ -153,6 +153,8 @@ export const main = async (argv: readonly string[]): Promise<number> => {
     withArgs: config.withArgs,
     withoutArgs: config.withoutArgs,
     cwd: config.cwd,
+    guideDirectory: config.guideDirectory,
+    harness: config.harness,
     timeout: config.timeout,
     target: config.skillName,
     shortName: config.shortName,
@@ -164,14 +166,17 @@ export const main = async (argv: readonly string[]): Promise<number> => {
       buildEvaluationPrompt(config.evaluationsDirectory, evaluation),
   };
 
+  const harnessCaps =
+    config.harness === "claude"
+      ? `generation=$${String(config.budget)}/6 turns  judge=$${String(config.judgeBudget)}/1 turn  `
+      : `generation-timeout=${String(config.timeout)}s  output-limit=10000 chars  `;
   process.stderr.write(
     `skill: ${config.skillName}  evals: ${String(config.evaluations.length)}  ` +
       `runs/arm: ${String(config.runs)}  concurrency: ${String(config.concurrency)}  ` +
       `workspace: ${config.iterationDirectory}\n` +
-      `gen model: ${config.claudeModel || "<default>"}  ` +
+      `harness: ${config.harness}  gen model: ${config.model || "<default>"}  ` +
       `judge model: ${config.judgeModel || "<default>"}\n` +
-      `caps: generation=$${String(config.budget)}/6 turns  ` +
-      `judge=$${String(config.judgeBudget)}/1 turn  ` +
+      `caps: ${harnessCaps}` +
       `model_calls=${String(outputModelCallCount(config.evaluations.length, config.runs))}  ` +
       `batches=${String(config.evaluationBatches.length)}  ` +
       `max_batch_calls=${String(config.maxBatchModelCalls)}/${String(MAX_OUTPUT_MODEL_CALLS)}  ` +
@@ -195,6 +200,9 @@ export const main = async (argv: readonly string[]): Promise<number> => {
   const withoutBlock = aggregateArm(records, "without_skill", config.runs);
   const benchmark = {
     skill: config.skillName,
+    harness: config.harness,
+    model: config.model || null,
+    judge_model: config.judgeModel || null,
     iteration: config.iteration,
     runs_per_arm: config.runs,
     eval_count: config.evaluations.length,

@@ -5,6 +5,7 @@
 - **URLs:**
   - https://zod.dev/
   - https://zod.dev/api
+- **Version:** 4.0.0
 - **Last reviewed:** 2026-07-19
 - **Used for:** `SKILL.md` and all `references/`; Zod 4 schemas, parsing, refinements, transforms, composition, defaults, string formats, error handling, and inferred types.
 - **References:** all

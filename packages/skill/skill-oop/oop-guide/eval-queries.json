@@ -54,44 +54,44 @@
     "split": "train"
   },
   {
-    "query": "In Lua, write a function that takes an array of a few thousand numbers and returns them as a single comma-separated string. Make it efficient for large inputs.",
-    "rationale": "near miss owned by lua-guide",
+    "query": "We're on moonrepo 2.0. I want to enable and configure one of Moon's built-in extensions in our workspace. Which config file does the extension configuration go in, and show me a minimal example of the config block.",
+    "rationale": "near miss owned by moon-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "I'm iterating in a running Lua process. I edited `myapp.settings` on disk, but calling `require(\"myapp.settings\")` again keeps returning the stale version from before my edit. How do I force it to pick up the new file? Show the code.",
-    "rationale": "near miss owned by lua-guide",
+    "query": "I have a Terraform config that creates private subnets, one per availability zone, from a variable list of AZs. Right now removing a single AZ from the middle of the list forces Terraform to recreate several unrelated subnets. Write the resource and any supporting locals so this stops happening.",
+    "rationale": "near miss owned by terraform-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "Write a Lua 5.4 function `paginate(total, per_page)` that returns two values: the number of full pages needed to hold all items (rounded up is not required — use floor of total divided by per_page), and the exact average items-per-page as a decimal number.",
-    "rationale": "near miss owned by lua-guide",
+    "query": "I have a log file with about 20 million lines already loaded as an array of strings in JavaScript. Write a function that keeps only the ERROR lines, extracts the timestamp from each, and returns the first 10. Explain any performance concerns.",
+    "rationale": "near miss owned by fp-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "A review comment on `work/module-pattern/` says the module pattern change handles the normal fixture but leaves the failure path undefined. For this Lua task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
-    "rationale": "near miss owned by lua-guide",
+    "query": "our particle simulator stalls when we have 50k particles — the update loop reads position and velocity out of a fat 96-byte struct, can you restructure it for cache efficiency",
+    "rationale": "near miss owned by data-oriented-design-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "quick pre-merge sanity check: after the local variables change under `work/local-variables/`, a clean checkout behaves differently from my local run. What Lua-specific assumption could cause that? Show the correction and the exact narrow validation.",
-    "rationale": "near miss owned by lua-guide",
+    "query": "We just wrapped a debugging session where I made a couple of mistakes and had to correct course. Capture the development lessons from this session and save each one as its own file so a future agent can reuse it. Show me exactly what one of those files should contain.",
+    "rationale": "near miss owned by reflect-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "The clean Linux CI job fails only for the minimal metatables fixture under `work/metatables/`, while the full local fixture passes. Trace the Lua-specific boundary that could cause the difference, then propose a patch and a regression check.",
-    "rationale": "near miss owned by lua-guide",
+    "query": "our exporter crashes opening the second project but the first one is fine — where do I even start",
+    "rationale": "near miss owned by debugging-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "A review comment on `work/coroutines/` says the coroutines change handles the normal fixture but leaves the failure path undefined. For this Lua task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
-    "rationale": "near miss owned by lua-guide",
+    "query": "map a mandatory protected-path control to Pi and tell me whether it can actually block",
+    "rationale": "near miss owned by pi-guide",
     "should_trigger": false,
     "split": "validation"
   }

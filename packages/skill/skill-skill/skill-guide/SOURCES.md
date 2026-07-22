@@ -119,6 +119,15 @@
   - `compatibility` field for declaring network/runtime needs → network/runtime section
   - Treat-skills-as-software, audit untrusted scripts/URLs, fetched-content-as-untrusted-data, no hardcoded secrets → repo-original synthesis (not a transcription of an upstream "Security" page)
 
+## OpenAI Codex skills and non-interactive mode
+
+- **URLs:**
+  - https://learn.chatgpt.com/docs/build-skills.md
+  - https://learn.chatgpt.com/docs/non-interactive-mode.md
+- **Last reviewed:** 2026-07-22
+- **References:** references/evaluating-triggers.md, references/evaluating-outputs.md
+- **Aspects extracted:** Codex skill discovery and progressive disclosure; implicit routing from skill descriptions; repository/user skill locations; explicit `$skill-name` invocation; ephemeral JSONL `codex exec`; ignored user configuration and execution rules; read-only sandbox selection.
+
 ## Guide-level synthesis
 
 - **Provenance:** Repository-original integration of the source blocks above; these references combine multiple inputs or maintained conventions rather than one exclusive upstream

@@ -3,6 +3,7 @@
 ## Hono: Full Documentation (LLM-friendly distillation)
 
 - **URL:** https://hono.dev/llms-full.txt
+- **Version:** 4.0.0
 - **Last reviewed:** 2026-05-13
 - **Used for:**
   - `SKILL.md` → all sections

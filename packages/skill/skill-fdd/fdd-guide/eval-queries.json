@@ -78,20 +78,20 @@
     "split": "validation"
   },
   {
-    "query": "is this user story good? \"As a rider I want to pay for my trip\" — does it pass INVEST?",
-    "rationale": "near miss owned by user-stories-guide",
+    "query": "how do I get the business and developers speaking the same vocabulary that also shows up in the code?",
+    "rationale": "near miss owned by ddd-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "this story is too big for a sprint, how do I split it into smaller stories?",
-    "rationale": "near miss owned by user-stories-guide",
+    "query": "I have a Rectangle class with mutable width and height and setWidth/setHeight methods. I now need a Square type in the same system. What's the cleanest way to model Square given I already have Rectangle?",
+    "rationale": "near miss owned by oop-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "what does SPIDR stand for and when do I use a spike to split a story?",
-    "rationale": "near miss owned by user-stories-guide",
+    "query": "In a Hono API running on Node with @hono/node-server, add a WebSocket endpoint at /ws/chat that echoes each incoming message back to the sender. Show both the server bootstrap code and the route definition.",
+    "rationale": "near miss owned by hono-guide",
     "should_trigger": false,
     "split": "validation"
   }

@@ -12,6 +12,7 @@ import {
 import {parseCli, parseFrontmatterName} from "./cli.js";
 import {
   buildTriggerClaudeArgs,
+  buildTriggerCodexArgs,
   MAX_TRIGGER_MODEL_RUNS,
   parseQueries,
   parseQuerySplit,
@@ -38,10 +39,12 @@ interface TriggerConfigOptions {
 
 export interface TriggerConfig {
   readonly budget: number;
-  readonly claudeArgs: readonly string[];
-  readonly claudeExecutable: string;
-  readonly claudeModel: string;
+  readonly guideDirectory: string;
+  readonly harness: "claude" | "codex";
+  readonly harnessArgs: readonly string[];
+  readonly harnessExecutable: string;
   readonly maxBatchModelRuns: number;
+  readonly model: string;
   readonly queryBatches: readonly (readonly Query[])[];
   readonly queryCount: number;
   readonly runs: number;
@@ -126,13 +129,22 @@ export const resolveTriggerConfig = (
   }
   const resolveExecutablePath =
     options.resolveExecutablePath ?? defaultResolveExecutablePath;
-  const claudeExecutable = resolveExecutablePath("claude");
-  if (claudeExecutable === undefined) {
-    return failure("runtime", "'claude' CLI not found in PATH");
+  const harnessInput =
+    cli.harness ?? environment.SKILL_EVAL_HARNESS ?? "claude";
+  if (harnessInput !== "claude" && harnessInput !== "codex") {
+    return failure(
+      "usage",
+      `argument harness: invalid choice: '${harnessInput}' (choose from 'claude', 'codex')`,
+    );
+  }
+  const harness = harnessInput;
+  const harnessExecutable = resolveExecutablePath(harness);
+  if (harnessExecutable === undefined) {
+    return failure("runtime", `'${harness}' CLI not found in PATH`);
   }
   const executableRuns = options.executableRuns ?? defaultExecutableRuns;
-  if (!executableRuns(claudeExecutable)) {
-    return failure("runtime", "'claude' CLI not found in PATH");
+  if (!executableRuns(harnessExecutable)) {
+    return failure("runtime", `'${harness}' CLI not found in PATH`);
   }
 
   const optionsResult = parseTriggerOptions({
@@ -153,8 +165,9 @@ export const resolveTriggerConfig = (
     cli.pluginDir ?? environment.PLUGIN_DIR ?? dirname(guideDirectory);
   const pluginDirectory = resolve(workingDirectory, pluginDirectoryArgument);
   if (
-    !isDirectory(pluginDirectory) ||
-    !isFile(join(pluginDirectory, ".claude-plugin", "plugin.json"))
+    harness === "claude" &&
+    (!isDirectory(pluginDirectory) ||
+      !isFile(join(pluginDirectory, ".claude-plugin", "plugin.json")))
   ) {
     return failure(
       "runtime",
@@ -197,22 +210,31 @@ export const resolveTriggerConfig = (
     );
   }
 
-  const modelInput = cli.model ?? environment.CLAUDE_MODEL ?? "haiku";
-  const claudeModel = modelInput.trim().length > 0 ? modelInput : "haiku";
+  const defaultModel = harness === "claude" ? "haiku" : "";
+  const environmentModel =
+    harness === "claude" ? environment.CLAUDE_MODEL : environment.CODEX_MODEL;
+  const modelInput = cli.model ?? environmentModel ?? defaultModel;
+  const model = modelInput.trim().length > 0 ? modelInput : defaultModel;
   const shortName = skillName.split(":").pop() ?? skillName;
 
   return {
     success: true,
     data: {
       budget,
-      claudeArgs: buildTriggerClaudeArgs({
-        model: claudeModel,
-        budget,
-        pluginDirectories: resolveClaudePluginDirectories(pluginDirectory),
-      }),
-      claudeExecutable,
-      claudeModel,
+      guideDirectory,
+      harness,
+      harnessArgs:
+        harness === "claude"
+          ? buildTriggerClaudeArgs({
+              model,
+              budget,
+              pluginDirectories:
+                resolveClaudePluginDirectories(pluginDirectory),
+            })
+          : buildTriggerCodexArgs({model}),
+      harnessExecutable,
       maxBatchModelRuns,
+      model,
       queryBatches,
       queryCount: selectionResult.data.length,
       runs,

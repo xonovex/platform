@@ -24,24 +24,6 @@
     "split": "train"
   },
   {
-    "query": "I have a Claude Code slash command at `.claude/commands/changelog.md`. Its body uses `$ARGUMENTS` for the user input and embeds git output inline with `` !`git log --oneline -20` ``. I want to port this same command to the Gemini CLI. Tell me exactly what to change and where the file goes.",
-    "rationale": "near miss owned by command-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
-    "query": "We have a ~140-line Claude Code slash command that inlines its entire Goal, Workflow, Output format, and Gotchas. I want to refactor it into a thin command that keeps only its argument contract and delegates the actual procedure to a reusable guideline skill. It's packaged as a plugin. Walk me through every step so nothing breaks at run time.",
-    "rationale": "near miss owned by command-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
-    "query": "I just finished a task where I stripped every `console.log` call out of `packages/billing-service/src/` for our invoicing app. Save this as a reusable slash command I can run on other projects.",
-    "rationale": "near miss owned by command-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
     "query": "A review comment on `work/create/` says the create change handles the normal fixture but leaves the failure path undefined. For this Llmstxt task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
     "rationale": "implicit task cue derived from the create reference",
     "should_trigger": true,
@@ -66,32 +48,50 @@
     "split": "validation"
   },
   {
-    "query": "A review comment on `work/distill/` says the distill change handles the normal fixture but leaves the failure path undefined. For this Command task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
+    "query": "I have a Claude Code slash command at `.claude/commands/changelog.md`. Its body uses `$ARGUMENTS` for the user input and embeds git output inline with `` !`git log --oneline -20` ``. I want to port this same command to the Gemini CLI. Tell me exactly what to change and where the file goes.",
     "rationale": "near miss owned by command-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "quick pre-merge sanity check: after the create change under `work/create/`, a clean checkout behaves differently from my local run. What Command-specific assumption could cause that? Show the correction and the exact narrow validation.",
-    "rationale": "near miss owned by command-guide",
+    "query": "I have a log file with about 20 million lines already loaded as an array of strings in JavaScript. Write a function that keeps only the ERROR lines, extracts the timestamp from each, and returns the first 10. Explain any performance concerns.",
+    "rationale": "near miss owned by fp-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "The clean Linux CI job fails only for the minimal merge fixture under `work/merge/`, while the full local fixture passes. Trace the Command-specific boundary that could cause the difference, then propose a patch and a regression check.",
-    "rationale": "near miss owned by command-guide",
+    "query": "this packages/auth dir doesn't have an AGENTS.md yet — set one up",
+    "rationale": "near miss owned by instruction-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "create a new skill for our GraphQL resolver conventions — SKILL.md plus a few reference files",
+    "rationale": "near miss owned by skill-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "In an Astro page I already have static content. Add two React components: a `<NewsletterSignup />` in the page footer that should only become interactive once the user scrolls it into view, and a `<ThemeToggle />` that reads `window.localStorage` on mount and therefore must not be server-rendered at all. Show the page frontmatter and markup with the correct hydration for each.",
+    "rationale": "near miss owned by astro-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Write a Strudel.cc live-coding snippet for a driving techno groove at 130 BPM. Include a four-on-the-floor kick, an offbeat clap, and closed hi-hats layered together.",
+    "rationale": "near miss owned by strudel-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "A review comment on `work/simplify/` says the simplify change handles the normal fixture but leaves the failure path undefined. For this Command task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
-    "rationale": "near miss owned by command-guide",
+    "query": "Rewrite this so it reads like a person wrote it, not an AI: 'Our platform offers a seamless, intuitive experience that empowers teams to unlock their full potential. Experts agree it's a game-changer, and studies show productivity has never been better.'",
+    "rationale": "near miss owned by content-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "quick pre-merge sanity check: after the harness formats change under `work/harness-formats/`, a clean checkout behaves differently from my local run. What Command-specific assumption could cause that? Show the correction and the exact narrow validation.",
-    "rationale": "near miss owned by command-guide",
+    "query": "help me run a three amigos session and write Given-When-Then scenarios for the checkout story before we code",
+    "rationale": "near miss owned by bdd-guide",
     "should_trigger": false,
     "split": "validation"
   }

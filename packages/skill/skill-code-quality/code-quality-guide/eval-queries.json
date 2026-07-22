@@ -72,26 +72,26 @@
     "split": "train"
   },
   {
-    "query": "Set up the remote state backend for our production environment's Terraform root module. We're on AWS. Show the backend configuration and explain the key decisions.",
-    "rationale": "near miss owned by terraform-guide",
+    "query": "Research the code paths and current library versions we need before planning rate limiting for packages/api. Keep it read-only and cite the evidence.",
+    "rationale": "near miss owned by plan-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "Someone changed our infrastructure manually in the cloud console. I want to see what has drifted from our Terraform state before I decide whether to reconcile it. What command should I run and why?",
-    "rationale": "near miss owned by terraform-guide",
+    "query": "Write an Express 5 + TypeScript login route handler. It should look up the user by email, verify the submitted password against the stored hash, and on success return a signed JWT the client will send on future API requests.",
+    "rationale": "near miss owned by expressjs-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "Add a Terraform variable named database_config that is a structured object with instance_class (string), engine_version (string), and a backup_retention number that callers may omit and should default to 7. We're on Terraform 1.12.",
-    "rationale": "near miss owned by terraform-guide",
+    "query": "walk me through red-green-refactor on this shopping-cart total function",
+    "rationale": "near miss owned by tdd-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "A review comment on `work/module-structure/` says the module structure change handles the normal fixture but leaves the failure path undefined. For this Terraform task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
-    "rationale": "near miss owned by terraform-guide",
+    "query": "Using Zod 4, write a TypeScript schema named UserSchema for a user object with these fields: an id that is a UUID, an email address, a createdAt that is an ISO datetime string, and a name string between 1 and 100 characters. Also export the inferred TypeScript type.",
+    "rationale": "near miss owned by zod-guide",
     "should_trigger": false,
     "split": "validation"
   }

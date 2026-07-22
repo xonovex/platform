@@ -1,4 +1,7 @@
 import {spawn} from "node:child_process";
+import {appendFileSync, cpSync, mkdirSync, mkdtempSync, rmSync} from "node:fs";
+import {tmpdir} from "node:os";
+import {join} from "node:path";
 import {createInterface} from "node:readline";
 import {streamTextDeltaLength} from "./validation.js";
 
@@ -9,6 +12,16 @@ export interface TriggerOutcome {
   readonly triggered: boolean;
   readonly error: string | null;
 }
+
+interface CodexTriggerOptions {
+  readonly args: readonly string[];
+  readonly executable: string;
+  readonly guideDirectory: string;
+  readonly query: string;
+  readonly shortName: string;
+}
+
+const CODEX_TRIGGER_SIGNAL = "XONOVEX_SKILL_TRIGGERED";
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null && !Array.isArray(value);
@@ -209,3 +222,129 @@ export const checkTriggered = (
       finish({triggered: false, error: null});
     });
   });
+
+const codexAgentMessage = (line: string): string => {
+  try {
+    const event: unknown = JSON.parse(line);
+    if (!isRecord(event) || event.type !== "item.completed") return "";
+    const item = event.item;
+    return isRecord(item) &&
+      item.type === "agent_message" &&
+      typeof item.text === "string"
+      ? item.text
+      : "";
+  } catch {
+    return "";
+  }
+};
+
+export const checkCodexTriggered = (
+  options: CodexTriggerOptions,
+): Promise<TriggerOutcome> => {
+  const workspace = mkdtempSync(join(tmpdir(), "xonovex-codex-trigger-"));
+  const skillDirectory = join(
+    workspace,
+    ".agents",
+    "skills",
+    options.shortName,
+  );
+  const isolatedHome = join(workspace, "home");
+  const isolatedCodexHome = join(workspace, ".codex");
+  mkdirSync(join(workspace, ".agents", "skills"), {recursive: true});
+  mkdirSync(isolatedHome, {recursive: true});
+  mkdirSync(isolatedCodexHome, {recursive: true});
+  cpSync(options.guideDirectory, skillDirectory, {recursive: true});
+  appendFileSync(
+    join(skillDirectory, "SKILL.md"),
+    `\n## Evaluation signal\n\nWhen this skill applies, reply with exactly ${CODEX_TRIGGER_SIGNAL}.\n`,
+  );
+
+  const prompt =
+    `${options.query}\n\nDecide only whether an available skill applies. ` +
+    "Do not perform the task. If no skill applies, reply exactly NOT_APPLICABLE.";
+
+  return new Promise((resolvePromise) => {
+    const proc = spawn(options.executable, [...options.args, prompt], {
+      cwd: workspace,
+      env: {
+        ...process.env,
+        CODEX_HOME: isolatedCodexHome,
+        HOME: isolatedHome,
+      },
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+    let matched = false;
+    let timedOut = false;
+    let outputLimitExceeded = false;
+    let outputCharacters = 0;
+    let stderr = "";
+    let spawnError: string | null = null;
+    let settled = false;
+
+    const finish = (outcome: TriggerOutcome): void => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timeoutTimer);
+      rmSync(workspace, {recursive: true, force: true});
+      resolvePromise(outcome);
+    };
+    const killProc = (): void => {
+      if (proc.exitCode === null && proc.signalCode === null) {
+        proc.kill("SIGKILL");
+      }
+    };
+    const timeoutTimer = setTimeout(() => {
+      timedOut = true;
+      killProc();
+    }, TRIGGER_TIMEOUT_MS);
+    const rl = createInterface({input: proc.stdout, crlfDelay: Infinity});
+    rl.on("line", (raw) => {
+      const message = codexAgentMessage(raw.trim());
+      outputCharacters += message.length;
+      if (message.includes(CODEX_TRIGGER_SIGNAL)) {
+        matched = true;
+        rl.close();
+        killProc();
+      } else if (outputCharacters > TRIGGER_OUTPUT_LIMIT) {
+        outputLimitExceeded = true;
+        rl.close();
+        killProc();
+      }
+    });
+    proc.stderr.setEncoding("utf8");
+    proc.stderr.on("data", (chunk: string) => {
+      stderr += chunk;
+    });
+    proc.on("error", (error) => {
+      spawnError = error.message;
+    });
+    proc.on("close", (code) => {
+      if (matched) {
+        finish({triggered: true, error: null});
+        return;
+      }
+      if (timedOut) {
+        finish({triggered: false, error: "timeout"});
+        return;
+      }
+      if (outputLimitExceeded) {
+        finish({triggered: false, error: "output-limit"});
+        return;
+      }
+      if (spawnError !== null) {
+        finish({triggered: false, error: spawnError});
+        return;
+      }
+      if (code !== 0) {
+        const detail = stderr.trim();
+        const suffix = detail.length > 0 ? `: ${detail}` : "";
+        finish({
+          triggered: false,
+          error: `codex exited ${String(code)}${suffix}`,
+        });
+        return;
+      }
+      finish({triggered: false, error: null});
+    });
+  });
+};

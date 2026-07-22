@@ -2,6 +2,7 @@
 import {existsSync, readdirSync, statSync} from "node:fs";
 import {homedir} from "node:os";
 import {join, resolve} from "node:path";
+import {fileURLToPath} from "node:url";
 
 const RETIRED = new Map([
   ["xonovex-skill-general-fp", "xonovex-skill-fp"],
@@ -51,7 +52,7 @@ const installedVersions = (pluginDirectory) => {
     .toSorted();
 };
 
-const findRetired = (roots) => {
+export const findRetired = (roots) => {
   const findings = [];
   for (const root of roots) {
     if (!existsSync(root) || !statSync(root).isDirectory()) continue;
@@ -94,11 +95,16 @@ const main = () => {
   return findings.length === 0 ? 0 : 1;
 };
 
-try {
-  process.exit(main());
-} catch (error) {
-  process.stderr.write(
-    `Error: ${error instanceof Error ? error.message : String(error)}\n`,
-  );
-  process.exit(2);
+if (
+  process.argv[1] !== undefined &&
+  resolve(process.argv[1]) === fileURLToPath(import.meta.url)
+) {
+  try {
+    process.exit(main());
+  } catch (error) {
+    process.stderr.write(
+      `Error: ${error instanceof Error ? error.message : String(error)}\n`,
+    );
+    process.exit(2);
+  }
 }

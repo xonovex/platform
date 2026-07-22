@@ -78,26 +78,26 @@
     "split": "train"
   },
   {
-    "query": "Write a reusable helper for our Hono API that turns a Zod validation failure into a standardized structured JSON error response for a 400. Show the exact response body shape it produces.",
-    "rationale": "near miss owned by hono-guide",
+    "query": "correlate Bitrise pipeline and AWS deployment references in Datadog CI/CD Visibility",
+    "rationale": "near miss owned by datadog-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "Our Hono app must read a DATABASE_URL environment variable inside a route handler, and the same code has to run correctly whether deployed on Node or on Cloudflare Workers. Write the handler.",
-    "rationale": "near miss owned by hono-guide",
+    "query": "Write an Express 5 + TypeScript login route handler. It should look up the user by email, verify the submitted password against the stored hash, and on success return a signed JWT the client will send on future API requests.",
+    "rationale": "near miss owned by expressjs-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "In a Hono handler, set a secure session cookie that JavaScript cannot read, is only transmitted over HTTPS, and uses the __Host- name prefix. Write the cookie-setting code.",
-    "rationale": "near miss owned by hono-guide",
+    "query": "In a Remotion project running at 30fps, write a React component that fades a headline in from opacity 0 to 1 over the first half second and slides it up 40px at the same time. Give me the full component code.",
+    "rationale": "near miss owned by remotion-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "A review comment on `work/application-structure/` says the application structure change handles the normal fixture but leaves the failure path undefined. For this Hono task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
-    "rationale": "near miss owned by hono-guide",
+    "query": "Using Zod 4, write a TypeScript schema named UserSchema for a user object with these fields: an id that is a UUID, an email address, a createdAt that is an ISO datetime string, and a name string between 1 and 100 characters. Also export the inferred TypeScript type.",
+    "rationale": "near miss owned by zod-guide",
     "should_trigger": false,
     "split": "validation"
   }

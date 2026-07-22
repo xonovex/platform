@@ -6,3 +6,7 @@ tasks:
     command: echo 'build complete'
     options:
       cache: false
+  test:
+    command: npm run test
+    inputs:
+      - "skill-guide/scripts/**/*.mjs"

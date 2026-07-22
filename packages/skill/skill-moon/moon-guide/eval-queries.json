@@ -24,30 +24,6 @@
     "split": "train"
   },
   {
-    "query": "I have a Hono app configured with `app.use('*', cors())`. Write a Vitest test that verifies the CORS preflight (OPTIONS) request to `/api/users` with an Origin header succeeds and that the Access-Control-Allow-Origin header is returned.",
-    "rationale": "near miss owned by vitest-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
-    "query": "Write a Vitest test for an async updateUser(id) function. The test should create a record, update it, and verify that the record's updatedAt timestamp is strictly newer than the original createdAt.",
-    "rationale": "near miss owned by vitest-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
-    "query": "In a Vitest test file I have `import { db } from '../src/db'` and I want to mock the entire '../src/db' module so its exported `query` function returns a fixed row object. Show the mock setup.",
-    "rationale": "near miss owned by vitest-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
-    "query": "Write a Vitest mock for an async `getUser(id)` dependency that resolves to `{ id: '123', email: 'test@example.com' }`, then call it and assert it was invoked with '123'.",
-    "rationale": "near miss owned by vitest-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
     "query": "A review comment on `work/task-configuration/` says the task configuration change handles the normal fixture but leaves the failure path undefined. For this Moon task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
     "rationale": "implicit task cue derived from the task configuration reference",
     "should_trigger": true,
@@ -72,26 +48,50 @@
     "split": "validation"
   },
   {
-    "query": "A review comment on `work/type-safety/` says the type safety change handles the normal fixture but leaves the failure path undefined. For this Vitest task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
+    "query": "I have a Hono app configured with `app.use('*', cors())`. Write a Vitest test that verifies the CORS preflight (OPTIONS) request to `/api/users` with an Origin header succeeds and that the Access-Control-Allow-Origin header is returned.",
     "rationale": "near miss owned by vitest-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "quick pre-merge sanity check: after the http testing change under `work/http-testing/`, a clean checkout behaves differently from my local run. What Vitest-specific assumption could cause that? Show the correction and the exact narrow validation.",
-    "rationale": "near miss owned by vitest-guide",
+    "query": "Write a production Dockerfile for a Node.js 22 web service that builds TypeScript with `npm run build` and serves on port 3000. Keep the final image as small and secure as reasonably possible.",
+    "rationale": "near miss owned by docker-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Design a PostgreSQL table for meeting-room reservations. Each reservation has a room, a start time, and an end time. The database itself must guarantee that two reservations for the same room can never overlap in time. Write the CREATE TABLE statement.",
+    "rationale": "near miss owned by sql-postgresql-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Write an Express 5 + TypeScript login route handler. It should look up the user by email, verify the submitted password against the stored hash, and on success return a signed JWT the client will send on future API requests.",
+    "rationale": "near miss owned by expressjs-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "In a Remotion project running at 30fps, write a React component that fades a headline in from opacity 0 to 1 over the first half second and slides it up 40px at the same time. Give me the full component code.",
+    "rationale": "near miss owned by remotion-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "I'm writing TypeScript that compiles to Lua with the typescript-to-lua transpiler. Write a `divmod` function that takes two numbers and returns both the quotient (floored) and the remainder so the generated Lua uses native Lua multiple return values rather than an array or object wrapper. Include a call site that consumes both values.",
+    "rationale": "near miss owned by typescript-to-lua-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "The clean Linux CI job fails only for the minimal timestamp testing fixture under `work/timestamp-testing/`, while the full local fixture passes. Trace the Vitest-specific boundary that could cause the difference, then propose a patch and a regression check.",
-    "rationale": "near miss owned by vitest-guide",
+    "query": "Write a Lua 5.4 function `load_config(path)` that opens the file at `path`, reads all of it, and returns the parsed contents. Show how a caller would use it when the file might not exist, falling back to a default config instead of crashing.",
+    "rationale": "near miss owned by lua-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "A review comment on `work/typescript-config/` says the typescript config change handles the normal fixture but leaves the failure path undefined. For this Vitest task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
-    "rationale": "near miss owned by vitest-guide",
+    "query": "I have a Rectangle class with mutable width and height and setWidth/setHeight methods. I now need a Square type in the same system. What's the cleanest way to model Square given I already have Rectangle?",
+    "rationale": "near miss owned by oop-guide",
     "should_trigger": false,
     "split": "validation"
   }

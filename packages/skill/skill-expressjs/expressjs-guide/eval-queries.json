@@ -24,30 +24,6 @@
     "split": "train"
   },
   {
-    "query": "In a Hono API running on Node with @hono/node-server, add a WebSocket endpoint at /ws/chat that echoes each incoming message back to the sender. Show both the server bootstrap code and the route definition.",
-    "rationale": "near miss owned by hono-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
-    "query": "Write a reusable helper for our Hono API that turns a Zod validation failure into a standardized structured JSON error response for a 400. Show the exact response body shape it produces.",
-    "rationale": "near miss owned by hono-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
-    "query": "Our Hono app must read a DATABASE_URL environment variable inside a route handler, and the same code has to run correctly whether deployed on Node or on Cloudflare Workers. Write the handler.",
-    "rationale": "near miss owned by hono-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
-    "query": "In a Hono handler, set a secure session cookie that JavaScript cannot read, is only transmitted over HTTPS, and uses the __Host- name prefix. Write the cookie-setting code.",
-    "rationale": "near miss owned by hono-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
     "query": "A review comment on `work/project-structure/` says the project structure change handles the normal fixture but leaves the failure path undefined. For this Expressjs task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
     "rationale": "implicit task cue derived from the project structure reference",
     "should_trigger": true,
@@ -72,26 +48,50 @@
     "split": "validation"
   },
   {
-    "query": "A review comment on `work/application-structure/` says the application structure change handles the normal fixture but leaves the failure path undefined. For this Hono task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
+    "query": "In a Hono API running on Node with @hono/node-server, add a WebSocket endpoint at /ws/chat that echoes each incoming message back to the sender. Show both the server bootstrap code and the route definition.",
     "rationale": "near miss owned by hono-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "quick pre-merge sanity check: after the validation type safety change under `work/validation-type-safety/`, a clean checkout behaves differently from my local run. What Hono-specific assumption could cause that? Show the correction and the exact narrow validation.",
-    "rationale": "near miss owned by hono-guide",
+    "query": "Using Zod 4, write a TypeScript schema named UserSchema for a user object with these fields: an id that is a UUID, an email address, a createdAt that is an ISO datetime string, and a name string between 1 and 100 characters. Also export the inferred TypeScript type.",
+    "rationale": "near miss owned by zod-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "add proper types to the response shape in src/api/users.ts so the consumer doesn't have to cast",
+    "rationale": "near miss owned by typescript-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Write a Lua 5.4 function `load_config(path)` that opens the file at `path`, reads all of it, and returns the parsed contents. Show how a caller would use it when the file might not exist, falling back to a default config instead of crashing.",
+    "rationale": "near miss owned by lua-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "I have a Hono app configured with `app.use('*', cors())`. Write a Vitest test that verifies the CORS preflight (OPTIONS) request to `/api/users` with an Origin header succeeds and that the Access-Control-Allow-Origin header is returned.",
+    "rationale": "near miss owned by vitest-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "In an Astro page I already have static content. Add two React components: a `<NewsletterSignup />` in the page footer that should only become interactive once the user scrolls it into view, and a `<ThemeToggle />` that reads `window.localStorage` on mount and therefore must not be server-rendered at all. Show the page frontmatter and markup with the correct hydration for each.",
+    "rationale": "near miss owned by astro-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "The clean Linux CI job fails only for the minimal middleware patterns fixture under `work/middleware-patterns/`, while the full local fixture passes. Trace the Hono-specific boundary that could cause the difference, then propose a patch and a regression check.",
-    "rationale": "near miss owned by hono-guide",
+    "query": "We're on moonrepo 2.0. I want to enable and configure one of Moon's built-in extensions in our workspace. Which config file does the extension configuration go in, and show me a minimal example of the config block.",
+    "rationale": "near miss owned by moon-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "A review comment on `work/middleware-combine/` says the middleware combine change handles the normal fixture but leaves the failure path undefined. For this Hono task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
-    "rationale": "near miss owned by hono-guide",
+    "query": "Set up the compiler configuration (CMake) for a C99 library target named `netcodec` that calls `readlink` and `strnlen`. Configure it for strict ISO C99, treat warnings as errors with `-Wall -Wextra`, and make sure it still compiles cleanly even though the code uses partial designated initializers like `(cfg_t){ .port = 8080 }` throughout.",
+    "rationale": "near miss owned by c99-guide",
     "should_trigger": false,
     "split": "validation"
   }

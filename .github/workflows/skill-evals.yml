@@ -1,6 +1,16 @@
 name: Skill model evals
 
 on:
+  pull_request:
+    paths:
+      - ".github/workflows/skill-evals.yml"
+      - ".moon/tasks/tag-skill.yml"
+      - "packages/script/script-moon-common/**"
+      - "packages/script/script-moon-skill-eval-outputs/**"
+      - "packages/script/script-moon-skill-eval-triggers/**"
+      - "packages/skill/**"
+  schedule:
+    - cron: "17 3 1 * *"
   workflow_dispatch:
 
 concurrency:
@@ -13,6 +23,9 @@ permissions:
 jobs:
   matrix:
     name: Select skill evals
+    if: >-
+      (github.event_name == 'workflow_dispatch' || vars.SKILL_EVALS_ENABLED == 'true') &&
+      (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
     runs-on: ubuntu-latest
     outputs:
       skills: ${{ steps.select.outputs.skills }}
@@ -30,26 +43,26 @@ jobs:
         run: nix develop --no-update-lock-file --command npm ci
 
       - id: select
-        name: Select skill matrix
+        name: Select bounded full or changed-skill matrix
         shell: bash
         run: |
           set -euo pipefail
-          nix develop --no-update-lock-file --command npx moon query tasks \
-            --id ci-skill-eval-trigger \
-            >"${RUNNER_TEMP}/skill-eval-trigger-tasks.json"
-          nix develop --no-update-lock-file --command npx moon query tasks \
-            --id ci-skill-eval-output \
-            >"${RUNNER_TEMP}/skill-eval-output-tasks.json"
-          skills="$(nix develop --no-update-lock-file --command jq -sc \
-            '[.[].tasks | keys[]] | unique | map({project: ., package: ltrimstr("skill-")})' \
-            "${RUNNER_TEMP}/skill-eval-trigger-tasks.json" \
-            "${RUNNER_TEMP}/skill-eval-output-tasks.json")"
+          changed_file="-"
+          if [[ "${GITHUB_EVENT_NAME}" == "pull_request" ]]; then
+            changed_file="${RUNNER_TEMP}/changed-files.txt"
+            git diff --name-only "${BASE_SHA}...${HEAD_SHA}" >"${changed_file}"
+          fi
+          offset="$((10#$(date -u +%m) * 12))"
+          skills="$(node packages/skill/skill-skill/skill-guide/scripts/list-eval-matrix.mjs \
+            packages/skill "${changed_file}" 12 "${offset}")"
           printf 'skills=%s\n' "${skills}" >>"${GITHUB_OUTPUT}"
         env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   eval:
-    name: ${{ matrix.skill.package }} ${{ matrix.mode }} eval
+    name: ${{ matrix.skill.package }} ${{ matrix.harness }} ${{ matrix.mode }} eval
     needs: matrix
     if: needs.matrix.outputs.skills != '[]'
     runs-on: ubuntu-latest
@@ -58,6 +71,7 @@ jobs:
       max-parallel: 2
       matrix:
         mode: [trigger, output]
+        harness: [claude, codex]
         skill: ${{ fromJSON(needs.matrix.outputs.skills) }}
 
     steps:
@@ -73,7 +87,15 @@ jobs:
       - name: Require model-eval credential
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-        run: test -n "$ANTHROPIC_API_KEY"
+          CODEX_API_KEY: ${{ secrets.CODEX_API_KEY }}
+          HARNESS: ${{ matrix.harness }}
+        run: |
+          set -euo pipefail
+          if [[ "$HARNESS" == "codex" ]]; then
+            test -n "$CODEX_API_KEY"
+          else
+            test -n "$ANTHROPIC_API_KEY"
+          fi
 
       - name: Install repository dependencies
         run: nix develop --no-update-lock-file --command npm ci
@@ -81,6 +103,10 @@ jobs:
       - name: Run skill evals
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          CODEX_API_KEY: ${{ secrets.CODEX_API_KEY }}
+          SKILL_EVAL_HARNESS: ${{ matrix.harness }}
+          CLAUDE_MODEL: haiku
+          JUDGE_MODEL: sonnet
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           MOON_TARGET: ${{ matrix.skill.project }}:ci-skill-eval-${{ matrix.mode }}
         run: nix develop --no-update-lock-file --command npx moon run "$MOON_TARGET"
@@ -89,7 +115,7 @@ jobs:
         if: success() || failure()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: skill-eval-${{ matrix.skill.package }}-${{ matrix.mode }}
+          name: skill-eval-${{ matrix.skill.package }}-${{ matrix.harness }}-${{ matrix.mode }}
           path: packages/skill/${{ matrix.skill.project }}/.skill-eval-results/${{ matrix.mode }}
           if-no-files-found: warn
           retention-days: 30

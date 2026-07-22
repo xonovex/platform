@@ -18,12 +18,6 @@
     "rationale": "versioned matrix and executable trust"
   },
   {
-    "query": "write a unit test using Arrange-Act-Assert",
-    "should_trigger": false,
-    "split": "train",
-    "rationale": "near miss owned by testing guidance"
-  },
-  {
     "query": "Can a Pi tool_call extension block this exact tool operation? Validate the installed surface and its coverage.",
     "rationale": "output-eval task also exercises this skill's routing boundary",
     "should_trigger": true,
@@ -42,42 +36,6 @@
     "split": "validation"
   },
   {
-    "query": "map a mandatory protected-path control to Claude Code and tell me whether it can actually block",
-    "rationale": "near miss owned by code-harness-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
-    "query": "preview onboarding a project-provided Claude Code executable module without applying it",
-    "rationale": "near miss owned by code-harness-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
-    "query": "what version and trust probes should I run before relying on this Claude Code hook or extension?",
-    "rationale": "near miss owned by code-harness-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
-    "query": "Can a Claude Code PreToolUse hook block this exact tool operation? Validate the installed surface and its coverage.",
-    "rationale": "near miss owned by code-harness-guide",
-    "should_trigger": false,
-    "split": "validation"
-  },
-  {
-    "query": "Advise onboarding a repository-provided Claude Code hook, plugin, extension, or package. Do not mutate yet.",
-    "rationale": "near miss owned by code-harness-guide",
-    "should_trigger": false,
-    "split": "validation"
-  },
-  {
-    "query": "Provide deterministic, model-evaluator, and specialist-agent patterns for Claude Code.",
-    "rationale": "near miss owned by code-harness-guide",
-    "should_trigger": false,
-    "split": "validation"
-  },
-  {
     "query": "A review comment on `work/capabilities/` says the capabilities change handles the normal fixture but leaves the failure path undefined. For this Pi task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
     "rationale": "implicit task cue derived from the capabilities reference",
     "should_trigger": true,
@@ -90,9 +48,51 @@
     "split": "validation"
   },
   {
-    "query": "configure Kiro steering files and an agent hook for this repository",
+    "query": "map a mandatory protected-path control to Claude Code and tell me whether it can actually block",
+    "rationale": "near miss owned by code-harness-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "map a mandatory protected-path control to Codex and tell me whether it can actually block",
+    "rationale": "near miss owned by codex-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "map a mandatory protected-path control to GitHub Copilot and tell me whether it can actually block",
+    "rationale": "near miss owned by copilot-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "map a mandatory protected-path control to Kiro and tell me whether it can actually block",
     "rationale": "near miss owned by kiro-guide",
     "should_trigger": false,
     "split": "train"
+  },
+  {
+    "query": "map a mandatory protected-path control to OpenCode and tell me whether it can actually block",
+    "rationale": "near miss owned by opencode-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "preview onboarding a project-provided Claude Code executable module without applying it",
+    "rationale": "near miss owned by code-harness-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "preview onboarding a project-provided Codex executable module without applying it",
+    "rationale": "near miss owned by codex-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "preview onboarding a project-provided GitHub Copilot executable module without applying it",
+    "rationale": "near miss owned by copilot-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

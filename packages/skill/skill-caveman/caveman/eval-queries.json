@@ -72,26 +72,26 @@
     "split": "train"
   },
   {
-    "query": "Set up the remote state backend for our production environment's Terraform root module. We're on AWS. Show the backend configuration and explain the key decisions.",
-    "rationale": "near miss owned by terraform-guide",
+    "query": "Rewrite this so it reads like a person wrote it, not an AI: 'Our platform offers a seamless, intuitive experience that empowers teams to unlock their full potential. Experts agree it's a game-changer, and studies show productivity has never been better.'",
+    "rationale": "near miss owned by content-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "Someone changed our infrastructure manually in the cloud console. I want to see what has drifted from our Terraform state before I decide whether to reconcile it. What command should I run and why?",
-    "rationale": "near miss owned by terraform-guide",
+    "query": "I'm writing a small C99 physics engine. Define a rigid body struct and a function that applies a linear impulse to it. It must correctly handle both dynamic bodies and immovable/static bodies.",
+    "rationale": "near miss owned by c99-game-opinionated-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "Add a Terraform variable named database_config that is a structured object with instance_class (string), engine_version (string), and a backup_retention number that callers may omit and should default to 7. We're on Terraform 1.12.",
-    "rationale": "near miss owned by terraform-guide",
+    "query": "In a Remotion project running at 30fps, write a React component that fades a headline in from opacity 0 to 1 over the first half second and slides it up 40px at the same time. Give me the full component code.",
+    "rationale": "near miss owned by remotion-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "A review comment on `work/module-structure/` says the module structure change handles the normal fixture but leaves the failure path undefined. For this Terraform task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
-    "rationale": "near miss owned by terraform-guide",
+    "query": "Write a Lua 5.4 function `load_config(path)` that opens the file at `path`, reads all of it, and returns the parsed contents. Show how a caller would use it when the file might not exist, falling back to a default config instead of crashing.",
+    "rationale": "near miss owned by lua-guide",
     "should_trigger": false,
     "split": "validation"
   }

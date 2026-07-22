@@ -18,54 +18,6 @@
     "split": "train"
   },
   {
-    "query": "make this client component server-rendered if possible — it's just fetching the user's recent orders",
-    "rationale": "near miss owned by react-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
-    "query": "add a useActionState hook for the contact form so we can show pending state",
-    "rationale": "near miss owned by react-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
-    "query": "the streaming Suspense boundary on /dashboard isn't cutting at the right spot, can you adjust where the fallback shows",
-    "rationale": "near miss owned by react-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
-    "query": "convert the old forwardRef pattern in Button.tsx to ref-as-prop",
-    "rationale": "near miss owned by react-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
-    "query": "Form submission in checkout/page.tsx is double-firing — can you wire up useFormStatus properly",
-    "rationale": "near miss owned by react-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
-    "query": "fetch the user's posts inside a use() call instead of useEffect — we want it to suspend",
-    "rationale": "near miss owned by react-guide",
-    "should_trigger": false,
-    "split": "validation"
-  },
-  {
-    "query": "the search filter in components/Filters.tsx re-renders on every keystroke even though the parent doesn't change — fix it",
-    "rationale": "near miss owned by react-guide",
-    "should_trigger": false,
-    "split": "validation"
-  },
-  {
-    "query": "i think the React Compiler is over-memoizing this list, can you check src/feed/Feed.tsx",
-    "rationale": "near miss owned by react-guide",
-    "should_trigger": false,
-    "split": "validation"
-  },
-  {
     "query": "A review comment on `work/islands-architecture/` says the islands architecture change handles the normal fixture but leaves the failure path undefined. For this Astro task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
     "rationale": "implicit task cue derived from the islands architecture reference",
     "should_trigger": true,
@@ -93,6 +45,54 @@
     "query": "quick pre-merge sanity check: after the accessibility change under `work/accessibility/`, a clean checkout behaves differently from my local run. What Astro-specific assumption could cause that? Show the correction and the exact narrow validation.",
     "rationale": "implicit task cue derived from the accessibility reference",
     "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "make this client component server-rendered if possible — it's just fetching the user's recent orders",
+    "rationale": "near miss owned by react-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "In a Hono API running on Node with @hono/node-server, add a WebSocket endpoint at /ws/chat that echoes each incoming message back to the sender. Show both the server bootstrap code and the route definition.",
+    "rationale": "near miss owned by hono-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Write an Express 5 + TypeScript login route handler. It should look up the user by email, verify the submitted password against the stored hash, and on success return a signed JWT the client will send on future API requests.",
+    "rationale": "near miss owned by expressjs-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Using Zod 4, write a TypeScript schema named UserSchema for a user object with these fields: an id that is a UUID, an email address, a createdAt that is an ISO datetime string, and a name string between 1 and 100 characters. Also export the inferred TypeScript type.",
+    "rationale": "near miss owned by zod-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "We're on moonrepo 2.0. I want to enable and configure one of Moon's built-in extensions in our workspace. Which config file does the extension configuration go in, and show me a minimal example of the config block.",
+    "rationale": "near miss owned by moon-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Design a PostgreSQL table for meeting-room reservations. Each reservation has a room, a start time, and an end time. The database itself must guarantee that two reservations for the same room can never overlap in time. Write the CREATE TABLE statement.",
+    "rationale": "near miss owned by sql-postgresql-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "In a React + TypeScript app, create a reusable component that fades and slides its children upward into view when it first mounts, using the Motion animation library. Show the full component code.",
+    "rationale": "near miss owned by motion-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "add proper types to the response shape in src/api/users.ts so the consumer doesn't have to cast",
+    "rationale": "near miss owned by typescript-guide",
+    "should_trigger": false,
     "split": "validation"
   }
 ]

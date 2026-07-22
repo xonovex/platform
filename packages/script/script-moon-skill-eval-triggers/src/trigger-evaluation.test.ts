@@ -12,10 +12,7 @@ const optionsWith = (
   queryBatches,
   runs: 2,
   threshold: 0.5,
-  claudeArgs: [],
   skillName: "test-skill",
-  shortName: "test-skill",
-  claudeExecutable: "claude",
   workspace: undefined,
   check,
 });

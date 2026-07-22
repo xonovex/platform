@@ -90,14 +90,14 @@
     "split": "validation"
   },
   {
-    "query": "our editor UI pushes tens of thousands of rectangles to the GPU every frame and it's bandwidth-bound — how do I get the whole UI down to one draw call?",
-    "rationale": "near miss owned by imgui-guide",
+    "query": "track a screen view when this ViewModel loads",
+    "rationale": "near miss owned by android-analytics-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "how do I add Tab/Shift-Tab keyboard navigation and 'first responder' style focus to an IMGUI that has no widget tree?",
-    "rationale": "near miss owned by imgui-guide",
+    "query": "I have a Terraform config that creates private subnets, one per availability zone, from a variable list of AZs. Right now removing a single AZ from the middle of the list forces Terraform to recreate several unrelated subnets. Write the resource and any supporting locals so this stops happening.",
+    "rationale": "near miss owned by terraform-guide",
     "should_trigger": false,
     "split": "validation"
   }

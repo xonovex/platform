@@ -47,6 +47,9 @@ interface SourceReport {
   covers_all_references: boolean;
   reference_mapping_missing: boolean;
   dangling_refs: readonly string[];
+  version: string | null;
+  commit: string | null;
+  watch_count: number;
   fetch?: FetchReport;
   fetches?: readonly FetchReport[];
   drift?: DriftReport;
@@ -341,6 +344,9 @@ const auditSkill = async (
       covers_all_references: s.coversAllReferences,
       reference_mapping_missing: referenceMappingMissing,
       dangling_refs: dangling,
+      version: s.version ?? null,
+      commit: s.commit ?? null,
+      watch_count: s.watches.length,
     };
     if (s.coversAllReferences) {
       for (const reference of existingRefs) covered.add(reference);

@@ -54,44 +54,44 @@
     "split": "train"
   },
   {
-    "query": "Define a Python data model for a paginated API response: it holds a list of items whose element type varies per endpoint, a total count, and an optional next-page cursor string.",
-    "rationale": "near miss owned by python-guide",
+    "query": "I have a Terraform config that creates private subnets, one per availability zone, from a variable list of AZs. Right now removing a single AZ from the middle of the list forces Terraform to recreate several unrelated subnets. Write the resource and any supporting locals so this stops happening.",
+    "rationale": "near miss owned by terraform-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "I have a pure, deterministic function that is expensive and gets called repeatedly with the same arguments. Show me how to memoize it two ways: one that keeps every result, and one that caps memory by keeping only the most recently used results.",
-    "rationale": "near miss owned by python-guide",
+    "query": "add proper types to the response shape in src/api/users.ts so the consumer doesn't have to cast",
+    "rationale": "near miss owned by typescript-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "Write a reusable Python helper that wraps a block of database work in a transaction so callers can use it with a 'with' statement, committing when the block succeeds.",
-    "rationale": "near miss owned by python-guide",
+    "query": "Set up the compiler configuration (CMake) for a C99 library target named `netcodec` that calls `readlink` and `strnlen`. Configure it for strict ISO C99, treat warnings as errors with `-Wall -Wextra`, and make sure it still compiles cleanly even though the code uses partial designated initializers like `(cfg_t){ .port = 8080 }` throughout.",
+    "rationale": "near miss owned by c99-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "A review comment on `work/dataclasses-type-hints/` says the dataclasses type hints change handles the normal fixture but leaves the failure path undefined. For this Python task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
-    "rationale": "near miss owned by python-guide",
+    "query": "Using Zod 4, write a TypeScript schema named UserSchema for a user object with these fields: an id that is a UUID, an email address, a createdAt that is an ISO datetime string, and a name string between 1 and 100 characters. Also export the inferred TypeScript type.",
+    "rationale": "near miss owned by zod-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "quick pre-merge sanity check: after the type checking change under `work/type-checking/`, a clean checkout behaves differently from my local run. What Python-specific assumption could cause that? Show the correction and the exact narrow validation.",
-    "rationale": "near miss owned by python-guide",
+    "query": "Research the code paths and current library versions we need before planning rate limiting for packages/api. Keep it read-only and cite the evidence.",
+    "rationale": "near miss owned by plan-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "The clean Linux CI job fails only for the minimal generators comprehensions fixture under `work/generators-comprehensions/`, while the full local fixture passes. Trace the Python-specific boundary that could cause the difference, then propose a patch and a regression check.",
-    "rationale": "near miss owned by python-guide",
+    "query": "I have a Rectangle class with mutable width and height and setWidth/setHeight methods. I now need a Square type in the same system. What's the cleanest way to model Square given I already have Rectangle?",
+    "rationale": "near miss owned by oop-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "A review comment on `work/caching-functions/` says the caching functions change handles the normal fixture but leaves the failure path undefined. For this Python task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
-    "rationale": "near miss owned by python-guide",
+    "query": "Write a Strudel.cc live-coding snippet for a driving techno groove at 130 BPM. Include a four-on-the-floor kick, an offbeat clap, and closed hi-hats layered together.",
+    "rationale": "near miss owned by strudel-guide",
     "should_trigger": false,
     "split": "validation"
   }

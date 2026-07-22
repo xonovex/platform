@@ -18,6 +18,8 @@ Perform one explicit operation on one subject, then compose additional calls onl
 - **Keep authority explicit** — a descriptive decision grants no authority, and every publishing, cleanup, merge, or other side effect requires exact scope and authorization
 - **Keep workspaces orthogonal** — core operations never create, merge, abandon, or clean a workspace implicitly
 
+When execution needs controls, evidence sinks, or a maturity assessment, hand the already selected operation to **agent-governance-guide**. Reliability and security criteria remain optional capabilities owned by **reliability-guide** and **security-assurance-guide**; they never change an operation's verb or authority.
+
 ## Core Operations
 
 - **Create** — produce a new result without changing the source — see [references/create.md](references/create.md)

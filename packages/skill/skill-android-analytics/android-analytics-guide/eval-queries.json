@@ -90,14 +90,14 @@
     "split": "validation"
   },
   {
-    "query": "TalkBack reads the icons in the wrong order on this composable — fix the focus order",
-    "rationale": "near miss owned by android-wcag-guide",
+    "query": "what's the difference between a mock, a stub, a fake, and a spy?",
+    "rationale": "near miss owned by testing-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "add contentDescription to these images and mark the decorative ones as ignored",
-    "rationale": "near miss owned by android-wcag-guide",
+    "query": "I have a Hono app configured with `app.use('*', cors())`. Write a Vitest test that verifies the CORS preflight (OPTIONS) request to `/api/users` with an Origin header succeeds and that the Access-Control-Allow-Origin header is returned.",
+    "rationale": "near miss owned by vitest-guide",
     "should_trigger": false,
     "split": "validation"
   }

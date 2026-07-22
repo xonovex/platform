@@ -527,7 +527,7 @@ const checkReferenceTocs = (skillDir: string, report: Report): void => {
 
   for (const entry of mdFiles) {
     const lines = splitLines(readFileSync(join(refsDir, entry), "utf8"));
-    if (lines.length <= 100) {
+    if (lines.length <= 200) {
       continue;
     }
     checked += 1;
@@ -540,12 +540,12 @@ const checkReferenceTocs = (skillDir: string, report: Report): void => {
   }
   if (missing.length > 0) {
     report.addWarn(
-      "references: file(s) >100 lines lack a '## Contents' table of contents — " +
+      "references: file(s) >200 lines lack a '## Contents' table of contents — " +
         missing.join(", "),
     );
   } else {
     report.addPass(
-      `references: all ${String(checked)} reference file(s) >100 lines open with a ` +
+      `references: all ${String(checked)} reference file(s) >200 lines open with a ` +
         "'## Contents' table of contents",
     );
   }

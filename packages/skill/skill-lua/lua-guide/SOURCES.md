@@ -4,6 +4,7 @@
 
 - **URLs:**
   - https://www.lua.org/manual/5.4/
+- **Version:** 5.4.0
 - **Last reviewed:** 2026-07-19
 - **Used for:** `SKILL.md` and all `references/`; modules, local scope, tables, metatables, coroutines, error handling, iteration, and standard-library behavior.
 - **References:** all

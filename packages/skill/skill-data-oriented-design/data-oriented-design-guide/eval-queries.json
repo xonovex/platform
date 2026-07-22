@@ -108,8 +108,8 @@
     "split": "validation"
   },
   {
-    "query": "Define a Python data model for a paginated API response: it holds a list of items whose element type varies per endpoint, a total count, and an optional next-page cursor string.",
-    "rationale": "near miss owned by python-guide",
+    "query": "I have a Rectangle class with mutable width and height and setWidth/setHeight methods. I now need a Square type in the same system. What's the cleanest way to model Square given I already have Rectangle?",
+    "rationale": "near miss owned by oop-guide",
     "should_trigger": false,
     "split": "validation"
   }

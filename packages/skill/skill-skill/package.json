@@ -10,6 +10,7 @@
   ],
   "scripts": {
     "fmt": "prettier --write .",
-    "fmt:check": "prettier --check ."
+    "fmt:check": "prettier --check .",
+    "test": "vitest run"
   }
 }

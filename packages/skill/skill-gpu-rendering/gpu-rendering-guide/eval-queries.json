@@ -138,14 +138,14 @@
     "split": "validation"
   },
   {
-    "query": "we're calling vkAllocateMemory once per VkImage and hit maxMemoryAllocationCount on big levels — how do I pick memory types from VkPhysicalDeviceMemoryProperties and sub-allocate from a few large VkDeviceMemory blocks honoring VkMemoryRequirements alignment",
-    "rationale": "near miss owned by gpu-rendering-vulkan-guide",
+    "query": "I'm building the core document store for our level editor — objects of different kinds each with a set of named properties, and I want to add new object types at runtime without recompiling. How should the type/property schema work?",
+    "rationale": "near miss owned by data-model-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "I want one giant sampler2D array the shader indexes by an integer — how do I set up VkDescriptorSetLayout with update-after-bind and descriptor indexing and use nonuniformEXT",
-    "rationale": "near miss owned by gpu-rendering-vulkan-guide",
+    "query": "I'm building an ECS and can't decide how to store components — should each entity own its components or should I group entities by which components they have?",
+    "rationale": "near miss owned by ecs-guide",
     "should_trigger": false,
     "split": "validation"
   }

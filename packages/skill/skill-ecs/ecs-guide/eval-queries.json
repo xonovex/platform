@@ -78,20 +78,20 @@
     "split": "train"
   },
   {
-    "query": "our editor UI pushes tens of thousands of rectangles to the GPU every frame and it's bandwidth-bound — how do I get the whole UI down to one draw call?",
-    "rationale": "near miss owned by imgui-guide",
+    "query": "I have a Terraform config that creates private subnets, one per availability zone, from a variable list of AZs. Right now removing a single AZ from the middle of the list forces Terraform to recreate several unrelated subnets. Write the resource and any supporting locals so this stops happening.",
+    "rationale": "near miss owned by terraform-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "how do I add Tab/Shift-Tab keyboard navigation and 'first responder' style focus to an IMGUI that has no widget tree?",
-    "rationale": "near miss owned by imgui-guide",
+    "query": "our renderer hand-writes a barrier before and after every pass and it breaks every time we reorder passes — I want passes to just declare what they read and write and have ordering and transitions figured out for us",
+    "rationale": "near miss owned by gpu-rendering-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "I want to drag an item from one panel and drop it onto another panel in my tool — what's the cleanest way to track the drag across windows?",
-    "rationale": "near miss owned by imgui-guide",
+    "query": "Using vanilla Three.js, set up a WebGLRenderer and a render loop that spins a cube smoothly. It must keep a consistent rotation speed regardless of frame rate and stay crisp on high-DPI / retina displays. Give me the renderer setup and the loop.",
+    "rationale": "near miss owned by threejs-guide",
     "should_trigger": false,
     "split": "validation"
   }
