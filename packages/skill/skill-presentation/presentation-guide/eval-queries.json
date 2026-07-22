@@ -36,15 +36,15 @@
     "split": "validation"
   },
   {
-    "query": "A review comment on `work/presentation-create/` says the presentation create change handles the normal fixture but leaves the failure path undefined. For this Presentation task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
-    "rationale": "implicit task cue derived from the presentation create reference",
+    "query": "Create a technical slide deck that walks from the user problem through architecture, code evidence, tradeoffs, and a concrete recommendation.",
     "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
     "split": "validation"
   },
   {
-    "query": "quick pre-merge sanity check: after the presentation motion scaffold change under `work/presentation-motion-scaffold/`, a clean checkout behaves differently from my local run. What Presentation-specific assumption could cause that? Show the correction and the exact narrow validation.",
-    "rationale": "implicit task cue derived from the presentation motion scaffold reference",
+    "query": "Scaffold a Motion-based presentation with reusable slide primitives, keyboard navigation, progress state, and reduced-motion support.",
     "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
     "split": "validation"
   },
   {
@@ -72,25 +72,25 @@
     "split": "train"
   },
   {
-    "query": "The clean Linux CI job fails only for the minimal content collections fixture under `work/content-collections/`, while the full local fixture passes. Trace the Astro-specific boundary that could cause the difference, then propose a patch and a regression check.",
+    "query": "Define a blog collection with a Zod schema, reject posts without a publication date, and render only non-draft entries sorted newest first.",
     "rationale": "near miss owned by astro-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "quick pre-merge sanity check: after the sequencing change under `work/sequencing/`, a clean checkout behaves differently from my local run. What Remotion-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "query": "Sequence three Remotion scenes with overlaps and transitions while keeping every scene's local frame origin predictable.",
     "rationale": "near miss owned by remotion-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "A review comment on `work/governed-promotion/` says the governed promotion change handles the normal fixture but leaves the failure path undefined. For this Reflect task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
+    "query": "Review these session notes and promote only evidence-backed recurring lessons into durable project instructions with an owner and validation rule.",
     "rationale": "near miss owned by reflect-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "quick pre-merge sanity check: after the textures change under `work/textures/`, a clean checkout behaves differently from my local run. What Threejs-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "query": "Load a color texture and normal map in Three.js with correct color space, UV behavior, filtering, and cleanup after the material is removed.",
     "rationale": "near miss owned by threejs-guide",
     "should_trigger": false,
     "split": "validation"

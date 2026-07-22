@@ -36,15 +36,15 @@
     "split": "validation"
   },
   {
-    "query": "A review comment on `work/capabilities/` says the capabilities change handles the normal fixture but leaves the failure path undefined. For this Code Harness task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
-    "rationale": "implicit task cue derived from the capabilities reference",
+    "query": "Configure Claude Code permissions so repository reads and the test command are allowed, destructive shell commands require confirmation, and network tools stay blocked.",
     "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
     "split": "validation"
   },
   {
-    "query": "quick pre-merge sanity check: after the onboarding change under `work/onboarding/`, a clean checkout behaves differently from my local run. What Code Harness-specific assumption could cause that? Show the correction and the exact narrow validation.",
-    "rationale": "implicit task cue derived from the onboarding reference",
+    "query": "Write onboarding steps for Claude Code that explain where project instructions live, how hooks are installed, and how a developer verifies the harness is active.",
     "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
     "split": "validation"
   },
   {

@@ -18,33 +18,33 @@
     "split": "train"
   },
   {
-    "query": "A review comment on `work/islands-architecture/` says the islands architecture change handles the normal fixture but leaves the failure path undefined. For this Astro task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
-    "rationale": "implicit task cue derived from the islands architecture reference",
+    "query": "An Astro page renders a React pricing calculator eagerly on every request. Convert it to an island that hydrates only when visible while keeping the surrounding page static.",
     "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
     "split": "train"
   },
   {
-    "query": "quick pre-merge sanity check: after the project structure change under `work/project-structure/`, a clean checkout behaves differently from my local run. What Astro-specific assumption could cause that? Show the correction and the exact narrow validation.",
-    "rationale": "implicit task cue derived from the project structure reference",
+    "query": "Our Astro content collection works locally but a fresh checkout has no generated content types. Fix the project setup so astro sync runs before type checking.",
     "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
     "split": "train"
   },
   {
-    "query": "The clean Linux CI job fails only for the minimal content collections fixture under `work/content-collections/`, while the full local fixture passes. Trace the Astro-specific boundary that could cause the difference, then propose a patch and a regression check.",
-    "rationale": "implicit task cue derived from the content collections reference",
+    "query": "Define a blog collection with a Zod schema, reject posts without a publication date, and render only non-draft entries sorted newest first.",
     "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
     "split": "validation"
   },
   {
-    "query": "A review comment on `work/components/` says the components change handles the normal fixture but leaves the failure path undefined. For this Astro task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
-    "rationale": "implicit task cue derived from the components reference",
+    "query": "I need an Astro component whose typed props accept a heading and optional call-to-action, forward safe HTML attributes, and render the link only when supplied.",
     "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
     "split": "validation"
   },
   {
-    "query": "quick pre-merge sanity check: after the accessibility change under `work/accessibility/`, a clean checkout behaves differently from my local run. What Astro-specific assumption could cause that? Show the correction and the exact narrow validation.",
-    "rationale": "implicit task cue derived from the accessibility reference",
+    "query": "Audit this Astro navigation and form for keyboard focus, semantic landmarks, descriptive labels, and reduced-motion behavior.",
     "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
     "split": "validation"
   },
   {
@@ -78,19 +78,19 @@
     "split": "train"
   },
   {
-    "query": "quick pre-merge sanity check: after the gestures change under `work/gestures/`, a clean checkout behaves differently from my local run. What Motion-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "query": "Implement keyboard, hover, and drag feedback with Motion while avoiding gesture conflicts and preserving accessible button semantics.",
     "rationale": "near miss owned by motion-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "quick pre-merge sanity check: after the sequencing change under `work/sequencing/`, a clean checkout behaves differently from my local run. What Remotion-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "query": "Sequence three Remotion scenes with overlaps and transitions while keeping every scene's local frame origin predictable.",
     "rationale": "near miss owned by remotion-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "quick pre-merge sanity check: after the textures change under `work/textures/`, a clean checkout behaves differently from my local run. What Threejs-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "query": "Load a color texture and normal map in Three.js with correct color space, UV behavior, filtering, and cleanup after the material is removed.",
     "rationale": "near miss owned by threejs-guide",
     "should_trigger": false,
     "split": "validation"

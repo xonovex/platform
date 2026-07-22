@@ -24,27 +24,27 @@
     "split": "train"
   },
   {
-    "query": "A review comment on `work/tempo-timing/` says the tempo timing change handles the normal fixture but leaves the failure path undefined. For this Strudel task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
-    "rationale": "implicit task cue derived from the tempo timing reference",
+    "query": "Set a Strudel pattern to 128 BPM, align a four-bar chord cycle with a two-bar drum loop, and avoid an unintended tempo reset.",
     "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
     "split": "train"
   },
   {
-    "query": "quick pre-merge sanity check: after the mini notation change under `work/mini-notation/`, a clean checkout behaves differently from my local run. What Strudel-specific assumption could cause that? Show the correction and the exact narrow validation.",
-    "rationale": "implicit task cue derived from the mini notation reference",
+    "query": "Write a Strudel mini-notation pattern with rests, subdivisions, alternation, and repetition, then explain the resulting cycle.",
     "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
     "split": "validation"
   },
   {
-    "query": "The clean Linux CI job fails only for the minimal layering fixture under `work/layering/`, while the full local fixture passes. Trace the Strudel-specific boundary that could cause the difference, then propose a patch and a regression check.",
-    "rationale": "implicit task cue derived from the layering reference",
+    "query": "Layer Strudel bass, drums, and chords with independent transformations while keeping their cycles phase-aligned.",
     "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
     "split": "validation"
   },
   {
-    "query": "A review comment on `work/sounds/` says the sounds change handles the normal fixture but leaves the failure path undefined. For this Strudel task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
-    "rationale": "implicit task cue derived from the sounds reference",
+    "query": "Build a Strudel sound chain that selects samples, shapes an envelope, filters highs, and limits the final output safely.",
     "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
     "split": "validation"
   },
   {
@@ -66,13 +66,13 @@
     "split": "train"
   },
   {
-    "query": "quick pre-merge sanity check: after the sequencing change under `work/sequencing/`, a clean checkout behaves differently from my local run. What Remotion-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "query": "Sequence three Remotion scenes with overlaps and transitions while keeping every scene's local frame origin predictable.",
     "rationale": "near miss owned by remotion-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "quick pre-merge sanity check: after the gestures change under `work/gestures/`, a clean checkout behaves differently from my local run. What Motion-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "query": "Implement keyboard, hover, and drag feedback with Motion while avoiding gesture conflicts and preserving accessible button semantics.",
     "rationale": "near miss owned by motion-guide",
     "should_trigger": false,
     "split": "train"

@@ -19,7 +19,7 @@ The catalog validator runs as `moon-skill-validate --strict <skill-dir>` and exi
 
 ## Frontmatter Checks
 
-- `name` present, 1-64 chars, matches `^[a-z0-9]+(-[a-z0-9]+)*$`, not a reserved word (`anthropic`/`claude`), no XML tags, equals parent directory name
+- `name` present, 1-64 chars, matches `^[a-z0-9]+(-[a-z0-9]+)*$`, does not use a reserved word (`anthropic`/`claude`) except the catalog's explicit `claude-code-guide` product adapter, has no XML tags, and equals the parent directory name
 - `description` present, 1-1024 chars (warns on `<…>` angle-bracket markup — fine for component/generic references)
 - `description` starts with imperative cue ("Use when...", "Use this skill when...")
 - `description` includes trigger contexts ("Triggers on...", "even when the user doesn't say...")

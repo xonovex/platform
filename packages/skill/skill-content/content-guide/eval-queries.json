@@ -30,21 +30,21 @@
     "split": "train"
   },
   {
-    "query": "A review comment on `work/humanize/` says the humanize change handles the normal fixture but leaves the failure path undefined. For this Content task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
-    "rationale": "implicit task cue derived from the humanize reference",
+    "query": "Rewrite this destination article so it sounds locally informed and specific, removes generic travel clichés, and preserves every verified fact.",
     "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
     "split": "validation"
   },
   {
-    "query": "quick pre-merge sanity check: after the news add change under `work/news-add/`, a clean checkout behaves differently from my local run. What Content-specific assumption could cause that? Show the correction and the exact narrow validation.",
-    "rationale": "implicit task cue derived from the news add reference",
+    "query": "Add a bilingual news article with matching frontmatter, translated summaries, publication metadata, and locale-correct internal links.",
     "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
     "split": "validation"
   },
   {
-    "query": "The clean Linux CI job fails only for the minimal travelguide add fixture under `work/travelguide-add/`, while the full local fixture passes. Trace the Content-specific boundary that could cause the difference, then propose a patch and a regression check.",
-    "rationale": "implicit task cue derived from the travelguide add reference",
+    "query": "Create Dutch and English venue-guide entries with coordinates, accessibility facts, opening-hour provenance, and consistent slugs.",
     "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
     "split": "validation"
   },
   {
@@ -72,7 +72,7 @@
     "split": "train"
   },
   {
-    "query": "A review comment on `work/governed-promotion/` says the governed promotion change handles the normal fixture but leaves the failure path undefined. For this Reflect task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
+    "query": "Review these session notes and promote only evidence-backed recurring lessons into durable project instructions with an owner and validation rule.",
     "rationale": "near miss owned by reflect-guide",
     "should_trigger": false,
     "split": "train"
@@ -84,7 +84,7 @@
     "split": "validation"
   },
   {
-    "query": "quick pre-merge sanity check: after the markdown mirrors change under `work/markdown-mirrors/`, a clean checkout behaves differently from my local run. What Llmstxt-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "query": "Generate per-page Markdown mirrors for an llms.txt index while preserving canonical URLs, headings, code fences, and link targets.",
     "rationale": "near miss owned by llmstxt-guide",
     "should_trigger": false,
     "split": "validation"

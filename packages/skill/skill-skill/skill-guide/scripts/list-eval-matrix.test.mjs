@@ -1,7 +1,7 @@
 import {readFileSync} from "node:fs";
 import {resolve} from "node:path";
 import {describe, expect, it} from "vitest";
-import {selectEvalMatrix} from "./list-eval-matrix.mjs";
+import {catalogEntries, selectEvalMatrix} from "./list-eval-matrix.mjs";
 
 const entries = ["alpha", "beta", "gamma", "omega"].map((name) => ({
   package: name,
@@ -41,7 +41,7 @@ describe("selectEvalMatrix", () => {
     ).toEqual([entries[3], entries[0]]);
   });
 
-  it("wires scheduled runs to a bounded 12-skill rotation", () => {
+  it("wires scheduled runs to a three-month catalog rotation", () => {
     const workflow = readFileSync(
       resolve(
         import.meta.dirname,
@@ -53,7 +53,21 @@ describe("selectEvalMatrix", () => {
     expect(workflow).toMatch(
       /GITHUB_EVENT_NAME\}" == "schedule" \|\| \( "\$\{GITHUB_EVENT_NAME\}" == "workflow_dispatch" && "\$\{DISPATCH_SCOPE\}" == "rotated" \)/,
     );
-    expect(workflow).toContain("limit=12");
-    expect(workflow).toContain('offset="$((10#$(date -u +%m) * 12))"');
+    expect(workflow).toContain("limit=32");
+    expect(workflow).toContain('offset="$(((10#$(date -u +%m) - 1) * 32))"');
+    expect(workflow).toContain("-name invalid-run.json");
+
+    const catalog = catalogEntries(resolve(import.meta.dirname, "../../.."));
+    const selected = new Set(
+      [0, 32, 64].flatMap((offset) =>
+        selectEvalMatrix({
+          entries: catalog,
+          changedFiles: undefined,
+          limit: 32,
+          offset,
+        }).map(({project}) => project),
+      ),
+    );
+    expect(selected.size).toBe(catalog.length);
   });
 });

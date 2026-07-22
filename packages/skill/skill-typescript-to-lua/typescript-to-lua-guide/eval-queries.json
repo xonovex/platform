@@ -24,27 +24,27 @@
     "split": "train"
   },
   {
-    "query": "A review comment on `work/namespaces-vs-classes/` says the namespaces vs classes change handles the normal fixture but leaves the failure path undefined. For this Typescript To Lua task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
-    "rationale": "implicit task cue derived from the namespaces vs classes reference",
+    "query": "Refactor this TSTL class used only as a namespace into module functions without changing the emitted Lua API.",
     "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
     "split": "train"
   },
   {
-    "query": "quick pre-merge sanity check: after the multi return functions change under `work/multi-return-functions/`, a clean checkout behaves differently from my local run. What Typescript To Lua-specific assumption could cause that? Show the correction and the exact narrow validation.",
-    "rationale": "implicit task cue derived from the multi return functions reference",
+    "query": "Return two values from TypeScript-to-Lua without allocating an array and consume them with the correct multi-return typing.",
     "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
     "split": "validation"
   },
   {
-    "query": "The clean Linux CI job fails only for the minimal tstl decorators fixture under `work/tstl-decorators/`, while the full local fixture passes. Trace the Typescript To Lua-specific boundary that could cause the difference, then propose a patch and a regression check.",
-    "rationale": "implicit task cue derived from the tstl decorators reference",
+    "query": "Define a TSTL decorator that records component metadata without relying on unsupported JavaScript reflection at runtime.",
     "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
     "split": "validation"
   },
   {
-    "query": "A review comment on `work/performance-tips/` says the performance tips change handles the normal fixture but leaves the failure path undefined. For this Typescript To Lua task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
-    "rationale": "implicit task cue derived from the performance tips reference",
+    "query": "Optimize this TypeScript-to-Lua update loop to avoid temporary tables, array helpers, and polymorphic object shapes in emitted Lua.",
     "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
     "split": "validation"
   },
   {
@@ -78,13 +78,13 @@
     "split": "train"
   },
   {
-    "query": "quick pre-merge sanity check: after the local variables change under `work/local-variables/`, a clean checkout behaves differently from my local run. What Lua-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "query": "A Lua loop accidentally writes counters into _G. Fix the scoping and explain which locals should be captured by the returned closures.",
     "rationale": "near miss owned by lua-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "quick pre-merge sanity check: after the http testing change under `work/http-testing/`, a clean checkout behaves differently from my local run. What Vitest-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "query": "Test a Hono or Express HTTP endpoint with Vitest, including JSON validation, status, headers, and a CORS preflight request.",
     "rationale": "near miss owned by vitest-guide",
     "should_trigger": false,
     "split": "validation"

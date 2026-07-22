@@ -24,27 +24,27 @@
     "split": "train"
   },
   {
-    "query": "A review comment on `work/cte-patterns/` says the cte patterns change handles the normal fixture but leaves the failure path undefined. For this Sql Postgresql task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
-    "rationale": "implicit task cue derived from the cte patterns reference",
+    "query": "Rewrite this PostgreSQL report query with readable CTEs while ensuring an accidentally materialized intermediate result does not regress performance.",
     "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
     "split": "train"
   },
   {
-    "query": "quick pre-merge sanity check: after the data types change under `work/data-types/`, a clean checkout behaves differently from my local run. What Sql Postgresql-specific assumption could cause that? Show the correction and the exact narrow validation.",
-    "rationale": "implicit task cue derived from the data types reference",
+    "query": "Choose PostgreSQL types for money, timestamps, bounded status values, and identifiers without using text for every column.",
     "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
     "split": "validation"
   },
   {
-    "query": "The clean Linux CI job fails only for the minimal indexing fixture under `work/indexing/`, while the full local fixture passes. Trace the Sql Postgresql-specific boundary that could cause the difference, then propose a patch and a regression check.",
-    "rationale": "implicit task cue derived from the indexing reference",
+    "query": "Design indexes for a PostgreSQL query filtering tenant_id and status, ordering by created_at, and returning only active rows; verify with EXPLAIN ANALYZE.",
     "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
     "split": "validation"
   },
   {
-    "query": "A review comment on `work/constraints/` says the constraints change handles the normal fixture but leaves the failure path undefined. For this Sql Postgresql task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
-    "rationale": "implicit task cue derived from the constraints reference",
+    "query": "Add primary, foreign-key, unique, check, and exclusion constraints to enforce these booking invariants in PostgreSQL.",
     "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
     "split": "validation"
   },
   {
@@ -72,13 +72,13 @@
     "split": "train"
   },
   {
-    "query": "quick pre-merge sanity check: after the local variables change under `work/local-variables/`, a clean checkout behaves differently from my local run. What Lua-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "query": "A Lua loop accidentally writes counters into _G. Fix the scoping and explain which locals should be captured by the returned closures.",
     "rationale": "near miss owned by lua-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "quick pre-merge sanity check: after the type checking change under `work/type-checking/`, a clean checkout behaves differently from my local run. What Python-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "query": "Tighten this Python module until pyright strict passes without Any, ignored errors, or casts that hide an invalid state.",
     "rationale": "near miss owned by python-guide",
     "should_trigger": false,
     "split": "validation"

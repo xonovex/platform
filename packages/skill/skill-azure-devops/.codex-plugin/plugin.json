@@ -17,5 +17,6 @@
       "Review our Azure DevOps controls",
       "Onboard an Azure DevOps provider safely"
     ]
-  }
+  },
+  "dependencies": ["xonovex-skill-credential-management"]
 }

@@ -1,17 +1,6 @@
-## Adoption modes
+## Governance ownership
 
-Choose the narrowest native pattern that satisfies the requested behavior:
-
-| Mode                 | Native result                                                | Enforcement claim                                   |
-| -------------------- | ------------------------------------------------------------ | --------------------------------------------------- |
-| Knowledge-only       | `AGENTS.md` or an Agent Skill                                | Guidance only                                       |
-| Advisory             | Post-event observer or non-blocking handler                  | Evidence or feedback only                           |
-| Enforcing            | Deterministic pre-event handler with verified coverage       | Only the documented covered operations              |
-| Model evaluator      | Native supported model handler or explicit command runner    | Bounded validated inference, never silent authority |
-| Specialist agent     | Explicit bounded launcher                                    | Attenuated authority, depth and budgets enforced    |
-| Organization-managed | Native managed configuration plus pinned executable delivery | Only within verified native and external guarantees |
-
-Record native event, handler, matcher, input schema, output/exit behavior, timeout, concurrency, permissions, data exposure, evidence, and rollback for each translated template.
+Load **agent-governance-guide** to select the adoption mode and define executor, control, evidence, and enforcement semantics. This reference owns only the Pi mapping and product-specific caveats.
 
 ## Pi mappings
 

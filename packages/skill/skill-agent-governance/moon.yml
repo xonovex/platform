@@ -6,5 +6,3 @@ tasks:
     command: echo 'build complete'
     options:
       cache: false
-  skill-validate:
-    script: npx moon-skill-validate agent-governance-guide

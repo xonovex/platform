@@ -17,5 +17,6 @@
       "Compare Bitbucket Cloud and Data Center capabilities",
       "Onboard Bitbucket controls safely"
     ]
-  }
+  },
+  "dependencies": ["xonovex-skill-credential-management"]
 }

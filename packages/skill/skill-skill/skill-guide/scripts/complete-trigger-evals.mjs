@@ -11,12 +11,14 @@ import {fileURLToPath} from "node:url";
 
 const MIN_PER_POLARITY = 8;
 const FRONTMATTER_RE = /^---\n([\s\S]*?)\n---\n([\s\S]*)$/;
-const REFERENCE_RE = /references\/([a-z0-9][a-z0-9-]*\.md)/g;
 const GENERATED_QUERY_RES = [
   /^Help me handle .+ correctly in this .+ task, including the edge cases that usually get missed\.$/,
   /^I'm reviewing `[^`]+` in an? .+ project\. The happy path works, but .+ is unclear\./,
   /^A teammate says our .+ change may mishandle .+ before release\. Inspect the likely risk around /,
   /^CI started failing after we changed .+ in an? .+ project\. Use /,
+  /^A review comment on `work\//,
+  /^quick pre-merge sanity check: after the /,
+  /^The clean Linux CI job fails only for the minimal /,
 ];
 const WORD_RE = /[a-z][a-z0-9-]{2,}/g;
 const STOP_WORDS = new Set([
@@ -40,7 +42,7 @@ const STOP_WORDS = new Set([
 
 const HARNESS_SIBLINGS = new Map([
   [
-    "code-harness-guide",
+    "claude-code-guide",
     [
       "codex-guide",
       "copilot-guide",
@@ -52,7 +54,7 @@ const HARNESS_SIBLINGS = new Map([
   [
     "codex-guide",
     [
-      "code-harness-guide",
+      "claude-code-guide",
       "copilot-guide",
       "kiro-guide",
       "opencode-guide",
@@ -62,7 +64,7 @@ const HARNESS_SIBLINGS = new Map([
   [
     "copilot-guide",
     [
-      "code-harness-guide",
+      "claude-code-guide",
       "codex-guide",
       "kiro-guide",
       "opencode-guide",
@@ -72,7 +74,7 @@ const HARNESS_SIBLINGS = new Map([
   [
     "kiro-guide",
     [
-      "code-harness-guide",
+      "claude-code-guide",
       "codex-guide",
       "copilot-guide",
       "opencode-guide",
@@ -82,7 +84,7 @@ const HARNESS_SIBLINGS = new Map([
   [
     "opencode-guide",
     [
-      "code-harness-guide",
+      "claude-code-guide",
       "codex-guide",
       "copilot-guide",
       "kiro-guide",
@@ -92,7 +94,7 @@ const HARNESS_SIBLINGS = new Map([
   [
     "pi-guide",
     [
-      "code-harness-guide",
+      "claude-code-guide",
       "codex-guide",
       "copilot-guide",
       "kiro-guide",
@@ -341,62 +343,8 @@ const similarity = (left, right) => {
   return union === 0 ? 0 : intersection / union;
 };
 
-const humanize = (value) =>
-  value
-    .replace(/-guide$/, "")
-    .replaceAll("-", " ")
-    .replace(/\b\w/g, (letter) => letter.toUpperCase());
-
-const slugify = (value) =>
-  value
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "");
-
 const isGeneratedQuery = (query) =>
   GENERATED_QUERY_RES.some((pattern) => pattern.test(query));
-
-const scenarioQuery = (skillName, topic, index) => {
-  const subject = humanize(skillName);
-  const path = `work/${slugify(topic) || "change"}/`;
-  const templates = [
-    `A review comment on \`${path}\` says the ${topic} change handles the normal fixture but leaves the failure path undefined. For this ${subject} task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.`,
-    `quick pre-merge sanity check: after the ${topic} change under \`${path}\`, a clean checkout behaves differently from my local run. What ${subject}-specific assumption could cause that? Show the correction and the exact narrow validation.`,
-    `The clean Linux CI job fails only for the minimal ${topic} fixture under \`${path}\`, while the full local fixture passes. Trace the ${subject}-specific boundary that could cause the difference, then propose a patch and a regression check.`,
-  ];
-  return templates[index % templates.length];
-};
-
-const referenceTopics = (body) => {
-  const topics = [];
-  for (const match of body.matchAll(REFERENCE_RE)) {
-    const file = match[1];
-    if (file !== undefined && !topics.includes(file)) topics.push(file);
-  }
-  return topics.map((file) => file.replace(/\.md$/, "").replaceAll("-", " "));
-};
-
-const headingTopics = (body) =>
-  [...body.matchAll(/^##\s+(.+\S)\s*$/gm)]
-    .map((match) => match[1])
-    .filter(
-      (heading) =>
-        typeof heading === "string" &&
-        !/^(gotchas|progressive disclosure|example|quick contrast)$/i.test(
-          heading,
-        ),
-    );
-
-const descriptionTopics = (description) => {
-  const triggerText = /Triggers on (.*?)(?:,? even when|\.(?:\s|$))/i.exec(
-    description,
-  )?.[1];
-  if (triggerText === undefined) return [];
-  return triggerText
-    .split(/,|\bor\b|\band\b/)
-    .map((topic) => topic.trim().replace(/^prompts about\s+/i, ""))
-    .filter((topic) => topic.length > 3);
-};
 
 const deduplicate = (entries) => {
   const seen = new Set();
@@ -456,52 +404,9 @@ const addPositiveSeeds = (skill) => {
   const positives = skill.queries.filter(
     (entry) => entry.should_trigger === true,
   );
-  const seen = new Set(
-    skill.queries
-      .filter((entry) => typeof entry.query === "string")
-      .map((entry) => entry.query.trim().toLowerCase()),
-  );
-  const candidates = [
-    ...skill.outputPrompts.map((query) => ({
-      query,
-      rationale:
-        "output-eval task also exercises this skill's routing boundary",
-    })),
-    ...referenceTopics(skill.body).map((topic, index) => ({
-      query: scenarioQuery(skill.name, topic, index),
-      rationale: `implicit task cue derived from the ${topic} reference`,
-    })),
-    ...headingTopics(skill.body).map((topic, index) => ({
-      query: scenarioQuery(
-        skill.name,
-        topic.toLowerCase(),
-        index + referenceTopics(skill.body).length,
-      ),
-      rationale: `implicit task cue derived from the ${topic} section`,
-    })),
-    ...descriptionTopics(skill.description).map((topic, index) => ({
-      query: scenarioQuery(
-        skill.name,
-        topic,
-        index +
-          referenceTopics(skill.body).length +
-          headingTopics(skill.body).length,
-      ),
-      rationale: `routing cue derived from the description's ${topic} trigger`,
-    })),
-  ];
-  for (const candidate of candidates) {
-    if (positives.length >= MIN_PER_POLARITY) break;
-    const key = candidate.query.trim().toLowerCase();
-    if (seen.has(key)) continue;
-    const entry = {...candidate, should_trigger: true};
-    skill.queries.push(entry);
-    positives.push(entry);
-    seen.add(key);
-  }
   if (positives.length < MIN_PER_POLARITY) {
     throw new Error(
-      `${skill.name} has only ${String(positives.length)} usable positive seeds`,
+      `${skill.name} has only ${String(positives.length)} curated positive seeds; add realistic queries before completing the catalog`,
     );
   }
 };
@@ -631,10 +536,6 @@ const main = () => {
     return {
       ...parsed,
       guideDirectory,
-      outputPrompts: output.evals
-        .filter(isRecord)
-        .map((entry) => entry.prompt)
-        .filter((prompt) => typeof prompt === "string"),
       queries: deduplicate(queries),
     };
   });

@@ -41,11 +41,28 @@ describe("skill validator entrypoints", () => {
     expect(result).toBe(0);
   });
 
+  it("allows the catalog's explicit Claude Code adapter name", () => {
+    const skill = resolve(
+      import.meta.dirname,
+      "../../../skill/skill-claude-code",
+    );
+    vi.spyOn(console, "log").mockImplementation(() => {});
+
+    const result = validateSkill(["--strict", skill]);
+
+    expect(result).toBe(0);
+  });
+
   it("reports malformed frontmatter and missing catalog files", () => {
     const root = mkdtempSync(join(tmpdir(), "skill-validate-"));
     temporaryDirectories.push(root);
     const skill = join(root, "invalid-skill");
     mkdirSync(skill);
+    mkdirSync(join(skill, "references", "nested"), {recursive: true});
+    writeFileSync(
+      join(skill, "references", "nested", "sources.md"),
+      "# Details\n\n## External References\n\n- https://example.com/nested-source\n",
+    );
     writeFileSync(
       join(skill, "SKILL.md"),
       `---
@@ -56,6 +73,10 @@ unknown-field: true
 # Guide
 
 Use references/missing_file.md with @references/legacy.md.
+
+## External References
+
+- https://example.com/misplaced-source
 `,
     );
     const log = vi.spyOn(console, "log").mockImplementation(() => {});
@@ -69,6 +90,9 @@ Use references/missing_file.md with @references/legacy.md.
       "frontmatter: 'description' must use one double-quoted scalar",
     );
     expect(output).toContain("catalog: missing evals.json");
+    expect(output).toContain(
+      "sources: '## External References' belongs in SOURCES.md, not SKILL.md, references/nested/sources.md",
+    );
     expect(output).toContain("Result: FAIL");
   });
 

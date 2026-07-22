@@ -24,27 +24,27 @@
     "split": "train"
   },
   {
-    "query": "A review comment on `work/entrance/` says the entrance change handles the normal fixture but leaves the failure path undefined. For this Motion task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
-    "rationale": "implicit task cue derived from the entrance reference",
+    "query": "Add a Motion entrance animation to this React card list with staggered children and an equivalent no-motion state for reduced-motion users.",
     "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
     "split": "train"
   },
   {
-    "query": "quick pre-merge sanity check: after the gestures change under `work/gestures/`, a clean checkout behaves differently from my local run. What Motion-specific assumption could cause that? Show the correction and the exact narrow validation.",
-    "rationale": "implicit task cue derived from the gestures reference",
+    "query": "Implement keyboard, hover, and drag feedback with Motion while avoiding gesture conflicts and preserving accessible button semantics.",
     "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
     "split": "validation"
   },
   {
-    "query": "The clean Linux CI job fails only for the minimal scroll fixture under `work/scroll/`, while the full local fixture passes. Trace the Motion-specific boundary that could cause the difference, then propose a patch and a regression check.",
-    "rationale": "implicit task cue derived from the scroll reference",
+    "query": "Drive a Motion progress indicator from scroll position with a bounded transform and no React state updates on every frame.",
     "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
     "split": "validation"
   },
   {
-    "query": "A review comment on `work/layout/` says the layout change handles the normal fixture but leaves the failure path undefined. For this Motion task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
-    "rationale": "implicit task cue derived from the layout reference",
+    "query": "Animate a React panel between compact and expanded layouts with layout animations while preventing surrounding text from jumping.",
     "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
     "split": "validation"
   },
   {
@@ -72,7 +72,7 @@
     "split": "train"
   },
   {
-    "query": "quick pre-merge sanity check: after the sequencing change under `work/sequencing/`, a clean checkout behaves differently from my local run. What Remotion-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "query": "Sequence three Remotion scenes with overlaps and transitions while keeping every scene's local frame origin predictable.",
     "rationale": "near miss owned by remotion-guide",
     "should_trigger": false,
     "split": "train"
@@ -84,13 +84,13 @@
     "split": "validation"
   },
   {
-    "query": "The clean Linux CI job fails only for the minimal content collections fixture under `work/content-collections/`, while the full local fixture passes. Trace the Astro-specific boundary that could cause the difference, then propose a patch and a regression check.",
+    "query": "Define a blog collection with a Zod schema, reject posts without a publication date, and render only non-draft entries sorted newest first.",
     "rationale": "near miss owned by astro-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "quick pre-merge sanity check: after the mini notation change under `work/mini-notation/`, a clean checkout behaves differently from my local run. What Strudel-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "query": "Write a Strudel mini-notation pattern with rests, subdivisions, alternation, and repetition, then explain the resulting cycle.",
     "rationale": "near miss owned by strudel-guide",
     "should_trigger": false,
     "split": "validation"

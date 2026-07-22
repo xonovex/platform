@@ -19,6 +19,8 @@ const PROGRESSIVE_DISCLOSURE_RE =
 const HEADING_RE = /^#{1,6} /m;
 const CODE_FENCE_OPEN_RE = /^```([\w+-]+)?[^\S\n]*$/gm;
 const LOAD_WHEN_RE = /load when/i;
+const EXTERNAL_REFERENCES_HEADING_RE = /^## +External References\b/im;
+const RESERVED_VENDOR_ADAPTER_NAMES = new Set(["claude-code-guide"]);
 
 const HARNESS_PATTERNS: readonly [RegExp, string][] = [
   // Proprietary tool / function / mode names
@@ -207,7 +209,10 @@ const checkName = (
   }
 
   if (typeof name === "string") {
-    if (/anthropic|claude/i.test(name)) {
+    if (
+      /anthropic|claude/i.test(name) &&
+      !RESERVED_VENDOR_ADAPTER_NAMES.has(name)
+    ) {
       report.addFail(
         `frontmatter: name '${name}' uses a reserved word (anthropic/claude)`,
       );
@@ -433,6 +438,49 @@ const checkBody = (body: string, report: Report): void => {
       "content: no '## Gotchas' section — non-obvious env-specific facts have no home",
     );
   }
+};
+
+const checkSourcePlacement = (
+  body: string,
+  skillDir: string,
+  report: Report,
+): void => {
+  const misplaced = EXTERNAL_REFERENCES_HEADING_RE.test(body)
+    ? ["SKILL.md"]
+    : [];
+  const referencesDir = join(skillDir, "references");
+  if (isDirectory(referencesDir)) {
+    const pending = [{directory: referencesDir, relative: "references"}];
+    while (pending.length > 0) {
+      const current = pending.pop();
+      if (current === undefined) break;
+      for (const entry of readdirSync(current.directory, {
+        withFileTypes: true,
+      })) {
+        const path = join(current.directory, entry.name);
+        const relative = `${current.relative}/${entry.name}`;
+        if (entry.isDirectory()) {
+          pending.push({directory: path, relative});
+          continue;
+        }
+        if (!entry.isFile() || !entry.name.endsWith(".md")) continue;
+        const content = readFileSync(path, "utf8");
+        if (EXTERNAL_REFERENCES_HEADING_RE.test(content)) {
+          misplaced.push(relative);
+        }
+      }
+    }
+  }
+
+  if (misplaced.length === 0) {
+    report.addPass("sources: external provenance is kept in SOURCES.md");
+    return;
+  }
+
+  report.addFail(
+    "sources: '## External References' belongs in SOURCES.md, not " +
+      misplaced.toSorted().join(", "),
+  );
 };
 
 const checkReferences = (
@@ -682,6 +730,7 @@ export const main = (argv: readonly string[]): number => {
   checkFrontmatter(fm, parentName, report);
   checkLoaderQuoting(fmRaw, report);
   checkBody(body, report);
+  checkSourcePlacement(body, skillDir, report);
   checkReferences(body, skillDir, report);
   checkReferenceTocs(skillDir, report);
   checkReferenceFileLinks(skillDir, report);

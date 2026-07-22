@@ -36,20 +36,20 @@
     "split": "validation"
   },
   {
-    "query": "A review comment on `work/capabilities/` says the capabilities change handles the normal fixture but leaves the failure path undefined. For this Pi task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
-    "rationale": "implicit task cue derived from the capabilities reference",
+    "query": "Configure Pi extensions, tools, and model settings so repository work is allowed but credential files and deployment commands remain unavailable.",
     "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
     "split": "validation"
   },
   {
-    "query": "quick pre-merge sanity check: after the onboarding change under `work/onboarding/`, a clean checkout behaves differently from my local run. What Pi-specific assumption could cause that? Show the correction and the exact narrow validation.",
-    "rationale": "implicit task cue derived from the onboarding reference",
+    "query": "Write Pi onboarding steps for installing the package, loading project instructions, enabling required extensions, and verifying tool permissions.",
     "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
     "split": "validation"
   },
   {
     "query": "map a mandatory protected-path control to Claude Code and tell me whether it can actually block",
-    "rationale": "near miss owned by code-harness-guide",
+    "rationale": "near miss owned by claude-code-guide",
     "should_trigger": false,
     "split": "train"
   },
@@ -79,7 +79,7 @@
   },
   {
     "query": "Provide deterministic, model-evaluator, and specialist-agent patterns for Claude Code.",
-    "rationale": "near miss owned by code-harness-guide",
+    "rationale": "near miss owned by claude-code-guide",
     "should_trigger": false,
     "split": "validation"
   },

@@ -1,0 +1,9 @@
+{
+  "name": "xonovex-skill-credential-management",
+  "version": "7.0.0",
+  "description": "Xonovex credential lifecycle skills",
+  "author": {
+    "name": "Xonovex"
+  },
+  "skills": ["./credential-management-guide"]
+}

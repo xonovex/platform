@@ -24,27 +24,27 @@
     "split": "train"
   },
   {
-    "query": "A review comment on `work/task-configuration/` says the task configuration change handles the normal fixture but leaves the failure path undefined. For this Moon task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
-    "rationale": "implicit task cue derived from the task configuration reference",
+    "query": "Define a moon task with explicit inputs and outputs, environment variables, dependencies, and a script because it needs shell redirection.",
     "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
     "split": "train"
   },
   {
-    "query": "quick pre-merge sanity check: after the task inheritance change under `work/task-inheritance/`, a clean checkout behaves differently from my local run. What Moon-specific assumption could cause that? Show the correction and the exact narrow validation.",
-    "rationale": "implicit task cue derived from the task inheritance reference",
+    "query": "A project-local moon.yml task override erased flags inherited from .moon/tasks. Fix the inheritance so the shared strict check remains active.",
     "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
     "split": "validation"
   },
   {
-    "query": "The clean Linux CI job fails only for the minimal tag based filtering fixture under `work/tag-based-filtering/`, while the full local fixture passes. Trace the Moon-specific boundary that could cause the difference, then propose a patch and a regression check.",
-    "rationale": "implicit task cue derived from the tag based filtering reference",
+    "query": "Run tests only for moon projects tagged skill and query which matching projects inherit the test task.",
     "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
     "split": "validation"
   },
   {
-    "query": "A review comment on `work/query-language/` says the query language change handles the normal fixture but leaves the failure path undefined. For this Moon task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
-    "rationale": "implicit task cue derived from the query language reference",
+    "query": "Write a moon query that selects TypeScript library projects but excludes private tooling, then run their build task with affected filtering.",
     "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
     "split": "validation"
   },
   {
@@ -72,25 +72,25 @@
     "split": "train"
   },
   {
-    "query": "quick pre-merge sanity check: after the security change under `work/security/`, a clean checkout behaves differently from my local run. What Docker-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "query": "Harden this production container: run as a non-root numeric user, pin the base image, avoid copying secrets, and make the filesystem read-only where possible.",
     "rationale": "near miss owned by docker-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "quick pre-merge sanity check: after the configmaps secrets change under `work/configmaps-secrets/`, a clean checkout behaves differently from my local run. What Kubernetes-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "query": "Move non-secret settings to a ConfigMap and credentials to a Secret, then mount both without checking decoded secret values into Git.",
     "rationale": "near miss owned by kubernetes-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "quick pre-merge sanity check: after the strict mode change under `work/strict-mode/`, a clean checkout behaves differently from my local run. What Shell Scripting-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "query": "Add safe shell error handling to this script, accounting for commands where set -e is suppressed and cleanup that must always run.",
     "rationale": "near miss owned by shell-scripting-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "quick pre-merge sanity check: after the module definition change under `work/module-definition/`, a clean checkout behaves differently from my local run. What Terraform-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "query": "Define a Terraform module with a narrow input contract, validated variables, useful outputs, and no provider configuration inside the child module.",
     "rationale": "near miss owned by terraform-guide",
     "should_trigger": false,
     "split": "validation"

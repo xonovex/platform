@@ -6,6 +6,9 @@
   - https://www.postgresql.org/docs/15/
   - https://www.postgresql.org/docs/15/queries-with.html
   - https://www.postgresql.org/docs/15/indexes.html
+  - https://www.postgresql.org/docs/15/ddl-default.html
+  - https://www.postgresql.org/docs/15/datatype-numeric.html#DATATYPE-SERIAL
+  - https://www.postgresql.org/docs/15/ddl-identity-columns.html
 - **Version:** 15.0.0
 - **Last reviewed:** 2026-07-19
 - **Used for:** `SKILL.md` and all `references/`; query construction, CTEs, indexing, transactions, JSONB, row-level security, migrations, and `EXPLAIN`.

@@ -5,5 +5,6 @@
   "author": {
     "name": "Xonovex"
   },
-  "skills": ["./kiro-guide"]
+  "skills": ["./kiro-guide"],
+  "dependencies": ["xonovex-skill-agent-governance"]
 }

@@ -122,6 +122,28 @@ describe("checkCatalogFiles", () => {
     );
   });
 
+  it.each([
+    "A review comment on `work/widgets/` says the widgets change handles the normal fixture but leaves the failure path undefined.",
+    "quick pre-merge sanity check: after the widgets change under `work/widgets/`, a clean checkout behaves differently from my local run.",
+    "The clean Linux CI job fails only for the minimal widgets fixture under `work/widgets/`, while the full local fixture passes.",
+  ])("rejects catalog-completion scenario templates", (query) => {
+    const skillDir = makeSkill();
+    const path = join(skillDir, "eval-queries.json");
+    const queries = JSON.parse(readFileSync(path, "utf8")) as {
+      query: string;
+    }[];
+    const first = queries[0];
+    if (first === undefined) throw new Error("fixture has no trigger queries");
+    first.query = query;
+    writeFileSync(path, JSON.stringify(queries));
+
+    const report = checkCatalogFiles(skillDir, {name: "example-guide"});
+
+    expect(report.errors).toContain(
+      `catalog: generic trigger eval query must be replaced: '${query}'`,
+    );
+  });
+
   it("rejects generated near misses concentrated in one sibling", () => {
     const skillDir = makeSkill();
     const path = join(skillDir, "eval-queries.json");

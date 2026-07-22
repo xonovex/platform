@@ -24,27 +24,27 @@
     "split": "train"
   },
   {
-    "query": "A review comment on `work/math-types/` says the math types change handles the normal fixture but leaves the failure path undefined. For this C99 Game Opinionated task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
-    "rationale": "implicit task cue derived from the math types reference",
+    "query": "Define C99 vector, quaternion, and matrix value types for a game runtime, with caller-owned outputs and no heap allocation in the math layer.",
     "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
     "split": "train"
   },
   {
-    "query": "quick pre-merge sanity check: after the coordinate system change under `work/coordinate-system/`, a clean checkout behaves differently from my local run. What C99 Game Opinionated-specific assumption could cause that? Show the correction and the exact narrow validation.",
-    "rationale": "implicit task cue derived from the coordinate system reference",
+    "query": "Our camera and physics code disagree on handedness and forward axis. Establish one coordinate-system convention and identify every conversion boundary.",
     "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
     "split": "validation"
   },
   {
-    "query": "The clean Linux CI job fails only for the minimal geometry pipeline fixture under `work/geometry-pipeline/`, while the full local fixture passes. Trace the C99 Game Opinionated-specific boundary that could cause the difference, then propose a patch and a regression check.",
-    "rationale": "implicit task cue derived from the geometry pipeline reference",
+    "query": "Refactor mesh generation into a C99 pipeline that counts required vertices first, writes into caller-provided buffers, and reports capacity errors explicitly.",
     "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
     "split": "validation"
   },
   {
-    "query": "A review comment on `work/builder-pattern/` says the builder pattern change handles the normal fixture but leaves the failure path undefined. For this C99 Game Opinionated task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
-    "rationale": "implicit task cue derived from the builder pattern reference",
+    "query": "Create a fluent C99 builder for a renderable entity that stores plain data, validates required fields at build time, and does not hide allocation.",
     "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
     "split": "validation"
   },
   {
@@ -72,7 +72,7 @@
     "split": "train"
   },
   {
-    "query": "quick pre-merge sanity check: after the designated initializers change under `work/designated-initializers/`, a clean checkout behaves differently from my local run. What C99-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "query": "Replace this positional C99 struct initializer with designated initializers so a newly inserted field cannot silently shift existing values.",
     "rationale": "near miss owned by c99-guide",
     "should_trigger": false,
     "split": "train"

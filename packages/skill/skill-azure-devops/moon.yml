@@ -6,7 +6,3 @@ tasks:
     command: echo 'build complete'
     options:
       cache: false
-  skill-validate:
-    script: npx moon-skill-validate azure-devops-guide
-  skill-audit-sources:
-    script: node ../../../node_modules/@xonovex/script-moon-skill-audit-sources/dist/src/index.js azure-devops-guide

@@ -17,5 +17,6 @@
       "Review our Bitrise mobile CI setup",
       "Configure Bitrise-to-AWS OIDC safely"
     ]
-  }
+  },
+  "dependencies": ["xonovex-skill-credential-management"]
 }

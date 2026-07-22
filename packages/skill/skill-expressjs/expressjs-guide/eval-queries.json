@@ -24,27 +24,27 @@
     "split": "train"
   },
   {
-    "query": "A review comment on `work/project-structure/` says the project structure change handles the normal fixture but leaves the failure path undefined. For this Expressjs task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
-    "rationale": "implicit task cue derived from the project structure reference",
+    "query": "Restructure this Express 5 API so routers, middleware, controllers, and domain services have clear boundaries without a global mutable app singleton.",
     "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
     "split": "train"
   },
   {
-    "query": "quick pre-merge sanity check: after the validation change under `work/validation/`, a clean checkout behaves differently from my local run. What Expressjs-specific assumption could cause that? Show the correction and the exact narrow validation.",
-    "rationale": "implicit task cue derived from the validation reference",
+    "query": "Validate Express route params and JSON bodies at the boundary, return field-level 400 responses, and pass typed values to the service layer.",
     "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
     "split": "validation"
   },
   {
-    "query": "The clean Linux CI job fails only for the minimal error handling fixture under `work/error-handling/`, while the full local fixture passes. Trace the Expressjs-specific boundary that could cause the difference, then propose a patch and a regression check.",
-    "rationale": "implicit task cue derived from the error handling reference",
+    "query": "An async Express 5 handler throws but clients receive HTML and logs duplicate the error. Implement one JSON error boundary with explicit operational-error mapping.",
     "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
     "split": "validation"
   },
   {
-    "query": "A review comment on `work/authentication/` says the authentication change handles the normal fixture but leaves the failure path undefined. For this Expressjs task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
-    "rationale": "implicit task cue derived from the authentication reference",
+    "query": "Add bearer-token authentication and authorization middleware to selected Express routes while keeping public health endpoints outside the protected router.",
     "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
     "split": "validation"
   },
   {
@@ -72,19 +72,19 @@
     "split": "train"
   },
   {
-    "query": "A review comment on `work/migration-v4/` says the migration v4 change handles the normal fixture but leaves the failure path undefined. For this Zod task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
+    "query": "Migrate these Zod 3 string and error-customization schemas to Zod 4 without changing accepted inputs or issue paths.",
     "rationale": "near miss owned by zod-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "quick pre-merge sanity check: after the http testing change under `work/http-testing/`, a clean checkout behaves differently from my local run. What Vitest-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "query": "Test a Hono or Express HTTP endpoint with Vitest, including JSON validation, status, headers, and a CORS preflight request.",
     "rationale": "near miss owned by vitest-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "quick pre-merge sanity check: after the validation type safety change under `work/validation-type-safety/`, a clean checkout behaves differently from my local run. What Hono-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "query": "Validate a Hono JSON request with Zod, expose the inferred type to the handler, and return a consistent 422 response for invalid input.",
     "rationale": "near miss owned by hono-guide",
     "should_trigger": false,
     "split": "validation"

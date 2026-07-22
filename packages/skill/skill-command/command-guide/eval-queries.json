@@ -18,33 +18,33 @@
     "split": "train"
   },
   {
-    "query": "A review comment on `work/distill/` says the distill change handles the normal fixture but leaves the failure path undefined. For this Command task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
-    "rationale": "implicit task cue derived from the distill reference",
+    "query": "Distill these three overlapping slash commands into one reusable command with explicit inputs, a stable output contract, and no harness-specific tool names.",
     "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
     "split": "train"
   },
   {
-    "query": "quick pre-merge sanity check: after the create change under `work/create/`, a clean checkout behaves differently from my local run. What Command-specific assumption could cause that? Show the correction and the exact narrow validation.",
-    "rationale": "implicit task cue derived from the create reference",
+    "query": "Create a user-invocable command that reviews staged changes, accepts an optional risk focus, and returns findings without modifying the worktree.",
     "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
     "split": "train"
   },
   {
-    "query": "The clean Linux CI job fails only for the minimal merge fixture under `work/merge/`, while the full local fixture passes. Trace the Command-specific boundary that could cause the difference, then propose a patch and a regression check.",
-    "rationale": "implicit task cue derived from the merge reference",
+    "query": "Merge two prompt commands that both prepare releases while preserving their distinct validation branches and removing duplicated instructions.",
     "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
     "split": "validation"
   },
   {
-    "query": "A review comment on `work/simplify/` says the simplify change handles the normal fixture but leaves the failure path undefined. For this Command task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
-    "rationale": "implicit task cue derived from the simplify reference",
+    "query": "Simplify this 180-line slash command by moving stable project policy to AGENTS.md and keeping only the invocation-specific workflow.",
     "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
     "split": "validation"
   },
   {
-    "query": "quick pre-merge sanity check: after the harness formats change under `work/harness-formats/`, a clean checkout behaves differently from my local run. What Command-specific assumption could cause that? Show the correction and the exact narrow validation.",
-    "rationale": "implicit task cue derived from the harness formats reference",
+    "query": "Represent the same reusable command for Claude Code, Codex, and Copilot while preserving one semantic contract and documenting only format differences.",
     "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
     "split": "validation"
   },
   {
@@ -78,7 +78,7 @@
     "split": "train"
   },
   {
-    "query": "A review comment on `work/governed-promotion/` says the governed promotion change handles the normal fixture but leaves the failure path undefined. For this Reflect task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
+    "query": "Review these session notes and promote only evidence-backed recurring lessons into durable project instructions with an owner and validation rule.",
     "rationale": "near miss owned by reflect-guide",
     "should_trigger": false,
     "split": "validation"
@@ -90,7 +90,7 @@
     "split": "validation"
   },
   {
-    "query": "quick pre-merge sanity check: after the markdown mirrors change under `work/markdown-mirrors/`, a clean checkout behaves differently from my local run. What Llmstxt-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "query": "Generate per-page Markdown mirrors for an llms.txt index while preserving canonical URLs, headings, code fences, and link targets.",
     "rationale": "near miss owned by llmstxt-guide",
     "should_trigger": false,
     "split": "validation"

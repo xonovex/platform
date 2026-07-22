@@ -15,6 +15,9 @@ const GENERIC_TRIGGER_QUERY_RES = [
   /^I'm reviewing `[^`]+` in an? .+ project\. The happy path works, but .+ is unclear\./i,
   /^A teammate says our .+ change may mishandle .+ before release\. Inspect the likely risk around /i,
   /^CI started failing after we changed .+ in an? .+ project\. Use /i,
+  /^A review comment on `work\//i,
+  /^quick pre-merge sanity check: after the /i,
+  /^The clean Linux CI job fails only for the minimal /i,
 ];
 
 export interface CatalogFileReport {

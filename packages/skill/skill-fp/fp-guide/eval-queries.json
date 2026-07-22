@@ -72,7 +72,7 @@
     "split": "train"
   },
   {
-    "query": "quick pre-merge sanity check: after the type checking change under `work/type-checking/`, a clean checkout behaves differently from my local run. What Python-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "query": "Tighten this Python module until pyright strict passes without Any, ignored errors, or casts that hide an invalid state.",
     "rationale": "near miss owned by python-guide",
     "should_trigger": false,
     "split": "train"
@@ -84,13 +84,13 @@
     "split": "validation"
   },
   {
-    "query": "quick pre-merge sanity check: after the designated initializers change under `work/designated-initializers/`, a clean checkout behaves differently from my local run. What C99-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "query": "Replace this positional C99 struct initializer with designated initializers so a newly inserted field cannot silently shift existing values.",
     "rationale": "near miss owned by c99-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "quick pre-merge sanity check: after the local variables change under `work/local-variables/`, a clean checkout behaves differently from my local run. What Lua-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "query": "A Lua loop accidentally writes counters into _G. Fix the scoping and explain which locals should be captured by the returned closures.",
     "rationale": "near miss owned by lua-guide",
     "should_trigger": false,
     "split": "validation"

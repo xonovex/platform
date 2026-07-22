@@ -14,6 +14,7 @@ Describe a governance overlay for an already selected operation by choosing inde
 - **Treat every trigger as an adapter** - Normalize manual use, hooks, CI/CD, schedules, webhooks, and domain events to one trigger contract, see [references/adapters.md](references/adapters.md)
 - **Select one executor capability** - Deterministic commands, command-plus-model execution, and agents with workflow skills are adapters rather than governance branches, see [references/composition.md](references/composition.md)
 - **Select zero or more controls** - Declare each control phase and choose `observe` or `enforce` explicitly, see [references/controls.md](references/controls.md)
+- **Name the adoption mode** - Distinguish knowledge, advice, enforcement, model evaluation, specialist agents, and organization-managed delivery before mapping them to a harness, see [references/adoption-modes.md](references/adoption-modes.md)
 - **Select evidence deliberately** - State whether each evidence-sink failure is ignored or fails the composition; no sink is mandatory by default
 - **Require capabilities by name** - Treat a declared capability as available only when the effective composition or an independent assessment verifies it
 - **Derive maturity** - Assess A1, A2, A3, or another scale after composition; maturity never selects execution behavior, see [references/maturity.md](references/maturity.md)
@@ -38,5 +39,6 @@ The selected operation remains owned by **workflow-guide**. Load **reliability-g
 - Read [references/architecture.md](references/architecture.md) - Load when deciding boundaries or auditing what is intrinsic versus selected
 - Read [references/composition.md](references/composition.md) - Load when creating or reviewing a governance composition and its decision record
 - Read [references/controls.md](references/controls.md) - Load when authoring controls or choosing observe/enforce and before/after behavior
+- Read [references/adoption-modes.md](references/adoption-modes.md) - Load when choosing a harness adoption mode or reviewing an enforcement claim
 - Read [references/adapters.md](references/adapters.md) - Load when wiring manual, hook, CI/CD, schedule, webhook, or host adapters
 - Read [references/maturity.md](references/maturity.md) - Load when defining or assessing A1/A2/A3 or another capability scale

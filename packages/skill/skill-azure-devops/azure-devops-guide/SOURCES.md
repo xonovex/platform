@@ -54,7 +54,7 @@
 - **URL:** https://learn.microsoft.com/en-us/cli/azure/repos/pr?view=azure-cli-latest
 - **Last reviewed:** 2026-07-17
 - **Used for:** `references/first-time-setup.md`, `references/auth.md`, `references/create-pr.md`, `references/update-pr.md`, `references/linking.md`, `references/reviewers-autocomplete.md`, and `SKILL.md` Essentials
-- **Aspects extracted:** `az login` sign-in modes and the `azure-devops` extension install/defaults; `az repos pr create` / `update` / `show` / `reviewer add`, `--auto-complete`, `--draft`, `--work-items`, and `!<PRID>` / `#<WorkItemId>` linking; `AZURE_DEVOPS_EXT_PAT` and Basic-auth PAT delivery for raw REST, PAT scoping/rotation at `_usersSettings/tokens`, and pre-call HTTP verification. The Services-only extension limitation, remote-derived coordinates, keychain-first storage ladder, and CI stored-secret-vs-OIDC guidance are the Xonovex CLI operational path.
+- **Aspects extracted:** `az login` sign-in modes and the `azure-devops` extension install/defaults; `az repos pr create` / `update` / `show` / `reviewer add`, `--auto-complete`, `--draft`, `--work-items`, and `!<PRID>` / `#<WorkItemId>` linking; `AZURE_DEVOPS_EXT_PAT` and Basic-auth PAT delivery for raw REST, PAT scoping at `_usersSettings/tokens`, and pre-call HTTP verification. Provider-neutral storage, CI injection, rotation, and exposure response are owned by `credential-management-guide`.
 
 ## Refresh Workflow
 

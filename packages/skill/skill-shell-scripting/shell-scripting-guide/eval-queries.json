@@ -24,27 +24,27 @@
     "split": "train"
   },
   {
-    "query": "A review comment on `work/posix-compatibility/` says the posix compatibility change handles the normal fixture but leaves the failure path undefined. For this Shell Scripting task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
-    "rationale": "implicit task cue derived from the posix compatibility reference",
+    "query": "Make this deployment helper run under POSIX sh by removing Bash arrays, process substitution, and [[ tests without changing its interface.",
     "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
     "split": "train"
   },
   {
-    "query": "quick pre-merge sanity check: after the strict mode change under `work/strict-mode/`, a clean checkout behaves differently from my local run. What Shell Scripting-specific assumption could cause that? Show the correction and the exact narrow validation.",
-    "rationale": "implicit task cue derived from the strict mode reference",
+    "query": "Add safe shell error handling to this script, accounting for commands where set -e is suppressed and cleanup that must always run.",
     "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
     "split": "validation"
   },
   {
-    "query": "The clean Linux CI job fails only for the minimal quoting fixture under `work/quoting/`, while the full local fixture passes. Trace the Shell Scripting-specific boundary that could cause the difference, then propose a patch and a regression check.",
-    "rationale": "implicit task cue derived from the quoting reference",
+    "query": "Fix this shell loop so filenames with spaces, glob characters, and newlines are handled without word splitting or command injection.",
     "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
     "split": "validation"
   },
   {
-    "query": "A review comment on `work/functions/` says the functions change handles the normal fixture but leaves the failure path undefined. For this Shell Scripting task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
-    "rationale": "implicit task cue derived from the functions reference",
+    "query": "Refactor repeated shell steps into functions with explicit arguments, local variables in Bash, and meaningful exit statuses.",
     "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
     "split": "validation"
   },
   {
@@ -78,19 +78,19 @@
     "split": "train"
   },
   {
-    "query": "quick pre-merge sanity check: after the type checking change under `work/type-checking/`, a clean checkout behaves differently from my local run. What Python-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "query": "Tighten this Python module until pyright strict passes without Any, ignored errors, or casts that hide an invalid state.",
     "rationale": "near miss owned by python-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "quick pre-merge sanity check: after the compile options change under `work/compile-options/`, a clean checkout behaves differently from my local run. What Cmake-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "query": "Apply strict warnings to our own CMake targets without leaking them into third-party dependencies or downstream consumers.",
     "rationale": "near miss owned by cmake-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "quick pre-merge sanity check: after the task inheritance change under `work/task-inheritance/`, a clean checkout behaves differently from my local run. What Moon-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "query": "A project-local moon.yml task override erased flags inherited from .moon/tasks. Fix the inheritance so the shared strict check remains active.",
     "rationale": "near miss owned by moon-guide",
     "should_trigger": false,
     "split": "validation"

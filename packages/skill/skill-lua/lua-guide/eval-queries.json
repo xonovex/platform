@@ -24,27 +24,27 @@
     "split": "train"
   },
   {
-    "query": "A review comment on `work/module-pattern/` says the module pattern change handles the normal fixture but leaves the failure path undefined. For this Lua task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
-    "rationale": "implicit task cue derived from the module pattern reference",
+    "query": "Turn this Lua 5.4 script into a module that returns a table, keeps helpers local, and exposes only the documented constructor and methods.",
     "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
     "split": "train"
   },
   {
-    "query": "quick pre-merge sanity check: after the local variables change under `work/local-variables/`, a clean checkout behaves differently from my local run. What Lua-specific assumption could cause that? Show the correction and the exact narrow validation.",
-    "rationale": "implicit task cue derived from the local variables reference",
+    "query": "A Lua loop accidentally writes counters into _G. Fix the scoping and explain which locals should be captured by the returned closures.",
     "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
     "split": "validation"
   },
   {
-    "query": "The clean Linux CI job fails only for the minimal metatables fixture under `work/metatables/`, while the full local fixture passes. Trace the Lua-specific boundary that could cause the difference, then propose a patch and a regression check.",
-    "rationale": "implicit task cue derived from the metatables reference",
+    "query": "Implement a Lua metatable-backed value object with explicit __index and __eq behavior and no surprising mutation through shared prototype tables.",
     "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
     "split": "validation"
   },
   {
-    "query": "A review comment on `work/coroutines/` says the coroutines change handles the normal fixture but leaves the failure path undefined. For this Lua task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
-    "rationale": "implicit task cue derived from the coroutines reference",
+    "query": "Use a Lua coroutine to stream parsed records with clear error propagation, completion semantics, and no global scheduler state.",
     "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
     "split": "validation"
   },
   {
@@ -84,7 +84,7 @@
     "split": "validation"
   },
   {
-    "query": "quick pre-merge sanity check: after the multi return functions change under `work/multi-return-functions/`, a clean checkout behaves differently from my local run. What Typescript To Lua-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "query": "Return two values from TypeScript-to-Lua without allocating an array and consume them with the correct multi-return typing.",
     "rationale": "near miss owned by typescript-to-lua-guide",
     "should_trigger": false,
     "split": "validation"

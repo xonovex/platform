@@ -24,27 +24,27 @@
     "split": "train"
   },
   {
-    "query": "A review comment on `work/create/` says the create change handles the normal fixture but leaves the failure path undefined. For this Llmstxt task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
-    "rationale": "implicit task cue derived from the create reference",
+    "query": "Create an llms.txt for this documentation site with the required heading, a concise summary, and curated Markdown links grouped by task.",
     "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
     "split": "train"
   },
   {
-    "query": "quick pre-merge sanity check: after the markdown mirrors change under `work/markdown-mirrors/`, a clean checkout behaves differently from my local run. What Llmstxt-specific assumption could cause that? Show the correction and the exact narrow validation.",
-    "rationale": "implicit task cue derived from the markdown mirrors reference",
+    "query": "Generate per-page Markdown mirrors for an llms.txt index while preserving canonical URLs, headings, code fences, and link targets.",
     "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
     "split": "validation"
   },
   {
-    "query": "The clean Linux CI job fails only for the minimal examples fixture under `work/examples/`, while the full local fixture passes. Trace the Llmstxt-specific boundary that could cause the difference, then propose a patch and a regression check.",
-    "rationale": "implicit task cue derived from the examples reference",
+    "query": "Show a compliant llms.txt example that separates essential API docs from optional background material without turning it into a sitemap dump.",
     "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
     "split": "validation"
   },
   {
-    "query": "A review comment on `work/processing-tools/` says the processing tools change handles the normal fixture but leaves the failure path undefined. For this Llmstxt task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
-    "rationale": "implicit task cue derived from the processing tools reference",
+    "query": "Design a deterministic build step that emits llms.txt and Markdown mirrors from site content, then checks for broken or non-canonical links.",
     "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
     "split": "validation"
   },
   {
@@ -72,7 +72,7 @@
     "split": "train"
   },
   {
-    "query": "The clean Linux CI job fails only for the minimal merge fixture under `work/merge/`, while the full local fixture passes. Trace the Command-specific boundary that could cause the difference, then propose a patch and a regression check.",
+    "query": "Merge two prompt commands that both prepare releases while preserving their distinct validation branches and removing duplicated instructions.",
     "rationale": "near miss owned by command-guide",
     "should_trigger": false,
     "split": "train"
@@ -90,7 +90,7 @@
     "split": "validation"
   },
   {
-    "query": "A review comment on `work/humanize/` says the humanize change handles the normal fixture but leaves the failure path undefined. For this Content task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
+    "query": "Rewrite this destination article so it sounds locally informed and specific, removes generic travel clichés, and preserves every verified fact.",
     "rationale": "near miss owned by content-guide",
     "should_trigger": false,
     "split": "validation"

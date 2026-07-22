@@ -5,8 +5,8 @@
 - **Source:** Prose governance contracts maintained with this skill
 - **Provenance:** Repository-authored architectural synthesis
 - **Last reviewed:** 2026-07-21
-- **Used for:** `SKILL.md`, `references/architecture.md`, `references/composition.md`, `references/controls.md`, `references/adapters.md`, `references/maturity.md`
-- **Aspects extracted:** External operation selection, independent governance dimensions, normalized trigger adapters, explicit observe/enforce modes, evidence failure behavior, capability requirements, governance explanation, and caller-defined maturity assessment
+- **Used for:** `SKILL.md`, `references/architecture.md`, `references/composition.md`, `references/controls.md`, `references/adapters.md`, `references/adoption-modes.md`, `references/maturity.md`
+- **Aspects extracted:** External operation selection, independent governance dimensions, normalized trigger adapters, adoption-mode ownership, explicit observe/enforce modes, evidence failure behavior, capability requirements, governance explanation, and caller-defined maturity assessment
 
 ## Review procedure
 

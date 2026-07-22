@@ -36,15 +36,15 @@
     "split": "validation"
   },
   {
-    "query": "A review comment on `work/jit-friendly-tables/` says the jit friendly tables change handles the normal fixture but leaves the failure path undefined. For this Lua Opinionated task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
-    "rationale": "implicit task cue derived from the jit friendly tables reference",
+    "query": "This LuaJIT hot loop allocates a fresh table for every entity. Reuse stable arrays and shapes without changing observable results.",
     "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
     "split": "validation"
   },
   {
-    "query": "quick pre-merge sanity check: after the cache lookups change under `work/cache-lookups/`, a clean checkout behaves differently from my local run. What Lua Opinionated-specific assumption could cause that? Show the correction and the exact narrow validation.",
-    "rationale": "implicit task cue derived from the cache lookups reference",
+    "query": "Optimize repeated nested-table lookups in a Lua hot path by caching invariant references locally and measuring the change without stale-cache bugs.",
     "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
     "split": "validation"
   },
   {
@@ -66,13 +66,13 @@
     "split": "train"
   },
   {
-    "query": "quick pre-merge sanity check: after the local variables change under `work/local-variables/`, a clean checkout behaves differently from my local run. What Lua-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "query": "A Lua loop accidentally writes counters into _G. Fix the scoping and explain which locals should be captured by the returned closures.",
     "rationale": "near miss owned by lua-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "quick pre-merge sanity check: after the multi return functions change under `work/multi-return-functions/`, a clean checkout behaves differently from my local run. What Typescript To Lua-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "query": "Return two values from TypeScript-to-Lua without allocating an array and consume them with the correct multi-return typing.",
     "rationale": "near miss owned by typescript-to-lua-guide",
     "should_trigger": false,
     "split": "train"

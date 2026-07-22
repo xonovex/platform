@@ -5,5 +5,6 @@
   "author": {
     "name": "Xonovex"
   },
-  "skills": ["./azure-devops-guide"]
+  "skills": ["./azure-devops-guide"],
+  "dependencies": ["xonovex-skill-credential-management"]
 }

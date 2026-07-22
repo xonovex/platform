@@ -64,8 +64,9 @@ jobs:
           limit=10000
           offset=0
           if [[ "${GITHUB_EVENT_NAME}" == "schedule" || ( "${GITHUB_EVENT_NAME}" == "workflow_dispatch" && "${DISPATCH_SCOPE}" == "rotated" ) ]]; then
-            limit=12
-            offset="$((10#$(date -u +%m) * 12))"
+            # Three monthly slices cover the catalog while 90-day artifacts remain available.
+            limit=32
+            offset="$(((10#$(date -u +%m) - 1) * 32))"
           fi
           skills="$(node packages/skill/skill-skill/skill-guide/scripts/list-eval-matrix.mjs \
             packages/skill "${changed_file}" "${limit}" "${offset}")"
@@ -227,7 +228,7 @@ jobs:
               }
             }' >catalog-eval-metadata.json
           mapfile -d '' files < <(
-            find evidence -type f \( -name benchmark.json -o -name summary.json \) \
+            find evidence -type f \( -name benchmark.json -o -name summary.json -o -name invalid-run.json \) \
               -print0 | sort -z
           )
           if (( ${#files[@]} == 0 )); then

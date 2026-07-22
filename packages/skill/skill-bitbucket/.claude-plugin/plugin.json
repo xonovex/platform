@@ -5,5 +5,6 @@
   "author": {
     "name": "Xonovex"
   },
-  "skills": ["./bitbucket-guide"]
+  "skills": ["./bitbucket-guide"],
+  "dependencies": ["xonovex-skill-credential-management"]
 }

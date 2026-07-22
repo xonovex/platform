@@ -159,6 +159,11 @@
       "description": "Xonovex GitHub Copilot harness governance skills"
     },
     {
+      "name": "xonovex-skill-credential-management",
+      "source": "./packages/skill/skill-credential-management",
+      "description": "Xonovex credential lifecycle skills"
+    },
+    {
       "name": "xonovex-skill-cross-platform",
       "source": "./packages/skill/skill-cross-platform",
       "description": "Xonovex Cross-platform / portability skills"

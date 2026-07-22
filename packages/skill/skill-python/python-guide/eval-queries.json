@@ -24,27 +24,27 @@
     "split": "train"
   },
   {
-    "query": "A review comment on `work/dataclasses-type-hints/` says the dataclasses type hints change handles the normal fixture but leaves the failure path undefined. For this Python task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
-    "rationale": "implicit task cue derived from the dataclasses type hints reference",
+    "query": "Model this Python 3.12 configuration with frozen dataclasses, precise collection types, and validation that rejects inconsistent fields.",
     "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
     "split": "train"
   },
   {
-    "query": "quick pre-merge sanity check: after the type checking change under `work/type-checking/`, a clean checkout behaves differently from my local run. What Python-specific assumption could cause that? Show the correction and the exact narrow validation.",
-    "rationale": "implicit task cue derived from the type checking reference",
+    "query": "Tighten this Python module until pyright strict passes without Any, ignored errors, or casts that hide an invalid state.",
     "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
     "split": "validation"
   },
   {
-    "query": "The clean Linux CI job fails only for the minimal generators comprehensions fixture under `work/generators-comprehensions/`, while the full local fixture passes. Trace the Python-specific boundary that could cause the difference, then propose a patch and a regression check.",
-    "rationale": "implicit task cue derived from the generators comprehensions reference",
+    "query": "Replace an eager Python list pipeline over a million rows with generators and comprehensions while preserving error reporting and one-pass semantics.",
     "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
     "split": "validation"
   },
   {
-    "query": "A review comment on `work/caching-functions/` says the caching functions change handles the normal fixture but leaves the failure path undefined. For this Python task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
-    "rationale": "implicit task cue derived from the caching functions reference",
+    "query": "Add bounded caching to a pure Python lookup function, including a way to clear it in tests and avoiding caching transient failures.",
     "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
     "split": "validation"
   },
   {
@@ -90,7 +90,7 @@
     "split": "validation"
   },
   {
-    "query": "quick pre-merge sanity check: after the strict mode change under `work/strict-mode/`, a clean checkout behaves differently from my local run. What Shell Scripting-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "query": "Add safe shell error handling to this script, accounting for commands where set -e is suppressed and cleanup that must always run.",
     "rationale": "near miss owned by shell-scripting-guide",
     "should_trigger": false,
     "split": "validation"

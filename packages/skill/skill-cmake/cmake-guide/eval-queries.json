@@ -24,27 +24,27 @@
     "split": "train"
   },
   {
-    "query": "A review comment on `work/target-types/` says the target types change handles the normal fixture but leaves the failure path undefined. For this Cmake task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
-    "rationale": "implicit task cue derived from the target types reference",
+    "query": "Split this CMake project into a static library, a CLI executable, and a test executable with explicit target dependencies and no directory-wide flags.",
     "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
     "split": "train"
   },
   {
-    "query": "quick pre-merge sanity check: after the compile options change under `work/compile-options/`, a clean checkout behaves differently from my local run. What Cmake-specific assumption could cause that? Show the correction and the exact narrow validation.",
-    "rationale": "implicit task cue derived from the compile options reference",
+    "query": "Apply strict warnings to our own CMake targets without leaking them into third-party dependencies or downstream consumers.",
     "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
     "split": "validation"
   },
   {
-    "query": "The clean Linux CI job fails only for the minimal visibility specifiers fixture under `work/visibility-specifiers/`, while the full local fixture passes. Trace the Cmake-specific boundary that could cause the difference, then propose a patch and a regression check.",
-    "rationale": "implicit task cue derived from the visibility specifiers reference",
+    "query": "A library's public header includes fmt but its CMake target links fmt privately. Correct the PUBLIC, PRIVATE, and INTERFACE usage requirements.",
     "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
     "split": "validation"
   },
   {
-    "query": "A review comment on `work/find-package/` says the find package change handles the normal fixture but leaves the failure path undefined. For this Cmake task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
-    "rationale": "implicit task cue derived from the find package reference",
+    "query": "Replace a hard-coded library path with find_package and an imported target, including a clear configure-time error when the dependency is absent.",
     "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
     "split": "validation"
   },
   {
@@ -78,13 +78,13 @@
     "split": "train"
   },
   {
-    "query": "quick pre-merge sanity check: after the strict mode change under `work/strict-mode/`, a clean checkout behaves differently from my local run. What Shell Scripting-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "query": "Add safe shell error handling to this script, accounting for commands where set -e is suppressed and cleanup that must always run.",
     "rationale": "near miss owned by shell-scripting-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "quick pre-merge sanity check: after the module definition change under `work/module-definition/`, a clean checkout behaves differently from my local run. What Terraform-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "query": "Define a Terraform module with a narrow input contract, validated variables, useful outputs, and no provider configuration inside the child module.",
     "rationale": "near miss owned by terraform-guide",
     "should_trigger": false,
     "split": "validation"

@@ -44,7 +44,3 @@ description: "Use when configuring moonrepo monorepo tasks. Triggers on `.moon/`
 - Read [references/project-constraints.md](references/project-constraints.md) - Load when enforcing project boundaries
 - Read [references/migration-v2.md](references/migration-v2.md) - Load when migrating from moon v1 to v2
 - Read [references/docker-multistage.md](references/docker-multistage.md) - Load when building Docker images with moon scaffold
-
-## External References
-
-- [Moon 2.0 Migration Guide](https://moonrepo.dev/docs/migrate/2.0)

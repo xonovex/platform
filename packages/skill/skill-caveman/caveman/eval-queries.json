@@ -84,7 +84,7 @@
     "split": "validation"
   },
   {
-    "query": "A review comment on `work/humanize/` says the humanize change handles the normal fixture but leaves the failure path undefined. For this Content task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
+    "query": "Rewrite this destination article so it sounds locally informed and specific, removes generic travel clichés, and preserves every verified fact.",
     "rationale": "near miss owned by content-guide",
     "should_trigger": false,
     "split": "validation"

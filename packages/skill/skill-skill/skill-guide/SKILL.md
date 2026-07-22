@@ -61,7 +61,7 @@ Bundled maintenance scripts. Python entries use PEP 723 and run with `uv run <sc
 - `scripts/eval-triggers.py <queries.json> <skill-name>` — run trigger-eval queries against a skill (Claude Code reference implementation; requires `claude` CLI in PATH)
 - `scripts/eval-outputs.py <evals.json> <skill-name>` — run output-quality evals with-skill vs without-skill; writes per-arm pass rate / tokens / duration + `benchmark.json` (requires `claude` CLI in PATH)
 - `scripts/audit-sources.py <skill-dir>` — audit a skill's `SOURCES.md` for drift: staleness vs `Last reviewed`, dangling provenance, source→reference mapping; `--fetch` to check URLs, `--mark-reviewed` to stamp the date after review (read-only by default)
-- `scripts/complete-trigger-evals.mjs [catalog-root]` — replace legacy generated queries and fill missing trigger-eval polarities with realistic deterministic scenarios
+- `scripts/complete-trigger-evals.mjs [catalog-root]` — remove legacy generated queries, require eight curated positive routes, and fill negative routes from real sibling prompts
 - `scripts/list-eval-matrix.mjs [catalog-root] [changed-files|-] [limit] [offset]` — emit a bounded, rotating full-catalog or changed-skill model-eval matrix as JSON
 - `scripts/check-retired-plugins.mjs [--root PATH]... [--json]` — find installed retired plugin bundles and name their replacements
 

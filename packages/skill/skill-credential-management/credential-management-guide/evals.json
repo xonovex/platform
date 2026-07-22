@@ -1,0 +1,43 @@
+{
+  "skill_name": "credential-management-guide",
+  "tier": "aggressive",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "A GitHub Actions deployment currently stores a long-lived cloud client secret. Redesign the credential flow for a cloud that supports OIDC, including the trust boundary and verification.",
+      "assertions": [
+        "Replaces the stored client secret with a job-scoped OIDC or workload-identity exchange",
+        "Constrains cloud trust to concrete repository, workflow, ref or environment, audience, and subject claims rather than trusting every workflow",
+        "Includes both a successful read-only probe and a denied untrusted or forked execution path"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "A cross-platform developer CLI needs a PAT locally. Define how macOS, Linux, Windows, WSL, and headless hosts should store and retrieve it without hard-coding a provider-specific token scope.",
+      "assertions": [
+        "Uses macOS Keychain, Linux Secret Service, and a retrievable Windows credential vault or SecretManagement integration as platform-native choices",
+        "Treats WSL and headless fallback explicitly and does not silently recommend plaintext",
+        "Retrieves at use time through the provider-supported channel and treats environment variables as transport rather than durable storage"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "A production API token was printed in CI logs and also committed to git. Give the ordered incident response and rotation procedure.",
+      "assertions": [
+        "Revokes or disables the credential before log cleanup or history rewriting",
+        "Preserves audit evidence, reviews affected identity, scopes and consumers, and checks for misuse",
+        "Issues and verifies a reduced-scope replacement, updates all consumers, and proves the revoked value fails",
+        "Coordinates repository history cleanup only after containment and evidence preservation"
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "Review a proposal to put one shared API token in a masked organization-level CI variable for every repository. Produce a safer lifecycle design.",
+      "assertions": [
+        "Rejects the shared high-blast-radius credential and assigns distinct non-human identities or credentials per integration and environment",
+        "Prefers short-lived federation or dynamic credentials and documents why any stored token remains necessary",
+        "Defines least privilege, protected-job access, fork and pull-request negative probes, rotation, revocation, ownership, and audit evidence"
+      ]
+    }
+  ]
+}

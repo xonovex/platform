@@ -24,27 +24,27 @@
     "split": "train"
   },
   {
-    "query": "A review comment on `work/module-structure/` says the module structure change handles the normal fixture but leaves the failure path undefined. For this Terraform task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
-    "rationale": "implicit task cue derived from the module structure reference",
+    "query": "Restructure this Terraform repository into reusable modules and environment root modules without sharing mutable local state files.",
     "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
     "split": "train"
   },
   {
-    "query": "quick pre-merge sanity check: after the module definition change under `work/module-definition/`, a clean checkout behaves differently from my local run. What Terraform-specific assumption could cause that? Show the correction and the exact narrow validation.",
-    "rationale": "implicit task cue derived from the module definition reference",
+    "query": "Define a Terraform module with a narrow input contract, validated variables, useful outputs, and no provider configuration inside the child module.",
     "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
     "split": "validation"
   },
   {
-    "query": "The clean Linux CI job fails only for the minimal typed variables fixture under `work/typed-variables/`, while the full local fixture passes. Trace the Terraform-specific boundary that could cause the difference, then propose a patch and a regression check.",
-    "rationale": "implicit task cue derived from the typed variables reference",
+    "query": "Replace loosely typed Terraform map(any) inputs with optional object attributes and validation that reports invalid combinations early.",
     "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
     "split": "validation"
   },
   {
-    "query": "A review comment on `work/root-module/` says the root module change handles the normal fixture but leaves the failure path undefined. For this Terraform task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
-    "rationale": "implicit task cue derived from the root module reference",
+    "query": "Compose a production root module with aliased providers, remote state, explicit module versions, and environment-specific values outside the reusable module.",
     "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
     "split": "validation"
   },
   {
@@ -72,13 +72,13 @@
     "split": "train"
   },
   {
-    "query": "quick pre-merge sanity check: after the security change under `work/security/`, a clean checkout behaves differently from my local run. What Docker-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "query": "Harden this production container: run as a non-root numeric user, pin the base image, avoid copying secrets, and make the filesystem read-only where possible.",
     "rationale": "near miss owned by docker-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "quick pre-merge sanity check: after the configmaps secrets change under `work/configmaps-secrets/`, a clean checkout behaves differently from my local run. What Kubernetes-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "query": "Move non-secret settings to a ConfigMap and credentials to a Secret, then mount both without checking decoded secret values into Git.",
     "rationale": "near miss owned by kubernetes-guide",
     "should_trigger": false,
     "split": "validation"
@@ -90,7 +90,7 @@
     "split": "validation"
   },
   {
-    "query": "quick pre-merge sanity check: after the compile options change under `work/compile-options/`, a clean checkout behaves differently from my local run. What Cmake-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "query": "Apply strict warnings to our own CMake targets without leaking them into third-party dependencies or downstream consumers.",
     "rationale": "near miss owned by cmake-guide",
     "should_trigger": false,
     "split": "validation"
