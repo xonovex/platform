@@ -11,7 +11,7 @@ argument-hint: >-
   <target> --reason <text> [--revision <revision>]
   [--capability <selection>] [--provider <selection>]
   [--result <destination-reference>] [--snapshot] [--remove]
-  [--delete-reference] [--confirm] [--dry-run]
+  [--remove-reference] [--confirm] [--dry-run]
 ---
 
 # /xonovex-workflow:workspace-abandon — Abandon Workspace
@@ -27,7 +27,7 @@ argument-hint: >-
 - `--snapshot` (optional): Preserve current work using the selected capability before
   removal.
 - `--remove` (optional): Remove the workspace after recording its state.
-- `--delete-reference` (optional): Also delete its provider-native branch or reference.
+- `--remove-reference` (optional): Also remove its provider-native branch or reference.
 - `--confirm` (optional): Explicitly authorize the described removals.
 - `--dry-run` (optional): Preview updates and removals without applying them.
 

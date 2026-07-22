@@ -97,13 +97,15 @@ cleanup_temp_log() {
   fi
 }
 
-# Pick moon executable (prefer local, then global, then npx)
+# Pick moon executable from the project or the current environment.
 if [[ -x "$PROJECT_DIR/node_modules/.bin/moon" ]]; then
   MOON=("$PROJECT_DIR/node_modules/.bin/moon")
 elif command -v moon >/dev/null 2>&1; then
   MOON=(moon)
 else
-  MOON=(npx --yes moon)
+  echo "Moon CLI not found; run 'npm install' in $PROJECT_DIR or install @moonrepo/cli." >&2
+  cleanup_temp_log
+  exit 127
 fi
 
 # Build target array from comma-separated string

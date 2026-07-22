@@ -102,5 +102,9 @@ claude plugin install xonovex-workflow@xonovex-marketplace
 
 ```bash
 codex plugin marketplace add xonovex/platform
-codex plugin add xonovex-workflow@xonovex-marketplace
+codex plugin add xonovex-skill-workflow@xonovex-marketplace
 ```
+
+Codex consumes the workflow skill directly. Invoke `$workflow-guide` and name the
+operation plus its arguments. The `/xonovex-workflow:*` command namespace is a
+Claude Code surface.

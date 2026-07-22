@@ -5,31 +5,6 @@
   },
   "plugins": [
     {
-      "name": "xonovex-utility",
-      "source": {
-        "source": "local",
-        "path": "./packages/command/command-utility"
-      },
-      "policy": {
-        "installation": "AVAILABLE",
-        "authentication": "ON_INSTALL"
-      },
-      "category": "Productivity"
-    },
-    {
-      "name": "xonovex-workflow",
-      "source": {
-        "source": "local",
-        "path": "./packages/command/command-workflow"
-      },
-      "description": "Xonovex composable operation and workspace commands",
-      "policy": {
-        "installation": "AVAILABLE",
-        "authentication": "ON_INSTALL"
-      },
-      "category": "Productivity"
-    },
-    {
       "name": "xonovex-skill-accessibility",
       "source": {
         "source": "local",
@@ -238,18 +213,6 @@
       "source": {
         "source": "local",
         "path": "./packages/skill/skill-c99-opinionated"
-      },
-      "policy": {
-        "installation": "AVAILABLE",
-        "authentication": "ON_INSTALL"
-      },
-      "category": "Productivity"
-    },
-    {
-      "name": "xonovex-skill-caveman",
-      "source": {
-        "source": "local",
-        "path": "./packages/skill/skill-caveman"
       },
       "policy": {
         "installation": "AVAILABLE",
@@ -478,18 +441,6 @@
       "source": {
         "source": "local",
         "path": "./packages/skill/skill-expressjs"
-      },
-      "policy": {
-        "installation": "AVAILABLE",
-        "authentication": "ON_INSTALL"
-      },
-      "category": "Productivity"
-    },
-    {
-      "name": "xonovex-skill-fable",
-      "source": {
-        "source": "local",
-        "path": "./packages/skill/skill-fable"
       },
       "policy": {
         "installation": "AVAILABLE",

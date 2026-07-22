@@ -42,7 +42,7 @@
     "split": "validation"
   },
   {
-    "query": "Represent the same reusable command for Claude Code, Codex, and Copilot while preserving one semantic contract and documenting only format differences.",
+    "query": "Represent the same reusable workflow for Claude Code, Codex, and Copilot while preserving one semantic contract, including when a harness uses skills instead of custom command plugins.",
     "should_trigger": true,
     "rationale": "curated domain-specific routing scenario",
     "split": "validation"

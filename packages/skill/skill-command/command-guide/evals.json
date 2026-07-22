@@ -16,7 +16,7 @@
       "prompt": "We have a ~140-line Claude Code slash command that inlines its entire Goal, Workflow, Output format, and Gotchas. I want to refactor it into a thin command that keeps only its argument contract and delegates the actual procedure to a reusable guideline skill. It's packaged as a plugin. Walk me through every step so nothing breaks at run time.",
       "assertions": [
         "Says to add the `Skill` tool to the command's `allowed-tools` so the delegation can load the skill",
-        "Says to declare the guideline skill as a dependency in BOTH the `.claude-plugin/plugin.json` and `.codex-plugin/plugin.json` manifests",
+        "Says to declare the guideline skill as a dependency in `.claude-plugin/plugin.json`, and to distribute the skill directly for Codex instead of creating a parallel command manifest",
         "Keeps the argument contract (flags/defaults) in the command while the Goal/Workflow/Output/Gotchas move into the skill's `references/{operation}.md`, and notes install does not equal in-context (must load via the Skill tool)"
       ]
     },

@@ -68,6 +68,7 @@ tasks:
     outputs: []
     options:
       cache: false
+      runInCI: false
   ts-format:
     script: npx prettier --write .
     inputs:
@@ -79,6 +80,7 @@ tasks:
     outputs: []
     options:
       cache: false
+      runInCI: false
   ts-format-check:
     script: npx prettier --check .
     inputs:
@@ -123,6 +125,7 @@ tasks:
     script: rm -rf dist coverage *.tsbuildinfo
     options:
       cache: false
+      runInCI: false
   build:
     command: noop
     deps: [ts-build]
@@ -140,6 +143,14 @@ tasks:
     deps: [ts-lint-fix]
     options:
       cache: false
+      runInCI: false
+      mergeDeps: append
+  format:
+    command: noop
+    deps: [ts-format]
+    options:
+      cache: false
+      runInCI: false
       mergeDeps: append
   typecheck:
     command: noop
@@ -164,6 +175,7 @@ tasks:
     deps: [ts-clean]
     options:
       cache: false
+      runInCI: false
   ci-check:
     command: echo 'ci-check complete'
     deps:

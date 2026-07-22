@@ -6,7 +6,7 @@ Refactor a self-contained ("fat") command — one that inlines its whole Goal / 
 
 - Move a command's procedure, output format, and gotchas into a guideline-skill reference
 - Reduce the command to its frontmatter, argument contract, and a delegation block (~15-25 lines)
-- Wire the command plugin to depend on the skill plugin so the skill is present at run time
+- Wire supported command-plugin dependencies so the skill is present at run time, or distribute the skill directly when the harness has no command-plugin surface
 
 ## Arguments
 
@@ -35,7 +35,7 @@ Refactor a self-contained ("fat") command — one that inlines its whole Goal / 
 4. **Register the operation** — add it to the skill's `SKILL.md` under Operations and Progressive Disclosure with an explicit load-when trigger
 5. **Slim the command** — replace the body with the thin shape: frontmatter + Arguments + a Delegation block
 6. **Add the `Skill` tool** — ensure `allowed-tools` includes `Skill`
-7. **Wire the dependency** — add the skill plugin to the command plugin's `dependencies` in BOTH `.claude-plugin/plugin.json` and `.codex-plugin/plugin.json` (bare-string name; once per plugin, not per command)
+7. **Wire the supported dependency** — add the skill plugin to each command-capable harness manifest that installs declared dependencies (for Xonovex commands, `.claude-plugin/plugin.json`; bare-string name, once per plugin, not per command). Codex plugins distribute the owning skill directly and do not mirror the Claude command package.
 8. **Preview or apply** — show the three artifacts (`--dry-run`) or write them
 9. **Report** — command line-count reduction, the skill/operation it now targets, manifests touched
 
@@ -63,7 +63,7 @@ procedure, output format, and gotchas — do not restate them.
 
 ## Install ≠ Load
 
-The `dependencies` entry guarantees the skill is **installed**, not that its text is in context at run time. The command must **explicitly** load the skill via the `Skill` tool — reliable precisely because the dependency guarantees presence. Never rely on implicit ambient auto-trigger of another plugin's skill; it is not a designed contract.
+A supported `dependencies` entry guarantees the skill is **installed**, not that its text is in context at run time. The command must **explicitly** load the skill via the `Skill` tool. On a harness that distributes skills without custom command plugins, users install and invoke the skill itself. Never rely on implicit ambient auto-trigger of another plugin's skill; it is not a designed contract.
 
 ## Error Handling
 
@@ -78,7 +78,7 @@ Commit to git first; use `--dry-run`; confirm the skill reference resolves and t
 
 ## Gotchas
 
-- Distilling the body but forgetting the `dependencies` entry leaves the command unable to guarantee its skill at run time — wire both manifests
+- Distilling the body but forgetting a dependency supported by the command harness leaves the command unable to guarantee its skill at run time
 - Adding `Skill` to `allowed-tools` is easy to miss; without it the delegation can't load the skill
 - Copying the procedure into the skill instead of moving it leaves two diverging copies — the command body must be deleted, not duplicated
 - A delegation block that names the skill but not the exact operation makes the command ambiguous — name both

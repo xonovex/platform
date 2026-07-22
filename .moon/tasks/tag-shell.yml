@@ -30,6 +30,7 @@ tasks:
       - "@globs(sources)"
     options:
       cache: false
+      runInCI: false
   sh-format-check:
     command:
       - shfmt
@@ -51,6 +52,13 @@ tasks:
     deps: [sh-format-check]
     options:
       cache: false
+      mergeDeps: append
+  format:
+    command: noop
+    deps: [sh-format]
+    options:
+      cache: false
+      runInCI: false
       mergeDeps: append
   ci-check:
     command: echo 'ci-check complete'

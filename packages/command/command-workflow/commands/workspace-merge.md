@@ -8,7 +8,8 @@ allowed-tools:
   - Skill
 argument-hint: >-
   <target> --into <destination-reference> [--revision <revision>]
-  [--method <selection>] [--capability <selection>] [--provider <selection>]
+  [--criteria <criteria>...] [--method <selection>]
+  [--capability <selection>...] [--provider <selection>]
   [--squash] [--remove] [--confirm] [--dry-run]
 ---
 
@@ -19,8 +20,12 @@ argument-hint: >-
 - `target` (required): Exact workspace path or provider-native source reference.
 - `--into` (required): Exact destination workspace, branch, or native reference.
 - `--revision` (optional): Exact source revision to merge.
-- `--method`, `--capability`, `--provider` (optional): Independent merge,
-  workspace, and provider selections.
+- `--criteria` (repeatable, optional): Explicit conditions the workspace must satisfy
+  before the merge.
+- `--method` (optional): Validation or merge procedure selection.
+- `--capability` (repeatable, optional): Independent workspace, validation, and merge
+  capability selections.
+- `--provider` (optional): Provider selection for native references and effects.
 - `--squash` (optional): Request one consolidated change when supported.
 - `--remove` (optional): Remove the source workspace only after a successful merge.
 - `--confirm` (optional): Explicitly authorize the described merge effect.

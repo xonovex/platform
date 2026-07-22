@@ -20,6 +20,7 @@ tasks:
       - build
     options:
       cache: false
+      runInCI: false
   github-check:
     script: bash scripts/github-release.sh "$workspaceRoot/packages/agent/agent-cli-go" "$projectRoot/release-assets" --dry-run
     deps:
@@ -35,12 +36,14 @@ tasks:
       - github-publish
     options:
       cache: false
+      runInCI: false
   ci-publish-dry-run:
     command: echo 'ci-publish-dry-run complete'
     deps:
       - github-check
     options:
       cache: false
+      runInCI: false
 language: bash
 dependsOn: []
 layer: unknown

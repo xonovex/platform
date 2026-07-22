@@ -5,6 +5,7 @@ import {validateRelease} from "./release-validation.js";
 
 const VERSION = "1.2.3";
 const PACKAGE_PATH = "packages/skill/skill-test";
+const COMMAND_PATH = "packages/command/command-test";
 
 const writeText = (root: string, path: string, content: string): void => {
   const target = resolve(root, path);
@@ -18,33 +19,66 @@ const writeJson = (root: string, path: string, value: unknown): void => {
 
 const createFixture = (): string => {
   const root = mkdtempSync(resolve(".release-validation-"));
-  const manifest = {
-    name: "skill-test",
+  const packageManifest = {
+    name: "@xonovex/skill-test",
     version: VERSION,
     description: "Test skill",
   };
-  const claudeManifest = {...manifest, skills: ["./test-guide"]};
-  const codexManifest = {...manifest, skills: "./test-guide"};
-  const marketplace = {
+  const pluginManifest = {
+    name: "xonovex-skill-test",
+    version: VERSION,
+    description: "Test skill",
+  };
+  const skillEntry = {
+    name: "xonovex-skill-test",
+    source: `./${PACKAGE_PATH}`,
+    description: "Test skill",
+  };
+  const commandPackageManifest = {
+    name: "@xonovex/command-test",
+    version: VERSION,
+    description: "Test command",
+  };
+  const commandPluginManifest = {
+    name: "xonovex-test",
+    version: VERSION,
+    description: "Test command",
+  };
+  const commandEntry = {
+    name: "xonovex-test",
+    source: `./${COMMAND_PATH}`,
+    description: "Test command",
+  };
+  const claudeMarketplace = {
     metadata: {version: VERSION},
-    plugins: [
-      {
-        name: "skill-test",
-        source: `./${PACKAGE_PATH}`,
-        description: "Test skill",
-      },
-    ],
+    plugins: [skillEntry, commandEntry],
   };
 
-  mkdirSync(resolve(root, "packages/command"), {recursive: true});
-  writeJson(root, ".claude-plugin/marketplace.json", marketplace);
-  writeJson(root, ".agents/plugins/marketplace.json", marketplace);
-  writeJson(root, `${PACKAGE_PATH}/package.json`, manifest);
-  writeJson(root, `${PACKAGE_PATH}/.claude-plugin/plugin.json`, claudeManifest);
-  writeJson(root, `${PACKAGE_PATH}/.codex-plugin/plugin.json`, codexManifest);
+  writeJson(root, ".claude-plugin/marketplace.json", claudeMarketplace);
+  writeJson(root, ".agents/plugins/marketplace.json", {
+    plugins: [skillEntry],
+  });
+  writeJson(root, `${PACKAGE_PATH}/package.json`, packageManifest);
+  writeJson(root, `${PACKAGE_PATH}/.claude-plugin/plugin.json`, {
+    ...pluginManifest,
+    skills: ["./test-guide"],
+  });
+  writeJson(root, `${PACKAGE_PATH}/.codex-plugin/plugin.json`, {
+    ...pluginManifest,
+    skills: "./test-guide",
+  });
   writeText(root, `${PACKAGE_PATH}/test-guide/SKILL.md`, "# Test skill\n");
+  writeJson(root, `${COMMAND_PATH}/package.json`, commandPackageManifest);
+  writeJson(
+    root,
+    `${COMMAND_PATH}/.claude-plugin/plugin.json`,
+    commandPluginManifest,
+  );
   writeJson(root, "package-lock.json", {
-    packages: {[PACKAGE_PATH]: {version: VERSION}},
+    packages: {
+      [PACKAGE_PATH]: {version: VERSION},
+      [COMMAND_PATH]: {version: VERSION},
+    },
   });
   writeText(root, "README.md", "# Test repository\n");
   writeText(
@@ -75,7 +109,7 @@ describe("release input validation", () => {
     try {
       const result = validateRelease(root);
 
-      expect(result).toMatchObject({failures: [], pluginPackages: 1});
+      expect(result).toMatchObject({failures: [], pluginPackages: 2});
     } finally {
       rmSync(root, {recursive: true, force: true});
     }
@@ -131,20 +165,52 @@ describe("release input validation", () => {
   it("reports duplicate marketplace plugin names", () => {
     const root = createFixture();
     const duplicate = {
-      name: "skill-test",
+      name: "xonovex-skill-test",
       source: `./${PACKAGE_PATH}`,
       description: "Test skill",
     };
+    const command = {
+      name: "xonovex-test",
+      source: `./${COMMAND_PATH}`,
+      description: "Test command",
+    };
     writeJson(root, ".claude-plugin/marketplace.json", {
       metadata: {version: VERSION},
-      plugins: [duplicate, duplicate],
+      plugins: [duplicate, duplicate, command],
     });
 
     try {
       const result = validateRelease(root);
 
       expect(result.failures).toContain(
-        "Claude marketplace contains every command and skill package exactly once",
+        "Claude marketplace has duplicate plugin entries: xonovex-skill-test (2)",
+      );
+    } finally {
+      rmSync(root, {recursive: true, force: true});
+    }
+  });
+
+  it("names unexpected Codex marketplace entries", () => {
+    const root = createFixture();
+    writeJson(root, ".agents/plugins/marketplace.json", {
+      plugins: [
+        {
+          name: "xonovex-skill-test",
+          source: {path: `./${PACKAGE_PATH}`},
+          description: "Test skill",
+        },
+        {
+          name: "xonovex-skill-retired",
+          source: {path: "./packages/skill/skill-retired"},
+        },
+      ],
+    });
+
+    try {
+      const result = validateRelease(root);
+
+      expect(result.failures).toContain(
+        "Codex marketplace has unexpected plugin entries: xonovex-skill-retired",
       );
     } finally {
       rmSync(root, {recursive: true, force: true});
@@ -154,7 +220,7 @@ describe("release input validation", () => {
   it("rejects a skill manifest path that does not resolve to its guide", () => {
     const root = createFixture();
     writeJson(root, `${PACKAGE_PATH}/.codex-plugin/plugin.json`, {
-      name: "skill-test",
+      name: "xonovex-skill-test",
       version: VERSION,
       description: "Test skill",
       skills: "./old-guide",

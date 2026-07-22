@@ -90,6 +90,7 @@ tasks:
     options:
       cache: false
       runFromWorkspaceRoot: true
+      runInCI: false
   agent-image-build:
     command:
       - nix

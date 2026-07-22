@@ -11,11 +11,11 @@ tasks:
       done
     toolchain: [system, nix]
     inputs:
-      - '@globs(sources)'
+      - "@globs(sources)"
       - Cargo.toml
       - Cargo.lock
     outputs:
-      - 'target/wasm32-wasip1/release/*.wasm'
+      - "target/wasm32-wasip1/release/*.wasm"
     options:
       cache: true
   moon-test:
@@ -26,8 +26,8 @@ tasks:
     deps:
       - moon-build
     inputs:
-      - '@globs(sources)'
-      - '@globs(tests)'
+      - "@globs(sources)"
+      - "@globs(tests)"
       - Cargo.toml
       - Cargo.lock
     options:
@@ -96,6 +96,7 @@ tasks:
       - github-check
     options:
       cache: false
+      runInCI: false
   github-publish-dry-run:
     script: |
       set -euo pipefail
@@ -117,17 +118,20 @@ tasks:
       - github-check
     options:
       cache: false
+      runInCI: false
   ci-publish:
     command: echo 'ci-publish complete'
     deps:
       - github-publish
     options:
       cache: false
+      runInCI: false
   ci-publish-dry-run:
     command: echo 'ci-publish-dry-run complete'
     deps:
       - github-publish-dry-run
     options:
       cache: false
+      runInCI: false
 inheritedBy:
   tag: moon-plugin

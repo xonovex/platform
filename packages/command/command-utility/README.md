@@ -15,16 +15,23 @@ claude plugin install xonovex-utility@xonovex-marketplace
 
 ```bash
 codex plugin marketplace add xonovex/platform
-codex plugin add xonovex-utility@xonovex-marketplace
+codex plugin add xonovex-skill-content@xonovex-marketplace
+codex plugin add xonovex-skill-instruction@xonovex-marketplace
+codex plugin add xonovex-skill-reflect@xonovex-marketplace
+codex plugin add xonovex-skill-skill@xonovex-marketplace
+codex plugin add xonovex-skill-command@xonovex-marketplace
+codex plugin add xonovex-skill-versioning@xonovex-marketplace
 ```
 
-### Dependencies
+Install only the skills needed for the intended operation and invoke the matching
+`$...-guide` skill directly. The `/xonovex-utility:*` command namespace is a Claude
+Code surface.
+
+### Claude Code dependencies
 
 Each command delegates its procedure to a guideline skill, declared in `plugin.json`
-`dependencies`. On Claude Code, installing this plugin auto-installs those skills; if a
-depended-on skill is missing the command is disabled with `dependency-unsatisfied`. On
-Codex, `dependencies` is not auto-installed — install the delegated skill plugins
-alongside this one.
+`dependencies`. Installing this plugin auto-installs those skills; if a depended-on
+skill is missing the command is disabled with `dependency-unsatisfied`.
 
 ## Commands
 

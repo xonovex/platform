@@ -14,6 +14,7 @@ tasks:
       - package.json
     options:
       cache: false
+      runInCI: false
   npm-publish-dry-run:
     command:
       - npx
@@ -28,6 +29,7 @@ tasks:
       - package.json
     options:
       cache: false
+      runInCI: false
   ci-publish:
     command: echo 'ci-publish complete'
     deps:
@@ -36,6 +38,7 @@ tasks:
       - package.json
     options:
       cache: false
+      runInCI: false
   npm-check:
     command:
       - npx
@@ -50,6 +53,7 @@ tasks:
     script: npm pkg fix
     options:
       cache: false
+      runInCI: false
   ci-publish-dry-run:
     command: echo 'ci-publish-dry-run complete'
     deps:
@@ -58,6 +62,7 @@ tasks:
       - package.json
     options:
       cache: false
+      runInCI: false
   version-bump:
     command:
       - npx
@@ -66,5 +71,6 @@ tasks:
       - script-moon-version-bump:install
     options:
       cache: false
+      runInCI: false
 inheritedBy:
   tag: npm

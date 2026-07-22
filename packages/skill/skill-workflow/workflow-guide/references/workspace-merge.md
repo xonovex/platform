@@ -10,8 +10,9 @@ Validate one exact workspace and merge it into one exact destination while prese
    provider only when unambiguous and report the inference.
 2. Load the selected workspace, validation, merge, and provider capabilities. Name and
    stop on any unavailable explicit capability.
-3. Verify source and destination identity, source metadata, cleanliness, and required
-   typecheck, lint, build, and tests.
+3. Verify source and destination identity, source metadata, cleanliness, and every
+   explicit validation criterion. Run typecheck, lint, build, or tests only when the
+   selected method, criteria, or capability requires them.
 4. Update the source against the current destination using the selected capability;
    never resolve conflicts by guesswork.
 5. Preview the final effect. Merge only with exact-scope authorization, and remove the

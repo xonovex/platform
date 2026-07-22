@@ -14,7 +14,8 @@ argument-hint: >-
   [--revision <revision>] [--kind <selection>] [--perspective <selection>]
   [--criteria <criteria>...] [--method <selection>]
   [--capability <selection>...] [--provider <selection>]
-  [--result <destination-reference>] [--cleanup <selection>] [--dry-run]
+  [--result <destination-reference>] [--cleanup <selection>] [--confirm]
+  [--dry-run]
 ---
 
 # /xonovex-workflow:abandon — Abandon
@@ -31,6 +32,8 @@ argument-hint: >-
 - `--criteria` (repeatable, optional): Retention or cleanup constraints.
 - `--result` (optional): Explicit destination for the abandonment record.
 - `--cleanup` (optional): Explicit cleanup capability or scope; preserve by default.
+- `--confirm` (optional): Explicitly authorize the scoped cleanup or provider state
+  update.
 - `--dry-run` (optional): Preview provider updates or cleanup.
 
 ## Delegation

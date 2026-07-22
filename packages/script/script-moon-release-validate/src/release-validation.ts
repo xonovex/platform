@@ -1,5 +1,5 @@
 import {existsSync, readdirSync, readFileSync, statSync} from "node:fs";
-import {resolve} from "node:path";
+import {basename, resolve} from "node:path";
 import {type z} from "zod";
 import {
   LockfileSchema,
@@ -103,6 +103,51 @@ const marketplaceDescriptions = (
 ): ReadonlyMap<string, string | undefined> =>
   new Map(marketplace.plugins.map((entry) => [entry.name, entry.description]));
 
+const expectedPluginName = (pluginPackage: string): string => {
+  const packageDirectory = basename(pluginPackage);
+  return packageDirectory.startsWith("command-")
+    ? `xonovex-${packageDirectory.slice("command-".length)}`
+    : `xonovex-${packageDirectory}`;
+};
+
+const validateMarketplaceInventory = (
+  label: string,
+  marketplace: Marketplace,
+  expectedNames: readonly string[],
+  check: Check,
+): void => {
+  const counts = marketplace.plugins.reduce<ReadonlyMap<string, number>>(
+    (current, entry) => {
+      const next = new Map(current);
+      next.set(entry.name, (next.get(entry.name) ?? 0) + 1);
+      return next;
+    },
+    new Map(),
+  );
+  const expected = new Set(expectedNames);
+  const missing = expectedNames.filter((name) => !counts.has(name)).toSorted();
+  const unexpected = [...counts.keys()]
+    .filter((name) => !expected.has(name))
+    .toSorted();
+  const duplicates = [...counts.entries()]
+    .filter(([, count]) => count > 1)
+    .map(([name, count]) => `${name} (${String(count)})`)
+    .toSorted();
+
+  check(
+    missing.length === 0,
+    `${label} is missing plugin entries: ${missing.join(", ")}`,
+  );
+  check(
+    unexpected.length === 0,
+    `${label} has unexpected plugin entries: ${unexpected.join(", ")}`,
+  );
+  check(
+    duplicates.length === 0,
+    `${label} has duplicate plugin entries: ${duplicates.join(", ")}`,
+  );
+};
+
 const dependencyEntries = (
   manifest: PackageManifest,
 ): readonly (readonly [string, string])[] =>
@@ -175,6 +220,8 @@ const validatePackage = (
 ): void => {
   const relativePath = (path: string): string =>
     path.slice(repositoryRoot.length + 1);
+  const packageLabel = relativePath(pluginPackage);
+  const skillPackage = packageLabel.startsWith("packages/skill/");
   const packageJsonPath = resolve(pluginPackage, "package.json");
   const claudeManifestPath = resolve(
     pluginPackage,
@@ -182,22 +229,21 @@ const validatePackage = (
   );
   const codexManifestPath = resolve(pluginPackage, ".codex-plugin/plugin.json");
 
-  check(
-    existsSync(packageJsonPath),
-    `${relativePath(pluginPackage)} has package.json`,
-  );
+  check(existsSync(packageJsonPath), `${packageLabel} has package.json`);
   check(
     existsSync(claudeManifestPath),
-    `${relativePath(pluginPackage)} has a Claude plugin manifest`,
+    `${packageLabel} has a Claude plugin manifest`,
   );
-  check(
-    existsSync(codexManifestPath),
-    `${relativePath(pluginPackage)} has a Codex plugin manifest`,
-  );
+  if (skillPackage) {
+    check(
+      existsSync(codexManifestPath),
+      `${packageLabel} has a Codex plugin manifest`,
+    );
+  }
   if (
     !existsSync(packageJsonPath) ||
     !existsSync(claudeManifestPath) ||
-    !existsSync(codexManifestPath)
+    (skillPackage && !existsSync(codexManifestPath))
   ) {
     return;
   }
@@ -214,16 +260,18 @@ const validatePackage = (
     PluginManifestSchema,
     check,
   );
-  const codexManifest = readJson<PluginManifest>(
-    codexManifestPath,
-    relativePath(codexManifestPath),
-    PluginManifestSchema,
-    check,
-  );
+  const codexManifest = skillPackage
+    ? readJson<PluginManifest>(
+        codexManifestPath,
+        relativePath(codexManifestPath),
+        PluginManifestSchema,
+        check,
+      )
+    : undefined;
   if (
     packageJson === undefined ||
     claudeManifest === undefined ||
-    codexManifest === undefined
+    (skillPackage && codexManifest === undefined)
   ) {
     return;
   }
@@ -238,26 +286,26 @@ const validatePackage = (
     `${claudeManifest.name} Claude manifest version matches ${releaseVersion}`,
   );
   check(
-    codexManifest.version === releaseVersion,
-    `${codexManifest.name} Codex manifest version matches ${releaseVersion}`,
-  );
-  check(
-    claudeManifest.name === codexManifest.name,
-    `${packageJson.name} manifest names match`,
-  );
-  check(
     claudeSources.get(claudeManifest.name) === source,
     `${claudeManifest.name} has the expected Claude marketplace source`,
   );
-  check(
-    codexSources.get(codexManifest.name) === source,
-    `${codexManifest.name} has the expected Codex marketplace source`,
-  );
 
-  if (relativePath(pluginPackage).startsWith("packages/skill/")) {
+  if (codexManifest !== undefined) {
+    check(
+      codexManifest.version === releaseVersion,
+      `${codexManifest.name} Codex manifest version matches ${releaseVersion}`,
+    );
+    check(
+      claudeManifest.name === codexManifest.name,
+      `${packageJson.name} manifest names match`,
+    );
+    check(
+      codexSources.get(codexManifest.name) === source,
+      `${codexManifest.name} has the expected Codex marketplace source`,
+    );
     validateSkillPackaging(
       pluginPackage,
-      relativePath(pluginPackage),
+      packageLabel,
       claudeManifest,
       codexManifest,
       check,
@@ -270,17 +318,19 @@ const validatePackage = (
       `${packageJson.name} package and Claude manifest descriptions match`,
     );
     check(
-      codexManifest.description === packageJson.description,
-      `${packageJson.name} package and Codex manifest descriptions match`,
-    );
-    check(
       claudeDescriptions.get(claudeManifest.name) === packageJson.description,
       `${packageJson.name} package and Claude marketplace descriptions match`,
     );
-    check(
-      codexDescriptions.get(codexManifest.name) === packageJson.description,
-      `${packageJson.name} package and Codex marketplace descriptions match`,
-    );
+    if (codexManifest !== undefined) {
+      check(
+        codexManifest.description === packageJson.description,
+        `${packageJson.name} package and Codex manifest descriptions match`,
+      );
+      check(
+        codexDescriptions.get(codexManifest.name) === packageJson.description,
+        `${packageJson.name} package and Codex marketplace descriptions match`,
+      );
+    }
   }
 
   for (const [dependency, version] of dependencyEntries(packageJson)) {
@@ -341,18 +391,17 @@ export const validateRelease = (
     "marketplace release must use a semantic version",
   );
 
-  const pluginPackages = [
-    ...childDirectories(
-      resolve(repositoryRoot, "packages/command"),
-      "packages/command",
-      check,
-    ),
-    ...childDirectories(
-      resolve(repositoryRoot, "packages/skill"),
-      "packages/skill",
-      check,
-    ),
-  ];
+  const commandPackages = childDirectories(
+    resolve(repositoryRoot, "packages/command"),
+    "packages/command",
+    check,
+  );
+  const skillPackages = childDirectories(
+    resolve(repositoryRoot, "packages/skill"),
+    "packages/skill",
+    check,
+  );
+  const pluginPackages = [...commandPackages, ...skillPackages];
   const claudeSources = marketplaceSource(marketplace);
   const codexSources = marketplaceSource(codexMarketplace);
   const claudeDescriptions = marketplaceDescriptions(marketplace);
@@ -371,15 +420,17 @@ export const validateRelease = (
     );
   }
 
-  check(
-    marketplace.plugins.length === pluginPackages.length &&
-      claudeSources.size === pluginPackages.length,
-    "Claude marketplace contains every command and skill package exactly once",
+  validateMarketplaceInventory(
+    "Claude marketplace",
+    marketplace,
+    pluginPackages.map(expectedPluginName),
+    check,
   );
-  check(
-    codexMarketplace.plugins.length === pluginPackages.length &&
-      codexSources.size === pluginPackages.length,
-    "Codex marketplace contains every command and skill package exactly once",
+  validateMarketplaceInventory(
+    "Codex marketplace",
+    codexMarketplace,
+    skillPackages.map(expectedPluginName),
+    check,
   );
 
   const lockfile = readJson<Lockfile>(
