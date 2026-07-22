@@ -48,14 +48,20 @@
     "split": "validation"
   },
   {
-    "query": "I'm writing TypeScript that compiles to Lua with the typescript-to-lua transpiler. Write a `divmod` function that takes two numbers and returns both the quotient (floored) and the remainder so the generated Lua uses native Lua multiple return values rather than an array or object wrapper. Include a call site that consumes both values.",
-    "rationale": "near miss owned by typescript-to-lua-guide",
+    "query": "Write a production Dockerfile for a Node.js 22 web service that builds TypeScript with `npm run build` and serves on port 3000. Keep the final image as small and secure as reasonably possible.",
+    "rationale": "near miss owned by docker-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "Write a production Dockerfile for a Node.js 22 web service that builds TypeScript with `npm run build` and serves on port 3000. Keep the final image as small and secure as reasonably possible.",
-    "rationale": "near miss owned by docker-guide",
+    "query": "I have a Terraform config that creates private subnets, one per availability zone, from a variable list of AZs. Right now removing a single AZ from the middle of the list forces Terraform to recreate several unrelated subnets. Write the resource and any supporting locals so this stops happening.",
+    "rationale": "near miss owned by terraform-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "compose Bitrise Pipelines from reusable Workflows and pin every custom Step version",
+    "rationale": "near miss owned by bitrise-guide",
     "should_trigger": false,
     "split": "train"
   },
@@ -66,32 +72,26 @@
     "split": "train"
   },
   {
-    "query": "make this client component server-rendered if possible — it's just fetching the user's recent orders",
-    "rationale": "near miss owned by react-guide",
+    "query": "quick pre-merge sanity check: after the security change under `work/security/`, a clean checkout behaves differently from my local run. What Docker-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "rationale": "near miss owned by docker-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "Write a Lua 5.4 function `load_config(path)` that opens the file at `path`, reads all of it, and returns the parsed contents. Show how a caller would use it when the file might not exist, falling back to a default config instead of crashing.",
-    "rationale": "near miss owned by lua-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
-    "query": "link Azure Boards work item 381 to the pull request and preserve both native references",
-    "rationale": "near miss owned by azure-devops-guide",
+    "query": "quick pre-merge sanity check: after the module definition change under `work/module-definition/`, a clean checkout behaves differently from my local run. What Terraform-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "rationale": "near miss owned by terraform-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "Write a Strudel.cc live-coding snippet for a driving techno groove at 130 BPM. Include a four-on-the-floor kick, an offbeat clap, and closed hi-hats layered together.",
-    "rationale": "near miss owned by strudel-guide",
+    "query": "is this a flaky emulator (device offline) or a real test failure?",
+    "rationale": "near miss owned by bitrise-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "I have a Hono app configured with `app.use('*', cors())`. Write a Vitest test that verifies the CORS preflight (OPTIONS) request to `/api/users` with an Origin header succeeds and that the Access-Control-Allow-Origin header is returned.",
-    "rationale": "near miss owned by vitest-guide",
+    "query": "quick pre-merge sanity check: after the task inheritance change under `work/task-inheritance/`, a clean checkout behaves differently from my local run. What Moon-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "rationale": "near miss owned by moon-guide",
     "should_trigger": false,
     "split": "validation"
   }

@@ -90,26 +90,26 @@
     "rationale": "validation positive: prototypes override bitmask + inherited/instantiated/removed sub-objects, delta serialization"
   },
   {
-    "query": "Using Zod 4, write a TypeScript schema named UserSchema for a user object with these fields: an id that is a UUID, an email address, a createdAt that is an ISO datetime string, and a name string between 1 and 100 characters. Also export the inferred TypeScript type.",
-    "rationale": "near miss owned by zod-guide",
+    "query": "I want artists to build effects by dragging boxes onto a canvas and connecting their inputs and outputs with wires instead of writing code — how should I structure the thing they're editing",
+    "rationale": "near miss owned by node-graph-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "Design a PostgreSQL table for meeting-room reservations. Each reservation has a room, a start time, and an end time. The database itself must guarantee that two reservations for the same room can never overlap in time. Write the CREATE TABLE statement.",
-    "rationale": "near miss owned by sql-postgresql-guide",
+    "query": "I'm starting a multiplayer game and need to decide whether the server owns all the gameplay objects or if peers can each own their own — and how to keep that flexible if I switch to peer-to-peer later",
+    "rationale": "near miss owned by game-networking-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "Write an async Python function fetch_all(urls) that retrieves the body of each URL over HTTP and returns them as a list. The URLs are independent of one another and there may be dozens of them.",
-    "rationale": "near miss owned by python-guide",
+    "query": "our editor lets artists drop in an FBX or PNG and we want them edited in-tool but shipped as packed GPU-ready data — how should we structure the two forms so editing and loading don't fight each other",
+    "rationale": "near miss owned by asset-pipeline-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "our renderer hand-writes a barrier before and after every pass and it breaks every time we reorder passes — I want passes to just declare what they read and write and have ordering and transitions figured out for us",
-    "rationale": "near miss owned by gpu-rendering-guide",
+    "query": "how do I get the business and developers speaking the same vocabulary that also shows up in the code?",
+    "rationale": "near miss owned by ddd-guide",
     "should_trigger": false,
     "split": "validation"
   }

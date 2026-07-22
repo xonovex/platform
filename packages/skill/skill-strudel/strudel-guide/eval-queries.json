@@ -54,43 +54,43 @@
     "split": "train"
   },
   {
-    "query": "Using Zod 4, write a TypeScript schema named UserSchema for a user object with these fields: an id that is a UUID, an email address, a createdAt that is an ISO datetime string, and a name string between 1 and 100 characters. Also export the inferred TypeScript type.",
-    "rationale": "near miss owned by zod-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
-    "query": "Write a Lua 5.4 function `load_config(path)` that opens the file at `path`, reads all of it, and returns the parsed contents. Show how a caller would use it when the file might not exist, falling back to a default config instead of crashing.",
-    "rationale": "near miss owned by lua-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
-    "query": "I have a Hono app configured with `app.use('*', cors())`. Write a Vitest test that verifies the CORS preflight (OPTIONS) request to `/api/users` with an Origin header succeeds and that the Access-Control-Allow-Origin header is returned.",
-    "rationale": "near miss owned by vitest-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
-    "query": "In a Hono API running on Node with @hono/node-server, add a WebSocket endpoint at /ws/chat that echoes each incoming message back to the sender. Show both the server bootstrap code and the route definition.",
-    "rationale": "near miss owned by hono-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
-    "query": "We're on moonrepo 2.0. I want to enable and configure one of Moon's built-in extensions in our workspace. Which config file does the extension configuration go in, and show me a minimal example of the config block.",
-    "rationale": "near miss owned by moon-guide",
-    "should_trigger": false,
-    "split": "validation"
-  },
-  {
-    "query": "Design a PostgreSQL table for meeting-room reservations. Each reservation has a room, a start time, and an end time. The database itself must guarantee that two reservations for the same room can never overlap in time. Write the CREATE TABLE statement.",
-    "rationale": "near miss owned by sql-postgresql-guide",
-    "should_trigger": false,
-    "split": "validation"
-  },
-  {
     "query": "In a React + TypeScript app, create a reusable component that fades and slides its children upward into view when it first mounts, using the Motion animation library. Show the full component code.",
+    "rationale": "near miss owned by motion-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "my sound randomly cuts out with a little pop when the frame rate dips — the mixing happens in a callback that sometimes grabs a mutex",
+    "rationale": "near miss owned by audio-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "quick pre-merge sanity check: after the sequencing change under `work/sequencing/`, a clean checkout behaves differently from my local run. What Remotion-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "rationale": "near miss owned by remotion-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "quick pre-merge sanity check: after the gestures change under `work/gestures/`, a clean checkout behaves differently from my local run. What Motion-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "rationale": "near miss owned by motion-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "the render thread needs to feed the device exactly one fixed block each time without ever allocating — what work is safe to do in there?",
+    "rationale": "near miss owned by audio-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Build a Remotion scene with 60 confetti pieces scattered at varied starting x/y positions and slightly different fall speeds, so it looks organic. Provide the component.",
+    "rationale": "near miss owned by remotion-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Build a React component that renders a list where each item animates into view one after another (a staggered reveal) when the list mounts. Provide the code.",
     "rationale": "near miss owned by motion-guide",
     "should_trigger": false,
     "split": "validation"

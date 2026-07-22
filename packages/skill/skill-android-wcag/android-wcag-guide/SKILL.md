@@ -1,6 +1,6 @@
 ---
 name: android-wcag-guide
-description: Use when making Android Jetpack Compose UI accessible or meeting WCAG 2.2 AA — labelling for TalkBack, focus / reading order, headings, state and live-region announcements, color contrast, text scaling, touch-target size, and accessibility testing. Triggers on contentDescription, semantics / clearAndSetSemantics / mergeDescendants, traversalIndex / isTraversalGroup / heading(), stateDescription / liveRegion / announceForAccessibility, Role, CustomAccessibilityAction, TalkBack, screen reader, contrast, font scaling, tap target, or @Composable accessibility tests — even when the user doesn't say "WCAG" or "accessibility".
+description: "Use when making Android Jetpack Compose UI accessible or meeting WCAG 2.2 AA — labelling for TalkBack, focus / reading order, headings, state and live-region announcements, color contrast, text scaling, touch-target size, and accessibility testing. Triggers on contentDescription, semantics / clearAndSetSemantics / mergeDescendants, traversalIndex / isTraversalGroup / heading(), stateDescription / liveRegion / announceForAccessibility, Role, CustomAccessibilityAction, TalkBack, screen reader, contrast, font scaling, tap target, or @Composable accessibility tests — even when the user doesn't say 'WCAG' or 'accessibility'."
 ---
 
 # Android (Compose) WCAG 2.2 AA — quick reference

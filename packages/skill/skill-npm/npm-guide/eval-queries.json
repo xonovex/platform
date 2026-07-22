@@ -78,8 +78,8 @@
     "split": "validation"
   },
   {
-    "query": "add proper types to the response shape in src/api/users.ts so the consumer doesn't have to cast",
-    "rationale": "near miss owned by typescript-guide",
+    "query": "bump this package to a minor release",
+    "rationale": "near miss owned by versioning-guide",
     "should_trigger": false,
     "split": "validation"
   },
@@ -90,8 +90,8 @@
     "split": "validation"
   },
   {
-    "query": "In a Hono API running on Node with @hono/node-server, add a WebSocket endpoint at /ws/chat that echoes each incoming message back to the sender. Show both the server bootstrap code and the route definition.",
-    "rationale": "near miss owned by hono-guide",
+    "query": "We're on moonrepo 2.0. I want to enable and configure one of Moon's built-in extensions in our workspace. Which config file does the extension configuration go in, and show me a minimal example of the config block.",
+    "rationale": "near miss owned by moon-guide",
     "should_trigger": false,
     "split": "validation"
   }

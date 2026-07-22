@@ -10,6 +10,7 @@ npx moon-skill-validate [--strict] [skill-dir | path/to/SKILL.md]   # defaults t
 
 Besides the Agent Skills frontmatter/body checks, validation requires the package evidence that keeps a catalog maintainable:
 
+- one loader-safe, double-quoted `description` scalar with single quotes for inner phrases;
 - structurally valid `evals.json` with at least three output probes;
 - `eval-queries.json` with at least eight positive and eight negative routes, including train/validation coverage for each polarity;
 - reviewed `SOURCES.md` URL or explicit repository-original provenance;

@@ -48,50 +48,50 @@
     "split": "validation"
   },
   {
-    "query": "Using Zod 4, write a TypeScript schema named UserSchema for a user object with these fields: an id that is a UUID, an email address, a createdAt that is an ISO datetime string, and a name string between 1 and 100 characters. Also export the inferred TypeScript type.",
-    "rationale": "near miss owned by zod-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
-    "query": "We're on moonrepo 2.0. I want to enable and configure one of Moon's built-in extensions in our workspace. Which config file does the extension configuration go in, and show me a minimal example of the config block.",
-    "rationale": "near miss owned by moon-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
     "query": "Write a Lua 5.4 function `load_config(path)` that opens the file at `path`, reads all of it, and returns the parsed contents. Show how a caller would use it when the file might not exist, falling back to a default config instead of crashing.",
     "rationale": "near miss owned by lua-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "In an Astro page I already have static content. Add two React components: a `<NewsletterSignup />` in the page footer that should only become interactive once the user scrolls it into view, and a `<ThemeToggle />` that reads `window.localStorage` on mount and therefore must not be server-rendered at all. Show the page frontmatter and markup with the correct hydration for each.",
-    "rationale": "near miss owned by astro-guide",
+    "query": "Write an async Python function fetch_all(urls) that retrieves the body of each URL over HTTP and returns them as a list. The URLs are independent of one another and there may be dozens of them.",
+    "rationale": "near miss owned by python-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "Write a Strudel.cc live-coding snippet for a driving techno groove at 130 BPM. Include a four-on-the-floor kick, an offbeat clap, and closed hi-hats layered together.",
-    "rationale": "near miss owned by strudel-guide",
+    "query": "add proper types to the response shape in src/api/users.ts so the consumer doesn't have to cast",
+    "rationale": "near miss owned by typescript-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "I have a Hono app configured with `app.use('*', cors())`. Write a Vitest test that verifies the CORS preflight (OPTIONS) request to `/api/users` with an Origin header succeeds and that the Access-Control-Allow-Origin header is returned.",
-    "rationale": "near miss owned by vitest-guide",
+    "query": "I'm building the core document store for our level editor — objects of different kinds each with a set of named properties, and I want to add new object types at runtime without recompiling. How should the type/property schema work?",
+    "rationale": "near miss owned by data-model-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "quick pre-merge sanity check: after the local variables change under `work/local-variables/`, a clean checkout behaves differently from my local run. What Lua-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "rationale": "near miss owned by lua-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "quick pre-merge sanity check: after the type checking change under `work/type-checking/`, a clean checkout behaves differently from my local run. What Python-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "rationale": "near miss owned by python-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "In a Hono API running on Node with @hono/node-server, add a WebSocket endpoint at /ws/chat that echoes each incoming message back to the sender. Show both the server bootstrap code and the route definition.",
-    "rationale": "near miss owned by hono-guide",
+    "query": "rewrite this string concat with template literals and pull out the magic numbers as named consts",
+    "rationale": "near miss owned by typescript-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "I have a Terraform config that creates private subnets, one per availability zone, from a variable list of AZs. Right now removing a single AZ from the middle of the list forces Terraform to recreate several unrelated subnets. Write the resource and any supporting locals so this stops happening.",
-    "rationale": "near miss owned by terraform-guide",
+    "query": "give me a single typed object database where every node has properties, children it owns, and links to other nodes by id, and the whole thing notifies on edit, supports undo, and saves to a versioned file",
+    "rationale": "near miss owned by data-model-guide",
     "should_trigger": false,
     "split": "validation"
   }

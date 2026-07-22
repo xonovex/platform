@@ -48,50 +48,50 @@
     "split": "validation"
   },
   {
-    "query": "In a Hono API running on Node with @hono/node-server, add a WebSocket endpoint at /ws/chat that echoes each incoming message back to the sender. Show both the server bootstrap code and the route definition.",
-    "rationale": "near miss owned by hono-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
-    "query": "Write an Express 5 + TypeScript login route handler. It should look up the user by email, verify the submitted password against the stored hash, and on success return a signed JWT the client will send on future API requests.",
-    "rationale": "near miss owned by expressjs-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
-    "query": "Research the code paths and current library versions we need before planning rate limiting for packages/api. Keep it read-only and cite the evidence.",
-    "rationale": "near miss owned by plan-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
     "query": "In an Astro page I already have static content. Add two React components: a `<NewsletterSignup />` in the page footer that should only become interactive once the user scrolls it into view, and a `<ThemeToggle />` that reads `window.localStorage` on mount and therefore must not be server-rendered at all. Show the page frontmatter and markup with the correct hydration for each.",
     "rationale": "near miss owned by astro-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "map a mandatory protected-path control to Pi and tell me whether it can actually block",
-    "rationale": "near miss owned by pi-guide",
+    "query": "In a Remotion project running at 30fps, write a React component that fades a headline in from opacity 0 to 1 over the first half second and slides it up 40px at the same time. Give me the full component code.",
+    "rationale": "near miss owned by remotion-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "Write a Lua 5.4 function `load_config(path)` that opens the file at `path`, reads all of it, and returns the parsed contents. Show how a caller would use it when the file might not exist, falling back to a default config instead of crashing.",
-    "rationale": "near miss owned by lua-guide",
+    "query": "We just wrapped a debugging session where I made a couple of mistakes and had to correct course. Capture the development lessons from this session and save each one as its own file so a future agent can reuse it. Show me exactly what one of those files should contain.",
+    "rationale": "near miss owned by reflect-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Using vanilla Three.js, set up a WebGLRenderer and a render loop that spins a cube smoothly. It must keep a consistent rotation speed regardless of frame rate and stay crisp on high-DPI / retina displays. Give me the renderer setup and the loop.",
+    "rationale": "near miss owned by threejs-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "The clean Linux CI job fails only for the minimal content collections fixture under `work/content-collections/`, while the full local fixture passes. Trace the Astro-specific boundary that could cause the difference, then propose a patch and a regression check.",
+    "rationale": "near miss owned by astro-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "quick pre-merge sanity check: after the sequencing change under `work/sequencing/`, a clean checkout behaves differently from my local run. What Remotion-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "rationale": "near miss owned by remotion-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "I have a Rectangle class with mutable width and height and setWidth/setHeight methods. I now need a Square type in the same system. What's the cleanest way to model Square given I already have Rectangle?",
-    "rationale": "near miss owned by oop-guide",
+    "query": "A review comment on `work/governed-promotion/` says the governed promotion change handles the normal fixture but leaves the failure path undefined. For this Reflect task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
+    "rationale": "near miss owned by reflect-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "Write a Strudel.cc live-coding snippet for a driving techno groove at 130 BPM. Include a four-on-the-floor kick, an offbeat clap, and closed hi-hats layered together.",
-    "rationale": "near miss owned by strudel-guide",
+    "query": "quick pre-merge sanity check: after the textures change under `work/textures/`, a clean checkout behaves differently from my local run. What Threejs-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "rationale": "near miss owned by threejs-guide",
     "should_trigger": false,
     "split": "validation"
   }

@@ -78,20 +78,20 @@
     "split": "validation"
   },
   {
-    "query": "Write a Lua 5.4 function `load_config(path)` that opens the file at `path`, reads all of it, and returns the parsed contents. Show how a caller would use it when the file might not exist, falling back to a default config instead of crashing.",
-    "rationale": "near miss owned by lua-guide",
+    "query": "what does Xonovex governance actually enforce, and can I run a workflow with no controls?",
+    "rationale": "near miss owned by agent-governance-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "Write a portable shell script that must run under dash and busybox sh, not just bash. It should verify that jq is installed, take a filename as its first argument, and abort early on any error or unset variable.",
-    "rationale": "near miss owned by shell-scripting-guide",
+    "query": "classify our AI-system role and applicable obligations before selecting a regulated profile",
+    "rationale": "near miss owned by ai-governance-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "I have a Terraform config that creates private subnets, one per availability zone, from a variable list of AZs. Right now removing a single AZ from the middle of the list forces Terraform to recreate several unrelated subnets. Write the resource and any supporting locals so this stops happening.",
-    "rationale": "near miss owned by terraform-guide",
+    "query": "using the stage-neutral operation contract, create a new architecture note from these source links without modifying the sources",
+    "rationale": "near miss owned by workflow-guide",
     "should_trigger": false,
     "split": "validation"
   }

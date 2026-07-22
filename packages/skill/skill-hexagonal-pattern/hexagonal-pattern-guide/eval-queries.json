@@ -66,32 +66,32 @@
     "split": "validation"
   },
   {
-    "query": "In a CMakeLists.txt for an executable target named `app`, add the fmt formatting library as a source dependency fetched from https://github.com/fmtlib/fmt.git at version 10.1.1, and link it to `app`. Show the CMake code.",
-    "rationale": "near miss owned by cmake-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
-    "query": "I have a Terraform config that creates private subnets, one per availability zone, from a variable list of AZs. Right now removing a single AZ from the middle of the list forces Terraform to recreate several unrelated subnets. Write the resource and any supporting locals so this stops happening.",
-    "rationale": "near miss owned by terraform-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
     "query": "design a plugin registry so new storage backends register themselves and the core never imports them",
     "rationale": "near miss owned by microkernel-pattern-guide",
     "should_trigger": false,
-    "split": "validation"
+    "split": "train"
   },
   {
-    "query": "walk me through red-green-refactor on this shopping-cart total function",
-    "rationale": "near miss owned by tdd-guide",
+    "query": "our internal/ dir has grown into a mess — there's a sandbox folder, a sandboxutil folder next to it, and nix code buried three levels deep; reorganize it so it stops feeling like spaghetti",
+    "rationale": "near miss owned by orthogonal-pattern-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "how do I get the business and developers speaking the same vocabulary that also shows up in the code?",
+    "rationale": "near miss owned by ddd-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "In a Remotion project running at 30fps, write a React component that fades a headline in from opacity 0 to 1 over the first half second and slides it up 40px at the same time. Give me the full component code.",
-    "rationale": "near miss owned by remotion-guide",
+    "query": "I have a log file with about 20 million lines already loaded as an array of strings in JavaScript. Write a function that keeps only the ERROR lines, extracts the timestamp from each, and returns the first 10. Explain any performance concerns.",
+    "rationale": "near miss owned by fp-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "We have a notification service in Go that currently sends messages over email, SMS, and push. We keep having to touch the sending code every time a new channel is added. Sketch a design that lets us add new channels later without rewriting the sender, and show the sending function's signature.",
+    "rationale": "near miss owned by microkernel-pattern-guide",
     "should_trigger": false,
     "split": "validation"
   }

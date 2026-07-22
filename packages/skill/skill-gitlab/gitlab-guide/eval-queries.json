@@ -96,26 +96,26 @@
     "rationale": "near-miss: PR description craft, use pull-request-guide"
   },
   {
-    "query": "open a pull request against main with reviewers and a label using the gh CLI",
-    "rationale": "near miss owned by github-guide",
+    "query": "how should I mark a review comment so the author knows it must be fixed before merge?",
+    "rationale": "near miss owned by code-review-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "link Azure Boards work item 381 to the pull request and preserve both native references",
-    "rationale": "near miss owned by azure-devops-guide",
-    "should_trigger": false,
-    "split": "validation"
-  },
-  {
-    "query": "require a Bitbucket Cloud pipeline status before merge and prove a spoofed status cannot satisfy it",
-    "rationale": "near miss owned by bitbucket-guide",
-    "should_trigger": false,
-    "split": "validation"
-  },
-  {
     "query": "ship this",
     "rationale": "near miss owned by git-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "help me write a good pull request description for this change",
+    "rationale": "near miss owned by pull-request-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "open a pull request against main with reviewers and a label using the gh CLI",
+    "rationale": "near miss owned by github-guide",
     "should_trigger": false,
     "split": "validation"
   }

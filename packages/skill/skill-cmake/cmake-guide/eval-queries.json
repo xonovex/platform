@@ -48,14 +48,8 @@
     "split": "validation"
   },
   {
-    "query": "I have a Hono app configured with `app.use('*', cors())`. Write a Vitest test that verifies the CORS preflight (OPTIONS) request to `/api/users` with an Origin header succeeds and that the Access-Control-Allow-Origin header is returned.",
-    "rationale": "near miss owned by vitest-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
-    "query": "add proper types to the response shape in src/api/users.ts so the consumer doesn't have to cast",
-    "rationale": "near miss owned by typescript-guide",
+    "query": "our codebase has #ifdef _WIN32 / #ifdef __linux__ branches in basically every source file and adding macOS means touching all of them — how do we restructure so the platform stuff lives in one place",
+    "rationale": "near miss owned by cross-platform-guide",
     "should_trigger": false,
     "split": "train"
   },
@@ -72,26 +66,32 @@
     "split": "train"
   },
   {
-    "query": "Write an async Python function fetch_all(urls) that retrieves the body of each URL over HTTP and returns them as a list. The URLs are independent of one another and there may be dozens of them.",
-    "rationale": "near miss owned by python-guide",
+    "query": "publish this package to npm",
+    "rationale": "near miss owned by npm-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "In a Remotion project running at 30fps, write a React component that fades a headline in from opacity 0 to 1 over the first half second and slides it up 40px at the same time. Give me the full component code.",
-    "rationale": "near miss owned by remotion-guide",
+    "query": "I need to find connected gamepads on Linux and read their button presses — how do I enumerate /dev/input and tell a controller apart from a keyboard",
+    "rationale": "near miss owned by cross-platform-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "quick pre-merge sanity check: after the strict mode change under `work/strict-mode/`, a clean checkout behaves differently from my local run. What Shell Scripting-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "rationale": "near miss owned by shell-scripting-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "publish this package to npm",
+    "query": "quick pre-merge sanity check: after the module definition change under `work/module-definition/`, a clean checkout behaves differently from my local run. What Terraform-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "rationale": "near miss owned by terraform-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "ship this package to the registry and skip it if already published",
     "rationale": "near miss owned by npm-guide",
-    "should_trigger": false,
-    "split": "validation"
-  },
-  {
-    "query": "Using Zod 4, write a TypeScript schema named UserSchema for a user object with these fields: an id that is a UUID, an email address, a createdAt that is an ISO datetime string, and a name string between 1 and 100 characters. Also export the inferred TypeScript type.",
-    "rationale": "near miss owned by zod-guide",
     "should_trigger": false,
     "split": "validation"
   }

@@ -48,50 +48,50 @@
     "split": "validation"
   },
   {
-    "query": "I have a Hono app configured with `app.use('*', cors())`. Write a Vitest test that verifies the CORS preflight (OPTIONS) request to `/api/users` with an Origin header succeeds and that the Access-Control-Allow-Origin header is returned.",
-    "rationale": "near miss owned by vitest-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
     "query": "Write a production Dockerfile for a Node.js 22 web service that builds TypeScript with `npm run build` and serves on port 3000. Keep the final image as small and secure as reasonably possible.",
     "rationale": "near miss owned by docker-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "Design a PostgreSQL table for meeting-room reservations. Each reservation has a room, a start time, and an end time. The database itself must guarantee that two reservations for the same room can never overlap in time. Write the CREATE TABLE statement.",
-    "rationale": "near miss owned by sql-postgresql-guide",
+    "query": "In a GitOps repo I have a base/ directory with a Deployment and Service. Write a Kustomize base kustomization.yaml plus a production overlay kustomization.yaml that changes the namespace to production, applies a replica-count patch file, and sets shared labels on all resources. Use current Kustomize v5 syntax.",
+    "rationale": "near miss owned by kubernetes-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "Write an Express 5 + TypeScript login route handler. It should look up the user by email, verify the submitted password against the stored hash, and on success return a signed JWT the client will send on future API requests.",
-    "rationale": "near miss owned by expressjs-guide",
+    "query": "Write a portable shell script that must run under dash and busybox sh, not just bash. It should verify that jq is installed, take a filename as its first argument, and abort early on any error or unset variable.",
+    "rationale": "near miss owned by shell-scripting-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "In a Remotion project running at 30fps, write a React component that fades a headline in from opacity 0 to 1 over the first half second and slides it up 40px at the same time. Give me the full component code.",
-    "rationale": "near miss owned by remotion-guide",
+    "query": "I have a Terraform config that creates private subnets, one per availability zone, from a variable list of AZs. Right now removing a single AZ from the middle of the list forces Terraform to recreate several unrelated subnets. Write the resource and any supporting locals so this stops happening.",
+    "rationale": "near miss owned by terraform-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "I'm writing TypeScript that compiles to Lua with the typescript-to-lua transpiler. Write a `divmod` function that takes two numbers and returns both the quotient (floored) and the remainder so the generated Lua uses native Lua multiple return values rather than an array or object wrapper. Include a call site that consumes both values.",
-    "rationale": "near miss owned by typescript-to-lua-guide",
+    "query": "quick pre-merge sanity check: after the security change under `work/security/`, a clean checkout behaves differently from my local run. What Docker-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "rationale": "near miss owned by docker-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "quick pre-merge sanity check: after the configmaps secrets change under `work/configmaps-secrets/`, a clean checkout behaves differently from my local run. What Kubernetes-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "rationale": "near miss owned by kubernetes-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "Write a Lua 5.4 function `load_config(path)` that opens the file at `path`, reads all of it, and returns the parsed contents. Show how a caller would use it when the file might not exist, falling back to a default config instead of crashing.",
-    "rationale": "near miss owned by lua-guide",
+    "query": "quick pre-merge sanity check: after the strict mode change under `work/strict-mode/`, a clean checkout behaves differently from my local run. What Shell Scripting-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "rationale": "near miss owned by shell-scripting-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "I have a Rectangle class with mutable width and height and setWidth/setHeight methods. I now need a Square type in the same system. What's the cleanest way to model Square given I already have Rectangle?",
-    "rationale": "near miss owned by oop-guide",
+    "query": "quick pre-merge sanity check: after the module definition change under `work/module-definition/`, a clean checkout behaves differently from my local run. What Terraform-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "rationale": "near miss owned by terraform-guide",
     "should_trigger": false,
     "split": "validation"
   }

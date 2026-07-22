@@ -102,26 +102,26 @@
     "rationale": "validation positive: input as a backend behind the input-source interface -> input-devices.md + platform-abstraction-layer.md"
   },
   {
-    "query": "help me run a three amigos session and write Given-When-Then scenarios for the checkout story before we code",
-    "rationale": "near miss owned by bdd-guide",
+    "query": "our renderer hand-writes a barrier before and after every pass and it breaks every time we reorder passes — I want passes to just declare what they read and write and have ordering and transitions figured out for us",
+    "rationale": "near miss owned by gpu-rendering-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "In a Remotion project running at 30fps, write a React component that fades a headline in from opacity 0 to 1 over the first half second and slides it up 40px at the same time. Give me the full component code.",
-    "rationale": "near miss owned by remotion-guide",
+    "query": "give me the exact VkImageMemoryBarrier2 with srcStageMask/srcAccessMask and dstStageMask/dstAccessMask plus the oldLayout/newLayout for reading a color attachment as a sampled texture, and the vkCmdPipelineBarrier2 call",
+    "rationale": "near miss owned by gpu-rendering-vulkan-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "our renderer hand-writes a barrier before and after every pass and it breaks every time we reorder passes — I want passes to just declare what they read and write and have ordering and transitions figured out for us",
-    "rationale": "near miss owned by gpu-rendering-guide",
+    "query": "In a CMakeLists.txt for an executable target named `app`, add the fmt formatting library as a source dependency fetched from https://github.com/fmtlib/fmt.git at version 10.1.1, and link it to `app`. Show the CMake code.",
+    "rationale": "near miss owned by cmake-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "decouple my domain logic from Postgres so I can swap the database without rewriting business rules",
-    "rationale": "near miss owned by hexagonal-pattern-guide",
+    "query": "I need to add a SIMD variant of my vec3_dot in lib/math/vec3.c — the rest of the project uses _sse4 and _avx2 suffixes",
+    "rationale": "near miss owned by c99-opinionated-guide",
     "should_trigger": false,
     "split": "validation"
   }

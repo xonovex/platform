@@ -48,50 +48,50 @@
     "split": "validation"
   },
   {
-    "query": "I need to add a SIMD variant of my vec3_dot in lib/math/vec3.c — the rest of the project uses _sse4 and _avx2 suffixes",
-    "rationale": "near miss owned by c99-opinionated-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
-    "query": "I'm writing TypeScript that compiles to Lua with the typescript-to-lua transpiler. Write a `divmod` function that takes two numbers and returns both the quotient (floored) and the remainder so the generated Lua uses native Lua multiple return values rather than an array or object wrapper. Include a call site that consumes both values.",
-    "rationale": "near miss owned by typescript-to-lua-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
-    "query": "I'm deploying a Hono API to a serverless edge runtime where cold-start latency is the dominant cost. Show me how to construct the Hono application instance, choosing the most appropriate router for this deployment, and briefly explain why.",
-    "rationale": "near miss owned by hono-opinionated-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
     "query": "Set up the compiler configuration (CMake) for a C99 library target named `netcodec` that calls `readlink` and `strnlen`. Configure it for strict ISO C99, treat warnings as errors with `-Wall -Wextra`, and make sure it still compiles cleanly even though the code uses partial designated initializers like `(cfg_t){ .port = 8080 }` throughout.",
     "rationale": "near miss owned by c99-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "Write a Lua 5.4 function `load_config(path)` that opens the file at `path`, reads all of it, and returns the parsed contents. Show how a caller would use it when the file might not exist, falling back to a default config instead of crashing.",
-    "rationale": "near miss owned by lua-guide",
+    "query": "in our level editor clicking on a character that's GPU-skinned never selects it because we ray-cast against physics shapes and skinned meshes have none — how should we figure out what's under the cursor",
+    "rationale": "near miss owned by editor-viewport-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "I have a Terraform config that creates private subnets, one per availability zone, from a variable list of AZs. Right now removing a single AZ from the middle of the list forces Terraform to recreate several unrelated subnets. Write the resource and any supporting locals so this stops happening.",
-    "rationale": "near miss owned by terraform-guide",
+    "query": "make our particle system stop calling malloc per particle — hand it a buffer it just fills",
+    "rationale": "near miss owned by memory-management-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "our particle simulator stalls when we have 50k particles — the update loop reads position and velocity out of a fat 96-byte struct, can you restructure it for cache efficiency",
+    "rationale": "near miss owned by data-oriented-design-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "quick pre-merge sanity check: after the designated initializers change under `work/designated-initializers/`, a clean checkout behaves differently from my local run. What C99-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "rationale": "near miss owned by c99-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "my translate gizmo jumps to the cursor on the first frame of the drag and our math divides by something that's basically zero when the handle points toward the camera",
+    "rationale": "near miss owned by editor-viewport-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "respond like a caveman from now on",
-    "rationale": "near miss owned by caveman",
+    "query": "design the buffer-ownership convention for our parser so there are no leaks on error paths",
+    "rationale": "near miss owned by memory-management-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "add proper types to the response shape in src/api/users.ts so the consumer doesn't have to cast",
-    "rationale": "near miss owned by typescript-guide",
+    "query": "profile why the broad-phase is slow — I suspect we're missing cache constantly but want to confirm before changing the layout",
+    "rationale": "near miss owned by data-oriented-design-guide",
     "should_trigger": false,
     "split": "validation"
   }

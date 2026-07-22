@@ -108,16 +108,10 @@
     "rationale": "near-miss: GPU frame graph -> gpu-rendering-guide, not networking"
   },
   {
-    "query": "I have a Terraform config that creates private subnets, one per availability zone, from a variable list of AZs. Right now removing a single AZ from the middle of the list forces Terraform to recreate several unrelated subnets. Write the resource and any supporting locals so this stops happening.",
-    "rationale": "near miss owned by terraform-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
     "query": "I'm building the core document store for our level editor — objects of different kinds each with a set of named properties, and I want to add new object types at runtime without recompiling. How should the type/property schema work?",
     "rationale": "near miss owned by data-model-guide",
     "should_trigger": false,
-    "split": "validation"
+    "split": "train"
   },
   {
     "query": "I'm building an ECS and can't decide how to store components — should each entity own its components or should I group entities by which components they have?",
@@ -126,8 +120,14 @@
     "split": "validation"
   },
   {
-    "query": "In an Astro page I already have static content. Add two React components: a `<NewsletterSignup />` in the page footer that should only become interactive once the user scrolls it into view, and a `<ThemeToggle />` that reads `window.localStorage` on mount and therefore must not be server-rendered at all. Show the page frontmatter and markup with the correct hydration for each.",
-    "rationale": "near miss owned by astro-guide",
+    "query": "our particle simulator stalls when we have 50k particles — the update loop reads position and velocity out of a fat 96-byte struct, can you restructure it for cache efficiency",
+    "rationale": "near miss owned by data-oriented-design-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "I want artists to build effects by dragging boxes onto a canvas and connecting their inputs and outputs with wires instead of writing code — how should I structure the thing they're editing",
+    "rationale": "near miss owned by node-graph-guide",
     "should_trigger": false,
     "split": "validation"
   }

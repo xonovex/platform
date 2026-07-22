@@ -108,26 +108,26 @@
     "rationale": "validation negative: concrete Vulkan barrier how-to -> gpu-rendering-vulkan-guide, not the viewport seam"
   },
   {
-    "query": "Using vanilla Three.js, set up a WebGLRenderer and a render loop that spins a cube smoothly. It must keep a consistent rotation speed regardless of frame rate and stay crisp on high-DPI / retina displays. Give me the renderer setup and the loop.",
-    "rationale": "near miss owned by threejs-guide",
+    "query": "our renderer hand-writes a barrier before and after every pass and it breaks every time we reorder passes — I want passes to just declare what they read and write and have ordering and transitions figured out for us",
+    "rationale": "near miss owned by gpu-rendering-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "how do I get the business and developers speaking the same vocabulary that also shows up in the code?",
-    "rationale": "near miss owned by ddd-guide",
+    "query": "I'm building the core document store for our level editor — objects of different kinds each with a set of named properties, and I want to add new object types at runtime without recompiling. How should the type/property schema work?",
+    "rationale": "near miss owned by data-model-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "In a Remotion project running at 30fps, write a React component that fades a headline in from opacity 0 to 1 over the first half second and slides it up 40px at the same time. Give me the full component code.",
-    "rationale": "near miss owned by remotion-guide",
+    "query": "I'm writing a small C99 physics engine. Define a rigid body struct and a function that applies a linear impulse to it. It must correctly handle both dynamic bodies and immovable/static bodies.",
+    "rationale": "near miss owned by c99-game-opinionated-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "make our particle system stop calling malloc per particle — hand it a buffer it just fills",
-    "rationale": "near miss owned by memory-management-guide",
+    "query": "I'm building an ECS and can't decide how to store components — should each entity own its components or should I group entities by which components they have?",
+    "rationale": "near miss owned by ecs-guide",
     "should_trigger": false,
     "split": "validation"
   }

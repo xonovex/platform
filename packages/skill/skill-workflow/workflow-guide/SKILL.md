@@ -1,6 +1,6 @@
 ---
 name: workflow-guide
-description: "Use when selecting, composing, executing, or explaining stage-neutral workflow operations and workspace utilities across independent kind, perspective, method, capability, trigger, executor, provider, reference, revision, criteria, and result dimensions. Triggers on create, review, revise, decide, execute, validate, publish, abandon, provider-native destinations, inline results, workspace lifecycle, operation ordering, or questions about which workflow operation fits, even when the user doesn't say 'workflow architecture'."
+description: "Use when a task explicitly needs a stage-neutral operation contract, independent operation composition, provider-native subject/result references, separation of invocation from execution, or an isolated workflow workspace. Triggers on choosing among the create/review/revise/decide/execute/validate/publish/abandon operation contracts, preserving opaque references and revisions, returning inline versus persisted results, composing operations without lifecycle assumptions, or explicitly creating, merging, abandoning, or cleaning a workflow workspace, even when the user doesn't say 'workflow architecture'."
 ---
 
 # Symmetric Workflow Operations

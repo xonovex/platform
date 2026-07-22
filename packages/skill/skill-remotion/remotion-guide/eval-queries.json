@@ -48,6 +48,12 @@
     "split": "validation"
   },
   {
+    "query": "In a React + TypeScript app, create a reusable component that fades and slides its children upward into view when it first mounts, using the Motion animation library. Show the full component code.",
+    "rationale": "near miss owned by motion-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
     "query": "make this client component server-rendered if possible — it's just fetching the user's recent orders",
     "rationale": "near miss owned by react-guide",
     "should_trigger": false,
@@ -60,38 +66,32 @@
     "split": "train"
   },
   {
-    "query": "I have a Hono app configured with `app.use('*', cors())`. Write a Vitest test that verifies the CORS preflight (OPTIONS) request to `/api/users` with an Origin header succeeds and that the Access-Control-Allow-Origin header is returned.",
-    "rationale": "near miss owned by vitest-guide",
+    "query": "Using vanilla Three.js, set up a WebGLRenderer and a render loop that spins a cube smoothly. It must keep a consistent rotation speed regardless of frame rate and stay crisp on high-DPI / retina displays. Give me the renderer setup and the loop.",
+    "rationale": "near miss owned by threejs-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "In a Hono API running on Node with @hono/node-server, add a WebSocket endpoint at /ws/chat that echoes each incoming message back to the sender. Show both the server bootstrap code and the route definition.",
-    "rationale": "near miss owned by hono-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
-    "query": "We're on moonrepo 2.0. I want to enable and configure one of Moon's built-in extensions in our workspace. Which config file does the extension configuration go in, and show me a minimal example of the config block.",
-    "rationale": "near miss owned by moon-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
-    "query": "In a React + TypeScript app, create a reusable component that fades and slides its children upward into view when it first mounts, using the Motion animation library. Show the full component code.",
+    "query": "quick pre-merge sanity check: after the gestures change under `work/gestures/`, a clean checkout behaves differently from my local run. What Motion-specific assumption could cause that? Show the correction and the exact narrow validation.",
     "rationale": "near miss owned by motion-guide",
     "should_trigger": false,
-    "split": "validation"
+    "split": "train"
   },
   {
-    "query": "add proper types to the response shape in src/api/users.ts so the consumer doesn't have to cast",
-    "rationale": "near miss owned by typescript-guide",
+    "query": "this 'use client' boundary in profile/edit shouldn't extend to the avatar picker — split it",
+    "rationale": "near miss owned by react-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "I'm writing TypeScript that compiles to Lua with the typescript-to-lua transpiler. Write a `divmod` function that takes two numbers and returns both the quotient (floored) and the remainder so the generated Lua uses native Lua multiple return values rather than an array or object wrapper. Include a call site that consumes both values.",
-    "rationale": "near miss owned by typescript-to-lua-guide",
+    "query": "quick pre-merge sanity check: after the mini notation change under `work/mini-notation/`, a clean checkout behaves differently from my local run. What Strudel-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "rationale": "near miss owned by strudel-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "quick pre-merge sanity check: after the textures change under `work/textures/`, a clean checkout behaves differently from my local run. What Threejs-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "rationale": "near miss owned by threejs-guide",
     "should_trigger": false,
     "split": "validation"
   }

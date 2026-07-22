@@ -78,6 +78,12 @@
     "split": "validation"
   },
   {
+    "query": "make this Compose screen accessible for TalkBack",
+    "rationale": "near miss owned by android-wcag-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
     "query": "build a threat-informed security assurance plan with exact control and evidence ownership",
     "rationale": "near miss owned by security-assurance-guide",
     "should_trigger": false,
@@ -86,12 +92,6 @@
   {
     "query": "classify our AI-system role and applicable obligations before selecting a regulated profile",
     "rationale": "near miss owned by ai-governance-guide",
-    "should_trigger": false,
-    "split": "validation"
-  },
-  {
-    "query": "link Azure Boards work item 381 to the pull request and preserve both native references",
-    "rationale": "near miss owned by azure-devops-guide",
     "should_trigger": false,
     "split": "validation"
   }

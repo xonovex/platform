@@ -48,50 +48,50 @@
     "split": "validation"
   },
   {
+    "query": "We just wrapped a debugging session where I made a couple of mistakes and had to correct course. Capture the development lessons from this session and save each one as its own file so a future agent can reuse it. Show me exactly what one of those files should contain.",
+    "rationale": "near miss owned by reflect-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
     "query": "respond like a caveman from now on",
     "rationale": "near miss owned by caveman",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "We're on moonrepo 2.0. I want to enable and configure one of Moon's built-in extensions in our workspace. Which config file does the extension configuration go in, and show me a minimal example of the config block.",
-    "rationale": "near miss owned by moon-guide",
+    "query": "Our TypeScript HTTP framework docs site at https://acme.dev has getting-started, API reference, routing, and middleware pages, plus a changelog and a migration guide that are only occasionally relevant. Write the llms.txt file we should serve.",
+    "rationale": "near miss owned by llmstxt-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "assess this exact web release against WCAG 2.2 AA and publish reviewable evidence",
-    "rationale": "near miss owned by accessibility-guide",
+    "query": "this packages/auth dir doesn't have an AGENTS.md yet — set one up",
+    "rationale": "near miss owned by instruction-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "In an Astro page I already have static content. Add two React components: a `<NewsletterSignup />` in the page footer that should only become interactive once the user scrolls it into view, and a `<ThemeToggle />` that reads `window.localStorage` on mount and therefore must not be server-rendered at all. Show the page frontmatter and markup with the correct hydration for each.",
-    "rationale": "near miss owned by astro-guide",
+    "query": "A review comment on `work/governed-promotion/` says the governed promotion change handles the normal fixture but leaves the failure path undefined. For this Reflect task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
+    "rationale": "near miss owned by reflect-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "Write a Lua 5.4 function `load_config(path)` that opens the file at `path`, reads all of it, and returns the parsed contents. Show how a caller would use it when the file might not exist, falling back to a default config instead of crashing.",
-    "rationale": "near miss owned by lua-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
-    "query": "In a CMakeLists.txt for an executable target named `app`, add the fmt formatting library as a source dependency fetched from https://github.com/fmtlib/fmt.git at version 10.1.1, and link it to `app`. Show the CMake code.",
-    "rationale": "near miss owned by cmake-guide",
+    "query": "Respond like a caveman. Does `git reset --soft HEAD~1` keep my staged changes or throw them away, and what is the exact command to undo the last commit while keeping everything staged?",
+    "rationale": "near miss owned by caveman",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "Our TypeScript HTTP framework docs site at https://acme.dev has getting-started, API reference, routing, and middleware pages, plus a changelog and a migration guide that are only occasionally relevant. Write the llms.txt file we should serve.",
+    "query": "quick pre-merge sanity check: after the markdown mirrors change under `work/markdown-mirrors/`, a clean checkout behaves differently from my local run. What Llmstxt-specific assumption could cause that? Show the correction and the exact narrow validation.",
     "rationale": "near miss owned by llmstxt-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "Write a Strudel.cc live-coding snippet for a driving techno groove at 130 BPM. Include a four-on-the-floor kick, an offbeat clap, and closed hi-hats layered together.",
-    "rationale": "near miss owned by strudel-guide",
+    "query": "the new microservice doesn't have project instructions yet — generate one based on what's in src/",
+    "rationale": "near miss owned by instruction-guide",
     "should_trigger": false,
     "split": "validation"
   }

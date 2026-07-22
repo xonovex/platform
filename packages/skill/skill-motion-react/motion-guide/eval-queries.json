@@ -48,14 +48,14 @@
     "split": "validation"
   },
   {
-    "query": "make this client component server-rendered if possible — it's just fetching the user's recent orders",
-    "rationale": "near miss owned by react-guide",
+    "query": "In a Remotion project running at 30fps, write a React component that fades a headline in from opacity 0 to 1 over the first half second and slides it up 40px at the same time. Give me the full component code.",
+    "rationale": "near miss owned by remotion-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "In a Remotion project running at 30fps, write a React component that fades a headline in from opacity 0 to 1 over the first half second and slides it up 40px at the same time. Give me the full component code.",
-    "rationale": "near miss owned by remotion-guide",
+    "query": "make this client component server-rendered if possible — it's just fetching the user's recent orders",
+    "rationale": "near miss owned by react-guide",
     "should_trigger": false,
     "split": "train"
   },
@@ -72,26 +72,26 @@
     "split": "train"
   },
   {
-    "query": "In a Hono API running on Node with @hono/node-server, add a WebSocket endpoint at /ws/chat that echoes each incoming message back to the sender. Show both the server bootstrap code and the route definition.",
-    "rationale": "near miss owned by hono-guide",
+    "query": "quick pre-merge sanity check: after the sequencing change under `work/sequencing/`, a clean checkout behaves differently from my local run. What Remotion-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "rationale": "near miss owned by remotion-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "add proper types to the response shape in src/api/users.ts so the consumer doesn't have to cast",
-    "rationale": "near miss owned by typescript-guide",
+    "query": "this 'use client' boundary in profile/edit shouldn't extend to the avatar picker — split it",
+    "rationale": "near miss owned by react-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "Write an Express 5 + TypeScript login route handler. It should look up the user by email, verify the submitted password against the stored hash, and on success return a signed JWT the client will send on future API requests.",
-    "rationale": "near miss owned by expressjs-guide",
+    "query": "The clean Linux CI job fails only for the minimal content collections fixture under `work/content-collections/`, while the full local fixture passes. Trace the Astro-specific boundary that could cause the difference, then propose a patch and a regression check.",
+    "rationale": "near miss owned by astro-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "Using Zod 4, write a TypeScript schema named UserSchema for a user object with these fields: an id that is a UUID, an email address, a createdAt that is an ISO datetime string, and a name string between 1 and 100 characters. Also export the inferred TypeScript type.",
-    "rationale": "near miss owned by zod-guide",
+    "query": "quick pre-merge sanity check: after the mini notation change under `work/mini-notation/`, a clean checkout behaves differently from my local run. What Strudel-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "rationale": "near miss owned by strudel-guide",
     "should_trigger": false,
     "split": "validation"
   }

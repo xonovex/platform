@@ -84,20 +84,20 @@
     "rationale": "near-miss: coupling theory behind Independent is owned by connascence-guide"
   },
   {
-    "query": "We're on moonrepo 2.0. I want to enable and configure one of Moon's built-in extensions in our workspace. Which config file does the extension configuration go in, and show me a minimal example of the config block.",
-    "rationale": "near miss owned by moon-guide",
+    "query": "help me run a three amigos session and write Given-When-Then scenarios for the checkout story before we code",
+    "rationale": "near miss owned by bdd-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "add proper types to the response shape in src/api/users.ts so the consumer doesn't have to cast",
-    "rationale": "near miss owned by typescript-guide",
+    "query": "we're adopting FDD — what are the five processes and which run once vs per feature set?",
+    "rationale": "near miss owned by fdd-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "publish this package to npm",
-    "rationale": "near miss owned by npm-guide",
+    "query": "I have a Hono app configured with `app.use('*', cors())`. Write a Vitest test that verifies the CORS preflight (OPTIONS) request to `/api/users` with an Origin header succeeds and that the Access-Control-Allow-Origin header is returned.",
+    "rationale": "near miss owned by vitest-guide",
     "should_trigger": false,
     "split": "validation"
   }

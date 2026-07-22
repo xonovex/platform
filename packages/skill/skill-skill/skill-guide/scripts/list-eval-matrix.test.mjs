@@ -1,3 +1,5 @@
+import {readFileSync} from "node:fs";
+import {resolve} from "node:path";
 import {describe, expect, it} from "vitest";
 import {selectEvalMatrix} from "./list-eval-matrix.mjs";
 
@@ -37,5 +39,21 @@ describe("selectEvalMatrix", () => {
         offset: 3,
       }),
     ).toEqual([entries[3], entries[0]]);
+  });
+
+  it("wires scheduled runs to a bounded 12-skill rotation", () => {
+    const workflow = readFileSync(
+      resolve(
+        import.meta.dirname,
+        "../../../../../.github/workflows/skill-evals.yml",
+      ),
+      "utf8",
+    );
+
+    expect(workflow).toMatch(
+      /GITHUB_EVENT_NAME\}" == "schedule" \|\| \( "\$\{GITHUB_EVENT_NAME\}" == "workflow_dispatch" && "\$\{DISPATCH_SCOPE\}" == "rotated" \)/,
+    );
+    expect(workflow).toContain("limit=12");
+    expect(workflow).toContain('offset="$((10#$(date -u +%m) * 12))"');
   });
 });

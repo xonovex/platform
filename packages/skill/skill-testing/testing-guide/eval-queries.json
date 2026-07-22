@@ -84,14 +84,14 @@
     "rationale": "near-miss: classical-vs-mockist as a development/design style is owned by tdd-guide"
   },
   {
-    "query": "track a screen view when this ViewModel loads",
-    "rationale": "near miss owned by android-analytics-guide",
+    "query": "these two modules feel way too tightly coupled — tell me concretely what kind of coupling it is and how to loosen the worst part",
+    "rationale": "near miss owned by connascence-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "I have a Hono app configured with `app.use('*', cors())`. Write a Vitest test that verifies the CORS preflight (OPTIONS) request to `/api/users` with an Origin header succeeds and that the Access-Control-Allow-Origin header is returned.",
-    "rationale": "near miss owned by vitest-guide",
+    "query": "walk me through red-green-refactor on this shopping-cart total function",
+    "rationale": "near miss owned by tdd-guide",
     "should_trigger": false,
     "split": "validation"
   }

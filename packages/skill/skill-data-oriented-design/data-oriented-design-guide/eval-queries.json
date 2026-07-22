@@ -102,14 +102,14 @@
     "rationale": "validation positive: statistics-recording returned-accumulator-pointer pattern, lazy history"
   },
   {
-    "query": "Write an async Python function fetch_all(urls) that retrieves the body of each URL over HTTP and returns them as a list. The URLs are independent of one another and there may be dozens of them.",
-    "rationale": "near miss owned by python-guide",
+    "query": "make our particle system stop calling malloc per particle — hand it a buffer it just fills",
+    "rationale": "near miss owned by memory-management-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "I have a Rectangle class with mutable width and height and setWidth/setHeight methods. I now need a Square type in the same system. What's the cleanest way to model Square given I already have Rectangle?",
-    "rationale": "near miss owned by oop-guide",
+    "query": "I need to add a SIMD variant of my vec3_dot in lib/math/vec3.c — the rest of the project uses _sse4 and _avx2 suffixes",
+    "rationale": "near miss owned by c99-opinionated-guide",
     "should_trigger": false,
     "split": "validation"
   }

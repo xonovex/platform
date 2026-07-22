@@ -16,11 +16,7 @@
 description: Process CSV files.
 
 # After
-description: >
-  Analyze CSV and tabular data — summary stats, derived columns, charts,
-  cleaning. Use when the user has a CSV / TSV / Excel file and wants to
-  explore, transform, or visualize it, even when they don't say "CSV"
-  or "analysis."
+description: "Use when analyzing CSV and tabular data through summary statistics, derived columns, charts, or cleaning. Triggers on CSV, TSV, Excel, tables, columns, data exploration, transformation, or visualization, even when the user doesn't say 'CSV' or 'analysis'."
 ```
 
 ## Gotchas

@@ -4,7 +4,10 @@ import {parseCliArgs} from "@xonovex/script-moon-common";
 import {boundedBatches} from "@xonovex/script-moon-common/batches";
 import {resolveExecutable} from "@xonovex/script-moon-common/executable";
 import {resolveClaudePluginDirectories} from "@xonovex/script-moon-common/fs";
-import {buildRoutingScenarios} from "./routing-catalog.js";
+import {
+  buildRoutingScenarios,
+  type RoutingScenario,
+} from "./routing-catalog.js";
 import {
   checkCodexTriggered,
   checkTriggered,
@@ -61,6 +64,78 @@ interface RoutingRecord {
   readonly pass: boolean;
 }
 
+interface RoutingContext {
+  readonly budget: number;
+  readonly executable: string;
+  readonly harness: "claude" | "codex";
+  readonly model: string;
+  readonly runs: number;
+  readonly threshold: number;
+}
+
+interface RoutingFailure {
+  readonly error: string;
+}
+
+const evaluateScenario = async (
+  scenario: RoutingScenario,
+  context: RoutingContext,
+): Promise<RoutingRecord | RoutingFailure> => {
+  const candidateNames = scenario.candidates.map(({shortName}) => shortName);
+  const target = scenario.expectedSkill;
+  const targetGuide = scenario.candidates.find(
+    ({shortName}) => shortName === target,
+  );
+  if (targetGuide === undefined) throw new Error(`owner missing: ${target}`);
+
+  const args =
+    context.harness === "claude"
+      ? buildTriggerClaudeArgs({
+          model: context.model,
+          budget: context.budget,
+          pluginDirectories: unique(
+            scenario.candidates.flatMap(({pluginDirectory}) =>
+              resolveClaudePluginDirectories(pluginDirectory),
+            ),
+          ),
+        })
+      : buildTriggerCodexArgs({model: context.model});
+  let ownerSelections = 0;
+  for (let runIndex = 0; runIndex < context.runs; runIndex += 1) {
+    const outcome: TriggerOutcome =
+      context.harness === "claude"
+        ? await checkTriggered(
+            scenario.query,
+            args,
+            target,
+            target,
+            context.executable,
+          )
+        : await checkCodexTriggered({
+            args,
+            executable: context.executable,
+            guideDirectory: targetGuide.guideDirectory,
+            query: scenario.query,
+            shortName: target,
+            candidateGuides: scenario.candidates,
+          });
+    if (outcome.error !== null) return {error: outcome.error};
+    if (outcome.triggered) ownerSelections += 1;
+  }
+
+  const selectionRate = ownerSelections / context.runs;
+  return {
+    query: scenario.query,
+    split: scenario.split,
+    expected_skill: target,
+    candidate_skills: candidateNames,
+    owner_selections: ownerSelections,
+    runs: context.runs,
+    selection_rate: Math.round(selectionRate * 1000) / 1000,
+    pass: selectionRate >= context.threshold,
+  };
+};
+
 export const main = async (argv: readonly string[]): Promise<number> => {
   const {values, positionals} = parseCliArgs(cliDefinition, argv);
   if (positionals.length > 1) {
@@ -78,9 +153,7 @@ export const main = async (argv: readonly string[]): Promise<number> => {
       `invalid harness '${harnessInput}'; expected claude or codex`,
     );
   }
-  const splitResult = parseQuerySplit(
-    (values.split as string | undefined) ?? "all",
-  );
+  const splitResult = parseQuerySplit(values.split ?? "all");
   if (!splitResult.success)
     throw new Error(`invalid split: ${splitResult.error}`);
   const optionsResult = parseTriggerOptions({
@@ -106,10 +179,10 @@ export const main = async (argv: readonly string[]): Promise<number> => {
     (scenario) =>
       splitResult.data === "all" || scenario.split === splitResult.data,
   );
-  const scenarios = splitScenarios.slice(
-    offset,
-    limit === undefined ? undefined : offset + limit,
-  );
+  const scenarios =
+    limit === undefined
+      ? splitScenarios.slice(offset)
+      : splitScenarios.slice(offset, offset + limit);
   if (scenarios.length === 0) throw new Error("no routing scenarios selected");
 
   const {batchSize, budget, runs, threshold} = optionsResult.data;
@@ -144,76 +217,32 @@ export const main = async (argv: readonly string[]): Promise<number> => {
   rmSync(summaryPath, {force: true});
   rmSync(invalidRunPath, {force: true});
 
+  const context: RoutingContext = {
+    budget,
+    executable,
+    harness,
+    model,
+    runs,
+    threshold,
+  };
   const records: RoutingRecord[] = [];
   for (const [batchIndex, batch] of batches.entries()) {
     process.stderr.write(
       `batch ${String(batchIndex + 1)}/${String(batches.length)}: ${String(batch.length)} routing scenarios\n`,
     );
     for (const scenario of batch) {
-      const candidateNames = scenario.candidates.map(
-        ({shortName}) => shortName,
-      );
-      const target = scenario.expectedSkill;
-      const targetGuide = scenario.candidates.find(
-        ({shortName}) => shortName === target,
-      );
-      if (targetGuide === undefined)
-        throw new Error(`owner missing: ${target}`);
-      const claudeArgs =
-        harness === "claude"
-          ? buildTriggerClaudeArgs({
-              model,
-              budget,
-              pluginDirectories: unique(
-                scenario.candidates.flatMap(({pluginDirectory}) =>
-                  resolveClaudePluginDirectories(pluginDirectory),
-                ),
-              ),
-            })
-          : buildTriggerCodexArgs({model});
-      let ownerSelections = 0;
-      for (let runIndex = 0; runIndex < runs; runIndex += 1) {
-        const outcome: TriggerOutcome =
-          harness === "claude"
-            ? await checkTriggered(
-                scenario.query,
-                claudeArgs,
-                target,
-                target,
-                executable,
-              )
-            : await checkCodexTriggered({
-                args: claudeArgs,
-                executable,
-                guideDirectory: targetGuide.guideDirectory,
-                query: scenario.query,
-                shortName: target,
-                candidateGuides: scenario.candidates,
-              });
-        if (outcome.error !== null) {
-          writeFileSync(
-            invalidRunPath,
-            `${JSON.stringify({query: scenario.query, error: outcome.error}, null, 2)}\n`,
-            "utf8",
-          );
-          process.stderr.write(
-            `Error: routing infrastructure failure: ${outcome.error}\n`,
-          );
-          return 2;
-        }
-        if (outcome.triggered) ownerSelections += 1;
+      const record = await evaluateScenario(scenario, context);
+      if ("error" in record) {
+        writeFileSync(
+          invalidRunPath,
+          `${JSON.stringify({query: scenario.query, error: record.error}, null, 2)}\n`,
+          "utf8",
+        );
+        process.stderr.write(
+          `Error: routing infrastructure failure: ${record.error}\n`,
+        );
+        return 2;
       }
-      const selectionRate = ownerSelections / runs;
-      const record: RoutingRecord = {
-        query: scenario.query,
-        split: scenario.split,
-        expected_skill: target,
-        candidate_skills: candidateNames,
-        owner_selections: ownerSelections,
-        runs,
-        selection_rate: Math.round(selectionRate * 1000) / 1000,
-        pass: selectionRate >= threshold,
-      };
       records.push(record);
       process.stdout.write(`${JSON.stringify(record)}\n`);
     }

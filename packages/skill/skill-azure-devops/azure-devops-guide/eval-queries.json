@@ -102,8 +102,8 @@
     "split": "validation"
   },
   {
-    "query": "create a least-privilege AWS role for CI OIDC without IAM user access keys",
-    "rationale": "near miss owned by aws-guide",
+    "query": "our self-hosted Bitbucket Data Center REST call returns 401, is this a Bearer vs Basic token problem?",
+    "rationale": "near miss owned by bitbucket-guide",
     "should_trigger": false,
     "split": "validation"
   }

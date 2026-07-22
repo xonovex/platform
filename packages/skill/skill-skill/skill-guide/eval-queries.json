@@ -84,14 +84,14 @@
     "rationale": "validation negative — near-miss, should match command-guide"
   },
   {
-    "query": "I have a Claude Code slash command at `.claude/commands/changelog.md`. Its body uses `$ARGUMENTS` for the user input and embeds git output inline with `` !`git log --oneline -20` ``. I want to port this same command to the Gemini CLI. Tell me exactly what to change and where the file goes.",
-    "rationale": "near miss owned by command-guide",
+    "query": "We just wrapped a debugging session where I made a couple of mistakes and had to correct course. Capture the development lessons from this session and save each one as its own file so a future agent can reuse it. Show me exactly what one of those files should contain.",
+    "rationale": "near miss owned by reflect-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "Research the code paths and current library versions we need before planning rate limiting for packages/api. Keep it read-only and cite the evidence.",
-    "rationale": "near miss owned by plan-guide",
+    "query": "I have a Claude Code slash command at `.claude/commands/changelog.md`. Its body uses `$ARGUMENTS` for the user input and embeds git output inline with `` !`git log --oneline -20` ``. I want to port this same command to the Gemini CLI. Tell me exactly what to change and where the file goes.",
+    "rationale": "near miss owned by command-guide",
     "should_trigger": false,
     "split": "validation"
   }

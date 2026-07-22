@@ -48,50 +48,50 @@
     "split": "validation"
   },
   {
-    "query": "these two modules feel way too tightly coupled — tell me concretely what kind of coupling it is and how to loosen the worst part",
-    "rationale": "near miss owned by connascence-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
-    "query": "Write a portable shell script that must run under dash and busybox sh, not just bash. It should verify that jq is installed, take a filename as its first argument, and abort early on any error or unset variable.",
-    "rationale": "near miss owned by shell-scripting-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
     "query": "respond like a caveman from now on",
     "rationale": "near miss owned by caveman",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "We're on moonrepo 2.0. I want to enable and configure one of Moon's built-in extensions in our workspace. Which config file does the extension configuration go in, and show me a minimal example of the config block.",
-    "rationale": "near miss owned by moon-guide",
+    "query": "We just wrapped a debugging session where I made a couple of mistakes and had to correct course. Capture the development lessons from this session and save each one as its own file so a future agent can reuse it. Show me exactly what one of those files should contain.",
+    "rationale": "near miss owned by reflect-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "this packages/auth dir doesn't have an AGENTS.md yet — set one up",
-    "rationale": "near miss owned by instruction-guide",
+    "query": "Rewrite this so it reads like a person wrote it, not an AI: 'Our platform offers a seamless, intuitive experience that empowers teams to unlock their full potential. Experts agree it's a game-changer, and studies show productivity has never been better.'",
+    "rationale": "near miss owned by content-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "I'm building the core document store for our level editor — objects of different kinds each with a set of named properties, and I want to add new object types at runtime without recompiling. How should the type/property schema work?",
-    "rationale": "near miss owned by data-model-guide",
+    "query": "Respond like a caveman. Does `git reset --soft HEAD~1` keep my staged changes or throw them away, and what is the exact command to undo the last commit while keeping everything staged?",
+    "rationale": "near miss owned by caveman",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "A review comment on `work/governed-promotion/` says the governed promotion change handles the normal fixture but leaves the failure path undefined. For this Reflect task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
+    "rationale": "near miss owned by reflect-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "A review comment on `work/humanize/` says the humanize change handles the normal fixture but leaves the failure path undefined. For this Content task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
+    "rationale": "near miss owned by content-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "walk me through red-green-refactor on this shopping-cart total function",
-    "rationale": "near miss owned by tdd-guide",
+    "query": "cut the filler, give me terse blunt answers",
+    "rationale": "near miss owned by caveman",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "I have a Terraform config that creates private subnets, one per availability zone, from a variable list of AZs. Right now removing a single AZ from the middle of the list forces Terraform to recreate several unrelated subnets. Write the resource and any supporting locals so this stops happening.",
-    "rationale": "near miss owned by terraform-guide",
+    "query": "Fold the lessons from this session into our project's AGENTS.md instructions. Explain how the reflect tooling does this by default before you run it.",
+    "rationale": "near miss owned by reflect-guide",
     "should_trigger": false,
     "split": "validation"
   }

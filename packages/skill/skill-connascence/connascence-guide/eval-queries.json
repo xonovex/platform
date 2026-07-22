@@ -66,32 +66,32 @@
     "split": "validation"
   },
   {
-    "query": "I have a Terraform config that creates private subnets, one per availability zone, from a variable list of AZs. Right now removing a single AZ from the middle of the list forces Terraform to recreate several unrelated subnets. Write the resource and any supporting locals so this stops happening.",
-    "rationale": "near miss owned by terraform-guide",
+    "query": "our internal/ dir has grown into a mess — there's a sandbox folder, a sandboxutil folder next to it, and nix code buried three levels deep; reorganize it so it stops feeling like spaghetti",
+    "rationale": "near miss owned by orthogonal-pattern-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "I have a log file with about 20 million lines already loaded as an array of strings in JavaScript. Write a function that keeps only the ERROR lines, extracts the timestamp from each, and returns the first 10. Explain any performance concerns.",
-    "rationale": "near miss owned by fp-guide",
+    "query": "how do I get the business and developers speaking the same vocabulary that also shows up in the code?",
+    "rationale": "near miss owned by ddd-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "Write an async Python function fetch_all(urls) that retrieves the body of each URL over HTTP and returns them as a list. The URLs are independent of one another and there may be dozens of them.",
-    "rationale": "near miss owned by python-guide",
+    "query": "harden the user-service module — it's full of `any` and swallowed errors, just tell me what to fix",
+    "rationale": "near miss owned by code-quality-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "Research the code paths and current library versions we need before planning rate limiting for packages/api. Keep it read-only and cite the evidence.",
-    "rationale": "near miss owned by plan-guide",
+    "query": "what's the difference between a mock, a stub, a fake, and a spy?",
+    "rationale": "near miss owned by testing-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "Write a Lua 5.4 function `load_config(path)` that opens the file at `path`, reads all of it, and returns the parsed contents. Show how a caller would use it when the file might not exist, falling back to a default config instead of crashing.",
-    "rationale": "near miss owned by lua-guide",
+    "query": "a single utils package at the repo root has become a dumping ground — every axis throws its helpers in there; how should I distribute them?",
+    "rationale": "near miss owned by orthogonal-pattern-guide",
     "should_trigger": false,
     "split": "validation"
   }

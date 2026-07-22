@@ -102,20 +102,20 @@
     "rationale": "Bitrise API account-wide personal access token auth and storage"
   },
   {
-    "query": "require a Bitbucket Cloud pipeline status before merge and prove a spoofed status cannot satisfy it",
-    "rationale": "near miss owned by bitbucket-guide",
+    "query": "Write a production Dockerfile for a Node.js 22 web service that builds TypeScript with `npm run build` and serves on port 3000. Keep the final image as small and secure as reasonably possible.",
+    "rationale": "near miss owned by docker-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "create a least-privilege AWS role for CI OIDC without IAM user access keys",
-    "rationale": "near miss owned by aws-guide",
+    "query": "In a GitOps repo I have a base/ directory with a Deployment and Service. Write a Kustomize base kustomization.yaml plus a production overlay kustomization.yaml that changes the namespace to production, applies a replica-count patch file, and sets shared labels on all resources. Use current Kustomize v5 syntax.",
+    "rationale": "near miss owned by kubernetes-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "link Azure Boards work item 381 to the pull request and preserve both native references",
-    "rationale": "near miss owned by azure-devops-guide",
+    "query": "I have a Terraform config that creates private subnets, one per availability zone, from a variable list of AZs. Right now removing a single AZ from the middle of the list forces Terraform to recreate several unrelated subnets. Write the resource and any supporting locals so this stops happening.",
+    "rationale": "near miss owned by terraform-guide",
     "should_trigger": false,
     "split": "validation"
   }

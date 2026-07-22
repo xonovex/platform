@@ -54,12 +54,6 @@
     "split": "train"
   },
   {
-    "query": "I have a Terraform config that creates private subnets, one per availability zone, from a variable list of AZs. Right now removing a single AZ from the middle of the list forces Terraform to recreate several unrelated subnets. Write the resource and any supporting locals so this stops happening.",
-    "rationale": "near miss owned by terraform-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
     "query": "add proper types to the response shape in src/api/users.ts so the consumer doesn't have to cast",
     "rationale": "near miss owned by typescript-guide",
     "should_trigger": false,
@@ -72,26 +66,32 @@
     "split": "train"
   },
   {
-    "query": "Using Zod 4, write a TypeScript schema named UserSchema for a user object with these fields: an id that is a UUID, an email address, a createdAt that is an ISO datetime string, and a name string between 1 and 100 characters. Also export the inferred TypeScript type.",
-    "rationale": "near miss owned by zod-guide",
+    "query": "Write a Lua 5.4 function `load_config(path)` that opens the file at `path`, reads all of it, and returns the parsed contents. Show how a caller would use it when the file might not exist, falling back to a default config instead of crashing.",
+    "rationale": "near miss owned by lua-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "Research the code paths and current library versions we need before planning rate limiting for packages/api. Keep it read-only and cite the evidence.",
-    "rationale": "near miss owned by plan-guide",
+    "query": "quick pre-merge sanity check: after the type checking change under `work/type-checking/`, a clean checkout behaves differently from my local run. What Python-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "rationale": "near miss owned by python-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "rewrite this string concat with template literals and pull out the magic numbers as named consts",
+    "rationale": "near miss owned by typescript-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "I have a Rectangle class with mutable width and height and setWidth/setHeight methods. I now need a Square type in the same system. What's the cleanest way to model Square given I already have Rectangle?",
-    "rationale": "near miss owned by oop-guide",
+    "query": "quick pre-merge sanity check: after the designated initializers change under `work/designated-initializers/`, a clean checkout behaves differently from my local run. What C99-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "rationale": "near miss owned by c99-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "Write a Strudel.cc live-coding snippet for a driving techno groove at 130 BPM. Include a four-on-the-floor kick, an offbeat clap, and closed hi-hats layered together.",
-    "rationale": "near miss owned by strudel-guide",
+    "query": "quick pre-merge sanity check: after the local variables change under `work/local-variables/`, a clean checkout behaves differently from my local run. What Lua-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "rationale": "near miss owned by lua-guide",
     "should_trigger": false,
     "split": "validation"
   }

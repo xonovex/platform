@@ -50,7 +50,7 @@ describe("skill validator entrypoints", () => {
       join(skill, "SKILL.md"),
       `---
 name: Invalid Skill
-description: 42
+description: Use when checking a deliberately invalid skill. Triggers on validator test fixtures, even when the user doesn't say validation.
 unknown-field: true
 ---
 # Guide
@@ -65,6 +65,9 @@ Use references/missing_file.md with @references/legacy.md.
     expect(result).toBe(1);
     const output = log.mock.calls.flat().join("\n");
     expect(output).toContain("frontmatter: name 'Invalid Skill'");
+    expect(output).toContain(
+      "frontmatter: 'description' must use one double-quoted scalar",
+    );
     expect(output).toContain("catalog: missing evals.json");
     expect(output).toContain("Result: FAIL");
   });

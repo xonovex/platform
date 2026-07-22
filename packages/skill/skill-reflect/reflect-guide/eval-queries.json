@@ -48,20 +48,20 @@
     "split": "validation"
   },
   {
+    "query": "create a new skill for our GraphQL resolver conventions — SKILL.md plus a few reference files",
+    "rationale": "near miss owned by skill-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Rewrite this so it reads like a person wrote it, not an AI: 'Our platform offers a seamless, intuitive experience that empowers teams to unlock their full potential. Experts agree it's a game-changer, and studies show productivity has never been better.'",
+    "rationale": "near miss owned by content-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
     "query": "I have a Claude Code slash command at `.claude/commands/changelog.md`. Its body uses `$ARGUMENTS` for the user input and embeds git output inline with `` !`git log --oneline -20` ``. I want to port this same command to the Gemini CLI. Tell me exactly what to change and where the file goes.",
     "rationale": "near miss owned by command-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
-    "query": "Write a Lua 5.4 function `load_config(path)` that opens the file at `path`, reads all of it, and returns the parsed contents. Show how a caller would use it when the file might not exist, falling back to a default config instead of crashing.",
-    "rationale": "near miss owned by lua-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
-    "query": "I have a Rectangle class with mutable width and height and setWidth/setHeight methods. I now need a Square type in the same system. What's the cleanest way to model Square given I already have Rectangle?",
-    "rationale": "near miss owned by oop-guide",
     "should_trigger": false,
     "split": "train"
   },
@@ -72,26 +72,26 @@
     "split": "train"
   },
   {
-    "query": "make this client component server-rendered if possible — it's just fetching the user's recent orders",
-    "rationale": "near miss owned by react-guide",
+    "query": "before we install this third-party skill, audit its scripts and the URLs it fetches and lock down what tools it's allowed to use",
+    "rationale": "near miss owned by skill-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "ship this",
-    "rationale": "near miss owned by git-guide",
+    "query": "A review comment on `work/humanize/` says the humanize change handles the normal fixture but leaves the failure path undefined. For this Content task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
+    "rationale": "near miss owned by content-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "map a mandatory protected-path control to Pi and tell me whether it can actually block",
-    "rationale": "near miss owned by pi-guide",
+    "query": "The clean Linux CI job fails only for the minimal merge fixture under `work/merge/`, while the full local fixture passes. Trace the Command-specific boundary that could cause the difference, then propose a patch and a regression check.",
+    "rationale": "near miss owned by command-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "https://www.figma.com/design/aB12cD34eF56/Checkout?node-id=42-7 — what's in this frame?",
-    "rationale": "near miss owned by figma-guide",
+    "query": "the new microservice doesn't have project instructions yet — generate one based on what's in src/",
+    "rationale": "near miss owned by instruction-guide",
     "should_trigger": false,
     "split": "validation"
   }

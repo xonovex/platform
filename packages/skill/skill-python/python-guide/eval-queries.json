@@ -48,32 +48,20 @@
     "split": "validation"
   },
   {
-    "query": "add proper types to the response shape in src/api/users.ts so the consumer doesn't have to cast",
-    "rationale": "near miss owned by typescript-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
     "query": "I have a log file with about 20 million lines already loaded as an array of strings in JavaScript. Write a function that keeps only the ERROR lines, extracts the timestamp from each, and returns the first 10. Explain any performance concerns.",
     "rationale": "near miss owned by fp-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "Using Zod 4, write a TypeScript schema named UserSchema for a user object with these fields: an id that is a UUID, an email address, a createdAt that is an ISO datetime string, and a name string between 1 and 100 characters. Also export the inferred TypeScript type.",
-    "rationale": "near miss owned by zod-guide",
+    "query": "I have a Rectangle class with mutable width and height and setWidth/setHeight methods. I now need a Square type in the same system. What's the cleanest way to model Square given I already have Rectangle?",
+    "rationale": "near miss owned by oop-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "I have a Hono app configured with `app.use('*', cors())`. Write a Vitest test that verifies the CORS preflight (OPTIONS) request to `/api/users` with an Origin header succeeds and that the Access-Control-Allow-Origin header is returned.",
-    "rationale": "near miss owned by vitest-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
-    "query": "I have a Terraform config that creates private subnets, one per availability zone, from a variable list of AZs. Right now removing a single AZ from the middle of the list forces Terraform to recreate several unrelated subnets. Write the resource and any supporting locals so this stops happening.",
-    "rationale": "near miss owned by terraform-guide",
+    "query": "add proper types to the response shape in src/api/users.ts so the consumer doesn't have to cast",
+    "rationale": "near miss owned by typescript-guide",
     "should_trigger": false,
     "split": "train"
   },
@@ -81,17 +69,29 @@
     "query": "Write a portable shell script that must run under dash and busybox sh, not just bash. It should verify that jq is installed, take a filename as its first argument, and abort early on any error or unset variable.",
     "rationale": "near miss owned by shell-scripting-guide",
     "should_trigger": false,
-    "split": "validation"
+    "split": "train"
   },
   {
-    "query": "Set up the compiler configuration (CMake) for a C99 library target named `netcodec` that calls `readlink` and `strnlen`. Configure it for strict ISO C99, treat warnings as errors with `-Wall -Wextra`, and make sure it still compiles cleanly even though the code uses partial designated initializers like `(cfg_t){ .port = 8080 }` throughout.",
-    "rationale": "near miss owned by c99-guide",
+    "query": "Help me with pure functions; apply the relevant Fp conventions and call out the important edge cases.",
+    "rationale": "near miss owned by fp-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Review this Oop change for design smells and fix the concrete issues you find.",
+    "rationale": "near miss owned by oop-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "our particle simulator stalls when we have 50k particles — the update loop reads position and velocity out of a fat 96-byte struct, can you restructure it for cache efficiency",
-    "rationale": "near miss owned by data-oriented-design-guide",
+    "query": "rewrite this string concat with template literals and pull out the magic numbers as named consts",
+    "rationale": "near miss owned by typescript-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "quick pre-merge sanity check: after the strict mode change under `work/strict-mode/`, a clean checkout behaves differently from my local run. What Shell Scripting-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "rationale": "near miss owned by shell-scripting-guide",
     "should_trigger": false,
     "split": "validation"
   }

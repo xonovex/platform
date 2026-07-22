@@ -78,19 +78,19 @@
     "split": "train"
   },
   {
-    "query": "preview onboarding a project-provided Claude Code executable module without applying it",
+    "query": "Provide deterministic, model-evaluator, and specialist-agent patterns for Claude Code.",
     "rationale": "near miss owned by code-harness-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "preview onboarding a project-provided GitHub Copilot executable module without applying it",
+    "query": "Provide deterministic, model-evaluator, and specialist-agent patterns for GitHub Copilot.",
     "rationale": "near miss owned by copilot-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "preview onboarding a project-provided Kiro executable module without applying it",
+    "query": "Provide deterministic, model-evaluator, and specialist-agent patterns for Kiro.",
     "rationale": "near miss owned by kiro-guide",
     "should_trigger": false,
     "split": "validation"

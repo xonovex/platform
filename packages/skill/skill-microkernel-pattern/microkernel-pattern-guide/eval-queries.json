@@ -66,32 +66,32 @@
     "split": "validation"
   },
   {
-    "query": "I need to add a SIMD variant of my vec3_dot in lib/math/vec3.c — the rest of the project uses _sse4 and _avx2 suffixes",
-    "rationale": "near miss owned by c99-opinionated-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
     "query": "decouple my domain logic from Postgres so I can swap the database without rewriting business rules",
     "rationale": "near miss owned by hexagonal-pattern-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "In a Hono API running on Node with @hono/node-server, add a WebSocket endpoint at /ws/chat that echoes each incoming message back to the sender. Show both the server bootstrap code and the route definition.",
-    "rationale": "near miss owned by hono-guide",
+    "query": "our internal/ dir has grown into a mess — there's a sandbox folder, a sandboxutil folder next to it, and nix code buried three levels deep; reorganize it so it stops feeling like spaghetti",
+    "rationale": "near miss owned by orthogonal-pattern-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "I'm building the core document store for our level editor — objects of different kinds each with a set of named properties, and I want to add new object types at runtime without recompiling. How should the type/property schema work?",
+    "rationale": "near miss owned by data-model-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "I have a Terraform config that creates private subnets, one per availability zone, from a variable list of AZs. Right now removing a single AZ from the middle of the list forces Terraform to recreate several unrelated subnets. Write the resource and any supporting locals so this stops happening.",
-    "rationale": "near miss owned by terraform-guide",
+    "query": "our particle simulator stalls when we have 50k particles — the update loop reads position and velocity out of a fat 96-byte struct, can you restructure it for cache efficiency",
+    "rationale": "near miss owned by data-oriented-design-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "In a Remotion project running at 30fps, write a React component that fades a headline in from opacity 0 to 1 over the first half second and slides it up 40px at the same time. Give me the full component code.",
-    "rationale": "near miss owned by remotion-guide",
+    "query": "I have a Go OrderService that directly calls a Postgres client to save orders. Refactor it so the business logic no longer depends on Postgres and I could swap in another database later. Show which package each type goes in and how the pieces depend on one another.",
+    "rationale": "near miss owned by hexagonal-pattern-guide",
     "should_trigger": false,
     "split": "validation"
   }

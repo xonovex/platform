@@ -48,20 +48,8 @@
     "split": "validation"
   },
   {
-    "query": "I have a Hono app configured with `app.use('*', cors())`. Write a Vitest test that verifies the CORS preflight (OPTIONS) request to `/api/users` with an Origin header succeeds and that the Access-Control-Allow-Origin header is returned.",
-    "rationale": "near miss owned by vitest-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
     "query": "In our LuaJIT game engine, write a factory function `create_entity(x, y, kind)` that returns a new entity table. Entities need position (x, y), a kind, a velocity (velocity_x, velocity_y starting at 0), health (starts at 100), and an active flag (starts true). Not all of these are known at the call site, so make it clean and efficient for a hot update loop.",
     "rationale": "near miss owned by lua-opinionated-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
-    "query": "I'm writing a small C99 physics engine. Define a rigid body struct and a function that applies a linear impulse to it. It must correctly handle both dynamic bodies and immovable/static bodies.",
-    "rationale": "near miss owned by c99-game-opinionated-guide",
     "should_trigger": false,
     "split": "train"
   },
@@ -72,26 +60,38 @@
     "split": "train"
   },
   {
-    "query": "In a GitOps repo I have a base/ directory with a Deployment and Service. Write a Kustomize base kustomization.yaml plus a production overlay kustomization.yaml that changes the namespace to production, applies a replica-count patch file, and sets shared labels on all resources. Use current Kustomize v5 syntax.",
-    "rationale": "near miss owned by kubernetes-guide",
+    "query": "I have a Hono app configured with `app.use('*', cors())`. Write a Vitest test that verifies the CORS preflight (OPTIONS) request to `/api/users` with an Origin header succeeds and that the Access-Control-Allow-Origin header is returned.",
+    "rationale": "near miss owned by vitest-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "In a Hono API running on Node with @hono/node-server, add a WebSocket endpoint at /ws/chat that echoes each incoming message back to the sender. Show both the server bootstrap code and the route definition.",
-    "rationale": "near miss owned by hono-guide",
+    "query": "add proper types to the response shape in src/api/users.ts so the consumer doesn't have to cast",
+    "rationale": "near miss owned by typescript-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Review this Lua Opinionated change for essentials and fix the concrete issues you find.",
+    "rationale": "near miss owned by lua-opinionated-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "quick pre-merge sanity check: after the local variables change under `work/local-variables/`, a clean checkout behaves differently from my local run. What Lua-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "rationale": "near miss owned by lua-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "We're on moonrepo 2.0. I want to enable and configure one of Moon's built-in extensions in our workspace. Which config file does the extension configuration go in, and show me a minimal example of the config block.",
-    "rationale": "near miss owned by moon-guide",
+    "query": "quick pre-merge sanity check: after the http testing change under `work/http-testing/`, a clean checkout behaves differently from my local run. What Vitest-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "rationale": "near miss owned by vitest-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "Write an async Python function fetch_all(urls) that retrieves the body of each URL over HTTP and returns them as a list. The URLs are independent of one another and there may be dozens of them.",
-    "rationale": "near miss owned by python-guide",
+    "query": "rewrite this string concat with template literals and pull out the magic numbers as named consts",
+    "rationale": "near miss owned by typescript-guide",
     "should_trigger": false,
     "split": "validation"
   }

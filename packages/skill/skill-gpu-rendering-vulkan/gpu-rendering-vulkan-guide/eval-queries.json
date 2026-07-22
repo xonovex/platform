@@ -96,8 +96,8 @@
     "split": "validation"
   },
   {
-    "query": "I have a Terraform config that creates private subnets, one per availability zone, from a variable list of AZs. Right now removing a single AZ from the middle of the list forces Terraform to recreate several unrelated subnets. Write the resource and any supporting locals so this stops happening.",
-    "rationale": "near miss owned by terraform-guide",
+    "query": "make our particle system stop calling malloc per particle — hand it a buffer it just fills",
+    "rationale": "near miss owned by memory-management-guide",
     "should_trigger": false,
     "split": "validation"
   }

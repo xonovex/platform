@@ -119,7 +119,7 @@ describe("checkCodexTriggered", () => {
     const outcome = await checkCodexTriggered({
       args: [
         "--eval",
-        String.raw`
+        `
 const {existsSync, readFileSync} = require("node:fs");
 const target = ".agents/skills/target-guide/SKILL.md";
 const competitor = ".agents/skills/competitor-guide/SKILL.md";

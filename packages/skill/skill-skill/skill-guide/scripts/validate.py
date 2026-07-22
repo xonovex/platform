@@ -141,6 +141,24 @@ def check_loader_quoting(fm_raw: str, report: Report) -> None:
     quotes; it stops at the first inner delimiter and reads the tail as an
     unknown attribute. `yaml.safe_load` accepts these, so scan the raw text.
     """
+    description_line = next(
+        (line for line in fm_raw.splitlines() if re.match(r"^description\s*:", line)),
+        None,
+    )
+    if description_line is not None:
+        raw_description = description_line.split(":", 1)[1].strip()
+        if (
+            len(raw_description) >= 2
+            and raw_description.startswith('"')
+            and raw_description.endswith('"')
+        ):
+            report.add_pass("frontmatter: description uses a double-quoted scalar")
+        else:
+            report.add_fail(
+                "frontmatter: 'description' must use one double-quoted scalar; "
+                "use single quotes for phrases inside it"
+            )
+
     flagged = False
     for raw_line in fm_raw.splitlines():
         m = QUOTED_SCALAR_RE.match(raw_line)

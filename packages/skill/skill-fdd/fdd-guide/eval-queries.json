@@ -84,14 +84,14 @@
     "split": "validation"
   },
   {
-    "query": "I have a Rectangle class with mutable width and height and setWidth/setHeight methods. I now need a Square type in the same system. What's the cleanest way to model Square given I already have Rectangle?",
-    "rationale": "near miss owned by oop-guide",
+    "query": "is this user story good? \"As a rider I want to pay for my trip\" — does it pass INVEST?",
+    "rationale": "near miss owned by user-stories-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "In a Hono API running on Node with @hono/node-server, add a WebSocket endpoint at /ws/chat that echoes each incoming message back to the sender. Show both the server bootstrap code and the route definition.",
-    "rationale": "near miss owned by hono-guide",
+    "query": "help me run a three amigos session and write Given-When-Then scenarios for the checkout story before we code",
+    "rationale": "near miss owned by bdd-guide",
     "should_trigger": false,
     "split": "validation"
   }

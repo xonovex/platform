@@ -54,12 +54,6 @@
     "split": "train"
   },
   {
-    "query": "I have a log file with about 20 million lines already loaded as an array of strings in JavaScript. Write a function that keeps only the ERROR lines, extracts the timestamp from each, and returns the first 10. Explain any performance concerns.",
-    "rationale": "near miss owned by fp-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
     "query": "this packages/auth dir doesn't have an AGENTS.md yet — set one up",
     "rationale": "near miss owned by instruction-guide",
     "should_trigger": false,
@@ -72,26 +66,32 @@
     "split": "train"
   },
   {
-    "query": "In an Astro page I already have static content. Add two React components: a `<NewsletterSignup />` in the page footer that should only become interactive once the user scrolls it into view, and a `<ThemeToggle />` that reads `window.localStorage` on mount and therefore must not be server-rendered at all. Show the page frontmatter and markup with the correct hydration for each.",
-    "rationale": "near miss owned by astro-guide",
+    "query": "Rewrite this so it reads like a person wrote it, not an AI: 'Our platform offers a seamless, intuitive experience that empowers teams to unlock their full potential. Experts agree it's a game-changer, and studies show productivity has never been better.'",
+    "rationale": "near miss owned by content-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "Write a Strudel.cc live-coding snippet for a driving techno groove at 130 BPM. Include a four-on-the-floor kick, an offbeat clap, and closed hi-hats layered together.",
-    "rationale": "near miss owned by strudel-guide",
+    "query": "The clean Linux CI job fails only for the minimal merge fixture under `work/merge/`, while the full local fixture passes. Trace the Command-specific boundary that could cause the difference, then propose a patch and a regression check.",
+    "rationale": "near miss owned by command-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "the new microservice doesn't have project instructions yet — generate one based on what's in src/",
+    "rationale": "near miss owned by instruction-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "Rewrite this so it reads like a person wrote it, not an AI: 'Our platform offers a seamless, intuitive experience that empowers teams to unlock their full potential. Experts agree it's a game-changer, and studies show productivity has never been better.'",
+    "query": "before we install this third-party skill, audit its scripts and the URLs it fetches and lock down what tools it's allowed to use",
+    "rationale": "near miss owned by skill-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "A review comment on `work/humanize/` says the humanize change handles the normal fixture but leaves the failure path undefined. For this Content task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
     "rationale": "near miss owned by content-guide",
-    "should_trigger": false,
-    "split": "validation"
-  },
-  {
-    "query": "help me run a three amigos session and write Given-When-Then scenarios for the checkout story before we code",
-    "rationale": "near miss owned by bdd-guide",
     "should_trigger": false,
     "split": "validation"
   }

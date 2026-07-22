@@ -119,6 +119,27 @@ const splitFrontmatter = (
 };
 
 const checkLoaderQuoting = (fmRaw: string, report: Report): void => {
+  const descriptionLine = splitLines(fmRaw).find((line) =>
+    /^description\s*:/.test(line),
+  );
+  if (descriptionLine !== undefined) {
+    const rawDescription = descriptionLine
+      .slice(descriptionLine.indexOf(":") + 1)
+      .trim();
+    if (
+      rawDescription.length >= 2 &&
+      rawDescription.startsWith('"') &&
+      rawDescription.endsWith('"')
+    ) {
+      report.addPass("frontmatter: description uses a double-quoted scalar");
+    } else {
+      report.addFail(
+        "frontmatter: 'description' must use one double-quoted scalar; " +
+          "use single quotes for phrases inside it",
+      );
+    }
+  }
+
   let flagged = false;
   for (const rawLine of splitLines(fmRaw)) {
     const m = QUOTED_SCALAR_RE.exec(rawLine);

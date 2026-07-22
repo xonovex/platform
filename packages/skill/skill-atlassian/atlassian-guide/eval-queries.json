@@ -72,32 +72,32 @@
     "rationale": "near-miss: PR content craft, use pull-request-guide"
   },
   {
-    "query": "In a Hono API running on Node with @hono/node-server, add a WebSocket endpoint at /ws/chat that echoes each incoming message back to the sender. Show both the server bootstrap code and the route definition.",
-    "rationale": "near miss owned by hono-guide",
+    "query": "require a Bitbucket Cloud pipeline status before merge and prove a spoofed status cannot satisfy it",
+    "rationale": "near miss owned by bitbucket-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "correlate Bitrise pipeline and AWS deployment references in Datadog CI/CD Visibility",
-    "rationale": "near miss owned by datadog-guide",
+    "query": "link Azure Boards work item 381 to the pull request and preserve both native references",
+    "rationale": "near miss owned by azure-devops-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "Write an Express 5 + TypeScript login route handler. It should look up the user by email, verify the submitted password against the stored hash, and on success return a signed JWT the client will send on future API requests.",
-    "rationale": "near miss owned by expressjs-guide",
+    "query": "https://www.figma.com/design/aB12cD34eF56/Checkout?node-id=42-7 — what's in this frame?",
+    "rationale": "near miss owned by figma-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "In a Remotion project running at 30fps, write a React component that fades a headline in from opacity 0 to 1 over the first half second and slides it up 40px at the same time. Give me the full component code.",
-    "rationale": "near miss owned by remotion-guide",
+    "query": "open a pull request against main with reviewers and a label using the gh CLI",
+    "rationale": "near miss owned by github-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "Using Zod 4, write a TypeScript schema named UserSchema for a user object with these fields: an id that is a UUID, an email address, a createdAt that is an ISO datetime string, and a name string between 1 and 100 characters. Also export the inferred TypeScript type.",
-    "rationale": "near miss owned by zod-guide",
+    "query": "our self-hosted Bitbucket Data Center REST call returns 401, is this a Bearer vs Basic token problem?",
+    "rationale": "near miss owned by bitbucket-guide",
     "should_trigger": false,
     "split": "validation"
   }

@@ -102,8 +102,8 @@
     "rationale": "near-miss: web content localization, not an immediate-mode UI string system -> not this skill"
   },
   {
-    "query": "I have a Terraform config that creates private subnets, one per availability zone, from a variable list of AZs. Right now removing a single AZ from the middle of the list forces Terraform to recreate several unrelated subnets. Write the resource and any supporting locals so this stops happening.",
-    "rationale": "near miss owned by terraform-guide",
+    "query": "our renderer hand-writes a barrier before and after every pass and it breaks every time we reorder passes — I want passes to just declare what they read and write and have ordering and transitions figured out for us",
+    "rationale": "near miss owned by gpu-rendering-guide",
     "should_trigger": false,
     "split": "validation"
   },
@@ -114,8 +114,8 @@
     "split": "validation"
   },
   {
-    "query": "make this Compose screen accessible for TalkBack",
-    "rationale": "near miss owned by android-wcag-guide",
+    "query": "give me the exact VkImageMemoryBarrier2 with srcStageMask/srcAccessMask and dstStageMask/dstAccessMask plus the oldLayout/newLayout for reading a color attachment as a sampled texture, and the vkCmdPipelineBarrier2 call",
+    "rationale": "near miss owned by gpu-rendering-vulkan-guide",
     "should_trigger": false,
     "split": "validation"
   }

@@ -15,7 +15,7 @@ description: "Use when editing or scaffolding Hono 4.0+ API servers in TypeScrip
 - **Type-safe validation** - Recover types at the `c.req.valid` boundary; schema design in **zod-guide**, see [references/validation-type-safety.md](references/validation-type-safety.md)
 - **Middleware configuration** - Use factories for CORS, composition with `some()`/`every()`/`except()`, see [references/middleware-patterns.md](references/middleware-patterns.md), [references/middleware-combine.md](references/middleware-combine.md)
 - **WebSocket helpers** - Keep object references to maintain `this` binding, see [references/websocket-support.md](references/websocket-support.md)
-- **Error responses** - Use RFC 7807 Problem Details format, see [references/error-handling.md](references/error-handling.md)
+- **Error responses** - Use RFC 9457 Problem Details with `application/problem+json`, see [references/error-handling.md](references/error-handling.md)
 - **Security middleware** - Apply `secureHeaders()` for security headers, see [references/security-middleware.md](references/security-middleware.md)
 - **Cookie handling** - Set secure options explicitly, use signed cookies, see [references/cookie-handling.md](references/cookie-handling.md)
 - **Platform portability** - Use `env(c)` for environment, `getRuntimeKey()` for detection, see [references/platform-runtime.md](references/platform-runtime.md)

@@ -74,7 +74,7 @@
   {
     "query": "commit what i have so far with a wip message",
     "should_trigger": true,
-    "split": "train",
+    "split": "validation",
     "rationale": "wip commit"
   },
   {
@@ -120,51 +120,51 @@
     "rationale": "Git worktree-state operation"
   },
   {
-    "query": "Research the code paths and current library versions we need before planning rate limiting for packages/api. Keep it read-only and cite the evidence.",
+    "query": "open a merge request against main with glab on this GitLab repo",
+    "rationale": "near miss owned by gitlab-guide",
     "should_trigger": false,
-    "split": "train",
-    "rationale": "near miss owned by plan-guide"
-  },
-  {
-    "query": "review this pull request and leave inline comments on the diff",
-    "should_trigger": false,
-    "split": "train",
-    "rationale": "near miss owned by code-review-guide"
+    "split": "train"
   },
   {
     "query": "open a pull request against main with reviewers and a label using the gh CLI",
+    "rationale": "near miss owned by github-guide",
     "should_trigger": false,
-    "split": "train",
-    "rationale": "near miss owned by github-guide"
+    "split": "train"
   },
   {
-    "query": "write a plan to refactor the auth module over the next sprint",
+    "query": "help me write a good pull request description for this change",
+    "rationale": "near miss owned by pull-request-guide",
     "should_trigger": false,
-    "split": "train",
-    "rationale": "near miss owned by plan-guide"
+    "split": "train"
   },
   {
-    "query": "I have a Terraform config that creates private subnets, one per availability zone, from a variable list of AZs. Right now removing a single AZ from the middle of the list forces Terraform to recreate several unrelated subnets. Write the resource and any supporting locals so this stops happening.",
+    "query": "bump this package to a minor release",
+    "rationale": "near miss owned by versioning-guide",
     "should_trigger": false,
-    "split": "validation",
-    "rationale": "near miss owned by terraform-guide"
+    "split": "train"
   },
   {
-    "query": "Write an Express 5 + TypeScript login route handler. It should look up the user by email, verify the submitted password against the stored hash, and on success return a signed JWT the client will send on future API requests.",
+    "query": "approve a merge request from the command line on GitLab",
+    "rationale": "near miss owned by gitlab-guide",
     "should_trigger": false,
-    "split": "validation",
-    "rationale": "near miss owned by expressjs-guide"
+    "split": "train"
   },
   {
-    "query": "walk me through red-green-refactor on this shopping-cart total function",
+    "query": "reply in a review thread and mark it resolved so the PR can merge",
+    "rationale": "near miss owned by github-guide",
     "should_trigger": false,
-    "split": "validation",
-    "rationale": "near miss owned by tdd-guide"
+    "split": "validation"
   },
   {
-    "query": "harden the user-service module — it's full of `any` and swallowed errors, just tell me what to fix",
+    "query": "how big should a pull request be",
+    "rationale": "near miss owned by pull-request-guide",
     "should_trigger": false,
-    "split": "validation",
-    "rationale": "near miss owned by code-quality-guide"
+    "split": "validation"
+  },
+  {
+    "query": "release 1.4.0 and add the changelog entries",
+    "rationale": "near miss owned by versioning-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

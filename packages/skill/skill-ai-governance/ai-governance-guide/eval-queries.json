@@ -78,8 +78,8 @@
     "split": "validation"
   },
   {
-    "query": "assess this exact web release against WCAG 2.2 AA and publish reviewable evidence",
-    "rationale": "near miss owned by accessibility-guide",
+    "query": "what does Xonovex governance actually enforce, and can I run a workflow with no controls?",
+    "rationale": "near miss owned by agent-governance-guide",
     "should_trigger": false,
     "split": "validation"
   },
@@ -90,8 +90,8 @@
     "split": "validation"
   },
   {
-    "query": "what does Xonovex governance actually enforce, and can I run a workflow with no controls?",
-    "rationale": "near miss owned by agent-governance-guide",
+    "query": "define service objectives, error budgets, dependencies, and user-impact indicators for this capability",
+    "rationale": "near miss owned by reliability-guide",
     "should_trigger": false,
     "split": "validation"
   }

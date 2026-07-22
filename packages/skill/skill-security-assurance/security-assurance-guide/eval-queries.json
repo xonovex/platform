@@ -78,20 +78,20 @@
     "split": "validation"
   },
   {
-    "query": "assess this exact web release against WCAG 2.2 AA and publish reviewable evidence",
-    "rationale": "near miss owned by accessibility-guide",
-    "should_trigger": false,
-    "split": "validation"
-  },
-  {
     "query": "classify our AI-system role and applicable obligations before selecting a regulated profile",
     "rationale": "near miss owned by ai-governance-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "I need to add a SIMD variant of my vec3_dot in lib/math/vec3.c — the rest of the project uses _sse4 and _avx2 suffixes",
-    "rationale": "near miss owned by c99-opinionated-guide",
+    "query": "what does Xonovex governance actually enforce, and can I run a workflow with no controls?",
+    "rationale": "near miss owned by agent-governance-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "using the stage-neutral operation contract, create a new architecture note from these source links without modifying the sources",
+    "rationale": "near miss owned by workflow-guide",
     "should_trigger": false,
     "split": "validation"
   }

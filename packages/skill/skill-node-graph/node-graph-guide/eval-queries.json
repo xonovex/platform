@@ -96,32 +96,32 @@
     "rationale": "near-miss: the underlying typed data model / object store -> data-model-guide, not the graph layer on top"
   },
   {
-    "query": "our editor lets artists drop in an FBX or PNG and we want them edited in-tool but shipped as packed GPU-ready data — how should we structure the two forms so editing and loading don't fight each other",
-    "rationale": "near miss owned by asset-pipeline-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
-    "query": "these two modules feel way too tightly coupled — tell me concretely what kind of coupling it is and how to loosen the worst part",
-    "rationale": "near miss owned by connascence-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
-    "query": "We're on moonrepo 2.0. I want to enable and configure one of Moon's built-in extensions in our workspace. Which config file does the extension configuration go in, and show me a minimal example of the config block.",
-    "rationale": "near miss owned by moon-guide",
-    "should_trigger": false,
-    "split": "validation"
-  },
-  {
     "query": "I'm building the core document store for our level editor — objects of different kinds each with a set of named properties, and I want to add new object types at runtime without recompiling. How should the type/property schema work?",
     "rationale": "near miss owned by data-model-guide",
     "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "our particle simulator stalls when we have 50k particles — the update loop reads position and velocity out of a fat 96-byte struct, can you restructure it for cache efficiency",
+    "rationale": "near miss owned by data-oriented-design-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "our renderer hand-writes a barrier before and after every pass and it breaks every time we reorder passes — I want passes to just declare what they read and write and have ordering and transitions figured out for us",
+    "rationale": "near miss owned by gpu-rendering-guide",
+    "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "Write an async Python function fetch_all(urls) that retrieves the body of each URL over HTTP and returns them as a list. The URLs are independent of one another and there may be dozens of them.",
-    "rationale": "near miss owned by python-guide",
+    "query": "our editor lets artists drop in an FBX or PNG and we want them edited in-tool but shipped as packed GPU-ready data — how should we structure the two forms so editing and loading don't fight each other",
+    "rationale": "near miss owned by asset-pipeline-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "give me a single typed object database where every node has properties, children it owns, and links to other nodes by id, and the whole thing notifies on edit, supports undo, and saves to a versioned file",
+    "rationale": "near miss owned by data-model-guide",
     "should_trigger": false,
     "split": "validation"
   }

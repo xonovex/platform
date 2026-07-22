@@ -63,7 +63,7 @@ jobs:
           fi
           limit=10000
           offset=0
-          if [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" && "${DISPATCH_SCOPE}" == "rotated" ]]; then
+          if [[ "${GITHUB_EVENT_NAME}" == "schedule" || ( "${GITHUB_EVENT_NAME}" == "workflow_dispatch" && "${DISPATCH_SCOPE}" == "rotated" ) ]]; then
             limit=12
             offset="$((10#$(date -u +%m) * 12))"
           fi
@@ -207,18 +207,39 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          jq -n \
+            --arg repository "${GITHUB_REPOSITORY}" \
+            --arg commit "${GITHUB_SHA}" \
+            --arg workflow_run_id "${GITHUB_RUN_ID}" \
+            --arg workflow_run_attempt "${GITHUB_RUN_ATTEMPT}" \
+            --arg event "${GITHUB_EVENT_NAME}" \
+            '{
+              schema_version: 1,
+              generated_at: (now | todateiso8601),
+              repository: $repository,
+              commit: $commit,
+              workflow_run_id: $workflow_run_id,
+              workflow_run_attempt: $workflow_run_attempt,
+              event: $event,
+              harnesses: {
+                claude: {runner: "@anthropic-ai/claude-code", version: "2.1.211", generation_model: "haiku", judge_model: "sonnet"},
+                codex: {runner: "@openai/codex", version: "0.145.0", model: "configured default"}
+              }
+            }' >catalog-eval-metadata.json
           mapfile -d '' files < <(
             find evidence -type f \( -name benchmark.json -o -name summary.json \) \
               -print0 | sort -z
           )
           if (( ${#files[@]} == 0 )); then
-            jq -n '{generated_at: now | todateiso8601, records: []}' \
+            jq '. + {records: []}' catalog-eval-metadata.json \
               >catalog-eval-summary.json
           else
-            jq -s '{generated_at: now | todateiso8601, records: .}' \
-              "${files[@]}" >catalog-eval-summary.json
+            jq -s --slurpfile metadata catalog-eval-metadata.json \
+              '$metadata[0] + {records: .}' "${files[@]}" \
+              >catalog-eval-summary.json
           fi
-          jq '{records: (.records | length)}' catalog-eval-summary.json
+          jq '{commit, workflow_run_id, records: (.records | length)}' \
+            catalog-eval-summary.json
 
       - name: Upload catalog summary
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1

@@ -48,12 +48,6 @@
     "split": "validation"
   },
   {
-    "query": "We're on moonrepo 2.0. I want to enable and configure one of Moon's built-in extensions in our workspace. Which config file does the extension configuration go in, and show me a minimal example of the config block.",
-    "rationale": "near miss owned by moon-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
     "query": "In a GitOps repo I have a base/ directory with a Deployment and Service. Write a Kustomize base kustomization.yaml plus a production overlay kustomization.yaml that changes the namespace to production, applies a replica-count patch file, and sets shared labels on all resources. Use current Kustomize v5 syntax.",
     "rationale": "near miss owned by kubernetes-guide",
     "should_trigger": false,
@@ -66,32 +60,38 @@
     "split": "train"
   },
   {
-    "query": "Write an async Python function fetch_all(urls) that retrieves the body of each URL over HTTP and returns them as a list. The URLs are independent of one another and there may be dozens of them.",
-    "rationale": "near miss owned by python-guide",
+    "query": "compose Bitrise Pipelines from reusable Workflows and pin every custom Step version",
+    "rationale": "near miss owned by bitrise-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "Using Zod 4, write a TypeScript schema named UserSchema for a user object with these fields: an id that is a UUID, an email address, a createdAt that is an ISO datetime string, and a name string between 1 and 100 characters. Also export the inferred TypeScript type.",
-    "rationale": "near miss owned by zod-guide",
+    "query": "We're on moonrepo 2.0. I want to enable and configure one of Moon's built-in extensions in our workspace. Which config file does the extension configuration go in, and show me a minimal example of the config block.",
+    "rationale": "near miss owned by moon-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "Using vanilla Three.js, set up a WebGLRenderer and a render loop that spins a cube smoothly. It must keep a consistent rotation speed regardless of frame rate and stay crisp on high-DPI / retina displays. Give me the renderer setup and the loop.",
-    "rationale": "near miss owned by threejs-guide",
+    "query": "quick pre-merge sanity check: after the configmaps secrets change under `work/configmaps-secrets/`, a clean checkout behaves differently from my local run. What Kubernetes-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "rationale": "near miss owned by kubernetes-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "quick pre-merge sanity check: after the module definition change under `work/module-definition/`, a clean checkout behaves differently from my local run. What Terraform-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "rationale": "near miss owned by terraform-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "In an Astro page I already have static content. Add two React components: a `<NewsletterSignup />` in the page footer that should only become interactive once the user scrolls it into view, and a `<ThemeToggle />` that reads `window.localStorage` on mount and therefore must not be server-rendered at all. Show the page frontmatter and markup with the correct hydration for each.",
-    "rationale": "near miss owned by astro-guide",
+    "query": "is this a flaky emulator (device offline) or a real test failure?",
+    "rationale": "near miss owned by bitrise-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "Write a Lua 5.4 function `load_config(path)` that opens the file at `path`, reads all of it, and returns the parsed contents. Show how a caller would use it when the file might not exist, falling back to a default config instead of crashing.",
-    "rationale": "near miss owned by lua-guide",
+    "query": "quick pre-merge sanity check: after the task inheritance change under `work/task-inheritance/`, a clean checkout behaves differently from my local run. What Moon-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "rationale": "near miss owned by moon-guide",
     "should_trigger": false,
     "split": "validation"
   }

@@ -1,5 +1,15 @@
 # Sources
 
+## RFC 9457: Problem Details for HTTP APIs
+
+- **URL:** https://www.rfc-editor.org/rfc/rfc9457.html
+- **Last reviewed:** 2026-07-22
+- **Used for:**
+  - `SKILL.md` → Problem Details version and media type
+  - `references/error-handling.md`
+- **Aspects extracted:**
+  - Canonical problem-detail members, extension members, problem-type URIs, and the `application/problem+json` media type
+
 ## Hono: Full Documentation (LLM-friendly distillation)
 
 - **URL:** https://hono.dev/llms-full.txt

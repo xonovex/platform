@@ -1,78 +1,78 @@
 [
   {
-    "query": "create a new architecture note from these source links without modifying the sources",
+    "query": "using the stage-neutral operation contract, create a new architecture note from these source links without modifying the sources",
     "should_trigger": true,
     "split": "train",
     "rationale": "new-result creation with an explicit non-mutation boundary"
   },
   {
-    "query": "review this exact proposal against the acceptance criteria and report findings without editing it",
+    "query": "select the workflow review operation for this exact proposal, evaluate the acceptance criteria, and report findings without editing it",
     "should_trigger": true,
     "split": "train",
     "rationale": "read-only review of an exact subject"
   },
   {
-    "query": "revise proposal revision 7 from these review findings and preserve a trace to the source revision",
+    "query": "use the workflow revise operation on provider revision 7 with these findings and preserve the opaque source revision",
     "should_trigger": true,
     "split": "train",
     "rationale": "traceable revision from explicit feedback"
   },
   {
-    "query": "compare the three options and record the selected outcome and rationale, but do not approve or merge anything",
+    "query": "which stage-neutral operation records a selected outcome and rationale without approving, authorizing, or merging anything? Apply it to these three options",
     "should_trigger": true,
     "split": "train",
     "rationale": "descriptive decision without implied authority"
   },
   {
-    "query": "execute this bounded migration step and return the observable result; do not publish or create a workspace",
+    "query": "use the workflow execute operation for this bounded migration step and return its inline observable result without publishing or creating a workspace",
     "should_trigger": true,
     "split": "train",
     "rationale": "bounded execution with explicit side-effect limits"
   },
   {
-    "query": "validate artifact sha256:abc against policy version 4 and return the evidence separately from the artifact",
+    "query": "use the workflow validate contract for artifact sha256:abc against policy version 4, preserving the native subject reference and returning evidence separately",
     "should_trigger": true,
     "split": "train",
     "rationale": "exact-subject validation against explicit criteria"
   },
   {
-    "query": "publish this exact package revision to the selected registry and return its registry-native locator; fail if that provider is unavailable",
+    "query": "use the workflow publish operation for this exact package revision and return its registry-native locator; fail if the selected provider is unavailable",
     "should_trigger": true,
     "split": "train",
     "rationale": "explicit provider publication with no implicit fallback"
   },
   {
-    "query": "abandon this attempt, preserving why it stopped, what partial result exists, and what would be needed to retry",
+    "query": "use the workflow abandon operation for this attempt, preserving why it stopped, its partial inline result, and the retry boundary",
     "should_trigger": true,
     "split": "train",
     "rationale": "explicit abandonment with recoverable state"
   },
   {
-    "query": "create an isolated workspace from main at this exact commit and report its native location",
+    "query": "run the workflow workspace-create utility from main at this exact revision and report the provider-native workspace location",
     "should_trigger": true,
     "split": "validation",
     "rationale": "explicit workspace creation from an exact source"
   },
   {
-    "query": "merge this selected workspace into main only after checking revisions, status, and conflicts",
+    "query": "run the workflow workspace-merge utility into main only after checking provider revisions, status, and conflicts",
     "should_trigger": true,
     "split": "validation",
     "rationale": "safe workspace merge with preflight checks"
   },
   {
-    "query": "abandon the selected workspace but preserve its branch and recoverable state unless removal is explicitly confirmed",
+    "query": "run the workflow workspace-abandon utility but preserve the native branch reference and recoverable state unless removal is explicitly confirmed",
     "should_trigger": true,
     "split": "validation",
     "rationale": "recoverable workspace abandonment"
   },
   {
-    "query": "preview stale workspaces, then clean up only the exact ones I confirm",
+    "query": "run the workflow workspace-cleanup utility in preview mode, then remove only the exact native workspace references I confirm",
     "should_trigger": true,
     "split": "validation",
     "rationale": "preview-first explicit workspace cleanup"
   },
   {
-    "query": "review, revise, and validate this result in the order required by its evidence; do not impose a standard lifecycle",
+    "query": "compose the workflow review, revise, and validate operation contracts in the order required by the evidence without imposing a lifecycle",
     "should_trigger": true,
     "split": "validation",
     "rationale": "illustrative composition of independent stage-neutral operations"
@@ -84,44 +84,44 @@
     "split": "train"
   },
   {
-    "query": "ship this",
-    "rationale": "near miss owned by git-guide",
+    "query": "build a threat-informed security assurance plan with exact control and evidence ownership",
+    "rationale": "near miss owned by security-assurance-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "open a pull request against main with reviewers and a label using the gh CLI",
-    "rationale": "near miss owned by github-guide",
+    "query": "define service objectives, error budgets, dependencies, and user-impact indicators for this capability",
+    "rationale": "near miss owned by reliability-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "open a merge request against main with glab on this GitLab repo",
-    "rationale": "near miss owned by gitlab-guide",
+    "query": "Research the code paths and current library versions we need before planning rate limiting for packages/api. Keep it read-only and cite the evidence.",
+    "rationale": "near miss owned by plan-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "assess this exact web release against WCAG 2.2 AA and publish reviewable evidence",
-    "rationale": "near miss owned by accessibility-guide",
+    "query": "Design a Xonovex workflow that can be started manually, by a Claude hook, or by CI. It should run the same review script in every case and should not require governance controls.",
+    "rationale": "near miss owned by agent-governance-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "how do I install the official Atlassian CLI and log in to Jira?",
-    "rationale": "near miss owned by atlassian-guide",
+    "query": "assess a privileged plugin's permissions, provenance, concurrency, and disable path",
+    "rationale": "near miss owned by security-assurance-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "In an Astro page I already have static content. Add two React components: a `<NewsletterSignup />` in the page footer that should only become interactive once the user scrolls it into view, and a `<ThemeToggle />` that reads `window.localStorage` on mount and therefore must not be server-rendered at all. Show the page frontmatter and markup with the correct hydration for each.",
-    "rationale": "near miss owned by astro-guide",
+    "query": "measure reliability without ranking individual developers or gaming deployment frequency",
+    "rationale": "near miss owned by reliability-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "map a mandatory protected-path control to Kiro and tell me whether it can actually block",
-    "rationale": "near miss owned by kiro-guide",
+    "query": "The previous chat is gone. Continue exactly one child from tracker plan:782 at revision 9f31, baseline the repo first, then stop.",
+    "rationale": "near miss owned by plan-guide",
     "should_trigger": false,
     "split": "validation"
   }

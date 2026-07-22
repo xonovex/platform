@@ -96,26 +96,26 @@
     "rationale": "near-miss: high-level async/pool usage, not real-time audio"
   },
   {
-    "query": "In a Remotion project running at 30fps, write a React component that fades a headline in from opacity 0 to 1 over the first half second and slides it up 40px at the same time. Give me the full component code.",
-    "rationale": "near miss owned by remotion-guide",
+    "query": "make our particle system stop calling malloc per particle — hand it a buffer it just fills",
+    "rationale": "near miss owned by memory-management-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "I'm writing TypeScript that compiles to Lua with the typescript-to-lua transpiler. Write a `divmod` function that takes two numbers and returns both the quotient (floored) and the remainder so the generated Lua uses native Lua multiple return values rather than an array or object wrapper. Include a call site that consumes both values.",
-    "rationale": "near miss owned by typescript-to-lua-guide",
+    "query": "our particle simulator stalls when we have 50k particles — the update loop reads position and velocity out of a fat 96-byte struct, can you restructure it for cache efficiency",
+    "rationale": "near miss owned by data-oriented-design-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "I'm writing a small C99 physics engine. Define a rigid body struct and a function that applies a linear impulse to it. It must correctly handle both dynamic bodies and immovable/static bodies.",
-    "rationale": "near miss owned by c99-game-opinionated-guide",
+    "query": "what memory_order should I use on the store and load when one thread fills a buffer and flips a ready flag the other thread waits on?",
+    "rationale": "near miss owned by lock-free-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "respond like a caveman from now on",
-    "rationale": "near miss owned by caveman",
+    "query": "In a Remotion project running at 30fps, write a React component that fades a headline in from opacity 0 to 1 over the first half second and slides it up 40px at the same time. Give me the full component code.",
+    "rationale": "near miss owned by remotion-guide",
     "should_trigger": false,
     "split": "validation"
   }

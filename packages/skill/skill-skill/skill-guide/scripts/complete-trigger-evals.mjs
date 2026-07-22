@@ -101,6 +101,180 @@ const HARNESS_SIBLINGS = new Map([
   ],
 ]);
 
+const SKILL_FAMILIES = [
+  [
+    "accessibility-guide",
+    "android-analytics-guide",
+    "android-wcag-guide",
+    "figma-guide",
+  ],
+  ["android-analytics-guide", "ai-governance-guide", "datadog-guide"],
+  [
+    "adr-guide",
+    "ddd-guide",
+    "plan-guide",
+    "user-stories-guide",
+    "workflow-guide",
+  ],
+  [
+    "accessibility-guide",
+    "agent-governance-guide",
+    "ai-governance-guide",
+    "reliability-guide",
+    "security-assurance-guide",
+    "workflow-guide",
+  ],
+  [
+    "atlassian-guide",
+    "azure-devops-guide",
+    "bitbucket-guide",
+    "figma-guide",
+    "github-guide",
+    "gitlab-guide",
+  ],
+  [
+    "aws-guide",
+    "azure-devops-guide",
+    "bitbucket-guide",
+    "bitrise-guide",
+    "datadog-guide",
+    "docker-guide",
+    "kubernetes-guide",
+    "reliability-guide",
+    "security-assurance-guide",
+    "terraform-guide",
+  ],
+  [
+    "bdd-guide",
+    "fdd-guide",
+    "tdd-guide",
+    "testing-guide",
+    "user-stories-guide",
+    "vitest-guide",
+  ],
+  [
+    "code-quality-guide",
+    "code-review-guide",
+    "github-guide",
+    "gitlab-guide",
+    "pull-request-guide",
+    "security-assurance-guide",
+  ],
+  [
+    "command-guide",
+    "content-guide",
+    "instruction-guide",
+    "llmstxt-guide",
+    "presentation-guide",
+    "reflect-guide",
+    "skill-guide",
+  ],
+  [
+    "c99-guide",
+    "lua-guide",
+    "python-guide",
+    "shell-scripting-guide",
+    "sql-postgresql-guide",
+    "typescript-guide",
+  ],
+  [
+    "c99-game-opinionated-guide",
+    "c99-guide",
+    "c99-opinionated-guide",
+    "cmake-guide",
+    "cross-platform-guide",
+    "data-oriented-design-guide",
+    "debugging-guide",
+    "lock-free-guide",
+    "memory-management-guide",
+  ],
+  [
+    "data-oriented-design-guide",
+    "lua-guide",
+    "lua-opinionated-guide",
+    "typescript-to-lua-guide",
+  ],
+  ["typescript-guide", "typescript-to-lua-guide", "vitest-guide", "zod-guide"],
+  [
+    "expressjs-guide",
+    "hono-guide",
+    "hono-opinionated-guide",
+    "typescript-guide",
+    "vitest-guide",
+    "zod-guide",
+  ],
+  [
+    "astro-guide",
+    "motion-guide",
+    "presentation-guide",
+    "react-guide",
+    "remotion-guide",
+    "threejs-guide",
+  ],
+  [
+    "asset-pipeline-guide",
+    "audio-guide",
+    "c99-game-opinionated-guide",
+    "cross-platform-guide",
+    "data-model-guide",
+    "data-oriented-design-guide",
+    "ecs-guide",
+    "editor-viewport-guide",
+    "game-networking-guide",
+    "gpu-rendering-guide",
+    "gpu-rendering-vulkan-guide",
+    "imgui-guide",
+    "memory-management-guide",
+    "microkernel-pattern-guide",
+    "node-graph-guide",
+    "threejs-guide",
+  ],
+  [
+    "connascence-guide",
+    "data-model-guide",
+    "data-oriented-design-guide",
+    "ddd-guide",
+    "fp-guide",
+    "hexagonal-pattern-guide",
+    "microkernel-pattern-guide",
+    "oop-guide",
+    "orthogonal-pattern-guide",
+  ],
+  [
+    "bitbucket-guide",
+    "code-review-guide",
+    "git-guide",
+    "github-guide",
+    "gitlab-guide",
+    "pull-request-guide",
+    "versioning-guide",
+  ],
+  [
+    "bitrise-guide",
+    "cmake-guide",
+    "docker-guide",
+    "kubernetes-guide",
+    "moon-guide",
+    "npm-guide",
+    "shell-scripting-guide",
+    "terraform-guide",
+    "versioning-guide",
+  ],
+  ["caveman", "content-guide", "fable", "reflect-guide"],
+  ["audio-guide", "motion-guide", "remotion-guide", "strudel-guide"],
+  ["data-model-guide", "node-graph-guide", "sql-postgresql-guide"],
+  ["npm-guide", "pull-request-guide", "versioning-guide"],
+];
+
+const FAMILY_NAMES_BY_SKILL = new Map();
+for (const [familyIndex, family] of SKILL_FAMILIES.entries()) {
+  for (const skillName of family) {
+    const familyNames = FAMILY_NAMES_BY_SKILL.get(skillName) ?? new Set();
+    familyNames.add(familyIndex);
+    FAMILY_NAMES_BY_SKILL.set(skillName, familyNames);
+  }
+}
+
 const isRecord = (value) =>
   typeof value === "object" && value !== null && !Array.isArray(value);
 
@@ -260,6 +434,24 @@ export const roundRobinCandidates = (siblings) => {
   return candidates;
 };
 
+const trainCountFor = (entryCount) =>
+  Math.max(2, Math.min(entryCount - 2, Math.ceil(entryCount * 0.6)));
+
+export const alternateFutureSplits = (queries) => {
+  const trainCount = trainCountFor(queries.length);
+  const train = queries.slice(0, trainCount);
+  const validation = queries.slice(trainCount);
+  const ordered = [];
+  const maximum = Math.max(train.length, validation.length);
+  for (let index = 0; index < maximum; index += 1) {
+    const trainQuery = train[index];
+    if (typeof trainQuery === "string") ordered.push(trainQuery);
+    const validationQuery = validation[index];
+    if (typeof validationQuery === "string") ordered.push(validationQuery);
+  }
+  return ordered;
+};
+
 const addPositiveSeeds = (skill) => {
   const positives = skill.queries.filter(
     (entry) => entry.should_trigger === true,
@@ -314,21 +506,54 @@ const addPositiveSeeds = (skill) => {
   }
 };
 
-const siblingNames = (skill, skills) => {
+const familyOverlap = (leftName, rightName) => {
+  const leftFamilies = FAMILY_NAMES_BY_SKILL.get(leftName) ?? new Set();
+  const rightFamilies = FAMILY_NAMES_BY_SKILL.get(rightName) ?? new Set();
+  return [...leftFamilies].filter((family) => rightFamilies.has(family)).length;
+};
+
+const namedReferences = (skill, skills) =>
+  new Set(
+    skills
+      .filter(
+        (candidate) =>
+          candidate.name !== skill.name && skill.body.includes(candidate.name),
+      )
+      .map((candidate) => candidate.name),
+  );
+
+export const selectSiblingNames = (skill, skills) => {
   const explicit = HARNESS_SIBLINGS.get(skill.name);
   if (explicit !== undefined) return explicit;
   const ownWords = wordSet(skill.description);
-  return skills
+  const outgoing = namedReferences(skill, skills);
+  const incoming = new Set(
+    skills
+      .filter(
+        (candidate) =>
+          candidate.name !== skill.name && candidate.body.includes(skill.name),
+      )
+      .map((candidate) => candidate.name),
+  );
+  const ranked = skills
     .filter((candidate) => candidate.name !== skill.name)
     .map((candidate) => ({
       name: candidate.name,
-      score: similarity(ownWords, wordSet(candidate.description)),
+      affinity:
+        (outgoing.has(candidate.name) ? 10_000 : 0) +
+        (incoming.has(candidate.name) ? 5_000 : 0) +
+        familyOverlap(skill.name, candidate.name) * 100,
+      lexical: similarity(ownWords, wordSet(candidate.description)),
     }))
     .toSorted(
       (left, right) =>
-        right.score - left.score || left.name.localeCompare(right.name),
-    )
-    .slice(0, 8)
+        right.affinity - left.affinity ||
+        right.lexical - left.lexical ||
+        left.name.localeCompare(right.name),
+    );
+  const related = ranked.filter((candidate) => candidate.affinity > 0);
+  return (related.length > 0 ? related : ranked)
+    .slice(0, 4)
     .map((candidate) => candidate.name);
 };
 
@@ -341,19 +566,23 @@ const addNegativeSeeds = (skill, skillsByName, allSkills) => {
       .filter((entry) => typeof entry.query === "string")
       .map((entry) => entry.query.trim().toLowerCase()),
   );
-  const siblings = siblingNames(skill, allSkills).flatMap((siblingName) => {
-    const sibling = skillsByName.get(siblingName);
-    if (sibling === undefined) return [];
-    return [
-      {
-        name: sibling.name,
-        queries: sibling.queries
-          .filter((query) => query.should_trigger === true)
-          .map((entry) => entry.query)
-          .filter((query) => typeof query === "string"),
-      },
-    ];
-  });
+  const siblings = selectSiblingNames(skill, allSkills).flatMap(
+    (siblingName) => {
+      const sibling = skillsByName.get(siblingName);
+      if (sibling === undefined) return [];
+      return [
+        {
+          name: sibling.name,
+          queries: alternateFutureSplits(
+            sibling.queries
+              .filter((query) => query.should_trigger === true)
+              .map((entry) => entry.query)
+              .filter((query) => typeof query === "string"),
+          ),
+        },
+      ];
+    },
+  );
   const candidates = roundRobinCandidates(siblings).map(({owner, query}) => ({
     query,
     rationale: `near miss owned by ${owner}`,
@@ -379,10 +608,7 @@ const assignSplits = (queries) => {
     const entries = queries.filter(
       (entry) => entry.should_trigger === polarity,
     );
-    const trainCount = Math.max(
-      2,
-      Math.min(entries.length - 2, Math.ceil(entries.length * 0.6)),
-    );
+    const trainCount = trainCountFor(entries.length);
     for (const [index, entry] of entries.entries()) {
       entry.split = index < trainCount ? "train" : "validation";
     }

@@ -90,8 +90,8 @@
     "split": "validation"
   },
   {
-    "query": "is this user story good? \"As a rider I want to pay for my trip\" — does it pass INVEST?",
-    "rationale": "near miss owned by user-stories-guide",
+    "query": "ship this",
+    "rationale": "near miss owned by git-guide",
     "should_trigger": false,
     "split": "validation"
   }

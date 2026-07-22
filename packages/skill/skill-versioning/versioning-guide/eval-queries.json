@@ -78,20 +78,20 @@
     "split": "validation"
   },
   {
-    "query": "ship this",
-    "rationale": "near miss owned by git-guide",
-    "should_trigger": false,
-    "split": "validation"
-  },
-  {
     "query": "publish this package to npm",
     "rationale": "near miss owned by npm-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "map a mandatory protected-path control to Pi and tell me whether it can actually block",
-    "rationale": "near miss owned by pi-guide",
+    "query": "help me write a good pull request description for this change",
+    "rationale": "near miss owned by pull-request-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "ship this",
+    "rationale": "near miss owned by git-guide",
     "should_trigger": false,
     "split": "validation"
   }

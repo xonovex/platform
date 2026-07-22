@@ -72,26 +72,26 @@
     "split": "train"
   },
   {
-    "query": "I have a Terraform config that creates private subnets, one per availability zone, from a variable list of AZs. Right now removing a single AZ from the middle of the list forces Terraform to recreate several unrelated subnets. Write the resource and any supporting locals so this stops happening.",
-    "rationale": "near miss owned by terraform-guide",
+    "query": "rewrite this string concat with template literals and pull out the magic numbers as named consts",
+    "rationale": "near miss owned by typescript-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "I'm writing TypeScript that compiles to Lua with the typescript-to-lua transpiler. Write a `divmod` function that takes two numbers and returns both the quotient (floored) and the remainder so the generated Lua uses native Lua multiple return values rather than an array or object wrapper. Include a call site that consumes both values.",
-    "rationale": "near miss owned by typescript-to-lua-guide",
+    "query": "quick pre-merge sanity check: after the type checking change under `work/type-checking/`, a clean checkout behaves differently from my local run. What Python-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "rationale": "near miss owned by python-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "Using Zod 4, write a TypeScript schema named UserSchema for a user object with these fields: an id that is a UUID, an email address, a createdAt that is an ISO datetime string, and a name string between 1 and 100 characters. Also export the inferred TypeScript type.",
-    "rationale": "near miss owned by zod-guide",
+    "query": "quick pre-merge sanity check: after the compile options change under `work/compile-options/`, a clean checkout behaves differently from my local run. What Cmake-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "rationale": "near miss owned by cmake-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "Using vanilla Three.js, set up a WebGLRenderer and a render loop that spins a cube smoothly. It must keep a consistent rotation speed regardless of frame rate and stay crisp on high-DPI / retina displays. Give me the renderer setup and the loop.",
-    "rationale": "near miss owned by threejs-guide",
+    "query": "quick pre-merge sanity check: after the task inheritance change under `work/task-inheritance/`, a clean checkout behaves differently from my local run. What Moon-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "rationale": "near miss owned by moon-guide",
     "should_trigger": false,
     "split": "validation"
   }

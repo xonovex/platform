@@ -32,7 +32,7 @@
   {
     "query": "Audit packages/worker for weak error handling and validation before we plan hardening work; grade findings by severity and make no edits.",
     "should_trigger": true,
-    "split": "validation",
+    "split": "train",
     "rationale": "read-only hardening audit remains code-quality work even when it may inform a later plan"
   },
   {
@@ -78,32 +78,32 @@
     "split": "validation"
   },
   {
-    "query": "I have a Terraform config that creates private subnets, one per availability zone, from a variable list of AZs. Right now removing a single AZ from the middle of the list forces Terraform to recreate several unrelated subnets. Write the resource and any supporting locals so this stops happening.",
-    "rationale": "near miss owned by terraform-guide",
+    "query": "these two modules feel way too tightly coupled — tell me concretely what kind of coupling it is and how to loosen the worst part",
+    "rationale": "near miss owned by connascence-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "Research the code paths and current library versions we need before planning rate limiting for packages/api. Keep it read-only and cite the evidence.",
-    "rationale": "near miss owned by plan-guide",
+    "query": "I have a Rectangle class with mutable width and height and setWidth/setHeight methods. I now need a Square type in the same system. What's the cleanest way to model Square given I already have Rectangle?",
+    "rationale": "near miss owned by oop-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "Write an Express 5 + TypeScript login route handler. It should look up the user by email, verify the submitted password against the stored hash, and on success return a signed JWT the client will send on future API requests.",
-    "rationale": "near miss owned by expressjs-guide",
+    "query": "how should I mark a review comment so the author knows it must be fixed before merge?",
+    "rationale": "near miss owned by code-review-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "walk me through red-green-refactor on this shopping-cart total function",
-    "rationale": "near miss owned by tdd-guide",
+    "query": "build a threat-informed security assurance plan with exact control and evidence ownership",
+    "rationale": "near miss owned by security-assurance-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "Using Zod 4, write a TypeScript schema named UserSchema for a user object with these fields: an id that is a UUID, an email address, a createdAt that is an ISO datetime string, and a name string between 1 and 100 characters. Also export the inferred TypeScript type.",
-    "rationale": "near miss owned by zod-guide",
+    "query": "Review this Go function for coupling problems and tell me how to fix the worst one:\n\n```go\nfunc (r *Repo) Save(order Order, dryRun bool) error {\n    if dryRun {\n        return validate(order)\n    }\n    return r.persist(order)\n}\n```\n\nCallers do `repo.Save(order, true)` in some places and `repo.Save(order, false)` in others.",
+    "rationale": "near miss owned by connascence-guide",
     "should_trigger": false,
     "split": "validation"
   }

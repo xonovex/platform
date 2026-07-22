@@ -48,50 +48,50 @@
     "split": "validation"
   },
   {
-    "query": "In a Hono API running on Node with @hono/node-server, add a WebSocket endpoint at /ws/chat that echoes each incoming message back to the sender. Show both the server bootstrap code and the route definition.",
-    "rationale": "near miss owned by hono-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
-    "query": "Using Zod 4, write a TypeScript schema named UserSchema for a user object with these fields: an id that is a UUID, an email address, a createdAt that is an ISO datetime string, and a name string between 1 and 100 characters. Also export the inferred TypeScript type.",
-    "rationale": "near miss owned by zod-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
     "query": "make this client component server-rendered if possible — it's just fetching the user's recent orders",
     "rationale": "near miss owned by react-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "I have a Terraform config that creates private subnets, one per availability zone, from a variable list of AZs. Right now removing a single AZ from the middle of the list forces Terraform to recreate several unrelated subnets. Write the resource and any supporting locals so this stops happening.",
-    "rationale": "near miss owned by terraform-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
-    "query": "Write an async Python function fetch_all(urls) that retrieves the body of each URL over HTTP and returns them as a list. The URLs are independent of one another and there may be dozens of them.",
-    "rationale": "near miss owned by python-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
-    "query": "add proper types to the response shape in src/api/users.ts so the consumer doesn't have to cast",
-    "rationale": "near miss owned by typescript-guide",
-    "should_trigger": false,
-    "split": "validation"
-  },
-  {
-    "query": "Write an Express 5 + TypeScript login route handler. It should look up the user by email, verify the submitted password against the stored hash, and on success return a signed JWT the client will send on future API requests.",
-    "rationale": "near miss owned by expressjs-guide",
-    "should_trigger": false,
-    "split": "validation"
-  },
-  {
     "query": "In a Remotion project running at 30fps, write a React component that fades a headline in from opacity 0 to 1 over the first half second and slides it up 40px at the same time. Give me the full component code.",
     "rationale": "near miss owned by remotion-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "In an Astro page I already have static content. Add two React components: a `<NewsletterSignup />` in the page footer that should only become interactive once the user scrolls it into view, and a `<ThemeToggle />` that reads `window.localStorage` on mount and therefore must not be server-rendered at all. Show the page frontmatter and markup with the correct hydration for each.",
+    "rationale": "near miss owned by astro-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "in our level editor clicking on a character that's GPU-skinned never selects it because we ray-cast against physics shapes and skinned meshes have none — how should we figure out what's under the cursor",
+    "rationale": "near miss owned by editor-viewport-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "this 'use client' boundary in profile/edit shouldn't extend to the avatar picker — split it",
+    "rationale": "near miss owned by react-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "quick pre-merge sanity check: after the sequencing change under `work/sequencing/`, a clean checkout behaves differently from my local run. What Remotion-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "rationale": "near miss owned by remotion-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "The clean Linux CI job fails only for the minimal content collections fixture under `work/content-collections/`, while the full local fixture passes. Trace the Astro-specific boundary that could cause the difference, then propose a patch and a regression check.",
+    "rationale": "near miss owned by astro-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "my translate gizmo jumps to the cursor on the first frame of the drag and our math divides by something that's basically zero when the handle points toward the camera",
+    "rationale": "near miss owned by editor-viewport-guide",
     "should_trigger": false,
     "split": "validation"
   }

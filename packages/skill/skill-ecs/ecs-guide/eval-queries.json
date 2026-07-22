@@ -72,26 +72,26 @@
     "rationale": "validation negative: LuaJIT table tuning -> lua-opinionated-guide"
   },
   {
-    "query": "I'm writing an immediate-mode GUI and my hover highlight flickers between two overlapping panels — how should I decide which control the mouse is over?",
-    "rationale": "near miss owned by imgui-guide",
+    "query": "our renderer hand-writes a barrier before and after every pass and it breaks every time we reorder passes — I want passes to just declare what they read and write and have ordering and transitions figured out for us",
+    "rationale": "near miss owned by gpu-rendering-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "I have a Terraform config that creates private subnets, one per availability zone, from a variable list of AZs. Right now removing a single AZ from the middle of the list forces Terraform to recreate several unrelated subnets. Write the resource and any supporting locals so this stops happening.",
-    "rationale": "near miss owned by terraform-guide",
+    "query": "our particle simulator stalls when we have 50k particles — the update loop reads position and velocity out of a fat 96-byte struct, can you restructure it for cache efficiency",
+    "rationale": "near miss owned by data-oriented-design-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "our renderer hand-writes a barrier before and after every pass and it breaks every time we reorder passes — I want passes to just declare what they read and write and have ordering and transitions figured out for us",
-    "rationale": "near miss owned by gpu-rendering-guide",
+    "query": "make our particle system stop calling malloc per particle — hand it a buffer it just fills",
+    "rationale": "near miss owned by memory-management-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "Using vanilla Three.js, set up a WebGLRenderer and a render loop that spins a cube smoothly. It must keep a consistent rotation speed regardless of frame rate and stay crisp on high-DPI / retina displays. Give me the renderer setup and the loop.",
-    "rationale": "near miss owned by threejs-guide",
+    "query": "I'm starting a multiplayer game and need to decide whether the server owns all the gameplay objects or if peers can each own their own — and how to keep that flexible if I switch to peer-to-peer later",
+    "rationale": "near miss owned by game-networking-guide",
     "should_trigger": false,
     "split": "validation"
   }

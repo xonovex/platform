@@ -48,14 +48,8 @@
     "split": "validation"
   },
   {
-    "query": "I need to add a SIMD variant of my vec3_dot in lib/math/vec3.c — the rest of the project uses _sse4 and _avx2 suffixes",
-    "rationale": "near miss owned by c99-opinionated-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
-    "query": "I'm deploying a Hono API to a serverless edge runtime where cold-start latency is the dominant cost. Show me how to construct the Hono application instance, choosing the most appropriate router for this deployment, and briefly explain why.",
-    "rationale": "near miss owned by hono-opinionated-guide",
+    "query": "Write a Lua 5.4 function `load_config(path)` that opens the file at `path`, reads all of it, and returns the parsed contents. Show how a caller would use it when the file might not exist, falling back to a default config instead of crashing.",
+    "rationale": "near miss owned by lua-guide",
     "should_trigger": false,
     "split": "train"
   },
@@ -66,32 +60,38 @@
     "split": "train"
   },
   {
-    "query": "Using vanilla Three.js, set up a WebGLRenderer and a render loop that spins a cube smoothly. It must keep a consistent rotation speed regardless of frame rate and stay crisp on high-DPI / retina displays. Give me the renderer setup and the loop.",
-    "rationale": "near miss owned by threejs-guide",
+    "query": "our particle simulator stalls when we have 50k particles — the update loop reads position and velocity out of a fat 96-byte struct, can you restructure it for cache efficiency",
+    "rationale": "near miss owned by data-oriented-design-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "Write a Lua 5.4 function `load_config(path)` that opens the file at `path`, reads all of it, and returns the parsed contents. Show how a caller would use it when the file might not exist, falling back to a default config instead of crashing.",
+    "query": "quick pre-merge sanity check: after the local variables change under `work/local-variables/`, a clean checkout behaves differently from my local run. What Lua-specific assumption could cause that? Show the correction and the exact narrow validation.",
     "rationale": "near miss owned by lua-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "I'm writing a small C99 physics engine. Define a rigid body struct and a function that applies a linear impulse to it. It must correctly handle both dynamic bodies and immovable/static bodies.",
-    "rationale": "near miss owned by c99-game-opinionated-guide",
+    "query": "quick pre-merge sanity check: after the multi return functions change under `work/multi-return-functions/`, a clean checkout behaves differently from my local run. What Typescript To Lua-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "rationale": "near miss owned by typescript-to-lua-guide",
     "should_trigger": false,
-    "split": "validation"
+    "split": "train"
   },
   {
-    "query": "our particle simulator stalls when we have 50k particles — the update loop reads position and velocity out of a fat 96-byte struct, can you restructure it for cache efficiency",
+    "query": "profile why the broad-phase is slow — I suspect we're missing cache constantly but want to confirm before changing the layout",
     "rationale": "near miss owned by data-oriented-design-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "add proper types to the response shape in src/api/users.ts so the consumer doesn't have to cast",
-    "rationale": "near miss owned by typescript-guide",
+    "query": "In Lua, write a function that takes an array of a few thousand numbers and returns them as a single comma-separated string. Make it efficient for large inputs.",
+    "rationale": "near miss owned by lua-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "In a typescript-to-lua project I need an interface that compiles directly to a plain raw Lua table with no runtime wrapper, and a standalone helper function that must NOT receive an implicit `self` parameter in the generated Lua. Write the TypeScript.",
+    "rationale": "near miss owned by typescript-to-lua-guide",
     "should_trigger": false,
     "split": "validation"
   }

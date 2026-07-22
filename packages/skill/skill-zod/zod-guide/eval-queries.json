@@ -72,26 +72,26 @@
     "split": "train"
   },
   {
-    "query": "Design a PostgreSQL table for meeting-room reservations. Each reservation has a room, a start time, and an end time. The database itself must guarantee that two reservations for the same room can never overlap in time. Write the CREATE TABLE statement.",
-    "rationale": "near miss owned by sql-postgresql-guide",
+    "query": "quick pre-merge sanity check: after the validation change under `work/validation/`, a clean checkout behaves differently from my local run. What Expressjs-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "rationale": "near miss owned by expressjs-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "Write an async Python function fetch_all(urls) that retrieves the body of each URL over HTTP and returns them as a list. The URLs are independent of one another and there may be dozens of them.",
-    "rationale": "near miss owned by python-guide",
+    "query": "quick pre-merge sanity check: after the validation type safety change under `work/validation-type-safety/`, a clean checkout behaves differently from my local run. What Hono-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "rationale": "near miss owned by hono-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "Using vanilla Three.js, set up a WebGLRenderer and a render loop that spins a cube smoothly. It must keep a consistent rotation speed regardless of frame rate and stay crisp on high-DPI / retina displays. Give me the renderer setup and the loop.",
-    "rationale": "near miss owned by threejs-guide",
+    "query": "rewrite this string concat with template literals and pull out the magic numbers as named consts",
+    "rationale": "near miss owned by typescript-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "In an Astro page I already have static content. Add two React components: a `<NewsletterSignup />` in the page footer that should only become interactive once the user scrolls it into view, and a `<ThemeToggle />` that reads `window.localStorage` on mount and therefore must not be server-rendered at all. Show the page frontmatter and markup with the correct hydration for each.",
-    "rationale": "near miss owned by astro-guide",
+    "query": "quick pre-merge sanity check: after the http testing change under `work/http-testing/`, a clean checkout behaves differently from my local run. What Vitest-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "rationale": "near miss owned by vitest-guide",
     "should_trigger": false,
     "split": "validation"
   }

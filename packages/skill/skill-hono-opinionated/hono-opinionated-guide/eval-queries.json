@@ -48,26 +48,8 @@
     "split": "validation"
   },
   {
-    "query": "I need to add a SIMD variant of my vec3_dot in lib/math/vec3.c — the rest of the project uses _sse4 and _avx2 suffixes",
-    "rationale": "near miss owned by c99-opinionated-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
     "query": "In a Hono API running on Node with @hono/node-server, add a WebSocket endpoint at /ws/chat that echoes each incoming message back to the sender. Show both the server bootstrap code and the route definition.",
     "rationale": "near miss owned by hono-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
-    "query": "In our LuaJIT game engine, write a factory function `create_entity(x, y, kind)` that returns a new entity table. Entities need position (x, y), a kind, a velocity (velocity_x, velocity_y starting at 0), health (starts at 100), and an active flag (starts true). Not all of these are known at the call site, so make it clean and efficient for a hot update loop.",
-    "rationale": "near miss owned by lua-opinionated-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
-    "query": "I'm writing a small C99 physics engine. Define a rigid body struct and a function that applies a linear impulse to it. It must correctly handle both dynamic bodies and immovable/static bodies.",
-    "rationale": "near miss owned by c99-game-opinionated-guide",
     "should_trigger": false,
     "split": "train"
   },
@@ -78,20 +60,38 @@
     "split": "train"
   },
   {
-    "query": "Design a PostgreSQL table for meeting-room reservations. Each reservation has a room, a start time, and an end time. The database itself must guarantee that two reservations for the same room can never overlap in time. Write the CREATE TABLE statement.",
-    "rationale": "near miss owned by sql-postgresql-guide",
+    "query": "Using Zod 4, write a TypeScript schema named UserSchema for a user object with these fields: an id that is a UUID, an email address, a createdAt that is an ISO datetime string, and a name string between 1 and 100 characters. Also export the inferred TypeScript type.",
+    "rationale": "near miss owned by zod-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "I have a Hono app configured with `app.use('*', cors())`. Write a Vitest test that verifies the CORS preflight (OPTIONS) request to `/api/users` with an Origin header succeeds and that the Access-Control-Allow-Origin header is returned.",
+    "rationale": "near miss owned by vitest-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "quick pre-merge sanity check: after the validation type safety change under `work/validation-type-safety/`, a clean checkout behaves differently from my local run. What Hono-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "rationale": "near miss owned by hono-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "quick pre-merge sanity check: after the validation change under `work/validation/`, a clean checkout behaves differently from my local run. What Expressjs-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "rationale": "near miss owned by expressjs-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "Set up the compiler configuration (CMake) for a C99 library target named `netcodec` that calls `readlink` and `strnlen`. Configure it for strict ISO C99, treat warnings as errors with `-Wall -Wextra`, and make sure it still compiles cleanly even though the code uses partial designated initializers like `(cfg_t){ .port = 8080 }` throughout.",
-    "rationale": "near miss owned by c99-guide",
+    "query": "A review comment on `work/migration-v4/` says the migration v4 change handles the normal fixture but leaves the failure path undefined. For this Zod task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
+    "rationale": "near miss owned by zod-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "Write an async Python function fetch_all(urls) that retrieves the body of each URL over HTTP and returns them as a list. The URLs are independent of one another and there may be dozens of them.",
-    "rationale": "near miss owned by python-guide",
+    "query": "quick pre-merge sanity check: after the http testing change under `work/http-testing/`, a clean checkout behaves differently from my local run. What Vitest-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "rationale": "near miss owned by vitest-guide",
     "should_trigger": false,
     "split": "validation"
   }

@@ -60,20 +60,8 @@
     "split": "train"
   },
   {
-    "query": "map a mandatory protected-path control to Claude Code and tell me whether it can actually block",
-    "rationale": "near miss owned by code-harness-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
     "query": "create a new skill for our GraphQL resolver conventions — SKILL.md plus a few reference files",
     "rationale": "near miss owned by skill-guide",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
-    "query": "map a mandatory protected-path control to Codex and tell me whether it can actually block",
-    "rationale": "near miss owned by codex-guide",
     "should_trigger": false,
     "split": "train"
   },
@@ -81,17 +69,29 @@
     "query": "Our TypeScript HTTP framework docs site at https://acme.dev has getting-started, API reference, routing, and middleware pages, plus a changelog and a migration guide that are only occasionally relevant. Write the llms.txt file we should serve.",
     "rationale": "near miss owned by llmstxt-guide",
     "should_trigger": false,
-    "split": "validation"
+    "split": "train"
   },
   {
-    "query": "what does Xonovex governance actually enforce, and can I run a workflow with no controls?",
-    "rationale": "near miss owned by agent-governance-guide",
+    "query": "the new microservice doesn't have project instructions yet — generate one based on what's in src/",
+    "rationale": "near miss owned by instruction-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "A review comment on `work/governed-promotion/` says the governed promotion change handles the normal fixture but leaves the failure path undefined. For this Reflect task, diagnose the domain-specific mistake, show the smallest correction, and name the focused check that proves it.",
+    "rationale": "near miss owned by reflect-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "map a mandatory protected-path control to GitHub Copilot and tell me whether it can actually block",
-    "rationale": "near miss owned by copilot-guide",
+    "query": "before we install this third-party skill, audit its scripts and the URLs it fetches and lock down what tools it's allowed to use",
+    "rationale": "near miss owned by skill-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "quick pre-merge sanity check: after the markdown mirrors change under `work/markdown-mirrors/`, a clean checkout behaves differently from my local run. What Llmstxt-specific assumption could cause that? Show the correction and the exact narrow validation.",
+    "rationale": "near miss owned by llmstxt-guide",
     "should_trigger": false,
     "split": "validation"
   }

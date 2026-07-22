@@ -102,20 +102,20 @@
     "rationale": "near-miss: single-threaded SIMD alignment, not concurrency"
   },
   {
-    "query": "Set up the compiler configuration (CMake) for a C99 library target named `netcodec` that calls `readlink` and `strnlen`. Configure it for strict ISO C99, treat warnings as errors with `-Wall -Wextra`, and make sure it still compiles cleanly even though the code uses partial designated initializers like `(cfg_t){ .port = 8080 }` throughout.",
-    "rationale": "near miss owned by c99-guide",
+    "query": "I need to add a SIMD variant of my vec3_dot in lib/math/vec3.c — the rest of the project uses _sse4 and _avx2 suffixes",
+    "rationale": "near miss owned by c99-opinionated-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "I have a log file with about 20 million lines already loaded as an array of strings in JavaScript. Write a function that keeps only the ERROR lines, extracts the timestamp from each, and returns the first 10. Explain any performance concerns.",
-    "rationale": "near miss owned by fp-guide",
+    "query": "our exporter crashes opening the second project but the first one is fine — where do I even start",
+    "rationale": "near miss owned by debugging-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "these two modules feel way too tightly coupled — tell me concretely what kind of coupling it is and how to loosen the worst part",
-    "rationale": "near miss owned by connascence-guide",
+    "query": "my sound randomly cuts out with a little pop when the frame rate dips — the mixing happens in a callback that sometimes grabs a mutex",
+    "rationale": "near miss owned by audio-guide",
     "should_trigger": false,
     "split": "validation"
   }

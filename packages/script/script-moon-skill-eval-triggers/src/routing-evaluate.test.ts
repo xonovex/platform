@@ -74,7 +74,7 @@ describe("catalog routing evaluator", () => {
   it("loads competing Claude plugins and writes passing evidence", async () => {
     executable(
       "claude",
-      String.raw`
+      `
 console.log(JSON.stringify({type:"system",subtype:"init",skills:["alpha-guide","beta-guide"]}));
 console.log(JSON.stringify({message:{content:[{type:"tool_use",name:"Skill",input:{skill:"alpha-guide"}}]}}));
 `,

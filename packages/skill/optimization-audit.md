@@ -7,11 +7,11 @@ Commits: `6af54791` (trim), `b67816f5` (restore).
 
 ## 2026-07-22 catalog follow-up
 
-- Current catalog: **93 skills**, **25,707** `SKILL.md` + `references/` lines, **372 output evals**, and **1,615 trigger queries**.
+- Current catalog: **93 skills**, **25,676** `SKILL.md` + `references/` lines, **371 output evals**, and **1,625 trigger queries**.
 - Tiers: 26 aggressive, 43 moderate, 24 conservative.
-- Every skill has `evals.json`, at least 8 positive plus 8 sibling-aware negative trigger queries with train/validation splits, reviewed source provenance, and diverse generated near-miss owners. Version-pinned descriptions also require an explicit source baseline.
+- Every skill has `evals.json`, at least 8 positive plus 8 semantically adjacent negative trigger queries with train/validation splits, reviewed source provenance, and explicit handoff- or domain-derived near-miss owners. The catalog currently yields 158 competitive routing scenarios: 96 train and 62 validation. Version-pinned descriptions also require an explicit source baseline.
 - `agent-governance`, `ai-governance`, and `workflow` were restored after the 2026-07-19 snapshot. They have current trigger/output/source fixtures but no claim to the historical calibration results below.
-- `.github/workflows/skill-evals.yml` runs changed-skill evaluation for enabled internal pull requests and a monthly rotating 12-skill slice, covering both Claude and Codex trigger/output adapters. Shared evaluator changes expand to a bounded slice rather than launching an unbounded catalog run. Trigger validation runs each query three times; output evaluation runs every probe once per arm in batches of at most six. Each runner refuses more than 24 model calls per batch, more than two concurrent calls, or more than three runs per arm. Claude retains its per-call spend caps; Codex uses ephemeral read-only runs with isolated homes and is bounded by run count, batching, timeout, and output ceilings. Calls are never retried automatically, and failed generations are not judged.
+- `.github/workflows/skill-evals.yml` runs changed-skill evaluation for enabled internal pull requests and a tested monthly rotating 12-skill slice, covering both Claude and Codex trigger/output adapters. Shared evaluator changes expand to a bounded slice rather than launching an unbounded catalog run. Trigger validation runs each query three times; output evaluation runs every probe twice per arm in batches of at most three. Each runner refuses more than 24 model calls per batch, more than two concurrent calls, or more than three runs per arm. Claude retains its per-call spend caps; Codex uses ephemeral read-only runs with isolated homes and is bounded by run count, batching, timeout, and output ceilings. Calls are never retried automatically, and failed generations are not judged. The aggregate evidence index records the exact commit, workflow run and attempt, event, harness package versions, and model configuration alongside the benchmark records.
 
 ### 2026-07-19 historical live calibration subset
 
@@ -34,7 +34,7 @@ Commits: `6af54791` (trim), `b67816f5` (restore).
 | `reliability`        |            3 |             178 | valid: 0.333 vs 0.000, delta +0.333                 |
 | `security-assurance` |            3 |             165 | invalid: generation process failure                 |
 
-The authenticated local calibration produced seven valid full A/B benchmarks, a valid final-cap Claude Code dependency smoke, and bounded invalid diagnostics for the remaining skills. Invalid runs never publish `benchmark.json`: zero-token, process, judge, output-limit, missing-activation, and aggregate-limit failures are infrastructure or skill-behavior findings, not optimization scores. The initial full results used the earlier per-call caps while the containment layers were being calibrated; future scheduled evidence uses the final lower caps and bounded six-eval batch. Re-run a bounded batch before changing a tier or trimming content from a live result.
+The authenticated local calibration produced seven valid full A/B benchmarks, a valid final-cap Claude Code dependency smoke, and bounded invalid diagnostics for the remaining skills. Invalid runs never publish `benchmark.json`: zero-token, process, judge, output-limit, missing-activation, and aggregate-limit failures are infrastructure or skill-behavior findings, not optimization scores. The initial full results used the earlier per-call caps while the containment layers were being calibrated; future scheduled evidence uses the final lower caps and bounded three-eval batches. Re-run a bounded batch before changing a tier or trimming content from a live result.
 
 ## Result
 
@@ -177,7 +177,7 @@ Before/after are total lines across `SKILL.md` + `references/`, measured from gi
 
 ## Re-running the evals (and adding a new model)
 
-Every skill carries an `evals.json` next to its `SKILL.md` — the output-eval seed consumed by `moon-skill-eval-outputs`. It holds the knowledge probes (`prompt` + binary `assertions`) that seed any A/B or ablation run. **356 evals across the catalog.** This is the durable "something to start from": no probe needs re-authoring to test a new model.
+Every skill carries an `evals.json` next to its `SKILL.md` — the output-eval seed consumed by `moon-skill-eval-outputs`. It holds the knowledge probes (`prompt` + binary `assertions`) that seed any A/B or ablation run. **371 evals across the catalog.** This is the durable "something to start from": no probe needs re-authoring to test a new model.
 
 ### Test one skill on any model
 
