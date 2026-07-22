@@ -25,4 +25,4 @@ npx moon-skill-eval-routing packages/skill --split all --harness claude --runs 3
 
 Catalog routing finds exact queries that one skill marks positive and one or more other skills mark negative. It loads the expected owner and all of those competing skills in the same isolated run, then passes only when the expected owner is selected. This tests ownership ranking and multi-skill coexistence; the target-only evaluator remains useful for measuring an individual description's recall and precision.
 
-Use `--owners alpha-guide,beta-guide` to restrict scenarios by expected owner. Pull requests use a one-run changed-owner smoke; scheduled and full manual runs use three runs per scenario so the routing rate reflects nondeterminism.
+Use `--owners alpha-guide,beta-guide` to restrict scenarios by expected owner. Use three runs per scenario when the routing rate must reflect nondeterminism.

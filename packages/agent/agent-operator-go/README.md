@@ -868,11 +868,6 @@ Observed 2026-07-16 with docker 29.1.3 / runc 1.4.0 on kernel 7.0.6-gentoo
   `TMPDIR` to a disk-backed path to get past that and reach the same Kind
   failure as the other suites.
 
-Working alternative: `.github/workflows/e2e.yml` runs the integration suite
-and all four e2e suites on a hosted runner. It is dormant until it reaches the
-remote default branch; trigger it with `workflow_dispatch` or wait for its
-nightly schedule.
-
 ## Architecture
 
 Each AgentRun reconciles along one of two paths:

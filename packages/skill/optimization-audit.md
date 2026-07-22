@@ -7,17 +7,13 @@ Commits: `6af54791` (trim), `b67816f5` (restore).
 
 ## 2026-07-22 catalog follow-up
 
-<!-- catalog-stats:start -->
-
 - Current catalog: **92 skills**, **24,741** `SKILL.md` + `references/` lines, **372 output evals**, and **1,643 trigger queries**.
 - Tiers: **26 aggressive**, **43 moderate**, **23 conservative**.
 - Competitive routing: **187 scenarios** (**93 train**, **94 validation**) with **92/92 skills** owning at least one validation scenario.
 
-<!-- catalog-stats:end -->
-
 - Every skill has `evals.json`, at least 8 positive plus 8 semantically adjacent negative trigger queries with train/validation splits, reviewed source provenance, and explicit handoff- or domain-derived near-miss owners. Version-pinned descriptions also require an explicit source baseline.
 - `agent-governance`, `ai-governance`, and `workflow` were restored after the 2026-07-19 snapshot. They have current trigger/output/source fixtures but no claim to the historical calibration results below.
-- `.github/workflows/skill-evals.yml` runs every directly changed skill for enabled internal pull requests and an unconditional monthly rotating 32-skill output slice, covering both Claude and Codex trigger/output adapters. A shared evaluator change samples at most eight skills on a pull request. Competitive routing on pull requests is a one-run smoke limited to scenarios owned by the changed or sampled skills; scheduled and full manual routing runs every catalog scenario three times. Trigger validation runs each query three times; output evaluation runs every probe twice per arm in batches of at most three. Each runner refuses more than 24 model calls per batch, more than two concurrent calls, or more than three runs per arm. Claude retains its per-call spend caps; Codex uses ephemeral read-only runs with isolated homes and is bounded by run count, batching, timeout, and output ceilings. Calls are never retried automatically, and failed generations are not judged. The aggregate evidence index records the exact commit, workflow run and attempt, event, harness package versions, and model configuration alongside the benchmark records; GitHub artifact attestation preserves a durable, verifiable digest beyond the raw artifact's retention window.
+- Live trigger, output, and competitive-routing evals remain available as explicit local Moon commands for individual skill packages. Claude retains its per-call spend caps; Codex uses ephemeral read-only runs with isolated homes and is bounded by run count, batching, timeout, and output ceilings. Calls are never retried automatically, and failed generations are not judged.
 
 ### 2026-07-19 historical live calibration subset
 
@@ -204,7 +200,7 @@ Each eval runs in repeated **with-skill** and **without-skill** arms and is grad
 
 The **weakest model you deploy is the gate** — "what the model already knows" is model-specific, so re-verify against the new model. Re-run the seed across the catalog:
 
-Use the **Skill model evals** workflow for the full catalog, or invoke `moon-skill-eval-outputs` per package with `--plugin-dir` as above. Live pull-request model evals are opt-in through `SKILL_EVALS_ENABLED` and restricted to internal pull requests; ordinary CI validates the eval schemas, routing balance, train/validation splits, provenance, and scripted-skill capabilities without credentials or network access.
+Invoke `moon-skill-eval-outputs` per package with `--plugin-dir` as above. Ordinary CI validates the eval schemas, routing balance, train/validation splits, provenance, and scripted-skill capabilities without credentials or network access.
 
 Read each eval's `with_skill` vs `without_skill` pass rate:
 

@@ -191,12 +191,6 @@ Upgrade the marketplace and selected plugins together; start a new session after
 | `xonovex-skill-insights`    | `xonovex-skill-reflect` |
 | `xonovex-skill-prompt`      | `xonovex-skill-command` |
 
-Detect stale local bundles before or after an upgrade:
-
-```bash
-node packages/skill/skill-skill/skill-guide/scripts/check-retired-plugins.mjs
-```
-
 In Codex CLI, open `codex`, run `/plugins`, select each retired installed entry, and choose **Uninstall plugin**; then install its replacement. For Claude Code user-scope installations:
 
 ```bash

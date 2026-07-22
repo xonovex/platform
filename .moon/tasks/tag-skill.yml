@@ -98,7 +98,6 @@ tasks:
         optional: true
       - script-moon-skill-eval-triggers:ci-runtime
     inputs:
-      - /.github/workflows/skill-evals.yml
       - /packages/skill/AGENTS.md
       - /packages/skill/skill-skill/skill-guide/scripts/**/*
     options:
@@ -120,7 +119,6 @@ tasks:
         optional: true
       - script-moon-skill-eval-outputs:ci-runtime
     inputs:
-      - /.github/workflows/skill-evals.yml
       - /packages/skill/AGENTS.md
       - /packages/skill/skill-skill/skill-guide/scripts/**/*
     options:

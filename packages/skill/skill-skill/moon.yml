@@ -6,15 +6,3 @@ tasks:
     command: echo 'build complete'
     options:
       cache: false
-  test:
-    command: npm run test
-    inputs:
-      - "skill-guide/assets/**/*"
-      - "skill-guide/scripts/**/*"
-      - "/.github/workflows/skill-evals.yml"
-      - "/packages/skill/optimization-audit.md"
-      - "/packages/skill/*/*/SKILL.md"
-      - "/packages/skill/*/*/references/**/*.md"
-      - "/packages/skill/*/*/evals.json"
-      - "/packages/skill/*/*/eval-queries.json"
-      - "/packages/skill/*/moon.yml"

@@ -1,8 +1,8 @@
 ---
 name: skill-guide
 description: "Use when authoring, reviewing, extracting, merging, simplifying, decomposing, or validating Agent Skills (SKILL.md plus references / scripts / assets), or when auditing, splitting, de-duplicating, or tiering a whole set of skills. Triggers on edits under a skills directory, on prompts about creating a new skill, progressive disclosure, reference files, pattern extraction, merging or assimilating skills, simplification to bullet format, validation against the Agent Skills spec, description tuning, evaluating trigger rate / output quality, or making a catalog composable (one owner per concept, cross-references, general→language→framework tiers) — even when the user doesn't say 'skill'."
-compatibility: "Node.js 22+ and Git run catalog maintenance; Python 3.11+ with uv runs legacy validators. Live trigger/output evals additionally require a credentialed Claude or Codex CLI and network access; source fetch/update options perform explicit network or file writes."
-allowed-tools: "Read Bash(git:*) Bash(node:*) Bash(uv:*) Bash(claude:*) Bash(codex:*)"
+compatibility: "Git and Python 3.11+ with uv run the bundled validation, evaluation, and source-audit scripts. Live trigger/output evals additionally require a credentialed Claude or Codex CLI and network access; source fetch/update options perform explicit network or file writes."
+allowed-tools: "Read Bash(git:*) Bash(uv:*) Bash(claude:*) Bash(codex:*)"
 ---
 
 # Skill Guidelines Management
@@ -55,15 +55,12 @@ Author, extract, merge, simplify, and validate Agent Skills following the Agent 
 
 ## Scripts
 
-Bundled maintenance scripts. Python entries use PEP 723 and run with `uv run <script>` (`uv` creates an isolated environment on first run); JavaScript entries run with Node.js 22+:
+Bundled maintenance scripts use PEP 723 and run with `uv run <script>` (`uv` creates an isolated environment on first run):
 
 - `scripts/validate.py <skill-dir>` — spec / quality / harness-neutrality audit (read-only; exits non-zero on errors)
 - `scripts/eval-triggers.py <queries.json> <skill-name>` — run trigger-eval queries against a skill (Claude Code reference implementation; requires `claude` CLI in PATH)
 - `scripts/eval-outputs.py <evals.json> <skill-name>` — run output-quality evals with-skill vs without-skill; writes per-arm pass rate / tokens / duration + `benchmark.json` (requires `claude` CLI in PATH)
 - `scripts/audit-sources.py <skill-dir>` — portable parity implementation of the catalog source audit: staleness, mappings, versioned drift anchors, live URLs, restricted-source classification, and content hashes; `--fetch` checks URLs and snapshots, `--pull` refreshes declared checkouts, and `--mark-reviewed` stamps the date after review (read-only by default)
-- `scripts/complete-trigger-evals.mjs [catalog-root]` — remove legacy generated queries, require eight curated positive routes, and fill negative routes from real sibling prompts
-- `scripts/list-eval-matrix.mjs [catalog-root] [changed-files|-] [limit] [offset]` — emit a bounded, rotating full-catalog or changed-skill model-eval matrix as JSON
-- `scripts/check-retired-plugins.mjs [--root PATH]... [--json]` — find installed retired plugin bundles and name their replacements
 
 The repository's `moon-skill-eval-triggers` and `moon-skill-eval-outputs` commands accept `--harness claude|codex`. Claude remains the default; Codex runs with an isolated home, ignored user configuration/rules, a read-only sandbox, ephemeral sessions, and only the target skill in the activated arm.
 
