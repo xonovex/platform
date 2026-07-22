@@ -262,7 +262,7 @@ const SKILL_FAMILIES = [
     "terraform-guide",
     "versioning-guide",
   ],
-  ["caveman", "content-guide", "fable", "reflect-guide"],
+  ["content-guide", "reflect-guide"],
   ["audio-guide", "motion-guide", "remotion-guide", "strudel-guide"],
   ["data-model-guide", "node-graph-guide", "sql-postgresql-guide"],
   ["npm-guide", "pull-request-guide", "versioning-guide"],

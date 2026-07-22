@@ -17,6 +17,10 @@
       "types": "./src/executable.ts",
       "default": "./dist/src/executable.js"
     },
+    "./skill-eval-models": {
+      "types": "./src/skill-eval-models.ts",
+      "default": "./dist/src/skill-eval-models.js"
+    },
     "./direct-execution": {
       "types": "./src/direct-execution.ts",
       "default": "./dist/src/direct-execution.js"

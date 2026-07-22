@@ -12,7 +12,7 @@ Options (flag overrides env):
     --runs N             / RUNS=N             runs per query (default: 3)
     --threshold F        / THRESHOLD=F        trigger-rate cutoff for a pass (default: 0.5)
     --harness H          / SKILL_EVAL_HARNESS harness: claude | codex (default: claude)
-    --model M                                  harness model (defaults: Claude haiku; Codex configured default)
+    --model M                                  harness model (defaults: Claude claude-haiku-4-5-20251001; Codex gpt-5.3-codex)
     --split S                                  train | validation | all (default: all)
     --batch-size N                             queries per sequential batch
     --workspace PATH                           directory for JSONL and summary evidence

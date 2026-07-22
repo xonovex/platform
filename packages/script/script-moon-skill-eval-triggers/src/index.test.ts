@@ -178,7 +178,7 @@ console.log(JSON.stringify({type: "item.completed", item: {type: "agent_message"
     ).toMatchObject({
       skill: "test-skill",
       harness: "codex",
-      model: null,
+      model: "gpt-5.3-codex",
       queries: 2,
       passed: 2,
       failed: 0,

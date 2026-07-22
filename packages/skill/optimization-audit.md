@@ -9,9 +9,9 @@ Commits: `6af54791` (trim), `b67816f5` (restore).
 
 <!-- catalog-stats:start -->
 
-- Current catalog: **94 skills**, **24,830** `SKILL.md` + `references/` lines, **378 output evals**, and **1,675 trigger queries**.
-- Tiers: **27 aggressive**, **43 moderate**, **24 conservative**.
-- Competitive routing: **191 scenarios** (**96 train**, **95 validation**) with **94/94 skills** owning at least one validation scenario.
+- Current catalog: **92 skills**, **24,741** `SKILL.md` + `references/` lines, **372 output evals**, and **1,643 trigger queries**.
+- Tiers: **26 aggressive**, **43 moderate**, **23 conservative**.
+- Competitive routing: **187 scenarios** (**93 train**, **94 validation**) with **92/92 skills** owning at least one validation scenario.
 
 <!-- catalog-stats:end -->
 
@@ -193,7 +193,8 @@ npx moon-skill-eval-outputs \
   --model <model> --plugin-dir packages/skill/<skill>
 # e.g. npx moon-skill-eval-outputs \
 #   packages/skill/skill-typescript/typescript-guide/evals.json \
-#   xonovex-skill-typescript:typescript-guide --model haiku \
+#   xonovex-skill-typescript:typescript-guide \
+#   --model claude-haiku-4-5-20251001 \
 #   --plugin-dir packages/skill/skill-typescript
 ```
 

@@ -9,7 +9,7 @@ npx moon-skill-eval-triggers [eval-queries.json] [skill-name] [train|validation|
 # queries defaults to ./eval-queries.json; skill-name defaults to the name in ./SKILL.md
 ```
 
-Requires the selected CLI on PATH and its API credential. Claude is the default harness.
+Requires the selected CLI on PATH and its API credential. Claude is the default harness. Generation defaults are pinned to `claude-haiku-4-5-20251001` for Claude and `gpt-5.3-codex` for Codex; `--model` or the harness-specific environment variable is an explicit override. Evidence records the resolved model identifier.
 
 Each run loads only the target local plugin and its declared local plugin dependencies, with empty user/project/local settings and MCP configuration. Plugin preflight requires skill-only manifests and rejects commands, agents, hooks, MCP, LSP, and settings components. `Skill` is the only exposed tool; `Read`, shell, file mutation, web, browser, task, and undeclared plugins are unavailable. The process is killed as soon as the target Skill call appears.
 

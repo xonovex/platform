@@ -132,8 +132,10 @@ jobs:
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           CODEX_API_KEY: ${{ secrets.CODEX_API_KEY }}
-          CLAUDE_MODEL: haiku
-          JUDGE_MODEL: sonnet
+          CLAUDE_MODEL: claude-haiku-4-5-20251001
+          CODEX_MODEL: gpt-5.3-codex
+          JUDGE_MODEL: claude-sonnet-4-6
+          CODEX_JUDGE_MODEL: gpt-5.3-codex
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SKILL_PROJECT: ${{ matrix.skill.project }}
         run: |
@@ -196,7 +198,8 @@ jobs:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           CODEX_API_KEY: ${{ secrets.CODEX_API_KEY }}
           SKILL_EVAL_HARNESS: ${{ matrix.harness }}
-          CLAUDE_MODEL: haiku
+          CLAUDE_MODEL: claude-haiku-4-5-20251001
+          CODEX_MODEL: gpt-5.3-codex
           SKILL_ROUTING_OWNERS: ${{ github.event_name == 'pull_request' && needs.matrix.outputs.routing_owners || '' }}
           SKILL_ROUTING_RUNS: ${{ github.event_name == 'pull_request' && '1' || '3' }}
           SKILL_ROUTING_SPLIT: all
@@ -260,8 +263,8 @@ jobs:
                 routing_runs_per_scenario: $routing_runs
               },
               harnesses: {
-                claude: {runner: "@anthropic-ai/claude-code", version: "2.1.211", generation_model: "haiku", judge_model: "sonnet"},
-                codex: {runner: "@openai/codex", version: "0.145.0", model: "configured default"}
+                claude: {runner: "@anthropic-ai/claude-code", version: "2.1.211", generation_model: "claude-haiku-4-5-20251001", judge_model: "claude-sonnet-4-6"},
+                codex: {runner: "@openai/codex", version: "0.145.0", generation_model: "gpt-5.3-codex", judge_model: "gpt-5.3-codex"}
               }
             }' >catalog-eval-metadata.json
           mapfile -d '' files < <(

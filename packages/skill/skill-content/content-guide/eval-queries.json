@@ -54,8 +54,8 @@
     "split": "train"
   },
   {
-    "query": "respond like a caveman from now on",
-    "rationale": "near miss owned by caveman",
+    "query": "help me write acceptance criteria for the checkout story covering edge cases and errors",
+    "rationale": "near miss owned by user-stories-guide",
     "should_trigger": false,
     "split": "train"
   },
@@ -78,8 +78,8 @@
     "split": "train"
   },
   {
-    "query": "Respond like a caveman. Does `git reset --soft HEAD~1` keep my staged changes or throw them away, and what is the exact command to undo the last commit while keeping everything staged?",
-    "rationale": "near miss owned by caveman",
+    "query": "rewrite this story using the As a / I want / so that template",
+    "rationale": "near miss owned by user-stories-guide",
     "should_trigger": false,
     "split": "validation"
   },

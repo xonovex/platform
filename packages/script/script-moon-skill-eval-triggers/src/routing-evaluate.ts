@@ -4,6 +4,7 @@ import {parseCliArgs} from "@xonovex/script-moon-common";
 import {boundedBatches} from "@xonovex/script-moon-common/batches";
 import {resolveExecutable} from "@xonovex/script-moon-common/executable";
 import {resolveClaudePluginDirectories} from "@xonovex/script-moon-common/fs";
+import {skillEvalModelDefaults} from "@xonovex/script-moon-common/skill-eval-models";
 import {
   buildRoutingScenarios,
   type RoutingScenario,
@@ -209,13 +210,14 @@ export const main = async (argv: readonly string[]): Promise<number> => {
 
   const harness = harnessInput;
   const executable = resolveExecutable(harness);
-  const defaultModel = harness === "claude" ? "haiku" : "";
-  const model =
+  const defaultModel = skillEvalModelDefaults(harness).generation;
+  const modelInput =
     (values.model as string | undefined) ??
     (harness === "claude"
       ? process.env.CLAUDE_MODEL
       : process.env.CODEX_MODEL) ??
     defaultModel;
+  const model = modelInput.trim().length > 0 ? modelInput : defaultModel;
   const workspace = resolve(
     (values.workspace as string | undefined) ??
       `.skill-eval-results/routing/${harness}`,
@@ -270,7 +272,7 @@ export const main = async (argv: readonly string[]): Promise<number> => {
     `${JSON.stringify(
       {
         harness,
-        model: model || null,
+        model,
         split: splitResult.data,
         selected_owners: [
           ...new Set(records.map(({expected_skill}) => expected_skill)),

@@ -175,8 +175,8 @@ export const main = async (argv: readonly string[]): Promise<number> => {
     `skill: ${config.skillName}  evals: ${String(config.evaluations.length)}  ` +
       `runs/arm: ${String(config.runs)}  concurrency: ${String(config.concurrency)}  ` +
       `workspace: ${config.iterationDirectory}\n` +
-      `harness: ${config.harness}  gen model: ${config.model || "<default>"}  ` +
-      `judge model: ${config.judgeModel || "<default>"}\n` +
+      `harness: ${config.harness}  gen model: ${config.model}  ` +
+      `judge model: ${config.judgeModel}\n` +
       `caps: ${harnessCaps}` +
       `model_calls=${String(outputModelCallCount(config.evaluations.length, config.runs))}  ` +
       `batches=${String(config.evaluationBatches.length)}  ` +
@@ -203,8 +203,8 @@ export const main = async (argv: readonly string[]): Promise<number> => {
     skill: config.skillName,
     tier: config.tier,
     harness: config.harness,
-    model: config.model || null,
-    judge_model: config.judgeModel || null,
+    model: config.model,
+    judge_model: config.judgeModel,
     iteration: config.iteration,
     runs_per_arm: config.runs,
     eval_count: config.evaluations.length,

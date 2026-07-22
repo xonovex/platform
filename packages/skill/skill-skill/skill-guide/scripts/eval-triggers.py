@@ -13,7 +13,8 @@ Usage:
 Options (flag overrides env; env keeps the loop/CI ergonomics):
     --runs N             / RUNS=N            runs per query (default: 3)
     --threshold F        / THRESHOLD=F       trigger-rate cutoff for a pass (default: 0.5)
-    --model M            / CLAUDE_MODEL=M    model for `claude --model` — use `haiku` to keep cost low
+    --model M            / CLAUDE_MODEL=M    model for `claude --model`
+                                               (default: claude-haiku-4-5-20251001)
     --plugin-dir PATH    / PLUGIN_DIR=PATH    target-only local plugin directory
     --max-budget-usd N   / MAX_BUDGET_USD=N  hard per-run spend cap (default/max: 0.05)
 
@@ -49,6 +50,7 @@ from pathlib import Path
 TRIGGER_TIMEOUT = 60
 TRIGGER_OUTPUT_LIMIT = 2_000
 MAX_MODEL_RUNS = 24
+CLAUDE_GENERATION_MODEL = "claude-haiku-4-5-20251001"
 TRIGGER_SYSTEM_PROMPT = (
     "Decide only whether the available skill applies to the user request. "
     "If it applies, invoke Skill immediately. Otherwise reply with one short sentence. "
@@ -159,8 +161,9 @@ def build_parser() -> argparse.ArgumentParser:
     )
     p.add_argument(
         "--model",
-        default=os.environ.get("CLAUDE_MODEL", "haiku"),
-        help="model alias/id passed to `claude --model` (env CLAUDE_MODEL, default haiku)",
+        default=os.environ.get("CLAUDE_MODEL") or CLAUDE_GENERATION_MODEL,
+        help="model id passed to `claude --model` "
+        f"(env CLAUDE_MODEL, default {CLAUDE_GENERATION_MODEL})",
     )
     p.add_argument("--plugin-dir", default=os.environ.get("PLUGIN_DIR"),
                    help="target-only local plugin directory (env PLUGIN_DIR)")
@@ -344,7 +347,7 @@ def main(argv: list[str]) -> int:
 
     runs = args.runs
     threshold = args.threshold
-    claude_model = args.model or "haiku"
+    claude_model = args.model or CLAUDE_GENERATION_MODEL
     budget = args.max_budget_usd
     if not 1 <= runs <= 3:
         sys.stderr.write("Error: --runs must be between 1 and 3\n")
@@ -434,6 +437,7 @@ def main(argv: list[str]) -> int:
             failed += 1
 
         result = {
+            "model": claude_model,
             "query": query,
             "should_trigger": should_trigger,
             "triggers": triggers,

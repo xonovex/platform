@@ -83,7 +83,7 @@ describe("trigger configuration", () => {
       threshold: 0.5,
       budget: 0.05,
       harness: "claude",
-      model: "haiku",
+      model: "claude-haiku-4-5-20251001",
       harnessExecutable: "/bin/claude",
       queryCount: 2,
       maxBatchModelRuns: 6,
@@ -145,6 +145,13 @@ describe("trigger configuration", () => {
         "--ignore-rules",
       ]),
     );
+  });
+
+  it("uses the pinned Codex model when no override is provided", () => {
+    const config = successfulConfig(resolveConfig(["--harness", "codex"]));
+
+    expect(config.model).toBe("gpt-5.3-codex");
+    expect(config.harnessArgs).toContain("gpt-5.3-codex");
   });
 
   it("classifies invalid positionals and options as usage errors", () => {

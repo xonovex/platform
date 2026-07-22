@@ -9,6 +9,7 @@ import {
   resolveClaudePluginDirectories,
   resolveGuideDirectory,
 } from "@xonovex/script-moon-common/fs";
+import {skillEvalModelDefaults} from "@xonovex/script-moon-common/skill-eval-models";
 import {parseCli, parseFrontmatterName} from "./cli.js";
 import {
   buildTriggerClaudeArgs,
@@ -210,7 +211,7 @@ export const resolveTriggerConfig = (
     );
   }
 
-  const defaultModel = harness === "claude" ? "haiku" : "";
+  const defaultModel = skillEvalModelDefaults(harness).generation;
   const environmentModel =
     harness === "claude" ? environment.CLAUDE_MODEL : environment.CODEX_MODEL;
   const modelInput = cli.model ?? environmentModel ?? defaultModel;

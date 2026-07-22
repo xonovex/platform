@@ -70,7 +70,7 @@ export const main = async (argv: readonly string[]): Promise<number> => {
         {
           skill: config.skillName,
           harness: config.harness,
-          model: config.model || null,
+          model: config.model,
           split: config.split,
           batches: config.queryBatches.length,
           queries: total,
@@ -93,7 +93,7 @@ export const main = async (argv: readonly string[]): Promise<number> => {
   process.stderr.write(
     `skill: ${config.skillName}  harness: ${config.harness}  split: ${config.split}  ` +
       `runs: ${String(config.runs)}  threshold: ${String(config.threshold)}  ` +
-      `model: ${config.model || "<default>"}  ` +
+      `model: ${config.model}  ` +
       budgetSummary +
       `timeout: 60s  ` +
       `output-limit: ${String(TRIGGER_OUTPUT_LIMIT)} chars  ` +

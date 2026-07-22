@@ -28,8 +28,10 @@ evals.json shape:
 Options (flag overrides env; env keeps the loop/CI ergonomics):
     --runs N / RUNS=N                  runs per arm per eval (default: 1; maximum: 3)
     --concurrency N / CONCURRENCY=N    parallel claude invocations (default/maximum: 2)
-    --model M / CLAUDE_MODEL=M         model for the generation runs (haiku/sonnet/opus)
-    --judge-model M / JUDGE_MODEL=M    model for grading (default: claude default)
+    --model M / CLAUDE_MODEL=M         generation model
+                                       (default: claude-haiku-4-5-20251001)
+    --judge-model M / JUDGE_MODEL=M    grading model
+                                       (default: claude-sonnet-4-6)
     --disallowed-tools L / DISALLOWED_TOOLS=L
                                        tools blocked in BOTH arms during generation
                                        (default: Bash,Edit,Write,NotebookEdit,WebFetch);
@@ -97,6 +99,8 @@ JUDGE_SYSTEM_PROMPT = (
     "return exactly the requested JSON."
 )
 MAX_OUTPUT_MODEL_CALLS = 24
+CLAUDE_GENERATION_MODEL = "claude-haiku-4-5-20251001"
+CLAUDE_JUDGE_MODEL = "claude-sonnet-4-6"
 OUTPUT_GATE_POLICIES = {
     "aggressive": {"minimum_with_skill_pass_rate": 0.75,
                    "minimum_delta_pass_rate": 0.05},
@@ -199,10 +203,18 @@ def build_parser() -> argparse.ArgumentParser:
                    help="runs per arm per eval (env RUNS, default 1, maximum 3)")
     p.add_argument("--concurrency", type=int, default=int(os.environ.get("CONCURRENCY", "2")),
                    help="parallel claude invocations (env CONCURRENCY, default/maximum 2)")
-    p.add_argument("--model", default=os.environ.get("CLAUDE_MODEL", "haiku"),
-                   help="model for the generation runs (env CLAUDE_MODEL, default haiku)")
-    p.add_argument("--judge-model", default=os.environ.get("JUDGE_MODEL", ""),
-                   help="model for grading (env JUDGE_MODEL)")
+    p.add_argument(
+        "--model",
+        default=os.environ.get("CLAUDE_MODEL") or CLAUDE_GENERATION_MODEL,
+        help="generation model "
+        f"(env CLAUDE_MODEL, default {CLAUDE_GENERATION_MODEL})",
+    )
+    p.add_argument(
+        "--judge-model",
+        default=os.environ.get("JUDGE_MODEL") or CLAUDE_JUDGE_MODEL,
+        help="grading model "
+        f"(env JUDGE_MODEL, default {CLAUDE_JUDGE_MODEL})",
+    )
     p.add_argument("--disallowed-tools",
                    default=os.environ.get("DISALLOWED_TOOLS", "Bash,Edit,Write,NotebookEdit,WebFetch"),
                    help="tools blocked in both arms (env DISALLOWED_TOOLS); without-skill also blocks Skill")
@@ -706,8 +718,8 @@ def main(argv: list[str]) -> int:
 
     runs = args.runs
     concurrency = args.concurrency
-    claude_model = args.model
-    judge_model = args.judge_model
+    claude_model = args.model or CLAUDE_GENERATION_MODEL
+    judge_model = args.judge_model or CLAUDE_JUDGE_MODEL
     disallowed = args.disallowed_tools
     timeout = args.gen_timeout
     cwd = args.eval_cwd or None
@@ -861,6 +873,7 @@ def main(argv: list[str]) -> int:
     without_block = aggregate_arm(records, "without_skill", runs)
     benchmark = {
         "skill": skill_name, "tier": tier, "iteration": iteration,
+        "model": claude_model, "judge_model": judge_model,
         "runs_per_arm": runs, "eval_count": len(norm),
         "run_summary": {
             "with_skill": with_block, "without_skill": without_block,

@@ -14,6 +14,8 @@ tasks:
       --coverage.thresholds.functions 80
       --coverage.thresholds.branches 70
       --coverage.thresholds.statements 80
+    deps:
+      - script-moon-common:build
     inputs:
       - /packages/skill/*/*/eval-queries.json
   ts-build:

@@ -146,17 +146,30 @@ describe("evaluation configuration", () => {
     });
   });
 
+  it("uses pinned Claude generation and judge models by default", () => {
+    const config = successfulConfig(resolveConfig());
+
+    expect(config).toMatchObject({
+      model: "claude-haiku-4-5-20251001",
+      judgeModel: "claude-sonnet-4-6",
+    });
+  });
+
   it("selects Codex for generation and judging", () => {
-    const config = successfulConfig(
-      resolveConfig(["--harness", "codex", "--model", "gpt-test"]),
-    );
+    const config = successfulConfig(resolveConfig(["--harness", "codex"]));
 
     expect(config).toMatchObject({
       harness: "codex",
-      model: "gpt-test",
+      model: "gpt-5.3-codex",
+      judgeModel: "gpt-5.3-codex",
     });
     expect(config.withArgs).toEqual(
-      expect.arrayContaining(["exec", "--json", "--ephemeral", "gpt-test"]),
+      expect.arrayContaining([
+        "exec",
+        "--json",
+        "--ephemeral",
+        "gpt-5.3-codex",
+      ]),
     );
   });
 

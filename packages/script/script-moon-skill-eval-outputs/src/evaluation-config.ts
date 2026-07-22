@@ -9,6 +9,7 @@ import {
   resolveClaudePluginDirectories,
   resolveGuideDirectory,
 } from "@xonovex/script-moon-common/fs";
+import {skillEvalModelDefaults} from "@xonovex/script-moon-common/skill-eval-models";
 import {
   buildCodexArgs,
   buildGenerationClaudeArgs,
@@ -103,7 +104,7 @@ const cliDefinition = {
     model: {
       type: "string",
       description:
-        "generation model (CLAUDE_MODEL or CODEX_MODEL; harness default when empty)",
+        "generation model (CLAUDE_MODEL or CODEX_MODEL; pinned harness default when empty)",
     },
     harness: {
       type: "string",
@@ -113,7 +114,7 @@ const cliDefinition = {
     "judge-model": {
       type: "string",
       description:
-        "grading model (JUDGE_MODEL or CODEX_JUDGE_MODEL; harness default when empty)",
+        "grading model (JUDGE_MODEL or CODEX_JUDGE_MODEL; pinned harness default when empty)",
     },
     "disallowed-tools": {
       type: "string",
@@ -386,17 +387,23 @@ export const resolveEvaluationConfig = (
     : resolve(workingDirectory, `${shortName}-workspace`);
   const iteration = optionsResult.data.iteration ?? nextIteration(workspace);
   const iterationDirectory = join(workspace, iteration);
-  const defaultModel = harness === "claude" ? "haiku" : "";
+  const defaultModels = skillEvalModelDefaults(harness);
   const environmentModel =
     harness === "claude" ? environment.CLAUDE_MODEL : environment.CODEX_MODEL;
+  const modelInput =
+    (values.model as string | undefined) ??
+    environmentModel ??
+    defaultModels.generation;
   const model =
-    (values.model as string | undefined) ?? environmentModel ?? defaultModel;
-  const judgeModel =
+    modelInput.trim().length > 0 ? modelInput : defaultModels.generation;
+  const judgeModelInput =
     (values["judge-model"] as string | undefined) ??
     (harness === "codex"
       ? environment.CODEX_JUDGE_MODEL
       : environment.JUDGE_MODEL) ??
-    "";
+    defaultModels.judge;
+  const judgeModel =
+    judgeModelInput.trim().length > 0 ? judgeModelInput : defaultModels.judge;
   const disallowedTools =
     (values["disallowed-tools"] as string | undefined) ??
     environment.DISALLOWED_TOOLS ??

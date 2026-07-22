@@ -96,6 +96,7 @@ console.log(JSON.stringify({message:{content:[{type:"tool_use",name:"Skill",inpu
       JSON.parse(readFileSync(join(workspace, "summary.json"), "utf8")),
     ).toMatchObject({
       harness: "claude",
+      model: "claude-haiku-4-5-20251001",
       catalog_scenarios: 1,
       selected_scenarios: 1,
       passed: 1,

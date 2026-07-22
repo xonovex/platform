@@ -1,9 +1,0 @@
-{
-  "name": "xonovex-skill-caveman",
-  "version": "7.0.0",
-  "description": "Xonovex Caveman writing-style skill",
-  "author": {
-    "name": "Xonovex"
-  },
-  "skills": "./caveman"
-}
