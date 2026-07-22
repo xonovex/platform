@@ -23,6 +23,8 @@ const createFixture = (): string => {
     version: VERSION,
     description: "Test skill",
   };
+  const claudeManifest = {...manifest, skills: ["./test-guide"]};
+  const codexManifest = {...manifest, skills: "./test-guide"};
   const marketplace = {
     metadata: {version: VERSION},
     plugins: [
@@ -38,8 +40,9 @@ const createFixture = (): string => {
   writeJson(root, ".claude-plugin/marketplace.json", marketplace);
   writeJson(root, ".agents/plugins/marketplace.json", marketplace);
   writeJson(root, `${PACKAGE_PATH}/package.json`, manifest);
-  writeJson(root, `${PACKAGE_PATH}/.claude-plugin/plugin.json`, manifest);
-  writeJson(root, `${PACKAGE_PATH}/.codex-plugin/plugin.json`, manifest);
+  writeJson(root, `${PACKAGE_PATH}/.claude-plugin/plugin.json`, claudeManifest);
+  writeJson(root, `${PACKAGE_PATH}/.codex-plugin/plugin.json`, codexManifest);
+  writeText(root, `${PACKAGE_PATH}/test-guide/SKILL.md`, "# Test skill\n");
   writeJson(root, "package-lock.json", {
     packages: {[PACKAGE_PATH]: {version: VERSION}},
   });
@@ -142,6 +145,29 @@ describe("release input validation", () => {
 
       expect(result.failures).toContain(
         "Claude marketplace contains every command and skill package exactly once",
+      );
+    } finally {
+      rmSync(root, {recursive: true, force: true});
+    }
+  });
+
+  it("rejects a skill manifest path that does not resolve to its guide", () => {
+    const root = createFixture();
+    writeJson(root, `${PACKAGE_PATH}/.codex-plugin/plugin.json`, {
+      name: "skill-test",
+      version: VERSION,
+      description: "Test skill",
+      skills: "./old-guide",
+    });
+
+    try {
+      const result = validateRelease(root);
+
+      expect(result.failures).toContain(
+        `${PACKAGE_PATH} Codex manifest skill paths match ./test-guide`,
+      );
+      expect(result.failures).toContain(
+        `${PACKAGE_PATH} manifest skill path resolves: ./old-guide`,
       );
     } finally {
       rmSync(root, {recursive: true, force: true});

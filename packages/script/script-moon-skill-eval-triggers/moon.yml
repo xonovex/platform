@@ -50,8 +50,9 @@ tasks:
   ci-routing:
     script: >-
       npx moon-skill-eval-routing packages/skill
-      --split all
-      --runs 1
+      --split "${SKILL_ROUTING_SPLIT:-all}"
+      --runs "${SKILL_ROUTING_RUNS:-3}"
+      --owners "${SKILL_ROUTING_OWNERS:-}"
       --threshold 0.5
       --batch-size 8
       --max-budget-usd 0.05

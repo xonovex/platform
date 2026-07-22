@@ -20,8 +20,9 @@ description: "Use when editing or scaffolding Express 5+ API servers in TypeScri
 
 ## Gotchas
 
-- Express 4 swallows unhandled async errors silently — wrap async handlers or upgrade to Express 5 (which forwards to error middleware)
+- Express 5 forwards rejected handler promises to error middleware — do not wrap every async handler; catch only for local recovery, added context, or non-Promise callback boundaries
 - Error-handling middleware needs **four** parameters `(err, req, res, next)` — three-arg middleware is a regular handler, not an error one
+- When `res.headersSent` is true, a custom error handler must call `next(err)` so Express can close or finish the response safely
 - Middleware order is execution order — auth must run before its route handler; misordering creates security holes or silent skips
 - `res.json()` ends the response — calling it twice (e.g. after `next()`) throws `Cannot set headers after they are sent`
 

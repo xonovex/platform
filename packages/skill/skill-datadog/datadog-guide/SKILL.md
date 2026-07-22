@@ -10,6 +10,7 @@ Operate Datadog as an optional evidence and telemetry provider. Datadog correlat
 ## Essentials
 
 - **Discover product and data scope** — resolve site/region, organization, tier, enabled products, integrations, API/app-key roles, pipelines/services, retention, residency, access, sampling, and cost before collection.
+- **Select provider credentials explicitly** — choose Datadog key types, scopes, service identity, headers, site, and validation here; use **credential-management-guide** for storage, injection, rotation, and exposure response, see [references/auth.md](references/auth.md)
 - **Keep sources authoritative** — preserve native source-provider and Datadog references; a Datadog trace/event/finding correlation never replaces the original commit, build, deployment, AWS, or audit record.
 - **Minimize before ingesting** — metadata is the default; prompts, model/tool content, source, logs, secrets, personal data, and payload bodies require an explicit purpose and authorization.
 - **Govern the full data lifecycle** — preview fields, tags, redaction, sampling, routing, retention, residency, access, deletion, downstream export, volume, and cost.
@@ -29,7 +30,7 @@ Operate Datadog as an optional evidence and telemetry provider. Datadog correlat
 - CI Visibility, CD Visibility, DORA, Audit Trail, Software Catalog, Cloud Security, and LLM Observability have different sources, tiers, identities, retention, and semantics.
 - A service, environment, version, commit SHA, pipeline ID, and deployment ID must map consistently; tag similarity alone can mis-correlate unrelated evidence.
 - Prompt and completion capture can contain secrets, personal data, source, customer content, and regulated data. Default it off unless explicitly justified and governed.
-- API keys identify the organization; application keys and roles authorize operations. Never place either in source, previews, logs, traces, fixtures, or client-side applications.
+- API keys identify the organization; application keys authorize API operations under their owner and scopes. Client-side applications use client tokens, never API or application keys; see [references/auth.md](references/auth.md).
 - Sampling and retention reduce volume but can remove evidence. Record the policy and state when an absent event is inconclusive.
 - DORA metrics depend on event mapping and completeness; they are measurements with limitations, not proof of delivery quality.
 
@@ -49,5 +50,6 @@ Rollback: disable owned integrations/export and preserve authorized retained aud
 - Read [references/ci-cd-and-dora.md](references/ci-cd-and-dora.md) - Load when instrumenting pipelines, tests, deployments, services, DORA events, exact revisions, or delivery correlations
 - Read [references/opentelemetry-and-llm.md](references/opentelemetry-and-llm.md) - Load when configuring OTel ingestion, GenAI/LLM traces, evaluations, prompt/content capture, attributes, sampling, or redaction
 - Read [references/audit-catalog-aws-and-cloud-security.md](references/audit-catalog-aws-and-cloud-security.md) - Load when operating Audit Trail, AWS integration, Cloud Security, or native cloud/security evidence
-- Read [references/privacy-and-onboarding.md](references/privacy-and-onboarding.md) - Load when setting up, diagnosing, dry-running, authorizing data collection, managing keys/roles, retention/residency/access/cost, rolling back, or checking drift
+- Read [references/auth.md](references/auth.md) - Load when selecting API, application, or client credentials; configuring Datadog headers/site; scoping access; or validating a key pair
+- Read [references/privacy-and-onboarding.md](references/privacy-and-onboarding.md) - Load when setting up, diagnosing, dry-running, authorizing data collection, governing retention/residency/access/cost, rolling back, or checking drift
 - Read [references/provider-conformance.md](references/provider-conformance.md) - Load when testing event mapping, telemetry redaction, source references, product tiers, outages, rate limits, rollback, or fresh-context recovery

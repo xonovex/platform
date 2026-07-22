@@ -14,20 +14,24 @@ const SHARED_EVAL_PATHS = [
 
 export const catalogEntries = (catalogRoot) =>
   readdirSync(catalogRoot)
-    .filter((project) => {
+    .flatMap((project) => {
       const directory = join(catalogRoot, project);
-      return (
-        project.startsWith("skill-") &&
-        statSync(directory).isDirectory() &&
-        readdirSync(directory).some((entry) =>
-          existsSync(join(directory, entry, "SKILL.md")),
-        )
+      if (!project.startsWith("skill-") || !statSync(directory).isDirectory()) {
+        return [];
+      }
+      const guide = readdirSync(directory).find((entry) =>
+        existsSync(join(directory, entry, "SKILL.md")),
       );
+      return guide === undefined
+        ? []
+        : [
+            {
+              guide,
+              package: project.replace(/^skill-/, ""),
+              project,
+            },
+          ];
     })
-    .map((project) => ({
-      package: project.replace(/^skill-/, ""),
-      project,
-    }))
     .toSorted((left, right) => left.project.localeCompare(right.project));
 
 const rotatedLimit = (entries, limit, offset) => {

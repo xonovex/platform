@@ -1,5 +1,13 @@
 # Sources
 
+## API and application keys
+
+- **URL:** https://docs.datadoghq.com/account_management/api-app-keys/
+- **Additional URLs:** https://docs.datadoghq.com/api/latest/
+- **Last reviewed:** 2026-07-22
+- **Used for:** `SKILL.md`, `references/auth.md`, `references/privacy-and-onboarding.md`
+- **Aspects extracted:** API, application, and client-token roles; application-key scopes and ownership; request headers; one-time-read behavior; validation endpoints; propagation delay; and revocation.
+
 ## Datadog CI/CD Visibility and DORA
 
 - **URL:** https://docs.datadoghq.com/continuous_integration/

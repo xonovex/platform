@@ -28,6 +28,15 @@
         "Requires an explicit Software Catalog source of truth and prevents observed telemetry tags from silently overwriting ownership",
         "Previews least-privilege AWS role/external trust, accounts/regions/resources/data/cost, finding/audit access/retention, verification, rollback, and drift"
       ]
+    },
+    {
+      "id": 4,
+      "prompt": "Set up credentials for a service that reads Datadog dashboards and for a browser that submits RUM events. Explain which Datadog key types to use, how to scope and verify them, and how their lifecycle should be managed.",
+      "assertions": [
+        "Uses an organization API key plus a least-privilege service-account application key for server-side API access, and a client token rather than either secret key in the browser",
+        "Names the DD-API-KEY and DD-APPLICATION-KEY headers and verifies the key pair against the selected Datadog site, including bounded handling of propagation delay",
+        "Hands provider-neutral secret storage, runtime injection, rotation, and exposure response to credential-management-guide instead of duplicating that lifecycle locally"
+      ]
     }
   ]
 }

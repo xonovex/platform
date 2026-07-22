@@ -54,8 +54,14 @@ describe("selectEvalMatrix", () => {
       /GITHUB_EVENT_NAME\}" == "schedule" \|\| \( "\$\{GITHUB_EVENT_NAME\}" == "workflow_dispatch" && "\$\{DISPATCH_SCOPE\}" == "rotated" \)/,
     );
     expect(workflow).toContain("limit=32");
+    expect(workflow).toContain(
+      'if [[ "${GITHUB_EVENT_NAME}" == "pull_request" ]]',
+    );
+    expect(workflow).toContain("limit=8");
     expect(workflow).toContain('offset="$(((10#$(date -u +%m) - 1) * 32))"');
     expect(workflow).toContain("-name invalid-run.json");
+    expect(workflow).toContain("SKILL_ROUTING_OWNERS:");
+    expect(workflow).toContain("SKILL_ROUTING_RUNS:");
 
     const catalog = catalogEntries(resolve(import.meta.dirname, "../../.."));
     const selected = new Set(

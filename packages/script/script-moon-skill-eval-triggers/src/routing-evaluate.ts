@@ -37,6 +37,10 @@ const cliDefinition = {
     split: {type: "string", description: "train, validation, or all"},
     "batch-size": {type: "string", description: "scenarios per bounded batch"},
     workspace: {type: "string", description: "evidence output directory"},
+    owners: {
+      type: "string",
+      description: "comma-separated expected skill owners; empty selects all",
+    },
     limit: {type: "string", description: "maximum scenarios after offset"},
     offset: {type: "string", description: "first scenario index (default 0)"},
     "max-budget-usd": {type: "string", description: "Claude spend cap per run"},
@@ -175,9 +179,16 @@ export const main = async (argv: readonly string[]): Promise<number> => {
       ? undefined
       : parseNonNegativeInteger("limit", limitRaw);
   const catalogScenarios = buildRoutingScenarios(catalogRoot);
+  const owners = new Set(
+    ((values.owners as string | undefined) ?? "")
+      .split(",")
+      .map((owner) => owner.trim())
+      .filter(Boolean),
+  );
   const splitScenarios = catalogScenarios.filter(
     (scenario) =>
-      splitResult.data === "all" || scenario.split === splitResult.data,
+      (splitResult.data === "all" || scenario.split === splitResult.data) &&
+      (owners.size === 0 || owners.has(scenario.expectedSkill)),
   );
   const scenarios =
     limit === undefined
@@ -261,6 +272,9 @@ export const main = async (argv: readonly string[]): Promise<number> => {
         harness,
         model: model || null,
         split: splitResult.data,
+        selected_owners: [
+          ...new Set(records.map(({expected_skill}) => expected_skill)),
+        ].toSorted(),
         catalog_scenarios: catalogScenarios.length,
         selected_scenarios: records.length,
         runs_per_scenario: runs,

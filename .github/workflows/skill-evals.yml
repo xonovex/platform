@@ -38,6 +38,8 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       skills: ${{ steps.select.outputs.skills }}
+      routing_owners: ${{ steps.select.outputs.routing_owners }}
+      scope: ${{ steps.select.outputs.scope }}
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
@@ -57,13 +59,22 @@ jobs:
         run: |
           set -euo pipefail
           changed_file="-"
+          scope="manual-full"
           if [[ "${GITHUB_EVENT_NAME}" == "pull_request" ]]; then
             changed_file="${RUNNER_TEMP}/changed-files.txt"
             git diff --name-only "${BASE_SHA}...${HEAD_SHA}" >"${changed_file}"
+            scope="pull-request-changed"
+          elif [[ "${GITHUB_EVENT_NAME}" == "schedule" ]]; then
+            scope="scheduled-rotation"
+          elif [[ "${DISPATCH_SCOPE}" == "rotated" ]]; then
+            scope="manual-rotation"
           fi
           limit=10000
           offset=0
-          if [[ "${GITHUB_EVENT_NAME}" == "schedule" || ( "${GITHUB_EVENT_NAME}" == "workflow_dispatch" && "${DISPATCH_SCOPE}" == "rotated" ) ]]; then
+          if [[ "${GITHUB_EVENT_NAME}" == "pull_request" ]]; then
+            # Shared evaluator changes exercise a deterministic bounded catalog slice.
+            limit=8
+          elif [[ "${GITHUB_EVENT_NAME}" == "schedule" || ( "${GITHUB_EVENT_NAME}" == "workflow_dispatch" && "${DISPATCH_SCOPE}" == "rotated" ) ]]; then
             # Three monthly slices cover the catalog while 90-day artifacts remain available.
             limit=32
             offset="$(((10#$(date -u +%m) - 1) * 32))"
@@ -71,6 +82,9 @@ jobs:
           skills="$(node packages/skill/skill-skill/skill-guide/scripts/list-eval-matrix.mjs \
             packages/skill "${changed_file}" "${limit}" "${offset}")"
           printf 'skills=%s\n' "${skills}" >>"${GITHUB_OUTPUT}"
+          routing_owners="$(jq -r '[.[].guide] | join(",")' <<<"${skills}")"
+          printf 'routing_owners=%s\n' "${routing_owners}" >>"${GITHUB_OUTPUT}"
+          printf 'scope=%s\n' "${scope}" >>"${GITHUB_OUTPUT}"
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
@@ -179,6 +193,9 @@ jobs:
           CODEX_API_KEY: ${{ secrets.CODEX_API_KEY }}
           SKILL_EVAL_HARNESS: ${{ matrix.harness }}
           CLAUDE_MODEL: haiku
+          SKILL_ROUTING_OWNERS: ${{ github.event_name == 'pull_request' && needs.matrix.outputs.routing_owners || '' }}
+          SKILL_ROUTING_RUNS: ${{ github.event_name == 'pull_request' && '1' || '3' }}
+          SKILL_ROUTING_SPLIT: all
         run: >-
           nix develop --no-update-lock-file --command
           npx moon run script-moon-skill-eval-triggers:ci-routing
@@ -194,7 +211,7 @@ jobs:
 
   summary:
     name: Aggregate catalog evidence
-    needs: [eval, routing]
+    needs: [matrix, eval, routing]
     if: always() && (needs.eval.result != 'skipped' || needs.routing.result != 'skipped')
     runs-on: ubuntu-latest
     steps:
@@ -206,6 +223,10 @@ jobs:
 
       - name: Build catalog evidence index
         shell: bash
+        env:
+          SELECTED_SKILLS: ${{ needs.matrix.outputs.skills }}
+          SELECTION_SCOPE: ${{ needs.matrix.outputs.scope }}
+          ROUTING_RUNS: ${{ github.event_name == 'pull_request' && '1' || '3' }}
         run: |
           set -euo pipefail
           jq -n \
@@ -214,6 +235,9 @@ jobs:
             --arg workflow_run_id "${GITHUB_RUN_ID}" \
             --arg workflow_run_attempt "${GITHUB_RUN_ATTEMPT}" \
             --arg event "${GITHUB_EVENT_NAME}" \
+            --arg selection_scope "${SELECTION_SCOPE}" \
+            --argjson selected_skills "${SELECTED_SKILLS}" \
+            --argjson routing_runs "${ROUTING_RUNS}" \
             '{
               schema_version: 1,
               generated_at: (now | todateiso8601),
@@ -222,6 +246,11 @@ jobs:
               workflow_run_id: $workflow_run_id,
               workflow_run_attempt: $workflow_run_attempt,
               event: $event,
+              selection: {
+                scope: $selection_scope,
+                skills: ($selected_skills | map(.project)),
+                routing_runs_per_scenario: $routing_runs
+              },
               harnesses: {
                 claude: {runner: "@anthropic-ai/claude-code", version: "2.1.211", generation_model: "haiku", judge_model: "sonnet"},
                 codex: {runner: "@openai/codex", version: "0.145.0", model: "configured default"}

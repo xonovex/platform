@@ -42,7 +42,7 @@
     "rationale": "near-miss: ports-and-adapters isolation -> hexagonal-pattern-guide"
   },
   {
-    "query": "which module should own the nix provisioning code — it feels misfiled",
+    "query": "which module should own the email-template rendering code — it feels misfiled",
     "should_trigger": false,
     "split": "train",
     "rationale": "near-miss: where a boundary goes -> orthogonal-pattern-guide"
@@ -66,7 +66,7 @@
     "split": "validation"
   },
   {
-    "query": "our internal/ dir has grown into a mess — there's a sandbox folder, a sandboxutil folder next to it, and nix code buried three levels deep; reorganize it so it stops feeling like spaghetti",
+    "query": "our notification code has grown into a mess — channel folders sit beside sendutil and template code is buried three levels deep; reorganize it so the independent choices are obvious",
     "rationale": "near miss owned by orthogonal-pattern-guide",
     "should_trigger": false,
     "split": "train"
@@ -90,7 +90,7 @@
     "split": "validation"
   },
   {
-    "query": "a single utils package at the repo root has become a dumping ground — every axis throws its helpers in there; how should I distribute them?",
+    "query": "a shared helpers package at the repo root has become a dumping ground — notification channels, templates, and delivery policies all put unrelated code there; how should I distribute it?",
     "rationale": "near miss owned by orthogonal-pattern-guide",
     "should_trigger": false,
     "split": "validation"

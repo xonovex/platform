@@ -9,15 +9,15 @@ Commits: `6af54791` (trim), `b67816f5` (restore).
 
 <!-- catalog-stats:start -->
 
-- Current catalog: **94 skills**, **25,146** `SKILL.md` + `references/` lines, **376 output evals**, and **1,673 trigger queries**.
+- Current catalog: **94 skills**, **24,854** `SKILL.md` + `references/` lines, **378 output evals**, and **1,675 trigger queries**.
 - Tiers: **27 aggressive**, **43 moderate**, **24 conservative**.
-- Competitive routing: **190 scenarios** (**96 train**, **94 validation**) with **94/94 skills** owning at least one validation scenario.
+- Competitive routing: **191 scenarios** (**96 train**, **95 validation**) with **94/94 skills** owning at least one validation scenario.
 
 <!-- catalog-stats:end -->
 
 - Every skill has `evals.json`, at least 8 positive plus 8 semantically adjacent negative trigger queries with train/validation splits, reviewed source provenance, and explicit handoff- or domain-derived near-miss owners. Version-pinned descriptions also require an explicit source baseline.
 - `agent-governance`, `ai-governance`, and `workflow` were restored after the 2026-07-19 snapshot. They have current trigger/output/source fixtures but no claim to the historical calibration results below.
-- `.github/workflows/skill-evals.yml` runs changed-skill evaluation for enabled internal pull requests and a tested monthly rotating 32-skill slice, covering both Claude and Codex trigger/output adapters. Shared evaluator changes expand to a bounded slice rather than launching an unbounded catalog run. Trigger validation runs each query three times; output evaluation runs every probe twice per arm in batches of at most three. Each runner refuses more than 24 model calls per batch, more than two concurrent calls, or more than three runs per arm. Claude retains its per-call spend caps; Codex uses ephemeral read-only runs with isolated homes and is bounded by run count, batching, timeout, and output ceilings. Calls are never retried automatically, and failed generations are not judged. The aggregate evidence index records the exact commit, workflow run and attempt, event, harness package versions, and model configuration alongside the benchmark records.
+- `.github/workflows/skill-evals.yml` runs changed-skill evaluation for enabled internal pull requests and a tested monthly rotating 32-skill output slice, covering both Claude and Codex trigger/output adapters. A shared evaluator change samples at most eight skills on a pull request. Competitive routing on pull requests is a one-run smoke limited to scenarios owned by the changed or sampled skills; scheduled and full manual routing runs every catalog scenario three times. Trigger validation runs each query three times; output evaluation runs every probe twice per arm in batches of at most three. Each runner refuses more than 24 model calls per batch, more than two concurrent calls, or more than three runs per arm. Claude retains its per-call spend caps; Codex uses ephemeral read-only runs with isolated homes and is bounded by run count, batching, timeout, and output ceilings. Calls are never retried automatically, and failed generations are not judged. The aggregate evidence index records the exact commit, workflow run and attempt, event, harness package versions, and model configuration alongside the benchmark records.
 
 ### 2026-07-19 historical live calibration subset
 
@@ -40,7 +40,7 @@ Commits: `6af54791` (trim), `b67816f5` (restore).
 | `reliability`        |            3 |             178 | valid: 0.333 vs 0.000, delta +0.333                 |
 | `security-assurance` |            3 |             165 | invalid: generation process failure                 |
 
-The authenticated local calibration produced seven valid full A/B benchmarks, a valid final-cap Claude Code dependency smoke, and bounded invalid diagnostics for the remaining skills. Invalid runs never publish `benchmark.json`: zero-token, process, judge, output-limit, missing-activation, and aggregate-limit failures are infrastructure or skill-behavior findings, not optimization scores. The initial full results used the earlier per-call caps while the containment layers were being calibrated; future scheduled evidence uses the final lower caps and bounded three-eval batches. Re-run a bounded batch before changing a tier or trimming content from a live result.
+The authenticated local calibration produced seven valid full A/B benchmarks, a valid final-cap Claude Code dependency smoke, and bounded invalid diagnostics for the remaining skills. These historical runs used one run per arm and predate the current tier gates and catalog content, so their pass rates are not current release evidence. Invalid runs never publish `benchmark.json`: zero-token, process, judge, output-limit, missing-activation, and aggregate-limit failures are infrastructure or skill-behavior findings, not optimization scores. Current evidence comes from the workflow's per-commit artifacts; run a full manual two-arm, two-run catalog evaluation before changing a tier or trimming content from a live result.
 
 ## Result
 
@@ -183,7 +183,7 @@ Before/after are total lines across `SKILL.md` + `references/`, measured from gi
 
 ## Re-running the evals (and adding a new model)
 
-Every skill carries an `evals.json` next to its `SKILL.md` — the output-eval seed consumed by `moon-skill-eval-outputs`. It holds the knowledge probes (`prompt` + binary `assertions`) that seed any A/B or ablation run. **371 evals across the catalog.** This is the durable "something to start from": no probe needs re-authoring to test a new model.
+Every skill carries an `evals.json` next to its `SKILL.md` — the output-eval seed consumed by `moon-skill-eval-outputs`. It holds the knowledge probes (`prompt` + binary `assertions`) that seed any A/B or ablation run. The generated catalog follow-up above is the authoritative current eval count. This is the durable "something to start from": no probe needs re-authoring to test a new model.
 
 ### Test one skill on any model
 
@@ -197,7 +197,7 @@ npx moon-skill-eval-outputs \
 #   --plugin-dir packages/skill/skill-typescript
 ```
 
-Each eval runs twice — **with** the skill and **without** it (no-skill baseline) — graded on its assertions by an LLM judge. The script exits `0` iff with-skill beats no-skill. Needs the `claude` CLI, and `--eval-cwd` set to where the skill resolves (installed plugin or this repo).
+Each eval runs in repeated **with-skill** and **without-skill** arms and is graded on its assertions by an LLM judge. A valid run exits `0` only when every activated arm fired and the skill's tier-specific absolute pass-rate and minimum-delta gates pass. Needs the selected harness CLI and credential, with `--eval-cwd` set to where the skill resolves (installed plugin or this repo).
 
 ### When a new model is added
 

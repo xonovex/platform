@@ -36,9 +36,20 @@ const isFile = (path: string): boolean => {
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null && !Array.isArray(value);
 
+const isStringArray = (value: unknown): value is readonly string[] =>
+  Array.isArray(value) && value.every((entry) => typeof entry === "string");
+
+const normalizedSkillPaths = (
+  value: unknown,
+): readonly string[] | undefined => {
+  if (typeof value === "string") return [value];
+  return isStringArray(value) ? value : undefined;
+};
+
 interface SkillPluginManifest {
   readonly name: string;
   readonly dependencies: readonly string[];
+  readonly skills: readonly string[];
 }
 
 interface SkillPackageSurface {
@@ -57,6 +68,7 @@ const NAMED_GUIDE_RE = /\*\*([a-z0-9][a-z0-9-]*-guide)\*\*/g;
 
 const readSkillPluginManifest = (
   path: string,
+  kind: "Claude" | "Codex",
   repoRoot: string,
   report: LinkReport,
 ): SkillPluginManifest | undefined => {
@@ -85,7 +97,20 @@ const readSkillPluginManifest = (
     );
     return undefined;
   }
-  return {name: value.name, dependencies};
+  const skillsValue = value.skills;
+  const skills = normalizedSkillPaths(skillsValue);
+  const expectedShape = kind === "Claude" ? "a string array" : "a string";
+  const hasExpectedShape =
+    kind === "Claude"
+      ? Array.isArray(skillsValue)
+      : typeof skillsValue === "string";
+  if (!hasExpectedShape || skills === undefined || skills.length === 0) {
+    report.addFail(
+      `skill packaging: ${relative(repoRoot, path)} skills must be ${expectedShape}`,
+    );
+    return undefined;
+  }
+  return {name: value.name, dependencies, skills};
 };
 
 const sameStrings = (
@@ -150,8 +175,13 @@ const checkSkillPackage = (
     );
     return {valid: false, pair: false, manifest: undefined, surface: undefined};
   }
-  const claude = readSkillPluginManifest(claudePath, repoRoot, report);
-  const codex = readSkillPluginManifest(codexPath, repoRoot, report);
+  const claude = readSkillPluginManifest(
+    claudePath,
+    "Claude",
+    repoRoot,
+    report,
+  );
+  const codex = readSkillPluginManifest(codexPath, "Codex", repoRoot, report);
   if (claude === undefined || codex === undefined) {
     return {valid: false, pair: false, manifest: undefined, surface: undefined};
   }
@@ -176,11 +206,30 @@ const checkSkillPackage = (
       `skill dependencies: manifest dependencies differ for ${claude.name}`,
     );
   }
+  if (!sameStrings(claude.skills, codex.skills)) {
+    valid = false;
+    report.addFail(
+      `skill packaging: manifest skill paths differ for ${claude.name}`,
+    );
+  }
+  const surface = skillPackageSurface(pkgDir);
+  const expectedSkills = surface.guideNames.map((guide) => `./${guide}`);
+  for (const [kind, manifest] of [
+    ["Claude", claude],
+    ["Codex", codex],
+  ] as const) {
+    if (!sameStrings(manifest.skills, expectedSkills)) {
+      valid = false;
+      report.addFail(
+        `skill packaging: ${kind} manifest in ${relative(repoRoot, pkgDir)} must point directly to ${expectedSkills.join(", ")}`,
+      );
+    }
+  }
   return {
     valid,
     pair: true,
     manifest: codex,
-    surface: skillPackageSurface(pkgDir),
+    surface,
   };
 };
 

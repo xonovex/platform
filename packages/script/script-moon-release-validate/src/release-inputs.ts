@@ -28,6 +28,7 @@ export const PluginManifestSchema = z.object({
   version: z.string().optional(),
   description: z.string().optional(),
   dependencies: z.array(z.string()).optional(),
+  skills: z.union([z.string(), z.array(z.string())]).optional(),
 });
 export type PluginManifest = z.infer<typeof PluginManifestSchema>;
 

@@ -4,7 +4,7 @@
 
 Before mutation, enumerate each source, field/content category, purpose, data owner, subject/resource scope, classification, redaction/tokenization, sampling, route/destination/site, residency, retention, access roles, deletion/export, downstream sharing, volume/cost budget, evidence need, and prohibited data. Unknown fields default to not collected.
 
-Use read-only API/application credentials for discovery. Configuration credentials are separate and narrowly scoped. Store keys in an approved secret manager or CI secret, never in source, commands, previews, logs, telemetry, fixtures, or client applications.
+Use the read-only or configuration identity selected in [auth.md](auth.md). Keep discovery and mutation authority separate; **credential-management-guide** owns storage, runtime injection, rotation, and exposure response.
 
 ## Lifecycle
 
@@ -20,4 +20,4 @@ Use read-only API/application credentials for discovery. Configuration credentia
 
 Drift includes new products/sources/fields/tags, enabled content capture, weakened redaction, changed sampling/retention/residency/access/export, broadened keys/roles, changed site/endpoints, ownership mapping changes, new AWS accounts/regions, and cost anomalies.
 
-Removal disables only owned integrations/export/collection and revokes owned keys/roles/trust. Preserve foreign monitors/catalog entries and legally/operationally retained evidence according to the authorized policy.
+Removal disables only owned integrations/export/collection and invokes the credential owner to revoke owned keys. Preserve foreign monitors/catalog entries and legally/operationally retained evidence according to the authorized policy.

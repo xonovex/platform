@@ -1,5 +1,11 @@
 [
   {
+    "query": "for Datadog API automation, which API and application keys and headers do I need, and how do I validate least-privilege access?",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "provider-specific Datadog key selection, transport, scope, site, and validation"
+  },
+  {
     "query": "correlate Bitrise pipeline and AWS deployment references in Datadog CI/CD Visibility",
     "should_trigger": true,
     "split": "train",

@@ -113,6 +113,56 @@ const dependencyEntries = (
     ...manifest.optionalDependencies,
   });
 
+const skillPaths = (manifest: PluginManifest): readonly string[] =>
+  typeof manifest.skills === "string"
+    ? [manifest.skills]
+    : (manifest.skills ?? []);
+
+const validateSkillPackaging = (
+  pluginPackage: string,
+  packageLabel: string,
+  claudeManifest: PluginManifest,
+  codexManifest: PluginManifest,
+  check: Check,
+): void => {
+  const guideNames = readdirSync(pluginPackage)
+    .filter((entry) => existsSync(resolve(pluginPackage, entry, "SKILL.md")))
+    .toSorted();
+  const expectedPaths = guideNames.map((guide) => `./${guide}`);
+  const claudePaths = skillPaths(claudeManifest);
+  const codexPaths = skillPaths(codexManifest);
+  const samePaths = (paths: readonly string[]): boolean =>
+    paths.length === expectedPaths.length &&
+    paths.toSorted().every((path, index) => path === expectedPaths[index]);
+
+  check(
+    Array.isArray(claudeManifest.skills) && claudePaths.length > 0,
+    `${packageLabel} Claude manifest exposes skills as a non-empty array`,
+  );
+  check(
+    typeof codexManifest.skills === "string",
+    `${packageLabel} Codex manifest exposes one direct skill path`,
+  );
+  check(
+    samePaths(claudePaths),
+    `${packageLabel} Claude manifest skill paths match ${expectedPaths.join(", ")}`,
+  );
+  check(
+    samePaths(codexPaths),
+    `${packageLabel} Codex manifest skill paths match ${expectedPaths.join(", ")}`,
+  );
+  for (const path of [...claudePaths, ...codexPaths]) {
+    const direct = /^\.\/[a-z0-9]+(?:-[a-z0-9]+)*$/u.test(path);
+    check(direct, `${packageLabel} manifest skill path is direct: ${path}`);
+    if (direct) {
+      check(
+        existsSync(resolve(pluginPackage, path, "SKILL.md")),
+        `${packageLabel} manifest skill path resolves: ${path}`,
+      );
+    }
+  }
+};
+
 const validatePackage = (
   pluginPackage: string,
   repositoryRoot: string,
@@ -203,6 +253,16 @@ const validatePackage = (
     codexSources.get(codexManifest.name) === source,
     `${codexManifest.name} has the expected Codex marketplace source`,
   );
+
+  if (relativePath(pluginPackage).startsWith("packages/skill/")) {
+    validateSkillPackaging(
+      pluginPackage,
+      relativePath(pluginPackage),
+      claudeManifest,
+      codexManifest,
+      check,
+    );
+  }
 
   if (packageJson.description !== undefined) {
     check(

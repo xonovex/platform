@@ -133,6 +133,36 @@ console.log(JSON.stringify({message:{content:[{type:"tool_use",name:"Skill",inpu
     });
   });
 
+  it("filters routing scenarios to selected expected owners", async () => {
+    executable(
+      "claude",
+      `
+console.log(JSON.stringify({type:"system",subtype:"init",skills:["alpha-guide","beta-guide"]}));
+console.log(JSON.stringify({message:{content:[{type:"tool_use",name:"Skill",input:{skill:"alpha-guide"}}]}}));
+`,
+    );
+    const workspace = join(directory, "owner-evidence");
+
+    const exitCode = await main([
+      catalog,
+      "--workspace",
+      workspace,
+      "--owners",
+      "alpha-guide",
+    ]);
+
+    expect(exitCode).toBe(0);
+    expect(
+      JSON.parse(readFileSync(join(workspace, "summary.json"), "utf8")),
+    ).toMatchObject({
+      selected_owners: ["alpha-guide"],
+      selected_scenarios: 1,
+    });
+    await expect(main([catalog, "--owners", "beta-guide"])).rejects.toThrow(
+      "no routing scenarios selected",
+    );
+  });
+
   it("returns one when a healthy run selects no owner", async () => {
     executable(
       "claude",

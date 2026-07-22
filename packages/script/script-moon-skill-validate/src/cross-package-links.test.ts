@@ -40,8 +40,17 @@ const makeRepo = (files: Record<string, string>): string => {
   return root;
 };
 
-const manifest = (name: string, dependencies: readonly string[] = []): string =>
-  JSON.stringify({name, dependencies});
+const manifest = (
+  name: string,
+  dependencies: readonly string[] = [],
+  kind: "claude" | "codex" = "codex",
+  skill = `./${name.replace(/^xonovex-skill-/, "")}-guide`,
+): string =>
+  JSON.stringify({
+    name,
+    dependencies,
+    skills: kind === "claude" ? [skill] : skill,
+  });
 
 const workflowCommandNames = [
   "abandon",
@@ -193,8 +202,11 @@ describe("checkCrossPackageLinks", () => {
         "# Plan\nSee [create](references/plan-create.md).\n",
       "packages/skill/skill-plan/plan-guide/references/plan-create.md":
         "# plan-create\n",
-      "packages/skill/skill-plan/.claude-plugin/plugin.json":
-        manifest("xonovex-skill-plan"),
+      "packages/skill/skill-plan/.claude-plugin/plugin.json": manifest(
+        "xonovex-skill-plan",
+        [],
+        "claude",
+      ),
       "packages/skill/skill-plan/.codex-plugin/plugin.json":
         manifest("xonovex-skill-plan"),
     });
@@ -208,10 +220,13 @@ describe("checkCrossPackageLinks", () => {
     const repo = makeRepo({
       "packages/skill/skill-x/x-guide/SKILL.md":
         "# X\nSee [g](../../skill-y/y-guide/references/g.md).\n",
-      "packages/skill/skill-x/.claude-plugin/plugin.json":
-        '{"name":"xonovex-skill-x"}',
+      "packages/skill/skill-x/.claude-plugin/plugin.json": manifest(
+        "xonovex-skill-x",
+        [],
+        "claude",
+      ),
       "packages/skill/skill-x/.codex-plugin/plugin.json":
-        '{"name":"xonovex-skill-x"}',
+        manifest("xonovex-skill-x"),
     });
     const report = makeSink();
     checkCrossPackageLinks(repo, report);
@@ -252,8 +267,11 @@ describe("checkSkillDependencies", () => {
   it("accepts matching acyclic manifest pairs", () => {
     const repo = makeRepo({
       "packages/skill/skill-base/base-guide/SKILL.md": "# Base\n",
-      "packages/skill/skill-base/.claude-plugin/plugin.json":
-        manifest("xonovex-skill-base"),
+      "packages/skill/skill-base/.claude-plugin/plugin.json": manifest(
+        "xonovex-skill-base",
+        [],
+        "claude",
+      ),
       "packages/skill/skill-base/.codex-plugin/plugin.json":
         manifest("xonovex-skill-base"),
       "packages/skill/skill-child/child-guide/SKILL.md":
@@ -261,6 +279,7 @@ describe("checkSkillDependencies", () => {
       "packages/skill/skill-child/.claude-plugin/plugin.json": manifest(
         "xonovex-skill-child",
         ["xonovex-skill-base"],
+        "claude",
       ),
       "packages/skill/skill-child/.codex-plugin/plugin.json": manifest(
         "xonovex-skill-child",
@@ -282,6 +301,7 @@ describe("checkSkillDependencies", () => {
       "packages/skill/skill-a/.claude-plugin/plugin.json": manifest(
         "xonovex-skill-a",
         ["xonovex-skill-b", "xonovex-skill-missing", "xonovex-skill-other"],
+        "claude",
       ),
       "packages/skill/skill-a/.codex-plugin/plugin.json": manifest(
         "xonovex-skill-a",
@@ -290,6 +310,7 @@ describe("checkSkillDependencies", () => {
       "packages/skill/skill-b/.claude-plugin/plugin.json": manifest(
         "xonovex-skill-b",
         ["xonovex-skill-a"],
+        "claude",
       ),
       "packages/skill/skill-b/.codex-plugin/plugin.json": manifest(
         "xonovex-skill-b",
@@ -330,6 +351,8 @@ describe("checkSkillDependencies", () => {
       "packages/skill/skill-base/base-guide/SKILL.md": "# Base\n",
       "packages/skill/skill-base/.claude-plugin/plugin.json": manifest(
         "xonovex-skill-wrong",
+        [],
+        "claude",
       ),
       "packages/skill/skill-base/.codex-plugin/plugin.json": manifest(
         "xonovex-skill-wrong",
@@ -338,6 +361,7 @@ describe("checkSkillDependencies", () => {
       "packages/skill/skill-child/.claude-plugin/plugin.json": manifest(
         "xonovex-skill-child",
         ["xonovex-skill-wrong"],
+        "claude",
       ),
       "packages/skill/skill-child/.codex-plugin/plugin.json": manifest(
         "xonovex-skill-child",
@@ -353,6 +377,34 @@ describe("checkSkillDependencies", () => {
     );
     expect(report.fails).toContain(
       "skill dependencies: xonovex-skill-child depends on xonovex-skill-wrong but does not name **base-guide** in its guidance",
+    );
+  });
+
+  it("rejects stale and mismatched manifest skill paths", () => {
+    const repo = makeRepo({
+      "packages/skill/skill-renamed/renamed-guide/SKILL.md": "# Renamed\n",
+      "packages/skill/skill-renamed/.claude-plugin/plugin.json": manifest(
+        "xonovex-skill-renamed",
+        [],
+        "claude",
+        "./old-guide",
+      ),
+      "packages/skill/skill-renamed/.codex-plugin/plugin.json": manifest(
+        "xonovex-skill-renamed",
+        [],
+        "codex",
+        "./renamed-guide",
+      ),
+    });
+    const report = makeSink();
+
+    checkSkillDependencies(repo, report);
+
+    expect(report.fails).toContain(
+      "skill packaging: manifest skill paths differ for xonovex-skill-renamed",
+    );
+    expect(report.fails).toContain(
+      "skill packaging: Claude manifest in packages/skill/skill-renamed must point directly to ./renamed-guide",
     );
   });
 });

@@ -1,5 +1,11 @@
 [
   {
+    "query": "for Datadog API automation, which API and application keys and headers do I need, and how do I validate least-privilege access?",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "provider-specific Datadog credential choice and transport belong to datadog-guide"
+  },
+  {
     "query": "Where should our developers keep API tokens on macOS, Linux, Windows, and WSL, and how should scripts retrieve them?",
     "should_trigger": true,
     "rationale": "provider-neutral local credential storage and retrieval",

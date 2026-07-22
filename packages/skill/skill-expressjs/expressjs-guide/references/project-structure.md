@@ -7,7 +7,7 @@ src/
 ├── app.ts
 ├── server.ts
 ├── routes/          # route + middleware chains, no business logic
-├── controllers/     # typed handlers with try-catch, call services
+├── controllers/     # typed Express 5 handlers that call services
 ├── middleware/      # auth, validation, error handling
 ├── schemas/         # Zod schemas
 ├── services/        # database / external APIs / business logic

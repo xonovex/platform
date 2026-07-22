@@ -42,7 +42,7 @@
     "rationale": "near-miss: coupling vocabulary -> connascence-guide"
   },
   {
-    "query": "which axis should own the nix provisioning code in this tree?",
+    "query": "which axis should own the SMS delivery code in this tree?",
     "should_trigger": false,
     "split": "train",
     "rationale": "near-miss: where a boundary goes -> orthogonal-pattern-guide"
@@ -72,7 +72,7 @@
     "split": "train"
   },
   {
-    "query": "our internal/ dir has grown into a mess — there's a sandbox folder, a sandboxutil folder next to it, and nix code buried three levels deep; reorganize it so it stops feeling like spaghetti",
+    "query": "our notification code has grown into a mess — channel folders sit beside sendutil and template code is buried three levels deep; reorganize it so the independent choices are obvious",
     "rationale": "near miss owned by orthogonal-pattern-guide",
     "should_trigger": false,
     "split": "train"

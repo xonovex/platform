@@ -17,5 +17,6 @@
       "Review our Datadog telemetry privacy",
       "Onboard Datadog evidence safely"
     ]
-  }
+  },
+  "dependencies": ["xonovex-skill-credential-management"]
 }

@@ -15,6 +15,7 @@
       "prompt": "Write a centralized error-handling middleware for an Express 5 + TypeScript API that turns thrown errors into JSON responses, and show how it is registered on the app.",
       "assertions": [
         "The error handler function is declared with exactly four parameters in the order (err, req, res, next)",
+        "The handler checks res.headersSent and delegates to next(err) before attempting to write a JSON response",
         "The error message and/or stack trace is only included in the response when NODE_ENV is not \"production\"; production returns a generic 500 without the stack",
         "The error handler is registered last, after all routes"
       ]
@@ -33,6 +34,14 @@
       "assertions": [
         "Security middleware (helmet/cors) is registered before the route modules are mounted",
         "A 404 catch-all handler is registered after the routes and before the error handler"
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "This Express 5 TypeScript controller wraps its entire async body in try/catch only to call next(error). Rewrite it in the preferred Express 5 style and explain when an explicit catch is still required.",
+      "assertions": [
+        "Removes the blanket try/catch-next wrapper and returns or awaits the handler Promise so Express 5 can forward a thrown error or rejection automatically",
+        "Keeps explicit error forwarding for asynchronous callback or timer work that is not represented by the returned Promise, or for a catch that performs genuine local recovery or adds context"
       ]
     }
   ]

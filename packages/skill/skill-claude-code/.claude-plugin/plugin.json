@@ -5,6 +5,6 @@
   "author": {
     "name": "Xonovex"
   },
-  "skills": ["./code-harness-guide"],
+  "skills": ["./claude-code-guide"],
   "dependencies": ["xonovex-skill-agent-governance"]
 }
