@@ -106,5 +106,11 @@
     "rationale": "near miss owned by bitbucket-guide",
     "should_trigger": false,
     "split": "validation"
+  },
+  {
+    "query": "transition JIRA-123 to Done from the command line",
+    "rationale": "validation near miss owned by atlassian-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

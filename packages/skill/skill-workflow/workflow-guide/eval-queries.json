@@ -124,5 +124,11 @@
     "rationale": "near miss owned by plan-guide",
     "should_trigger": false,
     "split": "validation"
+  },
+  {
+    "query": "draft a decision record for moving the store to Postgres",
+    "rationale": "validation near miss owned by adr-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

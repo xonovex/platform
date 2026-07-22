@@ -32,7 +32,13 @@ tasks:
       mergeDeps: append
   ci-check:
     command: echo 'ci-check complete'
-    deps: [build, format-check, skill-audit-sources, skill-validate]
+    deps:
+      - build
+      - format-check
+      - skill-audit-sources
+      - skill-validate
+      - target: ~:test
+        optional: true
     options:
       cache: false
   skill-validate:

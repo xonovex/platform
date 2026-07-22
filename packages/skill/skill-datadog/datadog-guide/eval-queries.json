@@ -94,5 +94,11 @@
     "rationale": "near miss owned by bitrise-guide",
     "should_trigger": false,
     "split": "validation"
+  },
+  {
+    "query": "write an Android ViewModel test with a fake tracker that asserts the screen-view event is tracked",
+    "rationale": "validation near miss owned by android-analytics-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

@@ -100,5 +100,11 @@
     "rationale": "near miss owned by figma-guide",
     "should_trigger": false,
     "split": "validation"
+  },
+  {
+    "query": "retest focus, zoom, errors, and dynamic status after this UI revision",
+    "rationale": "validation near miss owned by accessibility-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

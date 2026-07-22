@@ -118,5 +118,11 @@
     "should_trigger": false,
     "split": "validation",
     "rationale": "near-miss: Astro/MDX, not React component work"
+  },
+  {
+    "query": "I need to translate all the text in my immediate-mode tool UI into other languages without maintaining a giant table of string IDs — what's a good approach?",
+    "rationale": "validation near miss owned by imgui-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

@@ -100,5 +100,11 @@
     "rationale": "near miss owned by accessibility-guide",
     "should_trigger": false,
     "split": "validation"
+  },
+  {
+    "query": "audit who changed Datadog retention and preserve the native Audit Trail reference",
+    "rationale": "validation near miss owned by datadog-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

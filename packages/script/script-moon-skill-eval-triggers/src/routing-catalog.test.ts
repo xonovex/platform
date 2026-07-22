@@ -1,8 +1,11 @@
 import {mkdirSync, mkdtempSync, rmSync, writeFileSync} from "node:fs";
 import {tmpdir} from "node:os";
-import {join} from "node:path";
+import {join, resolve} from "node:path";
 import {afterEach, describe, expect, it} from "vitest";
-import {buildRoutingScenarios} from "./routing-catalog.js";
+import {
+  buildRoutingScenarios,
+  missingValidationRoutingOwners,
+} from "./routing-catalog.js";
 
 const temporaryDirectories: string[] = [];
 
@@ -59,6 +62,15 @@ describe("routing catalog", () => {
         ],
       },
     ]);
+    expect(missingValidationRoutingOwners(root)).toEqual(["beta-guide"]);
+  });
+
+  it("gives every catalog skill a validation routing scenario", () => {
+    const catalogRoot = resolve(import.meta.dirname, "../../../skill");
+
+    const missingOwners = missingValidationRoutingOwners(catalogRoot);
+
+    expect(missingOwners).toEqual([]);
   });
 
   it("rejects missing roots and malformed query files", () => {

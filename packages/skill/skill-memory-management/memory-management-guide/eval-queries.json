@@ -94,5 +94,11 @@
     "rationale": "near miss owned by debugging-guide",
     "should_trigger": false,
     "split": "validation"
+  },
+  {
+    "query": "I want to tag every allocation with file and line and check the counter is zero on shutdown to catch leaks",
+    "rationale": "validation near miss owned by debugging-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

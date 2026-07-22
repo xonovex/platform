@@ -10,7 +10,8 @@ A ready-to-scaffold template lives under `assets/guideline-skill-template/`:
 
 - [`SKILL.md.template`](../assets/guideline-skill-template/SKILL.md.template) — frontmatter, Essentials, Gotchas, Example, Progressive Disclosure (`## Requirements` is language/framework-only — delete it for general / pattern / process skills)
 - [`SOURCES.md`](../assets/guideline-skill-template/SOURCES.md) — source tracking with a **docs-URL** form and an authored **`Title:`** form for cited books/papers/articles
-- [`eval-queries.json`](../assets/guideline-skill-template/eval-queries.json) — 12 trigger-eval queries (8 train + 4 validation, mix of should-trigger and near-miss)
+- [`evals.json`](../assets/guideline-skill-template/evals.json) — three output-quality seeds with observable assertions
+- [`eval-queries.json`](../assets/guideline-skill-template/eval-queries.json) — 16 trigger-eval queries (8 positive + 8 negative with train/validation splits)
 - [`references/{topic}.md`](../assets/guideline-skill-template/references/{topic}.md) — reference template (`## sub-headers`, one per facet: statement / rationale / bad→good example; `## Contents` once >200 lines)
 
 To scaffold a new guideline skill: copy the directory, rename `{topic}.md` files, and fill in `{placeholders}`.

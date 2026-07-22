@@ -112,5 +112,11 @@
     "rationale": "near miss owned by ddd-guide",
     "should_trigger": false,
     "split": "validation"
+  },
+  {
+    "query": "Choose PostgreSQL types for money, timestamps, bounded status values, and identifiers without using text for every column.",
+    "rationale": "validation near miss owned by sql-postgresql-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

@@ -94,5 +94,11 @@
     "rationale": "near miss owned by ai-governance-guide",
     "should_trigger": false,
     "split": "validation"
+  },
+  {
+    "query": "write a Compose UI test that verifies the send button is reachable and labelled for TalkBack",
+    "rationale": "validation near miss owned by android-wcag-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

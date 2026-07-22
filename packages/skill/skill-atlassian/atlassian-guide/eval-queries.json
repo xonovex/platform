@@ -100,5 +100,11 @@
     "rationale": "near miss owned by bitbucket-guide",
     "should_trigger": false,
     "split": "validation"
+  },
+  {
+    "query": "create a pull request on Azure DevOps with az repos pr create and capture the id",
+    "rationale": "validation near miss owned by azure-devops-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

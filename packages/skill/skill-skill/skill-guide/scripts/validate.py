@@ -30,6 +30,7 @@ from pathlib import Path
 import yaml  # pyright: ignore[reportMissingModuleSource]  # PEP723 dep, installed by uv at runtime
 
 NAME_RE = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
+RESERVED_VENDOR_ADAPTER_NAMES = frozenset({"claude-code-guide"})
 FRONTMATTER_RE = re.compile(r"^---\n(.*?)\n---\n(.*)$", re.DOTALL)
 QUOTED_SCALAR_RE = re.compile(r"^[ \t]*[A-Za-z_][\w-]*:[ \t]*(?P<rest>.+?)[ \t]*$")
 REF_LINK_RE = re.compile(r"references/([a-zA-Z0-9_./<>{}-]+\.md)")
@@ -238,7 +239,10 @@ def check_frontmatter(fm: dict, parent_name: str, report: Report) -> None:
 
     # name: reserved words / XML tags (platform spec)
     if isinstance(name, str):
-        if re.search(r"anthropic|claude", name, re.IGNORECASE):
+        if (
+            name not in RESERVED_VENDOR_ADAPTER_NAMES
+            and re.search(r"anthropic|claude", name, re.IGNORECASE)
+        ):
             report.add_fail(f"frontmatter: name '{name}' uses a reserved word (anthropic/claude)")
         if re.search(r"<[^>]+>", name):
             report.add_fail(f"frontmatter: name '{name}' contains an XML tag")

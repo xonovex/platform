@@ -94,5 +94,11 @@
     "rationale": "near miss owned by threejs-guide",
     "should_trigger": false,
     "split": "validation"
+  },
+  {
+    "query": "fetch the node json for ids 42:7 from api.figma.com",
+    "rationale": "validation near miss owned by figma-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

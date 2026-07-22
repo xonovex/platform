@@ -102,3 +102,18 @@ export const buildRoutingScenarios = (
       a.query.localeCompare(b.query),
   );
 };
+
+export const missingValidationRoutingOwners = (
+  catalogRoot: string,
+): readonly string[] => {
+  const scenarios = buildRoutingScenarios(catalogRoot);
+  const validationOwners = new Set(
+    scenarios
+      .filter(({split}) => split === "validation")
+      .map(({expectedSkill}) => expectedSkill),
+  );
+  return catalogCandidates(resolve(catalogRoot))
+    .map(({shortName}) => shortName)
+    .filter((shortName) => !validationOwners.has(shortName))
+    .toSorted();
+};

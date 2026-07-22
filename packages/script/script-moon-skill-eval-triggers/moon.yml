@@ -4,6 +4,9 @@ tags: [typescript-script]
 dependsOn:
   - script-moon-common
 tasks:
+  ts-test:
+    inputs:
+      - /packages/skill/*/*/eval-queries.json
   ts-coverage:
     script: >-
       npx vitest run --coverage --coverage.include='src/**'
@@ -11,6 +14,8 @@ tasks:
       --coverage.thresholds.functions 80
       --coverage.thresholds.branches 70
       --coverage.thresholds.statements 80
+    inputs:
+      - /packages/skill/*/*/eval-queries.json
   ts-build:
     deps:
       - script-moon-common:build

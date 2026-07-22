@@ -118,5 +118,11 @@
     "rationale": "near miss owned by remotion-guide",
     "should_trigger": false,
     "split": "validation"
+  },
+  {
+    "query": "is plain volatile enough to share this flag between two threads, or do I actually need something else?",
+    "rationale": "validation near miss owned by lock-free-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

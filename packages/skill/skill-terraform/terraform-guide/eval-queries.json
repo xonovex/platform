@@ -94,5 +94,11 @@
     "rationale": "near miss owned by cmake-guide",
     "should_trigger": false,
     "split": "validation"
+  },
+  {
+    "query": "recover an AWS governance decision from CloudTrail and Security Hub references after restart",
+    "rationale": "validation near miss owned by aws-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

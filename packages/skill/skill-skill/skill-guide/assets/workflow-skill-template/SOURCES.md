@@ -1,6 +1,6 @@
 # Sources
 
-Optional: Include only if the skill distills an external source. House-process workflow skills (a planning lifecycle, a git procedure) that encode no external reference omit this file. When a source IS distilled, use the **docs** form for official documentation and the authored **Title** form for a cited book, paper, or article. Author/book/company names live only in this file.
+Keep this file for every catalog skill. Use the external-source form when the workflow distills published material; otherwise replace it with the repository-original provenance form. Author/book/company names live only in this file.
 
 ## {Source name}
 
@@ -12,6 +12,12 @@ Optional: Include only if the skill distills an external source. House-process w
   - `SKILL.md` → {section}
 - **Aspects extracted:**
   - {the specific claim / pattern this source backs}
+
+## {Repository-original workflow name — use instead of the source block above}
+
+- **Provenance:** {Repository-original procedure distilled from maintained project practice}
+- **References:** all
+- **Last reviewed:** {YYYY-MM-DD}
 
 ## Refresh Workflow
 

@@ -94,5 +94,11 @@
     "rationale": "near miss owned by plan-guide",
     "should_trigger": false,
     "split": "validation"
+  },
+  {
+    "query": "run the workflow workspace-create utility from main at this exact revision and report the provider-native workspace location",
+    "rationale": "validation near miss owned by workflow-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

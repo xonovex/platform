@@ -7,11 +7,17 @@ Commits: `6af54791` (trim), `b67816f5` (restore).
 
 ## 2026-07-22 catalog follow-up
 
-- Current catalog: **93 skills**, **25,676** `SKILL.md` + `references/` lines, **371 output evals**, and **1,625 trigger queries**.
-- Tiers: 26 aggressive, 43 moderate, 24 conservative.
-- Every skill has `evals.json`, at least 8 positive plus 8 semantically adjacent negative trigger queries with train/validation splits, reviewed source provenance, and explicit handoff- or domain-derived near-miss owners. The catalog currently yields 158 competitive routing scenarios: 96 train and 62 validation. Version-pinned descriptions also require an explicit source baseline.
+<!-- catalog-stats:start -->
+
+- Current catalog: **94 skills**, **25,146** `SKILL.md` + `references/` lines, **376 output evals**, and **1,673 trigger queries**.
+- Tiers: **27 aggressive**, **43 moderate**, **24 conservative**.
+- Competitive routing: **190 scenarios** (**96 train**, **94 validation**) with **94/94 skills** owning at least one validation scenario.
+
+<!-- catalog-stats:end -->
+
+- Every skill has `evals.json`, at least 8 positive plus 8 semantically adjacent negative trigger queries with train/validation splits, reviewed source provenance, and explicit handoff- or domain-derived near-miss owners. Version-pinned descriptions also require an explicit source baseline.
 - `agent-governance`, `ai-governance`, and `workflow` were restored after the 2026-07-19 snapshot. They have current trigger/output/source fixtures but no claim to the historical calibration results below.
-- `.github/workflows/skill-evals.yml` runs changed-skill evaluation for enabled internal pull requests and a tested monthly rotating 12-skill slice, covering both Claude and Codex trigger/output adapters. Shared evaluator changes expand to a bounded slice rather than launching an unbounded catalog run. Trigger validation runs each query three times; output evaluation runs every probe twice per arm in batches of at most three. Each runner refuses more than 24 model calls per batch, more than two concurrent calls, or more than three runs per arm. Claude retains its per-call spend caps; Codex uses ephemeral read-only runs with isolated homes and is bounded by run count, batching, timeout, and output ceilings. Calls are never retried automatically, and failed generations are not judged. The aggregate evidence index records the exact commit, workflow run and attempt, event, harness package versions, and model configuration alongside the benchmark records.
+- `.github/workflows/skill-evals.yml` runs changed-skill evaluation for enabled internal pull requests and a tested monthly rotating 32-skill slice, covering both Claude and Codex trigger/output adapters. Shared evaluator changes expand to a bounded slice rather than launching an unbounded catalog run. Trigger validation runs each query three times; output evaluation runs every probe twice per arm in batches of at most three. Each runner refuses more than 24 model calls per batch, more than two concurrent calls, or more than three runs per arm. Claude retains its per-call spend caps; Codex uses ephemeral read-only runs with isolated homes and is bounded by run count, batching, timeout, and output ceilings. Calls are never retried automatically, and failed generations are not judged. The aggregate evidence index records the exact commit, workflow run and attempt, event, harness package versions, and model configuration alongside the benchmark records.
 
 ### 2026-07-19 historical live calibration subset
 

@@ -100,5 +100,11 @@
     "rationale": "near miss owned by vitest-guide",
     "should_trigger": false,
     "split": "validation"
+  },
+  {
+    "query": "should a feature in our feature list be capped at two weeks, and what if a step is bigger?",
+    "rationale": "validation near miss owned by fdd-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

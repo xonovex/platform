@@ -94,5 +94,11 @@
     "rationale": "near miss owned by kiro-guide",
     "should_trigger": false,
     "split": "validation"
+  },
+  {
+    "query": "Provide deterministic, model-evaluator, and specialist-agent patterns for Pi.",
+    "rationale": "validation near miss owned by pi-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

@@ -118,5 +118,17 @@
     "rationale": "near miss owned by gitlab-guide",
     "should_trigger": false,
     "split": "validation"
+  },
+  {
+    "query": "Create a lifecycle inventory for client secrets with owners, consumers, expiry, audit source, and revocation path.",
+    "rationale": "validation near miss owned by credential-management-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "commit what i have so far with a wip message",
+    "rationale": "validation near miss owned by git-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

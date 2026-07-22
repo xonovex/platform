@@ -94,5 +94,17 @@
     "rationale": "near miss owned by connascence-guide",
     "should_trigger": false,
     "split": "validation"
+  },
+  {
+    "query": "how many scenarios per business rule should we keep, versus pushing cases into unit tests?",
+    "rationale": "validation near miss owned by bdd-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "name this test and split it — it verifies five things at once",
+    "rationale": "validation near miss owned by testing-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

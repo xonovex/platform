@@ -124,5 +124,11 @@
     "rationale": "near miss owned by data-model-guide",
     "should_trigger": false,
     "split": "validation"
+  },
+  {
+    "query": "we need to emit different compressed texture formats and byte order per target platform but share one source asset — how should the pipeline handle platforms",
+    "rationale": "validation near miss owned by asset-pipeline-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

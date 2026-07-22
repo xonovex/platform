@@ -106,5 +106,11 @@
     "rationale": "near miss owned by connascence-guide",
     "should_trigger": false,
     "split": "validation"
+  },
+  {
+    "query": "write clear actionable review feedback that leads with what is good",
+    "rationale": "validation near miss owned by code-review-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

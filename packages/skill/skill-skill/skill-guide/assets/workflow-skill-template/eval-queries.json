@@ -1,15 +1,15 @@
 [
   {
-    "query": "{realistic should-trigger prompt — names the operation/workflow directly}",
+    "query": "{realistic should-trigger prompt — names the workflow directly}",
     "should_trigger": true,
     "split": "train",
-    "rationale": "direct mention"
+    "rationale": "direct workflow mention"
   },
   {
-    "query": "{realistic should-trigger prompt — describes the task without naming the workflow}",
+    "query": "{realistic should-trigger prompt — describes the goal without naming the workflow}",
     "should_trigger": true,
     "split": "train",
-    "rationale": "implicit trigger"
+    "rationale": "implicit workflow trigger"
   },
   {
     "query": "{realistic should-trigger prompt — names a specific operation}",
@@ -18,57 +18,81 @@
     "rationale": "operation-level trigger"
   },
   {
-    "query": "{realistic should-trigger prompt — casual phrasing or typo}",
+    "query": "{realistic should-trigger prompt — uses casual phrasing or a typo}",
     "should_trigger": true,
     "split": "train",
     "rationale": "casual phrasing"
   },
   {
-    "query": "{realistic should-trigger prompt — operation buried in a larger task}",
+    "query": "{realistic should-trigger prompt — buries an operation in a larger task}",
     "should_trigger": true,
     "split": "train",
     "rationale": "buried in larger task"
   },
   {
-    "query": "{near-miss prompt — shares keywords but is a different skill's operation}",
-    "should_trigger": false,
-    "split": "train",
-    "rationale": "keyword overlap, different owner"
-  },
-  {
-    "query": "{near-miss prompt — adjacent workflow, not this one}",
-    "should_trigger": false,
-    "split": "train",
-    "rationale": "adjacent workflow"
-  },
-  {
-    "query": "{near-miss prompt — related terminology in a different context}",
-    "should_trigger": false,
-    "split": "train",
-    "rationale": "terminology overlap"
-  },
-  {
-    "query": "{realistic should-trigger prompt — different phrasing for validation set}",
+    "query": "{realistic should-trigger prompt — validation phrasing names the workflow}",
     "should_trigger": true,
     "split": "validation",
-    "rationale": "validation positive"
+    "rationale": "validation positive — explicit"
   },
   {
-    "query": "{realistic should-trigger prompt — validation set, implicit trigger}",
+    "query": "{realistic should-trigger prompt — validation phrasing implies an operation}",
     "should_trigger": true,
     "split": "validation",
     "rationale": "validation positive — implicit"
   },
   {
-    "query": "{near-miss prompt — validation set negative}",
-    "should_trigger": false,
+    "query": "{realistic should-trigger prompt — validation phrasing covers a failure path}",
+    "should_trigger": true,
     "split": "validation",
-    "rationale": "validation negative"
+    "rationale": "validation positive — failure path"
   },
   {
-    "query": "{near-miss prompt — validation set near-miss pointing at the right owner}",
+    "query": "{near-miss prompt — shares keywords but belongs to another workflow}",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "keyword overlap, different owner"
+  },
+  {
+    "query": "{near-miss prompt — requests an adjacent operation owned elsewhere}",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "adjacent operation"
+  },
+  {
+    "query": "{near-miss prompt — uses related terminology outside this workflow}",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "terminology overlap"
+  },
+  {
+    "query": "{near-miss prompt — asks for guidance but not execution of the workflow}",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "different intent"
+  },
+  {
+    "query": "{near-miss prompt — requests the same artifact through a different owner}",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "same artifact, different workflow"
+  },
+  {
+    "query": "{near-miss prompt — validation phrasing points to the closest sibling workflow}",
     "should_trigger": false,
     "split": "validation",
-    "rationale": "validation negative — near-miss"
+    "rationale": "validation negative — sibling owner"
+  },
+  {
+    "query": "{near-miss prompt — validation phrasing overlaps operation terminology only}",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "validation negative — terminology overlap"
+  },
+  {
+    "query": "{near-miss prompt — validation phrasing requests a different result}",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "validation negative — different result"
   }
 ]

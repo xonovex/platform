@@ -94,5 +94,11 @@
     "rationale": "near miss owned by user-stories-guide",
     "should_trigger": false,
     "split": "validation"
+  },
+  {
+    "query": "I want clean code that works — let the tests grow the API instead of designing it up front",
+    "rationale": "validation near miss owned by tdd-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

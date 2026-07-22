@@ -94,5 +94,11 @@
     "rationale": "near miss owned by bdd-guide",
     "should_trigger": false,
     "split": "validation"
+  },
+  {
+    "query": "our backlog refinement is a mess — when is a story actually ready and who sizes it?",
+    "rationale": "validation near miss owned by user-stories-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

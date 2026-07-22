@@ -100,5 +100,11 @@
     "rationale": "near miss owned by memory-management-guide",
     "should_trigger": false,
     "split": "validation"
+  },
+  {
+    "query": "I want my vertex shader to read positions straight out of a big storage buffer instead of binding a vertex layout, so I can support quantized formats and morph targets from one shader",
+    "rationale": "validation near miss owned by gpu-rendering-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

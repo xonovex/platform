@@ -19,6 +19,12 @@ tasks:
       cache: false
   ci-check:
     deps: [composition-check, coverage]
+  ts-test:
+    inputs:
+      - /packages/skill/skill-skill/skill-guide/assets/**/*
+  ts-coverage:
+    inputs:
+      - /packages/skill/skill-skill/skill-guide/assets/**/*
   ts-build:
     deps:
       - script-moon-common:build

@@ -130,5 +130,11 @@
     "rationale": "near miss owned by node-graph-guide",
     "should_trigger": false,
     "split": "validation"
+  },
+  {
+    "query": "how should rendering components hook into the engine so I can cull lots of meshes per camera and feed several shadow views in one pass?",
+    "rationale": "validation near miss owned by ecs-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

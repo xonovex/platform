@@ -118,5 +118,11 @@
     "rationale": "near miss owned by node-graph-guide",
     "should_trigger": false,
     "split": "validation"
+  },
+  {
+    "query": "one node should adapt its input and output types depending on what's wired into it — a CPU image vs a GPU image — instead of me making two near-identical nodes",
+    "rationale": "validation near miss owned by node-graph-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

@@ -94,5 +94,11 @@
     "rationale": "near miss owned by threejs-guide",
     "should_trigger": false,
     "split": "validation"
+  },
+  {
+    "query": "Help me with scaffolding Motion-based slide packages; apply the relevant Presentation conventions and call out the important edge cases.",
+    "rationale": "validation near miss owned by presentation-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

@@ -148,5 +148,11 @@
     "rationale": "near miss owned by ecs-guide",
     "should_trigger": false,
     "split": "validation"
+  },
+  {
+    "query": "how should I lay out VkCommandPool per worker thread per frame and reset with vkResetCommandPool, and wire vkAcquireNextImageKHR / vkQueueSubmit2 / vkQueuePresentKHR with a VkFence per frame",
+    "rationale": "validation near miss owned by gpu-rendering-vulkan-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]
