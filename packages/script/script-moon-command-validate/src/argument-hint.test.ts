@@ -63,4 +63,18 @@ describe("parseArgumentHint", () => {
       },
     ]);
   });
+
+  it("keeps an enumerated flag value inside one placeholder", () => {
+    expect(
+      parseArgumentHint("[--tier <auto|aggressive|moderate|conservative>]"),
+    ).toEqual([
+      {
+        kind: "flag",
+        name: "tier",
+        required: false,
+        repeatable: false,
+        valueName: "auto|aggressive|moderate|conservative",
+      },
+    ]);
+  });
 });

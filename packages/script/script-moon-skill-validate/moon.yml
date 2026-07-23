@@ -2,6 +2,7 @@ $schema: https://moonrepo.dev/schemas/project.json
 language: typescript
 tags: [typescript-script]
 dependsOn:
+  - shared-core
   - script-moon-common
 tasks:
   composition-check:
@@ -23,6 +24,20 @@ tasks:
       - /packages/command/command-workflow/commands/*.md
     options:
       runFromWorkspaceRoot: true
+  composition-sync:
+    command:
+      - node
+      - packages/script/script-moon-skill-validate/dist/src/sync-composition-catalog-cli.js
+      - .
+    deps: [build]
+    inputs:
+      - /packages/skill/composition-catalog.json
+      - /packages/skill/skill-workflow/workflow-guide/assets/composition-catalog.json
+    outputs:
+      - /packages/skill/skill-workflow/workflow-guide/assets/composition-catalog.json
+    options:
+      cache: false
+      runFromWorkspaceRoot: true
   coverage:
     command: noop
     deps: [ts-coverage]
@@ -31,17 +46,22 @@ tasks:
   ci-check:
     deps: [composition-check, coverage]
   ts-test:
+    deps:
+      - shared-core:build
     inputs:
       - /packages/skill/composition-catalog.json
       - /packages/skill/skill-skill/skill-guide/assets/**/*
       - /packages/skill/skill-workflow/workflow-guide/assets/composition-catalog.json
   ts-coverage:
+    deps:
+      - shared-core:build
     inputs:
       - /packages/skill/composition-catalog.json
       - /packages/skill/skill-skill/skill-guide/assets/**/*
       - /packages/skill/skill-workflow/workflow-guide/assets/composition-catalog.json
   ts-build:
     deps:
+      - shared-core:build
       - script-moon-common:build
   install:
     command:

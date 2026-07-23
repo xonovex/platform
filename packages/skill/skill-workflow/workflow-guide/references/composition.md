@@ -5,7 +5,7 @@
 | Layer                  | Contents                                                                                           | Owner                                                                      |
 | ---------------------- | -------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
 | Operation              | Create, Review, Revise, Decide, Execute, Validate, Publish, Abandon, or a workspace transaction    | Caller selects one immediate verb.                                         |
-| Semantic selection     | Subject/result kind, method, repeatable perspectives, criteria                                     | Caller selects explicitly; resolver may propose or derive with provenance. |
+| Semantic selection     | Subject/result kind, method, perspectives, criteria, skill requirements, preference overlays       | Caller selects explicitly; resolver may propose or derive with provenance. |
 | Resource binding       | Named input/output slot, inline value or provider-native reference, revision, kind, schema, intent | Each provider adapter interprets only its binding.                         |
 | Invocation context     | Trigger, executor, effect mode, authorization context                                              | Host supplies context; policy verifies effects.                            |
 | Derived implementation | Skills, tools, adapters, capabilities                                                              | Runtime derives, validates, and reports exact selections.                  |

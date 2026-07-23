@@ -34,6 +34,9 @@ work:
 - Reject a request document whose operation conflicts with the invoked operation.
 - Keep exact expert skill or capability overrides only in
   `implementationOverrides`; ordinary callers request semantics, not mechanisms.
+- Put operation-conditional semantic needs in `selection.skillRequirements` and
+  applicable preference conventions in `selection.preferenceOverlays`; use empty
+  arrays when neither applies.
 
 `destination` is valid only for Publish. A destination hidden in `inputs`, output
 metadata, method text, or conversational context never authorizes persistence.
@@ -53,7 +56,10 @@ The result records:
 
 - normalized request and contract version;
 - completed, partial, blocked, or failed status;
-- resolved method, perspectives, criteria, proposals, skills, and capabilities;
+- resolved method, perspectives, criteria, proposals, skills, preference overlays,
+  and capabilities;
+- unavailable, incompatible, ambiguous, and conflicting skill selections without
+  fabricated implementation identities;
 - provenance, reason, confidence, and binding status;
 - primary inline output or the exact provider binding returned by Publish;
 - evidence, observed or proposed effects, and authorization status;

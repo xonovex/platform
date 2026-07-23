@@ -11,6 +11,8 @@ This package provides common utilities used across all TypeScript scripts in the
 - **Platform Detection**: OS detection and platform-specific commands
 - **Error Handling**: Graceful error handling and validation
 - **Path Utilities**: File system navigation and platform root detection
+- **Skill Composition**: Deterministic exact and semantic skill selection with
+  scoped preference overlays
 
 ## Installation
 
@@ -51,6 +53,29 @@ die("Fatal error occurred", 1);
 ```
 
 ## API Reference
+
+### Skill Composition
+
+Import the composition contract directly from
+`@xonovex/core/skill-composition`. It parses a versioned catalog, an installed
+skill inventory, and a request containing exact skills, semantic requirements,
+and preference overlays. Resolution returns selected skills, visible failures,
+overlay conflicts, catalog identity, and an overall `ready`, `degraded`, or
+`blocked` status.
+
+The installed inventory may omit repository-local `packagePath` and
+`sourcesPath` fields. Exact implementation versions and provision versions use
+SemVer. Required resolution failures block; preferred failures remain in the
+result and degrade it.
+
+The package also exposes a JSON CLI:
+
+```bash
+xonovex-skill-compose \
+  composition-catalog.json \
+  installed-skills.json \
+  composition-request.json
+```
 
 ### Logging Functions
 

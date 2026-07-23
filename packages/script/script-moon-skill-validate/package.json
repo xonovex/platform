@@ -4,13 +4,14 @@
   "private": true,
   "type": "module",
   "bin": {
+    "moon-skill-composition-sync": "./dist/src/sync-composition-catalog-cli.js",
     "moon-skill-validate": "./dist/src/index.js",
     "moon-skill-links": "./dist/src/links-cli.js"
   },
   "dependencies": {
+    "@xonovex/core": "0.1.22",
     "@xonovex/script-moon-common": "0.0.0",
     "semver": "^7.7.3",
-    "zod": "^4.4.3",
     "yaml": "^2.9.0"
   },
   "devDependencies": {

@@ -1,9 +1,7 @@
 import {readFileSync} from "node:fs";
 import {resolve} from "node:path";
-import {describe, expect, it} from "vitest";
 import {
-  checkCompositionCatalog,
-  compositionCatalogErrors,
+  compositionCatalogIssues,
   compositionCatalogSnapshotErrors,
   parseCompositionCatalog,
   resolveExactSkill,
@@ -12,8 +10,16 @@ import {
   type CompositionCatalogEntry,
   type InstalledSkill,
   type SemanticRequirement,
-} from "./composition-catalog.js";
+} from "@xonovex/core/skill-composition";
+import {describe, expect, it} from "vitest";
+import {checkCompositionCatalog} from "./composition-catalog-check.js";
 import {type LinkReport} from "./reference-file-links.js";
+
+const compositionCatalogErrors = (
+  currentCatalog: CompositionCatalog,
+  installedSkills: readonly InstalledSkill[],
+): readonly string[] =>
+  compositionCatalogIssues(currentCatalog, installedSkills).errors;
 
 const entry = (
   name: string,
@@ -34,8 +40,17 @@ const entry = (
 const catalog = (
   skills: readonly CompositionCatalogEntry[],
 ): CompositionCatalog => ({
-  contractVersion: "1.0.0",
+  contractVersion: "2.0.0",
   digest: "catalog-digest",
+  overlayPrecedence: [
+    "global",
+    "organization",
+    "repository",
+    "language",
+    "framework",
+    "path",
+    "explicit",
+  ],
   skills,
 });
 
@@ -63,7 +78,7 @@ const requirement = (
 describe("composition catalog schema", () => {
   it("accepts independent lifecycle and functional-role classifications", () => {
     const result = parseCompositionCatalog({
-      contractVersion: "1.0.0",
+      contractVersion: "2.0.0",
       skills: [
         {
           name: "example-guide",
@@ -88,7 +103,7 @@ describe("composition catalog schema", () => {
     [
       "mixed lifecycle",
       {
-        contractVersion: "1.0.0",
+        contractVersion: "2.0.0",
         skills: [
           {
             name: "example-guide",
@@ -103,7 +118,7 @@ describe("composition catalog schema", () => {
     [
       "mixed functional role",
       {
-        contractVersion: "1.0.0",
+        contractVersion: "2.0.0",
         skills: [
           {
             name: "example-guide",
@@ -118,7 +133,7 @@ describe("composition catalog schema", () => {
     [
       "invalid provision version",
       {
-        contractVersion: "1.0.0",
+        contractVersion: "2.0.0",
         skills: [
           {
             name: "example-guide",
@@ -134,7 +149,7 @@ describe("composition catalog schema", () => {
     [
       "invalid requirement range",
       {
-        contractVersion: "1.0.0",
+        contractVersion: "2.0.0",
         skills: [
           {
             name: "example-guide",
@@ -160,13 +175,13 @@ describe("composition catalog schema", () => {
 
   it("rejects an unsupported catalog contract major", () => {
     const result = parseCompositionCatalog({
-      contractVersion: "2.0.0",
+      contractVersion: "3.0.0",
       skills: [],
     });
 
     expect(result).toEqual({
       success: false,
-      errors: ["contractVersion: unsupported major 2; expected 1"],
+      errors: ["contractVersion: unsupported major 3; expected 2"],
     });
   });
 
@@ -254,7 +269,28 @@ describe("composition catalog integrity", () => {
     expect(errors).toEqual(
       expect.arrayContaining([
         "alpha-guide declares provision assurance:evidence more than once",
-        "alpha-guide declares requirement assurance:evidence ^1.0.0 required more than once",
+        "alpha-guide declares requirement assurance:evidence more than once",
+      ]),
+    );
+  });
+
+  it("rejects duplicate requirement identifiers and installed guide identities", () => {
+    const errors = compositionCatalogErrors(
+      catalog([
+        entry("alpha-guide", {
+          requirements: [
+            requirement(),
+            requirement({range: "^2.0.0", strength: "preferred"}),
+          ],
+        }),
+      ]),
+      [installed("alpha-guide"), installed("alpha-guide", "8.0.0")],
+    );
+
+    expect(errors).toEqual(
+      expect.arrayContaining([
+        "alpha-guide declares requirement assurance:evidence more than once",
+        "installed snapshot contains duplicate guide alpha-guide",
       ]),
     );
   });
@@ -366,7 +402,7 @@ describe("installed-snapshot selection", () => {
     expect(result).toEqual({
       status: "selected",
       selection: {
-        catalogContractVersion: "1.0.0",
+        catalogContractVersion: "2.0.0",
         catalogDigest: "catalog-digest",
         guide: "alpha-guide",
         implementationVersion: "7.0.0",

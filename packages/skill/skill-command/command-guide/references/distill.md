@@ -16,7 +16,8 @@ its public argument contract stable.
 - `--owner-skill` (optional) — exact guide that owns the procedure.
 - `--owner-plugin` (optional) — distribution plugin for the owner guide.
 - `--operation` (optional) — operation/reference within the owner skill.
-- `--requires` (repeatable, optional) — soft supporting semantic requirement.
+- `--requires` (repeatable, optional) — soft requirement in
+  `<provision-id>@<range>[:required|preferred]` form; defaults to preferred.
 - `--dry-run` (optional) — preview command, skill, and manifest changes.
 
 ## Content boundary
@@ -27,6 +28,11 @@ Keep in the command:
 - argument names, defaults, repeatability, and effect boundary;
 - exact owner skill, owner plugin, and operation;
 - soft semantic requirements that affect runtime selection.
+
+Write each soft requirement under `## Requirements` as
+`- \`<provision-id>@<range>\` (required|preferred): <reason>`. Repository validation
+checks the syntax and catalog compatibility; the runtime records missing preferred
+support as visible degradation.
 
 Move to the owner skill:
 

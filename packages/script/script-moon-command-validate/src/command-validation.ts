@@ -1,6 +1,12 @@
 import {existsSync, readdirSync, readFileSync, statSync} from "node:fs";
 import {join, relative, resolve, sep} from "node:path";
 import {
+  parseCompositionCatalog,
+  resolveSemanticRequirement,
+  type CompositionCatalog,
+  type InstalledSkill,
+} from "@xonovex/core/skill-composition";
+import {
   parseCommandDocument,
   type CommandDocument,
 } from "./command-document.js";
@@ -24,6 +30,11 @@ export interface CommandPackageValidation {
   readonly report: ValidationReport;
 }
 
+interface CompositionContext {
+  readonly catalog: CompositionCatalog;
+  readonly installedSkills: readonly InstalledSkill[];
+}
+
 const readJson = (path: string, issues: ValidationIssue[]): unknown => {
   try {
     return JSON.parse(readFileSync(path, "utf8")) as unknown;
@@ -39,6 +50,161 @@ const readJson = (path: string, issues: ValidationIssue[]): unknown => {
 const expectedNpmDependency = (plugin: string): string | undefined => {
   const match = /^xonovex-(skill-[a-z0-9-]+)$/u.exec(plugin);
   return match?.[1] === undefined ? undefined : `@xonovex/${match[1]}`;
+};
+
+const validateArgumentParity = (
+  document: CommandDocument,
+  issues: ValidationIssue[],
+): void => {
+  const argumentKeys = document.arguments.map(
+    ({kind, name}) => `${kind}:${name}`,
+  );
+  for (const duplicate of new Set(
+    argumentKeys.filter(
+      (argument, index) => argumentKeys.indexOf(argument) !== index,
+    ),
+  )) {
+    const name = duplicate.slice(duplicate.indexOf(":") + 1);
+    issues.push(
+      issue(
+        "command.argument-duplicate",
+        document.path,
+        `${duplicate.startsWith("flag:") ? "flag" : "positional argument"} '${name}' appears more than once in argument-hint`,
+      ),
+    );
+  }
+  const hintedNames = document.arguments.map(({name}) => name);
+  const hinted = new Set(hintedNames);
+  for (const name of [...hinted].filter(
+    (argument) => !document.documentedArguments.has(argument),
+  )) {
+    issues.push(
+      issue(
+        "command.argument-undocumented",
+        document.path,
+        `argument '${name}' appears in argument-hint but not the Arguments section`,
+      ),
+    );
+  }
+  for (const name of [...document.documentedArguments].filter(
+    (argument) => !hinted.has(argument),
+  )) {
+    issues.push(
+      issue(
+        "command.argument-missing-hint",
+        document.path,
+        `argument '${name}' appears in the Arguments section but not argument-hint`,
+      ),
+    );
+  }
+};
+
+const compositionContext = (
+  repositoryRoot: string,
+  issues: ValidationIssue[],
+): CompositionContext | undefined => {
+  const catalogPath = join(
+    repositoryRoot,
+    "packages",
+    "skill",
+    "composition-catalog.json",
+  );
+  if (!existsSync(catalogPath)) {
+    issues.push(
+      issue(
+        "command.requirement-catalog",
+        relative(repositoryRoot, catalogPath),
+        "composition catalog is required to validate semantic requirements",
+      ),
+    );
+    return undefined;
+  }
+  const sourceText = readFileSync(catalogPath, "utf8");
+  const input = readJson(catalogPath, issues);
+  const parsed = parseCompositionCatalog(input, sourceText);
+  if (!parsed.success) {
+    for (const error of parsed.errors) {
+      issues.push(
+        issue(
+          "command.requirement-catalog",
+          relative(repositoryRoot, catalogPath),
+          error,
+        ),
+      );
+    }
+    return undefined;
+  }
+  const installedSkills = parsed.data.skills.flatMap(({name}) => {
+    const packageName = name.replace(/-guide$/u, "");
+    const packageDirectory = join(
+      repositoryRoot,
+      "packages",
+      "skill",
+      `skill-${packageName}`,
+    );
+    const packagePath = join(packageDirectory, "package.json");
+    if (!existsSync(packagePath)) return [];
+    const packageJson = readJson(packagePath, issues);
+    if (
+      typeof packageJson !== "object" ||
+      packageJson === null ||
+      !("version" in packageJson) ||
+      typeof packageJson.version !== "string"
+    ) {
+      return [];
+    }
+    return [
+      {
+        guide: name,
+        implementationVersion: packageJson.version,
+        packagePath: relative(repositoryRoot, packageDirectory),
+        plugin: `xonovex-skill-${packageName}`,
+        sourcesPath: relative(
+          repositoryRoot,
+          join(packageDirectory, name, "SOURCES.md"),
+        ),
+      },
+    ];
+  });
+  return {catalog: parsed.data, installedSkills};
+};
+
+const validateSemanticRequirements = (
+  documents: readonly CommandDocument[],
+  repositoryRoot: string,
+  issues: ValidationIssue[],
+): void => {
+  if (
+    documents.every(
+      ({semanticRequirements}) => semanticRequirements.length === 0,
+    )
+  ) {
+    return;
+  }
+  const context = compositionContext(repositoryRoot, issues);
+  if (context === undefined) return;
+  for (const document of documents) {
+    for (const requirement of document.semanticRequirements) {
+      const resolution = resolveSemanticRequirement(
+        context.catalog,
+        context.installedSkills,
+        requirement,
+        {
+          kind: "semantic-requirement",
+          reason: requirement.reason,
+          requestedBy: `command:${document.command}`,
+        },
+      );
+      if (resolution.status === "selected") continue;
+      issues.push(
+        issue(
+          `command.requirement-${resolution.status}`,
+          document.path,
+          resolution.message,
+        ),
+      );
+    }
+  }
 };
 
 const markdownFilesBelow = (directory: string): readonly string[] => {
@@ -173,6 +339,7 @@ export const validateCommandPackage = (
     const document = parsed.document;
     if (document === undefined) continue;
     documents.push(document);
+    validateArgumentParity(document, issues);
     if (document.fileName !== document.command) {
       issues.push(
         issue(
@@ -243,6 +410,7 @@ export const validateCommandPackage = (
     }
   }
 
+  validateSemanticRequirements(documents, repositoryRoot, issues);
   return {
     documents,
     report: {commands: commandFiles.length, issues},

@@ -73,8 +73,12 @@ The workspace-level composition check keeps structured metadata outside Agent Sk
 - `mixed`, malformed provision identifiers, invalid semantic versions/ranges, and duplicate local provisions/requirements fail.
 - Required semantic requirements resolve to exactly one compatible installed provision; missing, incompatible, or ambiguous resolution fails.
 - Preferred resolution remains visible but does not fail solely because a provider is unavailable.
+- Preference overlays apply only to preference guides, follow catalog scope
+  precedence, and reject equal-scope conflicts.
 - Deterministically selected required semantic dependencies are acyclic.
-- Exact manifest dependencies remain paired, resolvable, named in guidance, and acyclic independently of semantic requirements.
+- Exact manifest dependencies remain paired, mirrored in package dependencies,
+  explicitly loaded in guidance, resolvable, and acyclic independently of semantic
+  requirements.
 - Selection records the catalog contract/digest, guide/plugin identities, exact implementation version, provision compatibility, reason, and `SOURCES.md` provenance path.
 - The catalog snapshot packaged with the workflow skill is byte-identical to the canonical repository catalog, so installed selection never depends on repository-root access.
 

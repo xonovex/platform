@@ -7,7 +7,7 @@ allowed-tools:
   - Edit
   - Skill
 argument-hint: >-
-  [patch|minor|major] [--type <patch|minor|major>] [--exact <version>] [--preid
+  [<type>] [--type <patch|minor|major>] [--exact <version>] [--preid
   <tag>] [--dry-run] [--no-changelog] [--no-dependents] [--changelog-path <file>]
   [--git-base <ref>] [--include-types <a,b>]
 ---

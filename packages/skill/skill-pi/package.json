@@ -3,6 +3,9 @@
   "version": "7.0.0",
   "private": true,
   "type": "module",
+  "dependencies": {
+    "@xonovex/skill-agent-governance": "7.0.0"
+  },
   "keywords": [
     "xonovex",
     "skill",

@@ -32,7 +32,41 @@ const makeSink = (): LinkReport & {fails: string[]; passes: string[]} => {
 const makeRepo = (files: Record<string, string>): string => {
   const root = mkdtempSync(join(tmpdir(), "xpkg-links-"));
   created.push(root);
-  for (const [rel, content] of Object.entries(files)) {
+  const generatedPackageFiles = Object.fromEntries(
+    Object.entries(files).flatMap(([path, content]) => {
+      const match =
+        /^(packages\/skill\/skill-[^/]+)\/\.claude-plugin\/plugin\.json$/u.exec(
+          path,
+        );
+      if (match?.[1] === undefined) return [];
+      const packagePath = `${match[1]}/package.json`;
+      if (files[packagePath] !== undefined) return [];
+      const plugin = JSON.parse(content) as {
+        readonly dependencies?: readonly string[];
+        readonly name: string;
+      };
+      const dependencies = Object.fromEntries(
+        (plugin.dependencies ?? []).map((dependency) => [
+          `@xonovex/${dependency.replace(/^xonovex-/u, "")}`,
+          "7.0.0",
+        ]),
+      );
+      return [
+        [
+          packagePath,
+          JSON.stringify({
+            name: `@xonovex/${plugin.name.replace(/^xonovex-/u, "")}`,
+            version: "7.0.0",
+            dependencies,
+          }),
+        ],
+      ];
+    }),
+  );
+  for (const [rel, content] of Object.entries({
+    ...generatedPackageFiles,
+    ...files,
+  })) {
     const abs = join(root, rel);
     mkdirSync(dirname(abs), {recursive: true});
     writeFileSync(abs, content);
@@ -376,7 +410,114 @@ describe("checkSkillDependencies", () => {
       "skill dependencies: manifests in packages/skill/skill-base must be named xonovex-skill-base",
     );
     expect(report.fails).toContain(
-      "skill dependencies: xonovex-skill-child depends on xonovex-skill-wrong but does not name **base-guide** in its guidance",
+      "skill dependencies: xonovex-skill-child depends on xonovex-skill-wrong but does not explicitly apply, follow, load, or use **base-guide** in its guidance",
+    );
+  });
+
+  it("requires plugin hard dependencies in the npm and Moon graph", () => {
+    const repo = makeRepo({
+      "packages/skill/skill-base/base-guide/SKILL.md": "# Base\n",
+      "packages/skill/skill-base/.claude-plugin/plugin.json": manifest(
+        "xonovex-skill-base",
+        [],
+        "claude",
+      ),
+      "packages/skill/skill-base/.codex-plugin/plugin.json":
+        manifest("xonovex-skill-base"),
+      "packages/skill/skill-child/package.json": JSON.stringify({
+        name: "@xonovex/skill-child",
+        version: "7.0.0",
+      }),
+      "packages/skill/skill-child/child-guide/SKILL.md":
+        "# Child\nLoad **base-guide**.\n",
+      "packages/skill/skill-child/.claude-plugin/plugin.json": manifest(
+        "xonovex-skill-child",
+        ["xonovex-skill-base"],
+        "claude",
+      ),
+      "packages/skill/skill-child/.codex-plugin/plugin.json": manifest(
+        "xonovex-skill-child",
+        ["xonovex-skill-base"],
+      ),
+    });
+    const report = makeSink();
+
+    checkSkillDependencies(repo, report);
+
+    expect(report.fails).toContain(
+      "skill dependencies: xonovex-skill-child declares xonovex-skill-base in its plugin manifests but omits @xonovex/skill-base from package.json",
+    );
+  });
+
+  it("requires exact bidirectional npm and plugin dependency parity", () => {
+    const repo = makeRepo({
+      "packages/skill/skill-base/base-guide/SKILL.md": "# Base\n",
+      "packages/skill/skill-base/.claude-plugin/plugin.json": manifest(
+        "xonovex-skill-base",
+        [],
+        "claude",
+      ),
+      "packages/skill/skill-base/.codex-plugin/plugin.json":
+        manifest("xonovex-skill-base"),
+      "packages/skill/skill-child/package.json": JSON.stringify({
+        name: "@xonovex/skill-child",
+        version: "7.0.0",
+        dependencies: {
+          "@xonovex/skill-base": "^7.0.0",
+        },
+      }),
+      "packages/skill/skill-child/child-guide/SKILL.md": "# Child\n",
+      "packages/skill/skill-child/.claude-plugin/plugin.json": manifest(
+        "xonovex-skill-child",
+        [],
+        "claude",
+      ),
+      "packages/skill/skill-child/.codex-plugin/plugin.json": manifest(
+        "xonovex-skill-child",
+      ),
+    });
+    const report = makeSink();
+
+    checkSkillDependencies(repo, report);
+
+    expect(report.fails).toContain(
+      "skill dependencies: xonovex-skill-child declares @xonovex/skill-base in package.json but omits xonovex-skill-base from its plugin manifests",
+    );
+
+    const pinnedRepo = makeRepo({
+      "packages/skill/skill-base/base-guide/SKILL.md": "# Base\n",
+      "packages/skill/skill-base/.claude-plugin/plugin.json": manifest(
+        "xonovex-skill-base",
+        [],
+        "claude",
+      ),
+      "packages/skill/skill-base/.codex-plugin/plugin.json":
+        manifest("xonovex-skill-base"),
+      "packages/skill/skill-child/package.json": JSON.stringify({
+        name: "@xonovex/skill-child",
+        version: "7.0.0",
+        dependencies: {
+          "@xonovex/skill-base": "^7.0.0",
+        },
+      }),
+      "packages/skill/skill-child/child-guide/SKILL.md":
+        "# Child\nLoad **base-guide**.\n",
+      "packages/skill/skill-child/.claude-plugin/plugin.json": manifest(
+        "xonovex-skill-child",
+        ["xonovex-skill-base"],
+        "claude",
+      ),
+      "packages/skill/skill-child/.codex-plugin/plugin.json": manifest(
+        "xonovex-skill-child",
+        ["xonovex-skill-base"],
+      ),
+    });
+    const pinnedReport = makeSink();
+
+    checkSkillDependencies(pinnedRepo, pinnedReport);
+
+    expect(pinnedReport.fails).toContain(
+      "skill dependencies: xonovex-skill-child pins @xonovex/skill-base@^7.0.0; expected exact installed version 7.0.0",
     );
   });
 

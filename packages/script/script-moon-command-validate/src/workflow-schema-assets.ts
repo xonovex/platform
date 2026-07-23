@@ -1,3 +1,4 @@
+import {createHash} from "node:crypto";
 import {readdirSync, readFileSync} from "node:fs";
 import {join, relative} from "node:path";
 import {
@@ -6,6 +7,7 @@ import {
   type ErrorObject,
   type ValidateFunction,
 } from "ajv/dist/2020.js";
+import {valid, validRange} from "semver";
 import {issue, type ValidationIssue} from "./validation.js";
 
 export type WorkflowSchemaKind = "request" | "result" | "work-record";
@@ -79,6 +81,14 @@ export const createWorkflowSchemaValidators = (
     strictTypes: false,
   });
   ajv.addFormat("date-time", {type: "string", validate: validDateTime});
+  ajv.addFormat("semver", {
+    type: "string",
+    validate: (value: string) => valid(value) !== null,
+  });
+  ajv.addFormat("semver-range", {
+    type: "string",
+    validate: (value: string) => validRange(value) !== null,
+  });
   const schemaList: readonly AnySchemaObject[] = [
     schemas.request,
     schemas.result,
@@ -145,6 +155,74 @@ const fixtureKind = (input: unknown): WorkflowSchemaKind | undefined => {
 const expectsInvalid = (path: string): boolean =>
   path.split(/[\\/]/u).includes("invalid");
 
+interface CatalogIdentity {
+  readonly contractVersion: string;
+  readonly digest: string;
+}
+
+const catalogIdentity = (
+  assetDirectory: string,
+): CatalogIdentity | undefined => {
+  const path = join(assetDirectory, "composition-catalog.json");
+  try {
+    const text = readFileSync(path, "utf8");
+    const input = JSON.parse(text) as unknown;
+    if (
+      typeof input !== "object" ||
+      input === null ||
+      Array.isArray(input) ||
+      !("contractVersion" in input) ||
+      typeof input.contractVersion !== "string"
+    ) {
+      return undefined;
+    }
+    return {
+      contractVersion: input.contractVersion,
+      digest: createHash("sha256").update(text).digest("hex"),
+    };
+  } catch {
+    return undefined;
+  }
+};
+
+const catalogReferences = (
+  input: unknown,
+  path = "",
+): readonly {
+  readonly contractVersion?: string;
+  readonly digest?: string;
+  readonly path: string;
+}[] => {
+  if (Array.isArray(input)) {
+    return input.flatMap((entry, index) =>
+      catalogReferences(entry, `${path}/${String(index)}`),
+    );
+  }
+  if (typeof input !== "object" || input === null) return [];
+  const record = input as Readonly<Record<string, unknown>>;
+  const current =
+    typeof record.catalogContractVersion === "string" ||
+    typeof record.catalogDigest === "string"
+      ? [
+          {
+            path: path.length === 0 ? "/" : path,
+            ...(typeof record.catalogContractVersion === "string"
+              ? {contractVersion: record.catalogContractVersion}
+              : {}),
+            ...(typeof record.catalogDigest === "string"
+              ? {digest: record.catalogDigest}
+              : {}),
+          },
+        ]
+      : [];
+  return [
+    ...current,
+    ...Object.entries(record).flatMap(([key, value]) =>
+      catalogReferences(value, `${path}/${key}`),
+    ),
+  ];
+};
+
 export const validateWorkflowSchemaAssets = (
   assetDirectory: string,
 ): WorkflowAssetReport => {
@@ -165,6 +243,16 @@ export const validateWorkflowSchemaAssets = (
 
   const examplesDirectory = join(assetDirectory, "examples");
   const fixtureFiles = filesBelow(examplesDirectory);
+  const expectedCatalog = catalogIdentity(assetDirectory);
+  if (expectedCatalog === undefined) {
+    issues.push(
+      issue(
+        "workflow-schema.catalog",
+        assetDirectory,
+        "composition-catalog.json needs a string contractVersion",
+      ),
+    );
+  }
   for (const path of fixtureFiles) {
     const displayPath = relative(assetDirectory, path);
     let input: unknown;
@@ -200,6 +288,34 @@ export const validateWorkflowSchemaAssets = (
             : validation.errors.join("; "),
         ),
       );
+    }
+    if (!invalid && expectedCatalog !== undefined) {
+      for (const reference of catalogReferences(input)) {
+        if (
+          reference.contractVersion !== undefined &&
+          reference.contractVersion !== expectedCatalog.contractVersion
+        ) {
+          issues.push(
+            issue(
+              "workflow-fixture.catalog-version",
+              displayPath,
+              `${reference.path} records catalog contract ${reference.contractVersion}; expected ${expectedCatalog.contractVersion}`,
+            ),
+          );
+        }
+        if (
+          reference.digest !== undefined &&
+          reference.digest !== expectedCatalog.digest
+        ) {
+          issues.push(
+            issue(
+              "workflow-fixture.catalog-digest",
+              displayPath,
+              `${reference.path} records stale catalog digest ${reference.digest}; expected ${expectedCatalog.digest}`,
+            ),
+          );
+        }
+      }
     }
   }
 

@@ -142,6 +142,128 @@ describe("workflow JSON Schema assets", () => {
     expect(validation("result", {...result, concurrency})).toBe(false);
   });
 
+  it("accepts portable selected skills and natural semantic resolution failures", () => {
+    const result = readExample("review-operation-result.json");
+    const portable = structuredClone(result.resolution) as {
+      skills: Record<string, unknown>[];
+    };
+    delete portable.skills[0]?.packagePath;
+    delete portable.skills[0]?.sourcesPath;
+    expect(validation("result", {...result, resolution: portable})).toBe(true);
+
+    const failed = structuredClone(result.resolution) as {
+      skills: Record<string, unknown>[];
+    };
+    const selected = failed.skills[0] as Record<string, unknown>;
+    failed.skills = [
+      {
+        status: "unavailable",
+        blocking: false,
+        candidates: [],
+        message: "No installed skill provides the requested assurance.",
+        provenance: selected.provenance,
+        catalogContractVersion: selected.catalogContractVersion,
+        catalogDigest: selected.catalogDigest,
+        reason: "Test assurance is useful but optional.",
+        required: false,
+        requestedRange: "^1.0.0",
+        requirement: {
+          id: "assurance:testing",
+          range: "^1.0.0",
+          strength: "preferred",
+          reason: "Test assurance is useful but optional.",
+        },
+      },
+    ];
+    expect(validation("result", {...result, resolution: failed})).toBe(true);
+
+    const inconsistent = structuredClone(failed);
+    inconsistent.skills[0] = {
+      ...inconsistent.skills[0],
+      required: true,
+      blocking: false,
+    };
+    expect(validation("result", {...result, resolution: inconsistent})).toBe(
+      false,
+    );
+  });
+
+  it("requires semantic requirements, preference overlays, and overlay outcomes", () => {
+    const request = readExample("multi-provider-review-request.json");
+    const selectionWithoutRequirements = structuredClone(request.selection) as
+      Record<string, unknown> | undefined;
+    delete selectionWithoutRequirements?.skillRequirements;
+    expect(
+      validation("request", {
+        ...request,
+        selection: selectionWithoutRequirements,
+      }),
+    ).toBe(false);
+
+    const selectionWithoutOverlays = structuredClone(request.selection) as
+      Record<string, unknown> | undefined;
+    delete selectionWithoutOverlays?.preferenceOverlays;
+    expect(
+      validation("request", {
+        ...request,
+        selection: selectionWithoutOverlays,
+      }),
+    ).toBe(false);
+
+    const result = readExample("review-operation-result.json");
+    const resolution = structuredClone(result.resolution) as Record<
+      string,
+      unknown
+    >;
+    delete resolution.overlays;
+    expect(validation("result", {...result, resolution})).toBe(false);
+
+    const record = readExample("durable-work-record.json");
+    const recordWithoutOverlays = structuredClone(record);
+    delete recordWithoutOverlays.overlays;
+    expect(validation("work-record", recordWithoutOverlays)).toBe(false);
+  });
+
+  it("validates semantic versions and separates skill from capability overrides", () => {
+    const request = readExample("multi-provider-review-request.json");
+    const invalidRange = structuredClone(request.selection) as Record<
+      string,
+      unknown
+    >;
+    invalidRange.skillRequirements = [
+      {
+        id: "assurance:testing",
+        range: "newest",
+        strength: "preferred",
+        reason: "Use test assurance when available.",
+      },
+    ];
+    expect(validation("request", {...request, selection: invalidRange})).toBe(
+      false,
+    );
+
+    expect(
+      validation("request", {
+        ...request,
+        implementationOverrides: {
+          skills: [{id: "workflow-guide", version: "7.0.0"}],
+          capabilities: [
+            {id: "github.pull-request.read", version: "provider-native"},
+          ],
+        },
+      }),
+    ).toBe(true);
+    expect(
+      validation("request", {
+        ...request,
+        implementationOverrides: {
+          skills: [{id: "workflow-guide", version: "latest"}],
+          capabilities: [],
+        },
+      }),
+    ).toBe(false);
+  });
+
   it("requires durable provider-owned identities and exact revisions", () => {
     const record = readExample("durable-work-record.json");
     expect(validation("work-record", record)).toBe(true);
@@ -177,6 +299,29 @@ describe("workflow JSON Schema assets", () => {
     );
     expect(validateWorkflowSchemaAssets(directory).issues).toContainEqual(
       expect.objectContaining({code: "workflow-fixture.unexpected-valid"}),
+    );
+  });
+
+  it("rejects stale catalog identities in committed fixtures", () => {
+    const directory = mkdtempSync(join(tmpdir(), "workflow-assets-"));
+    temporaryDirectories.push(directory);
+    cpSync(assetDirectory, directory, {recursive: true});
+    const fixturePath = join(
+      directory,
+      "examples",
+      "review-operation-result.json",
+    );
+    const result = JSON.parse(readFileSync(fixturePath, "utf8")) as {
+      resolution: {skills: Record<string, unknown>[]};
+    };
+    result.resolution.skills[0] = {
+      ...result.resolution.skills[0],
+      catalogDigest: "0".repeat(64),
+    };
+    writeFileSync(fixturePath, JSON.stringify(result));
+
+    expect(validateWorkflowSchemaAssets(directory).issues).toContainEqual(
+      expect.objectContaining({code: "workflow-fixture.catalog-digest"}),
     );
   });
 });

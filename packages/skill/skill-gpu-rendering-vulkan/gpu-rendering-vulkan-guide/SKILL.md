@@ -5,7 +5,10 @@ description: "Use when implementing a Vulkan renderer: the concrete Vulkan API f
 
 # Vulkan Rendering Guidelines
 
-The concrete Vulkan API for a low-level renderer. This skill is the Vulkan _how_; for the _why_ and the API-agnostic architecture (render graphs, binding model, sync model, frames-in-flight, memory strategy) see gpu-rendering-guide. For the general allocator principle behind device memory see memory-management-guide.
+The concrete Vulkan API for a low-level renderer. This skill is the Vulkan _how_;
+apply **gpu-rendering-guide** for the _why_ and the API-agnostic architecture (render
+graphs, binding model, sync model, frames-in-flight, memory strategy). For the general
+allocator principle behind device memory see memory-management-guide.
 
 ## Requirements
 

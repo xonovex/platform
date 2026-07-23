@@ -2,6 +2,10 @@
 
 Use one harness-neutral catalog to describe semantic composition. Agent Skill frontmatter owns discovery, plugin manifests own installation, and the composition catalog owns classification plus semantic contracts.
 
+Catalog contract v2 also defines the broad-to-narrow preference-overlay precedence:
+global, organization, repository, language, framework, path, then explicit request.
+The resolver uses this declared order; prompt or load order has no authority.
+
 ## Two independent classifications
 
 Every guide has exactly one lifecycle and one primary functional role:
@@ -94,15 +98,25 @@ Every resolved selection records:
 - matched provision identifier, provision version, and requested range when semantic;
 - selection kind: explicit, exact dependency, semantic requirement, or policy;
 - requesting skill or operation and human-readable reason;
-- package path and the selected guide's `SOURCES.md` path.
+- package path and the selected guide's `SOURCES.md` path when the installed runtime
+  exposes local paths.
 
 `SOURCES.md` remains the content-provenance authority. Do not copy its URLs, commits, review dates, or source versions into the composition catalog. Durable domain or context conflicts require explicit authority, scope, freshness, and evidence resolution; preference overlay order does not resolve factual conflicts.
+
+## Preference overlays
+
+Only a guide classified as `preference` may be requested as an overlay. Each request
+names the guide, target, scope kind/value, and reason. Resolve applicable overlays
+from broad to narrow catalog precedence. Two different overlays for the same target
+at the same scope are a conflict until policy or an explicit narrower scope selects
+one. Never pass a domain or context guide through overlay resolution.
 
 ## Distribution
 
 Repository validation uses one canonical composition catalog. Package an exact generated snapshot inside the workflow skill that performs semantic selection:
 
 - Keep the snapshot byte-identical to the canonical file.
+- After changing the canonical catalog, run `npx moon run script-moon-skill-validate:composition-sync`.
 - Compute the catalog digest from those exact bytes.
 - Make the workflow guidance load its packaged snapshot rather than reaching outside its installed plugin directory.
 - Fail validation when the packaged snapshot is absent or differs, so it can never become a second authored source.
@@ -117,4 +131,5 @@ Do not assume that a marketplace repository root remains readable after one plug
 - Reject required requirements that are missing, incompatible, or ambiguous in the installed snapshot.
 - Reject cycles formed by deterministically selected required semantic requirements.
 - Preserve preferred failures as visible results rather than silently dropping them.
+- Reject non-preference overlays and equal-scope overlay conflicts.
 - Reject a missing or non-identical packaged workflow snapshot.

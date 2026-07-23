@@ -12,7 +12,7 @@ allowed-tools:
   - TodoWrite
   - Task
   - Skill
-argument-hint: "[skill-file|--all] [--model <weakest>] [--tier auto|aggressive|moderate|conservative] [--dry-run] [--report-only]"
+argument-hint: "[skill-file|--all] [--model <weakest>] [--tier <tier>] [--dry-run] [--report-only]"
 ---
 
 # /xonovex-utility:skill-optimize — Trim a skill to its knowledge delta and verify

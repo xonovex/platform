@@ -9,6 +9,8 @@ const TITLE_RE =
 const DELEGATION_RE =
   /Load the `([^`]+)` skill \(plugin `([^`]+)`\)[\s\S]*?\*\*([^*]+)\*\*/u;
 const HEADING_RE = /^## (.+)$/gmu;
+const REQUIREMENT_RE =
+  /^-\s+`([a-z][a-z0-9-]*:[a-z0-9]+(?:[.-][a-z0-9]+)*)@([^`]+)`\s+\((required|preferred)\):\s+(.+)$/u;
 
 export interface CommandFrontmatter {
   readonly allowedTools: readonly string[];
@@ -22,6 +24,13 @@ export interface CommandDelegation {
   readonly skill: string;
 }
 
+export interface CommandSemanticRequirement {
+  readonly id: string;
+  readonly range: string;
+  readonly reason: string;
+  readonly strength: "preferred" | "required";
+}
+
 export interface CommandDocument {
   readonly arguments: readonly CommandArgument[];
   readonly body: string;
@@ -33,6 +42,7 @@ export interface CommandDocument {
   readonly headings: readonly string[];
   readonly namespace: string;
   readonly path: string;
+  readonly semanticRequirements: readonly CommandSemanticRequirement[];
   readonly title: string;
 }
 
@@ -46,8 +56,8 @@ const stringArray = (value: unknown): readonly string[] | undefined =>
     ? value
     : undefined;
 
-const argumentSection = (body: string): string => {
-  const startMatch = /^## Arguments\s*$/mu.exec(body);
+const section = (body: string, heading: string): string => {
+  const startMatch = new RegExp(`^## ${heading}\\s*$`, "mu").exec(body);
   if (startMatch === null) return "";
   const rest = body.slice(startMatch.index + startMatch[0].length);
   const nextHeading = /^## /mu.exec(rest);
@@ -56,25 +66,87 @@ const argumentSection = (body: string): string => {
 
 const documentedArguments = (body: string): ReadonlySet<string> => {
   const names = new Set<string>();
-  for (const match of argumentSection(body).matchAll(/`([^`]+)`/gu)) {
-    const raw = match[1]?.trim();
-    if (raw === undefined) continue;
-    const flags = [...raw.matchAll(/--([a-z0-9]+(?:-[a-z0-9]+)*)/giu)].flatMap(
-      (flagMatch) => (flagMatch[1] === undefined ? [] : [flagMatch[1]]),
-    );
-    if (flags.length > 0) {
-      for (const flag of flags) names.add(flag);
-      continue;
-    }
-    const positional = raw
-      .replace(/^\[/u, "")
-      .replace(/\]$/u, "")
-      .split(/[ <|]/u, 1)[0];
-    if (positional !== undefined && /^[a-z0-9][a-z0-9-]*$/iu.test(positional)) {
-      names.add(positional);
+  for (const line of section(body, "Arguments").split(/\r?\n/u)) {
+    if (!/^\s*-\s+/u.test(line)) continue;
+    const separator = line.indexOf(":");
+    const modifier = /\s+\((?:optional|required|repeatable)\b/iu.exec(line);
+    const end = [separator, modifier?.index ?? -1]
+      .filter((index) => index >= 0)
+      .toSorted((left, right) => left - right)[0];
+    const declaration = end === undefined ? line : line.slice(0, end);
+    for (const match of declaration.matchAll(/`([^`]+)`/gu)) {
+      const raw = match[1]?.trim();
+      if (raw === undefined) continue;
+      const flags = [
+        ...raw.matchAll(/--([a-z0-9]+(?:-[a-z0-9]+)*)/giu),
+      ].flatMap((flagMatch) =>
+        flagMatch[1] === undefined ? [] : [flagMatch[1]],
+      );
+      if (flags.length > 0) {
+        for (const flag of flags) names.add(flag);
+        continue;
+      }
+      const positional = raw
+        .replace(/^\[/u, "")
+        .replace(/\]$/u, "")
+        .split(/[ <|]/u, 1)[0];
+      if (
+        positional !== undefined &&
+        /^[a-z0-9][a-z0-9-]*$/iu.test(positional)
+      ) {
+        names.add(positional);
+      }
     }
   }
   return names;
+};
+
+const semanticRequirements = (
+  body: string,
+  path: string,
+  issues: ValidationIssue[],
+): readonly CommandSemanticRequirement[] => {
+  const requirements: CommandSemanticRequirement[] = [];
+  const text = section(body, "Requirements").trim();
+  if (text.length === 0) return requirements;
+  for (const line of text
+    .split(/\r?\n/u)
+    .filter((value) => value.trim() !== "")) {
+    const match = REQUIREMENT_RE.exec(line);
+    if (match === null) {
+      issues.push(
+        issue(
+          "command.requirement-format",
+          path,
+          `invalid semantic requirement '${line.trim()}'; expected '- \`<id>@<range>\` (required|preferred): <reason>'`,
+        ),
+      );
+      continue;
+    }
+    const [id, range, strength, reason] = match.slice(1);
+    if (
+      id === undefined ||
+      range === undefined ||
+      (strength !== "required" && strength !== "preferred") ||
+      reason === undefined
+    ) {
+      continue;
+    }
+    requirements.push({id, range, strength, reason: reason.trim()});
+  }
+  const keys = requirements.map(({id}) => id);
+  for (const duplicate of new Set(
+    keys.filter((key, index) => keys.indexOf(key) !== index),
+  )) {
+    issues.push(
+      issue(
+        "command.requirement-duplicate",
+        path,
+        `semantic requirement '${duplicate}' is declared more than once`,
+      ),
+    );
+  }
+  return requirements;
 };
 
 export const parseCommandDocument = (
@@ -160,6 +232,7 @@ export const parseCommandDocument = (
   }
 
   const body = frontmatterMatch[2] ?? "";
+  const requirements = semanticRequirements(body, path, issues);
   const titleMatch = TITLE_RE.exec(body);
   if (titleMatch === null) {
     issues.push(
@@ -235,6 +308,7 @@ export const parseCommandDocument = (
       headings,
       namespace: titleMatch[1] ?? "",
       path,
+      semanticRequirements: requirements,
       title: titleMatch[3] ?? "",
     },
     issues,

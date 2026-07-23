@@ -39,6 +39,12 @@ const isRecord = (value: unknown): value is Record<string, unknown> =>
 const isStringArray = (value: unknown): value is readonly string[] =>
   Array.isArray(value) && value.every((entry) => typeof entry === "string");
 
+const isStringRecord = (
+  value: unknown,
+): value is Readonly<Record<string, string>> =>
+  isRecord(value) &&
+  Object.values(value).every((entry) => typeof entry === "string");
+
 const normalizedSkillPaths = (
   value: unknown,
 ): readonly string[] | undefined => {
@@ -300,10 +306,53 @@ const checkSkillPackage = (
 const checkDeclaredDependencies = (
   manifests: ReadonlyMap<string, SkillPluginManifest>,
   surfaces: ReadonlyMap<string, SkillPackageSurface>,
+  repoRoot: string,
   report: LinkReport,
 ): boolean => {
   let valid = true;
   for (const manifest of manifests.values()) {
+    const packagePath = join(
+      repoRoot,
+      "packages",
+      "skill",
+      manifest.name.replace(/^xonovex-/u, ""),
+      "package.json",
+    );
+    let packageDependencies: Readonly<Record<string, string>> | undefined;
+    try {
+      const packageJson = JSON.parse(
+        readFileSync(packagePath, "utf8"),
+      ) as unknown;
+      if (isRecord(packageJson) && isStringRecord(packageJson.dependencies)) {
+        packageDependencies = packageJson.dependencies;
+      } else if (
+        isRecord(packageJson) &&
+        packageJson.dependencies === undefined
+      ) {
+        packageDependencies = {};
+      } else {
+        valid = false;
+        report.addFail(
+          `skill dependencies: ${relative(repoRoot, packagePath)} dependencies must map package names to versions`,
+        );
+      }
+    } catch (error) {
+      valid = false;
+      report.addFail(
+        `skill dependencies: cannot read ${relative(repoRoot, packagePath)}: ${error instanceof Error ? error.message : String(error)}`,
+      );
+    }
+    for (const npmDependency of Object.keys(packageDependencies ?? {}).filter(
+      (dependency) => dependency.startsWith("@xonovex/skill-"),
+    )) {
+      const pluginDependency = `xonovex-${npmDependency.slice("@xonovex/".length)}`;
+      if (!manifest.dependencies.includes(pluginDependency)) {
+        valid = false;
+        report.addFail(
+          `skill dependencies: ${manifest.name} declares ${npmDependency} in package.json but omits ${pluginDependency} from its plugin manifests`,
+        );
+      }
+    }
     for (const dependency of manifest.dependencies) {
       if (!manifests.has(dependency)) {
         valid = false;
@@ -311,6 +360,48 @@ const checkDeclaredDependencies = (
           `skill dependencies: ${manifest.name} depends on missing ${dependency}`,
         );
         continue;
+      }
+      const npmDependency = `@xonovex/${dependency.replace(/^xonovex-/u, "")}`;
+      const declaredVersion = packageDependencies?.[npmDependency];
+      if (declaredVersion === undefined) {
+        valid = false;
+        report.addFail(
+          `skill dependencies: ${manifest.name} declares ${dependency} in its plugin manifests but omits ${npmDependency} from package.json`,
+        );
+      } else {
+        const dependencyPackagePath = join(
+          repoRoot,
+          "packages",
+          "skill",
+          dependency.replace(/^xonovex-/u, ""),
+          "package.json",
+        );
+        try {
+          const dependencyPackage = JSON.parse(
+            readFileSync(dependencyPackagePath, "utf8"),
+          ) as unknown;
+          const expectedVersion =
+            isRecord(dependencyPackage) &&
+            typeof dependencyPackage.version === "string"
+              ? dependencyPackage.version
+              : undefined;
+          if (expectedVersion === undefined) {
+            valid = false;
+            report.addFail(
+              `skill dependencies: ${relative(repoRoot, dependencyPackagePath)} needs a string version`,
+            );
+          } else if (declaredVersion !== expectedVersion) {
+            valid = false;
+            report.addFail(
+              `skill dependencies: ${manifest.name} pins ${npmDependency}@${declaredVersion}; expected exact installed version ${expectedVersion}`,
+            );
+          }
+        } catch (error) {
+          valid = false;
+          report.addFail(
+            `skill dependencies: cannot read ${relative(repoRoot, dependencyPackagePath)}: ${error instanceof Error ? error.message : String(error)}`,
+          );
+        }
       }
       const targetGuides = surfaces.get(dependency)?.guideNames ?? [];
       const sourceSurface = surfaces.get(manifest.name);
@@ -321,11 +412,17 @@ const checkDeclaredDependencies = (
         .join(" or ");
       if (
         targetGuides.length > 0 &&
-        targetGuides.every((guide) => !sourceMarkdown.includes(`**${guide}**`))
+        targetGuides.every(
+          (guide) =>
+            !new RegExp(
+              String.raw`\b(?:apply|follow|load|use)\b[^.\n]*\*\*${guide}\*\*`,
+              "iu",
+            ).test(sourceMarkdown),
+        )
       ) {
         valid = false;
         report.addFail(
-          `skill dependencies: ${manifest.name} depends on ${dependency} but does not name ${namedTargets} in its guidance`,
+          `skill dependencies: ${manifest.name} depends on ${dependency} but does not explicitly apply, follow, load, or use ${namedTargets} in its guidance`,
         );
       }
       if (sourceSurface !== undefined && targetSurface !== undefined) {
@@ -397,7 +494,8 @@ export const checkSkillDependencies = (
     }
   }
 
-  valid = checkDeclaredDependencies(manifests, surfaces, report) && valid;
+  valid =
+    checkDeclaredDependencies(manifests, surfaces, repoRoot, report) && valid;
   for (const cycle of dependencyCycles(manifests)) {
     valid = false;
     report.addFail(`skill dependencies: dependency cycle ${cycle}`);

@@ -62,13 +62,18 @@
         "version": "1.0.0"
       },
       "requestedRange": "^1.0.0",
-      "catalogContractVersion": "1.0.0",
-      "catalogDigest": "3f2ff701ce0f8e56e098ed4f4ad16eb2e0291b3339d6635db98fcbdb0b74a2a4",
+      "catalogContractVersion": "2.0.0",
+      "catalogDigest": "6e81f31982a6f34cf0d43a16b0a3c26c31192dca77ecc7a88b274b1e42e9b00c",
       "reason": "Owns each operation contract in the graph.",
       "required": true,
       "status": "selected"
     }
   ],
+  "overlays": {
+    "applied": [],
+    "conflicts": [],
+    "failures": []
+  },
   "checkpoints": [],
   "plan": {
     "nodes": [

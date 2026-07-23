@@ -43,4 +43,4 @@ tasks:
     options:
       cache: false
       runFromWorkspaceRoot: true
-      runInCI: false
+      runInCI: true

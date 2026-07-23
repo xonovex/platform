@@ -102,7 +102,7 @@ tasks:
       - /packages/skill/skill-skill/skill-guide/scripts/**/*
     options:
       cache: false
-      runInCI: false
+      runInCI: true
   ci-skill-eval-output:
     script: >-
       npx moon-skill-eval-outputs
@@ -123,6 +123,6 @@ tasks:
       - /packages/skill/skill-skill/skill-guide/scripts/**/*
     options:
       cache: false
-      runInCI: false
+      runInCI: true
 inheritedBy:
   tag: skill

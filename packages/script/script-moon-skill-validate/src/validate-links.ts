@@ -1,4 +1,4 @@
-import {checkCompositionCatalog} from "./composition-catalog.js";
+import {checkCompositionCatalog} from "./composition-catalog-check.js";
 import {checkCrossPackageLinks} from "./cross-package-links.js";
 import {type LinkReport} from "./reference-file-links.js";
 
@@ -25,12 +25,16 @@ export const main = (argv: readonly string[]): number => {
 
   const passes: string[] = [];
   const errors: string[] = [];
+  const warnings: string[] = [];
   const report: LinkReport = {
     addPass: (message) => {
       passes.push(message);
     },
     addFail: (message) => {
       errors.push(message);
+    },
+    addWarn: (message) => {
+      warnings.push(message);
     },
   };
 
@@ -42,6 +46,9 @@ export const main = (argv: readonly string[]): number => {
   }
   for (const line of errors) {
     console.log(`[FAIL] ${line}`);
+  }
+  for (const line of warnings) {
+    console.log(`[WARN] ${line}`);
   }
 
   if (errors.length > 0) {

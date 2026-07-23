@@ -48,7 +48,7 @@ tasks:
     options:
       cache: false
       runFromWorkspaceRoot: true
-      runInCI: false
+      runInCI: true
   ci-routing:
     script: >-
       npx moon-skill-eval-routing packages/skill

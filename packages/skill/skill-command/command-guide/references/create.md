@@ -19,8 +19,8 @@ to one owning skill.
 - `--owner-plugin` (optional) — distribution plugin for the owner skill when the
   harness supports declared command dependencies.
 - `--operation` (optional) — operation/reference name within the owner skill.
-- `--requires` (repeatable, optional) — soft semantic capability requirement that can
-  be resolved at runtime.
+- `--requires` (repeatable, optional) — soft requirement in
+  `<provision-id>@<range>[:required|preferred]` form; defaults to preferred.
 - `--interactive` (optional) — ask about arguments and delegation choices.
 - `--dry-run` (optional) — print every proposed artifact without writing.
 - `--force` (optional) — replace one exact existing command only after preview.
@@ -44,6 +44,22 @@ to one owning skill.
 
 For a harness without command-to-skill delegation, keep the smallest supported prompt
 surface and distribute or invoke the skill directly when possible.
+
+## Semantic requirement contract
+
+When requirements are present, keep them in a machine-readable section:
+
+```markdown
+## Requirements
+
+- `assurance:evidence@^1.0.0` (preferred): Specialist evidence improves the result.
+```
+
+Use one line per requirement with an exact provision ID, semantic-version range,
+strength, and reason. Repository validation resolves it against the composition
+catalog. Runtime resolution uses the actual installed inventory; an unavailable
+preferred requirement is reported as degradation, while an unavailable required
+requirement blocks.
 
 ## Output
 

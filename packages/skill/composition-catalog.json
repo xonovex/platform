@@ -1,5 +1,14 @@
 {
-  "contractVersion": "1.0.0",
+  "contractVersion": "2.0.0",
+  "overlayPrecedence": [
+    "global",
+    "organization",
+    "repository",
+    "language",
+    "framework",
+    "path",
+    "explicit"
+  ],
   "skills": [
     {
       "name": "accessibility-guide",
@@ -155,7 +164,15 @@
         "lifecycle": "procedural",
         "functionalRole": "assurance"
       },
-      "provisions": [{"id": "method:code-review", "version": "1.0.0"}]
+      "provisions": [{"id": "method:code-review", "version": "1.0.0"}],
+      "requirements": [
+        {
+          "id": "assurance:testing",
+          "range": "^1.0.0",
+          "strength": "preferred",
+          "reason": "Code review benefits from specialist test-quality assurance."
+        }
+      ]
     },
     {
       "name": "codex-guide",

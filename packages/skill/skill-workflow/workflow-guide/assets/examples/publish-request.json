@@ -25,7 +25,9 @@
     "criteria": [],
     "roleLenses": [],
     "resolutionMode": "assisted",
-    "acceptedSuggestions": []
+    "acceptedSuggestions": [],
+    "skillRequirements": [],
+    "preferenceOverlays": []
   },
   "effect": {
     "mode": "apply",

@@ -23,5 +23,10 @@ The workspace-level composition check verifies boundary-crossing Markdown links 
 The same check validates `packages/skill/composition-catalog.json`: every installed guide has one lifecycle and primary functional role; provision versions and requirement ranges use SemVer; required semantic requirements resolve to exactly one compatible installed provider; and the selected semantic graph is acyclic. Semantic selection records the catalog digest, exact installed implementation, reason, and content-provenance path without changing manifest dependency behavior. It also requires the generated catalog snapshot packaged under workflow-guide assets to be byte-identical, so installed workflow composition never depends on access to the monorepo root.
 
 ```bash
+npx moon run script-moon-skill-validate:composition-sync
 npx moon run script-moon-skill-validate:composition-check
 ```
+
+Run `composition-sync` after editing the canonical catalog. It copies the exact
+canonical bytes into the workflow skill's packaged snapshot; `composition-check`
+then verifies identity and all semantic contracts without writing files.

@@ -118,6 +118,153 @@ describe("validateCommandPackage", () => {
     ]);
   });
 
+  it("rejects drift between argument-hint and the Arguments section", () => {
+    const {packageDir, root} = fixture();
+    write(
+      root,
+      "packages/command/command-test/commands/run.md",
+      commandSource()
+        .replace(
+          'argument-hint: "<subject>"',
+          'argument-hint: "<subject> [--extra]"',
+        )
+        .replace(
+          "- `subject` (required): Subject.",
+          "- `documented` (required): Subject.",
+        ),
+    );
+
+    const codes = validateCommandPackage(packageDir, root).report.issues.map(
+      ({code}) => code,
+    );
+
+    expect(codes).toEqual(
+      expect.arrayContaining([
+        "command.argument-undocumented",
+        "command.argument-missing-hint",
+      ]),
+    );
+  });
+
+  it("allows a positional and a flag alias but rejects a repeated argument", () => {
+    const {packageDir, root} = fixture();
+    write(
+      root,
+      "packages/command/command-test/commands/run.md",
+      commandSource().replace(
+        'argument-hint: "<subject>"',
+        'argument-hint: "<subject> [--subject <subject>]"',
+      ),
+    );
+    expect(
+      validateCommandPackage(packageDir, root).report.issues.map(
+        ({code}) => code,
+      ),
+    ).not.toContain("command.argument-duplicate");
+
+    write(
+      root,
+      "packages/command/command-test/commands/run.md",
+      commandSource()
+        .replace(
+          'argument-hint: "<subject>"',
+          'argument-hint: "<subject> [--extra] [--extra]"',
+        )
+        .replace(
+          "- `subject` (required): Subject.",
+          "- `subject` (required): Subject.\n- `--extra` (optional): Extra mode.",
+        ),
+    );
+    expect(
+      validateCommandPackage(packageDir, root).report.issues.map(
+        ({code}) => code,
+      ),
+    ).toContain("command.argument-duplicate");
+  });
+
+  it("validates semantic requirements against compatible catalog provisions", () => {
+    const {packageDir, root} = fixture();
+    write(
+      root,
+      "packages/command/command-test/commands/run.md",
+      commandSource().replace(
+        "## Delegation",
+        [
+          "## Requirements",
+          "",
+          "- `assurance:evidence@^1.0.0` (preferred): Specialist evidence improves the result.",
+          "",
+          "## Delegation",
+        ].join("\n"),
+      ),
+    );
+    write(
+      root,
+      "packages/skill/composition-catalog.json",
+      JSON.stringify({
+        contractVersion: "2.0.0",
+        overlayPrecedence: [
+          "global",
+          "organization",
+          "repository",
+          "language",
+          "framework",
+          "path",
+          "explicit",
+        ],
+        skills: [
+          {
+            name: "evidence-guide",
+            classification: {
+              lifecycle: "procedural",
+              functionalRole: "assurance",
+            },
+            provisions: [{id: "assurance:evidence", version: "1.0.0"}],
+          },
+        ],
+      }),
+    );
+    write(
+      root,
+      "packages/skill/skill-evidence/package.json",
+      JSON.stringify({version: "7.0.0"}),
+    );
+
+    expect(validateCommandPackage(packageDir, root).report.issues).toEqual([]);
+  });
+
+  it("rejects an unavailable command semantic requirement", () => {
+    const {packageDir, root} = fixture();
+    write(
+      root,
+      "packages/command/command-test/commands/run.md",
+      commandSource().replace(
+        "## Delegation",
+        [
+          "## Requirements",
+          "",
+          "- `assurance:missing@^1.0.0` (preferred): Optional specialist evidence.",
+          "",
+          "## Delegation",
+        ].join("\n"),
+      ),
+    );
+    write(
+      root,
+      "packages/skill/composition-catalog.json",
+      JSON.stringify({
+        contractVersion: "2.0.0",
+        skills: [],
+      }),
+    );
+
+    expect(
+      validateCommandPackage(packageDir, root).report.issues.map(
+        ({code}) => code,
+      ),
+    ).toContain("command.requirement-unavailable");
+  });
+
   it("validates local Markdown targets and fragments", () => {
     const {packageDir, root} = fixture();
     write(

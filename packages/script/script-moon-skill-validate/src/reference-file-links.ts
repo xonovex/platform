@@ -8,6 +8,7 @@ const EXTERNAL_LINK_RE = /^(?:https?|mailto):/i;
 export interface LinkReport {
   addFail(message: string): void;
   addPass(message: string): void;
+  addWarn?(message: string): void;
 }
 
 const isFile = (path: string): boolean => {

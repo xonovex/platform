@@ -12,7 +12,7 @@ Xonovex workflow commands, multi-axis composition, role lenses, criteria,
 perspectives, durable workflows, story decomposition, and composable skills.
 
 It is deliberately not a target specification. It separates repository facts from
-ideas discussed so that a future designer can retain, alter, or reject any proposal.
+ideas discussed so that maintainers can retain, alter, or reject any proposal.
 An entirely different architecture is acceptable if it better satisfies the
 underlying goals.
 
@@ -1247,42 +1247,29 @@ implementation instead of the desired outcome.
 An advanced exact override can remain possible when deterministic selection is
 required.
 
-## Current validation and evaluation findings
+## Validation and evaluation architecture
 
-Current targeted package checks pass:
+Command validation parses frontmatter, argument declarations, argument hints,
+semantic requirement declarations, and cross-package links. Requirement lines use
+the same provision identifiers and SemVer ranges as the composition catalog, and
+validation resolves them against the installed skill inventory.
 
-- command-workflow:ci-check
-- skill-workflow:ci-check
-- command-utility:ci-check
-- skill-command:ci-check
+Workflow request, result, and work-record fixtures are validated against executable
+JSON Schemas. Requests carry semantic requirements and preference overlays; results
+preserve selected identities, natural selection failures, overlay conflicts, and the
+exact catalog identity. Fixture validation rejects stale catalog digests.
 
-Observed limitations:
+The canonical composition catalog is synchronized into the workflow skill as an
+exact packaged snapshot and checked for byte identity. A shared runtime performs
+exact selection, semantic selection, required-versus-preferred handling, and
+deterministic broad-to-narrow preference overlay resolution.
 
-- Command checks primarily cover formatting and cross-package links.
-- A cross-package-link validator states that package-local validation owns command
-  inventory, prompt structure, and internal links, but no corresponding semantic
-  command validator was found.
-- One current command, skill-optimize.md, contains frontmatter that a YAML parser
-  rejects because its description includes an unquoted colon.
-- Existing workflow evaluations do not sufficiently exercise multi-provider input,
-  several simultaneous perspectives, role-to-perspective resolution, capability
-  conflicts, result/publish separation, or publish bypass.
-- Some output evaluation paths are not enforced as CI gates.
-- Semantic guidance is duplicated across command documentation and workflow skill
-  references, creating drift risk.
-- Current slashcommand-create guidance can produce a relatively large command even
-  though the command design principle is to delegate rather than duplicate.
-- Slashcommand-create does not fully match the preview and overwrite behavior
-  described by the command guide.
-- Slashcommand-distill accepts one skill/plugin-shaped argument, which can conflate
-  a plugin with its guide and limits multi-skill composition.
-- The root contributing documentation describes an older workflow command set.
+Structural routing and output evaluation contracts run in normal package checks.
+A scheduled canary additionally exercises the skill, command, and workflow guides
+through both routing and output harnesses; it can also be dispatched against either
+supported harness.
 
-These are current-state observations, not instructions to patch each symptom in
-place. The receiving model should identify root causes and propose the right
-validation architecture.
-
-## Evaluation scenarios the future design should pass
+## Required evaluation scenarios
 
 ### Composition
 
@@ -1344,7 +1331,7 @@ validation architecture.
 - Human output remains useful when structured output is unavailable.
 - Structured output remains valid when the human summary changes.
 
-## Decisions the receiving model should make explicitly
+## Design decisions to revisit explicitly
 
 1. Are the eight core operations complete, redundant, or incorrectly factored?
 2. Should publish remain an operation or become output binding?
@@ -1365,9 +1352,9 @@ validation architecture.
 17. How should simple slash commands expand into advanced requests?
 18. What compatibility or migration promises are actually needed?
 
-## Suggested architecture deliverables
+## Architecture documentation
 
-The receiving model should ideally return:
+Keep these artifacts current:
 
 - a concise conceptual model;
 - a glossary with non-overlapping definitions;
@@ -1381,7 +1368,7 @@ The receiving model should ideally return:
 - two or three SDLC workflow graphs;
 - a story-splitting example;
 - failure and recovery behavior;
-- a migration plan from current packages;
+- a compatibility policy for package evolution;
 - semantic validators and evaluation cases;
 - rejected alternatives and tradeoffs.
 

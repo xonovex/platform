@@ -300,23 +300,32 @@
       "properties": {
         "id": {
           "type": "string",
-          "minLength": 1
+          "pattern": "^[a-z][a-z0-9-]*:[a-z0-9]+(?:[.-][a-z0-9]+)*$"
         },
         "version": {
           "type": "string",
-          "minLength": 1
+          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?$",
+          "format": "semver"
         }
       }
     },
     "skillSelection": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/selectedSkillSelection"
+        },
+        {
+          "$ref": "#/$defs/failedSkillSelection"
+        }
+      ]
+    },
+    "selectedSkillSelection": {
       "type": "object",
       "additionalProperties": false,
       "required": [
         "guide",
         "plugin",
         "implementationVersion",
-        "packagePath",
-        "sourcesPath",
         "provenance",
         "catalogContractVersion",
         "catalogDigest",
@@ -327,15 +336,16 @@
       "properties": {
         "guide": {
           "type": "string",
-          "minLength": 1
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*-guide$"
         },
         "plugin": {
           "type": "string",
-          "minLength": 1
+          "pattern": "^xonovex-skill-[a-z0-9]+(?:-[a-z0-9]+)*$"
         },
         "implementationVersion": {
           "type": "string",
-          "minLength": 1
+          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?$",
+          "format": "semver"
         },
         "packagePath": {
           "type": "string",
@@ -353,10 +363,11 @@
         },
         "requestedRange": {
           "type": "string",
-          "minLength": 1
+          "minLength": 1,
+          "format": "semver-range"
         },
         "catalogContractVersion": {
-          "const": "1.0.0"
+          "const": "2.0.0"
         },
         "catalogDigest": {
           "type": "string",
@@ -370,12 +381,306 @@
           "type": "boolean"
         },
         "status": {
-          "type": "string",
-          "enum": ["selected", "unavailable", "conflict"]
+          "const": "selected"
         },
         "override": {
           "type": "boolean",
           "default": false
+        }
+      }
+    },
+    "failedSkillSelection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "blocking",
+        "candidates",
+        "message",
+        "provenance",
+        "catalogContractVersion",
+        "catalogDigest",
+        "reason",
+        "required"
+      ],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["ambiguous", "conflict", "incompatible", "unavailable"]
+        },
+        "blocking": {
+          "type": "boolean"
+        },
+        "candidates": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1
+        },
+        "provenance": {
+          "$ref": "#/$defs/selectionProvenance"
+        },
+        "catalogContractVersion": {
+          "const": "2.0.0"
+        },
+        "catalogDigest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "requestedGuide": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*-guide$"
+        },
+        "requestedVersion": {
+          "type": "string",
+          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?$",
+          "format": "semver"
+        },
+        "requestedRange": {
+          "type": "string",
+          "minLength": 1,
+          "format": "semver-range"
+        },
+        "requirement": {
+          "$ref": "workflow-request.schema.json#/$defs/semanticRequirement"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {"required": {"const": true}},
+            "required": ["required"]
+          },
+          "then": {
+            "properties": {"blocking": {"const": true}}
+          }
+        },
+        {
+          "if": {
+            "properties": {"required": {"const": false}},
+            "required": ["required"]
+          },
+          "then": {
+            "properties": {"blocking": {"const": false}}
+          }
+        }
+      ]
+    },
+    "selectedSkillIdentity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "guide",
+        "plugin",
+        "implementationVersion",
+        "provenance",
+        "catalogContractVersion",
+        "catalogDigest"
+      ],
+      "properties": {
+        "guide": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*-guide$"
+        },
+        "plugin": {
+          "type": "string",
+          "pattern": "^xonovex-skill-[a-z0-9]+(?:-[a-z0-9]+)*$"
+        },
+        "implementationVersion": {
+          "type": "string",
+          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?$",
+          "format": "semver"
+        },
+        "packagePath": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sourcesPath": {
+          "type": "string",
+          "minLength": 1
+        },
+        "provenance": {
+          "$ref": "#/$defs/selectionProvenance"
+        },
+        "provision": {
+          "$ref": "#/$defs/matchedProvision"
+        },
+        "requestedRange": {
+          "type": "string",
+          "minLength": 1,
+          "format": "semver-range"
+        },
+        "catalogContractVersion": {
+          "const": "2.0.0"
+        },
+        "catalogDigest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "appliedPreferenceOverlay": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "guide",
+        "target",
+        "scope",
+        "precedence",
+        "reason",
+        "selection"
+      ],
+      "properties": {
+        "guide": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*-guide$"
+        },
+        "target": {
+          "type": "string",
+          "minLength": 1
+        },
+        "scope": {
+          "$ref": "workflow-request.schema.json#/$defs/overlayScope"
+        },
+        "precedence": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        },
+        "selection": {
+          "$ref": "#/$defs/selectedSkillIdentity"
+        }
+      }
+    },
+    "preferenceOverlayConflict": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "target", "scope", "candidates", "message"],
+      "properties": {
+        "status": {
+          "const": "conflict"
+        },
+        "target": {
+          "type": "string",
+          "minLength": 1
+        },
+        "scope": {
+          "$ref": "workflow-request.schema.json#/$defs/overlayScope"
+        },
+        "candidates": {
+          "type": "array",
+          "minItems": 2,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "preferenceOverlayFailure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "blocking",
+        "candidates",
+        "message",
+        "provenance",
+        "catalogContractVersion",
+        "catalogDigest"
+      ],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["ambiguous", "conflict", "incompatible", "unavailable"]
+        },
+        "blocking": {
+          "type": "boolean"
+        },
+        "candidates": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1
+        },
+        "provenance": {
+          "$ref": "#/$defs/selectionProvenance"
+        },
+        "catalogContractVersion": {
+          "const": "2.0.0"
+        },
+        "catalogDigest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "requestedGuide": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*-guide$"
+        },
+        "requestedVersion": {
+          "type": "string",
+          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?$",
+          "format": "semver"
+        },
+        "requestedRange": {
+          "type": "string",
+          "minLength": 1,
+          "format": "semver-range"
+        },
+        "requirement": {
+          "$ref": "workflow-request.schema.json#/$defs/semanticRequirement"
+        }
+      }
+    },
+    "preferenceOverlayResolution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["applied", "conflicts", "failures"],
+      "properties": {
+        "applied": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/appliedPreferenceOverlay"
+          }
+        },
+        "conflicts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/preferenceOverlayConflict"
+          }
+        },
+        "failures": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/preferenceOverlayFailure"
+          }
         }
       }
     },
@@ -422,6 +727,7 @@
         "criteria",
         "proposals",
         "skills",
+        "overlays",
         "capabilities",
         "conflicts"
       ],
@@ -456,6 +762,9 @@
           "items": {
             "$ref": "#/$defs/skillSelection"
           }
+        },
+        "overlays": {
+          "$ref": "#/$defs/preferenceOverlayResolution"
         },
         "capabilities": {
           "type": "array",

@@ -13,6 +13,7 @@
     "inputs",
     "criteria",
     "skills",
+    "overlays",
     "checkpoints",
     "children",
     "unresolved",
@@ -75,6 +76,9 @@
       "items": {
         "$ref": "workflow-result.schema.json#/$defs/skillSelection"
       }
+    },
+    "overlays": {
+      "$ref": "workflow-result.schema.json#/$defs/preferenceOverlayResolution"
     },
     "checkpoints": {
       "type": "array",

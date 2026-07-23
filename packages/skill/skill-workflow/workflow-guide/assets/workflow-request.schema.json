@@ -366,6 +366,75 @@
         }
       }
     },
+    "semanticRequirement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "range", "strength", "reason"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]*:[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+        },
+        "range": {
+          "type": "string",
+          "minLength": 1,
+          "format": "semver-range"
+        },
+        "strength": {
+          "type": "string",
+          "enum": ["required", "preferred"]
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "overlayScope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "value"],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "global",
+            "organization",
+            "repository",
+            "language",
+            "framework",
+            "path",
+            "explicit"
+          ]
+        },
+        "value": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "preferenceOverlay": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["guide", "target", "scope", "reason"],
+      "properties": {
+        "guide": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*-guide$"
+        },
+        "target": {
+          "type": "string",
+          "minLength": 1
+        },
+        "scope": {
+          "$ref": "#/$defs/overlayScope"
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
     "semanticSelection": {
       "type": "object",
       "additionalProperties": false,
@@ -374,7 +443,9 @@
         "criteria",
         "roleLenses",
         "resolutionMode",
-        "acceptedSuggestions"
+        "acceptedSuggestions",
+        "skillRequirements",
+        "preferenceOverlays"
       ],
       "properties": {
         "method": {
@@ -414,6 +485,18 @@
           "items": {
             "type": "string",
             "minLength": 1
+          }
+        },
+        "skillRequirements": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/semanticRequirement"
+          }
+        },
+        "preferenceOverlays": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/preferenceOverlay"
           }
         }
       }
@@ -467,7 +550,23 @@
         }
       }
     },
-    "exactImplementation": {
+    "exactSkillImplementation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "version"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*-guide$"
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?$",
+          "format": "semver"
+        }
+      }
+    },
+    "exactCapabilityImplementation": {
       "type": "object",
       "additionalProperties": false,
       "required": ["id", "version"],
@@ -491,14 +590,14 @@
           "type": "array",
           "uniqueItems": true,
           "items": {
-            "$ref": "#/$defs/exactImplementation"
+            "$ref": "#/$defs/exactSkillImplementation"
           }
         },
         "capabilities": {
           "type": "array",
           "uniqueItems": true,
           "items": {
-            "$ref": "#/$defs/exactImplementation"
+            "$ref": "#/$defs/exactCapabilityImplementation"
           }
         }
       }
