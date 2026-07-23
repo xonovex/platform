@@ -9,7 +9,7 @@ allowed-tools:
   - AskUserQuestion
   - Skill
 argument-hint: >-
-  <description> [--name <name>] [--owner-skill <skill-name>]
+  [description] [--name <name>] [--owner-skill <skill-name>]
   [--owner-plugin <plugin-name>] [--operation <name>]
   [--requires <semantic-capability>...] [--interactive] [--dry-run] [--force]
 ---

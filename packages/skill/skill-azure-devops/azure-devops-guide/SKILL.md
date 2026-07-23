@@ -16,7 +16,7 @@ Operate Azure DevOps as an optional provider for work items, source and pull req
 - **Federate cloud access** — prefer workload identity federation or another temporary credential path; never create long-lived cloud secrets by default.
 - **Transact every setup** — discover, preview exact native changes and authority, authorize, apply idempotently, re-read to verify, retain rollback, and detect drift.
 - **Drive the Services CLI directly** — install and connect `az` plus the `azure-devops` extension, then `az repos pr create` / `update` / link / review from the shell, deriving `--org` and `--project` from the git remote (`v3/<org>/<project>/<repo>`), not the configured default.
-- **Handle CLI credentials safely** — prefer a short-lived `az login` or workload-identity federation; use a PAT only when a flow cannot, scope it (Code and Work Items read/write, single org, shortest expiry), keep it in the OS keychain or a secret manager, read it into `AZURE_DEVOPS_EXT_PAT` at call time, and never inline, `echo`, or commit it.
+- **Handle CLI credentials safely** — prefer a short-lived `az login` or workload-identity federation; fall back only to a scoped, keychained PAT read into `AZURE_DEVOPS_EXT_PAT` at call time and never inlined, `echo`ed, or committed, see [references/auth.md](references/auth.md).
 
 ## Workflow
 

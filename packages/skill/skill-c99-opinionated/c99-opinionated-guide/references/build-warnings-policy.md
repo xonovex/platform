@@ -1,21 +1,14 @@
 # Build & warnings policy
 
-This style ships `-Wall -Wextra -Werror`, but a library's warning policy differs from an application's, and strict C99 needs help to see the platform.
+An opinionated overlay on **c99-guide**'s build-and-warnings policy. Apply **c99-guide** for the shared foundation — pinning strict ISO C99 with `C_EXTENSIONS OFF`, re-exposing POSIX through `_XOPEN_SOURCE=700`, suppressing the intentional-ZII `-Wmissing-field-initializers` / `-Wmissing-braces` pair, and keeping an ASan/UBSan debug preset. This overlay adds only the house-style deltas: the strict-C99 helper, the library-vs-application warning split, and the snprintf-truncation check.
 
-## Strict ISO C99 + explicit POSIX
+## Centralize strict C99 in one helper
 
-Pin the standard so the toolchain can't drift into the GNU dialect, then re-expose POSIX deliberately:
-
-```cmake
-set_target_properties(target PROPERTIES C_STANDARD 99 C_STANDARD_REQUIRED ON C_EXTENSIONS OFF)
-target_compile_definitions(target PRIVATE _XOPEN_SOURCE=700)  # readlink/strnlen/ssize_t/pthread/clock_gettime
-```
-
-Without `_XOPEN_SOURCE` (or equivalent), strict `-std=c99` turns every POSIX call into an implicit-declaration error. Centralize this in one `strict_c(target)` helper and apply it to every first-party target so the policy is one edit, not N.
+Wrap **c99-guide**'s strict-C99 + explicit-POSIX setup in a single `strict_c(target)` helper and apply it to every first-party target, so the policy is one edit, not N.
 
 ## Unused symbols are library surface, not defects
 
-For library code, `-Werror` on correctness warnings, but relax the whole unused-_symbol_ family (a library legitimately carries interface-mandated parameters, header-defined reflection/mapping tables, and `_DEFAULT` helpers its own TUs never reference). Keep **`-Wunused-value`** — a discarded computation is a real bug — as a hard error:
+A library's warning policy differs from an application's. For library code, `-Werror` on correctness warnings, but relax the whole unused-_symbol_ family (a library legitimately carries interface-mandated parameters, header-defined reflection/mapping tables, and `_DEFAULT` helpers its own TUs never reference). Keep **`-Wunused-value`** — a discarded computation is a real bug — as a hard error:
 
 ```
 -Werror -Wno-unused-parameter -Wno-unused-variable -Wno-unused-but-set-variable -Wno-unused-function
@@ -32,19 +25,6 @@ Leaf/application targets keep the full set: there, an unused symbol _is_ dead co
 int n = snprintf(dst, sizeof(dst), "%s/%s", a, b);
 if (n < 0 || (size_t)n >= sizeof(dst)) return ERR_PATH_TOO_LONG;
 ```
-
-## Sanitizers — a debug preset under ASan + UBSan
-
-Strict warnings catch what the compiler proves statically; manual memory and pointer/index work need a runtime net too. Keep a debug preset built with the sanitizers and run the tests under it:
-
-```cmake
-target_compile_options(target_asan PRIVATE -fsanitize=address,undefined -fno-omit-frame-pointer -g)
-target_link_options(target_asan    PRIVATE -fsanitize=address,undefined)
-```
-
-- **AddressSanitizer** red-zones allocations and stack frames to catch the overflow / use-after-free / double-free that doesn't segfault — exactly the failure mode of hand-carved arena and caller-owned buffers. `ASAN_OPTIONS=detect_leaks=1` adds leak detection.
-- **UBSan** traps signed overflow, misaligned access, and out-of-range shifts — relevant when you do alignment math or pointer tagging.
-- ASan and **ThreadSanitizer** are mutually exclusive; give each its own preset. Keep `-fno-omit-frame-pointer -g` for readable traces, and reproduce crashes under ASan or a debugger rather than `printf`.
 
 ### Related
 

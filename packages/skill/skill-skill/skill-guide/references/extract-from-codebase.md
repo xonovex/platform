@@ -73,7 +73,7 @@ description: "{one-line description}"
 
 ## Progressive disclosure
 
-- **references/{file}.md** - Load when {specific trigger condition}
+- Read [references/{file}.md](references/{file}.md) - Load when {specific trigger condition}
 ```
 
 ### Reference File Format

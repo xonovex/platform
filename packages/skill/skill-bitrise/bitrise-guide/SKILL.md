@@ -15,10 +15,8 @@ Operate Bitrise as an optional mobile CI, artifact, deployment-status, and nativ
 - **Protect secrets and artifacts** — disclose pull-request exposure, runner trust, variable scope, artifact access/retention, network/data flow, and build-status publication.
 - **Federate AWS access** — constrain Bitrise OIDC claims to the intended workspace/app/repository/workflow/environment.
 - **Transact setup** — discover, preview exact native changes, authorize, apply idempotently, re-read and probe, roll back, and detect drift.
-- **Install nothing** — the Bitrise API is REST/token-only: no CLI, no `auth login`, no credential helper. Mint a personal access token, keychain it, and send it with `curl`; the `bitrise` CLI is a local `bitrise.yml` workflow runner, not an API client.
-- **Authenticate with an account-wide token** — the Bitrise API personal access token is account-wide (not repo-scoped; the same token reads logs and starts builds), sent as a raw `Authorization: <token>` header with no `Bearer`/`token` prefix and verified by `GET /v0.1/me` returning 200; store it outside the repo (OS keychain), never `~/.netrc`.
-- **Find and read a build from a commit** — map a commit to its build via the git host's build-status API, split the app and build slugs out of the `app.bitrise.io` URL, and read the log (finished build: fetch `expiring_raw_log_url` with no auth header; running build: paginated `log_chunks`).
-- **Triage, then re-trigger** — distinguish emulator/infra flakiness (`device offline`, `AdbCommandRejectedException`, `Expected N tests, received 1`) from a real failure (`(N failed)` > 0 or an assertion trace), and re-run with `POST /v0.1/apps/{app}/builds` using the real `original_build_params.workflow_id`.
+- **Authenticate over REST only** — the Bitrise API is token-only (no CLI or `auth login`); mint an account-wide personal access token, keychain it, and send it as a raw `Authorization` header verified by `GET /v0.1/me`.
+- **Read and re-trigger builds by commit** — map a commit to its build via the Git-host status API, read the log, distinguish emulator/infra flakiness from a real failure, and re-run with the build's real `workflow_id`.
 
 ## Workflow
 

@@ -19,7 +19,6 @@ A performance overlay on **lua-guide**. Apply **lua-guide** for all Lua fundamen
 
 ## Gotchas
 
-- Iterate dense arrays with the plain numeric `for i = 1, #t do ... end`; the simple idiom is the deliverable — don't manually unroll it (`while i < n - 3 ... i = i + 4`)
 - Apply hot-path tuning only where profiling shows a need — don't over-engineer with FFI arrays or SIMD-style tricks beyond what was asked
 
 ## Progressive disclosure

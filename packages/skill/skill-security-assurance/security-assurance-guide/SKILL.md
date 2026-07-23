@@ -1,6 +1,6 @@
 ---
 name: security-assurance-guide
-description: "Use when the user, project, or applicable requirement explicitly selects security assurance. Covers threat and control analysis, secure-development criteria, software-supply-chain trust, and security verification. Triggers on threat models, NIST CSF or SP 800-53 profiles, SSDF, SLSA, artifact provenance, signatures, attestations, security gates, scanner gaps, compensating controls, or security claims, even when the user doesn't say 'security assurance' verbatim; an ordinary code change or release is not enough."
+description: "Use when the user, project, or applicable requirement explicitly selects security assurance. Covers threat and control analysis, secure-development criteria, software-supply-chain trust, and security verification. Triggers on threat models, NIST CSF or SP 800-53 profiles, SSDF, SLSA, artifact provenance, signatures, attestations, security gates, scanner gaps, compensating controls, or security claims, even when the user doesn't say 'security assurance' verbatim."
 ---
 
 # Optional Security Assurance

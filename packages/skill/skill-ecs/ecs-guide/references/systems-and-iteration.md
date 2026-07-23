@@ -20,7 +20,7 @@ Per-element id lookups, virtual dispatch, or branches inside the loop reintroduc
 
 ```c
 // Good: pointer-walk over co-located arrays, trivially splittable into jobs
-void velocity_system(tm_transform_t *td, const tm_velocity_t *vd, uint32_t n, float dt) {
+void velocity_system(transform_t *td, const velocity_t *vd, uint32_t n, float dt) {
     while (n--) {
         td->pos = vec3_mul_add(td->pos, vd->vel, dt);
         ++td, ++vd;

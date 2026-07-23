@@ -28,13 +28,6 @@ argument-hint: "[skill-file|--all] [--model <weakest>] [--tier auto|aggressive|m
 
 ## Delegation
 
-Load the `skill-guide` skill (plugin `xonovex-skill-skill`) and run its **optimize**
-operation end to end for the target(s), in five phases:
-
-1. **Baseline** — measure the weakest model against each skill's `evals.json` with the skill absent, to map what it already knows.
-2. **Scope** — classify the trim depth (aggressive/moderate/conservative) for the skill's type.
-3. **Excise** — cut to the knowledge delta; dedupe; fix any defect the cut surfaces.
-4. **Gate** — `scripts/validate.py` must pass.
-5. **Ablate** — re-measure with the trimmed skill in context and restore any essential fact it no longer conveys.
-
-The skill is the source of truth for the procedure, tiers, and gotchas — do not restate them.
+Load the `skill-guide` skill (plugin `xonovex-skill-skill`) and perform its
+**optimize** operation with these arguments. The skill is the source of truth for the
+procedure, tiers, and gotchas — do not restate them.

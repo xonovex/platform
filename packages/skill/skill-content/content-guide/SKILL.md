@@ -7,7 +7,7 @@ description: "Use when authoring or rewriting multilingual articles, news, trave
 
 Author multilingual articles (news, travel guides, etc.) with structured frontmatter and CEFR B1-B2 readability; rewrite AI-generated prose so it reads as a human wrote it.
 
-Tenant-agnostic: these patterns apply to any structured multilingual content. Domain-specific guide types (e.g. cruise port/ship guides) live in their tenant's own skills and reuse this skill's patterns.
+Tenant-agnostic: these patterns apply to any structured multilingual content. Domain-specific guide types (e.g. city or attraction guides) live in their tenant's own skills and reuse this skill's patterns.
 
 ## Core Principles
 

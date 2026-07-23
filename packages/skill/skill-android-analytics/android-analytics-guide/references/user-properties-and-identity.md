@@ -15,7 +15,7 @@ Set slowly-changing user dimensions once via a typed `setUserProperties` call ke
 
 ```kotlin
 enum class AnalyticsUserProperty {
-    ENVIRONMENT, APP_LANGUAGE, LOGGED_IN_CONSUMER, LOGGED_IN_BUSINESS, HAS_PAS
+    ENVIRONMENT, APP_LANGUAGE, LOGGED_IN_CONSUMER, LOGGED_IN_BUSINESS, HAS_SUBSCRIPTION
 }
 
 interface AnalyticsTracker {
@@ -40,7 +40,7 @@ fun onConsumerLoggedIn(tracker: AnalyticsTracker, user: User) {
     tracker.setUserProperties(
         mapOf(
             AnalyticsUserProperty.LOGGED_IN_CONSUMER to "true",
-            AnalyticsUserProperty.HAS_PAS to user.hasPas.toString(),
+            AnalyticsUserProperty.HAS_SUBSCRIPTION to user.hasSubscription.toString(),
         ),
     )
 }

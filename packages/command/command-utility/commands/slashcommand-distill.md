@@ -10,7 +10,7 @@ allowed-tools:
   - AskUserQuestion
   - Skill
 argument-hint: >-
-  <command-file> [--owner-skill <skill-name>] [--owner-plugin <plugin-name>]
+  [command-file] [--owner-skill <skill-name>] [--owner-plugin <plugin-name>]
   [--operation <name>] [--requires <semantic-capability>...] [--dry-run]
 ---
 

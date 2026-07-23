@@ -17,7 +17,7 @@ Author, merge, simplify, and distill reusable user-invocable prompt files (somet
 - **Bound the Body** — target 15-40 lines for a delegating command and <150 lines for
   a harness that cannot delegate
 - **Delegate, Don't Duplicate** — a command owns its argument contract and delegates the procedure to a guideline skill via the `Skill` tool; the skill is the single source of truth, the command a thin, stable interface
-- **Depend on Skills Two Ways** — a command depends on a skill either **hard** (name the exact skill and, when the command harness installs declared dependencies, add it to the command plugin's `dependencies`) or **soft** (describe the capability needed and let the agent select the best-fitting installed skill at run time, declaring nothing and degrading gracefully when none matches). Use hard when one specific skill is always required, soft when several interchangeable skills could satisfy it. If the target harness distributes skills but not commands, publish and invoke the skill directly instead of inventing a command plugin surface. Either way, explicitly load the selected skill at run time (install ≠ in-context), see [references/distill.md](references/distill.md)
+- **Depend on Skills Two Ways** — depend **hard** (name the exact skill, and add it to the plugin's `dependencies` when the harness installs them) when one specific skill is always required, or **soft** (describe the capability and let the agent select an installed skill, degrading gracefully) when several interchangeable skills fit; if the harness distributes skills but not commands, publish and invoke the skill directly; either way load the selected skill at run time (install ≠ in-context), see [references/distill.md](references/distill.md)
 
 ## Gotchas
 

@@ -111,7 +111,7 @@
     {
       "name": "xonovex-skill-claude-code",
       "source": "./packages/skill/skill-claude-code",
-      "description": "Xonovex Claude Code harness governance skills"
+      "description": "Xonovex Claude Code hook skills"
     },
     {
       "name": "xonovex-skill-cmake",
@@ -131,7 +131,7 @@
     {
       "name": "xonovex-skill-codex",
       "source": "./packages/skill/skill-codex",
-      "description": "Xonovex Codex harness governance skills"
+      "description": "Xonovex Codex hook skills"
     },
     {
       "name": "xonovex-skill-command",
@@ -151,7 +151,7 @@
     {
       "name": "xonovex-skill-copilot",
       "source": "./packages/skill/skill-copilot",
-      "description": "Xonovex GitHub Copilot harness governance skills"
+      "description": "Xonovex GitHub Copilot hook skills"
     },
     {
       "name": "xonovex-skill-credential-management",
@@ -281,7 +281,7 @@
     {
       "name": "xonovex-skill-kiro",
       "source": "./packages/skill/skill-kiro",
-      "description": "Xonovex Kiro harness governance skills"
+      "description": "Xonovex Kiro hook skills"
     },
     {
       "name": "xonovex-skill-kubernetes",
@@ -346,7 +346,7 @@
     {
       "name": "xonovex-skill-opencode",
       "source": "./packages/skill/skill-opencode",
-      "description": "Xonovex OpenCode harness governance skills"
+      "description": "Xonovex OpenCode plugin skills"
     },
     {
       "name": "xonovex-skill-orthogonal-pattern",
@@ -356,7 +356,7 @@
     {
       "name": "xonovex-skill-pi",
       "source": "./packages/skill/skill-pi",
-      "description": "Xonovex Pi harness governance skills"
+      "description": "Xonovex Pi extension skills"
     },
     {
       "name": "xonovex-skill-plan",

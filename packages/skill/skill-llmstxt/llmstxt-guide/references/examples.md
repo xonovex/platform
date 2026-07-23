@@ -73,7 +73,7 @@ When a project provides both:
 - **llmstxt.org itself** — minimal example, just the spec links
 - **FastHTML docs** — referenced in the spec as a worked example
 - **Hono** — `https://hono.dev/llms-full.txt` (full-dump sibling convention)
-- **Anthropic, Stripe, Vercel** docs sites — many large doc sets now publish `llms.txt` files
+- **Large product documentation sites** — many big doc sets now publish `llms.txt` files; study a cross-section to see grouping styles at scale
 
 ## Gotchas
 

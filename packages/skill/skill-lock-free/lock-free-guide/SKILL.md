@@ -7,7 +7,7 @@ description: "Use when writing or reviewing shared-memory concurrent code: atomi
 
 ## Requirements
 
-- C11 atomics (`<stdatomic.h>`); audience is a C99/C11 game engine with atomic/thread/job modules.
+- C11 atomics (`<stdatomic.h>`); applies to systems code with atomic, threading, and job-scheduling primitives.
 
 ## Essentials
 

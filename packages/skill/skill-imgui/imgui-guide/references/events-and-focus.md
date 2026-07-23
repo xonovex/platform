@@ -16,7 +16,7 @@ Track keyboard focus as a responder chain (root → focused control) built from 
 
 ```c
 // Trickle + consume in end_*(): only the focused chain reacts, and it eats the event
-void end_pane(tm_ui_o *ui, uint64_t my_id) {
+void end_pane(ui_o *ui, uint64_t my_id) {
     if (ui->key_pressed[KEY_PGDN] && in_responder_chain(ui, my_id)) {
         scroll_page_down(my_id);
         ui->key_pressed[KEY_PGDN] = false; // consumed; outer controls won't also scroll

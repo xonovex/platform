@@ -15,7 +15,7 @@
       "id": 2,
       "prompt": "I have a finished presentation.md (title 'Microservices Architecture', theme colors #2563eb, #dc2626, #16a34a, slides for overview / services / challenges / next steps). Scaffold a React + Motion presentation package from it. Describe the directory layout and files you would generate.",
       "assertions": [
-        "The package is created at a path under `packages/presentations/<name>/`",
+        "The scaffolded package is a self-contained directory named for the deck (e.g. `microservices/`), not hardcoded under a repository-specific path like `packages/presentations/`",
         "A dedicated theme module (e.g. theme.ts) is generated from the #hex Style Guide colors",
         "Each slide is generated via a factory function that computes its step count (maxSteps) automatically rather than hardcoding it per slide"
       ]

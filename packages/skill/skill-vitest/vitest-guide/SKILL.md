@@ -1,6 +1,6 @@
 ---
 name: vitest-guide
-description: "Use when writing or editing Vitest 3+ tests in TypeScript. Triggers on `.test.ts`, `.spec.ts`, `vitest.config.*` files, and prompts about test setup, mocking, HTTP assertions, CORS preflight tests, type safety in tests, or snapshots, even when the user doesn't say 'Vitest'."
+description: "Use when writing or editing Vitest 3+ tests in TypeScript. Triggers on `.test.ts`, `.spec.ts`, `vitest.config.*` files, and prompts about test setup, mocking, HTTP assertions, CORS preflight tests, or type safety in tests, even when the user doesn't say 'Vitest'."
 ---
 
 # Vitest Testing Guidelines
@@ -11,11 +11,11 @@ description: "Use when writing or editing Vitest 3+ tests in TypeScript. Trigger
 
 ## Essentials
 
-- **Type safety** - Cast `res.json()` to declared interfaces (references/type-safety.md)
-- **HTTP testing** - Assert the status the middleware actually sends (references/http-testing.md)
-- **Timestamp testing** - Avoid flaky comparisons; verify existence or add delays (references/timestamp-testing.md)
-- **TypeScript config** - Include test paths; verify project reference levels (references/typescript-config.md)
-- **Test organization** - Mirror API structure under `test/` with nested describe blocks (references/test-organization.md)
+- **Type safety** - Cast `res.json()` to declared interfaces, see [references/type-safety.md](references/type-safety.md)
+- **HTTP testing** - Assert the status the middleware actually sends, see [references/http-testing.md](references/http-testing.md)
+- **Timestamp testing** - Avoid flaky comparisons; verify existence or add delays, see [references/timestamp-testing.md](references/timestamp-testing.md)
+- **TypeScript config** - Include test paths; verify project reference levels, see [references/typescript-config.md](references/typescript-config.md)
+- **Test organization** - Mirror API structure under `test/` with nested describe blocks, see [references/test-organization.md](references/test-organization.md)
 
 ## Gotchas
 

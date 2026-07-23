@@ -1,6 +1,6 @@
 # entrance: Fade, Slide, and Hero Reveals
 
-Animate with `initial`/`animate` on opacity + transforms (`y`/`x`/`scale`) only; apply Apple easing `[0.22, 1, 0.36, 1]`. Never animate `margin`.
+Animate with `initial`/`animate` on opacity + transforms (`y`/`x`/`scale`) only; apply the smooth ease-out curve `[0.22, 1, 0.36, 1]`. Never animate `margin`.
 
 ```tsx
 function FadeUp({children}) {
