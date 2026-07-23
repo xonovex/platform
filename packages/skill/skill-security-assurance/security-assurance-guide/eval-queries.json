@@ -2,7 +2,7 @@
   {
     "query": "build a threat-informed security assurance plan with exact control and evidence ownership",
     "should_trigger": true,
-    "split": "train",
+    "split": "validation",
     "rationale": "assurance planning"
   },
   {

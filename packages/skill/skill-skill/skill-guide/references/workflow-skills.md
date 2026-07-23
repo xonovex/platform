@@ -2,6 +2,8 @@
 
 A workflow skill encodes a **procedure** the agent — or a command plugin — delegates to (e.g. plan, git, skill, instruction, command, content, reflect), not coding-style rules for a language or framework (those are [guideline-skills.md](guideline-skills.md)). A skill may **combine both** — a procedure skill that also lays down coding-style rules keeps an `## Essentials` block alongside its `## Operations` (e.g. llmstxt teaches the format _and_ its authoring workflow).
 
+Classify a workflow skill independently from this authoring shape. Most are `procedural` / `procedure`; an embedded convention does not justify `mixed`. Split independently selectable guidance, or retain the primary procedure classification and expose only stable semantic provisions. See [composition-metadata.md](composition-metadata.md).
+
 ## Skeleton
 
 `Core Principles → Operations → Gotchas → Progressive Disclosure`
@@ -29,6 +31,8 @@ To scaffold: copy the directory, rename `{operation}.md` files, and fill in `{pl
 ## Command delegation
 
 When a command plugin delegates to an operation, keep the contract one-directional: the command body says "load the `<skill>` skill and perform its **<operation>** operation", and the skill — not the command — owns the procedure, output format, and gotchas. Declare the skill in the command plugin's `dependencies` (both manifests).
+
+That command-to-skill edge is an exact hard dependency. Inside the workflow skill, request an interchangeable assurance, method, or other semantic provider through the composition catalog only when the need is invariant; derive operation-conditional needs at invocation time instead.
 
 ## Conventions
 

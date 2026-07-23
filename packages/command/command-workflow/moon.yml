@@ -13,16 +13,44 @@ tasks:
     deps:
       - script-moon-skill-validate:build
     inputs:
+      - /packages/skill/composition-catalog.json
+      - /packages/skill/*/package.json
+      - /packages/skill/*/.claude-plugin/plugin.json
+      - /packages/skill/*/.codex-plugin/plugin.json
       - /packages/skill/*/*/SKILL.md
+      - /packages/skill/*/*/SOURCES.md
       - /packages/skill/*/*/references/*.md
+      - /packages/skill/skill-workflow/workflow-guide/assets/composition-catalog.json
       - /packages/command/command-workflow/docs/*.md
       - /packages/command/command-workflow/commands/*.md
       - /packages/script/script-moon-skill-validate/src/*.ts
     options:
       cache: false
       runFromWorkspaceRoot: true
+  workflow-contract:
+    command:
+      - npx
+      - moon-command-validate
+      - .
+      - --contract
+      - contracts/workflow-commands.v1.json
+      - --assets
+      - ../../skill/skill-workflow/workflow-guide/assets
+    deps:
+      - script-moon-command-validate:install
+    inputs:
+      - contracts/*.json
+      - commands/*.md
+      - package.json
+      - .claude-plugin/plugin.json
+      - /packages/skill/skill-workflow/workflow-guide/SKILL.md
+      - /packages/skill/skill-workflow/workflow-guide/assets/**/*.json
+      - /packages/skill/skill-workflow/workflow-guide/references/*.md
+      - /packages/script/script-moon-command-validate/src/*.ts
+    options:
+      cache: false
   ci-check:
-    deps: [cross-package-links]
+    deps: [cross-package-links, workflow-contract]
     options:
       cache: false
       mergeDeps: append

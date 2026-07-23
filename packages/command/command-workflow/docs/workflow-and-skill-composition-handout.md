@@ -2,6 +2,11 @@
 
 Snapshot date: 2026-07-23
 
+Status: historical design input. The repository implementation that followed this
+handout is documented in [the command package README](../README.md) and
+[the migration guide](migration.md). Appendix argument shapes describe the
+pre-migration snapshot and are intentionally retained as evidence.
+
 This handout gives another model enough context to form an independent solution for
 Xonovex workflow commands, multi-axis composition, role lenses, criteria,
 perspectives, durable workflows, story decomposition, and composable skills.

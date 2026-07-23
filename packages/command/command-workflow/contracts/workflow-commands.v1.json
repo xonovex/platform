@@ -1,0 +1,505 @@
+{
+  "contractVersion": 1,
+  "namespace": "xonovex-workflow",
+  "delegation": {
+    "packageName": "@xonovex/skill-workflow",
+    "plugin": "xonovex-skill-workflow",
+    "skill": "workflow-guide",
+    "skillDirectory": "packages/skill/skill-workflow/workflow-guide"
+  },
+  "forbiddenArguments": [
+    "capability",
+    "confirm",
+    "dry-run",
+    "kind",
+    "provider",
+    "reference",
+    "result"
+  ],
+  "toolProfiles": {
+    "inline": ["Read", "Glob", "Grep", "AskUserQuestion", "Skill"],
+    "inline-workspace": ["Read", "Glob", "AskUserQuestion", "Skill"],
+    "effectful": [
+      "Read",
+      "Write",
+      "Edit",
+      "Bash",
+      "Glob",
+      "Grep",
+      "AskUserQuestion",
+      "Skill"
+    ],
+    "workspace-effect": ["Read", "Bash", "Glob", "AskUserQuestion", "Skill"]
+  },
+  "argumentSets": {
+    "subject-binding": [
+      {
+        "name": "subject",
+        "kind": "positional",
+        "required": false,
+        "repeatable": false,
+        "valueName": "subject"
+      },
+      {
+        "name": "request",
+        "kind": "flag",
+        "required": false,
+        "repeatable": false,
+        "valueName": "file"
+      },
+      {
+        "name": "subject-provider",
+        "kind": "flag",
+        "required": false,
+        "repeatable": false,
+        "valueName": "provider"
+      },
+      {
+        "name": "subject-revision",
+        "kind": "flag",
+        "required": false,
+        "repeatable": false,
+        "valueName": "revision"
+      },
+      {
+        "name": "subject-kind",
+        "kind": "flag",
+        "required": false,
+        "repeatable": false,
+        "valueName": "kind"
+      }
+    ],
+    "perspectives": [
+      {
+        "name": "perspective",
+        "kind": "flag",
+        "required": false,
+        "repeatable": true,
+        "valueName": "perspective"
+      },
+      {
+        "name": "role",
+        "kind": "flag",
+        "required": false,
+        "repeatable": true,
+        "valueName": "lens"
+      }
+    ],
+    "criteria-method-resolution": [
+      {
+        "name": "criterion",
+        "kind": "flag",
+        "required": false,
+        "repeatable": true,
+        "valueName": "criterion"
+      },
+      {
+        "name": "method",
+        "kind": "flag",
+        "required": false,
+        "repeatable": false,
+        "valueName": "method"
+      },
+      {
+        "name": "resolution",
+        "kind": "flag",
+        "required": false,
+        "repeatable": false,
+        "valueName": "strict|assisted|automatic"
+      }
+    ],
+    "workspace-binding": [
+      {
+        "name": "target",
+        "kind": "positional",
+        "required": false,
+        "repeatable": false,
+        "valueName": "target"
+      },
+      {
+        "name": "request",
+        "kind": "flag",
+        "required": false,
+        "repeatable": false,
+        "valueName": "file"
+      },
+      {
+        "name": "workspace-provider",
+        "kind": "flag",
+        "required": false,
+        "repeatable": false,
+        "valueName": "provider"
+      }
+    ]
+  },
+  "commands": [
+    {
+      "name": "create",
+      "operation": "Create",
+      "family": "core",
+      "reference": "references/create.md",
+      "effectModes": ["inspect"],
+      "toolProfile": "inline",
+      "argumentSets": [
+        "subject-binding",
+        "perspectives",
+        "criteria-method-resolution"
+      ],
+      "arguments": []
+    },
+    {
+      "name": "review",
+      "operation": "Review",
+      "family": "core",
+      "reference": "references/review.md",
+      "effectModes": ["inspect"],
+      "toolProfile": "inline",
+      "argumentSets": [
+        "subject-binding",
+        "perspectives",
+        "criteria-method-resolution"
+      ],
+      "arguments": []
+    },
+    {
+      "name": "revise",
+      "operation": "Revise",
+      "family": "core",
+      "reference": "references/revise.md",
+      "effectModes": ["inspect"],
+      "toolProfile": "inline",
+      "argumentSets": [
+        "subject-binding",
+        "perspectives",
+        "criteria-method-resolution"
+      ],
+      "arguments": [
+        {
+          "name": "feedback",
+          "kind": "flag",
+          "required": false,
+          "repeatable": true,
+          "valueName": "feedback"
+        }
+      ]
+    },
+    {
+      "name": "decide",
+      "operation": "Decide",
+      "family": "core",
+      "reference": "references/decide.md",
+      "effectModes": ["inspect"],
+      "toolProfile": "inline",
+      "argumentSets": [
+        "subject-binding",
+        "perspectives",
+        "criteria-method-resolution"
+      ],
+      "arguments": [
+        {
+          "name": "outcome",
+          "kind": "flag",
+          "required": false,
+          "repeatable": false,
+          "valueName": "text"
+        }
+      ]
+    },
+    {
+      "name": "execute",
+      "operation": "Execute",
+      "family": "core",
+      "reference": "references/execute.md",
+      "effectModes": ["inspect", "preview", "apply"],
+      "toolProfile": "effectful",
+      "argumentSets": [
+        "subject-binding",
+        "perspectives",
+        "criteria-method-resolution"
+      ],
+      "arguments": [
+        {
+          "name": "effect",
+          "kind": "flag",
+          "required": false,
+          "repeatable": false,
+          "valueName": "inspect|preview|apply"
+        }
+      ]
+    },
+    {
+      "name": "validate",
+      "operation": "Validate",
+      "family": "core",
+      "reference": "references/validate.md",
+      "effectModes": ["inspect"],
+      "toolProfile": "inline",
+      "argumentSets": [
+        "subject-binding",
+        "perspectives",
+        "criteria-method-resolution"
+      ],
+      "arguments": []
+    },
+    {
+      "name": "publish",
+      "operation": "Publish",
+      "family": "core",
+      "reference": "references/publish.md",
+      "effectModes": ["preview", "apply"],
+      "toolProfile": "effectful",
+      "argumentSets": ["subject-binding"],
+      "arguments": [
+        {
+          "name": "destination-provider",
+          "kind": "flag",
+          "required": false,
+          "repeatable": false,
+          "valueName": "provider"
+        },
+        {
+          "name": "destination-reference",
+          "kind": "flag",
+          "required": false,
+          "repeatable": false,
+          "valueName": "reference"
+        },
+        {
+          "name": "destination-revision",
+          "kind": "flag",
+          "required": false,
+          "repeatable": false,
+          "valueName": "revision"
+        },
+        {
+          "name": "criterion",
+          "kind": "flag",
+          "required": false,
+          "repeatable": true,
+          "valueName": "criterion"
+        },
+        {
+          "name": "idempotency-key",
+          "kind": "flag",
+          "required": false,
+          "repeatable": false,
+          "valueName": "key"
+        },
+        {
+          "name": "effect",
+          "kind": "flag",
+          "required": false,
+          "repeatable": false,
+          "valueName": "preview|apply"
+        }
+      ]
+    },
+    {
+      "name": "abandon",
+      "operation": "Abandon",
+      "family": "core",
+      "reference": "references/abandon.md",
+      "effectModes": ["inspect"],
+      "toolProfile": "inline",
+      "argumentSets": ["subject-binding"],
+      "arguments": [
+        {
+          "name": "reason",
+          "kind": "flag",
+          "required": false,
+          "repeatable": false,
+          "valueName": "text"
+        },
+        {
+          "name": "criterion",
+          "kind": "flag",
+          "required": false,
+          "repeatable": true,
+          "valueName": "criterion"
+        },
+        {
+          "name": "resolution",
+          "kind": "flag",
+          "required": false,
+          "repeatable": false,
+          "valueName": "strict|assisted|automatic"
+        }
+      ]
+    },
+    {
+      "name": "workspace-create",
+      "operation": "Workspace create",
+      "family": "workspace",
+      "reference": "references/workspace-create.md",
+      "effectModes": ["preview", "apply"],
+      "toolProfile": "workspace-effect",
+      "argumentSets": ["workspace-binding"],
+      "arguments": [
+        {
+          "name": "source-reference",
+          "kind": "flag",
+          "required": false,
+          "repeatable": false,
+          "valueName": "reference"
+        },
+        {
+          "name": "source-revision",
+          "kind": "flag",
+          "required": false,
+          "repeatable": false,
+          "valueName": "revision"
+        },
+        {
+          "name": "branch-reference",
+          "kind": "flag",
+          "required": false,
+          "repeatable": false,
+          "valueName": "reference"
+        },
+        {
+          "name": "effect",
+          "kind": "flag",
+          "required": false,
+          "repeatable": false,
+          "valueName": "preview|apply"
+        }
+      ]
+    },
+    {
+      "name": "workspace-merge",
+      "operation": "Workspace merge",
+      "family": "workspace",
+      "reference": "references/workspace-merge.md",
+      "effectModes": ["preview", "apply"],
+      "toolProfile": "workspace-effect",
+      "argumentSets": ["workspace-binding"],
+      "arguments": [
+        {
+          "name": "workspace-revision",
+          "kind": "flag",
+          "required": false,
+          "repeatable": false,
+          "valueName": "revision"
+        },
+        {
+          "name": "destination-provider",
+          "kind": "flag",
+          "required": false,
+          "repeatable": false,
+          "valueName": "provider"
+        },
+        {
+          "name": "destination-reference",
+          "kind": "flag",
+          "required": false,
+          "repeatable": false,
+          "valueName": "reference"
+        },
+        {
+          "name": "destination-revision",
+          "kind": "flag",
+          "required": false,
+          "repeatable": false,
+          "valueName": "revision"
+        },
+        {
+          "name": "criterion",
+          "kind": "flag",
+          "required": false,
+          "repeatable": true,
+          "valueName": "criterion"
+        },
+        {
+          "name": "method",
+          "kind": "flag",
+          "required": false,
+          "repeatable": false,
+          "valueName": "method"
+        },
+        {
+          "name": "effect",
+          "kind": "flag",
+          "required": false,
+          "repeatable": false,
+          "valueName": "preview|apply"
+        }
+      ]
+    },
+    {
+      "name": "workspace-abandon",
+      "operation": "Workspace abandon",
+      "family": "workspace",
+      "reference": "references/workspace-abandon.md",
+      "effectModes": ["inspect"],
+      "toolProfile": "inline-workspace",
+      "argumentSets": ["workspace-binding"],
+      "arguments": [
+        {
+          "name": "reason",
+          "kind": "flag",
+          "required": false,
+          "repeatable": false,
+          "valueName": "text"
+        },
+        {
+          "name": "workspace-revision",
+          "kind": "flag",
+          "required": false,
+          "repeatable": false,
+          "valueName": "revision"
+        }
+      ]
+    },
+    {
+      "name": "workspace-cleanup",
+      "operation": "Workspace cleanup",
+      "family": "workspace",
+      "reference": "references/workspace-cleanup.md",
+      "effectModes": ["preview", "apply"],
+      "toolProfile": "workspace-effect",
+      "argumentSets": [],
+      "arguments": [
+        {
+          "name": "target",
+          "kind": "positional",
+          "required": false,
+          "repeatable": true,
+          "valueName": "target"
+        },
+        {
+          "name": "request",
+          "kind": "flag",
+          "required": false,
+          "repeatable": false,
+          "valueName": "file"
+        },
+        {
+          "name": "workspace-provider",
+          "kind": "flag",
+          "required": false,
+          "repeatable": false,
+          "valueName": "provider"
+        },
+        {
+          "name": "remove-reference",
+          "kind": "flag",
+          "required": false,
+          "repeatable": false
+        },
+        {
+          "name": "force",
+          "kind": "flag",
+          "required": false,
+          "repeatable": false
+        },
+        {
+          "name": "effect",
+          "kind": "flag",
+          "required": false,
+          "repeatable": false,
+          "valueName": "preview|apply"
+        }
+      ]
+    }
+  ]
+}

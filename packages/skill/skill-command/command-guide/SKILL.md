@@ -11,9 +11,11 @@ Author, merge, simplify, and distill reusable user-invocable prompt files (somet
 
 - **Generic by Default** — strip project-specific paths, domain terms, and tech names at author time so prompts reuse across projects
 - **Match Style and Voice** — preserve the target's structure, voice, formatting when merging
-- **Structure Integrity** — front matter, Goal, Arguments, Core Workflow, Implementation, Error Handling are the essential sections
+- **Structure Integrity** — frontmatter, Arguments, and Delegation are the essential
+  thin-command sections; the owning skill carries the procedure, output, and errors
 - **Safe Modifications** — preview changes (`--dry-run`) before applying
-- **Bound the Body** — target <150 lines per prompt; anything longer usually wants to be two prompts
+- **Bound the Body** — target 15-40 lines for a delegating command and <150 lines for
+  a harness that cannot delegate
 - **Delegate, Don't Duplicate** — a command owns its argument contract and delegates the procedure to a guideline skill via the `Skill` tool; the skill is the single source of truth, the command a thin, stable interface
 - **Depend on Skills Two Ways** — a command depends on a skill either **hard** (name the exact skill and, when the command harness installs declared dependencies, add it to the command plugin's `dependencies`) or **soft** (describe the capability needed and let the agent select the best-fitting installed skill at run time, declaring nothing and degrading gracefully when none matches). Use hard when one specific skill is always required, soft when several interchangeable skills could satisfy it. If the target harness distributes skills but not commands, publish and invoke the skill directly instead of inventing a command plugin surface. Either way, explicitly load the selected skill at run time (install ≠ in-context), see [references/distill.md](references/distill.md)
 
@@ -27,14 +29,15 @@ Author, merge, simplify, and distill reusable user-invocable prompt files (somet
 
 ## Operations
 
-- **Create** a new prompt from a completed task — see [references/create.md](references/create.md)
+- **Create** a thin command contract that delegates to one owning skill — see [references/create.md](references/create.md)
 - **Merge** elements from one prompt into another — see [references/merge.md](references/merge.md)
 - **Simplify** a verbose prompt — see [references/simplify.md](references/simplify.md)
 - **Distill** a fat command into a thin skill-delegating command — see [references/distill.md](references/distill.md)
 
 ## Progressive Disclosure
 
-- Read [references/create.md](references/create.md) - Load when capturing a completed task or workflow as a reusable prompt
+- Read [references/create.md](references/create.md) - Load when creating a thin
+  user-invocable command, selecting its owner skill/plugin, or defining its arguments
 - Read [references/merge.md](references/merge.md) - Load when porting elements from one prompt into another
 - Read [references/simplify.md](references/simplify.md) - Load when condensing a verbose prompt
 - Read [references/distill.md](references/distill.md) - Load when refactoring a self-contained command into a thin delegator that loads its guideline skill at run time

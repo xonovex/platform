@@ -135,6 +135,13 @@
 - **References:** references/evaluating-triggers.md, references/evaluating-outputs.md
 - **Aspects extracted:** Competitive multi-skill routing scenarios, two-run CI evidence, full activation, absolute pass-rate floors, and minimum quality deltas are repository conventions.
 
+## Xonovex skill-composition catalog contract
+
+- **Provenance:** Repository-original classification, semantic contract, installed-snapshot resolution, compatibility, and selection-provenance rules
+- **Last reviewed:** 2026-07-23
+- **References:** references/composition-metadata.md, references/composability.md, references/catalog-audit.md, references/create.md, references/decompose.md, references/merge.md, references/validate.md, references/workflow-skills.md
+- **Aspects extracted:** Independent durable/procedural lifecycle and functional-role classifications; exact manifest dependency versus semantic requirement boundary; provision contract SemVer; deterministic installed-snapshot selection; ambiguity, incompatibility, and cycle failures; exact implementation and source-provenance recording.
+
 ## Guide-level synthesis
 
 - **Provenance:** Repository-original integration of the source blocks above; these references combine multiple inputs or maintained conventions rather than one exclusive upstream

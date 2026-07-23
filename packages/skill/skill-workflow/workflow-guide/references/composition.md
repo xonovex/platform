@@ -1,30 +1,42 @@
 # Operation Composition
 
-## Independent dimensions
+## Semantic layers
 
-| Dimension   | Question                                               | Rule                                                |
-| ----------- | ------------------------------------------------------ | --------------------------------------------------- |
-| Operation   | What should happen?                                    | Select one core verb per call.                      |
-| Kind        | What kind of subject or result is involved?            | Keep open; infer only when unambiguous.             |
-| Perspective | Which evidence or stakeholder lens matters?            | Change emphasis, not operation semantics.           |
-| Method      | Which procedure should guide the operation?            | Load the selected method capability.                |
-| Executor    | Who or what performs the call?                         | Never change the selected operation.                |
-| Capability  | Which installed domain, method, or adapter is needed?  | Load only when selected or unambiguous.             |
-| Trigger     | What initiated the call?                               | Supply context without adding a stage or authority. |
-| Provider    | Which native system reads or persists?                 | Own authentication, revisions, and effects.         |
-| Reference   | Where is the native subject, evidence, or destination? | Remain opaque outside the provider.                 |
+| Layer                  | Contents                                                                                           | Owner                                                                      |
+| ---------------------- | -------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| Operation              | Create, Review, Revise, Decide, Execute, Validate, Publish, Abandon, or a workspace transaction    | Caller selects one immediate verb.                                         |
+| Semantic selection     | Subject/result kind, method, repeatable perspectives, criteria                                     | Caller selects explicitly; resolver may propose or derive with provenance. |
+| Resource binding       | Named input/output slot, inline value or provider-native reference, revision, kind, schema, intent | Each provider adapter interprets only its binding.                         |
+| Invocation context     | Trigger, executor, effect mode, authorization context                                              | Host supplies context; policy verifies effects.                            |
+| Derived implementation | Skills, tools, adapters, capabilities                                                              | Runtime derives, validates, and reports exact selections.                  |
 
-Criteria, supporting references, source revisions, result destinations, and dry-run or confirmation choices remain explicit inputs rather than hidden dimensions.
+These are not peer axes. Supplying a trigger never selects a provider; selecting a
+perspective never grants a capability; an installed skill never grants authority.
 
-## Selection procedure
+## Public and runtime concepts
 
-1. Resolve the exact subject and requested operation.
-2. Resolve every explicit dimension independently; infer kind or provider only from unambiguous evidence and report the basis.
-3. Load only the selected or unambiguous domain, method, execution, workspace, and provider capabilities.
-4. Stop and name any unavailable explicit capability instead of substituting another.
-5. Perform only the selected operation and preserve its side-effect boundary.
-6. Return the result inline unless the caller explicitly selects a destination provider and reference.
+Public requests use operation, semantic selections, named resource bindings, desired
+output kind, resolution mode, and effect intent. Trigger and executor may be
+host-supplied metadata.
 
-## Composition
+The runtime owns skill/capability selection, provider adapter resolution, policy,
+authorization, approvals, idempotency, retries, audit, and durable administrative
+checkpoints. Expert request documents may pin exact implementation identifiers and
+versions, but cannot widen semantics or authority.
 
-Examples such as `create → review → revise`, `review → publish`, `execute → validate`, and `create → decide` are optional compositions. Calls may be omitted, repeated, reordered, or used alone when the subject and selected method require it. A role lens may suggest a composition but never grants permission, selects a provider, or changes a verb's semantics.
+## Composition procedure
+
+- [ ] Normalize one exact `WorkflowRequest`.
+- [ ] Resolve each named binding and immutable revision independently.
+- [ ] Resolve semantics with provenance and mandatory policy.
+- [ ] Derive and report implementation selections.
+- [ ] Perform only the requested operation and allowed effect mode.
+- [ ] Return one inline `OperationResult`.
+- [ ] Feed a later operation only an exact prior result or provider binding.
+
+Calls may stand alone, repeat, run in parallel, or appear in policy-defined order.
+Examples such as Create → Review → Revise, Execute → Validate, or Review → Publish
+are compositions, never mandatory lifecycle stages.
+
+Publish is not a hidden tail of another operation. A host may automate the pair only
+when it records two operation contracts and separately verifies Publish authority.

@@ -1,68 +1,63 @@
 # Role Lenses
 
-A role lens is an illustrative way to compose the same eight operations. It is not a
-permission model, mandatory handoff, stage sequence, or role-specific command set.
-Every caller uses the same command semantics.
+A role lens is a convenience mapping to suggested perspectives, criteria, evidence,
+and communication depth. It is not a persona, executor identity, permission set,
+owner, workflow, or stage sequence.
 
-The noun selected with `--kind` describes the subject or result. The value selected
-with `--perspective` describes the evidence or concerns to emphasize. Both can change
-between roles without changing what `create`, `review`, `revise`, `decide`, `execute`,
-`validate`, `publish`, or `abandon` means.
+Prefer explicit repeatable `--perspective` selections. Use `--role` when a familiar
+organizational lens is more convenient, then inspect the resolved suggestions.
 
-## Illustrative compositions
+## Suggested mappings
+
+| Role lens   | Possible perspectives                       | Typical evidence questions                                             |
+| ----------- | ------------------------------------------- | ---------------------------------------------------------------------- |
+| product     | user value, scope, acceptance               | Does this solve the stated problem and cover the accepted outcome?     |
+| design      | usability, accessibility, content           | Can intended users understand and operate it across relevant contexts? |
+| engineering | correctness, maintainability, compatibility | Is the change bounded, supportable, and safe for consumers?            |
+| quality     | behavior, evidence quality, regression      | Is each binding criterion reproducibly demonstrated?                   |
+| security    | threat, privacy, abuse, auditability        | What trust boundary changed and what evidence supports the control?    |
+| operations  | reliability, operability, recovery          | Can the change be observed, reversed, and supported?                   |
+
+Mappings are suggestions, not exhaustive bundles. The runtime records:
+
+- every resolved perspective;
+- whether it was explicit, inherited, suggested, or inferred;
+- the reason it applies;
+- questions, evidence needs, and advisory criteria it added;
+- any specialist skill selected to support it.
+
+## Authority boundary
+
+A role lens cannot:
+
+- grant access or approval;
+- determine executor identity;
+- claim organizational ownership;
+- force an operation order;
+- select a provider;
+- make an advisory criterion binding;
+- authorize merge, release, deployment, publication, or cleanup.
+
+The runtime or provider owns authority. Explicit caller input, an authoritative
+artifact, or mandatory policy determines binding criteria.
+
+## Example
 
 ```text
-PM/PO:              create -> review -> revise -> decide
-UX:                 create -> review -> revise -> decide
-Developer:          create -> review -> revise -> execute -> validate -> publish
-QA:                 create -> review -> execute -> validate -> publish
-Developer reviewer: review -> publish
+/xonovex-workflow:review ./checkout-design.md \
+  --role design \
+  --perspective privacy \
+  --perspective localization
 ```
 
-These compositions are examples. A call can omit, repeat, or reorder operations when
-the subject and selected method call for it.
-
-### PM/PO
-
-A PM/PO might create and refine requirements, review them from a product perspective,
-and record a descriptive decision. The kind may be a problem statement, requirement,
-or plan. `decide` records an outcome and rationale; it does not grant operational
-authority or change a gate.
-
-### UX
-
-A UX practitioner might create and refine a design result, review it from interaction,
-content, research, or accessibility perspectives, and record a decision. Those
-perspectives select applicable evidence and capabilities rather than a different set
-of commands.
-
-### Developer
-
-A developer might create and revise a plan or implementation, execute bounded work,
-validate the result, and publish it to an explicit destination. Publishing is separate
-from execution and occurs only when the destination and effect are explicit.
-
-### QA
-
-QA creates or reviews test material, executes checks, validates behavior against
-criteria, and publishes the resulting evidence. QA owns validation of behavior and
-evidence in this example. QA does not review or approve the pull request containing
-the implementation.
-
-### Developer reviewer
-
-A separate developer reviewer reviews the exact pull-request revision and records the
-review or approval through the selected source-control provider. The illustrative
-`review -> publish` composition keeps evaluation separate from the provider action
-that publishes the disposition. This reviewer, not QA, owns pull-request review and
-approval in these examples.
-
-There are no aliases such as `qa-validate` or `developer-review`. Role names do not
-imply permissions, authority, required handoffs, or provider effects.
+The design role may suggest usability and accessibility. Privacy and localization
+remain explicit additional perspectives. The result reports the full resolved set;
+no operation chain is implied.
 
 ## Related guides
 
 - [Command inventory](../README.md)
-- [Provider-native references](references.md)
-- [Invocation and execution](invocation.md)
+- [Provider-native resource bindings](references.md)
+- [Invocation, effects, and execution](invocation.md)
+- [Contract migration](migration.md)
 - [Operation model](../../../diagram/diagram-agent-workflow/operation-model.png)

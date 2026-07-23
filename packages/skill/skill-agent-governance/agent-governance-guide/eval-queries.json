@@ -2,7 +2,7 @@
   {
     "query": "what does Xonovex governance actually enforce, and can I run a workflow with no controls?",
     "should_trigger": true,
-    "split": "train",
+    "split": "validation",
     "rationale": "direct question about the governance execution kernel's enforcement boundary"
   },
   {

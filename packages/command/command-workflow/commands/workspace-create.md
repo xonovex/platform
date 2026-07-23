@@ -1,5 +1,5 @@
 ---
-description: Create one explicitly targeted workspace from an exact source without lifecycle assumptions
+description: Create one isolated workspace from one exact source without merging or cleanup
 allowed-tools:
   - Read
   - Bash
@@ -7,24 +7,28 @@ allowed-tools:
   - AskUserQuestion
   - Skill
 argument-hint: >-
-  <target> --source <reference> [--branch <reference>]
-  [--capability <selection>] [--provider <selection>] [--dry-run]
+  [target] [--request <file>] [--workspace-provider <provider>]
+  [--source-reference <reference>] [--source-revision <revision>]
+  [--branch-reference <reference>] [--effect <preview|apply>]
 ---
 
 # /xonovex-workflow:workspace-create — Create Workspace
 
 ## Arguments
 
-- `target` (required): Exact workspace path or provider-native destination.
-- `--source` (required): Exact source branch, revision, or provider-native reference.
-- `--branch` (optional): Explicit branch reference when the selected capability uses
-  branches.
-- `--capability`, `--provider` (optional): Independent workspace method and provider
-  selections.
-- `--dry-run` (optional): Validate and preview creation without changing state.
+- `target` (required unless `--request` supplies it): Exact workspace path or opaque
+  provider-native destination reference.
+- `--request` (optional): Structured request file for independently bound source and
+  workspace resources. Do not combine it with the shorthands.
+- `--workspace-provider` (required for provider-native shorthand): Provider that owns
+  workspace creation and target interpretation.
+- `--source-reference`, `--source-revision` (required for shorthand): Opaque source
+  locator and exact native revision.
+- `--branch-reference` (optional): Explicit native branch when the provider uses one.
+- `--effect` (optional): `preview` or `apply`; defaults to `preview`.
 
 ## Delegation
 
 Load the `workflow-guide` skill (plugin `xonovex-skill-workflow`) and perform its
-**Workspace create** operation with these arguments. The skill is the source of truth
-for the procedure, output, and error handling; do not restate them.
+**Workspace create** operation with these arguments. The skill is the source of truth.
+Create only the named workspace resources; never merge, remove, or publish.

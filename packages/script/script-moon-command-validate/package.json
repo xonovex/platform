@@ -1,0 +1,21 @@
+{
+  "name": "@xonovex/script-moon-command-validate",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "moon-command-validate": "./dist/src/index.js"
+  },
+  "dependencies": {
+    "ajv": "^8.20.0",
+    "yaml": "^2.9.0",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {},
+  "keywords": [
+    "xonovex",
+    "script",
+    "moon",
+    "command"
+  ]
+}

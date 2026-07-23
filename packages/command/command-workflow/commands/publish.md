@@ -1,5 +1,5 @@
 ---
-description: Publish an exact subject to an explicit provider destination and return its native locator
+description: Publish one exact subject to one explicit provider destination with idempotent effect reporting
 allowed-tools:
   - Read
   - Write
@@ -10,30 +10,34 @@ allowed-tools:
   - AskUserQuestion
   - Skill
 argument-hint: >-
-  <subject> --result <destination-reference> [--reference <reference>...]
-  [--revision <revision>] [--kind <selection>] [--perspective <selection>]
-  [--criteria <criteria>...] [--method <selection>]
-  [--capability <selection>...] [--provider <selection>]
-  [--confirm] [--dry-run]
+  [subject] [--request <file>] [--subject-provider <provider>]
+  [--subject-revision <revision>] [--subject-kind <kind>]
+  [--destination-provider <provider>] [--destination-reference <reference>]
+  [--destination-revision <revision>] [--criterion <criterion>...]
+  [--idempotency-key <key>] [--effect <preview|apply>]
 ---
 
 # /xonovex-workflow:publish — Publish
 
 ## Arguments
 
-- `subject` (required): Inline content or one opaque provider-native reference.
-- `--result` (required): Explicit provider-native destination reference.
-- `--reference` (repeatable): Supporting inputs or opaque references.
-- `--revision` (optional): Exact native source revision; required when provider
-  context does not otherwise pin it.
-- `--kind`, `--perspective`, `--method`, `--capability`, `--provider`
-  (optional): Independent, open selections.
-- `--criteria` (repeatable, optional): Preconditions the publication must satisfy.
-- `--confirm` (optional): Explicitly authorize the described publication effect.
-- `--dry-run` (optional): Resolve and preview the publication without applying it.
+- `subject` (required unless `--request` supplies it): Exact inline result, operation
+  result, or provider-native source reference.
+- `--request` (optional): Structured request file for independently bound source,
+  evidence, criteria, and destination. Do not combine it with the shorthands.
+- `--subject-provider`, `--subject-revision`, `--subject-kind` (optional): Provider,
+  exact native revision, and semantic kind for the simple source shorthand.
+- `--destination-provider`, `--destination-reference` (required for shorthand):
+  Provider and opaque native locator for the publication destination.
+- `--destination-revision` (optional): Expected destination revision for optimistic
+  concurrency.
+- `--criterion` (repeatable, optional): Binding publication precondition.
+- `--idempotency-key` (required for `apply`): Stable key for safe retry.
+- `--effect` (optional): `preview` or `apply`; defaults to `preview`.
 
 ## Delegation
 
 Load the `workflow-guide` skill (plugin `xonovex-skill-workflow`) and perform its
-**Publish** operation with these arguments. The skill is the source of truth for the
-procedure, output, and error handling; do not restate them.
+**Publish** operation with these arguments. This is the only core operation that may
+persist a domain result. The skill is the source of truth; return the destination's
+native locator, revision, and observed effect without implying approval.

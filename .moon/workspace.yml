@@ -11,8 +11,9 @@ projects:
     - packages/docker/*
     - packages/script/*
     - packages/moon/*
-    # The project globs exclude Markdown tenant files so locations stay directories.
+    # Project globs exclude tenant files so discovered locations stay directories.
     - "!**/*.md"
+    - "!packages/skill/composition-catalog.json"
   sources:
     github-actions: .github
     repository-shell: .hooks

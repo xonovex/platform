@@ -21,7 +21,7 @@ const UNSAFE_CREDENTIAL_PATTERNS: readonly [RegExp, string][] = [
   ],
   [/<\s*token\.txt\b/i, "reads a secret from token.txt"],
   [
-    /\bexport\s+[A-Z_]*(?:TOKEN|KEY|PAT|SECRET|PASSWORD)\s*=\s*(?!["']?\$)[^\s]+/i,
+    /\bexport\s+[A-Z_]*(?:TOKEN|KEY|PAT|SECRET|PASSWORD)\s*=\s*(?!["']?\$)\S+/i,
     "assigns a secret in an export command",
   ],
 ];
@@ -297,7 +297,8 @@ const checkSources = (
       COMMIT_FIELD_RE.test(block) &&
       WATCH_FIELD_RE.test(block);
     if (!hasContentSnapshot && !hasRepositoryDriftAnchor) {
-      const title = block.split(/\r?\n/, 1)[0]?.trim() || "unnamed source";
+      const title =
+        block.split(/\r?\n/, 1)[0]?.trim() ?? "unnamed source";
       errors.push(
         `catalog: versioned web source '${title}' needs Content SHA256 or Checkout + Commit + Watch drift fields`,
       );

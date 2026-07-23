@@ -1,134 +1,146 @@
 [
   {
-    "query": "using the stage-neutral operation contract, create a new architecture note from these source links without modifying the sources",
+    "query": "Review GitHub PR api#42 at head 7f31 with Jira story API-123 rev 17 and Datadog trace-set 19, then give me a structured handoff.",
     "should_trigger": true,
     "split": "train",
-    "rationale": "new-result creation with an explicit non-mutation boundary"
+    "rationale": "multi-provider Review with exact bindings and OperationResult"
   },
   {
-    "query": "select the workflow review operation for this exact proposal, evaluate the acceptance criteria, and report findings without editing it",
+    "query": "Create the result inline first; saving it to our document store must be a separate previewed publish operation.",
     "should_trigger": true,
     "split": "train",
-    "rationale": "read-only review of an exact subject"
+    "rationale": "strict domain-result publication separation"
   },
   {
-    "query": "use the workflow revise operation on provider revision 7 with these findings and preserve the opaque source revision",
+    "query": "Use security, accessibility, and reliability perspectives, explain which checks they add, and keep suggestions advisory.",
     "should_trigger": true,
     "split": "train",
-    "rationale": "traceable revision from explicit feedback"
+    "rationale": "repeatable perspective and criterion resolution"
   },
   {
-    "query": "which stage-neutral operation records a selected outcome and rationale without approving, authorizing, or merging anything? Apply it to these three options",
+    "query": "The old chat is unavailable; resume child STORY-41-A from WORK-783 rev 2 and the exact prior workflow result.",
     "should_trigger": true,
     "split": "train",
-    "rationale": "descriptive decision without implied authority"
+    "rationale": "durable cross-session continuation"
   },
   {
-    "query": "use the workflow execute operation for this bounded migration step and return its inline observable result without publishing or creating a workspace",
+    "query": "Split this exact parent story vertically into independently valuable children with full criterion coverage and parallel work records.",
     "should_trigger": true,
     "split": "train",
-    "rationale": "bounded execution with explicit side-effect limits"
+    "rationale": "story decomposition through stable workflow operations"
   },
   {
-    "query": "use the workflow validate contract for artifact sha256:abc against policy version 4, preserving the native subject reference and returning evidence separately",
+    "query": "Model our regulated release as repeated review/revise, parallel validations, readiness decision, and separately authorized publish.",
     "should_trigger": true,
     "split": "train",
-    "rationale": "exact-subject validation against explicit criteria"
+    "rationale": "policy-defined non-universal SDLC graph"
   },
   {
-    "query": "use the workflow publish operation for this exact package revision and return its registry-native locator; fail if the selected provider is unavailable",
+    "query": "Execute the mitigation in preview mode and tell me how to recover if the provider response is lost after the write.",
     "should_trigger": true,
     "split": "train",
-    "rationale": "explicit provider publication with no implicit fallback"
+    "rationale": "effect modes and unknown-outcome recovery"
   },
   {
-    "query": "use the workflow abandon operation for this attempt, preserving why it stopped, its partial inline result, and the retry boundary",
-    "should_trigger": true,
-    "split": "train",
-    "rationale": "explicit abandonment with recoverable state"
-  },
-  {
-    "query": "run the workflow workspace-create utility from main at this exact revision and report the provider-native workspace location",
+    "query": "Create one worktree from main@abc, but do not implement, merge, abandon, or remove anything else.",
     "should_trigger": true,
     "split": "validation",
-    "rationale": "explicit workspace creation from an exact source"
+    "rationale": "workspace-create exclusive boundary"
   },
   {
-    "query": "run the workflow workspace-merge utility into main only after checking provider revisions, status, and conflicts",
+    "query": "Merge this exact workspace, leave it and its branch intact, and make cleanup a later explicit transaction.",
     "should_trigger": true,
     "split": "validation",
-    "rationale": "safe workspace merge with preflight checks"
+    "rationale": "workspace merge/cleanup separation"
   },
   {
-    "query": "run the workflow workspace-abandon utility but preserve the native branch reference and recoverable state unless removal is explicitly confirmed",
+    "query": "Return a machine-readable operation result for the partial run, including effects, evidence, uncertainty, retry, and revisions.",
     "should_trigger": true,
     "split": "validation",
-    "rationale": "recoverable workspace abandonment"
+    "rationale": "OperationResult contract"
   },
   {
-    "query": "run the workflow workspace-cleanup utility in preview mode, then remove only the exact native workspace references I confirm",
+    "query": "Incident 204 needs evidence review and mitigation in parallel, recovery validation, then optional follow-up creation.",
     "should_trigger": true,
     "split": "validation",
-    "rationale": "preview-first explicit workspace cleanup"
+    "rationale": "parallel incident workflow composition"
   },
   {
-    "query": "compose the workflow review, revise, and validate operation contracts in the order required by the evidence without imposing a lifecycle",
+    "query": "Use a product role lens only to propose value and coverage concerns; don't assign ownership or a lifecycle.",
     "should_trigger": true,
     "split": "validation",
-    "rationale": "illustrative composition of independent stage-neutral operations"
+    "rationale": "narrow role-lens resolution"
   },
   {
-    "query": "what does Xonovex governance actually enforce, and can I run a workflow with no controls?",
-    "rationale": "near miss owned by agent-governance-guide",
+    "query": "What governance controls, approval budgets, and kill switches should the agent runtime enforce?",
     "should_trigger": false,
-    "split": "train"
+    "split": "train",
+    "rationale": "runtime governance design rather than workflow operation semantics"
   },
   {
-    "query": "build a threat-informed security assurance plan with exact control and evidence ownership",
-    "rationale": "near miss owned by security-assurance-guide",
+    "query": "Build a threat model and map abuse cases to security controls for our authentication service.",
     "should_trigger": false,
-    "split": "train"
+    "split": "train",
+    "rationale": "security assurance content rather than workflow composition"
   },
   {
-    "query": "define service objectives, error budgets, dependencies, and user-impact indicators for this capability",
-    "rationale": "near miss owned by reliability-guide",
+    "query": "Define service-level objectives, an error budget, and user-impact indicators for checkout.",
     "should_trigger": false,
-    "split": "train"
+    "split": "train",
+    "rationale": "reliability engineering content rather than operation contract"
   },
   {
-    "query": "Research the code paths and current library versions we need before planning rate limiting for packages/api. Keep it read-only and cite the evidence.",
-    "rationale": "near miss owned by plan-guide",
+    "query": "Research the current code paths and dependency versions before writing a plan; keep it read-only.",
     "should_trigger": false,
-    "split": "train"
+    "split": "train",
+    "rationale": "planning research task without workflow contract intent"
   },
   {
-    "query": "Design a Xonovex workflow that can be started manually, by a Claude hook, or by CI. It should run the same review script in every case and should not require governance controls.",
-    "rationale": "near miss owned by agent-governance-guide",
+    "query": "Draft an architecture decision record for moving the primary store to Postgres.",
     "should_trigger": false,
-    "split": "train"
+    "split": "train",
+    "rationale": "ADR authoring rather than workflow operation architecture"
   },
   {
-    "query": "assess a privileged plugin's permissions, provenance, concurrency, and disable path",
-    "rationale": "near miss owned by security-assurance-guide",
+    "query": "Teach me the exact git commands to rebase this branch and resolve rename conflicts.",
     "should_trigger": false,
-    "split": "validation"
+    "split": "train",
+    "rationale": "provider capability-use mechanics rather than workspace transaction contract"
   },
   {
-    "query": "measure reliability without ranking individual developers or gaming deployment frequency",
-    "rationale": "near miss owned by reliability-guide",
+    "query": "Create an Agent Skill for our logging conventions and add good trigger eval queries.",
     "should_trigger": false,
-    "split": "validation"
+    "split": "validation",
+    "rationale": "skill authoring rather than using a workflow operation"
   },
   {
-    "query": "The previous chat is gone. Continue exactly one child from tracker plan:782 at revision 9f31, baseline the repo first, then stop.",
-    "rationale": "near miss owned by plan-guide",
+    "query": "Write unit tests for packages/api and follow the repository's TypeScript test conventions.",
     "should_trigger": false,
-    "split": "validation"
+    "split": "validation",
+    "rationale": "implementation/testing task without stage-neutral workflow semantics"
   },
   {
-    "query": "draft a decision record for moving the store to Postgres",
-    "rationale": "validation near miss owned by adr-guide",
+    "query": "Explain how to authenticate to the tracker API and rotate its service token.",
     "should_trigger": false,
-    "split": "validation"
+    "split": "validation",
+    "rationale": "provider onboarding and credentials rather than resource binding semantics"
+  },
+  {
+    "query": "Write a concise user story with Given/When/Then acceptance criteria for refundable booking changes.",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "story authoring content without decomposition or workflow composition"
+  },
+  {
+    "query": "Make a Claude slash command that delegates to an existing skill and uses the right frontmatter.",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "command authoring rather than workflow operation execution"
+  },
+  {
+    "query": "Compare two JSON Schema libraries and recommend one for our TypeScript service.",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "technology recommendation without workflow contract intent"
   }
 ]

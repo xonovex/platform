@@ -2,7 +2,7 @@
   {
     "query": "Research the code paths and current library versions we need before planning rate limiting for packages/api. Keep it read-only and cite the evidence.",
     "should_trigger": true,
-    "split": "train"
+    "split": "validation"
   },
   {
     "query": "Create a high-level implementation plan from the migration notes below, including risks, validation, and the coding skills the implementer must consult.",

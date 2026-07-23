@@ -1,43 +1,34 @@
 ---
-description: Stop work on one subject while preserving its reason, partial result, and retry boundary
+description: Stop work and return an inline abandonment record without cleanup or provider mutation
 allowed-tools:
   - Read
-  - Write
-  - Edit
-  - Bash
   - Glob
   - Grep
   - AskUserQuestion
   - Skill
 argument-hint: >-
-  <subject> --reason <text> [--reference <reference>...]
-  [--revision <revision>] [--kind <selection>] [--perspective <selection>]
-  [--criteria <criteria>...] [--method <selection>]
-  [--capability <selection>...] [--provider <selection>]
-  [--result <destination-reference>] [--cleanup <selection>] [--confirm]
-  [--dry-run]
+  [subject] [--request <file>] [--reason <text>]
+  [--subject-provider <provider>] [--subject-revision <revision>]
+  [--subject-kind <kind>] [--criterion <criterion>...]
+  [--resolution <strict|assisted|automatic>]
 ---
 
 # /xonovex-workflow:abandon — Abandon
 
 ## Arguments
 
-- `subject` (required): Inline work description or one opaque provider-native
-  reference.
-- `--reason` (required): Present-tense reason for stopping.
-- `--reference` (repeatable): Partial results, evidence, or opaque references.
-- `--revision` (optional): Exact native revision being abandoned.
-- `--kind`, `--perspective`, `--method`, `--capability`, `--provider`
-  (optional): Independent, open selections.
-- `--criteria` (repeatable, optional): Retention or cleanup constraints.
-- `--result` (optional): Explicit destination for the abandonment record.
-- `--cleanup` (optional): Explicit cleanup capability or scope; preserve by default.
-- `--confirm` (optional): Explicitly authorize the scoped cleanup or provider state
-  update.
-- `--dry-run` (optional): Preview provider updates or cleanup.
+- `subject` and `--reason` (required unless `--request` supplies them): Exact work
+  being stopped and the present-tense reason.
+- `--request` (optional): Structured request file for the subject, partial results,
+  evidence, reason, and criteria. Do not combine it with the shorthands.
+- `--subject-provider`, `--subject-revision`, `--subject-kind` (optional): Provider,
+  exact native revision, and semantic kind for the simple subject shorthand.
+- `--criterion` (repeatable, optional): Retention or recovery constraint.
+- `--resolution` (optional): Constraint-resolution mode; defaults to `assisted`.
 
 ## Delegation
 
 Load the `workflow-guide` skill (plugin `xonovex-skill-workflow`) and perform its
-**Abandon** operation with these arguments. The skill is the source of truth for the
-procedure, output, and error handling; do not restate them.
+**Abandon** operation with these arguments. Return the reason, partial state,
+unresolved work, and retry boundary inline. The skill is the source of truth; do not
+publish, delete, clean, snapshot, or mutate provider state.

@@ -1,38 +1,29 @@
 ---
-description: Abandon one explicit workspace while preserving its reason and recoverable state
+description: Record why one workspace was abandoned while preserving every workspace resource
 allowed-tools:
   - Read
-  - Write
-  - Bash
   - Glob
   - AskUserQuestion
   - Skill
 argument-hint: >-
-  <target> --reason <text> [--revision <revision>]
-  [--capability <selection>] [--provider <selection>]
-  [--result <destination-reference>] [--snapshot] [--remove]
-  [--remove-reference] [--confirm] [--dry-run]
+  [target] [--request <file>] [--reason <text>]
+  [--workspace-provider <provider>] [--workspace-revision <revision>]
 ---
 
 # /xonovex-workflow:workspace-abandon — Abandon Workspace
 
 ## Arguments
 
-- `target` (required): Exact workspace path or provider-native reference.
-- `--reason` (required): Present-tense reason for abandonment.
-- `--revision` (optional): Exact workspace revision being abandoned.
-- `--capability`, `--provider` (optional): Independent workspace and provider
-  selections.
-- `--result` (optional): Explicit destination for the abandonment record.
-- `--snapshot` (optional): Preserve current work using the selected capability before
-  removal.
-- `--remove` (optional): Remove the workspace after recording its state.
-- `--remove-reference` (optional): Also remove its provider-native branch or reference.
-- `--confirm` (optional): Explicitly authorize the described removals.
-- `--dry-run` (optional): Preview updates and removals without applying them.
+- `target` and `--reason` (required unless `--request` supplies them): Exact workspace
+  locator and present-tense reason for stopping.
+- `--request` (optional): Structured request file for the workspace, partial state,
+  evidence, and recovery information. Do not combine it with the shorthands.
+- `--workspace-provider`, `--workspace-revision` (optional): Provider and exact
+  revision for the simple workspace shorthand.
 
 ## Delegation
 
 Load the `workflow-guide` skill (plugin `xonovex-skill-workflow`) and perform its
-**Workspace abandon** operation with these arguments. The skill is the source of truth
-for the procedure, output, and error handling; do not restate them.
+**Workspace abandon** operation with these arguments. Return an inline abandonment
+and recovery record. The skill is the source of truth; do not snapshot, remove, prune,
+or mutate the workspace or its provider-native reference.

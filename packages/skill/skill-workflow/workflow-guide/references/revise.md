@@ -2,20 +2,26 @@
 
 ## Goal
 
-Produce one traceable new revision from explicit feedback while preserving the source, feedback provenance, and unresolved items.
+Produce one traceable inline successor from explicit feedback while preserving the
+pinned source, feedback provenance, and unresolved items.
 
 ## Procedure
 
-1. Resolve the subject, exact source revision, feedback, and explicit selections. Stop on ambiguous kind or provider inference.
-2. Load only explicitly selected or unambiguous revision, domain, method, and provider capabilities.
-3. Let the selected provider interpret opaque subjects, feedback, references, and revisions.
-4. Apply feedback to a new result. Record applied, deferred, and conflicting feedback without rewriting source history.
-5. Return the revision inline or persist it only to an explicit destination.
+- [ ] Resolve the exact source revision and every named feedback binding.
+- [ ] Resolve constraints, perspectives, method, and implementation with provenance.
+- [ ] Classify feedback as applied, deferred, conflicting, or rejected with reason.
+- [ ] Produce a new inline result without editing or persisting the source.
+- [ ] Return an inline `OperationResult` linking the successor to its source and
+      feedback.
 
-Kind, perspective, method, capability, and provider remain independent. Trigger, executor, identity, and maturity do not alter revision semantics.
+Revise always uses `effect.mode: inspect`. To store the successor, pass its exact
+result to Publish. Publishing to the same logical provider reference requires an
+expected-revision precondition and creates a provider-native successor; it never
+rewrites the pinned source revision.
 
 ## Error handling
 
-- Stop on missing feedback or an unpinned mutable source.
-- Report conflicting feedback and request a decision instead of guessing.
-- Report ambiguous providers and unavailable explicit capabilities without substitution.
+- Return blocked on missing feedback or an unpinned mutable source.
+- Preserve conflicting feedback rather than choosing by prompt order.
+- Return partial when a useful successor exists but material feedback remains
+  unresolved.

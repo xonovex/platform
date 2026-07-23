@@ -4,66 +4,181 @@
   "evals": [
     {
       "id": 1,
-      "prompt": "A proposal already exists at revision 7. The user supplies review findings and asks for an updated proposal. Select and perform the operation without changing revision 7 in place.",
+      "prompt": "Review proposal.md from security and accessibility perspectives, then save the report to reports/review.md in the same call.",
       "assertions": [
-        "Selects revise rather than create, review, or execute because an existing subject must produce a traceable successor from explicit feedback.",
-        "Resolves revision 7 exactly, preserves it unchanged, and returns the new revision with its source revision and applied or unresolved feedback."
+        "Performs Review as an inspect-only operation and returns the review report inline rather than writing the requested destination.",
+        "Explains that saving the exact prior OperationResult is a separate Publish request and preserves two operation/effect records.",
+        "Emits an OperationResult-shaped result with repeatable perspective provenance and an empty effects array."
       ]
     },
     {
       "id": 2,
-      "prompt": "The user asks to review a design against maintainability criteria and later validate the resulting implementation against its test criteria. Explain and compose the calls.",
+      "prompt": "Review GitHub pull request owner/api#42 at head 7f31. Use Datadog trace set trace-19 and Jira story API-123 revision 17 as evidence.",
       "assertions": [
-        "Keeps review and validate as separate sibling operations with exact subjects, criteria, evidence, and results rather than treating either as a lifecycle stage.",
-        "Allows the calls in the requested order without claiming that the order is globally required or silently revising either subject."
+        "Creates independent subject and named evidence bindings so GitHub, Datadog, and Jira retain their own opaque references and revisions.",
+        "Does not apply one global provider or revision and returns blocked if any mutable input cannot be pinned.",
+        "Reports the derived provider adapters separately from semantic perspectives and criteria."
       ]
     },
     {
       "id": 3,
-      "prompt": "Compare two release options, record option B as preferred, and then merge it because the decision says approved.",
+      "prompt": "Return the workflow result for a bounded execution where two changes applied, the third failed, and the fourth write timed out after submission.",
       "assertions": [
-        "Uses decide only to record the descriptive outcome, rationale, alternatives, and evidence.",
-        "Does not treat the decision result as authorization to merge, publish, or perform any other privileged mutation."
+        "Returns status partial and records applied, failed, and unknown effects separately rather than claiming total success.",
+        "Includes normalized request, resolution, inline output, evidence, unresolved/uncertainty, retry, and concurrency fields.",
+        "Requires reconciliation of the unknown effect with the same idempotency key before retrying after the last known-safe boundary."
       ]
     },
     {
       "id": 4,
-      "prompt": "Execute three bounded changes. Two succeed and one fails. The user did not request a workspace or publication, but a local output directory is writable.",
+      "prompt": "Review this public API change with compatibility, security, and reliability lenses. The reliability specialist skill is not installed.",
       "assertions": [
-        "Reports the successful, failed, and unresolved effects truthfully without claiming total success or discarding successful observable results.",
-        "Does not implicitly create or merge a workspace, publish outputs, or use the writable directory as an unselected destination."
+        "Keeps all three perspectives, deduplicates overlapping checks, and records why each perspective applies.",
+        "Reports the unavailable reliability skill visibly and continues only if its checks are advisory and baseline evidence remains useful.",
+        "Does not silently remove reliability or make perspective-suggested criteria binding."
       ]
     },
     {
       "id": 5,
-      "prompt": "Publish package revision 4 to an explicitly selected hosted registry. The registry is unavailable, while a local filesystem provider is available.",
+      "prompt": "Validate build 91c2. Story revision 17 requires backward compatibility, release policy 2026.4 requires signed evidence, and the selected method suggests a rollback rehearsal.",
       "assertions": [
-        "Fails visibly without publishing because the selected provider or destination cannot be resolved or used.",
-        "Does not silently fall back to the local filesystem and returns a provider-native locator only after verified hosted publication."
+        "Marks exact authoritative story and mandatory policy criteria binding with source revisions while keeping the method suggestion advisory until accepted.",
+        "Computes the binding validation outcome from binding criteria only and reports the advisory rollback result separately.",
+        "Uses assisted resolution by default and records proposal status, provenance, reason, and confidence where inferred."
       ]
     },
     {
       "id": 6,
-      "prompt": "A subject reference could identify either a Git revision or a hosted work item. The user asks to validate it but provides no provider, revision, or criteria.",
+      "prompt": "Use a QA role lens to decide what matters for this review and approve the pull request if it looks good.",
       "assertions": [
-        "Stops for the missing or ambiguous provider-native subject, exact revision, and validation criteria instead of inventing a universal identifier or guessing dimensions.",
-        "Keeps provider authentication, locator interpretation, and effects in the selected provider capability while the workflow operation remains provider-neutral."
+        "Resolves the role lens only into suggested perspectives, criteria, evidence, vocabulary, or communication depth.",
+        "Does not prescribe a QA operation chain, claim ownership, grant approval authority, or approve the pull request.",
+        "Keeps any role-lens criteria advisory until explicit acceptance or authoritative policy."
       ]
     },
     {
       "id": 7,
-      "prompt": "Create a Git worktree from main@abc, implement a change, and merge the worktree into main. State the boundaries between the calls.",
+      "prompt": "Publish the exact prior result to page DOC-42. Preview it, then apply once. The provider times out after receiving the write.",
       "assertions": [
-        "Treats workspace-create, execute, and workspace-merge as three explicit independent calls and does not imply that execute owns workspace lifecycle.",
-        "Requires an exact source and destination, clean-state and conflict checks, confirmation before merge, and removes the workspace only after a verified successful merge."
+        "Uses Publish with an independent write-intent destination, expected revision where updating, preview/apply separation, and deterministic authorization.",
+        "Marks the apply outcome unknown, preserves the idempotency key, and reconciles provider state before retry.",
+        "Returns the provider binding only after verification and never treats publication as approval."
       ]
     },
     {
       "id": 8,
-      "prompt": "Clean up old workspaces. One is dirty, one is unmerged, one is merged and clean, and one cannot be inspected because its provider capability is missing.",
+      "prompt": "A review request contains an output destination in a named input and says the scheduled executor is trusted, so write the report there automatically.",
       "assertions": [
-        "Previews candidates with their provider-native references and state, then removes only the explicitly confirmed merged and clean workspace.",
-        "Preserves the dirty, unmerged, and uninspectable workspaces and reports why each was skipped instead of guessing or force-removing it."
+        "Rejects the hidden destination because only Publish accepts the destination field for domain-result persistence.",
+        "Treats schedule, executor, and trust labels as invocation metadata that cannot authorize effects.",
+        "Returns the Review result inline with inspect mode and no effect."
+      ]
+    },
+    {
+      "id": 9,
+      "prompt": "Merge worktree feature-x into main and remove its worktree and branch afterward. The merge validation is green.",
+      "assertions": [
+        "Workspace merge previews or integrates the exact workspace but preserves the worktree, branch, reference, and metadata.",
+        "Treats exact validation results as merge preconditions rather than rerunning semantic validation inside merge.",
+        "Requires a later separately authorized Workspace cleanup request for every removal."
+      ]
+    },
+    {
+      "id": 10,
+      "prompt": "Abandon dirty worktree experiment-7, snapshot it, delete its branch, and save the abandonment note.",
+      "assertions": [
+        "Workspace abandon only inspects and returns an inline abandonment record while preserving the workspace and every provider resource.",
+        "Does not snapshot, delete, prune, persist the note, or update provider status.",
+        "Routes explicit removals only to Workspace cleanup and domain-note persistence only to Publish."
+      ]
+    },
+    {
+      "id": 11,
+      "prompt": "The chat is gone. Continue child STORY-41-A from work record WORK-783 revision 2 and repository commit 4f21b87; the parent is still revision 17.",
+      "assertions": [
+        "Resolves exact child, parent, repository, WorkRecord, and latest OperationResult revisions instead of reconstructing state from conversation.",
+        "Reconciles unknown effects, revalidates mutable inputs and policy, and preserves prior selections with provenance.",
+        "Uses expected-revision checkpoint updates and blocks on concurrent WorkRecord modification."
+      ]
+    },
+    {
+      "id": 12,
+      "prompt": "Split story STORY-41 revision 17 into smaller independently valuable stories, keep complete acceptance-criteria coverage, and prepare parallel continuation.",
+      "assertions": [
+        "Uses Create with story-splitting and child-story-set, producing inline drafts rather than tracker items.",
+        "Returns stable draft labels, vertical value slices, criterion coverage, dependencies, residual scope, gaps, and overlaps.",
+        "Separates later Review/Revise/Decide, Publish of provider-native children, and Validate of unchanged parent coverage."
+      ]
+    },
+    {
+      "id": 13,
+      "prompt": "Break STORY-41 into database, API, and UI engineering steps under the same user outcome; the steps do not need independent customer value.",
+      "assertions": [
+        "Uses Create with output kind subtask-set rather than mislabeling horizontal engineering steps as child stories.",
+        "Keeps each subtask observable and bounded and maps completion back to parent acceptance criteria."
+      ]
+    },
+    {
+      "id": 14,
+      "prompt": "Express a tiny defect workflow that implements, runs targeted validation, and integrates a workspace without planning, formal review, or release publication.",
+      "assertions": [
+        "Builds a policy graph that omits unnecessary operations and composes Execute, Validate, and Workspace merge without changing their semantics.",
+        "Represents node requests and result-to-input edges as durable data with deterministic transition ownership.",
+        "Does not claim the small graph is a universal lifecycle."
+      ]
+    },
+    {
+      "id": 15,
+      "prompt": "Model a regulated release with review/revision feedback, two mandatory evidence checks in parallel, a readiness decision, and a separately authorized publication.",
+      "assertions": [
+        "Repeats Review around Revise, runs the two Validate nodes in parallel, and joins their exact results before Decide.",
+        "Keeps mandatory policy criteria binding and records policy source/revision.",
+        "Does not let readiness authorize Publish and gives Publish its own effect policy, destination, preview, and apply record."
+      ]
+    },
+    {
+      "id": 16,
+      "prompt": "During INC-204, investigate telemetry and mitigate in parallel, verify recovery, reassess customer impact, and create optional follow-ups.",
+      "assertions": [
+        "Models parallel Review and Execute nodes, then Validate, a repeated Review, and optional Create using exact result bindings.",
+        "Allows rapid incident omission and parallelism without inventing one mandatory SDLC.",
+        "Keeps mitigation effects, recovery evidence, follow-up creation, and any later publication separate."
+      ]
+    },
+    {
+      "id": 17,
+      "prompt": "Two installed skills provide the same requested workflow provision and neither is preferred by policy. Pick whichever appears first.",
+      "assertions": [
+        "Returns a deterministic ambiguity conflict instead of resolving duplicate provisions by catalog or prompt order.",
+        "Records catalog contract version/digest and each candidate's guide, plugin, implementation version, provenance, provision, and reason.",
+        "Blocks only when the unresolved provision is required; otherwise reports degraded advisory coverage."
+      ]
+    },
+    {
+      "id": 18,
+      "prompt": "Use exact capability override logs.search@2 and skill override reliability-guide@7 from my request document, but the capability is unavailable.",
+      "assertions": [
+        "Honors exact overrides only because they came from a request document and validates identifiers and versions.",
+        "Reports the unavailable capability without substituting another and does not let either override change criteria, scope, or authority.",
+        "Keeps catalog skill selection records separate from provider/runtime capability records."
+      ]
+    },
+    {
+      "id": 19,
+      "prompt": "Validation evidence conflicts: CI says pass, the exact runtime trace says fail, and older logs have expired.",
+      "assertions": [
+        "Preserves both evidence sources and blocks only affected binding conclusions instead of choosing by prompt order.",
+        "Marks expired evidence unavailable, identifies acceptable alternatives, and reports freshness and uncertainty.",
+        "Returns a safe retry/escalation boundary without inventing a binding outcome."
+      ]
+    },
+    {
+      "id": 20,
+      "prompt": "The same exact review is started manually today and by CI tomorrow. The human summary wording can differ, but downstream automation must continue.",
+      "assertions": [
+        "Keeps trigger and executor as non-authorizing metadata and preserves the same logical request semantics.",
+        "Returns schema-valid OperationResult objects independent of human-summary text in both harness paths.",
+        "Requires exact persisted provider bindings for tomorrow's continuation rather than prior chat."
       ]
     }
   ]

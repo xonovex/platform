@@ -1,62 +1,63 @@
-# Invocation and Execution
+# Invocation, Effects, and Execution
 
-Invocation answers how a command call starts. Execution answers who or what performs
-it. They are independent of the selected operation and of each other.
+Invocation, execution, and authority are runtime context. They do not change the
+meaning of a workflow operation.
 
-## Invocation mechanisms
+## Invocation
 
-The same command contract can be invoked by:
+A person, harness hook, CI/CD event, webhook, or scheduler may submit the same
+versioned request contract. The host records the trigger and authorization context;
+the public slash command does not expose them as semantic selection flags.
 
-- a person issuing a manual command;
-- an agent harness hook;
-- a CI/CD hook;
-- a webhook handler; or
-- a scheduler.
+## Execution
 
-Each mechanism supplies the same subject and optional kind, perspective, criteria,
-method, capability, provider, reference, revision, and result selections. The trigger
-does not add a lifecycle stage, change an operation, or authorize its side effects.
+A human, deterministic tool, model, or agent may execute a request. Every executor
+must honor the same:
 
-## Executors
+- exact resource bindings and revisions;
+- method, perspective, and criterion resolution;
+- effect mode;
+- capability availability;
+- operation-result envelope;
+- policy and provider boundary.
 
-A human, deterministic script, LLM, or agent can execute the call. The executor must
-honor the same argument contract, capability availability checks, provider boundary,
-and explicit side-effect rules. Changing executor does not turn `review` into
-`validate`, make `execute` publish, or give `decide` authority.
+The runtime derives the required skills, tools, and adapters, then reports their
+identities, installed versions, selection reasons, and any unavailable requirement.
+An ordinary caller does not choose a generic `--capability`.
 
-Harnesses and providers may attach labels such as A1, A2, or A3 as optional executor
-metadata. The command package does not define those labels, pass them as command modes,
-derive permissions from them, or map them to required stages. Any enforcement belongs
-to the invoking harness or provider and leaves operation semantics unchanged.
+## Effect modes
 
-## Examples
+`inspect` reads and reasons without proposing or applying mutations.
 
-A manual caller and a CI hook can request the same validation:
+`preview` resolves the exact target and produces a reviewable effect set without
+applying it.
 
-```text
-/xonovex-workflow:validate <subject> --criteria <criteria>
-```
+`apply` performs only the previewed, authorized effects and records each effect as
+planned, applied, failed, or unknown.
 
-A webhook handler and a scheduler can request the same bounded execution:
+Execute defaults to `inspect`. Publish and effectful workspace commands default to
+`preview`. Read-only and inline-generative operations expose no effect flag.
 
-```text
-/xonovex-workflow:execute <subject> --criteria <criteria>
-```
+An `apply` request is not authority. The runtime and provider still enforce
+credentials, permissions, approvals, budgets, idempotency, and concurrency.
 
-Their authentication, retry, scheduling, and delivery mechanisms differ. The command
-contract does not.
+## Partial and unknown outcomes
+
+The operation result preserves successful, failed, and unknown effects separately.
+It never reports whole-call success after a partial write. The retry boundary states
+whether retry is safe and includes an idempotency key when the provider supports one.
 
 ## Kubernetes callers
 
-A Kubernetes-based manual tool, harness hook, CI/CD system, webhook handler, or
-scheduler submits an `AgentRun` directly through the Kubernetes API. The
+A Kubernetes caller submits its execution request through the Kubernetes API. The
 [agent operator submission boundary](../../../agent/agent-operator-go/README.md#submission-boundary)
-admits and reconciles that execution request. The operator is not a workflow runtime
-and does not interpret trigger-specific workflow stages.
+admits and reconciles that request. The operator may enforce runtime policy but does
+not invent lifecycle stages or change operation semantics.
 
 ## Related guides
 
 - [Command inventory](../README.md)
+- [Provider-native resource bindings](references.md)
 - [Role lenses](role-lenses.md)
-- [Provider-native references](references.md)
+- [Contract migration](migration.md)
 - [Operation model](../../../diagram/diagram-agent-workflow/operation-model.png)

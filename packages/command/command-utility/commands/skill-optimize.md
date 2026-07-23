@@ -1,5 +1,7 @@
 ---
-description: Optimize a skill (or the whole catalog) to its delta over the weakest model in five phases — Baseline, Scope, Excise, Gate, Ablate: measure priors, set trim depth, cut to the delta, validate.py, then ablate-restore any essential fact lost
+description: >-
+  Optimize a skill or catalog to its delta over the weakest model through
+  baseline, scope, excise, gate, and ablation
 allowed-tools:
   - Read
   - Edit

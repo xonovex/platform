@@ -2,28 +2,25 @@
 
 ## Goal
 
-Create one isolated workspace at an explicit target from an exact source, preserving the relationship needed for a later merge.
+Preview or create one isolated workspace at an exact target from an exact source,
+without executing domain work.
 
 ## Procedure
 
-1. Resolve the exact target, source, branch when applicable, and explicit capability or
-   provider. Infer a provider only when context makes it unambiguous and report the
-   inference.
-2. Load only the selected or unambiguous workspace capability. Name and stop on an
-   unavailable explicit capability.
-3. Verify the source exists and that neither target nor native reference would be
-   overwritten or used elsewhere.
-4. Preview the exact resources, then create them only within the named target.
-5. Record the source relationship in provider-native metadata when supported and
-   return the workspace locator and revision.
+- [ ] Resolve source and target as independent bindings, including exact source
+      revision and provider-native branch when applicable.
+- [ ] Derive the workspace adapter and inspect target/reference collisions.
+- [ ] Return the exact resources and metadata that preview would create.
+- [ ] On apply, require runtime authorization and unchanged preconditions, then create
+      only the previewed resources.
+- [ ] Return every created locator, revision, receipt, and recovery action inline.
 
-Provider-specific workspace mechanics and metadata belong to the selected capability.
-This operation owns the source/target contract, safety boundary, and returned locator;
-it does not restate provider commands or unrelated planning metadata.
+Workspace create owns creation only. It does not execute work, merge, abandon, or
+remove. `preview` and `apply` are the only valid effect modes.
 
 ## Error handling
 
-- Stop on a missing or broad target, source, or required branch.
-- Report target or branch collisions without overwriting.
-- Stop on provider ambiguity or an unavailable explicit capability.
-- Report every created resource and its safe recovery action after partial creation.
+- Return blocked on broad targets, missing source revisions, provider ambiguity, or
+  collisions.
+- After partial creation, report each created resource and safe compensation without
+  applying cleanup implicitly.

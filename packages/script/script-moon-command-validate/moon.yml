@@ -1,0 +1,44 @@
+$schema: https://moonrepo.dev/schemas/project.json
+language: typescript
+tags: [typescript-script]
+tasks:
+  coverage:
+    command: noop
+    deps: [ts-coverage]
+    options:
+      cache: false
+  ts-coverage:
+    script: >-
+      npx vitest run --coverage --coverage.include='src/**'
+      --coverage.thresholds.lines 80
+      --coverage.thresholds.functions 80
+      --coverage.thresholds.branches 70
+      --coverage.thresholds.statements 80
+    inputs:
+      - /packages/command/command-workflow/contracts/*.json
+      - /packages/command/command-workflow/commands/*.md
+      - /packages/skill/skill-workflow/workflow-guide/SKILL.md
+      - /packages/skill/skill-workflow/workflow-guide/assets/**/*.json
+      - /packages/skill/skill-workflow/workflow-guide/references/*.md
+  ts-test:
+    inputs:
+      - /packages/command/command-workflow/contracts/*.json
+      - /packages/command/command-workflow/commands/*.md
+      - /packages/skill/skill-workflow/workflow-guide/SKILL.md
+      - /packages/skill/skill-workflow/workflow-guide/assets/**/*.json
+      - /packages/skill/skill-workflow/workflow-guide/references/*.md
+  install:
+    command:
+      - npm
+      - install
+      - -w
+      - "@xonovex/script-moon-command-validate"
+    deps:
+      - ~:build
+    options:
+      cache: false
+      runFromWorkspaceRoot: true
+  ci-check:
+    deps: [coverage]
+    options:
+      mergeDeps: append

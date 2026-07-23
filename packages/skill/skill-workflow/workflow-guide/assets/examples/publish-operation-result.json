@@ -1,0 +1,145 @@
+{
+  "contractVersion": "xonovex.workflow.result/v1",
+  "operation": "publish",
+  "status": "completed",
+  "summary": "Published the exact review result to DOC-42 as revision 12.",
+  "request": {
+    "contractVersion": "xonovex.workflow.request/v1",
+    "operation": "publish",
+    "subject": {
+      "kind": "operation-result",
+      "intent": "read",
+      "locator": {
+        "provider": "tracker",
+        "reference": "WORK-782/checkpoints/review-3",
+        "revision": "immutable-review-3"
+      }
+    },
+    "destination": {
+      "kind": "review-report",
+      "intent": "write",
+      "writeMode": "update",
+      "locator": {
+        "provider": "document-store",
+        "reference": "DOC-42",
+        "expectedRevision": "11"
+      }
+    },
+    "selection": {
+      "perspectives": [],
+      "criteria": [],
+      "roleLenses": [],
+      "resolutionMode": "assisted",
+      "acceptedSuggestions": []
+    },
+    "effect": {
+      "mode": "apply",
+      "idempotencyKey": "publish-review-3-to-doc-42"
+    },
+    "output": {
+      "kind": "published-review-report"
+    }
+  },
+  "resolution": {
+    "mode": "assisted",
+    "perspectives": [],
+    "criteria": [],
+    "proposals": [],
+    "skills": [
+      {
+        "guide": "workflow-guide",
+        "plugin": "xonovex-skill-workflow",
+        "implementationVersion": "7.0.0",
+        "packagePath": "packages/skill/skill-workflow",
+        "sourcesPath": "packages/skill/skill-workflow/workflow-guide/SOURCES.md",
+        "provenance": {
+          "kind": "semantic-requirement",
+          "reason": "The request requires the Publish operation contract.",
+          "requestedBy": "operation:publish"
+        },
+        "provision": {
+          "id": "procedure:workflow-operation",
+          "version": "1.0.0"
+        },
+        "requestedRange": "^1.0.0",
+        "catalogContractVersion": "1.0.0",
+        "catalogDigest": "3f2ff701ce0f8e56e098ed4f4ad16eb2e0291b3339d6635db98fcbdb0b74a2a4",
+        "reason": "Owns the Publish contract.",
+        "required": true,
+        "status": "selected"
+      }
+    ],
+    "capabilities": [
+      {
+        "id": "document-store.page.update",
+        "version": "provider-native",
+        "source": "provider",
+        "reason": "Updates DOC-42 under its provider-native concurrency contract.",
+        "required": true,
+        "status": "selected"
+      }
+    ],
+    "conflicts": []
+  },
+  "output": {
+    "kind": "published-review-report",
+    "binding": {
+      "kind": "review-report",
+      "intent": "write",
+      "writeMode": "update",
+      "locator": {
+        "provider": "document-store",
+        "reference": "DOC-42",
+        "revision": "12",
+        "expectedRevision": "11"
+      }
+    }
+  },
+  "evidence": [
+    {
+      "id": "publish-receipt",
+      "observation": "The provider returned revision 12 for DOC-42."
+    }
+  ],
+  "effects": [
+    {
+      "id": "publish-doc-42",
+      "kind": "domain-result-persistence",
+      "mode": "apply",
+      "status": "applied",
+      "target": {
+        "kind": "review-report",
+        "intent": "write",
+        "writeMode": "update",
+        "locator": {
+          "provider": "document-store",
+          "reference": "DOC-42",
+          "revision": "12",
+          "expectedRevision": "11"
+        }
+      },
+      "authorization": {
+        "status": "approved",
+        "reference": "approval-context-31"
+      },
+      "idempotencyKey": "publish-review-3-to-doc-42"
+    }
+  ],
+  "unresolved": [],
+  "uncertainty": [],
+  "retry": {
+    "safe": false,
+    "boundary": "Do not replay the confirmed provider write.",
+    "reason": "The provider receipt confirms the effect.",
+    "idempotencyKey": "publish-review-3-to-doc-42",
+    "reconcileBeforeRetry": true
+  },
+  "concurrency": [
+    {
+      "binding": "destination",
+      "observedRevision": "11",
+      "expectedRevision": "11",
+      "status": "unchanged"
+    }
+  ]
+}

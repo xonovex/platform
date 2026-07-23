@@ -1,5 +1,5 @@
 ---
-description: Validate and merge one explicit workspace into one explicit destination
+description: Validate and integrate one exact workspace while leaving all cleanup separate
 allowed-tools:
   - Read
   - Bash
@@ -7,32 +7,33 @@ allowed-tools:
   - AskUserQuestion
   - Skill
 argument-hint: >-
-  <target> --into <destination-reference> [--revision <revision>]
-  [--criteria <criteria>...] [--method <selection>]
-  [--capability <selection>...] [--provider <selection>]
-  [--squash] [--remove] [--confirm] [--dry-run]
+  [target] [--request <file>] [--workspace-provider <provider>]
+  [--workspace-revision <revision>] [--destination-provider <provider>]
+  [--destination-reference <reference>] [--destination-revision <revision>]
+  [--criterion <criterion>...] [--method <method>]
+  [--effect <preview|apply>]
 ---
 
 # /xonovex-workflow:workspace-merge — Merge Workspace
 
 ## Arguments
 
-- `target` (required): Exact workspace path or provider-native source reference.
-- `--into` (required): Exact destination workspace, branch, or native reference.
-- `--revision` (optional): Exact source revision to merge.
-- `--criteria` (repeatable, optional): Explicit conditions the workspace must satisfy
-  before the merge.
-- `--method` (optional): Validation or merge procedure selection.
-- `--capability` (repeatable, optional): Independent workspace, validation, and merge
-  capability selections.
-- `--provider` (optional): Provider selection for native references and effects.
-- `--squash` (optional): Request one consolidated change when supported.
-- `--remove` (optional): Remove the source workspace only after a successful merge.
-- `--confirm` (optional): Explicitly authorize the described merge effect.
-- `--dry-run` (optional): Validate and preview without merging.
+- `target` (required unless `--request` supplies it): Exact workspace path or opaque
+  provider-native source reference.
+- `--request` (optional): Structured request file for independently bound workspace,
+  destination, evidence, and criteria. Do not combine it with the shorthands.
+- `--workspace-provider`, `--workspace-revision` (required for provider-native
+  shorthand): Provider and exact revision of the source workspace.
+- `--destination-provider`, `--destination-reference` (required for shorthand):
+  Provider and opaque native destination locator.
+- `--destination-revision` (optional): Expected destination revision for concurrency.
+- `--criterion` (repeatable, optional): Binding pre-integration condition.
+- `--method` (optional): Requested validation and integration procedure.
+- `--effect` (optional): `preview` or `apply`; defaults to `preview`.
 
 ## Delegation
 
 Load the `workflow-guide` skill (plugin `xonovex-skill-workflow`) and perform its
-**Workspace merge** operation with these arguments. The skill is the source of truth
-for the procedure, output, and error handling; do not restate them.
+**Workspace merge** operation with these arguments. The skill is the source of truth.
+Integrate only after validation and exact authorization. Leave the workspace, branch,
+reference, and metadata intact; cleanup is a separate operation.

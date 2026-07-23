@@ -1,93 +1,143 @@
 # Composable Workflow Commands
 
-Twelve independently invocable commands share one contract: select one operation,
-provide a subject, and add only the dimensions needed for that call. The command
-semantics do not depend on a lifecycle stage, role, trigger, executor, or agent
-maturity label. Each public command preserves its argument contract and delegates
-the operation procedure to the required `workflow-guide` skill.
+Twelve thin Claude Code commands expose stable workflow operations and delegate their
+semantics to `workflow-guide`. Codex installs and invokes the skill directly.
+
+The public model has five layers:
+
+| Layer                  | User question                      | Examples                                     |
+| ---------------------- | ---------------------------------- | -------------------------------------------- |
+| Operation              | What immediate work should happen? | create, review, execute                      |
+| Semantic selection     | What does good work mean here?     | kind, method, perspectives, criteria         |
+| Resource binding       | Which exact artifact is involved?  | provider, opaque reference, native revision  |
+| Invocation context     | How may this call run?             | effect mode, host-owned trigger and executor |
+| Derived implementation | How can the runtime perform it?    | installed skills, tools, provider adapters   |
+
+These layers are related but are not peer command axes. In particular, users request
+work and semantic concerns; the runtime derives implementation capabilities and
+reports its choices.
+
+## Result boundary
+
+Create, review, revise, decide, execute, validate, and abandon return a structured
+operation-result envelope inline. They never persist their domain result.
+
+Publish is the only core operation that writes a domain result to an external
+destination. A host may separately checkpoint workflow administration state when its
+policy authorizes that infrastructure effect; a checkpoint is not publication and
+must appear in the result's observed effects.
+
+This separation makes authorization, retry, and auditing visible:
+
+```text
+review -> inline result -> publish
+execute -> inline result -> validate -> inline result -> publish
+```
+
+## Commands
+
+The eight core operations are siblings. They can stand alone, repeat, run in
+parallel, or compose in any order the work requires.
+
+| Command                            | Operation                                                |
+| ---------------------------------- | -------------------------------------------------------- |
+| [`create`](commands/create.md)     | Produce a new inline result without changing its source. |
+| [`review`](commands/review.md)     | Return evidence-linked findings about an exact subject.  |
+| [`revise`](commands/revise.md)     | Return a traceable successor from explicit feedback.     |
+| [`decide`](commands/decide.md)     | Record a descriptive outcome without granting authority. |
+| [`execute`](commands/execute.md)   | Perform bounded effects under an explicit effect mode.   |
+| [`validate`](commands/validate.md) | Return one evidence-backed result per binding criterion. |
+| [`publish`](commands/publish.md)   | Persist an exact result to one explicit destination.     |
+| [`abandon`](commands/abandon.md)   | Return a reason, partial state, and retry boundary.      |
+
+Workspace operations are explicit primitives outside the core model:
+
+| Command                                              | Exclusive responsibility                    |
+| ---------------------------------------------------- | ------------------------------------------- |
+| [`workspace-create`](commands/workspace-create.md)   | Create named workspace resources.           |
+| [`workspace-merge`](commands/workspace-merge.md)     | Validate and integrate without removal.     |
+| [`workspace-abandon`](commands/workspace-abandon.md) | Record abandonment without mutation.        |
+| [`workspace-cleanup`](commands/workspace-cleanup.md) | Remove exact previewed workspace resources. |
+
+## Simple and advanced requests
+
+Simple calls use a subject plus subject-specific shorthands:
+
+```text
+/xonovex-workflow:review owner/repository#42 \
+  --subject-provider github \
+  --subject-revision 7f4c2d1 \
+  --perspective compatibility \
+  --perspective security
+```
+
+When subject, evidence, policy, and destination use different providers, use
+`--request <file>`. The request binds every named resource independently. A binding
+keeps its provider-native reference opaque and carries its own revision and semantic
+kind.
+
+Do not flatten a multi-provider request into one global provider or revision. See
+[Provider-native resource bindings](docs/references.md).
+
+## Perspectives, roles, and criteria
+
+Perspectives are repeatable semantic lenses. They add questions, evidence needs, and
+advisory criteria without changing the operation or granting authority.
+
+Role lenses are optional conveniences that resolve into suggested perspectives,
+criteria, evidence, and communication depth. They never identify the executor,
+authorize an effect, claim ownership, or prescribe a lifecycle. See
+[Role lenses](docs/role-lenses.md).
+
+Criteria carry provenance and status:
+
+- explicit caller and authoritative artifact or policy criteria can be binding;
+- method, perspective, and model suggestions are advisory until accepted;
+- every derived criterion records its source and reason;
+- validation blocks when it cannot resolve any binding criterion.
+
+Constraint resolution defaults to `assisted`. `strict` accepts only explicit or
+authoritative constraints. `automatic` may apply high-confidence advisory checks but
+can never invent a binding merge, release, or publication gate.
+
+## Effects and authority
+
+| Command           | Effect modes            | Default       |
+| ----------------- | ----------------------- | ------------- |
+| execute           | inspect, preview, apply | inspect       |
+| publish           | preview, apply          | preview       |
+| workspace-create  | preview, apply          | preview       |
+| workspace-merge   | preview, apply          | preview       |
+| workspace-cleanup | preview, apply          | preview       |
+| all others        | no external effect      | inline result |
+
+The runtime or provider enforces authentication, authorization, approvals,
+idempotency, concurrency, retry limits, and budgets. A skill explains procedure but
+cannot grant those powers. `decide`, `review`, and `validate` are always descriptive.
+
+## Durable continuation
+
+Chat history is not workflow storage. Continue cross-session work from an exact
+provider-native work record and revision. The work record retains requests, result
+envelopes, criteria, selected skills and versions, effects, unresolved questions,
+child work, and retry boundaries.
+
+Same-conversation shorthand may refer to the immediately preceding result. A later
+session must supply the persisted native reference. The workflow skill owns the
+request, result, and work-record schemas.
+
+## Migration
+
+Version 1 of the composition contract replaces ambiguous global flags and overlapping
+effects without compatibility aliases. See [Contract migration](docs/migration.md).
 
 ## Guides
 
-- [Role lenses](docs/role-lenses.md) show illustrative compositions for PM/PO, UX,
-  developer, QA, and developer-reviewer perspectives.
-- [Provider-native references](docs/references.md) explain how subjects, revisions,
-  and result destinations are resolved without a universal identifier layer.
-- [Invocation and execution](docs/invocation.md) separates how a call starts from
-  who or what executes it.
-- [Operation model](../../diagram/diagram-agent-workflow/operation-model.png) shows
-  the operations, selection axes, invocation inputs, and results without prescribing
-  a stage order.
-
-## Operations
-
-The eight core operations are siblings. Each call performs exactly the operation
-named by its command; callers compose calls only when their work needs more than one.
-
-| Command                            | Operation                                                                          |
-| ---------------------------------- | ---------------------------------------------------------------------------------- |
-| [`create`](commands/create.md)     | Produce a new result without changing the subject.                                 |
-| [`review`](commands/review.md)     | Evaluate an exact subject against explicit criteria without changing it.           |
-| [`revise`](commands/revise.md)     | Produce a traceable new revision from explicit feedback.                           |
-| [`decide`](commands/decide.md)     | Record a descriptive outcome and rationale without granting authority.             |
-| [`execute`](commands/execute.md)   | Carry out one bounded subject and report the observable result.                    |
-| [`validate`](commands/validate.md) | Check an exact subject against explicit criteria and return evidence.              |
-| [`publish`](commands/publish.md)   | Publish an exact subject to an explicit destination and return its native locator. |
-| [`abandon`](commands/abandon.md)   | Stop work while preserving the reason, partial result, and retry boundary.         |
-
-The four workspace utilities manage explicitly selected workspaces. They sit outside
-the operation model: no core operation implicitly creates, merges, abandons, or cleans
-a workspace.
-
-| Command                                              | Utility                                                                 |
-| ---------------------------------------------------- | ----------------------------------------------------------------------- |
-| [`workspace-create`](commands/workspace-create.md)   | Create one workspace from an exact source.                              |
-| [`workspace-merge`](commands/workspace-merge.md)     | Validate and merge one workspace into one destination.                  |
-| [`workspace-abandon`](commands/workspace-abandon.md) | Preserve the reason and recoverable state when abandoning a workspace.  |
-| [`workspace-cleanup`](commands/workspace-cleanup.md) | Preview and remove only explicitly selected stale or merged workspaces. |
-
-## Independent dimensions
-
-Each dimension answers a separate question. Supplying one must not silently select a
-value for another.
-
-| Dimension        | Question it answers                                                       | Contract                                                                        |
-| ---------------- | ------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
-| Operation        | What should happen?                                                       | One of the eight command verbs.                                                 |
-| Kind             | What kind of subject or result is involved?                               | An open domain selection, inferred only when unambiguous.                       |
-| Perspective      | From which evidence or stakeholder lens should the subject be considered? | Changes emphasis, not command semantics.                                        |
-| Method           | Which procedure should guide the operation?                               | Selects a method capability when one is requested.                              |
-| Executor         | Who or what performs the call?                                            | A human, deterministic script, LLM, or agent; it does not change the operation. |
-| Agent capability | Which installed skill, tool, or adapter is needed?                        | Loaded only when selected or unambiguous.                                       |
-| Trigger          | What initiated the call?                                                  | Manual use, a harness hook, CI/CD, a webhook, or a scheduler.                   |
-| Provider         | Which native system resolves or persists the subject or result?           | Owns authentication, locator interpretation, revisions, and effects.            |
-| Reference        | Where is the provider-native subject, evidence, or destination?           | Remains opaque to the command.                                                  |
-
-The common arguments also keep criteria, supporting references, source revisions, and
-result destinations explicit. Refer to each command file for its required arguments
-and side-effect boundary.
-
-## Capability selection
-
-Commands always load the required `workflow-guide` operation, then load only the
-additional capabilities needed by the selected kind, perspective, method, or
-provider. A selected capability must be installed and available at execution time.
-If it is missing, the call stops and identifies the missing capability. It does not
-substitute another capability, invent an umbrella domain, method, or provider
-capability, or silently fall back to a local file or provider.
-
-## Composition examples
-
-These are examples, not a required workflow:
-
-```text
-create -> review -> revise
-review -> publish
-execute -> validate
-create -> decide
-```
-
-Any operation may be called alone. Repeated operations and different orderings are
-valid when the subject and selected method require them.
+- [Provider-native resource bindings](docs/references.md)
+- [Invocation, effects, and execution](docs/invocation.md)
+- [Role lenses](docs/role-lenses.md)
+- [Design handout and decision history](docs/workflow-and-skill-composition-handout.md)
+- [Operation model](../../diagram/diagram-agent-workflow/operation-model.png)
 
 ## Installation
 
@@ -105,6 +155,5 @@ codex plugin marketplace add xonovex/platform
 codex plugin add xonovex-skill-workflow@xonovex-marketplace
 ```
 
-Codex consumes the workflow skill directly. Invoke `$workflow-guide` and name the
-operation plus its arguments. The `/xonovex-workflow:*` command namespace is a
-Claude Code surface.
+Invoke `$workflow-guide` in Codex and name the operation plus its request. The
+`/xonovex-workflow:*` namespace is the Claude Code surface.

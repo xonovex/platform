@@ -17,6 +17,24 @@ tasks:
       - "*.config.*"
       - package.json
     outputs: []
+  command-validate:
+    command:
+      - npx
+      - moon-command-validate
+      - .
+    deps:
+      - target: ~:build
+        optional: true
+      - script-moon-command-validate:install
+    inputs:
+      - commands/*.md
+      - docs/**/*.md
+      - README.md
+      - package.json
+      - .claude-plugin/plugin.json
+      - /packages/skill/*/*/SKILL.md
+    options:
+      cache: false
   format:
     command: noop
     deps: [command-format]
@@ -32,7 +50,7 @@ tasks:
       mergeDeps: append
   ci-check:
     command: echo 'ci-check complete'
-    deps: [build, format-check]
+    deps: [build, command-validate, format-check]
     options:
       cache: false
 inheritedBy:

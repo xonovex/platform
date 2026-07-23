@@ -2,28 +2,23 @@
 
 ## Goal
 
-Stop using one explicit workspace, record why, and preserve partial work and recovery information before any optional removal.
+Return an inline record explaining why one exact workspace will no longer be used,
+while preserving every workspace resource and recovery locator.
 
 ## Procedure
 
-1. Resolve the exact target, revision, reason, and explicit selections. Infer a provider
-   only when unambiguous and report the inference.
-2. Load the selected workspace and provider capabilities. Name and stop on an
-   unavailable explicit capability.
-3. Inspect unsaved state and report how it can be recovered. Create a snapshot only
-   when explicitly selected.
-4. Produce the abandonment record with reason, partial state, revision, and recovery
-   locator. Persist it only to an explicit destination.
-5. Keep the workspace by default. Remove the workspace or native reference only after
-   exact-scope authorization; never broaden the target.
+- [ ] Resolve the exact workspace, revision, reason, and known partial state.
+- [ ] Inspect unsaved or untracked state without creating a snapshot.
+- [ ] Report recovery references, unknown state, and the safe retry boundary.
+- [ ] Preserve the workspace, branch, reference, and metadata.
+- [ ] Return the abandonment `OperationResult` inline with `effect.mode: inspect`.
 
-Provider-specific snapshot, removal, and reference commands belong to the selected
-capability. This operation owns the abandonment record, recovery boundary, and exact
-authorization for optional removal.
+Workspace abandon records only. It does not snapshot, remove, prune, persist the
+record, or update provider status. Administrative checkpointing remains a
+policy-authorized runtime effect; explicit removal belongs only to Workspace cleanup.
 
 ## Error handling
 
-- Stop on a missing target or reason.
-- Preserve dirty state when removal lacks a recoverable snapshot.
-- Return a preview when exact authorization is absent.
-- Report remaining path, metadata, and reference state after partial removal.
+- Return blocked on a missing target or reason.
+- Mark uninspectable state unknown and preserve it.
+- Never claim recovery is durable when no exact native recovery binding exists.

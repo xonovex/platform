@@ -2,7 +2,7 @@
 
 ## Contents
 
-[Core Workflow](#core-workflow) · [Frontmatter Checks](#frontmatter-checks) · [Body Checks](#body-checks) · [Reference Checks](#reference-checks) · [Content Quality Checks](#content-quality-checks) · [Structural-Pattern Hints](#structural-pattern-hints-soft-signals) · [Harness Neutrality Checks](#harness-neutrality-checks) · [Output](#output) · [Error Handling](#error-handling) · [Safety](#safety)
+[Core Workflow](#core-workflow) · [Frontmatter Checks](#frontmatter-checks) · [Body Checks](#body-checks) · [Reference Checks](#reference-checks) · [Content Quality Checks](#content-quality-checks) · [Structural-Pattern Hints](#structural-pattern-hints-soft-signals) · [Harness Neutrality Checks](#harness-neutrality-checks) · [Composition Catalog Checks](#composition-catalog-checks) · [Output](#output) · [Error Handling](#error-handling) · [Safety](#safety)
 
 Read-only audit of a SKILL.md against the Agent Skills spec, project conventions, and authoring best practices. Reports pass/fail per check with line numbers.
 
@@ -14,8 +14,9 @@ The catalog validator runs as `moon-skill-validate --strict <skill-dir>` and exi
 2. Resolve target: SKILL.md path or skill directory
 3. Parse frontmatter (YAML) and body separately
 4. Run all checks (frontmatter, body, references, content quality, harness neutrality)
-5. Report pass/fail with file:line evidence and remediation hints
-6. Read-only — never modify files
+5. When repository context is available, validate paired manifests, exact dependencies, and the composition catalog
+6. Report pass/fail with file:line evidence and remediation hints
+7. Read-only — never modify files
 
 ## Frontmatter Checks
 
@@ -64,6 +65,19 @@ These patterns are advisory during local exploration and fail the repository's s
 - No vendor-prefixed frontmatter keys
 - No vendor-specific instruction filenames — use `AGENTS.md` (the open standard)
 
+## Composition Catalog Checks
+
+The workspace-level composition check keeps structured metadata outside Agent Skill frontmatter and vendor manifests:
+
+- Every installed guide appears exactly once, alphabetically, with one lifecycle and one primary functional role.
+- `mixed`, malformed provision identifiers, invalid semantic versions/ranges, and duplicate local provisions/requirements fail.
+- Required semantic requirements resolve to exactly one compatible installed provision; missing, incompatible, or ambiguous resolution fails.
+- Preferred resolution remains visible but does not fail solely because a provider is unavailable.
+- Deterministically selected required semantic dependencies are acyclic.
+- Exact manifest dependencies remain paired, resolvable, named in guidance, and acyclic independently of semantic requirements.
+- Selection records the catalog contract/digest, guide/plugin identities, exact implementation version, provision compatibility, reason, and `SOURCES.md` provenance path.
+- The catalog snapshot packaged with the workflow skill is byte-identical to the canonical repository catalog, so installed selection never depends on repository-root access.
+
 ## Output
 
 ```
@@ -77,6 +91,7 @@ Validation: <skills-dir>/{skill-name}/SKILL.md
   - SKILL.md:58 → references/old-name.md (file not found)
 [WARN] references: 3 links lack load-when triggers
   - SKILL.md:42, SKILL.md:51, SKILL.md:60
+[PASS] composition catalog: one classification and compatible installed provisions
 [FAIL] harness neutrality: 1 vendor-specific reference
   - SKILL.md:30 → proprietary tool name detected
 

@@ -1,35 +1,37 @@
 ---
-description: Create a new result from an inline or provider-referenced subject without changing the source
+description: Create one new inline result without changing or publishing the source
 allowed-tools:
   - Read
-  - Write
-  - Bash
   - Glob
   - Grep
   - AskUserQuestion
   - Skill
 argument-hint: >-
-  <subject> [--reference <reference>...] [--revision <revision>]
-  [--kind <selection>] [--perspective <selection>] [--criteria <criteria>...]
-  [--method <selection>] [--capability <selection>...] [--provider <selection>]
-  [--result <destination-reference>] [--dry-run]
+  [subject] [--request <file>] [--subject-provider <provider>]
+  [--subject-revision <revision>] [--subject-kind <kind>]
+  [--perspective <perspective>...] [--role <lens>...]
+  [--criterion <criterion>...] [--method <method>]
+  [--resolution <strict|assisted|automatic>]
 ---
 
 # /xonovex-workflow:create — Create
 
 ## Arguments
 
-- `subject` (required): Inline source content or one opaque provider-native reference.
-- `--reference` (repeatable): Supporting inline content or opaque references.
-- `--revision` (optional): Exact native revision of a referenced subject.
-- `--kind`, `--perspective`, `--method`, `--capability`, `--provider`
-  (optional): Independent, open selections.
-- `--criteria` (repeatable, optional): Explicit properties the new result must satisfy.
-- `--result` (optional): Explicit provider-native destination reference.
-- `--dry-run` (optional): Preview any persistence or other side effect.
+- `subject` (required unless `--request` supplies it): Inline source content or one
+  provider-native reference.
+- `--request` (optional): Structured request file for named, independently bound
+  inputs. Do not combine it with the subject or selection shorthands.
+- `--subject-provider`, `--subject-revision`, `--subject-kind` (optional): Provider,
+  exact native revision, and semantic kind for the simple subject shorthand.
+- `--perspective`, `--role`, `--criterion` (repeatable, optional): Explicit lenses,
+  role conveniences, and criteria. Roles may only suggest lenses and criteria.
+- `--method` (optional): Requested creation procedure.
+- `--resolution` (optional): Constraint-resolution mode; defaults to `assisted`.
 
 ## Delegation
 
 Load the `workflow-guide` skill (plugin `xonovex-skill-workflow`) and perform its
-**Create** operation with these arguments. The skill is the source of truth for the
-procedure, output, and error handling; do not restate them.
+**Create** operation with these arguments. Return its operation-result envelope
+inline. The skill is the source of truth for the procedure and errors; do not publish
+or persist the result from this command.

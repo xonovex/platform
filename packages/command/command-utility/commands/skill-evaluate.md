@@ -8,7 +8,7 @@ allowed-tools:
   - Bash
   - TodoWrite
   - Skill
-argument-hint: "[skill-file] [--count <n>]"
+argument-hint: "<skill-file> [--count <n>]"
 ---
 
 # /xonovex-utility:skill-evaluate — Seed a skill's output-eval file

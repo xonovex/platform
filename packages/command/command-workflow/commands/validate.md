@@ -1,35 +1,38 @@
 ---
-description: Validate an exact subject against explicit criteria and return evidence without changing the subject
+description: Validate an exact subject against provenance-aware criteria and return evidence inline
 allowed-tools:
   - Read
-  - Write
-  - Bash
   - Glob
   - Grep
   - AskUserQuestion
   - Skill
 argument-hint: >-
-  <subject> --criteria <criteria>... [--reference <reference>...]
-  [--revision <revision>] [--kind <selection>] [--perspective <selection>]
-  [--method <selection>] [--capability <selection>...]
-  [--provider <selection>] [--result <destination-reference>]
+  [subject] [--request <file>] [--subject-provider <provider>]
+  [--subject-revision <revision>] [--subject-kind <kind>]
+  [--perspective <perspective>...] [--role <lens>...]
+  [--criterion <criterion>...] [--method <method>]
+  [--resolution <strict|assisted|automatic>]
 ---
 
 # /xonovex-workflow:validate — Validate
 
 ## Arguments
 
-- `subject` (required): Inline content or one opaque provider-native reference.
-- `--criteria` (repeatable, required): Inline criterion or opaque criteria reference.
-- `--reference` (repeatable): Supporting evidence or opaque references.
-- `--revision` (optional): Exact native revision; required when provider context does
-  not otherwise pin a referenced subject.
-- `--kind`, `--perspective`, `--method`, `--capability`, `--provider`
-  (optional): Independent, open selections.
-- `--result` (optional): Explicit provider-native evidence destination.
+- `subject` (required unless `--request` supplies it): Inline content or one
+  provider-native reference.
+- `--request` (optional): Structured request file for named subject, evidence, and
+  criteria bindings. Do not combine it with the shorthands.
+- `--subject-provider`, `--subject-revision`, `--subject-kind` (optional): Provider,
+  exact native revision, and semantic kind for the simple subject shorthand.
+- `--perspective`, `--role`, `--criterion` (repeatable, optional): Explicit lenses,
+  role conveniences, and criteria. Validation blocks when no binding criterion can
+  be resolved.
+- `--method` (optional): Requested validation procedure.
+- `--resolution` (optional): Constraint-resolution mode; defaults to `assisted`.
 
 ## Delegation
 
 Load the `workflow-guide` skill (plugin `xonovex-skill-workflow`) and perform its
-**Validate** operation with these arguments. The skill is the source of truth for the
-procedure, output, and error handling; do not restate them.
+**Validate** operation with these arguments. Return one criterion result and evidence
+record per binding criterion in the inline operation-result envelope. The skill is
+the source of truth; do not revise, accept, publish, or mutate the subject.

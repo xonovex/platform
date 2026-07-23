@@ -1,0 +1,56 @@
+{
+  "contractVersion": "xonovex.workflow.request/v1",
+  "operation": "review",
+  "subject": {
+    "kind": "pull-request",
+    "intent": "read",
+    "locator": {
+      "provider": "github",
+      "reference": "owner/repository pull request #42",
+      "revision": "head-7f31"
+    }
+  },
+  "inputs": {
+    "evidence": [
+      {
+        "kind": "trace-set",
+        "intent": "read",
+        "locator": {
+          "provider": "datadog",
+          "reference": "trace query native reference",
+          "revision": "immutable-event-set-19"
+        }
+      },
+      {
+        "kind": "story",
+        "intent": "read",
+        "locator": {
+          "provider": "jira",
+          "reference": "PROJECT-123",
+          "revision": "17"
+        }
+      }
+    ]
+  },
+  "selection": {
+    "method": "pull-request-review",
+    "perspectives": ["compatibility", "security", "reliability"],
+    "criteria": [
+      {
+        "id": "story-acceptance",
+        "statement": "The exact story acceptance criteria are satisfied.",
+        "binding": "binding",
+        "sourceInput": "evidence"
+      }
+    ],
+    "roleLenses": [],
+    "resolutionMode": "assisted",
+    "acceptedSuggestions": []
+  },
+  "effect": {
+    "mode": "inspect"
+  },
+  "output": {
+    "kind": "review-report"
+  }
+}

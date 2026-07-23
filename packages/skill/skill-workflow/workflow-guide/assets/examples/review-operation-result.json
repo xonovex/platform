@@ -1,0 +1,225 @@
+{
+  "contractVersion": "xonovex.workflow.result/v1",
+  "operation": "review",
+  "status": "completed",
+  "summary": "Reviewed the exact pull-request revision using the bound story and trace evidence.",
+  "request": {
+    "contractVersion": "xonovex.workflow.request/v1",
+    "operation": "review",
+    "subject": {
+      "kind": "pull-request",
+      "intent": "read",
+      "locator": {
+        "provider": "github",
+        "reference": "owner/repository pull request #42",
+        "revision": "head-7f31"
+      }
+    },
+    "inputs": {
+      "evidence": [
+        {
+          "kind": "trace-set",
+          "intent": "read",
+          "locator": {
+            "provider": "datadog",
+            "reference": "trace query native reference",
+            "revision": "immutable-event-set-19"
+          }
+        },
+        {
+          "kind": "story",
+          "intent": "read",
+          "locator": {
+            "provider": "jira",
+            "reference": "PROJECT-123",
+            "revision": "17"
+          }
+        }
+      ]
+    },
+    "selection": {
+      "method": "pull-request-review",
+      "perspectives": ["compatibility", "security", "reliability"],
+      "criteria": [
+        {
+          "id": "story-acceptance",
+          "statement": "The exact story acceptance criteria are satisfied.",
+          "binding": "binding",
+          "sourceInput": "evidence"
+        }
+      ],
+      "roleLenses": [],
+      "resolutionMode": "assisted",
+      "acceptedSuggestions": []
+    },
+    "effect": {
+      "mode": "inspect"
+    },
+    "output": {
+      "kind": "review-report"
+    }
+  },
+  "resolution": {
+    "mode": "assisted",
+    "method": {
+      "value": "pull-request-review",
+      "provenance": {
+        "source": "explicit",
+        "reason": "The request selected this method."
+      }
+    },
+    "perspectives": [
+      {
+        "value": "compatibility",
+        "provenance": {
+          "source": "explicit",
+          "reason": "The request selected this perspective."
+        },
+        "questions": ["Does the change preserve the public contract?"],
+        "criterionIds": [],
+        "evidenceRequirements": ["Compare the exact base and head contracts."]
+      },
+      {
+        "value": "security",
+        "provenance": {
+          "source": "explicit",
+          "reason": "The request selected this perspective."
+        },
+        "questions": ["Does the change alter an authorization boundary?"],
+        "criterionIds": [],
+        "evidenceRequirements": ["Inspect authorization-path changes."]
+      },
+      {
+        "value": "reliability",
+        "provenance": {
+          "source": "explicit",
+          "reason": "The request selected this perspective."
+        },
+        "questions": ["Does trace evidence show a new failure mode?"],
+        "criterionIds": [],
+        "evidenceRequirements": ["Use the exact trace event set."]
+      }
+    ],
+    "criteria": [
+      {
+        "id": "story-acceptance",
+        "statement": "The exact story acceptance criteria are satisfied.",
+        "binding": "binding",
+        "provenance": {
+          "source": "inherited",
+          "reason": "The criterion came from the exact authoritative story revision.",
+          "sourceBinding": "evidence"
+        },
+        "evaluation": "pass"
+      },
+      {
+        "id": "rollback-evidence",
+        "statement": "A rollback rehearsal is documented.",
+        "binding": "advisory",
+        "provenance": {
+          "source": "inferred",
+          "reason": "The reliability perspective suggested a reversible-change check.",
+          "confidence": 0.86
+        },
+        "evaluation": "blocked"
+      }
+    ],
+    "proposals": [
+      {
+        "id": "proposal-rollback-evidence",
+        "kind": "criterion",
+        "value": "A rollback rehearsal is documented.",
+        "status": "pending",
+        "provenance": {
+          "source": "inferred",
+          "reason": "The reliability perspective suggested it as advisory."
+        }
+      }
+    ],
+    "skills": [
+      {
+        "guide": "workflow-guide",
+        "plugin": "xonovex-skill-workflow",
+        "implementationVersion": "7.0.0",
+        "packagePath": "packages/skill/skill-workflow",
+        "sourcesPath": "packages/skill/skill-workflow/workflow-guide/SOURCES.md",
+        "provenance": {
+          "kind": "semantic-requirement",
+          "reason": "The request requires a stage-neutral workflow operation contract.",
+          "requestedBy": "operation:review"
+        },
+        "provision": {
+          "id": "procedure:workflow-operation",
+          "version": "1.0.0"
+        },
+        "requestedRange": "^1.0.0",
+        "catalogContractVersion": "1.0.0",
+        "catalogDigest": "3f2ff701ce0f8e56e098ed4f4ad16eb2e0291b3339d6635db98fcbdb0b74a2a4",
+        "reason": "Owns the workflow operation contract.",
+        "required": true,
+        "status": "selected"
+      }
+    ],
+    "capabilities": [
+      {
+        "id": "github.pull-request.read",
+        "version": "provider-native",
+        "source": "provider",
+        "reason": "Reads the exact pull-request revision.",
+        "required": true,
+        "status": "selected"
+      },
+      {
+        "id": "datadog.trace.read",
+        "version": "provider-native",
+        "source": "provider",
+        "reason": "Reads the bound trace event set.",
+        "required": true,
+        "status": "selected"
+      }
+    ],
+    "conflicts": []
+  },
+  "output": {
+    "kind": "review-report",
+    "inline": {
+      "findings": [],
+      "advisories": [
+        "Rollback rehearsal evidence was unavailable; this does not fail the binding acceptance gate."
+      ]
+    }
+  },
+  "evidence": [
+    {
+      "id": "evidence-story-acceptance",
+      "criterionId": "story-acceptance",
+      "observation": "The reviewed revision covers the bound story acceptance criteria.",
+      "freshness": "Story revision 17 and pull-request head head-7f31."
+    }
+  ],
+  "effects": [],
+  "unresolved": [],
+  "uncertainty": [
+    {
+      "statement": "Rollback rehearsal evidence was not available.",
+      "impact": "The advisory rollback check remains blocked."
+    }
+  ],
+  "retry": {
+    "safe": true,
+    "boundary": "The complete read-only review may be rerun against the same exact revisions.",
+    "reconcileBeforeRetry": false
+  },
+  "concurrency": [
+    {
+      "binding": "subject",
+      "observedRevision": "head-7f31",
+      "status": "unchanged"
+    },
+    {
+      "binding": "inputs.evidence[1]",
+      "observedRevision": "17",
+      "status": "unchanged"
+    }
+  ]
+}

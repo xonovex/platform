@@ -3,60 +3,64 @@ digraph OperationModel {
     bgcolor="white",
     fontname="Arial",
     fontsize=18,
-    label="Composable operation model",
+    label="Composable workflow contract",
     labelloc=t,
     nodesep=0.35,
     pad=0.25,
     ranksep=0.55,
-    splines=ortho
+    splines=polyline
   ];
   node [
     color="#4b5563",
     fillcolor="white",
     fontname="Arial",
-    fontsize=10,
+    fontsize=9,
     shape=box,
     style="rounded,filled"
   ];
   edge [
     color="#6b7280",
     fontname="Arial",
-    fontsize=9
+    fontsize=8
   ];
 
-  subgraph cluster_selection {
+  subgraph cluster_request {
     color="#93c5fd";
     fillcolor="#eff6ff";
-    label="Orthogonal selections";
+    label="Normalized WorkflowRequest";
     style="rounded,filled";
 
-    kind [label="kind\nsubject or result noun"];
-    perspective [label="perspective\nevidence or stakeholder lens"];
-    method [label="method\nselected procedure"];
-    capability [label="agent capability\ninstalled skill, tool, or adapter"];
-    provider [label="provider\nresolves and persists"];
-    reference [label="reference + native revision\nopaque provider locator"];
+    operation_selection [
+      label="operation\none stable verb"
+    ];
+    semantic_selection [
+      label="semantic selection\nsubject/result kind · method\nrepeatable perspectives · criteria"
+    ];
+    resource_bindings [
+      label="per-resource bindings\nnamed slot · provider · opaque reference\nrevision · kind · schema · intent"
+    ];
+    invocation_context [
+      label="invocation context\ntrigger · executor · effect mode\nauthorization-context reference"
+    ];
+    derived_implementation [
+      fillcolor="#ede9fe",
+      label="derived implementation\ncatalog-selected skills · adapters · capabilities\nexact versions + provenance"
+    ];
 
-    {rank=same; kind; perspective; method;}
-    {rank=same; capability; provider; reference;}
+    {rank=same; operation_selection; semantic_selection;}
+    {rank=same; resource_bindings; invocation_context;}
   }
 
-  subgraph cluster_invocation {
-    color="#c4b5fd";
-    fillcolor="#f5f3ff";
-    label="Independent invocation inputs";
-    style="rounded,filled";
-
-    trigger [label="trigger\nmanual · harness hook · CI/CD\nwebhook · scheduler"];
-    executor [label="executor\nhuman · deterministic script\nLLM · agent"];
-    metadata [label="optional executor metadata\nprovider or harness owned"];
-
-    {rank=same; trigger; executor; metadata;}
-  }
-
-  contract [
+  policy [
     fillcolor="#fef3c7",
-    label="One command call\nselect one operation; keep every other axis independent",
+    label="deterministic runtime policy\nauthority · approvals · idempotency · retries\nbudgets · audit · transition enforcement",
+    penwidth=2,
+    shape=component
+  ];
+
+  request_contract [
+    fillcolor="#dbeafe",
+    label="validated request\nlayers stay distinct",
     penwidth=2,
     shape=component
   ];
@@ -64,22 +68,22 @@ digraph OperationModel {
   subgraph cluster_operations {
     color="#86efac";
     fillcolor="#f0fdf4";
-    label="Eight sibling operations — compose as needed; no required order";
+    label="Eight sibling operations — omit, repeat, parallelize, or compose";
     style="rounded,filled";
 
     operation [
       fillcolor="#dcfce7",
-      label="operation\nsame semantics for every trigger and executor",
+      label="selected operation",
       shape=ellipse
     ];
-    create [label="create"];
-    review [label="review"];
-    revise [label="revise"];
-    decide [label="decide"];
-    execute [label="execute"];
-    validate [label="validate"];
-    publish [label="publish"];
-    abandon [label="abandon"];
+    create [label="create\ninline result"];
+    review [label="review\ninline judgment"];
+    revise [label="revise\ninline successor"];
+    decide [label="decide\ninline outcome"];
+    execute [label="execute\ninspect · preview · apply"];
+    validate [label="validate\ninline evidence"];
+    publish [fillcolor="#fef3c7", label="publish\npreview · apply"];
+    abandon [label="abandon\ninline record"];
 
     {rank=same; create; review; revise; decide;}
     {rank=same; execute; validate; publish; abandon;}
@@ -94,43 +98,80 @@ digraph OperationModel {
     operation -> abandon [arrowhead=none];
   }
 
-  result [
+  operation_result [
     fillcolor="#e0f2fe",
-    label="result\ninline, or provider-native locator + revision\nwhen an explicit destination is supplied",
+    label="inline OperationResult\nnormalized request · resolution · output · evidence\neffects · uncertainty · retry · concurrency",
     shape=folder
+  ];
+
+  domain_destination [
+    fillcolor="#ffedd5",
+    label="provider-owned domain result\nonly Publish writes",
+    shape=cylinder
+  ];
+
+  bounded_effects [
+    fillcolor="#fee2e2",
+    label="bounded subject effects\nExecute apply only",
+    shape=box3d
   ];
 
   subgraph cluster_workspace {
     color="#d1d5db";
     fillcolor="#f9fafb";
-    label="Workspace utilities — explicit and outside operation semantics";
+    label="Workspace transactions — exclusive effect boundaries";
     style="dashed,filled";
 
-    workspace_create [label="workspace-create"];
-    workspace_merge [label="workspace-merge"];
-    workspace_abandon [label="workspace-abandon"];
-    workspace_cleanup [label="workspace-cleanup"];
+    workspace_create [label="workspace-create\ncreates only"];
+    workspace_merge [label="workspace-merge\nintegrates only"];
+    workspace_abandon [label="workspace-abandon\nrecords inline only"];
+    workspace_cleanup [label="workspace-cleanup\nremoves only"];
 
     {rank=same; workspace_create; workspace_merge; workspace_abandon; workspace_cleanup;}
   }
 
-  kind -> contract;
-  perspective -> contract;
-  method -> contract;
-  capability -> contract;
-  provider -> contract;
-  reference -> contract;
-  trigger -> contract;
-  executor -> contract;
-  metadata -> contract;
-  contract -> operation;
-  operation -> result;
+  workspace_effects [
+    fillcolor="#fee2e2",
+    label="workspace provider effects\npreview/apply for create · merge · cleanup",
+    shape=box3d
+  ];
+
+  work_record [
+    fillcolor="#f3e8ff",
+    label="provider-owned WorkRecord\npolicy-authorized administrative checkpoint\nnot domain-result publication",
+    shape=folder
+  ];
+
+  operation_selection -> request_contract;
+  semantic_selection -> request_contract;
+  resource_bindings -> request_contract;
+  invocation_context -> request_contract;
+  derived_implementation -> request_contract;
+  policy -> derived_implementation [label="resolves"];
+  policy -> request_contract [label="constrains"];
+  request_contract -> operation;
+  operation -> operation_result;
+  workspace_create -> operation_result;
+  workspace_merge -> operation_result;
+  workspace_abandon -> operation_result;
+  workspace_cleanup -> operation_result;
+
+  publish -> domain_destination [label="authorized write"];
+  execute -> bounded_effects [label="apply"];
+  workspace_create -> workspace_effects [label="create"];
+  workspace_merge -> workspace_effects [label="integrate"];
+  workspace_cleanup -> workspace_effects [label="remove"];
+  policy -> domain_destination [label="authorizes"];
+  policy -> bounded_effects [label="authorizes"];
+  policy -> workspace_effects [label="authorizes"];
+  policy -> work_record [label="checkpoints", style=dashed];
+  operation_result -> work_record [label="administrative reference", style=dashed];
 
   legend [
     color="#f59e0b",
     fillcolor="#fffbeb",
-    label="Lines show inputs and possible composition, not gates, permissions, or lifecycle stages.",
+    label="Every operation returns inline. Publish alone persists a domain result.\nEffect intent never grants authority.",
     shape=note
   ];
-  workspace_cleanup -> legend [style=invis];
+  work_record -> legend [style=invis];
 }

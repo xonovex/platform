@@ -1,36 +1,37 @@
 ---
-description: Review an exact subject against explicit criteria without changing it
+description: Review an exact subject through repeatable perspectives and return inline findings
 allowed-tools:
   - Read
-  - Write
-  - Bash
   - Glob
   - Grep
   - AskUserQuestion
   - Skill
 argument-hint: >-
-  <subject> [--reference <reference>...] [--revision <revision>]
-  [--kind <selection>] [--perspective <selection>] [--criteria <criteria>...]
-  [--method <selection>] [--capability <selection>...] [--provider <selection>]
-  [--result <destination-reference>]
+  [subject] [--request <file>] [--subject-provider <provider>]
+  [--subject-revision <revision>] [--subject-kind <kind>]
+  [--perspective <perspective>...] [--role <lens>...]
+  [--criterion <criterion>...] [--method <method>]
+  [--resolution <strict|assisted|automatic>]
 ---
 
 # /xonovex-workflow:review — Review
 
 ## Arguments
 
-- `subject` (required): Inline content or one opaque provider-native reference.
-- `--reference` (repeatable): Supporting evidence or opaque references.
-- `--revision` (optional): Exact native revision; required when provider context does
-  not otherwise pin a referenced subject.
-- `--kind`, `--perspective`, `--method`, `--capability`, `--provider`
-  (optional): Independent, open selections.
-- `--criteria` (repeatable, conditionally required): Explicit review criteria. A
-  selected method may supply them only when that contract is unambiguous.
-- `--result` (optional): Explicit provider-native destination reference.
+- `subject` (required unless `--request` supplies it): Inline content or one
+  provider-native reference.
+- `--request` (optional): Structured request file for named subject, evidence, and
+  other provider-bound inputs. Do not combine it with the shorthands.
+- `--subject-provider`, `--subject-revision`, `--subject-kind` (optional): Provider,
+  exact native revision, and semantic kind for the simple subject shorthand.
+- `--perspective`, `--role`, `--criterion` (repeatable, optional): Explicit lenses,
+  role conveniences, and review criteria. Roles cannot grant authority.
+- `--method` (optional): Requested review procedure.
+- `--resolution` (optional): Constraint-resolution mode; defaults to `assisted`.
 
 ## Delegation
 
 Load the `workflow-guide` skill (plugin `xonovex-skill-workflow`) and perform its
-**Review** operation with these arguments. The skill is the source of truth for the
-procedure, output, and error handling; do not restate them.
+**Review** operation with these arguments. Return evidence-linked findings and the
+operation-result envelope inline. The skill is the source of truth; do not modify the
+subject or persist the review from this command.

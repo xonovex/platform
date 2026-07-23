@@ -1,57 +1,129 @@
-# Provider-Native References
+# Provider-Native Resource Bindings
 
-A reference is an opaque locator interpreted by a selected provider. A caller may
-also supply an optional provider-native revision, such as a commit, branch, item
-version, or immutable digest. The command passes both values to the provider instead
-of parsing them into a Xonovex-specific identifier.
+A resource binding says which provider owns one named resource, gives that provider's
+opaque reference, and pins its native revision when the resource is mutable.
+
+Provider, reference, revision, and kind belong to the binding. They are not global
+workflow settings.
+
+## Simple subject shorthand
+
+A simple command can bind one subject directly:
+
+```text
+/xonovex-workflow:review owner/repository#42 \
+  --subject-provider github \
+  --subject-revision 7f4c2d1 \
+  --subject-kind pull-request
+```
+
+The command does not parse `owner/repository#42` into a universal Xonovex identifier.
+The GitHub provider interprets it. Command normalization wraps the shorthand in a
+read-intent locator, supplies the operation's default output kind, creates empty
+selection collections with `assisted` resolution, and sets the operation's default
+effect mode.
+
+## Named bindings
+
+Use `--request <file>` when a call has multiple resources, providers, revisions, or
+slots:
+
+```json
+{
+  "contractVersion": "xonovex.workflow.request/v1",
+  "operation": "review",
+  "subject": {
+    "kind": "pull-request",
+    "intent": "read",
+    "locator": {
+      "provider": "github",
+      "reference": "owner/repository pull request #42",
+      "revision": "head-7f31"
+    }
+  },
+  "inputs": {
+    "evidence": [
+      {
+        "kind": "trace-set",
+        "intent": "read",
+        "locator": {
+          "provider": "datadog",
+          "reference": "trace query native reference",
+          "revision": "immutable-event-set-19"
+        }
+      },
+      {
+        "kind": "story",
+        "intent": "read",
+        "locator": {
+          "provider": "jira",
+          "reference": "PROJECT-123",
+          "revision": "17"
+        }
+      }
+    ]
+  },
+  "selection": {
+    "method": "pull-request-review",
+    "perspectives": ["compatibility", "security", "reliability"],
+    "criteria": [
+      {
+        "id": "story-acceptance",
+        "statement": "The exact story acceptance criteria are satisfied.",
+        "binding": "binding",
+        "sourceInput": "evidence"
+      }
+    ],
+    "roleLenses": [],
+    "resolutionMode": "assisted",
+    "acceptedSuggestions": []
+  },
+  "effect": {
+    "mode": "inspect"
+  },
+  "output": {
+    "kind": "review-report"
+  }
+}
+```
+
+This is the packaged
+[multi-provider review fixture](../../../skill/skill-workflow/workflow-guide/assets/examples/multi-provider-review-request.json).
+The structure is validated against the request schema shipped with `workflow-guide`.
+JSON and YAML representations have the same logical fields.
 
 ## Resolution
 
-A command may infer a provider only when the subject or execution context makes one
-choice unambiguous. It reports the inference and its basis. When more than one
-provider could interpret the locator, the caller selects the provider explicitly; the
-command stops rather than guessing.
+- Infer a provider only when one provider is unambiguous; record the inference and its
+  basis.
+- Require an exact native revision before judging or changing a mutable resource.
+- Keep source, evidence, policy, work record, and destination as separate named
+  bindings.
+- Stop rather than interpreting one locator through an arbitrary provider.
+- Never replace an unavailable provider with a local file or another provider.
 
-The selected provider owns:
+The runtime coordinates policy, authority checks, approvals, idempotency, retry
+budgets, and audit. Each selected provider enforces its native authentication,
+authorization, locator and revision semantics, concurrency, relationships, and
+effects.
 
-- locator interpretation and native revision semantics;
-- authentication and authorization at the provider boundary;
-- reading, writing, copying, and idempotency behavior;
-- any native relationship between subjects, evidence, and results.
+## Inline and persisted results
 
-## Results and destinations
+Every operation returns an inline operation-result envelope. A domain result becomes
+provider-persisted only through `publish`, which takes a separate destination binding
+and returns its observed native locator and revision.
 
-Operations return their result inline unless the request explicitly supplies a
-destination reference. A publish or copy operation resolves that destination through
-the selected provider and returns the provider-native locator plus its native revision
-when supported. Inline results require no persistence provider.
+For Publish shorthand, `--destination-revision` normalizes to an update binding with
+that exact expected revision. Omitting it normalizes to a collision-safe create; it
+never means overwrite-whatever-exists.
 
-Source references and result destinations remain distinct. Publishing or copying a
-result does not rewrite the source reference.
-
-## Provider-shaped examples
-
-These examples deliberately retain each provider's shape; they are not normalized:
-
-```text
-local:   plans/example.md
-git:     https://example.com/team/repository.git + commit 4f21b87
-git:     https://example.com/team/repository.git + branch feature/example
-github:  owner/repository pull request #42
-github:  owner/repository issue #17
-tracker: PROJECT-123
-```
-
-The provider decides whether a revision is required and how it is represented. For
-example, Git can resolve a commit or branch, while a tracker adapter can resolve its
-own item key and revision model.
-
-There is no Xonovex ID, central resolver, central reference store, provider-neutral
-reference schema, or silent local fallback. A missing or ambiguous provider remains
-an explicit resolution error.
+A host-owned workflow checkpoint is administrative state, not a domain result
+destination. The host may write it only under explicit runtime policy and must record
+the checkpoint effect.
 
 ## Related guides
 
 - [Command inventory](../README.md)
 - [Role lenses](role-lenses.md)
-- [Invocation and execution](invocation.md)
+- [Invocation, effects, and execution](invocation.md)
+- [Contract migration](migration.md)

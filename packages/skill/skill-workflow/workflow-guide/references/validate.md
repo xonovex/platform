@@ -2,20 +2,25 @@
 
 ## Goal
 
-Evaluate one exact subject against explicit criteria, return reproducible evidence for every criterion, and remain read-only with respect to the subject.
+Return reproducible criterion-by-criterion evidence about one exact subject without
+changing the subject or persisting the evidence result.
 
 ## Procedure
 
-1. Resolve the exact subject, revision, criteria, supporting evidence, and explicit selections.
-2. Load only explicitly selected or unambiguous validation, domain, method, and provider capabilities.
-3. Let the selected provider interpret opaque references and revisions.
-4. Report each criterion as pass, fail, or blocked with reproducible evidence and freshness.
-5. Return evidence inline or persist it only to an explicit destination.
+- [ ] Pin subject, criteria sources, supporting evidence, and revisions.
+- [ ] Resolve criterion provenance and binding status under assisted resolution.
+- [ ] Evaluate every selected criterion as pass, fail, or blocked and record evidence
+      freshness and reproduction information.
+- [ ] Compute the binding validation outcome from binding criteria only; keep advisory
+      outcomes separate.
+- [ ] Return an inline evidence `OperationResult` with no domain persistence effect.
 
-Validation does not revise, accept, publish, or otherwise mutate the subject. Trigger, executor, identity, and maturity do not change its contract.
+Validation does not accept, publish, revise, merge, release, or deploy. An advisory
+failure cannot silently fail a binding gate.
 
 ## Error handling
 
-- Stop on missing criteria or an unpinned mutable subject.
-- Mark an unevaluable criterion blocked and identify the missing evidence.
-- Report ambiguous providers and unavailable explicit capabilities without fallback.
+- Return blocked when no binding criteria can be resolved for a required gate.
+- Mark only an unevaluable criterion blocked and identify missing evidence.
+- Return blocked on an unpinned mutable subject or changed authoritative criteria
+  revision.

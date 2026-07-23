@@ -2,20 +2,25 @@
 
 ## Goal
 
-Resolve one question into a descriptive outcome and rationale while keeping evidence, recommendation, and outcome distinguishable.
+Resolve one question into a descriptive inline outcome and rationale while keeping
+evidence, recommendation, outcome, and operational authority distinct.
 
 ## Procedure
 
-1. Resolve the decision question, evidence, criteria, exact revision, and explicit selections.
-2. Load only selected or unambiguous decision, domain, method, and provider capabilities.
-3. Let the selected provider interpret opaque references and revisions.
-4. Compare evidence against criteria and record the outcome, rationale, alternatives, assumptions, and uncertainty.
-5. Return the decision inline or persist it only to an explicit destination.
+- [ ] Resolve the exact question, options, evidence, criteria, revisions, and
+      perspectives.
+- [ ] Separate binding criteria from advisory considerations.
+- [ ] Compare alternatives and record rationale, assumptions, uncertainty, and
+      dissenting evidence.
+- [ ] Record the descriptive outcome without applying a gate or protected mutation.
+- [ ] Return the inline decision `OperationResult` with no effects.
 
-The result never approves, rejects, authorizes, promotes, or changes a gate. A separate authority capability owns any operational decision or protected mutation.
+Decide never approves, rejects, merges, promotes, releases, deploys, or publishes.
+Deterministic provider and organization policy owns any later protected action.
 
 ## Error handling
 
-- Stop on an unclear decision question or materially missing evidence.
-- Report ambiguous providers and unavailable explicit capabilities without substitution.
-- When authority is requested, return only the descriptive decision and state that the separate authority action was not performed.
+- Return blocked on an unclear question or materially missing binding evidence.
+- Keep a recommendation distinct when no authoritative outcome was supplied.
+- If a protected action is requested, report that it remains a separate authorized
+  operation.

@@ -2,20 +2,23 @@
 
 ## Goal
 
-Stop work on one subject while preserving its reason, partial results, evidence, cleanup state, and retry boundary without deleting or rewriting the subject.
+Stop work on one subject and return an inline abandonment record containing reason,
+partial output, evidence, uncertainty, and retry boundary.
 
 ## Procedure
 
-1. Resolve the exact subject, revision, reason, and explicit selections.
-2. Load only explicitly selected or unambiguous domain, abandonment, cleanup, and provider capabilities.
-3. Let the selected provider interpret opaque references and revisions.
-4. Record the reason, partial result, evidence, cleanup state, and retry boundary. Preserve the source by default.
-5. Return the record inline or persist it only to an explicit destination. Apply cleanup only when explicitly scoped and authorized.
+- [ ] Resolve the exact subject, revision, reason, partial results, and evidence.
+- [ ] Inspect known effects and classify each as applied, failed, skipped, or unknown.
+- [ ] State what is recoverable, what remains unresolved, and whether retry is safe.
+- [ ] Preserve every source and provider resource.
+- [ ] Return the abandonment `OperationResult` inline with `effect.mode: inspect`.
 
-Abandonment is descriptive unless a selected provider performs an explicitly authorized state update.
+Abandon does not persist the record, change provider status, clean resources, or
+authorize compensation. A host may checkpoint the record administratively under
+policy, or the caller may Publish it separately as a domain artifact.
 
 ## Error handling
 
-- Stop on a missing subject or reason.
-- Report ambiguous providers and unavailable explicit capabilities without substitution.
-- Preserve state and return a preview when destructive cleanup lacks exact scope or authorization.
+- Return blocked on a missing subject or reason.
+- Require reconciliation before retry when an earlier write outcome is unknown.
+- Never describe retained or uninspected state as removed.

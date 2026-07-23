@@ -1,0 +1,220 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://xonovex.dev/schemas/workflow-work-record.schema.json",
+  "title": "WorkRecord",
+  "description": "Provider-owned administrative checkpoint for cross-session continuation.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contractVersion",
+    "self",
+    "state",
+    "root",
+    "inputs",
+    "criteria",
+    "skills",
+    "checkpoints",
+    "children",
+    "unresolved",
+    "updatedAt"
+  ],
+  "properties": {
+    "contractVersion": {
+      "const": "xonovex.workflow.work-record/v1"
+    },
+    "self": {
+      "$ref": "workflow-request.schema.json#/$defs/resourceBinding"
+    },
+    "state": {
+      "type": "string",
+      "enum": ["active", "blocked", "abandoned", "completed"]
+    },
+    "root": {
+      "$ref": "workflow-request.schema.json#/$defs/resourceBinding"
+    },
+    "parent": {
+      "$ref": "workflow-request.schema.json#/$defs/resourceBinding"
+    },
+    "inputs": {
+      "type": "object",
+      "propertyNames": {
+        "pattern": "^[a-z][a-z0-9-]*$"
+      },
+      "additionalProperties": {
+        "oneOf": [
+          {
+            "$ref": "workflow-request.schema.json#/$defs/resourceBinding"
+          },
+          {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "$ref": "workflow-request.schema.json#/$defs/resourceBinding"
+            }
+          }
+        ]
+      }
+    },
+    "method": {
+      "$ref": "workflow-result.schema.json#/$defs/selectedValue"
+    },
+    "perspectives": {
+      "type": "array",
+      "items": {
+        "$ref": "workflow-result.schema.json#/$defs/resolvedPerspective"
+      }
+    },
+    "criteria": {
+      "type": "array",
+      "items": {
+        "$ref": "workflow-result.schema.json#/$defs/resolvedCriterion"
+      }
+    },
+    "skills": {
+      "type": "array",
+      "items": {
+        "$ref": "workflow-result.schema.json#/$defs/skillSelection"
+      }
+    },
+    "checkpoints": {
+      "type": "array",
+      "items": {
+        "$ref": "workflow-request.schema.json#/$defs/resourceBinding"
+      }
+    },
+    "latestResult": {
+      "$ref": "workflow-request.schema.json#/$defs/resourceBinding"
+    },
+    "plan": {
+      "$ref": "#/$defs/workflowPlan"
+    },
+    "children": {
+      "type": "array",
+      "items": {
+        "$ref": "workflow-request.schema.json#/$defs/resourceBinding"
+      }
+    },
+    "unresolved": {
+      "type": "array",
+      "items": {
+        "$ref": "workflow-result.schema.json#/$defs/unresolved"
+      }
+    },
+    "retry": {
+      "$ref": "workflow-result.schema.json#/$defs/retry"
+    },
+    "expectedRevision": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Revision precondition for the next administrative checkpoint update."
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "$defs": {
+    "workflowNode": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "operation", "state", "required", "request"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]*$"
+        },
+        "operation": {
+          "$ref": "workflow-request.schema.json#/$defs/operation"
+        },
+        "state": {
+          "type": "string",
+          "enum": [
+            "pending",
+            "ready",
+            "running",
+            "completed",
+            "blocked",
+            "failed",
+            "skipped"
+          ]
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "request": {
+          "$ref": "workflow-request.schema.json#/$defs/resourceBinding"
+        },
+        "latestResult": {
+          "$ref": "workflow-request.schema.json#/$defs/resourceBinding"
+        },
+        "policy": {
+          "$ref": "workflow-request.schema.json#/$defs/resourceBinding"
+        },
+        "skipReason": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "bindingMap": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source", "target"],
+      "properties": {
+        "source": {
+          "type": "string",
+          "minLength": 1
+        },
+        "target": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "workflowEdge": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["from", "to", "condition", "bindings"],
+      "properties": {
+        "from": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]*$"
+        },
+        "to": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]*$"
+        },
+        "condition": {
+          "type": "string",
+          "enum": ["completed", "failed", "always", "policy"]
+        },
+        "bindings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/bindingMap"
+          }
+        }
+      }
+    },
+    "workflowPlan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["nodes", "edges"],
+      "properties": {
+        "nodes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/workflowNode"
+          }
+        },
+        "edges": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/workflowEdge"
+          }
+        }
+      }
+    }
+  }
+}

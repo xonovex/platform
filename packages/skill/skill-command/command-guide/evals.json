@@ -26,7 +26,25 @@
       "assertions": [
         "Replaces the project-specific path `packages/billing-service/src/` and domain/app terms (billing, invoicing) with generic equivalents rather than hardcoding them",
         "Gives the command a kebab-case name",
-        "Resulting command body is kept short (under ~150 lines) with the essential sections (description/metadata, Goal, Arguments, Core Workflow, Error Handling)"
+        "Creates or selects one owner skill for the reusable procedure and keeps the resulting command thin with frontmatter, Arguments, and Delegation rather than embedding the workflow"
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "Create a Claude command for repository release checks. The procedure is owned by release-readiness-guide in plugin xonovex-skill-release-readiness, and it can optionally use any installed changelog capability. Preview everything because a command with that name already exists.",
+      "assertions": [
+        "Keeps release-readiness-guide as the owner skill and xonovex-skill-release-readiness as the separate distribution plugin instead of conflating their names",
+        "Represents changelog support as a soft semantic requirement rather than making a second skill co-own the command or copying its instructions",
+        "Uses dry-run to preview the command, owner-skill reference, and manifest changes and refuses to overwrite the existing command without an explicit exact-target force choice"
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "Distill this fat deploy command. Keep its existing flags exactly, move the procedure to deploy-guide's promote operation, require the xonovex-skill-deploy plugin, and let runtime select separate observability and rollback helpers.",
+      "assertions": [
+        "Preserves the existing public argument names, defaults, and repeatability in the thin command",
+        "Moves procedure, output, errors, and gotchas to deploy-guide's promote operation and explicitly loads that owner at runtime",
+        "Wires xonovex-skill-deploy as the owner plugin dependency while expressing observability and rollback as supporting semantic requirements"
       ]
     }
   ]

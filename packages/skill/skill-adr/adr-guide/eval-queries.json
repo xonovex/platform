@@ -48,7 +48,7 @@
     "rationale": "near-miss: runbook, not a decision"
   },
   {
-    "query": "draft a decision record for moving the store to Postgres",
+    "query": "Choose between Kafka and NATS for event delivery and record an architecture decision with the final outcome.",
     "should_trigger": true,
     "split": "validation",
     "rationale": "decision record, synonym for ADR"
@@ -78,7 +78,7 @@
     "split": "validation"
   },
   {
-    "query": "using the stage-neutral operation contract, create a new architecture note from these source links without modifying the sources",
+    "query": "Return a machine-readable operation result for the partial run, including effects, evidence, uncertainty, retry, and revisions.",
     "rationale": "near miss owned by workflow-guide",
     "should_trigger": false,
     "split": "validation"

@@ -1,0 +1,34 @@
+{
+  "contractVersion": "xonovex.workflow.request/v1",
+  "operation": "create",
+  "subject": {
+    "kind": "story",
+    "intent": "read",
+    "locator": {
+      "provider": "tracker",
+      "reference": "STORY-41",
+      "revision": "17"
+    }
+  },
+  "selection": {
+    "method": "story-splitting",
+    "perspectives": ["user-value", "coverage"],
+    "criteria": [
+      {
+        "id": "parent-coverage",
+        "statement": "Every binding parent acceptance criterion is covered by a child.",
+        "binding": "binding"
+      }
+    ],
+    "roleLenses": [],
+    "resolutionMode": "assisted",
+    "acceptedSuggestions": []
+  },
+  "effect": {
+    "mode": "inspect"
+  },
+  "output": {
+    "kind": "child-story-set",
+    "schema": "xonovex.workflow.child-story-set/v1"
+  }
+}

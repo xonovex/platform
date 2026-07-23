@@ -1,85 +1,79 @@
 # distill: Distill a Fat Command into a Skill Delegator
 
-Refactor a self-contained ("fat") command — one that inlines its whole Goal / Workflow / Output / Gotchas — into a thin delegator that keeps only its argument contract and loads a guideline skill at run time. The procedure moves into the skill's `references/{operation}.md`, leaving the skill as the single source of truth and the command as a stable public interface.
+Move a self-contained command's reusable procedure into one owner skill while keeping
+its public argument contract stable.
 
 ## Goal
 
-- Move a command's procedure, output format, and gotchas into a guideline-skill reference
-- Reduce the command to its frontmatter, argument contract, and a delegation block (~15-25 lines)
-- Wire supported command-plugin dependencies so the skill is present at run time, or distribute the skill directly when the harness has no command-plugin surface
+- Move procedure, output, errors, and gotchas into the owner skill.
+- Keep frontmatter, Arguments, and an explicit Delegation block in the command.
+- Distinguish guide name, plugin name, operation, and supporting semantic needs.
+- Preserve callers while reducing duplicated prompt content.
 
 ## Arguments
 
-- `command-file` (required) — path to the command file to distill
-- `--skill <plugin>` (optional) — the guideline-skill plugin that should own the procedure (auto-detect from the command's domain if omitted)
-- `--operation <name>` (optional) — the operation/reference name within the skill (default: the command's verb)
-- `--dry-run` (optional) — preview the thin command, the skill reference, and manifest changes without writing
+- `command-file` (required) — exact command to distill.
+- `--owner-skill` (optional) — exact guide that owns the procedure.
+- `--owner-plugin` (optional) — distribution plugin for the owner guide.
+- `--operation` (optional) — operation/reference within the owner skill.
+- `--requires` (repeatable, optional) — soft supporting semantic requirement.
+- `--dry-run` (optional) — preview command, skill, and manifest changes.
 
-## What Stays vs What Moves
+## Content boundary
 
-### Stays in the command (its public contract)
+Keep in the command:
 
-- Frontmatter — `description`, `allowed-tools` (with `Skill` added), `argument-hint`
-- Arguments — the flag/default contract (command-unique; absent from the skill)
-- A `## Delegation` block naming the exact skill + operation
+- description, allowed tools, and argument hint;
+- argument names, defaults, repeatability, and effect boundary;
+- exact owner skill, owner plugin, and operation;
+- soft semantic requirements that affect runtime selection.
 
-### Moves to the skill reference (the single source of truth)
+Move to the owner skill:
 
-- Goal, Core Workflow, Output Format, Examples, Error Handling, Gotchas — deleted from the command, authored once in `references/{operation}.md`
+- goal and procedure;
+- output contract;
+- examples;
+- error handling;
+- gotchas.
 
-## Core Workflow
+## Core workflow
 
-1. **Read the command** — identify its verb, argument contract, and the procedure body to relocate
-2. **Find the owning skill** — match the command's domain to an existing `*-guide` skill; if the operation already has an owner, reuse it (never duplicate a concept — cross-reference)
-3. **Author or update the skill reference** — write the procedure into `references/{operation}.md` in the skill's reference style (Goal / Workflow / Output / Error Handling / Gotchas)
-4. **Register the operation** — add it to the skill's `SKILL.md` under Operations and Progressive Disclosure with an explicit load-when trigger
-5. **Slim the command** — replace the body with the thin shape: frontmatter + Arguments + a Delegation block
-6. **Add the `Skill` tool** — ensure `allowed-tools` includes `Skill`
-7. **Wire the supported dependency** — add the skill plugin to each command-capable harness manifest that installs declared dependencies (for Xonovex commands, `.claude-plugin/plugin.json`; bare-string name, once per plugin, not per command). Codex plugins distribute the owning skill directly and do not mirror the Claude command package.
-8. **Preview or apply** — show the three artifacts (`--dry-run`) or write them
-9. **Report** — command line-count reduction, the skill/operation it now targets, manifests touched
+- [ ] Parse the existing public arguments before changing any content.
+- [ ] Resolve one concept owner. Reuse an existing owner rather than copying.
+- [ ] Resolve the owner plugin separately and verify that it distributes the guide.
+- [ ] Move the reusable procedure to the owner's operation reference and register the
+      operation in its progressive-disclosure index.
+- [ ] Describe supporting interchangeable skills as semantic requirements. Use exact
+      dependencies only when the procedure cannot complete without one named guide.
+- [ ] Replace the command body with Arguments and Delegation while preserving its
+      argument contract.
+- [ ] Add the skill-loading capability and wire supported plugin dependencies.
+- [ ] Preview or apply, then validate command syntax, argument parity, links,
+      manifests, and the skill.
 
-## The Thin-Command Shape
+## Output
 
-```
----
-description: <one line>
-allowed-tools: [..., Skill]
-argument-hint: "<contract>"
----
+Report:
 
-# /<plugin>:<command> — <Title>
+- before/after command line count;
+- preserved argument contract;
+- owner guide, plugin, and operation;
+- added semantic or hard requirements;
+- command, skill, and manifest files affected;
+- validation result.
 
-## Arguments
+## Error handling
 
-- <the flag/default contract>
-
-## Delegation
-
-Load the `<skill>` skill (plugin `<plugin>`) and perform its **<operation>**
-operation with these arguments. The skill is the source of truth for the
-procedure, output format, and gotchas — do not restate them.
-```
-
-## Install ≠ Load
-
-A supported `dependencies` entry guarantees the skill is **installed**, not that its text is in context at run time. The command must **explicitly** load the skill via the `Skill` tool. On a harness that distributes skills without custom command plugins, users install and invoke the skill itself. Never rely on implicit ambient auto-trigger of another plugin's skill; it is not a designed contract.
-
-## Error Handling
-
-- Command already thin (has a Delegation block, no inlined procedure) → report and skip
-- No owning skill exists → author the `*-guide` skill first (skill-guide owns guideline-skill authoring), or flag it for the user
-- Operation already owned by another skill → reuse it; do not duplicate the concept
-- Skill reference link doesn't resolve after registration → fix the `SKILL.md` → `references/` path
-
-## Safety
-
-Commit to git first; use `--dry-run`; confirm the skill reference resolves and the manifests are valid JSON before relying on the result; verify the command still allows the `Skill` tool.
+- Already thin → validate and report without rewriting.
+- No concept owner → create or extend the owner skill first.
+- Multiple possible owners → stop and ask; never merge ownership by prompt order.
+- Plugin does not distribute the named guide → stop and report the mismatch.
+- Public argument drift → restore the original contract or declare a separate
+  migration.
 
 ## Gotchas
 
-- Distilling the body but forgetting a dependency supported by the command harness leaves the command unable to guarantee its skill at run time
-- Adding `Skill` to `allowed-tools` is easy to miss; without it the delegation can't load the skill
-- Copying the procedure into the skill instead of moving it leaves two diverging copies — the command body must be deleted, not duplicated
-- A delegation block that names the skill but not the exact operation makes the command ambiguous — name both
-- Leaving the argument contract out of the thin command strands callers — the flags/defaults stay command-side
+- `--owner-skill` names a guide; `--owner-plugin` names its distribution package.
+- Supporting skills do not become co-owners of the command procedure.
+- Installation is not loading; the delegation must load the owner at runtime.
+- Copying instead of moving leaves two sources of truth.

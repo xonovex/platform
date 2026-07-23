@@ -77,10 +77,10 @@ skill is missing the command is disabled with `dependency-unsatisfied`.
 
 | Command                   | Description                                                |
 | ------------------------- | ---------------------------------------------------------- |
-| `slashcommand-create`     | Create a new slash command from a completed task           |
+| `slashcommand-create`     | Create a thin command with one owner skill                 |
 | `slashcommand-simplify`   | Reduce verbosity in slash command files                    |
 | `slashcommand-assimilate` | Augment a slash command with elements from another         |
-| `slashcommand-distill`    | Distill a fat command into a thin skill-delegating command |
+| `slashcommand-distill`    | Distill a fat command with explicit owner/supporting needs |
 
 ### Versioning
 

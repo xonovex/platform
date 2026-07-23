@@ -2,21 +2,29 @@
 
 ## Goal
 
-Publish one exact subject to one explicit provider destination and return its native locator and revision without changing the source.
+Preview or apply persistence or transmission of one exact domain result or artifact
+to one explicit provider destination.
 
 ## Procedure
 
-1. Pin the subject revision and explicit destination. Infer kind or provider only when unambiguous.
-2. Load only explicitly selected or unambiguous publication, domain, method, and provider capabilities.
-3. Let the provider own native authentication, identifiers, revisions, idempotency, and publication effects.
-4. Preview the exact effect. Apply it only when the caller authorizes that subject, destination, and effect.
-5. Return the provider-native locator and revision when supported.
+- [ ] Resolve the exact artifact binding or immediately preceding result and verify
+      its source revisions.
+- [ ] Resolve the independent destination provider, opaque reference, and expected
+      revision.
+- [ ] Derive the provider adapter and produce the exact write preview.
+- [ ] On apply, require deterministic authorization, an idempotency key, and unchanged
+      concurrency preconditions.
+- [ ] Apply once, verify the provider receipt, and return the native locator and
+      revision in `OperationResult`.
 
-Publication never revises the source or implies approval, acceptance, or a gate decision. Trigger, executor, identity, and maturity do not select provider behavior.
+Publish is the only domain-result persistence operation. It never implies approval,
+acceptance, readiness, merge, or release. A publish destination may be the same
+logical reference as an input only when the expected revision pins the successor
+write.
 
 ## Error handling
 
-- Stop on a missing destination or mutable source revision.
-- Report ambiguous providers or destinations without guessing.
-- Stop when an explicit capability is unavailable; never fall back.
-- Return a preview and request confirmation when exact authorization is missing.
+- Return blocked on a missing destination, mutable unpinned artifact, ambiguous
+  provider, denied authority, or stale expected revision.
+- Never fall back to another provider or local file.
+- On an unknown write outcome, retain the idempotency key and reconcile before retry.

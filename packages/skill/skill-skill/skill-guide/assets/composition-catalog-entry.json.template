@@ -1,0 +1,9 @@
+{
+  "name": "{name}",
+  "classification": {
+    "lifecycle": "{durable-or-procedural}",
+    "functionalRole": "{functional-role}"
+  },
+  "provisions": [],
+  "requirements": []
+}

@@ -2,7 +2,7 @@
   {
     "query": "define service objectives, error budgets, dependencies, and user-impact indicators for this capability",
     "should_trigger": true,
-    "split": "train",
+    "split": "validation",
     "rationale": "reliability objectives"
   },
   {

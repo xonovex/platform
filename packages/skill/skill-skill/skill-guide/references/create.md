@@ -18,6 +18,8 @@ Spec limits (name / description / body / optional-field rules) live in the paren
 - **Capability** — task-specific automation with bundled scripts
 - **Processor** — transforms input to output
 
+These are authoring shapes, not composition classifications. Independently assign one lifecycle and one functional role from [composition-metadata.md](composition-metadata.md).
+
 ## Core Workflow
 
 1. **Identify Source & Type**: URL, file, conversation, or task description; classify the skill type (guideline skills: see [guideline-skills.md](guideline-skills.md))
@@ -27,8 +29,9 @@ Spec limits (name / description / body / optional-field rules) live in the paren
 5. **Categorize**: Group by topic (or by step, for workflows); decide what lives in SKILL.md vs `references/`
 6. **Generate SKILL.md**: Condensed quick reference with essentials (3-7 items) and a routing-first description (see [writing-descriptions.md](writing-descriptions.md)); include a Gotchas section for non-obvious env-specific facts
 7. **Create Supporting Files**: `references/*.md` for detail (pair each with a load-when trigger), `scripts/` for executables (see [using-scripts.md](using-scripts.md)), `assets/` for templates
-8. **Validate Structure**: Frontmatter limits met, all reference paths resolve, body under spec ceiling
-9. **Write Files**: Save to `<skills-dir>/{name}/` (path depends on the agent harness) or preview without writing
+8. **Classify Composition**: Add one alphabetized catalog entry from `assets/composition-catalog-entry.json.template`; choose one lifecycle and primary functional role, then declare only audited semantic provisions and invariant requirements
+9. **Validate Structure**: Frontmatter limits met, all reference paths resolve, body under spec ceiling, and catalog inventory/compatibility checks pass
+10. **Write Files**: Save to `<skills-dir>/{name}/` (path depends on the agent harness) or preview without writing
 
 ## Output Structure
 
@@ -67,6 +70,7 @@ description: "Use when {task}. Triggers on {patterns}."
 - Apply the parent SKILL.md Core Principles (add what the agent lacks, defaults over menus, procedures over declarations)
 - Match specificity to fragility — prescriptive only when consistency is required
 - Mine non-obvious facts/corrections into a **Gotchas** section
+- Keep discovery frontmatter harness-neutral; do not put structured composition fields into top-level frontmatter or vendor plugin manifests
 
 ## Error Handling
 
@@ -82,3 +86,4 @@ description: "Use when {task}. Triggers on {patterns}."
 - Check for existing skill directory
 - Preserve existing reference files when merging
 - Remove source-specific paths and project names
+- Preview the catalog entry with the skill and reject duplicate names or provisions before writing either

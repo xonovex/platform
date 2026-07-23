@@ -1,68 +1,108 @@
 ---
 name: workflow-guide
-description: "Use when a task explicitly needs a stage-neutral operation contract, independent operation composition, provider-native subject/result references, separation of invocation from execution, or an isolated workflow workspace. Triggers on choosing among the create/review/revise/decide/execute/validate/publish/abandon operation contracts, preserving opaque references and revisions, returning inline versus persisted results, composing operations without lifecycle assumptions, or explicitly creating, merging, abandoning, or cleaning a workflow workspace, even when the user doesn't say 'workflow architecture'."
+description: "Use when work needs a stage-neutral create, review, revise, decide, execute, validate, publish, or abandon contract; exact multi-provider inputs; durable continuation; story decomposition; policy-shaped SDLC composition; or isolated workspace creation, integration, abandonment, or cleanup. Triggers on operation selection, structured handoffs, criteria or perspective resolution, provider-native references and revisions, preview/apply effects, partial or unknown outcomes, and cross-session workflow state, even when the user doesn't say 'workflow architecture'."
 ---
 
-# Symmetric Workflow Operations
+# Composable Workflow Operations
 
-Perform one explicit operation on one subject, then compose additional calls only when the work requires them. Operations are siblings rather than lifecycle stages.
+Perform one explicit operation on exact inputs. Return a human summary plus the
+machine-readable `OperationResult` defined in
+[references/contracts.md](references/contracts.md); compose later calls from that
+result instead of conversational inference.
 
 ## Core Principles
 
-- **Select one operation** — choose exactly one of the eight core verbs for each call; role, stage, trigger, executor, and maturity never change its semantics, see [references/composition.md](references/composition.md)
-- **Keep dimensions independent** — resolve kind, perspective, method, capability, executor, trigger, provider, reference, and result separately, see [references/composition.md](references/composition.md)
-- **Preserve native references** — let the selected provider interpret opaque locators, revisions, authentication, idempotency, and side effects, see [references/provider-native-references.md](references/provider-native-references.md)
-- **Load capabilities narrowly** — use only explicitly selected or unambiguous domain, method, and provider capabilities; stop rather than substitute when an explicit capability is unavailable
-- **Return inline by default** — persist only when the caller explicitly supplies a destination, then return its provider-native locator and revision
-- **Separate invocation from execution** — manual calls, hooks, CI/CD, webhooks, and schedules share the same operation contract; humans, tools, models, and agents do not redefine it, see [references/invocation-and-execution.md](references/invocation-and-execution.md)
-- **Keep authority explicit** — a descriptive decision grants no authority, and every publishing, cleanup, merge, or other side effect requires exact scope and authorization
-- **Keep workspaces orthogonal** — core operations never create, merge, abandon, or clean a workspace implicitly
-
-When execution needs controls, evidence sinks, or a maturity assessment, hand the already selected operation to **agent-governance-guide**. Reliability and security criteria remain optional capabilities owned by **reliability-guide** and **security-assurance-guide**; they never change an operation's verb or authority.
+- **Keep layers distinct** — operation, semantic selection, resource binding,
+  invocation context, and derived implementation have different owners, see
+  [references/composition.md](references/composition.md)
+- **Bind every resource independently** — preserve each provider-native reference and
+  revision; use named bindings for multi-provider work, see
+  [references/provider-native-references.md](references/provider-native-references.md)
+- **Publish domain results separately** — non-publish operations return inline
+  results; only Publish persists or transmits a domain result
+- **Resolve criteria visibly** — assisted resolution is the default; record source,
+  reason, confidence, and binding status without promoting advice, see
+  [references/criteria-and-perspectives.md](references/criteria-and-perspectives.md)
+- **Derive implementation** — derive skills, adapters, and capabilities from the
+  request and policy; report exact selections and honor only exact expert overrides
+  from a request document, see
+  [references/skill-resolution.md](references/skill-resolution.md)
+- **Separate intent from authority** — effect mode requests inspect, preview, or
+  apply; deterministic runtime policy verifies authority, approvals, idempotency,
+  budgets, and retries, see
+  [references/effects-and-authority.md](references/effects-and-authority.md)
+- **Checkpoint administration separately** — runtime-managed durable checkpoints are
+  policy-authorized administrative records, not domain-result publication, see
+  [references/durable-work.md](references/durable-work.md)
 
 ## Core Operations
 
-- **Create** — produce a new result without changing the source — see [references/create.md](references/create.md)
-- **Review** — evaluate an exact subject and report evidence-linked findings — see [references/review.md](references/review.md)
-- **Revise** — produce a traceable new revision from explicit feedback — see [references/revise.md](references/revise.md)
-- **Decide** — record a descriptive outcome and rationale without granting authority — see [references/decide.md](references/decide.md)
-- **Execute** — carry out one bounded subject without implicit publication or workspace changes — see [references/execute.md](references/execute.md)
-- **Validate** — check an exact subject against explicit criteria without changing it — see [references/validate.md](references/validate.md)
-- **Publish** — publish an exact subject to one explicit destination — see [references/publish.md](references/publish.md)
-- **Abandon** — stop work while preserving the reason, partial result, and retry boundary — see [references/abandon.md](references/abandon.md)
+- **Create** — produce a new inline result without changing a source — see
+  [references/create.md](references/create.md)
+- **Review** — return evidence-linked judgment about an exact subject — see
+  [references/review.md](references/review.md)
+- **Revise** — produce an inline successor from explicit feedback — see
+  [references/revise.md](references/revise.md)
+- **Decide** — record a descriptive outcome without granting authority — see
+  [references/decide.md](references/decide.md)
+- **Execute** — inspect, preview, or apply one bounded action — see
+  [references/execute.md](references/execute.md)
+- **Validate** — return criterion-by-criterion evidence without changing the subject
+  — see [references/validate.md](references/validate.md)
+- **Publish** — preview or apply persistence of one exact result to one destination —
+  see [references/publish.md](references/publish.md)
+- **Abandon** — return why work stopped and its safe retry boundary — see
+  [references/abandon.md](references/abandon.md)
 
-## Workspace Utilities
+## Workspace Transactions
 
-- **Workspace create** — create one isolated workspace from an exact source — see [references/workspace-create.md](references/workspace-create.md)
-- **Workspace merge** — validate and merge one workspace into one destination — see [references/workspace-merge.md](references/workspace-merge.md)
-- **Workspace abandon** — preserve recoverable state before optional removal — see [references/workspace-abandon.md](references/workspace-abandon.md)
-- **Workspace cleanup** — preview and remove only explicitly selected targets — see [references/workspace-cleanup.md](references/workspace-cleanup.md)
+- **Workspace create** — preview or create one isolated workspace — see
+  [references/workspace-create.md](references/workspace-create.md)
+- **Workspace merge** — preview or integrate one workspace without removing it — see
+  [references/workspace-merge.md](references/workspace-merge.md)
+- **Workspace abandon** — report abandonment without removing resources — see
+  [references/workspace-abandon.md](references/workspace-abandon.md)
+- **Workspace cleanup** — exclusively preview or remove named workspace resources —
+  see [references/workspace-cleanup.md](references/workspace-cleanup.md)
 
 ## Gotchas
 
-- Composition examples are illustrative; any core operation may stand alone, repeat, or appear in another order.
-- `review` produces judgment and findings; `validate` returns a result for every explicit criterion.
-- `decide` never approves, rejects, authorizes, promotes, or changes a gate.
-- `execute` never publishes or manages a workspace implicitly; request those effects separately.
-- `publish` changes a destination but never revises the source or implies approval.
-- A workspace merge is a workspace utility, not a lifecycle stage or proof of acceptance.
-- A missing selected provider or capability is an error; never fall back silently to a local file, another provider, or an invented umbrella capability.
+- A provider binding is a typed envelope around an opaque native locator, not a
+  universal identifier.
+- An explicit perspective selects a lens; it does not make that lens's suggested
+  criteria binding.
+- An apply request is effect intent, not proof of authorization.
+- Execute and workspace transactions may perform their named effects, but they never
+  persist their `OperationResult`; Publish owns that separate effect.
+- A ready decision, passing validation, or approved review never implies merge,
+  release, deployment, or publication authority.
+- Same-conversation shorthand may use only the exact immediately preceding result;
+  continuation elsewhere needs a persisted native binding.
 
 ## Progressive Disclosure
 
-- Read [references/composition.md](references/composition.md) - Load when selecting operations or composing independent dimensions and calls
-- Read [references/provider-native-references.md](references/provider-native-references.md) - Load when resolving or persisting opaque subjects, revisions, evidence, or result destinations
-- Read [references/invocation-and-execution.md](references/invocation-and-execution.md) - Load when a manual call, hook, CI/CD event, webhook, schedule, human, tool, model, or agent initiates or performs an operation
-- Read [references/role-lenses.md](references/role-lenses.md) - Load when applying a PM, UX, developer, QA, or reviewer perspective without creating role-specific commands
-- Read [references/create.md](references/create.md) - Load when producing a new result without changing its source
-- Read [references/review.md](references/review.md) - Load when evaluating an exact subject and reporting evidence-linked findings
-- Read [references/revise.md](references/revise.md) - Load when producing a new revision from explicit feedback
-- Read [references/decide.md](references/decide.md) - Load when recording a descriptive outcome without granting authority
-- Read [references/execute.md](references/execute.md) - Load when carrying out one bounded subject
-- Read [references/validate.md](references/validate.md) - Load when checking an exact subject against explicit criteria
-- Read [references/publish.md](references/publish.md) - Load when publishing an exact subject to an explicit provider destination
-- Read [references/abandon.md](references/abandon.md) - Load when stopping work while preserving reason, partial result, and retry state
-- Read [references/workspace-create.md](references/workspace-create.md) - Load when creating one explicitly targeted isolated workspace
-- Read [references/workspace-merge.md](references/workspace-merge.md) - Load when validating and merging one workspace into one explicit destination
-- Read [references/workspace-abandon.md](references/workspace-abandon.md) - Load when abandoning one workspace while preserving recoverable state
-- Read [references/workspace-cleanup.md](references/workspace-cleanup.md) - Load when previewing and removing explicitly selected stale or merged workspaces
+- Read [contracts](references/contracts.md) - Load when performing any operation
+- Read [composition](references/composition.md) - Load when composing operations
+- Read [bindings](references/provider-native-references.md) - Load when resolving resources
+- Read [criteria](references/criteria-and-perspectives.md) - Load when resolving semantics
+- Read [skill resolution](references/skill-resolution.md) - Load when deriving implementation
+- Read [catalog](assets/composition-catalog.json) - Load when matching skill provisions
+- Read [effects](references/effects-and-authority.md) - Load when an effect is possible
+- Read [invocation](references/invocation-and-execution.md) - Load when calls start or run
+- Read [role lenses](references/role-lenses.md) - Load when a role should suggest concerns
+- Read [durable work](references/durable-work.md) - Load when work crosses sessions
+- Read [story decomposition](references/story-decomposition.md) - Load when splitting stories
+- Read [SDLC composition](references/sdlc-composition.md) - Load when policy defines a graph
+- Read [recovery](references/recovery.md) - Load when outcomes are partial or uncertain
+- Read [references/create.md](references/create.md) - Load when performing Create
+- Read [references/review.md](references/review.md) - Load when performing Review
+- Read [references/revise.md](references/revise.md) - Load when performing Revise
+- Read [references/decide.md](references/decide.md) - Load when performing Decide
+- Read [references/execute.md](references/execute.md) - Load when performing Execute
+- Read [references/validate.md](references/validate.md) - Load when performing Validate
+- Read [references/publish.md](references/publish.md) - Load when performing Publish
+- Read [references/abandon.md](references/abandon.md) - Load when performing Abandon
+- Read [workspace create](references/workspace-create.md) - Load when creating a workspace
+- Read [workspace merge](references/workspace-merge.md) - Load when integrating a workspace
+- Read [workspace abandon](references/workspace-abandon.md) - Load when abandoning a workspace
+- Read [workspace cleanup](references/workspace-cleanup.md) - Load when removing a workspace
