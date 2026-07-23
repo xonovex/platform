@@ -380,7 +380,7 @@ describe("checkSkillDependencies", () => {
     );
   });
 
-  it("requires package-derived names and visible hard-dependency handoffs", () => {
+  it("requires package-derived plugin names", () => {
     const repo = makeRepo({
       "packages/skill/skill-base/base-guide/SKILL.md": "# Base\n",
       "packages/skill/skill-base/.claude-plugin/plugin.json": manifest(
@@ -408,9 +408,6 @@ describe("checkSkillDependencies", () => {
 
     expect(report.fails).toContain(
       "skill dependencies: manifests in packages/skill/skill-base must be named xonovex-skill-base",
-    );
-    expect(report.fails).toContain(
-      "skill dependencies: xonovex-skill-child depends on xonovex-skill-wrong but does not explicitly apply, follow, load, or use **base-guide** in its guidance",
     );
   });
 

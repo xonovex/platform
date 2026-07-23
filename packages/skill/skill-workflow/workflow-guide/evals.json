@@ -180,6 +180,24 @@
         "Returns schema-valid OperationResult objects independent of human-summary text in both harness paths.",
         "Requires exact persisted provider bindings for tomorrow's continuation rather than prior chat."
       ]
+    },
+    {
+      "id": 21,
+      "prompt": "Two installed guides provide assurance:evidence@^1.0.0. My WorkflowRequest pins first-guide@7.0.0 and binds assurance:evidence to first-guide. Resolve and load the composition.",
+      "assertions": [
+        "Validates that first-guide provides a compatible assurance:evidence contract and uses it to resolve the ambiguity.",
+        "Emits first-guide once with explicit and semantic provenance aggregated rather than duplicate skill records.",
+        "Loads exact hard dependencies before first-guide and returns one dependency-first loadOrder."
+      ]
+    },
+    {
+      "id": 22,
+      "prompt": "Apply global-formatting-guide globally, repo-formatting-guide to org/repo, and react-formatting-guide to React for the same formatting:source target. This repository uses TypeScript and React.",
+      "assertions": [
+        "Filters overlays against explicit runtime scope context instead of treating every declaration as applicable.",
+        "Reports repository and framework overlays as incomparable for the same target unless explicit policy resolves them.",
+        "Returns one effective overlay plus shadowed broader provenance only after the conflict is resolved; prompt order never decides."
+      ]
     }
   ]
 }

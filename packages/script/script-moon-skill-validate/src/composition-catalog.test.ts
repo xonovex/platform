@@ -1,16 +1,20 @@
 import {readFileSync} from "node:fs";
 import {resolve} from "node:path";
 import {
-  compositionCatalogIssues,
-  compositionCatalogSnapshotErrors,
   parseCompositionCatalog,
-  resolveExactSkill,
-  resolveSemanticRequirement,
   type CompositionCatalog,
   type CompositionCatalogEntry,
   type InstalledSkill,
   type SemanticRequirement,
-} from "@xonovex/core/skill-composition";
+} from "@xonovex/core/skill-composition-contract";
+import {
+  compositionCatalogIssues,
+  compositionCatalogSnapshotErrors,
+} from "@xonovex/core/skill-composition-validation";
+import {
+  resolveExactSkill,
+  resolveSemanticRequirement,
+} from "@xonovex/core/skill-selection";
 import {describe, expect, it} from "vitest";
 import {checkCompositionCatalog} from "./composition-catalog-check.js";
 import {type LinkReport} from "./reference-file-links.js";
@@ -60,6 +64,7 @@ const installed = (
 ): InstalledSkill => ({
   guide,
   implementationVersion,
+  dependencies: [],
   packagePath: `packages/skill/${guide.replace(/-guide$/, "")}`,
   plugin: `xonovex-skill-${guide.replace(/-guide$/, "")}`,
   sourcesPath: `packages/skill/${guide.replace(/-guide$/, "")}/${guide}/SOURCES.md`,
@@ -75,9 +80,12 @@ const requirement = (
   ...overrides,
 });
 
+const parseCatalog = (input: unknown) =>
+  parseCompositionCatalog(input, JSON.stringify(input));
+
 describe("composition catalog schema", () => {
   it("accepts independent lifecycle and functional-role classifications", () => {
-    const result = parseCompositionCatalog({
+    const result = parseCatalog({
       contractVersion: "2.0.0",
       skills: [
         {
@@ -170,11 +178,11 @@ describe("composition catalog schema", () => {
       },
     ],
   ])("rejects %s", (_label, input) => {
-    expect(parseCompositionCatalog(input).success).toBe(false);
+    expect(parseCatalog(input).success).toBe(false);
   });
 
   it("rejects an unsupported catalog contract major", () => {
-    const result = parseCompositionCatalog({
+    const result = parseCatalog({
       contractVersion: "3.0.0",
       skills: [],
     });

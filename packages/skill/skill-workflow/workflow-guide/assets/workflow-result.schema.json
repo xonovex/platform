@@ -309,6 +309,21 @@
         }
       }
     },
+    "matchedProvisionSelection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["provision", "requestedRange"],
+      "properties": {
+        "provision": {
+          "$ref": "#/$defs/matchedProvision"
+        },
+        "requestedRange": {
+          "type": "string",
+          "minLength": 1,
+          "format": "semver-range"
+        }
+      }
+    },
     "skillSelection": {
       "oneOf": [
         {
@@ -327,9 +342,12 @@
         "plugin",
         "implementationVersion",
         "provenance",
+        "provenances",
+        "matchedProvisions",
         "catalogContractVersion",
         "catalogDigest",
         "reason",
+        "reasons",
         "required",
         "status"
       ],
@@ -358,6 +376,19 @@
         "provenance": {
           "$ref": "#/$defs/selectionProvenance"
         },
+        "provenances": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/selectionProvenance"
+          }
+        },
+        "matchedProvisions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/matchedProvisionSelection"
+          }
+        },
         "provision": {
           "$ref": "#/$defs/matchedProvision"
         },
@@ -376,6 +407,15 @@
         "reason": {
           "type": "string",
           "minLength": 1
+        },
+        "reasons": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
         },
         "required": {
           "type": "boolean"
@@ -571,7 +611,14 @@
     "preferenceOverlayConflict": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["status", "target", "scope", "candidates", "message"],
+      "required": [
+        "status",
+        "target",
+        "scope",
+        "scopes",
+        "candidates",
+        "message"
+      ],
       "properties": {
         "status": {
           "const": "conflict"
@@ -582,6 +629,13 @@
         },
         "scope": {
           "$ref": "workflow-request.schema.json#/$defs/overlayScope"
+        },
+        "scopes": {
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "$ref": "workflow-request.schema.json#/$defs/overlayScope"
+          }
         },
         "candidates": {
           "type": "array",
@@ -662,7 +716,7 @@
     "preferenceOverlayResolution": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["applied", "conflicts", "failures"],
+      "required": ["applied", "conflicts", "failures", "shadowed", "skipped"],
       "properties": {
         "applied": {
           "type": "array",
@@ -680,6 +734,18 @@
           "type": "array",
           "items": {
             "$ref": "#/$defs/preferenceOverlayFailure"
+          }
+        },
+        "shadowed": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/appliedPreferenceOverlay"
+          }
+        },
+        "skipped": {
+          "type": "array",
+          "items": {
+            "$ref": "workflow-request.schema.json#/$defs/preferenceOverlay"
           }
         }
       }
@@ -726,6 +792,7 @@
         "perspectives",
         "criteria",
         "proposals",
+        "loadOrder",
         "skills",
         "overlays",
         "capabilities",
@@ -755,6 +822,14 @@
           "type": "array",
           "items": {
             "$ref": "#/$defs/proposal"
+          }
+        },
+        "loadOrder": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*-guide$"
           }
         },
         "skills": {

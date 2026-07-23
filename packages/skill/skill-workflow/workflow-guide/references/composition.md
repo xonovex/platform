@@ -29,7 +29,8 @@ versions, but cannot widen semantics or authority.
 - [ ] Normalize one exact `WorkflowRequest`.
 - [ ] Resolve each named binding and immutable revision independently.
 - [ ] Resolve semantics with provenance and mandatory policy.
-- [ ] Derive and report implementation selections.
+- [ ] Run composition, load its dependency-first guide order, and report exact
+      implementation selections.
 - [ ] Perform only the requested operation and allowed effect mode.
 - [ ] Return one inline `OperationResult`.
 - [ ] Feed a later operation only an exact prior result or provider binding.

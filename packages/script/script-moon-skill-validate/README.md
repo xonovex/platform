@@ -18,7 +18,7 @@ Besides the Agent Skills frontmatter/body checks, validation requires the packag
 
 Use `--strict` in CI so authoring warnings fail validation instead of returning a successful exit code.
 
-The workspace-level composition check verifies boundary-crossing Markdown links and named skill handoffs. It also requires matching Claude and Codex manifests whose names match their packages, requires every hard dependency to appear as a named handoff in the depending skill, and rejects duplicate plugin names, dangling dependencies, and dependency cycles.
+The workspace-level composition check verifies boundary-crossing Markdown links and named advisory handoffs. It also requires matching Claude and Codex manifests whose names match their packages and rejects duplicate plugin names, dangling dependencies, and dependency cycles. Exact hard dependencies are machine-readable manifest edges; the runtime resolver traverses them instead of inferring loading behavior from prose.
 
 The same check validates `packages/skill/composition-catalog.json`: every installed guide has one lifecycle and primary functional role; provision versions and requirement ranges use SemVer; required semantic requirements resolve to exactly one compatible installed provider; and the selected semantic graph is acyclic. Semantic selection records the catalog digest, exact installed implementation, reason, and content-provenance path without changing manifest dependency behavior. It also requires the generated catalog snapshot packaged under workflow-guide assets to be byte-identical, so installed workflow composition never depends on access to the monorepo root.
 

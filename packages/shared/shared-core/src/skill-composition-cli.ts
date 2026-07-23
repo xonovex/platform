@@ -4,8 +4,8 @@ import {
   parseCompositionCatalog,
   parseCompositionRequest,
   parseInstalledSkillInventory,
-  resolveComposition,
-} from "./skill-composition.js";
+} from "./skill-composition-contract.js";
+import {resolveComposition} from "./skill-composition.js";
 
 const readJson = (
   path: string,

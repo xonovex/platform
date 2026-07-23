@@ -403,28 +403,8 @@ const checkDeclaredDependencies = (
           );
         }
       }
-      const targetGuides = surfaces.get(dependency)?.guideNames ?? [];
       const sourceSurface = surfaces.get(manifest.name);
       const targetSurface = surfaces.get(dependency);
-      const sourceMarkdown = sourceSurface?.markdown ?? "";
-      const namedTargets = targetGuides
-        .map((guide) => `**${guide}**`)
-        .join(" or ");
-      if (
-        targetGuides.length > 0 &&
-        targetGuides.every(
-          (guide) =>
-            !new RegExp(
-              String.raw`\b(?:apply|follow|load|use)\b[^.\n]*\*\*${guide}\*\*`,
-              "iu",
-            ).test(sourceMarkdown),
-        )
-      ) {
-        valid = false;
-        report.addFail(
-          `skill dependencies: ${manifest.name} depends on ${dependency} but does not explicitly apply, follow, load, or use ${namedTargets} in its guidance`,
-        );
-      }
       if (sourceSurface !== undefined && targetSurface !== undefined) {
         valid =
           checkDependencyReferenceOverlap(

@@ -78,6 +78,22 @@
         "reason": "The durable record requires the workflow operation contract.",
         "requestedBy": "work-record:WORK-782"
       },
+      "provenances": [
+        {
+          "kind": "semantic-requirement",
+          "reason": "The durable record requires the workflow operation contract.",
+          "requestedBy": "work-record:WORK-782"
+        }
+      ],
+      "matchedProvisions": [
+        {
+          "provision": {
+            "id": "procedure:workflow-operation",
+            "version": "1.0.0"
+          },
+          "requestedRange": "^1.0.0"
+        }
+      ],
       "provision": {
         "id": "procedure:workflow-operation",
         "version": "1.0.0"
@@ -86,6 +102,7 @@
       "catalogContractVersion": "2.0.0",
       "catalogDigest": "6e81f31982a6f34cf0d43a16b0a3c26c31192dca77ecc7a88b274b1e42e9b00c",
       "reason": "Owns the durable workflow contract.",
+      "reasons": ["Owns the durable workflow contract."],
       "required": true,
       "status": "selected"
     }
@@ -93,7 +110,9 @@
   "overlays": {
     "applied": [],
     "conflicts": [],
-    "failures": []
+    "failures": [],
+    "shadowed": [],
+    "skipped": []
   },
   "checkpoints": [
     {

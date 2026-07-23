@@ -1,11 +1,13 @@
 import {readdirSync, readFileSync} from "node:fs";
 import {join, relative} from "node:path";
 import {
-  compositionCatalogIssues,
-  compositionCatalogSnapshotErrors,
   parseCompositionCatalog,
   type InstalledSkill,
-} from "@xonovex/core/skill-composition";
+} from "@xonovex/core/skill-composition-contract";
+import {
+  compositionCatalogIssues,
+  compositionCatalogSnapshotErrors,
+} from "@xonovex/core/skill-composition-validation";
 import {isDirectory, isFile} from "@xonovex/script-moon-common/fs";
 import {valid} from "semver";
 import {type LinkReport} from "./reference-file-links.js";
@@ -63,6 +65,7 @@ const installedSkillInventory = (
       installed.push({
         guide,
         implementationVersion: packageJson.version,
+        dependencies: [],
         packagePath: relative(repoRoot, packagePath),
         plugin: `xonovex-${packageName}`,
         sourcesPath: relative(repoRoot, sourcesPath),

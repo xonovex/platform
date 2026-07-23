@@ -17,6 +17,12 @@ These layers are related but are not peer command axes. In particular, users req
 work and semantic concerns; the runtime derives implementation capabilities and
 reports its choices.
 
+Every invocation normalizes one `WorkflowRequest`, asks the host composition runtime
+to resolve it, and loads its unique dependency-first guide order before the
+operation. Required failures block; preferred failures produce a visible degraded
+result. Exact request overrides and requirement-provider bindings resolve ambiguity
+without network lookup.
+
 ## Result boundary
 
 Create, review, revise, decide, execute, validate, and abandon return a structured
@@ -136,7 +142,7 @@ effects without compatibility aliases. See [Contract migration](docs/migration.m
 - [Provider-native resource bindings](docs/references.md)
 - [Invocation, effects, and execution](docs/invocation.md)
 - [Role lenses](docs/role-lenses.md)
-- [Design handout and decision history](docs/workflow-and-skill-composition-handout.md)
+- [Historical design handout](docs/history/workflow-and-skill-composition-handout.md)
 - [Operation model](../../diagram/diagram-agent-workflow/operation-model.png)
 
 ## Installation

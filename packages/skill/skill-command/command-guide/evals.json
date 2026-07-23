@@ -46,6 +46,24 @@
         "Moves procedure, output, errors, and gotchas to deploy-guide's promote operation and explicitly loads that owner at runtime",
         "Wires xonovex-skill-deploy as the owner plugin dependency while expressing observability and rollback as supporting semantic requirements"
       ]
+    },
+    {
+      "id": 6,
+      "prompt": "Simplify this 90-line Claude command. It already delegates to release-guide but repeats that guide's workflow, validation, and errors in the command body.",
+      "assertions": [
+        "Preserves metadata, arguments, requirements, exact owner plugin, and operation as the public command contract",
+        "Removes duplicated procedure from the command and keeps or moves it into the registered release-guide operation",
+        "Validates argument parity, operation registration, dependencies, and tool permissions instead of preserving a fat workflow to hit a percentage target"
+      ]
+    },
+    {
+      "id": 7,
+      "prompt": "Merge the safety and validation behavior from source.md into target.md. Both are skill-delegating commands, but they currently name different owner skills.",
+      "assertions": [
+        "Treats the two owner skills as an ownership conflict and requires one procedure owner before merging",
+        "Merges compatible public arguments or semantic requirements into the command while moving reusable safety and validation behavior into the selected owner operation",
+        "Does not inline the source workflow into the target command or silently widen tools and effects"
+      ]
     }
   ]
 }

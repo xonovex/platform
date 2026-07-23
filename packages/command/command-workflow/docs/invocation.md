@@ -25,6 +25,12 @@ The runtime derives the required skills, tools, and adapters, then reports their
 identities, installed versions, selection reasons, and any unavailable requirement.
 An ordinary caller does not choose a generic `--capability`.
 
+Before executing an operation, normalize the request and ask the host composition
+runtime to resolve it against every installed plugin root, or one explicit
+inventory. A blocked result stops execution; a degraded result remains visible; a
+ready or degraded result loads each guide once in its returned dependency-first
+`loadOrder`.
+
 ## Effect modes
 
 `inspect` reads and reasons without proposing or applying mutations.

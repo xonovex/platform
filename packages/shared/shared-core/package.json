@@ -22,7 +22,8 @@
     "dist"
   ],
   "bin": {
-    "xonovex-skill-compose": "./dist/src/skill-composition-cli.js"
+    "xonovex-skill-compose": "./dist/src/skill-composition-cli.js",
+    "xonovex-workflow-compose": "./dist/src/workflow-composition-runtime-cli.js"
   },
   "exports": {
     ".": "./dist/src/index.js",

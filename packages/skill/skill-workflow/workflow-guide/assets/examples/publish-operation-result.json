@@ -32,6 +32,14 @@
       "resolutionMode": "assisted",
       "acceptedSuggestions": [],
       "skillRequirements": [],
+      "skillProviders": {},
+      "overlayContext": {
+        "global": "*",
+        "languages": [],
+        "frameworks": [],
+        "paths": [],
+        "explicit": []
+      },
       "preferenceOverlays": []
     },
     "effect": {
@@ -47,6 +55,7 @@
     "perspectives": [],
     "criteria": [],
     "proposals": [],
+    "loadOrder": ["workflow-guide"],
     "skills": [
       {
         "guide": "workflow-guide",
@@ -59,6 +68,22 @@
           "reason": "The request requires the Publish operation contract.",
           "requestedBy": "operation:publish"
         },
+        "provenances": [
+          {
+            "kind": "semantic-requirement",
+            "reason": "The request requires the Publish operation contract.",
+            "requestedBy": "operation:publish"
+          }
+        ],
+        "matchedProvisions": [
+          {
+            "provision": {
+              "id": "procedure:workflow-operation",
+              "version": "1.0.0"
+            },
+            "requestedRange": "^1.0.0"
+          }
+        ],
         "provision": {
           "id": "procedure:workflow-operation",
           "version": "1.0.0"
@@ -67,6 +92,7 @@
         "catalogContractVersion": "2.0.0",
         "catalogDigest": "6e81f31982a6f34cf0d43a16b0a3c26c31192dca77ecc7a88b274b1e42e9b00c",
         "reason": "Owns the Publish contract.",
+        "reasons": ["Owns the Publish contract."],
         "required": true,
         "status": "selected"
       }
@@ -74,7 +100,9 @@
     "overlays": {
       "applied": [],
       "conflicts": [],
-      "failures": []
+      "failures": [],
+      "shadowed": [],
+      "skipped": []
     },
     "capabilities": [
       {

@@ -3,8 +3,8 @@
 Snapshot date: 2026-07-23
 
 Status: historical design input. The repository implementation that followed this
-handout is documented in [the command package README](../README.md) and
-[the migration guide](migration.md). Appendix argument shapes describe the
+handout is documented in [the command package README](../../README.md) and
+[the migration guide](../migration.md). Appendix argument shapes describe the
 pre-migration snapshot and are intentionally retained as evidence.
 
 This handout gives another model enough context to form an independent solution for
@@ -1546,5 +1546,6 @@ The conversation progressed through these questions:
 12. Can skills use independent lifecycle and functional-role taxonomies?
 
 The resulting direction emphasized semantic clarity, composability, provenance,
-durable references, explicit authority, and small skills. No final architecture was
-accepted, and the receiving model is expected to revisit every decision.
+durable references, explicit authority, and small skills. The later implementation
+accepted workflow contract v1 and composition catalog contract v2; the proposal
+questions and stale command tables above remain historical evidence.

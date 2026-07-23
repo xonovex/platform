@@ -57,6 +57,22 @@
         "reason": "The graph requires composable workflow operations.",
         "requestedBy": "work-record:CHANGE-19/workflow"
       },
+      "provenances": [
+        {
+          "kind": "semantic-requirement",
+          "reason": "The graph requires composable workflow operations.",
+          "requestedBy": "work-record:CHANGE-19/workflow"
+        }
+      ],
+      "matchedProvisions": [
+        {
+          "provision": {
+            "id": "procedure:workflow-operation",
+            "version": "1.0.0"
+          },
+          "requestedRange": "^1.0.0"
+        }
+      ],
       "provision": {
         "id": "procedure:workflow-operation",
         "version": "1.0.0"
@@ -65,6 +81,7 @@
       "catalogContractVersion": "2.0.0",
       "catalogDigest": "6e81f31982a6f34cf0d43a16b0a3c26c31192dca77ecc7a88b274b1e42e9b00c",
       "reason": "Owns each operation contract in the graph.",
+      "reasons": ["Owns each operation contract in the graph."],
       "required": true,
       "status": "selected"
     }
@@ -72,7 +89,9 @@
   "overlays": {
     "applied": [],
     "conflicts": [],
-    "failures": []
+    "failures": [],
+    "shadowed": [],
+    "skipped": []
   },
   "checkpoints": [],
   "plan": {

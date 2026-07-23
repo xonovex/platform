@@ -30,7 +30,7 @@ To scaffold: copy the directory, rename `{operation}.md` files, and fill in `{pl
 
 ## Command delegation
 
-When a command plugin delegates to an operation, keep the contract one-directional: the command body says "load the `<skill>` skill and perform its **<operation>** operation", and the skill — not the command — owns the procedure, output format, and gotchas. Declare the skill in the command plugin's `dependencies` (both manifests).
+When a command plugin delegates to an operation, keep the contract one-directional: the command body says "load the `<skill>` skill and perform its **<operation>** operation", and the skill — not the command — owns the procedure, output format, and gotchas. Declare the skill in every dependency-capable manifest the command package actually supports. A Claude-only command package has one Claude manifest; Codex distributes and invokes the skill directly instead of mirroring a command package.
 
 That command-to-skill edge is an exact hard dependency. Inside the workflow skill, request an interchangeable assurance, method, or other semantic provider through the composition catalog only when the need is invariant; derive operation-conditional needs at invocation time instead.
 

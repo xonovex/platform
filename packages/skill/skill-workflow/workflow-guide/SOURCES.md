@@ -9,7 +9,7 @@ format.
 - **Provenance:** Maintained as the public contract for eight sibling workflow
   operations and four orthogonal workspace utilities.
 - **Last reviewed:** 2026-07-21
-- **Used for:** `SKILL.md` and all `references/`
+- **Used for:** `SKILL.md`, all `references/`, and `assets/`
 - **Aspects extracted:** Stage-neutral operation semantics, independent selection
   dimensions, explicit side-effect boundaries, and the rule that workspace lifecycle
   is never implicit in a core operation.

@@ -77,8 +77,8 @@ The workspace-level composition check keeps structured metadata outside Agent Sk
   precedence, and reject equal-scope conflicts.
 - Deterministically selected required semantic dependencies are acyclic.
 - Exact manifest dependencies remain paired, mirrored in package dependencies,
-  explicitly loaded in guidance, resolvable, and acyclic independently of semantic
-  requirements.
+  discoverable by the runtime inventory, resolvable, dependency-first, and acyclic
+  independently of semantic requirements.
 - Selection records the catalog contract/digest, guide/plugin identities, exact implementation version, provision compatibility, reason, and `SOURCES.md` provenance path.
 - The catalog snapshot packaged with the workflow skill is byte-identical to the canonical repository catalog, so installed selection never depends on repository-root access.
 

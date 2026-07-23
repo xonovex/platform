@@ -49,6 +49,21 @@ tasks:
       - /packages/script/script-moon-command-validate/src/*.ts
     options:
       cache: false
+  workflow-schema-sync:
+    command:
+      - node
+      - packages/script/script-moon-command-validate/dist/src/sync-workflow-composition-schema.js
+      - packages/skill/skill-workflow/workflow-guide/assets/workflow-request.schema.json
+    deps:
+      - script-moon-command-validate:build
+    inputs:
+      - /packages/shared/shared-core/src/skill-composition-contract.ts
+      - /packages/shared/shared-core/src/workflow-composition.ts
+    outputs:
+      - /packages/skill/skill-workflow/workflow-guide/assets/workflow-request.schema.json
+    options:
+      cache: false
+      runFromWorkspaceRoot: true
   ci-check:
     deps: [cross-package-links, workflow-contract]
     options:

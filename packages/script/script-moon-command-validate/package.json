@@ -4,7 +4,8 @@
   "private": true,
   "type": "module",
   "bin": {
-    "moon-command-validate": "./dist/src/index.js"
+    "moon-command-validate": "./dist/src/index.js",
+    "moon-command-workflow-schema-sync": "./dist/src/sync-workflow-composition-schema.js"
   },
   "dependencies": {
     "@xonovex/core": "0.1.22",
@@ -14,7 +15,8 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
-    "@types/semver": "^7.7.1"
+    "@types/semver": "^7.7.1",
+    "prettier": "^3.9.6"
   },
   "keywords": [
     "xonovex",

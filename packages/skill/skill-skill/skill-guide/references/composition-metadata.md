@@ -2,9 +2,12 @@
 
 Use one harness-neutral catalog to describe semantic composition. Agent Skill frontmatter owns discovery, plugin manifests own installation, and the composition catalog owns classification plus semantic contracts.
 
-Catalog contract v2 also defines the broad-to-narrow preference-overlay precedence:
+Catalog contract v2 declares a stable display order for preference-overlay scopes:
 global, organization, repository, language, framework, path, then explicit request.
-The resolver uses this declared order; prompt or load order has no authority.
+Resolution uses applicable scope containment: global is broad, explicit is narrow,
+organization contains repository/path, repository contains path, and language
+contains framework. Independent applicable axes conflict unless policy selects one;
+prompt or load order has no authority.
 
 ## Two independent classifications
 
@@ -24,6 +27,11 @@ Every guide has exactly one lifecycle and one primary functional role:
 | Functional role | `communication`  | Audience, terminology, sections, evidence, and handoff format                                  |
 
 `mixed` is not a classification. Classify the guide by its primary contract during migration, then split it when independent concerns need separate routing or selection. The lifecycle describes the guidance, not the package release lifetime.
+
+Lifecycle and functional role are governance and audit metadata. The resolver uses
+the `preference` role to guard overlay application, but it never invents
+requirements, authority, conflicts, or load order from another role alone. Those
+behaviors require explicit provisions, requirements, overlays, or dependency edges.
 
 ## Catalog entry
 
@@ -71,12 +79,13 @@ An exact manifest dependency remains the installation contract. Do not duplicate
 Resolve without network lookup or a newest-version fallback:
 
 1. Honor an explicit exact guide and implementation version.
-2. Honor exact plugin dependencies already installed by the manifests.
+2. Traverse exact plugin dependencies from the installed inventory and load them
+   dependency-first.
 3. Match accepted or inherited required semantic requirements against installed provisions.
 4. Resolve preferred requirements after required ones.
 5. Select only when exactly one installed provision satisfies the identifier and SemVer range.
 
-No compatible provider is unavailable or incompatible. More than one compatible provider is ambiguous until an explicit selection or policy resolves it. A missing required provision blocks composition; a missing preferred provision remains visible as non-blocking degradation. Never substitute a similarly named skill.
+No compatible provider is unavailable or incompatible. More than one compatible provider is ambiguous until an explicit guide, requirement-provider binding, policy, or already selected compatible guide resolves it. An incompatible exact guide fails visibly. A missing required provision blocks composition; a missing preferred provision remains visible as non-blocking degradation. Never substitute a similarly named skill or emit the same selected guide twice; aggregate its reasons, matched provisions, and provenance edges.
 
 ## Version and compatibility boundaries
 
@@ -106,10 +115,14 @@ Every resolved selection records:
 ## Preference overlays
 
 Only a guide classified as `preference` may be requested as an overlay. Each request
-names the guide, target, scope kind/value, and reason. Resolve applicable overlays
-from broad to narrow catalog precedence. Two different overlays for the same target
-at the same scope are a conflict until policy or an explicit narrower scope selects
-one. Never pass a domain or context guide through overlay resolution.
+names the guide, typed semantic target, scope kind/value, and reason. Runtime context
+names the active organization, repository, languages, frameworks, paths, and
+explicit request scopes. Filter unrelated overlays, resolve comparable applicable
+overlays to one effective winner, and retain broader entries as shadowed provenance.
+Two different maximal overlays at equal or incomparable applicable scopes conflict
+until policy or a narrower scope selects one. A narrower winner shadows conflicts
+among the broader scopes it dominates. Never pass a domain or context guide through
+overlay resolution.
 
 ## Distribution
 
@@ -130,6 +143,8 @@ Do not assume that a marketplace repository root remains readable after one plug
 - Reject duplicate provisions or requirements within one guide.
 - Reject required requirements that are missing, incompatible, or ambiguous in the installed snapshot.
 - Reject cycles formed by deterministically selected required semantic requirements.
-- Preserve preferred failures as visible results rather than silently dropping them.
-- Reject non-preference overlays and equal-scope overlay conflicts.
+- Preserve preferred failures as visible degraded results rather than silently
+  dropping them.
+- Reject non-preference overlays and equal or incomparable applicable-scope
+  conflicts; report skipped and shadowed overlays separately.
 - Reject a missing or non-identical packaged workflow snapshot.

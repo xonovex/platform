@@ -54,6 +54,14 @@
     "resolutionMode": "assisted",
     "acceptedSuggestions": [],
     "skillRequirements": [],
+    "skillProviders": {},
+    "overlayContext": {
+      "global": "*",
+      "languages": [],
+      "frameworks": [],
+      "paths": [],
+      "explicit": []
+    },
     "preferenceOverlays": []
   },
   "effect": {

@@ -46,7 +46,28 @@
     "roleLenses": [],
     "resolutionMode": "assisted",
     "acceptedSuggestions": [],
-    "skillRequirements": [],
+    "skillRequirements": [
+      {
+        "id": "assurance:security",
+        "range": "^1.0.0",
+        "strength": "preferred",
+        "reason": "Security assurance strengthens the requested security perspective."
+      },
+      {
+        "id": "assurance:reliability",
+        "range": "^1.0.0",
+        "strength": "preferred",
+        "reason": "Reliability assurance strengthens the requested reliability perspective."
+      }
+    ],
+    "skillProviders": {},
+    "overlayContext": {
+      "global": "*",
+      "languages": [],
+      "frameworks": [],
+      "paths": [],
+      "explicit": []
+    },
     "preferenceOverlays": []
   },
   "effect": {

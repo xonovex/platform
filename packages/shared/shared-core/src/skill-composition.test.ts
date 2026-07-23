@@ -1,18 +1,22 @@
 import {describe, expect, it} from "vitest";
 import {
-  compositionCatalogIssues,
   parseCompositionCatalog,
   parseCompositionRequest,
   parseInstalledSkillInventory,
-  resolveComposition,
-  resolveExactSkill,
-  resolvePreferenceOverlays,
-  resolveSemanticRequirement,
   type CompositionCatalog,
   type CompositionCatalogEntry,
+  type CompositionRequest,
   type InstalledSkill,
+  type InstalledSkillDependency,
   type SemanticRequirement,
-} from "./skill-composition.js";
+} from "./skill-composition-contract.js";
+import {compositionCatalogIssues} from "./skill-composition-validation.js";
+import {resolveComposition} from "./skill-composition.js";
+import {resolvePreferenceOverlays} from "./skill-preference-overlays.js";
+import {
+  resolveExactSkill,
+  resolveSemanticRequirement,
+} from "./skill-selection.js";
 
 const entry = (
   name: string,
@@ -55,12 +59,31 @@ const catalog = (
 const installed = (
   guide: string,
   implementationVersion = "7.0.0",
+  dependencies: readonly InstalledSkillDependency[] = [],
 ): InstalledSkill => ({
   guide,
   implementationVersion,
+  dependencies: [...dependencies],
   packagePath: `packages/skill/${guide.replace(/-guide$/u, "")}`,
   plugin: `xonovex-skill-${guide.replace(/-guide$/u, "")}`,
   sourcesPath: `packages/skill/${guide.replace(/-guide$/u, "")}/${guide}/SOURCES.md`,
+});
+
+const compositionRequest = (
+  overrides: Partial<CompositionRequest>,
+): CompositionRequest => ({
+  exactSkills: [],
+  overlayContext: {
+    global: "*",
+    languages: [],
+    frameworks: [],
+    paths: [],
+    explicit: [],
+  },
+  preferenceOverlays: [],
+  requirementProviders: {},
+  requirements: [],
+  ...overrides,
 });
 
 const requirement = (
@@ -75,7 +98,7 @@ const requirement = (
 
 describe("composition inputs", () => {
   it("parses a v2 catalog with deterministic overlay precedence", () => {
-    const result = parseCompositionCatalog({
+    const input = {
       contractVersion: "2.0.0",
       overlayPrecedence: [
         "global",
@@ -95,7 +118,8 @@ describe("composition inputs", () => {
           },
         },
       ],
-    });
+    };
+    const result = parseCompositionCatalog(input, JSON.stringify(input));
 
     expect(result.success).toBe(true);
     if (!result.success) throw new Error(result.errors.join("\n"));
@@ -108,20 +132,26 @@ describe("composition inputs", () => {
 
   it("rejects unsupported catalog versions and invalid precedence", () => {
     expect(
-      parseCompositionCatalog({
-        contractVersion: "1.0.0",
-        skills: [],
-      }),
+      parseCompositionCatalog(
+        {
+          contractVersion: "1.0.0",
+          skills: [],
+        },
+        '{"contractVersion":"1.0.0","skills":[]}',
+      ),
     ).toEqual({
       success: false,
       errors: ["contractVersion: unsupported major 1; expected 2"],
     });
     expect(
-      parseCompositionCatalog({
-        contractVersion: "2.0.0",
-        overlayPrecedence: Array.from({length: 7}, () => "global"),
-        skills: [],
-      }).success,
+      parseCompositionCatalog(
+        {
+          contractVersion: "2.0.0",
+          overlayPrecedence: Array.from({length: 7}, () => "global"),
+          skills: [],
+        },
+        '{"contractVersion":"2.0.0","skills":[]}',
+      ).success,
     ).toBe(false);
   });
 
@@ -344,12 +374,22 @@ describe("preference overlays", () => {
           reason: "The global defaults apply.",
         },
       ],
+      {
+        global: "*",
+        repository: "example/repo",
+        languages: [],
+        frameworks: [],
+        paths: [],
+        explicit: [],
+      },
     );
 
     expect(resolution.conflicts).toEqual([]);
     expect(resolution.applied.map(({guide}) => guide)).toEqual([
-      "base-preference-guide",
       "local-preference-guide",
+    ]);
+    expect(resolution.shadowed.map(({guide}) => guide)).toEqual([
+      "base-preference-guide",
     ]);
   });
 
@@ -388,6 +428,14 @@ describe("preference overlays", () => {
           reason: "Second convention.",
         },
       ],
+      {
+        global: "*",
+        repository: "example/repo",
+        languages: [],
+        frameworks: [],
+        paths: [],
+        explicit: [],
+      },
     );
 
     expect(resolution.failures).toMatchObject([
@@ -403,6 +451,113 @@ describe("preference overlays", () => {
       },
     ]);
     expect(resolution.applied).toEqual([]);
+  });
+
+  it("rejects incomparable applicable overlays and skips unrelated scopes", () => {
+    const current = catalog([
+      entry("language-preference-guide", {functionalRole: "preference"}),
+      entry("repository-preference-guide", {functionalRole: "preference"}),
+      entry("unused-preference-guide", {functionalRole: "preference"}),
+    ]);
+
+    const resolution = resolvePreferenceOverlays(
+      current,
+      [
+        installed("language-preference-guide"),
+        installed("repository-preference-guide"),
+        installed("unused-preference-guide"),
+      ],
+      [
+        {
+          guide: "repository-preference-guide",
+          target: "formatting:source",
+          scope: {kind: "repository", value: "example/repo"},
+          reason: "The repository has formatting conventions.",
+        },
+        {
+          guide: "language-preference-guide",
+          target: "formatting:source",
+          scope: {kind: "language", value: "typescript"},
+          reason: "The language has formatting conventions.",
+        },
+        {
+          guide: "unused-preference-guide",
+          target: "formatting:source",
+          scope: {kind: "framework", value: "react"},
+          reason: "The framework convention is unrelated.",
+        },
+      ],
+      {
+        global: "*",
+        repository: "example/repo",
+        languages: ["typescript"],
+        frameworks: [],
+        paths: [],
+        explicit: [],
+      },
+    );
+
+    expect(resolution.applied).toEqual([]);
+    expect(resolution.conflicts[0]).toMatchObject({
+      candidates: ["language-preference-guide", "repository-preference-guide"],
+    });
+    expect(resolution.skipped.map(({guide}) => guide)).toEqual([
+      "unused-preference-guide",
+    ]);
+  });
+
+  it("lets an explicit overlay dominate otherwise incomparable scopes", () => {
+    const current = catalog([
+      entry("language-preference-guide", {functionalRole: "preference"}),
+      entry("repository-preference-guide", {functionalRole: "preference"}),
+      entry("explicit-preference-guide", {functionalRole: "preference"}),
+    ]);
+
+    const resolution = resolvePreferenceOverlays(
+      current,
+      [
+        installed("explicit-preference-guide"),
+        installed("language-preference-guide"),
+        installed("repository-preference-guide"),
+      ],
+      [
+        {
+          guide: "repository-preference-guide",
+          target: "formatting:source",
+          scope: {kind: "repository", value: "example/repo"},
+          reason: "The repository has formatting conventions.",
+        },
+        {
+          guide: "language-preference-guide",
+          target: "formatting:source",
+          scope: {kind: "language", value: "typescript"},
+          reason: "The language has formatting conventions.",
+        },
+        {
+          guide: "explicit-preference-guide",
+          target: "formatting:source",
+          scope: {kind: "explicit", value: "release"},
+          reason: "The release explicitly selects its convention.",
+        },
+      ],
+      {
+        global: "*",
+        repository: "example/repo",
+        languages: ["typescript"],
+        frameworks: [],
+        paths: [],
+        explicit: ["release"],
+      },
+    );
+
+    expect(resolution.conflicts).toEqual([]);
+    expect(resolution.applied.map(({guide}) => guide)).toEqual([
+      "explicit-preference-guide",
+    ]);
+    expect(resolution.shadowed.map(({guide}) => guide)).toEqual([
+      "repository-preference-guide",
+      "language-preference-guide",
+    ]);
   });
 });
 
@@ -421,7 +576,7 @@ describe("composition runtime", () => {
     const resolution = resolveComposition(
       current,
       [installed("assurance-guide"), installed("procedure-guide")],
-      {
+      compositionRequest({
         exactSkills: [
           {
             guide: "procedure-guide",
@@ -436,8 +591,7 @@ describe("composition runtime", () => {
             reason: "Optional specialist review.",
           }),
         ],
-        preferenceOverlays: [],
-      },
+      }),
     );
 
     expect(resolution.status).toBe("degraded");
@@ -497,8 +651,7 @@ describe("composition runtime", () => {
         installed("context-guide"),
         installed("procedure-guide"),
       ],
-      {
-        exactSkills: [],
+      compositionRequest({
         requirements: [
           requirement({
             id: "procedure:work",
@@ -513,7 +666,7 @@ describe("composition runtime", () => {
             reason: "Apply global C conventions.",
           },
         ],
-      },
+      }),
     );
 
     expect(resolution.status).toBe("ready");
@@ -523,8 +676,8 @@ describe("composition runtime", () => {
       ),
     ).toEqual([
       "procedure-guide",
+      "base-preference-guide",
       "assurance-guide",
-      "context-guide",
       "context-guide",
     ]);
   });
@@ -536,19 +689,147 @@ describe("composition runtime", () => {
       }),
     ]);
 
-    const resolution = resolveComposition(current, [], {
-      exactSkills: [
-        {
-          guide: "procedure-guide",
-          reason: "The operation needs its procedure.",
-          required: true,
-        },
-      ],
-      requirements: [],
-      preferenceOverlays: [],
-    });
+    const resolution = resolveComposition(
+      current,
+      [],
+      compositionRequest({
+        exactSkills: [
+          {
+            guide: "procedure-guide",
+            reason: "The operation needs its procedure.",
+            required: true,
+          },
+        ],
+      }),
+    );
 
     expect(resolution.skills).toHaveLength(1);
     expect(resolution.status).toBe("blocked");
+  });
+
+  it("uses an exact selection to disambiguate and aggregates duplicate edges", () => {
+    const current = catalog([
+      entry("first-guide", {
+        provisions: [{id: "assurance:evidence", version: "1.0.0"}],
+      }),
+      entry("second-guide", {
+        provisions: [{id: "assurance:evidence", version: "1.1.0"}],
+      }),
+    ]);
+
+    const resolution = resolveComposition(
+      current,
+      [installed("first-guide"), installed("second-guide")],
+      compositionRequest({
+        exactSkills: [
+          {
+            guide: "first-guide",
+            reason: "The caller selected the first provider.",
+            required: true,
+          },
+        ],
+        requirements: [requirement()],
+      }),
+    );
+
+    expect(resolution.status).toBe("ready");
+    expect(resolution.loadOrder).toEqual(["first-guide"]);
+    expect(resolution.skills).toHaveLength(1);
+    expect(resolution.skills[0]).toMatchObject({
+      guide: "first-guide",
+      reasons: [
+        "The caller selected the first provider.",
+        "The procedure needs evidence assurance.",
+      ],
+      provenances: [{kind: "explicit"}, {kind: "semantic-requirement"}],
+    });
+  });
+
+  it("loads exact hard dependencies before their consumer", () => {
+    const current = catalog([entry("base-guide"), entry("consumer-guide")]);
+
+    const resolution = resolveComposition(
+      current,
+      [
+        installed("base-guide"),
+        installed("consumer-guide", "7.0.0", [
+          {
+            plugin: "xonovex-skill-base",
+            implementationVersion: "7.0.0",
+          },
+        ]),
+      ],
+      compositionRequest({
+        exactSkills: [
+          {
+            guide: "consumer-guide",
+            reason: "The operation needs the consumer.",
+            required: true,
+          },
+        ],
+      }),
+    );
+
+    expect(resolution.status).toBe("ready");
+    expect(resolution.loadOrder).toEqual(["base-guide", "consumer-guide"]);
+    expect(resolution.skills[0]).toMatchObject({
+      guide: "base-guide",
+      provenance: {
+        kind: "exact-dependency",
+        requestedBy: "consumer-guide",
+      },
+    });
+  });
+
+  it("closes required invariants before resolving preferred support", () => {
+    const current = catalog([
+      entry("owner-guide", {
+        requirements: [
+          requirement({
+            id: "capability:base",
+            reason: "The owner requires its base provider.",
+          }),
+        ],
+      }),
+      entry("base-guide", {
+        provisions: [
+          {id: "capability:base", version: "1.0.0"},
+          {id: "assurance:evidence", version: "1.0.0"},
+        ],
+      }),
+      entry("alternative-guide", {
+        provisions: [{id: "assurance:evidence", version: "1.1.0"}],
+      }),
+    ]);
+
+    const resolution = resolveComposition(
+      current,
+      [
+        installed("alternative-guide"),
+        installed("base-guide"),
+        installed("owner-guide"),
+      ],
+      compositionRequest({
+        exactSkills: [
+          {
+            guide: "owner-guide",
+            reason: "The operation selects its owner.",
+            required: true,
+          },
+        ],
+        requirements: [requirement({strength: "preferred"})],
+      }),
+    );
+
+    expect(resolution.status).toBe("ready");
+    expect(resolution.loadOrder).toEqual(["owner-guide", "base-guide"]);
+    expect(resolution.skills).toHaveLength(2);
+    expect(resolution.skills[1]).toMatchObject({
+      guide: "base-guide",
+      matchedProvisions: [
+        {provision: {id: "capability:base"}},
+        {provision: {id: "assurance:evidence"}},
+      ],
+    });
   });
 });

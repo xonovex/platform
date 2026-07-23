@@ -35,8 +35,9 @@ work:
 - Keep exact expert skill or capability overrides only in
   `implementationOverrides`; ordinary callers request semantics, not mechanisms.
 - Put operation-conditional semantic needs in `selection.skillRequirements` and
-  applicable preference conventions in `selection.preferenceOverlays`; use empty
-  arrays when neither applies.
+  applicable preference conventions in `selection.preferenceOverlays`; bind an
+  ambiguous requirement explicitly in `selection.skillProviders` and supply the
+  active overlay scope values in `selection.overlayContext`.
 
 `destination` is valid only for Publish. A destination hidden in `inputs`, output
 metadata, method text, or conversational context never authorizes persistence.
@@ -58,6 +59,8 @@ The result records:
 - completed, partial, blocked, or failed status;
 - resolved method, perspectives, criteria, proposals, skills, preference overlays,
   and capabilities;
+- one unique dependency-first skill `loadOrder`, with all reasons, matched
+  provisions, and provenance edges aggregated on each selected guide;
 - unavailable, incompatible, ambiguous, and conflicting skill selections without
   fabricated implementation identities;
 - provenance, reason, confidence, and binding status;

@@ -1,5 +1,6 @@
 export interface ValidationIssue {
   readonly code: string;
+  readonly severity: "error" | "warning";
   readonly path: string;
   readonly message: string;
 }
@@ -13,4 +14,5 @@ export const issue = (
   code: string,
   path: string,
   message: string,
-): ValidationIssue => ({code, path, message});
+  severity: ValidationIssue["severity"] = "error",
+): ValidationIssue => ({code, severity, path, message});

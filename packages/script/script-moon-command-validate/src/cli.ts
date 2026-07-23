@@ -17,17 +17,21 @@ options:
 
 const render = (report: ValidationReport): number => {
   for (const problem of report.issues) {
-    console.error(
-      `[FAIL] ${problem.path}: ${problem.code}: ${problem.message}`,
-    );
+    const line = `[${problem.severity === "warning" ? "WARN" : "FAIL"}] ${problem.path}: ${problem.code}: ${problem.message}`;
+    if (problem.severity === "warning") console.warn(line);
+    else console.error(line);
   }
-  if (report.issues.length > 0) {
+  const errors = report.issues.filter(({severity}) => severity === "error");
+  const warnings = report.issues.filter(({severity}) => severity === "warning");
+  if (errors.length > 0) {
     console.error(
-      `Result: FAIL (${String(report.issues.length)} issue(s), ${String(report.commands)} command(s))`,
+      `Result: FAIL (${String(errors.length)} error(s), ${String(warnings.length)} warning(s), ${String(report.commands)} command(s))`,
     );
     return 1;
   }
-  console.log(`Result: PASS (${String(report.commands)} command(s))`);
+  console.log(
+    `Result: PASS (${String(report.commands)} command(s), ${String(warnings.length)} warning(s))`,
+  );
   return 0;
 };
 

@@ -14,37 +14,25 @@
     "output"
   ],
   "properties": {
-    "contractVersion": {
-      "const": "xonovex.workflow.request/v1"
-    },
+    "contractVersion": {"const": "xonovex.workflow.request/v1"},
     "requestId": {
       "type": "string",
       "minLength": 1,
       "description": "Optional invocation-local identifier; never a universal work identity."
     },
-    "operation": {
-      "$ref": "#/$defs/operation"
-    },
-    "subject": {
-      "$ref": "#/$defs/resourceBinding"
-    },
+    "operation": {"$ref": "#/$defs/operation"},
+    "subject": {"$ref": "#/$defs/resourceBinding"},
     "inputs": {
       "type": "object",
       "description": "Named supporting slots. Each resource retains its own provider, locator, revision, kind, schema, and intent.",
-      "propertyNames": {
-        "pattern": "^[a-z][a-z0-9-]*$"
-      },
+      "propertyNames": {"pattern": "^[a-z][a-z0-9-]*$"},
       "additionalProperties": {
         "oneOf": [
-          {
-            "$ref": "#/$defs/resourceBinding"
-          },
+          {"$ref": "#/$defs/resourceBinding"},
           {
             "type": "array",
             "minItems": 1,
-            "items": {
-              "$ref": "#/$defs/resourceBinding"
-            }
+            "items": {"$ref": "#/$defs/resourceBinding"}
           }
         ]
       }
@@ -57,74 +45,36 @@
       "$ref": "#/$defs/resourceBinding",
       "description": "Exact persisted OperationResult or administrative WorkRecord used to resume work."
     },
-    "selection": {
-      "$ref": "#/$defs/semanticSelection"
-    },
-    "effect": {
-      "$ref": "#/$defs/effectRequest"
-    },
-    "output": {
-      "$ref": "#/$defs/outputSpec"
-    },
-    "invocation": {
-      "$ref": "#/$defs/invocationContext"
-    },
-    "implementationOverrides": {
-      "$ref": "#/$defs/implementationOverrides"
-    }
+    "selection": {"$ref": "#/$defs/semanticSelection"},
+    "effect": {"$ref": "#/$defs/effectRequest"},
+    "output": {"$ref": "#/$defs/outputSpec"},
+    "invocation": {"$ref": "#/$defs/invocationContext"},
+    "implementationOverrides": {"$ref": "#/$defs/implementationOverrides"}
   },
   "allOf": [
     {
       "if": {
-        "properties": {
-          "operation": {
-            "const": "publish"
-          }
-        },
+        "properties": {"operation": {"const": "publish"}},
         "required": ["operation"]
       },
       "then": {
         "required": ["destination"],
         "properties": {
-          "effect": {
-            "properties": {
-              "mode": {
-                "enum": ["preview", "apply"]
-              }
-            }
-          },
-          "destination": {
-            "properties": {
-              "intent": {
-                "const": "write"
-              }
-            }
-          }
+          "effect": {"properties": {"mode": {"enum": ["preview", "apply"]}}},
+          "destination": {"properties": {"intent": {"const": "write"}}}
         }
       },
-      "else": {
-        "not": {
-          "required": ["destination"]
-        }
-      }
+      "else": {"not": {"required": ["destination"]}}
     },
     {
       "if": {
-        "properties": {
-          "operation": {
-            "const": "execute"
-          }
-        },
+        "properties": {"operation": {"const": "execute"}},
         "required": ["operation"]
       },
       "then": {
         "properties": {
           "effect": {
-            "properties": {
-              "mode": {
-                "enum": ["inspect", "preview", "apply"]
-              }
-            }
+            "properties": {"mode": {"enum": ["inspect", "preview", "apply"]}}
           }
         }
       }
@@ -140,13 +90,7 @@
       },
       "then": {
         "properties": {
-          "effect": {
-            "properties": {
-              "mode": {
-                "enum": ["preview", "apply"]
-              }
-            }
-          }
+          "effect": {"properties": {"mode": {"enum": ["preview", "apply"]}}}
         }
       }
     },
@@ -168,15 +112,7 @@
         "required": ["operation"]
       },
       "then": {
-        "properties": {
-          "effect": {
-            "properties": {
-              "mode": {
-                "const": "inspect"
-              }
-            }
-          }
-        }
+        "properties": {"effect": {"properties": {"mode": {"const": "inspect"}}}}
       }
     }
   ],
@@ -206,10 +142,7 @@
       "additionalProperties": false,
       "required": ["provider", "reference"],
       "properties": {
-        "provider": {
-          "type": "string",
-          "minLength": 1
-        },
+        "provider": {"type": "string", "minLength": 1},
         "reference": {
           "type": "string",
           "minLength": 1,
@@ -236,24 +169,11 @@
       "additionalProperties": false,
       "required": ["kind", "intent"],
       "properties": {
-        "kind": {
-          "type": "string",
-          "minLength": 1
-        },
-        "schema": {
-          "type": "string",
-          "minLength": 1
-        },
-        "intent": {
-          "type": "string",
-          "enum": ["read", "write"]
-        },
-        "inline": {
-          "$ref": "#/$defs/jsonValue"
-        },
-        "locator": {
-          "$ref": "#/$defs/nativeLocator"
-        },
+        "kind": {"type": "string", "minLength": 1},
+        "schema": {"type": "string", "minLength": 1},
+        "intent": {"type": "string", "enum": ["read", "write"]},
+        "inline": {"$ref": "#/$defs/jsonValue"},
+        "locator": {"$ref": "#/$defs/nativeLocator"},
         "writeMode": {
           "type": "string",
           "enum": ["create", "update"],
@@ -261,46 +181,24 @@
         }
       },
       "oneOf": [
-        {
-          "required": ["inline"],
-          "not": {
-            "required": ["locator"]
-          }
-        },
-        {
-          "required": ["locator"],
-          "not": {
-            "required": ["inline"]
-          }
-        }
+        {"required": ["inline"], "not": {"required": ["locator"]}},
+        {"required": ["locator"], "not": {"required": ["inline"]}}
       ],
       "allOf": [
         {
           "if": {
-            "properties": {
-              "intent": {
-                "const": "read"
-              }
-            },
+            "properties": {"intent": {"const": "read"}},
             "required": ["intent", "locator"]
           },
           "then": {
-            "not": {
-              "required": ["writeMode"]
-            },
+            "not": {"required": ["writeMode"]},
             "properties": {
               "locator": {
                 "anyOf": [
-                  {
-                    "required": ["revision"]
-                  },
+                  {"required": ["revision"]},
                   {
                     "required": ["immutable"],
-                    "properties": {
-                      "immutable": {
-                        "const": true
-                      }
-                    }
+                    "properties": {"immutable": {"const": true}}
                   }
                 ]
               }
@@ -309,35 +207,21 @@
         },
         {
           "if": {
-            "properties": {
-              "intent": {
-                "const": "write"
-              }
-            },
+            "properties": {"intent": {"const": "write"}},
             "required": ["intent"]
           },
-          "then": {
-            "required": ["locator", "writeMode"]
-          }
+          "then": {"required": ["locator", "writeMode"]}
         },
         {
           "if": {
             "properties": {
-              "intent": {
-                "const": "write"
-              },
-              "writeMode": {
-                "const": "update"
-              }
+              "intent": {"const": "write"},
+              "writeMode": {"const": "update"}
             },
             "required": ["intent", "writeMode"]
           },
           "then": {
-            "properties": {
-              "locator": {
-                "required": ["expectedRevision"]
-              }
-            }
+            "properties": {"locator": {"required": ["expectedRevision"]}}
           }
         }
       ]
@@ -347,18 +231,9 @@
       "additionalProperties": false,
       "required": ["id", "statement", "binding"],
       "properties": {
-        "id": {
-          "type": "string",
-          "minLength": 1
-        },
-        "statement": {
-          "type": "string",
-          "minLength": 1
-        },
-        "binding": {
-          "type": "string",
-          "enum": ["binding", "advisory"]
-        },
+        "id": {"type": "string", "minLength": 1},
+        "statement": {"type": "string", "minLength": 1},
+        "binding": {"type": "string", "enum": ["binding", "advisory"]},
         "sourceInput": {
           "type": "string",
           "minLength": 1,
@@ -368,32 +243,20 @@
     },
     "semanticRequirement": {
       "type": "object",
-      "additionalProperties": false,
-      "required": ["id", "range", "strength", "reason"],
       "properties": {
         "id": {
           "type": "string",
           "pattern": "^[a-z][a-z0-9-]*:[a-z0-9]+(?:[.-][a-z0-9]+)*$"
         },
-        "range": {
-          "type": "string",
-          "minLength": 1,
-          "format": "semver-range"
-        },
-        "strength": {
-          "type": "string",
-          "enum": ["required", "preferred"]
-        },
-        "reason": {
-          "type": "string",
-          "minLength": 1
-        }
-      }
+        "range": {"type": "string", "format": "semver-range"},
+        "strength": {"type": "string", "enum": ["required", "preferred"]},
+        "reason": {"type": "string", "minLength": 1}
+      },
+      "required": ["id", "range", "strength", "reason"],
+      "additionalProperties": false
     },
     "overlayScope": {
       "type": "object",
-      "additionalProperties": false,
-      "required": ["kind", "value"],
       "properties": {
         "kind": {
           "type": "string",
@@ -407,33 +270,46 @@
             "explicit"
           ]
         },
-        "value": {
-          "type": "string",
-          "minLength": 1
-        }
-      }
+        "value": {"type": "string", "minLength": 1}
+      },
+      "required": ["kind", "value"],
+      "additionalProperties": false
     },
     "preferenceOverlay": {
       "type": "object",
-      "additionalProperties": false,
-      "required": ["guide", "target", "scope", "reason"],
       "properties": {
         "guide": {
           "type": "string",
           "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*-guide$"
         },
+        "reason": {"type": "string", "minLength": 1},
+        "scope": {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "enum": [
+                "global",
+                "organization",
+                "repository",
+                "language",
+                "framework",
+                "path",
+                "explicit"
+              ]
+            },
+            "value": {"type": "string", "minLength": 1}
+          },
+          "required": ["kind", "value"],
+          "additionalProperties": false
+        },
         "target": {
           "type": "string",
-          "minLength": 1
-        },
-        "scope": {
-          "$ref": "#/$defs/overlayScope"
-        },
-        "reason": {
-          "type": "string",
-          "minLength": 1
+          "pattern": "^[a-z][a-z0-9-]*:[a-z0-9]+(?:[.-][a-z0-9]+)*$"
         }
-      }
+      },
+      "required": ["guide", "reason", "scope", "target"],
+      "additionalProperties": false
     },
     "semanticSelection": {
       "type": "object",
@@ -445,34 +321,25 @@
         "resolutionMode",
         "acceptedSuggestions",
         "skillRequirements",
+        "skillProviders",
+        "overlayContext",
         "preferenceOverlays"
       ],
       "properties": {
-        "method": {
-          "type": "string",
-          "minLength": 1
-        },
+        "method": {"type": "string", "minLength": 1},
         "perspectives": {
           "type": "array",
           "uniqueItems": true,
-          "items": {
-            "type": "string",
-            "minLength": 1
-          }
+          "items": {"type": "string", "minLength": 1}
         },
         "criteria": {
           "type": "array",
-          "items": {
-            "$ref": "#/$defs/criterionRequest"
-          }
+          "items": {"$ref": "#/$defs/criterionRequest"}
         },
         "roleLenses": {
           "type": "array",
           "uniqueItems": true,
-          "items": {
-            "type": "string",
-            "minLength": 1
-          }
+          "items": {"type": "string", "minLength": 1}
         },
         "resolutionMode": {
           "type": "string",
@@ -482,22 +349,17 @@
         "acceptedSuggestions": {
           "type": "array",
           "uniqueItems": true,
-          "items": {
-            "type": "string",
-            "minLength": 1
-          }
+          "items": {"type": "string", "minLength": 1}
         },
         "skillRequirements": {
           "type": "array",
-          "items": {
-            "$ref": "#/$defs/semanticRequirement"
-          }
+          "items": {"$ref": "#/$defs/semanticRequirement"}
         },
+        "skillProviders": {"$ref": "#/$defs/requirementProviders"},
+        "overlayContext": {"$ref": "#/$defs/overlayContext"},
         "preferenceOverlays": {
           "type": "array",
-          "items": {
-            "$ref": "#/$defs/preferenceOverlay"
-          }
+          "items": {"$ref": "#/$defs/preferenceOverlay"}
         }
       }
     },
@@ -506,14 +368,8 @@
       "additionalProperties": false,
       "required": ["mode"],
       "properties": {
-        "mode": {
-          "type": "string",
-          "enum": ["inspect", "preview", "apply"]
-        },
-        "idempotencyKey": {
-          "type": "string",
-          "minLength": 1
-        }
+        "mode": {"type": "string", "enum": ["inspect", "preview", "apply"]},
+        "idempotencyKey": {"type": "string", "minLength": 1}
       }
     },
     "outputSpec": {
@@ -521,28 +377,16 @@
       "additionalProperties": false,
       "required": ["kind"],
       "properties": {
-        "kind": {
-          "type": "string",
-          "minLength": 1
-        },
-        "schema": {
-          "type": "string",
-          "minLength": 1
-        }
+        "kind": {"type": "string", "minLength": 1},
+        "schema": {"type": "string", "minLength": 1}
       }
     },
     "invocationContext": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "trigger": {
-          "type": "string",
-          "minLength": 1
-        },
-        "executor": {
-          "type": "string",
-          "minLength": 1
-        },
+        "trigger": {"type": "string", "minLength": 1},
+        "executor": {"type": "string", "minLength": 1},
         "authorizationContext": {
           "type": "string",
           "minLength": 1,
@@ -552,54 +396,103 @@
     },
     "exactSkillImplementation": {
       "type": "object",
-      "additionalProperties": false,
-      "required": ["id", "version"],
       "properties": {
-        "id": {
-          "type": "string",
-          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*-guide$"
-        },
+        "id": {"type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*-guide$"},
         "version": {
           "type": "string",
-          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?$",
-          "format": "semver"
+          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?$"
         }
-      }
+      },
+      "required": ["id", "version"],
+      "additionalProperties": false
     },
     "exactCapabilityImplementation": {
       "type": "object",
-      "additionalProperties": false,
-      "required": ["id", "version"],
       "properties": {
-        "id": {
-          "type": "string",
-          "minLength": 1
-        },
-        "version": {
-          "type": "string",
-          "minLength": 1
-        }
-      }
+        "id": {"type": "string", "minLength": 1},
+        "version": {"type": "string", "minLength": 1}
+      },
+      "required": ["id", "version"],
+      "additionalProperties": false
     },
     "implementationOverrides": {
       "type": "object",
-      "additionalProperties": false,
-      "required": ["skills", "capabilities"],
       "properties": {
         "skills": {
+          "default": [],
           "type": "array",
-          "uniqueItems": true,
           "items": {
-            "$ref": "#/$defs/exactSkillImplementation"
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*-guide$"
+              },
+              "version": {
+                "type": "string",
+                "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?$"
+              }
+            },
+            "required": ["id", "version"],
+            "additionalProperties": false
           }
         },
         "capabilities": {
+          "default": [],
           "type": "array",
-          "uniqueItems": true,
           "items": {
-            "$ref": "#/$defs/exactCapabilityImplementation"
+            "type": "object",
+            "properties": {
+              "id": {"type": "string", "minLength": 1},
+              "version": {"type": "string", "minLength": 1}
+            },
+            "required": ["id", "version"],
+            "additionalProperties": false
           }
         }
+      },
+      "required": ["skills", "capabilities"],
+      "additionalProperties": false
+    },
+    "overlayContext": {
+      "type": "object",
+      "properties": {
+        "global": {"default": "*", "type": "string", "minLength": 1},
+        "organization": {"type": "string", "minLength": 1},
+        "repository": {"type": "string", "minLength": 1},
+        "languages": {
+          "default": [],
+          "type": "array",
+          "items": {"type": "string", "minLength": 1}
+        },
+        "frameworks": {
+          "default": [],
+          "type": "array",
+          "items": {"type": "string", "minLength": 1}
+        },
+        "paths": {
+          "default": [],
+          "type": "array",
+          "items": {"type": "string", "minLength": 1}
+        },
+        "explicit": {
+          "default": [],
+          "type": "array",
+          "items": {"type": "string", "minLength": 1}
+        }
+      },
+      "required": ["global", "languages", "frameworks", "paths", "explicit"],
+      "additionalProperties": false
+    },
+    "requirementProviders": {
+      "type": "object",
+      "propertyNames": {
+        "type": "string",
+        "pattern": "^[a-z][a-z0-9-]*:[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+      },
+      "additionalProperties": {
+        "type": "string",
+        "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*-guide$"
       }
     }
   }

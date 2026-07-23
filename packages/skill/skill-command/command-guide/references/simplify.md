@@ -1,89 +1,54 @@
-# simplify: Condense a Verbose Prompt
+# simplify: Simplify a User-Invocable Command
 
-Reduce verbosity in a prompt file while preserving all functional content. Removes duplication, simplifies examples, makes content generic for cross-project use.
-
-## Goal
-
-- Reduce file length by 40-60% while maintaining full functionality
-- Remove duplicate and redundant sections
-- Simplify verbose examples and explanations
-- Convert project-specific content to generic equivalents
-- Preserve essential functionality, arguments, and implementation guidance
+Reduce command surface without changing its public contract or creating a second
+procedure owner.
 
 ## Arguments
 
-- `prompt-file` (required) — path to the prompt file to simplify
-- `--dry-run` (optional) — preview without writing
-- `--target-reduction` (optional) — target reduction percentage (default 50, range 30-70)
+- `prompt-file` (required) — exact command file to simplify.
+- `--dry-run` (optional) — preview without writing.
+- `--target-reduction` (optional) — target reduction percentage; defaults to 50,
+  range 30-70.
 
-## Core Workflow
+## Core workflow
 
-1. **Setup** — track steps in a task list
-2. **Read File** — load the prompt file
-3. **Analyze Structure** — classify each section:
-   - **Essential (keep):** metadata block, goal, arguments, core workflow, implementation details, error handling
-   - **Simplifiable (reduce):** examples, explanations, output samples
-   - **Removable (delete):** advanced features, best practices, version control, technical notes
-4. **Identify Patterns** — scan for project-specific content: paths, domain clusters (3+ related terms), API/service names, industry terminology, redundant sections
-5. **Simplify Content** — merge duplicates, reduce examples (4+ → 2-3), condense explanations, shorten output samples (60-70%)
-6. **Make Generic** — replace specific paths / domain terms / API names; remove industry context
-7. **Preview or Apply** — show diff (`--dry-run`) or write the simplified file
-8. **Report** — display line-count reduction and sections modified
+- [ ] Resolve the command harness and parse metadata, arguments, requirements, and
+      delegation.
+- [ ] Record the original public argument and effect contract.
+- [ ] If the harness can delegate, keep only metadata, Arguments, Requirements, and
+      Delegation; move reusable procedure into the registered owner operation.
+- [ ] If the harness cannot delegate, retain the minimum inline procedure,
+      validation, errors, and safety rules needed for execution.
+- [ ] Remove duplicated explanations, redundant examples, and project-specific
+      coordinates that are not part of the contract.
+- [ ] Preview command, owner-skill, and manifest changes; validate argument parity,
+      operation registration, requirements, dependencies, and line budget.
 
-## Simplification Rules
+## Preservation rules
 
-### Remove entirely
+- Preserve command name, namespace, argument names, defaults, repeatability, and
+  effect boundary.
+- Preserve semantic requirement IDs, ranges, strengths, and reasons.
+- Preserve the exact owner skill, plugin, and operation unless the caller requests a
+  migration.
+- Move safety and error behavior to the owner operation for delegating harnesses;
+  never delete it merely to meet a reduction target.
+- Treat the target percentage as a preference, not a correctness criterion.
 
-advanced features, best practices, version-control integration, technical notes, troubleshooting (if redundant)
+## Output
 
-### Merge
+Report before/after line counts, preserved public contract, moved procedure sections,
+owner changes, manifest changes, and validation outcome.
 
-"What this does" + "Workflow" → "Core Workflow"; Usage + Examples; multiple example subsections → 2-3 cases
+## Error handling
 
-### Simplify
-
-reduce examples (4+ → 2-3), condense output samples (60-70%), convert paragraphs to bullets
-
-### Make generic
-
-replace specific paths, domain terms, project names with generic equivalents (`packages/myapp/` → `packages/example/`, `users` → `items`, `MyProjectAPI` → `API`)
-
-### Keep (essential)
-
-metadata block, goal, arguments, core workflow, implementation details, error handling, safety guidelines
-
-## Generalization Patterns
-
-1. **Paths:** replace `/packages\/[\w-]+\//g` → `packages/example/`
-2. **Domain terms:** find 3+ related specialized terms (e.g. `users+orders+payments`) and replace with generic equivalents
-3. **Project names:** replace `(\w+)(API|Service|Database|Client)` → `MyProject$2`
-4. **Business context:** remove industry-specific workflows, use generic CRUD examples
-
-## Dry-run Output
-
-```
-=== Preview ===
-File: example.md | 503 → 252 lines (50%)
-Remove: Advanced Features (45), Best Practices (32)
-Merge: "What this does" + "Workflow" → "Core Workflow"
-Simplify: Examples 4→3 (-60), Output samples (-45)
-Generic: 8 paths, 15 domain terms
-Result: 208 lines (59%)
-```
-
-## Error Handling
-
-- File not found → verify path
-- Not a prompt (no metadata block or wrong format for the harness) → check
-- Already simplified → lower target
-- Cannot achieve target → reduce %
-
-## Safety
-
-Commit to git first; use `--dry-run`; test after changes; skip if <150 lines.
+- Missing or unrecognized command → stop with the unresolved format.
+- No registered owner for a delegating command → route to distill first.
+- Required reduction would alter the public contract → keep the larger valid form.
+- Existing thin command → validate and return unchanged.
 
 ## Gotchas
 
-- "Already simplified" usually means <150 lines, but a 200-line file with 60% prose padding still has room — measure prose:bullets ratio
-- Stripping "Best Practices" sections sometimes removes the only place a critical safety rule lives — diff carefully
-- Generalizing too aggressively (e.g. all paths → `src/`) destroys the example's usefulness — keep enough specificity to learn from
+- A short command can still be fat when it owns procedure duplicated in a skill.
+- An inline safety rule belongs in the owner operation before it leaves the command.
+- Generic examples must retain enough structure to explain argument semantics.

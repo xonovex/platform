@@ -1,68 +1,59 @@
-# merge: Port Elements from One Prompt into Another
+# merge: Port Elements from One Command into Another
 
-Extracts elements from a source prompt and integrates them into a target prompt while strictly preserving the target's structure, style, and voice.
+Merge compatible public-contract elements while preserving one procedure owner.
 
 ## Arguments
 
-- `target` (required) — target prompt file (augmented)
-- `source` (required) — source prompt file (provides elements)
-- `--aspects <aspects>` (optional) — focus aspects (e.g. `"workflow,validation,error-handling"`)
-- `--percentage <percent>` (optional) — intensity 10-100 (default 50)
-- `--interactive` (optional) — ask clarifying questions
-- `--dry-run` (optional) — preview without modifying
+- `target` (required) — target command file.
+- `source` (required) — source command file.
+- `--aspects <aspects>` (optional) — arguments, requirements, metadata, or
+  owner-skill procedure.
+- `--percentage <percent>` (optional) — intensity 10-100; defaults to 50.
+- `--interactive` (optional) — ask about incompatible contracts.
+- `--dry-run` (optional) — preview without modifying.
 
-## Core Workflow
+## Core workflow
 
-1. Track steps in a task list
-2. Read target/source prompts
-3. Analyze target's DNA (structure, style, voice, formatting, conventions)
-4. Extract source elements (workflow, arguments, validation, error handling, examples)
-5. Filter by aspects/percentage
-6. Ask questions if `--interactive`
-7. Rewrite source in target's voice, match formatting exactly
-8. Preview or apply
-9. Report summary
+- [ ] Resolve both command formats and whether the target harness can delegate.
+- [ ] Compare namespaces, arguments, effect boundaries, requirements, owner skills,
+      and operations.
+- [ ] Preserve the target's metadata, voice, formatting, and existing public
+      arguments.
+- [ ] Merge compatible argument or requirement additions into the command contract.
+- [ ] For a delegating harness, merge procedure, validation, errors, and examples
+      into the target owner skill operation; keep the command thin.
+- [ ] For a non-delegating harness, merge only the minimum inline procedure the
+      harness needs.
+- [ ] Preview the command, owner-skill, and manifest changes, then validate all
+      affected artifacts.
 
-## Integration Rules
+## Compatibility rules
 
-### Preserve (CRITICAL)
+- Different owner skills for the same procedure are an ownership conflict; select
+  one owner before merging.
+- An argument collision with different meaning, defaults, or effect scope is a
+  public-contract conflict.
+- A source requirement may merge only when its semantic contract and strength remain
+  intact.
+- A source procedure for a different operation belongs in a separate command.
+- `--percentage` controls optional examples and explanatory depth; it never weakens
+  safety, validation, requirements, or argument semantics.
 
-metadata block, section order, formatting (bullets/numbers), voice/tone, code style, argument format, example structure, spacing
+## Output
 
-### Extract from source
+Report the preserved and added arguments, requirements, owner operation, affected
+manifests, changed command/skill files, and validation outcome.
 
-workflow steps, arguments/flags, validation, error handling, safety guidelines, examples
+## Error handling
 
-### Style matching
-
-match workflow format, argument style, example format, heading caps, whitespace, vocabulary
-
-### Approach
-
-rewrite in target's voice → insert in existing sections → match format exactly → adapt examples → avoid duplicates
-
-### Percentage scale
-
-10-30% critical only, 30-50% important (default), 50-70% comprehensive, 70-100% extensive
-
-### Aspect filtering
-
-`workflow` (steps/sequence), `arguments` (patterns/validation), `error-handling` (cases/messages), `examples` (use cases), `validation` (rules/checks), `safety` (guidelines/warnings)
-
-## Discovery
-
-Accept prompt-file paths or bare names; resolve to the harness-specific location and extension (see [harness-formats.md](harness-formats.md)).
-
-## Error Handling
-
-File not found, invalid percentage (10-100), no new content, aspect not found, incompatible prompts, style detection failed
-
-## Safety
-
-Recommend git commit; never modify metadata block without confirmation; preserve all target content (add only); use `--dry-run`; warn if >40% added; abort if style confidence <80%.
+- Missing file or unsupported format → stop with the unresolved path or harness.
+- Incompatible argument or effect contract → stop and describe the collision.
+- Multiple possible owners → ask for one owner rather than combining procedures.
+- No new compatible content → return unchanged.
 
 ## Gotchas
 
-- A target prompt's argument shape is part of its public contract — merging different argument styles silently breaks callers
-- "Same workflow, different aspect" merges are the most useful; "different workflow" merges usually mean you want a new prompt instead
-- Style confidence <80% means the target has too much manual customization to safely overwrite — bail
+- Style compatibility does not make two procedures the same operation.
+- A delegating command that absorbs procedure content becomes a second source of
+  truth.
+- A metadata merge must not silently widen tools, effects, or model selection.

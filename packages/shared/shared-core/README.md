@@ -57,16 +57,20 @@ die("Fatal error occurred", 1);
 ### Skill Composition
 
 Import the composition contract directly from
-`@xonovex/core/skill-composition`. It parses a versioned catalog, an installed
-skill inventory, and a request containing exact skills, semantic requirements,
-and preference overlays. Resolution returns selected skills, visible failures,
-overlay conflicts, catalog identity, and an overall `ready`, `degraded`, or
-`blocked` status.
+`@xonovex/core/skill-composition-contract`, primitive selectors from
+`@xonovex/core/skill-selection`, preference resolution from
+`@xonovex/core/skill-preference-overlays`, and graph composition from
+`@xonovex/core/skill-composition`. The modules parse a versioned catalog from exact
+source bytes, an installed skill inventory, and a request containing exact skills,
+semantic requirements, provider bindings, overlay context, and preference overlays.
+Resolution returns a unique dependency-first load order, aggregated selection
+provenance, visible failures, effective/shadowed/skipped overlays, catalog identity,
+and an overall `ready`, `degraded`, or `blocked` status.
 
 The installed inventory may omit repository-local `packagePath` and
-`sourcesPath` fields. Exact implementation versions and provision versions use
-SemVer. Required resolution failures block; preferred failures remain in the
-result and degrade it.
+`sourcesPath` fields. Its exact plugin dependency edges carry installed versions.
+Exact implementation versions and provision versions use SemVer. Required
+resolution failures block; preferred failures remain in the result and degrade it.
 
 The package also exposes a JSON CLI:
 
@@ -76,6 +80,20 @@ xonovex-skill-compose \
   installed-skills.json \
   composition-request.json
 ```
+
+Normalized workflow requests use the canonical adapter and installed-plugin
+discovery:
+
+```bash
+xonovex-workflow-compose \
+  --catalog composition-catalog.json \
+  --request workflow-request.json \
+  --installed-root ./installed-plugins
+```
+
+The workflow skill remains declarative and packages its catalog snapshot, but no
+executable runtime. The host invokes this shared CLI with that snapshot and its
+actual installed inventory.
 
 ### Logging Functions
 

@@ -1,6 +1,7 @@
 import {createHash} from "node:crypto";
 import {readdirSync, readFileSync} from "node:fs";
 import {join, relative} from "node:path";
+import {workflowRequestCompositionSchemaDefinitions} from "@xonovex/core/workflow-composition";
 import {
   Ajv2020,
   type AnySchemaObject,
@@ -155,6 +156,38 @@ const fixtureKind = (input: unknown): WorkflowSchemaKind | undefined => {
 const expectsInvalid = (path: string): boolean =>
   path.split(/[\\/]/u).includes("invalid");
 
+const compositionSchemaIssues = (
+  requestSchema: AnySchemaObject,
+  path: string,
+): readonly ValidationIssue[] => {
+  const definitions = requestSchema.$defs;
+  if (
+    typeof definitions !== "object" ||
+    definitions === null ||
+    Array.isArray(definitions)
+  ) {
+    return [
+      issue(
+        "workflow-schema.composition-definitions",
+        path,
+        "request schema needs $defs generated from the composition contract",
+      ),
+    ];
+  }
+  return Object.entries(workflowRequestCompositionSchemaDefinitions()).flatMap(
+    ([name, expected]) =>
+      JSON.stringify(definitions[name]) === JSON.stringify(expected)
+        ? []
+        : [
+            issue(
+              "workflow-schema.composition-definition-drift",
+              path,
+              `$defs.${name} differs from the typed composition contract`,
+            ),
+          ],
+  );
+};
+
 interface CatalogIdentity {
   readonly contractVersion: string;
   readonly digest: string;
@@ -243,6 +276,12 @@ export const validateWorkflowSchemaAssets = (
 
   const examplesDirectory = join(assetDirectory, "examples");
   const fixtureFiles = filesBelow(examplesDirectory);
+  issues.push(
+    ...compositionSchemaIssues(
+      schemas.request,
+      relative(assetDirectory, join(assetDirectory, SCHEMA_FILES.request)),
+    ),
+  );
   const expectedCatalog = catalogIdentity(assetDirectory);
   if (expectedCatalog === undefined) {
     issues.push(

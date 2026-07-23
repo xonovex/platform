@@ -2,10 +2,10 @@ import {existsSync, readdirSync, readFileSync, statSync} from "node:fs";
 import {join, relative, resolve, sep} from "node:path";
 import {
   parseCompositionCatalog,
-  resolveSemanticRequirement,
   type CompositionCatalog,
   type InstalledSkill,
-} from "@xonovex/core/skill-composition";
+} from "@xonovex/core/skill-composition-contract";
+import {resolveSemanticRequirement} from "@xonovex/core/skill-selection";
 import {
   parseCommandDocument,
   type CommandDocument,
@@ -51,6 +51,13 @@ const expectedNpmDependency = (plugin: string): string | undefined => {
   const match = /^xonovex-(skill-[a-z0-9-]+)$/u.exec(plugin);
   return match?.[1] === undefined ? undefined : `@xonovex/${match[1]}`;
 };
+
+const operationReference = (operation: string): string =>
+  `references/${operation
+    .trim()
+    .toLowerCase()
+    .replaceAll(/[^a-z0-9]+/gu, "-")
+    .replaceAll(/^-|-$/gu, "")}.md`;
 
 const validateArgumentParity = (
   document: CommandDocument,
@@ -157,6 +164,7 @@ const compositionContext = (
       {
         guide: name,
         implementationVersion: packageJson.version,
+        dependencies: [],
         packagePath: relative(repositoryRoot, packageDirectory),
         plugin: `xonovex-skill-${packageName}`,
         sourcesPath: relative(
@@ -201,6 +209,7 @@ const validateSemanticRequirements = (
           `command.requirement-${resolution.status}`,
           document.path,
           resolution.message,
+          requirement.strength === "preferred" ? "warning" : "error",
         ),
       );
     }
@@ -407,6 +416,20 @@ export const validateCommandPackage = (
           `delegated skill '${delegation.skill}' does not exist in '${dependencyLabel}'`,
         ),
       );
+      continue;
+    }
+    if (skillPackage !== undefined) {
+      const skillPath = join(skillPackage, delegation.skill, "SKILL.md");
+      const reference = operationReference(delegation.operation);
+      if (!readFileSync(skillPath, "utf8").includes(`](${reference})`)) {
+        issues.push(
+          issue(
+            "delegation.operation-missing",
+            displayPath,
+            `delegated operation '${delegation.operation}' is not registered as '${reference}' in '${delegation.skill}'`,
+          ),
+        );
+      }
     }
   }
 

@@ -1,6 +1,7 @@
 import {mkdtempSync, readFileSync, rmSync, writeFileSync} from "node:fs";
 import {tmpdir} from "node:os";
 import {join, resolve} from "node:path";
+import {composeWorkflowRequest} from "@xonovex/core/workflow-composition-runtime";
 import {afterEach, describe, expect, it} from "vitest";
 import {
   readWorkflowContract,
@@ -11,6 +12,10 @@ import {
 const repositoryRoot = resolve(import.meta.dirname, "../../../..");
 const packageDir = resolve(repositoryRoot, "packages/command/command-workflow");
 const contractPath = resolve(packageDir, "contracts/workflow-commands.v1.json");
+const compositionCatalogPath = resolve(
+  repositoryRoot,
+  "packages/skill/skill-workflow/workflow-guide/assets/composition-catalog.json",
+);
 const temporaryDirectories: string[] = [];
 
 const temporaryContract = (contract: WorkflowContract): string => {
@@ -33,6 +38,32 @@ describe("workflow command contract", () => {
     expect(
       validateWorkflowContract(contractPath, packageDir, repositoryRoot),
     ).toEqual({commands: 12, issues: []});
+  });
+
+  it("normalizes and resolves every registered command operation", () => {
+    const contract = readWorkflowContract(contractPath);
+    const catalogSourceText = readFileSync(compositionCatalogPath, "utf8");
+    const catalogInput: unknown = JSON.parse(catalogSourceText);
+
+    for (const command of contract.commands) {
+      const result = composeWorkflowRequest({
+        catalogInput,
+        catalogSourceText,
+        installedRoots: [resolve(repositoryRoot, "packages/skill")],
+        workflowRequest: {
+          operation: command.name,
+          selection: {},
+        },
+      });
+
+      expect(result, command.name).toMatchObject({
+        success: true,
+        data: {
+          status: "ready",
+          loadOrder: ["workflow-guide"],
+        },
+      });
+    }
   });
 
   it("rejects architecture drift independently of Markdown drift", () => {

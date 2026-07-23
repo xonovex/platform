@@ -27,18 +27,26 @@ capability.
 
 ## Resolution procedure
 
+- [ ] Validate and normalize one `WorkflowRequest`.
+- [ ] Ask the host composition runtime to resolve the request against every
+      installed plugin root available to it. An explicit inventory may replace
+      discovery.
 - [ ] Resolve required semantic requirements before preferred support.
 - [ ] Select one owner per duplicated check or procedure.
 - [ ] Resolve `WorkflowRequest.selection.skillRequirements` against the actual
       installed inventory and retain every preferred failure as degradation.
 - [ ] Compose `preferenceOverlays` from global to explicit scope using catalog
-      precedence; reject equal-scope conflicts and non-preference guides.
+      precedence; reject equal or incomparable maximal-scope conflicts and
+      non-preference guides.
 - [ ] Treat domain or context conflicts as fact conflicts; compare authority,
       freshness, scope, and evidence.
 - [ ] Select provider adapters from each resource binding, not from a global provider.
 - [ ] Surface unavailable or conflicting selections instead of silently substituting.
 - [ ] Block only when a missing selection is required by the operation or binding
       policy; otherwise report degraded advisory coverage.
+- [ ] Load each selected guide exactly once in returned `loadOrder`; dependency
+      guides precede their consumers. Do not continue the operation while composition
+      is blocked.
 
 Exact overrides belong only in `WorkflowRequest.implementationOverrides` and must
 name both identifier and version. Skill overrides name a guide and an exact SemVer;
@@ -54,6 +62,7 @@ teach reliable mechanism use. Assurance skills add evidence and checks. Recovery
 skills guide failure handling. Communication skills shape the human summary.
 
 The runtime owns dependency resolution, sequence, conflict handling, and mandatory
-policy. Use the shared composition resolver or its `xonovex-skill-compose` executable
-with the packaged catalog, actual installed inventory, and normalized request; raw
-prompt order is not a composition algorithm.
+policy. The skill contains only the declarative contract and packaged catalog; it
+does not bundle executable resolver code. Xonovex platform hosts can call
+`xonovex-workflow-compose` from shared tooling with the packaged catalog and actual
+installed inventory. Raw prompt order is not a composition algorithm.

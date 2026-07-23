@@ -52,7 +52,16 @@ const fixture = (): {packageDir: string; root: string} => {
     }),
   );
   write(root, "packages/command/command-test/commands/run.md", commandSource());
-  write(root, "packages/skill/skill-test/test-guide/SKILL.md", "# Test\n");
+  write(
+    root,
+    "packages/skill/skill-test/test-guide/SKILL.md",
+    "# Test\n\n- **Run** — run one test — see [run](references/run.md)\n",
+  );
+  write(
+    root,
+    "packages/skill/skill-test/test-guide/references/run.md",
+    "# Run\n",
+  );
   return {packageDir, root};
 };
 
@@ -106,6 +115,17 @@ describe("validateCommandPackage", () => {
         "delegation.package-dependency",
         "delegation.skill-missing",
       ]),
+    );
+  });
+
+  it("rejects a delegated operation that the owner does not register", () => {
+    const {packageDir, root} = fixture();
+    write(root, "packages/skill/skill-test/test-guide/SKILL.md", "# Test\n");
+
+    expect(
+      validateCommandPackage(packageDir, root).report.issues,
+    ).toContainEqual(
+      expect.objectContaining({code: "delegation.operation-missing"}),
     );
   });
 
@@ -233,7 +253,7 @@ describe("validateCommandPackage", () => {
     expect(validateCommandPackage(packageDir, root).report.issues).toEqual([]);
   });
 
-  it("rejects an unavailable command semantic requirement", () => {
+  it("warns when a preferred command semantic requirement is unavailable", () => {
     const {packageDir, root} = fixture();
     write(
       root,
@@ -259,10 +279,48 @@ describe("validateCommandPackage", () => {
     );
 
     expect(
-      validateCommandPackage(packageDir, root).report.issues.map(
-        ({code}) => code,
+      validateCommandPackage(packageDir, root).report.issues,
+    ).toContainEqual(
+      expect.objectContaining({
+        code: "command.requirement-unavailable",
+        severity: "warning",
+      }),
+    );
+  });
+
+  it("fails when a required command semantic requirement is unavailable", () => {
+    const {packageDir, root} = fixture();
+    write(
+      root,
+      "packages/command/command-test/commands/run.md",
+      commandSource().replace(
+        "## Delegation",
+        [
+          "## Requirements",
+          "",
+          "- `assurance:missing@^1.0.0` (required): Required specialist evidence.",
+          "",
+          "## Delegation",
+        ].join("\n"),
       ),
-    ).toContain("command.requirement-unavailable");
+    );
+    write(
+      root,
+      "packages/skill/composition-catalog.json",
+      JSON.stringify({
+        contractVersion: "2.0.0",
+        skills: [],
+      }),
+    );
+
+    expect(
+      validateCommandPackage(packageDir, root).report.issues,
+    ).toContainEqual(
+      expect.objectContaining({
+        code: "command.requirement-unavailable",
+        severity: "error",
+      }),
+    );
   });
 
   it("validates local Markdown targets and fragments", () => {

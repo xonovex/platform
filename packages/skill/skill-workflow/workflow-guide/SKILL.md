@@ -24,8 +24,8 @@ result instead of conversational inference.
   reason, confidence, and binding status without promoting advice, see
   [references/criteria-and-perspectives.md](references/criteria-and-perspectives.md)
 - **Derive implementation** — derive skills, adapters, and capabilities from the
-  request and policy; report exact selections and honor only exact expert overrides
-  from a request document, see
+  request and policy; consume the host resolver result, stop when blocked, report
+  degradation, load its ordered guides, and honor only exact expert overrides, see
   [references/skill-resolution.md](references/skill-resolution.md)
 - **Separate intent from authority** — effect mode requests inspect, preview, or
   apply; deterministic runtime policy verifies authority, approvals, idempotency,
