@@ -147,4 +147,3 @@ Do not assume that a marketplace repository root remains readable after one plug
   dropping them.
 - Reject non-preference overlays and equal or incomparable applicable-scope
   conflicts; report skipped and shadowed overlays separately.
-- Reject a missing or non-identical packaged workflow snapshot.

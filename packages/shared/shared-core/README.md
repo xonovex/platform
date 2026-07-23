@@ -81,20 +81,6 @@ xonovex-skill-compose \
   composition-request.json
 ```
 
-Normalized workflow requests use the canonical adapter and installed-plugin
-discovery:
-
-```bash
-xonovex-workflow-compose \
-  --catalog composition-catalog.json \
-  --request workflow-request.json \
-  --installed-root ./installed-plugins
-```
-
-The workflow skill remains declarative and packages its catalog snapshot, but no
-executable runtime. The host invokes this shared CLI with that snapshot and its
-actual installed inventory.
-
 ### Logging Functions
 
 - `logInfo(...args)` - Log info message (blue)

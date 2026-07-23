@@ -1,9 +1,0 @@
-{
-  "name": "xonovex-skill-workflow",
-  "version": "7.0.0",
-  "description": "Xonovex symmetric workflow operation skills",
-  "author": {
-    "name": "Xonovex"
-  },
-  "skills": ["./workflow-guide"]
-}

@@ -9,7 +9,6 @@
 - Keep versions lockstep across every skill plugin, command plugin, and `marketplace.json`.
 - Register every new skill alphabetically in both marketplace files; skills are not auto-discovered.
 - Give every guide exactly one reviewed lifecycle and functional-role classification in `composition-catalog.json`; never use a mixed classification.
-- Keep the generated workflow-guide asset `assets/composition-catalog.json` byte-identical to the canonical catalog so installed workflow composition uses the validated snapshot and digest.
 - Keep exact install-time dependencies in both plugin manifests. Declare semantic provisions and requirements only in `composition-catalog.json`, and only when their contract and compatibility are understood.
 - Keep skill implementation versions in package/plugin manifests, semantic contract versions in catalog provisions, and content provenance in each guide's `SOURCES.md`; never copy one version or provenance source into another field.
 - Format changed packages and `marketplace.json` with `npx prettier --write`, validate JSON, and resolve every `SKILL.md` -> `references/` link.

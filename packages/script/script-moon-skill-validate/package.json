@@ -4,7 +4,6 @@
   "private": true,
   "type": "module",
   "bin": {
-    "moon-skill-composition-sync": "./dist/src/sync-composition-catalog-cli.js",
     "moon-skill-validate": "./dist/src/index.js",
     "moon-skill-links": "./dist/src/links-cli.js"
   },

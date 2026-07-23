@@ -1,9 +1,0 @@
-{
-  "name": "xonovex-skill-security-assurance",
-  "version": "7.0.0",
-  "description": "Optional Xonovex security assurance skills",
-  "author": {
-    "name": "Xonovex"
-  },
-  "skills": ["./security-assurance-guide"]
-}

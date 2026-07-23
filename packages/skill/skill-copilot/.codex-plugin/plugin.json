@@ -5,6 +5,5 @@
   "author": {
     "name": "Xonovex"
   },
-  "skills": "./copilot-guide",
-  "dependencies": ["xonovex-skill-agent-governance"]
+  "skills": "./copilot-guide"
 }

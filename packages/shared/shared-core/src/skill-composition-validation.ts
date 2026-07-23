@@ -125,20 +125,3 @@ export const compositionCatalogIssues = (
   }
   return {errors, preferredFailures};
 };
-
-export const compositionCatalogSnapshotErrors = (
-  canonical: string,
-  snapshot: string | undefined,
-): readonly string[] => {
-  if (snapshot === undefined) {
-    return [
-      "packaged workflow snapshot workflow-guide/assets/composition-catalog.json is missing",
-    ];
-  }
-  if (snapshot !== canonical) {
-    return [
-      "packaged workflow snapshot differs from packages/skill/composition-catalog.json",
-    ];
-  }
-  return [];
-};

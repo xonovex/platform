@@ -85,13 +85,13 @@
   },
   {
     "query": "build a threat-informed security assurance plan with exact control and evidence ownership",
-    "rationale": "near miss owned by security-assurance-guide",
+    "rationale": "security planning rather than accessibility work",
     "should_trigger": false,
     "split": "validation"
   },
   {
     "query": "classify our AI-system role and applicable obligations before selecting a regulated profile",
-    "rationale": "near miss owned by ai-governance-guide",
+    "rationale": "AI regulatory classification rather than accessibility work",
     "should_trigger": false,
     "split": "validation"
   },

@@ -1,7 +1,3 @@
-## Governance ownership
-
-Load **agent-governance-guide** to select the adoption mode and define executor, control, evidence, and enforcement semantics. This reference owns only the Kiro mapping and product-specific caveats.
-
 ## Kiro mappings
 
 | Pattern                               | Native mapping                                                                  | Caveat                                                     |

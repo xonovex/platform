@@ -1,9 +1,0 @@
-{
-  "name": "xonovex-skill-reliability",
-  "version": "7.0.0",
-  "description": "Xonovex reliability and resilience skills",
-  "author": {
-    "name": "Xonovex"
-  },
-  "skills": ["./reliability-guide"]
-}

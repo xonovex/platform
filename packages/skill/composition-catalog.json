@@ -30,22 +30,6 @@
       "provisions": [{"id": "method:adr", "version": "1.0.0"}]
     },
     {
-      "name": "agent-governance-guide",
-      "classification": {
-        "lifecycle": "procedural",
-        "functionalRole": "assurance"
-      },
-      "provisions": [{"id": "assurance:agent-governance", "version": "1.0.0"}]
-    },
-    {
-      "name": "ai-governance-guide",
-      "classification": {
-        "lifecycle": "procedural",
-        "functionalRole": "assurance"
-      },
-      "provisions": [{"id": "assurance:ai-governance", "version": "1.0.0"}]
-    },
-    {
       "name": "android-analytics-guide",
       "classification": {
         "lifecycle": "procedural",
@@ -494,33 +478,11 @@
       }
     },
     {
-      "name": "reliability-guide",
-      "classification": {
-        "lifecycle": "procedural",
-        "functionalRole": "assurance"
-      },
-      "provisions": [
-        {"id": "perspective:reliability", "version": "1.0.0"},
-        {"id": "assurance:reliability", "version": "1.0.0"}
-      ]
-    },
-    {
       "name": "remotion-guide",
       "classification": {
         "lifecycle": "procedural",
         "functionalRole": "capability-use"
       }
-    },
-    {
-      "name": "security-assurance-guide",
-      "classification": {
-        "lifecycle": "procedural",
-        "functionalRole": "assurance"
-      },
-      "provisions": [
-        {"id": "perspective:security", "version": "1.0.0"},
-        {"id": "assurance:security", "version": "1.0.0"}
-      ]
     },
     {
       "name": "shell-scripting-guide",
@@ -615,14 +577,6 @@
         "lifecycle": "procedural",
         "functionalRole": "capability-use"
       }
-    },
-    {
-      "name": "workflow-guide",
-      "classification": {
-        "lifecycle": "procedural",
-        "functionalRole": "procedure"
-      },
-      "provisions": [{"id": "procedure:workflow-operation", "version": "1.0.0"}]
     },
     {
       "name": "zod-guide",

@@ -541,16 +541,22 @@ const collectSkillMarkdown = (repoRoot: string): string[] => {
   return files;
 };
 
-// command-workflow's current published surface. Its package-local validator owns
-// inventory, prompt structure, and links that stay inside the package; this guard
-// owns only links from README/docs/commands that cross a package boundary.
-const collectCommandWorkflowMarkdown = (repoRoot: string): string[] => {
-  const base = join(repoRoot, "packages", "command", "command-workflow");
-  return [
-    join(base, "README.md"),
-    ...markdownEntries(join(base, "docs")),
-    ...markdownEntries(join(base, "commands")),
-  ].filter(isFile);
+// collectCommandMarkdown returns the published Markdown surface of every command
+// package so cross-package references do not depend on one special command family.
+const collectCommandMarkdown = (repoRoot: string): string[] => {
+  const root = join(repoRoot, "packages", "command");
+  if (!isDir(root)) return [];
+  return readdirSync(root)
+    .toSorted()
+    .flatMap((pkg) => {
+      const base = join(root, pkg);
+      if (!isDir(base)) return [];
+      return [
+        join(base, "README.md"),
+        ...markdownEntries(join(base, "docs")),
+        ...markdownEntries(join(base, "commands")),
+      ].filter(isFile);
+    });
 };
 
 // The packages/<layer>/<package> root a file lives under, or null when the file
@@ -618,7 +624,7 @@ export const checkCrossPackageLinks = (
 ): void => {
   const files = [
     ...collectSkillMarkdown(repoRoot),
-    ...collectCommandWorkflowMarkdown(repoRoot),
+    ...collectCommandMarkdown(repoRoot),
   ];
   const {resolved, broken} = checkMarkdownFilesForCrossPackageLinks(
     files,

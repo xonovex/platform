@@ -79,7 +79,7 @@
   },
   {
     "query": "Return a machine-readable operation result for the partial run, including effects, evidence, uncertainty, retry, and revisions.",
-    "rationale": "near miss owned by workflow-guide",
+    "rationale": "near miss requesting artifact creation rather than an architecture decision record",
     "should_trigger": false,
     "split": "validation"
   },
@@ -97,7 +97,7 @@
   },
   {
     "query": "run the workflow workspace-create utility from main at this exact revision and report the provider-native workspace location",
-    "rationale": "validation near miss owned by workflow-guide",
+    "rationale": "validation request without architecture decision-record work",
     "should_trigger": false,
     "split": "validation"
   }

@@ -1,9 +1,0 @@
-{
-  "name": "xonovex-skill-agent-governance",
-  "version": "7.0.0",
-  "description": "Composable Xonovex agent governance, controls, and maturity",
-  "author": {
-    "name": "Xonovex"
-  },
-  "skills": ["./agent-governance-guide"]
-}

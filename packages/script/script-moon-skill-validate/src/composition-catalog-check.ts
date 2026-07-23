@@ -4,10 +4,7 @@ import {
   parseCompositionCatalog,
   type InstalledSkill,
 } from "@xonovex/core/skill-composition-contract";
-import {
-  compositionCatalogIssues,
-  compositionCatalogSnapshotErrors,
-} from "@xonovex/core/skill-composition-validation";
+import {compositionCatalogIssues} from "@xonovex/core/skill-composition-validation";
 import {isDirectory, isFile} from "@xonovex/script-moon-common/fs";
 import {valid} from "semver";
 import {type LinkReport} from "./reference-file-links.js";
@@ -103,25 +100,6 @@ export const checkCompositionCatalog = (
     }
     return;
   }
-  const snapshotPath = join(
-    repoRoot,
-    "packages",
-    "skill",
-    "skill-workflow",
-    "workflow-guide",
-    "assets",
-    "composition-catalog.json",
-  );
-  const snapshotText = isFile(snapshotPath)
-    ? readFileSync(snapshotPath, "utf8")
-    : undefined;
-  const snapshotErrors = compositionCatalogSnapshotErrors(
-    sourceText,
-    snapshotText,
-  );
-  for (const error of snapshotErrors) {
-    report.addFail(`composition catalog: ${error}`);
-  }
   const installed = installedSkillInventory(repoRoot, report);
   const issues = compositionCatalogIssues(parsed.data, installed.skills);
   for (const error of issues.errors) {
@@ -134,7 +112,6 @@ export const checkCompositionCatalog = (
   }
   if (
     issues.errors.length === 0 &&
-    snapshotErrors.length === 0 &&
     installed.valid &&
     installed.skills.length > 0
   ) {

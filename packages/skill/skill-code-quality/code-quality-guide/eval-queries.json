@@ -97,7 +97,7 @@
   },
   {
     "query": "build a threat-informed security assurance plan with exact control and evidence ownership",
-    "rationale": "near miss owned by security-assurance-guide",
+    "rationale": "security planning rather than a code-quality audit",
     "should_trigger": false,
     "split": "validation"
   },

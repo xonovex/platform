@@ -1,4 +1,7 @@
-import {describe, expect, it} from "vitest";
+import {mkdirSync, mkdtempSync, rmSync, writeFileSync} from "node:fs";
+import {tmpdir} from "node:os";
+import {join} from "node:path";
+import {afterEach, describe, expect, it} from "vitest";
 import {
   parseCompositionCatalog,
   parseCompositionRequest,
@@ -12,11 +15,21 @@ import {
 } from "./skill-composition-contract.js";
 import {compositionCatalogIssues} from "./skill-composition-validation.js";
 import {resolveComposition} from "./skill-composition.js";
+import {discoverInstalledSkillInventory} from "./skill-inventory.js";
 import {resolvePreferenceOverlays} from "./skill-preference-overlays.js";
 import {
   resolveExactSkill,
   resolveSemanticRequirement,
 } from "./skill-selection.js";
+
+const temporaryDirectories: string[] = [];
+
+afterEach(() => {
+  for (const directory of temporaryDirectories) {
+    rmSync(directory, {force: true, recursive: true});
+  }
+  temporaryDirectories.length = 0;
+});
 
 const entry = (
   name: string,
@@ -94,6 +107,72 @@ const requirement = (
   strength: "required",
   reason: "The procedure needs evidence assurance.",
   ...overrides,
+});
+
+describe("installed skill inventory discovery", () => {
+  it("discovers exact plugin dependencies and package versions", () => {
+    const root = mkdtempSync(join(tmpdir(), "skill-inventory-"));
+    temporaryDirectories.push(root);
+    const writePlugin = (
+      packageName: string,
+      guide: string,
+      dependencies: readonly string[],
+      packageDependencies: Readonly<Record<string, string>>,
+    ): void => {
+      const packageRoot = join(root, packageName);
+      mkdirSync(join(packageRoot, ".claude-plugin"), {recursive: true});
+      mkdirSync(join(packageRoot, guide), {recursive: true});
+      writeFileSync(
+        join(packageRoot, ".claude-plugin", "plugin.json"),
+        JSON.stringify({
+          name: `xonovex-${packageName}`,
+          version: "7.0.0",
+          skills: [`./${guide}`],
+          dependencies,
+        }),
+      );
+      writeFileSync(
+        join(packageRoot, "package.json"),
+        JSON.stringify({
+          name: `@xonovex/${packageName}`,
+          version: "7.0.0",
+          dependencies: packageDependencies,
+        }),
+      );
+    };
+    writePlugin("skill-base", "base-guide", [], {});
+    writePlugin("skill-consumer", "consumer-guide", ["xonovex-skill-base"], {
+      "@xonovex/skill-base": "7.0.0",
+    });
+
+    const result = discoverInstalledSkillInventory([root]);
+
+    expect(result.success).toBe(true);
+    if (!result.success) throw new Error(result.errors.join("\n"));
+    expect(
+      result.data.find(({guide}) => guide === "consumer-guide")?.dependencies,
+    ).toEqual([
+      {
+        plugin: "xonovex-skill-base",
+        implementationVersion: "7.0.0",
+      },
+    ]);
+  });
+
+  it("reports malformed plugin manifests instead of hiding them", () => {
+    const root = mkdtempSync(join(tmpdir(), "skill-inventory-invalid-"));
+    temporaryDirectories.push(root);
+    const pluginRoot = join(root, "skill-invalid");
+    mkdirSync(join(pluginRoot, ".claude-plugin"), {recursive: true});
+    writeFileSync(join(pluginRoot, ".claude-plugin", "plugin.json"), "{");
+
+    const result = discoverInstalledSkillInventory([root]);
+
+    expect(result).toMatchObject({
+      success: false,
+      errors: [expect.stringContaining("cannot parse JSON")],
+    });
+  });
 });
 
 describe("composition inputs", () => {

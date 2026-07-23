@@ -2,16 +2,12 @@ import {resolve} from "node:path";
 import {parseArgs} from "node:util";
 import {validateCommandPackage} from "./command-validation.js";
 import {type ValidationReport} from "./validation.js";
-import {validateWorkflowContract} from "./workflow-contract.js";
-import {validateWorkflowSchemaAssets} from "./workflow-schema-assets.js";
 
 const HELP = `usage: moon-command-validate [package-dir] [options]
 
-Validate command Markdown and optional package-specific semantic contracts.
+Validate command Markdown and semantic requirements.
 
 options:
-  --assets <path>     validate workflow JSON Schemas and examples
-  --contract <path>   validate a declarative workflow command contract
   --repo-root <path>  repository root (defaults to three levels above package)
   -h, --help          show this help`;
 
@@ -48,8 +44,6 @@ export const main = (argv: readonly string[]): number => {
       allowPositionals: true,
       strict: true,
       options: {
-        assets: {type: "string"},
-        contract: {type: "string"},
         "repo-root": {type: "string"},
       },
     });
@@ -70,25 +64,8 @@ export const main = (argv: readonly string[]): number => {
     typeof parsed.values["repo-root"] === "string"
       ? resolve(parsed.values["repo-root"])
       : resolve(packageDir, "../../..");
-  const contract =
-    typeof parsed.values.contract === "string"
-      ? resolve(parsed.values.contract)
-      : undefined;
-  const assets =
-    typeof parsed.values.assets === "string"
-      ? resolve(parsed.values.assets)
-      : undefined;
   try {
-    const report =
-      contract === undefined
-        ? validateCommandPackage(packageDir, repositoryRoot).report
-        : validateWorkflowContract(contract, packageDir, repositoryRoot);
-    if (assets === undefined) return render(report);
-    const assetReport = validateWorkflowSchemaAssets(assets);
-    return render({
-      commands: report.commands,
-      issues: [...report.issues, ...assetReport.issues],
-    });
+    return render(validateCommandPackage(packageDir, repositoryRoot).report);
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     process.stderr.write(

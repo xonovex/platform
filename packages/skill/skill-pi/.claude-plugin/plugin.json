@@ -5,6 +5,5 @@
   "author": {
     "name": "Xonovex"
   },
-  "skills": ["./pi-guide"],
-  "dependencies": ["xonovex-skill-agent-governance"]
+  "skills": ["./pi-guide"]
 }

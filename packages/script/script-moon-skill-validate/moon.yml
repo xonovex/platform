@@ -19,24 +19,7 @@ tasks:
       - /packages/skill/*/*/SKILL.md
       - /packages/skill/*/*/SOURCES.md
       - /packages/skill/*/*/references/*.md
-      - /packages/skill/skill-workflow/workflow-guide/assets/composition-catalog.json
-      - /packages/command/command-workflow/docs/*.md
-      - /packages/command/command-workflow/commands/*.md
     options:
-      runFromWorkspaceRoot: true
-  composition-sync:
-    command:
-      - node
-      - packages/script/script-moon-skill-validate/dist/src/sync-composition-catalog-cli.js
-      - .
-    deps: [build]
-    inputs:
-      - /packages/skill/composition-catalog.json
-      - /packages/skill/skill-workflow/workflow-guide/assets/composition-catalog.json
-    outputs:
-      - /packages/skill/skill-workflow/workflow-guide/assets/composition-catalog.json
-    options:
-      cache: false
       runFromWorkspaceRoot: true
   coverage:
     command: noop
@@ -51,14 +34,12 @@ tasks:
     inputs:
       - /packages/skill/composition-catalog.json
       - /packages/skill/skill-skill/skill-guide/assets/**/*
-      - /packages/skill/skill-workflow/workflow-guide/assets/composition-catalog.json
   ts-coverage:
     deps:
       - shared-core:build
     inputs:
       - /packages/skill/composition-catalog.json
       - /packages/skill/skill-skill/skill-guide/assets/**/*
-      - /packages/skill/skill-workflow/workflow-guide/assets/composition-catalog.json
   ts-build:
     deps:
       - shared-core:build

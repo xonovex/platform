@@ -16,12 +16,6 @@ tasks:
       --coverage.thresholds.functions 80
       --coverage.thresholds.branches 70
       --coverage.thresholds.statements 80
-    inputs:
-      - /packages/command/command-workflow/contracts/*.json
-      - /packages/command/command-workflow/commands/*.md
-      - /packages/skill/skill-workflow/workflow-guide/SKILL.md
-      - /packages/skill/skill-workflow/workflow-guide/assets/**/*.json
-      - /packages/skill/skill-workflow/workflow-guide/references/*.md
     deps:
       - shared-core:build
   ts-build:
@@ -30,12 +24,6 @@ tasks:
   ts-test:
     deps:
       - shared-core:build
-    inputs:
-      - /packages/command/command-workflow/contracts/*.json
-      - /packages/command/command-workflow/commands/*.md
-      - /packages/skill/skill-workflow/workflow-guide/SKILL.md
-      - /packages/skill/skill-workflow/workflow-guide/assets/**/*.json
-      - /packages/skill/skill-workflow/workflow-guide/references/*.md
   install:
     command:
       - npm

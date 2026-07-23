@@ -19,13 +19,11 @@ packages/
     prettier-config/    # Prettier configuration
     vite-config-base/   # Vite configuration
   diagram/              # Diagram packages
-    diagram-agent-workflow/ # Agent workflow diagram
     diagram-moon-action/ # Moon action graph diagrams
   skill/                # Coding guidelines and skills
     skill-*/            # Skill packages (instructions, references, scripts, and assets)
   command/              # Workflow and utility commands
     command-utility/    # Utility commands (content, instructions, slash commands)
-    command-workflow/   # Workflow commands (plan, git, reflect, code)
   script/               # Internal build scripts
     script-moon-common/ # Shared moon script utilities
     script-moon-*/      # Moon task scripts (action-graph, npm-check, npm-publish, version-bump, version-detect)

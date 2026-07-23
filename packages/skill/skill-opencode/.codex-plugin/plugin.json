@@ -5,6 +5,5 @@
   "author": {
     "name": "Xonovex"
   },
-  "skills": "./opencode-guide",
-  "dependencies": ["xonovex-skill-agent-governance"]
+  "skills": "./opencode-guide"
 }

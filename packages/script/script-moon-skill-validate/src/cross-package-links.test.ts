@@ -86,27 +86,14 @@ const manifest = (
     skills: kind === "claude" ? [skill] : skill,
   });
 
-const workflowCommandNames = [
-  "abandon",
-  "create",
-  "decide",
-  "execute",
-  "publish",
-  "review",
-  "revise",
-  "validate",
-  "workspace-abandon",
-  "workspace-cleanup",
-  "workspace-create",
-  "workspace-merge",
-] as const;
+const commandNames = ["create", "review"] as const;
 
-const workflowCommands = (
+const commandFiles = (
   overrides: Readonly<Record<string, string>> = {},
 ): Record<string, string> =>
   Object.fromEntries(
-    workflowCommandNames.map((name) => [
-      `packages/command/command-workflow/commands/${name}.md`,
+    commandNames.map((name) => [
+      `packages/command/command-test/commands/${name}.md`,
       overrides[name] ?? `# ${name}\n`,
     ]),
   );
@@ -122,13 +109,10 @@ describe("checkMarkdownFilesForCrossPackageLinks", () => {
   it("resolves a boundary-crossing link to an existing target", () => {
     const repo = makeRepo({
       "packages/skill/skill-x/x-guide/references/actors.md": "# Actors\n",
-      "packages/command/command-workflow/commands/foo.md":
+      "packages/command/command-test/commands/foo.md":
         "See [actors](../../../skill/skill-x/x-guide/references/actors.md).",
     });
-    const source = join(
-      repo,
-      "packages/command/command-workflow/commands/foo.md",
-    );
+    const source = join(repo, "packages/command/command-test/commands/foo.md");
     const report = makeSink();
     const counts = checkMarkdownFilesForCrossPackageLinks(
       [source],
@@ -141,13 +125,10 @@ describe("checkMarkdownFilesForCrossPackageLinks", () => {
 
   it("fails a boundary-crossing link whose target is missing, naming the source and link", () => {
     const repo = makeRepo({
-      "packages/command/command-workflow/commands/foo.md":
+      "packages/command/command-test/commands/foo.md":
         "See [actors](../../../skill/skill-x/x-guide/references/actors.md).",
     });
-    const source = join(
-      repo,
-      "packages/command/command-workflow/commands/foo.md",
-    );
+    const source = join(repo, "packages/command/command-test/commands/foo.md");
     const report = makeSink();
     const counts = checkMarkdownFilesForCrossPackageLinks(
       [source],
@@ -157,7 +138,7 @@ describe("checkMarkdownFilesForCrossPackageLinks", () => {
     expect(counts.broken).toBe(1);
     expect(report.fails).toHaveLength(1);
     expect(report.fails[0]).toContain(
-      "packages/command/command-workflow/commands/foo.md",
+      "packages/command/command-test/commands/foo.md",
     );
     expect(report.fails[0]).toContain(
       "../../../skill/skill-x/x-guide/references/actors.md",
@@ -166,9 +147,9 @@ describe("checkMarkdownFilesForCrossPackageLinks", () => {
 
   it("ignores an intra-package link, even a broken one", () => {
     const repo = makeRepo({
-      "packages/command/command-workflow/docs/a.md": "See [b](./missing.md).",
+      "packages/command/command-test/docs/a.md": "See [b](./missing.md).",
     });
-    const source = join(repo, "packages/command/command-workflow/docs/a.md");
+    const source = join(repo, "packages/command/command-test/docs/a.md");
     const report = makeSink();
     const counts = checkMarkdownFilesForCrossPackageLinks(
       [source],
@@ -181,7 +162,7 @@ describe("checkMarkdownFilesForCrossPackageLinks", () => {
 
   it("skips external, placeholder, ellipsis, and anchor forms", () => {
     const repo = makeRepo({
-      "packages/command/command-workflow/docs/skips.md": [
+      "packages/command/command-test/docs/skips.md": [
         "[a](https://example.com)",
         "[b](mailto:x@y.z)",
         "[c](../../../skill/<topic>.md)",
@@ -190,10 +171,7 @@ describe("checkMarkdownFilesForCrossPackageLinks", () => {
         "[f](#anchor)",
       ].join("\n"),
     });
-    const source = join(
-      repo,
-      "packages/command/command-workflow/docs/skips.md",
-    );
+    const source = join(repo, "packages/command/command-test/docs/skips.md");
     const report = makeSink();
     const counts = checkMarkdownFilesForCrossPackageLinks(
       [source],
@@ -207,10 +185,10 @@ describe("checkMarkdownFilesForCrossPackageLinks", () => {
   it("resolves a boundary-crossing link that carries an in-page fragment", () => {
     const repo = makeRepo({
       "packages/skill/skill-y/y-guide/references/g.md": "# G\n",
-      "packages/command/command-workflow/docs/a.md":
+      "packages/command/command-test/docs/a.md":
         "See [g](../../../skill/skill-y/y-guide/references/g.md#section).",
     });
-    const source = join(repo, "packages/command/command-workflow/docs/a.md");
+    const source = join(repo, "packages/command/command-test/docs/a.md");
     const report = makeSink();
     const counts = checkMarkdownFilesForCrossPackageLinks(
       [source],
@@ -223,14 +201,14 @@ describe("checkMarkdownFilesForCrossPackageLinks", () => {
 });
 
 describe("checkCrossPackageLinks", () => {
-  it("scans the twelve-command surface and retained planning references", () => {
+  it("scans command packages and retained planning references", () => {
     const repo = makeRepo({
-      ...workflowCommands(),
-      "packages/command/command-workflow/README.md":
-        "See the [operation model](../../diagram/diagram-agent-workflow/operation-model.png).\n",
-      "packages/command/command-workflow/docs/invocation.md":
+      ...commandFiles(),
+      "packages/command/command-test/README.md":
+        "See the [command model](../../diagram/diagram-command/command-model.png).\n",
+      "packages/command/command-test/docs/invocation.md":
         "See the [submission boundary](../../../agent/agent-operator-go/README.md).\n",
-      "packages/diagram/diagram-agent-workflow/operation-model.png": "image",
+      "packages/diagram/diagram-command/command-model.png": "image",
       "packages/agent/agent-operator-go/README.md": "# Operator\n",
       "packages/skill/skill-plan/plan-guide/SKILL.md":
         "# Plan\nSee [create](references/plan-create.md).\n",

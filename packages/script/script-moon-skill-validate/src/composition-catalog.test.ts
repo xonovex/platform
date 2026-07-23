@@ -7,10 +7,7 @@ import {
   type InstalledSkill,
   type SemanticRequirement,
 } from "@xonovex/core/skill-composition-contract";
-import {
-  compositionCatalogIssues,
-  compositionCatalogSnapshotErrors,
-} from "@xonovex/core/skill-composition-validation";
+import {compositionCatalogIssues} from "@xonovex/core/skill-composition-validation";
 import {
   resolveExactSkill,
   resolveSemanticRequirement,
@@ -193,22 +190,6 @@ describe("composition catalog schema", () => {
     });
   });
 
-  it("requires the packaged workflow snapshot to be byte-identical", () => {
-    expect(
-      compositionCatalogSnapshotErrors('{"skills":[]}\n', undefined),
-    ).toEqual([
-      "packaged workflow snapshot workflow-guide/assets/composition-catalog.json is missing",
-    ]);
-    expect(
-      compositionCatalogSnapshotErrors('{"skills":[]}\n', '{"skills": []}\n'),
-    ).toEqual([
-      "packaged workflow snapshot differs from packages/skill/composition-catalog.json",
-    ]);
-    expect(
-      compositionCatalogSnapshotErrors('{"skills":[]}\n', '{"skills":[]}\n'),
-    ).toEqual([]);
-  });
-
   it("validates the complete repository catalog", () => {
     const repositoryRoot = resolve(import.meta.dirname, "../../../..");
     const passes: string[] = [];
@@ -226,7 +207,7 @@ describe("composition catalog schema", () => {
 
     expect(failures).toEqual([]);
     expect(passes).toContain(
-      "composition catalog: 92 installed skill(s) have one validated classification",
+      "composition catalog: 87 installed skill(s) have one validated classification",
     );
     const parsed = JSON.parse(
       readFileSync(
@@ -234,7 +215,7 @@ describe("composition catalog schema", () => {
         "utf8",
       ),
     ) as {skills: unknown[]};
-    expect(parsed.skills).toHaveLength(92);
+    expect(parsed.skills).toHaveLength(87);
   });
 });
 
