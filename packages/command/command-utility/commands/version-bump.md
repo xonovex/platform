@@ -16,8 +16,6 @@ argument-hint: >-
 
 ## Arguments
 
-`/version-bump [patch|minor|major] [--type <type>] [--exact <version>] [--preid <tag>] [--dry-run] [--no-changelog] [--no-dependents] [--changelog-path <file>] [--git-base <ref>] [--include-types <a,b>]`
-
 - `type` (optional positional): Bump level — `patch` (default), `minor`, or `major`
 - `--type <type>` (optional): Bump level; same values as the positional argument
 - `--exact <version>` (optional): Set this exact `X.Y.Z` / `X.Y.Z-tag.N` version instead of bumping

@@ -5,5 +5,6 @@
   "author": {
     "name": "Xonovex"
   },
-  "skills": ["./gpu-rendering-vulkan-guide"]
+  "skills": ["./gpu-rendering-vulkan-guide"],
+  "dependencies": ["xonovex-skill-gpu-rendering"]
 }

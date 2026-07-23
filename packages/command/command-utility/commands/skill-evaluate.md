@@ -20,7 +20,6 @@ argument-hint: "[skill-file] [--count <n>]"
 
 ## Delegation
 
-Load the `skill-guide` skill (plugin `xonovex-skill-skill`) and author the skill's
-`evals.json` output-eval seed following its **evaluating-outputs** procedure — knowledge
-probes with binary assertions, plus a `tier` field, stored at the guide root. The skill
-is the source of truth for the shape and gotchas — do not restate them.
+Load the `skill-guide` skill (plugin `xonovex-skill-skill`) and perform its
+**evaluating-outputs** operation with these arguments. The skill is the source of truth
+for the procedure, output format, and gotchas — do not restate them.

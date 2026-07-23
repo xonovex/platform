@@ -5,6 +5,8 @@ description: "Use when writing or editing Vitest 3+ tests in TypeScript. Trigger
 
 # Vitest Testing Guidelines
 
+For framework-independent test design — Arrange-Act-Assert, FIRST, and choosing/naming test doubles — see **testing-guide**; this guide covers only Vitest-specific mechanics.
+
 ## Requirements
 
 - Vitest ≥ 3, TypeScript ≥ 5.8

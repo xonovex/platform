@@ -9,7 +9,7 @@ description: "Use when editing or scaffolding Astro sites with islands architect
 
 - **Islands architecture** - Default to static HTML, hydrate only where needed, see [references/islands-architecture.md](references/islands-architecture.md)
 - **Project structure** - Use `src/pages`, `src/components`, `src/layouts`, `src/content`, see [references/project-structure.md](references/project-structure.md)
-- **Content collections** - Use `astro:content` with schema-validated frontmatter, see [references/content-collections.md](references/content-collections.md)
+- **Content collections** - Use `astro:content` with schema-validated frontmatter; schema design in **zod-guide**, see [references/content-collections.md](references/content-collections.md)
 - **Framework components** - Integrate React, Vue, or other frameworks, see [references/components.md](references/components.md)
 - **Accessibility** - Use semantic HTML, alt text, ARIA as needed, see [references/accessibility.md](references/accessibility.md)
 
