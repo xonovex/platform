@@ -1,0 +1,54 @@
+{
+  "skill_name": "workflow-guide",
+  "tier": "moderate",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Review proposal.md from compatibility and accessibility perspectives, then save the report to reports/review.md in the same operation.",
+      "assertions": [
+        "The review remains read-only and returns evidence-linked findings inline.",
+        "Writing the report is identified as a separate publish operation rather than an implicit review effect."
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Execute the migration in preview mode and use whatever installed repository-specific capabilities fit.",
+      "assertions": [
+        "The response selects relevant installed capabilities without inventing a hard dependency on one concrete implementation skill.",
+        "Preview reports an exact effect plan and does not apply changes."
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Validate build 91c2 against backward compatibility and signed evidence. A rollback rehearsal is only advisory.",
+      "assertions": [
+        "Each binding criterion receives a separate pass, fail, or blocked result with evidence.",
+        "The advisory rehearsal is reported separately and does not determine the binding validation outcome."
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "Merge workspace feature-x into main and remove its worktree and branch afterward.",
+      "assertions": [
+        "Workspace merge validates and integrates the exact workspace while preserving its worktree and branch.",
+        "Removal is deferred to a separately previewed and authorized workspace-cleanup operation."
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "Review this API change. The preferred accessibility capability is unavailable, but baseline review is still useful.",
+      "assertions": [
+        "The unavailable preferred capability is reported as degraded coverage rather than silently omitted.",
+        "The review continues with safe baseline checks and states the resulting limitation."
+      ]
+    },
+    {
+      "id": 6,
+      "prompt": "Execute this operation, but its required deployment capability is unavailable.",
+      "assertions": [
+        "The operation blocks before effects because a required capability cannot be resolved.",
+        "The result names the missing capability and gives a concrete recovery boundary without substituting an unrelated skill."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "name": "@xonovex/skill-workflow",
+  "version": "7.0.0",
+  "description": "Xonovex minimal workflow operation skills",
+  "private": true,
+  "type": "module",
+  "keywords": [
+    "xonovex",
+    "skill",
+    "workflow",
+    "operations"
+  ],
+  "scripts": {
+    "fmt": "prettier --write .",
+    "fmt:check": "prettier --check ."
+  }
+}

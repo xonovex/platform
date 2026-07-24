@@ -131,6 +131,7 @@ Each skill is a separate plugin. A compatible harness can route to an installed 
 claude plugin marketplace add xonovex/platform
 
 # Install only the independent capabilities you need
+claude plugin install xonovex-workflow@xonovex-marketplace            # explicit create / review / revise / decide / execute / validate / publish / abandon and workspace commands
 claude plugin install xonovex-skill-plan@xonovex-marketplace          # research, decide, plan, revise, critique, accept/reject, subplans, continue, update, validate, code-align/harden/simplify
 claude plugin install xonovex-skill-git@xonovex-marketplace           # commit, merge-resolve, feature-worktree create/merge/abandon/cleanup
 claude plugin install xonovex-skill-instruction@xonovex-marketplace   # AGENTS.md init / sync / simplify / consolidate / merge
@@ -139,6 +140,7 @@ claude plugin install xonovex-skill-code-review@xonovex-marketplace   # Conventi
 claude plugin install xonovex-skill-pull-request@xonovex-marketplace  # PR authoring: description, size/atomicity, testing evidence, tradeoffs, self-review
 claude plugin install xonovex-skill-command@xonovex-marketplace        # author / merge / simplify reusable prompt files (cross-harness format reference)
 claude plugin install xonovex-skill-skill@xonovex-marketplace         # author / extract / merge / simplify / validate Agent Skills
+claude plugin install xonovex-skill-workflow@xonovex-marketplace      # direct workflow operation routing without slash commands
 claude plugin install xonovex-skill-content@xonovex-marketplace       # multilingual articles, news, travel guides, prose humanization
 claude plugin install xonovex-skill-llmstxt@xonovex-marketplace       # /llms.txt files and per-page markdown mirrors
 
@@ -166,6 +168,7 @@ codex plugin add xonovex-skill-code-review@xonovex-marketplace   # Conventional 
 codex plugin add xonovex-skill-pull-request@xonovex-marketplace  # PR authoring: description, size/atomicity, testing evidence, tradeoffs, self-review
 codex plugin add xonovex-skill-command@xonovex-marketplace        # author / merge / simplify reusable prompt files (cross-harness format reference)
 codex plugin add xonovex-skill-skill@xonovex-marketplace         # author / extract / merge / simplify / validate Agent Skills
+codex plugin add xonovex-skill-workflow@xonovex-marketplace      # explicit workflow operations with effect and workspace boundaries
 codex plugin add xonovex-skill-content@xonovex-marketplace       # multilingual articles, news, travel guides, prose humanization
 codex plugin add xonovex-skill-llmstxt@xonovex-marketplace       # /llms.txt files and per-page markdown mirrors
 

@@ -1,0 +1,9 @@
+{
+  "name": "xonovex-workflow",
+  "version": "7.0.0",
+  "description": "Xonovex explicit workflow operation commands",
+  "author": {
+    "name": "Xonovex"
+  },
+  "dependencies": ["xonovex-skill-workflow"]
+}

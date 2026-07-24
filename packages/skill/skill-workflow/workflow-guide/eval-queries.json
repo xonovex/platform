@@ -1,0 +1,112 @@
+[
+  {
+    "query": "Run the workflow review operation on proposal.md with compatibility and accessibility concerns, but keep the result inline.",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Compose create, review, and publish as separate operations so no review step writes externally.",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Execute this migration in preview mode, select the installed capabilities that fit the repository, and show every planned effect.",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Use workspace-create for feature/cache from main@91c2 and do not implement, merge, or clean anything.",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Merge the exact workspace after validation and leave its branch and worktree intact for a later cleanup call.",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Abandon this partial workflow with the current evidence and a retry boundary; do not delete its workspace.",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Preview publishing this exact result to DOC-42, then report what authorization and idempotency information apply would need.",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Run /xonovex-workflow:validate on release candidate 91c2 against these three binding criteria and return pass, fail, or blocked with evidence for each.",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "The preferred accessibility capability is not installed. Continue the workflow review with baseline checks if that is still useful and report the degradation.",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Record a workflow decision between the two supplied options, but do not approve the release or change any protected gate.",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Review pull request #418 and draft line comments for correctness and maintainability.",
+    "rationale": "Direct pull-request review has a concrete domain owner and does not need operation-level workflow orchestration.",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Create a React component for the account settings form and add component tests.",
+    "rationale": "Direct implementation should route to concrete framework and testing capabilities.",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Rebase feature/auth onto main and resolve the rename conflict.",
+    "rationale": "A direct version-control operation does not need the generic workspace workflow boundary.",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Write an implementation plan for migrating the cache layer and identify risks.",
+    "rationale": "Planning is a concrete procedure rather than a generic workflow operation request.",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Publish version 7.1.0 of the npm packages and create release tags.",
+    "rationale": "Package release mechanics have a concrete capability owner.",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Create an architecture decision record for adopting PostgreSQL.",
+    "rationale": "ADR authoring is a concrete creation procedure.",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Remove old build directories under packages/app after showing me their sizes.",
+    "rationale": "Ordinary filesystem cleanup is not workspace lifecycle management.",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Create a slash command that delegates to the testing skill.",
+    "rationale": "Command authoring is outside workflow operation execution.",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Explain how hard and soft skill dependencies differ in the composition catalog.",
+    "rationale": "This is skill-composition authoring guidance, not execution of a workflow operation.",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Investigate the production latency spike, inspect traces, and identify the likely regression.",
+    "rationale": "Direct incident investigation should use concrete debugging and observability capabilities.",
+    "should_trigger": false,
+    "split": "validation"
+  }
+]

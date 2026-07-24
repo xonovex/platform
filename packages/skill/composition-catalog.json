@@ -579,6 +579,14 @@
       }
     },
     {
+      "name": "workflow-guide",
+      "classification": {
+        "lifecycle": "procedural",
+        "functionalRole": "procedure"
+      },
+      "provisions": [{"id": "procedure:workflow-operation", "version": "1.0.0"}]
+    },
+    {
       "name": "zod-guide",
       "classification": {
         "lifecycle": "procedural",

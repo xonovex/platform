@@ -102,6 +102,19 @@ describe("checkCatalogFiles", () => {
     );
   });
 
+  it("rejects TypeScript and MJS implementation files", () => {
+    const skillDir = makeSkill();
+    mkdirSync(join(skillDir, "scripts"));
+    writeFileSync(join(skillDir, "scripts", "validate.ts"), "");
+    writeFileSync(join(skillDir, "scripts", "evaluate.mjs"), "");
+
+    expect(
+      checkCatalogFiles(skillDir, {name: "example-guide"}).errors,
+    ).toContain(
+      "catalog: skills must not contain TypeScript or MJS implementation files: scripts/evaluate.mjs, scripts/validate.ts",
+    );
+  });
+
   it("rejects generated routing boilerplate", () => {
     const skillDir = makeSkill();
     const path = join(skillDir, "eval-queries.json");

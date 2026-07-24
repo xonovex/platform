@@ -207,7 +207,7 @@ describe("composition catalog schema", () => {
 
     expect(failures).toEqual([]);
     expect(passes).toContain(
-      "composition catalog: 87 installed skill(s) have one validated classification",
+      "composition catalog: 88 installed skill(s) have one validated classification",
     );
     const parsed = JSON.parse(
       readFileSync(
@@ -215,7 +215,7 @@ describe("composition catalog schema", () => {
         "utf8",
       ),
     ) as {skills: unknown[]};
-    expect(parsed.skills).toHaveLength(87);
+    expect(parsed.skills).toHaveLength(88);
   });
 });
 

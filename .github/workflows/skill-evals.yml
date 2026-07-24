@@ -53,8 +53,10 @@ jobs:
           nix develop --no-update-lock-file --command npx moon run \
             skill-skill:ci-skill-eval-trigger \
             skill-command:ci-skill-eval-trigger \
+            skill-workflow:ci-skill-eval-trigger \
             skill-skill:ci-skill-eval-output \
-            skill-command:ci-skill-eval-output
+            skill-command:ci-skill-eval-output \
+            skill-workflow:ci-skill-eval-output
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}

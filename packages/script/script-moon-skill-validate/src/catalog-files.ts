@@ -352,6 +352,31 @@ const hasExecutableScripts = (dir: string): boolean => {
   return false;
 };
 
+const forbiddenImplementationFiles = (
+  dir: string,
+  prefix = "",
+): readonly string[] => {
+  if (!isDirectory(dir)) return [];
+  return readdirSync(dir, {withFileTypes: true}).flatMap((entry) => {
+    if (entry.name === "__pycache__" || entry.name.startsWith(".")) return [];
+    const path = join(dir, entry.name);
+    const label = prefix === "" ? entry.name : `${prefix}/${entry.name}`;
+    if (entry.isDirectory()) return forbiddenImplementationFiles(path, label);
+    return entry.isFile() && /\.(?:mjs|ts)$/u.test(entry.name) ? [label] : [];
+  });
+};
+
+const checkImplementationFormats = (
+  skillDir: string,
+  errors: string[],
+): void => {
+  const forbidden = forbiddenImplementationFiles(skillDir);
+  if (forbidden.length === 0) return;
+  errors.push(
+    `catalog: skills must not contain TypeScript or MJS implementation files: ${forbidden.join(", ")}`,
+  );
+};
+
 const checkScriptMetadata = (
   skillDir: string,
   frontmatter: Readonly<Record<string, unknown>>,
@@ -397,6 +422,7 @@ export const checkCatalogFiles = (
   checkTriggerEvals(skillDir, passes, errors);
   checkSources(skillDir, frontmatter.description, passes, errors);
   checkCredentialExamples(skillDir, passes, errors);
+  checkImplementationFormats(skillDir, errors);
   checkScriptMetadata(skillDir, frontmatter, passes, errors);
   return {passes, errors};
 };
