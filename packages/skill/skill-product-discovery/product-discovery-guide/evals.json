@@ -1,0 +1,33 @@
+{
+  "skill_name": "product-discovery-guide",
+  "tier": "moderate",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Leadership wants an AI chatbot in checkout next quarter. Frame the discovery without accepting the solution or starting delivery.",
+      "assertions": [
+        "Reframes the chatbot request into an affected-user problem and current journey with explicit exclusions",
+        "Separates available evidence from assumptions and identifies the highest-consequence weakly supported assumptions",
+        "Defines a measurable outcome, guardrails, smallest useful tests, and a proceed/change/pause/stop boundary without approving delivery"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Compare three interventions for reducing failed identity checks. The evidence conflicts and each stakeholder has a preferred option.",
+      "assertions": [
+        "Compares every option against the same outcome, evidence, feasibility, cost, risk, reversibility, and whole-journey dimensions",
+        "Preserves contradictory evidence and sensitivity to disputed assumptions instead of collapsing them into an unexplained score",
+        "Returns a recommendation with dissent, unresolved uncertainty, and the next evidence boundary"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "We have a baseline but no reliable target or guardrails. Design the smallest product discovery that can support a decision.",
+      "assertions": [
+        "Pins population, measurement window, leading and lagging indicators, target rationale, and guardrails",
+        "Chooses tests that can disconfirm the proposed intervention and names the result that would change or stop it",
+        "Produces a traceable product-definition handoff without creating stories or an implementation plan"
+      ]
+    }
+  ]
+}

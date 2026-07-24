@@ -1,0 +1,17 @@
+{
+  "name": "@xonovex/skill-threat-modeling",
+  "version": "7.0.0",
+  "private": true,
+  "type": "module",
+  "keywords": [
+    "xonovex",
+    "skill",
+    "security",
+    "threat",
+    "modeling"
+  ],
+  "scripts": {
+    "fmt": "prettier --write .",
+    "fmt:check": "prettier --check ."
+  }
+}

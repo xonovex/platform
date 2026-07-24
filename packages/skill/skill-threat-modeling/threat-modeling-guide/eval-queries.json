@@ -1,0 +1,90 @@
+[
+  {
+    "query": "threat model this authentication flow and its trust boundaries",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "identify credible abuse cases for this payment callback design",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "apply STRIDE to the actual data-flow elements and prioritize the results",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "turn these security threats into owned mitigations and verification cases",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "review whether this architecture diagram is a sufficient threat model",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "update the threat model after this new integration changed privileges and data flows",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "record residual threats and the evidence an accountable risk decision needs",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "derive replay, ordering, partial failure, and recovery threats from this state transition",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "audit npm dependencies for known vulnerable package versions",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "Dependency vulnerability scanning is not design threat modeling"
+  },
+  {
+    "query": "configure AWS identity policies and organization guardrails",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "Cloud provider implementation has a concrete owner"
+  },
+  {
+    "query": "respond to the active credential-exposure incident",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "An active incident requires response coordination"
+  },
+  {
+    "query": "review this pull request for correctness and maintainability",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "General code review does not create a system threat model"
+  },
+  {
+    "query": "write unit tests for input validation in this parser",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "Test construction follows an already selected control"
+  },
+  {
+    "query": "design the domain aggregates and bounded contexts",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "Domain modeling is not security threat enumeration"
+  },
+  {
+    "query": "assess this release against WCAG 2.2 AA",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "Accessibility assurance evaluates a different quality concern"
+  },
+  {
+    "query": "store and rotate this API credential safely",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "Credential lifecycle implementation has a concrete owner"
+  }
+]

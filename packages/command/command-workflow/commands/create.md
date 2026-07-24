@@ -18,9 +18,11 @@ argument-hint: >-
 
 - `subject` (required unless `--request` supplies it): Inline content, a path, or an
   opaque native reference.
-- `--request` (optional): Markdown file containing the subject and equivalent inputs.
-  Do not combine it with shorthand arguments.
-- `--subject-revision` (optional): Exact native revision of the subject.
+- `--request` (optional): Markdown workflow handoff containing the subject and
+  equivalent inputs, including required or preferred capabilities when applicable. Do
+  not combine it with shorthand arguments.
+- `--subject-revision` (optional): Exact native revision of the subject; required for a
+  protected provider-native subject when the provider exposes one.
 - `--criterion` (repeatable, optional): Constraint the result must satisfy.
 - `--method` (optional): Requested subject-specific procedure.
 

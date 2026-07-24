@@ -1,0 +1,9 @@
+{
+  "name": "xonovex-skill-threat-modeling",
+  "version": "7.0.0",
+  "description": "Xonovex software threat modeling skills",
+  "author": {
+    "name": "Xonovex"
+  },
+  "skills": ["./threat-modeling-guide"]
+}

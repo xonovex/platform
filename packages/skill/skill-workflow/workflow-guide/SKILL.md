@@ -14,6 +14,8 @@ operation semantics; selected domain skills own the subject-specific procedure.
   silently chain the next operation
 - **Explicit subject** — act on the supplied inline subject, path, or opaque native
   reference without inventing missing identity or revision data
+- **Traceable handoffs** — preserve subject revisions, relationships, criteria,
+  capability needs, evidence, limitations, and effects across role boundaries
 - **Soft capability selection** — choose relevant installed skills from the subject,
   method, perspectives, criteria, and their routing descriptions; keep this general
   skill free of concrete domain dependencies
@@ -32,15 +34,16 @@ operation semantics; selected domain skills own the subject-specific procedure.
 
 ## Operation Procedure
 
-1. Identify the requested operation, exact subject, constraints, and requested effect
-   mode.
+1. Identify the requested operation, exact subject, constraints, requested effect
+   mode, and any handoff relationships.
 2. Reject or separate additional operations whose effect boundaries differ.
-3. Select and load relevant installed capabilities using the subject, method,
-   perspectives, and criteria.
+3. Resolve required and preferred capability needs from shorthand arguments or the
+   Markdown request contract, then load relevant installed capabilities.
 4. Adapt selected procedures to the operation's effect and persistence boundary.
 5. Perform only the requested operation without assuming publication, approval, or a
    following lifecycle step.
-6. Verify the result and report evidence, degradation, blockers, and effects.
+6. Verify the result and preserve material identity, evidence, degradation, blockers,
+   relationships, and effects in the returned handoff.
 
 Use these headings only when they add information:
 
@@ -50,6 +53,8 @@ Use these headings only when they add information:
 Status: completed | partial | blocked
 
 ## Result
+
+## Subject and relationships
 
 ## Evidence
 
@@ -99,6 +104,8 @@ Do not force empty headings or serialize the result into a fixed envelope.
 - Installing a skill does not load it; load every selected guide explicitly
 - Caller-declared preferred capability needs degrade visibly when unavailable;
   caller-declared required needs block before effects
+- A `--request` file follows the Markdown handoff contract; shorthand arguments remain
+  useful for requests that do not need cross-role traceability
 - A selected guide never widens the operation: persistence remains Publish, workspace
   removal remains Workspace cleanup, and mutation still requires `apply`
 - Preview is not authorization to apply, and a successful decision is not approval
@@ -124,3 +131,7 @@ Do not force empty headings or serialize the result into a fixed envelope.
   preview, apply, publish, or otherwise affect external state
 - Read [references/capability-selection.md](references/capability-selection.md) - Load when
   resolving soft selections, hard-dependency order, degradation, or blockers
+- Read [references/handoffs.md](references/handoffs.md) - Load when accepting a Markdown
+  request, returning a cross-role result, aggregating evidence, or preserving relationships
+- Read [references/sdlc.md](references/sdlc.md) - Load when composing the atomic
+  operations across product, UX, engineering, QA, release, and operations roles

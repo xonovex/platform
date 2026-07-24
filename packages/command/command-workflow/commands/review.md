@@ -10,7 +10,7 @@ allowed-tools:
 argument-hint: >-
   [subject] [--request <file>] [--subject-revision <revision>]
   [--perspective <perspective>...]
-  [--criterion <criterion>...] [--method <method>]
+  [--criterion <criterion>...] [--method <method>] [--independent]
 ---
 
 # /xonovex-workflow:review — Review
@@ -19,12 +19,16 @@ argument-hint: >-
 
 - `subject` (required unless `--request` supplies it): Inline content, a path, or an
   opaque native reference.
-- `--request` (optional): Markdown file containing the subject and equivalent inputs.
-  Do not combine it with shorthand arguments.
-- `--subject-revision` (optional): Exact native revision of the subject.
+- `--request` (optional): Markdown workflow handoff containing the subject and
+  equivalent inputs, including evidence and required or preferred capabilities. Do not
+  combine it with shorthand arguments.
+- `--subject-revision` (optional): Exact native revision of the subject; required when
+  revision-pinned review is a criterion and the provider exposes one.
 - `--perspective` (repeatable, optional): Explicit review lens.
 - `--criterion` (repeatable, optional): Review criterion.
 - `--method` (optional): Requested subject-specific review procedure.
+- `--independent` (optional): Start fresh review context without creator context or
+  prior findings. Use separate invocations for independently accountable perspectives.
 
 ## Delegation
 

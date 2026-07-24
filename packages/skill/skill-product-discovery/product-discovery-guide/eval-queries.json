@@ -1,0 +1,96 @@
+[
+  {
+    "query": "turn this solution-led feature request into an evidence-backed product opportunity",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "define a baseline, target, guardrails, and decision threshold for this product outcome",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "which assumption should we test first before funding this product idea",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "compare these product interventions without hiding weak evidence in one score",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "write an opportunity brief from support evidence, analytics, and current user workarounds",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "decide whether discovery evidence supports proceeding, changing, pausing, or stopping",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "our stakeholder prescribed a chatbot; reframe the actual problem and smallest useful tests",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "prepare a traceable handoff from discovery into product definition",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "split this epic into small vertical user stories with acceptance criteria",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "Delivery slicing belongs to user-story refinement after discovery"
+  },
+  {
+    "query": "interview six users about how they currently complete this journey",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "Conducting user research is a separate research procedure"
+  },
+  {
+    "query": "create a detailed implementation plan for the approved cache migration",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "Implementation planning begins after the opportunity is defined"
+  },
+  {
+    "query": "write the React checkout form from this Figma frame",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "Framework implementation is not product discovery"
+  },
+  {
+    "query": "review pull request 418 and leave blocking line comments",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "Code review evaluates an implemented change"
+  },
+  {
+    "query": "run exploratory tests against this release candidate",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "Release-candidate exploration is a quality activity"
+  },
+  {
+    "query": "bump these packages to the next semantic version",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "Versioning is a concrete release mechanic"
+  },
+  {
+    "query": "declare and coordinate the current production outage",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "Active incident coordination is operational response"
+  },
+  {
+    "query": "audit this research report for unsupported findings, sample gaps, and overclaimed confidence",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "Research-quality review belongs to the user-research capability, not opportunity discovery"
+  }
+]

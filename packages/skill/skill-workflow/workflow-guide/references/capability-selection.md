@@ -7,13 +7,15 @@ capabilities softly at runtime.
 ## Selection Procedure
 
 1. Derive capability needs from the operation, subject, explicit method, perspectives,
-   criteria, repository context, and requested effects.
+   criteria, Markdown request declarations, repository context, and requested effects.
 2. Inventory the installed skills' names and routing descriptions.
-3. Honor an explicitly requested installed guide when its description fits the work.
-4. Otherwise select the narrowest installed guide whose description matches the
+3. Resolve caller-declared required needs before preferred needs, preserving whether
+   each declaration names an exact guide or describes an interchangeable capability.
+4. Honor an explicitly requested installed guide when its description fits the work.
+5. Otherwise select the narrowest installed guide whose description matches the
    subject and requested method, perspective, or criterion.
-5. Resolve each selected guide's exact manifest dependencies recursively.
-6. Load dependencies before dependents and load every guide at most once.
+6. Resolve each selected guide's exact manifest dependencies recursively.
+7. Load dependencies before dependents and load every guide at most once.
 
 Do not select by filesystem or marketplace order, guess from a provider-reference
 shape, duplicate a selected guide, or invent an unavailable capability.
@@ -29,6 +31,11 @@ shape, duplicate a selected guide, or invent an unavailable capability.
 
 If two installed descriptions fit equally well and the request does not distinguish
 them, report the ambiguity instead of picking by order.
+
+Use the `Required capabilities` and `Preferred capabilities` sections from the
+Markdown handoff contract for explicit declarations. A declaration may use an exact
+installed guide name or a capability description. Never reinterpret a preferred need
+as required or silently weaken a required need.
 
 ## Composition Boundary
 

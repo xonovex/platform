@@ -17,9 +17,10 @@ argument-hint: >-
 ## Arguments
 
 - `subject` (required unless `--request` supplies it): Exact source to revise.
-- `--request` (optional): Markdown file containing the source, feedback, and equivalent
-  inputs. Do not combine it with shorthand arguments.
-- `--subject-revision` (optional): Exact native revision of the source.
+- `--request` (optional): Markdown workflow handoff containing the source, feedback,
+  relationships, and equivalent inputs. Do not combine it with shorthand arguments.
+- `--subject-revision` (optional): Exact native revision of the source; required for a
+  provider-native source when the provider exposes one.
 - `--feedback` (repeatable, required unless `--request` supplies it): Feedback to
   address.
 - `--criterion` (repeatable, optional): Constraint the revision must retain.

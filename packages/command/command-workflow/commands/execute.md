@@ -12,7 +12,8 @@ allowed-tools:
 argument-hint: >-
   [subject] [--request <file>] [--subject-revision <revision>]
   [--criterion <criterion>...]
-  [--method <method>] [--effect <inspect|preview|apply>]
+  [--method <method>] [--idempotency-key <key>]
+  [--effect <inspect|preview|apply>]
 ---
 
 # /xonovex-workflow:execute — Execute
@@ -21,11 +22,14 @@ argument-hint: >-
 
 - `subject` (required unless `--request` supplies it): Bounded instructions, a path,
   or an opaque native reference.
-- `--request` (optional): Markdown file containing the subject and equivalent inputs.
-  Do not combine it with shorthand arguments.
-- `--subject-revision` (optional): Exact native revision of the subject.
+- `--request` (optional): Markdown workflow handoff containing the subject, effects,
+  relationships, and equivalent inputs. Do not combine it with shorthand arguments.
+- `--subject-revision` (optional): Exact native revision of the subject; required for a
+  protected provider-native subject when the provider exposes one.
 - `--criterion` (repeatable, optional): Completion criterion.
 - `--method` (optional): Requested subject-specific execution procedure.
+- `--idempotency-key` (optional): Stable retry key. Required for an externally
+  submitted `apply` when the selected provider supports idempotency.
 - `--effect` (optional): `inspect`, `preview`, or `apply`; defaults to `inspect`.
 
 ## Delegation

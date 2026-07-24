@@ -1,0 +1,17 @@
+{
+  "name": "@xonovex/skill-ux-research",
+  "version": "7.0.0",
+  "private": true,
+  "type": "module",
+  "keywords": [
+    "xonovex",
+    "skill",
+    "ux",
+    "research",
+    "usability"
+  ],
+  "scripts": {
+    "fmt": "prettier --write .",
+    "fmt:check": "prettier --check ."
+  }
+}

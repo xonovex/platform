@@ -49,6 +49,32 @@
         "The operation blocks before effects because a required capability cannot be resolved.",
         "The result names the missing capability and gives a concrete recovery boundary without substituting an unrelated skill."
       ]
+    },
+    {
+      "id": 7,
+      "prompt": "Validate release candidate RC-7 from a Markdown handoff. Keep the product-owner, QA, accessibility, and threat-model evidence separate, reject evidence for older revisions, and run independently from implementation.",
+      "assertions": [
+        "The response preserves each evidence entry's source, perspective, criterion, subject revision, freshness, outcome, and limitations.",
+        "Evidence for a different subject revision is reported as stale instead of being silently reused.",
+        "Validation starts fresh independent context and returns one binding result per criterion without approving release."
+      ]
+    },
+    {
+      "id": 8,
+      "prompt": "Apply a provider-native workspace merge. The provider exposes workspace and destination revisions plus idempotent submission, but none were supplied.",
+      "assertions": [
+        "The operation blocks before effects and requests the exact workspace revision, expected destination revision, and stable idempotency key.",
+        "The response does not weaken concurrency or retry protection merely because apply was requested."
+      ]
+    },
+    {
+      "id": 9,
+      "prompt": "Describe a complete handoff from product discovery through UX, planning, development, independent review, QA, release, and incident learning without making any phase authorize the next.",
+      "assertions": [
+        "The response uses explicit versioned handoffs and separate atomic operations across all named roles.",
+        "It selects concrete product-discovery, UX-research, exploratory-testing, threat-modeling, and incident-response capabilities when installed.",
+        "Provider approvals, identity, assignments, notifications, and protected gates remain external."
+      ]
     }
   ]
 }

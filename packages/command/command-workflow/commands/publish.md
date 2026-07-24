@@ -22,14 +22,18 @@ argument-hint: >-
 
 - `subject` (required unless `--request` supplies it): Exact inline result, path, or
   opaque native source reference.
-- `--request` (optional): Markdown file containing the subject, destination, and
-  equivalent inputs. Do not combine it with shorthand arguments.
-- `--subject-revision` (optional): Exact native revision of the subject.
+- `--request` (optional): Markdown workflow handoff containing the subject,
+  destination, preconditions, retry identity, and equivalent inputs. Do not combine it
+  with shorthand arguments.
+- `--subject-revision` (optional): Exact native revision of the subject; required for
+  `apply` when the provider exposes one.
 - `--destination` (required unless `--request` supplies it): Exact native destination
   reference.
-- `--expected-revision` (optional): Expected destination revision for concurrency.
+- `--expected-revision` (optional): Expected destination revision for concurrency;
+  required for `apply` when an existing destination exposes one.
 - `--criterion` (repeatable, optional): Binding publication precondition.
-- `--idempotency-key` (required for `apply`): Stable retry key.
+- `--idempotency-key` (optional): Stable retry key. Required for an externally
+  submitted `apply` when the selected provider supports idempotency.
 - `--effect` (optional): `preview` or `apply`; defaults to `preview`.
 
 ## Delegation

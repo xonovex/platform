@@ -40,9 +40,13 @@ installed skill names and routing descriptions. A required missing capability bl
 a preferred missing capability remains visible.
 
 The workflow operation owns its effect (`inspect`, `preview`, or `apply`), persistence
-boundary, subject identity, and optional subject revision. A selected domain procedure
-adapts to that contract: it cannot mutate during inspect or preview, persist an inline
-result, or silently perform another operation.
+boundary, subject identity, and revision requirements. For cross-role work, accept a
+Markdown request contract that preserves subject relationships, operation inputs,
+required and preferred capabilities, evidence, effects, and constraints. A selected
+domain procedure adapts to that contract: it cannot mutate during inspect or preview,
+persist an inline result, or silently perform another operation. Provider-backed
+mutation requires the provider's conditional revision and idempotency mechanisms when
+they exist; otherwise report that the guarantee is unavailable.
 
 ## Conventions
 

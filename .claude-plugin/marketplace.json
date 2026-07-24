@@ -199,6 +199,11 @@
       "description": "Xonovex Express.js skills"
     },
     {
+      "name": "xonovex-skill-exploratory-testing",
+      "source": "./packages/skill/skill-exploratory-testing",
+      "description": "Xonovex session-based exploratory testing skills"
+    },
+    {
       "name": "xonovex-skill-fdd",
       "source": "./packages/skill/skill-fdd",
       "description": "Xonovex Feature-driven development skills"
@@ -262,6 +267,11 @@
       "name": "xonovex-skill-imgui",
       "source": "./packages/skill/skill-imgui",
       "description": "Xonovex immediate-mode GUI skills"
+    },
+    {
+      "name": "xonovex-skill-incident-response",
+      "source": "./packages/skill/skill-incident-response",
+      "description": "Xonovex production incident response skills"
     },
     {
       "name": "xonovex-skill-instruction",
@@ -359,6 +369,11 @@
       "description": "Xonovex Presentation skills"
     },
     {
+      "name": "xonovex-skill-product-discovery",
+      "source": "./packages/skill/skill-product-discovery",
+      "description": "Xonovex evidence-driven product discovery skills"
+    },
+    {
       "name": "xonovex-skill-pull-request",
       "source": "./packages/skill/skill-pull-request",
       "description": "Xonovex Pull request skills"
@@ -419,6 +434,11 @@
       "description": "Xonovex Testing skills"
     },
     {
+      "name": "xonovex-skill-threat-modeling",
+      "source": "./packages/skill/skill-threat-modeling",
+      "description": "Xonovex software threat modeling skills"
+    },
+    {
       "name": "xonovex-skill-threejs",
       "source": "./packages/skill/skill-threejs",
       "description": "Xonovex Three.js skills"
@@ -437,6 +457,11 @@
       "name": "xonovex-skill-user-stories",
       "source": "./packages/skill/skill-user-stories",
       "description": "Xonovex User story skills"
+    },
+    {
+      "name": "xonovex-skill-ux-research",
+      "source": "./packages/skill/skill-ux-research",
+      "description": "Xonovex user and usability research skills"
     },
     {
       "name": "xonovex-skill-versioning",

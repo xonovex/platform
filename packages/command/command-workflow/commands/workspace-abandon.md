@@ -5,7 +5,9 @@ allowed-tools:
   - Glob
   - AskUserQuestion
   - Skill
-argument-hint: "[target] [--request <file>] [--reason <text>]"
+argument-hint: >-
+  [target] [--request <file>] [--target-revision <revision>]
+  [--reason <text>]
 ---
 
 # /xonovex-workflow:workspace-abandon — Abandon Workspace
@@ -14,8 +16,9 @@ argument-hint: "[target] [--request <file>] [--reason <text>]"
 
 - `target` (required unless `--request` supplies it): Exact workspace path or opaque
   native reference.
-- `--request` (optional): Markdown file containing the workspace, reason, and
-  equivalent inputs. Do not combine it with shorthand arguments.
+- `--request` (optional): Markdown workflow handoff containing the workspace, reason,
+  partial state, and equivalent inputs. Do not combine it with shorthand arguments.
+- `--target-revision` (optional): Exact workspace revision when available.
 - `--reason` (required unless `--request` supplies it): Present-tense reason for
   stopping.
 

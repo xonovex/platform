@@ -1,0 +1,17 @@
+{
+  "name": "@xonovex/skill-exploratory-testing",
+  "version": "7.0.0",
+  "private": true,
+  "type": "module",
+  "keywords": [
+    "xonovex",
+    "skill",
+    "testing",
+    "exploratory",
+    "quality"
+  ],
+  "scripts": {
+    "fmt": "prettier --write .",
+    "fmt:check": "prettier --check ."
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "skill_name": "incident-response-guide",
+  "tier": "moderate",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Checkout failures jumped to 62% in one region. The cause is unknown and several engineers are already changing production. Coordinate the response.",
+      "assertions": [
+        "Declares from observed impact with explicit severity, scope, uncertainty, roles, channels, and update cadence without waiting for root cause",
+        "Stops uncoordinated changes and assigns one incident commander, operations lead, and communications lead with bounded specialist work",
+        "Chooses a mitigation-first preview, effect log, authority boundary, verification, and rollback or compensation plan"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "A rollback may fix the outage but the release included a data migration and three external writes have unknown outcomes.",
+      "assertions": [
+        "Does not recommend blind rollback and resolves data compatibility, external side effects, revisions, authority, and recovery information first",
+        "Reconciles unknown effects before retrying and uses stable retry identity when supported",
+        "Defines user-journey, data, dependency, telemetry, and observation-window recovery checks"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Produce a post-incident record from this timeline without blaming the engineer who triggered the deployment.",
+      "assertions": [
+        "Reconstructs detection, impact, response, effects, communications, and recovery from evidence",
+        "Separates the trigger from technical, process, organizational, and observability conditions",
+        "Creates bounded follow-up actions with owners and verification while preserving uncertainty and avoiding recurrence guarantees"
+      ]
+    }
+  ]
+}

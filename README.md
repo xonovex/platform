@@ -141,6 +141,11 @@ claude plugin install xonovex-skill-pull-request@xonovex-marketplace  # PR autho
 claude plugin install xonovex-skill-command@xonovex-marketplace        # author / merge / simplify reusable prompt files (cross-harness format reference)
 claude plugin install xonovex-skill-skill@xonovex-marketplace         # author / extract / merge / simplify / validate Agent Skills
 claude plugin install xonovex-skill-workflow@xonovex-marketplace      # direct workflow operation routing without slash commands
+claude plugin install xonovex-skill-product-discovery@xonovex-marketplace   # frame opportunities, assumptions, experiments, and outcomes
+claude plugin install xonovex-skill-ux-research@xonovex-marketplace         # plan, conduct, analyse, and hand off user research
+claude plugin install xonovex-skill-exploratory-testing@xonovex-marketplace # charter, explore, debrief, and report testing evidence
+claude plugin install xonovex-skill-threat-modeling@xonovex-marketplace     # model threats, prioritize risks, and verify mitigations
+claude plugin install xonovex-skill-incident-response@xonovex-marketplace   # declare, coordinate, mitigate, recover, and learn
 claude plugin install xonovex-skill-content@xonovex-marketplace       # multilingual articles, news, travel guides, prose humanization
 claude plugin install xonovex-skill-llmstxt@xonovex-marketplace       # /llms.txt files and per-page markdown mirrors
 
@@ -169,6 +174,11 @@ codex plugin add xonovex-skill-pull-request@xonovex-marketplace  # PR authoring:
 codex plugin add xonovex-skill-command@xonovex-marketplace        # author / merge / simplify reusable prompt files (cross-harness format reference)
 codex plugin add xonovex-skill-skill@xonovex-marketplace         # author / extract / merge / simplify / validate Agent Skills
 codex plugin add xonovex-skill-workflow@xonovex-marketplace      # explicit workflow operations with effect and workspace boundaries
+codex plugin add xonovex-skill-product-discovery@xonovex-marketplace   # frame opportunities, assumptions, experiments, and outcomes
+codex plugin add xonovex-skill-ux-research@xonovex-marketplace         # plan, conduct, analyse, and hand off user research
+codex plugin add xonovex-skill-exploratory-testing@xonovex-marketplace # charter, explore, debrief, and report testing evidence
+codex plugin add xonovex-skill-threat-modeling@xonovex-marketplace     # model threats, prioritize risks, and verify mitigations
+codex plugin add xonovex-skill-incident-response@xonovex-marketplace   # declare, coordinate, mitigate, recover, and learn
 codex plugin add xonovex-skill-content@xonovex-marketplace       # multilingual articles, news, travel guides, prose humanization
 codex plugin add xonovex-skill-llmstxt@xonovex-marketplace       # /llms.txt files and per-page markdown mirrors
 

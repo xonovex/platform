@@ -17,8 +17,8 @@ merge, and workspace cleanup default to preview and may apply.
 
 For preview or apply:
 
-1. Resolve exact targets, expected revisions, preconditions, and the requested effect
-   mode.
+1. Resolve exact targets, available source revisions, expected destination revisions,
+   preconditions, retry identity, and the requested effect mode.
 2. Produce an exact effect plan that names additions, changes, removals, and external
    writes.
 3. Validate target identity, current state, authority, preconditions, and recovery
@@ -29,6 +29,17 @@ For preview or apply:
 
 Do not infer apply from urgency, a trusted executor, a prior preview, a successful
 validation, or a decision outcome.
+
+A protected operation against provider-native state requires the exact source or
+destination revision when that provider exposes one. When revision control is
+unsupported, report the target as unversioned and its race consequence; block when the
+requested criteria require stale-write protection.
+
+An externally submitted apply operation requires a stable idempotency key when the
+provider supports one. When it does not, name the non-idempotent retry boundary and
+reconcile observed state before any retry. Local operations may instead use a
+provider-independent natural identity when they can prove that repeating the exact
+plan is safe.
 
 A selected domain procedure cannot change the effect mode. In `inspect` or `preview`,
 omit its mutation steps. If its useful result inherently requires mutation, return a

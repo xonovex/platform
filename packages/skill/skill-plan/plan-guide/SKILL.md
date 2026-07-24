@@ -16,6 +16,7 @@ Provide implementation-planning procedures selected by a caller or generic opera
 - **One requested operation** — research, create, critique, revise, expand, continue, update, or validate without silently performing another operation
 - **Caller-owned effects** — continuation honors `inspect`, `preview`, or explicit `apply`; every other planning operation is read-only
 - **Separate publication** — persisting a planning result is a later Publish operation, never an implicit side effect of planning
+- **Traceable handoffs** — preserve the source subject and revision, parent or child relationships, criteria, capability needs, evidence, effects, and constraints when a plan crosses role boundaries
 - **Skills to consult** — plans name applicable implementation capabilities, and continuation loads them before editing
 - **Evidence-based validation** — check explicit success criteria and Definition of Done evidence, not merely command exit codes
 
@@ -36,6 +37,7 @@ Provide implementation-planning procedures selected by a caller or generic opera
 - Status is optional descriptive metadata — do not use approval or status fields to authorize or gate another planning operation
 - Successful validation is evidence about criteria, not approval, acceptance, publication, or permission to proceed
 - A plan without `skills_to_consult` leaves implementers without project-specific guidance
+- A cross-role handoff that omits the source subject, relationships, criteria, or evidence breaks traceability even when its prose is understandable
 - Toolchain discovery limited to one manifest misses workspace-level or task-runner validation
 - Critique needs fresh independent context; continuation needs reconstructed subject context after session loss
 - Expansion may use any explicit parent plan, regardless of whether it has an approval field

@@ -437,6 +437,18 @@
       "category": "Productivity"
     },
     {
+      "name": "xonovex-skill-exploratory-testing",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-exploratory-testing"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer Tools"
+    },
+    {
       "name": "xonovex-skill-fdd",
       "source": {
         "source": "local",
@@ -591,6 +603,18 @@
         "authentication": "ON_INSTALL"
       },
       "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-incident-response",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-incident-response"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer Tools"
     },
     {
       "name": "xonovex-skill-instruction",
@@ -822,6 +846,18 @@
       "category": "Productivity"
     },
     {
+      "name": "xonovex-skill-product-discovery",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-product-discovery"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
       "name": "xonovex-skill-pull-request",
       "source": {
         "source": "local",
@@ -966,6 +1002,18 @@
       "category": "Productivity"
     },
     {
+      "name": "xonovex-skill-threat-modeling",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-threat-modeling"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer Tools"
+    },
+    {
       "name": "xonovex-skill-threejs",
       "source": {
         "source": "local",
@@ -1006,6 +1054,18 @@
       "source": {
         "source": "local",
         "path": "./packages/skill/skill-user-stories"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-ux-research",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-ux-research"
       },
       "policy": {
         "installation": "AVAILABLE",

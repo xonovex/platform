@@ -50,6 +50,16 @@
     "split": "validation"
   },
   {
+    "query": "Compose a full SDLC flow from product discovery through UX, development, QA, security, release, and incident learning using traceable Markdown handoffs.",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Independently validate this implementation handoff against its acceptance criteria and cited evidence without inheriting the implementer's conclusion.",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
     "query": "Review pull request #418 and draft line comments for correctness and maintainability.",
     "rationale": "Direct pull-request review has a concrete domain owner and does not need operation-level workflow orchestration.",
     "should_trigger": false,

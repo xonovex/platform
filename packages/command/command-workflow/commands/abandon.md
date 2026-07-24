@@ -17,9 +17,10 @@ argument-hint: >-
 ## Arguments
 
 - `subject` (required unless `--request` supplies it): Exact work being stopped.
-- `--request` (optional): Markdown file containing the subject, reason, and equivalent
-  inputs. Do not combine it with shorthand arguments.
-- `--subject-revision` (optional): Exact native revision of the subject.
+- `--request` (optional): Markdown workflow handoff containing the subject, reason,
+  partial state, relationships, and equivalent inputs. Do not combine it with shorthand
+  arguments.
+- `--subject-revision` (optional): Exact native revision of the subject when available.
 - `--reason` (required unless `--request` supplies it): Present-tense reason for
   stopping.
 - `--criterion` (repeatable, optional): Retention or recovery constraint.

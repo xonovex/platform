@@ -1,0 +1,9 @@
+{
+  "name": "xonovex-skill-ux-research",
+  "version": "7.0.0",
+  "description": "Xonovex user and usability research skills",
+  "author": {
+    "name": "Xonovex"
+  },
+  "skills": ["./ux-research-guide"]
+}

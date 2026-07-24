@@ -14,6 +14,13 @@ Workspace commands:
 - `workspace-abandon`, `workspace-cleanup`
 
 Operations remain separate: a command never implies the next lifecycle step.
-Core commands accept an optional exact subject revision. Results stay inline except
-for `publish`; `execute` defaults to inspect, while publishing and workspace mutations
-default to preview and require explicit apply.
+Core commands accept exact subject revisions and conditionally require them at
+provider-native protected boundaries. Results stay inline except for `publish`;
+`execute` defaults to inspect, while publishing and workspace mutations default to
+preview and require explicit apply.
+
+Use `--request <file>` with the workflow guide's Markdown handoff contract for
+cross-role traceability, explicit required or preferred capability needs, evidence
+bundles, relationships, and retry identity. Review and validation can run in fresh
+independent context; externally submitted apply operations use an idempotency key when
+their provider supports one.

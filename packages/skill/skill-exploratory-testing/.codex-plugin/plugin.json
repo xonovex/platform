@@ -1,0 +1,21 @@
+{
+  "name": "xonovex-skill-exploratory-testing",
+  "version": "7.0.0",
+  "description": "Xonovex session-based exploratory testing skills",
+  "author": {
+    "name": "Xonovex"
+  },
+  "skills": "./exploratory-testing-guide",
+  "interface": {
+    "displayName": "Exploratory Testing",
+    "shortDescription": "Explore software risks with test charters",
+    "longDescription": "Design and run focused exploratory sessions with explicit charters, risk heuristics, reproducible evidence, debriefs, and honest coverage limits.",
+    "developerName": "Xonovex",
+    "category": "Developer Tools",
+    "capabilities": ["Read", "Write"],
+    "defaultPrompt": [
+      "Create an exploratory test charter",
+      "Debrief this exploratory test session"
+    ]
+  }
+}

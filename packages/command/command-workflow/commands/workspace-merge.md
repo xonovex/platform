@@ -8,8 +8,9 @@ allowed-tools:
   - Skill
 argument-hint: >-
   [target] [--request <file>] [--destination <reference>]
-  [--expected-revision <revision>] [--criterion <criterion>...]
-  [--method <method>] [--effect <preview|apply>]
+  [--target-revision <revision>] [--expected-revision <revision>]
+  [--criterion <criterion>...] [--method <method>]
+  [--idempotency-key <key>] [--effect <preview|apply>]
 ---
 
 # /xonovex-workflow:workspace-merge — Merge Workspace
@@ -18,13 +19,19 @@ argument-hint: >-
 
 - `target` (required unless `--request` supplies it): Exact workspace path or opaque
   native source reference.
-- `--request` (optional): Markdown file containing the workspace, destination, and
-  equivalent inputs. Do not combine it with shorthand arguments.
+- `--request` (optional): Markdown workflow handoff containing the workspace,
+  destination, criteria, retry identity, and equivalent inputs. Do not combine it with
+  shorthand arguments.
+- `--target-revision` (optional): Exact workspace revision; required for
+  provider-native integration when the provider exposes one.
 - `--destination` (required unless `--request` supplies it): Exact native destination
   reference.
-- `--expected-revision` (optional): Expected destination revision for concurrency.
+- `--expected-revision` (optional): Expected destination revision for concurrency;
+  required for `apply` when an existing destination exposes one.
 - `--criterion` (repeatable, optional): Binding pre-integration criterion.
 - `--method` (optional): Requested validation and integration procedure.
+- `--idempotency-key` (optional): Stable retry key. Required for provider-native
+  `apply` when the selected provider supports idempotency.
 - `--effect` (optional): `preview` or `apply`; defaults to `preview`.
 
 ## Delegation

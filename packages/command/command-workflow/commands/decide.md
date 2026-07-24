@@ -8,7 +8,7 @@ allowed-tools:
   - Skill
 argument-hint: >-
   [subject] [--request <file>] [--subject-revision <revision>]
-  [--outcome <text>]
+  [--option <option>...] [--evidence <reference>...] [--outcome <text>]
   [--criterion <criterion>...] [--method <method>]
 ---
 
@@ -18,9 +18,13 @@ argument-hint: >-
 
 - `subject` (required unless `--request` supplies it): Decision question, options, or
   an opaque native reference.
-- `--request` (optional): Markdown file containing the question, evidence, and
-  equivalent inputs. Do not combine it with shorthand arguments.
-- `--subject-revision` (optional): Exact native revision of the decision subject.
+- `--request` (optional): Markdown workflow handoff containing the question, options,
+  evidence entries, and equivalent inputs. Do not combine it with shorthand arguments.
+- `--subject-revision` (optional): Exact native revision of the decision subject;
+  required when binding evidence is revision-pinned and the provider exposes one.
+- `--option` (repeatable, optional): Explicit option to compare.
+- `--evidence` (repeatable, optional): Opaque evidence reference to preserve and
+  evaluate.
 - `--outcome` (optional): Outcome to record; otherwise derive a recommendation.
 - `--criterion` (repeatable, optional): Decision criterion.
 - `--method` (optional): Requested subject-specific decision procedure.

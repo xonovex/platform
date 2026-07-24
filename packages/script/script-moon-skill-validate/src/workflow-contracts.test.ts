@@ -28,6 +28,14 @@ const planningReferences = [
   "plan-validate",
 ] as const;
 
+const retryProtectedCommands = [
+  "execute",
+  "publish",
+  "workspace-create",
+  "workspace-merge",
+  "workspace-cleanup",
+] as const;
+
 describe("workflow composition contracts", () => {
   it("keeps core command subjects revision-addressable", () => {
     for (const command of coreWorkflowCommands) {
@@ -39,12 +47,94 @@ describe("workflow composition contracts", () => {
     }
   });
 
-  it("allows review to create fresh independent context", () => {
-    const source = readRepositoryFile(
-      "packages/command/command-workflow/commands/review.md",
+  it("allows review and validation to create fresh independent context", () => {
+    for (const command of ["review", "validate"]) {
+      const source = readRepositoryFile(
+        `packages/command/command-workflow/commands/${command}.md`,
+      );
+
+      expect(source).toMatch(/allowed-tools:[\s\S]*\n  - Task\n/u);
+      expect(source).toContain("[--independent]");
+      expect(source).toContain("`--independent` (optional)");
+    }
+  });
+
+  it("defines traceable Markdown handoffs and evidence aggregation", () => {
+    const handoffs = readRepositoryFile(
+      "packages/skill/skill-workflow/workflow-guide/references/handoffs.md",
     );
 
-    expect(source).toMatch(/allowed-tools:[\s\S]*\n  - Task\n/u);
+    for (const heading of [
+      "## Subject",
+      "## Relationships",
+      "## Required capabilities",
+      "## Preferred capabilities",
+      "## Evidence",
+      "## Effects",
+    ]) {
+      expect(handoffs).toContain(heading);
+    }
+    expect(handoffs).toContain("Subject revision:");
+    expect(handoffs).toContain("Freshness:");
+    expect(handoffs).toContain("Limitations:");
+    expect(handoffs).toContain(
+      "Separate independent reviewers or validators produce separate evidence entries.",
+    );
+  });
+
+  it("exposes revision and retry protection for mutating provider operations", () => {
+    for (const command of retryProtectedCommands) {
+      const source = readRepositoryFile(
+        `packages/command/command-workflow/commands/${command}.md`,
+      );
+      expect(source).toContain("[--idempotency-key <key>]");
+      expect(source).toContain("`--idempotency-key`");
+    }
+
+    const merge = readRepositoryFile(
+      "packages/command/command-workflow/commands/workspace-merge.md",
+    );
+    expect(merge).toContain("[--target-revision <revision>]");
+    expect(merge).toContain("[--expected-revision <revision>]");
+
+    const effects = readRepositoryFile(
+      "packages/skill/skill-workflow/workflow-guide/references/effects.md",
+    );
+    expect(effects).toMatch(
+      /requires the exact source or\s+destination revision when that provider exposes one/u,
+    );
+    expect(effects).toMatch(
+      /requires a stable idempotency key when the\s+provider supports one/u,
+    );
+  });
+
+  it("documents multi-role SDLC composition without internalizing provider authority", () => {
+    const sdlc = readRepositoryFile(
+      "packages/skill/skill-workflow/workflow-guide/references/sdlc.md",
+    );
+
+    for (const role of [
+      "Product manager",
+      "UX researcher",
+      "Developer",
+      "QA",
+      "Release manager",
+      "Incident commander",
+    ]) {
+      expect(sdlc).toContain(role);
+    }
+    for (const capability of [
+      "product-discovery-guide",
+      "ux-research-guide",
+      "exploratory-testing-guide",
+      "threat-modeling-guide",
+      "incident-response-guide",
+    ]) {
+      expect(sdlc).toContain(capability);
+    }
+    expect(sdlc).toContain(
+      "Assignments, access control, approvals, status transitions, notifications, scheduling,",
+    );
   });
 
   it("keeps planning operations inline and continuation effect-aware", () => {

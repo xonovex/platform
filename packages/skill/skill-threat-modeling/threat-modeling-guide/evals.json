@@ -1,0 +1,33 @@
+{
+  "skill_name": "threat-modeling-guide",
+  "tier": "moderate",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Threat model a payment callback that crosses the public edge and finalizes an order. Include duplicate and reordered events.",
+      "assertions": [
+        "Pins the exact subject revision, assets, security objectives, actors, data flows, states, identities, entry points, and trust boundaries",
+        "Derives credible replay, reordering, forgery, privilege, partial-effect, and recovery threats from the modeled flow",
+        "Prioritizes with explicit rationale and defines owned mitigations plus adversarial verification and residual risk"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Review this threat model. It is a diagram plus a generated STRIDE list, and every mitigation says encrypt, validate, or log.",
+      "assertions": [
+        "Identifies missing assets, objectives, scenarios, assumptions, boundaries, credible attack paths, prioritization, and evidence",
+        "Treats STRIDE as an enumeration aid rather than proof of coverage or a risk rating",
+        "Rewrites generic mitigations into component-specific controls with owner, target, mechanism, verification, operational signal, and residual risk"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Update the threat model after a new privileged integration and a production incident invalidated two assumptions.",
+      "assertions": [
+        "Pins the new revision and updates flows, trust boundaries, identities, privileges, assumptions, and incident evidence",
+        "Marks evidence from the old assumptions or revision as stale and reevaluates affected threats",
+        "Preserves accountable residual-risk decisions as external authority rather than silently accepting them"
+      ]
+    }
+  ]
+}

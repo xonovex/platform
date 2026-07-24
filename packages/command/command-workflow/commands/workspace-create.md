@@ -8,7 +8,8 @@ allowed-tools:
   - Skill
 argument-hint: >-
   [target] [--request <file>] [--source <reference>]
-  [--source-revision <revision>] [--effect <preview|apply>]
+  [--source-revision <revision>] [--idempotency-key <key>]
+  [--effect <preview|apply>]
 ---
 
 # /xonovex-workflow:workspace-create — Create Workspace
@@ -17,10 +18,13 @@ argument-hint: >-
 
 - `target` (required unless `--request` supplies it): Exact workspace path or opaque
   native destination reference.
-- `--request` (optional): Markdown file containing the workspace and equivalent
-  inputs. Do not combine it with shorthand arguments.
+- `--request` (optional): Markdown workflow handoff containing the workspace, source,
+  retry identity, and equivalent inputs. Do not combine it with shorthand arguments.
 - `--source` (required unless `--request` supplies it): Exact source reference.
-- `--source-revision` (optional): Exact source revision.
+- `--source-revision` (optional): Exact source revision; required when the provider
+  exposes one.
+- `--idempotency-key` (optional): Stable retry key. Required for provider-native
+  `apply` when the selected provider supports idempotency.
 - `--effect` (optional): `preview` or `apply`; defaults to `preview`.
 
 ## Delegation

@@ -1,0 +1,96 @@
+[
+  {
+    "query": "write a test charter for exploring interrupted checkout recovery",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "run a time-boxed session to search for unknown failure modes in this release candidate",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "choose risk heuristics and test oracles for this stateful workflow",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "debrief these exploratory notes into findings, coverage, and follow-up charters",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "explore regression interactions that our automated suite does not represent",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "review whether this session-based testing report supports its release claim",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "map what this exploratory session covered and what remains unknown",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "turn this production defect pattern into a focused exploratory mission",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "write one unit test using Arrange Act Assert and choose the right test double",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "Individual automated test construction has a separate owner"
+  },
+  {
+    "query": "drive this feature with a failing test before writing production code",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "Test-first implementation rhythm is not exploratory testing"
+  },
+  {
+    "query": "write Given-When-Then acceptance examples during a three-amigos session",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "Collaborative acceptance specification owns agreed examples"
+  },
+  {
+    "query": "investigate this native crash with a debugger and sanitizer",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "Known low-level failure diagnosis is debugging"
+  },
+  {
+    "query": "interview customers about why they abandon this journey",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "Research with users is not software exploration"
+  },
+  {
+    "query": "review this pull request and produce line-anchored blocking comments",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "Code review inspects a diff rather than exploring running behavior"
+  },
+  {
+    "query": "define the product outcome and riskiest assumption before delivery",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "Product discovery precedes release-candidate testing"
+  },
+  {
+    "query": "coordinate responders and communications for the active outage",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "Incident response owns live operational coordination"
+  },
+  {
+    "query": "reconstruct this incident timeline and create blameless verified follow-up work",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "Incident learning belongs to incident response rather than release exploration"
+  }
+]
