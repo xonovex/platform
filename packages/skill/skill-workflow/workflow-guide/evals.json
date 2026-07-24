@@ -72,7 +72,7 @@
       "prompt": "Describe a complete handoff from product discovery through UX, planning, development, independent review, QA, release, and incident learning without making any phase authorize the next.",
       "assertions": [
         "The response uses explicit versioned handoffs and separate atomic operations across all named roles.",
-        "It selects concrete product-discovery, UX-research, exploratory-testing, threat-modeling, and incident-response capabilities when installed.",
+        "It selects concrete product-discovery, product-analytics, UX-research, UX-design, architecture-evaluation, test-strategy, exploratory-testing, threat-modeling, security-testing, operational-readiness, release-readiness, and incident-response capabilities when installed.",
         "Provider approvals, identity, assignments, notifications, and protected gates remain external."
       ]
     }

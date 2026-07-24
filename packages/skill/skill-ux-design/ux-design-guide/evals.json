@@ -1,0 +1,33 @@
+{
+  "skill_name": "ux-design-guide",
+  "tier": "moderate",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Turn research about interrupted identity checks into an end-to-end interaction design before engineering starts.",
+      "assertions": [
+        "Pins the user need, whole journey, desired outcome, constraints, source evidence, exclusions, and unresolved assumptions",
+        "Models normal, exceptional, interrupted, recovery, accessibility, content, and channel states rather than drawing only a happy path",
+        "Compares alternatives and defines focused prototype questions without treating the design as approved implementation"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "We have three checkout flows and a week to decide. Choose prototype fidelity and an evaluation approach.",
+      "assertions": [
+        "Matches prototype fidelity to the structural, comprehension, or interaction uncertainty being tested",
+        "Defines representative participants, realistic tasks, observable success, confounds, and retain/revise/reject evidence",
+        "Synthesizes results against exact artifact revisions and preserves prototype limitations"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Prepare the UX handoff for a tested account-recovery design to product, development, QA, accessibility, and operations.",
+      "assertions": [
+        "Provides the tested revision, rationale, state and content inventory, accessibility requirements, evidence, limitations, and open questions",
+        "Keeps stories, test strategy, analytics implementation, and release approval with their owning capabilities",
+        "Defines how material implementation deviations update the design decision and remain traceable"
+      ]
+    }
+  ]
+}

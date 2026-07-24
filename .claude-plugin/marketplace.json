@@ -39,6 +39,11 @@
       "description": "Xonovex Android WCAG accessibility skills"
     },
     {
+      "name": "xonovex-skill-architecture-evaluation",
+      "source": "./packages/skill/skill-architecture-evaluation",
+      "description": "Xonovex architecture tradeoff evaluation skills"
+    },
+    {
       "name": "xonovex-skill-asset-pipeline",
       "source": "./packages/skill/skill-asset-pipeline",
       "description": "Xonovex Asset pipeline skills"
@@ -194,14 +199,14 @@
       "description": "Xonovex Editor viewport skills"
     },
     {
-      "name": "xonovex-skill-expressjs",
-      "source": "./packages/skill/skill-expressjs",
-      "description": "Xonovex Express.js skills"
-    },
-    {
       "name": "xonovex-skill-exploratory-testing",
       "source": "./packages/skill/skill-exploratory-testing",
       "description": "Xonovex session-based exploratory testing skills"
+    },
+    {
+      "name": "xonovex-skill-expressjs",
+      "source": "./packages/skill/skill-expressjs",
+      "description": "Xonovex Express.js skills"
     },
     {
       "name": "xonovex-skill-fdd",
@@ -349,6 +354,11 @@
       "description": "Xonovex OpenCode plugin skills"
     },
     {
+      "name": "xonovex-skill-operational-readiness",
+      "source": "./packages/skill/skill-operational-readiness",
+      "description": "Xonovex operational readiness review skills"
+    },
+    {
       "name": "xonovex-skill-orthogonal-pattern",
       "source": "./packages/skill/skill-orthogonal-pattern",
       "description": "Xonovex Orthogonal pattern skills"
@@ -367,6 +377,11 @@
       "name": "xonovex-skill-presentation",
       "source": "./packages/skill/skill-presentation",
       "description": "Xonovex Presentation skills"
+    },
+    {
+      "name": "xonovex-skill-product-analytics",
+      "source": "./packages/skill/skill-product-analytics",
+      "description": "Xonovex trustworthy product measurement skills"
     },
     {
       "name": "xonovex-skill-product-discovery",
@@ -394,9 +409,19 @@
       "description": "Xonovex Reflect skills"
     },
     {
+      "name": "xonovex-skill-release-readiness",
+      "source": "./packages/skill/skill-release-readiness",
+      "description": "Xonovex release candidate readiness skills"
+    },
+    {
       "name": "xonovex-skill-remotion",
       "source": "./packages/skill/skill-remotion",
       "description": "Xonovex Remotion skills"
+    },
+    {
+      "name": "xonovex-skill-security-testing",
+      "source": "./packages/skill/skill-security-testing",
+      "description": "Xonovex authorized security testing skills"
     },
     {
       "name": "xonovex-skill-shell-scripting",
@@ -429,6 +454,11 @@
       "description": "Xonovex Terraform skills"
     },
     {
+      "name": "xonovex-skill-test-strategy",
+      "source": "./packages/skill/skill-test-strategy",
+      "description": "Xonovex risk-based test strategy skills"
+    },
+    {
       "name": "xonovex-skill-testing",
       "source": "./packages/skill/skill-testing",
       "description": "Xonovex Testing skills"
@@ -457,6 +487,11 @@
       "name": "xonovex-skill-user-stories",
       "source": "./packages/skill/skill-user-stories",
       "description": "Xonovex User story skills"
+    },
+    {
+      "name": "xonovex-skill-ux-design",
+      "source": "./packages/skill/skill-ux-design",
+      "description": "Xonovex evidence-driven UX design skills"
     },
     {
       "name": "xonovex-skill-ux-research",

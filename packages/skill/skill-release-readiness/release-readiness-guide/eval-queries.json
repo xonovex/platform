@@ -1,0 +1,90 @@
+[
+  {
+    "query": "assess whether this exact release candidate is ready for a staged rollout",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "build a release evidence matrix tied to artifact digests and provenance",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "design canary stages guardrails observation windows and abort rules",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "check rollback roll-forward migration recovery and communication readiness",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "write a traceable ready conditionally ready not ready or blocked recommendation",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "determine which evidence can safely carry forward to this rebuilt candidate",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "assess this exact release candidate using traceable evidence, rollout controls, and recovery readiness",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "define post-deployment verification for the artifact and target configuration",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "design risk-based test coverage across levels and test types for this release",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "Test strategy creates the quality-evidence approach"
+  },
+  {
+    "query": "run a production readiness review covering SLOs, dependencies, observability, on-call, and recovery",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "Operational readiness assesses enduring service operation"
+  },
+  {
+    "query": "bump these packages and generate the changelog",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "Versioning performs release preparation mechanics"
+  },
+  {
+    "query": "deploy image sha256 abc to the production cluster",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "Deployment is a protected provider effect"
+  },
+  {
+    "query": "approve the protected production environment now",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "Approval belongs to the provider and accountable approver"
+  },
+  {
+    "query": "write unit and integration tests for this change",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "Test implementation produces evidence consumed here"
+  },
+  {
+    "query": "coordinate the active production outage caused by the deployment",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "An active outage follows incident response"
+  },
+  {
+    "query": "define a product measurement model for whether this feature improves retention",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "Product analytics defines outcome measurement"
+  }
+]

@@ -1,0 +1,90 @@
+[
+  {
+    "query": "plan an authorized security assessment with explicit rules of engagement",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "derive security test coverage from this threat model and ASVS requirements",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "combine manual review SAST DAST dependency scanning and abuse tests for this change",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "turn these scanner and manual test results into reproducible vulnerability findings",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "retest this authorization fix and look for adjacent bypass paths",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "audit our security test coverage and explain the blind spots",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "plan an authorized security assessment from threat scenarios and versioned verification requirements",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "verify this remediation revision and update the residual security risk",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "identify assets trust boundaries threats and mitigations for this design",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "Threat modeling identifies security-design risks before verification"
+  },
+  {
+    "query": "write secure input validation code for this endpoint",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "Language and framework implementation own the remediation"
+  },
+  {
+    "query": "create the overall test strategy for this release",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "Test strategy allocates all quality evidence"
+  },
+  {
+    "query": "review this pull request for security and correctness defects",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "Code review inspects an implementation change"
+  },
+  {
+    "query": "rotate the compromised production credential now",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "Credential response is a protected operational effect"
+  },
+  {
+    "query": "declare and coordinate an active security incident",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "Active compromise follows incident response"
+  },
+  {
+    "query": "design risk-based test coverage across levels and test types for this release",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "Test strategy owns cross-quality coverage allocation"
+  },
+  {
+    "query": "record whether the security evidence supports releasing candidate rc-18",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "Release readiness integrates security evidence with all other candidate evidence"
+  }
+]

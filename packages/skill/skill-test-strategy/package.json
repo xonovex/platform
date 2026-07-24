@@ -1,0 +1,17 @@
+{
+  "name": "@xonovex/skill-test-strategy",
+  "version": "7.0.0",
+  "private": true,
+  "type": "module",
+  "keywords": [
+    "xonovex",
+    "skill",
+    "testing",
+    "strategy",
+    "quality"
+  ],
+  "scripts": {
+    "fmt": "prettier --write .",
+    "fmt:check": "prettier --check ."
+  }
+}

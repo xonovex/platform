@@ -1,0 +1,90 @@
+[
+  {
+    "query": "create a risk-based test strategy for this product change",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "map our quality risks to test levels, types, techniques, and evidence",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "find the important gaps in this unit integration and end-to-end test approach",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "define test environments, test data, oracles, automation, and flake policy",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "set evidence-based test entry and completion criteria for this candidate",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "decide where exploratory accessibility performance security and recovery testing fit",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "design risk-based test coverage across levels and test types for this release",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "audit whether our test evidence actually covers the highest product risks",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "write one boundary-value test for this input parser",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "A focused testing capability designs an individual test"
+  },
+  {
+    "query": "run a session-based exploratory test of the mobile checkout",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "Exploratory testing executes a specific charter"
+  },
+  {
+    "query": "write BDD acceptance examples for this user story",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "BDD specifies concrete behavior collaboratively"
+  },
+  {
+    "query": "fix the flaky Vitest test in this pull request",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "Framework-specific test implementation owns this change"
+  },
+  {
+    "query": "perform a WCAG audit against the implemented interface",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "Accessibility assurance executes specialist evaluation"
+  },
+  {
+    "query": "approve and deploy this release candidate to production",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "Provider approval and deployment remain external effects"
+  },
+  {
+    "query": "plan an authorized security assessment from threat scenarios and versioned verification requirements",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "Security testing owns the authorized security assessment"
+  },
+  {
+    "query": "assess this exact release candidate using traceable evidence, rollout controls, and recovery readiness",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "Release readiness integrates candidate-level evidence"
+  }
+]

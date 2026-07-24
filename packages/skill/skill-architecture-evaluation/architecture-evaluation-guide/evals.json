@@ -1,0 +1,33 @@
+{
+  "skill_name": "architecture-evaluation-guide",
+  "tier": "moderate",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Evaluate a proposed payment architecture before the team records its ADR.",
+      "assertions": [
+        "Pins the architecture revision, scope, business drivers, stakeholders, constraints, dependencies, and evidence",
+        "Expresses prioritized quality goals as measurable source-stimulus-environment-artifact-response scenarios",
+        "Returns traceable risks, non-risks, sensitivity points, tradeoffs, and evidence gaps without selecting or approving the ADR"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Compare an event-driven and synchronous design for availability, latency, modifiability, and operational complexity.",
+      "assertions": [
+        "Compares both approaches against the same concrete scenarios rather than pattern reputation",
+        "Uses explicit causal reasoning and identifies the measurements, models, or experiments needed where evidence is weak",
+        "Preserves quality interactions, migration cost, reversibility, assumptions, and dissent instead of reducing the decision to one score"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Turn an architecture workshop into findings that can be handed to decision owners and delivery teams.",
+      "assertions": [
+        "Binds every finding to the exact subject revision, affected drivers and scenarios, evidence, confidence, and consequence",
+        "Provides bounded mitigations or experiments, owners, targets, and re-evaluation triggers",
+        "Separates the evaluation recommendation from accountable risk acceptance and provider-enforced approval"
+      ]
+    }
+  ]
+}

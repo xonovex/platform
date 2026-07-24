@@ -53,6 +53,18 @@
       "category": "Productivity"
     },
     {
+      "name": "xonovex-skill-architecture-evaluation",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-architecture-evaluation"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer Tools"
+    },
+    {
       "name": "xonovex-skill-asset-pipeline",
       "source": {
         "source": "local",
@@ -425,18 +437,6 @@
       "category": "Productivity"
     },
     {
-      "name": "xonovex-skill-expressjs",
-      "source": {
-        "source": "local",
-        "path": "./packages/skill/skill-expressjs"
-      },
-      "policy": {
-        "installation": "AVAILABLE",
-        "authentication": "ON_INSTALL"
-      },
-      "category": "Productivity"
-    },
-    {
       "name": "xonovex-skill-exploratory-testing",
       "source": {
         "source": "local",
@@ -447,6 +447,18 @@
         "authentication": "ON_INSTALL"
       },
       "category": "Developer Tools"
+    },
+    {
+      "name": "xonovex-skill-expressjs",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-expressjs"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
     },
     {
       "name": "xonovex-skill-fdd",
@@ -797,6 +809,18 @@
       "category": "Productivity"
     },
     {
+      "name": "xonovex-skill-operational-readiness",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-operational-readiness"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer Tools"
+    },
+    {
       "name": "xonovex-skill-orthogonal-pattern",
       "source": {
         "source": "local",
@@ -838,6 +862,18 @@
       "source": {
         "source": "local",
         "path": "./packages/skill/skill-presentation"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-product-analytics",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-product-analytics"
       },
       "policy": {
         "installation": "AVAILABLE",
@@ -906,6 +942,18 @@
       "category": "Productivity"
     },
     {
+      "name": "xonovex-skill-release-readiness",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-release-readiness"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer Tools"
+    },
+    {
       "name": "xonovex-skill-remotion",
       "source": {
         "source": "local",
@@ -916,6 +964,18 @@
         "authentication": "ON_INSTALL"
       },
       "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-security-testing",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-security-testing"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer Tools"
     },
     {
       "name": "xonovex-skill-shell-scripting",
@@ -990,6 +1050,18 @@
       "category": "Productivity"
     },
     {
+      "name": "xonovex-skill-test-strategy",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-test-strategy"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer Tools"
+    },
+    {
       "name": "xonovex-skill-testing",
       "source": {
         "source": "local",
@@ -1054,6 +1126,18 @@
       "source": {
         "source": "local",
         "path": "./packages/skill/skill-user-stories"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-ux-design",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-ux-design"
       },
       "policy": {
         "installation": "AVAILABLE",

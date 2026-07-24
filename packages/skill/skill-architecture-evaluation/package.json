@@ -1,0 +1,17 @@
+{
+  "name": "@xonovex/skill-architecture-evaluation",
+  "version": "7.0.0",
+  "private": true,
+  "type": "module",
+  "keywords": [
+    "xonovex",
+    "skill",
+    "architecture",
+    "evaluation",
+    "tradeoffs"
+  ],
+  "scripts": {
+    "fmt": "prettier --write .",
+    "fmt:check": "prettier --check ."
+  }
+}

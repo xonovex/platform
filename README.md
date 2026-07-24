@@ -142,9 +142,16 @@ claude plugin install xonovex-skill-command@xonovex-marketplace        # author 
 claude plugin install xonovex-skill-skill@xonovex-marketplace         # author / extract / merge / simplify / validate Agent Skills
 claude plugin install xonovex-skill-workflow@xonovex-marketplace      # direct workflow operation routing without slash commands
 claude plugin install xonovex-skill-product-discovery@xonovex-marketplace   # frame opportunities, assumptions, experiments, and outcomes
+claude plugin install xonovex-skill-product-analytics@xonovex-marketplace   # define metrics, instrumentation, data quality, and experiment decisions
 claude plugin install xonovex-skill-ux-research@xonovex-marketplace         # plan, conduct, analyse, and hand off user research
+claude plugin install xonovex-skill-ux-design@xonovex-marketplace           # model, prototype, evaluate, and hand off interaction designs
+claude plugin install xonovex-skill-architecture-evaluation@xonovex-marketplace # evaluate quality scenarios, risks, and tradeoffs
+claude plugin install xonovex-skill-test-strategy@xonovex-marketplace       # allocate risk-based test coverage and completion evidence
 claude plugin install xonovex-skill-exploratory-testing@xonovex-marketplace # charter, explore, debrief, and report testing evidence
 claude plugin install xonovex-skill-threat-modeling@xonovex-marketplace     # model threats, prioritize risks, and verify mitigations
+claude plugin install xonovex-skill-security-testing@xonovex-marketplace    # plan authorized assessments, findings, and retests
+claude plugin install xonovex-skill-operational-readiness@xonovex-marketplace # assess service ownership, SLOs, response, and recovery
+claude plugin install xonovex-skill-release-readiness@xonovex-marketplace   # assess a pinned candidate, rollout, and recovery evidence
 claude plugin install xonovex-skill-incident-response@xonovex-marketplace   # declare, coordinate, mitigate, recover, and learn
 claude plugin install xonovex-skill-content@xonovex-marketplace       # multilingual articles, news, travel guides, prose humanization
 claude plugin install xonovex-skill-llmstxt@xonovex-marketplace       # /llms.txt files and per-page markdown mirrors
@@ -175,9 +182,16 @@ codex plugin add xonovex-skill-command@xonovex-marketplace        # author / mer
 codex plugin add xonovex-skill-skill@xonovex-marketplace         # author / extract / merge / simplify / validate Agent Skills
 codex plugin add xonovex-skill-workflow@xonovex-marketplace      # explicit workflow operations with effect and workspace boundaries
 codex plugin add xonovex-skill-product-discovery@xonovex-marketplace   # frame opportunities, assumptions, experiments, and outcomes
+codex plugin add xonovex-skill-product-analytics@xonovex-marketplace   # define metrics, instrumentation, data quality, and experiment decisions
 codex plugin add xonovex-skill-ux-research@xonovex-marketplace         # plan, conduct, analyse, and hand off user research
+codex plugin add xonovex-skill-ux-design@xonovex-marketplace           # model, prototype, evaluate, and hand off interaction designs
+codex plugin add xonovex-skill-architecture-evaluation@xonovex-marketplace # evaluate quality scenarios, risks, and tradeoffs
+codex plugin add xonovex-skill-test-strategy@xonovex-marketplace       # allocate risk-based test coverage and completion evidence
 codex plugin add xonovex-skill-exploratory-testing@xonovex-marketplace # charter, explore, debrief, and report testing evidence
 codex plugin add xonovex-skill-threat-modeling@xonovex-marketplace     # model threats, prioritize risks, and verify mitigations
+codex plugin add xonovex-skill-security-testing@xonovex-marketplace    # plan authorized assessments, findings, and retests
+codex plugin add xonovex-skill-operational-readiness@xonovex-marketplace # assess service ownership, SLOs, response, and recovery
+codex plugin add xonovex-skill-release-readiness@xonovex-marketplace   # assess a pinned candidate, rollout, and recovery evidence
 codex plugin add xonovex-skill-incident-response@xonovex-marketplace   # declare, coordinate, mitigate, recover, and learn
 codex plugin add xonovex-skill-content@xonovex-marketplace       # multilingual articles, news, travel guides, prose humanization
 codex plugin add xonovex-skill-llmstxt@xonovex-marketplace       # /llms.txt files and per-page markdown mirrors

@@ -1,0 +1,17 @@
+{
+  "name": "@xonovex/skill-security-testing",
+  "version": "7.0.0",
+  "private": true,
+  "type": "module",
+  "keywords": [
+    "xonovex",
+    "skill",
+    "security",
+    "testing",
+    "verification"
+  ],
+  "scripts": {
+    "fmt": "prettier --write .",
+    "fmt:check": "prettier --check ."
+  }
+}

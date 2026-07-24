@@ -1,0 +1,21 @@
+{
+  "name": "xonovex-skill-ux-design",
+  "version": "7.0.0",
+  "description": "Xonovex evidence-driven UX design skills",
+  "author": {
+    "name": "Xonovex"
+  },
+  "skills": "./ux-design-guide",
+  "interface": {
+    "displayName": "UX Design",
+    "shortDescription": "Turn research into tested interaction designs",
+    "longDescription": "Frame end-to-end journeys, explore alternatives at suitable fidelity, evaluate them with users, and hand off traceable interaction decisions without treating prototypes as production.",
+    "developerName": "Xonovex",
+    "category": "Productivity",
+    "capabilities": ["Read", "Write"],
+    "defaultPrompt": [
+      "Design this end-to-end user journey",
+      "Turn these findings into a testable prototype"
+    ]
+  }
+}

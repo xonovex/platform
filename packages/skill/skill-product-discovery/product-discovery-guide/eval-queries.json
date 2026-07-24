@@ -92,5 +92,11 @@
     "should_trigger": false,
     "split": "validation",
     "rationale": "Research-quality review belongs to the user-research capability, not opportunity discovery"
+  },
+  {
+    "query": "define a product measurement model with metric formulas, segments, guardrails, and decision thresholds",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "Product analytics defines and governs quantitative outcome measurement"
   }
 ]

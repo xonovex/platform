@@ -1,0 +1,90 @@
+[
+  {
+    "query": "map the whole user journey and every recovery, error, and interruption state",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "turn these user needs into alternative interaction flows before we pick one",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "choose the right prototype fidelity for the design questions we still have",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "design the information architecture and content hierarchy for this service journey",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "prepare a traceable UX handoff with states, rationale, evidence, and open questions",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "revise this interaction design from the latest usability evidence",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "turn these research findings into a testable end-to-end interaction design",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "compare these three flows against the same user and accessibility criteria",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "plan interviews to understand why people abandon this journey",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "Generative research planning belongs to user research"
+  },
+  {
+    "query": "split this feature into vertical user stories and acceptance criteria",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "Story slicing is a product-definition activity"
+  },
+  {
+    "query": "implement this approved Figma design in React",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "Framework implementation consumes the design handoff"
+  },
+  {
+    "query": "audit this interface against WCAG 2.2 AA",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "Accessibility assurance is an independent specialist evaluation"
+  },
+  {
+    "query": "create a product metric taxonomy and analytics tracking plan",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "Measurement design belongs to product analytics"
+  },
+  {
+    "query": "run exploratory testing against the implemented checkout candidate",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "Release-candidate exploration belongs to exploratory testing"
+  },
+  {
+    "query": "evaluate this architecture against prioritized quality-attribute scenarios and expose tradeoffs",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "Architecture evaluation analyzes system quality tradeoffs"
+  },
+  {
+    "query": "assess whether this exact build is ready for a controlled production rollout",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "Release readiness evaluates a pinned candidate"
+  }
+]

@@ -1,0 +1,21 @@
+{
+  "name": "xonovex-skill-release-readiness",
+  "version": "7.0.0",
+  "description": "Xonovex release candidate readiness skills",
+  "author": {
+    "name": "Xonovex"
+  },
+  "skills": "./release-readiness-guide",
+  "interface": {
+    "displayName": "Release Readiness",
+    "shortDescription": "Assess a pinned release candidate",
+    "longDescription": "Integrate candidate identity, quality and security evidence, change controls, rollout signals, recovery, communications, and residual risk into a traceable release recommendation.",
+    "developerName": "Xonovex",
+    "category": "Developer Tools",
+    "capabilities": ["Read", "Write"],
+    "defaultPrompt": [
+      "Assess this release candidate",
+      "Find the release-readiness gaps"
+    ]
+  }
+}

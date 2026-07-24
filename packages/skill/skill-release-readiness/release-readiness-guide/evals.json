@@ -1,0 +1,33 @@
+{
+  "skill_name": "release-readiness-guide",
+  "tier": "moderate",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Assess release candidate rc-18 for a staged checkout rollout.",
+      "assertions": [
+        "Pins source, build, artifact digests and provenance, dependencies, configuration, migrations, targets, and included changes",
+        "Maps applicable product, quality, security, accessibility, architecture, and operational evidence to rc-18 with freshness and limitations",
+        "Returns a bounded readiness recommendation and hands protected approval and deployment to the provider"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Design the rollout and recovery evidence needed for a payment-service change with a data migration.",
+      "assertions": [
+        "Defines stages, representative exposure, observation windows, baselines, guardrails, and explicit proceed, pause, and abort rules",
+        "Analyzes application, schema, message, client, and data compatibility for rollback, roll-forward, feature disable, and restore",
+        "Includes operator access, rehearsals, runbooks, contacts, support, communications, and points of no return"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "The pipeline is green but most evidence is from rc-17 and the artifact was rebuilt. Determine readiness.",
+      "assertions": [
+        "Treats the rebuild as a new candidate and rejects mutable identity or a green pipeline as sufficient evidence",
+        "Allows inherited evidence only for demonstrably unchanged inputs with explicit rationale and otherwise marks it stale",
+        "Reports not ready or blocked conditions, evidence gaps, residual risk, and exact actions needed for reassessment"
+      ]
+    }
+  ]
+}

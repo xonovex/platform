@@ -1,0 +1,90 @@
+[
+  {
+    "query": "run an operational readiness review for this service and its owning team",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "define user-centered SLOs ownership support hours and escalation for this service",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "assess observability alerts dashboards runbooks playbooks and on-call readiness",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "verify dependency failure degraded mode backup restore and recovery readiness",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "turn our incidents and near misses into a tailored production-readiness checklist",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "find the staffing access support maintenance and operational risk gaps before launch",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "run a production readiness review covering SLOs, dependencies, observability, on-call, and recovery",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "evaluate whether the actual responder can restore this service within its recovery objectives",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "assess this exact release candidate using traceable evidence, rollout controls, and recovery readiness",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "Release readiness integrates evidence for one candidate and rollout"
+  },
+  {
+    "query": "declare the active outage and establish incident command",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "Active production events belong to incident response"
+  },
+  {
+    "query": "configure Datadog monitors for this service",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "The observability provider implements monitoring controls"
+  },
+  {
+    "query": "design the service architecture for multi-region failover",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "Architecture design creates the proposed solution"
+  },
+  {
+    "query": "deploy this build to production after approval",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "Deployment is a protected provider effect"
+  },
+  {
+    "query": "write a post-incident review for yesterday's database outage",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "Incident response owns active-event learning artifacts"
+  },
+  {
+    "query": "create a capacity test in k6 for the checkout API",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "A performance-testing implementation supplies readiness evidence"
+  },
+  {
+    "query": "approve the residual operational risks for launch",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "Risk acceptance belongs to the accountable provider process"
+  }
+]

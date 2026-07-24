@@ -1,0 +1,17 @@
+{
+  "name": "@xonovex/skill-release-readiness",
+  "version": "7.0.0",
+  "private": true,
+  "type": "module",
+  "keywords": [
+    "xonovex",
+    "skill",
+    "release",
+    "readiness",
+    "deployment"
+  ],
+  "scripts": {
+    "fmt": "prettier --write .",
+    "fmt:check": "prettier --check ."
+  }
+}

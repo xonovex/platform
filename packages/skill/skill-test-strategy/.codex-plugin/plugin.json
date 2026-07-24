@@ -1,0 +1,21 @@
+{
+  "name": "xonovex-skill-test-strategy",
+  "version": "7.0.0",
+  "description": "Xonovex risk-based test strategy skills",
+  "author": {
+    "name": "Xonovex"
+  },
+  "skills": "./test-strategy-guide",
+  "interface": {
+    "displayName": "Test Strategy",
+    "shortDescription": "Design risk-based test coverage",
+    "longDescription": "Turn product, architecture, change, and operational risks into proportionate test levels, types, techniques, environments, evidence, and completion criteria.",
+    "developerName": "Xonovex",
+    "category": "Developer Tools",
+    "capabilities": ["Read", "Write"],
+    "defaultPrompt": [
+      "Create a risk-based test strategy",
+      "Find the important gaps in this test approach"
+    ]
+  }
+}

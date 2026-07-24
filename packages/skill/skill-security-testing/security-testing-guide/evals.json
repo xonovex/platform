@@ -1,0 +1,33 @@
+{
+  "skill_name": "security-testing-guide",
+  "tier": "moderate",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Plan an authorized security assessment of checkout staging rc-18 from its threat model and ASVS requirements.",
+      "assertions": [
+        "Pins authorization, target and build, accounts, time, techniques, exclusions, safety limits, contacts, data handling, stop conditions, and recovery",
+        "Derives risk-based coverage from threats, trust boundaries, change impact, and explicitly versioned applicable requirements",
+        "Combines complementary techniques and documents their blind spots instead of relying on one scanner or penetration test"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Triage scanner, code-review, and manual API-test results into security findings.",
+      "assertions": [
+        "Validates and classifies results instead of reporting every tool alert as a vulnerability",
+        "Records exact revision, preconditions, minimal reproduction, impact, exposure, controls, severity rationale, confidence, and redacted evidence",
+        "Protects sensitive evidence and separates confirmed findings, validation needs, false positives, and residual-risk decisions"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Retest the fix for a cross-tenant authorization vulnerability.",
+      "assertions": [
+        "Pins the remediation revision and repeats the original reproduction with the authorized accounts and environment",
+        "Tests adjacent read, list, mutation, role, identifier, and regression paths for bypasses",
+        "Reports remediation state, updated evidence, limitations, and residual risk without accepting risk or approving release"
+      ]
+    }
+  ]
+}

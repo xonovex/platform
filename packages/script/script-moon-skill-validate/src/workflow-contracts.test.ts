@@ -115,9 +115,14 @@ describe("workflow composition contracts", () => {
 
     for (const role of [
       "Product manager",
+      "Product analyst",
       "UX researcher",
+      "Product designer",
+      "Architect",
       "Developer",
       "QA",
+      "Security tester",
+      "Service owner",
       "Release manager",
       "Incident commander",
     ]) {
@@ -125,9 +130,16 @@ describe("workflow composition contracts", () => {
     }
     for (const capability of [
       "product-discovery-guide",
+      "product-analytics-guide",
       "ux-research-guide",
+      "ux-design-guide",
+      "architecture-evaluation-guide",
+      "test-strategy-guide",
       "exploratory-testing-guide",
       "threat-modeling-guide",
+      "security-testing-guide",
+      "operational-readiness-guide",
+      "release-readiness-guide",
       "incident-response-guide",
     ]) {
       expect(sdlc).toContain(capability);

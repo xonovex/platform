@@ -1,0 +1,90 @@
+[
+  {
+    "query": "define a metric tree from this product outcome to signals measures and guardrails",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "specify the exact numerator denominator eligibility window and segments for this KPI",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "create a versioned event taxonomy and data-quality plan for this funnel",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "audit whether retries identity stitching late events and test traffic distort this dashboard",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "design an A B experiment with guardrails duration quality checks and a decision rule",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "interpret these product metrics without claiming causality from correlation",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "define a product measurement model with metric formulas, segments, guardrails, and decision thresholds",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "decide whether the experiment evidence is trustworthy and practically meaningful",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "frame whether this product opportunity is worth pursuing before delivery",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "Product discovery owns opportunity framing and investment hypotheses"
+  },
+  {
+    "query": "interview users to understand why they abandon checkout",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "User research supplies qualitative evidence"
+  },
+  {
+    "query": "implement Firebase Analytics events in this Android app",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "The platform analytics capability implements instrumentation"
+  },
+  {
+    "query": "design the checkout interaction states and prototype",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "UX design creates the interaction design"
+  },
+  {
+    "query": "configure production SLO alerts for the service",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "Observability and operational capabilities implement service signals"
+  },
+  {
+    "query": "prioritize these roadmap opportunities using discovery evidence",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "Product discovery compares investment opportunities"
+  },
+  {
+    "query": "run a usability study on this prototype",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "User research evaluates behavior qualitatively"
+  },
+  {
+    "query": "approve the product decision and update the roadmap",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "Accountable product governance owns approval and roadmap mutation"
+  }
+]
