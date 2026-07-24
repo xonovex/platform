@@ -18,8 +18,7 @@ Author, merge, simplify, and distill reusable user-invocable prompt files (somet
   a harness that cannot delegate
 - **Delegate, Don't Duplicate** — a command owns its argument contract and delegates the procedure to a guideline skill via the `Skill` tool; the skill is the single source of truth, the command a thin, stable interface
 - **Depend on Skills Two Ways** — depend **hard** (name the exact skill, and add it to the plugin's `dependencies` when the harness installs them) when one specific skill is always required, or **soft** (describe the capability and let the agent select an installed skill, degrading gracefully) when several interchangeable skills fit; if the harness distributes skills but not commands, publish and invoke the skill directly; either way load the selected skill at run time (install ≠ in-context), see [references/distill.md](references/distill.md)
-- **Validate the public contract** — keep argument-hint and Arguments names identical;
-  record soft requirements as provision ID, range, strength, and reason
+- **Validate the public contract** — keep argument-hint and Arguments names identical; express optional supporting capabilities in delegation prose, not command metadata
 
 ## Gotchas
 

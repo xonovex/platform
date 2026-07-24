@@ -7,7 +7,8 @@ allowed-tools:
   - AskUserQuestion
   - Skill
 argument-hint: >-
-  [subject] [--request <file>] [--outcome <text>]
+  [subject] [--request <file>] [--subject-revision <revision>]
+  [--outcome <text>]
   [--criterion <criterion>...] [--method <method>]
 ---
 
@@ -19,6 +20,7 @@ argument-hint: >-
   an opaque native reference.
 - `--request` (optional): Markdown file containing the question, evidence, and
   equivalent inputs. Do not combine it with shorthand arguments.
+- `--subject-revision` (optional): Exact native revision of the decision subject.
 - `--outcome` (optional): Outcome to record; otherwise derive a recommendation.
 - `--criterion` (repeatable, optional): Decision criterion.
 - `--method` (optional): Requested subject-specific decision procedure.

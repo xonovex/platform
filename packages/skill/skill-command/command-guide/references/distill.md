@@ -7,7 +7,7 @@ its public argument contract stable.
 
 - Move procedure, output, errors, and gotchas into the owner skill.
 - Keep frontmatter, Arguments, and an explicit Delegation block in the command.
-- Distinguish guide name, plugin name, operation, and supporting semantic needs.
+- Distinguish guide name, plugin name, operation, and optional supporting capabilities.
 - Preserve callers while reducing duplicated prompt content.
 
 ## Arguments
@@ -16,8 +16,6 @@ its public argument contract stable.
 - `--owner-skill` (optional) — exact guide that owns the procedure.
 - `--owner-plugin` (optional) — distribution plugin for the owner guide.
 - `--operation` (optional) — operation/reference within the owner skill.
-- `--requires` (repeatable, optional) — soft requirement in
-  `<provision-id>@<range>[:required|preferred]` form; defaults to preferred.
 - `--dry-run` (optional) — preview command, skill, and manifest changes.
 
 ## Content boundary
@@ -27,12 +25,8 @@ Keep in the command:
 - description, allowed tools, and argument hint;
 - argument names, defaults, repeatability, and effect boundary;
 - exact owner skill, owner plugin, and operation;
-- soft semantic requirements that affect runtime selection.
-
-Write each soft requirement under `## Requirements` as
-`- \`<provision-id>@<range>\` (required|preferred): <reason>`. Repository validation
-checks the syntax and catalog compatibility; the runtime records missing preferred
-support as visible degradation.
+- brief natural-language supporting needs that the owner operation should select from
+  installed skill names and descriptions.
 
 Move to the owner skill:
 
@@ -49,7 +43,7 @@ Move to the owner skill:
 - [ ] Resolve the owner plugin separately and verify that it distributes the guide.
 - [ ] Move the reusable procedure to the owner's operation reference and register the
       operation in its progressive-disclosure index.
-- [ ] Describe supporting interchangeable skills as semantic requirements. Use exact
+- [ ] Describe supporting interchangeable skills in Delegation. Use exact
       dependencies only when the procedure cannot complete without one named guide.
 - [ ] Replace the command body with Arguments and Delegation while preserving its
       argument contract.
@@ -64,7 +58,7 @@ Report:
 - before/after command line count;
 - preserved argument contract;
 - owner guide, plugin, and operation;
-- added semantic or hard requirements;
+- added soft capability descriptions or exact hard dependencies;
 - command, skill, and manifest files affected;
 - validation result.
 

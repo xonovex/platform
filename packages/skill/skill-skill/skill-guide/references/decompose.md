@@ -19,8 +19,8 @@ Decompose **splits**; it does not condense — reach for `simplify` when one ski
 4. **Carve out each new skill** — move its references verbatim into a new skill directory; write its `SKILL.md` (name = dir, routing-first description, essentials, progressive-disclosure links) per the skill structure and [composability.md](composability.md).
 5. **Cross-link, don't copy** — where a new skill needs another's concept, reference the owner by name (upward only); never duplicate content or use cross-package file links.
 6. **Retire or slim the original** — if fully split, remove it and repoint every referrer; if a core concept remains, keep that core and replace the moved sections with by-name cross-references.
-7. **Register and classify** — add each new skill to packaging and the composition catalog; assign one lifecycle and primary role, move stable provisions to their owner, and repoint semantic requirements. See [composition-metadata.md](composition-metadata.md).
-8. **Verify** — every `SKILL.md` → `references/` link resolves, every guide appears once in the catalog, required semantic resolution is deterministic and acyclic, no concept is owned twice, no referrer dangles, and trigger evals route to the right owner.
+7. **Register and connect** — add each new skill to packaging and marketplaces, move advisory ownership handoffs to the rightful owner, and retain exact hard dependencies only where indispensable.
+8. **Verify** — every `SKILL.md` → `references/` link resolves, registrations and named handoffs resolve, hard dependencies are acyclic, no concept is owned twice, no referrer dangles, and trigger evals route to the right owner.
 
 ## Heuristics
 
@@ -35,5 +35,5 @@ Decompose **splits**; it does not condense — reach for `simplify` when one ski
 - Leaving the original pointing at moved references dangles the links — repoint or retire every referrer in the same change.
 - Duplicating a shared concept into each new skill recreates the problem decompose solves — one owner, cross-link the rest.
 - Collapsing parallel-by-domain operations while splitting destroys real structure — those are separate-by-domain, not duplication.
-- A new skill is not auto-discovered — register it (catalog, packaging, lockfile) or it strands.
-- Copying the original classification to every child invents false contracts — classify each resulting guide by its own primary concern.
+- A new skill is not auto-discovered — register it in packaging, marketplaces, and the lockfile or it strands.
+- Copying every original hard dependency to every child invents false coupling — keep only dependencies each child truly needs.

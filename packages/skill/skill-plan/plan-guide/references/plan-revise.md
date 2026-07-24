@@ -1,6 +1,6 @@
 # plan-revise: Revise a Plan from Explicit Feedback
 
-Create one revised plan from an inline plan or provider-native reference, explicit feedback, and an optional native revision. Preserve the source and return the new result inline unless the caller requests provider persistence.
+Create one revised plan from an inline plan or provider-native reference, explicit feedback, and an optional native revision. Preserve the source and return the new result inline.
 
 ## Feedback Inputs
 
@@ -13,7 +13,7 @@ Accept inline feedback, provider-native feedback references, or provider-native 
 3. Classify each item as applied, deferred, rejected, unresolved question, or scope change, with a concise rationale.
 4. Propagate accepted changes through scope, approach, dependencies, risks, proposed children, validation, success criteria, and skills to consult.
 5. Produce a traceable new revision without invisibly overwriting the source. Status, when present, remains descriptive metadata.
-6. Return the revised plan and item-by-item disposition inline, or persist to an explicitly requested provider destination and return its native reference and revision.
+6. Return the revised plan and item-by-item disposition inline. Use a separate Publish operation if the revision must be persisted.
 
 ## Gotchas
 

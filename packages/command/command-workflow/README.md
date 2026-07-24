@@ -14,3 +14,6 @@ Workspace commands:
 - `workspace-abandon`, `workspace-cleanup`
 
 Operations remain separate: a command never implies the next lifecycle step.
+Core commands accept an optional exact subject revision. Results stay inline except
+for `publish`; `execute` defaults to inspect, while publishing and workspace mutations
+default to preview and require explicit apply.

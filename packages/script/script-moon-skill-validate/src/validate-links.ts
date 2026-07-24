@@ -1,11 +1,10 @@
-import {checkCompositionCatalog} from "./composition-catalog-check.js";
 import {checkCrossPackageLinks} from "./cross-package-links.js";
 import {type LinkReport} from "./reference-file-links.js";
 
 const HELP_TEXT = [
   "usage: moon-skill-links [-h] [repo-root]",
   "",
-  "Validate the composition catalog, links, and paired acyclic skill dependencies.",
+  "Validate links, skill packaging, and paired acyclic hard dependencies.",
   "",
   "positional arguments:",
   "  repo-root   repository root to scan (defaults to the current directory)",
@@ -39,7 +38,6 @@ export const main = (argv: readonly string[]): number => {
   };
 
   checkCrossPackageLinks(repoRoot, report);
-  checkCompositionCatalog(repoRoot, report);
 
   for (const line of passes) {
     console.log(`[PASS] ${line}`);
@@ -52,11 +50,13 @@ export const main = (argv: readonly string[]): number => {
   }
 
   if (errors.length > 0) {
-    console.log(`Result: FAIL (${String(errors.length)} composition error(s))`);
+    console.log(
+      `Result: FAIL (${String(errors.length)} dependency or link error(s))`,
+    );
     return 1;
   }
   console.log(
-    "Result: PASS (composition catalog, links, and dependencies are valid)",
+    "Result: PASS (links, packaging, and hard dependencies are valid)",
   );
   return 0;
 };

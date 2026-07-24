@@ -98,7 +98,7 @@
     "split": "validation"
   },
   {
-    "query": "Explain how hard and soft skill dependencies differ in the composition catalog.",
+    "query": "Explain how optional description-based skill selection differs from an exact plugin dependency.",
     "rationale": "This is skill-composition authoring guidance, not execution of a workflow operation.",
     "should_trigger": false,
     "split": "validation"

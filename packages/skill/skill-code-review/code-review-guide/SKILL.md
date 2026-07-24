@@ -5,7 +5,7 @@ description: "Use when writing, structuring, or labelling code-review feedback o
 
 # Code-review feedback — quick reference
 
-Host-independent review-comment craft. **Every comment states its type and its urgency — a reader must never guess whether it blocks the merge.** For delivering comments on a specific host (auth, line anchors, posting API) load the matching host skill — `github-guide` (plugin `xonovex-skill-github`), `gitlab-guide` (plugin `xonovex-skill-gitlab`), or another `skill-<host>`.
+Host-independent review-comment craft. **Every comment states its type and its urgency — a reader must never guess whether it blocks the merge.** Review operations return findings inline and never post, edit, resolve, or persist them. A separate Publish operation may select a matching host skill for delivery.
 
 ## Essentials
 
@@ -15,7 +15,7 @@ Host-independent review-comment craft. **Every comment states its type and its u
 - **Cross-link, never cross-reference by number** - link the summary to its inline threads; a reader does not see your "comment 3" numbering, see [references/review-structure.md](references/review-structure.md)
 - **Verify before you assert** - check each claim against the branch code / API / design-system source and cite `file:line`; never review from memory, see [references/review-structure.md](references/review-structure.md)
 - **Lead with what works, then be specific** - praise is a label too; for every issue show the fix, not just the problem, see [references/review-structure.md](references/review-structure.md)
-- **Carry findings in a shared contract** - the analyze → refine → post → resolve pipeline moves one canonical findings shape, anchored to new-file lines; host delivery (post / resolve) is the host skill's (`github-guide` / `gitlab-guide`), see [references/findings-schema.md](references/findings-schema.md), [references/review-analyze.md](references/review-analyze.md), [references/review-refine.md](references/review-refine.md)
+- **Carry findings in a shared contract** - analyze and refine return one canonical findings shape, anchored to new-file lines; later Publish or Execute operations may pass it to a host skill, see [references/findings-schema.md](references/findings-schema.md), [references/review-analyze.md](references/review-analyze.md), [references/review-refine.md](references/review-refine.md)
 
 ## Gotchas
 
@@ -26,6 +26,7 @@ Host-independent review-comment craft. **Every comment states its type and its u
 - Keep each comment self-contained, especially if you may edit it later. If comment A says "see comment B" and B is reworded or removed, A is left dangling.
 - Suggested-code blocks must compile against the real APIs. A confidently wrong snippet is worse than prose; verify component / function signatures first (this is where a framework skill, e.g. a design-system guide, composes in).
 - AI-generated findings and AI-written code are not self-verifying — the human reviewer must actively evaluate each, not rubber-stamp; adversarial AI review complements, never replaces, human judgement on the merge decision.
+- Loading a host skill during Review to post or resolve findings silently changes the operation and is out of scope.
 
 ## Example — a labelled inline comment, and a summary that links to it
 
@@ -55,6 +56,6 @@ Each reference is a trigger — read it only when the user's intent matches; do 
 
 - Read [references/conventional-comments.md](references/conventional-comments.md) - Load when choosing a label or decoration, mapping severity to whether it gates merge, or wanting the full label list and the machine-parseable shape.
 - Read [references/review-structure.md](references/review-structure.md) - Load when structuring a whole review (summary vs inline), ordering by priority, cross-linking comments, verifying claims before posting, or setting tone and matching a repo's writing style.
-- Read [references/findings-schema.md](references/findings-schema.md) - Load when producing, refining, or publishing structured findings — the canonical findings JSON contract and new-file line anchoring.
+- Read [references/findings-schema.md](references/findings-schema.md) - Load when producing or refining structured findings — the canonical findings JSON contract and new-file line anchoring.
 - Read [references/review-analyze.md](references/review-analyze.md) - Load when turning a branch diff into structured findings (correctness then quality, anchoring, the effort dial, comparing against prior findings).
 - Read [references/review-refine.md](references/review-refine.md) - Load when refining findings before posting (keep / reword / relabel / re-anchor / merge / split / drop, label discipline, stop-after-each-pass).

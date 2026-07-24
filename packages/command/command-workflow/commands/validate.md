@@ -7,7 +7,8 @@ allowed-tools:
   - AskUserQuestion
   - Skill
 argument-hint: >-
-  [subject] [--request <file>] [--criterion <criterion>...]
+  [subject] [--request <file>] [--subject-revision <revision>]
+  [--criterion <criterion>...]
   [--perspective <perspective>...] [--method <method>]
 ---
 
@@ -19,6 +20,7 @@ argument-hint: >-
   opaque native reference.
 - `--request` (optional): Markdown file containing the subject, criteria, and
   equivalent inputs. Do not combine it with shorthand arguments.
+- `--subject-revision` (optional): Exact native revision of the subject.
 - `--criterion` (repeatable, required unless `--request` supplies it): Binding
   criterion to evaluate.
 - `--perspective` (repeatable, optional): Advisory validation lens.

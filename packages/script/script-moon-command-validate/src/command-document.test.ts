@@ -17,10 +17,6 @@ argument-hint: "<subject> [--perspective <selection>...]"
 - \`--perspective\`, \`--role\` (repeatable, optional): Perspective.
 - \`--one, --two, --three\` (optional): Grouped flags.
 
-## Requirements
-
-- \`assurance:evidence@^1.0.0\` (preferred): Specialist evidence improves the result.
-
 ## Delegation
 
 Load the \`test-guide\` skill (plugin \`xonovex-skill-test\`) and perform its
@@ -40,14 +36,6 @@ describe("parseCommandDocument", () => {
         plugin: "xonovex-skill-test",
         skill: "test-guide",
       },
-      semanticRequirements: [
-        {
-          id: "assurance:evidence",
-          range: "^1.0.0",
-          reason: "Specialist evidence improves the result.",
-          strength: "preferred",
-        },
-      ],
     });
     expect(result.document?.documentedArguments).toEqual(
       new Set(["subject", "perspective", "role", "one", "two", "three"]),
@@ -85,24 +73,22 @@ describe("parseCommandDocument", () => {
     );
   });
 
-  it("rejects malformed and duplicate semantic requirements", () => {
-    const duplicate = validCommand.replace(
+  it("rejects machine-readable soft requirements", () => {
+    const withRequirements = validCommand.replace(
       "## Delegation",
       [
-        "- `assurance:evidence@^2.0.0` (required): Conflicting evidence requirement.",
-        "- invalid",
+        "## Requirements",
+        "",
+        "- `assurance:evidence@^1.0.0` (preferred): Specialist evidence.",
         "",
         "## Delegation",
       ].join("\n"),
     );
 
-    const result = parseCommandDocument("commands/review.md", duplicate);
+    const result = parseCommandDocument("commands/review.md", withRequirements);
 
-    expect(result.issues).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({code: "command.requirement-duplicate"}),
-        expect.objectContaining({code: "command.requirement-format"}),
-      ]),
+    expect(result.issues).toContainEqual(
+      expect.objectContaining({code: "command.requirements-unsupported"}),
     );
   });
 });

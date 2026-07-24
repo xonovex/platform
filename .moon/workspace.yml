@@ -13,7 +13,6 @@ projects:
     - packages/moon/*
     # Project globs exclude tenant files so discovered locations stay directories.
     - "!**/*.md"
-    - "!packages/skill/composition-catalog.json"
   sources:
     github-actions: .github
     repository-shell: .hooks

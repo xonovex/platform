@@ -11,7 +11,7 @@ allowed-tools:
 argument-hint: >-
   [description] [--name <name>] [--owner-skill <skill-name>]
   [--owner-plugin <plugin-name>] [--operation <name>]
-  [--requires <requirement>...] [--interactive] [--dry-run] [--force]
+  [--interactive] [--dry-run] [--force]
 ---
 
 # /xonovex-utility:slashcommand-create — Create Slash Command
@@ -22,8 +22,6 @@ argument-hint: >-
 - `--name` (optional): Kebab-case command name.
 - `--owner-skill`, `--owner-plugin`, `--operation` (optional): Exact guide,
   distribution plugin, and operation that own the procedure.
-- `--requires` (repeatable, optional): Soft requirement in
-  `<provision-id>@<range>[:required|preferred]` form; defaults to preferred.
 - `--interactive` (optional): Ask about arguments and delegation choices.
 - `--dry-run` (optional): Preview command, skill, and manifest artifacts.
 - `--force` (optional): Replace the exact existing command only after preview.

@@ -15,10 +15,13 @@ operation semantics; selected domain skills own the subject-specific procedure.
 - **Explicit subject** — act on the supplied inline subject, path, or opaque native
   reference without inventing missing identity or revision data
 - **Soft capability selection** — choose relevant installed skills from the subject,
-  method, perspectives, and criteria; keep this general skill free of concrete skill
-  dependencies
-- **Dependency-first composition** — resolve selected skills' hard dependencies,
-  preferred requirements, and applicable overlays before loading each guide once
+  method, perspectives, criteria, and their routing descriptions; keep this general
+  skill free of concrete domain dependencies
+- **Dependency-first composition** — load each selected guide's exact manifest
+  dependencies before the guide itself, once per operation
+- **Operation boundary wins** — use only the part of a selected procedure that fits the
+  requested effect and persistence boundary; block when that procedure cannot be
+  separated from a broader effect
 - **Visible boundaries** — report degraded coverage, blockers, evidence, and every
   planned or observed effect instead of hiding uncertainty
 - **Authority stays explicit** — review, validation, and decision results are
@@ -34,9 +37,10 @@ operation semantics; selected domain skills own the subject-specific procedure.
 2. Reject or separate additional operations whose effect boundaries differ.
 3. Select and load relevant installed capabilities using the subject, method,
    perspectives, and criteria.
-4. Perform only the requested operation without assuming publication, approval, or a
+4. Adapt selected procedures to the operation's effect and persistence boundary.
+5. Perform only the requested operation without assuming publication, approval, or a
    following lifecycle step.
-5. Verify the result and report evidence, degradation, blockers, and effects.
+6. Verify the result and report evidence, degradation, blockers, and effects.
 
 Use these headings only when they add information:
 
@@ -93,8 +97,10 @@ Do not force empty headings or serialize the result into a fixed envelope.
 - A request containing several verbs still needs separate operation boundaries when
   their effects differ
 - Installing a skill does not load it; load every selected guide explicitly
-- Missing preferred capability degrades coverage; missing required capability blocks
-  before effects
+- Caller-declared preferred capability needs degrade visibly when unavailable;
+  caller-declared required needs block before effects
+- A selected guide never widens the operation: persistence remains Publish, workspace
+  removal remains Workspace cleanup, and mutation still requires `apply`
 - Preview is not authorization to apply, and a successful decision is not approval
 - Workspace merge never implies branch, reference, or worktree cleanup
 - Provider-native references are opaque; pass them to the selected provider capability
@@ -117,4 +123,4 @@ Do not force empty headings or serialize the result into a fixed envelope.
 - Read [references/effects.md](references/effects.md) - Load when an operation may read,
   preview, apply, publish, or otherwise affect external state
 - Read [references/capability-selection.md](references/capability-selection.md) - Load when
-  resolving capability order, overlays, degradation, or blockers
+  resolving soft selections, hard-dependency order, degradation, or blockers

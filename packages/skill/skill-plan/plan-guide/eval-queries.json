@@ -25,7 +25,7 @@
     "split": "train"
   },
   {
-    "query": "The previous chat is gone. Continue exactly one child from tracker plan:782 at revision 9f31, baseline the repo first, then stop.",
+    "query": "The previous chat is gone. Apply exactly one child from tracker plan:782 at revision 9f31, baseline the repo first, then stop.",
     "should_trigger": true,
     "split": "validation"
   },

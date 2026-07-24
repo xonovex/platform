@@ -2,7 +2,7 @@
 
 ## Contents
 
-[Core Workflow](#core-workflow) · [Frontmatter Checks](#frontmatter-checks) · [Body Checks](#body-checks) · [Reference Checks](#reference-checks) · [Content Quality Checks](#content-quality-checks) · [Structural-Pattern Hints](#structural-pattern-hints-soft-signals) · [Harness Neutrality Checks](#harness-neutrality-checks) · [Composition Catalog Checks](#composition-catalog-checks) · [Output](#output) · [Error Handling](#error-handling) · [Safety](#safety)
+[Core Workflow](#core-workflow) · [Frontmatter Checks](#frontmatter-checks) · [Body Checks](#body-checks) · [Reference Checks](#reference-checks) · [Content Quality Checks](#content-quality-checks) · [Structural-Pattern Hints](#structural-pattern-hints-soft-signals) · [Harness Neutrality Checks](#harness-neutrality-checks) · [Composition Checks](#composition-checks) · [Output](#output) · [Error Handling](#error-handling) · [Safety](#safety)
 
 Read-only audit of a SKILL.md against the Agent Skills spec, project conventions, and authoring best practices. Reports pass/fail per check with line numbers.
 
@@ -14,7 +14,7 @@ The catalog validator runs as `moon-skill-validate --strict <skill-dir>` and exi
 2. Resolve target: SKILL.md path or skill directory
 3. Parse frontmatter (YAML) and body separately
 4. Run all checks (frontmatter, body, references, content quality, harness neutrality)
-5. When repository context is available, validate paired manifests, exact dependencies, and the composition catalog
+5. When repository context is available, validate registration, paired manifests, exact hard dependencies, and named handoffs
 6. Report pass/fail with file:line evidence and remediation hints
 7. Read-only — never modify files
 
@@ -65,22 +65,17 @@ These patterns are advisory during local exploration and fail the repository's s
 - No vendor-prefixed frontmatter keys
 - No vendor-specific instruction filenames — use `AGENTS.md` (the open standard)
 
-## Composition Catalog Checks
+## Composition Checks
 
-The workspace-level composition check keeps structured metadata outside Agent Skill frontmatter and vendor manifests:
+The workspace-level composition check validates only durable, exact structure:
 
-- Every installed guide appears exactly once, alphabetically, with one lifecycle and one primary functional role.
-- `mixed`, malformed provision identifiers, invalid semantic versions/ranges, and duplicate local provisions/requirements fail.
-- Required semantic requirements resolve to exactly one compatible installed provision; missing, incompatible, or ambiguous resolution fails.
-- Preferred resolution remains visible but does not fail solely because a provider is unavailable.
-- Preference overlays apply only to preference guides, follow catalog scope
-  precedence, and reject equal-scope conflicts.
-- Deterministically selected required semantic dependencies are acyclic.
-- Exact manifest dependencies remain paired, mirrored in package dependencies,
-  discoverable by the runtime inventory, resolvable, dependency-first, and acyclic
-  independently of semantic requirements.
-- Selection records the catalog contract/digest, guide/plugin identities, exact implementation version, provision compatibility, reason, and `SOURCES.md` provenance path.
-- The catalog snapshot packaged with the workflow skill is byte-identical to the canonical repository catalog, so installed selection never depends on repository-root access.
+- Every skill package and guide is registered in the supported marketplaces.
+- Paired plugin manifests use the package-derived name and direct guide path.
+- Exact hard dependencies match between supported manifests and package dependencies.
+- Every hard dependency and named ownership handoff resolves to an existing registered skill.
+- Hard dependencies are dependency-first and acyclic.
+- Optional selection remains in runtime prose and relies on installed skill names and routing descriptions, not a second metadata graph.
+- `SOURCES.md` records content provenance independently of package versions.
 
 ## Output
 
@@ -95,7 +90,7 @@ Validation: <skills-dir>/{skill-name}/SKILL.md
   - SKILL.md:58 → references/old-name.md (file not found)
 [WARN] references: 3 links lack load-when triggers
   - SKILL.md:42, SKILL.md:51, SKILL.md:60
-[PASS] composition catalog: one classification and compatible installed provisions
+[PASS] composition: manifests, hard dependencies, and handoffs resolve
 [FAIL] harness neutrality: 1 vendor-specific reference
   - SKILL.md:30 → proprietary tool name detected
 

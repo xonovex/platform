@@ -5,7 +5,7 @@ import {type ValidationReport} from "./validation.js";
 
 const HELP = `usage: moon-command-validate [package-dir] [options]
 
-Validate command Markdown and semantic requirements.
+Validate command Markdown, delegation, arguments, and hard dependencies.
 
 options:
   --repo-root <path>  repository root (defaults to three levels above package)

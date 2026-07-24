@@ -30,6 +30,10 @@ For preview or apply:
 Do not infer apply from urgency, a trusted executor, a prior preview, a successful
 validation, or a decision outcome.
 
+A selected domain procedure cannot change the effect mode. In `inspect` or `preview`,
+omit its mutation steps. If its useful result inherently requires mutation, return a
+blocked result that names `apply` as the retry boundary.
+
 ## Effect Reporting
 
 Classify each attempted effect:

@@ -30,10 +30,10 @@
     "rationale": "merge/assimilate one skill into another"
   },
   {
-    "query": "classify every guide in our agent-skill catalog on durable versus procedural and domain/context/preference/procedure/capability/assurance/recovery/communication, without adding mixed metadata to both vendor manifests",
+    "query": "audit every guide in our skill set for ambiguous descriptions, dangling named handoffs, and exact hard dependencies that should only be optional runtime selections",
     "should_trigger": true,
     "split": "train",
-    "rationale": "two-axis skill taxonomy and harness-neutral catalog composition"
+    "rationale": "skill-set routing and dependency composition"
   },
   {
     "query": "before we install this third-party skill, audit its scripts and the URLs it fetches and lock down what tools it's allowed to use",
@@ -78,10 +78,10 @@
     "rationale": "validation positive — implicit de-duplication / composability"
   },
   {
-    "query": "our procedure needs any installed assurance:evidence provider compatible with ^1.0.0; define required versus preferred resolution, ambiguity failure, exact version recording, and how this differs from a plugin dependency",
+    "query": "our workflow needs any installed evidence-review skill; define required versus preferred description matching, ambiguity handling, and how this differs from an exact plugin dependency",
     "should_trigger": true,
     "split": "validation",
-    "rationale": "semantic requirements, provisions, compatibility, and selection provenance"
+    "rationale": "soft description-based selection versus exact hard dependency"
   },
   {
     "query": "consolidate the duplicated AGENTS.md files across our packages into one canonical set",

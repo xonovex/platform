@@ -7,7 +7,8 @@ allowed-tools:
   - AskUserQuestion
   - Skill
 argument-hint: >-
-  [subject] [--request <file>] [--criterion <criterion>...]
+  [subject] [--request <file>] [--subject-revision <revision>]
+  [--criterion <criterion>...]
   [--method <method>]
 ---
 
@@ -19,6 +20,7 @@ argument-hint: >-
   opaque native reference.
 - `--request` (optional): Markdown file containing the subject and equivalent inputs.
   Do not combine it with shorthand arguments.
+- `--subject-revision` (optional): Exact native revision of the subject.
 - `--criterion` (repeatable, optional): Constraint the result must satisfy.
 - `--method` (optional): Requested subject-specific procedure.
 

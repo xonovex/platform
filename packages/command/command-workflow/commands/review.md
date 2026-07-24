@@ -5,9 +5,11 @@ allowed-tools:
   - Glob
   - Grep
   - AskUserQuestion
+  - Task
   - Skill
 argument-hint: >-
-  [subject] [--request <file>] [--perspective <perspective>...]
+  [subject] [--request <file>] [--subject-revision <revision>]
+  [--perspective <perspective>...]
   [--criterion <criterion>...] [--method <method>]
 ---
 
@@ -19,6 +21,7 @@ argument-hint: >-
   opaque native reference.
 - `--request` (optional): Markdown file containing the subject and equivalent inputs.
   Do not combine it with shorthand arguments.
+- `--subject-revision` (optional): Exact native revision of the subject.
 - `--perspective` (repeatable, optional): Explicit review lens.
 - `--criterion` (repeatable, optional): Review criterion.
 - `--method` (optional): Requested subject-specific review procedure.

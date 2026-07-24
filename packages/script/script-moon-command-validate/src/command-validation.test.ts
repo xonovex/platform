@@ -202,7 +202,7 @@ describe("validateCommandPackage", () => {
     ).toContain("command.argument-duplicate");
   });
 
-  it("validates semantic requirements against compatible catalog provisions", () => {
+  it("rejects obsolete machine-readable soft requirements", () => {
     const {packageDir, root} = fixture();
     write(
       root,
@@ -212,112 +212,17 @@ describe("validateCommandPackage", () => {
         [
           "## Requirements",
           "",
-          "- `assurance:evidence@^1.0.0` (preferred): Specialist evidence improves the result.",
+          "- `assurance:evidence@^1.0.0` (preferred): Specialist evidence.",
           "",
           "## Delegation",
         ].join("\n"),
       ),
     );
-    write(
-      root,
-      "packages/skill/composition-catalog.json",
-      JSON.stringify({
-        contractVersion: "2.0.0",
-        overlayPrecedence: [
-          "global",
-          "organization",
-          "repository",
-          "language",
-          "framework",
-          "path",
-          "explicit",
-        ],
-        skills: [
-          {
-            name: "evidence-guide",
-            classification: {
-              lifecycle: "procedural",
-              functionalRole: "assurance",
-            },
-            provisions: [{id: "assurance:evidence", version: "1.0.0"}],
-          },
-        ],
-      }),
-    );
-    write(
-      root,
-      "packages/skill/skill-evidence/package.json",
-      JSON.stringify({version: "7.0.0"}),
-    );
-
-    expect(validateCommandPackage(packageDir, root).report.issues).toEqual([]);
-  });
-
-  it("warns when a preferred command semantic requirement is unavailable", () => {
-    const {packageDir, root} = fixture();
-    write(
-      root,
-      "packages/command/command-test/commands/run.md",
-      commandSource().replace(
-        "## Delegation",
-        [
-          "## Requirements",
-          "",
-          "- `assurance:missing@^1.0.0` (preferred): Optional specialist evidence.",
-          "",
-          "## Delegation",
-        ].join("\n"),
-      ),
-    );
-    write(
-      root,
-      "packages/skill/composition-catalog.json",
-      JSON.stringify({
-        contractVersion: "2.0.0",
-        skills: [],
-      }),
-    );
-
     expect(
       validateCommandPackage(packageDir, root).report.issues,
     ).toContainEqual(
       expect.objectContaining({
-        code: "command.requirement-unavailable",
-        severity: "warning",
-      }),
-    );
-  });
-
-  it("fails when a required command semantic requirement is unavailable", () => {
-    const {packageDir, root} = fixture();
-    write(
-      root,
-      "packages/command/command-test/commands/run.md",
-      commandSource().replace(
-        "## Delegation",
-        [
-          "## Requirements",
-          "",
-          "- `assurance:missing@^1.0.0` (required): Required specialist evidence.",
-          "",
-          "## Delegation",
-        ].join("\n"),
-      ),
-    );
-    write(
-      root,
-      "packages/skill/composition-catalog.json",
-      JSON.stringify({
-        contractVersion: "2.0.0",
-        skills: [],
-      }),
-    );
-
-    expect(
-      validateCommandPackage(packageDir, root).report.issues,
-    ).toContainEqual(
-      expect.objectContaining({
-        code: "command.requirement-unavailable",
+        code: "command.requirements-unsupported",
         severity: "error",
       }),
     );

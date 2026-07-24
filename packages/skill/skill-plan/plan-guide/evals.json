@@ -44,7 +44,7 @@
     },
     {
       "id": 6,
-      "prompt": "Resume implementation from provider plan:auth-44 revision a110 after losing the previous session. Complete one actionable child and stop.",
+      "prompt": "Resume implementation from provider plan:auth-44 revision a110 after losing the previous session. Use effect apply, complete one actionable child, and stop.",
       "assertions": [
         "The operation reconstructs the explicit provider-native subject, baselines applicable validation, and loads the target's skills before editing",
         "It completes and verifies only one actionable target, reports evidence and remaining work, and does not continue to another child"
@@ -64,6 +64,14 @@
       "assertions": [
         "Every criterion receives an independent pass, fail, or blocked result with reproducible evidence and freshness",
         "The operation remains read-only and does not mutate status, claim approval, or treat green tests as sufficient by themselves"
+      ]
+    },
+    {
+      "id": 9,
+      "prompt": "Preview continuing tracker plan:auth-44 at revision a110. Show the first actionable target, exact intended edits, and validation, but do not change files or plan state.",
+      "assertions": [
+        "The operation resolves only the first actionable target and returns exact proposed changes and validation without editing files",
+        "It does not update provider state, persist progress, mark tasks complete, or continue to another target"
       ]
     }
   ]

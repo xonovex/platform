@@ -9,7 +9,7 @@ Validate one explicit inline or provider-native plan and its implementation evid
 3. Run applicable typecheck, lint, build, tests, integration, policy, and non-functional checks. Record not-applicable or unavailable categories explicitly.
 4. Evaluate every success criterion, task, review or documentation requirement, non-functional requirement, unresolved finding, and cumulative child condition independently.
 5. Report pass, fail, or blocked per criterion with reproducible evidence, freshness, limitations, and exact revisions checked.
-6. Return evidence inline or persist it only to an explicitly requested provider destination. Do not mutate the plan or its status.
+6. Return evidence inline. Do not mutate the plan or its status; use a separate Publish operation if the evidence must be persisted.
 
 ## Gotchas
 

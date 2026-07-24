@@ -5,7 +5,7 @@ description: "Use when authoring a pull or merge request - writing the descripti
 
 # Pull Request Authoring Guidelines
 
-How to write a pull request that gets reviewed fast and correctly. This skill owns the author's craft. Host mechanics (creating the PR, linking work items) live in your git host's own tooling, the reviewer's feedback side lives in `code-review-guide`, and branch/commit work lives in `git-guide`.
+How to write a pull request that gets reviewed fast and correctly. This skill owns the author's craft and returns the title and description inline during Create. Host creation, updates, and work-item links require a separate Publish operation with the git host's tooling; reviewer feedback lives in `code-review-guide`, and branch or commit work lives in `git-guide`.
 
 ## Essentials
 
@@ -22,6 +22,7 @@ How to write a pull request that gets reviewed fast and correctly. This skill ow
 - Line count measures volume, not risk - a 20-line auth change needs more scrutiny than a 400-line generated-code or scaffolding diff, so call those out
 - A refactor bundled into a feature PR hides the real change - split it into its own PR
 - A PR merges only on the required approving review(s) plus green required status checks (branch protection) - never bypass the gate
+- Drafting a PR is not authorization to create or update one on a host
 
 ## Example
 

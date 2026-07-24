@@ -18,9 +18,12 @@ Besides the Agent Skills frontmatter/body checks, validation requires the packag
 
 Use `--strict` in CI so authoring warnings fail validation instead of returning a successful exit code.
 
-The workspace-level composition check verifies boundary-crossing Markdown links and named advisory handoffs. It also requires matching Claude and Codex manifests whose names match their packages and rejects duplicate plugin names, dangling dependencies, and dependency cycles. Exact hard dependencies are machine-readable manifest edges; the runtime resolver traverses them instead of inferring loading behavior from prose.
-
-The same check validates `packages/skill/composition-catalog.json`: every installed guide has one lifecycle and primary functional role; provision versions and requirement ranges use SemVer; required semantic requirements resolve to exactly one compatible installed provider; and the selected semantic graph is acyclic. Semantic selection records the catalog digest, exact installed implementation, reason, and content-provenance path without changing manifest dependency behavior.
+The workspace-level composition check verifies boundary-crossing Markdown links and
+named advisory handoffs. It also requires matching Claude and Codex manifests whose
+names match their packages and rejects duplicate plugin names, dangling hard
+dependencies, and dependency cycles. Soft selection uses installed skill descriptions;
+exact hard dependencies remain machine-readable manifest edges and load
+dependency-first.
 
 ```bash
 npx moon run script-moon-skill-validate:composition-check

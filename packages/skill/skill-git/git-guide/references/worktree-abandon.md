@@ -1,20 +1,21 @@
 # worktree-abandon: Abandon Feature Worktree with Documented Reason
 
-Abandon a feature: record the reason and recovery revision, optionally commit current
-state, and keep the worktree by default. Remove it only when explicitly requested.
+Inspect an abandoned feature and return a recovery record. This operation is read-only:
+it never commits, resets, removes, tags, pushes, or changes provider state.
 
 ## Steps
 
-1. Verify in a feature worktree (`*-feature-*`); get reason from user or prompt.
+1. Verify the exact feature worktree (`*-feature-*`) and get the reason from the caller.
 2. Inspect the worktree and branch for dirty or uncommitted state.
 3. Capture the reason, current branch, HEAD revision, dirty-state summary, and the
    command needed to recover or resume the work.
-4. Optional commit: stage only the intended partial state and commit it with a
-   conventional message that explains the stopped attempt.
-5. Optional removal: preview the exact worktree and branch effects, then use
-   `git worktree remove <path>` only with explicit authorization.
+4. Report any untracked work, unpushed revisions, detached state, or missing remote
+   that would affect recovery.
+5. Return the record inline. Use separate Commit, Publish, or Cleanup operations for
+   any requested mutation.
 
 ## Gotchas
 
 - Abandoning without recording _why_ the approach failed loses the learning — always capture it with the recovery revision
-- `git worktree remove` doesn't delete the branch ref — pair with `git branch -D <feature-branch>` (or tag `abandoned/<name>` first) to preserve the work in history
+- Do not create a safety commit or tag: even a preservation-oriented write exceeds the Abandon operation
+- Do not treat a request to abandon as authorization to discard or clean up work

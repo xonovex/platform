@@ -7,7 +7,8 @@ allowed-tools:
   - AskUserQuestion
   - Skill
 argument-hint: >-
-  [subject] [--request <file>] [--reason <text>]
+  [subject] [--request <file>] [--subject-revision <revision>]
+  [--reason <text>]
   [--criterion <criterion>...]
 ---
 
@@ -18,6 +19,7 @@ argument-hint: >-
 - `subject` (required unless `--request` supplies it): Exact work being stopped.
 - `--request` (optional): Markdown file containing the subject, reason, and equivalent
   inputs. Do not combine it with shorthand arguments.
+- `--subject-revision` (optional): Exact native revision of the subject.
 - `--reason` (required unless `--request` supplies it): Present-tense reason for
   stopping.
 - `--criterion` (repeatable, optional): Retention or recovery constraint.

@@ -10,10 +10,12 @@ Provide implementation-planning procedures selected by a caller or generic opera
 ## Core Principles
 
 - **Explicit subjects** — accept an inline plan or an opaque provider-native reference plus an optional native revision
-- **Provider-owned references** — let a selected provider resolve, version, relate, or persist native resources; otherwise return inline results
+- **Provider-owned references** — let a selected provider resolve, version, or relate native resources; return operation results inline
 - **Research first** — ground plans in codebase evidence, constraints, uncertainty, and relevant external sources
 - **Read-only analysis** — planning research, critique, and validation report findings without changing their subjects; only continuation implements planned work
 - **One requested operation** — research, create, critique, revise, expand, continue, update, or validate without silently performing another operation
+- **Caller-owned effects** — continuation honors `inspect`, `preview`, or explicit `apply`; every other planning operation is read-only
+- **Separate publication** — persisting a planning result is a later Publish operation, never an implicit side effect of planning
 - **Skills to consult** — plans name applicable implementation capabilities, and continuation loads them before editing
 - **Evidence-based validation** — check explicit success criteria and Definition of Done evidence, not merely command exit codes
 
@@ -38,6 +40,7 @@ Provide implementation-planning procedures selected by a caller or generic opera
 - Critique needs fresh independent context; continuation needs reconstructed subject context after session loss
 - Expansion may use any explicit parent plan, regardless of whether it has an approval field
 - Continuation completes one target and stops instead of silently chaining into the next child
+- Inspect and preview continuation never edit files, provider resources, or plan state
 - Subplans with more than seven tasks risk silent drops — target five to seven focused tasks
 - Re-read tasks and success criteria before reporting completion; green tests alone do not prove the plan is done
 

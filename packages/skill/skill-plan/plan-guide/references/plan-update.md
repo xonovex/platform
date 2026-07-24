@@ -1,6 +1,6 @@
 # plan-update: Update Plan Progress and Evidence
 
-Refresh one explicit inline or provider-native plan from current implementation evidence without changing its planned scope. Return a traceable revised result inline or through an explicitly selected provider.
+Refresh one explicit inline or provider-native plan from current implementation evidence without changing its planned scope. Return a traceable revised result inline.
 
 ## Core Workflow
 
@@ -9,7 +9,7 @@ Refresh one explicit inline or provider-native plan from current implementation 
 3. Record completed, pending, and blocked work plus validation results, limitations, and unavailable categories.
 4. Reconcile child progress and cumulative completion without erasing independently stored results.
 5. Treat status as optional descriptive metadata derived from evidence. It neither authorizes nor gates another operation.
-6. Return the updated plan and remaining work inline, or ask the explicitly selected provider to persist a new native revision.
+6. Return the updated plan and remaining work inline. Use a separate Publish operation if the update must be persisted.
 
 ## Gotchas
 

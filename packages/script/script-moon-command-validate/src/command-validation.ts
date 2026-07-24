@@ -1,12 +1,6 @@
 import {existsSync, readdirSync, readFileSync, statSync} from "node:fs";
 import {join, relative, resolve, sep} from "node:path";
 import {
-  parseCompositionCatalog,
-  type CompositionCatalog,
-  type InstalledSkill,
-} from "@xonovex/core/skill-composition-contract";
-import {resolveSemanticRequirement} from "@xonovex/core/skill-selection";
-import {
   parseCommandDocument,
   type CommandDocument,
 } from "./command-document.js";
@@ -28,11 +22,6 @@ interface PluginManifest {
 export interface CommandPackageValidation {
   readonly documents: readonly CommandDocument[];
   readonly report: ValidationReport;
-}
-
-interface CompositionContext {
-  readonly catalog: CompositionCatalog;
-  readonly installedSkills: readonly InstalledSkill[];
 }
 
 const readJson = (path: string, issues: ValidationIssue[]): unknown => {
@@ -103,116 +92,6 @@ const validateArgumentParity = (
         `argument '${name}' appears in the Arguments section but not argument-hint`,
       ),
     );
-  }
-};
-
-const compositionContext = (
-  repositoryRoot: string,
-  issues: ValidationIssue[],
-): CompositionContext | undefined => {
-  const catalogPath = join(
-    repositoryRoot,
-    "packages",
-    "skill",
-    "composition-catalog.json",
-  );
-  if (!existsSync(catalogPath)) {
-    issues.push(
-      issue(
-        "command.requirement-catalog",
-        relative(repositoryRoot, catalogPath),
-        "composition catalog is required to validate semantic requirements",
-      ),
-    );
-    return undefined;
-  }
-  const sourceText = readFileSync(catalogPath, "utf8");
-  const input = readJson(catalogPath, issues);
-  const parsed = parseCompositionCatalog(input, sourceText);
-  if (!parsed.success) {
-    for (const error of parsed.errors) {
-      issues.push(
-        issue(
-          "command.requirement-catalog",
-          relative(repositoryRoot, catalogPath),
-          error,
-        ),
-      );
-    }
-    return undefined;
-  }
-  const installedSkills = parsed.data.skills.flatMap(({name}) => {
-    const packageName = name.replace(/-guide$/u, "");
-    const packageDirectory = join(
-      repositoryRoot,
-      "packages",
-      "skill",
-      `skill-${packageName}`,
-    );
-    const packagePath = join(packageDirectory, "package.json");
-    if (!existsSync(packagePath)) return [];
-    const packageJson = readJson(packagePath, issues);
-    if (
-      typeof packageJson !== "object" ||
-      packageJson === null ||
-      !("version" in packageJson) ||
-      typeof packageJson.version !== "string"
-    ) {
-      return [];
-    }
-    return [
-      {
-        guide: name,
-        implementationVersion: packageJson.version,
-        dependencies: [],
-        packagePath: relative(repositoryRoot, packageDirectory),
-        plugin: `xonovex-skill-${packageName}`,
-        sourcesPath: relative(
-          repositoryRoot,
-          join(packageDirectory, name, "SOURCES.md"),
-        ),
-      },
-    ];
-  });
-  return {catalog: parsed.data, installedSkills};
-};
-
-const validateSemanticRequirements = (
-  documents: readonly CommandDocument[],
-  repositoryRoot: string,
-  issues: ValidationIssue[],
-): void => {
-  if (
-    documents.every(
-      ({semanticRequirements}) => semanticRequirements.length === 0,
-    )
-  ) {
-    return;
-  }
-  const context = compositionContext(repositoryRoot, issues);
-  if (context === undefined) return;
-  for (const document of documents) {
-    for (const requirement of document.semanticRequirements) {
-      const resolution = resolveSemanticRequirement(
-        context.catalog,
-        context.installedSkills,
-        requirement,
-        {
-          kind: "semantic-requirement",
-          reason: requirement.reason,
-          requestedBy: `command:${document.command}`,
-        },
-      );
-      if (resolution.status === "selected") continue;
-      issues.push(
-        issue(
-          `command.requirement-${resolution.status}`,
-          document.path,
-          resolution.message,
-          requirement.strength === "preferred" ? "warning" : "error",
-        ),
-      );
-    }
   }
 };
 
@@ -433,7 +312,6 @@ export const validateCommandPackage = (
     }
   }
 
-  validateSemanticRequirements(documents, repositoryRoot, issues);
   return {
     documents,
     report: {commands: commandFiles.length, issues},

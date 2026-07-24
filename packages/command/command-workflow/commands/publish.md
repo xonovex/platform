@@ -10,7 +10,8 @@ allowed-tools:
   - AskUserQuestion
   - Skill
 argument-hint: >-
-  [subject] [--request <file>] [--destination <reference>]
+  [subject] [--request <file>] [--subject-revision <revision>]
+  [--destination <reference>]
   [--expected-revision <revision>] [--criterion <criterion>...]
   [--idempotency-key <key>] [--effect <preview|apply>]
 ---
@@ -23,6 +24,7 @@ argument-hint: >-
   opaque native source reference.
 - `--request` (optional): Markdown file containing the subject, destination, and
   equivalent inputs. Do not combine it with shorthand arguments.
+- `--subject-revision` (optional): Exact native revision of the subject.
 - `--destination` (required unless `--request` supplies it): Exact native destination
   reference.
 - `--expected-revision` (optional): Expected destination revision for concurrency.

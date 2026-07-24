@@ -25,10 +25,20 @@ Specific tiers link **up** to the general tier for the rationale; the general ti
 A skill or command relates to another capability in three distinct ways. Never copy the other skill's content or use a cross-package file link:
 
 - **Advisory handoff** — name the concept owner (`owned by **testing-guide**`, `see **bdd-guide**`) so the agent can continue there when it is available. The current skill remains useful without it, so this does not create an installation dependency and may point laterally.
-- **Semantic selection** — request a named, versioned provision without naming one implementation, then resolve exactly one compatible provider from the installed snapshot. Put invariant requirements in the composition catalog; derive conditional requirements from the operation request. Missing preferred support remains visible, while missing required support blocks.
+- **Soft selection** — state the needed capability in the operation request and choose from installed skill names and routing descriptions. Prefer an explicitly named fitting skill; otherwise choose the narrowest unambiguous description match. Report missing preferred support and block on missing required support.
 - **Hard dependency** — name the exact skill because the current skill's core workflow cannot complete without it, and add the bare plugin name to `dependencies` in every manifest supported by that package. Skill plugins pair Claude and Codex manifests; a Claude-only command plugin declares the edge only in its Claude manifest. Installation still does not put the skill in context, so load it explicitly when needed.
 
-Hard dependencies point **upward only** — a specific skill may require a general one; the general tier never requires a specific one, and the manifest graph has no cycles. Advisory handoffs may be reciprocal because they do not promise installation or loading. Every named handoff and declared dependency must still resolve to an existing catalog skill. The composition validator enforces the mechanical contract: matching package-derived manifest names, matching dependency lists, named hard-dependency handoffs, no missing targets, and no cycles. It separately validates catalog classifications, semantic compatibility, deterministic required selections, and semantic cycles; see [composition-metadata.md](composition-metadata.md). Whether a workflow truly cannot complete without a dependency and whether an edge points upward remain author-review decisions.
+Hard dependencies point **upward only** — a specific skill may require a general one; the general tier never requires a specific one, and the manifest graph has no cycles. Advisory handoffs may be reciprocal because they do not promise installation or loading. Every named handoff and declared dependency must resolve to an existing registered skill. The composition validator enforces matching package-derived manifest names, matching dependency lists, named hard-dependency handoffs, no missing targets, dependency-first order, and no cycles. Whether a workflow truly cannot complete without a dependency and whether an edge points upward remain author-review decisions.
+
+Soft selection is deliberately descriptive rather than another dependency graph. Do
+not infer suitability from package order, reference filenames, or an "opinionated"
+label. When two descriptions fit equally well, ask or report the ambiguity instead of
+silently selecting one.
+
+An opinionated or layered guide is not a separate overlay mechanism. It is an ordinary
+specific skill whose routing description names the narrower context and whose manifest
+hard-depends on its general foundation only when it cannot stand alone. Precedence
+comes from the more specific applicable guidance, not separate overlay metadata.
 
 ## Generalize-or-link decision
 
@@ -43,4 +53,4 @@ For any concept appearing in a language/framework skill, ask: **is this concept 
 - The general tier must stay self-contained: it explains the principle without referencing any language or framework skill.
 - Mark advisory ownership handoffs by **skill name**, bolded in prose (`owned by **hono-guide**`) — readers route by name, and names survive repackaging that file paths do not.
 - A description routes by its own trigger words, not by naming other skills; keep cross-references in the body, which links the owning skill by name for depth.
-- Do not duplicate exact manifest dependencies as semantic requirements. The former selects an implementation for installation; the latter selects any compatible provision.
+- Do not encode optional runtime choices as manifest dependencies. A hard dependency installs one exact required implementation; a soft selection chooses among what is already installed.

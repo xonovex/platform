@@ -12,7 +12,7 @@ Extracts elements from a source skill and integrates them into a target skill wh
 6. Ask clarifying questions if interactive mode was requested
 7. Rewrite source in target's voice, match formatting exactly
 8. Update/create reference files
-9. Reconcile composition metadata: preserve the target's primary classification, move only provisions the merged target truly owns, and repoint requirements before retiring the source
+9. Reconcile routing descriptions, named ownership handoffs, registrations, and exact hard dependencies before retiring the source
 10. Preview or apply
 11. Report summary
 
@@ -56,4 +56,4 @@ Accept SKILL.md paths or names (e.g., `typescript-guide` → `<skills-dir>/types
 
 ## Safety
 
-Recommend git commit, never modify frontmatter `name:` and preserve target `description:` triggering quality (imperative "Use when…", trigger contexts, ≤1024 chars), preserve all target content (add only), preview before writing, reject duplicate or dangling catalog entries, warn if >40% added or body would exceed 500 lines, abort if style confidence <80%
+Recommend git commit, never modify frontmatter `name:` and preserve target `description:` triggering quality (imperative "Use when…", trigger contexts, ≤1024 chars), preserve all target content (add only), preview before writing, reject duplicate registrations or dangling named handoffs, warn if >40% added or body would exceed 500 lines, abort if style confidence <80%

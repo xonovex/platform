@@ -132,7 +132,7 @@ claude plugin marketplace add xonovex/platform
 
 # Install only the independent capabilities you need
 claude plugin install xonovex-workflow@xonovex-marketplace            # explicit create / review / revise / decide / execute / validate / publish / abandon and workspace commands
-claude plugin install xonovex-skill-plan@xonovex-marketplace          # research, decide, plan, revise, critique, accept/reject, subplans, continue, update, validate, code-align/harden/simplify
+claude plugin install xonovex-skill-plan@xonovex-marketplace          # research, create, critique, revise, expand, continue, update, validate
 claude plugin install xonovex-skill-git@xonovex-marketplace           # commit, merge-resolve, feature-worktree create/merge/abandon/cleanup
 claude plugin install xonovex-skill-instruction@xonovex-marketplace   # AGENTS.md init / sync / simplify / consolidate / merge
 claude plugin install xonovex-skill-reflect@xonovex-marketplace       # session reflection: extract lessons, fold into AGENTS.md or a skill
@@ -160,7 +160,7 @@ claude plugin install xonovex-skill-vitest@xonovex-marketplace
 codex plugin marketplace add xonovex/platform
 
 # Install only the independent capabilities you need
-codex plugin add xonovex-skill-plan@xonovex-marketplace          # research, decide, plan, revise, critique, accept/reject, subplans, continue, update, validate, code-align/harden/simplify
+codex plugin add xonovex-skill-plan@xonovex-marketplace          # research, create, critique, revise, expand, continue, update, validate
 codex plugin add xonovex-skill-git@xonovex-marketplace           # commit, merge-resolve, feature-worktree create/merge/abandon/cleanup
 codex plugin add xonovex-skill-instruction@xonovex-marketplace   # AGENTS.md init / sync / simplify / consolidate / merge
 codex plugin add xonovex-skill-reflect@xonovex-marketplace       # session reflection: extract lessons, fold into AGENTS.md or a skill

@@ -8,7 +8,7 @@ to one owning skill.
 - Keep the user-facing command short and predictable.
 - Put procedure, output format, error handling, and gotchas in one owner skill.
 - Separate the skill's guide name from its distribution plugin.
-- Declare exact installation dependencies and soft semantic requirements distinctly.
+- Keep exact installation dependencies distinct from optional description-based selection.
 - Preview safely and never overwrite an existing command by accident.
 
 ## Arguments
@@ -19,8 +19,6 @@ to one owning skill.
 - `--owner-plugin` (optional) — distribution plugin for the owner skill when the
   harness supports declared command dependencies.
 - `--operation` (optional) — operation/reference name within the owner skill.
-- `--requires` (repeatable, optional) — soft requirement in
-  `<provision-id>@<range>[:required|preferred]` form; defaults to preferred.
 - `--interactive` (optional) — ask about arguments and delegation choices.
 - `--dry-run` (optional) — print every proposed artifact without writing.
 - `--force` (optional) — replace one exact existing command only after preview.
@@ -33,8 +31,8 @@ to one owning skill.
       or extend that skill before the command.
 - [ ] Keep only frontmatter, Arguments, and Delegation in a harness that can load
       skills. Put procedures and errors in the owner skill reference.
-- [ ] Record optional supporting needs as semantic requirements, not copied
-      instructions or generic capability flags.
+- [ ] Describe any optional supporting capability briefly in Delegation and let the
+      owner operation select it from installed skill names and descriptions.
 - [ ] Wire the owner plugin as a hard installation dependency where the harness
       supports it. Installation still requires explicit runtime loading.
 - [ ] Validate metadata, argument-hint/body parity, delegation, dependency wiring,
@@ -45,22 +43,6 @@ to one owning skill.
 For a harness without command-to-skill delegation, keep the smallest supported prompt
 surface and distribute or invoke the skill directly when possible.
 
-## Semantic requirement contract
-
-When requirements are present, keep them in a machine-readable section:
-
-```markdown
-## Requirements
-
-- `assurance:evidence@^1.0.0` (preferred): Specialist evidence improves the result.
-```
-
-Use one line per requirement with an exact provision ID, semantic-version range,
-strength, and reason. Repository validation resolves it against the composition
-catalog. Runtime resolution uses the actual installed inventory; an unavailable
-preferred requirement is reported as degradation, while an unavailable required
-requirement blocks.
-
 ## Output
 
 Report:
@@ -68,7 +50,7 @@ Report:
 - command path and harness;
 - public argument contract;
 - owner guide, owner plugin, and operation;
-- semantic requirements;
+- optional supporting-capability descriptions;
 - manifest changes;
 - validation result;
 - whether the run previewed, created, or replaced a file.

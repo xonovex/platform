@@ -10,11 +10,7 @@
   "dependencies": {
     "@xonovex/core": "0.1.22",
     "@xonovex/script-moon-common": "0.0.0",
-    "semver": "^7.7.3",
     "yaml": "^2.9.0"
-  },
-  "devDependencies": {
-    "@types/semver": "^7.7.1"
   },
   "keywords": [
     "xonovex",

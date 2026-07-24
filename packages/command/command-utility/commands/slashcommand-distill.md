@@ -1,5 +1,5 @@
 ---
-description: Distill a fat slash command into a thin delegator with one owner and explicit supporting requirements
+description: Distill a fat slash command into a thin delegator with one owner
 allowed-tools:
   - Read
   - Edit
@@ -11,7 +11,7 @@ allowed-tools:
   - Skill
 argument-hint: >-
   [command-file] [--owner-skill <skill-name>] [--owner-plugin <plugin-name>]
-  [--operation <name>] [--requires <requirement>...] [--dry-run]
+  [--operation <name>] [--dry-run]
 ---
 
 # /xonovex-utility:slashcommand-distill — Distill a Command
@@ -21,8 +21,6 @@ argument-hint: >-
 - `command-file` (required): Exact slash command to distill.
 - `--owner-skill`, `--owner-plugin`, `--operation` (optional): Exact guide,
   distribution plugin, and operation that own the procedure.
-- `--requires` (repeatable, optional): Soft requirement in
-  `<provision-id>@<range>[:required|preferred]` form; defaults to preferred.
 - `--dry-run` (optional): Preview command, skill, and manifest changes.
 
 ## Delegation

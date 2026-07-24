@@ -1,6 +1,6 @@
 # plan-research: Research Codebase and External Evidence for a Plan
 
-Produce a read-only, planning-oriented report from an inline subject or an opaque provider-native reference plus an optional revision. Let a selected provider resolve native inputs; return the report inline unless the caller explicitly requests provider persistence.
+Produce a read-only, planning-oriented report from an inline subject or an opaque provider-native reference plus an optional revision. Let a selected provider resolve native inputs and return the report inline.
 
 ## Core Workflow
 
@@ -8,7 +8,7 @@ Produce a read-only, planning-oriented report from an inline subject or an opaqu
 2. **Inspect the codebase** — find architecture, integration points, similar implementations, dependency versions, validation tasks, and applicable implementation skills. Parallelize independent searches where available.
 3. **Research external facts** — when current versions, APIs, standards, or recommendations matter, consult authoritative sources and record provenance and freshness.
 4. **Separate evidence from synthesis** — distinguish observed facts, inferred implications, constraints, uncertainty, and unresolved questions.
-5. **Return one report** — include current stack, relevant locations, options or recommendation, risks, skills to consult, and sources. Persist only through an explicitly selected destination provider.
+5. **Return one report** — include current stack, relevant locations, options or recommendation, risks, skills to consult, and sources. Use a separate Publish operation if the result must be persisted.
 
 If the request is a general hardening, simplification, alignment, duplication, comment,
 barrel, or TODO audit rather than research for an explicit future plan, hand it to

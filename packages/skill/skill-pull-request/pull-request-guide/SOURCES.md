@@ -27,3 +27,10 @@
 2. Diff against the prior pull (or scan for newly added sections)
 3. For each changed area, update the corresponding `references/<topic>.md`
 4. Bump **Last reviewed** date above
+
+## Xonovex workflow boundary
+
+- **Provenance:** Repository-original operation boundary for pull-request authoring
+- **Last reviewed:** 2026-07-24
+- **References:** all
+- **Aspects extracted:** Create returns the title and description inline; creating or updating the host resource remains a separate Publish operation.

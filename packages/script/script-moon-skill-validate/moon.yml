@@ -12,7 +12,6 @@ tasks:
       - .
     deps: [build]
     inputs:
-      - /packages/skill/composition-catalog.json
       - /packages/skill/*/package.json
       - /packages/skill/*/.claude-plugin/plugin.json
       - /packages/skill/*/.codex-plugin/plugin.json
@@ -32,13 +31,11 @@ tasks:
     deps:
       - shared-core:build
     inputs:
-      - /packages/skill/composition-catalog.json
       - /packages/skill/skill-skill/skill-guide/assets/**/*
   ts-coverage:
     deps:
       - shared-core:build
     inputs:
-      - /packages/skill/composition-catalog.json
       - /packages/skill/skill-skill/skill-guide/assets/**/*
   ts-build:
     deps:

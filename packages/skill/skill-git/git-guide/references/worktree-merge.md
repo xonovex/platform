@@ -1,14 +1,14 @@
 # worktree-merge: Merge Feature Worktree Back to Source
 
-Merge a feature branch from a `<worktree>-feature-*` worktree back into its source branch in the sibling source worktree.
+Preview or apply integration of a feature branch from a `<worktree>-feature-*` worktree into its recorded source branch. Default to `preview`; only explicit `apply` may change refs or worktrees.
 
-## Steps
+## Procedure
 
-1. Validate: pwd basename matches `*-feature-*`, feature branch matches `<worktree>/feature/*`.
-2. Source branch: `git config branch.<feature-branch>.mergeBackTo` (error if missing — run `worktree-create` first).
-3. Source worktree: sibling `../<base-worktree>` (verify exists and holds the source branch).
-4. Require the feature worktree clean (`git status` — error if dirty).
-5. In the source worktree, `git checkout <source-branch>`, then `git fetch` and rebase the feature branch onto the current base (`git rebase <source-branch> <feature-branch>`) before merging — required, same as the push/PR path, so the merge never lands on a stale base:
+1. Resolve and report the exact feature worktree, feature branch, feature revision, recorded source branch, source worktree, source revision, remote, and merge strategy.
+2. Validate that the directory and branch naming match, `branch.<feature-branch>.mergeBackTo` exists, both worktrees are clean, the source worktree holds the source branch, and the destination is not a protected mainline.
+3. Fetch remote state for an informed preview only when the caller authorizes that external read. Determine whether the feature must be rebased and whether the merge would be fast-forward, regular, squash, conflicting, or empty.
+4. In `preview`, return the exact rebase and merge commands, changed refs, conflict risk, validation, and recovery commands without running them.
+5. In explicit `apply`, revalidate the previewed revisions, rebase the feature onto the current source, merge with the selected strategy, and run repository validation:
 
 ```bash
 git merge <feature-branch>                 # regular
@@ -18,14 +18,12 @@ git merge --squash <feature-branch> && git commit -m "<type>: <feature-name>
 Squashed commits from <worktree>/feature/<feature-name>"
 ```
 
-6. Optional cleanup: `git worktree remove <feature-worktree-path>`; remote delete: `git push origin --delete <feature-branch>`.
-
-**Never** remove the worktree if the merge fails.
+6. Verify the destination revision and validation evidence. Preserve the feature worktree, local branch, and remote branch; removal belongs only to `worktree-cleanup`.
 
 ## Gotchas
 
 - Uncommitted changes in the feature worktree silently ride along in some merge strategies — confirm clean first
 - `--squash` loses individual commit history — pick it only when commit-by-commit replay isn't valuable
-- `git worktree remove` refuses a dirty worktree — commit, stash, or `--force` (destructive)
-- The feature branch ref persists after `worktree remove` — `git branch -d <feature-branch>` to clean it up
-- Skipping the step-5 fetch + rebase produces stale-base merges when collaborating — it is required, not optional
+- A preview based on stale remote state is incomplete — report when fetch was not authorized or available
+- Skipping the rebase produces stale-base merges when collaborating — it is required, not optional
+- Never remove a worktree or branch during merge, whether the merge succeeds or fails

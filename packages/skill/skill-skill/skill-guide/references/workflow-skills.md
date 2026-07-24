@@ -2,7 +2,9 @@
 
 A workflow skill encodes a **procedure** the agent — or a command plugin — delegates to (e.g. plan, git, skill, instruction, command, content, reflect), not coding-style rules for a language or framework (those are [guideline-skills.md](guideline-skills.md)). A skill may **combine both** — a procedure skill that also lays down coding-style rules keeps an `## Essentials` block alongside its `## Operations` (e.g. llmstxt teaches the format _and_ its authoring workflow).
 
-Classify a workflow skill independently from this authoring shape. Most are `procedural` / `procedure`; an embedded convention does not justify `mixed`. Split independently selectable guidance, or retain the primary procedure classification and expose only stable semantic provisions. See [composition-metadata.md](composition-metadata.md).
+Split independently selectable domain guidance instead of embedding every possible
+method in the workflow skill. The workflow owns operation boundaries; selected domain
+skills supply subject-specific procedures without widening those boundaries.
 
 ## Skeleton
 
@@ -32,7 +34,15 @@ To scaffold: copy the directory, rename `{operation}.md` files, and fill in `{pl
 
 When a command plugin delegates to an operation, keep the contract one-directional: the command body says "load the `<skill>` skill and perform its **<operation>** operation", and the skill — not the command — owns the procedure, output format, and gotchas. Declare the skill in every dependency-capable manifest the command package actually supports. A Claude-only command package has one Claude manifest; Codex distributes and invokes the skill directly instead of mirroring a command package.
 
-That command-to-skill edge is an exact hard dependency. Inside the workflow skill, request an interchangeable assurance, method, or other semantic provider through the composition catalog only when the need is invariant; derive operation-conditional needs at invocation time instead.
+That command-to-skill edge is an exact hard dependency. Inside the workflow skill,
+derive supporting capability needs from the operation request and choose among
+installed skill names and routing descriptions. A required missing capability blocks;
+a preferred missing capability remains visible.
+
+The workflow operation owns its effect (`inspect`, `preview`, or `apply`), persistence
+boundary, subject identity, and optional subject revision. A selected domain procedure
+adapts to that contract: it cannot mutate during inspect or preview, persist an inline
+result, or silently perform another operation.
 
 ## Conventions
 

@@ -21,16 +21,9 @@
   "files": [
     "dist"
   ],
-  "bin": {
-    "xonovex-skill-compose": "./dist/src/skill-composition-cli.js"
-  },
   "exports": {
     ".": "./dist/src/index.js",
     "./*": "./dist/src/*.js"
-  },
-  "dependencies": {
-    "semver": "^7.7.3",
-    "zod": "^4.4.3"
   },
   "scripts": {
     "build": "tsc --build",
@@ -51,7 +44,6 @@
     "@xonovex/ts-config-cli": "0.1.22",
     "@xonovex/vitest-config-node": "0.1.22",
     "@types/node": "^26.1.1",
-    "@types/semver": "^7.7.1",
     "@vitest/coverage-v8": "^4.1.10",
     "eslint": "^10.7.0",
     "jiti": "^2.7.0",

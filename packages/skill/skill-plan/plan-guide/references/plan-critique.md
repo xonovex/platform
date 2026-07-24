@@ -1,6 +1,6 @@
 # plan-critique: Independently Stress-Test a Plan
 
-Review an inline plan or an exact provider-native plan reference without changing it. Use the optional native revision to pin mutable provider state, run in fresh context, and return separate findings inline or through an explicitly selected result provider.
+Review an inline plan or an exact provider-native plan reference without changing it. Use the optional native revision to pin mutable provider state, run in fresh context, and return separate findings inline.
 
 ## Lenses
 
@@ -15,7 +15,7 @@ Review an inline plan or an exact provider-native plan reference without changin
 2. Start fresh independent context that did not author the plan. Reconstruct provider-native inputs instead of relying on conversation memory.
 3. Ground material claims in source evidence and current environment facts.
 4. Apply the selected lenses and report findings with severity, confidence, affected section, failure mode, evidence, and suggested direction.
-5. Return the critique as a separate result. Persist it only to an explicitly requested provider destination.
+5. Return the critique as a separate inline result. Use a later Publish operation if it must be persisted.
 
 ## Gotchas
 

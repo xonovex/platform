@@ -9,8 +9,6 @@ const TITLE_RE =
 const DELEGATION_RE =
   /Load the `([^`]+)` skill \(plugin `([^`]+)`\)[\s\S]*?\*\*([^*]+)\*\*/u;
 const HEADING_RE = /^## (.+)$/gmu;
-const REQUIREMENT_RE =
-  /^-\s+`([a-z][a-z0-9-]*:[a-z0-9]+(?:[.-][a-z0-9]+)*)@([^`]+)`\s+\((required|preferred)\):\s+(.+)$/u;
 
 export interface CommandFrontmatter {
   readonly allowedTools: readonly string[];
@@ -24,13 +22,6 @@ export interface CommandDelegation {
   readonly skill: string;
 }
 
-export interface CommandSemanticRequirement {
-  readonly id: string;
-  readonly range: string;
-  readonly reason: string;
-  readonly strength: "preferred" | "required";
-}
-
 export interface CommandDocument {
   readonly arguments: readonly CommandArgument[];
   readonly body: string;
@@ -42,7 +33,6 @@ export interface CommandDocument {
   readonly headings: readonly string[];
   readonly namespace: string;
   readonly path: string;
-  readonly semanticRequirements: readonly CommandSemanticRequirement[];
   readonly title: string;
 }
 
@@ -99,54 +89,6 @@ const documentedArguments = (body: string): ReadonlySet<string> => {
     }
   }
   return names;
-};
-
-const semanticRequirements = (
-  body: string,
-  path: string,
-  issues: ValidationIssue[],
-): readonly CommandSemanticRequirement[] => {
-  const requirements: CommandSemanticRequirement[] = [];
-  const text = section(body, "Requirements").trim();
-  if (text.length === 0) return requirements;
-  for (const line of text
-    .split(/\r?\n/u)
-    .filter((value) => value.trim() !== "")) {
-    const match = REQUIREMENT_RE.exec(line);
-    if (match === null) {
-      issues.push(
-        issue(
-          "command.requirement-format",
-          path,
-          `invalid semantic requirement '${line.trim()}'; expected '- \`<id>@<range>\` (required|preferred): <reason>'`,
-        ),
-      );
-      continue;
-    }
-    const [id, range, strength, reason] = match.slice(1);
-    if (
-      id === undefined ||
-      range === undefined ||
-      (strength !== "required" && strength !== "preferred") ||
-      reason === undefined
-    ) {
-      continue;
-    }
-    requirements.push({id, range, strength, reason: reason.trim()});
-  }
-  const keys = requirements.map(({id}) => id);
-  for (const duplicate of new Set(
-    keys.filter((key, index) => keys.indexOf(key) !== index),
-  )) {
-    issues.push(
-      issue(
-        "command.requirement-duplicate",
-        path,
-        `semantic requirement '${duplicate}' is declared more than once`,
-      ),
-    );
-  }
-  return requirements;
 };
 
 export const parseCommandDocument = (
@@ -232,7 +174,6 @@ export const parseCommandDocument = (
   }
 
   const body = frontmatterMatch[2] ?? "";
-  const requirements = semanticRequirements(body, path, issues);
   const titleMatch = TITLE_RE.exec(body);
   if (titleMatch === null) {
     issues.push(
@@ -246,6 +187,15 @@ export const parseCommandDocument = (
   const headings = [...body.matchAll(HEADING_RE)].flatMap((match) =>
     match[1] === undefined ? [] : [match[1]],
   );
+  if (headings.includes("Requirements")) {
+    issues.push(
+      issue(
+        "command.requirements-unsupported",
+        path,
+        "soft requirements belong in delegation prose and runtime description matching, not a machine-readable Requirements section",
+      ),
+    );
+  }
   for (const requiredHeading of ["Arguments", "Delegation"]) {
     if (
       headings.filter((heading) => heading === requiredHeading).length !== 1
@@ -308,7 +258,6 @@ export const parseCommandDocument = (
       headings,
       namespace: titleMatch[1] ?? "",
       path,
-      semanticRequirements: requirements,
       title: titleMatch[3] ?? "",
     },
     issues,

@@ -37,21 +37,21 @@
     },
     {
       "id": 5,
-      "prompt": "Our catalog has many Agent Skills packaged for two different harnesses. Add a durable/procedural lifecycle axis, a functional-role axis, semantic requirements and provisions, and compatible version selection. Tell me exactly where this metadata belongs without duplicating it across every vendor manifest.",
+      "prompt": "Our workflow command always needs workflow-guide, but one operation can optionally use any installed changelog skill whose description fits. Explain how to represent both relationships without copying instructions or building another metadata catalog.",
       "assertions": [
-        "Places structured composition metadata in one harness-neutral catalog rather than Agent Skill top-level frontmatter, paired vendor manifests, or both vendor marketplaces.",
-        "Keeps exactly one lifecycle and one primary functional role per guide and rejects a generic `mixed` classification.",
-        "Keeps exact install-time dependencies in plugin manifests while semantic requirements target versioned provisions in the composition catalog.",
-        "Separates catalog contract version, provision contract version, installed implementation version, free-text runtime compatibility, and SOURCES.md content provenance."
+        "Places the exact workflow-guide installation dependency in every supported plugin manifest and matching package dependencies.",
+        "Keeps optional changelog selection in runtime prose and selects from installed skill names and routing descriptions.",
+        "States that installation does not load a skill into context and avoids copying either skill's procedure.",
+        "Does not add lifecycle roles, provisions, semantic-version ranges, overlays, or another composition catalog."
       ]
     },
     {
       "id": 6,
-      "prompt": "A procedure requires assurance:evidence ^1.0.0. Two installed skills provide compatible versions, a third provider exists only in a remote marketplace, and the requirement is mandatory. Resolve the skill and show the durable selection record.",
+      "prompt": "A workflow requires evidence review. Two installed skill descriptions fit equally well, and a third matching skill exists only in a remote marketplace. Resolve the required capability.",
       "assertions": [
-        "Reports the two compatible installed providers as ambiguous and does not choose one by version, prompt order, remote availability, or an invented newest-version rule.",
-        "Treats the mandatory ambiguity as blocking until an explicit selection or policy resolves it.",
-        "Describes a selection record containing catalog contract/digest, guide and plugin identity, exact implementation version, matched provision/version/range, selection reason, and SOURCES.md provenance path."
+        "Reports the two installed description matches as ambiguous and does not choose by filesystem, marketplace, prompt, or version order.",
+        "Treats the required ambiguity as blocking until the caller selects or further distinguishes the need.",
+        "Does not select the remote-only skill because soft runtime selection is limited to installed skills."
       ]
     }
   ]

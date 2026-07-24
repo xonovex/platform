@@ -7,7 +7,8 @@ allowed-tools:
   - AskUserQuestion
   - Skill
 argument-hint: >-
-  [subject] [--request <file>] [--feedback <feedback>...]
+  [subject] [--request <file>] [--subject-revision <revision>]
+  [--feedback <feedback>...]
   [--criterion <criterion>...] [--method <method>]
 ---
 
@@ -18,6 +19,7 @@ argument-hint: >-
 - `subject` (required unless `--request` supplies it): Exact source to revise.
 - `--request` (optional): Markdown file containing the source, feedback, and equivalent
   inputs. Do not combine it with shorthand arguments.
+- `--subject-revision` (optional): Exact native revision of the source.
 - `--feedback` (repeatable, required unless `--request` supplies it): Feedback to
   address.
 - `--criterion` (repeatable, optional): Constraint the revision must retain.

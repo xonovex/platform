@@ -1,6 +1,6 @@
 # worktree-create: Create Feature Worktree
 
-Create a sibling worktree with a feature branch for isolated development, deriving names from the current worktree.
+Preview or apply creation of a sibling worktree with a feature branch for isolated development. Default to `preview`; only explicit `apply` may mutate repository state.
 
 ## Naming convention
 
@@ -12,7 +12,14 @@ Create a sibling worktree with a feature branch for isolated development, derivi
 | ----------- | ---------- | --------------------------- | --------------------------- |
 | `services`  | `auth-fix` | `services-feature-auth-fix` | `services/feature/auth-fix` |
 
-## Steps
+## Procedure
+
+1. Resolve the exact source revision, source branch, destination path, and new branch name.
+2. Reject collisions, a missing source revision, or a source branch already checked out where that makes the operation unsafe.
+3. In `preview`, return the exact commands and resulting branch, worktree, and config effects without running them.
+4. In explicit `apply`, run the previewed commands and verify the worktree, checked-out revision, branch, and `mergeBackTo` value.
+
+## Apply Commands
 
 ```bash
 # worktree name = basename of pwd; source = specified or `git branch --show-current`
@@ -26,3 +33,4 @@ git -C ../<worktree>-feature-<name> config branch.<branch>.mergeBackTo <source-b
 - `branch.<branch>.mergeBackTo` is a custom key this workflow sets and reads; Git ignores it and provides no built-in behavior
 - `mergeBackTo` is the only record of the source branch — without it `worktree-merge` can't find where to merge back
 - A branch can't be checked out in two worktrees at once — use a different source branch or move the existing worktree
+- Creating the worktree does not start feature implementation or publish the branch

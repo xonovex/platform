@@ -12,23 +12,22 @@ procedure owner.
 
 ## Core workflow
 
-- [ ] Resolve the command harness and parse metadata, arguments, requirements, and
-      delegation.
+- [ ] Resolve the command harness and parse metadata, arguments, and delegation.
 - [ ] Record the original public argument and effect contract.
-- [ ] If the harness can delegate, keep only metadata, Arguments, Requirements, and
-      Delegation; move reusable procedure into the registered owner operation.
+- [ ] If the harness can delegate, keep only metadata, Arguments, and Delegation;
+      move reusable procedure into the registered owner operation.
 - [ ] If the harness cannot delegate, retain the minimum inline procedure,
       validation, errors, and safety rules needed for execution.
 - [ ] Remove duplicated explanations, redundant examples, and project-specific
       coordinates that are not part of the contract.
 - [ ] Preview command, owner-skill, and manifest changes; validate argument parity,
-      operation registration, requirements, dependencies, and line budget.
+      operation registration, dependencies, and line budget.
 
 ## Preservation rules
 
 - Preserve command name, namespace, argument names, defaults, repeatability, and
   effect boundary.
-- Preserve semantic requirement IDs, ranges, strengths, and reasons.
+- Preserve natural-language supporting-capability needs that affect runtime behavior.
 - Preserve the exact owner skill, plugin, and operation unless the caller requests a
   migration.
 - Move safety and error behavior to the owner operation for delegating harnesses;
