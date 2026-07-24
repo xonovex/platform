@@ -8,6 +8,7 @@ allowed-tools:
   - Skill
 argument-hint: >-
   [subject] [--request <file>] [--subject-revision <revision>]
+  [--context <context>...]
   [--criterion <criterion>...]
   [--method <method>]
 ---
@@ -23,6 +24,9 @@ argument-hint: >-
   not combine it with shorthand arguments.
 - `--subject-revision` (optional): Exact native revision of the subject; required for a
   protected provider-native subject when the provider exposes one.
+- `--context` (repeatable, optional): Canonical explanatory context or an opaque
+  context reference to resolve and preserve without treating it as evidence or
+  authority.
 - `--criterion` (repeatable, optional): Constraint the result must satisfy.
 - `--method` (optional): Requested subject-specific procedure.
 

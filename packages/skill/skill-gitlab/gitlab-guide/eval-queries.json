@@ -66,6 +66,30 @@
     "rationale": "GitLab-native reusable CI and centrally injected policy enforcement"
   },
   {
+    "query": "create a GitLab issue with assignees labels milestone due date and task type",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "GitLab-native ticket creation and metadata"
+  },
+  {
+    "query": "move issue 42 from Ready to Doing on a GitLab issue board without dropping unrelated labels",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "GitLab label-list board semantics"
+  },
+  {
+    "query": "publish versioned decision context to this GitLab issue and merge request for a later agent session",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "durable GitLab issue and merge-request notes"
+  },
+  {
+    "query": "use GitLab work item Status when supported and fall back to a configured label board on older Free instances",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "version and tier aware kanban status"
+  },
+  {
     "query": "how do GitLab pipeline execution policy job suffix conflicts and project versus group policy merge order work",
     "should_trigger": true,
     "split": "validation",

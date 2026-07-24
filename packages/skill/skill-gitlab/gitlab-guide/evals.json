@@ -45,6 +45,42 @@
         "Protects release/deployment targets and environments with eligible approval, least-privilege credentials, exact commit/artifact binding, and pipeline/job/artifact/deployment evidence",
         "Uses discover, rendered preview, authorize, apply, authoritative re-read/negative-probe verify, rollback, and drift steps without requiring an agent harness or lifecycle module"
       ]
+    },
+    {
+      "id": 6,
+      "prompt": "Create GitLab ticket group/project#42 as a task, assign two users, add backend and urgent labels, set milestone 17, a due date, and return a durable reference for another role.",
+      "assertions": [
+        "Uses the project-scoped issue IID together with the project id or full path, preserves the global id and web URL when returned, and does not confuse iid with the global issue id.",
+        "Creates or reconciles the issue metadata and uses additive label operations on update so unrelated labels are not replaced.",
+        "Returns observed updated_at, state, issue type, metadata, and exact effects for a later session."
+      ]
+    },
+    {
+      "id": 7,
+      "prompt": "Move GitLab issue group/project#42 from the Ready label list to Doing on issue board 3 without losing its security label, then verify the card's board position.",
+      "assertions": [
+        "Resolves the board and list resources, recognizes that a label-list card is a view over issue labels, and uses add_labels/remove_labels rather than a fictional REST card-move endpoint.",
+        "Removes only the source board label, adds only the target board label, preserves unrelated labels, and re-reads both the issue and board list membership.",
+        "Distinguishes changing list membership from changing vertical rank and uses GraphQL issueMoveList only when an explicit within-list position is requested and supported."
+      ]
+    },
+    {
+      "id": 8,
+      "prompt": "Publish decision context version 3 to GitLab issue group/project#42 and merge request !81. Retry safely, preserve history when the decision changes, and return references for a future agent.",
+      "assertions": [
+        "Uses top-level Notes endpoints for the issue and merge request with a stable marker carrying context id, version, and digest, never an inline diff discussion.",
+        "An identical publication is a no-op, same-version divergent content blocks, and changed context is an append-only successor naming the superseded note.",
+        "Returns project path, issue or MR IID, note id, constructed note URL, updated_at, and the authoritative context source."
+      ]
+    },
+    {
+      "id": 9,
+      "prompt": "Move a GitLab work item to In progress on its board, but first support GitLab Free 17.x and Premium 18.6 self-managed instances.",
+      "assertions": [
+        "Discovers the host version, edition, board list type, and available API or GraphQL fields before selecting a mechanism.",
+        "Uses configurable work-item Status only when the instance and tier support it; otherwise uses an explicitly configured label-based board workflow rather than pretending native status is available.",
+        "Preserves open/closed state semantics, reports any degraded capability, and verifies the resulting issue or work-item and board view."
+      ]
     }
   ]
 }

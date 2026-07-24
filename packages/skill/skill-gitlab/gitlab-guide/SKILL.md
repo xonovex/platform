@@ -1,18 +1,25 @@
 ---
 name: gitlab-guide
-description: "Use when delivering a merge request/review or configuring native CI/policy enforcement on GitLab (GitLab.com, self-managed, or Dedicated). Triggers on `glab mr create`, inline discussions, approvals, CI/CD components/typed inputs, SHA pinning, pipeline execution policies, compliance frameworks, protected environments, or GitLab token scopes — even when the user doesn't say 'glab'."
+description: "Use when managing GitLab tickets/work items, issue-board kanban, merge-request delivery/review, durable issue or MR context notes, or native CI/policy enforcement on GitLab.com, Self-Managed, or Dedicated. Triggers on `glab issue`, issue links, work items, board lists/status moves, `glab mr`, Notes/discussions, approvals, CI/CD components, pipeline execution policies, compliance frameworks, protected environments, or GitLab token scopes — even when the user doesn't say 'glab'."
 ---
 
-# GitLab delivery and enforcement — quick reference
+# GitLab workflow delivery and enforcement — quick reference
 
-How to realize merge request delivery and provider-native external enforcement on GitLab: wire finished review/MR artifacts onto GitLab, and map governance intent onto GitLab-native components, pipeline policies, compliance frameworks, protected environments, permissions, and evidence.
+How to realize tickets, kanban, merge-request delivery, durable context projections,
+and provider-native external enforcement on GitLab. The operations map finished
+artifacts and workflow intent onto GitLab-native resources.
 
-The one thing to internalize: **a GitLab "review" is not one object — you assemble it from a plain summary note, individual position-anchored discussion threads, and a separate approve/withhold signal, and almost every write needs the coarse, all-or-nothing `api` scope plus a sufficient role, so plan around the missing atomic-review endpoint and the absent write-only scope.**
+The one thing to internalize: **a project issue/work item, an issue-board list, a
+top-level Note, an inline discussion, and approval are separate objects. Most board
+cards are views over issue attributes, and review has no atomic object, so preserve
+every native identity and effect separately.**
 
 Before any write:
 
 1. Run `glab auth status` and confirm the intended identity on the intended host — a stale env token silently acts as the wrong user.
-2. Re-fetch the three diff SHAs after every push and verify each inline comment came back as a `DiffNote`, never trust a 201 alone.
+2. Read `/metadata` and the actual resource/schema when version or tier changes the
+   operation.
+3. Re-fetch the three diff SHAs after every push and verify each inline comment came back as a `DiffNote`, never trust a 201 alone.
 
 ## Requirements
 
@@ -22,6 +29,16 @@ Before any write:
 
 ## Essentials
 
+- **Manage workflow tickets** — create/reconcile project issues; update metadata
+  without losing unrelated values; preserve project + IID + global ID + URL; and
+  manage native links or work-item-only widgets explicitly. See
+  [references/issues.md](references/issues.md).
+- **Manage issue-board kanban** — resolve board/list type and IDs, translate card
+  moves into minimal issue-attribute changes, use native Status only on supporting
+  hosts, and keep vertical ranking separate. See [references/boards.md](references/boards.md).
+- **Publish durable issue/MR context** — use append-only top-level Notes with canonical
+  ID/version/digest markers, exact retry reconciliation, successor links, and native
+  note references. See [references/context-notes.md](references/context-notes.md).
 - **MR object & branch flags** — `glab mr create --source-branch <b> --target-branch main` (`-s` defaults to current branch, `-b` to project default); glab addresses MRs by per-project `iid`. See [references/create.md](references/create.md).
 - **glab does not push** — `git push -u origin HEAD` first (see `git-guide`'s push reference), then create; or pass `--push`. Always pass `--yes` in scripts or create hangs on the confirmation prompt. See [references/create.md](references/create.md).
 - **Summary note** — the review's prose is a plain non-anchored note: `glab mr note <iid> -m "## Summary…"` (`POST .../notes`). See [references/review-post.md](references/review-post.md).
@@ -32,10 +49,24 @@ Before any write:
 - **Auth & host** — `api` scope for writes (`read_api` reads), `GITLAB_HOST` targets self-managed, `GITLAB_TOKEN` is the general auth token. See [references/auth.md](references/auth.md).
 - **Enforce with native automation** — use pinned, typed, tested CI/CD components, pipeline execution policies, compliance frameworks, protected environments, least-privilege credentials, and provider-native evidence. See [references/automation-and-enforcement.md](references/automation-and-enforcement.md).
 - **Transact every governance change** — discover, preview exact group/project mutations and authority, authorize, apply idempotently against observed revisions, verify with allow and deny probes, roll back, and own the drift. See [references/onboarding.md](references/onboarding.md).
+- **Preserve provider conformance** — map tickets, boards, changes, reviews, context,
+  and evidence to separate native identities while exposing tier/version and
+  concurrency limits. See [references/provider-conformance.md](references/provider-conformance.md).
 
 ## Gotchas
 
 - **No write-only scope.** Create MR, comment, approve, and resolve ALL require the broad `api` scope (full read+write to every group/project the identity can reach, plus Git-over-HTTP). `read_api` is read-only and 403s on POST; `write_repository` covers only git push / repo files, NOT discussions. Use separate read vs write tokens; prefer a project access token scoped to one project.
+- **IID is not ID.** Issue and MR IIDs are project-scoped; REST global IDs and GraphQL
+  Global IDs are different identities. Preserve project path/ID with every IID.
+- **Board cards are views.** A label-list move changes labels, an assignee-list move
+  changes assignees, and a Closed move changes issue state. There is no ordinary REST
+  card-move endpoint; preserve unrelated labels and metadata.
+- **Tier and version matter.** Native work-item Status and several board list types are
+  not universally available. Read instance metadata and actual schema/resources;
+  never invent a Premium or newer-version capability.
+- **Notes are not idempotent.** Reconcile append-only ID/version/digest markers before
+  create. GitLab does not enforce marker uniqueness, so concurrent publishers need
+  one writer or an external lock.
 - **Scope is necessary but not sufficient.** An `api`-scoped token still 403s without the role: create MR / open a diff thread / resolve needs >= Developer (or MR author); approving needs being an eligible approver; unapprove / reset_approvals work only for bot users (humans 401). A 403 with `api` scope is usually a role or config problem, not a scope one.
 - **CI_JOB_TOKEN is read-only on MRs** (GET list/get/notes only) — it cannot create MRs, post notes, or approve. CI that opens or reviews MRs must use a PAT or project/group access token in a masked CI/CD variable.
 - **No atomic review object.** Summary = a plain note, each inline comment = its own `POST /discussions`, verdict = a separate `/approve`. The batched "Submit review with summary" exists only in the UI / GraphQL; over REST you publish each piece immediately.
@@ -85,8 +116,20 @@ Each reference is a trigger — read it only when the user's intent matches; do 
 
 - Read [references/first-time-setup.md](references/first-time-setup.md) — Load when setting up a fresh machine or account: installing glab, `glab auth login` (web / device / stdin), choosing `git_protocol` vs `api_protocol`, cloning, and verifying with a read call.
 - Read [references/auth.md](references/auth.md) — Load when auth fails, choosing a token type (PAT / project access token / fine-grained / CI_JOB_TOKEN), scoping it to the exact operation (`read_api` vs `api`), targeting a self-managed host, storing it (keyring / CI), or rotating a leak.
+- Read [references/issues.md](references/issues.md) — Load when creating, finding,
+  updating, relating, closing, reopening, or commenting on GitLab issues/work items as
+  workflow tickets.
+- Read [references/boards.md](references/boards.md) — Load when reading or configuring
+  issue boards, moving tickets between list types, changing native Status or
+  label-based stages, or changing vertical rank.
+- Read [references/context-notes.md](references/context-notes.md) — Load when
+  publishing or reconciling versioned decision, rationale, tradeoff, assumption, or
+  constraint context as a top-level issue or merge-request Note.
 - Read [references/create.md](references/create.md) — Load when opening or updating an MR: push, `glab mr create` flags, draft, reviewers / labels, issue-link / close semantics, the one-open-MR-per-branch 409, additive-body rules, and the raw REST equivalent.
 - Read [references/review-post.md](references/review-post.md) — Load when publishing a review: the summary note, the exact inline position model (three SHAs + conditional line keys), verifying `DiffNote`, the blocking mechanism, and the `#note_<id>` deep-link.
 - Read [references/review-resolve.md](references/review-resolve.md) — Load when listing threads, matching a finding to a discussion by id, resolving via the REST PUT, replying in-thread, and the merge-gating effect.
 - Read [references/onboarding.md](references/onboarding.md) — Load when setting up, diagnosing, dry-running, verifying, rolling back, uninstalling, or checking drift for selected GitLab adapters and controls.
 - Read [references/automation-and-enforcement.md](references/automation-and-enforcement.md) — Load when configuring or onboarding CI/CD components, typed inputs, pipeline execution policies, compliance frameworks, protected environments, policy projects, evidence, rollback, or governance-only GitLab adoption.
+- Read [provider conformance](references/provider-conformance.md) — Load when composing
+  GitLab tickets, boards, merge requests, reviews, context, and evidence into a
+  provider-neutral handoff or testing adapter behavior.

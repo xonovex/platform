@@ -2,17 +2,43 @@
 
 ## glab CLI (official GitLab CLI)
 
-- **URLs:** https://docs.gitlab.com/cli/ · https://docs.gitlab.com/cli/auth/ · https://docs.gitlab.com/cli/auth/login/ · https://docs.gitlab.com/cli/auth/status/ · https://docs.gitlab.com/cli/repo/clone/ · https://docs.gitlab.com/cli/mr/ · https://docs.gitlab.com/cli/mr/create/ · https://docs.gitlab.com/cli/mr/note/ · https://docs.gitlab.com/cli/mr/note/create/ · https://docs.gitlab.com/cli/mr/note/resolve/ · https://docs.gitlab.com/cli/mr/approve/ · https://docs.gitlab.com/cli/mr/diff/ · https://docs.gitlab.com/cli/mr/view/
-- **Last reviewed:** 2026-06-26
-- **Used for:** install / supported versions, `glab auth login` (web / device / stdin / `--hostname`) and `glab auth status`, `git_protocol` vs `api_protocol` config, `glab repo clone`, `glab mr create` flags (`-s`/`-b`, `--yes`, `--push`, `--draft`/`--wip`, `--reviewer`/`--assignee` usernames, `--label`, `--related-issue`), `glab mr note` / `note create` (`--file`/`--line`/`--old-line`/`--reply`/`--unique`) and the EXPERIMENTAL `note list`/`resolve`/`reopen`, `glab mr approve`, env vars (`GITLAB_TOKEN`/`GITLAB_HOST` and the `GLAB_` rename in 2.0.0+), and the plaintext-config / `--use-keyring` storage behavior.
-- **References:** references/auth.md, references/create.md, references/first-time-setup.md, references/review-post.md, references/review-resolve.md
+- **URLs:** https://docs.gitlab.com/cli/ · https://docs.gitlab.com/cli/api/ · https://docs.gitlab.com/cli/auth/ · https://docs.gitlab.com/cli/auth/login/ · https://docs.gitlab.com/cli/auth/status/ · https://docs.gitlab.com/cli/repo/clone/ · https://docs.gitlab.com/cli/issue/ · https://docs.gitlab.com/cli/issue/create/ · https://docs.gitlab.com/cli/issue/update/ · https://docs.gitlab.com/cli/issue/view/ · https://docs.gitlab.com/cli/issue/board/ · https://docs.gitlab.com/cli/work-items/ · https://docs.gitlab.com/cli/work-items/list/ · https://docs.gitlab.com/cli/work-items/update/ · https://docs.gitlab.com/cli/mr/ · https://docs.gitlab.com/cli/mr/create/ · https://docs.gitlab.com/cli/mr/note/ · https://docs.gitlab.com/cli/mr/note/create/ · https://docs.gitlab.com/cli/mr/note/resolve/ · https://docs.gitlab.com/cli/mr/approve/ · https://docs.gitlab.com/cli/mr/diff/ · https://docs.gitlab.com/cli/mr/view/
+- **Last reviewed:** 2026-07-24
+- **Used for:** install / supported versions; auth, host, and protocol behavior;
+  `glab api` scalar/file input and pagination; issue create/update/view, additive
+  labels/assignees, board and experimental work-item commands (issues.md, boards.md);
+  MR create/review commands; and Notes/discussion behavior.
+- **References:** references/auth.md, references/boards.md,
+  references/context-notes.md, references/create.md,
+  references/first-time-setup.md, references/issues.md,
+  references/provider-conformance.md, references/review-post.md,
+  references/review-resolve.md
 
 ## GitLab REST & GraphQL API
 
-- **URLs:** https://docs.gitlab.com/api/merge_requests/ · https://docs.gitlab.com/api/merge_request_approvals/ · https://docs.gitlab.com/api/discussions/ · https://docs.gitlab.com/api/draft_notes/ · https://docs.gitlab.com/api/graphql/reference/
-- **Last reviewed:** 2026-06-26
-- **Used for:** `POST /merge_requests` (numeric `reviewer_ids`/`assignee_ids`, comma-separated `labels`, 409 one-open-MR-per-branch) and the replace-only `PUT` body / additive `add_labels`/`remove_labels`, `POST /notes` vs `POST /discussions`, the inline position object (`position_type=text`, mandatory `base_sha`/`start_sha`/`head_sha`, required `old_path`+`new_path`, conditional `old_line`/`new_line`), the `DiffNote`-vs-`Note` downgrade, `PUT .../discussions/:discussion_id?resolved=true` (REST-only resolve; thread-vs-single-comment resolvability), single-note resolve, `/approve` (`&sha`, 409), `detailed_merge_status`, and the GraphQL Global-ID `discussionToggleResolve`.
-- **References:** references/create.md, references/review-post.md, references/review-resolve.md
+- **URLs:** https://docs.gitlab.com/api/metadata/ · https://docs.gitlab.com/api/issues/ · https://docs.gitlab.com/api/issue_links/ · https://docs.gitlab.com/api/boards/ · https://docs.gitlab.com/api/group_boards/ · https://docs.gitlab.com/api/notes/ · https://docs.gitlab.com/api/merge_requests/ · https://docs.gitlab.com/api/merge_request_approvals/ · https://docs.gitlab.com/api/discussions/ · https://docs.gitlab.com/api/draft_notes/ · https://docs.gitlab.com/api/graphql/ · https://docs.gitlab.com/api/graphql/reference/ · https://docs.gitlab.com/api/graphql/sample_issue_boards/
+- **Last reviewed:** 2026-07-24
+- **Used for:** instance version/edition discovery; project issue IID/global-ID
+  identity; issue types, metadata, state, additive labels, time tracking, marker
+  reconciliation and cross-project links (issues.md); project/group board/list REST
+  resources and GraphQL Global IDs,
+  status/rank schema discovery (boards.md); paginated issue/MR Notes, internal
+  visibility, append-only context identity and note URLs (context-notes.md); plus MR,
+  discussions, approvals, and review resolution.
+- **References:** references/boards.md, references/context-notes.md,
+  references/create.md, references/issues.md,
+  references/provider-conformance.md, references/review-post.md,
+  references/review-resolve.md
+
+## GitLab issues, work items, Status, and boards
+
+- **URLs:** https://docs.gitlab.com/user/project/issues/ · https://docs.gitlab.com/user/project/issues/managing_issues/ · https://docs.gitlab.com/user/project/issues/related_issues/ · https://docs.gitlab.com/user/project/issue_board/ · https://docs.gitlab.com/user/work_items/ · https://docs.gitlab.com/user/work_items/status/ · https://docs.gitlab.com/api/graphql/epic_work_items_api_migration_guide/
+- **Last reviewed:** 2026-07-24
+- **Used for:** issue/work-item responsibility; board cards as views over labels,
+  assignees, milestones, iterations, or Status; cross-list effects; native Status
+  version/tier/category behavior; work-item migration and experimental API boundaries.
+- **References:** references/boards.md, references/issues.md,
+  references/provider-conformance.md
 
 ## GitLab tokens, scopes, and CI
 
@@ -45,13 +71,22 @@
 ## Guide-level synthesis
 
 - **Provenance:** Repository-original integration of the source blocks above; these references combine multiple inputs or maintained conventions rather than one exclusive upstream
-- **References:** references/auth.md, references/create.md, references/first-time-setup.md, references/onboarding.md, references/review-post.md, references/review-resolve.md
+- **References:** references/auth.md, references/boards.md,
+  references/context-notes.md, references/create.md,
+  references/first-time-setup.md, references/issues.md, references/onboarding.md,
+  references/provider-conformance.md, references/review-post.md,
+  references/review-resolve.md
 - **Last reviewed:** 2026-07-16
 
 ## Refresh Workflow
 
-1. Re-check the glab CLI docs for renamed flags / env vars (the `GLAB_` prefix migration) and whether the `glab mr note` resolve/list subcommands are still EXPERIMENTAL.
-2. Re-verify the Discussions API position fields and the `DiffNote` downgrade behavior, and confirm `read_api` vs `api` scope split and CI_JOB_TOKEN read-only status are unchanged.
-3. Re-run a read smoke test (`glab auth status` + `glab mr list`) against a real instance.
-4. Re-test component input/pin/catalog behavior, pipeline-policy merge/name/variable semantics, compliance-framework scope, and protected-environment approval behavior against each supported edition/version.
-5. Bump each **Last reviewed** above.
+1. Re-check `glab issue`, `issue board`, `work-items`, MR, Notes, auth, and
+   environment-variable changes, including experimental commands.
+2. Re-verify Issues, Issue Links, Boards, Notes, Work Item GraphQL, Discussions, and
+   Metadata APIs against supported self-managed versions and tiers.
+3. Re-run authenticated read smoke tests for one issue, board/list, work-item schema,
+   MR, and complete Notes pagination.
+4. Re-test ticket marker reconciliation, label/status board moves, rank changes,
+   append-only context publication, and provider-conformance race handling.
+5. Re-test enforcement components/policies/environments against supported editions.
+6. Bump each **Last reviewed** above.

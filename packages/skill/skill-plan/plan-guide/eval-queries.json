@@ -30,6 +30,16 @@
     "split": "validation"
   },
   {
+    "query": "Resume this plan in a new session using its versioned architecture-decision context notes, but ignore an invalidated assumption.",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Critique this plan independently in two passes so supplied author context cannot bias the initial findings.",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
     "query": "Update the implementation plan using the attached test evidence and task results, but do not change its scope.",
     "should_trigger": true,
     "split": "validation"

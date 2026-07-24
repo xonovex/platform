@@ -8,6 +8,7 @@ allowed-tools:
   - Skill
 argument-hint: >-
   [subject] [--request <file>] [--subject-revision <revision>]
+  [--context <context>...]
   [--feedback <feedback>...]
   [--criterion <criterion>...] [--method <method>]
 ---
@@ -21,6 +22,8 @@ argument-hint: >-
   relationships, and equivalent inputs. Do not combine it with shorthand arguments.
 - `--subject-revision` (optional): Exact native revision of the source; required for a
   provider-native source when the provider exposes one.
+- `--context` (repeatable, optional): Canonical explanatory context or an opaque
+  context reference to resolve and retain when producing the successor.
 - `--feedback` (repeatable, required unless `--request` supplies it): Feedback to
   address.
 - `--criterion` (repeatable, optional): Constraint the revision must retain.

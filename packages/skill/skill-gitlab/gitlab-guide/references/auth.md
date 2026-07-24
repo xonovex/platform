@@ -14,14 +14,21 @@ Use the shortest supported expiry.
 
 ## Scopes and roles
 
-| Operation                             | Classic scope                           | Additional authority                |
-| ------------------------------------- | --------------------------------------- | ----------------------------------- |
-| Read merge requests, diffs, and notes | `read_api`                              | Project read role                   |
-| Create merge requests or discussions  | `api`                                   | Developer or eligible author        |
-| Approve or resolve discussions        | `api`                                   | Eligible approver, Developer/author |
-| Push or read repository files         | `write_repository` or `read_repository` | Corresponding repository access     |
+| Operation                              | Classic scope                           | Additional authority                |
+| -------------------------------------- | --------------------------------------- | ----------------------------------- |
+| Read issues, work items, boards, notes | `read_api`                              | Resource read role                  |
+| Create/update issues or Notes          | `api`                                   | Issue/work-item update role         |
+| Move tickets or configure board lists  | `api`                                   | Planner or host-required role       |
+| Mutate Work Item GraphQL widgets       | `api`                                   | Feature/tier plus update role       |
+| Read merge requests, diffs, and notes  | `read_api`                              | Project read role                   |
+| Create merge requests or discussions   | `api`                                   | Developer or eligible author        |
+| Approve or resolve discussions         | `api`                                   | Eligible approver, Developer/author |
+| Push or read repository files          | `write_repository` or `read_repository` | Corresponding repository access     |
 
-`write_repository` does not authorize API discussions, and `read_api` cannot POST. Scope is necessary but not sufficient: an `api` token still receives `403` when its identity lacks the project role. Some unapprove and reset-approval operations are bot-only.
+`write_repository` does not authorize Issues, Notes, boards, GraphQL mutations, or API
+discussions, and `read_api` cannot POST/PUT. Scope is necessary but not sufficient: an
+`api` token still receives `403` when its identity lacks the resource role or licensed
+feature. Some unapprove and reset-approval operations are bot-only.
 
 ## Hosts and variables
 

@@ -8,6 +8,7 @@ allowed-tools:
   - Skill
 argument-hint: >-
   [subject] [--request <file>] [--subject-revision <revision>]
+  [--context <context>...]
   [--reason <text>]
   [--criterion <criterion>...]
 ---
@@ -21,6 +22,8 @@ argument-hint: >-
   partial state, relationships, and equivalent inputs. Do not combine it with shorthand
   arguments.
 - `--subject-revision` (optional): Exact native revision of the subject when available.
+- `--context` (repeatable, optional): Canonical explanatory context or an opaque
+  context reference to preserve with recovery information.
 - `--reason` (required unless `--request` supplies it): Present-tense reason for
   stopping.
 - `--criterion` (repeatable, optional): Retention or recovery constraint.

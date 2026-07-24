@@ -7,6 +7,7 @@ allowed-tools:
   - Skill
 argument-hint: >-
   [target] [--request <file>] [--target-revision <revision>]
+  [--context <context>...]
   [--reason <text>]
 ---
 
@@ -19,6 +20,8 @@ argument-hint: >-
 - `--request` (optional): Markdown workflow handoff containing the workspace, reason,
   partial state, and equivalent inputs. Do not combine it with shorthand arguments.
 - `--target-revision` (optional): Exact workspace revision when available.
+- `--context` (repeatable, optional): Canonical explanatory context or an opaque
+  context reference to preserve with recovery information.
 - `--reason` (required unless `--request` supplies it): Present-tense reason for
   stopping.
 

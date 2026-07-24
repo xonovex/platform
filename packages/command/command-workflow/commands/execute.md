@@ -11,6 +11,7 @@ allowed-tools:
   - Skill
 argument-hint: >-
   [subject] [--request <file>] [--subject-revision <revision>]
+  [--context <context>...]
   [--criterion <criterion>...]
   [--method <method>] [--idempotency-key <key>]
   [--effect <inspect|preview|apply>]
@@ -26,6 +27,9 @@ argument-hint: >-
   relationships, and equivalent inputs. Do not combine it with shorthand arguments.
 - `--subject-revision` (optional): Exact native revision of the subject; required for a
   protected provider-native subject when the provider exposes one.
+- `--context` (repeatable, optional): Canonical explanatory context or an opaque
+  context reference to resolve; active context constrains the work and is preserved
+  in the result.
 - `--criterion` (repeatable, optional): Completion criterion.
 - `--method` (optional): Requested subject-specific execution procedure.
 - `--idempotency-key` (optional): Stable retry key. Required for an externally

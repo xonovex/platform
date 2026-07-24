@@ -8,14 +8,37 @@
   - https://cli.github.com/manual/gh_auth_setup-git
   - https://cli.github.com/manual/gh_help_environment
   - https://cli.github.com/manual/gh_api
+  - https://cli.github.com/manual/gh_issue
+  - https://cli.github.com/manual/gh_issue_create
+  - https://cli.github.com/manual/gh_issue_edit
+  - https://cli.github.com/manual/gh_issue_close
+  - https://cli.github.com/manual/gh_project
+  - https://cli.github.com/manual/gh_project_view
+  - https://cli.github.com/manual/gh_project_field-list
+  - https://cli.github.com/manual/gh_project_item-list
+  - https://cli.github.com/manual/gh_project_item-add
+  - https://cli.github.com/manual/gh_project_item-edit
+  - https://cli.github.com/manual/gh_project_item-archive
+  - https://cli.github.com/manual/gh_project_item-delete
   - https://cli.github.com/manual/gh_pr_create
+  - https://cli.github.com/manual/gh_pr_comment
   - https://cli.github.com/manual/gh_pr_edit
   - https://cli.github.com/manual/gh_pr_review
   - https://docs.github.com/en/github-cli/github-cli/quickstart
   - https://github.com/cli/cli/blob/trunk/docs/install_linux.md
-- **Last reviewed:** 2026-06-26
-- **Used for:** install (first-time-setup.md), `gh auth login` / `status` / `setup-git` flow, the GH_TOKEN / GH_ENTERPRISE_TOKEN / GH_HOST environment split (auth.md), `gh pr create` flags + `gh pr edit` replace-on-body behavior (create.md), and the `gh pr review` inline-comment limitation (review-post.md).
-- **References:** references/auth.md, references/create.md, references/first-time-setup.md, references/review-post.md
+- **Last reviewed:** 2026-07-24
+- **Used for:** install (first-time-setup.md), `gh auth login` / `status` / `setup-git`
+  flow, the GH_TOKEN / GH_ENTERPRISE_TOKEN / GH_HOST environment split (auth.md),
+  issue create/edit/close/reopen, metadata and relationship flags (issues.md);
+  project scope, discovery, item add/list/edit/archive/delete and typed field flags
+  (projects.md); `gh pr create` flags + `gh pr edit` replace-on-body behavior
+  (create.md); `gh pr comment` body and last-comment behavior
+  (context-comments.md); and the `gh pr review` inline-comment limitation
+  (review-post.md).
+- **References:** references/auth.md, references/context-comments.md,
+  references/create.md, references/first-time-setup.md, references/issues.md,
+  references/projects.md, references/provider-conformance.md,
+  references/review-post.md
 
 ## GitHub REST API
 
@@ -23,10 +46,24 @@
   - https://docs.github.com/en/rest/pulls/pulls?apiVersion=2022-11-28
   - https://docs.github.com/en/rest/pulls/reviews
   - https://docs.github.com/en/rest/pulls/comments
+  - https://docs.github.com/en/rest/issues/issues
+  - https://docs.github.com/en/rest/issues
+  - https://docs.github.com/en/rest/issues/sub-issues
+  - https://docs.github.com/en/rest/issues/comments
+  - https://docs.github.com/en/rest/using-the-rest-api/best-practices-for-using-the-rest-api
   - https://docs.github.com/en/rest/using-the-rest-api/troubleshooting-the-rest-api
-- **Last reviewed:** 2026-06-26
-- **Used for:** `POST /pulls` (no-push, head/base semantics) in create.md; the `.../pulls/{n}/reviews` object with `comments[]` path/line/side/start_line/start_side/commit_id and the deprecated `position` field in review-post.md; the 404-on-private and `X-Accepted-GitHub-Permissions` header behavior in auth.md.
-- **References:** references/auth.md, references/create.md, references/review-post.md
+- **Last reviewed:** 2026-07-24
+- **Used for:** repository issue identity, pagination, metadata, create/update/state,
+  sub-issue relationships, and comment endpoints (issues.md); `POST /pulls` (no-push, head/base semantics) in
+  create.md; list and create issue comments on issues and pull requests plus unsafe
+  conditional-request limitations in context-comments.md and provider-conformance.md; the
+  `.../pulls/{n}/reviews` object with `comments[]`
+  path/line/side/start_line/start_side/commit_id and the deprecated `position` field
+  in review-post.md; the 404-on-private and `X-Accepted-GitHub-Permissions` header
+  behavior in auth.md.
+- **References:** references/auth.md, references/context-comments.md,
+  references/create.md, references/issues.md, references/provider-conformance.md,
+  references/review-post.md
 
 ## GitHub GraphQL API
 
@@ -34,9 +71,30 @@
   - https://docs.github.com/en/graphql/reference/mutations
   - https://docs.github.com/en/graphql/reference/input-objects
   - https://docs.github.com/en/graphql/reference/pulls
+  - https://docs.github.com/en/graphql/reference/objects#projectv2
+  - https://docs.github.com/en/graphql/reference/mutations#addprojectv2itembyid
+  - https://docs.github.com/en/graphql/reference/mutations#updateprojectv2itemfieldvalue
 - **Last reviewed:** 2026-06-26
-- **Used for:** `resolveReviewThread` / `unresolveReviewThread` / `addPullRequestReviewThreadReply` mutations and the `pullRequest.reviewThreads` connection in review-resolve.md.
-- **References:** references/review-resolve.md
+- **Used for:** ProjectV2 project/item/field identities, add-item and typed field
+  mutations (projects.md); `resolveReviewThread` / `unresolveReviewThread` /
+  `addPullRequestReviewThreadReply` mutations and the `pullRequest.reviewThreads`
+  connection in review-resolve.md.
+- **References:** references/projects.md, references/provider-conformance.md,
+  references/review-resolve.md
+
+## GitHub Issues and Projects product guidance
+
+- **URLs:**
+  - https://docs.github.com/en/issues/tracking-your-work-with-issues
+  - https://docs.github.com/en/issues/planning-and-tracking-with-projects/learning-about-projects/best-practices-for-projects
+  - https://docs.github.com/en/issues/planning-and-tracking-with-projects/managing-items-in-your-project/adding-items-to-your-project
+  - https://docs.github.com/en/issues/planning-and-tracking-with-projects/automating-your-project/using-the-built-in-automations
+- **Last reviewed:** 2026-07-24
+- **Used for:** issue-versus-project responsibility; project Status, typed fields,
+  item lifecycle, built-in automatic add/status/archive/close effects, and
+  re-verification requirements.
+- **References:** references/issues.md, references/projects.md,
+  references/provider-conformance.md
 
 ## Tokens, permissions, and Actions
 
@@ -90,13 +148,20 @@
 ## Guide-level synthesis
 
 - **Provenance:** Repository-original integration of the source blocks above; these references combine multiple inputs or maintained conventions rather than one exclusive upstream
-- **References:** references/auth.md, references/create.md, references/first-time-setup.md, references/onboarding.md, references/review-post.md, references/review-resolve.md
+- **References:** references/auth.md, references/context-comments.md,
+  references/create.md, references/first-time-setup.md, references/issues.md,
+  references/onboarding.md, references/projects.md,
+  references/provider-conformance.md, references/review-post.md,
+  references/review-resolve.md
 - **Last reviewed:** 2026-07-16
 
 ## Refresh Workflow
 
-1. Re-fetch the `gh` manual and the REST/GraphQL reference pages above; scan for new/removed flags and fields (especially `gh pr review` gaining inline support, and any REST resolve-thread endpoint).
+1. Re-fetch the `gh` manual and REST/GraphQL references; scan for issue relationship,
+   Projects field/item, `gh pr review` inline, and review-thread changes.
 2. Re-verify a read call (`gh api user`, `gh api graphql -f query='query{viewer{login}}'`) and one `X-Accepted-GitHub-Permissions` header against a `.../reviews` endpoint.
-3. Re-confirm the fine-grained-PAT scope table (Contents: write to push; resolve needing Contents: read & write).
+3. Re-confirm issue, Projects, pull-request, and fine-grained-PAT/App permissions.
 4. Re-test reusable workflow pin/secret/permission behavior, ruleset layering and required-check source binding, environment approval semantics, and artifact-attestation permissions.
-5. Bump **Last reviewed** above.
+5. Re-test ticket marker reconciliation, Projects add/edit plus automation races, and
+   append-only issue/PR context publication.
+6. Bump **Last reviewed** above.

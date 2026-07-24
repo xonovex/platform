@@ -24,3 +24,11 @@ cross-role traceability, explicit required or preferred capability needs, eviden
 bundles, relationships, and retry identity. Review and validation can run in fresh
 independent context; externally submitted apply operations use an idempotency key when
 their provider supports one.
+
+Use repeatable `--context <text-or-reference>` arguments on Create, Review, Revise,
+Decide, Execute, Validate, Abandon, Workspace Create, Workspace Merge, and Workspace
+Abandon for smaller handoffs. Context has stable identity, version, digest,
+applicability, provenance, status, audience, and visibility; it remains distinct from
+evidence and authority. Persist selected context for future sessions through a
+separate Publish operation, such as a provider-native issue, pull-request, or
+merge-request note.

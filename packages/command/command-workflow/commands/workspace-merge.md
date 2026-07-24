@@ -9,6 +9,7 @@ allowed-tools:
 argument-hint: >-
   [target] [--request <file>] [--destination <reference>]
   [--target-revision <revision>] [--expected-revision <revision>]
+  [--context <context>...]
   [--criterion <criterion>...] [--method <method>]
   [--idempotency-key <key>] [--effect <preview|apply>]
 ---
@@ -28,6 +29,8 @@ argument-hint: >-
   reference.
 - `--expected-revision` (optional): Expected destination revision for concurrency;
   required for `apply` when an existing destination exposes one.
+- `--context` (repeatable, optional): Canonical explanatory context or an opaque
+  context reference that constrains integration and is preserved in the result.
 - `--criterion` (repeatable, optional): Binding pre-integration criterion.
 - `--method` (optional): Requested validation and integration procedure.
 - `--idempotency-key` (optional): Stable retry key. Required for provider-native

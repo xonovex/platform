@@ -8,11 +8,15 @@ Accept inline feedback, provider-native feedback references, or provider-native 
 
 ## Core Workflow
 
-1. Resolve the explicit plan, feedback, supporting references, and optional native revision through the selected provider when applicable.
+1. Resolve the explicit plan, active canonical context, feedback, supporting
+   references, and optional native revision through selected providers when
+   applicable.
 2. Enumerate every distinct feedback item before editing. Stop on materially conflicting instructions that the available evidence cannot resolve.
 3. Classify each item as applied, deferred, rejected, unresolved question, or scope change, with a concise rationale.
 4. Propagate accepted changes through scope, approach, dependencies, risks, proposed children, validation, success criteria, and skills to consult.
-5. Produce a traceable new revision without invisibly overwriting the source. Status, when present, remains descriptive metadata.
+5. Produce a traceable new revision without invisibly overwriting the source. Preserve
+   still-active context and create versioned superseding or invalidating context
+   records when accepted feedback changes it. Status remains descriptive metadata.
 6. Return the revised plan and item-by-item disposition inline. Use a separate Publish operation if the revision must be persisted.
 
 ## Gotchas

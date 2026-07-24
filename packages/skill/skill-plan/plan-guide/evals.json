@@ -73,6 +73,23 @@
         "The operation resolves only the first actionable target and returns exact proposed changes and validation without editing files",
         "It does not update provider state, persist progress, mark tasks complete, or continue to another target"
       ]
+    },
+    {
+      "id": 10,
+      "prompt": "Resume provider plan:auth-44 at revision a110 in a new session. Its active context references include architecture decision version 3 and an invalidated assumption. Apply exactly one child and return a handoff for the next role.",
+      "assertions": [
+        "The operation resolves and preserves canonical active context with identity, version, digest, provenance, applicability, and native revision while retaining but not applying the invalidated entry.",
+        "Active context constrains target selection and implementation without becoming evidence or authority, and unresolved active context blocks before edits.",
+        "The result returns newly established or superseding context plus the exact implementation revision, validation evidence, and remaining work for a later session."
+      ]
+    },
+    {
+      "id": 11,
+      "prompt": "Independently critique provider plan:782 at revision 9f31. Two decision-context notes are supplied, but I do not want them to bias the initial critique.",
+      "assertions": [
+        "The critique first evaluates the pinned plan and criteria without author context, preserving its initial findings.",
+        "It then resolves the supplied context in a second pass and reports whether each finding was confirmed, changed, or added without treating context as evidence."
+      ]
     }
   ]
 }

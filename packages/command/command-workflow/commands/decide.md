@@ -8,7 +8,8 @@ allowed-tools:
   - Skill
 argument-hint: >-
   [subject] [--request <file>] [--subject-revision <revision>]
-  [--option <option>...] [--evidence <reference>...] [--outcome <text>]
+  [--context <context>...] [--option <option>...]
+  [--evidence <reference>...] [--outcome <text>]
   [--criterion <criterion>...] [--method <method>]
 ---
 
@@ -22,6 +23,9 @@ argument-hint: >-
   evidence entries, and equivalent inputs. Do not combine it with shorthand arguments.
 - `--subject-revision` (optional): Exact native revision of the decision subject;
   required when binding evidence is revision-pinned and the provider exposes one.
+- `--context` (repeatable, optional): Canonical explanatory context or an opaque
+  context reference to resolve; it frames the choice without counting as supporting
+  evidence.
 - `--option` (repeatable, optional): Explicit option to compare.
 - `--evidence` (repeatable, optional): Opaque evidence reference to preserve and
   evaluate.

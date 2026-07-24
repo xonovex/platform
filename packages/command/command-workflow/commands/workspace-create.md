@@ -8,7 +8,8 @@ allowed-tools:
   - Skill
 argument-hint: >-
   [target] [--request <file>] [--source <reference>]
-  [--source-revision <revision>] [--idempotency-key <key>]
+  [--source-revision <revision>] [--context <context>...]
+  [--idempotency-key <key>]
   [--effect <preview|apply>]
 ---
 
@@ -23,6 +24,8 @@ argument-hint: >-
 - `--source` (required unless `--request` supplies it): Exact source reference.
 - `--source-revision` (optional): Exact source revision; required when the provider
   exposes one.
+- `--context` (repeatable, optional): Canonical explanatory context or an opaque
+  context reference to preserve with the workspace handoff.
 - `--idempotency-key` (optional): Stable retry key. Required for provider-native
   `apply` when the selected provider supports idempotency.
 - `--effect` (optional): `preview` or `apply`; defaults to `preview`.

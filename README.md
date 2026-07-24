@@ -131,9 +131,11 @@ Each skill is a separate plugin. A compatible harness can route to an installed 
 claude plugin marketplace add xonovex/platform
 
 # Install only the independent capabilities you need
-claude plugin install xonovex-workflow@xonovex-marketplace            # explicit create / review / revise / decide / execute / validate / publish / abandon and workspace commands
+claude plugin install xonovex-workflow@xonovex-marketplace            # explicit operations, context forwarding, publishing, and workspace commands
 claude plugin install xonovex-skill-plan@xonovex-marketplace          # research, create, critique, revise, expand, continue, update, validate
 claude plugin install xonovex-skill-git@xonovex-marketplace           # commit, merge-resolve, feature-worktree create/merge/abandon/cleanup
+claude plugin install xonovex-skill-github@xonovex-marketplace        # GitHub issues, Projects, PRs/reviews, durable context, enforcement
+claude plugin install xonovex-skill-gitlab@xonovex-marketplace        # GitLab issues/work items, boards, MRs/reviews, durable context, enforcement
 claude plugin install xonovex-skill-instruction@xonovex-marketplace   # AGENTS.md init / sync / simplify / consolidate / merge
 claude plugin install xonovex-skill-reflect@xonovex-marketplace       # session reflection: extract lessons, fold into AGENTS.md or a skill
 claude plugin install xonovex-skill-code-review@xonovex-marketplace   # Conventional Comments feedback: blocking vs non-blocking, summary + inline
@@ -174,13 +176,15 @@ codex plugin marketplace add xonovex/platform
 # Install only the independent capabilities you need
 codex plugin add xonovex-skill-plan@xonovex-marketplace          # research, create, critique, revise, expand, continue, update, validate
 codex plugin add xonovex-skill-git@xonovex-marketplace           # commit, merge-resolve, feature-worktree create/merge/abandon/cleanup
+codex plugin add xonovex-skill-github@xonovex-marketplace        # GitHub issues, Projects, PRs/reviews, durable context, enforcement
+codex plugin add xonovex-skill-gitlab@xonovex-marketplace        # GitLab issues/work items, boards, MRs/reviews, durable context, enforcement
 codex plugin add xonovex-skill-instruction@xonovex-marketplace   # AGENTS.md init / sync / simplify / consolidate / merge
 codex plugin add xonovex-skill-reflect@xonovex-marketplace       # session reflection: extract lessons, fold into AGENTS.md or a skill
 codex plugin add xonovex-skill-code-review@xonovex-marketplace   # Conventional Comments feedback: blocking vs non-blocking, summary + inline
 codex plugin add xonovex-skill-pull-request@xonovex-marketplace  # PR authoring: description, size/atomicity, testing evidence, tradeoffs, self-review
 codex plugin add xonovex-skill-command@xonovex-marketplace        # author / merge / simplify reusable prompt files (cross-harness format reference)
 codex plugin add xonovex-skill-skill@xonovex-marketplace         # author / extract / merge / simplify / validate Agent Skills
-codex plugin add xonovex-skill-workflow@xonovex-marketplace      # explicit workflow operations with effect and workspace boundaries
+codex plugin add xonovex-skill-workflow@xonovex-marketplace      # explicit operations, context forwarding, and effect/workspace boundaries
 codex plugin add xonovex-skill-product-discovery@xonovex-marketplace   # frame opportunities, assumptions, experiments, and outcomes
 codex plugin add xonovex-skill-product-analytics@xonovex-marketplace   # define metrics, instrumentation, data quality, and experiment decisions
 codex plugin add xonovex-skill-ux-research@xonovex-marketplace         # plan, conduct, analyse, and hand off user research

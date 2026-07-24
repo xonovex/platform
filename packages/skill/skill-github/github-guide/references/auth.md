@@ -8,15 +8,25 @@ Classic PATs use coarse scopes. `repo` covers private-repository push, pull-requ
 
 Prefer a fine-grained PAT where its repository and organization constraints fit:
 
-| Operation                             | Fine-grained permission                         |
-| ------------------------------------- | ----------------------------------------------- |
-| Push commits or update refs           | Contents: write                                 |
-| Open a pull request                   | Pull requests: write and Contents: read         |
-| Submit a review                       | Pull requests: write                            |
-| Post a top-level pull-request comment | Issues: write                                   |
-| Resolve a review thread               | Pull requests: write and Contents: read & write |
+| Operation                            | Fine-grained permission                         |
+| ------------------------------------ | ----------------------------------------------- |
+| Push commits or update refs          | Contents: write                                 |
+| Read repository issues               | Issues: read or Pull requests: read             |
+| Create or update an issue            | Issues: write                                   |
+| Open a pull request                  | Pull requests: write and Contents: read         |
+| Submit a review                      | Pull requests: write                            |
+| Post an issue comment                | Issues: write                                   |
+| Post a pull-request timeline comment | Issues: write or Pull requests: write           |
+| Resolve a review thread              | Pull requests: write and Contents: read & write |
 
 Metadata: read is automatically required. Organization approval may leave a fine-grained token pending and effectively read-public-only.
+
+`gh project` documents the classic `project` scope as its minimum. For fine-grained
+PATs or GitHub Apps, grant the target user/organization Projects permission required
+by the selected query or mutation and repository read access for linked content.
+The built-in repository `GITHUB_TOKEN` is not a general organization-Projects
+credential; prefer a reviewed App installation token or narrowly scoped PAT for that
+cross-resource operation.
 
 ## Verify endpoint requirements
 

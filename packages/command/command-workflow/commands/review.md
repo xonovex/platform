@@ -9,6 +9,7 @@ allowed-tools:
   - Skill
 argument-hint: >-
   [subject] [--request <file>] [--subject-revision <revision>]
+  [--context <context>...]
   [--perspective <perspective>...]
   [--criterion <criterion>...] [--method <method>] [--independent]
 ---
@@ -24,11 +25,15 @@ argument-hint: >-
   combine it with shorthand arguments.
 - `--subject-revision` (optional): Exact native revision of the subject; required when
   revision-pinned review is a criterion and the provider exposes one.
+- `--context` (repeatable, optional): Canonical explanatory context or an opaque
+  context reference to resolve without accepting it as evidence, approval, or a
+  substitute for independent review.
 - `--perspective` (repeatable, optional): Explicit review lens.
 - `--criterion` (repeatable, optional): Review criterion.
 - `--method` (optional): Requested subject-specific review procedure.
-- `--independent` (optional): Start fresh review context without creator context or
-  prior findings. Use separate invocations for independently accountable perspectives.
+- `--independent` (optional): Inspect the pinned subject without creator context or
+  prior findings first, then assess supplied context in a second pass and report its
+  effect. Use separate invocations for independently accountable perspectives.
 
 ## Delegation
 

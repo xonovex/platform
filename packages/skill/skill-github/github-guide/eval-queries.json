@@ -72,6 +72,30 @@
     "rationale": "GitHub-native ruleset layering and bypass behavior"
   },
   {
+    "query": "publish a durable implementation-decision comment on this GitHub PR and reconcile the same marked comment on retry without touching my unrelated latest comment",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "provider-native pull-request context comment with append-only retry reconciliation"
+  },
+  {
+    "query": "create a GitHub issue with assignees labels milestone and a blocked-by relationship",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "GitHub-native ticket creation and metadata"
+  },
+  {
+    "query": "add issue 482 to organization Project 7 and set its Status field to In progress without duplicating the item",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "GitHub Projects v2 item and kanban field operation"
+  },
+  {
+    "query": "publish versioned decision context to this GitHub issue for the next agent session",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "durable issue context comment"
+  },
+  {
     "query": "open a merge request on a GitLab-hosted repo with glab and request reviewers",
     "should_trigger": false,
     "split": "train",
