@@ -18,7 +18,7 @@ git merge --squash <feature-branch> && git commit -m "<type>: <feature-name>
 Squashed commits from <worktree>/feature/<feature-name>"
 ```
 
-6. Optional cleanup: `git worktree remove <feature-worktree-path>`; remote delete: `git push origin --delete <feature-branch>`.
+6. Optional cleanup: name the worktree path and the refs to delete, and get confirmation, before `git worktree remove <feature-worktree-path>` and the remote delete `git push origin --delete <feature-branch>` — both are unrecoverable from the local worktree.
 
 **Never** remove the worktree if the merge fails.
 

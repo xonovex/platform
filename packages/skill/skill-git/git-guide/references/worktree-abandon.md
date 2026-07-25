@@ -17,7 +17,7 @@ abandoned_date: "2026-05-13"
 
 Add an `## Abandonment Notes` section with the detailed explanation and learnings.
 
-5. Optional: `git worktree remove <path>`.
+5. Optional removal: name the worktree path and branch ref, and get confirmation, before `git worktree remove <path>` — removal discards anything uncommitted and the paired `git branch -D` discards unmerged commits.
 
 ## Gotchas
 
