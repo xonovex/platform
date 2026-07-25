@@ -1,6 +1,6 @@
-# String views and builders
+# String views
 
-C strings carry no length, so every `strlen`/`strcmp`/`strtok` rescans for the terminator. Two small types remove the rescans and the hidden-allocation surprises: a non-owning **view** (read) and an owning **builder** over caller memory (write).
+C strings carry no length, so every `strlen`/`strcmp`/`strtok` rescans for the terminator — an O(n) hidden cost that becomes O(n²) inside a loop. A non-owning **view** carries the length and removes the rescans.
 
 ## View — non-owning (pointer + length)
 
@@ -16,15 +16,6 @@ typedef struct { const char *data; size_t len; } strview_t;  /* not required to 
 
 A view borrows: it is valid only while the bytes it points at outlive it, and it never frees them.
 
-## Builder — owning, over a caller-provided buffer
+## Writing
 
-```c
-typedef struct { char *data; size_t len, capacity; bool truncated; } strbuilder_t;
-```
-
-- Caller owns the buffer (no allocation inside): a `_req(max_len)` returns the byte count, the caller sizes storage, `_init(buf, cap)` binds it.
-- Every append is **bounded**: what doesn't fit is dropped, the result stays null-terminated, and a `truncated` flag latches so the caller can check once after a run of appends instead of per call.
-- `data` is always a valid C string; expose both a `view()` (length-carrying) and a `cstr()` accessor.
-- A formatted append wraps `vsnprintf` into the remaining space and latches `truncated` the same way.
-
-This pair replaces the `strcpy`/`strcat`/`sprintf`/`strtok` cluster: reads borrow length-carrying views, writes go through a bounded builder over memory the caller owns.
+Where a write goes through libc, use the bounded `n` variants (`snprintf`, `strnlen`, `strncmp`) with an explicit cap, check the return for truncation, and carry the resulting length onward instead of rescanning. Who owns and sizes the destination buffer is a project design decision, not a property of C99.

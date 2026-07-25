@@ -3,6 +3,7 @@ import {readdirSync, readFileSync, statSync} from "node:fs";
 import {basename, dirname, join, resolve} from "node:path";
 import {parse as parseYaml} from "yaml";
 import {checkCatalogFiles} from "./catalog-files.js";
+import {checkReferenceFileLinks} from "./reference-file-links.js";
 
 const NAME_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const FRONTMATTER_RE = /^---\n([\s\S]*?)\n---\n([\s\S]*)$/;
@@ -648,6 +649,7 @@ const main = (argv: readonly string[]): number => {
   checkBody(body, report);
   checkReferences(body, skillDir, report);
   checkReferenceTocs(skillDir, report);
+  checkReferenceFileLinks(skillDir, report);
   checkHarnessNeutrality(body, report);
   const catalogReport = checkCatalogFiles(skillDir, fm);
   for (const pass of catalogReport.passes) report.addPass(pass);

@@ -4,6 +4,21 @@ tags: [typescript-script]
 dependsOn:
   - script-moon-common
 tasks:
+  composition-check:
+    command:
+      - npx
+      - moon-skill-links
+      - $workspaceRoot
+    deps:
+      - ~:build
+    inputs:
+      - "/packages/skill/*/*/SKILL.md"
+      - "/packages/skill/*/*/references/*.md"
+      - "/packages/skill/*/.claude-plugin/plugin.json"
+      - "/packages/skill/*/.codex-plugin/plugin.json"
+      - "/packages/skill/*/package.json"
+    options:
+      cache: false
   ts-build:
     deps:
       - script-moon-common:build
@@ -18,3 +33,7 @@ tasks:
     options:
       cache: false
       runFromWorkspaceRoot: true
+  ci-check:
+    deps: [composition-check]
+    options:
+      mergeDeps: append

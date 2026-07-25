@@ -17,7 +17,7 @@ description: "Use when editing or reviewing general-purpose C99 — libraries, C
 
 - **Error handling** - Use return codes, check all fallible operations, see [references/error-handling.md](references/error-handling.md)
 - **Value-oriented APIs** - Return small results by value or in a `{ok, value}` result struct; reserve out-params for large or multiple results, see [references/value-types.md](references/value-types.md)
-- **Strings** - Borrow length-carrying views, write through bounded builders over caller memory — not `strlen`/`strcat`/`strtok` rescans, see [references/string-views.md](references/string-views.md)
+- **Strings** - Carry lengths in non-owning views instead of rescanning with `strlen`/`strcmp`/`strtok`; bound every libc write with the `n` variants, see [references/string-views.md](references/string-views.md)
 - **Input validation** - Check bounds, NULL pointers, division by zero
 - **Readability** - Small functions, clear naming, comments for non-obvious logic
 - **Paradigm** - Functional style (pure functions, explicit context) → **fp-guide**; object/data modeling → **oop-guide**
@@ -39,7 +39,7 @@ description: "Use when editing or reviewing general-purpose C99 — libraries, C
 
 - Read [references/build-and-warnings.md](references/build-and-warnings.md) - Load when configuring the C standard, feature-test macros, warning flags, or sanitizers
 - Read [references/fixed-width-types.md](references/fixed-width-types.md) - Load when choosing integer types for struct fields, serialized data, counts, or indices
-- Read [references/string-views.md](references/string-views.md) - Load when handling strings without repeated terminator scans or hidden allocations
+- Read [references/string-views.md](references/string-views.md) - Load when handling strings without repeated terminator scans
 - Read [references/value-types.md](references/value-types.md) - Load when designing function signatures: returning results by value vs. out-parameters
 - Read [references/memory-management.md](references/memory-management.md) - Load when allocating memory or managing resource lifetimes
 - Read [references/designated-initializers.md](references/designated-initializers.md) - Load when initializing structs or arrays with specific values

@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "bin": {
+    "moon-skill-links": "./dist/src/links-cli.js",
     "moon-skill-validate": "./dist/src/index.js"
   },
   "dependencies": {
