@@ -2,7 +2,7 @@
   {
     "query": "track an Android screen view when this ViewModel loads",
     "should_trigger": true,
-    "split": "train",
+    "split": "validation",
     "rationale": "screen tracking placement"
   },
   {

@@ -2,7 +2,7 @@
   {
     "query": "make this Compose screen accessible for TalkBack",
     "should_trigger": true,
-    "split": "train",
+    "split": "validation",
     "rationale": "direct mention of Compose accessibility"
   },
   {
