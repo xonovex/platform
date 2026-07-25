@@ -35,9 +35,9 @@ The default is the **browser / device-code** flow, not a token paste. Answer **G
 Headless / CI — skip interactive login:
 
 ```bash
-export GH_TOKEN=ghp_xxx                           # github.com (GH_ENTERPRISE_TOKEN for GHES)
-# or feed a CLASSIC PAT (min scopes repo, read:org, gist) on stdin:
-gh auth login --with-token < token.txt
+export GH_TOKEN="$(op read 'op://<vault>/github/token')"   # github.com (GH_ENTERPRISE_TOKEN for GHES)
+# or feed a CLASSIC PAT (min scopes repo, read:org, gist) on stdin, straight from the store:
+gh auth login --with-token < <(op read 'op://<vault>/github/token')
 ```
 
 Do NOT feed a fine-grained PAT to `--with-token` (its per-resource scoping confuses that flow) — use `GH_TOKEN` for fine-grained PATs.
@@ -72,6 +72,6 @@ gh api graphql -f query='query{viewer{login}}'   # real GraphQL read
 ```bash
 gh auth login --hostname ghe.example.com
 export GH_HOST=ghe.example.com
-export GH_ENTERPRISE_TOKEN=ghp_xxx               # NOT GH_TOKEN for GHES
+export GH_ENTERPRISE_TOKEN="$(op read 'op://<vault>/ghes/token')"   # NOT GH_TOKEN for GHES
 gh api user --hostname ghe.example.com -q '.login'
 ```

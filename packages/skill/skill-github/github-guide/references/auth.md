@@ -63,7 +63,7 @@ export GH_TOKEN="$(vault kv get -mount=secret -field=token github)" # HashiCorp 
 ```bash
 gh auth login --hostname ghe.example.com      # interactive
 export GH_HOST=ghe.example.com
-export GH_ENTERPRISE_TOKEN=ghp_xxx            # NOT GH_TOKEN for GHES
+export GH_ENTERPRISE_TOKEN="$(op read 'op://<vault>/ghes/token')"   # NOT GH_TOKEN for GHES
 gh api user --hostname ghe.example.com -q '.login'   # verify against the enterprise host
 ```
 
