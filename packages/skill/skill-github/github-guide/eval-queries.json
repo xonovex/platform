@@ -1,51 +1,15 @@
 [
   {
-    "query": "open a pull request against main with reviewers and a label using the gh CLI",
-    "should_trigger": true,
-    "split": "train",
-    "rationale": "gh pr create with reviewers/labels"
-  },
-  {
-    "query": "post an inline review comment anchored to a specific line on a GitHub pull request",
-    "should_trigger": true,
-    "split": "train",
-    "rationale": "inline anchor inside the reviews API object"
-  },
-  {
-    "query": "submit a REQUEST_CHANGES review with a summary and inline comments in one gh api call",
-    "should_trigger": true,
-    "split": "train",
-    "rationale": "atomic reviews object via gh api"
-  },
-  {
-    "query": "resolve a review thread on a GitHub PR from the terminal",
-    "should_trigger": true,
-    "split": "train",
-    "rationale": "GraphQL-only resolveReviewThread"
-  },
-  {
-    "query": "what token scope do I need so gh can push commits and open a PR",
-    "should_trigger": true,
-    "split": "train",
-    "rationale": "Contents: write to push, Pull requests: write to open PR"
-  },
-  {
     "query": "gh pr review won't let me add inline comments, how do I post them",
     "should_trigger": true,
     "split": "train",
     "rationale": "gh pr review has no inline support; drop to gh api reviews"
   },
   {
-    "query": "set GH_ENTERPRISE_TOKEN to authenticate gh against our GitHub Enterprise Server",
+    "query": "our release PR merges into the release/9 branch and carries 'Closes acme/tracker#4471' for a ticket in another repo \u2014 neither that one nor the plain 'Closes #123' ones ever close, but the same lines work on other PRs",
     "should_trigger": true,
     "split": "train",
-    "rationale": "GHES env var split vs GH_TOKEN"
-  },
-  {
-    "query": "my Closes #123 didn't close the issue when the PR merged, why",
-    "should_trigger": true,
-    "split": "train",
-    "rationale": "closing keyword auto-closes only on merge into default branch"
+    "rationale": "auto-close needs the default branch, and a cross-repo close needs owner/repo#N"
   },
   {
     "query": "reply in a review thread and mark it resolved so the PR can merge",
@@ -60,40 +24,34 @@
     "rationale": "404-hides-existence; read X-Accepted-GitHub-Permissions"
   },
   {
-    "query": "onboard a SHA-pinned reusable GitHub Actions workflow as a required ruleset check with a protected production environment",
-    "should_trigger": true,
-    "split": "validation",
-    "rationale": "GitHub-native reusable CI, repository, and deployment enforcement"
-  },
-  {
-    "query": "why can this GitHub ruleset be bypassed and how do matching rulesets and required checks combine",
-    "should_trigger": true,
-    "split": "validation",
-    "rationale": "GitHub-native ruleset layering and bypass behavior"
-  },
-  {
-    "query": "publish a durable implementation-decision comment on this GitHub PR and reconcile the same marked comment on retry without touching my unrelated latest comment",
-    "should_trigger": true,
-    "split": "validation",
-    "rationale": "provider-native pull-request context comment with append-only retry reconciliation"
-  },
-  {
-    "query": "create a GitHub issue with assignees labels milestone and a blocked-by relationship",
-    "should_trigger": true,
-    "split": "train",
-    "rationale": "GitHub-native ticket creation and metadata"
-  },
-  {
     "query": "add issue 482 to organization Project 7 and set its Status field to In progress without duplicating the item",
     "should_trigger": true,
     "split": "train",
     "rationale": "GitHub Projects v2 item and kanban field operation"
   },
   {
-    "query": "publish versioned decision context to this GitHub issue for the next agent session",
+    "query": "our merge bot is stuck on acme/widgets#412 \u2014 dan left a request-changes then went on PTO, two other people approved after him, and the bot still won't merge. the same bot merges straight through a request-changes on our other repo. it runs headless with just a token, no browser.",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "REQUEST_CHANGES clears only via the same reviewer or a write-access dismissal, never another approval"
+  },
+  {
+    "query": "we squashed and force-pushed feat/auth-retry and now PR #88 says merging is blocked on unresolved conversations, but the Conversation tab looks completely empty to me. what is actually holding it up?",
     "should_trigger": true,
     "split": "validation",
-    "rationale": "durable issue context comment"
+    "rationale": "invisible outdated threads block merge; detect with isOutdated, and the original author may be the only one who can resolve"
+  },
+  {
+    "query": "our review bot posts a review with inline comments on acme/widgets#412, then tries to reply under one of them: POST /repos/acme/widgets/pulls/412/comments/2231887/replies -> 404. the comment id came straight out of the response when we created the review and i can see that comment on the PR.",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "only reviewThreads returns full reply chains; reviews/timeline silently drop replies"
+  },
+  {
+    "query": "my review bot posts range comments on acme/widgets#77 \u2014 one finding covering src/parser/b.ts lines 10 through 14 as a single comment. it goes up, but github greys it out as 'outdated' almost immediately. i compute the diff position by counting hunk lines and pass the sha from git rev-parse HEAD in my checkout.",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "multi-line anchor ordering plus HEAD-sha commit_id explains the outdated symptom"
   },
   {
     "query": "open a merge request on a GitLab-hosted repo with glab and request reviewers",
