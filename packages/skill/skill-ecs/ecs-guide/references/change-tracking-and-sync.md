@@ -28,7 +28,7 @@ The ECS stores raw batch-iteration data and does not inherently know "what chang
 
 ```c
 // Good: brute-force mirror as an ordinary system; runs before dependent queries this frame
-void mirror_kinematics_system(tm_kinematic_actor_t *kd, const tm_transform_t *td, uint32_t n) {
+void mirror_kinematics_system(kinematic_actor_t *kd, const transform_t *td, uint32_t n) {
     while (n--) { kd->actor->setGlobalPose(to_physx(td)); ++kd, ++td; }
 }
 // Bad: on_transform_changed callback pushes to physics outside declared deps -> scheduler race + recursion

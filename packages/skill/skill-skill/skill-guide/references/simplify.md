@@ -39,7 +39,7 @@ frontmatter, one-line description, section headings, bullet points with rule + b
 
 #### Bullet format
 
-`- **Rule** - Brief 5-10 word how-to (references/{topic}.md)`
+`- **Rule** - Brief 5-10 word how-to, see [references/{topic}.md](references/{topic}.md)`
 
 #### Reference triggers
 

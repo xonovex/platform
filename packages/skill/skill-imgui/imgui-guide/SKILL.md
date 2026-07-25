@@ -40,7 +40,7 @@ Architecture for an immediate-mode GUI: the UI is re-issued every frame from app
 
 ```c
 // A button: stateless to issue, identified by a stable id; state lives in the ui context.
-bool button(tm_ui_o *ui, uint64_t id, rect_t r, const char *label) {
+bool button(ui_o *ui, uint64_t id, rect_t r, const char *label) {
     if (rect_contains(r, ui->mouse))
         ui->next_hover = id;                 // resolved at frame end (last-drawn wins)
     const bool clicked = ui->hover == id && ui->left_mouse_released;

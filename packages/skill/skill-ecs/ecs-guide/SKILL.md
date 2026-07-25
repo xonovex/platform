@@ -33,7 +33,7 @@ Architecture for a data-oriented ECS: how entities and components are stored, ho
 ```c
 // A system selects entity types whose bitmask includes (transform, velocity),
 // then walks the co-located component arrays with no per-entity lookup.
-void velocity_system(tm_transform_t *td, const tm_velocity_t *vd, uint32_t n, float dt) {
+void velocity_system(transform_t *td, const velocity_t *vd, uint32_t n, float dt) {
     while (n--) {
         td->pos = vec3_mul_add(td->pos, vd->vel, dt);
         ++td, ++vd;
