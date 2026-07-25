@@ -1,11 +1,11 @@
 {
   "name": "@xonovex/skill-typescript",
-  "version": "5.0.0",
+  "version": "5.1.0",
   "private": true,
   "type": "module",
   "dependencies": {
-    "@xonovex/skill-fp": "5.0.0",
-    "@xonovex/skill-oop": "5.0.0"
+    "@xonovex/skill-fp": "5.1.0",
+    "@xonovex/skill-oop": "5.1.0"
   },
   "keywords": [
     "xonovex",

@@ -1,11 +1,11 @@
 {
   "name": "@xonovex/skill-fdd",
-  "version": "5.0.0",
+  "version": "5.1.0",
   "private": true,
   "type": "module",
   "dependencies": {
-    "@xonovex/skill-ddd": "5.0.0",
-    "@xonovex/skill-user-stories": "5.0.0"
+    "@xonovex/skill-ddd": "5.1.0",
+    "@xonovex/skill-user-stories": "5.1.0"
   },
   "keywords": [
     "xonovex",

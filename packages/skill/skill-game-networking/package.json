@@ -1,10 +1,10 @@
 {
   "name": "@xonovex/skill-game-networking",
-  "version": "5.0.0",
+  "version": "5.1.0",
   "private": true,
   "type": "module",
   "dependencies": {
-    "@xonovex/skill-data-model": "5.0.0"
+    "@xonovex/skill-data-model": "5.1.0"
   },
   "keywords": [
     "xonovex",
