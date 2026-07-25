@@ -1,7 +1,6 @@
-import {defineConfig} from "vitest/config";
+/// <reference types="vitest" />
 
-export default defineConfig({
-  test: {
-    include: ["src/**/*.test.ts"],
-  },
-});
+import baseConfig from "@xonovex/vitest-config-node";
+import {defineConfig, mergeConfig} from "vitest/config";
+
+export default defineConfig(mergeConfig(baseConfig, {}));

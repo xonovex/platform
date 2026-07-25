@@ -14,5 +14,8 @@
     "script",
     "moon",
     "command"
-  ]
+  ],
+  "devDependencies": {
+    "@xonovex/vitest-config-node": "0.1.22"
+  }
 }
