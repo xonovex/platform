@@ -41,38 +41,36 @@
     "split": "train",
     "rationale": "colloquial ship; relies on commit-and-push"
   },
-
   {
     "query": "i've got a merge conflict in package-lock.json — help me resolve it",
-    "should_trigger": false,
+    "should_trigger": true,
     "split": "train",
-    "rationale": "near-miss: should match git-guide"
+    "rationale": "merge-conflict diagnosis and resolution"
   },
   {
     "query": "rebase my feature branch onto main and squash",
-    "should_trigger": false,
+    "should_trigger": true,
     "split": "train",
-    "rationale": "near-miss: should match git-guide"
+    "rationale": "explicit rebase and history rewrite"
   },
   {
     "query": "create a worktree for the new auth feature",
-    "should_trigger": false,
+    "should_trigger": true,
     "split": "train",
-    "rationale": "near-miss: should match plan-worktree-create"
+    "rationale": "Git worktree creation"
   },
   {
     "query": "merge the worktree back into main",
-    "should_trigger": false,
+    "should_trigger": true,
     "split": "train",
-    "rationale": "near-miss: should match plan-worktree-merge"
+    "rationale": "Git worktree integration"
   },
   {
     "query": "show me the diff between my branch and main",
-    "should_trigger": false,
+    "should_trigger": true,
     "split": "train",
-    "rationale": "read-only git, not commit-and-push"
+    "rationale": "read-only Git repository inspection"
   },
-
   {
     "query": "commit what i have so far with a wip message",
     "should_trigger": true,
@@ -103,23 +101,70 @@
     "split": "validation",
     "rationale": "colloquial commit + push"
   },
-
   {
     "query": "what's the convention for naming feature branches here",
-    "should_trigger": false,
+    "should_trigger": true,
     "split": "validation",
-    "rationale": "near-miss: workflow question, should match git-guide"
+    "rationale": "Git branch convention question"
   },
   {
     "query": "revert the last 3 commits",
-    "should_trigger": false,
+    "should_trigger": true,
     "split": "validation",
-    "rationale": "near-miss: history rewrite, should match git-guide"
+    "rationale": "Git history mutation"
   },
   {
     "query": "stash my changes so i can switch branches",
-    "should_trigger": false,
+    "should_trigger": true,
     "split": "validation",
-    "rationale": "near-miss: stash, not commit"
+    "rationale": "Git worktree-state operation"
+  },
+  {
+    "query": "open a merge request against main with glab on this GitLab repo",
+    "rationale": "near miss owned by gitlab-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "open a pull request against main with reviewers and a label using the gh CLI",
+    "rationale": "near miss owned by github-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "help me write a good pull request description for this change",
+    "rationale": "near miss owned by pull-request-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "bump this package to a minor release",
+    "rationale": "near miss owned by versioning-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "approve a merge request from the command line on GitLab",
+    "rationale": "near miss owned by gitlab-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "reply in a review thread and mark it resolved so the PR can merge",
+    "rationale": "near miss owned by github-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "how big should a pull request be",
+    "rationale": "near miss owned by pull-request-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "release 1.4.0 and add the changelog entries",
+    "rationale": "near miss owned by versioning-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

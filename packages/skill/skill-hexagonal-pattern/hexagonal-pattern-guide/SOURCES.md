@@ -31,6 +31,12 @@
 - **Aspects extracted:**
   - Stable-dependencies / stable-abstractions, instability, Zone of Pain → `references/dependency-inversion.md`
 
+## Guide-level synthesis
+
+- **Provenance:** Repository-original integration of the source blocks above; these references combine multiple inputs or maintained conventions rather than one exclusive upstream
+- **References:** references/testability.md
+- **Last reviewed:** 2026-06-27
+
 ## Refresh Workflow
 
 1. Re-read the upstream source(s) above

@@ -50,13 +50,13 @@
   {
     "query": "one node should adapt its input and output types depending on what's wired into it — a CPU image vs a GPU image — instead of me making two near-identical nodes",
     "should_trigger": true,
-    "split": "train",
+    "split": "validation",
     "rationale": "polymorphic/variant node resolving pin types from connections -> typing-and-connections.md"
   },
   {
     "query": "the last node in my graph produces a draw call but nothing actually runs it; where is the work supposed to get scheduled from",
     "should_trigger": true,
-    "split": "train",
+    "split": "validation",
     "rationale": "terminal/output node hands result to owning system which schedules -> node-model.md (scheduling itself -> gpu-rendering-guide)"
   },
   {
@@ -92,7 +92,43 @@
   {
     "query": "I'm designing the reflectable typed object store with properties and references that everything serializes into",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "near-miss: the underlying typed data model / object store -> data-model-guide, not the graph layer on top"
+  },
+  {
+    "query": "I'm building the core document store for our level editor — objects of different kinds each with a set of named properties, and I want to add new object types at runtime without recompiling. How should the type/property schema work?",
+    "rationale": "near miss owned by data-model-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "our particle simulator stalls when we have 50k particles — the update loop reads position and velocity out of a fat 96-byte struct, can you restructure it for cache efficiency",
+    "rationale": "near miss owned by data-oriented-design-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "our renderer hand-writes a barrier before and after every pass and it breaks every time we reorder passes — I want passes to just declare what they read and write and have ordering and transitions figured out for us",
+    "rationale": "near miss owned by gpu-rendering-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "our editor lets artists drop in an FBX or PNG and we want them edited in-tool but shipped as packed GPU-ready data — how should we structure the two forms so editing and loading don't fight each other",
+    "rationale": "near miss owned by asset-pipeline-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "give me a single typed object database where every node has properties, children it owns, and links to other nodes by id, and the whole thing notifies on edit, supports undo, and saves to a versioned file",
+    "rationale": "near miss owned by data-model-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "we need to emit different compressed texture formats and byte order per target platform but share one source asset — how should the pipeline handle platforms",
+    "rationale": "validation near miss owned by asset-pipeline-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

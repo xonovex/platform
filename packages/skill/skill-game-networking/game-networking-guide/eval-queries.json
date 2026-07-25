@@ -56,19 +56,19 @@
   {
     "query": "I want to run a server and a client in the same process to debug, then deploy them to separate machines without changing code. How do I make local talk behave like remote?",
     "should_trigger": true,
-    "split": "train",
+    "split": "validation",
     "rationale": "direct: virtual networking / in-process short-circuit -> dev-iteration-and-observability.md"
   },
   {
     "query": "How can I fake 150ms of lag and a bandwidth cap in the editor so I can reproduce a desync bug without a real bad network?",
     "should_trigger": true,
-    "split": "train",
+    "split": "validation",
     "rationale": "direct: injected latency/bandwidth + packet inspection -> dev-iteration-and-observability.md"
   },
   {
     "query": "I need to fire a remote event at a specific entity on the other side and sometimes the order of these events matters and sometimes it doesn't. How should I send them?",
     "should_trigger": true,
-    "split": "train",
+    "split": "validation",
     "rationale": "implicit: replicate event by id, ordered vs unordered delivery -> state-replication.md / transport-and-channels.md"
   },
   {
@@ -98,13 +98,43 @@
   {
     "query": "How do I give every asset and object a stable GUID so references survive save/load and renaming?",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "near-miss: typed object/id model -> data-model-guide, not networking (networking only reuses those ids)"
   },
   {
     "query": "I need to insert the right resource barriers between my render passes and alias transient targets on the GPU",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "near-miss: GPU frame graph -> gpu-rendering-guide, not networking"
+  },
+  {
+    "query": "I'm building the core document store for our level editor — objects of different kinds each with a set of named properties, and I want to add new object types at runtime without recompiling. How should the type/property schema work?",
+    "rationale": "near miss owned by data-model-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "I'm building an ECS and can't decide how to store components — should each entity own its components or should I group entities by which components they have?",
+    "rationale": "near miss owned by ecs-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "our particle simulator stalls when we have 50k particles — the update loop reads position and velocity out of a fat 96-byte struct, can you restructure it for cache efficiency",
+    "rationale": "near miss owned by data-oriented-design-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "I want artists to build effects by dragging boxes onto a canvas and connecting their inputs and outputs with wires instead of writing code — how should I structure the thing they're editing",
+    "rationale": "near miss owned by node-graph-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "how should rendering components hook into the engine so I can cull lots of meshes per camera and feed several shadow views in one pass?",
+    "rationale": "validation near miss owned by ecs-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

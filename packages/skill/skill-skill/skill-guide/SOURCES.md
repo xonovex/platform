@@ -118,3 +118,32 @@
   - `allowed-tools` frontmatter (experimental, space-separated allowlist) → least-privilege section; the "reduces blast radius, not injection likelihood" framing also informed by the security-considerations section of https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview
   - `compatibility` field for declaring network/runtime needs → network/runtime section
   - Treat-skills-as-software, audit untrusted scripts/URLs, fetched-content-as-untrusted-data, no hardcoded secrets → repo-original synthesis (not a transcription of an upstream "Security" page)
+
+## OpenAI Codex skills and non-interactive mode
+
+- **URLs:**
+  - https://learn.chatgpt.com/docs/build-skills.md
+  - https://learn.chatgpt.com/docs/non-interactive-mode.md
+- **Last reviewed:** 2026-07-22
+- **References:** references/evaluating-triggers.md, references/evaluating-outputs.md
+- **Aspects extracted:** Codex skill discovery and progressive disclosure; implicit routing from skill descriptions; repository/user skill locations; explicit `$skill-name` invocation; ephemeral JSONL `codex exec`; ignored user configuration and execution rules; read-only sandbox selection.
+
+## Xonovex skill-evaluation policy
+
+- **Provenance:** Repository-original catalog routing, evidence-health, repetition, and tier-gate policy maintained with the evaluator implementations
+- **Last reviewed:** 2026-07-22
+- **References:** references/evaluating-triggers.md, references/evaluating-outputs.md
+- **Aspects extracted:** Competitive multi-skill routing scenarios, two-run CI evidence, full activation, absolute pass-rate floors, and minimum quality deltas are repository conventions.
+
+## Xonovex skill-composition conventions
+
+- **Provenance:** Repository-original skill ownership, description-based routing, and manifest dependency conventions
+- **Last reviewed:** 2026-07-24
+- **References:** references/composability.md, references/catalog-audit.md, references/create.md, references/decompose.md, references/merge.md, references/validate.md, references/workflow-skills.md
+- **Aspects extracted:** One concept per owner; optional runtime selection by installed skill name and description; exact dependency-first installation through manifests; acyclic dependency direction; source-provenance recording.
+
+## Guide-level synthesis
+
+- **Provenance:** Repository-original integration of the source blocks above; these references combine multiple inputs or maintained conventions rather than one exclusive upstream
+- **References:** references/decompose.md, references/extract-from-codebase.md, references/merge.md, references/optimize.md, references/simplify.md, references/workflow-skills.md
+- **Last reviewed:** 2026-05-27

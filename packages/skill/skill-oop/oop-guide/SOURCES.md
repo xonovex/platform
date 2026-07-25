@@ -5,6 +5,7 @@
 - **Title:** "Refactoring: Improving the Design of Existing Code" (Martin Fowler & Kent Beck), Ch. 3 "Bad Smells in Code"
 - **URL:** https://martinfowler.com/books/refactoring.html
 - **Last reviewed:** 2026-06-27
+- **References:** all
 - **Used for:**
   - `SKILL.md` → Design smells
 - **Aspects extracted:**
@@ -15,6 +16,7 @@
 - **Title:** Liskov & Wing — "A Behavioral Notion of Subtyping" (ACM TOPLAS, 1994); Barbara Liskov, OOPSLA 1987 keynote
 - **URL:** https://dl.acm.org/doi/10.1145/197320.197383
 - **Last reviewed:** 2026-06-27
+- **References:** all
 - **Used for:**
   - `SKILL.md` → Design smells (Refused Bequest, Downcasting), Gotchas (Liskov)
 - **Aspects extracted:**
@@ -24,6 +26,7 @@
 
 - **URL:** https://en.wikipedia.org/wiki/SOLID
 - **Last reviewed:** 2026-06-27
+- **References:** all
 - **Used for:**
   - `SKILL.md` → Best practices, Design smells
 - **Aspects extracted:**

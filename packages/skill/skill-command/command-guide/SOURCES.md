@@ -12,6 +12,20 @@
   - `` !`cmd` `` inline shell execution
   - Skill / command merger in v2.1.101 — skill wins on name collision
 
+## Codex: Plugins, Skills, and Custom Prompts
+
+- **URL:** https://developers.openai.com/codex/plugins
+- **URL:** https://developers.openai.com/codex/skills
+- **URL:** https://developers.openai.com/codex/custom-prompts
+- **Last reviewed:** 2026-07-22
+- **Used for:** `references/harness-formats.md` → Codex matrix row, Claude Code → Codex migration note, custom-prompt gotcha; `references/distill.md` → Codex skill distribution boundary
+- **Aspects extracted:**
+  - Plugin manifests distribute Agent Skills through the `skills` component
+  - Repository and user skill discovery locations
+  - Explicit `$skill-name` invocation
+  - Custom prompts under `~/.codex/prompts/` are deprecated and user-local
+  - Claude command packages should become directly distributed skills for Codex
+
 ## Cursor: Rules
 
 - **URL:** https://cursor.com/docs/rules
@@ -127,3 +141,9 @@
   - `$@` (all args) and `{{name}}` (named placeholders) substitution
   - `/name` invocation; skills separate via `/skill:name`
   - `--no-prompt-templates` disable flag
+
+## Guide-level synthesis
+
+- **Provenance:** Repository-original integration of the source blocks above; these references combine multiple inputs or maintained conventions rather than one exclusive upstream
+- **References:** references/create.md, references/distill.md, references/merge.md, references/simplify.md
+- **Last reviewed:** 2026-07-24

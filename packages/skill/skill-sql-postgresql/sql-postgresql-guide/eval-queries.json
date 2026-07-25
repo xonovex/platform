@@ -1,0 +1,98 @@
+[
+  {
+    "query": "Design a PostgreSQL table for meeting-room reservations. Each reservation has a room, a start time, and an end time. The database itself must guarantee that two reservations for the same room can never overlap in time. Write the CREATE TABLE statement.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "We have a products table with tens of millions of rows and an API endpoint that lets users page through them ordered by created_at descending. The current implementation uses LIMIT with a page offset and gets slower on deeper pages. Rewrite the pagination query so it stays fast on any page.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "This query is doing a sequential scan and is slow on a large users table: SELECT * FROM users WHERE lower(email) = 'user@example.com'. There is already a B-tree index on the email column but the planner ignores it. Add an index that makes this query use an index scan.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Set up a PostgreSQL readwrite role for an application in the public schema. The application user must be able to SELECT/INSERT/UPDATE/DELETE on all existing tables, on any tables created later without re-granting, and it must be able to insert into tables that use identity/serial columns. Provide the SQL.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Rewrite this PostgreSQL report query with readable CTEs while ensuring an accidentally materialized intermediate result does not regress performance.",
+    "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
+    "split": "train"
+  },
+  {
+    "query": "Choose PostgreSQL types for money, timestamps, bounded status values, and identifiers without using text for every column.",
+    "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
+    "split": "validation"
+  },
+  {
+    "query": "Design indexes for a PostgreSQL query filtering tenant_id and status, ordering by created_at, and returning only active rows; verify with EXPLAIN ANALYZE.",
+    "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
+    "split": "validation"
+  },
+  {
+    "query": "Add primary, foreign-key, unique, check, and exclusion constraints to enforce these booking invariants in PostgreSQL.",
+    "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
+    "split": "validation"
+  },
+  {
+    "query": "Write a Lua 5.4 function `load_config(path)` that opens the file at `path`, reads all of it, and returns the parsed contents. Show how a caller would use it when the file might not exist, falling back to a default config instead of crashing.",
+    "rationale": "near miss owned by lua-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Write an async Python function fetch_all(urls) that retrieves the body of each URL over HTTP and returns them as a list. The URLs are independent of one another and there may be dozens of them.",
+    "rationale": "near miss owned by python-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "add proper types to the response shape in src/api/users.ts so the consumer doesn't have to cast",
+    "rationale": "near miss owned by typescript-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "I'm building the core document store for our level editor — objects of different kinds each with a set of named properties, and I want to add new object types at runtime without recompiling. How should the type/property schema work?",
+    "rationale": "near miss owned by data-model-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "A Lua loop accidentally writes counters into _G. Fix the scoping and explain which locals should be captured by the returned closures.",
+    "rationale": "near miss owned by lua-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Tighten this Python module until pyright strict passes without Any, ignored errors, or casts that hide an invalid state.",
+    "rationale": "near miss owned by python-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "rewrite this string concat with template literals and pull out the magic numbers as named consts",
+    "rationale": "near miss owned by typescript-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "give me a single typed object database where every node has properties, children it owns, and links to other nodes by id, and the whole thing notifies on edit, supports undo, and saves to a versioned file",
+    "rationale": "near miss owned by data-model-guide",
+    "should_trigger": false,
+    "split": "validation"
+  }
+]

@@ -1,0 +1,98 @@
+[
+  {
+    "query": "We just wrapped a debugging session where I made a couple of mistakes and had to correct course. Capture the development lessons from this session and save each one as its own file so a future agent can reuse it. Show me exactly what one of those files should contain.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Fold the lessons from this session into our project's AGENTS.md instructions. Explain how the reflect tooling does this by default before you run it.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "This session surfaced one useful lesson about how we type JSON responses in our tests. Should I spin up a new guideline skill to capture it? Tell me where this lesson should actually live.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "When I extract insights from a session, I usually just tag every one with applies_to: [\"general\"] to keep it simple. Is that a good idea for how these get integrated later?",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "A policy denial and an incident both suggest a new organization-wide blocking rule. Extract the lesson and promote it automatically to every agent configuration.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Review these session notes and promote only evidence-backed recurring lessons into durable project instructions with an owner and validation rule.",
+    "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
+    "split": "validation"
+  },
+  {
+    "query": "Extract the mistakes, successful tactics, and unresolved risks from this completed debugging session without retelling the transcript.",
+    "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
+    "split": "validation"
+  },
+  {
+    "query": "Integrate one reusable lesson into AGENTS.md in present tense, remove the superseded rule, and keep invocation-specific details out.",
+    "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
+    "split": "validation"
+  },
+  {
+    "query": "create a new skill for our GraphQL resolver conventions — SKILL.md plus a few reference files",
+    "rationale": "near miss owned by skill-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Rewrite this so it reads like a person wrote it, not an AI: 'Our platform offers a seamless, intuitive experience that empowers teams to unlock their full potential. Experts agree it's a game-changer, and studies show productivity has never been better.'",
+    "rationale": "near miss owned by content-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "I have a Claude Code slash command at `.claude/commands/changelog.md`. Its body uses `$ARGUMENTS` for the user input and embeds git output inline with `` !`git log --oneline -20` ``. I want to port this same command to the Gemini CLI. Tell me exactly what to change and where the file goes.",
+    "rationale": "near miss owned by command-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "this packages/auth dir doesn't have an AGENTS.md yet — set one up",
+    "rationale": "near miss owned by instruction-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "before we install this third-party skill, audit its scripts and the URLs it fetches and lock down what tools it's allowed to use",
+    "rationale": "near miss owned by skill-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Rewrite this destination article so it sounds locally informed and specific, removes generic travel clichés, and preserves every verified fact.",
+    "rationale": "near miss owned by content-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Merge two prompt commands that both prepare releases while preserving their distinct validation branches and removing duplicated instructions.",
+    "rationale": "near miss owned by command-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "the new microservice doesn't have project instructions yet — generate one based on what's in src/",
+    "rationale": "near miss owned by instruction-guide",
+    "should_trigger": false,
+    "split": "validation"
+  }
+]

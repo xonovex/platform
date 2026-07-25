@@ -1,0 +1,98 @@
+[
+  {
+    "query": "Write an Express 5 + TypeScript login route handler. It should look up the user by email, verify the submitted password against the stored hash, and on success return a signed JWT the client will send on future API requests.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Write a centralized error-handling middleware for an Express 5 + TypeScript API that turns thrown errors into JSON responses, and show how it is registered on the app.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Write a reusable Express + TypeScript middleware factory that validates an incoming request body against a given Zod schema before the route handler runs.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Set up the main app entrypoint (app.ts) for an Express 5 + TypeScript API: wire helmet, cors, morgan, JSON body parsing, mount the route modules, and handle unmatched routes.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Restructure this Express 5 API so routers, middleware, controllers, and domain services have clear boundaries without a global mutable app singleton.",
+    "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
+    "split": "train"
+  },
+  {
+    "query": "Validate Express route params and JSON bodies at the boundary, return field-level 400 responses, and pass typed values to the service layer.",
+    "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
+    "split": "validation"
+  },
+  {
+    "query": "An async Express 5 handler throws but clients receive HTML and logs duplicate the error. Implement one JSON error boundary with explicit operational-error mapping.",
+    "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
+    "split": "validation"
+  },
+  {
+    "query": "Add bearer-token authentication and authorization middleware to selected Express routes while keeping public health endpoints outside the protected router.",
+    "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
+    "split": "validation"
+  },
+  {
+    "query": "Using Zod 4, write a TypeScript schema named UserSchema for a user object with these fields: an id that is a UUID, an email address, a createdAt that is an ISO datetime string, and a name string between 1 and 100 characters. Also export the inferred TypeScript type.",
+    "rationale": "near miss owned by zod-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "I have a Hono app configured with `app.use('*', cors())`. Write a Vitest test that verifies the CORS preflight (OPTIONS) request to `/api/users` with an Origin header succeeds and that the Access-Control-Allow-Origin header is returned.",
+    "rationale": "near miss owned by vitest-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "In a Hono API running on Node with @hono/node-server, add a WebSocket endpoint at /ws/chat that echoes each incoming message back to the sender. Show both the server bootstrap code and the route definition.",
+    "rationale": "near miss owned by hono-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "add proper types to the response shape in src/api/users.ts so the consumer doesn't have to cast",
+    "rationale": "near miss owned by typescript-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Migrate these Zod 3 string and error-customization schemas to Zod 4 without changing accepted inputs or issue paths.",
+    "rationale": "near miss owned by zod-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Test a Hono or Express HTTP endpoint with Vitest, including JSON validation, status, headers, and a CORS preflight request.",
+    "rationale": "near miss owned by vitest-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Validate a Hono JSON request with Zod, expose the inferred type to the handler, and return a consistent 422 response for invalid input.",
+    "rationale": "near miss owned by hono-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "rewrite this string concat with template literals and pull out the magic numbers as named consts",
+    "rationale": "near miss owned by typescript-guide",
+    "should_trigger": false,
+    "split": "validation"
+  }
+]

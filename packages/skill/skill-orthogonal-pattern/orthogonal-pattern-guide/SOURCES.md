@@ -17,11 +17,11 @@
   - `SKILL.md` → Essentials (structure mirrors the model), Gotchas (package by layer hides axes)
 - **Aspects extracted:**
   - The "axis of change" reading of SRP → `references/finding-axes.md`
-  - Package-by-axis/feature vs package-by-layer (screaming architecture) → `references/structure-isomorphism.md`
+  - Package-by-axis/feature vs package-by-layer (screaming architecture) → `references/applying-the-layout.md`
 
 ## Software product lines — commonality / variability analysis
 
-- **URL:** https://www.sei.cmu.edu/our-work/software-product-lines/
+- **URL:** https://www.sei.cmu.edu/library/software-product-lines-collection/
 - **Last reviewed:** 2026-06-27
 - **Used for:**
   - `SKILL.md` → Essentials (shared-core + per-variant leaves)
@@ -66,7 +66,7 @@
 - **Used for:**
   - `SKILL.md` → Gotchas (Zone of Pain)
 - **Aspects extracted:**
-  - REP/CCP/CRP component cohesion; ADP/SDP/SAP component coupling; instability metric and Main Sequence (Zone of Pain) → `references/commonality-variability.md`, `references/structure-isomorphism.md`, `references/variation-point-bridges.md`
+  - Shared/variant cohesion and dependency direction → `references/commonality-variability.md`, `references/variation-point-bridges.md`
 
 ## Software product lines & variability
 
@@ -79,7 +79,7 @@
   - `SKILL.md` → framing, Essentials
 - **Aspects extracted:**
   - Commonality/variability analysis, variation point, variant → `references/finding-axes.md`, `references/commonality-variability.md`
-  - Feature models, cross-tree constraints (requires/excludes), orthogonal variability model → `references/structure-isomorphism.md`, `references/variation-point-bridges.md`
+  - Feature models, cross-tree constraints (requires/excludes), orthogonal variability model → `references/variation-point-bridges.md`
 
 ## Separation of concerns & cross-cutting concerns
 
@@ -116,7 +116,13 @@
 - **Used for:**
   - `references/boundary-alignment.md`
 - **Aspects extracted:**
-  - Structure mirrors team communication; single owner per axis; bounded-context / domain-seam alignment; fitness functions / architecture tests → `references/structure-isomorphism.md`, `references/applying-the-layout.md`
+  - Structure mirrors team communication; single owner per axis; bounded-context and domain-seam alignment → `references/boundary-alignment.md`, `references/applying-the-layout.md`
+
+## Guide-level synthesis
+
+- **Provenance:** Repository-original integration of the source blocks above; these references combine multiple inputs or maintained conventions rather than one exclusive upstream
+- **References:** references/boundary-alignment.md, references/naming-symmetry.md
+- **Last reviewed:** 2026-06-27
 
 ## Refresh Workflow
 

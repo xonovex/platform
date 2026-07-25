@@ -48,7 +48,7 @@
     "rationale": "near-miss: runbook, not a decision"
   },
   {
-    "query": "draft a decision record for moving the store to Postgres",
+    "query": "Choose between Kafka and NATS for event delivery and record an architecture decision with the final outcome.",
     "should_trigger": true,
     "split": "validation",
     "rationale": "decision record, synonym for ADR"
@@ -62,13 +62,43 @@
   {
     "query": "add a tutorial showing how to call the SDK",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "near-miss: tutorial, not a decision"
   },
   {
     "query": "explain this algorithm in inline code comments",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "near-miss: code comments, not a decision record"
+  },
+  {
+    "query": "Our platform already ships a feature where every backend service stores and transports timestamps in UTC and only localizes them at the display layer. There is no decision record for this yet. Write one.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Return a machine-readable operation result for the partial run, including effects, evidence, uncertainty, retry, and revisions.",
+    "rationale": "near miss requesting artifact creation rather than an architecture decision record",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "how do I get the business and developers speaking the same vocabulary that also shows up in the code?",
+    "rationale": "near miss owned by ddd-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Research the code paths and current library versions we need before planning rate limiting for packages/api. Keep it read-only and cite the evidence.",
+    "rationale": "near miss owned by plan-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "run the workflow workspace-create utility from main at this exact revision and report the provider-native workspace location",
+    "rationale": "validation request without architecture decision-record work",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

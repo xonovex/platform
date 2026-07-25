@@ -50,43 +50,43 @@
   {
     "query": "in my retained-vs-immediate UI experiment, how do I keep widget state across frames when I re-issue every control from scratch?",
     "should_trigger": true,
-    "split": "validation",
+    "split": "train",
     "rationale": "validation positive: immediate-mode state model, what persists vs recomputed"
   },
   {
     "query": "a keyboard shortcut creates a popup that then immediately reacts to the same keypress that opened it — how do I stop that?",
     "should_trigger": true,
-    "split": "validation",
+    "split": "train",
     "rationale": "validation positive: event ordering / one-frame delay for event-created controls"
   },
   {
     "query": "style this landing page hero section with a bold gradient and tasteful typography",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "validation negative: visual web design -> frontend-design"
   },
   {
     "query": "lay out my CPU entity components as struct-of-arrays so the simulation loop is cache-friendly",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "validation negative: ECS/data layout -> ecs-guide / data-oriented-design-guide"
   },
   {
     "query": "I need to translate all the text in my immediate-mode tool UI into other languages without maintaining a giant table of string IDs — what's a good approach?",
     "should_trigger": true,
-    "split": "train",
+    "split": "validation",
     "rationale": "localization: hash source string as key, swappable localizer, extraction tool, pseudo-loc"
   },
   {
     "query": "how do I tell which UI strings I forgot to wrap for translation, and make sure the layout doesn't break when translations are longer?",
     "should_trigger": true,
-    "split": "train",
+    "split": "validation",
     "rationale": "localization: pseudo-localization (gibberish) mode padded longer to catch unmarked strings + expansion"
   },
   {
     "query": "people keep telling me an immediate-mode GUI can't support a screen reader — how do I expose my widgets to assistive tech and keyboard-only users?",
     "should_trigger": true,
-    "split": "train",
+    "split": "validation",
     "rationale": "accessibility: per-frame side semantic list registered while drawing, bridged to platform a11y APIs"
   },
   {
@@ -98,7 +98,25 @@
   {
     "query": "translate the copy on my marketing landing page into French and German with a CMS",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "near-miss: web content localization, not an immediate-mode UI string system -> not this skill"
+  },
+  {
+    "query": "our renderer hand-writes a barrier before and after every pass and it breaks every time we reorder passes — I want passes to just declare what they read and write and have ordering and transitions figured out for us",
+    "rationale": "near miss owned by gpu-rendering-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "I'm building an ECS and can't decide how to store components — should each entity own its components or should I group entities by which components they have?",
+    "rationale": "near miss owned by ecs-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "give me the exact VkImageMemoryBarrier2 with srcStageMask/srcAccessMask and dstStageMask/dstAccessMask plus the oldLayout/newLayout for reading a color attachment as a sampled texture, and the vkCmdPipelineBarrier2 call",
+    "rationale": "near miss owned by gpu-rendering-vulkan-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

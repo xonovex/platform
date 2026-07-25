@@ -56,19 +56,19 @@
   {
     "query": "my translate gizmo jumps to the cursor on the first frame of the drag and our math divides by something that's basically zero when the handle points toward the camera",
     "should_trigger": true,
-    "split": "train",
+    "split": "validation",
     "rationale": "gizmo-math: apply the delta from a stored start parameter and guard near-parallel/degenerate denominators with an epsilon"
   },
   {
     "query": "our transform handles become tiny and unclickable when the camera pulls back — how do I keep them a constant size on screen",
     "should_trigger": true,
-    "split": "train",
+    "split": "validation",
     "rationale": "gizmo-math: scale handle geometry by camera distance for constant on-screen pixel size"
   },
   {
     "query": "where should the boundary sit between editor code and the renderer for things like the grid and selection overlays so editor code never touches command buffers",
     "should_trigger": true,
-    "split": "train",
+    "split": "validation",
     "rationale": "render-editor-integration: thin POD data seam, viewport layer owns pipeline details, composite after post in sRGB"
   },
   {
@@ -86,7 +86,7 @@
   {
     "query": "model the component/entity data so each renderable stores its transform and the system iterates them cache-friendly",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "near-miss: generic component/data model layout -> ecs-guide / data-model-guide, not the viewport gizmo interface"
   },
   {
@@ -104,7 +104,31 @@
   {
     "query": "show me the exact VkImageMemoryBarrier2 and vkCmdPipelineBarrier2 for transitioning my id render target from color-attachment to a sampled read",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "validation negative: concrete Vulkan barrier how-to -> gpu-rendering-vulkan-guide, not the viewport seam"
+  },
+  {
+    "query": "our renderer hand-writes a barrier before and after every pass and it breaks every time we reorder passes — I want passes to just declare what they read and write and have ordering and transitions figured out for us",
+    "rationale": "near miss owned by gpu-rendering-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "I'm building the core document store for our level editor — objects of different kinds each with a set of named properties, and I want to add new object types at runtime without recompiling. How should the type/property schema work?",
+    "rationale": "near miss owned by data-model-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "I'm writing a small C99 physics engine. Define a rigid body struct and a function that applies a linear impulse to it. It must correctly handle both dynamic bodies and immovable/static bodies.",
+    "rationale": "near miss owned by c99-game-opinionated-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "I'm building an ECS and can't decide how to store components — should each entity own its components or should I group entities by which components they have?",
+    "rationale": "near miss owned by ecs-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

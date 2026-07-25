@@ -1,39 +1,39 @@
 [
   {
-    "query": "our internal/ dir has grown into a mess — there's a sandbox folder, a sandboxutil folder next to it, and nix code buried three levels deep; reorganize it so it stops feeling like spaghetti",
+    "query": "our notification code has grown into a mess — channel folders sit beside sendutil and template code is buried three levels deep; reorganize it so the independent choices are obvious",
     "should_trigger": true,
     "split": "train",
-    "rationale": "direct: reorganize a tangled tree into clean axes, misplaced util/nix packages"
+    "rationale": "direct: reorganize a tangled tree into clean domain axes and remove a homeless utility package"
   },
   {
-    "query": "I have isolation, network and provision as separate flags but the folders don't reflect that — where should the nix provisioning code actually live?",
+    "query": "I have format, destination, and compression as separate configuration choices but the folders don't reflect that — where should each implementation live?",
     "should_trigger": true,
     "split": "train",
-    "rationale": "direct: structure should mirror the orthogonal axes; nixprov belongs under a provision axis"
+    "rationale": "direct: structure should mirror independently selectable axes"
   },
   {
-    "query": "we have bwrap and docker backends and want to add a third without editing the existing ones — how should the packages be laid out?",
+    "query": "we have email and SMS notification channels and want to add push without reorganizing the existing ones — how should the packages be laid out?",
     "should_trigger": true,
     "split": "train",
     "rationale": "implicit: shared-core + per-variant leaves, Strategy per axis, open-for-extension layout"
   },
   {
-    "query": "name these sibling modules consistently — right now it's sandbox, net, and nixprov and it reads inconsistently",
+    "query": "name these sibling modules consistently — right now it's send-email, sms-provider, and push and they read like different categories",
     "should_trigger": true,
     "split": "train",
-    "rationale": "naming symmetry: sibling concepts need sibling grammar; tool-named leaves are a smell"
+    "rationale": "naming symmetry: sibling channel variants need one grammar and abstraction level"
   },
   {
-    "query": "the CLI and the kubernetes operator have drifted — they implement the same concepts but with totally different folder structures; make them symmetric",
+    "query": "the web request path and background worker have drifted — they implement the same notification concepts under totally different folder names; make them symmetric",
     "should_trigger": true,
     "split": "train",
     "rationale": "consumer symmetry: two realizers of the same axes should rhyme, share down to a common lib"
   },
   {
-    "query": "bwrap needs some nix-specific glue to mount the closure — should that be a new top-level package?",
+    "query": "the email channel needs a small piece of HTML-template-specific glue — should that become a new top-level html-email package?",
     "should_trigger": true,
     "split": "train",
-    "rationale": "variation-point bridge: localize cross-axis coupling inside the type, don't hoist a sibling"
+    "rationale": "variation-point bridge: localize one cross-axis constraint inside the dependent variant"
   },
   {
     "query": "should this be packaged by feature or by layer? right now everything is split into controllers/, services/, utils/, types/",
@@ -68,31 +68,31 @@
   {
     "query": "I'm designing a new tool with three independent config dimensions — input format, transport, and output sink — how do I lay out the packages so adding one input doesn't touch the others?",
     "should_trigger": true,
-    "split": "validation",
+    "split": "train",
     "rationale": "validation positive: orthogonal axes + cross-product, fan-out layout, open-for-extension"
   },
   {
-    "query": "a single utils package at the repo root has become a dumping ground — every axis throws its helpers in there; how should I distribute them?",
+    "query": "a shared helpers package at the repo root has become a dumping ground — notification channels, templates, and delivery policies all put unrelated code there; how should I distribute it?",
     "should_trigger": true,
     "split": "validation",
     "rationale": "validation positive: per-axis shared/, axis owns its own utils, no homeless util sibling"
   },
   {
-    "query": "rename the provisioner type from nixprov to just nix and move it next to its sibling provisioners",
+    "query": "rename the email_sender module to email and move it beside the sms and push channel variants",
     "should_trigger": true,
     "split": "validation",
-    "rationale": "validation positive: bare type names under axis context, sibling co-location"
+    "rationale": "validation positive: bare variant names under axis context and sibling co-location"
   },
   {
     "query": "write the kubernetes Deployment and NetworkPolicy manifests for this service",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "validation negative: authoring k8s manifests -> kubernetes-guide, not package decomposition"
   },
   {
     "query": "profile whether the broad-phase is cache-bound before I change any layout",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "validation negative: measurement of runtime cache behavior -> data-oriented-design-guide"
   },
   {
@@ -114,7 +114,7 @@
     "rationale": "near-miss: narrow ports / interface segregation -> hexagonal-pattern-guide"
   },
   {
-    "query": "the core package imports the concrete docker and nix packages directly; invert it so the core depends only on interfaces",
+    "query": "the core package imports the concrete email and SMS adapters directly; invert it so the core depends only on interfaces",
     "should_trigger": false,
     "split": "validation",
     "rationale": "near-miss: dependency inversion / ports-and-adapters -> hexagonal-pattern-guide"
@@ -122,25 +122,25 @@
   {
     "query": "should I model this as an abstract base class with virtual methods or a plain interface — which OO construct fits?",
     "should_trigger": false,
-    "split": "train",
+    "split": "validation",
     "rationale": "near-miss: class/paradigm construct choice -> oop-guide, not axis decomposition"
   },
   {
     "query": "logging, metrics, and the auth check are copied into every backend and I keep forgetting one — where should concerns that touch every backend live?",
     "should_trigger": true,
-    "split": "train",
+    "split": "validation",
     "rationale": "cross-cutting concerns: scattering/tangling, weave once at the composition root, not a sibling axis"
   },
   {
     "query": "should the storage backend be picked at compile time with build flags, or at runtime from config — and how does that change the wiring?",
     "should_trigger": false,
-    "split": "train",
+    "split": "validation",
     "rationale": "near-miss: binding time -> microkernel-pattern-guide"
   },
   {
     "query": "we split the monolith into packages but everything still imports everything — how do I actually enforce the module boundaries?",
     "should_trigger": true,
-    "split": "train",
+    "split": "validation",
     "rationale": "false modularity / distributed monolith: enforce with import/architecture tests + data ownership, not folders"
   },
   {
@@ -156,9 +156,9 @@
     "rationale": "boundary alignment: Conway's law, single owner per axis, domain seams"
   },
   {
-    "query": "write the actual bubblewrap unshare/bind syscall sequence for the sandbox runner",
+    "query": "write the actual SMTP request and retry loop for the email notification adapter",
     "should_trigger": false,
-    "split": "train",
+    "split": "validation",
     "rationale": "near-miss: implementing one variant's internals, not deciding the decomposition"
   }
 ]

@@ -44,7 +44,7 @@
 ## GPU memory strategy
 
 - **URLs:**
-  - GPU memory allocator documentation — https://gpuopen.com/learn/vulkan-memory-allocator/
+  - GPU memory allocator documentation — https://gpuopen-librariesandsdks.github.io/VulkanMemoryAllocator/html/index.html
   - "Writing an efficient Vulkan renderer" — https://zeux.io/2020/02/27/writing-an-efficient-vulkan-renderer/
 - **Last reviewed:** 2026-05-27
 - **Used for:**
@@ -72,6 +72,7 @@
 
 ## Game-engine development blog (archive)
 
+- **Provenance:** Locally archived game-engine development articles
 - **Last reviewed:** 2026-05-27
 - **Used for:**
   - `SKILL.md` → Architecture, Resources, Output, Synchronization, Gotchas

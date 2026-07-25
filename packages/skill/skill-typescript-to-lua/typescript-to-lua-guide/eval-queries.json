@@ -1,0 +1,98 @@
+[
+  {
+    "query": "I'm writing TypeScript that compiles to Lua with the typescript-to-lua transpiler. Write a `divmod` function that takes two numbers and returns both the quotient (floored) and the remainder so the generated Lua uses native Lua multiple return values rather than an array or object wrapper. Include a call site that consumes both values.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "In a typescript-to-lua project I need an interface that compiles directly to a plain raw Lua table with no runtime wrapper, and a standalone helper function that must NOT receive an implicit `self` parameter in the generated Lua. Write the TypeScript.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "I'm building a small 2D vector math module (add, magnitude) in TypeScript that compiles to Lua via typescript-to-lua. Write it in the way that produces the cleanest, most efficient Lua output for this transpiler.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Set up the tsconfig.json for a typescript-to-lua project that targets LuaJIT and should remap Lua stack traces back to the original TypeScript line numbers. Show the config.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Refactor this TSTL class used only as a namespace into module functions without changing the emitted Lua API.",
+    "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
+    "split": "train"
+  },
+  {
+    "query": "Return two values from TypeScript-to-Lua without allocating an array and consume them with the correct multi-return typing.",
+    "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
+    "split": "validation"
+  },
+  {
+    "query": "Define a TSTL decorator that records component metadata without relying on unsupported JavaScript reflection at runtime.",
+    "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
+    "split": "validation"
+  },
+  {
+    "query": "Optimize this TypeScript-to-Lua update loop to avoid temporary tables, array helpers, and polymorphic object shapes in emitted Lua.",
+    "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
+    "split": "validation"
+  },
+  {
+    "query": "In our LuaJIT game engine, write a factory function `create_entity(x, y, kind)` that returns a new entity table. Entities need position (x, y), a kind, a velocity (velocity_x, velocity_y starting at 0), health (starts at 100), and an active flag (starts true). Not all of these are known at the call site, so make it clean and efficient for a hot update loop.",
+    "rationale": "near miss owned by lua-opinionated-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Write a Lua 5.4 function `load_config(path)` that opens the file at `path`, reads all of it, and returns the parsed contents. Show how a caller would use it when the file might not exist, falling back to a default config instead of crashing.",
+    "rationale": "near miss owned by lua-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "I have a Hono app configured with `app.use('*', cors())`. Write a Vitest test that verifies the CORS preflight (OPTIONS) request to `/api/users` with an Origin header succeeds and that the Access-Control-Allow-Origin header is returned.",
+    "rationale": "near miss owned by vitest-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "add proper types to the response shape in src/api/users.ts so the consumer doesn't have to cast",
+    "rationale": "near miss owned by typescript-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Review this Lua Opinionated change for essentials and fix the concrete issues you find.",
+    "rationale": "near miss owned by lua-opinionated-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "A Lua loop accidentally writes counters into _G. Fix the scoping and explain which locals should be captured by the returned closures.",
+    "rationale": "near miss owned by lua-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Test a Hono or Express HTTP endpoint with Vitest, including JSON validation, status, headers, and a CORS preflight request.",
+    "rationale": "near miss owned by vitest-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "rewrite this string concat with template literals and pull out the magic numbers as named consts",
+    "rationale": "near miss owned by typescript-guide",
+    "should_trigger": false,
+    "split": "validation"
+  }
+]

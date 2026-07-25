@@ -1,0 +1,98 @@
+[
+  {
+    "query": "Write a portable shell script that must run under dash and busybox sh, not just bash. It should verify that jq is installed, take a filename as its first argument, and abort early on any error or unset variable.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Write a shell script that ensures the line `export PATH=\"$PATH:/opt/tool/bin\"` is present in the user's ~/.profile, and regenerates a config file at /etc/app/config from a template. A provisioning system runs it repeatedly, so re-running must not duplicate the line and must not corrupt the config if the script is interrupted mid-write.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Write a shell script that reads a list of file paths from an input file, one path per line where paths may contain spaces, tabs, or backslashes, and processes each path. It also needs a temporary working directory that is always removed, even if the script exits early or is interrupted.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Write a bash script with a helper for fatal errors and meaningful exit statuses. It requires the docker command to be present and takes exactly one argument, an image name. A caller should be able to distinguish a usage error from a missing-command error purely by the script's exit code.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Make this deployment helper run under POSIX sh by removing Bash arrays, process substitution, and [[ tests without changing its interface.",
+    "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
+    "split": "train"
+  },
+  {
+    "query": "Add safe shell error handling to this script, accounting for commands where set -e is suppressed and cleanup that must always run.",
+    "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
+    "split": "validation"
+  },
+  {
+    "query": "Fix this shell loop so filenames with spaces, glob characters, and newlines are handled without word splitting or command injection.",
+    "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
+    "split": "validation"
+  },
+  {
+    "query": "Refactor repeated shell steps into functions with explicit arguments, local variables in Bash, and meaningful exit statuses.",
+    "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
+    "split": "validation"
+  },
+  {
+    "query": "add proper types to the response shape in src/api/users.ts so the consumer doesn't have to cast",
+    "rationale": "near miss owned by typescript-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Write an async Python function fetch_all(urls) that retrieves the body of each URL over HTTP and returns them as a list. The URLs are independent of one another and there may be dozens of them.",
+    "rationale": "near miss owned by python-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "In a CMakeLists.txt for an executable target named `app`, add the fmt formatting library as a source dependency fetched from https://github.com/fmtlib/fmt.git at version 10.1.1, and link it to `app`. Show the CMake code.",
+    "rationale": "near miss owned by cmake-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "We're on moonrepo 2.0. I want to enable and configure one of Moon's built-in extensions in our workspace. Which config file does the extension configuration go in, and show me a minimal example of the config block.",
+    "rationale": "near miss owned by moon-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "rewrite this string concat with template literals and pull out the magic numbers as named consts",
+    "rationale": "near miss owned by typescript-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Tighten this Python module until pyright strict passes without Any, ignored errors, or casts that hide an invalid state.",
+    "rationale": "near miss owned by python-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Apply strict warnings to our own CMake targets without leaking them into third-party dependencies or downstream consumers.",
+    "rationale": "near miss owned by cmake-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "A project-local moon.yml task override erased flags inherited from .moon/tasks. Fix the inheritance so the shared strict check remains active.",
+    "rationale": "near miss owned by moon-guide",
+    "should_trigger": false,
+    "split": "validation"
+  }
+]

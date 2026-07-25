@@ -12,7 +12,7 @@
     "rationale": "what-to-mock decision: value objects are a do-not-mock case owned here"
   },
   {
-    "query": "this test asserts on every internal call and breaks on every refactor — is that over-mocking?",
+    "query": "this test asserts on every internal call and breaks on every refactor \u2014 is that over-mocking?",
     "should_trigger": true,
     "split": "train",
     "rationale": "over-mocking / behaviour-vs-state verification and the Fragile-Test symptom"
@@ -24,15 +24,15 @@
     "rationale": "AAA structure and FIRST qualities are owned concepts"
   },
   {
-    "query": "my fixture setup is a mess of canned objects — should I use a Test Data Builder or an Object Mother?",
+    "query": "my fixture setup is a mess of canned objects \u2014 should I use a Test Data Builder or an Object Mother?",
     "should_trigger": true,
-    "split": "validation",
+    "split": "train",
     "rationale": "fixture-creation patterns owned here"
   },
   {
-    "query": "name this test and split it — it verifies five things at once",
+    "query": "name this test and split it \u2014 it verifies five things at once",
     "should_trigger": true,
-    "split": "train",
+    "split": "validation",
     "rationale": "test naming plus the Eager Test smell, both owned here"
   },
   {
@@ -42,13 +42,13 @@
     "rationale": "stub sub-kinds and state-vs-behaviour verification owned here"
   },
   {
-    "query": "this test is flaky and obscure — what smell is it and how do I fix it?",
+    "query": "this test is flaky and obscure \u2014 what smell is it and how do I fix it?",
     "should_trigger": true,
     "split": "validation",
     "rationale": "Erratic and Obscure test smells owned here"
   },
   {
-    "query": "when in the cycle should I write the failing test — before or after the production code?",
+    "query": "when in the cycle should I write the failing test \u2014 before or after the production code?",
     "should_trigger": false,
     "split": "train",
     "rationale": "near-miss: test-first rhythm / red-green-refactor is owned by tdd-guide, not the shape of a single test"
@@ -62,7 +62,7 @@
   {
     "query": "what kind of coupling does this over-mocked test reveal and how do I reduce it?",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "near-miss: the coupling diagnosis/vocabulary is owned by connascence-guide; testing only flags the symptom"
   },
   {
@@ -74,13 +74,31 @@
   {
     "query": "audit this module for dead code and missing input validation, read-only",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "near-miss: read-only smell audit is owned by code-quality-guide"
   },
   {
     "query": "should I grow this design with classical or mockist TDD as my development style?",
     "should_trigger": false,
-    "split": "train",
+    "split": "validation",
     "rationale": "near-miss: classical-vs-mockist as a development/design style is owned by tdd-guide"
+  },
+  {
+    "query": "these two modules feel way too tightly coupled \u2014 tell me concretely what kind of coupling it is and how to loosen the worst part",
+    "rationale": "near miss owned by connascence-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "walk me through red-green-refactor on this shopping-cart total function",
+    "rationale": "near miss owned by tdd-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Run /xonovex-workflow:plan-validate on release candidate 91c2 against these three binding criteria and return pass, fail, or blocked with evidence for each.",
+    "rationale": "near miss: plan-validate is owned by plan-guide, not testing-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

@@ -62,13 +62,37 @@
   {
     "query": "bump every dependent package and tag the release version",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "validation negative — owned by versioning-guide"
   },
   {
     "query": "add a new dependency to package.json",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "validation negative — package.json edit, not publishing"
+  },
+  {
+    "query": "Write a shell/Node routine that publishes the npm package described by the current package.json, but only if that exact name@version is not already on the registry (so re-running it in CI is safe). Show the command(s) and the skip logic.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "bump this package to a minor release",
+    "rationale": "near miss owned by versioning-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "In a CMakeLists.txt for an executable target named `app`, add the fmt formatting library as a source dependency fetched from https://github.com/fmtlib/fmt.git at version 10.1.1, and link it to `app`. Show the CMake code.",
+    "rationale": "near miss owned by cmake-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "We're on moonrepo 2.0. I want to enable and configure one of Moon's built-in extensions in our workspace. Which config file does the extension configuration go in, and show me a minimal example of the config block.",
+    "rationale": "near miss owned by moon-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

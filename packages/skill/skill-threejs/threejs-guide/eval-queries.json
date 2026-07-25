@@ -1,0 +1,98 @@
+[
+  {
+    "query": "Using vanilla Three.js, set up a WebGLRenderer and a render loop that spins a cube smoothly. It must keep a consistent rotation speed regardless of frame rate and stay crisp on high-DPI / retina displays. Give me the renderer setup and the loop.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Write a Three.js setup that renders with WebGPU and gives a mesh a material whose color animates over time. It should target modern browsers and use Three's cross-renderer shader approach rather than raw GLSL.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "I'm applying an albedo/base-color texture and a normal map to a MeshStandardMaterial. Colors look washed out and the lighting is off. Show me how to load and configure both textures correctly for color-accurate PBR.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "I have a THREE.Points cloud of about 50,000 particles built from a BufferGeometry with positions I set manually. When I orbit the camera, the entire point cloud sometimes vanishes even though points are clearly within view. What's causing this and how do I fix it?",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Set up a Three.js scene, perspective camera, resize-safe renderer, and animation loop with correct pixel-ratio handling and disposal.",
+    "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
+    "split": "train"
+  },
+  {
+    "query": "Load a color texture and normal map in Three.js with correct color space, UV behavior, filtering, and cleanup after the material is removed.",
+    "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
+    "split": "validation"
+  },
+  {
+    "query": "Configure physically plausible Three.js lighting and shadow maps for a moving character without enabling shadows on every object.",
+    "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
+    "split": "validation"
+  },
+  {
+    "query": "Generate and update a Three.js BufferGeometry with indexed positions, normals, bounds, and explicit GPU-resource disposal.",
+    "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
+    "split": "validation"
+  },
+  {
+    "query": "make this client component server-rendered if possible — it's just fetching the user's recent orders",
+    "rationale": "near miss owned by react-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "In a Remotion project running at 30fps, write a React component that fades a headline in from opacity 0 to 1 over the first half second and slides it up 40px at the same time. Give me the full component code.",
+    "rationale": "near miss owned by remotion-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "In an Astro page I already have static content. Add two React components: a `<NewsletterSignup />` in the page footer that should only become interactive once the user scrolls it into view, and a `<ThemeToggle />` that reads `window.localStorage` on mount and therefore must not be server-rendered at all. Show the page frontmatter and markup with the correct hydration for each.",
+    "rationale": "near miss owned by astro-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "in our level editor clicking on a character that's GPU-skinned never selects it because we ray-cast against physics shapes and skinned meshes have none — how should we figure out what's under the cursor",
+    "rationale": "near miss owned by editor-viewport-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "this 'use client' boundary in profile/edit shouldn't extend to the avatar picker — split it",
+    "rationale": "near miss owned by react-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Sequence three Remotion scenes with overlaps and transitions while keeping every scene's local frame origin predictable.",
+    "rationale": "near miss owned by remotion-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Define a blog collection with a Zod schema, reject posts without a publication date, and render only non-draft entries sorted newest first.",
+    "rationale": "near miss owned by astro-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "my translate gizmo jumps to the cursor on the first frame of the drag and our math divides by something that's basically zero when the handle points toward the camera",
+    "rationale": "near miss owned by editor-viewport-guide",
+    "should_trigger": false,
+    "split": "validation"
+  }
+]

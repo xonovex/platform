@@ -1,0 +1,98 @@
+[
+  {
+    "query": "I have a Claude Code slash command at `.claude/commands/changelog.md`. Its body uses `$ARGUMENTS` for the user input and embeds git output inline with `` !`git log --oneline -20` ``. I want to port this same command to the Gemini CLI. Tell me exactly what to change and where the file goes.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "We have a ~140-line Claude Code slash command that inlines its entire Goal, Workflow, Output format, and Gotchas. I want to refactor it into a thin command that keeps only its argument contract and delegates the actual procedure to a reusable guideline skill. It's packaged as a plugin. Walk me through every step so nothing breaks at run time.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "I just finished a task where I stripped every `console.log` call out of `packages/billing-service/src/` for our invoicing app. Save this as a reusable slash command I can run on other projects.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Distill these three overlapping slash commands into one reusable command with explicit inputs, a stable output contract, and no harness-specific tool names.",
+    "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
+    "split": "train"
+  },
+  {
+    "query": "Create a user-invocable command that reviews staged changes, accepts an optional risk focus, and returns findings without modifying the worktree.",
+    "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
+    "split": "train"
+  },
+  {
+    "query": "Merge two prompt commands that both prepare releases while preserving their distinct validation branches and removing duplicated instructions.",
+    "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
+    "split": "validation"
+  },
+  {
+    "query": "Simplify this 180-line slash command by moving stable project policy to AGENTS.md and keeping only the invocation-specific workflow.",
+    "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
+    "split": "validation"
+  },
+  {
+    "query": "Represent the same reusable workflow for Claude Code, Codex, and Copilot while preserving one semantic contract, including when a harness uses skills instead of custom command plugins.",
+    "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
+    "split": "validation"
+  },
+  {
+    "query": "this packages/auth dir doesn't have an AGENTS.md yet — set one up",
+    "rationale": "near miss owned by instruction-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "We just wrapped a debugging session where I made a couple of mistakes and had to correct course. Capture the development lessons from this session and save each one as its own file so a future agent can reuse it. Show me exactly what one of those files should contain.",
+    "rationale": "near miss owned by reflect-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "create a new skill for our GraphQL resolver conventions — SKILL.md plus a few reference files",
+    "rationale": "near miss owned by skill-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Our TypeScript HTTP framework docs site at https://acme.dev has getting-started, API reference, routing, and middleware pages, plus a changelog and a migration guide that are only occasionally relevant. Write the llms.txt file we should serve.",
+    "rationale": "near miss owned by llmstxt-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "the new microservice doesn't have project instructions yet — generate one based on what's in src/",
+    "rationale": "near miss owned by instruction-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Review these session notes and promote only evidence-backed recurring lessons into durable project instructions with an owner and validation rule.",
+    "rationale": "near miss owned by reflect-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "before we install this third-party skill, audit its scripts and the URLs it fetches and lock down what tools it's allowed to use",
+    "rationale": "near miss owned by skill-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Generate per-page Markdown mirrors for an llms.txt index while preserving canonical URLs, headings, code fences, and link targets.",
+    "rationale": "near miss owned by llmstxt-guide",
+    "should_trigger": false,
+    "split": "validation"
+  }
+]

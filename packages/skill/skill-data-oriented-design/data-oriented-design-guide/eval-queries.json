@@ -62,7 +62,7 @@
   {
     "query": "lay the float arrays out so the inner loop auto-vectorizes with aligned AVX loads instead of falling back to scalar gathers",
     "should_trigger": true,
-    "split": "validation",
+    "split": "train",
     "rationale": "validation positive: SIMD-friendly SoA layout + alignment"
   },
   {
@@ -80,7 +80,7 @@
   {
     "query": "write a lock-free single-producer single-consumer ring buffer for our audio thread",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "validation negative: lock-free/threading -> lock-free-guide"
   },
   {
@@ -92,7 +92,7 @@
   {
     "query": "I want always-on counters for draw calls and allocations that I can leave in the hot path without slowing it down, and plot over the last few hundred frames to catch hitches",
     "should_trigger": true,
-    "split": "train",
+    "split": "validation",
     "rationale": "statistics-recording: per-frame accumulator, cached pointer (one store), ring history, graph readout"
   },
   {
@@ -100,5 +100,17 @@
     "should_trigger": true,
     "split": "validation",
     "rationale": "validation positive: statistics-recording returned-accumulator-pointer pattern, lazy history"
+  },
+  {
+    "query": "make our particle system stop calling malloc per particle — hand it a buffer it just fills",
+    "rationale": "near miss owned by memory-management-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "I need to add a SIMD variant of my vec3_dot in lib/math/vec3.c — the rest of the project uses _sse4 and _avx2 suffixes",
+    "rationale": "near miss owned by c99-opinionated-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

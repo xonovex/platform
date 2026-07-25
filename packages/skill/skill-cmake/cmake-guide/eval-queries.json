@@ -1,0 +1,98 @@
+[
+  {
+    "query": "In a CMakeLists.txt for an executable target named `app`, add the fmt formatting library as a source dependency fetched from https://github.com/fmtlib/fmt.git at version 10.1.1, and link it to `app`. Show the CMake code.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "I have a CMake library target `core`. Make it require C++20, and add `-Wall -Wextra -pedantic` warnings on GCC/Clang and `/W4` on MSVC, without affecting other targets in the build. Write the CMake commands.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "I have a library target `mylib` with public headers in `include/`. Write the CMake install rules so that a downstream project can consume it with find_package and get a properly namespaced imported target.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Set up CTest for a project. Register a test executable `unit_tests` as a test, tag it so it can be run selectively as a group, and give it a 30-second timeout. Show the CMake code.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Split this CMake project into a static library, a CLI executable, and a test executable with explicit target dependencies and no directory-wide flags.",
+    "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
+    "split": "train"
+  },
+  {
+    "query": "Apply strict warnings to our own CMake targets without leaking them into third-party dependencies or downstream consumers.",
+    "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
+    "split": "validation"
+  },
+  {
+    "query": "A library's public header includes fmt but its CMake target links fmt privately. Correct the PUBLIC, PRIVATE, and INTERFACE usage requirements.",
+    "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
+    "split": "validation"
+  },
+  {
+    "query": "Replace a hard-coded library path with find_package and an imported target, including a clear configure-time error when the dependency is absent.",
+    "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
+    "split": "validation"
+  },
+  {
+    "query": "our codebase has #ifdef _WIN32 / #ifdef __linux__ branches in basically every source file and adding macOS means touching all of them — how do we restructure so the platform stuff lives in one place",
+    "rationale": "near miss owned by cross-platform-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Write a portable shell script that must run under dash and busybox sh, not just bash. It should verify that jq is installed, take a filename as its first argument, and abort early on any error or unset variable.",
+    "rationale": "near miss owned by shell-scripting-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "I have a Terraform config that creates private subnets, one per availability zone, from a variable list of AZs. Right now removing a single AZ from the middle of the list forces Terraform to recreate several unrelated subnets. Write the resource and any supporting locals so this stops happening.",
+    "rationale": "near miss owned by terraform-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "publish this package to npm",
+    "rationale": "near miss owned by npm-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "I need to find connected gamepads on Linux and read their button presses — how do I enumerate /dev/input and tell a controller apart from a keyboard",
+    "rationale": "near miss owned by cross-platform-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Add safe shell error handling to this script, accounting for commands where set -e is suppressed and cleanup that must always run.",
+    "rationale": "near miss owned by shell-scripting-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Define a Terraform module with a narrow input contract, validated variables, useful outputs, and no provider configuration inside the child module.",
+    "rationale": "near miss owned by terraform-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "ship this package to the registry and skip it if already published",
+    "rationale": "near miss owned by npm-guide",
+    "should_trigger": false,
+    "split": "validation"
+  }
+]

@@ -19,3 +19,9 @@
   - Content categories to include: build/test commands, setup, code style, testing procedures, security, commit/PR formatting, dev env tips, deployment, dataset handling → `init.md` Include list
   - What to exclude (README-style human-onboarding content) → `init.md` Exclude list
   - "Standard Markdown, flexible headings, no required fields" — informed the loose-format approach but project convention prefers a stricter bullet-list format
+
+## Guide-level synthesis
+
+- **Provenance:** Repository-original integration of the source blocks above; these references combine multiple inputs or maintained conventions rather than one exclusive upstream
+- **References:** references/merge.md, references/simplify.md
+- **Last reviewed:** 2026-05-13

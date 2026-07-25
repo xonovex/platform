@@ -1,0 +1,104 @@
+[
+  {
+    "query": "I have a Terraform config that creates private subnets, one per availability zone, from a variable list of AZs. Right now removing a single AZ from the middle of the list forces Terraform to recreate several unrelated subnets. Write the resource and any supporting locals so this stops happening.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Set up the remote state backend for our production environment's Terraform root module. We're on AWS. Show the backend configuration and explain the key decisions.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Someone changed our infrastructure manually in the cloud console. I want to see what has drifted from our Terraform state before I decide whether to reconcile it. What command should I run and why?",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Add a Terraform variable named database_config that is a structured object with instance_class (string), engine_version (string), and a backup_retention number that callers may omit and should default to 7. We're on Terraform 1.12.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Restructure this Terraform repository into reusable modules and environment root modules without sharing mutable local state files.",
+    "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
+    "split": "train"
+  },
+  {
+    "query": "Define a Terraform module with a narrow input contract, validated variables, useful outputs, and no provider configuration inside the child module.",
+    "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
+    "split": "validation"
+  },
+  {
+    "query": "Replace loosely typed Terraform map(any) inputs with optional object attributes and validation that reports invalid combinations early.",
+    "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
+    "split": "validation"
+  },
+  {
+    "query": "Compose a production root module with aliased providers, remote state, explicit module versions, and environment-specific values outside the reusable module.",
+    "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
+    "split": "validation"
+  },
+  {
+    "query": "Write a production Dockerfile for a Node.js 22 web service that builds TypeScript with `npm run build` and serves on port 3000. Keep the final image as small and secure as reasonably possible.",
+    "rationale": "near miss owned by docker-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "In a GitOps repo I have a base/ directory with a Deployment and Service. Write a Kustomize base kustomization.yaml plus a production overlay kustomization.yaml that changes the namespace to production, applies a replica-count patch file, and sets shared labels on all resources. Use current Kustomize v5 syntax.",
+    "rationale": "near miss owned by kubernetes-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "compose Bitrise Pipelines from reusable Workflows and pin every custom Step version",
+    "rationale": "near miss: hosted CI pipeline composition, not infrastructure code",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "In a CMakeLists.txt for an executable target named `app`, add the fmt formatting library as a source dependency fetched from https://github.com/fmtlib/fmt.git at version 10.1.1, and link it to `app`. Show the CMake code.",
+    "rationale": "near miss owned by cmake-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Harden this production container: run as a non-root numeric user, pin the base image, avoid copying secrets, and make the filesystem read-only where possible.",
+    "rationale": "near miss owned by docker-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Move non-secret settings to a ConfigMap and credentials to a Secret, then mount both without checking decoded secret values into Git.",
+    "rationale": "near miss owned by kubernetes-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "is this a flaky emulator (device offline) or a real test failure?",
+    "rationale": "near miss: mobile CI test triage, not Terraform",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Apply strict warnings to our own CMake targets without leaking them into third-party dependencies or downstream consumers.",
+    "rationale": "near miss owned by cmake-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "recover an AWS governance decision from CloudTrail and Security Hub references after restart",
+    "rationale": "validation near miss: cloud audit-log forensics, not Terraform configuration",
+    "should_trigger": false,
+    "split": "validation"
+  }
+]

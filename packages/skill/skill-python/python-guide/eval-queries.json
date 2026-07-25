@@ -1,0 +1,98 @@
+[
+  {
+    "query": "Write an async Python function fetch_all(urls) that retrieves the body of each URL over HTTP and returns them as a list. The URLs are independent of one another and there may be dozens of them.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Define a Python data model for a paginated API response: it holds a list of items whose element type varies per endpoint, a total count, and an optional next-page cursor string.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "I have a pure, deterministic function that is expensive and gets called repeatedly with the same arguments. Show me how to memoize it two ways: one that keeps every result, and one that caps memory by keeping only the most recently used results.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Write a reusable Python helper that wraps a block of database work in a transaction so callers can use it with a 'with' statement, committing when the block succeeds.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Model this Python 3.12 configuration with frozen dataclasses, precise collection types, and validation that rejects inconsistent fields.",
+    "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
+    "split": "train"
+  },
+  {
+    "query": "Tighten this Python module until pyright strict passes without Any, ignored errors, or casts that hide an invalid state.",
+    "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
+    "split": "validation"
+  },
+  {
+    "query": "Replace an eager Python list pipeline over a million rows with generators and comprehensions while preserving error reporting and one-pass semantics.",
+    "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
+    "split": "validation"
+  },
+  {
+    "query": "Add bounded caching to a pure Python lookup function, including a way to clear it in tests and avoiding caching transient failures.",
+    "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
+    "split": "validation"
+  },
+  {
+    "query": "I have a log file with about 20 million lines already loaded as an array of strings in JavaScript. Write a function that keeps only the ERROR lines, extracts the timestamp from each, and returns the first 10. Explain any performance concerns.",
+    "rationale": "near miss owned by fp-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "I have a Rectangle class with mutable width and height and setWidth/setHeight methods. I now need a Square type in the same system. What's the cleanest way to model Square given I already have Rectangle?",
+    "rationale": "near miss owned by oop-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "add proper types to the response shape in src/api/users.ts so the consumer doesn't have to cast",
+    "rationale": "near miss owned by typescript-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Write a portable shell script that must run under dash and busybox sh, not just bash. It should verify that jq is installed, take a filename as its first argument, and abort early on any error or unset variable.",
+    "rationale": "near miss owned by shell-scripting-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Help me with pure functions; apply the relevant Fp conventions and call out the important edge cases.",
+    "rationale": "near miss owned by fp-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Review this Oop change for design smells and fix the concrete issues you find.",
+    "rationale": "near miss owned by oop-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "rewrite this string concat with template literals and pull out the magic numbers as named consts",
+    "rationale": "near miss owned by typescript-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Add safe shell error handling to this script, accounting for commands where set -e is suppressed and cleanup that must always run.",
+    "rationale": "near miss owned by shell-scripting-guide",
+    "should_trigger": false,
+    "split": "validation"
+  }
+]

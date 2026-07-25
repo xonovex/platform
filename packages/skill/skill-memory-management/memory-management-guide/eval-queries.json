@@ -32,7 +32,7 @@
   {
     "query": "design the buffer-ownership convention for our parser so there are no leaks on error paths",
     "should_trigger": true,
-    "split": "train",
+    "split": "validation",
     "rationale": "ownership convention, caller-owns"
   },
   {
@@ -74,7 +74,31 @@
   {
     "query": "split the hot and cold fields of this struct to shrink the cache working set",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "near-miss: hot/cold layout -> data-oriented-design-guide"
+  },
+  {
+    "query": "our particle simulator stalls when we have 50k particles — the update loop reads position and velocity out of a fat 96-byte struct, can you restructure it for cache efficiency",
+    "rationale": "near miss owned by data-oriented-design-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "give me the exact VkImageMemoryBarrier2 with srcStageMask/srcAccessMask and dstStageMask/dstAccessMask plus the oldLayout/newLayout for reading a color attachment as a sampled texture, and the vkCmdPipelineBarrier2 call",
+    "rationale": "near miss owned by gpu-rendering-vulkan-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "our exporter crashes opening the second project but the first one is fine — where do I even start",
+    "rationale": "near miss owned by debugging-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "I want to tag every allocation with file and line and check the counter is zero on shutdown to catch leaks",
+    "rationale": "validation near miss owned by debugging-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

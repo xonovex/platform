@@ -41,7 +41,6 @@
     "split": "train",
     "rationale": "new package needs init"
   },
-
   {
     "query": "the existing AGENTS.md in packages/core is out of date — refresh it",
     "should_trigger": false,
@@ -72,11 +71,10 @@
     "split": "train",
     "rationale": "different doc type"
   },
-
   {
     "query": "add a CLAUDE.md to the new monorepo workspace at packages/billing",
     "should_trigger": true,
-    "split": "validation",
+    "split": "train",
     "rationale": "direct init"
   },
   {
@@ -103,7 +101,6 @@
     "split": "validation",
     "rationale": "init from analysis"
   },
-
   {
     "query": "generate API docs for our public endpoints",
     "should_trigger": false,

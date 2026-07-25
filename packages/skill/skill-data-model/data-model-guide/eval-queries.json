@@ -74,13 +74,13 @@
   {
     "query": "write fwrite/fread routines to dump and reload this fixed C struct of camera settings to a binary file",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "validation negative: plain serialization of a fixed struct, no model/schema/versioning"
   },
   {
     "query": "I want prefabs in my editor: edit a template object and have all placed copies update, but each copy can tweak individual properties and keep those tweaks — how do I store and resolve that?",
     "should_trigger": true,
-    "split": "train",
+    "split": "validation",
     "rationale": "prototypes: prototype/instance inheritance, per-property override, read-through resolution, edit propagation"
   },
   {
@@ -88,5 +88,35 @@
     "should_trigger": true,
     "split": "validation",
     "rationale": "validation positive: prototypes override bitmask + inherited/instantiated/removed sub-objects, delta serialization"
+  },
+  {
+    "query": "I want artists to build effects by dragging boxes onto a canvas and connecting their inputs and outputs with wires instead of writing code — how should I structure the thing they're editing",
+    "rationale": "near miss owned by node-graph-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "I'm starting a multiplayer game and need to decide whether the server owns all the gameplay objects or if peers can each own their own — and how to keep that flexible if I switch to peer-to-peer later",
+    "rationale": "near miss owned by game-networking-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "our editor lets artists drop in an FBX or PNG and we want them edited in-tool but shipped as packed GPU-ready data — how should we structure the two forms so editing and loading don't fight each other",
+    "rationale": "near miss owned by asset-pipeline-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "how do I get the business and developers speaking the same vocabulary that also shows up in the code?",
+    "rationale": "near miss owned by ddd-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Choose PostgreSQL types for money, timestamps, bounded status values, and identifiers without using text for every column.",
+    "rationale": "validation near miss owned by sql-postgresql-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

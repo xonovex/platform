@@ -38,7 +38,7 @@
   {
     "query": "how should I lay out VkCommandPool per worker thread per frame and reset with vkResetCommandPool, and wire vkAcquireNextImageKHR / vkQueueSubmit2 / vkQueuePresentKHR with a VkFence per frame",
     "should_trigger": true,
-    "split": "train",
+    "split": "validation",
     "rationale": "direct: Vulkan command pools, swapchain acquire/present, fence per frame"
   },
   {
@@ -80,7 +80,7 @@
   {
     "query": "explain the conceptual difference between device-local and host-visible GPU memory tiers and when to stage uploads — keep it API-neutral",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "validation negative: agnostic gpu-memory-strategy -> gpu-rendering-guide, no Vk* specifics"
   },
   {
@@ -88,5 +88,23 @@
     "should_trigger": false,
     "split": "validation",
     "rationale": "validation negative: high-level web 3D, not Vulkan"
+  },
+  {
+    "query": "our renderer hand-writes a barrier before and after every pass and it breaks every time we reorder passes — I want passes to just declare what they read and write and have ordering and transitions figured out for us",
+    "rationale": "near miss owned by gpu-rendering-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "make our particle system stop calling malloc per particle — hand it a buffer it just fills",
+    "rationale": "near miss owned by memory-management-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "I want my vertex shader to read positions straight out of a big storage buffer instead of binding a vertex layout, so I can support quantized formats and morph targets from one shader",
+    "rationale": "validation near miss owned by gpu-rendering-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

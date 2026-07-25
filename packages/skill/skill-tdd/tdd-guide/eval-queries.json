@@ -20,7 +20,7 @@
   {
     "query": "help me build a test list and work it one item at a time without writing them all up front",
     "should_trigger": true,
-    "split": "validation",
+    "split": "train",
     "rationale": "test list / to-do list, owned by tdd"
   },
   {
@@ -38,7 +38,7 @@
   {
     "query": "my green bar never refactors — is that still TDD?",
     "should_trigger": true,
-    "split": "train",
+    "split": "validation",
     "rationale": "refactor-step discipline, an owned gotcha"
   },
   {
@@ -50,7 +50,7 @@
   {
     "query": "structure this test with Arrange-Act-Assert and make it follow FIRST",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "near-miss: anatomy of a single test (AAA / FIRST / naming) -> testing-guide"
   },
   {
@@ -62,7 +62,7 @@
   {
     "query": "this class has low cohesion and too many responsibilities — how should I redesign it?",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "near-miss: the design bar the refactor aims at -> oop-guide / connascence-guide"
   },
   {
@@ -70,5 +70,41 @@
     "should_trigger": false,
     "split": "train",
     "rationale": "near-miss: framework API mechanics -> vitest-guide"
+  },
+  {
+    "query": "Implement a `discountedTotal(items, rate)` function test-first, where each item has a `price`. Show the ordered sequence of failing tests and the exact code change you make to pass each one, step by step.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "what's the difference between a mock, a stub, a fake, and a spy?",
+    "rationale": "near miss owned by testing-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "I have a Rectangle class with mutable width and height and setWidth/setHeight methods. I now need a Square type in the same system. What's the cleanest way to model Square given I already have Rectangle?",
+    "rationale": "near miss owned by oop-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "these two modules feel way too tightly coupled — tell me concretely what kind of coupling it is and how to loosen the worst part",
+    "rationale": "near miss owned by connascence-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "how many scenarios per business rule should we keep, versus pushing cases into unit tests?",
+    "rationale": "validation near miss owned by bdd-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "name this test and split it — it verifies five things at once",
+    "rationale": "validation near miss owned by testing-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

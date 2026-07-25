@@ -1,0 +1,98 @@
+[
+  {
+    "query": "In an Astro page I already have static content. Add two React components: a `<NewsletterSignup />` in the page footer that should only become interactive once the user scrolls it into view, and a `<ThemeToggle />` that reads `window.localStorage` on mount and therefore must not be server-rendered at all. Show the page frontmatter and markup with the correct hydration for each.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Set up an Astro content collection for blog posts. Each post has a title, a publish date, an array of tags, and a boolean draft flag that defaults to false. Then write the query that returns only the non-draft posts. Provide the collection config file and the query snippet.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Create a reusable Astro `Card` component with a required `title` string, an optional `href` string, and an optional `variant` that is either \"default\" or \"featured\" (defaulting to \"default\"). It should render child content and have component-scoped styles.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "An Astro page renders a React pricing calculator eagerly on every request. Convert it to an island that hydrates only when visible while keeping the surrounding page static.",
+    "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
+    "split": "train"
+  },
+  {
+    "query": "Our Astro content collection works locally but a fresh checkout has no generated content types. Fix the project setup so astro sync runs before type checking.",
+    "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
+    "split": "train"
+  },
+  {
+    "query": "Define a blog collection with a Zod schema, reject posts without a publication date, and render only non-draft entries sorted newest first.",
+    "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
+    "split": "validation"
+  },
+  {
+    "query": "I need an Astro component whose typed props accept a heading and optional call-to-action, forward safe HTML attributes, and render the link only when supplied.",
+    "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
+    "split": "validation"
+  },
+  {
+    "query": "Audit this Astro navigation and form for keyboard focus, semantic landmarks, descriptive labels, and reduced-motion behavior.",
+    "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
+    "split": "validation"
+  },
+  {
+    "query": "make this client component server-rendered if possible — it's just fetching the user's recent orders",
+    "rationale": "near miss owned by react-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "In a React + TypeScript app, create a reusable component that fades and slides its children upward into view when it first mounts, using the Motion animation library. Show the full component code.",
+    "rationale": "near miss owned by motion-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "In a Remotion project running at 30fps, write a React component that fades a headline in from opacity 0 to 1 over the first half second and slides it up 40px at the same time. Give me the full component code.",
+    "rationale": "near miss owned by remotion-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Using vanilla Three.js, set up a WebGLRenderer and a render loop that spins a cube smoothly. It must keep a consistent rotation speed regardless of frame rate and stay crisp on high-DPI / retina displays. Give me the renderer setup and the loop.",
+    "rationale": "near miss owned by threejs-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "this 'use client' boundary in profile/edit shouldn't extend to the avatar picker — split it",
+    "rationale": "near miss owned by react-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Implement keyboard, hover, and drag feedback with Motion while avoiding gesture conflicts and preserving accessible button semantics.",
+    "rationale": "near miss owned by motion-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Sequence three Remotion scenes with overlaps and transitions while keeping every scene's local frame origin predictable.",
+    "rationale": "near miss owned by remotion-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Load a color texture and normal map in Three.js with correct color space, UV behavior, filtering, and cleanup after the material is removed.",
+    "rationale": "near miss owned by threejs-guide",
+    "should_trigger": false,
+    "split": "validation"
+  }
+]

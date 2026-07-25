@@ -1,0 +1,98 @@
+[
+  {
+    "query": "I have a log file with about 20 million lines already loaded as an array of strings in JavaScript. Write a function that keeps only the ERROR lines, extracts the timestamp from each, and returns the first 10. Explain any performance concerns.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Write a pure function `describeShape` that takes a discriminated-union shape value (a circle, a square, or any other shape) and returns a human-readable string. Handle the circle and square cases specifically and provide a fallback for everything else.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Design a small rate-limiter module in TypeScript that tracks how many requests each client has made in the current window and decides whether to allow the next request. Show the module's public functions and how a caller uses them.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "I have an array of user IDs and an async function `fetchUser(id)` that returns a Promise. I want a composed pipeline that fetches every user and then uppercases each user's name. Someone told me to just `ids.map(fetchUser).map(u => u.name.toUpperCase())`. Is that correct? Show the right way.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Review this Fp change for core principles and fix the concrete issues you find.",
+    "rationale": "implicit task cue derived from the Core principles section",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Help me with pure functions; apply the relevant Fp conventions and call out the important edge cases.",
+    "rationale": "routing cue derived from the description's pure functions trigger",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Help me with immutability; apply the relevant Fp conventions and call out the important edge cases.",
+    "rationale": "routing cue derived from the description's immutability trigger",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Help me with function composition; apply the relevant Fp conventions and call out the important edge cases.",
+    "rationale": "routing cue derived from the description's function composition trigger",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Write an async Python function fetch_all(urls) that retrieves the body of each URL over HTTP and returns them as a list. The URLs are independent of one another and there may be dozens of them.",
+    "rationale": "near miss owned by python-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "add proper types to the response shape in src/api/users.ts so the consumer doesn't have to cast",
+    "rationale": "near miss owned by typescript-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Set up the compiler configuration (CMake) for a C99 library target named `netcodec` that calls `readlink` and `strnlen`. Configure it for strict ISO C99, treat warnings as errors with `-Wall -Wextra`, and make sure it still compiles cleanly even though the code uses partial designated initializers like `(cfg_t){ .port = 8080 }` throughout.",
+    "rationale": "near miss owned by c99-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Write a Lua 5.4 function `load_config(path)` that opens the file at `path`, reads all of it, and returns the parsed contents. Show how a caller would use it when the file might not exist, falling back to a default config instead of crashing.",
+    "rationale": "near miss owned by lua-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Tighten this Python module until pyright strict passes without Any, ignored errors, or casts that hide an invalid state.",
+    "rationale": "near miss owned by python-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "rewrite this string concat with template literals and pull out the magic numbers as named consts",
+    "rationale": "near miss owned by typescript-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Replace this positional C99 struct initializer with designated initializers so a newly inserted field cannot silently shift existing values.",
+    "rationale": "near miss owned by c99-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "A Lua loop accidentally writes counters into _G. Fix the scoping and explain which locals should be captured by the returned closures.",
+    "rationale": "near miss owned by lua-guide",
+    "should_trigger": false,
+    "split": "validation"
+  }
+]

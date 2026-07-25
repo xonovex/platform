@@ -20,7 +20,7 @@
   {
     "query": "is an Order with its line items one aggregate, and should other things reference it by id or by object?",
     "should_trigger": true,
-    "split": "validation",
+    "split": "train",
     "rationale": "aggregate + root, reference-by-identity rules — ddd-guide tactical blocks"
   },
   {
@@ -38,7 +38,7 @@
   {
     "query": "what's the difference between strategic and tactical design, and is a repository just an ORM wrapper?",
     "should_trigger": true,
-    "split": "train",
+    "split": "validation",
     "rationale": "strategic vs tactical split + repository definition — ddd-guide"
   },
   {
@@ -62,7 +62,7 @@
   {
     "query": "design an in-memory object database with stable GUIDs, change notification and undo/redo for my editor",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "near-miss: in-memory object/property model with undo/serialization -> data-model-guide, not a DDD repository"
   },
   {
@@ -74,13 +74,25 @@
   {
     "query": "split this big user story into thin vertical slices and write INVEST acceptance criteria",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "near-miss: story container and slicing -> user-stories-guide"
   },
   {
     "query": "audit this module for code smells like dead code and swallowed errors",
     "should_trigger": false,
-    "split": "train",
+    "split": "validation",
     "rationale": "near-miss: read-only quality smell audit -> code-quality-guide, not domain modelling"
+  },
+  {
+    "query": "I have a Rectangle class with mutable width and height and setWidth/setHeight methods. I now need a Square type in the same system. What's the cleanest way to model Square given I already have Rectangle?",
+    "rationale": "near miss owned by oop-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "I'm building the core document store for our level editor — objects of different kinds each with a set of named properties, and I want to add new object types at runtime without recompiling. How should the type/property schema work?",
+    "rationale": "near miss owned by data-model-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

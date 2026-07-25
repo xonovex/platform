@@ -1,0 +1,98 @@
+[
+  {
+    "query": "In a GitOps repo I have a base/ directory with a Deployment and Service. Write a Kustomize base kustomization.yaml plus a production overlay kustomization.yaml that changes the namespace to production, applies a replica-count patch file, and sets shared labels on all resources. Use current Kustomize v5 syntax.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Write a hardened Kubernetes Deployment manifest for a stateless HTTP API container listening on port 3000. It must follow security best practices for running untrusted workloads.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Write a NetworkPolicy that locks down a pod labeled app=api in the production namespace so it only accepts ingress from the ingress-nginx namespace on port 3000 and only reaches a database on port 5432. It uses both Ingress and Egress policyTypes.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "I need to store a database connection string and an API key as a Kubernetes Secret that will be committed to our Git repository. Show me the Secret manifest and explain how to make it safe to commit.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Create a Kubernetes Deployment with rolling-update limits, readiness and liveness probes, resource requests, a security context, and immutable image tags.",
+    "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
+    "split": "train"
+  },
+  {
+    "query": "Move non-secret settings to a ConfigMap and credentials to a Secret, then mount both without checking decoded secret values into Git.",
+    "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
+    "split": "validation"
+  },
+  {
+    "query": "Build dev and production Kustomize overlays that patch replicas, hostnames, and image tags without duplicating the base manifests.",
+    "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
+    "split": "validation"
+  },
+  {
+    "query": "Validate these Kubernetes manifests for selector mismatches, missing resource limits, unsafe security contexts, and references to absent ConfigMaps.",
+    "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
+    "split": "validation"
+  },
+  {
+    "query": "Write a production Dockerfile for a Node.js 22 web service that builds TypeScript with `npm run build` and serves on port 3000. Keep the final image as small and secure as reasonably possible.",
+    "rationale": "near miss owned by docker-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "I have a Terraform config that creates private subnets, one per availability zone, from a variable list of AZs. Right now removing a single AZ from the middle of the list forces Terraform to recreate several unrelated subnets. Write the resource and any supporting locals so this stops happening.",
+    "rationale": "near miss owned by terraform-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "compose Bitrise Pipelines from reusable Workflows and pin every custom Step version",
+    "rationale": "near miss: hosted CI pipeline composition, not cluster manifests",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "We're on moonrepo 2.0. I want to enable and configure one of Moon's built-in extensions in our workspace. Which config file does the extension configuration go in, and show me a minimal example of the config block.",
+    "rationale": "near miss owned by moon-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Harden this production container: run as a non-root numeric user, pin the base image, avoid copying secrets, and make the filesystem read-only where possible.",
+    "rationale": "near miss owned by docker-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Define a Terraform module with a narrow input contract, validated variables, useful outputs, and no provider configuration inside the child module.",
+    "rationale": "near miss owned by terraform-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "is this a flaky emulator (device offline) or a real test failure?",
+    "rationale": "near miss: mobile CI test triage, not Kubernetes",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "A project-local moon.yml task override erased flags inherited from .moon/tasks. Fix the inheritance so the shared strict check remains active.",
+    "rationale": "near miss owned by moon-guide",
+    "should_trigger": false,
+    "split": "validation"
+  }
+]

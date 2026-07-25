@@ -62,13 +62,37 @@
   {
     "query": "open a pull request for the release branch",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "validation negative — owned by pull-request-guide"
   },
   {
     "query": "fix the merge conflict in two package.json files",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "validation negative — conflict resolution, owned by git-guide"
+  },
+  {
+    "query": "A package's package.json currently reads \"version\": \"1.2.3-beta.4\". The beta cycle is over and we're ready to ship the stable release. Tell me the exact version string it should become and explain briefly why.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "publish this package to npm",
+    "rationale": "near miss owned by npm-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "help me write a good pull request description for this change",
+    "rationale": "near miss owned by pull-request-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "ship this",
+    "rationale": "near miss owned by git-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

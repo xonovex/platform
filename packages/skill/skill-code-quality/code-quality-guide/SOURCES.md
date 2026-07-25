@@ -78,6 +78,14 @@
 - **Aspects extracted:**
   - Severity tiers; grade by blast radius × likelihood and remediation effort, not finding count
 
+## Xonovex cleanup-inventory conventions
+
+- **Provenance:** Repository-original read-only detector procedures maintained within skill-code-quality
+- **Last reviewed:** 2026-07-22
+- **Used for:** `references/cleanup-inventories.md`
+- **References:** cleanup-inventories.md
+- **Aspects extracted:** Barrel, redundant-comment, shared-extraction, and TODO/FIXME inventories remain evidence-linked and read-only.
+
 ## Refresh Workflow
 
 1. Re-read the upstream source(s) above

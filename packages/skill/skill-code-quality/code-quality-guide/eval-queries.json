@@ -26,8 +26,20 @@
   {
     "query": "which of our dependencies are unused or redundant — report only, no removals",
     "should_trigger": true,
-    "split": "validation",
+    "split": "train",
     "rationale": "simplify: unused dependencies, read-only"
+  },
+  {
+    "query": "Audit packages/worker for weak error handling and validation before we plan hardening work; grade findings by severity and make no edits.",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "read-only hardening audit remains code-quality work even when it may inform a later plan"
+  },
+  {
+    "query": "Inventory and group the TODO and FIXME comments under packages/agent so we can decide what belongs in a cleanup plan.",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "read-only TODO and FIXME cleanup inventory"
   },
   {
     "query": "write a plan to refactor the auth module over the next sprint",
@@ -44,7 +56,61 @@
   {
     "query": "go ahead and apply all the simplifications you found and run the tests",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "near-miss: implementing the changes, not a read-only audit"
+  },
+  {
+    "query": "Here is part of a Node/Express service. Of the quality problems in it, which should I address first, and why?\n\n```ts\nfunction buildInvoiceLines(rows: Row[]): string {\n  let out = '';\n  for (const r of rows) {\n    for (const item of r.items) {\n      if (item.qty > 0) {\n        if (item.discount) {\n          out += `${item.name}: ${item.qty} @ ${item.price} (-${item.discount})\\n`;\n        } else {\n          out += `${item.name}: ${item.qty} @ ${item.price}\\n`;\n        }\n      }\n    }\n  }\n  // ...roughly 45 lines total, pure string assembly, no I/O\n  return out;\n}\n\napp.post('/orders', (req, res) => {\n  const qty = req.body.quantity;\n  const total = qty * req.body.price;\n  db.insertOrder({ customerId: req.body.customerId, total });\n  res.json({ total });\n});\n```",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "This config loader is riddled with `any` and my linter flags it in about 20 spots. How should I characterize the type-safety problem and what is the right fix?\n\n```ts\nconst data: any = JSON.parse(await readFile(configPath, 'utf8'));\nconst host = data.server.host;\nconst port: any = data.server.port;\nconst retries = data.server.retries;\nconst endpoints: any[] = data.endpoints;\nconst timeout = data.limits.timeout;\n// ...~15 more reads of fields off `data`, each typed any\n```",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Do a read-only audit of the error handling in this file and tell me which catches are genuinely a problem worth fixing.\n\n```ts\ntry {\n  await refreshCache(key);\n} catch (err) {\n  // cache refresh is best-effort; a miss is fine and we recompute later\n}\n\nasync function loadUser(id: string) {\n  try {\n    return await db.getUser(id);\n  } catch (err) {\n    return null;\n  }\n}\n```",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "these two modules feel way too tightly coupled — tell me concretely what kind of coupling it is and how to loosen the worst part",
+    "rationale": "near miss owned by connascence-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "I have a Rectangle class with mutable width and height and setWidth/setHeight methods. I now need a Square type in the same system. What's the cleanest way to model Square given I already have Rectangle?",
+    "rationale": "near miss owned by oop-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "how should I mark a review comment so the author knows it must be fixed before merge?",
+    "rationale": "near miss owned by code-review-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "build a threat-informed security assurance plan with exact control and evidence ownership",
+    "rationale": "security planning rather than a code-quality audit",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Review this Go function for coupling problems and tell me how to fix the worst one:\n\n```go\nfunc (r *Repo) Save(order Order, dryRun bool) error {\n    if dryRun {\n        return validate(order)\n    }\n    return r.persist(order)\n}\n```\n\nCallers do `repo.Save(order, true)` in some places and `repo.Save(order, false)` in others.",
+    "rationale": "near miss owned by connascence-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "write clear actionable review feedback that leads with what is good",
+    "rationale": "validation near miss owned by code-review-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

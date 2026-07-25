@@ -32,7 +32,7 @@
   {
     "query": "write clear actionable review feedback that leads with what is good",
     "should_trigger": true,
-    "split": "train",
+    "split": "validation",
     "rationale": "tone and structure"
   },
   {
@@ -82,5 +82,17 @@
     "should_trigger": false,
     "split": "validation",
     "rationale": "near-miss: repo settings, not review-comment craft"
+  },
+  {
+    "query": "open a pull request against main with reviewers and a label using the gh CLI",
+    "rationale": "near miss owned by github-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "open a merge request against main with glab on this GitLab repo",
+    "rationale": "near miss owned by gitlab-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

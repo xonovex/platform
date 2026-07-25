@@ -1,0 +1,98 @@
+[
+  {
+    "query": "Write a Lua 5.4 function `load_config(path)` that opens the file at `path`, reads all of it, and returns the parsed contents. Show how a caller would use it when the file might not exist, falling back to a default config instead of crashing.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "In Lua, write a function that takes an array of a few thousand numbers and returns them as a single comma-separated string. Make it efficient for large inputs.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "I'm iterating in a running Lua process. I edited `myapp.settings` on disk, but calling `require(\"myapp.settings\")` again keeps returning the stale version from before my edit. How do I force it to pick up the new file? Show the code.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Write a Lua 5.4 function `paginate(total, per_page)` that returns two values: the number of full pages needed to hold all items (rounded up is not required — use floor of total divided by per_page), and the exact average items-per-page as a decimal number.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Turn this Lua 5.4 script into a module that returns a table, keeps helpers local, and exposes only the documented constructor and methods.",
+    "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
+    "split": "train"
+  },
+  {
+    "query": "A Lua loop accidentally writes counters into _G. Fix the scoping and explain which locals should be captured by the returned closures.",
+    "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
+    "split": "validation"
+  },
+  {
+    "query": "Implement a Lua metatable-backed value object with explicit __index and __eq behavior and no surprising mutation through shared prototype tables.",
+    "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
+    "split": "validation"
+  },
+  {
+    "query": "Use a Lua coroutine to stream parsed records with clear error propagation, completion semantics, and no global scheduler state.",
+    "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
+    "split": "validation"
+  },
+  {
+    "query": "I have a Rectangle class with mutable width and height and setWidth/setHeight methods. I now need a Square type in the same system. What's the cleanest way to model Square given I already have Rectangle?",
+    "rationale": "near miss owned by oop-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "I have a log file with about 20 million lines already loaded as an array of strings in JavaScript. Write a function that keeps only the ERROR lines, extracts the timestamp from each, and returns the first 10. Explain any performance concerns.",
+    "rationale": "near miss owned by fp-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "I'm writing TypeScript that compiles to Lua with the typescript-to-lua transpiler. Write a `divmod` function that takes two numbers and returns both the quotient (floored) and the remainder so the generated Lua uses native Lua multiple return values rather than an array or object wrapper. Include a call site that consumes both values.",
+    "rationale": "near miss owned by typescript-to-lua-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "In our LuaJIT game engine, write a factory function `create_entity(x, y, kind)` that returns a new entity table. Entities need position (x, y), a kind, a velocity (velocity_x, velocity_y starting at 0), health (starts at 100), and an active flag (starts true). Not all of these are known at the call site, so make it clean and efficient for a hot update loop.",
+    "rationale": "near miss owned by lua-opinionated-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Review this Oop change for design smells and fix the concrete issues you find.",
+    "rationale": "near miss owned by oop-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Help me with pure functions; apply the relevant Fp conventions and call out the important edge cases.",
+    "rationale": "near miss owned by fp-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Return two values from TypeScript-to-Lua without allocating an array and consume them with the correct multi-return typing.",
+    "rationale": "near miss owned by typescript-to-lua-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Review this Lua Opinionated change for essentials and fix the concrete issues you find.",
+    "rationale": "near miss owned by lua-opinionated-guide",
+    "should_trigger": false,
+    "split": "validation"
+  }
+]

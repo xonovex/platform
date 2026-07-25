@@ -7,6 +7,7 @@ were distilled from conference-talk material on modern, data-oriented C.
 
 ## Modern C / data-oriented C conference talks
 
+- **Provenance:** Repository-original C99 conventions supplemented by conference-talk notes retained during the original distillation
 - **Last reviewed:** 2026-06-13
 - **Used for:**
   - `SKILL.md` → Fixed-width types, Value-oriented APIs, Quality (sanitizers), Gotchas
@@ -21,6 +22,12 @@ were distilled from conference-talk material on modern, data-oriented C.
 The C11 `_Generic` overloading and macro-heavy metaprogramming (defer macros, stb_ds-style
 meta-header dynamic arrays) from the same talks are intentionally **excluded** — out of scope
 for this C99 guide.
+
+## Guide-level synthesis
+
+- **Provenance:** Repository-original integration of the source blocks above; these references combine multiple inputs or maintained conventions rather than one exclusive upstream
+- **References:** references/compound-literals.md, references/const-correctness.md, references/inline-functions.md, references/memory-management.md
+- **Last reviewed:** 2026-06-13
 
 ## Refresh Workflow
 

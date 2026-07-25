@@ -1,0 +1,98 @@
+[
+  {
+    "query": "Rewrite this so it reads like a person wrote it, not an AI: 'Our platform offers a seamless, intuitive experience that empowers teams to unlock their full potential. Experts agree it's a game-changer, and studies show productivity has never been better.'",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Add two short news posts about recent electric-vehicle developments to our content site. We publish in both English and Dutch, and each post is a Markdown file with frontmatter.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Write a travel guide for visitors to the city of Porto that we can publish on our multilingual content site.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "This blog paragraph feels robotic. Make it sound human without changing the facts: 'The release was pivotal. It was not just faster, but also cleaner and more reliable. This delivers a robust, seamless experience — creating value — while ensuring users remain engaged. Overall, the future looks promising.'",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Review this Content change for core principles and fix the concrete issues you find.",
+    "rationale": "implicit task cue derived from the Core Principles section",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Rewrite this destination article so it sounds locally informed and specific, removes generic travel clichés, and preserves every verified fact.",
+    "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
+    "split": "validation"
+  },
+  {
+    "query": "Add a bilingual news article with matching frontmatter, translated summaries, publication metadata, and locale-correct internal links.",
+    "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
+    "split": "validation"
+  },
+  {
+    "query": "Create Dutch and English venue-guide entries with coordinates, accessibility facts, opening-hour provenance, and consistent slugs.",
+    "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
+    "split": "validation"
+  },
+  {
+    "query": "We just wrapped a debugging session where I made a couple of mistakes and had to correct course. Capture the development lessons from this session and save each one as its own file so a future agent can reuse it. Show me exactly what one of those files should contain.",
+    "rationale": "near miss owned by reflect-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "help me write acceptance criteria for the checkout story covering edge cases and errors",
+    "rationale": "near miss owned by user-stories-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Our TypeScript HTTP framework docs site at https://acme.dev has getting-started, API reference, routing, and middleware pages, plus a changelog and a migration guide that are only occasionally relevant. Write the llms.txt file we should serve.",
+    "rationale": "near miss owned by llmstxt-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "this packages/auth dir doesn't have an AGENTS.md yet — set one up",
+    "rationale": "near miss owned by instruction-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Review these session notes and promote only evidence-backed recurring lessons into durable project instructions with an owner and validation rule.",
+    "rationale": "near miss owned by reflect-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "rewrite this story using the As a / I want / so that template",
+    "rationale": "near miss owned by user-stories-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Generate per-page Markdown mirrors for an llms.txt index while preserving canonical URLs, headings, code fences, and link targets.",
+    "rationale": "near miss owned by llmstxt-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "the new microservice doesn't have project instructions yet — generate one based on what's in src/",
+    "rationale": "near miss owned by instruction-guide",
+    "should_trigger": false,
+    "split": "validation"
+  }
+]

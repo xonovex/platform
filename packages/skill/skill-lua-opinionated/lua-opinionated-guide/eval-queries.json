@@ -1,0 +1,98 @@
+[
+  {
+    "query": "In our LuaJIT game engine, write a factory function `create_entity(x, y, kind)` that returns a new entity table. Entities need position (x, y), a kind, a velocity (velocity_x, velocity_y starting at 0), health (starts at 100), and an active flag (starts true). Not all of these are known at the call site, so make it clean and efficient for a hot update loop.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "This LuaJIT function runs every frame over thousands of entities and shows up hot in the profiler. Rewrite it to be faster without changing behavior:\n\n```lua\nfunction update_positions(entities, dt)\n    for i = 1, #entities do\n        local e = entities[i]\n        e.x = e.x + e.velocity_x * dt\n        e.y = e.y + e.velocity_y * dt\n    end\nend\n```",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Write a LuaJIT hot-loop function that computes and stores sin and cos of each angle in a large numeric array `angles` into two output arrays. Optimize it for repeated per-frame execution.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "I need to build a large lookup buffer in LuaJIT: an array `buf` of `size` numbers, each initialized to 0, that I'll later index into during a hot loop. Show the idiomatic performant way to create and fill it.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Review this Lua Opinionated change for requirements and fix the concrete issues you find.",
+    "rationale": "implicit task cue derived from the Requirements section",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Review this Lua Opinionated change for essentials and fix the concrete issues you find.",
+    "rationale": "implicit task cue derived from the Essentials section",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "This LuaJIT hot loop allocates a fresh table for every entity. Reuse stable arrays and shapes without changing observable results.",
+    "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
+    "split": "validation"
+  },
+  {
+    "query": "Optimize repeated nested-table lookups in a Lua hot path by caching invariant references locally and measuring the change without stale-cache bugs.",
+    "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
+    "split": "validation"
+  },
+  {
+    "query": "Write a Lua 5.4 function `load_config(path)` that opens the file at `path`, reads all of it, and returns the parsed contents. Show how a caller would use it when the file might not exist, falling back to a default config instead of crashing.",
+    "rationale": "near miss owned by lua-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "I'm writing TypeScript that compiles to Lua with the typescript-to-lua transpiler. Write a `divmod` function that takes two numbers and returns both the quotient (floored) and the remainder so the generated Lua uses native Lua multiple return values rather than an array or object wrapper. Include a call site that consumes both values.",
+    "rationale": "near miss owned by typescript-to-lua-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "our particle simulator stalls when we have 50k particles — the update loop reads position and velocity out of a fat 96-byte struct, can you restructure it for cache efficiency",
+    "rationale": "near miss owned by data-oriented-design-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "A Lua loop accidentally writes counters into _G. Fix the scoping and explain which locals should be captured by the returned closures.",
+    "rationale": "near miss owned by lua-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Return two values from TypeScript-to-Lua without allocating an array and consume them with the correct multi-return typing.",
+    "rationale": "near miss owned by typescript-to-lua-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "profile why the broad-phase is slow — I suspect we're missing cache constantly but want to confirm before changing the layout",
+    "rationale": "near miss owned by data-oriented-design-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "In Lua, write a function that takes an array of a few thousand numbers and returns them as a single comma-separated string. Make it efficient for large inputs.",
+    "rationale": "near miss owned by lua-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "In a typescript-to-lua project I need an interface that compiles directly to a plain raw Lua table with no runtime wrapper, and a standalone helper function that must NOT receive an implicit `self` parameter in the generated Lua. Write the TypeScript.",
+    "rationale": "near miss owned by typescript-to-lua-guide",
+    "should_trigger": false,
+    "split": "validation"
+  }
+]

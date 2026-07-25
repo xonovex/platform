@@ -44,7 +44,7 @@
   {
     "query": "my Closes #123 didn't close the issue when the PR merged, why",
     "should_trigger": true,
-    "split": "validation",
+    "split": "train",
     "rationale": "closing keyword auto-closes only on merge into default branch"
   },
   {
@@ -58,6 +58,42 @@
     "should_trigger": true,
     "split": "validation",
     "rationale": "404-hides-existence; read X-Accepted-GitHub-Permissions"
+  },
+  {
+    "query": "onboard a SHA-pinned reusable GitHub Actions workflow as a required ruleset check with a protected production environment",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "GitHub-native reusable CI, repository, and deployment enforcement"
+  },
+  {
+    "query": "why can this GitHub ruleset be bypassed and how do matching rulesets and required checks combine",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "GitHub-native ruleset layering and bypass behavior"
+  },
+  {
+    "query": "publish a durable implementation-decision comment on this GitHub PR and reconcile the same marked comment on retry without touching my unrelated latest comment",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "provider-native pull-request context comment with append-only retry reconciliation"
+  },
+  {
+    "query": "create a GitHub issue with assignees labels milestone and a blocked-by relationship",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "GitHub-native ticket creation and metadata"
+  },
+  {
+    "query": "add issue 482 to organization Project 7 and set its Status field to In progress without duplicating the item",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "GitHub Projects v2 item and kanban field operation"
+  },
+  {
+    "query": "publish versioned decision context to this GitHub issue for the next agent session",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "durable issue context comment"
   },
   {
     "query": "open a merge request on a GitLab-hosted repo with glab and request reviewers",
@@ -74,13 +110,49 @@
   {
     "query": "how should I label review feedback as blocking vs nit and structure the summary",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "near-miss: review content/labels craft, use code-review-guide"
   },
   {
     "query": "what should I write in the PR description and how do I split a large change",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "near-miss: PR description craft, use pull-request-guide"
+  },
+  {
+    "query": "how should I mark a review comment so the author knows it must be fixed before merge?",
+    "rationale": "near miss owned by code-review-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "ship this",
+    "rationale": "near miss owned by git-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "help me write a good pull request description for this change",
+    "rationale": "near miss owned by pull-request-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "open a merge request against main with glab on this GitLab repo",
+    "rationale": "near miss owned by gitlab-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Create a lifecycle inventory for client secrets with owners, consumers, expiry, audit source, and revocation path.",
+    "rationale": "validation near miss: secret lifecycle governance, not GitHub delivery",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "commit what i have so far with a wip message",
+    "rationale": "validation near miss owned by git-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

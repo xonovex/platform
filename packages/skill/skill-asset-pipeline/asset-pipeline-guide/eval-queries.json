@@ -50,25 +50,25 @@
   {
     "query": "we need to emit different compressed texture formats and byte order per target platform but share one source asset — how should the pipeline handle platforms",
     "should_trigger": true,
-    "split": "train",
+    "split": "validation",
     "rationale": "import-and-compile: target platform as an input folded into output and cache key"
   },
   {
     "query": "references between our baked assets break whenever someone renames or moves a source file — how should asset dependencies be keyed so they survive reorg",
     "should_trigger": true,
-    "split": "train",
+    "split": "validation",
     "rationale": "dependency-tracking: edges by stable identity (GUID) not path"
   },
   {
     "query": "should we do all the mip generation and vertex optimization while importing the FBX, or keep import dumb and do that later",
     "should_trigger": true,
-    "split": "train",
+    "split": "validation",
     "rationale": "raw-vs-runtime-formats: minimal massaging on import, heavy work deferred to compile"
   },
   {
     "query": "a file watcher fires several times for one save and we end up recompiling the asset three times in a row",
     "should_trigger": true,
-    "split": "train",
+    "split": "validation",
     "rationale": "hot-reloading-content: debounce/coalesce watcher events"
   },
   {
@@ -80,19 +80,49 @@
   {
     "query": "I'm modeling assets as typed objects that reference each other by id — how should I design the schema and the reference fields themselves",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "near-miss: how assets are modeled as typed objects/references -> data-model-guide"
   },
   {
     "query": "what discipline keeps my C structs and function pointers safe to swap when I reload a shared library at runtime",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "near-miss: reload-safety discipline of the C code itself -> c99-opinionated-guide"
   },
   {
     "query": "how do I declare render passes so the frame graph derives barriers and transitions for my Vulkan renderer",
     "should_trigger": false,
-    "split": "validation",
+    "split": "train",
     "rationale": "near-miss: GPU render-graph architecture -> gpu-rendering-guide, not the asset pipeline"
+  },
+  {
+    "query": "I'm building the core document store for our level editor — objects of different kinds each with a set of named properties, and I want to add new object types at runtime without recompiling. How should the type/property schema work?",
+    "rationale": "near miss owned by data-model-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "our particle simulator stalls when we have 50k particles — the update loop reads position and velocity out of a fat 96-byte struct, can you restructure it for cache efficiency",
+    "rationale": "near miss owned by data-oriented-design-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "I need to add a SIMD variant of my vec3_dot in lib/math/vec3.c — the rest of the project uses _sse4 and _avx2 suffixes",
+    "rationale": "near miss owned by c99-opinionated-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "I want artists to build effects by dragging boxes onto a canvas and connecting their inputs and outputs with wires instead of writing code — how should I structure the thing they're editing",
+    "rationale": "near miss owned by node-graph-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "one node should adapt its input and output types depending on what's wired into it — a CPU image vs a GPU image — instead of me making two near-identical nodes",
+    "rationale": "validation near miss owned by node-graph-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

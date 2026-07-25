@@ -1,0 +1,98 @@
+[
+  {
+    "query": "We're on moonrepo 2.0. I want to enable and configure one of Moon's built-in extensions in our workspace. Which config file does the extension configuration go in, and show me a minimal example of the config block.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Write a multi-stage Dockerfile that uses `moon docker scaffold` and `moon docker prune` to build our Node service `my-service`, with a final runtime stage based on `gcr.io/distroless/nodejs22-debian12:nonroot`. Make sure the app can actually read its files at runtime.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "In a Moon 2.0 `.moon/tasks/*.yml` task, I need a build step that runs `mkdir -p bin && go build -o bin/app ./cmd/...` and also sets an OUTPUT_DIR env var that should default to `bin` when it is not already set in the environment. Write the task definition.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Migrate this moon v1 project config to moon 2.0:\n\n```yaml\ntype: library\nplatform: node\ntasks:\n  dev:\n    command: 'npm run dev'\n    local: true\n```\n\nAlso tell me what MQL field replaces `projectType` when I later query these projects.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Define a moon task with explicit inputs and outputs, environment variables, dependencies, and a script because it needs shell redirection.",
+    "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
+    "split": "train"
+  },
+  {
+    "query": "A project-local moon.yml task override erased flags inherited from .moon/tasks. Fix the inheritance so the shared strict check remains active.",
+    "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
+    "split": "validation"
+  },
+  {
+    "query": "Run tests only for moon projects tagged skill and query which matching projects inherit the test task.",
+    "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
+    "split": "validation"
+  },
+  {
+    "query": "Write a moon query that selects TypeScript library projects but excludes private tooling, then run their build task with affected filtering.",
+    "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
+    "split": "validation"
+  },
+  {
+    "query": "Write a production Dockerfile for a Node.js 22 web service that builds TypeScript with `npm run build` and serves on port 3000. Keep the final image as small and secure as reasonably possible.",
+    "rationale": "near miss owned by docker-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "In a GitOps repo I have a base/ directory with a Deployment and Service. Write a Kustomize base kustomization.yaml plus a production overlay kustomization.yaml that changes the namespace to production, applies a replica-count patch file, and sets shared labels on all resources. Use current Kustomize v5 syntax.",
+    "rationale": "near miss owned by kubernetes-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Write a portable shell script that must run under dash and busybox sh, not just bash. It should verify that jq is installed, take a filename as its first argument, and abort early on any error or unset variable.",
+    "rationale": "near miss owned by shell-scripting-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "I have a Terraform config that creates private subnets, one per availability zone, from a variable list of AZs. Right now removing a single AZ from the middle of the list forces Terraform to recreate several unrelated subnets. Write the resource and any supporting locals so this stops happening.",
+    "rationale": "near miss owned by terraform-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Harden this production container: run as a non-root numeric user, pin the base image, avoid copying secrets, and make the filesystem read-only where possible.",
+    "rationale": "near miss owned by docker-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Move non-secret settings to a ConfigMap and credentials to a Secret, then mount both without checking decoded secret values into Git.",
+    "rationale": "near miss owned by kubernetes-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Add safe shell error handling to this script, accounting for commands where set -e is suppressed and cleanup that must always run.",
+    "rationale": "near miss owned by shell-scripting-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Define a Terraform module with a narrow input contract, validated variables, useful outputs, and no provider configuration inside the child module.",
+    "rationale": "near miss owned by terraform-guide",
+    "should_trigger": false,
+    "split": "validation"
+  }
+]
