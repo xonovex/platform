@@ -26,7 +26,7 @@
       "assertions": [
         "Replaces the project-specific path `packages/billing-service/src/` and domain/app terms (billing, invoicing) with generic equivalents rather than hardcoding them",
         "Gives the command a kebab-case name",
-        "Resulting command body is kept short (under ~150 lines) with the essential sections (description/metadata, Goal, Arguments, Core Workflow, Error Handling)"
+        "Resulting command body is kept short (under ~150 lines); since no installed skill owns the procedure, it is self-contained with the sections for that case (description/metadata, Goal, Arguments, Core Workflow, Error Handling)"
       ]
     }
   ]

@@ -19,21 +19,22 @@ Generate a new reusable prompt file (a.k.a. slash command, user-invocable comman
 
 1. **Analyze Task** — parse description to identify core goal, required inputs, key steps, tools used, validation, output
 2. **Generate Name** — create kebab-case name from description (e.g. "Remove comments" → `code-comments-remove`)
-3. **Make Generic** — strip project-specific paths (`packages/myapp/` → `src/`), domain terms (`users` → `items`), tech-specific names
+3. **Make Generic** — replace project coordinates with neutral equivalents that preserve shape: keep a path's depth and role (`packages/billing-service/src/` → `packages/example/src/`, not `src/`), swap a domain cluster for a neutral one (`users`/`orders`/`payments` → `items`), drop vendor and service names
 4. **Pick Target Format** — determine the target agent harness and its file format (see [harness-formats.md](harness-formats.md) for the per-harness matrix)
-5. **Structure Prompt** — metadata block + Goal (3-5 bullets) + Usage (2-3 examples) + Arguments + Core Workflow (5-8 steps) + Implementation Details + Error Handling
+5. **Structure Prompt** — thin shape by default (skeleton in [distill.md](distill.md)); self-contained only when no owning skill exists: metadata block + Goal (3-5 bullets) + Arguments + Core Workflow (4-8 steps) + Implementation Details + Error Handling
 6. **Validate Structure** — required sections present, metadata block parses, generic examples, no project-specific content, file length <150 lines
 7. **Write File** — save to the harness-specific location and extension (see [harness-formats.md](harness-formats.md))
 
-## Required Sections
+## Sections for a self-contained command (no owning skill)
 
 - Metadata block: at minimum a 1-sentence `description`; add other fields (tools, permissions, argument hint, activation scope) appropriate for the target harness — see [harness-formats.md](harness-formats.md)
-- Goal (3-5 bullets), Usage (2-3 examples), Arguments (required/optional, defaults), Core Workflow (4-8 steps), Implementation Details, Error Handling
+- Goal (3-5 bullets), Arguments (required/optional, defaults), Core Workflow (4-8 steps), Implementation Details, Error Handling
+- Let the argument contract carry usage instead of example blocks: enumerate allowed values inline (`--tone formal|casual|technical`), state defaults, and mark required arguments as required in the `argument-hint`
 
 ## Error Handling
 
 - Description too vague → ask for more details
-- Name already exists → suggest alternatives or `--force`
+- Name already exists → suggest alternatives; never overwrite
 - Invalid name → must be kebab-case, alphanumeric
 - Missing required sections → validate before writing
 

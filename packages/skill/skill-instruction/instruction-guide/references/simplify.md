@@ -1,6 +1,6 @@
 # simplify: Condense Verbose AGENTS.md
 
-Reduce AGENTS.md verbosity by 40-50% while preserving structure, workflows, and project-specific technology names.
+Reduce AGENTS.md verbosity by 30-60% (default target 45%) while preserving structure, workflows, and project-specific technology names.
 
 ## Core Workflow
 
@@ -29,8 +29,6 @@ section headings, dependencies, command examples with actual tool names, file/di
 ### After
 
 Environment configs (`main.tf`, vars, `backend.sh`) - local, staging
-
-Valid reduction range: 30-60%.
 
 ## Gotchas
 

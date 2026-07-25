@@ -50,7 +50,7 @@ These belong **in the test queries**, not in the description itself. Generic que
 2. Identify train-set failures
 3. Revise the description:
    - Should-trigger failing → broaden or add context
-   - Should-not-trigger false-positive → add specificity / "skip" clauses
+   - Should-not-trigger false-positive → sharpen the distinguishing trigger words; do not add a "skip" clause
    - Avoid copying failed-query keywords (overfit) — address the category
    - If stuck after a few iterations, try a structurally different framing
    - Stay ≤1024 chars

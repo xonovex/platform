@@ -4,7 +4,7 @@ Reduce verbosity in a prompt file while preserving all functional content. Remov
 
 ## Goal
 
-- Reduce file length by 40-60% while maintaining full functionality
+- Reduce file length by 30-70% (default target 50%) while maintaining full functionality
 - Remove duplicate and redundant sections
 - Simplify verbose examples and explanations
 - Convert project-specific content to generic equivalents
@@ -23,7 +23,7 @@ Reduce verbosity in a prompt file while preserving all functional content. Remov
 3. **Analyze Structure** — classify each section:
    - **Essential (keep):** metadata block, goal, arguments, core workflow, implementation details, error handling
    - **Simplifiable (reduce):** examples, explanations, output samples
-   - **Removable (delete):** advanced features, best practices, version control, technical notes
+   - **Usually removable:** advanced features, version control, technical notes; best practices and troubleshooting only after checking they hold no safety rule
 4. **Identify Patterns** — scan for project-specific content: paths, domain clusters (3+ related terms), API/service names, industry terminology, redundant sections
 5. **Simplify Content** — merge duplicates, reduce examples (4+ → 2-3), condense explanations, shorten output samples (60-70%)
 6. **Make Generic** — replace specific paths / domain terms / API names; remove industry context
@@ -32,9 +32,9 @@ Reduce verbosity in a prompt file while preserving all functional content. Remov
 
 ## Simplification Rules
 
-### Remove entirely
+### Usually removable
 
-advanced features, best practices, version-control integration, technical notes, troubleshooting (if redundant)
+Sections that restate baseline model knowledge, the harness's own documentation, or content already covered elsewhere in the file — typically Advanced Features, Version-Control Integration, Technical Notes, and redundant Troubleshooting. Before deleting Best Practices or Troubleshooting, check whether it is the only home of a safety or destructive-action rule; if so, move that rule into Safety and delete the rest.
 
 ### Merge
 
@@ -54,9 +54,9 @@ metadata block, goal, arguments, core workflow, implementation details, error ha
 
 ## Generalization Patterns
 
-1. **Paths:** replace `/packages\/[\w-]+\//g` → `packages/example/`
+1. **Paths:** neutralize the project segment but keep the path's depth and role (`packages/billing-service/src/` → `packages/example/src/`)
 2. **Domain terms:** find 3+ related specialized terms (e.g. `users+orders+payments`) and replace with generic equivalents
-3. **Project names:** replace `(\w+)(API|Service|Database|Client)` → `MyProject$2`
+3. **Project names:** neutralize the qualifier and keep the role suffix (`StripeClient` → `PaymentClient`, `AcmeUserService` → `UserService`)
 4. **Business context:** remove industry-specific workflows, use generic CRUD examples
 
 ## Dry-run Output
@@ -80,10 +80,9 @@ Result: 208 lines (59%)
 
 ## Safety
 
-Commit to git first; use `--dry-run`; test after changes; skip if <150 lines.
+Commit to git first; use `--dry-run`; test after changes; skip if already thin (a Delegation block and no inlined procedure).
 
 ## Gotchas
 
 - "Already simplified" usually means <150 lines, but a 200-line file with 60% prose padding still has room — measure prose:bullets ratio
-- Stripping "Best Practices" sections sometimes removes the only place a critical safety rule lives — diff carefully
 - Generalizing too aggressively (e.g. all paths → `src/`) destroys the example's usefulness — keep enough specificity to learn from

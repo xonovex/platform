@@ -17,6 +17,7 @@ Author, refresh, simplify, consolidate, and port AGENTS.md project-instruction f
 - **Preserve Project Context** — never modify technology names, paths, or commands
 - **Match Style and Voice** — maintain the target file's formatting and terminology
 - **Structure Integrity** — keep section order and hierarchy intact; preview changes (dry-run) before applying
+- **Shape follows size** — a single-concern file is a `# Title` plus a flat bullet list; add `##` sections once the file covers several distinct concerns (a repo-root or package-root file usually does). Prose paragraphs stay out either way
 - **Signal Over Volume** — keep only non-obvious content; anything inferable from `package.json` + source belongs in the code, not the doc
 - **Living documentation** — update alongside project changes (sync operation)
 

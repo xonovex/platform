@@ -7,7 +7,7 @@
 - **User intent over implementation** — match what the user asks for, not internal mechanics
 - **Be pushy on triggers** — include "even when the user doesn't say '{keyword}'" for non-obvious matches
 - **Concise** — a short paragraph; ≤1024 chars (spec limit)
-- **Positive routing only** — describe what the skill is for and let triggers route; do not add "Skip …" clauses, enumerate out-of-scope work, or point to other skills by name in the description
+- **Positive routing only** — describe what the skill is for and let triggers route; do not add "Skip …" clauses, enumerate out-of-scope work, or point to other skills by name in the description. The one exception is an overlay skill declaring its base ("An overlay on c99-guide: covers only …, not …"), where the base would otherwise steal every route
 
 ## Anatomy
 

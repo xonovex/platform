@@ -27,7 +27,7 @@ caveats, gotchas, non-obvious constraints, style rules, or architectural decisio
 
 ### Format
 
-`# Title` (humanized dir name) + flat bullet list — no `##` headings, no prose paragraphs
+Standardize to the shape rule in SKILL.md — flatten prose to bullets, and drop `##` scaffolding from single-concern files. A file covering several distinct concerns keeps its `##` sections.
 
 - Convert prose → bullet points; remove redundant descriptions and predictable guideline links
 - Remove bullets that summarize code (an agent can read the code itself)

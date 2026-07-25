@@ -20,7 +20,7 @@ Generate a concise AGENTS.md for a directory by scanning its structure, config f
 
 ## Output Format
 
-`# Title` (humanized dir name, e.g. `agent-operator-go` → `Agent Operator Go`) + flat bullet list — no `##` headings, no prose
+`# Title` (humanized dir name, e.g. `agent-operator-go` → `Agent Operator Go`) + bullets, per the shape rule in SKILL.md — no prose paragraphs
 
 - Backtick-wrap commands/files/keys; `—` for descriptions, `→` for workflow chains
 - Parenthetical file lists: `(main.tf, vars)`; dash-separated examples: `- local, staging`
