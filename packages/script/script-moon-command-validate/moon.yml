@@ -1,0 +1,31 @@
+$schema: https://moonrepo.dev/schemas/project.json
+language: typescript
+tags: [typescript-script]
+tasks:
+  coverage:
+    command: noop
+    deps: [ts-coverage]
+    options:
+      cache: false
+  ts-coverage:
+    script: >-
+      npx vitest run --coverage --coverage.include='src/**'
+      --coverage.thresholds.lines 80
+      --coverage.thresholds.functions 80
+      --coverage.thresholds.branches 70
+      --coverage.thresholds.statements 80
+  install:
+    command:
+      - npm
+      - install
+      - -w
+      - "@xonovex/script-moon-command-validate"
+    deps:
+      - ~:build
+    options:
+      cache: false
+      runFromWorkspaceRoot: true
+  ci-check:
+    deps: [coverage]
+    options:
+      mergeDeps: append

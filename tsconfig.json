@@ -27,6 +27,9 @@
       "path": "./packages/script/script-moon-action-graph"
     },
     {
+      "path": "./packages/script/script-moon-command-validate"
+    },
+    {
       "path": "./packages/script/script-moon-common"
     },
     {

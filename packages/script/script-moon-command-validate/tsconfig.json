@@ -1,0 +1,18 @@
+{
+  "extends": "@xonovex/ts-config-cli",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": ".",
+    "paths": {
+      "@xonovex/core/*": ["../../shared/shared-core/src/*"],
+      "@xonovex/core": ["../../shared/shared-core/src/index.ts"]
+    }
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "dist"],
+  "references": [
+    {
+      "path": "../../shared/shared-core"
+    }
+  ]
+}
