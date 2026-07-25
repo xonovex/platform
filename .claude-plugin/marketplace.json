@@ -67,11 +67,6 @@
       "description": "Xonovex C99 opinionated skills"
     },
     {
-      "name": "xonovex-skill-caveman",
-      "source": "./packages/skill/skill-caveman",
-      "description": "Xonovex Caveman writing-style skill"
-    },
-    {
       "name": "xonovex-skill-cmake",
       "source": "./packages/skill/skill-cmake",
       "description": "Xonovex CMake skills"
@@ -145,11 +140,6 @@
       "name": "xonovex-skill-expressjs",
       "source": "./packages/skill/skill-expressjs",
       "description": "Xonovex Express.js skills"
-    },
-    {
-      "name": "xonovex-skill-fable",
-      "source": "./packages/skill/skill-fable",
-      "description": "Xonovex Fable mode skill"
     },
     {
       "name": "xonovex-skill-fdd",
