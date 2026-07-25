@@ -1,6 +1,6 @@
 ---
 name: android-analytics-guide
-description: "Use when adding or reviewing analytics / event tracking in an Android app — tracking screen views and user-intent events, deciding where tracking belongs (ViewModel vs UI), typed events and screen names, user properties and identity, consent-gated and privacy-safe tracking, A/B experiments, and testing tracking with a fake tracker. Triggers on an injected analytics tracker, trackScreen / trackEvent / setUserProperties, screen-view or button-click events, user properties, cookie consent or PII in events, or asserting tracked events in tests — even when the user doesn't say 'analytics'."
+description: "Use when adding or reviewing analytics / event tracking in an Android app — tracking screen views and user-intent events, deciding where tracking belongs (ViewModel vs UI), typed events and screen names, user properties and identity, consent-gated and privacy-safe tracking, A/B experiments, and testing tracking with a fake tracker. Triggers on an injected analytics tracker, trackScreen / trackEvent / setUserProperties, screen-view or button-click events, user properties, consent state or PII in events, or asserting tracked events in tests — even when the user doesn't say 'analytics'."
 ---
 
 # Android analytics — quick reference

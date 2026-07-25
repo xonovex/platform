@@ -27,8 +27,5 @@ argument-hint: "[skill-file|--all] [--model <weakest>] [--tier auto|aggressive|m
 ## Delegation
 
 Load the `skill-guide` skill (plugin `xonovex-skill-skill`) and run its **optimize**
-operation end to end for the target(s): measure the weakest model's baseline against each
-skill's `evals.json` with the skill absent, classify tier, trim to the knowledge delta,
-gate with `scripts/validate.py`, then ablate — re-measure with the trimmed skill in context
-and restore any essential fact it no longer conveys. The skill is the source of truth for
-the procedure, tiers, and gotchas — do not restate them.
+operation end to end for the target(s), trimming and then ablation-verifying each. The
+skill is the source of truth for the procedure, tiers, and gotchas — do not restate them.
