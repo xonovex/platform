@@ -1,6 +1,8 @@
 ---
 name: skill-guide
 description: "Use when authoring, reviewing, extracting, merging, simplifying, decomposing, or validating Agent Skills (SKILL.md plus references / scripts / assets), or when auditing, splitting, de-duplicating, or tiering a whole set of skills. Triggers on edits under a skills directory, on prompts about creating a new skill, progressive disclosure, reference files, pattern extraction, merging or assimilating skills, simplification to bullet format, validation against the Agent Skills spec, description tuning, evaluating trigger rate / output quality, or making a catalog composable (one owner per concept, cross-references, general→language→framework tiers) — even when the user doesn't say 'skill'."
+compatibility: "Python 3.11+ with uv runs the bundled validate, eval, and source-audit scripts. audit-sources.py additionally needs git and network access to re-check sources; the trigger and output eval runners need a credentialed Claude CLI."
+allowed-tools: "Read Bash(git:*) Bash(uv:*) Bash(claude:*)"
 ---
 
 # Skill Guidelines Management
