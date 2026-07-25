@@ -56,16 +56,15 @@ alongside this one.
 
 ### Skills
 
-| Command            | Description                                             |
-| ------------------ | ------------------------------------------------------- |
-| `skill-create`     | Create a guideline skill from a document or URL         |
-| `skill-extract`    | Extract patterns from codebase into a skill             |
-| `skill-simplify`   | Make skills project-independent and condense            |
-| `skill-decompose`  | Split a multi-concern skill into single-owner skills    |
-| `skill-assimilate` | Augment a skill with elements from another skill        |
-| `skill-optimize`   | Trim a skill to its delta over baseline model knowledge |
-| `skill-evaluate`   | Seed a skill's evals.json output-eval file              |
-| `skill-ablate`     | Verify no essential knowledge was trimmed               |
+| Command            | Description                                                          |
+| ------------------ | -------------------------------------------------------------------- |
+| `skill-create`     | Create a guideline skill from a document or URL                      |
+| `skill-extract`    | Extract patterns from codebase into a skill                          |
+| `skill-simplify`   | Make skills project-independent and condense                         |
+| `skill-decompose`  | Split a multi-concern skill into single-owner skills                 |
+| `skill-assimilate` | Augment a skill with elements from another skill                     |
+| `skill-optimize`   | Trim a skill (or catalog) to its knowledge delta and ablation-verify |
+| `skill-evaluate`   | Seed a skill's evals.json output-eval file                           |
 
 ### Slash Commands
 
