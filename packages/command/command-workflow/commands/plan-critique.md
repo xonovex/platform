@@ -13,7 +13,7 @@ argument-hint: "[plan-file] [--mode red-team|pre-mortem|falsify|steelman|all]"
 
 # /xonovex-workflow:plan-critique — Adversarially Critique a Plan
 
-> Lifecycle: research → decide → create → revise ⇄ **critique** → subplans-create → continue → update → validate
+> Lifecycle: research → decide → create → revise ⇄ **critique** → accept → subplans-create → continue → update → validate
 
 ## Arguments
 

@@ -14,7 +14,7 @@ argument-hint: "[spec-file-or-requirements] [--interactive] [--depends-on <plan>
 
 # /xonovex-workflow:plan-create — Create Plan with Research
 
-> Lifecycle: research → decide → **create** → revise ⇄ critique → subplans-create → continue → update → validate
+> Lifecycle: research → decide → **create** → revise ⇄ critique → accept → subplans-create → continue → update → validate
 
 ## Arguments
 

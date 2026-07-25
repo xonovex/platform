@@ -17,7 +17,7 @@ argument-hint: "[document-path]"
 
 # /xonovex-workflow:plan-continue — Continue Progress from Plan
 
-> Lifecycle: research → decide → create → revise ⇄ critique → subplans-create → **continue** → update → validate
+> Lifecycle: research → decide → create → revise ⇄ critique → accept → subplans-create → **continue** → update → validate
 
 ## Arguments
 

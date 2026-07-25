@@ -13,7 +13,7 @@ argument-hint: "[document-path] [--dry-run]"
 
 # /xonovex-workflow:plan-update — Update Plan Progress
 
-> Lifecycle: research → decide → create → revise ⇄ critique → subplans-create → continue → **update** → validate
+> Lifecycle: research → decide → create → revise ⇄ critique → accept → subplans-create → continue → **update** → validate
 
 ## Arguments
 

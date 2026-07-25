@@ -15,7 +15,7 @@ argument-hint: "[plan-file] [--detailed]"
 
 # /xonovex-workflow:plan-validate — Validate Plan Achievement
 
-> Lifecycle: research → decide → create → revise ⇄ critique → subplans-create → continue → update → **validate**
+> Lifecycle: research → decide → create → revise ⇄ critique → accept → subplans-create → continue → update → **validate**
 
 ## Arguments
 

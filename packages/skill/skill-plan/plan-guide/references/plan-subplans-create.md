@@ -4,7 +4,7 @@ Generate detailed implementation subplans from an approved parent plan, with par
 
 ## Prerequisites
 
-An approved parent plan (run `plan-create` first). Does **NOT** explore the codebase — relies on parent-plan context.
+An approved parent plan — `status: approved`, set by `plan-accept`. Does **NOT** explore the codebase — relies on parent-plan context.
 
 ## Core Workflow
 

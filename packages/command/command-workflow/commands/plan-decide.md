@@ -14,7 +14,7 @@ argument-hint: "[topic-or-plan-file] [--save-to <file>]"
 
 # /xonovex-workflow:plan-decide — Settle Decisions One at a Time
 
-> Lifecycle: research → **decide** → create → revise ⇄ critique → subplans-create → continue → update → validate
+> Lifecycle: research → **decide** → create → revise ⇄ critique → accept → subplans-create → continue → update → validate
 
 ## Arguments
 

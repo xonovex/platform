@@ -13,7 +13,7 @@ argument-hint: "[parent-plan-file] [--by-phase] [--dry-run]"
 
 # /xonovex-workflow:plan-subplans-create — Generate Detailed Subplans from Parent Plan
 
-> Lifecycle: research → decide → create → revise ⇄ critique → **subplans-create** → continue → update → validate
+> Lifecycle: research → decide → create → revise ⇄ critique → accept → **subplans-create** → continue → update → validate
 
 ## Arguments
 

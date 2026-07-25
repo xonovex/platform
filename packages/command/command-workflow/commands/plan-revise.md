@@ -12,7 +12,7 @@ argument-hint: "[plan-file]"
 
 # /xonovex-workflow:plan-revise — Revise Plan from Feedback
 
-> Lifecycle: research → decide → create → **revise** ⇄ critique → subplans-create → continue → update → validate
+> Lifecycle: research → decide → create → **revise** ⇄ critique → accept → subplans-create → continue → update → validate
 
 ## Arguments
 
