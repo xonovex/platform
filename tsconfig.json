@@ -55,9 +55,6 @@
     },
     {
       "path": "./packages/shared/shared-core"
-    },
-    {
-      "path": "packages/agent/agent-cli"
     }
   ]
 }
