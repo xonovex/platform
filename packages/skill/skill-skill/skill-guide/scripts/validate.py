@@ -8,12 +8,12 @@
 """Validate a SKILL.md against the Agent Skills spec and authoring best practices.
 
 Usage:
-    validate.py <skill-dir>
-    validate.py <path-to-SKILL.md>
+    validate.py [--strict] <skill-dir>
+    validate.py [--strict] <path-to-SKILL.md>
 
 Exit codes:
-    0 = PASS (no errors; warnings allowed)
-    1 = FAIL (one or more errors)
+    0 = PASS (no errors; warnings allowed unless --strict)
+    1 = FAIL (one or more errors, or warnings under --strict)
     2 = usage error / file not found
 
 Read-only — never modifies files.
@@ -83,6 +83,10 @@ def build_parser() -> argparse.ArgumentParser:
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     p.add_argument("target", help="skill directory or path to a SKILL.md")
+    p.add_argument(
+        "--strict", action="store_true",
+        help="treat authoring warnings as validation failures",
+    )
     return p
 
 
@@ -93,8 +97,6 @@ def resolve_target(arg: str) -> tuple[Path, Path]:
         if (target / "SKILL.md").is_file():
             skill = target / "SKILL.md"
         else:
-            # Skill-package layout: the SKILL.md lives in a single guide subdir
-            # (e.g. skill-c99/c99-guide/SKILL.md), so descend one level.
             nested = sorted(p for p in target.glob("*/SKILL.md") if p.is_file())
             if len(nested) > 1:
                 sys.stderr.write(
@@ -134,6 +136,24 @@ def check_loader_quoting(fm_raw: str, report: Report) -> None:
     quotes; it stops at the first inner delimiter and reads the tail as an
     unknown attribute. `yaml.safe_load` accepts these, so scan the raw text.
     """
+    description_line = next(
+        (line for line in fm_raw.splitlines() if re.match(r"^description\s*:", line)),
+        None,
+    )
+    if description_line is not None:
+        raw_description = description_line.split(":", 1)[1].strip()
+        if (
+            len(raw_description) >= 2
+            and raw_description.startswith('"')
+            and raw_description.endswith('"')
+        ):
+            report.add_pass("frontmatter: description uses a double-quoted scalar")
+        else:
+            report.add_fail(
+                "frontmatter: 'description' must use one double-quoted scalar; "
+                "use single quotes for phrases inside it"
+            )
+
     flagged = False
     for raw_line in fm_raw.splitlines():
         m = QUOTED_SCALAR_RE.match(raw_line)
@@ -450,7 +470,9 @@ def check_harness_neutrality(body: str, report: Report) -> None:
         report.add_pass("harness-neutrality: clean")
 
 
-def render_report(report: Report, skill_path: Path, skill_dir: Path) -> int:
+def render_report(
+    report: Report, skill_path: Path, skill_dir: Path, strict: bool,
+) -> int:
     print(f"Validation: {skill_path}")
     print(f"Skill dir: {skill_dir}")
     print()
@@ -468,6 +490,9 @@ def render_report(report: Report, skill_path: Path, skill_dir: Path) -> int:
         print(f"Result: FAIL ({n_err} error(s), {n_warn} warning(s))")
         return 1
     if n_warn > 0:
+        if strict:
+            print(f"Result: FAIL ({n_warn} warning(s) in strict mode)")
+            return 1
         print(f"Result: PASS with {n_warn} warning(s)")
         return 0
     print("Result: PASS (no warnings)")
@@ -494,7 +519,7 @@ def main(argv: list[str]) -> int:
     check_reference_tocs(skill_dir, report)
     check_harness_neutrality(body, report)
 
-    return render_report(report, skill_path, skill_dir)
+    return render_report(report, skill_path, skill_dir, args.strict)
 
 
 if __name__ == "__main__":

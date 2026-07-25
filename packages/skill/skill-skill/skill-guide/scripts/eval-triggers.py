@@ -13,19 +13,18 @@ Usage:
 Options (flag overrides env; env keeps the loop/CI ergonomics):
     --runs N             / RUNS=N            runs per query (default: 3)
     --threshold F        / THRESHOLD=F       trigger-rate cutoff for a pass (default: 0.5)
-    --model M            / CLAUDE_MODEL=M    model for `claude --model` — use `haiku` to keep cost low
-    --disallowed-tools L / DISALLOWED_TOOLS=L  tools blocked during the eval (default blocks
-                                             everything but Skill, so non-triggering runs stay cheap)
-    --max-budget-usd N   / MAX_BUDGET_USD=N  hard per-run spend cap (default: 0.10; 0 disables)
+    --model M            / CLAUDE_MODEL=M    model for `claude --model`
+                                               (default: claude-haiku-4-5-20251001)
+    --plugin-dir PATH    / PLUGIN_DIR=PATH    target-only local plugin directory
+    --max-budget-usd N   / MAX_BUDGET_USD=N  hard per-run spend cap (default/max: 0.05)
 
 Cost: a run where the skill does NOT fire would otherwise execute the whole task.
-The default tool-blocking keeps those short, `--model haiku` makes them cheap, and
-`--max-budget-usd` caps each run. While iterating, prefer `--runs 1` on the train split.
+Only Skill is exposed, negative responses are bounded, and each run has hard
+budget/time/output ceilings. While iterating, prefer `--runs 1` on the train split.
 
 Safety model:
     1. Each query launches `claude -p --output-format stream-json --verbose`
-       with side-effect tools disallowed. State-mutating tools are blocked
-       even before the kill fires.
+       with only the target plugin and Skill tool available.
     2. The runner reads the stream line-by-line. The instant a `Skill` tool_use
        OR a `Skill` permission_denial matching the target skill is observed,
        the claude process is terminated — no further tools dispatch.
@@ -43,10 +42,92 @@ import argparse
 import json
 import os
 import shutil
-import signal
 import subprocess
 import sys
+import threading
 from pathlib import Path
+
+TRIGGER_TIMEOUT = 60
+TRIGGER_OUTPUT_LIMIT = 2_000
+MAX_MODEL_RUNS = 24
+CLAUDE_GENERATION_MODEL = "claude-haiku-4-5-20251001"
+TRIGGER_SYSTEM_PROMPT = (
+    "Decide only whether the available skill applies to the user request. "
+    "If it applies, invoke Skill immediately. Otherwise reply with one short sentence. "
+    "Do not perform the requested task."
+)
+CLAUDE_SKILL_PLUGIN_FIELDS = {
+    "author", "dependencies", "description", "name", "skills", "version",
+}
+CLAUDE_EXECUTABLE_COMPONENTS = (
+    "commands", "agents", "hooks", ".mcp.json", ".lsp.json", "settings.json",
+    ".claude/settings.json",
+)
+
+
+def read_plugin_manifest(directory: Path) -> tuple[str, list[str]]:
+    manifest_path = directory / ".claude-plugin" / "plugin.json"
+    try:
+        value = json.loads(manifest_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as error:
+        raise ValueError(f"invalid Claude plugin manifest: {manifest_path}") from error
+    if not isinstance(value, dict) or not isinstance(value.get("name"), str):
+        raise ValueError(f"Claude plugin manifest has no name: {manifest_path}")
+    unsupported = sorted(set(value) - CLAUDE_SKILL_PLUGIN_FIELDS)
+    if unsupported:
+        raise ValueError(
+            f"Claude eval plugin is not skill-only: {manifest_path} has "
+            f"{unsupported[0]}"
+        )
+    skills = value.get("skills")
+    if not isinstance(skills, list) or not skills or not all(
+        isinstance(skill, str) for skill in skills
+    ):
+        raise ValueError(f"Claude plugin skills are invalid: {manifest_path}")
+    dependencies = value.get("dependencies", [])
+    if not isinstance(dependencies, list) or not all(
+        isinstance(dependency, str) for dependency in dependencies
+    ):
+        raise ValueError(f"Claude plugin dependencies are invalid: {manifest_path}")
+    executable = next(
+        (entry for entry in CLAUDE_EXECUTABLE_COMPONENTS if (directory / entry).exists()),
+        None,
+    )
+    if executable is not None:
+        raise ValueError(
+            f"Claude eval plugin is not skill-only: {directory} contains {executable}"
+        )
+    return value["name"], dependencies
+
+
+def resolve_plugin_directories(target: Path) -> list[Path]:
+    target = target.resolve()
+    directories: dict[str, Path] = {}
+    for directory in target.parent.iterdir():
+        if not (directory / ".claude-plugin" / "plugin.json").is_file():
+            continue
+        name, _ = read_plugin_manifest(directory)
+        directories[name] = directory
+
+    ordered: list[Path] = []
+    visited: set[str] = set()
+
+    def visit(directory: Path) -> None:
+        name, dependencies = read_plugin_manifest(directory)
+        if name in visited:
+            return
+        visited.add(name)
+        for dependency in dependencies:
+            dependency_directory = directories.get(dependency)
+            if dependency_directory is None:
+                raise ValueError(
+                    f"local Claude plugin dependency not found: {name} -> {dependency}"
+                )
+            visit(dependency_directory)
+        ordered.append(directory)
+
+    visit(target)
+    return ordered
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -80,24 +161,18 @@ def build_parser() -> argparse.ArgumentParser:
     )
     p.add_argument(
         "--model",
-        default=os.environ.get("CLAUDE_MODEL", "haiku"),
-        help="model alias/id passed to `claude --model` (env CLAUDE_MODEL, default haiku)",
+        default=os.environ.get("CLAUDE_MODEL") or CLAUDE_GENERATION_MODEL,
+        help="model id passed to `claude --model` "
+        f"(env CLAUDE_MODEL, default {CLAUDE_GENERATION_MODEL})",
     )
-    p.add_argument(
-        "--disallowed-tools",
-        default=os.environ.get(
-            "DISALLOWED_TOOLS",
-            "Bash,Edit,Write,NotebookEdit,WebFetch,WebSearch,Read,Glob,Grep,Task,TodoWrite",
-        ),
-        help="comma-separated tools blocked during the eval (env DISALLOWED_TOOLS); the "
-        "default blocks everything but Skill so non-triggering runs stay short and cheap",
-    )
+    p.add_argument("--plugin-dir", default=os.environ.get("PLUGIN_DIR"),
+                   help="target-only local plugin directory (env PLUGIN_DIR)")
     p.add_argument(
         "--max-budget-usd",
         type=float,
-        default=float(os.environ.get("MAX_BUDGET_USD", "0.10")),
-        help="hard per-run spend cap passed to `claude --max-budget-usd` "
-        "(env MAX_BUDGET_USD, default 0.10; 0 disables)",
+        default=float(os.environ.get("MAX_BUDGET_USD", "0.05")),
+        help="hard per-run spend cap, maximum 0.05 "
+        "(env MAX_BUDGET_USD, default 0.05)",
     )
     return p
 
@@ -144,10 +219,42 @@ def check_line(line: str, target: str, short: str) -> bool:
     return False
 
 
+def skill_available_line(line: str, target: str, short: str) -> bool:
+    try:
+        obj = json.loads(line)
+    except json.JSONDecodeError:
+        return False
+    if not isinstance(obj, dict):
+        return False
+    if obj.get("type") != "system" or obj.get("subtype") != "init":
+        return False
+    skills = obj.get("skills")
+    return isinstance(skills, list) and any(
+        match_skill(skill, target, short) for skill in skills
+    )
+
+
+def stream_text_delta_length(line: str) -> int:
+    try:
+        obj = json.loads(line)
+    except json.JSONDecodeError:
+        return 0
+    if not isinstance(obj, dict) or obj.get("type") != "stream_event":
+        return 0
+    event = obj.get("event")
+    if not isinstance(event, dict) or event.get("type") != "content_block_delta":
+        return 0
+    delta = event.get("delta")
+    if not isinstance(delta, dict) or delta.get("type") != "text_delta":
+        return 0
+    text = delta.get("text")
+    return len(text) if isinstance(text, str) else 0
+
+
 def check_triggered(
     query: str, claude_args: list[str], target: str, short: str
-) -> bool:
-    """Return True if a matching Skill call appears in the stream.
+) -> tuple[bool, str | None]:
+    """Return the target trigger result or an infrastructure error.
 
     Terminates the claude process on first match — no further tools fire.
     """
@@ -155,37 +262,74 @@ def check_triggered(
         ["claude", *claude_args, query],
         stdin=subprocess.DEVNULL,
         stdout=subprocess.PIPE,
-        stderr=subprocess.DEVNULL,
+        stderr=subprocess.PIPE,
         text=True,
-        bufsize=1,  # line-buffered
     )
-    matched = False
-    try:
+    state = {
+        "matched": False,
+        "target_available": False,
+        "output_limit_exceeded": False,
+    }
+    stderr_chunks: list[str] = []
+
+    def kill_process() -> None:
+        if proc.poll() is None:
+            try:
+                proc.kill()
+            except ProcessLookupError:
+                pass
+
+    def read_stdout() -> None:
+        output_chars = 0
         assert proc.stdout is not None
-        for line in proc.stdout:
-            line = line.strip()
+        for raw_line in proc.stdout:
+            line = raw_line.strip()
             if not line:
                 continue
+            state["target_available"] = state["target_available"] or skill_available_line(
+                line, target, short,
+            )
             if check_line(line, target, short):
-                matched = True
-                break
-    finally:
-        # Terminate forcefully — SIGKILL on POSIX, TerminateProcess on Windows
-        if proc.poll() is None:
-            if sys.platform == "win32":
-                proc.terminate()
-            else:
-                try:
-                    proc.send_signal(signal.SIGKILL)
-                except ProcessLookupError:
-                    pass
-        try:
-            proc.wait(timeout=5)
-        except subprocess.TimeoutExpired:
-            proc.kill()
-            proc.wait()
+                state["matched"] = True
+                kill_process()
+                return
+            output_chars += stream_text_delta_length(line)
+            if output_chars > TRIGGER_OUTPUT_LIMIT:
+                state["output_limit_exceeded"] = True
+                kill_process()
+                return
 
-    return matched
+    def read_stderr() -> None:
+        assert proc.stderr is not None
+        stderr_chunks.append(proc.stderr.read())
+
+    stdout_thread = threading.Thread(target=read_stdout)
+    stderr_thread = threading.Thread(target=read_stderr)
+    stdout_thread.start()
+    stderr_thread.start()
+    timed_out = False
+    try:
+        return_code = proc.wait(timeout=TRIGGER_TIMEOUT)
+    except subprocess.TimeoutExpired:
+        timed_out = True
+        kill_process()
+        return_code = proc.wait()
+    stdout_thread.join()
+    stderr_thread.join()
+
+    if state["matched"]:
+        return True, None
+    if timed_out:
+        return False, "timeout"
+    if state["output_limit_exceeded"]:
+        return False, "output-limit"
+    if return_code != 0:
+        detail = "".join(stderr_chunks).strip()
+        suffix = f": {detail}" if detail else ""
+        return False, f"claude exited {return_code}{suffix}"
+    if not state["target_available"]:
+        return False, "target skill unavailable"
+    return False, None
 
 
 def main(argv: list[str]) -> int:
@@ -203,21 +347,40 @@ def main(argv: list[str]) -> int:
 
     runs = args.runs
     threshold = args.threshold
-    claude_model = args.model
-    disallowed = args.disallowed_tools
+    claude_model = args.model or CLAUDE_GENERATION_MODEL
     budget = args.max_budget_usd
+    if not 1 <= runs <= 3:
+        sys.stderr.write("Error: --runs must be between 1 and 3\n")
+        return 2
+    if not 0 <= threshold <= 1:
+        sys.stderr.write("Error: --threshold must be between 0 and 1\n")
+        return 2
+    if not 0 < budget <= 0.05:
+        sys.stderr.write("Error: --max-budget-usd must be > 0 and <= 0.05\n")
+        return 2
+
+    plugin_dir = Path(args.plugin_dir) if args.plugin_dir else queries_file.parent.parent
+    if not plugin_dir.is_dir():
+        sys.stderr.write(f"Error: target plugin directory is invalid: {plugin_dir}\n")
+        return 2
+    try:
+        plugin_directories = resolve_plugin_directories(plugin_dir)
+    except ValueError as error:
+        sys.stderr.write(f"Error: {error}\n")
+        return 2
 
     short = skill_name.rsplit(":", 1)[-1]
 
-    claude_args = ["-p", "--output-format", "stream-json", "--verbose"]
-    if claude_model:
-        claude_args.extend(["--model", claude_model])
-    if disallowed:
-        # Use --opt=val to avoid the variadic parser swallowing the prompt
-        claude_args.append(f"--disallowedTools={disallowed}")
-    if budget and budget > 0:
-        # Hard per-run ceiling so a non-triggering run can't execute the whole task
-        claude_args.extend(["--max-budget-usd", str(budget)])
+    claude_args = [
+        "-p", "--output-format", "stream-json", "--verbose",
+        "--include-partial-messages", "--setting-sources", "",
+        "--strict-mcp-config", "--mcp-config", '{"mcpServers":{}}',
+        "--no-session-persistence", "--no-chrome", "--model", claude_model,
+        "--max-budget-usd", str(budget), "--max-turns", "1",
+        "--system-prompt", TRIGGER_SYSTEM_PROMPT, "--tools", "Skill",
+    ]
+    for plugin_directory in plugin_directories:
+        claude_args.extend(["--plugin-dir", str(plugin_directory)])
 
     try:
         queries = json.loads(queries_file.read_text(encoding="utf-8"))
@@ -230,6 +393,13 @@ def main(argv: list[str]) -> int:
 
     if split != "all":
         queries = [q for q in queries if q.get("split") == split]
+    model_runs = len(queries) * runs
+    if model_runs > MAX_MODEL_RUNS:
+        sys.stderr.write(
+            f"Error: trigger eval would launch {model_runs} model runs; "
+            f"maximum is {MAX_MODEL_RUNS}\n"
+        )
+        return 2
 
     passed = 0
     failed = 0
@@ -244,7 +414,16 @@ def main(argv: list[str]) -> int:
 
         triggers = 0
         for _ in range(runs):
-            if check_triggered(query, claude_args, skill_name, short):
+            triggered, error = check_triggered(
+                query, claude_args, skill_name, short,
+            )
+            if error is not None:
+                sys.stderr.write(
+                    f"Error: trigger infrastructure failure for query "
+                    f"{json.dumps(query)}: {error}\n"
+                )
+                return 2
+            if triggered:
                 triggers += 1
 
         rate = triggers / runs if runs else 0.0
@@ -258,6 +437,7 @@ def main(argv: list[str]) -> int:
             failed += 1
 
         result = {
+            "model": claude_model,
             "query": query,
             "should_trigger": should_trigger,
             "triggers": triggers,
@@ -272,8 +452,8 @@ def main(argv: list[str]) -> int:
     print(
         f"skill: {skill_name}  split: {split}  runs: {runs}  "
         f"threshold: {threshold}  model: {claude_model or '<default>'}  "
-        f"budget/run: {('$' + str(budget)) if budget and budget > 0 else 'none'}  "
-        f"disallowed: {disallowed}",
+        f"budget/run: ${budget}  tools: Skill  timeout: {TRIGGER_TIMEOUT}s  "
+        f"output-limit: {TRIGGER_OUTPUT_LIMIT} chars",
         file=sys.stderr,
     )
     print(f"passed: {passed} / {total}   failed: {failed}", file=sys.stderr)

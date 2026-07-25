@@ -1,6 +1,6 @@
 ---
 name: code-review-guide
-description: Use when writing, structuring, or labelling code-review feedback on a pull or merge request — Conventional Comments labels (praise / nitpick / suggestion / issue / question / thought / chore / todo), the blocking vs non-blocking vs if-minor decorations, pairing one top-level summary with line-anchored inline comments, cross-linking the summary to its details instead of "see comment 3", and verifying each claim against an authoritative source before asserting it. Platform-independent review craft. Triggers on PR / MR review, leaving review comments, blocking / non-blocking, nit, severity, request-changes vs approve, or a review summary — even when the user doesn't say "code review".
+description: "Use when writing, structuring, or labelling code-review feedback on a pull or merge request — Conventional Comments labels (praise / nitpick / suggestion / issue / question / thought / chore / todo), the blocking vs non-blocking vs if-minor decorations, pairing one top-level summary with line-anchored inline comments, cross-linking the summary to its details instead of 'see comment 3', and verifying each claim against an authoritative source before asserting it. Platform-independent review craft. Triggers on PR / MR review, leaving review comments, blocking / non-blocking, nit, severity, request-changes vs approve, or a review summary — even when the user doesn't say 'code review'."
 ---
 
 # Code-review feedback — quick reference
