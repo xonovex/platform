@@ -26,12 +26,6 @@ depended-on skill is missing the command is disabled with `dependency-unsatisfie
 Codex, `dependencies` is not auto-installed — install the delegated skill plugins
 alongside this one.
 
-The `pr-*` commands additionally load a **host-delivery skill** chosen from the git remote
-to open PRs/MRs and post reviews — `xonovex-skill-github` (GitHub), `xonovex-skill-gitlab`
-(GitLab), or another `xonovex-skill-<host>`. These are pluggable, not hard dependencies:
-install the one matching your host. With none installed, the `pr-*` commands still load and
-tell you which host skill to add.
-
 ```
 +---------------------+     +---------------------+     +---------------------+
 |      Research       |     |      Planning       |     |   Worktree Setup    |
@@ -82,15 +76,7 @@ Learning: reflect-to-instructions / reflect-to-skill fold learnings into guideli
 | `plan-continue`         | Resume work from an existing plan                                                          |
 | `plan-validate`         | Verify that a plan or current work has been fully achieved                                 |
 | `plan-update`           | Update plan status and test results                                                        |
-| `story-refine`          | Refine user stories against INVEST and split them vertically (SPIDR)                       |
-| `acceptance-formalize`  | Formalize acceptance criteria as Given-When-Then scenarios (three-amigos)                  |
-| `acceptance-validate`   | Validate a PR against its acceptance scenarios, pass/fail per scenario                     |
 | `git-commit`            | Commit and push changes                                                                    |
-| `pr-create`             | Open a pull request with a drafted description (any host)                                  |
-| `pr-review-analyze`     | Review a branch diff into a structured findings file                                       |
-| `pr-review-refine`      | Refine review findings one by one before publishing                                        |
-| `pr-review-post`        | Publish a structured, labelled code review to a PR (any host)                              |
-| `pr-review-resolve`     | Verify fixes and resolve the review's blocking threads                                     |
 | `plan-worktree-merge`   | Merge feature worktree back to source                                                      |
 | `plan-worktree-abandon` | Document and abandon a feature with reason and learnings                                   |
 | `plan-worktree-cleanup` | Remove stale and merged worktrees, and prune leftover admin metadata                       |

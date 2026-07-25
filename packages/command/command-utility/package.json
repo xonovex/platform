@@ -7,8 +7,7 @@
     "@xonovex/skill-content": "5.0.0",
     "@xonovex/skill-instruction": "5.0.0",
     "@xonovex/skill-reflect": "5.0.0",
-    "@xonovex/skill-skill": "5.0.0",
-    "@xonovex/skill-versioning": "5.0.0"
+    "@xonovex/skill-skill": "5.0.0"
   },
   "keywords": [
     "xonovex",

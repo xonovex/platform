@@ -36,7 +36,7 @@ digraph AgenticTargetArchitecture {
     wf_def [label="Workflow definitions\nworkflows/*.yml\n(steps, gates, loops,\nmax iterations, budgets)", shape=note];
     orchestrator [label="Orchestrator (one semantics, three interpreters)\nL1: workflow-next command (in-session)\nL2: agent-cli workflow run (headless loop)\nL3: WorkflowRun controller (agent-operator-go,\ndeployed on the ci cluster)"];
     gate [label="Gate\npolicy: manual | assisted | auto\naudit trail per decision", shape=diamond, fillcolor=lightcoral];
-    reviewer [label="(Gate reviewer agents:\nplan-critique,\npr-review-analyze, ...)", shape=ellipse, fillcolor=lightyellow];
+    reviewer [label="(Gate reviewer agents:\nplan-critique,\nplan-validate, ...)", shape=ellipse, fillcolor=lightyellow];
   }
 
   // State
@@ -55,7 +55,7 @@ digraph AgenticTargetArchitecture {
     style=filled;
     fillcolor="#e8f0fe";
 
-    steps [label="Commands as steps\nplan-*, pr-*, git-commit, reflect-*\n+ result contract (machine-readable outcome)", fillcolor=lightblue];
+    steps [label="Commands as steps\nplan-*, git-commit, reflect-*\n+ result contract (machine-readable outcome)", fillcolor=lightblue];
     skills [label="Skills\n(procedure source of truth,\nsteps stay thin)"];
   }
 
@@ -117,7 +117,7 @@ digraph AgenticTargetArchitecture {
   steps -> skills [label="consult", style=dashed];
   steps -> journal [label="write result"];
   steps -> plans [label="update status"];
-  steps -> pr [label="pr-create /\ngit-commit --push"];
+  steps -> pr [label="git-commit --push"];
 
   // Delivery and feedback loops
   pr -> gitlab_ci [label="pipeline"];

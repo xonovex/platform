@@ -7,7 +7,7 @@ digraph AgenticMaturityLadder {
 
   l0 [label="L0 - Manual (today)\nadvances: human types each command\ngates: human decides inline\nrunner: interactive session\nreview: human only", fillcolor="#e6f3ff"];
   l1 [label="L1 - Assisted + Adversarial\nadvances: workflow-next reads state,\nsuggests or runs the next step in-session;\nplan-critique stress-tests each plan\ngates: manual / assisted + AI adversarial review\nrunner: interactive session\nreview: human + plan-critique", fillcolor="#d9ecff"];
-  l2 [label="L2 - Supervised autonomous\nadvances: headless loop (agent-cli workflow run)\nruns until the next manual gate\ngates: assisted / auto, async approvals\nrunner: sandboxed headless sessions\nreview: pr-review-analyze + human sign-off", fillcolor="#cce5ff"];
+  l2 [label="L2 - Supervised autonomous\nadvances: headless loop (agent-cli workflow run)\nruns until the next manual gate\ngates: assisted / auto, async approvals\nrunner: sandboxed headless sessions\nreview: agent review + human sign-off", fillcolor="#cce5ff"];
   l3 [label="L3 - Full Autonomous + HITL\nadvances: WorkflowRun controller (operator)\ntriggered by humans, schedules, or sensors\ngates: auto + PR approvals + AgentPolicy\nrunner: AgentRun Jobs (ci cluster)\nreview: automated + human-in-the-loop escalation", fillcolor="#bfdeff"];
 
   l0 -> l1 [label="add workflow defs\n+ plan-critique\n+ step result contract"];

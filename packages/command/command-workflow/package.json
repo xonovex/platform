@@ -5,10 +5,8 @@
   "dependencies": {
     "@xonovex/skill-bdd": "5.0.0",
     "@xonovex/skill-code-quality": "5.0.0",
-    "@xonovex/skill-code-review": "5.0.0",
     "@xonovex/skill-git": "5.0.0",
     "@xonovex/skill-plan": "5.0.0",
-    "@xonovex/skill-pull-request": "5.0.0",
     "@xonovex/skill-tdd": "5.0.0"
   },
   "keywords": [

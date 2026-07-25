@@ -9,7 +9,7 @@
     {
       "name": "xonovex-utility",
       "source": "./packages/command/command-utility",
-      "description": "Xonovex utility commands — skills, instructions, reflect, content, versioning"
+      "description": "Xonovex utility commands — skills, instructions, reflect, content"
     },
     {
       "name": "xonovex-workflow",
