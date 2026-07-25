@@ -3,5 +3,11 @@
   "version": "0.1.30",
   "private": true,
   "description": "Docker image build and GHCR publish for agent-operator-go",
-  "keywords": ["xonovex", "agent", "operator", "go", "docker"]
+  "keywords": [
+    "xonovex",
+    "agent",
+    "operator",
+    "go",
+    "docker"
+  ]
 }

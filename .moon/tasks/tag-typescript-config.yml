@@ -2,7 +2,7 @@ $schema: https://moonrepo.dev/schemas/tasks.json
 extends: ./tag-typescript.yml
 fileGroups:
   configs:
-    - '*.config.*'
+    - "*.config.*"
     - tsconfig*.json
     - .eslintrc*
     - .prettierrc*

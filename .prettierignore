@@ -56,6 +56,10 @@ reports/
 .rts2_cache_umd/
 
 # Auto-Generated Files
+# Go golden fixtures are compared byte-for-byte against yaml.Marshal output
+*.golden.yaml
+# CRDs carry controller-gen's formatting; reformatting diverges from regeneration
+**/config/crd/bases/
 *.gen.*
 auto-imports.d.ts
 routeTree.gen.ts

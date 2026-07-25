@@ -12,7 +12,7 @@ tasks:
       - hadolint
       - Dockerfile
     inputs:
-      - '@globs(dockerfiles)'
+      - "@globs(dockerfiles)"
     outputs: []
     options:
       cache: true

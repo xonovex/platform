@@ -1,9 +1,9 @@
 $schema: https://moonrepo.dev/schemas/tasks.json
 fileGroups:
   sources:
-    - 'src/**/*'
+    - "src/**/*"
   tests:
-    - 'tests/**/*'
+    - "tests/**/*"
 tasks:
   rust-lint:
     command:
@@ -15,8 +15,8 @@ tasks:
       - warnings
     toolchain: [system, nix]
     inputs:
-      - '@globs(sources)'
-      - '@globs(tests)'
+      - "@globs(sources)"
+      - "@globs(tests)"
       - Cargo.toml
       - Cargo.lock
     options:
@@ -28,8 +28,8 @@ tasks:
       - --check
     toolchain: [system, nix]
     inputs:
-      - '@globs(sources)'
-      - '@globs(tests)'
+      - "@globs(sources)"
+      - "@globs(tests)"
     options:
       cache: true
   lint:

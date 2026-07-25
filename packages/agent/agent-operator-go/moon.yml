@@ -18,8 +18,8 @@ tasks:
       - ghcr.io/xonovex/agent-operator-go:latest
       - .
     inputs:
-      - '@globs(sources)'
-      - '@globs(dockerfiles)'
+      - "@globs(sources)"
+      - "@globs(dockerfiles)"
     outputs: []
     options:
       cache: false
@@ -49,8 +49,8 @@ tasks:
     deps:
       - go-build
     inputs:
-      - '@globs(sources)'
-      - '@globs(tests)'
+      - "@globs(sources)"
+      - "@globs(tests)"
     outputs: []
     options:
       cache: false
@@ -65,8 +65,8 @@ tasks:
     deps:
       - go-build
     inputs:
-      - '@globs(sources)'
-      - '@globs(tests)'
+      - "@globs(sources)"
+      - "@globs(tests)"
     outputs: []
     options:
       cache: false
@@ -81,8 +81,8 @@ tasks:
     deps:
       - go-build
     inputs:
-      - '@globs(sources)'
-      - '@globs(tests)'
+      - "@globs(sources)"
+      - "@globs(tests)"
     outputs: []
     options:
       cache: false
@@ -97,8 +97,8 @@ tasks:
     deps:
       - go-build
     inputs:
-      - '@globs(sources)'
-      - '@globs(tests)'
+      - "@globs(sources)"
+      - "@globs(tests)"
     outputs: []
     options:
       cache: false

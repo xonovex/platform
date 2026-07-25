@@ -41,24 +41,24 @@ spec:
 
 #### Full spec reference
 
-| Field | Type | Description |
-| --- | --- | --- |
-| `harnessRef` | string | Name of an AgentHarness in the same namespace |
-| `harness` | object | Inline harness config (mutually exclusive with `harnessRef`) |
-| `providerRef` | string | Name of an AgentProvider in the same namespace |
-| `provider` | object | Inline provider config (mutually exclusive with `providerRef`) |
-| `workspaceRef` | string | Name of an AgentWorkspace for shared workspace support |
-| `workspace` | object | Inline workspace config (mutually exclusive with `workspaceRef`) |
-| `toolchainRef` | string | Name of an AgentToolchain in the same namespace |
-| `toolchain` | object | Inline toolchain config (mutually exclusive with `toolchainRef`) |
-| `prompt` | string | Task prompt for headless execution |
-| `resources` | object | K8s resource requirements for the agent container |
-| `timeout` | duration | Max run duration (default: `1h`) |
-| `env` | list | Additional environment variables |
-| `image` | string | Container image override |
-| `runtimeClassName` | string | Pod runtime class for sandboxed execution (e.g. `gvisor`, `kata`) |
-| `nodeSelector` | map | Node selector for pod scheduling |
-| `tolerations` | list | Tolerations for pod scheduling |
+| Field              | Type     | Description                                                       |
+| ------------------ | -------- | ----------------------------------------------------------------- |
+| `harnessRef`       | string   | Name of an AgentHarness in the same namespace                     |
+| `harness`          | object   | Inline harness config (mutually exclusive with `harnessRef`)      |
+| `providerRef`      | string   | Name of an AgentProvider in the same namespace                    |
+| `provider`         | object   | Inline provider config (mutually exclusive with `providerRef`)    |
+| `workspaceRef`     | string   | Name of an AgentWorkspace for shared workspace support            |
+| `workspace`        | object   | Inline workspace config (mutually exclusive with `workspaceRef`)  |
+| `toolchainRef`     | string   | Name of an AgentToolchain in the same namespace                   |
+| `toolchain`        | object   | Inline toolchain config (mutually exclusive with `toolchainRef`)  |
+| `prompt`           | string   | Task prompt for headless execution                                |
+| `resources`        | object   | K8s resource requirements for the agent container                 |
+| `timeout`          | duration | Max run duration (default: `1h`)                                  |
+| `env`              | list     | Additional environment variables                                  |
+| `image`            | string   | Container image override                                          |
+| `runtimeClassName` | string   | Pod runtime class for sandboxed execution (e.g. `gvisor`, `kata`) |
+| `nodeSelector`     | map      | Node selector for pod scheduling                                  |
+| `tolerations`      | list     | Tolerations for pod scheduling                                    |
 
 ### AgentHarness
 
@@ -82,15 +82,15 @@ spec:
 
 #### Full spec reference
 
-| Field | Type | Description |
-| --- | --- | --- |
-| `type` | string | Agent type (`claude`, `opencode`) |
-| `defaultProvider` | string | Default provider name |
-| `defaultImage` | string | Default container image |
-| `defaultResources` | object | Default resource requirements |
-| `defaultTimeout` | duration | Default timeout for agent runs |
-| `defaultRuntimeClassName` | string | Default pod runtime class (e.g. `gvisor`, `kata`) |
-| `env` | list | Default environment variables |
+| Field                     | Type     | Description                                       |
+| ------------------------- | -------- | ------------------------------------------------- |
+| `type`                    | string   | Agent type (`claude`, `opencode`)                 |
+| `defaultProvider`         | string   | Default provider name                             |
+| `defaultImage`            | string   | Default container image                           |
+| `defaultResources`        | object   | Default resource requirements                     |
+| `defaultTimeout`          | duration | Default timeout for agent runs                    |
+| `defaultRuntimeClassName` | string   | Default pod runtime class (e.g. `gvisor`, `kata`) |
+| `env`                     | list     | Default environment variables                     |
 
 ### AgentProvider
 
@@ -117,13 +117,13 @@ The controller validates that the referenced Secret exists and contains the spec
 
 #### Full spec reference
 
-| Field | Type | Description |
-| --- | --- | --- |
-| `type` | string | Provider type (e.g. `anthropic`, `openai`) |
-| `displayName` | string | Human-readable name |
-| `authTokenSecretRef` | object | Secret reference for auth token |
-| `environment` | map | Environment variables to set |
-| `cliArgs` | list | Additional CLI arguments |
+| Field                | Type   | Description                                |
+| -------------------- | ------ | ------------------------------------------ |
+| `type`               | string | Provider type (e.g. `anthropic`, `openai`) |
+| `displayName`        | string | Human-readable name                        |
+| `authTokenSecretRef` | object | Secret reference for auth token            |
+| `environment`        | map    | Environment variables to set               |
+| `cliArgs`            | list   | Additional CLI arguments                   |
 
 ### AgentWorkspace
 
@@ -154,18 +154,18 @@ spec:
 
 #### Full spec reference
 
-| Field | Type | Description |
-| --- | --- | --- |
-| `type` | string | Workspace type (`git` or `jj`) |
-| `repository.url` | string | Git repository URL (required) |
-| `repository.branch` | string | Branch to checkout |
-| `storageClass` | string | Storage class for workspace PVC (must support RWX) |
-| `storageSize` | string | Storage size for workspace PVC (default: `10Gi`) |
-| `sharedVolumes[].name` | string | Volume name (used as PVC suffix) |
-| `sharedVolumes[].mountPath` | string | Mount path in agent containers |
-| `sharedVolumes[].storageSize` | string | PVC size for this volume (default: `1Gi`) |
-| `git.worktree` | object | Git worktree configuration |
-| `jj.revision` | string | Jujutsu revision |
+| Field                         | Type   | Description                                        |
+| ----------------------------- | ------ | -------------------------------------------------- |
+| `type`                        | string | Workspace type (`git` or `jj`)                     |
+| `repository.url`              | string | Git repository URL (required)                      |
+| `repository.branch`           | string | Branch to checkout                                 |
+| `storageClass`                | string | Storage class for workspace PVC (must support RWX) |
+| `storageSize`                 | string | Storage size for workspace PVC (default: `10Gi`)   |
+| `sharedVolumes[].name`        | string | Volume name (used as PVC suffix)                   |
+| `sharedVolumes[].mountPath`   | string | Mount path in agent containers                     |
+| `sharedVolumes[].storageSize` | string | PVC size for this volume (default: `1Gi`)          |
+| `git.worktree`                | object | Git worktree configuration                         |
+| `jj.revision`                 | string | Jujutsu revision                                   |
 
 #### Volume layout
 
@@ -202,13 +202,13 @@ spec:
 
 #### Full spec reference
 
-| Field | Type | Description |
-| --- | --- | --- |
-| `type` | string | Toolchain type (`nix`) |
-| `nix.nixpkgsRev` | string | Pinned nixpkgs rev the image was built from (required reproducibility pin) |
-| `nix.packages` | list | Nixpkgs attribute names baked into the image (packages source; mutually exclusive with `flakeRef`) |
-| `nix.flakeRef` / `nix.shell` | string | Project flake + devShell (project-flake source; mutually exclusive with `packages`) |
-| `nix.image` | string | Pre-built, digest-pinned agent OCI image the pod runs (required; satisfies `RequirePinnedProvision`) |
+| Field                        | Type   | Description                                                                                          |
+| ---------------------------- | ------ | ---------------------------------------------------------------------------------------------------- |
+| `type`                       | string | Toolchain type (`nix`)                                                                               |
+| `nix.nixpkgsRev`             | string | Pinned nixpkgs rev the image was built from (required reproducibility pin)                           |
+| `nix.packages`               | list   | Nixpkgs attribute names baked into the image (packages source; mutually exclusive with `flakeRef`)   |
+| `nix.flakeRef` / `nix.shell` | string | Project flake + devShell (project-flake source; mutually exclusive with `packages`)                  |
+| `nix.image`                  | string | Pre-built, digest-pinned agent OCI image the pod runs (required; satisfies `RequirePinnedProvision`) |
 
 The `nix` toolchain selects the pre-built image as the pod image — the **same content-addressed store-path closure** the CLI resolves (built from the same `flake.lock` + `nix/agent-env.nix`, verified with `nix path-info -r`). The pod starts by image pull: **no `nix-env` emptyDir, no `nixos/nix` init container, no per-pod `nix profile install`**. The webhook rejects a `NixSpec` missing `nixpkgsRev` or `image`. Build/push the image with `npx moon run agent-operator-go:agent-image-build` (→ `nix build .#legacyPackages.<sys>.agentImage` + skopeo push).
 
@@ -473,6 +473,7 @@ spec:
 ```
 
 The agent container image must include the `jj` binary. When workspace type is `jj`:
+
 - **Standalone clone**: `git clone ... && jj git init --colocate`
 - **Standalone worktree**: `jj workspace add` instead of `git worktree add`
 - **Workspace init**: clone + `jj git init --colocate`
@@ -768,17 +769,19 @@ go test -tags=e2e_coco -v -timeout=600s ./test/e2e-coco/
 Each AgentRun triggers one of two paths:
 
 **Standalone path** (no `workspaceRef`):
+
 1. **Workspace PVC** (RWO) is created for persistent git storage
 2. **Job** is created with init container (git clone) and main container (agent binary)
 3. Controller watches Job status and updates AgentRun phase
 
 **Workspace path** (with `workspaceRef`):
+
 1. **AgentWorkspace** must be in `Ready` phase (requeue if not)
 2. **Job** is created using the workspace's shared PVC (RWX) with init container (git worktree add) and main container (agent binary working in the worktree)
 3. Shared volume PVCs are mounted at configured paths (e.g. `~/.claude/`)
 4. Controller watches Job status and updates AgentRun phase
 
-**RuntimeClassName** is applied to the Job's PodSpec when set on the AgentRun or inherited from the referenced AgentHarness. Both init and main containers run in the sandboxed runtime. Workspace init Jobs do *not* inherit runtimeClassName; only agent Jobs do.
+**RuntimeClassName** is applied to the Job's PodSpec when set on the AgentRun or inherited from the referenced AgentHarness. Both init and main containers run in the sandboxed runtime. Workspace init Jobs do _not_ inherit runtimeClassName; only agent Jobs do.
 
 ```
 Standalone:                         Workspace:
