@@ -1,6 +1,6 @@
 ---
 name: gitlab-guide
-description: "Use when delivering a merge request and its review on GitLab (gitlab.com, self-managed, or Dedicated) with the official glab CLI — opening an MR with `glab mr create`, posting a structured review (summary note + line-anchored inline discussions), resolving review threads, approving/withholding approval, detecting the GitLab host from the git remote, and choosing token type and scopes (the broad `api` scope for any write, `read_api` for reads). Triggers on a gitlab.com or self-managed GitLab remote, `glab`, a merge request / MR, opening an MR against main, posting an inline MR comment, a position object with base/start/head SHAs, resolving a discussion / thread, approving an MR, or a GitLab token scope question — even when the user doesn't say 'glab'."
+description: "Use when delivering a merge request and its review on GitLab (gitlab.com, self-managed, or Dedicated) with the official glab CLI — opening an MR with `glab mr create`, posting a structured review (summary note + line-anchored inline discussions), resolving review threads, approving/withholding approval, working issues as tickets, moving cards across an issue board, detecting the GitLab host from the git remote, and choosing token type and scopes (the broad `api` scope for any write, `read_api` for reads). Triggers on a gitlab.com or self-managed GitLab remote, `glab`, a merge request / MR, opening an MR against main, posting an inline MR comment, a position object with base/start/head SHAs, resolving a discussion / thread, approving an MR, `glab issue` create / close / label, an issue IID, a label-driven issue board list, or a GitLab token scope question — even when the user doesn't say 'glab'."
 ---
 
 # GitLab MR & review delivery — quick reference
@@ -30,6 +30,8 @@ Before any write:
 - **Resolve a thread** — `PUT .../discussions/:discussion_id?resolved=true` (REST is enough on GitLab; no GraphQL needed); match by discussion `id`, never by line. See [references/review-resolve.md](references/review-resolve.md).
 - **Deep-link** — MR notes carry no `web_url`; build `<mr_url>#note_<note_id>` from the returned note `id`. See [references/review-post.md](references/review-post.md).
 - **Auth & host** — `api` scope for writes (`read_api` reads), `GITLAB_HOST` targets self-managed, `GITLAB_TOKEN` is the general auth token. See [references/auth.md](references/auth.md).
+- **Work an issue as a ticket** — `glab issue view/create/update/close`; identity is project + IID, which is not the global id the API returns. See [references/issues.md](references/issues.md).
+- **Track work on a board** — issue boards are label-driven: moving a card means changing labels, and the REST board payload omits the built-in Open/Closed lists. See [references/boards.md](references/boards.md).
 
 ## Gotchas
 
@@ -83,6 +85,8 @@ Each reference is a trigger — read it only when the user's intent matches; do 
 
 - Read [references/onboarding.md](references/onboarding.md) — Load when setting up a fresh machine or account: installing glab, `glab auth login` (web / device / stdin), choosing `git_protocol` vs `api_protocol`, cloning, and verifying with a read call.
 - Read [references/auth.md](references/auth.md) — Load when auth fails, choosing a token type (PAT / project access token / fine-grained / CI_JOB_TOKEN), scoping it to the exact operation (`read_api` vs `api`), targeting a self-managed host, storing it (keyring / CI), or rotating a leak.
+- Read [references/issues.md](references/issues.md) — Load when creating, reading, updating, assigning, labelling or closing issues as tickets: IID vs global id, the state_event verbs, and note handling.
+- Read [references/boards.md](references/boards.md) — Load when moving work across an issue board: label-driven lists, the omitted built-in lists, and resolving board and list ids.
 - Read [references/create.md](references/create.md) — Load when opening or updating an MR: push, `glab mr create` flags, draft, reviewers / labels, issue-link / close semantics, the one-open-MR-per-branch 409, additive-body rules, and the raw REST equivalent.
 - Read [references/review-post.md](references/review-post.md) — Load when publishing a review: the summary note, the exact inline position model (three SHAs + conditional line keys), verifying `DiffNote`, the blocking mechanism, and the `#note_<id>` deep-link.
 - Read [references/review-resolve.md](references/review-resolve.md) — Load when listing threads, matching a finding to a discussion by id, resolving via the REST PUT, replying in-thread, and the merge-gating effect.

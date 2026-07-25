@@ -82,8 +82,8 @@
 
 - **Provenance:** Repository-original read-only detector procedures maintained within skill-code-quality
 - **Last reviewed:** 2026-07-22
-- **Used for:** `references/cleanup-inventories.md`
-- **References:** cleanup-inventories.md
+- **Used for:** ``
+- **References:**
 - **Aspects extracted:** Barrel, redundant-comment, shared-extraction, and TODO/FIXME inventories remain evidence-linked and read-only.
 
 ## Refresh Workflow

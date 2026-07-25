@@ -1,6 +1,6 @@
 ---
 name: github-guide
-description: "Use when delivering a pull request and its review on GitHub (github.com or GitHub Enterprise Server) from the command line with the `gh` CLI and `gh api` — opening a PR with `gh pr create`, posting a structured review with line-anchored inline comments, resolving review threads, detecting that the host is GitHub from the git remote, and scoping a classic or fine-grained token. Triggers on a github.com / GHES remote, `gh pr create`, `gh api .../pulls/.../reviews`, an inline review comment by path+line, resolving a review thread (resolveReviewThread), REQUEST_CHANGES / branch-protection merge gating, or GH_TOKEN / GH_ENTERPRISE_TOKEN scopes — even when the user doesn't say 'gh' but the repo is hosted on GitHub."
+description: "Use when delivering a pull request and its review on GitHub (github.com or GitHub Enterprise Server) from the command line with the `gh` CLI and `gh api` — opening a PR with `gh pr create`, posting a structured review with line-anchored inline comments, resolving review threads, working issues as tickets, moving cards on a GitHub Projects board, detecting that the host is GitHub from the git remote, and scoping a classic or fine-grained token. Triggers on a github.com / GHES remote, `gh pr create`, `gh api .../pulls/.../reviews`, an inline review comment by path+line, resolving a review thread (resolveReviewThread), REQUEST_CHANGES / branch-protection merge gating, `gh issue` create / close / label, filtering pull requests out of an issue listing, a Projects board field update, or GH_TOKEN / GH_ENTERPRISE_TOKEN scopes — even when the user doesn't say 'gh' but the repo is hosted on GitHub."
 ---
 
 # GitHub PR & review delivery — quick reference
@@ -34,6 +34,8 @@ When this skill fires:
 - **Write the review content with code-review-guide** — labels, severity, and blocking decoration are `code-review-guide`'s; this skill only anchors and submits them.
 - **Write the PR body with pull-request-guide** — `gh pr create --body-file` takes a description authored per `pull-request-guide`.
 - **Resolve a thread** — GraphQL-only `resolveReviewThread` by thread node id (`PRRT_…`), matched by id never by line; list threads with `pullRequest.reviewThreads`. See [references/review-resolve.md](references/review-resolve.md).
+- **Work an issue as a ticket** — `gh issue view/create/edit/close`; identity is repo + number, and raw REST issue listings also return pull requests, so filter out entries carrying `pull_request`. See [references/issues.md](references/issues.md).
+- **Track work on a board** — GitHub Projects is GraphQL-only: a field update needs project, item, field and option ids together, and there is no compare-and-swap. See [references/projects.md](references/projects.md).
 - **Scope the token per operation** — push needs Contents: write; open-PR / post-review need Pull requests: write; resolve also needs Contents: read & write on a fine-grained token. See [references/auth.md](references/auth.md).
 
 ## Gotchas
@@ -86,6 +88,8 @@ Each reference is a trigger — read only the one matching the user's intent; do
 
 - Read [references/onboarding.md](references/onboarding.md) — Load when setting up a fresh machine/account: installing `gh`, running `gh auth login`, picking HTTPS vs SSH, making gh the git credential helper, cloning, and verifying with a read call (GHES included).
 - Read [references/auth.md](references/auth.md) — Load when auth fails, choosing classic vs fine-grained PAT, scoping a token per operation (push / open-PR / review / resolve), the GH_TOKEN vs GH_ENTERPRISE_TOKEN split, keyring storage, or wiring tokens into CI / GitHub Actions.
+- Read [references/issues.md](references/issues.md) — Load when creating, reading, editing, assigning, labelling or closing issues as tickets: the json field set, filtering pull requests out of issue listings, state vs stateReason, and comment handling.
+- Read [references/projects.md](references/projects.md) — Load when moving work across a GitHub Projects board: resolving the four ids a field update needs, single-select option ids, and the absence of optimistic concurrency.
 - Read [references/create.md](references/create.md) — Load when opening a PR: `gh pr create` flags, draft, reviewers/labels, issue-linking and auto-close semantics, the additive-body / replace-on-edit trap, idempotency guard, and the raw `POST /pulls` REST equivalent.
 - Read [references/review-post.md](references/review-post.md) — Load when publishing a review: the single `.../reviews` object, the exact path/line/side inline anchor model, the REQUEST_CHANGES blocking mechanism, and deep-linking from `html_url`.
 - Read [references/review-resolve.md](references/review-resolve.md) — Load when resolving/replying on threads: listing `reviewThreads`, matching a finding to a thread by id (never line), the GraphQL `resolveReviewThread` mutation, in-thread replies, and the conversation-resolution merge gate.
