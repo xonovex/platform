@@ -32,7 +32,7 @@ export interface TriggerEvaluationOptions {
   readonly check: TriggerCheck;
 }
 
-// A harness error is usually transient (a dropped stream, an output-limit trip), so
+// A harness error is transient (a dropped stream, a timeout, a killed process), so
 // retry the run before discarding the whole batch's evidence. A run that fails every
 // attempt still invalidates: partial evidence must never be reported as a pass.
 export const TRIGGER_RUN_ATTEMPTS = 3;

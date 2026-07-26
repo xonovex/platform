@@ -83,14 +83,27 @@ console.log("not json");
     });
   });
 
-  it("stops a response that exceeds the output limit", async () => {
+  it("scores a response that exceeds the output limit as a non-trigger", async () => {
     const outcome = await runNode(`
 console.log(JSON.stringify({type: "system", subtype: "init", skills: ["test-skill"]}));
 console.log(JSON.stringify({type: "stream_event", event: {type: "content_block_delta", delta: {type: "text_delta", text: "x".repeat(${String(TRIGGER_OUTPUT_LIMIT + 1)})}}}));
 setInterval(() => {}, 1000);
 `);
 
-    expect(outcome).toEqual({triggered: false, error: "output-limit"});
+    expect(outcome).toEqual({triggered: false, error: null});
+  });
+
+  it("still reports an unavailable skill when the output limit is exceeded", async () => {
+    const outcome = await runNode(`
+console.log(JSON.stringify({type: "system", subtype: "init", skills: ["other-skill"]}));
+console.log(JSON.stringify({type: "stream_event", event: {type: "content_block_delta", delta: {type: "text_delta", text: "x".repeat(${String(TRIGGER_OUTPUT_LIMIT + 1)})}}}));
+setInterval(() => {}, 1000);
+`);
+
+    expect(outcome).toEqual({
+      triggered: false,
+      error: "target skill unavailable",
+    });
   });
 });
 
@@ -162,12 +175,12 @@ console.log(JSON.stringify({type: "item.completed", item: {type: "agent_message"
     });
   });
 
-  it("stops a response that exceeds the output limit", async () => {
+  it("scores a response that exceeds the output limit as a non-trigger", async () => {
     const outcome = await runCodexNode(`
 console.log(JSON.stringify({type: "item.completed", item: {type: "agent_message", text: "x".repeat(${String(TRIGGER_OUTPUT_LIMIT + 1)})}}));
 setInterval(() => {}, 1000);
 `);
 
-    expect(outcome).toEqual({triggered: false, error: "output-limit"});
+    expect(outcome).toEqual({triggered: false, error: null});
   });
 });

@@ -6,6 +6,14 @@ import {createInterface} from "node:readline";
 import {streamTextDeltaLength} from "./validation.js";
 
 const TRIGGER_TIMEOUT_MS = 60_000;
+
+// A run that never invokes the skill would otherwise answer the whole query, which
+// dominates trigger-eval spend. Once this many answer characters have streamed with
+// no invocation, the routing outcome is settled — the response was written without
+// the skill — so the run ends early and scores as a non-trigger. It is conclusive
+// evidence, not an infrastructure failure: a query whose plain answer is long (any
+// "write this code" negative) would otherwise invalidate its skill's whole sweep on
+// every attempt, since the length is a property of the query rather than a flake.
 export const TRIGGER_OUTPUT_LIMIT = 2000;
 
 export interface TriggerOutcome {
@@ -205,7 +213,11 @@ export const checkTriggered = (
         return;
       }
       if (outputLimitExceeded) {
-        finish({triggered: false, error: "output-limit"});
+        finish(
+          targetAvailable
+            ? {triggered: false, error: null}
+            : {triggered: false, error: "target skill unavailable"},
+        );
         return;
       }
       if (spawnError !== null) {
@@ -339,7 +351,7 @@ export const checkCodexTriggered = (
         return;
       }
       if (outputLimitExceeded) {
-        finish({triggered: false, error: "output-limit"});
+        finish({triggered: false, error: null});
         return;
       }
       if (spawnError !== null) {
