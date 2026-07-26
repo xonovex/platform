@@ -104,6 +104,7 @@ tasks:
       --batch-size 8
       --workspace ".skill-eval-results/trigger/${SKILL_EVAL_HARNESS:-claude}"
       --plugin-dir .
+      --catalog-root "$workspaceRoot/packages/skill"
     deps:
       - target: ~:build
         optional: true

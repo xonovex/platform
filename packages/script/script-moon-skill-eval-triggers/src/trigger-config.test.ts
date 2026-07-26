@@ -238,6 +238,99 @@ describe("trigger configuration", () => {
     ).toContain("has no queries");
   });
 
+  const writeCatalog = (
+    entries: readonly {
+      readonly directory: string;
+      readonly name: string;
+      readonly queries: readonly unknown[];
+    }[],
+  ): string => {
+    const catalogRoot = join(directory, "catalog");
+    for (const entry of entries) {
+      const guideDirectory = join(catalogRoot, entry.directory, entry.name);
+      mkdirSync(guideDirectory, {recursive: true});
+      writeFileSync(
+        join(guideDirectory, "SKILL.md"),
+        `---\nname: ${entry.name}\n---\n`,
+      );
+      writeFileSync(
+        join(guideDirectory, "eval-queries.json"),
+        JSON.stringify(entry.queries),
+      );
+    }
+    return catalogRoot;
+  };
+
+  const negative = (name: string) => ({
+    query: name,
+    should_trigger: false,
+    rationale: "near miss",
+    split: "train" as const,
+  });
+
+  it("leaves a query another catalog skill owns to the routing evaluator", () => {
+    writeFileSync(
+      join(directory, "eval-queries.json"),
+      JSON.stringify([query("own concept"), negative("owned elsewhere")]),
+    );
+    const catalogRoot = writeCatalog([
+      {
+        directory: "skill-test",
+        name: "test-skill",
+        queries: [query("own concept"), negative("owned elsewhere")],
+      },
+      {
+        directory: "skill-other",
+        name: "other-skill",
+        queries: [query("owned elsewhere")],
+      },
+    ]);
+
+    const config = successfulConfig(
+      resolveConfig(["--catalog-root", catalogRoot]),
+    );
+
+    expect(config).toMatchObject({queryCount: 1, deferredToRouting: 1});
+    expect(config.queryBatches.flat().map((entry) => entry.query)).toEqual([
+      "own concept",
+    ]);
+  });
+
+  it("keeps a negative no catalog skill claims", () => {
+    writeFileSync(
+      join(directory, "eval-queries.json"),
+      JSON.stringify([query("own concept"), negative("unclaimed")]),
+    );
+    const catalogRoot = writeCatalog([
+      {
+        directory: "skill-test",
+        name: "test-skill",
+        queries: [query("own concept"), negative("unclaimed")],
+      },
+    ]);
+
+    const config = successfulConfig(
+      resolveConfig(["--catalog-root", catalogRoot]),
+    );
+
+    expect(config).toMatchObject({queryCount: 2, deferredToRouting: 0});
+  });
+
+  it("scores every query when no catalog root is given", () => {
+    const config = successfulConfig(resolveConfig());
+
+    expect(config).toMatchObject({deferredToRouting: 0});
+  });
+
+  it("reports an unreadable catalog root", () => {
+    expect(
+      failureMessage(
+        resolveConfig(["--catalog-root", join(directory, "absent")]),
+        "runtime",
+      ),
+    ).toContain("catalog root unreadable");
+  });
+
   it("rejects oversized batches and accepts a bounded equivalent", () => {
     writeFileSync(
       join(directory, "eval-queries.json"),

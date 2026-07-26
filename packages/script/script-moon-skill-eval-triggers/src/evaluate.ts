@@ -99,7 +99,8 @@ export const main = async (argv: readonly string[]): Promise<number> => {
       `output-limit: ${String(TRIGGER_OUTPUT_LIMIT)} chars  ` +
       `batches: ${String(config.queryBatches.length)}  ` +
       `model-runs: ${String(triggerModelRunCount(config.queryCount, config.runs))}  ` +
-      `max-batch-runs: ${String(config.maxBatchModelRuns)}/${String(MAX_TRIGGER_MODEL_RUNS)}\n`,
+      `max-batch-runs: ${String(config.maxBatchModelRuns)}/${String(MAX_TRIGGER_MODEL_RUNS)}  ` +
+      `routing-deferred: ${String(config.deferredToRouting)}\n`,
   );
   process.stderr.write(
     `passed: ${String(passed)} / ${String(total)}   failed: ${String(failed)}\n`,

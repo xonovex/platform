@@ -17,6 +17,8 @@ Options (flag overrides env):
     --batch-size N                             queries per sequential batch
     --workspace PATH                           directory for JSONL and summary evidence
     --plugin-dir PATH    / PLUGIN_DIR=PATH     target-only local plugin directory
+    --catalog-root DIR   / CATALOG_ROOT=DIR   skill catalog root; queries another skill in it
+                                              owns are left to the routing evaluator
     --max-budget-usd N   / MAX_BUDGET_USD=N   hard per-run spend cap (default/max: 0.05)
     -h, --help                                show this help and exit`;
 
@@ -30,6 +32,7 @@ export interface ParsedCli {
   readonly batchSize?: string;
   readonly workspace?: string;
   readonly pluginDir?: string;
+  readonly catalogRoot?: string;
   readonly maxBudget?: string;
 }
 
@@ -42,6 +45,7 @@ const OPTION_FLAGS = new Set([
   "--batch-size",
   "--workspace",
   "--plugin-dir",
+  "--catalog-root",
   "--max-budget-usd",
 ]);
 
@@ -126,6 +130,7 @@ export const parseCli = (argv: readonly string[]): ParsedCli => {
     batchSize: options["--batch-size"],
     workspace: options["--workspace"],
     pluginDir: options["--plugin-dir"],
+    catalogRoot: options["--catalog-root"],
     maxBudget: options["--max-budget-usd"],
   };
 };

@@ -45,7 +45,7 @@ tasks:
   ci-routing:
     script: >-
       npx moon-skill-eval-routing packages/skill
-      --split "${SKILL_ROUTING_SPLIT:-all}"
+      --split "${SKILL_ROUTING_SPLIT:-validation}"
       --runs "${SKILL_ROUTING_RUNS:-3}"
       --owners "${SKILL_ROUTING_OWNERS:-}"
       --threshold 0.5
@@ -54,7 +54,10 @@ tasks:
       --workspace ".skill-eval-results/routing/${SKILL_EVAL_HARNESS:-claude}"
     deps:
       - ~:install
+    inputs:
+      - /packages/skill/*/*/eval-queries.json
+      - /packages/skill/*/*/SKILL.md
     options:
       cache: false
       runFromWorkspaceRoot: true
-      runInCI: false
+      runInCI: true

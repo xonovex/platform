@@ -11,6 +11,7 @@ import {
 } from "@xonovex/script-moon-common/fs";
 import {skillEvalModelDefaults} from "@xonovex/script-moon-common/skill-eval-models";
 import {parseCli, parseFrontmatterName} from "./cli.js";
+import {catalogQueryOwners} from "./routing-catalog.js";
 import {
   buildTriggerClaudeArgs,
   buildTriggerCodexArgs,
@@ -47,6 +48,7 @@ export interface TriggerConfig {
   readonly maxBatchModelRuns: number;
   readonly model: string;
   readonly queryBatches: readonly (readonly Query[])[];
+  readonly deferredToRouting: number;
   readonly queryCount: number;
   readonly runs: number;
   readonly shortName: string;
@@ -73,6 +75,47 @@ const failure = (
   kind: "runtime" | "usage",
   error: string,
 ): TriggerConfigResult => ({success: false, error, kind});
+
+type PartitionResult =
+  | {
+      readonly success: true;
+      readonly kept: readonly Query[];
+      readonly deferred: readonly Query[];
+    }
+  | {readonly success: false; readonly error: string};
+
+// This evaluator loads one skill, so it can only answer whether that skill claims a
+// query when it is the sole candidate. A near miss the catalog assigns to another
+// skill asks a different question — which of the two wins with both loaded — and the
+// routing evaluator answers it. Scoring such a query here reports a failure for
+// correct behaviour, because the rightful owner was never on offer. Without a catalog
+// root every query is kept, so a standalone run still evaluates the whole file.
+const partitionOwnedQueries = (
+  queries: readonly Query[],
+  shortName: string,
+  catalogRootArgument: string | undefined,
+  workingDirectory: string,
+): PartitionResult => {
+  if (catalogRootArgument === undefined) {
+    return {success: true, kept: queries, deferred: []};
+  }
+  let owners: ReadonlyMap<string, string>;
+  try {
+    owners = catalogQueryOwners(resolve(workingDirectory, catalogRootArgument));
+  } catch (error: unknown) {
+    const detail = error instanceof Error ? error.message : String(error);
+    return {success: false, error: `catalog root unreadable: ${detail}`};
+  }
+  const ownedElsewhere = (query: Query): boolean => {
+    const owner = owners.get(query.query);
+    return owner !== undefined && owner !== shortName;
+  };
+  return {
+    success: true,
+    kept: queries.filter((query) => !ownedElsewhere(query)),
+    deferred: queries.filter(ownedElsewhere),
+  };
+};
 
 export const resolveTriggerConfig = (
   argv: readonly string[],
@@ -195,9 +238,21 @@ export const resolveTriggerConfig = (
     return failure("runtime", selectionResult.error);
   }
 
-  const queryBatches = boundedBatches(
+  const shortNameForCatalog = skillName.split(":").pop() ?? skillName;
+  const deferredResult = partitionOwnedQueries(
     selectionResult.data,
-    batchSize ?? Math.max(selectionResult.data.length, 1),
+    shortNameForCatalog,
+    cli.catalogRoot ?? environment.CATALOG_ROOT,
+    workingDirectory,
+  );
+  if (!deferredResult.success) {
+    return failure("runtime", deferredResult.error);
+  }
+  const {kept, deferred} = deferredResult;
+
+  const queryBatches = boundedBatches(
+    kept,
+    batchSize ?? Math.max(kept.length, 1),
   );
   const maxBatchModelRuns = Math.max(
     0,
@@ -237,7 +292,8 @@ export const resolveTriggerConfig = (
       maxBatchModelRuns,
       model,
       queryBatches,
-      queryCount: selectionResult.data.length,
+      deferredToRouting: deferred.length,
+      queryCount: kept.length,
       runs,
       shortName,
       skillName,

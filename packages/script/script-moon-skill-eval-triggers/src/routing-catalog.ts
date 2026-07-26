@@ -103,6 +103,37 @@ export const buildRoutingScenarios = (
   );
 };
 
+// The skill that claims each query, keyed by query text. A query only one skill
+// declares positive has a single owner; one no skill declares positive is absent
+// from the map. Callers use it to tell a query the catalog assigns elsewhere from
+// one that belongs to no skill at all.
+export const catalogQueryOwners = (
+  catalogRoot: string,
+): ReadonlyMap<string, string> => {
+  const root = resolve(catalogRoot);
+  if (!isDirectory(root)) throw new Error(`catalog root not found: ${root}`);
+
+  const positivesByQuery = new Map<string, string[]>();
+  for (const candidate of catalogCandidates(root)) {
+    const queries = readQueries(
+      join(candidate.guideDirectory, "eval-queries.json"),
+    );
+    for (const query of queries) {
+      if (!query.should_trigger) continue;
+      const owners = positivesByQuery.get(query.query) ?? [];
+      owners.push(candidate.shortName);
+      positivesByQuery.set(query.query, owners);
+    }
+  }
+
+  const owners = new Map<string, string>();
+  for (const [queryText, names] of positivesByQuery) {
+    const only = names.length === 1 ? names[0] : undefined;
+    if (only !== undefined) owners.set(queryText, only);
+  }
+  return owners;
+};
+
 export const missingValidationRoutingOwners = (
   catalogRoot: string,
 ): readonly string[] => {
