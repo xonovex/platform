@@ -130,6 +130,9 @@ placement follows the catalog's own one-owner discipline.
 
 ### Still open for subplan 7
 
-The eval-harness fail-fast retry (defect 3) and the routing-owner invariant living
-only in `script-moon-skill-eval-triggers:ts-coverage` rather than the skill-tag gate.
-Neither blocks enforcement of the three drift rules.
+Nothing. The two items this record originally left open are resolved: the output
+harness retries transient failures (three attempts, matching the trigger harness)
+before invalidating a batch, and the routing-owner invariant runs in the skill-tag
+gate — `skill-validate` depends on
+`script-moon-skill-eval-triggers:routing-owners-check`, so `#skill:ci-check` fails
+when a cull strips a skill's only routing pairing.

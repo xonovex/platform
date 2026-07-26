@@ -166,6 +166,12 @@ artifacts into the repo untracked, and is now gitignored.
 
 Catalog-wide `#skill:skill-eval-outputs` was not run: roughly 3 minutes per skill puts
 72 skills at hours of wall clock plus spend. `plan-guide`'s own output evals also
-cannot complete — its first eval's with-skill arm dies on `error_max_turns`, and the
-harness exposes no turn limit to raise, so one unfinishable eval invalidates the whole
-batch (defect 3 from subplan 2, still open for subplan 6).
+could not complete at the time — its first eval's with-skill arm died on
+`error_max_turns`, and the harness exposed no turn limit to raise, so one unfinishable
+eval invalidated the whole batch (defect 3 from subplan 2).
+
+Since resolved (2026-07-26): the generation turn cap defaults to 12 and is
+configurable via `--max-turns` / `MAX_TURNS` up to 24, and the output harness retries
+transient failures (three attempts, matching the trigger harness) before invalidating
+a batch. `plan-guide` eval 1 now completes and scores; the catalog-wide sweep remains
+unrun on cost grounds only.
