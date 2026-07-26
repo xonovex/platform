@@ -98,8 +98,8 @@
   },
   {
     "query": "Choose between Kafka and NATS for event delivery and record an architecture decision with the final outcome.",
-    "rationale": "Decision ownership is outside the planning skill boundary",
-    "should_trigger": false,
+    "rationale": "settling and recording a decision is the plan-decide operation",
+    "should_trigger": true,
     "split": "validation"
   },
   {
@@ -115,6 +115,12 @@
   {
     "query": "Refactor this React form into smaller components and replace the local state with a reducer.",
     "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "should a subplan be capped at seven tasks, and what if one task is bigger?",
+    "rationale": "subplan sizing is a planning decision",
+    "should_trigger": true,
     "split": "validation"
   }
 ]
