@@ -1,9 +1,0 @@
-{
-  "name": "xonovex-skill-release-readiness",
-  "version": "7.0.0",
-  "description": "Xonovex release candidate readiness skills",
-  "author": {
-    "name": "Xonovex"
-  },
-  "skills": ["./release-readiness-guide"]
-}

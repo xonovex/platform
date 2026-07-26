@@ -76,11 +76,12 @@
     },
     {
       "id": 10,
-      "prompt": "Resume provider plan:auth-44 at revision a110 in a new session. Its active context references include architecture decision version 3 and an invalidated assumption. Apply exactly one child and return a handoff for the next role.",
+      "prompt": "Resume provider plan:auth-44 at revision a110 in a new session. The handoff carries two decisions with code anchors, one of which a later decision supersedes. Apply exactly one child and return a handoff for the next role.",
       "assertions": [
-        "The operation resolves and preserves canonical active context with identity, version, digest, provenance, applicability, and native revision while retaining but not applying the invalidated entry.",
-        "Active context constrains target selection and implementation without becoming evidence or authority, and unresolved active context blocks before edits.",
-        "The result returns newly established or superseding context plus the exact implementation revision, validation evidence, and remaining work for a later session."
+        "Applies the carried decisions as constraints on target selection and implementation without treating them as evidence, approval, or authority",
+        "Uses the superseding decision and keeps the superseded one visible in the history rather than deleting or silently applying it",
+        "Blocks before editing when a carried decision cannot be resolved, instead of proceeding as though it were absent",
+        "Returns a handoff with the subject and its implementation revision, the decisions made during the work anchored to code locations, validation evidence, and the remaining work"
       ]
     },
     {

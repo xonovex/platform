@@ -1,32 +1,27 @@
 ---
-description: Record why one workspace was abandoned while preserving its resources
+description: Record workspace abandonment without mutation
 allowed-tools:
   - Read
   - Glob
+  - Grep
   - AskUserQuestion
   - Skill
 argument-hint: >-
-  [target] [--request <file>] [--target-revision <revision>]
-  [--context <context>...]
-  [--reason <text>]
+  [subject] [reason] [--request <file>] [--context <context>...]
 ---
 
-# /xonovex-workflow:workspace-abandon — Abandon Workspace
+# /xonovex-workflow:workspace-abandon — Workspace abandon
 
 ## Arguments
 
-- `target` (required unless `--request` supplies it): Exact workspace path or opaque
-  native reference.
-- `--request` (optional): Markdown workflow handoff containing the workspace, reason,
-  partial state, and equivalent inputs. Do not combine it with shorthand arguments.
-- `--target-revision` (optional): Exact workspace revision when available.
-- `--context` (repeatable, optional): Canonical explanatory context or an opaque
-  context reference to preserve with recovery information.
-- `--reason` (required unless `--request` supplies it): Present-tense reason for
-  stopping.
+- `subject` (required unless `--request` supplies it): The workspace being abandoned.
+- `reason` (optional): Why it is being abandoned.
+- `--request` (optional): Markdown workflow handoff carrying the subject and
+  equivalent inputs. Do not combine it with shorthand arguments.
+- `--context` (repeatable, optional): Explanatory context, or an opaque reference to
+  resolve. Context constrains the work; it is never evidence or approval.
 
 ## Delegation
 
 Load the `workflow-guide` skill (plugin `xonovex-skill-workflow`) and perform its
-**Workspace abandon** operation with these arguments. Return abandonment and recovery
-information without removing or mutating workspace resources.
+**Workspace abandon** operation with these arguments. Record the abandonment and the retry boundary. Remove nothing.

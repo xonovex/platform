@@ -100,5 +100,11 @@
     "rationale": "validation near miss owned by debugging-guide",
     "should_trigger": false,
     "split": "validation"
+  },
+  {
+    "query": "the render thread needs to feed the device exactly one fixed block each time without ever allocating — what work is safe to do in there?",
+    "rationale": "near miss owned by audio-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

@@ -48,10 +48,10 @@
     "rationale": "near-miss: should match motion-guide"
   },
   {
-    "query": "render this 30-second product showcase video with captions",
+    "query": "build this marketing page as static Astro islands with minimal client JavaScript",
     "should_trigger": false,
     "split": "train",
-    "rationale": "near-miss: should match remotion-guide"
+    "rationale": "near-miss: should match astro-guide"
   },
   {
     "query": "build a React Native screen for the mobile checkout",
@@ -60,7 +60,7 @@
     "rationale": "near-miss: RN, not web React"
   },
   {
-    "query": "configure Vite's rollup output for a non-React Express SSR build",
+    "query": "configure Vite's rollup output for a non-React Hono SSR build",
     "should_trigger": false,
     "split": "train",
     "rationale": "near-miss: Vite config but no React work"
@@ -122,6 +122,12 @@
   {
     "query": "I need to translate all the text in my immediate-mode tool UI into other languages without maintaining a giant table of string IDs — what's a good approach?",
     "rationale": "validation near miss owned by imgui-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "retest focus, zoom, errors, and dynamic status after this UI revision",
+    "rationale": "near miss owned by accessibility-guide",
     "should_trigger": false,
     "split": "validation"
   }

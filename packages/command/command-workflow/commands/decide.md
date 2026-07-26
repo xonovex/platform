@@ -1,5 +1,5 @@
 ---
-description: Record one descriptive inline outcome without changing a protected gate
+description: Record one descriptive decision without granting authority
 allowed-tools:
   - Read
   - Glob
@@ -7,34 +7,22 @@ allowed-tools:
   - AskUserQuestion
   - Skill
 argument-hint: >-
-  [subject] [--request <file>] [--subject-revision <revision>]
-  [--context <context>...] [--option <option>...]
-  [--evidence <reference>...] [--outcome <text>]
-  [--criterion <criterion>...] [--method <method>]
+  [subject] [--request <file>] [--context <context>...]
 ---
 
 # /xonovex-workflow:decide — Decide
 
 ## Arguments
 
-- `subject` (required unless `--request` supplies it): Decision question, options, or
-  an opaque native reference.
-- `--request` (optional): Markdown workflow handoff containing the question, options,
-  evidence entries, and equivalent inputs. Do not combine it with shorthand arguments.
-- `--subject-revision` (optional): Exact native revision of the decision subject;
-  required when binding evidence is revision-pinned and the provider exposes one.
-- `--context` (repeatable, optional): Canonical explanatory context or an opaque
-  context reference to resolve; it frames the choice without counting as supporting
-  evidence.
-- `--option` (repeatable, optional): Explicit option to compare.
-- `--evidence` (repeatable, optional): Opaque evidence reference to preserve and
-  evaluate.
-- `--outcome` (optional): Outcome to record; otherwise derive a recommendation.
-- `--criterion` (repeatable, optional): Decision criterion.
-- `--method` (optional): Requested subject-specific decision procedure.
+- `subject` (required unless `--request` supplies it): The question, with its options, as inline content, a path, or an opaque
+  native reference.
+- `--request` (optional): Markdown workflow handoff carrying the subject and
+  equivalent inputs. Do not combine it with shorthand arguments.
+- `--context` (repeatable, optional): Explanatory context, or an opaque reference to
+  resolve. Context constrains the work; it is never evidence or approval.
 
 ## Delegation
 
 Load the `workflow-guide` skill (plugin `xonovex-skill-workflow`) and perform its
-**Decide** operation with these arguments. Return a descriptive decision; do not
-approve, reject, merge, publish, or change a protected gate.
+**Decide** operation with these arguments. Record one outcome with its reason. The result is descriptive: it authorizes no
+publication, integration, or other protected effect.

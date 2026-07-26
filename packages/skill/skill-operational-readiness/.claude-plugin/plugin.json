@@ -1,9 +1,0 @@
-{
-  "name": "xonovex-skill-operational-readiness",
-  "version": "7.0.0",
-  "description": "Xonovex operational readiness review skills",
-  "author": {
-    "name": "Xonovex"
-  },
-  "skills": ["./operational-readiness-guide"]
-}

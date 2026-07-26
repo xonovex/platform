@@ -14,6 +14,7 @@ Author, merge, simplify, and distill reusable user-invocable prompt files (somet
 - **Structure Integrity** — frontmatter, Arguments, and Delegation are the essential
   thin-command sections; the owning skill carries the procedure, output, and errors
 - **Safe Modifications** — preview changes (`--dry-run`) before applying
+- **Deletion-first editing** — a simplify or distill pass cuts at least as much as it adds, and reuses existing vocabulary rather than coining new terms; **skill-guide** owns this rule
 - **Bound the Body** — target 15-40 lines for a delegating command and <150 lines for
   a harness that cannot delegate
 - **Delegate, Don't Duplicate** — a command owns its argument contract and delegates the procedure to a guideline skill via the `Skill` tool; the skill is the single source of truth, the command a thin, stable interface

@@ -19,6 +19,7 @@ Author, refresh, simplify, consolidate, and port AGENTS.md project-instruction f
 - **Match Style and Voice** — maintain the target file's formatting and terminology
 - **Structure Integrity** — keep section order and hierarchy intact; preview changes (dry-run) before applying
 - **Signal Over Volume** — keep only non-obvious content; anything inferable from `package.json` + source belongs in the code, not the doc
+- **Deletion-first editing** — a simplify or consolidate pass cuts at least as much as it adds, and reuses existing vocabulary rather than coining new terms; **skill-guide** owns this rule
 - **Living documentation** — update alongside project changes (sync operation)
 
 ## Gotchas

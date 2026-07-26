@@ -24,26 +24,6 @@
       "description": "Xonovex accessibility assurance skills"
     },
     {
-      "name": "xonovex-skill-adr",
-      "source": "./packages/skill/skill-adr",
-      "description": "Xonovex ADR skills"
-    },
-    {
-      "name": "xonovex-skill-android-analytics",
-      "source": "./packages/skill/skill-android-analytics",
-      "description": "Xonovex Android analytics skills"
-    },
-    {
-      "name": "xonovex-skill-android-wcag",
-      "source": "./packages/skill/skill-android-wcag",
-      "description": "Xonovex Android WCAG accessibility skills"
-    },
-    {
-      "name": "xonovex-skill-architecture-evaluation",
-      "source": "./packages/skill/skill-architecture-evaluation",
-      "description": "Xonovex architecture tradeoff evaluation skills"
-    },
-    {
       "name": "xonovex-skill-asset-pipeline",
       "source": "./packages/skill/skill-asset-pipeline",
       "description": "Xonovex Asset pipeline skills"
@@ -54,39 +34,14 @@
       "description": "Xonovex Astro skills"
     },
     {
-      "name": "xonovex-skill-atlassian",
-      "source": "./packages/skill/skill-atlassian",
-      "description": "Xonovex Atlassian Cloud CLI skills"
-    },
-    {
       "name": "xonovex-skill-audio",
       "source": "./packages/skill/skill-audio",
       "description": "Xonovex Low-level audio skills"
     },
     {
-      "name": "xonovex-skill-aws",
-      "source": "./packages/skill/skill-aws",
-      "description": "Xonovex AWS governance and evidence skills"
-    },
-    {
-      "name": "xonovex-skill-azure-devops",
-      "source": "./packages/skill/skill-azure-devops",
-      "description": "Xonovex Azure DevOps platform skills"
-    },
-    {
       "name": "xonovex-skill-bdd",
       "source": "./packages/skill/skill-bdd",
       "description": "Xonovex Behaviour/acceptance-driven development skills"
-    },
-    {
-      "name": "xonovex-skill-bitbucket",
-      "source": "./packages/skill/skill-bitbucket",
-      "description": "Xonovex Bitbucket platform skills"
-    },
-    {
-      "name": "xonovex-skill-bitrise",
-      "source": "./packages/skill/skill-bitrise",
-      "description": "Xonovex Bitrise platform skills"
     },
     {
       "name": "xonovex-skill-c99",
@@ -169,11 +124,6 @@
       "description": "Xonovex Data-oriented design skills"
     },
     {
-      "name": "xonovex-skill-datadog",
-      "source": "./packages/skill/skill-datadog",
-      "description": "Xonovex Datadog observability and evidence skills"
-    },
-    {
       "name": "xonovex-skill-ddd",
       "source": "./packages/skill/skill-ddd",
       "description": "Xonovex Domain-driven design skills"
@@ -197,26 +147,6 @@
       "name": "xonovex-skill-editor-viewport",
       "source": "./packages/skill/skill-editor-viewport",
       "description": "Xonovex Editor viewport skills"
-    },
-    {
-      "name": "xonovex-skill-exploratory-testing",
-      "source": "./packages/skill/skill-exploratory-testing",
-      "description": "Xonovex session-based exploratory testing skills"
-    },
-    {
-      "name": "xonovex-skill-expressjs",
-      "source": "./packages/skill/skill-expressjs",
-      "description": "Xonovex Express.js skills"
-    },
-    {
-      "name": "xonovex-skill-fdd",
-      "source": "./packages/skill/skill-fdd",
-      "description": "Xonovex Feature-driven development skills"
-    },
-    {
-      "name": "xonovex-skill-figma",
-      "source": "./packages/skill/skill-figma",
-      "description": "Xonovex Figma REST API skills"
     },
     {
       "name": "xonovex-skill-fp",
@@ -274,11 +204,6 @@
       "description": "Xonovex immediate-mode GUI skills"
     },
     {
-      "name": "xonovex-skill-incident-response",
-      "source": "./packages/skill/skill-incident-response",
-      "description": "Xonovex production incident response skills"
-    },
-    {
       "name": "xonovex-skill-instruction",
       "source": "./packages/skill/skill-instruction",
       "description": "Xonovex Instruction skills"
@@ -329,11 +254,6 @@
       "description": "Xonovex Moon skills"
     },
     {
-      "name": "xonovex-skill-motion-react",
-      "source": "./packages/skill/skill-motion-react",
-      "description": "Xonovex Motion for React skills"
-    },
-    {
       "name": "xonovex-skill-node-graph",
       "source": "./packages/skill/skill-node-graph",
       "description": "Xonovex Node graph skills"
@@ -354,11 +274,6 @@
       "description": "Xonovex OpenCode plugin skills"
     },
     {
-      "name": "xonovex-skill-operational-readiness",
-      "source": "./packages/skill/skill-operational-readiness",
-      "description": "Xonovex operational readiness review skills"
-    },
-    {
       "name": "xonovex-skill-orthogonal-pattern",
       "source": "./packages/skill/skill-orthogonal-pattern",
       "description": "Xonovex Orthogonal pattern skills"
@@ -372,21 +287,6 @@
       "name": "xonovex-skill-plan",
       "source": "./packages/skill/skill-plan",
       "description": "Xonovex implementation-planning skills"
-    },
-    {
-      "name": "xonovex-skill-presentation",
-      "source": "./packages/skill/skill-presentation",
-      "description": "Xonovex Presentation skills"
-    },
-    {
-      "name": "xonovex-skill-product-analytics",
-      "source": "./packages/skill/skill-product-analytics",
-      "description": "Xonovex trustworthy product measurement skills"
-    },
-    {
-      "name": "xonovex-skill-product-discovery",
-      "source": "./packages/skill/skill-product-discovery",
-      "description": "Xonovex evidence-driven product discovery skills"
     },
     {
       "name": "xonovex-skill-pull-request",
@@ -409,21 +309,6 @@
       "description": "Xonovex Reflect skills"
     },
     {
-      "name": "xonovex-skill-release-readiness",
-      "source": "./packages/skill/skill-release-readiness",
-      "description": "Xonovex release candidate readiness skills"
-    },
-    {
-      "name": "xonovex-skill-remotion",
-      "source": "./packages/skill/skill-remotion",
-      "description": "Xonovex Remotion skills"
-    },
-    {
-      "name": "xonovex-skill-security-testing",
-      "source": "./packages/skill/skill-security-testing",
-      "description": "Xonovex authorized security testing skills"
-    },
-    {
       "name": "xonovex-skill-shell-scripting",
       "source": "./packages/skill/skill-shell-scripting",
       "description": "Xonovex Shell scripting skills"
@@ -439,11 +324,6 @@
       "description": "Xonovex PostgreSQL skills"
     },
     {
-      "name": "xonovex-skill-strudel",
-      "source": "./packages/skill/skill-strudel",
-      "description": "Xonovex Strudel skills"
-    },
-    {
       "name": "xonovex-skill-tdd",
       "source": "./packages/skill/skill-tdd",
       "description": "Xonovex Test-driven development skills"
@@ -454,19 +334,9 @@
       "description": "Xonovex Terraform skills"
     },
     {
-      "name": "xonovex-skill-test-strategy",
-      "source": "./packages/skill/skill-test-strategy",
-      "description": "Xonovex risk-based test strategy skills"
-    },
-    {
       "name": "xonovex-skill-testing",
       "source": "./packages/skill/skill-testing",
       "description": "Xonovex Testing skills"
-    },
-    {
-      "name": "xonovex-skill-threat-modeling",
-      "source": "./packages/skill/skill-threat-modeling",
-      "description": "Xonovex software threat modeling skills"
     },
     {
       "name": "xonovex-skill-threejs",
@@ -487,16 +357,6 @@
       "name": "xonovex-skill-user-stories",
       "source": "./packages/skill/skill-user-stories",
       "description": "Xonovex User story skills"
-    },
-    {
-      "name": "xonovex-skill-ux-design",
-      "source": "./packages/skill/skill-ux-design",
-      "description": "Xonovex evidence-driven UX design skills"
-    },
-    {
-      "name": "xonovex-skill-ux-research",
-      "source": "./packages/skill/skill-ux-research",
-      "description": "Xonovex user and usability research skills"
     },
     {
       "name": "xonovex-skill-versioning",

@@ -1,9 +1,0 @@
-{
-  "name": "xonovex-skill-security-testing",
-  "version": "7.0.0",
-  "description": "Xonovex authorized security testing skills",
-  "author": {
-    "name": "Xonovex"
-  },
-  "skills": ["./security-testing-guide"]
-}

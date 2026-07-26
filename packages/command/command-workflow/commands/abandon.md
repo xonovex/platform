@@ -1,5 +1,5 @@
 ---
-description: Stop work and return an inline abandonment record without cleanup
+description: Stop work and return the reason, partial state, and retry boundary
 allowed-tools:
   - Read
   - Glob
@@ -7,29 +7,22 @@ allowed-tools:
   - AskUserQuestion
   - Skill
 argument-hint: >-
-  [subject] [--request <file>] [--subject-revision <revision>]
-  [--context <context>...]
-  [--reason <text>]
-  [--criterion <criterion>...]
+  [subject] [reason] [--request <file>] [--context <context>...]
 ---
 
 # /xonovex-workflow:abandon — Abandon
 
 ## Arguments
 
-- `subject` (required unless `--request` supplies it): Exact work being stopped.
-- `--request` (optional): Markdown workflow handoff containing the subject, reason,
-  partial state, relationships, and equivalent inputs. Do not combine it with shorthand
-  arguments.
-- `--subject-revision` (optional): Exact native revision of the subject when available.
-- `--context` (repeatable, optional): Canonical explanatory context or an opaque
-  context reference to preserve with recovery information.
-- `--reason` (required unless `--request` supplies it): Present-tense reason for
-  stopping.
-- `--criterion` (repeatable, optional): Retention or recovery constraint.
+- `subject` (required unless `--request` supplies it): The work being abandoned.
+- `reason` (optional): Why the work is stopping.
+- `--request` (optional): Markdown workflow handoff carrying the subject and
+  equivalent inputs. Do not combine it with shorthand arguments.
+- `--context` (repeatable, optional): Explanatory context, or an opaque reference to
+  resolve. Context constrains the work; it is never evidence or approval.
 
 ## Delegation
 
 Load the `workflow-guide` skill (plugin `xonovex-skill-workflow`) and perform its
-**Abandon** operation with these arguments. Return the reason, usable partial state,
-unresolved work, and retry boundary; do not publish, clean, or mutate external state.
+**Abandon** operation with these arguments. Report partial state and the safe retry boundary. Change nothing and clean up
+nothing.

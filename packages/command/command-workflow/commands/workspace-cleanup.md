@@ -1,36 +1,33 @@
 ---
-description: Preview and remove only explicitly named workspace resources
+description: Preview and remove only the exact named workspace resources
 allowed-tools:
   - Read
+  - Write
+  - Edit
   - Bash
   - Glob
+  - Grep
   - AskUserQuestion
   - Skill
 argument-hint: >-
-  [target...] [--request <file>] [--target-revision <revision>...]
-  [--remove-reference] [--force] [--idempotency-key <key>]
-  [--effect <preview|apply>]
+  [subject] [--request <file>] [--revision <revision>]
+  [--effect <inspect|preview|apply>] [--idempotency-key <key>]
 ---
 
-# /xonovex-workflow:workspace-cleanup — Clean Up Workspaces
+# /xonovex-workflow:workspace-cleanup — Workspace cleanup
 
 ## Arguments
 
-- `target` (repeatable, required unless `--request` supplies it): Exact workspace path
-  or opaque native reference.
-- `--request` (optional): Markdown workflow handoff containing exact cleanup targets,
-  revisions, recovery information, and equivalent inputs. Do not combine it with
-  shorthand arguments.
-- `--target-revision` (repeatable, optional): Exact native revision corresponding to
-  each target when its provider exposes one.
-- `--remove-reference` (optional): Include each target's exact associated reference.
-- `--force` (optional): Include an exact dirty or unmerged target in the preview.
-- `--idempotency-key` (optional): Stable retry key. Required for provider-native
-  `apply` when the selected provider supports idempotency.
-- `--effect` (optional): `preview` or `apply`; defaults to `preview`.
+- `subject` (required unless `--request` supplies it): Exact resources to remove.
+- `--request` (optional): Markdown workflow handoff carrying the subject and
+  equivalent inputs. Do not combine it with shorthand arguments.
+- `--revision` (optional): Exact native revision of the subject. Required for a
+  protected provider-native subject when the provider exposes one.
+- `--effect` (optional): `inspect`, `preview`, or `apply`. Defaults to `inspect`.
+- `--idempotency-key` (optional): Stable retry key. Required for an externally
+  submitted `apply` when the provider supports idempotency.
 
 ## Delegation
 
 Load the `workflow-guide` skill (plugin `xonovex-skill-workflow`) and perform its
-**Workspace cleanup** operation with these arguments. Apply only the exact previewed
-set and report recovery information for every effect.
+**Workspace cleanup** operation with these arguments. Remove only the exact named resources. Never widen the set; preview before apply.

@@ -8,7 +8,7 @@ Accept inline feedback, provider-native feedback references, or provider-native 
 
 ## Core Workflow
 
-1. Resolve the explicit plan, active canonical context, feedback, supporting
+1. Resolve the explicit plan, its carried decisions, feedback, supporting
    references, and optional native revision through selected providers when
    applicable.
 2. Enumerate every distinct feedback item before editing. Stop on materially conflicting instructions that the available evidence cannot resolve.

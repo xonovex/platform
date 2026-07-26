@@ -1,9 +1,9 @@
 [
   {
-    "query": "for Datadog API automation, which API and application keys and headers do I need, and how do I validate least-privilege access?",
+    "query": "which gh CLI flags call a GitHub REST endpoint directly, and how do I page through the results?",
     "should_trigger": false,
     "split": "validation",
-    "rationale": "provider-specific Datadog credential choice and transport belong to datadog-guide"
+    "rationale": "provider request mechanics belong to github-guide"
   },
   {
     "query": "Where should our developers keep API tokens on macOS, Linux, Windows, and WSL, and how should scripts retrieve them?",
@@ -66,15 +66,15 @@
     "split": "train"
   },
   {
-    "query": "Show the X-Figma-Token header and the cheapest endpoint for verifying that my Figma PAT works.",
+    "query": "Show the header and cheapest GitLab API endpoint for verifying that my personal access token works.",
     "should_trigger": false,
-    "rationale": "provider request mechanics belong to figma-guide",
+    "rationale": "provider request mechanics belong to gitlab-guide",
     "split": "train"
   },
   {
-    "query": "Configure AWS IAM permissions for a Lambda function to read one Secrets Manager secret encrypted with a customer KMS key.",
+    "query": "Configure a Kubernetes ServiceAccount and RBAC so one pod can read a single decrypted secret.",
     "should_trigger": false,
-    "rationale": "AWS resource policy implementation belongs to aws-guide",
+    "rationale": "cluster RBAC and secret wiring belong to kubernetes-guide",
     "split": "train"
   },
   {
@@ -84,15 +84,15 @@
     "split": "train"
   },
   {
-    "query": "Authenticate acli to Jira Cloud with an API token and switch between two site profiles.",
+    "query": "list this repository open pull requests with gh and filter them by review state",
     "should_trigger": false,
-    "rationale": "Atlassian-specific login belongs to atlassian-guide",
+    "rationale": "provider CLI mechanics belong to github-guide",
     "split": "validation"
   },
   {
-    "query": "Create an Azure DevOps service connection with exact federated subject claims for this pipeline environment.",
+    "query": "define a GitLab CI job that runs only on protected branches and publishes a build artifact",
     "should_trigger": false,
-    "rationale": "provider-specific service connection belongs to azure-devops-guide",
+    "rationale": "provider pipeline mechanics belong to gitlab-guide",
     "split": "validation"
   },
   {

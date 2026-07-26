@@ -1,44 +1,36 @@
 ---
-description: Validate and integrate one exact workspace while leaving cleanup separate
+description: Validate and integrate a workspace without cleanup
 allowed-tools:
   - Read
+  - Write
+  - Edit
   - Bash
   - Glob
+  - Grep
   - AskUserQuestion
   - Skill
 argument-hint: >-
-  [target] [--request <file>] [--destination <reference>]
-  [--target-revision <revision>] [--expected-revision <revision>]
-  [--context <context>...]
-  [--criterion <criterion>...] [--method <method>]
-  [--idempotency-key <key>] [--effect <preview|apply>]
+  [subject] [--request <file>] [--destination <destination>]
+  [--expected-revision <revision>] [--effect <inspect|preview|apply>]
+  [--idempotency-key <key>]
 ---
 
-# /xonovex-workflow:workspace-merge — Merge Workspace
+# /xonovex-workflow:workspace-merge — Workspace merge
 
 ## Arguments
 
-- `target` (required unless `--request` supplies it): Exact workspace path or opaque
-  native source reference.
-- `--request` (optional): Markdown workflow handoff containing the workspace,
-  destination, criteria, retry identity, and equivalent inputs. Do not combine it with
-  shorthand arguments.
-- `--target-revision` (optional): Exact workspace revision; required for
-  provider-native integration when the provider exposes one.
-- `--destination` (required unless `--request` supplies it): Exact native destination
-  reference.
-- `--expected-revision` (optional): Expected destination revision for concurrency;
-  required for `apply` when an existing destination exposes one.
-- `--context` (repeatable, optional): Canonical explanatory context or an opaque
-  context reference that constrains integration and is preserved in the result.
-- `--criterion` (repeatable, optional): Binding pre-integration criterion.
-- `--method` (optional): Requested validation and integration procedure.
-- `--idempotency-key` (optional): Stable retry key. Required for provider-native
-  `apply` when the selected provider supports idempotency.
-- `--effect` (optional): `preview` or `apply`; defaults to `preview`.
+- `subject` (required unless `--request` supplies it): The workspace to integrate.
+- `--request` (optional): Markdown workflow handoff carrying the subject and
+  equivalent inputs. Do not combine it with shorthand arguments.
+- `--destination` (required unless `--request` supplies it): Exact destination.
+- `--expected-revision` (optional): Destination revision the write expects. Blocks
+  the write when the destination has moved.
+- `--effect` (optional): `inspect`, `preview`, or `apply`. Defaults to `inspect`.
+- `--idempotency-key` (optional): Stable retry key. Required for an externally
+  submitted `apply` when the provider supports idempotency.
 
 ## Delegation
 
 Load the `workflow-guide` skill (plugin `xonovex-skill-workflow`) and perform its
-**Workspace merge** operation with these arguments. Integrate only after validation
-and explicit authority; preserve workspace resources for separate cleanup.
+**Workspace merge** operation with these arguments. Integrate into the destination and stop. Merging never implies branch, reference,
+or worktree cleanup.

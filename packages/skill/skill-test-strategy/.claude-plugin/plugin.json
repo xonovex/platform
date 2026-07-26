@@ -1,9 +1,0 @@
-{
-  "name": "xonovex-skill-test-strategy",
-  "version": "7.0.0",
-  "description": "Xonovex risk-based test strategy skills",
-  "author": {
-    "name": "Xonovex"
-  },
-  "skills": ["./test-strategy-guide"]
-}

@@ -72,10 +72,10 @@
     "rationale": "near-miss: domain modelling and ubiquitous language are owned by ddd-guide"
   },
   {
-    "query": "name our features using the FDD action-result-object template and build the feature list",
+    "query": "break this epic into a parent plan and child plans with explicit parallel groups",
     "should_trigger": false,
     "split": "train",
-    "rationale": "near-miss: FDD feature list and naming template are owned by fdd-guide"
+    "rationale": "near-miss: plan decomposition is owned by plan-guide"
   },
   {
     "query": "these two stories keep breaking each other — analyse the coupling between the modules",
@@ -90,8 +90,8 @@
     "split": "validation"
   },
   {
-    "query": "we're adopting FDD — what are the five processes and which run once vs per feature set?",
-    "rationale": "near miss owned by fdd-guide",
+    "query": "we're adopting DDD — what are the tactical building blocks and which of them are aggregates?",
+    "rationale": "near miss owned by ddd-guide",
     "should_trigger": false,
     "split": "validation"
   },
@@ -102,8 +102,8 @@
     "split": "validation"
   },
   {
-    "query": "should a feature in our feature list be capped at two weeks, and what if a step is bigger?",
-    "rationale": "validation near miss owned by fdd-guide",
+    "query": "should a subplan be capped at seven tasks, and what if one task is bigger?",
+    "rationale": "validation near miss owned by plan-guide",
     "should_trigger": false,
     "split": "validation"
   }

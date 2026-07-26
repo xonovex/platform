@@ -60,7 +60,7 @@
     "rationale": "atomicity, splitting"
   },
   {
-    "query": "run az repos pr create to open the PR on Azure DevOps",
+    "query": "set this merge request to auto-merge once the GitLab pipeline succeeds",
     "should_trigger": false,
     "split": "train",
     "rationale": "host mechanics, out of scope"

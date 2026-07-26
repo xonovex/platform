@@ -1,5 +1,5 @@
 ---
-description: Produce one traceable inline revision without overwriting its source
+description: Revise one subject into a traceable successor
 allowed-tools:
   - Read
   - Glob
@@ -7,30 +7,24 @@ allowed-tools:
   - AskUserQuestion
   - Skill
 argument-hint: >-
-  [subject] [--request <file>] [--subject-revision <revision>]
+  [subject] [feedback] [--request <file>] [--revision <revision>]
   [--context <context>...]
-  [--feedback <feedback>...]
-  [--criterion <criterion>...] [--method <method>]
 ---
 
 # /xonovex-workflow:revise — Revise
 
 ## Arguments
 
-- `subject` (required unless `--request` supplies it): Exact source to revise.
-- `--request` (optional): Markdown workflow handoff containing the source, feedback,
-  relationships, and equivalent inputs. Do not combine it with shorthand arguments.
-- `--subject-revision` (optional): Exact native revision of the source; required for a
-  provider-native source when the provider exposes one.
-- `--context` (repeatable, optional): Canonical explanatory context or an opaque
-  context reference to resolve and retain when producing the successor.
-- `--feedback` (repeatable, required unless `--request` supplies it): Feedback to
-  address.
-- `--criterion` (repeatable, optional): Constraint the revision must retain.
-- `--method` (optional): Requested subject-specific revision procedure.
+- `subject` (required unless `--request` supplies it): Inline content, a path, or an opaque native reference.
+- `feedback` (optional): The change to apply, as explicit feedback.
+- `--request` (optional): Markdown workflow handoff carrying the subject and
+  equivalent inputs. Do not combine it with shorthand arguments.
+- `--revision` (optional): Exact native revision of the subject. Required for a
+  protected provider-native subject when the provider exposes one.
+- `--context` (repeatable, optional): Explanatory context, or an opaque reference to
+  resolve. Context constrains the work; it is never evidence or approval.
 
 ## Delegation
 
 Load the `workflow-guide` skill (plugin `xonovex-skill-workflow`) and perform its
-**Revise** operation with these arguments. Preserve the source and return the successor
-inline without publishing it.
+**Revise** operation with these arguments. Return the successor inline and preserve the source. Do not publish it.

@@ -16,12 +16,12 @@ Provide implementation-planning procedures selected by a caller or generic opera
 - **One requested operation** — research, create, critique, revise, expand, continue, update, or validate without silently performing another operation
 - **Caller-owned effects** — continuation honors `inspect`, `preview`, or explicit `apply`; every other planning operation is read-only
 - **Separate publication** — persisting a planning result is a later Publish operation, never an implicit side effect of planning
-- **Traceable handoffs** — preserve the source subject and revision, parent or child
-  relationships, canonical context, criteria, capability needs, evidence, effects, and
-  constraints when a plan crosses role boundaries
-- **Scoped context** — resolve active decision, assumption, constraint, and tradeoff
-  records with identity, version, digest, provenance, applicability, status, and
-  native revision; context constrains planning but is not evidence or authority
+- **Traceable handoffs** — crossing a session or role boundary carries the subject and
+  revision, relationships, decisions, criteria, evidence, and constraints; see
+  **workflow-guide** for the shape
+- **Decisions carry anchors** — record what, why, and where in the code, so a later
+  session can find it; decisions constrain planning without becoming evidence or
+  authority
 - **Skills to consult** — plans name applicable implementation capabilities, and continuation loads them before editing
 - **Evidence-based validation** — check explicit success criteria and Definition of Done evidence, not merely command exit codes
 

@@ -34,6 +34,9 @@ Author, extract, merge, simplify, and validate Agent Skills following the Agent 
 - **Style Consistency** — match existing skill patterns in structure and voice
 - **Add what the agent lacks; omit what it knows** — trim to the delta over baseline model knowledge (tier-aware) and verify against the weakest model, see [references/optimize.md](references/optimize.md); no general-knowledge filler
 - **Defaults over menus** — one default, alternatives mentioned briefly
+- **Deletion-first editing** — an editing pass cuts at least as much as it adds; if a change grows a file, say what it replaces or bump the file's recorded budget in the same change
+- **No new nouns** — reuse the vocabulary the catalog already owns; a new term of art needs a defining file and an entry in the vocabulary manifest, or it is a synonym and should be deleted
+- **Anchor to an artifact** — every instruction must pass "could an agent do this, and could you verify it did?"; an instruction naming no checkable output is advice, not a skill
 - **Procedures over declarations** — teach the approach/steps, not a one-off answer
 - **Evals before docs** — build trigger/output evals for the gap first, then write the minimum to pass them; iterate observe→revise, see [references/evaluating-triggers.md](references/evaluating-triggers.md), [references/evaluating-outputs.md](references/evaluating-outputs.md)
 

@@ -31,9 +31,9 @@
     },
     {
       "id": 4,
-      "prompt": "Create a Claude command for repository release checks. The procedure is owned by release-readiness-guide in plugin xonovex-skill-release-readiness, and it can optionally use any installed changelog capability. Preview everything because a command with that name already exists.",
+      "prompt": "Create a Claude command for repository release checks. The procedure is owned by versioning-guide in plugin xonovex-skill-versioning, and it can optionally use any installed changelog capability. Preview everything because a command with that name already exists.",
       "assertions": [
-        "Keeps release-readiness-guide as the owner skill and xonovex-skill-release-readiness as the separate distribution plugin instead of conflating their names",
+        "Keeps versioning-guide as the owner skill and xonovex-skill-versioning as the separate distribution plugin instead of conflating their names",
         "Describes changelog support as an optional runtime capability selected from installed skill names and descriptions rather than making a second skill co-own the command or copying its instructions",
         "Uses dry-run to preview the command, owner-skill reference, and manifest changes and refuses to overwrite the existing command without an explicit exact-target force choice"
       ]

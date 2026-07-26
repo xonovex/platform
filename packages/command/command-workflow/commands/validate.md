@@ -1,43 +1,31 @@
 ---
-description: Validate one exact subject against binding criteria and return evidence inline
+description: Evaluate binding criteria independently and report evidence
 allowed-tools:
   - Read
   - Glob
   - Grep
   - AskUserQuestion
-  - Task
   - Skill
 argument-hint: >-
-  [subject] [--request <file>] [--subject-revision <revision>]
+  [subject] [criteria] [--request <file>] [--revision <revision>]
   [--context <context>...]
-  [--criterion <criterion>...]
-  [--perspective <perspective>...] [--method <method>] [--independent]
 ---
 
 # /xonovex-workflow:validate — Validate
 
 ## Arguments
 
-- `subject` (required unless `--request` supplies it): Inline content, a path, or an
-  opaque native reference.
-- `--request` (optional): Markdown workflow handoff containing the subject, criteria,
-  evidence, and required or preferred capabilities. Do not combine it with shorthand
-  arguments.
-- `--subject-revision` (optional): Exact native revision of the subject; required when
-  a binding criterion needs revision-pinned evidence and the provider exposes one.
-- `--context` (repeatable, optional): Canonical explanatory context or an opaque
-  context reference to resolve without converting it into evidence or a binding
-  outcome.
-- `--criterion` (repeatable, required unless `--request` supplies it): Binding
-  criterion to evaluate.
-- `--perspective` (repeatable, optional): Advisory validation lens.
-- `--method` (optional): Requested subject-specific validation procedure.
-- `--independent` (optional): Evaluate the pinned subject without implementation or
-  prior-review context first, then assess supplied context in a second pass and report
-  its effect. Use separate invocations for independently accountable roles.
+- `subject` (required unless `--request` supplies it): Inline content, a path, or an opaque native reference.
+- `criteria` (optional): The binding criteria to evaluate, inline or as a path.
+- `--request` (optional): Markdown workflow handoff carrying the subject and
+  equivalent inputs. Do not combine it with shorthand arguments.
+- `--revision` (optional): Exact native revision of the subject. Required for a
+  protected provider-native subject when the provider exposes one.
+- `--context` (repeatable, optional): Explanatory context, or an opaque reference to
+  resolve. Context constrains the work; it is never evidence or approval.
 
 ## Delegation
 
 Load the `workflow-guide` skill (plugin `xonovex-skill-workflow`) and perform its
-**Validate** operation with these arguments. Return one evidence-backed result per
-binding criterion; do not revise, accept, publish, or mutate the subject.
+**Validate** operation with these arguments. Evaluate each criterion against the pinned subject and report pass, fail, or
+blocked with its evidence. The result authorizes nothing.

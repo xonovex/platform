@@ -1,9 +1,0 @@
-{
-  "name": "xonovex-skill-product-discovery",
-  "version": "7.0.0",
-  "description": "Xonovex evidence-driven product discovery skills",
-  "author": {
-    "name": "Xonovex"
-  },
-  "skills": ["./product-discovery-guide"]
-}

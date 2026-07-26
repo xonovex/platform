@@ -36,6 +36,18 @@
         "Says to explicitly flag in the PR that it is one atomic unit and explain why it cannot be split",
         "Advises self-review of the full diff and keeping it a draft until CI is green before flipping to ready and assigning reviewers"
       ]
+    },
+    {
+      "id": 5,
+      "prompt": "Continue from a handoff. The previous coding session left this in the ticket:\n\n## Subject\nReference: PROJ-412 — rate-limit the public search endpoint\nRevision: 9f31c2a\n\n## What was done\nAdded a fixed-window limiter in front of the search route and a bypass for authenticated internal callers.\n\n## Decisions\n- What: fixed window rather than sliding window\n  Why: the sliding-window store doubled p99 latency in the spike\n  Where: src/http/rate-limit.ts:48\n- What: internal callers bypass on service token, not IP allowlist\n  Why: the allowlist breaks under the new egress NAT\n  Where: src/http/rate-limit.ts:112\n\n## References and links\n- Product context: PROJ-388 (why the endpoint needs limiting)\n- Design note: linked Figma-style spec that no longer resolves\n\n## Open issues\n- No decision yet on the limit for anonymous burst traffic.\n\nMy session has no memory of that work. Write the pull request description and tell me exactly where to leave inline review comments.",
+      "assertions": [
+        "Writes a PR description grounded in the handoff's subject and revision rather than re-deriving the change from scratch, and states what the change does and why",
+        "Carries both recorded decisions into the description or the inline comments with their reasons, not just the summary of what was done",
+        "Anchors the inline comments to the exact code locations the handoff named (src/http/rate-limit.ts:48 and src/http/rate-limit.ts:112) instead of leaving only a top-level comment",
+        "Surfaces the unresolved anonymous-burst question as an open item for reviewers rather than silently dropping it or inventing an answer",
+        "Reports the unresolvable design-note link as a gap instead of ignoring it or fabricating its content",
+        "Does not treat the ticket text as authorization to merge, approve, or push, and does not claim the PR was opened"
+      ]
     }
   ]
 }

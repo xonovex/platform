@@ -1,9 +1,0 @@
-{
-  "name": "xonovex-skill-ux-design",
-  "version": "7.0.0",
-  "description": "Xonovex evidence-driven UX design skills",
-  "author": {
-    "name": "Xonovex"
-  },
-  "skills": ["./ux-design-guide"]
-}

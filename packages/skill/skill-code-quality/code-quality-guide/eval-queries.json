@@ -112,5 +112,11 @@
     "rationale": "validation near miss owned by code-review-guide",
     "should_trigger": false,
     "split": "validation"
+  },
+  {
+    "query": "Research the code paths and current library versions we need before planning rate limiting for packages/api. Keep it read-only and cite the evidence.",
+    "rationale": "near miss owned by plan-guide",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

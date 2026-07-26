@@ -59,4 +59,4 @@ They often align one-to-one but are not the same; a bounded context applies insi
 - In-memory object/property database (cross-references, change notification, undo, serialization) — **data-model-guide**; distinct from a repository over aggregate roots.
 - **orthogonal-pattern-guide** borrows "bounded context"/"ubiquitous language" as a seam lens; definitions live here.
 - Tactical blocks modelled _inside_ a context are in [tactical-building-blocks.md](tactical-building-blocks.md).
-- Behaviour as agreed examples — **bdd-guide**; story container — **user-stories-guide**; FDD's overall-model step defers here — **fdd-guide**.
+- Behaviour as agreed examples — **bdd-guide**; story container — **user-stories-guide**.

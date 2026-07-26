@@ -47,4 +47,4 @@ A persistence-ignorant, collection-like abstraction over aggregate **roots**: as
 - Strategic context — bounded contexts, ubiquitous language, ACL — in [strategic-design.md](strategic-design.md).
 - Class/inheritance mechanics — **oop-guide**. Coupling/cohesion metrics — **connascence-guide**.
 - In-memory object/property database — **data-model-guide**; distinct from a repository over aggregate roots.
-- Driving behaviour from agreed examples — **bdd-guide**; the client-valued unit of work — **user-stories-guide**, **fdd-guide**.
+- Driving behaviour from agreed examples — **bdd-guide**; the client-valued unit of work — **user-stories-guide**.

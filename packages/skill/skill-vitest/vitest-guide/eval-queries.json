@@ -48,8 +48,8 @@
     "split": "validation"
   },
   {
-    "query": "Write an Express 5 + TypeScript login route handler. It should look up the user by email, verify the submitted password against the stored hash, and on success return a signed JWT the client will send on future API requests.",
-    "rationale": "near miss owned by expressjs-guide",
+    "query": "Explain when to use a stub versus a spy versus a fake, independent of any test framework.",
+    "rationale": "near miss owned by testing-guide",
     "should_trigger": false,
     "split": "train"
   },
@@ -72,8 +72,8 @@
     "split": "train"
   },
   {
-    "query": "Validate Express route params and JSON bodies at the boundary, return field-level 400 responses, and pass typed values to the service layer.",
-    "rationale": "near miss owned by expressjs-guide",
+    "query": "Drive this pricing rule test-first: write the failing test, go green with a fake, then refactor.",
+    "rationale": "near miss owned by tdd-guide",
     "should_trigger": false,
     "split": "train"
   },

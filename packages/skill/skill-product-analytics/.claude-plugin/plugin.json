@@ -1,9 +1,0 @@
-{
-  "name": "xonovex-skill-product-analytics",
-  "version": "7.0.0",
-  "description": "Xonovex trustworthy product measurement skills",
-  "author": {
-    "name": "Xonovex"
-  },
-  "skills": ["./product-analytics-guide"]
-}

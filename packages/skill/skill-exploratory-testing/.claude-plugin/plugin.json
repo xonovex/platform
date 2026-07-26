@@ -1,9 +1,0 @@
-{
-  "name": "xonovex-skill-exploratory-testing",
-  "version": "7.0.0",
-  "description": "Xonovex session-based exploratory testing skills",
-  "author": {
-    "name": "Xonovex"
-  },
-  "skills": ["./exploratory-testing-guide"]
-}

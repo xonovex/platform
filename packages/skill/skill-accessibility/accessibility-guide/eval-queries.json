@@ -42,10 +42,10 @@
     "rationale": "operational lifecycle"
   },
   {
-    "query": "add contentDescription to this Jetpack Compose icon",
+    "query": "memoize this React icon button so it stops re-rendering with the parent list",
     "should_trigger": false,
     "split": "train",
-    "rationale": "near miss: Android implementation owner"
+    "rationale": "near miss: React implementation owner"
   },
   {
     "query": "implement an aria-live React component",
@@ -78,8 +78,8 @@
     "split": "validation"
   },
   {
-    "query": "make this Compose screen accessible for TalkBack",
-    "rationale": "near miss owned by android-wcag-guide",
+    "query": "convert this React class component to hooks and memoize the expensive list render",
+    "rationale": "near miss owned by react-guide",
     "should_trigger": false,
     "split": "validation"
   },
@@ -96,8 +96,8 @@
     "split": "validation"
   },
   {
-    "query": "write a Compose UI test that verifies the send button is reachable and labelled for TalkBack",
-    "rationale": "validation near miss owned by android-wcag-guide",
+    "query": "write a Vitest test that mocks the payment service and asserts the retry backoff timing",
+    "rationale": "near miss owned by vitest-guide",
     "should_trigger": false,
     "split": "validation"
   }

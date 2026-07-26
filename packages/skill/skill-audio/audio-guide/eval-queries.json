@@ -114,8 +114,8 @@
     "split": "validation"
   },
   {
-    "query": "In a Remotion project running at 30fps, write a React component that fades a headline in from opacity 0 to 1 over the first half second and slides it up 40px at the same time. Give me the full component code.",
-    "rationale": "near miss owned by remotion-guide",
+    "query": "Import authored glTF meshes at build time and emit runtime-ready assets with a stable content hash.",
+    "rationale": "near miss owned by asset-pipeline-guide",
     "should_trigger": false,
     "split": "validation"
   },
