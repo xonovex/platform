@@ -32,23 +32,16 @@ tasks:
     options:
       cache: false
       runFromWorkspaceRoot: true
-  ci-runtime:
+  routing-owners-check:
     command:
-      - bash
-      - -c
-      - |
-        set -euo pipefail
-        case "${SKILL_EVAL_HARNESS:-claude}" in
-          claude) npm install --no-save "@anthropic-ai/claude-code@2.1.211" ;;
-          codex) npm install --no-save "@openai/codex@0.145.0" ;;
-          *) printf 'unsupported skill eval harness: %s\n' "$SKILL_EVAL_HARNESS" >&2; exit 2 ;;
-        esac
-    deps:
-      - ~:install
+      - node
+      - packages/script/script-moon-skill-eval-triggers/dist/src/routing-owners-cli.js
+      - packages/skill
+    deps: [build]
+    inputs:
+      - /packages/skill/*/*/eval-queries.json
     options:
-      cache: false
       runFromWorkspaceRoot: true
-      runInCI: true
   ci-routing:
     script: >-
       npx moon-skill-eval-routing packages/skill
@@ -60,7 +53,7 @@ tasks:
       --max-budget-usd 0.05
       --workspace ".skill-eval-results/routing/${SKILL_EVAL_HARNESS:-claude}"
     deps:
-      - ~:ci-runtime
+      - ~:install
     options:
       cache: false
       runFromWorkspaceRoot: true

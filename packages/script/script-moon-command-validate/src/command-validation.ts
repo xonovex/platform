@@ -1,5 +1,6 @@
 import {existsSync, readdirSync, readFileSync, statSync} from "node:fs";
 import {join, relative, resolve, sep} from "node:path";
+import {checkCommandBudgets} from "./command-budgets.js";
 import {
   parseCommandDocument,
   type CommandDocument,
@@ -311,6 +312,8 @@ export const validateCommandPackage = (
       }
     }
   }
+
+  issues.push(...checkCommandBudgets(packageDir, repositoryRoot));
 
   return {
     documents,

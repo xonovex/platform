@@ -39,7 +39,9 @@ describe("Claude process isolation", () => {
 
     expect(args).toContain("Skill,Read");
     expect(args).toContain("0.1");
-    expect(args).toContain("6");
+    // Enough turns for the arm to load a progressively-disclosed skill and still
+    // answer; too few reports error_max_turns and invalidates the batch.
+    expect(args[args.indexOf("--max-turns") + 1]).toBe("12");
     expect(args).toContain("--include-partial-messages");
     expect(args.some((arg) => arg.includes("under 1,000 words"))).toBe(true);
     expect(args).toContain("");

@@ -27,20 +27,3 @@ tasks:
     options:
       cache: false
       runFromWorkspaceRoot: true
-  ci-runtime:
-    command:
-      - bash
-      - -c
-      - |
-        set -euo pipefail
-        case "${SKILL_EVAL_HARNESS:-claude}" in
-          claude) npm install --no-save "@anthropic-ai/claude-code@2.1.211" ;;
-          codex) npm install --no-save "@openai/codex@0.145.0" ;;
-          *) printf 'unsupported skill eval harness: %s\n' "$SKILL_EVAL_HARNESS" >&2; exit 2 ;;
-        esac
-    deps:
-      - ~:install
-    options:
-      cache: false
-      runFromWorkspaceRoot: true
-      runInCI: true

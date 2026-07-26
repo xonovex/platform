@@ -5,7 +5,8 @@
   "type": "module",
   "bin": {
     "moon-skill-validate": "./dist/src/index.js",
-    "moon-skill-links": "./dist/src/links-cli.js"
+    "moon-skill-links": "./dist/src/links-cli.js",
+    "moon-skill-drift": "./dist/src/drift-cli.js"
   },
   "dependencies": {
     "@xonovex/core": "0.1.22",

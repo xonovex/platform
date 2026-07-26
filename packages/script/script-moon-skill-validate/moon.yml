@@ -20,13 +20,28 @@ tasks:
       - /packages/skill/*/*/references/*.md
     options:
       runFromWorkspaceRoot: true
+  drift-check:
+    command:
+      - node
+      - packages/script/script-moon-skill-validate/dist/src/drift-cli.js
+    deps: [build]
+    env:
+      XONOVEX_LINT_MODE: enforce
+    inputs:
+      - /budgets.json
+      - /vocabulary.json
+      - /packages/command/*/commands/*.md
+      - /packages/skill/*/*/SKILL.md
+      - /packages/skill/*/*/references/*.md
+    options:
+      runFromWorkspaceRoot: true
   coverage:
     command: noop
     deps: [ts-coverage]
     options:
       cache: false
   ci-check:
-    deps: [composition-check, coverage]
+    deps: [composition-check, coverage, drift-check]
   ts-test:
     deps:
       - shared-core:build

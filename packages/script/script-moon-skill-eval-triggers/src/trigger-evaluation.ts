@@ -32,14 +32,37 @@ export interface TriggerEvaluationOptions {
   readonly check: TriggerCheck;
 }
 
+// A harness error is usually transient (a dropped stream, an output-limit trip), so
+// retry the run before discarding the whole batch's evidence. A run that fails every
+// attempt still invalidates: partial evidence must never be reported as a pass.
+export const TRIGGER_RUN_ATTEMPTS = 3;
+
+const runOnce = async (
+  query: string,
+  options: TriggerEvaluationOptions,
+): Promise<{readonly triggered: boolean} | {readonly error: string}> => {
+  let lastError = "unknown failure";
+  for (let attempt = 1; attempt <= TRIGGER_RUN_ATTEMPTS; attempt += 1) {
+    const outcome = await options.check(query);
+    if (outcome.error === null) return {triggered: outcome.triggered};
+    lastError = outcome.error;
+    if (attempt < TRIGGER_RUN_ATTEMPTS) {
+      process.stderr.write(
+        `retrying after transient failure (${String(attempt)}/${String(TRIGGER_RUN_ATTEMPTS)}): ${outcome.error}\n`,
+      );
+    }
+  }
+  return {error: lastError};
+};
+
 const evaluateQuery = async (
   entry: Query,
   options: TriggerEvaluationOptions,
 ): Promise<ResultRecord | undefined> => {
   let triggers = 0;
   for (let index = 0; index < options.runs; index += 1) {
-    const outcome = await options.check(entry.query);
-    if (outcome.error !== null) {
+    const outcome = await runOnce(entry.query, options);
+    if ("error" in outcome) {
       if (options.workspace !== undefined) {
         writeFileSync(
           join(options.workspace, "invalid-run.json"),

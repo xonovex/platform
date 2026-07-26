@@ -1,5 +1,10 @@
 import {readdirSync, readFileSync} from "node:fs";
 import {basename, dirname, join, resolve} from "node:path";
+import {findWorkspaceRoot} from "@xonovex/script-moon-common";
+import {
+  DRIFT_LINT_MODE_ENV,
+  resolveDriftLintMode,
+} from "@xonovex/script-moon-common/drift-budgets";
 import {
   isDirectory,
   isFile,
@@ -8,6 +13,7 @@ import {
 import {parse as parseYaml} from "yaml";
 import {checkCatalogFiles} from "./catalog-files.js";
 import {descriptionRoutingErrors} from "./description-routing.js";
+import {checkGuideDrift} from "./drift-lints.js";
 import {checkReferenceFileLinks} from "./reference-file-links.js";
 
 const NAME_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
@@ -47,6 +53,9 @@ class Report {
   readonly passes: string[] = [];
   readonly warnings: string[] = [];
   readonly errors: string[] = [];
+  // Drift findings stay advisory in warn mode: --strict escalates authoring
+  // warnings, but not measurements the catalog has not yet been corrected for.
+  readonly drift: string[] = [];
 
   addPass(msg: string): void {
     this.passes.push(msg);
@@ -58,6 +67,10 @@ class Report {
 
   addFail(msg: string): void {
     this.errors.push(msg);
+  }
+
+  addDrift(msg: string): void {
+    this.drift.push(msg);
   }
 }
 
@@ -79,6 +92,14 @@ const yamlTypeName = (value: unknown): string => {
   if (Array.isArray(value)) return "list";
   if (typeof value === "object") return "dict";
   return typeof value;
+};
+
+const workspaceRootOrUndefined = (start: string): string | undefined => {
+  try {
+    return findWorkspaceRoot(start);
+  } catch {
+    return undefined;
+  }
 };
 
 const resolveTarget = (arg: string): {skill: string; skillDir: string} => {
@@ -653,6 +674,9 @@ const renderReport = (
   for (const line of report.warnings) {
     console.log(`[WARN] ${line}`);
   }
+  for (const line of report.drift) {
+    console.log(`[DRIFT] ${line}`);
+  }
   for (const line of report.errors) {
     console.log(`[FAIL] ${line}`);
   }
@@ -738,6 +762,22 @@ export const main = (argv: readonly string[]): number => {
   const catalogReport = checkCatalogFiles(skillDir, fm);
   for (const pass of catalogReport.passes) report.addPass(pass);
   for (const error of catalogReport.errors) report.addFail(error);
+
+  // Budgets and vocabulary are repository-scoped; a skill validated outside a
+  // workspace simply has no manifests to measure against.
+  const repositoryRoot = workspaceRootOrUndefined(skillDir);
+  if (repositoryRoot !== undefined) {
+    const driftMode = resolveDriftLintMode(process.env[DRIFT_LINT_MODE_ENV]);
+    const drift = checkGuideDrift(skillDir, repositoryRoot);
+    for (const error of drift.manifestErrors) report.addFail(error);
+    for (const finding of drift.findings) {
+      if (driftMode === "enforce") report.addFail(finding);
+      else report.addDrift(finding);
+    }
+    if (drift.findings.length === 0 && drift.manifestErrors.length === 0) {
+      report.addPass("drift: file budgets and vocabulary ownership hold");
+    }
+  }
 
   return renderReport(report, skillPath, skillDir, strict);
 };

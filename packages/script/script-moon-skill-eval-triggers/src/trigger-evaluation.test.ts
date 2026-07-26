@@ -52,7 +52,33 @@ describe("trigger evaluation", () => {
     });
   });
 
-  it("invalidates evidence after an infrastructure failure", async () => {
+  it("retries a transient failure instead of discarding the batch", async () => {
+    let calls = 0;
+    const flakyOnce: TriggerCheck = (query) => {
+      calls += 1;
+      // Fail the very first attempt, then behave normally.
+      if (calls === 1)
+        return Promise.resolve({triggered: false, error: "flaky"});
+      return Promise.resolve({triggered: query === "positive", error: null});
+    };
+    const options = optionsWith(flakyOnce, [
+      [
+        {
+          query: "positive",
+          should_trigger: true,
+          rationale: "matches",
+          split: "train",
+        },
+      ],
+    ]);
+
+    const result = await runTriggerEvaluation(options);
+
+    expect(result).toMatchObject({success: true, passed: 1, total: 1});
+    expect(calls).toBe(3); // one wasted attempt, then the two real runs
+  });
+
+  it("invalidates evidence when every attempt fails", async () => {
     const options = optionsWith(failInfrastructure, [
       [
         {

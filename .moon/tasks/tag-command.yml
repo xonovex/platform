@@ -32,7 +32,10 @@ tasks:
       - README.md
       - package.json
       - .claude-plugin/plugin.json
+      - /budgets.json
       - /packages/skill/*/*/SKILL.md
+    env:
+      XONOVEX_LINT_MODE: enforce
     options:
       cache: false
   format:

@@ -28,6 +28,10 @@
     "./package-json": {
       "types": "./src/package-json.ts",
       "default": "./dist/src/package-json.js"
+    },
+    "./drift-budgets": {
+      "types": "./src/drift-budgets.ts",
+      "default": "./dist/src/drift-budgets.js"
     }
   },
   "dependencies": {

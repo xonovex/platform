@@ -5,7 +5,8 @@
   "type": "module",
   "bin": {
     "moon-skill-eval-routing": "./dist/src/routing-index.js",
-    "moon-skill-eval-triggers": "./dist/src/index.js"
+    "moon-skill-eval-triggers": "./dist/src/index.js",
+    "moon-skill-routing-owners": "./dist/src/routing-owners-cli.js"
   },
   "dependencies": {
     "@xonovex/script-moon-common": "0.0.0",

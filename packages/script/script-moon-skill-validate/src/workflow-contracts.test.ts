@@ -28,6 +28,13 @@ const planningReferences = [
   "plan-validate",
 ] as const;
 
+const workspaceCommands = [
+  "workspace-create",
+  "workspace-merge",
+  "workspace-abandon",
+  "workspace-cleanup",
+] as const;
+
 const retryProtectedCommands = [
   "execute",
   "publish",
@@ -36,49 +43,66 @@ const retryProtectedCommands = [
   "workspace-cleanup",
 ] as const;
 
+// The safety core from the architecture contract. Growing this set is a decision,
+// not an accident, so the count is asserted rather than the membership alone.
+const SAFETY_CORE_FLAGS = [
+  "--context",
+  "--destination",
+  "--effect",
+  "--expected-revision",
+  "--idempotency-key",
+  "--request",
+  "--revision",
+  "--source",
+] as const;
+
+const workflowCommandSources = (): readonly string[] =>
+  [...coreWorkflowCommands, ...workspaceCommands].map((command) =>
+    readRepositoryFile(
+      `packages/command/command-workflow/commands/${command}.md`,
+    ),
+  );
+
 describe("workflow composition contracts", () => {
+  it("keeps the command flag surface at the safety core", () => {
+    const used = new Set<string>();
+    for (const source of workflowCommandSources()) {
+      for (const match of source.matchAll(/(?<![`\w])--[a-z][a-z-]*/gu)) {
+        used.add(match[0]);
+      }
+    }
+
+    expect([...used].toSorted()).toEqual([...SAFETY_CORE_FLAGS]);
+  });
+
   it("keeps core command subjects revision-addressable", () => {
     for (const command of coreWorkflowCommands) {
       const source = readRepositoryFile(
         `packages/command/command-workflow/commands/${command}.md`,
       );
-      expect(source).toContain("[--subject-revision <revision>]");
-      expect(source).toContain("`--subject-revision` (optional)");
+      expect(source).toContain("`subject`");
     }
   });
 
-  it("allows review and validation to create fresh independent context", () => {
-    for (const command of ["review", "validate"]) {
-      const source = readRepositoryFile(
-        `packages/command/command-workflow/commands/${command}.md`,
-      );
-
-      expect(source).toMatch(/allowed-tools:[\s\S]*\n  - Task\n/u);
-      expect(source).toContain("[--independent]");
-      expect(source).toContain("`--independent` (optional)");
-    }
-  });
-
-  it("defines traceable Markdown handoffs and evidence aggregation", () => {
+  it("defines a minimal cold-boundary handoff anchored to code", () => {
     const handoffs = readRepositoryFile(
       "packages/skill/skill-workflow/workflow-guide/references/handoffs.md",
     );
 
     for (const heading of [
       "## Subject",
-      "## Relationships",
-      "## Required capabilities",
-      "## Preferred capabilities",
-      "## Evidence",
-      "## Effects",
+      "## What was done",
+      "## Decisions",
+      "## References and links",
+      "## Open issues",
     ]) {
       expect(handoffs).toContain(heading);
     }
-    expect(handoffs).toContain("Subject revision:");
-    expect(handoffs).toContain("Freshness:");
-    expect(handoffs).toContain("Limitations:");
-    expect(handoffs).toContain(
-      "Separate independent reviewers or validators produce separate evidence entries.",
+    expect(handoffs).toContain("file:line");
+    expect(handoffs).toMatch(/only at a cold boundary/u);
+    // The 16-field context protocol the contract replaced must not return.
+    expect(handoffs).not.toMatch(
+      /Context digest|Context version|Audience:|Visibility:/u,
     );
   });
 
@@ -94,7 +118,6 @@ describe("workflow composition contracts", () => {
     const merge = readRepositoryFile(
       "packages/command/command-workflow/commands/workspace-merge.md",
     );
-    expect(merge).toContain("[--target-revision <revision>]");
     expect(merge).toContain("[--expected-revision <revision>]");
 
     const effects = readRepositoryFile(
@@ -108,45 +131,59 @@ describe("workflow composition contracts", () => {
     );
   });
 
-  it("documents multi-role SDLC composition without internalizing provider authority", () => {
+  it("states governance once and points every other file at it", () => {
+    const governance = readRepositoryFile(
+      "packages/skill/skill-workflow/workflow-guide/references/governance.md",
+    );
+    expect(governance).toMatch(/never instructs it/u);
+    expect(governance).toMatch(/declared team convention|Declared Convention/u);
+
+    // Only governance.md may state the untrusted-data invariant normatively.
+    const restating = [
+      "SKILL.md",
+      "references/handoffs.md",
+      "references/context-forwarding.md",
+      "references/sdlc.md",
+      "references/execute.md",
+      "references/decide.md",
+      "references/publish.md",
+    ].filter((file) =>
+      /untrusted data/u.test(
+        readRepositoryFile(
+          `packages/skill/skill-workflow/workflow-guide/${file}`,
+        ),
+      ),
+    );
+
+    expect(restating).toEqual([]);
+  });
+
+  it("defines Execute positively and expects an antecedent", () => {
+    const execute = readRepositoryFile(
+      "packages/skill/skill-workflow/workflow-guide/references/execute.md",
+    );
+
+    expect(execute).toMatch(/carries out work that was already specified/u);
+    expect(execute).toMatch(/expects an antecedent/u);
+    expect(execute).toMatch(/freeform session/u);
+  });
+
+  it("scopes SDLC composition to the frozen scenario families", () => {
     const sdlc = readRepositoryFile(
       "packages/skill/skill-workflow/workflow-guide/references/sdlc.md",
     );
 
-    for (const role of [
-      "Product manager",
-      "Product analyst",
-      "UX researcher",
-      "Product designer",
-      "Architect",
-      "Developer",
-      "QA",
-      "Security tester",
-      "Service owner",
-      "Release manager",
-      "Incident commander",
+    for (const family of [
+      "Xonovex platform",
+      "Drodan and CruiseReviews",
+      "Native and game engine",
+      "Infrastructure and operations",
     ]) {
-      expect(sdlc).toContain(role);
+      expect(sdlc).toContain(family);
     }
-    for (const capability of [
-      "product-discovery-guide",
-      "product-analytics-guide",
-      "ux-research-guide",
-      "ux-design-guide",
-      "architecture-evaluation-guide",
-      "test-strategy-guide",
-      "exploratory-testing-guide",
-      "threat-modeling-guide",
-      "security-testing-guide",
-      "operational-readiness-guide",
-      "release-readiness-guide",
-      "incident-response-guide",
-    ]) {
-      expect(sdlc).toContain(capability);
-    }
-    expect(sdlc).toContain(
-      "Assignments, access control, approvals, status transitions, notifications, scheduling,",
-    );
+    // The 22-phase role matrix the rewrite deleted must not return.
+    expect(sdlc).not.toContain("Incident commander");
+    expect(sdlc).not.toContain("| Phase ");
   });
 
   it("keeps planning operations inline and continuation effect-aware", () => {

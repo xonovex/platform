@@ -211,6 +211,12 @@ const isolatedClaudeArgs = (outputFormat: "json" | "stream-json") =>
     "--no-chrome",
   ] as const;
 
+// A with-skill run spends turns loading the skill and its references before it
+// answers, so a guide with progressive disclosure needs more headroom than a bare
+// answer. Too low a ceiling reports error_max_turns, which invalidates the batch
+// rather than scoring the arm.
+const GENERATION_MAX_TURNS = 12;
+
 const GENERATION_SYSTEM_PROMPT =
   "Answer the user request directly. Use the explicitly invoked skill as " +
   "authoritative guidance. Read only files that the skill itself identifies " +
@@ -232,7 +238,7 @@ export const buildGenerationClaudeArgs = (
     "--max-budget-usd",
     String(options.budget),
     "--max-turns",
-    "6",
+    String(GENERATION_MAX_TURNS),
     "--system-prompt",
     GENERATION_SYSTEM_PROMPT,
   ];

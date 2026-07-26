@@ -3,6 +3,7 @@ language: typescript
 tags: [typescript-script]
 dependsOn:
   - shared-core
+  - script-moon-common
 tasks:
   coverage:
     command: noop

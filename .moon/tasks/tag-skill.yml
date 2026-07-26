@@ -50,6 +50,13 @@ tasks:
       - target: ~:build
         optional: true
       - script-moon-skill-validate:install
+      - script-moon-skill-eval-triggers:routing-owners-check
+    env:
+      XONOVEX_LINT_MODE: enforce
+    inputs:
+      - "**/*.md"
+      - /budgets.json
+      - /vocabulary.json
     options:
       cache: false
   skill-audit-sources:
@@ -66,6 +73,8 @@ tasks:
     command:
       - npx
       - moon-skill-eval-triggers
+      - --batch-size
+      - "8"
     deps:
       - target: ~:build
         optional: true
@@ -77,6 +86,8 @@ tasks:
     command:
       - npx
       - moon-skill-eval-outputs
+      - --plugin-dir
+      - .
     deps:
       - target: ~:build
         optional: true
@@ -96,7 +107,7 @@ tasks:
     deps:
       - target: ~:build
         optional: true
-      - script-moon-skill-eval-triggers:ci-runtime
+      - script-moon-skill-eval-triggers:install
     inputs:
       - /packages/skill/AGENTS.md
       - /packages/skill/skill-skill/skill-guide/scripts/**/*
@@ -117,7 +128,7 @@ tasks:
     deps:
       - target: ~:build
         optional: true
-      - script-moon-skill-eval-outputs:ci-runtime
+      - script-moon-skill-eval-outputs:install
     inputs:
       - /packages/skill/AGENTS.md
       - /packages/skill/skill-skill/skill-guide/scripts/**/*
