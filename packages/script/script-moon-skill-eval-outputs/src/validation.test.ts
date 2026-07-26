@@ -6,11 +6,13 @@ import {
   evalEntries,
   evaluateOutputGate,
   findEvaluationInfrastructureFailures,
+  GENERATION_MAX_TURNS,
   normalizeEval,
   outputModelCallCount,
   parseJudgeResults,
   parseOutputOptions,
   runFailFastPool,
+  runWithTransientRetry,
   streamTextDeltaLength,
   validateUniqueEvaluationIds,
 } from "./validation.js";
@@ -33,6 +35,7 @@ describe("Claude process isolation", () => {
       arm: "with_skill",
       model: "haiku",
       budget: 0.1,
+      maxTurns: GENERATION_MAX_TURNS,
       disallowedTools: "Bash,Edit,Write",
       pluginDirectories: ["dependency-directory", "plugin-directory"],
     });
@@ -49,11 +52,24 @@ describe("Claude process isolation", () => {
     expect(args.filter((arg) => arg === "--plugin-dir")).toHaveLength(2);
   });
 
+  it("honours a raised per-generation turn cap", () => {
+    const args = buildGenerationClaudeArgs({
+      arm: "with_skill",
+      model: "haiku",
+      budget: 0.1,
+      maxTurns: 24,
+      disallowedTools: "",
+    });
+
+    expect(args[args.indexOf("--max-turns") + 1]).toBe("24");
+  });
+
   it("allows only Read in baseline and no tools in the judge", () => {
     const baseline = buildGenerationClaudeArgs({
       arm: "without_skill",
       model: "haiku",
       budget: 0.1,
+      maxTurns: GENERATION_MAX_TURNS,
       disallowedTools: "Bash,Edit,Write",
     });
     const judge = buildJudgeClaudeArgs({
@@ -116,6 +132,51 @@ describe("fail-fast scheduling", () => {
 
     expect(results).toEqual([1, 2]);
     expect(started).toEqual([1, 2]);
+  });
+});
+
+describe("transient failure retry", () => {
+  it("returns the first healthy result without retrying", async () => {
+    const attempts: number[] = [];
+    const result = await runWithTransientRetry(
+      () => Promise.resolve({error: null, value: "ok"}),
+      3,
+      (attempt) => attempts.push(attempt),
+    );
+
+    expect(result).toEqual({error: null, value: "ok"});
+    expect(attempts).toEqual([]);
+  });
+
+  it("retries a transient failure and keeps the recovered result", async () => {
+    const outcomes = [
+      {error: "claude exited 1: error_max_turns"},
+      {error: null},
+    ];
+    const retried: string[] = [];
+    const result = await runWithTransientRetry(
+      () => Promise.resolve(outcomes.shift() ?? {error: "exhausted"}),
+      3,
+      (_attempt, error) => retried.push(error),
+    );
+
+    expect(result).toEqual({error: null});
+    expect(retried).toEqual(["claude exited 1: error_max_turns"]);
+  });
+
+  it("surfaces the last failure once every attempt is spent", async () => {
+    let runs = 0;
+    const result = await runWithTransientRetry(
+      () => {
+        runs += 1;
+        return Promise.resolve({error: `timeout ${String(runs)}`});
+      },
+      3,
+      () => undefined,
+    );
+
+    expect(runs).toBe(3);
+    expect(result).toEqual({error: "timeout 3"});
   });
 });
 
@@ -275,6 +336,7 @@ describe("numeric option validation", () => {
         timeout: "600",
         budget: "0.1",
         judgeBudget: "0.1",
+        maxTurns: "24",
         batchSize: "6",
         iteration: "iteration-3",
       }),
@@ -286,10 +348,24 @@ describe("numeric option validation", () => {
         timeout: 600,
         budget: 0.1,
         judgeBudget: 0.1,
+        maxTurns: 24,
         batchSize: 6,
         iteration: "iteration-3",
       },
     });
+  });
+
+  it("defaults the turn cap when none is supplied", () => {
+    const result = parseOutputOptions({
+      runs: "1",
+      concurrency: "1",
+      timeout: "1",
+    });
+
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.maxTurns).toBe(GENERATION_MAX_TURNS);
+    }
   });
 
   it.each([
@@ -301,6 +377,8 @@ describe("numeric option validation", () => {
     {runs: "1", concurrency: "1", timeout: "1", budget: "Infinity"},
     {runs: "1", concurrency: "1", timeout: "1", budget: "0.11"},
     {runs: "1", concurrency: "1", timeout: "1", judgeBudget: "0.11"},
+    {runs: "1", concurrency: "1", timeout: "1", maxTurns: "0"},
+    {runs: "1", concurrency: "1", timeout: "1", maxTurns: "25"},
     {runs: "1", concurrency: "1", timeout: "1", batchSize: "0"},
     {
       runs: "1",

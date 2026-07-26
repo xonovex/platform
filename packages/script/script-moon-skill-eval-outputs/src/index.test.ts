@@ -1,5 +1,5 @@
-import {describe, expect, it} from "vitest";
-import {main} from "./evaluate.js";
+import {describe, expect, it, vi} from "vitest";
+import {main, writeRetryNotice} from "./evaluate.js";
 import {
   aggregateArm,
   claudeFailureDetail,
@@ -103,5 +103,20 @@ describe("output evaluation helpers", () => {
 describe("main", () => {
   it("fails cleanly when the evaluation file is missing", async () => {
     await expect(main(["missing-evals.json"])).resolves.toBe(2);
+  });
+});
+
+describe("writeRetryNotice", () => {
+  it("names the attempt, the attempt cap, and the failure", () => {
+    const write = vi
+      .spyOn(process.stderr, "write")
+      .mockImplementation(() => true);
+
+    writeRetryNotice(2, "claude exited 1: error_max_turns");
+
+    expect(write).toHaveBeenCalledWith(
+      "retrying after transient failure (2/3): claude exited 1: error_max_turns\n",
+    );
+    write.mockRestore();
   });
 });

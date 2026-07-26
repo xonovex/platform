@@ -9,8 +9,10 @@ import {
   evaluateOutputGate,
   findEvaluationInfrastructureFailures,
   MAX_OUTPUT_MODEL_CALLS,
+  OUTPUT_RUN_ATTEMPTS,
   outputModelCallCount,
   runFailFastPool,
+  runWithTransientRetry,
   type EvaluationArm,
   type NormalizedEval,
 } from "./validation.js";
@@ -37,6 +39,12 @@ const evaluationJobs = (
   );
 };
 
+export const writeRetryNotice = (attempt: number, error: string): void => {
+  process.stderr.write(
+    `retrying after transient failure (${String(attempt)}/${String(OUTPUT_RUN_ATTEMPTS)}): ${error}\n`,
+  );
+};
+
 const runEvaluationBatches = async (
   batches: readonly (readonly NormalizedEval[])[],
   concurrency: number,
@@ -54,7 +62,12 @@ const runEvaluationBatches = async (
     const batchRecords = await runFailFastPool(
       evaluationJobs(batch, context.runs),
       concurrency,
-      (job) => runJob(job.evaluation, job.arm, job.runIndex, context),
+      (job) =>
+        runWithTransientRetry(
+          () => runJob(job.evaluation, job.arm, job.runIndex, context),
+          OUTPUT_RUN_ATTEMPTS,
+          writeRetryNotice,
+        ),
       (record) => findEvaluationInfrastructureFailures([record]).length > 0,
     );
     records.push(...batchRecords);
@@ -169,7 +182,8 @@ export const main = async (argv: readonly string[]): Promise<number> => {
 
   const harnessCaps =
     config.harness === "claude"
-      ? `generation=$${String(config.budget)}/6 turns  judge=$${String(config.judgeBudget)}/1 turn  `
+      ? `generation=$${String(config.budget)}/${String(config.maxTurns)} turns  ` +
+        `judge=$${String(config.judgeBudget)}/1 turn  `
       : `generation-timeout=${String(config.timeout)}s  output-limit=10000 chars  `;
   process.stderr.write(
     `skill: ${config.skillName}  evals: ${String(config.evaluations.length)}  ` +
@@ -181,7 +195,7 @@ export const main = async (argv: readonly string[]): Promise<number> => {
       `model_calls=${String(outputModelCallCount(config.evaluations.length, config.runs))}  ` +
       `batches=${String(config.evaluationBatches.length)}  ` +
       `max_batch_calls=${String(config.maxBatchModelCalls)}/${String(MAX_OUTPUT_MODEL_CALLS)}  ` +
-      "retries=0\n---\n",
+      `retries=${String(OUTPUT_RUN_ATTEMPTS - 1)}\n---\n`,
   );
 
   const records = await runEvaluationBatches(

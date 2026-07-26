@@ -73,6 +73,7 @@ export interface EvaluationConfig {
   readonly judgeBudget: number;
   readonly judgeModel: string;
   readonly maxBatchModelCalls: number;
+  readonly maxTurns: number;
   readonly model: string;
   readonly runs: number;
   readonly shortName: string;
@@ -125,6 +126,11 @@ const cliDefinition = {
       type: "string",
       description:
         "per-generation timeout in seconds (env GEN_TIMEOUT, default 600)",
+    },
+    "max-turns": {
+      type: "string",
+      description:
+        "per-generation turn cap for the claude harness (env MAX_TURNS, default 12, maximum 24)",
     },
     workspace: {
       type: "string",
@@ -331,6 +337,8 @@ export const resolveEvaluationConfig = (
   }
 
   const batchSizeRaw = values["batch-size"] as string | undefined;
+  const maxTurnsRaw =
+    (values["max-turns"] as string | undefined) ?? environment.MAX_TURNS;
   const iterationArgument = positionals[2] ?? "";
   const optionsResult = parseOutputOptions({
     runs: (values.runs as string | undefined) ?? environment.RUNS ?? "1",
@@ -351,6 +359,7 @@ export const resolveEvaluationConfig = (
       environment.JUDGE_MAX_BUDGET_USD ??
       "0.10",
     ...(batchSizeRaw === undefined ? {} : {batchSize: batchSizeRaw}),
+    ...(maxTurnsRaw === undefined ? {} : {maxTurns: maxTurnsRaw}),
     ...(iterationArgument ? {iteration: iterationArgument} : {}),
   });
   if (!optionsResult.success) {
@@ -360,7 +369,7 @@ export const resolveEvaluationConfig = (
     );
   }
 
-  const {runs, concurrency, timeout, batchSize} = optionsResult.data;
+  const {runs, concurrency, timeout, batchSize, maxTurns} = optionsResult.data;
   const evaluationBatches = boundedBatches(
     loaded.data.evaluations,
     batchSize ?? Math.max(loaded.data.evaluations.length, 1),
@@ -431,6 +440,7 @@ export const resolveEvaluationConfig = (
       judgeBudget: optionsResult.data.judgeBudget,
       judgeModel,
       maxBatchModelCalls,
+      maxTurns,
       model,
       runs,
       shortName,
@@ -443,6 +453,7 @@ export const resolveEvaluationConfig = (
               arm: "with_skill",
               model,
               budget,
+              maxTurns,
               disallowedTools,
               ...(pluginDirectory
                 ? {
@@ -458,6 +469,7 @@ export const resolveEvaluationConfig = (
               arm: "without_skill",
               model,
               budget,
+              maxTurns,
               disallowedTools,
             })
           : buildCodexArgs({model}),

@@ -131,6 +131,8 @@ describe("evaluation configuration", () => {
         "run-here",
         "--model",
         "cli-model",
+        "--max-turns",
+        "18",
         "evals.json",
         "explicit-skill",
         "iteration-4",
@@ -143,7 +145,24 @@ describe("evaluation configuration", () => {
       iteration: "iteration-4",
       cwd: "run-here",
       model: "cli-model",
+      maxTurns: 18,
     });
+    expect(
+      config.withArgs[config.withArgs.indexOf("--max-turns") + 1],
+    ).toBe("18");
+    expect(
+      config.withoutArgs[config.withoutArgs.indexOf("--max-turns") + 1],
+    ).toBe("18");
+  });
+
+  it("defaults the turn cap and rejects one above the ceiling", () => {
+    expect(successfulConfig(resolveConfig())).toMatchObject({maxTurns: 12});
+    expect(successfulConfig(resolveConfig([], {MAX_TURNS: "20"}))).toMatchObject(
+      {maxTurns: 20},
+    );
+    expect(failureMessage(resolveConfig(["--max-turns", "25"]))).toContain(
+      "invalid evaluator options",
+    );
   });
 
   it("uses pinned Claude generation and judge models by default", () => {

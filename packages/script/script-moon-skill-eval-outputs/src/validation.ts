@@ -71,12 +71,24 @@ const JudgeBudgetTextSchema = PositiveNumberTextSchema.pipe(
   z.number().max(0.1),
 );
 
+// A with-skill run spends turns loading the skill and its references before it
+// answers, so a guide with progressive disclosure needs more headroom than a bare
+// answer. Too low a ceiling reports error_max_turns, which invalidates the batch
+// rather than scoring the arm; the cap stays configurable up to twice the default
+// for skills whose references need extra reads.
+export const GENERATION_MAX_TURNS = 12;
+
+const MaxTurnsTextSchema = PositiveIntegerTextSchema.pipe(
+  z.number().max(GENERATION_MAX_TURNS * 2),
+);
+
 const OutputOptionsSchema = z.object({
   runs: RunsTextSchema,
   concurrency: ConcurrencyTextSchema,
   timeout: PositiveNumberTextSchema,
   budget: GenerationBudgetTextSchema.default(0.1),
   judgeBudget: JudgeBudgetTextSchema.default(0.1),
+  maxTurns: MaxTurnsTextSchema.default(GENERATION_MAX_TURNS),
   batchSize: z
     .string()
     .regex(/^\d+$/, "must be a positive integer")
@@ -126,6 +138,7 @@ interface GenerationClaudeOptions {
   readonly arm: EvaluationArm;
   readonly model: string;
   readonly budget: number;
+  readonly maxTurns: number;
   readonly disallowedTools: string;
   readonly pluginDirectories?: readonly string[];
 }
@@ -211,12 +224,6 @@ const isolatedClaudeArgs = (outputFormat: "json" | "stream-json") =>
     "--no-chrome",
   ] as const;
 
-// A with-skill run spends turns loading the skill and its references before it
-// answers, so a guide with progressive disclosure needs more headroom than a bare
-// answer. Too low a ceiling reports error_max_turns, which invalidates the batch
-// rather than scoring the arm.
-const GENERATION_MAX_TURNS = 12;
-
 const GENERATION_SYSTEM_PROMPT =
   "Answer the user request directly. Use the explicitly invoked skill as " +
   "authoritative guidance. Read only files that the skill itself identifies " +
@@ -238,7 +245,7 @@ export const buildGenerationClaudeArgs = (
     "--max-budget-usd",
     String(options.budget),
     "--max-turns",
-    String(GENERATION_MAX_TURNS),
+    String(options.maxTurns),
     "--system-prompt",
     GENERATION_SYSTEM_PROMPT,
   ];
@@ -340,6 +347,32 @@ export const streamTextDeltaLength = (input: unknown): number => {
   const delta = event.delta;
   if (!isRecord(delta) || delta.type !== "text_delta") return 0;
   return typeof delta.text === "string" ? delta.text.length : 0;
+};
+
+// A harness error is usually transient (a dropped stream, an output-limit trip, an
+// exhausted turn cap), so retry the job before discarding the whole batch's
+// evidence. A with-skill run whose target skill never activated carries no error
+// and is not retried: that is a finding, not a flake. A job that fails every
+// attempt still invalidates: partial evidence must never be reported as a pass.
+export const OUTPUT_RUN_ATTEMPTS = 3;
+
+export const runWithTransientRetry = async <
+  R extends {readonly error: string | null},
+>(
+  run: () => Promise<R>,
+  attempts: number,
+  onRetry: (attempt: number, error: string) => void,
+): Promise<R> => {
+  let result = await run();
+  for (
+    let attempt = 1;
+    attempt < attempts && result.error !== null;
+    attempt += 1
+  ) {
+    onRetry(attempt, result.error);
+    result = await run();
+  }
+  return result;
 };
 
 export const runFailFastPool = async <T, R>(
