@@ -52,6 +52,35 @@ console.log(JSON.stringify({message: {content: [{type: "tool_use", name: "Skill"
     expect(outcome).toEqual({triggered: true, error: null});
   });
 
+  it("scores a competing skill invocation as a non-trigger", async () => {
+    const outcome = await runNode(`
+console.log(JSON.stringify({type: "system", subtype: "init", skills: ["plugin:test-skill"]}));
+console.log(JSON.stringify({message: {content: [{type: "tool_use", name: "Skill", input: {skill: "other-skill"}}]}}));
+process.exit(1);
+`);
+
+    expect(outcome).toEqual({triggered: false, error: null});
+  });
+
+  it("scores a denied competing skill invocation as a non-trigger", async () => {
+    const outcome = await runNode(`
+console.log(JSON.stringify({type: "system", subtype: "init", skills: ["plugin:test-skill"]}));
+console.log(JSON.stringify({permission_denials: [{tool_name: "Skill", tool_input: {skill: "other-skill"}}]}));
+process.exit(1);
+`);
+
+    expect(outcome).toEqual({triggered: false, error: null});
+  });
+
+  it("prefers the target when it is invoked alongside a competing skill", async () => {
+    const outcome = await runNode(`
+console.log(JSON.stringify({type: "system", subtype: "init", skills: ["plugin:test-skill"]}));
+console.log(JSON.stringify({message: {content: [{type: "tool_use", name: "Skill", input: {skill: "other-skill"}}, {type: "tool_use", name: "Skill", input: {skill: "test-skill"}}]}}));
+`);
+
+    expect(outcome).toEqual({triggered: true, error: null});
+  });
+
   it("returns a clean negative result when the skill is available", async () => {
     const outcome = await runNode(`
 console.log(JSON.stringify({type: "system", subtype: "init", skills: ["test-skill"]}));

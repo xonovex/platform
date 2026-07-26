@@ -55,28 +55,29 @@ const matchSkill = (
   );
 };
 
-const checkLine = (line: string, target: string, short: string): boolean => {
+// Every skill the line invokes, whether the harness allowed the call or denied it.
+// The names matter beyond the target's own: a line that invokes some other skill
+// settles the routing outcome just as firmly as one that invokes the target.
+export const invokedSkillNames = (line: string): readonly string[] => {
   let obj: unknown;
   try {
     obj = JSON.parse(line);
   } catch {
-    return false;
+    return [];
   }
   if (!isRecord(obj)) {
-    return false;
+    return [];
   }
 
+  const names: string[] = [];
   const message = obj.message;
   if (isRecord(message)) {
     const content = Array.isArray(message.content) ? message.content : [];
     for (const item of content) {
       if (isRecord(item) && item.type === "tool_use" && item.name === "Skill") {
         const inputField = item.input;
-        if (
-          isRecord(inputField) &&
-          matchSkill(inputField.skill, target, short)
-        ) {
-          return true;
+        if (isRecord(inputField) && typeof inputField.skill === "string") {
+          names.push(inputField.skill);
         }
       }
     }
@@ -88,13 +89,13 @@ const checkLine = (line: string, target: string, short: string): boolean => {
   for (const denial of denials) {
     if (isRecord(denial) && denial.tool_name === "Skill") {
       const toolInput = denial.tool_input;
-      if (isRecord(toolInput) && matchSkill(toolInput.skill, target, short)) {
-        return true;
+      if (isRecord(toolInput) && typeof toolInput.skill === "string") {
+        names.push(toolInput.skill);
       }
     }
   }
 
-  return false;
+  return names;
 };
 
 const skillAvailableLine = (
@@ -138,6 +139,7 @@ export const checkTriggered = (
     let matched = false;
     let targetAvailable = false;
     let timedOut = false;
+    let competingSkill: string | null = null;
     let outputLimitExceeded = false;
     let outputCharacters = 0;
     let stderr = "";
@@ -180,8 +182,19 @@ export const checkTriggered = (
         return;
       }
       targetAvailable ||= skillAvailableLine(line, target, short);
-      if (checkLine(line, target, short)) {
+      const invoked = invokedSkillNames(line);
+      if (invoked.some((skill) => matchSkill(skill, target, short))) {
         matched = true;
+        rl.close();
+        killProc();
+        return;
+      }
+      // Another skill won the request, so the target's routing outcome is settled and
+      // the run ends here. The single allowed turn is spent by that invocation, so
+      // letting the process run on would only end in error_max_turns and discard a
+      // conclusive result — the exact answer a should-not-trigger query is asking for.
+      if (invoked.length > 0) {
+        competingSkill = invoked[0] ?? "";
         rl.close();
         killProc();
         return;
@@ -212,7 +225,7 @@ export const checkTriggered = (
         finish({triggered: false, error: "timeout"});
         return;
       }
-      if (outputLimitExceeded) {
+      if (competingSkill !== null || outputLimitExceeded) {
         finish(
           targetAvailable
             ? {triggered: false, error: null}
