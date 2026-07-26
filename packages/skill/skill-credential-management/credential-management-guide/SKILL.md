@@ -1,6 +1,6 @@
 ---
 name: credential-management-guide
-description: "Use when choosing, storing, injecting, rotating, revoking, or responding to exposure of machine credentials and secrets. Triggers on API tokens, PATs, client secrets, keychains, secret managers, masked CI variables, workload identity federation, OIDC, `.env` secret handling, credential rotation, or leaked credentials, even when the user doesn't say 'credential management' and names only a provider-specific token."
+description: "Use when choosing, storing, injecting, rotating, revoking, or responding to exposure of machine-to-machine credentials and secrets — the tokens a service, workload, or CI job presents to another system. Triggers on API tokens, PATs, client secrets, keychains, secret managers, masked CI variables, workload identity federation, OIDC, `.env` secret handling, credential rotation, or leaked credentials, even when the user doesn't say 'credential management' and names only a provider-specific token."
 ---
 
 # Credential Management Guidelines
@@ -29,6 +29,7 @@ Load the relevant provider skill for whether a PAT, app token, OAuth grant, serv
 - Fork, pull-request, reusable-workflow, and protected-environment rules differ by CI provider. Verify both allowed and denied paths.
 - Rotating a value without updating every consumer causes an outage; updating consumers without revoking the old value leaves two valid credentials.
 - Rewriting git history does not revoke a leaked credential and can destroy useful incident evidence if done before containment.
+- An end user's own password is not a machine credential: hashing parameters, reset rules, and login flows are account security and follow different guidance from the tokens covered here.
 
 ## Progressive Disclosure
 
