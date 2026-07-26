@@ -78,7 +78,7 @@
     "split": "train"
   },
   {
-    "query": "rewrite this string concat with template literals and pull out the magic numbers as named consts",
+    "query": "rewrite this string concat with template literals and pull out the magic numbers as named consts:\n\nconst label = name + ' (' + (qty * 1.21).toFixed(2) + ')';\nif (retries > 3) { throw new Error('too many'); }",
     "rationale": "near miss owned by typescript-guide",
     "should_trigger": false,
     "split": "validation"
@@ -93,6 +93,12 @@
     "query": "Validate a Hono JSON request with Zod, expose the inferred type to the handler, and return a consistent 422 response for invalid input.",
     "rationale": "near miss owned by hono-guide",
     "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "fix the failing assertion in user.spec.ts \u2014 it expects 200 but we return 204",
+    "rationale": "fixing a failing Vitest assertion",
+    "should_trigger": true,
     "split": "validation"
   }
 ]

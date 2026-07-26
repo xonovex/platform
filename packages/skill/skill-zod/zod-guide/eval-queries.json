@@ -84,7 +84,7 @@
     "split": "validation"
   },
   {
-    "query": "rewrite this string concat with template literals and pull out the magic numbers as named consts",
+    "query": "rewrite this string concat with template literals and pull out the magic numbers as named consts:\n\nconst label = name + ' (' + (qty * 1.21).toFixed(2) + ')';\nif (retries > 3) { throw new Error('too many'); }",
     "rationale": "near miss owned by typescript-guide",
     "should_trigger": false,
     "split": "validation"
