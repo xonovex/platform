@@ -66,7 +66,7 @@
     "split": "train"
   },
   {
-    "query": "I'm building the core document store for our level editor — objects of different kinds each with a set of named properties, and I want to add new object types at runtime without recompiling. How should the type/property schema work?",
+    "query": "I'm building the core document store for our level editor \u2014 objects of different kinds each with a set of named properties, and I want to add new object types at runtime without recompiling. How should the type/property schema work?",
     "rationale": "near miss owned by data-model-guide",
     "should_trigger": false,
     "split": "train"
@@ -78,13 +78,13 @@
     "split": "train"
   },
   {
-    "query": "Tighten this Python module until pyright strict passes without Any, ignored errors, or casts that hide an invalid state.",
+    "query": "Tighten src/ingest/config.py until pyright strict passes without Any, ignored errors, or casts that hide an invalid state. It loads JSON into a dict and reads roughly fifteen fields off it, each typed Any.",
     "rationale": "near miss owned by python-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "rewrite this string concat with template literals and pull out the magic numbers as named consts",
+    "query": "rewrite this string concat with template literals and pull out the magic numbers as named consts:\n\nconst label = name + ' (' + (qty * 1.21).toFixed(2) + ')';\nif (retries > 3) { throw new Error('too many'); }",
     "rationale": "near miss owned by typescript-guide",
     "should_trigger": false,
     "split": "validation"

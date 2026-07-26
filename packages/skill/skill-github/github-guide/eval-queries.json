@@ -48,7 +48,7 @@
     "rationale": "closing keyword auto-closes only on merge into default branch"
   },
   {
-    "query": "reply in a review thread and mark it resolved so the PR can merge",
+    "query": "reply in the review thread on PR #482 and mark it resolved so the PR can merge",
     "should_trigger": true,
     "split": "validation",
     "rationale": "addPullRequestReviewThreadReply + resolveReviewThread + conversation-resolution gate"

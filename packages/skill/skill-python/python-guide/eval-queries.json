@@ -30,7 +30,7 @@
     "split": "train"
   },
   {
-    "query": "Tighten this Python module until pyright strict passes without Any, ignored errors, or casts that hide an invalid state.",
+    "query": "Tighten src/ingest/config.py until pyright strict passes without Any, ignored errors, or casts that hide an invalid state. It loads JSON into a dict and reads roughly fifteen fields off it, each typed Any.",
     "should_trigger": true,
     "rationale": "curated domain-specific routing scenario",
     "split": "validation"

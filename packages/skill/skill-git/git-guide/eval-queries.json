@@ -12,7 +12,7 @@
     "rationale": "direct"
   },
   {
-    "query": "ok we're done — save the changes",
+    "query": "ok we're done \u2014 save the changes",
     "should_trigger": true,
     "split": "train",
     "rationale": "colloquial save-the-work"
@@ -24,7 +24,7 @@
     "rationale": "wrap up"
   },
   {
-    "query": "looks good — push it up",
+    "query": "looks good \u2014 push it up",
     "should_trigger": true,
     "split": "train",
     "rationale": "casual push"
@@ -42,7 +42,7 @@
     "rationale": "colloquial ship; relies on commit-and-push"
   },
   {
-    "query": "i've got a merge conflict in package-lock.json — help me resolve it",
+    "query": "i've got a merge conflict in package-lock.json \u2014 help me resolve it",
     "should_trigger": true,
     "split": "train",
     "rationale": "merge-conflict diagnosis and resolution"
@@ -78,7 +78,7 @@
     "rationale": "wip commit"
   },
   {
-    "query": "save and push these changes — feat for the new endpoint",
+    "query": "save and push these changes \u2014 feat for the new endpoint",
     "should_trigger": true,
     "split": "validation",
     "rationale": "explicit with type"
@@ -150,7 +150,7 @@
     "split": "train"
   },
   {
-    "query": "reply in a review thread and mark it resolved so the PR can merge",
+    "query": "reply in the review thread on PR #482 and mark it resolved so the PR can merge",
     "rationale": "near miss owned by github-guide",
     "should_trigger": false,
     "split": "validation"

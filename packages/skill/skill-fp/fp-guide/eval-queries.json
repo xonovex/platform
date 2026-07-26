@@ -72,13 +72,13 @@
     "split": "train"
   },
   {
-    "query": "Tighten this Python module until pyright strict passes without Any, ignored errors, or casts that hide an invalid state.",
+    "query": "Tighten src/ingest/config.py until pyright strict passes without Any, ignored errors, or casts that hide an invalid state. It loads JSON into a dict and reads roughly fifteen fields off it, each typed Any.",
     "rationale": "near miss owned by python-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "rewrite this string concat with template literals and pull out the magic numbers as named consts",
+    "query": "rewrite this string concat with template literals and pull out the magic numbers as named consts:\n\nconst label = name + ' (' + (qty * 1.21).toFixed(2) + ')';\nif (retries > 3) { throw new Error('too many'); }",
     "rationale": "near miss owned by typescript-guide",
     "should_trigger": false,
     "split": "validation"
