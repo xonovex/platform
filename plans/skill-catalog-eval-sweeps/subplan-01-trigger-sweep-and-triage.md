@@ -84,9 +84,9 @@ skill-credential-management:ci-skill-eval-trigger` — and record per-skill wall
 - [x] Every failure bucketed with a cited fix or recorded disposition; the 8
       known queries all dispositioned
 - [~] Affected skills re-run green; `skill-validate` green catalog-wide —
-      `skill-validate` is green; after the harness re-baseline 10 of 70 trigger
-      failures and 3 of 80 routing scenarios remain open with recorded
-      dispositions
+  `skill-validate` is green; after the harness re-baseline 10 of 70 trigger
+  failures and 3 of 80 routing scenarios remain open with recorded
+  dispositions
 
 ## Files Modified/Created
 
@@ -110,25 +110,25 @@ output results for the same skills).
 
 Sweep results are attributable to these revisions, landed before any sweep ran:
 
-| SHA | Change |
-| --- | --- |
-| `0b023be6` | output-eval transient retries (3 attempts) and configurable `--max-turns` (default 12, max 24) |
-| `e4dd519a` | stabilization subplan 5/6 record corrections; this plan and its subplans |
-| `8013654b` | trigger output-limit stop scores as a non-trigger (bucket 4, found by the pilot) |
-| `dcf1bca5` | competing skill invocation scores as a non-trigger (bucket 4, found by the first full sweep) |
+| SHA        | Change                                                                                            |
+| ---------- | ------------------------------------------------------------------------------------------------- |
+| `0b023be6` | output-eval transient retries (3 attempts) and configurable `--max-turns` (default 12, max 24)    |
+| `e4dd519a` | stabilization subplan 5/6 record corrections; this plan and its subplans                          |
+| `8013654b` | trigger output-limit stop scores as a non-trigger (bucket 4, found by the pilot)                  |
+| `dcf1bca5` | competing skill invocation scores as a non-trigger (bucket 4, found by the first full sweep)      |
 | `9a39ae30` | `--catalog-root` defers cross-skill near misses to the routing evaluator; `ci-routing` runs in CI |
 
 ### Pilot calibration
 
 Five known-failure skills, run sequentially, validation split, 3 runs, batch 8:
 
-| Skill | Wall clock | Queries | Result |
-| --- | --- | --- | --- |
-| `skill-hono` | 130s | 6 | 5 pass / 1 fail |
-| `skill-zod` | 102s | 6 | 4 pass / 2 fail |
-| `skill-threejs` | 134s | 6 | 5 pass / 1 fail |
-| `skill-user-stories` | 144s | 7 | invalidated (bucket 4) → 149s, 3/7 after fix |
-| `skill-credential-management` | 145s | 7 | 6 pass / 1 fail |
+| Skill                         | Wall clock | Queries | Result                                       |
+| ----------------------------- | ---------- | ------- | -------------------------------------------- |
+| `skill-hono`                  | 130s       | 6       | 5 pass / 1 fail                              |
+| `skill-zod`                   | 102s       | 6       | 4 pass / 2 fail                              |
+| `skill-threejs`               | 134s       | 6       | 5 pass / 1 fail                              |
+| `skill-user-stories`          | 144s       | 7       | invalidated (bucket 4) → 149s, 3/7 after fix |
+| `skill-credential-management` | 145s       | 7       | 6 pass / 1 fail                              |
 
 - Mean ~132s per skill at 6–7 validation queries; 508 validation queries
   catalog-wide, 1524 model calls at 3 runs.
@@ -148,12 +148,12 @@ give one log per skill for the findings table.
 
 ### Sweeps
 
-| Run | Skills | Queries scored | Invalid | Retries | Failures | Wall |
-| --- | --- | --- | --- | --- | --- | --- |
-| First (aborted at 17/72) | 17 | — | 6 | 20 | — | — |
-| Second (post-`dcf1bca5`) | 72/72 | 508 | 0 | 0 | 70 | 2711s |
-| Final (post-triage) | 72/72 | 317 + 196 deferred | 0 | 0 | 12 | 2160s |
-| Routing (first ever run) | — | 77 scenarios | 0 | 0 | 9 | concurrent |
+| Run                      | Skills | Queries scored     | Invalid | Retries | Failures | Wall       |
+| ------------------------ | ------ | ------------------ | ------- | ------- | -------- | ---------- |
+| First (aborted at 17/72) | 17     | —                  | 6       | 20      | —        | —          |
+| Second (post-`dcf1bca5`) | 72/72  | 508                | 0       | 0       | 70       | 2711s      |
+| Final (post-triage)      | 72/72  | 317 + 196 deferred | 0       | 0       | 12       | 2160s      |
+| Routing (first ever run) | —      | 77 scenarios       | 0       | 0       | 9        | concurrent |
 
 ### Findings and triage
 
@@ -200,16 +200,16 @@ description reaches the router, and it named neither bindings nor FFI;
 
 ### The 8 known queries
 
-| Query | Disposition |
-| --- | --- |
-| `hono[LinearRouter]` | Passes (0.333 as a negative); resolved by the cull, no action |
-| `hono[Hono or Express + Vitest]` | Bucket 4 — deferred to routing, `vitest-guide` owns it |
-| `zod[Hono JSON request]` | Bucket 4 — deferred to routing, `hono-guide` owns it |
-| `threejs[translate gizmo]` | Bucket 4 — deferred to routing; `editor-viewport-guide` loses the scenario 0/3, open |
-| `user-stories[As a / I want]` | Bucket 1 — referent supplied, passes |
-| `user-stories[SMART]` | Bucket 1 — referent supplied, passes |
-| `user-stories[three amigos]` | Bucket 4 — deferred to routing, `bdd-guide` owns it |
-| `credential-management[Argon2]` | Bucket 2 — description scoped, scores 0/3, passes |
+| Query                            | Disposition                                                                          |
+| -------------------------------- | ------------------------------------------------------------------------------------ |
+| `hono[LinearRouter]`             | Passes (0.333 as a negative); resolved by the cull, no action                        |
+| `hono[Hono or Express + Vitest]` | Bucket 4 — deferred to routing, `vitest-guide` owns it                               |
+| `zod[Hono JSON request]`         | Bucket 4 — deferred to routing, `hono-guide` owns it                                 |
+| `threejs[translate gizmo]`       | Bucket 4 — deferred to routing; `editor-viewport-guide` loses the scenario 0/3, open |
+| `user-stories[As a / I want]`    | Bucket 1 — referent supplied, passes                                                 |
+| `user-stories[SMART]`            | Bucket 1 — referent supplied, passes                                                 |
+| `user-stories[three amigos]`     | Bucket 4 — deferred to routing, `bdd-guide` owns it                                  |
+| `credential-management[Argon2]`  | Bucket 2 — description scoped, scores 0/3, passes                                    |
 
 ### Open findings
 
@@ -260,11 +260,11 @@ landed here because the first was a defect introduced by this subplan.
 
 ### Further harness commits
 
-| SHA | Change |
-| --- | --- |
+| SHA        | Change                                                                                                                                                |
+| ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `0333a195` | an unresolvable skill name no longer counts as a competitor win; turn cap 1 -> 2; `selected_skills` per run; corrected the dependency-loading comment |
-| `45594ee1` | three routing-owner pairing adds (hexagonal-pattern, data-oriented-design, hono-opinionated) |
-| `6cff46fa` | the remediation report, with its unreproduced frequency claim corrected |
+| `45594ee1` | three routing-owner pairing adds (hexagonal-pattern, data-oriented-design, hono-opinionated)                                                          |
+| `6cff46fa` | the remediation report, with its unreproduced frequency claim corrected                                                                               |
 
 `dcf1bca5` settled a run the moment any non-target name appeared. A captured
 stream shows the model invoking the bare plugin name
@@ -274,12 +274,12 @@ scored the opposite with no error for a retry to catch.
 
 ### Results after the re-baseline
 
-| Gate | Before | After |
-| --- | --- | --- |
-| Trigger failures | 12 | 10 |
-| Routing failures | 9 of 77 | 3 of 80 |
-| Invalid runs | 0 | 0 |
-| Transient retries | 0 | 0 |
+| Gate              | Before  | After   |
+| ----------------- | ------- | ------- |
+| Trigger failures  | 12      | 10      |
+| Routing failures  | 9 of 77 | 3 of 80 |
+| Invalid runs      | 0       | 0       |
+| Transient retries | 0       | 0       |
 
 Six of the nine routing failures were the unresolvable-name defect and cleared
 without any catalog edit; `data-oriented-design-guide`'s broad-phase scenario

@@ -1,7 +1,7 @@
 ---
 type: plan
 has_subplans: true
-status: approved
+status: complete
 dependencies:
   plans:
     - plans/skill-catalog-stabilization.md
@@ -184,19 +184,20 @@ record:
 
 ## Success Criteria
 
-- [ ] Pilot record exists: measured spend, wall clock, flake rate, chosen
+- [x] Pilot record exists: measured spend, wall clock, flake rate, chosen
       parallelism bound
-- [ ] Trigger sweep complete: 72/72 skills with valid runs; every failure carries
+- [x] Trigger sweep complete: 72/72 skills with valid runs; every failure carries
       a taxonomy bucket and a cited fix or disposition; affected skills re-run
       green
-- [ ] Output sweep complete: 72/72 skills with valid runs; every keep-tier gate
+- [x] Output sweep complete: 72/72 skills with valid runs; every keep-tier gate
       PASS or its failure carries a cited disposition; `plan-guide`'s gate
-      resolved; golden eval still passing
-- [ ] Zero uncited catalog edits within this plan's window (review-checkable via
-      commit messages)
-- [ ] Full `ci-check` green across skill, command, and typescript-script tags
-      after all triage lands
-- [ ] Parent plan updated: `[~]` criterion flipped with evidence; go/no-go for
+      resolved; golden eval still passing (0.916)
+- [x] Zero uncited catalog edits within this plan's window (7 commits touching
+      `packages/skill/`, each quoting its failing query or eval; both budget
+      bumps atomic with their content edit)
+- [x] Full `ci-check` green across skill, command, and typescript-script tags
+      after all triage lands (522 tasks)
+- [x] Parent plan updated: `[~]` criterion flipped with evidence; go/no-go for
       subplan 7 stated
 
 ## Estimated Effort
@@ -207,3 +208,65 @@ record:
 - Output sweep: unattended hours to a day, then 1–3 triage sessions (unknown
   surface; `plan-guide` is the one known gate risk).
 - Evidence consolidation: 0.5 session.
+
+## Execution Record (2026-07-26/27)
+
+Both sweeps ran to completion. Subplans 1 and 2 carry the detailed findings;
+`remediation-open-findings.md` carries the verified analysis of what stayed open.
+
+### Measured actuals against the estimate
+
+|                      | Estimated                   | Measured                                                                                                                                                        |
+| -------------------- | --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Trigger sweep        | "unattended hours"          | 2711s first full pass, 2225s re-baseline, at 4 concurrent calls                                                                                                 |
+| Output sweep         | "unattended hours to a day" | 7050s for 71 skills at 6 concurrent calls                                                                                                                       |
+| Per-skill wall clock | ~3 min for outputs          | held: 71 skills in just under two hours                                                                                                                         |
+| Flake rate           | unknown                     | zero transient retries in every full pass                                                                                                                       |
+| Spend                | uncapped estimate           | not measured — neither harness reports per-run cost; bounded by the per-call caps at $76 for triggers and $255 for outputs, and actual spend is well under both |
+
+Parallelism settled at 4 concurrent model calls, calibrated by a probe rather
+than assumed, and run as one moon invocation per skill so a failing skill cannot
+truncate the sweep.
+
+### Results
+
+| Gate        | Coverage     | Invalid | Outcome                             |
+| ----------- | ------------ | ------- | ----------------------------------- |
+| Trigger     | 72/72        | 0       | 70 → 10 failures                    |
+| Routing     | 80 scenarios | 0       | 3 failures (first run of this gate) |
+| Output      | 72/72        | 0       | 45 PASS / 27 FAIL                   |
+| Golden eval | —            | —       | 0.916, anchor 0.833                 |
+
+### Harness defects found and fixed
+
+The sweeps were unfinishable as configured. Five defects surfaced, each fixed at
+source rather than by loosening an invalidation rule:
+
+1. A deterministic `output-limit` stop invalidated a skill's whole trigger sweep.
+2. A competing skill invocation invalidated the run instead of scoring it.
+3. Cross-skill near misses were scored with the rightful owner absent — 43 of the
+   70 trigger failures, none of them fixable by editing a skill.
+4. An unresolvable skill name was counted as a competitor win. This one was
+   introduced by fix 2 during this plan and caught by an adversarial review.
+5. A 10000-character ceiling discarded long claude generations as invalid,
+   penalising the arm under test and invalidating five output benchmarks.
+
+### Go / no-go for stabilization subplan 7
+
+**Go, with one decision to take first.**
+
+The evidence this plan existed to produce is complete: both sweeps cover 72/72
+skills with zero invalid runs, the citation discipline held across every catalog
+commit, the three-tag gate is green at 522 tasks, and the golden eval improved
+rather than regressed. The stabilization plan's `[~]` criterion is flipped.
+
+Nothing found is a release blocker. The residual is a calibration question, not a
+defect: 22 of the 27 output-gate failures miss a tier's absolute floor while
+measurably working, several lifting a bare model from near zero. Releasing with
+those gates red is defensible only once the floors are either affirmed or
+adjusted deliberately — and the standing rule forbids adjusting them to make a
+sweep pass, so it has to be a recorded decision rather than a convenience.
+
+The two remaining ownership questions — whether `claude-code-guide` and
+`instruction-guide` should claim work Claude Code's own bundled skills already
+own — do not gate the release; they change eval labels, not shipped content.

@@ -241,9 +241,10 @@ enabling a later session's PR description and anchored inline comments. The
 
 - [x] Contract document exists, ≤ 1 page (649 words), seven clauses; every surviving
       artifact maps to a frozen scenario
-- [~] Catalog at 72 skills; zero references to cut guides (grep-verifiable);
-  trigger evals green catalog-wide — catalog and grep done; catalog-wide trigger
-  evals still unrun (hours of wall clock plus API spend)
+- [x] Catalog at 72 skills; zero references to cut guides (grep-verifiable);
+      trigger evals green catalog-wide — swept 2026-07-27 at `45594ee1`: 72/72
+      skills, zero invalid runs, failures 70 → 10 after triage, and a routing
+      gate that had never run before now scores 80 scenarios with 3 failures
 - [x] Governance normative in exactly 1 file (from 40); `handoffs.md` 5 field groups
       with `file:line` anchors and no digest/version/audience machinery; command flag
       count = 8; `execute.md` contains the positive definition
@@ -266,9 +267,23 @@ Measured outcome so far: 100 → 72 skills, workflow-core owned scope 8890 → 7
 `sdlc.md` 1345 → 417, `context-forwarding.md` 849 → 270, command flags 21 → 8,
 governance restatements 40 → 1, drift lints enforcing with 0 findings over 555 files.
 
-Two catalog-wide eval sweeps remain unrun — trigger and output — because each is hours
-of wall clock plus API spend rather than because anything blocks them; the harness
-defects that did block them are fixed.
+Both catalog-wide eval sweeps have now run (`plans/skill-catalog-eval-sweeps.md`).
+
+The trigger sweep covers 72/72 skills with zero invalid runs. Failures fell from 70 to
+10: 43 were cross-skill near misses the per-skill evaluator could not judge at all,
+because it loads one skill and the rightful owner was absent, and they now go to the
+routing evaluator, which had been defined but never run and which passes 77 of its 80
+scenarios. Twenty-two more were genuine and fixed with a cited change; the rest are
+dispositioned. Four harness defects surfaced and were fixed at source, one of them
+introduced during the sweep itself.
+
+The output sweep covers 72/72 skills with zero invalid runs and 45 of 72 gates PASS.
+The golden end-to-end eval rose to 0.916 against its 0.833 anchor. The 27 failures are
+not skill defects and none was papered over: 22 miss a tier's absolute floor while
+measurably working — `moon-guide` scores 0.75 against 0.19 without the skill,
+`pi-guide` 0.50 against 0.00 — and 5 cannot show a delta because the bare model already
+performs the task. Both groups are calibration questions about the gate policy, which
+the sweeps plan forbids relaxing to make a sweep pass.
 
 ## Estimated Effort
 

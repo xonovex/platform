@@ -79,8 +79,8 @@ cited disposition — with the golden end-to-end eval still passing.
 - [x] `plan-guide` gate resolved: eight prompts carried a cited bucket-1 fix and
       the re-run gate is recorded (0.205 -> 0.477, still FAIL, residual stated)
 - [~] Every keep-tier gate PASS or its failure carries a cited disposition —
-      45 PASS, 27 FAIL, all dispositioned; 22 of the 27 need a gate-policy
-      decision rather than a catalog edit
+  45 PASS, 27 FAIL, all dispositioned; 22 of the 27 need a gate-policy
+  decision rather than a catalog edit
 - [x] Golden eval still passes after all triage edits (0.916, anchor 0.833)
 - [x] All `--max-turns` exceptions recorded per skill with rationale
 
@@ -103,10 +103,10 @@ Unattended sweep hours to a day + 1–3 triage sessions.
 
 ### Commits
 
-| SHA | Change |
-| --- | --- |
+| SHA        | Change                                                                                                            |
+| ---------- | ----------------------------------------------------------------------------------------------------------------- |
 | `a3a42779` | supplied the artifacts eight `plan-guide` output-eval prompts referenced; retargeted eval 1 at a path that exists |
-| `6d2e0782` | the 10000-character generation ceiling applies to codex only, matching the caps the harness reports |
+| `6d2e0782` | the 10000-character generation ceiling applies to codex only, matching the caps the harness reports               |
 
 ### Sweep
 
@@ -115,13 +115,13 @@ Full catalog, `ci-skill-eval-output` one moon invocation per skill under `xargs 
 the bound calibrated in subplan 1). 71 skills in 7050s; `plan-guide` ran
 separately because its evals were being edited.
 
-| | |
-| --- | --- |
-| Benchmarks | 72/72 |
-| Invalid runs | 0 (6 before the harness fix) |
-| Gate PASS | 45 |
-| Gate FAIL | 27 |
-| Golden eval (`pull-request-guide` eval 5) | 0.916, anchor 0.833 |
+|                                           |                              |
+| ----------------------------------------- | ---------------------------- |
+| Benchmarks                                | 72/72                        |
+| Invalid runs                              | 0 (6 before the harness fix) |
+| Gate PASS                                 | 45                           |
+| Gate FAIL                                 | 27                           |
+| Golden eval (`pull-request-guide` eval 5) | 0.916, anchor 0.833          |
 
 319 evals at 2 runs per arm is 1276 generations plus 1276 judge calls. The
 harness reports no per-run cost, so spend is bounded by the $0.10 per-call cap
