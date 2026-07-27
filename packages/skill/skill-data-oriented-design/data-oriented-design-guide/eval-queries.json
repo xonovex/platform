@@ -1,12 +1,12 @@
 [
   {
-    "query": "our particle simulator stalls when we have 50k particles — the update loop reads position and velocity out of a fat 96-byte struct, can you restructure it for cache efficiency",
+    "query": "our particle simulator stalls when we have 50k particles \u2014 the update loop reads position and velocity out of a fat 96-byte struct, can you restructure it for cache efficiency",
     "should_trigger": true,
     "split": "train",
     "rationale": "direct: AoS->SoA / hot-field layout for cache efficiency"
   },
   {
-    "query": "the enemy update loop spends all its time chasing next pointers through a linked list of agents — make iteration fast",
+    "query": "the enemy update loop spends all its time chasing next pointers through a linked list of agents \u2014 make iteration fast",
     "should_trigger": true,
     "split": "train",
     "rationale": "implicit: pointer-chasing -> sequential array access, no DOD named"
@@ -24,7 +24,7 @@
     "rationale": "existence-based processing / ECS bucketing, branches to loops"
   },
   {
-    "query": "we malloc every projectile individually and the heap is fragmented and slow — switch to a frame arena",
+    "query": "we malloc every projectile individually and the heap is fragmented and slow \u2014 switch to a frame arena",
     "should_trigger": true,
     "split": "train",
     "rationale": "arena/pool allocation over per-object malloc"
@@ -36,7 +36,7 @@
     "rationale": "hot/cold splitting, buried in larger task"
   },
   {
-    "query": "I added a mutex around the shared counter but threads still contend badly — fix the false sharing between cores",
+    "query": "I added a mutex around the shared counter but threads still contend badly \u2014 fix the false sharing between cores",
     "should_trigger": false,
     "split": "train",
     "rationale": "near-miss: concurrency/false-sharing for threads -> lock-free-guide"
@@ -66,7 +66,7 @@
     "rationale": "validation positive: SIMD-friendly SoA layout + alignment"
   },
   {
-    "query": "profile why the broad-phase is slow — I suspect we're missing cache constantly but want to confirm before changing the layout",
+    "query": "profile why the broad-phase is slow \u2014 I suspect we're missing cache constantly but want to confirm before changing the layout",
     "should_trigger": true,
     "split": "validation",
     "rationale": "validation positive: measure cache misses before layout change"
@@ -96,21 +96,27 @@
     "rationale": "statistics-recording: per-frame accumulator, cached pointer (one store), ring history, graph readout"
   },
   {
-    "query": "my profiling counters do a string hash and hashtable lookup on every record call and it's showing up in the profile — how do I make recording basically free?",
+    "query": "my profiling counters do a string hash and hashtable lookup on every record call and it's showing up in the profile \u2014 how do I make recording basically free?",
     "should_trigger": true,
     "split": "validation",
     "rationale": "validation positive: statistics-recording returned-accumulator-pointer pattern, lazy history"
   },
   {
-    "query": "make our particle system stop calling malloc per particle — hand it a buffer it just fills",
+    "query": "make our particle system stop calling malloc per particle \u2014 hand it a buffer it just fills",
     "rationale": "near miss owned by memory-management-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "I need to add a SIMD variant of my vec3_dot in lib/math/vec3.c — the rest of the project uses _sse4 and _avx2 suffixes",
+    "query": "I need to add a SIMD variant of my vec3_dot in lib/math/vec3.c \u2014 the rest of the project uses _sse4 and _avx2 suffixes",
     "rationale": "near miss owned by c99-opinionated-guide",
     "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Lay out the mesh and transform component arrays as SoA so the update loop stays cache-friendly.",
+    "rationale": "SoA component layout for cache-friendly iteration",
+    "should_trigger": true,
     "split": "validation"
   }
 ]

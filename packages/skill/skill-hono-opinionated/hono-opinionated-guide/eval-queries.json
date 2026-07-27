@@ -94,5 +94,11 @@
     "rationale": "near miss owned by vitest-guide",
     "should_trigger": false,
     "split": "validation"
+  },
+  {
+    "query": "add bodyLimit middleware to all routes in our Hono app",
+    "rationale": "request payload cap; bodyLimit is an opinionated-overlay decision",
+    "should_trigger": true,
+    "split": "validation"
   }
 ]
