@@ -3,6 +3,7 @@ export type {CliSpec, ParsedArgs} from "./cli-args.js";
 export {logError, logInfo, logSuccess, logWarning} from "./logging.js";
 export {readPkg, writePkg} from "./package-json.js";
 export type {PackageJson} from "./package-json.js";
+export {isRecord} from "./records.js";
 export {readPlatformMeta} from "./platform-meta.js";
 export type {PlatformMeta} from "./platform-meta.js";
 export {findWorkspaceRoot} from "./workspace.js";

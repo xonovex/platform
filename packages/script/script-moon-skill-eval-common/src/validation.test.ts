@@ -1,5 +1,7 @@
 import {describe, expect, it} from "vitest";
 import {
+  buildIsolatedClaudeArgs,
+  buildIsolatedCodexArgs,
   buildTriggerClaudeArgs,
   parseQueries,
   parseQuerySplit,
@@ -104,6 +106,54 @@ describe("trigger numeric options", () => {
   it("counts every query repetition as one model run", () => {
     expect(triggerModelRunCount(8, 3)).toBe(24);
     expect(triggerModelRunCount(9, 3)).toBe(27);
+  });
+});
+
+// Every Claude and Codex eval invocation across the trigger, routing, and output
+// harnesses is built from these two argument sets. A flag dropped here silently
+// lets a run read the machine's real settings, so the whole set is pinned.
+describe("shared harness isolation", () => {
+  it("denies a Claude run the machine's settings, MCP servers, and session", () => {
+    const args = buildIsolatedClaudeArgs("stream-json");
+
+    expect(args).toEqual([
+      "-p",
+      "--output-format",
+      "stream-json",
+      "--setting-sources",
+      "",
+      "--strict-mcp-config",
+      "--mcp-config",
+      '{"mcpServers":{}}',
+      "--no-session-persistence",
+      "--no-chrome",
+    ]);
+  });
+
+  it("carries the requested output format", () => {
+    const args = buildIsolatedClaudeArgs("json");
+
+    expect(args.slice(0, 3)).toEqual(["-p", "--output-format", "json"]);
+  });
+
+  it("denies a Codex run user config, rules, and write access", () => {
+    expect(buildIsolatedCodexArgs({model: ""})).toEqual([
+      "exec",
+      "--json",
+      "--ephemeral",
+      "--sandbox",
+      "read-only",
+      "--ignore-user-config",
+      "--ignore-rules",
+      "--skip-git-repo-check",
+    ]);
+  });
+
+  it("appends only a non-empty Codex model", () => {
+    expect(buildIsolatedCodexArgs({model: "gpt-5"}).slice(-2)).toEqual([
+      "--model",
+      "gpt-5",
+    ]);
   });
 });
 

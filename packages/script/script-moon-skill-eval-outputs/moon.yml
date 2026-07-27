@@ -3,6 +3,7 @@ language: typescript
 tags: [typescript-script]
 dependsOn:
   - script-moon-common
+  - script-moon-skill-eval-common
 tasks:
   ts-coverage:
     script: >-
@@ -13,9 +14,11 @@ tasks:
       --coverage.thresholds.statements 85
     deps:
       - script-moon-common:build
+      - script-moon-skill-eval-common:build
   ts-build:
     deps:
       - script-moon-common:build
+      - script-moon-skill-eval-common:build
   install:
     command:
       - npm

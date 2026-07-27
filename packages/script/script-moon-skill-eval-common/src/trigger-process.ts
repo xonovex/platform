@@ -3,6 +3,7 @@ import {appendFileSync, cpSync, mkdirSync, mkdtempSync, rmSync} from "node:fs";
 import {tmpdir} from "node:os";
 import {join} from "node:path";
 import {createInterface} from "node:readline";
+import {isRecord} from "@xonovex/script-moon-common/records";
 import {streamTextDeltaLength} from "./validation.js";
 
 const TRIGGER_TIMEOUT_MS = 60_000;
@@ -39,9 +40,6 @@ export interface CodexCandidateGuide {
 }
 
 const CODEX_TRIGGER_SIGNAL = "XONOVEX_SKILL_TRIGGERED";
-
-const isRecord = (value: unknown): value is Record<string, unknown> =>
-  typeof value === "object" && value !== null && !Array.isArray(value);
 
 const matchSkill = (
   skillField: unknown,

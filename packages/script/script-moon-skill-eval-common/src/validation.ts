@@ -1,3 +1,4 @@
+import {isRecord} from "@xonovex/script-moon-common/records";
 import {z} from "zod";
 
 const QuerySchema = z.object({
@@ -42,7 +43,7 @@ interface TriggerClaudeOptions {
   readonly pluginDirectories: readonly string[];
 }
 
-interface TriggerCodexOptions {
+interface IsolatedCodexOptions {
   readonly model: string;
 }
 
@@ -112,22 +113,51 @@ export const parseTriggerOptions = (
 // there, so the extra turn costs nothing on the runs that get it right.
 export const TRIGGER_MAX_TURNS = 2;
 
+// buildIsolatedClaudeArgs carries the flags that keep an eval run hermetic: no
+// settings from the developer's machine, no MCP servers, no persisted session, no
+// browser. A run that inherits any of them scores the local environment instead of
+// the skill, so every Claude eval invocation starts from this set.
+export const buildIsolatedClaudeArgs = (
+  outputFormat: "json" | "stream-json",
+): readonly string[] => [
+  "-p",
+  "--output-format",
+  outputFormat,
+  "--setting-sources",
+  "",
+  "--strict-mcp-config",
+  "--mcp-config",
+  '{"mcpServers":{}}',
+  "--no-session-persistence",
+  "--no-chrome",
+];
+
+// buildIsolatedCodexArgs is the Codex counterpart of buildIsolatedClaudeArgs:
+// an ephemeral read-only exec that reads neither user config nor rules.
+export const buildIsolatedCodexArgs = (
+  options: IsolatedCodexOptions,
+): readonly string[] => {
+  const args = [
+    "exec",
+    "--json",
+    "--ephemeral",
+    "--sandbox",
+    "read-only",
+    "--ignore-user-config",
+    "--ignore-rules",
+    "--skip-git-repo-check",
+  ];
+  if (options.model.length > 0) args.push("--model", options.model);
+  return args;
+};
+
 export const buildTriggerClaudeArgs = (
   options: TriggerClaudeOptions,
 ): readonly string[] => {
   const args = [
-    "-p",
-    "--output-format",
-    "stream-json",
+    ...buildIsolatedClaudeArgs("stream-json"),
     "--verbose",
     "--include-partial-messages",
-    "--setting-sources",
-    "",
-    "--strict-mcp-config",
-    "--mcp-config",
-    '{"mcpServers":{}}',
-    "--no-session-persistence",
-    "--no-chrome",
     "--model",
     options.model,
     "--max-budget-usd",
@@ -146,26 +176,6 @@ export const buildTriggerClaudeArgs = (
   }
   return args;
 };
-
-export const buildTriggerCodexArgs = (
-  options: TriggerCodexOptions,
-): readonly string[] => {
-  const args = [
-    "exec",
-    "--json",
-    "--ephemeral",
-    "--sandbox",
-    "read-only",
-    "--ignore-user-config",
-    "--ignore-rules",
-    "--skip-git-repo-check",
-  ];
-  if (options.model.length > 0) args.push("--model", options.model);
-  return args;
-};
-
-const isRecord = (value: unknown): value is Record<string, unknown> =>
-  typeof value === "object" && value !== null && !Array.isArray(value);
 
 export const streamTextDeltaLength = (input: unknown): number => {
   if (!isRecord(input) || input.type !== "stream_event") return 0;

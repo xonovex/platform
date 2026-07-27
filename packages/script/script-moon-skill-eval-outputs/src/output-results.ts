@@ -1,3 +1,4 @@
+import {isRecord} from "@xonovex/script-moon-common/records";
 import {type EvaluationArm} from "./validation.js";
 
 const TOKEN_KEYS = [
@@ -47,9 +48,6 @@ export interface ArmBlock {
   readonly duration_ms: MeanBlock;
   skill_trigger_rate?: {readonly mean: number};
 }
-
-export const isRecord = (value: unknown): value is Record<string, unknown> =>
-  typeof value === "object" && value !== null && !Array.isArray(value);
 
 export const round = (value: number, digits = 0): number => {
   const factor = 10 ** digits;

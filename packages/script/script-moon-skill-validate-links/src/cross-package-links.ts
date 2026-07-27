@@ -1,5 +1,6 @@
 import {readdirSync, readFileSync, statSync} from "node:fs";
 import {basename, dirname, join, relative, resolve, sep} from "node:path";
+import {isRecord} from "@xonovex/script-moon-common/records";
 import {
   MD_LINK_RE,
   relativeLinkTarget,
@@ -32,9 +33,6 @@ const isFile = (path: string): boolean => {
     return false;
   }
 };
-
-const isRecord = (value: unknown): value is Record<string, unknown> =>
-  typeof value === "object" && value !== null && !Array.isArray(value);
 
 const isStringArray = (value: unknown): value is readonly string[] =>
   Array.isArray(value) && value.every((entry) => typeof entry === "string");

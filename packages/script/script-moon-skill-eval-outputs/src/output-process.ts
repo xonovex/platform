@@ -10,10 +10,14 @@ import {
 import {tmpdir} from "node:os";
 import {join} from "node:path";
 import {resolveExecutable} from "@xonovex/script-moon-common/executable";
+import {isRecord} from "@xonovex/script-moon-common/records";
+import {
+  buildIsolatedCodexArgs,
+  streamTextDeltaLength,
+} from "@xonovex/script-moon-skill-eval-common/validation";
 import {
   claudeFailureDetail,
   extractJson,
-  isRecord,
   summarize,
   sumTokens,
   type AssertionResult,
@@ -21,12 +25,10 @@ import {
   type JobRecord,
 } from "./output-results.js";
 import {
-  buildCodexArgs,
   buildCodexGenerationPrompt,
   buildGenerationPrompt,
   buildJudgeClaudeArgs,
   parseJudgeResults,
-  streamTextDeltaLength,
   type EvaluationArm,
   type NormalizedEval,
 } from "./validation.js";
@@ -406,7 +408,7 @@ const grade = async (
           budget,
           assertionCount: assertions.length,
         })
-      : buildCodexArgs({model});
+      : buildIsolatedCodexArgs({model});
   const proc = await runHarness(harness, args, rubric, undefined, 300_000);
   if (proc.error) return allFail(`judge process error: ${proc.error}`);
   if (proc.timedOut) return allFail("judge timeout");

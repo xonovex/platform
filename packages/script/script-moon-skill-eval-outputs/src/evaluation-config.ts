@@ -10,8 +10,8 @@ import {
   resolveGuideDirectory,
 } from "@xonovex/script-moon-common/fs";
 import {skillEvalModelDefaults} from "@xonovex/script-moon-common/skill-eval-models";
+import {buildIsolatedCodexArgs} from "@xonovex/script-moon-skill-eval-common/validation";
 import {
-  buildCodexArgs,
   buildGenerationClaudeArgs,
   evalEntries,
   MAX_OUTPUT_MODEL_CALLS,
@@ -462,7 +462,7 @@ export const resolveEvaluationConfig = (
                   }
                 : {}),
             })
-          : buildCodexArgs({model}),
+          : buildIsolatedCodexArgs({model}),
       withoutArgs:
         harness === "claude"
           ? buildGenerationClaudeArgs({
@@ -472,7 +472,7 @@ export const resolveEvaluationConfig = (
               maxTurns,
               disallowedTools,
             })
-          : buildCodexArgs({model}),
+          : buildIsolatedCodexArgs({model}),
     },
   };
 };

@@ -16,7 +16,7 @@ import {
 } from "@xonovex/script-moon-skill-eval-common/trigger-process";
 import {
   buildTriggerClaudeArgs,
-  buildTriggerCodexArgs,
+  buildIsolatedCodexArgs,
   MAX_TRIGGER_MODEL_RUNS,
   parseQuerySplit,
   parseTriggerOptions,
@@ -104,7 +104,7 @@ const evaluateScenario = async (
             ),
           ),
         })
-      : buildTriggerCodexArgs({model: context.model});
+      : buildIsolatedCodexArgs({model: context.model});
   let ownerSelections = 0;
   for (let runIndex = 0; runIndex < context.runs; runIndex += 1) {
     const outcome: TriggerOutcome =

@@ -1,8 +1,6 @@
 import {isAbsolute} from "node:path";
+import {buildIsolatedClaudeArgs} from "@xonovex/script-moon-skill-eval-common/validation";
 import {z} from "zod";
-
-const isRecord = (value: unknown): value is Record<string, unknown> =>
-  typeof value === "object" && value !== null && !Array.isArray(value);
 
 const SafePathSegmentSchema = z
   .string()
@@ -149,10 +147,6 @@ interface JudgeClaudeOptions {
   readonly assertionCount: number;
 }
 
-interface CodexOptions {
-  readonly model: string;
-}
-
 interface EvaluationHealthRecord {
   readonly id: string | number;
   readonly arm: EvaluationArm;
@@ -210,20 +204,6 @@ export const buildCodexGenerationPrompt = (
   skillName: string,
 ): string => (arm === "with_skill" ? `$${skillName}\n\n${prompt}` : prompt);
 
-const isolatedClaudeArgs = (outputFormat: "json" | "stream-json") =>
-  [
-    "-p",
-    "--output-format",
-    outputFormat,
-    "--setting-sources",
-    "",
-    "--strict-mcp-config",
-    "--mcp-config",
-    '{"mcpServers":{}}',
-    "--no-session-persistence",
-    "--no-chrome",
-  ] as const;
-
 const GENERATION_SYSTEM_PROMPT =
   "Answer the user request directly. Use the explicitly invoked skill as " +
   "authoritative guidance. Read only files that the skill itself identifies " +
@@ -237,7 +217,7 @@ export const buildGenerationClaudeArgs = (
   options: GenerationClaudeOptions,
 ): readonly string[] => {
   const args: string[] = [
-    ...isolatedClaudeArgs("stream-json"),
+    ...buildIsolatedClaudeArgs("stream-json"),
     "--verbose",
     "--include-partial-messages",
     "--model",
@@ -290,7 +270,7 @@ export const buildJudgeClaudeArgs = (
     additionalProperties: false,
   });
   const args: string[] = [
-    ...isolatedClaudeArgs("json"),
+    ...buildIsolatedClaudeArgs("json"),
     "--tools",
     "",
     "--max-budget-usd",
@@ -303,21 +283,6 @@ export const buildJudgeClaudeArgs = (
     schema,
   ];
   if (options.model) args.push("--model", options.model);
-  return args;
-};
-
-export const buildCodexArgs = (options: CodexOptions): readonly string[] => {
-  const args = [
-    "exec",
-    "--json",
-    "--ephemeral",
-    "--sandbox",
-    "read-only",
-    "--ignore-user-config",
-    "--ignore-rules",
-    "--skip-git-repo-check",
-  ];
-  if (options.model.length > 0) args.push("--model", options.model);
   return args;
 };
 
@@ -339,15 +304,6 @@ export const findEvaluationInfrastructureFailures = (
     }
     return [];
   });
-
-export const streamTextDeltaLength = (input: unknown): number => {
-  if (!isRecord(input) || input.type !== "stream_event") return 0;
-  const event = input.event;
-  if (!isRecord(event) || event.type !== "content_block_delta") return 0;
-  const delta = event.delta;
-  if (!isRecord(delta) || delta.type !== "text_delta") return 0;
-  return typeof delta.text === "string" ? delta.text.length : 0;
-};
 
 // A harness error is usually transient (a dropped stream, an output-limit trip, an
 // exhausted turn cap), so retry the job before discarding the whole batch's

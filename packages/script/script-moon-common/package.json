@@ -29,6 +29,10 @@
       "types": "./src/package-json.ts",
       "default": "./dist/src/package-json.js"
     },
+    "./records": {
+      "types": "./src/records.ts",
+      "default": "./dist/src/records.js"
+    },
     "./drift-budgets": {
       "types": "./src/drift-budgets.ts",
       "default": "./dist/src/drift-budgets.js"

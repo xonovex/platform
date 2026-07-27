@@ -1,6 +1,7 @@
 import {readdirSync, readFileSync} from "node:fs";
 import {join} from "node:path";
 import {isDirectory, isFile} from "@xonovex/script-moon-common/fs";
+import {isRecord} from "@xonovex/script-moon-common/records";
 
 const OUTPUT_TIERS = new Set(["aggressive", "moderate", "conservative"]);
 const QUERY_SPLITS = new Set(["train", "validation"]);
@@ -39,9 +40,6 @@ export interface CatalogFileReport {
   readonly passes: readonly string[];
   readonly errors: readonly string[];
 }
-
-const isRecord = (value: unknown): value is Record<string, unknown> =>
-  typeof value === "object" && value !== null && !Array.isArray(value);
 
 const readJson = (path: string, errors: string[]): unknown => {
   try {

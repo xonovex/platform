@@ -14,7 +14,7 @@ import {skillEvalModelDefaults} from "@xonovex/script-moon-common/skill-eval-mod
 import {catalogQueryOwners} from "@xonovex/script-moon-skill-eval-common/routing-catalog";
 import {
   buildTriggerClaudeArgs,
-  buildTriggerCodexArgs,
+  buildIsolatedCodexArgs,
   MAX_TRIGGER_MODEL_RUNS,
   parseQueries,
   parseQuerySplit,
@@ -291,7 +291,7 @@ export const resolveTriggerConfig = (
               pluginDirectories:
                 resolveClaudePluginDirectories(pluginDirectory),
             })
-          : buildTriggerCodexArgs({model}),
+          : buildIsolatedCodexArgs({model}),
       harnessExecutable,
       maxBatchModelRuns,
       model,

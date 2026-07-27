@@ -13,9 +13,27 @@ import {
   parseOutputOptions,
   runFailFastPool,
   runWithTransientRetry,
-  streamTextDeltaLength,
   validateUniqueEvaluationIds,
 } from "./validation.js";
+
+// Both generation arms and the judge run through buildIsolatedClaudeArgs. These
+// assertions fail if a builder stops routing through it, which is the only way the
+// harness could inherit the running machine's settings or MCP servers.
+const expectIsolated = (args: readonly string[]): void => {
+  const settingIndex = args.indexOf("--setting-sources");
+  expect(args.slice(settingIndex, settingIndex + 2)).toEqual([
+    "--setting-sources",
+    "",
+  ]);
+  const mcpIndex = args.indexOf("--mcp-config");
+  expect(args.slice(mcpIndex, mcpIndex + 2)).toEqual([
+    "--mcp-config",
+    '{"mcpServers":{}}',
+  ]);
+  expect(args).toContain("--strict-mcp-config");
+  expect(args).toContain("--no-session-persistence");
+  expect(args).toContain("--no-chrome");
+};
 
 describe("generation prompt isolation", () => {
   it("requires the target skill only in the with-skill arm", () => {
@@ -47,7 +65,7 @@ describe("Claude process isolation", () => {
     expect(args[args.indexOf("--max-turns") + 1]).toBe("12");
     expect(args).toContain("--include-partial-messages");
     expect(args.some((arg) => arg.includes("under 1,000 words"))).toBe(true);
-    expect(args).toContain("");
+    expectIsolated(args);
     expect(args).not.toContain("Bash");
     expect(args.filter((arg) => arg === "--plugin-dir")).toHaveLength(2);
   });
@@ -91,29 +109,8 @@ describe("Claude process isolation", () => {
     expect(judge).toContain("0.1");
     expect(judge).toContain("1");
     expect(judge).toContain("--json-schema");
-  });
-});
-
-describe("stream output accounting", () => {
-  it("counts only assistant text deltas", () => {
-    expect(
-      streamTextDeltaLength({
-        type: "stream_event",
-        event: {
-          type: "content_block_delta",
-          delta: {type: "text_delta", text: "answer"},
-        },
-      }),
-    ).toBe(6);
-    expect(
-      streamTextDeltaLength({
-        type: "stream_event",
-        event: {
-          type: "content_block_delta",
-          delta: {type: "input_json_delta", partial_json: "tool input"},
-        },
-      }),
-    ).toBe(0);
+    expectIsolated(baseline);
+    expectIsolated(judge);
   });
 });
 
