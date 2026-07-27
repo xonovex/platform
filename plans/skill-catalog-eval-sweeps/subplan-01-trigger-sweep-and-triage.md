@@ -84,8 +84,9 @@ skill-credential-management:ci-skill-eval-trigger` — and record per-skill wall
 - [x] Every failure bucketed with a cited fix or recorded disposition; the 8
       known queries all dispositioned
 - [~] Affected skills re-run green; `skill-validate` green catalog-wide —
-      `skill-validate` is green; 12 of 70 trigger failures remain open with
-      recorded dispositions, and the newly enabled routing gate has 9
+      `skill-validate` is green; after the harness re-baseline 10 of 70 trigger
+      failures and 3 of 80 routing scenarios remain open with recorded
+      dispositions
 
 ## Files Modified/Created
 
@@ -250,3 +251,68 @@ triaged.
 - `npx moon run script-moon-skill-eval-outputs:ci-check` — green
 - `npx moon run script-moon-skill-validate:ci-check` — green
 - Final sweep: 72/72 skills, zero `invalid-run.json`, zero transient retries
+
+## Re-baseline (2026-07-27)
+
+The open findings were investigated and adversarially verified; the report is
+`remediation-open-findings.md` in this directory. Two of its recommendations
+landed here because the first was a defect introduced by this subplan.
+
+### Further harness commits
+
+| SHA | Change |
+| --- | --- |
+| `0333a195` | an unresolvable skill name no longer counts as a competitor win; turn cap 1 -> 2; `selected_skills` per run; corrected the dependency-loading comment |
+| `45594ee1` | three routing-owner pairing adds (hexagonal-pattern, data-oriented-design, hono-opinionated) |
+| `6cff46fa` | the remediation report, with its unreproduced frequency claim corrected |
+
+`dcf1bca5` settled a run the moment any non-target name appeared. A captured
+stream shows the model invoking the bare plugin name
+`xonovex-skill-memory-management`, the harness answering `Unknown skill`, and
+nothing launching — the model had chosen the target and mistyped it, and the run
+scored the opposite with no error for a retry to catch.
+
+### Results after the re-baseline
+
+| Gate | Before | After |
+| --- | --- | --- |
+| Trigger failures | 12 | 10 |
+| Routing failures | 9 of 77 | 3 of 80 |
+| Invalid runs | 0 | 0 |
+| Transient retries | 0 | 0 |
+
+Six of the nine routing failures were the unresolvable-name defect and cleared
+without any catalog edit; `data-oriented-design-guide`'s broad-phase scenario
+moved 0.333 -> 1.0. The trigger count moved only 12 -> 10 because its
+composition changed: several cleared while `hono-opinionated` and `testing`
+crossed the threshold in the other direction.
+
+Run outcomes across 951 trigger runs: `target` 773, `none` 153, `competitor` 20,
+`output-limit` 5.
+
+### What `selected_skills` immediately showed
+
+Two failures are a **declared dependency beating its own overlay**, which no
+rate could have revealed and which cost probe archaeology to find before:
+
+- `c99-opinionated-guide`'s header-rebuild query lost 2 of 3 runs to
+  `c99-guide`.
+- `hono-opinionated-guide`'s router query lost 2 of 3 runs to `hono-guide`.
+
+Dropping dependency plugins is not the answer — measured separately, the
+overlay alone scores 0/4 on its own physical-design query, because the base
+establishes the language context that makes the overlay reachable. This is a
+policy question about what a per-skill gate should measure, recorded as U7 in
+the remediation report.
+
+`instruction-guide` lost 3 of 3 to the bundled `init` skill, which settles that
+finding as a genuine boundary decision rather than a description gap.
+
+### Still open
+
+10 trigger failures and 3 routing scenarios, all dispositioned in the
+remediation report: the catalog-versus-bundled boundary (D1, D2), the
+`debugging` versus `memory-management` leak-detection dispute (D3), the
+degenerate `lua-opinionated` query (D5), the two dependency-competition cases
+above, and the near-threshold items that stay red until run escalation (S3)
+rather than being tuned against the validation split.
