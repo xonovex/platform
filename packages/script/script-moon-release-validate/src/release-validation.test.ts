@@ -83,6 +83,23 @@ const createFixture = (): string => {
   writeText(root, "README.md", "# Test repository\n");
   writeText(
     root,
+    ".moon/tasks/tag-typescript.yml",
+    `tasks:
+  ci-check:
+    deps: [build, lint, typecheck, test, format-check]
+`,
+  );
+  writeText(
+    root,
+    ".moon/tasks/tag-typescript-script.yml",
+    `extends: ./tag-typescript.yml
+tasks:
+  ci-check:
+    deps: [build, lint, typecheck, test, format-check, coverage]
+`,
+  );
+  writeText(
+    root,
     ".github/workflows/release.yml",
     `on:
   workflow_dispatch:

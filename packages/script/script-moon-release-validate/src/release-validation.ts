@@ -11,6 +11,7 @@ import {
   type PackageManifest,
   type PluginManifest,
 } from "./release-inputs.js";
+import {taskInheritanceFailures} from "./task-inheritance.js";
 import {
   createChecker,
   forbiddenClaims,
@@ -478,6 +479,21 @@ export const validateRelease = (
     for (const failure of releaseWorkflowFailures(releaseWorkflow)) {
       check(false, failure);
     }
+  }
+
+  const tagTaskDirectory = resolve(repositoryRoot, ".moon/tasks");
+  const tagTaskFiles = existsSync(tagTaskDirectory)
+    ? readdirSync(tagTaskDirectory)
+        .toSorted()
+        .filter((entry) => entry.endsWith(".yml"))
+        .map((entry) => ({
+          name: entry,
+          text: readFileSync(resolve(tagTaskDirectory, entry), "utf8"),
+        }))
+    : [];
+  check(tagTaskFiles.length > 0, ".moon/tasks must define tag task files");
+  for (const failure of taskInheritanceFailures(tagTaskFiles)) {
+    check(false, failure);
   }
 
   return {
