@@ -28,10 +28,10 @@
     "@types/node": "^26.1.1",
     "@vitest/coverage-istanbul": "4.1.10",
     "@vitest/coverage-v8": "^4.1.10",
-    "eslint": "^10.7.0",
+    "eslint": "^10.8.0",
     "gitlab-ci-local": "^4.73.0",
     "jiti": "^2.7.0",
-    "npm-check-updates": "22.2.9",
+    "npm-check-updates": "23.0.0",
     "prettier": "^3.9.6",
     "tsx": "^4.23.1",
     "typescript": "6.0.3",
@@ -39,8 +39,8 @@
     "vitest": "^4.1.10"
   },
   "scripts": {
-    "deps:check": "npm-check-updates --workspaces --dep prod,dev,optional",
-    "deps:update": "npm-check-updates --workspaces -u --dep prod,dev,optional",
+    "deps:check": "npm-check-updates --root --workspaces --dep prod,dev,optional",
+    "deps:update": "npm-check-updates --root --workspaces -u --dep prod,dev,optional",
     "nix:shell": "nix --extra-experimental-features 'nix-command flakes' develop",
     "nix:lock": "nix --extra-experimental-features 'nix-command flakes' flake lock",
     "ci:github": "act push -W .github/workflows/ci.yml --input dry_run=true",
