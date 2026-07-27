@@ -7,7 +7,6 @@
     "moon-command-validate": "./dist/src/index.js"
   },
   "dependencies": {
-    "@xonovex/core": "0.1.22",
     "@xonovex/script-moon-common": "0.0.0",
     "yaml": "^2.9.0"
   },

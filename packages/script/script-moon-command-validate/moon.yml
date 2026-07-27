@@ -2,7 +2,6 @@ $schema: https://moonrepo.dev/schemas/project.json
 language: typescript
 tags: [typescript-script]
 dependsOn:
-  - shared-core
   - script-moon-common
 tasks:
   coverage:
@@ -17,14 +16,9 @@ tasks:
       --coverage.thresholds.functions 80
       --coverage.thresholds.branches 70
       --coverage.thresholds.statements 80
-    deps:
-      - shared-core:build
   ts-build:
     deps:
-      - shared-core:build
-  ts-test:
-    deps:
-      - shared-core:build
+      - script-moon-common:build
   install:
     command:
       - npm

@@ -4,8 +4,6 @@
     "outDir": "./dist",
     "rootDir": ".",
     "paths": {
-      "@xonovex/core/*": ["../../shared/shared-core/src/*"],
-      "@xonovex/core": ["../../shared/shared-core/src/index.ts"],
       "@xonovex/script-moon-common": ["../script-moon-common/src/index.ts"],
       "@xonovex/script-moon-common/*": ["../script-moon-common/src/*"]
     }
@@ -13,9 +11,6 @@
   "include": ["src"],
   "exclude": ["node_modules", "dist"],
   "references": [
-    {
-      "path": "../../shared/shared-core"
-    },
     {
       "path": "../script-moon-common"
     }

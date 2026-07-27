@@ -2,7 +2,6 @@ $schema: https://moonrepo.dev/schemas/project.json
 language: typescript
 tags: [typescript-script]
 dependsOn:
-  - shared-core
   - script-moon-common
   - script-moon-skill-catalog-common
 tasks:
@@ -12,18 +11,13 @@ tasks:
     options:
       cache: false
   ts-test:
-    deps:
-      - shared-core:build
     inputs:
       - /packages/skill/skill-skill/skill-guide/assets/**/*
   ts-coverage:
-    deps:
-      - shared-core:build
     inputs:
       - /packages/skill/skill-skill/skill-guide/assets/**/*
   ts-build:
     deps:
-      - shared-core:build
       - script-moon-common:build
       - script-moon-skill-catalog-common:build
   install:
