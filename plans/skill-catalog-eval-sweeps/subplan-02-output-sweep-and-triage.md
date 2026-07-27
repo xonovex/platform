@@ -3,7 +3,7 @@ type: plan
 has_subplans: false
 parent_plan: plans/skill-catalog-eval-sweeps.md
 parallel_group: 2
-status: pending
+status: complete
 dependencies:
   plans: [subplan-01-trigger-sweep-and-triage]
   files:
@@ -12,11 +12,11 @@ dependencies:
     - budgets.json
 skills_to_consult: [skill-guide, testing-guide, moon-guide, git-guide]
 validation:
-  type_check: pending
-  lint: pending
-  build: pending
-  tests: pending
-  integration: pending
+  type_check: pass
+  lint: pass
+  build: pass
+  tests: pass
+  integration: partial
 ---
 
 # Subplan 2: output-sweep-and-triage
@@ -75,12 +75,14 @@ cited disposition — with the golden end-to-end eval still passing.
 
 ## Success Criteria
 
-- [ ] 72/72 skills swept with valid runs (no `invalid-run.json`)
-- [ ] `plan-guide` gate resolved: PASS, or every failing eval carries a cited
-      bucket-1/2 fix and the re-run gate result recorded
-- [ ] Every keep-tier gate PASS or its failure carries a cited disposition
-- [ ] Golden eval still passes after all triage edits
-- [ ] All `--max-turns` exceptions recorded per skill with rationale
+- [x] 72/72 skills swept with valid runs (no `invalid-run.json`)
+- [x] `plan-guide` gate resolved: eight prompts carried a cited bucket-1 fix and
+      the re-run gate is recorded (0.205 -> 0.477, still FAIL, residual stated)
+- [~] Every keep-tier gate PASS or its failure carries a cited disposition —
+      45 PASS, 27 FAIL, all dispositioned; 22 of the 27 need a gate-policy
+      decision rather than a catalog edit
+- [x] Golden eval still passes after all triage edits (0.916, anchor 0.833)
+- [x] All `--max-turns` exceptions recorded per skill with rationale
 
 ## Files Modified/Created
 
@@ -96,3 +98,105 @@ cited disposition — with the golden end-to-end eval still passing.
 ## Estimated Duration
 
 Unattended sweep hours to a day + 1–3 triage sessions.
+
+## Execution Record (2026-07-27)
+
+### Commits
+
+| SHA | Change |
+| --- | --- |
+| `a3a42779` | supplied the artifacts eight `plan-guide` output-eval prompts referenced; retargeted eval 1 at a path that exists |
+| `6d2e0782` | the 10000-character generation ceiling applies to codex only, matching the caps the harness reports |
+
+### Sweep
+
+Full catalog, `ci-skill-eval-output` one moon invocation per skill under `xargs -P3`
+(the task itself runs two concurrent generations, so six model calls in flight —
+the bound calibrated in subplan 1). 71 skills in 7050s; `plan-guide` ran
+separately because its evals were being edited.
+
+| | |
+| --- | --- |
+| Benchmarks | 72/72 |
+| Invalid runs | 0 (6 before the harness fix) |
+| Gate PASS | 45 |
+| Gate FAIL | 27 |
+| Golden eval (`pull-request-guide` eval 5) | 0.916, anchor 0.833 |
+
+319 evals at 2 runs per arm is 1276 generations plus 1276 judge calls. The
+harness reports no per-run cost, so spend is bounded by the $0.10 per-call cap
+rather than measured — a $255 ceiling that actual spend is well under, since most
+generations finish far below the cap. The pilot estimate of roughly 3 minutes per
+skill held: 71 skills in just under two hours at six concurrent calls.
+
+### `--max-turns` exceptions
+
+- `skill-guide`: `MAX_TURNS=20`. Eval 3's with-skill arm exhausted the default 12
+  turns on every attempt. Recorded as a per-skill exception.
+- `plan-guide`: none in the final run. An earlier attempt at 24 turns exhausted
+  the `$0.10` generation budget instead, which is what identified eval 1's real
+  defect — it named `packages/api`, absent from this workspace, so the search ran
+  until some cap stopped it. Retargeted, it completes at the default.
+
+### Findings and triage
+
+**Bucket 4 — the generation ceiling invalidated five skills.** `content-guide`
+eval 3, `github-guide` eval 5, `gitlab-guide` eval 5,
+`gpu-rendering-vulkan-guide` eval 1 and `workflow-guide` eval 9 each reported
+`output-limit` on the with-skill arm on every attempt, discarding the whole
+benchmark. A 10000-character ceiling was applied to both harnesses although the
+run summary only advertised it for codex; claude already carries a spend cap and
+a turn cap that bind sooner, so the ceiling only threw away long answers — and
+length is what a thorough skill produces, so it penalised the arm under test.
+Fixed in `6d2e0782`; all five re-ran valid.
+
+**Bucket 1 — `plan-guide`'s prompts named artifacts the eval never supplied.**
+Eight of eleven referenced an inline plan, attached feedback, supplied evidence
+or handoff notes that were absent, so the model asked for them and every
+assertion failed. Fixed in `a3a42779`; the gate moved 0.205 -> 0.477 with valid
+runs. Catalog-wide this defect is rare — a scan of all 319 prompts found 16
+candidates across 11 skills, most of them false positives that carry their own
+context.
+
+### Open: the 27 gate failures
+
+None is an invalid run, and none fails the trigger check — every skill fires on
+its own evals. They split cleanly, and neither group is fixed by editing a skill.
+
+**22 fail the absolute bar while measurably working.** `moon-guide` scores 0.75
+against 0.19 without, `skill-guide` 0.77 against 0.20, `gitlab-guide` 0.71
+against 0.16, `github-guide` 0.54 against 0.04, `pi-guide` 0.50 against 0.00.
+The delta is large and positive; the tier's absolute floor is what they miss.
+Most are the provider- and harness-facing guides, whose evals ask for
+product-specific facts a bare model does not have — which is precisely why the
+without-skill arm sits near zero. Whether a skill that lifts a model from 0.00 to
+0.50 should fail its gate is a policy question about the floor, and the parent
+plan forbids relaxing a gate to make a sweep pass, so nothing was changed.
+
+**5 fail the delta while the bare model is already competent.**
+`code-quality-guide` 1.00 against 1.00, `docker-guide` 0.94 against 1.00,
+`shell-scripting-guide` 0.92 against 1.00, `c99-guide` 0.75 against 0.79,
+`oop-guide` 0.75 against 0.75. These evals do not discriminate: they measure
+competence the base model already has, so no skill edit can produce a delta.
+Re-authoring them around what each skill uniquely adds is the fix, and it is a
+design change rather than a repair.
+
+`plan-guide` sits in the first group with a negative delta after its prompt fix,
+and its residual is the same shape as the second: nine of eleven evals now score
+identically with and without the skill.
+
+### Constraint recorded for later triage
+
+136 of the 319 output-eval prompts are byte-identical to a trigger query in some
+`eval-queries.json`. Editing one of those prompts silently re-targets the trigger
+eval as well, so any such edit has to be made and re-measured in both gates
+together. `plan-guide`'s eleven are not among them, which is why its prompts
+could be rewritten freely.
+
+### Validation
+
+- `npx moon run '#skill:skill-validate'` — 176 tasks, green
+- `npx moon run script-moon-skill-eval-outputs:ci-check` — green
+- `npx moon run script-moon-skill-eval-triggers:ci-check` — green
+- 72/72 benchmarks valid, zero `invalid-run.json`
+- Golden eval 0.916, above its 0.833 anchor
