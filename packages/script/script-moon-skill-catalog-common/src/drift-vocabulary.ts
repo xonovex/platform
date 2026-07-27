@@ -2,6 +2,10 @@ import {readFileSync} from "node:fs";
 import {isFile} from "@xonovex/script-moon-common/fs";
 import {z} from "zod";
 
+// The repository-relative name of the vocabulary manifest, owned here alongside
+// the schema that parses it so every reader resolves the same file.
+export const VOCABULARY_MANIFEST_FILE = "vocabulary.json";
+
 export const VocabularyManifestSchema = z.record(z.string(), z.string());
 
 export type VocabularyManifest = z.infer<typeof VocabularyManifestSchema>;

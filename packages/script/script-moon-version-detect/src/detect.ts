@@ -1,8 +1,8 @@
 import {execFileSync} from "node:child_process";
 import {existsSync, readFileSync} from "node:fs";
 import {join} from "node:path";
-import type {MoonProject} from "@xonovex/script-moon-common";
 import {resolveExecutable} from "@xonovex/script-moon-common/executable";
+import type {MoonProject} from "@xonovex/script-moon-common/moon-query";
 
 interface PackageJson {
   readonly name?: unknown;

@@ -1,7 +1,7 @@
 import {spawnSync} from "node:child_process";
 import {posix} from "node:path";
-import type {PackageJson} from "@xonovex/script-moon-common";
 import {resolveExecutable} from "@xonovex/script-moon-common/executable";
+import type {PackageJson} from "@xonovex/script-moon-common/package-json";
 import {isRecord} from "@xonovex/script-moon-common/records";
 
 type ReadPackedFile = (path: string) => string;

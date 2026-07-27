@@ -1,4 +1,4 @@
-import type {PackageJson} from "@xonovex/script-moon-common";
+import type {PackageJson} from "@xonovex/script-moon-common/package-json";
 import {bumpVersion, updateDependencyVersions} from "./bump.js";
 
 interface DependentUpdate {

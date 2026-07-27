@@ -8,8 +8,8 @@ import {
 } from "node:fs";
 import {tmpdir} from "node:os";
 import {join} from "node:path";
-import {readPkg} from "@xonovex/script-moon-common";
 import {resolveExecutable} from "@xonovex/script-moon-common/executable";
+import {readPkg} from "@xonovex/script-moon-common/package-json";
 import {afterEach, describe, expect, it} from "vitest";
 import {main} from "./version-bump.js";
 

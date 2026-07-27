@@ -1,6 +1,5 @@
 import {readdirSync, readFileSync} from "node:fs";
 import {basename, dirname, join, resolve} from "node:path";
-import {findWorkspaceRoot} from "@xonovex/script-moon-common";
 import {
   DRIFT_LINT_MODE_ENV,
   resolveDriftLintMode,
@@ -10,6 +9,7 @@ import {
   isFile,
   resolveGuideDirectory,
 } from "@xonovex/script-moon-common/fs";
+import {findWorkspaceRoot} from "@xonovex/script-moon-common/workspace";
 import {checkGuideDrift} from "@xonovex/script-moon-skill-catalog-common/drift-lints";
 import {checkReferenceFileLinks} from "@xonovex/script-moon-skill-catalog-common/reference-file-links";
 import {parse as parseYaml} from "yaml";

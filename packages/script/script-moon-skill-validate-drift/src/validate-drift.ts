@@ -1,25 +1,23 @@
 import {writeFileSync} from "node:fs";
 import {dirname, join, resolve} from "node:path";
 import {fileURLToPath} from "node:url";
-import {findWorkspaceRoot} from "@xonovex/script-moon-common";
 import {
+  BUDGET_MANIFEST_FILE,
   DRIFT_LINT_MODE_ENV,
   evaluateBudgets,
   readBudgetManifest,
   resolveDriftLintMode,
   seedBudgets,
 } from "@xonovex/script-moon-common/drift-budgets";
+import {findWorkspaceRoot} from "@xonovex/script-moon-common/workspace";
 import {
   collectCommandCatalogFiles,
   collectSkillCatalogFiles,
 } from "@xonovex/script-moon-skill-catalog-common/drift-files";
 import {
-  BUDGET_MANIFEST_FILE,
-  VOCABULARY_MANIFEST_FILE,
-} from "@xonovex/script-moon-skill-catalog-common/drift-lints";
-import {
   evaluateVocabulary,
   readVocabularyManifest,
+  VOCABULARY_MANIFEST_FILE,
 } from "@xonovex/script-moon-skill-catalog-common/drift-vocabulary";
 import {evaluateDuplication} from "./drift-duplication.js";
 

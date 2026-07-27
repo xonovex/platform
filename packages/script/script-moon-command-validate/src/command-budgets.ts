@@ -1,6 +1,7 @@
 import {readdirSync, readFileSync} from "node:fs";
 import {join, relative, sep} from "node:path";
 import {
+  BUDGET_MANIFEST_FILE,
   DRIFT_LINT_MODE_ENV,
   evaluateBudgets,
   readBudgetManifest,
@@ -9,8 +10,6 @@ import {
 } from "@xonovex/script-moon-common/drift-budgets";
 import {isDirectory, isFile} from "@xonovex/script-moon-common/fs";
 import {issue, type ValidationIssue} from "./validation.js";
-
-export const BUDGET_MANIFEST_FILE = "budgets.json";
 
 // commandFiles reads every command document as a budgeted file keyed by its
 // repository-relative path, matching the manifest written by moon-skill-validate-drift.

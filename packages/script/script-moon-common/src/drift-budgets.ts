@@ -21,6 +21,10 @@ export const DRIFT_WORD_CAPS = {
 
 export type DriftFileKind = keyof typeof DRIFT_WORD_CAPS;
 
+// The repository-relative name of the budget manifest, owned here alongside the
+// schema that parses it so every reader resolves the same file.
+export const BUDGET_MANIFEST_FILE = "budgets.json";
+
 export const BudgetManifestSchema = z.record(z.string(), z.int().positive());
 
 export type BudgetManifest = z.infer<typeof BudgetManifestSchema>;

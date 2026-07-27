@@ -1,7 +1,7 @@
 import {mkdirSync, rmSync, writeFileSync} from "node:fs";
 import {join, resolve} from "node:path";
-import {parseCliArgs} from "@xonovex/script-moon-common";
 import {boundedBatches} from "@xonovex/script-moon-common/batches";
+import {parseCliArgs} from "@xonovex/script-moon-common/cli-args";
 import {resolveExecutable} from "@xonovex/script-moon-common/executable";
 import {resolveClaudePluginDirectories} from "@xonovex/script-moon-common/fs";
 import {skillEvalModelDefaults} from "@xonovex/script-moon-common/skill-eval-models";

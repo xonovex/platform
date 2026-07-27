@@ -1,7 +1,7 @@
 import {existsSync, readdirSync, readFileSync} from "node:fs";
 import {dirname, join, resolve} from "node:path";
-import {parseCliArgs} from "@xonovex/script-moon-common";
 import {boundedBatches} from "@xonovex/script-moon-common/batches";
+import {parseCliArgs} from "@xonovex/script-moon-common/cli-args";
 import {resolveExecutable} from "@xonovex/script-moon-common/executable";
 import {
   isDirectory,

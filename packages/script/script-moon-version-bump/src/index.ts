@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import {logError} from "@xonovex/script-moon-common";
+import {logError} from "@xonovex/script-moon-common/logging";
 import {main} from "./version-bump.js";
 
 try {

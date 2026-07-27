@@ -1,11 +1,9 @@
 #!/usr/bin/env node
 import {dirname} from "node:path";
 import {fileURLToPath} from "node:url";
-import {
-  findWorkspaceRoot,
-  parseCliArgs,
-  queryMoonProjects,
-} from "@xonovex/script-moon-common";
+import {parseCliArgs} from "@xonovex/script-moon-common/cli-args";
+import {queryMoonProjects} from "@xonovex/script-moon-common/moon-query";
+import {findWorkspaceRoot} from "@xonovex/script-moon-common/workspace";
 import {
   createGitReader,
   detectVersionChanges,

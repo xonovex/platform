@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 import {existsSync, readFileSync} from "node:fs";
 import {join} from "node:path";
+import {parseCliArgs} from "@xonovex/script-moon-common/cli-args";
 import {
   logError,
   logInfo,
   logSuccess,
-  parseCliArgs,
-  readPkg,
-} from "@xonovex/script-moon-common";
+} from "@xonovex/script-moon-common/logging";
+import {readPkg} from "@xonovex/script-moon-common/package-json";
 import {packagedFilePaths, validatePackedPackage} from "./packed-package.js";
 import {validateDeclaredFiles, validatePackage} from "./validate.js";
 

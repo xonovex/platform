@@ -1,4 +1,4 @@
-import type {PackageJson} from "@xonovex/script-moon-common";
+import type {PackageJson} from "@xonovex/script-moon-common/package-json";
 import {describe, expect, it} from "vitest";
 import {
   parsePackagedFilePaths,

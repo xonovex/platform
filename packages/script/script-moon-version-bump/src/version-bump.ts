@@ -1,14 +1,13 @@
 import {existsSync, readFileSync} from "node:fs";
 import {dirname, join, relative} from "node:path";
+import {parseCliArgs} from "@xonovex/script-moon-common/cli-args";
+import {logInfo, logSuccess} from "@xonovex/script-moon-common/logging";
+import {findAllPackageJsonPaths} from "@xonovex/script-moon-common/moon-query";
 import {
-  findAllPackageJsonPaths,
-  findWorkspaceRoot,
-  logInfo,
-  logSuccess,
-  parseCliArgs,
   readPkg,
   type PackageJson,
-} from "@xonovex/script-moon-common";
+} from "@xonovex/script-moon-common/package-json";
+import {findWorkspaceRoot} from "@xonovex/script-moon-common/workspace";
 import {bumpVersion, type BumpType} from "./bump.js";
 import {
   determineBumpLevel,

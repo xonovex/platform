@@ -1,5 +1,6 @@
 import {join} from "node:path";
 import {
+  BUDGET_MANIFEST_FILE,
   evaluateBudgets,
   readBudgetManifest,
 } from "@xonovex/script-moon-common/drift-budgets";
@@ -7,10 +8,8 @@ import {collectGuideFiles} from "./drift-files.js";
 import {
   evaluateVocabulary,
   readVocabularyManifest,
+  VOCABULARY_MANIFEST_FILE,
 } from "./drift-vocabulary.js";
-
-export const BUDGET_MANIFEST_FILE = "budgets.json";
-export const VOCABULARY_MANIFEST_FILE = "vocabulary.json";
 
 export interface DriftLintReport {
   readonly findings: readonly string[];

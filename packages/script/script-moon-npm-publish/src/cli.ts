@@ -1,11 +1,9 @@
 import {execFileSync} from "node:child_process";
 import {readFileSync, writeFileSync} from "node:fs";
-import {
-  logInfo,
-  parseCliArgs,
-  readPlatformMeta,
-} from "@xonovex/script-moon-common";
+import {parseCliArgs} from "@xonovex/script-moon-common/cli-args";
 import {resolveExecutable} from "@xonovex/script-moon-common/executable";
+import {logInfo} from "@xonovex/script-moon-common/logging";
+import {readPlatformMeta} from "@xonovex/script-moon-common/platform-meta";
 import {
   isPublished,
   publishArgs,
