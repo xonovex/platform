@@ -1,0 +1,41 @@
+$schema: https://moonrepo.dev/schemas/project.json
+language: typescript
+tags: [typescript-script]
+dependsOn:
+  - script-moon-common
+  - script-moon-skill-catalog-common
+tasks:
+  ts-build:
+    deps:
+      - script-moon-common:build
+      - script-moon-skill-catalog-common:build
+  install:
+    command:
+      - npm
+      - install
+      - -w
+      - "@xonovex/script-moon-skill-validate-drift"
+    deps:
+      - ~:build
+    options:
+      cache: false
+      runFromWorkspaceRoot: true
+  drift-check:
+    command:
+      - node
+      - packages/script/script-moon-skill-validate-drift/dist/src/index.js
+    deps: [build]
+    env:
+      XONOVEX_LINT_MODE: enforce
+    inputs:
+      - /budgets.json
+      - /vocabulary.json
+      - /packages/command/*/commands/*.md
+      - /packages/skill/*/*/SKILL.md
+      - /packages/skill/*/*/references/*.md
+    options:
+      runFromWorkspaceRoot: true
+  ci-check:
+    deps: [drift-check]
+    options:
+      mergeDeps: append

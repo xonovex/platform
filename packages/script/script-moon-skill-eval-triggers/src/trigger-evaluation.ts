@@ -1,7 +1,7 @@
 import {writeFileSync} from "node:fs";
 import {join} from "node:path";
-import {type TriggerOutcome} from "./trigger-process.js";
-import {type Query} from "./validation.js";
+import {type TriggerOutcome} from "@xonovex/script-moon-skill-eval-common/trigger-process";
+import {type Query} from "@xonovex/script-moon-skill-eval-common/validation";
 
 interface ResultRecord {
   readonly query: string;

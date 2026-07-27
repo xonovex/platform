@@ -1,0 +1,31 @@
+{
+  "name": "@xonovex/script-moon-skill-eval-common",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./trigger-process": {
+      "types": "./src/trigger-process.ts",
+      "default": "./dist/src/trigger-process.js"
+    },
+    "./validation": {
+      "types": "./src/validation.ts",
+      "default": "./dist/src/validation.js"
+    },
+    "./routing-catalog": {
+      "types": "./src/routing-catalog.ts",
+      "default": "./dist/src/routing-catalog.js"
+    }
+  },
+  "dependencies": {
+    "@xonovex/script-moon-common": "0.0.0",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {},
+  "keywords": [
+    "xonovex",
+    "script",
+    "moon",
+    "skill"
+  ]
+}

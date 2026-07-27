@@ -1,0 +1,32 @@
+{
+  "extends": "@xonovex/ts-config-cli",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": ".",
+    "paths": {
+      "@xonovex/core/*": ["../../shared/shared-core/src/*"],
+      "@xonovex/script-moon-common": ["../script-moon-common/src/index.ts"],
+      "@xonovex/script-moon-common/*": ["../script-moon-common/src/*"],
+      "@xonovex/core": ["../../shared/shared-core/src/index.ts"],
+      "@xonovex/script-moon-skill-catalog-common": [
+        "../script-moon-skill-catalog-common/src/index.ts"
+      ],
+      "@xonovex/script-moon-skill-catalog-common/*": [
+        "../script-moon-skill-catalog-common/src/*"
+      ]
+    }
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "dist"],
+  "references": [
+    {
+      "path": "../../shared/shared-core"
+    },
+    {
+      "path": "../script-moon-common"
+    },
+    {
+      "path": "../script-moon-skill-catalog-common"
+    }
+  ]
+}

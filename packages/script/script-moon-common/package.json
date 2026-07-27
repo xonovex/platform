@@ -32,6 +32,10 @@
     "./drift-budgets": {
       "types": "./src/drift-budgets.ts",
       "default": "./dist/src/drift-budgets.js"
+    },
+    "./frontmatter": {
+      "types": "./src/frontmatter.ts",
+      "default": "./dist/src/frontmatter.js"
     }
   },
   "dependencies": {

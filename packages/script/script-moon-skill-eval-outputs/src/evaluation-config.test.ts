@@ -147,9 +147,9 @@ describe("evaluation configuration", () => {
       model: "cli-model",
       maxTurns: 18,
     });
-    expect(
-      config.withArgs[config.withArgs.indexOf("--max-turns") + 1],
-    ).toBe("18");
+    expect(config.withArgs[config.withArgs.indexOf("--max-turns") + 1]).toBe(
+      "18",
+    );
     expect(
       config.withoutArgs[config.withoutArgs.indexOf("--max-turns") + 1],
     ).toBe("18");
@@ -157,9 +157,9 @@ describe("evaluation configuration", () => {
 
   it("defaults the turn cap and rejects one above the ceiling", () => {
     expect(successfulConfig(resolveConfig())).toMatchObject({maxTurns: 12});
-    expect(successfulConfig(resolveConfig([], {MAX_TURNS: "20"}))).toMatchObject(
-      {maxTurns: 20},
-    );
+    expect(
+      successfulConfig(resolveConfig([], {MAX_TURNS: "20"})),
+    ).toMatchObject({maxTurns: 20});
     expect(failureMessage(resolveConfig(["--max-turns", "25"]))).toContain(
       "invalid evaluator options",
     );

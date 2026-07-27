@@ -1,5 +1,3 @@
-import {readFileSync} from "node:fs";
-
 const PROGRAM = "moon-skill-eval-triggers";
 
 const USAGE = `Usage: ${PROGRAM} [queries.json] [skill_name] [split] [options]
@@ -52,22 +50,6 @@ const OPTION_FLAGS = new Set([
 export const usageError = (message: string): never => {
   process.stderr.write(`${USAGE}\n${PROGRAM}: error: ${message}\n`);
   process.exit(2);
-};
-
-export const parseFrontmatterName = (skillFile: string): string | undefined => {
-  const text = readFileSync(skillFile, "utf8");
-  const match = /^---\r?\n([\s\S]*?)\r?\n---/.exec(text);
-  const frontmatter = match?.[1];
-  if (frontmatter === undefined) {
-    return undefined;
-  }
-  for (const line of frontmatter.split(/\r?\n/)) {
-    const name = /^name:\s*(.+?)\s*$/.exec(line)?.[1];
-    if (name !== undefined) {
-      return name.replaceAll(/^["']|["']$/g, "");
-    }
-  }
-  return undefined;
 };
 
 export const parseCli = (argv: readonly string[]): ParsedCli => {

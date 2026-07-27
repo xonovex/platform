@@ -3,6 +3,7 @@ import {readFileSync} from "node:fs";
 import {dirname, join, resolve} from "node:path";
 import {boundedBatches} from "@xonovex/script-moon-common/batches";
 import {resolveExecutable} from "@xonovex/script-moon-common/executable";
+import {parseFrontmatterName} from "@xonovex/script-moon-common/frontmatter";
 import {
   isDirectory,
   isFile,
@@ -10,8 +11,7 @@ import {
   resolveGuideDirectory,
 } from "@xonovex/script-moon-common/fs";
 import {skillEvalModelDefaults} from "@xonovex/script-moon-common/skill-eval-models";
-import {parseCli, parseFrontmatterName} from "./cli.js";
-import {catalogQueryOwners} from "./routing-catalog.js";
+import {catalogQueryOwners} from "@xonovex/script-moon-skill-eval-common/routing-catalog";
 import {
   buildTriggerClaudeArgs,
   buildTriggerCodexArgs,
@@ -22,7 +22,8 @@ import {
   selectQueries,
   triggerModelRunCount,
   type Query,
-} from "./validation.js";
+} from "@xonovex/script-moon-skill-eval-common/validation";
+import {parseCli} from "./cli.js";
 
 type TriggerConfigResult =
   | {readonly success: true; readonly data: TriggerConfig}

@@ -6,11 +6,11 @@
     "paths": {
       "@xonovex/script-moon-common": ["../script-moon-common/src/index.ts"],
       "@xonovex/script-moon-common/*": ["../script-moon-common/src/*"],
-      "@xonovex/script-moon-skill-eval-common": [
-        "../script-moon-skill-eval-common/src/index.ts"
+      "@xonovex/script-moon-skill-catalog-common": [
+        "../script-moon-skill-catalog-common/src/index.ts"
       ],
-      "@xonovex/script-moon-skill-eval-common/*": [
-        "../script-moon-skill-eval-common/src/*"
+      "@xonovex/script-moon-skill-catalog-common/*": [
+        "../script-moon-skill-catalog-common/src/*"
       ]
     }
   },
@@ -21,7 +21,7 @@
       "path": "../script-moon-common"
     },
     {
-      "path": "../script-moon-skill-eval-common"
+      "path": "../script-moon-skill-catalog-common"
     }
   ]
 }

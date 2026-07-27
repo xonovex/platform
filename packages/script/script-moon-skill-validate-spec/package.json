@@ -1,17 +1,17 @@
 {
-  "name": "@xonovex/script-moon-skill-eval-triggers",
+  "name": "@xonovex/script-moon-skill-validate-spec",
   "version": "0.0.0",
   "private": true,
   "type": "module",
   "bin": {
-    "moon-skill-eval-triggers": "./dist/src/index.js"
+    "moon-skill-validate-spec": "./dist/src/index.js"
   },
   "dependencies": {
+    "@xonovex/core": "0.1.22",
     "@xonovex/script-moon-common": "0.0.0",
-    "zod": "^4.4.3",
-    "@xonovex/script-moon-skill-eval-common": "0.0.0"
+    "yaml": "^2.9.0",
+    "@xonovex/script-moon-skill-catalog-common": "0.0.0"
   },
-  "devDependencies": {},
   "keywords": [
     "xonovex",
     "script",

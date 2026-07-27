@@ -23,12 +23,6 @@ export default defineConfig({
           functions: 100,
           lines: 90,
         },
-        "src/trigger-process.ts": {
-          statements: 80,
-          branches: 65,
-          functions: 80,
-          lines: 80,
-        },
       },
     },
   },

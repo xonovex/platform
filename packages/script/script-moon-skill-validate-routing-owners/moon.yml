@@ -1,0 +1,36 @@
+$schema: https://moonrepo.dev/schemas/project.json
+language: typescript
+tags: [typescript-script]
+dependsOn:
+  - script-moon-common
+  - script-moon-skill-eval-common
+tasks:
+  ts-build:
+    deps:
+      - script-moon-common:build
+      - script-moon-skill-eval-common:build
+  install:
+    command:
+      - npm
+      - install
+      - -w
+      - "@xonovex/script-moon-skill-validate-routing-owners"
+    deps:
+      - ~:build
+    options:
+      cache: false
+      runFromWorkspaceRoot: true
+  routing-owners-check:
+    command:
+      - node
+      - packages/script/script-moon-skill-validate-routing-owners/dist/src/index.js
+      - packages/skill
+    deps: [build]
+    inputs:
+      - /packages/skill/*/*/eval-queries.json
+    options:
+      runFromWorkspaceRoot: true
+  ci-check:
+    deps: [routing-owners-check]
+    options:
+      mergeDeps: append

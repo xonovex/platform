@@ -3,6 +3,7 @@ language: typescript
 tags: [typescript-script]
 dependsOn:
   - script-moon-common
+  - script-moon-skill-eval-common
 tasks:
   ts-test:
     inputs:
@@ -16,11 +17,13 @@ tasks:
       --coverage.thresholds.statements 80
     deps:
       - script-moon-common:build
+      - script-moon-skill-eval-common:build
     inputs:
       - /packages/skill/*/*/eval-queries.json
   ts-build:
     deps:
       - script-moon-common:build
+      - script-moon-skill-eval-common:build
   install:
     command:
       - npm
@@ -32,32 +35,3 @@ tasks:
     options:
       cache: false
       runFromWorkspaceRoot: true
-  routing-owners-check:
-    command:
-      - node
-      - packages/script/script-moon-skill-eval-triggers/dist/src/routing-owners-cli.js
-      - packages/skill
-    deps: [build]
-    inputs:
-      - /packages/skill/*/*/eval-queries.json
-    options:
-      runFromWorkspaceRoot: true
-  ci-routing:
-    script: >-
-      npx moon-skill-eval-routing packages/skill
-      --split "${SKILL_ROUTING_SPLIT:-validation}"
-      --runs "${SKILL_ROUTING_RUNS:-3}"
-      --owners "${SKILL_ROUTING_OWNERS:-}"
-      --threshold 0.5
-      --batch-size 8
-      --max-budget-usd 0.05
-      --workspace ".skill-eval-results/routing/${SKILL_EVAL_HARNESS:-claude}"
-    deps:
-      - ~:install
-    inputs:
-      - /packages/skill/*/*/eval-queries.json
-      - /packages/skill/*/*/SKILL.md
-    options:
-      cache: false
-      runFromWorkspaceRoot: true
-      runInCI: true

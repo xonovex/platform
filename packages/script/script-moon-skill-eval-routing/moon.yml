@@ -1,0 +1,41 @@
+$schema: https://moonrepo.dev/schemas/project.json
+language: typescript
+tags: [typescript-script]
+dependsOn:
+  - script-moon-common
+  - script-moon-skill-eval-common
+tasks:
+  ts-build:
+    deps:
+      - script-moon-common:build
+      - script-moon-skill-eval-common:build
+  install:
+    command:
+      - npm
+      - install
+      - -w
+      - "@xonovex/script-moon-skill-eval-routing"
+    deps:
+      - ~:build
+    options:
+      cache: false
+      runFromWorkspaceRoot: true
+  ci-routing:
+    script: >-
+      npx moon-skill-eval-routing packages/skill
+      --split "${SKILL_ROUTING_SPLIT:-validation}"
+      --runs "${SKILL_ROUTING_RUNS:-3}"
+      --owners "${SKILL_ROUTING_OWNERS:-}"
+      --threshold 0.5
+      --batch-size 8
+      --max-budget-usd 0.05
+      --workspace ".skill-eval-results/routing/${SKILL_EVAL_HARNESS:-claude}"
+    deps:
+      - ~:install
+    inputs:
+      - /packages/skill/*/*/eval-queries.json
+      - /packages/skill/*/*/SKILL.md
+    options:
+      cache: false
+      runFromWorkspaceRoot: true
+      runInCI: true

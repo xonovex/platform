@@ -44,13 +44,13 @@ tasks:
   skill-validate:
     command:
       - npx
-      - moon-skill-validate
+      - moon-skill-validate-spec
       - --strict
     deps:
       - target: ~:build
         optional: true
-      - script-moon-skill-validate:install
-      - script-moon-skill-eval-triggers:routing-owners-check
+      - script-moon-skill-validate-spec:install
+      - script-moon-skill-validate-routing-owners:routing-owners-check
     env:
       XONOVEX_LINT_MODE: enforce
     inputs:

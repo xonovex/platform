@@ -1,0 +1,35 @@
+{
+  "name": "@xonovex/script-moon-skill-catalog-common",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./reference-file-links": {
+      "types": "./src/reference-file-links.ts",
+      "default": "./dist/src/reference-file-links.js"
+    },
+    "./drift-lints": {
+      "types": "./src/drift-lints.ts",
+      "default": "./dist/src/drift-lints.js"
+    },
+    "./drift-files": {
+      "types": "./src/drift-files.ts",
+      "default": "./dist/src/drift-files.js"
+    },
+    "./drift-vocabulary": {
+      "types": "./src/drift-vocabulary.ts",
+      "default": "./dist/src/drift-vocabulary.js"
+    }
+  },
+  "dependencies": {
+    "@xonovex/script-moon-common": "0.0.0",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {},
+  "keywords": [
+    "xonovex",
+    "script",
+    "moon",
+    "skill"
+  ]
+}
