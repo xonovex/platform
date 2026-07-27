@@ -4,5 +4,6 @@
     pkgs.go_1_26
     pkgs.golangci-lint
     pkgs.git
+    pkgs.tmux
   ];
 }
