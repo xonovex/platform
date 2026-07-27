@@ -33,6 +33,9 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
+          # asset-images:asset-check asserts a real PNG mime type, which fails
+          # against the pointer files a non-LFS checkout leaves behind.
+          lfs: true
 
       - uses: ./.github/actions/setup-nix
         with:
