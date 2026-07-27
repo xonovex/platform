@@ -5,6 +5,12 @@ dependsOn:
   - script-moon-common
   - script-moon-skill-catalog-common
 tasks:
+  ts-coverage:
+    env:
+      TS_COVERAGE_MIN_LINES: "85"
+      TS_COVERAGE_MIN_FUNCTIONS: "90"
+      TS_COVERAGE_MIN_BRANCHES: "75"
+      TS_COVERAGE_MIN_STATEMENTS: "80"
   ts-build:
     deps:
       - script-moon-common:build

@@ -107,10 +107,18 @@ tasks:
   ts-coverage:
     script: >-
       npx vitest run --coverage --coverage.include='src/**'
-      --coverage.thresholds.lines 50
-      --coverage.thresholds.functions 50
-      --coverage.thresholds.branches 50
-      --coverage.thresholds.statements 50
+      --coverage.thresholds.lines "$TS_COVERAGE_MIN_LINES"
+      --coverage.thresholds.functions "$TS_COVERAGE_MIN_FUNCTIONS"
+      --coverage.thresholds.branches "$TS_COVERAGE_MIN_BRANCHES"
+      --coverage.thresholds.statements "$TS_COVERAGE_MIN_STATEMENTS"
+    # These are the floors for a project that sets none of its own. Each project
+    # overrides them to sit just under its own coverage, so a drop fails that
+    # project instead of coasting on the weakest project's floor.
+    env:
+      TS_COVERAGE_MIN_LINES: "50"
+      TS_COVERAGE_MIN_FUNCTIONS: "50"
+      TS_COVERAGE_MIN_BRANCHES: "50"
+      TS_COVERAGE_MIN_STATEMENTS: "50"
     deps:
       - ^:build
     inputs:

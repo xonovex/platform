@@ -4,6 +4,12 @@ tags: [typescript-script]
 dependsOn:
   - script-moon-common
 tasks:
+  ts-coverage:
+    env:
+      TS_COVERAGE_MIN_LINES: "95"
+      TS_COVERAGE_MIN_FUNCTIONS: "95"
+      TS_COVERAGE_MIN_BRANCHES: "75"
+      TS_COVERAGE_MIN_STATEMENTS: "95"
   ts-build:
     deps:
       - script-moon-common:build

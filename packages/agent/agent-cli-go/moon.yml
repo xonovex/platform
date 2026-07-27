@@ -43,12 +43,11 @@ tasks:
     options:
       cache: true
   ts-coverage:
-    script: >-
-      npx vitest run --coverage --coverage.include='src/**'
-      --coverage.thresholds.lines 75
-      --coverage.thresholds.functions 60
-      --coverage.thresholds.branches 90
-      --coverage.thresholds.statements 75
+    env:
+      TS_COVERAGE_MIN_LINES: "75"
+      TS_COVERAGE_MIN_FUNCTIONS: "60"
+      TS_COVERAGE_MIN_BRANCHES: "90"
+      TS_COVERAGE_MIN_STATEMENTS: "75"
     inputs:
       - src/**/*.ts
       - vitest.config.ts

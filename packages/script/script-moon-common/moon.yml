@@ -2,6 +2,12 @@ $schema: https://moonrepo.dev/schemas/project.json
 language: typescript
 tags: [typescript-script]
 tasks:
+  ts-coverage:
+    env:
+      TS_COVERAGE_MIN_LINES: "90"
+      TS_COVERAGE_MIN_FUNCTIONS: "85"
+      TS_COVERAGE_MIN_BRANCHES: "80"
+      TS_COVERAGE_MIN_STATEMENTS: "90"
   coverage:
     command: noop
     deps: [ts-coverage]

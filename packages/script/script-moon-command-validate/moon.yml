@@ -10,12 +10,11 @@ tasks:
     options:
       cache: false
   ts-coverage:
-    script: >-
-      npx vitest run --coverage --coverage.include='src/**'
-      --coverage.thresholds.lines 80
-      --coverage.thresholds.functions 80
-      --coverage.thresholds.branches 70
-      --coverage.thresholds.statements 80
+    env:
+      TS_COVERAGE_MIN_LINES: "85"
+      TS_COVERAGE_MIN_FUNCTIONS: "90"
+      TS_COVERAGE_MIN_BRANCHES: "70"
+      TS_COVERAGE_MIN_STATEMENTS: "80"
   ts-build:
     deps:
       - script-moon-common:build
