@@ -4,7 +4,7 @@
   "evals": [
     {
       "id": 1,
-      "prompt": "Research the codebase and current official documentation needed to plan request throttling for packages/api. Return the report inline and do not edit anything.",
+      "prompt": "Research the code in packages/script/script-moon-skill-eval-triggers/src and the current official documentation needed to plan a per-query retry budget for it. Return the report inline and do not edit anything.",
       "assertions": [
         "The report separates observed code or source evidence from inference, uncertainty, and unresolved questions",
         "The operation remains read-only and stops without creating a plan or changing code"
@@ -12,7 +12,7 @@
     },
     {
       "id": 2,
-      "prompt": "Create one high-level implementation plan from the inline migration research below. Return it inline; detailed child plans can come later.",
+      "prompt": "Create one high-level implementation plan from the migration research below. Return it inline; detailed child plans can come later.\n\nResearch: packages/db wraps Postgres 14 in a hand-rolled query layer, about 40 call sites, no migrations framework. We want Drizzle. Observed: six tables, two with JSONB columns; packages/api and packages/worker both import packages/db directly; the suite runs against a live Postgres container. Unresolved: whether the worker tolerates a short read-only window, and whether the JSONB column types survive codegen.\nWork only from the text above; do not read or edit any files.",
       "assertions": [
         "The plan includes objective, scope, dependencies, risks, validation, explicit success criteria, and a non-empty skills_to_consult list",
         "The result stays at parent-plan level and does not create detailed child plans or require an approval status"
@@ -28,7 +28,7 @@
     },
     {
       "id": 4,
-      "prompt": "Revise this inline plan from the attached feedback. Two comments are unresolved, and I need a traceable result rather than an overwrite.",
+      "prompt": "Revise the plan below from the feedback below it. Two comments are unresolved, and I need a traceable result rather than an overwrite.\n\nPlan: cap request rate on packages/api\n  Objective: reject traffic over a per-route ceiling before it reaches handlers.\n  Tasks: (1) add a token-bucket middleware, (2) make the ceiling configurable per\n  route, (3) return 429 with a Retry-After header, (4) add load-shedding metrics.\n  Success criteria: requests over the limit return 429; the limit is configurable\n  per route; existing routes keep current behaviour; p99 latency unchanged.\n  Validation: unit tests for the bucket, an integration test per route group.\n\nFeedback:\n  1. \"Retry-After is not in the success criteria \u2014 either drop it from the tasks or add the criterion.\"\n  2. \"Unresolved: do we shed load per route or per client? The plan assumes per route without saying so.\"\n  3. \"Unresolved: no criterion covers what happens when the bucket store is unavailable.\"\nWork only from the text above; do not read or edit any files.",
       "assertions": [
         "Every feedback item receives an applied, deferred, rejected, unresolved, or scope-change disposition with rationale",
         "The output preserves the source and returns a distinct revised plan without assigning approval semantics to status"
@@ -36,7 +36,7 @@
     },
     {
       "id": 5,
-      "prompt": "Expand this parent plan into detailed child plans. It has no approval or status field; sequence children that overlap on mutable files.",
+      "prompt": "Expand the parent plan below into detailed child plans. It has no approval or status field; sequence children that overlap on mutable files.\n\nPlan: cap request rate on packages/api\n  Objective: reject traffic over a per-route ceiling before it reaches handlers.\n  Tasks: (1) add a token-bucket middleware, (2) make the ceiling configurable per\n  route, (3) return 429 with a Retry-After header, (4) add load-shedding metrics.\n  Success criteria: requests over the limit return 429; the limit is configurable\n  per route; existing routes keep current behaviour; p99 latency unchanged.\n  Validation: unit tests for the bucket, an integration test per route group.\n  Note: tasks 1 and 4 both edit packages/api/src/middleware/index.ts.\nWork only from the text above; do not read or edit any files.",
       "assertions": [
         "Expansion proceeds from the explicit parent without requiring approval or a particular status value",
         "Children contain roughly five to seven focused tasks and are grouped or sequenced from dependencies and overlapping mutable resources"
@@ -44,7 +44,7 @@
     },
     {
       "id": 6,
-      "prompt": "Resume implementation from provider plan:auth-44 revision a110 after losing the previous session. Use effect apply, complete one actionable child, and stop.",
+      "prompt": "Resume implementation of the plan below after losing the previous session. Complete one actionable child and stop.\n\nPlan: cap request rate on packages/api\n  Objective: reject traffic over a per-route ceiling before it reaches handlers.\n  Tasks: (1) add a token-bucket middleware, (2) make the ceiling configurable per\n  route, (3) return 429 with a Retry-After header, (4) add load-shedding metrics.\n  Success criteria: requests over the limit return 429; the limit is configurable\n  per route; existing routes keep current behaviour; p99 latency unchanged.\n  Validation: unit tests for the bucket, an integration test per route group.\n  Progress so far: task 1 is done and its unit tests pass; tasks 2, 3 and 4 are untouched.",
       "assertions": [
         "The operation reconstructs the explicit provider-native subject, baselines applicable validation, and loads the target's skills before editing",
         "It completes and verifies only one actionable target, reports evidence and remaining work, and does not continue to another child"
@@ -52,7 +52,7 @@
     },
     {
       "id": 7,
-      "prompt": "Update this implementation plan from the supplied task and validation evidence without changing scope.",
+      "prompt": "Update the plan below from the task and validation evidence below it, without changing scope.\n\nPlan: cap request rate on packages/api\n  Objective: reject traffic over a per-route ceiling before it reaches handlers.\n  Tasks: (1) add a token-bucket middleware, (2) make the ceiling configurable per\n  route, (3) return 429 with a Retry-After header, (4) add load-shedding metrics.\n  Success criteria: requests over the limit return 429; the limit is configurable\n  per route; existing routes keep current behaviour; p99 latency unchanged.\n  Validation: unit tests for the bucket, an integration test per route group.\n\nEvidence: task 1 landed in packages/api/src/middleware/rate-limit.ts; its unit tests pass (14 cases). Task 3 landed but returns 429 with no Retry-After header. Tasks 2 and 4 are untouched. Typecheck and lint are green; the integration suite was not run.\nWork only from the text above; do not read or edit any files.",
       "assertions": [
         "Each task and success criterion is compared with concrete implementation or validation evidence",
         "Any status is presented as optional descriptive metadata and is not treated as authorization or a gate"
@@ -60,7 +60,7 @@
     },
     {
       "id": 8,
-      "prompt": "Validate this plan against its explicit success criteria and Definition of Done at commit 8a02. Return the evidence inline.",
+      "prompt": "Validate the plan below against its explicit success criteria and Definition of Done. Return the evidence inline.\n\nPlan: cap request rate on packages/api\n  Objective: reject traffic over a per-route ceiling before it reaches handlers.\n  Tasks: (1) add a token-bucket middleware, (2) make the ceiling configurable per\n  route, (3) return 429 with a Retry-After header, (4) add load-shedding metrics.\n  Success criteria: requests over the limit return 429; the limit is configurable\n  per route; existing routes keep current behaviour; p99 latency unchanged.\n  Validation: unit tests for the bucket, an integration test per route group.\n\nEvidence at commit 8a02: requests over the limit return 429 (integration test passes). The ceiling is a single module-level constant, not per route. Existing route behaviour is covered by the untouched suite, which is green. No latency measurement was taken.\nWork only from the text above; do not read or edit any files.",
       "assertions": [
         "Every criterion receives an independent pass, fail, or blocked result with reproducible evidence and freshness",
         "The operation remains read-only and does not mutate status, claim approval, or treat green tests as sufficient by themselves"
@@ -76,7 +76,7 @@
     },
     {
       "id": 10,
-      "prompt": "Resume provider plan:auth-44 at revision a110 in a new session. The handoff carries two decisions with code anchors, one of which a later decision supersedes. Apply exactly one child and return a handoff for the next role.",
+      "prompt": "Resume the plan below in a new session. The handoff carries two decisions with code anchors, one of which a later decision supersedes. Apply exactly one child and return a handoff for the next role.\n\nPlan: cap request rate on packages/api\n  Objective: reject traffic over a per-route ceiling before it reaches handlers.\n  Tasks: (1) add a token-bucket middleware, (2) make the ceiling configurable per\n  route, (3) return 429 with a Retry-After header, (4) add load-shedding metrics.\n  Success criteria: requests over the limit return 429; the limit is configurable\n  per route; existing routes keep current behaviour; p99 latency unchanged.\n  Validation: unit tests for the bucket, an integration test per route group.\n\nHandoff decisions:\n  A. (packages/api/src/middleware/rate-limit.ts:22) store buckets in process memory \u2014 simplest, and one instance is enough for now.\n  B. (packages/api/src/middleware/rate-limit.ts:22, later) supersedes A: store buckets in Redis, because we now run three instances behind the load balancer.",
       "assertions": [
         "Applies the carried decisions as constraints on target selection and implementation without treating them as evidence, approval, or authority",
         "Uses the superseding decision and keeps the superseded one visible in the history rather than deleting or silently applying it",
@@ -86,7 +86,7 @@
     },
     {
       "id": 11,
-      "prompt": "Independently critique provider plan:782 at revision 9f31. Two decision-context notes are supplied, but I do not want them to bias the initial critique.",
+      "prompt": "Independently critique the plan below. Two decision-context notes follow it, but I do not want them to bias the initial critique.\n\nPlan: cap request rate on packages/api\n  Objective: reject traffic over a per-route ceiling before it reaches handlers.\n  Tasks: (1) add a token-bucket middleware, (2) make the ceiling configurable per\n  route, (3) return 429 with a Retry-After header, (4) add load-shedding metrics.\n  Success criteria: requests over the limit return 429; the limit is configurable\n  per route; existing routes keep current behaviour; p99 latency unchanged.\n  Validation: unit tests for the bucket, an integration test per route group.\n\nDecision-context notes:\n  1. \"We chose per-route ceilings over a global one because the export endpoint needs a much lower cap.\"\n  2. \"We accepted an in-memory bucket store for the first release.\"\nWork only from the text above; do not read or edit any files.",
       "assertions": [
         "The critique first evaluates the pinned plan and criteria without author context, preserving its initial findings.",
         "It then resolves the supplied context in a second pass and reports whether each finding was confirmed, changed, or added without treating context as evidence."
