@@ -27,7 +27,7 @@ const repositoryFixture = (
 
 describe("moon-skill-validate-drift", () => {
   beforeEach(() => {
-    vi.spyOn(console, "log").mockImplementation(() => undefined);
+    vi.spyOn(console, "log").mockImplementation(() => {});
   });
 
   afterEach(() => {

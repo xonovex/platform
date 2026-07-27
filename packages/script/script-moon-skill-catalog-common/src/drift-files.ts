@@ -3,8 +3,6 @@ import {join, relative, sep} from "node:path";
 import type {BudgetedFile} from "@xonovex/script-moon-common/drift-budgets";
 import {isDirectory, isFile} from "@xonovex/script-moon-common/fs";
 
-const MARKDOWN_RE = /\.md$/;
-
 const readDirectory = (path: string): readonly string[] =>
   isDirectory(path) ? readdirSync(path).toSorted() : [];
 
@@ -35,7 +33,7 @@ export const collectGuideFiles = (
 ): readonly BudgetedFile[] => [
   ...readBudgeted(repositoryRoot, join(guideDirectory, "SKILL.md"), "skill"),
   ...readDirectory(join(guideDirectory, "references"))
-    .filter((entry) => MARKDOWN_RE.test(entry))
+    .filter((entry) => entry.endsWith(".md"))
     .flatMap((entry) =>
       readBudgeted(
         repositoryRoot,
@@ -75,7 +73,7 @@ export const collectCommandPackageFiles = (
   repositoryRoot: string,
 ): readonly BudgetedFile[] =>
   readDirectory(join(packageDirectory, "commands"))
-    .filter((entry) => MARKDOWN_RE.test(entry))
+    .filter((entry) => entry.endsWith(".md"))
     .flatMap((entry) =>
       readBudgeted(
         repositoryRoot,

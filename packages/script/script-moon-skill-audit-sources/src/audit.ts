@@ -164,7 +164,7 @@ const fetchStatusOnce = async (
     if (code === 404) {
       return {status: "missing", detail: `HTTP ${String(code)}`};
     }
-    if (code === 401 || code === 403 || code === 429) {
+    if ([401, 403, 429].includes(code)) {
       return {status: "restricted", detail};
     }
     if (!code || code >= 400) return {status: "error", detail};
@@ -360,6 +360,99 @@ const computeDrift = (
   return report;
 };
 
+// AuditContext carries the settings every source of one skill is audited against.
+interface AuditContext {
+  readonly existingRefs: ReadonlySet<string>;
+  readonly workspaceRoot: string;
+  readonly maxAge: number;
+  readonly versionMaxAge: number;
+  readonly doFetch: boolean;
+  readonly pull: boolean;
+  readonly today: Date;
+}
+
+// auditSource reports one source entry and counts the problems it carries.
+const auditSource = async (
+  s: Source,
+  context: AuditContext,
+): Promise<{readonly report: SourceReport; readonly problems: number}> => {
+  const {
+    existingRefs,
+    workspaceRoot,
+    maxAge,
+    versionMaxAge,
+    doFetch,
+    pull,
+    today,
+  } = context;
+  let problems = 0;
+  const age = s.reviewed ? daysBetween(today, s.reviewed) : null;
+  const reviewMaxAge = s.version === undefined ? maxAge : versionMaxAge;
+  const stale = age !== null && age > reviewMaxAge;
+  const referenceMappingMissing = !hasReferenceMapping(s);
+  const driftAnchorMissing =
+    s.version !== undefined &&
+    s.urls.length > 0 &&
+    s.contentSha256 === undefined &&
+    !(
+      s.checkout !== undefined &&
+      s.commit !== undefined &&
+      s.watches.length > 0
+    );
+  const dangling = [...s.refs].filter((r) => !existingRefs.has(r)).toSorted();
+  const report: SourceReport = {
+    title: s.title,
+    url: s.url,
+    urls: s.urls,
+    provenance: s.provenance,
+    last_reviewed: s.reviewedRaw ?? null,
+    age_days: age,
+    review_max_age_days: reviewMaxAge,
+    stale,
+    refs: [...s.refs].toSorted(),
+    covers_all_references: s.coversAllReferences,
+    reference_mapping_missing: referenceMappingMissing,
+    dangling_refs: dangling,
+    version: s.version ?? null,
+    commit: s.commit ?? null,
+    watch_count: s.watches.length,
+    content_sha256: s.contentSha256 ?? null,
+    fetched_content_sha256: null,
+    content_changed: false,
+    drift_anchor_missing: driftAnchorMissing,
+  };
+  if (age === null || stale || dangling.length > 0) {
+    problems += 1;
+  }
+  if (referenceMappingMissing) problems += 1;
+  if (driftAnchorMissing) problems += 1;
+  if (doFetch && s.urls.length > 0) {
+    const fetches = await Promise.all(s.urls.map((url) => fetchStatus(url)));
+    report.fetch = fetches[0];
+    report.fetches = fetches;
+    problems += fetches.filter(
+      (fetch) => fetch.status !== "ok" && fetch.status !== "restricted",
+    ).length;
+    report.fetched_content_sha256 = aggregateContentSha256(s.urls, fetches);
+    if (s.contentSha256 !== undefined) {
+      if (report.fetched_content_sha256 === null) {
+        problems += 1;
+      } else if (report.fetched_content_sha256 !== s.contentSha256) {
+        report.content_changed = true;
+        problems += 1;
+      }
+    }
+  }
+  if (s.checkout !== undefined) {
+    const drift = computeDrift(workspaceRoot, s, pull);
+    report.drift = drift;
+    if (drift.pull_failed || drift.behind || drift.commit_count > 0) {
+      problems += 1;
+    }
+  }
+  return {problems, report};
+};
+
 const auditSkill = async (
   sourcesFile: string,
   maxAge: number,
@@ -374,80 +467,27 @@ const auditSkill = async (
   const sources = parseSources(text);
 
   const existingRefs = listExistingRefs(skillDir);
-  const covered = new Set<string>();
+  const context: AuditContext = {
+    doFetch,
+    existingRefs,
+    maxAge,
+    pull,
+    today,
+    versionMaxAge,
+    workspaceRoot,
+  };
 
+  const covered = new Set<string>();
   const srcReports: SourceReport[] = [];
   let problems = 0;
   for (const s of sources) {
-    const age = s.reviewed ? daysBetween(today, s.reviewed) : null;
-    const reviewMaxAge = s.version === undefined ? maxAge : versionMaxAge;
-    const stale = age !== null && age > reviewMaxAge;
-    const referenceMappingMissing = !hasReferenceMapping(s);
-    const driftAnchorMissing =
-      s.version !== undefined &&
-      s.urls.length > 0 &&
-      s.contentSha256 === undefined &&
-      !(
-        s.checkout !== undefined &&
-        s.commit !== undefined &&
-        s.watches.length > 0
-      );
-    const dangling = [...s.refs].filter((r) => !existingRefs.has(r)).toSorted();
+    const audited = await auditSource(s, context);
+    problems += audited.problems;
     for (const r of s.refs) covered.add(r);
-    const report: SourceReport = {
-      title: s.title,
-      url: s.url,
-      urls: s.urls,
-      provenance: s.provenance,
-      last_reviewed: s.reviewedRaw ?? null,
-      age_days: age,
-      review_max_age_days: reviewMaxAge,
-      stale,
-      refs: [...s.refs].toSorted(),
-      covers_all_references: s.coversAllReferences,
-      reference_mapping_missing: referenceMappingMissing,
-      dangling_refs: dangling,
-      version: s.version ?? null,
-      commit: s.commit ?? null,
-      watch_count: s.watches.length,
-      content_sha256: s.contentSha256 ?? null,
-      fetched_content_sha256: null,
-      content_changed: false,
-      drift_anchor_missing: driftAnchorMissing,
-    };
     if (s.coversAllReferences) {
       for (const reference of existingRefs) covered.add(reference);
     }
-    if (age === null || stale || dangling.length > 0) {
-      problems += 1;
-    }
-    if (referenceMappingMissing) problems += 1;
-    if (driftAnchorMissing) problems += 1;
-    if (doFetch && s.urls.length > 0) {
-      const fetches = await Promise.all(s.urls.map((url) => fetchStatus(url)));
-      report.fetch = fetches[0];
-      report.fetches = fetches;
-      problems += fetches.filter(
-        (fetch) => fetch.status !== "ok" && fetch.status !== "restricted",
-      ).length;
-      report.fetched_content_sha256 = aggregateContentSha256(s.urls, fetches);
-      if (s.contentSha256 !== undefined) {
-        if (report.fetched_content_sha256 === null) {
-          problems += 1;
-        } else if (report.fetched_content_sha256 !== s.contentSha256) {
-          report.content_changed = true;
-          problems += 1;
-        }
-      }
-    }
-    if (s.checkout !== undefined) {
-      const drift = computeDrift(workspaceRoot, s, pull);
-      report.drift = drift;
-      if (drift.pull_failed || drift.behind || drift.commit_count > 0) {
-        problems += 1;
-      }
-    }
-    srcReports.push(report);
+    srcReports.push(audited.report);
   }
 
   const uncovered = [...existingRefs].filter((r) => !covered.has(r)).toSorted();

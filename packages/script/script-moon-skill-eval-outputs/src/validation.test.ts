@@ -138,7 +138,9 @@ describe("transient failure retry", () => {
     const result = await runWithTransientRetry(
       () => Promise.resolve({error: null, value: "ok"}),
       3,
-      (attempt) => attempts.push(attempt),
+      (attempt) => {
+        attempts.push(attempt);
+      },
     );
 
     expect(result).toEqual({error: null, value: "ok"});
@@ -154,7 +156,9 @@ describe("transient failure retry", () => {
     const result = await runWithTransientRetry(
       () => Promise.resolve(outcomes.shift() ?? {error: "exhausted"}),
       3,
-      (_attempt, error) => retried.push(error),
+      (_attempt, error) => {
+        retried.push(error);
+      },
     );
 
     expect(result).toEqual({error: null});
@@ -169,7 +173,7 @@ describe("transient failure retry", () => {
         return Promise.resolve({error: `timeout ${String(runs)}`});
       },
       3,
-      () => undefined,
+      () => {},
     );
 
     expect(runs).toBe(3);
@@ -359,10 +363,10 @@ describe("numeric option validation", () => {
       timeout: "1",
     });
 
-    expect(result.success).toBe(true);
-    if (result.success) {
-      expect(result.data.maxTurns).toBe(GENERATION_MAX_TURNS);
-    }
+    expect(result).toMatchObject({
+      data: {maxTurns: GENERATION_MAX_TURNS},
+      success: true,
+    });
   });
 
   it.each([

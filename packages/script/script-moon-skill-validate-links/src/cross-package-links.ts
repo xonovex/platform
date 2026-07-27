@@ -301,6 +301,131 @@ const checkSkillPackage = (
   };
 };
 
+// readPackageDependencies returns a skill package's dependencies, or undefined
+// when package.json is unreadable or its dependencies are not a string map.
+const readPackageDependencies = (
+  packagePath: string,
+  repoRoot: string,
+  report: LinkReport,
+): Readonly<Record<string, string>> | undefined => {
+  try {
+    const packageJson = JSON.parse(
+      readFileSync(packagePath, "utf8"),
+    ) as unknown;
+    if (isRecord(packageJson) && isStringRecord(packageJson.dependencies)) {
+      return packageJson.dependencies;
+    }
+    if (isRecord(packageJson) && packageJson.dependencies === undefined) {
+      return {};
+    }
+    report.addFail(
+      `skill dependencies: ${relative(repoRoot, packagePath)} dependencies must map package names to versions`,
+    );
+  } catch (error) {
+    report.addFail(
+      `skill dependencies: cannot read ${relative(repoRoot, packagePath)}: ${error instanceof Error ? error.message : String(error)}`,
+    );
+  }
+  return undefined;
+};
+
+// checkDependencyVersion verifies a dependent pins the exact version the
+// dependency's own package.json declares.
+const checkDependencyVersion = (
+  manifestName: string,
+  dependency: string,
+  npmDependency: string,
+  declaredVersion: string,
+  repoRoot: string,
+  report: LinkReport,
+): boolean => {
+  const dependencyPackagePath = join(
+    repoRoot,
+    "packages",
+    "skill",
+    dependency.replace(/^xonovex-/u, ""),
+    "package.json",
+  );
+  try {
+    const dependencyPackage = JSON.parse(
+      readFileSync(dependencyPackagePath, "utf8"),
+    ) as unknown;
+    const expectedVersion =
+      isRecord(dependencyPackage) &&
+      typeof dependencyPackage.version === "string"
+        ? dependencyPackage.version
+        : undefined;
+    if (expectedVersion === undefined) {
+      report.addFail(
+        `skill dependencies: ${relative(repoRoot, dependencyPackagePath)} needs a string version`,
+      );
+      return false;
+    }
+    if (declaredVersion !== expectedVersion) {
+      report.addFail(
+        `skill dependencies: ${manifestName} pins ${npmDependency}@${declaredVersion}; expected exact installed version ${expectedVersion}`,
+      );
+      return false;
+    }
+    return true;
+  } catch (error) {
+    report.addFail(
+      `skill dependencies: cannot read ${relative(repoRoot, dependencyPackagePath)}: ${error instanceof Error ? error.message : String(error)}`,
+    );
+    return false;
+  }
+};
+
+// checkManifestDependency verifies one plugin-manifest dependency resolves, is
+// pinned in package.json, and shares reference surface with its dependent.
+const checkManifestDependency = (
+  manifest: SkillPluginManifest,
+  dependency: string,
+  packageDependencies: Readonly<Record<string, string>> | undefined,
+  manifests: ReadonlyMap<string, SkillPluginManifest>,
+  surfaces: ReadonlyMap<string, SkillPackageSurface>,
+  repoRoot: string,
+  report: LinkReport,
+): boolean => {
+  if (!manifests.has(dependency)) {
+    report.addFail(
+      `skill dependencies: ${manifest.name} depends on missing ${dependency}`,
+    );
+    return false;
+  }
+  const npmDependency = `@xonovex/${dependency.replace(/^xonovex-/u, "")}`;
+  const declaredVersion = packageDependencies?.[npmDependency];
+  let valid: boolean;
+  if (declaredVersion === undefined) {
+    valid = false;
+    report.addFail(
+      `skill dependencies: ${manifest.name} declares ${dependency} in its plugin manifests but omits ${npmDependency} from package.json`,
+    );
+  } else {
+    valid = checkDependencyVersion(
+      manifest.name,
+      dependency,
+      npmDependency,
+      declaredVersion,
+      repoRoot,
+      report,
+    );
+  }
+  const sourceSurface = surfaces.get(manifest.name);
+  const targetSurface = surfaces.get(dependency);
+  if (sourceSurface !== undefined && targetSurface !== undefined) {
+    valid =
+      checkDependencyReferenceOverlap(
+        manifest.name,
+        dependency,
+        sourceSurface,
+        targetSurface,
+        report,
+      ) && valid;
+  }
+  return valid;
+};
+
 const checkDeclaredDependencies = (
   manifests: ReadonlyMap<string, SkillPluginManifest>,
   surfaces: ReadonlyMap<string, SkillPackageSurface>,
@@ -316,30 +441,12 @@ const checkDeclaredDependencies = (
       manifest.name.replace(/^xonovex-/u, ""),
       "package.json",
     );
-    let packageDependencies: Readonly<Record<string, string>> | undefined;
-    try {
-      const packageJson = JSON.parse(
-        readFileSync(packagePath, "utf8"),
-      ) as unknown;
-      if (isRecord(packageJson) && isStringRecord(packageJson.dependencies)) {
-        packageDependencies = packageJson.dependencies;
-      } else if (
-        isRecord(packageJson) &&
-        packageJson.dependencies === undefined
-      ) {
-        packageDependencies = {};
-      } else {
-        valid = false;
-        report.addFail(
-          `skill dependencies: ${relative(repoRoot, packagePath)} dependencies must map package names to versions`,
-        );
-      }
-    } catch (error) {
-      valid = false;
-      report.addFail(
-        `skill dependencies: cannot read ${relative(repoRoot, packagePath)}: ${error instanceof Error ? error.message : String(error)}`,
-      );
-    }
+    const packageDependencies = readPackageDependencies(
+      packagePath,
+      repoRoot,
+      report,
+    );
+    if (packageDependencies === undefined) valid = false;
     for (const npmDependency of Object.keys(packageDependencies ?? {}).filter(
       (dependency) => dependency.startsWith("@xonovex/skill-"),
     )) {
@@ -352,67 +459,16 @@ const checkDeclaredDependencies = (
       }
     }
     for (const dependency of manifest.dependencies) {
-      if (!manifests.has(dependency)) {
-        valid = false;
-        report.addFail(
-          `skill dependencies: ${manifest.name} depends on missing ${dependency}`,
-        );
-        continue;
-      }
-      const npmDependency = `@xonovex/${dependency.replace(/^xonovex-/u, "")}`;
-      const declaredVersion = packageDependencies?.[npmDependency];
-      if (declaredVersion === undefined) {
-        valid = false;
-        report.addFail(
-          `skill dependencies: ${manifest.name} declares ${dependency} in its plugin manifests but omits ${npmDependency} from package.json`,
-        );
-      } else {
-        const dependencyPackagePath = join(
+      valid =
+        checkManifestDependency(
+          manifest,
+          dependency,
+          packageDependencies,
+          manifests,
+          surfaces,
           repoRoot,
-          "packages",
-          "skill",
-          dependency.replace(/^xonovex-/u, ""),
-          "package.json",
-        );
-        try {
-          const dependencyPackage = JSON.parse(
-            readFileSync(dependencyPackagePath, "utf8"),
-          ) as unknown;
-          const expectedVersion =
-            isRecord(dependencyPackage) &&
-            typeof dependencyPackage.version === "string"
-              ? dependencyPackage.version
-              : undefined;
-          if (expectedVersion === undefined) {
-            valid = false;
-            report.addFail(
-              `skill dependencies: ${relative(repoRoot, dependencyPackagePath)} needs a string version`,
-            );
-          } else if (declaredVersion !== expectedVersion) {
-            valid = false;
-            report.addFail(
-              `skill dependencies: ${manifest.name} pins ${npmDependency}@${declaredVersion}; expected exact installed version ${expectedVersion}`,
-            );
-          }
-        } catch (error) {
-          valid = false;
-          report.addFail(
-            `skill dependencies: cannot read ${relative(repoRoot, dependencyPackagePath)}: ${error instanceof Error ? error.message : String(error)}`,
-          );
-        }
-      }
-      const sourceSurface = surfaces.get(manifest.name);
-      const targetSurface = surfaces.get(dependency);
-      if (sourceSurface !== undefined && targetSurface !== undefined) {
-        valid =
-          checkDependencyReferenceOverlap(
-            manifest.name,
-            dependency,
-            sourceSurface,
-            targetSurface,
-            report,
-          ) && valid;
-      }
+          report,
+        ) && valid;
     }
   }
   return valid;

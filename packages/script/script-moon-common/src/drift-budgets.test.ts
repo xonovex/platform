@@ -16,6 +16,9 @@ const file = (path: string, text: string, kind = "reference" as const) => ({
   text,
 });
 
+const words = (count: number) =>
+  Array.from({length: count}, () => "word").join(" ");
+
 describe("drift budgets", () => {
   it("counts prose words and excludes fenced code", () => {
     expect(countProseWords("one two three")).toBe(3);
@@ -51,9 +54,6 @@ describe("drift budgets", () => {
   });
 
   it("caps each kind separately", () => {
-    const words = (count: number) =>
-      Array.from({length: count}, () => "word").join(" ");
-
     const findings = evaluateBudgets(
       [
         {kind: "command", path: "c.md", text: words(260)},
@@ -69,7 +69,7 @@ describe("drift budgets", () => {
     const manifest = seedBudgets([
       file("b.md", "one two"),
       file("a.md", "one"),
-      file("empty.md", "   "),
+      file("empty.md", " ".repeat(3)),
     ]);
 
     expect(Object.keys(manifest)).toEqual(["a.md", "b.md"]);

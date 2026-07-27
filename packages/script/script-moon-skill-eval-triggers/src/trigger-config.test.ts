@@ -11,6 +11,13 @@ const query = (name: string, split: "train" | "validation" = "train") => ({
   split,
 });
 
+const negative = (name: string) => ({
+  query: name,
+  should_trigger: false,
+  rationale: "near miss",
+  split: "train" as const,
+});
+
 type TriggerConfigResult = ReturnType<typeof resolveTriggerConfig>;
 const defaultEnvironment = {PLUGIN_DIR: "plugin"} as const;
 
@@ -260,13 +267,6 @@ describe("trigger configuration", () => {
     }
     return catalogRoot;
   };
-
-  const negative = (name: string) => ({
-    query: name,
-    should_trigger: false,
-    rationale: "near miss",
-    split: "train" as const,
-  });
 
   it("leaves a query another catalog skill owns to the routing evaluator", () => {
     writeFileSync(

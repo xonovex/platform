@@ -109,9 +109,11 @@ describe("main", () => {
       import.meta.dirname,
       "../../../skill/skill-skill/skill-guide/scripts/audit-sources.py",
     );
-    const portableResult = spawnSync("uv", ["run", portable, skill, "--json"], {
-      encoding: "utf8",
-    });
+    const portableResult = spawnSync(
+      resolveExecutable("uv"),
+      ["run", portable, skill, "--json"],
+      {encoding: "utf8"},
+    );
     const portableReport = JSON.parse(
       portableResult.stdout,
     ) as typeof canonical;

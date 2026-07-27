@@ -83,9 +83,7 @@ const validateArgumentParity = (
       ),
     );
   }
-  for (const name of [...document.documentedArguments].filter(
-    (argument) => !hinted.has(argument),
-  )) {
+  for (const name of document.documentedArguments.difference(hinted)) {
     issues.push(
       issue(
         "command.argument-missing-hint",

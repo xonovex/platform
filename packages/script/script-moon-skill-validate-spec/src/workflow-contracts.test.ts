@@ -148,11 +148,9 @@ describe("workflow composition contracts", () => {
       "references/decide.md",
       "references/publish.md",
     ].filter((file) =>
-      /untrusted data/u.test(
-        readRepositoryFile(
-          `packages/skill/skill-workflow/workflow-guide/${file}`,
-        ),
-      ),
+      readRepositoryFile(
+        `packages/skill/skill-workflow/workflow-guide/${file}`,
+      ).includes("untrusted data"),
     );
 
     expect(restating).toEqual([]);

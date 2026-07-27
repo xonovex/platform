@@ -47,7 +47,9 @@ const stringArray = (value: unknown): readonly string[] | undefined =>
     : undefined;
 
 const section = (body: string, heading: string): string => {
-  const startMatch = new RegExp(`^## ${heading}\\s*$`, "mu").exec(body);
+  const startMatch = new RegExp(String.raw`^## ${heading}\s*$`, "mu").exec(
+    body,
+  );
   if (startMatch === null) return "";
   const rest = body.slice(startMatch.index + startMatch[0].length);
   const nextHeading = /^## /mu.exec(rest);
@@ -60,9 +62,10 @@ const documentedArguments = (body: string): ReadonlySet<string> => {
     if (!/^\s*-\s+/u.test(line)) continue;
     const separator = line.indexOf(":");
     const modifier = /\s+\((?:optional|required|repeatable)\b/iu.exec(line);
-    const end = [separator, modifier?.index ?? -1]
-      .filter((index) => index >= 0)
-      .toSorted((left, right) => left - right)[0];
+    const boundaries = [separator, modifier?.index ?? -1].filter(
+      (index) => index >= 0,
+    );
+    const end = boundaries.length === 0 ? undefined : Math.min(...boundaries);
     const declaration = end === undefined ? line : line.slice(0, end);
     for (const match of declaration.matchAll(/`([^`]+)`/gu)) {
       const raw = match[1]?.trim();

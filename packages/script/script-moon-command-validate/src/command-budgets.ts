@@ -12,8 +12,6 @@ import {issue, type ValidationIssue} from "./validation.js";
 
 export const BUDGET_MANIFEST_FILE = "budgets.json";
 
-const MARKDOWN_RE = /\.md$/;
-
 // commandFiles reads every command document as a budgeted file keyed by its
 // repository-relative path, matching the manifest written by moon-skill-validate-drift.
 export const commandFiles = (
@@ -24,7 +22,7 @@ export const commandFiles = (
   if (!isDirectory(commandDirectory)) return [];
   return readdirSync(commandDirectory)
     .toSorted()
-    .filter((entry) => MARKDOWN_RE.test(entry))
+    .filter((entry) => entry.endsWith(".md"))
     .map((entry) => join(commandDirectory, entry))
     .filter((path) => isFile(path))
     .map((path) => ({

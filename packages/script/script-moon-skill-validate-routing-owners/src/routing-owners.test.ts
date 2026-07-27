@@ -46,7 +46,7 @@ const query = (text: string, shouldTrigger: boolean) => ({
 
 describe("routing owners check", () => {
   it("renders help without reading a catalog", () => {
-    const log = vi.spyOn(console, "log").mockImplementation(() => undefined);
+    const log = vi.spyOn(console, "log").mockImplementation(() => {});
 
     expect(main(["--help"])).toBe(0);
     expect(log.mock.calls.at(0)?.at(0)).toContain(
@@ -64,7 +64,7 @@ describe("routing owners check", () => {
   });
 
   it("passes when every skill owns a validation routing scenario", () => {
-    const log = vi.spyOn(console, "log").mockImplementation(() => undefined);
+    const log = vi.spyOn(console, "log").mockImplementation(() => {});
     const root = writeCatalog([
       {
         name: "owner",
@@ -81,7 +81,7 @@ describe("routing owners check", () => {
   });
 
   it("reports a skill whose only pairing was stripped", () => {
-    const log = vi.spyOn(console, "log").mockImplementation(() => undefined);
+    const log = vi.spyOn(console, "log").mockImplementation(() => {});
     const root = writeCatalog([
       {name: "owner", queries: [query("unpaired routing query", true)]},
       {name: "rival", queries: [query("a query nobody else carries", true)]},

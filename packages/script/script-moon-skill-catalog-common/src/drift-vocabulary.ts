@@ -17,7 +17,7 @@ export interface VocabularyFinding {
   readonly message: string;
 }
 
-const FENCED_BLOCK_RE = /^```[\s\S]*?^```[^\S\n]*$/gm;
+const FENCED_BLOCK_RE = /^```[\s\S]+?^```[^\S\n]*$/gm;
 const HEADING_RE = /^#{1,6}[^\S\n]+(.+?)[^\S\n]*$/gm;
 const BOLD_DEFINITION_RE = /\*\*(.+?)\*\*\s*(?:—|-{1,2}|:|is\b|means\b)/g;
 // A coined term of art is a phrase or hyphenated compound. A single bare token

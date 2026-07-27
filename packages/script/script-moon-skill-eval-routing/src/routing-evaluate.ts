@@ -15,8 +15,8 @@ import {
   type TriggerOutcome,
 } from "@xonovex/script-moon-skill-eval-common/trigger-process";
 import {
-  buildTriggerClaudeArgs,
   buildIsolatedCodexArgs,
+  buildTriggerClaudeArgs,
   MAX_TRIGGER_MODEL_RUNS,
   parseQuerySplit,
   parseTriggerOptions,

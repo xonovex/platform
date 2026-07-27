@@ -37,12 +37,12 @@ export interface BudgetedFile {
   readonly text: string;
 }
 
-const FENCED_BLOCK_RE = /^```[\s\S]*?^```[^\S\n]*$/gm;
+const FENCED_BLOCK_RE = /^```[\s\S]+?^```[^\S\n]*$/gm;
 
 // countProseWords measures rendered prose: fenced code is excluded so that
 // examples do not consume a file's word budget.
 export const countProseWords = (text: string): number => {
-  const prose = text.replace(FENCED_BLOCK_RE, "");
+  const prose = text.replaceAll(FENCED_BLOCK_RE, "");
   return prose.split(/\s+/u).filter((token) => token.length > 0).length;
 };
 

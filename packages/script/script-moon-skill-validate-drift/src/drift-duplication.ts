@@ -12,8 +12,8 @@ export interface DuplicationFinding {
 
 // A normative sentence states a rule; only those are worth de-duplicating.
 const NORMATIVE_RE =
-  /\b(must|never|always|require[sd]?|shall|may not|cannot|do not|don't)\b/i;
-const FENCED_BLOCK_RE = /^```[\s\S]*?^```[^\S\n]*$/gm;
+  /\b(?:must|never|always|require[sd]?|shall|may not|cannot|do not|don't)\b/i;
+const FENCED_BLOCK_RE = /^```[\s\S]+?^```[^\S\n]*$/gm;
 const SENTENCE_SPLIT_RE = /(?<=[.!?])\s+|\n{2,}/;
 
 export const DUPLICATION_SIMILARITY_THRESHOLD = 0.75;
