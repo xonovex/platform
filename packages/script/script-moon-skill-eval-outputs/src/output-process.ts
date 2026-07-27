@@ -112,6 +112,8 @@ const codexAgentMessage = (value: unknown): string => {
     : "";
 };
 
+export const GENERATION_OUTPUT_LIMIT = 10_000;
+
 const runHarness = (
   harness: "claude" | "codex",
   args: readonly string[],
@@ -314,7 +316,11 @@ const generate = async (
     prompt,
     cwd,
     timeout * 1000,
-    10_000,
+    // Codex bounds a generation by wall clock alone, so a character ceiling is what
+    // stops a runaway answer there. Claude already carries a per-run spend cap and a
+    // turn cap, which bound it sooner; applying the ceiling as well only discards an
+    // answer for being long, and length is what a thorough skill produces.
+    context.harness === "codex" ? GENERATION_OUTPUT_LIMIT : null,
     expectSkill && context.harness === "codex"
       ? context.guideDirectory
       : undefined,

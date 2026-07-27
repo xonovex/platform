@@ -3,7 +3,11 @@ import {
   buildEvaluationPrompt,
   resolveEvaluationConfig,
 } from "./evaluation-config.js";
-import {runJob, type RunContext} from "./output-process.js";
+import {
+  GENERATION_OUTPUT_LIMIT,
+  runJob,
+  type RunContext,
+} from "./output-process.js";
 import {aggregateArm, fmean, round, type JobRecord} from "./output-results.js";
 import {
   evaluateOutputGate,
@@ -184,7 +188,8 @@ export const main = async (argv: readonly string[]): Promise<number> => {
     config.harness === "claude"
       ? `generation=$${String(config.budget)}/${String(config.maxTurns)} turns  ` +
         `judge=$${String(config.judgeBudget)}/1 turn  `
-      : `generation-timeout=${String(config.timeout)}s  output-limit=10000 chars  `;
+      : `generation-timeout=${String(config.timeout)}s  ` +
+        `output-limit=${String(GENERATION_OUTPUT_LIMIT)} chars  `;
   process.stderr.write(
     `skill: ${config.skillName}  evals: ${String(config.evaluations.length)}  ` +
       `runs/arm: ${String(config.runs)}  concurrency: ${String(config.concurrency)}  ` +
