@@ -24,9 +24,6 @@
       "path": "./packages/config/vitest-config-node"
     },
     {
-      "path": "./packages/script/script-moon-action-graph"
-    },
-    {
       "path": "./packages/script/script-moon-command-validate"
     },
     {
