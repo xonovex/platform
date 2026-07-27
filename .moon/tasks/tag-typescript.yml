@@ -70,7 +70,7 @@ tasks:
       cache: false
       runInCI: false
   ts-format:
-    script: npx prettier --write .
+    script: npx prettier --write . --ignore-path "$workspaceRoot/.prettierignore"
     inputs:
       - "@globs(sources)"
       - "@globs(tests)"
@@ -82,7 +82,7 @@ tasks:
       cache: false
       runInCI: false
   ts-format-check:
-    script: npx prettier --check .
+    script: npx prettier --check . --ignore-path "$workspaceRoot/.prettierignore"
     inputs:
       - "@globs(sources)"
       - "@globs(tests)"
