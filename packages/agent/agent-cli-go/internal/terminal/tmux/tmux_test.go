@@ -2,7 +2,6 @@ package tmux
 
 import (
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -189,24 +188,32 @@ func TestBuildShellCommand(t *testing.T) {
 	}
 }
 
-func TestExecutor_IsAvailable(t *testing.T) {
-	e := NewExecutor()
-	available := e.IsAvailable()
+func TestExecutorIsAvailableWhenTmuxResolves(t *testing.T) {
+	installFakeTmux(t, false)
 
-	// Check if tmux is actually installed
-	_, err := exec.LookPath("tmux")
-	expected := err == nil
-
-	if available != expected {
-		t.Errorf("IsAvailable() = %v, want %v", available, expected)
+	if !NewExecutor().IsAvailable() {
+		t.Error("IsAvailable() = false, want true when tmux resolves on PATH")
 	}
 }
 
-func TestExecutor_IsInside(t *testing.T) {
-	e := NewExecutor()
-	// This test just verifies the method runs without error
-	// The actual result depends on the test environment
-	_ = e.IsInside()
+func TestExecutorIsUnavailableWhenTmuxDoesNotResolve(t *testing.T) {
+	t.Setenv("PATH", t.TempDir())
+
+	if NewExecutor().IsAvailable() {
+		t.Error("IsAvailable() = true, want false when tmux does not resolve on PATH")
+	}
+}
+
+func TestExecutorIsInsideReadsTheTmuxEnvironment(t *testing.T) {
+	t.Setenv("TMUX", "")
+	if NewExecutor().IsInside() {
+		t.Error("IsInside() = true, want false when TMUX is empty")
+	}
+
+	t.Setenv("TMUX", "/tmp/tmux-1000/default,123,0")
+	if !NewExecutor().IsInside() {
+		t.Error("IsInside() = false, want true when TMUX is set")
+	}
 }
 
 func TestExecutorExecuteKeepsEnvironmentOutOfTmuxArguments(t *testing.T) {
