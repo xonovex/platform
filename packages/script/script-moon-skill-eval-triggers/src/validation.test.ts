@@ -6,6 +6,7 @@ import {
   parseTriggerOptions,
   selectQueries,
   streamTextDeltaLength,
+  TRIGGER_MAX_TURNS,
   triggerModelRunCount,
 } from "./validation.js";
 
@@ -125,8 +126,11 @@ describe("trigger process isolation", () => {
     expect(args).toContain("--no-session-persistence");
     expect(args).toContain("--max-budget-usd");
     expect(args).toContain("0.05");
-    expect(args).toContain("--max-turns");
-    expect(args).toContain("1");
+    const turnsIndex = args.indexOf("--max-turns");
+    expect(args.slice(turnsIndex, turnsIndex + 2)).toEqual([
+      "--max-turns",
+      String(TRIGGER_MAX_TURNS),
+    ]);
     expect(args).not.toContain("Read");
     expect(args).not.toContain("Bash");
     expect(args.filter((argument) => argument === "--plugin-dir")).toHaveLength(

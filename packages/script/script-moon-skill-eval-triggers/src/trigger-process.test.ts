@@ -49,27 +49,58 @@ console.log(JSON.stringify({type: "system", subtype: "init", skills: ["plugin:te
 console.log(JSON.stringify({message: {content: [{type: "tool_use", name: "Skill", input: {skill: "test-skill"}}]}}));
 `);
 
-    expect(outcome).toEqual({triggered: true, error: null});
+    expect(outcome).toEqual({triggered: true, error: null, selected: "target"});
   });
 
-  it("scores a competing skill invocation as a non-trigger", async () => {
+  it("scores a competing skill that the harness launched as a non-trigger", async () => {
     const outcome = await runNode(`
 console.log(JSON.stringify({type: "system", subtype: "init", skills: ["plugin:test-skill"]}));
 console.log(JSON.stringify({message: {content: [{type: "tool_use", name: "Skill", input: {skill: "other-skill"}}]}}));
-process.exit(1);
+console.log(JSON.stringify({message: {content: [{type: "tool_result", content: "Launching skill: other-skill"}]}}));
+setInterval(() => {}, 1000);
 `);
 
-    expect(outcome).toEqual({triggered: false, error: null});
+    expect(outcome).toEqual({
+      triggered: false,
+      error: null,
+      selected: "competitor:other-skill",
+    });
+  });
+
+  it("does not settle the run when the harness cannot resolve the skill name", async () => {
+    const outcome = await runNode(`
+console.log(JSON.stringify({type: "system", subtype: "init", skills: ["plugin:test-skill"]}));
+console.log(JSON.stringify({message: {content: [{type: "tool_use", name: "Skill", input: {skill: "plugin"}}]}}));
+console.log(JSON.stringify({message: {content: [{type: "tool_result", is_error: true, content: "<tool_use_error>Unknown skill: plugin</tool_use_error>"}]}}));
+console.log(JSON.stringify({message: {content: [{type: "tool_use", name: "Skill", input: {skill: "test-skill"}}]}}));
+`);
+
+    expect(outcome).toEqual({triggered: true, error: null, selected: "target"});
+  });
+
+  it("scores an unresolved skill name that is never corrected as a clean negative", async () => {
+    const outcome = await runNode(`
+console.log(JSON.stringify({type: "system", subtype: "init", skills: ["plugin:test-skill"]}));
+console.log(JSON.stringify({message: {content: [{type: "tool_use", name: "Skill", input: {skill: "plugin"}}]}}));
+console.log(JSON.stringify({message: {content: [{type: "tool_result", is_error: true, content: "<tool_use_error>Unknown skill: plugin</tool_use_error>"}]}}));
+`);
+
+    expect(outcome).toEqual({triggered: false, error: null, selected: "none"});
   });
 
   it("scores a denied competing skill invocation as a non-trigger", async () => {
     const outcome = await runNode(`
 console.log(JSON.stringify({type: "system", subtype: "init", skills: ["plugin:test-skill"]}));
 console.log(JSON.stringify({permission_denials: [{tool_name: "Skill", tool_input: {skill: "other-skill"}}]}));
-process.exit(1);
+console.log(JSON.stringify({message: {content: [{type: "tool_result", content: "Launching skill: other-skill"}]}}));
+setInterval(() => {}, 1000);
 `);
 
-    expect(outcome).toEqual({triggered: false, error: null});
+    expect(outcome).toEqual({
+      triggered: false,
+      error: null,
+      selected: "competitor:other-skill",
+    });
   });
 
   it("prefers the target when it is invoked alongside a competing skill", async () => {
@@ -78,7 +109,7 @@ console.log(JSON.stringify({type: "system", subtype: "init", skills: ["plugin:te
 console.log(JSON.stringify({message: {content: [{type: "tool_use", name: "Skill", input: {skill: "other-skill"}}, {type: "tool_use", name: "Skill", input: {skill: "test-skill"}}]}}));
 `);
 
-    expect(outcome).toEqual({triggered: true, error: null});
+    expect(outcome).toEqual({triggered: true, error: null, selected: "target"});
   });
 
   it("returns a clean negative result when the skill is available", async () => {
@@ -87,7 +118,7 @@ console.log(JSON.stringify({type: "system", subtype: "init", skills: ["test-skil
 console.log("not json");
 `);
 
-    expect(outcome).toEqual({triggered: false, error: null});
+    expect(outcome).toEqual({triggered: false, error: null, selected: "none"});
   });
 
   it("reports when the target skill is unavailable", async () => {
@@ -119,7 +150,11 @@ console.log(JSON.stringify({type: "stream_event", event: {type: "content_block_d
 setInterval(() => {}, 1000);
 `);
 
-    expect(outcome).toEqual({triggered: false, error: null});
+    expect(outcome).toEqual({
+      triggered: false,
+      error: null,
+      selected: "output-limit",
+    });
   });
 
   it("still reports an unavailable skill when the output limit is exceeded", async () => {

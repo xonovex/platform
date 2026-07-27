@@ -19,6 +19,9 @@ export const TRIGGER_OUTPUT_LIMIT = 2000;
 export interface TriggerOutcome {
   readonly triggered: boolean;
   readonly error: string | null;
+  // How the run ended, recorded per run so a later triage reads the evidence instead
+  // of re-probing the model to recover which skill answered.
+  readonly selected?: string;
 }
 
 interface CodexTriggerOptions {
@@ -124,6 +127,41 @@ const textDeltaLength = (line: string): number => {
   }
 };
 
+// What the harness did with a Skill call. An invocation naming something the harness
+// cannot resolve launches nothing, so it says nothing about which skill the request
+// belongs to; only a launch settles that. The two are indistinguishable from the
+// tool_use line alone, which carries whatever name the model wrote.
+export type ToolResultOutcome = "launched" | "rejected";
+
+export const toolResultOutcome = (line: string): ToolResultOutcome | null => {
+  let obj: unknown;
+  try {
+    obj = JSON.parse(line);
+  } catch {
+    return null;
+  }
+  if (!isRecord(obj)) {
+    return null;
+  }
+  const message = obj.message;
+  if (!isRecord(message)) {
+    return null;
+  }
+  const content = Array.isArray(message.content) ? message.content : [];
+  for (const item of content) {
+    if (!isRecord(item) || item.type !== "tool_result") {
+      continue;
+    }
+    if (item.is_error === true) {
+      return "rejected";
+    }
+    const text =
+      typeof item.content === "string" ? item.content : JSON.stringify(item.content);
+    return text.includes("tool_use_error") ? "rejected" : "launched";
+  }
+  return null;
+};
+
 export const checkTriggered = (
   query: string,
   claudeArgs: readonly string[],
@@ -139,6 +177,7 @@ export const checkTriggered = (
     let matched = false;
     let targetAvailable = false;
     let timedOut = false;
+    let pendingSkill: string | null = null;
     let competingSkill: string | null = null;
     let outputLimitExceeded = false;
     let outputCharacters = 0;
@@ -189,14 +228,27 @@ export const checkTriggered = (
         killProc();
         return;
       }
-      // Another skill won the request, so the target's routing outcome is settled and
-      // the run ends here. The single allowed turn is spent by that invocation, so
-      // letting the process run on would only end in error_max_turns and discard a
-      // conclusive result — the exact answer a should-not-trigger query is asking for.
+      // Some other name was invoked. Whether it settles the run depends on what the
+      // harness did with it, which arrives on a later line, so hold it and read on.
       if (invoked.length > 0) {
-        competingSkill = invoked[0] ?? "";
-        rl.close();
-        killProc();
+        pendingSkill = invoked[0] ?? "";
+        return;
+      }
+      if (pendingSkill !== null) {
+        const outcome = toolResultOutcome(line);
+        if (outcome === "launched") {
+          // Another skill answered the request, so the target lost it. Ending here
+          // spends no further turns on a settled result.
+          competingSkill = pendingSkill;
+          rl.close();
+          killProc();
+          return;
+        }
+        if (outcome === "rejected") {
+          // The harness resolved nothing, so no skill answered and the run is not
+          // settled. The model still has a turn to name a skill that exists.
+          pendingSkill = null;
+        }
         return;
       }
       outputCharacters += textDeltaLength(line);
@@ -218,7 +270,7 @@ export const checkTriggered = (
 
     proc.on("close", (code) => {
       if (matched) {
-        finish({triggered: true, error: null});
+        finish({triggered: true, error: null, selected: "target"});
         return;
       }
       if (timedOut) {
@@ -226,9 +278,13 @@ export const checkTriggered = (
         return;
       }
       if (competingSkill !== null || outputLimitExceeded) {
+        const selected =
+          competingSkill === null
+            ? "output-limit"
+            : `competitor:${competingSkill}`;
         finish(
           targetAvailable
-            ? {triggered: false, error: null}
+            ? {triggered: false, error: null, selected}
             : {triggered: false, error: "target skill unavailable"},
         );
         return;
@@ -250,7 +306,7 @@ export const checkTriggered = (
         finish({triggered: false, error: "target skill unavailable"});
         return;
       }
-      finish({triggered: false, error: null});
+      finish({triggered: false, error: null, selected: "none"});
     });
   });
 

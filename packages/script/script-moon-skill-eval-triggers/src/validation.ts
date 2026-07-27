@@ -105,6 +105,13 @@ export const parseTriggerOptions = (
     : {success: false, error: errorText(result.error)};
 };
 
+// One turn to choose a skill, and a second only for the run that needs it: a model
+// that writes a skill name the harness cannot resolve launches nothing, and the turn
+// it spent says nothing about routing. The second turn lets it answer the harness's
+// error with a name that exists. A run that picks a skill on its first turn ends
+// there, so the extra turn costs nothing on the runs that get it right.
+export const TRIGGER_MAX_TURNS = 2;
+
 export const buildTriggerClaudeArgs = (
   options: TriggerClaudeOptions,
 ): readonly string[] => {
@@ -126,7 +133,7 @@ export const buildTriggerClaudeArgs = (
     "--max-budget-usd",
     String(options.budget),
     "--max-turns",
-    "1",
+    String(TRIGGER_MAX_TURNS),
     "--system-prompt",
     "Decide which available skill best matches the user request. " +
       "If one applies, invoke only that Skill immediately. Otherwise reply with one short sentence. " +

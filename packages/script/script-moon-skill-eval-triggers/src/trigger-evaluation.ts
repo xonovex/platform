@@ -11,6 +11,10 @@ interface ResultRecord {
   readonly trigger_rate: number;
   readonly pass: boolean;
   readonly rationale: string;
+  // One entry per run naming how it ended — the target, a named competitor, the
+  // output limit, or nothing. A rate on its own cannot say which skill answered, and
+  // recovering that after the fact costs a re-probe per run.
+  readonly selected_skills: readonly string[];
 }
 
 export interface TriggerEvaluationResult {
@@ -40,11 +44,18 @@ export const TRIGGER_RUN_ATTEMPTS = 3;
 const runOnce = async (
   query: string,
   options: TriggerEvaluationOptions,
-): Promise<{readonly triggered: boolean} | {readonly error: string}> => {
+): Promise<
+  | {readonly triggered: boolean; readonly selected: string}
+  | {readonly error: string}
+> => {
   let lastError = "unknown failure";
   for (let attempt = 1; attempt <= TRIGGER_RUN_ATTEMPTS; attempt += 1) {
     const outcome = await options.check(query);
-    if (outcome.error === null) return {triggered: outcome.triggered};
+    if (outcome.error === null)
+      return {
+        triggered: outcome.triggered,
+        selected: outcome.selected ?? "unrecorded",
+      };
     lastError = outcome.error;
     if (attempt < TRIGGER_RUN_ATTEMPTS) {
       process.stderr.write(
@@ -60,6 +71,7 @@ const evaluateQuery = async (
   options: TriggerEvaluationOptions,
 ): Promise<ResultRecord | undefined> => {
   let triggers = 0;
+  const selected: string[] = [];
   for (let index = 0; index < options.runs; index += 1) {
     const outcome = await runOnce(entry.query, options);
     if ("error" in outcome) {
@@ -75,6 +87,7 @@ const evaluateQuery = async (
       );
       return undefined;
     }
+    selected.push(outcome.selected);
     if (outcome.triggered) {
       triggers += 1;
     }
@@ -89,6 +102,7 @@ const evaluateQuery = async (
     trigger_rate: Math.round(rate * 1000) / 1000,
     pass: rate >= options.threshold === entry.should_trigger,
     rationale: entry.rationale,
+    selected_skills: selected,
   };
 };
 

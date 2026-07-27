@@ -84,9 +84,12 @@ type PartitionResult =
     }
   | {readonly success: false; readonly error: string};
 
-// This evaluator loads one skill, so it can only answer whether that skill claims a
-// query when it is the sole candidate. A near miss the catalog assigns to another
-// skill asks a different question — which of the two wins with both loaded — and the
+// This evaluator loads the target plugin and whatever plugins it declares as
+// dependencies, so an overlay is measured alongside the base skill it extends but
+// never alongside the rest of the catalog. It can therefore answer whether the target
+// claims a query against that narrow field, and a dependency can legitimately win one
+// of the queries kept here. A near miss the catalog assigns to a skill outside that
+// field asks a different question — which of the two wins with both loaded — and the
 // routing evaluator answers it. Scoring such a query here reports a failure for
 // correct behaviour, because the rightful owner was never on offer. Without a catalog
 // root every query is kept, so a standalone run still evaluates the whole file.
