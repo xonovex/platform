@@ -7,16 +7,23 @@ layer: library
 dependsOn:
   - shared-core-go
 tasks:
+  go-test-coverage:
+    env:
+      GO_COVERAGE_MIN: "85"
   go-package-coverage:
     command: >-
       bash "$workspaceRoot/.moon/scripts/check-go-package-coverage.sh"
+      ./pkg/agentcmd=60
       ./pkg/agents=90
+      ./pkg/isolation=100
+      ./pkg/network=100
+      ./pkg/policy=100
       ./pkg/providers=90
+      ./pkg/provision/nix=85
+      ./pkg/validation=85
       ./pkg/workspace=100
     inputs:
-      - /packages/shared/shared-agent-go/pkg/agents/**/*.go
-      - /packages/shared/shared-agent-go/pkg/providers/**/*.go
-      - /packages/shared/shared-agent-go/pkg/workspace/**/*.go
+      - /packages/shared/shared-agent-go/pkg/**/*.go
       - /packages/shared/shared-agent-go/go.mod
       - /packages/shared/shared-agent-go/go.sum
       - /packages/shared/shared-core-go/**/*.go

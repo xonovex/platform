@@ -5,3 +5,26 @@ tags:
   - shared
 language: go
 layer: library
+tasks:
+  go-test-coverage:
+    env:
+      GO_COVERAGE_MIN: "85"
+  go-package-coverage:
+    command: >-
+      bash "$workspaceRoot/.moon/scripts/check-go-package-coverage.sh"
+      ./pkg/colors=100
+      ./pkg/envutil=100
+      ./pkg/logging=75
+      ./pkg/shell=100
+    inputs:
+      - /packages/shared/shared-core-go/pkg/**/*.go
+      - /packages/shared/shared-core-go/go.mod
+      - /packages/shared/shared-core-go/go.sum
+      - /.moon/scripts/check-go-package-coverage.sh
+    options:
+      cache: true
+      runInCI: true
+    toolchain: [system, nix]
+  coverage:
+    deps:
+      - go-package-coverage

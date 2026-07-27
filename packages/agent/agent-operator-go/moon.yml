@@ -8,16 +8,26 @@ dependsOn:
   - shared-core-go
   - shared-agent-go
 tasks:
+  go-test-coverage:
+    env:
+      GO_COVERAGE_MIN: "55"
   go-package-coverage:
     script: >-
       bash "$workspaceRoot/.moon/scripts/check-go-package-coverage.sh"
+      ./api/v1alpha1=35
+      ./cmd/e2e-summary=45
       ./internal/controller=55
       ./internal/isolation/shared=85
       ./internal/network/shared=95
+      ./internal/plugins=35
+      ./internal/provider=90
       ./internal/provision/nix=80
+      ./internal/resolver=60
+      ./internal/validator=100
       ./internal/webhook=85
       ./internal/workspace/git=80
       ./internal/workspace/jj=80
+      ./internal/workspace/shared=75
       ./internal/harness/claude=80
       ./internal/harness/opencode=80
     inputs:

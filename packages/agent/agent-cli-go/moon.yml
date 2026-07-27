@@ -16,6 +16,9 @@ dependsOn:
   - id: vitest-config-node
     scope: development
 tasks:
+  go-test-coverage:
+    env:
+      GO_COVERAGE_MIN: "75"
   ts-build:
     script: npx tsc
     deps:
@@ -56,14 +59,21 @@ tasks:
       bash "$workspaceRoot/.moon/scripts/check-go-package-coverage.sh"
       ./internal/cmd=70
       ./internal/config=60
+      ./internal/network/shared=80
+      ./internal/provision/command=100
       ./internal/provision/nix=80
+      ./internal/provision/none=100
       ./internal/isolation/bwrap=65
       ./internal/isolation/docker=65
       ./internal/isolation/none=80
       ./internal/isolation/shared=80
+      ./internal/sandbox=95
+      ./internal/sandbox/plugins=100
+      ./internal/terminal=100
       ./internal/terminal/tmux=75
       ./internal/workspace/git=80
       ./internal/workspace/jj=90
+      ./internal/workspace/shared=55
     inputs:
       - "@globs(sources)"
       - "@globs(tests)"
