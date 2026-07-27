@@ -14,3 +14,9 @@
 - Comments describe present behavior and name the declaration, function, or module; never reference a plan, agent, doc path, porting history, `INTERIM`, or `TODO`.
 - Use conventional commits.
 - Dependency direction: `config -> shared -> agent`.
+- Write in plain sentences; prefer a comma, colon, or full stop to an em dash, and use a colon after a label.
+- Report when the requested work is done or blocked: quality gates, what was done, what remains, suggestions.
+- Report each gate by its command and outcome; a gate that was skipped, cached, or does not cover the change is not a pass.
+- Mark each claim as verified, naming the evidence, or as unverified; correct an earlier claim when new evidence contradicts it.
+- Keep what remains, meaning unfinished work inside the agreed scope, separate from suggestions, which are optional follow-ups.
+- Label what remains `R1`, `R2`, ... and suggestions `S1`, `S2`, ... so either can be referenced by its identifier.
