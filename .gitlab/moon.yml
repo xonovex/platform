@@ -34,9 +34,21 @@ tasks:
     deps: [ci-config-format-check]
     options:
       cache: false
+  # --preview expands includes, extends and references and validates the result
+  # against the JSON schema without starting a job. The state dir keeps the
+  # generated .gitlab-ci-local out of the repository root.
+  gitlab-ci-lint:
+    script: npx gitlab-ci-local --file .gitlab/ci.yml --state-dir .moon/cache/gitlab-ci-local/ --preview >/dev/null
+    inputs:
+      - "**/*.yml"
+    outputs: []
+    options:
+      cache: true
+      runFromWorkspaceRoot: true
   ci-check:
     command: noop
     deps:
       - format-check
+      - gitlab-ci-lint
     options:
       cache: false
