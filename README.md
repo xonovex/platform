@@ -30,6 +30,11 @@ The sandbox is selected by three orthogonal axes — `--isolation {none,bwrap,do
 `--provision {none,nix,command}` × `--network {host,none,proxy}` — see
 `packages/agent/AGENTS.md`.
 
+![Three Claude Code agents in a tiled tmux session, each in its own git worktree: one under bwrap, one under bwrap with a Nix-provisioned toolchain, and one under Docker, routed to two different model providers](packages/asset/asset-images/multiple-agents.png)
+
+Each pane is a separate worktree with its own axis combination and provider, so
+concurrent agents neither share a checkout nor a sandbox.
+
 ### Agent Kubernetes Operator
 
 The operator requires a digest-pinned agent image and an installed sandboxed

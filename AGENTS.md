@@ -3,7 +3,8 @@
 - Monorepo for Xonovex tools and configuration packages; code lives under `packages/`.
 - Setup: `npm install`.
 - Run tasks with `npx moon run <project>:<task>` or `npx moon run #<tag>:<task>`; query projects with `moon query projects --tags "<pattern>"`.
-- `.moon/tasks/*.yml` templates inherit by project type, language, and tags.
+- Task templates are tag-based: a project inherits `.moon/tasks/tag-<name>.yml` by listing `<name>` in its `moon.yml` `tags`. A template refines another with `extends`, as `tag-typescript-script.yml` and `tag-typescript-config.yml` extend `tag-typescript.yml`.
+- A task redefined across `extends` replaces the parent's `deps` rather than appending to them, so restate every inherited dep or declare `mergeDeps: replace`; `script-moon-release-validate` fails the build otherwise.
 - Do not create feature branches or push unless explicitly asked.
 - Delegate to a subagent only for large, genuinely independent work such as a wide multi-file investigation; do not delegate what a handful of tool calls finishes, do not spawn one to check your own work, and keep the count low.
 - Release only through a reviewed `version packages` PR; merging to `main` runs `.github/workflows/release.yml` (`:ci-publish` -> release/tag). Never bypass branch protection.
