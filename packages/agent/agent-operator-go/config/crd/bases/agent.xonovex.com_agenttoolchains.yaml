@@ -49,18 +49,24 @@ spec:
                   type: object
                   description: Nix package provisioning configuration
                   properties:
+                    nixpkgsRev:
+                      type: string
+                      description: Nixpkgs revision the image was built from. Required; the pin is what makes the provisioning reproducible.
                     packages:
                       type: array
-                      description: Nixpkgs attribute names to install
+                      description: Nixpkgs attribute names baked into the image. Mutually exclusive with flakeRef.
                       items:
                         type: string
+                    flakeRef:
+                      type: string
+                      description: Project flake the devShell was built from. Mutually exclusive with packages.
+                    shell:
+                      type: string
+                      description: devShell attribute for the project-flake source. Defaults to "default".
                     image:
                       type: string
                       description: Pre-built, digest-pinned Nix agent image used by the pod.
                       pattern: ^.+@sha256:[0-9a-fA-F]{64}$
-                    storeSizeLimit:
-                      type: string
-                      description: Size limit for the Nix store EmptyDir volume (default 10Gi)
             status:
               type: object
               description: AgentToolchainStatus defines the observed state of AgentToolchain
