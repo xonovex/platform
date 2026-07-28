@@ -28,3 +28,6 @@ tasks:
     deps: [lint]
     options:
       cache: false
+      # Replacing args keeps the command single when a project inherits two
+      # templates that both own ci-check.
+      mergeArgs: replace

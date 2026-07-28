@@ -181,6 +181,9 @@ tasks:
     deps: [build, lint, typecheck, test, coverage, format-check]
     options:
       cache: false
+      # Replacing args keeps the command single when a project inherits two
+      # templates that both own ci-check.
+      mergeArgs: replace
   go-clean:
     script: rm -rf dist coverage.out
     options:

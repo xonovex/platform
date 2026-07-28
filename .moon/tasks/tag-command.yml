@@ -55,5 +55,8 @@ tasks:
     deps: [build, command-validate, format-check]
     options:
       cache: false
+      # Replacing args keeps the command single when a project inherits two
+      # templates that both own ci-check.
+      mergeArgs: replace
 inheritedBy:
   tag: command
