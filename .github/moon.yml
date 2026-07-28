@@ -4,13 +4,10 @@ layer: configuration
 tags:
   - ci
 tasks:
-  # The GitLab pipelines mirror these workflows and have no project of their
-  # own, so both CI configurations are formatted here.
   ci-config-format:
-    script: npx prettier --write "$workspaceRoot/.github/**/*.yml" "$workspaceRoot/.gitlab/**/*.yml" --ignore-path "$workspaceRoot/.prettierignore"
+    script: npx prettier --write "$workspaceRoot/.github/**/*.yml" --ignore-path "$workspaceRoot/.prettierignore"
     inputs:
       - "**/*.yml"
-      - /.gitlab/**/*.yml
       - /.prettierignore
       - /prettier.config.ts
     outputs: []
@@ -18,10 +15,9 @@ tasks:
       cache: false
       runInCI: false
   ci-config-format-check:
-    script: npx prettier --check "$workspaceRoot/.github/**/*.yml" "$workspaceRoot/.gitlab/**/*.yml" --ignore-path "$workspaceRoot/.prettierignore"
+    script: npx prettier --check "$workspaceRoot/.github/**/*.yml" --ignore-path "$workspaceRoot/.prettierignore"
     inputs:
       - "**/*.yml"
-      - /.gitlab/**/*.yml
       - /.prettierignore
       - /prettier.config.ts
     outputs: []
