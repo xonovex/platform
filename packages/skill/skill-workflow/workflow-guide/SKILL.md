@@ -48,8 +48,8 @@ architecture these operations implement is in
 5. Adapt selected procedures to the operation's effect and persistence boundary.
 6. Perform only the requested operation without assuming publication, approval, or a
    following lifecycle step.
-7. Verify the result and preserve material identity, context, evidence, degradation,
-   blockers, relationships, and effects in the returned handoff.
+7. Preserve material identity, context, evidence, degradation, blockers,
+   relationships, and effects in the returned handoff.
 
 Use these headings only when they add information:
 
