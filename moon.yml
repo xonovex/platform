@@ -1,0 +1,52 @@
+$schema: https://moonrepo.dev/schemas/project.json
+language: unknown
+layer: configuration
+tasks:
+  # The workspace configuration and the root config files sit outside every
+  # package, so no package format task reaches them.
+  workspace-format:
+    script: npx prettier --write "$workspaceRoot"/.moon/*.yml "$workspaceRoot"/.moon/tasks/*.yml "$workspaceRoot"/*.json "$workspaceRoot"/*.md "$workspaceRoot"/*.yml --ignore-path "$workspaceRoot/.prettierignore"
+    inputs:
+      - /.moon/*.yml
+      - /.moon/tasks/*.yml
+      - /*.json
+      - /*.md
+      - /*.yml
+      - /.prettierignore
+      - /prettier.config.ts
+    outputs: []
+    options:
+      cache: false
+      runInCI: false
+  workspace-format-check:
+    script: npx prettier --check "$workspaceRoot"/.moon/*.yml "$workspaceRoot"/.moon/tasks/*.yml "$workspaceRoot"/*.json "$workspaceRoot"/*.md "$workspaceRoot"/*.yml --ignore-path "$workspaceRoot/.prettierignore"
+    inputs:
+      - /.moon/*.yml
+      - /.moon/tasks/*.yml
+      - /*.json
+      - /*.md
+      - /*.yml
+      - /.prettierignore
+      - /prettier.config.ts
+    outputs: []
+    options:
+      cache: true
+  format:
+    command: noop
+    deps: [workspace-format]
+    options:
+      cache: false
+      runInCI: false
+  format-check:
+    command: noop
+    deps: [workspace-format-check]
+    options:
+      cache: false
+  ci-check:
+    command: echo 'ci-check complete'
+    deps: [format-check]
+    options:
+      cache: false
+      # Replacing args keeps the command single when a project inherits two
+      # templates that both own ci-check.
+      mergeArgs: replace

@@ -15,6 +15,7 @@ projects:
   sources:
     github-actions: .github
     repository-shell: .hooks
+    workspace-config: .
 vcs:
   hooks:
     commit-msg:
