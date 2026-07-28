@@ -5,6 +5,7 @@
 - Run tasks with `npx moon run <project>:<task>` or `npx moon run #<tag>:<task>`; query projects with `moon query projects --tags "<pattern>"`.
 - `.moon/tasks/*.yml` templates inherit by project type, language, and tags.
 - Do not create feature branches or push unless explicitly asked.
+- Delegate to a subagent only for large, genuinely independent work such as a wide multi-file investigation; do not delegate what a handful of tool calls finishes, do not spawn one to check your own work, and keep the count low.
 - Release only through a reviewed `version packages` PR; merging to `main` runs `.github/workflows/release.yml` (`:ci-publish` -> release/tag). Never bypass branch protection.
 - Prefer pure functions, immutability, composition, module-level functions, and explicit state; avoid global mutable state.
 - Import directly from source; do not add re-exports, deprecated APIs, compatibility wrappers, or shims.
