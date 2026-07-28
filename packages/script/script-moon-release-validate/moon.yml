@@ -14,25 +14,14 @@ tasks:
       mergeDeps: append
   ts-coverage:
     env:
-      TS_COVERAGE_MIN_LINES: "85"
+      TS_COVERAGE_MIN_LINES: "90"
       TS_COVERAGE_MIN_FUNCTIONS: "100"
-      TS_COVERAGE_MIN_BRANCHES: "70"
-      TS_COVERAGE_MIN_STATEMENTS: "85"
+      TS_COVERAGE_MIN_BRANCHES: "77"
+      TS_COVERAGE_MIN_STATEMENTS: "90"
     deps:
       - ~:ts-build
     options:
       mergeDeps: append
-  install:
-    command:
-      - npm
-      - install
-      - -w
-      - "@xonovex/script-moon-release-validate"
-    deps:
-      - ~:build
-    options:
-      cache: false
-      runFromWorkspaceRoot: true
   release-validate:
     command: node packages/script/script-moon-release-validate/dist/src/index.js
     deps:
@@ -42,6 +31,8 @@ tasks:
       - /README.md
       - /package-lock.json
       - /.github/workflows/release.yml
+      - /.moon/tasks/*.yml
+      - /packages/*/*/moon.yml
       - /.claude-plugin/marketplace.json
       - /.agents/plugins/marketplace.json
       - /packages/command/*/package.json

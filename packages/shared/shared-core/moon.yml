@@ -2,17 +2,17 @@ $schema: https://moonrepo.dev/schemas/project.json
 tasks:
   ts-coverage:
     env:
-      TS_COVERAGE_MIN_LINES: "85"
-      TS_COVERAGE_MIN_FUNCTIONS: "95"
-      TS_COVERAGE_MIN_BRANCHES: "60"
-      TS_COVERAGE_MIN_STATEMENTS: "85"
+      TS_COVERAGE_MIN_LINES: "100"
+      TS_COVERAGE_MIN_FUNCTIONS: "100"
+      TS_COVERAGE_MIN_BRANCHES: "100"
+      TS_COVERAGE_MIN_STATEMENTS: "100"
   coverage:
     command: noop
     deps: [ts-coverage]
     options:
       cache: false
   ci-check:
-    deps: [coverage]
+    deps: [coverage, npm-check]
   ts-build:
     deps:
       - ^:build

@@ -1,6 +1,7 @@
 import {existsSync, readdirSync, readFileSync, statSync} from "node:fs";
 import {basename, resolve} from "node:path";
 import {type z} from "zod";
+import {coverageFloorFailures} from "./coverage-floors.js";
 import {
   LockfileSchema,
   MarketplaceSchema,
@@ -493,6 +494,20 @@ export const validateRelease = (
     : [];
   check(tagTaskFiles.length > 0, ".moon/tasks must define tag task files");
   for (const failure of taskInheritanceFailures(tagTaskFiles)) {
+    check(false, failure);
+  }
+
+  const packagesDirectory = resolve(repositoryRoot, "packages");
+  const projectFiles = childDirectories(packagesDirectory, "packages", check)
+    .flatMap((group) => childDirectories(group, basename(group), check))
+    .map((project) => resolve(project, "moon.yml"))
+    .filter((path) => existsSync(path))
+    .map((path) => ({
+      path: path.slice(repositoryRoot.length + 1),
+      text: readFileSync(path, "utf8"),
+    }));
+  check(projectFiles.length > 0, "packages must define project task files");
+  for (const failure of coverageFloorFailures(projectFiles)) {
     check(false, failure);
   }
 

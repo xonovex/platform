@@ -6,6 +6,7 @@ import {validateRelease} from "./release-validation.js";
 const VERSION = "1.2.3";
 const PACKAGE_PATH = "packages/skill/skill-test";
 const COMMAND_PATH = "packages/command/command-test";
+const SCRIPT_PATH = "packages/script/script-test";
 
 const writeText = (root: string, path: string, content: string): void => {
   const target = resolve(root, path);
@@ -83,6 +84,20 @@ const createFixture = (): string => {
   writeText(root, "README.md", "# Test repository\n");
   writeText(
     root,
+    `${SCRIPT_PATH}/moon.yml`,
+    `language: typescript
+tags: [typescript-script]
+tasks:
+  ts-coverage:
+    env:
+      TS_COVERAGE_MIN_LINES: "85"
+      TS_COVERAGE_MIN_FUNCTIONS: "90"
+      TS_COVERAGE_MIN_BRANCHES: "70"
+      TS_COVERAGE_MIN_STATEMENTS: "85"
+`,
+  );
+  writeText(
+    root,
     ".moon/tasks/tag-typescript.yml",
     `tasks:
   ci-check:
@@ -127,6 +142,34 @@ describe("release input validation", () => {
       const result = validateRelease(root);
 
       expect(result).toMatchObject({failures: [], pluginPackages: 2});
+    } finally {
+      rmSync(root, {recursive: true, force: true});
+    }
+  });
+
+  it("reports a typescript project that inherits the template coverage floor", () => {
+    const root = createFixture();
+    writeText(
+      root,
+      `${SCRIPT_PATH}/moon.yml`,
+      `language: typescript
+tags: [typescript-script]
+tasks:
+  ts-coverage:
+    env:
+      TS_COVERAGE_MIN_LINES: "85"
+      TS_COVERAGE_MIN_STATEMENTS: "85"
+`,
+    );
+
+    try {
+      const result = validateRelease(root);
+
+      expect(result.failures).toEqual([
+        expect.stringContaining(
+          `${SCRIPT_PATH}/moon.yml task 'ts-coverage' sets no TS_COVERAGE_MIN_FUNCTIONS, TS_COVERAGE_MIN_BRANCHES`,
+        ),
+      ]);
     } finally {
       rmSync(root, {recursive: true, force: true});
     }
