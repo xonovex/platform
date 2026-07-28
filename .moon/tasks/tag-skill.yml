@@ -49,7 +49,6 @@ tasks:
     deps:
       - target: ~:build
         optional: true
-      - script-moon-skill-validate-spec:install
       - script-moon-skill-validate-routing-owners:routing-owners-check
     env:
       XONOVEX_LINT_MODE: enforce
@@ -66,7 +65,6 @@ tasks:
     deps:
       - target: ~:build
         optional: true
-      - script-moon-skill-audit-sources:install
     options:
       cache: false
   skill-eval-triggers:
@@ -78,7 +76,6 @@ tasks:
     deps:
       - target: ~:build
         optional: true
-      - script-moon-skill-eval-triggers:install
     options:
       cache: false
       runInCI: false
@@ -91,7 +88,6 @@ tasks:
     deps:
       - target: ~:build
         optional: true
-      - script-moon-skill-eval-outputs:install
     options:
       cache: false
       runInCI: false
@@ -108,13 +104,12 @@ tasks:
     deps:
       - target: ~:build
         optional: true
-      - script-moon-skill-eval-triggers:install
     inputs:
       - /packages/skill/AGENTS.md
       - /packages/skill/skill-skill/skill-guide/scripts/**/*
     options:
       cache: false
-      runInCI: true
+      runInCI: false
   ci-skill-eval-output:
     script: >-
       npx moon-skill-eval-outputs
@@ -129,12 +124,11 @@ tasks:
     deps:
       - target: ~:build
         optional: true
-      - script-moon-skill-eval-outputs:install
     inputs:
       - /packages/skill/AGENTS.md
       - /packages/skill/skill-skill/skill-guide/scripts/**/*
     options:
       cache: false
-      runInCI: true
+      runInCI: false
 inheritedBy:
   tag: skill

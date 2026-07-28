@@ -25,7 +25,6 @@ tasks:
     deps:
       - target: ~:build
         optional: true
-      - script-moon-command-validate:install
     inputs:
       - commands/*.md
       - docs/**/*.md

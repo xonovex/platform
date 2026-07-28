@@ -17,6 +17,8 @@ tasks:
       - /nix/ci.nix
     options:
       cache: true
+  # Both nix tasks evaluate the flake, which resolves and may fetch its inputs,
+  # so they belong to ci-integration rather than the side-effect-free ci-check.
   nix-flake-check:
     command:
       - nix
@@ -32,6 +34,7 @@ tasks:
     options:
       cache: true
       runFromWorkspaceRoot: true
+      runInCI: false
   nix-flake-eval-all-systems:
     command:
       - nix
@@ -47,11 +50,18 @@ tasks:
     options:
       cache: true
       runFromWorkspaceRoot: true
+      runInCI: false
   ci-check:
     command: noop
     deps:
       - github-actions-lint
+    options:
+      cache: false
+  ci-integration:
+    command: noop
+    deps:
       - nix-flake-check
       - nix-flake-eval-all-systems
     options:
       cache: false
+      runInCI: false

@@ -5,9 +5,11 @@ const TaskSchema = z.looseObject({
   env: z.record(z.string(), z.unknown()).optional(),
 });
 
+// A key present but empty parses as null, which moon accepts, so neither an
+// empty tags list nor an empty tasks map makes a project unreadable.
 const ProjectFileSchema = z.looseObject({
-  tags: z.array(z.string()).optional(),
-  tasks: z.record(z.string(), TaskSchema).optional(),
+  tags: z.array(z.string()).nullish(),
+  tasks: z.record(z.string(), TaskSchema).nullish(),
 });
 
 export interface ProjectFile {

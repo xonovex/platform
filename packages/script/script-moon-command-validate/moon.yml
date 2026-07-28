@@ -18,17 +18,6 @@ tasks:
   ts-build:
     deps:
       - script-moon-common:build
-  install:
-    command:
-      - npm
-      - install
-      - -w
-      - "@xonovex/script-moon-command-validate"
-    deps:
-      - ~:build
-    options:
-      cache: false
-      runFromWorkspaceRoot: true
   ci-check:
     deps: [coverage]
     options:

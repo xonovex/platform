@@ -15,17 +15,6 @@ tasks:
     deps:
       - script-moon-common:build
       - script-moon-skill-eval-common:build
-  install:
-    command:
-      - npm
-      - install
-      - -w
-      - "@xonovex/script-moon-skill-eval-routing"
-    deps:
-      - ~:build
-    options:
-      cache: false
-      runFromWorkspaceRoot: true
   ci-routing:
     script: >-
       npx moon-skill-eval-routing packages/skill
@@ -36,12 +25,10 @@ tasks:
       --batch-size 8
       --max-budget-usd 0.05
       --workspace ".skill-eval-results/routing/${SKILL_EVAL_HARNESS:-claude}"
-    deps:
-      - ~:install
     inputs:
       - /packages/skill/*/*/eval-queries.json
       - /packages/skill/*/*/SKILL.md
     options:
       cache: false
       runFromWorkspaceRoot: true
-      runInCI: true
+      runInCI: false

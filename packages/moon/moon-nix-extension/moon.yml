@@ -37,6 +37,13 @@ tasks:
       - /package-lock.json
     options:
       cache: false
-  ci-check:
+      runInCI: false
+  # The consumer-workspace script builds a scratch workspace and runs nix, so it
+  # is an integration tier rather than a ci-check gate.
+  ci-integration:
+    command: noop
     deps:
       - integration
+    options:
+      cache: false
+      runInCI: false

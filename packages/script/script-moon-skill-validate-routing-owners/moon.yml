@@ -15,17 +15,6 @@ tasks:
     deps:
       - script-moon-common:build
       - script-moon-skill-eval-common:build
-  install:
-    command:
-      - npm
-      - install
-      - -w
-      - "@xonovex/script-moon-skill-validate-routing-owners"
-    deps:
-      - ~:build
-    options:
-      cache: false
-      runFromWorkspaceRoot: true
   routing-owners-check:
     command:
       - node

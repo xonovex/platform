@@ -12,7 +12,7 @@ tasks:
     options:
       cache: false
   ci-check:
-    deps: [coverage, npm-check]
+    deps: [coverage]
   ts-build:
     deps:
       - ^:build

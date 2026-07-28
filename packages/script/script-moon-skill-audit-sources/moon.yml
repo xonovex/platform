@@ -24,14 +24,3 @@ tasks:
   ts-test:
     inputs:
       - /packages/skill/skill-skill/skill-guide/scripts/audit-sources.py
-  install:
-    command:
-      - npm
-      - install
-      - -w
-      - "@xonovex/script-moon-skill-audit-sources"
-    deps:
-      - ~:build
-    options:
-      cache: false
-      runFromWorkspaceRoot: true

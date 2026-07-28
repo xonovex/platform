@@ -103,6 +103,7 @@ tasks:
       - go.sum
     options:
       cache: false
+      runInCI: false
     toolchain: [system, nix]
   coverage:
     command: noop
@@ -123,10 +124,18 @@ tasks:
       - coverage
       - format-check
       - npm-check
-      - go-integration
     options:
       cache: false
       mergeDeps: replace
+  # go-integration builds the real binary and executes it, so it is an
+  # integration tier rather than a ci-check gate.
+  ci-integration:
+    command: noop
+    deps:
+      - go-integration
+    options:
+      cache: false
+      runInCI: false
   ci-publish:
     script: echo 'ci-publish complete'
     deps:

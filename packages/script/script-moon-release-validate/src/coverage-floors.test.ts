@@ -120,6 +120,37 @@ tasks:
     expect(failures[0]).toContain("TS_COVERAGE_MIN_LINES");
   });
 
+  // A project can declare the key and leave it empty, which parses as null.
+  it("accepts a project whose tasks key is empty", () => {
+    const text = `tags: [typescript-config]
+tasks:
+`;
+
+    expect(
+      coverageFloorFailures([{path: "packages/config/example/moon.yml", text}]),
+    ).toEqual([]);
+  });
+
+  it("accepts a project whose tags key is empty", () => {
+    expect(
+      coverageFloorFailures([
+        {path: "packages/config/example/moon.yml", text: "tags:\ntasks:\n"},
+      ]),
+    ).toEqual([]);
+  });
+
+  it("still reports a typescript project whose tasks key is empty", () => {
+    const failures = coverageFloorFailures([
+      {
+        path: "packages/script/script-example/moon.yml",
+        text: "tags: [typescript-script]\ntasks:\n",
+      },
+    ]);
+
+    expect(failures).toHaveLength(1);
+    expect(failures[0]).toContain("TS_COVERAGE_MIN_LINES");
+  });
+
   it("reports a project file that is not valid YAML", () => {
     const failures = coverageFloorFailures([
       {path: "packages/script/script-example/moon.yml", text: "tags: [oops\n"},

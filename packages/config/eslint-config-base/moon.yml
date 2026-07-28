@@ -20,3 +20,9 @@ tasks:
     options:
       cache: true
       mergeDeps: replace
+workspace:
+  inheritedTasks:
+    # A config package has no tests (ts-test is stubbed out), so a
+    # coverage gate would measure nothing.
+    exclude:
+      - ts-coverage

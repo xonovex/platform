@@ -20,14 +20,3 @@ tasks:
   ts-build:
     deps:
       - script-moon-common:build
-  install:
-    command:
-      - npm
-      - install
-      - -w
-      - "@xonovex/script-moon-npm-check"
-    deps:
-      - ~:build
-    options:
-      cache: false
-      runFromWorkspaceRoot: true

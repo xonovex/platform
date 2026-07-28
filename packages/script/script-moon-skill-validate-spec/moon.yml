@@ -25,14 +25,3 @@ tasks:
     deps:
       - script-moon-common:build
       - script-moon-skill-catalog-common:build
-  install:
-    command:
-      - npm
-      - install
-      - -w
-      - "@xonovex/script-moon-skill-validate-spec"
-    deps:
-      - ~:build
-    options:
-      cache: false
-      runFromWorkspaceRoot: true

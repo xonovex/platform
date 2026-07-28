@@ -23,14 +23,3 @@ tasks:
     deps:
       - script-moon-common:build
       - script-moon-skill-eval-common:build
-  install:
-    command:
-      - npm
-      - install
-      - -w
-      - "@xonovex/script-moon-skill-eval-triggers"
-    deps:
-      - ~:build
-    options:
-      cache: false
-      runFromWorkspaceRoot: true
