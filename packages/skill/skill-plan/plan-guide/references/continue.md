@@ -1,4 +1,4 @@
-# plan-continue: Continue One Plan
+# Continue: One Plan
 
 Inspect, preview, or apply implementation of one explicit inline plan or provider-native plan reference plus an optional native revision. Default to `inspect`, operate on only the first actionable target, return the result inline, and stop.
 

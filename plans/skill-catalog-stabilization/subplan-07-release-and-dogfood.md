@@ -53,14 +53,14 @@ dogfood window that proves stability against the parent's Definition of Done.
    → fix), execute-smell tally.
 4. Run the window under the standing rule; convert each settled boundary case into
    a boundary eval query in the affected skill's `eval-queries.json`.
-5. On meeting the exit criterion, run `plan-validate` against the parent's
-   Definition of Done and `plan-update` the parent with the evidence.
+5. On meeting the exit criterion, run the plan Validate operation against the
+   parent's Definition of Done and Update the parent with the evidence.
 
 ## Validation Steps
 
 - Release workflow green; publish verified.
 - Fresh-session catalog comparison (task 2) recorded in `dogfood.md`.
-- `plan-validate` run against the parent at window end.
+- Plan Validate run against the parent at window end.
 
 ## Success Criteria
 

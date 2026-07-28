@@ -80,10 +80,59 @@ None — blocks all other subplans.
 
 ## Appendix: scenario mapping
 
-Scenario ids are defined in
-`packages/skill/skill-workflow/workflow-guide/references/contract.md`. Every keep-tier
-skill and every workflow command maps to at least one; no artifact was unmappable, so
-nothing was escalated to the parent cull table.
+Scenario ids are defined below. They record the practice the catalog was frozen
+against; they are a planning record, not skill content, because the workflow guide
+selects capabilities from installed routing descriptions rather than from a fixed
+inventory. Every keep-tier skill and every workflow command maps to at least one; no
+artifact was unmappable, so nothing was escalated to the parent cull table.
+
+### Frozen scenarios
+
+Each line reads `trigger -> operations and skills -> artifact`.
+
+**Xonovex platform** — agent tooling.
+
+- XP1 capability gap or repeated correction -> reflect, skill, command, instruction ->
+  amended catalog artifact with evals
+- XP2 multi-step change needs scoping -> plan, decide; architecture-pattern guides ->
+  plan document with subplans
+- XP3 package implementation -> execute, validate; typescript, vitest, moon -> source
+  with green tasks
+- XP4 change ready to land -> review, publish; git, pull-request, versioning, npm ->
+  pull request and published release
+
+**Drodan and CruiseReviews** — multilingual product and public sites.
+
+- DR1 editorial or destination guide requested -> create, revise, publish; content,
+  accessibility -> published multilingual entry
+- DR2 increment needs slicing -> decide, validate; user-stories, bdd, tdd -> stories
+  with agreed examples
+- DR3 web surface built -> execute; astro, react, accessibility -> rendered page or
+  component
+- DR4 endpoint and its data added -> execute, validate; hono, zod, sql-postgresql ->
+  endpoint with migration and tests
+
+**Native and game engine** — C99 runtimes and editors.
+
+- NG1 throughput-critical subsystem -> execute; data-oriented-design, ecs, c99,
+  memory-management -> subsystem and build target
+- NG2 rendering or editor feature -> execute; gpu-rendering, editor-viewport, imgui,
+  node-graph -> viewport feature
+- NG3 authored content or gameplay script -> execute; asset-pipeline, audio, lua ->
+  pipeline stage and scripted behaviour
+- NG4 new target or reported crash -> execute, abandon; cross-platform, debugging ->
+  platform layer or minimal repro and fix
+
+**Infrastructure and operations** — clusters, pipelines, repository state.
+
+- IO1 service must run in a cluster -> create, publish; docker, kubernetes, terraform
+  -> GitOps manifests
+- IO2 automation or check must run -> execute, validate; github, gitlab, moon,
+  shell-scripting -> pipeline definition and scripts
+- IO3 machine credential stored, injected, or rotated -> execute;
+  credential-management -> secret-manager-backed configuration
+- IO4 parallel work isolated or integrated -> workspace create, merge, abandon,
+  cleanup -> worktree lifecycle
 
 ### Keep-tier skills (72)
 

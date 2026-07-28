@@ -2,6 +2,7 @@
 description: Record one descriptive decision without granting authority
 allowed-tools:
   - Read
+  - Bash
   - Glob
   - Grep
   - AskUserQuestion

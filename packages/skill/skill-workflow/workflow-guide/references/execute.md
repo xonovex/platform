@@ -13,7 +13,8 @@ belongs in a freeform session.
 1. Resolve the antecedent and the bounded subject it specifies, plus the optional
    subject revision, completion criteria, effect mode, exact targets, applicable
    capabilities, and retry identity.
-2. Default to `inspect`; use `preview` or `apply` only when explicitly requested.
+2. Take the mode [effects.md](effects.md) assigns; widen it only when explicitly
+   requested.
 3. Adapt the selected method to the effect mode; block before effects when its useful
    procedure cannot run without a broader mode.
 4. Perform only work the antecedent specifies and the effect mode permits.

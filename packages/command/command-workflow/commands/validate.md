@@ -2,6 +2,7 @@
 description: Evaluate binding criteria independently and report evidence
 allowed-tools:
   - Read
+  - Bash
   - Glob
   - Grep
   - AskUserQuestion

@@ -15,9 +15,9 @@ Workspace commands:
 
 Operations remain separate: a command never implies the next lifecycle step.
 Core commands accept exact subject revisions and conditionally require them at
-provider-native protected boundaries. Results stay inline except for `publish`;
-`execute` defaults to inspect, while publishing and workspace mutations default to
-preview and require explicit apply.
+provider-native protected boundaries. Results stay inline except for `publish`. Each
+command's `--effect` argument documents its own default; the workflow guide's
+`references/effects.md` owns the table those defaults come from.
 
 Use `--request <file>` with the workflow guide's Markdown handoff contract for
 cross-role traceability, explicit required or preferred capability needs, evidence
@@ -27,8 +27,8 @@ their provider supports one.
 
 Use repeatable `--context <text-or-reference>` arguments on Create, Review, Revise,
 Decide, Execute, Validate, Abandon, Workspace Create, Workspace Merge, and Workspace
-Abandon for smaller handoffs. Context has stable identity, version, digest,
-applicability, provenance, status, audience, and visibility; it remains distinct from
-evidence and authority. Persist selected context for future sessions through a
-separate Publish operation, such as a provider-native issue, pull-request, or
-merge-request note.
+Abandon for smaller handoffs. Context explains intent, constraints, and tradeoffs; it
+remains distinct from evidence and authority, and it never carries digests, version
+counters, audience taxonomies, or visibility labels. Persist selected context for
+future sessions through a separate Publish operation, such as a provider-native issue,
+pull-request, or merge-request note.

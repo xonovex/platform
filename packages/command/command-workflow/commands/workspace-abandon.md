@@ -2,6 +2,7 @@
 description: Record workspace abandonment without mutation
 allowed-tools:
   - Read
+  - Bash
   - Glob
   - Grep
   - AskUserQuestion

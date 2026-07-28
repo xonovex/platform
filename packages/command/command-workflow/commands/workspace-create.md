@@ -24,7 +24,7 @@ argument-hint: >-
 - `--source` (required unless `--request` supplies it): Exact source to isolate.
 - `--revision` (optional): Exact native revision of the subject. Required for a
   protected provider-native subject when the provider exposes one.
-- `--effect` (optional): `inspect`, `preview`, or `apply`. Defaults to `inspect`.
+- `--effect` (optional): `inspect`, `preview`, or `apply`. Defaults to `preview`.
 - `--idempotency-key` (optional): Stable retry key. Required for an externally
   submitted `apply` when the provider supports idempotency.
 

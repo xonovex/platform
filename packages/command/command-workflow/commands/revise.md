@@ -2,6 +2,7 @@
 description: Revise one subject into a traceable successor
 allowed-tools:
   - Read
+  - Bash
   - Glob
   - Grep
   - AskUserQuestion

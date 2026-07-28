@@ -11,7 +11,7 @@ skills supply subject-specific procedures without widening those boundaries.
 `Core Principles → Operations → Gotchas → Progressive Disclosure`
 
 - **Core Principles** — the rules that govern every operation (replaces a guideline skill's `Essentials`).
-- **Operations** — one row per procedure the skill performs (replaces the single `Example`). Each operation maps **1:1** to a `references/` file and, usually, to a command (`/plan-create` → the `plan-create` operation → `references/plan-create.md`). The Operations list mirrors the Progressive Disclosure list.
+- **Operations** — one row per procedure the skill performs (replaces the single `Example`). Each operation maps **1:1** to a `references/` file and, usually, to a command (`/review` → the `Review` operation → `references/review.md`); name the file after the operation, not after the skill. The Operations list mirrors the Progressive Disclosure list.
 - **Gotchas** and **Progressive Disclosure** — as in any skill.
 
 Split Operations into domain groups once there are more than ~7 — e.g. `## Plan Lifecycle` + `## Plan Operations`, or `## Commit Operations` + `## Branch Operations` + `## Worktree Operations`.

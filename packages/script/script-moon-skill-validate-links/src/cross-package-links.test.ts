@@ -211,9 +211,8 @@ describe("checkCrossPackageLinks", () => {
       "packages/diagram/diagram-command/command-model.png": "image",
       "packages/agent/agent-operator-go/README.md": "# Operator\n",
       "packages/skill/skill-plan/plan-guide/SKILL.md":
-        "# Plan\nSee [create](references/plan-create.md).\n",
-      "packages/skill/skill-plan/plan-guide/references/plan-create.md":
-        "# plan-create\n",
+        "# Plan\nSee [create](references/create.md).\n",
+      "packages/skill/skill-plan/plan-guide/references/create.md": "# create\n",
       "packages/skill/skill-plan/.claude-plugin/plugin.json": manifest(
         "xonovex-skill-plan",
         [],

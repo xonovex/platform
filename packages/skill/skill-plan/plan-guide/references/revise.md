@@ -1,4 +1,4 @@
-# plan-revise: Revise a Plan from Explicit Feedback
+# Revise: A Plan from Explicit Feedback
 
 Create one revised plan from an inline plan or provider-native reference, explicit feedback, and an optional native revision. Preserve the source and return the new result inline.
 

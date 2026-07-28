@@ -98,8 +98,8 @@
   },
   {
     "query": "Choose between Kafka and NATS for event delivery and record an architecture decision with the final outcome.",
-    "rationale": "settling and recording a decision is the plan-decide operation",
-    "should_trigger": true,
+    "rationale": "settling and recording a decision is the workflow Decide operation; planning has no Decide procedure",
+    "should_trigger": false,
     "split": "validation"
   },
   {

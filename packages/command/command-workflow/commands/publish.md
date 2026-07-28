@@ -25,7 +25,7 @@ argument-hint: >-
 - `--destination` (required unless `--request` supplies it): Exact destination.
 - `--expected-revision` (optional): Destination revision the write expects. Blocks
   the write when the destination has moved.
-- `--effect` (optional): `inspect`, `preview`, or `apply`. Defaults to `inspect`.
+- `--effect` (optional): `inspect`, `preview`, or `apply`. Defaults to `preview`.
 - `--idempotency-key` (optional): Stable retry key. Required for an externally
   submitted `apply` when the provider supports idempotency.
 

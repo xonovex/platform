@@ -1,4 +1,4 @@
-# plan-validate: Validate a Plan Against Explicit Criteria
+# Validate: A Plan Against Explicit Criteria
 
 Validate one explicit inline or provider-native plan and its implementation evidence without changing the plan. Use an optional native revision to pin mutable state, and report a result for every explicit success criterion and Definition of Done requirement.
 

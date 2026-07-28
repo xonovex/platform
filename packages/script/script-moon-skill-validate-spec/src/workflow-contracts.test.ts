@@ -1,4 +1,4 @@
-import {existsSync, readFileSync} from "node:fs";
+import {existsSync, readdirSync, readFileSync} from "node:fs";
 import {resolve} from "node:path";
 import {describe, expect, it} from "vitest";
 
@@ -18,14 +18,14 @@ const coreWorkflowCommands = [
 ] as const;
 
 const planningReferences = [
-  "plan-research",
-  "plan-create",
-  "plan-critique",
-  "plan-revise",
-  "plan-subplans-create",
-  "plan-continue",
-  "plan-update",
-  "plan-validate",
+  "research",
+  "create",
+  "critique",
+  "revise",
+  "expand",
+  "continue",
+  "update",
+  "validate",
 ] as const;
 
 const workspaceCommands = [
@@ -43,8 +43,11 @@ const retryProtectedCommands = [
   "workspace-cleanup",
 ] as const;
 
-// The safety core from the architecture contract. Growing this set is a decision,
-// not an accident, so the count is asserted rather than the membership alone.
+// The safety core from the architecture contract. This literal stays a literal on
+// purpose: the commands are the only place the flags exist, so deriving the expected
+// set from them would compare the commands to themselves and assert nothing. Like a
+// recorded budget, it is an external anchor that makes growing the surface a
+// decision rather than an accident.
 const SAFETY_CORE_FLAGS = [
   "--context",
   "--destination",
@@ -63,11 +66,66 @@ const workflowCommandSources = (): readonly string[] =>
     ),
   );
 
+// Every guide name the catalog ships, so the inventory ban derives from what
+// exists rather than from a list that ages the moment a skill is added.
+const installedGuideNames = (): readonly string[] =>
+  readdirSync(resolve(repositoryRoot, "packages/skill"), {
+    withFileTypes: true,
+  })
+    .filter((entry) => entry.isDirectory() && entry.name.startsWith("skill-"))
+    .flatMap((entry) =>
+      readdirSync(resolve(repositoryRoot, "packages/skill", entry.name), {
+        withFileTypes: true,
+      })
+        .filter((guide) => guide.isDirectory() && guide.name.endsWith("-guide"))
+        .map((guide) => guide.name),
+    );
+
+const commandFileName = (operation: string): string =>
+  operation.trim().toLowerCase().replaceAll(" ", "-");
+
+// The 'Modes Per Operation' table in effects.md, expanded to one entry per
+// command. An operation that takes no --effect maps to undefined.
+const effectDefaultsFromSkill = (
+  effects: string,
+): ReadonlyMap<string, string | undefined> => {
+  const section = effects.split("## Modes Per Operation", 2).at(1) ?? "";
+  const defaults = new Map<string, string | undefined>();
+  for (const line of section.split("\n")) {
+    const cells = line.split("|").map((cell) => cell.trim());
+    if (cells.length < 5 || cells[1] === undefined) continue;
+    const accepts = cells[2] ?? "";
+    const fallback = /`([a-z]+)`/u.exec(cells[3] ?? "")?.at(1);
+    if (fallback === undefined) continue;
+    const takesArgument = !accepts.includes("no `--effect`");
+    for (const operation of cells[1].split(",")) {
+      defaults.set(
+        commandFileName(operation),
+        takesArgument ? fallback : undefined,
+      );
+    }
+  }
+  return defaults;
+};
+
+// The default one command documents for its own --effect argument, or
+// undefined when it exposes no such argument.
+const effectDefaultFromCommand = (command: string): string | undefined => {
+  const source = readRepositoryFile(
+    `packages/command/command-workflow/commands/${command}.md`,
+  );
+  if (!source.includes("`--effect`")) return undefined;
+  return /`--effect`[^\n]*Defaults to `([a-z]+)`/u.exec(source)?.at(1);
+};
+
 describe("workflow composition contracts", () => {
   it("keeps the command flag surface at the safety core", () => {
+    // Every occurrence, not just the argument-hint ones: a backtick guard here
+    // would leave the Arguments section and the delegation prose unchecked, so a
+    // flag documented in only one of them would pass.
     const used = new Set<string>();
     for (const source of workflowCommandSources()) {
-      for (const match of source.matchAll(/(?<![`\w])--[a-z][a-z-]*/gu)) {
+      for (const match of source.matchAll(/--[a-z][a-z-]*/gu)) {
         used.add(match[0]);
       }
     }
@@ -100,10 +158,17 @@ describe("workflow composition contracts", () => {
     }
     expect(handoffs).toContain("file:line");
     expect(handoffs).toMatch(/only at a cold boundary/u);
-    // The 16-field context protocol the contract replaced must not return.
-    expect(handoffs).not.toMatch(
-      /Context digest|Context version|Audience:|Visibility:/u,
+    // The 16-field context protocol the contract replaced must not return,
+    // including in the plugin README a user reads before the guide.
+    const readme = readRepositoryFile(
+      "packages/command/command-workflow/README.md",
     );
+    for (const source of [handoffs, readme]) {
+      expect(source).not.toMatch(
+        /Context digest|Context version|Audience:|Visibility:/u,
+      );
+    }
+    expect(readme).not.toMatch(/Context has stable identity/u);
   });
 
   it("exposes revision and retry protection for mutating provider operations", () => {
@@ -166,22 +231,75 @@ describe("workflow composition contracts", () => {
     expect(execute).toMatch(/freeform session/u);
   });
 
-  it("scopes SDLC composition to the frozen scenario families", () => {
+  it("keeps SDLC composition free of a fixed project inventory", () => {
     const sdlc = readRepositoryFile(
       "packages/skill/skill-workflow/workflow-guide/references/sdlc.md",
     );
 
-    for (const family of [
-      "Xonovex platform",
-      "Drodan and CruiseReviews",
-      "Native and game engine",
-      "Infrastructure and operations",
-    ]) {
-      expect(sdlc).toContain(family);
+    // Derived from the catalog, not listed here: a guide added tomorrow is
+    // banned from this file without anyone remembering to extend a literal.
+    for (const guide of installedGuideNames()) {
+      expect(sdlc).not.toContain(guide);
     }
+    expect(sdlc).toContain("capability-selection.md");
     // The 22-phase role matrix the rewrite deleted must not return.
     expect(sdlc).not.toContain("Incident commander");
     expect(sdlc).not.toContain("| Phase ");
+  });
+
+  it("keeps the architecture contract to its clauses", () => {
+    const contract = readRepositoryFile(
+      "packages/skill/skill-workflow/workflow-guide/references/contract.md",
+    );
+
+    // The frozen scenarios are a planning record; the skill keeps the clauses
+    // that every operation obeys and nothing that dates on a new project.
+    expect(contract).toContain("## Clauses");
+    expect(contract).not.toContain("## Frozen Scenarios");
+    for (const scenario of ["XP1", "DR1", "NG1", "IO1"]) {
+      expect(contract).not.toContain(scenario);
+    }
+  });
+
+  it("agrees on the default effect mode across skill and commands", () => {
+    const effects = readRepositoryFile(
+      "packages/skill/skill-workflow/workflow-guide/references/effects.md",
+    );
+    // inline was a result-placement label, not an external-state mode.
+    expect(effects).not.toContain("`inline`");
+
+    // Both sides are read from the files. The test asserts they agree rather
+    // than restating the default, so a table edit that misses a command fails
+    // here instead of passing on two literals that were updated together.
+    const table = effectDefaultsFromSkill(effects);
+    expect(table.size).toBe(
+      coreWorkflowCommands.length + workspaceCommands.length,
+    );
+
+    for (const [command, expected] of table) {
+      const documented = effectDefaultFromCommand(command);
+      expect(
+        {command, effect: documented},
+        `${command} must document the default effects.md assigns`,
+      ).toEqual({command, effect: expected});
+    }
+    // Every mode the table names is a mode the mode table defines.
+    for (const mode of new Set(table.values())) {
+      if (mode === undefined) continue;
+      expect(effects).toContain(`| \`${mode}\``);
+    }
+  });
+
+  it("lets every operation read the subject it is given", () => {
+    // A provider-native subject or --context reference is read through a
+    // provider CLI, so withholding Bash would block the operation outright.
+    for (const command of [...coreWorkflowCommands, ...workspaceCommands]) {
+      expect(
+        readRepositoryFile(
+          `packages/command/command-workflow/commands/${command}.md`,
+        ),
+      ).toMatch(/^ {2}- Bash$/mu);
+    }
   });
 
   it("keeps planning operations inline and continuation effect-aware", () => {
@@ -195,7 +313,7 @@ describe("workflow composition contracts", () => {
     }
 
     const continuation = readRepositoryFile(
-      "packages/skill/skill-plan/plan-guide/references/plan-continue.md",
+      "packages/skill/skill-plan/plan-guide/references/continue.md",
     );
     expect(continuation).toContain("Default to `inspect`");
     expect(continuation).toContain("Only `apply` may implement the target");

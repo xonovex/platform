@@ -147,4 +147,4 @@ Do not force empty headings or serialize the result into a fixed envelope.
 - Read [references/context-forwarding.md](references/context-forwarding.md) - Load when
   carrying decisions into later operations or provider-native notes
 - Read [references/sdlc.md](references/sdlc.md) - Load when composing the atomic
-  operations across the frozen scenario families
+  operations into a multi-step delivery flow across roles

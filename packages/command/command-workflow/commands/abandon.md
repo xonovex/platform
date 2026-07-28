@@ -2,6 +2,7 @@
 description: Stop work and return the reason, partial state, and retry boundary
 allowed-tools:
   - Read
+  - Bash
   - Glob
   - Grep
   - AskUserQuestion

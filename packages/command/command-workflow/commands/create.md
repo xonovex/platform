@@ -2,6 +2,7 @@
 description: Create one new result inline without publishing it
 allowed-tools:
   - Read
+  - Bash
   - Glob
   - Grep
   - AskUserQuestion

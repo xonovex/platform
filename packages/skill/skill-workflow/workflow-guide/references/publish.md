@@ -4,7 +4,7 @@
    preconditions, the expected destination revision, and applicable capabilities.
 2. When the subject is forwarded context, check it carries no secrets or detail the
    destination's audience should not see.
-3. Default to `preview` and report the exact external write.
+3. Report the exact external write in the mode [effects.md](effects.md) assigns.
 4. Before `apply`, require explicit authority, the expected destination revision when
    the destination exposes one, and a stable idempotency key when the provider
    supports one.

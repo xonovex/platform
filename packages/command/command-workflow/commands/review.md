@@ -2,6 +2,7 @@
 description: Review one exact subject and return evidence-linked findings inline
 allowed-tools:
   - Read
+  - Bash
   - Glob
   - Grep
   - AskUserQuestion

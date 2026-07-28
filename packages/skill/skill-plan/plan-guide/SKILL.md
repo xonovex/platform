@@ -13,28 +13,35 @@ Provide implementation-planning procedures selected by a caller or generic opera
 - **Provider-owned references** — let a selected provider resolve, version, or relate native resources; return operation results inline
 - **Research first** — ground plans in codebase evidence, constraints, uncertainty, and relevant external sources
 - **Read-only analysis** — planning research, critique, and validation report findings without changing their subjects; only continuation implements planned work
-- **One requested operation** — research, create, critique, revise, expand, continue, update, or validate without silently performing another operation
-- **Caller-owned effects** — continuation honors `inspect`, `preview`, or explicit `apply`; every other planning operation is read-only
-- **Separate publication** — persisting a planning result is a later Publish operation, never an implicit side effect of planning
-- **Traceable handoffs** — crossing a session or role boundary carries the subject and
-  revision, relationships, decisions, criteria, evidence, and constraints; see
-  **workflow-guide** for the shape
-- **Decisions carry anchors** — record what, why, and where in the code, so a later
-  session can find it; decisions constrain planning without becoming evidence or
-  authority
 - **Skills to consult** — plans name applicable implementation capabilities, and continuation loads them before editing
 - **Evidence-based validation** — check explicit success criteria and Definition of Done evidence, not merely command exit codes
 
+Operation boundaries, effect modes, handoff shape, decision anchors, and authority are
+owned by **workflow-guide**; this skill adds no rule of its own on any of them.
+
+## Called From A Generic Operation
+
+A generic operation resolves to the planning procedure of the same name. Three do not
+match by name:
+
+| Generic operation | Planning procedure                |
+| ----------------- | --------------------------------- |
+| Review            | Critique                          |
+| Execute           | Continue                          |
+| Create            | Create, or Expand for child plans |
+
+Research and Update have no generic counterpart; a caller asks for them by name.
+
 ## Planning Operations
 
-- **Research** — investigate codebase and external evidence for a future plan — see [references/plan-research.md](references/plan-research.md)
-- **Create** — author one high-level plan and stop before detailed subplans — see [references/plan-create.md](references/plan-create.md)
-- **Critique** — independently stress-test one plan without revising it — see [references/plan-critique.md](references/plan-critique.md)
-- **Revise** — apply explicit feedback to a new plan revision — see [references/plan-revise.md](references/plan-revise.md)
-- **Expand** — derive focused child plans and their execution ordering — see [references/plan-subplans-create.md](references/plan-subplans-create.md)
-- **Continue** — implement one plan or child plan and stop — see [references/plan-continue.md](references/plan-continue.md)
-- **Update** — refresh descriptive progress and validation evidence — see [references/plan-update.md](references/plan-update.md)
-- **Validate** — evaluate explicit success criteria without changing the plan — see [references/plan-validate.md](references/plan-validate.md)
+- **Research** — investigate codebase and external evidence for a future plan — see [references/research.md](references/research.md)
+- **Create** — author one high-level plan and stop before detailed subplans — see [references/create.md](references/create.md)
+- **Critique** — independently stress-test one plan without revising it — see [references/critique.md](references/critique.md)
+- **Revise** — apply explicit feedback to a new plan revision — see [references/revise.md](references/revise.md)
+- **Expand** — derive focused child plans and their execution ordering — see [references/expand.md](references/expand.md)
+- **Continue** — implement one plan or child plan and stop — see [references/continue.md](references/continue.md)
+- **Update** — refresh descriptive progress and validation evidence — see [references/update.md](references/update.md)
+- **Validate** — evaluate explicit success criteria without changing the plan — see [references/validate.md](references/validate.md)
 
 ## Gotchas
 
@@ -59,11 +66,11 @@ Provide implementation-planning procedures selected by a caller or generic opera
 
 ### Planning
 
-- Read [references/plan-research.md](references/plan-research.md) - Load when researching codebase and external evidence explicitly for a future plan
-- Read [references/plan-create.md](references/plan-create.md) - Load when authoring a high-level implementation plan from explicit inputs
-- Read [references/plan-critique.md](references/plan-critique.md) - Load when independently stress-testing an exact plan without changing it
-- Read [references/plan-revise.md](references/plan-revise.md) - Load when applying explicit feedback or annotations to a plan
-- Read [references/plan-subplans-create.md](references/plan-subplans-create.md) - Load when expanding a parent plan into detailed child plans
-- Read [references/plan-continue.md](references/plan-continue.md) - Load when resuming implementation from an existing plan
-- Read [references/plan-update.md](references/plan-update.md) - Load when refreshing a plan with current progress and validation evidence
-- Read [references/plan-validate.md](references/plan-validate.md) - Load when checking a plan's success criteria and Definition of Done without mutation
+- Read [references/research.md](references/research.md) - Load when researching codebase and external evidence explicitly for a future plan
+- Read [references/create.md](references/create.md) - Load when authoring a high-level implementation plan from explicit inputs
+- Read [references/critique.md](references/critique.md) - Load when independently stress-testing an exact plan without changing it
+- Read [references/revise.md](references/revise.md) - Load when applying explicit feedback or annotations to a plan
+- Read [references/expand.md](references/expand.md) - Load when expanding a parent plan into detailed child plans
+- Read [references/continue.md](references/continue.md) - Load when resuming implementation from an existing plan
+- Read [references/update.md](references/update.md) - Load when refreshing a plan with current progress and validation evidence
+- Read [references/validate.md](references/validate.md) - Load when checking a plan's success criteria and Definition of Done without mutation

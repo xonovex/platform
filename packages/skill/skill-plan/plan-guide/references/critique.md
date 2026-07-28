@@ -1,4 +1,4 @@
-# plan-critique: Independently Stress-Test a Plan
+# Critique: Independently Stress-Test a Plan
 
 Review an inline plan or an exact provider-native plan reference without changing it. Use the optional native revision to pin mutable provider state, run in fresh context, and return separate findings inline.
 

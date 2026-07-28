@@ -1,4 +1,4 @@
-# plan-subplans-create: Expand a Plan into Child Plans
+# Expand: A Plan into Child Plans
 
 Expand any explicit parent plan, inline or provider-native, into focused child plans. An approval or status field is not a precondition. Stop after returning the child plans and execution ordering.
 

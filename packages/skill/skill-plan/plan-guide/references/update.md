@@ -1,4 +1,4 @@
-# plan-update: Update Plan Progress and Evidence
+# Update: Plan Progress and Evidence
 
 Refresh one explicit inline or provider-native plan from current implementation evidence without changing its planned scope. Return a traceable revised result inline.
 

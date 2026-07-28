@@ -4,14 +4,26 @@
 
 | Mode      | Permitted behavior                                                       |
 | --------- | ------------------------------------------------------------------------ |
-| `inline`  | Return a result without external mutation                                |
 | `inspect` | Read external state without mutation                                     |
 | `preview` | Resolve and report the exact effects that apply would attempt            |
 | `apply`   | Perform only the explicitly authorized and previously understood effects |
 
-Create, review, revise, decide, validate, abandon, and workspace abandon return inline
-results. Execute may inspect, preview, or apply. Publish, workspace create, workspace
-merge, and workspace cleanup default to preview and may apply.
+The mode governs external state; where the result goes is a separate question.
+
+## Modes Per Operation
+
+This table is the single source of the default. No other file, command, or README
+states it; they cite this one.
+
+| Operation                                                            | Accepts                       | Default   |
+| -------------------------------------------------------------------- | ----------------------------- | --------- |
+| Create, review, revise, decide, validate, abandon, workspace abandon | `inspect` only, no `--effect` | `inspect` |
+| Execute                                                              | every mode                    | `inspect` |
+| Publish, workspace create, workspace merge, workspace cleanup        | every mode                    | `preview` |
+
+The `inspect`-only operations may read the subject and its context wherever those
+live, including through a provider capability, and they return their result to the
+caller without writing anywhere.
 
 ## Plan, Validate, Execute
 

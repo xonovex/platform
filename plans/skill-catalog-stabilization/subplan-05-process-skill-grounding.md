@@ -133,7 +133,7 @@ the two `untrusted data` restatements became pointers to **workflow-guide**, whi
 owns that rule after subplan 4.
 
 Rewording ran slightly over budget on four files. Three were tightened back under —
-`SKILL.md` ended at 770 against its 776 budget — and `plan-create.md` needed +2 words
+`SKILL.md` ended at 770 against its 776 budget — and `create.md` needed +2 words
 for the cross-reference, so that one budget was bumped explicitly. The ratchet did its
 job on a real edit.
 

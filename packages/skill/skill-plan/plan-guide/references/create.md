@@ -1,4 +1,4 @@
-# plan-create: Create a High-Level Plan
+# Create: A High-Level Plan
 
 Create one high-level plan from explicit inline inputs or provider-native references plus optional revisions. Return the plan inline and stop before detailed child plans, persistence, or implementation.
 

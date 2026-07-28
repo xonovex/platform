@@ -1,4 +1,4 @@
-# plan-research: Research Codebase and External Evidence for a Plan
+# Research: Codebase and External Evidence for a Plan
 
 Produce a read-only, planning-oriented report from an inline subject or an opaque provider-native reference plus an optional revision. Let a selected provider resolve native inputs and return the report inline.
 

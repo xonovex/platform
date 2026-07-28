@@ -132,8 +132,9 @@ record:
    invalidate output results for the same skills); `plan-guide` first since it has
    a known open gate; same taxonomy, same citation rule; re-run affected skills.
 4. **Evidence consolidation.** Record both sweeps' results and dispositions;
-   `plan-update` the parent (flip `[~]` to `[x]`); confirm `ci-check` green across
-   skill, command, and typescript-script tags; state go/no-go for subplan 7.
+   run the plan Update operation on the parent (flip `[~]` to `[x]`); confirm
+   `ci-check` green across skill, command, and typescript-script tags; state
+   go/no-go for subplan 7.
 
 ### Constraints
 
