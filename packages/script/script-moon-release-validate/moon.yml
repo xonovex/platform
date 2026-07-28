@@ -40,6 +40,14 @@ tasks:
       - /packages/skill/*/package.json
       - /packages/skill/*/.claude-plugin/plugin.json
       - /packages/skill/*/.codex-plugin/plugin.json
+      - /AGENTS.md
+      - /CLAUDE.md
+      - /.moon/AGENTS.md
+      - /.moon/CLAUDE.md
+      - /packages/*/AGENTS.md
+      - /packages/*/CLAUDE.md
+      - /packages/*/*/AGENTS.md
+      - /packages/*/*/CLAUDE.md
     options:
       runFromWorkspaceRoot: true
   ci-check:

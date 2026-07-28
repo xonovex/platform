@@ -82,6 +82,14 @@ const createFixture = (): string => {
     },
   });
   writeText(root, "README.md", "# Test repository\n");
+  for (const group of ["skill", "command", "script"]) {
+    writeText(root, `packages/${group}/AGENTS.md`, `# ${group}\n`);
+    writeText(
+      root,
+      `packages/${group}/CLAUDE.md`,
+      "See @AGENTS.md for complete documentation.\n",
+    );
+  }
   writeText(
     root,
     `${SCRIPT_PATH}/moon.yml`,

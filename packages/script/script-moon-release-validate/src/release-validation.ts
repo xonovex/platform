@@ -3,6 +3,10 @@ import {basename, resolve} from "node:path";
 import {type z} from "zod";
 import {coverageFloorFailures} from "./coverage-floors.js";
 import {
+  instructionDocFailures,
+  type InstructionDirectory,
+} from "./instruction-docs.js";
+import {
   LockfileSchema,
   MarketplaceSchema,
   PackageManifestSchema,
@@ -314,25 +318,29 @@ const validatePackage = (
     );
   }
 
-  if (packageJson.description !== undefined) {
+  // package.json is the single description source: a plugin package must declare
+  // one, and every manifest and marketplace entry must repeat it verbatim.
+  check(
+    packageJson.description !== undefined && packageJson.description !== "",
+    `${packageJson.name} package declares a description`,
+  );
+  check(
+    claudeManifest.description === packageJson.description,
+    `${packageJson.name} package and Claude manifest descriptions match`,
+  );
+  check(
+    claudeDescriptions.get(claudeManifest.name) === packageJson.description,
+    `${packageJson.name} package and Claude marketplace descriptions match`,
+  );
+  if (codexManifest !== undefined) {
     check(
-      claudeManifest.description === packageJson.description,
-      `${packageJson.name} package and Claude manifest descriptions match`,
+      codexManifest.description === packageJson.description,
+      `${packageJson.name} package and Codex manifest descriptions match`,
     );
     check(
-      claudeDescriptions.get(claudeManifest.name) === packageJson.description,
-      `${packageJson.name} package and Claude marketplace descriptions match`,
+      codexDescriptions.get(codexManifest.name) === packageJson.description,
+      `${packageJson.name} package and Codex marketplace descriptions match`,
     );
-    if (codexManifest !== undefined) {
-      check(
-        codexManifest.description === packageJson.description,
-        `${packageJson.name} package and Codex manifest descriptions match`,
-      );
-      check(
-        codexDescriptions.get(codexManifest.name) === packageJson.description,
-        `${packageJson.name} package and Codex marketplace descriptions match`,
-      );
-    }
   }
 
   for (const [dependency, version] of dependencyEntries(packageJson)) {
@@ -498,8 +506,15 @@ export const validateRelease = (
   }
 
   const packagesDirectory = resolve(repositoryRoot, "packages");
-  const projectFiles = childDirectories(packagesDirectory, "packages", check)
-    .flatMap((group) => childDirectories(group, basename(group), check))
+  const groupDirectories = childDirectories(
+    packagesDirectory,
+    "packages",
+    check,
+  );
+  const projectDirectories = groupDirectories.flatMap((group) =>
+    childDirectories(group, basename(group), check),
+  );
+  const projectFiles = projectDirectories
     .map((project) => resolve(project, "moon.yml"))
     .filter((path) => existsSync(path))
     .map((path) => ({
@@ -508,6 +523,34 @@ export const validateRelease = (
     }));
   check(projectFiles.length > 0, "packages must define project task files");
   for (const failure of coverageFloorFailures(projectFiles)) {
+    check(false, failure);
+  }
+
+  // Every package group documents itself, and every AGENTS.md anywhere in the
+  // repository carries the CLAUDE.md pointer that makes it load in Claude Code.
+  const instructionDirectory = (directory: string): InstructionDirectory => {
+    const claudePath = resolve(directory, "CLAUDE.md");
+    return {
+      path: directory.slice(repositoryRoot.length + 1) || ".",
+      hasAgentsFile: existsSync(resolve(directory, "AGENTS.md")),
+      claudeText: existsSync(claudePath)
+        ? readFileSync(claudePath, "utf8")
+        : undefined,
+    };
+  };
+  const instructionDirectories = [
+    repositoryRoot,
+    resolve(repositoryRoot, ".moon"),
+    ...groupDirectories,
+    ...projectDirectories,
+  ].map(instructionDirectory);
+  const requiredInstructionDirectories = groupDirectories.map((group) =>
+    group.slice(repositoryRoot.length + 1),
+  );
+  for (const failure of instructionDocFailures(
+    instructionDirectories,
+    requiredInstructionDirectories,
+  )) {
     check(false, failure);
   }
 
