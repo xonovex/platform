@@ -8,7 +8,6 @@ projects:
     - packages/config/*
     - packages/agent/*
     - packages/shared/*
-    - packages/docker/*
     - packages/script/*
     - packages/moon/*
     # Project globs exclude tenant files so discovered locations stay directories.
