@@ -16,6 +16,7 @@
 - Dependency direction: `config -> shared -> agent`.
 - Internal `@xonovex/*` dependencies are exact, and a config package pins the plugins it configures exactly so consumers get identical behaviour. Every other external dependency takes a caret range; an exact pin elsewhere records its reason: `typescript` and `vite` in `.ncurc.cjs`, `@moonrepo/cli` because it resolves every task.
 - Write in plain sentences; prefer a comma, colon, or full stop to an em dash, and use a colon after a label.
+- Match a written document's length to what the task needs: cover the substance and leave out filler sections, redundant summaries, and boilerplate.
 - Report when the requested work is done or blocked: quality gates, what was done, what remains, suggestions.
 - Report each gate by its command and outcome; a gate that was skipped, cached, or does not cover the change is not a pass.
 - Mark each claim as verified, naming the evidence, or as unverified; correct an earlier claim when new evidence contradicts it.
