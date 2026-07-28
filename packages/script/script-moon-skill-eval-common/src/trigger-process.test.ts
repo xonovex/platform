@@ -177,7 +177,7 @@ describe("checkCodexTriggered", () => {
       'console.log(JSON.stringify({type:"item.completed",item:{type:"agent_message",text:"XONOVEX_SKILL_TRIGGERED"}}))',
     );
 
-    expect(outcome).toEqual({triggered: true, error: null});
+    expect(outcome).toEqual({triggered: true, error: null, selected: "target"});
   });
 
   it("stages multiple candidate guides while signaling only the target", async () => {
@@ -216,7 +216,7 @@ console.log(JSON.stringify({type:"item.completed",item:{type:"agent_message",tex
       ],
     });
 
-    expect(outcome).toEqual({triggered: true, error: null});
+    expect(outcome).toEqual({triggered: true, error: null, selected: "target"});
   });
 
   it("returns a clean negative result for malformed and nonmatching output", async () => {
@@ -225,7 +225,7 @@ console.log("not json");
 console.log(JSON.stringify({type: "item.completed", item: {type: "agent_message", text: "NOT_APPLICABLE"}}));
 `);
 
-    expect(outcome).toEqual({triggered: false, error: null});
+    expect(outcome).toEqual({triggered: false, error: null, selected: "none"});
   });
 
   it("includes process stderr in nonzero-exit failures", async () => {
@@ -245,6 +245,10 @@ console.log(JSON.stringify({type: "item.completed", item: {type: "agent_message"
 setInterval(() => {}, 1000);
 `);
 
-    expect(outcome).toEqual({triggered: false, error: null});
+    expect(outcome).toEqual({
+      triggered: false,
+      error: null,
+      selected: "output-limit",
+    });
   });
 });

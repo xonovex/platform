@@ -408,9 +408,13 @@ export const checkCodexTriggered = (
     proc.on("error", (error) => {
       spawnError = error.message;
     });
+    // The outcomes carry the same `selected` evidence the Claude path records, so a
+    // triage reads how a Codex run ended from its result rather than re-probing the
+    // model. Codex has no competitor outcome: it signals applicability in the agent
+    // message instead of invoking a skill, so no other skill can win the request.
     proc.on("close", (code) => {
       if (matched) {
-        finish({triggered: true, error: null});
+        finish({triggered: true, error: null, selected: "target"});
         return;
       }
       if (timedOut) {
@@ -418,7 +422,7 @@ export const checkCodexTriggered = (
         return;
       }
       if (outputLimitExceeded) {
-        finish({triggered: false, error: null});
+        finish({triggered: false, error: null, selected: "output-limit"});
         return;
       }
       if (spawnError !== null) {
@@ -434,7 +438,7 @@ export const checkCodexTriggered = (
         });
         return;
       }
-      finish({triggered: false, error: null});
+      finish({triggered: false, error: null, selected: "none"});
     });
   });
 };
