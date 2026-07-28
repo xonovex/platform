@@ -170,7 +170,7 @@ describe("evaluation configuration", () => {
 
     expect(config).toMatchObject({
       model: "claude-haiku-4-5-20251001",
-      judgeModel: "claude-sonnet-4-6",
+      judgeModel: "claude-sonnet-5",
     });
   });
 

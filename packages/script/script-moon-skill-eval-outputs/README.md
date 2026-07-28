@@ -9,7 +9,7 @@ npx moon-skill-eval-outputs [evals.json] [skill-name] [iteration] [--harness cla
 # evals defaults to ./evals.json; skill-name defaults to the name in ./SKILL.md
 ```
 
-Requires the selected CLI on PATH and its API credential. Claude is the default harness. Claude defaults to `claude-haiku-4-5-20251001` for generation and `claude-sonnet-4-6` for judging; Codex defaults to `gpt-5.3-codex` for both. CLI options and harness-specific environment variables are explicit overrides, and evidence records both resolved identifiers.
+Requires the selected CLI on PATH and its API credential. Claude is the default harness. Claude defaults to `claude-haiku-4-5-20251001` for generation and `claude-sonnet-5` for judging; Codex defaults to `gpt-5.3-codex` for both. CLI options and harness-specific environment variables are explicit overrides, and evidence records both resolved identifiers.
 
 The Claude adapter uses `--plugin-dir packages/skill/<package>` to load an unpublished repository plugin and its declared local plugin dependencies only in the with-skill arm. Plugin preflight requires skill-only manifests and rejects commands, agents, hooks, MCP, LSP, and settings components. That arm invokes the exact namespaced slash command; the baseline prompt stays unchanged and blocks the Skill tool. Generation runs expose only `Skill` plus `Read` in the activated arm and only `Read` in baseline. Judges have no tools. The Codex adapter uses separate ephemeral homes, stages only the target skill for the activated arm, explicitly invokes it with `$skill-name`, ignores inherited configuration and rules, and runs read-only.
 

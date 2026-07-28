@@ -31,7 +31,7 @@ Options (flag overrides env; env keeps the loop/CI ergonomics):
     --model M / CLAUDE_MODEL=M         generation model
                                        (default: claude-haiku-4-5-20251001)
     --judge-model M / JUDGE_MODEL=M    grading model
-                                       (default: claude-sonnet-4-6)
+                                       (default: claude-sonnet-5)
     --disallowed-tools L / DISALLOWED_TOOLS=L
                                        tools blocked in BOTH arms during generation
                                        (default: Bash,Edit,Write,NotebookEdit,WebFetch);
@@ -100,7 +100,7 @@ JUDGE_SYSTEM_PROMPT = (
 )
 MAX_OUTPUT_MODEL_CALLS = 24
 CLAUDE_GENERATION_MODEL = "claude-haiku-4-5-20251001"
-CLAUDE_JUDGE_MODEL = "claude-sonnet-4-6"
+CLAUDE_JUDGE_MODEL = "claude-sonnet-5"
 OUTPUT_GATE_POLICIES = {
     "aggressive": {"minimum_with_skill_pass_rate": 0.75,
                    "minimum_delta_pass_rate": 0.05},

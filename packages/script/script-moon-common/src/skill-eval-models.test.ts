@@ -5,7 +5,7 @@ describe("skill evaluation model defaults", () => {
   it("uses canonical Claude model identifiers", () => {
     expect(skillEvalModelDefaults("claude")).toEqual({
       generation: "claude-haiku-4-5-20251001",
-      judge: "claude-sonnet-4-6",
+      judge: "claude-sonnet-5",
     });
   });
 

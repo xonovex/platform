@@ -8,7 +8,7 @@ export interface SkillEvalModelDefaults {
 const MODEL_DEFAULTS = {
   claude: {
     generation: "claude-haiku-4-5-20251001",
-    judge: "claude-sonnet-4-6",
+    judge: "claude-sonnet-5",
   },
   codex: {
     generation: "gpt-5.3-codex",
