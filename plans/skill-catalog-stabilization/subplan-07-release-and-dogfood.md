@@ -12,6 +12,8 @@ dependencies:
     - subplan-06-anti-drift-enforce
   files:
     - plans/skill-catalog-stabilization.md
+  blocked_by:
+    - plans/skill-catalog-eval-sweeps/decision-gate-floors.md
 skills_to_consult:
   [versioning-guide, npm-guide, git-guide, github-guide, reflect-guide]
 validation:

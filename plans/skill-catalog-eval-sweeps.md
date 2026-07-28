@@ -1,7 +1,7 @@
 ---
 type: plan
 has_subplans: true
-status: complete
+status: in_progress
 dependencies:
   plans:
     - plans/skill-catalog-stabilization.md
@@ -9,6 +9,9 @@ dependencies:
     - plans/skill-catalog-eval-sweeps/subplan-01-trigger-sweep-and-triage.md
     - plans/skill-catalog-eval-sweeps/subplan-02-output-sweep-and-triage.md
     - plans/skill-catalog-eval-sweeps/subplan-03-evidence-consolidation.md
+open_items:
+  - plans/skill-catalog-eval-sweeps/decision-gate-floors.md
+  - plans/skill-catalog-eval-sweeps/remediation-open-findings.md
 parallel_groups:
   group-1: [subplan-01-trigger-sweep-and-triage]
   group-2: [subplan-02-output-sweep-and-triage]
@@ -271,3 +274,14 @@ sweep pass, so it has to be a recorded decision rather than a convenience.
 The two remaining ownership questions — whether `claude-code-guide` and
 `instruction-guide` should claim work Claude Code's own bundled skills already
 own — do not gate the release; they change eval labels, not shipped content.
+
+### What is still open
+
+The sweeps are done; this plan is not, because it still owns two live documents:
+
+- `decision-gate-floors.md` (`open`) holds the floors decision named above. It is
+  the one item gating stabilization subplan 7, and it recommends leaving the
+  floors alone. Taking or rejecting that recommendation closes it.
+- `remediation-open-findings.md` (`active`) tracks the findings that survived
+  subplan 1: S3 adaptive run escalation, F4 workflow train positives, and the
+  D1-D7 ownership decisions.
