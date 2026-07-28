@@ -14,7 +14,7 @@
 - Comments describe present behavior and name the declaration, function, or module; never reference a plan, agent, doc path, porting history, `INTERIM`, or `TODO`.
 - Use conventional commits.
 - Dependency direction: `config -> shared -> agent`.
-- Internal `@xonovex/*` dependencies are exact; external dependencies take a caret range. Pin an external dependency exactly only when a floating range breaks the toolchain, and record the reason: `typescript` and `vite` in `.ncurc.cjs`, `@moonrepo/cli` because it resolves every task.
+- Internal `@xonovex/*` dependencies are exact, and a config package pins the plugins it configures exactly so consumers get identical behaviour. Every other external dependency takes a caret range; an exact pin elsewhere records its reason: `typescript` and `vite` in `.ncurc.cjs`, `@moonrepo/cli` because it resolves every task.
 - Write in plain sentences; prefer a comma, colon, or full stop to an em dash, and use a colon after a label.
 - Report when the requested work is done or blocked: quality gates, what was done, what remains, suggestions.
 - Report each gate by its command and outcome; a gate that was skipped, cached, or does not cover the change is not a pass.
