@@ -53,7 +53,7 @@ Provide implementation-planning procedures selected by a caller or generic opera
 - Continuation completes one target and stops instead of silently chaining into the next child
 - Inspect and preview continuation never edit files, provider resources, or plan state
 - Subplans with more than seven tasks risk silent drops — target five to seven focused tasks
-- Re-read tasks and success criteria before reporting completion; green tests alone do not prove the plan is done
+- Completion is measured against the tasks and success criteria; green tests alone do not prove it
 
 ## Progressive Disclosure
 
