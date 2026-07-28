@@ -155,38 +155,39 @@ describe("Logging", () => {
         `${Colors.BLUE}${"-".repeat(9)}${Colors.NC}`,
       );
     });
+
+    it("should omit the separator for an empty title", async () => {
+      const {printSubsection} = await import("./logging.js");
+      printSubsection("");
+
+      expect(consoleLogSpy).toHaveBeenCalledExactlyOnceWith(
+        `\n${Colors.BLUE}${Colors.NC}`,
+      );
+    });
   });
 
   describe("checkResult", () => {
-    it("should show green checkmark for SUCCESS", async () => {
-      const {checkResult} = await import("./logging.js");
-      checkResult("Test check", "SUCCESS");
+    it.each([
+      ["PASS", "✓", Colors.GREEN],
+      ["OK", "✓", Colors.GREEN],
+      ["SUCCESS", "✓", Colors.GREEN],
+      ["FAIL", "✗", Colors.RED],
+      ["ERROR", "✗", Colors.RED],
+      ["FAILED", "✗", Colors.RED],
+      ["WARN", "⚠", Colors.YELLOW],
+      ["WARNING", "⚠", Colors.YELLOW],
+      ["INFO", "ℹ", Colors.BLUE],
+    ] as const)(
+      "should show %s as %s in its status color",
+      async (status, symbol, color) => {
+        const {checkResult} = await import("./logging.js");
+        checkResult("Test check", status);
 
-      expect(consoleLogSpy).toHaveBeenCalledWith(expect.stringContaining("✓"));
-      expect(consoleLogSpy).toHaveBeenCalledWith(
-        expect.stringContaining(Colors.GREEN),
-      );
-    });
-
-    it("should show red X for FAILED", async () => {
-      const {checkResult} = await import("./logging.js");
-      checkResult("Test check", "FAILED");
-
-      expect(consoleLogSpy).toHaveBeenCalledWith(expect.stringContaining("✗"));
-      expect(consoleLogSpy).toHaveBeenCalledWith(
-        expect.stringContaining(Colors.RED),
-      );
-    });
-
-    it("should show yellow warning for WARN", async () => {
-      const {checkResult} = await import("./logging.js");
-      checkResult("Test check", "WARN");
-
-      expect(consoleLogSpy).toHaveBeenCalledWith(expect.stringContaining("⚠"));
-      expect(consoleLogSpy).toHaveBeenCalledWith(
-        expect.stringContaining(Colors.YELLOW),
-      );
-    });
+        expect(consoleLogSpy).toHaveBeenCalledWith(
+          `${color}${symbol} Test check${Colors.NC}`,
+        );
+      },
+    );
 
     it("should print details if provided", async () => {
       const {checkResult} = await import("./logging.js");
