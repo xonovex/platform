@@ -1,6 +1,7 @@
 {
   "name": "@xonovex/skill-editor-viewport",
   "version": "7.0.0",
+  "description": "Xonovex Editor viewport skills",
   "private": true,
   "type": "module",
   "keywords": [

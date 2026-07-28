@@ -1,6 +1,7 @@
 {
   "name": "@xonovex/skill-gpu-rendering",
   "version": "7.0.0",
+  "description": "Xonovex GPU rendering skills",
   "private": true,
   "type": "module",
   "keywords": [

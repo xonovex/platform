@@ -1,6 +1,7 @@
 {
   "name": "@xonovex/skill-tdd",
   "version": "7.0.0",
+  "description": "Xonovex Test-driven development skills",
   "private": true,
   "type": "module",
   "keywords": [

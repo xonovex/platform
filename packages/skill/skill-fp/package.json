@@ -1,6 +1,7 @@
 {
   "name": "@xonovex/skill-fp",
   "version": "7.0.0",
+  "description": "Xonovex Functional programming skills",
   "private": true,
   "type": "module",
   "keywords": [

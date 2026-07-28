@@ -1,6 +1,7 @@
 {
   "name": "@xonovex/skill-oop",
   "version": "7.0.0",
+  "description": "Xonovex Object-oriented programming skills",
   "private": true,
   "type": "module",
   "keywords": [

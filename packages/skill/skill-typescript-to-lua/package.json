@@ -1,6 +1,7 @@
 {
   "name": "@xonovex/skill-typescript-to-lua",
   "version": "7.0.0",
+  "description": "Xonovex TypeScript to Lua skills",
   "private": true,
   "type": "module",
   "dependencies": {

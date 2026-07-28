@@ -1,6 +1,7 @@
 {
   "name": "@xonovex/skill-code-quality",
   "version": "7.0.0",
+  "description": "Xonovex Code quality skills",
   "private": true,
   "type": "module",
   "keywords": [

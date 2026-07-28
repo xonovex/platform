@@ -1,6 +1,7 @@
 {
   "name": "@xonovex/command-workflow",
   "version": "7.0.0",
+  "description": "Xonovex explicit workflow operation commands",
   "private": true,
   "dependencies": {
     "@xonovex/skill-workflow": "7.0.0"

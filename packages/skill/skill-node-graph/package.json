@@ -1,6 +1,7 @@
 {
   "name": "@xonovex/skill-node-graph",
   "version": "7.0.0",
+  "description": "Xonovex Node graph skills",
   "private": true,
   "type": "module",
   "keywords": [

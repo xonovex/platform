@@ -1,6 +1,7 @@
 {
   "name": "@xonovex/skill-c99-opinionated",
   "version": "7.0.0",
+  "description": "Xonovex C99 opinionated skills",
   "private": true,
   "type": "module",
   "dependencies": {

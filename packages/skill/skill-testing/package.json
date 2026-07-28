@@ -1,6 +1,7 @@
 {
   "name": "@xonovex/skill-testing",
   "version": "7.0.0",
+  "description": "Xonovex Testing skills",
   "private": true,
   "type": "module",
   "keywords": [

@@ -1,6 +1,7 @@
 {
   "name": "@xonovex/skill-debugging",
   "version": "7.0.0",
+  "description": "Xonovex Debugging skills",
   "private": true,
   "type": "module",
   "keywords": [

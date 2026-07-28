@@ -1,6 +1,7 @@
 {
   "name": "@xonovex/skill-typescript",
   "version": "7.0.0",
+  "description": "Xonovex TypeScript skills",
   "private": true,
   "type": "module",
   "keywords": [

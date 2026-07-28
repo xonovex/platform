@@ -1,6 +1,7 @@
 {
   "name": "@xonovex/skill-python",
   "version": "7.0.0",
+  "description": "Xonovex Python skills",
   "private": true,
   "type": "module",
   "keywords": [

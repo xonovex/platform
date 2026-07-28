@@ -1,6 +1,7 @@
 {
   "name": "@xonovex/skill-microkernel-pattern",
   "version": "7.0.0",
+  "description": "Xonovex Microkernel architecture skills",
   "private": true,
   "type": "module",
   "keywords": [

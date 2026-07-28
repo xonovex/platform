@@ -1,6 +1,7 @@
 {
   "name": "@xonovex/skill-shell-scripting",
   "version": "7.0.0",
+  "description": "Xonovex Shell scripting skills",
   "private": true,
   "type": "module",
   "keywords": [

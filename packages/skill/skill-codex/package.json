@@ -1,6 +1,7 @@
 {
   "name": "@xonovex/skill-codex",
   "version": "7.0.0",
+  "description": "Xonovex Codex hook skills",
   "private": true,
   "type": "module",
   "keywords": [

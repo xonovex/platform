@@ -1,6 +1,7 @@
 {
   "name": "@xonovex/skill-github",
   "version": "7.0.0",
+  "description": "Xonovex GitHub host delivery skills",
   "private": true,
   "type": "module",
   "dependencies": {

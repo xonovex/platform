@@ -1,6 +1,7 @@
 {
   "name": "@xonovex/skill-versioning",
   "version": "7.0.0",
+  "description": "Xonovex versioning skills",
   "private": true,
   "type": "module",
   "keywords": [

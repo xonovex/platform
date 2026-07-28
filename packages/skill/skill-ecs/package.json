@@ -1,6 +1,7 @@
 {
   "name": "@xonovex/skill-ecs",
   "version": "7.0.0",
+  "description": "Xonovex Entity-Component-System skills",
   "private": true,
   "type": "module",
   "keywords": [

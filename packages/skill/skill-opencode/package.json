@@ -1,6 +1,7 @@
 {
   "name": "@xonovex/skill-opencode",
   "version": "7.0.0",
+  "description": "Xonovex OpenCode plugin skills",
   "private": true,
   "type": "module",
   "keywords": [

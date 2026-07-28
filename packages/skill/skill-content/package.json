@@ -1,6 +1,7 @@
 {
   "name": "@xonovex/skill-content",
   "version": "7.0.0",
+  "description": "Xonovex Content skills",
   "private": true,
   "type": "module",
   "keywords": [

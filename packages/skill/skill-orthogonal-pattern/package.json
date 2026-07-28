@@ -1,6 +1,7 @@
 {
   "name": "@xonovex/skill-orthogonal-pattern",
   "version": "7.0.0",
+  "description": "Xonovex Orthogonal pattern skills",
   "private": true,
   "type": "module",
   "keywords": [

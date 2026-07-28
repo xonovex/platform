@@ -1,6 +1,7 @@
 {
   "name": "@xonovex/skill-gitlab",
   "version": "7.0.0",
+  "description": "Xonovex GitLab host delivery skills",
   "private": true,
   "type": "module",
   "dependencies": {

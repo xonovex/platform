@@ -1,6 +1,7 @@
 {
   "name": "@xonovex/skill-cross-platform",
   "version": "7.0.0",
+  "description": "Xonovex Cross-platform / portability skills",
   "private": true,
   "type": "module",
   "keywords": [

@@ -1,6 +1,7 @@
 {
   "name": "@xonovex/skill-pi",
   "version": "7.0.0",
+  "description": "Xonovex Pi extension skills",
   "private": true,
   "type": "module",
   "keywords": [

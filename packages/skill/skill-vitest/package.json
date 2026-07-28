@@ -1,6 +1,7 @@
 {
   "name": "@xonovex/skill-vitest",
   "version": "7.0.0",
+  "description": "Xonovex Vitest skills",
   "private": true,
   "type": "module",
   "keywords": [

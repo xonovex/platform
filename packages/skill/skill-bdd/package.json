@@ -1,6 +1,7 @@
 {
   "name": "@xonovex/skill-bdd",
   "version": "7.0.0",
+  "description": "Xonovex Behaviour/acceptance-driven development skills",
   "private": true,
   "type": "module",
   "keywords": [

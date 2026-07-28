@@ -86,7 +86,7 @@
     {
       "name": "xonovex-skill-command",
       "source": "./packages/skill/skill-command",
-      "description": "Xonovex Command skill — author, merge, simplify reusable user-invocable prompt files"
+      "description": "Xonovex Command skill — author, merge, simplify reusable user-invocable prompt files (slash commands)"
     },
     {
       "name": "xonovex-skill-connascence",
@@ -221,7 +221,7 @@
     {
       "name": "xonovex-skill-llmstxt",
       "source": "./packages/skill/skill-llmstxt",
-      "description": "Xonovex llms.txt skill — author and maintain /llms.txt files and per-page markdown mirrors per the llmstxt.org spec"
+      "description": "Xonovex llms.txt skill — author and maintain /llms.txt files (and per-page markdown mirrors) per the llmstxt.org specification"
     },
     {
       "name": "xonovex-skill-lock-free",
@@ -316,7 +316,7 @@
     {
       "name": "xonovex-skill-skill",
       "source": "./packages/skill/skill-skill",
-      "description": "Xonovex Skill skills"
+      "description": "Xonovex Skill skill — author, extract, assimilate, simplify, validate Agent Skills via progressive disclosure"
     },
     {
       "name": "xonovex-skill-sql-postgresql",

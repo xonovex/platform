@@ -1,6 +1,7 @@
 {
   "name": "@xonovex/skill-pull-request",
   "version": "7.0.0",
+  "description": "Xonovex Pull request skills",
   "private": true,
   "type": "module",
   "keywords": [

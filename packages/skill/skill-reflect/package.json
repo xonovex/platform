@@ -1,6 +1,7 @@
 {
   "name": "@xonovex/skill-reflect",
   "version": "7.0.0",
+  "description": "Xonovex Reflect skills",
   "private": true,
   "type": "module",
   "keywords": [

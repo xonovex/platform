@@ -1,6 +1,7 @@
 {
   "name": "@xonovex/skill-hono-opinionated",
   "version": "7.0.0",
+  "description": "Xonovex Hono opinionated skills",
   "private": true,
   "type": "module",
   "dependencies": {
