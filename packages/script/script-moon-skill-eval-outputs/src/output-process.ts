@@ -9,6 +9,7 @@ import {
 } from "node:fs";
 import {tmpdir} from "node:os";
 import {join} from "node:path";
+import {terminateProcess} from "@xonovex/script-moon-common/child-process";
 import {resolveExecutable} from "@xonovex/script-moon-common/executable";
 import {isRecord} from "@xonovex/script-moon-common/records";
 import {
@@ -170,18 +171,24 @@ const runHarness = (
     let partialLine = "";
     let outputCharacters = 0;
     let settled = false;
+    let killTimer: NodeJS.Timeout | undefined;
     const finish = (error: string | null): void => {
       if (settled) return;
       settled = true;
       clearTimeout(timer);
+      clearTimeout(killTimer);
       if (isolatedWorkspace !== undefined) {
         rmSync(isolatedWorkspace, {recursive: true, force: true});
       }
       resolvePromise({stdout, timedOut, outputLimitExceeded, error});
     };
+    const killChild = (): void => {
+      clearTimeout(killTimer);
+      killTimer = terminateProcess(child);
+    };
     const timer = setTimeout(() => {
       timedOut = true;
-      child.kill("SIGKILL");
+      killChild();
     }, timeoutMs);
     child.stdout.setEncoding("utf8");
     child.stdout.on("data", (chunk: string) => {
@@ -203,7 +210,7 @@ const runHarness = (
             : codexAgentMessage(event).length;
         if (outputCharacters > maxOutputCharacters) {
           outputLimitExceeded = true;
-          child.kill("SIGKILL");
+          killChild();
           break;
         }
       }

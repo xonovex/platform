@@ -8,6 +8,10 @@
       "types": "./src/batches.ts",
       "default": "./dist/src/batches.js"
     },
+    "./child-process": {
+      "types": "./src/child-process.ts",
+      "default": "./dist/src/child-process.js"
+    },
     "./cli-args": {
       "types": "./src/cli-args.ts",
       "default": "./dist/src/cli-args.js"

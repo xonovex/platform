@@ -3,6 +3,7 @@ import {appendFileSync, cpSync, mkdirSync, mkdtempSync, rmSync} from "node:fs";
 import {tmpdir} from "node:os";
 import {join} from "node:path";
 import {createInterface} from "node:readline";
+import {terminateProcess} from "@xonovex/script-moon-common/child-process";
 import {isRecord} from "@xonovex/script-moon-common/records";
 import {streamTextDeltaLength} from "./validation.js";
 
@@ -194,9 +195,7 @@ export const checkTriggered = (
       }
       settled = true;
       clearTimeout(timeoutTimer);
-      if (killTimer) {
-        clearTimeout(killTimer);
-      }
+      clearTimeout(killTimer);
       resolvePromise(outcome);
     };
 
@@ -206,10 +205,8 @@ export const checkTriggered = (
     }, TRIGGER_TIMEOUT_MS);
 
     const killProc = (): void => {
-      if (proc.exitCode === null && proc.signalCode === null) {
-        proc.kill("SIGKILL");
-        killTimer = setTimeout(() => proc.kill("SIGKILL"), 5000);
-      }
+      clearTimeout(killTimer);
+      killTimer = terminateProcess(proc);
     };
 
     rl.on("line", (raw) => {
@@ -372,18 +369,19 @@ export const checkCodexTriggered = (
     let stderr = "";
     let spawnError: string | null = null;
     let settled = false;
+    let killTimer: NodeJS.Timeout | undefined;
 
     const finish = (outcome: TriggerOutcome): void => {
       if (settled) return;
       settled = true;
       clearTimeout(timeoutTimer);
+      clearTimeout(killTimer);
       rmSync(workspace, {recursive: true, force: true});
       resolvePromise(outcome);
     };
     const killProc = (): void => {
-      if (proc.exitCode === null && proc.signalCode === null) {
-        proc.kill("SIGKILL");
-      }
+      clearTimeout(killTimer);
+      killTimer = terminateProcess(proc);
     };
     const timeoutTimer = setTimeout(() => {
       timedOut = true;
