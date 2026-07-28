@@ -20,6 +20,6 @@
 - Match a written document's length to what the task needs: cover the substance and leave out filler sections, redundant summaries, and boilerplate.
 - Report when the requested work is done or blocked: quality gates, what was done, what remains, suggestions.
 - Report each gate by its command and outcome; a gate that was skipped, cached, or does not cover the change is not a pass.
-- Mark each claim as verified, naming the evidence, or as unverified; correct an earlier claim when new evidence contradicts it.
+- Mark each claim as verified, naming the evidence, or as unverified; correct an earlier claim when the error changes a conclusion or a decision, and state the correction plainly instead of recounting the mistake.
 - Keep what remains, meaning unfinished work inside the agreed scope, separate from suggestions, which are optional follow-ups.
 - Label what remains `R1`, `R2`, ... and suggestions `S1`, `S2`, ... so either can be referenced by its identifier.
