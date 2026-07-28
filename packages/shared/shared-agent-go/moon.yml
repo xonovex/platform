@@ -9,19 +9,24 @@ dependsOn:
 tasks:
   go-test-coverage:
     env:
-      GO_COVERAGE_MIN: "85"
+      GO_COVERAGE_MIN: "88"
   go-package-coverage:
-    command: >-
-      bash "$workspaceRoot/.moon/scripts/check-go-package-coverage.sh"
-      ./pkg/agentcmd=60
-      ./pkg/agents=90
-      ./pkg/isolation=100
-      ./pkg/network=100
-      ./pkg/policy=100
-      ./pkg/providers=90
-      ./pkg/provision/nix=85
-      ./pkg/validation=85
-      ./pkg/workspace=100
+    script: |
+      set -euo pipefail
+      # Every package the module builds is named here. pkg/provision and
+      # pkg/types declare shared types and hold no statements.
+      bash "$workspaceRoot/.moon/scripts/check-go-package-coverage.sh" \
+        ./pkg/agentcmd=60 \
+        ./pkg/agents=90 \
+        ./pkg/isolation=100 \
+        ./pkg/network=100 \
+        ./pkg/policy=100 \
+        ./pkg/providers=95 \
+        ./pkg/provision=exempt \
+        ./pkg/provision/nix=85 \
+        ./pkg/types=exempt \
+        ./pkg/validation=85 \
+        ./pkg/workspace=100
     inputs:
       - /packages/shared/shared-agent-go/pkg/**/*.go
       - /packages/shared/shared-agent-go/go.mod
@@ -30,6 +35,7 @@ tasks:
       - /packages/shared/shared-core-go/go.mod
       - /packages/shared/shared-core-go/go.sum
       - /.moon/scripts/check-go-package-coverage.sh
+      - /.moon/scripts/strip-generated-coverage.sh
     options:
       cache: true
       runInCI: true

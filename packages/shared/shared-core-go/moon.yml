@@ -8,19 +8,22 @@ layer: library
 tasks:
   go-test-coverage:
     env:
-      GO_COVERAGE_MIN: "85"
+      GO_COVERAGE_MIN: "89"
   go-package-coverage:
-    command: >-
-      bash "$workspaceRoot/.moon/scripts/check-go-package-coverage.sh"
-      ./pkg/colors=100
-      ./pkg/envutil=100
-      ./pkg/logging=75
-      ./pkg/shell=100
+    script: |
+      set -euo pipefail
+      # Every package the module builds is named here.
+      bash "$workspaceRoot/.moon/scripts/check-go-package-coverage.sh" \
+        ./pkg/colors=100 \
+        ./pkg/envutil=100 \
+        ./pkg/logging=75 \
+        ./pkg/shell=100
     inputs:
       - /packages/shared/shared-core-go/pkg/**/*.go
       - /packages/shared/shared-core-go/go.mod
       - /packages/shared/shared-core-go/go.sum
       - /.moon/scripts/check-go-package-coverage.sh
+      - /.moon/scripts/strip-generated-coverage.sh
     options:
       cache: true
       runInCI: true

@@ -46,11 +46,13 @@ tasks:
     script: |
       set -euo pipefail
       go test -v -coverprofile=coverage.out ./...
+      bash "$workspaceRoot/.moon/scripts/strip-generated-coverage.sh" coverage.out
       coverage="$(go tool cover -func=coverage.out | awk '/^total:/ { gsub(/%/, "", $3); print $3 }')"
       awk -v coverage="$coverage" -v minimum="$GO_COVERAGE_MIN" 'BEGIN { if (coverage + 0 < minimum + 0) { printf "coverage %.1f%% is below %s%%\n", coverage, minimum > "/dev/stderr"; exit 1 } }'
     # GO_COVERAGE_MIN is the floor for a project that sets none of its own. Each
     # Go project overrides it to sit just under its own coverage, so a drop fails
-    # that project instead of coasting on the weakest project's floor.
+    # that project instead of coasting on the weakest project's floor. Generated
+    # files are stripped first, so the floor measures hand-written code.
     env:
       GO_COVERAGE_MIN: "55"
     toolchain: [system, nix]
@@ -59,6 +61,7 @@ tasks:
     inputs:
       - "@globs(sources)"
       - "@globs(tests)"
+      - /.moon/scripts/strip-generated-coverage.sh
     outputs:
       - coverage.out
     options:

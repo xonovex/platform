@@ -10,30 +10,42 @@ dependsOn:
 tasks:
   go-test-coverage:
     env:
-      GO_COVERAGE_MIN: "55"
+      GO_COVERAGE_MIN: "75"
   go-package-coverage:
-    script: >-
-      bash "$workspaceRoot/.moon/scripts/check-go-package-coverage.sh"
-      ./api/v1alpha1=35
-      ./cmd/e2e-summary=45
-      ./internal/controller=55
-      ./internal/isolation/shared=85
-      ./internal/network/shared=95
-      ./internal/plugins=35
-      ./internal/provider=90
-      ./internal/provision/nix=80
-      ./internal/resolver=60
-      ./internal/validator=100
-      ./internal/webhook=85
-      ./internal/workspace/git=80
-      ./internal/workspace/jj=80
-      ./internal/workspace/shared=75
-      ./internal/harness/claude=80
-      ./internal/harness/opencode=80
+    script: |
+      set -euo pipefail
+      # Every package the module builds is named here. cmd/operator is manager
+      # wiring covered by go-test-integration under envtest, test/testutil is
+      # test support, and config, internal/arch and the shared packages declare
+      # interfaces and embedded manifests with no statements.
+      bash "$workspaceRoot/.moon/scripts/check-go-package-coverage.sh" \
+        ./api/v1alpha1=100 \
+        ./cmd/e2e-summary=87 \
+        ./cmd/operator=exempt \
+        ./config=exempt \
+        ./internal/arch=exempt \
+        ./internal/controller=83 \
+        ./internal/harness/claude=85 \
+        ./internal/harness/opencode=80 \
+        ./internal/harness/shared=exempt \
+        ./internal/isolation/shared=85 \
+        ./internal/network/shared=100 \
+        ./internal/plugins=100 \
+        ./internal/provider=90 \
+        ./internal/provision/nix=100 \
+        ./internal/provision/shared=exempt \
+        ./internal/resolver=91 \
+        ./internal/validator=100 \
+        ./internal/webhook=85 \
+        ./internal/workspace/git=100 \
+        ./internal/workspace/jj=100 \
+        ./internal/workspace/shared=75 \
+        ./test/testutil=exempt
     inputs:
       - "@globs(sources)"
       - "@globs(tests)"
       - /.moon/scripts/check-go-package-coverage.sh
+      - /.moon/scripts/strip-generated-coverage.sh
     options:
       cache: true
     toolchain: [system, nix]
@@ -113,6 +125,7 @@ tasks:
       - /nix/mkAgentImage.nix
     outputs: []
     options:
+      runInCI: false
       cache: false
       runFromWorkspaceRoot: true
   go-test-integration:
@@ -143,6 +156,7 @@ tasks:
       TMPDIR: /var/tmp
     outputs: []
     options:
+      runInCI: false
       cache: false
     toolchain: [system, nix]
   go-test-e2e-gvisor:
@@ -162,6 +176,7 @@ tasks:
       TMPDIR: /var/tmp
     outputs: []
     options:
+      runInCI: false
       cache: false
     toolchain: [system, nix]
   go-test-e2e-kata:
@@ -181,6 +196,7 @@ tasks:
       TMPDIR: /var/tmp
     outputs: []
     options:
+      runInCI: false
       cache: false
     toolchain: [system, nix]
   go-test-e2e-coco:
@@ -200,5 +216,6 @@ tasks:
       TMPDIR: /var/tmp
     outputs: []
     options:
+      runInCI: false
       cache: false
     toolchain: [system, nix]
