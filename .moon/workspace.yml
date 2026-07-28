@@ -2,7 +2,6 @@ $schema: https://moonrepo.dev/schemas/workspace.json
 projects:
   globs:
     - packages/asset/*
-    - packages/diagram/*
     - packages/skill/*
     - packages/command/*
     - packages/config/*

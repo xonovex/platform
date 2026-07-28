@@ -5,7 +5,6 @@
   "type": "module",
   "workspaces": [
     "packages/asset/*",
-    "packages/diagram/*",
     "packages/skill/*",
     "packages/command/*",
     "packages/config/*",

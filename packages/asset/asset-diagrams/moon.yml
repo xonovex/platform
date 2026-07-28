@@ -1,0 +1,27 @@
+$schema: https://moonrepo.dev/schemas/project.json
+language: unknown
+tasks:
+  ci-check:
+    command: noop
+    deps: [graph-build]
+    options:
+      cache: false
+  graph-build:
+    # Every .dot source is rendered, so a new diagram cannot enter unrendered.
+    script: |
+      shopt -s nullglob
+      sources=(*.dot)
+      if [ "${#sources[@]}" -eq 0 ]; then
+        echo 'No .dot sources found' >&2
+        exit 1
+      fi
+      for source in "${sources[@]}"; do
+        dot -Tpng -Gdpi=150 -o "${source%.dot}.png" "$source"
+      done
+    toolchain: [system, nix]
+    inputs:
+      - "*.dot"
+    outputs:
+      - "*.png"
+    options:
+      cache: true

@@ -205,10 +205,10 @@ describe("checkCrossPackageLinks", () => {
     const repo = makeRepo({
       ...commandFiles(),
       "packages/command/command-test/README.md":
-        "See the [command model](../../diagram/diagram-command/command-model.png).\n",
+        "See the [command model](../../asset/asset-diagrams/command-model.png).\n",
       "packages/command/command-test/docs/invocation.md":
         "See the [submission boundary](../../../agent/agent-operator-go/README.md).\n",
-      "packages/diagram/diagram-command/command-model.png": "image",
+      "packages/asset/asset-diagrams/command-model.png": "image",
       "packages/agent/agent-operator-go/README.md": "# Operator\n",
       "packages/skill/skill-plan/plan-guide/SKILL.md":
         "# Plan\nSee [create](references/create.md).\n",
