@@ -76,6 +76,20 @@ describe("drift budgets", () => {
     expect(manifest).toEqual({"a.md": 1, "b.md": 2});
   });
 
+  it("orders seeded keys by code point rather than by locale", () => {
+    // A locale-aware sort ignores case and puts references/ first, which
+    // reorders the whole manifest on every reseed.
+    const manifest = seedBudgets([
+      file("guide/references/a.md", "one"),
+      file("guide/SKILL.md", "one"),
+    ]);
+
+    expect(Object.keys(manifest)).toEqual([
+      "guide/SKILL.md",
+      "guide/references/a.md",
+    ]);
+  });
+
   it("round-trips seeded budgets without findings", () => {
     const files = [file("a.md", "one two three"), file("b.md", "four five")];
 

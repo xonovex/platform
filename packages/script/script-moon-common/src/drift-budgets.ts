@@ -108,6 +108,14 @@ export const evaluateBudgets = (
       : [];
   });
 
+// byCodePoint orders manifest keys the way the stored manifest is written. A
+// locale-aware comparison folds case and punctuation, which reorders every
+// nested path on a reseed and varies with the machine's locale.
+const byCodePoint = (left: string, right: string): number => {
+  if (left === right) return 0;
+  return left < right ? -1 : 1;
+};
+
 // seedBudgets records current sizes so the ratchet starts from the corrected
 // catalog rather than from the caps.
 export const seedBudgets = (files: readonly BudgetedFile[]): BudgetManifest =>
@@ -115,5 +123,5 @@ export const seedBudgets = (files: readonly BudgetedFile[]): BudgetManifest =>
     files
       .map((file) => [file.path, countProseWords(file.text)] as const)
       .filter(([, words]) => words > 0)
-      .toSorted(([left], [right]) => left.localeCompare(right)),
+      .toSorted(([left], [right]) => byCodePoint(left, right)),
   );
