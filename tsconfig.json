@@ -63,7 +63,7 @@
       "path": "./packages/script/script-moon-skill-validate-links"
     },
     {
-      "path": "./packages/script/script-moon-skill-validate-routing-owners"
+      "path": "./packages/script/script-moon-skill-validate-routing"
     },
     {
       "path": "./packages/script/script-moon-skill-validate-spec"

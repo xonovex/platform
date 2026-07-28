@@ -1,10 +1,10 @@
 {
-  "name": "@xonovex/script-moon-skill-validate-routing-owners",
+  "name": "@xonovex/script-moon-skill-validate-routing",
   "version": "0.0.0",
   "private": true,
   "type": "module",
   "bin": {
-    "moon-skill-validate-routing-owners": "./dist/src/index.js"
+    "moon-skill-validate-routing": "./dist/src/index.js"
   },
   "dependencies": {
     "@xonovex/script-moon-common": "0.0.0",

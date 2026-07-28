@@ -52,7 +52,7 @@ tasks:
     deps:
       - target: ~:build
         optional: true
-      - script-moon-skill-validate-routing-owners:routing-owners-check
+      - script-moon-skill-validate-routing:routing-check
     env:
       XONOVEX_LINT_MODE: enforce
     inputs:

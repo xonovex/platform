@@ -177,7 +177,7 @@ decision" while invoking nothing. Fixed in `9d57ec0e` and `eb3938d2` by carrying
 the story, tasks, snippet, module, options, criteria, handoff, or PR inline. The
 skills were not touched; `user-stories-guide` already named both the story
 template and SMART as triggers. Skills holding these queries as negatives follow
-the new wording so every routing-owner pairing survives — `routing-owners-check`
+the new wording so every routing-owner pairing survives — `routing-check`
 caught the break when it did not.
 
 **6 — negatives naming an owner that never claimed the query (bucket 3).** No

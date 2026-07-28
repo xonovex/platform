@@ -134,6 +134,110 @@ export const catalogQueryOwners = (
   return owners;
 };
 
+export interface QueryOwnerConflict {
+  readonly owners: readonly string[];
+  readonly query: string;
+}
+
+// normalizeQuery folds the differences that make a copied query look distinct:
+// case, run-together whitespace, and closing punctuation. Two skills claiming
+// the same normalized text are claiming the same route.
+const normalizeQuery = (query: string): string =>
+  query
+    .toLowerCase()
+    .split(/\s+/u)
+    .filter(Boolean)
+    .join(" ")
+    .replace(/[.?!]+$/u, "");
+
+// Queries more than one skill declares positive. buildRoutingScenarios and
+// catalogQueryOwners both drop these silently, so an undetected conflict costs
+// the query its routing coverage on top of the ambiguity itself.
+export const conflictingQueryOwners = (
+  catalogRoot: string,
+): readonly QueryOwnerConflict[] => {
+  const root = resolve(catalogRoot);
+  if (!isDirectory(root)) throw new Error(`catalog root not found: ${root}`);
+
+  const claimants = new Map<string, {owners: Set<string>; query: string}>();
+  for (const candidate of catalogCandidates(root)) {
+    const queries = readQueries(
+      join(candidate.guideDirectory, "eval-queries.json"),
+    );
+    for (const query of queries) {
+      if (!query.should_trigger) continue;
+      const key = normalizeQuery(query.query);
+      const entry = claimants.get(key) ?? {
+        owners: new Set(),
+        query: query.query,
+      };
+      entry.owners.add(candidate.shortName);
+      claimants.set(key, entry);
+    }
+  }
+
+  return [...claimants.values()]
+    .filter(({owners}) => owners.size > 1)
+    .map(({owners, query}) => ({owners: [...owners].toSorted(), query}))
+    .toSorted((a, b) => a.query.localeCompare(b.query));
+};
+
+export interface UnresolvedOperation {
+  readonly operation: string;
+  readonly rationale: string;
+  readonly skill: string;
+}
+
+const OPERATION_MENTION = /`?([a-z0-9]+(?:-[a-z0-9]+)+)`?\s+operation/gu;
+
+const guideTopic = (shortName: string): string =>
+  shortName.replace(/-guide$/u, "");
+
+// Rationales that name an operation of a catalog skill which owns no reference
+// file for it. Scoped to tokens prefixed with a real skill topic so that plain
+// English compounds ('a version-control operation') are not identifiers.
+export const unresolvedOperationRationales = (
+  catalogRoot: string,
+): readonly UnresolvedOperation[] => {
+  const root = resolve(catalogRoot);
+  if (!isDirectory(root)) throw new Error(`catalog root not found: ${root}`);
+
+  const candidates = catalogCandidates(root);
+  const topics = candidates.map(({shortName}) => guideTopic(shortName));
+  const references = new Set(
+    candidates.flatMap(({guideDirectory}) => {
+      const directory = join(guideDirectory, "references");
+      if (!isDirectory(directory)) return [];
+      return readdirSync(directory)
+        .filter((entry) => entry.endsWith(".md"))
+        .map((entry) => entry.slice(0, -".md".length));
+    }),
+  );
+
+  const findings: UnresolvedOperation[] = [];
+  for (const candidate of candidates) {
+    const queries = readQueries(
+      join(candidate.guideDirectory, "eval-queries.json"),
+    );
+    for (const {rationale} of queries) {
+      for (const [, operation] of rationale.matchAll(OPERATION_MENTION)) {
+        if (operation === undefined || references.has(operation)) continue;
+        if (topics.every((topic) => !operation.startsWith(`${topic}-`)))
+          continue;
+        findings.push({
+          operation,
+          rationale,
+          skill: candidate.shortName,
+        });
+      }
+    }
+  }
+  return findings.toSorted(
+    (a, b) =>
+      a.skill.localeCompare(b.skill) || a.operation.localeCompare(b.operation),
+  );
+};
+
 export const missingValidationRoutingOwners = (
   catalogRoot: string,
 ): readonly string[] => {

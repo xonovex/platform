@@ -134,5 +134,5 @@ Nothing. The two items this record originally left open are resolved: the output
 harness retries transient failures (three attempts, matching the trigger harness)
 before invalidating a batch, and the routing-owner invariant runs in the skill-tag
 gate — `skill-validate` depends on
-`script-moon-skill-eval-triggers:routing-owners-check`, so `#skill:ci-check` fails
+`script-moon-skill-validate-routing:routing-check`, so `#skill:ci-check` fails
 when a cull strips a skill's only routing pairing.

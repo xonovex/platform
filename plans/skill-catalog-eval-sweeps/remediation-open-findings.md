@@ -103,7 +103,7 @@ Add: `selected_skills` (one entry per run, with the S1 three-way tag: `target` /
 
 This is the prerequisite that turns triage from probe archaeology into data — recovering "who won" cost this review and the two prior ones roughly 30 probe calls. **It must not be counted as remediating any of the 21.**
 
-**Argument against:** none material. Do not extend `routing-owners-check` to enforce declared-vs-loaded parity: loading a base alongside its overlay is by design for every `*-opinionated` pair, so the warning would fire on nearly every overlay scenario.
+**Argument against:** none material. Do not extend `routing-check` to enforce declared-vs-loaded parity: loading a base alongside its overlay is by design for every `*-opinionated` pair, so the warning would fire on nearly every overlay scenario.
 
 ### S3 — Adaptive run escalation for non-unanimous queries · **AFTER S1**
 
@@ -148,7 +148,7 @@ Three blockers must move together:
 
 **Wave 0 — harness only, no catalog edits.** S1 + S2 + the trigger-config.ts:87-92 comment correction, with tests (`trigger-process.test.ts` for the three-way classification incl. the multi-skill/unresolvable cases; `trigger-evaluation.test.ts`, `routing-evaluate.test.ts`, `index.test.ts` for the record shape). Then a **full re-baseline sweep**: 951 trigger runs + 231 routing runs ≈ **$7.3**, routing wall-clock ≈ 1.6 h. Everything downstream is measured against the new baseline.
 
-**Wave 1 — three pairing adds (FIX NOW, catalog).** No query text changes, no description changes, no budget bumps. Then `routing-owners-check` + `ci-routing --owners hexagonal-pattern-guide,data-oriented-design-guide,hono-opinionated-guide` + `ci-skill-eval-trigger` for those three skills (a new self-owned positive enters the owner's own per-skill gate — self-owned queries are kept, not deferred).
+**Wave 1 — three pairing adds (FIX NOW, catalog).** No query text changes, no description changes, no budget bumps. Then `routing-check` + `ci-routing --owners hexagonal-pattern-guide,data-oriented-design-guide,hono-opinionated-guide` + `ci-skill-eval-trigger` for those three skills (a new self-owned positive enters the owner's own per-skill gate — self-owned queries are kept, not deferred).
 
 **Wave 2 — decisions (D1-D5), after the owner rules.** Each is its own commit citing its specific failing row.
 
@@ -225,7 +225,7 @@ Cites `skill-threejs` trigger_rate 0.667 on a `should_trigger:false` row. Do **n
 
 Cites `skill-typescript` trigger_rate 1 on a `should_trigger:false` row. **E3 supersedes the investigator's 3-step sequencing**: with the true field (hono-opinionated + its `hono` dependency + typescript) the owner wins **4/4** pooled. No description edit, no `budgets.json` 295 bump, no train query. `bodyLimit` content exists only under `hono-opinionated-guide` (SKILL.md + `references/body-limit.md`); `skill-hono` has zero occurrences. Optionally correct typescript-guide's now-stale rationale string ("should match hono-guide") — rationale text is not load-bearing for pairing.
 
-All three: `routing-owners-check` stays green (verified — 147 scenarios / 77 validation; 67 skills own exactly 1, 5 own 2; orthogonal, threejs and typescript each keep their own passing scenario). Cost: +9 routing runs.
+All three: `routing-check` stays green (verified — 147 scenarios / 77 validation; 67 skills own exactly 1, 5 own 2; orthogonal, threejs and typescript each keep their own passing scenario). Cost: +9 routing runs.
 
 ### Catalog — one eval-set gap (bucket 1)
 
@@ -326,7 +326,7 @@ The bodies are unambiguous: `c99-guide/SKILL.md:20` owns "Borrow length-carrying
    > `Use when editing systems or embedded C99 code in projects that follow the opinionated caller-owns-memory, data-oriented style. A focused overlay that covers only house-style decisions, not generic C99 idioms. Triggers on \`.c\`/\`.h\` files in systems/embedded/DOD projects and on prompts about caller-owns-memory, SoA/SIMD variants, alignment, index/handle references, physical design, plugin architecture, strict file naming, and shaping a C API to be bound from other languages (Lua/C#/Python/Rust FFI, generated wrappers), even when the user doesn't say 'opinionated'.`
 2. Flip this entry to `should_trigger:false` (rationale: "strings are owned by c99-guide; this overlay adds only caller-owned storage, which the prompt does not ask for") and add the identical text to `c99-guide/eval-queries.json` as `should_trigger:true, split:validation` — making it a real routing scenario.
 
-Counts are safe: c99-opinionated has **17** positives (validation 6 → 5). c99-opinionated keeps its own validation scenario ("review the file naming under src/comms/…"), so `routing-owners-check` stays green.
+Counts are safe: c99-opinionated has **17** positives (validation 6 → 5). c99-opinionated keeps its own validation scenario ("review the file naming under src/comms/…"), so `routing-check` stays green.
 
 **Caveat the flip alone does not fix:** pooled probes are 4/6 to c99-guide, i.e. inside the same indifference band. Flipping without the description edit relocates the flake into the routing gate. **Requires a full per-skill re-sweep of c99-opinionated** (the description change touches its other 16 positives), so schedule it after Wave 0.
 
@@ -364,7 +364,7 @@ _Query:_ "retest focus, zoom, errors, and dynamic status after this UI revision"
 
 `run` is confirmed in the advertised skill list and demonstrably wins ("I'll help you run and test the app to verify that focus, zoom, errors, and dynamic status work correctly after your UI revision"). Pooled 2/7 to accessibility across seven probes, with one bare-plugin-name emission (an S1 case) among them. The routing 3/3 is the lucky sample, not evidence the trigger gate is wrong.
 
-**Recommendation: do not suppress via deferral** (see §1). Re-measure after S1 at n=9. If it still loses, this is a third catalog-vs-bundled boundary call of the same kind as D1/D2, and the decision axis is whether "re-verify accessibility behaviour after a change" is a category accessibility-guide should own in its description (it currently says "exact-revision reassessment") or a request the harness's `run` skill legitimately takes. Do **not** rewrite the query text: it would require the same edit in `skill-react/react-guide/eval-queries.json` or `routing-owners-check` fails for accessibility-guide.
+**Recommendation: do not suppress via deferral** (see §1). Re-measure after S1 at n=9. If it still loses, this is a third catalog-vs-bundled boundary call of the same kind as D1/D2, and the decision axis is whether "re-verify accessibility behaviour after a change" is a category accessibility-guide should own in its description (it currently says "exact-revision reassessment") or a request the harness's `run` skill legitimately takes. Do **not** rewrite the query text: it would require the same edit in `skill-react/react-guide/eval-queries.json` or `routing-check` fails for accessibility-guide.
 
 ---
 

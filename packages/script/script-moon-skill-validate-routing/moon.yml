@@ -15,17 +15,21 @@ tasks:
     deps:
       - script-moon-common:build
       - script-moon-skill-eval-common:build
-  routing-owners-check:
+  routing-check:
     command:
       - node
-      - packages/script/script-moon-skill-validate-routing-owners/dist/src/index.js
+      - packages/script/script-moon-skill-validate-routing/dist/src/index.js
       - packages/skill
     deps: [build]
     inputs:
       - /packages/skill/*/*/eval-queries.json
+      # The operation check resolves cited names against the reference files,
+      # and skill names come from the guide frontmatter.
+      - /packages/skill/*/*/SKILL.md
+      - /packages/skill/*/*/references/*.md
     options:
       runFromWorkspaceRoot: true
   ci-check:
-    deps: [routing-owners-check]
+    deps: [routing-check]
     options:
       mergeDeps: append

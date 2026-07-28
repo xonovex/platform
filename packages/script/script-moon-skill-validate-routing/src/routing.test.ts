@@ -2,7 +2,7 @@ import {mkdirSync, mkdtempSync, rmSync, writeFileSync} from "node:fs";
 import {tmpdir} from "node:os";
 import {join} from "node:path";
 import {afterEach, describe, expect, it, vi} from "vitest";
-import {main} from "./routing-owners.js";
+import {main} from "./routing.js";
 
 const temporaryDirectories: string[] = [];
 
@@ -20,7 +20,7 @@ interface CatalogSkill {
 }
 
 const writeCatalog = (skills: readonly CatalogSkill[]): string => {
-  const root = mkdtempSync(join(tmpdir(), "routing-owners-"));
+  const root = mkdtempSync(join(tmpdir(), "routing-"));
   temporaryDirectories.push(root);
   for (const skill of skills) {
     const guide = join(root, `skill-${skill.name}`, `${skill.name}-guide`);
@@ -50,7 +50,7 @@ describe("routing owners check", () => {
 
     expect(main(["--help"])).toBe(0);
     expect(log.mock.calls.at(0)?.at(0)).toContain(
-      "moon-skill-validate-routing-owners",
+      "moon-skill-validate-routing",
     );
   });
 
@@ -93,12 +93,69 @@ describe("routing owners check", () => {
     ).toContain("owns no validation-split routing scenario");
   });
 
+  it("reports a query two skills both claim", () => {
+    const log = vi.spyOn(console, "log").mockImplementation(() => {});
+    const root = writeCatalog([
+      {
+        name: "owner",
+        queries: [
+          query("contested query", true),
+          query("rival's query", false),
+        ],
+      },
+      {
+        name: "rival",
+        queries: [
+          query("contested query", true),
+          query("owner's query", false),
+        ],
+      },
+    ]);
+
+    expect(main([root])).toBe(1);
+    expect(
+      log.mock.calls.map((call) => String(call.at(0))).join("\n"),
+    ).toContain(
+      'owner-guide and rival-guide both mark "contested query" should_trigger',
+    );
+  });
+
+  it("reports a rationale citing an operation no reference file backs", () => {
+    const log = vi.spyOn(console, "log").mockImplementation(() => {});
+    const root = writeCatalog([
+      {
+        name: "owner",
+        queries: [
+          {
+            query: "settle the option",
+            rationale: "settling it is the owner-decide operation",
+            should_trigger: true,
+            split: "validation" as const,
+          },
+          query("rival's query", false),
+        ],
+      },
+      {
+        name: "rival",
+        queries: [
+          query("rival's query", true),
+          query("settle the option", false),
+        ],
+      },
+    ]);
+
+    expect(main([root])).toBe(1);
+    expect(
+      log.mock.calls.map((call) => String(call.at(0))).join("\n"),
+    ).toContain("owner-guide cites the 'owner-decide' operation");
+  });
+
   it("reports an unreadable catalog root", () => {
     const write = vi
       .spyOn(process.stderr, "write")
       .mockImplementation(() => true);
 
-    expect(main([join(tmpdir(), "routing-owners-absent")])).toBe(2);
+    expect(main([join(tmpdir(), "routing-absent")])).toBe(2);
     expect(write.mock.calls.at(0)?.at(0)).toContain("catalog root not found");
   });
 });
