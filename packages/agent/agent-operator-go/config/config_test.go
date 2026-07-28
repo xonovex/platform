@@ -94,6 +94,39 @@ func TestSampleAgentRunPassesAdmissionWithSamplePolicyAndProvider(t *testing.T) 
 	}
 }
 
+func TestSampleAgentToolchainPassesAdmission(t *testing.T) {
+	toolchain := decodeSample[agentv1alpha1.AgentToolchain](t, "agenttoolchain_sample.yaml", map[string]string{
+		"<nixpkgsRev>": strings.Repeat("b", 40),
+		"<digest>":     strings.Repeat("a", 64),
+	})
+	toolchainWebhook := &agentwebhook.AgentToolchainWebhook{}
+
+	warnings, err := toolchainWebhook.ValidateCreate(context.Background(), toolchain)
+
+	if err != nil {
+		t.Fatalf("sample AgentToolchain admission failed: %v", err)
+	}
+	if len(warnings) != 0 {
+		t.Fatalf("sample AgentToolchain admission warnings = %v, want none", warnings)
+	}
+}
+
+func TestSampleAgentHarnessPassesAdmission(t *testing.T) {
+	harness := decodeSample[agentv1alpha1.AgentHarness](t, "agentharness_sample.yaml", map[string]string{
+		"<digest>": strings.Repeat("a", 64),
+	})
+	harnessWebhook := &agentwebhook.AgentHarnessWebhook{}
+
+	warnings, err := harnessWebhook.ValidateCreate(context.Background(), harness)
+
+	if err != nil {
+		t.Fatalf("sample AgentHarness admission failed: %v", err)
+	}
+	if len(warnings) != 0 {
+		t.Fatalf("sample AgentHarness admission warnings = %v, want none", warnings)
+	}
+}
+
 func decodeSample[T any](t testing.TB, name string, replacements map[string]string) *T {
 	t.Helper()
 	data, err := os.ReadFile(filepath.Join("samples", name))
