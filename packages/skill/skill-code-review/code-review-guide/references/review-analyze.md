@@ -14,8 +14,10 @@ Zero issues on a clean diff is a valid result — do not invent findings to fill
 
 ## Effort dial
 
-- `low` / `medium` — fewer, high-confidence findings.
-- `high` — wider coverage; lean on `question` for uncertain ones rather than asserting `issue`.
+Effort scales coverage, not what gets reported. Report every finding at every setting and let [review-refine.md](review-refine.md) drop what should not survive; withholding one here loses it, because refine only sees what analysis returned.
+
+- `low` / `medium` — a fast pass over the highest-risk hunks.
+- `high` — wide coverage across the diff and the code surrounding it.
 
 ## Comparing against prior findings
 
