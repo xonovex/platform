@@ -6,7 +6,8 @@ parallel_group: group-2
 status: complete
 dependencies:
   plans: [plans/hardening-branch-migration/subplan-02-infra-config-slice.md]
-  files: [flake.nix, nix, .github/moon.yml, .github/actions, .moon/toolchains.yml]
+  files:
+    [flake.nix, nix, .github/moon.yml, .github/actions, .moon/toolchains.yml]
 skills_to_consult:
   - git-guide
   - github-guide

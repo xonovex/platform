@@ -53,9 +53,9 @@ documentation. Ship as one small PR so the branch can be retired.
    - Five (`skill-codex`, `skill-copilot`, `skill-kiro`, `skill-opencode`,
      `skill-pi`) belong to harness adapters that arrive on `main` in subplan 08,
      which names them explicitly. Their evidence is real salvage: the donor
-     branch regresses these rows to `Not installed in the validation
-     environment`, so taking donor state verbatim would discard credentialed
-     probe results. Anchored by the tag `salvage/runtime-probes-d1692d3e` so
+     branch regresses these rows to a not-installed note, so taking donor state
+     verbatim would discard credentialed probe results. Anchored by the tag
+     `salvage/runtime-probes-d1692d3e` so
      branch deletion in subplan 08 cannot destroy it; subplan 08 task 5 carries
      the values and subplan 10 guards the tag.
    - One (`plans/composable-workflow-phases/VALIDATION.txt`) is plan
@@ -63,6 +63,7 @@ documentation. Ship as one small PR so the branch can be retired.
 
    Skip the two `chore(plan)` bookkeeping commits — they reference subplans that
    don't exist on main.
+
 4. **Verify no resurrections**: `git status` must show no files that main's
    removal commits (`708dfa1a`, `b01d38ab`) deleted.
 5. **Run validation** (see below), commit with conventional messages, open the

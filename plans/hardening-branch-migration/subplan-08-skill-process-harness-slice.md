@@ -104,7 +104,7 @@ lands it. Re-enable each and confirm `npx moon run :ci-check --force` is green.
    - plus catalog-wide: `66b9ad55`, `6b332e83`, `22f48559`, `87d452e0`
 5. **Restore the runtime probe evidence** on the harness adapters. The donor
    branch records `Observed runtime | Not installed in the validation
-   environment` for codex, copilot, opencode and pi, and drops the probe
+environment` for codex, copilot, opencode and pi, and drops the probe
    paragraph from `skill-kiro`'s onboarding reference. Taking the donor state
    verbatim therefore discards credentialed probe results that exist only on
    `composable-workflow-implementations-merge`, anchored by the tag
@@ -112,12 +112,12 @@ lands it. Re-enable each and confirm `npx moon run :ci-check --force` is green.
    reapply to each `<harness>-guide/references/capabilities.md` capability
    table:
 
-   | Skill | Observed runtime | Probed |
-   | --- | --- | --- |
-   | `skill-codex` | `codex-cli 0.144.4` | `2026-07-16` |
-   | `skill-copilot` | `0.0.377 (Copilot CLI)` | `2026-07-16` |
-   | `skill-opencode` | `1.14.30` | `2026-07-16` |
-   | `skill-pi` | `0.80.2` | `2026-07-16` |
+   | Skill            | Observed runtime        | Probed       |
+   | ---------------- | ----------------------- | ------------ |
+   | `skill-codex`    | `codex-cli 0.144.4`     | `2026-07-16` |
+   | `skill-copilot`  | `0.0.377 (Copilot CLI)` | `2026-07-16` |
+   | `skill-opencode` | `1.14.30`               | `2026-07-16` |
+   | `skill-pi`       | `0.80.2`                | `2026-07-16` |
 
    Carry the accompanying caveat with the values: the probe observed the
    installed CLI version on a host with a working credentialed install and
@@ -127,6 +127,7 @@ lands it. Re-enable each and confirm `npx moon run :ci-check --force` is green.
    same tag; kiro stays a candidate (not installed). Leave each guide's
    `Documentation snapshot` at the donor's value — only the observed-runtime
    rows are restored.
+
 6. **Close deferred gates**: any validators subplans 04/06/07 deferred to "when
    the full catalog is migrated" are enabled and must pass now, except
    marketplace-registration checks (subplan 10).

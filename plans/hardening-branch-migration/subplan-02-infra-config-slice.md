@@ -96,16 +96,16 @@ slice validates against.
 Each gate below arrives with the donor's infrastructure but checks content that
 is still main's, so it is held back here and belongs to the slice named.
 
-| Gate | Held back to | Why |
-| --- | --- | --- |
-| `skill-validate` runs `moon-skill-validate-spec --strict` and depends on `script-moon-skill-validate-routing:routing-check` | 04 | Neither the binary nor the project exists on main; reverted to `moon-skill-validate` |
-| `skill-audit-sources` in `ci-check` with `runInCI` enabled | 04 | The script reaches the network, which `.moon/AGENTS.md` forbids in `ci-check`, and the donor rewrote it (1,829 insertions across 12 files) |
-| `coverage` in `tag-go.yml`'s `ci-check` (`GO_COVERAGE_MIN` 55) | 05 | `agent-cli-go` covers 44.8% on main; the donor's own `moon.yml` sets 81 because its tests arrive with `packages/agent` |
-| `coverage` in `tag-typescript-script.yml`'s `ci-check` (50% floors) | 04 | Several script packages have no tests on main |
-| `passWithNoTests` removed from the shared vitest config | 04 | `script-moon-version-detect` has no test file on main; the donor adds `src/detect.test.ts` |
-| `noInlineConfig`, `no-warning-comments`, `sonarjs/cognitive-complexity: ["error", 30]` | 04 | 31 lint errors, all inside `packages/script`, which the donor rewrote wholesale |
-| `.moon/toolchains.yml` `shellByTag` entries `ci: ci` and `docker: docker` | 11 — done | The root `flake.nix` defines no `ci` or `docker` devShell, and `agent-operator-go` carries the `docker` tag |
-| `zizmor` step kept in `.github/workflows/ci.yml` | 11 — done | The donor moved it into a `.github/moon.yml` project, which is outside this slice's paths |
+| Gate                                                                                                                        | Held back to | Why                                                                                                                                        |
+| --------------------------------------------------------------------------------------------------------------------------- | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| `skill-validate` runs `moon-skill-validate-spec --strict` and depends on `script-moon-skill-validate-routing:routing-check` | 04           | Neither the binary nor the project exists on main; reverted to `moon-skill-validate`                                                       |
+| `skill-audit-sources` in `ci-check` with `runInCI` enabled                                                                  | 04           | The script reaches the network, which `.moon/AGENTS.md` forbids in `ci-check`, and the donor rewrote it (1,829 insertions across 12 files) |
+| `coverage` in `tag-go.yml`'s `ci-check` (`GO_COVERAGE_MIN` 55)                                                              | 05           | `agent-cli-go` covers 44.8% on main; the donor's own `moon.yml` sets 81 because its tests arrive with `packages/agent`                     |
+| `coverage` in `tag-typescript-script.yml`'s `ci-check` (50% floors)                                                         | 04           | Several script packages have no tests on main                                                                                              |
+| `passWithNoTests` removed from the shared vitest config                                                                     | 04           | `script-moon-version-detect` has no test file on main; the donor adds `src/detect.test.ts`                                                 |
+| `noInlineConfig`, `no-warning-comments`, `sonarjs/cognitive-complexity: ["error", 30]`                                      | 04           | 31 lint errors, all inside `packages/script`, which the donor rewrote wholesale                                                            |
+| `.moon/toolchains.yml` `shellByTag` entries `ci: ci` and `docker: docker`                                                   | 11 — done    | The root `flake.nix` defines no `ci` or `docker` devShell, and `agent-operator-go` carries the `docker` tag                                |
+| `zizmor` step kept in `.github/workflows/ci.yml`                                                                            | 11 — done    | The donor moved it into a `.github/moon.yml` project, which is outside this slice's paths                                                  |
 
 Note that the per-project coverage opt-ins on main are untouched:
 `script-moon-command-validate` and the config packages declare their own

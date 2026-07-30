@@ -5,7 +5,8 @@ parent_plan: plans/hardening-branch-migration.md
 parallel_group: group-4
 status: pending
 dependencies:
-  plans: [plans/hardening-branch-migration/subplan-04-script-validation-slice.md]
+  plans:
+    [plans/hardening-branch-migration/subplan-04-script-validation-slice.md]
   files: [packages/skill]
 skills_to_consult:
   - git-guide

@@ -1,0 +1,35 @@
+$schema: https://moonrepo.dev/schemas/project.json
+language: unknown
+layer: configuration
+tasks:
+  # Prettier over the whole repository, so files in no package and packages
+  # whose tags carry no prettier task are still checked. The tag templates
+  # cover their own sources; this catches what falls between them, such as
+  # markdown and JSON in Go, Rust and shell projects, and .devcontainer.
+  workspace-format:
+    script: npx prettier --write . --ignore-path "$workspaceRoot/.prettierignore"
+    options:
+      cache: false
+      runFromWorkspaceRoot: true
+      runInCI: false
+  workspace-format-check:
+    script: npx prettier --check . --ignore-path "$workspaceRoot/.prettierignore"
+    options:
+      cache: false
+      runFromWorkspaceRoot: true
+  format:
+    command: noop
+    deps: [workspace-format]
+    options:
+      cache: false
+      runInCI: false
+  format-check:
+    command: noop
+    deps: [workspace-format-check]
+    options:
+      cache: false
+  ci-check:
+    command: noop
+    deps: [format-check]
+    options:
+      cache: false

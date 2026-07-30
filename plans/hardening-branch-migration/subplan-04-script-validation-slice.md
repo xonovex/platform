@@ -75,8 +75,8 @@ it checks is present, and confirm the workspace `ci-check` stays green:
    - `b7d68e8a` — skill handoff / manifest-pair / single-ownership guards intact
    - `15b5a21e` — command thin-delegation validator intact
    - `3f04baaa` — skill eval + sources contracts gated in CI
-   Also confirm the branch's newer validators (e.g. `61165aa4` em-dash /
-   ellipsis / typographic-quote validation) supersede rather than drop these.
+     Also confirm the branch's newer validators (e.g. `61165aa4` em-dash /
+     ellipsis / typographic-quote validation) supersede rather than drop these.
 5. **Regenerate the lockfile** if `packages/script/package.json` changed
    dependencies: `npm install`, never copy the branch lockfile.
 6. **Run full validation**, commit, open the PR with the deferred-gate list.
@@ -136,15 +136,15 @@ the migration rather than inside a migration slice.
 Everything below reads the skill catalog or the marketplace, not the scripts,
 so it gates content later slices carry.
 
-| Gate | Held back to | Why |
-| --- | --- | --- |
-| `skill-validate` (`moon-skill-validate-spec --strict` + `routing-check`) | 08 | The spec validator reports findings against current skills, and routing fails because `gitlab-guide` owns no validation-split scenario |
-| `skill-audit-sources` in `ci-check` | 08 | Current skills report `feeds: (missing)`; the network question is settled — `--fetch` is opt-in and the task does not pass it |
-| `script-moon-skill-validate-routing:routing-check` | 08 | Same `gitlab-guide` finding, as its own task |
-| `script-moon-skill-validate-drift:drift-check` | 08 | Enforce mode reports 36 findings across 598 catalog and command files |
-| `script-moon-release-validate:release-validate` and its end-to-end test | 10 | The Codex marketplace still lists the command plugins, which subplan 10 reconciles |
-| 18 tests in `script-moon-skill-validate-spec`, 1 in `script-moon-skill-eval-common` | 08 | They read live skills, the workflow command files, and the catalog's template assets rather than fixtures |
-| `coverage` in `tag-go.yml`'s `ci-check` | 05 | Unchanged from subplan 02 |
+| Gate                                                                                | Held back to | Why                                                                                                                                    |
+| ----------------------------------------------------------------------------------- | ------------ | -------------------------------------------------------------------------------------------------------------------------------------- |
+| `skill-validate` (`moon-skill-validate-spec --strict` + `routing-check`)            | 08           | The spec validator reports findings against current skills, and routing fails because `gitlab-guide` owns no validation-split scenario |
+| `skill-audit-sources` in `ci-check`                                                 | 08           | Current skills report `feeds: (missing)`; the network question is settled — `--fetch` is opt-in and the task does not pass it          |
+| `script-moon-skill-validate-routing:routing-check`                                  | 08           | Same `gitlab-guide` finding, as its own task                                                                                           |
+| `script-moon-skill-validate-drift:drift-check`                                      | 08           | Enforce mode reports 36 findings across 598 catalog and command files                                                                  |
+| `script-moon-release-validate:release-validate` and its end-to-end test             | 10           | The Codex marketplace still lists the command plugins, which subplan 10 reconciles                                                     |
+| 18 tests in `script-moon-skill-validate-spec`, 1 in `script-moon-skill-eval-common` | 08           | They read live skills, the workflow command files, and the catalog's template assets rather than fixtures                              |
+| `coverage` in `tag-go.yml`'s `ci-check`                                             | 05           | Unchanged from subplan 02                                                                                                              |
 
 Two per-package coverage floors were lowered to match the skipped tests and
 must rise with them: `script-moon-skill-validate-spec` (`moon.yml` functions

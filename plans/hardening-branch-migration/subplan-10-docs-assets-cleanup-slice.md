@@ -5,8 +5,7 @@ parent_plan: plans/hardening-branch-migration.md
 parallel_group: group-7
 status: pending
 dependencies:
-  plans:
-    [plans/hardening-branch-migration/subplan-09-command-plugins-slice.md]
+  plans: [plans/hardening-branch-migration/subplan-09-command-plugins-slice.md]
   files:
     [
       packages/diagram,

@@ -102,11 +102,11 @@ file the donor removed survives on `main` unless it is removed explicitly. All
 three predate the merge base, so each is a deliberate donor removal rather than
 newer work on `main`:
 
-| Path | Donor commit | Why it had to go |
-| --- | --- | --- |
-| `agent-cli-go/internal/network/proxy/` | `861264a0` | Its only surviving import still named the old `packages/cli/agent-cli-go` module path, which no longer resolves after the donor renamed the module to match its directory |
-| `shared-core-go/pkg/scriptlib/` | `7ab28721` | No tests and no consumers, so the per-package coverage check failed with "declares no coverage floor" |
-| `agent-operator-go/config/samples/agentconfig_sample.yaml` | `73c70ca8` | `AgentConfig` was replaced by the four-concern resource model, so the sample no longer decodes against the API scheme |
+| Path                                                       | Donor commit | Why it had to go                                                                                                                                                          |
+| ---------------------------------------------------------- | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `agent-cli-go/internal/network/proxy/`                     | `861264a0`   | Its only surviving import still named the old `packages/cli/agent-cli-go` module path, which no longer resolves after the donor renamed the module to match its directory |
+| `shared-core-go/pkg/scriptlib/`                            | `7ab28721`   | No tests and no consumers, so the per-package coverage check failed with "declares no coverage floor"                                                                     |
+| `agent-operator-go/config/samples/agentconfig_sample.yaml` | `73c70ca8`   | `AgentConfig` was replaced by the four-concern resource model, so the sample no longer decodes against the API scheme                                                     |
 
 ## Findings
 

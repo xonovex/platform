@@ -131,15 +131,15 @@ Approach comparison (all measured in-session, 2026-07-30):
 Intent-preservation map — each slice must verify these main-side commits still
 hold after taking the branch state:
 
-| Slice | Main commits whose intent must survive |
-| --- | --- |
-| infra-config | `9dfb7522` (prettier pass), `2ea459ef` (shared vitest config), `15b5a21e` (.moon/tasks, tsconfig), `87d452e0` (tsconfig) |
-| moon-plugins | `9dfb7522` (prettier pass, packages/moon part) |
-| script-validation | `2ea459ef`, `ef22afec`, `b7d68e8a`, `15b5a21e`, `3f04baaa` |
-| shared-agent | `022af353`, `a2b8e0f4`, `9dfb7522` (agent/shared parts) |
-| skill slices | `c3b920d2`, `67fbb767`, `f121e7e7`, `6060d9ac`, `b7d68e8a`, `3f04baaa`, `27a4319c`, `6b332e83`, `a90a569a`, `66b9ad55`, `2ad6505e`, `87d452e0`, `22f48559`, `9ab3bd7d`, `0d020e3e`, `85968666`, `b01d38ab` (removal) |
-| command-plugins | `f121e7e7`, `a90a569a` (skill-ablate fold), `9ab3bd7d`, `708dfa1a` (removal), `4668aade` |
-| docs-assets-cleanup | `4668aade`, `85968666`, `708dfa1a`, `b01d38ab` (marketplace/catalog reconciliation) |
+| Slice               | Main commits whose intent must survive                                                                                                                                                                               |
+| ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| infra-config        | `9dfb7522` (prettier pass), `2ea459ef` (shared vitest config), `15b5a21e` (.moon/tasks, tsconfig), `87d452e0` (tsconfig)                                                                                             |
+| moon-plugins        | `9dfb7522` (prettier pass, packages/moon part)                                                                                                                                                                       |
+| script-validation   | `2ea459ef`, `ef22afec`, `b7d68e8a`, `15b5a21e`, `3f04baaa`                                                                                                                                                           |
+| shared-agent        | `022af353`, `a2b8e0f4`, `9dfb7522` (agent/shared parts)                                                                                                                                                              |
+| skill slices        | `c3b920d2`, `67fbb767`, `f121e7e7`, `6060d9ac`, `b7d68e8a`, `3f04baaa`, `27a4319c`, `6b332e83`, `a90a569a`, `66b9ad55`, `2ad6505e`, `87d452e0`, `22f48559`, `9ab3bd7d`, `0d020e3e`, `85968666`, `b01d38ab` (removal) |
+| command-plugins     | `f121e7e7`, `a90a569a` (skill-ablate fold), `9ab3bd7d`, `708dfa1a` (removal), `4668aade`                                                                                                                             |
+| docs-assets-cleanup | `4668aade`, `85968666`, `708dfa1a`, `b01d38ab` (marketplace/catalog reconciliation)                                                                                                                                  |
 
 ## Proposed Approach
 
@@ -195,19 +195,19 @@ hold after taking the branch state:
 
 ## Proposed Child Plans
 
-| # | Subplan | Scope (paths) |
-| --- | --- | --- |
-| 1 | salvage-side-branch-fixes | cherry-pick `052865b1` deps fix; port runtime-probe docs from `composable-workflow-implementations-merge` |
-| 2 | infra-config-slice | `packages/config`, `.moon/`, root configs, `.devcontainer/`, `.github/workflows/` |
-| 3 | moon-plugins-slice | `packages/moon` — new `moon-nix-extension` and `moon-nix-runtime` crates, `moon-nix-toolchain` source changes with a version bump past 0.6.1; workspace `.moon/toolchains.yml` reference bumps only after the release exists |
-| 4 | script-validation-slice | `packages/script`, coupled `.moon/tasks` gates |
-| 5 | shared-agent-slice | `packages/shared`, `packages/agent` |
-| 6 | skill-language-guides-slice | language/framework skill packages (c99*, cmake, lua*, python, shell, sql, typescript*, hono*, zod, vitest, react, ...) |
-| 7 | skill-domain-guides-slice | domain/engine skill packages (audio, ecs, gpu-*, imgui, lock-free, memory-management, data-*, networking, ...) |
-| 8 | skill-process-harness-slice | process + harness skill packages (plan, git, pr, review, skill, command, instruction, harness adapters, new additions) |
-| 9 | command-plugins-slice | `packages/command` (delegates to skills, so lands after slices 6-8) |
-| 10 | docs-assets-cleanup-slice | `packages/diagram`, `packages/asset`, `plans/`, README, marketplace/catalog reconciliation, zero-diff verification, branch + worktree removal |
-| 11 | nix-shells-github-project-slice | root `flake.nix`, `nix/`, `.github/moon.yml`, `.github/actions` — the infra paths subplan 02's path list missed; unblocks its `shellByTag` and zizmor deferrals |
+| #   | Subplan                         | Scope (paths)                                                                                                                                                                                                                |
+| --- | ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | salvage-side-branch-fixes       | cherry-pick `052865b1` deps fix; port runtime-probe docs from `composable-workflow-implementations-merge`                                                                                                                    |
+| 2   | infra-config-slice              | `packages/config`, `.moon/`, root configs, `.devcontainer/`, `.github/workflows/`                                                                                                                                            |
+| 3   | moon-plugins-slice              | `packages/moon` — new `moon-nix-extension` and `moon-nix-runtime` crates, `moon-nix-toolchain` source changes with a version bump past 0.6.1; workspace `.moon/toolchains.yml` reference bumps only after the release exists |
+| 4   | script-validation-slice         | `packages/script`, coupled `.moon/tasks` gates                                                                                                                                                                               |
+| 5   | shared-agent-slice              | `packages/shared`, `packages/agent`                                                                                                                                                                                          |
+| 6   | skill-language-guides-slice     | language/framework skill packages (c99*, cmake, lua*, python, shell, sql, typescript*, hono*, zod, vitest, react, ...)                                                                                                       |
+| 7   | skill-domain-guides-slice       | domain/engine skill packages (audio, ecs, gpu-_, imgui, lock-free, memory-management, data-_, networking, ...)                                                                                                               |
+| 8   | skill-process-harness-slice     | process + harness skill packages (plan, git, pr, review, skill, command, instruction, harness adapters, new additions)                                                                                                       |
+| 9   | command-plugins-slice           | `packages/command` (delegates to skills, so lands after slices 6-8)                                                                                                                                                          |
+| 10  | docs-assets-cleanup-slice       | `packages/diagram`, `packages/asset`, `plans/`, README, marketplace/catalog reconciliation, zero-diff verification, branch + worktree removal                                                                                |
+| 11  | nix-shells-github-project-slice | root `flake.nix`, `nix/`, `.github/moon.yml`, `.github/actions` — the infra paths subplan 02's path list missed; unblocks its `shellByTag` and zizmor deferrals                                                              |
 
 Execution groups:
 
