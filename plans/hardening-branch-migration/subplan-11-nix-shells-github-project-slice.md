@@ -3,7 +3,7 @@ type: plan
 has_subplans: false
 parent_plan: plans/hardening-branch-migration.md
 parallel_group: group-2
-status: pending
+status: complete
 dependencies:
   plans: [plans/hardening-branch-migration/subplan-02-infra-config-slice.md]
   files: [flake.nix, nix, .github/moon.yml, .github/actions, .moon/toolchains.yml]
@@ -13,11 +13,11 @@ skills_to_consult:
   - pull-request-guide
   - moon-guide
 validation:
-  type_check: pending
-  lint: pending
-  build: pending
-  tests: pending
-  integration: pending
+  type_check: pass
+  lint: pass
+  build: pass
+  tests: pass
+  integration: pass
 ---
 
 # Subplan 11: Nix Shells & GitHub Project Slice
@@ -65,16 +65,25 @@ them. Two donor changes depend on them, so subplan 02 had to hold both back:
 
 - `nix develop -c bash -c 'command -v hadolint && command -v zizmor'` resolves
   in the tagged shells
-- `npx moon run .github:ci-check` passes, proving zizmor runs from moon
+- `npx moon run github-actions:ci-check` passes, proving zizmor runs from moon
 - Full workspace `npx moon run :ci-check --force` green with nothing cached
 
 ## Success Criteria
 
-- [ ] `flake.nix` defines `ci` and `docker` devShells and both resolve
-- [ ] `shellByTag` carries `ci` and `docker`; `agent-operator-go` still lints
-- [ ] zizmor runs through `.github:ci-check`, not the workflow step
-- [ ] Nix toolchain `plugin:` still on `moon_nix_toolchain-v0.6.1`
-- [ ] Workspace `ci-check` green, uncached
+- [x] `flake.nix` defines `ci` and `docker` devShells and both resolve —
+      `nix develop .#ci` supplies zizmor, `.#docker` supplies hadolint
+- [x] `shellByTag` carries `ci` and `docker`; `agent-operator-go` still lints
+- [x] zizmor runs through `github-actions:ci-check`, not the workflow step —
+      audits all four workflow files, "No findings to report"
+- [x] Nix toolchain `plugin:` still on `moon_nix_toolchain-v0.6.1`
+- [x] Workspace `ci-check` green, uncached — 700 tasks, exit 0
+
+## Outcome
+
+moon maps `.github` to the project id `github-actions` through the `sources`
+block in `.moon/workspace.yml`, which subplan 02 already carried; a project id
+cannot start with a dot. The project count went 122 to 123 and `ci-check` went
+696 tasks to 700.
 
 ## Files Modified/Created
 

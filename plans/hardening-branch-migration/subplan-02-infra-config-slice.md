@@ -104,20 +104,20 @@ is still main's, so it is held back here and belongs to the slice named.
 | `coverage` in `tag-typescript-script.yml`'s `ci-check` (50% floors) | 04 | Several script packages have no tests on main |
 | `passWithNoTests` removed from the shared vitest config | 04 | `script-moon-version-detect` has no test file on main; the donor adds `src/detect.test.ts` |
 | `noInlineConfig`, `no-warning-comments`, `sonarjs/cognitive-complexity: ["error", 30]` | 04 | 31 lint errors, all inside `packages/script`, which the donor rewrote wholesale |
-| `.moon/toolchains.yml` `shellByTag` entries `ci: ci` and `docker: docker` | unassigned — see below | The root `flake.nix` defines no `ci` or `docker` devShell, and `agent-operator-go` carries the `docker` tag |
-| `zizmor` step kept in `.github/workflows/ci.yml` | unassigned — see below | The donor moved it into a `.github/moon.yml` project, which is outside this slice's paths |
+| `.moon/toolchains.yml` `shellByTag` entries `ci: ci` and `docker: docker` | 11 — done | The root `flake.nix` defines no `ci` or `docker` devShell, and `agent-operator-go` carries the `docker` tag |
+| `zizmor` step kept in `.github/workflows/ci.yml` | 11 — done | The donor moved it into a `.github/moon.yml` project, which is outside this slice's paths |
 
 Note that the per-project coverage opt-ins on main are untouched:
 `script-moon-command-validate` and the config packages declare their own
 `ci-check: deps: [coverage]` with their own thresholds and still gate on them.
 
-## Plan Gap Found
+## Plan Gap Found — Closed
 
-The root `flake.nix` and `.github/moon.yml` belong to no subplan. This slice
-covers `.moon/` and `.github/workflows` but not either file, and two donor
-changes depend on them — the `shellByTag` entries need the `ci` and `docker`
-devShells, and the zizmor move needs the `.github` project. Assign both before
-subplan 10 runs its zero-diff check, or that check will report them as residue.
+The root `flake.nix` and `.github/moon.yml` belonged to no subplan. This slice
+covers `.moon/` and `.github/workflows` but neither file, and two donor changes
+depend on them — the `shellByTag` entries need the `ci` and `docker` devShells,
+and the zizmor move needs the `.github` project. Subplan 11 now claims both and
+has landed them, re-enabling the last two rows of the table above.
 
 ## Files Modified/Created
 
