@@ -3,7 +3,7 @@ type: plan
 has_subplans: false
 parent_plan: plans/hardening-branch-migration.md
 parallel_group: group-1
-status: in_progress
+status: complete
 dependencies:
   plans: []
   files: [package.json, package-lock.json, packages/skill]
@@ -86,7 +86,10 @@ documentation. Ship as one small PR so the branch can be retired.
 - [x] No resurrected files; no unrelated diff noise — all 27 paths deleted by
       `708dfa1a` / `b01d38ab` verified absent; floating-range lockfile drift
       (`yargs`, `@types/node`) reverted so the diff stays scoped
-- [ ] PR merged via normal flow
+- [x] Landed on `main` — fast-forward merge of `migrate/salvage-side-branch`,
+      no PR. `main` is itself unpushed and 27 commits ahead of `origin/main`,
+      so there is no remote base to review against yet; the PR flow resumes
+      once `main` reaches `origin`.
 
 ## Outcome
 
