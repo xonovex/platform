@@ -1,0 +1,5 @@
+extends: './extensions-base.yml'
+nix-environment:
+  environmentByTask:
+    system:negative:
+      installable: 'let shell = {}; in shell'

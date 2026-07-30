@@ -1,0 +1,54 @@
+$schema: https://moonrepo.dev/schemas/project.json
+language: rust
+layer: library
+tags:
+  - rust
+tasks:
+  check:
+    command:
+      - cargo
+      - check
+      - --all-targets
+    toolchain: [system, nix]
+    inputs:
+      - src/**/*
+      - tests/**/*
+      - Cargo.toml
+      - Cargo.lock
+    options:
+      cache: true
+  build:
+    command:
+      - cargo
+      - build
+      - --all-targets
+    toolchain: [system, nix]
+    inputs:
+      - src/**/*
+      - tests/**/*
+      - Cargo.toml
+      - Cargo.lock
+    options:
+      cache: true
+  test:
+    command:
+      - cargo
+      - test
+    toolchain: [system, nix]
+    inputs:
+      - src/**/*
+      - tests/**/*
+      - Cargo.toml
+      - Cargo.lock
+    options:
+      cache: true
+  ci-check:
+    command: echo 'ci-check complete'
+    deps:
+      - check
+      - build
+      - test
+      - lint
+      - format-check
+    options:
+      cache: false

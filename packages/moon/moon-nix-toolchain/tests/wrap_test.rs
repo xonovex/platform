@@ -48,7 +48,9 @@ fn flake_ref(output: &ExtendTaskCommandOutput) -> String {
         panic!("expected args to be replaced, got {:?}", output.args);
     };
     assert_eq!(args[0], "develop");
-    args[1].clone()
+    assert_eq!(&args[1..4], ["--option", "eval-cache", "false"]);
+    assert_eq!(args[4], "--no-update-lock-file");
+    args[5].clone()
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
@@ -69,10 +71,12 @@ async fn wraps_command_task_in_nix_develop() {
         panic!("expected args to be replaced, got {:?}", output.args);
     };
     assert_eq!(args[0], "develop");
-    assert!(!args[1].is_empty(), "workspace root should be resolved");
-    assert_eq!(args[2], "--command");
-    assert_eq!(args[3], "clang-format");
-    assert_eq!(args[4], "--version");
+    assert_eq!(&args[1..4], ["--option", "eval-cache", "false"]);
+    assert_eq!(args[4], "--no-update-lock-file");
+    assert!(!args[5].is_empty(), "workspace root should be resolved");
+    assert_eq!(args[6], "--command");
+    assert_eq!(args[7], "clang-format");
+    assert_eq!(args[8], "--version");
 
     assert_eq!(output.env.get(SENTINEL).map(String::as_str), Some("1"));
 }
@@ -152,19 +156,21 @@ async fn wraps_script_task_via_bash() {
     reset_wrap_env();
 
     let sandbox = create_empty_moon_sandbox();
+    let expected_root = format!("{}/", sandbox.root.to_string_lossy());
     let plugin = sandbox.create_toolchain("nix").await;
 
     let output = plugin
         .extend_task_script(ExtendTaskScriptInput {
-            script: "echo hi && ls".into(),
+            script: "echo 'hi' && ls".into(),
             ..Default::default()
         })
         .await;
 
     let script = output.script.expect("script should be wrapped");
-    assert!(script.starts_with("nix develop "), "got: {script}");
-    assert!(script.contains("--command bash -c "), "got: {script}");
-    assert!(script.contains("echo hi && ls"), "got: {script}");
+    assert_eq!(
+        script,
+        format!("nix develop --option eval-cache false --no-update-lock-file '{expected_root}' --command bash -c 'echo '\\''hi'\\'' && ls'")
+    );
     assert_eq!(output.env.get(SENTINEL).map(String::as_str), Some("1"));
 }
 
@@ -513,12 +519,32 @@ async fn define_toolchain_config_exposes_camel_case_schema() {
         "shellByToolchain",
         "shellByTag",
         "shellByLanguage",
+        "failClosedByTag",
+        "failClosedByLanguage",
     ] {
         assert!(
             rendered.contains(key),
             "schema should expose `{key}`: {rendered}"
         );
     }
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 1)]
+#[serial]
+async fn register_toolchain_preserves_public_metadata() {
+    let sandbox = create_empty_moon_sandbox();
+    let plugin = sandbox.create_toolchain("nix").await;
+
+    let input = serde_json::from_value(serde_json::json!({ "id": "nix" })).unwrap();
+
+    let output = plugin.register_toolchain(input).await;
+
+    assert_eq!(output.name, "Nix");
+    assert_eq!(output.plugin_version, "0.7.0");
+    assert_eq!(
+        output.description.as_deref(),
+        Some("Runs every task inside the project's or workspace's nix flake dev shell.")
+    );
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 1)]

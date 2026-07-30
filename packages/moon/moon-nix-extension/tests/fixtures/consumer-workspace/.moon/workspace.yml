@@ -1,0 +1,17 @@
+$schema: https://moonrepo.dev/schemas/workspace.json
+projects:
+  node-basic: projects/node-basic
+  polyglot: projects/polyglot
+  overrides: projects/overrides
+  legacy: projects/legacy
+  special-compiler: projects/special-compiler
+  system: projects/system
+vcs:
+  client: git
+  defaultBranch: main
+hasher:
+  walkStrategy: glob
+pipeline:
+  logRunningCommand: false
+  syncProjects: false
+  syncWorkspace: false

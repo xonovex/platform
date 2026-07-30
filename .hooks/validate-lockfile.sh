@@ -10,9 +10,8 @@ set -Eeuo pipefail
 # at commit time pulls in unrelated transitive version drift and is
 # non-deterministic across npm versions, so we leave that to the developer.
 #
-# Runs only when a package.json (root or any workspace) is staged. Verifies
-# every workspace package is present in the lockfile's "packages" map and blocks
-# with guidance if any is missing.
+# Runs only when a package.json (root or any workspace) is staged. npm performs
+# the same package/lock consistency validation as CI without changing files.
 
 root="$(git rev-parse --show-toplevel)"
 cd "$root"
@@ -22,13 +21,7 @@ if ! git diff --cached --name-only --diff-filter=ACMRD | grep -Eq '(^|/)package\
   exit 0
 fi
 
-missing=0
-while IFS= read -r pkg; do
-  dir="${pkg%/package.json}"
-  grep -q "\"${dir}\":" package-lock.json || { echo "validate-lockfile: ${dir} is missing from package-lock.json"; missing=1; }
-done < <(git ls-files 'packages/*/*/package.json' 'packages/*/package.json')
-
-if [ "$missing" -ne 0 ]; then
+if ! npm ci --dry-run --ignore-scripts --no-audit --no-fund; then
   echo "validate-lockfile: package-lock.json is out of sync. Run 'npm install' and stage package-lock.json, then commit again." >&2
   exit 1
 fi

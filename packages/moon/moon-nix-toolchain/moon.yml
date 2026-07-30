@@ -4,3 +4,21 @@ language: rust
 tags:
   - rust
   - moon-plugin
+dependsOn:
+  - moon-nix-runtime
+tasks:
+  moon-build:
+    deps:
+      - moon-nix-runtime:build
+    inputs:
+      - /packages/moon/moon-nix-runtime/src/**/*
+      - /packages/moon/moon-nix-runtime/Cargo.toml
+      - /packages/moon/moon-nix-runtime/Cargo.lock
+  moon-test:
+    deps:
+      - moon-nix-runtime:test
+    inputs:
+      - /packages/moon/moon-nix-runtime/src/**/*
+      - /packages/moon/moon-nix-runtime/tests/**/*
+      - /packages/moon/moon-nix-runtime/Cargo.toml
+      - /packages/moon/moon-nix-runtime/Cargo.lock

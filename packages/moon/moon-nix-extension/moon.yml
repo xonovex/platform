@@ -1,0 +1,49 @@
+$schema: https://moonrepo.dev/schemas/project.json
+layer: library
+language: rust
+tags:
+  - rust
+  - moon-plugin
+dependsOn:
+  - moon-nix-runtime
+tasks:
+  moon-build:
+    deps:
+      - moon-nix-runtime:build
+    inputs:
+      - /packages/moon/moon-nix-runtime/src/**/*
+      - /packages/moon/moon-nix-runtime/Cargo.toml
+      - /packages/moon/moon-nix-runtime/Cargo.lock
+  moon-test:
+    deps:
+      - moon-nix-runtime:test
+    inputs:
+      - /packages/moon/moon-nix-runtime/src/**/*
+      - /packages/moon/moon-nix-runtime/tests/**/*
+      - /packages/moon/moon-nix-runtime/Cargo.toml
+      - /packages/moon/moon-nix-runtime/Cargo.lock
+  integration:
+    command:
+      - bash
+      - tests/integration/consumer-workspace.sh
+    toolchain: [system, nix]
+    deps:
+      - moon-build
+    inputs:
+      - tests/integration/**/*
+      - tests/fixtures/consumer-workspace/**/*
+      - tests/fixtures/consumer-workspace/.moon/**/*
+      - /package.json
+      - /package-lock.json
+    options:
+      cache: false
+      runInCI: false
+  # The consumer-workspace script builds a scratch workspace and runs nix, so it
+  # is an integration tier rather than a ci-check gate.
+  ci-integration:
+    command: noop
+    deps:
+      - integration
+    options:
+      cache: false
+      runInCI: false

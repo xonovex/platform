@@ -1,0 +1,42 @@
+nix-environment:
+  plugin: 'file://./plugins/moon_nix_extension.wasm'
+  baseComponents: [general]
+  environmentByToolchain:
+    javascript: node
+    npm: node
+    node: node
+    go: go
+  environmentByProject:
+    overrides:
+      components: [postgresql]
+      mode: append
+    legacy:
+      components: [general, node20]
+      mode: replace
+    special-compiler:
+      installable: 'path:./projects/special-compiler#moon'
+  environmentByTask:
+    overrides:task-append:
+      components: [protobuf]
+      mode: append
+    overrides:task-replace:
+      components: [general, node24]
+      mode: replace
+    special-compiler:bootstrap:
+      installable: 'path:./projects/special-compiler#bootstrap'
+    special-compiler:supersede:
+      components: [general, node24]
+      mode: replace
+    system:scoped-only:
+      components: [protobuf]
+      mode: append
+    system:missing-component:
+      components: [missing]
+      mode: replace
+    system:broken-evaluation:
+      components: [broken]
+      mode: replace
+    system:negative:
+      components: [general]
+      mode: replace
+  failClosed: true

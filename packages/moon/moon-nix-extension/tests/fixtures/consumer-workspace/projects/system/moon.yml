@@ -1,0 +1,49 @@
+$schema: https://moonrepo.dev/schemas/project.json
+language: system
+layer: application
+tasks:
+  unmapped:
+    command: /bin/sh
+    args: [-c, "printf '%s\\n' system-unmapped"]
+    toolchains: [system]
+    inputs: [source.txt]
+    options:
+      shell: false
+  scoped-only:
+    script: |
+      moon-general-marker
+      moon-protobuf-marker
+      for unexpected in moon-go-marker moon-node-marker moon-node20-marker moon-node24-marker moon-postgresql-marker; do
+        if command -v "$unexpected" >/dev/null 2>&1; then
+          printf 'unexpected component command: %s\n' "$unexpected" >&2
+          exit 1
+        fi
+      done
+    toolchains: [system]
+    inputs: [source.txt]
+  reentry:
+    command: /bin/sh
+    args: [-c, "printf '%s\\n' sentinel-reentry"]
+    toolchains: [node]
+    inputs: [source.txt]
+    options:
+      shell: false
+  negative:
+    command: /bin/sh
+    args: [-c, "printf '%s\\n' negative-control"]
+    toolchains: [system]
+    inputs: [source.txt]
+    options:
+      shell: false
+  missing-component:
+    command: /bin/true
+    toolchains: [system]
+    inputs: [source.txt]
+    options:
+      shell: false
+  broken-evaluation:
+    command: /bin/true
+    toolchains: [system]
+    inputs: [source.txt]
+    options:
+      shell: false

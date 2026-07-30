@@ -1,5 +1,17 @@
 # @xonovex/moon-nix-toolchain
 
+## 0.7.0
+
+### Minor Changes
+
+- Move the wrap, guard, flake-target, and Nix string-escaping logic into the new `moon_nix_runtime` crate and consume it from there. The toolchain now depends on `moon_nix_runtime` by path and shares one implementation with `moon_nix_extension` instead of carrying its own copy, so the two plugins cannot drift in how they decide to wrap a task, resolve a flake target, or escape a Nix string. Hook behaviour, config keys, and devShell precedence are unchanged.
+
+### Patch Changes
+
+- Stop a project-flake devShell probe from failing open. `flake_exposes_shell` now returns an error when `nix eval` exits non-zero or prints anything other than `true` / `false`, rather than treating the failure as "shell absent" and silently falling back to the default devShell. A genuine `false` still selects the default shell, so the 0.6.1 fallback is intact; only unreadable results now stop the wrap.
+- Probe project flakes without touching the lock file. The devShell probe passes `--no-update-lock-file`, so inspecting a project flake can no longer rewrite that project's `flake.lock` as a side effect of running a task.
+- Read flake state with the Nix evaluation cache disabled. The probes pass `--option eval-cache false`, so a stale evaluation cache cannot report a devShell set that no longer matches the flake on disk.
+
 ## 0.6.1
 
 ### Patch Changes
