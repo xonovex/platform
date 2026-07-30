@@ -10,9 +10,9 @@ import (
 	"fmt"
 	"sort"
 
-	isoshared "github.com/xonovex/platform/packages/cli/agent-cli-go/internal/isolation/shared"
-	netshared "github.com/xonovex/platform/packages/cli/agent-cli-go/internal/network/shared"
-	provshared "github.com/xonovex/platform/packages/cli/agent-cli-go/internal/provision/shared"
+	isoshared "github.com/xonovex/platform/packages/agent/agent-cli-go/internal/isolation/shared"
+	netshared "github.com/xonovex/platform/packages/agent/agent-cli-go/internal/network/shared"
+	provshared "github.com/xonovex/platform/packages/agent/agent-cli-go/internal/provision/shared"
 	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/isolation"
 	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/policy"
 	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/provision"
@@ -90,12 +90,13 @@ func (r *Registry) IsolationMethods() []isolation.IsolationMethod {
 
 // Request bundles the per-run axis selection handed to Select.
 type Request struct {
-	Isolation   isolation.IsolationMethod
-	Provision   provision.ProvisionMethod
-	Network     netshared.Mode
-	Passthrough bool
-	Runtime     string
-	Image       string
+	Isolation      isolation.IsolationMethod
+	Provision      provision.ProvisionMethod
+	Network        netshared.Mode
+	Passthrough    bool
+	Runtime        string
+	Image          string
+	HasCustomBinds bool
 }
 
 // Select resolves the isolator and provisioner for a request and enforces the
@@ -112,8 +113,8 @@ func Select(reg *Registry, req Request, pol policy.SandboxPolicy) (isoshared.Iso
 		return nil, nil, err
 	}
 	caps := policy.Capabilities{
-		Pinned:               prov.Pinned(),
-		HostToolsUnreachable: iso.HidesHost(req.Passthrough, req.Image),
+		Pinned:               iso.PinnedProvision(req.Provision, prov.Pinned(), req.Image),
+		HostToolsUnreachable: iso.HidesHost(req.Passthrough, req.Image) && !req.HasCustomBinds,
 		EgressRestricted:     netshared.EgressIsRestricted(req.Network),
 		KernelIsolated:       iso.KernelIsolated(req.Runtime),
 	}

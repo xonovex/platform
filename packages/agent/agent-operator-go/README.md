@@ -39,26 +39,40 @@ spec:
 
 **Lifecycle phases:** `Pending` -> `Initializing` -> `Running` -> `Succeeded` | `Failed` | `TimedOut`
 
+#### Submission boundary
+
+`AgentRun` is the operator's execution request API. Manual tools, harness hooks,
+CI/CD systems, webhook handlers, Kubernetes CronJobs, and other external
+integrations create `AgentRun` resources through the Kubernetes API. The
+operator has no scheduling or event-ingress listener and does not interpret
+caller-specific trigger metadata.
+
+The operator admits and reconciles the submitted run specification. Any
+additional approval, policy, evidence, or escalation requirements belong to
+the caller or the native platform that submits the run.
+
+Every execution namespace must contain exactly one `AgentPolicy`. Admission rejects AgentRuns and AgentWorkspaces when the policy is absent or ambiguous, because the operator cannot safely determine runtime-class or Secret authority otherwise.
+
 #### Full spec reference
 
-| Field              | Type     | Description                                                       |
-| ------------------ | -------- | ----------------------------------------------------------------- |
-| `harnessRef`       | string   | Name of an AgentHarness in the same namespace                     |
-| `harness`          | object   | Inline harness config (mutually exclusive with `harnessRef`)      |
-| `providerRef`      | string   | Name of an AgentProvider in the same namespace                    |
-| `provider`         | object   | Inline provider config (mutually exclusive with `providerRef`)    |
-| `workspaceRef`     | string   | Name of an AgentWorkspace for shared workspace support            |
-| `workspace`        | object   | Inline workspace config (mutually exclusive with `workspaceRef`)  |
-| `toolchainRef`     | string   | Name of an AgentToolchain in the same namespace                   |
-| `toolchain`        | object   | Inline toolchain config (mutually exclusive with `toolchainRef`)  |
-| `prompt`           | string   | Task prompt for headless execution                                |
-| `resources`        | object   | K8s resource requirements for the agent container                 |
-| `timeout`          | duration | Max run duration (default: `1h`)                                  |
-| `env`              | list     | Additional environment variables                                  |
-| `image`            | string   | Container image override                                          |
-| `runtimeClassName` | string   | Pod runtime class for sandboxed execution (e.g. `gvisor`, `kata`) |
-| `nodeSelector`     | map      | Node selector for pod scheduling                                  |
-| `tolerations`      | list     | Tolerations for pod scheduling                                    |
+| Field              | Type     | Description                                                                                       |
+| ------------------ | -------- | ------------------------------------------------------------------------------------------------- |
+| `harnessRef`       | string   | Name of an AgentHarness in the same namespace                                                     |
+| `harness`          | object   | Inline harness config (mutually exclusive with `harnessRef`)                                      |
+| `providerRef`      | string   | Name of an AgentProvider in the same namespace                                                    |
+| `provider`         | object   | Inline provider config (mutually exclusive with `providerRef`)                                    |
+| `workspaceRef`     | string   | Name of an AgentWorkspace for shared workspace support                                            |
+| `workspace`        | object   | Inline workspace config (mutually exclusive with `workspaceRef`)                                  |
+| `toolchainRef`     | string   | Name of an AgentToolchain in the same namespace                                                   |
+| `toolchain`        | object   | Inline toolchain config (mutually exclusive with `toolchainRef`)                                  |
+| `prompt`           | string   | Task prompt for headless execution                                                                |
+| `resources`        | object   | K8s resource requirements applied to the agent and its init containers                            |
+| `timeout`          | duration | Positive max run duration (default: `1h`)                                                         |
+| `env`              | list     | Additional environment variables; Secret refs require policy allowlisting                         |
+| `image`            | string   | Digest-pinned agent image override; required unless resolved from a harness, toolchain, or policy |
+| `runtimeClassName` | string   | Sandboxed pod runtime class; required unless resolved from a harness or policy                    |
+| `nodeSelector`     | map      | Node selector for pod scheduling                                                                  |
+| `tolerations`      | list     | Tolerations for pod scheduling                                                                    |
 
 ### AgentHarness
 
@@ -72,7 +86,7 @@ metadata:
 spec:
   type: claude
   defaultProvider: gemini-provider
-  defaultImage: "node:trixie-slim"
+  defaultImage: "ghcr.io/example/agents/claude@sha256:<digest>"
   defaultRuntimeClassName: gvisor
   defaultTimeout: 1h
   env:
@@ -86,7 +100,7 @@ spec:
 | ------------------------- | -------- | ------------------------------------------------- |
 | `type`                    | string   | Agent type (`claude`, `opencode`)                 |
 | `defaultProvider`         | string   | Default provider name                             |
-| `defaultImage`            | string   | Default container image                           |
+| `defaultImage`            | string   | Default digest-pinned agent image                 |
 | `defaultResources`        | object   | Default resource requirements                     |
 | `defaultTimeout`          | duration | Default timeout for agent runs                    |
 | `defaultRuntimeClassName` | string   | Default pod runtime class (e.g. `gvisor`, `kata`) |
@@ -106,6 +120,7 @@ spec:
   authTokenSecretRef:
     name: gemini-credentials
     key: api-key
+  authTokenEnv: ANTHROPIC_AUTH_TOKEN
   environment:
     ANTHROPIC_BASE_URL: "http://litellm-proxy:8317"
     API_TIMEOUT_MS: "3000000"
@@ -113,17 +128,19 @@ spec:
     ANTHROPIC_DEFAULT_SONNET_MODEL: "gemini-3-flash-preview"
 ```
 
-The controller validates that the referenced Secret exists and contains the specified key, reporting readiness via `.status.ready`.
+The controller validates that the referenced Secret exists and contains the specified key, reporting readiness via `.status.ready`. Using the provider from an AgentRun also requires the Secret name in `AgentPolicy.spec.enforced.allowedSecretNames`.
 
 #### Full spec reference
 
-| Field                | Type   | Description                                |
-| -------------------- | ------ | ------------------------------------------ |
-| `type`               | string | Provider type (e.g. `anthropic`, `openai`) |
-| `displayName`        | string | Human-readable name                        |
-| `authTokenSecretRef` | object | Secret reference for auth token            |
-| `environment`        | map    | Environment variables to set               |
-| `cliArgs`            | list   | Additional CLI arguments                   |
+| Field                | Type   | Description                                                         |
+| -------------------- | ------ | ------------------------------------------------------------------- |
+| `presetRef`          | string | Portable shared provider preset; host-loopback presets are rejected |
+| `agentType`          | string | Agent used to resolve `presetRef`; defaults to `claude`             |
+| `displayName`        | string | Human-readable name                                                 |
+| `authTokenSecretRef` | object | Secret reference for the auth token                                 |
+| `authTokenEnv`       | string | Credential destination; supplied by a preset when omitted           |
+| `environment`        | map    | Environment variables to set                                        |
+| `cliArgs`            | list   | Additional CLI arguments                                            |
 
 ### AgentWorkspace
 
@@ -139,14 +156,18 @@ spec:
   repository:
     url: https://github.com/org/repo.git
     branch: main
+    # credentialsSecretRef:
+    #   name: repository-credentials
+    #   key: credentials
   storageClass: nfs-csi
   storageSize: 10Gi
+  runtimeClassName: gvisor
   sharedVolumes:
     - name: claude-config
-      mountPath: /root/.claude
+      mountPath: /home/agent/.claude
       storageSize: 1Gi
     - name: opencode-config
-      mountPath: /root/.opencode
+      mountPath: /home/agent/.config/opencode
       storageSize: 512Mi
 ```
 
@@ -154,18 +175,20 @@ spec:
 
 #### Full spec reference
 
-| Field                         | Type   | Description                                        |
-| ----------------------------- | ------ | -------------------------------------------------- |
-| `type`                        | string | Workspace type (`git` or `jj`)                     |
-| `repository.url`              | string | Git repository URL (required)                      |
-| `repository.branch`           | string | Branch to checkout                                 |
-| `storageClass`                | string | Storage class for workspace PVC (must support RWX) |
-| `storageSize`                 | string | Storage size for workspace PVC (default: `10Gi`)   |
-| `sharedVolumes[].name`        | string | Volume name (used as PVC suffix)                   |
-| `sharedVolumes[].mountPath`   | string | Mount path in agent containers                     |
-| `sharedVolumes[].storageSize` | string | PVC size for this volume (default: `1Gi`)          |
-| `git.worktree`                | object | Git worktree configuration                         |
-| `jj.revision`                 | string | Jujutsu revision                                   |
+| Field                             | Type   | Description                                                                               |
+| --------------------------------- | ------ | ----------------------------------------------------------------------------------------- |
+| `type`                            | string | Workspace type (`git` or `jj`)                                                            |
+| `repository.url`                  | string | Git repository URL (required)                                                             |
+| `repository.branch`               | string | Branch to checkout                                                                        |
+| `repository.credentialsSecretRef` | object | Allowlisted Secret key containing one git-credential-store entry for private HTTPS clones |
+| `storageClass`                    | string | Storage class for workspace PVC (must support RWX)                                        |
+| `storageSize`                     | string | Storage size for workspace PVC (default: `10Gi`)                                          |
+| `runtimeClassName`                | string | Sandboxed runtime for the clone Job; defaults from the namespace policy                   |
+| `sharedVolumes[].name`            | string | Volume name (used as PVC suffix)                                                          |
+| `sharedVolumes[].mountPath`       | string | Mount path in agent containers                                                            |
+| `sharedVolumes[].storageSize`     | string | PVC size for this volume (default: `1Gi`)                                                 |
+| `git.worktree`                    | object | Git worktree configuration                                                                |
+| `jj.revision`                     | string | Jujutsu revision                                                                          |
 
 #### Volume layout
 
@@ -177,9 +200,11 @@ workspace PVC (RWX):
   /workspace-wt/agent-2/   <- worktree for agent-2
 
 shared volume PVCs (RWX, one per sharedVolumes entry):
-  /root/.claude/           <- claude-config PVC
-  /root/.opencode/         <- opencode-config PVC
+  /home/agent/.claude/           <- claude-config PVC
+  /home/agent/.config/opencode/  <- opencode-config PVC
 ```
+
+For a private HTTPS repository, the referenced Secret key contains a standard git credential-store line such as `https://username:token@github.com`. The key is mounted read-only into the clone container only; it is not mounted into the agent container. Keep the Secret encrypted at rest and out of source control.
 
 ### AgentToolchain
 
@@ -210,7 +235,54 @@ spec:
 | `nix.flakeRef` / `nix.shell` | string | Project flake + devShell (project-flake source; mutually exclusive with `packages`)                  |
 | `nix.image`                  | string | Pre-built, digest-pinned agent OCI image the pod runs (required; satisfies `RequirePinnedProvision`) |
 
-The `nix` toolchain selects the pre-built image as the pod image — the **same content-addressed store-path closure** the CLI resolves (built from the same `flake.lock` + `nix/agent-env.nix`, verified with `nix path-info -r`). The pod starts by image pull: **no `nix-env` emptyDir, no `nixos/nix` init container, no per-pod `nix profile install`**. The webhook rejects a `NixSpec` missing `nixpkgsRev` or `image`. Build/push the image with `npx moon run agent-operator-go:agent-image-build` (→ `nix build .#legacyPackages.<sys>.agentImage` + skopeo push).
+The `nix` toolchain selects the pre-built image as the pod image — the **same content-addressed store-path closure** the CLI resolves (built from the same `flake.lock` + `nix/agent-env.nix`, verified with `nix path-info -r`). The pod starts by image pull: **no `nix-env` emptyDir, no `nixos/nix` init container, no per-pod `nix profile install`**. The AgentRun and AgentToolchain webhooks reject a `NixSpec` without `nixpkgsRev`, exactly one packages/flake source, and an `@sha256:` image digest. Build/push the image with `npx moon run agent-operator-go:agent-image-build` (→ `nix build .#legacyPackages.<sys>.agentImage` + skopeo push).
+
+### AgentPolicy
+
+Namespace-scoped admission policy for AgentRuns and AgentWorkspaces. Exactly one AgentPolicy is required per execution namespace; missing or multiple policies reject admission because the effective authority would be unknown.
+
+```yaml
+apiVersion: agent.xonovex.com/v1alpha1
+kind: AgentPolicy
+metadata:
+  name: agent-policy
+  namespace: ai-agents
+spec:
+  enforced:
+    runtimeClassName: kata
+    allowedRuntimeClassNames: [kata, gvisor]
+    allowedSecretNames:
+      - gemini-credentials
+      - repository-credentials
+    requireSecurityContext: true
+    requireNetworkPolicy: true
+    requireEgressRestricted: true
+    maxTimeout: 1h
+    maxResources:
+      cpu: "2"
+      memory: 4Gi
+    allowedImages:
+      - ghcr.io/example/agents/
+  defaults:
+    image: ghcr.io/example/agents/runtime@sha256:<digest>
+    timeout: 30m
+    runtimeClassName: kata
+```
+
+| Host policy intent  | Native admission behavior                                                                                           | Independent verification                                                  |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| Runtime isolation   | Requires or allowlists `runtimeClassName`                                                                           | Verify the cluster RuntimeClass and runtime implementation                |
+| Container hardening | Rejects explicit privilege escalation and root weakening                                                            | Inspect the generated Pod security context and cluster admission policy   |
+| Network restriction | Rejects disabled policies, unrestricted host networking, proxy mode without a backend, and unprovable custom egress | Verify generated NetworkPolicy behavior with the installed network plugin |
+| Duration bound      | Requires an explicit/policy-defaulted timeout at or below `maxTimeout`                                              | Observe Job timeout and terminal status                                   |
+| Resource bound      | Requires a limit for each `maxResources` entry; rejects requests/limits above it                                    | Keep namespace LimitRange and ResourceQuota as an independent control     |
+| Image restriction   | Requires a digest-pinned image resolved from the run, harness, toolchain, or policy, then applies `allowedImages`   | Add signature/provenance admission when digest pinning is insufficient    |
+| Secret authority    | Rejects env, provider, and repository Secret references whose names are not explicitly allowlisted                  | Keep Kubernetes RBAC from granting direct Secret reads to run submitters  |
+| Toolchain pinning   | AgentToolchain/inline Nix validation requires revision, source, and image digest                                    | Verify registry digest and the built closure provenance                   |
+
+Policy defaults are applied before harness, provider, and toolchain references are resolved at admission. Referenced execution inputs are snapshotted inline, and the admitted AgentRun stores the exact image, runtime, resources, environment, and Secret references that policy approved.
+
+Admission configuration and the webhook endpoint must be reachable for these controls to enforce. Verify installation with negative probes for a wrong runtime class, disabled or custom-open network policy, host or proxy network mode, invalid workspace storage quantity, excessive timeout/resource limit, disallowed or missing image, moving Nix image tag, policy API outage, and duplicate namespace policies. An accepted object is admission evidence only; it does not prove the runtime, network, registry, or quota layer behaved correctly.
 
 ## Installation
 
@@ -219,6 +291,7 @@ The `nix` toolchain selects the pre-built image as the pod image — the **same 
 - Kubernetes cluster (v1.28+)
 - `kubectl` configured to access the cluster
 - `kustomize` (or `kubectl` with built-in kustomize)
+- cert-manager v1.16+ with its CA injector enabled
 
 ### Install CRDs
 
@@ -233,7 +306,10 @@ kubectl apply -k https://github.com/xonovex/platform//packages/agent/agent-opera
 kubectl apply -k https://github.com/xonovex/platform//packages/agent/agent-operator-go/config/default
 ```
 
-The manager deployment uses `ghcr.io/xonovex/agent-operator-go:latest`.
+The default overlay deploys the admission service and uses cert-manager to issue
+its serving certificate and inject the CA bundle into the webhook configurations.
+The manager deployment uses the digest-pinned image declared in
+`config/manager/manager.yaml`.
 
 To build locally:
 
@@ -255,9 +331,10 @@ go run ./cmd/operator/ \
 
 ## Usage
 
-### Standalone agent run (full workflow)
+### Standalone agent run (direct submission)
 
-The typical workflow: create a Secret, an AgentProvider, optionally an AgentHarness for defaults, then run an agent.
+Create a Secret, an AgentProvider, optionally an AgentHarness for defaults, then
+submit an AgentRun directly.
 
 ```bash
 # 1. Create a Secret for your provider credentials
@@ -276,6 +353,7 @@ spec:
   authTokenSecretRef:
     name: gemini-credentials
     key: api-key
+  authTokenEnv: ANTHROPIC_AUTH_TOKEN
   environment:
     ANTHROPIC_BASE_URL: "http://litellm-proxy:8317"
 ```
@@ -566,7 +644,7 @@ spec:
 
 ### Multi-agent shared workspace
 
-Create a workspace with shared volumes, then launch concurrent agents. Each agent gets an isolated git worktree but shares the same checkout and config directories.
+Create a workspace with shared volumes, then launch concurrent agents. Each agent gets an isolated git worktree named from its AgentRun while sharing the same checkout and config directories.
 
 ```yaml
 apiVersion: agent.xonovex.com/v1alpha1
@@ -580,9 +658,10 @@ spec:
     branch: main
   storageClass: nfs-csi
   storageSize: 10Gi
+  runtimeClassName: gvisor
   sharedVolumes:
     - name: claude-config
-      mountPath: /root/.claude
+      mountPath: /home/agent/.claude
       storageSize: 1Gi
 ---
 apiVersion: agent.xonovex.com/v1alpha1
@@ -592,10 +671,6 @@ metadata:
 spec:
   harnessRef: claude-harness
   workspaceRef: my-workspace
-  workspace:
-    git:
-      worktree:
-        branch: agent-1-work
   providerRef: gemini-provider
   prompt: "Fix the login bug"
 ---
@@ -606,10 +681,6 @@ metadata:
 spec:
   harnessRef: claude-harness
   workspaceRef: my-workspace
-  workspace:
-    git:
-      worktree:
-        branch: agent-2-work
   providerRef: gemini-provider
   prompt: "Add unit tests for the auth module"
 ```
@@ -642,6 +713,7 @@ spec:
     branch: main
   storageClass: nfs-csi
   storageSize: 10Gi
+  runtimeClassName: gvisor
 ---
 apiVersion: agent.xonovex.com/v1alpha1
 kind: AgentRun
@@ -650,8 +722,6 @@ metadata:
 spec:
   harnessRef: claude-harness
   workspaceRef: jj-workspace
-  workspace:
-    type: jj
   providerRef: gemini-provider
   prompt: "Implement the search feature"
 ```
@@ -668,7 +738,7 @@ metadata:
 spec:
   harness:
     type: claude
-    defaultImage: "node:22-slim"
+    defaultImage: "ghcr.io/example/agents/claude@sha256:<digest>"
     defaultTimeout: 30m
     defaultRuntimeClassName: gvisor
   providerRef: gemini-provider
@@ -691,10 +761,10 @@ metadata:
 spec:
   harnessRef: claude-harness
   provider:
-    type: anthropic
     authSecretRef:
       name: anthropic-credentials
       key: api-key
+    authTokenEnv: ANTHROPIC_API_KEY
     environment:
       ANTHROPIC_BASE_URL: "https://api.anthropic.com"
   workspace:
@@ -730,8 +800,11 @@ kubectl logs job/fix-auth-bug -c git-clone
 go test ./...
 
 # Integration tests (envtest, real API server, no kubelet)
-# Requires: setup-envtest (go install sigs.k8s.io/controller-runtime/tools/setup-envtest@latest)
-KUBEBUILDER_ASSETS=$(setup-envtest use -p path) go test -tags=integration -v -timeout=300s ./test/integration/
+# Requires: setup-envtest, provided by the nix devshell (nix/k8s.nix)
+# The moon task wires KUBEBUILDER_ASSETS itself — no manual export needed:
+npx moon run agent-operator-go:go-test-integration
+# Direct invocation outside moon:
+KUBEBUILDER_ASSETS="$(setup-envtest use -i -p path)" go test -tags=integration -v -timeout=300s ./test/integration/
 
 # E2E tests (Kind, full cluster with scheduling and garbage collection)
 # Requires: kind, kubectl, Docker
@@ -757,16 +830,47 @@ go test -tags=e2e_coco -v -timeout=600s ./test/e2e-coco/
 
 ### What the tests cover
 
-- **Unit (68 tests):** Builders (PVC, Job, containers, env vars, workspace PVC/Job/worktree), webhooks (defaulting and validation for all CRDs including workspaceRef rules), resolvers (harness, provider, workspace, toolchain).
-- **Integration (20 tests):** Reconciler logic against a real API server. PVC/Job creation, phase transitions (Running, Succeeded, Failed, TimedOut), provider resolution, AgentHarness defaults, terminal phase skipping, AgentWorkspace PVC creation, workspace Ready/Failed transitions, AgentRun with workspaceRef waiting for workspace Ready.
-- **E2E (7 tests):** Full cluster behavior. Pod scheduling, PVC binding, init container failure propagation, owner reference garbage collection, Docker image deployment with health probe validation, multi-agent workspace with concurrent runs, full-cycle pipeline (git clone + fake agent binary -> Succeeded).
-- **E2E gVisor (5 tests):** Sandbox isolation verification (dmesg gVisor banner), runtimeClassName propagation to Job/Pod, AgentHarness default inheritance, full workflow (Secret + Provider + Harness + git clone + agent -> Succeeded inside gVisor), workspace-based run (init Job has no runtimeClassName, agent Job does).
-- **E2E Kata (4 tests):** VM isolation verification (guest kernel differs from host, /dev/pmem0), runtimeClassName propagation to Job/Pod, AgentHarness default inheritance, full workflow (Secret + Provider + Harness + git clone + agent -> Succeeded inside Kata VM, skips in unprivileged kind).
-- **E2E CoCo (5 tests):** Confidential Containers runtimeClassName propagation (kata-cc, kata-tdx), AgentHarness default inheritance, full workflow (Secret + Provider + git clone + agent -> Succeeded with kata-cc), workspace-based run (init Job has no runtimeClassName, agent Job does).
+- **Unit:** Builders (PVC, Job, containers, env vars, workspace PVC/Job/worktree), policy/admission bypass cases, webhooks, resolvers, providers, and toolchains.
+- **Integration:** Reconciler logic against a real API server, including resource creation, phase transitions, provider resolution, harness defaults, terminal phases, and shared workspaces.
+- **E2E:** Full cluster scheduling, storage, initialization, owner cleanup, image deployment, multi-agent workspaces, and the full agent pipeline.
+- **E2E gVisor/Kata/CoCo:** RuntimeClass propagation, harness defaults, complete runs, workspace paths, and runtime-specific isolation evidence where the environment supports it.
+
+### Known host issue: Kind node exec fails (`setns process: exec: already started`)
+
+On affected hosts every Kind-based e2e suite fails at cluster creation ("Writing
+configuration") before running a single test, with:
+
+```
+OCI runtime exec failed: exec failed: unable to start container process: error starting setns process: exec: already started
+```
+
+Observed 2026-07-16 with docker 29.1.3 / runc 1.4.0 on kernel 7.0.6-gentoo
+(cgroup v2, nsdelegate). Findings from the investigation:
+
+- `docker exec` into a plain container (alpine) works, with or without
+  `--privileged`.
+- `docker exec` into a Kind node container fails identically with or without
+  `--privileged`, on both `kindest/node:v1.35.0` and `v1.31.9` — the node-image
+  version is irrelevant.
+- The node container runs systemd in a private cgroup namespace: its PID 1
+  sits in the child cgroup `init.scope` while controllers are enabled on the
+  container's root cgroup, so attaching an exec'd process to that root cgroup
+  violates cgroup v2's internal-process constraint. The `exec: already started`
+  text is Go's `os/exec` error for a second `Start` on one `Cmd`, which places
+  the fault in runc's exec/cgroup-attach retry path, not in the kernel setns
+  call itself.
+- Best hypothesis: a runc 1.4.0 exec bug triggered by systemd containers on
+  this kernel/cgroup layout. Portage carries runc 1.4.2 (stable) and 1.4.3
+  (~testing); upgrading and restarting docker is the untested candidate fix —
+  it needs root, so it was not applied.
+- Separately, the kata suite extracts a multi-GB Kata release into `$TMPDIR`;
+  on a small tmpfs `/tmp` it fails at `tar` (ENOSPC) before reaching Kind. Set
+  `TMPDIR` to a disk-backed path to get past that and reach the same Kind
+  failure as the other suites.
 
 ## Architecture
 
-Each AgentRun triggers one of two paths:
+Each AgentRun reconciles along one of two paths:
 
 **Standalone path** (no `workspaceRef`):
 
@@ -781,7 +885,7 @@ Each AgentRun triggers one of two paths:
 3. Shared volume PVCs are mounted at configured paths (e.g. `~/.claude/`)
 4. Controller watches Job status and updates AgentRun phase
 
-**RuntimeClassName** is applied to the Job's PodSpec when set on the AgentRun or inherited from the referenced AgentHarness. Both init and main containers run in the sandboxed runtime. Workspace init Jobs do _not_ inherit runtimeClassName; only agent Jobs do.
+**RuntimeClassName** is required for every execution pod. AgentRun Jobs resolve it from the run, harness, or namespace policy. AgentWorkspace clone Jobs resolve it from the workspace or namespace policy. Init and main containers therefore run inside the approved sandboxed runtime.
 
 ```
 Standalone:                         Workspace:
@@ -796,13 +900,13 @@ AgentRun                            AgentWorkspace
     +-> Job                            +-> AgentHarness (via harnessRef)
           +-> Init: git clone          +-> AgentProvider -> Secret
           +-> Main: agent binary       +-> AgentToolchain (optional)
-          +-> runtimeClassName?        |
+          +-> runtimeClassName         |
                                        +-> Job (uses workspace PVC)
                                              +-> Init: git worktree add
                                              +-> Main: agent binary
                                                    workingDir: /workspace-wt/{run}
                                                    mounts: shared volumes
-                                             +-> runtimeClassName?
+                                             +-> runtimeClassName
 ```
 
 ## Cleanup

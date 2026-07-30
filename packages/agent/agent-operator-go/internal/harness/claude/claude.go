@@ -11,11 +11,14 @@ import (
 type CommandBuilder struct{}
 
 // Command returns the binary and args for an AgentRun.
-func (c *CommandBuilder) Command(run *agentv1alpha1.AgentRun) ([]string, []string) {
-	agent, _ := agents.GetAgent(types.AgentClaude)
+func (CommandBuilder) Command(run *agentv1alpha1.AgentRun, _ []string) ([]string, []string, error) {
+	agent, err := agents.GetAgent(types.AgentClaude)
+	if err != nil {
+		return nil, nil, err
+	}
 	args := agents.BuildClaudeArgs(nil, types.AgentExecOptions{Sandbox: true})
 	if run.Spec.Prompt != "" {
 		args = append(args, "--print", "--prompt", run.Spec.Prompt)
 	}
-	return []string{agent.Binary}, args
+	return []string{agent.Binary}, args, nil
 }

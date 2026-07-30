@@ -1,7 +1,4 @@
-// Package shared is the terminal-output axis core: the TerminalExecutor port and
-// its config types. It was formerly shared pkg/types/terminal.go (evicted from
-// the shared module in the per-axis split, as the operator never implements it).
-// The leaves (tmux) implement the port; this core names no concrete leaf.
+// Package shared defines the terminal executor interface and its configuration.
 package shared
 
 // TerminalType represents the terminal wrapper type.

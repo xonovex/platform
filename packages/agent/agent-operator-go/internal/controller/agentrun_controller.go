@@ -3,16 +3,19 @@ package controller
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
 	networkingv1 "k8s.io/api/networking/v1"
+	"k8s.io/apimachinery/pkg/api/equality"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/tools/events"
+	"k8s.io/client-go/util/retry"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
@@ -56,6 +59,9 @@ func (r *AgentRunReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 		}
 		return ctrl.Result{}, err
 	}
+	if !agentRun.DeletionTimestamp.IsZero() {
+		return ctrl.Result{}, nil
+	}
 
 	// Skip if already completed
 	if agentRun.Status.Phase == agentv1alpha1.AgentRunPhaseSucceeded ||
@@ -72,39 +78,179 @@ func (r *AgentRunReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 	return r.reconcileStandalone(ctx, &agentRun)
 }
 
+type resolvedRunExecution struct {
+	agentType       agentv1alpha1.AgentType
+	providerEnv     []corev1.EnvVar
+	providerCliArgs []string
+	toolchain       *agentv1alpha1.ToolchainSpec
+	defaults        resolver.ResolvedDefaults
+	image           string
+}
+
+func (r *AgentRunReconciler) resolveRunExecution(ctx context.Context, run *agentv1alpha1.AgentRun) (*resolvedRunExecution, error) {
+	harness, err := resolver.ResolveHarness(ctx, r.Client, run.Namespace, run.Spec.HarnessRef, run.Spec.Harness)
+	if err != nil {
+		return nil, fmt.Errorf("HarnessResolutionFailed: %w", err)
+	}
+
+	agentType := agentv1alpha1.AgentTypeClaude
+	defaultProvider := ""
+	if harness != nil {
+		agentType = harness.Spec.Type
+		defaultProvider = harness.Spec.DefaultProvider
+	}
+	resolvedProvider, err := provider.ResolveProvider(ctx, r.Client, run, defaultProvider)
+	if err != nil {
+		return nil, fmt.Errorf("ProviderResolutionFailed: %w", err)
+	}
+	toolchain, err := resolver.ResolveToolchain(ctx, r.Client, run.Namespace, run.Spec.ToolchainRef, run.Spec.Toolchain)
+	if err != nil {
+		return nil, fmt.Errorf("ToolchainResolutionFailed: %w", err)
+	}
+
+	defaults := resolver.ApplyHarnessDefaults(run, harness)
+	image := defaults.Image
+	if resolvedToolchain := plugins.ResolveToolchain(toolchain); resolvedToolchain != nil && resolvedToolchain.Image() != "" {
+		image = resolvedToolchain.Image()
+	}
+	if image == "" {
+		return nil, fmt.Errorf("ImageResolutionFailed: admission did not resolve an agent execution image")
+	}
+	if run.Spec.RuntimeClassName == nil || strings.TrimSpace(*run.Spec.RuntimeClassName) == "" {
+		return nil, fmt.Errorf("RuntimeClassResolutionFailed: admission did not resolve a sandboxed runtimeClassName")
+	}
+
+	return &resolvedRunExecution{
+		agentType:       agentType,
+		providerEnv:     resolvedProvider.Environment,
+		providerCliArgs: resolvedProvider.CliArgs,
+		toolchain:       toolchain,
+		defaults:        defaults,
+		image:           image,
+	}, nil
+}
+
+func (r *AgentRunReconciler) reconcileExecutionResources(
+	ctx context.Context,
+	run *agentv1alpha1.AgentRun,
+	execution *resolvedRunExecution,
+	pvcName string,
+	workspaceType agentv1alpha1.WorkspaceType,
+	binding *isoshared.WorkspaceBinding,
+) (ctrl.Result, error) {
+	logger := log.FromContext(ctx).WithValues("agentRun", run.Name, "namespace", run.Namespace)
+	networkPolicy := execution.defaults.NetworkPolicy
+	if networkPolicy == nil || !networkPolicy.Disabled {
+		resource, err := netshared.BuildNetworkPolicy(run, networkPolicy)
+		if err != nil {
+			return ctrl.Result{}, err
+		}
+		if err := ctrl.SetControllerReference(run, resource, r.Scheme); err != nil {
+			return ctrl.Result{}, err
+		}
+		if err := r.Create(ctx, resource); err != nil {
+			if !errors.IsAlreadyExists(err) {
+				return ctrl.Result{}, fmt.Errorf("create network policy: %w", err)
+			}
+			var existing networkingv1.NetworkPolicy
+			if err := r.Get(ctx, client.ObjectKeyFromObject(resource), &existing); err != nil {
+				return ctrl.Result{}, fmt.Errorf("get existing network policy: %w", err)
+			}
+			if err := verifyControlledResource(run, &existing, resource.Spec, existing.Spec); err != nil {
+				return ctrl.Result{}, fmt.Errorf("existing NetworkPolicy %q: %w", resource.Name, err)
+			}
+		} else {
+			r.Recorder.Eventf(run, nil, corev1.EventTypeNormal, "NetworkPolicyCreated", "NetworkPolicyCreated",
+				"Created NetworkPolicy %s", resource.Name)
+		}
+	}
+
+	jobName := run.Name
+	if run.Status.JobName == "" {
+		if err := ensureAgentServiceAccount(ctx, r.Client, run.Namespace); err != nil {
+			return ctrl.Result{}, err
+		}
+		job, err := isoshared.BuildJob(
+			run,
+			execution.providerEnv,
+			execution.providerCliArgs,
+			pvcName,
+			execution.image,
+			execution.defaults.Timeout,
+			execution.agentType,
+			workspaceType,
+			execution.defaults.TTL,
+			binding,
+		)
+		if err != nil {
+			logger.Error(err, "failed to build agent Job")
+			return r.updatePhase(ctx, run, agentv1alpha1.AgentRunPhaseFailed, fmt.Sprintf("JobBuildFailed: %v", err))
+		}
+		if err := ctrl.SetControllerReference(run, job, r.Scheme); err != nil {
+			return ctrl.Result{}, err
+		}
+		if err := r.Create(ctx, job); err != nil {
+			if !errors.IsAlreadyExists(err) {
+				return ctrl.Result{}, fmt.Errorf("create agent Job: %w", err)
+			}
+			var existing batchv1.Job
+			if err := r.Get(ctx, client.ObjectKeyFromObject(job), &existing); err != nil {
+				return ctrl.Result{}, fmt.Errorf("get existing agent Job: %w", err)
+			}
+			if err := verifyControlledResource(run, &existing, job.Spec, existing.Spec); err != nil {
+				return ctrl.Result{}, fmt.Errorf("existing Job %q: %w", job.Name, err)
+			}
+		} else {
+			logger.Info("created Job", "jobName", jobName, "agentType", execution.agentType,
+				"runtimeClass", ptrOrEmpty(run.Spec.RuntimeClassName))
+			r.Recorder.Eventf(run, nil, corev1.EventTypeNormal, "AgentRunStarted", "AgentRunStarted",
+				"Created Job %s (agent=%s, provider=%s, runtimeClass=%s)",
+				jobName, string(execution.agentType), run.Spec.ProviderRef, ptrOrEmpty(run.Spec.RuntimeClassName))
+		}
+
+		run.Status.JobName = jobName
+		if err := r.updateStatus(ctx, run); err != nil {
+			return ctrl.Result{}, err
+		}
+	}
+
+	var job batchv1.Job
+	if err := r.Get(ctx, types.NamespacedName{Name: jobName, Namespace: run.Namespace}, &job); err != nil {
+		if errors.IsNotFound(err) {
+			return ctrl.Result{RequeueAfter: 5 * time.Second}, nil
+		}
+		return ctrl.Result{}, err
+	}
+	return r.reconcileJobStatus(ctx, run, &job)
+}
+
+func verifyControlledResource(owner client.Object, existing client.Object, desiredSpec, existingSpec any) error {
+	if !metav1.IsControlledBy(existing, owner) {
+		ownerKind := "owner"
+		switch owner.(type) {
+		case *agentv1alpha1.AgentRun:
+			ownerKind = "AgentRun"
+		case *agentv1alpha1.AgentWorkspace:
+			ownerKind = "AgentWorkspace"
+		}
+		return fmt.Errorf("resource is not controlled by %s UID %q", ownerKind, owner.GetUID())
+	}
+	if !equality.Semantic.DeepDerivative(desiredSpec, existingSpec) {
+		return fmt.Errorf("resource specification differs from the admitted execution")
+	}
+	return nil
+}
+
 func (r *AgentRunReconciler) reconcileStandalone(ctx context.Context, agentRun *agentv1alpha1.AgentRun) (ctrl.Result, error) {
 	log := log.FromContext(ctx).WithValues(
 		"agentRun", agentRun.Name,
 		"namespace", agentRun.Namespace,
 	)
 
-	// Resolve harness
-	harness, err := resolver.ResolveHarness(ctx, r.Client, agentRun.Namespace, agentRun.Spec.HarnessRef, agentRun.Spec.Harness)
+	execution, err := r.resolveRunExecution(ctx, agentRun)
 	if err != nil {
-		log.Error(err, "failed to resolve harness", "harnessRef", agentRun.Spec.HarnessRef)
-	}
-
-	// Determine agent type from harness
-	agentType := agentv1alpha1.AgentTypeClaude
-	if harness != nil {
-		agentType = harness.Spec.Type
-	}
-
-	// Resolve provider
-	defaultProvider := ""
-	if harness != nil {
-		defaultProvider = harness.Spec.DefaultProvider
-	}
-	providerEnv, err := provider.ResolveProvider(ctx, r.Client, agentRun, defaultProvider)
-	if err != nil {
-		log.Error(err, "failed to resolve provider", "providerRef", agentRun.Spec.ProviderRef)
-		return r.updatePhase(ctx, agentRun, agentv1alpha1.AgentRunPhaseFailed, fmt.Sprintf("ProviderResolutionFailed: %v", err))
-	}
-
-	// Resolve toolchain
-	tc, err := resolver.ResolveToolchain(ctx, r.Client, agentRun.Namespace, agentRun.Spec.ToolchainRef, agentRun.Spec.Toolchain)
-	if err != nil {
-		log.Error(err, "failed to resolve toolchain", "toolchainRef", agentRun.Spec.ToolchainRef)
+		log.Error(err, "failed to resolve execution inputs")
+		return r.updatePhase(ctx, agentRun, agentv1alpha1.AgentRunPhaseFailed, err.Error())
 	}
 
 	// Get workspace config
@@ -138,82 +284,15 @@ func (r *AgentRunReconciler) reconcileStandalone(ctx context.Context, agentRun *
 		}
 	}
 
-	// Resolve NetworkPolicy config
-	netpolCfg := agentRun.Spec.NetworkPolicy
-	if netpolCfg == nil && harness != nil {
-		netpolCfg = harness.Spec.DefaultNetworkPolicy
-	}
-
-	// Create NetworkPolicy (unless explicitly disabled)
-	if netpolCfg == nil || !netpolCfg.Disabled {
-		np := netshared.BuildNetworkPolicy(agentRun, netpolCfg)
-		if err := ctrl.SetControllerReference(agentRun, np, r.Scheme); err != nil {
-			return ctrl.Result{}, err
-		}
-		if err := r.Create(ctx, np); err != nil && !errors.IsAlreadyExists(err) {
-			log.Error(err, "failed to create network policy")
-			return ctrl.Result{}, err
-		}
-		r.Recorder.Eventf(agentRun, nil, corev1.EventTypeNormal, "NetworkPolicyCreated", "NetworkPolicyCreated",
-			"Created NetworkPolicy %s", np.Name)
-	}
-
-	// Create Job if needed
-	jobName := agentRun.Name
-	if agentRun.Status.JobName == "" {
-		defaults := resolver.ApplyHarnessDefaults(agentRun, harness)
-
-		// An image-based toolchain (e.g. nix) provisions via its pre-built,
-		// digest-pinned image.
-		image := defaults.Image
-		if tcl := plugins.ResolveToolchain(tc); tcl != nil && tcl.Image() != "" {
-			image = tcl.Image()
-		}
-
-		if err := r.ensureAgentServiceAccount(ctx, agentRun.Namespace); err != nil {
-			return ctrl.Result{}, err
-		}
-
-		job := isoshared.BuildJob(agentRun, providerEnv, pvcName, image, defaults.Timeout, agentType, wsType, tc, defaults.TTL, nil)
-		if err := ctrl.SetControllerReference(agentRun, job, r.Scheme); err != nil {
-			return ctrl.Result{}, err
-		}
-
-		if err := r.Create(ctx, job); err != nil && !errors.IsAlreadyExists(err) {
-			log.Error(err, "failed to create job", "jobName", jobName)
-			return ctrl.Result{}, err
-		}
-
-		log.Info("creating Job", "jobName", jobName, "agentType", agentType,
-			"runtimeClass", ptrOrEmpty(agentRun.Spec.RuntimeClassName))
-		r.Recorder.Eventf(agentRun, nil, corev1.EventTypeNormal, "AgentRunStarted", "AgentRunStarted",
-			"Created Job %s (agent=%s, provider=%s, runtimeClass=%s)",
-			jobName, string(agentType), agentRun.Spec.ProviderRef, ptrOrEmpty(agentRun.Spec.RuntimeClassName))
-
-		agentRun.Status.JobName = jobName
-		if err := r.Status().Update(ctx, agentRun); err != nil {
-			return ctrl.Result{}, err
-		}
-	}
-
-	// Watch Job status
-	var job batchv1.Job
-	if err := r.Get(ctx, types.NamespacedName{Name: jobName, Namespace: agentRun.Namespace}, &job); err != nil {
-		if errors.IsNotFound(err) {
-			return ctrl.Result{RequeueAfter: 5 * time.Second}, nil
-		}
-		return ctrl.Result{}, err
-	}
-
-	return r.reconcileJobStatus(ctx, agentRun, &job)
+	return r.reconcileExecutionResources(ctx, agentRun, execution, pvcName, wsType, nil)
 }
 
-// ensureAgentServiceAccount creates the dedicated zero-RBAC ServiceAccount agent
-// pods bind to, idempotently. It is a shared namespace resource, so it carries no
-// owner reference (it outlives any single AgentRun).
-func (r *AgentRunReconciler) ensureAgentServiceAccount(ctx context.Context, namespace string) error {
+// ensureAgentServiceAccount creates the dedicated zero-RBAC ServiceAccount used
+// by all untrusted agent and workspace-init pods. It is a shared namespace
+// resource, so it has no owner reference.
+func ensureAgentServiceAccount(ctx context.Context, kubeClient client.Client, namespace string) error {
 	sa := isoshared.BuildAgentServiceAccount(namespace)
-	if err := r.Create(ctx, sa); err != nil && !errors.IsAlreadyExists(err) {
+	if err := kubeClient.Create(ctx, sa); err != nil && !errors.IsAlreadyExists(err) {
 		return err
 	}
 	return nil
@@ -242,31 +321,10 @@ func (r *AgentRunReconciler) reconcileWithWorkspace(ctx context.Context, agentRu
 		}
 	}
 
-	// Resolve harness
-	harness, err := resolver.ResolveHarness(ctx, r.Client, agentRun.Namespace, agentRun.Spec.HarnessRef, agentRun.Spec.Harness)
+	execution, err := r.resolveRunExecution(ctx, agentRun)
 	if err != nil {
-		log.Error(err, "failed to resolve harness", "harnessRef", agentRun.Spec.HarnessRef)
-	}
-	agentType := agentv1alpha1.AgentTypeClaude
-	if harness != nil {
-		agentType = harness.Spec.Type
-	}
-
-	// Resolve provider
-	defaultProvider := ""
-	if harness != nil {
-		defaultProvider = harness.Spec.DefaultProvider
-	}
-	providerEnv, err := provider.ResolveProvider(ctx, r.Client, agentRun, defaultProvider)
-	if err != nil {
-		log.Error(err, "failed to resolve provider", "providerRef", agentRun.Spec.ProviderRef)
-		return r.updatePhase(ctx, agentRun, agentv1alpha1.AgentRunPhaseFailed, fmt.Sprintf("ProviderResolutionFailed: %v", err))
-	}
-
-	// Resolve toolchain
-	tc, err := resolver.ResolveToolchain(ctx, r.Client, agentRun.Namespace, agentRun.Spec.ToolchainRef, agentRun.Spec.Toolchain)
-	if err != nil {
-		log.Error(err, "failed to resolve toolchain", "toolchainRef", agentRun.Spec.ToolchainRef)
+		log.Error(err, "failed to resolve execution inputs")
+		return r.updatePhase(ctx, agentRun, agentv1alpha1.AgentRunPhaseFailed, err.Error())
 	}
 
 	// Get workspace type and worktree info from AgentWorkspace CRD
@@ -290,84 +348,22 @@ func (r *AgentRunReconciler) reconcileWithWorkspace(ctx context.Context, agentRu
 		sourceBranch = ws.Spec.Jj.Revision
 	}
 
-	// Resolve NetworkPolicy config
-	netpolCfg := agentRun.Spec.NetworkPolicy
-	if netpolCfg == nil && harness != nil {
-		netpolCfg = harness.Spec.DefaultNetworkPolicy
+	binding := &isoshared.WorkspaceBinding{
+		SharedVolumes:    ws.Spec.SharedVolumes,
+		SharedVolumePVCs: ws.Status.SharedVolumePVCs,
+		WorktreeBranch:   worktreeBranch,
+		SourceBranch:     sourceBranch,
+		WorkspaceRef:     agentRun.Spec.WorkspaceRef,
 	}
-
-	// Create NetworkPolicy (unless explicitly disabled)
-	if netpolCfg == nil || !netpolCfg.Disabled {
-		np := netshared.BuildNetworkPolicy(agentRun, netpolCfg)
-		if err := ctrl.SetControllerReference(agentRun, np, r.Scheme); err != nil {
-			return ctrl.Result{}, err
-		}
-		if err := r.Create(ctx, np); err != nil && !errors.IsAlreadyExists(err) {
-			log.Error(err, "failed to create network policy")
-			return ctrl.Result{}, err
-		}
-		r.Recorder.Eventf(agentRun, nil, corev1.EventTypeNormal, "NetworkPolicyCreated", "NetworkPolicyCreated",
-			"Created NetworkPolicy %s", np.Name)
-	}
-
-	// Create Job if needed
-	jobName := agentRun.Name
-	if agentRun.Status.JobName == "" {
-		defaults := resolver.ApplyHarnessDefaults(agentRun, harness)
-
-		// An image-based toolchain (e.g. nix) provisions via its pre-built,
-		// digest-pinned image.
-		image := defaults.Image
-		if tcl := plugins.ResolveToolchain(tc); tcl != nil && tcl.Image() != "" {
-			image = tcl.Image()
-		}
-
-		if err := r.ensureAgentServiceAccount(ctx, agentRun.Namespace); err != nil {
-			return ctrl.Result{}, err
-		}
-
-		job := isoshared.BuildJob(agentRun, providerEnv, ws.Status.WorkspacePVC, image, defaults.Timeout, agentType, wsType, tc, defaults.TTL, &isoshared.WorkspaceBinding{
-			SharedVolumes:    ws.Spec.SharedVolumes,
-			SharedVolumePVCs: ws.Status.SharedVolumePVCs,
-			WorktreeBranch:   worktreeBranch,
-			SourceBranch:     sourceBranch,
-			WorkspaceRef:     agentRun.Spec.WorkspaceRef,
-		})
-		if err := ctrl.SetControllerReference(agentRun, job, r.Scheme); err != nil {
-			return ctrl.Result{}, err
-		}
-
-		if err := r.Create(ctx, job); err != nil && !errors.IsAlreadyExists(err) {
-			log.Error(err, "failed to create workspace job", "jobName", jobName)
-			return ctrl.Result{}, err
-		}
-
-		log.Info("creating Job", "jobName", jobName, "agentType", agentType,
-			"runtimeClass", ptrOrEmpty(agentRun.Spec.RuntimeClassName))
-		r.Recorder.Eventf(agentRun, nil, corev1.EventTypeNormal, "AgentRunStarted", "AgentRunStarted",
-			"Created Job %s (agent=%s, provider=%s, runtimeClass=%s)",
-			jobName, string(agentType), agentRun.Spec.ProviderRef, ptrOrEmpty(agentRun.Spec.RuntimeClassName))
-
-		agentRun.Status.JobName = jobName
-		if err := r.Status().Update(ctx, agentRun); err != nil {
-			return ctrl.Result{}, err
-		}
-	}
-
-	// Watch Job status
-	var job batchv1.Job
-	if err := r.Get(ctx, types.NamespacedName{Name: jobName, Namespace: agentRun.Namespace}, &job); err != nil {
-		if errors.IsNotFound(err) {
-			return ctrl.Result{RequeueAfter: 5 * time.Second}, nil
-		}
-		return ctrl.Result{}, err
-	}
-
-	return r.reconcileJobStatus(ctx, agentRun, &job)
+	return r.reconcileExecutionResources(ctx, agentRun, execution, ws.Status.WorkspacePVC, wsType, binding)
 }
 
 func (r *AgentRunReconciler) reconcileJobStatus(ctx context.Context, agentRun *agentv1alpha1.AgentRun, job *batchv1.Job) (ctrl.Result, error) {
 	now := metav1.Now()
+	statusChanged, err := r.observePodStatus(ctx, agentRun, job)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
 
 	// Check for completion
 	for _, condition := range job.Status.Conditions {
@@ -403,8 +399,48 @@ func (r *AgentRunReconciler) reconcileJobStatus(ctx context.Context, agentRun *a
 			}
 		}
 	}
+	if statusChanged {
+		if err := r.updateStatus(ctx, agentRun); err != nil {
+			return ctrl.Result{}, err
+		}
+	}
 
 	return ctrl.Result{RequeueAfter: 10 * time.Second}, nil
+}
+
+func (r *AgentRunReconciler) observePodStatus(ctx context.Context, agentRun *agentv1alpha1.AgentRun, job *batchv1.Job) (bool, error) {
+	if job.Name == "" {
+		return false, nil
+	}
+	var pods corev1.PodList
+	if err := r.List(ctx, &pods, client.InNamespace(job.Namespace), client.MatchingLabels{"job-name": job.Name}); err != nil {
+		return false, fmt.Errorf("list pods for Job %q: %w", job.Name, err)
+	}
+	if len(pods.Items) == 0 {
+		return false, nil
+	}
+	observed := &pods.Items[0]
+	for index := 1; index < len(pods.Items); index++ {
+		candidate := &pods.Items[index]
+		if candidate.CreationTimestamp.After(observed.CreationTimestamp.Time) ||
+			(candidate.CreationTimestamp.Equal(&observed.CreationTimestamp) && candidate.Name > observed.Name) {
+			observed = candidate
+		}
+	}
+	changed := agentRun.Status.PodName != observed.Name
+	agentRun.Status.PodName = observed.Name
+	for _, containerStatus := range observed.Status.ContainerStatuses {
+		if containerStatus.Name != "agent" || containerStatus.State.Terminated == nil {
+			continue
+		}
+		exitCode := containerStatus.State.Terminated.ExitCode
+		if agentRun.Status.ExitCode == nil || *agentRun.Status.ExitCode != exitCode {
+			agentRun.Status.ExitCode = &exitCode
+			changed = true
+		}
+		break
+	}
+	return changed, nil
 }
 
 func (r *AgentRunReconciler) updatePhase(ctx context.Context, agentRun *agentv1alpha1.AgentRun, phase agentv1alpha1.AgentRunPhase, message string) (ctrl.Result, error) {
@@ -421,10 +457,30 @@ func (r *AgentRunReconciler) updatePhase(ctx context.Context, agentRun *agentv1a
 		agentRun.Status.Conditions = append(agentRun.Status.Conditions, condition)
 	}
 
-	if err := r.Status().Update(ctx, agentRun); err != nil {
+	if err := r.updateStatus(ctx, agentRun); err != nil {
 		return ctrl.Result{}, err
 	}
 	return ctrl.Result{}, nil
+}
+
+func (r *AgentRunReconciler) updateStatus(ctx context.Context, run *agentv1alpha1.AgentRun) error {
+	desired := run.DeepCopy().Status
+	key := client.ObjectKeyFromObject(run)
+	return retry.RetryOnConflict(retry.DefaultRetry, func() error {
+		var current agentv1alpha1.AgentRun
+		if err := r.Get(ctx, key, &current); err != nil {
+			if errors.IsNotFound(err) {
+				return nil
+			}
+			return err
+		}
+		current.Status = desired
+		if err := r.Status().Update(ctx, &current); err != nil {
+			return err
+		}
+		*run = current
+		return nil
+	})
 }
 
 func (r *AgentRunReconciler) SetupWithManager(mgr ctrl.Manager) error {

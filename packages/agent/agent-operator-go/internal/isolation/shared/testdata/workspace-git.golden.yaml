@@ -26,6 +26,15 @@ spec:
         - bypassPermissions
         command:
         - claude
+        env:
+        - name: HOME
+          value: /home/agent
+        - name: XDG_CONFIG_HOME
+          value: /home/agent/.config
+        - name: XDG_CACHE_HOME
+          value: /home/agent/.cache
+        - name: XDG_STATE_HOME
+          value: /home/agent/.local/state
         image: node:trixie-slim
         name: agent
         resources:
@@ -49,6 +58,8 @@ spec:
           name: workspace
         - mountPath: /tmp
           name: tmp
+        - mountPath: /home/agent
+          name: home
         workingDir: /workspace-wt/golden-ws-run
       initContainers:
       - args:
@@ -59,9 +70,24 @@ spec:
           git worktree add '/workspace-wt/golden-ws-run' -b 'feature' 'HEAD'
         command:
         - sh
+        env:
+        - name: HOME
+          value: /home/agent
+        - name: XDG_CONFIG_HOME
+          value: /home/agent/.config
+        - name: XDG_CACHE_HOME
+          value: /home/agent/.cache
+        - name: XDG_STATE_HOME
+          value: /home/agent/.local/state
         image: node:trixie-slim
         name: git-worktree
-        resources: {}
+        resources:
+          limits:
+            cpu: "2"
+            memory: 4Gi
+          requests:
+            cpu: 250m
+            memory: 512Mi
         securityContext:
           allowPrivilegeEscalation: false
           capabilities:
@@ -74,8 +100,13 @@ spec:
         volumeMounts:
         - mountPath: /workspace
           name: workspace
+        - mountPath: /home/agent
+          name: home
+        - mountPath: /tmp
+          name: tmp
       restartPolicy: Never
       securityContext:
+        fsGroup: 1000
         runAsNonRoot: true
         seccompProfile:
           type: RuntimeDefault
@@ -86,5 +117,7 @@ spec:
           claimName: my-workspace-ws
       - emptyDir: {}
         name: tmp
+      - emptyDir: {}
+        name: home
   ttlSecondsAfterFinished: 3600
 status: {}

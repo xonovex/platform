@@ -4,9 +4,9 @@ import (
 	"errors"
 	"testing"
 
-	isoshared "github.com/xonovex/platform/packages/cli/agent-cli-go/internal/isolation/shared"
-	netshared "github.com/xonovex/platform/packages/cli/agent-cli-go/internal/network/shared"
-	provshared "github.com/xonovex/platform/packages/cli/agent-cli-go/internal/provision/shared"
+	isoshared "github.com/xonovex/platform/packages/agent/agent-cli-go/internal/isolation/shared"
+	netshared "github.com/xonovex/platform/packages/agent/agent-cli-go/internal/network/shared"
+	provshared "github.com/xonovex/platform/packages/agent/agent-cli-go/internal/provision/shared"
 	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/isolation"
 	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/policy"
 	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/provision"
@@ -22,9 +22,14 @@ type fakeIsolator struct {
 
 func (f fakeIsolator) Available() (bool, error)                                     { return f.available, nil }
 func (f fakeIsolator) Run(isoshared.RunConfig, provision.Contribution) (int, error) { return 0, nil }
-func (f fakeIsolator) Command(isoshared.RunConfig, provision.Contribution) []string { return nil }
-func (f fakeIsolator) TerminalCommand(isoshared.RunConfig, provision.Contribution) ([]string, []string) {
+func (f fakeIsolator) Command(isoshared.RunConfig, provision.Contribution) ([]string, error) {
 	return nil, nil
+}
+func (f fakeIsolator) TerminalCommand(isoshared.RunConfig, provision.Contribution) ([]string, []string, error) {
+	return nil, nil, nil
+}
+func (f fakeIsolator) PinnedProvision(_ provision.ProvisionMethod, provisionerPinned bool, _ string) bool {
+	return provisionerPinned
 }
 func (f fakeIsolator) HidesHost(_ bool, _ string) bool { return f.hidesHost }
 func (f fakeIsolator) KernelIsolated(_ string) bool    { return f.kernelIso }
@@ -95,6 +100,18 @@ func TestSelect_PolicyFromPluginCapabilities(t *testing.T) {
 				t.Fatalf("Select err = %v, want %v", err, tc.wantErr)
 			}
 		})
+	}
+}
+
+func TestSelect_RejectsCustomBindsWhenHostToolsMustBeUnreachable(t *testing.T) {
+	reg := testRegistry(fakeIsolator{hidesHost: true}, fakeProvisioner{pinned: true})
+	req := bwrapNixReq()
+	req.HasCustomBinds = true
+
+	_, _, err := Select(reg, req, policy.SandboxPolicy{RequireHostToolsUnreachable: true})
+
+	if !errors.Is(err, policy.ErrHostToolsReachable) {
+		t.Fatalf("Select() error = %v, want %v", err, policy.ErrHostToolsReachable)
 	}
 }
 

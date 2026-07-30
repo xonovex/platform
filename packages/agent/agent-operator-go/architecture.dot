@@ -14,8 +14,8 @@ digraph AgentOperatorArchitecture {
   node [shape=box, style="rounded,filled", fontname="Arial", fontsize=10];
   edge [fontname="Arial", fontsize=8, color="#78909c"];
 
-  // ─── User ──────────────────────────────────────────────────────────
-  user [label="User / CI Pipeline", shape=house, fillcolor="#e8eaf6"];
+  // ─── External callers ──────────────────────────────────────────────
+  caller [label="External caller\nmanual | CI/CD | webhook | scheduler", shape=house, fillcolor="#e8eaf6"];
 
   // ─── CRDs ──────────────────────────────────────────────────────────
   subgraph cluster_crds {
@@ -280,7 +280,7 @@ digraph AgentOperatorArchitecture {
           <TR><TD><B>Main: agent</B></TD></TR>
           <TR><TD><FONT POINT-SIZE="8">workingDir: /workspace-wt/{run}</FONT></TD></TR>
           <TR><TD><FONT POINT-SIZE="8">mounts: workspace PVC + shared vols</FONT></TD></TR>
-          <TR><TD><FONT POINT-SIZE="8">e.g. /root/.claude, /root/.opencode</FONT></TD></TR>
+          <TR><TD><FONT POINT-SIZE="8">e.g. /home/agent/.claude, /home/agent/.config/opencode</FONT></TD></TR>
         </TABLE>>,
         fillcolor="#4dd0e1"
       ];
@@ -331,12 +331,12 @@ digraph AgentOperatorArchitecture {
 
   // ═══ MAIN FLOW EDGES ══════════════════════════════════════════════
 
-  // User creates CRDs
-  user -> agentrun [label="kubectl apply"];
-  user -> agentworkspace [label="kubectl apply"];
-  user -> agentharness [style=dashed, color="#b0bec5"];
-  user -> agentprovider [style=dashed, color="#b0bec5"];
-  user -> agenttoolchain [style=dashed, color="#b0bec5"];
+  // External callers submit resources through the Kubernetes API
+  caller -> agentrun [label="create via\nKubernetes API"];
+  caller -> agentworkspace [label="create via\nKubernetes API"];
+  caller -> agentharness [style=dashed, color="#b0bec5"];
+  caller -> agentprovider [style=dashed, color="#b0bec5"];
+  caller -> agenttoolchain [style=dashed, color="#b0bec5"];
 
   // Webhooks validate/default
   agentrun -> wh_run [label="admit", color="#c62828", fontcolor="#c62828"];

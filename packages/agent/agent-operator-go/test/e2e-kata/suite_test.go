@@ -5,7 +5,8 @@ package e2e_kata
 import (
 	"bytes"
 	"context"
-	"encoding/json"
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
 	"io"
 	"net/http"
@@ -14,6 +15,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"testing"
+	"time"
 
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -24,6 +26,16 @@ import (
 	"github.com/xonovex/platform/packages/agent/agent-operator-go/test/testutil"
 	"k8s.io/client-go/tools/clientcmd"
 )
+
+const (
+	kataVersion        = "4.0.0"
+	maxKataArchiveSize = int64(2_100_000_000)
+)
+
+var kataChecksums = map[string]string{
+	"amd64": "2c3b9dfeba355582b40aee462b12916c9740654d0230f696adf719d67b063a8c",
+	"arm64": "730c789efa2a1e0a762875f5241126c8558fb238e87562ae52e1f1f2a748385c",
+}
 
 var (
 	k8sClient   client.Client
@@ -198,32 +210,23 @@ handler: kata
 }
 
 func downloadKata(destDir string) error {
-	arch := runtime.GOARCH // amd64, arm64, etc.
-
-	// Get latest release tag
-	resp, err := http.Get("https://api.github.com/repos/kata-containers/kata-containers/releases/latest")
-	if err != nil {
-		return fmt.Errorf("failed to fetch latest release: %w", err)
-	}
-	defer resp.Body.Close()
-
-	var release struct {
-		TagName string `json:"tag_name"`
-	}
-	if err := json.NewDecoder(resp.Body).Decode(&release); err != nil {
-		return fmt.Errorf("failed to parse release JSON: %w", err)
+	arch := runtime.GOARCH
+	expectedChecksum, ok := kataChecksums[arch]
+	if !ok {
+		return fmt.Errorf("unsupported Kata architecture: %s", arch)
 	}
 
 	url := fmt.Sprintf("https://github.com/kata-containers/kata-containers/releases/download/%s/kata-static-%s-%s.tar.zst",
-		release.TagName, release.TagName, arch)
-	fmt.Printf("Downloading Kata %s from %s\n", release.TagName, url)
+		kataVersion, kataVersion, arch)
+	fmt.Printf("Downloading Kata %s from %s\n", kataVersion, url)
 
 	tarball := filepath.Join(destDir, "kata.tar.zst")
 	if err := os.MkdirAll(destDir, 0755); err != nil {
 		return err
 	}
 
-	dlResp, err := http.Get(url)
+	client := &http.Client{Timeout: 45 * time.Minute}
+	dlResp, err := client.Get(url)
 	if err != nil {
 		return fmt.Errorf("GET %s: %w", url, err)
 	}
@@ -232,16 +235,33 @@ func downloadKata(destDir string) error {
 	if dlResp.StatusCode != http.StatusOK {
 		return fmt.Errorf("GET %s: status %d", url, dlResp.StatusCode)
 	}
+	if dlResp.ContentLength > maxKataArchiveSize {
+		return fmt.Errorf("GET %s: content length %d exceeds limit", url, dlResp.ContentLength)
+	}
 
 	f, err := os.Create(tarball)
 	if err != nil {
 		return err
 	}
-	if _, err := io.Copy(f, dlResp.Body); err != nil {
-		f.Close()
+	defer func() {
+		_ = f.Close()
+		_ = os.Remove(tarball)
+	}()
+	hash := sha256.New()
+	written, err := io.Copy(io.MultiWriter(f, hash), io.LimitReader(dlResp.Body, maxKataArchiveSize+1))
+	if err != nil {
 		return err
 	}
-	f.Close()
+	if written > maxKataArchiveSize {
+		return fmt.Errorf("GET %s: response exceeds %d bytes", url, maxKataArchiveSize)
+	}
+	if err := f.Close(); err != nil {
+		return err
+	}
+	actualChecksum := hex.EncodeToString(hash.Sum(nil))
+	if actualChecksum != expectedChecksum {
+		return fmt.Errorf("Kata checksum mismatch for %s: got %s", arch, actualChecksum)
+	}
 
 	// Extract (tar auto-detects zstd compression)
 	cmd := exec.Command("tar", "xf", tarball, "-C", destDir)
@@ -251,7 +271,7 @@ func downloadKata(destDir string) error {
 		return fmt.Errorf("tar extract: %w", err)
 	}
 
-	return os.Remove(tarball)
+	return nil
 }
 
 func cleanup() {

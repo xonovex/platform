@@ -15,6 +15,7 @@ import (
 	rbacv1 "k8s.io/api/rbac/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
+	certutil "k8s.io/client-go/util/cert"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/xonovex/platform/packages/agent/agent-operator-go/test/testutil"
@@ -52,6 +53,21 @@ func TestE2E_ImageDeployment(t *testing.T) {
 	}
 
 	ns := createNamespace(t, "e2e-image")
+	webhookCert, webhookKey, err := certutil.GenerateSelfSignedCertKey("agent-operator", nil, nil)
+	if err != nil {
+		t.Fatalf("failed to generate webhook certificate: %v", err)
+	}
+	webhookSecret := &corev1.Secret{
+		ObjectMeta: metav1.ObjectMeta{Name: "agent-operator-webhook-cert", Namespace: ns},
+		Type:       corev1.SecretTypeTLS,
+		Data: map[string][]byte{
+			corev1.TLSCertKey:       webhookCert,
+			corev1.TLSPrivateKeyKey: webhookKey,
+		},
+	}
+	if err := k8sClient.Create(ctx, webhookSecret); err != nil {
+		t.Fatalf("failed to create webhook certificate Secret: %v", err)
+	}
 
 	// Create ServiceAccount
 	sa := &corev1.ServiceAccount{
@@ -98,6 +114,12 @@ func TestE2E_ImageDeployment(t *testing.T) {
 				Spec: corev1.PodSpec{
 					ServiceAccountName:            "agent-operator",
 					TerminationGracePeriodSeconds: ptr(int64(10)),
+					Volumes: []corev1.Volume{{
+						Name: "webhook-cert",
+						VolumeSource: corev1.VolumeSource{
+							Secret: &corev1.SecretVolumeSource{SecretName: webhookSecret.Name},
+						},
+					}},
 					Containers: []corev1.Container{{
 						Name:            "manager",
 						Image:           "agent-operator:latest",
@@ -108,6 +130,11 @@ func TestE2E_ImageDeployment(t *testing.T) {
 							ContainerPort: 8081,
 							Name:          "health",
 							Protocol:      corev1.ProtocolTCP,
+						}},
+						VolumeMounts: []corev1.VolumeMount{{
+							Name:      "webhook-cert",
+							MountPath: "/tmp/k8s-webhook-server/serving-certs",
+							ReadOnly:  true,
 						}},
 						LivenessProbe: &corev1.Probe{
 							ProbeHandler: corev1.ProbeHandler{

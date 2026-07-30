@@ -1,9 +1,9 @@
 // Package config loads the CLI's optional file configuration (YAML/TOML/key=value).
-// It was formerly shared pkg/config; it has a single consumer (this CLI), so it
-// and its go-toml/yaml dependencies live in the CLI module, not the shared one.
 package config
 
 import (
+	"bytes"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -22,25 +22,34 @@ type FileConfig struct {
 }
 
 // GetDefaultConfigPath returns the default config file path.
-func GetDefaultConfigPath() string {
-	home, _ := os.UserHomeDir()
-	return filepath.Join(home, ".config", "sandboxed-claude", "config")
+func GetDefaultConfigPath() (string, error) {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return "", fmt.Errorf("resolve user home directory: %w", err)
+	}
+	return filepath.Join(home, ".config", "sandboxed-claude", "config"), nil
 }
 
 // LoadConfigFile loads configuration from a YAML or TOML file. If path is empty,
 // it tries the default config path.
 func LoadConfigFile(path string) (*FileConfig, error) {
+	explicit := path != ""
 	if path == "" {
-		defaultPath := GetDefaultConfigPath()
+		defaultPath, err := GetDefaultConfigPath()
+		if err != nil {
+			return nil, err
+		}
 		if _, err := os.Stat(defaultPath); os.IsNotExist(err) {
 			return &FileConfig{}, nil
+		} else if err != nil {
+			return nil, fmt.Errorf("inspect default config %q: %w", defaultPath, err)
 		}
 		path = defaultPath
 	}
 
 	data, err := os.ReadFile(path)
 	if err != nil {
-		if os.IsNotExist(err) {
+		if os.IsNotExist(err) && !explicit {
 			return &FileConfig{}, nil
 		}
 		return nil, err
@@ -51,15 +60,13 @@ func LoadConfigFile(path string) (*FileConfig, error) {
 
 	switch ext {
 	case ".yaml", ".yml":
-		err = yaml.Unmarshal(data, config)
+		err = decodeYAML(data, config)
 	case ".toml":
-		err = toml.Unmarshal(data, config)
+		err = decodeTOML(data, config)
 	default:
-		// Try YAML first, then TOML, then key=value format.
-		if err = yaml.Unmarshal(data, config); err != nil {
-			if err = toml.Unmarshal(data, config); err != nil {
-				config = parseKeyValueConfig(string(data))
-				err = nil
+		if err = decodeYAML(data, config); err != nil {
+			if err = decodeTOML(data, config); err != nil {
+				config, err = parseKeyValueConfig(string(data))
 			}
 		}
 	}
@@ -71,11 +78,22 @@ func LoadConfigFile(path string) (*FileConfig, error) {
 	return config, nil
 }
 
-// parseKeyValueConfig parses a simple key=value config format.
-func parseKeyValueConfig(content string) *FileConfig {
-	config := &FileConfig{}
+func decodeYAML(data []byte, config *FileConfig) error {
+	decoder := yaml.NewDecoder(bytes.NewReader(data))
+	decoder.KnownFields(true)
+	return decoder.Decode(config)
+}
 
-	for _, line := range strings.Split(content, "\n") {
+func decodeTOML(data []byte, config *FileConfig) error {
+	return toml.NewDecoder(bytes.NewReader(data)).DisallowUnknownFields().Decode(config)
+}
+
+// parseKeyValueConfig parses a simple key=value config format.
+func parseKeyValueConfig(content string) (*FileConfig, error) {
+	config := &FileConfig{}
+	seen := make(map[string]struct{})
+
+	for lineNumber, line := range strings.Split(content, "\n") {
 		line = strings.TrimSpace(line)
 		if line == "" || strings.HasPrefix(line, "#") {
 			continue
@@ -83,28 +101,28 @@ func parseKeyValueConfig(content string) *FileConfig {
 
 		parts := strings.SplitN(line, "=", 2)
 		if len(parts) != 2 {
-			continue
+			return nil, fmt.Errorf("line %d: expected key=value", lineNumber+1)
 		}
 
 		key := strings.TrimSpace(parts[0])
 		value := strings.TrimSpace(parts[1])
+		if key == "" {
+			return nil, fmt.Errorf("line %d: configuration key is empty", lineNumber+1)
+		}
+		if _, exists := seen[key]; exists {
+			return nil, fmt.Errorf("line %d: duplicate configuration key %q", lineNumber+1, key)
+		}
+		seen[key] = struct{}{}
 
 		switch key {
 		case "homeDir", "SANDBOXHOMEDIR":
 			config.HomeDir = value
 		case "provider":
 			config.Provider = value
+		default:
+			return nil, fmt.Errorf("line %d: unknown configuration key %q", lineNumber+1, key)
 		}
 	}
 
-	return config
-}
-
-// LoadDefaultConfig loads config from the default path if it exists.
-func LoadDefaultConfig() *FileConfig {
-	config, err := LoadConfigFile("")
-	if err != nil {
-		return &FileConfig{}
-	}
-	return config
+	return config, nil
 }

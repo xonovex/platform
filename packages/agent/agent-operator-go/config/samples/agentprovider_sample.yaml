@@ -2,13 +2,13 @@ apiVersion: agent.xonovex.com/v1alpha1
 kind: AgentProvider
 metadata:
   name: anthropic-provider
-  namespace: default
+  namespace: ai-agents
 spec:
   displayName: Anthropic Claude
-  agentTypes:
-    - claude
+  agentType: claude
   authTokenSecretRef:
     name: anthropic-credentials
     key: api-key
+  authTokenEnv: ANTHROPIC_API_KEY
   environment:
     ANTHROPIC_BASE_URL: "https://api.anthropic.com"

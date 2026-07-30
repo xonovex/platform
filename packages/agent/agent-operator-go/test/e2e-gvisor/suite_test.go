@@ -5,6 +5,8 @@ package e2e_gvisor
 import (
 	"bytes"
 	"context"
+	"crypto/sha512"
+	"encoding/hex"
 	"fmt"
 	"io"
 	"net/http"
@@ -13,6 +15,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"testing"
+	"time"
 
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -23,6 +26,22 @@ import (
 	"github.com/xonovex/platform/packages/agent/agent-operator-go/test/testutil"
 	"k8s.io/client-go/tools/clientcmd"
 )
+
+const (
+	gvisorRelease       = "20260714.0"
+	maxGVisorBinarySize = 160 << 20
+)
+
+var gvisorChecksums = map[string]map[string]string{
+	"x86_64": {
+		"runsc":                    "75c092fe87d84078f06ac40937cb5207fb5a1a92511b38b4790c915801555daadc59fef33de8db4dd92e1892a6de390c8a2e390a7a3bd0e2d3731d9ed6a3a6e8",
+		"containerd-shim-runsc-v1": "7ece190ec2ee5d1218c50a1452baab095e2005553201a0775196a99c095b26b6b7883a6a0fab5745c413dcc0fe050983060cd440bf3b91b9b60143ba57b04599",
+	},
+	"aarch64": {
+		"runsc":                    "ee39fa48121797db60919dacb77145d604c9a54616323a00304f8482fca87af20e8e78b079cb193ab7bef7230ad3f79096a3491e12c09ba11625c7be5130e084",
+		"containerd-shim-runsc-v1": "88f56fe83636b58f22eb8874132f387ec2b0feafea7c4475f1fd0f86b17e3feade2495e551d5aefe703051fe7bfb910be547cff854f15530186561b05e549c1b",
+	},
+}
 
 var (
 	k8sClient   client.Client
@@ -192,13 +211,23 @@ handler: runsc
 
 func downloadGVisorBinary(name, dest string) error {
 	arch := runtime.GOARCH
-	if arch == "amd64" {
+	switch arch {
+	case "amd64":
 		arch = "x86_64"
+	case "arm64":
+		arch = "aarch64"
+	default:
+		return fmt.Errorf("unsupported gVisor architecture: %s", arch)
 	}
-	url := fmt.Sprintf("https://storage.googleapis.com/gvisor/releases/release/latest/%s/%s", arch, name)
+	expectedChecksum, ok := gvisorChecksums[arch][name]
+	if !ok {
+		return fmt.Errorf("no gVisor checksum for %s/%s", arch, name)
+	}
+	url := fmt.Sprintf("https://storage.googleapis.com/gvisor/releases/release/%s/%s/%s", gvisorRelease, arch, name)
 	fmt.Printf("Downloading %s from %s\n", name, url)
 
-	resp, err := http.Get(url)
+	client := &http.Client{Timeout: 5 * time.Minute}
+	resp, err := client.Get(url)
 	if err != nil {
 		return fmt.Errorf("GET %s: %w", url, err)
 	}
@@ -207,18 +236,43 @@ func downloadGVisorBinary(name, dest string) error {
 	if resp.StatusCode != http.StatusOK {
 		return fmt.Errorf("GET %s: status %d", url, resp.StatusCode)
 	}
+	if resp.ContentLength > maxGVisorBinarySize {
+		return fmt.Errorf("GET %s: content length %d exceeds limit", url, resp.ContentLength)
+	}
 
 	f, err := os.Create(dest)
 	if err != nil {
 		return err
 	}
-	defer f.Close()
+	keepFile := false
+	defer func() {
+		_ = f.Close()
+		if !keepFile {
+			_ = os.Remove(dest)
+		}
+	}()
 
-	if _, err := io.Copy(f, resp.Body); err != nil {
+	hash := sha512.New()
+	written, err := io.Copy(io.MultiWriter(f, hash), io.LimitReader(resp.Body, maxGVisorBinarySize+1))
+	if err != nil {
+		return err
+	}
+	if written > maxGVisorBinarySize {
+		return fmt.Errorf("GET %s: response exceeds %d bytes", url, maxGVisorBinarySize)
+	}
+	if err := f.Close(); err != nil {
+		return err
+	}
+	actualChecksum := hex.EncodeToString(hash.Sum(nil))
+	if actualChecksum != expectedChecksum {
+		return fmt.Errorf("gVisor checksum mismatch for %s/%s: got %s", arch, name, actualChecksum)
+	}
+	if err := os.Chmod(dest, 0o755); err != nil {
 		return err
 	}
 
-	return os.Chmod(dest, 0755)
+	keepFile = true
+	return nil
 }
 
 func cleanup() {

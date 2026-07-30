@@ -234,6 +234,7 @@ func TestE2E_CoCo_FullCycleWithGitClone(t *testing.T) {
 
 	provider := testutil.NewAgentProvider(ns, "test-provider",
 		testutil.WithAuthTokenSecretRef("provider-token", "api-key"),
+		testutil.WithAuthTokenEnv("ANTHROPIC_AUTH_TOKEN"),
 		testutil.WithEnvironment(map[string]string{
 			"ANTHROPIC_API_KEY": "fake-key",
 			"TEST_ENV_VAR":      "e2e-value",
@@ -372,13 +373,14 @@ func TestE2E_CoCo_FullCycleWithGitClone(t *testing.T) {
 	t.Log("Full workflow completed with kata-cc runtimeClassName")
 }
 
-// TestE2E_CoCo_WorkspaceJobWithRuntimeClassName verifies that workspace-based
-// AgentRun Jobs get runtimeClassName but workspace init Jobs do not.
+// TestE2E_CoCo_WorkspaceJobWithRuntimeClassName verifies that workspace init
+// and AgentRun Jobs use their approved sandbox runtime classes.
 func TestE2E_CoCo_WorkspaceJobWithRuntimeClassName(t *testing.T) {
 	ns := createNamespace(t, "e2e-coco-ws")
 
 	ws := testutil.NewAgentWorkspace(ns, "coco-ws",
 		testutil.WithWorkspaceStorageSize("1Gi"),
+		testutil.WithWorkspaceRuntimeClassName("kata-cc"),
 	)
 	if err := k8sClient.Create(ctx, ws); err != nil {
 		t.Fatalf("failed to create AgentWorkspace: %v", err)
@@ -392,14 +394,14 @@ func TestE2E_CoCo_WorkspaceJobWithRuntimeClassName(t *testing.T) {
 		return w.Status.InitJobName != ""
 	})
 
-	// Verify workspace init Job does NOT have runtimeClassName
+	// Verify workspace init Job uses the sandbox runtime.
 	var initJob batchv1.Job
 	initJobKey := types.NamespacedName{Name: "coco-ws-init", Namespace: ns}
 	if err := k8sClient.Get(ctx, initJobKey, &initJob); err != nil {
 		t.Fatalf("init Job not created: %v", err)
 	}
-	if initJob.Spec.Template.Spec.RuntimeClassName != nil {
-		t.Errorf("workspace init Job RuntimeClassName = %s, want <nil>", *initJob.Spec.Template.Spec.RuntimeClassName)
+	if initJob.Spec.Template.Spec.RuntimeClassName == nil || *initJob.Spec.Template.Spec.RuntimeClassName != "kata-cc" {
+		t.Errorf("workspace init Job RuntimeClassName = %v, want kata-cc", initJob.Spec.Template.Spec.RuntimeClassName)
 	}
 
 	// Manually complete the workspace init Job

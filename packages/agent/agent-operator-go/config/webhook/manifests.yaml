@@ -1,0 +1,134 @@
+apiVersion: admissionregistration.k8s.io/v1
+kind: MutatingWebhookConfiguration
+metadata:
+  name: agent-operator-mutating-webhook-configuration
+  annotations:
+    cert-manager.io/inject-ca-from: agent-operator-system/agent-operator-serving-cert
+webhooks:
+  - name: magentrun.agent.xonovex.com
+    admissionReviewVersions: [v1]
+    clientConfig:
+      service:
+        name: agent-operator-webhook-service
+        namespace: agent-operator-system
+        path: /mutate-agent-xonovex-com-v1alpha1-agentrun
+    failurePolicy: Fail
+    matchPolicy: Equivalent
+    rules:
+      - apiGroups: [agent.xonovex.com]
+        apiVersions: [v1alpha1]
+        operations: [CREATE, UPDATE]
+        resources: [agentruns]
+        scope: Namespaced
+    sideEffects: None
+    timeoutSeconds: 5
+  - name: magentworkspace.agent.xonovex.com
+    admissionReviewVersions: [v1]
+    clientConfig:
+      service:
+        name: agent-operator-webhook-service
+        namespace: agent-operator-system
+        path: /mutate-agent-xonovex-com-v1alpha1-agentworkspace
+    failurePolicy: Fail
+    matchPolicy: Equivalent
+    rules:
+      - apiGroups: [agent.xonovex.com]
+        apiVersions: [v1alpha1]
+        operations: [CREATE, UPDATE]
+        resources: [agentworkspaces]
+        scope: Namespaced
+    sideEffects: None
+    timeoutSeconds: 5
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingWebhookConfiguration
+metadata:
+  name: agent-operator-validating-webhook-configuration
+  annotations:
+    cert-manager.io/inject-ca-from: agent-operator-system/agent-operator-serving-cert
+webhooks:
+  - name: vagentrun.agent.xonovex.com
+    admissionReviewVersions: [v1]
+    clientConfig:
+      service:
+        name: agent-operator-webhook-service
+        namespace: agent-operator-system
+        path: /validate-agent-xonovex-com-v1alpha1-agentrun
+    failurePolicy: Fail
+    matchPolicy: Equivalent
+    rules:
+      - apiGroups: [agent.xonovex.com]
+        apiVersions: [v1alpha1]
+        operations: [CREATE, UPDATE]
+        resources: [agentruns]
+        scope: Namespaced
+    sideEffects: None
+    timeoutSeconds: 5
+  - name: vagentharness.agent.xonovex.com
+    admissionReviewVersions: [v1]
+    clientConfig:
+      service:
+        name: agent-operator-webhook-service
+        namespace: agent-operator-system
+        path: /validate-agent-xonovex-com-v1alpha1-agentharness
+    failurePolicy: Fail
+    matchPolicy: Equivalent
+    rules:
+      - apiGroups: [agent.xonovex.com]
+        apiVersions: [v1alpha1]
+        operations: [CREATE, UPDATE]
+        resources: [agentharnesses]
+        scope: Namespaced
+    sideEffects: None
+    timeoutSeconds: 5
+  - name: vagentprovider.agent.xonovex.com
+    admissionReviewVersions: [v1]
+    clientConfig:
+      service:
+        name: agent-operator-webhook-service
+        namespace: agent-operator-system
+        path: /validate-agent-xonovex-com-v1alpha1-agentprovider
+    failurePolicy: Fail
+    matchPolicy: Equivalent
+    rules:
+      - apiGroups: [agent.xonovex.com]
+        apiVersions: [v1alpha1]
+        operations: [CREATE, UPDATE]
+        resources: [agentproviders]
+        scope: Namespaced
+    sideEffects: None
+    timeoutSeconds: 5
+  - name: vagenttoolchain.agent.xonovex.com
+    admissionReviewVersions: [v1]
+    clientConfig:
+      service:
+        name: agent-operator-webhook-service
+        namespace: agent-operator-system
+        path: /validate-agent-xonovex-com-v1alpha1-agenttoolchain
+    failurePolicy: Fail
+    matchPolicy: Equivalent
+    rules:
+      - apiGroups: [agent.xonovex.com]
+        apiVersions: [v1alpha1]
+        operations: [CREATE, UPDATE]
+        resources: [agenttoolchains]
+        scope: Namespaced
+    sideEffects: None
+    timeoutSeconds: 5
+  - name: vagentworkspace.agent.xonovex.com
+    admissionReviewVersions: [v1]
+    clientConfig:
+      service:
+        name: agent-operator-webhook-service
+        namespace: agent-operator-system
+        path: /validate-agent-xonovex-com-v1alpha1-agentworkspace
+    failurePolicy: Fail
+    matchPolicy: Equivalent
+    rules:
+      - apiGroups: [agent.xonovex.com]
+        apiVersions: [v1alpha1]
+        operations: [CREATE, UPDATE]
+        resources: [agentworkspaces]
+        scope: Namespaced
+    sideEffects: None
+    timeoutSeconds: 5

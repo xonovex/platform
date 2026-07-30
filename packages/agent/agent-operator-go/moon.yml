@@ -8,6 +8,98 @@ dependsOn:
   - shared-core-go
   - shared-agent-go
 tasks:
+  go-test-coverage:
+    env:
+      GO_COVERAGE_MIN: "75"
+  go-package-coverage:
+    script: |
+      set -euo pipefail
+      # Every package the module builds is named here. cmd/operator is manager
+      # wiring covered by go-test-integration under envtest, test/testutil is
+      # test support, and config, internal/arch and the shared packages declare
+      # interfaces and embedded manifests with no statements.
+      bash "$workspaceRoot/.moon/scripts/check-go-package-coverage.sh" \
+        ./api/v1alpha1=100 \
+        ./cmd/e2e-summary=87 \
+        ./cmd/operator=exempt \
+        ./config=exempt \
+        ./internal/arch=exempt \
+        ./internal/controller=83 \
+        ./internal/harness/claude=85 \
+        ./internal/harness/opencode=80 \
+        ./internal/harness/shared=exempt \
+        ./internal/isolation/shared=85 \
+        ./internal/network/shared=100 \
+        ./internal/plugins=100 \
+        ./internal/provider=90 \
+        ./internal/provision/nix=100 \
+        ./internal/provision/shared=exempt \
+        ./internal/resolver=91 \
+        ./internal/validator=100 \
+        ./internal/webhook=85 \
+        ./internal/workspace/git=100 \
+        ./internal/workspace/jj=100 \
+        ./internal/workspace/shared=75 \
+        ./test/testutil=exempt
+    inputs:
+      - "@globs(sources)"
+      - "@globs(tests)"
+      - /.moon/scripts/check-go-package-coverage.sh
+      - /.moon/scripts/strip-generated-coverage.sh
+    options:
+      cache: true
+    toolchain: [system, nix]
+  coverage:
+    command: noop
+    deps:
+      - go-test-coverage
+      - go-package-coverage
+    options:
+      cache: false
+      mergeDeps: replace
+  # go-test-integration downloads envtest assets and runs a real kube-apiserver
+  # and etcd, so it is an integration tier rather than a ci-check gate.
+  ci-integration:
+    command: noop
+    deps:
+      - go-test-integration
+    options:
+      cache: false
+      runInCI: false
+  ci-e2e:
+    command: noop
+    deps: [go-test-e2e]
+    options:
+      cache: false
+      runInCI: false
+  ci-e2e-gvisor:
+    command: noop
+    deps: [go-test-e2e-gvisor]
+    options:
+      cache: false
+      runInCI: false
+  ci-e2e-kata:
+    command: noop
+    deps: [go-test-e2e-kata]
+    options:
+      cache: false
+      runInCI: false
+  ci-e2e-coco:
+    command: noop
+    deps: [go-test-e2e-coco]
+    options:
+      cache: false
+      runInCI: false
+  ci-e2e-summary:
+    command:
+      - go
+      - run
+      - ./cmd/e2e-summary
+    inputs:
+      - cmd/e2e-summary/**/*
+    options:
+      cache: false
+      runInCI: false
   docker-build:
     command:
       - docker
@@ -24,6 +116,8 @@ tasks:
     options:
       cache: false
       runFromWorkspaceRoot: true
+      runInCI: false
+  # nix build fetches and realises store paths, so it stays out of CI.
   agent-image-build:
     command:
       - nix
@@ -36,16 +130,11 @@ tasks:
       - /nix/mkAgentImage.nix
     outputs: []
     options:
+      runInCI: false
       cache: false
       runFromWorkspaceRoot: true
   go-test-integration:
-    command:
-      - go
-      - test
-      - -tags=integration
-      - -v
-      - -timeout=300s
-      - ./test/integration/
+    script: KUBEBUILDER_ASSETS="$(setup-envtest use -i -p path)" go test -tags=integration -v -timeout=300s ./test/integration/
     deps:
       - go-build
     inputs:
@@ -54,6 +143,8 @@ tasks:
     outputs: []
     options:
       cache: false
+      runInCI: false
+    toolchain: [system, nix]
   go-test-e2e:
     command:
       - go
@@ -67,9 +158,13 @@ tasks:
     inputs:
       - "@globs(sources)"
       - "@globs(tests)"
+    env:
+      TMPDIR: /var/tmp
     outputs: []
     options:
+      runInCI: false
       cache: false
+    toolchain: [system, nix]
   go-test-e2e-gvisor:
     command:
       - go
@@ -83,9 +178,13 @@ tasks:
     inputs:
       - "@globs(sources)"
       - "@globs(tests)"
+    env:
+      TMPDIR: /var/tmp
     outputs: []
     options:
+      runInCI: false
       cache: false
+    toolchain: [system, nix]
   go-test-e2e-kata:
     command:
       - go
@@ -99,6 +198,30 @@ tasks:
     inputs:
       - "@globs(sources)"
       - "@globs(tests)"
+    env:
+      TMPDIR: /var/tmp
     outputs: []
     options:
+      runInCI: false
       cache: false
+    toolchain: [system, nix]
+  go-test-e2e-coco:
+    command:
+      - go
+      - test
+      - -tags=e2e_coco
+      - -v
+      - -timeout=600s
+      - ./test/e2e-coco/
+    deps:
+      - go-build
+    inputs:
+      - "@globs(sources)"
+      - "@globs(tests)"
+    env:
+      TMPDIR: /var/tmp
+    outputs: []
+    options:
+      runInCI: false
+      cache: false
+    toolchain: [system, nix]

@@ -1,70 +1,97 @@
 package tmux
 
 import (
+	"fmt"
+	"os"
 	"strings"
+
+	"github.com/xonovex/platform/packages/shared/shared-core-go/pkg/shell"
 )
 
-// bashReservedVars contains variables that bash considers read-only
-// and should not be exported to avoid errors
-var bashReservedVars = map[string]bool{
-	"UID":    true,
-	"EUID":   true,
-	"GID":    true,
-	"GROUPS": true,
+type environmentVariable struct {
+	name  string
+	value string
 }
 
-// FilterEnv filters out bash reserved variables from the environment
-func FilterEnv(env []string) []string {
-	filtered := make([]string, 0, len(env))
-	for _, e := range env {
-		idx := strings.Index(e, "=")
-		if idx <= 0 {
+// filterEnvironment returns shell-safe, writable environment variables.
+func filterEnvironment(env []string) []environmentVariable {
+	filtered := make([]environmentVariable, 0, len(env))
+	for _, entry := range env {
+		name, value, found := strings.Cut(entry, "=")
+		if !found || !isEnvironmentName(name) || isShellReservedVariable(name) {
 			continue
 		}
-		key := e[:idx]
-		if bashReservedVars[key] {
-			continue
-		}
-		filtered = append(filtered, e)
+		filtered = append(filtered, environmentVariable{name: name, value: value})
 	}
 	return filtered
 }
 
-// EscapeEnvValue escapes double quotes in an environment variable value
-func EscapeEnvValue(value string) string {
-	// Escape backslashes first, then double quotes
-	value = strings.ReplaceAll(value, "\\", "\\\\")
-	value = strings.ReplaceAll(value, "\"", "\\\"")
-	// Escape dollar signs to prevent variable expansion
-	value = strings.ReplaceAll(value, "$", "\\$")
-	// Escape backticks to prevent command substitution
-	value = strings.ReplaceAll(value, "`", "\\`")
-	return value
+func isEnvironmentName(name string) bool {
+	if name == "" || !isEnvironmentNameStart(name[0]) {
+		return false
+	}
+	for index := 1; index < len(name); index++ {
+		character := name[index]
+		if !isEnvironmentNameStart(character) && (character < '0' || character > '9') {
+			return false
+		}
+	}
+	return true
 }
 
-// BuildEnvExports builds a shell command to export environment variables
-// Format: export KEY="VALUE"; export KEY2="VALUE2";
-func BuildEnvExports(env []string) string {
-	if len(env) == 0 {
-		return ""
+func isEnvironmentNameStart(character byte) bool {
+	return character == '_' || character >= 'A' && character <= 'Z' || character >= 'a' && character <= 'z'
+}
+
+func isShellReservedVariable(name string) bool {
+	switch name {
+	case "UID", "EUID", "GID", "GROUPS":
+		return true
+	default:
+		return false
+	}
+}
+
+// createLaunchScript writes a private, self-deleting script that installs the
+// requested environment before replacing itself with the agent command.
+func createLaunchScript(command []string, env []string) (string, error) {
+	if len(command) == 0 {
+		return "", fmt.Errorf("tmux command is required")
 	}
 
-	filtered := FilterEnv(env)
-	if len(filtered) == 0 {
-		return ""
+	file, err := os.CreateTemp("", "xonovex-agent-tmux-*.sh")
+	if err != nil {
+		return "", fmt.Errorf("create tmux launch script: %w", err)
+	}
+	path := file.Name()
+	removeOnError := func(cause error) (string, error) {
+		_ = file.Close()
+		_ = os.Remove(path)
+		return "", cause
 	}
 
-	var exports []string
-	for _, e := range filtered {
-		idx := strings.Index(e, "=")
-		if idx <= 0 {
-			continue
-		}
-		key := e[:idx]
-		value := e[idx+1:]
-		escapedValue := EscapeEnvValue(value)
-		exports = append(exports, "export "+key+"=\""+escapedValue+"\"")
+	var script strings.Builder
+	script.WriteString("#!/bin/sh\n")
+	script.WriteString("rm -f -- ")
+	script.WriteString(shell.Quote(path))
+	script.WriteByte('\n')
+	for _, variable := range filterEnvironment(env) {
+		script.WriteString("export ")
+		script.WriteString(variable.name)
+		script.WriteByte('=')
+		script.WriteString(shell.Quote(variable.value))
+		script.WriteByte('\n')
 	}
+	script.WriteString("exec ")
+	script.WriteString(buildShellCommand(command))
+	script.WriteByte('\n')
 
-	return strings.Join(exports, "; ") + "; "
+	if _, err := file.WriteString(script.String()); err != nil {
+		return removeOnError(fmt.Errorf("write tmux launch script: %w", err))
+	}
+	if err := file.Close(); err != nil {
+		_ = os.Remove(path)
+		return "", fmt.Errorf("close tmux launch script: %w", err)
+	}
+	return path, nil
 }

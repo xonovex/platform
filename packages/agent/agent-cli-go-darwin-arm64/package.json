@@ -20,6 +20,12 @@
   "files": [
     "bin"
   ],
+  "os": [
+    "darwin"
+  ],
+  "cpu": [
+    "arm64"
+  ],
   "keywords": [
     "xonovex",
     "agent",

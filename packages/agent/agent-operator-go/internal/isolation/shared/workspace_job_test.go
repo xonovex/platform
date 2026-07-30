@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	agentv1alpha1 "github.com/xonovex/platform/packages/agent/agent-operator-go/api/v1alpha1"
@@ -18,7 +19,7 @@ func TestBuildWorkspaceInitJob_Basic(t *testing.T) {
 		},
 	}
 
-	job := BuildWorkspaceInitJob(ws, "my-workspace-ws", "alpine/git:latest", nil)
+	job := mustBuildWorkspaceInitJob(t, ws, "my-workspace-ws", "alpine/git:latest", nil)
 
 	if job.Name != "my-workspace-init" {
 		t.Errorf("job name = %s, want my-workspace-init", job.Name)
@@ -33,7 +34,7 @@ func TestBuildWorkspaceInitJob_Basic(t *testing.T) {
 	if container.Name != "git-clone" || container.Image != "alpine/git:latest" {
 		t.Errorf("container = %s/%s", container.Name, container.Image)
 	}
-	if len(container.VolumeMounts) != 1 || container.VolumeMounts[0].MountPath != "/workspace" {
+	if !hasMount(container.VolumeMounts, "workspace", "/workspace") {
 		t.Error("expected workspace volume mount at /workspace")
 	}
 	script := container.Args[1]
@@ -43,8 +44,18 @@ func TestBuildWorkspaceInitJob_Basic(t *testing.T) {
 	if !strings.Contains(script, "--branch 'main'") {
 		t.Error("expected clone script to contain quoted branch")
 	}
-	if len(job.Spec.Template.Spec.Volumes) != 1 || job.Spec.Template.Spec.Volumes[0].PersistentVolumeClaim.ClaimName != "my-workspace-ws" {
+	if !hasPVC(job.Spec.Template.Spec.Volumes, "workspace", "my-workspace-ws") {
 		t.Error("expected PVC volume my-workspace-ws")
+	}
+	if job.Spec.Template.Spec.ServiceAccountName != AgentServiceAccountName ||
+		job.Spec.Template.Spec.AutomountServiceAccountToken == nil || *job.Spec.Template.Spec.AutomountServiceAccountToken {
+		t.Error("workspace init Job must use the zero-RBAC ServiceAccount without a token")
+	}
+	if len(container.Resources.Requests) == 0 || len(container.Resources.Limits) == 0 {
+		t.Error("workspace init container must have resource requests and limits")
+	}
+	if !hasMount(container.VolumeMounts, homeVolumeName, agentHome) || !hasMount(container.VolumeMounts, "tmp", "/tmp") {
+		t.Error("workspace init container must have writable HOME and /tmp mounts")
 	}
 }
 
@@ -57,7 +68,7 @@ func TestBuildWorkspaceInitJob_WithJujutsu(t *testing.T) {
 		},
 	}
 
-	job := BuildWorkspaceInitJob(ws, "jj-workspace-ws", "alpine/git:latest", nil)
+	job := mustBuildWorkspaceInitJob(t, ws, "jj-workspace-ws", "alpine/git:latest", nil)
 	script := job.Spec.Template.Spec.Containers[0].Args[1]
 	if !strings.Contains(script, "git clone") {
 		t.Error("jj workspace init should still use git clone")
@@ -67,16 +78,16 @@ func TestBuildWorkspaceInitJob_WithJujutsu(t *testing.T) {
 	}
 }
 
-func TestBuildWorkspaceInitJob_NoRuntimeClassName(t *testing.T) {
+func TestBuildWorkspaceInitJob_RejectsMissingRuntimeClassName(t *testing.T) {
 	ws := &agentv1alpha1.AgentWorkspace{
 		ObjectMeta: metav1.ObjectMeta{Name: "my-workspace", Namespace: "default"},
 		Spec: agentv1alpha1.AgentWorkspaceSpec{
 			Repository: agentv1alpha1.RepositorySpec{URL: "https://github.com/org/repo.git", Branch: "main"},
 		},
 	}
-	job := BuildWorkspaceInitJob(ws, "my-workspace-ws", "alpine/git:latest", nil)
-	if job.Spec.Template.Spec.RuntimeClassName != nil {
-		t.Errorf("expected nil RuntimeClassName, got %q", *job.Spec.Template.Spec.RuntimeClassName)
+	_, err := BuildWorkspaceInitJob(ws, "my-workspace-ws", "alpine/git:latest", nil)
+	if err == nil {
+		t.Fatal("BuildWorkspaceInitJob() error = nil, want missing runtimeClassName error")
 	}
 }
 
@@ -89,7 +100,7 @@ func TestBuildWorkspaceInitJob_WithRuntimeClassName(t *testing.T) {
 			RuntimeClassName: &runtimeClass,
 		},
 	}
-	job := BuildWorkspaceInitJob(ws, "my-workspace-ws", "alpine/git:latest", ws.Spec.RuntimeClassName)
+	job := mustBuildWorkspaceInitJob(t, ws, "my-workspace-ws", "alpine/git:latest", ws.Spec.RuntimeClassName)
 	if job.Spec.Template.Spec.RuntimeClassName == nil || *job.Spec.Template.Spec.RuntimeClassName != "kata" {
 		t.Error("expected RuntimeClassName kata")
 	}
@@ -100,7 +111,7 @@ func worktreeRun() *agentv1alpha1.AgentRun {
 }
 
 func TestBuildWorktreeInitContainers_Basic(t *testing.T) {
-	containers := BuildWorktreeInitContainers(worktreeRun(), "node:trixie-slim", agentv1alpha1.WorkspaceTypeGit, "agent-1-work", "main", nil)
+	containers := mustBuildWorktreeInitContainers(t, worktreeRun(), "node:trixie-slim", agentv1alpha1.WorkspaceTypeGit, "agent-1-work", "main", nil)
 	if len(containers) != 1 {
 		t.Fatalf("init containers = %d, want 1", len(containers))
 	}
@@ -113,14 +124,14 @@ func TestBuildWorktreeInitContainers_Basic(t *testing.T) {
 }
 
 func TestBuildWorktreeInitContainers_DefaultSourceBranch(t *testing.T) {
-	containers := BuildWorktreeInitContainers(worktreeRun(), "node:trixie-slim", agentv1alpha1.WorkspaceTypeGit, "agent-1-work", "", nil)
+	containers := mustBuildWorktreeInitContainers(t, worktreeRun(), "node:trixie-slim", agentv1alpha1.WorkspaceTypeGit, "agent-1-work", "", nil)
 	if script := containers[0].Args[1]; !strings.Contains(script, "git worktree add '/workspace-wt/agent-1' -b 'agent-1-work' 'HEAD'") {
 		t.Errorf("expected HEAD default source branch, got: %s", script)
 	}
 }
 
 func TestBuildWorktreeInitContainers_WithJujutsu(t *testing.T) {
-	containers := BuildWorktreeInitContainers(worktreeRun(), "node:trixie-slim", agentv1alpha1.WorkspaceTypeJujutsu, "agent-1-work", "main", nil)
+	containers := mustBuildWorktreeInitContainers(t, worktreeRun(), "node:trixie-slim", agentv1alpha1.WorkspaceTypeJujutsu, "agent-1-work", "main", nil)
 	if containers[0].Name != "jj-workspace" {
 		t.Errorf("name = %s, want jj-workspace", containers[0].Name)
 	}
@@ -134,7 +145,7 @@ func TestBuildWorktreeInitContainers_WithJujutsu(t *testing.T) {
 }
 
 func TestBuildWorkspaceMainContainers_Basic(t *testing.T) {
-	containers := BuildWorkspaceMainContainers(worktreeRun(), nil, "node:trixie-slim", agentv1alpha1.AgentTypeClaude, nil, nil, nil)
+	containers := mustBuildWorkspaceMainContainers(t, worktreeRun(), nil, "node:trixie-slim", agentv1alpha1.AgentTypeClaude, nil, nil, nil)
 	if len(containers) != 1 {
 		t.Fatalf("containers = %d, want 1", len(containers))
 	}
@@ -154,7 +165,7 @@ func TestBuildWorkspaceMainContainers_WithSharedVolumes(t *testing.T) {
 	}
 	sharedVolumePVCs := map[string]string{"claude-config": "ws-claude-config", "opencode-config": "ws-opencode-config"}
 
-	containers := BuildWorkspaceMainContainers(worktreeRun(), nil, "node:trixie-slim", agentv1alpha1.AgentTypeClaude, sharedVolumes, sharedVolumePVCs, nil)
+	containers := mustBuildWorkspaceMainContainers(t, worktreeRun(), nil, "node:trixie-slim", agentv1alpha1.AgentTypeClaude, sharedVolumes, sharedVolumePVCs, nil)
 	c := containers[0]
 	if len(c.VolumeMounts) != 4 {
 		t.Fatalf("volume mounts = %d, want 4", len(c.VolumeMounts))
@@ -179,7 +190,7 @@ func TestBuildWorkspaceJob_Basic(t *testing.T) {
 		Spec:       agentv1alpha1.AgentRunSpec{WorkspaceRef: "my-workspace"},
 	}
 
-	job := BuildJob(run, nil, "my-workspace-ws", "node:trixie-slim", time.Hour, agentv1alpha1.AgentTypeClaude, agentv1alpha1.WorkspaceTypeGit, nil, nil, &WorkspaceBinding{
+	job := mustBuildJob(t, run, nil, "my-workspace-ws", "node:trixie-slim", time.Hour, agentv1alpha1.AgentTypeClaude, agentv1alpha1.WorkspaceTypeGit, nil, nil, &WorkspaceBinding{
 		WorktreeBranch: "agent-1-work",
 		WorkspaceRef:   "my-workspace",
 	})
@@ -196,8 +207,8 @@ func TestBuildWorkspaceJob_Basic(t *testing.T) {
 	if job.Spec.Template.Spec.Containers[0].WorkingDir != "/workspace-wt/agent-1" {
 		t.Errorf("working dir = %s", job.Spec.Template.Spec.Containers[0].WorkingDir)
 	}
-	if len(job.Spec.Template.Spec.Volumes) != 2 || job.Spec.Template.Spec.Volumes[0].PersistentVolumeClaim.ClaimName != "my-workspace-ws" {
-		t.Error("expected workspace + tmp volumes with my-workspace-ws PVC")
+	if len(job.Spec.Template.Spec.Volumes) != 3 || !hasPVC(job.Spec.Template.Spec.Volumes, "workspace", "my-workspace-ws") {
+		t.Error("expected workspace + tmp + home volumes with my-workspace-ws PVC")
 	}
 }
 
@@ -209,15 +220,15 @@ func TestBuildWorkspaceJob_WithSharedVolumes(t *testing.T) {
 	sharedVolumes := []agentv1alpha1.SharedVolumeSpec{{Name: "claude-config", MountPath: "/root/.claude", StorageSize: "1Gi"}}
 	sharedVolumePVCs := map[string]string{"claude-config": "my-workspace-claude-config"}
 
-	job := BuildJob(run, nil, "my-workspace-ws", "node:trixie-slim", time.Hour, agentv1alpha1.AgentTypeClaude, agentv1alpha1.WorkspaceTypeGit, nil, nil, &WorkspaceBinding{
+	job := mustBuildJob(t, run, nil, "my-workspace-ws", "node:trixie-slim", time.Hour, agentv1alpha1.AgentTypeClaude, agentv1alpha1.WorkspaceTypeGit, nil, nil, &WorkspaceBinding{
 		SharedVolumes:    sharedVolumes,
 		SharedVolumePVCs: sharedVolumePVCs,
 		WorktreeBranch:   "agent-1-work",
 		WorkspaceRef:     "my-workspace",
 	})
 
-	if len(job.Spec.Template.Spec.Volumes) != 3 {
-		t.Fatalf("volumes = %d, want 3", len(job.Spec.Template.Spec.Volumes))
+	if len(job.Spec.Template.Spec.Volumes) != 4 {
+		t.Fatalf("volumes = %d, want 4", len(job.Spec.Template.Spec.Volumes))
 	}
 	foundSharedVol := false
 	for _, vol := range job.Spec.Template.Spec.Volumes {
@@ -230,6 +241,49 @@ func TestBuildWorkspaceJob_WithSharedVolumes(t *testing.T) {
 	}
 }
 
+func TestBuildWorkspaceInitJob_MountsRepositoryCredentials(t *testing.T) {
+	ws := &agentv1alpha1.AgentWorkspace{
+		ObjectMeta: metav1.ObjectMeta{Name: "private-workspace", Namespace: "default"},
+		Spec: agentv1alpha1.AgentWorkspaceSpec{Repository: agentv1alpha1.RepositorySpec{
+			URL:                  "https://github.com/org/private.git",
+			CredentialsSecretRef: &agentv1alpha1.SecretKeyRef{Name: "repo-auth", Key: "credentials"},
+		}},
+	}
+
+	job := mustBuildWorkspaceInitJob(t, ws, "private-workspace-ws", "alpine/git:latest", nil)
+
+	if !hasMount(job.Spec.Template.Spec.Containers[0].VolumeMounts, repositoryCredentialsVolumeName, "/var/run/agent-repository-credentials") {
+		t.Fatal("clone container is missing repository credential mount")
+	}
+	foundSecret := false
+	for _, volume := range job.Spec.Template.Spec.Volumes {
+		if volume.Name == repositoryCredentialsVolumeName && volume.Secret != nil && volume.Secret.SecretName == "repo-auth" {
+			foundSecret = true
+		}
+	}
+	if !foundSecret {
+		t.Fatal("repository credential Secret volume was not created")
+	}
+}
+
+func hasMount(mounts []corev1.VolumeMount, name, path string) bool {
+	for _, mount := range mounts {
+		if mount.Name == name && mount.MountPath == path {
+			return true
+		}
+	}
+	return false
+}
+
+func hasPVC(volumes []corev1.Volume, name, claimName string) bool {
+	for _, volume := range volumes {
+		if volume.Name == name && volume.PersistentVolumeClaim != nil && volume.PersistentVolumeClaim.ClaimName == claimName {
+			return true
+		}
+	}
+	return false
+}
+
 func TestBuildWorkspaceJob_WithRuntimeClassName(t *testing.T) {
 	runtimeClass := "kata"
 	run := &agentv1alpha1.AgentRun{
@@ -237,7 +291,7 @@ func TestBuildWorkspaceJob_WithRuntimeClassName(t *testing.T) {
 		Spec:       agentv1alpha1.AgentRunSpec{WorkspaceRef: "my-workspace", RuntimeClassName: &runtimeClass},
 	}
 
-	job := BuildJob(run, nil, "my-workspace-ws", "node:trixie-slim", time.Hour, agentv1alpha1.AgentTypeClaude, agentv1alpha1.WorkspaceTypeGit, nil, nil, &WorkspaceBinding{
+	job := mustBuildJob(t, run, nil, "my-workspace-ws", "node:trixie-slim", time.Hour, agentv1alpha1.AgentTypeClaude, agentv1alpha1.WorkspaceTypeGit, nil, nil, &WorkspaceBinding{
 		WorktreeBranch: "agent-1-work",
 		WorkspaceRef:   "my-workspace",
 	})
@@ -253,12 +307,28 @@ func TestBuildWorkspaceJob_DefaultTTL(t *testing.T) {
 		Spec:       agentv1alpha1.AgentRunSpec{WorkspaceRef: "my-workspace"},
 	}
 
-	job := BuildJob(run, nil, "my-workspace-ws", "node:trixie-slim", time.Hour, agentv1alpha1.AgentTypeClaude, agentv1alpha1.WorkspaceTypeGit, nil, nil, &WorkspaceBinding{
+	job := mustBuildJob(t, run, nil, "my-workspace-ws", "node:trixie-slim", time.Hour, agentv1alpha1.AgentTypeClaude, agentv1alpha1.WorkspaceTypeGit, nil, nil, &WorkspaceBinding{
 		WorktreeBranch: "agent-1-work",
 		WorkspaceRef:   "my-workspace",
 	})
 
 	if job.Spec.TTLSecondsAfterFinished == nil || *job.Spec.TTLSecondsAfterFinished != 3600 {
 		t.Error("expected default TTL 3600")
+	}
+}
+
+func TestBuildWorkspaceInitJob_UnknownWorkspaceTypeReturnsError(t *testing.T) {
+	ws := &agentv1alpha1.AgentWorkspace{
+		ObjectMeta: metav1.ObjectMeta{Name: "invalid", Namespace: "default"},
+		Spec: agentv1alpha1.AgentWorkspaceSpec{
+			Type:       "unknown",
+			Repository: agentv1alpha1.RepositorySpec{URL: "https://example.com/repo.git"},
+		},
+	}
+
+	_, err := BuildWorkspaceInitJob(ws, "invalid-ws", "image", nil)
+
+	if err == nil {
+		t.Fatal("expected unknown workspace type to return an error")
 	}
 }

@@ -20,7 +20,7 @@ func TestAgentWorkspace_CreatesPVCsAndTransitionsToPending(t *testing.T) {
 	ns := createNamespace(t, "ws-pending")
 	ws := testutil.NewAgentWorkspace(ns, "test-ws",
 		testutil.WithSharedVolumes(
-			agentv1alpha1.SharedVolumeSpec{Name: "claude-config", MountPath: "/root/.claude", StorageSize: "1Gi"},
+			agentv1alpha1.SharedVolumeSpec{Name: "claude-config", MountPath: "/home/agent/.claude", StorageSize: "1Gi"},
 		),
 	)
 

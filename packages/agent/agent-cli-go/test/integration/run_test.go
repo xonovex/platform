@@ -6,21 +6,29 @@ package integration
 import (
 	"os"
 	"os/exec"
-	"path/filepath"
 	"strings"
 	"testing"
 )
 
-var binaryPath string
+func testBinary(t testing.TB) string {
+	t.Helper()
+	path := os.Getenv("AGENT_CLI_BINARY")
+	if path == "" {
+		t.Fatal("AGENT_CLI_BINARY is required")
+	}
+	return path
+}
 
-func init() {
-	// Resolve binary path relative to test file location
-	wd, _ := os.Getwd()
-	binaryPath = filepath.Join(wd, "..", "..", "dist", "agent-cli")
+func testCommand(t *testing.T, args ...string) *exec.Cmd {
+	t.Helper()
+	home := t.TempDir()
+	cmd := exec.Command(testBinary(t), args...)
+	cmd.Env = append(os.Environ(), "HOME="+home, "XDG_CONFIG_HOME="+home)
+	return cmd
 }
 
 func TestRunCommand_Help(t *testing.T) {
-	cmd := exec.Command(binaryPath, "run", "--help")
+	cmd := testCommand(t, "run", "--help")
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		t.Fatalf("run --help failed: %v\nOutput: %s", err, output)
@@ -36,7 +44,10 @@ func TestRunCommand_Help(t *testing.T) {
 		"--network",
 		"--isolation-docker-runtime",
 		"--isolation-bwrap-passthrough",
-		"--network-proxy-egress-allow",
+		"--require-pinned-provision",
+		"--require-host-tools-unreachable",
+		"--require-egress-restricted",
+		"--require-kernel-isolation",
 		"--work-dir",
 		"--worktree-branch",
 		"--config",
@@ -50,20 +61,23 @@ func TestRunCommand_Help(t *testing.T) {
 }
 
 func TestVersion(t *testing.T) {
-	cmd := exec.Command(binaryPath, "--version")
+	cmd := testCommand(t, "--version")
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		t.Fatalf("--version failed: %v\nOutput: %s", err, output)
 	}
 
-	outputStr := string(output)
-	if !strings.Contains(outputStr, "0.1.0") {
-		t.Errorf("Version output incorrect: %s", output)
+	expected := os.Getenv("AGENT_CLI_VERSION")
+	if expected == "" {
+		t.Fatal("AGENT_CLI_VERSION is required")
+	}
+	if outputStr := string(output); !strings.Contains(outputStr, expected) {
+		t.Errorf("Version output = %q, want %q", outputStr, expected)
 	}
 }
 
 func TestRunCommand_InvalidAgent(t *testing.T) {
-	cmd := exec.Command(binaryPath, "run", "-a", "invalid-agent-xyz")
+	cmd := testCommand(t, "run", "-a", "invalid-agent-xyz")
 	output, err := cmd.CombinedOutput()
 
 	// Should fail with error
@@ -78,7 +92,7 @@ func TestRunCommand_InvalidAgent(t *testing.T) {
 }
 
 func TestRunCommand_InvalidIsolation(t *testing.T) {
-	cmd := exec.Command(binaryPath, "run", "--isolation", "invalid-isolation-xyz")
+	cmd := testCommand(t, "run", "--isolation", "invalid-isolation-xyz")
 	output, err := cmd.CombinedOutput()
 
 	// Should fail closed: the registry has no isolator for the unknown method.
@@ -97,7 +111,7 @@ func TestRunCommand_Agents(t *testing.T) {
 
 	for _, agent := range agents {
 		t.Run(agent, func(t *testing.T) {
-			cmd := exec.Command(binaryPath, "run", "-a", agent, "--help")
+			cmd := testCommand(t, "run", "-a", agent, "--help")
 			output, err := cmd.CombinedOutput()
 
 			if err != nil {
@@ -113,7 +127,7 @@ func TestRunCommand_IsolationMethods(t *testing.T) {
 	for _, method := range methods {
 		t.Run(method, func(t *testing.T) {
 			// Test that the isolation axis is recognized (even if not available).
-			cmd := exec.Command(binaryPath, "run", "--isolation", method, "--help")
+			cmd := testCommand(t, "run", "--isolation", method, "--help")
 			_, err := cmd.CombinedOutput()
 
 			// Help should always work
@@ -129,7 +143,7 @@ func TestCompletionCommand(t *testing.T) {
 
 	for _, shell := range shells {
 		t.Run(shell, func(t *testing.T) {
-			cmd := exec.Command(binaryPath, "completion", shell)
+			cmd := testCommand(t, "completion", shell)
 			output, err := cmd.CombinedOutput()
 
 			if err != nil {
@@ -147,7 +161,7 @@ func TestWorktree_InvalidRepo(t *testing.T) {
 	// Create temp non-git directory
 	tmpDir := t.TempDir()
 
-	cmd := exec.Command(binaryPath, "run",
+	cmd := testCommand(t, "run",
 		"-w", tmpDir,
 		"--worktree-branch", "test-branch",
 		"-a", "claude")

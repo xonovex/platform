@@ -3,18 +3,16 @@ package webhook
 import (
 	"context"
 	"fmt"
-	"strings"
-	"time"
 
+	"k8s.io/apimachinery/pkg/api/equality"
+	"k8s.io/apimachinery/pkg/api/resource"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-
 	agentv1alpha1 "github.com/xonovex/platform/packages/agent/agent-operator-go/api/v1alpha1"
 	"github.com/xonovex/platform/packages/agent/agent-operator-go/internal/plugins"
-	"github.com/xonovex/platform/packages/agent/agent-operator-go/internal/validator"
+	agentvalidation "github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/validation"
 )
 
 // AgentRunWebhook implements defaulting and validation for AgentRun
@@ -35,12 +33,18 @@ func (w *AgentRunWebhook) SetupWebhookWithManager(mgr ctrl.Manager) error {
 }
 
 // Default implements admission.Defaulter
-func (w *AgentRunWebhook) Default(_ context.Context, run *agentv1alpha1.AgentRun) error {
-	if run.Spec.Timeout == nil {
-		defaultTimeout := metav1.Duration{Duration: time.Hour}
-		run.Spec.Timeout = &defaultTimeout
+func (w *AgentRunWebhook) Default(ctx context.Context, run *agentv1alpha1.AgentRun) error {
+	policy, err := namespacePolicy(ctx, w.Client, run.Namespace)
+	if err != nil {
+		return err
 	}
-
+	if policy != nil {
+		applyPolicyDefaults(run, policy)
+	}
+	if err := w.applyReferencedDefaults(ctx, run); err != nil {
+		return err
+	}
+	applyBuiltInDefaults(run)
 	return nil
 }
 
@@ -50,7 +54,10 @@ func (w *AgentRunWebhook) ValidateCreate(ctx context.Context, run *agentv1alpha1
 }
 
 // ValidateUpdate implements admission.Validator
-func (w *AgentRunWebhook) ValidateUpdate(ctx context.Context, _ *agentv1alpha1.AgentRun, newObj *agentv1alpha1.AgentRun) (admission.Warnings, error) {
+func (w *AgentRunWebhook) ValidateUpdate(ctx context.Context, oldObj *agentv1alpha1.AgentRun, newObj *agentv1alpha1.AgentRun) (admission.Warnings, error) {
+	if !equality.Semantic.DeepEqual(oldObj.Spec, newObj.Spec) {
+		return nil, fmt.Errorf("AgentRun spec is immutable after creation; create a new run for changed execution inputs")
+	}
 	return w.validate(ctx, newObj)
 }
 
@@ -94,17 +101,34 @@ func (w *AgentRunWebhook) validate(ctx context.Context, run *agentv1alpha1.Agent
 			return nil, err
 		}
 	}
+	if run.Spec.Provider != nil {
+		if err := validateProviderConfig(
+			run.Spec.Provider.PresetRef,
+			run.Spec.Provider.AgentType,
+			run.Spec.Provider.AuthSecretRef,
+			run.Spec.Provider.AuthTokenEnv,
+			run.Spec.Provider.Environment,
+			run.Spec.Provider.CliArgs,
+		); err != nil {
+			return nil, fmt.Errorf("invalid inline provider: %w", err)
+		}
+	}
 
 	// Validate inline workspace repository fields
 	if run.Spec.Workspace != nil {
 		repo := run.Spec.Workspace.Repository
-		if err := validator.ValidateRepositoryURL(repo.URL); err != nil {
+		if run.Spec.Workspace.StorageSize != "" {
+			if _, err := resource.ParseQuantity(run.Spec.Workspace.StorageSize); err != nil {
+				return nil, fmt.Errorf("workspace storageSize %q is not a valid resource quantity: %v", run.Spec.Workspace.StorageSize, err)
+			}
+		}
+		if err := agentvalidation.ValidateRepositoryURL(repo.URL); err != nil {
 			return nil, err
 		}
-		if err := validator.ValidateBranch(repo.Branch); err != nil {
+		if err := agentvalidation.ValidateBranch(repo.Branch); err != nil {
 			return nil, err
 		}
-		if err := validator.ValidateCommit(repo.Commit); err != nil {
+		if err := agentvalidation.ValidateCommit(repo.Commit); err != nil {
 			return nil, err
 		}
 	}
@@ -118,6 +142,9 @@ func (w *AgentRunWebhook) validate(ctx context.Context, run *agentv1alpha1.Agent
 
 	// Validate NetworkPolicy egress rules
 	var warnings admission.Warnings
+	if run.Spec.Network == agentv1alpha1.NetworkModeProxy {
+		return nil, fmt.Errorf("network=proxy is unavailable until an enforceable FQDN-aware backend is configured")
+	}
 	if run.Spec.NetworkPolicy != nil && !run.Spec.NetworkPolicy.Disabled {
 		for _, rule := range run.Spec.NetworkPolicy.Egress {
 			if len(rule.To) == 0 {
@@ -126,110 +153,35 @@ func (w *AgentRunWebhook) validate(ctx context.Context, run *agentv1alpha1.Agent
 		}
 	}
 
-	// Look up AgentPolicy in the namespace
-	if w.Client != nil {
-		var policyList agentv1alpha1.AgentPolicyList
-		if err := w.Client.List(ctx, &policyList, client.InNamespace(run.Namespace)); err != nil {
-			warnings = append(warnings, "AgentPolicy lookup failed: "+err.Error())
-			return warnings, nil
+	policy, err := namespacePolicy(ctx, w.Client, run.Namespace)
+	if err != nil {
+		return nil, err
+	}
+	effectiveRun := run.DeepCopy()
+	if policy != nil {
+		applyPolicyDefaults(effectiveRun, policy)
+	}
+	if err := w.applyReferencedDefaults(ctx, effectiveRun); err != nil {
+		return nil, err
+	}
+	applyBuiltInDefaults(effectiveRun)
+	if err := validateTimeout(effectiveRun.Spec.Timeout); err != nil {
+		return nil, err
+	}
+	if err := validateExecutionBoundary(effectiveRun, policy); err != nil {
+		return nil, err
+	}
+	if policy != nil {
+		if err := validatePolicyDurations(policy); err != nil {
+			return nil, err
 		}
-		if len(policyList.Items) > 0 {
-			if err := enforcePolicy(run, &policyList.Items[0]); err != nil {
-				return nil, err
-			}
+		if err := validateRunSecretAccess(effectiveRun, policy); err != nil {
+			return nil, err
+		}
+		if err := enforcePolicy(effectiveRun, policy); err != nil {
+			return nil, err
 		}
 	}
 
 	return warnings, nil
-}
-
-// validateNixSpec validates the nix toolchain: a pinned rev, exactly one source
-// (packages XOR project flake), and a pre-built pinned image. The provisioning is
-// build-time, so the image must be supplied — fail closed otherwise.
-func validateNixSpec(nix *agentv1alpha1.NixSpec) error {
-	if nix == nil {
-		return nil
-	}
-	if nix.NixpkgsRev == "" {
-		return fmt.Errorf("nix toolchain requires nixpkgsRev (the reproducibility pin)")
-	}
-	hasPackages := len(nix.Packages) > 0
-	hasFlake := nix.FlakeRef != ""
-	if hasPackages && hasFlake {
-		return fmt.Errorf("nix toolchain: packages and flakeRef are mutually exclusive")
-	}
-	if !hasPackages && !hasFlake {
-		return fmt.Errorf("nix toolchain requires a source: packages or flakeRef")
-	}
-	if nix.Image == "" {
-		return fmt.Errorf("nix toolchain requires a pre-built pinned image (build-time provisioning)")
-	}
-	return nil
-}
-
-func enforcePolicy(run *agentv1alpha1.AgentRun, policy *agentv1alpha1.AgentPolicy) error {
-	e := policy.Spec.Enforced
-
-	// Enforce runtimeClassName
-	if e.RuntimeClassName != nil {
-		rc := run.Spec.RuntimeClassName
-		if rc == nil || *rc != *e.RuntimeClassName {
-			return fmt.Errorf("policy requires runtimeClassName %q", *e.RuntimeClassName)
-		}
-	}
-
-	// Enforce allowed runtime class names
-	if len(e.AllowedRuntimeClassNames) > 0 {
-		allowed := false
-		for _, name := range e.AllowedRuntimeClassNames {
-			if run.Spec.RuntimeClassName != nil && *run.Spec.RuntimeClassName == name {
-				allowed = true
-				break
-			}
-		}
-		if !allowed {
-			return fmt.Errorf("runtimeClassName must be one of %v", e.AllowedRuntimeClassNames)
-		}
-	}
-
-	// Enforce no privilege escalation weakening
-	if e.RequireSecurityContext && run.Spec.SecurityContext != nil {
-		sc := run.Spec.SecurityContext
-		if sc.AllowPrivilegeEscalation != nil && *sc.AllowPrivilegeEscalation {
-			return fmt.Errorf("policy prohibits AllowPrivilegeEscalation=true")
-		}
-		if sc.RunAsNonRoot != nil && !*sc.RunAsNonRoot {
-			return fmt.Errorf("policy requires RunAsNonRoot=true")
-		}
-	}
-
-	// Enforce network policy required
-	if e.RequireNetworkPolicy {
-		if run.Spec.NetworkPolicy != nil && run.Spec.NetworkPolicy.Disabled {
-			return fmt.Errorf("policy requires NetworkPolicy to be enabled")
-		}
-	}
-
-	// Enforce max timeout
-	if e.MaxTimeout != nil && run.Spec.Timeout != nil {
-		if run.Spec.Timeout.Duration > e.MaxTimeout.Duration {
-			return fmt.Errorf("timeout %v exceeds policy maximum %v", run.Spec.Timeout.Duration, e.MaxTimeout.Duration)
-		}
-	}
-
-	// Enforce allowed images
-	if len(e.AllowedImages) > 0 && run.Spec.Image != "" {
-		allowed := false
-		for _, prefix := range e.AllowedImages {
-			if strings.HasPrefix(run.Spec.Image, prefix) {
-				allowed = true
-				break
-			}
-		}
-		if !allowed {
-			return fmt.Errorf("image %q is not in the allowed images list", run.Spec.Image)
-		}
-	}
-
-	return nil
 }

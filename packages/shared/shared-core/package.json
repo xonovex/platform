@@ -40,9 +40,10 @@
   },
   "devDependencies": {
     "@xonovex/eslint-config-cli": "0.1.22",
+    "@xonovex/prettier-config": "0.1.22",
     "@xonovex/ts-config-cli": "0.1.22",
     "@xonovex/vitest-config-node": "0.1.22",
-    "@types/node": "^26.1.2",
+    "@types/node": "^26.1.1",
     "@vitest/coverage-v8": "^4.1.10",
     "eslint": "^10.8.0",
     "jiti": "^2.7.0",

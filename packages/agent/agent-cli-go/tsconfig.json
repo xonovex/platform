@@ -7,13 +7,20 @@
       "@xonovex/eslint-config-cli": [
         "../../config/eslint-config-cli/src/index.ts"
       ],
-      "@xonovex/eslint-config-cli/*": ["../../config/eslint-config-cli/src/*"]
+      "@xonovex/eslint-config-cli/*": ["../../config/eslint-config-cli/src/*"],
+      "@xonovex/vitest-config-node": [
+        "../../config/vitest-config-node/src/index.ts"
+      ],
+      "@xonovex/vitest-config-node/*": ["../../config/vitest-config-node/src/*"]
     }
   },
   "include": ["src/**/*.ts"],
   "references": [
     {
       "path": "../../config/eslint-config-cli"
+    },
+    {
+      "path": "../../config/vitest-config-node"
     }
   ]
 }

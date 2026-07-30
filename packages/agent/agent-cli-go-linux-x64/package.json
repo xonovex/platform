@@ -20,6 +20,12 @@
   "files": [
     "bin"
   ],
+  "os": [
+    "linux"
+  ],
+  "cpu": [
+    "x64"
+  ],
   "keywords": [
     "xonovex",
     "agent",

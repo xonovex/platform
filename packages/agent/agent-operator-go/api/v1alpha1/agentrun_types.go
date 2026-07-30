@@ -54,12 +54,10 @@ const (
 	NetworkModeHost NetworkMode = "host"
 	// NetworkModeNone allows DNS only.
 	NetworkModeNone NetworkMode = "none"
-	// NetworkModeProxy allows public egress except metadata/RFC1918/loopback.
+	// NetworkModeProxy is reserved for an enforceable FQDN-aware proxy backend.
+	// Admission rejects it until such a backend is configured.
 	NetworkModeProxy NetworkMode = "proxy"
 )
-
-// ProviderType represents the type of AI provider
-type ProviderType string
 
 // ToolchainType represents the type of toolchain
 type ToolchainType string
@@ -106,10 +104,11 @@ type ProviderSpec struct {
 	// Defaults to "claude".
 	// +optional
 	AgentType string `json:"agentType,omitempty"`
-	// Type of the provider (e.g., "anthropic", "openai")
-	Type ProviderType `json:"type,omitempty"`
 	// AuthSecretRef references a Secret containing the auth token
 	AuthSecretRef *SecretKeyRef `json:"authSecretRef,omitempty"`
+	// AuthTokenEnv is the environment variable that receives AuthSecretRef.
+	// A portable preset supplies this value when omitted.
+	AuthTokenEnv string `json:"authTokenEnv,omitempty"`
 	// Environment variables to set
 	Environment map[string]string `json:"environment,omitempty"`
 	// CliArgs are additional CLI arguments for the provider
@@ -136,6 +135,7 @@ type NixSpec struct {
 	Shell string `json:"shell,omitempty"`
 	// Image is the pre-built, digest-pinned nix agent image the pod runs. Required
 	// for the nix toolchain — it satisfies RequirePinnedProvision.
+	// +kubebuilder:validation:Pattern=`^.+@sha256:[0-9a-fA-F]{64}$`
 	Image string `json:"image,omitempty"`
 }
 
@@ -181,7 +181,8 @@ type AgentSpec struct {
 	Type AgentType `json:"type"`
 	// DefaultProvider is the default provider name
 	DefaultProvider string `json:"defaultProvider,omitempty"`
-	// DefaultImage is the default container image
+	// DefaultImage is the digest-pinned container image used when AgentRun.Spec.Image is empty.
+	// +kubebuilder:validation:Pattern=`^.+@sha256:[0-9a-fA-F]{64}$`
 	DefaultImage string `json:"defaultImage,omitempty"`
 	// DefaultResources are the default resource requirements
 	DefaultResources corev1.ResourceRequirements `json:"defaultResources,omitempty"`
@@ -227,7 +228,9 @@ type AgentRunSpec struct {
 	Timeout *metav1.Duration `json:"timeout,omitempty"`
 	// Env are additional environment variables
 	Env []corev1.EnvVar `json:"env,omitempty"`
-	// Image is the container image for the agent
+	// Image is the digest-pinned container image for the agent. It must be set
+	// directly or resolved from a harness, toolchain, or policy default.
+	// +kubebuilder:validation:Pattern=`^.+@sha256:[0-9a-fA-F]{64}$`
 	Image string `json:"image,omitempty"`
 	// NodeSelector for pod scheduling
 	NodeSelector map[string]string `json:"nodeSelector,omitempty"`
@@ -239,14 +242,10 @@ type AgentRunSpec struct {
 	SecurityContext *corev1.SecurityContext `json:"securityContext,omitempty"`
 	// PodSecurityContext overrides the default pod-level security context
 	PodSecurityContext *corev1.PodSecurityContext `json:"podSecurityContext,omitempty"`
-	// Network is the egress axis (host, none, proxy) mapped onto the per-AgentRun
-	// egress NetworkPolicy. host = unrestricted (does not satisfy egress-restricted);
-	// none = DNS only; proxy = public egress except metadata/RFC1918/loopback (an
-	// FQDN-aware allowlist is the documented upgrade). Defaults to none.
+	// Network is the egress axis mapped onto the per-AgentRun NetworkPolicy.
+	// host is unrestricted, none is DNS-only, and proxy is rejected until an
+	// enforceable FQDN-aware backend is available. Defaults to none.
 	Network NetworkMode `json:"network,omitempty"`
-	// EgressAllowlist extends the default allowlist for Network=proxy (FQDN-aware
-	// upgrade path; carried for the policy engine, not enforced by L3/L4 rules).
-	EgressAllowlist []string `json:"egressAllowlist,omitempty"`
 	// NetworkPolicy configures the NetworkPolicy applied to agent pods. When set it
 	// takes precedence over Network. Defaults to deny-all egress. Set Disabled:true
 	// to skip creation.

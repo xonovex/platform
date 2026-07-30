@@ -1,0 +1,22 @@
+apiVersion: agent.xonovex.com/v1alpha1
+kind: AgentToolchain
+metadata:
+  name: nix-toolchain
+  namespace: ai-agents
+spec:
+  type: nix
+  nix:
+    # The revision the image was built from, as a complete 40- or 64-character
+    # hexadecimal rev. The pin is what makes the provisioning reproducible.
+    nixpkgsRev: <nixpkgsRev>
+    # Attribute names baked into the image. Mutually exclusive with flakeRef.
+    packages:
+      - nodejs_22
+      - ripgrep
+    # The project-flake source, used instead of packages:
+    # flakeRef: github:your-org/repo
+    # shell: default
+    #
+    # The pod runs this pre-built image; nothing is installed per pod. Build it
+    # with `npx moon run agent-operator-go:agent-image-build` and push it.
+    image: ghcr.io/xonovex/agent-image@sha256:<digest>

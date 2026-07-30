@@ -9,12 +9,19 @@ spec:
     requireSecurityContext: true
     requireNetworkPolicy: true
     maxTimeout: 2h0m0s
+    maxResources:
+      cpu: "2"
+      memory: 4Gi
     allowedImages:
       - ghcr.io/your-org/
       - ghcr.io/xonovex/
     allowedRuntimeClassNames:
       - kata
       - gvisor
+    allowedSecretNames:
+      - anthropic-credentials
+      - repository-credentials
   defaults:
-    image: ghcr.io/xonovex/agent-image:latest
+    image: ghcr.io/xonovex/agent-image@sha256:<digest>
     timeout: 30m0s
+    runtimeClassName: kata

@@ -4,11 +4,13 @@ import (
 	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/types"
 )
 
-var opencodeAgent = &types.AgentConfig{
-	Type:        types.AgentOpencode,
-	DisplayName: "OpenCode",
-	Binary:      "opencode",
-	NixPackage:  "opencode",
+func opencodeAgent() *types.AgentConfig {
+	return &types.AgentConfig{
+		Type:        types.AgentOpencode,
+		DisplayName: "OpenCode",
+		Binary:      "opencode",
+		NixPackage:  "opencode",
+	}
 }
 
 // BuildOpencodeArgs builds arguments for OpenCode agent

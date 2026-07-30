@@ -1,15 +1,16 @@
-// Package shared is the network axis core. Network is a CLOSED enum
-// (host|none|proxy) realized here with no registry — unlike isolation and
-// provision, the variant set is fixed, so there is no lazy-factory plug-in
-// machinery. The per-isolator network flags live in isolation bridge files
-// (isolation/<type>/network.go), which depend on this package one-way only.
+// Package shared is the network axis core. Network is a closed enum with host
+// and none realized here and proxy reserved until an enforceable transport is
+// available. The per-isolator network flags live in isolation bridge files,
+// which depend on this package one-way only.
 package shared
 
 import (
-	"os"
+	"errors"
 
 	netenum "github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/network"
 )
+
+var ErrProxyEnforcementUnavailable = errors.New("network=proxy has no enforceable transport backend")
 
 // Mode is the network-egress selection. It aliases the shared closed enum so the
 // CLI names the axis locally without redefining the variant set (one owner: the
@@ -22,23 +23,16 @@ const (
 	ModeProxy = netenum.NetworkProxy
 )
 
-// ProxyEnvVar names the host environment variable holding the egress-allowlist
-// proxy URL used when Mode=proxy. An empty value means no proxy is configured;
-// the isolator still applies network isolation (fail closed, not open).
-const ProxyEnvVar = "AGENT_SANDBOX_PROXY"
-
-// EgressIsRestricted reports whether the mode restricts egress (none or proxy);
-// host shares the host network unrestricted and does not qualify.
+// EgressIsRestricted reports whether the mode enforceably restricts egress.
 func EgressIsRestricted(m Mode) bool { return netenum.EgressIsRestricted(m) }
-
-// ProxyURL returns the configured egress-allowlist proxy URL, or "" if unset.
-func ProxyURL() string { return os.Getenv(ProxyEnvVar) }
 
 // ParseMode validates s and returns the corresponding Mode.
 func ParseMode(s string) (Mode, error) {
 	switch Mode(s) {
-	case ModeHost, ModeNone, ModeProxy:
+	case ModeHost, ModeNone:
 		return Mode(s), nil
+	case ModeProxy:
+		return "", ErrProxyEnforcementUnavailable
 	default:
 		return "", &InvalidModeError{Value: s}
 	}
@@ -48,23 +42,5 @@ func ParseMode(s string) (Mode, error) {
 type InvalidModeError struct{ Value string }
 
 func (e *InvalidModeError) Error() string {
-	return "unknown network mode " + e.Value + "; valid: host, none, proxy"
-}
-
-// ProxyEnv returns the proxy environment: all egress is routed through proxyURL
-// and NO_PROXY is empty so nothing bypasses it. It returns nil when proxyURL is
-// empty. The caller is responsible for only invoking it for the proxy mode (the
-// proxy leaf owns it).
-func ProxyEnv(proxyURL string) map[string]string {
-	if proxyURL == "" {
-		return nil
-	}
-	return map[string]string{
-		"HTTP_PROXY":  proxyURL,
-		"HTTPS_PROXY": proxyURL,
-		"http_proxy":  proxyURL,
-		"https_proxy": proxyURL,
-		"NO_PROXY":    "",
-		"no_proxy":    "",
-	}
+	return "unknown network mode " + e.Value + "; valid: host, none"
 }

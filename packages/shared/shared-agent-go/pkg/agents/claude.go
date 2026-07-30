@@ -4,11 +4,13 @@ import (
 	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/types"
 )
 
-var claudeAgent = &types.AgentConfig{
-	Type:        types.AgentClaude,
-	DisplayName: "Claude Code",
-	Binary:      "claude",
-	NixPackage:  "claude-code",
+func claudeAgent() *types.AgentConfig {
+	return &types.AgentConfig{
+		Type:        types.AgentClaude,
+		DisplayName: "Claude Code",
+		Binary:      "claude",
+		NixPackage:  "claude-code",
+	}
 }
 
 // BuildClaudeArgs builds arguments for Claude agent

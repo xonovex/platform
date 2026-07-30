@@ -48,6 +48,9 @@ func (w *AgentToolchainWebhook) validate(tc *agentv1alpha1.AgentToolchain) (admi
 				return nil, fmt.Errorf("nix.packages[%d] %q contains shell metacharacters", i, pkg)
 			}
 		}
+		if err := validateNixSpec(tc.Spec.Nix); err != nil {
+			return nil, err
+		}
 	}
 
 	return nil, nil

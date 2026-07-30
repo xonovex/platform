@@ -2,6 +2,8 @@ package nix
 
 import "testing"
 
+const testRevision = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+
 func TestValidatePackageName(t *testing.T) {
 	valid := []string{"git", "nodejs_24", "python312Packages.pip", "gcc-wrapper", "fd"}
 	for _, name := range valid {
@@ -18,18 +20,28 @@ func TestValidatePackageName(t *testing.T) {
 }
 
 func TestValidateSource_Packages(t *testing.T) {
-	if err := ValidateSource(NixSource{Kind: NixSourcePackages, Packages: []string{"git", "ripgrep"}}); err != nil {
+	if err := ValidateSource(NixSource{Kind: NixSourcePackages, Rev: testRevision, Packages: []string{"git", "ripgrep"}}); err != nil {
 		t.Errorf("ValidateSource(packages) = %v, want nil", err)
 	}
 	// Named sets expand and validate.
-	if err := ValidateSource(NixSource{Kind: NixSourcePackages, Packages: []string{"python"}}); err != nil {
+	if err := ValidateSource(NixSource{Kind: NixSourcePackages, Rev: testRevision, Packages: []string{"python"}}); err != nil {
 		t.Errorf("ValidateSource(set) = %v, want nil", err)
 	}
 	if err := ValidateSource(NixSource{Kind: NixSourcePackages}); err == nil {
 		t.Error("ValidateSource(no packages) = nil, want error")
 	}
-	if err := ValidateSource(NixSource{Kind: NixSourcePackages, Packages: []string{"bad name"}}); err == nil {
+	if err := ValidateSource(NixSource{Kind: NixSourcePackages, Rev: testRevision, Packages: []string{"bad name"}}); err == nil {
 		t.Error("ValidateSource(bad package name) = nil, want error")
+	}
+}
+
+func TestValidateSource_RejectsMutablePackageRevision(t *testing.T) {
+	source := NixSource{Kind: NixSourcePackages, Rev: "nixos-unstable", Packages: []string{"git"}}
+
+	err := ValidateSource(source)
+
+	if err == nil {
+		t.Fatal("ValidateSource() error = nil, want immutable revision error")
 	}
 }
 

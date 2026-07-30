@@ -9,7 +9,9 @@
     "packages/skill/*",
     "packages/command/*",
     "packages/config/*",
-    "packages/agent/*",
+    "packages/agent/agent-cli-go",
+    "packages/agent/agent-cli-go-github",
+    "packages/agent/agent-operator-go-docker",
     "packages/shared/*",
     "packages/script/*"
   ],

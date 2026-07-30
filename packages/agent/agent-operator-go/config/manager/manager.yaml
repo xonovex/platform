@@ -22,15 +22,19 @@ spec:
       terminationGracePeriodSeconds: 10
       containers:
         - name: manager
-          image: ghcr.io/xonovex/agent-operator-go:latest
+          image: ghcr.io/xonovex/agent-operator-go@sha256:0cab8c2115522f6e352cd3e096740c79cdc5effebccb38bfda85e7bbe94f4549
           command:
             - /operator
           args:
             - --leader-elect
             - --health-probe-bind-address=:8081
+            - --workspace-init-image=docker.io/alpine/git:2.54.0@sha256:697cb1c85aefc5724febaec2202a974e0d66f6abb6be91a9a86d0c8757af692a
           ports:
             - containerPort: 8081
               name: health
+              protocol: TCP
+            - containerPort: 9443
+              name: webhook
               protocol: TCP
           livenessProbe:
             httpGet:
@@ -53,8 +57,19 @@ spec:
               memory: 64Mi
           securityContext:
             allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
             capabilities:
               drop:
                 - ALL
+          volumeMounts:
+            - name: webhook-cert
+              mountPath: /tmp/k8s-webhook-server/serving-certs
+              readOnly: true
       securityContext:
         runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      volumes:
+        - name: webhook-cert
+          secret:
+            secretName: agent-operator-webhook-server-cert

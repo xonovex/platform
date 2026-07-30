@@ -105,17 +105,21 @@ func WithRuntimeClassName(name string) AgentRunOption {
 func WithWorkspaceRef(ref string) AgentRunOption {
 	return func(r *agentv1alpha1.AgentRun) {
 		r.Spec.WorkspaceRef = ref
+		r.Spec.Workspace = nil
 	}
 }
 
 // NewAgentRun creates an AgentRun with defaults and applies options.
 func NewAgentRun(namespace, name string, opts ...AgentRunOption) *agentv1alpha1.AgentRun {
+	runtimeClassName := "kata"
 	run := &agentv1alpha1.AgentRun{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      name,
 			Namespace: namespace,
 		},
 		Spec: agentv1alpha1.AgentRunSpec{
+			Image:            "ghcr.io/xonovex/agent@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+			RuntimeClassName: &runtimeClassName,
 			Workspace: &agentv1alpha1.WorkspaceSpec{
 				Repository: agentv1alpha1.RepositorySpec{URL: "https://github.com/example/repo"},
 			},
@@ -130,13 +134,6 @@ func NewAgentRun(namespace, name string, opts ...AgentRunOption) *agentv1alpha1.
 // AgentProviderOption configures an AgentProvider.
 type AgentProviderOption func(*agentv1alpha1.AgentProvider)
 
-// WithProviderType sets the provider type.
-func WithProviderType(t agentv1alpha1.ProviderType) AgentProviderOption {
-	return func(p *agentv1alpha1.AgentProvider) {
-		p.Spec.Type = t
-	}
-}
-
 // WithAuthTokenSecretRef sets the auth token secret reference.
 func WithAuthTokenSecretRef(name, key string) AgentProviderOption {
 	return func(p *agentv1alpha1.AgentProvider) {
@@ -144,6 +141,13 @@ func WithAuthTokenSecretRef(name, key string) AgentProviderOption {
 			Name: name,
 			Key:  key,
 		}
+	}
+}
+
+// WithAuthTokenEnv sets the provider credential destination.
+func WithAuthTokenEnv(name string) AgentProviderOption {
+	return func(p *agentv1alpha1.AgentProvider) {
+		p.Spec.AuthTokenEnv = name
 	}
 }
 
@@ -259,6 +263,13 @@ func WithSharedVolumes(volumes ...agentv1alpha1.SharedVolumeSpec) AgentWorkspace
 func WithWorkspaceType(t agentv1alpha1.WorkspaceType) AgentWorkspaceOption {
 	return func(ws *agentv1alpha1.AgentWorkspace) {
 		ws.Spec.Type = t
+	}
+}
+
+// WithWorkspaceRuntimeClassName sets the sandboxed runtime for the workspace init Job.
+func WithWorkspaceRuntimeClassName(name string) AgentWorkspaceOption {
+	return func(ws *agentv1alpha1.AgentWorkspace) {
+		ws.Spec.RuntimeClassName = &name
 	}
 }
 

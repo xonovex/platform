@@ -3,8 +3,8 @@ package plugins
 import (
 	"testing"
 
-	netshared "github.com/xonovex/platform/packages/cli/agent-cli-go/internal/network/shared"
-	"github.com/xonovex/platform/packages/cli/agent-cli-go/internal/sandbox"
+	netshared "github.com/xonovex/platform/packages/agent/agent-cli-go/internal/network/shared"
+	"github.com/xonovex/platform/packages/agent/agent-cli-go/internal/sandbox"
 	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/isolation"
 	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/policy"
 	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/provision"

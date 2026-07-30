@@ -4,6 +4,7 @@ language: go
 layer: unknown
 tags:
   - npm
+  - npm-platform
 env:
   GOOS: linux
   GOARCH: amd64
@@ -11,9 +12,15 @@ env:
   BIN_EXT: ""
 tasks:
   go-build:
-    script: mkdir -p bin && cd $workspaceRoot/packages/agent/agent-cli-go && go build -ldflags="-s -w" -o "$projectRoot/bin/agent-cli-go${BIN_EXT}" ./cmd/agent-cli
+    script: |
+      set -euo pipefail
+      version="$(node -p "require('$workspaceRoot/packages/agent/agent-cli-go/package.json').version")"
+      mkdir -p bin
+      cd "$workspaceRoot/packages/agent/agent-cli-go"
+      go build -ldflags="-s -w -X github.com/xonovex/platform/packages/agent/agent-cli-go/internal/cmd.version=$version" -o "$projectRoot/bin/agent-cli-go${BIN_EXT}" ./cmd/agent-cli
     inputs:
       - /packages/agent/agent-cli-go/**/*.go
+      - /packages/agent/agent-cli-go/package.json
       - /packages/agent/agent-cli-go/go.mod
       - /packages/agent/agent-cli-go/go.sum
       - /packages/shared/shared-agent-go/**/*.go
@@ -24,6 +31,7 @@ tasks:
       - bin/
     options:
       cache: true
+    toolchain: [system, nix]
   ci-check:
     command: echo 'ci-check complete'
     deps:

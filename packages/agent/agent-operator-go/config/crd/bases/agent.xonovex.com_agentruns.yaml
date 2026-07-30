@@ -55,7 +55,8 @@ spec:
                       description: Default provider name
                     defaultImage:
                       type: string
-                      description: Default container image
+                      description: Digest-pinned container image used when AgentRun.Spec.Image is empty.
+                      pattern: ^.+@sha256:[0-9a-fA-F]{64}$
                     defaultResources:
                       type: object
                       description: Default resource requirements
@@ -168,13 +169,10 @@ spec:
                   properties:
                     presetRef:
                       type: string
-                      description: References a named provider preset from shared-agent-go
+                      description: References a portable provider preset from shared-agent-go
                     agentType:
                       type: string
                       description: Agent type for preset disambiguation (defaults to "claude")
-                    type:
-                      type: string
-                      description: Provider type
                     authSecretRef:
                       type: object
                       description: References a Secret containing the auth token
@@ -186,6 +184,9 @@ spec:
                           type: string
                         key:
                           type: string
+                    authTokenEnv:
+                      type: string
+                      description: Environment variable that receives the auth token Secret
                     environment:
                       type: object
                       additionalProperties:
@@ -275,17 +276,24 @@ spec:
                       type: object
                       description: Nix package provisioning configuration
                       properties:
+                        nixpkgsRev:
+                          type: string
+                          description: Nixpkgs revision the image was built from. Required; the pin is what makes the provisioning reproducible.
                         packages:
                           type: array
-                          description: Nixpkgs attribute names to install
+                          description: Nixpkgs attribute names baked into the image. Mutually exclusive with flakeRef.
                           items:
                             type: string
+                        flakeRef:
+                          type: string
+                          description: Project flake the devShell was built from. Mutually exclusive with packages.
+                        shell:
+                          type: string
+                          description: devShell attribute for the project-flake source. Defaults to "default".
                         image:
                           type: string
-                          description: Nix container image for the init container (default nixos/nix:latest)
-                        storeSizeLimit:
-                          type: string
-                          description: Size limit for the Nix store EmptyDir volume (default 10Gi)
+                          description: Pre-built, digest-pinned Nix agent image used by the pod.
+                          pattern: ^.+@sha256:[0-9a-fA-F]{64}$
                 prompt:
                   type: string
                   description: Prompt for headless task execution
@@ -367,7 +375,8 @@ spec:
                                 x-kubernetes-int-or-string: true
                 image:
                   type: string
-                  description: Container image for the agent
+                  description: Digest-pinned container image for the agent. It must be set directly or resolved from a harness, toolchain, or policy default.
+                  pattern: ^.+@sha256:[0-9a-fA-F]{64}$
                 nodeSelector:
                   type: object
                   additionalProperties:
@@ -391,7 +400,8 @@ spec:
                         type: integer
                         format: int64
                 runtimeClassName:
-                  description: RuntimeClassName sets the pod runtimeClassName for
+                  description:
+                    RuntimeClassName sets the pod runtimeClassName for
                     VM-based isolation (e.g. Kata Containers)
                   type: string
                 securityContext:
@@ -402,6 +412,13 @@ spec:
                   description: PodSecurityContext overrides the default pod-level security context.
                   type: object
                   x-kubernetes-preserve-unknown-fields: true
+                network:
+                  description: Network selects the egress mode. Host is unrestricted, none is DNS-only, and proxy is rejected until an enforceable FQDN-aware backend is configured.
+                  type: string
+                  enum:
+                    - host
+                    - none
+                    - proxy
                 networkPolicy:
                   description: NetworkPolicy configures the NetworkPolicy applied to agent pods.
                   type: object

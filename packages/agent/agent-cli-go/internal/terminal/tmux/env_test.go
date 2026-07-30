@@ -1,144 +1,90 @@
 package tmux
 
 import (
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 )
 
-func TestFilterEnv(t *testing.T) {
-	tests := []struct {
-		name     string
-		input    []string
-		expected []string
-	}{
-		{
-			name:     "filters bash reserved vars",
-			input:    []string{"PATH=/usr/bin", "UID=1000", "HOME=/home/user", "EUID=1000", "GID=1000", "GROUPS=1000"},
-			expected: []string{"PATH=/usr/bin", "HOME=/home/user"},
-		},
-		{
-			name:     "keeps all non-reserved vars",
-			input:    []string{"FOO=bar", "BAZ=qux", "CUSTOM_VAR=value"},
-			expected: []string{"FOO=bar", "BAZ=qux", "CUSTOM_VAR=value"},
-		},
-		{
-			name:     "handles empty input",
-			input:    []string{},
-			expected: []string{},
-		},
-		{
-			name:     "filters invalid entries",
-			input:    []string{"VALID=value", "invalid", "=nokey", "ANOTHER=ok"},
-			expected: []string{"VALID=value", "ANOTHER=ok"},
-		},
+func TestFilterEnvironmentRejectsInvalidAndReservedNames(t *testing.T) {
+	environment := []string{
+		"PATH=/usr/bin",
+		"SAFE_VALUE=content",
+		"UID=1000",
+		"9INVALID=value",
+		"BAD;touch /tmp/injected=value",
+		"missing-separator",
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			result := FilterEnv(tt.input)
-			if len(result) != len(tt.expected) {
-				t.Errorf("FilterEnv() returned %d items, want %d", len(result), len(tt.expected))
-				return
-			}
-			for i, v := range result {
-				if v != tt.expected[i] {
-					t.Errorf("FilterEnv()[%d] = %v, want %v", i, v, tt.expected[i])
-				}
-			}
-		})
+	filtered := filterEnvironment(environment)
+
+	if len(filtered) != 2 {
+		t.Fatalf("filterEnvironment() returned %d variables, want 2", len(filtered))
+	}
+	if filtered[0].name != "PATH" || filtered[1].name != "SAFE_VALUE" {
+		t.Fatalf("filterEnvironment() = %v, want PATH and SAFE_VALUE", filtered)
 	}
 }
 
-func TestEscapeEnvValue(t *testing.T) {
-	tests := []struct {
-		name     string
-		input    string
-		expected string
-	}{
-		{
-			name:     "plain string unchanged",
-			input:    "simple",
-			expected: "simple",
-		},
-		{
-			name:     "escapes double quotes",
-			input:    `value with "quotes"`,
-			expected: `value with \"quotes\"`,
-		},
-		{
-			name:     "escapes backslashes",
-			input:    `path\to\file`,
-			expected: `path\\to\\file`,
-		},
-		{
-			name:     "escapes dollar signs",
-			input:    "value $VAR here",
-			expected: `value \$VAR here`,
-		},
-		{
-			name:     "escapes backticks",
-			input:    "value `cmd` here",
-			expected: "value \\`cmd\\` here",
-		},
+func TestCreateLaunchScriptKeepsSecretsOutOfArgumentsAndExecutesEnvironment(t *testing.T) {
+	outputPath := filepath.Join(t.TempDir(), "environment.txt")
+	secret := "token with '$HOME' and a newline\nvalue"
+	command := []string{"sh", "-c", "printf '%s' \"$SAFE_VALUE\" > \"$1\"", "sh", outputPath}
+
+	launchScript, err := createLaunchScript(command, []string{
+		"SAFE_VALUE=" + secret,
+		"BAD;touch " + filepath.Join(t.TempDir(), "injected") + "=value",
+	})
+
+	if err != nil {
+		t.Fatalf("createLaunchScript() error = %v", err)
+	}
+	info, err := os.Stat(launchScript)
+	if err != nil {
+		t.Fatalf("stat launch script: %v", err)
+	}
+	if info.Mode().Perm() != 0o600 {
+		t.Fatalf("launch script mode = %o, want 600", info.Mode().Perm())
+	}
+	if strings.Contains(launchScript, secret) {
+		t.Fatal("launch script path contains secret")
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			result := EscapeEnvValue(tt.input)
-			if result != tt.expected {
-				t.Errorf("EscapeEnvValue(%q) = %q, want %q", tt.input, result, tt.expected)
-			}
-		})
+	if err := runLaunchScript(launchScript); err != nil {
+		t.Fatalf("run launch script: %v", err)
+	}
+	result, err := os.ReadFile(outputPath)
+	if err != nil {
+		t.Fatalf("read command output: %v", err)
+	}
+	if string(result) != secret {
+		t.Fatalf("command output = %q, want %q", result, secret)
+	}
+	if _, err := os.Stat(launchScript); !os.IsNotExist(err) {
+		t.Fatalf("self-deleted launch script stat error = %v, want not exists", err)
 	}
 }
 
-func TestBuildEnvExports(t *testing.T) {
-	tests := []struct {
-		name     string
-		input    []string
-		contains []string
-		isEmpty  bool
-	}{
-		{
-			name:    "empty input returns empty string",
-			input:   []string{},
-			isEmpty: true,
-		},
-		{
-			name:     "builds export statements",
-			input:    []string{"FOO=bar", "BAZ=qux"},
-			contains: []string{`export FOO="bar"`, `export BAZ="qux"`},
-		},
-		{
-			name:     "escapes values in exports",
-			input:    []string{`KEY=value with "quotes"`},
-			contains: []string{`export KEY="value with \"quotes\""`},
-		},
-		{
-			name:    "filters reserved vars",
-			input:   []string{"UID=1000", "EUID=1000"},
-			isEmpty: true,
-		},
+func TestCreateLaunchScriptRequiresCommand(t *testing.T) {
+	if _, err := createLaunchScript(nil, nil); err == nil {
+		t.Fatal("createLaunchScript(nil, nil) error = nil, want error")
 	}
+}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			result := BuildEnvExports(tt.input)
-			if tt.isEmpty {
-				if result != "" {
-					t.Errorf("BuildEnvExports() = %q, want empty", result)
-				}
-				return
-			}
-			for _, substr := range tt.contains {
-				if !strings.Contains(result, substr) {
-					t.Errorf("BuildEnvExports() = %q, want to contain %q", result, substr)
-				}
-			}
-			// Should end with "; "
-			if !strings.HasSuffix(result, "; ") {
-				t.Errorf("BuildEnvExports() = %q, should end with '; '", result)
-			}
-		})
+func runLaunchScript(path string) error {
+	process, err := os.StartProcess("/bin/sh", []string{"sh", path}, &os.ProcAttr{
+		Files: []*os.File{os.Stdin, os.Stdout, os.Stderr},
+	})
+	if err != nil {
+		return err
 	}
+	state, err := process.Wait()
+	if err != nil {
+		return err
+	}
+	if !state.Success() {
+		return &os.PathError{Op: "execute", Path: path, Err: os.ErrInvalid}
+	}
+	return nil
 }

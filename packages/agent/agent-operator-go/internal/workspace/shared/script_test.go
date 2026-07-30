@@ -38,6 +38,22 @@ func TestCloneScript_WithBranch(t *testing.T) {
 	}
 }
 
+func TestCloneScript_UsesMountedCredentialStore(t *testing.T) {
+	repo := agentv1alpha1.RepositorySpec{
+		URL:                  "https://github.com/example/private.git",
+		CredentialsSecretRef: &agentv1alpha1.SecretKeyRef{Name: "repo-auth", Key: "credentials"},
+	}
+
+	script := CloneScript(repo, &git.Strategy{})
+
+	if !strings.Contains(script, "credential.helper=store --file="+RepositoryCredentialsFile) {
+		t.Fatalf("clone script does not use the mounted credential store:\n%s", script)
+	}
+	if strings.Contains(script, "repo-auth") {
+		t.Fatal("clone script must not expose the Kubernetes Secret name")
+	}
+}
+
 func TestCloneScript_InjectionQuoted(t *testing.T) {
 	repo := agentv1alpha1.RepositorySpec{
 		URL:    "https://github.com/example/repo.git",

@@ -6,7 +6,7 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/xonovex/platform/packages/shared/shared-core-go/pkg/scriptlib"
+	"github.com/xonovex/platform/packages/shared/shared-core-go/pkg/logging"
 	"github.com/xonovex/platform/packages/shared/shared-core-go/pkg/shell"
 )
 
@@ -21,7 +21,7 @@ func SpawnSandbox(command string, args []string, env []string, errorPrefix strin
 // and waits for completion, returning the child exit code.
 func SpawnSandboxInDir(command string, args []string, env []string, dir string, errorPrefix string, verbose bool) (int, error) {
 	if verbose {
-		scriptlib.LogDebug(verbose, fmt.Sprintf("Executing: %s %s", command, strings.Join(args, " ")))
+		logging.LogDebug(fmt.Sprintf("Executing: %s %s", command, strings.Join(args, " ")))
 	}
 
 	cmd := exec.Command(command, args...)

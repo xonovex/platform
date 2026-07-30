@@ -9,5 +9,5 @@ import (
 
 // CommandBuilder builds the command and args for an agent type.
 type CommandBuilder interface {
-	Command(run *agentv1alpha1.AgentRun) (command []string, args []string)
+	Command(run *agentv1alpha1.AgentRun, providerCliArgs []string) (command []string, args []string, err error)
 }

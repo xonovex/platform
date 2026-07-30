@@ -178,7 +178,7 @@ tasks:
       mergeDeps: append
   ci-check:
     command: echo 'ci-check complete'
-    deps: [build, lint, typecheck, test, format-check]
+    deps: [build, lint, typecheck, test, coverage, format-check]
     options:
       cache: false
       # Replacing args keeps the command single when a project inherits two

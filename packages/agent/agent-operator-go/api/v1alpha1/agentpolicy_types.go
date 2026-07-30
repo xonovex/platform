@@ -9,7 +9,7 @@ import (
 // Ensure unused imports don't cause errors
 var _ = resource.Quantity{}
 
-// AgentPolicyEnforced defines constraints that AgentRuns in this namespace cannot override.
+// AgentPolicyEnforced defines constraints that AgentRuns and AgentWorkspaces in this namespace cannot override.
 type AgentPolicyEnforced struct {
 	// RuntimeClassName, if set, requires all AgentRuns to use this runtimeClassName.
 	RuntimeClassName *string `json:"runtimeClassName,omitempty"`
@@ -23,24 +23,36 @@ type AgentPolicyEnforced struct {
 	// (i.e. spec.networkPolicy must not be Disabled).
 	RequireNetworkPolicy bool `json:"requireNetworkPolicy,omitempty"`
 
+	// RequireEgressRestricted, if true, rejects host networking and custom egress
+	// rules whose effective destination set cannot be proven restricted.
+	RequireEgressRestricted bool `json:"requireEgressRestricted,omitempty"`
+
 	// MaxTimeout is the maximum allowed timeout for AgentRuns.
 	MaxTimeout *metav1.Duration `json:"maxTimeout,omitempty"`
 
-	// MaxResources defines the upper bound for any single container's resource limits.
+	// MaxResources defines resource ceilings. Every named resource requires an
+	// explicit limit; requests and limits must not exceed the ceiling.
 	MaxResources *corev1.ResourceList `json:"maxResources,omitempty"`
 
-	// AllowedImages is a list of allowed container image prefixes.
-	// If set, AgentRun.Spec.Image must match one of these prefixes.
+	// AllowedImages is a list of allowed container image prefixes. If set, the
+	// AgentRun must carry an explicit image or receive an AgentPolicy default,
+	// and the resulting image must match one of these prefixes.
 	AllowedImages []string `json:"allowedImages,omitempty"`
 
 	// AllowedRuntimeClassNames lists permitted runtimeClassNames.
 	// If non-empty, AgentRun.Spec.RuntimeClassName must be in this list.
 	AllowedRuntimeClassNames []string `json:"allowedRuntimeClassNames,omitempty"`
+
+	// AllowedSecretNames lists Secrets that AgentRuns and AgentWorkspaces may
+	// reference. Secret-backed environment variables, provider credentials, and
+	// repository credentials are rejected unless their Secret is listed here.
+	AllowedSecretNames []string `json:"allowedSecretNames,omitempty"`
 }
 
-// AgentPolicyDefaults defines overridable defaults applied when AgentRun fields are absent.
+// AgentPolicyDefaults defines overridable defaults applied when execution fields are absent.
 type AgentPolicyDefaults struct {
-	// Image is the default container image when AgentRun.Spec.Image is not set.
+	// Image is the digest-pinned container image used when AgentRun.Spec.Image is not set.
+	// +kubebuilder:validation:Pattern=`^.+@sha256:[0-9a-fA-F]{64}$`
 	Image string `json:"image,omitempty"`
 
 	// Timeout is the default timeout when AgentRun.Spec.Timeout is not set.
@@ -70,7 +82,7 @@ type AgentPolicyStatus struct {
 // +kubebuilder:resource:scope=Namespaced
 // +kubebuilder:printcolumn:name="Age",type=date,JSONPath=`.metadata.creationTimestamp`
 
-// AgentPolicy defines enforced security constraints and defaults for AgentRuns in a namespace.
+// AgentPolicy defines enforced security constraints and defaults for agent execution in a namespace.
 type AgentPolicy struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`

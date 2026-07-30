@@ -2,17 +2,18 @@ apiVersion: agent.xonovex.com/v1alpha1
 kind: AgentWorkspace
 metadata:
   name: my-workspace
-  namespace: default
+  namespace: ai-agents
 spec:
   repository:
     url: https://github.com/org/repo.git
     branch: main
   storageClass: nfs-csi
   storageSize: 10Gi
+  runtimeClassName: kata
   sharedVolumes:
     - name: claude-config
-      mountPath: /root/.claude
+      mountPath: /home/agent/.claude
       storageSize: 1Gi
     - name: opencode-config
-      mountPath: /root/.opencode
+      mountPath: /home/agent/.config/opencode
       storageSize: 512Mi

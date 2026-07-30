@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"os"
 
 	"k8s.io/apimachinery/pkg/runtime"
@@ -12,31 +13,34 @@ import (
 
 	agentv1alpha1 "github.com/xonovex/platform/packages/agent/agent-operator-go/api/v1alpha1"
 	"github.com/xonovex/platform/packages/agent/agent-operator-go/internal/controller"
+	"github.com/xonovex/platform/packages/agent/agent-operator-go/internal/validator"
 	"github.com/xonovex/platform/packages/agent/agent-operator-go/internal/webhook"
 )
-
-var (
-	scheme   = runtime.NewScheme()
-	setupLog = ctrl.Log.WithName("setup")
-)
-
-func init() {
-	_ = clientgoscheme.AddToScheme(scheme)
-	_ = agentv1alpha1.AddToScheme(scheme)
-}
 
 func main() {
 	var probeAddr string
 	var enableLeaderElection bool
+	var workspaceInitImage string
 
 	flag.StringVar(&probeAddr, "health-probe-bind-address", ":8081", "The address the probe endpoint binds to.")
 	flag.BoolVar(&enableLeaderElection, "leader-elect", false, "Enable leader election for controller manager.")
+	flag.StringVar(&workspaceInitImage, "workspace-init-image", controller.DefaultWorkspaceInitImage, "Digest-pinned image used to initialize shared workspaces.")
 
 	opts := zap.Options{Development: true}
 	opts.BindFlags(flag.CommandLine)
 	flag.Parse()
 
 	ctrl.SetLogger(zap.New(zap.UseFlagOptions(&opts)))
+	setupLog := ctrl.Log.WithName("setup")
+	scheme, err := newScheme()
+	if err != nil {
+		setupLog.Error(err, "unable to register Kubernetes API schemes")
+		os.Exit(1)
+	}
+	if err := validator.ValidatePinnedImageReference(workspaceInitImage); err != nil {
+		setupLog.Error(err, "invalid workspace init image", "image", workspaceInitImage)
+		os.Exit(1)
+	}
 
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
 		Scheme:                 scheme,
@@ -68,16 +72,33 @@ func main() {
 	}
 
 	if err = (&controller.AgentWorkspaceReconciler{
-		Client:   mgr.GetClient(),
-		Scheme:   mgr.GetScheme(),
-		Recorder: mgr.GetEventRecorder("agent-operator"),
+		Client:             mgr.GetClient(),
+		Scheme:             mgr.GetScheme(),
+		Recorder:           mgr.GetEventRecorder("agent-operator"),
+		WorkspaceInitImage: workspaceInitImage,
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "AgentWorkspace")
 		os.Exit(1)
 	}
 
-	if err = (&webhook.AgentRunWebhook{}).SetupWebhookWithManager(mgr); err != nil {
+	if err = (&webhook.AgentRunWebhook{Client: mgr.GetClient()}).SetupWebhookWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to set up webhook", "webhook", "AgentRun")
+		os.Exit(1)
+	}
+	if err = (&webhook.AgentHarnessWebhook{}).SetupWebhookWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to set up webhook", "webhook", "AgentHarness")
+		os.Exit(1)
+	}
+	if err = (&webhook.AgentProviderWebhook{}).SetupWebhookWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to set up webhook", "webhook", "AgentProvider")
+		os.Exit(1)
+	}
+	if err = (&webhook.AgentToolchainWebhook{}).SetupWebhookWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to set up webhook", "webhook", "AgentToolchain")
+		os.Exit(1)
+	}
+	if err = (&webhook.AgentWorkspaceWebhook{}).SetupWebhookWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to set up webhook", "webhook", "AgentWorkspace")
 		os.Exit(1)
 	}
 
@@ -95,4 +116,15 @@ func main() {
 		setupLog.Error(err, "problem running manager")
 		os.Exit(1)
 	}
+}
+
+func newScheme() (*runtime.Scheme, error) {
+	scheme := runtime.NewScheme()
+	if err := clientgoscheme.AddToScheme(scheme); err != nil {
+		return nil, fmt.Errorf("register Kubernetes core API: %w", err)
+	}
+	if err := agentv1alpha1.AddToScheme(scheme); err != nil {
+		return nil, fmt.Errorf("register agent API: %w", err)
+	}
+	return scheme, nil
 }

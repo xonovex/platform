@@ -1,0 +1,29 @@
+apiVersion: agent.xonovex.com/v1alpha1
+kind: AgentHarness
+metadata:
+  name: claude-harness
+  namespace: ai-agents
+spec:
+  type: claude
+  defaultProvider: anthropic-provider
+  defaultImage: ghcr.io/xonovex/agent-image@sha256:<digest>
+  defaultTimeout: 30m0s
+  # Kernel isolation is required; the runtime class must be one the AgentPolicy allows.
+  defaultRuntimeClassName: kata
+  defaultResources:
+    requests:
+      cpu: "500m"
+      memory: 512Mi
+      ephemeral-storage: 1Gi
+    limits:
+      cpu: "2"
+      memory: 2Gi
+      ephemeral-storage: 5Gi
+  env:
+    - name: CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC
+      value: "1"
+  # Runs inherit this policy. Empty egress rules deny all egress; public model
+  # APIs need either a rule here or `network: host` on the run.
+  defaultNetworkPolicy:
+    disabled: false
+  defaultTtlSecondsAfterFinished: 3600
