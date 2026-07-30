@@ -1,6 +1,6 @@
 ---
 name: plan-guide
-description: "Use when scoping, researching, deciding, planning, revising, critiquing, continuing, updating, or validating a feature, refactor, or analysis task — covers the whole plan-document lifecycle plus codebase research (alignment, hardening, simplification, template extraction, TODO scanning, shared-library design). Triggers on prompts about planning, designing, scoping, breaking down, architecting, settling or interrogating requirements and decisions, stress-testing / critiquing a plan, code analysis / cleanup / hardening / alignment, even when the user doesn't say 'plan'."
+description: "Use when scoping, researching, deciding, planning, revising, critiquing, continuing, delegating, updating, or validating a feature, refactor, or analysis task — covers the whole plan-document lifecycle plus codebase research (alignment, hardening, simplification, template extraction, TODO scanning, shared-library design). Triggers on prompts about planning, designing, scoping, breaking down, architecting, settling or interrogating requirements and decisions, stress-testing / critiquing a plan, working a roadmap by supervising implementation agents instead of implementing, code analysis / cleanup / hardening / alignment, even when the user doesn't say 'plan'."
 ---
 
 # Planning & Code-Research Guidelines
@@ -29,6 +29,7 @@ Author and maintain plan documents across their full lifecycle (research → dec
 - Auto-continuing to the next plan after completion silently chains work — `plan-continue` STOPS after one
 - Subplans with >7 tasks risk silent drops — target 5–7 tasks each
 - Skipping the verification re-read before marking complete is the #1 cause of incomplete work
+- Under `plan-delegate` the implementation agent's report is input to review, not evidence — accepting it without re-running the key suites records a red build as green
 
 ## Plan Lifecycle
 
@@ -39,7 +40,7 @@ Author and maintain plan documents across their full lifecycle (research → dec
 5. **Critique** — `plan-critique` adversarially stress-tests the plan (red-team / pre-mortem), feeding findings back into revise
 6. **Accept / Reject** — `plan-accept` sets `status: approved` (the gate to subplans); `plan-reject` sets `status: rejected` with a reason
 7. **Expand** — `plan-subplans-create` generates detailed child plans
-8. **Execute** — `plan-continue` works through subplans one at a time
+8. **Execute** — `plan-continue` works through subplans one at a time; `plan-delegate` supervises a whole roadmap, briefing one implementation agent per item and reviewing before accepting
 9. **Update** — `plan-update` refreshes status / phase / validation results
 10. **Validate** — `plan-validate` confirms success criteria are met (read-only)
 
@@ -65,5 +66,6 @@ Author and maintain plan documents across their full lifecycle (research → dec
 - Read [references/plan-reject.md](references/plan-reject.md) - Load when rejecting a plan with a reason (set status: rejected, record why, keep the plan)
 - Read [references/plan-subplans-create.md](references/plan-subplans-create.md) - Load when expanding an approved plan into detailed parallelizable subplans
 - Read [references/plan-continue.md](references/plan-continue.md) - Load when resuming implementation work from an existing plan
+- Read [references/plan-delegate.md](references/plan-delegate.md) - Load when supervising a roadmap's execution as a delegator — briefing an implementation agent per item, reviewing its work, and recording the result without implementing anything
 - Read [references/plan-update.md](references/plan-update.md) - Load when refreshing a plan with current status / validation / progress
 - Read [references/plan-validate.md](references/plan-validate.md) - Load when verifying a plan's success criteria are met (read-only)

@@ -54,6 +54,7 @@ alongside this one.
                                                         |        Done         |
                                                         +---------------------+
 
+Supervised: plan-delegate walks a roadmap's ordering, briefing one implementation agent per item and reviewing before it accepts
 Parallel: Multiple agents work on parallel subplan groups in separate worktrees
 Learning: reflect-to-instructions / reflect-to-skill fold learnings into guidelines for future sessions
 ```
@@ -74,6 +75,7 @@ Learning: reflect-to-instructions / reflect-to-skill fold learnings into guideli
 | `plan-subplans-create`  | Generate detailed subplans with parallel execution detection                               |
 | `plan-worktree-create`  | Create a git worktree for a feature branch                                                 |
 | `plan-continue`         | Resume work from an existing plan                                                          |
+| `plan-delegate`         | Work a roadmap as supervisor: brief an agent per item, verify it, record and commit        |
 | `plan-validate`         | Verify that a plan or current work has been fully achieved                                 |
 | `plan-update`           | Update plan status and test results                                                        |
 | `git-commit`            | Commit and push changes                                                                    |

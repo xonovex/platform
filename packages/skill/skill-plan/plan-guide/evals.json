@@ -33,6 +33,15 @@
         "The plan includes a non-empty skills_to_consult list naming applicable coding-guideline skills for implementers",
         "It stops at the high-level/parent plan and does NOT write out detailed implementation subplans in the same pass"
       ]
+    },
+    {
+      "id": 5,
+      "prompt": "Here is plans/example-family/roadmap.md with seven pending subplans. Drive it for me, but do not implement any of it yourself.",
+      "assertions": [
+        "Delegates each subplan to a separate implementation agent and keeps the supervising session out of implementation entirely",
+        "Independently re-runs the subplan's validation commands before accepting the agent's report, rather than treating the report's green claim as evidence",
+        "Records any success criterion that was not met as a miss instead of ticking it, and stops on a blocker rather than continuing down the ordering"
+      ]
     }
   ]
 }
