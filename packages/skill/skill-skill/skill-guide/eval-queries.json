@@ -1,18 +1,18 @@
 [
   {
-    "query": "create a new skill for our GraphQL resolver conventions — SKILL.md plus a few reference files",
+    "query": "create a new skill for our GraphQL resolver conventions: SKILL.md plus a few reference files",
     "should_trigger": true,
     "split": "train",
     "rationale": "direct: authoring a new skill"
   },
   {
-    "query": "the SKILL.md body is ~700 lines — push the detail into references with load-when triggers and keep the body an index",
+    "query": "the SKILL.md body is ~700 lines: push the detail into references with load-when triggers and keep the body an index",
     "should_trigger": true,
     "split": "train",
     "rationale": "implicit: progressive disclosure / simplify without naming the skill guide"
   },
   {
-    "query": "editing packages/skill/skill-zod/zod-guide/SKILL.md and it never seems to fire — can you tighten the description so it routes better?",
+    "query": "editing packages/skill/skill-zod/zod-guide/SKILL.md and it never seems to fire: can you tighten the description so it routes better?",
     "should_trigger": true,
     "split": "train",
     "rationale": "context cue: editing under a skills dir + description tuning"
@@ -21,10 +21,10 @@
     "query": "audit our skill catalog for duplicated reference files and split them into general/language/framework tiers, cross-linking the owner",
     "should_trigger": true,
     "split": "train",
-    "rationale": "catalog-level work — the broadened composability/audit scope"
+    "rationale": "catalog-level work: the broadened composability/audit scope"
   },
   {
-    "query": "two of our skills overlap a lot — pull the useful rules from one into the other but keep the target's voice and structure",
+    "query": "two of our skills overlap a lot: pull the useful rules from one into the other but keep the target's voice and structure",
     "should_trigger": true,
     "split": "train",
     "rationale": "merge/assimilate one skill into another"
@@ -42,7 +42,7 @@
     "rationale": "security audit of an untrusted skill + allowed-tools least privilege"
   },
   {
-    "query": "simplify our AGENTS.md — it's gotten verbose and repeats itself across sections",
+    "query": "simplify our AGENTS.md: it's gotten verbose and repeats itself across sections",
     "should_trigger": false,
     "split": "train",
     "rationale": "near-miss: project instructions, should match instruction-guide"
@@ -72,10 +72,10 @@
     "rationale": "validation positive: evaluating trigger rate"
   },
   {
-    "query": "this guide re-explains the immutability rules that fp-guide already owns — factor them out and cross-reference it",
+    "query": "this guide re-explains the immutability rules that fp-guide already owns: factor them out and cross-reference it",
     "should_trigger": true,
     "split": "validation",
-    "rationale": "validation positive — implicit de-duplication / composability"
+    "rationale": "validation positive: implicit de-duplication / composability"
   },
   {
     "query": "our workflow needs any installed evidence-review skill; define required versus preferred description matching, ambiguity handling, and how this differs from an exact plugin dependency",
@@ -93,7 +93,7 @@
     "query": "simplify this verbose prompt template we reuse for support replies",
     "should_trigger": false,
     "split": "validation",
-    "rationale": "validation negative — near-miss, should match command-guide"
+    "rationale": "validation negative: near-miss, should match command-guide"
   },
   {
     "query": "We just wrapped a debugging session where I made a couple of mistakes and had to correct course. Capture the development lessons from this session and save each one as its own file so a future agent can reuse it. Show me exactly what one of those files should contain.",

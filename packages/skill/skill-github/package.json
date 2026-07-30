@@ -1,8 +1,12 @@
 {
   "name": "@xonovex/skill-github",
   "version": "5.1.0",
+  "description": "Xonovex GitHub host delivery skills",
   "private": true,
   "type": "module",
+  "dependencies": {
+    "@xonovex/skill-credential-management": "5.1.0"
+  },
   "keywords": [
     "xonovex",
     "skill",

@@ -1,26 +1,21 @@
 # worktree-abandon: Abandon Feature Worktree with Documented Reason
 
-Abandon a feature: record the reason in its plan, optionally commit current state, and keep the worktree by default (remove only if requested) so insights can be extracted later.
+Inspect an abandoned feature and return a recovery record. This operation is read-only:
+it never commits, resets, removes, tags, pushes, or changes provider state.
 
 ## Steps
 
-1. Verify in a feature worktree (`*-feature-*`); get reason from user or prompt.
-2. Read plan path from `git config branch.<branch>.plan`.
-3. Optional commit: `git add . && git commit -m "wip: abandoned work on <feature>"`.
-4. Update the plan (unless asked to skip):
-
-```yaml
-status: "abandoned"
-abandoned_reason: "Superseded by OAuth 2.0"
-abandoned_date: "2026-05-13"
-```
-
-Add an `## Abandonment Notes` section with the detailed explanation and learnings.
-
-5. Optional removal: name the worktree path and branch ref, and get confirmation, before `git worktree remove <path>` — removal discards anything uncommitted and the paired `git branch -D` discards unmerged commits.
+1. Verify the exact feature worktree (`*-feature-*`) and get the reason from the caller.
+2. Inspect the worktree and branch for dirty or uncommitted state.
+3. Capture the reason, current branch, HEAD revision, dirty-state summary, and the
+   command needed to recover or resume the work.
+4. Report any untracked work, unpushed revisions, detached state, or missing remote
+   that would affect recovery.
+5. Return the record inline. Use separate Commit, Publish, or Cleanup operations for
+   any requested mutation.
 
 ## Gotchas
 
-- Abandoning without recording _why_ the approach failed loses the learning — always capture it
-- A plan marked `abandoned` is the canonical signal for downstream ops — don't reuse the same plan file for a fresh attempt; bump a new path
-- `git worktree remove` doesn't delete the branch ref — pair with `git branch -D <feature-branch>` (or tag `abandoned/<name>` first) to preserve the work in history
+- Abandoning without recording _why_ the approach failed loses the learning, always capture it with the recovery revision
+- Do not create a safety commit or tag: even a preservation-oriented write exceeds the Abandon operation
+- Do not treat a request to abandon as authorization to discard or clean up work

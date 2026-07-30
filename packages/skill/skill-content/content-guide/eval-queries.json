@@ -18,7 +18,7 @@
     "split": "train"
   },
   {
-    "query": "This blog paragraph feels robotic. Make it sound human without changing the facts: 'The release was pivotal. It was not just faster, but also cleaner and more reliable. This delivers a robust, seamless experience — creating value — while ensuring users remain engaged. Overall, the future looks promising.'",
+    "query": "This blog paragraph feels robotic. Make it sound human without changing the facts: 'The release was pivotal. It was not just faster, but also cleaner and more reliable. This delivers a robust, seamless experience: creating value, while ensuring users remain engaged. Overall, the future looks promising.'",
     "rationale": "output-eval task also exercises this skill's routing boundary",
     "should_trigger": true,
     "split": "train"
@@ -30,7 +30,7 @@
     "split": "train"
   },
   {
-    "query": "Rewrite this destination article so it sounds locally informed and specific, removes generic travel clichés, and preserves every verified fact.",
+    "query": "Rewrite this destination article so it sounds locally informed and specific, removes generic travel clich\u00e9s, and preserves every verified fact.",
     "should_trigger": true,
     "rationale": "curated domain-specific routing scenario",
     "split": "validation"
@@ -66,7 +66,7 @@
     "split": "train"
   },
   {
-    "query": "this packages/auth dir doesn't have an AGENTS.md yet — set one up",
+    "query": "this packages/auth dir doesn't have an AGENTS.md yet: set one up",
     "rationale": "near miss owned by instruction-guide",
     "should_trigger": false,
     "split": "train"
@@ -78,7 +78,7 @@
     "split": "train"
   },
   {
-    "query": "rewrite this story using the As a / I want / so that template",
+    "query": "rewrite this story using the As a / I want / so that template: \"Logged-in shoppers need a way to save a card so checkout is faster next time.\"",
     "rationale": "near miss owned by user-stories-guide",
     "should_trigger": false,
     "split": "validation"
@@ -90,7 +90,7 @@
     "split": "validation"
   },
   {
-    "query": "the new microservice doesn't have project instructions yet — generate one based on what's in src/",
+    "query": "the new microservice doesn't have project instructions yet: generate one based on what's in src/",
     "rationale": "near miss owned by instruction-guide",
     "should_trigger": false,
     "split": "validation"

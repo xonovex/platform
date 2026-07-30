@@ -1,13 +1,13 @@
 # simplify: Condense a Skill's Text
 
-Reduce a verbose skill to its essentials — condense the `SKILL.md` body and trim bloated reference files — while preserving the quick reference and keeping content project-independent.
+Reduce a verbose skill to its essentials: condense the `SKILL.md` body and trim bloated reference files, while preserving the quick reference and keeping content project-independent.
 
-Spec limits (name / description / body / optional-field rules) live in the parent SKILL.md — re-check after edits.
+Spec limits (name / description / body / optional-field rules) live in the parent SKILL.md: re-check after edits.
 
 ## Contents
 
-- [Condensing SKILL.md](#condensing-skillmd) — 60-80% reduction, bullet format, extract examples to references
-- [Condensing reference files](#condensing-reference-files) — merge overlapping sections, 20-40% reduction
+- [Condensing SKILL.md](#condensing-skillmd): 60-80% reduction, bullet format, extract examples to references
+- [Condensing reference files](#condensing-reference-files): merge overlapping sections, 20-40% reduction
 - [Error Handling](#error-handling)
 - [Safety](#safety)
 
@@ -51,7 +51,7 @@ code examples exist, detailed explanation needed, multiple examples, or counter-
 
 #### Defaults over menus
 
-never leave 3+ equal options when condensing — pick one default, mention alternatives briefly
+never leave 3+ equal options when condensing: pick one default, mention alternatives briefly
 
 #### Project-independence
 
@@ -78,9 +78,9 @@ Reference files are the detail layer of progressive disclosure. When they grow v
 - Consolidate multiple code examples into fewer that demonstrate more
 - Remove prose that restates what the heading already says
 - Remove redundant code examples already shown in the top-level example block
-- Preserve all distinct technical content — **merge, don't delete**
+- Preserve all distinct technical content: **merge, don't delete**
 - Target 20-40% reduction (reference files are already the detail layer)
-- Do not move content to sub-files — reference is the bottom of the disclosure hierarchy
+- Do not move content to sub-files: reference is the bottom of the disclosure hierarchy
 
 ### Example
 

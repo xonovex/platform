@@ -1,0 +1,30 @@
+{
+  "skill_name": "claude-code-guide",
+  "tier": "moderate",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Can a Claude Code PreToolUse hook block this exact tool operation? Validate the installed surface and its coverage.",
+      "assertions": [
+        "Requires the observed runtime version or an explicit not-installed result and selects the matching versioned capability matrix.",
+        "Checks executing handler type, exact covered operations, blocking and failure behavior, ordering, trust, and limitations before accepting the guarantee."
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Advise onboarding a repository-provided Claude Code hook, plugin, extension, or package. Do not mutate yet.",
+      "assertions": [
+        "Inspects native scopes, existing modules, conflicts, trust, source/version, permissions, secrets, network and data flow before recommending a change.",
+        "Shows an exact native preview, authorization requirement, idempotent apply, verification, disable, rollback, update, and drift plan without applying."
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Provide deterministic, model-evaluator, and specialist-agent patterns for Claude Code.",
+      "assertions": [
+        "Keeps the three executor classes separate and uses only handler types that the platform matrix says execute.",
+        "Bounds model and agent execution with schemas, time/token/cost/depth/authority/cancellation limits and fails visibly on unsupported or invalid behavior."
+      ]
+    }
+  ]
+}

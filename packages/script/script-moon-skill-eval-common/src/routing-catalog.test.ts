@@ -76,11 +76,7 @@ describe("routing catalog", () => {
     expect(missingValidationRoutingOwners(root)).toEqual(["beta-guide"]);
   });
 
-  // Reads the live catalog rather than a fixture, so it passes only once every
-  // skill package owns a validation-split query. `gitlab-guide` does not yet:
-  // its validation queries are all claimed by another guide, so it owns no
-  // routing scenario. Skipped until the skill catalog lands.
-  it.skip("gives every catalog skill a validation routing scenario", () => {
+  it("gives every catalog skill a validation routing scenario", () => {
     const catalogRoot = resolve(import.meta.dirname, "../../../skill");
 
     const missingOwners = missingValidationRoutingOwners(catalogRoot);

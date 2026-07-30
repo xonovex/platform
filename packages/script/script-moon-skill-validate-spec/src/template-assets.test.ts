@@ -47,9 +47,7 @@ afterEach(() => {
   temporaryDirectories.length = 0;
 });
 
-// Materializes the skill-authoring template assets from the catalog, so it
-// passes only once those templates land with the skill catalog.
-describe.skip.each(["guideline-skill-template", "workflow-skill-template"])(
+describe.each(["guideline-skill-template", "workflow-skill-template"])(
   "%s",
   (templateName) => {
     it("provides strict catalog evidence after identity fields are filled", () => {

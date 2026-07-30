@@ -21,8 +21,6 @@ tasks:
       - packages/script/script-moon-skill-validate-routing/dist/src/index.js
       - packages/skill
     deps: [build]
-    # Reads the live skill catalog, where gitlab-guide owns no validation-split
-    # routing scenario, so it reports a finding until the catalog is migrated.
     inputs:
       - /packages/skill/*/*/eval-queries.json
       # The operation check resolves cited names against the reference files,
@@ -31,7 +29,7 @@ tasks:
       - /packages/skill/*/*/references/*.md
     options:
       runFromWorkspaceRoot: true
-      runInCI: false
   ci-check:
+    deps: [routing-check]
     options:
       mergeDeps: append

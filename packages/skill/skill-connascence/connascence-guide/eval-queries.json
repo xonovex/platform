@@ -1,6 +1,6 @@
 [
   {
-    "query": "these two modules feel way too tightly coupled — tell me concretely what kind of coupling it is and how to loosen the worst part",
+    "query": "these two modules feel way too tightly coupled: tell me concretely what kind of coupling it is and how to loosen the worst part",
     "should_trigger": true,
     "split": "train",
     "rationale": "direct: grade the seam (connascence + coupling ladder) and weaken it"
@@ -12,19 +12,19 @@
     "rationale": "Law of Demeter / train wreck = content coupling"
   },
   {
-    "query": "should this function take positional arguments or a named options object — which couples callers less?",
+    "query": "should this function take positional arguments or a named options object: which couples callers less?",
     "should_trigger": true,
     "split": "train",
     "rationale": "connascence of position vs name; rule of degree"
   },
   {
-    "query": "this helper module is just a grab-bag of unrelated init steps that run at startup — is that bad cohesion?",
+    "query": "this helper module is just a grab-bag of unrelated init steps that run at startup: is that bad cohesion?",
     "should_trigger": true,
     "split": "train",
     "rationale": "temporal/coincidental cohesion vs functional"
   },
   {
-    "query": "I pass a boolean flag into this shared method that switches its behavior — code smell?",
+    "query": "I pass a boolean flag into this shared method that switches its behavior: code smell?",
     "should_trigger": true,
     "split": "train",
     "rationale": "control coupling on the ladder"
@@ -42,7 +42,7 @@
     "rationale": "near-miss: ports-and-adapters isolation -> hexagonal-pattern-guide"
   },
   {
-    "query": "which module should own the email-template rendering code — it feels misfiled",
+    "query": "which module should own the email-template rendering code. It feels misfiled",
     "should_trigger": false,
     "split": "train",
     "rationale": "near-miss: where a boundary goes -> orthogonal-pattern-guide"
@@ -54,7 +54,7 @@
     "split": "validation"
   },
   {
-    "query": "Is a chained expression like `order.Customer().Address().City()` a problem in our codebase? Explain concretely what it costs and what to do instead. Also: we have a builder used as `NewQuery().Where(x).OrderBy(y).Build()` — is that the same problem?",
+    "query": "Is a chained expression like `order.Customer().Address().City()` a problem in our codebase? Explain concretely what it costs and what to do instead. Also: we have a builder used as `NewQuery().Where(x).OrderBy(y).Build()`. Is that the same problem?",
     "rationale": "output-eval task also exercises this skill's routing boundary",
     "should_trigger": true,
     "split": "validation"
@@ -66,7 +66,7 @@
     "split": "validation"
   },
   {
-    "query": "our notification code has grown into a mess — channel folders sit beside sendutil and template code is buried three levels deep; reorganize it so the independent choices are obvious",
+    "query": "our notification code has grown into a mess: channel folders sit beside sendutil and template code is buried three levels deep; reorganize it so the independent choices are obvious",
     "rationale": "near miss owned by orthogonal-pattern-guide",
     "should_trigger": false,
     "split": "train"
@@ -78,7 +78,7 @@
     "split": "train"
   },
   {
-    "query": "harden the user-service module — it's full of `any` and swallowed errors, just tell me what to fix",
+    "query": "harden the user-service module: it's full of `any` and swallowed errors, just tell me what to fix",
     "rationale": "near miss owned by code-quality-guide",
     "should_trigger": false,
     "split": "validation"
@@ -90,7 +90,7 @@
     "split": "validation"
   },
   {
-    "query": "a shared helpers package at the repo root has become a dumping ground — notification channels, templates, and delivery policies all put unrelated code there; how should I distribute it?",
+    "query": "a shared helpers package at the repo root has become a dumping ground: notification channels, templates, and delivery policies all put unrelated code there; how should I distribute it?",
     "rationale": "near miss owned by orthogonal-pattern-guide",
     "should_trigger": false,
     "split": "validation"

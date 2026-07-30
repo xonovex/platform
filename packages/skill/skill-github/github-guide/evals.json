@@ -33,6 +33,60 @@
       "assertions": [
         "Identifies that the GitHub Enterprise Server host reads GH_ENTERPRISE_TOKEN (or GITHUB_ENTERPRISE_TOKEN), not GH_TOKEN/GITHUB_TOKEN, and that the token must be supplied via that enterprise variable"
       ]
+    },
+    {
+      "id": 5,
+      "prompt": "Onboard mandatory governance checks and protected production releases across our GitHub organization. We want reusable automation rather than copied YAML, immutable dependencies, least privilege, a merge gate that developers cannot omit, deployment approval, attestations, preview/rollback, and evidence. Explain the native design and the bypass tests.",
+      "assertions": [
+        "Uses a reusable workflow (and composite action only for reusable steps), pins cross-repository workflows/actions to full commit SHAs, and gives the reusable workflow a stable required-check identity",
+        "Enforces the check with an active ruleset or branch protection, explains that matching rulesets layer with the most restrictive duplicate rule, and inventories/tests every bypass actor plus omitted/renamed/spoofed/skipped checks",
+        "Places target-changing release/deployment work behind a protected environment with authorized review, target restrictions, least-privilege short-lived credentials, and exact artifact/revision binding",
+        "Publishes provider-native workflow/check/artifact-attestation/deployment evidence and separates decision, enforcement, target mutation, and verification records",
+        "Uses discover, preview, authorize, apply, re-read/negative-probe verify, rollback, and drift steps without requiring an agent harness or lifecycle module"
+      ]
+    },
+    {
+      "id": 6,
+      "prompt": "Publish decision context to PR #482 so human and agent reviewers can see why we chose a transaction marker over a queue. A retry must reconcile this exact context note instead of adding a duplicate or editing my unrelated latest comment.",
+      "assertions": [
+        "Uses a stable hidden marker carrying context id, version, and digest to find an exact comment authored by the authenticated identity; an identical retry returns that comment without another write",
+        "Does not use `gh pr comment --edit-last`, because the current identity's latest comment can be unrelated",
+        "Blocks same-version content conflicts, publishes a changed decision as an append-only successor, returns the native comment URL or id, and keeps rationale distinct from an approving review or merge gate"
+      ]
+    },
+    {
+      "id": 7,
+      "prompt": "Create a GitHub ticket for the checkout timeout, assign it to @me, add bug and payments labels, put it in milestone v8, link blocking issue #91, and return a durable reference for another session.",
+      "assertions": [
+        "Creates or reconciles one repository issue and manages assignees, labels, milestone, and blocked-by relationship without replacing unrelated metadata.",
+        "Returns the repository identity, issue number and node or URL identity, observed updated revision, state and state reason, and exact applied effects."
+      ]
+    },
+    {
+      "id": 8,
+      "prompt": "Add GitHub issue #482 to organization Project 7 and move the card to In progress. A retry must not create a second project item.",
+      "assertions": [
+        "Discovers the project, project node id, item id, Status field id, and exact single-select option id instead of assuming display names are stable ids.",
+        "Uses `gh project item-add` or the equivalent addProjectV2ItemById mutation, then edits the existing project item field; it does not mutate the issue open/closed state to represent kanban status.",
+        "Lists or queries existing project items before adding, treats an existing item as a retry, and re-reads the item and field value after the write."
+      ]
+    },
+    {
+      "id": 9,
+      "prompt": "The GitHub Project automation may have changed issue #482's Status after my preview. Apply my planned move only if the project item and field still match what I previewed.",
+      "assertions": [
+        "Re-reads the exact project item and Status field immediately before mutation and blocks when their observed values differ from the previewed precondition.",
+        "Reports that Projects field updates do not expose a general compare-and-swap guarantee and never claims stronger concurrency protection than the provider offers."
+      ]
+    },
+    {
+      "id": 10,
+      "prompt": "Publish architecture-decision context version 4 to GitHub issue #91 and PR #482, then make both native comment URLs available to a later agent session.",
+      "assertions": [
+        "Uses the issue-comments API for both the issue and the pull request, with distinct destination identities and the same canonical context id/version/digest.",
+        "Reconciles each destination independently, creates only an absent exact publication, and returns both native comment URLs with observed revisions.",
+        "Treats each published comment as a projection while preserving the authoritative decision reference in the context payload."
+      ]
     }
   ]
 }

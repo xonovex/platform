@@ -98,7 +98,7 @@
   },
   {
     "query": "Choose between Kafka and NATS for event delivery and record an architecture decision with the final outcome.",
-    "rationale": "Decision ownership is outside the planning skill boundary",
+    "rationale": "settling and recording a decision is the workflow Decide operation; planning has no Decide procedure",
     "should_trigger": false,
     "split": "validation"
   },
@@ -118,12 +118,8 @@
     "split": "validation"
   },
   {
-    "query": "Take plans/example-family/roadmap.md and work it end to end without writing the code yourself: hand each subplan to an implementation agent, then check the result before you accept it.",
-    "should_trigger": true,
-    "split": "train"
-  },
-  {
-    "query": "Keep going down this roadmap's ordering until something blocks, one agent per subplan, and commit each item only once you have re-run its suites yourself.",
+    "query": "should a subplan be capped at seven tasks, and what if one task is bigger?",
+    "rationale": "subplan sizing is a planning decision",
     "should_trigger": true,
     "split": "validation"
   }

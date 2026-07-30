@@ -1,43 +1,72 @@
-# create: Create a Prompt from a Completed Task
+# create: Create a Thin User-Invocable Command
 
-Generate a new reusable prompt file (a.k.a. slash command, user-invocable command) from a recently completed task. Extracts essential steps, makes them generic and reusable.
+Create a stable harness-specific argument contract and delegate its reusable procedure
+to one owning skill.
 
 ## Goal
 
-- Convert completed tasks into reusable prompts
-- Extract essential steps and make them generic
-- Follow a minimal, language-agnostic structure
-- Validate against prompt-authoring best practices
+- Keep the user-facing command short and predictable.
+- Put procedure, output format, error handling, and gotchas in one owner skill.
+- Separate the skill's guide name from its distribution plugin.
+- Keep exact installation dependencies distinct from optional description-based selection.
+- Preview safely and never overwrite an existing command by accident.
 
 ## Arguments
 
-- `description` (required) — brief description of what the task accomplished
-- `--name` (optional) — prompt name (auto-generated from description if not provided)
-- `--interactive` (optional) — ask clarifying questions about arguments, validation, output, error handling
+- `description` (required). What the caller wants the command to accomplish.
+- `--name` (optional): kebab-case command name.
+- `--owner-skill` (optional): exact guide that owns the procedure.
+- `--owner-plugin` (optional): distribution plugin for the owner skill when the
+  harness supports declared command dependencies.
+- `--operation` (optional): operation/reference name within the owner skill.
+- `--interactive` (optional): ask about arguments and delegation choices.
+- `--dry-run` (optional): print every proposed artifact without writing.
+- `--force` (optional): replace one exact existing command only after preview.
 
-## Core Workflow
+## Core workflow
 
-1. **Analyze Task** — parse description to identify core goal, required inputs, key steps, tools used, validation, output
-2. **Generate Name** — create kebab-case name from description (e.g. "Remove comments" → `code-comments-remove`)
-3. **Make Generic** — replace project coordinates with neutral equivalents that preserve shape: keep a path's depth and role (`packages/billing-service/src/` → `packages/example/src/`, not `src/`), swap a domain cluster for a neutral one (`users`/`orders`/`payments` → `items`), drop vendor and service names
-4. **Pick Target Format** — determine the target agent harness and its file format (see [harness-formats.md](harness-formats.md) for the per-harness matrix)
-5. **Structure Prompt** — thin shape by default (skeleton in [distill.md](distill.md)); self-contained only when no owning skill exists: metadata block + Goal (3-5 bullets) + Arguments + Core Workflow (4-8 steps) + Implementation Details + Error Handling
-6. **Validate Structure** — required sections present, metadata block parses, generic examples, no project-specific content, file length <150 lines
-7. **Write File** — save to the harness-specific location and extension (see [harness-formats.md](harness-formats.md))
+- [ ] Identify the public arguments, defaults, repeatability, and effect boundary.
+- [ ] Select the target harness and its supported command format.
+- [ ] Resolve one exact owner skill and operation. If none owns the procedure, create
+      or extend that skill before the command.
+- [ ] Keep only frontmatter, Arguments, and Delegation in a harness that can load
+      skills. Put procedures and errors in the owner skill reference.
+- [ ] Describe any optional supporting capability briefly in Delegation and let the
+      owner operation select it from installed skill names and descriptions.
+- [ ] Wire the owner plugin as a hard installation dependency where the harness
+      supports it. Installation still requires explicit runtime loading.
+- [ ] Validate metadata, argument-hint/body parity, delegation, dependency wiring,
+      name, location, and line budget.
+- [ ] Preview all files. Refuse an existing target unless `--force` explicitly names
+      that target, then write and revalidate.
 
-## Sections for a self-contained command (no owning skill)
+For a harness without command-to-skill delegation, keep the smallest supported prompt
+surface and distribute or invoke the skill directly when possible.
 
-- Metadata block: at minimum a 1-sentence `description`; add other fields (tools, permissions, argument hint, activation scope) appropriate for the target harness — see [harness-formats.md](harness-formats.md)
-- Goal (3-5 bullets), Arguments (required/optional, defaults), Core Workflow (4-8 steps), Implementation Details, Error Handling
-- Let the argument contract carry usage instead of example blocks: enumerate allowed values inline (`--tone formal|casual|technical`), state defaults, and mark required arguments as required in the `argument-hint`
+## Output
 
-## Error Handling
+Report:
 
-- Description too vague → ask for more details
-- Name already exists → suggest alternatives; never overwrite
-- Invalid name → must be kebab-case, alphanumeric
-- Missing required sections → validate before writing
+- command path and harness;
+- public argument contract;
+- owner guide, owner plugin, and operation;
+- optional supporting-capability descriptions;
+- manifest changes;
+- validation result;
+- whether the run previewed, created, or replaced a file.
 
-## Safety
+## Error handling
 
-Preview before writing, check for existing files, validate the metadata block parses in the target format, ensure no sensitive/project-specific data.
+- Vague description or ambiguous arguments → ask before defining the public contract.
+- Existing name without `--force` → stop and show the collision.
+- Missing owner skill → route to skill authoring rather than embedding a fat workflow.
+- Owner skill and plugin mismatch → stop before changing a manifest.
+- Unsupported command surface → publish/invoke the skill directly or use the nearest
+  harness-native prompt mechanism.
+
+## Gotchas
+
+- A plugin name is not a guide name; keep both explicit.
+- One owner does not prevent several runtime-selected supporting skills.
+- A command dependency installs a skill but does not load it into context.
+- `--dry-run` must include the command, skill reference, and manifest changes.

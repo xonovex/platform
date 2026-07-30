@@ -1,6 +1,6 @@
 # worktree-create: Create Feature Worktree
 
-Create a sibling worktree with a feature branch for isolated development, deriving names from the current worktree.
+Preview or apply creation of a sibling worktree with a feature branch for isolated development. Default to `preview`; only explicit `apply` may mutate repository state.
 
 ## Naming convention
 
@@ -8,12 +8,18 @@ Create a sibling worktree with a feature branch for isolated development, derivi
 - Branch: `<worktree>/feature/<feature-name>`
 - Use a type-descriptive prefix conveying the kind of change (`feature/`, `fix/`, `docs/`, `hotfix/`), not a single generic `feature` segment
 
-| In worktree | Feature        | Directory                   | Branch                      |
-| ----------- | -------------- | --------------------------- | --------------------------- |
-| `services`  | `auth-fix`     | `services-feature-auth-fix` | `services/feature/auth-fix` |
-| `api`       | `new-endpoint` | `api-feature-new-endpoint`  | `api/feature/new-endpoint`  |
+| In worktree | Feature    | Directory                   | Branch                      |
+| ----------- | ---------- | --------------------------- | --------------------------- |
+| `services`  | `auth-fix` | `services-feature-auth-fix` | `services/feature/auth-fix` |
 
-## Steps
+## Procedure
+
+1. Resolve the exact source revision, source branch, destination path, and new branch name.
+2. Reject collisions, a missing source revision, or a source branch already checked out where that makes the operation unsafe.
+3. In `preview`, return the exact commands and resulting branch, worktree, and config effects without running them.
+4. In explicit `apply`, run the previewed commands and verify the worktree, checked-out revision, branch, and `mergeBackTo` value.
+
+## Apply Commands
 
 ```bash
 # worktree name = basename of pwd; source = specified or `git branch --show-current`
@@ -21,11 +27,10 @@ git worktree add ../<worktree>-feature-<name> -b <worktree>/feature/<name> <sour
 git -C ../<worktree>-feature-<name> config branch.<branch>.mergeBackTo <source-branch>
 ```
 
-Optionally associate a plan via `git config branch.<branch>.plan <path>`.
-
 ## Gotchas
 
-- The `<worktree>-feature-<name>` dir pattern is what merge/abandon/cleanup detect — non-conforming names break the workflow
-- `branch.<branch>.mergeBackTo` and `branch.<branch>.plan` are custom keys this workflow sets/reads; git ignores them, no built-in behavior
-- `mergeBackTo` is the only record of the source branch — without it `worktree-merge` can't find where to merge back
-- A branch can't be checked out in two worktrees at once — use a different source branch or move the existing worktree
+- The `<worktree>-feature-<name>` dir pattern is what merge/abandon/cleanup detect: non-conforming names break the workflow
+- `branch.<branch>.mergeBackTo` is a custom key this workflow sets and reads; Git ignores it and provides no built-in behavior
+- `mergeBackTo` is the only record of the source branch, without it `worktree-merge` can't find where to merge back
+- A branch can't be checked out in two worktrees at once: use a different source branch or move the existing worktree
+- Creating the worktree does not start feature implementation or publish the branch

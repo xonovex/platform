@@ -72,7 +72,7 @@
     "split": "train"
   },
   {
-    "query": "my entities are just getters and setters with all the logic in services — is that proper domain modelling?",
+    "query": "my entities are just getters and setters with all the logic in services: is that proper domain modelling?",
     "rationale": "near miss owned by ddd-guide",
     "should_trigger": false,
     "split": "train"
@@ -90,7 +90,7 @@
     "split": "validation"
   },
   {
-    "query": "Tighten this Python module until pyright strict passes without Any, ignored errors, or casts that hide an invalid state.",
+    "query": "Tighten src/ingest/config.py until pyright strict passes without Any, ignored errors, or casts that hide an invalid state. It loads JSON into a dict and reads roughly fifteen fields off it, each typed Any.",
     "rationale": "near miss owned by python-guide",
     "should_trigger": false,
     "split": "validation"

@@ -24,9 +24,7 @@ describe("skill validator entrypoints", () => {
     expect(validateSkill(["--unknown"])).toBe(2);
   });
 
-  // Validates a live catalog skill under the strict spec, so it passes only
-  // once that skill is migrated. Skipped until the skill catalog lands.
-  it.skip("validates a complete repository skill", () => {
+  it("validates a complete repository skill", () => {
     const skill = resolve(
       import.meta.dirname,
       "../../../skill/skill-code-quality",
@@ -38,9 +36,7 @@ describe("skill validator entrypoints", () => {
     expect(result).toBe(0);
   });
 
-  // Copies a live catalog skill into a throwaway workspace, so it inherits
-  // that skill's current shape. Skipped until the skill catalog lands.
-  it.skip("keeps drift findings advisory in warn mode and blocking in enforce mode", () => {
+  it("keeps drift findings advisory in warn mode and blocking in enforce mode", () => {
     // A copied skill in a throwaway workspace keeps the assertion independent of
     // whatever the real catalog currently measures.
     const root = mkdtempSync(join(tmpdir(), "skill-drift-"));
@@ -73,9 +69,7 @@ describe("skill validator entrypoints", () => {
     }
   });
 
-  // Reads the live Claude Code adapter skill. Skipped until the skill catalog
-  // lands.
-  it.skip("allows the catalog's explicit Claude Code adapter name", () => {
+  it("allows the catalog's explicit Claude Code adapter name", () => {
     const skill = resolve(
       import.meta.dirname,
       "../../../skill/skill-claude-code",

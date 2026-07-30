@@ -3,7 +3,7 @@
     "query": "help me run a three amigos session and write Given-When-Then scenarios for the checkout story before we code",
     "should_trigger": true,
     "split": "train",
-    "rationale": "discovery + Gherkin formulation before coding — core bdd"
+    "rationale": "discovery + Gherkin formulation before coding: core bdd"
   },
   {
     "query": "how do I structure a feature file with Background and a Scenario Outline for the coupon rules?",
@@ -12,7 +12,7 @@
     "rationale": "Gherkin keyword structure owned by bdd"
   },
   {
-    "query": "we want to do example mapping on this story — what do the yellow, blue, green and red cards mean?",
+    "query": "we want to do example mapping on this story. What do the yellow, blue, green and red cards mean?",
     "should_trigger": true,
     "split": "train",
     "rationale": "example mapping card colours owned by bdd discovery"
@@ -33,7 +33,7 @@
     "query": "how many scenarios per business rule should we keep, versus pushing cases into unit tests?",
     "should_trigger": true,
     "split": "validation",
-    "rationale": "2-5 scenarios per rule, push exhaustive cases down — bdd boundary guidance"
+    "rationale": "2-5 scenarios per rule, push exhaustive cases down: bdd boundary guidance"
   },
   {
     "query": "what's the red-green-refactor cycle and how do I write a failing test first for this pricing function?",
@@ -90,15 +90,21 @@
     "split": "validation"
   },
   {
-    "query": "is this user story good? \"As a rider I want to pay for my trip\" — does it pass INVEST?",
+    "query": "is this user story good? \"As a rider I want to pay for my trip\": does it pass INVEST?",
     "rationale": "near miss owned by user-stories-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "I want clean code that works — let the tests grow the API instead of designing it up front",
+    "query": "I want clean code that works: let the tests grow the API instead of designing it up front",
     "rationale": "validation near miss owned by tdd-guide",
     "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Write Given-When-Then scenarios for the refund policy with the product owner.",
+    "rationale": "Given-When-Then scenarios written with the business are this skill's core",
+    "should_trigger": true,
     "split": "validation"
   }
 ]

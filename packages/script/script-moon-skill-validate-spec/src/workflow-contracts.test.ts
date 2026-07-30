@@ -118,11 +118,9 @@ const effectDefaultFromCommand = (command: string): string | undefined => {
   return /`--effect`[^\n]*Defaults to `([a-z]+)`/u.exec(source)?.at(1);
 };
 
-// Reads the repository's own workflow command and skill files rather than
-// fixtures, so it passes only once the skill catalog carries them. Skipped
-// until those packages land.
-describe.skip("workflow composition contracts", () => {
-  it("keeps the command flag surface at the safety core", () => {
+describe("workflow composition contracts", () => {
+  // Reads the workflow command files, which live in the command packages.
+  it.skip("keeps the command flag surface at the safety core", () => {
     // Every occurrence, not just the argument-hint ones: a backtick guard here
     // would leave the Arguments section and the delegation prose unchecked, so a
     // flag documented in only one of them would pass.
@@ -136,7 +134,8 @@ describe.skip("workflow composition contracts", () => {
     expect([...used].toSorted()).toEqual([...SAFETY_CORE_FLAGS]);
   });
 
-  it("keeps core command subjects revision-addressable", () => {
+  // Reads the workflow command files, which live in the command packages.
+  it.skip("keeps core command subjects revision-addressable", () => {
     for (const command of coreWorkflowCommands) {
       const source = readRepositoryFile(
         `packages/command/command-workflow/commands/${command}.md`,
@@ -174,7 +173,8 @@ describe.skip("workflow composition contracts", () => {
     expect(readme).not.toMatch(/Context has stable identity/u);
   });
 
-  it("exposes revision and retry protection for mutating provider operations", () => {
+  // Reads the workflow command files, which live in the command packages.
+  it.skip("exposes revision and retry protection for mutating provider operations", () => {
     for (const command of retryProtectedCommands) {
       const source = readRepositoryFile(
         `packages/command/command-workflow/commands/${command}.md`,
@@ -264,7 +264,8 @@ describe.skip("workflow composition contracts", () => {
     }
   });
 
-  it("agrees on the default effect mode across skill and commands", () => {
+  // Reads the workflow command files, which live in the command packages.
+  it.skip("agrees on the default effect mode across skill and commands", () => {
     const effects = readRepositoryFile(
       "packages/skill/skill-workflow/workflow-guide/references/effects.md",
     );
@@ -293,7 +294,8 @@ describe.skip("workflow composition contracts", () => {
     }
   });
 
-  it("lets every operation read the subject it is given", () => {
+  // Reads the workflow command files, which live in the command packages.
+  it.skip("lets every operation read the subject it is given", () => {
     // A provider-native subject or --context reference is read through a
     // provider CLI, so withholding Bash would block the operation outright.
     for (const command of [...coreWorkflowCommands, ...workspaceCommands]) {

@@ -27,15 +27,18 @@
   - https://docs.github.com/en/github-cli/github-cli/quickstart
   - https://github.com/cli/cli/blob/trunk/docs/install_linux.md
 - **Last reviewed:** 2026-07-24
-- **Used for:** install, `gh auth login` / `status` / `setup-git`
+- **Used for:** install (first-time-setup.md), `gh auth login` / `status` / `setup-git`
   flow, the GH_TOKEN / GH_ENTERPRISE_TOKEN / GH_HOST environment split (auth.md),
   issue create/edit/close/reopen, metadata and relationship flags (issues.md);
   project scope, discovery, item add/list/edit/archive/delete and typed field flags
   (projects.md); `gh pr create` flags + `gh pr edit` replace-on-body behavior
-  (create.md); `gh pr comment` body and last-comment behavior; and the `gh pr review` inline-comment limitation
+  (create.md); `gh pr comment` body and last-comment behavior
+  (context-comments.md); and the `gh pr review` inline-comment limitation
   (review-post.md).
-- **References:** references/auth.md, references/create.md, references/issues.md,
-  references/projects.md, references/review-post.md
+- **References:** references/auth.md, references/context-comments.md,
+  references/create.md, references/first-time-setup.md, references/issues.md,
+  references/projects.md, references/provider-conformance.md,
+  references/review-post.md
 
 ## GitHub REST API
 
@@ -53,12 +56,14 @@
 - **Used for:** repository issue identity, pagination, metadata, create/update/state,
   sub-issue relationships, and comment endpoints (issues.md); `POST /pulls` (no-push, head/base semantics) in
   create.md; list and create issue comments on issues and pull requests plus unsafe
-  conditional-request limitations; the
+  conditional-request limitations in context-comments.md and provider-conformance.md; the
   `.../pulls/{n}/reviews` object with `comments[]`
   path/line/side/start_line/start_side/commit_id and the deprecated `position` field
   in review-post.md; the 404-on-private and `X-Accepted-GitHub-Permissions` header
   behavior in auth.md.
-- **References:** references/auth.md, references/create.md, references/issues.md, references/review-post.md
+- **References:** references/auth.md, references/context-comments.md,
+  references/create.md, references/issues.md, references/provider-conformance.md,
+  references/review-post.md
 
 ## GitHub GraphQL API
 
@@ -74,7 +79,8 @@
   mutations (projects.md); `resolveReviewThread` / `unresolveReviewThread` /
   `addPullRequestReviewThreadReply` mutations and the `pullRequest.reviewThreads`
   connection in review-resolve.md.
-- **References:** references/projects.md, references/review-resolve.md
+- **References:** references/projects.md, references/provider-conformance.md,
+  references/review-resolve.md
 
 ## GitHub Issues and Projects product guidance
 
@@ -87,7 +93,8 @@
 - **Used for:** issue-versus-project responsibility; project Status, typed fields,
   item lifecycle, built-in automatic add/status/archive/close effects, and
   re-verification requirements.
-- **References:** references/issues.md, references/projects.md
+- **References:** references/issues.md, references/projects.md,
+  references/provider-conformance.md
 
 ## Tokens, permissions, and Actions
 
@@ -123,7 +130,7 @@
   - https://docs.github.com/en/actions/how-tos/deploy/configure-and-manage-deployments/manage-environments
   - https://docs.github.com/en/actions/how-tos/secure-your-work/use-artifact-attestations/use-artifact-attestations
 - **Last reviewed:** 2026-07-16
-- **Used for:** ``
+- **Used for:** `references/automation-and-enforcement.md`
 - **Aspects extracted:** `workflow_call` location/input/secret behavior; same-commit and full-SHA references; nested permission attenuation; composite-action scope; full-SHA immutable action pins; least-privilege tokens and untrusted-input handling; aggregated ruleset layering and bypass actors; exact required checks; environment reviewers, self-review prevention, target restrictions and secret release; OIDC/attestation permissions and native evidence. Transaction, failure-policy, exact-revision, and governance-only adoption rules are Xonovex adapter constraints.
 
 ## gh CLI limitations (tracking issues)
@@ -141,9 +148,10 @@
 ## Guide-level synthesis
 
 - **Provenance:** Repository-original integration of the source blocks above; these references combine multiple inputs or maintained conventions rather than one exclusive upstream
-- **References:** references/auth.md, references/create.md, references/issues.md,
+- **References:** references/auth.md, references/context-comments.md,
+  references/create.md, references/first-time-setup.md, references/issues.md,
   references/onboarding.md, references/projects.md,
-  references/review-post.md,
+  references/provider-conformance.md, references/review-post.md,
   references/review-resolve.md
 - **Last reviewed:** 2026-07-16
 

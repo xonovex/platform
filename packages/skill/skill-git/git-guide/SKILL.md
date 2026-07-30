@@ -12,6 +12,7 @@ description: "Use when running git operations or resolving repo-state issues. Tr
 - **Isolated Development** - Use worktrees for feature branches, see [references/worktree-create.md](references/worktree-create.md)
 - **Validate Before Merge** - Run typecheck/lint/build/test, see [references/worktree-validate.md](references/worktree-validate.md)
 - **Publish and Rebase** - Push a branch upstream and rebase onto the base before opening a PR / MR, see [references/push.md](references/push.md)
+- **Explicit Effects** - Worktree create, merge, and cleanup default to preview and mutate only for an explicit apply
 
 ## Commit Operations
 
@@ -28,22 +29,21 @@ description: "Use when running git operations or resolving repo-state issues. Tr
 
 ## Worktree Operations
 
-- **Create** - `<worktree>-feature-<name>` directory with branch, see [references/worktree-create.md](references/worktree-create.md)
+- **Create** - Preview or apply creation of a `<worktree>-feature-<name>` directory and branch, see [references/worktree-create.md](references/worktree-create.md)
 - **Validate** - Pre-merge validation checkpoint, see [references/worktree-validate.md](references/worktree-validate.md)
-- **Merge** - Merge feature back to source branch, see [references/worktree-merge.md](references/worktree-merge.md)
-- **Cleanup** - Remove stale and merged worktrees, see [references/worktree-cleanup.md](references/worktree-cleanup.md)
-- **Abandon** - Document and remove failed feature, see [references/worktree-abandon.md](references/worktree-abandon.md)
+- **Merge** - Preview or apply integration into the source branch without cleanup, see [references/worktree-merge.md](references/worktree-merge.md)
+- **Cleanup** - Preview or apply removal of exact stale or merged targets, see [references/worktree-cleanup.md](references/worktree-cleanup.md)
+- **Abandon** - Inspect and document a stopped feature without mutation, see [references/worktree-abandon.md](references/worktree-abandon.md)
 
 ## Gotchas
 
-- `git pull` is `fetch` + `merge` — on a shared branch this creates spurious merge commits; prefer `pull --rebase` or `fetch` then explicit merge
-- Detached HEAD: committing in this state silently loses commits when you `checkout` away — note the SHA or branch immediately
-- `git rebase` rewrites history; force-pushing to a shared branch overwrites teammates' work — never force-push to `main`/`master`
-- Hooks in `.git/hooks/` are not version-controlled — share via `core.hooksPath` pointing at a tracked directory
-- `.gitignore` only ignores untracked files; already-tracked files need `git rm --cached` to stop tracking
+- `git pull` is `fetch` + `merge`, on a shared branch this creates spurious merge commits; prefer `pull --rebase` or `fetch` then explicit merge
+- Detached HEAD: committing in this state silently loses commits when you `checkout` away. Note the SHA or branch immediately
+- Hooks in `.git/hooks/` are not version-controlled: share via `core.hooksPath` pointing at a tracked directory
 - A feature `worktree-merge` integrates a branch into its **parent** branch; landing on the mainline goes through push + PR + CI review, never a direct local merge to `main`
-- Long-lived feature branches drift and conflict — keep them short-lived; integrate work spanning sessions incrementally behind feature flags / branch-by-abstraction
-- Deleting a worktree directory by hand leaves a stale admin entry — run `git worktree prune`; and each worktree needs its own dependency install (`node_modules` is not shared across worktrees)
+- Merge, abandon, and cleanup are separate operations, none may silently perform another
+- Long-lived feature branches drift and conflict: keep them short-lived; integrate work spanning sessions incrementally behind feature flags / branch-by-abstraction
+- Deleting a worktree directory by hand leaves a stale admin entry: run `git worktree prune`; and each worktree needs its own dependency install (`node_modules` is not shared across worktrees)
 
 ## Progressive Disclosure
 

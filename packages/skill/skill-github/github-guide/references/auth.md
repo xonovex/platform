@@ -1,81 +1,57 @@
-# GitHub auth — token families and per-operation least-privilege scopes
+# GitHub Authentication and Token Permissions
 
-`gh` and `gh api` authenticate with a token. There are two families with different scope models; pick the narrowest scope for the operation, scope it per endpoint, and store it in the OS keyring. Onboarding (the interactive `gh auth login` flow) is in [onboarding.md](onboarding.md); this file is the token + scope + storage reference.
+Load **credential-management-guide** for provider-neutral storage, CI boundaries, rotation, and exposure response. This reference owns GitHub token families, exact permissions, hosts, variables, and verification.
 
-## Two token families
+## Token families
 
-### Classic PAT — coarse, all-or-nothing scopes
+Classic PATs use coarse scopes. `repo` covers private-repository push, pull-request, review, comment, and thread-resolution work; `public_repo` is the public-only alternative. Classic PATs remain necessary for some public non-member, outside-collaborator, and multi-organization cases.
 
-- The single **`repo`** scope covers the whole lifecycle: push, open a PR, post/submit a review, and resolve a thread. Use **`public_repo`** for public-only repos.
-- `gh auth login --with-token` (and the browser flow) wants a classic PAT with at least **`repo`, `read:org`, `gist`**. SSH key upload also needs **`admin:public_key`** (the browser flow requests it; a hand-rolled `--with-token` PAT will not have it).
-- Classic PATs work everywhere fine-grained PATs do not: public repos where you are a non-member, outside-collaborator access, and tokens that must span multiple orgs.
+Prefer a fine-grained PAT where its repository and organization constraints fit:
 
-### Fine-grained PAT — per-repo, per-permission (preferred where it fits)
+| Operation                            | Fine-grained permission                         |
+| ------------------------------------ | ----------------------------------------------- |
+| Push commits or update refs          | Contents: write                                 |
+| Read repository issues               | Issues: read or Pull requests: read             |
+| Create or update an issue            | Issues: write                                   |
+| Open a pull request                  | Pull requests: write and Contents: read         |
+| Submit a review                      | Pull requests: write                            |
+| Post an issue comment                | Issues: write                                   |
+| Post a pull-request timeline comment | Issues: write or Pull requests: write           |
+| Resolve a review thread              | Pull requests: write and Contents: read & write |
 
-Grant only the permissions the operation needs. Per the GitHub fine-grained-PAT permissions reference:
+Metadata: read is automatically required. Organization approval may leave a fine-grained token pending and effectively read-public-only.
 
-| Operation                                                                           | Required fine-grained permission                        |
-| ----------------------------------------------------------------------------------- | ------------------------------------------------------- |
-| Push commits / create / update refs (`POST/PATCH .../git/refs`, `PUT .../contents`) | **Contents: write**                                     |
-| Open a PR (`POST .../pulls`)                                                        | **Pull requests: write** + Contents: read               |
-| Post / submit a review (`POST .../pulls/{n}/reviews`)                               | **Pull requests: write**                                |
-| Top-level PR conversation comment (a PR is an issue)                                | **Issues: write**                                       |
-| Resolve a thread (`resolveReviewThread`, GraphQL)                                   | **Pull requests: write** AND **Contents: read & write** |
+`gh project` documents the classic `project` scope as its minimum. For fine-grained
+PATs or GitHub Apps, grant the target user/organization Projects permission required
+by the selected query or mutation and repository read access for linked content.
+The built-in repository `GITHUB_TOKEN` is not a general organization-Projects
+credential; prefer a reviewed App installation token or narrowly scoped PAT for that
+cross-resource operation.
 
-- **Contents: read is NOT enough to push** — pushing and ref creation are Contents: write operations. Contents: read suffices only to open a PR and post a review.
-- `Pull requests: write` subsumes read; `Metadata: read` is auto-required on every fine-grained token.
-- `resolveReviewThread` needs the non-obvious **Contents: read & write** on top of Pull requests: write, or it fails "Resource not accessible by integration" (community #44650). Classic `repo` has no such gap.
-- **Fine-grained gaps (2025–2026):** cannot contribute to public repos where you are a non-member, cannot be used by outside collaborators, cannot span multiple orgs — use a classic PAT for those. Org-approval-required tokens sit "pending" (read public only, 403/404 on writes) until an admin approves.
-
-### Verify the exact permission an endpoint wants
-
-Don't guess — read the response header:
-
-```bash
-gh api -i repos/{owner}/{repo}/pulls/123/reviews 2>&1 | grep -i x-accepted-github-permissions
-# X-Accepted-GitHub-Permissions: pull_requests=write,contents=read
-```
-
-Comma = AND, semicolon = alternatives. On a private repo, insufficient permission returns **404 (not 403)** — GitHub hides existence; this header still tells you what was required.
-
-## Environment variables (host matters)
-
-- **github.com and `*.ghe.com`:** `GH_TOKEN` or `GITHUB_TOKEN` (GH_TOKEN wins).
-- **GitHub Enterprise Server (self-managed):** `GH_ENTERPRISE_TOKEN` or `GITHUB_ENTERPRISE_TOKEN`. Mixing these with GH_TOKEN is the classic "works on github.com, 401 on GHES".
-- **`GH_HOST`** sets the default host; per-command `--hostname ghe.example.com` overrides it.
-
-A token in any of these env vars takes precedence over the keyring and disables interactive `gh auth login` for that host.
-
-## Storage (keyring-first)
-
-- `gh` stores the token in the **OS keyring** by default, falling back to plaintext config only when no keyring is present. Never pass `--insecure-storage` on a shared machine.
-- Resolve secrets at call time from a secret manager rather than inlining them:
+## Verify endpoint requirements
 
 ```bash
-export GH_TOKEN="$(op read 'op://<vault>/github/token')"          # 1Password
-export GH_TOKEN="$(vault kv get -mount=secret -field=token github)" # HashiCorp Vault
+gh api -i repos/{owner}/{repo}/pulls/123/reviews 2>&1 \
+  | grep -i x-accepted-github-permissions
 ```
 
-- Never commit a token (not even to a private repo), never pass it as a literal CLI arg or `echo` it (shell history / `ps`), and use a distinct token per integration so a leak is revoked in isolation. On suspected leak, **revoke/reissue first**, then update every store.
+In `X-Accepted-GitHub-Permissions`, commas mean all listed permissions and semicolons indicate alternatives. Insufficient access to a private repository may return `404` instead of `403`.
 
-## Self-managed / Enterprise targeting
+## Hosts, variables, and storage
+
+- github.com and `*.ghe.com`: `GH_TOKEN` or `GITHUB_TOKEN`, with `GH_TOKEN` taking precedence.
+- GitHub Enterprise Server: `GH_ENTERPRISE_TOKEN` or `GITHUB_ENTERPRISE_TOKEN`.
+- `GH_HOST` or `--hostname` selects the target; a working github.com token proves nothing about GHES.
+
+`gh auth login` stores credentials in the OS keyring by default and can fall back to plaintext configuration when no keyring exists. Avoid `--insecure-storage` on shared machines. **credential-management-guide** owns external secret-store retrieval and lifecycle behavior.
+
+Verify the intended host and identity before a write:
 
 ```bash
-gh auth login --hostname ghe.example.com      # interactive
-export GH_HOST=ghe.example.com
-export GH_ENTERPRISE_TOKEN="$(op read 'op://<vault>/ghes/token')"   # NOT GH_TOKEN for GHES
-gh api user --hostname ghe.example.com -q '.login'   # verify against the enterprise host
+gh auth status
+gh api user --hostname <host> -q '.login'
 ```
 
-## CI
+## GitHub Actions
 
-- Store the token as a **masked secret** and expose it as `GH_TOKEN` (or `GH_ENTERPRISE_TOKEN` for GHES); never commit it.
-- **GitHub Actions:** the built-in `GITHUB_TOKEN` needs an explicit `permissions:` block — e.g. `pull-requests: write` to post reviews, `contents: write` to push. Events it creates do NOT trigger downstream workflows; to chain CI use a GitHub App installation token or a PAT secret.
-
-```yaml
-permissions:
-  contents: write # push commits / refs
-  pull-requests: write # open PR, post review
-env:
-  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-```
+The built-in `GITHUB_TOKEN` needs an explicit `permissions:` block. Use `pull-requests: write` for pull-request mutations and `contents: write` for pushes. Events produced with this token generally do not trigger a new workflow run; use a reviewed GitHub App installation token or PAT only when chaining is required.

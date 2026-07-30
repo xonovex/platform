@@ -30,9 +30,7 @@ tasks:
       - /packages/skill/*/*/references/*.md
     options:
       runFromWorkspaceRoot: true
-      # Enforce mode reports 36 findings against the current skill catalog and
-      # command prose, so it gates content that is not yet migrated.
-      runInCI: false
   ci-check:
+    deps: [drift-check]
     options:
       mergeDeps: append

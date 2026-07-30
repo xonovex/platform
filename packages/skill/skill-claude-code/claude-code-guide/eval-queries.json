@@ -1,0 +1,104 @@
+[
+  {
+    "query": "map a mandatory protected-path control to Claude Code and tell me whether it can actually block",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "Claude Code capability and guarantee mapping"
+  },
+  {
+    "query": "preview onboarding a project-provided Claude Code executable module without applying it",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "advisory transactional onboarding"
+  },
+  {
+    "query": "what version and trust probes should I run before relying on this Claude Code hook or extension?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "versioned matrix and executable trust"
+  },
+  {
+    "query": "Can a Claude Code PreToolUse hook block this exact tool operation? Validate the installed surface and its coverage.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Advise onboarding a repository-provided Claude Code hook, plugin, extension, or package. Do not mutate yet.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Provide deterministic, model-evaluator, and specialist-agent patterns for Claude Code.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Configure Claude Code permissions so repository reads and the test command are allowed, destructive shell commands require confirmation, and network tools stay blocked.",
+    "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
+    "split": "validation"
+  },
+  {
+    "query": "Write onboarding steps for Claude Code that explain where project instructions live, how hooks are installed, and how a developer verifies the harness is active.",
+    "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
+    "split": "validation"
+  },
+  {
+    "query": "map a mandatory protected-path control to Codex and tell me whether it can actually block",
+    "rationale": "near miss owned by codex-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "map a mandatory protected-path control to GitHub Copilot and tell me whether it can actually block",
+    "rationale": "near miss owned by copilot-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "map a mandatory protected-path control to Kiro and tell me whether it can actually block",
+    "rationale": "near miss owned by kiro-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "map a mandatory protected-path control to OpenCode and tell me whether it can actually block",
+    "rationale": "near miss owned by opencode-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "map a mandatory protected-path control to Pi and tell me whether it can actually block",
+    "rationale": "near miss owned by pi-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Provide deterministic, model-evaluator, and specialist-agent patterns for Codex.",
+    "rationale": "near miss owned by codex-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Provide deterministic, model-evaluator, and specialist-agent patterns for GitHub Copilot.",
+    "rationale": "near miss owned by copilot-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Provide deterministic, model-evaluator, and specialist-agent patterns for Kiro.",
+    "rationale": "near miss owned by kiro-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Provide deterministic, model-evaluator, and specialist-agent patterns for Pi.",
+    "rationale": "validation near miss owned by pi-guide",
+    "should_trigger": false,
+    "split": "validation"
+  }
+]

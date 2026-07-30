@@ -1,0 +1,30 @@
+{
+  "skill_name": "{topic}-guide",
+  "tier": "moderate",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "{Realistic request to perform the workflow's primary operation}",
+      "assertions": [
+        "{Observable condition proving the requested operation completed}",
+        "{Observable condition proving the required output shape was followed}"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "{Realistic request covering an error or safety boundary in the workflow}",
+      "assertions": [
+        "{Observable condition proving the boundary is handled safely}",
+        "{Observable condition proving the failure is reported clearly}"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "{Realistic multi-step request that embeds one of the workflow's operations}",
+      "assertions": [
+        "{Observable condition proving the correct operation is selected}",
+        "{Observable condition proving the result is validated before completion}"
+      ]
+    }
+  ]
+}

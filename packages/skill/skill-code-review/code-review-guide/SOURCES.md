@@ -4,9 +4,9 @@
 
 - **URL:** https://gitlab.com/conventionalcomments/conventionalcomments.gitlab.io
 - **Last reviewed:** 2026-07-22
-- **Used for:** `references/conventional-comments.md` — label list, the `label (decoration): subject` format, the blocking / non-blocking / if-minor decorations, and the machine-parseable shape
+- **Used for:** `references/conventional-comments.md`: label list, the `label (decoration): subject` format, the blocking / non-blocking / if-minor decorations, and the machine-parseable shape
 
-## Conventional comments — practitioner guides
+## Conventional comments: practitioner guides
 
 - **URL:** https://graphite.com/guides/conventional-comments
 - **Last reviewed:** 2026-06-24
@@ -18,7 +18,7 @@
 - **Provenance:** Repository-original review conventions distilled from maintained team practice
 - **Last reviewed:** 2026-07-24
 - **Used for:** the summary-plus-inline structure, cross-linking instead of ordinal references, verify-before-assert (read the branch, confirm component / API signatures via the relevant design-system or library skill before suggesting a fix), and the house writing style (no em-dash / semicolon / ellipsis in review prose) mined from a real Bitbucket PR review
-- **Also used for:** the platform-independent findings pipeline — `references/findings-schema.md` (canonical inline findings shape, new-file hunk anchoring), `references/review-analyze.md` (diff → findings, effort dial, prior-findings comparison), `references/review-refine.md` (per-finding operations, label discipline) — distilled from maintained review commands; host delivery is a separate Publish or Execute operation
+- **Also used for:** the platform-independent findings pipeline: `references/findings-schema.md` (canonical inline findings shape, new-file hunk anchoring), `references/review-analyze.md` (diff → findings, effort dial, prior-findings comparison), `references/review-refine.md` (per-finding operations, label discipline). Distilled from maintained review commands; host delivery is a separate Publish or Execute operation
 
 ## Guide-level synthesis
 

@@ -5,6 +5,5 @@
   "author": {
     "name": "Xonovex"
   },
-  "skills": "./hexagonal-pattern-guide",
-  "dependencies": ["xonovex-skill-connascence"]
+  "skills": "./hexagonal-pattern-guide"
 }

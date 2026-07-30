@@ -28,7 +28,7 @@ gh pr create \
 
 ## Issue linking and close semantics
 
-Closing keywords live in the PR **body** only — there is no `gh` flag:
+Closing keywords live in the PR **body** only. There is no `gh` flag:
 
 - Keywords: `close`/`closes`/`closed`, `fix`/`fixes`/`fixed`, `resolve`/`resolves`/`resolved`.
 - `Closes #123` same-repo; `Closes owner/repo#100` cross-repo.
@@ -36,18 +36,18 @@ Closing keywords live in the PR **body** only — there is no `gh` flag:
 
 ## Additive-body semantics (the edit trap)
 
-`gh pr edit --body` / `--body-file` **replaces** the entire description — it never appends. To preserve existing text, fetch first and recombine:
+`gh pr edit --body` / `--body-file` **replaces** the entire description: it never appends. To preserve existing text, fetch first and recombine:
 
 ```bash
 body=$(gh pr view 123 --json body -q .body)
-gh pr edit 123 --body "$body"$'\n\n## Update\n…'
+gh pr edit 123 --body "$body"$'\n\n## Update\n...'
 ```
 
 Metadata, by contrast, IS incremental via paired flags: `--add-reviewer`/`--remove-reviewer`, `--add-label`/`--remove-label`, `--add-assignee`, `--add-project`.
 
 ## Idempotency
 
-`gh pr create` is NOT create-or-update — it aborts non-zero with "a pull request already exists for the 'X' branch" if an open PR exists. Guard it:
+`gh pr create` is NOT create-or-update. It aborts non-zero with "a pull request already exists for the 'X' branch" if an open PR exists. Guard it:
 
 ```bash
 gh pr create --fill --base main || gh pr view --json url -q .url
@@ -60,11 +60,11 @@ Only `--web` proceeds anyway; `--dry-run` prints details but "may still push git
 ```bash
 gh api --method POST repos/{owner}/{repo}/pulls \
   -f title="feat: x" -f head="feat/x" -f base="main" \
-  -f body="…" -F draft=false
+  -f body="..." -F draft=false
 ```
 
 - Requires `head` + `base` and (`title` OR an issue); optional `body`, `draft`, `head_repo`, `maintainer_can_modify`; cross-fork head is `username:branch`.
-- REST does **not** push your branch — the ref must already exist or you get `422 "Head sha can't be blank"`.
+- REST does **not** push your branch. The ref must already exist or you get `422 "Head sha can't be blank"`.
 - REST cannot set reviewers/assignees/labels in this call (separate endpoints).
 
 ### Related

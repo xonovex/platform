@@ -1,13 +1,9 @@
 {
   "name": "@xonovex/skill-plan",
   "version": "5.1.0",
+  "description": "Xonovex implementation-planning skills",
   "private": true,
   "type": "module",
-  "dependencies": {
-    "@xonovex/skill-bdd": "5.1.0",
-    "@xonovex/skill-code-quality": "5.1.0",
-    "@xonovex/skill-tdd": "5.1.0"
-  },
   "keywords": [
     "xonovex",
     "skill",

@@ -3,49 +3,49 @@
     "query": "how do I get the business and developers speaking the same vocabulary that also shows up in the code?",
     "should_trigger": true,
     "split": "train",
-    "rationale": "ubiquitous language grounded in model and code — owned by ddd-guide"
+    "rationale": "ubiquitous language grounded in model and code: owned by ddd-guide"
   },
   {
     "query": "where should I draw the bounded contexts for an online shop where 'customer' means different things in ordering, shipping and billing?",
     "should_trigger": true,
     "split": "train",
-    "rationale": "bounded context + polysemy + context map — core ddd-guide strategic design"
+    "rationale": "bounded context + polysemy + context map: core ddd-guide strategic design"
   },
   {
-    "query": "we call an upstream payment API directly and its concepts are leaking into our model — how do I isolate it?",
+    "query": "we call an upstream payment API directly and its concepts are leaking into our model. How do I isolate it?",
     "should_trigger": true,
     "split": "train",
-    "rationale": "anti-corruption layer protecting a model — owned by ddd-guide"
+    "rationale": "anti-corruption layer protecting a model: owned by ddd-guide"
   },
   {
     "query": "is an Order with its line items one aggregate, and should other things reference it by id or by object?",
     "should_trigger": true,
     "split": "train",
-    "rationale": "aggregate + root, reference-by-identity rules — ddd-guide tactical blocks"
+    "rationale": "aggregate + root, reference-by-identity rules: ddd-guide tactical blocks"
   },
   {
     "query": "should money be an entity or a value object, and what makes the difference?",
     "should_trigger": true,
     "split": "train",
-    "rationale": "entity vs value object distinction — owned by ddd-guide"
+    "rationale": "entity vs value object distinction: owned by ddd-guide"
   },
   {
-    "query": "my entities are just getters and setters with all the logic in services — is that proper domain modelling?",
+    "query": "my entities are just getters and setters with all the logic in services: is that proper domain modelling?",
     "should_trigger": true,
     "split": "validation",
-    "rationale": "anemic-domain-model anti-pattern — owned by ddd-guide"
+    "rationale": "anemic-domain-model anti-pattern: owned by ddd-guide"
   },
   {
     "query": "what's the difference between strategic and tactical design, and is a repository just an ORM wrapper?",
     "should_trigger": true,
     "split": "validation",
-    "rationale": "strategic vs tactical split + repository definition — ddd-guide"
+    "rationale": "strategic vs tactical split + repository definition: ddd-guide"
   },
   {
     "query": "should I emit a domain event when an order is placed so shipping can react?",
     "should_trigger": true,
     "split": "validation",
-    "rationale": "domain event as a building block — owned by ddd-guide"
+    "rationale": "domain event as a building block: owned by ddd-guide"
   },
   {
     "query": "measure the connascence between these two modules and tell me which coupling form is strongest",
@@ -90,7 +90,7 @@
     "split": "validation"
   },
   {
-    "query": "I'm building the core document store for our level editor — objects of different kinds each with a set of named properties, and I want to add new object types at runtime without recompiling. How should the type/property schema work?",
+    "query": "I'm building the core document store for our level editor: objects of different kinds each with a set of named properties, and I want to add new object types at runtime without recompiling. How should the type/property schema work?",
     "rationale": "near miss owned by data-model-guide",
     "should_trigger": false,
     "split": "validation"

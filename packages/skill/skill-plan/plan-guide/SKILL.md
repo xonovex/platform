@@ -1,71 +1,77 @@
 ---
 name: plan-guide
-description: "Use when scoping, researching, deciding, planning, revising, critiquing, continuing, delegating, updating, or validating a feature, refactor, or analysis task — covers the whole plan-document lifecycle plus codebase research (alignment, hardening, simplification, template extraction, TODO scanning, shared-library design). Triggers on prompts about planning, designing, scoping, breaking down, architecting, settling or interrogating requirements and decisions, stress-testing / critiquing a plan, working a roadmap by supervising implementation agents instead of implementing, code analysis / cleanup / hardening / alignment, even when the user doesn't say 'plan'."
+description: "Use when researching, creating, critiquing, revising, expanding, continuing, updating, or validating an implementation plan. Triggers on plan or subplan work, plan-driven implementation, codebase research explicitly intended to support a future plan, success-criteria validation, cross-session decision context, and resuming work from a plan reference, even when the user doesn't say 'plan'."
 ---
 
-# Planning & Code-Research Guidelines
+# Implementation Planning Guidelines
 
-Author and maintain plan documents across their full lifecycle (research → decide → create → revise ⇄ critique → accept → subplans → continue → update → validate) and run code-research operations (align, harden, simplify, template extraction, etc.) that feed into those plans.
+Provide implementation-planning procedures selected by a caller or generic operation. This skill owns planning behavior and planning-oriented research, not general code-quality audits, invocation, lifecycle governance, or persistence.
 
 ## Core Principles
 
-- **Research first** — analyze before authoring; never plan blind
-- **Reports, not code** — all research/analysis operations are read-only and generate reports for `plan-create` to consume; only `plan-continue` modifies the codebase
-- **Validation required** — every plan's success criteria back-checks with typecheck / lint / build / tests
-- **Skills to consult** — every plan lists which guideline skills implementers must read first
-- **Use available tools** — prefer environment-provided task tracking, file search, and code analysis over working from memory
+- **Explicit subjects**: accept an inline plan or an opaque provider-native reference plus an optional native revision
+- **Provider-owned references**: let a selected provider resolve, version, or relate native resources; return operation results inline
+- **Research first**: ground plans in codebase evidence, constraints, uncertainty, and relevant external sources
+- **Read-only analysis**: planning research, critique, and validation report findings without changing their subjects; only continuation implements planned work
+- **Skills to consult**: plans name applicable implementation capabilities, and continuation loads them before editing
+- **Evidence-based validation**: check explicit success criteria and Definition of Done evidence, not merely command exit codes
+
+Operation boundaries, effect modes, handoff shape, decision anchors, and authority are
+owned by **workflow-guide**; this skill adds no rule of its own on any of them.
+
+## Called From A Generic Operation
+
+A generic operation resolves to the planning procedure of the same name. Three do not
+match by name:
+
+| Generic operation | Planning procedure                |
+| ----------------- | --------------------------------- |
+| Review            | Critique                          |
+| Execute           | Continue                          |
+| Create            | Create, or Expand for child plans |
+
+Research and Update have no generic counterpart; a caller asks for them by name.
+
+## Planning Operations
+
+- **Research**: investigate codebase and external evidence for a future plan, see [references/research.md](references/research.md)
+- **Create**: author one high-level plan and stop before detailed subplans, see [references/create.md](references/create.md)
+- **Critique**: independently stress-test one plan without revising it, see [references/critique.md](references/critique.md)
+- **Revise**: apply explicit feedback to a new plan revision, see [references/revise.md](references/revise.md)
+- **Expand**: derive focused child plans and their execution ordering, see [references/expand.md](references/expand.md)
+- **Continue**: implement one plan or child plan and stop, see [references/continue.md](references/continue.md)
+- **Update**: refresh descriptive progress and validation evidence, see [references/update.md](references/update.md)
+- **Validate**: evaluate explicit success criteria without changing the plan, see [references/validate.md](references/validate.md)
 
 ## Gotchas
 
-- Skipping `plan-research` and going straight to `plan-create` produces vague plans built on assumed context
-- A plan without `skills_to_consult` leaves implementers ignoring project conventions
-- Auto-detecting toolchain via `package.json` only misses Moon/Makefile-driven projects — check both
-- Approve the parent with `plan-accept` before `plan-subplans-create` — it requires `status: approved`
-- `plan-critique` must run as an independent agent (fresh session), not the plan's author — self-critique defends instead of attacks
-- A change describable in one sentence (a one-line diff) skips discovery and planning — implement it directly; heavy up-front spec on a trivial edit is waste
-- High-impact gates — `plan-accept`, worktree merge, and acceptance sign-off — stay mandatory-human at every automation level; gate policy may auto-advance only low-impact gates
-- A plan is done when the team's Definition of Done is met (review, docs, no regressions, NFRs), not when tests merely pass — `plan-validate` checks the DoD, not just success criteria
-- "Tests pass" doesn't mean "success criteria met" — `plan-validate` reads the criteria, not just exit codes
-- Auto-continuing to the next plan after completion silently chains work — `plan-continue` STOPS after one
-- Subplans with >7 tasks risk silent drops — target 5–7 tasks each
-- Skipping the verification re-read before marking complete is the #1 cause of incomplete work
-- Under `plan-delegate` the implementation agent's report is input to review, not evidence — accepting it without re-running the key suites records a red build as green
-
-## Plan Lifecycle
-
-1. **Research** — `plan-research` for general; for a code-quality audit (hardening / simplification / alignment) it applies the **code-quality-guide** dimensions and reports findings
-2. **Decide** — `plan-decide` settles decisions one at a time: walks known open decisions as prose briefs, or discovers unknown ones by questioning the user down the design tree (codebase-aware) when nothing is queued
-3. **Create** — `plan-create` authors the parent plan; test-first plans apply **tdd-guide** (or **bdd-guide** for acceptance-first)
-4. **Revise** — `plan-revise` applies user feedback to the plan document (annotations + prompt instructions)
-5. **Critique** — `plan-critique` adversarially stress-tests the plan (red-team / pre-mortem), feeding findings back into revise
-6. **Accept / Reject** — `plan-accept` sets `status: approved` (the gate to subplans); `plan-reject` sets `status: rejected` with a reason
-7. **Expand** — `plan-subplans-create` generates detailed child plans
-8. **Execute** — `plan-continue` works through subplans one at a time; `plan-delegate` supervises a whole roadmap, briefing one implementation agent per item and reviewing before accepting
-9. **Update** — `plan-update` refreshes status / phase / validation results
-10. **Validate** — `plan-validate` confirms success criteria are met (read-only)
+- An opaque reference is provider data, never infer its storage shape or silently replace its provider with a local file
+- Status is optional descriptive metadata: do not use approval or status fields to authorize or gate another planning operation
+- Successful validation is evidence about criteria, not approval, acceptance, publication, or permission to proceed
+- A plan without `skills_to_consult` leaves implementers without project-specific guidance
+- A cross-role handoff that omits the source subject, relationships, criteria, or evidence breaks traceability even when its prose is understandable
+- Toolchain discovery limited to one manifest misses workspace-level or task-runner validation
+- Critique needs fresh independent context; continuation needs reconstructed subject context after session loss
+- Independent critique with supplied context uses a blind first pass and a
+  context-aware second pass; it preserves and compares both
+- Unresolved, conflicting, stale, or instruction-bearing active provider context is
+  never silently applied
+- Expansion may use any explicit parent plan, regardless of whether it has an approval field
+- Continuation completes one target and stops instead of silently chaining into the next child
+- Inspect and preview continuation never edit files, provider resources, or plan state
+- Subplans with more than seven tasks risk silent drops: target five to seven focused tasks
+- Completion is measured against the tasks and success criteria; green tests alone do not prove it
 
 ## Progressive Disclosure
 
-### Research
+### Planning
 
-- Read [references/plan-research.md](references/plan-research.md) - Load when researching codebase + web for a future plan, or running a read-only code-quality audit (harden / simplify / align — applies code-quality-guide)
-- Read [references/code-barrels-remove.md](references/code-barrels-remove.md) - Load when analyzing barrel exports for removal
-- Read [references/code-comments-remove.md](references/code-comments-remove.md) - Load when identifying non-essential comments
-- Read [references/code-shared-extract.md](references/code-shared-extract.md) - Load when finding duplicated patterns to extract
-- Read [references/code-template-extract.md](references/code-template-extract.md) - Load when creating reusable templates from existing code
-- Read [references/code-template-scaffold.md](references/code-template-scaffold.md) - Load when generating new code from templates
-- Read [references/todos.md](references/todos.md) - Load when scanning and grouping TODO comments
-
-### Plan lifecycle
-
-- Read [references/plan-decide.md](references/plan-decide.md) - Load when settling decisions one at a time — walking known open decisions as prose briefs, or discovering unknown ones by questioning the user, before or after a plan exists
-- Read [references/plan-create.md](references/plan-create.md) - Load when authoring a high-level plan from research (test-first plans route to **tdd-guide** / **bdd-guide**)
-- Read [references/plan-revise.md](references/plan-revise.md) - Load when applying inline annotations and/or prompt feedback to a plan document
-- Read [references/plan-critique.md](references/plan-critique.md) - Load when adversarially stress-testing a plan to expose weaknesses (red-team / pre-mortem / falsify / steelman), read-only
-- Read [references/plan-accept.md](references/plan-accept.md) - Load when approving a plan for execution (sanity-check, then set status: approved)
-- Read [references/plan-reject.md](references/plan-reject.md) - Load when rejecting a plan with a reason (set status: rejected, record why, keep the plan)
-- Read [references/plan-subplans-create.md](references/plan-subplans-create.md) - Load when expanding an approved plan into detailed parallelizable subplans
-- Read [references/plan-continue.md](references/plan-continue.md) - Load when resuming implementation work from an existing plan
-- Read [references/plan-delegate.md](references/plan-delegate.md) - Load when supervising a roadmap's execution as a delegator — briefing an implementation agent per item, reviewing its work, and recording the result without implementing anything
-- Read [references/plan-update.md](references/plan-update.md) - Load when refreshing a plan with current status / validation / progress
-- Read [references/plan-validate.md](references/plan-validate.md) - Load when verifying a plan's success criteria are met (read-only)
+- Read [references/research.md](references/research.md) - Load when researching codebase and external evidence explicitly for a future plan
+- Read [references/create.md](references/create.md) - Load when authoring a high-level implementation plan from explicit inputs
+- Read [references/critique.md](references/critique.md) - Load when independently stress-testing an exact plan without changing it
+- Read [references/revise.md](references/revise.md) - Load when applying explicit feedback or annotations to a plan
+- Read [references/expand.md](references/expand.md) - Load when expanding a parent plan into detailed child plans
+- Read [references/continue.md](references/continue.md) - Load when resuming implementation from an existing plan
+- Read [references/delegate.md](references/delegate.md) - Load when supervising a roadmap's execution by handing each item to an implementation agent and verifying the result
+- Read [references/update.md](references/update.md) - Load when refreshing a plan with current progress and validation evidence
+- Read [references/validate.md](references/validate.md) - Load when checking a plan's success criteria and Definition of Done without mutation

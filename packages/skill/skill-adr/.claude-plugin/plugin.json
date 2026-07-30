@@ -1,7 +1,0 @@
-{
-  "name": "xonovex-skill-adr",
-  "version": "5.1.0",
-  "description": "Xonovex ADR skills",
-  "author": {"name": "Xonovex"},
-  "skills": ["./adr-guide"]
-}

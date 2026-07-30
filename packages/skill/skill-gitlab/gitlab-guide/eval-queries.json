@@ -1,5 +1,29 @@
 [
   {
+    "query": "open a merge request against main with glab on this GitLab repo",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "create MR via glab: core op"
+  },
+  {
+    "query": "I pushed my branch, now create an MR on gitlab.com and add reviewers",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "create MR with reviewers/labels"
+  },
+  {
+    "query": "post an inline review comment anchored to line 42 of a file on a GitLab merge request",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "position-anchored discussion via POST /discussions"
+  },
+  {
+    "query": "my inline MR comment came back as a plain note instead of attaching to the diff. What's wrong with the position SHAs?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "DiffNote downgrade / three-SHA position model"
+  },
+  {
     "query": "resolve the discussion thread on my GitLab merge request and reply in it",
     "should_trigger": true,
     "split": "train",
@@ -10,6 +34,36 @@
     "should_trigger": true,
     "split": "train",
     "rationale": "withhold approval / unresolved threads gating"
+  },
+  {
+    "query": "what token scope does glab need to create a merge request and post comments: is read_api enough?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "api vs read_api scope question"
+  },
+  {
+    "query": "set up glab against our self-managed GitLab instance and verify access",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "auth login --hostname / onboarding / read verify"
+  },
+  {
+    "query": "approve a merge request from the command line on GitLab",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "glab mr approve verdict"
+  },
+  {
+    "query": "why does a second glab mr create on the same branch fail with 409?",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "one-open-MR-per-branch idempotency"
+  },
+  {
+    "query": "onboard a SHA-pinned GitLab CI/CD component with typed inputs and enforce it through a group pipeline execution policy",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "GitLab-native reusable CI and centrally injected policy enforcement"
   },
   {
     "query": "create a GitLab issue with assignees labels milestone due date and task type",
@@ -24,34 +78,22 @@
     "rationale": "GitLab label-list board semantics"
   },
   {
-    "query": "our release job needs to stick the test-matrix results at the bottom of MR !812's description \u2014 how do I wire that up with glab?",
-    "should_trigger": true,
-    "split": "train",
-    "rationale": "replace-only description on update; read-modify-write required"
-  },
-  {
-    "query": "the CI job that opens the MR and posts our lint findings can read the MR fine but every write comes back denied \u2014 it's using CI_JOB_TOKEN",
+    "query": "publish versioned decision context to this GitLab issue and merge request for a later agent session",
     "should_trigger": true,
     "split": "validation",
-    "rationale": "CI_JOB_TOKEN read-only on MRs; not fixable by config"
+    "rationale": "durable GitLab issue and merge-request notes"
   },
   {
-    "query": "I hit approve on !221 by accident and now glab mr unapprove just gives me a 401 \u2014 my PAT has full api scope and I'm on the approver list",
+    "query": "use GitLab work item Status when supported and fall back to a configured label board on older Free instances",
     "should_trigger": true,
     "split": "validation",
-    "rationale": "scope necessary but not sufficient; 403 with api = role, not scope"
+    "rationale": "version and tier aware kanban status"
   },
   {
-    "query": "I deliberately left two threads unresolved to hold the MR, dev pushed a fixup, and now the merge button is green again \u2014 nobody clicked resolve",
+    "query": "how do GitLab pipeline execution policy job suffix conflicts and project versus group policy merge order work",
     "should_trigger": true,
     "split": "validation",
-    "rationale": "outdated-thread auto-resolve silently drops the merge gate"
-  },
-  {
-    "query": "our self-managed GitLab is 17.11 Free \u2014 set the board up so tickets flow Ready \u2192 In progress \u2192 Done, and move #418 into In progress",
-    "should_trigger": true,
-    "split": "validation",
-    "rationale": "Status GA 18.4 + Premium/Ultimate; otherwise configured labels, never invented"
+    "rationale": "GitLab-native policy precedence and naming behavior"
   },
   {
     "query": "open a pull request and request reviewers on a GitHub-hosted repo with gh",

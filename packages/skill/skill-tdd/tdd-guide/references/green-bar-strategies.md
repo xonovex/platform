@@ -1,12 +1,10 @@
-# tdd: Going Green — Obvious Implementation, Fake It, Triangulation
+# tdd: Going Green: Obvious Implementation, Fake It, Triangulation
 
 Three ways to make a red test pass; choose by how sure you are of the real code.
 
-- **Obvious Implementation** — you know the real code and it's small: type it. This is the default; most steps are obvious implementations.
-- **Fake It** — unsure of the real code: return a constant that satisfies the test. Now the same literal lives in the test and the code; removing that duplication during refactor is what drives you to the general implementation. Fake It turns "I don't know how to write this" into "I know how to remove this duplication".
-- **Triangulation** — generalize only once two or more concrete examples force it: fake one test, add a second with a different value the fake can't satisfy, abstract to the shape both pin down.
-
-**Triangulation is a fallback, not the canonical move.** It circulates as if it were _the_ TDD technique; the reserved position is to use it only when you are completely unsure how to refactor toward the general solution. If you can already see how to remove the duplication, write the general solution directly instead of ceremonially adding a second example to "justify" it. It's the last resort before stepping away.
+- **Obvious Implementation**: you know the real code and it's small: type it. This is the default; most steps are obvious implementations.
+- **Fake It**: unsure of the real code: return a constant that satisfies the test. Now the same literal lives in the test and the code; removing that duplication during refactor is what drives you to the general implementation. Fake It turns "I don't know how to write this" into "I know how to remove this duplication".
+- **Triangulation**: generalize only once two or more concrete examples force it: fake one test, add a second with a different value the fake can't satisfy, abstract to the shape both pin down.
 
 ```
 Is the real implementation obvious right now?
@@ -20,6 +18,6 @@ Is the real implementation obvious right now?
 
 ## Cross-references
 
-- The cycle these live inside, and why their duplication must be refactored away — see [red-green-refactor.md](red-green-refactor.md).
-- Choosing the next test and letting the API emerge — see [test-list-and-design.md](test-list-and-design.md).
-- Structuring the individual test (AAA) — **testing-guide**.
+- The cycle these live inside, and why their duplication must be refactored away, see [red-green-refactor.md](red-green-refactor.md).
+- Choosing the next test and letting the API emerge, see [test-list-and-design.md](test-list-and-design.md).
+- Structuring the individual test (AAA): **testing-guide**.

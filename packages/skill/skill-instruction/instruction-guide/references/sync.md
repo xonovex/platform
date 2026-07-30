@@ -34,8 +34,8 @@ check recent commits for directory/file additions not reflected in AGENTS.md
 - **Update:** existing directories → refresh patterns with current state
 - **Remove:** deleted directories → remove bullet, warn
 - **Preserve:** Integration Points, headings, descriptions, technology names
-- **Verify commands:** build / test / lint commands listed in AGENTS.md will be **executed** by agents — confirm they still work, update or remove stale ones
-- **Respect nested scope:** each AGENTS.md syncs against its own directory tree, not the whole repo — the closest one wins, so don't pull subproject details into the root
+- **Verify commands:** build / test / lint commands listed in AGENTS.md will be **executed** by agents: confirm they still work, update or remove stale ones
+- **Respect nested scope:** each AGENTS.md syncs against its own directory tree, not the whole repo: the closest one wins, so don't pull subproject details into the root
 
 ## Example
 
@@ -55,8 +55,8 @@ check recent commits for directory/file additions not reflected in AGENTS.md
 
 ## Gotchas
 
-- Removed directories that come back later look like a sync churn loop — confirm git history before deleting bullets
-- Manual descriptions in Subdirectories often encode information the filesystem can't tell you (purpose, owner, status) — preserve verbatim
-- A directory that exists in the filesystem but isn't worth documenting (e.g. tooling cache) shouldn't get auto-added — match the existing skip list
-- A stale `npm test` / `cargo build` / `pytest` command will be executed by agents and waste turns — re-run listed commands during sync and update or remove broken ones
-- Nested AGENTS.md files sync independently — pulling a subproject's content into the root violates closest-wins precedence
+- Removed directories that come back later look like a sync churn loop: confirm git history before deleting bullets
+- Manual descriptions in Subdirectories often encode information the filesystem can't tell you (purpose, owner, status): preserve verbatim
+- A directory that exists in the filesystem but isn't worth documenting (e.g. tooling cache) shouldn't get auto-added: match the existing skip list
+- A stale `npm test` / `cargo build` / `pytest` command will be executed by agents and waste turns: re-run listed commands during sync and update or remove broken ones
+- Nested AGENTS.md files sync independently: pulling a subproject's content into the root violates closest-wins precedence

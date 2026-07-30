@@ -1,36 +1,36 @@
 [
   {
-    "query": "our notification code has grown into a mess — channel folders sit beside sendutil and template code is buried three levels deep; reorganize it so the independent choices are obvious",
+    "query": "our notification code has grown into a mess: channel folders sit beside sendutil and template code is buried three levels deep; reorganize it so the independent choices are obvious",
     "should_trigger": true,
     "split": "train",
     "rationale": "direct: reorganize a tangled tree into clean domain axes and remove a homeless utility package"
   },
   {
-    "query": "I have format, destination, and compression as separate configuration choices but the folders don't reflect that — where should each implementation live?",
+    "query": "I have format, destination, and compression as separate configuration choices but the folders don't reflect that. Where should each implementation live?",
     "should_trigger": true,
     "split": "train",
     "rationale": "direct: structure should mirror independently selectable axes"
   },
   {
-    "query": "we have email and SMS notification channels and want to add push without reorganizing the existing ones — how should the packages be laid out?",
+    "query": "we have email and SMS notification channels and want to add push without reorganizing the existing ones. How should the packages be laid out?",
     "should_trigger": true,
     "split": "train",
     "rationale": "implicit: shared-core + per-variant leaves, Strategy per axis, open-for-extension layout"
   },
   {
-    "query": "name these sibling modules consistently — right now it's send-email, sms-provider, and push and they read like different categories",
+    "query": "name these sibling modules consistently: right now it's send-email, sms-provider, and push and they read like different categories",
     "should_trigger": true,
     "split": "train",
     "rationale": "naming symmetry: sibling channel variants need one grammar and abstraction level"
   },
   {
-    "query": "the web request path and background worker have drifted — they implement the same notification concepts under totally different folder names; make them symmetric",
+    "query": "the web request path and background worker have drifted. They implement the same notification concepts under totally different folder names; make them symmetric",
     "should_trigger": true,
     "split": "train",
     "rationale": "consumer symmetry: two realizers of the same axes should rhyme, share down to a common lib"
   },
   {
-    "query": "the email channel needs a small piece of HTML-template-specific glue — should that become a new top-level html-email package?",
+    "query": "the email channel needs a small piece of HTML-template-specific glue: should that become a new top-level html-email package?",
     "should_trigger": true,
     "split": "train",
     "rationale": "variation-point bridge: localize one cross-axis constraint inside the dependent variant"
@@ -54,7 +54,7 @@
     "rationale": "near-miss: runtime data layout for cache -> data-oriented-design-guide, not module structure"
   },
   {
-    "query": "should this be a class with inheritance or composition of functions — design the object model",
+    "query": "should this be a class with inheritance or composition of functions: design the object model",
     "should_trigger": false,
     "split": "train",
     "rationale": "near-miss: class-vs-function design -> oop-guide / fp-guide"
@@ -66,13 +66,13 @@
     "rationale": "near-miss: monorepo task config -> moon-guide, not source-tree decomposition"
   },
   {
-    "query": "I'm designing a new tool with three independent config dimensions — input format, transport, and output sink — how do I lay out the packages so adding one input doesn't touch the others?",
+    "query": "I'm designing a new tool with three independent config dimensions: input format, transport, and output sink. How do I lay out the packages so adding one input doesn't touch the others?",
     "should_trigger": true,
     "split": "train",
     "rationale": "validation positive: orthogonal axes + cross-product, fan-out layout, open-for-extension"
   },
   {
-    "query": "a shared helpers package at the repo root has become a dumping ground — notification channels, templates, and delivery policies all put unrelated code there; how should I distribute it?",
+    "query": "a shared helpers package at the repo root has become a dumping ground: notification channels, templates, and delivery policies all put unrelated code there; how should I distribute it?",
     "should_trigger": true,
     "split": "validation",
     "rationale": "validation positive: per-axis shared/, axis owns its own utils, no homeless util sibling"
@@ -96,7 +96,7 @@
     "rationale": "validation negative: measurement of runtime cache behavior -> data-oriented-design-guide"
   },
   {
-    "query": "adding a new storage backend means editing a giant switch in three files — make it so a new backend plugs in without touching the core",
+    "query": "adding a new storage backend means editing a giant switch in three files: make it so a new backend plugs in without touching the core",
     "should_trigger": false,
     "split": "train",
     "rationale": "near-miss: open/closed plugin extension -> microkernel-pattern-guide"
@@ -108,7 +108,7 @@
     "rationale": "near-miss: plugin registry / open-closed -> microkernel-pattern-guide"
   },
   {
-    "query": "this Isolator interface has nine methods and half the implementations just return nil — split it so each type only implements what it needs",
+    "query": "this Isolator interface has nine methods and half the implementations just return nil: split it so each type only implements what it needs",
     "should_trigger": false,
     "split": "train",
     "rationale": "near-miss: narrow ports / interface segregation -> hexagonal-pattern-guide"
@@ -120,25 +120,25 @@
     "rationale": "near-miss: dependency inversion / ports-and-adapters -> hexagonal-pattern-guide"
   },
   {
-    "query": "should I model this as an abstract base class with virtual methods or a plain interface — which OO construct fits?",
+    "query": "should I model this as an abstract base class with virtual methods or a plain interface: which OO construct fits?",
     "should_trigger": false,
     "split": "validation",
     "rationale": "near-miss: class/paradigm construct choice -> oop-guide, not axis decomposition"
   },
   {
-    "query": "logging, metrics, and the auth check are copied into every backend and I keep forgetting one — where should concerns that touch every backend live?",
+    "query": "logging, metrics, and the auth check are copied into every backend and I keep forgetting one. Where should concerns that touch every backend live?",
     "should_trigger": true,
     "split": "validation",
     "rationale": "cross-cutting concerns: scattering/tangling, weave once at the composition root, not a sibling axis"
   },
   {
-    "query": "should the storage backend be picked at compile time with build flags, or at runtime from config — and how does that change the wiring?",
+    "query": "should the storage backend be picked at compile time with build flags, or at runtime from config, and how does that change the wiring?",
     "should_trigger": false,
     "split": "validation",
     "rationale": "near-miss: binding time -> microkernel-pattern-guide"
   },
   {
-    "query": "we split the monolith into packages but everything still imports everything — how do I actually enforce the module boundaries?",
+    "query": "we split the monolith into packages but everything still imports everything. How do I actually enforce the module boundaries?",
     "should_trigger": true,
     "split": "validation",
     "rationale": "false modularity / distributed monolith: enforce with import/architecture tests + data ownership, not folders"
@@ -150,7 +150,7 @@
     "rationale": "near-miss: coupling vocabulary -> connascence-guide"
   },
   {
-    "query": "two teams keep colliding on the same module — how should we draw the boundary so each owns its piece?",
+    "query": "two teams keep colliding on the same module. How should we draw the boundary so each owns its piece?",
     "should_trigger": true,
     "split": "validation",
     "rationale": "boundary alignment: Conway's law, single owner per axis, domain seams"

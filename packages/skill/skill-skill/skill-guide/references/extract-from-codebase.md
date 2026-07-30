@@ -6,7 +6,7 @@
 
 ## Spec Constraints
 
-Spec limits (name / description / body / optional-field rules) live in the parent SKILL.md — re-check after edits.
+Spec limits (name / description / body / optional-field rules) live in the parent SKILL.md: re-check after edits.
 
 ## Core Workflow
 
@@ -61,7 +61,7 @@ description: "{one-line description}"
 
 ## Essentials
 
-- {3-5 key points as bullets — add only what the agent lacks}
+- {3-5 key points as bullets: add only what the agent lacks}
 
 ## Gotchas
 

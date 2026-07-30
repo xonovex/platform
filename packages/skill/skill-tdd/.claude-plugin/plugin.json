@@ -2,7 +2,8 @@
   "name": "xonovex-skill-tdd",
   "version": "5.1.0",
   "description": "Xonovex Test-driven development skills",
-  "author": {"name": "Xonovex"},
-  "skills": ["./tdd-guide"],
-  "dependencies": ["xonovex-skill-testing"]
+  "author": {
+    "name": "Xonovex"
+  },
+  "skills": ["./tdd-guide"]
 }

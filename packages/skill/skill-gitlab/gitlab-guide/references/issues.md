@@ -1,4 +1,4 @@
-# GitLab Issues
+# GitLab Issues as Workflow Tickets
 
 Use project issues for provider-native tickets. GitLab's `iid` is unique only within
 its project; preserve host + project full path or numeric project ID + issue IID.
@@ -98,8 +98,9 @@ using the old short reference as if it identified the destination.
 
 ## Notes and Context
 
-Ordinary issue comments use `glab issue note` or the Issue Notes API. Keep durable
-context there rather than in a merge-request review thread, which is scoped to the MR.
+Ordinary issue comments use `glab issue note` or the Issue Notes API. Durable versioned
+context on issues and merge requests uses the append-only procedure in
+[context-notes.md](context-notes.md).
 
 ## Result Handoff
 

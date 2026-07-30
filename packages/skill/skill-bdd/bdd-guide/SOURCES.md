@@ -2,7 +2,7 @@
 
 ## Origin of BDD and Given-When-Then
 
-- **Title:** Dan North — "Introducing BDD"
+- **Title:** Dan North, "Introducing BDD"
 - **URL:** https://dannorth.net/introducing-bdd/
 - **Last reviewed:** 2026-06-27
 - **Used for:**
@@ -13,7 +13,7 @@
 
 ## Gherkin notation
 
-- **Title:** Cucumber — "Gherkin Reference"
+- **Title:** Cucumber, "Gherkin Reference"
 - **URL:** https://cucumber.io/docs/gherkin/reference/
 - **Last reviewed:** 2026-06-27
 - **Used for:**
@@ -23,7 +23,7 @@
 
 ## The three BDD practices and living documentation
 
-- **Title:** Cucumber — "BDD"
+- **Title:** Cucumber, "BDD"
 - **URL:** https://cucumber.io/docs/bdd/
 - **Last reviewed:** 2026-06-27
 - **Used for:**
@@ -34,7 +34,7 @@
 
 ## The three-practices model and formulation techniques
 
-- **Title:** Seb Rose & Gaspar Nagy — "The BDD Books: Discovery" and "The BDD Books: Formulation"
+- **Title:** Seb Rose & Gaspar Nagy, "The BDD Books: Discovery" and "The BDD Books: Formulation"
 - **URLs:**
   - https://leanpub.com/bddbooks-discovery
   - https://leanpub.com/bddbooks-formulation
@@ -47,7 +47,7 @@
 
 ## Example Mapping
 
-- **Title:** Matt Wynne — "Introducing Example Mapping" (Cucumber blog)
+- **Title:** Matt Wynne, "Introducing Example Mapping" (Cucumber blog)
 - **URL:** https://cucumber.io/blog/bdd/example-mapping-introduction/
 - **Last reviewed:** 2026-06-27
 - **Used for:**
@@ -57,7 +57,7 @@
 
 ## The collaboration-tool framing (Appendix A)
 
-- **Title:** Aslak Hellesøy (creator of Cucumber) — comment on the "Cucumber: Behaviour-Driven Development" thread (Hacker News, item 10194242), corroborated by "The World's Most Misunderstood Collaboration Tool" (Cucumber blog)
+- **Title:** Aslak Hellesøy (creator of Cucumber), comment on the "Cucumber: Behaviour-Driven Development" thread (Hacker News, item 10194242), corroborated by "The World's Most Misunderstood Collaboration Tool" (Cucumber blog)
 - **URLs:**
   - https://news.ycombinator.com/item?id=10194242
   - https://cucumber.io/blog/collaboration/the-worlds-most-misunderstood-collaboration-tool/
@@ -73,7 +73,7 @@
 
 ## Specification by Example
 
-- **Title:** Gojko Adzic — "Specification by Example: How Successful Teams Deliver the Right Software" (Manning, 2011)
+- **Title:** Gojko Adzic, "Specification by Example: How Successful Teams Deliver the Right Software" (Manning, 2011)
 - **URL:** https://www.manning.com/books/specification-by-example
 - **Last reviewed:** 2026-06-27
 - **Used for:**
@@ -83,7 +83,7 @@
 
 ## ATDD and the three amigos
 
-- **Title:** Agile Alliance Glossary — "ATDD"
+- **Title:** Agile Alliance Glossary, "ATDD"
 - **URL:** https://agilealliance.org/glossary/atdd/
 - **Last reviewed:** 2026-06-27
 - **Used for:**

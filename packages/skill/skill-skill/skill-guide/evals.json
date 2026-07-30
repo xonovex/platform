@@ -6,9 +6,9 @@
       "id": 1,
       "prompt": "I'm creating a new Agent Skill that validates GraphQL schemas. Write the YAML frontmatter `description` field for its SKILL.md so it routes reliably.",
       "assertions": [
-        "The description starts with an imperative 'Use when' (or 'Use this skill when') phrasing rather than 'This skill…' / 'I can…' / 'You can…'.",
+        "The description starts with an imperative 'Use when' (or 'Use this skill when') phrasing rather than 'This skill...' / 'I can...' / 'You can...'.",
         "The description contains an explicit trigger clause of the form 'even when the user doesn't say ...' (or equivalent 'even if not mentioned') to catch non-obvious matches.",
-        "The description contains NO negative/out-of-scope 'Skip …' exclusion clause and does not point to any other skill by name."
+        "The description contains NO negative/out-of-scope 'Skip ...' exclusion clause and does not point to any other skill by name."
       ]
     },
     {
@@ -33,6 +33,25 @@
       "assertions": [
         "Each essentials bullet leads with a bolded short rule name followed by a brief (roughly 5-10 word) how-to.",
         "Each essentials bullet cross-references its topic's references/*.md file via a markdown link (e.g. 'see [references/ownership.md](references/ownership.md)')."
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "Our workflow command always needs workflow-guide, but one operation can optionally use any installed changelog skill whose description fits. Explain how to represent both relationships without copying instructions or building another metadata catalog.",
+      "assertions": [
+        "Places the exact workflow-guide installation dependency in every supported plugin manifest and matching package dependencies.",
+        "Keeps optional changelog selection in runtime prose and selects from installed skill names and routing descriptions.",
+        "States that installation does not load a skill into context and avoids copying either skill's procedure.",
+        "Does not add lifecycle roles, provisions, semantic-version ranges, overlays, or another composition catalog."
+      ]
+    },
+    {
+      "id": 6,
+      "prompt": "A workflow requires evidence review. Two installed skill descriptions fit equally well, and a third matching skill exists only in a remote marketplace. Resolve the required capability.",
+      "assertions": [
+        "Reports the two installed description matches as ambiguous and does not choose by filesystem, marketplace, prompt, or version order.",
+        "Treats the required ambiguity as blocking until the caller selects or further distinguishes the need.",
+        "Does not select the remote-only skill because soft runtime selection is limited to installed skills."
       ]
     }
   ]

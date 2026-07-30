@@ -1,28 +1,27 @@
-# Smell Catalog — What to Audit For, and Who Owns Each
+# Smell Catalog: What to Audit For, and Who Owns Each
 
 Every code smell, the signal that detects it, and the **one** skill that owns its definition and fix. Routes; does not redefine. Grouped by design-problem **family** (the peer-reviewed grouping), not by an application/class/method scope tier.
 
 Owner key: `robustness.md` = this skill's robustness dimension · **oop-guide** = OO-design smells · **connascence-guide** = coupling/cohesion smells · _here_ = this skill owns the detector (duplication / dead code / over-abstraction / redundant-comment cleanup).
 
-## Bloaters — grown too large
+## Bloaters: grown too large
 
-| Smell                    | Detector signal                                                 | Owner                                                             |
-| ------------------------ | --------------------------------------------------------------- | ----------------------------------------------------------------- |
-| Long Method              | function over ~30 lines; high cyclomatic / cognitive complexity | `robustness.md` (code smells)                                     |
-| Large Class / God Object | many fields/methods, low cohesion, `Manager`/`Util` grab-bag    | **oop-guide** (SRP)                                               |
-| Primitive Obsession      | a domain concept carried as a raw string/number; magic literals | `robustness.md` / **connascence-guide**                           |
-| Long Parameter List      | more than ~4 params, especially boolean flag params             | `robustness.md` + **connascence-guide** (connascence of position) |
-| Data Clumps              | the same group of values always travels together                | **connascence-guide**                                             |
+| Smell               | Detector signal                                                 | Owner                                                             |
+| ------------------- | --------------------------------------------------------------- | ----------------------------------------------------------------- |
+| Long Method         | function over ~30 lines; high cyclomatic / cognitive complexity | `robustness.md` (code smells)                                     |
+| Primitive Obsession | a domain concept carried as a raw string/number; magic literals | `robustness.md` / **connascence-guide**                           |
+| Long Parameter List | more than ~4 params, especially boolean flag params             | `robustness.md` + **connascence-guide** (connascence of position) |
+| Data Clumps         | the same group of values always travels together                | **connascence-guide**                                             |
 
 ## Object-Orientation Abusers
 
-| Smell                                     | Detector signal                                                 | Owner                                                   |
-| ----------------------------------------- | --------------------------------------------------------------- | ------------------------------------------------------- |
-| Switch on a type code                     | the same type-switch duplicated in several places               | **oop-guide** (polymorphism)                            |
-| Refused Bequest                           | subclass ignores or throws on inherited members (LSP violation) | **oop-guide** (LSP)                                     |
-| Downcasting                               | a cast that breaks the abstraction model                        | **oop-guide** (LSP) — _supplementary; cited in SOURCES_ |
-| Temporary Field                           | a field set/used only in some circumstances, empty otherwise    | **oop-guide**                                           |
-| Alternative Classes, Different Interfaces | two classes do the same job with unswappable APIs               | **oop-guide**                                           |
+| Smell                                     | Detector signal                                                 | Owner                                                  |
+| ----------------------------------------- | --------------------------------------------------------------- | ------------------------------------------------------ |
+| Switch on a type code                     | the same type-switch duplicated in several places               | **oop-guide** (polymorphism)                           |
+| Refused Bequest                           | subclass ignores or throws on inherited members (LSP violation) | **oop-guide** (LSP)                                    |
+| Downcasting                               | a cast that breaks the abstraction model                        | **oop-guide** (LSP): _supplementary; cited in SOURCES_ |
+| Temporary Field                           | a field set/used only in some circumstances, empty otherwise    | **oop-guide**                                          |
+| Alternative Classes, Different Interfaces | two classes do the same job with unswappable APIs               | **oop-guide**                                          |
 
 ## Change Preventers
 
@@ -32,16 +31,14 @@ Owner key: `robustness.md` = this skill's robustness dimension · **oop-guide** 
 | Shotgun Surgery                  | one conceptual change smeared across many modules | **connascence-guide** (locality at a distance) |
 | Parallel Inheritance Hierarchies | every new subclass forces a mirrored subclass     | **oop-guide**                                  |
 
-## Dispensables — remove for free (this skill owns the detector)
+## Dispensables: remove for free (this skill owns the detector)
 
-| Smell                    | Detector signal                                                                                                  | Owner                                                           |
-| ------------------------ | ---------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
-| Duplicated Code          | identical / near-identical logic in 2+ places                                                                    | _here_ (DUPLICATES)                                             |
-| Dead Code                | unreachable or never-called code, exports, params                                                                | _here_ (DEAD CODE)                                              |
-| Speculative Generality   | abstraction / hook with no current user                                                                          | _here_ (OVER-ENGINEERING)                                       |
-| Comments (noise)         | a comment restating a well-named declaration, narrating a plan / provenance, or denser than the surrounding code | _here_ (REDUNDANT COMMENT) — rename to self-document, or delete |
-| Lazy Class / Data Class  | a class too thin to justify itself, or only fields                                                               | **oop-guide**                                                   |
-| Magic Numbers / Literals | unnamed constants begging for a name                                                                             | `robustness.md` — _supplementary; cited in SOURCES_             |
+| Smell                    | Detector signal                                                                                                  | Owner                                                          |
+| ------------------------ | ---------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- |
+| Speculative Generality   | abstraction / hook with no current user                                                                          | _here_ (OVER-ENGINEERING)                                      |
+| Comments (noise)         | a comment restating a well-named declaration, narrating a plan / provenance, or denser than the surrounding code | _here_ (REDUNDANT COMMENT): rename to self-document, or delete |
+| Lazy Class / Data Class  | a class too thin to justify itself, or only fields                                                               | **oop-guide**                                                  |
+| Magic Numbers / Literals | unnamed constants begging for a name                                                                             | `robustness.md`: _supplementary; cited in SOURCES_             |
 
 ## Couplers
 
@@ -54,4 +51,4 @@ Owner key: `robustness.md` = this skill's robustness dimension · **oop-guide** 
 
 ## Grade and report
 
-Grade each finding by severity — blast radius × likelihood × remediation effort — group by family, and report read-only. See [SKILL.md](../SKILL.md) for the method and [robustness.md](robustness.md) for the robustness signals.
+Grade each finding by severity: blast radius × likelihood × remediation effort: group by family, and report read-only. See [SKILL.md](../SKILL.md) for the method and [robustness.md](robustness.md) for the robustness signals.

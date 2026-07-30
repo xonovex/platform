@@ -27,7 +27,7 @@ Safety model:
        with only the target plugin and Skill tool available.
     2. The runner reads the stream line-by-line. The instant a `Skill` tool_use
        OR a `Skill` permission_denial matching the target skill is observed,
-       the claude process is terminated — no further tools dispatch.
+       the claude process is terminated, no further tools dispatch.
     3. Skill names match three ways: exact, last-segment-after-colon, or
        ":<short>" suffix.
 
@@ -151,7 +151,7 @@ def build_parser() -> argparse.ArgumentParser:
         "--runs",
         type=int,
         default=int(os.environ.get("RUNS", "3")),
-        help="runs per query — model is nondeterministic (env RUNS, default 3)",
+        help="runs per query: model is nondeterministic (env RUNS, default 3)",
     )
     p.add_argument(
         "--threshold",
@@ -256,7 +256,7 @@ def check_triggered(
 ) -> tuple[bool, str | None]:
     """Return the target trigger result or an infrastructure error.
 
-    Terminates the claude process on first match — no further tools fire.
+    Terminates the claude process on first match, no further tools fire.
     """
     proc = subprocess.Popen(
         ["claude", *claude_args, query],

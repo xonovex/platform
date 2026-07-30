@@ -15,7 +15,8 @@
       "prompt": "I'm currently working inside a worktree whose directory is named `services`. Set up an isolated sibling worktree with its own branch so I can build a feature called `auth-fix` without touching my current checkout. Show the exact commands.",
       "assertions": [
         "Creates a worktree directory named `services-feature-auth-fix` and a branch named `services/feature/auth-fix`",
-        "Records the source/base branch in a `branch.<branch>.mergeBackTo` git config value"
+        "Records the source/base branch in a `branch.<branch>.mergeBackTo` git config value",
+        "Defaults to previewing the exact commands and effects unless apply was explicitly requested"
       ]
     },
     {
@@ -31,6 +32,30 @@
       "prompt": "I added `config/local.env` to `.gitignore`, but git still keeps showing it as a tracked/modified file. How do I make git stop tracking it while keeping the file on disk?",
       "assertions": [
         "Instructs to run `git rm --cached config/local.env` (removes from the index without deleting the working-tree file)"
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "Preview merging the feature worktree back to its recorded source branch. Do not change refs or clean anything up.",
+      "assertions": [
+        "Resolves exact feature and source worktrees, branches, and revisions and reports the rebase, merge strategy, validation, and recovery commands",
+        "Does not merge, rebase, remove the worktree, or delete local or remote branches"
+      ]
+    },
+    {
+      "id": 6,
+      "prompt": "Abandon this failed feature worktree because the API assumption was wrong. Preserve enough information to resume or recover it.",
+      "assertions": [
+        "Returns the reason, branch, HEAD revision, dirty-state summary, recovery command, and any unpushed or untracked risk",
+        "Does not commit, tag, reset, push, remove the worktree, or delete a branch"
+      ]
+    },
+    {
+      "id": 7,
+      "prompt": "Preview cleanup of stale feature worktrees older than 30 days. Show exactly what would be removed.",
+      "assertions": [
+        "Treats age and naming as candidate signals, resolves exact worktree and ref targets, and protects dirty, active, unmerged, or unpushed work",
+        "Returns exact commands and recovery revisions without deleting anything; force and remote deletion require separate explicit authorization"
       ]
     }
   ]

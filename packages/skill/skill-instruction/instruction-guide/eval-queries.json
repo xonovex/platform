@@ -1,6 +1,6 @@
 [
   {
-    "query": "this packages/auth dir doesn't have an AGENTS.md yet — set one up",
+    "query": "this packages/auth dir doesn't have an AGENTS.md yet: set one up",
     "should_trigger": true,
     "split": "train",
     "rationale": "direct init"
@@ -12,7 +12,7 @@
     "rationale": "direct bootstrap"
   },
   {
-    "query": "i want claude to know what's in apps/admin — write the agent docs from scratch",
+    "query": "i want claude to know what's in apps/admin: write the agent docs from scratch",
     "should_trigger": true,
     "split": "train",
     "rationale": "from-scratch intent"
@@ -24,7 +24,7 @@
     "rationale": "init at repo root"
   },
   {
-    "query": "document this directory for an AI agent — first time",
+    "query": "document this directory for an AI agent: first time",
     "should_trigger": true,
     "split": "train",
     "rationale": "first-time doc"
@@ -36,19 +36,19 @@
     "rationale": "scaffold = init"
   },
   {
-    "query": "we just split out the analytics package — can you create instructions for it",
+    "query": "we just split out the analytics package: can you create instructions for it",
     "should_trigger": true,
     "split": "train",
     "rationale": "new package needs init"
   },
   {
-    "query": "the existing AGENTS.md in packages/core is out of date — refresh it",
+    "query": "the existing AGENTS.md in packages/core is out of date: refresh it",
     "should_trigger": false,
     "split": "train",
     "rationale": "near-miss: should match instructions-sync"
   },
   {
-    "query": "the AGENTS.md in apps/web is way too verbose — trim it",
+    "query": "the AGENTS.md in apps/web is way too verbose: trim it",
     "should_trigger": false,
     "split": "train",
     "rationale": "near-miss: should match instructions-simplify"
@@ -60,7 +60,7 @@
     "rationale": "near-miss: should match instructions-assimilate"
   },
   {
-    "query": "we have AGENTS.md scattered all over the monorepo — clean them up and dedupe",
+    "query": "we have AGENTS.md scattered all over the monorepo: clean them up and dedupe",
     "should_trigger": false,
     "split": "train",
     "rationale": "near-miss: should match instructions-consolidate"
@@ -78,13 +78,13 @@
     "rationale": "direct init"
   },
   {
-    "query": "the new microservice doesn't have project instructions yet — generate one based on what's in src/",
+    "query": "the new microservice doesn't have project instructions yet: generate one based on what's in src/",
     "should_trigger": true,
     "split": "validation",
     "rationale": "init intent without saying 'AGENTS'"
   },
   {
-    "query": "write up a fresh AGENTS file for tools/cli-runner — just analyze what's there",
+    "query": "write up a fresh AGENTS file for tools/cli-runner, just analyze what's there",
     "should_trigger": true,
     "split": "validation",
     "rationale": "fresh + analyze = init"
@@ -96,7 +96,7 @@
     "rationale": "kick off = init"
   },
   {
-    "query": "no claude.md in services/payments — analyze the code and write one",
+    "query": "no claude.md in services/payments: analyze the code and write one",
     "should_trigger": true,
     "split": "validation",
     "rationale": "init from analysis"

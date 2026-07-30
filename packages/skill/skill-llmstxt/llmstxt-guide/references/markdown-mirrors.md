@@ -25,10 +25,10 @@ The mirror should be a **clean** markdown rendering of the original page:
 
 ## Generation Approaches
 
-- **Static-site generators** — most modern SSGs (Astro, Hugo, Next.js, Eleventy, Docusaurus) can emit a `.md` alongside each `.html` route via a custom build step or plugin
-- **Server middleware** — intercept requests for `*.md` URLs and render the page's source content as markdown on the fly
-- **Manual export** — for small sites: export from CMS / docs source, place files at the expected paths
-- **Reverse from HTML** — if no source is available: extract main content (e.g. via `readability`-style extraction) and serialize to markdown
+- **Static-site generators**: most modern SSGs (Astro, Hugo, Next.js, Eleventy, Docusaurus) can emit a `.md` alongside each `.html` route via a custom build step or plugin
+- **Server middleware**: intercept requests for `*.md` URLs and render the page's source content as markdown on the fly
+- **Manual export**: for small sites: export from CMS / docs source, place files at the expected paths
+- **Reverse from HTML**: if no source is available: extract main content (e.g. via `readability`-style extraction) and serialize to markdown
 
 Whichever approach: the result must be at the exact URL the `/llms.txt` link expects, returning `text/plain; charset=utf-8` or `text/markdown` with HTTP 200.
 
@@ -40,9 +40,9 @@ Whichever approach: the result must be at the exact URL the `/llms.txt` link exp
 
 ## Gotchas
 
-- Mirrors that include nav chrome defeat the whole purpose — they re-introduce the bloat `llms.txt` was meant to bypass
-- Relative links inside a mirror are useless once the file is ingested in isolation — resolve to absolute URLs
-- A mirror that 404s from a `/llms.txt` listing makes the whole file look stale — verify all links during CI
-- Serving `text/html` for a `.md` URL works in browsers but breaks tools that rely on `Content-Type` — set the right MIME type
+- Mirrors that include nav chrome defeat the whole purpose: they re-introduce the bloat `llms.txt` was meant to bypass
+- Relative links inside a mirror are useless once the file is ingested in isolation: resolve to absolute URLs
+- A mirror that 404s from a `/llms.txt` listing makes the whole file look stale: verify all links during CI
+- Serving `text/html` for a `.md` URL works in browsers but breaks tools that rely on `Content-Type`: set the right MIME type
 - Renaming a page changes the mirror URL; remember to update `/llms.txt` whenever URLs shift
-- Image-heavy pages don't translate well — link to the page's images by absolute URL rather than embedding base64
+- Image-heavy pages don't translate well: link to the page's images by absolute URL rather than embedding base64

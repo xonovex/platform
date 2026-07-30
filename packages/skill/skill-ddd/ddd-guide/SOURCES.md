@@ -2,7 +2,7 @@
 
 ## Ubiquitous language
 
-- **Title:** Martin Fowler — "UbiquitousLanguage" (bliki)
+- **Title:** Martin Fowler, "UbiquitousLanguage" (bliki)
 - **URL:** https://martinfowler.com/bliki/UbiquitousLanguage.html
 - **Last reviewed:** 2026-06-27
 - **Used for:**
@@ -12,7 +12,7 @@
 
 ## Bounded context and context map
 
-- **Title:** Martin Fowler — "BoundedContext" (bliki)
+- **Title:** Martin Fowler, "BoundedContext" (bliki)
 - **URL:** https://martinfowler.com/bliki/BoundedContext.html
 - **Last reviewed:** 2026-06-27
 - **Used for:**
@@ -22,7 +22,7 @@
 
 ## Aggregates
 
-- **Title:** Martin Fowler — "DDD_Aggregate" (bliki)
+- **Title:** Martin Fowler, "DDD_Aggregate" (bliki)
 - **URL:** https://martinfowler.com/bliki/DDD_Aggregate.html
 - **Last reviewed:** 2026-06-27
 - **Used for:**
@@ -32,7 +32,7 @@
 
 ## DDD overview: strategic vs tactical
 
-- **Title:** Martin Fowler — "DomainDrivenDesign" (bliki)
+- **Title:** Martin Fowler, "DomainDrivenDesign" (bliki)
 - **URL:** https://martinfowler.com/bliki/DomainDrivenDesign.html
 - **Last reviewed:** 2026-06-27
 - **Used for:**
@@ -43,7 +43,7 @@
 
 ## Aggregate design rules
 
-- **Title:** Vaughn Vernon — "Implementing Domain-Driven Design" (the Red Book), Ch. 10, via InformIT / ArchiLab
+- **Title:** Vaughn Vernon, "Implementing Domain-Driven Design" (the Red Book), Ch. 10, via InformIT / ArchiLab
 - **URL:** https://www.informit.com/articles/article.aspx?p=2020371&seqNum=3
 - **Last reviewed:** 2026-06-27
 - **Used for:**
@@ -53,7 +53,7 @@
 
 ## Anti-corruption layer, entity/value object, repository
 
-- **Title:** Eric Evans — "Domain-Driven Design Reference", corroborated via Wikipedia "Domain-driven design"
+- **Title:** Eric Evans, "Domain-Driven Design Reference", corroborated via Wikipedia "Domain-driven design"
 - **URL:** https://en.wikipedia.org/wiki/Domain-driven_design
 - **Last reviewed:** 2026-06-27
 - **Used for:**

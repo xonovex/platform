@@ -1,0 +1,18 @@
+{
+  "name": "@xonovex/skill-kiro",
+  "version": "5.1.0",
+  "description": "Xonovex Kiro hook skills",
+  "private": true,
+  "type": "module",
+  "keywords": [
+    "xonovex",
+    "skill",
+    "kiro",
+    "hooks",
+    "automation"
+  ],
+  "scripts": {
+    "fmt": "prettier --write .",
+    "fmt:check": "prettier --check ."
+  }
+}

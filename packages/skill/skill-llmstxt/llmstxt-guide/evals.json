@@ -31,7 +31,7 @@
       "id": 4,
       "prompt": "Review this llms.txt draft and tell me what's wrong with it:\n\n# DataPipe\n\n> Streaming ETL library for Python.\n\nDataPipe moves data between sources and sinks.\n\n### Key concepts\n\nPipelines are composed of stages.\n\n## Docs\n\n- [Quickstart](https://datapipe.io/docs/quickstart.html)\n- [API](https://datapipe.io/docs/api.md)",
       "assertions": [
-        "Flags that the descriptive prose contains a heading (`### Key concepts`) which is not allowed — prose between the blockquote and the first H2 must contain no headings.",
+        "Flags that the descriptive prose contains a heading (`### Key concepts`) which is not allowed: prose between the blockquote and the first H2 must contain no headings.",
         "Flags that the Quickstart link points to the `.html` page instead of its `.md` mirror (should be `https://datapipe.io/docs/quickstart.html.md`)."
       ]
     }

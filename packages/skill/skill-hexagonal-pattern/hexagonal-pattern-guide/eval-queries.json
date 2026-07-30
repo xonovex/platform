@@ -6,13 +6,13 @@
     "rationale": "ports-and-adapters: driven adapter behind a core-owned port"
   },
   {
-    "query": "where should the repository interface live — in the core or in the database layer?",
+    "query": "where should the repository interface live, in the core or in the database layer?",
     "should_trigger": true,
     "split": "train",
     "rationale": "the port belongs to the core (dependency rule)"
   },
   {
-    "query": "my service class imports the ORM and the HTTP framework directly — how do I keep the domain clean?",
+    "query": "my service class imports the ORM and the HTTP framework directly. How do I keep the domain clean?",
     "should_trigger": true,
     "split": "train",
     "rationale": "dependencies must point inward; adapters on the outside"
@@ -72,7 +72,7 @@
     "split": "train"
   },
   {
-    "query": "our notification code has grown into a mess — channel folders sit beside sendutil and template code is buried three levels deep; reorganize it so the independent choices are obvious",
+    "query": "our notification code has grown into a mess: channel folders sit beside sendutil and template code is buried three levels deep; reorganize it so the independent choices are obvious",
     "rationale": "near miss owned by orthogonal-pattern-guide",
     "should_trigger": false,
     "split": "train"
@@ -93,6 +93,12 @@
     "query": "We have a notification service in Go that currently sends messages over email, SMS, and push. We keep having to touch the sending code every time a new channel is added. Sketch a design that lets us add new channels later without rewriting the sender, and show the sending function's signature.",
     "rationale": "near miss owned by microkernel-pattern-guide",
     "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "the core package imports the concrete email and SMS adapters directly; invert it so the core depends only on interfaces",
+    "rationale": "dependency inversion at the core boundary",
+    "should_trigger": true,
     "split": "validation"
   }
 ]

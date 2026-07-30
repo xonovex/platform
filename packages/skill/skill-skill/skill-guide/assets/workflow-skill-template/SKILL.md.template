@@ -7,17 +7,17 @@ description: "Use when {running | authoring | maintaining} {the workflow, e.g. '
 
 ## Core Principles
 
-- **{Principle}** — {the rule that governs every operation, one line}
-- **{Principle}** — {…}
-- **{Principle}** — {…}
+- **{Principle}**: {the rule that governs every operation, one line}
+- **{Principle}**: {...}
+- **{Principle}**: {...}
 
 ## Operations
 
-Each operation is a procedure the agent (or a command) delegates to — one row per `references/` file, mirrored below in Progressive Disclosure. Split into domain groups (e.g. `## Plan Operations` / `## Commit Operations`) once there are more than ~7.
+Each operation is a procedure the agent (or a command) delegates to. One row per `references/` file, mirrored below in Progressive Disclosure. Split into domain groups (e.g. `## Plan Operations` / `## Commit Operations`) once there are more than ~7.
 
-- **{Operation}** — {what it produces} — see [references/{operation}.md](references/{operation}.md)
-- **{Operation}** — {…} — see [references/{operation}.md](references/{operation}.md)
-- **{Operation}** — {…} — see [references/{operation}.md](references/{operation}.md)
+- **{Operation}**: {what it produces}, see [references/{operation}.md](references/{operation}.md)
+- **{Operation}**: {...}, see [references/{operation}.md](references/{operation}.md)
+- **{Operation}**: {...}, see [references/{operation}.md](references/{operation}.md)
 
 ## Gotchas
 

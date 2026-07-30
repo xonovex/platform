@@ -16,7 +16,7 @@ tasks:
   ts-coverage:
     env:
       TS_COVERAGE_MIN_LINES: "75"
-      TS_COVERAGE_MIN_FUNCTIONS: "89"
+      TS_COVERAGE_MIN_FUNCTIONS: "90"
       TS_COVERAGE_MIN_BRANCHES: "60"
       TS_COVERAGE_MIN_STATEMENTS: "75"
     inputs:

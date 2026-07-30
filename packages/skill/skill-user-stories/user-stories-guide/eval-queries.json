@@ -1,6 +1,6 @@
 [
   {
-    "query": "is this user story good? \"As a rider I want to pay for my trip\" — does it pass INVEST?",
+    "query": "is this user story good? \"As a rider I want to pay for my trip\": does it pass INVEST?",
     "should_trigger": true,
     "split": "train",
     "rationale": "core INVEST evaluation of a user story"
@@ -9,7 +9,7 @@
     "query": "this story is too big for a sprint, how do I split it into smaller stories?",
     "should_trigger": true,
     "split": "train",
-    "rationale": "story splitting — SPIDR / flowchart territory"
+    "rationale": "story splitting: SPIDR / flowchart territory"
   },
   {
     "query": "what does SPIDR stand for and when do I use a spike to split a story?",
@@ -24,7 +24,7 @@
     "rationale": "acceptance criteria coverage is owned by user-stories"
   },
   {
-    "query": "explain the 3 Cs — card, conversation, confirmation — for our stories",
+    "query": "explain the 3 Cs: card, conversation, confirmation, for our stories",
     "should_trigger": true,
     "split": "train",
     "rationale": "the 3 Cs model is owned here"
@@ -36,19 +36,19 @@
     "rationale": "vertical slicing / walking skeleton owned by user-stories"
   },
   {
-    "query": "our backlog refinement is a mess — when is a story actually ready and who sizes it?",
+    "query": "our backlog refinement is a mess. When is a story actually ready and who sizes it?",
     "should_trigger": true,
     "split": "validation",
     "rationale": "backlog refinement and readiness owned here"
   },
   {
-    "query": "rewrite this story using the As a / I want / so that template",
+    "query": "rewrite this story using the As a / I want / so that template: \"Logged-in shoppers need a way to save a card so checkout is faster next time.\"",
     "should_trigger": true,
     "split": "validation",
     "rationale": "the story template is owned by user-stories"
   },
   {
-    "query": "break these tasks down so each one is SMART",
+    "query": "break these tasks down so each one is SMART: \"improve checkout performance\", \"clean up the payment module\", \"add better logging\".",
     "should_trigger": true,
     "split": "validation",
     "rationale": "SMART tasks are the task-level companion owned here"
@@ -72,13 +72,13 @@
     "rationale": "near-miss: domain modelling and ubiquitous language are owned by ddd-guide"
   },
   {
-    "query": "name our features using the FDD action-result-object template and build the feature list",
+    "query": "break this epic into a parent plan and child plans with explicit parallel groups",
     "should_trigger": false,
     "split": "train",
-    "rationale": "near-miss: FDD feature list and naming template are owned by fdd-guide"
+    "rationale": "near-miss: plan decomposition is owned by plan-guide"
   },
   {
-    "query": "these two stories keep breaking each other — analyse the coupling between the modules",
+    "query": "these two stories keep breaking each other: analyse the coupling between the modules",
     "should_trigger": false,
     "split": "train",
     "rationale": "near-miss: coupling theory behind Independent is owned by connascence-guide"
@@ -90,8 +90,8 @@
     "split": "validation"
   },
   {
-    "query": "we're adopting FDD — what are the five processes and which run once vs per feature set?",
-    "rationale": "near miss owned by fdd-guide",
+    "query": "we're adopting DDD. What are the tactical building blocks and which of them are aggregates?",
+    "rationale": "near miss owned by ddd-guide",
     "should_trigger": false,
     "split": "validation"
   },
@@ -102,8 +102,8 @@
     "split": "validation"
   },
   {
-    "query": "should a feature in our feature list be capped at two weeks, and what if a step is bigger?",
-    "rationale": "validation near miss owned by fdd-guide",
+    "query": "should a subplan be capped at seven tasks, and what if one task is bigger?",
+    "rationale": "validation near miss owned by plan-guide",
     "should_trigger": false,
     "split": "validation"
   }

@@ -1,0 +1,30 @@
+{
+  "skill_name": "{tech}-guide",
+  "tier": "moderate",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "{Realistic request that requires the skill's default guidance}",
+      "assertions": [
+        "{Observable condition that distinguishes a correct result}",
+        "{Second specific condition covering the important constraint}"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "{Realistic request covering a non-obvious edge case}",
+      "assertions": [
+        "{Observable condition proving the edge case is handled}",
+        "{Observable condition preventing the common failure mode}"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "{Realistic review or diagnosis request where the skill should change the answer}",
+      "assertions": [
+        "{Observable condition proving the relevant issue is identified}",
+        "{Observable condition proving the recommendation is actionable}"
+      ]
+    }
+  ]
+}

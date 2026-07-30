@@ -2,11 +2,11 @@
 
 ## Contents
 
-[Core Workflow](#core-workflow) · [Frontmatter Checks](#frontmatter-checks) · [Body Checks](#body-checks) · [Reference Checks](#reference-checks) · [Content Quality Checks](#content-quality-checks) · [Structural-Pattern Hints](#structural-pattern-hints-soft-signals) · [Harness Neutrality Checks](#harness-neutrality-checks) · [Output](#output) · [Error Handling](#error-handling) · [Safety](#safety)
+[Core Workflow](#core-workflow) · [Frontmatter Checks](#frontmatter-checks) · [Body Checks](#body-checks) · [Reference Checks](#reference-checks) · [Content Quality Checks](#content-quality-checks) · [Structural-Pattern Hints](#structural-pattern-hints-soft-signals) · [Harness Neutrality Checks](#harness-neutrality-checks) · [Composition Checks](#composition-checks) · [Output](#output) · [Error Handling](#error-handling) · [Safety](#safety)
 
 Read-only audit of a SKILL.md against the Agent Skills spec, project conventions, and authoring best practices. Reports pass/fail per check with line numbers.
 
-A reference implementation lives at [scripts/validate.py](../scripts/validate.py) (PEP 723 self-contained Python): `uv run scripts/validate.py <skill-dir>` runs all checks below and exits non-zero on errors.
+The catalog validator runs as `moon-skill-validate --strict <skill-dir>` and exits non-zero on errors or authoring warnings. A portable reference implementation lives at [scripts/validate.py](../scripts/validate.py) (PEP 723 self-contained Python).
 
 ## Core Workflow
 
@@ -14,15 +14,17 @@ A reference implementation lives at [scripts/validate.py](../scripts/validate.py
 2. Resolve target: SKILL.md path or skill directory
 3. Parse frontmatter (YAML) and body separately
 4. Run all checks (frontmatter, body, references, content quality, harness neutrality)
-5. Report pass/fail with file:line evidence and remediation hints
-6. Read-only — never modify files
+5. When repository context is available, validate registration, paired manifests, exact hard dependencies, and named handoffs
+6. Report pass/fail with file:line evidence and remediation hints
+7. Read-only, never modify files
 
 ## Frontmatter Checks
 
-- `name` present, 1-64 chars, matches `^[a-z0-9]+(-[a-z0-9]+)*$`, not a reserved word (`anthropic`/`claude`), no XML tags, equals parent directory name
-- `description` present, 1-1024 chars (warns on `<…>` angle-bracket markup — fine for component/generic references)
+- `name` present, 1-64 chars, matches `^[a-z0-9]+(-[a-z0-9]+)*$`, does not use a reserved word (`anthropic`/`claude`) except the catalog's explicit `claude-code-guide` product adapter, has no XML tags, and equals the parent directory name
+- `description` present, 1-1024 chars (warns on `<...>` angle-bracket markup: fine for component/generic references)
 - `description` starts with imperative cue ("Use when...", "Use this skill when...")
 - `description` includes trigger contexts ("Triggers on...", "even when the user doesn't say...")
+- `description` positively distinguishes the relevant user intent or context where adjacent skills share trigger words; it does not use skip/out-of-scope clauses or name other skills
 - Optional fields obey their limits/types: `compatibility` ≤500 chars, `license` string, `metadata` string→string map, `allowed-tools` space-separated token string
 - No unknown top-level fields (outside `name`/`description`/`license`/`compatibility`/`metadata`/`allowed-tools`)
 
@@ -49,19 +51,31 @@ A reference implementation lives at [scripts/validate.py](../scripts/validate.py
 
 ## Structural-Pattern Hints (soft signals)
 
-Soft warnings only — these patterns aid agent execution but aren't required. See [instruction-patterns.md](instruction-patterns.md).
+These patterns are advisory during local exploration and fail the repository's strict CI mode until resolved. See [instruction-patterns.md](instruction-patterns.md).
 
-- Multi-step workflow (>3 ordered steps) without a checklist (`- [ ]`) — consider adding one
-- Output-producing skill without an output template — consider adding one
-- Fragile edits / destructive operations without a validation loop or plan-validate-execute pattern — consider adding one
+- Multi-step workflow (>3 ordered steps) without a checklist (`- [ ]`): consider adding one
+- Output-producing skill without an output template: consider adding one
+- Fragile edits / destructive operations without a validation loop or plan-validate-execute pattern: consider adding one
 
 ## Harness Neutrality Checks
 
-- No proprietary tool / function names from any agent harness — describe the capability instead
-- No vendor model IDs or model names — describe the role (e.g. "exploration agent")
-- No hardcoded vendor-namespaced paths — use placeholders like `<skills-dir>/`, `<commands-dir>/`
+- No proprietary tool / function names from any agent harness: describe the capability instead
+- No vendor model IDs or model names: describe the role (e.g. "exploration agent")
+- No hardcoded vendor-namespaced paths: use placeholders like `<skills-dir>/`, `<commands-dir>/`
 - No vendor-prefixed frontmatter keys
-- No vendor-specific instruction filenames — use `AGENTS.md` (the open standard)
+- No vendor-specific instruction filenames: use `AGENTS.md` (the open standard)
+
+## Composition Checks
+
+The workspace-level composition check validates only durable, exact structure:
+
+- Every skill package and guide is registered in the supported marketplaces.
+- Paired plugin manifests use the package-derived name and direct guide path.
+- Exact hard dependencies match between supported manifests and package dependencies.
+- Every hard dependency and named ownership handoff resolves to an existing registered skill.
+- Hard dependencies are dependency-first and acyclic.
+- Optional selection remains in runtime prose and relies on installed skill names and routing descriptions, not a second metadata graph.
+- `SOURCES.md` records content provenance independently of package versions.
 
 ## Output
 
@@ -76,6 +90,7 @@ Validation: <skills-dir>/{skill-name}/SKILL.md
   - SKILL.md:58 → references/old-name.md (file not found)
 [WARN] references: 3 links lack load-when triggers
   - SKILL.md:42, SKILL.md:51, SKILL.md:60
+[PASS] composition: manifests, hard dependencies, and handoffs resolve
 [FAIL] harness neutrality: 1 vendor-specific reference
   - SKILL.md:30 → proprietary tool name detected
 

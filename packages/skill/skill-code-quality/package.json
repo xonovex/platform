@@ -1,12 +1,9 @@
 {
   "name": "@xonovex/skill-code-quality",
   "version": "5.1.0",
+  "description": "Xonovex Code quality skills",
   "private": true,
   "type": "module",
-  "dependencies": {
-    "@xonovex/skill-connascence": "5.1.0",
-    "@xonovex/skill-oop": "5.1.0"
-  },
   "keywords": [
     "xonovex",
     "skill",

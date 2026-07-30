@@ -1,4 +1,4 @@
-# GitHub Issues
+# GitHub Issues as Workflow Tickets
 
 Use repository issues as provider-native tickets. A durable identity is the repository
 plus issue number; preserve the issue node ID, URL, and observed `updatedAt` when
@@ -99,9 +99,10 @@ active subject. Delete is destructive and must never be inferred from close.
 
 ## Comments and Context
 
-Ordinary discussion uses `gh issue comment`. Keep durable context in issue comments
-rather than a review verdict or an inline diff thread — those are scoped to the pull
-request and go outdated when the branch moves.
+Ordinary discussion uses `gh issue comment`. Durable versioned workflow context on
+either an issue or pull request uses the append-only issue-comment procedure in
+[context-comments.md](context-comments.md). Never use a review verdict or inline diff
+thread as the authoritative ticket context channel.
 
 ## Result Handoff
 

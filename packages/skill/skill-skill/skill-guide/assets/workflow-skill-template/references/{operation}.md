@@ -8,7 +8,7 @@
 
 ## Core Workflow
 
-1. {Step — a concrete action, naming the tool/script where relevant}
+1. {Step: a concrete action, naming the tool/script where relevant}
 2. {Step}
 3. {Step}
 
@@ -22,8 +22,8 @@
 
 ## Error Handling
 
-- **Error** — {a condition that aborts the operation, and what the agent reports instead}
-- **Warning** — {a non-fatal condition to surface and continue past}
+- **Error**: {a condition that aborts the operation, and what the agent reports instead}
+- **Warning**: {a non-fatal condition to surface and continue past}
 
 ## Gotchas
 

@@ -1,12 +1,9 @@
 {
   "name": "xonovex-skill-plan",
   "version": "5.1.0",
-  "description": "Xonovex Plan skills",
-  "author": {"name": "Xonovex"},
-  "skills": ["./plan-guide"],
-  "dependencies": [
-    "xonovex-skill-code-quality",
-    "xonovex-skill-tdd",
-    "xonovex-skill-bdd"
-  ]
+  "description": "Xonovex implementation-planning skills",
+  "author": {
+    "name": "Xonovex"
+  },
+  "skills": ["./plan-guide"]
 }

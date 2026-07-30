@@ -2,12 +2,8 @@
   "name": "xonovex-skill-orthogonal-pattern",
   "version": "5.1.0",
   "description": "Xonovex Orthogonal pattern skills",
-  "author": {"name": "Xonovex"},
-  "skills": ["./orthogonal-pattern-guide"],
-  "dependencies": [
-    "xonovex-skill-connascence",
-    "xonovex-skill-ddd",
-    "xonovex-skill-hexagonal-pattern",
-    "xonovex-skill-microkernel-pattern"
-  ]
+  "author": {
+    "name": "Xonovex"
+  },
+  "skills": ["./orthogonal-pattern-guide"]
 }

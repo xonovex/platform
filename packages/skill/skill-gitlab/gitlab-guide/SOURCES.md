@@ -9,9 +9,9 @@
   labels/assignees, board and experimental work-item commands (issues.md, boards.md);
   MR create/review commands; and Notes/discussion behavior.
 - **References:** references/auth.md, references/boards.md,
-  references/create.md,
-  references/issues.md,
-  references/review-post.md,
+  references/context-notes.md, references/create.md,
+  references/first-time-setup.md, references/issues.md,
+  references/provider-conformance.md, references/review-post.md,
   references/review-resolve.md
 
 ## GitLab REST & GraphQL API
@@ -23,10 +23,11 @@
   reconciliation and cross-project links (issues.md); project/group board/list REST
   resources and GraphQL Global IDs,
   status/rank schema discovery (boards.md); paginated issue/MR Notes, internal
-  visibility, append-only context identity and note URLs; plus MR,
+  visibility, append-only context identity and note URLs (context-notes.md); plus MR,
   discussions, approvals, and review resolution.
-- **References:** references/boards.md, references/create.md, references/issues.md,
-  references/review-post.md,
+- **References:** references/boards.md, references/context-notes.md,
+  references/create.md, references/issues.md,
+  references/provider-conformance.md, references/review-post.md,
   references/review-resolve.md
 
 ## GitLab issues, work items, Status, and boards
@@ -36,7 +37,8 @@
 - **Used for:** issue/work-item responsibility; board cards as views over labels,
   assignees, milestones, iterations, or Status; cross-list effects; native Status
   version/tier/category behavior; work-item migration and experimental API boundaries.
-- **References:** references/boards.md, references/issues.md
+- **References:** references/boards.md, references/issues.md,
+  references/provider-conformance.md
 
 ## GitLab tokens, scopes, and CI
 
@@ -56,7 +58,7 @@
 
 - **URLs:** https://docs.gitlab.com/ci/components/ · https://docs.gitlab.com/ci/yaml/inputs/ · https://docs.gitlab.com/user/application_security/policies/pipeline_execution_policies/ · https://docs.gitlab.com/user/compliance/compliance_frameworks/ · https://docs.gitlab.com/ci/environments/protected_environments/ · https://docs.gitlab.com/ci/environments/deployment_approvals/ · https://docs.gitlab.com/ci/jobs/job_artifacts/
 - **Last reviewed:** 2026-07-16
-- **Used for:** ``
+- **Used for:** `references/automation-and-enforcement.md`
 - **Aspects extracted:** Component layout, typed inputs, configurable job naming, commit/release/partial/latest references, component tests and catalog release/security guidance; pipeline-policy application without project CI, job-conflict suffix behavior, project/project-policy/group-policy merge order, reserved stages, injection strategies and failure modes; compliance-framework scope; protected-environment/deployment approval and provider-native pipeline/job/artifact/deployment evidence. Transaction, exact-revision, failure-policy, governance-only adoption, and no-certification claims are Xonovex adapter constraints.
 
 ## glab tracking issues
@@ -70,9 +72,9 @@
 
 - **Provenance:** Repository-original integration of the source blocks above; these references combine multiple inputs or maintained conventions rather than one exclusive upstream
 - **References:** references/auth.md, references/boards.md,
-  references/create.md,
-  references/issues.md, references/onboarding.md,
-  references/review-post.md,
+  references/context-notes.md, references/create.md,
+  references/first-time-setup.md, references/issues.md, references/onboarding.md,
+  references/provider-conformance.md, references/review-post.md,
   references/review-resolve.md
 - **Last reviewed:** 2026-07-16
 

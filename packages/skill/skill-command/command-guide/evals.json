@@ -16,7 +16,7 @@
       "prompt": "We have a ~140-line Claude Code slash command that inlines its entire Goal, Workflow, Output format, and Gotchas. I want to refactor it into a thin command that keeps only its argument contract and delegates the actual procedure to a reusable guideline skill. It's packaged as a plugin. Walk me through every step so nothing breaks at run time.",
       "assertions": [
         "Says to add the `Skill` tool to the command's `allowed-tools` so the delegation can load the skill",
-        "Says to declare the guideline skill as a dependency in BOTH the `.claude-plugin/plugin.json` and `.codex-plugin/plugin.json` manifests",
+        "Says to declare the guideline skill as a dependency in `.claude-plugin/plugin.json`, and to distribute the skill directly for Codex instead of creating a parallel command manifest",
         "Keeps the argument contract (flags/defaults) in the command while the Goal/Workflow/Output/Gotchas move into the skill's `references/{operation}.md`, and notes install does not equal in-context (must load via the Skill tool)"
       ]
     },
@@ -26,7 +26,43 @@
       "assertions": [
         "Replaces the project-specific path `packages/billing-service/src/` and domain/app terms (billing, invoicing) with generic equivalents rather than hardcoding them",
         "Gives the command a kebab-case name",
-        "Resulting command body is kept short (under ~150 lines); since no installed skill owns the procedure, it is self-contained with the sections for that case (description/metadata, Goal, Arguments, Core Workflow, Error Handling)"
+        "Creates or selects one owner skill for the reusable procedure and keeps the resulting command thin with frontmatter, Arguments, and Delegation rather than embedding the workflow"
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "Create a Claude command for repository release checks. The procedure is owned by versioning-guide in plugin xonovex-skill-versioning, and it can optionally use any installed changelog capability. Preview everything because a command with that name already exists.",
+      "assertions": [
+        "Keeps versioning-guide as the owner skill and xonovex-skill-versioning as the separate distribution plugin instead of conflating their names",
+        "Describes changelog support as an optional runtime capability selected from installed skill names and descriptions rather than making a second skill co-own the command or copying its instructions",
+        "Uses dry-run to preview the command, owner-skill reference, and manifest changes and refuses to overwrite the existing command without an explicit exact-target force choice"
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "Distill this fat deploy command. Keep its existing flags exactly, move the procedure to deploy-guide's promote operation, require the xonovex-skill-deploy plugin, and let runtime select separate observability and rollback helpers.",
+      "assertions": [
+        "Preserves the existing public argument names, defaults, and repeatability in the thin command",
+        "Moves procedure, output, errors, and gotchas to deploy-guide's promote operation and explicitly loads that owner at runtime",
+        "Wires xonovex-skill-deploy as the owner plugin dependency while describing observability and rollback as optional supporting capabilities selected at runtime"
+      ]
+    },
+    {
+      "id": 6,
+      "prompt": "Simplify this 90-line Claude command. It already delegates to release-guide but repeats that guide's workflow, validation, and errors in the command body.",
+      "assertions": [
+        "Preserves metadata, arguments, supporting-capability prose, exact owner plugin, and operation as the public command contract",
+        "Removes duplicated procedure from the command and keeps or moves it into the registered release-guide operation",
+        "Validates argument parity, operation registration, dependencies, and tool permissions instead of preserving a fat workflow to hit a percentage target"
+      ]
+    },
+    {
+      "id": 7,
+      "prompt": "Merge the safety and validation behavior from source.md into target.md. Both are skill-delegating commands, but they currently name different owner skills.",
+      "assertions": [
+        "Treats the two owner skills as an ownership conflict and requires one procedure owner before merging",
+        "Merges compatible public arguments or supporting-capability prose into the command while moving reusable safety and validation behavior into the selected owner operation",
+        "Does not inline the source workflow into the target command or silently widen tools and effects"
       ]
     }
   ]

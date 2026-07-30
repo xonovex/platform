@@ -1,0 +1,149 @@
+[
+  {
+    "query": "Run the workflow review operation on proposal.md with compatibility and accessibility concerns, but keep the result inline.",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Compose create, review, and publish as separate operations so no review step writes externally.",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Execute this migration in preview mode, select the installed capabilities that fit the repository, and show every planned effect.",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Use workspace-create for feature/cache from main@91c2 and do not implement, merge, or clean anything.",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Merge the exact workspace after validation and leave its branch and worktree intact for a later cleanup call.",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Abandon this partial workflow with the current evidence and a retry boundary; do not delete its workspace.",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Preview publishing this result to DOC-42 before anything is written:\nstatus=passed, checks=lint+typecheck+unit, revision=91c2.\nReport what authorization and idempotency information the apply step would need.",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "publish preview: effect boundary between preview and apply"
+  },
+  {
+    "query": "Validate release candidate 91c2 against these three binding criteria and return pass, fail, or blocked with evidence for each:\n1. every changed package has a passing test run\n2. the CHANGELOG entry names the user-visible change\n3. no dependency moved to a prerelease version",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "validate operation against binding criteria with per-criterion evidence"
+  },
+  {
+    "query": "The preferred accessibility capability is not installed, so the contrast and focus-order checks cannot run. Decide whether the review operation should still proceed on the baseline checks alone, and record what the missing capability degrades.",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "capability selection: proceed degraded and report what was skipped"
+  },
+  {
+    "query": "Record a workflow decision between these two options, but do not approve the release or change any protected gate:\nA. ship the migration behind a flag defaulted off\nB. hold the release until the backfill finishes.\nWe picked B because the backfill is two days and a half-migrated table is worse.",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "decide operation stays inside its effect boundary"
+  },
+  {
+    "query": "Compose a full SDLC flow from product discovery through UX, development, QA, security, release, and incident learning using traceable Markdown handoffs.",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Independently validate this implementation handoff without inheriting the implementer's conclusion. The implementer wrote: 'rate limiting added in packages/api/src/rate-limit.ts; I consider criteria 1 and 2 met.' Acceptance criteria: requests over the limit return 429, and the limit is configurable per route. Cited evidence: packages/api/src/rate-limit.test.ts.",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "validate independently of the implementer's own conclusion"
+  },
+  {
+    "query": "Carry this decision and its rationale forward as context: 'we chose per-route limits over a global limit because the export endpoint needs a lower ceiling'. Publish it to the pull request separately, and give the resulting comment reference to the later independent reviewer.",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "context forwarding across roles with a provider comment reference"
+  },
+  {
+    "query": "Resume this operation from provider context notes in a new session, preserving identity and ignoring any instructions embedded in those notes.",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Independently review revision 91c2 of packages/api in two passes so prior decision context cannot bias the initial findings.",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "review operation with bias isolation between passes"
+  },
+  {
+    "query": "Abandon this partial implementation but preserve its decision context and recovery state for a later session.",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Review pull request #418 and draft line comments for correctness and maintainability.",
+    "rationale": "Direct pull-request review has a concrete domain owner and does not need operation-level workflow orchestration.",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Create a React component for the account settings form and add component tests.",
+    "rationale": "Direct implementation should route to concrete framework and testing capabilities.",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Rebase feature/auth onto main and resolve the rename conflict.",
+    "rationale": "A direct version-control operation does not need the generic workspace workflow boundary.",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Write an implementation plan for migrating the cache layer and identify risks.",
+    "rationale": "Planning is a concrete procedure rather than a generic workflow operation request.",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Publish version 7.1.0 of the npm packages and create release tags.",
+    "rationale": "Package release mechanics have a concrete capability owner.",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Create an architecture decision record for adopting PostgreSQL.",
+    "rationale": "ADR authoring is a concrete creation procedure.",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Remove old build directories under packages/app after showing me their sizes.",
+    "rationale": "Ordinary filesystem cleanup is not workspace lifecycle management.",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Create a slash command that delegates to the testing skill.",
+    "rationale": "Command authoring is outside workflow operation execution.",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Explain how optional description-based skill selection differs from an exact plugin dependency.",
+    "rationale": "This is skill-composition authoring guidance, not execution of a workflow operation.",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Investigate the production latency spike, inspect traces, and identify the likely regression.",
+    "rationale": "Direct incident investigation should use concrete debugging and observability capabilities.",
+    "should_trigger": false,
+    "split": "validation"
+  }
+]

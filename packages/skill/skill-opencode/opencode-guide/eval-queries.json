@@ -1,0 +1,98 @@
+[
+  {
+    "query": "map a mandatory protected-path control to OpenCode and tell me whether it can actually block",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "native capability and guarantee mapping"
+  },
+  {
+    "query": "preview onboarding a project-provided OpenCode executable module without applying it",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "advisory transactional onboarding"
+  },
+  {
+    "query": "what version and trust probes should I run before relying on this OpenCode hook or extension?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "versioned matrix and executable trust"
+  },
+  {
+    "query": "Can an OpenCode tool.execute.before plugin block this exact tool operation? Validate the installed surface and its coverage.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Advise onboarding a repository-provided OpenCode hook, plugin, extension, or package. Do not mutate yet.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Provide deterministic, model-evaluator, and specialist-agent patterns for OpenCode.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Configure OpenCode providers, permissions, and commands so the agent can edit this repository and test locally without exposing unrelated environment secrets.",
+    "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
+    "split": "validation"
+  },
+  {
+    "query": "Document OpenCode onboarding, including config locations, AGENTS.md behavior, provider setup, and a harmless command that proves the setup works.",
+    "should_trigger": true,
+    "rationale": "curated domain-specific routing scenario",
+    "split": "validation"
+  },
+  {
+    "query": "map a mandatory protected-path control to Claude Code and tell me whether it can actually block",
+    "rationale": "near miss owned by claude-code-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "map a mandatory protected-path control to Codex and tell me whether it can actually block",
+    "rationale": "near miss owned by codex-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "map a mandatory protected-path control to GitHub Copilot and tell me whether it can actually block",
+    "rationale": "near miss owned by copilot-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "map a mandatory protected-path control to Kiro and tell me whether it can actually block",
+    "rationale": "near miss owned by kiro-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "map a mandatory protected-path control to Pi and tell me whether it can actually block",
+    "rationale": "near miss owned by pi-guide",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Provide deterministic, model-evaluator, and specialist-agent patterns for Claude Code.",
+    "rationale": "near miss owned by claude-code-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Provide deterministic, model-evaluator, and specialist-agent patterns for Codex.",
+    "rationale": "near miss owned by codex-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Provide deterministic, model-evaluator, and specialist-agent patterns for GitHub Copilot.",
+    "rationale": "near miss owned by copilot-guide",
+    "should_trigger": false,
+    "split": "validation"
+  }
+]

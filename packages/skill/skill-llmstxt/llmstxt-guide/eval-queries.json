@@ -54,13 +54,13 @@
     "split": "train"
   },
   {
-    "query": "this packages/auth dir doesn't have an AGENTS.md yet — set one up",
+    "query": "this packages/auth dir doesn't have an AGENTS.md yet: set one up",
     "rationale": "near miss owned by instruction-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "create a new skill for our GraphQL resolver conventions — SKILL.md plus a few reference files",
+    "query": "create a new skill for our GraphQL resolver conventions: SKILL.md plus a few reference files",
     "rationale": "near miss owned by skill-guide",
     "should_trigger": false,
     "split": "train"
@@ -78,7 +78,7 @@
     "split": "train"
   },
   {
-    "query": "the new microservice doesn't have project instructions yet — generate one based on what's in src/",
+    "query": "the new microservice doesn't have project instructions yet: generate one based on what's in src/",
     "rationale": "near miss owned by instruction-guide",
     "should_trigger": false,
     "split": "validation"

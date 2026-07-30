@@ -12,7 +12,7 @@
     },
     {
       "id": 2,
-      "prompt": "Is a chained expression like `order.Customer().Address().City()` a problem in our codebase? Explain concretely what it costs and what to do instead. Also: we have a builder used as `NewQuery().Where(x).OrderBy(y).Build()` — is that the same problem?",
+      "prompt": "Is a chained expression like `order.Customer().Address().City()` a problem in our codebase? Explain concretely what it costs and what to do instead. Also: we have a builder used as `NewQuery().Where(x).OrderBy(y).Build()`. Is that the same problem?",
       "assertions": [
         "Labels the order.Customer().Address().City() chain as content coupling (reaching through returned objects into their internals) and violating the Law of Demeter",
         "Recommends replacing it with a single method on the direct neighbor (e.g. order.ShippingCity()) that hides the intermediate objects",
@@ -24,7 +24,7 @@
       "prompt": "A billing function reads an Order's total by passing a magic number: `cache.Get(key, 0)` where `0` means \"no expiry\", and a far-away handler does `if ttl == 0 { /* unlimited */ }`. Grade this coupling precisely and give me the fix.",
       "assertions": [
         "Names the specific connascence form as connascence of meaning/convention (both distant sites silently agree that 0 means unlimited) rather than only calling it 'tight coupling'",
-        "Applies the rule of degree to convert it to connascence of name — e.g. a named/typed value like an explicit Unlimited field or constant so the pact is visible at both call sites"
+        "Applies the rule of degree to convert it to connascence of name, e.g. a named/typed value like an explicit Unlimited field or constant so the pact is visible at both call sites"
       ]
     },
     {

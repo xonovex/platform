@@ -1,6 +1,6 @@
 # simplify: Condense Verbose AGENTS.md
 
-Reduce AGENTS.md verbosity by 30-60% (default target 45%) while preserving structure, workflows, and project-specific technology names.
+Reduce AGENTS.md verbosity by 40-50% while preserving structure, workflows, and project-specific technology names.
 
 ## Core Workflow
 
@@ -30,8 +30,10 @@ section headings, dependencies, command examples with actual tool names, file/di
 
 Environment configs (`main.tf`, vars, `backend.sh`) - local, staging
 
+Valid reduction range: 30-60%.
+
 ## Gotchas
 
-- Tech names look like noise but are essential — don't strip `moon` / `Terraform` / `Flux` even if a generic verb works
+- Tech names look like noise but are essential: don't strip `moon` / `Terraform` / `Flux` even if a generic verb works
 - Removing a code block looks like progress until you realize it was the only place a command was documented
-- "Already minimal" usually means <15 lines, but a 30-line file dense with gotchas is also already minimal — measure signal, not just length
+- "Already minimal" usually means <15 lines, but a 30-line file dense with gotchas is also already minimal: measure signal, not just length

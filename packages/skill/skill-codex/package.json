@@ -1,0 +1,18 @@
+{
+  "name": "@xonovex/skill-codex",
+  "version": "5.1.0",
+  "description": "Xonovex Codex hook skills",
+  "private": true,
+  "type": "module",
+  "keywords": [
+    "xonovex",
+    "skill",
+    "codex",
+    "hooks",
+    "automation"
+  ],
+  "scripts": {
+    "fmt": "prettier --write .",
+    "fmt:check": "prettier --check ."
+  }
+}

@@ -51,25 +51,25 @@
     "query": "release 1.4.0 and add the changelog entries",
     "should_trigger": true,
     "split": "validation",
-    "rationale": "validation positive — exact release + changelog"
+    "rationale": "validation positive: exact release + changelog"
   },
   {
     "query": "tag the next version after these feat and fix commits",
     "should_trigger": true,
     "split": "validation",
-    "rationale": "validation positive — bump inferred from commits"
+    "rationale": "validation positive: bump inferred from commits"
   },
   {
     "query": "open a pull request for the release branch",
     "should_trigger": false,
     "split": "train",
-    "rationale": "validation negative — owned by pull-request-guide"
+    "rationale": "validation negative: owned by pull-request-guide"
   },
   {
     "query": "fix the merge conflict in two package.json files",
     "should_trigger": false,
     "split": "train",
-    "rationale": "validation negative — conflict resolution, owned by git-guide"
+    "rationale": "validation negative: conflict resolution, owned by git-guide"
   },
   {
     "query": "A package's package.json currently reads \"version\": \"1.2.3-beta.4\". The beta cycle is over and we're ready to ship the stable release. Tell me the exact version string it should become and explain briefly why.",

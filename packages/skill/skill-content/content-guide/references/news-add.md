@@ -17,14 +17,14 @@ Auto-curate the latest news and developments on a given topic, then produce CEFR
 
 ## Workflow
 
-1. **Research** — web search with date filters; find ≥3 credible sources per story on the given `topic`
-2. **Triangulate** — verify facts across sources; discard click-bait or unsourced claims
-3. **Headline** — authoritative yet friendly
-4. **Summary** — 35-45 words; tease key details
-5. **Tone** — 60% informative / 40% conversational
-6. **Paraphrase** — do not copy text verbatim
-7. **Image** — one royalty-free hero image; fallback to a relevant Unsplash keyword search
-8. **Front-matter** — assemble per language:
+1. **Research**: web search with date filters; find ≥3 credible sources per story on the given `topic`
+2. **Triangulate**: verify facts across sources; discard click-bait or unsourced claims
+3. **Headline**: authoritative yet friendly
+4. **Summary**: 35-45 words; tease key details
+5. **Tone**: 60% informative / 40% conversational
+6. **Paraphrase**: do not copy text verbatim
+7. **Image**: one royalty-free hero image; fallback to a relevant Unsplash keyword search
+8. **Front-matter**: assemble per language:
    ```yaml
    ---
    title: "{{HEADLINE_EN}}"
@@ -35,12 +35,12 @@ Auto-curate the latest news and developments on a given topic, then produce CEFR
    lang: "en"
    ---
    ```
-9. **Filenames** — `{{slug}}.{{lang}}.md` (specified slug if provided, otherwise `slugify(title_en)`)
-10. **Validate** — against the project's content schema if one exists
+9. **Filenames**: `{{slug}}.{{lang}}.md` (specified slug if provided, otherwise `slugify(title_en)`)
+10. **Validate**: against the project's content schema if one exists
 
 ## Gotchas
 
-- A single source isn't triangulation — require ≥3 credible sources before drafting
-- Verbatim phrases from a primary source will surface in plagiarism / duplication checks — paraphrase aggressively
-- Unsplash fallbacks need topic-relevant keywords, not generic ones — a generic image undercuts the headline
-- Slug collisions silently overwrite — slugify with a date suffix if a story repeats on a topic
+- A single source isn't triangulation: require ≥3 credible sources before drafting
+- Verbatim phrases from a primary source will surface in plagiarism / duplication checks: paraphrase aggressively
+- Unsplash fallbacks need topic-relevant keywords, not generic ones: a generic image undercuts the headline
+- Slug collisions silently overwrite: slugify with a date suffix if a story repeats on a topic

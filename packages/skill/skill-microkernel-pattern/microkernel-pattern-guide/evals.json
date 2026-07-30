@@ -25,7 +25,7 @@
       "prompt": "We have a payment-gateway integration that today has a single provider, but we know a second provider is coming and which one to use will be chosen from a config/environment value at deploy time. A colleague proposes selecting the provider with compile-time build tags. Advise us on the selection mechanism and justify it.",
       "assertions": [
         "Advises AGAINST compile-time build tags for this case and recommends resolving the provider at load/deploy time via config/DI/registry population (or run-time registry lookup), because the choice comes from a deploy-time config value",
-        "Explicitly reasons about binding time — that the moment the variant is chosen determines the technique, and binding compile-time here would force shipping/rebuilding separate binaries to switch a config-selectable provider"
+        "Explicitly reasons about binding time: that the moment the variant is chosen determines the technique, and binding compile-time here would force shipping/rebuilding separate binaries to switch a config-selectable provider"
       ]
     },
     {

@@ -4,7 +4,7 @@
 
 ## {Facet}
 
-{Statement and rationale — what this facet of the topic requires and why it matters.}
+{Statement and rationale. What this facet of the topic requires and why it matters.}
 
 ```{language}
 // Bad

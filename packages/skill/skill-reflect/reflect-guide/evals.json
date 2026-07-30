@@ -34,6 +34,15 @@
         "Warns that applies_to: [\"general\"] breaks or defeats routing/auto-detection (it cannot pick the correct AGENTS.md or owner skill)",
         "Recommends using a specific routing key (e.g. a directory/package/domain name) instead of general"
       ]
+    },
+    {
+      "id": 5,
+      "prompt": "A policy denial and an incident both suggest a new organization-wide blocking rule. Extract the lesson and promote it automatically to every agent configuration.",
+      "assertions": [
+        "Captures the denial and incident as source-evidenced learning candidates but rejects automatic global promotion",
+        "Routes the proposal to the existing policy or module owner and requires exact-scope owner review, authorization, versioning, conflict checks, validation, and a representative canary where executable",
+        "Requires effectiveness and user-friction measures, authoritative apply verification, provenance from source to target version, and a rollback or removal path"
+      ]
     }
   ]
 }

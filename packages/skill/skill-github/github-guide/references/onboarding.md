@@ -1,77 +1,21 @@
-# First-time GitHub CLI setup
+# Safe Onboarding and Operations
 
-Get from a bare machine to a working `gh`: install, authenticate, pick a git protocol, clone, and verify with a read call. Token families and per-operation scopes are in [auth.md](auth.md); this file is the ordered first-run flow.
+## Lifecycle
 
-## 1. Install (prefer a package manager for auto-updates)
+1. **Discover** host/product (github.com or Enterprise Server), version/plan features, organization/repository scope, Actions and pinning policy, workflows and resolved `uses:` refs, rulesets/branch protections, required checks and their source apps, bypass actors, environments, runners, CODEOWNERS/required reviewers, App/PAT/`GITHUB_TOKEN` permissions, Actions/Dependabot secrets, OIDC trust, webhooks, deploy keys, and evidence sinks, from an authenticated read ([first-time-setup.md](first-time-setup.md) covers a fresh `gh` install and login).
+2. **Assess** requested capabilities against the pinned baseline; report plan/feature gaps, ruleset and protection overlaps, bypass actors, renamed or spoofable check identities, missing full-SHA pins, untrusted-runner and fork exposure, and token/secret/data risks.
+3. **Propose** the smallest native composition with SHA-pinned reusable workflows/actions, stable check identity, active layered rulesets, a protected environment for privileged jobs, least-privilege permissions and constrained OIDC claims, provider-native evidence, verification probes, rollback, and drift owner.
+4. **Preview** exact before/after workflow, ruleset/protection, environment, permission, secret/OIDC, webhook, deploy-key, and App-installation changes plus network/data/cost effects, partial failure behavior, verification, and rollback.
+5. **Authorize** the preview digest, host, organization/repository subject, actor, scope, module pin, and expiry.
+6. **Apply** idempotently against observed resource revisions and the exact head SHA; stop on drift or permission expansion.
+7. **Verify** authoritative ruleset/protection, environment, and permission state plus allow, deny (omitted, renamed, skipped, or spoofed check), direct/force-push, fork-origin, merge-queue, bypass-actor, API-merge, attestation-resolution, and credential-expiry probes.
+8. **Record** separate preview, authorization, apply, verification, evidence, and rollback references.
+9. **Operate** diagnose, dry-run, rotate tokens/keys, update pins, detect drift, disable, uninstall, and roll back.
 
-```bash
-brew install gh                                  # macOS
-sudo dnf install gh                              # Fedora / RHEL
-winget install --id GitHub.cli                   # Windows
-```
+## Drift and removal
 
-Debian / Ubuntu (official apt repo, so `gh` updates with the system):
+Drift includes host/product/plan or Enterprise Server version changes, Actions allow/pinning policy changes, moved or unpinned action and reusable-workflow refs, altered workflow files, ruleset/protection status and bypass-actor changes, renamed checks or a changed source application, CODEOWNERS and reviewer-eligibility changes, App/PAT/`GITHUB_TOKEN` permission changes, secret and OIDC claim changes, new deploy keys, webhook destinations, artifact/log retention, and stale audit-log or attestation evidence.
 
-```bash
-sudo mkdir -p -m 755 /etc/apt/keyrings
-curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
-  | sudo tee /etc/apt/keyrings/githubcli-archive-keyring.gpg > /dev/null
-sudo chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg
-echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" \
-  | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
-sudo apt update && sudo apt install gh
+Adopt an existing compatible resource only after explicit ownership transfer. Removal deletes only owned workflow callers, rulesets/protections, environments, secrets/variables, webhooks, deploy keys, App installations, and cloud OIDC trust; it preserves foreign controls, workflows, identities, and retained native evidence.
 
-gh --version
-```
-
-## 2. Authenticate
-
-```bash
-gh auth login                                    # interactive (default)
-```
-
-The default is the **browser / device-code** flow, not a token paste. Answer **GitHub.com vs Other** (for GHES pass `--hostname ghe.example.com`), pick **HTTPS or SSH** for the git protocol, and answer **yes** to authenticate git so `gh` becomes the git credential helper. The token lands in the OS keyring.
-
-Headless / CI — skip interactive login:
-
-```bash
-export GH_TOKEN="$(op read 'op://<vault>/github/token')"   # github.com (GH_ENTERPRISE_TOKEN for GHES)
-# or feed a CLASSIC PAT (min scopes repo, read:org, gist) on stdin, straight from the store:
-gh auth login --with-token < <(op read 'op://<vault>/github/token')
-```
-
-Do NOT feed a fine-grained PAT to `--with-token` (its per-resource scoping confuses that flow) — use `GH_TOKEN` for fine-grained PATs.
-
-## 3. Git protocol
-
-- HTTPS: if you authenticated by token/env rather than the browser flow, git-over-HTTPS will not use `gh` until you run `gh auth setup-git`.
-- SSH: `gh auth login --git-protocol ssh` lets `gh` generate and upload a key (needs `admin:public_key` / `write:public_key`, which the browser flow requests but a hand-rolled `--with-token` PAT will not have — then use `--skip-ssh-key` and upload manually).
-
-```bash
-gh auth setup-git                                # make gh the git credential helper (HTTPS, token login)
-```
-
-## 4. Clone
-
-```bash
-gh repo clone OWNER/REPO
-```
-
-## 5. Verify with a read call
-
-```bash
-gh auth status                                   # exits 1 on an auth problem — a good CI gate
-gh api user -q '.login'                          # real REST read
-gh api graphql -f query='query{viewer{login}}'   # real GraphQL read
-```
-
-`gh auth status` exits non-zero on auth problems, but with `--json` it exits 0 even when broken — back it with a real read call.
-
-## Enterprise (GHES)
-
-```bash
-gh auth login --hostname ghe.example.com
-export GH_HOST=ghe.example.com
-export GH_ENTERPRISE_TOKEN="$(op read 'op://<vault>/ghes/token')"   # NOT GH_TOKEN for GHES
-gh api user --hostname ghe.example.com -q '.login'
-```
+Rollback restores captured workflow, ruleset, environment, and pin revisions in dependency order, revokes temporary trust and grants, and re-runs both positive and negative probes. Preview compensating changes and partial-state risk when atomic rollback is unavailable.

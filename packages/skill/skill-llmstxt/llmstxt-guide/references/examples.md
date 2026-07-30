@@ -21,9 +21,9 @@ Concrete `/llms.txt` examples to model authoring decisions on.
 
 Notes:
 
-- Single H1, single blockquote, single H2 section — minimum viable structure
+- Single H1, single blockquote, single H2 section: minimum viable structure
 - Link descriptions vary in length; longer is fine when it actually adds value (the `ed` demo line clarifies the purpose)
-- Each URL ends in `.md` — no HTML URLs
+- Each URL ends in `.md`, no HTML URLs
 
 ## Docs-Site Example
 
@@ -61,23 +61,23 @@ Pattern this demonstrates:
 
 ## Sibling Convention: `llms-full.txt`
 
-Some projects publish a single-file dump of all their docs as `/llms-full.txt` (e.g. `https://hono.dev/llms-full.txt`). This is **not the spec** — the spec defines `llms.txt` (the curated index) and `llms-ctx*.txt` (processor outputs). The `llms-full.txt` convention is a community pattern that works well for small-to-medium docs sites where the whole corpus fits in a single file.
+Some projects publish a single-file dump of all their docs as `/llms-full.txt` (e.g. `https://hono.dev/llms-full.txt`). This is **not the spec**: the spec defines `llms.txt` (the curated index) and `llms-ctx*.txt` (processor outputs). `llms-full.txt` is a community convention.
 
 When a project provides both:
 
-- `/llms.txt` — curated index with `.md` links (for tooling that follows the spec)
-- `/llms-full.txt` — single-file dump (for one-shot ingestion)
+- `/llms.txt`: curated index with `.md` links (for tooling that follows the spec)
+- `/llms-full.txt`: single-file dump (for one-shot ingestion)
 
 ## Real-World Examples to Study
 
-- **llmstxt.org itself** — minimal example, just the spec links
-- **FastHTML docs** — referenced in the spec as a worked example
-- **Hono** — `https://hono.dev/llms-full.txt` (full-dump sibling convention)
-- **Large product documentation sites** — many big doc sets now publish `llms.txt` files; study a cross-section to see grouping styles at scale
+- **llmstxt.org itself**: minimal example, just the spec links
+- **FastHTML docs**: referenced in the spec as a worked example
+- **Hono**: `https://hono.dev/llms-full.txt` (full-dump sibling convention)
+- **Large product documentation sites**: many big doc sets now publish `llms.txt` files; study a cross-section to see grouping styles at scale
 
 ## Gotchas
 
-- Copying a competitor's structure verbatim without revisiting groupings produces awkward fits — group by what _your_ users would ask, not what someone else grouped
-- A bloated `## Docs` section with 50 links is unhelpful — split into themed sub-sections (`## API`, `## Guides`, `## Reference`) when one section grows past ~15 entries
-- "Examples" sections that just list page titles without describing the example's outcome waste space — say what each example demonstrates
-- Mixing HTML and `.md` URLs inside the same file is a fast way to make it look unmaintained — pick one (`.md` is the spec) and stick with it
+- Copying a competitor's structure verbatim without revisiting groupings produces awkward fits: group by what _your_ users would ask, not what someone else grouped
+- A bloated `## Docs` section with 50 links is unhelpful: split into themed sub-sections (`## API`, `## Guides`, `## Reference`) when one section grows past ~15 entries
+- "Examples" sections that just list page titles without describing the example's outcome waste space: say what each example demonstrates
+- Mixing HTML and `.md` URLs inside the same file is a fast way to make it look unmaintained: pick one (`.md` is the spec) and stick with it

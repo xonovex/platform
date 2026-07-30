@@ -1,58 +1,21 @@
-# First-time setup: install and connect glab
+# Safe Onboarding and Operations
 
-Get from a bare machine to a working GitLab CLI: install `glab`, authenticate, choose the protocols, clone, and verify with a read call. Token type and exact scopes are in [auth.md](auth.md); this file is the ordered first-run flow. glab officially supports GitLab 16.0+.
+## Lifecycle
 
-## 1. Install
+1. **Discover** offering (GitLab.com, Self-Managed, or Dedicated), edition/tier/version and feature flags, group/project scope, includes and resolved component refs, policy projects and linked scopes, compliance frameworks, protected branches/tags/environments, push rules, approval rules and required approvals, CODEOWNERS, runners, roles, project/group access tokens and `CI_JOB_TOKEN` allowlists, masked/protected CI/CD variables, `id_token` cloud trust, webhooks, deploy keys/tokens, and audit-event sinks, from an authenticated read ([first-time-setup.md](first-time-setup.md) covers a fresh `glab` install and login).
+2. **Assess** requested capabilities against the pinned baseline; report tier/flag gaps, approval-rule and job-name conflicts, bypass actors, missing full-SHA pins, untrusted-runner and fork exposure, unsupported features, and token/variable/data risks.
+3. **Propose** the smallest native composition with SHA-pinned typed components, mandatory pipeline-execution-policy injection, stable job names, protected targets, least-privilege identities and constrained `id_token` claims, provider-native evidence, verification probes, rollback, and drift owner ([automation-and-enforcement.md](automation-and-enforcement.md) owns which mechanism realizes each intent).
+4. **Preview** exact before/after component, policy, framework, protected-branch/tag/environment, role, token/variable, `id_token`, webhook, and deploy-key changes plus the resolved component/policy SHAs, the merged job graph, network/data/cost effects, partial failure behavior, verification, and rollback.
+5. **Authorize** the preview digest, offering, group/project subject, actor, scope, component/policy pin, and expiry.
+6. **Apply** idempotently against observed revisions and the exact head SHA; stop on drift or authority expansion.
+7. **Verify** authoritative policy, framework, protected-setting, and approval-rule state plus compliant, omission, duplicate-job-name, variable-override, bypass-role, fork/detached-pipeline secret denial, protected-environment, policy-outage, evidence-resolution, and credential-expiry probes.
+8. **Record** separate preview, authorization, apply, verification, evidence, and rollback references.
+9. **Operate** diagnose, dry-run, rotate tokens/keys, update pins, detect drift, disable, uninstall, and roll back.
 
-```bash
-brew install glab            # the only officially supported installer
-glab version                 # confirm
-```
+## Drift and rollback
 
-Community packages exist (snap, dnf, pacman, nixpkgs) but may lag the official release.
+Drift includes offering/tier or Self-Managed version and feature-flag changes, moved or unpinned component and include refs, unlinked policy projects, altered policy merge strategy or suffix behavior, renamed or duplicated policy job names, framework reassignment, weakened protected branches/tags/environments, push-rule and required-approval changes, new bypass actors, CODEOWNERS and approver-eligibility changes, runner trust, masked/protected variable and `id_token` claim changes, new project/group access tokens or deploy keys/tokens, widened `CI_JOB_TOKEN` allowlists, webhook destinations, artifact/log retention, and stale audit-event evidence.
 
-## 2. Authenticate
+Rollback restores captured component pins, policy links and configuration, framework assignment, protected settings, approval rules, variables, and credentials in dependency order, revokes temporary trust and grants, and re-runs both positive and negative probes. Preview compensating changes and partial-state risk when atomic rollback is unavailable.
 
-```bash
-# gitlab.com — run inside a repo so glab auto-detects the instance from the git remote
-glab auth login
-
-# self-managed / Dedicated — --hostname is REQUIRED or glab silently targets gitlab.com
-glab auth login --hostname gitlab.example.com
-```
-
-Pick a flow at the prompt:
-
-- **Web** (browser) — default interactive.
-- **`--device`** — OAuth device flow (needs GitLab 17.9+), ideal for headless / SSH sessions.
-- **Non-interactive** — `glab auth login --hostname H --stdin < <(secret-tool lookup service gitlab username "$USER")` — read from the store at call time; preferred over `--token`, which lands in shell history, and over a token file on disk.
-
-Add `--use-keyring` to store the token in the OS keyring instead of plaintext `~/.config/glab-cli/config.yml`. Token scopes and types are in [auth.md](auth.md) — at minimum the token needs `api` and `write_repository` for full read/write use, or `read_api` for read-only.
-
-## 3. Choose protocols (separate per-host settings)
-
-`git_protocol` (how git clones/pushes) and `api_protocol` (how glab calls the API) are independent — a working ssh clone does NOT imply API calls work.
-
-```bash
-glab config set -h gitlab.example.com git_protocol ssh
-glab config set -h gitlab.example.com api_protocol https
-```
-
-In minimal containers use `git_protocol https` because the ssh binary may be absent.
-
-## 4. Clone
-
-```bash
-glab repo clone group/subgroup/project    # by path
-glab repo clone 12345678                   # or by numeric project ID
-```
-
-## 5. Verify (the read call)
-
-```bash
-glab auth status                                   # logged-in user, host, REST /api/v4/ + GraphQL endpoints, protocols
-glab api user                                      # GET /api/v4/user — confirms the token identity
-glab mr list --assignee=@me -R group/project       # review smoke test
-```
-
-Run `glab auth status` immediately before any write to confirm the intended identity on the intended host — a stale env token silently acts as the wrong user (env tokens override stored config, see [auth.md](auth.md)).
+Adopt an existing compatible component, policy, framework, or protected setting only after explicit ownership transfer. Uninstall deletes only owned includes, policy links, framework assignments, protected settings, variables, webhooks, deploy keys, and cloud `id_token` trust; it preserves foreign policies, pipelines, approval rules, identities, and retained audit events.

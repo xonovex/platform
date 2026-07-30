@@ -13,7 +13,7 @@
 
 ## Liskov Substitution Principle
 
-- **Title:** Liskov & Wing — "A Behavioral Notion of Subtyping" (ACM TOPLAS, 1994); Barbara Liskov, OOPSLA 1987 keynote
+- **Title:** Liskov & Wing, "A Behavioral Notion of Subtyping" (ACM TOPLAS, 1994); Barbara Liskov, OOPSLA 1987 keynote
 - **URL:** https://dl.acm.org/doi/10.1145/197320.197383
 - **Last reviewed:** 2026-06-27
 - **References:** all

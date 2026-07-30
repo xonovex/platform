@@ -6,7 +6,7 @@
     "rationale": "core owned concept: the TDD cycle"
   },
   {
-    "query": "write the test first, then the code — drive this feature test-first",
+    "query": "write the test first, then the code: drive this feature test-first",
     "should_trigger": true,
     "split": "train",
     "rationale": "test-first discipline is the owned rhythm"
@@ -30,13 +30,13 @@
     "rationale": "classical vs mockist as a TDD design-style choice, owned by tdd"
   },
   {
-    "query": "I want clean code that works — let the tests grow the API instead of designing it up front",
+    "query": "I want clean code that works: let the tests grow the API instead of designing it up front",
     "should_trigger": true,
     "split": "validation",
     "rationale": "letting tests drive design + the clean-code-that-works goal"
   },
   {
-    "query": "my green bar never refactors — is that still TDD?",
+    "query": "my green bar never refactors: is that still TDD?",
     "should_trigger": true,
     "split": "validation",
     "rationale": "refactor-step discipline, an owned gotcha"
@@ -60,7 +60,7 @@
     "rationale": "near-miss: acceptance-first / example-led specification -> bdd-guide"
   },
   {
-    "query": "this class has low cohesion and too many responsibilities — how should I redesign it?",
+    "query": "this class has low cohesion and too many responsibilities. How should I redesign it?",
     "should_trigger": false,
     "split": "train",
     "rationale": "near-miss: the design bar the refactor aims at -> oop-guide / connascence-guide"
@@ -90,7 +90,7 @@
     "split": "validation"
   },
   {
-    "query": "these two modules feel way too tightly coupled — tell me concretely what kind of coupling it is and how to loosen the worst part",
+    "query": "these two modules feel way too tightly coupled: tell me concretely what kind of coupling it is and how to loosen the worst part",
     "rationale": "near miss owned by connascence-guide",
     "should_trigger": false,
     "split": "validation"
@@ -102,9 +102,15 @@
     "split": "validation"
   },
   {
-    "query": "name this test and split it — it verifies five things at once",
+    "query": "name this test and split it: it verifies five things at once",
     "rationale": "validation near miss owned by testing-guide",
     "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "should I grow this design with classical or mockist TDD as my development style?",
+    "rationale": "classical vs mockist is a TDD development style",
+    "should_trigger": true,
     "split": "validation"
   }
 ]

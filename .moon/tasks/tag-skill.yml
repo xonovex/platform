@@ -35,6 +35,8 @@ tasks:
     deps:
       - build
       - format-check
+      - skill-audit-sources
+      - skill-validate
       - target: ~:test
         optional: true
     options:
@@ -62,7 +64,6 @@ tasks:
       - /vocabulary.json
     options:
       cache: false
-      runInCI: false
   skill-audit-sources:
     command:
       - npx
@@ -72,7 +73,6 @@ tasks:
         optional: true
     options:
       cache: false
-      runInCI: false
   skill-eval-triggers:
     command:
       - npx

@@ -1,6 +1,8 @@
-# Findings schema — the review's data contract
+# Findings schema: the review's data contract
 
-The single canonical shape shared by every stage (analyze → refine → post → resolve). Hold in session between same-session stages, or persist to JSON to cross sessions.
+The canonical inline shape returned by Review analysis and refinement. A later Publish
+or Execute operation may use this shape as its subject, but Review never persists or
+delivers it.
 
 ## Shape
 
@@ -16,23 +18,16 @@ The single canonical shape shared by every stage (analyze → refine → post �
       "decoration": "blocking", // blocking | non-blocking | if-minor
       "blocking": true, // must-fix-before-merge; must agree with decoration
       "body": "Self-contained markdown: problem, why, suggested fix.",
-      "status": "new", // new | recurring — only when comparing against prior findings
+      "status": "new", // new | recurring, only when comparing against prior findings
       "commentId": 101, // written by the post stage; carried on a recurring finding to keep threads linked
     },
   ],
 }
 ```
 
-`decoration` and `blocking` must agree — dropping `blocking` flips the decoration off `(blocking)`. Bodies are self-contained (no "see the other comment") since findings post/edit/resolve independently.
+`decoration` and `blocking` must agree: dropping `blocking` flips the decoration off `(blocking)`. Bodies are self-contained because later delivery may create independent threads.
 
-## Anchoring to new-file lines
+Anchors are **new-file** line numbers (the side a host inline comment attaches to), never old-file or absolute: a `+` line is `lineType: ADDED`, an unchanged in-hunk line is `CONTEXT`; a `path` / `line` that is not a real ADDED/CONTEXT diff line orphans when posted.
 
-Anchors are **new-file** line numbers (the side a host inline comment attaches to), never old-file or absolute:
-
-- Parse each hunk header `@@ -a,b +c,d @@` and walk it: `+` and context lines advance the new-file counter; `-` lines do not.
-- `+` line → `lineType: ADDED`; unchanged in-hunk line → `lineType: CONTEXT`.
-- A `path` / `line` that is not a real ADDED/CONTEXT diff line orphans when posted — re-anchor to one in a changed hunk.
-
-## Building the JSON
-
-Build/edit with a serializer (`python3` + `json`), never hand-escape — bodies carry backticks, quotes, newlines. Read, mutate, re-serialize the whole document; do not splice strings.
+Return valid JSON inline. Use a serializer when one is already available in the
+calling environment; never hand-splice escaped strings.

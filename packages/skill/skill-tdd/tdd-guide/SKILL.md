@@ -1,11 +1,11 @@
 ---
 name: tdd-guide
-description: "Use when driving code test-first or coaching the red-green-refactor rhythm — writing a failing test before the production code, going green with fake-it / obvious-implementation / triangulation, then refactoring to remove duplication, working a test list one item at a time, and letting the tests grow the design. Triggers on red-green-refactor, test-first, 'write the test first', failing test before code, triangulation, fake it till you make it, test list / to-do list, classical (Detroit) vs mockist (London) TDD, and 'clean code that works' — even when the user doesn't say 'TDD'."
+description: "Use when driving code test-first or coaching the red-green-refactor rhythm: writing a failing test before the production code, going green with fake-it / obvious-implementation / triangulation, then refactoring to remove duplication, working a test list one item at a time, and letting the tests grow the design. Triggers on red-green-refactor, test-first, 'write the test first', failing test before code, triangulation, fake it till you make it, test list / to-do list, classical (Detroit) vs mockist (London) TDD, and 'clean code that works', even when the user doesn't say 'TDD'."
 ---
 
 # Test-Driven Development
 
-Drive production code from a failing test, one small step at a time: red (write a test that fails), green (make it pass by any means), refactor (remove the duplication you just created). The goal is clean code that works — and the design emerges from the tests rather than being drawn up front.
+Drive production code from a failing test, one small step at a time: red (write a test that fails), green (make it pass by any means), refactor (remove the duplication you just created). The goal is clean code that works, and the design emerges from the tests rather than being drawn up front.
 
 ## Essentials
 
@@ -17,13 +17,12 @@ Drive production code from a failing test, one small step at a time: red (write 
 
 ## Gotchas
 
-- Triangulation is a fallback, not the canonical move — reach for it only when you cannot yet see the general solution; obvious implementation and fake it are used far more often.
-- Skipping refactor leaves the duplication you committed to go green (including a constant duplicated between test and code) — removing it is exactly what the third step is for.
+- Skipping refactor leaves the duplication you committed to go green (including a constant duplicated between test and code): removing it is exactly what the third step is for.
 - "Refactor" means change structure without changing behaviour while the test stays green; it is not "rewrite", "optimize", or "add the next feature".
-- The test list is a list of test IDEAS, not a batch of tests written up front — write them one at a time to preserve the cycle.
-- Test-first is the rhythm; classical vs mockist is an orthogonal design choice — you can do classical TDD test-first, so don't conflate the two.
-- Neither classical nor mockist is "more modern" — mockist trades integration coverage and tighter implementation-coupling for faster, smaller fixtures.
-- A single good test's anatomy (AAA, FIRST, naming, the test-double taxonomy) belongs to **testing-guide** — this skill owns only the rhythm in which you write it.
+- The test list is a list of test IDEAS, not a batch of tests written up front: write them one at a time to preserve the cycle.
+- Test-first is the rhythm; classical vs mockist is an orthogonal design choice. You can do classical TDD test-first, so don't conflate the two.
+- Neither classical nor mockist is "more modern": mockist trades integration coverage and tighter implementation-coupling for faster, smaller fixtures.
+- A single good test's anatomy (AAA, FIRST, naming, the test-double taxonomy) belongs to **testing-guide**. This skill owns only the rhythm in which you write it.
 
 ## Example
 

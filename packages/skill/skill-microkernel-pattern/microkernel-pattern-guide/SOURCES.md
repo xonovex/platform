@@ -2,7 +2,7 @@
 
 ## Microkernel / plug-in architecture pattern
 
-- **Title:** "Software Architecture Patterns" — microkernel architecture (Mark Richards, O'Reilly)
+- **Title:** "Software Architecture Patterns": microkernel architecture (Mark Richards, O'Reilly)
 - **URL:** https://www.oreilly.com/library/view/software-architecture-patterns/9781098134280/ch04.html
 - **Last reviewed:** 2026-06-27
 - **Used for:**
@@ -52,7 +52,7 @@
 - **Used for:**
   - `references/metapatterns-lens.md`
 - **Aspects extracted:**
-  - The "microkernel regarded as multiple ports-and-adapters cores sharing a common middleware", "middleware-gateway", and "distributed microkernel relates to mesh" framings — recorded explicitly as one author's non-canonical synthesis, with caveats (OS-vs-pattern conflation; gateway is a sub-type of middleware; a service mesh is a networking data plane and does not virtualize system resources). Single-author, self-published CC catalogue, not standard CS doctrine.
+  - The "microkernel regarded as multiple ports-and-adapters cores sharing a common middleware", "middleware-gateway", and "distributed microkernel relates to mesh" framings: recorded explicitly as one author's non-canonical synthesis, with caveats (OS-vs-pattern conflation; gateway is a sub-type of middleware; a service mesh is a networking data plane and does not virtualize system resources). Single-author, self-published CC catalogue, not standard CS doctrine.
 
 ## Refresh Workflow
 
