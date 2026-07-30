@@ -3,7 +3,7 @@ type: plan
 has_subplans: false
 parent_plan: plans/hardening-branch-migration.md
 parallel_group: group-4
-status: pending
+status: complete
 dependencies:
   plans:
     [plans/hardening-branch-migration/subplan-04-script-validation-slice.md]
@@ -15,11 +15,11 @@ skills_to_consult:
   - skill-guide
   - moon-guide
 validation:
-  type_check: pending
-  lint: pending
-  build: pending
-  tests: pending
-  integration: pending
+  type_check: pass
+  lint: pass
+  build: pass
+  tests: pass
+  integration: pass
 ---
 
 # Subplan 07: Skill Slice — Domain & Engine Guides
@@ -85,10 +85,45 @@ counterpart on main.
 
 ## Success Criteria
 
-- [ ] Chunk membership documented; NEW packages flagged
-- [ ] Applicable mapped intents verified on chunk paths
-- [ ] No registration-file changes in the diff
-- [ ] Workspace validators green
+- [x] Chunk membership documented; NEW packages flagged — see below
+- [x] Applicable mapped intents verified on chunk paths — see below
+- [x] No registration-file changes in the diff
+- [x] Workspace validators green — `:ci-check --force`, 801 tasks, exit 0,
+      nothing cached; composition-check reports 272/272 handoffs, 1491/1491
+      links and 74 manifest pairs
+
+## Chunk Membership
+
+Sixteen packages migrated. Two corrections to the list above:
+
+- `skill-accessibility` landed with subplan 06, which needed it to resolve a
+  handoff from `react-guide` and `astro-guide`. It is already at donor state
+  and is not re-migrated here.
+- `skill-editor-viewport` is described above as new on the branch; it already
+  exists on `main`, so it is an ordinary content migration.
+
+**NEW:** `skill-credential-management` exists only on the donor. It ships
+unregistered — no marketplace entry — because registration files are reconciled
+once, in subplan 10. Nothing in the build depends on registration, and the
+catalog validators pass without it.
+
+## Intent Verification
+
+- `66b9ad55` — no vendor or tenant specifics in chunk guides. Present.
+- `6b332e83` — trigger-eval and sources coverage: all sixteen packages carry
+  both `eval-queries.json` and `SOURCES.md`. Present.
+- `87d452e0` — no phantom trigger words: every skill named by a chunk eval
+  query resolves to a package that exists. Present.
+- `22f48559` — not applicable; the authoring guidance it corrected lives in
+  `skill-skill`, which is subplan 08's.
+
+## Notes
+
+- No dangling handoffs this time, so no boundary adjustment was needed — the
+  chunk's overlays pin only `skill-gpu-rendering`, which is inside the chunk.
+- `git diff <donor> -- <paths> --name-only` silently treats `--name-only` as a
+  pathspec and diffs the whole tree. The flag has to precede the commit:
+  `git diff --name-only <donor> -- <paths>`.
 
 ## Files Modified/Created
 
