@@ -16,9 +16,15 @@ dependencies:
     - plans/hardening-branch-migration/subplan-08-skill-process-harness-slice.md
     - plans/hardening-branch-migration/subplan-09-command-plugins-slice.md
     - plans/hardening-branch-migration/subplan-10-docs-assets-cleanup-slice.md
+    - plans/hardening-branch-migration/subplan-11-nix-shells-github-project-slice.md
 parallel_groups:
   group-1: [subplan-01-salvage-side-branch-fixes, subplan-02-infra-config-slice]
-  group-2: [subplan-03-moon-plugins-slice, subplan-04-script-validation-slice]
+  group-2:
+    [
+      subplan-03-moon-plugins-slice,
+      subplan-04-script-validation-slice,
+      subplan-11-nix-shells-github-project-slice,
+    ]
   group-3: [subplan-05-shared-agent-slice]
   group-4:
     [
@@ -39,6 +45,7 @@ proposed_subplans:
   - skill-process-harness-slice
   - command-plugins-slice
   - docs-assets-cleanup-slice
+  - nix-shells-github-project-slice
 skills_to_consult:
   - git-guide
   - github-guide
@@ -200,14 +207,17 @@ hold after taking the branch state:
 | 8 | skill-process-harness-slice | process + harness skill packages (plan, git, pr, review, skill, command, instruction, harness adapters, new additions) |
 | 9 | command-plugins-slice | `packages/command` (delegates to skills, so lands after slices 6-8) |
 | 10 | docs-assets-cleanup-slice | `packages/diagram`, `packages/asset`, `plans/`, README, marketplace/catalog reconciliation, zero-diff verification, branch + worktree removal |
+| 11 | nix-shells-github-project-slice | root `flake.nix`, `nix/`, `.github/moon.yml`, `.github/actions` — the infra paths subplan 02's path list missed; unblocks its `shellByTag` and zizmor deferrals |
 
 Execution groups:
 
 - **group-1**: salvage-side-branch-fixes, infra-config-slice (independent of each
   other)
-- **group-2**: moon-plugins-slice, script-validation-slice (parallel; the moon
-  crates need infra's `.moon/tasks` rust templates but nothing consumes them
-  locally, so they don't block or get blocked by anything downstream)
+- **group-2**: moon-plugins-slice, script-validation-slice,
+  nix-shells-github-project-slice (parallel; the moon crates need infra's
+  `.moon/tasks` rust templates but nothing consumes them locally, so they don't
+  block or get blocked by anything downstream; the nix slice touches only
+  `flake.nix`, `nix/`, and `.github/`, which the other two leave alone)
 - **group-3**: shared-agent-slice
 - **group-4**: skill-language-guides-slice, skill-domain-guides-slice (parallel;
   neither touches registration files)
