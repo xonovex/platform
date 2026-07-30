@@ -50,8 +50,6 @@ jobs:
           # saving a ~260MB cache and thrashing the repo's Actions cache budget).
           save-if: ${{ github.ref == 'refs/heads/main' }}
 
-      - run: nix develop --no-update-lock-file --command zizmor --offline .github/
-
       - run: rm -f .moon/cache/runReport.json
       - run: |
           nix develop --no-update-lock-file --command npm ci

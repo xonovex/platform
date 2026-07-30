@@ -1,0 +1,98 @@
+$schema: https://moonrepo.dev/schemas/project.json
+language: unknown
+layer: configuration
+tags:
+  - ci
+tasks:
+  ci-config-format:
+    script: npx prettier --write "$workspaceRoot/.github/**/*.yml" --ignore-path "$workspaceRoot/.prettierignore"
+    inputs:
+      - "**/*.yml"
+      - /.prettierignore
+      - /prettier.config.ts
+    outputs: []
+    options:
+      cache: false
+      runInCI: false
+  ci-config-format-check:
+    script: npx prettier --check "$workspaceRoot/.github/**/*.yml" --ignore-path "$workspaceRoot/.prettierignore"
+    inputs:
+      - "**/*.yml"
+      - /.prettierignore
+      - /prettier.config.ts
+    outputs: []
+    options:
+      cache: true
+  format:
+    command: noop
+    deps: [ci-config-format]
+    options:
+      cache: false
+      runInCI: false
+  format-check:
+    command: noop
+    deps: [ci-config-format-check]
+    options:
+      cache: false
+  github-actions-lint:
+    command:
+      - zizmor
+      - --offline
+      - .
+    toolchain: [system, nix]
+    inputs:
+      - "**/*"
+      - /flake.lock
+      - /flake.nix
+      - /nix/ci.nix
+    options:
+      cache: true
+  # Both nix tasks evaluate the flake, which resolves and may fetch its inputs,
+  # so they belong to ci-integration rather than the side-effect-free ci-check.
+  nix-flake-check:
+    command:
+      - nix
+      - flake
+      - check
+      - --no-update-lock-file
+      - --print-build-logs
+    toolchain: [system, nix]
+    inputs:
+      - /flake.lock
+      - /flake.nix
+      - /nix/**/*
+    options:
+      cache: true
+      runFromWorkspaceRoot: true
+      runInCI: false
+  nix-flake-eval-all-systems:
+    command:
+      - nix
+      - flake
+      - show
+      - --all-systems
+      - --json
+      - --no-update-lock-file
+    inputs:
+      - /flake.lock
+      - /flake.nix
+      - /nix/**/*
+    options:
+      cache: true
+      runFromWorkspaceRoot: true
+      runInCI: false
+  ci-check:
+    command: noop
+    deps:
+      - github-actions-lint
+      - format-check
+    options:
+      cache: false
+  ci-integration:
+    command: noop
+    deps:
+      - nix-flake-check
+      - nix-flake-eval-all-systems
+    options:
+      cache: false
+      runInCI: false

@@ -35,6 +35,7 @@ runs:
         nix_conf: |
           keep-env-derivations = true
           keep-outputs = true
+          eval-cache = false
           experimental-features = nix-command flakes
 
     - uses: nix-community/cache-nix-action@7df957e333c1e5da7721f60227dbba6d06080569 # v7

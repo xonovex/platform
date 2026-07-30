@@ -1,6 +1,6 @@
 { pkgs }:
 {
   packages = [
-    pkgs.nodejs_24
+    pkgs.nodejs_26
   ];
 }

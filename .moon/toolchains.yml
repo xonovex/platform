@@ -17,6 +17,8 @@ javascript:
 nix:
   plugin: "github://xonovex/platform/moon_nix_toolchain@moon_nix_toolchain-v0.6.1"
   shellByTag:
+    ci: ci
+    docker: docker
     go: go
     shell: shell
     rust: rust

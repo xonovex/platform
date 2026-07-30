@@ -1,10 +1,8 @@
 # mkAgentImage builds a non-root agent OCI image with streamLayeredImage.
 #
-# Adapted from nothingnesses/agent-images (lib/mkAgentImage.nix), which is
-# bus-factor 1 and uses buildLayeredImage with a named user. This vendored fork
-# reworks the layout onto streamLayeredImage (which never realizes a store
-# tarball) and a hand-written passwd/group keyed on NUMERIC uid 1000, so the
-# image works under `User = "1000:1000"` without relying on a named user.
+# streamLayeredImage avoids realizing an intermediate store tarball. A
+# hand-written passwd/group maps numeric uid 1000 so `User = "1000:1000"`
+# works without relying on a named runtime user.
 #
 # The operator builds this image; the CLI resolves the same closure as a
 # devShell (see agent-env.nix). Both surfaces share one content-addressed
