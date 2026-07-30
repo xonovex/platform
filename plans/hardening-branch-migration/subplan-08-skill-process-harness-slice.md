@@ -70,6 +70,28 @@ lands it. Re-enable each and confirm `npx moon run :ci-check --force` is green.
      lines 75
 5. Restore the runtime probe evidence recorded earlier in this document.
 
+## Carried From Subplan 06
+
+- **Hold the catalog version at 5.1.0.** The donor has all 72 skill packages at
+  7.0.0 in lockstep. Bumping only this chunk splits the catalog and breaks the
+  exact-version pins overlays place on their bases. Revert `version` in
+  `package.json`, `.claude-plugin/plugin.json` and `.codex-plugin/plugin.json`,
+  and any `@xonovex/skill-*` pin, back to 5.1.0. Subplan 10 bumps the catalog
+  once.
+- **Apply the donor's deletions by hand.** `git checkout <branch> -- <paths>`
+  adds and modifies but never deletes. Every skill package loses its
+  `prettier.config.ts` (the donor keeps only the root config), and several lose
+  reference files whose content moved. Compute them with
+  `git diff --name-status main <donor> -- <chunk paths>` and remove the `D`
+  entries.
+- **Check handoffs before committing.** Run
+  `npx moon run script-moon-skill-validate-links:composition-check`. A guide
+  naming a skill outside the catalog fails it; subplan 06 had to pull
+  `skill-accessibility` forward for that reason.
+- **Verify against the donor with a working-tree diff.**
+  `git diff <donor> -- <chunk paths>` must be empty. `main..HEAD` reads empty
+  until the slice is committed and proves nothing.
+
 ## Tasks
 
 1. **Fix chunk membership**: everything in `packages/skill` not taken by

@@ -3,7 +3,7 @@ type: plan
 has_subplans: false
 parent_plan: plans/hardening-branch-migration.md
 parallel_group: group-4
-status: pending
+status: complete
 dependencies:
   plans:
     [plans/hardening-branch-migration/subplan-04-script-validation-slice.md]
@@ -15,11 +15,11 @@ skills_to_consult:
   - skill-guide
   - moon-guide
 validation:
-  type_check: pending
-  lint: pending
-  build: pending
-  tests: pending
-  integration: pending
+  type_check: pass
+  lint: pass
+  build: pass
+  tests: pass
+  integration: pass
 ---
 
 # Subplan 06: Skill Slice — Language & Framework Guides
@@ -76,10 +76,60 @@ with subplan 07.
 
 ## Success Criteria
 
-- [ ] Chunk membership documented and handoff-consistent
-- [ ] All applicable mapped intents verified on chunk paths
-- [ ] No registration-file changes in the diff
-- [ ] Workspace validators green with the mixed catalog
+- [x] Chunk membership documented and handoff-consistent — the 23 listed
+      packages all exist on both sides, plus `skill-accessibility` pulled in
+      (see below)
+- [x] All applicable mapped intents verified on chunk paths — see below
+- [x] No registration-file changes in the diff
+- [x] Workspace validators green with the mixed catalog —
+      `:ci-check --force`, 797 tasks, exit 0, nothing cached;
+      composition-check reports 268/268 handoffs, 1507/1507 links and 73
+      manifest pairs
+
+## Chunk Membership
+
+The 23 named packages needed no boundary change: each exists on both sides, so
+this chunk adds and removes no skill. One package was pulled forward:
+`skill-accessibility`. Both `react-guide` and `astro-guide` gain a reference
+naming **accessibility-guide** as the owning skill, and a handoff to a skill
+outside the catalog dangles, which `composition-check` fails on. Its
+marketplace registration is deliberately not added here; that stays with the
+other registration files in subplan 10.
+
+## Catalog Version Held at 5.1.0
+
+The donor has all 72 skill packages at 7.0.0 in lockstep. Taking that for 23 of
+them splits the catalog and breaks two things at once: the repo's lockstep rule,
+and the exact-version pins overlays place on their bases — `c99-opinionated`
+pins `@xonovex/skill-c99`, `hono-opinionated` pins `@xonovex/skill-hono`, and
+so on. The version fields and those base pins are therefore held at main's
+5.1.0, leaving the whole-catalog bump to subplan 10, which the parent plan
+already reserves for catalog version reconciliation.
+
+## Intent Verification
+
+- `f121e7e7` — c99 build policy deduped: `c99-guide` owns
+  `build-and-warnings.md`, and the opinionated overlay's
+  `build-warnings-policy.md` opens by delegating to it rather than restating
+  it. Present.
+- `66b9ad55` — no vendor or tenant specifics in chunk guides. Present.
+- `6b332e83` — trigger-eval and sources coverage: every chunk package has both
+  `eval-queries.json` and `SOURCES.md`. Present.
+- `87d452e0` — no phantom trigger words: every chunk package carries eval
+  queries. Present.
+- `22f48559`, `6060d9ac`, `c3b920d2` — not applicable to this chunk;
+  `skill-skill`, the android guides and the provider guides all live in later
+  chunks.
+
+## Findings
+
+- A path checkout never deletes, so 36 donor-side deletions had to be applied by
+  hand: the per-package `prettier.config.ts` — which the donor drops across all
+  72 skills in favour of the root config — and thirteen reference files whose
+  content moved. Watch for the remaining 49 prettier configs in subplans 07 and 08.
+- Comparing a slice against the donor must diff the working tree
+  (`git diff <donor> -- <paths>`), not `main..HEAD`, which reads as empty until
+  the slice is committed and hides whether the chunk actually matches.
 
 ## Files Modified/Created
 
