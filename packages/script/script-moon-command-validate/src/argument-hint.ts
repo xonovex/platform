@@ -14,7 +14,7 @@ interface HintToken {
 }
 
 const TOKEN_RE =
-  /\[|\]|--[a-z0-9]+(?:-[a-z0-9]+)*|<[^>\s]+>(?:\.\.\.)?|[a-z0-9]+(?:-[a-z0-9]+)*(?:\|[a-z0-9]+(?:-[a-z0-9]+)*)+|[a-z0-9]+(?:-[a-z0-9]+)*(?:\.\.\.)?/giu;
+  /\[|\]|--[a-z0-9]+(?:-[a-z0-9]+)*|<[^>\s]+>(?:\.\.\.)?|[a-z0-9]+(?:-[a-z0-9]+)*(?:\.\.\.)?/giu;
 
 const tokenize = (hint: string): readonly HintToken[] => {
   const tokens: HintToken[] = [];
@@ -52,9 +52,7 @@ export const parseArgumentHint = (hint: string): readonly CommandArgument[] => {
       const next = tokens[index + 1];
       const hasValue =
         next !== undefined &&
-        !next.text.startsWith("--") &&
-        next.text !== "[" &&
-        next.text !== "]" &&
+        next.text.startsWith("<") &&
         !hint.slice(token.end, next.start).includes("]");
       if (hasValue) consumed.add(index + 1);
       argumentsFound.push({

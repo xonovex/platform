@@ -16,7 +16,7 @@ argument-hint: >-
   [--interactive] [--dry-run]
 ---
 
-# /xonovex-utility:skill-assimilate — Augment Skill with Another Skill
+# /xonovex-utility:skill-assimilate - Augment Skill with Another Skill
 
 ## Arguments
 
@@ -31,4 +31,4 @@ argument-hint: >-
 
 Load the `skill-guide` skill (plugin `xonovex-skill-skill`) and perform its
 **merge** operation with these arguments. The skill is the source of truth for the
-procedure, output format, and gotchas — do not restate them.
+procedure, output format, and gotchas. Do not restate them.

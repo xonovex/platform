@@ -119,7 +119,8 @@ const effectDefaultFromCommand = (command: string): string | undefined => {
 };
 
 describe("workflow composition contracts", () => {
-  // Reads the workflow command files, which live in the command packages.
+  // Asserts the generic workflow command surface. This repository keeps the
+  // plan-prefixed commands, so the files this reads do not exist.
   it.skip("keeps the command flag surface at the safety core", () => {
     // Every occurrence, not just the argument-hint ones: a backtick guard here
     // would leave the Arguments section and the delegation prose unchecked, so a
@@ -134,7 +135,8 @@ describe("workflow composition contracts", () => {
     expect([...used].toSorted()).toEqual([...SAFETY_CORE_FLAGS]);
   });
 
-  // Reads the workflow command files, which live in the command packages.
+  // Asserts the generic workflow command surface. This repository keeps the
+  // plan-prefixed commands, so the files this reads do not exist.
   it.skip("keeps core command subjects revision-addressable", () => {
     for (const command of coreWorkflowCommands) {
       const source = readRepositoryFile(
@@ -173,7 +175,8 @@ describe("workflow composition contracts", () => {
     expect(readme).not.toMatch(/Context has stable identity/u);
   });
 
-  // Reads the workflow command files, which live in the command packages.
+  // Asserts the generic workflow command surface. This repository keeps the
+  // plan-prefixed commands, so the files this reads do not exist.
   it.skip("exposes revision and retry protection for mutating provider operations", () => {
     for (const command of retryProtectedCommands) {
       const source = readRepositoryFile(
@@ -264,7 +267,8 @@ describe("workflow composition contracts", () => {
     }
   });
 
-  // Reads the workflow command files, which live in the command packages.
+  // Asserts the generic workflow command surface. This repository keeps the
+  // plan-prefixed commands, so the files this reads do not exist.
   it.skip("agrees on the default effect mode across skill and commands", () => {
     const effects = readRepositoryFile(
       "packages/skill/skill-workflow/workflow-guide/references/effects.md",
@@ -294,7 +298,8 @@ describe("workflow composition contracts", () => {
     }
   });
 
-  // Reads the workflow command files, which live in the command packages.
+  // Asserts the generic workflow command surface. This repository keeps the
+  // plan-prefixed commands, so the files this reads do not exist.
   it.skip("lets every operation read the subject it is given", () => {
     // A provider-native subject or --context reference is read through a
     // provider CLI, so withholding Bash would block the operation outright.

@@ -9,7 +9,7 @@ allowed-tools:
 argument-hint: "<subject> [--perspective <selection>...]"
 ---
 
-# /xonovex-test:review — Review
+# /xonovex-test:review - Review
 
 ## Arguments
 
@@ -70,6 +70,25 @@ describe("parseCommandDocument", () => {
         expect.objectContaining({code: "command.heading"}),
         expect.objectContaining({code: "command.delegation-tool"}),
       ]),
+    );
+  });
+
+  it("rejects machine-readable soft requirements", () => {
+    const withRequirements = validCommand.replace(
+      "## Delegation",
+      [
+        "## Requirements",
+        "",
+        "- `assurance:evidence@^1.0.0` (preferred): Specialist evidence.",
+        "",
+        "## Delegation",
+      ].join("\n"),
+    );
+
+    const result = parseCommandDocument("commands/review.md", withRequirements);
+
+    expect(result.issues).toContainEqual(
+      expect.objectContaining({code: "command.requirements-unsupported"}),
     );
   });
 });

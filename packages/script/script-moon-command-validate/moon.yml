@@ -1,6 +1,8 @@
 $schema: https://moonrepo.dev/schemas/project.json
 language: typescript
 tags: [typescript-script]
+dependsOn:
+  - script-moon-common
 tasks:
   bin-permissions:
     command: [chmod, +x, dist/src/index.js]
@@ -16,23 +18,14 @@ tasks:
     options:
       cache: false
   ts-coverage:
-    script: >-
-      npx vitest run --coverage --coverage.include='src/**'
-      --coverage.thresholds.lines 80
-      --coverage.thresholds.functions 80
-      --coverage.thresholds.branches 70
-      --coverage.thresholds.statements 80
-  install:
-    command:
-      - npm
-      - install
-      - -w
-      - "@xonovex/script-moon-command-validate"
+    env:
+      TS_COVERAGE_MIN_LINES: "85"
+      TS_COVERAGE_MIN_FUNCTIONS: "90"
+      TS_COVERAGE_MIN_BRANCHES: "70"
+      TS_COVERAGE_MIN_STATEMENTS: "80"
+  ts-build:
     deps:
-      - ~:build
-    options:
-      cache: false
-      runFromWorkspaceRoot: true
+      - script-moon-common:build
   ci-check:
     deps: [coverage]
     options:

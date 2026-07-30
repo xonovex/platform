@@ -12,7 +12,7 @@ allowed-tools:
 argument-hint: "[directory] [--dry-run] [--recursive]"
 ---
 
-# /xonovex-utility:instructions-init — Create AGENTS.md
+# /xonovex-utility:instructions-init - Create AGENTS.md
 
 ## Arguments
 
@@ -24,4 +24,4 @@ argument-hint: "[directory] [--dry-run] [--recursive]"
 
 Load the `instruction-guide` skill (plugin `xonovex-skill-instruction`) and perform its
 **init** operation with these arguments. The skill is the source of truth for the
-procedure, output format, and gotchas — do not restate them.
+procedure, output format, and gotchas. Do not restate them.

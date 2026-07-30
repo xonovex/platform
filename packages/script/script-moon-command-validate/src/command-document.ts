@@ -5,7 +5,7 @@ import {issue, type ValidationIssue} from "./validation.js";
 
 const FRONTMATTER_RE = /^---\r?\n([\s\S]*?)\r?\n---\r?\n([\s\S]*)$/u;
 const TITLE_RE =
-  /^# \/([a-z0-9]+(?:-[a-z0-9]+)*):([a-z0-9]+(?:-[a-z0-9]+)*)\s+—\s+(.+)$/mu;
+  /^# \/([a-z0-9]+(?:-[a-z0-9]+)*):([a-z0-9]+(?:-[a-z0-9]+)*)\s+-\s+(.+)$/mu;
 const DELEGATION_RE =
   /Load the `([^`]+)` skill \(plugin `([^`]+)`\)[\s\S]*?\*\*([^*]+)\*\*/u;
 const HEADING_RE = /^## (.+)$/gmu;
@@ -62,10 +62,10 @@ const documentedArguments = (body: string): ReadonlySet<string> => {
     if (!/^\s*-\s+/u.test(line)) continue;
     const separator = line.indexOf(":");
     const modifier = /\s+\((?:optional|required|repeatable)\b/iu.exec(line);
-    const candidates = [separator, modifier?.index ?? -1].filter(
+    const boundaries = [separator, modifier?.index ?? -1].filter(
       (index) => index >= 0,
     );
-    const end = candidates.length === 0 ? undefined : Math.min(...candidates);
+    const end = boundaries.length === 0 ? undefined : Math.min(...boundaries);
     const declaration = end === undefined ? line : line.slice(0, end);
     for (const match of declaration.matchAll(/`([^`]+)`/gu)) {
       const raw = match[1]?.trim();
@@ -183,13 +183,22 @@ export const parseCommandDocument = (
       issue(
         "command.title",
         path,
-        "expected '# /<namespace>:<command> — <title>'",
+        "expected '# /<namespace>:<command> - <title>'",
       ),
     );
   }
   const headings = [...body.matchAll(HEADING_RE)].flatMap((match) =>
     match[1] === undefined ? [] : [match[1]],
   );
+  if (headings.includes("Requirements")) {
+    issues.push(
+      issue(
+        "command.requirements-unsupported",
+        path,
+        "soft requirements belong in delegation prose and runtime description matching, not a machine-readable Requirements section",
+      ),
+    );
+  }
   for (const requiredHeading of ["Arguments", "Delegation"]) {
     if (
       headings.filter((heading) => heading === requiredHeading).length !== 1

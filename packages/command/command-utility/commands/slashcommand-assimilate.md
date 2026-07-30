@@ -15,7 +15,7 @@ argument-hint: >-
   <percent>] [--interactive] [--dry-run]
 ---
 
-# /xonovex-utility:slashcommand-assimilate — Augment Slash Command
+# /xonovex-utility:slashcommand-assimilate - Augment Slash Command
 
 ## Arguments
 
@@ -30,4 +30,4 @@ argument-hint: >-
 
 Load the `command-guide` skill (plugin `xonovex-skill-command`) and perform its
 **merge** operation with these arguments. The skill is the source of truth for the
-procedure, output format, and gotchas — do not restate them.
+procedure, output format, and gotchas. Do not restate them.

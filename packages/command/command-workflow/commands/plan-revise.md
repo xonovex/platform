@@ -10,7 +10,7 @@ allowed-tools:
 argument-hint: "[plan-file]"
 ---
 
-# /xonovex-workflow:plan-revise — Revise Plan from Feedback
+# /xonovex-workflow:plan-revise - Revise Plan from Feedback
 
 > Lifecycle: research → decide → create → **revise** ⇄ critique → accept → subplans-create → continue → update → validate
 
@@ -21,5 +21,5 @@ argument-hint: "[plan-file]"
 ## Delegation
 
 Load the `plan-guide` skill (plugin `xonovex-skill-plan`) and perform its
-**plan-revise** operation with these arguments. The skill is the source of truth for
-the procedure, output format, and gotchas — do not restate them.
+**revise** operation with these arguments. The skill is the source of truth for
+the procedure, output format, and gotchas. Do not restate them.

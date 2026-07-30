@@ -5,4 +5,7 @@ command's YAML frontmatter, verifies its public title and thin delegation shape,
 checks that hard skill delegations are declared by both package and Claude plugin
 manifests. The delegated operation must be registered as an exact reference in the
 owner skill. Interchangeable supporting skills are selected at runtime from installed
-skill descriptions rather than declared in command metadata.
+skill descriptions rather than declared in command metadata. Every prose file in the
+package is also checked for an em dash, ellipsis character, or typographic quote, in
+both the literal and unicode-escaped spelling; the command title separator is a plain
+hyphen.

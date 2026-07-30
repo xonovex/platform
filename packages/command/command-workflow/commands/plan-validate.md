@@ -13,7 +13,7 @@ allowed-tools:
 argument-hint: "[plan-file] [--detailed]"
 ---
 
-# /xonovex-workflow:plan-validate — Validate Plan Achievement
+# /xonovex-workflow:plan-validate - Validate Plan Achievement
 
 > Lifecycle: research → decide → create → revise ⇄ critique → accept → subplans-create → continue → update → **validate**
 
@@ -27,5 +27,5 @@ argument-hint: "[plan-file] [--detailed]"
 ## Delegation
 
 Load the `plan-guide` skill (plugin `xonovex-skill-plan`) and perform its
-**plan-validate** operation with these arguments. The skill is the source of truth for
-the procedure, output format, and gotchas — do not restate them.
+**validate** operation with these arguments. The skill is the source of truth for
+the procedure, output format, and gotchas. Do not restate them.

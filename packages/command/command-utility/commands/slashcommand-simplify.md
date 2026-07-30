@@ -12,7 +12,7 @@ allowed-tools:
 argument-hint: "[command-file] [--dry-run] [--target-reduction <percent>]"
 ---
 
-# /xonovex-utility:slashcommand-simplify — Simplify Slash Command Documentation
+# /xonovex-utility:slashcommand-simplify - Simplify Slash Command Documentation
 
 ## Arguments
 
@@ -24,4 +24,4 @@ argument-hint: "[command-file] [--dry-run] [--target-reduction <percent>]"
 
 Load the `command-guide` skill (plugin `xonovex-skill-command`) and perform its
 **simplify** operation with these arguments. The skill is the source of truth for the
-procedure, output format, and gotchas — do not restate them.
+procedure, output format, and gotchas. Do not restate them.

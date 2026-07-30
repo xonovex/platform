@@ -38,10 +38,6 @@ tasks:
       XONOVEX_LINT_MODE: enforce
     options:
       cache: false
-      # The command surface still names the plan-prefixed operations while the
-      # skill catalog now registers the renamed ones, so the delegation
-      # contract only closes once the command packages are migrated.
-      runInCI: false
   format:
     command: noop
     deps: [command-format]
@@ -57,7 +53,7 @@ tasks:
       mergeDeps: append
   ci-check:
     command: echo 'ci-check complete'
-    deps: [build, format-check]
+    deps: [build, command-validate, format-check]
     options:
       cache: false
       # Replacing args keeps the command single when a project inherits two

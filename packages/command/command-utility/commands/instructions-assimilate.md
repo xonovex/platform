@@ -15,7 +15,7 @@ argument-hint: >-
   [--percentage <percent>] [--interactive] [--dry-run]
 ---
 
-# /xonovex-utility:instructions-assimilate — Augment Project Instructions
+# /xonovex-utility:instructions-assimilate - Augment Project Instructions
 
 ## Arguments
 
@@ -30,4 +30,4 @@ argument-hint: >-
 
 Load the `instruction-guide` skill (plugin `xonovex-skill-instruction`) and perform its
 **merge** operation with these arguments. The skill is the source of truth for the
-procedure, output format, and gotchas — do not restate them.
+procedure, output format, and gotchas. Do not restate them.

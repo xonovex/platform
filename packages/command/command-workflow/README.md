@@ -23,7 +23,7 @@ codex plugin add xonovex-workflow@xonovex-marketplace
 Each command delegates its procedure to a guideline skill, declared in `plugin.json`
 `dependencies`. On Claude Code, installing this plugin auto-installs those skills; if a
 depended-on skill is missing the command is disabled with `dependency-unsatisfied`. On
-Codex, `dependencies` is not auto-installed — install the delegated skill plugins
+Codex, `dependencies` is not auto-installed. Install the delegated skill plugins
 alongside this one.
 
 ```
@@ -66,7 +66,7 @@ Learning: reflect-to-instructions / reflect-to-skill fold learnings into guideli
 | Command                 | Description                                                                                |
 | ----------------------- | ------------------------------------------------------------------------------------------ |
 | `plan-research`         | Research codebase + web, or run a read-only code-quality audit (harden / simplify / align) |
-| `plan-decide`           | Settle decisions one at a time — walk known open ones, or discover them by questioning     |
+| `plan-decide`           | Settle decisions one at a time: walk known open ones, or discover them by questioning      |
 | `plan-create`           | Create a high-level plan for user review (test-first plans route to tdd / bdd guides)      |
 | `plan-revise`           | Apply annotations and prompt feedback to the plan                                          |
 | `plan-critique`         | Adversarially stress-test a plan to expose weaknesses                                      |

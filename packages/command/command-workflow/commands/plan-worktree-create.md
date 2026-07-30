@@ -8,7 +8,7 @@ allowed-tools:
 argument-hint: "[feature-name] [--from <branch>]"
 ---
 
-# /xonovex-workflow:plan-worktree-create — Create Feature Worktree
+# /xonovex-workflow:plan-worktree-create - Create Feature Worktree
 
 ## Arguments
 
@@ -21,4 +21,4 @@ argument-hint: "[feature-name] [--from <branch>]"
 
 Load the `git-guide` skill (plugin `xonovex-skill-git`) and perform its
 **worktree-create** operation with these arguments. The skill is the source of truth
-for the procedure, output format, and gotchas — do not restate them.
+for the procedure, output format, and gotchas. Do not restate them.

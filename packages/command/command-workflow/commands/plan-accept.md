@@ -1,5 +1,5 @@
 ---
-description: "Draft: approve a plan for execution — set status: approved after a final sanity check"
+description: "Draft: approve a plan for execution, setting status approved after a final sanity check"
 allowed-tools:
   - Read
   - Edit
@@ -10,7 +10,7 @@ allowed-tools:
 argument-hint: "[plan-file]"
 ---
 
-# /xonovex-workflow:plan-accept — Approve a Plan
+# /xonovex-workflow:plan-accept - Approve a Plan
 
 > Lifecycle: research → decide → create → revise ⇄ critique → **accept** → subplans-create → continue → update → validate
 
@@ -21,5 +21,5 @@ argument-hint: "[plan-file]"
 ## Delegation
 
 Load the `plan-guide` skill (plugin `xonovex-skill-plan`) and perform its
-**plan-accept** operation with these arguments. The skill is the source of truth for
-the procedure, output format, and gotchas — do not restate them.
+**accept** operation with these arguments. The skill is the source of truth for
+the procedure, output format, and gotchas. Do not restate them.

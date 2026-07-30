@@ -13,7 +13,7 @@ allowed-tools:
 argument-hint: "[--dry-run] [--path <directory>]"
 ---
 
-# /xonovex-utility:instructions-consolidate — Consolidate project instruction files
+# /xonovex-utility:instructions-consolidate - Consolidate project instruction files
 
 ## Arguments
 
@@ -24,4 +24,4 @@ argument-hint: "[--dry-run] [--path <directory>]"
 
 Load the `instruction-guide` skill (plugin `xonovex-skill-instruction`) and perform its
 **consolidate** operation with these arguments. The skill is the source of truth for the
-procedure, output format, and gotchas — do not restate them.
+procedure, output format, and gotchas. Do not restate them.

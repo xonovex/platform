@@ -1,13 +1,15 @@
 {
   "name": "@xonovex/command-utility",
   "version": "5.1.0",
+  "description": "Xonovex utility commands: skills, instructions, reflect, content, versioning",
   "private": true,
   "dependencies": {
     "@xonovex/skill-command": "5.1.0",
     "@xonovex/skill-content": "5.1.0",
     "@xonovex/skill-instruction": "5.1.0",
     "@xonovex/skill-reflect": "5.1.0",
-    "@xonovex/skill-skill": "5.1.0"
+    "@xonovex/skill-skill": "5.1.0",
+    "@xonovex/skill-versioning": "5.1.0"
   },
   "keywords": [
     "xonovex",

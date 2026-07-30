@@ -15,7 +15,7 @@ allowed-tools:
 argument-hint: "[document-path]"
 ---
 
-# /xonovex-workflow:plan-continue — Continue Progress from Plan
+# /xonovex-workflow:plan-continue - Continue Progress from Plan
 
 > Lifecycle: research → decide → create → revise ⇄ critique → accept → subplans-create → **continue** → update → validate
 
@@ -31,5 +31,5 @@ argument-hint: "[document-path]"
 ## Delegation
 
 Load the `plan-guide` skill (plugin `xonovex-skill-plan`) and perform its
-**plan-continue** operation with these arguments. The skill is the source of truth for
-the procedure, output format, and gotchas — do not restate them.
+**continue** operation with these arguments. The skill is the source of truth for
+the procedure, output format, and gotchas. Do not restate them.

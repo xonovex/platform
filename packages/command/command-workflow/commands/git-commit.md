@@ -9,7 +9,7 @@ argument-hint: >-
   [--remote <remote>] [--branch <branch>] [--push] [--dry-run] [--interactive]
 ---
 
-# /xonovex-workflow:git-commit — Auto-Commit with Smart Messages
+# /xonovex-workflow:git-commit - Auto-Commit with Smart Messages
 
 ## Arguments
 
@@ -28,4 +28,4 @@ argument-hint: >-
 
 Load the `git-guide` skill (plugin `xonovex-skill-git`) and perform its **commit**
 operation with these arguments. The skill is the source of truth for the procedure,
-output format, and gotchas — do not restate them.
+output format, and gotchas. Do not restate them.

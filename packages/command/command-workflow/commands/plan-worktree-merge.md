@@ -6,7 +6,7 @@ allowed-tools:
 argument-hint: "[--squash] [--remove-worktree] [--delete-remote] [--dry-run]"
 ---
 
-# /xonovex-workflow:plan-worktree-merge — Merge Feature Worktree Back to Source
+# /xonovex-workflow:plan-worktree-merge - Merge Feature Worktree Back to Source
 
 ## Arguments
 
@@ -21,4 +21,4 @@ argument-hint: "[--squash] [--remove-worktree] [--delete-remote] [--dry-run]"
 
 Load the `git-guide` skill (plugin `xonovex-skill-git`) and perform its
 **worktree-merge** operation with these arguments. The skill is the source of truth
-for the procedure, output format, and gotchas — do not restate them.
+for the procedure, output format, and gotchas. Do not restate them.

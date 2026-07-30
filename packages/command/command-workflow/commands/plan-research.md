@@ -15,7 +15,7 @@ allowed-tools:
 argument-hint: "<requirements> [--interactive] [--save-to <file>]"
 ---
 
-# /xonovex-workflow:plan-research — Research Codebase and Web
+# /xonovex-workflow:plan-research - Research Codebase and Web
 
 > Lifecycle: **research** → decide → create → revise ⇄ critique → accept → subplans-create → continue → update → validate
 
@@ -28,5 +28,5 @@ argument-hint: "<requirements> [--interactive] [--save-to <file>]"
 ## Delegation
 
 Load the `plan-guide` skill (plugin `xonovex-skill-plan`) and perform its
-**plan-research** operation with these arguments. The skill is the source of truth for
-the procedure, output format, and gotchas — do not restate them.
+**research** operation with these arguments. The skill is the source of truth for
+the procedure, output format, and gotchas. Do not restate them.

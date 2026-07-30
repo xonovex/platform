@@ -11,7 +11,7 @@ allowed-tools:
 argument-hint: "[parent-plan-file] [--by-phase] [--dry-run]"
 ---
 
-# /xonovex-workflow:plan-subplans-create — Generate Detailed Subplans from Parent Plan
+# /xonovex-workflow:plan-subplans-create - Generate Detailed Subplans from Parent Plan
 
 > Lifecycle: research → decide → create → revise ⇄ critique → accept → **subplans-create** → continue → update → validate
 
@@ -24,5 +24,5 @@ argument-hint: "[parent-plan-file] [--by-phase] [--dry-run]"
 ## Delegation
 
 Load the `plan-guide` skill (plugin `xonovex-skill-plan`) and perform its
-**plan-subplans-create** operation with these arguments. The skill is the source of
-truth for the procedure, output format, and gotchas — do not restate them.
+**expand** operation with these arguments. The skill is the source of
+truth for the procedure, output format, and gotchas. Do not restate them.

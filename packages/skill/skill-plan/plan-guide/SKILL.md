@@ -68,9 +68,12 @@ Research and Update have no generic counterpart; a caller asks for them by name.
 
 - Read [references/research.md](references/research.md) - Load when researching codebase and external evidence explicitly for a future plan
 - Read [references/create.md](references/create.md) - Load when authoring a high-level implementation plan from explicit inputs
+- Read [references/decide.md](references/decide.md) - Load when settling an open decision before or after a plan exists
 - Read [references/critique.md](references/critique.md) - Load when independently stress-testing an exact plan without changing it
 - Read [references/revise.md](references/revise.md) - Load when applying explicit feedback or annotations to a plan
 - Read [references/expand.md](references/expand.md) - Load when expanding a parent plan into detailed child plans
+- Read [references/accept.md](references/accept.md) - Load when approving a plan for execution
+- Read [references/reject.md](references/reject.md) - Load when rejecting a plan and recording why
 - Read [references/continue.md](references/continue.md) - Load when resuming implementation from an existing plan
 - Read [references/delegate.md](references/delegate.md) - Load when supervising a roadmap's execution by handing each item to an implementation agent and verifying the result
 - Read [references/update.md](references/update.md) - Load when refreshing a plan with current progress and validation evidence

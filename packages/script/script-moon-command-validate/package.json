@@ -1,12 +1,13 @@
 {
   "name": "@xonovex/script-moon-command-validate",
-  "version": "5.0.0",
+  "version": "0.0.0",
   "private": true,
   "type": "module",
   "bin": {
     "moon-command-validate": "./dist/src/index.js"
   },
   "dependencies": {
+    "@xonovex/script-moon-common": "0.0.0",
     "yaml": "^2.9.0"
   },
   "keywords": [
@@ -14,8 +15,5 @@
     "script",
     "moon",
     "command"
-  ],
-  "devDependencies": {
-    "@xonovex/vitest-config-node": "0.1.22"
-  }
+  ]
 }

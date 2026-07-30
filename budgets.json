@@ -375,7 +375,7 @@
   "packages/skill/skill-pi/pi-guide/references/capabilities.md": 430,
   "packages/skill/skill-pi/pi-guide/references/onboarding.md": 267,
   "packages/skill/skill-pi/pi-guide/references/patterns.md": 203,
-  "packages/skill/skill-plan/plan-guide/SKILL.md": 754,
+  "packages/skill/skill-plan/plan-guide/SKILL.md": 790,
   "packages/skill/skill-plan/plan-guide/references/continue.md": 453,
   "packages/skill/skill-plan/plan-guide/references/create.md": 263,
   "packages/skill/skill-plan/plan-guide/references/critique.md": 267,
@@ -554,5 +554,8 @@
   "packages/skill/skill-zod/zod-guide/references/migration-v4.md": 68,
   "packages/skill/skill-zod/zod-guide/references/schema-organization.md": 29,
   "packages/skill/skill-zod/zod-guide/references/validation-patterns.md": 25,
-  "packages/skill/skill-plan/plan-guide/references/delegate.md": 1015
+  "packages/skill/skill-plan/plan-guide/references/delegate.md": 1015,
+  "packages/skill/skill-plan/plan-guide/references/accept.md": 171,
+  "packages/skill/skill-plan/plan-guide/references/decide.md": 739,
+  "packages/skill/skill-plan/plan-guide/references/reject.md": 160
 }

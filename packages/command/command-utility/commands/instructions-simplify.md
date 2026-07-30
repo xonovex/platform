@@ -10,7 +10,7 @@ allowed-tools:
 argument-hint: "[instruction-file] [--dry-run] [--target-reduction <percent>]"
 ---
 
-# /xonovex-utility:instructions-simplify — Simplify project instruction files
+# /xonovex-utility:instructions-simplify - Simplify project instruction files
 
 ## Arguments
 
@@ -22,4 +22,4 @@ argument-hint: "[instruction-file] [--dry-run] [--target-reduction <percent>]"
 
 Load the `instruction-guide` skill (plugin `xonovex-skill-instruction`) and perform its
 **simplify** operation with these arguments. The skill is the source of truth for the
-procedure, output format, and gotchas — do not restate them.
+procedure, output format, and gotchas. Do not restate them.

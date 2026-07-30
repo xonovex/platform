@@ -15,7 +15,7 @@ argument-hint: >-
   <slug>]
 ---
 
-# /xonovex-utility:content-news-add — Auto-curate latest news stories
+# /xonovex-utility:content-news-add - Auto-curate latest news stories
 
 ## Arguments
 
@@ -30,4 +30,4 @@ argument-hint: >-
 
 Load the `content-guide` skill (plugin `xonovex-skill-content`) and perform its
 **news-add** operation with these arguments. The skill is the source of truth for the
-procedure, output format, and gotchas — do not restate them.
+procedure, output format, and gotchas. Do not restate them.

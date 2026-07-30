@@ -12,7 +12,7 @@ allowed-tools:
 argument-hint: "[spec-file-or-requirements] [--interactive] [--depends-on <plan>] [--dry-run]"
 ---
 
-# /xonovex-workflow:plan-create — Create Plan with Research
+# /xonovex-workflow:plan-create - Create Plan with Research
 
 > Lifecycle: research → decide → **create** → revise ⇄ critique → accept → subplans-create → continue → update → validate
 
@@ -26,5 +26,5 @@ argument-hint: "[spec-file-or-requirements] [--interactive] [--depends-on <plan>
 ## Delegation
 
 Load the `plan-guide` skill (plugin `xonovex-skill-plan`) and perform its
-**plan-create** operation with these arguments. The skill is the source of truth for
-the procedure, output format, and gotchas — do not restate them.
+**create** operation with these arguments. The skill is the source of truth for
+the procedure, output format, and gotchas. Do not restate them.

@@ -7,6 +7,7 @@ dependsOn:
   - skill-instruction
   - skill-reflect
   - skill-skill
+  - skill-versioning
 tasks:
   build:
     command: echo 'build complete'

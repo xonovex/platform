@@ -1,5 +1,5 @@
 ---
-description: "Pre-plan/draft: settle decisions one at a time — walk known open ones or discover them by questioning you"
+description: "Pre-plan/draft: settle decisions one at a time: walk known open ones or discover them by questioning you"
 allowed-tools:
   - Read
   - Glob
@@ -12,7 +12,7 @@ allowed-tools:
 argument-hint: "[topic-or-plan-file] [--save-to <file>]"
 ---
 
-# /xonovex-workflow:plan-decide — Settle Decisions One at a Time
+# /xonovex-workflow:plan-decide - Settle Decisions One at a Time
 
 > Lifecycle: research → **decide** → create → revise ⇄ critique → accept → subplans-create → continue → update → validate
 
@@ -23,11 +23,11 @@ argument-hint: "[topic-or-plan-file] [--save-to <file>]"
 
 ## Modes
 
-- **Walk** (open decisions are queued): present each known decision as a full brief — files involved, explanation, options with pros and cons, recommendation — one per message, recording your call before the next.
+- **Walk** (open decisions are queued): present each known decision as a full brief: files involved, explanation, options with pros and cons, recommendation, one per message, recording your call before the next.
 - **Discover** (nothing queued): surface unknown decisions by walking the design tree one question at a time, exploring the codebase to self-answer what it can, until shared understanding is reached.
 
 ## Delegation
 
 Load the `plan-guide` skill (plugin `xonovex-skill-plan`) and perform its
-**plan-decide** operation with these arguments. The skill is the source of truth for
-the procedure, output format, and gotchas — do not restate them.
+**decide** operation with these arguments. The skill is the source of truth for
+the procedure, output format, and gotchas. Do not restate them.

@@ -1,5 +1,7 @@
 ---
-description: Optimize a skill (or the whole catalog) to its delta over the weakest model — baseline-measure, tier-aware trim, validate.py gate, and ablation-restore of any essential fact lost
+description: >-
+  Optimize a skill or catalog to its delta over the weakest model through
+  baseline, scope, excise, gate, and ablation
 allowed-tools:
   - Read
   - Edit
@@ -10,10 +12,10 @@ allowed-tools:
   - TodoWrite
   - Task
   - Skill
-argument-hint: "[skill-file|--all] [--model <weakest>] [--tier auto|aggressive|moderate|conservative] [--dry-run] [--report-only]"
+argument-hint: "[skill-file|--all] [--model <weakest>] [--tier <tier>] [--dry-run] [--report-only]"
 ---
 
-# /xonovex-utility:skill-optimize — Trim a skill to its knowledge delta and verify
+# /xonovex-utility:skill-optimize - Trim a skill to its knowledge delta and verify
 
 ## Arguments
 
@@ -26,6 +28,6 @@ argument-hint: "[skill-file|--all] [--model <weakest>] [--tier auto|aggressive|m
 
 ## Delegation
 
-Load the `skill-guide` skill (plugin `xonovex-skill-skill`) and run its **optimize**
-operation end to end for the target(s), trimming and then ablation-verifying each. The
-skill is the source of truth for the procedure, tiers, and gotchas — do not restate them.
+Load the `skill-guide` skill (plugin `xonovex-skill-skill`) and perform its
+**optimize** operation with these arguments. The skill is the source of truth for the
+procedure, tiers, and gotchas. Do not restate them.
